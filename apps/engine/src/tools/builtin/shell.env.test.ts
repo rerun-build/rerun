@@ -10,6 +10,7 @@ const { describe, expect, it, vi } = await import('vitest')
 const { HostBreaker } = await import('../host-breaker.js')
 const { shellTools } = await import('./shell.js')
 const { agentConfigSchema } = await import('../../agents/types.js')
+const { writeSharedEnv } = await import('../../agents/shared-env.js')
 const { agentDataDbPath, sharedDbPath, workspaceDir } = await import('../../config/paths.js')
 
 type Runner = NonNullable<Parameters<typeof shellTools>[1]>
@@ -71,5 +72,25 @@ describe('shell_exec child environment', () => {
         expect(options.env).not.toHaveProperty('RERUN_DATA_DIR')
         expect(options.env?.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
         expect(options.env?.PATH).toBe(process.env.PATH)
+    })
+})
+
+describe('shell_exec output', () => {
+    async function runShell(agentEnv: Record<string, string>, run: Runner): Promise<string> {
+        const ctx = { agent: { id: 'env-agent', env: agentEnv, config: agentConfigSchema.parse({ name: 'env', tools: {} }) }, sessionId: 's', logger: { warn() {} }, hostBreaker: new HostBreaker() } as any
+        const result = await (shellTools(ctx, run).shell_exec as any).execute({ command: 'env', timeoutMs: 1000 }, { toolCallId: 'c', messages: [] })
+        return result
+    }
+
+    it('a shared or coworker secret in the output comes back redacted', async () => {
+        await writeSharedEnv({ GH_TOKEN: 'tok-shell-123456', EVEROS_URL: 'https://everos.example.com' })
+        const run = vi.fn<Runner>(async () => ({ stdout: 'a tok-shell-123456 b lin-secret-123 https://everos.example.com', stderr: '' }))
+        expect(await runShell({ LINEAR_API_KEY: 'lin-secret-123' }, run)).toBe('a [redacted] b [redacted] https://everos.example.com')
+    })
+
+    it('redacts a secret in the output of a failing command', async () => {
+        await writeSharedEnv({ GH_TOKEN: 'tok-shell-123456' })
+        const run = vi.fn<Runner>(async () => { throw Object.assign(new Error('exit 1'), { stdout: '', stderr: 'bad credentials tok-shell-123456' }) })
+        expect(await runShell({}, run)).toBe('Command failed: exit 1\n\nbad credentials [redacted]')
     })
 })

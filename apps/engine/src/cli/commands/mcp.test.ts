@@ -5,6 +5,7 @@ const state = vi.hoisted(() => ({
     env: { SECRET: 'x' } as Record<string, string>,
     events: [] as unknown[][],
     probes: {} as Record<string, unknown>,
+    writes: [] as unknown[][],
 }))
 
 vi.mock('../../agents/registry.js', () => ({
@@ -22,6 +23,23 @@ vi.mock('../../tools/mcp.js', () => ({
     },
 }))
 
+const configs: Record<string, unknown> = {}
+
+vi.mock('../../agents/loader.js', async () => ({
+    listAgentIdsOnDisk: async () => Object.keys(configs),
+    readAgentConfig: async (id: string) => configs[id],
+}))
+
+vi.mock('../../agents/config-write.js', async () => {
+    const actual = await vi.importActual<typeof import('../../agents/config-write.js')>('../../agents/config-write.js')
+    return {
+        ...actual,
+        writeAgentConfig: async (id: string, config: unknown) => {
+            state.writes.push([id, config])
+        },
+    }
+})
+
 vi.mock('../../tools/mcp-auth.js', () => ({
     deviceLogin: async (agentId: string, server: { name: string }, onPrompt: (start: { verificationUri: string }) => void) => {
         state.events.push(['deviceLogin', agentId, server.name])
@@ -35,6 +53,7 @@ vi.mock('../../tools/mcp-auth.js', () => ({
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const { mcpCommand } = await import('./mcp.js')
+const { mcpServerSchema } = await import('../../agents/types.js')
 
 let out = ''
 
@@ -42,6 +61,8 @@ beforeEach(() => {
     state.servers = []
     state.events = []
     state.probes = {}
+    state.writes = []
+    for (const id of Object.keys(configs)) delete configs[id]
     out = ''
     vi.spyOn(process.stdout, 'write').mockImplementation(chunk => {
         out += String(chunk)
@@ -113,7 +134,33 @@ describe('rerun mcp status', () => {
 
 describe('rerun mcp', () => {
     it('prints the usage for anything else', async () => {
-        await expect(mcpCommand([])).rejects.toThrow('Usage: rerun mcp <login|logout|status>')
-        await expect(mcpCommand(['add'])).rejects.toThrow('Usage: rerun mcp <login|logout|status>')
+        await expect(mcpCommand([])).rejects.toThrow('Usage: rerun mcp <login|logout|status|set-all>')
+        await expect(mcpCommand(['add'])).rejects.toThrow('Usage: rerun mcp <login|logout|status|set-all>')
+    })
+})
+
+describe('rerun mcp set-all', () => {
+    it('replaces the named server only on coworkers that have it', async () => {
+        const def = { name: 'everos', command: '/data/tools/bin/uv', args: ['run'], env: { EVEROS_TOKEN: '${EVEROS_TOKEN}' } }
+        configs.a1 = { name: 'a1', mcpServers: [mcpServerSchema.parse({ name: 'everos', command: '/data/tools/bin/everos-mcp' })] }
+        configs.a2 = { name: 'a2', mcpServers: [] }
+        await mcpCommand(['set-all', 'everos'], async () => JSON.stringify(def))
+        expect(state.writes).toEqual([['a1', { name: 'a1', mcpServers: [mcpServerSchema.parse(def)] }]])
+        expect(out).toBe('updated a1\n1 of 2 coworkers had everos; restart the engine so running coworkers pick it up.\n')
+    })
+
+    it('writes the same result when run again', async () => {
+        const def = { name: 'everos', command: '/data/tools/bin/uv' }
+        configs.a1 = { name: 'a1', mcpServers: [mcpServerSchema.parse(def)] }
+        await mcpCommand(['set-all', 'everos'], async () => JSON.stringify(def))
+        expect(state.writes).toEqual([['a1', { name: 'a1', mcpServers: [mcpServerSchema.parse(def)] }]])
+    })
+
+    it('refuses bad JSON, another name or a missing name and writes nothing', async () => {
+        configs.a1 = { name: 'a1', mcpServers: [] }
+        await expect(mcpCommand(['set-all', 'everos'], async () => '{"name":')).rejects.toThrow('nothing written')
+        await expect(mcpCommand(['set-all', 'everos'], async () => JSON.stringify({ name: 'other', command: 'x' }))).rejects.toThrow('nothing written')
+        await expect(mcpCommand(['set-all'], async () => '')).rejects.toThrow('Usage: rerun mcp set-all <server>')
+        expect(state.writes).toEqual([])
     })
 })

@@ -175,6 +175,7 @@ def measures(store, now, table=None):
     merged = []
     blocks = {k: 0 for k in BLOCK_STATES}
     escalated = escalated_merged = 0
+    in_window, ever = {}, {}
     for j in store.jobs():
         rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
         for t in rows:
@@ -185,22 +186,24 @@ def measures(store, now, table=None):
         if up:
             escalated += 1
             escalated_merged += j["state"] == "merged" and bool(into) and L.ts(into[-1]["at"]) >= L.ts(up[-1]["at"])
+        parent = None
+        if j["state"] == "merged" and str(j["issue"]).isdigit():
+            parent = cutshape.parse({"number": int(j["issue"]), "body": j.get("body")})["parent"]
+            if parent is not None:
+                ever[parent] = ever.get(parent, 0) + 1
         if j["state"] == "merged" and into and 0 <= now - L.ts(into[-1]["at"]) <= MEASURE_WINDOW_S:
             merged.append((str(j["issue"]), L.ts(into[-1]["at"]) - L.ts(rows[0]["at"]),
                            sum(1 for t in rows if t["to_state"] == "fix_wait")))
+            if parent is not None:
+                in_window[parent] = in_window.get(parent, 0) + 1
     n = len(merged)
     tokens = 0
-    parents = set()
     for job, _, _ in merged:
         row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", (job,)).fetchone()
         tokens += row[0]
-        found = store.get_job(job)
-        parent = cutshape.parse({"number": int(job), "body": found.get("body")})["parent"] if found and job.isdigit() else None
-        if parent is not None:
-            parents.add(parent)
-    for parent in sorted(parents):
+    for parent in sorted(in_window):
         row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", ("plan:%d" % parent,)).fetchone()
-        tokens += row[0]
+        tokens += row[0] * in_window[parent] / ever[parent]
     runs, units, _ = rework(store, weights.load() if table is None else table)
     return {"mergedPerHour": round(n / 24, 2), "leadTimeS": sum(m[1] for m in merged) / n if n else None,
             "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
@@ -213,18 +216,24 @@ def measures(store, now, table=None):
 
 def planners(store, now):
     jobs = []
-    for j in store.jobs():
-        rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
-        if not rows:
+    for r in store.db.execute("SELECT job, at FROM transitions WHERE id IN (SELECT MIN(id) FROM transitions WHERE from_state IS NOT to_state GROUP BY job)"):
+        if not 0 <= now - L.ts(r[1]) <= tokenstats.PLANNER_WINDOW_S:
             continue
+        j = store.get_job(r[0])
+        if j is None:
+            continue
+        rows = [t for t in store.transitions_of(r[0]) if t["from_state"] != t["to_state"]]
         parent = cutshape.parse({"number": int(j["issue"]), "body": j.get("body")})["parent"] if str(j["issue"]).isdigit() else None
         jobs.append({"parent": parent, "first": L.ts(rows[0]["at"]), "states": [t["to_state"] for t in rows],
                      "state": j["state"], "replans": j.get("replans") or 0})
+    keys = sorted({"plan:%d" % j["parent"] for j in jobs if j["parent"] is not None})
     fires = []
-    for r in store.db.execute("SELECT job, coworker, intent_at FROM fires WHERE stage='plan' AND job LIKE 'plan:%'"):
-        number = r[0].split(":", 1)[1]
-        if number.isdigit():
-            fires.append({"parent": int(number), "coworker": r[1], "at": L.ts(r[2])})
+    if keys:
+        marks = ",".join("?" * len(keys))
+        for r in store.db.execute("SELECT job, coworker, intent_at FROM fires WHERE stage='plan' AND job IN (%s)" % marks, keys):
+            number = r[0].split(":", 1)[1]
+            if number.isdigit():
+                fires.append({"parent": int(number), "coworker": r[1], "at": L.ts(r[2])})
     return tokenstats.planners(jobs, fires, now)
 
 
