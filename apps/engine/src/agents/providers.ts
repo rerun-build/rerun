@@ -252,11 +252,13 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 //
 // `sessionId` is what an OpenCode request names its conversation by: a one-shot call inside a run
 // (compaction, vision) passes the run's own, the others one of their own making.
-export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string }
+//
+// `readOnly` is a check-in: Codex runs its own shell in a sandbox that writes nowhere.
+export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; readOnly?: boolean }
 
 // What a run hands its model beyond the tools: the prompt and the screenshots for the CLIs, the
 // conversation for OpenCode.
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; onClaudeCompaction?: (compaction: ClaudeCompaction) => void }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; readOnly?: boolean; onClaudeCompaction?: (compaction: ClaudeCompaction) => void }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -365,7 +367,7 @@ function codexAppServerProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers:
         defaultSettings: {
             ...codexShared(agent),
             approvalPolicy: 'never',
-            sandboxPolicy: 'danger-full-access',
+            sandboxPolicy: options.readOnly ? 'read-only' : 'danger-full-access',
             autoApprove: true,
             // A thread written to disk, so the next message can resume it: the run passes its id
             // back (see `codexThreadToResume`), and Codex keys OpenAI's prompt cache on it.
@@ -462,7 +464,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, onClaudeCompaction }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, readOnly, onClaudeCompaction }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     // `wrapLanguageModel` runs the list from the end: the guard sits nearest the model, so no other
     // middleware ever reads a fake tool call, the card tags go next, and the quick replies read the
@@ -471,7 +473,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     const cardTags = createCardTagGuard(agent.id, provider)
     const guard = createFakeToolCallGuard(agent.id)
     if (provider === 'codex') {
-        const codex = codexAppServerProvider(agent, tools, mcpServers, { system })
+        const codex = codexAppServerProvider(agent, tools, mcpServers, { system, readOnly })
         return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
     }
     if (provider === 'claude') {

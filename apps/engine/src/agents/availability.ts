@@ -126,7 +126,7 @@ type Automation = { slug: string; connectionId: string | null; model: string | n
 
 // What a schedule or a trigger runs under. `warn` rather than `info` on the fallback: a connection
 // swapped without anyone asking changes both the bill and the quality of the answer.
-export async function automationModel(agent: LoadedAgent, automation: Automation, source: 'schedule' | 'trigger'): Promise<ModelOverride> {
+export async function automationModel(agent: LoadedAgent, automation: Automation, source: 'schedule' | 'trigger' | 'checkin'): Promise<ModelOverride> {
     const requested = automation.model ? { connectionId: automation.connectionId ?? undefined, model: automation.model } : undefined
     const resolved = await resolveAutomationModel(agent, requested)
     const asked = `${requested?.connectionId ?? agent.resolved.connection?.id ?? 'none'}:${requested?.model ?? agent.resolved.model}`

@@ -35,6 +35,10 @@ export const ENGINE_CAPABILITY_FOREMAN_FILES = 'foreman.files'
 // answer: the hub shows its coworker card only to a box that says so.
 export const ENGINE_CAPABILITY_FOREMAN_COWORKER = 'foreman.coworker'
 
+// The Chief of Staff wakes on its own (check-ins): its switch, its model and its log answer on
+// `/agents/foreman/checkins`. A hub shows their settings only to a box that says so.
+export const ENGINE_CAPABILITY_FOREMAN_CHECKINS = 'foreman.checkins'
+
 // The box has a window manager and a VNC server, so its screen can be watched and driven.
 export const ENGINE_CAPABILITY_DESKTOP = 'desktop'
 

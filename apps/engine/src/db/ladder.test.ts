@@ -112,6 +112,10 @@ describe('sqlite ladders', () => {
               6,
               "members",
             ],
+            [
+              7,
+              "run-checkin",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -287,6 +291,18 @@ describe('system.db v5 to v6', () => {
         await client.execute("INSERT INTO members (id, timezone, first_seen_at, last_seen_at) VALUES ('u1', 'Europe/Paris', '2026-11-19T00:00:00.000Z', '2026-11-19T00:00:00.000Z')")
         expect(await columns(client, 'members')).toEqual(['id', 'name', 'timezone', 'first_seen_at', 'last_seen_at'])
         expect((await client.execute('SELECT count(*) AS n FROM remote_jobs')).rows[0].n).toBe(1)
+    })
+})
+
+describe('system.db v6 to v7', () => {
+    it('adds the check-in log of a run, leaves the runs already there without one, and replays without harm', async () => {
+        const client = freshFile('v6-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 6), 'v6-system.db')
+        await client.execute("INSERT INTO runs (id, agent_id, session_id, status, started_at) VALUES ('r1', 'foreman', 's1', 'done', '2026-11-18T00:00:00.000Z')")
+        await migrateSystemDb(client, 'v6-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[6].up(client)
+        expect((await client.execute('SELECT id, checkin_json FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', checkin_json: null }])
     })
 })
 

@@ -16,6 +16,8 @@ const schema = z.object({
     RERUN_DESKTOP: z.string().optional(),
     // `on` accepts linked computers on this box ahead of the release, `off` refuses them after.
     RERUN_REMOTE_COMPUTERS: z.string().optional(),
+    // `off` stops every check-in of the Chief of Staff on this box, whatever its own switch says.
+    RERUN_FOREMAN_CHECKINS: z.string().optional(),
 })
 
 export type Env = z.infer<typeof schema>
@@ -48,4 +50,9 @@ export function desktopEnabled(): boolean {
 // `RERUN_REMOTE_COMPUTERS=off` refuses the computers' socket and offers no `remote_*` tool.
 export function remoteComputersEnabled(): boolean {
     return env().RERUN_REMOTE_COMPUTERS !== 'off'
+}
+
+// The emergency stop of the Chief of Staff's check-ins, above the switch each workspace has.
+export function checkinsEnabled(): boolean {
+    return env().RERUN_FOREMAN_CHECKINS !== 'off'
 }

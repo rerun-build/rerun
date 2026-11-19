@@ -142,6 +142,16 @@ export function isSetupAnswered(setup: { required: boolean | null; prompt: strin
     return setup.required === false || (setup.required === true && setup.prompt.trim().length > 0)
 }
 
+// The Chief of Staff's check-ins: it wakes on its own, reads the workspace and only ever suggests.
+// On for every workspace until an admin switches it off. `connectionId` and `model` pin what a
+// check-in runs on; null runs it on the workspace's default model. Only the foreman reads it.
+export const proactiveSchema = z.object({
+    enabled: z.boolean().default(true),
+    connectionId: z.string().nullable().default(null),
+    model: z.string().nullable().default(null),
+})
+export type Proactive = z.infer<typeof proactiveSchema>
+
 export const agentConfigSchema = z.object({
     name: z.string(),
     // `foreman` is the one built-in agent each engine writes for itself at boot. Never settable
@@ -178,6 +188,7 @@ export const agentConfigSchema = z.object({
     // Set when the user picks "Always allow" on a spend approval: paid data then runs without asking
     // again, which is what lets a delegate spend credit with nobody watching.
     paidDataAlwaysAllow: z.boolean().default(false),
+    proactive: proactiveSchema.prefault({}),
 })
 export type AgentConfig = z.infer<typeof agentConfigSchema>
 

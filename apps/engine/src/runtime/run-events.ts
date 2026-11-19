@@ -1,6 +1,8 @@
 import { sendNotification, type NotificationEvent, type NotificationKind } from './notify.js'
 import type { RunErrorCode } from './provider-errors.js'
 import type { RunTrigger } from './context.js'
+import { settleCheckin } from '../checkins/settle.js'
+import { parseCheckinLog } from '../checkins/log.js'
 
 const FINAL_TEXT_MAX = 2000
 
@@ -27,7 +29,8 @@ export type RunTerminal = {
 
 // A stored run only keeps the trigger's slug, not its display name; the slug is the best label
 // available when the terminal event is rebuilt outside the run loop.
-export function triggerFromRun(run: { triggerSource: string | null; triggerSlug: string | null }): RunTrigger {
+export function triggerFromRun(run: { triggerSource: string | null; triggerSlug: string | null; checkinJson?: string | null }): RunTrigger {
+    if (run.triggerSource === 'checkin') return { source: 'checkin', slug: run.triggerSlug ?? '', name: run.triggerSlug ?? 'checkin', reason: parseCheckinLog(run.checkinJson)?.reason ?? 'manual' }
     if (run.triggerSource === 'schedule') return { source: 'schedule', slug: run.triggerSlug ?? '', name: run.triggerSlug ?? 'schedule' }
     if (run.triggerSource === 'trigger') return { source: 'trigger', slug: run.triggerSlug ?? '', name: run.triggerSlug ?? 'trigger' }
     return { source: 'chat' }
@@ -57,6 +60,8 @@ function describe(terminal: RunTerminal): { event: NotificationEvent; message: s
 // The one place a run announces it is over. Every terminal path goes through it: the run loop's
 // settle, the cancel route when it finds an orphan, and the boot reconciliation.
 export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
+    // A check-in announces nothing of its own: see `checkins/settle.ts`.
+    if (terminal.trigger.source === 'checkin') return settleCheckin(terminal)
     const { event, message } = describe(terminal)
     const { trigger } = terminal
     const metadata: Record<string, unknown> = {

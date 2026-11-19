@@ -6,6 +6,7 @@ import { dispatchForemanHubTool } from '@/app/api/_services/foreman-hub.service'
 import { dispatchHubTool } from '@/app/api/_services/services.service'
 import { dispatchTeamHubTool, isTeamHubTool } from '@/app/api/_services/team-hub.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { FOREMAN_READ_TOOL_NAMES } from '@/lib/foreman/engine-brief'
 import { foremanHubTokenRequired, verifyForemanHubToken } from '@/lib/foreman/hub-token'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -34,11 +35,14 @@ export async function POST(req: Request): Promise<Response> {
     // The person the foreman's turn speaks for, from its signed token: their access, not the
     // workspace's. A token without one (minted before, or no token at all) acts as the workspace.
     let foremanActor: Actor = workspaceActor(engine.workspaceId)
+    // A check-in's token: only the tools that read pass, whoever it speaks for.
+    let readOnly = false
     if (isForeman) {
         const foremanToken = req.headers.get(FOREMAN_HUB_TOKEN_HEADER)
         if (foremanToken) {
             const claims = verifyForemanHubToken(foremanToken, engine.workspaceId)
             if (!claims) return new Response('Invalid foreman token', { status: 403 })
+            readOnly = claims.scope === 'read'
             if (claims.uid) {
                 const member = await memberActor(engine.workspaceId, claims.uid)
                 if (!member) return new Response('The member this foreman speaks for has left the workspace', { status: 403 })
@@ -64,6 +68,7 @@ export async function POST(req: Request): Promise<Response> {
     const tool = typeof body.tool === 'string' ? body.tool : ''
     const args = (body.args ?? {}) as Record<string, unknown>
     if (!tool) return new Response('Missing tool', { status: 400 })
+    if (readOnly && !FOREMAN_READ_TOOL_NAMES.has(tool)) return new Response('A check-in only reads', { status: 403 })
 
     try {
         const out = !agent

@@ -291,6 +291,41 @@ async function ownStateSections(agent: LoadedAgent, provider: Provider, heldBack
 const unattendedSection = (trigger: RunTrigger, cfg: LoadedAgent['config']['tools']) =>
     (trigger.source === 'schedule' || trigger.source === 'trigger') && (cfg.askUser || cfg.requestApproval) ? section('unattended_run', unattendedRunNote(trigger.source === 'schedule' ? 'a scheduled routine' : 'an incoming webhook call')) : ''
 
+const checkinEnvironmentNote = (foremanId: string) =>
+    `You run on the workspace's own server. Your own workspace is ${workspaceDir(foremanId)}, where your fs_ tools are rooted; your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker reads and writes; each coworker's own files are read with the agent_files_ tools, passing its handle. In a check-in every one of those only reads.`
+
+const CHECKIN_OPERATING_NOTES =
+    'This run is a check-in: you woke up on your own and nobody is reading as you work. Every tool you hold here reads: there is no shell, no sub-coworker, no call to a coworker, no card that asks someone, and nothing that creates, changes, sends or deletes anything. Do not try to work around that, and never say you did something you could only suggest. Read only what your decision needs, and keep the run short.'
+
+// A check-in reads and suggests. What it may not do is left out of its prompt as it is out of its
+// tools: no asking, no delegating, no files to show, no services of its own.
+async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promise<SystemPrompt> {
+    const cfg = agent.config.tools
+    const [own, sharedDbSchema, brain] = await Promise.all([
+        ownStateSections(agent, provider, Promise.resolve(undefined)),
+        cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
+        cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
+    ])
+    const stable = [
+        section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
+        section('vocabulary', VOCABULARY_NOTE),
+        section('environment', checkinEnvironmentNote(agent.id)),
+        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
+        section('operating_notes', CHECKIN_OPERATING_NOTES),
+        offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
+        section('verbosity', verbosityNote(agent.config.verbosity, false)),
+    ]
+    const volatile = [
+        own.skills,
+        own.schedules,
+        section('company_brain', brain),
+        own.memory,
+        cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes. You read it here with shared_db_query and shared_db_schema.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
+        section('current_time', currentTimeNote()),
+    ]
+    return { stable: joinSections(stable), volatile: joinSections(volatile) }
+}
+
 // The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
 // on the box and the runtime it is on, then what it keeps of its own like any coworker: its skills,
 // its memory, its routines and the services connected to it.
@@ -341,7 +376,7 @@ export async function buildSystemPrompt(
     // The MCP tools this run does not send to the model, known once its servers answered.
     heldBackMcp: Promise<McpCatalogEntry[] | undefined> = Promise.resolve(undefined),
 ): Promise<SystemPrompt> {
-    if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, trigger, provider, order, heldBackMcp)
+    if (agent.config.kind === 'foreman') return trigger.source === 'checkin' ? await buildCheckinPrompt(agent, provider) : await buildForemanPrompt(agent, trigger, provider, order, heldBackMcp)
     const cfg = agent.config.tools
     const [own, dbSchema, sharedDbSchema, brain] = await Promise.all([
         ownStateSections(agent, provider, heldBackMcp),

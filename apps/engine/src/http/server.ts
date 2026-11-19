@@ -7,6 +7,7 @@ import { healthRoutes } from './routes/health.js'
 import { agentRoutes } from './routes/agents.js'
 import { connectionRoutes } from './routes/connections.js'
 import { chatRoutes } from './routes/chat.js'
+import { checkinRoutes } from './routes/checkins.js'
 import { sessionRoutes } from './routes/sessions.js'
 import { memoryRoutes } from './routes/memories.js'
 import { createDataRouter } from './routes/data.js'
@@ -73,6 +74,7 @@ export function createServer(): Hono {
     api.route('/agents/:id/schedules', scheduleRoutes)
     api.route('/agents/:id/triggers', triggerRoutes)
     api.route('/agents/:id/runs', runRoutes)
+    api.route('/agents/:id/checkins', checkinRoutes)
     api.route('/agents/:id/usage', usageRoutes)
     api.route('/agents/:id/stats', statsRoutes)
     api.route(

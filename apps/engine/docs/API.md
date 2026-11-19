@@ -38,7 +38,8 @@ are open:
 - `GET` itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`,
   `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
   `/runs/:rid/tasks/:taskId/cancel`;
-- a `PATCH` that only carries `connectionId`, `provider` and `model`;
+- a `PATCH` that only carries `connectionId`, `provider`, `model` and `proactive`;
+- `POST /checkins/run`, a check-in now (see [Check-ins](#check-ins));
 - what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
   `/skill-proposals` and `/schedules`, `PATCH /mcp-servers`, `GET /mcp-servers/status`,
   `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
@@ -77,7 +78,7 @@ version the folder is at against the one this build takes it to.
   the conversations holding a run (the two should move together), `desktopViewers` the open screen
   connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
-  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
+  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), and `desktop`
   only when the desktop packages are installed.
@@ -1438,6 +1439,36 @@ conversation does not stay "working".
 
 Stops one sub-agent of a `delegate_tasks` call, by the task id the stream announced; the run
 carries on. `{ "ok": true, "aborted": true }`.
+
+### Check-ins
+
+A check-in is a run of the Chief of Staff that nobody started: it wakes on its own, reads the
+workspace and only suggests. Its run has `triggerSource: "checkin"` and a `checkinJson` that says
+why it woke (`reason`: `pulse`, `promise` or `manual`) and what it concluded (`note`). Its session
+has the `schedule` source and is announced to nobody.
+
+It runs on the brief the app returns to `POST {RERUN_HUB_BASE_URL}/api/foreman/checkin-brief`
+(`{ "reason": "pulse" }`, with the engine key): instructions, the hub tools that read, and a token
+the hub only accepts for those, for an hour. When the app has no such route or does not answer, it
+runs on a charter written in the engine, with no hub tool.
+
+Its tools only read: `fs_`, `shared_` and `agent_files_` `read`, `list` and `search`, `web_search`
+and `web_fetch`, `memory_recall`, `skill_list`, `skill_read` and `skill_read_file`, `brain_search`,
+`brain_read` and `brain_proposals`, `schedule_list` and `schedule_get`, `shared_db_query` and
+`shared_db_schema`, `tool_result_read` for a result cut at 40,000 characters, plus the hub tools of its brief. No shell, no sub-agent, no call to a coworker,
+no browser or computer, no card that asks someone, no write and no MCP server. On Claude and Codex
+the CLI starts none of its own servers, and Codex runs its shell in its `read-only` sandbox. A check-in
+proposes no skill and runs no curator.
+
+Its settings are `proactive` in the foreman's configuration, kept across boots:
+`{ "enabled": true, "connectionId": null, "model": null }`. `enabled: false` stops every check-in;
+`connectionId` and `model` pin what they run on, `null` runs them on the foreman's own model.
+`RERUN_FOREMAN_CHECKINS=off` stops them on the whole engine, whatever the setting says.
+
+#### `POST /agents/foreman/checkins/run`
+
+Starts a check-in now. `202 { "runId", "sessionId" }`, the one already running when there is one.
+`403` (`checkins_disabled`) when they are switched off. Any other agent answers `404`.
 
 ---
 

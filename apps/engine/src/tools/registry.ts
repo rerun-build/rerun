@@ -41,8 +41,63 @@ import { remoteComputerTools } from './builtin/remote.js'
 import { remoteComputersEnabled } from '../config/env.js'
 import { readComputers } from '../remote/store.js'
 
+// What a check-in of the Chief of Staff may call: it reads the workspace and suggests, nothing more.
+// A list of names rather than of families, so a tool added to a family later is refused until it is
+// named here. Shell, sub-coworkers, calls to coworkers, the browser and the computers, the cards that
+// ask someone, every write and the MCP servers stay out.
+export const CHECKIN_TOOL_NAMES: ReadonlySet<string> = new Set([
+    'fs_read',
+    'fs_list',
+    'fs_search',
+    'shared_read',
+    'shared_list',
+    'shared_search',
+    'agent_files_read',
+    'agent_files_list',
+    'agent_files_search',
+    'web_search',
+    'web_fetch',
+    'tool_result_read',
+    'memory_recall',
+    'skill_list',
+    'skill_read',
+    'skill_read_file',
+    'brain_search',
+    'brain_read',
+    'brain_proposals',
+    'schedule_list',
+    'schedule_get',
+    'shared_db_query',
+    'shared_db_schema',
+])
+
+// The hub tools of a check-in's brief are its own read-only ones, and the token it came with opens
+// nothing else on the hub. No board gesture: nobody is watching.
+function checkinTools(ctx: RunContext): ToolSet {
+    const cfg = ctx.agent.config.tools
+    const offered: ToolSet = {
+        ...filesystemTools(ctx),
+        ...sharedTools(ctx),
+        ...agentFilesTools(),
+        ...toolResultReadTool(ctx.agent.id),
+        ...(cfg.web ? webTools(ctx) : {}),
+        ...(cfg.memory ? memoryTools(ctx) : {}),
+        ...(cfg.skills ? skillTools(ctx) : {}),
+        ...(cfg.brain ? foremanBrainTools() : {}),
+        ...(cfg.schedule ? scheduleTools(ctx) : {}),
+        ...(cfg.sharedDb ? sharedDbTools(ctx) : {}),
+    }
+    if (CLI_PROVIDERS.has(ctx.provider)) delete offered.web_search
+    const tools = Object.fromEntries(Object.entries(offered).filter(([name]) => CHECKIN_TOOL_NAMES.has(name)))
+    const hubSpecs = new Set((ctx.agent.brief?.tools ?? []).filter(spec => spec.kind === 'hub').map(spec => spec.name))
+    for (const [name, hubTool] of Object.entries(foremanTools(ctx))) if (hubSpecs.has(name)) tools[name] = hubTool
+    return tools
+}
+
 // `heldBackMcp` lists the MCP tools the model is not sent, when the agent's set is too heavy to be.
 export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; heldBackMcp?: McpCatalogEntry[]; close: () => Promise<void> }> {
+    // Capped like any run: what a result leaves out is kept in its own workspace and read back from there.
+    if (ctx.readOnly) return { tools: ctx.agent.config.kind === 'foreman' ? capToolSet(checkinTools(ctx), ctx.agent.id) : {}, close: async () => closeAgentDb(ctx.agent.id) }
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
     if (ctx.agent.config.kind === 'foreman') Object.assign(tools, foremanTools(ctx), agentFilesTools())

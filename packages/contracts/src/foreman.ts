@@ -41,6 +41,16 @@ export const foremanBriefSchema = z.object({
 })
 export type ForemanBrief = z.infer<typeof foremanBriefSchema>
 
+// Why the Chief of Staff woke up: the daily pulse decided there was something to look at, a
+// routine it set itself to come back (a promise), or someone pressed "Check in now".
+export const CHECKIN_REASONS = ['pulse', 'promise', 'manual'] as const
+export const checkinReasonSchema = z.enum(CHECKIN_REASONS)
+export type CheckinReason = z.infer<typeof checkinReasonSchema>
+
+// POST /api/foreman/checkin-brief, from the box: the brief of a check-in. Its tools only read, and
+// its token only opens the hub tools that read.
+export const checkinBriefRequestSchema = z.object({ reason: checkinReasonSchema })
+
 // Which foreman the workspace talks to: the onboarding's on the hub, the everyday one on the engine, or
 // none at all for a workspace past its onboarding with no machine.
 export const foremanSurfaceSchema = z.enum(['onboarding', 'engine', 'none'])

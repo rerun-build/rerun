@@ -1,6 +1,7 @@
+import { createHmac } from 'crypto'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREMAN_HUB_TOKEN_TTL_MS, foremanHubTokenRequired, mintForemanHubToken, verifyForemanHubToken } from './hub-token'
+import { FOREMAN_CHECKIN_TOKEN_TTL_MS, FOREMAN_HUB_TOKEN_TTL_MS, foremanHubTokenRequired, mintForemanHubToken, verifyForemanHubToken } from './hub-token'
 
 const WORKSPACE_ID = 42
 
@@ -75,5 +76,17 @@ describe('foreman hub token', () => {
     it('carries the member the turn speaks for, and none for a workspace token', () => {
         expect(verifyForemanHubToken(mintForemanHubToken(WORKSPACE_ID, 'user-7'), WORKSPACE_ID)?.uid).toBe('user-7')
         expect(verifyForemanHubToken(mintForemanHubToken(WORKSPACE_ID), WORKSPACE_ID)?.uid).toBeUndefined()
+    })
+    it('mints a check-in token that only reads and lives an hour', () => {
+        const token = mintForemanHubToken(WORKSPACE_ID, null, Date.now(), 'read')
+        expect(verifyForemanHubToken(token, WORKSPACE_ID)).toEqual({ ws: WORKSPACE_ID, scope: 'read', exp: Date.now() + FOREMAN_CHECKIN_TOKEN_TTL_MS })
+        vi.advanceTimersByTime(FOREMAN_CHECKIN_TOKEN_TTL_MS + 1)
+        expect(verifyForemanHubToken(token, WORKSPACE_ID)).toBeNull()
+    })
+
+    it('refuses a token naming a scope this hub does not know, rather than opening everything', () => {
+        const payload = Buffer.from(JSON.stringify({ ws: WORKSPACE_ID, scope: 'admin', exp: Date.now() + 60_000 })).toString('base64url')
+        const signed = `${payload}.${createHmac('sha256', 'test-secret').update(payload).digest('base64url')}`
+        expect(verifyForemanHubToken(signed, WORKSPACE_ID)).toBeNull()
     })
 })

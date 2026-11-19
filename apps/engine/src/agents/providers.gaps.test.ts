@@ -337,6 +337,12 @@ describe('resolveModel on the codex subscription', () => {
         await expect(resolved.close()).resolves.toBeUndefined()
     })
 
+    it('runs its own shell with full access in a conversation, and in a sandbox that writes nowhere in a check-in', () => {
+        resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }))
+        resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), undefined, undefined, [], { readOnly: true })
+        expect(codexAppServerCalls.map(call => call.defaultSettings.sandboxPolicy)).toEqual(['danger-full-access', 'read-only'])
+    })
+
     it('keeps the web search off for an agent without the web', () => {
         const agent = agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' })
         agent.config.tools.web = false

@@ -1,6 +1,7 @@
-import type { ForemanBrief, ForemanToolSpec } from '@rerun/contracts'
+import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contracts'
 
 import type { ForemanState } from './phase'
+import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
 import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
 
@@ -27,8 +28,43 @@ const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountTo
 
 export const FOREMAN_ENGINE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set(HUB_TOOL_DEFS.map(def => def.name))
 
+// What a check-in may call on the hub: reads, nothing that creates, changes, sends or runs anything.
+// Named one by one, so a tool added to the belt stays out of a check-in until someone puts it here.
+export const FOREMAN_READ_TOOL_NAMES: ReadonlySet<string> = new Set([
+    'list_spaces',
+    'list_agents',
+    'get_team_status',
+    'get_agent',
+    'list_ai_connections',
+    'list_skills',
+    'get_skill',
+    'read_skill_file',
+    'list_schedules',
+    'list_runs',
+    'get_run',
+    'list_triggers',
+    'search_connectors',
+    'list_agent_connectors',
+    'list_connectors',
+    'list_tables',
+    'db_query',
+    'list_space_tables',
+    'space_db_query',
+    'list_agent_shares',
+    'search_docs',
+])
+
 function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSpec {
     return { name: def.name, description: def.description, inputSchema: def.inputSchema as Record<string, unknown>, kind, serial: SERIAL_TOOL_NAMES.has(def.name) }
+}
+
+// The brief of a check-in: its charter, and only the hub tools that read. No board gesture: nobody
+// is watching.
+export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason): ForemanBrief {
+    return {
+        instructions: foremanCheckinInstructions(state, reason),
+        tools: HUB_TOOL_DEFS.filter(def => FOREMAN_READ_TOOL_NAMES.has(def.name)).map(def => spec(def, 'hub')),
+    }
 }
 
 export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } = {}): ForemanBrief {

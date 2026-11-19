@@ -42,6 +42,8 @@ export const runs = sqliteTable('runs', {
     model: text('model'),
     triggerSource: text('trigger_source'),
     triggerSlug: text('trigger_slug'),
+    // What a check-in of the Chief of Staff made of its run: see `checkins/log.ts`.
+    checkinJson: text('checkin_json'),
     costMicros: integer('cost_micros'),
     inputTokens: integer('input_tokens'),
     outputTokens: integer('output_tokens'),

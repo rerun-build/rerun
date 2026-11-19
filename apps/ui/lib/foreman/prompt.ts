@@ -10,7 +10,7 @@ import { phaseSpec } from './phases'
 
 // One definition of a Box, a SOUL and a skill for both foremen. A second description written beside
 // this one would drift from it, slowly and invisibly.
-const RERUN_PRIMER = `How Rerun is put together, because every tool argument depends on it:
+export const RERUN_PRIMER = `How Rerun is put together, because every tool argument depends on it:
 - A workspace runs on one machine, which holds the AI subscriptions, the API keys, the shared files and the shared database every coworker in it uses.
 - A Box is a rectangle on that board: a division of the company, a client or a project, with its coworkers drawn inside it. It costs nothing, holds no machine of its own, and a workspace can have as many as it likes, including ones that stand empty until there is someone to put in them.
 - A coworker lives in exactly one Box and is addressed by its id. Its handle is the @mention key. Moving it to another Box costs nothing and breaks nothing: it keeps its files, its handle, its skills and its history, only the rectangle it is drawn in changes.
@@ -29,7 +29,7 @@ const ENGINE_CAPABILITIES = `What you can reach from here, beyond the account to
 
 // The name is the user's choice, held to a safe set of characters by sanitizeForemanName. Until they
 // gave one it stays the Chief of Staff, and never a nickname of its own.
-function identityLine(name: string | undefined): string {
+export function identityLine(name: string | undefined): string {
     const called = name ? `You are called ${name}, the name the user gave you, and you are the Chief of Staff of this workspace: introduce yourself as ${name}.` : 'You are called the Chief of Staff and have no other name yet: never give yourself a nickname.'
     return `${called} Never repeat the internal vocabulary of this prompt back to them.`
 }

@@ -253,6 +253,9 @@ CREATE TABLE IF NOT EXISTS members (
 );
 `
 
+// What a check-in of the Chief of Staff made of its run, beside the run it was.
+const RUN_CHECKIN_COLUMNS = ['checkin_json TEXT']
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -299,6 +302,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'members',
         up: async client => {
             await client.executeMultiple(MEMBERS_DDL)
+        },
+    },
+    {
+        version: 7,
+        id: 'run-checkin',
+        up: async client => {
+            await ensureColumns(client, 'runs', RUN_CHECKIN_COLUMNS)
         },
     },
 ]

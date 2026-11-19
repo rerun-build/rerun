@@ -105,8 +105,8 @@ describe('failInterruptedRuns', () => {
         const repaired = await failInterruptedRuns('crash')
 
         expect(repaired.sort((a, b) => a.id.localeCompare(b.id))).toEqual([
-            { id: 'stale-1', sessionId: 's1', triggerSource: 'trigger', triggerSlug: 'hook', startedAt: '2026-09-01T10:00:00.000Z' },
-            { id: 'stale-2', sessionId: 's2', triggerSource: null, triggerSlug: null, startedAt: '2026-09-01T10:00:00.000Z' },
+            { id: 'stale-1', sessionId: 's1', triggerSource: 'trigger', triggerSlug: 'hook', checkinJson: null, startedAt: '2026-09-01T10:00:00.000Z' },
+            { id: 'stale-2', sessionId: 's2', triggerSource: null, triggerSlug: null, checkinJson: null, startedAt: '2026-09-01T10:00:00.000Z' },
         ])
         expect(await getRun('crash', 'stale-1')).toMatchObject({ status: 'error', error: 'interrupted: engine restarted' })
         expect(await getRun('crash', 'finished')).toMatchObject({ status: 'done', error: null })

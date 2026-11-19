@@ -36,14 +36,15 @@ function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
     })
 }
 
-type KeptSettings = Pick<AgentConfig, 'connectionId' | 'provider' | 'model' | 'mcpServers' | 'verbosity'>
+type KeptSettings = Pick<AgentConfig, 'connectionId' | 'provider' | 'model' | 'mcpServers' | 'verbosity' | 'proactive'>
 
 // What a person, or the foreman itself, set on it: the model it runs on, the servers connected to
-// it and how long its answers are. Everything else is the code's, so it is all a reboot keeps.
+// it, how long its answers are and whether it checks in on its own. Everything else is the code's,
+// so it is all a reboot keeps.
 async function keptSettings(): Promise<Partial<KeptSettings>> {
     try {
-        const { connectionId, provider, model, mcpServers, verbosity } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
-        return { connectionId, provider, model, mcpServers, verbosity }
+        const { connectionId, provider, model, mcpServers, verbosity, proactive } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
+        return { connectionId, provider, model, mcpServers, verbosity, proactive }
     } catch {
         return {}
     }

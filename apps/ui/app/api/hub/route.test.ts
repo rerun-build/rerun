@@ -193,4 +193,17 @@ describe('POST /api/hub', () => {
         expect(response.status).toBe(403)
         expect(dispatchAccountTool).not.toHaveBeenCalled()
     })
+    it('lets a check-in read the workspace and refuses every tool that writes, with a 403', async () => {
+        const token = mintForemanHubToken(WORKSPACE_ID, null, Date.now(), 'read')
+
+        const read = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool: 'list_agents', args: {} } }))
+        expect(read.status).toBe(200)
+        expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
+
+        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'upsert_schedule', 'db_execute', 'set_name', 'create_boxes', 'install_template']) {
+            const write = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool, args: {} } }))
+            expect(write.status).toBe(403)
+        }
+        expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
+    })
 })

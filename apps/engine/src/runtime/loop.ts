@@ -43,7 +43,7 @@ import { mcpWireMiddleware } from '../tools/mcp-wire.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
-import { runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
+import { runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
 import { streamedTurn } from './streamed-turn.js'
 import { registerRunAbort, setRunCancel, unregisterRunAbort } from './run-control.js'
@@ -264,6 +264,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = handover?.controller ?? registerRunAbort(run.id, baseAgent.id)
     const author = trigger.source === 'chat' ? trigger.author : undefined
+    const readOnly = runsReadOnly(trigger)
     const tried = handover?.tried ?? new Set<string>()
 
     let agent = baseAgent
@@ -380,7 +381,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             if (replies && answerRow && !pending) sidecar.set(answerRow.id, [...(sidecar.get(answerRow.id) ?? []), quickRepliesCall(replies)])
             await writeSidecar(sidecar)
             if (provider === 'rerun') clearBudgetLatch()
-            if (provider === 'codex') await keepCodexThread().catch(() => forgetCodexThread(agent.id, sessionId))
+            // A check-in's thread holds its read-only prompt: a reply in the thread it opened starts
+            // a new one, on the chat's brief.
+            if (provider === 'codex') await (readOnly ? Promise.resolve(forgetCodexThread(agent.id, sessionId)) : keepCodexThread()).catch(() => forgetCodexThread(agent.id, sessionId))
             await finishRun(agent.id, run.id, settlement.usage, steps, settlement.costMicros, contextUsage?.()).catch(() => {})
             await touchSession(agent.id, sessionId).catch(() => {})
             text = settlement.text
@@ -470,7 +473,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             if (outcome.kind === 'done' && proposed) await emitSkillProposalEvent(agent, sessionId, run.id, proposed, author)
         }
 
-        if (outcome.kind === 'done' && !pending && agent.config.selfImprovement.enabled && userText) {
+        if (outcome.kind === 'done' && !pending && agent.config.selfImprovement.enabled && userText && !readOnly) {
             void runCurator(agent, sessionId, userText, text ?? '', runOverride).catch(e => logger.warn({ err: String(e) }, 'curator failed'))
         }
 
@@ -519,7 +522,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const t0 = Date.now()
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger) }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null
@@ -530,7 +533,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             ctx.callTargets = callTargets
             return buildTools(ctx)
         })
-        const preparedP = CLI_PROVIDERS.has(provider) ? Promise.all(agentMcpServers(agent).map(s => prepareMcpServer(agent.id, s, agent.env, agent.hubAgentId))) : Promise.resolve([])
+        // A check-in hands a CLI none of the servers it would start on its own: only the bridged tools.
+        const preparedP = CLI_PROVIDERS.has(provider) && !readOnly ? Promise.all(agentMcpServers(agent).map(s => prepareMcpServer(agent.id, s, agent.env, agent.hubAgentId))) : Promise.resolve([])
         // Claude reaches its servers through the engine's connections; Codex starts its own without
         // holding up the model, so it keeps dialing them as declared.
         const mcpServersP = provider === 'claude' ? preparedP.then(servers => withPooledRelays(agent, servers)) : preparedP
@@ -595,7 +599,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             writer?.write({ type: 'data-compaction', id: cliCompactionId, data: compaction })
             if (compaction.status === 'done') logger.info({ agent: agent.id, session: sessionId, run: run.id, tokensRecovered: compaction.tokensRecovered }, 'context compacted by the CLI')
         }
-        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, onClaudeCompaction })
+        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, readOnly, onClaudeCompaction })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.

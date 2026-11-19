@@ -72,6 +72,7 @@ export async function startRun(agentId: string, sessionId: string, id: string = 
         model: null,
         triggerSource: null,
         triggerSlug: null,
+        checkinJson: null,
         costMicros: null,
         inputTokens: null,
         outputTokens: null,
@@ -127,14 +128,14 @@ export async function cancelRun(agentId: string, id: string): Promise<void> {
     await db.update(runs).set({ status: 'cancelled', finishedAt: nowIso() }).where(eq(runs.id, id))
 }
 
-export type InterruptedRun = { id: string; sessionId: string; triggerSource: string | null; triggerSlug: string | null; startedAt: string }
+export type InterruptedRun = { id: string; sessionId: string; triggerSource: string | null; triggerSlug: string | null; checkinJson: string | null; startedAt: string }
 
 // Returns the rows it repaired rather than a count: a run interrupted mid-flight also left a
 // conversation stuck on the hub, and only these ids can tell it the run is over.
 export async function failInterruptedRuns(agentId: string): Promise<InterruptedRun[]> {
     const { db } = await getSystemDb(agentId)
     const stale = await db
-        .select({ id: runs.id, sessionId: runs.sessionId, triggerSource: runs.triggerSource, triggerSlug: runs.triggerSlug, startedAt: runs.startedAt })
+        .select({ id: runs.id, sessionId: runs.sessionId, triggerSource: runs.triggerSource, triggerSlug: runs.triggerSlug, checkinJson: runs.checkinJson, startedAt: runs.startedAt })
         .from(runs)
         .where(eq(runs.status, 'running'))
     if (stale.length === 0) return []

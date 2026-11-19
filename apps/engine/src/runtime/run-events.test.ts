@@ -21,6 +21,8 @@ vi.mock('./notify.js', async importOriginal => ({
 
 const { afterEach, describe, expect, it } = await import('vitest')
 const { emitRunTerminal, triggerFromRun } = await import('./run-events.js')
+const { readCheckinLog, writeCheckinLog } = await import('../checkins/log.js')
+const { startRun } = await import('../db/repos/runs.js')
 type RunTerminal = import('./run-events.js').RunTerminal
 
 const base: RunTerminal = { agentId: 'a1', sessionId: 's1', runId: 'r1', trigger: { source: 'chat' }, kind: 'done' }
@@ -162,5 +164,27 @@ describe('emitRunTerminal', () => {
     it('swallows a notification that fails to send', async () => {
         delivery.reject = true
         await expect(emitRunTerminal(base)).resolves.toBeUndefined()
+    })
+})
+
+describe('the end of a check-in', () => {
+    const checkin = { source: 'checkin', slug: 'checkin', name: 'Check-in', reason: 'pulse' } as const
+
+    it('tells the hub nothing and keeps what it concluded in its log', async () => {
+        await startRun('foreman', 's-checkin', 'r-checkin')
+        await writeCheckinLog('r-checkin', { reason: 'pulse' })
+        await emitRunTerminal({ ...base, agentId: 'foreman', sessionId: 's-checkin', runId: 'r-checkin', trigger: checkin, kind: 'done', text: '  Nothing new today.  ' })
+        expect(sent).toEqual([])
+        expect(await readCheckinLog('r-checkin')).toEqual({ reason: 'pulse', note: 'Nothing new today.' })
+    })
+
+    it('stays silent for one the boot found interrupted, its reason read back from its log', async () => {
+        await startRun('foreman', 's-orphan', 'r-orphan')
+        await writeCheckinLog('r-orphan', { reason: 'promise' })
+        const trigger = triggerFromRun({ triggerSource: 'checkin', triggerSlug: 'follow-up', checkinJson: JSON.stringify({ reason: 'promise' }) })
+        expect(trigger).toEqual({ source: 'checkin', slug: 'follow-up', name: 'follow-up', reason: 'promise' })
+        await emitRunTerminal({ ...base, agentId: 'foreman', sessionId: 's-orphan', runId: 'r-orphan', trigger, kind: 'error', error: 'interrupted: engine restarted' })
+        expect(sent).toEqual([])
+        expect(await readCheckinLog('r-orphan')).toEqual({ reason: 'promise', note: 'Failed: interrupted: engine restarted' })
     })
 })
