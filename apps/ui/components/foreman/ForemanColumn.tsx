@@ -18,6 +18,7 @@ import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
 import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
 import { ForemanCard } from '@/components/foreman/ForemanCard'
+import { ForemanCheckins } from '@/components/foreman/ForemanCheckins'
 import { ForemanDetails } from '@/components/foreman/ForemanDetails'
 import { DetailsColumn } from '@/components/workspace-view/DetailsColumn'
 import { DetailsToggle } from '@/components/workspace-view/DetailsToggle'
@@ -63,7 +64,7 @@ import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
-import { useSession } from '@/supabase/session/SessionProvider'
+import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
@@ -81,6 +82,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
     const hasCard = useForemanStore(state => state.hasCard)
     const { workspace, phoneStep } = useSession()
+    const workspaceAdmin = useIsWorkspaceAdmin()
     const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, restoredProposals, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
     // Its skill proposals, as a coworker's chat reads them, once its engine keeps skills of its own.
@@ -558,6 +560,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                     {onRoutines && hasCard && (
                         <div className="flex min-h-0 flex-1 flex-col pt-28 md:pt-24">
                             <ForemanCard onClose={() => useForemanStore.getState().setTab('assistant')}>
+                                {workspaceAdmin && <ForemanCheckins active={onRoutines} />}
                                 <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1" />
                             </ForemanCard>
                         </div>
