@@ -39,7 +39,7 @@ def check(issues, data, rows):
             want = END_LABEL.get(j["state"], "factory-blocked")
             if planning.READY in have and want in have:
                 out["ready_label_ended_job"].append(n)
-            if want not in have and planning.READY not in have and (plan is None or plan in ("blocked", "lost")):
+            if want not in have and planning.READY not in have and PAUSED not in have and (plan is None or plan in ("blocked", "lost")):
                 out["ended_unlabelled"].append({"issue": n, "want": want})
         m = GAPS.match(i.get("title") or "")
         if m:

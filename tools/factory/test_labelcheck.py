@@ -43,6 +43,10 @@ class Check(unittest.TestCase):
         out = labelcheck.check([issue(30), issue(31)], d, [])
         self.assertEqual(out["ended_unlabelled"], [{"issue": 31, "want": "factory-blocked"}])
 
+    def test_a_parked_ended_issue_is_not_drift(self):
+        d = data(jobs={"673": job("blocked")})
+        self.assertEqual(labelcheck.check([issue(673, "factory-paused")], d, [])["ended_unlabelled"], [])
+
     def test_an_ended_job_not_yet_relabelled_is_not_drift(self):
         d = data(jobs={"27": job("blocked", relabelled=False)})
         self.assertEqual(labelcheck.check([issue(27)], d, [])["ended_unlabelled"], [])
