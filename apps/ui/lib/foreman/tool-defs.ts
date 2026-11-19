@@ -93,9 +93,22 @@ export const FOREMAN_BOX_TOOL_DEFS = [
     },
 ] as const
 
-// What the Chief of Staff keeps about itself on the workspace. Only an admin's turn may change it:
-// the name is the one every member reads.
+// What the Chief of Staff does for the workspace itself, beyond its coworkers: its name, the one
+// every member reads, and the people it brings in. Only an admin's turn may use them.
 export const FOREMAN_SELF_TOOL_DEFS = [
+    {
+        name: 'invite_members',
+        description:
+            'Invite people to this workspace by email: each gets an email with a link to join. Only an admin can, and only once the user has confirmed the exact addresses: ask them with ask_user first, listing every address you are about to invite, and call this only with the ones they confirmed. Never invent or guess an address. scope "all" lets them use every Box open to the workspace, "assigned" only the Boxes an admin opens to them later. The answer says, address by address, whether the invitation left, and gives the link to pass on where Rerun sends no email.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                emails: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 10, description: 'The addresses the user confirmed, one per person.' },
+                scope: { type: 'string', enum: ['all', 'assigned'], description: 'Which Boxes they reach once they join. Defaults to all.' },
+            },
+            required: ['emails'],
+        },
+    },
     {
         name: 'set_name',
         description: `Save the name the user gave you, the one every member of the workspace will read on your chat and call you by. Only once they gave it, never one you made up. A first name or a short nickname: 1 to ${FOREMAN_NAME_MAX} letters, digits, spaces, dots, apostrophes or hyphens.`,

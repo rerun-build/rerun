@@ -7,6 +7,7 @@ import { describeNeed } from './needs'
 import { foremanUseCases, isMobileApp } from './phase'
 import type { ForemanState } from './phase'
 import { phaseSpec } from './phases'
+import { checklistBlock } from './checklist-block'
 
 // One definition of a Box, a SOUL and a skill for both foremen. A second description written beside
 // this one would drift from it, slowly and invisibly.
@@ -172,7 +173,7 @@ function greetingBlock(state: ForemanState): string {
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
 export function foremanEngineInstructions(state: ForemanState, { greeting = false }: { greeting?: boolean } = {}): string {
-    const blocks = [engineCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [engineCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, checklistBlock(state.gettingStarted), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

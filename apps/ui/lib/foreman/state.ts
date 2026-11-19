@@ -18,6 +18,8 @@ import type { KickoffIntent } from './kickoff-marker'
 import { accountLanguage, preferredLanguage } from './language'
 import { sanitizeForemanName } from './name'
 import { stampWorkspaceOnboarded } from './profile'
+import { readGettingStartedItems } from '@/app/api/_services/getting-started.service'
+import { progressOf } from '@/lib/onboarding/getting-started'
 import { foremanPhase, isNamedReadyMade, type ArrivingIntent, type ForemanAnswers, type ForemanState } from './phase'
 
 // The reads behind a phase: the profile the foreman keeps on the workspace, and the two tables the
@@ -96,7 +98,12 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     // the onboarding (a parked template link, the hero prompt) would wait forever.
     if (phase === 'companion' && !onboardingCompletedAt && !ctx.workspace.is_sandbox && !ctx.authUser.is_anonymous) await stampWorkspaceOnboarded(ctx).catch(err => console.error('Error stamping workspace onboarded', err))
 
+    // The checklist an admin still sees on the board: hidden or finished, it is no longer theirs to walk.
+    const items = phase === 'companion' && !reach ? await readGettingStartedItems(ctx.supabase, ctx.workspace.id).catch(() => null) : null
+    const gettingStarted = items && !items.has('dismissed') ? progressOf(items, null) : null
+
     return {
+        gettingStarted,
         phase,
         intent: arriving,
         answers,

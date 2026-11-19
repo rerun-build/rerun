@@ -153,3 +153,14 @@ describe('foremanEngineInstructions and its name', () => {
         expect(foremanEngineInstructions(stateWith({ isMember: true }))).not.toMatch(/call set_name/)
     })
 })
+
+describe('foremanEngineInstructions and the getting-started checklist', () => {
+    it('leads an admin to the next step of a checklist still under way', () => {
+        const text = foremanEngineInstructions(stateWith({ gettingStarted: { phone: null, first_agent: true, ai_provider: false, invite: false, schedule: false, payment_method: false } }))
+        expect(text).toContain('The next step: plug in their own AI subscription')
+    })
+
+    it('says nothing of a checklist it was not handed', () => {
+        expect(foremanEngineInstructions(stateWith({}))).not.toContain('getting started')
+    })
+})

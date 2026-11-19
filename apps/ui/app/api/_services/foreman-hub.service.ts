@@ -10,8 +10,11 @@ import { FOREMAN_NAME_MAX, sanitizeForemanName } from '@/lib/foreman/name'
 import { saveForemanName } from '@/lib/foreman/profile'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { FOREMAN_BOX_TOOL_DEFS } from '@/lib/foreman/tool-defs'
-import { requireString } from '@/lib/mcp/args'
+import { asString, asStringArray, requireString } from '@/lib/mcp/args'
+import { inviteMember } from '@/app/api/_services/members.service'
+import { failure } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { selectSingle } from '@/supabase/supabase-helpers'
 
 const BOX_TOOL_NAMES = new Set<string>(FOREMAN_BOX_TOOL_DEFS.map(def => def.name))
 
@@ -23,6 +26,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
 
     if (tool === 'search_docs') return searchDocs(requireString(args.query, 'query'))
     if (tool === 'set_name') return setName(actor, args)
+    if (tool === 'invite_members') return inviteMembers(actor, args)
 
     // The turn speaks for the member who wrote it: a Box they create is theirs to manage, a coworker
     // lands only in a Box they manage, and only their Boxes are listed. A turn with nobody behind it
@@ -47,3 +51,26 @@ async function setName(actor: Actor, args: Record<string, unknown>): Promise<{ n
     await saveForemanName({ supabase: createServiceRoleClient(), workspace: { id: actor.workspaceId } }, name)
     return { name }
 }
+
+const MAX_INVITES = 10
+
+// The invitations an admin confirmed in the conversation, sent as the dialog sends them, in the name
+// of the admin the turn speaks for (the founder for a turn with nobody behind it).
+async function inviteMembers(actor: Actor, args: Record<string, unknown>): Promise<{ invitations: Array<{ email: string; sent: boolean; inviteUrl?: string; error?: string }> }> {
+    if (!isAdminActor(actor)) throw new Error('Only an admin of the workspace can invite people. Tell the user to ask one.')
+    const emails = [...new Set(asStringArray(args.emails).map(email => email.trim().toLowerCase()))]
+    if (!emails.length) throw new Error('Pass the addresses the user confirmed in emails.')
+    if (emails.length > MAX_INVITES) throw new Error(`Invite at most ${MAX_INVITES} people at once.`)
+    const supabase = createServiceRoleClient()
+    const userId = actor.kind === 'user' ? actor.userId : await founderOf(actor.workspaceId)
+    const [{ data: workspace }, { data: inviter }] = await Promise.all([selectSingle(supabase, 'workspaces', ['id', 'name', 'max_seats'] as const, { id: actor.workspaceId }), supabase.auth.admin.getUserById(userId)])
+    if (!workspace) throw new Error('This workspace no longer exists.')
+    const scope = asString(args.scope) === 'assigned' ? 'assigned' : 'all'
+    const invitations = []
+    for (const email of emails) {
+        const result = await inviteMember({ supabase, workspace, invitedBy: { userId, email: inviter.user?.email ?? null } }, email, scope)
+        invitations.push(result.ok ? { email, sent: true, ...(result.inviteUrl ? { inviteUrl: result.inviteUrl } : {}) } : { email, sent: false, error: 'code' in result ? failure(result.code).error : result.error })
+    }
+    return { invitations }
+}
+

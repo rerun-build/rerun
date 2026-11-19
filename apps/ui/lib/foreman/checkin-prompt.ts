@@ -3,6 +3,7 @@ import 'server-only'
 import type { CheckinReason } from '@rerun/contracts'
 
 import { renderBoardMap } from './board-map'
+import { checklistBlock } from './checklist-block'
 import type { ForemanState } from './phase'
 import { RERUN_PRIMER, foremanProfileBlock, identityLine } from './prompt'
 
@@ -35,6 +36,7 @@ export function foremanCheckinInstructions(state: ForemanState, reason: CheckinR
         RERUN_PRIMER,
         `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}).${state.language ? ` Its owner reads Rerun in ${state.language}.` : ''}`,
         foremanProfileBlock(state),
+        checklistBlock(state.gettingStarted),
         `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`,
     ].filter(Boolean)
     return blocks.join('\n\n')

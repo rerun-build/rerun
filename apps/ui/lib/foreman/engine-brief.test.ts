@@ -76,9 +76,10 @@ describe('foremanEngineBrief', () => {
         expect(brief.tools.filter(tool => tool.name === 'list_templates')).toHaveLength(1)
     })
 
+    // Two invitations at once would both find the last free seat.
     it('never lets two creations overlap', () => {
         const serial = brief.tools.filter(tool => tool.serial).map(tool => tool.name)
-        expect(serial.sort()).toEqual(['create_agent', 'create_boxes', 'install_shared_agent', 'install_template'])
+        expect(serial.sort()).toEqual(['create_agent', 'create_boxes', 'install_shared_agent', 'install_template', 'invite_members'])
     })
 
     // The engine drops a tool whose schema it cannot turn into zod, silently.

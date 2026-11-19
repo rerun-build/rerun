@@ -5,6 +5,7 @@ import type { PriceArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import type { ForemanAgentRow, ForemanSpaceRow } from './board-map'
 import type { KickoffIntent } from './kickoff-marker'
+import type { GettingStartedProgress } from '@/lib/onboarding/getting-started'
 
 // Where the workspace stands, and therefore which foreman it talks to. A first arrival is walked by
 // the hub from "who are you" to a built team; after that, `companion`, the hub is done and the
@@ -214,4 +215,7 @@ export type ForemanState = {
     // person is a member rather than an admin.
     hiddenBoxes?: number
     isMember?: boolean
+    // The getting-started checklist as it stands, read for an admin of a running workspace while the
+    // list is still shown: what the Chief of Staff leads them through, one step at a time.
+    gettingStarted?: GettingStartedProgress | null
 }

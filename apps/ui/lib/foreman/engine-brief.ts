@@ -22,7 +22,7 @@ export const FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES: ReadonlySet<string> = new Set
 // createAgent and createBoxes read then write without a transaction: two in the same step would
 // take the same handle, the same cell, or the same free slot of the plan. An install creates agents
 // the same way.
-const SERIAL_TOOL_NAMES = new Set<string>(['create_agent', 'create_boxes', 'install_template', 'install_shared_agent'])
+const SERIAL_TOOL_NAMES = new Set<string>(['create_agent', 'create_boxes', 'install_template', 'install_shared_agent', 'invite_members'])
 
 const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))]
 
