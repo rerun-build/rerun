@@ -43,6 +43,7 @@ import { checkoutCopy, longDate, nextInvoiceDate, shortDate, type BillingTransla
 import { BilledFlow, CardOnFile, Headline, IntervalToggle, PayFooter, PayHeader, PlanCard, RightTitle, SuccessPanel, SummaryRows, TermsConsent, TestimonialStrip, Timeline, UsdFlow, usd } from './parts'
 import { StripeCheckoutProvider, StripePaymentFields, StripePaymentFieldsSkeleton, StripePromoCode } from './StripeCheckout'
 import { usePlanQuote } from './usePlanQuote'
+import { usePendingReferrer } from './referrals/usePendingReferrer'
 
 // The yearly price is what the dialog opens on, as designed; the toggle is one click away. Not during
 // a trial: subscribing ends it and bills today, and a year upfront is not what a trial user expects.
@@ -334,6 +335,7 @@ function SubscribeForm({
     onTrialRefused: () => void
 }) {
     const t = useTranslations('billing')
+    const locale = useLocale()
     const errorText = useErrorText()
     const checkout = useCheckout()
     const [accepted, setAccepted] = useState(false)
@@ -384,6 +386,8 @@ function SubscribeForm({
 
     const loaded = checkout.type === 'success' ? checkout.checkout : null
     const interval = selection.interval
+    const referrer = usePendingReferrer(trial)
+    const [trialEnds] = useState(() => trialEndDate(new Date()))
     const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval, priceArm)} />
     // The price after the trial follows a promotion code; without one it stays the list price.
     const nextInvoice = loaded?.discountAmounts?.length ? loaded.recurring?.dueNext : null
@@ -431,9 +435,20 @@ function SubscribeForm({
     return (
         <>
             <PayHeader title={trial ? t('checkout.pay.freeFor', { days: TRIAL_DAYS }) : t('checkout.pay.subscribe')} amount={amount} unit={trial ? t('checkout.pay.dueToday') : interval === 'yearly' ? t('checkout.pay.perYear') : t('checkout.pay.perMonth')} />
-            {trial && (
-                <p className="mt-2 text-sm text-muted-foreground">{t.rich('checkout.pay.thenPerMonth', { amount: () => <UsdFlow cents={afterTrialCents} /> })}</p>
-            )}
+            {trial &&
+                (referrer ? (
+                    <div className="mt-4">
+                        <SummaryRows
+                            rows={[
+                                { label: t('checkout.referral.trial'), value: t('checkout.referral.trialValue', { days: TRIAL_DAYS }) },
+                                { label: t('checkout.trial.firstCharge'), value: t.rich('checkout.trial.firstChargeValue', { charge: () => <UsdFlow cents={afterTrialCents} />, date: shortDate(trialEnds, locale) }) },
+                                { label: referrer.firstName ? t('checkout.referral.invitedBy', { name: referrer.firstName }) : t('checkout.referral.invitedByFriend'), value: t('checkout.referral.secondMonthFree'), strong: true },
+                            ]}
+                        />
+                    </div>
+                ) : (
+                    <p className="mt-2 text-sm text-muted-foreground">{t.rich('checkout.pay.thenPerMonth', { amount: () => <UsdFlow cents={afterTrialCents} /> })}</p>
+                ))}
             <div className="mt-4 flex flex-col">
                 <StripePromoCode disabled={submitting || updating} />
             </div>

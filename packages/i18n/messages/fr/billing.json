@@ -481,7 +481,14 @@
             "body": "Vous avez résilié votre essai. Vos coworkers tournent jusque-là, et rien n'est débité.",
             "resume": "Reprendre mon essai"
         },
-        "paneError": "Le formulaire de paiement n'a pas pu s'ouvrir"
+        "paneError": "Le formulaire de paiement n'a pas pu s'ouvrir",
+        "referral": {
+            "trial": "Essai",
+            "trialValue": "{days, plural, one {# jour offert} other {# jours offerts}}",
+            "invitedBy": "Invité par {name}",
+            "invitedByFriend": "Invité par un ami",
+            "secondMonthFree": "2e mois offert"
+        }
     },
     "parts": {
         "interval": {

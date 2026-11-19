@@ -481,7 +481,14 @@
             "body": "Denemenizi iptal ettiniz. Coworker'larınız o zamana kadar çalışmaya devam eder ve ücret alınmaz.",
             "resume": "Denememi sürdür"
         },
-        "paneError": "Ödeme formu açılamadı"
+        "paneError": "Ödeme formu açılamadı",
+        "referral": {
+            "trial": "Deneme",
+            "trialValue": "{days, plural, one {# gün ücretsiz} other {# gün ücretsiz}}",
+            "invitedBy": "Davet eden: {name}",
+            "invitedByFriend": "Bir arkadaşınız davet etti",
+            "secondMonthFree": "2. ay ücretsiz"
+        }
     },
     "parts": {
         "interval": {

@@ -560,6 +560,13 @@
             "change": "Change"
         },
         "cancelTrial": "Cancel trial",
+        "referral": {
+            "trial": "Trial",
+            "trialValue": "{days, plural, one {# day free} other {# days free}}",
+            "invitedBy": "Invited by {name}",
+            "invitedByFriend": "Invited by a friend",
+            "secondMonthFree": "2nd month free"
+        },
         "trial": {
             "title": "Your free trial",
             "included": "Included",

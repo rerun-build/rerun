@@ -481,7 +481,14 @@
             "body": "Você cancelou seu teste. Seus coworkers continuam rodando até lá, e nada é cobrado.",
             "resume": "Retomar meu teste"
         },
-        "paneError": "O formulário de pagamento não abriu"
+        "paneError": "O formulário de pagamento não abriu",
+        "referral": {
+            "trial": "Teste",
+            "trialValue": "{days, plural, one {# dia grátis} other {# dias grátis}}",
+            "invitedBy": "Indicado por {name}",
+            "invitedByFriend": "Indicado por um amigo",
+            "secondMonthFree": "2º mês grátis"
+        }
     },
     "parts": {
         "interval": {

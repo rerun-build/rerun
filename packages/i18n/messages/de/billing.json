@@ -481,7 +481,14 @@
             "body": "Du hast deine Testphase gekündigt. Deine Coworker laufen bis dahin weiter, und nichts wird berechnet.",
             "resume": "Testphase fortsetzen"
         },
-        "paneError": "Das Zahlungsformular konnte nicht geöffnet werden"
+        "paneError": "Das Zahlungsformular konnte nicht geöffnet werden",
+        "referral": {
+            "trial": "Testphase",
+            "trialValue": "{days, plural, one {# Tag gratis} other {# Tage gratis}}",
+            "invitedBy": "Eingeladen von {name}",
+            "invitedByFriend": "Von einem Freund eingeladen",
+            "secondMonthFree": "2. Monat gratis"
+        }
     },
     "parts": {
         "interval": {

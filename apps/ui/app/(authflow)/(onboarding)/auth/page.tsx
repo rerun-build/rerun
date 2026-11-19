@@ -1,8 +1,11 @@
 import { AuthTerms } from '@/components/auth/AuthShell'
 import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
+import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'
+import { referrerOfCode } from '@/ee/services/referral-attach.service'
 import { detectInAppBrowser, detectMobileOs } from '@/lib/in-app-browser'
 import { getTranslations } from 'next-intl/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { Suspense } from 'react'
 import { AuthPageMethods } from './AuthPageMethods'
 
@@ -13,9 +16,11 @@ export default async function AuthPage() {
     const phoneLeadsAlone = detectMobileOs(userAgent) !== null
     const showGoogle = !detectInAppBrowser(userAgent)
     const t = await getTranslations('auth.page')
+    const referrer = await referrerOfCode((await cookies()).get(REFERRAL_COOKIE)?.value)
     return (
         <OnboardingDialog stepKey="signin">
             <div className="flex flex-col gap-6">
+                {referrer && <ReferralInvite referrer={referrer} />}
                 <OnboardingHeading title={t('title')} subtitle={t('subtitle')} />
                 <Suspense fallback={null}>
                     <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} />

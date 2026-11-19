@@ -481,7 +481,14 @@
             "body": "Cancelaste tu prueba. Tus coworkers siguen funcionando hasta entonces, y no se cobra nada.",
             "resume": "Reanudar mi prueba"
         },
-        "paneError": "No se pudo abrir el formulario de pago"
+        "paneError": "No se pudo abrir el formulario de pago",
+        "referral": {
+            "trial": "Prueba",
+            "trialValue": "{days, plural, one {# día gratis} other {# días gratis}}",
+            "invitedBy": "Invitado por {name}",
+            "invitedByFriend": "Invitado por un amigo",
+            "secondMonthFree": "2.º mes gratis"
+        }
     },
     "parts": {
         "interval": {
