@@ -22,6 +22,7 @@ import posthog from 'posthog-js'
 import { useRouter } from 'next/navigation'
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { selectMany, selectMaybeSingle, selectSingle } from '../supabase-helpers'
+import { SESSION_USER_COLUMNS, SESSION_WORKSPACE_COLUMNS } from './session-columns'
 
 type Workspace = Pick<
     Database['public']['Tables']['workspaces']['Row'],
@@ -61,7 +62,6 @@ const FRESH_SIGNUP_MS = 60 * 60 * 1000
 
 installWorkspaceHeader()
 
-const WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'created_at', 'plan', 'stripe_customer_id', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'rerun_used_micros', 'rerun_budget_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'rerun_credit_paused_at', 'is_sandbox', 'boxes_disabled_at', 'boxes_archived_at', 'onboarded_at', 'price_arm', 'locale'] as const
 
 // Whether a verified phone number stands between this account and the app. `unknown` is the gap
 // between an account being born and its signup reaching this tab: nothing may start on its own
@@ -97,7 +97,11 @@ export type SessionContextValue = {
 
 const SessionContext = createContext<SessionContextValue | null>(null)
 
-export function SessionProvider({ children }: PropsWithChildren) {
+// What the server already read for the page it renders, so the board does not wait for the browser
+// to read it again.
+export type InitialSession = { user: User; workspace: Workspace; role: WorkspaceRole; boxScope: string }
+
+export function SessionProvider({ children, initial = null }: PropsWithChildren<{ initial?: InitialSession | null }>) {
     const [user, setUser] = useState<User | null>(null)
     const [workspace, setWorkspace] = useState<Workspace | null>(null)
     const [loadedAnswers, setLoadedAnswers] = useState<{ workspaceId: number; answers: WorkspaceAnswers | null } | null>(null)
@@ -115,6 +119,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const userReadSeq = useRef(0)
     const loadedWorkspaceRef = useRef<{ userId: string; workspaceId: number } | null>(null)
     const storedWorkspaceIdRef = useRef<number | null>(null)
+    const initialRef = useRef(initial)
 
     // The `users` row is read from the auth events alone: INITIAL_SESSION fires as soon as the
     // listener is attached, so a read on mount on top of it fetched the same row twice.
@@ -157,6 +162,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             // A refreshed token carries the same account: the row it would read back is the one in
             // hand, and the realtime channel below already follows its changes.
             if (event === 'TOKEN_REFRESHED' && !switchedAccount && loadedUserIdRef.current === nextUserId) return
+            if (event === 'INITIAL_SESSION') applyInitialSession(nextUserId)
             fetchUser()
         })
 
@@ -378,11 +384,38 @@ export function SessionProvider({ children }: PropsWithChildren) {
         onResync: () => setRoleReads(reads => reads + 1),
     })
 
+    // Applied once the browser knows its own account, never at the first render: the server's HTML
+    // stays the one it drew, and a session of another account, or a tab pinned to another workspace,
+    // keeps the reads below. They still run behind it and replace it with what they find.
+    function applyInitialSession(accountId: string | null) {
+        const given = initialRef.current
+        initialRef.current = null
+        if (!given || given.user.id !== accountId) return
+        if (readUrlWorkspace() !== null) return
+        const pinned = readTabWorkspace()
+        if (pinned !== null && pinned !== given.workspace.id) return
+        loadedUserIdRef.current = given.user.id
+        storedWorkspaceIdRef.current = given.user.workspace_id
+        setUser(given.user)
+        setUserLoading(false)
+        setWorkspace(given.workspace)
+        setWorkspaceLoading(false)
+        setLoadedRole({ workspaceId: given.workspace.id, role: given.role, boxScope: toBoxScope(given.boxScope) })
+    }
+
     // Only the latest read lands: an older one still in flight, the one SIGNED_IN fired before the
     // signup was stamped or the one for an account since left, would otherwise write over a newer row.
+    // Without a session there is no row to read, only a refusal.
     async function fetchUser() {
         const seq = ++userReadSeq.current
-        const { data } = await selectSingle(supabase, 'users', ['id', 'created_at', 'workspace_id', 'email_notification_prefs', 'account_role', 'expert_profile_id', 'signed_up_at', 'locale'], {})
+        if (!sessionUserId.current) {
+            loadedUserIdRef.current = null
+            storedWorkspaceIdRef.current = null
+            setUser(null)
+            setUserLoading(false)
+            return
+        }
+        const { data } = await selectSingle(supabase, 'users', SESSION_USER_COLUMNS, {})
         const tabUser = data && { ...data, workspace_id: await resolveTabWorkspace(data) }
         if (seq !== userReadSeq.current) return
         loadedUserIdRef.current = data?.id ?? null
@@ -403,7 +436,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
 
     async function fetchWorkspace() {
-        const { data } = await selectSingle(supabase, 'workspaces', WORKSPACE_COLUMNS, { id: user?.workspace_id })
+        const { data } = await selectSingle(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id: user?.workspace_id })
         setWorkspace(data)
         setWorkspaceLoading(false)
     }
@@ -423,7 +456,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setWorkspaces([])
             return
         }
-        const { data } = await selectMany(supabase, 'workspaces', WORKSPACE_COLUMNS, { id: ids })
+        const { data } = await selectMany(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id: ids })
         setWorkspaces(data ?? [])
     }
 

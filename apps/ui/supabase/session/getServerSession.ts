@@ -3,6 +3,7 @@ import type { Database, Enums } from '@/app/api/database.types'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { cache } from 'react'
 import { selectMaybeSingle, selectSingle } from '../supabase-helpers'
+import { SESSION_USER_COLUMNS, SESSION_WORKSPACE_COLUMNS } from './session-columns'
 
 // What the access token says about its bearer, checked against the project's signing key with no
 // round-trip to the auth server. It is as fresh as the token: a name or an email changed since it
@@ -11,8 +12,6 @@ import { selectMaybeSingle, selectSingle } from '../supabase-helpers'
 export type SessionIdentity = Pick<User, 'id' | 'email' | 'is_anonymous' | 'user_metadata' | 'app_metadata'>
 
 type SessionBase = { supabase: SupabaseClient<Database>; identity: SessionIdentity | null; requestedWorkspaceId: number | null }
-
-const WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'plan', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'is_sandbox', 'onboarded_at', 'price_arm', 'locale'] as const
 
 // A bearer client keeps no session, so the token is handed over; a cookie client reads its own.
 async function readSessionIdentity(supabase: SupabaseClient<Database>, token: string | null): Promise<SessionIdentity | null> {
@@ -37,7 +36,7 @@ export async function getSessionIdentity(): Promise<SessionIdentity | null> {
 }
 
 function readStoredUser(supabase: SupabaseClient<Database>) {
-    return selectSingle(supabase, 'users', ['id', 'workspace_id', 'email_notification_prefs', 'locale'] as const, {})
+    return selectSingle(supabase, 'users', SESSION_USER_COLUMNS, {})
 }
 
 async function readMembership(supabase: SupabaseClient<Database>, userId: string, workspaceId: number) {
@@ -82,7 +81,7 @@ export async function getSessionWorkspace() {
 export const getServerSession = cache(async () => {
     const base = await openSession()
     const { supabase, identity, requestedWorkspaceId } = base
-    const readWorkspace = (id: number) => selectSingle(supabase, 'workspaces', WORKSPACE_COLUMNS, { id })
+    const readWorkspace = (id: number) => selectSingle(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id })
 
     // The workspace row of a named workspace is asked for alongside the membership that will
     // confirm it, and dropped when that membership refuses.

@@ -12,7 +12,8 @@ import { computerFlag, i18nFlag, publishedAccessFlag, remoteComputersFlag, simpl
 import { FOREMAN_PLACEMENT_COOKIE, parseForemanPlacement } from '@/lib/foreman-layout'
 import { FOREMAN_OPEN_COOKIE, parseForemanOpen } from '@/lib/foreman-open'
 import { parseWorkspaceView, WORKSPACE_VIEW_COOKIE } from '@/lib/workspace-view'
-import { SessionProvider } from '@/supabase/session/SessionProvider'
+import { getServerSession } from '@/supabase/session/getServerSession'
+import { SessionProvider, type InitialSession } from '@/supabase/session/SessionProvider'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Once per server process, on the first board anyone opens: the crons a self-hosted app runs itself.
     startBackgroundSchedules()
-    const [computer, published, i18n, vault, simpleView, remoteComputers, apps] = await Promise.all([computerFlag(), publishedAccessFlag(), i18nFlag(), vaultFlag(), simpleViewFlag(), remoteComputersFlag(), paidAppFlags()])
+    const [computer, published, i18n, vault, simpleView, remoteComputers, apps, session] = await Promise.all([computerFlag(), publishedAccessFlag(), i18nFlag(), vaultFlag(), simpleViewFlag(), remoteComputersFlag(), paidAppFlags(), getServerSession()])
+    // The session this request already verified, so the browser does not read it again before the board.
+    const initialSession: InitialSession | null = session.user && session.workspace && session.membership ? { user: session.user, workspace: session.workspace, role: session.membership.role, boxScope: session.membership.box_scope } : null
     // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
     const cookieStore = await cookies()
     const foremanOpen = parseForemanOpen(cookieStore.get(FOREMAN_OPEN_COOKIE)?.value)
@@ -31,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const workspaceView = parseWorkspaceView(cookieStore.get(WORKSPACE_VIEW_COOKIE)?.value)
 
     return (
-        <SessionProvider>
+        <SessionProvider initial={initialSession}>
             <FeatureFlagsProvider computer={computer} published={published} i18n={i18n} vault={vault} simpleView={simpleView} remoteComputers={remoteComputers} apps={apps}>
                 <WorkspaceViewProvider initialView={workspaceView}>
                     <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
