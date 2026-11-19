@@ -344,7 +344,27 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, email, api
         methods: ['POST'],
     })
 
-    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault and routines.`)
+    await engine('POST', `/agents/${engineIds.leadScout}/skills`, {
+        name: 'qualify-a-lead',
+        description: 'Decide whether a company is worth an intro call, before adding it to HubSpot.',
+        body: '1. Open the company website and its last funding announcement.\n2. Keep it only if it sells B2B software, has 10 to 200 people and raised in the last six months.\n3. Look for a weak spot we can fix: no case studies, an old template, a rebrand in progress.\n4. Add it to HubSpot as **New lead**, with the weak spot in one line in the notes.\n5. Never email anyone without approval.',
+    })
+
+    await engine('POST', `/agents/${engineIds.invoiceChaser}/data/execute`, { sql: 'DROP TABLE IF EXISTS payments' })
+    await engine('POST', `/agents/${engineIds.invoiceChaser}/data/execute`, {
+        sql: 'CREATE TABLE payments (invoice TEXT PRIMARY KEY, client TEXT NOT NULL, amount_eur INTEGER NOT NULL, due_on TEXT NOT NULL, status TEXT NOT NULL, reminded_on TEXT)',
+    })
+    await engine('POST', `/agents/${engineIds.invoiceChaser}/data/execute`, {
+        sql: `INSERT INTO payments (invoice, client, amount_eur, due_on, status, reminded_on) VALUES
+            ('INV-2041', 'Fernway', 6400, '2026-10-01', 'overdue', '2026-11-12'),
+            ('INV-2043', 'Quillmate', 4800, '2026-10-06', 'overdue', '2026-11-12'),
+            ('INV-2046', 'Orbitly', 3000, '2026-10-10', 'overdue', '2026-11-12'),
+            ('INV-2050', 'Lattice Labs', 9600, '2026-11-02', 'paid', NULL),
+            ('INV-2052', 'Tessellate', 12800, '2026-11-20', 'open', NULL),
+            ('INV-2053', 'Northwind', 5200, '2026-11-28', 'open', NULL)`,
+    })
+
+    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault, routines, a skill and a payments table.`)
     return { engineIds }
 }
 

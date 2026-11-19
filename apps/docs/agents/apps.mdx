@@ -3,6 +3,8 @@ title: "Apps"
 description: "Give a coworker access to Gmail, Slack, Notion, Stripe and hundreds of other services."
 ---
 
+import { Shot } from '/snippets/media.jsx'
+
 An app is a ready-made integration. Installing one on a coworker gives it that service's tools, plus a skill explaining how to use them, plus wherever the credentials live.
 
 That skill belongs to the app: it is read only, in the app as much as for the coworker and the API. See [Skills](/agents/skills#skills-an-app-installed).
@@ -29,6 +31,8 @@ A coworker can hold several accounts of the same app, each with its own label (f
     [`search_connectors`](/api/tools/connectors#search_connectors) then [`attach_connector`](/api/tools/connectors#attach_connector). The API declares the app; you finish the sign-in in the app.
   </Tab>
 </Tabs>
+
+<Shot src="/images/agents/apps/apps-tab" alt="The Apps tab of Lead Scout: Gmail, HubSpot and a secret installed from the Vault, Stripe offered under From the Vault, and the CRM apps of the library" />
 
 ## Tools load when the coworker needs them
 
