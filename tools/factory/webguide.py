@@ -34,6 +34,8 @@ COPIED = {
 RETRIEVE = re.compile(r'npx -y modern-web-guidance@latest retrieve "([^"]+)"')
 CDN_SENTENCE = re.compile(r"If not using a package manager, import from a CDN, e\.g\. `[^`]*`\.")
 CDN_IMPORT = re.compile(r'"https://(?:unpkg\.com|cdn\.jsdelivr\.net/npm|esm\.sh)/((?:@[^/@"]+/)?[^/@"]+)@latest[^"]*"')
+CDN_SUGGEST = re.compile(r", or import it from a CDN such as `https://[^`]*` \(pin the exact version\)\.")
+CDN_ANY = re.compile(r"""(["'`])https://(?:unpkg\.com|esm\.sh|esm\.run|cdn\.jsdelivr\.net/npm)/([^"'`\s]+)\1""")
 CHANGES = """Source: modern-web-guidance %(version)s, Apache-2.0, https://www.npmjs.com/package/modern-web-guidance
 Pinned by the npm integrity value %(integrity)s
 
@@ -44,6 +46,8 @@ Rewrites of the guide text, in this order, and nothing else:
 1. The upstream retrieve command line, run through a package runner at the latest tag, becomes: /data/tools/bin/webguide get <id>
 2. The sentence that tells the reader to import from a CDN when no package manager is used becomes: %(no_cdn)s
 3. A quoted unpkg.com, cdn.jsdelivr.net/npm or esm.sh address of a package at the latest tag becomes the bare package name in quotes.
+4. The suggestion to import a package from a CDN when no bundler is used is dropped from its sentence.
+5. Any other quoted unpkg.com, esm.sh, esm.run or cdn.jsdelivr.net/npm address becomes the bare package path in the same quotes.
 """
 
 
@@ -66,7 +70,9 @@ def gone(root, rel, why="is missing"):
 def rewrite(text):
     text = RETRIEVE.sub(r"/data/tools/bin/webguide get \1", text)
     text = CDN_SENTENCE.sub(lambda m: NO_CDN, text)
-    return CDN_IMPORT.sub(r'"\1"', text)
+    text = CDN_IMPORT.sub(r'"\1"', text)
+    text = CDN_SUGGEST.sub(".", text)
+    return CDN_ANY.sub(r"\1\2\1", text)
 
 
 def guide_target(name):

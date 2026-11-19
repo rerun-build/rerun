@@ -22,10 +22,21 @@ LIGHT = (
     "`https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover.min.js`.\n"
     'await import("https://unpkg.com/interestfor@latest");\n'
 )
+HOSTS = (
+    "# CDN helpers\n"
+    "import('https://esm.sh/temporal-polyfill');\n"
+    "script.src = 'https://unpkg.com/scheduler-polyfill';\n"
+    '<script src="https://cdn.jsdelivr.net/npm/three-html-render/dist/polyfill.js"></script>\n'
+    "import('https://esm.run/invokers-polyfill');\n"
+    "Without a bundler, serve the package from your own origin, or import it from a CDN such as "
+    "`https://esm.sh/webauthn-polyfills@0.1.7` (pin the exact version).\n"
+    '<script src="https://cdn.example.com/lib@1.0.0.js"></script>\n'
+)
 INDEX = [
     {"id": "light-dismiss-a-dialog", "description": "Close a modal dialog by clicking outside it", "category": "ui-behaviors"},
     {"id": "dark-mode-toggle", "description": "Let users override the color scheme", "category": "ui-components"},
     {"id": "dialog", "description": "Build an accessible modal dialog", "category": "ui-components"},
+    {"id": "cdn-helpers", "description": "Load polyfill helpers", "category": "ui-behaviors"},
 ]
 
 
@@ -37,6 +48,7 @@ def make_tarball():
         BASE + "SKILL.md": b"run npx modern-web-guidance@latest search\n",
         BASE + "watchdog/main.js": b"1\n",
         BASE + "gen/guides.json": json.dumps(INDEX).encode(),
+        BASE + "guides/ui-behaviors/cdn-helpers.md": HOSTS.encode(),
         BASE + "guides/ui-behaviors/light-dismiss-a-dialog.md": LIGHT.encode(),
         BASE + "guides/ui-components/dialog.md": b"# Dialog\n## Fallback strategies\n",
         BASE + "guides/ui-components/dark-mode-toggle.md": b"# Dark mode toggle\n",
@@ -145,6 +157,7 @@ class WebguideTest(unittest.TestCase):
             "LICENSE",
             "THIRD_PARTY_NOTICES",
             "guides.json",
+            "guides/ui-behaviors/cdn-helpers.md",
             "guides/ui-behaviors/light-dismiss-a-dialog.md",
             "guides/ui-components/dark-mode-toggle.md",
             "guides/ui-components/dialog.md",
@@ -163,6 +176,27 @@ class WebguideTest(unittest.TestCase):
         self.assertIn("/data/tools/bin/webguide get dialog", text)
         self.assertIn('await import("interestfor")', text)
         self.assertIn(webguide.NO_CDN, text)
+
+    def test_no_third_party_package_host_in_any_installed_guide(self):
+        self.install()
+        for rel in tree(self.d):
+            if not rel.startswith("guides/"):
+                continue
+            with open(os.path.join(self.d, rel), encoding="utf-8") as f:
+                text = f.read()
+            for host in ("unpkg.com", "esm.sh", "esm.run", "cdn.jsdelivr.net"):
+                self.assertNotIn(host, text, rel)
+        self.assertEqual(webguide.get("cdn-helpers", root=self.d).splitlines(), [
+            "# CDN helpers",
+            "import('temporal-polyfill');",
+            "script.src = 'scheduler-polyfill';",
+            '<script src="three-html-render/dist/polyfill.js"></script>',
+            "import('invokers-polyfill');",
+            "Without a bundler, serve the package from your own origin.",
+            '<script src="https://cdn.example.com/lib@1.0.0.js"></script>',
+        ])
+        with open(os.path.join(self.d, "CHANGES"), encoding="utf-8") as f:
+            self.assertIn("esm.run", f.read())
 
     def test_lookup_works_with_the_network_off_and_no_switch_set(self):
         self.install()
