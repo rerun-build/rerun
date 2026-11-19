@@ -27,6 +27,8 @@ import { useAiConsent } from '@/lib/ai-consent'
 import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
 import { OpenPushTarget, usePushTarget } from '@/notifications/PushRouting'
+import { FrameMonitor } from '@/perf/FrameMonitor'
+import { PERF_LOG } from '@/perf/timing'
 import { useAppearanceLoaded } from '@/theme/appearance'
 import { ReducedMotionOverride } from '@/theme/ReducedMotionOverride'
 import { useColorSchemeName } from '@/theme/theme'
@@ -139,6 +141,7 @@ function App() {
                                     <Stack.Protected guard={__DEV__}>
                                         <Stack.Screen name="lab" />
                                         <Stack.Screen name="lab-chat" />
+                                        <Stack.Screen name="lab-perf" />
                                         <Stack.Screen name="lab-threads" />
                                         <Stack.Screen name="lab-message-times" />
                                         <Stack.Screen name="lab-icons" />
@@ -166,6 +169,7 @@ function App() {
                             </SplitShell>
                             <MediaViewerHost />
                             <SystemDialogHost />
+                            {PERF_LOG && <FrameMonitor top={4} />}
                         </InboxProvider>
                     </MockStore>
                 )}

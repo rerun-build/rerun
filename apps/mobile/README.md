@@ -69,6 +69,16 @@ Run from `apps/mobile`, or from the root with `pnpm --filter rerun-mobile <scrip
 
 End-to-end flows (Maestro) live in `.maestro/`, with their own README.
 
+## Measuring smoothness
+
+- `src/perf/chat-renders.test.tsx` opens a conversation of 200 messages and counts what typing,
+  scrolling and a streamed reply redraw. Its budgets fail a change that makes the chat redraw more.
+- The **Perf, 200 messages** lab (`/lab-perf`, development builds) lays the same conversation out on
+  the device, with buttons that type, stream and scroll for a few seconds and report what redrew.
+- `EXPO_PUBLIC_PERF=1 pnpm dev:mobile` prints in Metro's log how long a conversation took to open from
+  the Home, on the copy kept on the phone and then on the hub's, and every second that missed frames
+  on the JavaScript or the UI thread. A counter in the corner shows the same frames on screen.
+
 ## Rules
 
 `AGENTS.md` in this folder: the app is on Expo SDK 58, read the versioned Expo docs before writing

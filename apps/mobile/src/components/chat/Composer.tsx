@@ -9,6 +9,7 @@ import { GlassSurface } from '@/components/ui/GlassSurface'
 import * as Haptics from '@/lib/haptics'
 import type { Coworker } from '@/mocks/data'
 import type { Model } from '@/mocks/models'
+import { noteRender } from '@/perf/renders'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
@@ -50,6 +51,7 @@ type ComposerProps = {
 
 // A pill at rest, a card once in use (focused, holding text or attachments, or listening).
 export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], autoFocus, ref }: ComposerProps) {
+    noteRender('Composer')
     const theme = useTheme()
     const glass = useGlassStyle()
     const [focused, setFocused] = useState(Boolean(autoFocus))

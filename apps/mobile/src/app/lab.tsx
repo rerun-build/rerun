@@ -101,6 +101,7 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Rerun chat, empty', href: '/lab-chat?coworker=foreman&tabs=0' },
     { label: 'Rerun chat, streaming', href: '/lab-chat?coworker=foreman&tabs=1&state=streaming' },
     { label: 'Rerun chat, loading', href: '/lab-chat?coworker=foreman&tabs=1&state=loading' },
+    { label: 'Perf, 200 messages', href: '/lab-perf' },
     { label: 'Chat, 1 tab', href: '/lab-chat?tabs=1' },
     { label: 'Chat, 3 tabs, first active', href: '/lab-chat?tabs=3&active=0' },
     { label: 'Chat, 6 tabs, middle active', href: '/lab-chat?tabs=6&active=3' },

@@ -8,6 +8,7 @@ import remend from 'remend'
 import { ownedFileUrl, rawFileUrl, type FileOwner } from '@/api/files'
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import { noteRender } from '@/perf/renders'
 import { EASE_OUT } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing, withAlpha } from '@/theme/tokens'
@@ -294,6 +295,7 @@ type MarkdownProps = {
  * or fence never shows raw.
  */
 export function Markdown({ text, streaming = false, surface = 'page', owner = null, shortLinks = false }: MarkdownProps) {
+    noteRender('Markdown')
     const tokens = useMemo(() => Lexer.lex(remend(text), { gfm: true }), [text])
     const scope = useMemo(() => ({ surface, owner, shortLinks, muted: false }), [surface, owner, shortLinks])
     return (

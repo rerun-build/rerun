@@ -7,6 +7,7 @@ import { ownedFileUrl, type FileOwner } from '@/api/files'
 import type { MessageFeedback } from '@/chat/useMessageFeedback'
 import type { SkillProposals } from '@/chat/useSkillProposals'
 import type { ViewerItem } from '@/components/viewer/viewer-store'
+import { noteRender } from '@/perf/renders'
 import { spacing } from '@/theme/tokens'
 
 import { AgentPickerCard, readAgentPicks } from './cards/AgentPickerCard'
@@ -88,6 +89,7 @@ type MessageViewProps = {
 type Block = { key: string; node: React.ReactNode }
 
 export function MessageView({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
+    noteRender('MessageView')
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
     if (message.role === 'user') {

@@ -33,6 +33,7 @@ import { loadTranscript } from '@/data/local-cache'
 import { useInbox } from '@/data/InboxProvider'
 import { useBoard } from '@/data/useBoard'
 import { setBadge } from '@/notifications/push'
+import { startTiming } from '@/perf/timing'
 import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -78,7 +79,11 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
         if (unread !== null) setBadge(unread).catch(() => {})
     }, [unread])
 
-    const open = (coworker: HomeCoworker) => (coworker.id === FOREMAN_AGENT_ID ? openForeman() : go({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? GENERAL_PAGE_ID, to: coworker.id } }))
+    const open = (coworker: HomeCoworker) => {
+        startTiming('chat open', 'chat fresh')
+        if (coworker.id === FOREMAN_AGENT_ID) return openForeman()
+        go({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? GENERAL_PAGE_ID, to: coworker.id } })
+    }
 
     const warmUp = (coworker: HomeCoworker) => {
         const sessionId = coworker.latest?.id

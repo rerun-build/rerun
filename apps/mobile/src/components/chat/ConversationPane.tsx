@@ -15,6 +15,8 @@ import { track } from '@/lib/analytics'
 import * as Haptics from '@/lib/haptics'
 import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { askForPushOnce, setConversationOnScreen } from '@/notifications/push'
+import { noteRender } from '@/perf/renders'
+import { endTiming } from '@/perf/timing'
 import type { ChatEndpoints } from '@/chat/endpoints'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
 import { useMessageTimes } from '@/chat/useMessageTimes'
@@ -103,6 +105,7 @@ type ConversationPaneProps = {
 
 // One conversation on screen: the transcript, what waits on an answer, and the composer.
 export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
+    noteRender('ConversationPane')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const insets = useSafeAreaInsets()
@@ -205,6 +208,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     // Photos go to the coworker's folder first; the message then names their paths, as on the web, and
     // shows them from the phone until the transcript comes back.
     const sessionId = chat.sessionId
+    useEffect(() => {
+        if (onScreen && chat.fresh) endTiming('chat fresh', `${chat.messages.length} messages`)
+    }, [onScreen, chat.fresh, chat.messages.length])
     useEffect(() => {
         if (!onScreen) return
         setConversationOnScreen(sessionId)
@@ -370,6 +376,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                 <ScrollView
                     ref={scroll}
+                    testID="conversation-thread"
                     style={StyleSheet.absoluteFill}
                     scrollIndicatorInsets={{ bottom: footerHeight }}
                     keyboardDismissMode="interactive"
@@ -399,6 +406,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         setViewport(event.nativeEvent.layout.height)
                     }}
                     onContentSizeChange={(_, height) => {
+                        if (onScreen && chat.history === 'ready') endTiming('chat open', `${chat.messages.length} messages, ${chat.fresh ? 'from the hub' : 'kept on the phone'}`)
                         metrics.current = { ...metrics.current, content: height }
                         if (stuck.current) scroll.current?.scrollToEnd({ animated: shownTranscript.current })
                         if (chat.history === 'ready') shownTranscript.current = true
