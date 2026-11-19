@@ -23,7 +23,7 @@ import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
-import { claudeContextCapture, type ClaudeContextCapture } from './claude-context.js'
+import { claudeContextCapture, type ClaudeCompaction, type ClaudeContextCapture } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
 import { createCodexImageMiddleware } from './codex-images.js'
@@ -40,6 +40,7 @@ import { opencodeChatReasoningMiddleware, opencodeUsageMiddleware } from './open
 import { agentProcessEnv } from './process-env.js'
 import { BRIDGE_SERVER_NAME, CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { hubCallerHeaders } from '../runtime/hub.js'
+import { COMPACTION_TRIGGER_RATIO } from '../runtime/compaction/config.js'
 import type { StoredScreenshot } from '../runtime/screenshots.js'
 
 export { CLI_PROVIDERS }
@@ -61,9 +62,6 @@ const BRIDGE_TOOL_TIMEOUT_SEC = 3600
 // the CLI the Agent SDK ships (2.1.322); the provider forwards any `CLAUDE_*` through its allowlist
 // and merges these over it, so the unprefixed one passes too.
 export const CLAUDE_HARNESS_ENV = {
-    // Rerun compacts the session before the run. A second compaction inside the CLI would rewrite
-    // a history Rerun keeps sending in full, and the two would never agree on what was said.
-    DISABLE_AUTO_COMPACT: '1',
     // Update checks, telemetry, surveys.
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
     CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
@@ -74,6 +72,14 @@ export const CLAUDE_HARNESS_ENV = {
     // The CLI process exits with the turn, so nothing started in the background would outlive it.
     CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: '1',
     CLAUDE_CODE_DISABLE_CRON: '1',
+} as const
+
+// Rerun compacts the conversation before the turn, but a whole turn is a single step to the loop:
+// only the CLI can compact a long one as it goes. It does so in its own process, which
+// `persistSession: false` throws away with the turn, so the history Rerun stores stays whole. The
+// CLI reads the override as a percentage of the window, and still keeps 13k tokens below it.
+export const CLAUDE_COMPACTION_ENV = {
+    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE: String(Math.round(COMPACTION_TRIGGER_RATIO * 100)),
 } as const
 
 // Codex's native sub-agents run inside the app-server, which is closed with the run: a child
@@ -250,7 +256,7 @@ export type CliModelOptions = { system?: string; claudeTools?: readonly string[]
 
 // What a run hands its model beyond the tools: the prompt and the screenshots for the CLIs, the
 // conversation for OpenCode.
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; onClaudeCompaction?: (compaction: ClaudeCompaction) => void }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -300,6 +306,7 @@ function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpS
             env: {
                 ...agentEnv,
                 ...CLAUDE_HARNESS_ENV,
+                ...CLAUDE_COMPACTION_ENV,
                 ...claudeAuthEnv(connectionEnv(agent)),
                 ANTHROPIC_API_KEY: undefined,
                 MCP_TOOL_TIMEOUT: String(BRIDGE_TOOL_TIMEOUT_SEC * 1000),
@@ -463,7 +470,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, onClaudeCompaction }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     // `wrapLanguageModel` runs the list from the end: the guard sits nearest the model, so no other
     // middleware ever reads a fake tool call, the card tags go next, and the quick replies read the
@@ -476,7 +483,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
         return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
     }
     if (provider === 'claude') {
-        const capture = claudeContextCapture(agent.resolved.connection?.id)
+        const capture = claudeContextCapture(agent.resolved.connection?.id, onClaudeCompaction)
         const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
     }

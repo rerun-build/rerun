@@ -36,12 +36,14 @@ async function withinTimeout<T>(task: Promise<T>): Promise<T | undefined> {
     }
 }
 
+export type ClaudeCompaction = { status: 'running' } | { status: 'done'; tokensRecovered?: number }
+
 // The context window occupancy only exists while the CLI subprocess is alive:
 // `getContextUsage()` is a control-protocol round-trip that rejects once the
 // query has finished, so it must run inside a Stop hook. The hook's return
 // blocks the CLI's end of turn, hence the hard timeout. The plan limits of the
 // subscription are read on the same occasion, for the same reason.
-export function claudeContextCapture(connectionId?: string): ClaudeContextCapture {
+export function claudeContextCapture(connectionId?: string, onCompaction?: (compaction: ClaudeCompaction) => void): ClaudeContextCapture {
     let query: Query | undefined
     let snapshot: ContextOccupancy | undefined
 
@@ -79,6 +81,22 @@ export function claudeContextCapture(connectionId?: string): ClaudeContextCaptur
         return { continue: true }
     }
 
+    const usedTokens = async (): Promise<number | undefined> => (query ? (await withinTimeout(query.getContextUsage()))?.totalTokens : undefined)
+
+    let tokensBeforeCompaction: number | undefined
+    const preCompactHook = async (): Promise<{ continue: boolean }> => {
+        tokensBeforeCompaction = await usedTokens()
+        onCompaction?.({ status: 'running' })
+        return { continue: true }
+    }
+    const postCompactHook = async (): Promise<{ continue: boolean }> => {
+        const after = await usedTokens()
+        const before = tokensBeforeCompaction
+        tokensBeforeCompaction = undefined
+        onCompaction?.(typeof before === 'number' && typeof after === 'number' ? { status: 'done', tokensRecovered: Math.max(0, before - after) } : { status: 'done' })
+        return { continue: true }
+    }
+
     return {
         read: () => snapshot,
         settings: {
@@ -86,7 +104,11 @@ export function claudeContextCapture(connectionId?: string): ClaudeContextCaptur
                 query = q
                 void captureCliModels(q)
             },
-            hooks: { Stop: [{ hooks: [stopHook] }] },
+            hooks: {
+                Stop: [{ hooks: [stopHook] }],
+                // The provider drops the CLI's compaction boundary, so its hooks are the only way to see it.
+                ...(onCompaction ? { PreCompact: [{ hooks: [preCompactHook] }], PostCompact: [{ hooks: [postCompactHook] }] } : {}),
+            },
         },
     }
 }

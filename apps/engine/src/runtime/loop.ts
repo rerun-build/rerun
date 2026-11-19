@@ -7,6 +7,7 @@ import { createInRunCompactor } from './compaction/in-run.js'
 import { repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { CLI_PROVIDERS, resolveModel, type ModelOverride } from '../agents/providers.js'
+import type { ClaudeCompaction } from '../agents/claude-context.js'
 import { offersQuickReplies, quickRepliesCall, type QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import { codexThreadToResume, forgetCodexThread, rememberCodexThread } from '../agents/codex-threads.js'
 import { repairBoxDefault, toOverride, type RunModel } from '../agents/availability.js'
@@ -586,7 +587,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId })
+        let cliCompactionId = newId()
+        const onClaudeCompaction = (compaction: ClaudeCompaction): void => {
+            if (compaction.status === 'running') cliCompactionId = newId()
+            writer?.write({ type: 'data-compaction', id: cliCompactionId, data: compaction })
+            if (compaction.status === 'done') logger.info({ agent: agent.id, session: sessionId, run: run.id, tokensRecovered: compaction.tokensRecovered }, 'context compacted by the CLI')
+        }
+        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, onClaudeCompaction })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.

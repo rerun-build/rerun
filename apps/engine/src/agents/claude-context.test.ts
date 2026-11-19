@@ -64,6 +64,40 @@ describe('claudeContextCapture', () => {
         expect(capture.read()).toBeUndefined()
     })
 
+    describe('compaction inside a turn', () => {
+        type Hook = () => Promise<unknown>
+        const hookOf = (capture: ReturnType<typeof claudeContextCapture>, event: 'PreCompact' | 'PostCompact'): Hook => capture.settings.hooks?.[event]?.[0]?.hooks[0] as Hook
+
+        it('reports the CLI compacting and the tokens it gave back', async () => {
+            const seen: unknown[] = []
+            const capture = claudeContextCapture(undefined, compaction => seen.push(compaction))
+            const readings = [160_000, 30_000]
+            capture.settings.onQueryCreated?.(fakeQuery(async () => ({ totalTokens: readings.shift(), maxTokens: 200_000 })))
+
+            await expect(hookOf(capture, 'PreCompact')()).resolves.toEqual({ continue: true })
+            await expect(hookOf(capture, 'PostCompact')()).resolves.toEqual({ continue: true })
+
+            expect(seen).toEqual([{ status: 'running' }, { status: 'done', tokensRecovered: 130_000 }])
+        })
+
+        it('still reports the compaction when the occupancy cannot be read', async () => {
+            const seen: unknown[] = []
+            const capture = claudeContextCapture(undefined, compaction => seen.push(compaction))
+            capture.settings.onQueryCreated?.(fakeQuery(async () => Promise.reject(new Error('ProcessTransport is not ready for writing'))))
+
+            await hookOf(capture, 'PreCompact')()
+            await hookOf(capture, 'PostCompact')()
+
+            expect(seen).toEqual([{ status: 'running' }, { status: 'done' }])
+        })
+
+        it('keeps the Stop hook beside them, and adds none without a listener', () => {
+            const listened = claudeContextCapture(undefined, () => {})
+            expect(Object.keys(listened.settings.hooks ?? {})).toEqual(['Stop', 'PreCompact', 'PostCompact'])
+            expect(Object.keys(claudeContextCapture().settings.hooks ?? {})).toEqual(['Stop'])
+        })
+    })
+
     describe('plan limits', () => {
         const PLAN_USAGE = 'usage_EXPERIMENTAL_MAY_CHANGE_DO_NOT_RELY_ON_THIS_API_YET'
         const occupancy = async () => ({ totalTokens: 1000, maxTokens: 200_000 })

@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { tool, dynamicTool, jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { McpServer } from '@rerun/contracts'
-import { CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig } from './providers.js'
+import { CLAUDE_COMPACTION_ENV, CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig } from './providers.js'
 import { askUserTool, canonicalBridgeName, canonicalHitlName, isHitlToolName, requestApprovalTool } from '../tools/builtin/hitl.js'
 
 const HITL_CTX = { agent: { config: { tools: { cards: true } } } } as any
@@ -76,8 +76,11 @@ describe('claudeMcpConfig', () => {
 })
 
 describe('CLAUDE_HARNESS_ENV', () => {
-    it('leaves compaction to the engine', () => {
-        expect(CLAUDE_HARNESS_ENV.DISABLE_AUTO_COMPACT).toBe('1')
+    // A whole turn is a single step to the loop: only the CLI can compact a long one as it goes.
+    it('lets the CLI compact a long turn, at the ratio the engine compacts at', () => {
+        expect(CLAUDE_HARNESS_ENV).not.toHaveProperty('DISABLE_AUTO_COMPACT')
+        expect(CLAUDE_HARNESS_ENV).not.toHaveProperty('DISABLE_COMPACT')
+        expect(CLAUDE_COMPACTION_ENV.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE).toBe('75')
     })
 
     it('closes what would outlive the turn', () => {
