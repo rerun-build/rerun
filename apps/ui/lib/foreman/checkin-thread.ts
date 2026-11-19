@@ -19,17 +19,15 @@ export function isCheckinAnnouncement(payload: Pick<NotificationPayload, 'event'
     return payload.event === 'agent.session.created' && !!checkin && typeof checkin === 'object'
 }
 
-// The member the engine named, held to what they reach now: still a member, and able to see every
-// coworker the message is about. Null leaves the thread to whoever reads the foreman's routines.
+// The member the engine named, held to what they reach now: still a member, and one who sees the
+// whole workspace. The thread is the session the check-in ran in, so its reader gets everything the
+// run read, across every Box. Null leaves the thread to whoever reads the foreman's routines.
 export async function checkinReaderOf(workspaceId: number, metadata: NotificationPayload['metadata']): Promise<string | null> {
     const memberId = typeof metadata?.memberId === 'string' ? metadata.memberId : null
     if (!memberId) return null
     const actor = await memberActor(workspaceId, memberId)
     if (!actor) return null
-    const about = Array.isArray(metadata?.aboutAgentIds) ? metadata.aboutAgentIds.filter((id): id is string => typeof id === 'string') : []
-    if (!about.length) return memberId
-    const visible = await visibleAgentIds(actor)
-    return visible === 'all' || about.every(id => visible.has(id)) ? memberId : null
+    return (await visibleAgentIds(actor)) === 'all' ? memberId : null
 }
 
 async function foremanNameOf(workspaceId: number): Promise<string> {

@@ -4,6 +4,9 @@ import { createHmac, timingSafeEqual } from 'crypto'
 // is not enough, since `x-rerun-agent: foreman` opens the account tools. The hub signs one with
 // every foreman turn's brief, the engine keeps it in memory only, and the secret never leaves the hub.
 // Twelve hours outlive the longest run the turn starts.
+//
+// One exception, on purpose: a check-in has nobody to sign for it, so /api/foreman/checkin-brief
+// hands the engine key alone a `scope: 'read'` token.
 export const FOREMAN_HUB_TOKEN_TTL_MS = 12 * 60 * 60 * 1000
 
 // A check-in reads and suggests: its token outlives its run by little, and opens only the hub tools

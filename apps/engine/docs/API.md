@@ -1473,7 +1473,8 @@ Its settings are `proactive` in the foreman's configuration, kept across boots:
 
 A check-in that has something to say calls `report_to_member({ member?, about?, title })`: `member`
 is the id of the person it is for (the owner when left out), `about` the app's ids of the coworkers
-it is about, `title` the title of the thread. Its final message is what that person reads. Once the
+it is about, `title` the title of the thread. Its final message is what that person reads; the app
+hands the thread to the owner instead when the member named does not see every Box. Once the
 run is over the engine sends, in this order, `agent.session.created` (`title`, `message` the first
 200 characters of the message, `source: "schedule"`, `metadata: { checkin: { reason }, memberId,
 aboutAgentIds }`) then `agent.schedule.completed`. When the first is not delivered, both are sent

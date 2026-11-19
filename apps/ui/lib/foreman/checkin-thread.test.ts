@@ -19,7 +19,7 @@ const payload = (metadata: Record<string, unknown>) => ({ event: 'agent.session.
 beforeEach(() => {
     vi.clearAllMocks()
     mocks.memberActor.mockResolvedValue(ana)
-    mocks.visibleAgentIds.mockResolvedValue(new Set(['agent-invoices']))
+    mocks.visibleAgentIds.mockResolvedValue('all')
     mocks.openForemanRoutineThread.mockResolvedValue({ id: 'thread-1', userId: 'ana' })
     mocks.selectMaybeSingle.mockImplementation(async (_client: unknown, table: string) => (table === 'users' ? { data: { email_notification_prefs: null } } : { data: { answers: { foreman: { name: 'Max' } } } }))
 })
@@ -33,13 +33,18 @@ describe('isCheckinAnnouncement', () => {
 })
 
 describe('checkinReaderOf', () => {
-    it('keeps the member the engine named when they still reach every coworker it is about', async () => {
+    it('keeps the member the engine named when they see the whole workspace', async () => {
         expect(await checkinReaderOf(7, { memberId: 'ana', aboutAgentIds: ['agent-invoices'] })).toBe('ana')
-        expect(await checkinReaderOf(7, { memberId: 'ana', aboutAgentIds: [] })).toBe('ana')
+        expect(await checkinReaderOf(7, { memberId: 'ana' })).toBe('ana')
     })
 
-    it('drops a member who left, one kept out of a coworker it is about, or none named at all', async () => {
-        expect(await checkinReaderOf(7, { memberId: 'ana', aboutAgentIds: ['agent-invoices', 'agent-payroll'] })).toBeNull()
+    it('drops a member kept to some Boxes, even for a coworker of theirs: the thread holds all the run read', async () => {
+        mocks.visibleAgentIds.mockResolvedValue(new Set(['agent-invoices']))
+        expect(await checkinReaderOf(7, { memberId: 'ana', aboutAgentIds: ['agent-invoices'] })).toBeNull()
+        expect(await checkinReaderOf(7, { memberId: 'ana', aboutAgentIds: [] })).toBeNull()
+    })
+
+    it('drops a member who left, or none named at all', async () => {
         mocks.memberActor.mockResolvedValue(null)
         expect(await checkinReaderOf(7, { memberId: 'ana' })).toBeNull()
         expect(await checkinReaderOf(7, {})).toBeNull()
