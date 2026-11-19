@@ -22,7 +22,9 @@ const GRACE_MARGIN_S = 5
 // so it can wait for that run rather than vanish.
 // `knownUpdatedAt`: the version of the conversation in the list the app holds. A transcript kept at
 // that same version is the hub's own: the conversation opens on it ready to act on.
-export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = null, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; knownUpdatedAt?: string | null; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
+// `onScreen`: false for a page kept beside the one shown, which reads its transcript again only once
+// it comes back on screen.
+export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = null, onScreen = true, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; knownUpdatedAt?: string | null; onScreen?: boolean; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
     const { session, me } = useAuth()
     const callerRef = useRef<ChatCaller | null>(null)
     const sessionRef = useRef(initialSessionId)
@@ -122,6 +124,10 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     useEffect(() => {
         busyRef.current = busy
     }, [busy])
+    // Back from the background, only the page on screen reads again at once; one kept beside it does
+    // when it is shown.
+    const onScreenRef = useRef(onScreen)
+    const staleRef = useRef(false)
 
     const comeBack = useCallback(() => {
         awayRef.current = false
@@ -227,10 +233,19 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
                 rejoin().catch(() => {}).finally(comeBack)
                 return
             }
-            if (!busyRef.current) refresh({ resume: true }).catch(() => {})
+            if (busyRef.current) return
+            if (onScreenRef.current) refresh({ resume: true }).catch(() => {})
+            else staleRef.current = true
         })
         return () => subscription.remove()
     }, [refresh, rejoin, letGo, endGrace, clearError, comeBack])
+
+    useEffect(() => {
+        onScreenRef.current = onScreen
+        if (!onScreen || !staleRef.current) return
+        staleRef.current = false
+        refresh({ resume: true }).catch(() => {})
+    }, [onScreen, refresh])
 
     // The stream picked up again speaks for itself: busy follows the status from here.
     useEffect(() => {

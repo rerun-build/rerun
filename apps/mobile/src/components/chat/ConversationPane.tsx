@@ -20,6 +20,7 @@ import { noteRender } from '@/perf/renders'
 import { endTiming } from '@/perf/timing'
 import type { ChatEndpoints } from '@/chat/endpoints'
 import type { FileOwner } from '@/api/files'
+import { placeOf, rememberPlace } from '@/chat/reading-place'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
 import { useMessageTimes } from '@/chat/useMessageTimes'
 import { useMessageFeedback } from '@/chat/useMessageFeedback'
@@ -122,7 +123,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [endpoints] = useState(makeEndpoints)
     // A message the engine refused while a run held the conversation waits behind it, as on the web.
     const enqueueRef = useRef<(text: string, behindRunId: string | null) => void>(() => {})
-    const chat = useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt: updatedAt, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
+    const chat = useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt: updatedAt, onScreen, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
     const queue = useQueuedMessage(`${coworker.id}-${chat.sessionId ?? 'new'}`)
     const proposals = useSkillProposals(coworker.kind === 'coworker' ? chat.sessionId : null, chat.busy)
     // A decision lifts the wait the proposal raised on the session, as on the web.
@@ -143,8 +144,11 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     // The web's stick-to-bottom: the thread follows what arrives only while the person sits at its
     // end. Scrolling up lets go; scrolling back down, sending or the arrow takes it again. Only the
     // person's own scrolling decides, never the scrolls the pane makes itself.
-    const stuck = useRef(true)
-    const [following, setFollowing] = useState(true)
+    // A conversation left above its end earlier in this launch opens where it was left.
+    const [returningTo] = useState(() => (initialSessionId ? placeOf(initialSessionId) : null))
+    const restoring = useRef(returningTo)
+    const stuck = useRef(returningTo === null)
+    const [following, setFollowing] = useState(returningTo === null)
     const stick = (value: boolean) => {
         if (stuck.current === value) return
         stuck.current = value
@@ -425,6 +429,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                             setViewport(layoutMeasurement.height)
                         }
                         if (touching.current) stick(below <= AT_BOTTOM)
+                        if (chat.sessionId) rememberPlace(chat.sessionId, stuck.current ? null : below)
                     }}
                     onScrollBeginDrag={() => {
                         touching.current = true
@@ -443,6 +448,10 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         if (onScreen && chat.history === 'ready') endTiming('chat open', `${chat.messages.length} messages, ${chat.fresh ? 'from the hub' : 'kept on the phone'}`)
                         metrics.current = { ...metrics.current, content: height }
                         if (stuck.current) scroll.current?.scrollToEnd({ animated: shownTranscript.current })
+                        else if (restoring.current !== null && chat.history === 'ready' && metrics.current.viewport > 0) {
+                            scroll.current?.scrollTo({ y: Math.max(0, height - metrics.current.viewport - BLUR_ABOVE_FOOTER - restoring.current), animated: false })
+                            restoring.current = null
+                        }
                         if (chat.history === 'ready') shownTranscript.current = true
                     }}
                     contentContainerStyle={{ flexGrow: 1, justifyContent: empty ? 'center' : 'flex-end', width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}

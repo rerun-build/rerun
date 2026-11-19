@@ -8,6 +8,7 @@ import { useTranslations } from 'use-intl'
 
 import { useAuth } from '@/auth/AuthProvider'
 import { coworkerEndpoints } from '@/chat/endpoints'
+import { preloadGenerals } from '@/chat/preload'
 import { foremanOnBoard, lineOf, minutesSince, moodStatus, recentCoworkers, type HomeCoworker } from '@/components/home/board'
 import { SkeletonFade, useBootFill } from '@/components/home/BootFill'
 import { generalHref } from '@/components/chat/conversation-pages'
@@ -37,6 +38,9 @@ import { startTiming } from '@/perf/timing'
 import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+
+// The Home has drawn and settled before anything is read in the background.
+const PRELOAD_AFTER_MS = 1500
 
 // A wide window draws the Home as a sidebar beside the conversation: a tap swaps the conversation
 // instead of stacking one more screen, and the row of the open one stays lit.
@@ -72,6 +76,17 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running) : undefined)
     const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
+
+    // Once the Home has the hub's rows, the Generals of the coworkers talked to last are read in the
+    // background, for the next tap to open at once.
+    const coworkersRead = board.state === 'ready' && board.fresh ? board.coworkers : null
+    const accessToken = session?.access_token
+    const workspaceId = me?.workspace.id
+    useEffect(() => {
+        if (!coworkersRead || !accessToken || workspaceId === undefined) return
+        const timer = setTimeout(() => void preloadGenerals({ accessToken, workspaceId }, coworkersRead), PRELOAD_AFTER_MS)
+        return () => clearTimeout(timer)
+    }, [coworkersRead, accessToken, workspaceId])
 
     // The app icon shows the bell's count, never off the copy kept from the last visit.
     const unread = inbox.state === 'ready' && inbox.fresh ? inboxCount(inbox.items) : null

@@ -468,3 +468,40 @@ describe('useCoworkerChat in the time iOS grants in the background', () => {
         expect(mockChat.stop).toHaveBeenCalledTimes(1)
     })
 })
+
+// The pages a coworker keeps drawn beside the one shown do not all read the hub again at once.
+describe('useCoworkerChat on a page kept beside the one shown', () => {
+    beforeEach(() => {
+        clearLocalCache()
+        mockChat.initialStatus = 'ready'
+        jest.clearAllMocks()
+        jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+            appStateListener = listener as (state: AppStateStatus) => void
+            return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>
+        })
+    })
+
+    it('reads its transcript again once it comes on screen, not when the app comes back', async () => {
+        const endpoints = fakeEndpoints(null)
+        const { rerender } = await renderHook(({ onScreen }: { onScreen: boolean }) => useCoworkerChat({ endpoints, initialSessionId: 's1', onScreen }), { initialProps: { onScreen: false } })
+        await act(async () => {})
+        jest.clearAllMocks()
+
+        await act(async () => appStateListener('active'))
+        expect(endpoints.messages).not.toHaveBeenCalled()
+
+        await rerender({ onScreen: true })
+        await act(async () => {})
+        expect(endpoints.messages).toHaveBeenCalledTimes(1)
+    })
+
+    it('reads again at once when it is the one on screen', async () => {
+        const endpoints = fakeEndpoints(null)
+        await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1', onScreen: true }))
+        await act(async () => {})
+        jest.clearAllMocks()
+
+        await act(async () => appStateListener('active'))
+        expect(endpoints.messages).toHaveBeenCalledTimes(1)
+    })
+})
