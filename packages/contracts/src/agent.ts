@@ -144,7 +144,7 @@ export function isSetupAnswered(setup: { required: boolean | null; prompt: strin
 
 // The Chief of Staff's check-ins: it wakes on its own, reads the workspace and only ever suggests.
 // On for every workspace until an admin switches it off. `connectionId` and `model` pin what a
-// check-in runs on; null runs it on the workspace's default model. Only the foreman reads it.
+// check-in runs on; null runs it on the Chief of Staff's own model. Only the foreman reads it.
 export const proactiveSchema = z.object({
     enabled: z.boolean().default(true),
     connectionId: z.string().nullable().default(null),

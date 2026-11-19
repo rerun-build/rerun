@@ -56,3 +56,8 @@ export async function listCheckins(limit = 20): Promise<CheckinEntry[]> {
     })
 }
 
+// What its latest check-ins told someone, newest first. A check-in writes no memory of its own, so
+// this is how the next one knows what was already raised.
+export async function listReports(limit = 5): Promise<CheckinEntry[]> {
+    return (await listCheckins()).filter(checkin => checkin.status === 'done' && checkin.title && checkin.note).slice(0, limit)
+}

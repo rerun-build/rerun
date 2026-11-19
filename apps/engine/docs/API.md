@@ -39,7 +39,8 @@ are open:
   `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
   `/runs/:rid/tasks/:taskId/cancel`;
 - a `PATCH` that only carries `connectionId`, `provider`, `model` and `proactive`;
-- `POST /checkins/run`, a check-in now (see [Check-ins](#check-ins));
+- `GET /checkins`, its check-ins and their settings, and `POST /checkins/run`, a check-in now (see
+  [Check-ins](#check-ins));
 - what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
   `/skill-proposals` and `/schedules`, `PATCH /mcp-servers`, `GET /mcp-servers/status`,
   `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
@@ -1338,7 +1339,8 @@ Agents can also manage their own schedules at runtime with the `schedule_*` tool
 A schedule of the foreman can carry `checkIn: true` in its front matter, which its own `schedule_create`
 sets when it promises to come back to something. Such a schedule fires as a check-in for that
 promise (`reason: "promise"`, see [Check-ins](#check-ins)) rather than as a scheduled run, at most
-three times a day across all of them (an occurrence over the cap is spent without a run); `run`
+three times a day across all of them (an occurrence over the cap is spent without a run; one due
+while another check-in runs, or while the credit or the subscription it runs on is out, stays due); `run`
 fires it whatever the cap says. On any other agent the field means nothing.
 
 ---
@@ -1451,7 +1453,9 @@ carries on. `{ "ok": true, "aborted": true }`.
 A check-in is a run of the Chief of Staff that nobody started: it wakes on its own, reads the
 workspace and only suggests. Its run has `triggerSource: "checkin"` and a `checkinJson` that says
 why it woke (`reason`: `pulse`, `promise` or `manual`) and what it concluded (`note`). Its session
-has the `schedule` source and is announced to nobody.
+has the `schedule` source and is announced to nobody. Its opening message names the people who
+write in the workspace and the last five things its check-ins told someone: a check-in writes no
+memory, so that list is how it knows what it already raised.
 
 It runs on the brief the app returns to `POST {RERUN_HUB_BASE_URL}/api/foreman/checkin-brief`
 (`{ "reason": "pulse" }`, with the engine key): instructions, the hub tools that read, and a token
@@ -1468,7 +1472,8 @@ proposes no skill and runs no curator.
 
 Its settings are `proactive` in the foreman's configuration, kept across boots:
 `{ "enabled": true, "connectionId": null, "model": null }`. `enabled: false` stops every check-in;
-`connectionId` and `model` pin what they run on, `null` runs them on the foreman's own model.
+`connectionId` and `model` pin what they run on, `null` runs them on the foreman's own model. A
+`PATCH` merges `proactive` with what is stored: `{ "proactive": { "enabled": false } }` keeps the pin.
 `RERUN_FOREMAN_CHECKINS=off` stops them on the whole engine, whatever the setting says.
 
 A check-in that has something to say calls `report_to_member({ member?, about?, title })`: `member`
@@ -1486,12 +1491,23 @@ Besides the ones asked for (`manual`) and its own promises, the engine takes a d
 the box (from 09:00 plus a delay of up to two hours of its own, until 18:00, once per local day, never
 without a known time zone), it reads a digest of the box (`buildDigest`: numbers and short labels,
 `checkinDigestSchema` in the contracts) and decides by its rules (`decide`): no check-in when nobody
-wrote for 30 days or one ran in the last 20 hours; one every day of the first 14 days of the
+wrote for 30 days or a pulse ran in the last 20 hours (a check-in someone asked for, or a promise,
+does not count); one every day of the first 14 days of the
 foreman, one when 3 runs failed in a day, a question waits on someone or a Vault account needs a
 sign-in, one when a week passed without; otherwise, on something minor, it asks the app
 (`POST {RERUN_HUB_BASE_URL}/api/foreman/triage`, `{ "digest": … }`, answered
 `{ "checkin": true, "probability": 0.74 }`), and any failure there reads as no. A pulse that finds the
 foreman busy tries again on the next tick.
+
+#### `GET /agents/foreman/checkins`
+
+What the card of the Chief of Staff reads: `{ "proactive", "available", "checkins", "nextAt" }`.
+`proactive` is its settings, `available` is `false` when `RERUN_FOREMAN_CHECKINS=off`, `checkins` its
+last 20 check-ins, newest first (`{ runId, sessionId, status, startedAt, reason, note?, title?,
+reportedTo?, announcedAt? }`: `status` is the run's, `running` while it is under way, `title` and
+`reportedTo` only when it decided to speak, `announcedAt` once the app was told), and `nextAt` the
+earliest of its next pulse and its own promises, `null` while its check-ins are off. Any other agent
+answers `404`.
 
 #### `POST /agents/foreman/checkins/run`
 

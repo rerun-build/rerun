@@ -29,4 +29,6 @@ export const budgetExhausted = () => new HttpError(402, 'Rerun credits used up; 
 
 export const checkinsDisabled = () => new HttpError(403, 'The check-ins of the Chief of Staff are switched off on this box.', 'checkins_disabled')
 
+export const checkinBusy = () => new HttpError(409, 'The Chief of Staff is already checking in; this one waits for it to end.', 'checkin_busy')
+
 export const promiseCapReached = () => new HttpError(429, 'The Chief of Staff already came back to its own routines as often as it may today.', 'promise_cap')

@@ -133,6 +133,7 @@ agentRoutes.patch('/:id', async c => {
             tools: { ...current.tools, ...(body.tools as object | undefined) },
             selfImprovement: { ...current.selfImprovement, ...(body.selfImprovement as object | undefined) },
             setup: { ...current.setup, ...(body.setup as object | undefined) },
+            proactive: { ...current.proactive, ...(body.proactive as object | undefined) },
         })
         await writeAgentConfig(id, next)
         if (next.name !== current.name) {

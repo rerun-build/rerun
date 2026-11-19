@@ -1830,6 +1830,26 @@
                                                             "default": false,
                                                             "type": "boolean"
                                                         },
+                                                        "proactive": {
+                                                            "default": {},
+                                                            "properties": {
+                                                                "connectionId": {
+                                                                    "default": null,
+                                                                    "nullable": true,
+                                                                    "type": "string"
+                                                                },
+                                                                "enabled": {
+                                                                    "default": true,
+                                                                    "type": "boolean"
+                                                                },
+                                                                "model": {
+                                                                    "default": null,
+                                                                    "nullable": true,
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
                                                         "provider": {
                                                             "default": null,
                                                             "enum": [

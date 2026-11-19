@@ -14,6 +14,17 @@ export const messageAuthorSchema = z.object({
 
 // How an app with no cookie (the mobile app) tells the hub the time zone of the device.
 export const TIME_ZONE_HEADER = 'x-rerun-time-zone'
+
+// An IANA zone as the browser or the app sent it, or nothing: a zone Intl cannot read is dropped.
+export function validTimeZone(value: string | null | undefined): string | undefined {
+    if (!value) return undefined
+    try {
+        new Intl.DateTimeFormat('en', { timeZone: value })
+        return value
+    } catch {
+        return undefined
+    }
+}
 export type MessageAuthor = z.infer<typeof messageAuthorSchema>
 
 export const chatRequestSchema = z.object({

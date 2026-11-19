@@ -34,4 +34,20 @@ describe('buildCheckinMessage', () => {
         expect(message).toContain('a routine you set yourself to come back to something came due')
         expect(message).toContain('What you said you would come back to:\nSee whether Ana reconnected Stripe.')
     })
+
+    it('lists what its latest check-ins already told someone, so it does not say it again', () => {
+        const message = buildCheckinMessage({
+            slug: 'checkin',
+            name: 'Check-in',
+            reason: 'pulse',
+            now,
+            members: [{ id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' }],
+            reports: [
+                { runId: 'r2', sessionId: 's2', status: 'done', startedAt: '2026-11-18T08:00:00.000Z', reason: 'pulse', title: 'Stripe needs to be signed in again', reportedTo: 'u-ana' },
+                { runId: 'r1', sessionId: 's1', status: 'done', startedAt: '2026-11-16T08:00:00.000Z', reason: 'pulse', title: 'Invoices keep failing' },
+            ],
+        })
+        expect(message).toContain('What your latest check-ins already told someone, the latest first:\n- yesterday, for Ana: Stripe needs to be signed in again\n- 3 days ago, for the owner: Invoices keep failing')
+        expect(buildCheckinMessage({ slug: 'checkin', name: 'Check-in', reason: 'pulse', members: [], now })).not.toContain('already told someone')
+    })
 })

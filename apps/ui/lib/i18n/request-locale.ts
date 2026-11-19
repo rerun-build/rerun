@@ -1,8 +1,8 @@
 import 'server-only'
 
-import { TIME_ZONE_COOKIE, validTimeZone } from '@/lib/i18n/time-zone'
+import { TIME_ZONE_COOKIE } from '@/lib/i18n/time-zone'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
-import { TIME_ZONE_HEADER } from '@rerun/contracts'
+import { TIME_ZONE_HEADER, validTimeZone } from '@rerun/contracts'
 import { LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@rerun/i18n'
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'

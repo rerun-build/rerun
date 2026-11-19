@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type MessageAuthor } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, validTimeZone, type MessageAuthor } from '@rerun/contracts'
 import { nowIso } from '../../lib/ids.js'
 import { getSystemDb } from '../systemDb.js'
 
@@ -12,16 +12,6 @@ const rowOf = (row: Record<string, unknown>): Member => ({
     lastSeenAt: String(row.last_seen_at),
 })
 
-function validTimeZone(value: string | undefined): string | null {
-    if (!value) return null
-    try {
-        new Intl.DateTimeFormat('en', { timeZone: value })
-        return value
-    } catch {
-        return null
-    }
-}
-
 // Every message a person writes, to any coworker of the box. A message that names no zone, from an
 // older client, keeps the one the member had: their zone does not move because one app forgot it.
 export async function touchMember(author: MessageAuthor, at: string = nowIso()): Promise<void> {
@@ -29,7 +19,7 @@ export async function touchMember(author: MessageAuthor, at: string = nowIso()):
     await client.execute({
         sql: `INSERT INTO members (id, name, timezone, first_seen_at, last_seen_at) VALUES (?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET name = COALESCE(excluded.name, members.name), timezone = COALESCE(excluded.timezone, members.timezone), last_seen_at = MAX(members.last_seen_at, excluded.last_seen_at)`,
-        args: [author.id, author.name ?? null, validTimeZone(author.timezone), at, at],
+        args: [author.id, author.name ?? null, validTimeZone(author.timezone) ?? null, at, at],
     })
 }
 

@@ -84,6 +84,11 @@ describe('PATCH /agents/:id', () => {
         expect((await patchConfig({ tools: { shell: false } })).config.model).toBe('acme/router-large')
     })
 
+    it('merges the check-in settings instead of dropping the model they pin', async () => {
+        await patchConfig({ proactive: { enabled: true, connectionId: 'cnx-router', model: 'acme/router-small' } })
+        expect((await patchConfig({ proactive: { enabled: false } })).config.proactive).toEqual({ enabled: false, connectionId: 'cnx-router', model: 'acme/router-small' })
+    })
+
     it('writes the install prompt and merges the setup answer', async () => {
         const detail = await patchConfig({ install: 'Ask for the Stripe key, then test it.', setup: { required: true } })
         expect(detail.install.trim()).toBe('Ask for the Stripe key, then test it.')

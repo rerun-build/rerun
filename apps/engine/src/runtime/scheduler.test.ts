@@ -27,6 +27,8 @@ const state = vi.hoisted(() => ({
     sweep: vi.fn(async (_ids: string[]) => {}),
     sessions: 0,
     promisesToday: 0,
+    checkinRunning: false,
+    promiseLatch: null as Error | null,
     checkins: [] as Array<{ reason: string; slug?: string }>,
     announce: vi.fn(async () => {}),
     pulse: vi.fn(async () => {}),
@@ -37,6 +39,10 @@ vi.mock('../checkins/pulse.js', () => ({ runPulseIfDue: state.pulse }))
 vi.mock('../checkins/run.js', () => ({
     PROMISE_DAILY_CAP: 3,
     promisesInLastDay: async () => state.promisesToday,
+    checkinInFlight: () => state.checkinRunning,
+    refuseLatchedCheckin: async () => {
+        if (state.promiseLatch) throw state.promiseLatch
+    },
     startCheckin: async (reason: string, schedule?: { slug: string }) => {
         state.checkins.push({ reason, slug: schedule?.slug })
         return { runId: 'checkin-run', sessionId: 'checkin-session' }
@@ -138,6 +144,8 @@ beforeEach(() => {
     state.liveRuns = false
     state.launchError = null
     state.promisesToday = 0
+    state.checkinRunning = false
+    state.promiseLatch = null
     state.checkins = []
 })
 
@@ -393,6 +401,21 @@ describe('fireSchedule on a promise of the Chief of Staff', () => {
 
     it('still wakes it past the cap when someone pressed Run now', async () => {
         state.promisesToday = 3
+        await fireSchedule('foreman', schedule('come-back', { checkIn: true }), { manual: true })
+        expect(state.checkins).toEqual([{ reason: 'promise', slug: 'come-back' }])
+    })
+
+    it('leaves it due while another check-in runs, which would never read what was promised', async () => {
+        state.checkinRunning = true
+        await expect(fireSchedule('foreman', schedule('come-back', { checkIn: true }))).rejects.toMatchObject({ code: 'checkin_busy' })
+        expect(state.markFired).not.toHaveBeenCalled()
+        expect(state.checkins).toEqual([])
+    })
+
+    it('leaves it due while the credit is out, unless someone pressed Run now', async () => {
+        state.promiseLatch = Object.assign(new Error('Rerun credits used up'), { code: 'budget_latched' })
+        await expect(fireSchedule('foreman', schedule('come-back', { checkIn: true }))).rejects.toMatchObject({ code: 'budget_latched' })
+        expect(state.markFired).not.toHaveBeenCalled()
         await fireSchedule('foreman', schedule('come-back', { checkIn: true }), { manual: true })
         expect(state.checkins).toEqual([{ reason: 'promise', slug: 'come-back' }])
     })

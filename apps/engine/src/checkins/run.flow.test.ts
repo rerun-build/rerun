@@ -24,13 +24,13 @@ const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')
 const { createServer } = await import('../http/server.js')
 const { migrate } = await import('../db/migrate.js')
 const { ensureForeman } = await import('../agents/foreman.js')
-const { getRun } = await import('../db/repos/runs.js')
+const { failRun, finishRun, getRun, setRunContext, startRun } = await import('../db/repos/runs.js')
 const { getSession } = await import('../db/repos/sessions.js')
-const { readCheckinLog } = await import('./log.js')
+const { readCheckinLog, writeCheckinLog } = await import('./log.js')
 const { CHECKIN_FALLBACK_INSTRUCTIONS } = await import('./brief.js')
 const { workspaceDir } = await import('../config/paths.js')
 const { touchMember } = await import('../db/repos/members.js')
-const { announcePendingCheckins } = await import('./settle.js')
+const { announcePendingCheckins, settleCheckin } = await import('./settle.js')
 const { startScriptedModel } = await import('../remote/__fixtures__/scripted-model.mjs')
 
 // A check-in on the fallback brief, with a model that tries to write a file through the shell first.
@@ -114,6 +114,7 @@ describe('a check-in of the Chief of Staff', () => {
         expect(sent.map(event => event.event)).toEqual(['agent.session.created', 'agent.schedule.completed'])
         await announcePendingCheckins()
         expect(sent).toHaveLength(2)
+        expect(JSON.stringify(model.calls.at(-2)?.messages)).toContain('for Ana: Invoices keep failing')
         script.mode = 'sneak'
     }, 30_000)
 
@@ -128,6 +129,26 @@ describe('a check-in of the Chief of Staff', () => {
         expect(body.checkins[0]).toMatchObject({ reason: 'manual', title: 'Invoices keep failing' })
         expect(Number.isNaN(Date.parse(body.nextAt ?? ''))).toBe(false)
         expect((await send('GET', '/agents/someone/checkins')).status).toBe(404)
+    })
+
+    it('keeps in its log a check-in that failed before it could start, with why', async () => {
+        const run = await startRun(FOREMAN_AGENT_ID, sessionId)
+        await setRunContext(FOREMAN_AGENT_ID, run.id, { provider: 'custom', model: 'scripted', triggerSource: 'checkin', triggerSlug: 'checkin' })
+        await failRun(FOREMAN_AGENT_ID, run.id, 'sign-in expired')
+        await settleCheckin({ agentId: FOREMAN_AGENT_ID, sessionId, runId: run.id, trigger: { source: 'checkin', slug: 'checkin', name: 'Check-in', reason: 'pulse' }, kind: 'error', error: 'sign-in expired' })
+        expect(await readCheckinLog(run.id)).toEqual({ reason: 'pulse', note: 'Failed: sign-in expired' })
+        const { checkins } = (await (await send('GET', `/agents/${FOREMAN_AGENT_ID}/checkins`)).json()) as { checkins: Array<{ runId: string; status: string }> }
+        expect(checkins.find(checkin => checkin.runId === run.id)).toMatchObject({ status: 'error' })
+    })
+
+    it('says nothing on a later tick for a check-in that named someone and then wrote nothing', async () => {
+        const run = await startRun(FOREMAN_AGENT_ID, sessionId)
+        await setRunContext(FOREMAN_AGENT_ID, run.id, { provider: 'custom', model: 'scripted', triggerSource: 'checkin', triggerSlug: 'checkin' })
+        await writeCheckinLog(run.id, { reason: 'pulse', title: 'Invoices keep failing' })
+        await finishRun(FOREMAN_AGENT_ID, run.id, null, 1)
+        sent.length = 0
+        await announcePendingCheckins()
+        expect(sent).toEqual([])
     })
 
     it('refuses to start once an admin switched them off', async () => {

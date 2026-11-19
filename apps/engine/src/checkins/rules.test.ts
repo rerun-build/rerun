@@ -6,7 +6,7 @@ const now = Date.parse('2026-11-19T09:30:00.000Z')
 const HOUR = 60 * 60_000
 
 const calm: CheckinDigest = { workspaceAgeDays: 40, daysSinceLastCheckin: 2, daysSinceLastHumanMessage: 1, coworkers: 3, failedRuns24h: 0, failingCoworkers: [], pendingQuestions: 0, appsNeedingSignIn: 0, inactiveCoworkers: [], openSkillProposals: 0, neverUsed: [] }
-const at = (digest: Partial<CheckinDigest>, lastCheckinAt: number | null = now - 48 * HOUR) => decide({ digest: { ...calm, ...digest }, lastCheckinAt, now })
+const at = (digest: Partial<CheckinDigest>, lastPulseAt: number | null = now - 48 * HOUR) => decide({ digest: { ...calm, ...digest }, lastPulseAt, now })
 
 describe('decide', () => {
     it('leaves alone a workspace nobody wrote in, or nobody for thirty days', () => {

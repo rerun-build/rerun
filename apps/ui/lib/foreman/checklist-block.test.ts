@@ -12,6 +12,13 @@ describe('checklistBlock', () => {
         expect(block).toContain('checkIn set to true')
     })
 
+    it('tells a check-in what the next step is, never how: it talks to nobody and holds none of those tools', () => {
+        const block = checklistBlock({ ...NO_PROGRESS, first_agent: true, ai_provider: true }, { checkin: true })
+        expect(block).toContain('The next step: invite a teammate.')
+        expect(block).toContain('only when it is the most useful thing to tell them today')
+        for (const tool of ['ask_user', 'invite_members', 'schedule_create', 'open_settings']) expect(block).not.toContain(tool)
+    })
+
     it('says nothing once the checklist is finished, hidden or never read', () => {
         expect(checklistBlock({ ...NO_PROGRESS, first_agent: true, ai_provider: true, invite: true, schedule: true, payment_method: true })).toBeNull()
         expect(checklistBlock(null)).toBeNull()

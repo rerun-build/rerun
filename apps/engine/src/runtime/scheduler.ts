@@ -17,10 +17,10 @@ import { sendNotification } from './notify.js'
 import { isBudgetLatched } from './budget-latch.js'
 import { agentHasLiveRun } from './run-control.js'
 import { nowIso } from '../lib/ids.js'
-import { PROMISE_DAILY_CAP, promisesInLastDay, startCheckin } from '../checkins/run.js'
+import { PROMISE_DAILY_CAP, checkinInFlight, promisesInLastDay, refuseLatchedCheckin, startCheckin } from '../checkins/run.js'
 import { announcePendingCheckins } from '../checkins/settle.js'
 import { runPulseIfDue } from '../checkins/pulse.js'
-import { agentDisabled, budgetExhausted, coworkerBusy, HttpError, promiseCapReached, subscriptionLimited } from '../lib/errors.js'
+import { agentDisabled, budgetExhausted, checkinBusy, coworkerBusy, HttpError, promiseCapReached, subscriptionLimited } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 
 const TICK_MS = 30_000
@@ -90,12 +90,16 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
 }
 
 // A routine the Chief of Staff set itself to come back to something: a check-in, under a daily cap.
-// The occurrence is spent either way, so a capped or switched-off one does not fire on every tick.
+// A capped or switched-off occurrence is spent, so it does not fire on every tick. One that only has
+// to wait stays due: for the check-in already running, which would answer in its place without ever
+// reading what was promised, or for the credit or the subscription to come back, like any schedule.
 async function firePromise(schedule: Schedule, opts?: { markFired?: boolean; manual?: boolean }): Promise<{ runId: string; sessionId: string }> {
+    if (checkinInFlight()) throw checkinBusy()
     const capped = !opts?.manual && (await promisesInLastDay()) >= PROMISE_DAILY_CAP
+    if (!opts?.manual && !capped) await refuseLatchedCheckin(schedule)
     if (opts?.markFired !== false) await markFired(FOREMAN_AGENT_ID, schedule.slug, nowIso())
     if (capped) throw promiseCapReached()
-    return startCheckin('promise', schedule)
+    return startCheckin('promise', schedule, { manual: opts?.manual })
 }
 
 const SKIP_REASONS: Record<string, string> = {
@@ -103,6 +107,7 @@ const SKIP_REASONS: Record<string, string> = {
     checkins_disabled: 'check-ins of the Chief of Staff switched off',
     budget_latched: 'rerun budget latched',
     coworker_busy: 'another run of the coworker is live',
+    checkin_busy: 'the Chief of Staff is already checking in',
     subscription_limited: 'subscription limit latched',
 }
 

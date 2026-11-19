@@ -7,6 +7,7 @@ import { getSystemDb } from '../db/systemDb.js'
 import { logger } from '../lib/logger.js'
 import { agentHasLiveRun } from '../runtime/run-control.js'
 import { buildDigest } from './digest.js'
+import { parseCheckinLog } from './log.js'
 import { decide } from './rules.js'
 import { checkinInFlight, startCheckin } from './run.js'
 import { askTriage } from './triage.js'
@@ -39,10 +40,14 @@ async function writeMeta(key: string, value: string): Promise<void> {
     await client.execute({ sql: 'INSERT INTO system_meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', args: [key, value] })
 }
 
-async function lastCheckinAt(): Promise<number | null> {
+const RECENT_CHECKINS = 50
+
+// The pulse before this one. A check-in someone asked for, or one of its own promises, is not a pulse.
+async function lastPulseAt(): Promise<number | null> {
     const { client } = await getSystemDb(FOREMAN_AGENT_ID)
-    const at = (await client.execute("SELECT max(started_at) AS at FROM runs WHERE trigger_source = 'checkin'")).rows[0]?.at as string | null
-    return at ? Date.parse(at) : null
+    const { rows } = await client.execute({ sql: "SELECT started_at, checkin_json FROM runs WHERE trigger_source = 'checkin' ORDER BY started_at DESC LIMIT ?", args: [RECENT_CHECKINS] })
+    const pulse = rows.find(row => parseCheckinLog(row.checkin_json as string | null)?.reason === 'pulse')
+    return pulse ? Date.parse(String(pulse.started_at)) : null
 }
 
 let taking = false
@@ -65,7 +70,7 @@ export async function runPulseIfDue(now = new Date()): Promise<void> {
         await writeMeta(DAY_KEY, clock.day)
 
         const digest = await buildDigest(now.getTime())
-        const decision = decide({ digest, lastCheckinAt: await lastCheckinAt(), now: now.getTime() })
+        const decision = decide({ digest, lastPulseAt: await lastPulseAt(), now: now.getTime() })
         const go = decision === 'checkin' || (decision === 'ask' && (await askTriage(digest)))
         logger.info({ decision, go, day: clock.day }, 'pulse taken')
         if (go) await startCheckin('pulse')
