@@ -12,13 +12,13 @@
             "dockRight": "Rechts andocken",
             "float": "Schwebend"
         },
-        "newTask": "Neue Aufgabe",
+        "newConversation": "Neue Unterhaltung",
         "conversations": "Unterhaltungen"
     },
     "threads": {
         "general": "Allgemein",
         "back": "Zurück zu Allgemein",
-        "untitled": "Neue Aufgabe"
+        "untitled": "Neue Unterhaltung"
     },
     "history": {
         "title": "Unterhaltungen",

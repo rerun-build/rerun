@@ -169,7 +169,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
     // l'onboarding en cours, est un faux départ, donc c'est l'orbe qui tient l'écran. Ailleurs elle
     // veut dire que la conversation du serveur est encore en vol, et ça se dit avec la forme de ce
     // qui va arriver.
-    // A General nobody spoke in yet, whose threads were all opened from « New task », shows them.
+    // A General nobody spoke in yet, whose threads were all opened from « New conversation », shows them.
     const empty = visible.length === 0 && !error && threadRows.leading.length === 0
     const greeting = empty && guided
     const restoring = empty && !guided && !restored

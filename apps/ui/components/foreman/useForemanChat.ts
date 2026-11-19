@@ -331,7 +331,7 @@ export function useForemanChat() {
     // The server holds the conversations, so the column reads the one on screen when it first opens
     // and every time another takes its place: General, from the foreman the workspace talks to now
     // (the onboarding's never comes back once the engine took over), or a thread by its id. A thread
-    // "New task" just opened has nothing to read.
+    // "New conversation" just opened has nothing to read.
     // Adopting the id comes first: useChat is keyed on it, and messages set before the swap would
     // belong to the chat instance the swap throws away. The landing effect sets them once the ids
     // agree.
@@ -340,7 +340,7 @@ export function useForemanChat() {
     const readFor = useRef<string | null>(null)
     // Whether the transcript on the server has been read for the conversation on screen. Anything that
     // wants to write the first message has to wait for this, or it writes into a conversation it has
-    // not seen. A thread « New task » just opened has nothing to wait for.
+    // not seen. A thread « New conversation » just opened has nothing to wait for.
     const [readDoneFor, setReadDoneFor] = useState<string | null>(null)
     const draftId = useForemanStore(state => state.draftId)
     const restoreDone = readDoneFor === sessionId || draftId === sessionId

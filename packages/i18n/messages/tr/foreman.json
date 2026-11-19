@@ -12,13 +12,13 @@
             "dockRight": "Sağa sabitle",
             "float": "Serbest"
         },
-        "newTask": "Yeni görev",
+        "newConversation": "Yeni konuşma",
         "conversations": "Sohbetler"
     },
     "threads": {
         "general": "Genel",
         "back": "Genel'e dön",
-        "untitled": "Yeni görev"
+        "untitled": "Yeni konuşma"
     },
     "history": {
         "title": "Sohbetler",

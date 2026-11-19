@@ -119,10 +119,12 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
 
     const { queued, restoredId: restoredQueuedId, enqueue: enqueueMessage, clear: clearQueued } = useQueuedMessage('foreman')
     const composerRef = useRef<ChatComposerHandle | null>(null)
+    const blankDraft = useForemanStore(state => state.draftId === state.sessionId) && messages.length === 0
+    // A "New conversation" nobody has written in yet is the new one: asking again lands on it.
     const startNewChat = useCallback(() => {
-        useForemanStore.getState().newChat()
+        if (!blankDraft) useForemanStore.getState().newChat()
         composerRef.current?.focus()
-    }, [])
+    }, [blankDraft])
 
     // General carries its threads as branches; a thread slides over it, and the crumb brings it back.
     const tThreads = useTranslations('foreman.threads')
@@ -466,8 +468,12 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col">
                     {pinned ? (
                         <ForemanTopBar
-                            thread={threadOnScreen && { id: sessionId, ...threadOnScreen }}
+                            sessionId={sessionId}
+                            inThread={inThread}
+                            blankDraft={blankDraft}
+                            threads={threads}
                             onShowGeneral={backToGeneral}
+                            onOpenThread={openThread}
                             onNewTask={startNewChat}
                             end={<DetailsToggle label={tView('card')} />}
                             history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}

@@ -107,7 +107,7 @@ export function ForemanHeader({
                     {!guided && (
                         <Button size="sm" onClick={onNewChat}>
                             <PlusIcon />
-                            {t('newTask')}
+                            {t('newConversation')}
                         </Button>
                     )}
                 </>

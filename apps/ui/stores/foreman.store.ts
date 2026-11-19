@@ -56,7 +56,7 @@ type ForemanState = {
      * it, then the server's. On the hub, the onboarding's one conversation.
      */
     generalId: string
-    /** A thread "New task" just opened: the server has nothing of it yet, there is nothing to read. */
+    /** A thread "New conversation" just opened: the server has nothing of it yet, there is nothing to read. */
     draftId: string | null
     /**
      * Qui sert la conversation en cours. `null` tant qu'aucun message n'est parti : elle suit alors
@@ -130,7 +130,7 @@ type ForemanState = {
     /** Entrer dans le tunnel : le mode et l'ouverture, d'un seul coup. */
     startFunnel: () => void
     setArrival: (arrival: ForemanArrival | null) => void
-    /** « New task »: a thread of its own beside General, on the engine. */
+    /** « New conversation »: a thread of its own beside General, on the engine. */
     newChat: () => void
     /** Brings General back on screen, read again from the server. */
     showGeneral: () => void
@@ -258,11 +258,12 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         const sessionId = randomUuid()
         set({ ...CONVERSATION_SWITCH, sessionId, draftId: sessionId, intakePreview: null })
     },
+    // Left, a "New conversation" stops being a draft: written in, it is read from the server when it comes back.
     showGeneral: () => {
-        if (get().sessionId !== get().generalId) set({ ...CONVERSATION_SWITCH, sessionId: get().generalId })
+        if (get().sessionId !== get().generalId) set({ ...CONVERSATION_SWITCH, sessionId: get().generalId, draftId: null })
     },
     openThread: sessionId => {
-        if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine' })
+        if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine', draftId: null })
     },
     setGeneral: (sessionId, backend) => set({ generalId: sessionId, sessionId, backend: backend ?? null }),
     startEngineGeneral: () => {

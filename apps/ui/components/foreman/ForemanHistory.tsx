@@ -68,7 +68,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                         <div className="flex items-center gap-1.5">
                             <Button variant="outline" size="sm" onClick={pick(onNewTask)}>
                                 <PlusIcon className="size-3.5" />
-                                {tHeader('newTask')}
+                                {tHeader('newConversation')}
                             </Button>
                             <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
                                 <XIcon className="size-4" />

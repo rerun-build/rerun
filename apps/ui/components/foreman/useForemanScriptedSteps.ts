@@ -99,7 +99,7 @@ export function useForemanScriptedSteps({ messages, status, guided, restoreDone,
     }, [messages, restoreDone])
 
     // The phase is read from the server once per identity, so without this the column would stay in
-    // the funnel until the next reload, with its "New task" still hidden. The build claimed the
+    // the funnel until the next reload, with its "New conversation" still hidden. The build claimed the
     // machine on its way: the next message goes to the foreman running on it, while the build stays
     // on screen with its buttons.
     const finished = guided && funnelFinished(messages)

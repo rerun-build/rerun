@@ -12,13 +12,13 @@
             "dockRight": "Anclar a la derecha",
             "float": "Flotante"
         },
-        "newTask": "Nueva tarea",
+        "newConversation": "Nueva conversación",
         "conversations": "Conversaciones"
     },
     "threads": {
         "general": "General",
         "back": "Volver a General",
-        "untitled": "Nueva tarea"
+        "untitled": "Nueva conversación"
     },
     "history": {
         "title": "Conversaciones",

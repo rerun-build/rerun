@@ -145,7 +145,7 @@ describe('backend', () => {
 describe('General and threads', () => {
     beforeEach(() => useForemanStore.getState().setSurface('engine'))
 
-    it('opens « New task » as a thread beside General, with nothing to read from the server', () => {
+    it('opens « New conversation » as a thread beside General, with nothing to read from the server', () => {
         const store = useForemanStore.getState()
         store.setGeneral('general', 'engine')
         store.newChat()
@@ -165,6 +165,17 @@ describe('General and threads', () => {
         store.showGeneral()
         expect(useForemanStore.getState()).toMatchObject({ sessionId: 'general', backend: null })
         expect(selectForemanInThread(useForemanStore.getState())).toBe(false)
+    })
+
+    it('reads a « New conversation » from the server once it has been left, as any other thread', () => {
+        const store = useForemanStore.getState()
+        store.setGeneral('general', 'engine')
+        store.newChat()
+        const task = useForemanStore.getState().sessionId
+        store.showGeneral()
+        expect(useForemanStore.getState().draftId).toBeNull()
+        store.openThread(task)
+        expect(useForemanStore.getState()).toMatchObject({ sessionId: task, draftId: null })
     })
 
     it('sends what is asked from outside the column to General, whatever thread is on screen', () => {

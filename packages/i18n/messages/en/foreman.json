@@ -1,7 +1,7 @@
 {
     "_context": {
         "welcome.preparing": "Shimmering line under the welcome title while the first turn of the onboarding starts.",
-        "header.newTask": "Button that starts a new conversation with the Chief of Staff.",
+        "header.newConversation": "Button that starts a new conversation with the Chief of Staff.",
         "header.position.float": "Menu option: the chat floats in a corner of the screen instead of being docked.",
         "modelPill.hubReason": "Tooltip on the disabled model picker. Rerun Balanced is the name of a model, keep it as is.",
         "dock.tooltip": "Tooltip of the Chief of Staff orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
@@ -35,7 +35,7 @@
         "gettingStarted.prompts": "Messages sent to the assistant in the user's name when they click a step of the getting started checklist. First person, the user speaking.",
         "threads.general": "Back button above a thread: the name of the Chief of Staff's main conversation, which every thread hangs from. Keep it short.",
         "threads.back": "Accessible label of the back button above a thread.",
-        "threads.untitled": "Title of a thread the person just opened with New task, before they wrote anything in it.",
+        "threads.untitled": "Title of a thread the person just opened with New conversation, before they wrote anything in it.",
         "header.conversations": "Tooltip and label of the clock button that lists every conversation with the Chief of Staff.",
         "history.title": "Title of the list of every conversation with the Chief of Staff: General and its threads.",
         "plan.scene.planned": "Screen reader label of a Box or a coworker drawn on the board as part of a plan, not built yet. {name} is its name.",
@@ -54,13 +54,13 @@
             "dockRight": "Dock right",
             "float": "Float"
         },
-        "newTask": "New task",
+        "newConversation": "New conversation",
         "conversations": "Conversations"
     },
     "threads": {
         "general": "General",
         "back": "Back to General",
-        "untitled": "New task"
+        "untitled": "New conversation"
     },
     "history": {
         "title": "Conversations",
