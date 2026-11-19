@@ -1,15 +1,13 @@
-import { coworkerVaultAccountsSchema, type CoworkerVaultAccounts } from '@rerun/contracts'
+import { mobileApi, type CoworkerVaultAccounts } from '@rerun/contracts'
 
-import { api } from '@/api/client'
+import { hub } from '@/api/client'
 
 type Caller = { accessToken: string; workspaceId: number }
 
-const vault = (agentId: string) => `/api/v1/agents/${encodeURIComponent(agentId)}/vault`
-
 export async function readVaultAccounts(caller: Caller, agentId: string): Promise<CoworkerVaultAccounts> {
-    return coworkerVaultAccountsSchema.parse(await api(vault(agentId), caller))
+    return hub(mobileApi.listVaultAccounts, { ...caller, params: { id: agentId } })
 }
 
 export async function lendVaultAccount(caller: Caller, agentId: string, itemId: string): Promise<void> {
-    await api(vault(agentId), { ...caller, method: 'POST', body: { itemId } })
+    await hub(mobileApi.lendVaultAccount, { ...caller, params: { id: agentId }, body: { itemId } })
 }

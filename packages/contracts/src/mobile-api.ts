@@ -48,6 +48,7 @@ import { connectTargetSchema, installedServiceSchema, installResultSchema, insta
 import { sessionSourceSchema } from './session.js'
 import { skillProposalDecideRequestSchema, skillProposalSchema, skillProposalsListSchema } from './skill-proposal.js'
 import { skillSummariesViewSchema } from './skill.js'
+import { attachVaultAccountInputSchema, coworkerVaultAccountsSchema } from './vault.js'
 
 // The bodies and queries of the calls that had no schema of their own: the hub read them by hand, or
 // declared them in its route file, and the app sent an object literal.
@@ -191,6 +192,8 @@ export const mobileApi = {
     installService: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/services/{slug}/install', body: installServiceInputSchema, response: installResultSchema }),
     connectService: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/services/{slug}/connect', response: connectTargetSchema }),
     claimServiceSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/services/{slug}/authorized', body: signInClaimSchema, response: 'none' }),
+    listVaultAccounts: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}/vault', response: coworkerVaultAccountsSchema }),
+    lendVaultAccount: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/vault', body: attachVaultAccountInputSchema, response: 'none' }),
 
     // 304: the transcript the app holds, named by the ETag it sent back, has not changed.
     getConversationMessages: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/messages', response: z.array(conversationMessageSchema), emptyStatus: 304, headers: ['ETag'] }),

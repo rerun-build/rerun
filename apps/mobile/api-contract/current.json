@@ -4239,6 +4239,121 @@
                 "x-mobile-api": "listAgentSkills"
             }
         },
+        "/api/v1/agents/{id}/vault": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "accounts": {
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "slug",
+                                                    "label"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "canAttach": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "canAttach",
+                                        "accounts"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "listVaultAccounts"
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "itemId": {
+                                        "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "itemId"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "lendVaultAccount"
+            }
+        },
         "/api/v1/ai-connections": {
             "get": {
                 "parameters": [],
