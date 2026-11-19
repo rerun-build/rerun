@@ -28,6 +28,8 @@
     "spaceNotFound": "Alan bulunamadı",
     "sessionNotFound": "Oturum bulunamadı",
     "conversationNotFound": "Sohbet bulunamadı",
+    "requestAlreadyAnswered": "Bu isteğe zaten yanıt verildi.",
+    "coworkerStillWorking": "Coworker hâlâ çalışıyor. Birazdan tekrar deneyin.",
     "accountNotFound": "Hesap bulunamadı",
     "templateNotFound": "Şablon bulunamadı",
     "expertOnly": "Uzman hesaplarına özel",

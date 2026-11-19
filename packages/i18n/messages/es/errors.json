@@ -28,6 +28,8 @@
     "spaceNotFound": "Box no encontrada",
     "sessionNotFound": "Conversación no encontrada",
     "conversationNotFound": "Conversación no encontrada",
+    "requestAlreadyAnswered": "Esta solicitud ya fue respondida.",
+    "coworkerStillWorking": "El coworker sigue trabajando. Inténtalo de nuevo en un momento.",
     "accountNotFound": "Cuenta no encontrada",
     "templateNotFound": "Plantilla no encontrada",
     "expertOnly": "Reservado a las cuentas de experto",

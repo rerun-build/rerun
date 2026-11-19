@@ -1,9 +1,7 @@
 import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getExistingSession, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
+import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getExistingSession, recordMessageSent, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
-import { recordSessionParticipant, recordSessionRead } from '@/app/api/_services/notification-audience.service'
-import { recordSentMessage } from '@/app/api/_services/session-preview.service'
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
@@ -230,12 +228,8 @@ export async function POST(request: Request) {
         break
     }
 
-    await updateSessionStatus(supabaseSessionId, 'working')
-    await Promise.all([recordSessionParticipant(supabaseSessionId, author.id), recordSessionRead(supabaseSessionId, author.id)])
-    // Not awaited, and not in `after()` either: that one waits for the whole streamed answer, and
-    // would land the message after the reply it asked for. An install opens with its guide, which is
-    // nobody's message.
-    if (!install) void recordSentMessage(supabaseSessionId, text, author.id)
+    // An install opens with its guide, which is nobody's message.
+    await recordMessageSent(supabaseSessionId, author.id, install ? null : text)
 
     const headers = new Headers()
     headers.set('Content-Type', engineRes.headers.get('content-type') ?? 'text/event-stream')

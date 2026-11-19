@@ -1,0 +1,78 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { AuthorizationError } from '@/app/api/_auth/ownership'
+import { ApiError } from '@/lib/api-error'
+
+const engineChat = vi.fn()
+let status = 'awaiting_approval'
+let transcript: { role: string; parts: unknown[] }[] = []
+
+vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: () => ({ kind: 'user', userId: 'me', workspaceId: 7 }), callableEngineAgentIds: async () => undefined }))
+vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: () => ({ id: 'me' }) }))
+vi.mock('@/app/api/_services/chat.service', () => ({
+    getExistingSession: vi.fn(async (id: string) => {
+        if (id === 'elsewhere') throw new AuthorizationError('sessionNotFound')
+        return { sessionId: id, agentId: 'agent-1', engineSessionId: 'engine-session' }
+    }),
+    resolveAgentTarget: async () => ({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } }),
+    recordMessageSent: vi.fn(),
+}))
+vi.mock('@/app/api/_services/conversation.service', () => ({ readSessionTranscript: async () => ({ messages: transcript, updatedAt: null }) }))
+// The queue's retries are start-chat's, covered by the tests of /api/chat.
+vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: (...args: unknown[]) => engineChat(...args) }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: async () => ({ data: { status } }) }))
+
+const { replyToConversation } = await import('./reply.service')
+const { recordMessageSent } = await import('@/app/api/_services/chat.service')
+
+const ctx = {} as never
+const approvalCard = (toolCallId: string) => [{ role: 'assistant', parts: [{ type: 'tool-request_approval', toolCallId, input: { approvals: [{ action: 'Send 12 emails' }] } }] }]
+const started = () => new Response('data: {}\n\n', { headers: { 'x-run-id': 'run-9' } })
+
+async function refusalOf(promise: Promise<unknown>): Promise<ApiError> {
+    const err = await promise.catch(error => error)
+    expect(err).toBeInstanceOf(ApiError)
+    return err as ApiError
+}
+
+describe('replyToConversation', () => {
+    beforeEach(() => {
+        status = 'awaiting_approval'
+        transcript = approvalCard('call-1')
+        engineChat.mockReset().mockImplementation(async () => started())
+        vi.mocked(recordMessageSent).mockClear()
+    })
+
+    it('approves the card it names, starts the run and lets the stream go', async () => {
+        await expect(replyToConversation(ctx, 'conv-1', { action: 'approve', toolCallId: 'call-1' })).resolves.toEqual({ runId: 'run-9' })
+        const [, agentId, params] = engineChat.mock.calls[0]
+        expect(agentId).toBe('engine-agent')
+        expect(params).toMatchObject({ sessionId: 'engine-session', author: { id: 'me' } })
+        expect(params.message).toContain('1. **APPROVED** — Send 12 emails')
+        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', 'me', params.message)
+    })
+
+    it('refuses a card that is no longer the one waiting, on a second tap or once answered in the app', async () => {
+        expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'approve', toolCallId: 'call-0' }))).status).toBe(409)
+        status = 'working'
+        expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'deny', toolCallId: 'call-1' }))).code).toBe('requestAlreadyAnswered')
+        expect(engineChat).not.toHaveBeenCalled()
+    })
+
+    it('sends a reply to a finished run as a plain message', async () => {
+        status = 'idle'
+        await replyToConversation(ctx, 'conv-1', { action: 'reply', text: 'Now the Spanish one' })
+        expect(engineChat.mock.calls[0][2].message).toBe('Now the Spanish one')
+    })
+
+    it('says the coworker is still busy once the queue gave up, without recording anything', async () => {
+        engineChat.mockImplementation(async () => Response.json({ runId: 'run-1' }, { status: 409 }))
+        expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'reply', text: 'Thanks' }))).code).toBe('coworkerStillWorking')
+        expect(recordMessageSent).not.toHaveBeenCalled()
+    })
+
+    it('reads a conversation of another workspace as missing', async () => {
+        await expect(replyToConversation(ctx, 'elsewhere', { action: 'approve', toolCallId: 'call-1' })).rejects.toBeInstanceOf(AuthorizationError)
+    })
+})

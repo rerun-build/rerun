@@ -1,6 +1,5 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
-import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
-import { recordSentMessage } from '@/app/api/_services/session-preview.service'
+import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, recordMessageSent, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
@@ -20,7 +19,7 @@ vi.mock('@/app/api/_services/chat.service', async importOriginal => ({
     getExistingSession: vi.fn(),
     createSessionRow: vi.fn(),
     findGeneralSession: vi.fn(),
-    updateSessionStatus: vi.fn(),
+    recordMessageSent: vi.fn(),
 }))
 vi.mock('@/app/api/_services/session-preview.service', () => ({ recordSentMessage: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('@/lib/ai/generate-title', () => ({ generateSessionTitle: vi.fn().mockResolvedValue('Title') }))
@@ -234,7 +233,7 @@ describe('POST /api/chat', () => {
             const response = await settle(POST(request({})))
 
             expect(response.status).toBe(200)
-            expect(recordSentMessage).toHaveBeenCalledWith('session', 'ship it', 'me')
+            expect(recordMessageSent).toHaveBeenCalledWith('session', 'me', 'ship it')
         })
 
         it('keeps nothing of an install, which opens with its guide', async () => {
@@ -243,7 +242,7 @@ describe('POST /api/chat', () => {
 
             await settle(POST(request({ sessionId: undefined, text: buildInstallMessage('Set up the coworker', 'Scout') })))
 
-            expect(recordSentMessage).not.toHaveBeenCalled()
+            expect(recordMessageSent).toHaveBeenCalledWith('new-session', 'me', null)
         })
 
         it('keeps nothing when the engine refuses the message', async () => {
@@ -252,7 +251,7 @@ describe('POST /api/chat', () => {
             const response = await settle(POST(request({})))
 
             expect(response.status).toBe(502)
-            expect(recordSentMessage).not.toHaveBeenCalled()
+            expect(recordMessageSent).not.toHaveBeenCalled()
         })
     })
 })

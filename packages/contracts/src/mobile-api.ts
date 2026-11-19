@@ -21,7 +21,7 @@ import {
     updateConnectionSchema,
     workspaceDefaultInputSchema,
 } from './connection.js'
-import { activeRunSchema, agentConversationsOverviewSchema, conversationHitSchema, conversationMessageSchema, conversationSchema, inboxSchema, markHandledSchema, sessionKindSchema } from './conversation.js'
+import { activeRunSchema, agentConversationsOverviewSchema, conversationHitSchema, conversationMessageSchema, conversationReplyResultSchema, conversationReplySchema, conversationSchema, inboxSchema, markHandledSchema, sessionKindSchema } from './conversation.js'
 import { desktopSocketRequestSchema, desktopSocketSchema, takeoverRequestSchema, takeoverResultSchema } from './desktop.js'
 import { coworkerFilesSchema } from './file.js'
 import {
@@ -200,6 +200,8 @@ export const mobileApi = {
     getActiveRun: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/active-run', response: activeRunSchema }),
     stopConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/stop', response: 'none' }),
     acknowledgeConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/acknowledge', response: 'none' }),
+    // A button under a push: 409 once the card it names is no longer the one waiting, or the coworker is still busy.
+    replyToConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/reply', body: conversationReplySchema, response: conversationReplyResultSchema, errors: { 409: hubErrorSchema } }),
     listSkillProposals: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/skill-proposals', response: skillProposalsListSchema }),
     decideSkillProposal: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/skill-proposals', body: skillProposalDecideRequestSchema, response: skillProposalDecidedSchema }),
     listMessageFeedback: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/feedback', query: messageFeedbackQuerySchema, response: messageFeedbackListSchema }),

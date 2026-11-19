@@ -141,7 +141,19 @@ export const toHandleListSchema = z.object({
 })
 export type ToHandleList = z.infer<typeof toHandleListSchema>
 
-export const markHandledSchema = z.union([z.object({ sessionIds: z.array(z.string()).min(1) }), z.object({ all: z.literal(true) })])
+// An answer sent from outside the conversation, a push button above all. `toolCallId` names the card
+// it answers, and the hub refuses it once that card is no longer the one waiting: a second tap, or an
+// answer given meanwhile in the app. Without it, `reply` is a plain message in the conversation.
+export const conversationReplySchema = z.discriminatedUnion('action', [
+    z.object({ action: z.enum(['approve', 'deny']), toolCallId: z.string().min(1).max(256) }),
+    z.object({ action: z.literal('reply'), toolCallId: z.string().min(1).max(256).optional(), text: z.string().trim().min(1).max(4000) }),
+])
+export type ConversationReply = z.infer<typeof conversationReplySchema>
+
+export const conversationReplyResultSchema = z.object({ runId: z.string().nullable() })
+export type ConversationReplyResult = z.infer<typeof conversationReplyResultSchema>
+
+export const markHandledSchema =z.union([z.object({ sessionIds: z.array(z.string()).min(1) }), z.object({ all: z.literal(true) })])
 export type MarkHandledInput = z.infer<typeof markHandledSchema>
 
 export const inboxStatusSchema = z.enum(['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human', 'awaiting_ack', 'error', 'done'])

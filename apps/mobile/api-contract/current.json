@@ -7200,6 +7200,128 @@
                 "x-mobile-api": "getConversationMessages"
             }
         },
+        "/api/v1/conversations/{id}/reply": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "properties": {
+                                            "action": {
+                                                "enum": [
+                                                    "approve",
+                                                    "deny"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "toolCallId": {
+                                                "maxLength": 256,
+                                                "minLength": 1,
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "action",
+                                            "toolCallId"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    {
+                                        "properties": {
+                                            "action": {
+                                                "enum": [
+                                                    "reply"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "text": {
+                                                "maxLength": 4000,
+                                                "minLength": 1,
+                                                "type": "string"
+                                            },
+                                            "toolCallId": {
+                                                "maxLength": 256,
+                                                "minLength": 1,
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "action",
+                                            "text"
+                                        ],
+                                        "type": "object"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "runId": {
+                                            "nullable": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "runId"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "replyToConversation"
+            }
+        },
         "/api/v1/conversations/{id}/skill-proposals": {
             "get": {
                 "parameters": [

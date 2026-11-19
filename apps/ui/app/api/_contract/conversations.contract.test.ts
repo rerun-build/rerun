@@ -24,6 +24,7 @@ const engine = vi.hoisted(() => ({
     listSkillProposals: vi.fn<typeof import('@/lib/engine/client').listSkillProposals>(),
     decideSkillProposal: vi.fn<typeof import('@/lib/engine/client').decideSkillProposal>(),
     revertBrainPage: vi.fn<typeof import('@/lib/engine/client').revertBrainPage>(),
+    chat: vi.fn<typeof import('@/lib/engine/client').chat>(),
 }))
 
 vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), ...engine }))
@@ -316,6 +317,17 @@ describe('a conversation in the mobile app', () => {
             expect(engine.cancelRun).toHaveBeenCalledTimes(1)
             expect(engine.cancelRun).toHaveBeenCalledWith(expect.objectContaining({ apiKey: 'key' }), 'scout', 'run-2')
             expect(state.db?.writes('sessions')).toEqual([{ method: 'update', payload: { status: 'idle' }, filters: [{ table: 'sessions', method: 'eq', args: ['id', BAKERIES] }] }])
+        })
+
+        it('approves from a push the card it names, and refuses it once it no longer waits', async () => {
+            engine.getSessionMessages.mockResolvedValue([
+                { id: 'msg-g1', sessionId: 'eng-grace', role: 'assistant', contentJson: JSON.stringify([{ type: 'text', text: 'Ready to send.' }, { type: 'tool-call', toolCallId: 'call-grace', toolName: 'request_approval', input: { approvals: [{ action: 'Send the Q4 deck to the board' }] } }]), toolCallsJson: null, authorId: null, createdAt: '2026-11-19T06:00:00.000Z' },
+            ])
+            engine.chat.mockResolvedValue(new Response('data: {}\n\n', { headers: { 'x-run-id': 'run-grace' } }))
+            const { POST } = await import('@/app/api/v1/conversations/[id]/reply/route')
+            expect(await expectContract(mobileApi.replyToConversation, await callRoute(POST, mobileApi.replyToConversation, { params: { id: FOR_GRACE }, body: { action: 'approve', toolCallId: 'call-grace' } }))).toEqual({ runId: 'run-grace' })
+            expect(engine.chat.mock.calls[0][2]).toMatchObject({ sessionId: 'eng-grace', message: expect.stringContaining('1. **APPROVED** — Send the Q4 deck to the board') })
+            expect(await expectContract(mobileApi.replyToConversation, await callRoute(POST, mobileApi.replyToConversation, { params: { id: FOR_GRACE }, body: { action: 'deny', toolCallId: 'call-older' } }), 409)).toMatchObject({ code: 'requestAlreadyAnswered' })
         })
 
         it('clears the heads-up the person read, and only that one', async () => {

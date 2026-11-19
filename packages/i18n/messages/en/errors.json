@@ -72,6 +72,8 @@
     "spaceNotFound": "Space not found",
     "sessionNotFound": "Session not found",
     "conversationNotFound": "Conversation not found",
+    "requestAlreadyAnswered": "This request was already answered.",
+    "coworkerStillWorking": "The coworker is still working. Try again in a moment.",
     "accountNotFound": "Account not found",
     "templateNotFound": "Template not found",
     "expertOnly": "Reserved for expert accounts",
