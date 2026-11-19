@@ -9,7 +9,9 @@ process.env.RERUN_LOG_LEVEL = 'fatal'
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example'
 
 type FakeTransport = { kind: 'stdio' | 'sse' | 'http'; target: string; options: unknown }
-type Behaviour = { connectError?: string; connectCode?: number; closeError?: string; hang?: boolean; tools?: Array<{ name: string; description?: string; inputSchema?: unknown }> }
+type FakeTool = { name: string; description?: string; inputSchema?: unknown }
+// `pages` maps a cursor ('' for the first call) to the page a paginating server answers.
+type Behaviour = { connectError?: string; connectCode?: number; closeError?: string; hang?: boolean; tools?: FakeTool[]; pages?: Record<string, { tools: FakeTool[]; nextCursor?: string }> }
 
 const mcp = vi.hoisted(() => ({
     transports: [] as FakeTransport[],
@@ -51,8 +53,10 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
             if (behaviour?.hang) await new Promise(resolve => setTimeout(resolve, 50))
             if (behaviour?.connectError) throw Object.assign(new Error(behaviour.connectError), behaviour.connectCode ? { code: behaviour.connectCode } : {})
         }
-        async listTools() {
-            return { tools: mcp.behaviours.get(this.target)?.tools ?? [] }
+        async listTools(params?: { cursor?: string }) {
+            const behaviour = mcp.behaviours.get(this.target)
+            if (behaviour?.pages) return behaviour.pages[params?.cursor ?? '']!
+            return { tools: behaviour?.tools ?? [] }
         }
         async request({ params }: { params: { name: string; arguments: unknown } }) {
             mcp.calls.push({ target: this.target, ...params })
@@ -248,6 +252,27 @@ describe('probeMcp', () => {
         mcp.behaviours.set('https://ok.example/mcp', { tools: [{ name: 'a' }, { name: 'b' }], closeError: 'boom' })
         expect(await probeMcp('mcp-agent', server({ name: 'ok', url: 'https://ok.example/mcp' }), {}, { spawn })).toEqual({ ok: true, transport: 'http', toolNames: ['a', 'b'] })
         expect(mcp.closed).toEqual(['https://ok.example/mcp'])
+    })
+
+    it('reads every page of a server that splits its tool list', async () => {
+        mcp.behaviours.set('https://paged.example/mcp', {
+            pages: {
+                '': { tools: [{ name: 'agents_list' }], nextCursor: 'p2' },
+                p2: { tools: [{ name: 'account_get_usage' }], nextCursor: 'p3' },
+                p3: { tools: [{ name: 'creative_generate_speech' }, { name: 'creative_list_voices' }] },
+            },
+        })
+        expect((await probeMcp('mcp-agent', server({ name: 'paged', url: 'https://paged.example/mcp' }), {}, { spawn })).toolNames).toEqual(['agents_list', 'account_get_usage', 'creative_generate_speech', 'creative_list_voices'])
+    })
+
+    it('stops reading when a server hands back a cursor it already gave', async () => {
+        mcp.behaviours.set('https://looping.example/mcp', {
+            pages: {
+                '': { tools: [{ name: 'a' }], nextCursor: 'again' },
+                again: { tools: [{ name: 'b' }], nextCursor: 'again' },
+            },
+        })
+        expect((await probeMcp('mcp-agent', server({ name: 'looping', url: 'https://looping.example/mcp' }), {}, { spawn })).toolNames).toEqual(['a', 'b'])
     })
 
     it('reports the connection error with the transport it tried', async () => {

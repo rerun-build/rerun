@@ -55,13 +55,28 @@ function buildTransport(server: McpServer, spawn: McpSpawn): Transport | null {
     return new SSEClientTransport(url, headers ? { requestInit: { headers } } : undefined)
 }
 
+// A server may split its tools over several pages: ElevenLabs serves 245 in five, and its first page
+// holds nothing but the voice-agent tools.
+async function listAllTools(client: Client): Promise<McpTool[]> {
+    const tools: McpTool[] = []
+    const seenCursors = new Set<string>()
+    let cursor: string | undefined
+    do {
+        const page = await client.listTools(cursor ? { cursor } : undefined)
+        tools.push(...page.tools)
+        cursor = page.nextCursor && !seenCursors.has(page.nextCursor) ? page.nextCursor : undefined
+        if (cursor) seenCursors.add(cursor)
+    } while (cursor)
+    return tools
+}
+
 export async function openMcpClient(server: McpServer, spawn: McpSpawn): Promise<{ client: Client; tools: McpTool[] }> {
     const transport = buildTransport(server, spawn)
     if (!transport) throw new Error(`server "${server.name}" needs a command (stdio) or a url (sse/http)`)
     const client = new Client({ name: 'rerun-engine', version: '1.0.0' })
     try {
         await client.connect(transport)
-        return { client, tools: (await client.listTools()).tools }
+        return { client, tools: await listAllTools(client) }
     } catch (e) {
         await client.close().catch(() => {})
         throw e
