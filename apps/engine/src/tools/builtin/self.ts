@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { configPath, soulPath, workspaceDir } from '../../config/paths.js'
-import { agentConfigSchema, mcpServerSchema, verbositySchema, BRIDGE_SERVER_NAME, MCP_SERVER_NAME_RE, type McpServer } from '../../agents/types.js'
+import { agentConfigSchema, mcpServerSchema, verbositySchema, BRIDGE_SERVER_NAME, MCP_SERVER_NAME_RE } from '../../agents/types.js'
 import { reloadAgent } from '../../agents/registry.js'
 import { withAgentLock } from '../../agents/lock.js'
 import { writeAgentConfig, mergeMcpServers, ReservedMcpServerNameError, InvalidMcpServerNameError } from '../../agents/config-write.js'
@@ -20,20 +20,13 @@ import {
     pollDeviceToken,
     savePending,
     saveToken,
+    serverCarriesCredential,
     startDeviceFlow,
 } from '../mcp-auth.js'
 import type { RunContext } from '../../runtime/context.js'
 import { mcpSignInTool } from './hitl.js'
 
 const run = promisify(execFile)
-
-// A server dialed with a key the user gave is not asking for a sign-in when it answers 401: it is
-// turning that key down, and only a new value will fix it. The key can sit in any field
-// resolveServerSecrets fills in.
-function serverCarriesCredential(server: McpServer): boolean {
-    const holdsPlaceholder = (value: string | undefined) => value?.includes('${') === true
-    return Object.keys(server.headers).length > 0 || holdsPlaceholder(server.url) || holdsPlaceholder(server.command) || server.args.some(holdsPlaceholder)
-}
 
 // A server of the workspace's Vault is signed in from the Vault, once for every coworker using it:
 // a device sign-in here would land in this coworker's folder, where nothing reads it.
@@ -135,7 +128,7 @@ export function selfTools(ctx: RunContext): ToolSet {
             },
         }),
         mcp_login: tool({
-            description: 'Start OAuth device-code sign-in for a registered MCP server. Returns a URL for the user to open in their browser. After they confirm they signed in, call mcp_login_complete.',
+            description: 'Device-code sign-in for an MCP server, which few servers offer: try request_mcp_sign_in first. Returns a URL for the user to open in their browser. After they confirm they signed in, call mcp_login_complete.',
             inputSchema: z.object({ name: z.string() }),
             execute: async ({ name }) => {
                 const fromVault = vaultServerNote(name, ctx.agent)
@@ -151,7 +144,7 @@ export function selfTools(ctx: RunContext): ToolSet {
                     const minutes = Math.round(start.expiresIn / 60)
                     return `Ask the user to open this URL and sign in to "${name}":\n${start.verificationUri}\nThe link is valid for about ${minutes} minutes. Once the user confirms they have signed in, call mcp_login_complete with name "${name}".`
                 } catch (e) {
-                    return `Could not start sign-in for "${name}": ${(e as Error).message}`
+                    return `Could not start sign-in for "${name}": ${(e as Error).message}. Unless the user already skipped its Connect card, call request_mcp_sign_in with name "${name}" and end your turn. If they did, tell them it can only be connected from that card or from the Apps panel of this coworker.`
                 }
             },
         }),
@@ -195,9 +188,11 @@ export function selfTools(ctx: RunContext): ToolSet {
                             return `not connected yet ${server.name}: ${describeConnectorState(state, states)} is waiting for the user to connect it (suggest_service), every call to its tools fails until then`
                         }
                         const probe = await probeMcp(id, server, ctx.agent.env, { spawn: agentMcpSpawn(ctx.agent) })
-                        return probe.ok
-                            ? `connected ${server.name} (${probe.transport}): ${probe.toolNames.length} tools — ${modelToolNames(server.name, probe.toolNames)}`
-                            : `failed ${server.name} (${probe.transport}): ${probe.error}`
+                        if (probe.ok) return `connected ${server.name} (${probe.transport}): ${probe.toolNames.length} tools — ${modelToolNames(server.name, probe.toolNames)}`
+                        if (server.url && !server.vaultItemId && isAuthError(probe.error) && !serverCarriesCredential(server)) {
+                            return `needs sign-in ${server.name} (${probe.transport}): call request_mcp_sign_in with name "${server.name}" and end your turn`
+                        }
+                        return `failed ${server.name} (${probe.transport}): ${probe.error}`
                     }),
                 )
                 return lines.join('\n')

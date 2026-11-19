@@ -37,6 +37,14 @@ export function isAuthError(message?: string): boolean {
     return /\b401\b|unauthor/i.test(message ?? '')
 }
 
+// A server dialed with a key the user gave is not asking for a sign-in when it answers 401: it is
+// turning that key down, and only a new value will fix it. The key can sit in any field
+// resolveServerSecrets fills in.
+export function serverCarriesCredential(server: McpServer): boolean {
+    const holdsPlaceholder = (value: string | undefined) => value?.includes('${') === true
+    return Object.keys(server.headers).length > 0 || holdsPlaceholder(server.url) || holdsPlaceholder(server.command) || server.args.some(holdsPlaceholder)
+}
+
 export async function discoverDeviceAuth(mcpUrl: string): Promise<DeviceAuth> {
     const origin = new URL(mcpUrl).origin
     const res = await fetch(`${origin}/.well-known/oauth-protected-resource`)

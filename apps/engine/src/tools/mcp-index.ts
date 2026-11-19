@@ -1,6 +1,6 @@
 import { mcpToolNameFor, resolveTransport } from './mcp.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
-import { tokenSlotFor } from './mcp-auth.js'
+import { serverCarriesCredential, tokenSlotFor } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
 import type { Provider } from '@rerun/contracts'
 import type { LoadedAgent } from '../agents/types.js'
@@ -42,11 +42,15 @@ export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, hel
     if (servers.length === 0) return ''
     const states = await agentConnectorStates(agent)
     const toolCounts = heldBack ? mcpServerToolCounts(heldBack) : null
+    // Most servers only sign in through the browser, which the Connect card of request_mcp_sign_in
+    // runs; an agent without that tool sends the user to the panel that has the same button.
+    const { enabled, allowToolInstall } = agent.config.selfImprovement
+    const signInStep = enabled && allowToolInstall ? 'call request_mcp_sign_in with its name and end your turn' : 'ask the user to connect it from the Apps panel of this coworker'
     const lines = await Promise.all(
         servers.map(async server => {
             const transport = resolveTransport(server)
             const state = states.get(server.name)
-            let auth = 'not authenticated — call mcp_login if its tools fail'
+            let auth = transport === 'stdio' ? 'local command' : serverCarriesCredential(server) ? 'authenticated with a key in its url' : `not signed in — if its tools answer that sign-in is required, ${signInStep}`
             if (state) auth = connectorAuth(state, states)
             else if (Object.keys(server.headers).length > 0) auth = 'authenticated via request headers'
             else if (await tokenSlotFor(agent.id, server).load().catch(() => null)) auth = 'authenticated (OAuth)'

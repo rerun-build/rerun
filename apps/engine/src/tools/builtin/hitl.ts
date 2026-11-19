@@ -295,9 +295,9 @@ export function mcpSignInTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
     return {
         request_mcp_sign_in: hitlTool(
             ctx.turnOrder,
-            'Ask the user to sign in to an MCP server you registered with mcp_register that answered it requires sign-in, then END YOUR TURN. The user gets a card with a Connect button that runs the OAuth sign-in in a popup; you never see a token. Do not explain the sign-in steps yourself, the card does. The server\'s tools load once they are connected.',
+            'Ask the user to sign in to an MCP server of yours that requires sign-in, then END YOUR TURN. The user gets a card with a Connect button that runs the OAuth sign-in in a popup; you never see a token. Do not explain the sign-in steps yourself, the card does. The server\'s tools load once they are connected.',
             z.object({
-                name: z.string().min(1).describe('The exact name the server was registered under with mcp_register.'),
+                name: z.string().min(1).describe('The exact name of the server.'),
                 reason: nullTolerantOptional(z.string().max(300)).describe('One short line shown on the card telling the user what signing in unlocks.'),
             }),
         ),
