@@ -50,6 +50,13 @@ describe('shell_exec child environment', () => {
         })
     })
 
+    it('hands the copy number to the command environment', async () => {
+        const run = vi.fn<Runner>(async () => ({ stdout: '', stderr: '' }))
+        const ctx = { agent: { id: 'env-agent', env: {}, config: agentConfigSchema.parse({ name: 'env', tools: {} }) }, sessionId: 's1', runId: 'r1', lineage: { copyIndex: 3 }, logger: { warn() {} }, hostBreaker: new HostBreaker() } as any
+        await (shellTools(ctx, run).shell_exec as any).execute({ command: 'env', timeoutMs: 1000 }, { toolCallId: 'c', messages: [] })
+        expect(run.mock.calls[0][1].env).toMatchObject({ RERUN_COPY: '3' })
+    })
+
     it('leaves the shared database path out when the agent has no shared database', async () => {
         const options = await optionsSeenBy({}, { sharedDb: false })
         expect(options.env).not.toHaveProperty('RERUN_SHARED_DB')

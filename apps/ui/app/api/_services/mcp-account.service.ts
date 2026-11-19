@@ -898,7 +898,12 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 contextSize = parsed.data
             }
 
-            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}), ...(model ? { model } : {}), ...(thinkingLevel ? { thinkingLevel } : {}), ...(contextSize ? { contextSize } : {}) })
+            const copyIndex = args.copyIndex
+            if (copyIndex !== undefined && (typeof copyIndex !== 'number' || !Number.isInteger(copyIndex) || copyIndex < 1 || copyIndex > 64)) {
+                throw new Error('invalid_copy_index: copyIndex must be a whole number from 1 to 64')
+            }
+
+            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}), ...(model ? { model } : {}), ...(thinkingLevel ? { thinkingLevel } : {}), ...(contextSize ? { contextSize } : {}), ...(copyIndex !== undefined ? { copyIndex } : {}) })
             if (!res.ok) {
                 const body = await res.text().catch(() => '')
                 if (res.status === 400 && body.includes('invalid_goal')) throw new Error(`invalid_goal: the engine refused the goal. ${body}`.trim())

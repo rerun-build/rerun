@@ -25,6 +25,7 @@ export const chatRequestSchema = z.object({
     userLanguage: z.string().optional(),
     goal: runGoalSchema.optional(),
     contextSize: contextSizeSchema.optional(),
+    copyIndex: z.number().int().min(1).max(64).optional(),
 })
 
 export const contextOccupancySchema = z.object({

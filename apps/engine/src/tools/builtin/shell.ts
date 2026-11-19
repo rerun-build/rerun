@@ -30,6 +30,7 @@ export function shellTools(ctx: RunContext, run: ShellRunner = execAsync): ToolS
             runId: ctx.runId,
             jobRef: ctx.lineage?.jobRef,
             branch: ctx.lineage?.branch,
+            copyIndex: ctx.lineage?.copyIndex,
         }),
     )
     const env = childProcessEnv(agentEnv)

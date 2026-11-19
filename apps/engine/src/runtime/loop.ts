@@ -521,7 +521,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const stepGuard = typeof compactAt === 'number' && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, handover, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
+        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, handover, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch, copyIndex: ctx.lineage?.copyIndex }) })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies
