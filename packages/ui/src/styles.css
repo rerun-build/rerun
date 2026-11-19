@@ -43,9 +43,10 @@
    voir PAGE_UNATTENDED_ATTRIBUTE) : toute animation se fige sur sa frame courante et repart de là.
    Sans ça, une seule animation infinie fait produire au navigateur une image par rafraîchissement
    d'écran, même fenêtre cachée dans l'app desktop. Les entrées et sorties (animate-in, animate-out)
-   continuent : figées, un dialog ouvert sans le focus resterait invisible et un élément fermé resterait
-   monté. */
-html[data-unattended] *:not([class*="animate-in"]):not([class*="animate-out"]),
+   et les mots d'une réponse en streaming (data-sd-animate de Streamdown) continuent : figés, un dialog
+   ouvert sans le focus resterait invisible, un élément fermé resterait monté et chaque nouveau mot
+   resterait à l'opacité 0. */
+html[data-unattended] *:not([class*="animate-in"]):not([class*="animate-out"]):not([data-sd-animate]),
 html[data-unattended] *::before,
 html[data-unattended] *::after {
     animation-play-state: paused !important;
