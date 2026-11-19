@@ -13,7 +13,7 @@ jest.mock('@react-native-google-signin/google-signin', () => ({
 }))
 const mockSignInWithIdToken = jest.fn()
 jest.mock('@/auth/supabase', () => ({ supabase: { auth: { signInWithIdToken: (...args: unknown[]) => mockSignInWithIdToken(...args) } } }))
-jest.mock('@/api/client', () => ({ api: jest.fn(), ApiError: class extends Error {} }))
+jest.mock('@/api/client', () => ({ hub: jest.fn(), ApiError: class extends Error {} }))
 
 describe('signInWithGoogle', () => {
     it('asks iOS for its own client and Android for a token minted for the web client', () => {

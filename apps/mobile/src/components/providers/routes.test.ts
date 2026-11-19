@@ -3,7 +3,7 @@ import { logoOf } from '@/api/models'
 import { signsIn } from './routes'
 
 jest.mock('expo-router', () => ({ router: {} }))
-jest.mock('@/api/client', () => ({ api: jest.fn() }))
+jest.mock('@/api/client', () => ({ hub: jest.fn() }))
 
 describe('how a connection is put back on its feet', () => {
     // OpenCode is listed with the plans, but it is a key: "Sign in again" would add a second connection.

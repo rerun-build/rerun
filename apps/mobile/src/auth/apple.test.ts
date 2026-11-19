@@ -11,7 +11,7 @@ jest.mock('expo-apple-authentication', () => ({
 const mockSignInWithIdToken = jest.fn()
 const mockUpdateUser = jest.fn()
 jest.mock('@/auth/supabase', () => ({ supabase: { auth: { signInWithIdToken: (...args: unknown[]) => mockSignInWithIdToken(...args), updateUser: (...args: unknown[]) => mockUpdateUser(...args) } } }))
-jest.mock('@/api/client', () => ({ api: jest.fn(), ApiError: class extends Error {} }))
+jest.mock('@/api/client', () => ({ hub: jest.fn(), ApiError: class extends Error {} }))
 
 const describeOnIos = Platform.OS === 'ios' ? describe : describe.skip
 

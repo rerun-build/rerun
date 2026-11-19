@@ -1,14 +1,14 @@
-import { notificationPrefsSchema, type NotificationPrefs, type NotificationPrefsPatch } from '@rerun/contracts'
+import { mobileApi, type NotificationPrefs, type NotificationPrefsPatch } from '@rerun/contracts'
 
-import { api } from '@/api/client'
+import { hub } from '@/api/client'
 
 type Caller = { accessToken: string; workspaceId: number }
 
 export async function fetchNotificationPrefs(caller: Caller): Promise<NotificationPrefs> {
-    return notificationPrefsSchema.parse(await api('/api/v1/me/notifications', caller))
+    return hub(mobileApi.getNotificationPrefs, caller)
 }
 
 // The hub merges the patch on what it holds and answers with the result.
 export async function patchNotificationPrefs(caller: Caller, patch: NotificationPrefsPatch): Promise<NotificationPrefs> {
-    return notificationPrefsSchema.parse(await api('/api/v1/me/notifications', { ...caller, method: 'PATCH', body: patch }))
+    return hub(mobileApi.updateNotificationPrefs, { ...caller, body: patch })
 }

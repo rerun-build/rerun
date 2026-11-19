@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, mobileApi } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { randomUUID } from 'expo-crypto'
 
@@ -30,7 +30,7 @@ export type ChatEndpoints = {
 export function coworkerEndpoints(agentId: string, { general = false }: { general?: boolean } = {}): ChatEndpoints {
     return {
         agentId,
-        sendPath: '/api/chat',
+        sendPath: mobileApi.sendChatMessage.path,
         sendBody: (sessionId, text) => (general && !sessionId ? { agentId, kind: 'general', text } : { agentId, sessionId: sessionId ?? undefined, text }),
         bornSessionOf: response => response.headers.get('X-Session-Id'),
         messages: async (caller, sessionId, etag) => (await fetchMessages(caller, sessionId, etag)) as TranscriptRead,
@@ -47,7 +47,7 @@ export function foremanEndpoints(filesOnEngine: () => boolean, { general = false
     const draftId = randomUUID()
     return {
         agentId: FOREMAN_AGENT_ID,
-        sendPath: '/api/chat/foreman/engine',
+        sendPath: mobileApi.sendForemanMessage.path,
         sendBody: (sessionId, text) => ({ sessionId: sessionId ?? draftId, kind: general ? 'general' : 'thread', text }),
         bornSessionOf: response => (response.ok ? (response.headers.get('X-Session-Id') ?? draftId) : null),
         messages: async (caller, sessionId) => ({ messages: (await fetchForemanMessages(caller, sessionId)) as UIMessage[], etag: null, updatedAt: null }),

@@ -1,4 +1,4 @@
-import { CLIENT_HEADER, formatClientHeader, isRecord } from '@rerun/contracts'
+import { CLIENT_HEADER, formatClientHeader, hubPath, isRecord, type HubBody, type HubEndpoint, type HubPathParams, type HubQuery, type HubQueryValues, type HubResponse } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'
@@ -69,7 +69,9 @@ export function hubHeaders(clientHeader: string, { accessToken, workspaceId }: P
 
 const failureOf = (status: number, payload: unknown) => apiErrorOf(status, payload, translatorFor('mobileCommon')('errors.requestFailed', { status }))
 
-export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetch }: ApiClientConfig) {
+export type ApiClient = <T>(path: string, request?: ApiRequest) => Promise<T>
+
+export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetch }: ApiClientConfig): ApiClient {
     return async function request<T>(path: string, { method = 'GET', body, accessToken, workspaceId, signal }: ApiRequest = {}): Promise<T> {
         const headers: Record<string, string> = { Accept: 'application/json', ...hubHeaders(clientHeader, { accessToken, workspaceId }) }
         if (body !== undefined) headers['Content-Type'] = 'application/json'
@@ -99,10 +101,47 @@ export function createConditionalReader({ baseUrl, clientHeader, fetch: fetchImp
     }
 }
 
+// A call that answers JSON, or nothing the app reads. Streams and files go through their own paths.
+type JsonEndpoint = HubEndpoint & { response: Exclude<HubEndpoint['response'], 'ui-message-stream' | 'bytes'>; body?: Exclude<HubEndpoint['body'], 'bytes'> }
+
+type HubCall<E extends JsonEndpoint> = Pick<ApiRequest, 'accessToken' | 'workspaceId' | 'signal'> &
+    ([keyof HubPathParams<E>] extends [never] ? { params?: undefined } : { params: HubPathParams<E> }) &
+    (HubBody<E> extends undefined ? { body?: undefined } : { body: HubBody<E> }) &
+    (HubQuery<E> extends undefined ? { query?: undefined } : { query?: HubQuery<E> })
+
+type AnyCall = Pick<ApiRequest, 'accessToken' | 'workspaceId' | 'signal'> & { params?: Record<string, string>; body?: unknown; query?: HubQueryValues }
+
+type Parser = { parse: (value: unknown) => unknown }
+
+// One call of the registry: its method and path, and its answer read with the schema the hub promised.
+export function createHubClient(request: ApiClient) {
+    return async function hub<E extends JsonEndpoint>(endpoint: E, call: HubCall<E>): Promise<HubResponse<E>> {
+        const { params, body, query, accessToken, workspaceId, signal } = call as AnyCall
+        const payload = await request<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { method: endpoint.method, body, accessToken, workspaceId, signal })
+        if (typeof endpoint.response === 'string') return undefined as HubResponse<E>
+        return (endpoint.response as Parser).parse(payload) as HubResponse<E>
+    }
+}
+
+type ConditionalReader = ReturnType<typeof createConditionalReader>
+
+// A read of the registry the app may already hold: the answer read with its schema, or a null
+// `payload` when the hub said it is still the one named by `etag`.
+export function createConditionalHubReader(read: ConditionalReader) {
+    return async function hubConditional<E extends JsonEndpoint>(endpoint: E, call: HubCall<E> & { etag: string | null }): Promise<ConditionalRead<HubResponse<E>>> {
+        const { params, query, accessToken, workspaceId, etag } = call as AnyCall & { etag: string | null }
+        const answer = await read<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { accessToken, workspaceId, etag })
+        const payload = answer.payload === null || typeof endpoint.response === 'string' ? null : ((endpoint.response as Parser).parse(answer.payload) as HubResponse<E>)
+        return { ...answer, payload }
+    }
+}
+
 export const appBuild = Number(Application.nativeBuildVersion ?? 0)
 
 export const clientHeader = formatClientHeader({ platform: clientPlatform, version: Application.nativeApplicationVersion ?? '0.0.0', build: appBuild })
 
-export const api = createApiClient({ baseUrl: environment.apiUrl, clientHeader })
+const api = createApiClient({ baseUrl: environment.apiUrl, clientHeader })
 
-export const apiConditional = createConditionalReader({ baseUrl: environment.apiUrl, clientHeader })
+export const hub = createHubClient(api)
+
+export const hubConditional = createConditionalHubReader(createConditionalReader({ baseUrl: environment.apiUrl, clientHeader }))

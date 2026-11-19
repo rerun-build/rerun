@@ -1,19 +1,19 @@
-import { agentConversationsOverviewSchema, boardAgentSchema, boxSchema, createdCoworkerSchema, type AgentConversationsOverview, type BoardAgent, type Box, type CreateCoworkerInput, type CreatedCoworker } from '@rerun/contracts'
+import { mobileApi, type AgentConversationsOverview, type BoardAgent, type Box, type CreateCoworkerInput, type CreatedCoworker } from '@rerun/contracts'
 
-import { api } from '@/api/client'
+import { hub } from '@/api/client'
 
 type Caller = { accessToken: string; workspaceId: number }
 
 export async function fetchBoardAgents(caller: Caller): Promise<BoardAgent[]> {
-    return boardAgentSchema.array().parse(await api('/api/v1/agents', caller))
+    return hub(mobileApi.listAgents, caller)
 }
 
 export async function fetchConversationsOverview(caller: Caller): Promise<AgentConversationsOverview> {
-    return agentConversationsOverviewSchema.parse(await api('/api/v1/agents/conversations', caller))
+    return hub(mobileApi.getConversationsOverview, caller)
 }
 
 export async function fetchBoxes(caller: Caller): Promise<Box[]> {
-    return boxSchema.array().parse(await api('/api/v1/boxes', caller))
+    return hub(mobileApi.listBoxes, caller)
 }
 
 // The Home in one read: its coworkers, the latest conversation of each, and the Boxes they sit in.
@@ -25,5 +25,5 @@ export async function fetchBoard(caller: Caller): Promise<BoardRead> {
 }
 
 export async function createCoworker(caller: Caller, input: CreateCoworkerInput): Promise<CreatedCoworker> {
-    return createdCoworkerSchema.parse(await api('/api/v1/agents', { ...caller, method: 'POST', body: input }))
+    return hub(mobileApi.createAgent, { ...caller, body: input })
 }

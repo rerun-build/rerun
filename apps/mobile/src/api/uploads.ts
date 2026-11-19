@@ -1,4 +1,4 @@
-import { CHAT_ATTACHMENTS_DIR, uniqueAttachmentName } from '@rerun/contracts'
+import { CHAT_ATTACHMENTS_DIR, hubPath, mobileApi, uniqueAttachmentName, type HubPathParams, type HubQueryValues, type HubResponse } from '@rerun/contracts'
 
 import { apiErrorOf, clientHeader, hubHeaders } from '@/api/client'
 import type { FileOwner } from '@/api/files'
@@ -13,11 +13,13 @@ async function bytesOf(uri: string): Promise<Blob> {
     return (await fetch(uri)).blob()
 }
 
-async function postBytes(caller: Caller, path: string, body: Blob): Promise<unknown> {
-    const response = await fetch(`${environment.apiUrl}${path}`, { method: 'POST', headers: { ...hubHeaders(clientHeader, caller), 'Content-Type': 'application/octet-stream' }, body })
+type UploadEndpoint = typeof mobileApi.uploadAgentFile | typeof mobileApi.uploadForemanFile | typeof mobileApi.transcribeVoice
+
+async function postBytes<E extends UploadEndpoint>(caller: Caller, endpoint: E, query: HubQueryValues, body: Blob): Promise<HubResponse<E>> {
+    const response = await fetch(`${environment.apiUrl}${hubPath(endpoint, {} as HubPathParams<E>, query)}`, { method: 'POST', headers: { ...hubHeaders(clientHeader, caller), 'Content-Type': 'application/octet-stream' }, body })
     const payload: unknown = await response.json().catch(() => null)
     if (!response.ok) throw apiErrorOf(response.status, payload, translatorFor('mobileCommon')('errors.uploadFailed', { status: response.status }))
-    return payload
+    return endpoint.response.parse(payload) as HubResponse<E>
 }
 
 // A photo goes to the coworker's own folder on its machine, under chat-uploads like the web's, and the
@@ -25,8 +27,7 @@ async function postBytes(caller: Caller, path: string, body: Blob): Promise<unkn
 export async function uploadChatFile(caller: Caller, agentId: string, uri: string, fileName: string): Promise<string> {
     const blob = await bytesOf(uri)
     const name = uniqueAttachmentName(fileName, randomToken())
-    const query = new URLSearchParams({ agentId, name, size: String(blob.size), dir: CHAT_ATTACHMENTS_DIR })
-    const { path } = (await postBytes(caller, `/api/files/stream?${query}`, blob)) as { path: string }
+    const { path } = await postBytes(caller, mobileApi.uploadAgentFile, { agentId, name, size: String(blob.size), dir: CHAT_ATTACHMENTS_DIR }, blob)
     return path
 }
 
@@ -35,14 +36,14 @@ export async function uploadChatFile(caller: Caller, agentId: string, uri: strin
 export async function uploadVoiceRecording(caller: Caller, owner: FileOwner, uri: string): Promise<string> {
     const blob = await bytesOf(uri)
     const name = `${Date.now().toString(36)}-${randomToken()}-voice.m4a`
-    const query = new URLSearchParams({ ...(owner.kind === 'agent' ? { agentId: owner.agentId } : { sessionId: owner.sessionId }), name, size: String(blob.size), dir: CHAT_ATTACHMENTS_DIR })
-    const route = owner.kind === 'agent' ? '/api/files/stream' : '/api/foreman/files/stream'
-    const { path } = (await postBytes(caller, `${route}?${query}`, blob)) as { path: string }
+    const common = { name, size: String(blob.size), dir: CHAT_ATTACHMENTS_DIR }
+    const uploaded = owner.kind === 'agent' ? postBytes(caller, mobileApi.uploadAgentFile, { agentId: owner.agentId, ...common }, blob) : postBytes(caller, mobileApi.uploadForemanFile, { sessionId: owner.sessionId, ...common }, blob)
+    const { path } = await uploaded
     return path
 }
 
 // The hub's transcription, the one the web's voice messages use. iOS records AAC in an m4a file.
 export async function transcribeRecording(caller: Caller, uri: string): Promise<string> {
-    const { text } = (await postBytes(caller, '/api/voice/transcribe?format=m4a', await bytesOf(uri))) as { text: string }
+    const { text } = await postBytes(caller, mobileApi.transcribeVoice, { format: 'm4a' }, await bytesOf(uri))
     return text
 }

@@ -1,4 +1,4 @@
-import { ANDROID_PUSH_CHANNELS, pushDataSchema, type PushData } from '@rerun/contracts'
+import { ANDROID_PUSH_CHANNELS, mobileApi, pushDataSchema, type PushData } from '@rerun/contracts'
 import * as Application from 'expo-application'
 import Constants from 'expo-constants'
 import * as Device from 'expo-device'
@@ -7,7 +7,7 @@ import { AndroidImportance } from 'expo-notifications'
 import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
 
-import { api, appBuild } from '@/api/client'
+import { appBuild, hub } from '@/api/client'
 import { onCustomServer } from '@/config/environment'
 import { translatorFor } from '@/i18n/translator'
 import { clientPlatform } from '@/lib/client-platform'
@@ -88,7 +88,7 @@ export async function registerDevice(caller: Caller): Promise<void> {
     if (status !== 'granted') return
     const token = await expoPushToken()
     if (!token) return
-    await api('/api/v1/me/devices', { ...caller, method: 'POST', body: { token, platform: clientPlatform, appVersion: `${Application.nativeApplicationVersion ?? '0.0.0'} (${appBuild})` } })
+    await hub(mobileApi.registerDevice, { ...caller, body: { token, platform: clientPlatform, appVersion: `${Application.nativeApplicationVersion ?? '0.0.0'} (${appBuild})` } })
     registeredToken = token
 }
 
@@ -117,7 +117,7 @@ export async function turnOnPush(caller: Caller): Promise<Notifications.Permissi
 // Signing out stops this phone ringing for that account.
 export async function unregisterDevice(caller: Caller): Promise<void> {
     if (!registeredToken) return
-    await api('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: registeredToken, platform: clientPlatform } })
+    await hub(mobileApi.unregisterDevice, { ...caller, body: { token: registeredToken, platform: clientPlatform } })
     registeredToken = null
 }
 

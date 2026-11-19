@@ -1,4 +1,6 @@
-import { ApiError, createApiClient } from '@/api/client'
+import { hubEndpoint, mobileApi } from '@rerun/contracts'
+
+import { ApiError, createApiClient, createHubClient } from '@/api/client'
 import { setCurrentLocale, translatorFor } from '@/i18n/translator'
 
 type Call = { url: string; init: RequestInit }
@@ -70,5 +72,56 @@ describe('createApiClient', () => {
             const { request } = clientAnswering(new Response(null, { status: 500 }))
             await expect(request('/api/v1/me')).rejects.toMatchObject({ status: 500, message: translatorFor('mobileCommon')('errors.requestFailed', { status: 500 }), code: null })
         })
+    })
+})
+
+describe('createHubClient', () => {
+    function hubAnswering(response: Response) {
+        const { request, calls } = clientAnswering(response)
+        return { hub: createHubClient(request), calls }
+    }
+
+    it('sends the method and the path of the registry, its parameters encoded', async () => {
+        const { hub, calls } = hubAnswering(json({ supported: true }))
+        await hub(mobileApi.setAgentRoutineEnabled, { params: { id: 'agent 1', kind: 'schedule', slug: 'daily/brief' }, body: { enabled: false }, accessToken: 'jwt', workspaceId: 7 })
+        expect(calls[0].url).toBe('https://staging.rerun.build/api/v1/agents/agent%201/routines/schedule/daily%2Fbrief')
+        expect(calls[0].init).toMatchObject({ method: 'PATCH', body: '{"enabled":false}' })
+    })
+
+    it('puts the query in the path, leaving out what is not set', async () => {
+        const urls: string[] = []
+        for (const query of [{}, { keepOpen: '1' as const }]) {
+            const { hub, calls } = hubAnswering(json({ url: null, open: false }))
+            await hub(mobileApi.finishTakeover, { params: { id: 'a-1' }, query })
+            urls.push(calls[0].url)
+        }
+        expect(urls).toEqual(['https://staging.rerun.build/api/v1/agents/a-1/desktop/takeover', 'https://staging.rerun.build/api/v1/agents/a-1/desktop/takeover?keepOpen=1'])
+    })
+
+    it('reads the answer with the schema the hub promised', async () => {
+        const { hub } = hubAnswering(json({ runId: 'run-1', extra: 'ignored' }))
+        await expect(hub(mobileApi.getActiveRun, { params: { id: 'c-1' } })).resolves.toEqual({ runId: 'run-1' })
+    })
+
+    it('refuses an answer the schema cannot read rather than handing it on', async () => {
+        const { hub } = hubAnswering(json({ runId: 42 }))
+        await expect(hub(mobileApi.getActiveRun, { params: { id: 'c-1' } })).rejects.toThrow()
+    })
+
+    it('reads nothing from a call whose answer the app ignores', async () => {
+        const { hub } = hubAnswering(json({ released: { workspace: 1 } }))
+        await expect(hub(mobileApi.deleteAiConnection, { params: { id: 'cnx-1' } })).resolves.toBeUndefined()
+    })
+
+    it('throws the status of a failure, as the raw client does', async () => {
+        const { hub } = hubAnswering(json({ error: 'This page changed again since.' }, 409))
+        await expect(hub(mobileApi.revertBrainPage, { params: { slug: 'pricing' }, body: { revisionId: 'r-1' } })).rejects.toMatchObject({ status: 409, message: 'This page changed again since.' })
+    })
+
+    it('refuses a path parameter left empty instead of calling another route', async () => {
+        const { hub, calls } = hubAnswering(json({}))
+        const endpoint = hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}', response: 'none' })
+        await expect(hub(endpoint, { params: { id: '' } })).rejects.toThrow('needs id')
+        expect(calls).toHaveLength(0)
     })
 })

@@ -4,7 +4,7 @@ import { sendEmailCode, sendPhoneCode, signInWithPhone, SignInError } from '@/au
 const mockApi = jest.fn()
 jest.mock('@/api/client', () => {
     const actual = jest.requireActual('@/api/client')
-    return { ...actual, api: (...args: unknown[]) => mockApi(...args) }
+    return { ...actual, hub: actual.createHubClient((...args: unknown[]) => mockApi(...args)) }
 })
 const mockSetSession = jest.fn()
 const mockSignInWithOtp = jest.fn()

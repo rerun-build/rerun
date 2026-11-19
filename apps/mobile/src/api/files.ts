@@ -1,3 +1,4 @@
+import { hubPath, mobileApi } from '@rerun/contracts'
 import { Directory, File, Paths } from 'expo-file-system'
 
 import { clientHeader, hubHeaders } from '@/api/client'
@@ -13,13 +14,12 @@ export type FileOwner = { kind: 'agent'; agentId: string } | { kind: 'foreman'; 
 
 // The hub streams a file back from the Box; the shared folder of the workspace has no agent to name.
 export function rawFileUrl({ agentId, path, scope = 'agent' }: FileRef): string {
-    const params = scope === 'shared' ? `scope=shared&path=${encodeURIComponent(path)}` : `agentId=${encodeURIComponent(agentId)}&path=${encodeURIComponent(path)}`
-    return `${environment.apiUrl}/api/files/raw?${params}`
+    return `${environment.apiUrl}${hubPath(mobileApi.readAgentFile, {}, scope === 'shared' ? { scope: 'shared', path } : { agentId, path })}`
 }
 
 export function ownedFileUrl(owner: FileOwner, path: string): string {
     if (owner.kind === 'agent') return rawFileUrl({ agentId: owner.agentId, path })
-    return `${environment.apiUrl}/api/foreman/files/raw?sessionId=${encodeURIComponent(owner.sessionId)}&path=${encodeURIComponent(path)}`
+    return `${environment.apiUrl}${hubPath(mobileApi.readForemanFile, {}, { sessionId: owner.sessionId, path })}`
 }
 
 // An image a card points at: a web address as is, a path on the Box through the hub, anything else
@@ -43,7 +43,7 @@ export function isHubFileUrl(url: string): boolean {
     return HUB_FILE_PREFIXES.some(prefix => url.startsWith(prefix))
 }
 
-const HUB_FILE_PREFIXES = [`${environment.apiUrl}/api/files/raw?`, `${environment.apiUrl}/api/foreman/files/raw?`]
+const HUB_FILE_PREFIXES = [mobileApi.readAgentFile, mobileApi.readForemanFile].map(endpoint => `${environment.apiUrl}${endpoint.path}?`)
 
 export function fileHeadersFor(caller: Caller | null, url: string): Record<string, string> | undefined {
     return isHubFileUrl(url) ? fileHeaders(caller) : undefined

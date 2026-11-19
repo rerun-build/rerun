@@ -8,7 +8,7 @@ jest.mock('expo-web-browser', () => ({ openAuthSessionAsync: (...args: unknown[]
 const mockSignInWithOAuth = jest.fn()
 const mockExchange = jest.fn()
 jest.mock('@/auth/supabase', () => ({ supabase: { auth: { signInWithOAuth: (...args: unknown[]) => mockSignInWithOAuth(...args), exchangeCodeForSession: (...args: unknown[]) => mockExchange(...args) } } }))
-jest.mock('@/api/client', () => ({ api: jest.fn(), ApiError: class extends Error {} }))
+jest.mock('@/api/client', () => ({ hub: jest.fn(), ApiError: class extends Error {} }))
 
 const describeOnAndroid = Platform.OS === 'android' ? describe : describe.skip
 

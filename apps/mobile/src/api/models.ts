@@ -1,16 +1,16 @@
-import { agentModelsSchema, type AgentModels, type Provider, type SetAgentModelInput } from '@rerun/contracts'
+import { mobileApi, type AgentModels, type Provider, type SetAgentModelInput } from '@rerun/contracts'
 
-import { api } from '@/api/client'
+import { hub } from '@/api/client'
 import type { ModelProvider } from '@/mocks/models'
 
 type Caller = { accessToken: string; workspaceId: number }
 
 export async function fetchAgentModels(caller: Caller, agentId: string): Promise<AgentModels> {
-    return agentModelsSchema.parse(await api(`/api/v1/agents/${encodeURIComponent(agentId)}/models`, caller))
+    return hub(mobileApi.getAgentModels, { ...caller, params: { id: agentId } })
 }
 
 export async function setAgentModel(caller: Caller, agentId: string, choice: SetAgentModelInput): Promise<void> {
-    await api(`/api/v1/agents/${encodeURIComponent(agentId)}/model`, { ...caller, method: 'PUT', body: choice })
+    await hub(mobileApi.setAgentModel, { ...caller, params: { id: agentId }, body: choice })
 }
 
 // The mark a connection's provider shows under: five logos cover every provider the engine runs.

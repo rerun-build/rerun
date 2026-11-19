@@ -1,3 +1,4 @@
+import { hubPath, mobileApi } from '@rerun/contracts'
 import { DefaultChatTransport, isTextUIPart, type HttpChatTransportInitOptions, type UIMessage, type UIMessageChunk } from 'ai'
 import { fetch as expoFetch } from 'expo/fetch'
 import type { RefObject } from 'react'
@@ -93,6 +94,6 @@ export function createChatTransport(link: ChatLink) {
         fetch: streamingFetch,
         // `queued` tells the hub the text waited behind a run: it retries the engine instead of dropping it.
         prepareSendMessagesRequest: ({ messages, body }) => ({ body: { ...link.endpoints.sendBody(link.sessionRef.current, lastUserText(messages)), ...(body?.queued === true && { queued: true }) } }),
-        prepareReconnectToStreamRequest: () => ({ api: `${environment.apiUrl}/api/chat/resume?agentId=${encodeURIComponent(link.endpoints.agentId)}&runId=${encodeURIComponent(link.runRef.current ?? '')}`, headers: headers() }),
+        prepareReconnectToStreamRequest: () => ({ api: `${environment.apiUrl}${hubPath(mobileApi.resumeChat, {}, { agentId: link.endpoints.agentId, runId: link.runRef.current ?? '' })}`, headers: headers() }),
     })
 }

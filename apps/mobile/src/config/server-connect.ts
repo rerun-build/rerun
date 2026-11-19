@@ -1,4 +1,4 @@
-import { clientConfigSchema } from '@rerun/contracts'
+import { hubPath, mobileApi } from '@rerun/contracts'
 
 import { ApiError, clientHeader, createApiClient } from '@/api/client'
 import type { CustomServer } from '@/config/custom-server'
@@ -61,14 +61,14 @@ export async function lookUpServer(origin: string, request: Request = createApiC
     const timer = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS)
     let payload: unknown
     try {
-        payload = await request('/api/v1/client', { signal: controller.signal })
+        payload = await request(hubPath(mobileApi.getClientConfig, {}), { signal: controller.signal })
     } catch (error) {
         return { ok: false, problem: error instanceof ApiError ? 'not-rerun' : 'unreachable' }
     } finally {
         clearTimeout(timer)
     }
 
-    const config = clientConfigSchema.safeParse(payload)
+    const config = mobileApi.getClientConfig.response.safeParse(payload)
     if (!config.success) return { ok: false, problem: 'not-rerun' }
     if (!config.data.server) return { ok: false, problem: 'outdated' }
     if (!reachableOverHttp(config.data.server.supabaseUrl)) return { ok: false, problem: 'insecure' }
