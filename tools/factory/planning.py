@@ -369,6 +369,33 @@ def comment(errors):
     return "\n".join(lines)
 
 
+def width(parsed, open_numbers, held):
+    cut = {p["number"] for p in parsed}
+    rows = []
+    for worker in cutshape.WORKERS:
+        kids = [p for p in parsed if p["worker"] == worker]
+        if not kids:
+            continue
+        at_once = sum(1 for p in kids
+                      if p["number"] not in held
+                      and not cut & set(p["deps"])
+                      and all(open_numbers is not None and d not in open_numbers for d in p["deps"]))
+        rows.append((worker, len(kids), at_once))
+    return rows
+
+
+def width_text(numbers, rows, held, unread):
+    lines = ["## Cut shape", "", "Children: %s" % ", ".join("#%d" % k for k in numbers), "",
+             "| Type | Children | Can start at once |", "|---|---|---|"]
+    lines += ["| %s | %d | %d |" % row for row in rows]
+    lines.append("| all | %d | %d |" % (sum(r[1] for r in rows), sum(r[2] for r in rows)))
+    if held:
+        lines += ["", "Not labelled `factory`, refused by the checks: %s" % ", ".join("#%d" % k for k in sorted(held))]
+    if unread:
+        lines += ["", "The open issues could not be read, so a child that waits on an issue outside this cut counts as waiting."]
+    return "\n".join(lines)
+
+
 def stamp(t):
     return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -536,6 +563,7 @@ class Station:
                 self.store.set(job, "repair_tries", "0")
                 self.store.set(job, "state", "repair")
                 return
+            self.shape(n, rest, faulty)
             self.finish(n, "cut", ", ".join("#%d" % k for k in rest))
             return
         if row.get("state") == "cutting" and kind == "BLOCKED" and rest.startswith("plan:") and row.get("retried") != "1":
@@ -1036,7 +1064,9 @@ class Station:
             return
         for k, errors in faulty.items():
             self.comment(int(k), comment(errors))
-        self.finish(n, "cut", ", ".join("#%d" % k for k in json.loads(row.get("cut_children") or "[]")))
+        kids = json.loads(row.get("cut_children") or "[]")
+        self.shape(n, kids, faulty)
+        self.finish(n, "cut", ", ".join("#%d" % k for k in kids))
 
     def blocked(self, n, rest):
         self.finish(n, "blocked", rest)
@@ -1068,6 +1098,28 @@ class Station:
             self.gh(["issue", "edit", str(n), "-R", self.repo, "--remove-label", LABEL])
         except Exception:
             pass
+
+    def shape(self, n, numbers, faulty):
+        try:
+            kids = numbers[:30]
+            parsed = [cutshape.parse(json.loads(self.gh(["issue", "view", str(k), "-R", self.repo, "--json",
+                                                         "number,body"]))) for k in kids]
+            cut = set(kids)
+            open_numbers, unread = None, False
+            if any(d not in cut for p in parsed for d in p["deps"]):
+                try:
+                    open_numbers = {int(i["number"]) for i in json.loads(self.gh(
+                        ["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]))}
+                except Exception:
+                    open_numbers, unread = None, True
+            held = {int(k) for k in faulty}
+            text = width_text(kids, width(parsed, open_numbers, held), held, unread)
+            if self.store.get_all("plan:%d" % n).get("width") == text:
+                return
+            self.gh(["issue", "comment", str(n), "-R", self.repo, "--body", text])
+            self.store.set("plan:%d" % n, "width", text)
+        except Exception as e:
+            log("plan:%d" % n, "cut shape not posted: %s" % str(e)[:200])
 
     def label(self, numbers, comment_faults=True):
         children = []
