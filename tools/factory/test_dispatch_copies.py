@@ -45,6 +45,11 @@ class Copies(unittest.TestCase):
         self.assertIn("rerun #4", self.w.sends[3][1])
         self.assertEqual(self.d.store.get_job("4")["copy"], 2)
 
+    def test_each_send_carries_its_copy_number_as_copy_index(self):
+        self.make(3, [issue(n) for n in (1, 2, 3, 4)])
+        self.beat()
+        self.assertEqual([a.get("copyIndex") for a in self.w.send_args if a["agentId"] == "c1"], [1, 2, 3])
+
     def test_with_one_run_each_a_coworker_takes_one_job_and_the_briefs_carry_the_file_name_line(self):
         self.make(1, [issue(1), issue(2)])
         self.beat(2)

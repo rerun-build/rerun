@@ -1059,6 +1059,8 @@ class Dispatcher:
         self.save(j, step)
         self.store.set(str(j["issue"]), "seen", "")
         args = {"agentId": agent, "message": message, "waitSeconds": WAIT_S}
+        if isinstance(copy, int) and not isinstance(copy, bool) and copy >= 1:
+            args["copyIndex"] = copy
         if state in GOALS:
             args["goal"] = {"lastLineForms": GOALS[state], "turnLimit": 3}
         if j.get("run_model"):
