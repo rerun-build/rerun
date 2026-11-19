@@ -85,6 +85,28 @@ class CutShape(unittest.TestCase):
             b = FORM.replace("`tools/factory/cutshape.py`", "`%s`" % path)
             self.assertTrue(cutshape.parse({"number": 1, "body": b})["errors"], path)
 
+    def test_a_files_bullet_may_carry_a_note_with_code_after_its_path(self):
+        b = FORM.replace(
+            "- `tools/factory/test_cutshape.py`\n",
+            "- `tools/factory/test_cutshape.py`\n- `tools/factory/test_planning_cut.py` (:16 `BRIEF_SHA256` pins the brief's hash)\n",
+        )
+        p = cutshape.parse({"number": 1, "body": b})
+        self.assertEqual(p["errors"], [])
+        self.assertEqual(p["paths"], ["tools/factory/cutshape.py", "tools/factory/test_cutshape.py", "tools/factory/test_planning_cut.py"])
+
+    def test_a_test_file_line_may_carry_a_note_with_code_after_its_path(self):
+        b = FORM.replace(
+            "**Test file**: `tools/factory/test_cutshape.py`",
+            "**Test file**: `tools/factory/test_cutshape.py` (existing tests, driven by the fake in `tools/factory/test_dispatch.py`)",
+        )
+        p = cutshape.parse({"number": 1, "body": b})
+        self.assertEqual(p["errors"], [])
+        self.assertEqual(p["test"], "tools/factory/test_cutshape.py")
+
+    def test_a_bullet_that_does_not_start_with_its_path_is_still_refused(self):
+        b = FORM.replace("- `tools/factory/cutshape.py`\n", "- see `a.py` and `b.py`\n")
+        self.assertTrue(any(e.startswith("files: bullet needs exactly one path") for e in cutshape.parse({"number": 1, "body": b})["errors"]))
+
     def test_test_file_must_be_listed(self):
         b = FORM.replace("**Test file**: `tools/factory/test_cutshape.py`", "**Test file**: `other.py`")
         self.assertTrue(cutshape.parse({"number": 1, "body": b})["errors"])
