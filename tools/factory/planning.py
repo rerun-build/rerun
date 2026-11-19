@@ -59,9 +59,10 @@ def weight(issue):
     return max((WEIGHTS[n] for n in names(issue) if n in WEIGHTS), default=0)
 
 
-def unplanned(issues):
+def unplanned(issues, first=frozenset()):
     kept = [i for i in issues if weight(i) > 0 and not names(i) & SKIP]
-    return sorted(kept, key=lambda i: (TOKENS not in names(i), -weight(i), i.get("createdAt") or "", i["number"]))
+    return sorted(kept, key=lambda i: (i["number"] not in first, TOKENS not in names(i), -weight(i), i.get("createdAt") or "",
+                                       i["number"]))
 
 
 def brief_lines(issue, repo):
@@ -442,6 +443,18 @@ class Station:
 
     def live(self):
         return {n: r for n, r in self.records().items() if r.get("state") in LIVE}
+
+    def held_children(self):
+        out = set()
+        for r in self.records().values():
+            try:
+                out.update(int(k) for k in json.loads(r.get("held") or "[]"))
+            except (ValueError, TypeError):
+                pass
+            said = re.search(r"refused by the checks: ([^\n]*)", r.get("width") or "")
+            if said:
+                out.update(int(k) for k in re.findall(r"#(\d+)", said.group(1)))
+        return out
 
     def running(self):
         own = [(r["agent"], int(r["copy"])) for r in self.live().values()]
@@ -1102,6 +1115,7 @@ class Station:
             pass
 
     def shape(self, n, numbers, faulty):
+        self.store.set("plan:%d" % n, "held", json.dumps(sorted(int(k) for k in faulty)))
         try:
             kids = numbers[:30]
             parsed = [cutshape.parse(json.loads(self.gh(["issue", "view", str(k), "-R", self.repo, "--json",
@@ -1164,7 +1178,7 @@ class Station:
                 reset = True
         if reset:
             records = self.records()
-        for item in unplanned(issues):
+        for item in unplanned(issues, self.held_children()):
             if room <= 0:
                 break
             n = item["number"]
