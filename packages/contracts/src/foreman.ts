@@ -51,6 +51,32 @@ export type CheckinReason = z.infer<typeof checkinReasonSchema>
 // its token only opens the hub tools that read.
 export const checkinBriefRequestSchema = z.object({ reason: checkinReasonSchema })
 
+// What the box sees of its workspace when it takes its daily pulse: numbers and short labels only,
+// never a message, a file or a run's output. The hub's triage reads it as it is, so it stays small.
+export const NEVER_USED_FEATURES = ['scheduled_tasks', 'webhook_triggers', 'company_brain', 'shared_database'] as const
+const DIGEST_LABEL = z.string().min(1).max(60)
+const DIGEST_COUNT = z.number().int().min(0).max(1_000_000)
+export const checkinDigestSchema = z.strictObject({
+    workspaceAgeDays: DIGEST_COUNT,
+    daysSinceLastCheckin: DIGEST_COUNT.nullable(),
+    daysSinceLastHumanMessage: DIGEST_COUNT.nullable(),
+    coworkers: DIGEST_COUNT,
+    failedRuns24h: DIGEST_COUNT,
+    failingCoworkers: z.array(DIGEST_LABEL).max(20),
+    pendingQuestions: DIGEST_COUNT,
+    appsNeedingSignIn: DIGEST_COUNT,
+    inactiveCoworkers: z.array(DIGEST_LABEL).max(20),
+    openSkillProposals: DIGEST_COUNT,
+    neverUsed: z.array(z.enum(NEVER_USED_FEATURES)).max(NEVER_USED_FEATURES.length),
+})
+export type CheckinDigest = z.infer<typeof checkinDigestSchema>
+
+// POST /api/foreman/triage, from the box, when its rules cannot tell whether today is worth a
+// check-in. `checkin` is the hub's answer, `probability` how sure the model was that it is.
+export const checkinTriageRequestSchema = z.strictObject({ digest: checkinDigestSchema })
+export const checkinTriageResponseSchema = z.object({ checkin: z.boolean(), probability: z.number().min(0).max(1) })
+export type CheckinTriageResponse = z.infer<typeof checkinTriageResponseSchema>
+
 // Which foreman the workspace talks to: the onboarding's on the hub, the everyday one on the engine, or
 // none at all for a workspace past its onboarding with no machine.
 export const foremanSurfaceSchema = z.enum(['onboarding', 'engine', 'none'])

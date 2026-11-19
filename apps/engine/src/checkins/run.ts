@@ -28,6 +28,10 @@ export type StartedCheckin = { runId: string; sessionId: string }
 let inFlight: Promise<StartedCheckin> | null = null
 let running: StartedCheckin | null = null
 
+export function checkinInFlight(): boolean {
+    return running !== null || inFlight !== null
+}
+
 // A session nobody is told about: it only ever shows once the check-in decided to speak. The run
 // is the Chief of Staff's, on the read-only brief of a check-in. `schedule` is the routine that asked
 // for it, when the reason is a promise.

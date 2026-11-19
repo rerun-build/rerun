@@ -29,7 +29,10 @@ const state = vi.hoisted(() => ({
     promisesToday: 0,
     checkins: [] as Array<{ reason: string; slug?: string }>,
     announce: vi.fn(async () => {}),
+    pulse: vi.fn(async () => {}),
 }))
+
+vi.mock('../checkins/pulse.js', () => ({ runPulseIfDue: state.pulse }))
 
 vi.mock('../checkins/run.js', () => ({
     PROMISE_DAILY_CAP: 3,
@@ -148,6 +151,7 @@ afterEach(async () => {
     state.deleteFiredOneOff.mockImplementation(async () => true)
     state.sweep.mockClear()
     state.announce.mockClear()
+    state.pulse.mockClear()
     clearBudgetLatch()
     clearPlanLimitLatch('claude-sub')
     backupFree.value = false
@@ -421,6 +425,7 @@ describe('startScheduler', () => {
         expect(state.sweep).toHaveBeenCalledTimes(3)
         // The check-ins whose thread the hub did not hear yet are told again on every tick.
         expect(state.announce).toHaveBeenCalledTimes(3)
+        expect(state.pulse).toHaveBeenCalledTimes(3)
     })
 
     it('fires only the due schedules of enabled agents', async () => {

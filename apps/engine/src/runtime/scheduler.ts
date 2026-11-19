@@ -19,6 +19,7 @@ import { agentHasLiveRun } from './run-control.js'
 import { nowIso } from '../lib/ids.js'
 import { PROMISE_DAILY_CAP, promisesInLastDay, startCheckin } from '../checkins/run.js'
 import { announcePendingCheckins } from '../checkins/settle.js'
+import { runPulseIfDue } from '../checkins/pulse.js'
 import { agentDisabled, budgetExhausted, coworkerBusy, HttpError, promiseCapReached, subscriptionLimited } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 
@@ -128,6 +129,7 @@ async function tick(): Promise<void> {
         return
     }
     void announcePendingCheckins().catch(err => logger.warn({ err: String(err) }, 'check-in announcements failed'))
+    void runPulseIfDue(now)
     void sweepMemoriesIfDue(agentIds)
     void maintainBrainIfDue()
     void sweepCodexHomesIfDue()

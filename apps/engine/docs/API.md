@@ -1480,6 +1480,18 @@ aboutAgentIds }`) then `agent.schedule.completed`. When the first is not deliver
 again on the next ticks of the scheduler, for two days, never the second alone. A check-in that does
 not call it tells the app nothing.
 
+Besides the ones asked for (`manual`) and its own promises, the engine takes a daily pulse
+(`src/checkins/pulse.ts`): on a scheduler tick in the daytime of the first person who ever wrote on
+the box (from 09:00 plus a delay of up to two hours of its own, until 18:00, once per local day, never
+without a known time zone), it reads a digest of the box (`buildDigest`: numbers and short labels,
+`checkinDigestSchema` in the contracts) and decides by its rules (`decide`): no check-in when nobody
+wrote for 30 days or one ran in the last 20 hours; one every day of the first 14 days of the
+foreman, one when 3 runs failed in a day, a question waits on someone or a Vault account needs a
+sign-in, one when a week passed without; otherwise, on something minor, it asks the app
+(`POST {RERUN_HUB_BASE_URL}/api/foreman/triage`, `{ "digest": … }`, answered
+`{ "checkin": true, "probability": 0.74 }`), and any failure there reads as no. A pulse that finds the
+foreman busy tries again on the next tick.
+
 #### `POST /agents/foreman/checkins/run`
 
 Starts a check-in now. `202 { "runId", "sessionId" }`, the one already running when there is one.
