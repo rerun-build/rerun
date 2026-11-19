@@ -105,11 +105,14 @@ export type ConversationMessage = z.infer<typeof conversationMessageSchema>
 
 // What one row of the Chats screen needs, so the app reads the whole workspace in one request
 // instead of one per agent. `latest` is null for an agent nobody has talked to yet.
+// `generalSessionId` is the coworker's General, the conversation a tap on its row opens: null before
+// its first message, absent from a hub older than it.
 export const agentConversationsOverviewSchema = z.array(
     z.object({
         agentId: z.string(),
         latest: conversationSchema.nullable(),
         pending: z.number(),
+        generalSessionId: z.string().nullable().optional(),
     }),
 )
 export type AgentConversationsOverview = z.infer<typeof agentConversationsOverviewSchema>

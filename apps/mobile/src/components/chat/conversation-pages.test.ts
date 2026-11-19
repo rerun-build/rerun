@@ -1,4 +1,4 @@
-import { activePageIndex, conversationPages, GENERAL_DRAFT_KEY, GENERAL_PAGE_ID } from '@/components/chat/conversation-pages'
+import { activePageIndex, conversationPages, GENERAL_DRAFT_KEY, GENERAL_PAGE_ID, generalHref } from '@/components/chat/conversation-pages'
 
 describe('conversation pages', () => {
     it('follows the header tabs and ends on the draft', () => {
@@ -44,5 +44,10 @@ describe('conversation pages', () => {
         expect(activePageIndex(pages, 'a')).toBe(1)
         expect(activePageIndex(pages, null)).toBe(2)
         expect(activePageIndex(conversationPages([], {}, 'new-1', { sessionId: 'g' }), 'g')).toBe(0)
+    })
+
+    it('opens a coworker on its General, with its session when the opener knows it', () => {
+        expect(generalHref('pulse', 'g1')).toEqual({ pathname: '/chat/[id]', params: { id: GENERAL_PAGE_ID, to: 'pulse', general: 'g1' } })
+        expect(generalHref('pulse', null)).toEqual({ pathname: '/chat/[id]', params: { id: GENERAL_PAGE_ID, to: 'pulse' } })
     })
 })

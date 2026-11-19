@@ -1,5 +1,6 @@
 import type { DimensionValue } from 'react-native'
 import { View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { FadeOut } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
@@ -8,6 +9,7 @@ import { MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
+import { CHAT_HEADER_HEIGHT } from './ChatHeader'
 import { BUBBLE_GAP, BUBBLE_PADDING_X, BUBBLE_PADDING_Y, BUBBLE_RADIUS } from './Messages'
 
 // A body line is 24 high: each bar sits in the middle of the line it stands for.
@@ -56,5 +58,16 @@ export function ConversationSkeleton() {
                 )
             )}
         </Animated.View>
+    )
+}
+
+// A whole page while the app does not know yet which conversation it holds: the skeleton where the
+// thread will be, and no composer, so no keyboard opens on a draft about to be replaced.
+export function ConversationPagePlaceholder() {
+    const insets = useSafeAreaInsets()
+    return (
+        <View style={{ flex: 1, justifyContent: 'flex-end', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: insets.bottom + spacing.xl, paddingHorizontal: spacing.xl - 4 }}>
+            <ConversationSkeleton />
+        </View>
     )
 }

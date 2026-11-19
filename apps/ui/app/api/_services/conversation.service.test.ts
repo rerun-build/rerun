@@ -33,12 +33,13 @@ function session(agentId: string, id: string, updatedAt: string, status = 'idle'
     return { id, agent_id: agentId, title: `${id} title`, status, updated_at: updatedAt, created_at: updatedAt, engine_session_id: `engine-${id}`, source: 'dashboard', kind: 'thread' }
 }
 
-// selectMany is called three times in order: agents, the latest scan, then the pending count.
-function answers(agents: { id: string }[], recent: ReturnType<typeof session>[], pending: { agent_id: string }[]) {
+// selectMany is called four times in order: agents, the latest scan, the pending count, then the Generals.
+function answers(agents: { id: string }[], recent: ReturnType<typeof session>[], pending: { agent_id: string }[], generals: { id: string; agent_id: string }[] = []) {
     vi.mocked(selectMany)
         .mockResolvedValueOnce({ data: agents, error: null } as never)
         .mockResolvedValueOnce({ data: recent, error: null } as never)
         .mockResolvedValueOnce({ data: pending, error: null } as never)
+        .mockResolvedValueOnce({ data: generals, error: null } as never)
 }
 
 describe('listWorkspaceConversationOverview', () => {
@@ -64,7 +65,20 @@ describe('listWorkspaceConversationOverview', () => {
 
         const overview = await listWorkspaceConversationOverview(ctx)
 
-        expect(overview.find(row => row.agentId === 'quiet')).toEqual({ agentId: 'quiet', latest: null, pending: 0 })
+        expect(overview.find(row => row.agentId === 'quiet')).toEqual({ agentId: 'quiet', latest: null, pending: 0, generalSessionId: null })
+    })
+
+    // The app opens a coworker on its General, whichever conversation moved last.
+    it('names each coworker\'s General, read for the coworkers alone', async () => {
+        answers([{ id: 'a' }, { id: 'b' }], [session('a', 'thread-1', '2026-09-18T10:00:00Z')], [], [{ id: 'general-a', agent_id: 'a' }])
+
+        const overview = await listWorkspaceConversationOverview(ctx)
+
+        expect(overview.map(row => [row.agentId, row.latest?.id ?? null, row.generalSessionId])).toEqual([
+            ['a', 'thread-1', 'general-a'],
+            ['b', null, null],
+        ])
+        expect(vi.mocked(selectMany).mock.calls[3][3]).toEqual({ agent_id: ['a', 'b'], kind: 'general' })
     })
 
     it('counts the pending conversations per agent', async () => {

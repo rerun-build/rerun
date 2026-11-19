@@ -23,7 +23,7 @@ import { spacing, type ColorScheme } from '@/theme/tokens'
 
 const noop = () => {}
 
-const mock = (id: string, name: string, status: HomeCoworker['status'], description: string, pending = 0, paused = false): HomeCoworker => ({ id, name, handle: null, description, status, paused, spaceId: 'box-1', latest: null, pending })
+const mock = (id: string, name: string, status: HomeCoworker['status'], description: string, pending = 0, paused = false): HomeCoworker => ({ id, name, handle: null, description, status, paused, spaceId: 'box-1', latest: null, pending, generalSessionId: null })
 
 const TEAM: HomeCoworker[] = [
     mock('agent-scout', 'Scout', 'waiting_human', 'Lead finder', 2),

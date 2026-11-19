@@ -9,8 +9,9 @@ const one = (patch: Partial<BoardAgent>, overview: AgentConversationsOverview = 
 
 describe('home board', () => {
     it('joins each coworker to its latest conversation and its pending count', () => {
-        const coworker = one({}, [{ agentId: 'a1', latest: latest(), pending: 2 }])
-        expect(coworker).toMatchObject({ id: 'a1', latest: { title: 'Q4 prospects' }, pending: 2, paused: false })
+        const coworker = one({}, [{ agentId: 'a1', latest: latest(), pending: 2, generalSessionId: 'g1' }])
+        expect(coworker).toMatchObject({ id: 'a1', latest: { title: 'Q4 prospects' }, pending: 2, paused: false, generalSessionId: 'g1' })
+        expect(one({}, [{ agentId: 'a1', latest: latest(), pending: 0 }]).generalSessionId).toBeNull()
         expect(one({}).latest).toBeNull()
     })
 

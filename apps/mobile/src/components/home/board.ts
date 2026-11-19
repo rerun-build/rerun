@@ -16,6 +16,8 @@ export type HomeCoworker = {
     spaceId: string
     latest: AgentConversationsOverview[number]['latest']
     pending: number
+    // Its General, the conversation a tap opens; null before its first message, or from an older hub.
+    generalSessionId: string | null
 }
 
 export type SectionKey = 'needs' | 'working' | 'coworkers'
@@ -24,7 +26,7 @@ export function toHomeCoworkers(agents: BoardAgent[], overview: AgentConversatio
     const byAgent = new Map(overview.map(entry => [entry.agentId, entry]))
     return agents.map(agent => {
         const entry = byAgent.get(agent.id)
-        return { id: agent.id, name: agent.name, handle: agent.handle, description: agent.description, status: agent.status, paused: Boolean(agent.disabledAt), spaceId: agent.spaceId, latest: entry?.latest ?? null, pending: entry?.pending ?? 0 }
+        return { id: agent.id, name: agent.name, handle: agent.handle, description: agent.description, status: agent.status, paused: Boolean(agent.disabledAt), spaceId: agent.spaceId, latest: entry?.latest ?? null, pending: entry?.pending ?? 0, generalSessionId: entry?.generalSessionId ?? null }
     })
 }
 
@@ -55,7 +57,7 @@ export function recentCoworkers(coworkers: HomeCoworker[]): HomeCoworker[] {
 
 // The Foreman as a cell of the pinned grid: it can be pinned like a coworker, never listed among them.
 export function foremanOnBoard(running: boolean): HomeCoworker {
-    return { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
+    return { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0, generalSessionId: null }
 }
 
 // The order after a pinned row was dragged from one place to another.

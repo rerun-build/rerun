@@ -16,6 +16,7 @@ import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 
 import { ChatHeader, type ChatTab } from './ChatHeader'
+import { ConversationPagePlaceholder } from './ConversationSkeleton'
 import { stateOf } from './conversation-sections'
 import { activePageIndex, conversationPages, GENERAL_DRAFT_KEY, GENERAL_PAGE_ID, type ConversationPage } from './conversation-pages'
 import { ConversationPager } from './ConversationPager'
@@ -38,7 +39,8 @@ function startedByOf(conversation: Conversation | undefined): StartedBy | null {
     return conversation?.originAgentName ? { agentId: conversation.originAgentId ?? null, name: conversation.originAgentName } : null
 }
 
-export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionId: string | null }) {
+// `knownGeneralId`: the coworker's General as the opener knew it, before the list of conversations says it.
+export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { agentId: string; sessionId: string | null; knownGeneralId?: string | null }) {
     const theme = useTheme()
     const back = useChatBack()
     const { session, me } = useAuth()
@@ -52,7 +54,7 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
     const [activeId, setActiveId] = useState(sessionId)
     const [openIds, openChat] = useOpenChats(agentId, sessionId === GENERAL_PAGE_ID ? null : sessionId)
     const coworker = coworkerOf(agentId, view)
-    const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? null
+    const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? knownGeneralId
     const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
@@ -159,7 +161,7 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} />} />
+            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => (page.general && !page.sessionId && !conversationsLoaded ? <ConversationPagePlaceholder /> : <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} />)} />
             <ChatHeader coworker={coworker} tabs={tabs} activeId={shownId ?? undefined} progress={progress} allSessions={allTabs} onBack={back} onSelect={select} onNewSession={startNew} onOpenDetails={() => router.push({ pathname: '/coworker/[id]', params: { id: agentId, name: coworker.name } })} />
         </View>
     )

@@ -10,7 +10,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { coworkerEndpoints } from '@/chat/endpoints'
 import { foremanOnBoard, lineOf, minutesSince, moodStatus, recentCoworkers, type HomeCoworker } from '@/components/home/board'
 import { SkeletonFade, useBootFill } from '@/components/home/BootFill'
-import { GENERAL_PAGE_ID } from '@/components/chat/conversation-pages'
+import { generalHref } from '@/components/chat/conversation-pages'
 import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { CoworkerRow, HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { ForemanRow } from '@/components/home/ForemanRow'
@@ -82,11 +82,11 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const open = (coworker: HomeCoworker) => {
         startTiming('chat open', 'chat fresh')
         if (coworker.id === FOREMAN_AGENT_ID) return openForeman()
-        go({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? GENERAL_PAGE_ID, to: coworker.id } })
+        go(generalHref(coworker.id, coworker.generalSessionId))
     }
 
     const warmUp = (coworker: HomeCoworker) => {
-        const sessionId = coworker.latest?.id
+        const sessionId = coworker.generalSessionId
         if (!sessionId || !session || !me) return
         const caller = { accessToken: session.access_token, workspaceId: me.workspace.id }
         loadTranscript(caller.workspaceId, sessionId, () => coworkerEndpoints(coworker.id).messages(caller, sessionId)).catch(() => {})

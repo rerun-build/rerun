@@ -199,11 +199,15 @@ export async function listWorkspaceConversationOverview(ctx: WorkspaceContext): 
     const agentIds = (await reachableAgents(ctx)).map(a => a.id)
     if (agentIds.length === 0) return []
 
-    const { data: recent, error: recentError } = await selectMany(ctx.supabase, 'sessions', OVERVIEW_COLUMNS, { agent_id: agentIds }, { column: 'updated_at', ascending: false }, LATEST_SCAN_LIMIT)
+    // A coworker has one General at most: that read is bounded by the coworkers, not the conversations.
+    const [{ data: recent, error: recentError }, { data: pendingRows, error: pendingError }, { data: generalRows, error: generalError }] = await Promise.all([
+        selectMany(ctx.supabase, 'sessions', OVERVIEW_COLUMNS, { agent_id: agentIds }, { column: 'updated_at', ascending: false }, LATEST_SCAN_LIMIT),
+        selectMany(ctx.supabase, 'sessions', ['agent_id'] as const, { agent_id: agentIds, status: [...PENDING_STATUSES] }),
+        selectMany(ctx.supabase, 'sessions', ['id', 'agent_id'] as const, { agent_id: agentIds, kind: 'general' }),
+    ])
     if (recentError) throw recentError
-
-    const { data: pendingRows, error: pendingError } = await selectMany(ctx.supabase, 'sessions', ['agent_id'] as const, { agent_id: agentIds, status: [...PENDING_STATUSES] })
     if (pendingError) throw pendingError
+    if (generalError) throw generalError
 
     const latestByAgent = new Map<string, Conversation>()
     for (const row of recent ?? []) {
@@ -224,8 +228,9 @@ export async function listWorkspaceConversationOverview(ctx: WorkspaceContext): 
 
     const pendingByAgent = new Map<string, number>()
     for (const row of pendingRows ?? []) pendingByAgent.set(row.agent_id, (pendingByAgent.get(row.agent_id) ?? 0) + 1)
+    const generalByAgent = new Map((generalRows ?? []).map(row => [row.agent_id, row.id]))
 
-    return agentIds.map(agentId => ({ agentId, latest: latestByAgent.get(agentId) ?? null, pending: pendingByAgent.get(agentId) ?? 0 }))
+    return agentIds.map(agentId => ({ agentId, latest: latestByAgent.get(agentId) ?? null, pending: pendingByAgent.get(agentId) ?? 0, generalSessionId: generalByAgent.get(agentId) ?? null }))
 }
 
 const SEARCH_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at'] as const
