@@ -13,6 +13,10 @@ type Board = { state: 'loading' } | { state: 'error' } | { state: 'ready'; cowor
 
 const boardOf = ({ agents, overview, boxes }: BoardRead, fresh: boolean): Board => ({ state: 'ready', coworkers: toHomeCoworkers(agents, overview), boxes, fresh })
 
+export function boardKey(workspaceId: number) {
+    return `board:${workspaceId}`
+}
+
 // Realtime takes at most this many values in an `in` filter; a larger workspace hears every session.
 const FILTERED_AGENTS_MAX = 100
 
@@ -40,7 +44,7 @@ export function useBoard(): Board & { reload: () => void } {
     const workspaceId = me?.workspace.id
     const userId = me?.user.id
     const persisted = useMemo(() => (workspaceId === undefined ? undefined : cachedBoard(workspaceId)), [workspaceId])
-    const read = useHub(accessToken && workspaceId ? `board:${workspaceId}` : null, () => fetchBoard({ accessToken: accessToken!, workspaceId: workspaceId! }), { persisted, freshFor: 0, foreground: false })
+    const read = useHub(accessToken && workspaceId ? boardKey(workspaceId) : null, () => fetchBoard({ accessToken: accessToken!, workspaceId: workspaceId! }), { persisted, freshFor: 0, foreground: false })
     const { reload: readAgain } = read
     const reload = useCallback(() => void readAgain(), [readAgain])
     const reloadSoon = useBurstReload(reload)

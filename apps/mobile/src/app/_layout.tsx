@@ -21,6 +21,7 @@ import { SystemDialogHost } from '@/components/ui/system-dialogs'
 import { UpdateRequired } from '@/components/update/UpdateRequired'
 import { useUpdateRequired } from '@/components/update/useUpdateRequired'
 import { MediaViewerHost } from '@/components/viewer/MediaViewerHost'
+import { CoworkerLooks } from '@/data/CoworkerLooks'
 import { InboxProvider } from '@/data/InboxProvider'
 import { I18nProvider } from '@/i18n/I18nProvider'
 import { useAiConsent } from '@/lib/ai-consent'
@@ -116,64 +117,66 @@ function App() {
                     <NoPlan />
                 ) : (
                     <MockStore>
-                        <InboxProvider>
-                            {signedIn && <OpenPushTarget href={pushTarget.href} onOpened={pushTarget.opened} />}
-                            <SplitShell enabled={signedIn}>
-                                <Stack screenOptions={{ headerShown: false }}>
-                                    <Stack.Protected guard={signedIn} redirectTo="/sign-in">
-                                        {/* Under a conversation, the Home does not draw again until it is back. */}
-                                        <Stack.Screen name="index" options={{ freezeOnBlur: true }} />
-                                        <Stack.Screen name="chat/[id]" />
-                                        <Stack.Screen name="search" options={{ animation: 'fade' }} />
-                                        <Stack.Screen name="coworker/[id]/index" />
-                                        <Stack.Screen name="coworker/[id]/files" />
-                                        <Stack.Screen name="coworker/[id]/apps" />
-                                        <Stack.Screen name="coworker/[id]/routines" />
-                                        <Stack.Screen name="coworker/[id]/notifications" />
-                                        <Stack.Screen name="inbox" options={sheetOptions(scheme, [0.6, 1])} />
-                                        <Stack.Screen name="model" options={sheetOptions(scheme, [0.6, 1])} />
-                                        <Stack.Screen name="desktop" options={{ presentation: 'fullScreenModal' }} />
-                                        <Stack.Screen name="settings" options={sheetOptions(scheme, [1])} />
-                                        <Stack.Screen name="new-coworker" options={sheetOptions(scheme, [1])} />
-                                        <Stack.Screen name="providers" options={sheetOptions(scheme, [1])} />
-                                    </Stack.Protected>
-                                    <Stack.Protected guard={!signedIn} redirectTo="/">
-                                        <Stack.Screen name="sign-in" />
-                                    </Stack.Protected>
-                                    <Stack.Protected guard={__DEV__}>
-                                        <Stack.Screen name="lab" />
-                                        <Stack.Screen name="lab-chat" />
-                                        <Stack.Screen name="lab-perf" />
-                                        <Stack.Screen name="lab-threads" />
-                                        <Stack.Screen name="lab-message-times" />
-                                        <Stack.Screen name="lab-icons" />
-                                        <Stack.Screen name="lab-controls" />
-                                        <Stack.Screen name="lab-sign-in" />
-                                        <Stack.Screen name="lab-hitl" />
-                                        <Stack.Screen name="lab-screen" />
-                                        <Stack.Screen name="lab-delegate" />
-                                        <Stack.Screen name="lab-steps" />
-                                        <Stack.Screen name="lab-skill" />
-                                        <Stack.Screen name="lab-composer" />
-                                        <Stack.Screen name="lab-foreman" />
-                                        <Stack.Screen name="lab-home" />
-                                        <Stack.Screen name="lab-markdown" />
-                                        <Stack.Screen name="lab-onboarding" />
-                                        <Stack.Screen name="lab-consent" />
-                                        <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
-                                        <Stack.Screen name="lab-coworker" />
-                                        <Stack.Screen name="lab-notifications" />
-                                        <Stack.Screen name="lab-conversations" />
-                                        <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />
-                                        <Stack.Screen name="lab-providers" options={sheetOptions(scheme, [1])} />
-                                    </Stack.Protected>
-                                </Stack>
-                            </SplitShell>
-                            <MediaViewerHost />
-                            <SystemDialogHost />
-                            {PERF_LOG && <FrameMonitor top={4} />}
-                            <OpenStartRoute />
-                        </InboxProvider>
+                        <CoworkerLooks>
+                            <InboxProvider>
+                                {signedIn && <OpenPushTarget href={pushTarget.href} onOpened={pushTarget.opened} />}
+                                <SplitShell enabled={signedIn}>
+                                    <Stack screenOptions={{ headerShown: false }}>
+                                        <Stack.Protected guard={signedIn} redirectTo="/sign-in">
+                                            {/* Under a conversation, the Home does not draw again until it is back. */}
+                                            <Stack.Screen name="index" options={{ freezeOnBlur: true }} />
+                                            <Stack.Screen name="chat/[id]" />
+                                            <Stack.Screen name="search" options={{ animation: 'fade' }} />
+                                            <Stack.Screen name="coworker/[id]/index" />
+                                            <Stack.Screen name="coworker/[id]/files" />
+                                            <Stack.Screen name="coworker/[id]/apps" />
+                                            <Stack.Screen name="coworker/[id]/routines" />
+                                            <Stack.Screen name="coworker/[id]/notifications" />
+                                            <Stack.Screen name="inbox" options={sheetOptions(scheme, [0.6, 1])} />
+                                            <Stack.Screen name="model" options={sheetOptions(scheme, [0.6, 1])} />
+                                            <Stack.Screen name="desktop" options={{ presentation: 'fullScreenModal' }} />
+                                            <Stack.Screen name="settings" options={sheetOptions(scheme, [1])} />
+                                            <Stack.Screen name="new-coworker" options={sheetOptions(scheme, [1])} />
+                                            <Stack.Screen name="providers" options={sheetOptions(scheme, [1])} />
+                                        </Stack.Protected>
+                                        <Stack.Protected guard={!signedIn} redirectTo="/">
+                                            <Stack.Screen name="sign-in" />
+                                        </Stack.Protected>
+                                        <Stack.Protected guard={__DEV__}>
+                                            <Stack.Screen name="lab" />
+                                            <Stack.Screen name="lab-chat" />
+                                            <Stack.Screen name="lab-perf" />
+                                            <Stack.Screen name="lab-threads" />
+                                            <Stack.Screen name="lab-message-times" />
+                                            <Stack.Screen name="lab-icons" />
+                                            <Stack.Screen name="lab-controls" />
+                                            <Stack.Screen name="lab-sign-in" />
+                                            <Stack.Screen name="lab-hitl" />
+                                            <Stack.Screen name="lab-screen" />
+                                            <Stack.Screen name="lab-delegate" />
+                                            <Stack.Screen name="lab-steps" />
+                                            <Stack.Screen name="lab-skill" />
+                                            <Stack.Screen name="lab-composer" />
+                                            <Stack.Screen name="lab-foreman" />
+                                            <Stack.Screen name="lab-home" />
+                                            <Stack.Screen name="lab-markdown" />
+                                            <Stack.Screen name="lab-onboarding" />
+                                            <Stack.Screen name="lab-consent" />
+                                            <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
+                                            <Stack.Screen name="lab-coworker" />
+                                            <Stack.Screen name="lab-notifications" />
+                                            <Stack.Screen name="lab-conversations" />
+                                            <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />
+                                            <Stack.Screen name="lab-providers" options={sheetOptions(scheme, [1])} />
+                                        </Stack.Protected>
+                                    </Stack>
+                                </SplitShell>
+                                <MediaViewerHost />
+                                <SystemDialogHost />
+                                {PERF_LOG && <FrameMonitor top={4} />}
+                                <OpenStartRoute />
+                            </InboxProvider>
+                        </CoworkerLooks>
                     </MockStore>
                 )}
             </BuddyClock>

@@ -7,10 +7,12 @@ import { useTheme } from '@/theme/theme'
 import { BUDDY_FACE_CENTER, BuddyFace } from './BuddyFace'
 import { BUDDY_GEOMETRY, boxTop, leftWallPlane, roundedDiamond, wallsOutline, type BoxGeometry } from './geometry'
 import { buddyColor, buddyEyes, buddyMouth, hashUnit, shade, type BuddyEyes, type BuddyLook, type BuddyMood } from './look'
+import { useBuddyLookOf } from './looks'
 import { BuddyMotionScope, GrowsFrom, RidesOnWalls, Sweep } from './motion'
 
 // Ported from packages/ui/src/iso-grid/components/buddy (AgentBuddy, BuddyArt, RoundedBox): an
-// agent's buddy away from the board, the same block, colour and eyes, drawn from the same id.
+// agent's buddy away from the board, the same block, colour and eyes, the ones its coworker was
+// given or else the ones its id hashes to.
 
 // Below this width the board's block is too squat for its face to read: the buddy stands taller,
 // its face is painted flat and larger, and it loses its mouth.
@@ -23,9 +25,9 @@ const MARGIN = 2
 
 const STATE_COLOR: Record<'working' | 'error' | 'waiting', string> = { working: '#f59e0b', error: '#ef4444', waiting: '#06b6d4' }
 
-function smallLook(agentId: string): BuddyLook {
-    const eyes = buddyEyes(agentId, {})
-    return { mouth: 'none', eyes: SMALL_EYES[eyes] ?? eyes }
+function smallLook(agentId: string, look: BuddyLook): BuddyLook {
+    const eyes = buddyEyes(agentId, look)
+    return { ...look, mouth: 'none', eyes: SMALL_EYES[eyes] ?? eyes }
 }
 
 type AgentBuddyProps = {
@@ -45,7 +47,8 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
     const theme = useTheme()
     const small = size < SMALL_BELOW
     const geometry = small ? SMALL_GEOMETRY : BUDDY_GEOMETRY
-    const look = small ? smallLook(agentId) : {}
+    const worn = useBuddyLookOf(agentId)
+    const look = small ? smallLook(agentId, worn) : worn
 
     const side = geometry.halfW * 2 + MARGIN * 2
     const blockCentreY = geometry.base.y - geometry.depth / 2
