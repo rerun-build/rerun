@@ -20,7 +20,13 @@
         "phone.section": "Accessible name of a collapsible Box header in the phone's list: the Box's name and how many coworkers it holds.",
         "phone.byBox": "Option of the phone's list: the coworkers grouped by Box (a group of coworkers) rather than by recency.",
         "foreman.name": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
-        "foreman.rename": "Accessible label of the name of the Chief of Staff (the workspace's AI assistant) on its card, which an admin clicks to give it a name of their own. Emptying the field gives it back its default name."
+        "foreman.rename": "Accessible label of the name of the Chief of Staff (the workspace's AI assistant) on its card, which an admin clicks to give it a name of their own. Emptying the field gives it back its default name.",
+        "checkins.title": "Section of the Chief of Staff's card (the workspace's AI assistant) about its check-ins: it wakes up on its own, reads the workspace and writes to someone only when something is worth their time.",
+        "checkins.next": "{when} is a short relative time such as 'in 3h' or 'now'. The next time the assistant looks at the workspace on its own.",
+        "checkins.waiting": "Shown when check-ins are on but nobody has written in the workspace yet, so the assistant does not know when someone's day starts.",
+        "checkins.unavailable": "The server the workspace runs on has check-ins switched off by its operator.",
+        "checkins.switchedOff": "Tooltip of the disabled Check in now button while check-ins are off.",
+        "checkins.reasons.pulse": "A line in the list of past check-ins: the daily one found nothing worth saying."
     },
     "switch": {
         "label": "View",
@@ -72,5 +78,24 @@
         "recent": "Recent",
         "byBox": "By Box",
         "section": "{label}, {count}"
+    },
+    "checkins": {
+        "title": "Check-ins",
+        "toggle": "Check in on its own",
+        "next": "Next look {when}",
+        "waiting": "Waits for someone to write first",
+        "off": "Off",
+        "unavailable": "Switched off on this server",
+        "switchedOff": "Turn check-ins on first",
+        "modelHelper": "What its check-ins run on.",
+        "runNow": "Check in now",
+        "started": "Checking in. It writes to you only if there is something to say.",
+        "empty": "No check-in yet",
+        "reasons": {
+            "pulse": "Daily look, nothing to say",
+            "promise": "Came back as promised, nothing new",
+            "manual": "Checked in, nothing to say"
+        },
+        "failed": "Check-in did not finish"
     }
 }

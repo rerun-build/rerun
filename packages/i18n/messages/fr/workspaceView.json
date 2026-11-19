@@ -49,5 +49,24 @@
         "recent": "Récents",
         "byBox": "Par Box",
         "section": "{label}, {count}"
+    },
+    "checkins": {
+        "title": "Check-ins",
+        "toggle": "Faire des check-ins de lui-même",
+        "next": "Prochain passage {when}",
+        "waiting": "Attend que quelqu'un écrive d'abord",
+        "off": "Désactivés",
+        "unavailable": "Désactivés sur ce serveur",
+        "switchedOff": "Activez d'abord les check-ins",
+        "modelHelper": "Le modèle de ses check-ins.",
+        "runNow": "Faire un check-in maintenant",
+        "started": "Check-in en cours. Il ne vous écrit que s'il a quelque chose à dire.",
+        "empty": "Aucun check-in pour l'instant",
+        "reasons": {
+            "pulse": "Passage quotidien, rien à signaler",
+            "promise": "Revenu comme promis, rien de nouveau",
+            "manual": "Check-in fait, rien à signaler"
+        },
+        "failed": "Check-in non terminé"
     }
 }

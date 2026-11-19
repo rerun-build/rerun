@@ -49,5 +49,24 @@
         "recent": "Son kullanılanlar",
         "byBox": "Box'a göre",
         "section": "{label}, {count}"
+    },
+    "checkins": {
+        "title": "Check-in'ler",
+        "toggle": "Kendi kendine check-in yapsın",
+        "next": "Sonraki bakış {when}",
+        "waiting": "Önce birinin yazmasını bekliyor",
+        "off": "Kapalı",
+        "unavailable": "Bu sunucuda kapalı",
+        "switchedOff": "Önce check-in'leri açın",
+        "modelHelper": "Check-in'lerinin modeli.",
+        "runNow": "Şimdi check-in yap",
+        "started": "Check-in yapılıyor. Yalnızca söyleyecek bir şey olduğunda size yazar.",
+        "empty": "Henüz check-in yok",
+        "reasons": {
+            "pulse": "Günlük bakış, söylenecek bir şey yok",
+            "promise": "Söz verdiği gibi döndü, yeni bir şey yok",
+            "manual": "Check-in yapıldı, söylenecek bir şey yok"
+        },
+        "failed": "Check-in tamamlanmadı"
     }
 }

@@ -1,5 +1,5 @@
-import { FOREMAN_AGENT_ID, checkinReasonSchema } from '@rerun/contracts'
-import { eq } from 'drizzle-orm'
+import { FOREMAN_AGENT_ID, checkinReasonSchema, type CheckinEntry } from '@rerun/contracts'
+import { desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { getSystemDb } from '../db/systemDb.js'
 import { runs } from '../db/schema.js'
@@ -40,3 +40,19 @@ export async function writeCheckinLog(runId: string, patch: Partial<CheckinLog>)
     const next = checkinLogSchema.parse({ ...current, ...patch })
     await db.update(runs).set({ checkinJson: JSON.stringify(next) }).where(eq(runs.id, runId))
 }
+
+// The latest check-ins, newest first, for the Chief of Staff's card.
+export async function listCheckins(limit = 20): Promise<CheckinEntry[]> {
+    const { db } = await getSystemDb(FOREMAN_AGENT_ID)
+    const rows = await db
+        .select({ runId: runs.id, sessionId: runs.sessionId, status: runs.status, startedAt: runs.startedAt, checkinJson: runs.checkinJson })
+        .from(runs)
+        .where(eq(runs.triggerSource, 'checkin'))
+        .orderBy(desc(runs.startedAt))
+        .limit(limit)
+    return rows.flatMap(({ checkinJson, ...row }) => {
+        const log = parseCheckinLog(checkinJson)
+        return log ? [{ ...row, ...log }] : []
+    })
+}
+

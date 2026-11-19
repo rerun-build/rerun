@@ -49,5 +49,24 @@
         "recent": "Zuletzt",
         "byBox": "Nach Box",
         "section": "{label}, {count}"
+    },
+    "checkins": {
+        "title": "Check-ins",
+        "toggle": "Von sich aus einchecken",
+        "next": "Nächster Blick {when}",
+        "waiting": "Wartet, bis jemand zuerst schreibt",
+        "off": "Aus",
+        "unavailable": "Auf diesem Server ausgeschaltet",
+        "switchedOff": "Schalte die Check-ins zuerst ein",
+        "modelHelper": "Das Modell seiner Check-ins.",
+        "runNow": "Jetzt einchecken",
+        "started": "Check-in läuft. Er schreibt dir nur, wenn es etwas zu sagen gibt.",
+        "empty": "Noch kein Check-in",
+        "reasons": {
+            "pulse": "Täglicher Blick, nichts zu melden",
+            "promise": "Wie versprochen zurück, nichts Neues",
+            "manual": "Eingecheckt, nichts zu melden"
+        },
+        "failed": "Check-in nicht abgeschlossen"
     }
 }

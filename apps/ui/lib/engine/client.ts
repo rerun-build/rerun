@@ -11,8 +11,13 @@ import {
     type DesktopStatus,
     type TakeoverResult,
     ENGINE_CAPABILITY_FILES_STREAM,
+    ENGINE_CAPABILITY_FOREMAN_CHECKINS,
     ENGINE_CAPABILITY_FOREMAN_COWORKER,
     ENGINE_CAPABILITY_FOREMAN_FILES,
+    FOREMAN_AGENT_ID,
+    checkinStartedSchema,
+    foremanCheckinsSchema,
+    type ForemanCheckins,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_VAULT,
     ENGINE_CAPABILITY_VAULT_RENAME,
@@ -715,6 +720,19 @@ export async function supportsVaultRename(conn: EngineConnection): Promise<boole
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT_RENAME)
 }
 
+// The Chief of Staff wakes on its own, and its settings and log answer under /checkins.
+export async function supportsForemanCheckins(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_CHECKINS)
+}
+
+export async function getForemanCheckins(conn: EngineConnection): Promise<ForemanCheckins> {
+    return request(conn, `/agents/${FOREMAN_AGENT_ID}/checkins`, { method: 'GET' }, d => foremanCheckinsSchema.parse(d))
+}
+
+export async function runForemanCheckin(conn: EngineConnection): Promise<{ runId: string; sessionId: string }> {
+    return request(conn, `/agents/${FOREMAN_AGENT_ID}/checkins/run`, { method: 'POST' }, d => checkinStartedSchema.parse(d))
+}
+
 export async function supportsRemoteComputers(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_REMOTE_COMPUTERS)
 }
@@ -839,7 +857,7 @@ export async function updateSchedule(conn: EngineConnection, agentId: string, sl
 }
 
 export async function runScheduleNow(conn: EngineConnection, agentId: string, slug: string): Promise<{ runId: string; sessionId: string }> {
-    return request(conn, `/agents/${encodeURIComponent(agentId)}/schedules/${encodeURIComponent(slug)}/run`, { method: 'POST' }, d => d as { runId: string; sessionId: string })
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/schedules/${encodeURIComponent(slug)}/run`, { method: 'POST' }, d => checkinStartedSchema.parse(d))
 }
 
 export async function deleteSchedule(conn: EngineConnection, agentId: string, slug: string): Promise<void> {

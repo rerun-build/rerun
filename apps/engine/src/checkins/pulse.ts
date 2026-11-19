@@ -75,3 +75,20 @@ export async function runPulseIfDue(now = new Date()): Promise<void> {
         taking = false
     }
 }
+
+const DAY_MS = 24 * 60 * 60_000
+
+// When the pulse next looks, in the owner's day: today's window when it has not looked yet and the
+// window is not over, tomorrow's otherwise. Null without a time zone to wait for. Read for the
+// card, an hour of daylight saving off at most.
+export async function nextPulseAt(now = new Date()): Promise<Date | null> {
+    const [owner] = (await listMembers()).sort((a, b) => a.firstSeenAt.localeCompare(b.firstSeenAt))
+    if (!owner?.timezone) return null
+    const clock = localClock(now, owner.timezone)
+    const start = DAY_START_MINUTES + spreadMinutes()
+    const lookedToday = (await readMeta(DAY_KEY)) === clock.day
+    const today = !lookedToday && clock.minutes < DAY_END_MINUTES
+    const minutesAhead = today ? Math.max(0, start - clock.minutes) : DAY_MS / 60_000 - clock.minutes + start
+    return new Date(now.getTime() + minutesAhead * 60_000)
+}
+

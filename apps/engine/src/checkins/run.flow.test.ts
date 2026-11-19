@@ -117,6 +117,19 @@ describe('a check-in of the Chief of Staff', () => {
         script.mode = 'sneak'
     }, 30_000)
 
+    it('lists them for the card, newest first, with when it next looks', async () => {
+        const res = await send('GET', `/agents/${FOREMAN_AGENT_ID}/checkins`)
+        expect(res.status).toBe(200)
+        const body = (await res.json()) as { proactive: unknown; available: boolean; checkins: Array<{ reason: string; note?: string; title?: string }>; nextAt: string | null }
+        expect(body.proactive).toEqual({ enabled: true, connectionId: null, model: null })
+        expect(body.available).toBe(true)
+        expect(body.checkins).toHaveLength(3)
+        expect(body.checkins.at(-1)).toMatchObject({ reason: 'manual', note: 'Nothing worth a message today.' })
+        expect(body.checkins[0]).toMatchObject({ reason: 'manual', title: 'Invoices keep failing' })
+        expect(Number.isNaN(Date.parse(body.nextAt ?? ''))).toBe(false)
+        expect((await send('GET', '/agents/someone/checkins')).status).toBe(404)
+    })
+
     it('refuses to start once an admin switched them off', async () => {
         expect((await send('PATCH', `/agents/${FOREMAN_AGENT_ID}`, { proactive: { enabled: false } })).status).toBe(200)
         expect((await send('POST', `/agents/${FOREMAN_AGENT_ID}/checkins/run`)).status).toBe(403)

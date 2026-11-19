@@ -549,5 +549,7 @@
     "mcpNoSignInHere": "{name} no tiene ningún inicio de sesión que abrir desde aquí.",
     "loadReferralsFailed": "No se pudieron cargar tus invitaciones",
     "foremanNameInvalid": "Usa de 1 a {max} letras, números, espacios, puntos, apóstrofos o guiones.",
-    "saveForemanNameFailed": "No se pudo guardar el nombre."
+    "saveForemanNameFailed": "No se pudo guardar el nombre.",
+    "saveCheckinsFailed": "No se pudieron guardar los ajustes de los check-ins.",
+    "runCheckinFailed": "No se pudo iniciar un check-in."
 }

@@ -594,5 +594,7 @@
     "mcpServerNotFound": "MCP server not found: {name}",
     "mcpNoSignInHere": "{name} has no sign-in to open from here.",
     "foremanNameInvalid": "Use 1 to {max} letters, digits, spaces, dots, apostrophes or hyphens.",
-    "saveForemanNameFailed": "Could not save the name."
+    "saveForemanNameFailed": "Could not save the name.",
+    "saveCheckinsFailed": "Could not save the check-in settings.",
+    "runCheckinFailed": "Could not start a check-in."
 }

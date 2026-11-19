@@ -549,5 +549,7 @@
     "mcpNoSignInHere": "{name} hat keine Anmeldung, die sich von hier öffnen lässt.",
     "loadReferralsFailed": "Deine Empfehlungen konnten nicht geladen werden",
     "foremanNameInvalid": "Verwende 1 bis {max} Buchstaben, Ziffern, Leerzeichen, Punkte, Apostrophe oder Bindestriche.",
-    "saveForemanNameFailed": "Der Name konnte nicht gespeichert werden."
+    "saveForemanNameFailed": "Der Name konnte nicht gespeichert werden.",
+    "saveCheckinsFailed": "Die Check-in-Einstellungen konnten nicht gespeichert werden.",
+    "runCheckinFailed": "Der Check-in konnte nicht gestartet werden."
 }

@@ -39,4 +39,10 @@ describe('latestOutcomes', () => {
         expect(Object.keys(outcomes)).toEqual(['schedule:digest'])
         expect(outcomes['schedule:digest'].runId).toBe('ok')
     })
+
+    it("reads a promise of the Chief of Staff, which runs as a check-in, as its routine's run", () => {
+        const outcomes = latestOutcomes([run({ id: 'c1', triggerSource: 'checkin', triggerSlug: 'back-on-invoices', status: 'done' })])
+        expect(outcomes['schedule:back-on-invoices']).toMatchObject({ runId: 'c1', status: 'done' })
+    })
 })
+

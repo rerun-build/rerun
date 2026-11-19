@@ -549,5 +549,7 @@
     "mcpNoSignInHere": "{name} não tem login para abrir daqui.",
     "loadReferralsFailed": "Não foi possível carregar suas indicações",
     "foremanNameInvalid": "Use de 1 a {max} letras, números, espaços, pontos, apóstrofos ou hifens.",
-    "saveForemanNameFailed": "Não foi possível salvar o nome."
+    "saveForemanNameFailed": "Não foi possível salvar o nome.",
+    "saveCheckinsFailed": "Não foi possível salvar as configurações dos check-ins.",
+    "runCheckinFailed": "Não foi possível iniciar um check-in."
 }

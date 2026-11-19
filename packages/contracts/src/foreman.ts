@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { CLIENT_PLATFORMS, type ClientPlatform } from './client.js'
 import { conversationMessageSchema } from './conversation.js'
+import { proactiveSchema } from './agent.js'
 import { TEMPLATE_CATEGORIES } from './template-display.js'
 
 // The foreman lives on every engine under this fixed id, outside the agent index: the board, the
@@ -76,6 +77,27 @@ export type CheckinDigest = z.infer<typeof checkinDigestSchema>
 export const checkinTriageRequestSchema = z.strictObject({ digest: checkinDigestSchema })
 export const checkinTriageResponseSchema = z.object({ checkin: z.boolean(), probability: z.number().min(0).max(1) })
 export type CheckinTriageResponse = z.infer<typeof checkinTriageResponseSchema>
+
+// GET /agents/foreman/checkins: its check-in settings, whether the box lets them run at all (its own
+// switch), the latest check-ins newest first, and when it next looks at the workspace (the earliest
+// of its daily pulse and its own promises), null when nothing is planned.
+export const checkinEntrySchema = z.object({
+    runId: z.string(),
+    sessionId: z.string(),
+    status: z.string(),
+    startedAt: z.string(),
+    reason: checkinReasonSchema,
+    note: z.string().optional(),
+    title: z.string().optional(),
+    reportedTo: z.string().optional(),
+    announcedAt: z.string().optional(),
+})
+export type CheckinEntry = z.infer<typeof checkinEntrySchema>
+export const foremanCheckinsSchema = z.object({ proactive: proactiveSchema, available: z.boolean(), checkins: z.array(checkinEntrySchema), nextAt: z.string().nullable() })
+export type ForemanCheckins = z.infer<typeof foremanCheckinsSchema>
+
+// POST /agents/foreman/checkins/run: the check-in it started, or the one already under way.
+export const checkinStartedSchema = z.object({ runId: z.string(), sessionId: z.string() })
 
 // Which foreman the workspace talks to: the onboarding's on the hub, the everyday one on the engine, or
 // none at all for a workspace past its onboarding with no machine.

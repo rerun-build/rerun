@@ -21,7 +21,7 @@ const { migrate } = await import('../db/migrate.js')
 const { ensureForeman } = await import('../agents/foreman.js')
 const { touchMember } = await import('../db/repos/members.js')
 const { getSystemDb } = await import('../db/systemDb.js')
-const { runPulseIfDue } = await import('./pulse.js')
+const { nextPulseAt, runPulseIfDue } = await import('./pulse.js')
 
 // Paris is UTC+1 in November: 12:00 UTC is 13:00 there, well inside every box's window.
 const NOON_IN_PARIS = new Date('2026-11-19T12:00:00.000Z')
@@ -100,4 +100,16 @@ describe('the daily pulse', () => {
         await runPulseIfDue(NOON_IN_PARIS)
         expect(state.started).toEqual([])
     })
+
+    it("says when it next looks: later today before it has, tomorrow once it has", async () => {
+        const morning = new Date('2026-11-19T06:00:00.000Z')
+        const next = await nextPulseAt(morning)
+        expect(next!.getTime()).toBeGreaterThanOrEqual(Date.parse('2026-11-19T08:00:00.000Z'))
+        expect(next!.getTime()).toBeLessThan(Date.parse('2026-11-19T10:00:00.000Z'))
+        const { client } = await getSystemDb(FOREMAN_AGENT_ID)
+        await client.execute("INSERT INTO system_meta (key, value) VALUES ('checkin.pulse.day', '2026-11-19')")
+        const tomorrow = await nextPulseAt(NOON_IN_PARIS)
+        expect(tomorrow!.toISOString().slice(0, 10)).toBe('2026-11-20')
+    })
 })
+

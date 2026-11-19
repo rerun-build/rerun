@@ -611,7 +611,8 @@ async function routinesOf(conn: EngineConnection, agentId: string, engineAgentId
         engineListRuns(conn, engineAgentId, { status: 'running', limit: 20 }).catch(() => []),
         engineGetAgent(conn, engineAgentId).catch(() => null),
     ])
-    const scheduledRuns = runs.filter(run => run.status === 'running' && run.triggerSource === 'schedule')
+    // A promise of the Chief of Staff runs as a check-in, under its routine's slug.
+    const scheduledRuns = runs.filter(run => run.status === 'running' && (run.triggerSource === 'schedule' || run.triggerSource === 'checkin'))
     const setupPending = detail ? detail.config.setup.required === true && detail.config.setup.completedAt === null && detail.install.trim().length > 0 : false
     return schedules.map(schedule => ({
         agentId,

@@ -31,6 +31,7 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'DELETE', path: /^\/agents\/foreman\/mcp\/[^/]+\/token$/ },
     { method: 'GET', path: /^\/agents\/foreman\/keys$/ },
     { method: 'PATCH', path: /^\/agents\/foreman\/keys$/ },
+    { method: 'GET', path: /^\/agents\/foreman\/checkins$/ },
     { method: 'POST', path: /^\/agents\/foreman\/checkins\/run$/ },
 ]
 
