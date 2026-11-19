@@ -320,7 +320,8 @@ def builder_lock():
             if not told:
                 told = True
                 try:
-                    holder = open(lk).read().split()[0]
+                    with open(lk) as f:
+                        holder = f.read().split()[0]
                 except (OSError, IndexError):
                     holder = "unknown"
                 print("waiting for builders.lock (held by pid %s)" % holder, file=sys.stderr)

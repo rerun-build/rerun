@@ -1,4 +1,4 @@
-import io, os, sys, tempfile, types, unittest
+import io, os, sys, tempfile, types, unittest, warnings
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
@@ -22,13 +22,26 @@ class FactoryCap(unittest.TestCase):
 class LockMessage(unittest.TestCase):
     def test_waiting_line_on_stderr(self):
         with tempfile.TemporaryDirectory() as d:
-            open(os.path.join(d, "builders.lock"), "w").write("4242 1\n")
+            with open(os.path.join(d, "builders.lock"), "w") as f:
+                f.write("4242 1\n")
             err = io.StringIO()
             with mock.patch.object(F, "STATE", d), mock.patch.object(F, "LOCK_WAIT_S", 0), \
                     mock.patch("sys.stdout", io.StringIO()), mock.patch("sys.stderr", err):
                 with self.assertRaises(SystemExit), F.builder_lock():
                     pass
             self.assertIn("waiting for builders.lock (held by pid 4242)", err.getvalue())
+
+    def test_waiting_line_closes_the_lock_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "builders.lock"), "w") as f:
+                f.write("4242 1\n")
+            with warnings.catch_warnings(record=True) as seen:
+                warnings.simplefilter("always")
+                with mock.patch.object(F, "STATE", d), mock.patch.object(F, "LOCK_WAIT_S", 0), \
+                        mock.patch("sys.stdout", io.StringIO()), mock.patch("sys.stderr", io.StringIO()):
+                    with self.assertRaises(SystemExit), F.builder_lock():
+                        pass
+            self.assertEqual([str(w.message) for w in seen if issubclass(w.category, ResourceWarning)], [])
 
 
 if __name__ == "__main__":
