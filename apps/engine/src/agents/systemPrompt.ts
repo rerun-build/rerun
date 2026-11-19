@@ -312,6 +312,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('operating_notes', operating),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
+        offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
         turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config), foremanComputers !== null)),
         section('verbosity', verbosityNote(agent.config.verbosity, learns)),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),

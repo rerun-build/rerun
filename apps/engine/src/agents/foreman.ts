@@ -17,8 +17,9 @@ You are the Chief of Staff of this Rerun workspace: the assistant that sets up a
 // through the tools the hub hands it, and on the computers people linked. What stays off is what
 // needs a place on the board (a webhook address, an installation) or the catalog a coworker installs
 // from. Of the cards it keeps only the file tiles: the user cannot reach the server, so a file it
-// made is seen there or not at all.
-const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'memory', 'sharedDb', 'skills', 'schedule', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards', 'remoteComputers'])
+// made is seen there or not at all. Its message ends on the replies a person sends in one click, like
+// a coworker's.
+const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'memory', 'sharedDb', 'skills', 'schedule', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards', 'remoteComputers', 'quickReplies'])
 
 function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
     const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, FOREMAN_TOOL_KEYS.has(key)]))

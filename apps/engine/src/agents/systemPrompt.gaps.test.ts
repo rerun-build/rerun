@@ -309,6 +309,11 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).not.toContain('```draft')
     })
 
+    it('ends a message on the replies a person sends in one click, like a coworker', async () => {
+        expect(await buildSystemPrompt(foreman())).toContain('<quick_replies>\nWhen your message ends on a result')
+        expect(await buildSystemPrompt(foreman({ tools: { quickReplies: false } }))).not.toContain('<quick_replies>\nWhen your message ends')
+    })
+
     it('falls back to its soul when no brief arrived', async () => {
         const prompt = await buildSystemPrompt(foreman({}, { brief: undefined }))
         expect(prompt).toContain('<identity>\nSoul fallback.\n</identity>')

@@ -111,6 +111,8 @@ type ForemanChatLayerProps = {
  */
 export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const tName = useTranslations('workspaceView.foreman')
+    // A reply its message ends on is sent as the user's own message, word for word.
+    const sendQuickReply = onSuggestion ? ({ text }: { text: string }) => onSuggestion(text) : undefined
     const foremanName = useForemanName()
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -239,6 +241,9 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
                                     onRateMessage={actions?.onRate}
                                     feedbackRating={actions ? actions.ratingOf(message.id) : undefined}
                                     hitlCall={hitlCallBefore(visible, index)}
+                                    showQuickReplies={index === visible.length - 1 && !streaming && !engineHitl && !nextSteps?.length}
+                                    onSendMessage={sendQuickReply}
+                                    onDraftReply={onPrefill}
                                 />,
                                 ...(threadBranches(threadRows.after.get(index)) ?? []),
                             ])

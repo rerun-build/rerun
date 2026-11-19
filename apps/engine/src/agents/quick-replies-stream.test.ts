@@ -158,10 +158,10 @@ describe('quickRepliesCall', () => {
 describe('offersQuickReplies', () => {
     const config = (over: Record<string, unknown>) => agentConfigSchema.parse({ name: 'a', ...over })
 
-    it('holds for a regular coworker and not for a sub-coworker, the foreman or a switched-off one', () => {
+    it('holds for a regular coworker and the foreman, not for a sub-coworker or a switched-off one', () => {
         expect(offersQuickReplies(config({}))).toBe(true)
         expect(offersQuickReplies(config({ ephemeral: true }))).toBe(false)
-        expect(offersQuickReplies(config({ kind: 'foreman' }))).toBe(false)
+        expect(offersQuickReplies(config({ kind: 'foreman' }))).toBe(true)
         expect(offersQuickReplies(config({ tools: { quickReplies: false } }))).toBe(false)
     })
 })

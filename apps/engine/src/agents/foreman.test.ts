@@ -94,6 +94,11 @@ describe('foreman', () => {
         expect(names).toEqual(expect.arrayContaining(['create_agent', 'list_agents', 'focus_agent', 'ask_user', 'request_approval', 'fs_read', 'shared_read', 'shell_exec', 'web_fetch', 'shared_db_query', 'delegate_tasks', 'agent_files_read', 'agent_files_edit']))
     })
 
+    it('offers the quick replies its message ends on', async () => {
+        await ensureForeman()
+        expect((await getAgent(FOREMAN_AGENT_ID)).config.tools.quickReplies).toBe(true)
+    })
+
     it('keeps the company brain rather than proposing to it', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
