@@ -75,6 +75,7 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Onboarding, start failed', href: '/lab-onboarding?step=failed' },
     { label: 'Onboarding, cannot start here', href: '/lab-onboarding?step=blocked' },
     { label: 'Onboarding, waitlist', href: '/lab-onboarding?step=waitlist' },
+    { label: 'In-app browser', href: '/lab-browser' },
     { label: 'AI consent', href: '/lab-consent' },
     { label: 'AI consent, dark', href: '/lab-consent?scheme=dark' },
     { label: 'Markdown, text', href: '/lab-markdown?part=1' },

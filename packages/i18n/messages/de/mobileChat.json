@@ -284,5 +284,15 @@
         "silent": "In dieser Aufnahme war nichts zu hören.",
         "transcript": "Transkript",
         "waitingForMicrophone": "Warte auf das Mikrofon…"
+    },
+    "browser": {
+        "close": "Schließen",
+        "reload": "Neu laden",
+        "pageActions": "Aktionen für {host}",
+        "share": "Teilen",
+        "openInBrowser": "Im Browser öffnen",
+        "copyLink": "Link kopieren",
+        "backToChat": "Zurück zur Unterhaltung",
+        "brand": "Rerun"
     }
 }
