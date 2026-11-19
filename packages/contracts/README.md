@@ -2,9 +2,16 @@
 
 The types, zod schemas and small pure helpers that more than one side of Rerun has to agree on: an
 agent and its capabilities, a chat message and its cards, a run, a schedule, a trigger, a template,
-the plans and prices (`src/billing.ts`), the API the mobile app calls (`src/me.ts`, `src/client.ts`),
-and generic helpers such as `sleep` or the name of a tool part. One file per domain under `src/`,
-all re-exported by `src/index.ts`.
+the plans and prices (`src/billing.ts`), the API the mobile app calls, and generic helpers such as
+`sleep` or the name of a tool part. One file per domain under `src/`, all re-exported by `src/index.ts`.
+
+## The mobile API
+
+`src/mobile-api.ts` lists every call the mobile app makes to the hub, from every build still allowed
+to run: its method, its path, its body, its query, what it answers and the failures the app tells
+apart (`HubEndpoint`, `src/hub-endpoint.ts`). A build keeps the schemas it was compiled with for as
+long as it is installed, so an entry is a promise to every build in the stores: add to it, never
+change what an entry accepts or answers in a way a shipped build cannot read.
 
 ## Who imports it
 
