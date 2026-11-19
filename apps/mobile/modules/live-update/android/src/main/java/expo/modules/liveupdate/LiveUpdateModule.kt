@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -62,7 +63,7 @@ class LiveUpdateModule : Module() {
       .setOnlyAlertOnce(true)
       .setShowWhen(false)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
-      builder.setFlag(Notification.FLAG_PROMOTED_ONGOING, true)
+      builder.addExtras(Bundle().apply { putBoolean(REQUEST_PROMOTED_ONGOING, true) })
       update.chip?.let { builder.setShortCriticalText(it) }
     }
     return builder.build()
@@ -77,5 +78,8 @@ class LiveUpdateModule : Module() {
   companion object {
     const val CHANNEL_ID = "crew"
     const val NOTIFICATION_ID = 7270
+    // Notification.EXTRA_REQUEST_PROMOTED_ONGOING, by its value: the app asks, the system alone sets
+    // FLAG_PROMOTED_ONGOING on a notification it accepts.
+    const val REQUEST_PROMOTED_ONGOING = "android.requestPromotedOngoing"
   }
 }
