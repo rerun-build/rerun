@@ -1,13 +1,19 @@
 'use client'
 
 import type { AgentHealthResult } from '@/app/api/_services/gateway.service'
+import { useLastInteraction } from '@/hooks/useLastInteraction'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
+import { isIdle } from '@/lib/notifications/presence'
 import { translated } from '@/lib/i18n/toast-text'
 import { useBoardStore } from '@/stores/board.store'
 import { useCallback, useRef } from 'react'
 import { toast } from 'sonner'
 
 const POLL_INTERVAL = 10_000
+// Nobody has touched the page for PRESENCE_IDLE_MS (a board left open on a second screen, a tab
+// forgotten overnight): the poll slows down rather than stops, so a board watched without a click
+// still moves. The first gesture reads at once and goes back to every ten seconds.
+const IDLE_POLL_INTERVAL = 60_000
 const GRACE_IDLE = 2
 const GRACE_WORKING = 5
 // A Box absent from the caller's reach this many polls in a row leaves the board: one miss can be a
@@ -19,10 +25,12 @@ export function useAgentHealthSync(workspaceId: number | undefined) {
     const missingSpaceStrikes = useRef<Record<string, number>>({})
     // Un check plus long que l'intervalle ne doit pas en lancer un second par-dessus.
     const inFlight = useRef(false)
+    const lastSyncAt = useRef(0)
 
     const sync = useCallback(async () => {
         if (!workspaceId || inFlight.current) return
         inFlight.current = true
+        lastSyncAt.current = Date.now()
         try {
             const res = await fetch('/api/agents/health', { cache: 'no-store' })
             if (!res.ok) return
@@ -62,7 +70,15 @@ export function useAgentHealthSync(workspaceId: number | undefined) {
         }
     }, [workspaceId])
 
-    useVisibleInterval(sync, POLL_INTERVAL)
+    const { lastInteractionRef } = useLastInteraction(!!workspaceId, () => void sync())
+    const tick = useCallback(() => {
+        const now = Date.now()
+        // Half a tick of slack, so a tick that lands a moment early does not stretch the wait to 70 s.
+        if (isIdle(lastInteractionRef.current, now) && now - lastSyncAt.current < IDLE_POLL_INTERVAL - POLL_INTERVAL / 2) return
+        return sync()
+    }, [sync, lastInteractionRef])
+
+    useVisibleInterval(tick, POLL_INTERVAL)
 }
 
 function dropUnreachableSpaces(reachable: Set<string>, strikes: Record<string, number>) {

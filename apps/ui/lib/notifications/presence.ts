@@ -21,6 +21,10 @@ export function splitByPresence<T extends { id: string }>(recipients: T[], rows:
     return { present: recipients.filter(r => online.has(r.id)), away: recipients.filter(r => !online.has(r.id)) }
 }
 
+export function isIdle(lastInteractionAt: number, now: number): boolean {
+    return now - lastInteractionAt >= PRESENCE_IDLE_MS
+}
+
 export function shouldBeat({ visible, lastInteractionAt, now }: { visible: boolean; lastInteractionAt: number; now: number }): boolean {
-    return visible && now - lastInteractionAt < PRESENCE_IDLE_MS
+    return visible && !isIdle(lastInteractionAt, now)
 }
