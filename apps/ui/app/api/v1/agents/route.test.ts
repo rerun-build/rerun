@@ -46,6 +46,15 @@ describe('POST /api/v1/agents', () => {
         expect(await (await create({ name: 'Scout', description: 'Find leads', spaceId: SPACE })).json()).toEqual({ agentId: 'agent-1', active: true, sessionId: null, runId: null })
     })
 
+    it('dresses the coworker in the look it was given, and refuses a colour that means a state', async () => {
+        const look = { eyes: 'heart', mouth: 'cat', color: '#00b862' }
+        await create({ name: 'Scout', spaceId: SPACE, look })
+        expect(createAgentWithSetup).toHaveBeenCalledWith(expect.objectContaining({ name: 'Scout', look }))
+
+        expect((await create({ name: 'Scout', spaceId: SPACE, look: { ...look, color: '#f59e0b' } })).status).toBe(400)
+        expect(createAgentWithSetup).toHaveBeenCalledTimes(1)
+    })
+
     it('refuses a Box of another workspace and a nameless coworker', async () => {
         const { AuthorizationError } = await import('@/app/api/_auth/ownership')
         assertSpaceOwnedBy.mockRejectedValue(new AuthorizationError('spaceNotFound'))

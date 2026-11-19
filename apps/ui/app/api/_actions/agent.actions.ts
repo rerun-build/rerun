@@ -9,7 +9,7 @@ import { getAgentChatTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_s
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { followCoworker } from '@/app/api/_services/notification-audience.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
-import { deleteAgent, duplicateAgent, moveAgentToBox, renameAgent } from '@/app/api/_services/agent.service'
+import { deleteAgent, duplicateAgent, moveAgentToBox, renameAgent, setAgentLook } from '@/app/api/_services/agent.service'
 import {
     type ScheduleCreateParams,
     type ScheduleUpdateParams,
@@ -76,8 +76,8 @@ import type { TableListResult } from '@/lib/data/source'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
-import type { StatsQuery, UsageTimeRange } from '@rerun/contracts'
-import { FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
+import type { CoworkerLook, StatsQuery, UsageTimeRange } from '@rerun/contracts'
+import { coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode, type SuccessResult } from '@/lib/i18n/action-error'
@@ -143,6 +143,11 @@ export async function activateAgentAction(agentId: string): Promise<{ ok: true }
 export async function renameAgentAction(agentId: string, newName: string): Promise<{ name: string; handle: string | null }> {
     await assertAgentInWorkspace(agentId, 'manage')
     return renameAgent(agentId, newName)
+}
+
+export async function setAgentLookAction(agentId: string, look: CoworkerLook | null): Promise<void> {
+    await assertAgentInWorkspace(agentId, 'manage')
+    await setAgentLook(agentId, coworkerLookSchema.nullable().parse(look))
 }
 
 // --- Agent config (Settings tab) ---

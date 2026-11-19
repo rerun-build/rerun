@@ -7,7 +7,7 @@ import { getAgent as engineGetAgent } from '@/lib/engine/client'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { AgentView, BoardAgent } from '@rerun/contracts'
 
-const AGENT_COLUMNS = ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'disabled_at', 'disabled_reason'] as const
+const AGENT_COLUMNS = ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'disabled_at', 'disabled_reason', 'look'] as const
 
 function boardAgentFromRow(row: Parameters<typeof agentFromRow>[0]): BoardAgent {
     const { position: _position, ...agent } = agentFromRow(row)

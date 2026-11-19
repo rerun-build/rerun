@@ -354,7 +354,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     hydrate: async (workspaceId: number) => {
         const [agentsResult, spacesResult, grantsResult] = await Promise.all([
-            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order'] as const, { workspace_id: workspaceId }),
+            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order', 'look'] as const, { workspace_id: workspaceId }),
             selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at', 'visibility', 'sidebar_order'] as const, { workspace_id: workspaceId }),
             selectMany(supabase, 'space_members', ['space_id', 'user_id', 'access'] as const, { workspace_id: workspaceId }),
         ])

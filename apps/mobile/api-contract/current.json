@@ -1149,6 +1149,62 @@
                                             "id": {
                                                 "type": "string"
                                             },
+                                            "look": {
+                                                "nullable": true,
+                                                "properties": {
+                                                    "color": {
+                                                        "enum": [
+                                                            "#0f52ff",
+                                                            "#4fb800",
+                                                            "#f0127f",
+                                                            "#7a2cf5",
+                                                            "#e935c1",
+                                                            "#3b32e8",
+                                                            "#00b862",
+                                                            "#a81fe0"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "eyes": {
+                                                        "enum": [
+                                                            "pill",
+                                                            "round",
+                                                            "happy",
+                                                            "googly",
+                                                            "visor",
+                                                            "sleepy",
+                                                            "wink",
+                                                            "pixel",
+                                                            "star",
+                                                            "heart",
+                                                            "dot",
+                                                            "brows",
+                                                            "cyclops",
+                                                            "shades",
+                                                            "glasses",
+                                                            "sparkle",
+                                                            "line"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "mouth": {
+                                                        "enum": [
+                                                            "none",
+                                                            "smile",
+                                                            "open",
+                                                            "cat",
+                                                            "flat"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "eyes",
+                                                    "mouth",
+                                                    "color"
+                                                ],
+                                                "type": "object"
+                                            },
                                             "name": {
                                                 "type": "string"
                                             },
@@ -1216,6 +1272,61 @@
                                     "description": {
                                         "maxLength": 2000,
                                         "type": "string"
+                                    },
+                                    "look": {
+                                        "properties": {
+                                            "color": {
+                                                "enum": [
+                                                    "#0f52ff",
+                                                    "#4fb800",
+                                                    "#f0127f",
+                                                    "#7a2cf5",
+                                                    "#e935c1",
+                                                    "#3b32e8",
+                                                    "#00b862",
+                                                    "#a81fe0"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "eyes": {
+                                                "enum": [
+                                                    "pill",
+                                                    "round",
+                                                    "happy",
+                                                    "googly",
+                                                    "visor",
+                                                    "sleepy",
+                                                    "wink",
+                                                    "pixel",
+                                                    "star",
+                                                    "heart",
+                                                    "dot",
+                                                    "brows",
+                                                    "cyclops",
+                                                    "shades",
+                                                    "glasses",
+                                                    "sparkle",
+                                                    "line"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "mouth": {
+                                                "enum": [
+                                                    "none",
+                                                    "smile",
+                                                    "open",
+                                                    "cat",
+                                                    "flat"
+                                                ],
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "eyes",
+                                            "mouth",
+                                            "color"
+                                        ],
+                                        "type": "object"
                                     },
                                     "name": {
                                         "maxLength": 60,
@@ -1521,6 +1632,62 @@
                                                 },
                                                 "id": {
                                                     "type": "string"
+                                                },
+                                                "look": {
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "color": {
+                                                            "enum": [
+                                                                "#0f52ff",
+                                                                "#4fb800",
+                                                                "#f0127f",
+                                                                "#7a2cf5",
+                                                                "#e935c1",
+                                                                "#3b32e8",
+                                                                "#00b862",
+                                                                "#a81fe0"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "eyes": {
+                                                            "enum": [
+                                                                "pill",
+                                                                "round",
+                                                                "happy",
+                                                                "googly",
+                                                                "visor",
+                                                                "sleepy",
+                                                                "wink",
+                                                                "pixel",
+                                                                "star",
+                                                                "heart",
+                                                                "dot",
+                                                                "brows",
+                                                                "cyclops",
+                                                                "shades",
+                                                                "glasses",
+                                                                "sparkle",
+                                                                "line"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "mouth": {
+                                                            "enum": [
+                                                                "none",
+                                                                "smile",
+                                                                "open",
+                                                                "cat",
+                                                                "flat"
+                                                            ],
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "eyes",
+                                                        "mouth",
+                                                        "color"
+                                                    ],
+                                                    "type": "object"
                                                 },
                                                 "name": {
                                                     "type": "string"
@@ -1941,15 +2108,68 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "look": {
+                                        "nullable": true,
+                                        "properties": {
+                                            "color": {
+                                                "enum": [
+                                                    "#0f52ff",
+                                                    "#4fb800",
+                                                    "#f0127f",
+                                                    "#7a2cf5",
+                                                    "#e935c1",
+                                                    "#3b32e8",
+                                                    "#00b862",
+                                                    "#a81fe0"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "eyes": {
+                                                "enum": [
+                                                    "pill",
+                                                    "round",
+                                                    "happy",
+                                                    "googly",
+                                                    "visor",
+                                                    "sleepy",
+                                                    "wink",
+                                                    "pixel",
+                                                    "star",
+                                                    "heart",
+                                                    "dot",
+                                                    "brows",
+                                                    "cyclops",
+                                                    "shades",
+                                                    "glasses",
+                                                    "sparkle",
+                                                    "line"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "mouth": {
+                                                "enum": [
+                                                    "none",
+                                                    "smile",
+                                                    "open",
+                                                    "cat",
+                                                    "flat"
+                                                ],
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "eyes",
+                                            "mouth",
+                                            "color"
+                                        ],
+                                        "type": "object"
+                                    },
                                     "name": {
                                         "maxLength": 60,
                                         "minLength": 1,
                                         "type": "string"
                                     }
                                 },
-                                "required": [
-                                    "name"
-                                ],
                                 "type": "object"
                             }
                         }

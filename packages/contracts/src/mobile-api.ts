@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { agentKeysListSchema, createCoworkerSchema, createdCoworkerSchema, renameCoworkerSchema, updateAgentKeysSchema } from './agent.js'
+import { agentKeysListSchema, createCoworkerSchema, createdCoworkerSchema, updateAgentKeysSchema, updateCoworkerSchema } from './agent.js'
 import { accountDeletionStatusSchema, appSessionSchema, deleteAccountRequestSchema, emailCodePreparedSchema, emailCodeRequestSchema, phoneCodeRequestSchema, phoneCodeSentSchema, phoneSignInRequestSchema, signInRefusalSchema } from './app-auth.js'
 import { agentViewSchema, boardAgentSchema, boxSchema, workspaceSummarySchema } from './board.js'
 import { brainRevertRequestSchema } from './brain.js'
@@ -166,7 +166,7 @@ export const mobileApi = {
     listBoxes: hubEndpoint({ method: 'GET', path: '/api/v1/boxes', response: z.array(boxSchema) }),
 
     getAgent: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}', response: agentViewSchema }),
-    renameAgent: hubEndpoint({ method: 'PATCH', path: '/api/v1/agents/{id}', body: renameCoworkerSchema, response: 'none' }),
+    renameAgent: hubEndpoint({ method: 'PATCH', path: '/api/v1/agents/{id}', body: updateCoworkerSchema, response: 'none' }),
     deleteAgent: hubEndpoint({ method: 'DELETE', path: '/api/v1/agents/{id}', response: 'none' }),
     listAgentFiles: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}/files', response: coworkerFilesSchema }),
     listAgentServices: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}/services', response: z.array(installedServiceSchema) }),

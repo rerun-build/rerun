@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     assertAgentAccess: vi.fn(),
     resolveAgentTarget: vi.fn(),
     renameAgent: vi.fn(),
+    setAgentLook: vi.fn(),
     deleteAgent: vi.fn(),
     patchNotificationPrefs: vi.fn(),
     readNotificationPrefs: vi.fn(),
@@ -19,7 +20,7 @@ const mocks = vi.hoisted(() => ({
     recipientLocale: vi.fn(),
 }))
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/access')>()), assertAgentAccess: mocks.assertAgentAccess }))
-vi.mock('@/app/api/_services/agent.service', () => ({ renameAgent: mocks.renameAgent, deleteAgent: mocks.deleteAgent }))
+vi.mock('@/app/api/_services/agent.service', () => ({ renameAgent: mocks.renameAgent, setAgentLook: mocks.setAgentLook, deleteAgent: mocks.deleteAgent }))
 vi.mock('@/app/api/_services/notification-prefs.service', () => ({ patchNotificationPrefs: mocks.patchNotificationPrefs, readNotificationPrefs: mocks.readNotificationPrefs }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: mocks.resolveAgentTarget }))
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: mocks.recipientLocale }))
@@ -27,7 +28,7 @@ vi.mock('@/lib/engine/client', () => ({ listFiles: mocks.listFiles, listSchedule
 
 const { AccessDeniedError } = await import('@/app/api/_auth/access')
 const { AuthorizationError } = await import('@/app/api/_auth/ownership')
-const { deleteCoworker, listCoworkerFiles, listCoworkerRoutines, readCoworkerNotifications, renameCoworker, setCoworkerNotifications, setCoworkerRoutineEnabled } = await import('./coworker-details.service')
+const { deleteCoworker, listCoworkerFiles, listCoworkerRoutines, readCoworkerNotifications, setCoworkerNotifications, setCoworkerRoutineEnabled, updateCoworker } = await import('./coworker-details.service')
 
 const ctx = { userId: 'u1', role: 'member', boxScope: 'all', workspace: { id: 7 }, supabase: {} } as unknown as WorkspaceContext
 const actor = { kind: 'user', userId: 'u1', workspaceId: 7, role: 'member', boxScope: 'all' }
@@ -54,19 +55,34 @@ describe('coworker details', () => {
     })
 
     it('renames and deletes only a coworker whose Box the caller manages', async () => {
-        await renameCoworker(ctx, 'a1', { name: 'Scout' })
+        await updateCoworker(ctx, 'a1', { name: 'Scout' })
         await deleteCoworker(ctx, 'a1')
         expect(mocks.renameAgent).toHaveBeenCalledWith('a1', 'Scout')
         expect(mocks.deleteAgent).toHaveBeenCalledWith('a1')
         expect(mocks.assertAgentAccess).toHaveBeenCalledWith('a1', 'manage', actor)
 
         rowsAre({ access: 'use' })
-        await expect(renameCoworker(ctx, 'a2', { name: 'X' })).rejects.toBeInstanceOf(AccessDeniedError)
+        await expect(updateCoworker(ctx, 'a2', { name: 'X' })).rejects.toBeInstanceOf(AccessDeniedError)
         await expect(deleteCoworker(ctx, 'a2')).rejects.toBeInstanceOf(AccessDeniedError)
         rowsAre({ access: 'none' })
         await expect(deleteCoworker(ctx, 'gone')).rejects.toMatchObject({ name: 'AuthorizationError' })
         expect(mocks.renameAgent).toHaveBeenCalledTimes(1)
         expect(mocks.deleteAgent).toHaveBeenCalledTimes(1)
+    })
+
+    it('changes only what is sent: the look alone, or the look taken back', async () => {
+        const look = { eyes: 'googly', mouth: 'smile', color: '#7a2cf5' } as const
+        await updateCoworker(ctx, 'a1', { look })
+        await updateCoworker(ctx, 'a1', { look: null })
+        expect(mocks.setAgentLook.mock.calls).toEqual([
+            ['a1', look],
+            ['a1', null],
+        ])
+        expect(mocks.renameAgent).not.toHaveBeenCalled()
+
+        rowsAre({ access: 'use' })
+        await expect(updateCoworker(ctx, 'a2', { look })).rejects.toBeInstanceOf(AccessDeniedError)
+        expect(mocks.setAgentLook).toHaveBeenCalledTimes(2)
     })
 
     it('lists schedules then triggers, with the cron in words and no prompt', async () => {

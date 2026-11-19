@@ -1,4 +1,4 @@
-import { connectorSkillReadOnlyError, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { connectorSkillReadOnlyError, coworkerLookSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
@@ -49,7 +49,7 @@ import { slugify } from '@/lib/slugify'
 import { MAX_TRIGGER_BODY_BYTES, triggerWebhookUrl } from '@/lib/triggers/webhook'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { changeAgentHandle, createAgent, deleteAgent, moveAgentToBox, renameAgent } from './agent.service'
+import { changeAgentHandle, createAgent, deleteAgent, moveAgentToBox, renameAgent, setAgentLook } from './agent.service'
 import { declareService, installServiceSlugs } from './agent-setup.service'
 import { ensureSessionRow, resolveAgentTarget } from './chat.service'
 import { followCoworker, recordSessionParticipant } from './notification-audience.service'
@@ -277,12 +277,18 @@ function connectorView({ key, slug, name, label, status }: InstalledService) {
     return { key, slug, name, label, status }
 }
 
+function readLook(value: unknown) {
+    const parsed = coworkerLookSchema.nullable().safeParse(value)
+    if (!parsed.success) throw new Error(`look must be null or { eyes, mouth, color } with eyes one of ${coworkerLookSchema.shape.eyes.options.join(', ')}; mouth one of ${coworkerLookSchema.shape.mouth.options.join(', ')}; color one of ${coworkerLookSchema.shape.color.options.join(', ')}.`)
+    return parsed.data
+}
+
 async function listWorkspaceAgents(workspaceId: number, spaceId?: string) {
     const supabase = createServiceRoleClient()
     const { data } = await selectMany(
         supabase,
         'agents',
-        ['id', 'name', 'handle', 'description', 'status', 'space_id', 'created_at'] as const,
+        ['id', 'name', 'handle', 'description', 'status', 'space_id', 'created_at', 'look'] as const,
         spaceId ? { workspace_id: workspaceId, space_id: spaceId } : { workspace_id: workspaceId },
         { column: 'created_at', ascending: false },
     )
@@ -428,8 +434,9 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
             const soul = typeof args.soul === 'string' ? args.soul : undefined
 
-            // Checked before the rename and the move below: a refused pin must leave nothing done.
+            // Checked before the rename and the move below: a refused pin or look must leave nothing done.
             const checked = await checkedModelPin(conn, engineAgentId, args)
+            const look = 'look' in args ? readLook(args.look) : undefined
             const patch: EngineAgentConfigPatch & { soul?: string; install?: string } = readConfigPatch(args, checked?.pin)
             const description = asString(args.description)
             const setup = readSetup(args)
@@ -444,6 +451,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const newHandle = asString(args.handle)
             const renamed = newName ? await renameAgent(agentId, newName) : null
             const rehandled = newHandle ? await changeAgentHandle(agentId, newHandle) : null
+            if (look !== undefined) await setAgentLook(agentId, look)
 
             // Resolved only when asked for: resolveSpaceId falls back to the single Box of an
             // account that has one, so calling it blind would move the agent on every update.
@@ -465,7 +473,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const identityUpdated = [...(renamed ? ['name'] : []), ...(handleMoved ? ['handle'] : [])]
             return {
                 agentId,
-                updated: [...identityUpdated, ...Object.keys(patch), ...(moved ? ['spaceId'] : [])],
+                updated: [...identityUpdated, ...Object.keys(patch), ...(moved ? ['spaceId'] : []), ...(look !== undefined ? ['look'] : [])],
                 ...(moved?.ok ? { spaceId: requestedSpaceId, position: moved.position } : {}),
                 ...(identity ? { name: identity.name, handle: identity.handle } : {}),
                 ...(patched && checked ? { runsOn: projectRunsOn(patched, checked.connections) } : {}),

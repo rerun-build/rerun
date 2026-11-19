@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { coworkerLookSchema } from './coworker-look.js'
 import { OPENCODE_DEFAULT_MODEL } from './opencode.js'
 
 // Tools surface as "<server>_<tool>" and CLI providers key their config records by server name, so
@@ -193,6 +194,8 @@ export type CreateAgentInput = z.infer<typeof createAgentSchema>
 export const createCoworkerSchema = z.object({
     name: z.string().trim().min(1).max(60),
     description: z.string().trim().max(2000).optional(),
+    // Left out, its buddy is hashed from its id.
+    look: coworkerLookSchema.optional(),
     spaceId: z.string().uuid(),
 })
 export type CreateCoworkerInput = z.infer<typeof createCoworkerSchema>
@@ -209,7 +212,14 @@ export type CreatedCoworker = z.infer<typeof createdCoworkerSchema>
 
 // Renaming only changes what is displayed: the handle other coworkers mention it by stays put.
 export const renameCoworkerSchema = z.object({ name: z.string().trim().min(1).max(60) })
-export type RenameCoworkerInput = z.infer<typeof renameCoworkerSchema>
+
+// What PATCH /agents/:id changes, each field only when it is sent. A null look gives the buddy back
+// the one hashed from its id.
+export const updateCoworkerSchema = renameCoworkerSchema
+    .partial()
+    .extend({ look: coworkerLookSchema.nullable().optional() })
+    .refine(input => input.name !== undefined || input.look !== undefined, { message: 'Send a name or a look' })
+export type UpdateCoworkerInput = z.infer<typeof updateCoworkerSchema>
 
 // The caller's own rule for one coworker, the web bell's three choices. `default` follows the
 // caller's workspace-wide setting.

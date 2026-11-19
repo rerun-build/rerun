@@ -11,6 +11,7 @@ import {
     updateSchedule,
 } from '@/lib/engine/client'
 import type { EngineAgentConfigPatch } from '@/lib/engine/types'
+import type { CoworkerLook } from '@rerun/contracts'
 import { AGENT_SPAN, UNPLACED_COL, agentsOverlap, isPlaced } from '@/lib/board/iso'
 import type { GridPosition } from '@/lib/board/types'
 import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
@@ -40,6 +41,8 @@ type CreateAgentParams = {
     // Model, tool families and self-improvement flags to apply at creation rather than in a
     // follow-up patch, so an agent is never briefly live under settings nobody asked for.
     config?: Omit<EngineAgentConfigPatch, 'name' | 'displayName' | 'description'>
+    // The look it was dressed in while it was being made. Left out, its buddy is hashed from its id.
+    look?: CoworkerLook
     // Decided by a caller that creates several agents at once: the handle and the free slot are
     // read-then-write, and re-reading them per agent would hand two parallel creations the same one.
     handle?: string
@@ -148,7 +151,7 @@ export async function deriveUniqueHandles(supabase: ReturnType<typeof createServ
 }
 
 export async function createAgent(params: CreateAgentParams) {
-    const { name, description, soulMd, installMd, workspaceId, spaceId, position, config } = params
+    const { name, description, soulMd, installMd, workspaceId, spaceId, position, config, look } = params
 
     if (!name || !workspaceId || !spaceId) {
         throw new Error('name, workspaceId and spaceId are required')
@@ -188,6 +191,7 @@ export async function createAgent(params: CreateAgentParams) {
             row: cell ? cell.row : UNPLACED_COL,
             disabled_at: enabled ? null : new Date().toISOString(),
             disabled_reason: enabled ? null : PLAN_LIMIT_REASON,
+            look: look ?? null,
         })
         .select()
         .single()
@@ -413,6 +417,12 @@ export async function renameAgent(id: string, newName: string) {
     if (error) throw new Error(`Failed to rename agent: ${error.message}`)
 
     return { name: newName, handle, handleChanged: handle !== agent.handle }
+}
+
+// Null gives the buddy back the look hashed from its id.
+export async function setAgentLook(id: string, look: CoworkerLook | null) {
+    const { error } = await createServiceRoleClient().from('agents').update<Database['public']['Tables']['agents']['Update']>({ look }).eq('id', id)
+    if (error) throw new Error(`Failed to set the look of agent: ${error.message}`)
 }
 
 // A handle that no longer follows the name, set on purpose. The engine rewrites the `@oldHandle`

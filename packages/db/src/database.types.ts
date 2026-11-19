@@ -104,6 +104,7 @@ export type Database = {
           engine_agent_id: string | null
           handle: string | null
           id: string
+          look: Json | null
           name: string
           row: number
           sidebar_order: number | null
@@ -122,6 +123,7 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          look?: Json | null
           name: string
           row?: number
           sidebar_order?: number | null
@@ -140,6 +142,7 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          look?: Json | null
           name?: string
           row?: number
           sidebar_order?: number | null

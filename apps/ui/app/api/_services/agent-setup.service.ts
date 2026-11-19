@@ -3,6 +3,7 @@ import { compileService } from '@/lib/services/compiler'
 import { type ServiceManifest, autoInstallableMethod, serviceManifestSchema } from '@/lib/services/manifest'
 import type { ServiceChecklistItem } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
+import type { CoworkerLook } from '@rerun/contracts'
 import { selectSingle } from '@/supabase/supabase-helpers'
 import { createAgent } from './agent.service'
 import { type ServiceInstanceSeed, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
@@ -40,10 +41,11 @@ export async function declareService(agentId: string, manifest: ServiceManifest,
 // Create an agent and install the services the user picked. Services with required secrets
 // can't be auto-supplied, so they are marked needs_config and returned in the checklist for
 // the user to finish configuring.
-export async function createAgentWithSetup(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; actor: Actor; col?: number; row?: number }): Promise<{ agentId: string; active: boolean; checklist: ServiceChecklistItem[] }> {
+export async function createAgentWithSetup(params: { name: string; description?: string; look?: CoworkerLook; serviceSlugs?: string[]; workspaceId: number; spaceId: string; actor: Actor; col?: number; row?: number }): Promise<{ agentId: string; active: boolean; checklist: ServiceChecklistItem[] }> {
     const agent = await createAgent({
         name: params.name,
         description: params.description,
+        look: params.look,
         workspaceId: params.workspaceId,
         spaceId: params.spaceId,
         actor: params.actor,

@@ -1,3 +1,4 @@
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS } from '@rerun/contracts'
 import { SHARE_TOOL_DEFS } from './share-tools'
 import { TEMPLATE_TOOL_DEFS } from './template-tools'
 import { VAULT_TOOL_DEFS } from './vault-tools'
@@ -140,6 +141,12 @@ const AGENT_TOOL_DEFS = [
                 tools: { type: 'object', description: 'Capability families to toggle, e.g. {"shell": false, "browser": true}.', additionalProperties: { type: 'boolean' } },
                 selfImprovement: { type: 'object', description: 'e.g. {"allowSoulEdit": false}.', additionalProperties: { type: 'boolean' } },
                 setup: SETUP_PROPERTY,
+                look: {
+                    type: ['object', 'null'],
+                    description: 'How its buddy looks on the board and everywhere else: the colour of its top, its eyes and its mouth. Pass null to give it back the look drawn from its id. Amber, red and cyan are not offered: on the board they mean working, broken and waiting.',
+                    properties: { eyes: { type: 'string', enum: [...COWORKER_EYES] }, mouth: { type: 'string', enum: [...COWORKER_MOUTHS] }, color: { type: 'string', enum: [...COWORKER_COLORS] } },
+                    required: ['eyes', 'mouth', 'color'],
+                },
             },
             required: ['agentId'],
         },

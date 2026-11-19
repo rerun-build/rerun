@@ -27,7 +27,7 @@ Lists the coworkers of the Boxes the key reaches, newest first.
   Restrict the list to one Box.
 </ParamField>
 
-Each coworker carries `id`, `name` (the display name), `handle` (the mention and call key), `description`, `status`, `space_id` and `created_at`. The `id` is what every other tool takes as `agentId`.
+Each coworker carries `id`, `name` (the display name), `handle` (the mention and call key), `description`, `status`, `space_id`, `created_at` and `look` (see [`update_agent`](#update_agent), `null` when nobody chose one). The `id` is what every other tool takes as `agentId`.
 
 ## get_team_status
 
@@ -210,6 +210,16 @@ Updates a coworker. Every field is optional and only what you pass changes.
 </ParamField>
 <ParamField body="selfImprovement" type="object" />
 <ParamField body="setup" type="object" />
+
+<ParamField body="look" type="object | null">
+  How the coworker's character looks on the board and everywhere else it appears: `{ "eyes", "mouth", "color" }`, all three required. Pass `null` to give it back the look drawn from its id.
+
+  - `eyes`: `pill`, `round`, `happy`, `googly`, `visor`, `sleepy`, `wink`, `pixel`, `star`, `heart`, `dot`, `brows`, `cyclops`, `shades`, `glasses`, `sparkle` or `line`
+  - `mouth`: `none`, `smile`, `open`, `cat` or `flat`
+  - `color`: `#0f52ff`, `#4fb800`, `#f0127f`, `#7a2cf5`, `#e935c1`, `#3b32e8`, `#00b862` or `#a81fe0`
+
+  Amber, red and cyan are refused: on the board they mean working, in error and waiting for you. An invalid look is refused before anything else in the call is written.
+</ParamField>
 
 Renaming moves the handle. It is re-derived from the new `name`, and every `@oldhandle` written into the other coworkers (prompts, skills, scheduled tasks, webhook triggers, memories) is rewritten, so their calls keep resolving. Pass `handle` only to set a call key that differs from the name.
 

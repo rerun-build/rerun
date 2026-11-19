@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { agentDetailSchema } from './agent.js'
+import { coworkerLookSchema } from './coworker-look.js'
 
 // A member of the workspace. Admins run it (billing, members, keys, AI providers).
 export const workspaceRoleSchema = z.enum(['admin', 'member'])
@@ -57,6 +58,9 @@ export const boardAgentSchema = z.object({
     spaceId: z.string(),
     disabledAt: z.string().nullable(),
     disabledReason: z.string().nullable(),
+    // The look it was given, null when its buddy keeps the one hashed from its id. Optional: a
+    // server older than the field sends none.
+    look: coworkerLookSchema.nullable().optional(),
     // The caller's level on the coworker's Box.
     access: boxAccessSchema.optional(),
 })

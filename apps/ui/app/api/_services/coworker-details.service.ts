@@ -1,20 +1,21 @@
 import 'server-only'
 import { actorFromContext, assertAgentAccess } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { deleteAgent, renameAgent } from '@/app/api/_services/agent.service'
+import { deleteAgent, renameAgent, setAgentLook } from '@/app/api/_services/agent.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { patchNotificationPrefs, readNotificationPrefs } from '@/app/api/_services/notification-prefs.service'
 import { listFiles, listSchedules, listSkillSummaries, listTriggers, updateSchedule, updateTrigger } from '@/lib/engine/client'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { coworkerRuleOf } from '@/lib/notifications/prefs'
 import { humanCron } from '@/lib/schedules/cron'
-import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RenameCoworkerInput, RoutineKind, RoutinesView, SkillSummariesView } from '@rerun/contracts'
+import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RoutineKind, RoutinesView, SkillSummariesView, UpdateCoworkerInput } from '@rerun/contracts'
 
 // Renaming and deleting reach a coworker the engine may not answer for (switched off, not set up),
 // so they only check the caller's Box, without asking the engine.
-export async function renameCoworker(ctx: WorkspaceContext, agentId: string, input: RenameCoworkerInput): Promise<void> {
+export async function updateCoworker(ctx: WorkspaceContext, agentId: string, input: UpdateCoworkerInput): Promise<void> {
     await assertAgentAccess(agentId, 'manage', actorFromContext(ctx))
-    await renameAgent(agentId, input.name)
+    if (input.name !== undefined) await renameAgent(agentId, input.name)
+    if (input.look !== undefined) await setAgentLook(agentId, input.look)
 }
 
 export async function deleteCoworker(ctx: WorkspaceContext, agentId: string): Promise<void> {

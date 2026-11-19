@@ -1,4 +1,5 @@
 import type { Database } from '@/app/api/database.types'
+import { type CoworkerLook, parseCoworkerLook } from '@rerun/contracts'
 
 export type AgentRow = Database['public']['Tables']['agents']['Row']
 export type AgentInsert = Database['public']['Tables']['agents']['Insert']
@@ -82,9 +83,12 @@ export type IsoAgent = {
     // Where it sits in its Box in the Simple view's list, absent where the row was read without it.
     createdAt?: string
     sidebarOrder?: number | null
+    // The look it was given, null when its buddy keeps the one hashed from its id. Absent where the
+    // row was read without it.
+    look?: CoworkerLook | null
 }
 
-type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'> & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order'>>
+type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'> & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order' | 'look'>>
 
 export function agentFromRow(row: AgentRowFields): IsoAgent {
     return {
@@ -101,6 +105,7 @@ export function agentFromRow(row: AgentRowFields): IsoAgent {
         disabledReason: row.disabled_reason,
         ...(row.created_at !== undefined && { createdAt: row.created_at }),
         ...(row.sidebar_order !== undefined && { sidebarOrder: row.sidebar_order }),
+        ...(row.look !== undefined && { look: parseCoworkerLook(row.look) }),
     }
 }
 
