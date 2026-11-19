@@ -122,13 +122,16 @@ def base_roster(full):
     import roster as R
 
     def raw(path):
-        r = subprocess.run([GH, "api", "-H", "Accept: application/vnd.github.raw+json", path],
+        r = subprocess.run([GH, "api", "-i", "-H", "Accept: application/vnd.github.raw+json", path],
                            capture_output=True, text=True, timeout=300)
-        if r.returncode == 0:
-            return r.stdout
-        if "404" in (r.stderr + r.stdout) or "Not Found" in (r.stderr + r.stdout):
+        m = re.match(r"HTTP/\S+ (\d{3})", r.stdout or "")
+        status = m.group(1) if m else None
+        parts = re.split(r"\r?\n\r?\n", r.stdout or "", maxsplit=1)
+        if r.returncode == 0 and status == "200" and len(parts) == 2:
+            return parts[1]
+        if status == "404":
             return None
-        raise RosterError("cannot read roster (%s): %s" % (path, (r.stderr or r.stdout).strip()[-200:]))
+        raise RosterError("cannot read roster (%s): HTTP %s %s" % (path, status or "?", (r.stderr or "").strip()[-200:]))
 
     where = "repos/%s/contents/tools/factory/roster.json?ref=" % full
     text = raw(where + "dev")
