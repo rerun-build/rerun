@@ -22,7 +22,8 @@ export const POST = apiRoute({ auth: 'admin' }, async ({ req, ctx }): Promise<Fo
         entitled = await startCardlessTrial(platform)
     } catch (err) {
         const message = err instanceof Error ? err.message : ''
-        if (message === PHONE_REQUIRED_MESSAGE || message === ENGINE_WAITLIST_MESSAGE) throw new ApiError(409, message)
+        if (message === PHONE_REQUIRED_MESSAGE) throw new ApiError(409, { error: message, code: 'phoneRequired' })
+        if (message === ENGINE_WAITLIST_MESSAGE) throw new ApiError(409, { error: message, code: 'engineWaitlist' })
         throw err
     }
     if (entitled && !alreadyOn) await mergeForeman(ctx, { trialStartedIn: platform })

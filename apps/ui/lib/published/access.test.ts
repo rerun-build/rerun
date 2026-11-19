@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coworkerAccessMessage, effectivePolicy, humanMayGrant, inviteAllows, normalizeInvites, resolveCoworkerAccess, shownPolicy } from './access'
+import { coworkerAccessMessage, effectivePolicy, humanMayGrant, inviteAllows, resolveCoworkerAccess, shownPolicy } from './access'
 
 describe('effectivePolicy', () => {
     it('keeps every link public before the launch for a workspace that picked nothing', () => {
@@ -58,17 +58,6 @@ describe('humanMayGrant', () => {
         expect(humanMayGrant('people', 'public')).toBe(true)
         expect(humanMayGrant('never', 'public')).toBe(false)
         expect(humanMayGrant('never', 'invited')).toBe(true)
-    })
-})
-
-describe('normalizeInvites', () => {
-    it('lowercases, dedupes and reads a bare domain as one', () => {
-        expect(normalizeInvites([' Marie@Northwind.com', 'marie@northwind.com', 'northwind.com', '@globex.io', ''])).toEqual(['marie@northwind.com', '@northwind.com', '@globex.io'])
-    })
-
-    it('refuses what is neither an email nor a domain', () => {
-        expect(() => normalizeInvites(['marie'])).toThrow('Not an email or a domain: marie')
-        expect(() => normalizeInvites(['@nodot'])).toThrow()
     })
 })
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
+import { useThrownText } from '@/hooks/useErrorText'
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
 import { transcribeVoiceRecording } from '@/lib/voice/client'
 import type { QuestionVoice, QuestionVoiceStatus } from '@rerun/ui/chat'
@@ -15,6 +16,7 @@ import { toast } from 'sonner'
  */
 export function useQuestionVoice(): QuestionVoice {
     const t = useTranslations('chat.voice')
+    const thrownText = useThrownText()
     const [transcribing, setTranscribing] = useState(false)
     const deliverRef = useRef<((transcript: string) => void) | null>(null)
 
@@ -46,12 +48,12 @@ export function useQuestionVoice(): QuestionVoice {
             }
             deliverRef.current?.(transcript)
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : t('startFailed'))
+            toast.error(thrownText(err, t('startFailed')))
         } finally {
             deliverRef.current = null
             setTranscribing(false)
         }
-    }, [stop, t])
+    }, [stop, t, thrownText])
 
     useEffect(() => {
         finishRef.current = () => void finish()

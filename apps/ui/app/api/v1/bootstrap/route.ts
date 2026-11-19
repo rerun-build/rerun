@@ -16,7 +16,7 @@ export const POST = apiRoute({ auth: 'user' }, async ({ ctx }) => {
     } catch (err) {
         // apiRoute turns a refusal past authentication into a 404, but a workspace the device kept and
         // no longer belongs to must answer 403, the status the app falls back to its own workspace on.
-        if (err instanceof AuthorizationError) throw new ApiError(403, err.message)
+        if (err instanceof AuthorizationError) throw new ApiError(403, { error: err.message, code: err.code, params: err.params })
         throw err
     }
 })

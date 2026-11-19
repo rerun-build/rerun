@@ -1,6 +1,7 @@
 import { loadMessages } from '@rerun/i18n/messages'
 import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import { AccessDeniedError } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/errors'
 import { failure, failureOf, refusalOf } from './action-error'
@@ -22,6 +23,11 @@ describe('a refusal sent back by an action', () => {
     it('carries the code of an authorization refusal thrown deep in a service', () => {
         expect(failureOf(new AccessDeniedError())).toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(refusalOf(new AuthorizationError('coworkerNotFound'))).toEqual({ error: 'Coworker not found', code: 'coworkerNotFound' })
+    })
+
+    it('sends the refusal a zod schema names by code', () => {
+        const parsed = z.object({ ids: z.array(z.string()).min(1, 'selectAtLeastOneCoworker') }).safeParse({ ids: [] })
+        expect(failureOf(parsed.error)).toEqual({ ok: false, error: 'Select at least one coworker.', code: 'selectAtLeastOneCoworker' })
     })
 
     it('passes the text of any other error through, without a code', () => {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
+import type { ActionFailure } from '@/lib/i18n/action-error'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +25,8 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
     const errorText = useErrorText()
     const [loaded, setLoaded] = useState<Loaded | null>(null)
     const [error, setError] = useState<string | null>(null)
+    // The wizard shows a refusal's `error` as it is, so it gets it in the reader's language.
+    const inReaderLanguage = <R extends { ok: true } | ActionFailure>(result: R): R => (result.ok ? result : { ...result, error: errorText(result as ActionFailure) })
 
     useEffect(() => {
         if (!open || loaded || error) return
@@ -55,8 +58,8 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
                     <ExpertProfileWizard
                         expert={loaded.expert}
                         bannerOptions={loaded.bannerOptions}
-                        uploadAvatar={uploadMyExpertAvatarAction}
-                        uploadBanner={uploadMyExpertBannerAction}
+                        uploadAvatar={async formData => inReaderLanguage(await uploadMyExpertAvatarAction(formData))}
+                        uploadBanner={async formData => inReaderLanguage(await uploadMyExpertBannerAction(formData))}
                         submitLabel={t('submit')}
                         submittingLabel={t('submitting')}
                         renderHeader={header => <StepDialogHeader icon={UserRoundIcon} {...header} />}
@@ -66,7 +69,7 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
                                 toast.success(t('saved'))
                                 handleOpenChange(false)
                             }
-                            return result
+                            return inReaderLanguage(result)
                         }}
                     />
                 ) : (

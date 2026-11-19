@@ -115,12 +115,12 @@ describe('cancelReasonTextSchema', () => {
     const messageOf = (text: string) => cancelReasonTextSchema.safeParse(text).error?.issues[0]?.message
 
     it('asks for a reason in plain words when the answer is empty or blank', () => {
-        expect(messageOf('')).toBe('Tell us in a few words why you are leaving.')
-        expect(messageOf('   ')).toBe('Tell us in a few words why you are leaving.')
+        expect(messageOf('')).toBe('cancelReasonRequired')
+        expect(messageOf('   ')).toBe('cancelReasonRequired')
     })
 
     it('says how long an answer may be', () => {
-        expect(messageOf('a'.repeat(1001))).toBe('Keep it under 1,000 characters.')
+        expect(messageOf('a'.repeat(1001))).toBe('cancelReasonTooLong')
     })
 
     it('takes a written reason', () => {

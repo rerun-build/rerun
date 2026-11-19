@@ -1,4 +1,6 @@
 import { randomBytes } from 'node:crypto'
+import type { ActionRefusal } from '@/lib/i18n/action-error'
+import { getTranslations } from 'next-intl/server'
 import { NextResponse } from 'next/server'
 
 const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
@@ -40,4 +42,10 @@ export function oauthPopupResponse({ channel, message, label }: OAuthPopupResult
             'Cache-Control': 'no-store',
         },
     })
+}
+
+// The line a failed sign-in popup shows while it closes, in the reader's language.
+export async function popupFailureLabel(refusal: ActionRefusal): Promise<string> {
+    const t = await getTranslations('errors')
+    return t('authorizationFailedBecause', { reason: refusal.code ? t(refusal.code, refusal.params as never) : refusal.error })
 }

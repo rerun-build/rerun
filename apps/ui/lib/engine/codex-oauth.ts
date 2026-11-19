@@ -11,6 +11,8 @@
 //
 // This module runs server-side only. Import from server actions.
 
+import { AppError } from '@/lib/i18n/action-error'
+
 export const CODEX_OAUTH = {
     clientId: 'app_EMoamEEZ73f0CkXaXp7hrann',
     deviceCodeUrl: 'https://auth.openai.com/api/accounts/deviceauth/usercode',
@@ -75,12 +77,12 @@ export async function startCodexDeviceAuth(): Promise<CodexDeviceAuthStart> {
     })
     if (!res.ok) {
         const detail = await res.text().catch(() => '')
-        if (res.status === 404) throw new Error('Device login is not enabled for this account')
-        throw new Error(`Could not start the connection (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ''}`)
+        if (res.status === 404) throw new AppError('codexDeviceLoginDisabled')
+        throw detail ? new AppError('startConnectionFailedBecause', { status: res.status, detail: detail.slice(0, 200) }) : new AppError('startConnectionFailedStatus', { status: res.status })
     }
     // `interval` comes back as a string, and `expires_at` as an ISO date.
     const json = (await res.json()) as { device_auth_id?: string; user_code?: string; interval?: string | number; expires_at?: string }
-    if (!json.device_auth_id || !json.user_code) throw new Error('Malformed device authorization response')
+    if (!json.device_auth_id || !json.user_code) throw new AppError('malformedDeviceAuthResponse')
 
     const intervalS = Number(json.interval)
     const expiresAt = json.expires_at ? Date.parse(json.expires_at) : NaN

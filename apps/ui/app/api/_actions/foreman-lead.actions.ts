@@ -42,7 +42,7 @@ export async function startLeadSetupAction(agentId: string): Promise<StartLeadSe
         const handoff = (await startAgentSetup(ctx, { agents: [{ agentId, message: PLAIN_KICKOFF }] })) as { agents: HandoffResult[] }
         const result = handoff.agents[0]
         if (result?.inactive) return { ...failure('noFreeSlot'), inactive: true }
-        if (!result?.started || !result.conversationId) return result?.error ? { ok: false, error: result.error } : failure('startCoworkerFailed')
+        if (!result?.started || !result.conversationId) return result?.error ? { ok: false, error: result.error, code: result.code, ...(result.params ? { params: result.params } : {}) } : failure('startCoworkerFailed')
         return { ok: true, conversationId: result.conversationId, runId: result.runId ?? null }
     } catch (err) {
         return failureOf(err, 'startCoworkerFailed')

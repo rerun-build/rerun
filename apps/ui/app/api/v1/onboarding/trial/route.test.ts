@@ -74,6 +74,6 @@ describe('POST /api/v1/onboarding/trial', () => {
         startCardlessTrial.mockRejectedValue(new Error('Every machine is taken right now.'))
         const res = await POST(request(), segment)
         expect(res.status).toBe(409)
-        expect(await res.json()).toEqual({ error: 'Every machine is taken right now.' })
+        expect(await res.json()).toEqual({ error: 'Every machine is taken right now.', code: 'engineWaitlist' })
     })
 })

@@ -4,7 +4,8 @@ import { getConnectedAccount } from '@/lib/composio/client'
 import { composioUserForKey } from '@/lib/vault/composio'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
-import { oauthPopupResponse } from '@/lib/oauth/popup-result'
+import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
+import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
@@ -16,17 +17,21 @@ import type { DesktopShellChannel } from '@rerun/contracts'
 const ACTIVE_POLL_ATTEMPTS = 5
 const ACTIVE_POLL_DELAY_MS = 1000
 
-type CallbackResult = { ok: true; accountLabel?: string; claim?: string } | { ok: false; error: string }
+type CallbackResult = { ok: true; accountLabel?: string; claim?: string } | ({ ok: false } & ActionRefusal)
 
 // `key` lets a page holding several Connect buttons of one app tell which account just finished.
 // It is absent when the context could not be read, so every listener still hears that failure.
-function htmlResult(result: CallbackResult, key?: string): NextResponse {
+async function htmlResult(result: CallbackResult, key?: string): Promise<NextResponse> {
     const target = key ? { key } : {}
-    return oauthPopupResponse({
-        channel: 'composio-oauth',
-        message: result.ok ? { type: 'composio-oauth-success', ...target, accountLabel: result.accountLabel } : { type: 'composio-oauth-error', ...target, error: result.error },
-        label: result.ok ? `Connected${result.accountLabel ? ` as ${result.accountLabel}` : ''}. You can close this window.` : `Authorization failed: ${result.error}`,
-    })
+    if (result.ok) {
+        return oauthPopupResponse({
+            channel: 'composio-oauth',
+            message: { type: 'composio-oauth-success', ...target, accountLabel: result.accountLabel },
+            label: `Connected${result.accountLabel ? ` as ${result.accountLabel}` : ''}. You can close this window.`,
+        })
+    }
+    const { ok: _ok, ...failure } = result
+    return oauthPopupResponse({ channel: 'composio-oauth', message: { type: 'composio-oauth-error', ...target, ...failure }, label: await popupFailureLabel(failure) })
 }
 
 // Composio redirect target after the user completes the hosted sign-in. The query params are
@@ -36,7 +41,7 @@ function htmlResult(result: CallbackResult, key?: string): NextResponse {
 export async function GET(req: Request) {
     const url = new URL(req.url)
     const state = url.searchParams.get('state')
-    if (!state) return htmlResult({ ok: false, error: 'Missing state' })
+    if (!state) return htmlResult({ ok: false, ...refusal('missingState') })
 
     const cookieName = COMPOSIO_COOKIE_PREFIX + state
     const raw = (await cookies()).get(cookieName)?.value
@@ -47,13 +52,13 @@ export async function GET(req: Request) {
     let desktop: DesktopShellChannel | undefined
     let key: string | undefined
 
-    const finish = (result: CallbackResult): NextResponse => {
-        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : htmlResult(result, key)
+    const finish = async (result: CallbackResult): Promise<NextResponse> => {
+        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : await htmlResult(result, key)
         res.cookies.delete({ name: cookieName, path: COMPOSIO_COOKIE_PATH })
         return res
     }
 
-    if (!raw) return finish({ ok: false, error: 'Session expired, please retry' })
+    if (!raw) return finish({ ok: false, ...refusal('oauthSessionExpired') })
 
     // Decoded before the status check below so a refused sign-in also lands back in the app.
     let ctx: ComposioOAuthContext
@@ -61,7 +66,7 @@ export async function GET(req: Request) {
         ctx = decodeComposioContext(raw)
         key = ctx.key
     } catch {
-        return finish({ ok: false, error: 'Session expired, please retry' })
+        return finish({ ok: false, ...refusal('oauthSessionExpired') })
     }
     mobile = ctx.mobileGrant !== undefined
 
@@ -81,7 +86,7 @@ export async function GET(req: Request) {
         const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
         const userId = await composioUserForKey(conn, workspaceId, engineAgentId, ctx.agentId, ctx.key)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
-        if (!method?.composio) return finish({ ok: false, error: `${ctx.key} has no Composio connection to set up.` })
+        if (!method?.composio) return finish({ ok: false, ...refusal('noProviderConnectionToSetUp', { key: ctx.key, provider: 'Composio' }) })
         const authConfigId = method.composio.authConfigId
         let account = await getConnectedAccount(ctx.connectedAccountId)
         for (let attempt = 1; account.status !== 'ACTIVE' && account.status !== 'FAILED' && attempt < ACTIVE_POLL_ATTEMPTS; attempt++) {
@@ -90,10 +95,10 @@ export async function GET(req: Request) {
         }
         if (account.userId !== userId || account.authConfigId !== authConfigId) {
             console.warn(`[composio] connected account ${ctx.connectedAccountId} does not match the pending context`)
-            return finish({ ok: false, error: 'Connection mismatch, please retry' })
+            return finish({ ok: false, ...refusal('connectionMismatch') })
         }
         if (account.status !== 'ACTIVE') {
-            return finish({ ok: false, error: `Connection is not active yet (${account.status}). Please retry.` })
+            return finish({ ok: false, ...refusal('connectionNotActiveYet', { status: account.status }) })
         }
 
         if (grant) {
@@ -103,6 +108,6 @@ export async function GET(req: Request) {
         await markComposioAuthorized(ctx.agentId, ctx.key, ctx.connectedAccountId, undefined, actor)
         return finish({ ok: true })
     } catch (err) {
-        return finish({ ok: false, error: err instanceof Error ? err.message : 'Authorization failed' })
+        return finish({ ok: false, ...refusalOf(err, 'authorizationFailed') })
     }
 }

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { redirectPendingSignInPopup } from '@/components/services/sign-in-popup'
+import { RefusalError, useErrorText, useThrownText, type Refusal } from '@/hooks/useErrorText'
 import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, XCircleIcon } from '@/lib/icons'
@@ -31,18 +32,20 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // react to its result over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ManagedConnect({ agentId, instanceKey, provider, serverName, name, onAuthorized, autoStart, pendingPopup }: ManagedConnectProps) {
     const t = useTranslations('services.connect')
+    const errorText = useErrorText()
+    const thrownText = useThrownText()
     const [state, setState] = useState<ConnectState>('idle')
     const [email, setEmail] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const popupRef = useRef<Window | null>(null)
 
-    const armResult = useOAuthPopupResult<{ type: string; key?: string; email?: string; error?: string }>('managed-oauth', RESULT_TYPES, data => {
+    const armResult = useOAuthPopupResult<{ type: string; key?: string; email?: string } & Refusal>('managed-oauth', RESULT_TYPES, data => {
         if (data.type === 'managed-oauth-success') {
             setEmail(data.email ?? null)
             setState('authorized')
             onAuthorized(data.email)
         } else {
-            setError(data.error || t('authorizationFailed'))
+            setError(errorText(data, t('authorizationFailed')))
             setState('error')
         }
         popupRef.current?.close()
@@ -59,7 +62,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
                 setState('authorized')
                 onAuthorized()
             } else {
-                setError(result.error)
+                setError(errorText(result))
                 setState('error')
             }
             return
@@ -72,7 +75,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
                 body: JSON.stringify({ agentId, key: instanceKey, serverName }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || t('startOAuthFailed'))
+            if (!res.ok) throw new RefusalError(data)
 
             const w = 500
             const h = 640
@@ -82,7 +85,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : t('startOAuthFailed'))
+            setError(thrownText(err, t('startOAuthFailed')))
             setState('error')
         }
     }

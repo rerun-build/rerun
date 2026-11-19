@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { type ReactNode, type RefObject, useRef } from 'react'
 
 import { Form } from '@/components/ui/form'
+import { useThrownText } from '@/hooks/useErrorText'
 
 import { BoxComposer } from './BoxComposer'
 import { BoxPreview } from './BoxPreview'
@@ -40,6 +41,7 @@ export function NewBoxForm({
     intro?: NewBoxIntro
 }) {
     const t = useTranslations('dialogs.newBox')
+    const thrownText = useThrownText()
     const { heading, description } = intro ?? { heading: t('heading'), description: t('description') }
     const rootRef = useRef<HTMLFormElement>(null)
     const anchorRef = useRef<HTMLSpanElement>(null)
@@ -53,7 +55,7 @@ export function NewBoxForm({
         try {
             await onCreate(name)
         } catch (error) {
-            draft.form.setError('root', { message: error instanceof Error ? error.message : t('failed') })
+            draft.form.setError('root', { message: thrownText(error, t('failed')) })
         }
     })
 

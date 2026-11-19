@@ -156,7 +156,7 @@ export async function renameBox(actor: Actor, spaceId: string, newName: string):
     await assertSpaceAccess(spaceId, 'manage', actor)
     const supabase = createServiceRoleClient()
     const { error } = await supabase.from('spaces').update<Database['public']['Tables']['spaces']['Update']>({ name: newName }).eq('id', spaceId)
-    if (error) throw new Error(`Failed to rename the Box: ${error.message}`)
+    if (error) throw new AppError('renameBoxFailedBecause', { message: error.message })
 }
 
 // Deleting a Box no longer takes a machine down with it, so the agents drawn in it would be
@@ -170,5 +170,5 @@ export async function deleteBox(actor: Actor, spaceId: string): Promise<void> {
     if (agents) throw new AppError('boxStillHoldsCoworkers', { count: agents })
 
     const { error } = await supabase.from('spaces').delete().eq('id', spaceId)
-    if (error) throw new Error(`Failed to delete the Box: ${error.message}`)
+    if (error) throw new AppError('deleteBoxFailedBecause', { message: error.message })
 }

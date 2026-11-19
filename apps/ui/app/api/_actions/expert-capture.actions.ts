@@ -16,7 +16,7 @@ import { failureOf } from '@/lib/i18n/action-error'
 const planInputSchema = z.object({
     templateId: z.string().uuid(),
     spaceId: z.string().uuid(),
-    agentIds: z.array(z.string().uuid()).min(1, 'Select at least one coworker.'),
+    agentIds: z.array(z.string().uuid()).min(1, 'selectAtLeastOneCoworker'),
 })
 
 const captureInputSchema = z.object({
@@ -30,7 +30,7 @@ const captureInputSchema = z.object({
                 setup: captureSetupSchema.optional(),
             }),
         )
-        .min(1, 'Select at least one coworker.'),
+        .min(1, 'selectAtLeastOneCoworker'),
 })
 
 const removeAgentInputSchema = z.object({

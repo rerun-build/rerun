@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { redirectPendingSignInPopup } from '@/components/services/sign-in-popup'
+import { RefusalError, useErrorText, useThrownText, type Refusal } from '@/hooks/useErrorText'
 import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, XCircleIcon } from '@/lib/icons'
@@ -35,6 +36,8 @@ type DiscoveryResult = {
 
 export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuthorized, autoStart, pendingPopup, vaultItemId }: McpOAuthAuthorizeProps) {
     const t = useTranslations('agent.mcpOAuthAuthorize')
+    const errorText = useErrorText()
+    const thrownText = useThrownText()
     const [state, setState] = useState<OAuthState>('idle')
     const [error, setError] = useState<string | null>(null)
     const [discovery, setDiscovery] = useState<DiscoveryResult | null>(null)
@@ -51,26 +54,26 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
                 body: JSON.stringify({ url }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || t('discoveryFailed'))
+            if (!res.ok) throw new RefusalError(data)
             setDiscovery(data)
             setState('ready')
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : t('discoveryFailed'))
+            setError(thrownText(err, t('discoveryFailed')))
             setState('error')
         }
-    }, [url, pendingPopup, t])
+    }, [url, pendingPopup, t, thrownText])
 
     useEffect(() => {
         if (url.trim()) discover()
     }, [discover, url])
 
-    const armResult = useOAuthPopupResult<{ type: string; serverName?: string; error?: string }>('mcp-oauth', RESULT_TYPES, data => {
+    const armResult = useOAuthPopupResult<{ type: string; serverName?: string } & Refusal>('mcp-oauth', RESULT_TYPES, data => {
         if (data.type === 'mcp-oauth-success') {
             setState('authorized')
             onAuthorized()
         } else {
-            setError(data.error || t('authorizationFailed'))
+            setError(errorText(data, t('authorizationFailed')))
             setState('error')
         }
         popupRef.current?.close()
@@ -90,7 +93,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
                 setState('authorized')
                 onAuthorized()
             } else {
-                setError(result.error)
+                setError(errorText(result))
                 setState('error')
             }
             return
@@ -103,7 +106,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
                 body: JSON.stringify(vaultItemId ? { vaultItemId, serverName, mcpUrl: url } : { agentId, serverName, mcpUrl: url }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || t('startFailed'))
+            if (!res.ok) throw new RefusalError(data)
 
             const w = 500
             const h = 600
@@ -119,7 +122,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : t('startFailed'))
+            setError(thrownText(err, t('startFailed')))
             setState('error')
         }
     }

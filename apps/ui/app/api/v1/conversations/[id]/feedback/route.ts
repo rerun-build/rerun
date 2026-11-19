@@ -13,6 +13,6 @@ export const GET = apiRoute({ auth: 'member', query: scopeQuery }, async ({ para
 // The vote lands on the tap, before any details are asked for, as on the web.
 export const POST = apiRoute({ auth: 'member', body: messageFeedbackRateRequestSchema }, async ({ params, body }): Promise<{ id: string }> => {
     const rated = await rateMessageAction({ sessionId: params.id, ...body })
-    if (!rated.ok) throw new ApiError(rated.error === 'Conversation not found' ? 404 : 400, rated.error)
+    if (!rated.ok) throw new ApiError(rated.code === 'conversationNotFound' || rated.error === 'Conversation not found' ? 404 : 400, rated)
     return { id: rated.id }
 })

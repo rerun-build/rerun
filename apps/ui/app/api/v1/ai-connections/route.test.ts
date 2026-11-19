@@ -250,7 +250,7 @@ describe('custom endpoints', () => {
         engine.supportsCustomProvider.mockResolvedValue(true)
         const refused = await create({ baseUrl: 'http://192.168.1.20:11434/v1' })
         expect(refused.status).toBe(400)
-        expect(await refused.json()).toEqual({ error: 'The base URL must be a public web address.' })
+        expect(await refused.json()).toEqual({ error: 'The base URL must be a public web address.', code: 'baseUrlNotPublic' })
         cloud = false
         expect(await (await create({ baseUrl: 'http://192.168.1.20:11434/v1' })).json()).toEqual({ connectionId: 'cnx-new' })
     })
@@ -277,7 +277,7 @@ describe('POST /api/v1/ai-connections', () => {
         providerKeyProblem.mockResolvedValue({ code: 'providerKeyRejected', params: { provider: 'Anthropic' } })
         const refused = await send(list.POST, 'POST', '', { provider: 'anthropic', apiKey: 'sk-ant-api03-bad' })
         expect(refused.status).toBe(400)
-        expect(await refused.json()).toEqual({ error: 'Anthropic turned this key down. Check it was copied in full and is still active.' })
+        expect(await refused.json()).toEqual({ error: 'Anthropic turned this key down. Check it was copied in full and is still active.', code: 'providerKeyRejected', params: { provider: 'Anthropic' } })
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 

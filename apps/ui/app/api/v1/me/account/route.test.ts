@@ -46,7 +46,7 @@ describe('/api/v1/me/account', () => {
         user = { id: 'user-1', is_anonymous: false, last_sign_in_at: new Date(Date.now() - 11 * 60_000).toISOString() }
         const res = await remove({ confirmation: 'DELETE' })
         expect(res.status).toBe(403)
-        expect(await res.json()).toEqual({ error: 'Sign in again to delete your account.', reason: 'reauth_required' })
+        expect(await res.json()).toEqual({ error: 'Sign in again to delete your account.', code: 'signInAgainToDeleteAccount', reason: 'reauth_required' })
         user = { id: 'user-1', is_anonymous: false }
         expect((await remove({ confirmation: 'DELETE' })).status).toBe(403)
         expect(anonymizeAccount).not.toHaveBeenCalled()
@@ -61,7 +61,7 @@ describe('/api/v1/me/account', () => {
         anonymizeAccount.mockResolvedValue({ ok: false, blockers: [BLOCKER] })
         const res = await remove({ confirmation: 'DELETE' })
         expect(res.status).toBe(409)
-        expect(await res.json()).toEqual({ error: 'Cancel the subscription of Acme first.', blockers: [BLOCKER] })
+        expect(await res.json()).toEqual({ error: 'Cancel the subscription of Acme first.', code: 'cancelSubscriptionsFirst', params: { names: 'Acme' }, blockers: [BLOCKER] })
     })
 
     it('answers 401 to an anonymous visitor', async () => {

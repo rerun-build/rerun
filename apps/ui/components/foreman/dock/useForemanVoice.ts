@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useThrownText } from '@/hooks/useErrorText'
 import { usePushToTalk } from '@/hooks/usePushToTalk'
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
 import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
@@ -27,6 +28,7 @@ export type ForemanVoiceStatus = 'idle' | 'listening' | 'transcribing'
  */
 export function useForemanVoice(enabled: boolean) {
     const t = useTranslations('foreman.voice')
+    const thrownText = useThrownText()
     const [listening, setListening] = useState(false)
     const [transcribing, setTranscribing] = useState(false)
 
@@ -61,11 +63,11 @@ export function useForemanVoice(enabled: boolean) {
             }
             useForemanStore.getState().sendToForeman(transcript)
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : t('sendFailed'))
+            toast.error(thrownText(err, t('sendFailed')))
         } finally {
             setTranscribing(false)
         }
-    }, [stop, t])
+    }, [stop, t, thrownText])
 
     useEffect(() => {
         finishRef.current = () => void finish()

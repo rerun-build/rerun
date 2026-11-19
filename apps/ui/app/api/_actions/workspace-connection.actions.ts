@@ -22,7 +22,7 @@ import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
 import type { BoxBackupModels, BoxConnection, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { NO_BOX_BACKUPS, customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
-import { refusal, refusalOf, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
+import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 // The AI providers of the workspace, for the web dialog. The workspace of the session is the whole
 // scope, so these actions take no id at all; the logic is shared with the app in ai-connection.service.
@@ -154,8 +154,12 @@ export async function exchangeClaudeSubscriptionAction(code: string, verifier: s
     }
 }
 
-export async function startCodexDeviceAuthAction(): Promise<CodexDeviceAuthStart> {
-    return startCodexSignIn()
+export async function startCodexDeviceAuthAction(): Promise<({ ok: true } & CodexDeviceAuthStart) | ActionFailure> {
+    try {
+        return { ok: true, ...(await startCodexSignIn()) }
+    } catch (err) {
+        return failureOf(err, 'couldNotStartConnection')
+    }
 }
 
 export async function pollCodexDeviceAuthAction(deviceAuthId: string, userCode: string): Promise<{ status: 'pending' } | { status: 'ok'; keys: Record<string, string> } | ({ status: 'error' } & ActionRefusal)> {

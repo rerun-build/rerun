@@ -3,6 +3,7 @@
 import { getSharedTemplateAction, installTemplateAction } from '@/app/api/_actions/template.actions'
 import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
 import { claimSpaceAction } from '@/app/api/_actions/space.actions'
+import { useErrorText } from '@/hooks/useErrorText'
 import { rebaseOffset, resolveTargetSpace } from '@/lib/onboarding/target-space'
 import { reportInstall } from '@/lib/templates/install-feedback'
 import { useTemplateImportFlow } from '@/lib/templates/useTemplateImportFlow'
@@ -19,6 +20,7 @@ import { toast } from 'sonner'
 export function useStartPendingTemplate() {
     const { workspace } = useSession()
     const t = useTranslations('templates.installFeedback')
+    const errorText = useErrorText()
     const setStartingFirstAgent = useBoardStore(s => s.setStartingFirstAgent)
     const selectAgentWhenReady = useBoardStore(s => s.selectAgentWhenReady)
     const { run: startImport } = useTemplateImportFlow({ onDone: () => {} })
@@ -42,7 +44,7 @@ export function useStartPendingTemplate() {
             if (!template.owned) {
                 const result = await startTemplateCheckoutAction(parked.slug)
                 if (!result.ok) {
-                    toast.error(t('buyFailed', { title: parked.title }), { description: result.error })
+                    toast.error(t('buyFailed', { title: parked.title }), { description: errorText(result) })
                     throw new Error(result.error)
                 }
                 // Le checkout ramène sur `?template=<slug>&purchase=success`, où la fiche de succès
@@ -69,7 +71,7 @@ export function useStartPendingTemplate() {
             if (!spaceId || !corner) {
                 const claim = await claimSpaceAction({ workspaceId: workspace.id })
                 if (!claim.ok) {
-                    toast.error(t('prepareBoxFailed'), { description: claim.error })
+                    toast.error(t('prepareBoxFailed'), { description: errorText(claim) })
                     throw new Error(claim.error)
                 }
                 spaceId = claim.spaceId
@@ -85,7 +87,7 @@ export function useStartPendingTemplate() {
             const positions = parked.offsets?.map(offset => rebaseOffset(offset, corner))
             const result = await installTemplateAction({ slug: parked.slug, spaceId, positions })
             if (!result.ok) {
-                toast.error(t('setUpFailed', { title: parked.title }), { description: result.error })
+                toast.error(t('setUpFailed', { title: parked.title }), { description: errorText(result) })
                 throw new Error(result.error)
             }
 

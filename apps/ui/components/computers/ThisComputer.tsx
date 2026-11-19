@@ -16,7 +16,8 @@ import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { useErrorText } from '@/hooks/useErrorText'
+import { useErrorText, type Refusal } from '@/hooks/useErrorText'
+import type { ErrorCode } from '@/lib/i18n/action-error'
 import type { ComputerStatus } from '@/lib/computers/types'
 import { desktopShell } from '@/lib/desktop-shell/client'
 import { CheckIcon, FolderIcon, MonitorIcon, PlusIcon } from '@/lib/icons'
@@ -29,6 +30,16 @@ type RemoteComputerShell = NonNullable<NonNullable<ReturnType<typeof desktopShel
 
 function remoteComputerShell(): RemoteComputerShell | null {
     return desktopShell('remoteComputer')?.remoteComputer ?? null
+}
+
+// The desktop app refuses in plain English across IPC, which Electron wraps as
+// "Error invoking remote method '…': Error: <message>". The ones it is known to send get a code.
+const DESKTOP_REFUSALS: Record<string, ErrorCode> = { 'No server': 'desktopNoServer', 'Invalid token': 'desktopInvalidToken' }
+
+function desktopRefusal(err: unknown): Refusal {
+    const message = err instanceof Error ? err.message : String(err)
+    const known = Object.keys(DESKTOP_REFUSALS).find(text => message === text || message.endsWith(`Error: ${text}`))
+    return { error: message, code: known ? DESKTOP_REFUSALS[known] : undefined }
 }
 
 // This very computer, as the desktop app sees it, followed as it changes.
@@ -98,6 +109,7 @@ export function ThisComputerSection() {
     const [linking, setLinking] = useState(false)
     const [unlinking, setUnlinking] = useState<DesktopRemoteLink | null>(null)
     const [busy, setBusy] = useState(false)
+    const errorText = useErrorText()
     const shell = remoteComputerShell()
     if (!shell) return null
     if (!state || !workspace) return <Skeleton className="h-16 w-full" />
@@ -113,7 +125,7 @@ export function ThisComputerSection() {
             await shell.unlink(unlinking.computerId)
             setUnlinking(null)
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : String(err))
+            toast.error(errorText(desktopRefusal(err)))
         } finally {
             setBusy(false)
         }
@@ -218,7 +230,7 @@ function LinkComputerDialog({ open, onOpenChange, state, onLinked }: { open: boo
             onOpenChange(false)
             await onLinked()
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : String(err))
+            toast.error(errorText(desktopRefusal(err)))
         } finally {
             setPending(false)
         }

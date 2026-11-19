@@ -1,3 +1,4 @@
+import type { Refusal } from '@/hooks/useErrorText'
 import { desktopShell } from './client'
 
 // A service's sign-in from the desktop app: Google and most providers refuse a web view, so it runs
@@ -7,7 +8,7 @@ import { desktopShell } from './client'
 
 export type DesktopServiceTarget = { agentId: string; key: string } | { agentId: string; server: string }
 
-export type DesktopServiceSignIn = { ok: true } | { ok: false; error: string }
+export type DesktopServiceSignIn = { ok: true } | ({ ok: false; error: string } & Refusal)
 
 // The provider's own screens can take a while (a password manager, a second factor), not forever.
 const RETURN_TIMEOUT_MS = 10 * 60_000
@@ -21,9 +22,9 @@ function routeOf(target: DesktopServiceTarget): string {
     return 'key' in target ? `${agent}/services/${encodeURIComponent(target.key)}` : `${agent}/mcp/${encodeURIComponent(target.server)}`
 }
 
-async function errorOf(response: Response, fallback: string): Promise<string> {
-    const body = (await response.json().catch(() => null)) as { error?: string; message?: string } | null
-    return body?.error ?? body?.message ?? fallback
+async function refusalOf(response: Response, fallback: string): Promise<{ error: string } & Refusal> {
+    const body = (await response.json().catch(() => null)) as ({ message?: string } & Refusal) | null
+    return { error: body?.error ?? body?.message ?? fallback, code: body?.code, params: body?.params }
 }
 
 export async function signInThroughBrowser(target: DesktopServiceTarget, fallbackError: string): Promise<DesktopServiceSignIn> {
@@ -31,7 +32,7 @@ export async function signInThroughBrowser(target: DesktopServiceTarget, fallbac
     if (!shell) return { ok: false, error: fallbackError }
     const route = routeOf(target)
     const connect = await fetch(`${route}/connect`, { method: 'POST' })
-    if (!connect.ok) return { ok: false, error: await errorOf(connect, fallbackError) }
+    if (!connect.ok) return { ok: false, ...(await refusalOf(connect, fallbackError)) }
     const { url } = (await connect.json()) as { url: string }
 
     const returned = new Promise<Parameters<Parameters<typeof shell.oauth.onReturn>[0]>[0] | null>((resolve) => {
@@ -52,6 +53,6 @@ export async function signInThroughBrowser(target: DesktopServiceTarget, fallbac
     if (!result.claim) return { ok: true }
 
     const claimed = await fetch(`${route}/authorized`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim: result.claim }) })
-    if (!claimed.ok) return { ok: false, error: await errorOf(claimed, fallbackError) }
+    if (!claimed.ok) return { ok: false, ...(await refusalOf(claimed, fallbackError)) }
     return { ok: true }
 }

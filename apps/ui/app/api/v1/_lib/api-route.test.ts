@@ -55,6 +55,7 @@ describe('apiRoute', () => {
         mocks.requireWorkspaceContext.mockRejectedValue(new UnauthenticatedError())
         const res = await apiRoute({ auth: 'member' }, async () => ({ ok: true }))(post(''), segment)
         expect(res.status).toBe(401)
+        expect(await res.json()).toEqual({ error: 'Unauthorized', code: 'notAuthenticated' })
     })
 
     it('answers 401 on a user route without a signed-in user', async () => {
@@ -90,6 +91,15 @@ describe('apiRoute', () => {
         expect(await res.json()).toEqual({ error: 'Busy' })
     })
 
+    it('sends the code an ApiError carries beside its English text', async () => {
+        const route = apiRoute({ auth: 'member' }, async () => {
+            throw new ApiError(404, { error: 'MCP server not found: acme', code: 'mcpServerNotFound', params: { name: 'acme' } })
+        })
+        const res = await route(post(''), segment)
+        expect(res.status).toBe(404)
+        expect(await res.json()).toEqual({ error: 'MCP server not found: acme', code: 'mcpServerNotFound', params: { name: 'acme' } })
+    })
+
     it('answers 422 with the English text and the code of a refusal meant for the person', async () => {
         const route = apiRoute({ auth: 'member' }, async () => {
             throw new AppError('serviceKeyRejected', { name: 'Buffer' })
@@ -106,7 +116,7 @@ describe('apiRoute', () => {
         })
         const res = await route(post(''), segment)
         expect(res.status).toBe(500)
-        expect(await res.json()).toEqual({ error: 'Internal error' })
+        expect(await res.json()).toEqual({ error: 'Internal error', code: 'generic' })
     })
 
     it('runs a public route without looking for a caller', async () => {

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 // Claims the workspace's machine, once: a second call finds it claimed.
 export const POST = apiRoute({ auth: 'admin' }, async () => {
     const claimed = await claimWelcomeEngineAction()
-    if (!claimed.ok) throw new ApiError(503, claimed.error)
+    if (!claimed.ok) throw new ApiError(503, claimed)
 })
 
 // The app asks again until the machine answers.

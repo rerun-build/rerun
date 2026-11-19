@@ -17,6 +17,7 @@ import { track } from '@rerun/analytics/client'
 import { toast } from 'sonner'
 import type { ReactNode } from 'react'
 import { refusalText, translated } from '@/lib/i18n/toast-text'
+import { RefusalError } from '@/hooks/useErrorText'
 import type { Database } from '@/app/api/database.types'
 import { createClient } from '@/supabase/client'
 import { selectMany } from '@/supabase/supabase-helpers'
@@ -851,7 +852,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     claimSpace: async (workspaceId, name, from, viewer) => {
         const result = await claimSpaceAction({ workspaceId, name: name.trim() || null, from })
-        if (!result.ok) throw new Error(result.error)
+        if (!result.ok) throw new RefusalError(result)
         const userId = viewer?.userId
         if (!userId || viewer.role !== 'member') return
         set(state => ({

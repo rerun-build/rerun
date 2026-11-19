@@ -64,6 +64,11 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
         setBusy(true)
         try {
             const next = await startCodexDeviceAuthAction()
+            if (!next.ok) {
+                setError(errorText(next, t('startFailed')))
+                trackAiConnectionFailed('codex', 'oauth', surface, 'start_failed', next.error)
+                return
+            }
             setPending(next)
             setStartedAt(Date.now())
             setNow(Date.now())
@@ -77,7 +82,7 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
             openingRef.current = false
             setOpening(false)
         }
-    }, [surface, t])
+    }, [surface, t, errorText])
 
     const copy = useCallback(() => {
         if (!pending) return

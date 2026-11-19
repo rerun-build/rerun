@@ -68,7 +68,7 @@ export async function createAuthorTemplateDraft(userId: string, title: string): 
 
     const slug = await uniqueTemplateSlug(supabase, base)
     const result = await createTemplate(supabase, templateDocumentSchema.parse({ slug, title: trimmed, creatorId: userId }))
-    if (!result.ok) throw new Error(result.error)
+    if (!result.ok) throw result.code ? new AppError(result.code, result.params) : new Error(result.error)
 
     const { data: created } = await selectMaybeSingle(supabase, 'templates', ['id'] as const, { slug: result.slug })
     if (!created) throw new AppError('templateCreatedNotReloaded')
@@ -94,7 +94,7 @@ export async function loadEditableAuthorDocument(userId: string, id: string): Pr
 
 async function writeAuthorDocument(slug: string, document: TemplateDocument, review?: TemplateReviewPatch): Promise<AuthorWrite> {
     const result = await updateTemplateBySlug(createServiceRoleClient(), slug, document, review)
-    if (!result.ok) throw new Error(result.error)
+    if (!result.ok) throw result.code ? new AppError(result.code, result.params) : new Error(result.error)
     return { slug: result.slug, warnings: result.warnings }
 }
 

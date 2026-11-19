@@ -6,7 +6,7 @@ import { CLIENT_HEADER } from '@rerun/contracts'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { ApiError } from '@/lib/api-error'
-import { AppError } from '@/lib/i18n/action-error'
+import { AppError, refusal, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 
 // `public` is for what an app needs before anyone signs in (sign-in itself, the version gate). `user` only
 // proves who is calling, for the routes a caller reaches before it has a workspace. `admin` is a member
@@ -48,6 +48,11 @@ function errorResponse(status: number, error: string, extra?: Record<string, unk
     return Response.json({ error, ...extra }, { status })
 }
 
+// The English text stays what the clients that predate the codes always read.
+function codedResponse(status: number, error: string, code: ErrorCode | undefined, params?: ErrorParams, extra?: Record<string, unknown>): Response {
+    return errorResponse(status, error, { ...(code ? { code } : {}), ...(params ? { params } : {}), ...extra })
+}
+
 async function authenticateUser(): Promise<UserContext> {
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser((await getRequestAccessToken()) ?? undefined)
@@ -68,7 +73,7 @@ async function readBody(req: Request): Promise<unknown> {
     try {
         return JSON.parse(text)
     } catch {
-        throw new ApiError(400, 'Invalid JSON body')
+        throw new ApiError(400, refusal('invalidJsonBody'))
     }
 }
 
@@ -83,10 +88,10 @@ export function apiRoute<A extends AuthLevel, B extends z.ZodType | undefined = 
         try {
             ctx = await authenticate(options.auth)
         } catch (err) {
-            if (err instanceof UnauthenticatedError) return errorResponse(401, 'Unauthorized')
-            if (err instanceof AuthorizationError) return errorResponse(403, err.message)
+            if (err instanceof UnauthenticatedError) return codedResponse(401, 'Unauthorized', 'notAuthenticated')
+            if (err instanceof AuthorizationError) return codedResponse(403, err.message, err.code, err.params)
             console.error(`[api/v1] ${req.method} ${path} auth failed`, err)
-            return errorResponse(500, 'Internal error')
+            return codedResponse(500, 'Internal error', 'generic')
         }
 
         try {
@@ -98,16 +103,16 @@ export function apiRoute<A extends AuthLevel, B extends z.ZodType | undefined = 
             if (result === undefined) return new Response(null, { status: 204 })
             return Response.json(result)
         } catch (err) {
-            if (err instanceof z.ZodError) return errorResponse(400, 'Invalid request', { issues: err.issues })
-            if (err instanceof ApiError) return errorResponse(err.status, err.message)
-            // A refusal meant for the person, in English for the clients that predate the codes.
-            if (err instanceof AppError) return errorResponse(422, err.message, { code: err.code, ...(err.params ? { params: err.params } : {}) })
+            if (err instanceof z.ZodError) return codedResponse(400, 'Invalid request', 'invalidRequest', undefined, { issues: err.issues })
+            if (err instanceof ApiError) return codedResponse(err.status, err.message, err.code, err.params)
             // Reached, but the caller only uses this Box and the route changes it.
-            if (err instanceof AccessDeniedError) return errorResponse(403, err.message)
+            if (err instanceof AccessDeniedError) return codedResponse(403, err.message, err.code, err.params)
             // Past authentication, a resource outside the caller's workspace or Boxes reads as missing.
-            if (err instanceof AuthorizationError) return errorResponse(404, 'Not found')
+            if (err instanceof AuthorizationError) return codedResponse(404, 'Not found', 'notFound')
+            // A refusal meant for the person, in English for the clients that predate the codes.
+            if (err instanceof AppError) return codedResponse(422, err.message, err.code, err.params)
             console.error(`[api/v1] ${req.method} ${path} failed`, err)
-            return errorResponse(500, 'Internal error')
+            return codedResponse(500, 'Internal error', 'generic')
         }
     }
 }

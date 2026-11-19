@@ -4,6 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { redirectPendingSignInPopup } from '@/components/services/sign-in-popup'
+import { RefusalError, useErrorText, useThrownText, type Refusal } from '@/hooks/useErrorText'
 import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, ShieldCheck, XCircleIcon } from '@/lib/icons'
@@ -31,18 +32,20 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, autoStart, pendingPopup }: ComposioConnectProps) {
     const t = useTranslations('services.connect')
+    const errorText = useErrorText()
+    const thrownText = useThrownText()
     const [state, setState] = useState<ConnectState>('idle')
     const [accountLabel, setAccountLabel] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const popupRef = useRef<Window | null>(null)
 
-    const armResult = useOAuthPopupResult<{ type: string; key?: string; accountLabel?: string; error?: string }>('composio-oauth', RESULT_TYPES, data => {
+    const armResult = useOAuthPopupResult<{ type: string; key?: string; accountLabel?: string } & Refusal>('composio-oauth', RESULT_TYPES, data => {
         if (data.type === 'composio-oauth-success') {
             setAccountLabel(data.accountLabel ?? null)
             setState('authorized')
             onAuthorized(data.accountLabel)
         } else {
-            setError(data.error || t('authorizationFailed'))
+            setError(errorText(data, t('authorizationFailed')))
             setState('error')
         }
         popupRef.current?.close()
@@ -59,7 +62,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
                 setState('authorized')
                 onAuthorized()
             } else {
-                setError(result.error)
+                setError(errorText(result))
                 setState('error')
             }
             return
@@ -72,7 +75,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
                 body: JSON.stringify({ agentId, key: instanceKey }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || t('startFailed'))
+            if (!res.ok) throw new RefusalError(data)
 
             const w = 500
             const h = 640
@@ -82,7 +85,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : t('startFailed'))
+            setError(thrownText(err, t('startFailed')))
             setState('error')
         }
     }

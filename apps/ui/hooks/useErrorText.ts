@@ -8,6 +8,14 @@ import { useCallback } from 'react'
 // server deployed ahead of the page, falls back to the server's English.
 export type Refusal = { error?: string | null; code?: string; params?: ErrorParams }
 
+// Thrown where a refusal cannot be returned (a store method, a fetch helper), so the screen that
+// catches it still translates its code.
+export class RefusalError extends Error {
+    constructor(readonly refusal: Refusal) {
+        super(refusal.error ?? '')
+    }
+}
+
 // What a refused action says on screen: its code in the reader's language, or the server's English
 // text for a refusal that has no code yet. `fallback` stands in when the refusal carries no text.
 export function useErrorText() {
@@ -19,5 +27,17 @@ export function useErrorText() {
             return failure.error || fallback || t('generic')
         },
         [t]
+    )
+}
+
+// The same for a caught error: a thrown refusal is translated, any other error keeps its message.
+export function useThrownText() {
+    const errorText = useErrorText()
+    return useCallback(
+        (err: unknown, fallback: string): string => {
+            if (err instanceof RefusalError) return errorText(err.refusal, fallback)
+            return err instanceof Error && err.message ? err.message : fallback
+        },
+        [errorText]
     )
 }

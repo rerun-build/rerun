@@ -1,3 +1,5 @@
+import { AppError } from '@/lib/i18n/action-error'
+
 // Speech-to-text for the composer's voice messages. Whisper large v3 turbo through OpenRouter,
 // asking for groq first: it is the lowest-latency of the two providers serving that model, and
 // fallbacks stay on so a groq outage degrades speed rather than breaking the feature. Measured
@@ -12,7 +14,7 @@ const MODEL = process.env.RERUN_TRANSCRIBE_MODEL ?? 'openai/whisper-large-v3-tur
 
 export async function transcribeAudio(audio: Uint8Array, format: string, signal?: AbortSignal): Promise<string> {
     const apiKey = process.env.OPENROUTER_API_KEY
-    if (!apiKey) throw new Error('OPENROUTER_API_KEY is not set')
+    if (!apiKey) throw new AppError('transcriptionNotConfigured')
 
     const res = await fetch(ENDPOINT, {
         method: 'POST',
@@ -27,11 +29,11 @@ export async function transcribeAudio(audio: Uint8Array, format: string, signal?
 
     if (!res.ok) {
         const detail = await res.text().catch(() => '')
-        throw new Error(`Transcription failed (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ''}`)
+        throw detail ? new AppError('transcriptionFailedBecause', { status: res.status, detail: detail.slice(0, 200) }) : new AppError('transcriptionFailedStatus', { status: res.status })
     }
 
     const payload: unknown = await res.json()
     const text = (payload as { text?: unknown }).text
-    if (typeof text !== 'string') throw new Error('Transcription returned no text')
+    if (typeof text !== 'string') throw new AppError('transcriptionReturnedNoText')
     return text.trim()
 }

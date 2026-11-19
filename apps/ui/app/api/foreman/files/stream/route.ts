@@ -5,6 +5,7 @@ import { FOREMAN_FILES_BUCKET, foremanFileKey } from '@/lib/foreman/files'
 import { FOREMAN_MAX_UPLOAD_BYTES } from '@/lib/foreman/upload-limit'
 import { uploadPrivateFile } from '@/lib/storage/private'
 import { withQueryWorkspace } from '@/lib/workspace/query-workspace'
+import { getTranslations } from 'next-intl/server'
 
 export const runtime = 'nodejs'
 
@@ -18,7 +19,7 @@ async function upload(req: Request) {
     try {
         ctx = await requireWorkspaceContext()
     } catch {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        return Response.json({ error: 'Unauthorized', code: 'notAuthenticated' }, { status: 401 })
     }
 
     const url = new URL(req.url)
@@ -30,17 +31,15 @@ async function upload(req: Request) {
     if (!sessionId || invalidName(sessionId)) return Response.json({ error: 'Invalid session id' }, { status: 400 })
     if (invalidName(name)) return Response.json({ error: 'Invalid file name' }, { status: 400 })
     if (invalidDir(dir)) return Response.json({ error: 'Invalid directory' }, { status: 400 })
-    if (size > FOREMAN_MAX_UPLOAD_BYTES) {
-        return Response.json({ error: `${name} is over the ${FOREMAN_MAX_UPLOAD_BYTES / MB} MB limit.` }, { status: 413 })
-    }
+    const t = await getTranslations('files.uploadOutcome')
+    const oversized = () => Response.json({ error: t('oversized', { names: name, more: 0, count: 1, limit: FOREMAN_MAX_UPLOAD_BYTES / MB }) }, { status: 413 })
+    if (size > FOREMAN_MAX_UPLOAD_BYTES) return oversized()
     if (!req.body) return Response.json({ error: 'Expected the file bytes as the request body' }, { status: 400 })
 
     const path = dir ? `${dir}/${name}` : name
     try {
         const bytes = new Uint8Array(await req.arrayBuffer())
-        if (bytes.byteLength > FOREMAN_MAX_UPLOAD_BYTES) {
-            return Response.json({ error: `${name} is over the ${FOREMAN_MAX_UPLOAD_BYTES / MB} MB limit.` }, { status: 413 })
-        }
+        if (bytes.byteLength > FOREMAN_MAX_UPLOAD_BYTES) return oversized()
         await uploadPrivateFile(ctx.supabase, FOREMAN_FILES_BUCKET, foremanFileKey(ctx, sessionId, path), bytes, mediaContentType(name) ?? 'application/octet-stream')
         return Response.json({ path, bytes: bytes.byteLength }, { status: 201 })
     } catch (err) {

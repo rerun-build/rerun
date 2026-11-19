@@ -10,14 +10,15 @@ import {
     effectivePolicy,
     humanMayGrant,
     isPublishedAccess,
-    normalizeInvites,
     resolveCoworkerAccess,
     type AccessResolution,
     type EffectivePolicy,
     type PublishedAccess,
 } from '@/lib/published/access'
 import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedRawFileUrl, publishedSiteOrigin, rendersAsPage, slugPrefix, suffixedSlug } from '@/lib/published/host'
+import { normalizeInvites } from '@/lib/published/invites'
 import { hashPassword } from '@/lib/published/password'
+import { AppError } from '@/lib/i18n/action-error'
 import { siteObjectKey } from '@/lib/published/site-path'
 import { htmlTitle } from '@/lib/published/title'
 import { hubBaseUrl } from '@/lib/services/hub'
@@ -244,8 +245,8 @@ function currentAccess(row: AccessRow | null | undefined): AccessResolution | un
 async function accessFields(next: AccessResolution, input: AccessInput, existing?: AccessRow | null): Promise<AccessFields> {
     const invited = input.invite ? normalizeInvites(input.invite) : (existing?.invited ?? [])
     const passwordHash = input.password ? await hashPassword(input.password) : (existing?.password_hash ?? null)
-    if (next.access === 'invited' && invited.length === 0) throw new Error('Name at least one email or @domain to invite.')
-    if (next.access === 'password' && !passwordHash) throw new Error('Give a password for a password-protected link.')
+    if (next.access === 'invited' && invited.length === 0) throw new AppError('inviteSomeoneFirst')
+    if (next.access === 'password' && !passwordHash) throw new AppError('passwordRequiredForLink')
 
     const changed = !existing || existing.access !== next.access || !!input.password || !sameEntries(invited, existing.invited)
     const version = existing ? existing.access_version + (changed ? 1 : 0) : 1
@@ -352,7 +353,7 @@ export async function unpublishFile(agentId: string, ident: { path?: string; slu
     const supabase = createServiceRoleClient()
     const filters = slug ? { agent_id: agentId, slug } : { agent_id: agentId, source_path: path as string }
     const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', REMOVAL_COLUMNS, filters)
-    if (!rowData) throw new Error(slug ? `No published file with slug: ${slug}` : `No published file for path: ${path}`)
+    if (!rowData) throw slug ? new AppError('publishedSlugNotFound', { slug }) : new AppError('publishedPathNotFound', { path: path as string })
 
     await removePublished(supabase, rowData)
     return { status: 'unpublished', slug: rowData.slug, path: rowData.source_path }
@@ -362,7 +363,7 @@ export async function unpublishFile(agentId: string, ident: { path?: string; slu
 export async function unpublishInWorkspace(workspaceId: number, slug: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', REMOVAL_COLUMNS, { workspace_id: workspaceId, slug })
-    if (!rowData) throw new Error('This link no longer exists')
+    if (!rowData) throw new AppError('publishedLinkGone')
     await removePublished(supabase, rowData)
 }
 
@@ -373,17 +374,17 @@ export type AccessChange = AccessInput & { access: PublishedAccess }
 export async function updatePublishedAccess(workspaceId: number, slug: string, change: AccessChange): Promise<PublishedFile> {
     const supabase = createServiceRoleClient()
     const { data: row } = await selectMaybeSingle(supabase, 'published_files', ['id', ...ACCESS_COLUMNS] as const, { workspace_id: workspaceId, slug })
-    if (!row) throw new Error('This link no longer exists')
+    if (!row) throw new AppError('publishedLinkGone')
 
     const policy = await workspacePublishPolicy(workspaceId)
-    if (!humanMayGrant(policy, change.access)) throw new Error('Public links are turned off for this workspace.')
+    if (!humanMayGrant(policy, change.access)) throw new AppError('publicLinksOff')
 
     const fields = await accessFields({ access: change.access, requestedAccess: null }, change, row)
     const { error } = await supabase.from('published_files').update<PublishedUpdate>(fields).eq('id', row.id)
-    if (error) throw new Error(`Failed to update the link: ${error.message}`)
+    if (error) throw new AppError('updateLinkFailedBecause', { message: error.message })
 
     const updated = await getPublishedInWorkspace(workspaceId, slug)
-    if (!updated) throw new Error('This link no longer exists')
+    if (!updated) throw new AppError('publishedLinkGone')
     return updated
 }
 
@@ -394,7 +395,7 @@ export async function dismissAccessRequest(workspaceId: number, slug: string): P
         .update<PublishedUpdate>({ requested_access: null })
         .eq('workspace_id', workspaceId)
         .eq('slug', slug)
-    if (error) throw new Error(`Failed to update the link: ${error.message}`)
+    if (error) throw new AppError('updateLinkFailedBecause', { message: error.message })
 }
 
 // Turning public links off for the workspace closes the ones already open: they go back to the

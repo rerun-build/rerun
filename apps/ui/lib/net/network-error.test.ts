@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { describeSignInError, isNetworkFailure } from './network-error'
+import { isNetworkFailure, signInRefusal } from './network-error'
 
 const named = (name: string) => Object.assign(new Error(name), { name })
 
@@ -17,15 +17,16 @@ describe('isNetworkFailure', () => {
     })
 })
 
-describe('describeSignInError', () => {
+describe('signInRefusal', () => {
     it('replaces a network failure with a sentence', () => {
-        const message = describeSignInError(new TypeError('fetch failed'), 'Failed to start OAuth')
-        expect(message).not.toContain('fetch failed')
-        expect(message).toMatch(/try again/i)
+        const refusal = signInRefusal(new TypeError('fetch failed'), 'startOAuthFailed')
+        expect(refusal.error).not.toContain('fetch failed')
+        expect(refusal.error).toMatch(/try again/i)
+        expect(refusal.code).toBe('signInServiceUnreachable')
     })
 
     it('keeps any other message, and the fallback for a non-error', () => {
-        expect(describeSignInError(new Error('this server does not advertise an OAuth authorization server'), 'x')).toBe('this server does not advertise an OAuth authorization server')
-        expect(describeSignInError('nope', 'Failed to start OAuth')).toBe('Failed to start OAuth')
+        expect(signInRefusal(new Error('this server does not advertise an OAuth authorization server'), 'startOAuthFailed').error).toBe('this server does not advertise an OAuth authorization server')
+        expect(signInRefusal('nope', 'startOAuthFailed')).toEqual({ error: 'Failed to start OAuth', code: 'startOAuthFailed' })
     })
 })

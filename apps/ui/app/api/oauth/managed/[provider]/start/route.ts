@@ -3,7 +3,8 @@ import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, type ManagedOAuthContext, buildManagedAuthorizeUrl, createPkceState, encodeManagedContext, managedCallbackUrl } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
-import { describeSignInError } from '@/lib/net/network-error'
+import { signInRefusal } from '@/lib/net/network-error'
+import { refusal } from '@/lib/i18n/action-error'
 import { NextResponse } from 'next/server'
 
 // Begin the managed OAuth flow: build the authorize URL for Rerun's own client and stash the
@@ -12,7 +13,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
     try {
         const { provider: providerId } = await params
         const provider = getManagedProvider(providerId)
-        if (!provider) return NextResponse.json({ error: `Unknown provider: ${providerId}` }, { status: 404 })
+        if (!provider) return NextResponse.json(refusal('unknownOAuthProvider', { provider: providerId }), { status: 404 })
 
         const body = (await req.json()) as { agentId: string; key?: string; slug?: string; serverName?: string }
         const { agentId } = body
@@ -24,10 +25,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
         const entry = resolveRegistryEntry(await readRegistry(conn, engineAgentId), key)?.entry
         const serverName = entry?.managed?.serverName || body.serverName
-        if (!serverName) return NextResponse.json({ error: `${key} has no ${provider.label} connection to set up.` }, { status: 400 })
+        if (!serverName) return NextResponse.json(refusal('noProviderConnectionToSetUp', { key, provider: provider.label }), { status: 400 })
 
         const clientId = process.env[provider.oauth.clientIdEnv]
-        if (!clientId) return NextResponse.json({ error: `${provider.label} is not configured on this server.` }, { status: 400 })
+        if (!clientId) return NextResponse.json(refusal('providerNotConfigured', { provider: provider.label }), { status: 400 })
 
         const { verifier, challenge, state } = createPkceState()
         const ctx: ManagedOAuthContext = {
@@ -49,6 +50,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
         })
         return res
     } catch (err) {
-        return NextResponse.json({ error: describeSignInError(err, 'Failed to start OAuth') }, { status: 400 })
+        return NextResponse.json(signInRefusal(err, 'startOAuthFailed'), { status: 400 })
     }
 }

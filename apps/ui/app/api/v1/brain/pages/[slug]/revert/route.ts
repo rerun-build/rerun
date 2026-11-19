@@ -8,5 +8,5 @@ export const dynamic = 'force-dynamic'
 // changed again since.
 export const POST = apiRoute({ auth: 'member', body: brainRevertRequestSchema }, async ({ params, body }) => {
     const reverted = await revertBrainPageAction(params.slug, body.revisionId, body.expectedHash)
-    if (!reverted.ok) throw new ApiError(reverted.conflict ? 409 : 503, reverted.error)
+    if (!reverted.ok) throw new ApiError(reverted.conflict ? 409 : 503, reverted)
 })

@@ -6,7 +6,8 @@ import { composioConfigured, initiateConnectedAccount } from '@/lib/composio/cli
 import { composioUserForKey } from '@/lib/vault/composio'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, composioCallbackUrl, createComposioState, encodeComposioContext } from '@/lib/composio/oauth'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
-import { describeSignInError } from '@/lib/net/network-error'
+import { signInRefusal } from '@/lib/net/network-error'
+import { refusal } from '@/lib/i18n/action-error'
 import { NextResponse } from 'next/server'
 
 // Begin a Composio connect flow: ask Composio for a hosted sign-in link scoped to a
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
         const key = body.key ?? body.slug ?? ''
         const { actor } = await assertAgentAccess(agentId, 'manage')
 
-        if (!composioConfigured()) return NextResponse.json({ error: 'Composio connections are not configured on this server.' }, { status: 400 })
+        if (!composioConfigured()) return NextResponse.json(refusal('composioNotConfigured'), { status: 400 })
 
         const { instanceId } = parseServiceRegistryKey(key)
         const manifest = await loadManifest(key)
@@ -29,12 +30,12 @@ export async function POST(req: Request) {
         const entry = resolveRegistryEntry(await readRegistry(conn, engineAgentId), key)?.entry
         const serverName = entry?.composio?.serverName ?? (instanceId ? undefined : method?.mcpServers[0]?.name)
         if (!manifest || !method?.composio || !serverName) {
-            return NextResponse.json({ error: `${key} has no Composio connection to set up.` }, { status: 400 })
+            return NextResponse.json(refusal('noProviderConnectionToSetUp', { key, provider: 'Composio' }), { status: 400 })
         }
         // A self-hosted install ships the catalog without Rerun Cloud's auth configs: each one is created in
         // Composio and its id written on the service before the app can connect.
         if (!method.composio.authConfigId) {
-            return NextResponse.json({ error: `${manifest.name} needs a Composio auth config: create one for ${method.composio.toolkit} in Composio and set its id on the service.` }, { status: 400 })
+            return NextResponse.json(refusal('composioAuthConfigMissing', { name: manifest.name, toolkit: method.composio.toolkit }), { status: 400 })
         }
 
         const state = createComposioState()
@@ -59,6 +60,6 @@ export async function POST(req: Request) {
         })
         return res
     } catch (err) {
-        return NextResponse.json({ error: describeSignInError(err, 'Failed to start the connection') }, { status: 400 })
+        return NextResponse.json(signInRefusal(err, 'startConnectionFailed'), { status: 400 })
     }
 }

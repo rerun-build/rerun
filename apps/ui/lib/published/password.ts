@@ -1,4 +1,5 @@
 import { randomBytes, scrypt, timingSafeEqual, type ScryptOptions } from 'node:crypto'
+import { AppError } from '@/lib/i18n/action-error'
 
 const KEY_LENGTH = 32
 const SCRYPT_COST = 16_384
@@ -14,8 +15,8 @@ function derive(password: string, salt: Buffer, options: ScryptOptions): Promise
 }
 
 export function validatePassword(password: string): string {
-    if (password.length < MIN_PASSWORD_LENGTH) throw new Error(`Use at least ${MIN_PASSWORD_LENGTH} characters for the password.`)
-    if (password.length > MAX_PASSWORD_LENGTH) throw new Error(`Keep the password under ${MAX_PASSWORD_LENGTH} characters.`)
+    if (password.length < MIN_PASSWORD_LENGTH) throw new AppError('passwordTooShort', { min: MIN_PASSWORD_LENGTH })
+    if (password.length > MAX_PASSWORD_LENGTH) throw new AppError('passwordTooLong', { max: MAX_PASSWORD_LENGTH })
     return password
 }
 

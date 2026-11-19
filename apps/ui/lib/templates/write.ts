@@ -7,10 +7,11 @@ import { resolveAgentConnectors } from './connectors'
 import { documentToRow } from './document'
 import { describeSecretHit, scanDocumentForSecrets } from './secret-scan'
 import { submitRequirementLabel } from './submit'
+import { refusal, type ActionRefusal } from '@/lib/i18n/action-error'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import { renderTemplateCard } from './card-render'
 
-export type TemplateWriteResult = { ok: true; slug: string; warnings: string[] } | { ok: false; status: number; error: string }
+export type TemplateWriteResult = { ok: true; slug: string; warnings: string[] } | ({ ok: false; status: number } & ActionRefusal)
 
 // `currentSlug` is the row the caller is about to write: a template keeps its own slug instead
 // of being pushed to `-2` every time its metadata is regenerated.
@@ -74,7 +75,7 @@ export async function createTemplate(supabase: SupabaseClient<Database>, doc: Te
 
     const { data: clash, error: readError } = await selectMaybeSingle(supabase, 'templates', ['id'] as const, { slug: doc.slug })
     if (readError) return { ok: false, status: 500, error: readError.message }
-    if (clash) return { ok: false, status: 409, error: `A template with slug "${doc.slug}" already exists` }
+    if (clash) return { ok: false, status: 409, ...refusal('templateSlugTaken', { slug: doc.slug }) }
 
     const { error } = await supabase
         .from('templates')
@@ -98,14 +99,14 @@ export async function updateTemplateBySlug(
 ): Promise<TemplateWriteResult> {
     const { data: existing, error: readError } = await selectMaybeSingle(supabase, 'templates', ['id', 'slug', 'category', 'published_at'] as const, { slug })
     if (readError) return { ok: false, status: 500, error: readError.message }
-    if (!existing) return { ok: false, status: 404, error: `No template found with slug "${slug}"` }
+    if (!existing) return { ok: false, status: 404, ...refusal('templateSlugNotFound', { slug }) }
 
     const built = await buildRow(supabase, doc)
     if (!built.ok) return { ok: false, status: 400, error: built.error }
 
     if (doc.slug !== slug) {
         const { data: clash } = await selectMaybeSingle(supabase, 'templates', ['id'] as const, { slug: doc.slug })
-        if (clash) return { ok: false, status: 409, error: `A template with slug "${doc.slug}" already exists` }
+        if (clash) return { ok: false, status: 409, ...refusal('templateSlugTaken', { slug: doc.slug }) }
     }
 
     const published_at = isPublicStatus(doc.status) ? (existing.published_at ?? new Date().toISOString()) : null

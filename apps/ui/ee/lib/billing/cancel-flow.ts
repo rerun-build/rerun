@@ -10,7 +10,8 @@ export const CANCEL_REASONS = ['too_expensive', 'unused', 'too_complex', 'low_qu
 export type CancelReason = (typeof CANCEL_REASONS)[number]
 
 // What the customer writes about why they leave, checked the same way in the dialog and on the server.
-export const cancelReasonTextSchema = z.string().trim().min(1, 'Tell us in a few words why you are leaving.').max(1000, 'Keep it under 1,000 characters.')
+// Its messages are codes of the `errors` namespace, so the action sends the refusal translated.
+export const cancelReasonTextSchema = z.string().trim().min(1, 'cancelReasonRequired').max(1000, 'cancelReasonTooLong')
 
 // What each reason covers, for the model that files a customer's own words under one of them.
 export const CANCEL_REASON_GLOSS: Record<CancelReason, string> = {

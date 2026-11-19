@@ -64,8 +64,9 @@ type UploadCopy = ReturnType<typeof useTranslations<'files.uploadOutcome'>>
 
 function uploadErrorText(err: unknown, t: UploadCopy): string {
     if (err instanceof UploadHttpError) {
+        if (err.status === 401) return t('sessionExpired')
         if (err.serverMessage) return err.serverMessage
-        if (err.status === 401 || err.status === 403) return t('sessionExpired')
+        if (err.status === 403) return t('sessionExpired')
         return err.status === 413 ? t('tooLarge') : t('retryLater')
     }
     if (err instanceof UploadNetworkError) return t('networkFailed')

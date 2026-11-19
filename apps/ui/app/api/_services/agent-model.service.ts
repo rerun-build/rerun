@@ -3,6 +3,7 @@ import { actorFromContext, type AccessLevel } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
 import { ApiError } from '@/lib/api-error'
+import { refusal } from '@/lib/i18n/action-error'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
 import { connectionGroups } from '@/lib/engine/model-groups'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
@@ -48,6 +49,6 @@ export async function setAgentModel(ctx: WorkspaceContext, agentId: string, choi
         return
     }
     const connection = (await listConnections(conn)).connections.find(entry => entry.id === choice.connectionId && entry.connected)
-    if (!connection) throw new ApiError(400, 'This connection is not available on the machine')
+    if (!connection) throw new ApiError(400, refusal('connectionNotOnMachine'))
     await enginePatchAgent(conn, engineAgentId, { connectionId: connection.id, provider: connection.provider, model: choice.model })
 }

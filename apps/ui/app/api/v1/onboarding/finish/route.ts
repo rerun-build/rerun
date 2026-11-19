@@ -7,5 +7,5 @@ export const dynamic = 'force-dynamic'
 // owes them its first words.
 export const POST = apiRoute({ auth: 'admin' }, async () => {
     const finished = await finishWelcomeAction()
-    if (!finished.ok) throw new ApiError(503, finished.error)
+    if (!finished.ok) throw new ApiError(503, finished)
 })

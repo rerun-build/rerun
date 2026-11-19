@@ -112,7 +112,7 @@ describe('POST /api/mcp/oauth/start', () => {
         const res = await start({})
 
         expect(res.status).toBe(400)
-        expect(await res.json()).toEqual({ error: 'Coworker not found' })
+        expect(await res.json()).toEqual({ error: 'Coworker not found', code: 'coworkerNotFound' })
         expect(res.cookies.getAll()).toEqual([])
         expect(fetchMock).not.toHaveBeenCalled()
     })
@@ -123,7 +123,7 @@ describe('POST /api/mcp/oauth/start', () => {
         const res = await start({})
 
         expect(res.status).toBe(400)
-        expect(await res.json()).toEqual({ error: 'Only an admin or a manager of this Box can do this' })
+        expect(await res.json()).toEqual({ error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(res.cookies.getAll()).toEqual([])
         expect(fetchMock).not.toHaveBeenCalled()
     })
@@ -143,7 +143,7 @@ describe('POST /api/mcp/oauth/start', () => {
         const res = await start({})
 
         expect(res.status).toBe(400)
-        expect(await res.json()).toEqual({ error: 'No OAuth client available for this provider' })
+        expect(await res.json()).toEqual({ error: 'No OAuth client available for this provider', code: 'noOAuthClient' })
         expect(res.cookies.getAll()).toEqual([])
     })
 

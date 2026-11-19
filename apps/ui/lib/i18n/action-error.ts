@@ -1,6 +1,7 @@
 import type { Messages } from '@rerun/i18n/messages'
 import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
 import { createTranslator } from 'use-intl'
+import { ZodError } from 'zod'
 
 // A refusal a server action sends back to the screen: a key of the `errors` namespace the screen
 // translates, and the English text for the logs and the clients that predate the codes (the iOS app).
@@ -31,6 +32,8 @@ export class AppError extends Error {
 
 export function failureOf(err: unknown, fallback: ErrorCode = 'generic'): ActionFailure {
     if (err instanceof AppError) return failure(err.code, err.params)
+    const zodCode = err instanceof ZodError ? err.issues.map(issue => issue.message).find(isErrorCode) : undefined
+    if (zodCode) return failure(zodCode)
     return { ok: false, error: err instanceof Error ? err.message : english(fallback), code: err instanceof Error ? undefined : fallback }
 }
 

@@ -7,6 +7,7 @@ import { chat as engineChat, getAgent as engineGetAgent } from '@/lib/engine/cli
 import type { EngineConnection } from '@/lib/engine/types'
 import { buildInstallMessage, installSessionTitle } from '@/lib/chat/install-marker'
 import { preferredLanguage } from '@/lib/foreman/language'
+import { refusalOf, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { requireString } from '@/lib/mcp/args'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { headers } from 'next/headers'
@@ -25,7 +26,7 @@ import { headers } from 'next/headers'
 
 type Handoff = { agentId: string; message: string }
 
-export type HandoffResult = { agentId: string; started: boolean; inactive?: boolean; conversationId?: string | null; runId?: string | null; ranItsOwnInstall?: boolean; error?: string }
+export type HandoffResult = { agentId: string; started: boolean; inactive?: boolean; conversationId?: string | null; runId?: string | null; ranItsOwnInstall?: boolean; error?: string; code?: ErrorCode; params?: ErrorParams }
 
 function handoff(raw: unknown): Handoff {
     const value = (raw ?? {}) as Record<string, unknown>
@@ -99,7 +100,7 @@ async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean
 
         return { agentId, started: true, conversationId, runId, ranItsOwnInstall: written.ranItsOwnInstall }
     } catch (err) {
-        return { agentId, started: false, error: err instanceof Error ? err.message : 'The coworker could not be reached.' }
+        return { agentId, started: false, ...refusalOf(err, 'coworkerCouldNotBeReached') }
     }
 }
 
