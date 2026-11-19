@@ -41,6 +41,7 @@ class Doctor(unittest.TestCase):
 
     def run_doctor(self, code="200", token="factory-token\n", token_at=None):
         env = dict(os.environ, PATH=os.path.join(self.tmp, "bin") + os.pathsep + os.environ["PATH"], DOCTOR_WAIT_S="0",
+                   DOCTOR_SINCE="2026-11-19T00:00:30Z",
                    CURL_CODE=code, LOGS=os.path.join(self.tmp, "logs"), TOKEN_SERVICE=token,
                    TOKEN_AT=str(int(time.time()) - 60 if token_at is None else token_at))
         p = subprocess.run([SH, "deploy/vps/doctor.sh"], cwd=self.tmp, capture_output=True, text=True, env=env, timeout=60)
@@ -58,6 +59,15 @@ class Doctor(unittest.TestCase):
         self.assertEqual(self.run_doctor(), 1)
         self.assertIn("FAIL dispatcher", self.out)
         self.assertIn("HTTP 308", self.out)
+
+    def test_an_error_from_before_the_check_started_is_not_counted(self):
+        self.write("logs", "factory-dispatcher-1  | 2026-11-19T00:00:10Z #1406 send raised: account send_message failed: HTTP 401\n" + BEAT)
+        self.assertEqual(self.run_doctor(), 0, self.out)
+
+    def test_a_beat_from_before_the_check_started_is_not_enough(self):
+        self.write("logs", "factory-dispatcher-1  | 2026-11-19T00:00:10Z beat 2 | waiting 1, queued 0\n")
+        self.assertEqual(self.run_doctor(), 1)
+        self.assertIn("FAIL dispatcher", self.out)
 
     def test_a_dispatcher_with_no_beat_fails(self):
         self.write("logs", "")
