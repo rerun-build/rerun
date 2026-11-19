@@ -18,7 +18,7 @@ describe('decideNavigation', () => {
     it('treats a look-alike host or another port as another site', () => {
         expect(decideNavigation('https://moldwright.robagentic.tech.evil.com/', SERVER)).toBe('external')
         expect(decideNavigation('https://moldwright.robagentic.tech:8443/', SERVER)).toBe('external')
-        expect(decideNavigation('https://moldwright.robagentic.tech/', SERVER)).toBe('external')
+        expect(decideNavigation('http://moldwright.robagentic.tech/', SERVER)).toBe('external')
     })
 
     it('goes nowhere for local files, scripts and other apps’ schemes', () => {

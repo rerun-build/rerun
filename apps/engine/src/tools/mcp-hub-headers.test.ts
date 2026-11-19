@@ -35,7 +35,7 @@ describe('isHubMcpUrl', () => {
     })
 
     it('rejects a scheme downgrade on the same host', () => {
-        expect(isHubMcpUrl('https://moldwright.robagentic.tech/api/mcp/composio/gmail', HUB)).toBe(false)
+        expect(isHubMcpUrl('http://moldwright.robagentic.tech/api/mcp/composio/gmail', HUB)).toBe(false)
     })
 
     it('rejects another route of the same host', () => {
@@ -51,7 +51,7 @@ describe('isHubMcpUrl', () => {
     })
 
     it('normalises host casing and the default port', () => {
-        expect(isHubMcpUrl('https://APP.Rerun.Build/api/mcp/composio/gmail', HUB)).toBe(true)
+        expect(isHubMcpUrl('https://MOLDWRIGHT.Robagentic.Tech/api/mcp/composio/gmail', HUB)).toBe(true)
         expect(isHubMcpUrl(`https://moldwright.robagentic.tech:443/api/mcp/composio/gmail`, HUB)).toBe(true)
     })
 
