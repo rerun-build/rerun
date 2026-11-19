@@ -57,7 +57,7 @@ describe('chat cache', () => {
     it('hands back the transcript kept for a conversation, and nothing for another workspace', () => {
         saveTranscript(7, 's1', [message('a')])
 
-        expect(readTranscript(7, 's1')).toEqual([message('a')])
+        expect(readTranscript(7, 's1')?.messages).toEqual([message('a')])
         expect(readTranscript(8, 's1')).toBeNull()
     })
 
@@ -65,8 +65,8 @@ describe('chat cache', () => {
         saveTranscript(7, 's1', Array.from({ length: 250 }, (_, index) => message(`m${index}`)))
 
         const kept = readTranscript(7, 's1')
-        expect(kept).toHaveLength(200)
-        expect(kept?.[0].id).toBe('m50')
+        expect(kept?.messages).toHaveLength(200)
+        expect(kept?.messages[0].id).toBe('m50')
     })
 
     it('lets the least recently opened conversations go first', () => {
@@ -77,21 +77,41 @@ describe('chat cache', () => {
     })
 
     it('reads a conversation once while a read is on its way, and keeps the answer', async () => {
-        const fetchMessages = jest.fn(async () => [message('a')])
+        const fetchMessages = jest.fn(async () => ({ messages: [message('a')], etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' }))
 
         const [first, second] = await Promise.all([loadTranscript(7, 's1', fetchMessages), loadTranscript(7, 's1', fetchMessages)])
 
         expect(fetchMessages).toHaveBeenCalledTimes(1)
         expect(first).toBe(second)
-        expect(readTranscript(7, 's1')).toEqual([message('a')])
+        expect(readTranscript(7, 's1')).toEqual({ messages: [message('a')], etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
+    })
+
+    // The hub reads the conversation again, the body stays there: the copy on the phone is the transcript.
+    it('names the transcript it keeps to the hub, and keeps it when the hub says it has not changed', async () => {
+        saveTranscript(7, 's1', [message('a')], { etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
+        const fetchMessages = jest.fn(async () => ({ messages: null, etag: '"v1"', updatedAt: '2026-11-19T08:05:00Z' }))
+
+        const loaded = await loadTranscript(7, 's1', fetchMessages)
+
+        expect(fetchMessages).toHaveBeenCalledWith('"v1"')
+        expect(loaded).toEqual({ messages: [message('a')], unchanged: true, updatedAt: '2026-11-19T08:05:00Z' })
+        expect(readTranscript(7, 's1')?.updatedAt).toBe('2026-11-19T08:05:00Z')
+    })
+
+    it('names nothing for a transcript cut to its end, nor for one kept by an older app', async () => {
+        saveTranscript(7, 's1', Array.from({ length: 250 }, (_, index) => message(`m${index}`)), { etag: '"v1"', updatedAt: null })
+        expect(readTranscript(7, 's1')?.etag).toBeNull()
+
+        mockDisk.set('transcript-7-s2.json', { text: JSON.stringify({ v: 1, value: [message('a')] }), writtenAt: 1 })
+        expect(readTranscript(7, 's2')).toEqual({ messages: [message('a')], etag: null, updatedAt: null })
     })
 
     it('drops a read that lands after a sign-out', async () => {
-        let answer: (messages: UIMessage[]) => void = () => {}
+        let answer: (read: { messages: UIMessage[]; etag: null; updatedAt: null }) => void = () => {}
         const loading = loadTranscript(7, 's1', () => new Promise(resolve => (answer = resolve)))
 
         clearLocalCache()
-        answer([message('a')])
+        answer({ messages: [message('a')], etag: null, updatedAt: null })
         await loading
 
         expect(readTranscript(7, 's1')).toBeNull()

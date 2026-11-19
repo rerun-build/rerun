@@ -20,7 +20,9 @@ const GRACE_MARGIN_S = 5
 // chat across that birth instead of starting over.
 // `onRefused` gets back a message the engine turned down because a run still held the conversation,
 // so it can wait for that run rather than vanish.
-export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
+// `knownUpdatedAt`: the version of the conversation in the list the app holds. A transcript kept at
+// that same version is the hub's own: the conversation opens on it ready to act on.
+export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = null, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; knownUpdatedAt?: string | null; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
     const { session, me } = useAuth()
     const callerRef = useRef<ChatCaller | null>(null)
     const sessionRef = useRef(initialSessionId)
@@ -36,8 +38,10 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
     const [cached] = useState(() => (initialSessionId && me ? readTranscript(me.workspace.id, initialSessionId) : null))
     const [history, setHistory] = useState<HistoryState>(initialSessionId && !cached ? 'loading' : 'ready')
     // False while what is on screen is only the kept transcript: nothing that acts on the run's
-    // current state (a question to answer, quick replies) is offered on it.
-    const [fresh, setFresh] = useState(!initialSessionId)
+    // current state (a question to answer, quick replies) is offered on it, unless it was kept at the
+    // version the list of conversations names.
+    const [read, setRead] = useState(!initialSessionId)
+    const fresh = read || (!!cached?.updatedAt && cached.updatedAt === knownUpdatedAt)
     const [pageId] = useState(() => initialSessionId ?? `new-${endpoints.agentId}-${Date.now()}`)
     // When the run on screen began, for the timer under the last message.
     const [runStartedAt, setRunStartedAt] = useState(() => Date.now())
@@ -58,7 +62,7 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
     // eslint-disable-next-line react-hooks/refs
     const [transport] = useState(() => createChatTransport({ endpoints, sessionRef, runRef, callerRef, onSessionRef, resumeOntoRef, reconnectFailedRef }))
 
-    const chat = useChat({ id: pageId, transport, messages: cached ?? undefined, experimental_throttle: 80 })
+    const chat = useChat({ id: pageId, transport, messages: cached?.messages, experimental_throttle: 80 })
     const { setMessages, resumeStream, status, stop: dropStream, clearError } = chat
     const shownRef = useRef(chat.messages)
     const statusRef = useRef(status)
@@ -81,13 +85,15 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
             if (!caller || !id) return
             // The running run is looked up while the transcript loads; the stream is only picked up
             // once the transcript is in place, since it goes on from the messages already there.
-            const [messages, runId] = await Promise.all([loadTranscript(caller.workspaceId, id, () => endpoints.messages(caller, id)), resume ? endpoints.activeRun(caller, id).catch(() => null) : null])
+            const [transcript, runId] = await Promise.all([loadTranscript(caller.workspaceId, id, etag => endpoints.messages(caller, id, etag)), resume ? endpoints.activeRun(caller, id).catch(() => null) : null])
             setHistory('ready')
-            setFresh(true)
+            setRead(true)
             // A send left while the read was on its way: the hub's copy predates it, and the stream
             // on screen is already the one to follow. The end of that run reads the transcript again.
             if (statusRef.current === 'submitted' || statusRef.current === 'streaming') return
-            if (!sameTranscript(messages, shownRef.current)) setMessages(messages)
+            // The hub's copy is the one kept, already on screen unless a stream wrote over it since.
+            const { messages, unchanged } = transcript
+            if (!(unchanged && messages === cached?.messages) && !sameTranscript(messages, shownRef.current)) setMessages(messages)
             if (!runId) return
             runRef.current = runId
             setRunStartedAt(Date.now())

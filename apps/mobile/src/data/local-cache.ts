@@ -23,7 +23,7 @@ const familyOf = (key: string) => key.slice(0, key.indexOf('-') + 1)
 // A key read and found nowhere, so a screen asking at each render does not go to the disk each time.
 const MISSING = Symbol('missing')
 const memory = new Map<string, unknown>()
-const inFlight = new Map<string, Promise<UIMessage[]>>()
+const inFlight = new Map<string, Promise<TranscriptLoad>>()
 // Moves on at each sign-out: a write or a read still on its way from before is dropped.
 let generation = 0
 
@@ -180,25 +180,47 @@ export function loadCoworkerDetail<K extends keyof CoworkerDetailsRead>(workspac
 const transcriptKey = (workspaceId: number, sessionId: string) => `transcript-${workspaceId}-${sessionId}`
 const coworkerKey = (workspaceId: number, agentId: string) => `coworker-${workspaceId}-${agentId}`
 
-export function readTranscript(workspaceId: number, sessionId: string): UIMessage[] | null {
-    return read<UIMessage[]>(transcriptKey(workspaceId, sessionId))
+// A transcript as the hub last sent it: `etag` names it to the hub, `updatedAt` is the version of the
+// conversation it was read at. Both null for one streamed on the phone, or kept by an app older than them.
+export type KeptTranscript = { messages: UIMessage[]; etag: string | null; updatedAt: string | null }
+
+function parseTranscript(value: unknown): KeptTranscript {
+    if (Array.isArray(value)) return { messages: value as UIMessage[], etag: null, updatedAt: null }
+    const { messages, etag, updatedAt } = fieldsOf(value)
+    if (!Array.isArray(messages)) throw new Error('not a transcript')
+    return { messages: messages as UIMessage[], etag: typeof etag === 'string' ? etag : null, updatedAt: typeof updatedAt === 'string' ? updatedAt : null }
 }
 
-export function saveTranscript(workspaceId: number, sessionId: string, messages: UIMessage[]) {
-    write(transcriptKey(workspaceId, sessionId), messages.slice(-MESSAGE_LIMIT))
+export function readTranscript(workspaceId: number, sessionId: string): KeptTranscript | null {
+    return read(transcriptKey(workspaceId, sessionId), parseTranscript)
 }
+
+// Cut to its last messages, a transcript is no longer the one its ETag names.
+export function saveTranscript(workspaceId: number, sessionId: string, messages: UIMessage[], version: { etag: string | null; updatedAt: string | null } = { etag: null, updatedAt: null }) {
+    const cut = messages.length > MESSAGE_LIMIT
+    write(transcriptKey(workspaceId, sessionId), { messages: messages.slice(-MESSAGE_LIMIT), etag: cut ? null : version.etag, updatedAt: version.updatedAt })
+}
+
+export type TranscriptLoad = { messages: UIMessage[]; unchanged: boolean; updatedAt: string | null }
 
 // One read per conversation at a time: the row touched on the home starts it, the page opening
-// behind takes the same answer instead of asking again.
-export function loadTranscript(workspaceId: number, sessionId: string, fetchMessages: () => Promise<UIMessage[]>): Promise<UIMessage[]> {
+// behind takes the same answer instead of asking again. The transcript kept is named to the hub,
+// which answers that it has not changed rather than sending it all again.
+export function loadTranscript(workspaceId: number, sessionId: string, fetchMessages: (etag: string | null) => Promise<{ messages: UIMessage[] | null; etag: string | null; updatedAt: string | null }>): Promise<TranscriptLoad> {
     const key = transcriptKey(workspaceId, sessionId)
     const pending = inFlight.get(key)
     if (pending) return pending
     const askedFor = generation
-    const loading = fetchMessages()
-        .then(messages => {
-            if (askedFor === generation) saveTranscript(workspaceId, sessionId, messages)
-            return messages
+    const kept = readTranscript(workspaceId, sessionId)
+    const loading = fetchMessages(kept?.etag ?? null)
+        .then((answer): TranscriptLoad => {
+            if (answer.messages === null && kept) {
+                if (askedFor === generation && answer.updatedAt !== kept.updatedAt) saveTranscript(workspaceId, sessionId, kept.messages, { etag: kept.etag, updatedAt: answer.updatedAt })
+                return { messages: kept.messages, unchanged: true, updatedAt: answer.updatedAt }
+            }
+            const messages = answer.messages ?? []
+            if (askedFor === generation) saveTranscript(workspaceId, sessionId, messages, answer)
+            return { messages, unchanged: false, updatedAt: answer.updatedAt }
         })
         .finally(() => inFlight.delete(key))
     inFlight.set(key, loading)

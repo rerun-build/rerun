@@ -171,4 +171,8 @@ export const inboxSchema = z.object({
 })
 export type Inbox = z.infer<typeof inboxSchema>
 
+// On a conversation's transcript: the time its session last changed when the transcript was read.
+// Equal to the `updatedAt` of the conversation in a list read later, the transcript has not moved since.
+export const TRANSCRIPT_UPDATED_AT_HEADER = 'x-conversation-updated-at'
+
 export const activeRunSchema =z.object({ runId: z.string().nullable() })

@@ -203,7 +203,7 @@ export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel
     return agent.workspace_id
 }
 
-type OwnedSession = { id: string; agent_id: string; engine_session_id: string | null; engine_agent_id: string | null }
+type OwnedSession = { id: string; agent_id: string; engine_session_id: string | null; engine_agent_id: string | null; updated_at: string }
 
 // Asserts a session belongs to an agent the caller can use (session -> agent -> Box), mirroring the
 // RLS policy on sessions. The session, its agent and its Box come back in one read. `actor` is
@@ -212,14 +212,14 @@ export async function assertSessionInWorkspace(sessionId: string, actor?: Promis
     const [callerActor, session] = await Promise.all([actor ?? requireLightSessionActor(), readSessionWithAgent(sessionId)])
     if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
     if (!hasAccess(await readSpaceAccess(callerActor, session.agent.space_id), 'use')) throw new AuthorizationError('sessionNotFound')
-    return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id }
+    return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id, updated_at: session.updated_at }
 }
 
 async function readSessionWithAgent(sessionId: string) {
     const { data } = await selectMaybeSingleWithJoins(
         createServiceRoleClient(),
         'sessions',
-        ['id', 'agent_id', 'engine_session_id'] as const,
+        ['id', 'agent_id', 'engine_session_id', 'updated_at'] as const,
         // Named, because origin_agent_id points at agents too.
         { agent: { table: 'agents', foreignKey: 'agents!sessions_agent_id_fkey', columns: ['workspace_id', 'space_id', 'engine_agent_id'] } } as const,
         { id: sessionId },

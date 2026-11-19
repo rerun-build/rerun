@@ -8,6 +8,9 @@ import { fetchForemanActiveRun, fetchForemanMessages, stopForeman } from '@/api/
 
 type Caller = { accessToken: string; workspaceId: number }
 
+// The transcript, or null `messages` when it is still the one named by the `etag` sent.
+export type TranscriptRead = { messages: UIMessage[] | null; etag: string | null; updatedAt: string | null }
+
 // Where one conversation is sent, read back and stopped. A coworker talks through /api/chat and the
 // hub names a new conversation in a header; the Foreman has its own route and is handed the id of
 // the conversation by the app.
@@ -16,7 +19,7 @@ export type ChatEndpoints = {
     sendPath: string
     sendBody: (sessionId: string | null, text: string) => Record<string, unknown>
     bornSessionOf: (response: Response) => string | null
-    messages: (caller: Caller, sessionId: string) => Promise<UIMessage[]>
+    messages: (caller: Caller, sessionId: string, etag: string | null) => Promise<TranscriptRead>
     activeRun: (caller: Caller, sessionId: string) => Promise<string | null>
     stop: (caller: Caller, sessionId: string, runId: string | null) => Promise<void>
     // Where the conversation's uploads go, before its first send included.
@@ -30,7 +33,7 @@ export function coworkerEndpoints(agentId: string, { general = false }: { genera
         sendPath: '/api/chat',
         sendBody: (sessionId, text) => (general && !sessionId ? { agentId, kind: 'general', text } : { agentId, sessionId: sessionId ?? undefined, text }),
         bornSessionOf: response => response.headers.get('X-Session-Id'),
-        messages: async (caller, sessionId) => (await fetchMessages(caller, sessionId)) as UIMessage[],
+        messages: async (caller, sessionId, etag) => (await fetchMessages(caller, sessionId, etag)) as TranscriptRead,
         activeRun: fetchActiveRun,
         stop: (caller, sessionId) => stopConversation(caller, sessionId),
         fileOwner: () => ({ kind: 'agent', agentId }),
@@ -47,7 +50,7 @@ export function foremanEndpoints(filesOnEngine: () => boolean, { general = false
         sendPath: '/api/chat/foreman/engine',
         sendBody: (sessionId, text) => ({ sessionId: sessionId ?? draftId, kind: general ? 'general' : 'thread', text }),
         bornSessionOf: response => (response.ok ? (response.headers.get('X-Session-Id') ?? draftId) : null),
-        messages: async (caller, sessionId) => (await fetchForemanMessages(caller, sessionId)) as UIMessage[],
+        messages: async (caller, sessionId) => ({ messages: (await fetchForemanMessages(caller, sessionId)) as UIMessage[], etag: null, updatedAt: null }),
         activeRun: fetchForemanActiveRun,
         stop: stopForeman,
         fileOwner: sessionId => (filesOnEngine() ? { kind: 'agent', agentId: FOREMAN_AGENT_ID } : { kind: 'foreman', sessionId: sessionId ?? draftId }),

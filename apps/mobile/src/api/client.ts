@@ -67,6 +67,8 @@ export function hubHeaders(clientHeader: string, { accessToken, workspaceId }: P
     return headers
 }
 
+const failureOf = (status: number, payload: unknown) => apiErrorOf(status, payload, translatorFor('mobileCommon')('errors.requestFailed', { status }))
+
 export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetch }: ApiClientConfig) {
     return async function request<T>(path: string, { method = 'GET', body, accessToken, workspaceId, signal }: ApiRequest = {}): Promise<T> {
         const headers: Record<string, string> = { Accept: 'application/json', ...hubHeaders(clientHeader, { accessToken, workspaceId }) }
@@ -76,8 +78,24 @@ export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetc
         if (res.status === 204) return undefined as T
 
         const payload: unknown = await res.json().catch(() => null)
-        if (!res.ok) throw apiErrorOf(res.status, payload, translatorFor('mobileCommon')('errors.requestFailed', { status: res.status }))
+        if (!res.ok) throw failureOf(res.status, payload)
         return payload as T
+    }
+}
+
+// What a read the app may already hold answered: `payload` is null when the hub said it has not
+// changed since `etag` (a 304), and `headers` are the response's.
+export type ConditionalRead<T> = { payload: T | null; etag: string | null; headers: Headers }
+
+export function createConditionalReader({ baseUrl, clientHeader, fetch: fetchImpl = fetch }: ApiClientConfig) {
+    return async function read<T>(path: string, { accessToken, workspaceId, etag }: Pick<ApiRequest, 'accessToken' | 'workspaceId'> & { etag: string | null }): Promise<ConditionalRead<T>> {
+        const headers: Record<string, string> = { Accept: 'application/json', ...hubHeaders(clientHeader, { accessToken, workspaceId }) }
+        if (etag) headers['If-None-Match'] = etag
+        const res = await fetchImpl(`${baseUrl}${path}`, { headers })
+        if (res.status === 304) return { payload: null, etag, headers: res.headers }
+        const payload: unknown = await res.json().catch(() => null)
+        if (!res.ok) throw failureOf(res.status, payload)
+        return { payload: payload as T, etag: res.headers.get('etag'), headers: res.headers }
     }
 }
 
@@ -86,3 +104,5 @@ export const appBuild = Number(Application.nativeBuildVersion ?? 0)
 export const clientHeader = formatClientHeader({ platform: clientPlatform, version: Application.nativeApplicationVersion ?? '0.0.0', build: appBuild })
 
 export const api = createApiClient({ baseUrl: environment.apiUrl, clientHeader })
+
+export const apiConditional = createConditionalReader({ baseUrl: environment.apiUrl, clientHeader })

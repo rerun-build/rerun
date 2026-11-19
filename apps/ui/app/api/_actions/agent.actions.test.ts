@@ -218,7 +218,7 @@ describe('answerSecretRequestAction', () => {
     const pendingRequest = [{ id: 'm1', role: 'assistant', parts: [{ type: 'tool-request_secret', toolCallId: 'call-1', input: { secrets: [{ key: 'API_KEY', label: 'API key' }] } }] }]
 
     beforeEach(() => {
-        mocks.assertSessionInWorkspace.mockResolvedValue({ id: 'session-1', agent_id: AGENT, engine_session_id: 'es-1', engine_agent_id: 'engine-1' })
+        mocks.assertSessionInWorkspace.mockResolvedValue({ id: 'session-1', agent_id: AGENT, engine_session_id: 'es-1', engine_agent_id: 'engine-1', updated_at: '2026-11-19T08:00:00Z' })
         vi.mocked(engine.getSessionMessages).mockResolvedValue(pendingRequest as never)
     })
 

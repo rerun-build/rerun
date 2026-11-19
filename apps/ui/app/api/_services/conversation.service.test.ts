@@ -237,7 +237,7 @@ describe('renameSession', () => {
     function sessions(renamed: { id: string }[] = [{ id: 'session-1' }]) {
         const db = fakeSupabase(() => ({ data: renamed }))
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
-        vi.mocked(assertSessionInWorkspace).mockResolvedValue({ id: 'session-1', agent_id: 'a', engine_session_id: 'engine-1', engine_agent_id: 'engine-agent' })
+        vi.mocked(assertSessionInWorkspace).mockResolvedValue({ id: 'session-1', agent_id: 'a', engine_session_id: 'engine-1', engine_agent_id: 'engine-agent', updated_at: '2026-11-19T08:00:00Z' })
         return db
     }
 

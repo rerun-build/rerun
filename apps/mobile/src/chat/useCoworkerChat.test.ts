@@ -65,7 +65,7 @@ function fakeEndpoints(activeRunId: string | null): ChatEndpoints {
         sendPath: '/api/chat',
         sendBody: () => ({}),
         bornSessionOf: () => null,
-        messages: jest.fn(async () => []),
+        messages: jest.fn(async () => ({ messages: [], etag: null, updatedAt: null })),
         activeRun: jest.fn(async () => activeRunId),
         stop: jest.fn(async () => {}),
         fileOwner: () => ({ kind: 'agent', agentId: 'agent-1' }),
@@ -109,7 +109,7 @@ describe('useCoworkerChat in the background', () => {
         await act(async () => appStateListener('background'))
         await act(async () => appStateListener('active'))
 
-        expect(endpoints.messages).toHaveBeenCalledWith({ accessToken: 't', workspaceId: 7 }, 's1')
+        expect(endpoints.messages).toHaveBeenCalledWith({ accessToken: 't', workspaceId: 7 }, 's1', null)
         expect(mockChat.resumeStream).toHaveBeenCalledTimes(1)
         expect(result.current.busy).toBe(true)
 
@@ -133,7 +133,7 @@ describe('useCoworkerChat in the background', () => {
     it('shows the stored transcript on return when the run has ended', async () => {
         const stored = [{ id: 'm1', role: 'assistant' as const, parts: [{ type: 'text' as const, text: 'done' }] }]
         const endpoints = fakeEndpoints(null)
-        endpoints.messages = jest.fn(async () => stored)
+        endpoints.messages = jest.fn(async () => ({ messages: stored, etag: null, updatedAt: null }))
         const { result } = await openConversation(endpoints)
 
         await act(async () => appStateListener('background'))
@@ -175,17 +175,32 @@ describe('useCoworkerChat with a kept transcript', () => {
     })
 
     it('opens on it at once, then takes the hub copy without redrawing what did not change', async () => {
-        saveTranscript(7, 's1', kept)
+        saveTranscript(7, 's1', kept, { etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
         const endpoints = fakeEndpoints(null)
-        endpoints.messages = jest.fn(async () => kept)
+        endpoints.messages = jest.fn(async () => ({ messages: null, etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' }))
 
         const { result } = await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1' }))
 
         expect(mockChat.initialMessages).toEqual(kept)
         expect(result.current.history).toBe('ready')
         await act(async () => {})
-        expect(endpoints.messages).toHaveBeenCalledWith({ accessToken: 't', workspaceId: 7 }, 's1')
+        expect(endpoints.messages).toHaveBeenCalledWith({ accessToken: 't', workspaceId: 7 }, 's1', '"v1"')
+        expect(mockChat.setMessages).not.toHaveBeenCalled()
         expect(result.current.fresh).toBe(true)
+    })
+
+    // The list the hub just sent names the version the transcript was kept at: what waits on the person
+    // (a question, quick replies) shows without waiting for the transcript.
+    it('opens ready to act on when it was kept at the version the list names', async () => {
+        saveTranscript(7, 's1', kept, { etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
+        const endpoints = fakeEndpoints(null)
+        endpoints.messages = jest.fn(() => new Promise<never>(() => {}))
+
+        const current = await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1', knownUpdatedAt: '2026-11-19T08:00:00Z' }))
+        const moved = await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1', knownUpdatedAt: '2026-11-19T08:03:00Z' }))
+
+        expect(current.result.current.fresh).toBe(true)
+        expect(moved.result.current.fresh).toBe(false)
     })
 
     it('keeps it on screen when the hub cannot be reached', async () => {
@@ -203,19 +218,20 @@ describe('useCoworkerChat with a kept transcript', () => {
     it('keeps a stream started while the hub was being read, and reads again once it ends', async () => {
         saveTranscript(7, 's1', kept)
         const endpoints = fakeEndpoints('run-1')
-        let answer: (messages: typeof kept) => void = () => {}
-        endpoints.messages = jest.fn(() => new Promise<typeof kept>(resolve => (answer = resolve)))
+        type Read = { messages: typeof kept; etag: null; updatedAt: null }
+        let answer: (read: Read) => void = () => {}
+        endpoints.messages = jest.fn(() => new Promise<Read>(resolve => (answer = resolve)))
 
         const { result } = await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1' }))
         await act(async () => mockChat.setStatus('streaming'))
-        await act(async () => answer(kept))
+        await act(async () => answer({ messages: kept, etag: null, updatedAt: null }))
 
         expect(mockChat.setMessages).not.toHaveBeenCalled()
         expect(mockChat.resumeStream).not.toHaveBeenCalled()
         expect(result.current.fresh).toBe(true)
 
         await act(async () => mockChat.setStatus('ready'))
-        await act(async () => answer(kept))
+        await act(async () => answer({ messages: kept, etag: null, updatedAt: null }))
 
         expect(endpoints.messages).toHaveBeenCalledTimes(2)
     })
@@ -243,14 +259,15 @@ describe('useCoworkerChat opening a conversation', () => {
 
     it('asks for the running run without waiting for the transcript, and resumes only once the transcript is set', async () => {
         const endpoints = fakeEndpoints('run-2')
-        let transcriptArrives: (messages: typeof stored) => void = () => {}
-        endpoints.messages = jest.fn(() => new Promise<typeof stored>(resolve => (transcriptArrives = resolve)))
+        type Read = { messages: typeof stored; etag: null; updatedAt: null }
+        let transcriptArrives: (read: Read) => void = () => {}
+        endpoints.messages = jest.fn(() => new Promise<Read>(resolve => (transcriptArrives = resolve)))
         await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1' }))
 
         expect(endpoints.activeRun).toHaveBeenCalledTimes(1)
         expect(mockChat.resumeStream).not.toHaveBeenCalled()
 
-        await act(async () => transcriptArrives(stored))
+        await act(async () => transcriptArrives({ messages: stored, etag: null, updatedAt: null }))
 
         expect(mockChat.setMessages).toHaveBeenCalledWith(stored)
         expect(mockChat.resumeStream).toHaveBeenCalledTimes(1)
@@ -259,7 +276,7 @@ describe('useCoworkerChat opening a conversation', () => {
 
     it('still shows the transcript when the run lookup fails', async () => {
         const endpoints = fakeEndpoints(null)
-        endpoints.messages = jest.fn(async () => stored)
+        endpoints.messages = jest.fn(async () => ({ messages: stored, etag: null, updatedAt: null }))
         endpoints.activeRun = jest.fn(async () => {
             throw new Error('offline')
         })

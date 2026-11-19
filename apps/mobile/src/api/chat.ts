@@ -1,6 +1,6 @@
-import { activeRunSchema, agentViewSchema, conversationMessageSchema, conversationSchema, messageFeedbackEntrySchema, skillProposalSchema, skillProposalsListSchema, type AgentView, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
+import { TRANSCRIPT_UPDATED_AT_HEADER, activeRunSchema, agentViewSchema, conversationMessageSchema, conversationSchema, messageFeedbackEntrySchema, skillProposalSchema, skillProposalsListSchema, type AgentView, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
 
-import { api } from '@/api/client'
+import { api, apiConditional } from '@/api/client'
 
 type Caller = { accessToken: string; workspaceId: number }
 
@@ -12,8 +12,13 @@ export async function fetchAgentConversations(caller: Caller, agentId: string): 
     return conversationSchema.array().parse(await api(`/api/v1/agents/${encodeURIComponent(agentId)}/conversations`, caller))
 }
 
-export async function fetchMessages(caller: Caller, sessionId: string): Promise<ConversationMessage[]> {
-    return conversationMessageSchema.array().parse(await api(`/api/v1/conversations/${encodeURIComponent(sessionId)}/messages`, caller))
+// The transcript, unless it is still the one named `etag`: `messages` is then null. `updatedAt` is the
+// version of the conversation it was read at, absent from a hub older than it.
+export type TranscriptRead = { messages: ConversationMessage[] | null; etag: string | null; updatedAt: string | null }
+
+export async function fetchMessages(caller: Caller, sessionId: string, etag: string | null = null): Promise<TranscriptRead> {
+    const read = await apiConditional<unknown>(`/api/v1/conversations/${encodeURIComponent(sessionId)}/messages`, { ...caller, etag })
+    return { messages: read.payload === null ? null : conversationMessageSchema.array().parse(read.payload), etag: read.etag, updatedAt: read.headers.get(TRANSCRIPT_UPDATED_AT_HEADER) }
 }
 
 export async function fetchActiveRun(caller: Caller, sessionId: string): Promise<string | null> {

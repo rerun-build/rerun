@@ -368,11 +368,17 @@ export async function adoptEngineSession(agentId: string, engineSessionId: strin
 }
 
 export async function readSessionMessages(sessionId: string): Promise<HistoryMessage[]> {
+    return (await readSessionTranscript(sessionId)).messages
+}
+
+// The transcript with the time the session row last changed, read before the messages: a change
+// landing between the two leaves the time older than the messages, never newer.
+export async function readSessionTranscript(sessionId: string): Promise<{ messages: HistoryMessage[]; updatedAt: string | null }> {
     const ctx = await getSessionEngineContext(sessionId)
-    if (!ctx || !ctx.engineSessionId) return []
+    if (!ctx || !ctx.engineSessionId) return { messages: [], updatedAt: ctx?.updatedAt ?? null }
 
     const messages = await getSessionMessages(ctx.conn, ctx.engineAgentId, ctx.engineSessionId)
-    return transformEngineMessages(messages)
+    return { messages: transformEngineMessages(messages), updatedAt: ctx.updatedAt ?? null }
 }
 
 // What the conversation waits on, read the way the chat would read it when opened. Without its

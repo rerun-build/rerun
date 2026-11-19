@@ -8,7 +8,8 @@ import { useHub } from '@/data/hub-store'
 import { coworkerScreenPart } from '@/data/local-cache'
 import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
-type LiveConversations = { conversations: Conversation[]; loaded: boolean; reload: () => void }
+// `fresh`: the list is the hub's answer of this launch, not the copy kept from the last visit.
+type LiveConversations = { conversations: Conversation[]; loaded: boolean; fresh: boolean; reload: () => void }
 
 const NONE: Conversation[] = []
 
@@ -59,5 +60,5 @@ function useLiveConversations(agentId: string): LiveConversations {
         reloadSoon
     )
 
-    return { conversations: list.value ?? NONE, loaded: list.value !== null || list.fresh || list.failed, reload }
+    return { conversations: list.value ?? NONE, loaded: list.value !== null || list.fresh || list.failed, fresh: list.fresh, reload }
 }

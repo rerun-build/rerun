@@ -79,7 +79,7 @@ jest.mock('react-native-svg', () => {
 })
 
 const coworker = { id: 'agent-perf', kind: 'coworker' as const, name: 'Pulse', role: '', status: 'idle' as const }
-const endpoints = { agentId: 'agent-perf', sendPath: '/api/chat', sendBody: () => ({}), bornSessionOf: () => null, messages: async () => [], activeRun: async () => null, stop: async () => {}, fileOwner: () => ({ kind: 'agent' as const, agentId: 'agent-perf' }) }
+const endpoints = { agentId: 'agent-perf', sendPath: '/api/chat', sendBody: () => ({}), bornSessionOf: () => null, messages: async () => ({ messages: [], etag: null, updatedAt: null }), activeRun: async () => null, stop: async () => {}, fileOwner: () => ({ kind: 'agent' as const, agentId: 'agent-perf' }) }
 const makeEndpoints = () => endpoints
 const noop = () => {}
 

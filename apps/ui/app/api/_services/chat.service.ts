@@ -227,7 +227,8 @@ export async function clearSkillProposalAttention(sessionId: string, agentId: st
     await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' }).eq('id', sessionId).eq('status', 'awaiting_approval')
 }
 
-export type SessionEngineContext = { agentId: string; conn: EngineConnection; engineAgentId: string; engineSessionId: string | null }
+// `updatedAt`: the session row's, read before anything else of the conversation (a coworker's only).
+export type SessionEngineContext = { agentId: string; conn: EngineConnection; engineAgentId: string; engineSessionId: string | null; updatedAt?: string }
 
 // Full engine context for a Supabase session (used to replay history).
 export async function getSessionEngineContext(sessionId: string): Promise<SessionEngineContext | null> {
@@ -236,7 +237,7 @@ export async function getSessionEngineContext(sessionId: string): Promise<Sessio
     if (!session.engine_agent_id) return null
     if (!engine) throw new NoEngineError()
 
-    return { agentId: session.agent_id, conn: engine.conn, engineAgentId: session.engine_agent_id, engineSessionId: session.engine_session_id || null }
+    return { agentId: session.agent_id, conn: engine.conn, engineAgentId: session.engine_agent_id, engineSessionId: session.engine_session_id || null, updatedAt: session.updated_at }
 }
 
 export type SessionRuns = { latest?: EngineRun; lastDone?: EngineRun; running?: EngineRun }

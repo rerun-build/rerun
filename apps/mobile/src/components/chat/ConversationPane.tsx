@@ -90,6 +90,8 @@ type ConversationPaneProps = {
     // What the hub says the conversation waits on. A call the app cannot name is one to answer only
     // when the session waits on a human; a notification is pinned until read.
     status: SessionStatus | null
+    // The version of the conversation in a list the hub just sent: a transcript kept at it is current.
+    updatedAt?: string | null
     onStatusChange: () => void
     // Where the conversation opens on the web, which draws every block.
     webUrl: string
@@ -107,7 +109,7 @@ type ConversationPaneProps = {
 }
 
 // One conversation on screen: the transcript, what waits on an answer, and the composer.
-export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
+export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, updatedAt = null, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
     noteRender('ConversationPane')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
@@ -120,7 +122,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [endpoints] = useState(makeEndpoints)
     // A message the engine refused while a run held the conversation waits behind it, as on the web.
     const enqueueRef = useRef<(text: string, behindRunId: string | null) => void>(() => {})
-    const chat = useCoworkerChat({ endpoints, initialSessionId, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
+    const chat = useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt: updatedAt, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
     const queue = useQueuedMessage(`${coworker.id}-${chat.sessionId ?? 'new'}`)
     const proposals = useSkillProposals(coworker.kind === 'coworker' ? chat.sessionId : null, chat.busy)
     // A decision lifts the wait the proposal raised on the session, as on the web.

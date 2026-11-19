@@ -46,7 +46,7 @@ describe('createChatTransport on a reconnect', () => {
 
     function link(): ChatLink {
         return {
-            endpoints: { agentId: 'ag', sendPath: '/api/chat', sendBody: () => ({}), bornSessionOf: () => null, messages: async () => [], activeRun: async () => null, stop: async () => {}, fileOwner: () => ({ kind: 'agent', agentId: 'ag' }) },
+            endpoints: { agentId: 'ag', sendPath: '/api/chat', sendBody: () => ({}), bornSessionOf: () => null, messages: async () => ({ messages: [], etag: null, updatedAt: null }), activeRun: async () => null, stop: async () => {}, fileOwner: () => ({ kind: 'agent', agentId: 'ag' }) },
             sessionRef: { current: 's1' },
             runRef: { current: 'run-1' },
             callerRef: { current: null },

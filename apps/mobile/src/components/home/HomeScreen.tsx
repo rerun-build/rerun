@@ -89,7 +89,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
         const sessionId = coworker.generalSessionId
         if (!sessionId || !session || !me) return
         const caller = { accessToken: session.access_token, workspaceId: me.workspace.id }
-        loadTranscript(caller.workspaceId, sessionId, () => coworkerEndpoints(coworker.id).messages(caller, sessionId)).catch(() => {})
+        loadTranscript(caller.workspaceId, sessionId, etag => coworkerEndpoints(coworker.id).messages(caller, sessionId, etag)).catch(() => {})
     }
 
     const togglePin = (coworker: HomeCoworker) => (pins.pinned.includes(coworker.id) ? pins.unpin(coworker.id) : pins.pin(coworker.id))

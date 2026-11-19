@@ -55,7 +55,7 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const modelsRead = useHub(caller ? `models:${caller.workspaceId}:${agentId}` : null, () => fetchAgentModels(caller!, agentId), { persisted: persistedModels })
     const view = viewRead.value
     const models = modelsRead.value
-    const { conversations, loaded: conversationsLoaded, reload: loadConversations } = useCoworkerConversations(agentId)
+    const { conversations, loaded: conversationsLoaded, fresh: conversationsFresh, reload: loadConversations } = useCoworkerConversations(agentId)
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
     const [bornKeys, setBornKeys] = useState<Record<string, string>>({})
     const [activeId, setActiveId] = useState(sessionId)
@@ -162,7 +162,7 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => (page.general && !page.sessionId && !conversationsLoaded ? <ConversationPagePlaceholder /> : <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} />)} />
+            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => (page.general && !page.sessionId && !conversationsLoaded ? <ConversationPagePlaceholder /> : <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} updatedAt={conversationsFresh && page.sessionId ? (byId.get(page.sessionId)?.updatedAt ?? null) : null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} />)} />
             <ChatHeader coworker={coworker} tabs={tabs} activeId={shownId ?? undefined} progress={progress} allSessions={allTabs} onBack={back} onSelect={select} onNewSession={startNew} onOpenDetails={() => router.push({ pathname: '/coworker/[id]', params: { id: agentId, name: coworker.name } })} />
         </View>
     )
