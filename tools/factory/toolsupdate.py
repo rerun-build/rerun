@@ -1,4 +1,4 @@
-import os, shutil, subprocess, sys, tempfile
+import os, shutil, subprocess, sys, tempfile, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
@@ -6,6 +6,9 @@ import mirror as M
 import refresh
 
 FULL = "special-place-ai-heaven/moldwright"
+CAP = 120
+LATE = 50
+GUIDE_TIMEOUT = 60
 
 
 def prefix():
@@ -36,7 +39,7 @@ def gh_cli(args):
     return r.stdout
 
 
-def main(argv, gh=gh_cli):
+def update(argv, gh):
     pre = prefix()
     key = os.environ.get("FACTORY_JEV_KEYFILE") or os.path.join(pre, "jev.env")
     cur = current(pre)
@@ -74,6 +77,33 @@ def main(argv, gh=gh_cli):
         return 2
     print("TOOLS installed %s (was %s)" % (sha[:8], (cur or "none")[:8]))
     return 0
+
+
+def guides(pre, run=subprocess.run, timeout=GUIDE_TIMEOUT):
+    tool = os.path.join(pre, "factory-current", "webguide.py")
+    if not os.path.isfile(tool):
+        return
+    try:
+        r = run([sys.executable, "-I", tool, "--dir", os.path.join(pre, "webguide"), "ensure"],
+                capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        print("webguide: ensure stopped at %d s; next try after the one-hour wait" % timeout)
+        return
+    lines = [l for l in ((r.stdout or "") + "\n" + (r.stderr or "")).splitlines() if l.strip()]
+    if lines:
+        print(lines[-1][:300])
+
+
+def main(argv, gh=gh_cli, clock=time.monotonic):
+    t0 = clock()
+    code = update(argv, gh)
+    if code == 0:
+        spent = clock() - t0
+        if spent > LATE:
+            print("webguide: not checked; tools-update spent %d s of its %d s cap, the next run checks the copy" % (spent, CAP))
+        else:
+            guides(prefix())
+    return code
 
 
 if __name__ == "__main__":
