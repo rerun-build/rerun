@@ -3,11 +3,12 @@ import { answeringConnectionErrors } from '@/app/api/v1/_lib/ai-connection-error
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { mintClaudeSignIn } from '@/lib/engine/sign-in-ticket'
 import { isClaudePlanOffered } from '@rerun/cloud/billing'
+import { mobileApi } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
 // The PKCE pair stays sealed in the ticket: only this person's finish call can exchange the code.
-export const POST = apiRoute({ auth: 'admin' }, async ({ ctx }) =>
+export const POST = apiRoute(mobileApi.startClaudeSignIn, { auth: 'admin' }, async ({ ctx }) =>
     answeringConnectionErrors(async () => {
         if (!isClaudePlanOffered(ctx.workspace)) throw new ConnectionInputError('claudePlanNotOffered')
         const start = startClaudeSignIn()

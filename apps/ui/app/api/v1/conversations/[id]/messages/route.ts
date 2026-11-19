@@ -5,7 +5,7 @@ import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { refusal } from '@/lib/i18n/action-error'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { toApiMessages } from '@/lib/chat/engine-history'
-import { TRANSCRIPT_UPDATED_AT_HEADER } from '@rerun/contracts'
+import { mobileApi, TRANSCRIPT_UPDATED_AT_HEADER } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 // without its body. `TRANSCRIPT_UPDATED_AT_HEADER` names the version of the conversation the
 // transcript was read at, which the app compares with its list of conversations to open on its
 // copy without waiting. The phone keeps its own copy: nothing on the way stores this one.
-export const GET = apiRoute({ auth: 'member' }, async ({ params, req }) => {
+export const GET = apiRoute(mobileApi.getConversationMessages, { auth: 'member' }, async ({ params, req }) => {
     const { messages, updatedAt } = await readSessionTranscript(params.id).catch(err => {
         if (err instanceof AuthorizationError) throw err
         console.error('[api/v1] conversation messages unreachable', err)

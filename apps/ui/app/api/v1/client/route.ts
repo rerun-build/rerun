@@ -1,6 +1,6 @@
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
-import type { ClientConfig, ClientPlatform, ClientServer } from '@rerun/contracts'
+import { mobileApi, type ClientConfig, type ClientPlatform, type ClientServer } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,4 +38,4 @@ function serverOf(req: Request): ClientServer | undefined {
     return { supabaseUrl: supabaseUrlSeenFrom(req, supabaseUrl), supabasePublishableKey }
 }
 
-export const GET = apiRoute({ auth: 'public' }, async ({ req }): Promise<ClientConfig> => ({ minBuild: minBuildOf(appPlatformOf(req)), server: serverOf(req) }))
+export const GET = apiRoute(mobileApi.getClientConfig, { auth: 'public' }, async ({ req }): Promise<ClientConfig> => ({ minBuild: minBuildOf(appPlatformOf(req)), server: serverOf(req) }))

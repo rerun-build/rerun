@@ -19,6 +19,8 @@ export type HubEndpoint = {
     response: HubReply
     // The status of a success: 200 for a JSON body, 204 for none, unless the route says otherwise.
     status: number
+    // A success with nothing in it, when there is nothing to answer: a run already over has no stream.
+    emptyStatus?: number
     // The headers of a success the app reads.
     headers?: readonly string[]
     // The failures the app tells apart, with the body it reads from them. Any other one is a hubError.
@@ -46,3 +48,22 @@ export type HubBody<E extends HubEndpoint> = E['body'] extends z.ZodType ? z.inp
 export type HubQuery<E extends HubEndpoint> = E['query'] extends z.ZodObject ? z.input<E['query']> : undefined
 
 export type HubResponse<E extends HubEndpoint> = E['response'] extends z.ZodType ? z.output<E['response']> : void
+
+export type HubQueryValues = Record<string, string | number | boolean | null | undefined>
+
+const PARAM = /\{(\w+)\}/g
+
+// The path of one call, its parameters encoded, and its query without the values left out.
+export function hubPath<E extends HubEndpoint>(endpoint: E, params: HubPathParams<E>, query?: HubQueryValues): string {
+    const values = params as Record<string, unknown>
+    const path = endpoint.path.replace(PARAM, (_, name: string) => {
+        const value = values[name]
+        if (typeof value !== 'string' || !value) throw new Error(`${endpoint.method} ${endpoint.path} needs ${name}`)
+        return encodeURIComponent(value)
+    })
+    const qs = Object.entries(query ?? {})
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+        .join('&')
+    return qs ? `${path}?${qs}` : path
+}

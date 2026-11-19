@@ -56,6 +56,8 @@ export const conversationSearchQuerySchema = z.object({ q: z.string().max(200).d
 
 export const messageFeedbackQuerySchema = z.object({ scope: messageFeedbackScopeSchema.default('agent') })
 
+// keepOpen=1 when the person hands the browser back to the run that asked for it: the window stays on
+// the coworker's screen. Without it (skipped, or a browser opened by hand), the window closes.
 export const takeoverFinishQuerySchema = z.object({ keepOpen: z.literal('1').optional() })
 
 export const computerSummarySchema = z.object({ id: z.string(), name: z.string(), handle: z.string(), status: z.enum(['online', 'busy', 'paused', 'offline']) })
@@ -126,7 +128,11 @@ const accountDeletionRefusalSchema = z.looseObject({ error: z.string(), reason: 
 
 const noPlanSchema = z.looseObject({ error: z.string(), reason: z.string().optional() })
 
-const SIGN_IN_REFUSALS = { 400: signInRefusalSchema, 422: signInRefusalSchema, 429: signInRefusalSchema, 503: signInRefusalSchema } as const
+// A 400 is a refusal with its reason, or a body the hub could not read at all: the app tells the two
+// apart by the reason.
+const signInFailureSchema = z.looseObject({ error: z.string(), reason: z.string().optional(), retryAfterSeconds: z.number().optional() })
+
+const SIGN_IN_REFUSALS = { 400: signInFailureSchema, 422: signInRefusalSchema, 429: signInRefusalSchema, 503: signInRefusalSchema } as const
 
 const NO_PLAN = { 403: noPlanSchema } as const
 
@@ -240,7 +246,7 @@ export const mobileApi = {
     sendLegacyForemanMessage: hubEndpoint({ method: 'POST', path: '/api/chat/foreman', body: legacyForemanChatRequestSchema, response: 'ui-message-stream', errors: { 409: hubErrorSchema, 423: hubErrorSchema } }),
 
     sendChatMessage: hubEndpoint({ method: 'POST', path: '/api/chat', body: hubChatRequestSchema, response: 'ui-message-stream', headers: CHAT_HEADERS, errors: { 404: hubErrorSchema, 409: hubErrorSchema } }),
-    resumeChat: hubEndpoint({ method: 'GET', path: '/api/chat/resume', query: chatResumeQuerySchema, response: 'ui-message-stream' }),
+    resumeChat: hubEndpoint({ method: 'GET', path: '/api/chat/resume', query: chatResumeQuerySchema, response: 'ui-message-stream', emptyStatus: 204 }),
 
     uploadAgentFile: hubEndpoint({ method: 'POST', path: '/api/files/stream', query: agentFileUploadQuerySchema, body: 'bytes', response: fileUploadedSchema, status: 201 }),
     uploadForemanFile: hubEndpoint({ method: 'POST', path: '/api/foreman/files/stream', query: foremanFileUploadQuerySchema, body: 'bytes', response: fileUploadedSchema, status: 201 }),

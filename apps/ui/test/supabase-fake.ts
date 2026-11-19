@@ -69,3 +69,46 @@ export type FakeSupabase = ReturnType<typeof fakeSupabase>
 export function writeMethodOf(calls: readonly SupabaseCall[]): string | null {
     return calls.find(call => WRITE_METHODS.has(call.method))?.method ?? null
 }
+
+type Row = Record<string, unknown>
+
+function likePattern(pattern: string, flags: string): RegExp {
+    return new RegExp(`^${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*').replace(/_/g, '.')}$`, flags)
+}
+
+function keeps(row: Row, { method, args }: SupabaseCall): boolean {
+    const [column, value] = args as [string, unknown]
+    const cell = row[column]
+    if (method === 'eq') return cell === value
+    if (method === 'neq') return cell !== value
+    if (method === 'in') return (value as unknown[]).includes(cell)
+    if (method === 'is') return cell === value
+    if (method === 'not') return cell !== args[2]
+    if (method === 'gt') return (cell as string | number) > (value as string | number)
+    if (method === 'gte') return (cell as string | number) >= (value as string | number)
+    if (method === 'lt') return (cell as string | number) < (value as string | number)
+    if (method === 'lte') return (cell as string | number) <= (value as string | number)
+    if (method === 'like') return typeof cell === 'string' && likePattern(String(value), '').test(cell)
+    if (method === 'ilike') return typeof cell === 'string' && likePattern(String(value), 'i').test(cell)
+    return true
+}
+
+// A resolver that answers reads from rows held per table, the way PostgREST would: the filters of the
+// chain, its order, its limit, one row for single() and maybeSingle(). A write answers its payload.
+export function tableResolver(tables: Record<string, readonly object[]>): SupabaseResolver {
+    return (table, calls) => {
+        const write = calls.find(call => WRITE_METHODS.has(call.method))
+        if (write) return { data: write.method === 'delete' ? null : write.args[0] }
+        let rows = ((tables[table] ?? []) as Row[]).filter(row => calls.every(call => keeps(row, call)))
+        for (const call of calls.filter(c => c.method === 'order')) {
+            const [column, options] = call.args as [string, { ascending?: boolean } | undefined]
+            const direction = options?.ascending === false ? -1 : 1
+            rows = [...rows].sort((a, b) => (String(a[column]) < String(b[column]) ? -direction : String(a[column]) > String(b[column]) ? direction : 0))
+        }
+        const limit = calls.find(call => call.method === 'limit')
+        if (limit) rows = rows.slice(0, limit.args[0] as number)
+        const count = calls.some(call => call.method === 'select' && (call.args[1] as { count?: string } | undefined)?.count) ? rows.length : null
+        if (calls.some(call => call.method === 'single' || call.method === 'maybeSingle')) return { data: rows[0] ?? null, count }
+        return { data: rows, count }
+    }
+}

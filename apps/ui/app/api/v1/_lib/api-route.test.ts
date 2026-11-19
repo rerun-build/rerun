@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { hubEndpoint, hubErrorSchema } from '@rerun/contracts'
 import { z } from 'zod'
 
 const mocks = vi.hoisted(() => ({ requireWorkspaceContext: vi.fn(), requireAdminContext: vi.fn() }))
@@ -8,9 +9,9 @@ vi.mock('@/supabase/server', () => ({
     getRequestAccessToken: async () => null,
 }))
 
+// The real error classes: AuthorizationError is an AppError, which the order of the checks has to know.
 vi.mock('@/app/api/_auth/ownership', async () => {
-    class AuthorizationError extends Error {}
-    class UnauthenticatedError extends AuthorizationError {}
+    const { AuthorizationError, UnauthenticatedError } = await vi.importActual<typeof import('@/app/api/_auth/errors')>('@/app/api/_auth/errors')
     return {
         AuthorizationError,
         UnauthenticatedError,
@@ -22,6 +23,7 @@ vi.mock('@/app/api/_auth/ownership', async () => {
 const { apiRoute, ApiError } = await import('./api-route')
 const { AuthorizationError, UnauthenticatedError } = await import('@/app/api/_auth/ownership')
 const { AppError } = await import('@/lib/i18n/action-error')
+const { AccessDeniedError } = await import('@/app/api/_auth/access')
 
 const segment = { params: Promise.resolve({}) }
 
@@ -142,5 +144,63 @@ describe('apiRoute', () => {
         expect(await json.json()).toEqual({ ok: true })
         const empty = await apiRoute({ auth: 'member' }, async () => undefined)(post(''), segment)
         expect(empty.status).toBe(204)
+    })
+
+    it('answers 403 to a member who only uses the Box, not the 422 of a refusal meant for the person', async () => {
+        const route = apiRoute({ auth: 'member' }, async () => {
+            throw new AccessDeniedError()
+        })
+        expect((await route(post(''), segment)).status).toBe(403)
+    })
+})
+
+describe('apiRoute on a mobile endpoint', () => {
+    const named = hubEndpoint({ method: 'POST', path: '/api/v1/test/{id}', body: z.object({ name: z.string() }), response: z.object({ name: z.string() }), errors: { 409: z.object({ error: z.string(), reason: z.string() }) } })
+    const silent = hubEndpoint({ method: 'POST', path: '/api/v1/test/{id}', response: 'none' })
+    const withId = { params: Promise.resolve({ id: 'a-1' }) }
+    const send = (body: object) => new Request('https://app.rerun.build/api/v1/test/a-1', { method: 'POST', body: JSON.stringify(body) })
+
+    beforeEach(() => {
+        mocks.requireWorkspaceContext.mockReset()
+        mocks.requireWorkspaceContext.mockResolvedValue({ userId: 'user-1' })
+    })
+
+    it('reads the body with the schema of the registry and hands the path parameters over', async () => {
+        const route = apiRoute(named, { auth: 'member' }, async ({ params, body }) => ({ name: `${params.id} ${body.name}` }))
+        const res = await route(send({ name: 'Scout' }), withId)
+        expect(res.status).toBe(200)
+        expect(await res.json()).toEqual({ name: 'a-1 Scout' })
+        expect((await route(send({ name: 3 }), withId)).status).toBe(400)
+    })
+
+    it('answers 500 rather than a body the app could not read, and says why in the log', async () => {
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const route = apiRoute(named, { auth: 'member' }, async () => ({ name: 3 }) as unknown as { name: string })
+        const res = await route(send({ name: 'Scout' }), withId)
+        expect(res.status).toBe(500)
+        expect(await res.json()).toEqual({ error: 'Response breaks the mobile contract' })
+        expect(log).toHaveBeenCalledWith(expect.stringContaining('breaks the mobile contract: the body'), expect.anything())
+    })
+
+    it('answers 500 for a success under another status than the registry says', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        const route = apiRoute(silent, { auth: 'member' }, async () => ({ ok: true }))
+        expect((await route(send({}), withId)).status).toBe(500)
+        expect((await apiRoute(silent, { auth: 'member' }, async () => undefined)(send({}), withId)).status).toBe(204)
+    })
+
+    it('checks a refusal the route built against the body the app reads for its status', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        const readable = apiRoute(named, { auth: 'member' }, async () => Response.json({ error: 'Taken', reason: 'taken' }, { status: 409 }))
+        expect((await readable(send({ name: 'Scout' }), withId)).status).toBe(409)
+        const unreadable = apiRoute(named, { auth: 'member' }, async () => Response.json({ error: 'Taken' }, { status: 409 }))
+        expect((await unreadable(send({ name: 'Scout' }), withId)).status).toBe(500)
+        const other = apiRoute(named, { auth: 'member' }, async () => Response.json({ message: 'no error field' }, { status: 418 }))
+        expect((await other(send({ name: 'Scout' }), withId)).status).toBe(500)
+    })
+
+    it('names the endpoint it answers for, for the coverage test', () => {
+        expect(apiRoute(named, { auth: 'member' }, async () => ({ name: '' })).endpoint).toBe(named)
+        expect(hubErrorSchema.safeParse({ error: 'x', extra: 1 }).success).toBe(true)
     })
 })

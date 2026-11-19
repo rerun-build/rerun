@@ -6,11 +6,11 @@ import { isAppReviewNumber } from '@rerun/cloud/app-review'
 import { callerIp } from '@/lib/auth/caller-ip'
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { verificationLanguage } from '@/lib/phone/verification'
-import { phoneCodeRequestSchema } from '@rerun/contracts'
+import { mobileApi } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-export const POST = apiRoute({ auth: 'public', body: phoneCodeRequestSchema }, async ({ req, body }) => {
+export const POST = apiRoute(mobileApi.sendPhoneCode, { auth: 'public' }, async ({ req, body }) => {
     const phone = isPhoneCountry(body.country) ? toE164(body.phone, body.country) : null
     if (!phone) return phoneRefused('invalid_number')
     if (isAppReviewNumber(phone)) return { channel: body.channel }

@@ -4,12 +4,12 @@ import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { refusal } from '@/lib/i18n/action-error'
 import { mcpConnectUrl, requestingDesktop } from '@/app/api/v1/_lib/service-view'
 import { appReturnBase } from '@/lib/oauth/app-return'
-import type { ConnectTarget } from '@rerun/contracts'
+import { mobileApi, type ConnectTarget } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
 // Mints the ticket the in-app browser opens the server's sign-in with.
-export const POST = apiRoute({ auth: 'member' }, async ({ req, ctx, params }): Promise<ConnectTarget> => {
+export const POST = apiRoute(mobileApi.connectMcpServer, { auth: 'member' }, async ({ req, ctx, params }): Promise<ConnectTarget> => {
     const actor = actorFromContext(ctx)
     await assertAgentInWorkspace(params.id, 'manage', actor)
     const found = await getCustomMcpServer(params.id, params.name, actor)

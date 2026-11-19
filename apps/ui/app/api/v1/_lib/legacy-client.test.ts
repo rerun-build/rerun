@@ -1,20 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { z } from 'zod'
-import { agentConfigSchema, agentDetailSchema, agentModelsSchema, agentViewSchema, aiConnectionsViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
-import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider } from './legacy-client'
+import { agentViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
 
-// The provider list as the iOS builds already shipped parse it.
-const legacyProvider = z.enum(['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'])
-const legacyConnectionsView = aiConnectionsViewSchema.extend({
-    connections: z.array(aiConnectionsViewSchema.shape.connections.element.extend({ provider: legacyProvider })),
-    addable: z.array(aiConnectionsViewSchema.shape.addable.element.extend({ provider: legacyProvider.exclude(['rerun']) })),
-})
-const legacyModels = agentModelsSchema.extend({ groups: z.array(agentModelsSchema.shape.groups.element.extend({ provider: legacyProvider })) })
-const legacyAgentView = agentViewSchema.extend({
-    detail: agentDetailSchema
-        .extend({ config: agentConfigSchema.extend({ provider: legacyProvider.nullable().default(null) }), resolvedProvider: legacyProvider.nullable().default(null) })
-        .nullable(),
-})
+import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
+import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
@@ -100,12 +88,12 @@ describe('responses for an older build', () => {
     const old = request('ios/1.3.0 (39)')
 
     it('parse with the provider list that build knows', () => {
-        expect(legacyConnectionsView.safeParse(view).success).toBe(false)
-        expect(legacyConnectionsView.safeParse(aiConnectionsForClient(old, view)).success).toBe(true)
-        expect(legacyModels.safeParse(models).success).toBe(false)
-        expect(legacyModels.safeParse(agentModelsForClient(old, models)).success).toBe(true)
-        expect(legacyAgentView.safeParse(agentView).success).toBe(false)
-        expect(legacyAgentView.safeParse(agentViewForClient(old, agentView)).success).toBe(true)
+        expect(shippedIosConnectionsViewSchema.safeParse(view).success).toBe(false)
+        expect(shippedIosConnectionsViewSchema.safeParse(aiConnectionsForClient(old, view)).success).toBe(true)
+        expect(shippedIosAgentModelsSchema.safeParse(models).success).toBe(false)
+        expect(shippedIosAgentModelsSchema.safeParse(agentModelsForClient(old, models)).success).toBe(true)
+        expect(shippedIosAgentViewSchema.safeParse(agentView).success).toBe(false)
+        expect(shippedIosAgentViewSchema.safeParse(agentViewForClient(old, agentView)).success).toBe(true)
     })
 
     it('reads an OpenCode pin as following the machine, and the resolution as unknown', () => {
