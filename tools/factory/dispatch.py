@@ -2001,27 +2001,41 @@ class Dispatcher:
             out["plans"] = {str(n): r.get("state") for n, r in sorted(records.items()) if r.get("state") not in planning.ENDED}
             out["planner_free"] = len(pools.free_copies(dict(self.cfg, held=False), "planner", self.station.running()))
             out["planner_room"] = self.station.parallel - len(live)
+            rows = [("plan:%d" % n, r) for n, r in sorted(live.items())]
+            rows += [("recheck:%d" % n, r) for n, r in sorted(self.station.live_rechecks().items())]
+            out["planner_holders"] = [{"job": job, "by": self.names.get(r.get("agent"), str(r.get("agent"))[:8]), "state": r.get("state"),
+                                       "since": r.get("started")} for job, r in rows]
         except Exception as e:  # noqa: BLE001
             out["planner_error"] = type(e).__name__
         return out
 
     def report_line(self):
         self.answer = None
+        now = self.now()
         try:
-            now = self.now()
-            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
+            held = holds.active(self.store, now)
+        except Exception:  # noqa: BLE001
+            held = None
+        status, error = None, None
+        try:
+            snap = snapshot.build_snapshot(self.store, self.cfg, now, held, beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats),
                                            plan=renewal.plan(self.connections, now))
             digest.alarm(self.store, snap.get("digest"), now)
             snap.update(self.extra())
-            digest.post(self.gh, self.store, self.home, self.status(snap), now)
+            status = self.status(snap)
             self.answer = self.account("factory_report", {"snapshot": snap}, timeout=10)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat
-            text = str(e) if isinstance(e, Error) else type(e).__name__
-            if self.now() - self.started >= REPORT_QUIET_S and text not in self.report_logged:
-                self.report_logged.add(text)
-                log("-", "factory_report: %s" % text)
+            error = str(e) if isinstance(e, Error) else type(e).__name__
+            if self.now() - self.started >= REPORT_QUIET_S and error not in self.report_logged:
+                self.report_logged.add(error)
+                log("-", "factory_report: %s" % error)
+        if status is None:
+            status = self.status({"digest": {}, "holds": [held] if held else []})
+        if error:
+            status["report_error"] = error[:200]
+        digest.post(self.gh, self.store, self.home, status, now)
 
 
 def ask_refresh(gh, repo, logged):
