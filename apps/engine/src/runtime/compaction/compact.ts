@@ -1,18 +1,20 @@
 import { customContextWindow } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
-import { generateText, type ModelMessage } from 'ai'
-import { isContextPart, modelContextWindow, type Provider } from '@rerun/contracts'
+import { generateText, type LanguageModelUsage, type ModelMessage } from 'ai'
+import { COMPACTION_FINISH_REASON, isContextPart, modelContextWindow, type Provider } from '@rerun/contracts'
 import { modelFor, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
 import { listMessagesAfter } from '../../db/repos/messages.js'
 import { getLatestCheckpoint, saveCheckpoint } from '../../db/repos/checkpoints.js'
-import { newId } from '../../lib/ids.js'
+import { insertRunStep } from '../../db/repos/telemetry.js'
+import { newId, nowIso } from '../../lib/ids.js'
 import { deadlineSignal, raceAbort } from '../../lib/abort.js'
 import type { RunContext } from '../context.js'
 import { signHistoryMessage } from '../message-authors.js'
+import { costMicrosFrom } from '../step-cost.js'
 import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_SUMMARY_TOKENS_CEILING, COMPACTION_TAIL_TOKEN_BUDGET, COMPACTION_TRIGGER_RATIO } from './config.js'
 import { estimateTokens } from './estimate.js'
 import { pruneToolOutputs } from './prune.js'
@@ -68,11 +70,14 @@ function serializeForSummary(messages: ModelMessage[]): string {
         .join('\n\n')
 }
 
-async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefined, middle: ModelMessage[]): Promise<string> {
+export type CompactionSummary = { text: string; usage: LanguageModelUsage; providerMetadata: unknown; durationMs: number }
+
+export async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefined, middle: ModelMessage[]): Promise<CompactionSummary> {
+    const startedAt = Date.now()
     const release = await ensureCliAuth(ctx.agent.resolved.provider, ctx.agent.resolved.connection)
     try {
         const signal = deadlineSignal(COMPACTION_TIMEOUT_MS, ctx.abortSignal)
-        const { text } = await raceAbort(
+        const { text, usage, providerMetadata } = await raceAbort(
             generateText({
                 model: modelFor(ctx.agent, override, undefined, undefined, { sessionId: ctx.sessionId }),
                 system: SUMMARY_SYSTEM,
@@ -83,10 +88,45 @@ async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefi
             }),
             signal,
         )
-        return text.trim()
+        return { text: text.trim(), usage, providerMetadata, durationMs: Date.now() - startedAt }
     } finally {
         release()
     }
+}
+
+export function summaryMessageOf(preamble: string, text: string): ModelMessage {
+    return { role: 'user', content: `${preamble}\n\n${text}` }
+}
+
+// The summary is a model call the run pays like any step, so it gets its row among the run's
+// steps: without it the tokens a compaction saves could never be weighed against what it cost.
+// Its cost goes into the run's own, its tokens do not: the run's usage stays what its steps read.
+export async function recordCompactionUsage(ctx: RunContext, stepNumber: number, summary: CompactionSummary): Promise<void> {
+    if (!ctx.runId) return
+    const { usage } = summary
+    const costMicros = costMicrosFrom(summary.providerMetadata)
+    if (costMicros !== null) ctx.compactionCostMicros = (ctx.compactionCostMicros ?? 0) + costMicros
+    await insertRunStep(ctx.agent.id, {
+        id: newId(),
+        runId: ctx.runId,
+        agentId: ctx.agent.id,
+        sessionId: ctx.sessionId,
+        stepNumber,
+        provider: ctx.provider,
+        model: ctx.model,
+        finishReason: COMPACTION_FINISH_REASON,
+        inputTokens: usage.inputTokens ?? null,
+        outputTokens: usage.outputTokens ?? null,
+        cachedInputTokens: usage.cachedInputTokens ?? null,
+        reasoningTokens: usage.reasoningTokens ?? null,
+        totalTokens: usage.totalTokens ?? null,
+        cacheWriteTokens: usage.inputTokenDetails?.cacheWriteTokens ?? null,
+        costMicros,
+        toolCallCount: 0,
+        textLength: summary.text.length,
+        durationMs: summary.durationMs,
+        createdAt: nowIso(),
+    }).catch(err => ctx.logger.warn({ agent: ctx.agent.id, err: String(err) }, 'record compaction usage failed'))
 }
 
 // An OpenCode model OpenCode published after this build is only known to the live catalog, which
@@ -130,15 +170,16 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
         const pruned = pruneToolOutputs(working, tailStart)
         const middle = pruned.messages.slice(0, tailStart)
         const tail = pruned.messages.slice(tailStart)
-        const summaryText = await summarizeMiddle(ctx, override, middle)
-        const summaryMessage: ModelMessage = { role: 'user', content: `${SUMMARY_PREAMBLE}\n\n${summaryText}` }
+        const summary = await summarizeMiddle(ctx, override, middle)
+        await recordCompactionUsage(ctx, 0, summary)
+        const summaryMessage = summaryMessageOf(SUMMARY_PREAMBLE, summary.text)
         const throughRow = rows[newThroughRowIndex]
         await saveCheckpoint(agentId, ctx.sessionId, { summaryMessage, throughMessageId: throughRow.id, throughCreatedAt: throughRow.createdAt })
 
         const view = repairToolPairs([summaryMessage, ...tail])
         const tokensRecovered = Math.max(0, estimateTokens(middle) - estimateTokens([summaryMessage]))
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'done', messagesCompacted: newThroughRowIndex + 1, tokensRecovered } })
-        ctx.logger.info({ agent: agentId, session: ctx.sessionId, messagesCompacted: newThroughRowIndex + 1, tokensRecovered }, 'context compacted')
+        ctx.logger.info({ agent: agentId, session: ctx.sessionId, messagesCompacted: newThroughRowIndex + 1, tokensRecovered, usage: summary.usage }, 'context compacted')
         return view
     } catch (error) {
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'error' } })

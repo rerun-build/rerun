@@ -64,7 +64,7 @@ The engine is the one that calls the server, so the address has to work from the
 
 In the connection, under **Endpoint**:
 
-- **Context window** is used for models the server does not size itself (Ollama never does). Rerun compacts a conversation before it fills the window, 128k when nothing is set.
+- **Context window** is used for models the server does not size itself (Ollama never does). Rerun compacts a conversation before it fills the window, also in the middle of a long run, 128k when nothing is set.
 - **Models see images** stays off by default. Turn it on for a vision model: screenshots and the computer tools need it.
 - Add a model the server serves but does not list by its id.
 

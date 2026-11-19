@@ -465,7 +465,8 @@ as `Authorization: Bearer`. The connection counts as connected as soon as it has
   create and when `baseUrl` changes. `discoveredModels` on the summary lists what it answered, with
   the window when the server states one (`context_length`, `max_model_len`). A failed read keeps the
   previous one.
-- Compaction budgets against the listed window, then the connection's `contextWindow`, then 128k.
+- Compaction, before a turn and in the middle of a long run, budgets against the listed window, then
+  the connection's `contextWindow`, then 128k.
 - `vision` (default `false`) says whether the models see images: without it no screenshot is sent
   and the computer tools are not offered.
 - A run that cannot reach the server fails with "Could not reach the custom endpoint at
@@ -1410,6 +1411,10 @@ comment line while it waits. `204` when the run is over or unknown.
 
 `{ "steps": [...] }`, one per model step in order: `stepNumber`, `provider`, `model`,
 `finishReason`, the token counts, `costMicros`, `toolCallCount`, `textLength`, `durationMs`.
+
+A compaction adds a row of its own for its summary call, with `finishReason` `"compaction"` and no
+tool call. It carries the `stepNumber` of the step it follows, `0` when it ran before the turn, so
+it shares that number with a model step.
 
 ### `GET /agents/:id/runs/:rid/tools`
 

@@ -16,6 +16,8 @@ const state = vi.hoisted(() => ({
     summary: '  Condensed history.  ' as string | Error,
     prompts: [] as Array<Record<string, unknown>>,
     cliAuth: [] as Array<{ provider: string; beforeSummary: number }>,
+    steps: [] as Array<Record<string, unknown>>,
+    providerMetadata: undefined as Record<string, Record<string, never>> | undefined,
 }))
 
 vi.mock('../../agents/providers.js', async () => {
@@ -31,6 +33,7 @@ vi.mock('../../agents/providers.js', async () => {
                         finishReason: { unified: 'stop', raw: 'stop' },
                         usage: { inputTokens: { total: 1, noCache: 1, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 1, text: 1, reasoning: 0 } },
                         warnings: [],
+                        ...(state.providerMetadata ? { providerMetadata: state.providerMetadata } : {}),
                     }
                 },
             }),
@@ -46,6 +49,11 @@ vi.mock('../../db/repos/messages.js', () => ({
     listMessagesAfter: async (_agentId: string, _sessionId: string, after?: string) => {
         state.afterArgs.push(after)
         return state.rows
+    },
+}))
+vi.mock('../../db/repos/telemetry.js', () => ({
+    insertRunStep: async (_agentId: string, row: Record<string, unknown>) => {
+        state.steps.push(row)
     },
 }))
 vi.mock('../../db/repos/checkpoints.js', () => ({
@@ -100,6 +108,8 @@ afterEach(() => {
     state.summary = '  Condensed history.  '
     state.prompts = []
     state.cliAuth = []
+    state.steps = []
+    state.providerMetadata = undefined
 })
 
 describe('prepareRunHistory', () => {
@@ -273,6 +283,35 @@ describe('prepareRunHistory', () => {
         expect(history).toHaveLength(12)
         expect(state.saved).toHaveLength(0)
         expect(writes.map(w => w.data.status)).toEqual(['running', 'error'])
+    })
+
+    it('records what the summary cost as a step of the run', async () => {
+        state.rows = longHistory()
+        const { ctx } = context('gpt-4o', { runId: 'run-1' })
+
+        await prepareRunHistory(ctx, 'system')
+
+        expect(state.steps).toEqual([expect.objectContaining({ runId: 'run-1', agentId: 'compact-agent', stepNumber: 0, finishReason: 'compaction', inputTokens: 1, outputTokens: 1, toolCallCount: 0 })])
+    })
+
+    it('adds what the summary cost to the cost of the run', async () => {
+        state.rows = longHistory()
+        state.providerMetadata = { openrouter: { usage: { cost: 0.0042 } as never } }
+        const { ctx } = context('gpt-4o', { runId: 'run-1' })
+
+        await prepareRunHistory(ctx, 'system')
+
+        expect((ctx as { compactionCostMicros?: number }).compactionCostMicros).toBe(4200)
+        expect(state.steps).toEqual([expect.objectContaining({ costMicros: 4200 })])
+    })
+
+    it('records nothing for a compaction outside a run', async () => {
+        state.rows = longHistory()
+        const { ctx } = context()
+
+        await prepareRunHistory(ctx, 'system')
+
+        expect(state.steps).toHaveLength(0)
     })
 
     it('compacts without a writer attached', async () => {

@@ -3,6 +3,7 @@ import { RERUN_CONNECTION_ID, contextTextPart, pendingComputerAccess, providerSw
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
+import { createInRunCompactor } from './compaction/in-run.js'
 import { repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { CLI_PROVIDERS, resolveModel, type ModelOverride } from '../agents/providers.js'
@@ -48,6 +49,7 @@ import { registerRunAbort, setRunCancel, unregisterRunAbort } from './run-contro
 import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
 import { stepWithScreenshots } from './screenshots.js'
+import { costMicrosFrom } from './step-cost.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
 import { emitRunTerminal } from './run-events.js'
 import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
@@ -177,13 +179,6 @@ async function emitHitlEvent(agent: LoadedAgent, sessionId: string, runId: strin
 async function emitSkillProposalEvent(agent: LoadedAgent, sessionId: string, runId: string, notice: SkillProposalNotice, author: MessageAuthor | undefined): Promise<void> {
     const message = notice.mode === 'edit' ? `Wants to update a skill: ${notice.title}` : `Wants to save a new skill: ${notice.title}`
     await sendNotification({ event: 'agent.notification', kind: 'approval', agentId: agent.id, sessionId, runId, message, metadata: { toolName: 'skill_propose', proposalId: notice.proposalId, ...authorMetadata(author) } }).catch(() => {})
-}
-
-// OpenRouter's own cost, or what OpenCode says a step was worth to the user: 0 on the Go plan.
-function costMicrosFrom(providerMetadata: unknown): number | null {
-    const metadata = providerMetadata as { openrouter?: { usage?: { cost?: unknown } }; opencode?: { cost?: unknown } } | undefined
-    const cost = metadata?.opencode?.cost ?? metadata?.openrouter?.usage?.cost
-    return typeof cost === 'number' && Number.isFinite(cost) ? Math.round(cost * 1_000_000) : null
 }
 
 function safeJson(value: unknown): string | null {
@@ -561,7 +556,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         // the prompt, and the provider would read the whole conversation again outside its cache.
         const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
-        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, runOverride, shared, toolPayloadChars(sentTools)))
+        const toolChars = toolPayloadChars(sentTools)
+        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
@@ -586,6 +582,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const turnMessages: ModelMessage[] = handover ? continuationTurn(history) : [...history, { role: 'user', content: [{ type: 'text', text: turnText }, ...context] }]
 
         const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
+        const compactStep = createInRunCompactor(ctx, { system: systemText, toolChars, override: runOverride, initialMessages: cached.messages })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
         spawnToken = claudeTokenOf(connection)
@@ -611,11 +608,15 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             // The step that writes the message a bare card is missing gets no tool: `toolChoice`
             // rather than an empty `activeTools`, since Anthropic refuses a transcript holding
             // tool_use blocks when the request defines no tool.
-            prepareStep: ({ messages, steps }) => {
-                const step = stepWithScreenshots(messages, ctx.screenshots, provider, model, connection)
+            // A long run is compacted between two steps, before the screenshots are put back in: a
+            // summarised step has no screenshot left to show.
+            prepareStep: async ({ messages, steps, stepNumber }) => {
+                const base = (await compactStep?.({ messages, steps, stepNumber })) ?? messages
+                const step = stepWithScreenshots(base, ctx.screenshots, provider, model, connection)
+                const shown = step.messages ?? base
+                const sent = behaviourOf(provider, model) === 'anthropic' ? withTailBreakpoint(shown) : shown
                 return {
-                    ...step,
-                    ...(behaviourOf(provider, model) === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
+                    ...(sent !== messages ? { messages: sent } : {}),
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }
             },
@@ -666,7 +667,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                     })
                     return
                 }
-                await settle({ kind: 'done', text, usage: totalUsage, costMicros: runCostMicros ?? costMicrosFrom(providerMetadata), messages: response.messages })
+                const stepsCostMicros = runCostMicros ?? costMicrosFrom(providerMetadata)
+                const costMicros = ctx.compactionCostMicros === undefined ? stepsCostMicros : (stepsCostMicros ?? 0) + ctx.compactionCostMicros
+                await settle({ kind: 'done', text, usage: totalUsage, costMicros, messages: response.messages })
             },
         })
 

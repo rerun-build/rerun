@@ -35,6 +35,8 @@ export type RunContext = {
     partialResults?: PartialResult[]
     skillProposals?: SkillProposalNotice[]
     screenshots?: ScreenshotStore
+    // What the run's compaction summaries cost, added to the cost of its steps when it settles.
+    compactionCostMicros?: number
     // The user's turn goes to the database without holding the run up: a tool that reads the
     // session history back waits on it first.
     userTurnStored?: Promise<unknown>

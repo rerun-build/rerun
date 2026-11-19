@@ -30,6 +30,10 @@ export const runsListSchema = z.object({ runs: z.array(runSchema) })
 export const runDetailSchema = runSchema.extend({ output: z.string().nullable().optional() })
 export type RunDetail = z.infer<typeof runDetailSchema>
 
+// The `finishReason` of the row a compaction's summary call leaves among a run's steps. It carries
+// the number of the step it follows, 0 before the turn, and no tool call of its own.
+export const COMPACTION_FINISH_REASON = 'compaction'
+
 export const runStepSchema = z.object({
     id: z.string(),
     runId: z.string(),
