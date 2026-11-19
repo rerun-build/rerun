@@ -46,9 +46,10 @@ class CodeIntelRunbook(unittest.TestCase):
             "docker compose -f deploy/vps/code-intel.yml ps --all",
             '--network "$NET"',
             "--user 1001:1001",
-            "node /data/tools/factory/code-q.mjs --status",
+            "node /data/tools/factory-current/code-q.mjs --status",
         ):
             self.assertIn(needle, s)
+        self.assertNotIn("/data/tools/factory/", s)
         mounts = re.findall(r"-v (\S+)", s)
         self.assertEqual(len(mounts), 2)
         for m in mounts:
@@ -98,6 +99,29 @@ class CodeIntelRunbook(unittest.TestCase):
         self.assertIn("stop code-terminal-commander", t)
         self.assertIn("start code-terminal-commander", t)
         self.assertGreater(t.index("--force-recreate"), live)
+
+    def test_index_location_and_follow(self):
+        t = RUNBOOK.read_text()
+        for needle in ("`.symforge/`", "no `index.bin`", "follow_base", "with no restart"):
+            self.assertIn(needle, t)
+
+    def test_speed_and_cost_check(self):
+        s7 = section(7)
+        lines = s7.splitlines()
+        for line in (
+            "/data/tools/bin/code-q --check Agent_Army_Professionals search_symbols '{\"query\": \"main\"}'",
+            "/data/tools/bin/code-q --check rerun find_references '{\"name\": \"follow_base\"}'",
+            "pgrep -fa '[s]ymforge daemon' || echo no daemon left",
+        ):
+            self.assertIn(line, lines)
+        for needle in ("PASS", "stands in"):
+            self.assertIn(needle, s7)
+        self.assertNotIn("sudo", s7)
+        self.assertIn("docker compose -f deploy/vps/code-intel.yml down", section(8))
+        s4 = section(4)
+        self.assertIn("`watching`", s4)
+        self.assertIn("`not watching`", s4)
+        self.assertNotIn("pgrep -fa 'symforge daemon'", RUNBOOK.read_text())
 
     def test_no_addresses_or_keys(self):
         urls = {"http://%s:8787/mcp" % n for n in services()}
