@@ -207,6 +207,50 @@ class Acceptance(Base):
         self.tick(12)
         self.assertEqual(len(self.sent_to("a1")), 2)
 
+    def leave(self):
+        self.merge_child()
+        self.tick_until(lambda: self.sent_to("a1"))
+        self.w.finish("a1", "I looked and stopped.")
+        self.tick_until(lambda: len(self.sent_to("a1")) == 2)
+        self.w.finish("a1", "still nothing")
+        self.tick()
+        self.assertEqual(self.kv("accept:9", "state"), "left")
+
+    def test_a_left_parent_gets_one_fresh_round_after_a_wait_then_stays_left(self):
+        self.leave()
+        self.w.clock += 7 * 3600
+        self.tick_until(lambda: len(self.sent_to("a1")) == 3)
+        self.assertEqual(self.kv("accept:9", "revived"), "1")
+        self.w.finish("a1", "nothing again")
+        self.tick_until(lambda: len(self.sent_to("a1")) == 4)
+        self.w.finish("a1", "and nothing")
+        self.tick()
+        self.assertEqual(self.kv("accept:9", "state"), "left")
+        self.w.clock += 30 * 3600
+        self.tick(12)
+        self.assertEqual(len(self.sent_to("a1")), 4)
+
+    def test_the_fresh_round_waits_its_six_hours(self):
+        self.leave()
+        self.w.clock += 5 * 3600
+        self.tick(12)
+        self.assertEqual(len(self.sent_to("a1")), 2)
+        self.w.clock += 3600 + 1
+        self.tick_until(lambda: len(self.sent_to("a1")) == 3)
+
+    def test_a_left_parent_that_got_its_answer_in_the_fresh_round_is_accepted(self):
+        self.leave()
+        self.w.clock += 7 * 3600
+        self.tick_until(lambda: len(self.sent_to("a1")) == 3)
+        self.w.finish("a1", "checked\nACCEPTED: every ask is met")
+        self.tick()
+        self.assertEqual(self.kv("accept:9", "state"), "accepted")
+
+    def test_a_record_left_before_the_wait_was_kept_is_revived_at_once(self):
+        self.leave()
+        self.d.store.db.execute("DELETE FROM kv WHERE job='accept:9' AND k='left_at'")
+        self.tick_until(lambda: len(self.sent_to("a1")) == 3)
+
 
 if __name__ == "__main__":
     unittest.main()

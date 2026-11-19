@@ -12,6 +12,7 @@ NUM = re.compile(r"#(\d+)")
 EVERY = 5
 ASKS = 2
 RUN_LIMIT = 2700
+REVIVE_S = 6 * 3600
 HELD = ("running", "accepted", "closed", "left")
 CLOSED_LIMIT = 200
 OPEN_LIMIT = 1000
@@ -155,6 +156,8 @@ class Station:
         records = self.records()
         for n in sorted(due_map):
             row = records.get(n, {})
+            if row.get("state") == "left":
+                row = self.revive(n, row)
             if row.get("state") in HELD:
                 continue
             children = [j for j in jobs if j["issue"] in due_map[n]]
@@ -234,7 +237,17 @@ class Station:
             self.log(n, "acceptance: %s; asked once more" % why)
         else:
             self.store.set("accept:%d" % n, "state", "left")
+            self.store.set("accept:%d" % n, "left_at", self.now())
             self.log(n, "acceptance left: %s" % why)
+
+    def revive(self, n, row):
+        if row.get("revived") or (row.get("left_at") and self.now() - float(row["left_at"]) < REVIVE_S):
+            return row
+        job = "accept:%d" % n
+        for k, v in (("revived", 1), ("sends", 0), ("state", "unsent")):
+            self.store.set(job, k, v)
+        self.log(n, "acceptance gets one fresh round after it was left")
+        return self.store.get_all(job)
 
     def accept(self, n, line):
         name = self.name(n)
