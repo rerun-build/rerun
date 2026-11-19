@@ -15,6 +15,7 @@ import digest
 import drift
 import escapes
 import failures
+import flow
 from gist import gist
 import followups
 import gatefiles
@@ -1734,9 +1735,15 @@ class Dispatcher:
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
+        try:
+            records = {n: r.get("state") for n, r in self.acceptance.records().items()}
+            counts = flow.beat_text(self.jobs(), records, today)
+        except Exception as e:
+            counts = "by type: unreadable | features: unreadable"
+            log("-", "heartbeat counts: %s" % type(e).__name__)
+        line = "%s beat %d | %s | ended today: %s | %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead, *self.resolver.counts(self))
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), counts, self.unreadable, dead, *self.resolver.counts(self))
         self.beat_line = line
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
