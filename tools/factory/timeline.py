@@ -137,6 +137,46 @@ def feature_lines(rows, now):
     return lines
 
 
+def _state_start(mine, state, fallback):
+    start = parse(mine[-1]["at"]) if mine else fallback
+    for t in reversed(mine):
+        if t["to_state"] != state:
+            break
+        start = parse(t["at"])
+    return start
+
+
+def map_lines(rows, now):
+    trs = _by_job(rows)
+    state_of = {j["job"]: j["state"] for j in rows["jobs"]}
+    groups = {}
+    for j in rows["jobs"]:
+        if j["state"] in END:
+            continue
+        data = json.loads(j["data"] or "{}")
+        number = int(j["job"]) if j["job"].isdigit() else 0
+        parent = cutshape.parse({"number": number, "body": data.get("body") or ""})["parent"] or 0
+        mine = trs.get(j["job"], [])
+        first = parse(mine[0]["at"]) if mine else parse(j["updated_at"])
+        start = _state_start(mine, j["state"], parse(j["updated_at"]))
+        groups.setdefault(parent, []).append((first, j, data, start))
+    if not groups:
+        return ["dependency map of open work: none"]
+    lines = ["dependency map of open work, by first start (UTC):"]
+    for parent in sorted(groups, key=lambda p: (p == 0, p)):
+        lines.append("  no feature:" if parent == 0 else "  feature #%s:" % parent)
+        for first, j, data, start in sorted(groups[parent], key=lambda g: (g[0], _key(g[1]["job"]))):
+            line = "    %s #%s %s for %d min" % (
+                time.strftime("%m-%d %H:%M", time.gmtime(first)), j["job"], j["state"], max(0, now - start) // 60)
+            edges = data.get("waiting") or []
+            if edges:
+                line += " <- " + ", ".join("#%s %s" % (d, state_of.get(str(d), "not a factory job")) for d in edges)
+            if j["state"] in states.SLOW_WAIT and now - start > LONG_WAIT:
+                line += " | stuck"
+            lines.append(line)
+    return lines
+
+
 def _hm(t):
     return time.strftime("%H:%M", time.gmtime(t))
 
@@ -169,15 +209,21 @@ def gantt(rows, now, since):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="timeline.py")
+    p = argparse.ArgumentParser(
+        prog="timeline.py",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="sudo docker compose -f deploy/vps/factory-dispatcher.yml exec -T factory-dispatcher python3 -I /state/src/tools/factory/timeline.py status")
     p.add_argument("cmd", choices=("status", "gantt"))
     p.add_argument("--db", default="/state/ledger.db")
     p.add_argument("--since")
     a = p.parse_args(argv)
+    if not os.path.exists(a.db):
+        print("no ledger at %s" % a.db, file=sys.stderr)
+        return 2
     now = int(time.time())
     rows = read_rows(a.db)
     if a.cmd == "status":
-        print("\n".join(status_lines(rows, now)))
+        print("\n".join(status_lines(rows, now) + [""] + map_lines(rows, now)))
     else:
         print(gantt(rows, now, parse(a.since) if a.since else now - DAY))
     return 0
