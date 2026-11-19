@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { dirname } from 'node:path'
 import type { ToolSet } from 'ai'
 import { RESULT_HANDLE_CHARS } from '../runtime/compaction/config.js'
 import { resolveInWorkspace } from './sandbox.js'
