@@ -173,6 +173,8 @@ class World:
             return json.dumps(self.open_children)
         if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
             return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])
+        if a[:2] == ["issue", "list"] and "--label" in a and a[a.index("--label") + 1] == "factory-paused":
+            return json.dumps([{"number": i["number"]} for i in self.issues if "factory-paused" in i.get("labels", [])])
         if a[:2] == ["issue", "list"] and "--label" in a and a[a.index("--label") + 1] == "instructions":
             return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues
                                if "instructions" in i.get("labels", []) and i.get("state", "OPEN") == "OPEN"])
@@ -185,7 +187,8 @@ class World:
         if a[:2] == ["issue", "list"] and "--label" not in a:
             return json.dumps([{"number": n} for n in sorted(self.open_numbers)])
         if a[:2] == ["issue", "list"]:
-            return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues if i["number"] not in self.unlabelled])
+            return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"], "labels": [{"name": x} for x in i.get("labels", [])]}
+                               for i in self.issues if i["number"] not in self.unlabelled])
         if a[:2] == ["issue", "view"]:
             i = self.issue(a[2])
             return json.dumps({"title": i.get("title", ""), "state": i.get("state", "OPEN"), "body": i["body"],
