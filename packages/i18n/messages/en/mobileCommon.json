@@ -26,11 +26,18 @@
         "noPreview": "No preview for this file. Share it to open it in another app.",
         "position": "{index} / {total}"
     },
+    "vault": {
+        "fromVault": "Already in the Vault",
+        "useAccount": "Use {label}",
+        "manageBox": "You don't manage this coworker's Box",
+        "lendFailed": "Could not use this account"
+    },
     "_context": {
         "time.now": "Very short, shown next to a row of a list: the item changed less than a minute ago.",
         "time.minutesAgo": "As short as possible: minutes since the last activity, next to a row.",
         "time.hoursAgo": "As short as possible: hours since the last activity, next to a row.",
         "time.daysAgo": "As short as possible: days since the last activity, next to a row.",
-        "errors.requestFailed": "Shown when the server answered an error without a message of its own. {status} is the HTTP status code, like 502. Same for errors.uploadFailed, after sending a file."
+        "errors.requestFailed": "Shown when the server answered an error without a message of its own. {status} is the HTTP status code, like 502. Same for errors.uploadFailed, after sending a file.",
+        "vault.useAccount": "Button that lends an account already connected in the workspace's Vault to the coworker. {label} is the account, usually an email."
     }
 }

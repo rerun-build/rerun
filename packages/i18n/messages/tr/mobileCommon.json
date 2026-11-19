@@ -25,5 +25,11 @@
         "shareFailed": "Dosya paylaşılamadı",
         "noPreview": "Bu dosya için önizleme yok. Başka bir uygulamada açmak için paylaşın.",
         "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "Zaten Vault'ta",
+        "useAccount": "Kullan: {label}",
+        "manageBox": "Bu coworker'ın Box'ını yönetmiyorsunuz",
+        "lendFailed": "Bu hesap kullanılamadı"
     }
 }

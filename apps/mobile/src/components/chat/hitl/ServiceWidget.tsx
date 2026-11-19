@@ -9,6 +9,8 @@ import { installService, resolveServices } from '@/api/services'
 import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { TextField } from '@/components/ui/TextField'
+import { FromVault } from '@/components/vault/FromVault'
+import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect } from '@/lib/oauth-connect'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -66,6 +68,7 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const sent = useRef(false)
+    const vault = useVaultAccounts(agentId)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
 
@@ -120,10 +123,11 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
         setError(null)
     }
 
-    const settle = (outcome: ServiceSetupOutcome) => {
-        const next = entries.map((entry, at) => (at === index ? { slug: service.slug, name: service.name, outcome } : entry))
+    const settle = (outcome: ServiceSetupOutcome, at = index) => {
+        const settled = services[at]
+        const next = entries.map((entry, other) => (other === at ? { slug: settled.slug, name: settled.name, outcome } : entry))
         setEntries(next)
-        setValues(current => ({ ...current, [service.slug]: {} }))
+        setValues(current => ({ ...current, [settled.slug]: {} }))
         setError(null)
         const open = next.findIndex(entry => entry === null)
         if (open >= 0) setIndex(open)
@@ -150,6 +154,8 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
 
     const missing = (method?.inputs ?? []).some(input => input.required && !typed[input.key]?.trim())
     const decided = entries[index]
+    const fromVault = vault.accountsFor(service.slug).length > 0
+    const lending = vault.lending !== null
 
     return (
         <HitlCard symbol="link" label={t('service.label')}>
@@ -170,19 +176,12 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                                     {outcome === 'connected' ? t('service.connected', { name: step.name }) : outcome === 'not-found' ? t('service.notFound') : t('service.skipped')}
                                 </AppText>
                             ) : (
-                                (methodOf(step)?.inputs ?? []).map(input => (
-                                    <TextField
-                                        key={input.key}
-                                        id={input.key}
-                                        verbatim
-                                        label={input.label}
-                                        help={input.help}
-                                        placeholder={input.placeholder}
-                                        secret={input.secret || input.type === 'password'}
-                                        value={stepValues[input.key] ?? ''}
-                                        onChangeText={text => setValues(current => ({ ...current, [step.slug]: { ...current[step.slug], [input.key]: text } }))}
-                                    />
-                                ))
+                                <>
+                                    <FromVault slug={step.slug} vault={vault} disabled={busy} onLent={() => settle('connected', at)} />
+                                    {(methodOf(step)?.inputs ?? []).map(input => (
+                                        <TextField key={input.key} id={input.key} verbatim label={input.label} help={input.help} placeholder={input.placeholder} secret={input.secret || input.type === 'password'} value={stepValues[input.key] ?? ''} onChangeText={text => setValues(current => ({ ...current, [step.slug]: { ...current[step.slug], [input.key]: text } }))} />
+                                    ))}
+                                </>
                             )}
                             {at === index && error && (
                                 <AppText variant="footnote" tone="destructive">
@@ -195,8 +194,8 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                 actions={
                     !decided && (
                         <>
-                            <HitlAction label={services.length > 1 ? t('actions.skip') : t('actions.notNow')} onPress={() => settle('skipped')} disabled={busy} />
-                            <HitlAction label={busy ? t('actions.connecting') : t('actions.connect')} primary disabled={busy || missing || !method} onPress={connect} />
+                            <HitlAction label={services.length > 1 ? t('actions.skip') : t('actions.notNow')} onPress={() => settle('skipped')} disabled={busy || lending} />
+                            <HitlAction label={busy ? t('actions.connecting') : fromVault ? t('actions.connectNew') : t('actions.connect')} primary={!fromVault} disabled={busy || lending || missing || !method} onPress={connect} />
                         </>
                     )
                 }

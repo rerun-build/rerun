@@ -25,5 +25,11 @@
         "shareFailed": "Impossible de partager le fichier",
         "noPreview": "Aucun aperçu pour ce fichier. Partagez-le pour l'ouvrir dans une autre app.",
         "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "Déjà dans le Vault",
+        "useAccount": "Utiliser {label}",
+        "manageBox": "Vous ne gérez pas la Box de ce coworker",
+        "lendFailed": "Impossible d'utiliser ce compte"
     }
 }
