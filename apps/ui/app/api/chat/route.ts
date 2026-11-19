@@ -44,7 +44,8 @@ export async function POST(request: Request) {
     let workspaceId: number
     try {
         const ctx = await requireWorkspaceContext()
-        author = messageAuthorOf(ctx, await requestTimeZone())
+        // The zone only helps the Chief of Staff: a request it cannot be read from still sends.
+        author = messageAuthorOf(ctx, await requestTimeZone().catch(() => undefined))
         actor = actorFromContext(ctx)
         workspaceId = ctx.workspace.id
         // Read alongside the body and awaited inside the engine call's try: a failure fails the send

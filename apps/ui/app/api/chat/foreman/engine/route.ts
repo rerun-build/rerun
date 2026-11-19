@@ -74,6 +74,8 @@ export async function POST(req: Request): Promise<Response> {
     const model = typeof body.model === 'string' ? body.model : undefined
     const queued = body.queued === true
 
+    // The zone only helps the Chief of Staff: a request it cannot be read from still sends.
+    const timezone = await requestTimeZone().catch(() => undefined)
     let existing = await engineSessionOf(ctx, sessionId)
     if (existing?.backend === 'hub') return Response.json({ error: 'hub_conversation' }, { status: 409 })
 
@@ -104,7 +106,7 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, await requestTimeZone()), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, timezone), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the
             // foreman, which only exists beside a machine.
