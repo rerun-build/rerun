@@ -15,6 +15,7 @@ import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewa
 import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
 import { deliverLifetimeCheckout, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
 import { applyLifetimeAddonsSubscription } from '@/ee/services/lifetime-addons.service'
+import { rewardReferral } from '@/ee/services/referral.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent } from './idempotency'
@@ -57,6 +58,7 @@ vi.mock('@/ee/services/lifetime-deal.service', async importOriginal => ({
     refundLifetimePurchase: vi.fn(),
 }))
 vi.mock('@/ee/services/lifetime-addons.service', () => ({ applyLifetimeAddonsSubscription: vi.fn() }))
+vi.mock('@/ee/services/referral.service', () => ({ rewardReferral: vi.fn() }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
 const planSubscription = { id: 'sub_plan', object: 'subscription', metadata: { plan: 'base', workspace_id: '7' }, items: { data: [{ price: { id: 'price_base' } }] }, cancel_at_period_end: false }
@@ -318,9 +320,9 @@ describe('customer.subscription.*', () => {
 })
 
 describe('invoice.*', () => {
-    it('records a credit purchase, the renewal, reports the payment and stamps the first payment, in that order', async () => {
+    it('records a credit purchase, the renewal, reports the payment, stamps the first payment and rewards a referral, in that order', async () => {
         await deliver('invoice.paid', { id: 'in_1' })
-        const fns = [recordCreditInvoice, recordTemplateRenewal, reportPlanInvoicePaid, stampFirstPlanPayment]
+        const fns = [recordCreditInvoice, recordTemplateRenewal, reportPlanInvoicePaid, stampFirstPlanPayment, rewardReferral]
         for (const fn of fns) expect(fn).toHaveBeenCalledWith(expect.objectContaining({ id: 'in_1' }))
         const order = fns.map(fn => vi.mocked(fn).mock.invocationCallOrder[0])
         expect(order).toEqual([...order].sort((a, b) => a - b))

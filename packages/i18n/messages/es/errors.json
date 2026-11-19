@@ -547,5 +547,6 @@
     "taskNotFound": "Tarea no encontrada",
     "stopTaskFailed": "No se pudo detener esta tarea",
     "mcpServerNotFound": "Servidor MCP no encontrado: {name}",
-    "mcpNoSignInHere": "{name} no tiene ningún inicio de sesión que abrir desde aquí."
+    "mcpNoSignInHere": "{name} no tiene ningún inicio de sesión que abrir desde aquí.",
+    "loadReferralsFailed": "No se pudieron cargar tus invitaciones"
 }

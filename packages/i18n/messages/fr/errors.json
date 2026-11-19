@@ -547,5 +547,6 @@
     "taskNotFound": "Tâche introuvable",
     "stopTaskFailed": "Impossible d'arrêter cette tâche",
     "mcpServerNotFound": "Serveur MCP introuvable : {name}",
-    "mcpNoSignInHere": "{name} n'a aucune connexion à ouvrir depuis ici."
+    "mcpNoSignInHere": "{name} n'a aucune connexion à ouvrir depuis ici.",
+    "loadReferralsFailed": "Impossible de charger vos parrainages"
 }

@@ -1,6 +1,7 @@
 import type { Database } from '@/app/api/database.types'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
+import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
 import { drawPriceArm } from '@rerun/cloud/billing'
 import { internalPath } from '@/lib/auth/internal-path'
 import { routes } from '@/lib/routes'
@@ -13,9 +14,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Every page of the app needs an account. These are the ones a visitor without a session may open:
 // the sign-in itself, and the doors that bring someone to it with something to join (a workspace
-// invitation, a creator invite, an AppSumo code) or to leave (an unsubscribe link). Everything outside
-// the matcher of proxy.ts (published pages, the OG renders, the public and mobile APIs) never gets here.
-const PUBLIC_PATHS = [routes.auth, '/invite', '/redeem', '/creator/join', '/unsubscribe']
+// invitation, a creator invite, an AppSumo code, a friend's referral link) or to leave (an unsubscribe
+// link). Everything outside the matcher of proxy.ts (published pages, the OG renders, the public and
+// mobile APIs) never gets here.
+const PUBLIC_PATHS = [routes.auth, '/invite', '/redeem', '/creator/join', '/unsubscribe', REFERRAL_PATH]
 
 export function isPublicPath(pathname: string): boolean {
     return PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(`${path}/`))
@@ -174,6 +176,7 @@ export async function updateSession(request: NextRequest) {
                     userAgent: request.headers.get('user-agent'),
                 }),
                 locale: resolveLocale({ cookie: request.cookies.get(LOCALE_COOKIE)?.value, acceptLanguage: request.headers.get('accept-language') }),
+                referralCode: request.cookies.get(REFERRAL_COOKIE)?.value,
             })
         }
     }
@@ -183,6 +186,8 @@ export async function updateSession(request: NextRequest) {
     // returns below carry them over through `redirectKeepingSession`.
     applySessionHint(request, supabaseResponse, !!identity)
     if (identity && provisioned) applyProvisionedCookie(request, supabaseResponse, identity, provisioned.signedUp)
+    // Read once, at the birth of the account: an account that already existed never becomes a friend.
+    if (identity && provisioned && request.cookies.has(REFERRAL_COOKIE)) supabaseResponse.cookies.delete(REFERRAL_COOKIE)
 
     const { pathname } = request.nextUrl
     if (identity) {

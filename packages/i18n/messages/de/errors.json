@@ -547,5 +547,6 @@
     "taskNotFound": "Aufgabe nicht gefunden",
     "stopTaskFailed": "Diese Aufgabe konnte nicht gestoppt werden",
     "mcpServerNotFound": "MCP-Server nicht gefunden: {name}",
-    "mcpNoSignInHere": "{name} hat keine Anmeldung, die sich von hier öffnen lässt."
+    "mcpNoSignInHere": "{name} hat keine Anmeldung, die sich von hier öffnen lässt.",
+    "loadReferralsFailed": "Deine Empfehlungen konnten nicht geladen werden"
 }

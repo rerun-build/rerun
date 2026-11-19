@@ -2,6 +2,7 @@ import type { Database, Json } from '@/app/api/database.types'
 import { grantRerunTopup } from '@rerun/cloud/billing.server'
 import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
 import { randomBlob } from '@/lib/blobs/catalog'
+import { attachReferral } from '@/ee/services/referral-attach.service'
 import { DEFAULT_NOTIFICATION_PREFS } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -24,10 +25,13 @@ import type { SupabaseClient, User } from '@supabase/supabase-js'
 //
 // `locale` is the language of the request (the visitor's cookie, else the browser): a workspace born
 // on it has its coworkers write in that language when they work on their own.
+//
+// `referralCode` is the code of the referral link the visitor came through, if any: only an account
+// born on this request becomes that member's friend.
 export async function provisionUser(
     supabase: SupabaseClient<Database>,
     user: User,
-    { phoneStep, priceArm, locale = DEFAULT_LOCALE }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale },
+    { phoneStep, priceArm, locale = DEFAULT_LOCALE, referralCode }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale; referralCode?: string | null },
 ): Promise<{ signedUp: boolean } | null> {
     const existingUser = await selectMaybeSingle(supabase, 'users', ['id', 'workspace_id', 'signed_up_at'] as const, { id: user.id })
 
@@ -95,6 +99,7 @@ export async function provisionUser(
     // An account is born signed up: its allowance and its phone step come with it.
     await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
     if (phoneStep) await requirePhone(user.id)
+    if (referralCode) await attachReferral(user.id, workspace.id, referralCode)
     return { signedUp: true }
 }
 

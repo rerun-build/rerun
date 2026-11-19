@@ -319,6 +319,7 @@
     "loadCoworkersFailed": "Failed to load your coworkers",
     "loadCreditUsageFailed": "Failed to load your credit usage",
     "loadInvoicesFailed": "Failed to load your invoices",
+    "loadReferralsFailed": "Failed to load your referrals",
     "loadPayoutsAccountFailed": "Failed to load your payouts account.",
     "loadRevenueFailed": "Failed to load your revenue.",
     "loadSubscriptionFailed": "Failed to load your subscription",

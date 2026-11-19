@@ -2150,6 +2150,96 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+          workspace_id: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+          workspace_id: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+          workspace_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          referee_credit_cents: number | null
+          referee_user_id: string
+          referee_workspace_id: number
+          referrer_credit_cents: number | null
+          referrer_user_id: string
+          referrer_workspace_id: number
+          rewarded_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          referee_credit_cents?: number | null
+          referee_user_id: string
+          referee_workspace_id: number
+          referrer_credit_cents?: number | null
+          referrer_user_id: string
+          referrer_workspace_id: number
+          rewarded_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          referee_credit_cents?: number | null
+          referee_user_id?: string
+          referee_workspace_id?: number
+          referrer_credit_cents?: number | null
+          referrer_user_id?: string
+          referrer_workspace_id?: number
+          rewarded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_code_fkey"
+            columns: ["code"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "referrals_referee_workspace_id_fkey"
+            columns: ["referee_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_workspace_id_fkey"
+            columns: ["referrer_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       remote_computers: {
         Row: {
           app_version: string

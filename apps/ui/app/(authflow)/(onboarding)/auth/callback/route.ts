@@ -12,14 +12,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-
-// Behind the proxy the request's own origin is the internal one.
-function publicUrl(request: Request, destination: string): string {
-    const { origin } = new URL(request.url)
-    const forwardedHost = request.headers.get('x-forwarded-host')
-    if (process.env.NODE_ENV === 'development' || !forwardedHost) return `${origin}${destination}`
-    return `https://${forwardedHost}${destination}`
-}
+import { publicUrl } from '@/lib/auth/public-url'
 
 // Every provider click leaves the intent behind, and the app reads it back as the birth of an account
 // once `signed_up_at` shows up. An account that was already signed up before this sign-in, the one a

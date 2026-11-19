@@ -1540,6 +1540,20 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     if (isMachineEntitled(subscription.status)) await requestBoxRestore(workspaceId)
 }
 
+// The workspace a real charge for its own plan was taken from, or null for anything else: a `$0`
+// trial invoice, a template, the slots of a lifetime workspace, a dead sibling subscription.
+export async function paidPlanInvoiceWorkspace(invoice: Stripe.Invoice): Promise<{ workspaceId: number; subscription: Stripe.Subscription } | null> {
+    if (!invoice.amount_paid || invoice.amount_paid <= 0) return null
+
+    const subscription = await subscriptionOfInvoice(invoice)
+    if (!subscription || isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return null
+
+    const workspaceId = await findWorkspaceId(subscription)
+    if (!workspaceId) return null
+    if (!(await ownsWorkspacePlan(workspaceId, subscription))) return null
+    return { workspaceId, subscription }
+}
+
 /**
  * Stamps the moment a workspace first paid for its plan. This is the hard guardrail behind the
  * teardown: a workspace with `first_paid_at` set never has its Box deleted automatically, only
@@ -1547,14 +1561,9 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
  * status proves nothing on its own (a full-discount coupon reaches it without a payment).
  */
 export async function stampFirstPlanPayment(invoice: Stripe.Invoice): Promise<void> {
-    if (!invoice.amount_paid || invoice.amount_paid <= 0) return
-
-    const subscription = await subscriptionOfInvoice(invoice)
-    if (!subscription || isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
-
-    const workspaceId = await findWorkspaceId(subscription)
-    if (!workspaceId) return
-    if (!(await ownsWorkspacePlan(workspaceId, subscription))) return
+    const paid = await paidPlanInvoiceWorkspace(invoice)
+    if (!paid) return
+    const { workspaceId, subscription } = paid
 
     const supabase = createServiceRoleClient()
     const { data: existing } = await selectMaybeSingle(supabase, 'workspaces', ['first_paid_at'] as const, { id: workspaceId })

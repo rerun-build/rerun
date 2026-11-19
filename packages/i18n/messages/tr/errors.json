@@ -547,5 +547,6 @@
     "taskNotFound": "Görev bulunamadı",
     "stopTaskFailed": "Bu görev durdurulamadı",
     "mcpServerNotFound": "MCP sunucusu bulunamadı: {name}",
-    "mcpNoSignInHere": "{name} için buradan açılacak bir giriş yok."
+    "mcpNoSignInHere": "{name} için buradan açılacak bir giriş yok.",
+    "loadReferralsFailed": "Davetleriniz yüklenemedi"
 }

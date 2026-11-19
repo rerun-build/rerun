@@ -24,6 +24,7 @@ import { deliverLifetimeCheckout, isLifetimeCheckoutSession, refundLifetimePurch
 import { idOf, stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { isLifetimeAddonsCheckoutSession, isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
 import { applyLifetimeAddonsSubscription } from '@/ee/services/lifetime-addons.service'
+import { rewardReferral } from '@/ee/services/referral.service'
 import type Stripe from 'stripe'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent, unclaimedResponse } from './idempotency'
 
@@ -161,6 +162,7 @@ export async function POST(req: Request) {
                     // The only place a real charge is observed, and therefore the only place the
                     // "this workspace has paid" guardrail can be stamped.
                     () => stampFirstPlanPayment(invoice),
+                    () => rewardReferral(invoice),
                 ])
                 break
             }
