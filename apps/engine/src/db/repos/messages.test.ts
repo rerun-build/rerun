@@ -5,8 +5,8 @@ import { resolve } from 'node:path'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-messages-text-'))
 process.env.RERUN_API_KEY = ''
 
-const { describe, expect, it } = await import('vitest')
-const { appendMessage, collectAssistantText, extractText, listMessages } = await import('./messages.js')
+const { describe, expect, it, vi } = await import('vitest')
+const { appendMessage, collectAssistantText, extractText, listMessages, listMessagesAfter } = await import('./messages.js')
 
 describe('extractText', () => {
     it('keeps what the agent said', () => {

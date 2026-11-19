@@ -61,7 +61,7 @@ export async function collectAssistantText(agentId: string, sessionId: string, f
         .select()
         .from(messages)
         .where(and(eq(messages.sessionId, sessionId), gte(messages.createdAt, from)))
-        .orderBy(asc(messages.createdAt))
+        .orderBy(asc(messages.createdAt), asc(sql`rowid`))
     return rows
         .filter(r => r.role === 'assistant' && (!to || r.createdAt <= to))
         .map(r => visibleText(JSON.parse(r.contentJson), '\n'))
