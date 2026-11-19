@@ -15,6 +15,7 @@ jest.mock('expo-file-system', () => ({ Directory: class {}, File: class {}, Path
 jest.mock('@/api/inbox', () => ({ fetchInbox: () => mockFetchInbox(), markInboxRead: (caller: unknown, ids: string[] | 'all') => mockMarkInboxRead(caller, ids) }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_token: 't', user: { id: 'u1' } }, me: { user: { id: 'u1' }, workspace: { id: 7 } } }) }))
 jest.mock('@/auth/supabase', () => ({ supabase: require('@/test/realtime').fakeSupabase }))
+jest.mock('@/notifications/push', () => ({ setBadge: async () => {} }))
 
 const item = (id: string): InboxItem => ({ id, sessionId: `s-${id}`, sessionIds: [`s-${id}`], agentId: 'a1', agentName: 'Scout', status: 'done', title: id, message: null, updatedAt: '2026-11-19T09:00:00Z', count: 1 })
 const inboxWith = (...items: InboxItem[]): Inbox => ({ items, running: 0 })
