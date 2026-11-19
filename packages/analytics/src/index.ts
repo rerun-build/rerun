@@ -335,7 +335,8 @@ export interface AnalyticsEventMap {
     // One provider event and the coworkers it woke, zero included.
     app_event_fired: { app: string; event: string; woken: number }
     // The mobile app read a hub answer only once it had left out what it could not read: the call, and
-    // how many items or fields went. A hub change a shipped build does not know shows here first.
+    // how many items or fields went, once per call for as long as the app runs. A hub change a shipped
+    // build does not know shows here first.
     api_answer_salvaged: { call: string; dropped: number }
 }
 

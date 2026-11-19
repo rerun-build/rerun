@@ -115,6 +115,20 @@ describe('createHubClient', () => {
         expect(salvaged).toHaveBeenCalledWith('GET /api/v1/agents', ['0'])
     })
 
+    it('says it once per call, however often the app repeats that call', async () => {
+        const unreadable = { id: 'a1', name: 'Scout', handle: null, description: null, templateId: null, status: 'hibernating', workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null }
+        const me = { user: { id: 'u1', email: null, name: 'Ada', avatarUrl: null }, workspace: { id: 7, name: 'Atelier Nord', iconUrl: null, plan: 'pro', subscribed: true, role: 'owner-of-everything', boxScope: 'all' } }
+        const request = (async (path: string) => (path === '/api/v1/agents' ? [unreadable] : me)) as Parameters<typeof createHubClient>[0]
+        const salvaged = jest.fn()
+        const hub = createHubClient(request, { onSalvage: salvaged })
+        await hub(mobileApi.listAgents, {})
+        await hub(mobileApi.listAgents, {})
+        expect(salvaged).toHaveBeenCalledTimes(1)
+        await hub(mobileApi.getMe, {})
+        expect(salvaged).toHaveBeenLastCalledWith('GET /api/v1/me', ['workspace.role'])
+        expect(salvaged).toHaveBeenCalledTimes(2)
+    })
+
     it('reads nothing from a call whose answer the app ignores', async () => {
         const { hub } = hubAnswering(json({ released: { workspace: 1 } }))
         await expect(hub(mobileApi.deleteAiConnection, { params: { id: 'cnx-1' } })).resolves.toBeUndefined()

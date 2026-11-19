@@ -28,17 +28,25 @@ const UNREADABLE_INPUT: Record<CodeMethod, SignInError> = {
     email: new SignInError('Enter a valid email', 'invalid_email', undefined, 'email'),
 }
 
+const failed = () => new SignInError('Something went wrong. Try again.', 'generic')
+
+// An answer of the hub this build's schema cannot read. Told by its name: the app holds zod only
+// through @rerun/contracts.
+const isUnreadableAnswer = (error: unknown) => error instanceof Error && error.name === 'ZodError'
+
 // Only a call that got no answer is a connection problem: a hub that answered without a refusal the
-// app can read still turned down what was typed (400) or failed on its side.
+// app can read still turned down what was typed (400) or failed on its side, and one whose answer
+// this build cannot read did answer.
 async function hubCall<T>(method: CodeMethod, call: () => Promise<T>): Promise<T> {
     try {
         return await call()
     } catch (error) {
+        if (isUnreadableAnswer(error)) throw failed()
         if (!(error instanceof ApiError)) throw OFFLINE
         const refusal = signInRefusalSchema.safeParse(error.body)
         if (refusal.success) throw new SignInError(refusal.data.error, refusal.data.reason, refusal.data.retryAfterSeconds, method)
         if (error.status === 400) throw UNREADABLE_INPUT[method]
-        throw new SignInError('Something went wrong. Try again.', 'generic')
+        throw failed()
     }
 }
 

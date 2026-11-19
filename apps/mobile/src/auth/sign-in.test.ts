@@ -45,6 +45,14 @@ describe('sign-in calls', () => {
         expect(mockSignInWithOtp).not.toHaveBeenCalled()
     })
 
+    it('reads an answer this build cannot read as a failure of the hub, never as a connection problem', async () => {
+        mockApi.mockResolvedValue({ channel: 'pigeon' })
+        await expect(sendPhoneCode(REQUEST)).rejects.toMatchObject({ reason: 'generic' })
+        mockApi.mockResolvedValue({ sent: true })
+        await expect(sendEmailCode('grace@atelier-nord.fr')).rejects.toMatchObject({ reason: 'generic' })
+        expect(mockSignInWithOtp).not.toHaveBeenCalled()
+    })
+
     it('reads any other answer of the hub without a refusal as a failure of its own', async () => {
         mockApi.mockRejectedValue(new ApiError(500, 'Internal error', { error: 'Internal error' }))
         await expect(sendPhoneCode(REQUEST)).rejects.toMatchObject({ reason: 'generic' })

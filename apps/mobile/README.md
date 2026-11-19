@@ -29,7 +29,8 @@ fails `src/api/hub-paths.test.ts`.
 
 An answer the build cannot fully read is not dropped whole (`src/api/salvage.ts`): a value it does not know
 (a new enum value, a new kind of part) empties an optional field or leaves out the item of a list it sits
-in, the rest is read, and PostHog gets `api_answer_salvaged`. Only answers: what the app sends is never bent.
+in, the rest is read, and PostHog gets `api_answer_salvaged`, once per call for as long as the app runs.
+Only answers: what the app sends is never bent.
 
 What each build in the stores reads is frozen in `api-contract/`: see its README before changing a call.
 

@@ -112,11 +112,26 @@ type HubCall<E extends JsonEndpoint> = Pick<ApiRequest, 'accessToken' | 'workspa
 
 type AnyCall = Pick<ApiRequest, 'accessToken' | 'workspaceId' | 'signal'> & { params?: Record<string, string>; body?: unknown; query?: HubQueryValues }
 
-type HubClientOptions = { onSalvage?: (call: string, dropped: string[]) => void }
+type OnSalvage = (call: string, dropped: string[]) => void
+
+type HubClientOptions = { onSalvage?: OnSalvage }
+
+// Said once per call for as long as the app runs: a call the app repeats (the skill proposals, every
+// 1.5 s) would otherwise say it again at every answer, from a build nobody can fix any more.
+function reportingOnce(onSalvage: OnSalvage | undefined): OnSalvage | undefined {
+    if (!onSalvage) return undefined
+    const reported = new Set<string>()
+    return (call, dropped) => {
+        if (reported.has(call)) return
+        reported.add(call)
+        onSalvage(call, dropped)
+    }
+}
 
 // One call of the registry: its method and path, and its answer read with the schema the hub promised,
 // leaving out what this build cannot read rather than failing the whole answer (salvage.ts).
-export function createHubClient(request: ApiClient, { onSalvage }: HubClientOptions = {}) {
+export function createHubClient(request: ApiClient, options: HubClientOptions = {}) {
+    const onSalvage = reportingOnce(options.onSalvage)
     return async function hub<E extends JsonEndpoint>(endpoint: E, call: HubCall<E>): Promise<HubResponse<E>> {
         const { params, body, query, accessToken, workspaceId, signal } = call as AnyCall
         const payload = await request<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { method: endpoint.method, body, accessToken, workspaceId, signal })
@@ -124,7 +139,7 @@ export function createHubClient(request: ApiClient, { onSalvage }: HubClientOpti
     }
 }
 
-function readAnswer<E extends JsonEndpoint>(endpoint: E, payload: unknown, onSalvage: HubClientOptions['onSalvage']): HubResponse<E> {
+function readAnswer<E extends JsonEndpoint>(endpoint: E, payload: unknown, onSalvage: OnSalvage | undefined): HubResponse<E> {
     if (typeof endpoint.response === 'string') return undefined as HubResponse<E>
     const { data, dropped } = readSalvaging(endpoint.response as ResponseSchema, payload)
     if (dropped.length) onSalvage?.(`${endpoint.method} ${endpoint.path}`, dropped)
@@ -135,7 +150,8 @@ type ConditionalReader = ReturnType<typeof createConditionalReader>
 
 // A read of the registry the app may already hold: the answer read with its schema, or a null
 // `payload` when the hub said it is still the one named by `etag`.
-export function createConditionalHubReader(read: ConditionalReader, { onSalvage }: HubClientOptions = {}) {
+export function createConditionalHubReader(read: ConditionalReader, options: HubClientOptions = {}) {
+    const onSalvage = reportingOnce(options.onSalvage)
     return async function hubConditional<E extends JsonEndpoint>(endpoint: E, call: HubCall<E> & { etag: string | null }): Promise<ConditionalRead<HubResponse<E>>> {
         const { params, query, accessToken, workspaceId, etag } = call as AnyCall & { etag: string | null }
         const answer = await read<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { accessToken, workspaceId, etag })
