@@ -119,5 +119,22 @@
             "settings": "Paramètres de notification",
             "cancel": "Annuler"
         }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {# vous attend} other {# vous attendent}} · {working} au travail",
+            "waiting": "{waiting, plural, one {# vous attend} other {# vous attendent}}",
+            "working": "{working} au travail",
+            "none": "Tout est fait"
+        },
+        "crew": "Équipe",
+        "needsYou": "Vous attend",
+        "atWork": "au travail",
+        "allDone": "tout est fait",
+        "you": "Vous",
+        "stopped": "Arrêté",
+        "minutes": "{count} min",
+        "asks": "{name} demande",
+        "othersAtWork": "+{count} au travail"
     }
 }

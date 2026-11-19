@@ -119,5 +119,22 @@
             "settings": "Configurações de notificação",
             "cancel": "Cancelar"
         }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {# precisa de você} other {# precisam de você}} · {working} trabalhando",
+            "waiting": "{waiting, plural, one {# precisa de você} other {# precisam de você}}",
+            "working": "{working} trabalhando",
+            "none": "Tudo pronto"
+        },
+        "crew": "Equipe",
+        "needsYou": "Precisa de você",
+        "atWork": "trabalhando",
+        "allDone": "tudo pronto",
+        "you": "Você",
+        "stopped": "Parado",
+        "minutes": "{count} min",
+        "asks": "{name} pergunta",
+        "othersAtWork": "+{count} trabalhando"
     }
 }

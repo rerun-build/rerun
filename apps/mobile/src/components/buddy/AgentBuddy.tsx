@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { useId, type ReactNode, type Ref } from 'react'
 import { View, type StyleProp, type ViewStyle } from 'react-native'
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg'
 
@@ -40,9 +40,11 @@ type AgentBuddyProps = {
     // A buddy looks at what it stands next to: right when its text follows it, left when alone.
     facing?: 'left' | 'right'
     style?: StyleProp<ViewStyle>
+    // The drawing itself, for whoever turns it into a picture (the widgets' faces).
+    svgRef?: Ref<Svg>
 }
 
-export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, facing = 'left', style }: AgentBuddyProps) {
+export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, facing = 'left', style, svgRef }: AgentBuddyProps) {
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const theme = useTheme()
     const small = size < SMALL_BELOW
@@ -64,7 +66,7 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
     return (
         <View pointerEvents="none" style={[{ width: size, height: size, transform: facing === 'right' ? [{ scaleX: -1 }] : undefined, opacity: mood === 'asleep' ? 0.8 : 1 }, style]}>
             <BuddyMotionScope motion={mood === 'asleep' ? null : motion}>
-                <Svg viewBox={viewBox} width="100%" height="100%">
+                <Svg ref={svgRef} viewBox={viewBox} width="100%" height="100%">
                     <RoundedBox
                         uid={uid}
                         geometry={geometry}

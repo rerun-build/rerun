@@ -102,6 +102,34 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.530380179314-likpnhr06isv0ucqs86c4bgpt0oi91c5"
         }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "Crew",
+              "displayName": "Your crew",
+              "description": "Who needs you and who is at work.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryInline",
+                  "accessoryRectangular",
+                  "accessoryCircular"
+                ],
+                "initialLayout": "./src/widgets/CrewWidget.tsx"
+              },
+              "android": {
+                "targetCellWidth": 4,
+                "targetCellHeight": 2,
+                "initialLayout": "./src/widgets/CrewWidget.android.tsx"
+              }
+            }
+          ]
+        }
       ]
     ],
     "experiments": {

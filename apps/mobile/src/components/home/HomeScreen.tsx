@@ -38,6 +38,7 @@ import { startTiming } from '@/perf/timing'
 import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+import { WidgetSync } from '@/widgets/WidgetSync'
 
 // The Home has drawn and settled before anything is read in the background.
 const PRELOAD_AFTER_MS = 1500
@@ -122,6 +123,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     return (
         <BuddyClock resting={covered}>
             <View style={{ flex: 1, backgroundColor: theme.background }}>
+                {board.state === 'ready' && <WidgetSync coworkers={board.coworkers} />}
                 <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120, paddingLeft: pane.left, paddingRight: pane.right }} contentInsetAdjustmentBehavior="never">
                     {board.state === 'loading' && <HomeSkeleton />}
 

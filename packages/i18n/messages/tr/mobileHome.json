@@ -119,5 +119,22 @@
             "settings": "Bildirim ayarları",
             "cancel": "İptal"
         }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, other {# sizi bekliyor}} · {working} çalışıyor",
+            "waiting": "{waiting, plural, other {# sizi bekliyor}}",
+            "working": "{working} çalışıyor",
+            "none": "Hepsi tamam"
+        },
+        "crew": "Ekip",
+        "needsYou": "Sizi bekliyor",
+        "atWork": "çalışıyor",
+        "allDone": "hepsi tamam",
+        "you": "Siz",
+        "stopped": "Durdu",
+        "minutes": "{count} dk",
+        "asks": "{name} soruyor",
+        "othersAtWork": "+{count} çalışıyor"
     }
 }

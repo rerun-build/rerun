@@ -62,6 +62,7 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Rerun, new conversation', href: '/chat/new' },
     { label: 'New coworker', href: '/new-coworker' },
     { label: 'Notifications', href: '/inbox' },
+    { label: 'Widgets', href: '/lab-widgets' },
     { label: 'Push buttons', href: '/lab-push-actions' },
     { label: 'Sign-in sheet', href: '/lab-sign-in' },
     { label: 'Coworker screen in the chat', href: '/lab-screen' },

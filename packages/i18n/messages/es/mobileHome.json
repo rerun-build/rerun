@@ -119,5 +119,22 @@
             "settings": "Ajustes de notificaciones",
             "cancel": "Cancelar"
         }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {# te necesita} other {# te necesitan}} · {working} trabajando",
+            "waiting": "{waiting, plural, one {# te necesita} other {# te necesitan}}",
+            "working": "{working} trabajando",
+            "none": "Todo listo"
+        },
+        "crew": "Equipo",
+        "needsYou": "Te necesita",
+        "atWork": "trabajando",
+        "allDone": "todo listo",
+        "you": "Tú",
+        "stopped": "Detenido",
+        "minutes": "{count} min",
+        "asks": "{name} pregunta",
+        "othersAtWork": "+{count} trabajando"
     }
 }

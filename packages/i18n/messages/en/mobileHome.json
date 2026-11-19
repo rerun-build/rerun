@@ -120,6 +120,23 @@
             "cancel": "Cancel"
         }
     },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {# needs you} other {# need you}} · {working} at work",
+            "waiting": "{waiting, plural, one {# needs you} other {# need you}}",
+            "working": "{working} at work",
+            "none": "All done"
+        },
+        "crew": "Crew",
+        "needsYou": "Needs you",
+        "atWork": "at work",
+        "allDone": "all done",
+        "you": "You",
+        "stopped": "Stopped",
+        "minutes": "{count}m",
+        "asks": "{name} asks",
+        "othersAtWork": "+{count} at work"
+    },
     "_context": {
         "title": "Large title of the Home: the list of the workspace's coworkers. The native launch screen draws the same word.",
         "line.workingOn": "Status line under a coworker's name: it is running, {detail} is the title of its conversation or its description.",
@@ -134,6 +151,10 @@
         "section.label": "VoiceOver label of a collapsible section header: its name and how many rows it holds.",
         "account.leaveServerTitle": "{host} is the web address of the Rerun server the app is connected to.",
         "account.leaveServer": "Destructive button of the dialog that leaves a self-hosted server.",
-        "line.you": "Status line under a coworker's name: the last message of its conversation, written by the person reading. {message} is that message, cut to one line."
+        "line.you": "Status line under a coworker's name: the last message of its conversation, written by the person reading. {message} is that message, cut to one line.",
+        "widgets.headline.both": "Home screen and lock screen widget: how many coworkers wait on the person, then how many are working. Short, it sits above the clock.",
+        "widgets.needsYou": "Small solid chip on a widget, in capitals: a coworker waits on the person. Two words at most.",
+        "widgets.minutes": "How long a coworker has been working, very short, e.g. 12m.",
+        "widgets.asks": "Lock screen widget title: {name} is a coworker that waits on the person."
     }
 }

@@ -166,6 +166,7 @@ function App() {
                                             <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
                                             <Stack.Screen name="lab-coworker" />
                                             <Stack.Screen name="lab-notifications" />
+                                            <Stack.Screen name="lab-widgets" />
                                             <Stack.Screen name="lab-push-actions" />
                                             <Stack.Screen name="lab-conversations" />
                                             <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />

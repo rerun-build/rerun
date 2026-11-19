@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "dependencies": {
         "@ai-sdk/react": "3.0.307",
-        "@expo/ui": "~58.0.27",
+        "@expo/ui": "~58.0.29",
         "@posthog/react-native-plugin": "^2.12.7",
         "@react-native-google-signin/google-signin": "^16.1.5",
         "@react-native-masked-view/masked-view": "0.3.2",
@@ -42,6 +42,7 @@
         "expo-task-manager": "~58.0.14",
         "expo-updates": "~58.0.21",
         "expo-web-browser": "~58.0.7",
+        "expo-widgets": "~58.0.29",
         "i18n-iso-countries": "^7.14.0",
         "libphonenumber-js": "^1.13.14",
         "marked": "^17.0.6",

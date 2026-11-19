@@ -84,6 +84,8 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
     }
 }
 
+const PERSONAL_TEAM_DROPS: ReadonlySet<string | undefined> = new Set(['expo-notifications', 'expo-widgets'])
+
 export default ({ config: base }: ConfigContext): ExpoConfig => {
     assertStoreBuildHasHub()
     const config = withGoogleServices(withAndroidDevClient(withLanguages(withEasProject(base))))
@@ -93,7 +95,8 @@ export default ({ config: base }: ConfigContext): ExpoConfig => {
         ...config,
         name: config.name!,
         slug: config.slug!,
-        plugins: config.plugins?.filter(plugin => (Array.isArray(plugin) ? plugin[0] : plugin) !== 'expo-notifications'),
+        // A free Apple ID gets neither push nor an app group, which the widgets share their data through.
+        plugins: config.plugins?.filter(plugin => !PERSONAL_TEAM_DROPS.has(Array.isArray(plugin) ? plugin[0] : plugin)),
         ios: {
             ...config.ios,
             bundleIdentifier: process.env.RERUN_IOS_BUNDLE_ID ?? `${config.ios?.bundleIdentifier}.dev`,

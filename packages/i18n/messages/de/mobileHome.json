@@ -119,5 +119,22 @@
             "settings": "Benachrichtigungseinstellungen",
             "cancel": "Abbrechen"
         }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {# braucht dich} other {# brauchen dich}} · {working} bei der Arbeit",
+            "waiting": "{waiting, plural, one {# braucht dich} other {# brauchen dich}}",
+            "working": "{working} bei der Arbeit",
+            "none": "Alles erledigt"
+        },
+        "crew": "Team",
+        "needsYou": "Braucht dich",
+        "atWork": "bei der Arbeit",
+        "allDone": "alles erledigt",
+        "you": "Du",
+        "stopped": "Gestoppt",
+        "minutes": "{count} Min.",
+        "asks": "{name} fragt",
+        "othersAtWork": "+{count} bei der Arbeit"
     }
 }
