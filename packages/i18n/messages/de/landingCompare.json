@@ -1596,7 +1596,7 @@
                 },
                 "2": {
                     "question": "Kann ich Moldwright wie n8n selbst hosten?",
-                    "answer": "Jeder Tarif gibt dir bereits eine private, isolierte Maschine. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise, schreib uns an help@moldwright.robagentic.tech."
+                    "answer": "Jeder Tarif gibt dir bereits eine private, isolierte Maschine. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise, schreib uns an help@robagentic.tech."
                 },
                 "3": {
                     "question": "Was unterscheidet Moldwright vom AI-Agent-Node von n8n?",

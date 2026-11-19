@@ -133,7 +133,7 @@ describe('updateSession', () => {
             const response = await updateSession(new NextRequest('https://moldwright.robagentic.tech/board', { headers: DOCUMENT }))
 
             expect(response.cookies.get(SESSION_HINT_COOKIE)?.value).toBe(SESSION_HINT_VALUE)
-            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBe('.rerun.build')
+            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBeUndefined()
             expect(response.cookies.get(SESSION_HINT_COOKIE)?.maxAge).toBe(SESSION_HINT_MAX_AGE)
         })
 
@@ -153,7 +153,7 @@ describe('updateSession', () => {
             )
 
             expect(response.cookies.get(SESSION_HINT_COOKIE)?.maxAge).toBe(0)
-            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBe('.rerun.build')
+            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBeUndefined()
         })
 
         it('leaves a visitor who never had a hint alone', async () => {
@@ -170,7 +170,7 @@ describe('updateSession', () => {
             const response = await updateSession(new NextRequest('https://moldwright.robagentic.tech/auth', { headers: DOCUMENT }))
 
             expect(response.cookies.get(SESSION_HINT_COOKIE)?.value).toBe(SESSION_HINT_VALUE)
-            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBe('.rerun.build')
+            expect(response.cookies.get(SESSION_HINT_COOKIE)?.domain).toBeUndefined()
         })
 
         it('stays host-only in local development, where there is no parent domain to share', async () => {

@@ -157,7 +157,7 @@ describe('installSharedAgentAction', () => {
     })
 
     it('lets an admin install without a plan', async () => {
-        mocks.getAdminEmail.mockResolvedValue('admin@moldwright.robagentic.tech')
+        mocks.getAdminEmail.mockResolvedValue('admin@robagentic.tech')
         const db = database({ subscriptionStatus: null })
 
         await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: true, agentId: 'new-agent' })

@@ -183,11 +183,11 @@ describe('completePhoneSignIn', () => {
 
     it('signs into the account that holds the number, under its own address', async () => {
         stored({ owners: [{ user_id: 'user-1' }] })
-        admin.getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@moldwright.robagentic.tech' } } })
+        admin.getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@robagentic.tech' } } })
 
         expect(await completePhoneSignIn(session, PHONE, '123456', 'sms')).toEqual({ ok: true, created: false, session: TOKENS })
 
-        expect(admin.generateLink).toHaveBeenCalledWith({ type: 'magiclink', email: 'ada@moldwright.robagentic.tech' })
+        expect(admin.generateLink).toHaveBeenCalledWith({ type: 'magiclink', email: 'ada@robagentic.tech' })
         expect(verifyOtp).toHaveBeenCalledWith({ token_hash: 'hash', type: 'magiclink' })
         expect(admin.createUser).not.toHaveBeenCalled()
         expect(supabase.writes('user_phones')).toEqual([])
@@ -275,7 +275,7 @@ describe('completePhoneSignIn', () => {
 
     it('answers unavailable when the session cannot be opened', async () => {
         stored({ owners: [{ user_id: 'user-1' }] })
-        admin.getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@moldwright.robagentic.tech' } } })
+        admin.getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@robagentic.tech' } } })
         verifyOtp.mockResolvedValue({ data: { session: null }, error: { message: 'nope' } })
         vi.spyOn(console, 'error').mockImplementation(() => {})
 
@@ -283,7 +283,7 @@ describe('completePhoneSignIn', () => {
     })
 })
 
-const ACCOUNT = { id: 'user-1', email: 'ada@moldwright.robagentic.tech' }
+const ACCOUNT = { id: 'user-1', email: 'ada@robagentic.tech' }
 const PHONE_BORN = { id: 'user-1', email: '33700000000@phone.rerun.build' }
 
 describe('startPhoneChange', () => {

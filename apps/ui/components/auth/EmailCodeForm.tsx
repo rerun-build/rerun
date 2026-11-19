@@ -169,7 +169,7 @@ export function EmailCodeForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Input type="email" label={t('label')} placeholder="you@moldwright.robagentic.tech" autoComplete="email" {...field} />
+                                            <Input type="email" label={t('label')} placeholder="you@robagentic.tech" autoComplete="email" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

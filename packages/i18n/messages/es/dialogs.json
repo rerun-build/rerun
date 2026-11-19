@@ -47,7 +47,7 @@
             "linkHint": "Envía este enlace a {email}. Solo funciona para esa persona, una vez.",
             "copyLink": "Copiar el enlace de invitación",
             "emailLabel": "Invitar por correo",
-            "emailPlaceholder": "companero@moldwright.robagentic.tech",
+            "emailPlaceholder": "companero@robagentic.tech",
             "boxes": "Boxes",
             "submit": "Invitar",
             "sent": "Invitación enviada a {email}"
@@ -114,7 +114,7 @@
         "name": "Nombre",
         "namePlaceholder": "p. ej. Acme Inc.",
         "email": "Correo",
-        "emailPlaceholder": "companero@moldwright.robagentic.tech",
+        "emailPlaceholder": "companero@robagentic.tech",
         "emailHint": "Tus compañeros reciben una invitación por correo al crear el workspace. Invitar requiere un plan Team o Scale.",
         "add": "Añadir",
         "removeMember": "Quitar {email}",

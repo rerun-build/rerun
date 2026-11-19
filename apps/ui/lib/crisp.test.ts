@@ -14,9 +14,9 @@ afterEach(() => vi.unstubAllGlobals())
 describe('crisp identity', () => {
     it('tells Crisp the address of an email account', () => {
         const pushed = stubCrisp()
-        openCrisp('ada@moldwright.robagentic.tech')
+        openCrisp('ada@robagentic.tech')
         expect(pushed).toEqual([
-            ['set', 'user:email', ['ada@moldwright.robagentic.tech']],
+            ['set', 'user:email', ['ada@robagentic.tech']],
             ['do', 'chat:show'],
             ['do', 'chat:open'],
         ])

@@ -45,7 +45,7 @@ describe('proxy brand gate', () => {
         expect(response.status).toBe(200)
         const cookie = response.cookies.get(BRAND_GATE_COOKIE)
         expect(cookie?.value).toBe(TOKEN)
-        expect(cookie?.domain).toBe('.rerun.build')
+        expect(cookie?.domain).toBeUndefined()
         expect(cookie?.secure).toBe(true)
     })
 
@@ -87,7 +87,7 @@ describe('proxy staging gate', () => {
     beforeEach(() => vi.stubEnv('STAGING_PASSWORD', PASSWORD))
 
     it('asks for the password on a page, and never reads a session', async () => {
-        const response = await proxy(new NextRequest('https://staging.rerun.build/board'))
+        const response = await proxy(new NextRequest('https://staging.moldwright.robagentic.tech/board'))
 
         expect(response.status).toBe(401)
         expect(response.headers.get('www-authenticate')).toContain('Basic')
@@ -96,14 +96,14 @@ describe('proxy staging gate', () => {
     })
 
     it('hands the page to the session refresh with the right password', async () => {
-        const response = await proxy(new NextRequest('https://staging.rerun.build/board', { headers: { authorization: credentials } }))
+        const response = await proxy(new NextRequest('https://staging.moldwright.robagentic.tech/board', { headers: { authorization: credentials } }))
 
         expect(response.status).toBe(200)
         expect(mocks.updateSession).toHaveBeenCalledTimes(1)
     })
 
     it('leaves the API open to callers that have no prompt to answer', async () => {
-        const response = await proxy(new NextRequest('https://staging.rerun.build/api/stripe/webhook', { method: 'POST' }))
+        const response = await proxy(new NextRequest('https://staging.moldwright.robagentic.tech/api/stripe/webhook', { method: 'POST' }))
 
         expect(response.status).toBe(200)
         expect(mocks.updateSession).toHaveBeenCalledTimes(1)

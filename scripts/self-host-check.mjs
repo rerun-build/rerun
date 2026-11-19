@@ -62,7 +62,7 @@ async function askSupabase(url, secretKey) {
         response = await fetch(`${url}/rest/v1/rpc/check_email_exists`, {
             method: 'POST',
             headers: { apikey: secretKey, Authorization: `Bearer ${secretKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'check@moldwright.robagentic.tech' }),
+            body: JSON.stringify({ email: 'check@robagentic.tech' }),
             signal: AbortSignal.timeout(10_000),
         })
     } catch {

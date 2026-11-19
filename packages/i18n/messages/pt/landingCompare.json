@@ -1596,7 +1596,7 @@
                 },
                 "2": {
                     "question": "Posso auto-hospedar o Moldwright como o n8n?",
-                    "answer": "Todo plano já dá a você uma máquina privada e isolada. Infraestrutura dedicada ou auto-hospedada está disponível no Enterprise, fale com a gente em help@moldwright.robagentic.tech."
+                    "answer": "Todo plano já dá a você uma máquina privada e isolada. Infraestrutura dedicada ou auto-hospedada está disponível no Enterprise, fale com a gente em help@robagentic.tech."
                 },
                 "3": {
                     "question": "Qual é a diferença entre o Moldwright e o nó AI Agent do n8n?",

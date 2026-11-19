@@ -45,7 +45,7 @@ beforeEach(() => {
     vi.mocked(markWhatsAppReplied).mockResolvedValue(true)
     vi.mocked(loadWhatsAppMessageOwner).mockResolvedValue({ user_id: 'user-1', phone: PHONE })
     vi.mocked(phoneOwnerId).mockResolvedValue({ userId: null })
-    getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@moldwright.robagentic.tech' } } })
+    getUserById.mockResolvedValue({ data: { user: { id: 'user-1', email: 'ada@robagentic.tech' } } })
 })
 
 afterEach(() => {
@@ -161,7 +161,7 @@ describe('POST /api/webhooks/bird', () => {
 
             expect(getUserById).toHaveBeenCalledWith('user-1')
             expect(captureServer).toHaveBeenCalledWith(
-                'ada@moldwright.robagentic.tech',
+                'ada@robagentic.tech',
                 'phone_verification_delivery',
                 { status, channel: 'whatsapp', reason: undefined, country: 'BE', context: 'wall' },
                 { uuid: deterministicUuid('bird:msg_1') }
@@ -181,7 +181,7 @@ describe('POST /api/webhooks/bird', () => {
 
             vi.mocked(phoneOwnerId).mockResolvedValue({ userId: 'user-1' })
             await POST(signed(verifyEvent('verify.attempt.delivered', signIn)))
-            expect(vi.mocked(captureServer).mock.calls[0][0]).toBe('ada@moldwright.robagentic.tech')
+            expect(vi.mocked(captureServer).mock.calls[0][0]).toBe('ada@robagentic.tech')
 
             vi.mocked(phoneOwnerId).mockResolvedValue({ userId: null })
             await POST(signed(verifyEvent('verify.attempt.delivered', signIn)))

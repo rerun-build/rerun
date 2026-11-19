@@ -1596,7 +1596,7 @@
                 },
                 "2": {
                     "question": "¿Puedo autoalojar Moldwright como n8n?",
-                    "answer": "Cada plan ya te da una máquina privada y aislada. La infraestructura dedicada o autoalojada está disponible en Enterprise, escríbenos a help@moldwright.robagentic.tech."
+                    "answer": "Cada plan ya te da una máquina privada y aislada. La infraestructura dedicada o autoalojada está disponible en Enterprise, escríbenos a help@robagentic.tech."
                 },
                 "3": {
                     "question": "¿En qué se diferencia Moldwright del AI Agent node de n8n?",

@@ -86,7 +86,7 @@ describe('installTemplateAction', () => {
     })
 
     it('lets an admin install a template still in review', async () => {
-        mocks.getAdminEmail.mockResolvedValue('admin@moldwright.robagentic.tech')
+        mocks.getAdminEmail.mockResolvedValue('admin@robagentic.tech')
         database(template({ status: 'in_review' }))
 
         await expect(installTemplateAction({ slug: 'crm', spaceId: SPACE_ID })).resolves.toMatchObject({ ok: true })
@@ -181,7 +181,7 @@ describe('getSharedTemplateAction', () => {
     })
 
     it('lets an admin preview a draft', async () => {
-        mocks.getAdminEmail.mockResolvedValue('admin@moldwright.robagentic.tech')
+        mocks.getAdminEmail.mockResolvedValue('admin@robagentic.tech')
         database(template({ status: 'draft' }))
 
         await expect(getSharedTemplateAction('crm')).resolves.toEqual({ slug: 'crm' })

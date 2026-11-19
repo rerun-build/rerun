@@ -47,7 +47,7 @@
             "linkHint": "Schick diesen Link an {email}. Er gilt nur für sie, einmal.",
             "copyLink": "Einladungslink kopieren",
             "emailLabel": "Per E-Mail einladen",
-            "emailPlaceholder": "teammate@moldwright.robagentic.tech",
+            "emailPlaceholder": "teammate@robagentic.tech",
             "boxes": "Boxes",
             "submit": "Einladen",
             "sent": "Einladung an {email} gesendet"
@@ -114,7 +114,7 @@
         "name": "Name",
         "namePlaceholder": "z. B. Acme GmbH",
         "email": "E-Mail",
-        "emailPlaceholder": "teammate@moldwright.robagentic.tech",
+        "emailPlaceholder": "teammate@robagentic.tech",
         "emailHint": "Teammitglieder erhalten eine Einladung per E-Mail, wenn du den Workspace erstellst. Einladungen erfordern einen Team- oder Scale-Tarif.",
         "add": "Hinzufügen",
         "removeMember": "{email} entfernen",

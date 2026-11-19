@@ -7,7 +7,7 @@ import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { AUTH_RETURN_COOKIE, readAuthReturnCookie } from '@/lib/auth/auth-return'
 import { routes } from '@/lib/routes'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { SIGNUP_INTENT_COOKIE, sharedCookieDomain } from '@moldwright/analytics'
+import { SIGNUP_INTENT_COOKIE } from '@moldwright/analytics'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
@@ -28,9 +28,8 @@ async function wasSignedUpBeforeThisSignIn(supabase: SupabaseClient<Database>, u
     return Date.now() - Date.parse(data.signed_up_at) > SIGNUP_STAMP_WINDOW_MS
 }
 
-function forgetSignupIntent(request: Request, response: NextResponse) {
-    const domain = sharedCookieDomain(new URL(publicUrl(request, '/')).hostname)
-    response.cookies.set(SIGNUP_INTENT_COOKIE, '', { path: '/', maxAge: 0, ...(domain && { domain }) })
+function forgetSignupIntent(response: NextResponse) {
+    response.cookies.set(SIGNUP_INTENT_COOKIE, '', { path: '/', maxAge: 0 })
 }
 
 function providerIn(value: string | undefined): OAuthProvider {
@@ -87,7 +86,7 @@ export async function GET(request: Request) {
             const provider = cookieStore.get(OAUTH_PROVIDER_COOKIE)?.value
             if (!linking && isOAuthProvider(provider)) response.cookies.set(LAST_SIGN_IN_COOKIE, provider, { path: '/', maxAge: LAST_SIGN_IN_MAX_AGE_SECONDS, sameSite: 'lax' })
 
-            if (!linking && (await wasSignedUpBeforeThisSignIn(supabase, data.session.user.id))) forgetSignupIntent(request, response)
+            if (!linking && (await wasSignedUpBeforeThisSignIn(supabase, data.session.user.id))) forgetSignupIntent(response)
 
             return response
         }

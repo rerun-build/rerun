@@ -16,15 +16,15 @@ describe('redirectDelivery', () => {
     })
 
     it('reroutes every mail to the redirect inbox and names the intended recipient in the subject', () => {
-        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@moldwright.robagentic.tech')
-        expect(redirectDelivery('user@acme.com', 'Welcome')).toEqual({ to: 'qa@moldwright.robagentic.tech', subject: '[staging → user@acme.com] Welcome' })
+        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@robagentic.tech')
+        expect(redirectDelivery('user@acme.com', 'Welcome')).toEqual({ to: 'qa@robagentic.tech', subject: '[staging → user@acme.com] Welcome' })
     })
 
     it('reads the variable at send time, not at import', () => {
         vi.stubEnv('EMAIL_REDIRECT_TO', '')
         expect(redirectDelivery('a@b.c', 's').to).toBe('a@b.c')
-        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@moldwright.robagentic.tech')
-        expect(redirectDelivery('a@b.c', 's').to).toBe('qa@moldwright.robagentic.tech')
+        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@robagentic.tech')
+        expect(redirectDelivery('a@b.c', 's').to).toBe('qa@robagentic.tech')
     })
 })
 
@@ -37,7 +37,7 @@ describe('notificationUrl', () => {
 describe('IS_PRODUCTION_MAILER', () => {
     it('is off in production as soon as a redirect inbox is set', async () => {
         vi.stubEnv('NODE_ENV', 'production')
-        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@moldwright.robagentic.tech')
+        vi.stubEnv('EMAIL_REDIRECT_TO', 'qa@robagentic.tech')
         vi.resetModules()
         expect((await import('./client')).IS_PRODUCTION_MAILER).toBe(false)
         vi.stubEnv('EMAIL_REDIRECT_TO', '')

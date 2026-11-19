@@ -24,7 +24,7 @@ const SHARED_HOST_DOMAINS = new Set([
     'trycloudflare.com',
     'deno.dev',
     'replit.app',
-    'rerun.build',
+    'robagentic.tech',
 ])
 
 export function resolveMcpTransport(server: EngineMcpServer): McpTransportKind {

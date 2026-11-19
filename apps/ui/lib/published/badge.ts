@@ -1,7 +1,7 @@
 import { R_PATH } from '@moldwright/ui/logo'
 
 const LANDING_URL = 'https://rerun.build'
-const REPORT_EMAIL = 'help@moldwright.robagentic.tech'
+const REPORT_EMAIL = 'help@robagentic.tech'
 
 const BADGE_STYLE = `
 :host{all:initial}

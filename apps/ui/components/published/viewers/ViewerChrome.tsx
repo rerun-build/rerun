@@ -10,7 +10,7 @@ export const RAW_URL = '/__rerun/raw'
 export const DOWNLOAD_URL = '/__rerun/raw?download=1'
 
 const LANDING_URL = 'https://rerun.build'
-const REPORT_EMAIL = 'help@moldwright.robagentic.tech'
+const REPORT_EMAIL = 'help@robagentic.tech'
 
 export function ViewerPage({ slug, bar, children, className }: { slug: string; bar?: ReactNode; children: ReactNode; className?: string }) {
     return (

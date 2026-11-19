@@ -179,7 +179,7 @@ describe('GET /auth/callback', () => {
         const cleared = response.headers.getSetCookie().find(cookie => cookie.startsWith('rr_signup_intent='))
         expect(cleared).toMatch(/^rr_signup_intent=;/)
         expect(cleared).toContain('Max-Age=0')
-        expect(cleared).toContain('Domain=.rerun.build')
+        expect(cleared).not.toContain('Domain=')
     })
 
     it('forgets the signup intent of an account signed up a few minutes before this sign-in', async () => {

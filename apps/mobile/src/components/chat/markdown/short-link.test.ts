@@ -15,6 +15,6 @@ describe('shortenUrl', () => {
     })
 
     it('leaves anything but a web address alone', () => {
-        expect(shortenUrl('mailto:hello@moldwright.robagentic.tech')).toBe('mailto:hello@moldwright.robagentic.tech')
+        expect(shortenUrl('mailto:hello@robagentic.tech')).toBe('mailto:hello@robagentic.tech')
     })
 })

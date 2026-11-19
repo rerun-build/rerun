@@ -12,7 +12,7 @@ describe('decideNavigation', () => {
     it('sends the rest of the web to the browser', () => {
         expect(decideNavigation('https://example.com/c/pay', SERVER)).toBe('external')
         expect(decideNavigation('http://example.com', SERVER)).toBe('external')
-        expect(decideNavigation('mailto:hello@moldwright.robagentic.tech', SERVER)).toBe('external')
+        expect(decideNavigation('mailto:hello@robagentic.tech', SERVER)).toBe('external')
     })
 
     it('treats a look-alike host or another port as another site', () => {
