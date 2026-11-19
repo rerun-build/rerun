@@ -1,6 +1,6 @@
 # Ideas taken from other projects
 
-As of 2026-11-19. On 2026-11-19 Rob handed over eight outside projects to analyse. His ruling: "we go our own way". No outside code or plugin is installed; each idea worth having is rebuilt in our own code, and every one is measured before it stays. This file is the one place those ideas live: future work on them starts here.
+As of 2026-11-19. On 2026-11-19 Rob handed over eight outside projects and one guide ("Five Agent Orchestration Patterns for an Autonomous Software Factory") to analyse. His ruling: "we go our own way". No outside code or plugin is installed; each idea worth having is rebuilt in our own code, and every one is measured before it stays. This file is the one place those ideas live: future work on them starts here.
 
 Status words: **done** (merged), **trial** (live and being measured), **next** (decided, not built), **later** (decided, waits on something named), **not taken** (looked at, left out, with the reason).
 
@@ -18,6 +18,8 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 | 8 | Station model and effort chosen from published ability and cost data | modelplan | later | dispatch.json tiers |
 | 9 | Frugal's rules for the other stations (build, review, cut) | frugal | later | briefs |
 | 10 | One script calling many tools, for product coworkers with many connected apps | UTCP code-mode | later | engine (product) |
+| 11 | Two competing plans for large issues, scored by the review panel | the patterns guide (Best-of-N) | later | planning |
+| 12 | A review finding is checked against the code before it starts a fix round | the patterns guide (specialist review) | later | review station |
 
 ## 1. Code mode for Claude Code coworkers (done, #1618)
 
@@ -81,6 +83,24 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 - **What:** UTCP code-mode (MPL-2.0) gives an agent one tool that runs a TypeScript script calling all its connected tools, and returns only the result.
 - **Ours:** the engine already has the discovery half (`mcp_search`, `mcp_call`, loading only the tools a task needs). The other half helps Moldwright users whose coworkers have many connected apps; the factory measured almost no tool-server calls in its own runs (0.0% of 382 engine-loop calls), so it is a product feature, not a factory one.
 - **Condition:** model-written scripts run inside the coworker's own box, never in the engine process. That library's "sandbox" is Node's `vm` module, which does not isolate code safely.
+
+## 11. Two competing plans for large issues (later)
+
+- **What:** the guide's Best-of-N: several independent candidates, compared against the same written criteria, the strongest kept, or all rejected.
+- **Ours today:** one planner writes one plan; the review panel (LESLIE failure, ADA structure, BARBARA goal) reads it independently, in dry mode.
+- **Change:** for an issue sized large, or a plan that names a design choice, two planners write plans without seeing each other's; the panel scores both against one list (correctness, reliability, complexity, operations, cost, fit) and the better one goes to the cut. Never for routine issues: it costs a second plan run.
+- **Measure:** plan review notes and the rework of the children built from it, against single-plan issues of the same size.
+
+## 12. A review finding is checked before it starts a fix round (later)
+
+- **What:** the guide's specialist review: a finding is not a confirmed defect until it is checked against the code; false ones are dropped before they cause rework.
+- **Ours today:** a reviewer's findings go straight to the builder as a fix round.
+- **Change:** a cheap model (Haiku or Sonnet) confirms each finding against the diff and the code, with the line that proves it, before the fix round is sent; unconfirmed findings are recorded, not sent.
+- **Measure:** fix rounds per green issue (1.4 build and fix runs per green issue on 2026-11-19, threshold 1.3) and findings dropped as unconfirmed.
+
+## The guide, mapped to the factory
+
+As of 2026-11-19, the factory already runs builder and verifier separation (builder never reviews its own work, prover is not the reviewer, BARBARA accepts against the original asks, CI and "Done-test red before green" on the real commit, required last lines `PR:`, `VERDICT:`, `PROOF:`), independent lanes (the cut's Files, Depends on and worker per child, path leases, CI on dev as integration), a plan review panel close to a council, specialist review (LINUS, BRUCE; risk routing queued as #1587), explicit states (`tools/factory/states.py`, the registry), evidence in the ledger, failure handling (timeouts, bounded retries, failure causes, the resolver, dev red self-heal) and cost per green issue in the digest. Its gaps are ideas 11 and 12, idea 7, and coworker shell commands running in the engine's container (recorded under secure-claude-code below).
 
 ## Not taken
 
