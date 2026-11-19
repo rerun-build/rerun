@@ -1715,6 +1715,22 @@ class Dispatcher:
             return None
         return r.get("issue")
 
+    def dev_healed(self, sha, failed):
+        if not failed:
+            return None
+        try:
+            head = json.loads(self.gh(["api", "repos/%s/git/ref/heads/dev" % self.repo]))["object"]["sha"]
+            if head == sha:
+                return None
+            status = json.loads(self.gh(["api", "repos/%s/compare/%s...%s?per_page=1" % (self.repo, sha, head), "--jq", "{status}"])).get("status")
+            if status != "ahead":
+                return None
+            runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, head)])).get("workflow_runs") or []
+        except (Error, ValueError, KeyError, TypeError, AttributeError):
+            return None
+        passed = {r.get("workflow_id") for r in runs if r.get("conclusion") == "success"}
+        return head if checks_verdict(runs)[0] == "OK" and failed <= passed else None
+
     def dev_results(self):
         for j in self.jobs():
             if j["state"] != "merged" or not j.get("own_merge") or j.get("dev_result") in ("green", "unproved"):
@@ -1727,8 +1743,13 @@ class Dispatcher:
                 self.save(j, "merge commit %s" % sha[:7])
             runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["merge_sha"])])).get("workflow_runs") or []
             verdict, why = checks_verdict(runs)
+            failed = {r.get("workflow_id") for r in runs if r.get("conclusion") in ("failure", "timed_out")}
+            healed = self.dev_healed(j["merge_sha"], failed) if verdict == "FAIL" else None
             if verdict == "OK":
                 result = "green"
+            elif healed:
+                result, why = "green", "dev green again at %s, a later commit that contains this merge" % healed[:7]
+                j["dev_healed_by"] = healed
             elif verdict == "FAIL":
                 result = "red"
             elif j.get("dev_result") == "red":

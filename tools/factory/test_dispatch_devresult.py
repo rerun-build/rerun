@@ -91,5 +91,52 @@ class DevResult(Base):
         self.assertNotIn("own_merge", self.data())
 
 
+class DevHeals(Base):
+    LATER = "cafebabe87654321"
+    merged, data = DevResult.merged, DevResult.data
+
+    def later_dev(self, conclusion, status="ahead"):
+        self.w.branches["dev"] = self.LATER
+        self.w.workflows[self.LATER] = [wf("ci", conclusion, wid=7)]
+        gh = self.w.gh
+
+        def compare(args):
+            a = list(args)
+            if a[0] == "api" and "/compare/%s...%s" % (SHA, self.LATER) in a[1]:
+                return json.dumps({"status": status})
+            return gh(a)
+        self.w.gh = compare
+
+    def test_a_red_merge_is_green_once_a_later_dev_commit_passes(self):
+        self.later_dev("success")
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=7)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "green")
+        self.assertEqual(self.data()["dev_healed_by"], self.LATER)
+        self.assertIn("cafebab", self.data()["dev_why"])
+
+    def test_a_red_merge_stays_red_while_the_later_dev_commit_fails(self):
+        self.later_dev("failure")
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=1)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+
+    def test_a_later_commit_that_did_not_rerun_the_failed_workflow_does_not_heal_it(self):
+        self.later_dev("success")
+        self.merged()
+        self.w.workflows[SHA] = [wf("Factory tools", "failure", wid=2), wf("ci", "success", wid=7)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+
+    def test_a_later_commit_that_does_not_contain_the_merge_does_not_heal_it(self):
+        self.later_dev("success", status="diverged")
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=1)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+
+
 if __name__ == "__main__":
     unittest.main()
