@@ -291,10 +291,16 @@
     },
     "newAgent": {
         "title": "Nouveau coworker",
-        "description": "Décrivez la mission, ou partez d’une suggestion ou d’un template.",
+        "description": "Nommez votre coworker, choisissez son apparence, puis décrivez sa mission.",
         "headingNamed": "Que doit faire {name} ?",
         "heading": "Que doit faire votre nouveau coworker ?",
-        "suggestionsForBox": "Ou partez d'une suggestion pour {boxName}"
+        "suggestionsForBox": "Ou partez d'une suggestion pour {boxName}",
+        "nameHeading": "Nommez votre nouveau coworker",
+        "nameLabel": "Nom du coworker",
+        "lookHeading": "À quoi ressemble {name} ?",
+        "jobHeading": "Bonjour, je suis {name}. Que dois-je faire ?",
+        "continue": "Continuer",
+        "back": "Retour"
     },
     "renameAgent": {
         "title": "Renommer le coworker",

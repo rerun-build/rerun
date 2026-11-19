@@ -1,6 +1,7 @@
 'use server'
 
 import { assertAgentAccess, assertSpaceAccess } from '@/app/api/_auth/access'
+import { coworkerLookSchema, type CoworkerLook } from '@rerun/contracts'
 import { createAgentWithSetup } from '@/app/api/_services/agent-setup.service'
 import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService, withoutPaidApps } from '@/app/api/_services/services.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
@@ -114,10 +115,11 @@ export async function uninstallServiceAction(agentId: string, key: string): Prom
 
 // Create the agent and install the services the user picked, all at drop. Services that
 // need secrets come back in the checklist for the user to finish configuring.
-export async function createAgentWithSetupAction(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; col?: number; row?: number }): Promise<{ ok: true; agentId: string; active: boolean; checklist: ServiceChecklistItem[] } | ActionFailure> {
+export async function createAgentWithSetupAction(params: { name: string; description?: string; look?: CoworkerLook; serviceSlugs?: string[]; workspaceId: number; spaceId: string; col?: number; row?: number }): Promise<{ ok: true; agentId: string; active: boolean; checklist: ServiceChecklistItem[] } | ActionFailure> {
     try {
         const { actor } = await assertSpaceAccess(params.spaceId, 'manage')
-        const { agentId, active, checklist } = await createAgentWithSetup({ ...params, workspaceId: actor.workspaceId, actor })
+        const look = coworkerLookSchema.optional().parse(params.look)
+        const { agentId, active, checklist } = await createAgentWithSetup({ ...params, look, workspaceId: actor.workspaceId, actor })
         return { ok: true, agentId, active, checklist }
     } catch (err) {
         return failureOf(err, 'createCoworkerFailed')

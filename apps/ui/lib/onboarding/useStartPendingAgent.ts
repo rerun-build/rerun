@@ -41,7 +41,7 @@ export function useStartPendingAgent() {
             // L'agent atterrit là où l'utilisateur l'a lâché sur le bloc fantôme, rebasé sur le Space
             // qui vient d'être réclamé. Sans ancre (brouillon d'avant le placement), le serveur choisit.
             const anchor = draft.offset ? rebaseOffset(draft.offset, claim) : undefined
-            const res = await createAgentWithSetupAction({ name: draft.name, description: draft.description, serviceSlugs: draft.serviceSlugs, workspaceId: workspace.id, spaceId: claim.spaceId, col: anchor?.col, row: anchor?.row })
+            const res = await createAgentWithSetupAction({ name: draft.name, description: draft.description, look: draft.look, serviceSlugs: draft.serviceSlugs, workspaceId: workspace.id, spaceId: claim.spaceId, col: anchor?.col, row: anchor?.row })
             if (!res.ok) {
                 toast.error(t('startCoworkerFailed'), { description: errorText(res) })
                 throw new Error(res.error)

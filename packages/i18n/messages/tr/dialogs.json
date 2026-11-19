@@ -291,10 +291,16 @@
     },
     "newAgent": {
         "title": "Yeni coworker",
-        "description": "İşi tarif edin veya bir öneriden ya da şablondan başlayın.",
+        "description": "Coworker'ınıza bir ad verin, görünümünü seçin, ardından işini tarif edin.",
         "headingNamed": "{name} ne yapmalı?",
         "heading": "Yeni coworker'ınız ne yapmalı?",
-        "suggestionsForBox": "Veya {boxName} için seçilenlerden biriyle başlayın"
+        "suggestionsForBox": "Veya {boxName} için seçilenlerden biriyle başlayın",
+        "nameHeading": "Yeni coworker'ınıza bir ad verin",
+        "nameLabel": "Coworker adı",
+        "lookHeading": "{name} nasıl görünüyor?",
+        "jobHeading": "Merhaba, ben {name}. Ne yapmamı istersiniz?",
+        "continue": "Devam",
+        "back": "Geri"
     },
     "renameAgent": {
         "title": "Coworker'ı yeniden adlandır",

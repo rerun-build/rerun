@@ -12,9 +12,10 @@ import { useConnectorCatalog } from '@/lib/new-agent/useConnectorCatalog'
 import { useBoxAgentSuggestions } from '@/lib/onboarding/useBoxAgentSuggestions'
 import { useStartScratchAgent } from '@/lib/templates/useStartScratchAgent'
 
-// The agent described in one sentence: Rerun reads its name, its apps and its timing in it. The
-// dialog writes nothing and calls no action to create anything: the agent is created on the tile
-// drop, with its apps, and the description is its first message.
+// The agent is named, then dressed, then its job is described in one sentence: Rerun reads its apps
+// and its timing in it, and the name given wins over any the description holds. The dialog writes
+// nothing and calls no action to create anything: the agent is created on the tile drop, with its
+// apps and its look, and the description is its first message.
 //
 // One column rather than the house form and aside: the description is the whole dialog, and the
 // templates the aside used to carry are one button under it. The frame keeps the house size.
