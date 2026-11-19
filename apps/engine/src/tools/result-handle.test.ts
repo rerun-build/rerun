@@ -72,4 +72,18 @@ describe('wrapToolsWithResultHandle', () => {
         expect(kept.length).toBeGreaterThan(0)
         for (const l of kept) expect(lines.has(l)).toBe(true)
     })
+
+    it('shows the beginning and the end of a single line longer than the head', async () => {
+        const text = Array.from({ length: 3000 }, (_, i) => `{"k${i}":1}`).join(',')
+        expect(text.length).toBe(34_889)
+        const out = await run(text, LIMIT, 'call-6')
+        expect(out).toBe([text.slice(0, 8_000), '[... lines 1-1 kept whole ...]', text.slice(-4_000), 'Saved whole: .rerun/results/run-1/call-6.txt, lines 1-1'].join('\n'))
+        expect(readFileSync(resolve(workspaceDir('agent-a'), '.rerun/results/run-1/call-6.txt'), 'utf8')).toBe(text)
+    })
+
+    it('shows the end of a last line longer than the tail', async () => {
+        const big = Array.from({ length: 3000 }, (_, i) => `{"k${i}":1}`).join(',')
+        const out = await run(['short a', 'short b', big].join('\n'), LIMIT, 'call-7')
+        expect(out).toBe(['short a', 'short b', '[... lines 3-3 kept whole ...]', big.slice(-4_000), 'Saved whole: .rerun/results/run-1/call-7.txt, lines 1-3'].join('\n'))
+    })
 })
