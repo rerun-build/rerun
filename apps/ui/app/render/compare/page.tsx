@@ -1,1 +1,1 @@
-export { CompareOgGalleryPage as default, compareOgGalleryMetadata as metadata } from '@rerun/cloud/marketing-og'
+export { CompareOgGalleryPage as default, compareOgGalleryMetadata as metadata } from '@moldwright/cloud/marketing-og'

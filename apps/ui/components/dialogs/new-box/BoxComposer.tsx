@@ -1,6 +1,6 @@
 'use client'
 
-import { Caret } from '@rerun/ui/new-agent'
+import { Caret } from '@moldwright/ui/new-agent'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 

@@ -1,4 +1,4 @@
-import { MESSAGE_FEEDBACK_CATEGORIES, type MessageFeedbackCategory, type MessageFeedbackRating, type MessageFeedbackScope } from '@rerun/contracts'
+import { MESSAGE_FEEDBACK_CATEGORIES, type MessageFeedbackCategory, type MessageFeedbackRating, type MessageFeedbackScope } from '@moldwright/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 import { useTranslations } from 'use-intl'

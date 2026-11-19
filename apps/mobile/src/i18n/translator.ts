@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, type Locale } from '@moldwright/i18n'
 import { createTranslator } from 'use-intl'
 
 import { messagesFor, type MobileMessages } from '@/i18n/messages'

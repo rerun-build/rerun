@@ -1,4 +1,4 @@
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 
 import { fitAttachments, imageAttachment, isImage, MAX_ATTACHMENTS, type ComposerAttachment } from './attachments'
 

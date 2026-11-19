@@ -1,6 +1,6 @@
 import posthog from 'posthog-js'
 import type { BeforeSendFn } from 'posthog-js'
-import { SIGNUP_INTENT_COOKIE, sharedCookieDomain as sharedCookieDomainFor, type AnalyticsEventMap, type Attribution, type EventName } from './index'
+import { SIGNUP_INTENT_COOKIE, type AnalyticsEventMap, type Attribution, type EventName } from './index'
 
 type AnalyticsMode = 'off' | 'replay' | 'full'
 
@@ -71,21 +71,14 @@ export function track<E extends EventName>(
     })
 }
 
-function sharedCookieDomain(): string | undefined {
-    if (typeof window === 'undefined') return undefined
-    return sharedCookieDomainFor(window.location.hostname)
-}
-
 function writeCookie(name: string, value: string, maxAgeDays: number) {
     if (typeof document === 'undefined') return
-    const domain = sharedCookieDomain()
     const parts = [
         `${name}=${encodeURIComponent(value)}`,
         'path=/',
         `max-age=${maxAgeDays * 24 * 60 * 60}`,
         'SameSite=Lax',
     ]
-    if (domain) parts.push(`domain=${domain}`)
     if (window.location.protocol === 'https:') parts.push('Secure')
     document.cookie = parts.join('; ')
 }
@@ -227,8 +220,6 @@ export function identifyPerson(
 function deleteEverywhere(name: string) {
     const base = [`${name}=`, 'path=/', 'max-age=0']
     document.cookie = base.join('; ')
-    const domain = sharedCookieDomain()
-    if (domain) document.cookie = [...base, `domain=${domain}`].join('; ')
 }
 
 function clearPosthogStorage() {

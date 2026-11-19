@@ -11,7 +11,7 @@ import { serviceIconProps } from '@/lib/services/icons'
 import type { ServiceSearchResult } from '@/lib/services/types'
 import { SplitButton } from '@/components/ui/split-button'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { Trash2Icon, UnplugIcon } from '@/lib/icons'
 
 type ServiceListProps = {

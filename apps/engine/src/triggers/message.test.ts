@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { TriggerFireInput } from '@rerun/contracts'
+import type { TriggerFireInput } from '@moldwright/contracts'
 import { MAX_PAYLOAD_BYTES, buildTriggerMessage } from './message.js'
 import type { Trigger } from './loader.js'
 

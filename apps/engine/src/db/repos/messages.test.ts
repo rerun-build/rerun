@@ -5,8 +5,8 @@ import { resolve } from 'node:path'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-messages-text-'))
 process.env.RERUN_API_KEY = ''
 
-const { describe, expect, it } = await import('vitest')
-const { appendMessage, collectAssistantText, extractText, listMessages } = await import('./messages.js')
+const { describe, expect, it, vi } = await import('vitest')
+const { appendMessage, collectAssistantText, extractText, listMessages, listMessagesAfter } = await import('./messages.js')
 
 describe('extractText', () => {
     it('keeps what the agent said', () => {
@@ -62,5 +62,23 @@ describe('collectAssistantText', () => {
 
         const saved = (await listMessages('collect', 's3')).find(r => r.id === row.id)
         expect(saved?.contentJson).toBe(JSON.stringify([{ type: 'text', text: 'a' }, { type: 'text', text: 'b' }]))
+    })
+})
+
+describe('save order', () => {
+    it('keeps messages saved in the same millisecond in the order they were saved', async () => {
+        vi.useFakeTimers({ toFake: ['Date'] })
+        try {
+            vi.setSystemTime(new Date('2026-11-18T10:00:00.000Z'))
+            await appendMessage('order', 's1', { role: 'user', content: 'u1' })
+            await appendMessage('order', 's1', { role: 'tool', content: [] })
+            await appendMessage('order', 's1', { role: 'assistant', content: 'a1' })
+            await appendMessage('order', 's1', { role: 'user', content: 'u2' })
+        } finally {
+            vi.useRealTimers()
+        }
+
+        expect((await listMessages('order', 's1')).map(r => r.role)).toEqual(['user', 'tool', 'assistant', 'user'])
+        expect((await listMessagesAfter('order', 's1')).map(r => r.role)).toEqual(['user', 'tool', 'assistant', 'user'])
     })
 })

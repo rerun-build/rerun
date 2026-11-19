@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/ui/button'
 import { ArrowRightIcon } from '@/lib/icons'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
-import { CoinStack, type CatalogEntry } from '@rerun/ui/new-agent'
-import { Spinner } from '@rerun/ui/primitives'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
+import { CoinStack, type CatalogEntry } from '@moldwright/ui/new-agent'
+import { Spinner } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { type ReactNode, useState } from 'react'
 

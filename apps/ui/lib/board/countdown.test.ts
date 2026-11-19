@@ -1,4 +1,4 @@
-import { countdownShort, isCountdownSoon } from '@rerun/ui/iso-grid'
+import { countdownShort, isCountdownSoon } from '@moldwright/ui/iso-grid'
 import { describe, expect, it } from 'vitest'
 
 const SECOND = 1000

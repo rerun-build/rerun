@@ -1,4 +1,4 @@
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 
 export const MARK_SIZE = 128
 export const MARK_DISPLAY = 32

@@ -47,8 +47,8 @@ const { SKILL_STYLE } = await import('./style.js')
 const { insertSkillProposal, getSkillProposal, transitionSkillProposal } = await import('../db/repos/skill-proposals.js')
 const { skillsDir, skillDir, connectionsDir } = await import('../config/paths.js')
 const { rm } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, agentConfigSchema } = await import('@rerun/contracts')
-const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
+const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, agentConfigSchema } = await import('@moldwright/contracts')
+const { createConnection, ensureMoldwrightConnection } = await import('../connections/store.js')
 const { resolveConfiguredModel } = await import('../agents/availability.js')
 
 const id = 'applier'
@@ -141,7 +141,7 @@ describe('the model the skill is written with', () => {
     })
 
     async function rerunAgent() {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const config = agentConfigSchema.parse({ name: 'applier', connectionId: null, provider: null, model: null })
         return { id, config, soul: '', install: '', env: {}, resolved: await resolveConfiguredModel(config) } as any
     }

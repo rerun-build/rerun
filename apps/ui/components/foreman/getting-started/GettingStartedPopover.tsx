@@ -1,6 +1,6 @@
 'use client'
 
-import { ChromePill } from '@rerun/ui/chrome'
+import { ChromePill } from '@moldwright/ui/chrome'
 import { motion, useReducedMotion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type MouseEvent, type PointerEvent } from 'react'

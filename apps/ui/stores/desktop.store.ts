@@ -1,4 +1,4 @@
-import type { TakeoverResult } from '@rerun/contracts'
+import type { TakeoverResult } from '@moldwright/contracts'
 import { create } from 'zustand'
 
 export type TakeoverTarget = { agentId: string; url: string; reason: string; callId: string }

@@ -1,4 +1,4 @@
-import type { SessionSource, SessionStatus } from '@rerun/contracts'
+import type { SessionSource, SessionStatus } from '@moldwright/contracts'
 
 export type LabConversation = {
     id: string

@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { parseServiceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey } from '@moldwright/contracts'
 
 import { getServiceAlternativesAction, getServiceDetailsAction, installServiceAction, listCatalogServicesAction, resetServiceConnectionAction, searchServicesAction, uninstallServiceAction } from '@/app/api/_actions/services.actions'
 import { getAgentDetailAction, patchAgentMcpServersAction } from '@/app/api/_actions/agent.actions'
@@ -21,7 +21,7 @@ import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceList } from '@/components/services/ServiceList'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
-import { HScrollFade } from '@rerun/ui/primitives'
+import { HScrollFade } from '@moldwright/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'

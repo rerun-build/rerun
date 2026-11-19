@@ -1,6 +1,6 @@
 'use client'
 
-import { GitHubIcon, LinkedInIcon, XIcon } from '@rerun/ui/experts'
+import { GitHubIcon, LinkedInIcon, XIcon } from '@moldwright/ui/experts'
 import type { ComponentType } from 'react'
 import { useTranslations } from 'next-intl'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'

@@ -5,7 +5,7 @@ import { AttachmentLightbox, type ReadChatFile } from '@/components/chat/Attachm
 import { AttachmentTile } from '@/components/chat/AttachmentTile'
 import { MediaAlbum, isMediaAlbum, type MediaAlbumItem } from '@/components/chat/MediaAlbum'
 import { rawUrlResolver, sharedFileRawUrl, type RawUrlFor } from '@/lib/files/raw-url'
-import type { FileCard as FileCardData, FileCardEntry } from '@rerun/contracts'
+import type { FileCard as FileCardData, FileCardEntry } from '@moldwright/contracts'
 import { useState } from 'react'
 
 type FileCardProps = {

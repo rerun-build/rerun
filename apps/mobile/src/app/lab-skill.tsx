@@ -1,4 +1,4 @@
-import { FOREMAN_DISPLAY_NAME, type MessageFeedbackRating, type SkillProposal, type SkillProposalStatus } from '@rerun/contracts'
+import { FOREMAN_DISPLAY_NAME, type MessageFeedbackRating, type SkillProposal, type SkillProposalStatus } from '@moldwright/contracts'
 import { useLocalSearchParams } from 'expo-router'
 import { useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'

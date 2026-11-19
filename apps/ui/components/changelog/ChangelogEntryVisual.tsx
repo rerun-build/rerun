@@ -1,6 +1,6 @@
 'use client'
 
-import { StepTransition } from '@rerun/ui/steps'
+import { StepTransition } from '@moldwright/ui/steps'
 
 import type { ChangelogEntryView } from '@/app/api/_actions/changelog.actions'
 import { cn } from '@/lib/utils'

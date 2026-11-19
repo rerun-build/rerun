@@ -11,7 +11,7 @@ const { GET } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
 
-async function clientConfig(url = 'https://app.rerun.build/api/v1/client', headers: Record<string, string> = {}) {
+async function clientConfig(url = 'https://moldwright.robagentic.tech/api/v1/client', headers: Record<string, string> = {}) {
     const res = await GET(new Request(url, { headers }), segment)
     expect(res.status).toBe(200)
     return res.json()

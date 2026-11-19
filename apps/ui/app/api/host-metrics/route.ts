@@ -1,1 +1,1 @@
-export { receiveHostSample as POST } from '@rerun/cloud/host-metrics'
+export { receiveHostSample as POST } from '@moldwright/cloud/host-metrics'

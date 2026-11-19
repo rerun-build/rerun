@@ -8,7 +8,7 @@ import { listFiles, listSchedules, listSkillSummaries, listTriggers, updateSched
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { coworkerRuleOf } from '@/lib/notifications/prefs'
 import { humanCron } from '@/lib/schedules/cron'
-import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RenameCoworkerInput, RoutineKind, RoutinesView, SkillSummariesView } from '@rerun/contracts'
+import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RenameCoworkerInput, RoutineKind, RoutinesView, SkillSummariesView } from '@moldwright/contracts'
 
 export async function renameCoworker(ctx: WorkspaceContext, agentId: string, input: RenameCoworkerInput): Promise<void> {
     await assertAgentAccess(agentId, 'manage', actorFromContext(ctx))

@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import type { ConnectionUsage } from '@rerun/contracts'
+import type { ConnectionUsage } from '@moldwright/contracts'
 import { configPath } from '../config/paths.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
 import { withAgentLock } from '../agents/lock.js'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type RefObject } from 'react'
-import type { BorderBeamProps } from '@rerun/ui'
+import type { BorderBeamProps } from '@moldwright/ui'
 
 import { ForemanPill, type ForemanPillSide } from './ForemanPill'
 import { ForemanPillField } from './ForemanPillField'

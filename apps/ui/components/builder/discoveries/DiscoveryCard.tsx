@@ -1,7 +1,7 @@
 'use client'
 
-import { formatNumber } from '@rerun/i18n/format'
-import { BorderBeam } from '@rerun/ui'
+import { formatNumber } from '@moldwright/i18n/format'
+import { BorderBeam } from '@moldwright/ui'
 import { animate, motion } from 'motion/react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'

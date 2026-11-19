@@ -1,4 +1,4 @@
-import { sleep } from '@rerun/contracts'
+import { sleep } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 

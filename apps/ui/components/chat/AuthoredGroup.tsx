@@ -1,6 +1,6 @@
 'use client'
 
-import { CardAvatar } from '@rerun/ui/chat'
+import { CardAvatar } from '@moldwright/ui/chat'
 import type { ReactNode } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'

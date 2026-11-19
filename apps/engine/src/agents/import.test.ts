@@ -1,7 +1,7 @@
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
-import type { McpServer } from '@rerun/contracts'
+import type { McpServer } from '@moldwright/contracts'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-im-'))
 
@@ -10,7 +10,7 @@ const { ARCHIVE_LIMITS, buildArchive } = await import('./archive.js')
 const { importAgent } = await import('./import.js')
 const { agentConfigSchema } = await import('./types.js')
 const { loadAgentFromDisk } = await import('./loader.js')
-const { RERUN_MODEL } = await import('@rerun/contracts')
+const { RERUN_MODEL } = await import('@moldwright/contracts')
 const { listAgentIndex } = await import('../db/repos/agents.js')
 const { migrate } = await import('../db/migrate.js')
 const { createReadStream } = await import('node:fs')

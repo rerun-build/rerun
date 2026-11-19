@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
 import { FactoryLoader } from './FactoryLoader'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')

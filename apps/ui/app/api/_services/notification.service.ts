@@ -1,11 +1,11 @@
 import { realEmail } from '@/lib/auth/placeholder-email'
 import { after } from 'next/server'
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 
 import { boxAccessOf, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
 import type { Database } from '@/app/api/database.types'
-import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
+import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@moldwright/cloud/email'
 import { notificationUrl } from '@/lib/app-url'
 import type { NotificationPayload } from '@/lib/engine/types'
 import { RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
@@ -25,8 +25,8 @@ import { writeNotificationPrefs } from './notification-audience.service'
 import { loadPresence } from './presence.service'
 import { authenticateEngineToken } from './workspace-engine.service'
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from './workspace-owner.service'
-import { captureServer, deterministicUuid } from '@rerun/analytics/server'
-import { emailTranslator } from '@rerun/emails/i18n'
+import { captureServer, deterministicUuid } from '@moldwright/analytics/server'
+import { emailTranslator } from '@moldwright/emails/i18n'
 
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
 type SessionUpdate = Database['public']['Tables']['sessions']['Update']

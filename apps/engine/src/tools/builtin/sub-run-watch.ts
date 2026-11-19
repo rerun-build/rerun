@@ -1,4 +1,4 @@
-import { PAID_DATA_TOOL, SUB_RUN_TOOL_NAMES } from '@rerun/contracts'
+import { PAID_DATA_TOOL, SUB_RUN_TOOL_NAMES } from '@moldwright/contracts'
 import { abortRun } from '../../runtime/run-control.js'
 import type { AgentRun } from '../../runtime/loop.js'
 import { BLOCKED_SOURCE_PREFIX, isFailureStatus } from '../host-breaker.js'

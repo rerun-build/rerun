@@ -1,4 +1,4 @@
-import { agentImageRef, agentWorkspacePathFromHref } from '@rerun/contracts'
+import { agentImageRef, agentWorkspacePathFromHref } from '@moldwright/contracts'
 import { Lexer, type Token, type Tokens } from 'marked'
 import { createContext, use, useMemo, type ReactNode } from 'react'
 import { Text, View, type TextStyle } from 'react-native'

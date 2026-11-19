@@ -85,3 +85,5 @@ docker compose ps
 docker image prune -f
 echo "== keeper"
 sh deploy/vps/keeper.sh install || echo "keeper install failed: the copy installed before stays"
+echo "== doctor"
+sh deploy/vps/doctor.sh || echo "The checks above found a problem. The deploy itself is done."

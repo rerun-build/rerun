@@ -1,1 +1,1 @@
-export { parseScheduledRun, type ScheduledRun } from '@rerun/contracts'
+export { parseScheduledRun, type ScheduledRun } from '@moldwright/contracts'

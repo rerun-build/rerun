@@ -2,7 +2,7 @@ import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/app/api/database.types'
-import { stopWorkspaceCharges, subscriptionStillCharges, uninstallWorkspaceApps } from '@rerun/cloud/account'
+import { stopWorkspaceCharges, subscriptionStillCharges, uninstallWorkspaceApps } from '@moldwright/cloud/account'
 import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
 import { deletedAccountEmailFor } from '@/lib/auth/placeholder-email'
 import { DEFAULT_WORKSPACE_NAME } from '@/lib/naming/workspace-name'

@@ -6,7 +6,7 @@ import { McpClientPicker } from '@/components/dialogs/McpClientPicker'
 import { DocsLink } from '@/components/ui/docs-link'
 import { Field } from '@/components/ui/field'
 import { KEY_PLACEHOLDER, mcpClientDocs, mcpClientSnippets, type McpClientId } from '@/lib/mcp/connect'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

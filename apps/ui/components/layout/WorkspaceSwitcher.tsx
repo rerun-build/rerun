@@ -7,14 +7,14 @@ import { AccountDialog } from '@/components/dialogs/AccountDialog'
 import { AiProvidersDialog } from '@/components/dialogs/AiProvidersDialog'
 import { ApiKeysDialog } from '@/components/dialogs/ApiKeysDialog'
 import { ServersDialog } from '@/components/dialogs/ServersDialog'
-import { ADMIN_URL } from '@rerun/cloud/admin'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
-import { SERVERS_ENABLED } from '@rerun/cloud/servers'
+import { ADMIN_URL } from '@moldwright/cloud/admin'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
+import { SERVERS_ENABLED } from '@moldwright/cloud/servers'
 import { CreateWorkspaceDialog } from '@/components/dialogs/CreateWorkspaceDialog'
-import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
+import { CreditMeter, UpgradePill } from '@moldwright/cloud/billing.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
-import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
+import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@moldwright/cloud/apps.client'
 import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
 import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDialog'
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
@@ -24,15 +24,15 @@ import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
-import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
-import { Badge } from '@rerun/ui/primitives'
+import { WorkspaceLogoImage, WorkspacePill } from '@moldwright/ui/chrome'
+import { Badge } from '@moldwright/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@moldwright/cloud/billing'
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
-import { useRerunCredit } from '@/hooks/useRerunCredit'
+import { useMoldwrightCredit } from '@/hooks/useMoldwrightCredit'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useCreatorStore } from '@/stores/creator.store'
@@ -107,7 +107,7 @@ export function WorkspaceSwitcher() {
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
     const guided = useForemanStore(state => state.funnel === 'guided')
-    const credit = useRerunCredit()
+    const credit = useMoldwrightCredit()
 
     const sandbox = workspace?.is_sandbox ?? true
     useEffect(() => {

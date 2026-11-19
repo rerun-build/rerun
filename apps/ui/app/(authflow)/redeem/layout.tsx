@@ -1,1 +1,1 @@
-export { RedeemLayout as default, redeemMetadata as metadata } from '@rerun/cloud/redeem'
+export { RedeemLayout as default, redeemMetadata as metadata } from '@moldwright/cloud/redeem'

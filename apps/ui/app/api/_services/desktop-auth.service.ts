@@ -2,7 +2,7 @@ import 'server-only'
 import type { Database } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { DESKTOP_AUTH_CODE_TTL_SECONDS } from '@rerun/contracts'
+import { DESKTOP_AUTH_CODE_TTL_SECONDS } from '@moldwright/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createHash, randomBytes, timingSafeEqual } from 'crypto'
 

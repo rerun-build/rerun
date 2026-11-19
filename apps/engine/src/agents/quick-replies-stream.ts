@@ -1,5 +1,5 @@
 import type { LanguageModelMiddleware, ModelMessage } from 'ai'
-import { QUICK_REPLIES_MAX, QUICK_REPLIES_TOOL, QUICK_REPLY_MAX_LENGTH, parseQuickReplies, stripBridgePrefix, type AgentConfig } from '@rerun/contracts'
+import { QUICK_REPLIES_MAX, QUICK_REPLIES_TOOL, QUICK_REPLY_MAX_LENGTH, parseQuickReplies, stripBridgePrefix, type AgentConfig } from '@moldwright/contracts'
 import { newId } from '../lib/ids.js'
 
 export const QUICK_REPLIES_OPEN = '<quick_replies>'

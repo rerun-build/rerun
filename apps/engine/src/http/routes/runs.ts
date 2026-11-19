@@ -1,4 +1,4 @@
-import { runGoalRecordSchema, type RunGoalRecord } from '@rerun/contracts'
+import { runGoalRecordSchema, type RunGoalRecord } from '@moldwright/contracts'
 import { Hono } from 'hono'
 import { aggregateUsageByDay, cancelRun, getRun, listRunsByAgent } from '../../db/repos/runs.js'
 import { listRunSteps, listToolCalls } from '../../db/repos/telemetry.js'

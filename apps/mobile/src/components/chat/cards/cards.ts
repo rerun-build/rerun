@@ -1,4 +1,4 @@
-import { brainChangeOf, fileCardSchema, mcpRegisterCardOf, parseHubOutput, stripBridgePrefix, tableCardSchema, type BrainChange, type FileCard, type McpRegisterCard, type TableCard } from '@rerun/contracts'
+import { brainChangeOf, fileCardSchema, mcpRegisterCardOf, parseHubOutput, stripBridgePrefix, tableCardSchema, type BrainChange, type FileCard, type McpRegisterCard, type TableCard } from '@moldwright/contracts'
 
 type ToolPart = { type: string; toolName?: string; state?: string; output?: unknown }
 

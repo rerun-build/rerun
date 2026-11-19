@@ -1,4 +1,4 @@
-import { paidDataEntry, paidDataRouteMaxCostUsd, type PaidDataCapability } from '@rerun/contracts'
+import { paidDataEntry, paidDataRouteMaxCostUsd, type PaidDataCapability } from '@moldwright/contracts'
 
 const TREG_BASE_URL = 'https://treg.to'
 const TIMEOUT_MS = 90_000

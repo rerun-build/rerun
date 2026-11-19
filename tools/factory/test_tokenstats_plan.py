@@ -58,3 +58,16 @@ class MeasuresPlan(unittest.TestCase):
             self.fire(str(n), "r%d" % n, 100, 0)
         self.fire("plan:9", "rp", 1000, 0)
         self.assertEqual(digest.measures(self.st, NOW)["tokensPerMerged"], 600)
+
+    def test_a_parent_plan_is_shared_over_its_merged_children_and_its_fire_is_not_windowed(self):
+        body = "**Part of**: #9\n**Depends on**: none\n"
+        self.put(61, "queued", "08:00:00", body)
+        self.put(61, "merged", "09:00:00", body)
+        self.fire("61", "r61", 100, 0)
+        self.st.put_job("62", "queued", {"issue": 62, "title": "T", "body": body}, "r", at="2026-11-12T08:00:00Z")
+        self.st.put_job("62", "merged", {"issue": 62, "title": "T", "body": body}, "r", at="2026-11-12T09:00:00Z")
+        self.fire("62", "r62", 100, 0)
+        fid = self.st.intent("plan:9", "", "plan", at="2026-11-01T08:00:00Z")
+        self.st.fired(fid, "rp")
+        self.st.close_run("rp", "done", tokens_in=1000, tokens_out=0)
+        self.assertEqual(digest.measures(self.st, NOW)["tokensPerMerged"], 600)

@@ -1,8 +1,8 @@
 'use client'
 
-import { IsoGrid, SPACE_COLOR, agentTileStyle, type Container, type ContainerSide, type IsoCamera, type IsoFocusRequest, type TileResults } from '@rerun/ui/iso-grid'
+import { IsoGrid, SPACE_COLOR, agentTileStyle, type Container, type ContainerSide, type IsoCamera, type IsoFocusRequest, type TileResults } from '@moldwright/ui/iso-grid'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { useIsMobile } from '@moldwright/ui/primitives/use-is-mobile'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -11,9 +11,10 @@ import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled } from '@moldwright/cloud/billing'
 import { readHeroAgentApps, readHeroAgentName } from '@/lib/onboarding/hero-handoff'
 import { useResumePendingStart } from '@/lib/onboarding/useResumePendingStart'
+import { routes } from '@/lib/routes'
 import { nameAgentFromPromptAction } from '@/app/api/_actions/onboarding.actions'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { BOX_FIRST_INTRO, ClaimSpaceDialog, type ClaimSpaceTarget } from '@/components/dialogs/ClaimSpaceDialog'
@@ -35,7 +36,7 @@ import { useNextRuns } from '@/hooks/useNextRuns'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { containerFromSpace, linksFromSessions, tileFromAgent } from '@/lib/board/iso-adapter'
-import { useKitTranslations } from '@rerun/ui/locale'
+import { useKitTranslations } from '@moldwright/ui/locale'
 import { useAgentIdeas } from '@/lib/agent-ideas/useAgentIdeas'
 import { boxCtaExamples, boxCtaLabel } from '@/lib/onboarding/box-themes'
 import { localizeSuggestion } from '@/lib/onboarding/localize-suggestion'
@@ -230,7 +231,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         const foremanTakesOver = !workspace.is_sandbox && !workspace.onboarded_at
         void (async () => {
             const name = readHeroAgentName(searchParams) ?? (await nameAgentFromPromptAction(prompt))
-            router.replace('/')
+            router.replace(routes.board)
             setPendingFirstAgent({ name, serviceSlugs: readHeroAgentApps(searchParams), kickoff: prompt })
             if (foremanTakesOver) {
                 markFirstAgentFromPrompt()

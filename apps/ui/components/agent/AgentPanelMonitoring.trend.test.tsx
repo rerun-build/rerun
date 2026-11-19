@@ -2,8 +2,8 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import type { StatsPoint } from '@rerun/contracts'
-import { StatsChart } from '@rerun/ui/monitoring'
+import type { StatsPoint } from '@moldwright/contracts'
+import { StatsChart } from '@moldwright/ui/monitoring'
 
 let host: HTMLDivElement
 let root: Root

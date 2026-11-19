@@ -1,5 +1,5 @@
-import type { AiConnectionMethod } from '@rerun/analytics'
-import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart } from '@rerun/contracts'
+import type { AiConnectionMethod } from '@moldwright/analytics'
+import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart } from '@moldwright/contracts'
 import * as Clipboard from 'expo-clipboard'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'

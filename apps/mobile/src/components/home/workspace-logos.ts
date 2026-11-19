@@ -1,4 +1,4 @@
-import type { WorkspaceSummary } from '@rerun/contracts'
+import type { WorkspaceSummary } from '@moldwright/contracts'
 import { Directory, File, Paths } from 'expo-file-system'
 import { useEffect, useState } from 'react'
 

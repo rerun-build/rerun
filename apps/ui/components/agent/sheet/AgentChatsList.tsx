@@ -1,7 +1,7 @@
 'use client'
 
-import { InboxRow } from '@rerun/ui/inbox'
-import { Badge } from '@rerun/ui/primitives'
+import { InboxRow } from '@moldwright/ui/inbox'
+import { Badge } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 

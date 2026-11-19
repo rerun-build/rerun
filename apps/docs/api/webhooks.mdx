@@ -6,7 +6,7 @@ description: "Start a coworker run from any service that can send an HTTP reques
 A trigger gives a coworker a public URL. Call that URL and the coworker starts working. There is no SDK, no key exchange and no handshake: anything that can send an HTTP request can fire a coworker.
 
 ```
-https://app.rerun.build/api/t/{agentId}/{slug}/{token}
+https://moldwright.robagentic.tech/api/t/{agentId}/{slug}/{token}
 ```
 
 Create a trigger in the app under the coworker **Triggers** tab, or with [`upsert_trigger`](/api/tools/triggers#upsert-trigger). Both give you the full URL.
@@ -85,7 +85,7 @@ Pasting a trigger URL into a chat is still a leak, but it will not fire your cow
 Fire it yourself with `curl`:
 
 ```bash
-curl -i -X POST "https://app.rerun.build/api/t/AGENT_ID/SLUG/TOKEN" \
+curl -i -X POST "https://moldwright.robagentic.tech/api/t/AGENT_ID/SLUG/TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"event":"test"}'
 ```

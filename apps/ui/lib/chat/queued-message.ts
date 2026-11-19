@@ -1,1 +1,1 @@
-export { parseQueued, queuedPreview, shouldFlush, shouldKeepQueued, type QueuedMessage } from '@rerun/contracts'
+export { parseQueued, queuedPreview, shouldFlush, shouldKeepQueued, type QueuedMessage } from '@moldwright/contracts'

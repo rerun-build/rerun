@@ -1,4 +1,4 @@
-import type { ContextSize, RunGoal } from '@rerun/contracts'
+import type { ContextSize, RunGoal } from '@moldwright/contracts'
 import {
     ENGINE_CAPABILITY_DESKTOP,
     ENGINE_CAPABILITY_OPENCODE,
@@ -50,7 +50,7 @@ import {
     type BrainRevision,
     type BrainSeedPage,
     type BrainSeedResult,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { isNetworkFailure } from '@/lib/net/network-error'
 import {
     type EngineAgentConfigPatch,

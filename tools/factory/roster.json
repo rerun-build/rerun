@@ -47,7 +47,7 @@
     {"name": "docs", "owner": "linus", "builder": "dana", "sensitive": false, "globs": [
       "**/*.md", "docs/**", "doc/**"]},
     {"name": "factory-roster", "owner": "linus", "builder": "code", "sensitive": true, "globs": [
-      "tools/factory/roster.json", "tools/factory/roster.py"]},
+      "tools/factory/roster.json", "tools/factory/roster.py", "tools/factory/gate.py", "tools/factory/ledger.py"]},
     {"name": "factory-checkout", "owner": "linus", "builder": "code", "sensitive": true, "globs": [
       "tools/factory/factory.py", "tools/factory/clones.py", "tools/factory/mirror.py", "tools/factory/janitor.py",
       "tools/factory/toolsupdate.py", "tools/factory/install.sh", "tools/factory/bin/**"]},

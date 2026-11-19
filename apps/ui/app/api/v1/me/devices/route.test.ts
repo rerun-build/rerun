@@ -14,7 +14,7 @@ vi.mock('@/supabase/server', () => ({
 const { POST, DELETE } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
-const url = 'https://app.rerun.build/api/v1/me/devices'
+const url = 'https://moldwright.robagentic.tech/api/v1/me/devices'
 const call = (handler: typeof POST, body: object) => handler(new Request(url, { method: 'POST', body: JSON.stringify(body) }), segment)
 const TOKEN = 'ExponentPushToken[a-b_c]'
 const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60_000).toISOString()

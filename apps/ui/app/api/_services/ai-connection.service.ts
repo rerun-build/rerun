@@ -2,8 +2,8 @@ import 'server-only'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { isPremiumModelEntitled } from '@moldwright/cloud/billing'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import {
     KEY_PROVIDERS,
     keyProviders,
@@ -21,14 +21,14 @@ import {
     offeredModels,
     planWindowName,
     planWindowReset,
-    rerunCreditOf,
+    moldwrightCreditOf,
     modelDescription,
     sourceKind,
     sourceSummary,
     suggestName,
     type GuidedProvider,
     type KeyProvider,
-    type RerunCredit,
+    type MoldwrightCredit,
     type SourceCopy,
 } from '@/lib/engine/ai-sources'
 import { type ClaudeOAuthStart, buildClaudeAuthorize, exchangeClaudeCode } from '@/lib/engine/claude-oauth'
@@ -53,7 +53,7 @@ import { OPENCODE_ENABLED } from '@/lib/features'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
-import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@moldwright/contracts'
 
 export class ConnectionInputError extends AppError {
     constructor(code: ErrorCode, params?: ErrorParams) {
@@ -219,7 +219,7 @@ async function takenNames(workspaceId: number): Promise<string[]> {
     return (await engineListConnections(engine.conn)).connections.map(connection => connection.name)
 }
 
-function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, premiumAllowed: boolean, t: SourceCopy, locale: string): AiConnectionView {
+function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: MoldwrightCredit, premiumAllowed: boolean, t: SourceCopy, locale: string): AiConnectionView {
     const status = !source.connected || source.credentialRejected ? 'reconnect' : isCreditExhausted(source, credit) ? 'credit_used_up' : 'connected'
     return {
         id: source.id,
@@ -246,7 +246,7 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
 export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiConnectionsView> {
     const engine = await findWorkspaceEngine(ctx.workspace.id)
     const list = engine ? await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)) : { connections: [], default: null }
-    const credit = rerunCreditOf(ctx.workspace)
+    const credit = moldwrightCreditOf(ctx.workspace)
     const premiumAllowed = isPremiumModelEntitled(ctx.workspace)
     const pick = effectiveDefault(list.default)
     const taken = list.connections.map(connection => connection.name)

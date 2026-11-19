@@ -1,7 +1,7 @@
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import * as engine from '@/lib/engine/client'
-import { rowFilterSchema } from '@rerun/contracts'
+import { rowFilterSchema } from '@moldwright/contracts'
 import { z } from 'zod'
 import { withQueryWorkspace } from '@/lib/workspace/query-workspace'
 

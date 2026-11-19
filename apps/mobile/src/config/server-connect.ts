@@ -1,4 +1,4 @@
-import { clientConfigSchema } from '@rerun/contracts'
+import { clientConfigSchema } from '@moldwright/contracts'
 
 import { ApiError, clientHeader, createApiClient } from '@/api/client'
 import type { CustomServer } from '@/config/custom-server'

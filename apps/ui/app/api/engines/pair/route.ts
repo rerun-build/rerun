@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { engineAddress, redeemPairingToken, ServerPairingError } from '@/app/api/_services/servers.service'
-import { SERVERS_ENABLED } from '@rerun/cloud/servers'
+import { SERVERS_ENABLED } from '@moldwright/cloud/servers'
 import { APP_URL } from '@/lib/app-url'
 
 const pairSchema = z.object({

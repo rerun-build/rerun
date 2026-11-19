@@ -1,4 +1,4 @@
-import type { GoalVerdict, RunGoal } from '@rerun/contracts'
+import type { GoalVerdict, RunGoal } from '@moldwright/contracts'
 import { checkGoal, goalFeedback } from '../runtime/goal-check.js'
 
 type StopInput = { hook_event_name?: string; last_assistant_message?: string }

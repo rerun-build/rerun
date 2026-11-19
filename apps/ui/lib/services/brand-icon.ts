@@ -1,6 +1,6 @@
 import { fal } from '@fal-ai/client'
-import { isRecord } from '@rerun/contracts'
-import { withBrandIconTone, type BrandIconTone } from '@rerun/ui/brand-icon'
+import { isRecord } from '@moldwright/contracts'
+import { withBrandIconTone, type BrandIconTone } from '@moldwright/ui/brand-icon'
 import type { Database } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'

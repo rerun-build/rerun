@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { Client } from '@libsql/client'
-import { CARD_FIELD_ROLES, CARD_FORMATS, isCardFormat, tableViewConfigSchema, type TableView, type TableViewConfig, type TableViewInput } from '@rerun/contracts'
+import { CARD_FIELD_ROLES, CARD_FORMATS, isCardFormat, tableViewConfigSchema, type TableView, type TableViewConfig, type TableViewInput } from '@moldwright/contracts'
 import { tableColumns, withBusyRetry } from './sqlStore.js'
 
 export const VIEWS_TABLE = '_rerun_views'

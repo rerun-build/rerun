@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const sendSignInCodeEmail = vi.fn()
-vi.mock('@rerun/cloud/email', () => ({ sendSignInCodeEmail: (input: unknown) => sendSignInCodeEmail(input) }))
+vi.mock('@moldwright/cloud/email', () => ({ sendSignInCodeEmail: (input: unknown) => sendSignInCodeEmail(input) }))
 
 const selectMaybeSingle = vi.fn()
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: (...args: unknown[]) => selectMaybeSingle(...args) }))

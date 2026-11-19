@@ -1,9 +1,9 @@
 'use client'
 
-import { Badge, Card } from '@rerun/ui/primitives'
-import { TemplateBoardPreview, type BoardAgent } from '@rerun/ui/iso-grid'
-import type { TemplateConnector } from '@rerun/contracts'
-import type { Messages } from '@rerun/i18n/messages'
+import { Badge, Card } from '@moldwright/ui/primitives'
+import { TemplateBoardPreview, type BoardAgent } from '@moldwright/ui/iso-grid'
+import type { TemplateConnector } from '@moldwright/contracts'
+import type { Messages } from '@moldwright/i18n/messages'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 

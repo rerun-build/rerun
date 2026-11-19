@@ -1,8 +1,8 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
-import { ScrollFade } from '@rerun/ui/primitives'
+import { TextShimmer } from '@moldwright/ui'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
+import { ScrollFade } from '@moldwright/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'

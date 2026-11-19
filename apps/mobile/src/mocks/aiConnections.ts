@@ -1,4 +1,4 @@
-import type { AiConnectionView, AiConnectionsView, ConnectionUsage } from '@rerun/contracts'
+import type { AiConnectionView, AiConnectionsView, ConnectionUsage } from '@moldwright/contracts'
 
 const RERUN: AiConnectionView = {
     id: 'rerun',

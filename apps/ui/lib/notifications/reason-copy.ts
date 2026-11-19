@@ -1,4 +1,4 @@
-import type { EmailTranslator } from '@rerun/emails/i18n'
+import type { EmailTranslator } from '@moldwright/emails/i18n'
 import type { NotificationReason } from './routing'
 
 export type ReasonCopy = (key: 'mine' | 'participant' | 'followed' | 'allActivity' | 'everything' | 'workspace', values?: { agentName: string }) => string

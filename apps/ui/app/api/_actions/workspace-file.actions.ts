@@ -4,7 +4,7 @@ import { saveTextFile, type SaveFileResult } from '@/app/api/_services/file.serv
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import { NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
 
 const SHARED_FILES_BASE = '/shared/files'
 

@@ -3,7 +3,7 @@
 import { Combobox, type ComboboxGroup } from '@/components/ui/combobox'
 import { useBoardStore } from '@/stores/board.store'
 import type { IsoAgent } from '@/lib/board/types'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 

@@ -1,7 +1,7 @@
 import { task } from '@trigger.dev/sdk/v3'
 
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
-import { taskLogger as logger, triggerTaskAndWait, waitMinutes as waitFor } from '@rerun/cloud/tasks'
+import { taskLogger as logger, triggerTaskAndWait, waitMinutes as waitFor } from '@moldwright/cloud/tasks'
 import { companyExploreIdempotencyKey, companyExploreKey, requestAgentIdeas } from '@/lib/brain/request-seed'
 import { buildSeedPages } from '@/lib/brain/seed-pages'
 import { companySiteUrl } from '@/lib/company/firecrawl'

@@ -1,4 +1,4 @@
-import { cellText, formatText, isNumericFormat, isTruthyCell } from '@rerun/contracts'
+import { cellText, formatText, isNumericFormat, isTruthyCell } from '@moldwright/contracts'
 import type { ReactNode } from 'react'
 
 import { cn } from '../../cn'

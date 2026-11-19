@@ -5,7 +5,7 @@ import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import * as engine from '@/lib/engine/client'
 import type { DataScope } from '@/lib/data/source'
 import type { EngineConnection } from '@/lib/engine/types'
-import type { EngineDbGroup, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@rerun/contracts'
+import type { EngineDbGroup, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@moldwright/contracts'
 import { refusal, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 type ActionResult<T = object> = ({ success: true } & T) | ({ success: false } & ActionRefusal)

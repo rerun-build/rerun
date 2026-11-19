@@ -1,4 +1,4 @@
-import type { AddableProvider, AiConnectionsView } from '@rerun/contracts'
+import type { AddableProvider, AiConnectionsView } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Alert, View } from 'react-native'

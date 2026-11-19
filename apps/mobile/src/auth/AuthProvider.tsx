@@ -1,4 +1,4 @@
-import type { Me } from '@rerun/contracts'
+import type { Me } from '@moldwright/contracts'
 import type { Session } from '@supabase/supabase-js'
 import * as SecureStore from 'expo-secure-store'
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'

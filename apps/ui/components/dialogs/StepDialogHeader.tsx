@@ -1,7 +1,7 @@
 'use client'
 
-import { TextGenerateEffect } from '@rerun/ui'
-import { StepperBar, StepTransition, type StepperGroup, type StepperSplit } from '@rerun/ui/steps'
+import { TextGenerateEffect } from '@moldwright/ui'
+import { StepperBar, StepTransition, type StepperGroup, type StepperSplit } from '@moldwright/ui/steps'
 import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 

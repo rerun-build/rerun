@@ -1,4 +1,4 @@
-import type { Conversation } from '@rerun/contracts'
+import type { Conversation } from '@moldwright/contracts'
 
 export type ThreadItem = Pick<Conversation, 'title' | 'status' | 'source' | 'automationName' | 'outcome' | 'originAgentName'> & { id: string; createdAt: string; firstMessage?: string | null }
 

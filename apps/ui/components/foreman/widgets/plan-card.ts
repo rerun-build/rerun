@@ -1,4 +1,4 @@
-import { asRecord } from '@rerun/contracts'
+import { asRecord } from '@moldwright/contracts'
 import { readBeats, readGets, type PlanBeats } from '@/lib/foreman/plan-items'
 
 export type { PlanBeats }

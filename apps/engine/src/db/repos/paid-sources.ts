@@ -1,4 +1,4 @@
-import type { TableSourcesRequest, TableSourcesResult } from '@rerun/contracts'
+import type { TableSourcesRequest, TableSourcesResult } from '@moldwright/contracts'
 import { getSystemDb, systemDbExists } from '../systemDb.js'
 import { readPaidSources, writePaidSources, type PaidSourceRecord } from '../../paid-data/store.js'
 

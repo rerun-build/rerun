@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { OPENCODE_SNAPSHOT, connectionConfigSchema, parseOpencodeCatalog } from '@rerun/contracts'
+import { OPENCODE_SNAPSHOT, connectionConfigSchema, parseOpencodeCatalog } from '@moldwright/contracts'
 import { liveOpencodeProviderModels, opencodeModel, opencodeProviderModels, refreshOpencodeCatalog, refreshStaleOpencodeCatalog, resetOpencodeCatalogForTests } from './opencode-catalog.js'
 import { planLimitWindowsFromOpencode, readPlanLimits, forgetPlanLimits } from './plan-limits.js'
 import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits, forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'

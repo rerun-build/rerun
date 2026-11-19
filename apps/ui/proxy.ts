@@ -23,7 +23,7 @@ import {
     BRAND_GATE_PARAM,
     brandGateVerdict,
     isGatedPath,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { NextRequest, NextResponse } from 'next/server'
 
 function brandGate(request: NextRequest): NextResponse {
@@ -39,13 +39,11 @@ function brandGate(request: NextRequest): NextResponse {
 
     const response = NextResponse.next()
     if (verdict === 'grant' && secret) {
-        const host = (request.headers.get('host') ?? request.nextUrl.hostname).split(':')[0]
         const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim()
         response.cookies.set(BRAND_GATE_COOKIE, secret, {
             path: '/',
             maxAge: BRAND_GATE_MAX_AGE,
             sameSite: 'lax',
-            domain: host.endsWith('rerun.build') ? '.rerun.build' : undefined,
             secure: (forwarded ?? request.nextUrl.protocol.replace(':', '')) === 'https',
         })
     }

@@ -1,11 +1,11 @@
 'use client'
 
 import type { ComponentProps, ComponentType, ReactNode } from 'react'
-import { TRIAL_DAYS, formatAmount } from '@rerun/contracts'
-import { formatDate } from '@rerun/i18n/format'
+import { TRIAL_DAYS, formatAmount } from '@moldwright/contracts'
+import { formatDate } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
-import { BorderBeam } from '@rerun/ui'
-import { Badge } from '@rerun/ui/primitives'
+import { BorderBeam } from '@moldwright/ui'
+import { Badge } from '@moldwright/ui/primitives'
 import type { AppConnectionView, AppsOverview } from '@/app/api/_services/apps.service'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -22,7 +22,7 @@ import type { AppSlug } from '@/lib/apps/types'
 import { ArrowRightIcon, CheckIcon, ChevronLeftIcon, LogOutIcon, PlusIcon, UsersIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
-import { AppRerunLink } from './AppRerunLink'
+import { AppMoldwrightLink } from './AppMoldwrightLink'
 
 export type AppPresentation = {
     slug: AppSlug
@@ -124,7 +124,7 @@ export function IntroScreen({ presentation, overview, pending, onConnectStart, o
     return (
         <>
             <PanelScroller className="px-5 pb-6 sm:px-8">
-                <AppRerunLink slug={presentation.slug} className="pt-10 pb-8 max-sm:pt-6 max-sm:pb-6" />
+                <AppMoldwrightLink slug={presentation.slug} className="pt-10 pb-8 max-sm:pt-6 max-sm:pb-6" />
                 <div className="flex flex-col items-center gap-2 text-center">
                     <h2 className="text-xl font-semibold tracking-tight">{name}</h2>
                     <p className="max-w-sm text-sm text-pretty text-muted-foreground">{t(`presentation.pitch.${presentation.slug}`)}</p>

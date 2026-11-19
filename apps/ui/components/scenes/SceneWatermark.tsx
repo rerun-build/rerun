@@ -1,5 +1,5 @@
-import { BorderBeam } from '@rerun/ui'
-import { R_PATH } from '@rerun/ui/logo'
+import { BorderBeam } from '@moldwright/ui'
+import { R_PATH } from '@moldwright/ui/logo'
 
 export function SceneWatermark() {
     return (

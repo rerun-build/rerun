@@ -10,7 +10,7 @@ const CFG: ManagedOAuthConfig = {
     clientSecretEnv: 'Y',
 }
 
-const CTX: ManagedOAuthContext = { verifier: 'ver', agentId: 'a1', key: 'typeform', provider: 'typeform', serverName: 'Typeform', redirectUri: 'https://app.rerun.build/api/oauth/managed/typeform/callback' }
+const CTX: ManagedOAuthContext = { verifier: 'ver', agentId: 'a1', key: 'typeform', provider: 'typeform', serverName: 'Typeform', redirectUri: 'https://moldwright.robagentic.tech/api/oauth/managed/typeform/callback' }
 
 afterEach(() => {
     vi.unstubAllGlobals()
@@ -19,8 +19,8 @@ afterEach(() => {
 
 describe('managedCallbackUrl', () => {
     it('puts the provider in the path under the forwarded origin', () => {
-        const req = new Request('http://internal/', { headers: { 'x-forwarded-host': 'app.rerun.build', 'x-forwarded-proto': 'https' } })
-        expect(managedCallbackUrl(req, 'typeform')).toBe('https://app.rerun.build/api/oauth/managed/typeform/callback')
+        const req = new Request('http://internal/', { headers: { 'x-forwarded-host': 'moldwright.robagentic.tech', 'x-forwarded-proto': 'https' } })
+        expect(managedCallbackUrl(req, 'typeform')).toBe('https://moldwright.robagentic.tech/api/oauth/managed/typeform/callback')
     })
 
     it('answers over http on a local host', () => {

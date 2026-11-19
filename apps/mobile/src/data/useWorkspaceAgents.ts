@@ -1,4 +1,4 @@
-import type { BoardAgent } from '@rerun/contracts'
+import type { BoardAgent } from '@moldwright/contracts'
 import { useEffect, useState } from 'react'
 
 import { fetchBoardAgents } from '@/api/board'

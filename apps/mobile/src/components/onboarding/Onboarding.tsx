@@ -1,4 +1,4 @@
-import type { ForemanStateResponse } from '@rerun/contracts'
+import type { ForemanStateResponse } from '@moldwright/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'

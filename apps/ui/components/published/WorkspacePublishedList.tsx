@@ -1,6 +1,6 @@
 'use client'
 
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
 

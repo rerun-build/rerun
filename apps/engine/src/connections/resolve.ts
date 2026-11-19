@@ -1,4 +1,4 @@
-import { RERUN_CONNECTION_ID, type Provider } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, type Provider } from '@moldwright/contracts'
 import { findConnection, listConnections } from './registry.js'
 import type { LoadedConnection } from './types.js'
 

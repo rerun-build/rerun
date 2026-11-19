@@ -1,4 +1,4 @@
-import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView } from '@rerun/contracts'
+import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView } from '@moldwright/contracts'
 import { Fragment } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'

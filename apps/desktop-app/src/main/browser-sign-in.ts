@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { session as electronSession } from 'electron'
-import { DESKTOP_AUTH_PATH, type DesktopSignInError, type DesktopSignInProvider, type DesktopSignInResult } from '@rerun/contracts'
+import { DESKTOP_AUTH_PATH, type DesktopSignInError, type DesktopSignInProvider, type DesktopSignInResult } from '@moldwright/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { CHANNEL } from './identity'
 import { currentServer, getMainWindow, loadAppPath, openExternal, showMainWindow } from './main-window'

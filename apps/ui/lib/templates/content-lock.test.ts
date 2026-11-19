@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { isTemplateContentLocked, lockedPlaceholder, templateLockTooltip } from './content-lock'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 const FROM_TEMPLATE = { templateId: 'tpl_1' }
 

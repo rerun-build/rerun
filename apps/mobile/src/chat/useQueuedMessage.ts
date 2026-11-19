@@ -1,4 +1,4 @@
-import { parseQueued, queuedPreview, type QueuedMessage } from '@rerun/contracts'
+import { parseQueued, queuedPreview, type QueuedMessage } from '@moldwright/contracts'
 import { randomUUID } from 'expo-crypto'
 import { Directory, File, Paths } from 'expo-file-system'
 import { useCallback, useState } from 'react'

@@ -1,6 +1,6 @@
 'use client'
 
-import { IsoGrid } from '@rerun/ui/iso-grid'
+import { IsoGrid } from '@moldwright/ui/iso-grid'
 import { useMemo, type Ref } from 'react'
 
 import { containerFromSpace, tileFromAgent } from '@/lib/board/iso-adapter'

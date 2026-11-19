@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import type { TableCard } from '@rerun/contracts'
+import type { TableCard } from '@moldwright/contracts'
 
 import { cn } from '../../cn'
 import { DatabaseIcon } from '../../icons'

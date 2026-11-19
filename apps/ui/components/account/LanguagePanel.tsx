@@ -2,7 +2,7 @@
 
 import { Field } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { localeNativeName, parseAcceptLanguage, PSEUDO_LOCALE, stableLocales, DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
+import { localeNativeName, parseAcceptLanguage, PSEUDO_LOCALE, stableLocales, DEFAULT_LOCALE, type Locale } from '@moldwright/i18n'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

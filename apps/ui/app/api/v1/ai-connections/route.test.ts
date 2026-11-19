@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const workspace = { id: 7, subscription_status: 'active', is_sandbox: false, rerun_used_micros: 2_000_000, rerun_budget_micros: 10_000_000, rerun_topup_micros: 0, current_period_end: '2026-11-01T00:00:00Z' }
 let signedIn = true
 let role: 'admin' | 'member' = 'admin'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({
-    ...(await importOriginal<typeof import('@rerun/cloud/billing')>()),
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({
+    ...(await importOriginal<typeof import('@moldwright/cloud/billing')>()),
     BILLING_ENABLED: true,
     isPremiumModelEntitled: (plan: { subscription_status: string | null }) => plan.subscription_status !== 'trialing',
-    rerunCreditTotalMicros: (credit: { rerun_budget_micros?: number | null } | null | undefined) => credit?.rerun_budget_micros ?? 0,
+    moldwrightCreditTotalMicros: (credit: { rerun_budget_micros?: number | null } | null | undefined) => credit?.rerun_budget_micros ?? 0,
 }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => {
     const actual = await importOriginal<typeof import('@/app/api/_auth/ownership')>()
@@ -54,7 +54,7 @@ vi.mock('@/lib/features', async importOriginal => ({
     },
 }))
 let cloud = true
-vi.mock('@rerun/cloud/edition', () => ({
+vi.mock('@moldwright/cloud/edition', () => ({
     get RERUN_CLOUD() {
         return cloud
     },
@@ -108,7 +108,7 @@ const claudeFinish = await import('./claude/finish/route')
 const codexPoll = await import('./codex/poll/route')
 const { EngineRequestError } = await import('@/lib/engine/client')
 
-const base = 'https://app.rerun.build/api/v1/ai-connections'
+const base = 'https://moldwright.robagentic.tech/api/v1/ai-connections'
 const send = (handler: (req: Request, segment: { params: Promise<Record<string, string>> }) => Promise<Response>, method: string, path = '', body?: object, params: Record<string, string> = {}, headers: Record<string, string> = {}) =>
     handler(new Request(`${base}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined }), { params: Promise.resolve(params) })
 

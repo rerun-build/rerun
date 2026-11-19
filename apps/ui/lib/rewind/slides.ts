@@ -1,4 +1,4 @@
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 
 export const REWIND_SLIDE_IDS = ['intro', 'hours', 'rhythm', 'clock', 'mvp', 'connectors', 'highlights', 'memory', 'awards', 'outro'] as const
 export type RewindSlideId = (typeof REWIND_SLIDE_IDS)[number]

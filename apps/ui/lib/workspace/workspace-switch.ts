@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { clearTabWorkspace } from './tab-workspace'
+import { routes } from '@/lib/routes'
 
 let switching = false
 let loaderVisible = false
@@ -23,7 +24,7 @@ export function abortWorkspaceSwitch() {
 export function enterActiveWorkspace() {
     setState(true, true)
     clearTabWorkspace()
-    window.location.assign('/')
+    window.location.assign(window.location.pathname === routes.home ? routes.home : routes.board)
 }
 
 export function isWorkspaceSwitchInFlight() {

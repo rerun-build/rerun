@@ -5,7 +5,7 @@ alter table public.templates
   add column story jsonb not null default '[]'::jsonb;
 
 comment on column public.templates.story is
-  'Template story steps (templateStoryStepSchema in @rerun/contracts). Authored in the admin editor only.';
+  'Template story steps (templateStoryStepSchema in @moldwright/contracts). Authored in the admin editor only.';
 
 -- SELECT on this table is granted column by column (20260812121424_column_level_grants.sql), so a
 -- new column is invisible to the landing until it is named here.

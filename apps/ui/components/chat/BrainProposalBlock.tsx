@@ -2,7 +2,7 @@
 
 import { BrainIcon } from '@/lib/icons'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
-import { Button, Icon } from '@rerun/ui/primitives'
+import { Button, Icon } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 export function BrainProposalBlock({ title, mode }: { title: string; mode: 'create' | 'edit' }) {

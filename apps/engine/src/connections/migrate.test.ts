@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-cxmigrate-'))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
-const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
+const { RERUN_CONNECTION_ID } = await import('@moldwright/contracts')
 const { agentDir, agentEnvPath, codexAuthPath, configPath, connectionConfigPath, connectionDir, connectionsDir, connectionsMigratedPath } = await import('../config/paths.js')
 const { readEnvFile, writeEnvFile } = await import('../lib/env-file.js')
 const { foldAgentKeysIntoConnections, reconcileConnections } = await import('./migrate.js')

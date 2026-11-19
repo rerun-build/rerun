@@ -1,6 +1,6 @@
 'use client'
 
-import type { AgentShareInclude, ShareBucket } from '@rerun/contracts'
+import type { AgentShareInclude, ShareBucket } from '@moldwright/contracts'
 import { Field } from '@/components/ui/field'
 import { PANEL_CARD } from '@/components/ui/panel-row'
 import { Switch } from '@/components/ui/switch'

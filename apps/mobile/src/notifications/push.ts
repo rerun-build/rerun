@@ -1,4 +1,4 @@
-import { ANDROID_PUSH_CHANNELS, pushDataSchema, type PushData } from '@rerun/contracts'
+import { ANDROID_PUSH_CHANNELS, pushDataSchema, type PushData } from '@moldwright/contracts'
 import * as Application from 'expo-application'
 import Constants from 'expo-constants'
 import * as Device from 'expo-device'

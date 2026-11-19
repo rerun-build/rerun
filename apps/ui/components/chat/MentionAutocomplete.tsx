@@ -1,6 +1,6 @@
 'use client'
 
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import type { ComposerMention } from '@/lib/chat/composer-links'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'

@@ -5,9 +5,9 @@ import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
 
 const payloads = (client: FakeSupabase) => client.writes('user_phones').map(write => write.payload)
 
-const grantRerunTopup = vi.fn()
-vi.mock('@rerun/cloud/billing.server', () => ({ grantRerunTopup: (...args: unknown[]) => grantRerunTopup(...args) }))
-vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
+const grantMoldwrightTopup = vi.fn()
+vi.mock('@moldwright/cloud/billing.server', () => ({ grantMoldwrightTopup: (...args: unknown[]) => grantMoldwrightTopup(...args) }))
+vi.mock('@moldwright/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 
 let service = fakeSupabase()
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => service.client }))
@@ -23,7 +23,7 @@ const stampLands = () => {
 }
 
 beforeEach(() => {
-    grantRerunTopup.mockReset()
+    grantMoldwrightTopup.mockReset()
     stampLands()
 })
 
@@ -32,7 +32,7 @@ describe('provisionUser and the phone step', () => {
         expect(await provisionUser(existing(null).client, account, { phoneStep: true, priceArm: null })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([{ user_id: 'user-1' }])
-        expect(grantRerunTopup).toHaveBeenCalledTimes(1)
+        expect(grantMoldwrightTopup).toHaveBeenCalledTimes(1)
     })
 
     it('asks nothing of an account that arrives by invite or from the mobile app', async () => {

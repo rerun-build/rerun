@@ -17,7 +17,7 @@ vi.mock('next/headers', () => ({
 
 const { GET } = await import('./route')
 
-const callback = (query: string) => GET(new Request(`https://app.rerun.build/auth/callback${query}`))
+const callback = (query: string) => GET(new Request(`https://moldwright.robagentic.tech/auth/callback${query}`))
 
 const NOW = new Date('2026-10-16T10:30:00.000Z')
 
@@ -35,10 +35,10 @@ afterEach(() => {
 })
 
 describe('GET /auth/callback', () => {
-    it('sends a sign-in home', async () => {
+    it('sends a sign-in to the board', async () => {
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/board')
     })
 
     it('sends a sign-in that came from an invitation back to it', async () => {
@@ -46,7 +46,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/invite/token-1')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/invite/token-1')
     })
 
     it('remembers Google as the last way in', async () => {
@@ -91,13 +91,13 @@ describe('GET /auth/callback', () => {
     it('sends a failed sign-in to the expired link page', async () => {
         const response = await callback('?error=access_denied')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/auth-code-error')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/auth/auth-code-error')
     })
 
     it('sends a failed sign-in to the public host when the request reached it through the proxy', async () => {
-        const response = await GET(new Request('http://localhost:8080/auth/callback?error=access_denied', { headers: { 'x-forwarded-host': 'app.rerun.build' } }))
+        const response = await GET(new Request('http://localhost:8080/auth/callback?error=access_denied', { headers: { 'x-forwarded-host': 'moldwright.robagentic.tech' } }))
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/auth-code-error')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/auth/auth-code-error')
     })
 
     it('signs a visitor into the account their Google identity already belongs to', async () => {
@@ -105,7 +105,7 @@ describe('GET /auth/callback', () => {
 
         expect(signInWithOAuth).toHaveBeenCalledWith({
             provider: 'google',
-            options: { redirectTo: 'https://app.rerun.build/auth/callback', queryParams: { access_type: 'offline' } },
+            options: { redirectTo: 'https://moldwright.robagentic.tech/auth/callback', queryParams: { access_type: 'offline' } },
         })
         expect(response.headers.get('location')).toBe('https://project.supabase.co/auth/v1/authorize?provider=google')
     })
@@ -115,7 +115,7 @@ describe('GET /auth/callback', () => {
 
         await callback('?error=server_error&error_code=identity_already_exists')
 
-        expect(signInWithOAuth).toHaveBeenCalledWith({ provider: 'apple', options: { redirectTo: 'https://app.rerun.build/auth/callback' } })
+        expect(signInWithOAuth).toHaveBeenCalledWith({ provider: 'apple', options: { redirectTo: 'https://moldwright.robagentic.tech/auth/callback' } })
     })
 
     it('restarts Google when the provider cookie holds something unknown', async () => {
@@ -131,7 +131,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?error=server_error&error_code=identity_already_exists')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/auth-code-error')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/auth/auth-code-error')
     })
 
     it('brings a Google connection back to the account settings, and forgets the intent', async () => {
@@ -139,7 +139,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/board?account=sign-in')
         expect(response.cookies.get('rr_link_intent')?.value).toBe('')
     })
 
@@ -148,7 +148,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?error=server_error&error_code=identity_already_exists')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=identity_already_exists&link_provider=google')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/board?account=sign-in&link_error=identity_already_exists&link_provider=google')
         expect(exchangeCodeForSession).not.toHaveBeenCalled()
         expect(signInWithOAuth).not.toHaveBeenCalled()
     })
@@ -158,7 +158,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?error=access_denied&error_code=access_denied')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=access_denied&link_provider=apple')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/board?account=sign-in&link_error=access_denied&link_provider=apple')
     })
 
     it('brings a Google connection whose code could not be exchanged back with a failure', async () => {
@@ -167,7 +167,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=failed&link_provider=google')
+        expect(response.headers.get('location')).toBe('https://moldwright.robagentic.tech/board?account=sign-in&link_error=failed&link_provider=google')
     })
 
     it('forgets the signup intent of an account that was signed up before this sign-in', async () => {
@@ -179,7 +179,7 @@ describe('GET /auth/callback', () => {
         const cleared = response.headers.getSetCookie().find(cookie => cookie.startsWith('rr_signup_intent='))
         expect(cleared).toMatch(/^rr_signup_intent=;/)
         expect(cleared).toContain('Max-Age=0')
-        expect(cleared).toContain('Domain=.rerun.build')
+        expect(cleared).not.toContain('Domain=')
     })
 
     it('forgets the signup intent of an account signed up a few minutes before this sign-in', async () => {

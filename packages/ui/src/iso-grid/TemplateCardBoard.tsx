@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateConnector } from '@rerun/contracts'
+import type { TemplateConnector } from '@moldwright/contracts'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 

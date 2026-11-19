@@ -1,7 +1,7 @@
 import { posix } from 'node:path'
 import { deleteFile, listFiles, readFileText, skillFilesBase } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
 import { SKILL_ENTRY, isTextSkillFile } from './folder-import'
 
 export const MAX_SKILL_FILE_CHARS = TEXT_FILE_PAGE_CHARS

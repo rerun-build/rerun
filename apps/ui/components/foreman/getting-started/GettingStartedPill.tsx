@@ -1,6 +1,6 @@
 'use client'
 
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 

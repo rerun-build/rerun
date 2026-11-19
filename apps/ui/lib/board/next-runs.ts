@@ -1,4 +1,4 @@
-import type { TileCountdown } from '@rerun/ui/iso-grid'
+import type { TileCountdown } from '@moldwright/ui/iso-grid'
 
 import type { EngineSchedule } from '@/lib/engine/types'
 import { nextRunAt } from '@/lib/schedules/cron'

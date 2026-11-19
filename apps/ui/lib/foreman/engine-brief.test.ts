@@ -1,4 +1,4 @@
-import { foremanBriefSchema } from '@rerun/contracts'
+import { foremanBriefSchema } from '@moldwright/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 

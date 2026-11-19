@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, ROUTE_ID_PATTERN } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, ROUTE_ID_PATTERN } from '@moldwright/contracts'
 import { Redirect, useLocalSearchParams } from 'expo-router'
 
 import { CoworkerChat } from '@/components/chat/CoworkerChat'

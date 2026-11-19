@@ -1,4 +1,4 @@
-import type { AiConnectionView, ConnectionUsage, Provider } from '@rerun/contracts'
+import type { AiConnectionView, ConnectionUsage, Provider } from '@moldwright/contracts'
 import * as WebBrowser from 'expo-web-browser'
 import type { ReactNode } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'

@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
-import { formatNumber } from "@rerun/i18n/format";
+import { formatNumber } from "@moldwright/i18n/format";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -69,8 +69,8 @@ SandboxIdle.PreviewProps = {
   lastActiveLabel: "4 September",
   archiveLabel: "6 October",
   agentCount: 2,
-  sandboxUrl: "https://app.rerun.build",
-  appUrl: "https://app.rerun.build",
+  sandboxUrl: "https://moldwright.robagentic.tech",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies SandboxIdleProps;
 
 const meta: React.CSSProperties = {

@@ -1,4 +1,4 @@
-import { threadsByMessage } from '@rerun/contracts'
+import { threadsByMessage } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Fragment, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'

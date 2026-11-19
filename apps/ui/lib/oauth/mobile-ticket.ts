@@ -1,4 +1,4 @@
-import type { DesktopShellChannel } from '@rerun/contracts'
+import type { DesktopShellChannel } from '@moldwright/contracts'
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
 
 type ConnectSubject = { key: string; server?: undefined } | { server: string; key?: undefined }

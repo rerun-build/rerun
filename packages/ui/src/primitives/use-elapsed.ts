@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-export { formatElapsed } from '@rerun/contracts'
+export { formatElapsed } from '@moldwright/contracts'
 
 export function useElapsed(active: boolean): number | undefined {
     const [seconds, setSeconds] = useState<number | undefined>(undefined)

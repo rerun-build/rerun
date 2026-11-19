@@ -1,5 +1,5 @@
 {
-    "name": "@rerun/emails",
+    "name": "@moldwright/emails",
     "license": "AGPL-3.0-only",
     "version": "0.1.0",
     "private": true,
@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@react-email/components": "^1.0.12",
-        "@rerun/i18n": "workspace:*",
+        "@moldwright/i18n": "workspace:*",
         "use-intl": "^4.15.0"
     },
     "peerDependencies": {

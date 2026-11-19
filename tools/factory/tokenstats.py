@@ -63,9 +63,10 @@ def bar(jobs, fires, escaped, now):
 
 PLANNER_STOPS = ("blocked", "rejected", "returned")
 MAX_PLANNERS = 20
+PLANNER_WINDOW_S = 7 * 86400
 
 
-def planners(jobs, fires, now, window_s=7 * 86400):
+def planners(jobs, fires, now, window_s=PLANNER_WINDOW_S):
     groups = {}
     for j in jobs:
         if not 0 <= now - j["first"] <= window_s:

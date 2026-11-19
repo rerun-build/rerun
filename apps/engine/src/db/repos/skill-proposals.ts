@@ -1,5 +1,5 @@
 import { and, desc, eq, inArray, like } from 'drizzle-orm'
-import type { Provider, SkillProposal, SkillProposalMode, SkillProposalStatus } from '@rerun/contracts'
+import type { Provider, SkillProposal, SkillProposalMode, SkillProposalStatus } from '@moldwright/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { skillProposals, type SkillProposalRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'

@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, type BadgeTone } from '@rerun/ui/primitives'
+import { Badge, type BadgeTone } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 import { PUBLISHED_ACCESS_MODES, type PublishedAccess } from '@/lib/published/access'

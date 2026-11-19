@@ -1,4 +1,4 @@
-import { kindCategory, TEMPLATE_CATEGORIES } from '@rerun/contracts'
+import { kindCategory, TEMPLATE_CATEGORIES } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_BOX_NAMES, STUDIO_BOX_NAMES } from './box-name-suggestions'

@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 
 vi.mock('next-intl', async () => {
     const { createTranslator } = await import('use-intl')
-    const { ENGLISH_MESSAGES } = await import('@rerun/i18n/messages/en')
+    const { ENGLISH_MESSAGES } = await import('@moldwright/i18n/messages/en')
     const translators = new Map<string | undefined, ReturnType<typeof createTranslator>>()
     const translator = (namespace?: string) => {
         if (!translators.has(namespace)) translators.set(namespace, createTranslator({ locale: 'en', messages: ENGLISH_MESSAGES, namespace: namespace as never }))
@@ -20,7 +20,7 @@ vi.mock('next-intl', async () => {
 
 vi.mock('next-intl/server', async () => {
     const { createTranslator } = await import('use-intl')
-    const { ENGLISH_MESSAGES } = await import('@rerun/i18n/messages/en')
+    const { ENGLISH_MESSAGES } = await import('@moldwright/i18n/messages/en')
     return {
         getTranslations: async (options?: string | { namespace?: string; locale?: string }) => {
             const namespace = typeof options === 'string' ? options : options?.namespace

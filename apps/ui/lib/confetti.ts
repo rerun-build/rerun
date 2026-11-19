@@ -1,4 +1,4 @@
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 import type { Options, Shape } from 'canvas-confetti'
 
 const DURATION_MS = 2500
@@ -15,7 +15,7 @@ function rotatedColors() {
     return [...COLORS.slice(offset), ...COLORS.slice(0, offset)]
 }
 
-export async function fireRerunConfetti() {
+export async function fireMoldwrightConfetti() {
     if (firing) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     firing = true

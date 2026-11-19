@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry } from '@rerun/contracts'
+import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry } from '@moldwright/contracts'
 import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'

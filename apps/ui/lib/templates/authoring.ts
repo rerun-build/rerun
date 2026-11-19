@@ -1,4 +1,4 @@
-import type { TemplateCategory, TemplateFaqItem } from '@rerun/contracts'
+import type { TemplateCategory, TemplateFaqItem } from '@moldwright/contracts'
 import { z } from 'zod'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { slugify } from '@/lib/slugify'

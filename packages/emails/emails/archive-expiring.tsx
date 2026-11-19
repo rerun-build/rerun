@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
-import { formatNumber } from "@rerun/i18n/format";
+import { formatNumber } from "@moldwright/i18n/format";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -83,8 +83,8 @@ ArchiveExpiring.PreviewProps = {
   pausedLabel: "12 March",
   deletionLabel: "10 June",
   agentCount: 3,
-  billingUrl: "https://app.rerun.build/?billing=1",
-  appUrl: "https://app.rerun.build",
+  billingUrl: "https://moldwright.robagentic.tech/?billing=1",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies ArchiveExpiringProps;
 
 const meta: React.CSSProperties = {

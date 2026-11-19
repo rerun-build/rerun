@@ -1,5 +1,5 @@
 import { englishTranslator } from '@/lib/i18n/english-translator'
-import { loadMessages } from '@rerun/i18n/messages'
+import { loadMessages } from '@moldwright/i18n/messages'
 import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
 import { brainAuthorLabel as authorIn, brainSlugify, brainSourceLabel as sourceIn, brainSourceLabels as sourcesIn } from './labels'

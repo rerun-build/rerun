@@ -2,7 +2,7 @@ import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { selectMany } from '@/supabase/supabase-helpers'
 
-import type { CatalogEntry } from '@rerun/ui/new-agent'
+import type { CatalogEntry } from '@moldwright/ui/new-agent'
 
 export type { CatalogEntry }
 

@@ -2,7 +2,7 @@ import 'server-only'
 
 import { randomInt } from 'node:crypto'
 
-import { SERVICE_INSTANCE_ID_RE } from '@rerun/contracts'
+import { SERVICE_INSTANCE_ID_RE } from '@moldwright/contracts'
 
 import { type ServiceRegistry, entriesOfSlug } from './registry'
 

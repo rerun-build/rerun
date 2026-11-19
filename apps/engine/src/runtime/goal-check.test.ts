@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chatRequestSchema, runGoalSchema, type RunGoal } from '@rerun/contracts'
+import { chatRequestSchema, runGoalSchema, type RunGoal } from '@moldwright/contracts'
 import { checkGoal, goalFeedback } from './goal-check.js'
 
 const goal: RunGoal = {

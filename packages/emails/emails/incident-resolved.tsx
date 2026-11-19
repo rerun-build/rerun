@@ -63,8 +63,8 @@ IncidentResolved.PreviewProps = {
   agentName: "Atlas",
   sourceLabel: 'Schedule "weekly-export"',
   reason: "You follow Atlas's scheduled tasks.",
-  appUrl: "https://app.rerun.build",
-  conversationUrl: "https://app.rerun.build/?notification=preview",
+  appUrl: "https://moldwright.robagentic.tech",
+  conversationUrl: "https://moldwright.robagentic.tech/?notification=preview",
 } satisfies IncidentResolvedProps;
 
 const reasonLine: React.CSSProperties = {

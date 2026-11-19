@@ -6,7 +6,7 @@ def rate(events, jobs, group):
         return None
     ids = set(jobs)
     hit = sum(1 for e in events if e["group"] == group and e["job"] in ids)
-    return hit * N / len(jobs)
+    return hit * N / len(ids)
 
 
 def before(ended, at, n=N):

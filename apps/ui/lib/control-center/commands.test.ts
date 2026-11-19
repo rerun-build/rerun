@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
-vi.mock('@rerun/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
 
 import { buildControlCommands, pushRecentAgent, type ControlGates } from './commands'
 
@@ -55,6 +55,10 @@ describe('buildControlCommands', () => {
 describe('factory command', () => {
     it('offers a Factory command in the actions group, never disabled', () => {
         expect(find({ isSandbox: true, workspaceAdmin: false, needsMachineReason: 'Subscribe first' }, 'factory')).toMatchObject({ group: 'actions', disabledReason: null, paid: false })
+    })
+
+    it('offers a Board command next to it, never disabled', () => {
+        expect(find({ isSandbox: true, workspaceAdmin: false, needsMachineReason: 'Subscribe first' }, 'board')).toMatchObject({ group: 'actions', disabledReason: null, paid: false })
     })
 
     it('keeps every command id unique', () => {

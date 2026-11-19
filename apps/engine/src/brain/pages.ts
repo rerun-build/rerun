@@ -1,7 +1,7 @@
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import matter from 'gray-matter'
-import { BRAIN_CARD_TYPES, BRAIN_SLUG_RE, brainPageTypeSchema, type BrainPage, type BrainPageRef, type BrainPageSummary, type BrainPageType, type BrainRevision } from '@rerun/contracts'
+import { BRAIN_CARD_TYPES, BRAIN_SLUG_RE, brainPageTypeSchema, type BrainPage, type BrainPageRef, type BrainPageSummary, type BrainPageType, type BrainRevision } from '@moldwright/contracts'
 import { brainDir, brainPagePath } from '../config/paths.js'
 import { getBrainDb } from '../db/brainDb.js'
 import { badRequest, HttpError, notFound } from '../lib/errors.js'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, type RefObject } from 'react'
-import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { useIsMobile } from '@moldwright/ui/primitives/use-is-mobile'
 
 import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
 

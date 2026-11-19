@@ -3,7 +3,7 @@
 import { updateMyLocaleAction } from '@/app/api/_actions/account.actions'
 import type { LanguageChoice } from '@/components/account/LanguagePanel'
 import { useSession } from '@/supabase/session/SessionProvider'
-import { isStableLocale, PSEUDO_LOCALE } from '@rerun/i18n'
+import { isStableLocale, PSEUDO_LOCALE } from '@moldwright/i18n'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'

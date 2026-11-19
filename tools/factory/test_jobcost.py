@@ -36,6 +36,14 @@ class JobCostMatch(unittest.TestCase):
         self.assertIn("JOB rerun#84: 2 runs", out)
         self.assertRegex(out, r"TOTAL\s+0\s+0\s+200\s+120\s+20\s+60\s+14")
 
+    def test_lower_case_counts_and_another_owner_does_not(self):
+        code, out = self.cost("job rerun#84\nTask: a")
+        self.assertEqual(code, 0, out)
+        self.assertTrue(out.startswith("JOB rerun#84: 1 runs"), out)
+        code, out = self.cost("JOB someone/rerun#84\nTask: b")
+        self.assertEqual(code, 0, out)
+        self.assertTrue(out.startswith("JOB rerun#84: 0 runs"), out)
+
     def test_other_issue_numbers_and_repos_do_not_count(self):
         code, out = self.cost("JOB rerun#84\nTask: a", "JOB rerun#840\nTask: b", "JOB special-place-ai-heaven/rerun#8\nTask: c", "JOB testpilot#84\nTask: d")
         self.assertEqual(code, 0, out)

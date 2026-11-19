@@ -5,7 +5,7 @@ alter table public.templates
   add column if not exists role_page jsonb not null default '{}'::jsonb;
 
 comment on column public.templates.role_page is
-  'Role landing sections (templateRolePageSchema in @rerun/contracts). Authored in the admin editor only.';
+  'Role landing sections (templateRolePageSchema in @moldwright/contracts). Authored in the admin editor only.';
 
 -- SELECT on this table is granted column by column (20260812121424_column_level_grants.sql), so a
 -- new column is invisible to the landing until it is named here.

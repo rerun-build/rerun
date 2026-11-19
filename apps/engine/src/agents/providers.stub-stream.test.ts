@@ -9,7 +9,7 @@ delete process.env.OPENAI_BASE_URL
 
 const { afterAll, beforeAll, describe, expect, it } = await import('vitest')
 const { streamText } = await import('ai')
-const { agentConfigSchema, connectionConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema, connectionConfigSchema } = await import('@moldwright/contracts')
 const { resolveModel } = await import('./providers.js')
 
 const STUB = resolve(import.meta.dirname, '../../../../tools/factory/stub_model.py')

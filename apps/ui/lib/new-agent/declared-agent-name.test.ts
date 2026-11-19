@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { declaredAgentName } from '@rerun/ui/new-agent'
+import { declaredAgentName } from '@moldwright/ui/new-agent'
 
 const GIG_APPLIER = `You are Gig Applier, working for Haroon Haneef, a remote job seeker. Your job is to apply to AI training gig platforms and log every application in the shared tracker.`
 const TRACKER = `You are Tracker, working for Haroon Haneef. You own the central job application tracker.`

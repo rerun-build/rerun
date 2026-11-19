@@ -1,4 +1,4 @@
-import type { Me } from '@rerun/contracts'
+import type { Me } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 
 import { cachedBoard, cachedMe, clearLocalCache, loadCoworkerDetail, loadTranscript, readCoworkerDetails, readCoworkerScreen, readTranscript, sameTranscript, saveCoworkerScreen, saveTranscript } from './local-cache'

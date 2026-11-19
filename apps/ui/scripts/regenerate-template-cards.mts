@@ -1,5 +1,5 @@
-import { Constants, type Database } from '@rerun/db/types'
-import { selectAll } from '@rerun/db/helpers'
+import { Constants, type Database } from '@moldwright/db/types'
+import { selectAll } from '@moldwright/db/helpers'
 import { captureTemplateCard } from '../lib/templates/card-render'
 import { createServiceRoleClient } from '../supabase/serviceRole'
 

@@ -1,6 +1,6 @@
 import 'server-only'
 import type { Database } from '@/app/api/database.types'
-import { sendSignInCodeEmail } from '@rerun/cloud/email'
+import { sendSignInCodeEmail } from '@moldwright/cloud/email'
 import { normalizeEmail } from '@/lib/email'
 import { APP_URL } from '@/lib/app-url'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'

@@ -2,8 +2,8 @@
 
 import { detectInAppBrowser } from '@/lib/in-app-browser'
 import { abandonTrigger, createLeaveWatcher, type SignupLeaveEvent } from '@/lib/auth/signup-abandon'
-import { track } from '@rerun/analytics/client'
-import type { SignupStep, SignupSurface } from '@rerun/analytics'
+import { track } from '@moldwright/analytics/client'
+import type { SignupStep, SignupSurface } from '@moldwright/analytics'
 import { useCallback, useEffect, useRef } from 'react'
 
 export function useSignupFunnel({ surface, active, initialStep }: { surface: SignupSurface; active: boolean; initialStep: SignupStep }) {

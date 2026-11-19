@@ -13,17 +13,17 @@ import { PlanConnect } from '@/components/connections/plan-connect/PlanConnect'
 import { PlanLimitsBlock } from '@/components/connections/PlanLimitsBlock'
 import { DetailHeader } from '@/components/connections/SourceBits'
 import { Button } from '@/components/ui/button'
-import { CreditsUsageBar } from '@rerun/cloud/billing.client'
+import { CreditsUsageBar } from '@moldwright/cloud/billing.client'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { connectMethod, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, isCreditUsedUp, sourceKind, type MoldwrightCredit } from '@/lib/engine/ai-sources'
 import { catalogFor } from '@/lib/engine/models'
 import type { BoxConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { AlertTriangle, CoinsIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBillingStore } from '@/stores/billing.store'
-import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID } from '@rerun/contracts'
-import { shortDate } from '@rerun/i18n/format'
+import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID } from '@moldwright/contracts'
+import { shortDate } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -32,7 +32,7 @@ type MutationResult = { success: boolean; error?: string }
 
 type ConnectionDetailProps = {
     connection: BoxConnection
-    credit: RerunCredit
+    credit: MoldwrightCredit
     defaultModel: string | null
     reconnectRequested?: boolean
     onReconnected?: () => void
@@ -115,7 +115,7 @@ function AlertBlock({ children }: { children: ReactNode }) {
     )
 }
 
-function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { connection: BoxConnection; credit: RerunCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult> }) {
+function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { connection: BoxConnection; credit: MoldwrightCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult> }) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()

@@ -1,4 +1,4 @@
-import type { FactoryDepartment, FactoryEpicKind, FactoryJob, FactoryJobState, FactorySnapshot } from '@rerun/contracts'
+import type { FactoryDepartment, FactoryEpicKind, FactoryJob, FactoryJobState, FactorySnapshot } from '@moldwright/contracts'
 import { isLocalToday } from './FactoryTasks'
 
 export const DEPARTMENT_VIEW: Record<FactoryDepartment, { label: string; color: string }> = {

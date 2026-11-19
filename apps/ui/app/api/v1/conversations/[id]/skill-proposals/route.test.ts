@@ -15,7 +15,7 @@ const route = await import('./route')
 
 const proposal = { id: 'p1', sessionId: 'engine-session', toolCallId: 'call-1', mode: 'create', slug: null, title: 'Deal follow-ups', summary: 'Short drafts.', instructions: ['Keep every follow-up under 90 words.'], status: 'proposed', appliedSlug: null, error: null, createdAt: '2026-10-26T09:00:00.000Z' }
 const segment = { params: Promise.resolve({ id: 'session-1' }) }
-const request = (method: string, body?: object) => new Request('https://app.rerun.build/api/v1/conversations/session-1/skill-proposals', { method, body: body ? JSON.stringify(body) : undefined })
+const request = (method: string, body?: object) => new Request('https://moldwright.robagentic.tech/api/v1/conversations/session-1/skill-proposals', { method, body: body ? JSON.stringify(body) : undefined })
 
 describe('/api/v1/conversations/:id/skill-proposals', () => {
     beforeEach(() => {

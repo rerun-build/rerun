@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, pendingSecrets, serializeSecretResult } from '@rerun/contracts'
+import { HITL_CANCELLED, pendingSecrets, serializeSecretResult } from '@moldwright/contracts'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'

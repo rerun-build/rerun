@@ -1,6 +1,6 @@
 import { app, dialog } from 'electron'
 import electronUpdater, { type AppUpdater } from 'electron-updater'
-import type { DesktopUpdateState } from '@rerun/contracts'
+import type { DesktopUpdateState } from '@moldwright/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { CHANNEL } from './identity'
 import { getMainWindow, markQuitting } from './main-window'

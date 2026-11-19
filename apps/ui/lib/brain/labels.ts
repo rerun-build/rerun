@@ -1,4 +1,4 @@
-import { BRAIN_CARD_TYPES, FOREMAN_AGENT_ID, type BrainPageType } from '@rerun/contracts'
+import { BRAIN_CARD_TYPES, FOREMAN_AGENT_ID, type BrainPageType } from '@moldwright/contracts'
 
 export const isCardType = (type: BrainPageType) => (BRAIN_CARD_TYPES as readonly string[]).includes(type)
 

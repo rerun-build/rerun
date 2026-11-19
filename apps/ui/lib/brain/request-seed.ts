@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database, Json } from '@/app/api/database.types'
-import { globalIdempotencyKey, triggerTask } from '@rerun/cloud/tasks'
+import { globalIdempotencyKey, triggerTask } from '@moldwright/cloud/tasks'
 import type { CompanyFindingsRow } from '@/lib/company/explore/findings'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { exploreCompanyTask } from '@/trigger/explore-company'

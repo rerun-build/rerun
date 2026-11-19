@@ -1,6 +1,6 @@
 import { CaptchaError } from '@/components/auth/captcha/captcha-error'
 import { detectInAppBrowser } from '@/lib/in-app-browser'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 
 const MESSAGE_LIMIT = 200
 

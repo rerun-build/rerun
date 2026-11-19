@@ -1,7 +1,7 @@
 'use server'
 
-import { captureServer, deterministicUuid } from '@rerun/analytics/server'
-import { expertDistinctId } from '@rerun/analytics'
+import { captureServer, deterministicUuid } from '@moldwright/analytics/server'
+import { expertDistinctId } from '@moldwright/analytics'
 
 import type { Database } from '@/app/api/database.types'
 import { AuthorizationError } from '@/app/api/_auth/ownership'

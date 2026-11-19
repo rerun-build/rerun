@@ -1,7 +1,7 @@
 import { setWorkspaceDefaultModel } from '@/app/api/_services/ai-connection.service'
 import { answeringConnectionErrors } from '@/app/api/v1/_lib/ai-connection-errors'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { workspaceDefaultInputSchema } from '@rerun/contracts'
+import { workspaceDefaultInputSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { PanelDeleteButton } from '@/components/ui/panel-editor'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DownloadIcon, PencilIcon } from '@/lib/icons'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 import { FilePublishControl } from './FilePublishControl'

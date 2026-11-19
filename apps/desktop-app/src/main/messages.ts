@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import type { Locale } from '@rerun/i18n'
+import type { Locale } from '@moldwright/i18n'
 import { createTranslator } from 'use-intl/core'
 import { desktopAppMessages, resolveShellLocale } from '../shared/messages'
 import { readSettings, updateSettings } from './settings'

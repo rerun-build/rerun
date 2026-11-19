@@ -1,10 +1,10 @@
 'use client'
 
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
-import { TemplateBoardPreview } from '@rerun/ui/iso-grid'
+import type { TemplateAgent, TemplateConnector } from '@moldwright/contracts'
+import { TemplateBoardPreview } from '@moldwright/ui/iso-grid'
 import type { RefObject } from 'react'
 
-import { RerunWordmark } from '@/components/brand/RerunWordmark'
+import { MoldwrightWordmark } from '@/components/brand/MoldwrightWordmark'
 import { OgCta } from '@/components/og/OgCta'
 import { OG_HEIGHT, OG_WIDTH } from '@/lib/og/size'
 
@@ -35,7 +35,7 @@ export function TemplateOgStage({ title, tagline, agents, connectors, innerRef, 
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,#0a0a0a_22%,rgba(10,10,10,0.72)_42%,transparent_68%)]" />
 
             <div className="absolute left-16 top-14 z-20">
-                <RerunWordmark />
+                <MoldwrightWordmark />
             </div>
 
             <div className="absolute inset-y-0 left-16 z-20 flex max-w-[500px] flex-col items-start justify-center gap-8">

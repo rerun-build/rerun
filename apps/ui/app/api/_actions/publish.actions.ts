@@ -3,7 +3,7 @@
 import { assertAgentInWorkspace, isAdminActor, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
 import { requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
-import { EMAIL_DELIVERY } from '@rerun/cloud/email'
+import { EMAIL_DELIVERY } from '@moldwright/cloud/email'
 import { isPublishPolicy, isPublishedAccess, shownPolicy, type PublishPolicy } from '@/lib/published/access'
 import {
     closePublicLinks,

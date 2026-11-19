@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AddonQuantities } from '@rerun/contracts'
+import type { AddonQuantities } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { notifyWorkspace } from './notify'

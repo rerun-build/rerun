@@ -1,4 +1,4 @@
-import type { CliModels } from '@rerun/contracts'
+import type { CliModels } from '@moldwright/contracts'
 import { clearAgentCache } from '../agents/registry.js'
 
 const readings = new Map<string, CliModels>()

@@ -1,7 +1,7 @@
 import { statSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute } from 'node:path'
-import { visibleText } from '@rerun/contracts'
+import { visibleText } from '@moldwright/contracts'
 import { extractText, listMessages } from '../db/repos/messages.js'
 import { resolveInWorkspace, resolveWithin } from '../tools/sandbox.js'
 import { workspaceDir } from '../config/paths.js'

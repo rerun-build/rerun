@@ -2,7 +2,7 @@ import { app, clipboard, Menu, nativeImage, Notification, shell, Tray, type Menu
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import type { DesktopNotification, DesktopSettings } from '@rerun/contracts'
+import type { DesktopNotification, DesktopSettings } from '@moldwright/contracts'
 import badgeDot from '../../resources/tray/badge.png?asset'
 import trayColor from '../../resources/tray/tray.png?asset'
 import trayTemplate from '../../resources/tray/trayTemplate.png?asset'

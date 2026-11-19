@@ -5,7 +5,7 @@ import { deliverWhatsApp } from './send'
 
 vi.mock('./send', () => ({ deliverWhatsApp: vi.fn() }))
 vi.mock('@/lib/auth/recipient', () => ({ loadFirstName: vi.fn(async () => 'Lucien') }))
-vi.mock('@/lib/og/board-image', () => ({ boardImageUrl: vi.fn((scene: unknown) => `https://app.rerun.build/og/board?scene=${JSON.stringify(scene)}`) }))
+vi.mock('@/lib/og/board-image', () => ({ boardImageUrl: vi.fn((scene: unknown) => `https://moldwright.robagentic.tech/og/board?scene=${JSON.stringify(scene)}`) }))
 
 type Tables = { workspaces?: SupabaseResult; workspace_members?: SupabaseResult; agents?: SupabaseResult; notifications?: SupabaseResult }
 

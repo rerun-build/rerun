@@ -1,4 +1,4 @@
-import { suggestionsOnOffer, type AgentSuggestion } from '@rerun/ui/new-agent'
+import { suggestionsOnOffer, type AgentSuggestion } from '@moldwright/ui/new-agent'
 import { describe, expect, it } from 'vitest'
 
 const POOL: AgentSuggestion[] = ['a', 'b', 'c', 'd', 'e'].map(id => ({ id, title: id, description: id, name: id, kickoff: id, apps: [] }))

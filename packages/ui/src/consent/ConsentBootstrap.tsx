@@ -1,4 +1,4 @@
-import { CONSENT_ATTRIBUTE, CONSENT_COOKIE, CONSENT_VERSION, EEA_UK_TIME_ZONES } from '@rerun/contracts'
+import { CONSENT_ATTRIBUTE, CONSENT_COOKIE, CONSENT_VERSION, EEA_UK_TIME_ZONES } from '@moldwright/contracts'
 
 const SCRIPT = `try{
 var c=${JSON.stringify(CONSENT_COOKIE)},v=${JSON.stringify(CONSENT_VERSION)},z=${JSON.stringify(EEA_UK_TIME_ZONES)},s='pending';

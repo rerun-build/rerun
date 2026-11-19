@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { TemplatePricing, TemplatePricingModel } from '@rerun/contracts'
+import type { TemplatePricing, TemplatePricingModel } from '@moldwright/contracts'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { hasTemplateEntitlement } from '@/lib/templates/entitlement'

@@ -1,4 +1,4 @@
-export { MAX_RECORDING_MS } from '@rerun/contracts'
+export { MAX_RECORDING_MS } from '@moldwright/contracts'
 
 export const RECORDING_BITS_PER_SECOND = 32_000
 

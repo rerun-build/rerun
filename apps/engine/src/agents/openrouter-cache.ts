@@ -1,5 +1,5 @@
 import type { createOpenAI } from '@ai-sdk/openai'
-import { withAnthropicCacheBreakpoints, type ChatBody } from '@rerun/contracts'
+import { withAnthropicCacheBreakpoints, type ChatBody } from '@moldwright/contracts'
 
 type FetchFunction = NonNullable<NonNullable<Parameters<typeof createOpenAI>[0]>['fetch']>
 

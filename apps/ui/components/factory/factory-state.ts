@@ -1,5 +1,5 @@
 import { CheckCheck, Clock, CircleX, GitMerge, Hammer, Hourglass, Link2, OctagonPause, OctagonX, ScanEye, ShieldCheck, TriangleAlert, Undo2, Wrench, type LucideIcon } from 'lucide-react'
-import type { FactoryJobState } from '@rerun/contracts'
+import type { FactoryJobState } from '@moldwright/contracts'
 import { STATUS_COLOR } from './factory-scene'
 
 const GREY = '#9ca3af'

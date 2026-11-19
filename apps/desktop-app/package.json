@@ -8,7 +8,7 @@
     "type": "module",
     "author": {
         "name": "Rerun",
-        "email": "help@rerun.build"
+        "email": "help@robagentic.tech"
     },
     "homepage": "https://rerun.build",
     "main": "./out/main/index.js",
@@ -26,9 +26,9 @@
     },
     "devDependencies": {
         "@electron/fuses": "2.1.3",
-        "@rerun/contracts": "workspace:^",
-        "@rerun/i18n": "workspace:^",
-        "@rerun/ui": "workspace:^",
+        "@moldwright/contracts": "workspace:^",
+        "@moldwright/i18n": "workspace:^",
+        "@moldwright/ui": "workspace:^",
         "@tailwindcss/vite": "^4",
         "@types/node": "^24",
         "@types/react": "^19.2.16",

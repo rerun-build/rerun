@@ -1,7 +1,7 @@
 'use client'
 
 import { useForemanStore } from '@/stores/foreman.store'
-import { ForemanTabsBar } from '@rerun/ui/foreman'
+import { ForemanTabsBar } from '@moldwright/ui/foreman'
 
 export function ForemanTabs() {
     const tab = useForemanStore(state => state.tab)

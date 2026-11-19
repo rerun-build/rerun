@@ -1,4 +1,4 @@
-import type { EmailTranslator } from '@rerun/emails/i18n'
+import type { EmailTranslator } from '@moldwright/emails/i18n'
 import type { NotificationKind } from '@/lib/engine/types'
 
 export type SourceKeyInput = {

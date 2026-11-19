@@ -6,13 +6,14 @@ import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isWorkspaceApiEntitled } from '@moldwright/cloud/billing'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { AgentStatus, IsoAgent } from '@/lib/board/types'
 import { buildControlCommands, type ControlCommand, type ControlCommandId } from '@/lib/control-center/commands'
 import { openCrisp } from '@/lib/crisp'
 import { parseQuery, searchItems } from '@/lib/control-center/search'
 import { BellIcon, BoxIcon, BrainIcon, CirclePlusIcon, CreditCardIcon, FocusCenterIcon, FolderIcon, GridIcon, HeadsetIcon, KeyboardIcon, KeyIcon, LockKeyholeIcon, MegaphoneIcon, MessageCircle, MessageCircleQuestionIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { routes } from '@/lib/routes'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
@@ -25,7 +26,7 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import type { BadgeTone } from '@rerun/ui/primitives'
+import type { BadgeTone } from '@moldwright/ui/primitives'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
@@ -50,6 +51,7 @@ const COMMAND_ICONS: Record<ControlCommandId, ComponentType<{ className?: string
     ask_assistant: MessageCircleQuestionIcon,
     contact_support: HeadsetIcon,
     recenter_board: FocusCenterIcon,
+    board: BoxIcon,
     factory: GridIcon,
     toggle_theme: SunIcon,
     workspace: SettingsIcon,
@@ -220,7 +222,8 @@ export function ControlCenter() {
         ask_assistant: () => (text ? useForemanStore.getState().askForeman(query.trim()) : useForemanStore.getState().toggle()),
         contact_support: () => openCrisp(session?.user?.email),
         recenter_board: () => useBoardStore.getState().recenterBoard(),
-        factory: () => router.push('/factory'),
+        board: () => router.push(routes.board),
+        factory: () => router.push(routes.home),
         toggle_theme: () => setTheme(darkTheme ? 'light' : 'dark'),
         workspace: () => useWorkspaceSettingsStore.getState().openWorkspacePanel('workspace'),
         members: () => useWorkspaceSettingsStore.getState().openWorkspacePanel('members'),

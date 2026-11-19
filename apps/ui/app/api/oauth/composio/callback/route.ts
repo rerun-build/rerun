@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey, sleep } from '@rerun/contracts'
+import { parseServiceRegistryKey, sleep } from '@moldwright/contracts'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { composioUserId, getConnectedAccount } from '@/lib/composio/client'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
@@ -9,7 +9,7 @@ import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import type { DesktopShellChannel } from '@rerun/contracts'
+import type { DesktopShellChannel } from '@moldwright/contracts'
 
 const ACTIVE_POLL_ATTEMPTS = 5
 const ACTIVE_POLL_DELAY_MS = 1000

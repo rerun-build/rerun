@@ -1,4 +1,4 @@
-import type { ContextOccupancy } from '@rerun/contracts'
+import type { ContextOccupancy } from '@moldwright/contracts'
 import type { ClaudeCodeSettings, Query } from 'ai-sdk-provider-claude-code'
 import { cliModelsFresh, recordCliModels } from '../connections/cli-models.js'
 import { planLimitWindowsFromClaude, recordPlanLimits, type ClaudePlanUsage } from '../connections/plan-limits.js'

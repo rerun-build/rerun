@@ -4,7 +4,7 @@ import { englishTranslator } from '@/lib/i18n/english-translator'
 
 const t = englishTranslator('auth.oauthRetry')
 
-const FAILED = 'https://app.rerun.build/?error=invalid_request&error_code=bad_oauth_state&error_description=OAuth+state+not+found+or+expired'
+const FAILED = 'https://moldwright.robagentic.tech/?error=invalid_request&error_code=bad_oauth_state&error_description=OAuth+state+not+found+or+expired'
 
 describe('oauthErrorCode', () => {
     it('reads the code Supabase put in the query', () => {
@@ -12,23 +12,23 @@ describe('oauthErrorCode', () => {
     })
 
     it('reads it from the fragment too', () => {
-        expect(oauthErrorCode(new URL('https://app.rerun.build/#error=access_denied&error_description=denied'))).toBe('access_denied')
+        expect(oauthErrorCode(new URL('https://moldwright.robagentic.tech/#error=access_denied&error_description=denied'))).toBe('access_denied')
     })
 
     it('ignores a bare `error` some other flow may use', () => {
-        expect(oauthErrorCode(new URL('https://app.rerun.build/?error=1'))).toBeNull()
-        expect(oauthErrorCode(new URL('https://app.rerun.build/?billing=success'))).toBeNull()
+        expect(oauthErrorCode(new URL('https://moldwright.robagentic.tech/?error=1'))).toBeNull()
+        expect(oauthErrorCode(new URL('https://moldwright.robagentic.tech/?billing=success'))).toBeNull()
     })
 })
 
 describe('withoutOAuthError', () => {
     it('drops the three params and keeps everything else', () => {
-        expect(withoutOAuthError(new URL(`${FAILED}&template=seo`)).href).toBe('https://app.rerun.build/?template=seo')
+        expect(withoutOAuthError(new URL(`${FAILED}&template=seo`)).href).toBe('https://moldwright.robagentic.tech/?template=seo')
     })
 
     it('drops a fragment that carries the error, and only that one', () => {
-        expect(withoutOAuthError(new URL('https://app.rerun.build/#error=x&error_code=bad_oauth_state')).href).toBe('https://app.rerun.build/')
-        expect(withoutOAuthError(new URL('https://app.rerun.build/#section')).href).toBe('https://app.rerun.build/#section')
+        expect(withoutOAuthError(new URL('https://moldwright.robagentic.tech/#error=x&error_code=bad_oauth_state')).href).toBe('https://moldwright.robagentic.tech/')
+        expect(withoutOAuthError(new URL('https://moldwright.robagentic.tech/#section')).href).toBe('https://moldwright.robagentic.tech/#section')
     })
 })
 

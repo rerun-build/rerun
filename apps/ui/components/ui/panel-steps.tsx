@@ -1,6 +1,6 @@
 'use client'
 
-import { StepTransition } from '@rerun/ui/steps'
+import { StepTransition } from '@moldwright/ui/steps'
 import { useState, type ReactNode } from 'react'
 
 export function PanelSteps({ stepKey, depth, children }: { stepKey: string; depth: number; children: ReactNode }) {

@@ -1,4 +1,4 @@
-import type { TriggerFireInput } from '@rerun/contracts'
+import type { TriggerFireInput } from '@moldwright/contracts'
 import type { Trigger } from './loader.js'
 
 export const MAX_PAYLOAD_BYTES = 65_536

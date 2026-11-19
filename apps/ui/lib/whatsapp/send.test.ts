@@ -10,7 +10,7 @@ vi.mock('./client', () => ({ sendWhatsAppTemplate: vi.fn() }))
 vi.mock('./recipient', () => ({ loadWhatsAppRecipient: vi.fn() }))
 vi.mock('./store', () => ({ applyWhatsAppFailure: vi.fn(), claimWhatsAppMessage: vi.fn(), markWhatsAppMessageAccepted: vi.fn(), releaseWhatsAppMessage: vi.fn() }))
 
-const MESSAGE = paymentFailedMessage({ imageUrl: 'https://app.rerun.build/og/board?scene=x', team: 'Inbox Assistant', path: 'w/acme?billing=1' })
+const MESSAGE = paymentFailedMessage({ imageUrl: 'https://moldwright.robagentic.tech/og/board?scene=x', team: 'Inbox Assistant', path: 'w/acme?billing=1' })
 
 const deliver = () => deliverWhatsApp(fakeSupabase().client, { userId: 'user-1', workspaceId: 7, agentId: 'agent-1', message: MESSAGE, language: 'fr', dedupeKey: 'payment_failed:in_1' })
 

@@ -1,7 +1,7 @@
 import { rm } from 'node:fs/promises'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { TOOL_KEYS } from '@rerun/contracts'
+import { TOOL_KEYS } from '@moldwright/contracts'
 import { servesModel } from '../../connections/resolve.js'
 import { createAgent } from '../../agents/factory.js'
 import { unloadAgent } from '../../agents/registry.js'

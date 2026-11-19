@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { DESKTOP_SHELL_PLATFORMS, parseDesktopShellUserAgent, type DesktopShellIdentity, type DesktopShellPlatform } from '@rerun/contracts'
+import { DESKTOP_SHELL_PLATFORMS, parseDesktopShellUserAgent, type DesktopShellIdentity, type DesktopShellPlatform } from '@moldwright/contracts'
 import { headers } from 'next/headers'
 import { DESKTOP_SHELL_PREVIEW_HEADER } from './preview'
 

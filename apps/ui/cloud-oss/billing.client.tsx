@@ -1,6 +1,6 @@
 'use client'
 
-import { DEFAULT_PRICE_ARM, type PriceArm } from '@rerun/contracts'
+import { DEFAULT_PRICE_ARM, type PriceArm } from '@moldwright/contracts'
 
 import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'

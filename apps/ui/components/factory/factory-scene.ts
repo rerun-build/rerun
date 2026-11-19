@@ -1,4 +1,4 @@
-import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Container, type Tile, type TileLink, type TileResultItem, type TileToast } from '@rerun/ui/iso-grid'
+import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Container, type Tile, type TileLink, type TileResultItem, type TileToast } from '@moldwright/ui/iso-grid'
 
 export type Cell = { col: number; row: number }
 

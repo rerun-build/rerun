@@ -7,11 +7,11 @@ process.env.RERUN_API_KEY = ''
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { readFile, rm, stat } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL } = await import('@moldwright/contracts')
 const { connectionConfigPath, connectionDir, connectionEnvPath, connectionsDir } = await import('../config/paths.js')
 const { readEnvFile } = await import('../lib/env-file.js')
 const { getConnection, listConnections, unloadConnection } = await import('./registry.js')
-const { createConnection, deleteConnection, ensureRerunConnection, patchConnection, updateConnectionKeys } = await import('./store.js')
+const { createConnection, deleteConnection, ensureMoldwrightConnection, patchConnection, updateConnectionKeys } = await import('./store.js')
 const { isCredentialRejected, recordCredentialRejected } = await import('./credential-rejections.js')
 
 beforeEach(async () => {
@@ -59,15 +59,15 @@ describe('updateConnectionKeys', () => {
     })
 
     it('refuses the keyless Rerun connection', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         await expect(updateConnectionKeys(RERUN_CONNECTION_ID, { set: { X: 'y' }, remove: [] })).rejects.toMatchObject({ status: 400, message: 'The Rerun connection is keyless' })
     })
 })
 
 describe('the Rerun connection', () => {
     it('is provisioned once, keyless, and cannot be renamed, stripped of Rerun Balanced or deleted', async () => {
-        await ensureRerunConnection()
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
+        await ensureMoldwrightConnection()
         const rerun = await getConnection(RERUN_CONNECTION_ID)
         expect(rerun.config.provider).toBe('rerun')
         expect(rerun.env).toEqual({})
@@ -80,11 +80,11 @@ describe('the Rerun connection', () => {
     })
 
     it('gains the tiers that came after it at boot, once, behind the model it already had', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         await patchConnection(RERUN_CONNECTION_ID, { models: [RERUN_MODEL] })
 
-        await ensureRerunConnection()
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
+        await ensureMoldwrightConnection()
 
         expect((await getConnection(RERUN_CONNECTION_ID)).config.models).toEqual(['rerun-max', 'rerun-fast', 'rerun-smart'])
         expect(DEFAULT_CONNECTION_MODELS.rerun[0]).toBe(RERUN_MODEL)

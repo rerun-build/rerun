@@ -1,4 +1,4 @@
-import type { PaidDataPriceMultiplier } from '@rerun/contracts'
+import type { PaidDataPriceMultiplier } from '@moldwright/contracts'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 

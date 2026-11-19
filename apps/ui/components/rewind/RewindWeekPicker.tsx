@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

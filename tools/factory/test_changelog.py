@@ -17,6 +17,9 @@ class TestChangelog(unittest.TestCase):
         self.assertEqual(C.rate([{"job": 1, "group": "g"}], list(range(10)), "g"), 2.0)
         self.assertIsNone(C.rate(ev, [], "g"))
 
+    def test_duplicate_job_ids_count_once(self):
+        self.assertEqual(C.rate([{"job": 1, "group": "g"}], [1, 1] + list(range(2, 21)), "g"), 1.0)
+
     def test_before_takes_the_last_twenty_jobs_ended_by_then(self):
         e = ended(range(1, 31))
         self.assertEqual(C.before(e, 30 * 10 + 5), list(range(11, 31)))

@@ -28,4 +28,4 @@ export {
     type ServiceSetupOutcome,
     type ServiceSuggestionItem,
     type TakeoverRequest,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'

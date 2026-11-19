@@ -145,6 +145,9 @@ class Store:
     def set(self, job, k, v):
         self.db.execute("INSERT INTO kv VALUES(?,?,?) ON CONFLICT(job,k) DO UPDATE SET v=excluded.v", (job, k, str(v)))
 
+    def forget(self, job):
+        self.db.execute("DELETE FROM kv WHERE job=?", (job,))
+
     def get_all(self, job):
         return {r["k"]: r["v"] for r in self.db.execute("SELECT k,v FROM kv WHERE job=?", (job,))}
 

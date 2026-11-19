@@ -1,5 +1,5 @@
-import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
-import type { AgentSuggestion } from '@rerun/ui/new-agent'
+import { isTemplateCategory, type TemplateCategory } from '@moldwright/contracts'
+import type { AgentSuggestion } from '@moldwright/ui/new-agent'
 
 export type { AgentSuggestion }
 

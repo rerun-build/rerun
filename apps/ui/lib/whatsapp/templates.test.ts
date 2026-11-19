@@ -14,7 +14,7 @@ import {
     whatsappLanguage,
 } from './templates'
 
-const IMAGE = 'https://app.rerun.build/og/board?scene=x'
+const IMAGE = 'https://moldwright.robagentic.tech/og/board?scene=x'
 
 describe('WhatsApp template builders', () => {
     it('fills the header image, the named body variables and the button path', () => {

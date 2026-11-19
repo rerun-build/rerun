@@ -1,5 +1,5 @@
 {
-    "name": "@rerun/contracts",
+    "name": "@moldwright/contracts",
     "license": "AGPL-3.0-only",
     "version": "0.1.0",
     "type": "module",

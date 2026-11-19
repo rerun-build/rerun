@@ -1,4 +1,4 @@
-import { pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, type HitlKind } from '@rerun/contracts'
+import { pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, type HitlKind } from '@moldwright/contracts'
 import type { useTranslations } from 'use-intl'
 
 import type { IconName } from '@/components/ui/Icon'

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { dropHydrationNoiseOnTranslatedPage } from '@rerun/analytics/client'
+import { dropHydrationNoiseOnTranslatedPage } from '@moldwright/analytics/client'
 import type { CaptureResult } from 'posthog-js'
 import { afterEach, describe, expect, it } from 'vitest'
 

@@ -1,4 +1,4 @@
-import { asRecord } from '@rerun/contracts'
+import { asRecord } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 
 export const ONBOARDING_WIDGETS = ['ask_choice', 'ask_input', 'ask_either', 'show_starter_pack', 'show_plan', 'open_checkout', 'build_team'] as const

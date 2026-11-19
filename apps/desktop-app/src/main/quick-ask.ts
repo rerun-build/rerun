@@ -1,5 +1,5 @@
 import { app, BrowserWindow, globalShortcut, screen } from 'electron'
-import { QUICK_ASK_PATH, QUICK_ASK_SHORTCUT } from '@rerun/contracts'
+import { QUICK_ASK_PATH, QUICK_ASK_SHORTCUT } from '@moldwright/contracts'
 import { currentServer, getMainWindow, loadAppPath, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { partitionFor } from './server'
 import { decideNavigation } from './url-policy'

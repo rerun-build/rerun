@@ -1,5 +1,5 @@
-import { Button } from '@rerun/ui/primitives'
-import { ChevronDownIcon, ChevronUpIcon, XIcon } from '@rerun/cloud/ui-icons'
+import { Button } from '@moldwright/ui/primitives'
+import { ChevronDownIcon, ChevronUpIcon, XIcon } from '@moldwright/cloud/ui-icons'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { useTranslations } from 'use-intl'
 import type { FindResult } from '../../shared/ipc-channels'

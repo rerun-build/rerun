@@ -1,4 +1,4 @@
-import { paidDataSourcesByTurn, type PaidTurnSources } from '@rerun/contracts'
+import { paidDataSourcesByTurn, type PaidTurnSources } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'

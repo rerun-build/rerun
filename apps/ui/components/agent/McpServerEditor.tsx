@@ -13,7 +13,7 @@ import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { argsHaveSecret, externalizeArgs, externalizePairs, externalizeUrl, sanitize, urlHasSecret } from '@/lib/engine/mcp-secrets'
 import type { EngineMcpServer } from '@/lib/engine/types'
-import { MCP_SERVER_NAME_RE } from '@rerun/contracts'
+import { MCP_SERVER_NAME_RE } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 

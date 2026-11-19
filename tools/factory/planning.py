@@ -37,6 +37,9 @@ FAIL_OPEN = ("reviewing", "repairing")
 STAGES = {"planning": "plan", "running": "plan", "cutting": "cut", "reviewing": "review", "repairing": "repair"}
 AGAIN = {"cut": "planned", "review": "planned", "repair": "repair"}
 QUESTION_LABEL = "factory-question"
+REPLAN = "factory-replan"
+ENDED = ("blocked", "lost", "cut")
+CLEARED = frozenset(("factory-plan", "factory-blocked", "factory-unsolvable", "likely-fixed"))
 ANSWER = re.compile(r"(?mi)^ANSWER:[ \t]*(.+)$")
 ISSUE_URL = re.compile(r"/issues/(\d+)\b")
 MAX_QUESTIONS = 3
@@ -400,6 +403,7 @@ class Station:
         self.auto = cfg.get("planning", {}).get("auto", True)
         self.parallel = cfg.get("planning", {}).get("parallel", PARALLEL)
         self.pool = pools.types(cfg).get("planner")
+        self.held = False
 
     def records(self):
         rows = self.store.db.execute("SELECT job FROM kv WHERE k='state' AND job LIKE 'plan:%'").fetchall()
@@ -1094,6 +1098,16 @@ class Station:
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
                                      "number,title,labels,createdAt", "--limit", "100"]))
         records = self.records()
+        held = bool(self.cfg.get("held"))
+        if held != self.held:
+            log("-", "planning: sends held, no plan starts" if held else "planning: sends free again")
+            self.held = held
+        reset = False
+        for i in issues:
+            if REPLAN in names(i) and self.again(i, records.get(i["number"])):
+                reset = True
+        if reset:
+            records = self.records()
         for item in unplanned(issues):
             if room <= 0:
                 break
@@ -1113,6 +1127,44 @@ class Station:
                 break
             self.send(item, got, records.get(n))
             room -= 1
+
+    def again(self, item, row):
+        n = item["number"]
+        held = names(item)
+        state = (row or {}).get("state", "unsent")
+        blocking = sorted((held & SKIP) - CLEARED)
+        if blocking:
+            return self.waits(n, "labels:" + ",".join(blocking), "the issue also carries %s" % ", ".join(blocking))
+        if state not in ENDED + ("unsent",):
+            return self.waits(n, "progress", "its plan is still in progress")
+        children = self.open_children(n)
+        if children:
+            return self.waits(n, "children", "its child issues %s are open" % ", ".join("#%d" % k for k in sorted(c["number"] for c in children)))
+        gone = sorted(held & CLEARED) + [REPLAN]
+        for name in gone:
+            try:
+                self.gh(["issue", "edit", str(n), "-R", self.repo, "--remove-label", name])
+            except Exception as e:
+                log("plan:%d" % n, "replan waits: label %s not removed (%s)" % (name, type(e).__name__))
+                return False
+        if state != "unsent":
+            self.store.forget("plan:%d" % n)
+        self.store.forget("replan:%d" % n)
+        item["labels"] = [label for label in item.get("labels", []) if label.get("name") not in gone]
+        return True
+
+    def waits(self, n, kind, why):
+        job = "replan:%d" % n
+        if self.store.get_all(job).get("said:" + kind):
+            return False
+        try:
+            self.gh(["issue", "comment", str(n), "-R", self.repo, "--body",
+                     "`factory-replan` waits: %s. The label stays and the re-plan starts once that clears." % why])
+        except Exception as e:
+            log("plan:%d" % n, "replan note not posted (%s)" % type(e).__name__)
+            return False
+        self.store.set(job, "said:" + kind, "1")
+        return False
 
     def free(self, key):
         keep = set(self.pick(key))

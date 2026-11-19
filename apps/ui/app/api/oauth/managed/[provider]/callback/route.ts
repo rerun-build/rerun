@@ -10,7 +10,7 @@ import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import type { DesktopShellChannel } from '@rerun/contracts'
+import type { DesktopShellChannel } from '@moldwright/contracts'
 
 type CallbackResult = { ok: true; email?: string; claim?: string } | { ok: false; error: string }
 

@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { TileBuddy, agentTileStyle } from '@rerun/ui/iso-grid'
+import { TileBuddy, agentTileStyle } from '@moldwright/ui/iso-grid'
 
 const draw = (style: object) => renderToStaticMarkup(createElement(TileBuddy, { id: 'Delegator', style: style as never, width: 160, height: 80, floorOffset: 0 }))
 const idle = { color: '#444', buddy: { eyes: 'round' }, label: 'Delegator' }

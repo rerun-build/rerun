@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, pendingServices, serializeServiceSetupResult, type AuthMethodSummary, type ResolvedService, type ServiceSetupOutcome } from '@rerun/contracts'
+import { HITL_CANCELLED, pendingServices, serializeServiceSetupResult, type AuthMethodSummary, type ResolvedService, type ServiceSetupOutcome } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'

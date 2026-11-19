@@ -14,7 +14,7 @@ export default defineConfig(() => {
         main: {
             define,
             build: {
-                externalizeDeps: { exclude: ['@rerun/contracts'] },
+                externalizeDeps: { exclude: ['@moldwright/contracts'] },
             },
         },
         preload: {
@@ -32,9 +32,9 @@ export default defineConfig(() => {
             plugins: [react(), tailwindcss()],
             resolve: {
                 alias: [
-                    { find: '@rerun/cloud/ui-icons', replacement: ICONS },
+                    { find: '@moldwright/cloud/ui-icons', replacement: ICONS },
                     { find: /^lucide-react$/, replacement: require.resolve('lucide-react') },
-                    { find: '@rerun/ui/primitives/spinner', replacement: require.resolve('@rerun/ui/primitives/spinner') },
+                    { find: '@moldwright/ui/primitives/spinner', replacement: require.resolve('@moldwright/ui/primitives/spinner') },
                 ],
                 dedupe: ['react', 'react-dom'],
             },

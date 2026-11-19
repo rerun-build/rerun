@@ -1,7 +1,7 @@
 'use client'
 
-import type { TableCard as TableCardData } from '@rerun/contracts'
-import { TableCard, type FileUrl } from '@rerun/ui/chat'
+import type { TableCard as TableCardData } from '@moldwright/contracts'
+import { TableCard, type FileUrl } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 
 export function ViewSettingsPreview({ card, fileUrl }: { card: TableCardData; fileUrl?: FileUrl }) {

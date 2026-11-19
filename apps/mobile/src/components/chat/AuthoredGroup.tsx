@@ -1,4 +1,4 @@
-import { FORMER_MEMBER, type AuthorProfile } from '@rerun/contracts'
+import { FORMER_MEMBER, type AuthorProfile } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'

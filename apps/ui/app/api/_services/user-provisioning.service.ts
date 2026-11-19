@@ -1,11 +1,11 @@
 import type { Database, Json } from '@/app/api/database.types'
-import { grantRerunTopup } from '@rerun/cloud/billing.server'
-import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
+import { grantMoldwrightTopup } from '@moldwright/cloud/billing.server'
+import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS, type PriceArm } from '@moldwright/cloud/billing'
 import { randomBlob } from '@/lib/blobs/catalog'
 import { DEFAULT_NOTIFICATION_PREFS } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, type Locale } from '@moldwright/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 export async function provisionUser(
@@ -66,7 +66,7 @@ export async function provisionUser(
     if (membershipError) console.error('Error creating membership', membershipError)
 
     if (!user.is_anonymous) {
-        await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
+        await grantMoldwrightTopup(workspace.id, SIGNUP_BUDGET_MICROS)
         if (phoneStep) await requirePhone(user.id)
     }
     return { signedUp: !user.is_anonymous }
@@ -91,6 +91,6 @@ async function stampSignup(user: User, signedUpAt: string | null, workspaceId: n
         .select('id')
     if (error) return false
     if (!stamped?.length) return true
-    await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
+    await grantMoldwrightTopup(workspaceId, SIGNUP_BUDGET_MICROS)
     return true
 }

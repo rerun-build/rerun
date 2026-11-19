@@ -1,6 +1,6 @@
 import { toAgentSuggestion, type StoredIdea } from '@/lib/agent-ideas/stored'
 import type { Lens } from '@/lib/agent-ideas/types'
-import { isTemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory } from '@moldwright/contracts'
 
 import { agentSuggestionsForIndustry, DEFAULT_AGENT_SUGGESTIONS, INDUSTRY_AGENT_SUGGESTIONS, type AgentSuggestion } from './agent-suggestions'
 

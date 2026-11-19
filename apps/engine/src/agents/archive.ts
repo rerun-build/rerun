@@ -14,7 +14,7 @@ import {
     type AgentArchivePlan,
     type AgentArchiveRedaction,
     type McpServer,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { agentDir, mcpDir } from '../config/paths.js'
 import type { AgentConfig, LoadedAgent } from './types.js'
 import { getAgent } from './registry.js'

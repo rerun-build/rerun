@@ -1,4 +1,4 @@
-import { foremanClientSchema } from '@rerun/contracts'
+import { foremanClientSchema } from '@moldwright/contracts'
 import { Platform } from 'react-native'
 
 import { onboardingSendBody } from './useOnboardingChat'

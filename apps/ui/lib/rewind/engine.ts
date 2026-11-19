@@ -1,4 +1,4 @@
-import { rewindAgentReportSchema, type RewindAgentReport } from '@rerun/contracts'
+import { rewindAgentReportSchema, type RewindAgentReport } from '@moldwright/contracts'
 
 import { request } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'

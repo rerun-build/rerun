@@ -1,6 +1,6 @@
 'use client'
 
-import { CONSENT_ATTRIBUTE, type ConsentDecision, detectConsentStatus, writeConsentCookie } from '@rerun/contracts'
+import { CONSENT_ATTRIBUTE, type ConsentDecision, detectConsentStatus, writeConsentCookie } from '@moldwright/contracts'
 import { Cookie } from '../icons'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '../cn'

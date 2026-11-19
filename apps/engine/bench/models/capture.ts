@@ -8,7 +8,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-model-bench-')
 process.env.RERUN_API_KEY = 'bench'
 process.env.RERUN_LOG_LEVEL = 'fatal'
 
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { buildSystemPrompt } = await import('../../src/agents/systemPrompt.js')
 const { buildTools } = await import('../../src/tools/registry.js')
 const { logger } = await import('../../src/lib/logger.js')

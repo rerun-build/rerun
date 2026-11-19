@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { columnLabel, isNumericKind, rowCurrency, type FriendlyColumn } from '@/lib/data/friendly-columns'
 import { ArrowDownIcon, ArrowUpIcon, DatabaseIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import type { CellContext } from '@rerun/ui/chat'
+import type { CellContext } from '@moldwright/ui/chat'
 import { type Table } from '@tanstack/react-table'
 import { useTranslations } from 'next-intl'
 

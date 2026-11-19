@@ -27,12 +27,12 @@ icon = "server"
 
 [scripts.run.everything]
 available_in = [ "cloud" ]
-command = "bash .conductor/wait-for-setup.sh && bash .conductor/free-port.sh 3050 3049 engine 3053 && pnpm exec concurrently -k -n ui,landing,engine,emails -c cyan,blue,green,gray \"pnpm --filter rerun exec next dev -p 3050\" \"pnpm --dir cloud/apps/landing exec next dev -p 3049\" \"pnpm dev:engine\" \"EMAIL_ASSET_ORIGIN=http://localhost:3050 pnpm --filter @rerun/emails exec email dev --dir emails --port 3053\""
+command = "bash .conductor/wait-for-setup.sh && bash .conductor/free-port.sh 3050 3049 engine 3053 && pnpm exec concurrently -k -n ui,landing,engine,emails -c cyan,blue,green,gray \"pnpm --filter rerun exec next dev -p 3050\" \"pnpm --dir cloud/apps/landing exec next dev -p 3049\" \"pnpm dev:engine\" \"EMAIL_ASSET_ORIGIN=http://localhost:3050 pnpm --filter @moldwright/emails exec email dev --dir emails --port 3053\""
 icon = "play"
 
 [scripts.run.emails]
 available_in = [ "cloud" ]
-command = "bash .conductor/wait-for-setup.sh && bash .conductor/free-port.sh 3053 && EMAIL_ASSET_ORIGIN=http://localhost:3050 pnpm --filter @rerun/emails exec email dev --dir emails --port 3053"
+command = "bash .conductor/wait-for-setup.sh && bash .conductor/free-port.sh 3053 && EMAIL_ASSET_ORIGIN=http://localhost:3050 pnpm --filter @moldwright/emails exec email dev --dir emails --port 3053"
 icon = "mail"
 
 [scripts.run.docs]

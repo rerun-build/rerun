@@ -1,4 +1,4 @@
-import { isPaidSubscription } from '@rerun/cloud/billing'
+import { isPaidSubscription } from '@moldwright/cloud/billing'
 
 type LockableAgent = { templateId: string | null }
 type LockableWorkspace = { subscription_status: string | null; is_sandbox: boolean } | null | undefined

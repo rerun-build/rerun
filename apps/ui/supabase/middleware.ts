@@ -1,13 +1,13 @@
 import type { Database } from '@/app/api/database.types'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
-import { drawPriceArm } from '@rerun/cloud/billing'
+import { drawPriceArm } from '@moldwright/cloud/billing'
 import { routes } from '@/lib/routes'
-import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
-import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@rerun/contracts'
+import { EXPERIMENT_COOKIE } from '@moldwright/analytics/experiments'
+import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@moldwright/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { User } from '@supabase/supabase-js'
-import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
+import { LOCALE_COOKIE, resolveLocale } from '@moldwright/i18n'
 import { NextResponse, type NextRequest } from 'next/server'
 
 function shouldStartAnonymousSession(request: NextRequest): boolean {
@@ -26,11 +26,6 @@ function redirectKeepingSession(request: NextRequest, pathname: string, sessionR
     return response
 }
 
-function cookieDomain(request: NextRequest): string | undefined {
-    const host = (request.headers.get('host') ?? request.nextUrl.hostname).split(':')[0]
-    return host.endsWith('rerun.build') ? '.rerun.build' : undefined
-}
-
 function isSecure(request: NextRequest): boolean {
     const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim()
     return (forwarded ?? request.nextUrl.protocol.replace(':', '')) === 'https'
@@ -43,7 +38,6 @@ function applySessionHint(request: NextRequest, response: NextResponse, signedIn
         path: '/',
         maxAge: signedIn ? SESSION_HINT_MAX_AGE : 0,
         sameSite: 'lax',
-        domain: cookieDomain(request),
         secure: isSecure(request),
         httpOnly: false,
     })
@@ -133,9 +127,9 @@ export async function updateSession(request: NextRequest) {
 
     if (identity) {
         if (!identity.isAnonymous && request.nextUrl.pathname.startsWith(routes.auth) && request.nextUrl.pathname !== routes.authCallback && request.nextUrl.pathname !== DESKTOP_AUTH_PATH) {
-            return redirectKeepingSession(request, routes.home, supabaseResponse)
+            return redirectKeepingSession(request, routes.board, supabaseResponse)
         }
-    } else if (request.nextUrl.pathname === routes.home) {
+    } else if (request.nextUrl.pathname === routes.home || request.nextUrl.pathname === routes.board) {
         return redirectKeepingSession(request, routes.auth, supabaseResponse)
     }
 

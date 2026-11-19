@@ -1,4 +1,4 @@
-import type { BrainPageType, BrainSeedPage } from '@rerun/contracts'
+import type { BrainPageType, BrainSeedPage } from '@moldwright/contracts'
 
 import type { CatalogFindings, CatalogProduct } from '@/lib/company/explore/catalog-collector'
 import type { BusinessCard } from '@/lib/company/explore/synthesize'

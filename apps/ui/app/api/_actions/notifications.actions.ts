@@ -1,7 +1,7 @@
 'use server'
 
 import { patchNotificationPrefs } from '@/app/api/_services/notification-prefs.service'
-import { verifyUnsubscribeToken } from '@rerun/cloud/email'
+import { verifyUnsubscribeToken } from '@moldwright/cloud/email'
 import { notificationPrefsPatchSchema, type NotificationPrefsPatch } from '@/lib/notifications/prefs'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'

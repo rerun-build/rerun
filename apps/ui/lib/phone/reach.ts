@@ -1,3 +1,3 @@
-import { reachableChannels, type PhoneSender } from '@rerun/contracts'
+import { reachableChannels, type PhoneSender } from '@moldwright/contracts'
 
 export { reachableChannels, type PhoneSender }

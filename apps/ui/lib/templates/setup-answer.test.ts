@@ -1,4 +1,4 @@
-import { isSetupAnswered } from '@rerun/contracts'
+import { isSetupAnswered } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 describe('isSetupAnswered', () => {

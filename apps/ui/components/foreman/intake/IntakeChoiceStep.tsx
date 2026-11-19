@@ -1,7 +1,7 @@
 'use client'
 
-import { CustomOptionRow, OptionRow } from '@rerun/ui/chat'
-import { ScrollFade } from '@rerun/ui/primitives'
+import { CustomOptionRow, OptionRow } from '@moldwright/ui/chat'
+import { ScrollFade } from '@moldwright/ui/primitives'
 import { useState } from 'react'
 
 import { Field } from '@/components/ui/field'

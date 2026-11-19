@@ -2,7 +2,7 @@ import { actorFromContext } from '@/app/api/_auth/access'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { getAgentKeys, updateAgentKeys } from '@/lib/engine/client'
-import { updateAgentKeysSchema } from '@rerun/contracts'
+import { updateAgentKeysSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

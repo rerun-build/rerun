@@ -1,11 +1,11 @@
 import { convertToModelMessages, createIdGenerator, createUIMessageStream, createUIMessageStreamResponse, pruneMessages, stepCountIs, streamText, type UIMessage } from 'ai'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { foremanClientSchema } from '@rerun/contracts'
+import { foremanClientSchema } from '@moldwright/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { isPhoneStepPending } from '@rerun/cloud/phone.server'
-import { logRerunUsage, meteredFetch, type OpenRouterUsage } from '@rerun/cloud/billing.server'
-import { MICROS_PER_USD } from '@rerun/cloud/billing'
+import { isPhoneStepPending } from '@moldwright/cloud/phone.server'
+import { logMoldwrightUsage, meteredFetch, type OpenRouterUsage } from '@moldwright/cloud/billing.server'
+import { MICROS_PER_USD } from '@moldwright/cloud/billing'
 import { engineSessionOf, loadForemanConversation, saveForemanConversation } from '@/lib/foreman/conversation'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
 import { foremanErrorText } from '@/lib/foreman/error-text'
@@ -18,7 +18,7 @@ import { sealPendingWidgets } from '@/lib/foreman/seal-pending'
 import { loadForemanState } from '@/lib/foreman/state'
 import { withoutVoiceMarkers } from '@/lib/foreman/strip-voice'
 import { foremanSystemPrompt } from '@/lib/foreman/prompt'
-import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
+import { PHONE_REQUIRED_MESSAGE } from '@moldwright/cloud/phone'
 import { prepareScript, runScript } from '@/lib/foreman/scripted'
 import { foremanActiveTools, foremanTools } from '@/lib/foreman/tools'
 import { createForemanTurn } from '@/lib/foreman/turn'
@@ -89,7 +89,7 @@ export async function POST(req: Request): Promise<Response> {
 
     const settle = (usage: OpenRouterUsage) => {
         if (typeof usage.cost !== 'number') return
-        void logRerunUsage({
+        void logMoldwrightUsage({
             workspaceId: ctx.workspace.id,
             model: FOREMAN_MODEL_ID,
             tier: 'smart',

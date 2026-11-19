@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile, chmod, rename } from 'node:fs/promises'
-import { CONNECTION_TOKEN_KEY } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY } from '@moldwright/contracts'
 import { codexAuthPath, codexHomeDir, connectionEnvPath } from '../config/paths.js'
 import { readEnvFile, writeEnvFile } from '../lib/env-file.js'
 import { logger } from '../lib/logger.js'

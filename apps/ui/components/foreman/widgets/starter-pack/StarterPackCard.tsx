@@ -1,6 +1,6 @@
 'use client'
 
-import { BorderBeam } from '@rerun/ui'
+import { BorderBeam } from '@moldwright/ui'
 import { useTranslations } from 'next-intl'
 
 import { ServiceIconRow } from '@/components/services/ServiceIconRow'

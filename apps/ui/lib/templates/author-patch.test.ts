@@ -1,4 +1,4 @@
-import { templateDocumentSchema } from '@rerun/contracts'
+import { templateDocumentSchema } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { mergeAuthorDocument, pickSentFields, templateAuthorPatchSchema } from './expert'
 

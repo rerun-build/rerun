@@ -134,6 +134,15 @@ class Flow(P.ProofBase):
         self.assertIn("Pull request #42 is open", brief)
         self.assertIn("ASK 2: NOT MET (plan) Files lacks a path", brief)
 
+    def test_a_plan_reject_naming_another_commit_is_asked_again(self):
+        self.to_review()
+        self.w.finish("r1", "no\nVERDICT: REJECT (plan) @1234567: Files lacks a path")
+        self.tick(2)
+        self.assertEqual(self.state(), "reviewing")
+        reasons = [r[0] for r in self.w.rows("SELECT reason FROM transitions WHERE job='5' ORDER BY id")]
+        self.assertIn("verdict names 1234567, the head is abcdef1: asked again", reasons)
+        self.assertEqual(self.planner_sends(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

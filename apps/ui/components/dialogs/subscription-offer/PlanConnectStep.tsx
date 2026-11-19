@@ -1,6 +1,6 @@
 'use client'
 
-import { ScrollFade } from '@rerun/ui/primitives'
+import { ScrollFade } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 

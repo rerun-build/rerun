@@ -1,4 +1,4 @@
-import { PAID_DATA_CAPABILITIES, toolActivityOf } from '@rerun/contracts'
+import { PAID_DATA_CAPABILITIES, toolActivityOf } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { englishTranslator } from '@/lib/i18n/english-translator'

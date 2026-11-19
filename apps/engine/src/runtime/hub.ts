@@ -1,4 +1,4 @@
-import { FOREMAN_HUB_TOKEN_HEADER } from '@rerun/contracts'
+import { FOREMAN_HUB_TOKEN_HEADER } from '@moldwright/contracts'
 import type { LoadedAgent } from '../agents/types.js'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'

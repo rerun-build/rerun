@@ -3,7 +3,7 @@
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Icon } from '@/components/ui/icon'
 import { RocketIcon } from '@/lib/icons'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 export function UpdateRequiredDialog({ open }: { open: boolean }) {

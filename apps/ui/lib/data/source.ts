@@ -1,7 +1,7 @@
 import { deleteTableViewAction, listTableViewsAction, readTableGroupsAction, readTableSourcesAction, saveTableViewAction, updateTableRowAction } from '@/app/api/_actions/data-views.actions'
 import type { EngineDbRows, EngineDbTable } from '@/lib/engine/types'
 import type { ActionRefusal } from '@/lib/i18n/action-error'
-import type { EngineDbGroup, RowFilter, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@rerun/contracts'
+import type { EngineDbGroup, RowFilter, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@moldwright/contracts'
 
 export type DataScope = { kind: 'agent'; agentId: string } | { kind: 'shared' }
 

@@ -1,6 +1,6 @@
-import { isPremiumModel, modelLabel } from '@rerun/contracts'
+import { isPremiumModel, modelLabel } from '@moldwright/contracts'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isPremiumModelEntitled } from '@moldwright/cloud/billing'
 import { setBoxPlan } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { AppError } from '@/lib/i18n/action-error'

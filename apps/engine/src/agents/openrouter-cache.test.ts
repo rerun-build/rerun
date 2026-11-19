@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ANTHROPIC_CACHE_CONTROL, withAnthropicCacheBreakpoints } from '@rerun/contracts'
+import { ANTHROPIC_CACHE_CONTROL, withAnthropicCacheBreakpoints } from '@moldwright/contracts'
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 
 const sentBody = async (body: unknown) => {

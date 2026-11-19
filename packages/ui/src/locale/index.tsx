@@ -1,8 +1,8 @@
 'use client'
 
-import type { AppLocale } from '@rerun/i18n'
-import type { Messages } from '@rerun/i18n/messages'
-import englishKit from '@rerun/i18n/messages/en/kit.json'
+import type { AppLocale } from '@moldwright/i18n'
+import type { Messages } from '@moldwright/i18n/messages'
+import englishKit from '@moldwright/i18n/messages/en/kit.json'
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { createTranslator } from 'use-intl'
 

@@ -4,7 +4,7 @@ const startPhoneSignIn = vi.fn()
 vi.mock('@/app/api/_services/phone-sign-in.service', () => ({ startPhoneSignIn: (...args: unknown[]) => startPhoneSignIn(...args) }))
 vi.mock('@/supabase/server', () => ({ createClient: async () => ({}), getRequestAccessToken: async () => null }))
 
-vi.mock('@rerun/cloud/app-review', () => ({
+vi.mock('@moldwright/cloud/app-review', () => ({
     isAppReviewNumber: (phone: string) => !!process.env.APP_REVIEW_PHONE && phone === process.env.APP_REVIEW_PHONE,
     isAppReviewSignIn: (phone: string, code: string) => !!process.env.APP_REVIEW_PHONE && phone === process.env.APP_REVIEW_PHONE && !!process.env.APP_REVIEW_CODE && code === process.env.APP_REVIEW_CODE,
 }))
@@ -15,7 +15,7 @@ const segment = { params: Promise.resolve({}) }
 
 function ask(body: object, client?: string) {
     const headers: Record<string, string> = { 'x-forwarded-for': '203.0.113.7', 'accept-language': 'fr-FR', ...(client ? { 'x-rerun-client': client } : {}) }
-    return POST(new Request('https://app.rerun.build/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers }), segment)
+    return POST(new Request('https://moldwright.robagentic.tech/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers }), segment)
 }
 
 describe('POST /api/v1/auth/phone/code', () => {

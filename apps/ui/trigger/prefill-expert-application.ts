@@ -1,5 +1,5 @@
 import { task } from '@trigger.dev/sdk/v3'
-import { taskLogger as logger } from '@rerun/cloud/tasks'
+import { taskLogger as logger } from '@moldwright/cloud/tasks'
 import { prefillExpertFromProfile } from '@/lib/experts/prefill'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { expertScrapeQueue } from './expert-queue'

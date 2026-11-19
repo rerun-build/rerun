@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), enterSandbox: vi.fn
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/sandbox.service', () => ({ enterSandbox: mocks.enterSandbox }))
-vi.mock('@rerun/analytics/server', () => ({ captureServer: mocks.captureServer, deterministicUuid: (seed: string) => seed }))
+vi.mock('@moldwright/analytics/server', () => ({ captureServer: mocks.captureServer, deterministicUuid: (seed: string) => seed }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { claimCreatorSandboxAction } = await import('./creator-onboarding.actions')

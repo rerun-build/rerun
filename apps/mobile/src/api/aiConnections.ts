@@ -15,7 +15,7 @@ import {
     type CreateAiConnectionInput,
     type UpdateConnectionInput,
     type WorkspaceDefaultInput,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

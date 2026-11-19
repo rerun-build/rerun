@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
 import { sceneFromSnapshot } from './from-snapshot'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')

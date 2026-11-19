@@ -1,5 +1,5 @@
 import type { AuthMethod } from '@/lib/auth/auth-method'
-import type { SignupAbandonTrigger, SignupStep } from '@rerun/analytics'
+import type { SignupAbandonTrigger, SignupStep } from '@moldwright/analytics'
 
 export type SignupLeaveEvent = 'hidden' | 'pagehide' | 'dismissed'
 

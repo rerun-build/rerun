@@ -1,4 +1,4 @@
-import { MAX_STARTER_PICKS, type TemplateCategory } from '@rerun/contracts'
+import { MAX_STARTER_PICKS, type TemplateCategory } from '@moldwright/contracts'
 
 export type StarterCard = { template: string; promise: string; line?: string; focus?: string }
 

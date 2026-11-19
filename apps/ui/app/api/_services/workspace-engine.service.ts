@@ -1,7 +1,7 @@
 import { assertEngineEntitlement } from '@/app/api/_services/capacity.service'
 import { pushBoxPlan } from '@/app/api/_services/engine-plan.service'
 import type { Database } from '@/app/api/database.types'
-import { claimPoolEngine } from '@rerun/cloud/engines'
+import { claimPoolEngine } from '@moldwright/cloud/engines'
 import { requestCompanyBrainSeed } from '@/lib/brain/request-seed'
 import { buildBaseUrl } from '@/lib/engine/base-url'
 import type { EngineConnection } from '@/lib/engine/types'

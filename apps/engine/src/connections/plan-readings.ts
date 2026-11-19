@@ -1,4 +1,4 @@
-import type { PlanLimitWindow } from '@rerun/contracts'
+import type { PlanLimitWindow } from '@moldwright/contracts'
 import { raw } from '../db/client.js'
 
 export type PlanReading = {

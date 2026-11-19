@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { messageDayLabel, messageTime } from '@rerun/ui/time'
+import { messageDayLabel, messageTime } from '@moldwright/ui/time'
 import { splitTurnsAtBreaks, timeBreaksOf } from '@/lib/chat/message-times'
 import { authorTurnsOf } from '@/lib/chat/message-author'
 

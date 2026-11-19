@@ -9,7 +9,7 @@ import { isScheduledSource } from '@/lib/notifications/prefs'
 import { groupUnseenRuns } from '@/lib/notifications/unseen-runs'
 import { createClient } from '@/supabase/server'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
-import { ATTENTION_STATUSES, type Inbox, type InboxItem } from '@rerun/contracts'
+import { ATTENTION_STATUSES, type Inbox, type InboxItem } from '@moldwright/contracts'
 
 type SessionReadInsert = Database['public']['Tables']['session_reads']['Insert']
 

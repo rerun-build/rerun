@@ -1,8 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { ScrollFade } from '@rerun/ui/primitives'
-import { StepTransition } from '@rerun/ui/steps'
+import { ScrollFade } from '@moldwright/ui/primitives'
+import { StepTransition } from '@moldwright/ui/steps'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
 import { CaptureStepBody } from './CaptureStepBody'

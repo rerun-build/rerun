@@ -7,7 +7,7 @@ FROM base AS build
 COPY . .
 RUN --mount=type=cache,id=rerun-pnpm-store,target=/pnpm-store \
     pnpm install --frozen-lockfile --store-dir /pnpm-store --filter rerun-engine...
-RUN pnpm --filter @rerun/contracts build && pnpm --filter rerun-engine build
+RUN pnpm --filter @moldwright/contracts build && pnpm --filter rerun-engine build
 RUN pnpm --filter rerun-engine deploy --prod /out
 
 FROM base AS runtime

@@ -1,4 +1,4 @@
-import type { DesktopApp } from '@rerun/contracts'
+import type { DesktopApp } from '@moldwright/contracts'
 
 export const DOCK_APPS: Array<{ app: DesktopApp; label: string; windowClass: string }> = [
     { app: 'browser', label: 'Chrome', windowClass: '[Cc]hrom' },

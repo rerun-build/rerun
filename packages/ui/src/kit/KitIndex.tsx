@@ -10,7 +10,7 @@ export function KitIndex({ here, landingBase, appBase }: { here: 'landing' | 'ap
         <div className="flex flex-col gap-10">
             <KitIndexGroup
                 title="Shared bricks"
-                description="Everything in the @rerun/ui package: the pieces the marketing site and the app both render, from the same source."
+                description="Everything in the @moldwright/ui package: the pieces the marketing site and the app both render, from the same source."
                 offset={0}
                 categories={LANDING_CATEGORIES}
                 hrefOf={hrefOf}

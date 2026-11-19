@@ -1,4 +1,4 @@
-import { sleep } from '@rerun/contracts'
+import { sleep } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'

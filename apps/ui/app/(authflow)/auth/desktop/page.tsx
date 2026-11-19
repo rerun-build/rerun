@@ -1,7 +1,7 @@
 import { isPkceChallenge } from '@/app/api/_services/desktop-auth.service'
 import { Card } from '@/components/ui/card'
 import { createClient } from '@/supabase/server'
-import { isDesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
+import { isDesktopShellChannel, type DesktopSignInProvider } from '@moldwright/contracts'
 import { getTranslations } from 'next-intl/server'
 import { DesktopHandoff } from './DesktopHandoff'
 

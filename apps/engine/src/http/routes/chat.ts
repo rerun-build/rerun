@@ -1,4 +1,4 @@
-import { chatRequestSchema, runGoalSchema, ENGINE_SESSION_NOT_FOUND, type SessionSource } from '@rerun/contracts'
+import { chatRequestSchema, runGoalSchema, ENGINE_SESSION_NOT_FOUND, type SessionSource } from '@moldwright/contracts'
 import { Hono } from 'hono'
 import { resolveRunModel } from '../../agents/availability.js'
 import { getAgent } from '../../agents/registry.js'

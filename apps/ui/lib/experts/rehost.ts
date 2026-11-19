@@ -1,6 +1,6 @@
 import sharp from 'sharp'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@rerun/db'
+import type { Database } from '@moldwright/db'
 
 const BUCKET = 'expert-photos'
 

@@ -6,7 +6,7 @@ import { WaveDivider } from '@/components/ui/wave-divider'
 import { serviceIconProps } from '@/lib/services/icons'
 import type { ServiceAlternative } from '@/lib/services/types'
 import { Loader2Icon } from '@/lib/icons'
-import { brandIconFilter } from '@rerun/ui/brand-icon'
+import { brandIconFilter } from '@moldwright/ui/brand-icon'
 
 type ServiceAlternativesProps = {
     alternatives: ServiceAlternative[]

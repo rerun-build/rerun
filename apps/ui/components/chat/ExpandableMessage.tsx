@@ -4,7 +4,7 @@ import { AgentWorkspaceMessage } from '@/components/chat/AgentWorkspaceMessage'
 import type { ComposerMention } from '@/lib/chat/composer-links'
 import { ChevronDownIcon, ChevronUpIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 

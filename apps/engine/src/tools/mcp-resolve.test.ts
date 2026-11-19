@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { McpServer } from '@rerun/contracts'
+import type { McpServer } from '@moldwright/contracts'
 import { resolveServerSecrets } from './mcp-resolve.js'
 
 function server(partial: Partial<McpServer> & { name: string }): McpServer {

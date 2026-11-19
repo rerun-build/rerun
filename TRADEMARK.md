@@ -19,4 +19,4 @@ characters, which remain trademarks of Rerun.
 If you host Rerun for others, give it your own name and your own logo, and remove ours from the
 interface. The AGPL then asks you to publish your code, modifications included.
 
-Questions: help@rerun.build
+Questions: help@robagentic.tech

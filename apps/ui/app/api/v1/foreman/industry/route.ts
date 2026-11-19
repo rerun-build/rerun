@@ -1,6 +1,6 @@
 import { decideIndustryAction } from '@/app/api/_actions/foreman-intake.actions'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { foremanIndustryRequestSchema } from '@rerun/contracts'
+import { foremanIndustryRequestSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

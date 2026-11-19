@@ -1,5 +1,5 @@
-import { AGENT_SPAN, GRID_SIZE, TILE_H, TILE_W, agentTileStyle, connectorTileStyle, hashUnit } from '@rerun/ui/iso-grid'
-import type { Container, GridPosition, RoutedLink, RoutedTile, Tile, TileLink } from '@rerun/ui/iso-grid'
+import { AGENT_SPAN, GRID_SIZE, TILE_H, TILE_W, agentTileStyle, connectorTileStyle, hashUnit } from '@moldwright/ui/iso-grid'
+import type { Container, GridPosition, RoutedLink, RoutedTile, Tile, TileLink } from '@moldwright/ui/iso-grid'
 
 import { containerFromSpace } from '@/lib/board/iso-adapter'
 import { CABLE_DRAW_MS, routeAlone, routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'

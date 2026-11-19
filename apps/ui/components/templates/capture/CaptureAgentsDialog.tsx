@@ -1,6 +1,6 @@
 'use client'
 
-import { useStepper } from '@rerun/ui/steps'
+import { useStepper } from '@moldwright/ui/steps'
 import { useLayoutEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'

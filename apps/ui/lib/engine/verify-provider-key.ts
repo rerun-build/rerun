@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL, type Provider } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL, type Provider } from '@moldwright/contracts'
 import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 
 const VERIFY_TIMEOUT_MS = 5000

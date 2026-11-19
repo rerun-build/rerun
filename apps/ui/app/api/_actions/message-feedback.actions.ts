@@ -5,7 +5,7 @@ import { actorFromContext, assertAgentInWorkspace, assertSessionInWorkspace, isA
 import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { readSessionMessages } from '@/app/api/_services/conversation.service'
 import { engineSessionOf, readForemanEngineMessages } from '@/lib/foreman/conversation'
-import { MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackRating } from '@rerun/contracts'
+import { MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackRating } from '@moldwright/contracts'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { z } from 'zod'

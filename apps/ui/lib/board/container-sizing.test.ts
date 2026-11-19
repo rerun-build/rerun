@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AGENT_SPAN, MIN_CONTAINER_SPAN, clampAnchorToRange, containerCellRange, containerContainsTile, resizedContainerRect, type ContainerCells } from '@rerun/ui/iso-grid/iso'
+import { AGENT_SPAN, MIN_CONTAINER_SPAN, clampAnchorToRange, containerCellRange, containerContainsTile, resizedContainerRect, type ContainerCells } from '@moldwright/ui/iso-grid/iso'
 
 const box = (colStart: number, rowStart: number, size: number): ContainerCells => ({
     col_start: colStart,

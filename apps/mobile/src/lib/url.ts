@@ -1,4 +1,4 @@
-import { siteOf } from '@rerun/contracts'
+import { siteOf } from '@moldwright/contracts'
 import * as WebBrowser from 'expo-web-browser'
 
 export const hostOf = (url: string | null | undefined): string | null => (url ? siteOf(url) : null)

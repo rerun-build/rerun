@@ -10,7 +10,7 @@ import {
     type TableCard,
     type TableView,
     type TableViewInput,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { z } from 'zod'
 import { cellInputText } from '@/lib/data/views'
 

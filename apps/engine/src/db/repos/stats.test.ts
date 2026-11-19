@@ -9,7 +9,7 @@ const { beforeAll, describe, expect, it } = await import('vitest')
 const { getSystemDb } = await import('../systemDb.js')
 const { aggregateStats } = await import('./stats.js')
 import type { StatsRepoQuery } from './stats.js'
-import type { StatsPoint } from '@rerun/contracts'
+import type { StatsPoint } from '@moldwright/contracts'
 
 const AGENT = 'stats'
 

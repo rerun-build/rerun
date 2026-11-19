@@ -1,4 +1,4 @@
-import { formatElapsed, isSubRunFailing, isSubRunLive, isSubRunStalled, stripBridgePrefix, subRunOutcome, toolLabelOf, type SubRunCall, type SubRunTask } from '@rerun/contracts'
+import { formatElapsed, isSubRunFailing, isSubRunLive, isSubRunStalled, stripBridgePrefix, subRunOutcome, toolLabelOf, type SubRunCall, type SubRunTask } from '@moldwright/contracts'
 import { useEffect, useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import Animated, { cancelAnimation, Easing, FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'

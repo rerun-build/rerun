@@ -1,4 +1,4 @@
-import { LEGACY_UPLOAD_MAX_BYTES, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { LEGACY_UPLOAD_MAX_BYTES, MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { resolveRunTarget } from '@/app/api/_services/chat.service'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'

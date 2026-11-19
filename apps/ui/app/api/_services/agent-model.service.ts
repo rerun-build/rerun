@@ -4,12 +4,12 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
 import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { ApiError } from '@/lib/api-error'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isPremiumModelEntitled } from '@moldwright/cloud/billing'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
 import { connectionGroups } from '@/lib/engine/model-groups'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
-import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@moldwright/contracts'
 
 const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => (agentId === FOREMAN_AGENT_ID ? resolveRunTarget(agentId) : resolveAgentTarget(agentId, actorFromContext(ctx), access))
 

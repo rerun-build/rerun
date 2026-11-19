@@ -1,4 +1,4 @@
-import type { TemplateCategory } from '@rerun/contracts'
+import type { TemplateCategory } from '@moldwright/contracts'
 
 export const WORK_TYPES = [
     'business-owner',

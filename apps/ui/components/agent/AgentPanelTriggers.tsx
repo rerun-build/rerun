@@ -13,7 +13,7 @@ import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel
 import { PanelRow } from '@/components/ui/panel-row'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import type { EngineRun, EngineTrigger } from '@/lib/engine/types'
 import { PauseIcon, PlusIcon, WebhookIcon } from '@/lib/icons'
 import { outcomeKey, type TaskOutcome } from '@/lib/schedules/outcomes'

@@ -1,4 +1,4 @@
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
 export const agents = sqliteTable('agents', {

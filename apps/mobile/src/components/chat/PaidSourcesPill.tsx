@@ -1,4 +1,4 @@
-import type { PaidSource, PaidSourceLine, PaidTurnSources } from '@rerun/contracts'
+import type { PaidSource, PaidSourceLine, PaidTurnSources } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { Fragment, useState } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'

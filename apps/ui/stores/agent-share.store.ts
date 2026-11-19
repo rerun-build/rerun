@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AgentSharePreview } from '@rerun/contracts'
+import type { AgentSharePreview } from '@moldwright/contracts'
 
 type AgentShareFlowState = {
     token: string | null

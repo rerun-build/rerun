@@ -1,4 +1,4 @@
-import { agentKeysListSchema, type AgentKeysList } from '@rerun/contracts'
+import { agentKeysListSchema, type AgentKeysList } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

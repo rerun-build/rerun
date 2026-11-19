@@ -1,6 +1,6 @@
 import { generateText } from 'ai'
 
-import { AGENT_NAME_MAX } from '@rerun/ui/new-agent/reading'
+import { AGENT_NAME_MAX } from '@moldwright/ui/new-agent/reading'
 import { openrouter } from '@/lib/ai/openrouter'
 
 export async function generateAgentName(task: string): Promise<string> {

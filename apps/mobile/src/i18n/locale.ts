@@ -1,5 +1,5 @@
-import type { Me } from '@rerun/contracts'
-import { resolveLocale, type Locale } from '@rerun/i18n'
+import type { Me } from '@moldwright/contracts'
+import { resolveLocale, type Locale } from '@moldwright/i18n'
 
 export function accountLocale(me: Me | null): string | null {
     const user = me?.user as { locale?: unknown } | undefined

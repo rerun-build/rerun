@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { paidAppFlag } from '@rerun/cloud/apps.server'
+import { paidAppFlag } from '@moldwright/cloud/apps.server'
 import { requireLightSessionActor } from '@/app/api/_auth/access'
 import { requireAdminContext } from '@/app/api/_auth/ownership'
 import {

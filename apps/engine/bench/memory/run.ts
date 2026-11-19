@@ -18,7 +18,7 @@ process.env.RERUN_API_KEY = 'bench'
 process.env.RERUN_LOG_LEVEL = 'fatal'
 process.env.RERUN_HUB_BASE_URL = await hub.listen()
 
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { writeMemory, updateMemory, deleteMemory, deleteAllMemories, recallMemory, AUTO_RECALL_MIN_SIMILARITY } = await import('../../src/memory/store.js')
 const { reconcileWrite } = await import('../../src/memory/reconcile.js')
 const { listMemoryFiles, readMemoryFile } = await import('../../src/memory/files.js')

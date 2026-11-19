@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type AgentView, type BoardAgent, type BoxAccessLevel } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentView, type BoardAgent, type BoxAccessLevel } from '@moldwright/contracts'
 import { act, renderHook } from '@testing-library/react-native'
 
 import { UNKNOWN_ACCESS } from '@/auth/access'

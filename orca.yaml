@@ -15,7 +15,7 @@ scripts:
     done
     pnpm install --force --ignore-scripts
     pnpm rebuild esbuild sharp
-    pnpm --filter @rerun/contracts build
+    pnpm --filter @moldwright/contracts build
     [ ! -d cloud ] || node scripts/install-cloud.mjs
     [ ! -d cloud ] || pnpm cloud db:link || true
     [ ! -d cloud ] || pnpm cloud env:prod || true

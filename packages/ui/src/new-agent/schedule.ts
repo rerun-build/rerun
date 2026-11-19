@@ -1,4 +1,4 @@
-import { formatDate } from '@rerun/i18n/format'
+import { formatDate } from '@moldwright/i18n/format'
 
 import { englishKitTranslator, type KitTranslator } from '../kit-translator'
 

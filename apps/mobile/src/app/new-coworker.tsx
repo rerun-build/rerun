@@ -1,4 +1,4 @@
-import type { Box } from '@rerun/contracts'
+import type { Box } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, View } from 'react-native'

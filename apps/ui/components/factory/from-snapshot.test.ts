@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
-import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import { type BuddyLook, buddyColor, buddyEyes, buddyMouth, TileBuddy } from '@rerun/ui/iso-grid'
+import { type BuddyLook, buddyColor, buddyEyes, buddyMouth, TileBuddy } from '@moldwright/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
 import { factoryScene, LOOP_MS } from './factory-scene'
 

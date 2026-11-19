@@ -45,7 +45,7 @@ describe('PATCH /agents/:id/mcp-servers under concurrency', () => {
     })
 
     it('rejects the reserved bridge name instead of saving a server no provider will load', async () => {
-        const res = await patchMcp({ upsert: [{ name: 'rerun', transport: 'http', url: 'https://app.rerun.build/api/mcp/account', args: [], env: {}, headers: {} }] })
+        const res = await patchMcp({ upsert: [{ name: 'rerun', transport: 'http', url: 'https://moldwright.robagentic.tech/api/mcp/account', args: [], env: {}, headers: {} }] })
         expect(res.status).toBe(400)
         expect(await currentServerNames()).not.toContain('rerun')
     })

@@ -1,4 +1,4 @@
-import englishKit from '@rerun/i18n/messages/en/kit.json'
+import englishKit from '@moldwright/i18n/messages/en/kit.json'
 import { z } from 'zod'
 
 import { BUDGET_OPTIONS, EXPERT_AVAILABILITIES, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from './options'

@@ -2,7 +2,7 @@ import { readAgentView } from '@/app/api/_services/board-agents.service'
 import { deleteCoworker, renameCoworker } from '@/app/api/_services/coworker-details.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { agentViewForClient } from '@/app/api/v1/_lib/legacy-client'
-import { renameCoworkerSchema } from '@rerun/contracts'
+import { renameCoworkerSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

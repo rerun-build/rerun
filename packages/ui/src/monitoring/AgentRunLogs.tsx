@@ -1,7 +1,7 @@
 'use client'
 
-import type { Run } from '@rerun/contracts'
-import { formatDate, formatNumber } from '@rerun/i18n/format'
+import type { Run } from '@moldwright/contracts'
+import { formatDate, formatNumber } from '@moldwright/i18n/format'
 import type { LucideIcon } from '../icons'
 import { AlertCircleIcon, BanIcon, CheckIcon, ChevronRightIcon, LoaderIcon, ScrollTextIcon } from '../icons'
 import { Icon } from '../primitives/icon'

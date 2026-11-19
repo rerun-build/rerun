@@ -1,4 +1,4 @@
-import type { VoiceMessage } from '@rerun/contracts'
+import type { VoiceMessage } from '@moldwright/contracts'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import Animated from 'react-native-reanimated'

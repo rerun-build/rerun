@@ -1,6 +1,6 @@
 import { mkdir } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
-import type { ContextSize, Provider } from '@rerun/contracts'
+import type { ContextSize, Provider } from '@moldwright/contracts'
 import { handoverDir, sharedDir } from '../config/paths.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 

@@ -1,5 +1,5 @@
 import { task } from '@trigger.dev/sdk/v3'
-import { taskLogger as logger } from '@rerun/cloud/tasks'
+import { taskLogger as logger } from '@moldwright/cloud/tasks'
 
 import type { Database, Json } from '@/app/api/database.types'
 import { MAX_STORED_IDEAS, toStoredIdeas, type StoredAgentIdeas } from '@/lib/agent-ideas/stored'

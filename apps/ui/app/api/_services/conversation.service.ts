@@ -8,7 +8,7 @@ import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificati
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
 import type { EngineSkillProposal, SessionSource } from '@/lib/engine/types'
-import { ATTENTION_STATUSES, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
+import { ATTENTION_STATUSES, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -204,7 +204,7 @@ const SEARCH_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at'] as co
 const SEARCH_LIMIT = 20
 const AGENT_RECENT_LIMIT = 8
 
-export type { ConversationHit } from '@rerun/contracts'
+export type { ConversationHit } from '@moldwright/contracts'
 
 export async function searchWorkspaceConversations(ctx: WorkspaceContext, query: string, agentId?: string): Promise<ConversationHit[]> {
     const text = sanitizeIlike(query)

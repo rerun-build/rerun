@@ -3,7 +3,7 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { answerSecretRequestAction, getAgentKeysAction, updateAgentKeysAction } from '@/app/api/_actions/agent.actions'
 import { serializeSecretResult } from '@/lib/chat-hitl'
-import { SecretRequestBlock as SecretRequestBlockBase, type SecretRequestItem } from '@rerun/ui/chat'
+import { SecretRequestBlock as SecretRequestBlockBase, type SecretRequestItem } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 

@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 
 import { saveForemanIntakeAction, waiveForemanProfileAction } from '@/app/api/_actions/foreman-intake.actions'
 import { readArrivingIntent } from '@/lib/foreman/arriving-intent'

@@ -215,7 +215,7 @@ served on (Anthropic messages, OpenAI responses, OpenAI chat, Google). Every req
 
 - The catalog is read live from `https://opencode.ai/inference/{go/,}v1/models` (public, no key):
   at boot, on `GET /connections` when older than 30 minutes, before a new connection adopts the
-  default, and after a `400 Model is unavailable`. The snapshot built into `@rerun/contracts` stands
+  default, and after a `400 Model is unavailable`. The snapshot built into `@moldwright/contracts` stands
   in until it answers. `providerModels` on the summary lists what the catalog reaches today.
 - `planLimits` reads `https://opencode.ai/zen/go/v1/usage`: the five-hour `session`, `weekly` and
   `monthly` windows of the Go plan, for the whole account.
@@ -728,7 +728,7 @@ Agents can also manage their own schedules at runtime with the `schedule_create`
 
 Triggers are the event-driven counterpart of schedules: markdown files (`data/agents/<id>/triggers/<slug>.md`) that expose a public URL. When an external service calls it, the engine starts a fresh session and runs the trigger `body` with the caller's payload attached below it.
 
-The URL is served by the Rerun app, not by the engine: `https://app.rerun.build/api/t/<rerunAgentId>/<slug>/<token>`. It resolves the agent and forwards the payload to `POST /agents/:id/triggers/:slug/fire` with the space key. So a self-hosted engine with no hub can define triggers, but only the hub can hand out their URLs.
+The URL is served by the Rerun app, not by the engine: `https://moldwright.robagentic.tech/api/t/<rerunAgentId>/<slug>/<token>`. It resolves the agent and forwards the payload to `POST /agents/:id/triggers/:slug/fire` with the space key. So a self-hosted engine with no hub can define triggers, but only the hub can hand out their URLs.
 
 `triggers/` is **not** part of an agent archive: each file holds the secret of a live URL, which must not be copied into every install of a published template.
 

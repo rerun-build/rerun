@@ -1,4 +1,4 @@
-import { parseQuery, searchItems, type Box, type ConversationHit } from '@rerun/contracts'
+import { parseQuery, searchItems, type Box, type ConversationHit } from '@moldwright/contracts'
 import { router } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, TextInput, View } from 'react-native'

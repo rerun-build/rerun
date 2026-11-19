@@ -1,4 +1,4 @@
-import type { SubRunTask } from '@rerun/contracts'
+import type { SubRunTask } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState, type ReactNode } from 'react'

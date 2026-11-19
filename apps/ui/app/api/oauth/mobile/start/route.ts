@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey } from '@moldwright/contracts'
 import { workspaceActor } from '@/app/api/_auth/access'
 import { getCustomMcpServer } from '@/app/api/_services/custom-mcp.service'
 import { getServiceDetails, loadManifest } from '@/app/api/_services/services.service'

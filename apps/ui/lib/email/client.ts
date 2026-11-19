@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import { Resend } from 'resend'
 
-import { DEFAULT_SENDERS } from '@rerun/cloud/senders'
+import { DEFAULT_SENDERS } from '@moldwright/cloud/senders'
 import { APP_URL } from '@/lib/app-url'
 
 export { APP_URL, notificationUrl } from '@/lib/app-url'

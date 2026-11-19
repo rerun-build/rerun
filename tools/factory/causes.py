@@ -159,6 +159,10 @@ def outcome(out, groups):
         return bad("no CAUSES line")
     last = finals[-1]
     line = last.group(0).strip()
+    if out[last.end():].strip():
+        return bad("text follows the CAUSES line; it must be the last line")
+    if last.group(1) != "none" and int(last.group(2)) == 0:
+        return bad("CAUSES: 0 changes is not a form; write CAUSES: none")
     if last.group(1) == "none":
         return ("none", [], line)
     body = out[:last.start()]

@@ -1,6 +1,6 @@
 'use client'
 
-import { STORY_ACTION_MS, STORY_CARD_ENTER_MS } from '@rerun/contracts'
+import { STORY_ACTION_MS, STORY_CARD_ENTER_MS } from '@moldwright/contracts'
 import { useEffect, useRef, useState } from 'react'
 
 export function useActionTicker(count: number, playing: boolean, skip: boolean) {

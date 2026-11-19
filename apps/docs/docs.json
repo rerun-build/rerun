@@ -157,13 +157,13 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:help@rerun.build"
+        "href": "mailto:help@robagentic.tech"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://app.rerun.build"
+      "href": "https://moldwright.robagentic.tech"
     }
   },
   "contextual": {

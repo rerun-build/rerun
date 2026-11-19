@@ -1,8 +1,8 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
-import { ChromeBar } from '@rerun/ui/chrome'
-import { Badge } from '@rerun/ui/primitives'
+import { TextShimmer } from '@moldwright/ui'
+import { ChromeBar } from '@moldwright/ui/chrome'
+import { Badge } from '@moldwright/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 

@@ -6,7 +6,7 @@ import type { Database } from '@/app/api/database.types'
 import type { EngineConnection } from '@/lib/engine/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
-import type { Box } from '@rerun/contracts'
+import type { Box } from '@moldwright/contracts'
 
 export { buildBaseUrl }
 

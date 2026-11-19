@@ -9,7 +9,7 @@ import {
     roomOpenInputSchema,
     roomPostInputSchema,
     roomSummarySchema,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `agent-${i}`)
 const openBase = { title: 'T', question: 'Q', members: ['a', 'b'] }

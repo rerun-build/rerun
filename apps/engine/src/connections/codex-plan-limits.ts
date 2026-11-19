@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
-import { CONNECTION_TOKEN_KEY } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY } from '@moldwright/contracts'
 import { codexHomeDir } from '../config/paths.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'

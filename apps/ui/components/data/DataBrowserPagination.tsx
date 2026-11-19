@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
-import { formatNumber } from '@rerun/i18n/format'
+import { formatNumber } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 
 export const PAGE_SIZES = [25, 50, 100, 250]

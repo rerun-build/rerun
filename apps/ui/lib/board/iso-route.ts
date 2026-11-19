@@ -1,4 +1,4 @@
-import { DEFAULT_SPAN, routeTileLinks, type AxisPoint, type LinkFootprint, type RoutedLink, type RoutedTile } from '@rerun/ui/iso-grid'
+import { DEFAULT_SPAN, routeTileLinks, type AxisPoint, type LinkFootprint, type RoutedLink, type RoutedTile } from '@moldwright/ui/iso-grid'
 
 export type { AxisPoint }
 

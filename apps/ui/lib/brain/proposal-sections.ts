@@ -1,4 +1,4 @@
-import type { BrainProposal } from '@rerun/contracts'
+import type { BrainProposal } from '@moldwright/contracts'
 
 export type Section = { heading: string | null; body: string }
 

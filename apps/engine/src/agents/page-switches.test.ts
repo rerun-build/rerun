@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { agentConfigSchema } from '@rerun/contracts'
+import { agentConfigSchema } from '@moldwright/contracts'
 
 const base = { name: 'a' }
 

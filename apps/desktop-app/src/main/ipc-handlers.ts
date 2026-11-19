@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, session as electronSession } from 'electron'
-import { isDesktopOpenPath, type DesktopNotification, type DesktopSettings, type DesktopUpdateState } from '@rerun/contracts'
+import { isDesktopOpenPath, type DesktopNotification, type DesktopSettings, type DesktopUpdateState } from '@moldwright/contracts'
 import { IPC, type FindRequest, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 import { completeFromPastedCode, startBrowserSignIn } from './browser-sign-in'
 import { showDownload } from './downloads'

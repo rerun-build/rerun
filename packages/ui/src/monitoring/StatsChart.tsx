@@ -1,10 +1,10 @@
 'use client'
 
-import { formatDate, formatNumber } from '@rerun/i18n/format'
+import { formatDate, formatNumber } from '@moldwright/i18n/format'
 import { useMemo } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts'
-import { STATS_METRIC_META } from '@rerun/contracts'
-import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsPoint } from '@rerun/contracts'
+import { STATS_METRIC_META } from '@moldwright/contracts'
+import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsPoint } from '@moldwright/contracts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../primitives/chart'
 import { CHART_FALLBACK_COLOR, CHART_PALETTE, chartColorAt } from './chart-palette'
 import { cn } from '../cn'

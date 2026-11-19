@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { closestSuggestion, NO_APP_SELECTION, selectedApps, toggleApp } from '@rerun/ui/new-agent/apps'
+import { closestSuggestion, NO_APP_SELECTION, selectedApps, toggleApp } from '@moldwright/ui/new-agent/apps'
 
 describe('selectedApps', () => {
     it('merges the suggestion, the reading and the hand picked apps, once each', () => {

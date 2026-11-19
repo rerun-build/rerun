@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { TileBuddy, buddyEyes, buddyMouth } from '@rerun/ui/iso-grid'
+import { TileBuddy, buddyEyes, buddyMouth } from '@moldwright/ui/iso-grid'
 
 const html = (buddy: Record<string, unknown>, extra: Record<string, unknown> = {}) =>
     renderToStaticMarkup(

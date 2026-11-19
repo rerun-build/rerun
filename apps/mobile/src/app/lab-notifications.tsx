@@ -1,4 +1,4 @@
-import { DEFAULT_NOTIFICATION_PREFS, mergeNotificationPrefs, taskKey, type NotificationPrefs, type NotificationPrefsPatch } from '@rerun/contracts'
+import { DEFAULT_NOTIFICATION_PREFS, mergeNotificationPrefs, taskKey, type NotificationPrefs, type NotificationPrefsPatch } from '@moldwright/contracts'
 import type { PermissionStatus } from 'expo-notifications'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'

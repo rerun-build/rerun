@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildKickoff, DEFAULT_CUSTOM, DESCRIBED, type ScheduleChoice, scheduleLabel, toggleDay } from '@rerun/ui/new-agent/schedule'
+import { buildKickoff, DEFAULT_CUSTOM, DESCRIBED, type ScheduleChoice, scheduleLabel, toggleDay } from '@moldwright/ui/new-agent/schedule'
 
 const JOB = 'Sort every Lemlist reply and ping me in Slack'
 

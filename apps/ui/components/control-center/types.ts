@@ -1,4 +1,4 @@
-import type { BadgeTone } from '@rerun/ui/primitives'
+import type { BadgeTone } from '@moldwright/ui/primitives'
 import type { ComponentType } from 'react'
 
 export type ControlRowLeading = { kind: 'agent'; agentId: string } | { kind: 'assistant' } | { kind: 'icon'; icon: ComponentType<{ className?: string }> }

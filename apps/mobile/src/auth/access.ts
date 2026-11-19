@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type BoardAgent, type Box, type BoxAccessLevel, type WorkspaceRole } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type BoardAgent, type Box, type BoxAccessLevel, type WorkspaceRole } from '@moldwright/contracts'
 
 export type AccessReason = 'boxManage' | 'aiProvidersAdminOnly' | 'noManagedBox' | 'boxesFailed' | 'noBoxYet'
 

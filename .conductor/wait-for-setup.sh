@@ -3,7 +3,7 @@ set -uo pipefail
 
 cd "$(dirname "$0")/.."
 
-SETUP_STEPS='^(node \S*pnpm\S* |pnpm )(install|build:contracts|db:link|env:prod|--filter @rerun/contracts build)'
+SETUP_STEPS='^(node \S*pnpm\S* |pnpm )(install|build:contracts|db:link|env:prod|--filter @moldwright/contracts build)'
 GRACE_SECONDS=30
 TIMEOUT_SECONDS=900
 

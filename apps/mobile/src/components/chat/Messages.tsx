@@ -1,4 +1,4 @@
-import type { MessageFeedbackRating } from '@rerun/contracts'
+import type { MessageFeedbackRating } from '@moldwright/contracts'
 import * as Clipboard from 'expo-clipboard'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Pressable, Share, View, type ViewStyle } from 'react-native'

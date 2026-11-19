@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { desktopShell } from '@/lib/desktop-shell/client'
-import type { DesktopSignInError, DesktopSignInProvider } from '@rerun/contracts'
+import type { DesktopSignInError, DesktopSignInProvider } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState, type FormEvent } from 'react'
 import { startDesktopBrowserSignIn, stopWaitingForBrowser } from './desktop-sign-in'

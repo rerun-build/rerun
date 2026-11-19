@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { McpServer } from '@rerun/contracts'
+import type { McpServer } from '@moldwright/contracts'
 import { claudeMcpConfig, codexMcpConfig } from './providers.js'
 
 const stdio = (extra: Partial<McpServer> = {}) => ({ name: 'x', transport: 'stdio', command: 'npx', args: ['srv'], env: {}, ...extra }) as McpServer

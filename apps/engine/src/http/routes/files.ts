@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { z } from 'zod'
-import { MAX_UPLOAD_FILE_BYTES, writeFileSchema } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES, writeFileSchema } from '@moldwright/contracts'
 import { badRequest } from '../../lib/errors.js'
 import * as store from '../../files/store.js'
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@rerun/analytics/client', () => ({ track: vi.fn() }))
+vi.mock('@moldwright/analytics/client', () => ({ track: vi.fn() }))
 
 const { isSlowSend } = await import('./email-send')
 

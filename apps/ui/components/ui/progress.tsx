@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import type { CSSProperties } from 'react'
 

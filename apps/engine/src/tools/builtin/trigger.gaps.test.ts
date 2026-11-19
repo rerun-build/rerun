@@ -18,7 +18,7 @@ vi.mock('../../runtime/hub.js', () => ({
     },
 }))
 
-const { DEFAULT_CONNECTION_MODELS } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS } = await import('@moldwright/contracts')
 const { createConnection } = await import('../../connections/store.js')
 const { triggerTools } = await import('./trigger.js')
 const { markFired, readTrigger, triggerExists, writeTrigger } = await import('../../triggers/loader.js')
@@ -60,8 +60,8 @@ describe('trigger_list', () => {
 describe('trigger_create', () => {
     it('creates a POST trigger that follows the agent and hands back its public URL', async () => {
         const { id, run } = freshAgent()
-        hub.reply = { url: 'https://app.rerun.build/api/triggers/abc/new-lead' }
-        expect(await run('trigger_create', { name: 'New lead', description: 'Form submitted', body: 'Qualify the lead.' })).toBe('Created trigger new-lead (POST). Its public URL is https://app.rerun.build/api/triggers/abc/new-lead')
+        hub.reply = { url: 'https://moldwright.robagentic.tech/api/triggers/abc/new-lead' }
+        expect(await run('trigger_create', { name: 'New lead', description: 'Form submitted', body: 'Qualify the lead.' })).toBe('Created trigger new-lead (POST). Its public URL is https://moldwright.robagentic.tech/api/triggers/abc/new-lead')
         const trigger = await readTrigger(id, 'new-lead')
         expect(trigger).toMatchObject({ description: 'Form submitted', body: 'Qualify the lead.', methods: ['POST'], connectionId: null, provider: null, model: null, enabled: true })
         expect(hub.calls).toEqual([{ agentId: id, tool: 'trigger_url', args: { slug: 'new-lead', token: trigger.token } }])

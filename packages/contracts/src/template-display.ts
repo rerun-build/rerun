@@ -113,14 +113,14 @@ export function templateCardCtaLabel(pricing: TemplatePricing, t: TemplatePriceC
 export const MARKETPLACE_FEE_PERCENT = 5
 export const MARKETPLACE_FEE_FIXED_CENTS = 30
 
-export function rerunFeeCents(netOfTaxCents: number): number {
+export function moldwrightFeeCents(netOfTaxCents: number): number {
     if (netOfTaxCents <= 0) return 0
     const fee = Math.round((netOfTaxCents * MARKETPLACE_FEE_PERCENT) / 100) + MARKETPLACE_FEE_FIXED_CENTS
     return Math.min(fee, netOfTaxCents)
 }
 
 export function creatorNetCents(netOfTaxCents: number): number {
-    return Math.max(0, netOfTaxCents - rerunFeeCents(netOfTaxCents))
+    return Math.max(0, netOfTaxCents - moldwrightFeeCents(netOfTaxCents))
 }
 
 export function marketplaceFeeLabel(currency: string = TEMPLATE_CURRENCY): string {
@@ -131,6 +131,6 @@ export type SaleSplit = { taxCents: number; feeCents: number; netCents: number }
 
 export function splitSale(grossCents: number, taxCents: number): SaleSplit {
     const netOfTax = Math.max(0, grossCents - taxCents)
-    const feeCents = rerunFeeCents(netOfTax)
+    const feeCents = moldwrightFeeCents(netOfTax)
     return { taxCents, feeCents, netCents: netOfTax - feeCents }
 }

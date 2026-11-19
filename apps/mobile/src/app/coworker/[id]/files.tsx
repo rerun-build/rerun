@@ -1,4 +1,4 @@
-import type { CoworkerFile, CoworkerFiles as CoworkerFilesView } from '@rerun/contracts'
+import type { CoworkerFile, CoworkerFiles as CoworkerFilesView } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 

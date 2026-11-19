@@ -4,7 +4,7 @@ import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/capacity.service', () => ({ assertEngineEntitlement: vi.fn() }))
-vi.mock('@rerun/cloud/engines', () => ({ claimPoolEngine: vi.fn() }))
+vi.mock('@moldwright/cloud/engines', () => ({ claimPoolEngine: vi.fn() }))
 vi.mock('@/lib/brain/request-seed', () => ({ requestCompanyBrainSeed: vi.fn() }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')

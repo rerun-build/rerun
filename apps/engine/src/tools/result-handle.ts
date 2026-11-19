@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { dirname } from 'node:path'
 import type { ToolSet } from 'ai'
 import { RESULT_HANDLE_CHARS } from '../runtime/compaction/config.js'
 import { resolveInWorkspace } from './sandbox.js'
@@ -42,6 +42,12 @@ function takeTail(lines: string[], budget: number, floor: number): number {
     return count
 }
 
+function lastLineTail(lines: string[]): string[] {
+    const last = lines[lines.length - 1]
+    const from = Math.max(lines.length === 1 ? HEAD_CHARS : 0, last.length - TAIL_CHARS)
+    return from < last.length ? [last.slice(from)] : []
+}
+
 async function handleResult(text: string, toolCallId: string, options: ResultHandleOptions): Promise<string> {
     const lines = text.split('\n')
     const headCount = takeHead(lines, HEAD_CHARS)
@@ -51,14 +57,16 @@ async function handleResult(text: string, toolCallId: string, options: ResultHan
     try {
         const file = await resolveInWorkspace(options.agentId, relative)
         await mkdir(dirname(file), { recursive: true })
-        await writeFile(join(file), text)
+        await writeFile(file, text)
     } catch {
         return text
     }
+    const head = headCount > 0 ? lines.slice(0, headCount) : [lines[0].slice(0, HEAD_CHARS)]
+    const tail = tailCount > 0 ? lines.slice(lines.length - tailCount) : lastLineTail(lines)
     const parts = [
-        ...lines.slice(0, headCount),
+        ...head,
         `[... lines ${headCount + 1}-${lines.length - tailCount} kept whole ...]`,
-        ...lines.slice(lines.length - tailCount),
+        ...tail,
         `Saved whole: ${relative}, lines 1-${lines.length}`,
     ]
     return parts.join('\n')

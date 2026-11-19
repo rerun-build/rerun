@@ -1,4 +1,4 @@
-import type { McpServerStatus } from '@rerun/contracts'
+import type { McpServerStatus } from '@moldwright/contracts'
 import type { McpServer } from '../agents/types.js'
 import { isAuthError } from './mcp-auth.js'
 import { probeMcp, type McpProbe, type McpSpawn } from './mcp.js'

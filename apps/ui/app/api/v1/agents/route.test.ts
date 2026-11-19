@@ -16,7 +16,7 @@ const { POST } = await import('./route')
 
 const SPACE = '9b2f0c1e-4c1a-4b8e-9a52-2d5d3f1a7c11'
 const segment = { params: Promise.resolve({}) }
-const create = (body: object) => POST(new Request('https://app.rerun.build/api/v1/agents', { method: 'POST', body: JSON.stringify(body) }), segment)
+const create = (body: object) => POST(new Request('https://moldwright.robagentic.tech/api/v1/agents', { method: 'POST', body: JSON.stringify(body) }), segment)
 
 describe('POST /api/v1/agents', () => {
     beforeEach(() => {

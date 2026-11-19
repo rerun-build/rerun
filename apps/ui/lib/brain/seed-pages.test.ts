@@ -1,4 +1,4 @@
-import { brainSeedPageSchema } from '@rerun/contracts'
+import { brainSeedPageSchema } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import type { CatalogFindings } from '@/lib/company/explore/catalog-collector'

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AffiliateTracking } from "@rerun/cloud/support";
+import { AffiliateTracking } from "@moldwright/cloud/support";
 import { AppChrome } from "@/components/layout/AppChrome";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { DeployUpdateWatcher } from "@/components/deploy-update/DeployUpdateWatcher";
@@ -13,14 +13,14 @@ import { DesktopShellBridge } from "@/components/desktop-shell/DesktopShellBridg
 import { OpenInDesktopPrompt } from "@/components/desktop-shell/OpenInDesktopPrompt";
 import { ShellTitleBar } from "@/components/desktop-shell/ShellTitleBar";
 import { requestDesktopShell } from "@/lib/desktop-shell/server";
-import { DESKTOP_SHELL_ATTRIBUTE } from "@rerun/contracts";
-import { DomMutationGuard } from "@rerun/ui/dom-guard";
+import { DESKTOP_SHELL_ATTRIBUTE } from "@moldwright/contracts";
+import { DomMutationGuard } from "@moldwright/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
-import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
+import { ThemeCookieBootstrap, ThemeProvider } from "@moldwright/ui/theme";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { TimeZoneCookie } from "@/components/layout/TimeZoneCookie";
-import { UiLocaleProvider } from "@rerun/ui/locale";
+import { UiLocaleProvider } from "@moldwright/ui/locale";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 

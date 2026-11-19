@@ -1,5 +1,5 @@
 import { PowerBars } from '@/components/ui/power-bars'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 

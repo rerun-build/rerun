@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { nextPinnedIds, settledPinnedIds } from '@rerun/contracts'
+import { nextPinnedIds, settledPinnedIds } from '@moldwright/contracts'
 
 const proposal = (id: string, status: 'proposed' | 'accepted' | 'applied' | 'failed' | 'dismissed') => ({ id, status })
 

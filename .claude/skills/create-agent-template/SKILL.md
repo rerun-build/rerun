@@ -30,7 +30,7 @@ I count the words (`wc -w` on a file in `.context/`) before sending. Over budget
 ## Phase 0: Preflight (without asking anything)
 
 1. The `mcp__rerun__*` tools must exist. Otherwise I stop and give the command:
-   `claude mcp add --transport http rerun https://app.rerun.build/api/mcp/account --header "Authorization: Bearer rk_…"`, with the key of an **expert account** (docs: `apps/docs/api/connect.mdx`).
+   `claude mcp add --transport http rerun https://moldwright.robagentic.tech/api/mcp/account --header "Authorization: Bearer rk_…"`, with the key of an **expert account** (docs: `apps/docs/api/connect.mdx`).
 2. `list_capture_sources` → the sandbox Box where the agent is created. Capture only accepts coworkers from an expert account's sandbox: I never create anywhere else.
 3. `list_templates` and `list_agents` on that Box → if a draft or an agent already exists for this topic, I pick it up instead of creating a second one. I never touch a template that is `in_review`, `published`, `unlisted` or `archived`.
 

@@ -1,4 +1,4 @@
-import { hitlInputIsUsable, hitlKindOf, stripBridgePrefix } from '@rerun/contracts'
+import { hitlInputIsUsable, hitlKindOf, stripBridgePrefix } from '@moldwright/contracts'
 import { lastAssistantMessageIsCompleteWithToolCalls, type ChatStatus, type UIMessage } from 'ai'
 
 import { isForemanWidgetTool, type ForemanWidgetToolName } from './tool-defs'

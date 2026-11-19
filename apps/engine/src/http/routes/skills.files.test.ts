@@ -12,7 +12,7 @@ const { agentConfigSchema } = await import('../../agents/types.js')
 const { writeAgentConfig } = await import('../../agents/config-write.js')
 const { mkdir } = await import('node:fs/promises')
 const { agentDir } = await import('../../config/paths.js')
-const { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, TEXT_FILE_PAGE_CHARS } = await import('@rerun/contracts')
+const { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, TEXT_FILE_PAGE_CHARS } = await import('@moldwright/contracts')
 
 const id = 'skillagent'
 const app = createServer()

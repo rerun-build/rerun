@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { INTAKE_KINDS, TEMPLATE_CATEGORIES } from '@rerun/contracts'
+import { INTAKE_KINDS, TEMPLATE_CATEGORIES } from '@moldwright/contracts'
 import { z } from 'zod'
 import type { ForemanIntake } from '@/lib/onboarding/intake'
 import type { PendingAgentDraft } from './board.store'

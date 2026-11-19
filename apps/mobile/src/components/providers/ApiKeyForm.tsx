@@ -1,4 +1,4 @@
-import type { AiConnectionsView } from '@rerun/contracts'
+import type { AiConnectionsView } from '@moldwright/contracts'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'

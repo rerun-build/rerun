@@ -1,5 +1,5 @@
-import { Button } from '@rerun/ui/primitives'
-import type { DesktopUpdateState } from '@rerun/contracts'
+import { Button } from '@moldwright/ui/primitives'
+import type { DesktopUpdateState } from '@moldwright/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'use-intl'
 import { mount } from './mount'

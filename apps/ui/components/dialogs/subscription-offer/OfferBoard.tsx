@@ -11,7 +11,7 @@ import {
     useLivingBoard,
     usePrefersReducedMotion,
     useRenderedFrame,
-} from '@rerun/ui/iso-grid'
+} from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 

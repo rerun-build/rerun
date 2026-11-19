@@ -13,7 +13,7 @@ function isReanimatedWebOnly(request) {
     return request.startsWith('.') && REANIMATED_WEB_ONLY.some(entry => (entry.includes('/') ? request.endsWith(entry) : basename === entry))
 }
 
-const CLOUD_MOBILE = '@rerun/cloud-mobile/'
+const CLOUD_MOBILE = '@moldwright/cloud-mobile/'
 
 function resolveCloudMobile(request, options) {
     const module = request.slice(CLOUD_MOBILE.length)

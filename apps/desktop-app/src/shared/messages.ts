@@ -1,5 +1,5 @@
-import { mergeMessages, matchLocale, DEFAULT_LOCALE, type Locale, type MessageTree } from '@rerun/i18n'
-import english from '@rerun/i18n/messages/en/desktopApp.json'
+import { mergeMessages, matchLocale, DEFAULT_LOCALE, type Locale, type MessageTree } from '@moldwright/i18n'
+import english from '@moldwright/i18n/messages/en/desktopApp.json'
 
 const packs = import.meta.glob<{ default: MessageTree }>('../../../../packages/i18n/messages/*/desktopApp.json', { eager: true })
 

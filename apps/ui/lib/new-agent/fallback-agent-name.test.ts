@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AGENT_NAME_MAX, fallbackAgentName } from '@rerun/ui/new-agent'
+import { AGENT_NAME_MAX, fallbackAgentName } from '@moldwright/ui/new-agent'
 
 describe('fallbackAgentName', () => {
     it('takes the name the text declares', () => {

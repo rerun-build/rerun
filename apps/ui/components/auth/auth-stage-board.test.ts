@@ -1,4 +1,4 @@
-import { AGENT_SPAN } from '@rerun/ui/iso-grid'
+import { AGENT_SPAN } from '@moldwright/ui/iso-grid'
 import { describe, expect, it } from 'vitest'
 
 import { CABLE_DRAW_MS, routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'

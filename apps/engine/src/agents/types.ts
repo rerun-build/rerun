@@ -1,8 +1,8 @@
-import type { AgentConfig, ForemanBrief, Provider } from '@rerun/contracts'
+import type { AgentConfig, ForemanBrief, Provider } from '@moldwright/contracts'
 import type { RunModel } from './availability.js'
 
-export { mcpServerSchema, toolsSchema, selfImprovementSchema, agentSetupSchema, agentConfigSchema, verbositySchema, MCP_SERVER_NAME_RE } from '@rerun/contracts'
-export type { McpServer, AgentConfig, AgentSetup, Verbosity } from '@rerun/contracts'
+export { mcpServerSchema, toolsSchema, selfImprovementSchema, agentSetupSchema, agentConfigSchema, verbositySchema, MCP_SERVER_NAME_RE } from '@moldwright/contracts'
+export type { McpServer, AgentConfig, AgentSetup, Verbosity } from '@moldwright/contracts'
 
 export const BRIDGE_SERVER_NAME = 'rerun'
 

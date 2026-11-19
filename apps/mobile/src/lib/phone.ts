@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, type Locale } from '@moldwright/i18n'
 import countries from 'i18n-iso-countries'
 import german from 'i18n-iso-countries/langs/de.json'
 import english from 'i18n-iso-countries/langs/en.json'

@@ -1,6 +1,6 @@
-import { emailTranslator } from '@rerun/emails/i18n'
-import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
-import { dayAndMonth, utcClockTime } from '@rerun/i18n/format'
+import { emailTranslator } from '@moldwright/emails/i18n'
+import { DEFAULT_LOCALE, type Locale } from '@moldwright/i18n'
+import { dayAndMonth, utcClockTime } from '@moldwright/i18n/format'
 
 export function emailDateLabel(value: Date, locale: Locale = DEFAULT_LOCALE): string {
     return dayAndMonth(value, locale)

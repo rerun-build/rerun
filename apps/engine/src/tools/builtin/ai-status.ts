@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
+import { PROVIDER_LABELS, creditsFromMicros, type HubMoldwrightCredit, type Provider } from '@moldwright/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
@@ -36,9 +36,9 @@ function describeConnection(connection: LoadedConnection) {
     }
 }
 
-async function readRerunCredit(ctx: RunContext) {
+async function readMoldwrightCredit(ctx: RunContext) {
     try {
-        const { credit } = (await callHub(ctx.agent, 'rerun_credit', {})) as { credit?: HubRerunCredit | null }
+        const { credit } = (await callHub(ctx.agent, 'rerun_credit', {})) as { credit?: HubMoldwrightCredit | null }
         if (!credit) return null
         return {
             remainingCredits: creditsFromMicros(credit.remainingMicros),
@@ -62,7 +62,7 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
                 const connections = await listConnections()
                 refreshStaleCodexPlanLimits(connections)
                 refreshStaleOpencodePlanLimits(connections)
-                const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readRerunCredit(ctx), answeringModel(ctx.provider, ctx.model)])
+                const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readMoldwrightCredit(ctx), answeringModel(ctx.provider, ctx.model)])
                 const current = ctx.agent.resolved.connection
                 return {
                     current: {

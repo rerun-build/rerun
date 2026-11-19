@@ -1,7 +1,7 @@
 import { actorFromContext } from '@/app/api/_auth/access'
 import { claimParkedSignIn, finishParkedSignIn } from '@/app/api/_services/oauth-claim.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { signInClaimSchema } from '@rerun/contracts'
+import { signInClaimSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

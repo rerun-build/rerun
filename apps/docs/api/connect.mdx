@@ -6,7 +6,7 @@ description: "Wire Claude Code, Codex, Cursor, a Rerun coworker or any MCP clien
 The server URL is the same for everyone:
 
 ```
-https://app.rerun.build/api/mcp/account
+https://moldwright.robagentic.tech/api/mcp/account
 ```
 
 It is an HTTP MCP server. Every snippet below sends your key in an `Authorization` header. The app shows these same snippets with your real key already filled in, right after you create it, under the workspace pill then **API keys & MCP**.
@@ -18,7 +18,7 @@ It is an HTTP MCP server. Every snippet below sends your key in an `Authorizatio
 ## Claude Code
 
 ```bash
-claude mcp add --transport http rerun https://app.rerun.build/api/mcp/account --header "Authorization: Bearer rk_your_key"
+claude mcp add --transport http rerun https://moldwright.robagentic.tech/api/mcp/account --header "Authorization: Bearer rk_your_key"
 ```
 
 Then ask Claude Code what it can do with Rerun. It calls `tools/list` on its own and discovers the 53 tools.
@@ -29,7 +29,7 @@ Codex reads the key from the environment each time it starts the server, so expo
 
 ```bash
 export RERUN_MCP_KEY="rk_your_key"
-codex mcp add rerun --url https://app.rerun.build/api/mcp/account --bearer-token-env-var RERUN_MCP_KEY
+codex mcp add rerun --url https://moldwright.robagentic.tech/api/mcp/account --bearer-token-env-var RERUN_MCP_KEY
 ```
 
 <Note>
@@ -44,7 +44,7 @@ Add the server to `~/.cursor/mcp.json`:
 {
   "mcpServers": {
     "rerun": {
-      "url": "https://app.rerun.build/api/mcp/account",
+      "url": "https://moldwright.robagentic.tech/api/mcp/account",
       "headers": {
         "Authorization": "Bearer rk_your_key"
       }
@@ -61,7 +61,7 @@ You can give one of your own coworkers the same reach over the workspace as an o
 {
   "name": "rerun",
   "transport": "http",
-  "url": "https://app.rerun.build/api/mcp/account",
+  "url": "https://moldwright.robagentic.tech/api/mcp/account",
   "headers": {
     "Authorization": "Bearer rk_your_key"
   }
@@ -78,14 +78,14 @@ Point the client at the URL and add the header.
 
 | Field | Value |
 | --- | --- |
-| Server URL | `https://app.rerun.build/api/mcp/account` |
+| Server URL | `https://moldwright.robagentic.tech/api/mcp/account` |
 | Transport | HTTP |
 | Header | `Authorization: Bearer rk_your_key` |
 
 For a client that only speaks stdio, bridge it:
 
 ```bash
-npx -y mcp-remote https://app.rerun.build/api/mcp/account --header "Authorization: Bearer rk_your_key"
+npx -y mcp-remote https://moldwright.robagentic.tech/api/mcp/account --header "Authorization: Bearer rk_your_key"
 ```
 
 ## Check the connection
@@ -93,7 +93,7 @@ npx -y mcp-remote https://app.rerun.build/api/mcp/account --header "Authorizatio
 The cheapest call that proves everything works is `tools/list`.
 
 ```bash
-curl -s https://app.rerun.build/api/mcp/account \
+curl -s https://moldwright.robagentic.tech/api/mcp/account \
   -H "Authorization: Bearer rk_your_key" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'

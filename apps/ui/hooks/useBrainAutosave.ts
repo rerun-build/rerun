@@ -3,7 +3,7 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { readBrainPageAction, saveBrainPageAction } from '@/app/api/_actions/brain.actions'
 import type { BrainPageDetail } from '@/lib/engine/client'
-import type { BrainPage, BrainPageType } from '@rerun/contracts'
+import type { BrainPage, BrainPageType } from '@moldwright/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type BrainDraft = { title: string; type: BrainPageType; content: string }

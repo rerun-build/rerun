@@ -1,4 +1,4 @@
-import type { TableCard } from '@rerun/contracts'
+import type { TableCard } from '@moldwright/contracts'
 
 import { cellText, type CellContext } from './format-cell'
 import { BoardColumnHeader, BoardItem } from './items'

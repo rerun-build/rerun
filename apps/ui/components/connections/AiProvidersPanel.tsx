@@ -14,7 +14,7 @@ import { PanelRow } from '@/components/ui/panel-row'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { useRerunCredit } from '@/hooks/useRerunCredit'
+import { useMoldwrightCredit } from '@/hooks/useMoldwrightCredit'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import {
@@ -25,7 +25,7 @@ import {
     providerPitch,
     effectiveDefault,
     isCreditExhausted,
-    isRerunPaused,
+    isMoldwrightPaused,
     isUsable,
     livePlanWindows,
     modelName,
@@ -34,17 +34,17 @@ import {
     sourceSummary,
     tightestPlanWindow,
     type AddableProvider,
-    type RerunCredit,
+    type MoldwrightCredit,
     type SourceKind,
 } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { ChevronDownIcon, ChevronRightIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { RERUN_CONNECTION_ID } from '@rerun/contracts'
-import { BorderBeam } from '@rerun/ui'
-import { Stripes } from '@rerun/ui/primitives'
-import { shortDate } from '@rerun/i18n/format'
+import { RERUN_CONNECTION_ID } from '@moldwright/contracts'
+import { BorderBeam } from '@moldwright/ui'
+import { Stripes } from '@moldwright/ui/primitives'
+import { shortDate } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -70,7 +70,7 @@ export function AiProvidersPanel({
     const t = useTranslations('connections')
     const errorText = useErrorText()
     const { connections, boxDefault, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
-    const credit = useRerunCredit()
+    const credit = useMoldwrightCredit()
     const needsPlan = useNeedsPlanToConnect()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const readOnlyReason = workspaceAdmin ? undefined : t('panel.adminOnly')
@@ -197,7 +197,7 @@ export function Group({ title, addMenu, children }: { title: string; addMenu?: R
 type DefaultRowProps = {
     connections: BoxConnection[]
     current: BoxDefault
-    credit: RerunCredit
+    credit: MoldwrightCredit
     onPick: (pick: BoxDefault) => void
     onFix: (connectionId: string) => void
     readOnlyReason?: string
@@ -209,7 +209,7 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
     const source = connections.find(c => c.id === current.connectionId)
     const broken = source && !isUsable(source, credit)
     const creditGone = source && isCreditExhausted(source, credit)
-    const creditPaused = source && isRerunPaused(source, credit)
+    const creditPaused = source && isMoldwrightPaused(source, credit)
     const canChange = connections.some(c => isUsable(c, credit))
 
     const description = !broken
@@ -261,7 +261,7 @@ type SourceGroupProps = {
     title: string
     only: 'plan' | 'key'
     sources: BoxConnection[]
-    credit: RerunCredit
+    credit: MoldwrightCredit
     taken: Set<string>
     onOpen: (connectionId: string) => void
     onAdd?: (provider: AddableProvider) => void
@@ -315,7 +315,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
     )
 }
 
-function SourceRow({ source, credit, onClick, children }: { source: BoxConnection; credit: RerunCredit; onClick: () => void; children?: ReactNode }) {
+function SourceRow({ source, credit, onClick, children }: { source: BoxConnection; credit: MoldwrightCredit; onClick: () => void; children?: ReactNode }) {
     const t = useTranslations('connections')
     const locale = useLocale()
     return (

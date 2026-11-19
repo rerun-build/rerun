@@ -1,4 +1,4 @@
-import type { TableCard } from '@rerun/contracts'
+import type { TableCard } from '@moldwright/contracts'
 
 import type { CellContext } from './format-cell'
 import { ListItem } from './items'

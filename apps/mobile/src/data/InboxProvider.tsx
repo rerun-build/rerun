@@ -1,4 +1,4 @@
-import type { InboxItem } from '@rerun/contracts'
+import type { InboxItem } from '@moldwright/contracts'
 import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { fetchInbox, markInboxRead } from '@/api/inbox'

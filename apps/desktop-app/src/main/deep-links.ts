@@ -1,4 +1,4 @@
-import { DESKTOP_AUTH_CALLBACK_HOST, DESKTOP_AUTH_CALLBACK_PATH, DESKTOP_OAUTH_RETURN_HOST, DESKTOP_OPEN_HOST, isDesktopOpenPath, type DesktopOAuthReturn } from '@rerun/contracts'
+import { DESKTOP_AUTH_CALLBACK_HOST, DESKTOP_AUTH_CALLBACK_PATH, DESKTOP_OAUTH_RETURN_HOST, DESKTOP_OPEN_HOST, isDesktopOpenPath, type DesktopOAuthReturn } from '@moldwright/contracts'
 import { parseUrl } from './url-policy'
 
 export type DeepLink = { kind: 'auth-callback'; code: string; state: string } | { kind: 'oauth-return'; result: DesktopOAuthReturn } | { kind: 'open'; path: string }

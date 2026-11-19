@@ -1,6 +1,6 @@
 import { openDesktopSession, redeemDesktopAuthCode } from '@/app/api/_services/desktop-auth.service'
 import { createClient } from '@/supabase/server'
-import { parseDesktopShellUserAgent } from '@rerun/contracts'
+import { parseDesktopShellUserAgent } from '@moldwright/contracts'
 import { z } from 'zod'
 
 const exchangeSchema = z.object({ code: z.string().max(128), verifier: z.string().max(128) })

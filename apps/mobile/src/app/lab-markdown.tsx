@@ -1,4 +1,4 @@
-import { authorTurnsOf, FORMER_MEMBER, type AuthorProfile } from '@rerun/contracts'
+import { authorTurnsOf, FORMER_MEMBER, type AuthorProfile } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'

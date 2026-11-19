@@ -21,7 +21,7 @@ export function KeyLogos({ className = 'size-3.5' }: { className?: string }) {
     )
 }
 
-export function RerunGlyph({ className }: { className?: string }) {
+export function MoldwrightGlyph({ className }: { className?: string }) {
     return <ProviderIcon provider="rerun" className={className} />
 }
 

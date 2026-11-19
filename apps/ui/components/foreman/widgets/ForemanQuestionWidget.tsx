@@ -1,6 +1,6 @@
 'use client'
 
-import { QuestionForm } from '@rerun/ui/chat'
+import { QuestionForm } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 
 import { MessageResponse } from '@/components/ai-elements/message'

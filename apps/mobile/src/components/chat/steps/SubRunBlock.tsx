@@ -1,4 +1,4 @@
-import { isSubRunLive, readableToolError, subRunHeadline, titledSubRun, type SubRunProgress } from '@rerun/contracts'
+import { isSubRunLive, readableToolError, subRunHeadline, titledSubRun, type SubRunProgress } from '@moldwright/contracts'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

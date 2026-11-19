@@ -10,10 +10,10 @@ import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { SpaceRect, SpaceSide } from '@/lib/board/space-layout'
 import { installSharedAgentAction } from '@/app/api/_actions/agent-share.actions'
 import { installTemplateAction } from '@/app/api/_actions/template.actions'
-import { fireRerunConfetti } from '@/lib/confetti'
+import { fireMoldwrightConfetti } from '@/lib/confetti'
 import { clearPendingKickoff, readPendingKickoff, readPendingKickoffs, savePendingKickoff, type PendingKickoff } from '@/lib/onboarding/pending-kickoff'
 import { reportDuplicate, reportInstall, reportShareInstall } from '@/lib/templates/install-feedback'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { toast } from 'sonner'
 import type { ReactNode } from 'react'
 import { refusalText, translated } from '@/lib/i18n/toast-text'
@@ -283,7 +283,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     finalizeAgentCreation: (agentId, description, kickoff) => {
         if (kickoff || description) savePendingKickoff({ agentId, kickoff, description })
-        void fireRerunConfetti()
+        void fireMoldwrightConfetti()
         get().openAgentChat(agentId)
         void get().sendPendingKickoff(agentId)
     },

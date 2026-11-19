@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
-import type { FactoryJob } from '@rerun/contracts'
+import type { FactoryJob } from '@moldwright/contracts'
 import { JOB_STATE_VIEW, groupOf } from './factory-state'
 import { formatInState } from './FactoryTasks'
 

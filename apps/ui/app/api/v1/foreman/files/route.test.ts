@@ -11,7 +11,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 const { GET } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
-const request = () => new Request('https://app.rerun.build/api/v1/foreman/files')
+const request = () => new Request('https://moldwright.robagentic.tech/api/v1/foreman/files')
 
 describe('GET /api/v1/foreman/files', () => {
     beforeEach(() => foremanEngineFilesAction.mockReset())

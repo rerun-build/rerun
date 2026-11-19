@@ -1,5 +1,5 @@
 import type { Database } from '@/app/api/database.types'
-import { BASE_PLAN_SLUG, MICROS_PER_USD } from '@rerun/cloud/billing'
+import { BASE_PLAN_SLUG, MICROS_PER_USD } from '@moldwright/cloud/billing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { ensureWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 import { isSandboxLocked } from '@/lib/sandbox-idle/lock'

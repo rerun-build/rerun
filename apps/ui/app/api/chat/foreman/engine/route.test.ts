@@ -3,18 +3,18 @@ import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { startChat } from '@/lib/chat/start-chat'
 import { cancelRun } from '@/lib/engine/client'
-import { isPhoneStepPending } from '@rerun/cloud/phone.server'
+import { isPhoneStepPending } from '@moldwright/cloud/phone.server'
 import { cancelForemanSessionRuns, loadForemanConversation } from '@/lib/foreman/conversation'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
-import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
+import { PHONE_REQUIRED_MESSAGE } from '@moldwright/cloud/phone'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DELETE, GET, POST } from './route'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
 vi.mock('@/lib/foreman/hub-token', () => ({ mintForemanHubToken: vi.fn(() => null) }))
-vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
+vi.mock('@moldwright/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
 vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: vi.fn() }))

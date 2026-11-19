@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { desktopAppRequestSchema, desktopSessionRequestSchema, takeoverRequestSchema, type DesktopStatus } from '@rerun/contracts'
+import { desktopAppRequestSchema, desktopSessionRequestSchema, takeoverRequestSchema, type DesktopStatus } from '@moldwright/contracts'
 import { agentExists } from '../../agents/loader.js'
 import { openDesktopApp } from '../../desktop/apps.js'
 import { desktopAvailable, ensureDesktop, runningDesktops } from '../../desktop/session.js'

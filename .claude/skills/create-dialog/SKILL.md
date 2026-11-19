@@ -57,7 +57,7 @@ Every new dialog is **on a single column**. Two-column dialogs with an explainer
 
 ## Wizard variant
 
-- Stepping comes from `@rerun/ui/steps`: `useStepper`, `StepperBar`, `StepTransition`. Never rewrite progress bars by hand.
+- Stepping comes from `@moldwright/ui/steps`: `useStepper`, `StepperBar`, `StepTransition`. Never rewrite progress bars by hand.
 - Header: `StepDialogHeader` (`apps/ui/components/dialogs/StepDialogHeader.tsx`).
 - `StepTransition` remounts its whole subtree at every step: a hook that has to survive going from one step to the next is declared in the shell.
 - Two entry points that walk through the same wizard share the body AND the footer in a single component (see `CaptureStepPanel`).

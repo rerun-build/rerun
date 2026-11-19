@@ -1,4 +1,4 @@
-import type { BoardAgent } from '@rerun/contracts'
+import type { BoardAgent } from '@moldwright/contracts'
 
 import { insertAtCaret, insertMention, mentionAgentsOf, mentionItems, mentionQueryAt, type MentionAgent } from './mentions'
 

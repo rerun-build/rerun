@@ -1,1 +1,1 @@
-export { decodePeaks, encodePeaks, PEAK_COUNT } from '@rerun/contracts'
+export { decodePeaks, encodePeaks, PEAK_COUNT } from '@moldwright/contracts'

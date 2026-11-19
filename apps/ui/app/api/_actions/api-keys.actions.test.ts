@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { hashApiKey } from '@/lib/mcp/api-keys'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 const mocks = vi.hoisted(() => ({ getServerSession: vi.fn() }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/lib/app-origin', () => ({ getAppOrigin: async () => 'https://app.rerun.build' }))
+vi.mock('@/lib/app-origin', () => ({ getAppOrigin: async () => 'https://moldwright.robagentic.tech' }))
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<object>()), manageableSpaceIds: vi.fn(async () => 'all') }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
@@ -158,7 +158,7 @@ describe('createImportKeyAction', () => {
         expect(ttl).toBeLessThanOrEqual(24 * 3600_000 + 1000)
 
         const key = result.connectorUrl.split('/').pop()!
-        expect(result.connectorUrl).toBe(`https://app.rerun.build/api/mcp/account/${key}`)
+        expect(result.connectorUrl).toBe(`https://moldwright.robagentic.tech/api/mcp/account/${key}`)
         expect(payload.key_hash).toBe(hashApiKey(key))
         expect(JSON.stringify(payload)).not.toContain(key)
         expect(result.prompt).toContain(result.connectorUrl)

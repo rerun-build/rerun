@@ -11,18 +11,18 @@ import { AlertBlock } from '@/components/chat/AlertBlock'
 import { McpSignInBlock } from '@/components/chat/McpSignInBlock'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import { ChatScreen } from '@/components/chat/ChatScreen'
-import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
+import { BudgetExhaustedNotice, usePriceArm } from '@moldwright/cloud/billing.client'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import { ComposerSubscriptionCta } from '@/components/chat/ComposerSubscriptionCta'
 import { InstallGate } from '@/components/chat/InstallGate'
 import { QuestionForm } from '@/components/chat/QuestionForm'
-import type { QuestionFormHandle } from '@rerun/ui/chat'
+import type { QuestionFormHandle } from '@moldwright/ui/chat'
 import { SkillProposalDock } from '@/components/chat/SkillProposalDock'
 import { ChatActivityLoader } from '@/components/chat/ChatActivityLoader'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
-import type { CatalogEntry } from '@rerun/ui/new-agent'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
+import type { CatalogEntry } from '@moldwright/ui/new-agent'
 import { ChatComposer, type ChatComposerHandle } from '@/components/chat/ChatComposer'
 import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
@@ -67,20 +67,20 @@ import { lastUserText } from '@/lib/chat-payload'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { browserPermission } from '@/lib/notifications/browser'
 import { modelContextWindow } from '@/lib/engine/models'
-import { rerunCreditOf } from '@/lib/engine/ai-sources'
+import { moldwrightCreditOf } from '@/lib/engine/ai-sources'
 import { toGroup } from '@/lib/engine/model-groups'
-import { isLifetimePlan, isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isLifetimePlan, isPremiumModelEntitled } from '@moldwright/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
-import { COWORKER_STARTER_SUGGESTIONS, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@rerun/contracts'
-import { track } from '@rerun/analytics/client'
+import { COWORKER_STARTER_SUGGESTIONS, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@moldwright/contracts'
+import { track } from '@moldwright/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { scrollFadeMask, useScrollEdges } from '@rerun/ui/primitives'
+import { scrollFadeMask, useScrollEdges } from '@moldwright/ui/primitives'
 import { toast } from 'sonner'
 
 const SCROLL_FADE = 32
@@ -359,7 +359,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
     const [runError, setRunError] = useState<string | null>(null)
 
-    const rerunCredit = useMemo(() => rerunCreditOf(workspace), [workspace])
+    const rerunCredit = useMemo(() => moldwrightCreditOf(workspace), [workspace])
     const creditHasRoom = !rerunCredit.paused && rerunCredit.budgetMicros > rerunCredit.usedMicros
     const creditHasRoomRef = useRef(creditHasRoom)
     useEffect(() => {

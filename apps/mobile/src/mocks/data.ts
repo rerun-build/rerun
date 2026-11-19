@@ -1,4 +1,4 @@
-import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
+import { FOREMAN_DISPLAY_NAME } from '@moldwright/contracts'
 
 export type CoworkerStatus = 'idle' | 'working' | 'waiting_human' | 'error' | 'offline'
 

@@ -13,7 +13,7 @@ const { writeSkill } = await import('../../skills/loader.js')
 const { skillsDir } = await import('../../config/paths.js')
 const { listSessionSkillProposals, transitionSkillProposal } = await import('../../db/repos/skill-proposals.js')
 const { getSystemDb } = await import('../../db/systemDb.js')
-const { skillProposalInputSchema } = await import('@rerun/contracts')
+const { skillProposalInputSchema } = await import('@moldwright/contracts')
 
 const id = 'proposer'
 const announced: Array<{ proposalId: string; mode: string; title: string }> = []

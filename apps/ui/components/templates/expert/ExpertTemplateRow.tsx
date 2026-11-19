@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { TemplatePriceBadge } from '@/components/templates/TemplatePriceBadge'
 import { templateStatusLabel, templateStatusTone } from '@/lib/templates/status'

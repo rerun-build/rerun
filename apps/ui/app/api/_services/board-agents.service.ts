@@ -7,7 +7,7 @@ import { agentFromRow, computeAgentStatus } from '@/lib/board/types'
 import { getAgent as engineGetAgent } from '@/lib/engine/client'
 import { isTemplateContentLocked } from '@/lib/templates/content-lock'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import type { AgentView, BoardAgent } from '@rerun/contracts'
+import type { AgentView, BoardAgent } from '@moldwright/contracts'
 
 const AGENT_COLUMNS = ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'disabled_at', 'disabled_reason'] as const
 

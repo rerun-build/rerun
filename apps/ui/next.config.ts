@@ -6,7 +6,7 @@ process.env.NEXT_PUBLIC_BUILD_SHA ??= process.env.NODE_ENV === "production" ? `b
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [...(process.env.ALLOWED_DEV_ORIGINS?.split(",") ?? []), "*.conductor.show"],
-  transpilePackages: ["@rerun/ui", "@rerun/emails", "@rerun/db", "@rerun/analytics", "@rerun/i18n"],
+  transpilePackages: ["@moldwright/ui", "@moldwright/emails", "@moldwright/db", "@moldwright/analytics", "@moldwright/i18n"],
   serverExternalPackages: ["ssh2"],
   env: {
     NEXT_PUBLIC_BUILD_SHA: process.env.NEXT_PUBLIC_BUILD_SHA,

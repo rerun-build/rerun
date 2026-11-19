@@ -1,1 +1,1 @@
-export { affiliatePixel as GET } from '@rerun/cloud/affiliate'
+export { affiliatePixel as GET } from '@moldwright/cloud/affiliate'

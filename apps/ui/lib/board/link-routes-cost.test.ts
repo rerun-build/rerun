@@ -1,6 +1,6 @@
 import { appendFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { routeTileLinks, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { routeTileLinks, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 
 const tile = (id: string, col: number, row: number, span = 2): Tile => ({ id, position: { col, row }, span, style: { color: '#fff' } })
 const link = (source: string, target: string): TileLink => ({ source, target, variant: 'cable' })

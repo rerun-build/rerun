@@ -15,6 +15,7 @@ import digest
 import drift
 import escapes
 import failures
+import flow
 from gist import gist
 import followups
 import gatefiles
@@ -65,6 +66,7 @@ WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:can
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 STALE_RUN_S, STALE_RUNS_A_BEAT = 2 * 3600, 15
+DRAIN_SEND_S = 300
 DRAIN_MAX_S = 3 * 3600
 MAX_TAKES = 3
 INBOX = "Factory follow-ups inbox"
@@ -529,6 +531,8 @@ class Dispatcher:
     def save(self, j, reason=None, reset=False):
         if j["state"] not in WAIT_STATES:
             j.pop("wait_reason", None)
+        if j["state"] != "checks":
+            j.pop("checks_why", None)
         if self.repo != self.home:
             j["repo"] = self.repo
         self.store.put_job(str(j["issue"]), j["state"], j, reason, j.get("run"), reset_retries=reset)
@@ -695,11 +699,14 @@ class Dispatcher:
         self.note_failures(j, failures.kinds(old, state, msg), old, msg)
 
     def note_failures(self, j, kinds, old, msg):
-        runs, cost = weights.job_cost(self.store, j["issue"], self.weights)
-        for kind in kinds:
-            self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
-                                   model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
-                                   plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"), runs=runs, cost=cost)
+        try:
+            runs, cost = weights.job_cost(self.store, j["issue"], self.weights)
+            for kind in kinds:
+                self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
+                                       model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
+                                       plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"), runs=runs, cost=cost)
+        except Exception as e:
+            log(j["issue"], "failures: %s" % type(e).__name__)
 
     def file_holder(self, issue, paths):
         for j in self.jobs():
@@ -1354,9 +1361,10 @@ class Dispatcher:
             verdict = final_line(out, ("VERDICT:",)) or ""
             self.follow_ups(j, out)
             named = verdict_head(verdict)
-            if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
+            plan = bool(re.match(r"VERDICT:\s*REJECT \(plan\)", verdict))
+            if plan and named == j["head"][:7]:
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
-            stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
+            stale = (plan or bool(re.match(r"VERDICT:\s*ACCEPT", verdict))) and named != j["head"][:7]
             asks = proof.change_asks(j.get("body"))
             got = proof.evidence(out, len(asks))
             if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale and got < len(asks):
@@ -1373,9 +1381,9 @@ class Dispatcher:
                         first_accept={"head": j["head"], "by": j.get("reviewer")})
             elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
-            elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not plan and j["round"] == 1:
                 self.to(j, "fix_wait", gist(verdict, 160), review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + gist(verdict, 300)])
-            elif re.match(r"VERDICT:\s*REJECT", verdict) and not j.get("level"):
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not plan and not j.get("level"):
                 self.senior(j, "review rejected: " + gist(verdict, 300), out[-1500:])
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
@@ -1727,9 +1735,15 @@ class Dispatcher:
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
+        try:
+            records = {n: r.get("state") for n, r in self.acceptance.records().items()}
+            counts = flow.beat_text(self.jobs(), records, today)
+        except Exception as e:
+            counts = "by type: unreadable | features: unreadable"
+            log("-", "heartbeat counts: %s" % type(e).__name__)
+        line = "%s beat %d | %s | ended today: %s | %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead, *self.resolver.counts(self))
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), counts, self.unreadable, dead, *self.resolver.counts(self))
         self.beat_line = line
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
@@ -1796,8 +1810,9 @@ class Dispatcher:
         if state is not True:
             return
         holds.arm(self.store, "update", self.now() + 2 * self.cfg.get("poll_s", 30))
-        left = self.store.db.execute("SELECT COUNT(*) FROM fires WHERE status IN ('intent', 'running') AND intent_at >= ?",
-                                     (iso(self.now() - STALE_RUN_S),)).fetchone()[0]
+        sending = self.store.db.execute("SELECT COUNT(*) FROM fires WHERE status='intent' AND intent_at >= ?",
+                                        (iso(self.now() - DRAIN_SEND_S),)).fetchone()[0]
+        left = len(self.own()) + len(self.station.live()) + sending
         try:
             refresh.write(os.path.join(base, "drain-left"), str(left))
         except OSError as e:
@@ -1975,23 +1990,53 @@ class Dispatcher:
     def read_epic(self, n):
         return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
 
+    def status(self, snap):
+        d = snap.get("digest")
+        if d is None:
+            return None
+        out = dict(d, holds=snap.get("holds", []))
+        try:
+            records = self.station.records()
+            live = self.station.live()
+            out["plans"] = {str(n): r.get("state") for n, r in sorted(records.items()) if r.get("state") not in planning.ENDED}
+            out["planner_free"] = len(pools.free_copies(dict(self.cfg, held=False), "planner", self.station.running()))
+            out["planner_room"] = self.station.parallel - len(live)
+            out["planner_copies"] = {c["name"]: c["runs"] for c in (pools.types(self.cfg).get("planner") or {}).get("coworkers", [])}
+            rows = [("plan:%d" % n, r) for n, r in sorted(live.items())]
+            rows += [("recheck:%d" % n, r) for n, r in sorted(self.station.live_rechecks().items())]
+            out["planner_holders"] = [{"job": job, "by": self.names.get(r.get("agent"), str(r.get("agent"))[:8]), "state": r.get("state"),
+                                       "since": r.get("started")} for job, r in rows]
+        except Exception as e:  # noqa: BLE001
+            out["planner_error"] = type(e).__name__
+        return out
+
     def report_line(self):
         self.answer = None
+        now = self.now()
         try:
-            now = self.now()
-            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
+            held = holds.active(self.store, now)
+        except Exception:  # noqa: BLE001
+            held = None
+        status, error = None, None
+        try:
+            snap = snapshot.build_snapshot(self.store, self.cfg, now, held, beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats),
                                            plan=renewal.plan(self.connections, now))
             digest.alarm(self.store, snap.get("digest"), now)
             snap.update(self.extra())
+            status = self.status(snap)
             self.answer = self.account("factory_report", {"snapshot": snap}, timeout=10)
-            digest.post(self.gh, self.store, self.home, snap.get("digest"), now)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat
-            text = str(e) if isinstance(e, Error) else type(e).__name__
-            if self.now() - self.started >= REPORT_QUIET_S and text not in self.report_logged:
-                self.report_logged.add(text)
-                log("-", "factory_report: %s" % text)
+            error = str(e) if isinstance(e, Error) else type(e).__name__
+            if self.now() - self.started >= REPORT_QUIET_S and error not in self.report_logged:
+                self.report_logged.add(error)
+                log("-", "factory_report: %s" % error)
+        if status is None:
+            status = self.status({"digest": {}, "holds": [held] if held else []})
+        if error:
+            status["report_error"] = error[:200]
+        digest.post(self.gh, self.store, self.home, status, now)
 
 
 def ask_refresh(gh, repo, logged):

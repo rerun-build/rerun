@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { basename, resolve, sep } from 'node:path'
 import type { Client, Row } from '@libsql/client'
-import { capabilityOfCall, isPaidDataTool, PAID_DATA_TOOL, parseHubOutput, stripBridgePrefix } from '@rerun/contracts'
+import { capabilityOfCall, isPaidDataTool, PAID_DATA_TOOL, parseHubOutput, stripBridgePrefix } from '@moldwright/contracts'
 import { workspaceDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { paidCallVerdict } from './sources.js'

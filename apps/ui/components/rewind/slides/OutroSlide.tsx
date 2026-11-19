@@ -1,11 +1,11 @@
 'use client'
 
-import { Badge, Card } from '@rerun/ui/primitives'
+import { Badge, Card } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { fireRerunConfetti } from '@/lib/confetti'
+import { fireMoldwrightConfetti } from '@/lib/confetti'
 import { formatWeekRange, formatWorked } from '@/lib/rewind/format'
 import { cn } from '@/lib/utils'
 import { RewindCount } from '../RewindCount'
@@ -18,7 +18,7 @@ export function OutroSlide({ payload, agentName, onReplay, onClose }: RewindSlid
     const worked = formatWorked(payload.totals.workedMs)
 
     useEffect(() => {
-        const timer = setTimeout(() => void fireRerunConfetti(), 500)
+        const timer = setTimeout(() => void fireMoldwrightConfetti(), 500)
         return () => clearTimeout(timer)
     }, [])
 

@@ -1,9 +1,9 @@
 'use client'
 
-import { templateCategoryLabel } from '@rerun/contracts'
-import { BorderBeam } from '@rerun/ui'
-import { TemplateCardBoard, useBoardOnHover } from '@rerun/ui/iso-grid'
-import { Badge } from '@rerun/ui/primitives'
+import { templateCategoryLabel } from '@moldwright/contracts'
+import { BorderBeam } from '@moldwright/ui'
+import { TemplateCardBoard, useBoardOnHover } from '@moldwright/ui/iso-grid'
+import { Badge } from '@moldwright/ui/primitives'
 import { TemplateCardPrice } from '@/components/templates/TemplateCardPrice'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
 import { templateStatusLabel, templateStatusTone } from '@/lib/templates/status'

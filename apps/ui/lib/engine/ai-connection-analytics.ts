@@ -1,5 +1,5 @@
-import type { AiConnectionFailureReason, AiConnectionMethod, AiConnectionSurface } from '@rerun/analytics'
-import { track } from '@rerun/analytics/client'
+import type { AiConnectionFailureReason, AiConnectionMethod, AiConnectionSurface } from '@moldwright/analytics'
+import { track } from '@moldwright/analytics/client'
 
 const ERROR_MAX_LENGTH = 200
 

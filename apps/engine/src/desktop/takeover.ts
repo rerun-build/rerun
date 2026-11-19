@@ -1,5 +1,5 @@
 import type { BrowserContext } from 'patchright'
-import type { TakeoverResult } from '@rerun/contracts'
+import type { TakeoverResult } from '@moldwright/contracts'
 import { browserProfileDir } from '../config/paths.js'
 import { withKeyedLock } from '../lib/lock.js'
 import { logger } from '../lib/logger.js'

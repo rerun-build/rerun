@@ -1,4 +1,4 @@
-import { appendAttachmentsRef, appendVoiceMarker, buildAttachmentsRef, buildVoiceMarker, encodePeaks } from '@rerun/contracts'
+import { appendAttachmentsRef, appendVoiceMarker, buildAttachmentsRef, buildVoiceMarker, encodePeaks } from '@moldwright/contracts'
 
 import { userTextOf, voiceOf } from '@/components/chat/message-text'
 

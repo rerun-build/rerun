@@ -3,19 +3,19 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { connectMethod, providerPitch, sourceKind, isCreditExhausted, isRerunPaused, planLimitTone, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, providerPitch, sourceKind, isCreditExhausted, isMoldwrightPaused, planLimitTone, type AddableProvider, type MoldwrightCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection } from '@/lib/engine/types'
 import { ChevronLeftIcon, PencilIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { RERUN_CONNECTION_ID, addableProviderSchema } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
+import { RERUN_CONNECTION_ID, addableProviderSchema } from '@moldwright/contracts'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-export function SourceStatus({ source, credit }: { source: BoxConnection; credit: RerunCredit }) {
+export function SourceStatus({ source, credit }: { source: BoxConnection; credit: MoldwrightCredit }) {
     const t = useTranslations('connections.status')
-    if (isRerunPaused(source, credit)) {
+    if (isMoldwrightPaused(source, credit)) {
         return (
             <Badge size="xs" tone="orange" className="shrink-0">
                 {t('paused')}
@@ -111,7 +111,7 @@ function SourceSubtitle({ source }: { source: BoxConnection }) {
     return sourceKind(source.provider) === 'plan' || source.provider === 'custom' ? pitch.title : t('apiKey', { provider: pitch.title })
 }
 
-export function DetailHeader({ source, credit, onBack, onRename }: { source: BoxConnection; credit: RerunCredit; onBack: () => void; onRename?: (name: string) => void }) {
+export function DetailHeader({ source, credit, onBack, onRename }: { source: BoxConnection; credit: MoldwrightCredit; onBack: () => void; onRename?: (name: string) => void }) {
     return (
         <div className="flex items-center gap-3 border-b px-3 py-2.5">
             <BackButton onBack={onBack} />

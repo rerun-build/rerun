@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { connectorSkillReadOnlyError } from '@rerun/contracts'
+import { connectorSkillReadOnlyError } from '@moldwright/contracts'
 import { modelFor } from '../agents/providers.js'
 import { isUsable, resolveRunModel } from '../agents/availability.js'
 import { ensureCliAuth } from '../connections/cli-auth.js'

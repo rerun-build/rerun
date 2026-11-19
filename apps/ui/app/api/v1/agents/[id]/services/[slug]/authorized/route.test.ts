@@ -23,7 +23,7 @@ const { POST } = await import('./route')
 
 const ACTOR = { kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'all' }
 
-const call = (body: object) => POST(new Request('https://app.rerun.build/api/v1/agents/agent-1/services/acme/authorized', { method: 'POST', body: JSON.stringify(body), headers: { 'x-workspace-id': '7' } }), { params: Promise.resolve({ id: 'agent-1', slug: 'acme' }) })
+const call = (body: object) => POST(new Request('https://moldwright.robagentic.tech/api/v1/agents/agent-1/services/acme/authorized', { method: 'POST', body: JSON.stringify(body), headers: { 'x-workspace-id': '7' } }), { params: Promise.resolve({ id: 'agent-1', slug: 'acme' }) })
 
 beforeEach(() => {
     vi.clearAllMocks()

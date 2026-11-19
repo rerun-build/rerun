@@ -1,6 +1,6 @@
 import { finishTakeoverAction, startTakeoverAction } from '@/app/api/_actions/desktop.actions'
 import { ApiError, apiRoute, deniedStatus } from '@/app/api/v1/_lib/api-route'
-import { takeoverRequestSchema, type TakeoverResult } from '@rerun/contracts'
+import { takeoverRequestSchema, type TakeoverResult } from '@moldwright/contracts'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'

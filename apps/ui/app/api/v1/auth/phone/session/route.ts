@@ -1,11 +1,11 @@
 import { completeAppReviewSignIn, completePhoneSignIn, countVerifyAttempt, VERIFY_WINDOW_MS } from '@/app/api/_services/phone-sign-in.service'
 import { phoneRefused } from '@/app/api/v1/auth/_lib/refusal'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { isAppReviewSignIn } from '@rerun/cloud/app-review'
+import { isAppReviewSignIn } from '@moldwright/cloud/app-review'
 import { callerIp } from '@/lib/auth/caller-ip'
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { createSessionlessClient } from '@/supabase/server'
-import { phoneSignInRequestSchema, type AppSession } from '@rerun/contracts'
+import { phoneSignInRequestSchema, type AppSession } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

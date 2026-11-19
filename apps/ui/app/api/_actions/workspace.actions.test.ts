@@ -4,7 +4,7 @@ import { BLOB_ILLUSTRATIONS, blobUrl } from '@/lib/blobs/catalog'
 import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
-const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantRerunTopup: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantMoldwrightTopup: vi.fn() }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -14,10 +14,10 @@ vi.mock('@/lib/images/upload', () => ({ uploadPublicImage: mocks.uploadPublicIma
 vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
 const findSiteIcon = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/onboarding/site-icon.server', () => ({ findSiteIcon }))
-vi.mock('@rerun/cloud/billing.server', () => ({ grantRerunTopup: mocks.grantRerunTopup }))
+vi.mock('@moldwright/cloud/billing.server', () => ({ grantMoldwrightTopup: mocks.grantMoldwrightTopup }))
 const SIGNUP_ALLOWANCE_MICROS = vi.hoisted(() => 5_000_000)
-vi.mock('@rerun/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@rerun/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
-vi.mock('@rerun/cloud/illustrations', () => ({
+vi.mock('@moldwright/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@moldwright/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
+vi.mock('@moldwright/cloud/illustrations', () => ({
     ILLUSTRATION_ENTRIES: [
         { file: 'green-energy-blob.webp', desc: 'Green blob', color: 'green', form: 'blob' },
         { file: 'blue-vortex-ring.webp', desc: 'Blue vortex', color: 'blue', form: 'vortex' },
@@ -274,13 +274,13 @@ describe('createWorkspaceAction', () => {
         creatableDatabase()
 
         await expect(createWorkspaceAction('Acme')).resolves.toEqual({ ok: true, workspaceId: NEW_WORKSPACE_ID })
-        expect(mocks.grantRerunTopup).toHaveBeenCalledWith(NEW_WORKSPACE_ID, SIGNUP_ALLOWANCE_MICROS)
+        expect(mocks.grantMoldwrightTopup).toHaveBeenCalledWith(NEW_WORKSPACE_ID, SIGNUP_ALLOWANCE_MICROS)
     })
 
     it('grants nothing when the workspace could not be created', async () => {
         database(() => ({ data: null }))
 
         await createWorkspaceAction('Acme')
-        expect(mocks.grantRerunTopup).not.toHaveBeenCalled()
+        expect(mocks.grantMoldwrightTopup).not.toHaveBeenCalled()
     })
 })

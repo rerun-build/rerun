@@ -3,7 +3,7 @@
 import { updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { patchAgentModel, useAgentContext } from '@/hooks/useAgentContext'
 import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isPremiumModelEntitled } from '@moldwright/cloud/billing'
 import type { BoxDefault } from '@/lib/engine/types'
 import type { EngineProvider } from '@/lib/engine/types'
 import { useSession } from '@/supabase/session/SessionProvider'

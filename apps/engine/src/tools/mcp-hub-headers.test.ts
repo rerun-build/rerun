@@ -1,10 +1,10 @@
-process.env.RERUN_HUB_BASE_URL = 'https://app.rerun.build'
+process.env.RERUN_HUB_BASE_URL = 'https://moldwright.robagentic.tech'
 process.env.RERUN_API_KEY = 'space-key'
 
 const { describe, expect, it } = await import('vitest')
 const { isHubMcpUrl, withHubHeaders } = await import('./mcp-hub-headers.js')
 const { resolveServerSecrets } = await import('./mcp-resolve.js')
-const HUB = 'https://app.rerun.build'
+const HUB = 'https://moldwright.robagentic.tech'
 
 type Server = Parameters<typeof withHubHeaders>[0]
 
@@ -35,7 +35,7 @@ describe('isHubMcpUrl', () => {
     })
 
     it('rejects a scheme downgrade on the same host', () => {
-        expect(isHubMcpUrl('http://app.rerun.build/api/mcp/composio/gmail', HUB)).toBe(false)
+        expect(isHubMcpUrl('http://moldwright.robagentic.tech/api/mcp/composio/gmail', HUB)).toBe(false)
     })
 
     it('rejects another route of the same host', () => {
@@ -51,8 +51,8 @@ describe('isHubMcpUrl', () => {
     })
 
     it('normalises host casing and the default port', () => {
-        expect(isHubMcpUrl('https://APP.Rerun.Build/api/mcp/composio/gmail', HUB)).toBe(true)
-        expect(isHubMcpUrl(`https://app.rerun.build:443/api/mcp/composio/gmail`, HUB)).toBe(true)
+        expect(isHubMcpUrl('https://MOLDWRIGHT.Robagentic.Tech/api/mcp/composio/gmail', HUB)).toBe(true)
+        expect(isHubMcpUrl(`https://moldwright.robagentic.tech:443/api/mcp/composio/gmail`, HUB)).toBe(true)
     })
 
     it('rejects a missing url, a missing base, or an unparsable url', () => {

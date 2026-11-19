@@ -1,4 +1,4 @@
-import { COWORKER_MODES, coworkerRuleOf, taskNotifies, type CoworkerMode, type CoworkerRule, type NotificationPrefs, type RoutineKind, type RoutineView } from '@rerun/contracts'
+import { COWORKER_MODES, coworkerRuleOf, taskNotifies, type CoworkerMode, type CoworkerRule, type NotificationPrefs, type RoutineKind, type RoutineView } from '@moldwright/contracts'
 import { Fragment } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'

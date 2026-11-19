@@ -1,4 +1,4 @@
-import { containerContainsTile, routeTileLinks, type AxisPoint, type ContainerCells, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { containerContainsTile, routeTileLinks, type AxisPoint, type ContainerCells, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 
 import { BAY, SEAT, type Cell } from './factory-scene'
 

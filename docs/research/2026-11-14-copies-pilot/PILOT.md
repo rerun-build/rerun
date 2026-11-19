@@ -89,7 +89,7 @@ were installed again on the server at 02:50, and a test file in that folder no l
   planner. And nothing stops the line when the first step fails for every job: a wide cut would have spent one
   run per job before anyone looked.
 - The type check a build is told to run printed 897 errors in a fresh worktree of the web app. The ones read all
-  say that the module `@rerun/contracts` cannot be found. It cost that build minutes and proved nothing.
+  say that the module `@moldwright/contracts` cannot be found. It cost that build minutes and proved nothing.
 - A build that chains lint, type check, commit and `pr-open` in one shell command runs into the shell tool's
   limit of 120 seconds.
 - `/tmp` still holds the drafts of the builds from before #302.

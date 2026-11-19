@@ -1,4 +1,4 @@
-import { coworkerRuleOf, mergeNotificationPrefs, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch } from '@rerun/contracts'
+import { coworkerRuleOf, mergeNotificationPrefs, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch } from '@moldwright/contracts'
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import { Alert } from 'react-native'

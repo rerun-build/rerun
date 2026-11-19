@@ -48,12 +48,12 @@ function database({ visibility = 'workspace', grant = null }: Box = {}) {
 }
 
 function share(agentId: string) {
-    return { id: `share-${agentId}`, url: `https://app.rerun.build/s/${agentId}`, sourceAgentId: agentId, agentName: agentId, createdAt: '2026-11-05', installCount: 0, include: {} }
+    return { id: `share-${agentId}`, url: `https://moldwright.robagentic.tech/s/${agentId}`, sourceAgentId: agentId, agentName: agentId, createdAt: '2026-11-05', installCount: 0, include: {} }
 }
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.createAgentShare.mockResolvedValue({ token: 'tok', url: 'https://app.rerun.build/s/tok', warnings: [], reused: false })
+    mocks.createAgentShare.mockResolvedValue({ token: 'tok', url: 'https://moldwright.robagentic.tech/s/tok', warnings: [], reused: false })
     mocks.planAgentShare.mockResolvedValue({ agentName: 'Scout', contents: [], envKeyCount: 0, mcpAuthCount: 0, warnings: [] })
     mocks.listWorkspaceShares.mockResolvedValue([share(AGENT_ID), share(OTHER_AGENT_ID)])
 })

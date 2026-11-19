@@ -1,4 +1,4 @@
-import type { AgentSharePreview } from '@rerun/contracts'
+import type { AgentSharePreview } from '@moldwright/contracts'
 import type { AgentCardEntry, AgentCardNotes } from '@/components/templates/TemplateDetailAgentCard'
 import { BoxIcon, BrainIcon, DatabaseIcon, FileTextIcon, KeyIcon, PlugIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'

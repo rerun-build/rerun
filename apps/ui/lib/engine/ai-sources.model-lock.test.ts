@@ -1,4 +1,4 @@
-import { RERUN_CONNECTION_ID, RERUN_MODELS } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, RERUN_MODELS } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { isModelLocked } from './ai-sources'
 

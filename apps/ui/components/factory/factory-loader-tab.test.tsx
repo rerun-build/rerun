@@ -4,7 +4,7 @@ import path from 'node:path'
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { factorySnapshotSchema } from '@rerun/contracts'
+import { factorySnapshotSchema } from '@moldwright/contracts'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const sample = () => factorySnapshotSchema.parse(JSON.parse(readFileSync(path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json'), 'utf8')))
@@ -30,7 +30,7 @@ vi.mock('@/stores/board.store', () => {
     return { useBoardStore }
 })
 
-import FactoryPage from '@/app/(dashboard)/factory/page'
+import { FactoryPage } from '@/components/factory/FactoryPage'
 
 let host: HTMLDivElement
 let root: Root

@@ -15,7 +15,7 @@ vi.mock('@/app/api/_auth/access', () => ({
     visibleAgentIds: vi.fn(),
 }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@rerun/cloud/email', () => ({ EMAIL_DELIVERY: true }))
+vi.mock('@moldwright/cloud/email', () => ({ EMAIL_DELIVERY: true }))
 vi.mock('@/lib/services/publish-thumbnail', () => ({ publishWithThumbnail: vi.fn() }))
 vi.mock('@/lib/services/publish', () => ({
     listPublished: vi.fn(),

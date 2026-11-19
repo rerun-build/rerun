@@ -48,9 +48,9 @@ export default function SignInCode({
 
 SignInCode.PreviewProps = {
   code: "482913",
-  signInUrl: "https://app.rerun.build/auth/confirm?token_hash=abc123&type=magiclink",
+  signInUrl: "https://moldwright.robagentic.tech/auth/confirm?token_hash=abc123&type=magiclink",
   expiresInMinutes: 15,
-  appUrl: "https://app.rerun.build",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies SignInCodeProps;
 
 const codeBox: React.CSSProperties = {

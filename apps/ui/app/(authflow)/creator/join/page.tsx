@@ -16,7 +16,7 @@ export default async function CreatorJoinResumePage() {
         const t = await getTranslations('auth.creatorJoin')
         return <JoinShell title={t('nothingToClaim.title')} message={t('nothingToClaim.message')} />
     }
-    if (result.invite.termsAccepted) redirect(routes.home)
+    if (result.invite.termsAccepted) redirect(routes.board)
 
     return <CreatorOnboarding invite={result.invite} />
 }

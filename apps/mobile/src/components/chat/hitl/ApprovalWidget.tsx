@@ -1,4 +1,4 @@
-import { pendingApprovals, serializeApprovalDecisions, type ApprovalDecision } from '@rerun/contracts'
+import { pendingApprovals, serializeApprovalDecisions, type ApprovalDecision } from '@moldwright/contracts'
 import { useRef, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { useTranslations } from 'use-intl'

@@ -1,7 +1,7 @@
 'use client'
 
-import { formatNumber } from '@rerun/i18n/format'
-import { Badge } from '@rerun/ui/primitives'
+import { formatNumber } from '@moldwright/i18n/format'
+import { Badge } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { formatWorked, humanWorkdays, percentChange } from '@/lib/rewind/format'

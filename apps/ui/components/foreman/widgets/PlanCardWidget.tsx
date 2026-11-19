@@ -1,7 +1,7 @@
 'use client'
 
-import { IsoGrid } from '@rerun/ui/iso-grid'
-import { Badge } from '@rerun/ui/primitives'
+import { IsoGrid } from '@moldwright/ui/iso-grid'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 

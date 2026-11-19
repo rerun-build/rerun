@@ -1,4 +1,4 @@
-import type { ForemanBrief, ForemanToolSpec } from '@rerun/contracts'
+import type { ForemanBrief, ForemanToolSpec } from '@moldwright/contracts'
 
 import type { ForemanState } from './phase'
 import { foremanEngineInstructions } from './prompt'

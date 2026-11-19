@@ -25,7 +25,7 @@ const { AuthorizationError, UnauthenticatedError } = await import('@/app/api/_au
 const segment = { params: Promise.resolve({}) }
 
 function post(body: string) {
-    return new Request('https://app.rerun.build/api/v1/test', { method: 'POST', body })
+    return new Request('https://moldwright.robagentic.tech/api/v1/test', { method: 'POST', body })
 }
 
 describe('apiRoute', () => {
@@ -112,7 +112,7 @@ describe('apiRoute', () => {
         const route = apiRoute({ auth: 'member' }, async () => {
             throw new Error('boom')
         })
-        const req = new Request('https://app.rerun.build/api/v1/test', { method: 'POST', headers: { 'x-rerun-client': 'ios/1.0.0 (6)' } })
+        const req = new Request('https://moldwright.robagentic.tech/api/v1/test', { method: 'POST', headers: { 'x-rerun-client': 'ios/1.0.0 (6)' } })
         await route(req, segment)
         expect(log).toHaveBeenLastCalledWith('[api/v1] POST /api/v1/test [ios/1.0.0 (6)] failed', expect.any(Error))
     })

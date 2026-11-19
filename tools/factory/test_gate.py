@@ -217,16 +217,34 @@ class TestGateRoster(unittest.TestCase):
 
     def test_job_branch_roster_ignored(self):
         text = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "roster.json")).read()
-        got, seen = self._base([(0, text, "")])
+        got, seen = self._base([(0, "HTTP/2.0 200 OK\nX-A: b\r\n\r\n" + text, "")])
         self.assertTrue(got["areas"])
         self.assertTrue(seen[0].endswith("roster.json?ref=dev"), seen)
-        got, seen = self._base([(1, "", "HTTP 404 Not Found"), (0, "main\n", ""), (0, text, "")])
+        got, seen = self._base([(1, "HTTP/2.0 404 Not Found\nX-A: b\r\n\r\n{}", "gh: Not Found (HTTP 404)"), (0, "main\n", ""), (0, "HTTP/2.0 200 OK\nX-A: b\r\n\r\n" + text, "")])
         self.assertTrue(got["areas"])
         self.assertTrue(seen[2].endswith("roster.json?ref=main"), seen)
         self.assertFalse([s for s in seen if "job/" in s or "chunk/" in s])
 
     def test_no_roster_anywhere_is_none_and_500_raises(self):
-        got, _ = self._base([(1, "", "HTTP 404"), (0, "main\n", ""), (1, "", "HTTP 404")])
+        nf = (1, "HTTP/2.0 404 Not Found\nX-A: b\r\n\r\n{}", "gh: Not Found (HTTP 404)")
+        got, _ = self._base([nf, (0, "main\n", ""), nf])
         self.assertIsNone(got)
         got, _ = self._base([(1, "", "HTTP 500")])
         self.assertIsInstance(got, G.F.RosterError)
+
+    def test_absence_is_read_from_the_http_status_line(self):
+        text = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "roster.json")).read()
+        got, seen = self._base([(1, "HTTP/2.0 404 Not Found\nX-A: b\r\n\r\n{\"status\":\"404\"}", "gh: Not Found (HTTP 404)"),
+                                (0, "main\n", ""), (0, "HTTP/2.0 200 OK\nX-A: b\r\n\r\n" + text, "")])
+        self.assertTrue(got["areas"])
+        self.assertIn("-i", seen[0].split())
+        self.assertIn("-i", seen[2].split())
+
+    def test_not_found_text_under_another_status_fails_closed(self):
+        for answer in ((1, "HTTP/2.0 500 Internal Server Error\nX-A: b\r\n\r\nNot Found 404", "gh: Not Found (HTTP 500)"),
+                       (1, "", "dial tcp: 404 Not Found"),
+                       (1, "HTTP/2.0 403 Forbidden\nX-A: b\r\n\r\n{}", "gh: HTTP 404 Not Found"),
+                       (0, "HTTP/2.0 200 OK", "")):
+            got, seen = self._base([answer])
+            self.assertIsInstance(got, G.F.RosterError, answer)
+            self.assertEqual(len(seen), 1, answer)

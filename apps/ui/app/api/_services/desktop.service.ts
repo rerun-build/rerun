@@ -1,7 +1,7 @@
-import { DESKTOP_WS_PATH, type DesktopViewMode } from '@rerun/contracts'
+import { DESKTOP_WS_PATH, type DesktopViewMode } from '@moldwright/contracts'
 
 import { NoEngineError } from '@/app/api/_services/workspace-engine.service'
-import { DESKTOP_DIRECT, desktopRelayBase } from '@rerun/cloud/engines'
+import { DESKTOP_DIRECT, desktopRelayBase } from '@moldwright/cloud/engines'
 import { buildBaseUrl } from '@/lib/engine/base-url'
 import { supportsDesktop } from '@/lib/engine/client'
 import { mintDesktopTicket } from '@/lib/engine/desktop-ticket'

@@ -2,9 +2,6 @@ export type SignupMethod = 'google' | 'apple' | 'email' | 'phone'
 
 export const SIGNUP_INTENT_COOKIE = 'rr_signup_intent'
 
-export function sharedCookieDomain(hostname: string): string | undefined {
-    return hostname.endsWith('rerun.build') ? '.rerun.build' : undefined
-}
 export type SignupSurface = 'welcome_wall' | 'foreman_intake' | 'signin_dialog' | 'auth_page' | 'ready_made_arrival'
 export type SignupStep = 'phone' | 'phone_code' | 'email' | 'email_code'
 export type SignupAbandonTrigger = 'tab_hidden' | 'page_left' | 'dismissed'

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { rename, writeFile } from 'node:fs/promises'
-import { boxPlanSchema, trialModelFor, type BoxPlan, type Provider } from '@rerun/contracts'
+import { boxPlanSchema, trialModelFor, type BoxPlan, type Provider } from '@moldwright/contracts'
 import { boxPlanPath } from '../config/paths.js'
 import { clearAgentCache } from '../agents/registry.js'
 

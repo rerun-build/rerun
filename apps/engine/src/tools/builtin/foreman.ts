@@ -1,4 +1,4 @@
-import { FOREMAN_INTENT_PART, type ForemanToolSpec } from '@rerun/contracts'
+import { FOREMAN_INTENT_PART, type ForemanToolSpec } from '@moldwright/contracts'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { RunContext } from '../../runtime/context.js'

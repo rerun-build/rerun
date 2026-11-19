@@ -1,4 +1,4 @@
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/app/api/_actions/rewind.actions', () => ({ readRewindAction: vi.fn(), markRewindViewedAction: vi.fn() }))

@@ -1,4 +1,4 @@
-import { APP_GATED_PATHS, LANDING_GATED_PATHS, brandGateVerdict, isGatedPath } from '@rerun/contracts'
+import { APP_GATED_PATHS, LANDING_GATED_PATHS, brandGateVerdict, isGatedPath } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 const SECRET = 'kit-token'

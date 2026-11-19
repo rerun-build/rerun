@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import type { FactoryEpicKind } from '@rerun/contracts'
+import type { FactoryEpicKind } from '@moldwright/contracts'
 import { cn } from '@/lib/utils'
 import { formatEndedAt, formatInState } from './FactoryTasks'
 import { DEPARTMENT_VIEW, chainOf, type LedgerEpic, type LedgerTask } from './factory-ledger'

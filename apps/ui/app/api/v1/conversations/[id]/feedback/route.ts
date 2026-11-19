@@ -1,6 +1,6 @@
 import { fetchSessionFeedbackAction, rateMessageAction } from '@/app/api/_actions/message-feedback.actions'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { messageFeedbackRateRequestSchema, messageFeedbackScopeSchema, type MessageFeedbackEntry } from '@rerun/contracts'
+import { messageFeedbackRateRequestSchema, messageFeedbackScopeSchema, type MessageFeedbackEntry } from '@moldwright/contracts'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'

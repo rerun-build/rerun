@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { runUsesScreen, screenSite, serializeTakeoverResult } from '@rerun/contracts'
+import { runUsesScreen, screenSite, serializeTakeoverResult } from '@moldwright/contracts'
 
 const user = (text: string) => ({ role: 'user', parts: [{ type: 'text', text }] })
 const assistant = (...parts: { type: string; toolName?: string; input?: unknown }[]) => ({ role: 'assistant', parts })

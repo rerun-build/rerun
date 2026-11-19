@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { startAgentOnEngine, stopAgentsOnEngine } from '@/app/api/_services/agent-activation.service'
-import { triggerTask } from '@rerun/cloud/tasks'
+import { triggerTask } from '@moldwright/cloud/tasks'
 import { runContext } from '@/test/trigger-sdk'
 import { requestAgentActivationSync, syncAgentActivationTask } from './sync-agent-activation'
 
 vi.mock('@trigger.dev/sdk/v3', async () => (await import('@/test/trigger-sdk')).triggerSdkMock())
 vi.mock('@/app/api/_services/agent-activation.service', () => ({ startAgentOnEngine: vi.fn(), stopAgentsOnEngine: vi.fn() }))
-vi.mock('@rerun/cloud/tasks', async importOriginal => ({ ...(await importOriginal<object>()), triggerTask: vi.fn() }))
+vi.mock('@moldwright/cloud/tasks', async importOriginal => ({ ...(await importOriginal<object>()), triggerTask: vi.fn() }))
 
 type Run = (payload: unknown, params: unknown) => Promise<unknown>
 

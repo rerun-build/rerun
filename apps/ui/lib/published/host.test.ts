@@ -11,7 +11,7 @@ describe('publish host', () => {
     })
 
     it('rejects the app, nested and reserved hosts', () => {
-        expect(extractPublishedSlug('app.rerun.build')).toBeNull()
+        expect(extractPublishedSlug('moldwright.robagentic.tech')).toBeNull()
         expect(extractPublishedSlug('rerun.site')).toBeNull()
         expect(extractPublishedSlug('a.b.rerun.site')).toBeNull()
         expect(extractPublishedSlug('www.rerun.site')).toBeNull()

@@ -79,9 +79,9 @@ TrialStarted.PreviewProps = {
   trialEndsLabel: "12 March",
   monthlyPriceLabel: "$49",
   includedLabel: "3 coworkers and 350 credits",
-  workspaceUrl: "https://app.rerun.build",
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe",
+  workspaceUrl: "https://moldwright.robagentic.tech",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe",
 } satisfies TrialStartedProps;
 
 const meta: React.CSSProperties = {

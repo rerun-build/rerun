@@ -1,6 +1,6 @@
 import { EMAIL_PREPARATION_MESSAGES, type EmailPreparationFailure } from '@/lib/auth/email-sign-in-messages'
 import { PHONE_FAILURE_MESSAGES, type PhoneFailure } from '@/lib/phone/failure-messages'
-import type { SignInRefusal } from '@rerun/contracts'
+import type { SignInRefusal } from '@moldwright/contracts'
 
 const STATUS_BY_REASON: Partial<Record<PhoneFailure | EmailPreparationFailure, number>> = {
     too_soon: 429,

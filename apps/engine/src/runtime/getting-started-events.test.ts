@@ -20,10 +20,10 @@ vi.mock('./notify.js', async importOriginal => {
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { rm } = await import('node:fs/promises')
-const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
+const { RERUN_CONNECTION_ID } = await import('@moldwright/contracts')
 const { connectionRoutes } = await import('../http/routes/connections.js')
 const { agentsDir, connectionsDir } = await import('../config/paths.js')
-const { ensureRerunConnection } = await import('../connections/store.js')
+const { ensureMoldwrightConnection } = await import('../connections/store.js')
 const { unloadConnection } = await import('../connections/registry.js')
 const { clearBoxDefault } = await import('../connections/default.js')
 const { writeSchedule } = await import('../schedules/loader.js')
@@ -43,7 +43,7 @@ beforeEach(async () => {
     await clearBoxDefault()
     await rm(connectionsDir(), { recursive: true, force: true })
     await rm(agentsDir(), { recursive: true, force: true })
-    await ensureRerunConnection()
+    await ensureMoldwrightConnection()
 })
 
 describe('box.connection.connected', () => {

@@ -3,8 +3,8 @@
 import { AuthMethods } from '@/components/auth/AuthMethods'
 import { OAuthSignInButton } from '@/components/auth/OAuthSignInButton'
 import { PasswordSignInForm } from '@/components/auth/PasswordSignInForm'
-import { PHONE_ENABLED } from '@rerun/cloud/phone'
-import { PhoneSignIn } from '@rerun/cloud/phone.client'
+import { PHONE_ENABLED } from '@moldwright/cloud/phone'
+import { PhoneSignIn } from '@moldwright/cloud/phone.client'
 import { useSignupFunnel } from '@/components/auth/useSignupFunnel'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { signupStep } from '@/lib/auth/signup-abandon'
@@ -18,7 +18,7 @@ import { useDesktopSignInWaiting } from '@/components/desktop-shell/desktop-sign
 
 export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlone: boolean; showGoogle: boolean }) {
     const searchParams = useSearchParams()
-    const next = internalPath(searchParams.get('next'), routes.home)
+    const next = internalPath(searchParams.get('next'), routes.board)
     const router = useRouter()
     const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'
     const passwordOnly = searchParams.get('method') === 'password'

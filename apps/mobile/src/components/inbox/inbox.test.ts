@@ -1,4 +1,4 @@
-import type { InboxItem } from '@rerun/contracts'
+import type { InboxItem } from '@moldwright/contracts'
 
 import { badgeLabel, inboxCount, inboxSections } from '@/components/inbox/inbox'
 

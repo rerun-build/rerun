@@ -2,7 +2,7 @@
 
 import { NOTIFICATION_SCOPES, type NotificationScope } from '@/lib/notifications/prefs'
 import { cn } from '@/lib/utils'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import type { KeyboardEvent } from 'react'
 

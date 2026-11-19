@@ -1,6 +1,6 @@
-import { templateDocumentSchema, type TemplateDocument } from '@rerun/contracts'
+import { templateDocumentSchema, type TemplateDocument } from '@moldwright/contracts'
 import { assertTemplateOwnedBy } from '@/app/api/_auth/expert'
-import { isPayoutReady } from '@rerun/cloud/marketplace.server'
+import { isPayoutReady } from '@moldwright/cloud/marketplace.server'
 import { slugify } from '@/lib/slugify'
 import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'

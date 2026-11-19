@@ -8,7 +8,7 @@
         "menu.view.actualSize": "Menu item resetting the zoom of the page to 100%.",
         "menu.help.docs": "Menu item opening the documentation website in the browser.",
         "offline.title": "Shown in the app window when the Moldwright server cannot be reached.",
-        "offline.body": "{host} is the server address, for example app.rerun.build.",
+        "offline.body": "{host} is the server address, for example moldwright.robagentic.tech.",
         "offline.unavailable": "Shown when the server answered with an error (during a deploy, for example).",
         "unload.message": "Native dialog shown when the person closes or reloads the window while a coworker is working or a file has unsaved edits.",
         "find.matches": "Find in page bar: position of the highlighted match among all matches.",

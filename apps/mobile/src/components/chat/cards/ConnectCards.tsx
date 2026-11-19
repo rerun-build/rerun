@@ -1,4 +1,4 @@
-import type { McpRegisterCard, McpServerView, ResolvedService } from '@rerun/contracts'
+import type { McpRegisterCard, McpServerView, ResolvedService } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'

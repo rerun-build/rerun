@@ -1,7 +1,7 @@
 import { readFile, readdir, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import matter from 'gray-matter'
-import { providerSchema, triggerMethodSchema, type MessageAuthor, type Provider, type TriggerMethod } from '@rerun/contracts'
+import { providerSchema, triggerMethodSchema, type MessageAuthor, type Provider, type TriggerMethod } from '@moldwright/contracts'
 import { triggerFile, triggersDir } from '../config/paths.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import { newId, nowIso, slugify } from '../lib/ids.js'

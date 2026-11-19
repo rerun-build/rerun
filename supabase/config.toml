@@ -52,8 +52,8 @@ site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000/",
   "http://localhost:3005/auth/callback",
-  "https://app.rerun.build/auth/callback",
-  "https://app.rerun.build/",
+  "https://moldwright.robagentic.tech/auth/callback",
+  "https://moldwright.robagentic.tech/",
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

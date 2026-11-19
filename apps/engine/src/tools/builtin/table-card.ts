@@ -17,7 +17,7 @@ import {
     type TableCard,
     type TableCardGroup,
     type TableViewConfig,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { groupTableRows, readTableRows, tableColumns, type RowFilter, type RowGroup } from '../../db/sqlStore.js'
 import { checkViewColumns } from '../../db/tableViews.js'
 

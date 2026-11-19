@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { FactorySnapshot } from '@rerun/contracts'
+import type { FactorySnapshot } from '@moldwright/contracts'
 
 export type HeldSnapshot = { snapshot: FactorySnapshot; receivedAt: number }
 

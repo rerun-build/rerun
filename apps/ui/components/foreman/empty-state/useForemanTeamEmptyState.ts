@@ -1,6 +1,6 @@
 'use client'
 
-import type { TeamEmptyStateCopy } from '@rerun/contracts'
+import type { TeamEmptyStateCopy } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 

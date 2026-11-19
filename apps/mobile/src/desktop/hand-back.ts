@@ -1,4 +1,4 @@
-import type { TakeoverResult } from '@rerun/contracts'
+import type { TakeoverResult } from '@moldwright/contracts'
 
 const waiting = new Map<string, (result: TakeoverResult) => void>()
 

@@ -1,1 +1,1 @@
-export { Spinner } from '@rerun/ui/primitives'
+export { Spinner } from '@moldwright/ui/primitives'

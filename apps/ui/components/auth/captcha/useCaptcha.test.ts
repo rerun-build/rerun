@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const track = vi.hoisted(() => vi.fn())
-vi.mock('@rerun/analytics/client', () => ({ track }))
+vi.mock('@moldwright/analytics/client', () => ({ track }))
 
 type Callbacks = Record<string, (value?: string) => void>
 

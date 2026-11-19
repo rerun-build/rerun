@@ -50,7 +50,7 @@ const { agentRoutes } = await import('./agents.js')
 const { agentConfigSchema } = await import('../../agents/types.js')
 const { writeAgentConfig } = await import('../../agents/config-write.js')
 const { agentDir } = await import('../../config/paths.js')
-const { mcpSessionStateListSchema, mcpReconnectResultSchema, mcpReconnectEventSchema } = await import('@rerun/contracts')
+const { mcpSessionStateListSchema, mcpReconnectResultSchema, mcpReconnectEventSchema } = await import('@moldwright/contracts')
 
 const id = 'reconnectagent'
 
