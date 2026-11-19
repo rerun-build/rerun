@@ -55,6 +55,7 @@ WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
 REFRESH_BEATS = 10
+PAUSED = "factory-paused"
 REFRESH_EXIT = 75
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
@@ -494,6 +495,7 @@ class Dispatcher:
         self.repo, self.label = cfg["repo"], cfg.get("label", "factory")
         self.home = cfg.get("home") or self.repo
         self.taking, self.reporting, self.answer = True, True, None
+        self.parked_at, self.parked_set, self.parked_logged = None, set(), set()
         self.others, self.extra = list, dict
         self.store = ledger_store.Store(cfg["ledger_file"])
         self.weights = weights.load()
@@ -735,7 +737,9 @@ class Dispatcher:
         if all(r <= 0 for r in rooms.values()):
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
-                                     "--json", "number,title,body", "--limit", "100"]))
+                                     "--json", "number,title,labels,body", "--limit", "100"]))
+        paused = {i["number"] for i in issues if PAUSED in {x.get("name") for x in i.get("labels") or [] if isinstance(x, dict)}}
+        issues = [i for i in issues if i["number"] not in paused]
         for i in issues:
             old = self.store.get_job(str(i["number"]))
             if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
@@ -756,7 +760,7 @@ class Dispatcher:
         shape = cutshape.check(issues)
         self.refused = {n: e for n, e in shape.items() if e}
         self.unreadable = len(self.refused)
-        labelled = {i["number"] for i in issues}
+        labelled = {i["number"] for i in issues} | paused
         tree = None
         if any(plancheck.needs(i) and not self.plan_settled(i) for i in issues):
             tree = plancheck.tree(self.gh, self.repo)
@@ -1351,6 +1355,27 @@ class Dispatcher:
             log(j["issue"], "plan check skipped: %s" % e)
             return None
 
+    def parked(self, j):
+        if self.parked_at != self.beats:
+            try:
+                got = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", PAUSED, "--state", "open",
+                                          "--json", "number", "--limit", "1000"]))
+                self.parked_set = {int(i["number"]) for i in got}
+            except (Error, ValueError, TypeError, KeyError) as e:
+                log("-", "parked list not read, no build starts this beat: %s" % e)
+                self.parked_set = None
+            self.parked_at = self.beats
+        if self.parked_set is None:
+            return True
+        n = int(j["issue"])
+        if n not in self.parked_set:
+            self.parked_logged.discard(n)
+            return False
+        if n not in self.parked_logged:
+            self.parked_logged.add(n)
+            log(n, "parked: not built while %s" % PAUSED)
+        return True
+
     def step(self, j):
         st = j["state"]
         if j.get("sending"):
@@ -1365,6 +1390,8 @@ class Dispatcher:
             return
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
+            if got and self.parked(j):
+                return
             if got and self.take(j):
                 if self.recheck_first(j):
                     return
