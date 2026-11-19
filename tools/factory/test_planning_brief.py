@@ -43,7 +43,7 @@ class BriefTest(unittest.TestCase):
         self.assertIn("add no comments in code", self.text)
 
     def test_length(self):
-        self.assertLess(len(self.text), 2400)
+        self.assertLess(len(self.text), 2700)
 
 
 if __name__ == "__main__":

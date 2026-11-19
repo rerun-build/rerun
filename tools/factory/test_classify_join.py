@@ -5,6 +5,8 @@ from test_dispatch import Base
 LONG = "The merge retry in `tools/factory/dispatch.py` fails twice after a refused merge. " * 10
 FU = "In `tools/factory/gate.py` split the output on newlines." + "From the review of #929." + "<!-- followup:#929-1 -->"
 FU2 = "In `tools/factory/gate.py` keep the exit code on failure." + "From the review of #929." + "<!-- followup:#929-2 -->"
+SHARED_ONLY = "Work in tools/factory on `dev` and `factory.py`, then check `main`. " * 10
+SAME_FILE = "In tools/factory/gate.py the call `gate.split` drops a line. " * 10
 
 
 class ClassifyJoin(Base):
@@ -73,6 +75,40 @@ class ClassifyJoin(Base):
         self.assertEqual(self.prob(502)["labels"], ["P1"])
         self.assertEqual(self.prob(502)["comments"], [])
         self.assertEqual([c for c in self.w.gh_calls if c[:2] == ["label", "create"]], [])
+
+    def test_a_folder_and_a_branch_name_alone_do_not_make_issues_similar(self):
+        self.seed(701, "Dispatcher stalls on a held job", body=SHARED_ONLY + "One.", labels=["P1"])
+        self.seed(702, "Rename the planning label", body=SHARED_ONLY + "Two.", labels=["P1"])
+        self.seed(703, "Gate output keeps newlines", body=SAME_FILE + "One.", labels=["P1"])
+        self.seed(704, "Cover the gate splitter", body=SAME_FILE + "Two.", labels=["P1"])
+        self.tick()
+        self.assertEqual(self.prob(701)["comments"], [])
+        self.assertEqual(self.prob(701)["labels"], ["P1"])
+        self.assertEqual(self.prob(702)["comments"], [])
+        self.assertEqual(self.prob(703)["comments"], ["Similar to #704: both cite tools/factory/gate.py and gate.split."])
+
+    def test_each_issue_is_named_similar_to_at_most_three_others(self):
+        for n in range(601, 607):
+            self.seed(n, "Merge retry fails twice", labels=["P1"])
+        self.tick(4)
+        self.assertEqual([len(self.prob(n)["comments"]) for n in range(601, 607)], [3, 3, 3, 3, 1, 1])
+
+    def test_a_comment_refused_mid_pair_is_not_posted_again(self):
+        self.seed(801, "Merge retry fails twice", labels=["P1"])
+        self.seed(802, "Merge retry fails twice on refusal", labels=["P1"])
+        inner = self.w.gh
+
+        def refusing(args):
+            if args[:3] == ["issue", "comment", "802"] and not getattr(self, "refused", False):
+                self.refused = True
+                self.w.gh_calls.append(list(args))
+                raise RuntimeError("GraphQL: was submitted too quickly (addComment)")
+            return inner(args)
+
+        self.w.gh = refusing
+        self.tick(2)
+        self.assertEqual(self.prob(801)["comments"], ["Similar to #802: their titles share most words."])
+        self.assertEqual(self.prob(802)["comments"], [])
 
 
 if __name__ == "__main__":

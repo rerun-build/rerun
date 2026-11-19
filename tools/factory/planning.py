@@ -79,6 +79,8 @@ def brief_lines(issue, repo):
         "",
         "Compute on dev, before filing, every number a done-test asserts. Two children name the same file only when one depends on the other. The done-test calls the feature only through that public interface (a function the module exports, an HTTP route or a CLI command) and mock nothing of the module's own internals; only a boundary the repository already fakes (the network, the clock, the model) may be faked. Each Change says: add no comments in code.",
         "",
+        "Prove each child: see its done-test fail on dev, make it and every Run line pass, push that change as `plan/<child>` from the dev of its PLAN READY line, and add `**Proven branch**: plan/<child>`; the dispatcher then opens the pull request and sends no builder.",
+        "",
         "The first job of a feature crosses every layer the feature needs and ends in a visible result (an API answer, a screen or a CLI line); later jobs widen it. A docs-only child states the same rule where it writes the format.",
         "",
         GOAL_LINE + " Each child says in one line which part and which milestone of that page it serves.",
@@ -105,7 +107,7 @@ Every risk the plan lists has its answer and its failsafe carried by children: n
 Before you file a child:
 - Write its body to a file and run `python3 -I tools/factory/issuecheck.py <file>` in your dev checkout. File it only when it prints OK.
 - Write its done-test and run it on today's dev. It must fail, and for the reason the plan gives.
-- Write a throwaway change that makes it pass, and run the done-test and every Run line with it. File none of that code. If you cannot make it pass inside the child's Files, the Files or the plan are wrong: fix the list, or end BLOCKED: plan.
+- Write the change that makes it pass, and run the done-test and every Run line with it. Put none of that code in the issue: once the child is filed, push it as `plan/<child>` and add its `**Proven branch**` line above `**Depends on**`, as the rule above says; a child that depends on another starts from that child's `plan/<n>`. If you cannot make it pass inside the child's Files, the Files or the plan are wrong: fix the list, or end BLOCKED: plan.
 - Search dev for every value, name and version the change alters; every file that pins one is in Files.
 - Every Run line is inside the `**Run**` block, exactly as you ran it.
 - The Change names functions; a line number is only a hint beside the name.

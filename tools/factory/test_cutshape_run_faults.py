@@ -15,7 +15,11 @@ def errors(run, **kw):
 
 class RunFaults(unittest.TestCase):
     def test_a_plain_run_line_passes(self):
-        self.assertEqual(errors("cd tools/factory && python3 -I -m unittest test_x"), [])
+        self.assertEqual(errors('python3 -I -m unittest discover -s tools/factory -p "test_x.py"'), [])
+
+    def test_an_isolated_module_run_line_is_refused(self):
+        self.assertIn("cannot import", " ".join(errors("cd tools/factory && python3 -I -m unittest test_x")))
+        self.assertEqual(errors('python3 -I -m unittest discover -s tools/factory -p "test_x.py"'), [])
 
     def test_a_line_in_parentheses_is_refused(self):
         self.assertIn("arithmetic", " ".join(errors("(cd tools/factory && python3 -I -m unittest test_x)")))
