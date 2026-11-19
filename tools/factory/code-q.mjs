@@ -74,7 +74,13 @@ if (statusMode) {
     console.log('code-q: no servers configured');
     process.exit(1);
   }
-  const key = readFileSync(config.keyFile, 'utf8').trim();
+  let key;
+  try {
+    key = readFileSync(config.keyFile, 'utf8').trim();
+  } catch {
+    console.error(`code-q: cannot read the key file ${config.keyFile}`);
+    process.exit(1);
+  }
   const rows = await Promise.all(names.map(n => statusLine(n, config.servers[n], key)));
   for (const [line] of rows) console.log(line);
   process.exit(rows.every(([, ok]) => ok) ? 0 : 1);
