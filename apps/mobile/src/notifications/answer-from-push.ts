@@ -2,10 +2,9 @@ import { ANDROID_PUSH_CHANNELS, PUSH_ACTIONS, type ConversationReply, type PushD
 import * as Notifications from 'expo-notifications'
 
 import { replyToConversation } from '@/api/chat'
-import { storedWorkspaceId } from '@/auth/AuthProvider'
-import { supabase } from '@/auth/supabase'
 import { translatorFor } from '@/i18n/translator'
 
+import { backgroundCaller } from './background-caller'
 import { answersInPlace } from './categories'
 import { pushDataOf } from './push'
 
@@ -45,9 +44,9 @@ export async function answerFromPush(response: Notifications.NotificationRespons
     const agent = content.title ?? t('notifications.receipts.fallbackAgent')
     await Notifications.dismissNotificationAsync(identifier).catch(() => {})
     try {
-        const [{ data: auth }, workspaceId] = await Promise.all([supabase.auth.getSession(), data.workspaceId ?? storedWorkspaceId()])
-        if (!auth.session || workspaceId === null) throw new Error(t('notifications.receipts.signedOut'))
-        await replyToConversation({ accessToken: auth.session.access_token, workspaceId }, data.conversationId, reply)
+        const caller = await backgroundCaller(data.workspaceId)
+        if (!caller) throw new Error(t('notifications.receipts.signedOut'))
+        await replyToConversation(caller, data.conversationId, reply)
         await receipt(agent, t(`notifications.receipts.${action}`, { agent }), data)
     } catch (error) {
         await receipt(agent, t('notifications.receipts.failed', { reason: error instanceof Error ? error.message : '' }), data)

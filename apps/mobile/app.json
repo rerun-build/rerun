@@ -58,7 +58,8 @@
         {
           "icon": "./assets/images/notification-icon.png",
           "color": "#4d34f7",
-          "defaultChannel": "messages"
+          "defaultChannel": "messages",
+          "enableBackgroundRemoteNotifications": true
         }
       ],
       "expo-font",

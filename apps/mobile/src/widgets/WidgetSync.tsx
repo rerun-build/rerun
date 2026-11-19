@@ -1,6 +1,5 @@
 import type { CrewState } from '@rerun/contracts'
 import { File } from 'expo-file-system'
-import { widgetsDirectory } from 'expo-widgets'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import type Svg from 'react-native-svg'
@@ -11,14 +10,13 @@ import { translatorFor } from '@/i18n/translator'
 
 import CrewWidget from './CrewWidget'
 import { crewWidgetPropsOf, faceFileName, type CrewWidgetProps } from './crew-props'
+import { facesDirectory } from './refresh'
 
 const FACE_SIZE = 120
 // The buddy grows into place when it mounts: drawn before then, the picture would catch it halfway.
 const FACE_SETTLE_MS = 900
 
 type Face = { id: string; state: CrewState; file: File }
-
-const facesDirectory = widgetsDirectory?.replace(/\/$/, '') ?? null
 
 // A face that could not be saved is not drawn again until the next launch: the widget goes without it.
 function missingFaces(props: CrewWidgetProps, tried: ReadonlySet<string>): Face[] {

@@ -17,7 +17,7 @@ const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send'
 
 // Expo holds the APNs and FCM credentials, so the hub sends a plain POST rather than keeping an HTTP/2
 // connection open to Apple, which a route handler is in no position to do.
-type ExpoMessage = { to: string; title: string; subtitle?: string; body?: string; sound?: 'default'; channelId?: AndroidPushChannel; priority?: 'high'; categoryId?: PushCategory; data: PushData }
+type ExpoMessage = { to: string; title: string; subtitle?: string; body?: string; sound?: 'default'; channelId?: AndroidPushChannel; priority?: 'high'; categoryId?: PushCategory; _contentAvailable?: true; data: PushData }
 
 // On Android the channel, not the message, decides whether a push rings, and a normal-priority FCM
 // message waits for a sleeping phone to wake on its own: a question would sit unseen for minutes.
@@ -71,7 +71,8 @@ async function pushToUser(supabase: SupabaseClient<Database>, userId: string, no
     const buttons = pushButtonsOf(notification, context.conversationId)
     const data: PushData = { workspaceId: context.workspaceId, agentId: context.agentId, conversationId: context.conversationId, kind: notification.kind, ...(buttons?.toolCallId ? { toolCallId: buttons.toolCallId } : {}) }
     const category = buttons ? { categoryId: buttons.categoryId } : {}
-    const iosMessage = { title, subtitle, body, ...(silent ? {} : { sound: 'default' as const }), ...category, data }
+    // iOS wakes the app a moment for each push, which reads the crew again for its widgets.
+    const iosMessage = { title, subtitle, body, ...(silent ? {} : { sound: 'default' as const }), ...category, _contentAvailable: true as const, data }
     const androidMessage = { title: androidTitle, body, ...androidFieldsOf(silent), ...category, data }
     const sent = await sendToExpo(
         supabase,
