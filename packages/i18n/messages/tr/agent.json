@@ -863,7 +863,51 @@
         },
         "delete": "Coworker'ı sil",
         "saved": "Kaydedildi",
-        "save": "Değişiklikleri kaydet"
+        "save": "Değişiklikleri kaydet",
+        "appearance": "Görünüm"
+    },
+    "coworkerLook": {
+        "color": "Renk",
+        "eyes": "Gözler",
+        "mouth": "Ağız",
+        "shuffle": "Rastgele",
+        "reset": "Varsayılan",
+        "colors": {
+            "blue": "Mavi",
+            "indigo": "Çivit",
+            "violet": "Menekşe",
+            "purple": "Mor",
+            "pink": "Pembe",
+            "rose": "Ahududu",
+            "lime": "Misket limonu",
+            "green": "Yeşil"
+        },
+        "eyesOptions": {
+            "pill": "Hap gözler",
+            "round": "Yuvarlak gözler",
+            "happy": "Mutlu gözler",
+            "googly": "Pörtlek gözler",
+            "visor": "Vizör",
+            "sleepy": "Uykulu gözler",
+            "wink": "Göz kırpma",
+            "pixel": "Piksel gözler",
+            "star": "Yıldız gözler",
+            "heart": "Kalp gözler",
+            "dot": "Nokta gözler",
+            "brows": "Kaşlı gözler",
+            "cyclops": "Tek göz",
+            "shades": "Güneş gözlüğü",
+            "glasses": "Gözlük",
+            "sparkle": "Parıldayan gözler",
+            "line": "Kapalı gözler"
+        },
+        "mouthOptions": {
+            "none": "Ağız yok",
+            "smile": "Gülümseme",
+            "open": "Açık ağız",
+            "cat": "Kedi ağzı",
+            "flat": "Düz ağız"
+        }
     },
     "agentPanelLogs": {
         "empty": {

@@ -1,4 +1,4 @@
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS } from '@rerun/contracts'
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS, type CoworkerLook } from '@rerun/contracts'
 import { hashUnit } from '../../iso'
 import type { AgentStatus } from '../../presets'
 import type { BuddyEyes, BuddyLook, BuddyMood, BuddyMouth, TileStyle } from '../../types'
@@ -21,23 +21,29 @@ export const BUDDY_STATE_COLOR: Record<BuddyMood, string> = {
     asleep: 'var(--iso-buddy-asleep)',
 }
 
-// The colour of a resting agent's top, without the amber, red and cyan the board keeps for states.
-const IDENTITY: readonly string[] = COWORKER_COLORS
-
 export function buddyLook(style: TileStyle): BuddyLook {
     return style.buddy === true || style.buddy == null ? {} : style.buddy
 }
 
 export function buddyEyes(id: string, look: BuddyLook): BuddyEyes {
-    return look.eyes ?? BUDDY_EYES[Math.floor(hashUnit(id, 41) * BUDDY_EYES.length)]
+    return look.eyes ?? hashedBuddyLook(id).eyes
 }
 
 export function buddyMouth(id: string, look: BuddyLook): BuddyMouth {
-    return look.mouth ?? MOUTH_ODDS[Math.floor(hashUnit(id, 53) * MOUTH_ODDS.length)]
+    return look.mouth ?? hashedBuddyLook(id).mouth
 }
 
 export function buddyColor(id: string, look: BuddyLook) {
-    return look.color ?? IDENTITY[Math.floor(hashUnit(id, 23) * IDENTITY.length)]
+    return look.color ?? hashedBuddyLook(id).color
+}
+
+// The look a coworker wears until someone chooses one for it.
+export function hashedBuddyLook(id: string): CoworkerLook {
+    return {
+        eyes: COWORKER_EYES[Math.floor(hashUnit(id, 41) * COWORKER_EYES.length)],
+        mouth: MOUTH_ODDS[Math.floor(hashUnit(id, 53) * MOUTH_ODDS.length)],
+        color: COWORKER_COLORS[Math.floor(hashUnit(id, 23) * COWORKER_COLORS.length)],
+    }
 }
 
 export function buddyMood(style: TileStyle): BuddyMood {

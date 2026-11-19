@@ -1,4 +1,4 @@
-import { deleteAgentAction, duplicateAgentAction, moveAgentAction, renameAgentAction } from '@/app/api/_actions/agent.actions'
+import { deleteAgentAction, duplicateAgentAction, moveAgentAction, renameAgentAction, setAgentLookAction } from '@/app/api/_actions/agent.actions'
 import { BOX_MANAGE_ACTION_REASON, boxAccessFor, type BoxViewer, type SpaceGrant } from '@/lib/board/box-access'
 import { duplicateAgentName } from '@/lib/copy-name'
 import { startKickoffAction } from '@/app/api/_actions/chat.actions'
@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import type { ReactNode } from 'react'
 import { refusalText, translated } from '@/lib/i18n/toast-text'
 import { RefusalError } from '@/hooks/useErrorText'
+import type { CoworkerLook } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import { createClient } from '@/supabase/client'
 import { selectMany } from '@/supabase/supabase-helpers'
@@ -155,6 +156,8 @@ type BoardState = {
     orderSpaces: (writes: SidebarOrderWrite[], viewer: BoxViewer) => void
     orderAgents: (writes: SidebarOrderWrite[], viewer: BoxViewer) => void
     renameAgent: (id: string, name: string) => void
+    // Null gives the buddy back the look hashed from its id.
+    setAgentLook: (id: string, look: CoworkerLook | null) => void
     removeAgent: (id: string) => void
     setSessionStatus: (sessionId: string, status: SessionStatus) => void
     markSessionsHandled: (sessionIds: string[]) => void
@@ -684,6 +687,16 @@ export const useBoardStore = create<BoardState>((set, get) => ({
         renameAgentAction(id, name)
             .then(res => set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, handle: res.handle } : a)) })))
             .catch(() => {})
+    },
+
+    setAgentLook: (id, look) => {
+        const previous = get().agents.find(a => a.id === id)?.look ?? null
+        const wear = (worn: CoworkerLook | null) => set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, look: worn } : a)) }))
+        wear(look)
+        setAgentLookAction(id, look).catch(() => {
+            wear(previous)
+            toast.error(translated('builder.boardToasts.lookFailed'))
+        })
     },
 
     removeAgent: id => {

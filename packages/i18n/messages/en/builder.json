@@ -120,6 +120,7 @@
         "createdInactive": "\"{name}\" was created but is inactive",
         "createdInactiveHint": "Your plan has no free coworker slot. Activate it from the coworker panel.",
         "addFailed": "Could not add this coworker",
+        "lookFailed": "Could not change how this coworker looks",
         "duplicateFailed": "Could not duplicate this coworker",
         "importFailed": "Could not import this template",
         "importInterrupted": "The import was interrupted",

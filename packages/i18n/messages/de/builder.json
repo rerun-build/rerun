@@ -117,6 +117,7 @@
         "createdInactive": "„{name}“ wurde erstellt, ist aber inaktiv",
         "createdInactiveHint": "Dein Plan hat keinen freien Coworker-Platz. Aktiviere ihn im Coworker-Panel.",
         "addFailed": "Coworker konnte nicht hinzugefügt werden",
+        "lookFailed": "Das Aussehen dieses Coworkers konnte nicht geändert werden",
         "duplicateFailed": "Coworker konnte nicht dupliziert werden",
         "importFailed": "Vorlage konnte nicht importiert werden",
         "importInterrupted": "Der Import wurde unterbrochen",

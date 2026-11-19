@@ -117,6 +117,7 @@
         "createdInactive": "\"{name}\" oluşturuldu ama etkin değil",
         "createdInactiveHint": "Planınızda boş coworker yeri yok. Coworker panelinden etkinleştirin.",
         "addFailed": "Bu coworker eklenemedi",
+        "lookFailed": "Bu coworker'ın görünümü değiştirilemedi",
         "duplicateFailed": "Bu coworker çoğaltılamadı",
         "importFailed": "Bu şablon içe aktarılamadı",
         "importInterrupted": "İçe aktarma yarıda kesildi",

@@ -117,6 +117,7 @@
         "createdInactive": "\"{name}\" se creó, pero está inactivo",
         "createdInactiveHint": "Tu plan no tiene ningún hueco libre para coworkers. Actívalo desde el panel del coworker.",
         "addFailed": "No se pudo añadir este coworker",
+        "lookFailed": "No se pudo cambiar la apariencia de este coworker",
         "duplicateFailed": "No se pudo duplicar este coworker",
         "importFailed": "No se pudo importar esta plantilla",
         "importInterrupted": "La importación se interrumpió",

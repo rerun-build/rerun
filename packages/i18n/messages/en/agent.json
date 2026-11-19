@@ -29,6 +29,10 @@
         "agentPanelServices.account": "Button on an installed paid app: opens the picker of the account the app is bound to.",
         "agentPanelServices.uninstallLabeled": "{label} is the name the user gave to this account of the app (e.g. Work).",
         "agentPanelSettings.soul.label": "The soul is the coworker's system prompt, its core instructions.",
+        "agentPanelSettings.appearance": "Section title: how the coworker's character looks (its colour, eyes and mouth).",
+        "coworkerLook.shuffle": "Button that dresses the coworker's character in a random look.",
+        "coworkerLook.reset": "Button that gives the coworker's character back the look it was born with.",
+        "coworkerLook.eyesOptions": "Accessible names of the eye shapes a coworker's character can wear, read by a screen reader and shown on hover.",
         "agentPanelSetup.intro": "Shown to the author of a coworker template, above the install instructions.",
         "agentPanelSkills.appBadge": "Badge on a skill provided by a connected app.",
         "agentPanelSkills.newSkill": "Button that creates a new skill.",
@@ -949,7 +953,51 @@
         },
         "delete": "Delete coworker",
         "saved": "Saved",
-        "save": "Save changes"
+        "save": "Save changes",
+        "appearance": "Appearance"
+    },
+    "coworkerLook": {
+        "color": "Color",
+        "eyes": "Eyes",
+        "mouth": "Mouth",
+        "shuffle": "Shuffle",
+        "reset": "Default",
+        "colors": {
+            "blue": "Blue",
+            "indigo": "Indigo",
+            "violet": "Violet",
+            "purple": "Purple",
+            "pink": "Pink",
+            "rose": "Rose",
+            "lime": "Lime",
+            "green": "Green"
+        },
+        "eyesOptions": {
+            "pill": "Pill eyes",
+            "round": "Round eyes",
+            "happy": "Happy eyes",
+            "googly": "Googly eyes",
+            "visor": "Visor",
+            "sleepy": "Sleepy eyes",
+            "wink": "Wink",
+            "pixel": "Pixel eyes",
+            "star": "Star eyes",
+            "heart": "Heart eyes",
+            "dot": "Dot eyes",
+            "brows": "Eyes with brows",
+            "cyclops": "One eye",
+            "shades": "Sunglasses",
+            "glasses": "Glasses",
+            "sparkle": "Sparkling eyes",
+            "line": "Closed eyes"
+        },
+        "mouthOptions": {
+            "none": "No mouth",
+            "smile": "Smile",
+            "open": "Open mouth",
+            "cat": "Cat mouth",
+            "flat": "Flat mouth"
+        }
     },
     "agentPanelLogs": {
         "empty": {

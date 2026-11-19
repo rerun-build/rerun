@@ -117,6 +117,7 @@
         "createdInactive": "« {name} » a été créé mais est inactif",
         "createdInactiveHint": "Votre forfait n'a plus de place libre pour un coworker. Activez-le depuis le panneau du coworker.",
         "addFailed": "Impossible d'ajouter ce coworker",
+        "lookFailed": "Impossible de changer l'apparence de ce coworker",
         "duplicateFailed": "Impossible de dupliquer ce coworker",
         "importFailed": "Impossible d'importer ce template",
         "importInterrupted": "L'import a été interrompu",

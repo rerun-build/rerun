@@ -863,7 +863,51 @@
         },
         "delete": "Supprimer le coworker",
         "saved": "Enregistré",
-        "save": "Enregistrer les modifications"
+        "save": "Enregistrer les modifications",
+        "appearance": "Apparence"
+    },
+    "coworkerLook": {
+        "color": "Couleur",
+        "eyes": "Yeux",
+        "mouth": "Bouche",
+        "shuffle": "Au hasard",
+        "reset": "Par défaut",
+        "colors": {
+            "blue": "Bleu",
+            "indigo": "Indigo",
+            "violet": "Violet",
+            "purple": "Pourpre",
+            "pink": "Rose",
+            "rose": "Framboise",
+            "lime": "Citron vert",
+            "green": "Vert"
+        },
+        "eyesOptions": {
+            "pill": "Yeux en pilule",
+            "round": "Yeux ronds",
+            "happy": "Yeux rieurs",
+            "googly": "Yeux globuleux",
+            "visor": "Visière",
+            "sleepy": "Yeux endormis",
+            "wink": "Clin d'œil",
+            "pixel": "Yeux pixel",
+            "star": "Yeux étoilés",
+            "heart": "Yeux en cœur",
+            "dot": "Yeux en point",
+            "brows": "Yeux à sourcils",
+            "cyclops": "Un seul œil",
+            "shades": "Lunettes de soleil",
+            "glasses": "Lunettes",
+            "sparkle": "Yeux pétillants",
+            "line": "Yeux fermés"
+        },
+        "mouthOptions": {
+            "none": "Sans bouche",
+            "smile": "Sourire",
+            "open": "Bouche ouverte",
+            "cat": "Bouche de chat",
+            "flat": "Bouche droite"
+        }
     },
     "agentPanelLogs": {
         "empty": {

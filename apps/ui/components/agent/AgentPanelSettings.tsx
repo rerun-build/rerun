@@ -4,6 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { getAgentDetailAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorShell } from '@/components/ui/panel-editor'
 import { AgentAccessRow } from '@/components/agent/AgentAccessRow'
+import { CoworkerLookPicker } from '@/components/agent/CoworkerLookPicker'
 import { SharedLinksSection } from '@/components/agent/share/SharedLinksSection'
 import { DeleteAgentDialog } from '@/components/dialogs/DeleteAgentDialog'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const errorText = useErrorText()
     const verbosityOptions = useMemo(() => VERBOSITY_LEVELS.map((value: EngineVerbosity) => ({ value, label: t(`verbosity.${value}`) })), [t])
     const renameAgent = useBoardStore(s => s.renameAgent)
+    const setAgentLook = useBoardStore(s => s.setAgentLook)
     const openNotifications = useNotificationsStore(s => s.openNotifications)
     const canManage = useCanManageAgent(agent.id)
     const manageReason = canManage ? undefined : boxManageReason
@@ -129,6 +131,12 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                         className="h-8 text-xs"
                     />
                 </TooltipDisabledReason>
+
+                <Field label={t('appearance')}>
+                    <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
+                        <CoworkerLookPicker agentId={agent.id} look={agent.look ?? null} onChange={look => setAgentLook(agent.id, look)} disabled={!canManage} />
+                    </TooltipDisabledReason>
+                </Field>
 
                 {/* Un agent éteint ne répond plus : son détail engine est inatteignable par construction,
                     pas par panne. Seuls le renommage et la suppression restent utiles ici. */}
