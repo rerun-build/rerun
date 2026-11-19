@@ -28,7 +28,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Hom
     let initialSpaces: SpacePublic[] = []
     let initialWorkspaceId: number | null = null
 
-    // The token is checked locally: the middleware already asked the auth server on this page load.
+    // The token is checked locally. The middleware asks the auth server on every page load; a
+    // navigation inside the app relies on the token, valid for under an hour.
     const [supabase, user] = await Promise.all([createClient(), getSessionIdentity()])
 
     if (user) {

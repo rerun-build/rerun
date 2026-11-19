@@ -40,6 +40,7 @@ describe('useAgentHealthSync', () => {
         })
 
     beforeEach(async () => {
+        ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
         vi.useFakeTimers()
         fetchMock.mockClear()
         vi.stubGlobal('fetch', fetchMock)
