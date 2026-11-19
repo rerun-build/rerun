@@ -14,17 +14,15 @@ import type { IsoAgent } from '@/lib/board/types'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// The tile a coworker's card opens its apps from, here on the servers connected to the Chief of
-// Staff: the apps of the catalog are installed on a coworker's row, which it does not have.
 const TILES: { tile: CardDestination; screen: AgentViewTab }[] = [
-    { tile: 'services', screen: 'mcp' },
+    { tile: 'services', screen: 'services' },
     { tile: 'skills', screen: 'skills' },
     { tile: 'memories', screen: 'memories' },
     { tile: 'scheduled', screen: 'scheduled' },
 ]
 
-// What needs a row or a place on the board: an app of the catalog, a published page, a webhook address.
-const WITHOUT_TABS: readonly AgentViewTab[] = ['services', 'published', 'triggers']
+// What needs a row or a place on the board: a published page, a webhook address.
+const WITHOUT_TABS: readonly AgentViewTab[] = ['published', 'triggers']
 
 const BREADCRUMB_ORB_SIZE = 16
 
