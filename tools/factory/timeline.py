@@ -3,6 +3,7 @@ import argparse, calendar, json, os, sqlite3, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import acceptance
 import cutshape
+import flow
 import states
 
 END = states.END
@@ -44,9 +45,18 @@ def read_rows(path):
             except ValueError:
                 continue
             accepts.setdefault(parent, {})[r["k"]] = r["v"]
+        accept = {}
+        for r in db.execute("SELECT job, v FROM kv WHERE k='state' AND job LIKE 'accept:%'"):
+            try:
+                accept[int(r["job"].split(":")[1])] = r["v"]
+            except ValueError:
+                continue
+        tokens = {job: int(n) for job, n in db.execute(
+            "SELECT job, COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires GROUP BY job")}
     finally:
         db.close()
-    return {"jobs": jobs, "transitions": trs, "holds": holds, "fires": fires, "accepts": accepts}
+    return {"jobs": jobs, "transitions": trs, "holds": holds, "fires": fires, "accepts": accepts,
+            "accept": accept, "tokens": tokens}
 
 
 def _key(job):
@@ -177,6 +187,80 @@ def map_lines(rows, now):
     return lines
 
 
+def job_dicts(rows):
+    return [dict(json.loads(r["data"] or "{}"), issue=r["job"], state=r["state"], updated_at=r["updated_at"])
+            for r in rows["jobs"]]
+
+
+def _runs(mine):
+    runs = []
+    for t in mine:
+        if not runs or runs[-1][0] != t["to_state"]:
+            runs.append([t["to_state"], parse(t["at"])])
+    return runs
+
+
+def _wait_samples(trs, by_issue, now):
+    samples = {}
+    for job, mine in trs.items():
+        worker = by_issue.get(job, {}).get("worker")
+        runs = _runs(mine)
+        for (state, start), (_, nxt) in zip(runs, runs[1:]):
+            if state in states.WAIT_STATES and now - DAY <= nxt <= now:
+                samples.setdefault((flow.station_type(state, worker), state), []).append(nxt - start)
+    return samples
+
+
+def _mean_wait(sample):
+    if not sample:
+        return "-"
+    return "%d min" % (sum(sample) // len(sample) // 60)
+
+
+def _tokens_per_merged(issues, tokens):
+    if not issues:
+        return "-"
+    return str(sum(tokens.get(i, 0) for i in issues) // len(issues))
+
+
+def numbers_lines(rows, now):
+    jobs = job_dicts(rows)
+    by_issue = {j["issue"]: j for j in jobs}
+    trs = _by_job(rows)
+    accept = rows.get("accept") or {}
+    tokens = rows.get("tokens") or {}
+    samples = _wait_samples(trs, by_issue, now)
+    merged_at = {}
+    for job, mine in trs.items():
+        ins = [parse(t["at"]) for t in mine if t["to_state"] == "merged"]
+        if ins:
+            merged_at[job] = ins[-1]
+    counts = flow.by_type(jobs)
+    lines = ["numbers by type, last 24 h:"]
+    for kind in flow.TYPES:
+        c = counts[kind]
+        reviewer = kind == "reviewer"
+        stages = [s for s in states.WAIT_STATES if (flow.station_type(s, "coder") == "reviewer") == reviewer]
+        waits = ", ".join("%s %s" % (s, _mean_wait(samples.get((kind, s), []))) for s in stages)
+        line = "  %s: ready %d, running %d, waiting %d | mean wait: %s" % (kind, c["ready"], c["running"], c["waiting"], waits)
+        if not reviewer:
+            done = [j["issue"] for j in jobs
+                    if flow.station_type("merged", j.get("worker")) == kind
+                    and j["issue"] in merged_at and now - DAY <= merged_at[j["issue"]] <= now]
+            line += " | merged per hour %.2f | tokens per merged %s" % (len(done) / 24, _tokens_per_merged(done, tokens))
+        lines.append(line)
+    today = time.strftime("%Y-%m-%d", time.gmtime(now))
+    features = flow.by_feature(jobs, accept, today)
+    lines.append("numbers by feature, whole wave:")
+    if not features:
+        lines.append("  none")
+    for f in features:
+        merged = [j["issue"] for j in jobs if flow.parent_of(j) == f["parent"] and j["state"] == "merged"]
+        lines.append("  #%d: %d of %d done, convergence %s, tokens per merged %s" % (
+            f["parent"], f["done"], f["total"], f["convergence"], _tokens_per_merged(merged, tokens)))
+    return lines
+
+
 def _hm(t):
     return time.strftime("%H:%M", time.gmtime(t))
 
@@ -223,7 +307,7 @@ def main(argv=None):
     now = int(time.time())
     rows = read_rows(a.db)
     if a.cmd == "status":
-        print("\n".join(status_lines(rows, now) + [""] + map_lines(rows, now)))
+        print("\n".join(status_lines(rows, now) + [""] + numbers_lines(rows, now) + [""] + map_lines(rows, now)))
     else:
         print(gantt(rows, now, parse(a.since) if a.since else now - DAY))
     return 0
