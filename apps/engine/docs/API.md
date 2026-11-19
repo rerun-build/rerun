@@ -777,7 +777,7 @@ the assistant and tool messages, and runs the curator when `selfImprovement.enab
   "provider": "claude",
   "model": "opus",
   "source": "dashboard",
-  "author": { "id": "user-uuid", "name": "Ana" },
+  "author": { "id": "user-uuid", "name": "Ana", "timezone": "Europe/Paris" },
   "callableAgentIds": ["abc...", "def..."],
   "install": false,
   "userLanguage": "fr"
@@ -791,7 +791,10 @@ Only `message` is required.
   substituted here: that repair only happens for automations.
 - `source` names where the conversation comes from: `dashboard` (default), `builder`, `schedule`,
   `agent`, `delegate`, `api`, `trigger`.
-- `author` is the person who typed, kept on the message (the engine has no users of its own).
+- `author` is the person who typed, kept on the message (the engine has no users of its own). Every
+  message to any coworker also records them in the foreman's `members` table: their name, the IANA
+  `timezone` of their device (one Intl does not know is dropped, and a message without one keeps the
+  zone already on file), and when they first and last wrote.
 - `callableAgentIds` narrows the coworkers `call_agent` offers to the ones the author reaches; absent,
   every coworker can be called.
 - `install: true` on a new conversation starts the agent's guided setup there, and `userLanguage`

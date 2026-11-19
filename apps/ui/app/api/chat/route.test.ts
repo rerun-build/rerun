@@ -9,6 +9,7 @@ import { fakeSupabase } from '@/test/supabase-fake'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
+vi.mock('@/lib/i18n/request-locale', () => ({ requestTimeZone: vi.fn(async () => 'Europe/Paris') }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn().mockResolvedValue({ userId: 'me', workspace: { id: 7 }, authUser: { app_metadata: {}, user_metadata: {} } }) }))
 vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedValue(null) }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))

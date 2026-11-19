@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 
-import { loadMe, readMe } from './me.service'
+import { loadMe, messageAuthorOf, readMe } from './me.service'
 const getAuthUser = vi.fn()
 vi.mock('@/supabase/session/getServerSession', () => ({ getAuthUser: () => getAuthUser() }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
@@ -57,5 +57,13 @@ describe('loadMe', () => {
         const me = await loadMe(context({ user_metadata: {}, app_metadata: {} }))
 
         expect(me.user.name).toBeNull()
+    })
+})
+
+describe('messageAuthorOf', () => {
+    it('names the member and the zone of their device, and leaves out what is not known', () => {
+        const ctx = { userId: 'user-1', authUser: { user_metadata: { full_name: 'Ada Lovelace' } } } as unknown as WorkspaceContext
+        expect(messageAuthorOf(ctx, 'Europe/Paris')).toEqual({ id: 'user-1', name: 'Ada Lovelace', timezone: 'Europe/Paris' })
+        expect(messageAuthorOf({ ...ctx, authUser: { user_metadata: {} } } as unknown as WorkspaceContext)).toEqual({ id: 'user-1' })
     })
 })

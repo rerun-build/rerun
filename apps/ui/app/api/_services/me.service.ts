@@ -7,9 +7,11 @@ import type { User } from '@supabase/supabase-js'
 
 export { displayNameOf, readProfile, type UserProfile } from '@/lib/auth/user-profile'
 
-export function messageAuthorOf(ctx: Pick<WorkspaceContext, 'userId' | 'authUser'>): MessageAuthor {
+// `timezone`: the zone of the device the message was written from (requestTimeZone), so the Chief of
+// Staff knows the hour of this member's day.
+export function messageAuthorOf(ctx: Pick<WorkspaceContext, 'userId' | 'authUser'>, timezone?: string): MessageAuthor {
     const name = displayNameOf(ctx.authUser)?.slice(0, PROFILE_NAME_MAX)
-    return name ? { id: ctx.userId, name } : { id: ctx.userId }
+    return { id: ctx.userId, ...(name ? { name } : {}), ...(timezone ? { timezone } : {}) }
 }
 
 export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me {

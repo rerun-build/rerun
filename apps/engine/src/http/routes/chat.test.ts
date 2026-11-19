@@ -59,6 +59,7 @@ const { agentDir, installPath } = await import('../../config/paths.js')
 const { createSession, getSession } = await import('../../db/repos/sessions.js')
 const { getRun } = await import('../../db/repos/runs.js')
 const { claimSession, releaseSession, sessionClaimCount } = await import('../../runtime/run-control.js')
+const { listMembers } = await import('../../db/repos/members.js')
 
 const id = 'chatagent'
 const app = createServer()
@@ -198,5 +199,10 @@ describe('POST /agents/:id/chat', () => {
         await (await chat(id, { message: 'again' })).text()
 
         expect(state.calls.map(call => call.trigger?.callableAgentIds)).toEqual([['agent-x'], undefined])
+    })
+
+    it('remembers who wrote and the zone of their device, for the Chief of Staff', async () => {
+        await (await chat(id, { message: 'hi', author: { id: 'u-zoe', name: 'Zoé', timezone: 'Europe/Paris' } })).text()
+        await expect.poll(async () => (await listMembers()).find(member => member.id === 'u-zoe')).toMatchObject({ name: 'Zoé', timezone: 'Europe/Paris' })
     })
 })

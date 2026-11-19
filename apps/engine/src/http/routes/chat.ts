@@ -2,9 +2,11 @@ import { chatRequestSchema, ENGINE_SESSION_NOT_FOUND, type SessionSource } from 
 import { Hono } from 'hono'
 import { getAgent } from '../../agents/registry.js'
 import { claimInstallSession } from '../../agents/setup.js'
+import { touchMember } from '../../db/repos/members.js'
 import { createSession, getSession } from '../../db/repos/sessions.js'
 import { startRun } from '../../db/repos/runs.js'
 import { agentDisabled } from '../../lib/errors.js'
+import { logger } from '../../lib/logger.js'
 import { newId } from '../../lib/ids.js'
 import { runAgent } from '../../runtime/loop.js'
 import { claimSession, releaseSession, sessionClaim } from '../../runtime/run-control.js'
@@ -26,6 +28,7 @@ chatRoutes.post('/chat', async c => {
     const agent = await getAgent(agentId)
     if (!agent.config.enabled) throw agentDisabled()
     const body = chatRequestSchema.parse(await c.req.json())
+    if (body.author) void touchMember(body.author).catch(err => logger.warn({ err: String(err) }, 'touch member failed'))
     const runAgentView = agent.config.kind === 'foreman' && body.foreman ? { ...agent, brief: body.foreman } : agent
     const source = body.source ?? 'dashboard'
     const claim = body.install && !body.sessionId ? await claimInstallSession(agentId, () => createSession(agentId, undefined, undefined, source)) : null

@@ -108,6 +108,10 @@ describe('sqlite ladders', () => {
               5,
               "remote-jobs",
             ],
+            [
+              6,
+              "members",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -269,6 +273,20 @@ describe('system.db v4 to v5', () => {
         await client.execute("INSERT INTO remote_jobs (id, computer_id, session_id, command, state, started_at) VALUES ('j1', 'c1', 's1', 'ffmpeg', 'running', '2026-11-17T00:00:00.000Z')")
         expect((await client.execute('SELECT id, woke_at FROM remote_jobs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'j1', woke_at: null }])
         expect((await client.execute('SELECT count(*) AS n FROM paid_calls')).rows[0].n).toBe(1)
+    })
+})
+
+describe('system.db v5 to v6', () => {
+    it('adds the members of the box, keeps the jobs already there, and replays without harm', async () => {
+        const client = freshFile('v5-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 5), 'v5-system.db')
+        await client.execute("INSERT INTO remote_jobs (id, computer_id, session_id, command, state, started_at) VALUES ('j1', 'c1', 's1', 'ffmpeg', 'running', '2026-11-17T00:00:00.000Z')")
+        await migrateSystemDb(client, 'v5-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[5].up(client)
+        await client.execute("INSERT INTO members (id, timezone, first_seen_at, last_seen_at) VALUES ('u1', 'Europe/Paris', '2026-11-19T00:00:00.000Z', '2026-11-19T00:00:00.000Z')")
+        expect(await columns(client, 'members')).toEqual(['id', 'name', 'timezone', 'first_seen_at', 'last_seen_at'])
+        expect((await client.execute('SELECT count(*) AS n FROM remote_jobs')).rows[0].n).toBe(1)
     })
 })
 

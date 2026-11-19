@@ -241,6 +241,18 @@ CREATE TABLE IF NOT EXISTS remote_jobs (
 CREATE INDEX IF NOT EXISTS remote_jobs_session_idx ON remote_jobs(session_id);
 `
 
+// The people who wrote in this box's chats, kept in the foreman's own file: the hub names them on each
+// message, and the Chief of Staff reads from here the hour of their day and when they last came by.
+const MEMBERS_DDL = `
+CREATE TABLE IF NOT EXISTS members (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    timezone TEXT,
+    first_seen_at TEXT NOT NULL,
+    last_seen_at TEXT NOT NULL
+);
+`
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -280,6 +292,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'remote-jobs',
         up: async client => {
             await client.executeMultiple(REMOTE_JOBS_DDL)
+        },
+    },
+    {
+        version: 6,
+        id: 'members',
+        up: async client => {
+            await client.executeMultiple(MEMBERS_DDL)
         },
     },
 ]

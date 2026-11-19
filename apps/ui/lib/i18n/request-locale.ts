@@ -2,6 +2,7 @@ import 'server-only'
 
 import { TIME_ZONE_COOKIE, validTimeZone } from '@/lib/i18n/time-zone'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
+import { TIME_ZONE_HEADER } from '@rerun/contracts'
 import { LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@rerun/i18n'
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
@@ -26,6 +27,7 @@ export const requestLocale = cache(async (): Promise<AppLocale> => {
     return resolveLocale({ userLocale, cookie, acceptLanguage: (await headers()).get('accept-language') })
 })
 
+// The browser's cookie, or the header the mobile app sends with each call.
 export async function requestTimeZone(): Promise<string | undefined> {
-    return validTimeZone((await cookies()).get(TIME_ZONE_COOKIE)?.value)
+    return validTimeZone((await headers()).get(TIME_ZONE_HEADER) ?? (await cookies()).get(TIME_ZONE_COOKIE)?.value)
 }

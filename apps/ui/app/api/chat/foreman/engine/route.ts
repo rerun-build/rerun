@@ -4,6 +4,7 @@ import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
+import { requestTimeZone } from '@/lib/i18n/request-locale'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { embedTextShared } from '@/lib/services/embed'
@@ -103,7 +104,7 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, await requestTimeZone()), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the
             // foreman, which only exists beside a machine.

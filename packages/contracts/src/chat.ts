@@ -4,10 +4,16 @@ import { sessionSourceSchema } from './session.js'
 import { foremanBriefSchema } from './foreman.js'
 
 // The engine has no notion of users: the hub names who typed a message and the engine keeps it as is.
+// `timezone` is the IANA zone of the device they wrote from, what the Chief of Staff reads the hour
+// of their day in. An engine that predates it drops it.
 export const messageAuthorSchema = z.object({
     id: z.string().min(1).max(64),
     name: z.string().min(1).max(80).optional(),
+    timezone: z.string().min(1).max(64).optional(),
 })
+
+// How an app with no cookie (the mobile app) tells the hub the time zone of the device.
+export const TIME_ZONE_HEADER = 'x-rerun-time-zone'
 export type MessageAuthor = z.infer<typeof messageAuthorSchema>
 
 export const chatRequestSchema = z.object({

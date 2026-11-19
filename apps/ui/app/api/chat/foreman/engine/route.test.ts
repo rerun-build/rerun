@@ -13,6 +13,7 @@ import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DELETE, GET, POST } from './route'
 
+vi.mock('@/lib/i18n/request-locale', () => ({ requestTimeZone: vi.fn(async () => 'Europe/Paris') }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
 vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedValue(null) }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
