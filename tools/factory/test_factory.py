@@ -1,4 +1,4 @@
-import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, types, unittest
+import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, time, types, unittest
 from unittest import mock
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -540,31 +540,40 @@ class PrOpenRetry(FactoryCase):
 
     def pr_open(self, results):
         pending = list(results)
-        top = os.path.join(self.tmp, "top")
-        os.makedirs(top, exist_ok=True)
+        path = self.wt("1572", "1")
+        self.commit(path, "notes.txt", "x\n")
+        git(path, "remote", "set-url", "origin", "https://github.com/" + FULL + ".git")
+        git(path, "remote", "set-url", "--push", "origin", self.origin)
+        issue = {"number": 1572, "body": "**Files**\n- `notes.txt`\n"}
+        real_run = F.run
 
         def fake_run(cmd, *a, **k):
+            if cmd[0] == F.GH and cmd[1:2] == ["api"]:
+                return subprocess.CompletedProcess(cmd, 0, json.dumps(issue), "")
             if cmd[:3] == [F.GH, "pr", "create"]:
                 self.creates.append(cmd)
                 rc, out, err = pending.pop(0)
                 return subprocess.CompletedProcess(cmd, rc, out, err)
-            if cmd[:2] == [F.GH, "pr"]:
+            if cmd[0] == F.GH:
                 return subprocess.CompletedProcess(cmd, 0, "[]", "")
-            if cmd[1:2] == ["diff"]:
-                return subprocess.CompletedProcess(cmd, 0, "tools/factory/factory.py\n", "")
-            if cmd[1:2] == ["rev-list"]:
-                return subprocess.CompletedProcess(cmd, 0, "1\n", "")
-            if cmd[1:2] == ["log"] or cmd[1:2] == ["status"]:
+            if cmd[:2] == [F.GIT, "fetch"]:
                 return subprocess.CompletedProcess(cmd, 0, "", "")
-            return subprocess.CompletedProcess(cmd, 0, "", "")
+            return real_run(cmd, *a, **k)
 
-        ctx = (top, FULL, "chunk/1572-1", "dev", "1572", "1")
-        with mock.patch.object(F, "wt_context", lambda: ctx), mock.patch.object(F, "is_clone", lambda t: False), \
-                mock.patch.object(F, "token_shapes", lambda *a: []), mock.patch.object(F, "api", lambda *a, **k: {}), \
-                mock.patch.object(F, "preflight_lines", lambda *a: None), mock.patch.object(F, "preflight_lint", lambda *a: None), \
-                mock.patch.object(F, "run", fake_run), mock.patch.object(F.time, "sleep") as sleep:
+        old = os.getcwd()
+        os.chdir(path)
+        self.addCleanup(os.chdir, old)
+        real_sleep, waits = time.sleep, []
+
+        def fake_sleep(seconds):
+            if sys._getframe(1).f_code.co_filename == F.__file__:
+                waits.append(seconds)
+            else:
+                real_sleep(seconds)
+
+        with mock.patch.object(F, "run", fake_run), mock.patch.object(F.time, "sleep", fake_sleep):
             code, out = self.call(F.cmd_pr_open, ["--title", "T", "--body-file", self.body])
-        return code, out, [c.args[0] for c in sleep.call_args_list]
+        return code, out, waits
 
     def test_pr_open_retries_when_github_says_submitted_too_quickly(self):
         slow = (1, "", "GraphQL: was submitted too quickly (createPullRequest)")
