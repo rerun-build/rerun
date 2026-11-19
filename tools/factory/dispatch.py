@@ -2109,6 +2109,12 @@ class Dispatcher:
                 log(f["issue"], "label fix: " + f["did"])
         except Exception as e:  # noqa: BLE001
             out["label_fixed_error"] = type(e).__name__
+        try:
+            out["gaps_closed"] = labelcheck.close_gaps(self.gh, self.repo, self.store, out["label_drift"], data)
+            for f in out["gaps_closed"]:
+                log(f["issue"], "gap issue: %s, keeps #%d" % (f["did"], f["keep"]))
+        except Exception as e:  # noqa: BLE001
+            out["gaps_closed_error"] = type(e).__name__
         return out
 
     def report_line(self):
