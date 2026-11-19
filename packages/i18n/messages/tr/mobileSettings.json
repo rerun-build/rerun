@@ -114,6 +114,23 @@
             "tasksFailed": "Görevleri yüklenemedi. Birazdan tekrar deneyin.",
             "taskSwitch": "{name} hakkında beni bilgilendir",
             "muted": "{name} sessize alındı."
+        },
+        "actions": {
+            "approve": "Onayla",
+            "deny": "Reddet",
+            "answer": "Yanıtla",
+            "reply": "Yanıtla",
+            "open": "Aç",
+            "replyPlaceholder": "Yanıtınız",
+            "send": "Gönder"
+        },
+        "receipts": {
+            "approve": "Onaylandı. {agent} ilgileniyor.",
+            "deny": "Reddedildi. {agent} bunu yapmayacak.",
+            "reply": "Gönderildi. {agent} ilgileniyor.",
+            "failed": "Gönderilmedi: {reason}",
+            "signedOut": "Yeniden oturum açmak için Rerun’u açın.",
+            "fallbackAgent": "Coworker’ınız"
         }
     }
 }

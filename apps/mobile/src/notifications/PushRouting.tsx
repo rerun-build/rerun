@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useAuth } from '@/auth/AuthProvider'
 
+import { answersInPlace } from './categories'
 import { pushDataOf } from './push'
 
 function hrefOf(agentId: string, conversationId: string | null): Href {
@@ -18,7 +19,9 @@ function hrefOf(agentId: string, conversationId: string | null): Href {
 // `OpenPushTarget` only once that workspace is the active one, as the hub answers for no other. A push
 // sent before pushes named their workspace opens where the phone is.
 export function usePushTarget(): { href: Href | null; opened: () => void } {
-    const response = Notifications.useLastNotificationResponse()
+    const last = Notifications.useLastNotificationResponse()
+    // Approve, Deny and a reply typed under the push are answered where they are: nothing opens.
+    const response = last && !answersInPlace(last) ? last : null
     const { me, switchWorkspace } = useAuth()
     const activeWorkspaceId = me?.workspace.id ?? null
     // The push opened, or given up on: a switch the hub refused must not open it later, when the person

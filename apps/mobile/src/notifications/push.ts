@@ -12,6 +12,8 @@ import { onCustomServer } from '@/config/environment'
 import { translatorFor } from '@/i18n/translator'
 import { clientPlatform } from '@/lib/client-platform'
 
+import { registerPushCategories } from './categories'
+
 type Caller = { accessToken: string; workspaceId: number }
 
 const ASKED_KEY = 'rerun.push-asked'
@@ -82,7 +84,9 @@ async function expoPushToken(): Promise<string | null> {
 // Registered on every launch once allowed: Expo can rotate the token, and the hub keeps the last
 // time it was seen. A simulator has no token to give.
 export async function registerDevice(caller: Caller): Promise<void> {
-    if (!pushAvailable || !Device.isDevice) return
+    if (!pushAvailable) return
+    await registerPushCategories()
+    if (!Device.isDevice) return
     await createAndroidChannels()
     const { status } = await Notifications.getPermissionsAsync()
     if (status !== 'granted') return

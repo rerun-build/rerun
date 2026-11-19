@@ -30,7 +30,7 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null)
 
-async function storedWorkspaceId(): Promise<number | null> {
+export async function storedWorkspaceId(): Promise<number | null> {
     const raw = await SecureStore.getItemAsync(WORKSPACE_KEY)
     return raw && /^\d+$/.test(raw) ? Number(raw) : null
 }

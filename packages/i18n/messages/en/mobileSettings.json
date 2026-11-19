@@ -114,6 +114,23 @@
             "tasksFailed": "Could not load its tasks. Try again in a moment.",
             "taskSwitch": "Notify me about {name}",
             "muted": "{name} is muted."
+        },
+        "actions": {
+            "approve": "Approve",
+            "deny": "Deny",
+            "answer": "Answer",
+            "reply": "Reply",
+            "open": "Open",
+            "replyPlaceholder": "Your answer",
+            "send": "Send"
+        },
+        "receipts": {
+            "approve": "Approved. {agent} is on it.",
+            "deny": "Declined. {agent} will not do it.",
+            "reply": "Sent. {agent} is on it.",
+            "failed": "Not sent: {reason}",
+            "signedOut": "Open Rerun to sign in again.",
+            "fallbackAgent": "Your coworker"
         }
     },
     "_context": {
@@ -125,6 +142,11 @@
         "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to.",
         "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box.",
         "notifications.channels.messages.name": "Name of an Android notification channel, shown in the Android settings of the app: the pushes that ring.",
-        "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task."
+        "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task.",
+        "notifications.actions.approve": "Button under a push notification on the lock screen: approves what the coworker asked, after Face ID. Keep it short.",
+        "notifications.actions.answer": "Button under a push notification with a question from a coworker: opens a text field to answer it. Keep it short.",
+        "notifications.actions.reply": "Button under a push notification saying a coworker finished a task: opens a text field to send it a message. Keep it short.",
+        "notifications.receipts.approve": "Notification shown after the person approved from the lock screen. {agent} is the coworker name.",
+        "notifications.receipts.failed": "{reason} is the reason the hub gave, already translated."
     }
 }

@@ -114,6 +114,23 @@
             "tasksFailed": "Impossible de charger ses tâches. Réessayez dans un instant.",
             "taskSwitch": "Me notifier pour {name}",
             "muted": "{name} est en sourdine."
+        },
+        "actions": {
+            "approve": "Approuver",
+            "deny": "Refuser",
+            "answer": "Répondre",
+            "reply": "Répondre",
+            "open": "Ouvrir",
+            "replyPlaceholder": "Votre réponse",
+            "send": "Envoyer"
+        },
+        "receipts": {
+            "approve": "Approuvé. {agent} s’en occupe.",
+            "deny": "Refusé. {agent} ne le fera pas.",
+            "reply": "Envoyé. {agent} s’en occupe.",
+            "failed": "Non envoyé : {reason}",
+            "signedOut": "Ouvrez Rerun pour vous reconnecter.",
+            "fallbackAgent": "Votre coworker"
         }
     }
 }

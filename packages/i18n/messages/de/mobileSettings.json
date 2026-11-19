@@ -114,6 +114,23 @@
             "tasksFailed": "Aufgaben nicht geladen. Versuch es gleich erneut.",
             "taskSwitch": "Benachrichtige mich über {name}",
             "muted": "{name} ist stummgeschaltet."
+        },
+        "actions": {
+            "approve": "Genehmigen",
+            "deny": "Ablehnen",
+            "answer": "Antworten",
+            "reply": "Antworten",
+            "open": "Öffnen",
+            "replyPlaceholder": "Deine Antwort",
+            "send": "Senden"
+        },
+        "receipts": {
+            "approve": "Genehmigt. {agent} kümmert sich darum.",
+            "deny": "Abgelehnt. {agent} wird es nicht tun.",
+            "reply": "Gesendet. {agent} kümmert sich darum.",
+            "failed": "Nicht gesendet: {reason}",
+            "signedOut": "Öffne Rerun, um dich erneut anzumelden.",
+            "fallbackAgent": "Dein Coworker"
         }
     }
 }

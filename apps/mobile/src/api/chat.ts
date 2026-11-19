@@ -1,4 +1,4 @@
-import { TRANSCRIPT_UPDATED_AT_HEADER, mobileApi, type AgentView, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
+import { TRANSCRIPT_UPDATED_AT_HEADER, mobileApi, type AgentView, type ConversationReply, type ConversationReplyResult, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
 
 import { hub, hubConditional } from '@/api/client'
 
@@ -32,6 +32,10 @@ export async function stopConversation(caller: Caller, sessionId: string): Promi
 // The notification the conversation waited on was read: it goes back to idle.
 export async function acknowledgeAlert(caller: Caller, sessionId: string): Promise<void> {
     await hub(mobileApi.acknowledgeConversation, { ...caller, params: { id: sessionId } })
+}
+
+export async function replyToConversation(caller: Caller, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
+    return hub(mobileApi.replyToConversation, { ...caller, params: { id: sessionId }, body: reply })
 }
 
 export async function fetchSkillProposals(caller: Caller, sessionId: string): Promise<SkillProposal[]> {

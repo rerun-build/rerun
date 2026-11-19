@@ -27,6 +27,7 @@ import { I18nProvider } from '@/i18n/I18nProvider'
 import { useAiConsent } from '@/lib/ai-consent'
 import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
+import '@/notifications/background-answers'
 import { OpenPushTarget, usePushTarget } from '@/notifications/PushRouting'
 import { FrameMonitor } from '@/perf/FrameMonitor'
 import { PERF_LOG } from '@/perf/timing'
@@ -165,6 +166,7 @@ function App() {
                                             <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
                                             <Stack.Screen name="lab-coworker" />
                                             <Stack.Screen name="lab-notifications" />
+                                            <Stack.Screen name="lab-push-actions" />
                                             <Stack.Screen name="lab-conversations" />
                                             <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />
                                             <Stack.Screen name="lab-providers" options={sheetOptions(scheme, [1])} />

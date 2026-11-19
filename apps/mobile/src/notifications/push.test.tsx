@@ -36,6 +36,7 @@ const mockSetChannel = jest.fn(async (id: string, _channel: unknown) => {
     mockCalls.push(`channel:${id}`)
     return null
 })
+const mockSetCategory = jest.fn(async (..._args: unknown[]) => null)
 const mockPushToken = jest.fn(async () => ({ data: 'ExponentPushToken[abc]' }))
 let mockLastResponse: unknown = null
 jest.mock('expo-notifications', () => ({
@@ -47,6 +48,7 @@ jest.mock('expo-notifications', () => ({
     getExpoPushTokenAsync: () => mockPushToken(),
     setBadgeCountAsync: jest.fn(),
     useLastNotificationResponse: () => mockLastResponse,
+    setNotificationCategoryAsync: (...args: unknown[]) => mockSetCategory(...args),
 }))
 const mockPush = jest.fn((..._args: unknown[]) => void mockCalls.push('navigate'))
 jest.mock('expo-router', () => ({ router: { push: (...args: unknown[]) => mockPush(...args) } }))
@@ -154,6 +156,16 @@ describe('push registration', () => {
         expect(mockApi).not.toHaveBeenCalled()
     })
 
+    it('registers the buttons under a push, simulator included, worded in the current language', async () => {
+        mockSetCategory.mockClear()
+        mockDevice.isDevice = false
+        await registerDevice(caller)
+        const categories = Object.fromEntries(mockSetCategory.mock.calls.map(([id, actions]) => [id, (actions as { identifier: string; buttonTitle: string; options: { opensAppToForeground: boolean; isAuthenticationRequired: boolean } }[]).map(action => `${action.identifier}:${action.buttonTitle}`)]))
+        expect(categories).toEqual({ 'rerun.approval': ['approve:Approve', 'deny:Deny', 'open:Open'], 'rerun.question': ['reply:Answer', 'open:Open'], 'rerun.reply': ['reply:Reply'] })
+        const approve = (mockSetCategory.mock.calls.find(([id]) => id === 'rerun.approval')![1] as { options: object }[])[0]
+        expect(approve.options).toMatchObject({ opensAppToForeground: false, isAuthenticationRequired: true })
+    })
+
     it('drops the token on sign-out', async () => {
         await registerDevice(caller)
         await unregisterDevice(caller)
@@ -177,6 +189,13 @@ describe('push display and taps', () => {
         await settle()
         expect(mockPush).toHaveBeenCalledTimes(1)
         expect(mockPush).toHaveBeenCalledWith({ pathname: '/chat/[id]', params: { id: 'conv-2', to: 'a1' } })
+    })
+
+    it('opens nothing for a button that answers in place', async () => {
+        mockPush.mockClear()
+        mockLastResponse = { actionIdentifier: 'approve', notification: notification({ agentId: 'a1', conversationId: 'conv-11', kind: 'approval' }, 'n18') }
+        await renderRouting()
+        expect(mockPush).not.toHaveBeenCalled()
     })
 
     it('opens a push from the Foreman on its own chat page', async () => {

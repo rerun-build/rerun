@@ -114,6 +114,23 @@
             "tasksFailed": "Não foi possível carregar as tarefas. Tente de novo em instantes.",
             "taskSwitch": "Me avisar sobre {name}",
             "muted": "{name} está silenciado."
+        },
+        "actions": {
+            "approve": "Aprovar",
+            "deny": "Recusar",
+            "answer": "Responder",
+            "reply": "Responder",
+            "open": "Abrir",
+            "replyPlaceholder": "Sua resposta",
+            "send": "Enviar"
+        },
+        "receipts": {
+            "approve": "Aprovado. {agent} está cuidando disso.",
+            "deny": "Recusado. {agent} não vai fazer isso.",
+            "reply": "Enviado. {agent} está cuidando disso.",
+            "failed": "Não enviado: {reason}",
+            "signedOut": "Abra o Rerun para entrar novamente.",
+            "fallbackAgent": "Seu coworker"
         }
     }
 }

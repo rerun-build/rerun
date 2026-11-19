@@ -114,6 +114,23 @@
             "tasksFailed": "No se pudieron cargar sus tareas. Inténtalo de nuevo en un momento.",
             "taskSwitch": "Notificarme sobre {name}",
             "muted": "{name} está silenciado."
+        },
+        "actions": {
+            "approve": "Aprobar",
+            "deny": "Rechazar",
+            "answer": "Responder",
+            "reply": "Responder",
+            "open": "Abrir",
+            "replyPlaceholder": "Tu respuesta",
+            "send": "Enviar"
+        },
+        "receipts": {
+            "approve": "Aprobado. {agent} se encarga.",
+            "deny": "Rechazado. {agent} no lo hará.",
+            "reply": "Enviado. {agent} se encarga.",
+            "failed": "No enviado: {reason}",
+            "signedOut": "Abre Rerun para volver a iniciar sesión.",
+            "fallbackAgent": "Tu coworker"
         }
     }
 }
