@@ -37,6 +37,15 @@ class SharedEnvRunbookTest(unittest.TestCase):
         for name in names:
             self.assertEqual(env[name], "${" + name + "}")
         self.assertNotIn("everos-mcp", definition["command"])
+        runbook = read(RUNBOOK)
+        help_text = re.search(r"const HELP = `(.*?)`", read(ENGINE_BIN), re.S).group(1)
+        self.assertIn("mcp set-all " + definition["name"], runbook)
+        self.assertIn("rerun mcp set-all <server>", help_text)
+        for word in ["list", "set", "remove", "run"]:
+            self.assertIn("shared-env " + word, runbook)
+            self.assertIn("rerun shared-env " + word, help_text)
+        for name in names:
+            self.assertIn(name, runbook)
 
     def test_every_command_it_uses_is_in_the_engine_help(self):
         runbook = read(RUNBOOK)
