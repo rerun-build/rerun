@@ -172,6 +172,34 @@ NO_COMMENTS = ('Rob\'s rule, 2026-11-14: "any new work as a rule should NEVER ma
 NO_COMMENTS_REVIEW = ('Rob\'s rule, 2026-11-14: no comments in code. A line the pull request adds that is a code comment or a docstring, '
                       'and not a tool directive, is a reason to reject; it overrides the sprint rule above.')
 
+UI_PATH = re.compile(r"\.(tsx|jsx|css|scss|html|vue|svelte)$|^(apps/ui|packages/ui)/.*\.(ts|js|mts)$")
+NOT_WEB = re.compile(r"^(apps/mobile|packages/emails|supabase/templates)/")
+
+WEB_RULE = ('Browser support rule: a feature that is Baseline Widely available is used without a fallback; a Baseline Newly available '
+            'feature is used only behind feature detection, with the fallback from the guide\'s fallback section (any heading with '
+            '"fallback" in it); a feature of Limited availability is used only with a ruling written in the issue; when a guide states '
+            'no Baseline status or has no fallback section, the feature is used only behind feature detection, with a fallback that '
+            'keeps the page usable; nothing loads from a third-party host at run time, and a helper comes from the package registry '
+            'at build time or is not used.')
+
+WEB_GUIDE = " ".join([
+    'This job changes web UI files. Current web platform guides are on this server, pinned and read locally, with nothing fetched: '
+    '`/data/tools/bin/webguide search "<2 to 5 words>"` lists matching guides as JSON, and `/data/tools/bin/webguide get <id>` prints one. '
+    'Before you write HTML, CSS or browser-side JavaScript, look up each platform feature you use and follow its guide.',
+    WEB_RULE,
+    'The pull request body carries the line `Guides read: <id>, <id>`, with `(no fallback section)` or `(no Baseline status)` after an id '
+    'whose guide lacks it, or `Guides read: none (<why>)`; when the lookup prints an error, that error line is the why.',
+])
+
+WEB_GUIDE_REVIEW = " ".join([
+    'This job changes web UI files. Read the `Guides read:` line of the pull request body. For each guide it names, run '
+    '`/data/tools/bin/webguide get <id>` and check the code against that guide\'s fallback section.',
+    WEB_RULE,
+    'A feature used against that rule is wrong behaviour. Above your verdict line write `Fallback check: <id>: <result>; <id>: <result>`, '
+    'and for a guide with no fallback section or no Baseline status say so and say whether the code uses feature detection there. '
+    'A missing `Guides read:` line is a follow-up note, not a reason to reject.',
+])
+
 
 def stale_paragraph(j):
     return [
@@ -191,6 +219,10 @@ def where(j):
     return j.get("repo") or "rerun"
 
 
+def ui_job(j):
+    return any(UI_PATH.search(p) and not NOT_WEB.match(p) for p in issue_files(j.get("body")).split(", "))
+
+
 def build_brief(j):
     return "\n".join([
         'One job, sent by the dispatcher and not by Boss: %s #%s, "%s". You work alone on it: call no other coworker, not Boss either, and send no question to Rob.' % (where(j), j["issue"], j["title"]),
@@ -202,6 +234,7 @@ def build_brief(j):
         *(['   This job was taken before and returned. Open a new worktree with the suffix a%d, `/data/tools/bin/wt new %s %s a%d`, and not the earlier attempt\'s: its files follow the old plan. Write every file from the issue text as it is now.' % (j["take"], where(j), j["issue"], j["take"])] if j.get("take", 1) > 1 else []),
         '2. Where the issue names a done-test, write it first and see it fail. Then make the change, in the files the issue names and nowhere else.',
         NO_COMMENTS,
+        *([WEB_GUIDE] if ui_job(j) else []),
         '3. Run only the test files you touched, with the worker pool capped at 2. No full suite. Then run the lint and the type check of every package the change touched (`pnpm --filter <package> lint`, `pnpm --filter <package> ts-check`), and for Python files under `tools/factory` run `ruff check` on them where ruff is installed; fix what they report before opening the pull request. Lint warnings do not block; lint errors do. Give the lint and the type check each a shell call of their own, with `timeoutMs` set above the default of 120000 (the limit is 600000); never chain them with the commit or `pr-open`.',
         '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s".' % (j["issue"], j["issue"]),
         '5. Leave the worktree open. It is closed after the merge by a sweep.',
@@ -267,6 +300,7 @@ def review_brief(j, pr, head):
         '',
         NO_COMMENTS_REVIEW,
         '',
+        *([WEB_GUIDE_REVIEW, ''] if ui_job(j) else []),
         'When the pull request body has a `## Tests adapted` section, judge every test file listed there: it may change only what the change of the issue requires. An assertion weakened or removed without that need is wrong behaviour let through, and a REJECT.',
         '',
         *evidence_brief(proof.change_asks(j.get("body"))),

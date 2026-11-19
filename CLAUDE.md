@@ -167,3 +167,15 @@ never goes there: it starts with `pnpm security:start "<title>"` in a workspace 
 a draft GitHub security advisory and its private fork and locks the workspace's push to that fork.
 Follow the `security-fix` skill. In that workspace, never use the GitHub MCP write tools: they bypass
 git and its lock.
+
+# Browser support
+
+Web UI follows this rule. Look up the guide of a platform feature with `/data/tools/bin/webguide search "<words>"` and
+`/data/tools/bin/webguide get <id>`.
+Browser support rule: a feature that is Baseline Widely available is used without a fallback; a
+Baseline Newly available feature is used only behind feature detection, with the fallback from the
+guide's fallback section (any heading with "fallback" in it); a feature of Limited availability is
+used only with a ruling written in the issue; when a guide states no Baseline status or has no
+fallback section, the feature is used only behind feature detection, with a fallback that keeps the
+page usable; nothing loads from a third-party host at run time, and a helper comes from the package
+registry at build time or is not used.
