@@ -45,13 +45,13 @@ describe('whatsappDestination', () => {
 
     it('sends everything to the redirect number when one is set', () => {
         vi.stubEnv('WHATSAPP_REDIRECT_TO', '+352691000000')
-        vi.stubEnv('EMAIL_REDIRECT_TO', 'staging@rerun.build')
+        vi.stubEnv('EMAIL_REDIRECT_TO', 'staging@robagentic.tech')
 
         expect(whatsappDestination('+32492000000')).toBe('+352691000000')
     })
 
     it('sends nothing from a clone of production that has no redirect number', () => {
-        vi.stubEnv('EMAIL_REDIRECT_TO', 'staging@rerun.build')
+        vi.stubEnv('EMAIL_REDIRECT_TO', 'staging@robagentic.tech')
 
         expect(whatsappDestination('+32492000000')).toBeNull()
     })

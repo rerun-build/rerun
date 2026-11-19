@@ -18,8 +18,8 @@ function allowedColours(): Set<string> {
 }
 
 const NEWSLETTER_PREVIEW_PROPS = {
-    appUrl: 'https://app.rerun.build',
-    unsubscribeUrl: 'https://app.rerun.build/unsubscribe?token=test',
+    appUrl: 'https://moldwright.robagentic.tech',
+    unsubscribeUrl: 'https://moldwright.robagentic.tech/unsubscribe?token=test',
 }
 
 async function renderAll() {
@@ -95,9 +95,9 @@ describe('email templates in the reader\'s language', () => {
                 pausedLabel: '12 mars à 16:00 UTC',
                 keptUntilLabel: '10 juin',
                 summary: { agents: 3, runs: 41 },
-                billingUrl: 'https://app.rerun.build/?billing=1',
-                appUrl: 'https://app.rerun.build',
-                unsubscribeUrl: 'https://app.rerun.build/unsubscribe?token=test',
+                billingUrl: 'https://moldwright.robagentic.tech/?billing=1',
+                appUrl: 'https://moldwright.robagentic.tech',
+                unsubscribeUrl: 'https://moldwright.robagentic.tech/unsubscribe?token=test',
                 locale: 'fr',
             }),
         )

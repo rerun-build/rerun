@@ -6,5 +6,5 @@ In short: be kind, assume good intent, argue about the code and never about the 
 insults and discrimination of any kind are not welcome, in issues, pull requests, discussions or on
 Discord.
 
-Report a problem to **help@rerun.build**. Reports are read by the maintainers only and handled
+Report a problem to **help@robagentic.tech**. Reports are read by the maintainers only and handled
 in confidence. A maintainer may edit or remove a comment, or ban someone, temporarily or for good.

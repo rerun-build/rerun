@@ -26,11 +26,6 @@ function redirectKeepingSession(request: NextRequest, pathname: string, sessionR
     return response
 }
 
-function cookieDomain(request: NextRequest): string | undefined {
-    const host = (request.headers.get('host') ?? request.nextUrl.hostname).split(':')[0]
-    return host.endsWith('rerun.build') ? '.rerun.build' : undefined
-}
-
 function isSecure(request: NextRequest): boolean {
     const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim()
     return (forwarded ?? request.nextUrl.protocol.replace(':', '')) === 'https'
@@ -43,7 +38,6 @@ function applySessionHint(request: NextRequest, response: NextResponse, signedIn
         path: '/',
         maxAge: signedIn ? SESSION_HINT_MAX_AGE : 0,
         sameSite: 'lax',
-        domain: cookieDomain(request),
         secure: isSecure(request),
         httpOnly: false,
     })

@@ -33,7 +33,7 @@ export interface EmailPreview {
   element: React.ReactElement;
 }
 
-const APP_URL = "https://app.rerun.build";
+const APP_URL = "https://moldwright.robagentic.tech";
 const BILLING_URL = `${APP_URL}/?billing=1`;
 
 const KIND_LABELS: Record<AgentNotificationKind, string> = {

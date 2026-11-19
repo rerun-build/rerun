@@ -8,7 +8,7 @@ vi.mock('@/app/api/_services/account-deletion.service', () => ({ anonymizeAccoun
 
 const { deleteMyAccountAction, getAccountDeletionStatusAction } = await import('./account.actions')
 
-const ACCOUNT = { id: 'user-1', email: 'ada@rerun.build' }
+const ACCOUNT = { id: 'user-1', email: 'ada@robagentic.tech' }
 
 beforeEach(() => {
     vi.clearAllMocks()

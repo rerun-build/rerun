@@ -71,7 +71,7 @@ beforeEach(() => {
     vi.clearAllMocks()
     mocks.getAdminEmail.mockResolvedValue(null)
     mocks.isMachineEntitled.mockImplementation(CLOUD_ENTITLEMENTS.isMachineEntitled)
-    mocks.createAgentShare.mockResolvedValue({ url: 'https://app.rerun.build/s/tok', warnings: [], reused: false })
+    mocks.createAgentShare.mockResolvedValue({ url: 'https://moldwright.robagentic.tech/s/tok', warnings: [], reused: false })
     mocks.installAgentShare.mockResolvedValue({ agentId: 'new-agent' })
 })
 
@@ -86,7 +86,7 @@ describe('createAgentShareAction', () => {
     it('creates the share for the caller workspace', async () => {
         database()
 
-        await expect(createAgentShareAction({ agentId: AGENT_ID, include: { files: false } })).resolves.toEqual({ ok: true, url: 'https://app.rerun.build/s/tok', warnings: [], reused: false })
+        await expect(createAgentShareAction({ agentId: AGENT_ID, include: { files: false } })).resolves.toEqual({ ok: true, url: 'https://moldwright.robagentic.tech/s/tok', warnings: [], reused: false })
         expect(mocks.createAgentShare.mock.calls[0][1]).toEqual({ agentRowId: AGENT_ID, workspaceId: WORKSPACE_ID, userId: 'user-1', include: { memories: false, database: false, files: false } })
     })
 
@@ -157,7 +157,7 @@ describe('installSharedAgentAction', () => {
     })
 
     it('lets an admin install without a plan', async () => {
-        mocks.getAdminEmail.mockResolvedValue('admin@rerun.build')
+        mocks.getAdminEmail.mockResolvedValue('admin@robagentic.tech')
         const db = database({ subscriptionStatus: null })
 
         await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: true, agentId: 'new-agent' })

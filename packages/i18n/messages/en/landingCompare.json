@@ -1596,7 +1596,7 @@
                 },
                 "2": {
                     "question": "Can I self-host Moldwright like n8n?",
-                    "answer": "Every plan already gives you a private, isolated machine. Dedicated or self-hosted infrastructure is available on Enterprise, talk to us at help@rerun.build."
+                    "answer": "Every plan already gives you a private, isolated machine. Dedicated or self-hosted infrastructure is available on Enterprise, talk to us at help@robagentic.tech."
                 },
                 "3": {
                     "question": "How is Moldwright different from the n8n AI Agent node?",

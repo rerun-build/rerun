@@ -17,7 +17,7 @@ const desktop = await import('./route')
 const takeover = await import('./takeover/route')
 
 const segment = { params: Promise.resolve({ id: 'agent-1' }) }
-const request = (method: string, body?: object, search = '') => new Request(`https://app.rerun.build/api/v1/agents/agent-1/desktop${search}`, { method, body: body ? JSON.stringify(body) : undefined })
+const request = (method: string, body?: object, search = '') => new Request(`https://moldwright.robagentic.tech/api/v1/agents/agent-1/desktop${search}`, { method, body: body ? JSON.stringify(body) : undefined })
 
 describe('/api/v1/agents/:id/desktop', () => {
     beforeEach(() => {

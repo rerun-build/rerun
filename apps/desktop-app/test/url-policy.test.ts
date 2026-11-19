@@ -1,24 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { decideNavigation, decideWindowOpen, isInsecureServer, normalizeServerUrl } from '../src/main/url-policy'
 
-const SERVER = 'https://app.rerun.build'
+const SERVER = 'https://moldwright.robagentic.tech'
 
 describe('decideNavigation', () => {
     it('keeps the server’s own pages in the window', () => {
-        expect(decideNavigation('https://app.rerun.build/', SERVER)).toBe('stay')
-        expect(decideNavigation('https://app.rerun.build/auth?next=/x', SERVER)).toBe('stay')
+        expect(decideNavigation('https://moldwright.robagentic.tech/', SERVER)).toBe('stay')
+        expect(decideNavigation('https://moldwright.robagentic.tech/auth?next=/x', SERVER)).toBe('stay')
     })
 
     it('sends the rest of the web to the browser', () => {
         expect(decideNavigation('https://example.com/c/pay', SERVER)).toBe('external')
         expect(decideNavigation('http://example.com', SERVER)).toBe('external')
-        expect(decideNavigation('mailto:hello@rerun.build', SERVER)).toBe('external')
+        expect(decideNavigation('mailto:hello@robagentic.tech', SERVER)).toBe('external')
     })
 
     it('treats a look-alike host or another port as another site', () => {
-        expect(decideNavigation('https://app.rerun.build.evil.com/', SERVER)).toBe('external')
-        expect(decideNavigation('https://app.rerun.build:8443/', SERVER)).toBe('external')
-        expect(decideNavigation('http://app.rerun.build/', SERVER)).toBe('external')
+        expect(decideNavigation('https://moldwright.robagentic.tech.evil.com/', SERVER)).toBe('external')
+        expect(decideNavigation('https://moldwright.robagentic.tech:8443/', SERVER)).toBe('external')
+        expect(decideNavigation('http://moldwright.robagentic.tech/', SERVER)).toBe('external')
     })
 
     it('goes nowhere for local files, scripts and other apps’ schemes', () => {
@@ -34,7 +34,7 @@ describe('decideWindowOpen', () => {
     it('keeps sign-in popups and the server’s pages in a child window of the same session', () => {
         expect(decideWindowOpen('about:blank', SERVER)).toBe('child')
         expect(decideWindowOpen('', SERVER)).toBe('child')
-        expect(decideWindowOpen('https://app.rerun.build/published-auth?slug=x', SERVER)).toBe('child')
+        expect(decideWindowOpen('https://moldwright.robagentic.tech/published-auth?slug=x', SERVER)).toBe('child')
     })
 
     it('opens other sites in the browser and drops the rest', () => {

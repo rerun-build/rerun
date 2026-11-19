@@ -68,8 +68,8 @@ RunFailed.PreviewProps = {
   runId: "run_4f2a9c",
   errorMessage: "Tool call timed out after 900s while waiting for the engine.",
   reason: "You follow Atlas's scheduled tasks.",
-  appUrl: "https://app.rerun.build",
-  conversationUrl: "https://app.rerun.build/?notification=preview",
+  appUrl: "https://moldwright.robagentic.tech",
+  conversationUrl: "https://moldwright.robagentic.tech/?notification=preview",
 } satisfies RunFailedProps;
 
 const reasonLine: React.CSSProperties = {

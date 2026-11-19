@@ -17,7 +17,7 @@ vi.mock('@/supabase/server', () => ({
 const { GET, DELETE } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
-const url = 'https://app.rerun.build/api/v1/me/account'
+const url = 'https://moldwright.robagentic.tech/api/v1/me/account'
 const BLOCKER = { workspaceId: 7, name: 'Acme' }
 
 const remove = (body: object) => DELETE(new Request(url, { method: 'DELETE', body: JSON.stringify(body) }), segment)

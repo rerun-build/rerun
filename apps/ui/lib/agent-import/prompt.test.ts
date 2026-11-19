@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { buildImportPrompt } from './prompt'
 import { IMPORT_SOURCES } from './sources'
 
-const URL = 'https://app.rerun.build/api/mcp/account/rk_abc'
+const URL = 'https://moldwright.robagentic.tech/api/mcp/account/rk_abc'
 
 describe('buildImportPrompt', () => {
     it.each(IMPORT_SOURCES.map(source => source.id))('hands %s the connector, where to look and the rules', id => {

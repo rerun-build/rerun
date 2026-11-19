@@ -136,8 +136,8 @@ describe('discoverAuthServer', () => {
 
 describe('callbackUrl', () => {
     it('uses the forwarded host and protocol', () => {
-        const req = new Request('http://internal:8080/x', { headers: { 'x-forwarded-host': 'app.rerun.build', 'x-forwarded-proto': 'https' } })
-        expect(callbackUrl(req)).toBe('https://app.rerun.build/api/mcp/oauth/callback')
+        const req = new Request('http://internal:8080/x', { headers: { 'x-forwarded-host': 'moldwright.robagentic.tech', 'x-forwarded-proto': 'https' } })
+        expect(callbackUrl(req)).toBe('https://moldwright.robagentic.tech/api/mcp/oauth/callback')
     })
 
     it('defaults to http on localhost and https elsewhere', () => {
@@ -148,9 +148,9 @@ describe('callbackUrl', () => {
 
 describe('clientMetadataDocument', () => {
     it('names its own URL as the client id and the callback as the only redirect', () => {
-        const doc = clientMetadataDocument(new Request('http://x/', { headers: { host: 'app.rerun.build' } }))
-        expect(doc.client_id).toBe('https://app.rerun.build/api/mcp/oauth/client-metadata')
-        expect(doc.redirect_uris).toEqual(['https://app.rerun.build/api/mcp/oauth/callback'])
+        const doc = clientMetadataDocument(new Request('http://x/', { headers: { host: 'moldwright.robagentic.tech' } }))
+        expect(doc.client_id).toBe('https://moldwright.robagentic.tech/api/mcp/oauth/client-metadata')
+        expect(doc.redirect_uris).toEqual(['https://moldwright.robagentic.tech/api/mcp/oauth/callback'])
         expect(doc.token_endpoint_auth_method).toBe('none')
     })
 })
@@ -162,7 +162,7 @@ const CTX: OAuthContext = {
     mcpUrl: 'https://mcp.linear.app/mcp',
     tokenEndpoint: 'https://linear.app/token',
     clientId: 'client-1',
-    redirectUri: 'https://app.rerun.build/api/mcp/oauth/callback',
+    redirectUri: 'https://moldwright.robagentic.tech/api/mcp/oauth/callback',
 }
 
 describe('createPkce', () => {
@@ -208,7 +208,7 @@ describe('registerClient', () => {
 describe('resolveClient', () => {
     const GITHUB_MCP = 'https://api.githubcopilot.com/mcp/'
     const NO_REGISTRATION = { authorizationEndpoint: 'https://github.com/login/oauth/authorize', tokenEndpoint: 'https://github.com/login/oauth/access_token' }
-    const request = new Request('https://app.rerun.build/api/mcp/oauth/discover', { headers: { host: 'app.rerun.build' } })
+    const request = new Request('https://moldwright.robagentic.tech/api/mcp/oauth/discover', { headers: { host: 'moldwright.robagentic.tech' } })
 
     afterEach(() => {
         vi.unstubAllEnvs()
@@ -234,14 +234,14 @@ describe('resolveClient', () => {
     it('falls back to a Client ID Metadata Document when DCR is refused', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 400 })))
         const metadata = { ...NO_REGISTRATION, registrationEndpoint: 'https://auth/register', clientIdMetadataDocumentSupported: true }
-        await expect(resolveClient(metadata, 'https://mcp.example/mcp', request)).resolves.toEqual({ clientId: 'https://app.rerun.build/api/mcp/oauth/client-metadata' })
+        await expect(resolveClient(metadata, 'https://mcp.example/mcp', request)).resolves.toEqual({ clientId: 'https://moldwright.robagentic.tech/api/mcp/oauth/client-metadata' })
     })
 
     it('sends HeyGen its Client ID Metadata Document without registering, since its DCR hands out a shared client', async () => {
         const fetchMock = vi.fn().mockResolvedValue(Response.json({ client_id: 'heygen-shared', client_name: 'HeyGen MCP Default' }, { status: 201 }))
         vi.stubGlobal('fetch', fetchMock)
         const metadata = { ...NO_REGISTRATION, registrationEndpoint: 'https://api2.heygen.com/v1/oauth/register', clientIdMetadataDocumentSupported: true }
-        await expect(resolveClient(metadata, 'https://mcp.heygen.com/mcp/v1/', request)).resolves.toEqual({ clientId: 'https://app.rerun.build/api/mcp/oauth/client-metadata' })
+        await expect(resolveClient(metadata, 'https://mcp.heygen.com/mcp/v1/', request)).resolves.toEqual({ clientId: 'https://moldwright.robagentic.tech/api/mcp/oauth/client-metadata' })
         expect(fetchMock).not.toHaveBeenCalled()
     })
 

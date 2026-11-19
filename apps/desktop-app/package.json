@@ -8,7 +8,7 @@
     "type": "module",
     "author": {
         "name": "Rerun",
-        "email": "help@rerun.build"
+        "email": "help@robagentic.tech"
     },
     "homepage": "https://rerun.build",
     "main": "./out/main/index.js",

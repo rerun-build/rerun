@@ -93,8 +93,8 @@ TrialFinalNotice.PreviewProps = {
   trialEndsLabel: "12 March, 14:00 UTC",
   pausedLabel: "12 March, 16:00 UTC",
   keptUntilLabel: "10 June",
-  billingUrl: "https://app.rerun.build/?billing=1",
-  appUrl: "https://app.rerun.build",
+  billingUrl: "https://moldwright.robagentic.tech/?billing=1",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies TrialFinalNoticeProps;
 
 const meta: React.CSSProperties = {

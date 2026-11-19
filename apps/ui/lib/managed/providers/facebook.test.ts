@@ -37,7 +37,7 @@ afterEach(() => {
 
 describe('facebook provider oauth', () => {
     it('asks Facebook Login for Business for its configuration instead of scopes', () => {
-        const ctx = { verifier: 'v', agentId: 'a', key: 'facebook', provider: 'facebook', serverName: 'facebook', redirectUri: 'https://app.rerun.build/api/oauth/managed/facebook/callback' }
+        const ctx = { verifier: 'v', agentId: 'a', key: 'facebook', provider: 'facebook', serverName: 'facebook', redirectUri: 'https://moldwright.robagentic.tech/api/oauth/managed/facebook/callback' }
         const url = new URL(buildManagedAuthorizeUrl(facebookProvider.oauth, 'app-id', ctx, 'chal', 'st'))
         expect(url.hostname).toBe('www.facebook.com')
         expect(url.searchParams.has('scope')).toBe(false)

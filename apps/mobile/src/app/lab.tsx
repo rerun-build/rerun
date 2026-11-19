@@ -217,7 +217,7 @@ const LAB_WORKSPACES: WorkspaceSummary[] = [
     { id: 3, name: 'Northwind', iconUrl: null, plan: 'solo', subscribed: true, role: 'admin' },
     { id: 4, name: 'Broken logo', iconUrl: 'https://example.invalid/logo.png', plan: 'solo', subscribed: false, role: 'admin' },
 ]
-const hitlProps = (toolCallId: string, input: Record<string, unknown>, kind: 'question' | 'approval' | 'secret' | 'takeover' = 'question', output?: unknown) => ({ pending: { kind, toolCallId, input, output }, agentId: 'agent-scout', coworkerName: 'Scout', webUrl: 'https://app.rerun.build', onAnswer: noop, onDismiss: noop })
+const hitlProps = (toolCallId: string, input: Record<string, unknown>, kind: 'question' | 'approval' | 'secret' | 'takeover' = 'question', output?: unknown) => ({ pending: { kind, toolCallId, input, output }, agentId: 'agent-scout', coworkerName: 'Scout', webUrl: 'https://moldwright.robagentic.tech', onAnswer: noop, onDismiss: noop })
 
 const LAB_VOICE: VoiceSender = {
     upload: () => new Promise(resolve => setTimeout(() => resolve('chat-uploads/lab-voice.m4a'), 1200)),
@@ -530,7 +530,7 @@ export default function Lab() {
                         <ThemeScope key={scheme} scheme={scheme}>
                             <View style={{ gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, backgroundColor: palette[scheme].background, borderWidth: 1, borderColor: palette[scheme].border }}>
                                 <HitlBlock {...hitlProps('lab-1', { ...LAB_QUESTION, v: 9 })} />
-                                <UnknownCallBlock call={{ toolCallId: 'lab-2', toolName: 'request_signature', input: { reason: 'Sign the NDA with Acme before I send the proposal.' } }} coworkerName="Scout" webUrl="https://app.rerun.build" />
+                                <UnknownCallBlock call={{ toolCallId: 'lab-2', toolName: 'request_signature', input: { reason: 'Sign the NDA with Acme before I send the proposal.' } }} coworkerName="Scout" webUrl="https://moldwright.robagentic.tech" />
                             </View>
                         </ThemeScope>
                     ))}

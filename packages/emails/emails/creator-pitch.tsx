@@ -56,9 +56,9 @@ export default function CreatorPitch({
 CreatorPitch.PreviewProps = {
   firstName: "Clément",
   agentName: "Atlas",
-  creatorUrl: "https://app.rerun.build/creator",
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe",
+  creatorUrl: "https://moldwright.robagentic.tech/creator",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe",
 } satisfies CreatorPitchProps;
 
 const cta: React.CSSProperties = {

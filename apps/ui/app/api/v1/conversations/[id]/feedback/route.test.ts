@@ -18,7 +18,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 const conversation = await import('./route')
 const feedback = await import('@/app/api/v1/feedback/[id]/route')
 
-const request = (url: string, method: string, body?: object) => new Request(`https://app.rerun.build${url}`, { method, body: body ? JSON.stringify(body) : undefined })
+const request = (url: string, method: string, body?: object) => new Request(`https://moldwright.robagentic.tech${url}`, { method, body: body ? JSON.stringify(body) : undefined })
 const inConversation = { params: Promise.resolve({ id: 'session-1' }) }
 const onFeedback = { params: Promise.resolve({ id: 'feedback-1' }) }
 

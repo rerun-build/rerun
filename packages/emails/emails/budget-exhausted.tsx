@@ -46,7 +46,7 @@ export default function BudgetExhausted({
 
 BudgetExhausted.PreviewProps = {
   workspaceName: "Acme",
-  appUrl: "https://app.rerun.build",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies BudgetExhaustedProps;
 
 const hint: React.CSSProperties = {

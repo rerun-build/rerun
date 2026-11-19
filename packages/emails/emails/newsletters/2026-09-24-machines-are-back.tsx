@@ -53,8 +53,8 @@ export default function MachinesAreBack({
 }
 
 MachinesAreBack.PreviewProps = {
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe",
 } satisfies NewsletterProps;
 
 const cta: React.CSSProperties = {

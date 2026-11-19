@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **help@rerun.build** with what you found, how to reproduce it, and what an attacker could
+Email **help@robagentic.tech** with what you found, how to reproduce it, and what an attacker could
 do with it. Please do not open a public issue for a vulnerability.
 
 - We answer within **72 hours**.
