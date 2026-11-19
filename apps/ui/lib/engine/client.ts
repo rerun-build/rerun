@@ -464,7 +464,7 @@ export async function getSessionMessages(conn: EngineConnection, agentId: string
     return engineMessagesListSchema.parse(await res.json()).messages
 }
 
-export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[]; goal?: RunGoal; contextSize?: ContextSize }): Promise<Response> {
+export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[]; goal?: RunGoal; contextSize?: ContextSize; copyIndex?: number }): Promise<Response> {
     return fetchEngine(`${conn.baseUrl}/agents/${encodeURIComponent(agentId)}/chat`, {
         method: 'POST',
         headers: buildHeaders(conn),

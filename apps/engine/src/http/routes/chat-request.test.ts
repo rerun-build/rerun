@@ -56,3 +56,18 @@ describe('agentConfigSchema contextSize', () => {
         expect(agentConfigSchema.safeParse({ name: 'a', contextSize: 'huge' }).success).toBe(false)
     })
 })
+
+describe('chatRequestSchema copyIndex', () => {
+    it('accepts a whole number from 1 to 64', () => {
+        for (const copyIndex of [1, 2, 64]) {
+            const parsed = chatRequestSchema.safeParse({ message: 'hi', copyIndex })
+            expect(parsed.success && parsed.data.copyIndex).toBe(copyIndex)
+        }
+    })
+
+    it('refuses 0, 65, 1.5 and a string', () => {
+        for (const bad of [0, 65, 1.5, '2']) {
+            expect(chatRequestSchema.safeParse({ message: 'hi', copyIndex: bad }).success).toBe(false)
+        }
+    })
+})

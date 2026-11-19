@@ -51,7 +51,7 @@ chatRoutes.post('/chat', async c => {
     })
     const response = toResumableStreamResponse(run.id, async writer => {
         try {
-            const agentRun = await runAgent(runAgentView, session.id, body.message, override, writer, run.id, { source: 'chat', author: body.author, userLanguage: claim ? body.userLanguage : undefined, callableAgentIds: body.callableAgentIds, goal: body.goal, contextSize: body.contextSize })
+            const agentRun = await runAgent(runAgentView, session.id, body.message, override, writer, run.id, { source: 'chat', author: body.author, userLanguage: claim ? body.userLanguage : undefined, callableAgentIds: body.callableAgentIds, goal: body.goal, contextSize: body.contextSize, lineage: body.copyIndex === undefined ? undefined : { copyIndex: body.copyIndex } })
             mergeRunStream(writer, agentRun, meta)
         } catch (err) {
             releaseSession(run.id)
