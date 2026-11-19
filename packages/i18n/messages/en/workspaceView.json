@@ -27,7 +27,9 @@
         "checkins.unavailable": "The server the workspace runs on has check-ins switched off by its operator.",
         "checkins.switchedOff": "Tooltip of the disabled Check in now button while check-ins are off.",
         "checkins.recent": "Heading of the timeline of its past check-ins, on the Check-ins screen of the Chief of Staff's card.",
-        "checkins.reasons.pulse": "A line in the list of past check-ins: the daily one found nothing worth saying."
+        "checkins.reasons.pulse": "A line in the list of past check-ins: the daily one found nothing worth saying.",
+        "checkins.running": "A line in the list of check-ins: this one is under way right now.",
+        "checkins.stopped": "A line in the list of past check-ins: someone stopped this one before it finished."
     },
     "switch": {
         "label": "View",
@@ -97,6 +99,8 @@
             "promise": "Came back as promised, nothing new",
             "manual": "Checked in, nothing to say"
         },
-        "failed": "Check-in did not finish"
+        "failed": "Check-in did not finish",
+        "running": "Checking in",
+        "stopped": "Check-in stopped"
     }
 }

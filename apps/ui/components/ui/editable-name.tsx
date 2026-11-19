@@ -29,7 +29,11 @@ export function EditableName({ name, onRename, label, maxLength, allowEmpty = fa
                 onBlur={commit}
                 onKeyDown={e => {
                     if (e.key === 'Enter') commit()
-                    if (e.key === 'Escape') setDraft(null)
+                    if (e.key === 'Escape') {
+                        // Giving up on the name is all Escape means here: it must not also close what the name sits in.
+                        e.stopPropagation()
+                        setDraft(null)
+                    }
                 }}
                 className="h-7 text-sm"
             />

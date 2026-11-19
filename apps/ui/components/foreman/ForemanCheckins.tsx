@@ -24,6 +24,8 @@ type CheckinsControls = {
     runNow: () => void
 }
 
+const UNDER_WAY_POLL_MS = 5_000
+
 // What the card reads of its check-ins: undefined while loading, null on a box that has none. They
 // run on the model picked in its composer, so nothing is pinned here.
 function useForemanCheckins(active: boolean): CheckinsControls {
@@ -32,20 +34,31 @@ function useForemanCheckins(active: boolean): CheckinsControls {
     const [checkins, setCheckins] = useState<Checkins | null | undefined>(undefined)
     const [running, setRunning] = useState(false)
 
+    // A reload that fails keeps what is on screen: only a first load says there is nothing to show.
     const reload = useCallback(() => {
-        void loadForemanCheckinsAction().then(setCheckins)
+        void loadForemanCheckinsAction().then(next => setCheckins(current => next ?? current ?? null))
     }, [])
 
     useEffect(() => {
         if (active) reload()
     }, [active, reload])
 
+    const underWay = active && !!checkins?.checkins.some(checkin => checkin.status === 'running')
+    useEffect(() => {
+        if (!underWay) return
+        const timer = setInterval(reload, UNDER_WAY_POLL_MS)
+        return () => clearInterval(timer)
+    }, [underWay, reload])
+
     const setEnabled = async (enabled: boolean) => {
         if (!checkins) return
         const proactive = { enabled, connectionId: null, model: null }
         setCheckins({ ...checkins, proactive })
         const result = await updateForemanCheckinsAction(proactive)
-        if (!result.ok) toast.error(errorText(result))
+        if (!result.ok) {
+            toast.error(errorText(result))
+            setCheckins(checkins)
+        }
         reload()
     }
     const runNow = async () => {
@@ -85,6 +98,10 @@ export function ForemanCheckinsRowView({ checkins, onOpen, now }: { checkins: Ch
 export function ForemanCheckinsScreen({ name, avatar, onBack, onClose }: { name: string; avatar: ReactNode; onBack: () => void; onClose: () => void }) {
     const t = useTranslations('workspaceView.checkins')
     const { checkins, running, setEnabled, runNow } = useForemanCheckins(true)
+    // Nothing to show on this box, or none to reach: back to the card, where the row is gone too.
+    useEffect(() => {
+        if (checkins === null) onBack()
+    }, [checkins, onBack])
     return (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             <AgentViewHeader name={name} avatar={avatar} title={t('title')} onBack={onBack} onClose={onClose} />
@@ -163,16 +180,18 @@ function CheckinTimeline({ checkins, now }: { checkins: CheckinEntry[]; now?: Da
         <ol>
             {checkins.map((checkin, index) => {
                 const spoke = !!checkin.announcedAt
+                const underWay = checkin.status === 'running'
                 const failed = !spoke && checkin.status === 'error'
+                const quiet = underWay ? t('running') : failed ? t('failed') : checkin.status === 'cancelled' ? t('stopped') : t(`reasons.${checkin.reason}`)
                 return (
                     <li key={checkin.runId} className="relative flex gap-3 pb-4 last:pb-0">
                         {index < checkins.length - 1 && <span aria-hidden className="absolute top-4 bottom-0 left-[4.5px] w-px bg-border" />}
                         <span aria-hidden className="flex h-5 w-2.5 shrink-0 items-center justify-center">
-                            <span className={cn('rounded-full', spoke ? 'size-2.5 bg-brand ring-4 ring-brand/15' : failed ? 'size-2 bg-destructive' : 'size-2 border border-muted-foreground/50 bg-background')} />
+                            <span className={cn('rounded-full', spoke ? 'size-2.5 bg-brand ring-4 ring-brand/15' : underWay ? 'size-2 bg-brand motion-safe:animate-pulse' : failed ? 'size-2 bg-destructive' : 'size-2 border border-muted-foreground/50 bg-background')} />
                         </span>
                         <div className="min-w-0 flex-1">
                             <div className="flex items-baseline gap-2">
-                                <span className={cn('min-w-0 flex-1 truncate text-sm leading-5', !spoke && 'text-muted-foreground')}>{spoke ? checkin.title : failed ? t('failed') : t(`reasons.${checkin.reason}`)}</span>
+                                <span className={cn('min-w-0 flex-1 truncate text-sm leading-5', !spoke && 'text-muted-foreground')}>{spoke ? checkin.title : quiet}</span>
                                 <span className="shrink-0 text-xs text-muted-foreground">{shortRelativeTime(checkin.startedAt, locale, now)}</span>
                             </div>
                             {spoke && checkin.note && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{checkin.note}</p>}

@@ -67,6 +67,8 @@
             "promise": "Voltou como prometido, nada de novo",
             "manual": "Check-in feito, nada a dizer"
         },
-        "failed": "O check-in não terminou"
+        "failed": "O check-in não terminou",
+        "running": "Check-in em andamento",
+        "stopped": "Check-in interrompido"
     }
 }

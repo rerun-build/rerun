@@ -67,6 +67,8 @@
             "promise": "Söz verdiği gibi döndü, yeni bir şey yok",
             "manual": "Check-in yapıldı, söylenecek bir şey yok"
         },
-        "failed": "Check-in tamamlanmadı"
+        "failed": "Check-in tamamlanmadı",
+        "running": "Check-in sürüyor",
+        "stopped": "Check-in durduruldu"
     }
 }

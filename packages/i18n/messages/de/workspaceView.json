@@ -67,6 +67,8 @@
             "promise": "Wie versprochen zurück, nichts Neues",
             "manual": "Eingecheckt, nichts zu melden"
         },
-        "failed": "Check-in nicht abgeschlossen"
+        "failed": "Check-in nicht abgeschlossen",
+        "running": "Check-in läuft",
+        "stopped": "Check-in gestoppt"
     }
 }
