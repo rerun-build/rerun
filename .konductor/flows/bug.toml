@@ -82,6 +82,8 @@ title = "Close the card"
 chat = "summary"
 linear_comment = true
 prompt = """
+Demande-moi (AskUserQuestion) si on ajoute ou met à jour la carte dans la base Notion « Launchs », pour que Theo communique dessus.
+
 La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done avec le MCP Linear si elle n'y est pas déjà,
 puis écris sa mise à jour finale, postée telle quelle sur la carte : la PR mergée, la cause du bug, ce qui a été
 corrigé et comment c'est prouvé. Court, en français, sans clé, token ni contenu privé du client.
