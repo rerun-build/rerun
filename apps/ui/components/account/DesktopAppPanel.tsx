@@ -86,6 +86,11 @@ export function DesktopAppPanel() {
                             />
                         </Field>
                     )}
+                    {settings.coworkerDock !== undefined && (
+                        <Field orientation="row" label={t('coworkerDock')} helperText={t('coworkerDockHint')} htmlFor="desktop-coworker-dock">
+                            <Switch id="desktop-coworker-dock" checked={settings.coworkerDock} onCheckedChange={(coworkerDock) => void change({ coworkerDock })} />
+                        </Field>
+                    )}
                     {shell.platform !== 'mac' && (
                         <Field orientation="row" label={t('closeToTray')} helperText={t('closeToTrayHint')} htmlFor="desktop-close-to-tray">
                             <Switch id="desktop-close-to-tray" checked={settings.closeToTray} onCheckedChange={(closeToTray) => void change({ closeToTray })} />

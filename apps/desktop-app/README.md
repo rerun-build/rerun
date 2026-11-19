@@ -96,6 +96,15 @@ follows the server the window shows, not only the configured one.
   and a second press sends instead of putting the window away. A window the shell puts away while it
   listens stops listening and sends nothing (`quickAsk.onHidden`). The text goes to the main window through the origin's localStorage, never a
   URL a link could forge, and the main window asks it in a new conversation.
+- The coworker dock (`coworker-dock.ts`, capability `coworkerDock`): a transparent window as tall as
+  the screen, glued to an edge (`/coworker-dock`), on top of every app and every desktop. The page
+  draws the rail; outside it the clicks go through (`setIgnoreMouseEvents` with forwarding, a pointer
+  poll on Linux). The main window publishes the coworkers and their counts (`coworkerDock.publish`),
+  so the dock follows its workspace and its badge; a click on a buddy or on "+" goes back to it. A
+  workspace without coworkers publishes nothing, and "+" carries the reason it is disabled
+  (`createBlockedReason`). A full navigation of the main window that publishes nothing again within
+  10 s (the offline page, sign-in) hides the dock. The edge, the height, the display and the folded
+  state live in `settings.json`.
 - New Window (⌘⇧N): another window of the same session; each keeps its own workspace (the web
   holds it per tab).
 - Menus and tray in the language the person reads Rerun in (`locale.set`), a right-click menu
@@ -128,6 +137,7 @@ pnpm verify:desktop --scenario apps/desktop-app/e2e/links.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/native.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/open-links.mjs
 pnpm verify:desktop --onboarded --engine --scenario apps/desktop-app/e2e/quick-ask.mjs
+pnpm verify:desktop --onboarded --engine --scenario apps/desktop-app/e2e/coworker-dock.mjs
 pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/self-hosted.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/launch.mjs
 pnpm verify:desktop --packaged --scenario apps/desktop-app/e2e/shell.mjs # the packaged app, fuses on

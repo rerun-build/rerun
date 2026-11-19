@@ -66,7 +66,9 @@
             "taken": "{keys} é usado por outro app"
         },
         "quickAskVoice": "Pergunta rápida por voz",
-        "quickAskVoiceOn": "Fale com o seu Chief of Staff a partir de qualquer app."
+        "quickAskVoiceOn": "Fale com o seu Chief of Staff a partir de qualquer app.",
+        "coworkerDock": "Dock de coworkers",
+        "coworkerDockHint": "Seus coworkers na borda da tela, acima de todos os apps."
     },
     "openInApp": {
         "title": "Abrir esta página no {app}?",

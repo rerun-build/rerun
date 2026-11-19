@@ -28,7 +28,8 @@
         "quickAsk.micDeniedBody": "The computer does not let Rerun use the microphone. A button next to it opens the system settings.",
         "quickAsk.toggleHint": "Shown while the Quick ask window records the person's voice after the voice keyboard shortcut was pressed.",
         "coworkerDock.move": "Accessible name of the grip at the top of the coworker dock, a small bar of coworker avatars on the edge of the screen: drag it to move the bar.",
-        "coworkerDock.show": "Accessible name of the folded coworker dock, a small tab on the edge of the screen: a click unfolds it."
+        "coworkerDock.show": "Accessible name of the folded coworker dock, a small tab on the edge of the screen: a click unfolds it.",
+        "settings.coworkerDock": "Setting of the desktop app: a small bar of the person's AI coworkers on the edge of the screen, above every other app."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -97,7 +98,9 @@
             "taken": "{keys} is used by another app"
         },
         "quickAskVoice": "Voice quick ask",
-        "quickAskVoiceOn": "Talk to your Chief of Staff from any app."
+        "quickAskVoiceOn": "Talk to your Chief of Staff from any app.",
+        "coworkerDock": "Coworker dock",
+        "coworkerDockHint": "Your coworkers on the edge of the screen, above every app."
     },
     "openInApp": {
         "title": "Open this page in {app}?",

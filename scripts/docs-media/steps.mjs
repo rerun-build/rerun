@@ -46,7 +46,7 @@ export async function asDesktopApp(page, { remote } = {}) {
     await page.addInitScript((remote) => {
         const noop = () => {}
         const unsubscribe = () => noop
-        let settings = { openAtLogin: true, closeToTray: true, quickAsk: true, quickAskShortcut: 'Shift+Command+Space', quickAskVoiceShortcut: 'Alt+Shift+Space' }
+        let settings = { openAtLogin: true, closeToTray: true, quickAsk: true, quickAskShortcut: 'Shift+Command+Space', quickAskVoiceShortcut: 'Alt+Shift+Space', coworkerDock: true }
         const remoteState = remote && { links: remote.links, paused: false, workDir: remote.workDir, secureStorage: true, runningJobs: 0, machine: remote.machine }
         window.rerunShell = {
             apiVersion: 1,

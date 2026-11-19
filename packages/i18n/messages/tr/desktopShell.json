@@ -66,7 +66,9 @@
             "taken": "{keys} başka bir uygulama tarafından kullanılıyor"
         },
         "quickAskVoice": "Sesli hızlı soru",
-        "quickAskVoiceOn": "Herhangi bir uygulamadan Chief of Staff'ınızla konuşun."
+        "quickAskVoiceOn": "Herhangi bir uygulamadan Chief of Staff'ınızla konuşun.",
+        "coworkerDock": "Coworker dock'u",
+        "coworkerDockHint": "Coworker'larınız ekranın kenarında, tüm uygulamaların üstünde."
     },
     "openInApp": {
         "title": "Bu sayfa {app} uygulamasında açılsın mı?",
