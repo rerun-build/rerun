@@ -19,6 +19,8 @@ const CrewActivity = (props: CrewWidgetProps, environment: LiveActivityEnvironme
 
     const face = (uri: string | undefined, size: number) => (uri ? <Image uiImage={uri} modifiers={[resizable(), frame({ width: size, height: size })]} /> : <Spacer modifiers={[frame({ width: size, height: size })]} />)
     const clock = (since: string | null | undefined, size: number) => (since ? <Text date={new Date(since)} dateStyle="timer" modifiers={[font({ size, weight: 'semibold' }), monospacedDigit(), foregroundStyle(dim ? '#ffffff' : TINT), frame({ maxWidth: 80, alignment: 'trailing' })]} /> : <Text> </Text>)
+    // A coworker stopped on an error runs no clock: it says so, as its tile does.
+    const standing = (size: number) => (focus?.state === 'error' ? <Text modifiers={[font({ size, weight: 'semibold' }), foregroundStyle(GREY)]}>{focus.badge}</Text> : clock(focus?.since, size))
     const title = focus ? (asking ? props.asksLine : focus.name) : props.headline
     const subtitle = focus ? `${focus.line}${props.othersLine ? ` · ${props.othersLine}` : ''}` : ''
 
@@ -44,7 +46,7 @@ const CrewActivity = (props: CrewWidgetProps, environment: LiveActivityEnvironme
                         <Text modifiers={[font({ size: 13 }), lineLimit(1), foregroundStyle(GREY)]}>{subtitle}</Text>
                     </VStack>
                     <Spacer />
-                    {asking ? null : clock(focus?.since, 22)}
+                    {asking ? null : standing(22)}
                 </HStack>
                 {props.members.length > 1 ? tiles : null}
             </VStack>
@@ -55,10 +57,10 @@ const CrewActivity = (props: CrewWidgetProps, environment: LiveActivityEnvironme
                 {busy > 1 ? <Text modifiers={[font({ size: 14, weight: 'semibold' }), monospacedDigit()]}>{String(busy)}</Text> : null}
             </HStack>
         ),
-        compactTrailing: asking ? <Text modifiers={[font({ size: 14, weight: 'semibold' }), foregroundStyle(TINT)]}>{focus.badge}</Text> : clock(focus?.since, 14),
+        compactTrailing: asking ? <Text modifiers={[font({ size: 14, weight: 'semibold' }), foregroundStyle(TINT)]}>{focus.badge}</Text> : standing(14),
         minimal: face(focus?.face, 22),
         expandedLeading: face(focus?.face, 40),
-        expandedTrailing: asking ? <Text modifiers={[font({ size: 16, weight: 'semibold' }), foregroundStyle(TINT)]}>{props.needsYouLabel}</Text> : clock(focus?.since, 22),
+        expandedTrailing: asking ? <Text modifiers={[font({ size: 16, weight: 'semibold' }), foregroundStyle(TINT)]}>{props.needsYouLabel}</Text> : standing(22),
         expandedCenter: (
             <VStack alignment="leading" spacing={2}>
                 <Text modifiers={[font({ size: 16, weight: 'semibold' }), lineLimit(1)]}>{title}</Text>
