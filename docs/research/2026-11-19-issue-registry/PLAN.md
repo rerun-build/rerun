@@ -90,6 +90,7 @@ The name `returned` is already a build-job end state, so the handover statuses u
    - an older duplicate gap issue is closed in favour of the newest, after one dry-run digest that lists what it would close.
 
    The lost-plan re-send already exists (`planning.lost`).
+   - Shipped first (2026-11-19): a parent that acceptance left (no ACCEPTED or GAPS line after its asks) gets one fresh round 6 h after it was left (`acceptance.REVIVE_S`, `left_at`, `revived` in `accept:N`), logged; left again, it stays left and the registry keeps it in `stuck` as `refused`. Records left before `left_at` existed (#112, #84, #76) are revived at once.
 4. **`step:*` labels.** Exactly one per issue, set only by the factory, edited only when the step changes, with a cap per beat. The first run labels every open issue, so it spreads over beats. Before this slice, check what a label edit wakes in `repo_events.py`, so label churn wakes no coworker. Hand-set labels stay intent only: P level, `tokens`, `factory-paused`, `factory-replan`.
 5. **Factory room view** (app; needs the owner's deploy): the registry as a table per step with the handover column. Later.
 
