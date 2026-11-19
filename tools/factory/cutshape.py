@@ -10,6 +10,7 @@ _REFACTOR = re.compile(r"^\s*\*\*Refactor(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _FILES = re.compile(r"^\s*\*\*Files\*\*")
 _BULLET = re.compile(r"^\s*[-*+]\s+(.*)$")
 _TICK = re.compile(r"`([^`]*)`")
+_LEAD_TICK = re.compile(r"\s*`([^`]*)`")
 _NUM = re.compile(r"#(\d+)")
 _PLAN = re.compile(r"^PLAN READY\b(.*)$")
 _DEV = re.compile(r"\bdev ([0-9a-f]{7,40})\b", re.I)
@@ -128,10 +129,15 @@ def parse(issue):
             b = _BULLET.match(l)
             if not b:
                 continue
-            ticks = _TICK.findall(b.group(1))
-            if len(ticks) != 1:
-                errors.append("files: bullet needs exactly one path in backticks: %s" % l.strip())
-            elif _bad_path(ticks[0].strip()):
+            lead = _LEAD_TICK.match(b.group(1))
+            if lead:
+                ticks = [lead.group(1)]
+            else:
+                ticks = _TICK.findall(b.group(1))
+                if len(ticks) != 1:
+                    errors.append("files: bullet needs exactly one path in backticks: %s" % l.strip())
+                    continue
+            if _bad_path(ticks[0].strip()):
                 errors.append("files: unreadable path '%s'" % ticks[0])
             else:
                 paths.append(ticks[0].strip())
@@ -143,11 +149,12 @@ def parse(issue):
     if len(tl) > 1:
         errors.append("test file: more than one Test file line")
     elif tl:
-        t = _TICK.findall(tl[0])
-        if len(t) != 1:
+        lead = _LEAD_TICK.match(tl[0])
+        ticks = [lead.group(1)] if lead else _TICK.findall(tl[0])
+        if len(ticks) != 1:
             errors.append("test file: needs exactly one path in backticks on the line")
         else:
-            test = t[0].strip()
+            test = ticks[0].strip()
             if test not in paths:
                 errors.append("test file: '%s' is not one of the Files paths" % test)
 
