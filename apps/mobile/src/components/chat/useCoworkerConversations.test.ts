@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react-native'
 import { AppState, type AppStateStatus } from 'react-native'
 
 import { clearLocalCache } from '@/data/local-cache'
+import { BURST_MS } from '@/data/useLiveReload'
 import { realtime } from '@/test/realtime'
 
 import { useCoworkerConversations, useForemanConversations } from './useCoworkerConversations'
@@ -24,6 +25,7 @@ let appStateListeners: ((state: AppStateStatus) => void)[] = []
 
 describe('useCoworkerConversations', () => {
     beforeEach(() => {
+        jest.useFakeTimers()
         clearLocalCache()
         realtime.reset()
         mockFetchConversations.mockReset()
@@ -33,6 +35,7 @@ describe('useCoworkerConversations', () => {
             return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>
         })
     })
+    afterEach(() => jest.useRealTimers())
 
     it('follows the conversations of the coworker live', async () => {
         mockFetchConversations.mockResolvedValueOnce([general]).mockResolvedValue([general, startedOnTheWeb])
@@ -41,8 +44,37 @@ describe('useCoworkerConversations', () => {
         expect(realtime.live().flatMap(channel => channel.bindings)).toContainEqual(expect.objectContaining({ table: 'sessions', filter: 'agent_id=eq.a1' }))
 
         await act(async () => realtime.change('sessions'))
+        await act(async () => jest.advanceTimersByTime(BURST_MS))
 
         expect(result.current.conversations.map(c => c.id)).toEqual(['from-the-web', 'general'])
+    })
+
+    it('reads once for the burst of writes a run makes, and reads the first time at once', async () => {
+        mockFetchConversations.mockResolvedValue([general])
+        await renderHook(() => useCoworkerConversations('a1'))
+        await act(async () => {})
+        expect(mockFetchConversations).toHaveBeenCalledTimes(1)
+
+        // A run starting: its status, its preview, its engine session id, its title.
+        await act(async () => {
+            for (let i = 0; i < 4; i++) {
+                realtime.change('sessions')
+                jest.advanceTimersByTime(100)
+            }
+        })
+        expect(mockFetchConversations).toHaveBeenCalledTimes(1)
+        await act(async () => jest.advanceTimersByTime(BURST_MS))
+        expect(mockFetchConversations).toHaveBeenCalledTimes(2)
+    })
+
+    it('drops a read still waiting when the screen goes away', async () => {
+        mockFetchConversations.mockResolvedValue([general])
+        const { unmount } = await renderHook(() => useCoworkerConversations('a1'))
+        await act(async () => {})
+        await act(async () => realtime.change('sessions'))
+        await act(async () => unmount())
+        await act(async () => jest.advanceTimersByTime(BURST_MS * 2))
+        expect(mockFetchConversations).toHaveBeenCalledTimes(1)
     })
 
     // RER-7: iOS holds the app while the web starts the chat, the INSERT and the UPDATE go by unheard,
@@ -55,6 +87,7 @@ describe('useCoworkerConversations', () => {
 
         await act(async () => appStateListeners.forEach(listener => listener('background')))
         await act(async () => appStateListeners.forEach(listener => listener('active')))
+        await act(async () => jest.advanceTimersByTime(BURST_MS))
 
         expect(result.current.conversations).toContainEqual(expect.objectContaining({ id: 'from-the-web', status: 'working' }))
     })
@@ -66,6 +99,7 @@ describe('useCoworkerConversations', () => {
         expect(realtime.live().flatMap(channel => channel.bindings)).toContainEqual(expect.objectContaining({ table: 'foreman_conversations', filter: 'user_id=eq.u1' }))
 
         await act(async () => realtime.change('foreman_conversations'))
+        await act(async () => jest.advanceTimersByTime(BURST_MS))
 
         expect(result.current.conversations.map(c => c.id)).toEqual(['from-the-web', 'general'])
     })

@@ -5,7 +5,7 @@ import { fetchAgentConversations } from '@/api/chat'
 import { fetchForemanConversations } from '@/api/foreman'
 import { useAuth } from '@/auth/AuthProvider'
 import { readCoworkerScreen, saveCoworkerScreen } from '@/data/local-cache'
-import { useLiveReload } from '@/data/useLiveReload'
+import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
 type LiveConversations = { conversations: Conversation[]; loaded: boolean; reload: () => void }
 
@@ -46,6 +46,8 @@ function useLiveConversations(agentId: string): LiveConversations {
     }, [accessToken, workspaceId, agentId, foreman])
 
     useEffect(reload, [reload])
+    // A run writes its row several times in a row (its status, then its preview, its title): one read for the burst.
+    const reloadSoon = useBurstReload(reload)
 
     // The status moves on the hub while the page is open (a run ends on a question, another one starts
     // on a schedule): the header's menu sorts them by state, so every row of the coworker is followed live.
@@ -57,7 +59,7 @@ function useLiveConversations(agentId: string): LiveConversations {
             const rows = foreman ? ({ schema: 'public', table: 'foreman_conversations', filter: `user_id=eq.${userId}` } as const) : ({ schema: 'public', table: 'sessions', filter: `agent_id=eq.${agentId}` } as const)
             channel.on('postgres_changes', { event: 'INSERT', ...rows }, changed).on('postgres_changes', { event: 'UPDATE', ...rows }, changed)
         },
-        reload
+        reloadSoon
     )
 
     return { conversations, loaded, reload }

@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react-native'
 
 import type { BoardRead } from '@/api/board'
 import { cachedBoard, clearLocalCache } from '@/data/local-cache'
+import { BURST_MS } from '@/data/useLiveReload'
 import { realtime } from '@/test/realtime'
 
 import { useBoard } from './useBoard'
@@ -16,9 +17,6 @@ jest.mock('@/auth/supabase', () => ({ supabase: require('@/test/realtime').fakeS
 
 const agent = (id: string, name: string, status: BoardAgent['status'] = 'idle'): BoardAgent => ({ id, name, handle: null, description: null, templateId: null, status, workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null })
 const boardWith = (...agents: BoardAgent[]): BoardRead => ({ agents, overview: [], boxes: [] })
-
-// Several rows move at once when a run starts: the home reads once for the burst.
-const BURST_MS = 400
 
 describe('useBoard', () => {
     beforeEach(() => {

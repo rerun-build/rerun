@@ -1,19 +1,16 @@
 import type { Box } from '@rerun/contracts'
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 
 import { fetchBoard, type BoardRead } from '@/api/board'
 import { useAuth } from '@/auth/AuthProvider'
 import { toHomeCoworkers, type HomeCoworker } from '@/components/home/board'
 import { cachedBoard } from '@/data/local-cache'
-import { useLiveReload } from '@/data/useLiveReload'
+import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
 // `fresh`: read from the hub since the screen opened, not the copy the phone kept from the last visit.
 type Board = { state: 'loading' } | { state: 'error' } | { state: 'ready'; coworkers: HomeCoworker[]; boxes: Box[]; fresh: boolean }
 
 const boardOf = ({ agents, overview, boxes }: BoardRead, fresh: boolean): Board => ({ state: 'ready', coworkers: toHomeCoworkers(agents, overview), boxes, fresh })
-
-// Several rows change at once when a run moves (its session, then its agent): one read for the burst.
-const BURST_MS = 400
 
 // The coworkers of the active workspace with their latest conversation, read again whenever an agent
 // or a session changes in Realtime, and when the app comes back to the foreground, where Realtime
@@ -26,13 +23,9 @@ export function useBoard(): Board & { reload: () => void } {
     // Tied to the workspace it was read for, so a switch never shows the rows of the one left.
     const [read, setRead] = useState<{ workspaceId: number; board: Board } | null>(null)
     const [version, setVersion] = useState(0)
-    const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const reload = useCallback(() => setVersion(current => current + 1), [])
-    const reloadSoon = useCallback(() => {
-        if (timer.current) clearTimeout(timer.current)
-        timer.current = setTimeout(reload, BURST_MS)
-    }, [reload])
+    const reloadSoon = useBurstReload(reload)
 
     useEffect(() => {
         if (!accessToken || !workspaceId) return
@@ -69,12 +62,6 @@ export function useBoard(): Board & { reload: () => void } {
             if (userId) channel.on('postgres_changes', { event: '*', schema: 'public', table: 'space_members', filter: `user_id=eq.${userId}` }, changed)
         },
         reloadSoon
-    )
-    useEffect(
-        () => () => {
-            if (timer.current) clearTimeout(timer.current)
-        },
-        []
     )
 
     // A workspace already read opens on its rows, the hub's copy replaces them when it lands.

@@ -1,10 +1,41 @@
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { useEffect, useEffectEvent } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef } from 'react'
 import { AppState } from 'react-native'
 
 import { supabase } from '@/auth/supabase'
 
 const MAX_RETRY_MS = 15_000
+
+// Several rows change at once when a run moves (its session, then its agent or its notification).
+export const BURST_MS = 400
+
+/**
+ * `reload` once for a burst of changes, BURST_MS after the last one. A read still waiting when the
+ * screen goes away is dropped.
+ */
+export function useBurstReload(reload: () => void): () => void {
+    const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const latestReload = useRef(reload)
+
+    useEffect(() => {
+        latestReload.current = reload
+    }, [reload])
+
+    useEffect(
+        () => () => {
+            if (timer.current) clearTimeout(timer.current)
+        },
+        []
+    )
+
+    return useCallback(() => {
+        if (timer.current) clearTimeout(timer.current)
+        timer.current = setTimeout(() => {
+            timer.current = null
+            latestReload.current()
+        }, BURST_MS)
+    }, [])
+}
 
 /**
  * Keeps a screen's rows in step with the hub through Realtime, and reads them again whenever a
