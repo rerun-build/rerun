@@ -1,4 +1,5 @@
 import os, sys, tempfile, unittest
+from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import digest
 import limits
@@ -63,6 +64,27 @@ class DigestPlanners(unittest.TestCase):
         rows = digest.build(st, {}, now)["planners"]
         self.assertEqual(len(rows), 1)
         self.assertEqual((rows[0]["planner"], rows[0]["cut"], rows[0]["merged"], rows[0]["firstPass"]), ("IKE", 1, 1, 1))
+
+    def test_only_jobs_first_seen_in_the_window_are_read(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        st = ledger_store.Store(os.path.join(tmp.name, "l.db"))
+        self.addCleanup(st.db.close)
+        now = limits.ts("2026-11-15T12:00:00Z")
+        st.intent("plan:9", "", "plan", coworker="IKE", at="2026-11-15T08:00:00Z")
+        body = "**Part of**: #9\n**Depends on**: none\n"
+        with st.db:
+            st.db.execute("INSERT INTO transitions(job, at, from_state, to_state, reason) VALUES ('62', '2026-11-01T09:00:00Z', 'queued', 'queued', 'r')")
+        st.put_job("50", "queued", {"issue": 50, "title": "T", "body": body}, "r", at="2026-11-01T09:00:00Z")
+        st.put_job("50", "merged", {"issue": 50, "title": "T", "body": body}, "r", at="2026-11-01T10:00:00Z")
+        for n in (61, 62):
+            data = {"issue": n, "title": "T", "body": body}
+            st.put_job(str(n), "queued", data, "r", at="2026-11-15T09:00:00Z")
+            st.put_job(str(n), "merged", data, "r", at="2026-11-15T10:00:00Z")
+        with mock.patch.object(st, "transitions_of", wraps=st.transitions_of) as spy:
+            rows = digest.planners(st, now)
+        self.assertEqual({c.args[0] for c in spy.call_args_list}, {"61", "62"})
+        self.assertEqual([(r["planner"], r["cut"], r["merged"], r["firstPass"]) for r in rows], [("IKE", 2, 2, 2)])
 
 
 if __name__ == "__main__":
