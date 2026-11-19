@@ -37,13 +37,26 @@ class CodeQStatus(unittest.TestCase):
         t = time.time() - age
         os.utime(path, (t, t))
 
-    def status(self, servers):
+    def status_run(self, servers, key_file):
         cfg = os.path.join(self.tmp, "cfg.json")
         with open(cfg, "w") as f:
-            json.dump({"servers": servers, "checkouts": self.checkouts, "keyFile": self.key}, f)
+            json.dump({"servers": servers, "checkouts": self.checkouts, "keyFile": key_file}, f)
         env = dict(os.environ, CODE_Q_CONFIG=cfg)
-        p = subprocess.run(["node", CODE_Q, "--status"], env=env, capture_output=True, text=True, timeout=60)
+        return subprocess.run(["node", CODE_Q, "--status"], env=env, capture_output=True, text=True, timeout=60)
+
+    def status(self, servers):
+        p = self.status_run(servers, self.key)
         return p.returncode, p.stdout.splitlines()
+
+    def test_unreadable_key_is_one_line(self):
+        for key_file in (os.path.join(self.tmp, "missing"), self.tmp):
+            with self.subTest(key_file=key_file):
+                s = self.stub([text(READY)])
+                p = self.status_run({"alpha": s.url}, key_file)
+                self.assertEqual(p.stderr.splitlines(), ["code-q: cannot read the key file %s" % key_file])
+                self.assertEqual(p.stdout, "")
+                self.assertEqual(p.returncode, 1)
+                self.assertEqual(s.requests, [])
 
     def test_ready_line_with_files_and_fetch_age(self):
         s = self.stub([text(READY)])
