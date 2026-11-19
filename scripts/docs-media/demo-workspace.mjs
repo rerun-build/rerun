@@ -277,6 +277,82 @@ async function seedComputer({ admin, workspaceId, userId, dataDir }) {
     writeFileSync(join(dir, 'computers.json'), `${JSON.stringify({ computers: [computer] }, null, 4)}\n`, { mode: 0o600 })
 }
 
+// Templates the library lists, as the Rerun team would have published them. Their slugs are the
+// demo's own, so a run clears and writes them again without touching any other template.
+const TEMPLATES = [
+    {
+        slug: 'docs-demo-agency-growth',
+        title: 'Agency growth team',
+        tagline: 'Find funded companies, qualify them and book the intro calls.',
+        long_description: 'Three coworkers that keep an agency pipeline full. **Lead Scout** finds companies that just raised, **Qualifier** checks each one against your ideal customer, and **Booker** writes the intro email and books the call once you approve it.',
+        category: 'agencies',
+        tags: ['sales', 'prospecting'],
+        setup_minutes: 10,
+        featured: true,
+        agents: [
+            { key: 'lead-scout', name: 'Lead Scout', role: 'Prospecting', description: 'Finds funded companies that need a new site.', connectorSlugs: ['hubspot'], setupRequired: true },
+            { key: 'qualifier', name: 'Qualifier', role: 'Qualification', description: 'Checks each lead against your ideal customer.', connectorSlugs: ['hubspot'], setupRequired: false },
+            { key: 'booker', name: 'Booker', role: 'Outreach', description: 'Writes the intro email and books the call.', connectorSlugs: ['gmail', 'google-calendar'], setupRequired: true },
+        ],
+        connectors: [
+            { slug: 'hubspot', name: 'HubSpot', icon: '/services/hubspot.svg' },
+            { slug: 'gmail', name: 'Gmail', icon: '/services/gmail.svg' },
+            { slug: 'google-calendar', name: 'Google Calendar', icon: '/services/google-calendar.svg' },
+        ],
+    },
+    {
+        slug: 'docs-demo-finance-desk',
+        title: 'Finance desk',
+        tagline: 'Chase unpaid invoices and keep the books current.',
+        long_description: '**Invoice Chaser** follows up on every invoice past its due date, in your voice, and **Bookkeeper** matches each Stripe payment to its invoice.',
+        category: 'saas',
+        tags: ['finance'],
+        setup_minutes: 5,
+        featured: false,
+        agents: [
+            { key: 'invoice-chaser', name: 'Invoice Chaser', role: 'Collections', description: 'Follows up on unpaid invoices.', connectorSlugs: ['stripe', 'gmail'], setupRequired: true },
+            { key: 'bookkeeper', name: 'Bookkeeper', role: 'Accounting', description: 'Matches payments to invoices.', connectorSlugs: ['stripe'], setupRequired: false },
+        ],
+        connectors: [
+            { slug: 'stripe', name: 'Stripe', icon: '/services/stripe.svg' },
+            { slug: 'gmail', name: 'Gmail', icon: '/services/gmail.svg' },
+        ],
+    },
+    {
+        slug: 'docs-demo-support-inbox',
+        title: 'Support inbox',
+        tagline: 'Answer the easy emails, flag the rest in Slack.',
+        long_description: '**Inbox Triage** reads the support inbox every morning, answers what it can from your Brain and posts the rest in a Slack channel.',
+        category: 'productivity',
+        tags: ['support'],
+        setup_minutes: 5,
+        featured: false,
+        agents: [{ key: 'inbox-triage', name: 'Inbox Triage', role: 'Support', description: 'Sorts the support inbox.', connectorSlugs: ['gmail', 'slack'], setupRequired: true }],
+        connectors: [
+            { slug: 'gmail', name: 'Gmail', icon: '/services/gmail.svg' },
+            { slug: 'slack', name: 'Slack', icon: '/services/slack.png' },
+        ],
+    },
+]
+
+async function seedTemplates(admin) {
+    await check(admin.from('templates').delete().in('slug', TEMPLATES.map((template) => template.slug)), 'clear the demo templates')
+    await check(
+        admin.from('templates').insert(
+            TEMPLATES.map((template, index) => ({
+                ...template,
+                gallery: [],
+                status: 'published',
+                show_in_library: true,
+                pricing_model: 'free',
+                price_amount_cents: 0,
+                published_at: minutesAgo(60 * 24 * (10 + index)),
+            })),
+        ),
+        'publish the demo templates',
+    )
+}
+
 export async function seedDemoWorkspace({ admin, workspaceId, userId, email, apiKey, dataDir }) {
     const engine = engineClient(apiKey)
 
@@ -415,8 +491,9 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, email, api
     })
 
     await seedComputer({ admin, workspaceId, userId, dataDir })
+    await seedTemplates(admin)
 
-    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault, routines, a skill, a payments table and a computer.`)
+    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault, routines, a skill, a payments table, a computer and templates.`)
     return { engineIds }
 }
 
