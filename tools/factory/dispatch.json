@@ -15,6 +15,7 @@
   "classify": {"on": true, "gh_calls": 30, "model_runs": 5, "agent": "bf9008a5-532d-47de-aa67-04c4bdde9a64", "agent_name": "Issue Triage"},
   "planning": {
     "max_queue": 20,
+    "rules": true,
     "plan_by": ["Boss"],
     "cut_by": ["Scope Shaper", "IKE"],
     "reader": {"model": "claude-haiku-5-5", "thinkingLevel": "low"},

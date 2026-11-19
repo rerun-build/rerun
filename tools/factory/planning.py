@@ -301,6 +301,19 @@ def reader_lines(planning_cfg):
     return text + "A model your connection does not serve is refused with the list it serves."
 
 
+RULES_V = "frugal-1"
+RULES = """How to work. Every step reads all that came before it again, so keep the run small and the steps few:
+- Batch calls that do not depend on each other into one step.
+- Read a file once: never read an unchanged file again, and never repeat a search. Read the lines you need (a line range or a grep), not a whole large file.
+- Skip a call whose answer cannot change your next step. Stop a line of search once it turns up nothing new.
+- Write the plan comment briefly: each fact once, no restating of the issue or of what a file shows, no account of how you worked.
+- Keep exact: names, paths, commands, numbers, versions, and every not, never, only and except. Check an API, flag or version in the code instead of guessing it."""
+
+
+def rules_version(planning_cfg):
+    return RULES_V if isinstance(planning_cfg, dict) and planning_cfg.get("rules") is True else ""
+
+
 def plan_brief(issue, repo, retry=None, reader=None, review=None, answers=None, cut_notes=None):
     text = PLAN_BRIEF.format(repo=repo, number=issue["number"], title=issue["title"])
     head, rest = text.split("\n\n", 1)
@@ -316,6 +329,8 @@ def plan_brief(issue, repo, retry=None, reader=None, review=None, answers=None, 
     lines = reader_lines(reader)
     if lines:
         body = body.replace("\n3. What already exists", "\n" + lines + "\n3. What already exists", 1)
+    if rules_version(reader):
+        head += "\n\n" + RULES
     return head + "\n\n" + body
 
 
@@ -1349,7 +1364,7 @@ class Station:
         for k, v in (("state", "sending"), ("agent", agent), ("copy", copy), ("started", at),
                      ("title", item["title"]), ("run", ""), ("why", ""), ("intent", at), ("fire", fire),
                      ("sent_retry", retry or ""), ("sent_review", review or ""), ("sent_answers", json.dumps(answers or [])),
-                     ("sent_cut_notes", cut_notes or "")):
+                     ("sent_cut_notes", cut_notes or ""), ("rules", rules_version(self.cfg.get("planning", {})))):
             self.store.set(job, k, v)
         try:
             self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", LABEL])
