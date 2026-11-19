@@ -1,5 +1,6 @@
 import json, re
 
+import escapes
 import planning
 import states
 
@@ -73,3 +74,71 @@ def fix(gh, repo, store, drift):
         store.set(job, "plan", "1")
         done.append({"issue": n, "did": "removed " + planning.LABEL})
     return done
+
+
+IDLE_PLAN = ("blocked", "lost")
+DONE_ACCEPT = ("accepted", "closed")
+
+
+def busy(n, data):
+    j = data["jobs"].get(str(n))
+    plan = (data["kv"].get("plan:%d" % n) or {}).get("state")
+    accept = (data["kv"].get("accept:%d" % n) or {}).get("state")
+    return ((j is not None and j["state"] not in states.END) or (plan is not None and plan not in IDLE_PLAN)
+            or (accept is not None and accept not in DONE_ACCEPT))
+
+
+def body(gh, repo, n):
+    return json.loads(gh(["issue", "view", str(n), "-R", repo, "--json", "body"])).get("body") or ""
+
+
+def covered(gh, repo, dup, n):
+    kept = body(gh, repo, dup["keep"])
+    if not re.search(r"Part of\W*#%d\b" % dup["parent"], kept):
+        return "#%d does not say it is part of #%d" % (dup["keep"], dup["parent"])
+    extra = set(escapes.repairs(body(gh, repo, n))) - set(escapes.repairs(kept))
+    if extra:
+        return "it lists repairs %s that #%d does not" % (", ".join("#%d" % x for x in sorted(extra)), dup["keep"])
+    return None
+
+
+def close_gaps(gh, repo, store, drift, data):
+    out, used = [], 0
+    for dup in drift.get("duplicate_gaps") or []:
+        for n in dup["older"]:
+            job = "gapclose:%d" % n
+            rec = store.get_all(job)
+            tries = int(rec.get("tries") or 0)
+            if rec.get("closed") or rec.get("kept") or tries >= TRIES:
+                continue
+            if busy(n, data):
+                if rec.get("seen"):
+                    store.set(job, "seen", "")
+                continue
+            if used >= FIXES:
+                continue
+            used += 1
+            try:
+                why = covered(gh, repo, dup, n)
+            except Exception as e:  # noqa: BLE001
+                store.set(job, "tries", tries + 1)
+                out.append({"issue": n, "keep": dup["keep"], "did": "could not read: %s" % type(e).__name__})
+                continue
+            if why:
+                store.set(job, "kept", "1")
+                out.append({"issue": n, "keep": dup["keep"], "did": "left open: " + why})
+                continue
+            if rec.get("seen") != str(dup["keep"]):
+                store.set(job, "seen", dup["keep"])
+                out.append({"issue": n, "keep": dup["keep"], "did": "would close"})
+                continue
+            store.set(job, "tries", tries + 1)
+            try:
+                gh(["issue", "close", str(n), "-R", repo, "--reason", "not planned", "--comment",
+                    "Closed by the factory as a duplicate: #%d is the newest open gap issue of #%d and lists every repair this one lists." % (dup["keep"], dup["parent"])])
+            except Exception as e:  # noqa: BLE001
+                out.append({"issue": n, "keep": dup["keep"], "did": "could not close: %s" % type(e).__name__})
+                continue
+            store.set(job, "closed", "1")
+            out.append({"issue": n, "keep": dup["keep"], "did": "closed"})
+    return out
