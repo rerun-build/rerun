@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type EmailCodePrepared, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
 // The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
@@ -59,4 +59,14 @@ export function agentViewForClient(req: Request, view: AgentView): AgentView {
     const config = unknownToLegacy(detail.config.provider) ? { ...detail.config, provider: null, model: null } : detail.config
     const resolved = unknownToLegacy(detail.resolvedProvider) ? { resolvedProvider: null, resolvedModel: null } : {}
     return { ...view, detail: { ...detail, config, ...resolved } }
+}
+
+const FIRST_IOS_BUILD_WITHOUT_CREATED = 23
+
+// iOS 18 to 21 read the answer of an email code only with `created` in it, and only for analytics.
+// Always false: said true, it would tell anyone who holds an account. Goes with those builds.
+export function emailCodeForClient(req: Request, answer: EmailCodePrepared): EmailCodePrepared & { created?: false } {
+    const client = clientOf(req)
+    if (client && (client.platform === 'android' || client.build >= FIRST_IOS_BUILD_WITHOUT_CREATED)) return answer
+    return { ...answer, created: false }
 }

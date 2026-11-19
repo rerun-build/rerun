@@ -65,6 +65,10 @@ async function generate() {
     console.log(`wrote ${path.relative(ROOT, CURRENT)}`)
 }
 
+function changesListed(file) {
+    return readFileSync(file, 'utf8').split('\n').filter(line => line.trim() && !line.startsWith('#')).length
+}
+
 async function check() {
     const problems = []
     const fresh = json(await currentDocument())
@@ -74,24 +78,33 @@ async function check() {
     writeFileSync(tmp, fresh)
     const binary = oasdiffBinary()
     const snapshots = shippedSnapshots()
+    const ignoreList = path.join(os.tmpdir(), `mobile-contract-${process.pid}-ignore.txt`)
+    const withKnownBreaks = []
     for (const file of snapshots) {
-        // What the hub answers this build differently, so it reads it: each line names the change it covers.
-        const adapted = path.join(SHIPPED, file.replace(/\.json$/, '.adapted'))
-        const ignore = existsSync(adapted) ? ['--err-ignore', adapted, '--warn-ignore', adapted] : []
+        // Each line names one change of oasdiff. `.adapted`: the hub answers this build differently, so it
+        // still reads it. `.broken`: it breaks this build and no answer of the hub helps, until it retires.
+        const [adapted, broken] = ['.adapted', '.broken'].map(kind => path.join(SHIPPED, file.replace(/\.json$/, kind)))
+        const ignored = [adapted, broken].filter(existsSync)
+        writeFileSync(ignoreList, ignored.map(list => readFileSync(list, 'utf8')).join('\n'))
+        const ignore = ignored.length ? ['--err-ignore', ignoreList, '--warn-ignore', ignoreList] : []
         const result = spawnSync(binary, ['breaking', path.join(SHIPPED, file), tmp, '--fail-on', 'WARN', '--format', 'text', ...ignore], { encoding: 'utf8' })
         if (result.status === 0) {
-            console.log(`ok    ${file}`)
+            const knownBreaks = existsSync(broken) ? changesListed(broken) : 0
+            if (knownBreaks) withKnownBreaks.push(file)
+            console.log(knownBreaks ? `known ${file}: ${knownBreaks} breaks no answer can help, listed in ${path.basename(broken)}` : `ok    ${file}`)
             continue
         }
         console.log(`BREAK ${file}`)
         problems.push(`${file}: the hub would break this build\n${(result.stdout + result.stderr).trim()}`)
     }
     rmSync(tmp, { force: true })
+    rmSync(ignoreList, { force: true })
     if (problems.length) {
         console.error(`\n${problems.join('\n\n')}\n\nA shipped build keeps the schemas it was compiled with: see apps/mobile/api-contract/README.md.`)
         process.exit(1)
     }
-    console.log(`\nThe contract is up to date and the ${snapshots.length} shipped builds still read the hub.`)
+    const known = withKnownBreaks.length ? `, except for the breaks listed in the .broken of ${withKnownBreaks.length} of them` : ''
+    console.log(`\nThe contract is up to date and the ${snapshots.length} shipped builds still read the hub${known}.`)
 }
 
 async function snapshot(platform, build, { commit, src }) {

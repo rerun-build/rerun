@@ -16,7 +16,7 @@ export function useChannelLabel(): (channel: PhoneChannel) => string {
     return channel => t(SEND_BY_KEYS[channel])
 }
 
-const REASON_KEYS = { network: 'errors.offline', session: 'errors.session', apple: 'errors.apple', google: 'errors.google' } as const
+const REASON_KEYS = { network: 'errors.offline', generic: 'errors.generic', session: 'errors.session', apple: 'errors.apple', google: 'errors.google' } as const
 
 // The sentence of a failed sign-in in the app's language. A refusal of the hub the app has no sentence
 // for yet keeps the hub's own words.

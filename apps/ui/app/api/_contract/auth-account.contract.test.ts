@@ -1,4 +1,4 @@
-import { mobileApi } from '@rerun/contracts'
+import { mobileApi, signInRefusalSchema } from '@rerun/contracts'
 import type { GenerateLinkResponse, Session, SupabaseClient, User, UserResponse } from '@supabase/supabase-js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -183,6 +183,14 @@ describe('signing in from the mobile app and its account', () => {
             expect(provider.sendVerification).not.toHaveBeenCalled()
         })
 
+        it('refuses a body it cannot read with the reason every build shows in its language', async () => {
+            const { POST } = await import('@/app/api/v1/auth/phone/code/route')
+            const res = await callRoute(POST, mobileApi.sendPhoneCode, { body: { phone: '', country: 'France', channel: 'sms' } })
+            expect(res.status).toBe(400)
+            expect(signInRefusalSchema.parse(await expectContract(mobileApi.sendPhoneCode, res, 400))).toMatchObject({ reason: 'invalid_number' })
+            expect(provider.sendVerification).not.toHaveBeenCalled()
+        })
+
         it('holds a second code back with 429 and says how long to wait', async () => {
             state.tables.phone_sign_in_sends = [{ phone: PHONE, send_count: 1, send_window_started_at: minutesFromNow(-0.5), last_sent_at: minutesFromNow(-0.5), last_channel: 'sms' }] satisfies Rows<'phone_sign_in_sends'>
             const { POST } = await import('@/app/api/v1/auth/phone/code/route')
@@ -239,6 +247,22 @@ describe('signing in from the mobile app and its account', () => {
             expect(await expectContract(mobileApi.signInWithPhone, res, 400)).toMatchObject({ reason: 'wrong_code' })
         })
 
+        it('reads a code too short to be one as a wrong code, without counting a try', async () => {
+            const { POST } = await import('@/app/api/v1/auth/phone/session/route')
+            const res = await callRoute(POST, mobileApi.signInWithPhone, { body: { ...TYPED_PHONE, channel: 'sms', code: '12' } })
+            expect(res.status).toBe(400)
+            expect(signInRefusalSchema.parse(await expectContract(mobileApi.signInWithPhone, res, 400))).toMatchObject({ reason: 'wrong_code' })
+            expect(state.db?.chainsOn('rpc:claim_phone_sign_in_verify') ?? []).toHaveLength(0)
+            expect(provider.checkVerification).not.toHaveBeenCalled()
+        })
+
+        it('reads a number it cannot parse as an invalid number, even with a bad code', async () => {
+            const { POST } = await import('@/app/api/v1/auth/phone/session/route')
+            const res = await callRoute(POST, mobileApi.signInWithPhone, { body: { phone: '06 12 34 56 78', country: 'France', channel: 'sms', code: '12' } })
+            expect(res.status).toBe(400)
+            expect(signInRefusalSchema.parse(await expectContract(mobileApi.signInWithPhone, res, 400))).toMatchObject({ reason: 'invalid_number' })
+        })
+
         it('stops a loop over codes with 429 before the code is looked at', async () => {
             state.rpc.claim_phone_sign_in_verify = { data: 'phone' }
             const { POST } = await import('@/app/api/v1/auth/phone/session/route')
@@ -258,6 +282,14 @@ describe('signing in from the mobile app and its account', () => {
     })
 
     describe('a code mailed to an address', () => {
+        it('refuses an address it cannot read with the reason every build shows in its language', async () => {
+            const { POST } = await import('@/app/api/v1/auth/email/code/route')
+            const res = await callRoute(POST, mobileApi.sendEmailCode, { body: { email: 'grace at atelier-nord' } })
+            expect(res.status).toBe(400)
+            expect(signInRefusalSchema.parse(await expectContract(mobileApi.sendEmailCode, res, 400))).toMatchObject({ reason: 'invalid_email' })
+            expect(provider.createUser).not.toHaveBeenCalled()
+        })
+
         it('opens the account of a new address and lets the app ask Supabase for the code', async () => {
             provider.createUser.mockResolvedValue(userFound(authUser('user-new', 'grace@atelier-nord.fr')))
             const { POST } = await import('@/app/api/v1/auth/email/code/route')
@@ -275,6 +307,14 @@ describe('signing in from the mobile app and its account', () => {
             expect(await expectContract(mobileApi.sendEmailCode, await callRoute(POST, mobileApi.sendEmailCode, { body: { email: 'ada@atelier-nord.fr' } }))).toEqual({ mailed: true })
             expect(provider.sendSignInCodeEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'ada@atelier-nord.fr', code: '482913' }))
             authUsers['user-ada'] = ada
+        })
+
+        it('adds the created iOS 18 to 21 require to read the answer, always false', async () => {
+            provider.createUser.mockResolvedValue(userFound(authUser('user-new', 'grace@atelier-nord.fr')))
+            const { POST } = await import('@/app/api/v1/auth/email/code/route')
+            const res = await callRoute(POST, mobileApi.sendEmailCode, { body: { email: 'grace@atelier-nord.fr' }, client: 'ios/1.0.0 (18)' })
+            expect(await res.clone().json()).toEqual({ mailed: false, created: false })
+            await expectContract(mobileApi.sendEmailCode, res)
         })
 
         it('answers 429 to a network asking too often', async () => {

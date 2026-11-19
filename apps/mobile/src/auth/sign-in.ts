@@ -23,13 +23,22 @@ export class SignInError extends Error {
 
 const OFFLINE = new SignInError('We could not reach Rerun. Check your connection and try again.', 'network')
 
+const UNREADABLE_INPUT: Record<CodeMethod, SignInError> = {
+    phone: new SignInError('Enter a valid mobile number.', 'invalid_number', undefined, 'phone'),
+    email: new SignInError('Enter a valid email', 'invalid_email', undefined, 'email'),
+}
+
+// Only a call that got no answer is a connection problem: a hub that answered without a refusal the
+// app can read still turned down what was typed (400) or failed on its side.
 async function hubCall<T>(method: CodeMethod, call: () => Promise<T>): Promise<T> {
     try {
         return await call()
     } catch (error) {
-        const refusal = error instanceof ApiError ? signInRefusalSchema.safeParse(error.body) : null
-        if (refusal?.success) throw new SignInError(refusal.data.error, refusal.data.reason, refusal.data.retryAfterSeconds, method)
-        throw OFFLINE
+        if (!(error instanceof ApiError)) throw OFFLINE
+        const refusal = signInRefusalSchema.safeParse(error.body)
+        if (refusal.success) throw new SignInError(refusal.data.error, refusal.data.reason, refusal.data.retryAfterSeconds, method)
+        if (error.status === 400) throw UNREADABLE_INPUT[method]
+        throw new SignInError('Something went wrong. Try again.', 'generic')
     }
 }
 

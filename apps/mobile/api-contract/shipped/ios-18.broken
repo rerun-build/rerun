@@ -1,0 +1,13 @@
+# Breaks this build, and no answer of the hub fixes it: its sign-in to Claude and ChatGPT sends and reads
+# `verifier`, `state`, `deviceAuthId` and `userCode`, which a sealed ticket replaced. Everything else of
+# the build still works. It goes once app_build_days shows nobody on it: raise MOBILE_IOS_MIN_BUILD to 23,
+# then delete the files of this build.
+POST /api/v1/ai-connections/claude/finish added the new required request property `ticket`
+POST /api/v1/ai-connections/claude/start removed the required property `state` from the response with the `200` status
+POST /api/v1/ai-connections/claude/start removed the required property `verifier` from the response with the `200` status
+POST /api/v1/ai-connections/codex/poll added the new required request property `ticket`
+POST /api/v1/ai-connections/codex/start removed the required property `deviceAuthId` from the response with the `200` status
+POST /api/v1/ai-connections/claude/finish removed the request property `state`
+POST /api/v1/ai-connections/claude/finish removed the request property `verifier`
+POST /api/v1/ai-connections/codex/poll removed the request property `deviceAuthId`
+POST /api/v1/ai-connections/codex/poll removed the request property `userCode`

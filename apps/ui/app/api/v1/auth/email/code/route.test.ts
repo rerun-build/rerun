@@ -11,8 +11,8 @@ const { POST } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
 
-function ask(email: string) {
-    return POST(new Request('https://app.rerun.build/api/v1/auth/email/code', { method: 'POST', body: JSON.stringify({ email }), headers: { 'x-forwarded-for': '203.0.113.7' } }), segment)
+function ask(email: string, client = 'ios/1.0.2 (38)') {
+    return POST(new Request('https://app.rerun.build/api/v1/auth/email/code', { method: 'POST', body: JSON.stringify({ email }), headers: { 'x-forwarded-for': '203.0.113.7', 'x-rerun-client': client } }), segment)
 }
 
 describe('POST /api/v1/auth/email/code', () => {
@@ -36,6 +36,19 @@ describe('POST /api/v1/auth/email/code', () => {
         expect(ensureEmailAccount).toHaveBeenCalledWith('ada@example.com', '203.0.113.7')
         ensureEmailAccount.mockResolvedValue({ ok: true, created: false })
         expect(await (await ask('ada@example.com')).json()).toEqual({ mailed: false })
+    })
+
+    it('tells iOS 18 to 21 no account was created, the field they need to read the answer', async () => {
+        expect(await (await ask('ada@example.com', 'ios/1.0.0 (21)')).json()).toEqual({ mailed: false, created: false })
+        resendSignInCodeIfLive.mockResolvedValue('sent')
+        expect(await (await ask('ada@example.com', 'ios/1.0.0 (18)')).json()).toEqual({ mailed: true, created: false })
+    })
+
+    it('answers an address it cannot read with the reason the app shows in its language', async () => {
+        const res = await ask('ada at example')
+        expect(res.status).toBe(400)
+        expect(await res.json()).toMatchObject({ reason: 'invalid_email' })
+        expect(ensureEmailAccount).not.toHaveBeenCalled()
     })
 
     it('counts every ask against the caller, before reading anything about the address', async () => {

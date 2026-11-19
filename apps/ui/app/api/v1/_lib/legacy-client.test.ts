@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { agentViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
 
 import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
-import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider } from './legacy-client'
+import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider, emailCodeForClient } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
@@ -122,5 +122,18 @@ describe('responses for an older build', () => {
         expect(aiConnectionsForClient(current, view)).toBe(view)
         expect(agentModelsForClient(current, models)).toBe(models)
         expect(agentViewForClient(current, agentView)).toBe(agentView)
+    })
+})
+
+describe('emailCodeForClient', () => {
+    it('says no account was created to iOS 18 to 21, which cannot read the answer without it', () => {
+        expect(emailCodeForClient(request('ios/1.0.0 (18)'), { mailed: false })).toEqual({ mailed: false, created: false })
+        expect(emailCodeForClient(request('ios/1.0.1 (21)'), { mailed: true })).toEqual({ mailed: true, created: false })
+        expect(emailCodeForClient(request(), { mailed: false })).toEqual({ mailed: false, created: false })
+    })
+
+    it('leaves it out for the builds that never read it', () => {
+        expect(emailCodeForClient(request('ios/1.0.2 (23)'), { mailed: false })).toEqual({ mailed: false })
+        expect(emailCodeForClient(request('android/1.0.0 (3)'), { mailed: true })).toEqual({ mailed: true })
     })
 })

@@ -29,6 +29,7 @@ export const emailCodeRequestSchema = z.object({ email: z.string().trim().email(
 // left less than a minute ago. Otherwise the app asks Supabase for a new one. Whether the address had
 // an account is not said here: that would tell anyone who holds one, before any code is checked.
 export const emailCodePreparedSchema = z.object({ mailed: z.boolean() })
+export type EmailCodePrepared = z.infer<typeof emailCodePreparedSchema>
 
 export const signInRefusalSchema = z.object({
     error: z.string(),

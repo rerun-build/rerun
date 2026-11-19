@@ -9,9 +9,11 @@ import { type AppSession, mobileApi } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
+const refusedBody = (issues: { path: PropertyKey[] }[]) => phoneRefused(issues.every(issue => issue.path[0] === 'code') ? 'wrong_code' : 'invalid_number')
+
 // Signs into the account this number holds, or creates it, and hands the session to the app. Every
 // try is counted before the code is looked at: a wrong one and the review code alike.
-export const POST = apiRoute(mobileApi.signInWithPhone, { auth: 'public' }, async ({ req, body }): Promise<AppSession | Response> => {
+export const POST = apiRoute(mobileApi.signInWithPhone, { auth: 'public', invalidBody: refusedBody }, async ({ req, body }): Promise<AppSession | Response> => {
     const phone = isPhoneCountry(body.country) ? toE164(body.phone, body.country) : null
     if (!phone) return phoneRefused('invalid_number')
 

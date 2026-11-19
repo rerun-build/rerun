@@ -1,0 +1,20 @@
+# This build parses the provider of a connection strictly and knows neither opencode nor custom. The hub
+# leaves them out of what it answers a build that does not know them: apps/ui/app/api/v1/_lib/legacy-client.ts
+# (aiConnectionsForClient, agentViewForClient, agentModelsForClient), tested in legacy-client.test.ts.
+GET /api/v1/agents/{id} added the new `custom` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `custom` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `opencode` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `opencode` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `custom` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `opencode` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `custom` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `custom` enum value to the `connections/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `opencode` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `opencode` enum value to the `connections/items/provider` response property for the response status `200`
+# This build requires `created` in the answer of an email code; the hub adds it, always false, for the
+# builds below 23: apps/ui/app/api/v1/_lib/legacy-client.ts (emailCodeForClient), tested in legacy-client.test.ts.
+POST /api/v1/auth/email/code removed the required property `created` from the response with the `200` status
+# This build only ever sends the token of Notifications.getExpoPushTokenAsync, `ExponentPushToken[...]`,
+# which the pattern accepts (apps/mobile/src/notifications/push.ts of its commit).
+DELETE /api/v1/me/devices added the pattern `^ExponentPushToken\[[\w-]+\]$` to the request property `token`
+POST /api/v1/me/devices added the pattern `^ExponentPushToken\[[\w-]+\]$` to the request property `token`

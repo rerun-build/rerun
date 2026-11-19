@@ -38,6 +38,18 @@ describe('sign-in calls', () => {
         await expect(sendPhoneCode(REQUEST)).rejects.toMatchObject({ reason: 'network' })
     })
 
+    it('reads a 400 without a refusal as what was typed, never as a connection problem', async () => {
+        mockApi.mockRejectedValue(new ApiError(400, 'Invalid request', { error: 'Invalid request', issues: [] }))
+        await expect(sendPhoneCode(REQUEST)).rejects.toMatchObject({ reason: 'invalid_number', method: 'phone' })
+        await expect(sendEmailCode('grace at atelier-nord')).rejects.toMatchObject({ reason: 'invalid_email', method: 'email' })
+        expect(mockSignInWithOtp).not.toHaveBeenCalled()
+    })
+
+    it('reads any other answer of the hub without a refusal as a failure of its own', async () => {
+        mockApi.mockRejectedValue(new ApiError(500, 'Internal error', { error: 'Internal error' }))
+        await expect(sendPhoneCode(REQUEST)).rejects.toMatchObject({ reason: 'generic' })
+    })
+
     it('opens the session the hub handed back', async () => {
         mockApi.mockResolvedValue({ created: true, session: { accessToken: 'access', refreshToken: 'refresh' } })
         expect(await signInWithPhone(REQUEST, '123456')).toBe(true)

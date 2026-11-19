@@ -185,6 +185,15 @@ describe('apiRoute on a mobile endpoint', () => {
         expect((await route(send({ name: 3 }), withId)).status).toBe(400)
     })
 
+    it('answers a body it cannot read in the words of the route that has them, without running it', async () => {
+        const handler = vi.fn(async () => ({ name: '' }))
+        const route = apiRoute(named, { auth: 'member', invalidBody: issues => Response.json({ error: 'Name it', reason: String(issues[0].path[0]) }, { status: 409 }) }, handler)
+        const res = await route(send({ name: 3 }), withId)
+        expect(res.status).toBe(409)
+        expect(await res.json()).toEqual({ error: 'Name it', reason: 'name' })
+        expect(handler).not.toHaveBeenCalled()
+    })
+
     it('answers 500 rather than a body the app could not read, and says why in the log', async () => {
         const log = vi.spyOn(console, 'error').mockImplementation(() => {})
         const route = apiRoute(named, { auth: 'member' }, async () => ({ name: 3 }) as unknown as { name: string })

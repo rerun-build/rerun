@@ -121,7 +121,21 @@ function resultResponse(result: unknown): Response {
     return Response.json(result)
 }
 
-type Route = { auth: AuthLevel; body?: z.ZodType; query?: z.ZodType; endpoint?: HubEndpoint }
+// A route with its own words for a body it cannot read (the sign-in refusals, which every build of the
+// app already shows in its language) answers them instead of the bare 400.
+type InvalidBody = (issues: z.ZodError['issues']) => Response
+
+type EndpointOptions<A extends AuthLevel> = { auth: A; invalidBody?: InvalidBody }
+
+type Route = { auth: AuthLevel; body?: z.ZodType; query?: z.ZodType; endpoint?: HubEndpoint; invalidBody?: InvalidBody }
+
+async function readValidBody(req: Request, options: Route): Promise<unknown> {
+    if (!options.body) return undefined
+    const parsed = options.body.safeParse(await readBody(req))
+    if (parsed.success) return parsed.data
+    if (options.invalidBody) return options.invalidBody(parsed.error.issues)
+    throw parsed.error
+}
 
 function route(options: Route, handler: (args: HandlerArgs<AuthLevel, z.ZodType | undefined, z.ZodType | undefined>) => Promise<unknown>): ContractRoute {
     const { endpoint } = options
@@ -141,10 +155,10 @@ function route(options: Route, handler: (args: HandlerArgs<AuthLevel, z.ZodType 
 
         let res: Response
         try {
-            const body = options.body ? options.body.parse(await readBody(req)) : undefined
+            const body = await readValidBody(req, options)
             const query = options.query ? options.query.parse(Object.fromEntries(new URL(req.url).searchParams)) : undefined
             const params = (await segment.params) ?? {}
-            res = resultResponse(await handler({ req, params, ctx, body, query }))
+            res = body instanceof Response ? body : resultResponse(await handler({ req, params, ctx, body, query }))
         } catch (err) {
             if (err instanceof z.ZodError) return codedResponse(400, 'Invalid request', 'invalidRequest', undefined, { issues: err.issues })
             if (err instanceof ApiError) return codedResponse(err.status, err.message, err.code, err.params)
@@ -166,13 +180,13 @@ function route(options: Route, handler: (args: HandlerArgs<AuthLevel, z.ZodType 
 
 // A call of the mobile app: its body, query and parameters come from the registry, and what the
 // handler answers is typed by the schema the app reads it with.
-export function apiRoute<E extends HubEndpoint, A extends AuthLevel>(endpoint: E, options: { auth: A }, handler: (args: EndpointHandlerArgs<E, A>) => Promise<EndpointResult<E>>): ContractRoute
+export function apiRoute<E extends HubEndpoint, A extends AuthLevel>(endpoint: E, options: EndpointOptions<A>, handler: (args: EndpointHandlerArgs<E, A>) => Promise<EndpointResult<E>>): ContractRoute
 export function apiRoute<A extends AuthLevel, B extends z.ZodType | undefined = undefined, Q extends z.ZodType | undefined = undefined>(options: RouteOptions<A, B, Q>, handler: (args: HandlerArgs<A, B, Q>) => Promise<unknown>): ContractRoute
 export function apiRoute(first: HubEndpoint | RouteOptions<AuthLevel, z.ZodType | undefined, z.ZodType | undefined>, second: unknown, third?: unknown): ContractRoute {
     if ('method' in first) {
-        const { auth } = second as { auth: AuthLevel }
+        const { auth, invalidBody } = second as EndpointOptions<AuthLevel>
         const body = first.body === 'bytes' ? undefined : first.body
-        return route({ auth, body, query: first.query, endpoint: first }, third as Parameters<typeof route>[1])
+        return route({ auth, body, query: first.query, endpoint: first, invalidBody }, third as Parameters<typeof route>[1])
     }
     return route(first, second as Parameters<typeof route>[1])
 }
