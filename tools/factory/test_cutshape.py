@@ -103,6 +103,12 @@ class CutShape(unittest.TestCase):
         self.assertEqual(p["errors"], [])
         self.assertEqual(p["test"], "tools/factory/test_cutshape.py")
 
+    def test_a_test_file_line_that_does_not_start_with_its_path_is_still_accepted(self):
+        b = FORM.replace("**Test file**: `tools/factory/test_cutshape.py`", "**Test file**: see `tools/factory/test_cutshape.py`")
+        p = cutshape.parse({"number": 1, "body": b})
+        self.assertEqual(p["errors"], [])
+        self.assertEqual(p["test"], "tools/factory/test_cutshape.py")
+
     def test_a_bullet_that_does_not_start_with_its_path_is_still_refused(self):
         b = FORM.replace("- `tools/factory/cutshape.py`\n", "- see `a.py` and `b.py`\n")
         self.assertTrue(any(e.startswith("files: bullet needs exactly one path") for e in cutshape.parse({"number": 1, "body": b})["errors"]))

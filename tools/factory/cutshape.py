@@ -150,10 +150,11 @@ def parse(issue):
         errors.append("test file: more than one Test file line")
     elif tl:
         lead = _LEAD_TICK.match(tl[0])
-        if not lead:
+        ticks = [lead.group(1)] if lead else _TICK.findall(tl[0])
+        if len(ticks) != 1:
             errors.append("test file: needs exactly one path in backticks on the line")
         else:
-            test = lead.group(1).strip()
+            test = ticks[0].strip()
             if test not in paths:
                 errors.append("test file: '%s' is not one of the Files paths" % test)
 
