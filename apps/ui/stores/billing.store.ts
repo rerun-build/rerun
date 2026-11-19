@@ -9,8 +9,9 @@ export const AGENT_LIMIT_TRIGGER = 'entitlement_gate'
 // pick the stopped task back up once the plan is paid.
 export type BillingUpgrade = { coworker?: string; onPaid?: () => void }
 
-// `credit_pack` opens the purchase of Rerun credit, bought once outside the plan.
-export type BillingHighlight = AddonKey | 'credit_pack'
+// `credit_pack` opens the purchase of Rerun credit, bought once outside the plan. `referrals` opens
+// the plan dialog on Refer a friend.
+export type BillingHighlight = AddonKey | 'credit_pack' | 'referrals'
 
 type BillingState = {
     open: boolean

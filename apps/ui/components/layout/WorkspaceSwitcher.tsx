@@ -44,7 +44,7 @@ import { useBrainStore } from '@/stores/brain.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, MonitorIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BellIcon, BrainIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, MonitorIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserPlus, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
@@ -165,6 +165,8 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
 
     const listInPlace = isMobile && switching
     const trialing = workspace.subscription_status === 'trialing'
+    // Refer a friend lives in the plan dialog, which only a paying Stripe subscriber gets.
+    const canRefer = BILLING_ENABLED && !workspace.is_sandbox && workspace.subscription_status === 'active' && !!workspace.stripe_customer_id && !isLifetimePlan(workspace)
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
@@ -305,6 +307,17 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling()} className="gap-2 text-muted-foreground">
                         <CreditCardIcon className="size-4" />
                         {t('billing')}
+                    </DropdownMenuItem>
+                </DisabledWithReason>
+            )}
+            {canRefer && (
+                <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.billing')}>
+                    <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling('referrals', 'invite_friends')} className="gap-2 text-muted-foreground">
+                        <UserPlus className="size-4" />
+                        {t('inviteFriends')}
+                        <Badge size="xs" tone="green" className="ml-auto">
+                            {t('freeMonth')}
+                        </Badge>
                     </DropdownMenuItem>
                 </DisabledWithReason>
             )}

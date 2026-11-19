@@ -1,5 +1,8 @@
 {
     "_context": {
+        "plan.referrals.status.subscribed": "Badge on a referred friend who paid: both accounts got one free month.",
+        "plan.referrals.monthsOf": "{earned} free months earned out of the {cap} maximum, like \"2 of 12\".",
+        "plan.referrals.firstPayment": "Where the next invoice date would be: the free months are taken off the first invoice once the person subscribes.",
         "trialOffer.limitsDuringTrial": "{agents} is how many coworkers can run during the trial, {credits} the credit it comes with.",
         "trialOffer.chargeLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
         "trialOffer.cardlessLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
@@ -142,7 +145,32 @@
             "creditsLeft": "{credits} left",
             "keepYearly": "Keep my yearly plan",
             "switchHint": "Switch the billing to see the new price.",
-            "cancelPlan": "Cancel plan"
+            "cancelPlan": "Cancel plan",
+            "referFriend": "Refer a friend",
+            "freeMonths": "{count, plural, one {# free month} other {# free months}}",
+            "getFreeMonth": "Get a free month"
+        },
+        "referrals": {
+            "title": "Refer a friend",
+            "pitch": "When a friend subscribes with your link, you both get a month free.",
+            "linkLabel": "Your referral link",
+            "copy": "Copy",
+            "copied": "Copied",
+            "capped": "All {cap} months earned. Your link still gives friends a month.",
+            "freeMonths": "Free months",
+            "monthsOf": "{earned} of {cap}",
+            "progressLabel": "{earned} of {cap} free months earned",
+            "firstPayment": "Applied on your first payment",
+            "friends": "Friends",
+            "empty": "Friends who sign up with your link show up here.",
+            "more": "+{count} more",
+            "loadFailed": "Could not load your referrals.",
+            "status": {
+                "subscribed": "+1 month",
+                "trial": "Trial",
+                "signed_up": "Signed up",
+                "canceled": "Canceled"
+            }
         },
         "change": {
             "planLabel": "Unlimited coworkers{slots}",

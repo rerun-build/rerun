@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { formatCredits } from '@/ee/lib/billing/plans'
-import { ChevronRightIcon, CoinsIcon, Receipt, type LucideIcon } from '@/lib/icons'
+import { ChevronRightIcon, CoinsIcon, Receipt, UserPlus, type LucideIcon } from '@/lib/icons'
 
 // One line of the billing overview that opens something: its icon and label on the left, what it
 // holds on the right.
@@ -36,6 +36,24 @@ export function CreditUsageRow({ leftMicros, onOpen }: { leftMicros: number | nu
                 <>
                     {leftMicros != null && <span className="tabular-nums">{t('creditsLeft', { credits: formatCredits(leftMicros, locale) })}</span>}
                     <ChevronRightIcon className="size-4" />
+                </>
+            }
+            onOpen={onOpen}
+        />
+    )
+}
+
+// `monthsEarned` is null while the referrals load: the row keeps its place with the invitation.
+export function ReferralsRow({ monthsEarned, onOpen }: { monthsEarned: number | null; onOpen: () => void }) {
+    const t = useTranslations('billing.plan.overview')
+    return (
+        <OverviewLinkRow
+            icon={UserPlus}
+            label={t('referFriend')}
+            value={
+                <>
+                    <span className="truncate">{monthsEarned ? t('freeMonths', { count: monthsEarned }) : t('getFreeMonth')}</span>
+                    <ChevronRightIcon className="size-4 shrink-0" />
                 </>
             }
             onOpen={onOpen}

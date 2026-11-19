@@ -45,7 +45,10 @@
             "creditsLeft": "{credits} restants",
             "keepYearly": "Garder mon abonnement annuel",
             "switchHint": "Changez la facturation pour voir le nouveau prix.",
-            "cancelPlan": "Résilier l'abonnement"
+            "cancelPlan": "Résilier l'abonnement",
+            "referFriend": "Parrainer un ami",
+            "freeMonths": "{count, plural, one {# mois offert} other {# mois offerts}}",
+            "getFreeMonth": "Un mois offert"
         },
         "change": {
             "planLabel": "Coworkers illimités{slots}",
@@ -126,6 +129,28 @@
             "payOnStripe": "Payer sur Stripe",
             "chargedOnce": "Prélevé une seule fois sur cette carte.",
             "checkoutFootnote": "Vous payez sur une page Stripe sécurisée, puis revenez ici."
+        },
+        "referrals": {
+            "title": "Parrainer un ami",
+            "pitch": "Quand un ami s'abonne avec votre lien, vous recevez chacun un mois offert.",
+            "linkLabel": "Votre lien de parrainage",
+            "copy": "Copier",
+            "copied": "Copié",
+            "capped": "Les {cap} mois sont gagnés. Votre lien offre toujours un mois à vos amis.",
+            "freeMonths": "Mois offerts",
+            "monthsOf": "{earned} sur {cap}",
+            "progressLabel": "{earned} mois offerts gagnés sur {cap}",
+            "firstPayment": "Appliqué à votre premier paiement",
+            "friends": "Amis",
+            "empty": "Les amis qui s'inscrivent avec votre lien apparaissent ici.",
+            "more": "+{count} autres",
+            "loadFailed": "Impossible de charger vos parrainages.",
+            "status": {
+                "subscribed": "+1 mois",
+                "trial": "Essai",
+                "signed_up": "Inscrit",
+                "canceled": "Annulé"
+            }
         }
     },
     "lifetime": {

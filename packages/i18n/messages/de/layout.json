@@ -120,7 +120,9 @@
         "adminPanel": "Admin-Bereich",
         "notifications": "Benachrichtigungen",
         "account": "Konto",
-        "signOut": "Abmelden"
+        "signOut": "Abmelden",
+        "inviteFriends": "Freunde einladen",
+        "freeMonth": "Gratismonat"
     },
     "update": {
         "reload": "Neu laden",

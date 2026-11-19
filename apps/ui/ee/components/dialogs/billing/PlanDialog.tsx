@@ -37,12 +37,14 @@ import { UsagePane } from './credit-usage/UsagePane'
 import { useCreditUsage } from './credit-usage/useCreditUsage'
 import { shortDate } from './checkout-copy'
 import { InvoicesPane } from './InvoicesPane'
-import { CreditUsageRow, InvoicesRow } from './OverviewRows'
+import { CreditUsageRow, InvoicesRow, ReferralsRow } from './OverviewRows'
 import { BilledFlow, CardOnFile, CountFlow, IntervalToggle, Notice, PayFooter, PlanCard, RightTitle, SuccessPanel, SummaryRows, TermsConsent, usd } from './parts'
 import { StripeCheckoutProvider, StripePaymentFields, StripePaymentFieldsSkeleton } from './StripeCheckout'
 import { usePlanQuote } from './usePlanQuote'
+import { ReferralsPane } from './referrals/ReferralsPane'
+import { useReferrals } from './referrals/useReferrals'
 
-type Drill = 'overview' | 'card' | 'invoices' | 'credit' | 'usage' | 'business'
+type Drill = 'overview' | 'card' | 'invoices' | 'credit' | 'usage' | 'business' | 'referrals'
 type Success = { title: string; body: string; rows?: { label: string; value: string }[] }
 
 type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
@@ -90,9 +92,10 @@ export function PlanDialog({
     const slotsStates = appSlots ?? fetchedSlots
     const openApp = usePaidAppsStore(s => s.openApp)
     const [interval, setBillingInterval] = useState<BillingInterval>(state.interval)
-    const [drill, setDrill] = useState<Drill>(highlightAddon === 'credit_pack' ? 'credit' : 'overview')
+    const [drill, setDrill] = useState<Drill>(highlightAddon === 'credit_pack' ? 'credit' : highlightAddon === 'referrals' ? 'referrals' : 'overview')
     const [success, setSuccess] = useState<Success | null>(null)
     const credit = useCreditUsage()
+    const referrals = useReferrals()
 
     const pastDue = state.status === 'past_due'
     const locked = pastDue || state.cancelAtPeriodEnd || !!success
@@ -190,6 +193,8 @@ export function PlanDialog({
                     <UsagePane credit={credit} onBack={() => setDrill('overview')} />
                 ) : drill === 'business' ? (
                     <BusinessDetailsPane business={state.business} onBack={() => setDrill('overview')} onSaved={onChanged} />
+                ) : drill === 'referrals' ? (
+                    <ReferralsPane overview={referrals.overview} failed={referrals.failed} nextInvoice={state.nextInvoice} onBack={() => setDrill('overview')} />
                 ) : (
                     <OverviewPane
                         state={state}
@@ -198,6 +203,8 @@ export function PlanDialog({
                         onInvoices={() => setDrill('invoices')}
                         onUsage={() => setDrill('usage')}
                         onBusiness={() => setDrill('business')}
+                        monthsEarned={referrals.overview?.monthsEarned ?? null}
+                        onReferrals={() => setDrill('referrals')}
                         onCancel={onCancel}
                         onChanged={onChanged}
                     />
@@ -206,7 +213,8 @@ export function PlanDialog({
         )
     })()
 
-    return <BillingDialogShell title="Rerun Pro" left={left} right={right} />
+    // Opened from Invite friends, the pane is what was asked for: on a phone it comes before the plan.
+    return <BillingDialogShell title="Rerun Pro" left={left} right={right} mobileOrder={highlightAddon === 'referrals' ? 'payment-first' : 'plan-first'} />
 }
 
 function OverviewPane({
@@ -216,6 +224,8 @@ function OverviewPane({
     onInvoices,
     onUsage,
     onBusiness,
+    monthsEarned,
+    onReferrals,
     onCancel,
     onChanged,
 }: {
@@ -225,6 +235,8 @@ function OverviewPane({
     onInvoices: () => void
     onUsage: () => void
     onBusiness: () => void
+    monthsEarned: number | null
+    onReferrals: () => void
     onCancel: () => void
     onChanged: () => Promise<void>
 }) {
@@ -265,6 +277,7 @@ function OverviewPane({
                     <InvoicesRow onOpen={onInvoices} />
                     <BusinessDetailsRow business={state.business} onOpen={onBusiness} />
                     <CreditUsageRow leftMicros={creditLeftMicros} onOpen={onUsage} />
+                    <ReferralsRow monthsEarned={monthsEarned} onOpen={onReferrals} />
                     {state.pendingSwitch && (
                         <Button variant="outline" onClick={() => void keepYearly()} disabled={keeping}>
                             {t('plan.overview.keepYearly')}

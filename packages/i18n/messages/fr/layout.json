@@ -120,7 +120,9 @@
         "adminPanel": "Panneau d'admin",
         "notifications": "Notifications",
         "account": "Compte",
-        "signOut": "Se déconnecter"
+        "signOut": "Se déconnecter",
+        "inviteFriends": "Inviter des amis",
+        "freeMonth": "Mois offert"
     },
     "update": {
         "reload": "Recharger",

@@ -45,7 +45,10 @@
             "creditsLeft": "{credits} kaldı",
             "keepYearly": "Yıllık planımı koru",
             "switchHint": "Yeni fiyatı görmek için faturalandırmayı değiştirin.",
-            "cancelPlan": "Planı iptal et"
+            "cancelPlan": "Planı iptal et",
+            "referFriend": "Arkadaşını davet et",
+            "freeMonths": "{count, plural, one {# ücretsiz ay} other {# ücretsiz ay}}",
+            "getFreeMonth": "Bir ay ücretsiz kazanın"
         },
         "change": {
             "planLabel": "Sınırsız coworker{slots}",
@@ -126,6 +129,28 @@
             "payOnStripe": "Stripe'ta öde",
             "chargedOnce": "Bu karttan bir kez tahsil edilir.",
             "checkoutFootnote": "Güvenli bir Stripe sayfasında ödeyip buraya geri dönersiniz."
+        },
+        "referrals": {
+            "title": "Arkadaşını davet et",
+            "pitch": "Bir arkadaşınız bağlantınızla abone olduğunda ikiniz de bir ay ücretsiz kazanırsınız.",
+            "linkLabel": "Davet bağlantınız",
+            "copy": "Kopyala",
+            "copied": "Kopyalandı",
+            "capped": "{cap} ayın tamamı kazanıldı. Bağlantınız arkadaşlarınıza hâlâ bir ay kazandırıyor.",
+            "freeMonths": "Ücretsiz aylar",
+            "monthsOf": "{earned} / {cap}",
+            "progressLabel": "Kazanılan ücretsiz ay: {earned} / {cap}",
+            "firstPayment": "İlk ödemenizde uygulanır",
+            "friends": "Arkadaşlar",
+            "empty": "Bağlantınızla kaydolan arkadaşlarınız burada görünür.",
+            "more": "+{count} kişi daha",
+            "loadFailed": "Davetleriniz yüklenemedi.",
+            "status": {
+                "subscribed": "+1 ay",
+                "trial": "Deneme",
+                "signed_up": "Kaydoldu",
+                "canceled": "İptal edildi"
+            }
         }
     },
     "lifetime": {

@@ -45,7 +45,10 @@
             "creditsLeft": "{credits} restantes",
             "keepYearly": "Manter meu plano anual",
             "switchHint": "Mude a cobrança para ver o novo preço.",
-            "cancelPlan": "Cancelar plano"
+            "cancelPlan": "Cancelar plano",
+            "referFriend": "Indique um amigo",
+            "freeMonths": "{count, plural, one {# mês grátis} other {# meses grátis}}",
+            "getFreeMonth": "Ganhe um mês grátis"
         },
         "change": {
             "planLabel": "Coworkers ilimitados{slots}",
@@ -126,6 +129,28 @@
             "payOnStripe": "Pagar no Stripe",
             "chargedOnce": "Cobrado uma única vez neste cartão.",
             "checkoutFootnote": "Você paga em uma página segura do Stripe e depois volta para cá."
+        },
+        "referrals": {
+            "title": "Indique um amigo",
+            "pitch": "Quando um amigo assina com o seu link, vocês dois ganham um mês grátis.",
+            "linkLabel": "Seu link de indicação",
+            "copy": "Copiar",
+            "copied": "Copiado",
+            "capped": "Você ganhou os {cap} meses. Seu link continua dando um mês aos seus amigos.",
+            "freeMonths": "Meses grátis",
+            "monthsOf": "{earned} de {cap}",
+            "progressLabel": "{earned} de {cap} meses grátis ganhos",
+            "firstPayment": "Aplicado no seu primeiro pagamento",
+            "friends": "Amigos",
+            "empty": "Os amigos que se cadastrarem com o seu link aparecem aqui.",
+            "more": "+{count} a mais",
+            "loadFailed": "Não foi possível carregar suas indicações.",
+            "status": {
+                "subscribed": "+1 mês",
+                "trial": "Teste",
+                "signed_up": "Cadastrado",
+                "canceled": "Cancelado"
+            }
         }
     },
     "lifetime": {

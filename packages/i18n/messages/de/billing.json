@@ -45,7 +45,10 @@
             "creditsLeft": "{credits} übrig",
             "keepYearly": "Jahrestarif behalten",
             "switchHint": "Ändere die Abrechnung, um den neuen Preis zu sehen.",
-            "cancelPlan": "Tarif kündigen"
+            "cancelPlan": "Tarif kündigen",
+            "referFriend": "Freunde empfehlen",
+            "freeMonths": "{count, plural, one {# Gratismonat} other {# Gratismonate}}",
+            "getFreeMonth": "Gratismonat sichern"
         },
         "change": {
             "planLabel": "Unbegrenzte Coworker{slots}",
@@ -126,6 +129,28 @@
             "payOnStripe": "Bei Stripe bezahlen",
             "chargedOnce": "Einmalig von dieser Karte abgebucht.",
             "checkoutFootnote": "Du bezahlst auf einer sicheren Stripe-Seite und kommst dann hierher zurück."
+        },
+        "referrals": {
+            "title": "Freunde empfehlen",
+            "pitch": "Wenn ein Freund über deinen Link abonniert, bekommt ihr beide einen Monat gratis.",
+            "linkLabel": "Dein Empfehlungslink",
+            "copy": "Kopieren",
+            "copied": "Kopiert",
+            "capped": "Alle {cap} Monate verdient. Dein Link schenkt Freunden weiterhin einen Monat.",
+            "freeMonths": "Gratismonate",
+            "monthsOf": "{earned} von {cap}",
+            "progressLabel": "{earned} von {cap} Gratismonaten verdient",
+            "firstPayment": "Wird bei deiner ersten Zahlung angerechnet",
+            "friends": "Freunde",
+            "empty": "Freunde, die sich über deinen Link anmelden, erscheinen hier.",
+            "more": "+{count} weitere",
+            "loadFailed": "Deine Empfehlungen konnten nicht geladen werden.",
+            "status": {
+                "subscribed": "+1 Monat",
+                "trial": "Testphase",
+                "signed_up": "Angemeldet",
+                "canceled": "Gekündigt"
+            }
         }
     },
     "lifetime": {
