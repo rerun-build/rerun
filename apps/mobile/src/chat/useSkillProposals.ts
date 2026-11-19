@@ -1,4 +1,4 @@
-import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
+import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds, type SkillProposal, type SkillProposalDecision } from '@moldwright/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, AppState } from 'react-native'
 

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { agentConfigSchema, agentDetailSchema, agentModelsSchema, agentViewSchema, aiConnectionsViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
+import { agentConfigSchema, agentDetailSchema, agentModelsSchema, agentViewSchema, aiConnectionsViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@moldwright/contracts'
 import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider } from './legacy-client'
 
 const legacyProvider = z.enum(['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'])

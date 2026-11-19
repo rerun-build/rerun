@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, nativeTheme, shell, type WebContents } from 'electron'
 import { join } from 'node:path'
-import type { DesktopWindowState } from '@rerun/contracts'
+import type { DesktopWindowState } from '@moldwright/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { PRODUCT_NAME, shellPlatform } from './identity'
 import { localPageUrl } from './local-pages'

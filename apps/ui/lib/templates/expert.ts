@@ -1,4 +1,4 @@
-import { isPublicStatus, templateDocumentObject, type TemplateDocument, type TemplatePricing, type TemplatePricingModel, type TemplateStatus } from '@rerun/contracts'
+import { isPublicStatus, templateDocumentObject, type TemplateDocument, type TemplatePricing, type TemplatePricingModel, type TemplateStatus } from '@moldwright/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import type { Database } from '@/app/api/database.types'

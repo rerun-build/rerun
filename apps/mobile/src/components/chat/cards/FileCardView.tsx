@@ -1,5 +1,5 @@
-import type { FileCard } from '@rerun/contracts'
-import { formatNumber } from '@rerun/i18n/format'
+import type { FileCard } from '@moldwright/contracts'
+import { formatNumber } from '@moldwright/i18n/format'
 import { Pressable, View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'
 

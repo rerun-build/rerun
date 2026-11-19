@@ -1,1 +1,1 @@
-export { calendarDaysBetween, fullDateTime, messageDayLabel, messageTime, shortRelativeTime, shortUntil } from '@rerun/i18n/format'
+export { calendarDaysBetween, fullDateTime, messageDayLabel, messageTime, shortRelativeTime, shortUntil } from '@moldwright/i18n/format'

@@ -1,1 +1,1 @@
-export { stripBridgePrefix } from '@rerun/contracts'
+export { stripBridgePrefix } from '@moldwright/contracts'

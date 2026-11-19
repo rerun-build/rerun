@@ -1,2 +1,2 @@
-export { ActionApprovalBlock } from '@rerun/ui/chat'
-export type { ActionApprovalBlockProps, ApprovalDecision, ApprovalItem } from '@rerun/ui/chat'
+export { ActionApprovalBlock } from '@moldwright/ui/chat'
+export type { ActionApprovalBlockProps, ApprovalDecision, ApprovalItem } from '@moldwright/ui/chat'

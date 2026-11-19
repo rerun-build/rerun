@@ -1,6 +1,6 @@
 'use client'
 
-import { HScrollFade } from '@rerun/ui/primitives'
+import { HScrollFade } from '@moldwright/ui/primitives'
 import { useRef } from 'react'
 
 import type { StarterPackCard as Card } from '@/lib/foreman/starter-pack'

@@ -1,4 +1,4 @@
-import { formatDate } from '@rerun/i18n/format'
+import { formatDate } from '@moldwright/i18n/format'
 
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE

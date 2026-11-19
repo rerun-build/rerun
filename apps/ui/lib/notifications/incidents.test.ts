@@ -1,4 +1,4 @@
-import { emailTranslator } from '@rerun/emails/i18n'
+import { emailTranslator } from '@moldwright/emails/i18n'
 import { describe, expect, it } from 'vitest'
 
 import { announcesRecovery, emailSourceLabel, incidentKeyFor, resolvedIncidentKeysFor } from './incidents'

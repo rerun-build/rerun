@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateStoryArtifact } from '@rerun/contracts'
+import type { TemplateStoryArtifact } from '@moldwright/contracts'
 import { AnimatePresence, motion } from 'motion/react'
 import type { ReactNode } from 'react'
 

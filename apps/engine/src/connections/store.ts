@@ -9,7 +9,7 @@ import {
     type CreateConnectionInput,
     type UpdateConnectionInput,
     type UpdateConnectionKeysInput,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { connectionConfigPath, connectionDir, connectionEnvPath, connectionsDir } from '../config/paths.js'
 import { readEnvFile, serializeEnv, writeEnvFile } from '../lib/env-file.js'
 import { badRequest } from '../lib/errors.js'

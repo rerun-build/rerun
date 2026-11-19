@@ -1,6 +1,6 @@
 'use client'
 
-import { type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { type AxisPoint, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 
 import { along, atDistance, centreOf, inScanner, lineUp, podPath, settles, workSpot, toWorld, type P } from './factory-rest'
 import { Gate, GATE_CSS } from './FactoryGate'

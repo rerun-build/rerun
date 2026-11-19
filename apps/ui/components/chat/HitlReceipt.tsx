@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, PANEL_CARD, type BadgeTone } from '@rerun/ui/primitives'
+import { Badge, PANEL_CARD, type BadgeTone } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
 

@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { TileBuddy, type Tile } from '@rerun/ui/iso-grid'
+import { TileBuddy, type Tile } from '@moldwright/ui/iso-grid'
 import { factoryScene } from './factory-scene'
 
 const TIMES = [0, 6_000, 9_000, 25_000, 70_000]

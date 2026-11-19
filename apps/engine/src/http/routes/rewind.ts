@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { rewindAgentReportQuerySchema } from '@rerun/contracts'
+import { rewindAgentReportQuerySchema } from '@moldwright/contracts'
 import { agentExists } from '../../agents/loader.js'
 import { notFound } from '../../lib/errors.js'
 import { readAgentRewind } from '../../rewind/read.js'

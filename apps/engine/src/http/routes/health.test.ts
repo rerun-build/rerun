@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-health-'))
 process.env.RERUN_API_KEY = 'secret'
 
 const { describe, expect, it } = await import('vitest')
-const { ENGINE_CAPABILITY_ARTIFACT_UPDATE, ENGINE_CAPABILITY_FILES_STREAM, ENGINE_CAPABILITY_FOREMAN_FILES, ENGINE_CAPABILITY_SCHEDULE_RENAME, ENGINE_CAPABILITY_OPENCODE } = await import('@rerun/contracts')
+const { ENGINE_CAPABILITY_ARTIFACT_UPDATE, ENGINE_CAPABILITY_FILES_STREAM, ENGINE_CAPABILITY_FOREMAN_FILES, ENGINE_CAPABILITY_SCHEDULE_RENAME, ENGINE_CAPABILITY_OPENCODE } = await import('@moldwright/contracts')
 const { createServer } = await import('../server.js')
 const { claimSession, registerRunAbort, releaseSession, unregisterRunAbort } = await import('../../runtime/run-control.js')
 const { buildCommit, processStartedAt } = await import('../../runtime/build-info.js')

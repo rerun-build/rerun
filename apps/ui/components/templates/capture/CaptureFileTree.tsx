@@ -1,6 +1,6 @@
 'use client'
 
-import type { AgentArchiveEntry } from '@rerun/contracts'
+import type { AgentArchiveEntry } from '@moldwright/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import * as React from 'react'
 import { Checkbox } from '@/components/ui/checkbox'

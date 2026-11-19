@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { IsoGrid, type Tile } from '@rerun/ui/iso-grid'
+import { IsoGrid, type Tile } from '@moldwright/ui/iso-grid'
 
 const tile = (id: string, col: number, row: number): Tile => ({ id, position: { col, row }, span: 1, style: { color: '#fff' } })
 const TILES = [tile('a', 5, 5), tile('b', 8, 3)]

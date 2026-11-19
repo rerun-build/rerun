@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { TextShimmer } from '@rerun/ui'
+import { TextShimmer } from '@moldwright/ui'
 
 import { Message, MessageContent } from '@/components/ai-elements/message'
 import { DotSpinner } from '@/components/ui/dot-spinner'

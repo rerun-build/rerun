@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from '@rerun/ui/primitives'
-import type { PaidSourceLine, PaidTurnSources } from '@rerun/contracts'
+import { Badge } from '@moldwright/ui/primitives'
+import type { PaidSourceLine, PaidTurnSources } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { createElement } from 'react'
 

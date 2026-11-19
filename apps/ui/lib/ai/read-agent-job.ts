@@ -1,7 +1,7 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { generateText } from 'ai'
 
-import { AGENT_NAME_MAX, EMPTY_READING, parseJobReading, type JobReading } from '@rerun/ui/new-agent/reading'
+import { AGENT_NAME_MAX, EMPTY_READING, parseJobReading, type JobReading } from '@moldwright/ui/new-agent/reading'
 import type { CatalogEntry } from '@/lib/templates/catalog'
 
 const JOB_READER_MODEL = process.env.RERUN_JOB_READER_MODEL ?? 'google/gemini-2.5-flash-lite'

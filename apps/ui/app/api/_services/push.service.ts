@@ -6,7 +6,7 @@ import { pushCopyOf } from '@/lib/notifications/push-copy'
 import { pushAllowed, pushWindowStart } from '@/lib/notifications/push-limits'
 import { wantsPush, type NotificationRecipients, type RoutedMember } from '@/lib/notifications/routing'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
-import { ANDROID_PUSH_CHANNELS, type AndroidPushChannel, type PushData } from '@rerun/contracts'
+import { ANDROID_PUSH_CHANNELS, type AndroidPushChannel, type PushData } from '@moldwright/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 type DispatchInsert = Database['public']['Tables']['notification_push_dispatches']['Insert']

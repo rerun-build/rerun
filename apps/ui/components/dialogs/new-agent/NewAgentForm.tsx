@@ -1,7 +1,7 @@
 'use client'
 
-import { Orb } from '@rerun/ui/foreman'
-import { type AgentSuggestion, BrowseTemplates, Composer, type ConnectorCatalog, fall, Floor, type FloorLight, ForYouCards, SUGGESTION_CARDS, type JobReader, type JobReading, type NewAgentDraft, type NewAgentRequest, OrbLight, useFollow, useNewAgentDraft } from '@rerun/ui/new-agent'
+import { Orb } from '@moldwright/ui/foreman'
+import { type AgentSuggestion, BrowseTemplates, Composer, type ConnectorCatalog, fall, Floor, type FloorLight, ForYouCards, SUGGESTION_CARDS, type JobReader, type JobReading, type NewAgentDraft, type NewAgentRequest, OrbLight, useFollow, useNewAgentDraft } from '@moldwright/ui/new-agent'
 import { useTranslations } from 'next-intl'
 import { type ReactNode, type RefObject, useRef } from 'react'
 

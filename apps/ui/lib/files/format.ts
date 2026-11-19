@@ -1,4 +1,4 @@
-export { formatBytes } from '@rerun/i18n/format'
+export { formatBytes } from '@moldwright/i18n/format'
 
 export function formatEta(ms: number): string {
     const seconds = Math.ceil(ms / 1000)

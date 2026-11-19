@@ -234,13 +234,13 @@ importers:
       '@electron/fuses':
         specifier: 2.1.3
         version: 2.1.3
-      '@rerun/contracts':
+      '@moldwright/contracts':
         specifier: workspace:^
         version: link:../../packages/contracts
-      '@rerun/i18n':
+      '@moldwright/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
-      '@rerun/ui':
+      '@moldwright/ui':
         specifier: workspace:^
         version: link:../../packages/ui
       '@tailwindcss/vite':
@@ -318,7 +318,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.32.2
         version: 1.32.2(supports-color@10.2.2)(zod@4.6.7)
-      '@rerun/contracts':
+      '@moldwright/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
       ai:
@@ -415,13 +415,13 @@ importers:
       '@react-native-masked-view/masked-view':
         specifier: 0.3.2
         version: 0.3.2(react-native@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.3.0)(react@19.3.1)(supports-color@10.2.2))(react@19.3.1)
-      '@rerun/contracts':
+      '@moldwright/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@rerun/db':
+      '@moldwright/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@rerun/i18n':
+      '@moldwright/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
       '@supabase/supabase-js':
@@ -566,7 +566,7 @@ importers:
         specifier: ^4.15.0
         version: 4.15.0(@types/react@19.3.0)(react@19.3.1)
     devDependencies:
-      '@rerun/analytics':
+      '@moldwright/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
       '@testing-library/react-native':
@@ -662,22 +662,22 @@ importers:
       '@posthog/nextjs-config':
         specifier: ^1.12.2
         version: 1.12.2(next@16.4.6(@babel/core@7.29.13(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(posthog-js@1.447.12(@types/react@19.3.0)(react@19.3.1))(webpack@5.112.2(@swc/core@1.16.22(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@20.19.43)))
-      '@rerun/analytics':
+      '@moldwright/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
-      '@rerun/contracts':
+      '@moldwright/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@rerun/db':
+      '@moldwright/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@rerun/emails':
+      '@moldwright/emails':
         specifier: workspace:*
         version: link:../../packages/emails
-      '@rerun/i18n':
+      '@moldwright/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@rerun/ui':
+      '@moldwright/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@streamdown/cjk':
@@ -953,7 +953,7 @@ importers:
       '@react-email/components':
         specifier: ^1.0.12
         version: 1.0.12(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@rerun/i18n':
+      '@moldwright/i18n':
         specifier: workspace:*
         version: link:../i18n
       react:
@@ -990,10 +990,10 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.9.2
         version: 5.9.2(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(effect@3.21.0)(react-hook-form@7.92.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
-      '@rerun/contracts':
+      '@moldwright/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@rerun/i18n':
+      '@moldwright/i18n':
         specifier: workspace:*
         version: link:../i18n
       '@tiptap/pm':

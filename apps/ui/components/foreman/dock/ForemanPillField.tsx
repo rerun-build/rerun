@@ -3,7 +3,7 @@
 import { useReducedMotion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, type RefObject } from 'react'
-import { ChromeButton } from '@rerun/ui/chrome'
+import { ChromeButton } from '@moldwright/ui/chrome'
 
 import { Kbd } from '@/components/ui/kbd'
 import { MicIcon, SendIcon } from '@/lib/icons'

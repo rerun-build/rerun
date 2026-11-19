@@ -2,7 +2,7 @@ import { customContextWindow, customMeasuredContextWindow } from '../../connecti
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
-import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@rerun/contracts'
+import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@moldwright/contracts'
 import type { CompactListener } from '../../agents/claude-context.js'
 import { compactAtTokens, modelFor, type CompactPoint, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'

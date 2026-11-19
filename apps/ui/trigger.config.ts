@@ -37,7 +37,7 @@ export default defineConfig({
       esbuildPlugin({
         name: "rerun-contracts-from-source",
         setup(build) {
-          build.onResolve({ filter: /^@rerun\/contracts$/ }, () => ({ path: CONTRACTS_SOURCE_ENTRY }));
+          build.onResolve({ filter: /^@moldwright\/contracts$/ }, () => ({ path: CONTRACTS_SOURCE_ENTRY }));
         },
       }),
       esbuildPlugin({
@@ -45,7 +45,7 @@ export default defineConfig({
         setup(build) {
           build.onResolve({ filter: /^[^./]/ }, (args) => {
             if (!args.importer.startsWith(CLOUD_DIR) || args.pluginData?.fromApp) return undefined;
-            if (/^(node:|@\/|@rerun\/(contracts|cloud)(\/|$))/.test(args.path)) return undefined;
+            if (/^(node:|@\/|@moldwright\/(contracts|cloud)(\/|$))/.test(args.path)) return undefined;
             if (EXTERNAL_PACKAGES.some((name) => args.path === name || args.path.startsWith(`${name}/`))) return undefined;
             return build.resolve(args.path, { kind: args.kind, resolveDir: APP_DIR, pluginData: { fromApp: true } });
           });

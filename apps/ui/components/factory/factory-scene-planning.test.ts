@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { TileBuddy, buddyColor, type Tile } from '@rerun/ui/iso-grid'
+import { TileBuddy, buddyColor, type Tile } from '@moldwright/ui/iso-grid'
 import { BOSS, BOSS_ID, LOOP_MS, PLANNER_CELLS, PLAN_TANK, STATUS_COLOR, factoryScene } from './factory-scene'
 
 const at = (t: number) => factoryScene(t, 0)

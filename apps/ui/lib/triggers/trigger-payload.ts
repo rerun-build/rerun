@@ -1,1 +1,1 @@
-export { parseTriggerPayload, type TriggerPayload } from '@rerun/contracts'
+export { parseTriggerPayload, type TriggerPayload } from '@moldwright/contracts'

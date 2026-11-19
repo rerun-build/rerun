@@ -1,4 +1,4 @@
-import type { ContextSize, MessageAuthor, Provider, RunGoal } from '@rerun/contracts'
+import type { ContextSize, MessageAuthor, Provider, RunGoal } from '@moldwright/contracts'
 import type { UIMessageStreamWriter } from 'ai'
 import type { TurnOrder } from '../agents/turn-order.js'
 import type { LoadedAgent } from '../agents/types.js'

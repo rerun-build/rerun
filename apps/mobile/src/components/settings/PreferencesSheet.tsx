@@ -1,4 +1,4 @@
-import type { Locale } from '@rerun/i18n'
+import type { Locale } from '@moldwright/i18n'
 import * as Application from 'expo-application'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'

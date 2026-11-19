@@ -1,6 +1,6 @@
-import { isPhoneStepDone, type PhoneStatus } from '@rerun/cloud/phone'
+import { isPhoneStepDone, type PhoneStatus } from '@moldwright/cloud/phone'
 import type { WorkspaceDialogPanel } from '@/lib/settings/panels'
-import { BILLING_ENABLED } from '@rerun/cloud/billing'
+import { BILLING_ENABLED } from '@moldwright/cloud/billing'
 
 export const GETTING_STARTED_REWARD_DAYS = 3
 

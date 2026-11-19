@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ensureWorkspaceEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import type { ForemanState } from './phase'
 import { foremanSurface, type ForemanSurface } from './surface'
 

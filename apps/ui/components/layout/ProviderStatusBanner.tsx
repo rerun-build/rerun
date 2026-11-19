@@ -1,6 +1,6 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
+import { TextShimmer } from '@moldwright/ui'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 

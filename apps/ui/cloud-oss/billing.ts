@@ -1,6 +1,6 @@
-import type { PriceArm, TrialCopy } from '@rerun/contracts'
+import type { PriceArm, TrialCopy } from '@moldwright/contracts'
 
-export { PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, basePriceCents, parsePriceArm, type AddonKey, type PriceArm } from '@rerun/contracts'
+export { PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, basePriceCents, parsePriceArm, type AddonKey, type PriceArm } from '@moldwright/contracts'
 
 export const BILLING_ENABLED = false
 

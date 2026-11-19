@@ -10,7 +10,7 @@ process.env.RERUN_HUB_BASE_URL = 'https://hub.example.test/'
 const { afterEach, beforeEach, describe, expect, it, vi } = await import('vitest')
 
 const { paidDataTools } = await import('./paid-data.js')
-const { PAID_DATA_CAPABILITIES } = await import('@rerun/contracts')
+const { PAID_DATA_CAPABILITIES } = await import('@moldwright/contracts')
 const { workspaceDir } = await import('../../config/paths.js')
 const { lookupPaidSources } = await import('../../db/repos/paid-sources.js')
 const { HostBreaker } = await import('../host-breaker.js')

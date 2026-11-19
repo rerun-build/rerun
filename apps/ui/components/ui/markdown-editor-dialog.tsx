@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2Icon } from '@/lib/icons'
-import { RichTextEditor } from '@rerun/ui/rich-text-editor'
+import { RichTextEditor } from '@moldwright/ui/rich-text-editor'
 import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState, type ReactNode } from 'react'
 

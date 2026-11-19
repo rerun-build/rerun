@@ -2,7 +2,7 @@
 
 import { clearMessageFeedbackAction, fetchSessionFeedbackAction, rateMessageAction, updateMessageFeedbackAction, type FeedbackScope } from '@/app/api/_actions/message-feedback.actions'
 import type { MessageFeedbackDetails } from '@/components/chat/MessageFeedbackDialog'
-import type { MessageFeedbackRating } from '@rerun/contracts'
+import type { MessageFeedbackRating } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

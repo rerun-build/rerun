@@ -1,6 +1,6 @@
 'use client'
 
-import { activeAgentLimitFor } from '@rerun/cloud/billing'
+import { activeAgentLimitFor } from '@moldwright/cloud/billing'
 import { AGENT_LIMIT_TRIGGER, useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import type { CustomMcpStatus } from '@/lib/services/types'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 
 type CustomMcpStatusBadgeProps = {
     status: CustomMcpStatus | undefined

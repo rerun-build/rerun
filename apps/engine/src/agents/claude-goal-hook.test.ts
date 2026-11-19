@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { GoalVerdict, RunGoal } from '@rerun/contracts'
+import type { GoalVerdict, RunGoal } from '@moldwright/contracts'
 import { goalStopHook } from './claude-goal-hook.js'
 
 const goal = (turnLimit: number): RunGoal => ({ lastLineForms: [{ prefix: 'DONE ', rest: 'sha' }], turnLimit })

@@ -1,4 +1,4 @@
-import { BUDDY_EYES, BuddyFace, type BuddyEyes, type BuddyMood } from '@rerun/ui/iso-grid'
+import { BUDDY_EYES, BuddyFace, type BuddyEyes, type BuddyMood } from '@moldwright/ui/iso-grid'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'

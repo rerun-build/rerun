@@ -1,7 +1,7 @@
 'use client'
 
 import { isDesktopShell } from '@/lib/desktop-shell/client'
-import { DESKTOP_APP_COOKIE, DESKTOP_OPEN_HOST, desktopShellScheme, isDesktopOpenPath, isDesktopShellChannel } from '@rerun/contracts'
+import { DESKTOP_APP_COOKIE, DESKTOP_OPEN_HOST, desktopShellScheme, isDesktopOpenPath, isDesktopShellChannel } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'

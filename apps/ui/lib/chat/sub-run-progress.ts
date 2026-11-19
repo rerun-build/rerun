@@ -24,4 +24,4 @@ export {
     type SubRunProgress,
     type SubRunStatus,
     type SubRunTask,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'

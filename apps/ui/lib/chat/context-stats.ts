@@ -1,4 +1,4 @@
-import type { MessageUsageMetadata, Usage } from '@rerun/contracts'
+import type { MessageUsageMetadata, Usage } from '@moldwright/contracts'
 
 export type ContextStats = { used: number; max: number | undefined; usage: Usage; model: string | undefined; provider: string | undefined }
 

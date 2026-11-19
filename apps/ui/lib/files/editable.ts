@@ -1,5 +1,5 @@
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
-import { formatNumber } from '@rerun/i18n/format'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
+import { formatNumber } from '@moldwright/i18n/format'
 
 import { filePreviewKind } from './preview'
 

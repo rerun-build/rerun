@@ -1,6 +1,6 @@
 'use client'
 
-import { formatDate } from '@rerun/i18n/format'
+import { formatDate } from '@moldwright/i18n/format'
 import { motion } from 'motion/react'
 import { useLocale, useTranslations } from 'next-intl'
 

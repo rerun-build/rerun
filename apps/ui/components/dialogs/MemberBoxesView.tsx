@@ -20,7 +20,7 @@ import { Switch } from '@/components/ui/switch'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import type { AuthorProfile } from '@/lib/chat/message-author'
 import { ShieldCheckIcon } from '@/lib/icons'
-import { CardAvatar } from '@rerun/ui/chat'
+import { CardAvatar } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

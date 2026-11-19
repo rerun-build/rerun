@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 
 import { startLeadInstall } from '@/components/foreman/ForemanNextSteps'
 import { settleBuiltFunnel } from '@/components/foreman/useForemanKickoff'
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled } from '@moldwright/cloud/billing'
 import { KICKOFF_MARKER } from '@/lib/foreman/kickoff-marker'
 import { browserPermission } from '@/lib/notifications/browser'
 import { useBoardStore } from '@/stores/board.store'

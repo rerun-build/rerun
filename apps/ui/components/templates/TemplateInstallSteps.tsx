@@ -2,7 +2,7 @@
 
 import { Icon } from '@/components/ui/icon'
 import type { TemplateStep } from '@/lib/templates/useTemplateCta'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 
 export function TemplateInstallSteps({ steps }: { steps: TemplateStep[] }) {
     if (steps.length < 2) return null

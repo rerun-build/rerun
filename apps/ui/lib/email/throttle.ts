@@ -1,4 +1,4 @@
-import { sleep } from '@rerun/contracts'
+import { sleep } from '@moldwright/contracts'
 import type { ErrorResponse } from 'resend'
 
 const MAX_REQUESTS_PER_SECOND = 5

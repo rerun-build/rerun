@@ -1,4 +1,4 @@
-import type { Container, Tile } from '@rerun/ui/iso-grid'
+import type { Container, Tile } from '@moldwright/ui/iso-grid'
 import { BOX_MANAGE_ACTION_REASON, type BoxViewer } from './box-access'
 
 export function boxContainerFor(container: Container, manages: boolean, refusal: string = BOX_MANAGE_ACTION_REASON): Container {

@@ -1,6 +1,6 @@
 import { and, asc, eq, gte, isNotNull, sql, type SQL } from 'drizzle-orm'
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core'
-import { visibleText, type StatsDataset, type StatsGroupBy, type StatsMetric, type StatsPoint, type StatsRunStatusFilter } from '@rerun/contracts'
+import { visibleText, type StatsDataset, type StatsGroupBy, type StatsMetric, type StatsPoint, type StatsRunStatusFilter } from '@moldwright/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { runs, runSteps, sessions, toolCalls } from '../schema.js'
 

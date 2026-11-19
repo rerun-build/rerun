@@ -21,7 +21,7 @@ vi.mock('@/lib/services/registry', async importOriginal => ({
 }))
 vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toVectorLiteral: vi.fn() }))
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
-vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
+vi.mock('@moldwright/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
 const MANIFESTS: Record<string, unknown> = {

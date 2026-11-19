@@ -1,4 +1,4 @@
-import { Logo } from '@rerun/ui/logo'
+import { Logo } from '@moldwright/ui/logo'
 import type { ReactNode } from 'react'
 
 export function ShellFrame({ children }: { children: ReactNode }) {

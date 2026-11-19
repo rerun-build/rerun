@@ -15,7 +15,7 @@ vi.mock('../desktop/session.js', async importOriginal => ({
 
 const { describe, expect, it } = await import('vitest')
 const { asSchema } = await import('ai')
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { buildSystemPrompt, systemPromptText } = await import('./systemPrompt.js')
 const { buildTools } = await import('../tools/registry.js')
 const { HITL_TOOL_NAMES, HITL_TOOL_SET } = await import('../tools/builtin/hitl.js')

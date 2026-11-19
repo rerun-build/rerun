@@ -1,4 +1,4 @@
-import { needsHuman, type SessionStatus } from '@rerun/contracts'
+import { needsHuman, type SessionStatus } from '@moldwright/contracts'
 import type { SystemSymbolIcon } from '@/components/ui/system-symbols'
 
 export type ConversationState = 'needs-you' | 'running' | 'new' | 'earlier'

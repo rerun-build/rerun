@@ -1,4 +1,4 @@
-import { OPENCODE_CATALOG_URL, OPENCODE_PLANS, OPENCODE_SNAPSHOT, parseOpencodeCatalog, toProviderModel, type OpencodeModel, type OpencodePlan, type ProviderModel } from '@rerun/contracts'
+import { OPENCODE_CATALOG_URL, OPENCODE_PLANS, OPENCODE_SNAPSHOT, parseOpencodeCatalog, toProviderModel, type OpencodeModel, type OpencodePlan, type ProviderModel } from '@moldwright/contracts'
 import { logger } from '../lib/logger.js'
 import { opencodeUserAgent } from '../runtime/build-info.js'
 

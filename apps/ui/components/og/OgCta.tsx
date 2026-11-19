@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@rerun/ui/primitives'
+import { Button } from '@moldwright/ui/primitives'
 
 export function OgCta({ label }: { label: string }) {
     return (

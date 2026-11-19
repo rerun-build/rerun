@@ -1,4 +1,4 @@
-import { DESKTOP_SHELL_API_VERSION, type DesktopServerConfig } from '@rerun/contracts'
+import { DESKTOP_SHELL_API_VERSION, type DesktopServerConfig } from '@moldwright/contracts'
 
 const SEMVER = /^\d+\.\d+\.\d+$/
 

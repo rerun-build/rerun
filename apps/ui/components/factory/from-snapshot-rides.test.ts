@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
 import { sceneFromSnapshot, resetRides } from './from-snapshot'
 import { BOSS_ID, STATUS_COLOR } from './factory-scene'
 

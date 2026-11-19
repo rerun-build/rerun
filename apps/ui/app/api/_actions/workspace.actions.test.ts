@@ -14,10 +14,10 @@ vi.mock('@/lib/images/upload', () => ({ uploadPublicImage: mocks.uploadPublicIma
 vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
 const findSiteIcon = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/onboarding/site-icon.server', () => ({ findSiteIcon }))
-vi.mock('@rerun/cloud/billing.server', () => ({ grantRerunTopup: mocks.grantRerunTopup }))
+vi.mock('@moldwright/cloud/billing.server', () => ({ grantRerunTopup: mocks.grantRerunTopup }))
 const SIGNUP_ALLOWANCE_MICROS = vi.hoisted(() => 5_000_000)
-vi.mock('@rerun/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@rerun/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
-vi.mock('@rerun/cloud/illustrations', () => ({
+vi.mock('@moldwright/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@moldwright/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
+vi.mock('@moldwright/cloud/illustrations', () => ({
     ILLUSTRATION_ENTRIES: [
         { file: 'green-energy-blob.webp', desc: 'Green blob', color: 'green', form: 'blob' },
         { file: 'blue-vortex-ring.webp', desc: 'Blue vortex', color: 'blue', form: 'vortex' },

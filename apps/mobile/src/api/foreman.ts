@@ -1,4 +1,4 @@
-import { foremanEngineConversationSchema, foremanEngineFilesSchema, foremanEngineMessagesSchema, foremanStateSchema, type ConversationMessage, type ForemanStateResponse, type ForemanSurface } from '@rerun/contracts'
+import { foremanEngineConversationSchema, foremanEngineFilesSchema, foremanEngineMessagesSchema, foremanStateSchema, type ConversationMessage, type ForemanStateResponse, type ForemanSurface } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

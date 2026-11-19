@@ -1,6 +1,6 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
+import { TextShimmer } from '@moldwright/ui'
 import { useTranslations } from 'next-intl'
 
 import { LiveWaveform } from '@/components/ui/live-waveform'

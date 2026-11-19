@@ -1,4 +1,4 @@
-import { scanTextForSecrets, type TemplateDocument } from '@rerun/contracts'
+import { scanTextForSecrets, type TemplateDocument } from '@moldwright/contracts'
 
 export type SecretHit = { where: string; label: string }
 

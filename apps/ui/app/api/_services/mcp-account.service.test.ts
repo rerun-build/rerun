@@ -1,5 +1,5 @@
 import { workspaceActor } from '@/app/api/_auth/access'
-import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
+import { MAX_TEXT_WRITE_CHARS } from '@moldwright/contracts'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EngineUnreachableError, agentFilesBase, chat as engineChat, createMemory, createSchedule, createTrigger, getAgent, getRun, importSkill, listConnections, listSchedules, listSkills, listTriggers, patchAgent, updateSchedule, updateTrigger, uploadFile, writeFileText } from '@/lib/engine/client'

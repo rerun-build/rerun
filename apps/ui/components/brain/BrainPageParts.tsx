@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { CheckIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { brainPageTypeSchema, type BrainPageType } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
+import { brainPageTypeSchema, type BrainPageType } from '@moldwright/contracts'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useLayoutEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
 

@@ -15,7 +15,7 @@ vi.mock('../desktop/session.js', async importOriginal => ({
 }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText } = await import('./systemPrompt.js')
 
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))

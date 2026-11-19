@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { app, BrowserWindow, shell, type DownloadItem, type Session } from 'electron'
-import type { DesktopDownloadEvent } from '@rerun/contracts'
+import type { DesktopDownloadEvent } from '@moldwright/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { uniqueDownloadPath } from './download-path'
 import { getMainWindow } from './main-window'

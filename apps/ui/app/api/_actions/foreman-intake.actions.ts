@@ -1,6 +1,6 @@
 'use server'
 
-import { isTemplateCategory, SOFTWARE_STUDIO, type TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, SOFTWARE_STUDIO, type TemplateCategory } from '@moldwright/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { decideIndustry } from '@/lib/company/decide-industry'

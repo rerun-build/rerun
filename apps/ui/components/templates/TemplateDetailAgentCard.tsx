@@ -3,11 +3,11 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { Icon } from '@/components/ui/icon'
 import { TooltipLabeled } from '@/components/ui/tooltip'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { CalendarClock, WebhookIcon, Zap, type LucideIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { scheduleLabel } from '@/lib/templates/labels'
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
+import type { TemplateAgent, TemplateConnector } from '@moldwright/contracts'
 
 const MAX_CONNECTORS = 6
 const MAX_SKILLS = 4

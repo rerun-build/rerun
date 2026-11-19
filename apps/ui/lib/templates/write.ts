@@ -1,4 +1,4 @@
-import { isPublicStatus, isSeoDescriptionLength, type TemplateDocument } from '@rerun/contracts'
+import { isPublicStatus, isSeoDescriptionLength, type TemplateDocument } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { revalidateLanding } from '@/lib/landing-revalidate'

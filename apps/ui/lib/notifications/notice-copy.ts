@@ -1,5 +1,5 @@
 import type { Json } from '@/app/api/database.types'
-import type { Messages } from '@rerun/i18n/messages'
+import type { Messages } from '@moldwright/i18n/messages'
 
 export type NoticeKey = keyof Messages['notifications']['notices']
 export type NoticeCopy = { key: NoticeKey; values?: Record<string, string | number> }

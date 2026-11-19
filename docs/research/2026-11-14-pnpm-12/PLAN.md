@@ -60,9 +60,9 @@ And can EAS Build run pnpm 12 (step 7)?
 | `.gitattributes` | `*.yaml text eol=lf`, `Dockerfile* text eol=lf` **[repo]** |
 | `.github/workflows/ci.yml:26-31` | `pnpm/action-setup@v4` (no `version`, so it reads `packageManager`), `actions/setup-node@v4` with `node-version: 26`, `cache: pnpm`, then `pnpm install --frozen-lockfile` **[repo]** |
 | `.github/workflows/ci.yml:86` | a PR that touches `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` also builds both images **[repo]** |
-| `apps/ui/Dockerfile:3-5,27-28` | `node:26-bookworm-slim`, `npm install -g corepack && corepack enable`, `pnpm install --frozen-lockfile --store-dir /pnpm-store --filter rerun... --filter @rerun/contracts`. Runtime runs `node .../next start`, not pnpm **[repo]** |
+| `apps/ui/Dockerfile:3-5,27-28` | `node:26-bookworm-slim`, `npm install -g corepack && corepack enable`, `pnpm install --frozen-lockfile --store-dir /pnpm-store --filter rerun... --filter @moldwright/contracts`. Runtime runs `node .../next start`, not pnpm **[repo]** |
 | `apps/engine/Dockerfile:5-15` | `node:26-trixie-slim`, the same corepack line, `--filter rerun-engine...`, then `pnpm --filter rerun-engine deploy --prod /out`. Runtime runs `node dist/cli/bin.js` **[repo]** |
-| `apps/engine/package.json:8-12` | `files: [dist, assets, patches]`; depends on `@rerun/contracts: workspace:*` **[repo]** |
+| `apps/engine/package.json:8-12` | `files: [dist, assets, patches]`; depends on `@moldwright/contracts: workspace:*` **[repo]** |
 | Other pnpm callers | `apps/engine/src/cli/commands/update.ts:240` (`pnpm --filter rerun-engine... install --prod=false --frozen-lockfile` on git-checkout boxes), `tools/factory/factory.py:539` (`pnpm install --frozen-lockfile --prefer-offline`, 300 s timeout, fresh worktrees), `apps/mobile/eas.json:8` (`"pnpm": "8.15.4"` for EAS Build), `scripts/dev-mobile.mjs:135` (parses stdout of `pnpm --dir ... exec expo config --json`) **[repo]** |
 | Workspace protocol | every internal dependency uses `workspace:*` **[repo]** |
 | `npm_config_*` in repo | none **[repo]** |
@@ -325,7 +325,7 @@ Keys starting with `@` must be quoted in YAML; quoting every key keeps it unifor
   (`--frozen-lockfile false`) ([migration-v11](https://pnpm.io/migration-v11);
   [v12.0.0](https://github.com/pnpm/pnpm/releases/tag/v12.0.0) #14741).
 - No script is named `clean`, `deploy`, `setup` or `rebuild` at a root where it would shadow a
-  built-in. `@rerun/contracts` has a `clean` script, but pnpm 8 ran that script too
+  built-in. `@moldwright/contracts` has a `clean` script, but pnpm 8 ran that script too
   ([v11.0.0](https://github.com/pnpm/pnpm/releases/tag/v11.0.0) #11118).
 - No custom `pre*`/`post*` scripts exist, so `enable-pre-post-scripts` (on since
   [v9.0.0](https://github.com/pnpm/pnpm/releases/tag/v9.0.0)) changes nothing.
@@ -532,7 +532,7 @@ Commit: `chore: move to pnpm 12.18.0`.
 git clone --no-local E:/project/rerun C:/temp/rerun-pnpm12 && cd C:/temp/rerun-pnpm12 && git switch chore/pnpm-12
 pnpm install --frozen-lockfile && pnpm install --frozen-lockfile
 git status --porcelain                         # expect empty (lockfile and workspace file untouched)
-pnpm --filter @rerun/contracts build && pnpm -r --if-present ts-check && pnpm -r --if-present lint
+pnpm --filter @moldwright/contracts build && pnpm -r --if-present ts-check && pnpm -r --if-present lint
 pnpm --filter rerun run test --maxWorkers=2 && pnpm --filter rerun-engine run test --maxWorkers=2
 ```
 

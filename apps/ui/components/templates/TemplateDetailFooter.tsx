@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { Button } from '@/components/ui/button'
 import { TemplateInstallSteps } from '@/components/templates/TemplateInstallSteps'
 import type { LibraryTemplate } from '@/lib/templates/library'

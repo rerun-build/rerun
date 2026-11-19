@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { routeTileLinks } from '@rerun/ui/iso-grid'
+import { routeTileLinks } from '@moldwright/ui/iso-grid'
 
 import { applyMoves, canMove, dropReason, readMoves } from './factory-layout'
 import { CODE, factoryScene } from './factory-scene'

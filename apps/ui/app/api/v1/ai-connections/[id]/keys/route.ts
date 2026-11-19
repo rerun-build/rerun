@@ -2,7 +2,7 @@ import { updateAiConnectionKeys } from '@/app/api/_services/ai-connection.servic
 import { connectionTarget } from '@/app/api/v1/ai-connections/_lib/target'
 import { answeringConnectionErrors } from '@/app/api/v1/_lib/ai-connection-errors'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID, replaceAiConnectionKeyInputSchema } from '@rerun/contracts'
+import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID, replaceAiConnectionKeyInputSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

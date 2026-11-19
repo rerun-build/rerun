@@ -1,2 +1,2 @@
 export const runtime = 'nodejs'
-export { brandOgRoute as GET } from '@rerun/cloud/marketing-og'
+export { brandOgRoute as GET } from '@moldwright/cloud/marketing-og'

@@ -1,6 +1,6 @@
 import { readFile, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { sleep } from '@rerun/contracts'
+import { sleep } from '@moldwright/contracts'
 import { isPathSegment, mcpDir, mcpPendingPath, mcpTokenPath } from '../config/paths.js'
 import type { McpServer } from '../agents/types.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'

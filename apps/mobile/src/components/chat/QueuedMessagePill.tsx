@@ -1,4 +1,4 @@
-import { queuedPreview } from '@rerun/contracts'
+import { queuedPreview } from '@moldwright/contracts'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

@@ -1,6 +1,6 @@
 import { openDesktopAction } from '@/app/api/_actions/desktop.actions'
 import { ApiError, apiRoute, deniedStatus } from '@/app/api/v1/_lib/api-route'
-import { desktopSocketRequestSchema, type DesktopSocketView } from '@rerun/contracts'
+import { desktopSocketRequestSchema, type DesktopSocketView } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,4 +1,4 @@
-import type { SessionKind, SessionStatus } from '@rerun/contracts'
+import type { SessionKind, SessionStatus } from '@moldwright/contracts'
 import { Platform, Pressable, View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, LayoutAnimationConfig, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

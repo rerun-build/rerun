@@ -11,7 +11,7 @@ const { agentConfigSchema } = await import('../../agents/types.js')
 const { writeAgentConfig } = await import('../../agents/config-write.js')
 const { mkdir } = await import('node:fs/promises')
 const { agentDir, workspaceDir } = await import('../../config/paths.js')
-const { MAX_TEXT_WRITE_CHARS } = await import('@rerun/contracts')
+const { MAX_TEXT_WRITE_CHARS } = await import('@moldwright/contracts')
 
 const id = 'writeagent'
 const app = createServer()

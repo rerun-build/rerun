@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DownloadIcon, type LucideIcon } from '@/lib/icons'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
 import { cn } from '@/lib/utils'
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 
 export const RAW_URL = '/__rerun/raw'
 export const DOWNLOAD_URL = '/__rerun/raw?download=1'

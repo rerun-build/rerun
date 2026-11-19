@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
-import { MARKETPLACE_ENABLED } from '@rerun/cloud/marketplace'
+import { MARKETPLACE_ENABLED } from '@moldwright/cloud/marketplace'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 export const ENTITLED_PURCHASE_STATUSES = ['active', 'past_due'] as const

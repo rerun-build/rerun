@@ -1,5 +1,5 @@
 import type { Client, InStatement } from '@libsql/client'
-import type { TableSourceCall, TableSourceCell, TableSourcesRequest, TableSourcesResult } from '@rerun/contracts'
+import type { TableSourceCall, TableSourceCell, TableSourcesRequest, TableSourcesResult } from '@moldwright/contracts'
 import { cellKeys, emailKey, equalityKeys, extractPaidItems, isWeakKey, isWebField, paidItemKeys, toHref, webKeys, type PaidItem, type PaidScalar } from './sources.js'
 
 export type PaidSourceRecord = {

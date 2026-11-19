@@ -17,7 +17,7 @@ import { nextRunAt, routineFrequency } from '@/lib/schedules/cron'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
-import { RoutineList, routineKey } from '@rerun/ui/foreman'
+import { RoutineList, routineKey } from '@moldwright/ui/foreman'
 
 const RUN_SETTLE_MS = 1500
 

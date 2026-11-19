@@ -1,4 +1,4 @@
-import type { VoiceMessage } from '@rerun/contracts'
+import type { VoiceMessage } from '@moldwright/contracts'
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
 import { useEffect, useState } from 'react'
 

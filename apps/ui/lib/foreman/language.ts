@@ -1,4 +1,4 @@
-import { isStableLocale, languageName } from '@rerun/i18n'
+import { isStableLocale, languageName } from '@moldwright/i18n'
 
 export function preferredLanguage(header: string | null | undefined): string | null {
     const tag = (header ?? '')

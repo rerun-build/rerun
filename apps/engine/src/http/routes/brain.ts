@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { brainConfirmSectionsSchema, brainRevertSchema, brainPageWriteSchema, brainProposalAcceptSchema, brainProposalDismissSchema, brainProposalStatusSchema, brainSeedInputSchema } from '@rerun/contracts'
+import { brainConfirmSectionsSchema, brainRevertSchema, brainPageWriteSchema, brainProposalAcceptSchema, brainProposalDismissSchema, brainProposalStatusSchema, brainSeedInputSchema } from '@moldwright/contracts'
 import { confirmSections, deletePage, getPage, getRevision, listPages, listRevisions, revertPage, writePage } from '../../brain/pages.js'
 import { acceptProposal, countOpenProposals, dismissProposal, listProposals } from '../../brain/proposals.js'
 import { seedBrain } from '../../brain/seed.js'

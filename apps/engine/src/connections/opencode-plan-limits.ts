@@ -1,4 +1,4 @@
-import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL } from '@moldwright/contracts'
 import { logger } from '../lib/logger.js'
 import { opencodeUserAgent } from '../runtime/build-info.js'
 import { planLimitWindowsFromOpencode, recordPlanLimits } from './plan-limits.js'

@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, pendingTakeover, serializeTakeoverResult, type PendingHitl } from '@rerun/contracts'
+import { HITL_CANCELLED, pendingTakeover, serializeTakeoverResult, type PendingHitl } from '@moldwright/contracts'
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
 import { Alert } from 'react-native'

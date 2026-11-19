@@ -1,4 +1,4 @@
-import type { Conversation } from '@rerun/contracts'
+import type { Conversation } from '@moldwright/contracts'
 import { useCallback, useEffect, useId, useState } from 'react'
 
 import { fetchAgentConversations } from '@/api/chat'

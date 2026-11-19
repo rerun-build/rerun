@@ -1,6 +1,6 @@
-import { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, MAX_SKILL_REFERENCE_FILES } from '@rerun/contracts'
+import { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, MAX_SKILL_REFERENCE_FILES } from '@moldwright/contracts'
 
-export { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, MAX_SKILL_REFERENCE_FILES } from '@rerun/contracts'
+export { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, MAX_SKILL_REFERENCE_FILES } from '@moldwright/contracts'
 
 export const SKILL_ENTRY = 'SKILL.md'
 const IGNORED_NAMES = new Set(['.DS_Store', 'Thumbs.db'])

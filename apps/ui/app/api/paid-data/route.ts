@@ -1,5 +1,5 @@
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { BILLING_ENABLED } from '@rerun/cloud/billing'
+import { BILLING_ENABLED } from '@moldwright/cloud/billing'
 import { paidDataPriceMultiplier } from '@/lib/paid-data/pricing'
 
 export const dynamic = 'force-dynamic'

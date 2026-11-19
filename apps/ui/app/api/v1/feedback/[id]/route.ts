@@ -1,6 +1,6 @@
 import { clearMessageFeedbackAction, updateMessageFeedbackAction } from '@/app/api/_actions/message-feedback.actions'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { messageFeedbackDetailsRequestSchema } from '@rerun/contracts'
+import { messageFeedbackDetailsRequestSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,4 +1,4 @@
-export { parseInstallMessage, type InstallMessage } from '@rerun/contracts'
+export { parseInstallMessage, type InstallMessage } from '@moldwright/contracts'
 
 const CLOSING_TAG = '</agent_install>'
 const ESCAPED_CLOSING_TAG = '<\\/agent_install>'

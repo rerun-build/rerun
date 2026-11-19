@@ -1,6 +1,6 @@
 'use client'
 
-import { type Container, GRID_SIZE, IsoGrid, isoPosition, SPACE_COLOR, TILE_H, TILE_W, useRenderedFrame } from '@rerun/ui/iso-grid'
+import { type Container, GRID_SIZE, IsoGrid, isoPosition, SPACE_COLOR, TILE_H, TILE_W, useRenderedFrame } from '@moldwright/ui/iso-grid'
 import type { CSSProperties, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'

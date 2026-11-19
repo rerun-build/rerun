@@ -1,4 +1,4 @@
-import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView, UpdateConnectionInput } from '@rerun/contracts'
+import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView, UpdateConnectionInput } from '@moldwright/contracts'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'

@@ -1,4 +1,4 @@
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import * as engine from '@/lib/engine/client'
 import { attachmentUrl, audioFormatOf, baseMime, extensionOf, parseAttachmentRef, safeFileName, transcribeStream, type Transcription } from './attachments'
 import { downloadAttachment } from './linkup/client'

@@ -1,7 +1,7 @@
 'use client'
 
 import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
-import { isMachineEntitled } from '@rerun/cloud/billing'
+import { isMachineEntitled } from '@moldwright/cloud/billing'
 import { useSandboxArchiveStore } from '@/stores/sandbox-archive.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'

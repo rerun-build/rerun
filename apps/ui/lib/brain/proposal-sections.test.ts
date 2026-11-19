@@ -1,4 +1,4 @@
-import type { BrainProposal } from '@rerun/contracts'
+import type { BrainProposal } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import { changedOnly, humanAgentName, proposalHeadline, sectionChanges, sectionsOf } from './proposal-sections'

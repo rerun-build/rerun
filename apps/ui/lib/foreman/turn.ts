@@ -1,4 +1,4 @@
-import { asRecord } from '@rerun/contracts'
+import { asRecord } from '@moldwright/contracts'
 import { foremanPhase, isNamedReadyMade, type ForemanAnswers, type ForemanState } from './phase'
 
 export type ForemanTurn = {

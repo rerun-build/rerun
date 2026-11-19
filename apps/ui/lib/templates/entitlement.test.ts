@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { fakeSupabase } from '@/test/supabase-fake'
 import { hasTemplateEntitlement, templateAccessByWorkspace } from './entitlement'
-vi.mock('@rerun/cloud/marketplace', async () => (await import('@/test/cloud-fakes')).CLOUD_MARKETPLACE)
+vi.mock('@moldwright/cloud/marketplace', async () => (await import('@/test/cloud-fakes')).CLOUD_MARKETPLACE)
 
 const PAID = { id: 'tpl_1', pricing_model: 'one_time', creator_id: 'creator_1' }
 

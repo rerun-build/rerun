@@ -1,4 +1,4 @@
-import { opencodeUpstreamId, type Provider } from '@rerun/contracts'
+import { opencodeUpstreamId, type Provider } from '@moldwright/contracts'
 
 export type TurnOrder = 'message-first' | 'call-first'
 

@@ -234,7 +234,7 @@ describe('GET /agents/:id/runs', () => {
         })
 
         it('keeps a run without the new fields valid', async () => {
-            const { runSchema } = await import('@rerun/contracts')
+            const { runSchema } = await import('@moldwright/contracts')
             const { initiatorAgentId, initiatorRunId, initiatorSessionId, initiatorUserId, jobRef, branch, copyIndex, ...legacy } = (await getRun(jobAgent, 'j5'))!
             void [initiatorAgentId, initiatorRunId, initiatorSessionId, initiatorUserId, jobRef, branch, copyIndex]
             expect(runSchema.safeParse(legacy).success).toBe(true)

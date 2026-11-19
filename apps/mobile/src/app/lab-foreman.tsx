@@ -1,4 +1,4 @@
-import { appendVoiceMarker, buildVoiceMarker, FOREMAN_DISPLAY_NAME, teamEmptyStateOf } from '@rerun/contracts'
+import { appendVoiceMarker, buildVoiceMarker, FOREMAN_DISPLAY_NAME, teamEmptyStateOf } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'

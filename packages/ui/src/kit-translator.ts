@@ -1,4 +1,4 @@
-import englishKit from '@rerun/i18n/messages/en/kit.json'
+import englishKit from '@moldwright/i18n/messages/en/kit.json'
 import { createTranslator } from 'use-intl/core'
 
 import type { useKitTranslations } from './locale'

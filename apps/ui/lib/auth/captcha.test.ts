@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 const edition = vi.hoisted(() => ({ rerunCloud: true }))
-vi.mock('@rerun/cloud/edition', () => ({ get RERUN_CLOUD() { return edition.rerunCloud } }))
+vi.mock('@moldwright/cloud/edition', () => ({ get RERUN_CLOUD() { return edition.rerunCloud } }))
 
 const { verifyCaptcha } = await import('./captcha')
 

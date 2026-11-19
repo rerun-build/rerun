@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { brainProposalInputSchema, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { brainProposalInputSchema, FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import { deletePage, getPage, listPages, listRevisions, pageHash, readPageFile, writePage } from '../../brain/pages.js'
 import { searchBrain } from '../../brain/search.js'
 import { acceptProposal, dismissProposal, findProposalByFingerprint, getProposal, insertProposal, listProposals, openProposalFor, proposalFingerprint, replaceOpenProposal } from '../../brain/proposals.js'

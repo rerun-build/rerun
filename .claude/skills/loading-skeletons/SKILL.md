@@ -48,7 +48,7 @@ The counter-example not to reproduce: `SkeletonRows` (stacked `h-4 w-full` bars)
 
 ## The boundary: what is not a content load
 
-- **A button mid-action** → `<Button loading>` from `@rerun/ui/primitives` (renders a `DotLoader`). `components/ui/button.tsx` is only a re-export, so the prop is available everywhere. Do not hand-build a `Loader2Icon` inside a button.
+- **A button mid-action** → `<Button loading>` from `@moldwright/ui/primitives` (renders a `DotLoader`). `components/ui/button.tsx` is only a re-export, so the prop is available everywhere. Do not hand-build a `Loader2Icon` inside a button.
   - Trap: `useTransition` gives **one** shared `pending`. If several buttons live in the same component, keep the running action in a state (`running === 'submit'`) so only the right one spins. See `components/templates/expert/TemplateSubmitFooter.tsx`.
 - **An inline status in the chat** (`ToolCallBlock`, `CompactionBlock`) → `Spinner`.
 - **The app's full-screen loading** → `AnimatedLogo` + `Shimmer`.

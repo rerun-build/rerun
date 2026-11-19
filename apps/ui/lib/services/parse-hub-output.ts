@@ -1,1 +1,1 @@
-export { parseHubOutput, unwrapToolOutputEnvelope } from '@rerun/contracts'
+export { parseHubOutput, unwrapToolOutputEnvelope } from '@moldwright/contracts'

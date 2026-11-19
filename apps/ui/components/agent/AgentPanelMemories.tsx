@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 

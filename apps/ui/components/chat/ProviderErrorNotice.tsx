@@ -3,7 +3,7 @@
 import { NoticeActions, type NoticeAction } from '@/components/chat/NoticeActions'
 import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
-import { BorderBeam } from '@rerun/ui'
+import { BorderBeam } from '@moldwright/ui'
 import { AlertTriangleIcon, GaugeIcon, MessagePlusIcon, MessageSquareIcon, PlugIcon, RotateCwIcon, ScrollTextIcon, ServerIcon, SquareIcon, UnplugIcon } from '@/lib/icons'
 import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorCopy, type ChatErrorKind } from '@/lib/chat-error'
 import { useTranslations } from 'next-intl'

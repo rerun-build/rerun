@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
-vi.mock('@rerun/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
 
 import { buildControlCommands, pushRecentAgent, type ControlGates } from './commands'
 

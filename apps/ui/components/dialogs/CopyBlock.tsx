@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { CheckIcon, CopyIcon } from '@/lib/icons'
 import { useCopy } from '@/lib/use-copy'
 import { cn } from '@/lib/utils'
-import { ScrollFade } from '@rerun/ui/primitives'
+import { ScrollFade } from '@moldwright/ui/primitives'
 
 export function CopyBlock({ value, label, className, wrap = false }: { value: string; label: string; className?: string; wrap?: boolean }) {
     const { copied, copy } = useCopy()

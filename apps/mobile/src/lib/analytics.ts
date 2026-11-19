@@ -1,9 +1,9 @@
-import type { AnalyticsEventMap, EventName } from '@rerun/analytics'
+import type { AnalyticsEventMap, EventName } from '@moldwright/analytics'
 import PostHog from 'posthog-react-native'
 
 import { environment } from '@/config/environment'
 import { clientPlatform } from '@/lib/client-platform'
-import { POSTHOG_TOKEN } from '@rerun/cloud-mobile/environments'
+import { POSTHOG_TOKEN } from '@moldwright/cloud-mobile/environments'
 
 const UNSET_TOKEN = 'phc_unset'
 

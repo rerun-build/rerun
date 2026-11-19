@@ -1,6 +1,6 @@
 import { revertBrainPageAction } from '@/app/api/_actions/brain.actions'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { brainRevertRequestSchema } from '@rerun/contracts'
+import { brainRevertRequestSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

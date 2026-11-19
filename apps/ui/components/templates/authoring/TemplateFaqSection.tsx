@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@moldwright/ui/primitives'
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'

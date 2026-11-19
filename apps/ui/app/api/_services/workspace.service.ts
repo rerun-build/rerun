@@ -1,9 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled } from '@moldwright/cloud/billing'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
-import type { WorkspaceSummary } from '@rerun/contracts'
+import type { WorkspaceSummary } from '@moldwright/contracts'
 
 type Client = SupabaseClient<Database>
 

@@ -3,7 +3,7 @@ import 'server-only'
 import { i18nFlag } from '@/flags'
 import { TIME_ZONE_COOKIE, validTimeZone } from '@/lib/i18n/time-zone'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
-import { DEFAULT_LOCALE, LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@moldwright/i18n'
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 

@@ -1,4 +1,4 @@
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { Card } from '@/components/ui/card'
 
 export const JOIN_CARD_CLASS = 'relative bg-card p-8 shadow-xl shadow-black/20 ring-foreground/20'

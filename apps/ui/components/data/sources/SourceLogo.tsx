@@ -3,7 +3,7 @@
 import { DatabaseIcon } from '@/lib/icons'
 import { faviconUrl } from '@/lib/onboarding/site-favicon'
 import { cn } from '@/lib/utils'
-import type { PaidSource } from '@rerun/contracts'
+import type { PaidSource } from '@moldwright/contracts'
 
 const SIZE = { xs: 'size-3.5', sm: 'size-4', md: 'size-5' } as const
 

@@ -1,4 +1,4 @@
-import { DEFAULT_ADMIN_EMAILS } from '@rerun/cloud/admin'
+import { DEFAULT_ADMIN_EMAILS } from '@moldwright/cloud/admin'
 
 export function adminEmails(): string[] {
     const configured = process.env.NEXT_PUBLIC_ADMIN_EMAILS || process.env.ADMIN_EMAILS

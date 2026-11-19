@@ -3,8 +3,8 @@ import path from 'node:path'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
-import { TileBuddy, TileLinks, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
+import { TileBuddy, TileLinks, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')

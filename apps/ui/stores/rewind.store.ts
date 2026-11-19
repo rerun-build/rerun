@@ -1,4 +1,4 @@
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 import { create } from 'zustand'
 
 import { markRewindViewedAction, readRewindAction, type RewindWeekEntry } from '@/app/api/_actions/rewind.actions'

@@ -1,4 +1,4 @@
-import { SEO_DESCRIPTION_MAX_LENGTH, SEO_DESCRIPTION_MIN_LENGTH, TEMPLATE_TITLE_MAX_LENGTH } from '@rerun/contracts'
+import { SEO_DESCRIPTION_MAX_LENGTH, SEO_DESCRIPTION_MIN_LENGTH, TEMPLATE_TITLE_MAX_LENGTH } from '@moldwright/contracts'
 import { copyOf } from '@/lib/copy-name'
 
 export const MAX_TEMPLATES_PER_AUTHOR = 100

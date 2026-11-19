@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { TemplateCard } from "../components/TemplateCard";
 import { strong } from "../components/rich";
-import { formatDuration } from "@rerun/i18n/format";
+import { formatDuration } from "@moldwright/i18n/format";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 

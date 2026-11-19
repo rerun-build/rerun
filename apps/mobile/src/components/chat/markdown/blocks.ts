@@ -1,4 +1,4 @@
-import { bubblesOfBlocks, type MessageBubble } from '@rerun/contracts'
+import { bubblesOfBlocks, type MessageBubble } from '@moldwright/contracts'
 import { Lexer } from 'marked'
 
 const FOOTNOTE_REFERENCE = /\[\^[\w-]{1,200}\](?!:)/

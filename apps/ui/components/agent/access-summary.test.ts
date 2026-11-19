@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
+import { ENGLISH_MESSAGES } from '@moldwright/i18n/messages/en'
 import { createTranslator } from 'use-intl'
 import { coworkerAccessSummary } from './access-summary'
 

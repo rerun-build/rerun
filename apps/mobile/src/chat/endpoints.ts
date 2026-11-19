@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { randomUUID } from 'expo-crypto'
 

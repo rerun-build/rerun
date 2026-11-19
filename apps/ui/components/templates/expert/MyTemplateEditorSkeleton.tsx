@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardAction, CardContent, CardHeader, CardTitle, ScrollFade } from '@rerun/ui/primitives'
+import { Card, CardAction, CardContent, CardHeader, CardTitle, ScrollFade } from '@moldwright/ui/primitives'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function MyTemplateEditorSkeleton() {

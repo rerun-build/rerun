@@ -1,8 +1,8 @@
 'use client'
 
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
-import type { AgentShareInclude } from '@rerun/contracts'
-import { track } from '@rerun/analytics/client'
+import type { AgentShareInclude } from '@moldwright/contracts'
+import { track } from '@moldwright/analytics/client'
 import { useTranslations } from 'next-intl'
 import * as React from 'react'
 import type { AgentSharePlan } from '@/lib/agents/share-create'

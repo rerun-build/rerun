@@ -10,7 +10,7 @@ const CLOUD_IMPLEMENTATION = HAS_CLOUD ? CLOUD_SOURCE : path.resolve(import.meta
 export default defineConfig({
     resolve: {
         alias: [
-            { find: /^@rerun\/cloud\/(.*)$/, replacement: `${CLOUD_IMPLEMENTATION}/$1` },
+            { find: /^@moldwright\/cloud\/(.*)$/, replacement: `${CLOUD_IMPLEMENTATION}/$1` },
             { find: '@', replacement: path.resolve(import.meta.dirname, '.') },
             { find: 'server-only', replacement: path.resolve(import.meta.dirname, 'test/server-only-stub.ts') },
         ],

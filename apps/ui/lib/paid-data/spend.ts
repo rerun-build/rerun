@@ -1,4 +1,4 @@
-import { paidDataEntry, type PaidDataCapability, type PaidDataGroup } from '@rerun/contracts'
+import { paidDataEntry, type PaidDataCapability, type PaidDataGroup } from '@moldwright/contracts'
 
 import {
     AtSign,

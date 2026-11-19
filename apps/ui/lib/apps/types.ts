@@ -1,4 +1,4 @@
-import type { AddonKey } from '@rerun/contracts'
+import type { AddonKey } from '@moldwright/contracts'
 
 export type AppStatus = 'active' | 'frozen' | 'uninstalled'
 

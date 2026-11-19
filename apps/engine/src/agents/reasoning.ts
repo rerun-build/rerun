@@ -1,5 +1,5 @@
 import type { streamText } from 'ai'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { opencodeModel } from '../connections/opencode-catalog.js'
 import { logger } from '../lib/logger.js'
 import { behaviourOf } from './opencode.js'

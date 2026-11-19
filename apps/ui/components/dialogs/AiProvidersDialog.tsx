@@ -4,7 +4,7 @@ import { AiProvidersPanel, type InitialConnection } from '@/components/connectio
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 

@@ -1,4 +1,4 @@
-import type { AgentArchivePlan } from '@rerun/contracts'
+import type { AgentArchivePlan } from '@moldwright/contracts'
 import { fetchAgentArchive, planAgentArchive } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { AppError } from '@/lib/i18n/action-error'

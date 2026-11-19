@@ -1,9 +1,9 @@
 'use client'
 
 import { DESKTOP_SHELL_PREVIEW_PARAM } from '@/lib/desktop-shell/preview'
-import type { DesktopShellPlatform } from '@rerun/contracts'
-import { SegmentedControl, SegmentedControlItem } from '@rerun/ui/primitives'
-import { ThemeToggle } from '@rerun/ui/theme'
+import type { DesktopShellPlatform } from '@moldwright/contracts'
+import { SegmentedControl, SegmentedControlItem } from '@moldwright/ui/primitives'
+import { ThemeToggle } from '@moldwright/ui/theme'
 import { useState } from 'react'
 
 const PLATFORMS: { value: DesktopShellPlatform; label: string }[] = [

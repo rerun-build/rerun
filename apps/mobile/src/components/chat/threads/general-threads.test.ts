@@ -1,4 +1,4 @@
-import type { Conversation } from '@rerun/contracts'
+import type { Conversation } from '@moldwright/contracts'
 
 import { GENERAL_THREAD_LIMIT, generalThreadsOf } from '@/components/chat/threads/general-threads'
 

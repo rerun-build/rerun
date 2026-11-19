@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 
 import { readMe } from './me.service'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 const contextWith = (workspace: { subscription_status: string | null; is_sandbox: boolean }) =>
     ({

@@ -1,7 +1,7 @@
 'use server'
 
-import { isMachineEntitled } from '@rerun/cloud/billing'
-import { agentShareIncludeSchema, type AgentSharePreview } from '@rerun/contracts'
+import { isMachineEntitled } from '@moldwright/cloud/billing'
+import { agentShareIncludeSchema, type AgentSharePreview } from '@moldwright/contracts'
 import { z } from 'zod'
 import { getAdminEmail } from '@/lib/auth/admin'
 import { actorFromContext, assertAgentInWorkspace, assertSpaceAccess, keepVisible } from '@/app/api/_auth/access'

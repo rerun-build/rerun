@@ -48,7 +48,7 @@ t('composer.placeholder', { name })
 
 ## 4. Dates and numbers
 
-`@rerun/i18n/format` (`shortRelativeTime`, `messageDayLabel`, `shortDate`, `formatNumber`,
+`@moldwright/i18n/format` (`shortRelativeTime`, `messageDayLabel`, `shortDate`, `formatNumber`,
 `formatDate`, `formatBytes`, ...) with `useLocale()`. Its English output is the one the app always had.
 
 ## 5. Translate and check

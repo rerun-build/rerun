@@ -1,4 +1,4 @@
-import { brandIconToneFromUrl, withBrandIconTone } from '@rerun/ui/brand-icon'
+import { brandIconToneFromUrl, withBrandIconTone } from '@moldwright/ui/brand-icon'
 import { describe, expect, it } from 'vitest'
 
 import { syncTemplateConnectorIconSnapshot } from './brand-icon'

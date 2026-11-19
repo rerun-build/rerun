@@ -1,4 +1,4 @@
-import type { AddonKey } from '@rerun/contracts'
+import type { AddonKey } from '@moldwright/contracts'
 import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 import { APP_INFO, type AppInfo } from './catalog'
 import { LINKEDIN_WEBHOOK_EVENTS, linkedinProfile, linkedinSignInRefusal } from './linkedin/connect'

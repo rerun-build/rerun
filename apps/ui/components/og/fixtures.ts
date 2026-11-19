@@ -1,6 +1,6 @@
-import type { EngineUsageBucket } from '@rerun/contracts'
-import { agentTileStyle, connectorTileStyle, type AgentStatus, type Tile, type TileLink } from '@rerun/ui/iso-grid'
-import type { AgentStatusEntry } from '@rerun/ui/monitoring'
+import type { EngineUsageBucket } from '@moldwright/contracts'
+import { agentTileStyle, connectorTileStyle, type AgentStatus, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
+import type { AgentStatusEntry } from '@moldwright/ui/monitoring'
 
 const AGENTS: { id: string; name: string; col: number; row: number; status: AgentStatus }[] = [
     { id: 'a-research', name: 'Researcher', col: 1, row: 1, status: 'idle' },

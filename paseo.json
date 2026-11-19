@@ -5,7 +5,7 @@
       "base_port=$(bash scripts/paseo/workspace-port.sh) && mkdir -p .claude && { [ -e .claude/settings.local.json ] || printf '{\\n  \"env\": { \"CONDUCTOR_PORT\": \"%s\" }\\n}\\n' \"$base_port\" > .claude/settings.local.json; }",
       "[ -e cloud/.git ] || git clone -q --branch dev \"$(git remote get-url origin | sed -E 's#/rerun(\\.git)?$#/rerun-cloud.git#')\" cloud || echo '[setup] cloud/ not cloned: open source build only'",
       "for source in \"$PASEO_SOURCE_CHECKOUT_PATH\"/apps/*/.env \"$PASEO_SOURCE_CHECKOUT_PATH\"/apps/*/.env.local \"$PASEO_SOURCE_CHECKOUT_PATH\"/apps/*/.env.profile.* \"$PASEO_SOURCE_CHECKOUT_PATH\"/cloud/apps/*/.env \"$PASEO_SOURCE_CHECKOUT_PATH\"/cloud/apps/*/.env.local \"$PASEO_SOURCE_CHECKOUT_PATH\"/cloud/apps/*/.env.profile.*; do [ -f \"$source\" ] || continue; target=\"${source#\"$PASEO_SOURCE_CHECKOUT_PATH\"/}\"; [ -d \"$(dirname \"$target\")\" ] || continue; [ -e \"$target\" ] || cp \"$source\" \"$target\"; done",
-      "pnpm install --force --ignore-scripts && pnpm rebuild esbuild sharp && pnpm --filter @rerun/contracts build",
+      "pnpm install --force --ignore-scripts && pnpm rebuild esbuild sharp && pnpm --filter @moldwright/contracts build",
       "[ ! -d cloud ] || node scripts/install-cloud.mjs",
       "[ ! -d cloud ] || pnpm cloud db:link || true",
       "[ ! -d cloud ] || pnpm cloud env:prod || true"
@@ -29,13 +29,13 @@
     },
     "emails": {
       "type": "service",
-      "command": "EMAIL_ASSET_ORIGIN=http://localhost:$(bash scripts/paseo/workspace-port.sh) pnpm --filter @rerun/emails exec email dev --dir emails --port $PASEO_PORT"
+      "command": "EMAIL_ASSET_ORIGIN=http://localhost:$(bash scripts/paseo/workspace-port.sh) pnpm --filter @moldwright/emails exec email dev --dir emails --port $PASEO_PORT"
     },
     "engine": {
       "command": "pnpm dev:engine"
     },
     "everything": {
-      "command": "port=$(bash scripts/paseo/workspace-port.sh) && PATH=/opt/homebrew/bin:$PATH pnpm exec concurrently -k -n ui,landing,engine,emails,stripe,trigger -c cyan,blue,green,gray,magenta,yellow \"pnpm --filter rerun exec next dev -p $port\" \"pnpm --dir cloud/apps/landing exec next dev -p $((port + 1))\" \"pnpm dev:engine\" \"EMAIL_ASSET_ORIGIN=http://localhost:$port pnpm --filter @rerun/emails exec email dev --dir emails --port $((port + 3))\" \"stripe listen --forward-to localhost:$port/api/webhooks/stripe --forward-connect-to localhost:$port/api/webhooks/stripe/connect\" \"pnpm cloud trigger:dev\""
+      "command": "port=$(bash scripts/paseo/workspace-port.sh) && PATH=/opt/homebrew/bin:$PATH pnpm exec concurrently -k -n ui,landing,engine,emails,stripe,trigger -c cyan,blue,green,gray,magenta,yellow \"pnpm --filter rerun exec next dev -p $port\" \"pnpm --dir cloud/apps/landing exec next dev -p $((port + 1))\" \"pnpm dev:engine\" \"EMAIL_ASSET_ORIGIN=http://localhost:$port pnpm --filter @moldwright/emails exec email dev --dir emails --port $((port + 3))\" \"stripe listen --forward-to localhost:$port/api/webhooks/stripe --forward-connect-to localhost:$port/api/webhooks/stripe/connect\" \"pnpm cloud trigger:dev\""
     },
     "ui-full-env": {
       "command": "pnpm cloud dev:full"

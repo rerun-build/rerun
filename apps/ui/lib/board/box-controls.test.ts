@@ -1,4 +1,4 @@
-import type { Container, Tile } from '@rerun/ui/iso-grid'
+import type { Container, Tile } from '@moldwright/ui/iso-grid'
 import { describe, expect, it } from 'vitest'
 import { BOX_MANAGE_ACTION_REASON } from './box-access'
 import { boxContainerFor, boxTileFor, emptyBoardOffersBox, placementNeedsBoxFirst } from './box-controls'

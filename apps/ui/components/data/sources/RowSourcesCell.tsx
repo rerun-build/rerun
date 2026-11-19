@@ -1,6 +1,6 @@
 'use client'
 
-import type { PaidSource } from '@rerun/contracts'
+import type { PaidSource } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { SourceFacepile } from './SourceLogo'
 

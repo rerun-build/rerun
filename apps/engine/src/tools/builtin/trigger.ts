@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { providerSchema, triggerMethodSchema } from '@rerun/contracts'
+import { providerSchema, triggerMethodSchema } from '@moldwright/contracts'
 import { deleteTrigger, listTriggers, readTrigger, rotateTriggerToken, triggerExists, writeTrigger } from '../../triggers/loader.js'
 import { triggerPublicUrl, urlLine } from '../../triggers/url.js'
 import type { RunContext } from '../../runtime/context.js'

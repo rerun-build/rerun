@@ -1,4 +1,4 @@
-import { EMPTY_READING, MAX_READABLE_LENGTH, MIN_READABLE_LENGTH, type JobReading } from '@rerun/ui/new-agent/reading'
+import { EMPTY_READING, MAX_READABLE_LENGTH, MIN_READABLE_LENGTH, type JobReading } from '@moldwright/ui/new-agent/reading'
 
 import { readAgentJob } from '@/lib/ai/read-agent-job'
 import { createReadingLimiter } from '@/lib/new-agent/public-reading-limit'

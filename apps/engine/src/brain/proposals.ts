@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import type { BrainPageType, BrainProposal, BrainProposalAccept, BrainProposalHighlight, BrainProposalStatus } from '@rerun/contracts'
+import type { BrainPageType, BrainProposal, BrainProposalAccept, BrainProposalHighlight, BrainProposalStatus } from '@moldwright/contracts'
 import { getBrainDb } from '../db/brainDb.js'
 import { notFound } from '../lib/errors.js'
 import { newId, nowIso } from '../lib/ids.js'

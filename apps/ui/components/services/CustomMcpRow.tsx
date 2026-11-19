@@ -10,7 +10,7 @@ import { CustomMcpStatusBadge } from '@/components/services/CustomMcpStatusBadge
 import { serviceIconProps } from '@/lib/services/icons'
 import type { CustomMcpServer, CustomMcpStatus } from '@/lib/services/types'
 import { PencilIcon } from '@/lib/icons'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 
 type CustomMcpRowProps = {
     server: CustomMcpServer

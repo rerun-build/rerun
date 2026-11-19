@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type ForemanSurface } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type ForemanSurface } from '@moldwright/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'

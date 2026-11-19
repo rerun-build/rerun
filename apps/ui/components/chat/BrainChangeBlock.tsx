@@ -5,13 +5,13 @@ import { revertBrainPageAction } from '@/app/api/_actions/brain.actions'
 import { BrainIcon } from '@/lib/icons'
 import { useBrainStore } from '@/stores/brain.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
-import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
-import { Button, Icon } from '@rerun/ui/primitives'
+import { brainChangeHeadline, type BrainChange } from '@moldwright/contracts'
+import { Button, Icon } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-export { brainChangeOf, type BrainChange, type BrainChangeStatus } from '@rerun/contracts'
+export { brainChangeOf, type BrainChange, type BrainChangeStatus } from '@moldwright/contracts'
 
 export function BrainChangeBlock({ change }: { change: BrainChange }) {
     const openBrainPage = useWorkspaceSettingsStore(s => s.openBrainPage)

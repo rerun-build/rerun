@@ -1,4 +1,4 @@
-import { isDesktopShellChannel, type DesktopShellChannel } from '@rerun/contracts'
+import { isDesktopShellChannel, type DesktopShellChannel } from '@moldwright/contracts'
 
 export type BuildSettings = { channel: DesktopShellChannel; defaultServerUrl: string }
 

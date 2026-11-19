@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY_READING, parseJobReading } from '@rerun/ui/new-agent/reading'
+import { EMPTY_READING, parseJobReading } from '@moldwright/ui/new-agent/reading'
 
 const CATALOG = ['gmail', 'slack', 'hubspot', 'google-calendar', 'notion', 'stripe', 'linear']
 const TEXT = 'Every morning, sort our hello@ inbox and tell us in Slack what needs us today'

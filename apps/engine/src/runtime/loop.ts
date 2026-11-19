@@ -1,5 +1,5 @@
 import { streamText, ToolChoiceViolationError, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
-import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalVerdict, type MessageAuthor } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalVerdict, type MessageAuthor } from '@moldwright/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { effectiveCompactAt, prepareRunHistory, stepContextGuard } from './compaction/compact.js'

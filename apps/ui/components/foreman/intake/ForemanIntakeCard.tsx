@@ -1,6 +1,6 @@
 'use client'
 
-import { StepDots } from '@rerun/ui/chat'
+import { StepDots } from '@moldwright/ui/chat'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 

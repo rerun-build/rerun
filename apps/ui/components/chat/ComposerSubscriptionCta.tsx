@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ArrowRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 type ComposerSubscriptionCtaProps = {

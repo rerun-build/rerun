@@ -1,4 +1,4 @@
-import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
+import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@moldwright/contracts'
 import type { PermissionStatus } from 'expo-notifications'
 import { Platform, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'

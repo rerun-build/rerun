@@ -1,8 +1,8 @@
-import { loadMessages } from '@rerun/i18n/messages'
-import { localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@rerun/i18n'
-import { formatBytes, formatDuration, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil, weekdayNames } from '@rerun/i18n/format'
-import { pseudoLocalize } from '@rerun/i18n/pseudo'
-import { mergeMessages } from '@rerun/i18n'
+import { loadMessages } from '@moldwright/i18n/messages'
+import { localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@moldwright/i18n'
+import { formatBytes, formatDuration, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil, weekdayNames } from '@moldwright/i18n/format'
+import { pseudoLocalize } from '@moldwright/i18n/pseudo'
+import { mergeMessages } from '@moldwright/i18n'
 import { describe, expect, it } from 'vitest'
 
 const NOW = new Date('2026-11-09T12:00:00Z')

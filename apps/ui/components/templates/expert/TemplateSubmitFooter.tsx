@@ -1,6 +1,6 @@
 'use client'
 
-import { isPublicStatus, type TemplateStatus } from '@rerun/contracts'
+import { isPublicStatus, type TemplateStatus } from '@moldwright/contracts'
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'

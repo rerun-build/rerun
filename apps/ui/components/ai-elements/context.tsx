@@ -3,7 +3,7 @@
 import { Gauge } from '@/components/ui/gauge'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { cn } from '@/lib/utils'
-import { formatNumber } from '@rerun/i18n/format'
+import { formatNumber } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 
 export type ContextUsage = {

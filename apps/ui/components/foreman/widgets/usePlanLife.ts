@@ -1,7 +1,7 @@
 'use client'
 
-import { usePrefersReducedMotion } from '@rerun/ui/iso-grid'
-import { useTourBeat } from '@rerun/ui/tour'
+import { usePrefersReducedMotion } from '@moldwright/ui/iso-grid'
+import { useTourBeat } from '@moldwright/ui/tour'
 import { useMemo } from 'react'
 
 import { planLifeAt, planLifeBeats } from '@/lib/foreman/plan-life'

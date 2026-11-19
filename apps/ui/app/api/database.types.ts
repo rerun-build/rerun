@@ -1,1 +1,1 @@
-export * from '@rerun/db/types'
+export * from '@moldwright/db/types'

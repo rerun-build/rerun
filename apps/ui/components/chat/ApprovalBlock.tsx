@@ -1,7 +1,7 @@
 'use client'
 
 import { MessageResponse } from '@/components/ai-elements/message'
-import { ApprovalBlock as ApprovalPrompt } from '@rerun/ui/chat'
+import { ApprovalBlock as ApprovalPrompt } from '@moldwright/ui/chat'
 import { useToolDisplay } from '@/hooks/useToolDisplay'
 import type { ApprovalChoice } from '@/lib/engine/types'
 import { useCallback, useState } from 'react'

@@ -18,13 +18,13 @@ vi.mock('@/components/auth/OAuthSignInButton', () => ({ OAuthSignInButton: () =>
 vi.mock('@/components/auth/useSignupFunnel', () => ({
     useSignupFunnel: () => ({ setStep: vi.fn(), markConverted: vi.fn(), dismiss: vi.fn() }),
 }))
-vi.mock('@rerun/cloud/phone', () => ({ PHONE_ENABLED: false }))
-vi.mock('@rerun/cloud/phone.client', () => ({ PhoneSignIn: () => null }))
+vi.mock('@moldwright/cloud/phone', () => ({ PHONE_ENABLED: false }))
+vi.mock('@moldwright/cloud/phone.client', () => ({ PhoneSignIn: () => null }))
 vi.mock('@/lib/auth/oauth-providers', () => ({ ENABLED_OAUTH_PROVIDERS: [], isOAuthProvider: () => false }))
 vi.mock('@/stores/onboarding.store', () => ({ useOnboardingStore: (select: (s: { markResume: () => void }) => unknown) => select({ markResume: () => {} }) }))
 vi.mock('@/supabase/client', () => ({ createClient: () => ({ auth: {} }) }))
 vi.mock('@/supabase/session/SessionProvider', () => ({ useOptionalSession: () => null }))
-vi.mock('@rerun/analytics/client', () => ({ setSharedCookie: vi.fn(), track: vi.fn() }))
+vi.mock('@moldwright/analytics/client', () => ({ setSharedCookie: vi.fn(), track: vi.fn() }))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
 
 const SITE_KEY = '1x00000000000000000000AA'

@@ -1,1 +1,1 @@
-export { IconBadge } from '@rerun/ui/primitives'
+export { IconBadge } from '@moldwright/ui/primitives'

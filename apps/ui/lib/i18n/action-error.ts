@@ -1,5 +1,5 @@
-import type { Messages } from '@rerun/i18n/messages'
-import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
+import type { Messages } from '@moldwright/i18n/messages'
+import { ENGLISH_MESSAGES } from '@moldwright/i18n/messages/en'
 import { createTranslator } from 'use-intl'
 
 export type ErrorCode = keyof Omit<Messages['errors'], '_context'>

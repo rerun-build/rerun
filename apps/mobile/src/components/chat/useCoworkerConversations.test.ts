@@ -1,4 +1,4 @@
-import type { Conversation } from '@rerun/contracts'
+import type { Conversation } from '@moldwright/contracts'
 import { act, renderHook } from '@testing-library/react-native'
 import { AppState, type AppStateStatus } from 'react-native'
 

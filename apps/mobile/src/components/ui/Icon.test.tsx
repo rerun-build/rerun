@@ -1,4 +1,4 @@
-import { ICONS } from '@rerun/cloud-mobile/icons'
+import { ICONS } from '@moldwright/cloud-mobile/icons'
 import { render, screen } from '@testing-library/react-native'
 
 import { ICONS as SELF_HOSTED_ICONS } from '@/cloud-oss/icons'

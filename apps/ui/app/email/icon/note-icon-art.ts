@@ -1,4 +1,4 @@
-import type { NoteIcon } from '@rerun/emails'
+import type { NoteIcon } from '@moldwright/emails'
 
 export const ICON_SIZE = 18
 const SCALE = 2

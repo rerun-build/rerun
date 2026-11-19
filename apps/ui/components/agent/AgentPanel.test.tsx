@@ -40,8 +40,8 @@ vi.mock('@/components/layout/FeatureFlagsProvider', () => ({ useComputerEnabled:
 vi.mock('@/hooks/useAgentBuddyMood', () => ({ useAgentBuddyMood: () => 'idle' }))
 vi.mock('@/hooks/useConnectorServices', () => ({ useConnectorServices: () => ({ needsConfig: false }) }))
 vi.mock('@/hooks/useWorkspaceAccess', () => ({ useWorkspaceAccess: () => ({ access: 'live', needsMachineReason: null }) }))
-vi.mock('@rerun/ui', () => ({ BorderBeam: () => null }))
-vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: () => null }))
+vi.mock('@moldwright/ui', () => ({ BorderBeam: () => null }))
+vi.mock('@moldwright/ui/iso-grid', () => ({ AgentBuddy: () => null }))
 
 for (const proto of [Element.prototype, HTMLElement.prototype]) Reflect.deleteProperty(proto, 'animate')
 

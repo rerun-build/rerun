@@ -1,7 +1,7 @@
 import * as Updates from 'expo-updates'
 
 import { readCustomServer, type CustomServer } from '@/config/custom-server'
-import { PRODUCTION, STAGING } from '@rerun/cloud-mobile/environments'
+import { PRODUCTION, STAGING } from '@moldwright/cloud-mobile/environments'
 
 export type Environment = {
     name: 'production' | 'staging' | 'local' | 'custom'

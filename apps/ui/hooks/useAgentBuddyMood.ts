@@ -1,4 +1,4 @@
-import { buddyMoodOfStatus, type BuddyMood } from '@rerun/ui/iso-grid'
+import { buddyMoodOfStatus, type BuddyMood } from '@moldwright/ui/iso-grid'
 
 import { useBoardStore } from '@/stores/board.store'
 

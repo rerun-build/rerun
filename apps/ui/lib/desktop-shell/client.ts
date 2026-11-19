@@ -1,4 +1,4 @@
-import { DESKTOP_SHELL_API_VERSION, type DesktopShellApi, type DesktopShellCapability } from '@rerun/contracts'
+import { DESKTOP_SHELL_API_VERSION, type DesktopShellApi, type DesktopShellCapability } from '@moldwright/contracts'
 
 declare global {
     interface Window {

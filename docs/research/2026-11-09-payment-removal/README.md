@@ -7,7 +7,7 @@ shared code.
 
 ## How the build already treats payments
 
-- The private `cloud/` package is absent, so every `@rerun/cloud/*` import resolves to
+- The private `cloud/` package is absent, so every `@moldwright/cloud/*` import resolves to
   `apps/ui/cloud-oss/*` (`tsconfig.json`, `vitest.config.ts`).
 - `cloud-oss/billing.ts`: `BILLING_ENABLED = false`, every entitlement check returns true.
 - `cloud-oss/billing.client.tsx`: billing UI renders nothing (the out-of-balance notice now shows a

@@ -1,5 +1,5 @@
 import type { WorkType } from '@/lib/onboarding/work-types'
-import type { TemplateCategory } from '@rerun/contracts'
+import type { TemplateCategory } from '@moldwright/contracts'
 
 export type OnboardingAnswers = {
     company_url?: string

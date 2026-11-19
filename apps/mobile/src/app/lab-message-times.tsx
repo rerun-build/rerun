@@ -1,4 +1,4 @@
-import type { AuthorProfile } from '@rerun/contracts'
+import type { AuthorProfile } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { ScrollView, View } from 'react-native'

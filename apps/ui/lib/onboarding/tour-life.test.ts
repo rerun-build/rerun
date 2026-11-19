@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { TOUR_AGENT_IDS } from '@rerun/ui/tour/board'
-import { TOUR_LIFE_BEATS, TOUR_LIFE_START, TOUR_LIFE_STILL, type TourLifeStatus, tourLifeAt } from '@rerun/ui/tour/life'
+import { TOUR_AGENT_IDS } from '@moldwright/ui/tour/board'
+import { TOUR_LIFE_BEATS, TOUR_LIFE_START, TOUR_LIFE_STILL, type TourLifeStatus, tourLifeAt } from '@moldwright/ui/tour/life'
 
 const MIN_HOLD_MS: Record<TourLifeStatus, number> = {
     idle: 3_000,

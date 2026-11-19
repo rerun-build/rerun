@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn() }))
 
 vi.mock('next/server', () => ({ after: vi.fn() }))
-vi.mock('@rerun/cloud/email', () => ({}))
+vi.mock('@moldwright/cloud/email', () => ({}))
 vi.mock('@/lib/ai/generate-run-title', () => ({ generateRunTitle: vi.fn() }))
-vi.mock('@rerun/analytics/server', () => ({ captureServer: vi.fn(), deterministicUuid: vi.fn() }))
+vi.mock('@moldwright/analytics/server', () => ({ captureServer: vi.fn(), deterministicUuid: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle, selectMany: mocks.selectMany }))
 vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn() }))

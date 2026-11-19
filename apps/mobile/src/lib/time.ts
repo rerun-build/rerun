@@ -1,4 +1,4 @@
-import { calendarDaysBetween, formatDate } from '@rerun/i18n/format'
+import { calendarDaysBetween, formatDate } from '@moldwright/i18n/format'
 import { getCalendars } from 'expo-localization'
 import { useLocale, useTranslations } from 'use-intl'
 

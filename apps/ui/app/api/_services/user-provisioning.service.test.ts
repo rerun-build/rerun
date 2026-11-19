@@ -6,8 +6,8 @@ import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
 const payloads = (client: FakeSupabase) => client.writes('user_phones').map(write => write.payload)
 
 const grantRerunTopup = vi.fn()
-vi.mock('@rerun/cloud/billing.server', () => ({ grantRerunTopup: (...args: unknown[]) => grantRerunTopup(...args) }))
-vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
+vi.mock('@moldwright/cloud/billing.server', () => ({ grantRerunTopup: (...args: unknown[]) => grantRerunTopup(...args) }))
+vi.mock('@moldwright/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 
 let service = fakeSupabase()
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => service.client }))

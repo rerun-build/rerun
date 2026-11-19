@@ -1,4 +1,4 @@
-import { asRecord } from '@rerun/contracts'
+import { asRecord } from '@moldwright/contracts'
 import type { TemplateCardImage } from '@/lib/templates/card-image'
 import { MAX_STARTER_PICKS } from '@/lib/onboarding/starter-packs'
 import { asString, asStringArray } from '@/lib/mcp/args'

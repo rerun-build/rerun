@@ -1,2 +1,2 @@
-export { AgentPickerList } from '@rerun/ui/foreman'
-export type { AgentPickerRow } from '@rerun/ui/foreman'
+export { AgentPickerList } from '@moldwright/ui/foreman'
+export type { AgentPickerRow } from '@moldwright/ui/foreman'

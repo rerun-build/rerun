@@ -1,4 +1,4 @@
-import type { ForemanSurface } from '@rerun/contracts'
+import type { ForemanSurface } from '@moldwright/contracts'
 
 import type { ForemanPhase } from './phase'
 

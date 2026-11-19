@@ -7,7 +7,7 @@ import { CheckIcon, ChevronLeft, ChevronRight, ShieldAlertIcon } from '../icons'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState } from 'react'
 import { useKitTranslations } from '../locale'
-import type { ApprovalDecision, ApprovalItem } from '@rerun/contracts'
+import type { ApprovalDecision, ApprovalItem } from '@moldwright/contracts'
 import { DeclineReasonForm } from './DeclineReasonForm'
 import { StepDots } from './StepDots'
 

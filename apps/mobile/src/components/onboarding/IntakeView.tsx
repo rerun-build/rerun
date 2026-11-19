@@ -1,4 +1,4 @@
-import { INTAKE_INDUSTRIES, rolesForIndustry } from '@rerun/contracts'
+import { INTAKE_INDUSTRIES, rolesForIndustry } from '@moldwright/contracts'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeIn, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'

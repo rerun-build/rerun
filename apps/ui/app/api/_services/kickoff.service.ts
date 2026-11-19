@@ -6,7 +6,7 @@ import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { reformulateKickoff } from '@/lib/ai/reformulate-kickoff'
 import { chat } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import type { MessageAuthor } from '@rerun/contracts'
+import type { MessageAuthor } from '@moldwright/contracts'
 
 export type KickoffResult = { ok: true; sessionId: string; runId: string | null } | { ok: false; error: string; agentGone: boolean }
 

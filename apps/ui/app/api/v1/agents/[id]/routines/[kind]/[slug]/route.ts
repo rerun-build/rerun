@@ -1,7 +1,7 @@
 import { setCoworkerRoutineEnabled } from '@/app/api/_services/coworker-details.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { ENGINE_PATH_ID } from '@/app/api/v1/_lib/path-ids'
-import { routineKindSchema, updateRoutineSchema } from '@rerun/contracts'
+import { routineKindSchema, updateRoutineSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

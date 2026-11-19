@@ -1,4 +1,4 @@
-import { type TemplateDocument, templateDocumentSchema } from '@rerun/contracts'
+import { type TemplateDocument, templateDocumentSchema } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { type TemplateRow, documentToRow, rowToDocument } from './document'
 

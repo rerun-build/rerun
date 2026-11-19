@@ -7,7 +7,7 @@ const RECIPIENT = vi.hoisted(() => 'user-recipient')
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@rerun/cloud/email', () => ({ verifyUnsubscribeToken: (token: string) => (token === `token-of-${RECIPIENT}` ? { userId: RECIPIENT, scope: null } : null) }))
+vi.mock('@moldwright/cloud/email', () => ({ verifyUnsubscribeToken: (token: string) => (token === `token-of-${RECIPIENT}` ? { userId: RECIPIENT, scope: null } : null) }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { updateNotificationPrefsAction, updateNotificationPrefsByTokenAction } = await import('./notifications.actions')

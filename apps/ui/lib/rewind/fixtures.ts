@@ -1,4 +1,4 @@
-import { REWIND_HOURS_PER_WEEK, type RewindAgentReport, type RewindPayload } from '@rerun/contracts'
+import { REWIND_HOURS_PER_WEEK, type RewindAgentReport, type RewindPayload } from '@moldwright/contracts'
 import { mergeRewind, type ConnectorCatalog, type RewindAgentInput } from './merge'
 import { rewindWeekStarting } from './week'
 

@@ -5,7 +5,7 @@ import { listBoardAgents } from '@/app/api/_services/board-agents.service'
 import { startKickoff } from '@/app/api/_services/kickoff.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { createCoworkerSchema, type CreatedCoworker } from '@rerun/contracts'
+import { createCoworkerSchema, type CreatedCoworker } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

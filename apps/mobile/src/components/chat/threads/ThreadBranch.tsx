@@ -1,4 +1,4 @@
-import { needsHuman, type SessionStatus } from '@rerun/contracts'
+import { needsHuman, type SessionStatus } from '@moldwright/contracts'
 import { useId } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import Svg, { Defs, LinearGradient, Mask, Path, Pattern, Rect, Stop } from 'react-native-svg'

@@ -1,4 +1,4 @@
-import { clientServerSchema, type ClientServer } from '@rerun/contracts'
+import { clientServerSchema, type ClientServer } from '@moldwright/contracts'
 import { reloadAppAsync } from 'expo'
 import * as SecureStore from 'expo-secure-store'
 

@@ -23,7 +23,7 @@ import {
     BRAND_GATE_PARAM,
     brandGateVerdict,
     isGatedPath,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { NextRequest, NextResponse } from 'next/server'
 
 function brandGate(request: NextRequest): NextResponse {

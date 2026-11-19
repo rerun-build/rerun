@@ -1,5 +1,5 @@
-import { BILLING_ENABLED } from '@rerun/cloud/billing'
-import { SUPPORT_CHAT_ENABLED } from '@rerun/cloud/support'
+import { BILLING_ENABLED } from '@moldwright/cloud/billing'
+import { SUPPORT_CHAT_ENABLED } from '@moldwright/cloud/support'
 
 export const CONTROL_COMMAND_IDS = [
     'new_agent',

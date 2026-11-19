@@ -3,7 +3,7 @@
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { pollCodexDeviceAuthAction, startCodexDeviceAuthAction } from '@/app/api/_actions/workspace-connection.actions'
 import { trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
-import type { AiConnectionSurface } from '@rerun/analytics'
+import type { AiConnectionSurface } from '@moldwright/analytics'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

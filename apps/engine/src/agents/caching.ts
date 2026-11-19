@@ -1,5 +1,5 @@
 import type { ModelMessage, streamText } from 'ai'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { CLI_PROVIDERS } from './types.js'
 import { behaviourOf } from './opencode.js'
 import { systemPromptText, type SystemPrompt } from './systemPrompt.js'

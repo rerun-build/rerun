@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
-import { formatNumber } from "@rerun/i18n/format";
+import { formatNumber } from "@moldwright/i18n/format";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 

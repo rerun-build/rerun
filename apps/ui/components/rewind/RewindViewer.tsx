@@ -1,6 +1,6 @@
 'use client'
 
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type CSSProperties, type PointerEvent } from 'react'

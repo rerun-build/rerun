@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AnalyticsEventMap, EventName } from '@rerun/analytics'
-import { captureServer } from '@rerun/analytics/server'
+import type { AnalyticsEventMap, EventName } from '@moldwright/analytics'
+import { captureServer } from '@moldwright/analytics/server'
 import type { Database } from '@/app/api/database.types'
 import { selectMany } from '@/supabase/supabase-helpers'
 

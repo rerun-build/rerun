@@ -1,6 +1,6 @@
 import type { LoadedConnection } from '../connections/types.js'
 import { behaviourOf, modelSeesImages } from '../agents/opencode.js'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
 

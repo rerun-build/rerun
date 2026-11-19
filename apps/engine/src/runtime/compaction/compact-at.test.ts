@@ -34,7 +34,7 @@ vi.mock('../../agents/providers.js', async importOriginal => {
 vi.mock('../../connections/cli-auth.js', () => ({ ensureCliAuth: async () => () => {} }))
 
 const { afterEach, describe, expect, it } = await import('vitest')
-const { CUSTOM_DEFAULT_CONTEXT_WINDOW } = await import('@rerun/contracts')
+const { CUSTOM_DEFAULT_CONTEXT_WINDOW } = await import('@moldwright/contracts')
 const { customContextWindow } = await import('../../connections/custom-catalog.js')
 const { effectiveCompactAt, stepContextGuard } = await import('./compact.js')
 type Message = import('ai').ModelMessage

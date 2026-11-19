@@ -1,4 +1,4 @@
-import { FORMER_MEMBER, type AuthorProfile, type MemberProfile } from '@rerun/contracts'
+import { FORMER_MEMBER, type AuthorProfile, type MemberProfile } from '@moldwright/contracts'
 import { useCallback, useEffect, useState } from 'react'
 
 import { fetchMemberProfiles } from '@/api/members'

@@ -1,4 +1,4 @@
-import type { PhoneChannel } from '@rerun/contracts'
+import type { PhoneChannel } from '@moldwright/contracts'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'

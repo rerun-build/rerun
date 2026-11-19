@@ -1,6 +1,6 @@
 'use server'
 
-import type { FactorySnapshot } from '@rerun/contracts'
+import type { FactorySnapshot } from '@moldwright/contracts'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { getFactorySnapshot } from '@/lib/factory/snapshot-store'
 

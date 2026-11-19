@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { Card, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
+import { Card, CardContent, CardHeader, CardTitle } from '@moldwright/ui/primitives'
 import { Reorder } from 'motion/react'
 import * as React from 'react'
 import { Controller, useFormContext } from 'react-hook-form'

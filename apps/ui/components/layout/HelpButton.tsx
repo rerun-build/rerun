@@ -1,7 +1,7 @@
 'use client'
 
-import { SUPPORT_CHAT_ENABLED } from '@rerun/cloud/support'
-import { ChromePill } from '@rerun/ui/chrome'
+import { SUPPORT_CHAT_ENABLED } from '@moldwright/cloud/support'
+import { ChromePill } from '@moldwright/ui/chrome'
 import { HelpMenuItems } from '@/components/layout/ToolbarActions'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipLabeled } from '@/components/ui/tooltip'

@@ -1,4 +1,4 @@
-import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
+import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } from '@moldwright/ui/iso-grid'
 
 import type { PodView } from './factory-scene'
 

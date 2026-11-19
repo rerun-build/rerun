@@ -1,7 +1,7 @@
 'use client'
 
-import { TRIAL_DAYS, type TemplateConnector } from '@rerun/contracts'
-import { StepperBar, StepTransition } from '@rerun/ui/steps'
+import { TRIAL_DAYS, type TemplateConnector } from '@moldwright/contracts'
+import { StepperBar, StepTransition } from '@moldwright/ui/steps'
 import { useTranslations } from 'next-intl'
 
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'

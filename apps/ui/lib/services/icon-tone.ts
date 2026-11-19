@@ -1,4 +1,4 @@
-import type { BrandIconTone } from '@rerun/ui/brand-icon'
+import type { BrandIconTone } from '@moldwright/ui/brand-icon'
 
 export type Rgb = readonly [red: number, green: number, blue: number]
 

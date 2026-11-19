@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { factorySnapshotSchema } from '@rerun/contracts'
-import { LINK_PITCH, TILE_H, TILE_W, routeTileLinks, type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { factorySnapshotSchema } from '@moldwright/contracts'
+import { LINK_PITCH, TILE_H, TILE_W, routeTileLinks, type AxisPoint, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 
 import { applyMoves, copyTree } from '@/components/factory/factory-layout'
 import { LOOP_MS, factoryScene } from '@/components/factory/factory-scene'

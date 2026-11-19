@@ -5,7 +5,7 @@ import { TooltipDisabledReason, TooltipProvider } from '@/components/ui/tooltip'
 import { queuedPreview } from '@/lib/chat/queued-message'
 import { ClockIcon, CornerDownLeftIcon, PaperclipIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { Badge, Stripes } from '@rerun/ui/primitives'
+import { Badge, Stripes } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

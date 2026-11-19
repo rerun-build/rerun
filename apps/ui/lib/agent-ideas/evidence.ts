@@ -1,4 +1,4 @@
-import type { BrainPage } from '@rerun/contracts'
+import type { BrainPage } from '@moldwright/contracts'
 
 import type { CompanyFinding, CompanyFindingsRow } from '@/lib/company/explore/findings'
 import { describeNeed } from '@/lib/foreman/needs'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ExternalLinkIcon, HammerIcon } from '@/lib/icons'

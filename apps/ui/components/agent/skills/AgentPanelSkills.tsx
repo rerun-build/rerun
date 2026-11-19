@@ -16,7 +16,7 @@ import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel
 import { PanelRow } from '@/components/ui/panel-row'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { MAX_SKILL_FILE_BYTES, readSkillFolders } from '@/lib/skills/folder-import'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'

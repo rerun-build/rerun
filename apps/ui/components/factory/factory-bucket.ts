@@ -1,4 +1,4 @@
-import type { FactoryJob } from '@rerun/contracts'
+import type { FactoryJob } from '@moldwright/contracts'
 
 export type Bucket = 'rejects' | number
 

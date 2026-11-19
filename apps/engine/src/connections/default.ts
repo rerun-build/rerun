@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { boxDefaultModelSchema, type BoxDefaultModel } from '@rerun/contracts'
+import { boxDefaultModelSchema, type BoxDefaultModel } from '@moldwright/contracts'
 import { boxDefaultPath, connectionsDir } from '../config/paths.js'
 import { clearAgentCache } from '../agents/registry.js'
 

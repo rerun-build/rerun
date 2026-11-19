@@ -1,1 +1,1 @@
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@rerun/ui/primitives'
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@moldwright/ui/primitives'

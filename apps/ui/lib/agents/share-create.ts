@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { shareContents, shareExcludePaths, type AgentArchivePlan, type AgentShareContents, type AgentShareInclude, type AgentSharePreview } from '@rerun/contracts'
+import { shareContents, shareExcludePaths, type AgentArchivePlan, type AgentShareContents, type AgentShareInclude, type AgentSharePreview } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import { getSpaceConnection } from '@/app/api/_services/space.service'
 import { planAgentArchive } from '@/lib/engine/client'

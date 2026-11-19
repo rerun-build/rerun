@@ -3,7 +3,7 @@ import { getCustomMcpServer } from '@/app/api/_services/custom-mcp.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { mcpConnectUrl, requestingDesktop } from '@/app/api/v1/_lib/service-view'
 import { appReturnBase } from '@/lib/oauth/app-return'
-import type { ConnectTarget } from '@rerun/contracts'
+import type { ConnectTarget } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

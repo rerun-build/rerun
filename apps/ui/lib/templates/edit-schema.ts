@@ -1,4 +1,4 @@
-import { type TemplateDocument, templateDocumentSchema } from '@rerun/contracts'
+import { type TemplateDocument, templateDocumentSchema } from '@moldwright/contracts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Resolver } from 'react-hook-form'
 

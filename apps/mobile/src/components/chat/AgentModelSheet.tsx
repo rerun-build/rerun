@@ -1,4 +1,4 @@
-import type { AgentModels, SetAgentModelInput } from '@rerun/contracts'
+import type { AgentModels, SetAgentModelInput } from '@moldwright/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'

@@ -1,4 +1,4 @@
-import { notificationPrefsSchema, type NotificationPrefs, type NotificationPrefsPatch } from '@rerun/contracts'
+import { notificationPrefsSchema, type NotificationPrefs, type NotificationPrefsPatch } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

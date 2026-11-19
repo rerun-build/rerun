@@ -1,8 +1,8 @@
 'use client'
 
-import { BorderBeam } from '@rerun/ui'
-import { hashUnit, TemplateCardBoard, useBoardOnHover } from '@rerun/ui/iso-grid'
-import { Badge } from '@rerun/ui/primitives'
+import { BorderBeam } from '@moldwright/ui'
+import { hashUnit, TemplateCardBoard, useBoardOnHover } from '@moldwright/ui/iso-grid'
+import { Badge } from '@moldwright/ui/primitives'
 import { AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'

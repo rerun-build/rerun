@@ -1,7 +1,7 @@
 'use client'
 
 import { getSharedTemplateAction, installTemplateAction } from '@/app/api/_actions/template.actions'
-import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
+import { startTemplateCheckoutAction } from '@moldwright/cloud/marketplace.client'
 import { claimSpaceAction } from '@/app/api/_actions/space.actions'
 import { rebaseOffset, resolveTargetSpace } from '@/lib/onboarding/target-space'
 import { reportInstall } from '@/lib/templates/install-feedback'

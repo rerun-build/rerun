@@ -4,7 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_actions/skill-proposal.actions'
-import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds } from '@rerun/contracts'
+import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds } from '@moldwright/contracts'
 import type { EngineSkillProposal } from '@/lib/engine/types'
 
 const POLL_QUICK_MS = 1500

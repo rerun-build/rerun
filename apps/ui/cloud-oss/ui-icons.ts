@@ -281,7 +281,7 @@ import {
     ZapIcon as LucideZapIcon,
     ZapOffIcon as LucideZapOffIcon,
 } from 'lucide-react'
-import { SpinnerIcon } from '@rerun/ui/primitives/spinner'
+import { SpinnerIcon } from '@moldwright/ui/primitives/spinner'
 
 export type LucideIcon = FC<SVGProps<SVGSVGElement> & { size?: number | string; title?: string }>
 

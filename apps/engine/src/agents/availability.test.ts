@@ -1,7 +1,7 @@
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import type { LoadedAgent } from './types.js'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-availability-'))
@@ -10,7 +10,7 @@ process.env.RERUN_API_KEY = 'hub-key'
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { rm } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL, agentConfigSchema } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL, agentConfigSchema } = await import('@moldwright/contracts')
 const { connectionsDir } = await import('../config/paths.js')
 const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
 const { getConnection } = await import('../connections/registry.js')

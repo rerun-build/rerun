@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type BoxAccessLevel } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type BoxAccessLevel } from '@moldwright/contracts'
 import { useEffect, useMemo, useState } from 'react'
 
 import { fetchAgentView } from '@/api/chat'

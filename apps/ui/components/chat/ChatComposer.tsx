@@ -1,6 +1,6 @@
 'use client'
 
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import type { ChatStatus, FileUIPart } from 'ai'
 import { AnimatePresence, motion } from 'motion/react'
 import { type ReactNode, type Ref, type RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'

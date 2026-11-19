@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
     isMachineEntitled: vi.fn(),
 }))
 
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), isMachineEntitled: mocks.isMachineEntitled }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), isMachineEntitled: mocks.isMachineEntitled }))
 
 vi.mock('@/lib/auth/admin', () => ({
     getAdminEmail: mocks.getAdminEmail,

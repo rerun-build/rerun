@@ -9,7 +9,7 @@ import {
     templateImageSchema,
     templateRolePageSchema,
     templateStoryStepSchema,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { z } from 'zod'
 import type { Database } from '@/app/api/database.types'
 

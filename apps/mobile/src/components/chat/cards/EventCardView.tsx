@@ -1,4 +1,4 @@
-import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
+import { brainChangeHeadline, type BrainChange } from '@moldwright/contracts'
 import { useState, type ReactNode } from 'react'
 import { Alert, View } from 'react-native'
 import { useTranslations } from 'use-intl'

@@ -1,4 +1,4 @@
-import { capabilityOfCall, isKnownTool, PAID_DATA_TOOL, toolLabelOf, type ToolCopy } from '@rerun/contracts'
+import { capabilityOfCall, isKnownTool, PAID_DATA_TOOL, toolLabelOf, type ToolCopy } from '@moldwright/contracts'
 import {
     ActivityIcon,
     BellIcon,

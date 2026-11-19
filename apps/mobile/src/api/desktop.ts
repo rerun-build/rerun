@@ -1,4 +1,4 @@
-import { desktopSocketSchema, takeoverResultSchema, type DesktopSocketView, type DesktopViewMode, type TakeoverResult } from '@rerun/contracts'
+import { desktopSocketSchema, takeoverResultSchema, type DesktopSocketView, type DesktopViewMode, type TakeoverResult } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

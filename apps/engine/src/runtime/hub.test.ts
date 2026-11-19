@@ -8,7 +8,7 @@ process.env.RERUN_API_KEY = 'engine-token'
 
 const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { callHub } = await import('./hub.js')
-const { FOREMAN_HUB_TOKEN_HEADER } = await import('@rerun/contracts')
+const { FOREMAN_HUB_TOKEN_HEADER } = await import('@moldwright/contracts')
 
 const originalFetch = globalThis.fetch
 

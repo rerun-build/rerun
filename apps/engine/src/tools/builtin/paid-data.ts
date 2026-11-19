@@ -17,7 +17,7 @@ import {
     paidDataOverview,
     parsePaidDataParams,
     type PaidDataCatalogLookup,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { env } from '../../config/env.js'
 import { deadlineSignal } from '../../lib/abort.js'
 import { recordPaidSources } from '../../db/repos/paid-sources.js'

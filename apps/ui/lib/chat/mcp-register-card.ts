@@ -1,1 +1,1 @@
-export { mcpRegisterCardOf, type McpRegisterCard } from '@rerun/contracts'
+export { mcpRegisterCardOf, type McpRegisterCard } from '@moldwright/contracts'

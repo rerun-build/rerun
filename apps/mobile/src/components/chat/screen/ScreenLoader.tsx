@@ -1,4 +1,4 @@
-import { sweepIntensity } from '@rerun/contracts'
+import { sweepIntensity } from '@moldwright/contracts'
 import { useEffect, useState } from 'react'
 import { View, type LayoutChangeEvent } from 'react-native'
 import { useReducedMotion } from 'react-native-reanimated'

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { agentSharePreviewSchema, type AgentSharePreview } from '@rerun/contracts'
+import { agentSharePreviewSchema, type AgentSharePreview } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import { isOpaqueToken } from '@/lib/opaque-token'
 import { removePrivateFiles } from '@/lib/storage/private'

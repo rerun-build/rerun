@@ -8,8 +8,8 @@ import { opencodeModelRows, pricePerMillion, type OpencodeModelRow } from '@/lib
 import type { BoxConnection } from '@/lib/engine/types'
 import { SearchIcon, StarIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import type { OpencodePlan } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
+import type { OpencodePlan } from '@moldwright/contracts'
+import { Badge } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 

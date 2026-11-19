@@ -3,7 +3,7 @@
 import type { UIMessage } from 'ai'
 import { useEffect, useRef } from 'react'
 
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 
 import { readQuestionOutput } from '@/components/foreman/widgets/question-answer'
 import { readOwnAsk } from '@/lib/foreman/kickoff-marker'

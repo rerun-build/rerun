@@ -1,4 +1,4 @@
-import { agentModelsSchema, type AgentModels, type Provider, type SetAgentModelInput } from '@rerun/contracts'
+import { agentModelsSchema, type AgentModels, type Provider, type SetAgentModelInput } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 import type { ModelProvider } from '@/mocks/models'

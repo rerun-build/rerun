@@ -1,4 +1,4 @@
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 import type { Options, Shape } from 'canvas-confetti'
 
 const DURATION_MS = 2500

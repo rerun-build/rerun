@@ -20,8 +20,8 @@ import {
     type LucideIcon,
 } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { toneOf } from '@rerun/ui/chat'
-import { Badge, type BadgeTone } from '@rerun/ui/primitives'
+import { toneOf } from '@moldwright/ui/chat'
+import { Badge, type BadgeTone } from '@moldwright/ui/primitives'
 
 export const KIND_ICONS: Record<ColumnKind, LucideIcon> = {
     title: TypeIcon,

@@ -1,5 +1,5 @@
 import { and, count, eq, gte, inArray, isNotNull, lt, sql } from 'drizzle-orm'
-import { parseServiceRegistryKey, type RewindAgentReport } from '@rerun/contracts'
+import { parseServiceRegistryKey, type RewindAgentReport } from '@moldwright/contracts'
 import { getAgent } from '../agents/registry.js'
 import { getSystemDb } from '../db/systemDb.js'
 import { runs, sessions, toolCalls } from '../db/schema.js'

@@ -1,4 +1,4 @@
-import type { CoworkerRule, InboxItem } from '@rerun/contracts'
+import type { CoworkerRule, InboxItem } from '@moldwright/contracts'
 import { router } from 'expo-router'
 import { Alert, ScrollView, View } from 'react-native'
 import Animated, { FadeOut } from 'react-native-reanimated'

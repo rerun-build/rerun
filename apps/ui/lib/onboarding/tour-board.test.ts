@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest'
 
 import { routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
 import type { AxisRoute } from '@/lib/board/iso-route'
-import { GRID_SIZE, TILE_H, TILE_W, isoPosition } from '@rerun/ui/iso-grid/iso'
+import { GRID_SIZE, TILE_H, TILE_W, isoPosition } from '@moldwright/ui/iso-grid/iso'
 
-import { FOCUS_BOX_ID, FOCUS_TILE_IDS, LAST_TOUR_PHASE, TOUR_AGENTS, TOUR_BOXES, TOUR_CAMERA_SETTLE, TOUR_CONNECTORS, TOUR_HANDOFFS, TOUR_MODEL_PHASE, TOUR_STAGE_BOUNDS, boardForPhase, frameTourPhase, frameTourStage, isTourFocusPhase, linkId } from '@rerun/ui/tour/board'
-import { TOUR_TEAMMATES } from '@rerun/ui/tour/team'
+import { FOCUS_BOX_ID, FOCUS_TILE_IDS, LAST_TOUR_PHASE, TOUR_AGENTS, TOUR_BOXES, TOUR_CAMERA_SETTLE, TOUR_CONNECTORS, TOUR_HANDOFFS, TOUR_MODEL_PHASE, TOUR_STAGE_BOUNDS, boardForPhase, frameTourPhase, frameTourStage, isTourFocusPhase, linkId } from '@moldwright/ui/tour/board'
+import { TOUR_TEAMMATES } from '@moldwright/ui/tour/team'
 
 const full = boardForPhase(LAST_TOUR_PHASE)
 const tileById = new Map(full.tiles.map(tile => [tile.id, tile]))

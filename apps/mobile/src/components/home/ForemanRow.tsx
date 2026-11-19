@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@moldwright/contracts'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

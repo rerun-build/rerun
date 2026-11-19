@@ -1,4 +1,4 @@
-import { BRAND_GATE_COOKIE } from '@rerun/contracts'
+import { BRAND_GATE_COOKIE } from '@moldwright/contracts'
 import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

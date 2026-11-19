@@ -1,4 +1,4 @@
-import type { SkillSummary } from '@rerun/contracts'
+import type { SkillSummary } from '@moldwright/contracts'
 import { useEffect, useState } from 'react'
 
 import { fetchCoworkerSkills } from '@/api/coworker'

@@ -12,7 +12,7 @@ import { PanelScroller } from '@/components/ui/panel-list'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { AuthorProfile } from '@/lib/chat/message-author'
 import { Loader2Icon } from '@/lib/icons'
-import { CardAvatar } from '@rerun/ui/chat'
+import { CardAvatar } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 

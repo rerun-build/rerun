@@ -1,1 +1,1 @@
-export { threadsByMessage, type ThreadPlacement } from '@rerun/contracts'
+export { threadsByMessage, type ThreadPlacement } from '@moldwright/contracts'

@@ -2,8 +2,8 @@
 
 import { useTranslations } from 'next-intl'
 import { Icon } from '@/components/ui/icon'
-import { BorderBeam } from '@rerun/ui'
-import { Stripes } from '@rerun/ui/primitives'
+import { BorderBeam } from '@moldwright/ui'
+import { Stripes } from '@moldwright/ui/primitives'
 import { cn } from '@/lib/utils'
 import { PlusIcon } from '@/lib/icons'
 

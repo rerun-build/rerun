@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CUSTOM_DEFAULT_CONTEXT_WINDOW, connectionConfigSchema } from '@rerun/contracts'
+import { CUSTOM_DEFAULT_CONTEXT_WINDOW, connectionConfigSchema } from '@moldwright/contracts'
 import { candidateBaseUrls, customContextWindow, customDiscoveredModels, parseModelList, probeCustomEndpoint, refreshCustomCatalog, resetCustomCatalogForTests } from './custom-catalog.js'
 import { isConnected, toSummary } from './loader.js'
 import { effectiveCompactAt, runContextWindow } from '../runtime/compaction/compact.js'

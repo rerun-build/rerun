@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
-import { BorderBeam, type BorderBeamProps } from '@rerun/ui'
+import { BorderBeam, type BorderBeamProps } from '@moldwright/ui'
 
 import type { ForemanCorner } from '@/lib/foreman-layout'
 import { cn } from '@/lib/utils'

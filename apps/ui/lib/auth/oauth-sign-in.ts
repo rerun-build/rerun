@@ -1,7 +1,7 @@
 import { OAUTH_PROVIDER_CONFIG, OAUTH_PROVIDER_COOKIE, OAUTH_PROVIDER_COOKIE_MAX_AGE_SECONDS, isOAuthProvider, type OAuthProvider } from '@/lib/auth/oauth-providers'
 import { createClient } from '@/supabase/client'
-import { SIGNUP_INTENT_COOKIE } from '@rerun/analytics'
-import { getCookie, setSharedCookie } from '@rerun/analytics/client'
+import { SIGNUP_INTENT_COOKIE } from '@moldwright/analytics'
+import { getCookie, setSharedCookie } from '@moldwright/analytics/client'
 
 export async function startOAuthSignIn(provider: OAuthProvider, { linkAnonymous = false }: { linkAnonymous?: boolean } = {}) {
     setSharedCookie(SIGNUP_INTENT_COOKIE, provider, 1)

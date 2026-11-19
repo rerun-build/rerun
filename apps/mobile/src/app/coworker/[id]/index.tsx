@@ -1,4 +1,4 @@
-import type { AgentView, Box, CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
+import type { AgentView, Box, CoworkerFiles, InstalledServiceView, RoutineView } from '@moldwright/contracts'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'

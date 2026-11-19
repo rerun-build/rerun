@@ -1,4 +1,4 @@
-import { chatErrorTitle, classifyChatError, friendlyError } from '@rerun/contracts'
+import { chatErrorTitle, classifyChatError, friendlyError } from '@moldwright/contracts'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

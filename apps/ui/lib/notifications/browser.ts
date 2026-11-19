@@ -1,6 +1,6 @@
 'use client'
 
-import type { DesktopShellApi } from '@rerun/contracts'
+import type { DesktopShellApi } from '@moldwright/contracts'
 import { pageAttention } from '@/lib/desktop-shell/attention'
 import { desktopShell } from '@/lib/desktop-shell/client'
 

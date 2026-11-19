@@ -47,7 +47,7 @@ const { SKILL_STYLE } = await import('./style.js')
 const { insertSkillProposal, getSkillProposal, transitionSkillProposal } = await import('../db/repos/skill-proposals.js')
 const { skillsDir, skillDir, connectionsDir } = await import('../config/paths.js')
 const { rm } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, agentConfigSchema } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, agentConfigSchema } = await import('@moldwright/contracts')
 const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
 const { resolveConfiguredModel } = await import('../agents/availability.js')
 

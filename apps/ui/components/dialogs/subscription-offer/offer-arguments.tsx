@@ -1,6 +1,6 @@
 'use client'
 
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { PlugIcon, ShieldCheckIcon, UsersIcon, type LucideIcon } from '@/lib/icons'

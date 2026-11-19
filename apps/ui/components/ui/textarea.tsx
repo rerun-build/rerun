@@ -1,2 +1,2 @@
-export { Textarea } from '@rerun/ui/forms'
-export type { TextareaProps } from '@rerun/ui/forms'
+export { Textarea } from '@moldwright/ui/forms'
+export type { TextareaProps } from '@moldwright/ui/forms'

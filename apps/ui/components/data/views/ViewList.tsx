@@ -1,8 +1,8 @@
 'use client'
 
 import type { DbRow } from '@/components/data/DataBrowserTable'
-import type { TableView } from '@rerun/contracts'
-import { ListItem, type CellContext } from '@rerun/ui/chat'
+import type { TableView } from '@moldwright/contracts'
+import { ListItem, type CellContext } from '@moldwright/ui/chat'
 
 type ViewListProps = { view: TableView; rows: DbRow[]; context: CellContext; onOpenRow?: (row: DbRow) => void }
 

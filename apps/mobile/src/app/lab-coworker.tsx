@@ -1,4 +1,4 @@
-import type { CoworkerFiles as CoworkerFilesView, InstalledServiceView, RoutineView } from '@rerun/contracts'
+import type { CoworkerFiles as CoworkerFilesView, InstalledServiceView, RoutineView } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { Tile } from '@rerun/ui/iso-grid'
+import type { Tile } from '@moldwright/ui/iso-grid'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FactoryWorld } from './FactoryWorld'
@@ -11,8 +11,8 @@ import { layoutStorageKey } from './factory-layout'
 import { factoryScene } from './factory-scene'
 
 const probe = vi.hoisted(() => ({ props: null as null | Record<string, unknown> }))
-vi.mock('@rerun/ui/iso-grid', async importOriginal => {
-    const mod = await importOriginal<typeof import('@rerun/ui/iso-grid')>()
+vi.mock('@moldwright/ui/iso-grid', async importOriginal => {
+    const mod = await importOriginal<typeof import('@moldwright/ui/iso-grid')>()
     return { ...mod, IsoGrid: (props: Record<string, unknown>) => { probe.props = props; return null } }
 })
 

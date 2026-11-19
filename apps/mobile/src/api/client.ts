@@ -1,4 +1,4 @@
-import { CLIENT_HEADER, formatClientHeader } from '@rerun/contracts'
+import { CLIENT_HEADER, formatClientHeader } from '@moldwright/contracts'
 import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'

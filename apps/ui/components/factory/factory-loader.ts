@@ -1,4 +1,4 @@
-import type { FactoryJobState, FactorySnapshot, FactoryWorkerType } from '@rerun/contracts'
+import type { FactoryJobState, FactorySnapshot, FactoryWorkerType } from '@moldwright/contracts'
 
 export const BEAT_MS = 30_000
 

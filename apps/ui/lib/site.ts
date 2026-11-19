@@ -1,4 +1,4 @@
-import { TRIAL_DAYS } from '@rerun/contracts'
+import { TRIAL_DAYS } from '@moldwright/contracts'
 
 export const site = {
     name: 'Moldwright',

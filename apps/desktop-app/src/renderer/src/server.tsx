@@ -1,5 +1,5 @@
-import { Field, Input } from '@rerun/ui/forms'
-import { Button } from '@rerun/ui/primitives'
+import { Field, Input } from '@moldwright/ui/forms'
+import { Button } from '@moldwright/ui/primitives'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslations } from 'use-intl'
 import type { ServerInfo } from '../../shared/ipc-channels'

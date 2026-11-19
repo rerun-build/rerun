@@ -1,4 +1,4 @@
-import type { MemberProfile } from '@rerun/contracts'
+import type { MemberProfile } from '@moldwright/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { WorkspaceContext, WorkspaceRole } from '@/app/api/_auth/ownership'

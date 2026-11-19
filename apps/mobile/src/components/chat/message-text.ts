@@ -1,4 +1,4 @@
-import { attachmentDisplayName, decodePeaks, messageText, parseAttachments, parseVoiceMessage, stripAttachmentsRef, stripVoiceMarker, type VoiceMessage } from '@rerun/contracts'
+import { attachmentDisplayName, decodePeaks, messageText, parseAttachments, parseVoiceMessage, stripAttachmentsRef, stripVoiceMarker, type VoiceMessage } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 
 export function userTextOf(message: UIMessage): string {

@@ -1,4 +1,4 @@
-import type { Box } from '@rerun/contracts'
+import type { Box } from '@moldwright/contracts'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import { fetchBoard, type BoardRead } from '@/api/board'

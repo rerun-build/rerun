@@ -1,6 +1,6 @@
 import { readCoworkerNotifications, setCoworkerNotifications } from '@/app/api/_services/coworker-details.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { coworkerNotificationsSchema } from '@rerun/contracts'
+import { coworkerNotificationsSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -18,7 +18,7 @@ vi.mock('../../runtime/hub.js', () => ({
     },
 }))
 
-const { DEFAULT_CONNECTION_MODELS } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS } = await import('@moldwright/contracts')
 const { createConnection } = await import('../../connections/store.js')
 const { triggerTools } = await import('./trigger.js')
 const { markFired, readTrigger, triggerExists, writeTrigger } = await import('../../triggers/loader.js')

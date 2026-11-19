@@ -6,7 +6,7 @@ import type { AuthMethod } from '@/lib/auth/auth-method'
 import { useLastSignInMethod, type LastSignInMethod } from '@/lib/auth/last-sign-in'
 import { MailIcon, Smartphone } from '@/lib/icons'
 import { detectMobileOs } from '@/lib/in-app-browser'
-import { StepTransition } from '@rerun/ui/steps'
+import { StepTransition } from '@moldwright/ui/steps'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 

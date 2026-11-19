@@ -1,4 +1,4 @@
-import type { RoutineView } from '@rerun/contracts'
+import type { RoutineView } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'

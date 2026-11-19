@@ -1,4 +1,4 @@
-import { contextTexts, type Provider, type Verbosity } from '@rerun/contracts'
+import { contextTexts, type Provider, type Verbosity } from '@moldwright/contracts'
 import type { ModelMessage } from 'ai'
 import { buildSkillIndex } from '../skills/index.js'
 import { buildScheduleIndex } from '../schedules/index.js'

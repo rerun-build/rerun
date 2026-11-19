@@ -6,7 +6,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { attachmentDisplayName, parseAttachments } from '@/lib/chat/attachments-marker'
 import { fileExtension, filePreviewKind } from '@/lib/files/preview'
 import { downloadPrivateFile } from '@/lib/storage/private'
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
 
 import { FOREMAN_FILES_BUCKET, foremanFileKey } from './files'
 

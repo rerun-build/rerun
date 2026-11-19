@@ -5,7 +5,7 @@ import { actorFromContext, keepVisible, manageableSpaceIds } from '@/app/api/_au
 import { requireAdminContext, requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { getAppOrigin } from '@/lib/app-origin'
-import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isWorkspaceApiEntitled } from '@moldwright/cloud/billing'
 import { apiKeyPrefix, generateApiKey, hashApiKey } from '@/lib/mcp/api-keys'
 import { mcpAccountUrl } from '@/lib/mcp/connect'
 import { IMPORT_KEY_TTL_MS } from '@/lib/mcp/import-scope'

@@ -6,7 +6,7 @@ import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } fro
 import { activateAgent, NO_FREE_SLOT_ERROR, reactivateAgentsAfterRestore, reconcileAgentActivation, stopAgentsOnEngine, wakePlanLimitedAgents } from './agent-activation.service'
 import { pauseAgentSchedules, resumeAgentSchedules } from './agent.service'
 import { getSpaceConnection } from './space.service'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ patchAgent: vi.fn() }))

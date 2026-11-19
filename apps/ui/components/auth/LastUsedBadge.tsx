@@ -1,4 +1,4 @@
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 export function LastUsedBadge() {

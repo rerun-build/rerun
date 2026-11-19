@@ -1,5 +1,5 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@moldwright/contracts'
 import { generateText } from 'ai'
 import { z } from 'zod'
 

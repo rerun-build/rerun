@@ -1,4 +1,4 @@
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import Svg, { Path } from 'react-native-svg'
 
 import { useTheme } from '@/theme/theme'

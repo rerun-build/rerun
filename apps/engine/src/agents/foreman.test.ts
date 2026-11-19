@@ -16,7 +16,7 @@ vi.mock('../runtime/hub.js', async importOriginal => ({
 }))
 
 const { beforeAll, beforeEach, describe, expect, it } = await import('vitest')
-const { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, foremanBriefSchema } = await import('@rerun/contracts')
+const { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, foremanBriefSchema } = await import('@moldwright/contracts')
 const { migrate } = await import('../db/migrate.js')
 const { ensureForeman } = await import('./foreman.js')
 const { getAgent } = await import('./registry.js')

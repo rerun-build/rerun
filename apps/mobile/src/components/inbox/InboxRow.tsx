@@ -1,4 +1,4 @@
-import type { CoworkerRule, InboxItem } from '@rerun/contracts'
+import type { CoworkerRule, InboxItem } from '@moldwright/contracts'
 import { useRef } from 'react'
 import { Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'

@@ -1,4 +1,4 @@
-import type { BrainSeedPage, BrainSeedResult } from '@rerun/contracts'
+import type { BrainSeedPage, BrainSeedResult } from '@moldwright/contracts'
 import { readPageFile, SEED_AUTHOR, seedOwnsPage, writePage } from './pages.js'
 
 export async function seedBrain(pages: BrainSeedPage[]): Promise<BrainSeedResult> {

@@ -4,9 +4,9 @@ import { fakeSupabase } from '@/test/supabase-fake'
 vi.mock('./scrape', () => ({ scrapeProfile: vi.fn() }))
 vi.mock('./enrich', () => ({ enrichExpert: vi.fn() }))
 vi.mock('./rehost', () => ({ rehostAvatar: vi.fn(), rehostBanner: vi.fn() }))
-vi.mock('@rerun/db', () => ({ randomExpertBannerUrl: vi.fn() }))
+vi.mock('@moldwright/db', () => ({ randomExpertBannerUrl: vi.fn() }))
 
-import { randomExpertBannerUrl } from '@rerun/db'
+import { randomExpertBannerUrl } from '@moldwright/db'
 import { enrichExpert, type EnrichedExpert } from './enrich'
 import { importExpert } from './import'
 import { rehostAvatar, rehostBanner } from './rehost'

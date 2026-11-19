@@ -15,7 +15,7 @@ import type { EngineDbTable } from '@/lib/engine/types'
 import type { UploadEntry } from '@/lib/files/upload'
 import { BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import type { BrainPageSummary } from '@rerun/contracts'
+import type { BrainPageSummary } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, type ReactNode, type Ref } from 'react'
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { track } from '@rerun/analytics/client'
-import { TRIAL_DAYS } from '@rerun/contracts'
+import { track } from '@moldwright/analytics/client'
+import { TRIAL_DAYS } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 

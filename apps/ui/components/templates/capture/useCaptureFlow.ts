@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { defaultExcludedPaths, isSetupAnswered } from '@rerun/contracts'
+import { defaultExcludedPaths, isSetupAnswered } from '@moldwright/contracts'
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
 import type { AgentCapturePlan, CaptureSourceSpace } from '@/lib/templates/capture'

@@ -1,4 +1,4 @@
-import { CONNECTION_TOKEN_KEY, CUSTOM_DEFAULT_CONTEXT_WINDOW, type CustomProbeInput, type CustomProbeResult, type DiscoveredModel } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, CUSTOM_DEFAULT_CONTEXT_WINDOW, type CustomProbeInput, type CustomProbeResult, type DiscoveredModel } from '@moldwright/contracts'
 import { logger } from '../lib/logger.js'
 import type { LoadedConnection } from './types.js'
 

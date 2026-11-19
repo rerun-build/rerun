@@ -6,7 +6,7 @@ import { actorFromContext, requireLightSessionActor } from '@/app/api/_auth/acce
 import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { createBox, deleteBox, renameBox } from '@/app/api/_services/box.service'
 import { findWorkspaceEngine, NoEngineError } from '@/app/api/_services/workspace-engine.service'
-import { restartManagedEngine } from '@rerun/cloud/engines'
+import { restartManagedEngine } from '@moldwright/cloud/engines'
 import type { SpaceSide } from '@/lib/board/space-layout'
 
 export type ActionResult<T = unknown> = ({ ok: true } & T) | ActionFailure

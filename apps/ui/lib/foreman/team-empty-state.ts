@@ -1,9 +1,9 @@
-import { teamEmptyStateOf as teamEmptyStateFor, type TeamAgent, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamPulse } from '@rerun/contracts'
+import { teamEmptyStateOf as teamEmptyStateFor, type TeamAgent, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamPulse } from '@moldwright/contracts'
 
 import type { AgentSchedule } from '@/lib/board/next-runs'
 import { nextRunAt } from '@/lib/schedules/cron'
 
-export type { TeamEmptyStateAction, TeamEmptyStateModel, TeamEmptyStateRow, TeamPulse } from '@rerun/contracts'
+export type { TeamEmptyStateAction, TeamEmptyStateModel, TeamEmptyStateRow, TeamPulse } from '@moldwright/contracts'
 
 function soonestRoutine(schedules: AgentSchedule[], now: number): TeamPulse['nextRoutine'] {
     const at = new Date(now)

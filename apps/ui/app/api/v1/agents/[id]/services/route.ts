@@ -1,7 +1,7 @@
 import { actorFromContext } from '@/app/api/_auth/access'
 import { listInstalledServices } from '@/app/api/_services/services.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import type { InstalledServiceView } from '@rerun/contracts'
+import type { InstalledServiceView } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

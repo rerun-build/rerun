@@ -1,6 +1,6 @@
 'use client'
 
-import { agentTileStyle } from '@rerun/ui/iso-grid'
+import { agentTileStyle } from '@moldwright/ui/iso-grid'
 import { useReducedMotion } from 'motion/react'
 import { useMemo } from 'react'
 

@@ -1,5 +1,5 @@
 import { app, Menu, type MenuItemConstructorOptions } from 'electron'
-import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
+import { QUICK_ASK_SHORTCUT } from '@moldwright/contracts'
 import { devToolsAllowed, PRODUCT_NAME } from './identity'
 import { t } from './messages'
 

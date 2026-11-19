@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDownIcon, WorkflowIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { Markdown } from '@rerun/ui/markdown'
-import { Stripes } from '@rerun/ui/primitives'
+import { Markdown } from '@moldwright/ui/markdown'
+import { Stripes } from '@moldwright/ui/primitives'
 
 const HINT_CLASS_NAME = 'text-xs text-muted-foreground/80 [&_p]:leading-snug [&_code]:py-0 [&_code]:text-[0.8em]'
 

@@ -1,6 +1,6 @@
 import { startLeadSetupAction } from '@/app/api/_actions/foreman-lead.actions'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { foremanLeadRequestSchema } from '@rerun/contracts'
+import { foremanLeadRequestSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

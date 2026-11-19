@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { tool, dynamicTool, jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
-import type { McpServer } from '@rerun/contracts'
+import type { McpServer } from '@moldwright/contracts'
 import { CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig, compactAtTokens, compactEnvFor, modelFor, resolveModel } from './providers.js'
 import { askUserTool, canonicalBridgeName, canonicalHitlName, isHitlToolName, requestApprovalTool } from '../tools/builtin/hitl.js'
 

@@ -1,5 +1,5 @@
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, PROVIDER_OVERLOADED, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
+import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, PROVIDER_OVERLOADED, SUBSCRIPTION_LIMIT, type Provider } from '@moldwright/contracts'
 
 export const RUN_ERROR_CODES = {
     usageLimit: 'provider_usage_limit',

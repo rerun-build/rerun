@@ -8,10 +8,10 @@ import { TemplateDetailAbout } from '@/components/templates/TemplateDetailAbout'
 import { TemplateDetailAgentCard } from '@/components/templates/TemplateDetailAgentCard'
 import { TemplateDetailFooter } from '@/components/templates/TemplateDetailFooter'
 import { TemplateDetailMedia } from '@/components/templates/TemplateDetailMedia'
-import { CardCarousel, ScrollFade, Stripes } from '@rerun/ui/primitives'
+import { CardCarousel, ScrollFade, Stripes } from '@moldwright/ui/primitives'
 import { serviceIconProps } from '@/lib/services/icons'
 import { type LibraryTemplate } from '@/lib/templates/library'
-import { priceLabel, templateCategoryLabel } from '@rerun/contracts'
+import { priceLabel, templateCategoryLabel } from '@moldwright/contracts'
 import { cn } from '@/lib/utils'
 
 export function TemplateDetailPanel({ template, showStatus, onImported }: { template: LibraryTemplate; showStatus: boolean; onImported: () => void }) {

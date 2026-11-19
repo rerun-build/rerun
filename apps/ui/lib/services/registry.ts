@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey } from '@moldwright/contracts'
 
 import { makeDir, readFileText, writeFileText } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'

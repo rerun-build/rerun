@@ -215,7 +215,7 @@ served on (Anthropic messages, OpenAI responses, OpenAI chat, Google). Every req
 
 - The catalog is read live from `https://opencode.ai/inference/{go/,}v1/models` (public, no key):
   at boot, on `GET /connections` when older than 30 minutes, before a new connection adopts the
-  default, and after a `400 Model is unavailable`. The snapshot built into `@rerun/contracts` stands
+  default, and after a `400 Model is unavailable`. The snapshot built into `@moldwright/contracts` stands
   in until it answers. `providerModels` on the summary lists what the catalog reaches today.
 - `planLimits` reads `https://opencode.ai/zen/go/v1/usage`: the five-hour `session`, `weekly` and
   `monthly` windows of the Go plan, for the whole account.

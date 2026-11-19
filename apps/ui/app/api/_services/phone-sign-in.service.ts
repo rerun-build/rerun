@@ -9,7 +9,7 @@ import { isVerificationChannel, type VerificationChannel } from '@/lib/phone/ver
 import { checkVerification, sendVerification, type VerificationFailure } from '@/lib/sms/bird-verify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import type { ClientPlatform } from '@rerun/contracts'
+import type { ClientPlatform } from '@moldwright/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 const SEND_COLUMNS = ['phone', 'send_count', 'send_window_started_at', 'last_sent_at', 'last_channel'] as const

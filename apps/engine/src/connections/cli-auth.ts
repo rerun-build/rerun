@@ -1,4 +1,4 @@
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { acquireClaudeLease, ensureFreshClaudeToken } from './claude-token.js'
 import { ensureCodexAuth } from './codex-auth.js'
 import type { LoadedConnection } from './types.js'

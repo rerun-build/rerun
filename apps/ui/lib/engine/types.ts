@@ -49,7 +49,7 @@ import {
     runStepsListSchema,
     toolCallSchema,
     toolCallsListSchema,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import type {
     Tools,
     ToolDescriptor,
@@ -87,7 +87,7 @@ import type {
     RunStepsList,
     ToolCall,
     ToolCallsList,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 export type EngineConnection = {
     baseUrl: string
@@ -236,13 +236,13 @@ export {
     engineUsageSchema,
     dbQueryResultSchema,
     dbExecuteResultSchema,
-} from '@rerun/contracts'
-export type { EngineDbColumn, EngineDbTable, EngineDbRows, EngineDeleteRowsResult, EngineUsageBucket, DbQueryInput, DbQueryResult, DbExecuteInput, DbExecuteResult } from '@rerun/contracts'
+} from '@moldwright/contracts'
+export type { EngineDbColumn, EngineDbTable, EngineDbRows, EngineDeleteRowsResult, EngineUsageBucket, DbQueryInput, DbQueryResult, DbExecuteInput, DbExecuteResult } from '@moldwright/contracts'
 
-export { statsPointSchema as engineStatsPointSchema, statsResponseSchema as engineStatsResponseSchema } from '@rerun/contracts'
-export { engineDoctorSchema } from '@rerun/contracts'
-export type { EngineDoctor, EngineDoctorCheck } from '@rerun/contracts'
-export type { StatsPoint as EngineStatsPoint, StatsQuery as EngineStatsQuery } from '@rerun/contracts'
+export { statsPointSchema as engineStatsPointSchema, statsResponseSchema as engineStatsResponseSchema } from '@moldwright/contracts'
+export { engineDoctorSchema } from '@moldwright/contracts'
+export type { EngineDoctor, EngineDoctorCheck } from '@moldwright/contracts'
+export type { StatsPoint as EngineStatsPoint, StatsQuery as EngineStatsQuery } from '@moldwright/contracts'
 
 export type CronOutputEntry = {
     timestamp: string

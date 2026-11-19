@@ -3,7 +3,7 @@ import { deleteAgent as engineDeleteAgent, getAgent as engineGetAgent, listSkill
 import { installTemplate } from '../lib/templates/install'
 import { workspaceActor } from '../app/api/_auth/access'
 import { createServiceRoleClient } from '../supabase/serviceRole'
-import { selectMany } from '@rerun/db/helpers'
+import { selectMany } from '@moldwright/db/helpers'
 
 const SLUG = process.env.VERIFY_TEMPLATE_SLUG ?? 'dfs'
 const SPACE_ID = process.env.VERIFY_SPACE_ID ?? '644a7ff0-ba92-4830-aadf-a2465eb8ed3e'

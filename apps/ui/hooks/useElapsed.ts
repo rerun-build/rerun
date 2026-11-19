@@ -1,1 +1,1 @@
-export { useElapsed, formatElapsed } from '@rerun/ui/primitives'
+export { useElapsed, formatElapsed } from '@moldwright/ui/primitives'

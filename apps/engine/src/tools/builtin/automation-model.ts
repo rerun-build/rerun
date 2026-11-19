@@ -1,4 +1,4 @@
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import { connectionsOfProvider } from '../../connections/resolve.js'
 import type { RunContext } from '../../runtime/context.js'
 

@@ -1,7 +1,7 @@
 import { displayNameOf, PROFILE_NAME_MAX, readProfile } from '@/lib/auth/user-profile'
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled } from '@moldwright/cloud/billing'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import type { Me, MessageAuthor } from '@rerun/contracts'
+import type { Me, MessageAuthor } from '@moldwright/contracts'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { User } from '@supabase/supabase-js'
 

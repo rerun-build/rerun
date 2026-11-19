@@ -1,6 +1,6 @@
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'
-import { poolHasRoom } from '@rerun/cloud/engines'
+import { poolHasRoom } from '@moldwright/cloud/engines'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 

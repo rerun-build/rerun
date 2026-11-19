@@ -3,7 +3,7 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { formatNumber } from '@rerun/i18n/format'
+import { formatNumber } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { addAppSlotAction, cancelAppConnectAction, connectWhatsappAction, disconnectAppConnectionAction, getAppsOverviewAction, submitAppCheckpointAction } from '@/app/api/_actions/apps.actions'
 import type { AppConnectionView, AppsOverview, ConnectOutcome } from '@/app/api/_services/apps.service'

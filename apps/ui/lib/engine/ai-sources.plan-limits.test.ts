@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@moldwright/contracts'
 import { isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import type { BoxConnection } from './types'

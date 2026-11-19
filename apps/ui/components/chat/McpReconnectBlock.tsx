@@ -2,7 +2,7 @@
 
 import { StepRow } from '@/components/chat/StepRow'
 import { PlugIcon } from '@/lib/icons'
-import type { McpReconnectEvent } from '@rerun/contracts'
+import type { McpReconnectEvent } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 
 export function McpReconnectBlock({ data }: { data: McpReconnectEvent }) {

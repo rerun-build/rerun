@@ -1,4 +1,4 @@
-import { cliServesModel } from '@rerun/contracts'
+import { cliServesModel } from '@moldwright/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { REFUSAL_TTL_MS, forgetCliModels, readCliModels, recordCliModels, recordRefusedModel } from './cli-models.js'
 

@@ -3,7 +3,7 @@ import { act, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { routeTileLinks } from '@rerun/ui/iso-grid'
+import { routeTileLinks } from '@moldwright/ui/iso-grid'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FactoryOverlay } from './FactoryOverlay'
@@ -12,8 +12,8 @@ import { centreOf, toWorld } from './factory-rest'
 import { factoryScene } from './factory-scene'
 
 const probe = vi.hoisted(() => ({ props: null as null | { worldOverlay: () => ReactNode } }))
-vi.mock('@rerun/ui/iso-grid', async importOriginal => {
-    const mod = await importOriginal<typeof import('@rerun/ui/iso-grid')>()
+vi.mock('@moldwright/ui/iso-grid', async importOriginal => {
+    const mod = await importOriginal<typeof import('@moldwright/ui/iso-grid')>()
     return { ...mod, IsoGrid: (props: { worldOverlay: () => ReactNode }) => { probe.props = props; return null } }
 })
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true

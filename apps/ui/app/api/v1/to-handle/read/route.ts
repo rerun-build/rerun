@@ -1,6 +1,6 @@
 import { markSessionsHandled } from '@/app/api/_services/conversation.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { markHandledSchema } from '@rerun/contracts'
+import { markHandledSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

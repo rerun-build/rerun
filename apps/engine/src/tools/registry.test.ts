@@ -42,7 +42,7 @@ const skim = vi.hoisted(() => ({ on: false }))
 vi.mock('./builtin/skim-pages.js', async importOriginal => ({ ...(await importOriginal<typeof import('./builtin/skim-pages.js')>()), skimPagesEnabled: () => skim.on }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { TOOL_KEYS } = await import('@rerun/contracts')
+const { TOOL_KEYS } = await import('@moldwright/contracts')
 const { buildTools } = await import('./registry.js')
 const { toolPayloadChars } = await import('./payload.js')
 const { MCP_CALL_TOOL, MCP_SEARCH_TOOL, sentToolNames } = await import('./mcp-search.js')

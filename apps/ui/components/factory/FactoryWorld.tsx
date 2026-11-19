@@ -1,7 +1,7 @@
 'use client'
 
-import type { FactorySnapshot } from '@rerun/contracts'
-import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
+import type { FactorySnapshot } from '@moldwright/contracts'
+import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@moldwright/ui/iso-grid'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 
 import { fireRerunConfetti } from '@/lib/confetti'

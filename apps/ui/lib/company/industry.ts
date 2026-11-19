@@ -1,4 +1,4 @@
-import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@moldwright/contracts'
 
 export const INDUSTRY_GLOSS: Record<TemplateCategory, string> = {
     agencies: 'agencies delivering work for clients, advertising, marketing, design and consulting firms included',

@@ -2,7 +2,7 @@ import type { Database } from '@/app/api/database.types'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { deviceTokenSchema } from '@rerun/contracts'
+import { deviceTokenSchema } from '@moldwright/contracts'
 
 type DeviceTokenInsert = Database['public']['Tables']['device_tokens']['Insert']
 type DeviceTokenUpdate = Database['public']['Tables']['device_tokens']['Update']

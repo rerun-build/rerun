@@ -1,4 +1,4 @@
-import type { AgentStatus } from '@rerun/ui/iso-grid'
+import type { AgentStatus } from '@moldwright/ui/iso-grid'
 
 import type { PlanBeats, PlanItem } from '@/components/foreman/widgets/plan-card'
 

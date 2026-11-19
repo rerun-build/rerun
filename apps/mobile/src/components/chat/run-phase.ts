@@ -1,4 +1,4 @@
-import { hitlKindOf, pairSubRuns, stripBridgePrefix } from '@rerun/contracts'
+import { hitlKindOf, pairSubRuns, stripBridgePrefix } from '@moldwright/contracts'
 import { isReasoningUIPart, isToolUIPart, type ChatStatus, type UIMessage } from 'ai'
 
 import type { RunPhase } from '@/mocks/data'

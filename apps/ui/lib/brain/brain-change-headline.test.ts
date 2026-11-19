@@ -1,4 +1,4 @@
-import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
+import { brainChangeHeadline, type BrainChange } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { englishTranslator } from '@/lib/i18n/english-translator'

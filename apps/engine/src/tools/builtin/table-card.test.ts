@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-table-card-'))
 process.env.RERUN_API_KEY = ''
 
 const { beforeAll, describe, expect, it } = await import('vitest')
-const { CARD_MAX_GROUPS, CARD_MAX_ROWS } = await import('@rerun/contracts')
+const { CARD_MAX_GROUPS, CARD_MAX_ROWS } = await import('@moldwright/contracts')
 const { getAgentDb } = await import('../../db/agentDb.js')
 const { workspaceDir } = await import('../../config/paths.js')
 const { buildTableCard } = await import('./table-card.js')

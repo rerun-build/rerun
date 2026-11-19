@@ -7,7 +7,7 @@ process.env.RERUN_API_KEY = ''
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { readFile, rm, stat } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL } = await import('@moldwright/contracts')
 const { connectionConfigPath, connectionDir, connectionEnvPath, connectionsDir } = await import('../config/paths.js')
 const { readEnvFile } = await import('../lib/env-file.js')
 const { getConnection, listConnections, unloadConnection } = await import('./registry.js')

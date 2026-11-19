@@ -1,5 +1,5 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import type { RewindHighlight } from '@rerun/contracts'
+import type { RewindHighlight } from '@moldwright/contracts'
 import { generateText } from 'ai'
 import { z } from 'zod'
 import type { ReportedAgent } from './merge'

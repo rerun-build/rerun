@@ -1,4 +1,4 @@
-import type { InboxItem, SkillProposal, SkillProposalStatus, WorkspaceSummary } from '@rerun/contracts'
+import type { InboxItem, SkillProposal, SkillProposalStatus, WorkspaceSummary } from '@moldwright/contracts'
 import { Link, type Href } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'

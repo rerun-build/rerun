@@ -1,7 +1,7 @@
 'use server'
 
-import { isMachineEntitled } from '@rerun/cloud/billing'
-import { isPublicStatus, type TemplateStatus } from '@rerun/contracts'
+import { isMachineEntitled } from '@moldwright/cloud/billing'
+import { isPublicStatus, type TemplateStatus } from '@moldwright/contracts'
 import { z } from 'zod'
 import { assertAdminUser, getAdminEmail } from '@/lib/auth/admin'
 import { assertSpaceAccess } from '@/app/api/_auth/access'

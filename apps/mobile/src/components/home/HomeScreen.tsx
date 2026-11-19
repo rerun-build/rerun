@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import { router, useGlobalSearchParams, usePathname, type Href } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'

@@ -4,8 +4,8 @@ import { TooltipLabeled } from '@/components/ui/tooltip'
 import { isCreditUsedUp, planLimitTone, planWindowPercent, tightestPlanWindow, type PlanLimitTone, type RerunCredit } from '@/lib/engine/ai-sources'
 import { shortRelativeTime, shortUntil } from '@/lib/time'
 import { cn } from '@/lib/utils'
-import type { PlanLimitWindow } from '@rerun/contracts'
-import { shortDate } from '@rerun/i18n/format'
+import type { PlanLimitWindow } from '@moldwright/contracts'
+import { shortDate } from '@moldwright/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 
 const TONE_CLASS: Record<PlanLimitTone, string> = { brand: 'text-muted-foreground', warning: 'text-amber-500', destructive: 'text-destructive' }

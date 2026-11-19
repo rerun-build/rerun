@@ -1,7 +1,7 @@
 'use client'
 
-import type { EmailVerdictStatus } from '@rerun/contracts'
-import { Badge, type BadgeTone } from '@rerun/ui/primitives'
+import type { EmailVerdictStatus } from '@moldwright/contracts'
+import { Badge, type BadgeTone } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 
 export const EMAIL_VERDICT_TONES: Record<EmailVerdictStatus, BadgeTone> = {

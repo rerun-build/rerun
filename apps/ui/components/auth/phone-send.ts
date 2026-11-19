@@ -2,8 +2,8 @@ import type { PhoneActionRefusal, PhoneSendActionResult } from '@/app/api/_actio
 import type { PhoneCodeRequest } from '@/components/auth/PhoneCodeForm'
 import { CaptchaError } from '@/components/auth/captcha/captcha-error'
 import type { VerificationChannel } from '@/lib/phone/verification'
-import type { PhoneVerificationContext } from '@rerun/analytics'
-import { track } from '@rerun/analytics/client'
+import type { PhoneVerificationContext } from '@moldwright/analytics'
+import { track } from '@moldwright/analytics/client'
 
 const MESSAGE_LIMIT = 200
 

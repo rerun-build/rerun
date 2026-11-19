@@ -1,4 +1,4 @@
-import { SEO_DESCRIPTION_MAX_LENGTH, SEO_DESCRIPTION_MIN_LENGTH, type TemplateDocument, isSeoDescriptionLength } from '@rerun/contracts'
+import { SEO_DESCRIPTION_MAX_LENGTH, SEO_DESCRIPTION_MIN_LENGTH, type TemplateDocument, isSeoDescriptionLength } from '@moldwright/contracts'
 
 export type SubmitRequirementId = 'title' | 'tagline' | 'description' | 'metaDescription' | 'agent' | 'installAnswers' | 'payouts'
 

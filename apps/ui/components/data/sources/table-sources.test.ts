@@ -1,9 +1,9 @@
-import { TABLE_SOURCES_MAX_ROWS, type TableSourcesResult } from '@rerun/contracts'
+import { TABLE_SOURCES_MAX_ROWS, type TableSourcesResult } from '@moldwright/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { resolveTableSources, showsSourcesColumn, sourcesRequestRows, type RowSources } from './table-sources'
 
-vi.mock('@rerun/contracts', async importOriginal => ({
-    ...(await importOriginal<typeof import('@rerun/contracts')>()),
+vi.mock('@moldwright/contracts', async importOriginal => ({
+    ...(await importOriginal<typeof import('@moldwright/contracts')>()),
     paidDataSourceOfCall: (_capability: string, servedBy: string | null) =>
         servedBy ? { id: `vendor:${servedBy.split('.')[0]}`, name: servedBy.split('.')[0], domain: null, kind: 'vendor' } : { id: 'generic', name: 'Data provider', domain: null, kind: 'generic' },
 }))

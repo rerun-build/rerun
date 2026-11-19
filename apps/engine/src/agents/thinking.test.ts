@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { agentConfigSchema, chatRequestSchema, type Provider } from '@rerun/contracts'
+import { agentConfigSchema, chatRequestSchema, type Provider } from '@moldwright/contracts'
 import { REASONING_REQUEST, reasoningFetchFor } from './openrouter-reasoning.js'
 import { REASONING_OPTIONS } from './reasoning.js'
 import { CLAUDE_DEFAULT_THINKING, thinkingSettingsFor } from './thinking.js'

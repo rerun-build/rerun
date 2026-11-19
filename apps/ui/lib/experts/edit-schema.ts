@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { BUDGET_OPTIONS, EXPERT_AVAILABILITIES, EXPERT_STATUSES, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from '@rerun/ui/experts/options'
+import { BUDGET_OPTIONS, EXPERT_AVAILABILITIES, EXPERT_STATUSES, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from '@moldwright/ui/experts/options'
 
 import { isValidTimeZone } from './schedule/window'
 

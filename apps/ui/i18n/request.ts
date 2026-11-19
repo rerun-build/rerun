@@ -1,6 +1,6 @@
 import { requestLocale, requestTimeZone } from '@/lib/i18n/request-locale'
-import { cloudMessages } from '@rerun/cloud/messages'
-import { loadMessages } from '@rerun/i18n/messages'
+import { cloudMessages } from '@moldwright/cloud/messages'
+import { loadMessages } from '@moldwright/i18n/messages'
 import { getRequestConfig } from 'next-intl/server'
 
 const OTHER_SURFACES = /^(landing|mobile|desktopApp$|emails$|push$)/

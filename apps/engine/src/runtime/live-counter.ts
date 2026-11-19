@@ -1,4 +1,4 @@
-import type { Usage } from '@rerun/contracts'
+import type { Usage } from '@moldwright/contracts'
 
 export type LiveSnapshot = { toolCalls: number; usage?: Partial<Usage> }
 

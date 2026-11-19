@@ -1,7 +1,7 @@
 import { secretMatches } from '@/lib/secure-compare'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { triggerTask } from '@rerun/cloud/tasks'
+import { triggerTask } from '@moldwright/cloud/tasks'
 import type { prefillExpertApplicationTask } from '@/trigger/prefill-expert-application'
 
 export async function POST(req: Request) {

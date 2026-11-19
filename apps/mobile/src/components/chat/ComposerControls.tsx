@@ -1,4 +1,4 @@
-import type { SkillSummary } from '@rerun/contracts'
+import type { SkillSummary } from '@moldwright/contracts'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

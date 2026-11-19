@@ -4,8 +4,8 @@ import { Command, CommandGroup, CommandItem, CommandList, CommandSeparator } fro
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { BrainCircuitIcon, ChevronRightIcon, Settings2Icon } from '@/lib/icons'
-import type { Provider } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
+import type { Provider } from '@moldwright/contracts'
+import { Badge } from '@moldwright/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 

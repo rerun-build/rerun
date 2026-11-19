@@ -1,4 +1,4 @@
-import type { BoardAgent } from '@rerun/contracts'
+import type { BoardAgent } from '@moldwright/contracts'
 import { act, renderHook } from '@testing-library/react-native'
 
 import type { BoardRead } from '@/api/board'

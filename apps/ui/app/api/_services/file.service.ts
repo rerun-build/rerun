@@ -1,7 +1,7 @@
 import * as engine from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { hashText, looksBinary } from '@/lib/files/editable'
-import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
+import { MAX_TEXT_WRITE_CHARS } from '@moldwright/contracts'
 import { refusal, type ActionRefusal } from '@/lib/i18n/action-error'
 
 export type SaveFileResult = { success: true } | ({ success: false; conflict?: true } & ActionRefusal)

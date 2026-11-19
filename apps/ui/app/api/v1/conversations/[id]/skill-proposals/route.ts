@@ -1,6 +1,6 @@
 import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_actions/skill-proposal.actions'
 import { ApiError, apiRoute, deniedStatus } from '@/app/api/v1/_lib/api-route'
-import { skillProposalDecideRequestSchema, type SkillProposal } from '@rerun/contracts'
+import { skillProposalDecideRequestSchema, type SkillProposal } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

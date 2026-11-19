@@ -1,4 +1,4 @@
-import type { PhoneChannel } from '@rerun/contracts'
+import type { PhoneChannel } from '@moldwright/contracts'
 import type { CountryCode } from 'libphonenumber-js/min'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 

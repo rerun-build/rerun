@@ -1,7 +1,7 @@
 import { cliUnavailableReason, inPlanOrder, inTierOrder, isHiddenModel, isModelLocked, livePlanWindows, modelDescription, type SourceCopy } from '@/lib/engine/ai-sources'
 import { modelLabel, modelPower } from '@/lib/engine/models'
 import type { BoxConnection, EngineProvider } from '@/lib/engine/types'
-import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@moldwright/contracts'
 
 export type ConnectionGroup = {
     connectionId: string
