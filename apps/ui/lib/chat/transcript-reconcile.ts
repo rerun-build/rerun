@@ -1,4 +1,4 @@
-import { isToolPart, QUICK_REPLIES_TOOL, toolNameOf } from '@rerun/contracts'
+import { isToolPart, QUICK_REPLIES_TOOL, toolNameOf } from '@moldwright/contracts'
 
 type PartLike = { type: string; toolCallId?: string; toolName?: string; state?: string }
 type MessageLike = { role: string; parts: readonly PartLike[] }

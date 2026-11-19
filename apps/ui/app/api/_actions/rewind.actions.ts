@@ -1,6 +1,6 @@
 'use server'
 
-import { rewindPayloadSchema, type RewindPayload } from '@rerun/contracts'
+import { rewindPayloadSchema, type RewindPayload } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'

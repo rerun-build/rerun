@@ -5,7 +5,7 @@ import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { useLanguagePacksEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Languages } from '@/lib/icons'
-import { localeNativeName, PSEUDO_LOCALE, stableLocales } from '@rerun/i18n'
+import { localeNativeName, PSEUDO_LOCALE, stableLocales } from '@moldwright/i18n'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 

@@ -19,7 +19,7 @@ vi.mock('@/supabase/session/SessionProvider', () => ({
     useSession: () => ({ workspace: { id: 1, subscription_status: 'trialing', is_sandbox: false, rerun_budget_micros: 0, rerun_used_micros: 0, rerun_topup_micros: 0 } }),
     useOptionalSession: () => null,
 }))
-vi.mock('@rerun/analytics/client', () => ({ track: vi.fn() }))
+vi.mock('@moldwright/analytics/client', () => ({ track: vi.fn() }))
 vi.mock('@/hooks/useBoxAccess', () => ({ useCanManageAgent: () => mocks.canManage }))
 vi.mock('@/stores/board.store', () => ({ useBoardStore: (select: (state: { agents: { id: string }[] }) => unknown) => select({ agents: mocks.boardAgentIds.map(id => ({ id })) }) }))
 

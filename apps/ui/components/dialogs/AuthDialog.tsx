@@ -4,7 +4,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import { useAnonymousSignUp } from '@/components/auth/useAnonymousSignUp'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { OAuthRetryCopy } from '@/lib/auth/oauth-error'
-import type { SignupSurface } from '@rerun/analytics'
+import type { SignupSurface } from '@moldwright/analytics'
 import { useTranslations } from 'next-intl'
 
 type Variant = 'welcome' | 'build' | 'signin'

@@ -2,8 +2,8 @@
 
 import { ChevronDownIcon, ChevronUpIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { Markdown } from '@rerun/ui/markdown'
-import { Badge } from '@rerun/ui/primitives'
+import { Markdown } from '@moldwright/ui/markdown'
+import { Badge } from '@moldwright/ui/primitives'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 

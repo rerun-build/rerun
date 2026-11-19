@@ -1,6 +1,6 @@
 'use client'
 
-import type { DesktopDownloadEvent, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopUpdateState, DesktopWindowState } from '@moldwright/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { toast } from 'sonner'

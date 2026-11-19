@@ -13,7 +13,7 @@ vi.mock('../../runtime/notify.js', async importOriginal => ({
     sendNotification: async () => ({ delivered: true }),
 }))
 
-const { DEFAULT_CONNECTION_MODELS } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS } = await import('@moldwright/contracts')
 const { createConnection } = await import('../../connections/store.js')
 const { scheduleTools } = await import('./schedule.js')
 const { listSchedules, readSchedule, scheduleExists, writeSchedule } = await import('../../schedules/loader.js')

@@ -7,7 +7,7 @@ import { cn } from '../cn'
 import { ExternalLinkIcon, LockIcon, X } from '../icons'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import type { SecretRequestItem } from '@rerun/contracts'
+import type { SecretRequestItem } from '@moldwright/contracts'
 import { useKitTranslations } from '../locale'
 
 export type { SecretRequestItem }

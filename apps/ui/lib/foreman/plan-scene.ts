@@ -1,4 +1,4 @@
-import { SPACE_COLOR, agentTileStyle, type Container, type GridPosition, type Tile } from '@rerun/ui/iso-grid'
+import { SPACE_COLOR, agentTileStyle, type Container, type GridPosition, type Tile } from '@moldwright/ui/iso-grid'
 
 import type { PlanGroup, ShownPlan } from '@/components/foreman/widgets/plan-card'
 import { AGENT_SPAN } from '@/lib/board/iso'

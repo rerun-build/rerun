@@ -1,4 +1,4 @@
-import { pendingApprovals, pendingQuestions } from '@rerun/contracts'
+import { pendingApprovals, pendingQuestions } from '@moldwright/contracts'
 
 import { liveActivityLabel, type LiveActivityCopy } from '@/lib/agent-chat-loader'
 

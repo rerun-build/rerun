@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { dismissGettingStartedAction, restoreGettingStartedAction } from '@/app/api/_actions/getting-started.actions'
 import { GETTING_STARTED_STEPS, isComplete, progressOf, rewardOf, type GettingStartedState, type GettingStartedStepId } from '@/lib/onboarding/getting-started'
-import { isPhoneStepDone } from '@rerun/cloud/phone'
+import { isPhoneStepDone } from '@moldwright/cloud/phone'
 import { useForemanStore } from '@/stores/foreman.store'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'

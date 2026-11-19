@@ -12,7 +12,7 @@ vi.mock('../config/env.js', async importOriginal => ({ ...(await importOriginal<
 vi.mock('../paid-data/price.js', () => ({ paidDataOfferedSoFar: () => state.paidData }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { TOOL_KEYS } = await import('@rerun/contracts')
+const { TOOL_KEYS } = await import('@moldwright/contracts')
 const { agentToolCatalog, toolCatalog } = await import('./catalog.js')
 const { agentConfigSchema } = await import('../agents/types.js')
 beforeEach(() => {

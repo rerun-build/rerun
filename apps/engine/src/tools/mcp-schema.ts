@@ -1,4 +1,4 @@
-import { isRecord } from '@rerun/contracts'
+import { isRecord } from '@moldwright/contracts'
 
 type JsonObject = Record<string, unknown>
 

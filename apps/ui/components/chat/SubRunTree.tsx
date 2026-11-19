@@ -1,7 +1,7 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
-import { Badge, ScrollFade } from '@rerun/ui/primitives'
+import { TextShimmer } from '@moldwright/ui'
+import { Badge, ScrollFade } from '@moldwright/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'

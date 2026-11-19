@@ -1,7 +1,7 @@
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { TemplateCategory } from '@rerun/contracts'
+import type { TemplateCategory } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import { hasOpenRouterKey, openrouter } from '@/lib/ai/openrouter'

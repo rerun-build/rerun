@@ -1,7 +1,7 @@
-import { REWIND_HOURS_PER_WEEK } from '@rerun/contracts'
-import { formatDayRange, weekdayNames } from '@rerun/i18n/format'
+import { REWIND_HOURS_PER_WEEK } from '@moldwright/contracts'
+import { formatDayRange, weekdayNames } from '@moldwright/i18n/format'
 
-export { formatDuration } from '@rerun/i18n/format'
+export { formatDuration } from '@moldwright/i18n/format'
 
 const HOUR_MS = 60 * 60 * 1000
 const WORKDAY_HOURS = 8

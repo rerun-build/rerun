@@ -1,4 +1,4 @@
-import type { HitlKind } from '@rerun/contracts'
+import type { HitlKind } from '@moldwright/contracts'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 

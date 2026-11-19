@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useMemo, type PropsWithChildren } from 'react'
-import { APP_SLUGS, type AppSlug } from '@rerun/cloud/apps'
+import { APP_SLUGS, type AppSlug } from '@moldwright/cloud/apps'
 
 export type FeatureFlags = { rewind: boolean; computer: boolean; published: boolean; i18n?: boolean; apps: Partial<Record<AppSlug, boolean>> }
 

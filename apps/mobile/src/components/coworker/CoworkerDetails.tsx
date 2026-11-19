@@ -1,4 +1,4 @@
-import type { CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
+import type { CoworkerFiles, InstalledServiceView, RoutineView } from '@moldwright/contracts'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'

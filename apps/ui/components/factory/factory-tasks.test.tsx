@@ -2,7 +2,7 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { factoryJobStateSchema, type FactoryJob } from '@rerun/contracts'
+import { factoryJobStateSchema, type FactoryJob } from '@moldwright/contracts'
 import { JOB_STATE_VIEW, groupOf } from './factory-state'
 import { STATUS_COLOR } from './factory-scene'
 import { FactoryTasks, SAMPLE_TEXT, formatEndedAt, formatInState, isLocalToday } from './FactoryTasks'

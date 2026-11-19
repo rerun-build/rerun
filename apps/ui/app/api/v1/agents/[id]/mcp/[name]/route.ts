@@ -1,7 +1,7 @@
 import { actorFromContext } from '@/app/api/_auth/access'
 import { getCustomMcpServer } from '@/app/api/_services/custom-mcp.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import type { McpServerView } from '@rerun/contracts'
+import type { McpServerView } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

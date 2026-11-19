@@ -1,8 +1,8 @@
-import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, modelLabel } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, modelLabel } from '@moldwright/contracts'
 
 import { RERUN_DEMO_MODEL_IDS } from './constants'
 
-export { modelContextWindow, modelLabel } from '@rerun/contracts'
+export { modelContextWindow, modelLabel } from '@moldwright/contracts'
 
 export type CatalogModel = { id: string; label: string; power?: number }
 

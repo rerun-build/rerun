@@ -1,4 +1,4 @@
-import { authorTurnsOf, splitTurnsAtBreaks, timeBreaksOf, type AuthorProfile } from '@rerun/contracts'
+import { authorTurnsOf, splitTurnsAtBreaks, timeBreaksOf, type AuthorProfile } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { Fragment, useMemo, useState, type ReactNode } from 'react'
 

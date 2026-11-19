@@ -1,4 +1,4 @@
-import type { ActivatedAutomations } from '@rerun/contracts'
+import type { ActivatedAutomations } from '@moldwright/contracts'
 import { listSchedules, setScheduleEnabled } from '../schedules/loader.js'
 import { listTriggers, setTriggerEnabled } from '../triggers/loader.js'
 import { nowIso } from '../lib/ids.js'

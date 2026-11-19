@@ -1,4 +1,4 @@
-import { REWIND_HOURS_PER_WEEK, type RewindAgentReport, type RewindAwardId, type RewindHighlight, type RewindPayload } from '@rerun/contracts'
+import { REWIND_HOURS_PER_WEEK, type RewindAgentReport, type RewindAwardId, type RewindHighlight, type RewindPayload } from '@moldwright/contracts'
 import type { RewindWeek } from './week'
 
 const TOP_TOOLS = 8

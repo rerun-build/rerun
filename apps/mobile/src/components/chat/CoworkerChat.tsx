@@ -1,4 +1,4 @@
-import type { AgentModels, AgentView, Conversation } from '@rerun/contracts'
+import type { AgentModels, AgentView, Conversation } from '@moldwright/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'

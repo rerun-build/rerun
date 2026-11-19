@@ -1,7 +1,7 @@
 'use client'
 
-import { Orb, shortCountdown, WELCOME_ORB_SIZE } from '@rerun/ui/foreman'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { Orb, shortCountdown, WELCOME_ORB_SIZE } from '@moldwright/ui/foreman'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 
 import { PanelRow } from '@/components/ui/panel-row'

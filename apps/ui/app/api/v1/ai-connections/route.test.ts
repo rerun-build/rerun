@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const workspace = { id: 7, subscription_status: 'active', is_sandbox: false, rerun_used_micros: 2_000_000, rerun_budget_micros: 10_000_000, rerun_topup_micros: 0, current_period_end: '2026-11-01T00:00:00Z' }
 let signedIn = true
 let role: 'admin' | 'member' = 'admin'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({
-    ...(await importOriginal<typeof import('@rerun/cloud/billing')>()),
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({
+    ...(await importOriginal<typeof import('@moldwright/cloud/billing')>()),
     BILLING_ENABLED: true,
     isPremiumModelEntitled: (plan: { subscription_status: string | null }) => plan.subscription_status !== 'trialing',
     rerunCreditTotalMicros: (credit: { rerun_budget_micros?: number | null } | null | undefined) => credit?.rerun_budget_micros ?? 0,
@@ -54,7 +54,7 @@ vi.mock('@/lib/features', async importOriginal => ({
     },
 }))
 let cloud = true
-vi.mock('@rerun/cloud/edition', () => ({
+vi.mock('@moldwright/cloud/edition', () => ({
     get RERUN_CLOUD() {
         return cloud
     },

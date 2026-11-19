@@ -1,7 +1,7 @@
 'use client'
 
 import { MessageResponse } from '@/components/ai-elements/message'
-import { AlertBlock as AlertBlockBase, type AlertBlockProps } from '@rerun/ui/chat'
+import { AlertBlock as AlertBlockBase, type AlertBlockProps } from '@moldwright/ui/chat'
 
 const renderMarkdown = (text: string) => <MessageResponse>{text}</MessageResponse>
 

@@ -1,7 +1,7 @@
 'use client'
 
-import type { Tile } from '@rerun/ui/iso-grid'
-import { IsoGrid, frameTemplateBoard, useRenderedFrame } from '@rerun/ui/iso-grid'
+import type { Tile } from '@moldwright/ui/iso-grid'
+import { IsoGrid, frameTemplateBoard, useRenderedFrame } from '@moldwright/ui/iso-grid'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { AuthStage, StageStatus } from './auth-stage-board'

@@ -1,4 +1,4 @@
-import type { SubRunCall, SubRunTask } from '@rerun/contracts'
+import type { SubRunCall, SubRunTask } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 
 const BASE_TIME = Date.UTC(2026, 8, 17, 9, 12, 35)

@@ -1,6 +1,6 @@
 'use client'
 
-import type { TableCard as TableCardData } from '@rerun/contracts'
+import type { TableCard as TableCardData } from '@moldwright/contracts'
 
 import { BoardLayout } from './BoardLayout'
 import type { FileUrl } from './CardMedia'

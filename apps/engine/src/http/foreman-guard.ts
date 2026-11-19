@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import type { MiddlewareHandler } from 'hono'
 
 const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [

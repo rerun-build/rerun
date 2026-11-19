@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_HUB_TOKEN_HEADER } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_HUB_TOKEN_HEADER } from '@moldwright/contracts'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { readRerunCredit } from '@/app/api/_services/ai-status-hub.service'

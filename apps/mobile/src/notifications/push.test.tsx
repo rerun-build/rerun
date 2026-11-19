@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native'
-import { ANDROID_PUSH_CHANNELS, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { ANDROID_PUSH_CHANNELS, FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import * as Notifications from 'expo-notifications'
 import { AndroidImportance } from 'expo-notifications'
 import { Platform } from 'react-native'

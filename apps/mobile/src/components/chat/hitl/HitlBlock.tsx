@@ -1,4 +1,4 @@
-import type { UnknownPendingCall } from '@rerun/contracts'
+import type { UnknownPendingCall } from '@moldwright/contracts'
 import { useTranslations } from 'use-intl'
 
 import { FallbackCard } from './FallbackCard'

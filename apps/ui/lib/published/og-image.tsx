@@ -1,7 +1,7 @@
 import 'server-only'
 import { readFile } from 'node:fs/promises'
 import { ImageResponse } from 'next/og'
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 
 const WIDTH = 1200
 const HEIGHT = 630

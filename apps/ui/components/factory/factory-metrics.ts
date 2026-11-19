@@ -1,4 +1,4 @@
-import type { FactorySnapshot } from '@rerun/contracts'
+import type { FactorySnapshot } from '@moldwright/contracts'
 
 export type MetricKey =
     | 'queued' | 'building' | 'review' | 'checks' | 'solvedGreen'

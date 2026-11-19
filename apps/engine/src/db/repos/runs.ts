@@ -1,5 +1,5 @@
 import { and, desc, eq, gte, isNull, sql } from 'drizzle-orm'
-import type { ContextOccupancy } from '@rerun/contracts'
+import type { ContextOccupancy } from '@moldwright/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { runs, type RunRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'

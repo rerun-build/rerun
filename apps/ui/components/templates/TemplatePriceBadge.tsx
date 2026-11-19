@@ -1,7 +1,7 @@
 'use client'
 
-import { isPaid, priceLabel, type TemplatePricing } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
+import { isPaid, priceLabel, type TemplatePricing } from '@moldwright/contracts'
+import { Badge } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import type { PurchaseAccess } from '@/lib/templates/entitlement'
 import { cn } from '@/lib/utils'

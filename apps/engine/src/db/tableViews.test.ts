@@ -9,7 +9,7 @@ const { AGENT_HIDDEN_TABLES, getAgentDb, readAgentDbSchema } = await import('./a
 const { exportTableRows, listTables, updateTableRow } = await import('./sqlStore.js')
 const { deleteTableViews, deleteView, listViews, saveView, VIEWS_TABLE } = await import('./tableViews.js')
 const { cardTools } = await import('../tools/builtin/cards.js')
-const { tableCardSchema } = await import('@rerun/contracts')
+const { tableCardSchema } = await import('@moldwright/contracts')
 
 const AGENT = 'views-agent'
 let client: Awaited<ReturnType<typeof getAgentDb>>

@@ -1,4 +1,4 @@
-import { appendVoiceMarker, buildVoiceMarker, MAX_RECORDING_MS } from '@rerun/contracts'
+import { appendVoiceMarker, buildVoiceMarker, MAX_RECORDING_MS } from '@moldwright/contracts'
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from 'expo-audio'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

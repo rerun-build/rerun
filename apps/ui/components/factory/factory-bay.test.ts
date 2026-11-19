@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { routeTileLinks, type AxisPoint, type Container, type ContainerCells, type Tile, type TileLink } from '@rerun/ui/iso-grid'
-import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { routeTileLinks, type AxisPoint, type Container, type ContainerCells, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
+import { factorySnapshotSchema, type FactorySnapshot } from '@moldwright/contracts'
 
 import { applyMoves, beltCells, copyTree, treeRoutes } from './factory-layout'
 import { hits, inScanner, lineUp, podPath, settles, sphereShapes, tileShapes, workSpot, type P } from './factory-rest'

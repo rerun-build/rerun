@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
+import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@moldwright/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'

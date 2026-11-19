@@ -1,4 +1,4 @@
-import { canonicalModelId, providerSchema, type Provider } from '@rerun/contracts'
+import { canonicalModelId, providerSchema, type Provider } from '@moldwright/contracts'
 
 import type { BoxConnection } from '@/lib/engine/types'
 

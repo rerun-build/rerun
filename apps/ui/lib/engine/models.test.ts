@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CONNECTION_MODELS, MODEL_CONTEXT_WINDOW, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, isPremiumModel, providerSchema, trialModelFor } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, MODEL_CONTEXT_WINDOW, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, isPremiumModel, providerSchema, trialModelFor } from '@moldwright/contracts'
 import { ENGINE_MODEL_CATALOG, catalogFor } from './models'
 
 describe('ENGINE_MODEL_CATALOG', () => {

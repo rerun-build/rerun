@@ -1,4 +1,4 @@
-import { formatAmount, priceCtaLabel, priceLabel, templateCardCtaLabel, templateCategoryLabel, type TemplatePricing } from '@rerun/contracts'
+import { formatAmount, priceCtaLabel, priceLabel, templateCardCtaLabel, templateCategoryLabel, type TemplatePricing } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { englishTranslator } from '@/lib/i18n/english-translator'

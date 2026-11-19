@@ -32,7 +32,7 @@ vi.mock('../../connections/opencode-catalog.js', async importOriginal => {
 })
 vi.mock('../../connections/opencode-plan-limits.js', () => ({ refreshOpencodePlanLimits: async () => {}, refreshStaleOpencodePlanLimits: () => {}, forgetOpencodePlanLimitsAttempt: () => {}, pendingOpencodePlanLimits: () => undefined }))
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID } = await import('@moldwright/contracts')
 const { connectionRoutes } = await import('./connections.js')
 const { createServer } = await import('../server.js')
 const { agentDir, agentsDir, boxDefaultPath, configPath, connectionConfigPath, connectionEnvPath, connectionsDir, scheduleFile, schedulesDir } = await import('../../config/paths.js')

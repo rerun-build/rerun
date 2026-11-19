@@ -18,7 +18,7 @@ vi.mock('@/app/api/_actions/workspace-connection.actions', () => ({
 }))
 vi.mock('@/hooks/useAgentContext', () => ({ invalidateLoadedAgentContexts: vi.fn() }))
 vi.mock('@/lib/engine/ai-connection-analytics', () => ({ connectionMethod: vi.fn(), trackAiConnectionConnected: vi.fn(), trackAiConnectionFailed: vi.fn() }))
-vi.mock('@rerun/analytics/client', () => ({ track: vi.fn() }))
+vi.mock('@moldwright/analytics/client', () => ({ track: vi.fn() }))
 
 function connection(id: string, planPercent: number): BoxConnection {
     return {

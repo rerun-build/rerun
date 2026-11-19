@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import { rm } from 'node:fs/promises'
 import { prepareDataDir } from '../../datadir/ladder.js'
 import { createAgent } from '../../agents/factory.js'

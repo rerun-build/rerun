@@ -9,7 +9,7 @@ import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { ALL_ROWS, LAYOUT_ICONS } from '@/lib/data/views'
 import { EllipsisIcon, Maximize2Icon, PencilIcon, PlusIcon, TableIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { CARD_LAYOUTS, type CardLayout, type TableView } from '@rerun/contracts'
+import { CARD_LAYOUTS, type CardLayout, type TableView } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

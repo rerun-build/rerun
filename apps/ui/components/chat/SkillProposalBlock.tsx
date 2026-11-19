@@ -1,6 +1,6 @@
 'use client'
 
-import { SkillProposalBlock as SkillProposalBlockBase } from '@rerun/ui/chat'
+import { SkillProposalBlock as SkillProposalBlockBase } from '@moldwright/ui/chat'
 import { boxAccessFor } from '@/lib/board/box-access'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { useBoardStore } from '@/stores/board.store'

@@ -2,7 +2,7 @@ import { codexKeysWhenApproved, storeSignInKeys } from '@/app/api/_services/ai-c
 import { answeringConnectionErrors, signInStep } from '@/app/api/v1/_lib/ai-connection-errors'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { openCodexSignIn } from '@/lib/engine/sign-in-ticket'
-import { codexSignInPollInputSchema } from '@rerun/contracts'
+import { codexSignInPollInputSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

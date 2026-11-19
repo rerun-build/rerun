@@ -1,4 +1,4 @@
-import type { SkillProposal, SkillProposalDecision } from '@rerun/contracts'
+import type { SkillProposal, SkillProposalDecision } from '@moldwright/contracts'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import Animated from 'react-native-reanimated'

@@ -1,4 +1,4 @@
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 
 export const OAUTH_PROVIDERS = ['google', 'apple'] as const
 

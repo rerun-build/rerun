@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gt, gte, isNotNull, sql } from 'drizzle-orm'
 import type { ModelMessage } from 'ai'
-import { visibleText, type MessageAuthor } from '@rerun/contracts'
+import { visibleText, type MessageAuthor } from '@moldwright/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { messages, type MessageRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'

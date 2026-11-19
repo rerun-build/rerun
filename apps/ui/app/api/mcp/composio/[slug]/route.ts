@@ -1,4 +1,4 @@
-import { SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@rerun/contracts'
+import { SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@moldwright/contracts'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'

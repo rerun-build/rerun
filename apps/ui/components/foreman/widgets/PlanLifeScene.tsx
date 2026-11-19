@@ -1,7 +1,7 @@
 'use client'
 
-import { TextShimmer } from '@rerun/ui'
-import { IsoGrid, agentTileStyle } from '@rerun/ui/iso-grid'
+import { TextShimmer } from '@moldwright/ui'
+import { IsoGrid, agentTileStyle } from '@moldwright/ui/iso-grid'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'

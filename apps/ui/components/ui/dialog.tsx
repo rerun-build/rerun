@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Dialog as DialogPrimitive } from "radix-ui"
 import { Drawer as DrawerPrimitive } from "vaul"
-import { useResolvedIsMobile } from "@rerun/ui/primitives/use-is-mobile"
+import { useResolvedIsMobile } from "@moldwright/ui/primitives/use-is-mobile"
 
 import { cn } from "@/lib/utils"
 import { useCoverBoard } from "@/stores/board-cover.store"

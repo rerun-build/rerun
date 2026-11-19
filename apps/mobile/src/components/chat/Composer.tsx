@@ -1,4 +1,4 @@
-import { type SkillSummary } from '@rerun/contracts'
+import { type SkillSummary } from '@moldwright/contracts'
 import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
 import { Text, TextInput, View, type TextInputInstance } from 'react-native'
 import { useTranslations } from 'use-intl'

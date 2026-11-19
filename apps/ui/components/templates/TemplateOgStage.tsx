@@ -1,7 +1,7 @@
 'use client'
 
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
-import { TemplateBoardPreview } from '@rerun/ui/iso-grid'
+import type { TemplateAgent, TemplateConnector } from '@moldwright/contracts'
+import { TemplateBoardPreview } from '@moldwright/ui/iso-grid'
 import type { RefObject } from 'react'
 
 import { RerunWordmark } from '@/components/brand/RerunWordmark'

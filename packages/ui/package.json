@@ -1,5 +1,5 @@
 {
-    "name": "@rerun/ui",
+    "name": "@moldwright/ui",
     "license": "AGPL-3.0-only",
     "version": "0.1.0",
     "private": true,
@@ -79,8 +79,8 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@rerun/contracts": "workspace:*",
-        "@rerun/i18n": "workspace:*",
+        "@moldwright/contracts": "workspace:*",
+        "@moldwright/i18n": "workspace:*",
         "@tiptap/pm": "^3.33.1",
         "@tiptap/react": "^3.33.1",
         "@tiptap/starter-kit": "^3.33.1",

@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { desktopViewModeSchema, type DesktopViewMode } from '@rerun/contracts'
+import { desktopViewModeSchema, type DesktopViewMode } from '@moldwright/contracts'
 import { env } from '../config/env.js'
 
 function signedWith(key: string, payload: string, signature: string | undefined): boolean {

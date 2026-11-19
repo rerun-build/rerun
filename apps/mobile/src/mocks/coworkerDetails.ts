@@ -1,4 +1,4 @@
-import type { CoworkerFile, CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
+import type { CoworkerFile, CoworkerFiles, InstalledServiceView, RoutineView } from '@moldwright/contracts'
 
 const app = (slug: string, name: string, status: InstalledServiceView['status'], label?: string): InstalledServiceView => ({ key: slug, slug, name, label, icon: null, category: 'productivity', status, toolNames: [], installedAt: '2026-10-01T09:00:00.000Z' })
 

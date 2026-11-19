@@ -1,8 +1,8 @@
 'use client'
 
-import type { RewindAwardId } from '@rerun/contracts'
-import type { BorderBeamProps } from '@rerun/ui'
-import { Card } from '@rerun/ui/primitives'
+import type { RewindAwardId } from '@moldwright/contracts'
+import type { BorderBeamProps } from '@moldwright/ui'
+import { Card } from '@moldwright/ui/primitives'
 import { motion } from 'motion/react'
 import { useLocale, useTranslations } from 'next-intl'
 

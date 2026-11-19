@@ -1,5 +1,5 @@
 import { memberActor, workspaceActor, type Actor } from '@/app/api/_auth/access'
-import { FOREMAN_AGENT_ID, FOREMAN_HUB_TOKEN_HEADER } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_HUB_TOKEN_HEADER } from '@moldwright/contracts'
 
 import { isAiStatusHubTool, readRerunCredit } from '@/app/api/_services/ai-status-hub.service'
 import { dispatchForemanHubTool } from '@/app/api/_services/foreman-hub.service'

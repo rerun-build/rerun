@@ -4,7 +4,7 @@ import { accountLabel } from '@/lib/auth/placeholder-email'
 import { getBlobByFile } from '@/lib/blobs/catalog'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { cn } from '@/lib/utils'
-import { BorderBeam } from '@rerun/ui'
+import { BorderBeam } from '@moldwright/ui'
 import { useTranslations } from 'next-intl'
 
 type Member = { email: string; owner?: boolean }

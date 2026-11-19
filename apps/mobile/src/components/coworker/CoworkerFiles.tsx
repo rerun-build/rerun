@@ -1,5 +1,5 @@
-import type { CoworkerFile, CoworkerFileKind, CoworkerFiles as CoworkerFilesView } from '@rerun/contracts'
-import { formatDate } from '@rerun/i18n/format'
+import type { CoworkerFile, CoworkerFileKind, CoworkerFiles as CoworkerFilesView } from '@moldwright/contracts'
+import { formatDate } from '@moldwright/i18n/format'
 import { Fragment, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'

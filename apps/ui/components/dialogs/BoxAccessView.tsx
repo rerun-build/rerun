@@ -13,7 +13,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton, SkeletonPanelRows } from '@/components/ui/skeleton'
 import type { AuthorProfile } from '@/lib/chat/message-author'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 

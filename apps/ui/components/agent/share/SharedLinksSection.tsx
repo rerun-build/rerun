@@ -3,7 +3,7 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import * as React from 'react'
 import { toast } from 'sonner'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge } from '@moldwright/ui/primitives'
 import { listAgentSharesAction, revokeAgentShareAction } from '@/app/api/_actions/agent-share.actions'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'

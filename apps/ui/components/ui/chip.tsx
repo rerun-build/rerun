@@ -1,1 +1,1 @@
-export { Chip } from '@rerun/ui/primitives'
+export { Chip } from '@moldwright/ui/primitives'

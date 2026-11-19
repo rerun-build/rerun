@@ -1,7 +1,7 @@
 import { accountDeletionBlockers, anonymizeAccount } from '@/app/api/_services/account-deletion.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { ACCOUNT_DELETION_REAUTH_MS, deleteAccountRequestSchema, REAUTH_REQUIRED } from '@rerun/contracts'
+import { ACCOUNT_DELETION_REAUTH_MS, deleteAccountRequestSchema, REAUTH_REQUIRED } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

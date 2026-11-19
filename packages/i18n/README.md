@@ -1,4 +1,4 @@
-# @rerun/i18n
+# @moldwright/i18n
 
 The language packs of Rerun: the supported locales, the message catalogs, the formatters for dates
 and numbers, and the scripts that keep the packs in step with the English source.

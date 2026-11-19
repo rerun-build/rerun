@@ -1,4 +1,4 @@
-import type { InboxItem, InboxStatus } from '@rerun/contracts'
+import type { InboxItem, InboxStatus } from '@moldwright/contracts'
 
 import type { CoworkerStatus } from '@/mocks/data'
 

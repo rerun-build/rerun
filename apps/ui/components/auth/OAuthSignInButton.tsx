@@ -7,7 +7,7 @@ import { OAUTH_PROVIDER_CONFIG, type OAuthProvider } from '@/lib/auth/oauth-prov
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { useInAppBrowser } from '@/lib/use-in-app-browser'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { useTranslations } from 'next-intl'
 import { desktopBrowserSignInAvailable, startDesktopBrowserSignIn } from '@/components/desktop-shell/desktop-sign-in'
 

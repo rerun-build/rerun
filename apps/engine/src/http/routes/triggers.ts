@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { timingSafeEqual } from 'node:crypto'
-import { createTriggerSchema, triggerFireSchema, updateTriggerSchema } from '@rerun/contracts'
+import { createTriggerSchema, triggerFireSchema, updateTriggerSchema } from '@moldwright/contracts'
 import { deleteTrigger, isSafeSlug, listTriggers, readTrigger, rotateTriggerToken, triggerExists, writeTrigger } from '../../triggers/loader.js'
 import { buildTriggerMessage } from '../../triggers/message.js'
 import { fireTrigger } from '../../runtime/trigger-runner.js'

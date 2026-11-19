@@ -1,7 +1,7 @@
 'use client'
 
-import type { TableCard as TableCardData } from '@rerun/contracts'
-import { TableCard as TableCardBase } from '@rerun/ui/chat'
+import type { TableCard as TableCardData } from '@moldwright/contracts'
+import { TableCard as TableCardBase } from '@moldwright/ui/chat'
 import { rawUrlResolver, type RawUrlFor } from '@/lib/files/raw-url'
 import { useBoardStore } from '@/stores/board.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'

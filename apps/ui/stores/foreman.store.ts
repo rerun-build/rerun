@@ -8,7 +8,7 @@ import type { ForemanArrival, ForemanBackend } from '@/lib/foreman/phase'
 import type { ForemanSurface } from '@/lib/foreman/surface'
 import { rememberForemanOpen } from '@/lib/foreman-open'
 import { useBoardStore } from '@/stores/board.store'
-import type { ForemanTab } from '@rerun/ui/foreman'
+import type { ForemanTab } from '@moldwright/ui/foreman'
 import { randomUuid } from '@/lib/random-uuid'
 
 export type ForemanFunnel = 'unknown' | 'guided' | 'companion'

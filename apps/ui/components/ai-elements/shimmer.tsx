@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { TextShimmer, type TextShimmerProps } from "@rerun/ui";
+import { TextShimmer, type TextShimmerProps } from "@moldwright/ui";
 
 export type { TextShimmerProps };
 

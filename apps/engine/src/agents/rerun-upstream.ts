@@ -1,4 +1,4 @@
-import { rerunUpstreamModelsSchema, type Provider } from '@rerun/contracts'
+import { rerunUpstreamModelsSchema, type Provider } from '@moldwright/contracts'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 

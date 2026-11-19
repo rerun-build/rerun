@@ -1,1 +1,1 @@
-export { Icon, iconVariants } from '@rerun/ui/primitives'
+export { Icon, iconVariants } from '@moldwright/ui/primitives'

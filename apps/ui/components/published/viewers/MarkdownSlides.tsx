@@ -1,6 +1,6 @@
 import { PresentationIcon } from '@/lib/icons'
 import { splitMarkdownSlides } from '@/lib/published/viewer-kind'
-import { Markdown } from '@rerun/ui/markdown'
+import { Markdown } from '@moldwright/ui/markdown'
 import { useTranslations } from 'next-intl'
 import { DOCUMENT_CLASS } from './MarkdownViewer'
 import { slideFit } from './slide-fit'

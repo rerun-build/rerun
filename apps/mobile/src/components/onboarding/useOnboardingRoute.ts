@@ -1,4 +1,4 @@
-import type { ForemanPhase, ForemanStateResponse } from '@rerun/contracts'
+import type { ForemanPhase, ForemanStateResponse } from '@moldwright/contracts'
 import { useCallback, useEffect, useState } from 'react'
 import { AppState } from 'react-native'
 

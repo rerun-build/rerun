@@ -1,4 +1,4 @@
-import type { BorderBeamProps } from '@rerun/ui'
+import type { BorderBeamProps } from '@moldwright/ui'
 import type { NotificationKind } from '@/lib/engine/types'
 import { AlertCircle, CheckCircle2, HelpCircle, Plug, ShieldCheck, TriangleAlertIcon, type LucideIcon } from '@/lib/icons'
 

@@ -1,4 +1,4 @@
-import type { BoardAgent, Box, SkillSummary } from '@rerun/contracts'
+import type { BoardAgent, Box, SkillSummary } from '@moldwright/contracts'
 
 export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean }
 export type MentionItem = ({ kind: 'agent' } & MentionAgent) | ({ kind: 'skill' } & SkillSummary)

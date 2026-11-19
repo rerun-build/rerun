@@ -6,7 +6,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { CalendarClock, Plus, XIcon } from '@/lib/icons'
 import { COWORKER_MODES, DEFAULT_COWORKER_RULE, hasOwnRule, resetRule, type CoworkerMode, type CoworkerRule } from '@/lib/notifications/prefs'
 import { cn } from '@/lib/utils'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 

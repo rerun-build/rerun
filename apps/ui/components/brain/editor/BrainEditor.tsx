@@ -2,8 +2,8 @@
 
 import type { SharedFileRef } from '@/components/brain/useSharedFilesTree'
 import { cn } from '@/lib/utils'
-import type { BrainPageSummary } from '@rerun/contracts'
-import { richTextClassName } from '@rerun/ui/rich-text-editor'
+import type { BrainPageSummary } from '@moldwright/contracts'
+import { richTextClassName } from '@moldwright/ui/rich-text-editor'
 import { PluginKey } from '@tiptap/pm/state'
 import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import { exitSuggestion } from '@tiptap/suggestion'

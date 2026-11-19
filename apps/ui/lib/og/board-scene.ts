@@ -1,8 +1,8 @@
 import 'server-only'
 
-import type { TemplateConnector } from '@rerun/contracts'
-import type { BoardAgent } from '@rerun/ui/iso-grid'
-import { CARD_HEIGHT, CARD_MAX_ZOOM, CARD_WIDTH } from '@rerun/ui/iso-grid/card-capture'
+import type { TemplateConnector } from '@moldwright/contracts'
+import type { BoardAgent } from '@moldwright/ui/iso-grid'
+import { CARD_HEIGHT, CARD_MAX_ZOOM, CARD_WIDTH } from '@moldwright/ui/iso-grid/card-capture'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/app/api/database.types'

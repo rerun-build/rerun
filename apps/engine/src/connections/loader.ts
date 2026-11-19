@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID, connectionConfigSchema, type ConnectionSummary } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID, connectionConfigSchema, type ConnectionSummary } from '@moldwright/contracts'
 import { connectionConfigPath, connectionEnvPath, connectionsDir } from '../config/paths.js'
 import { readEnvFile } from '../lib/env-file.js'
 import { env } from '../config/env.js'

@@ -64,7 +64,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: |
           node -e "process.exit(require('./package.json').pnpm ? 1 : 0)"
-      - run: pnpm --filter @rerun/contracts build
+      - run: pnpm --filter @moldwright/contracts build
       - run: pnpm -r --if-present ts-check
       - run: pnpm -r --if-present lint
 
@@ -90,7 +90,7 @@ jobs:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @rerun/contracts build
+      - run: pnpm --filter @moldwright/contracts build
       - run: pnpm --filter ${{ matrix.part.filter }} run test --maxWorkers=4
 
   migrations:

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ModelMessage } from 'ai'
-import { modelContextWindow } from '@rerun/contracts'
+import { modelContextWindow } from '@moldwright/contracts'
 import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_TRIGGER_RATIO } from './config.js'
 import { estimateTokens } from './estimate.js'
 import { tailStartIndex } from './split.js'

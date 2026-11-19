@@ -1,4 +1,4 @@
-import type { AddableProvider } from '@rerun/contracts'
+import type { AddableProvider } from '@moldwright/contracts'
 import { router, type Href } from 'expo-router'
 
 export function connectHref(provider: AddableProvider, reconnectId?: string): Href {

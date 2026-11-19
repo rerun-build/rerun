@@ -1,4 +1,4 @@
-import type { Me } from '@rerun/contracts'
+import type { Me } from '@moldwright/contracts'
 import * as WebBrowser from 'expo-web-browser'
 import { Alert } from 'react-native'
 

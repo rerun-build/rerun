@@ -10,7 +10,7 @@ You need Node 26 and pnpm 12 (`npm install -g pnpm@12.18.0`), Docker (for the lo
 ```bash
 pnpm install
 npx supabase start                 # Postgres, auth, storage and Mailpit on ports 54420 to 54429
-pnpm --filter @rerun/contracts build
+pnpm --filter @moldwright/contracts build
 cp .env.example apps/ui/.env
 cp apps/engine/.env.example apps/engine/.env
 ```
@@ -66,7 +66,7 @@ CI runs the same, plus the migrations on an empty database and both Docker image
 `CLAUDE.md` holds the conventions of the codebase (and is what coding agents read): Supabase access
 through the typed helpers, responsive from the first version, migrations of the engine data-dir.
 
-`@rerun/cloud/*` is the seam where Rerun Cloud plugs in billing, paid apps, emails and its machine
+`@moldwright/cloud/*` is the seam where Rerun Cloud plugs in billing, paid apps, emails and its machine
 pool. In this repository it resolves to `apps/ui/cloud-oss/`, the self-hosted behaviour. Pull requests that change what it
 exports are unlikely to be merged.
 

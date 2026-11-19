@@ -1,4 +1,4 @@
-import { loadMessages } from '@rerun/i18n/messages'
+import { loadMessages } from '@moldwright/i18n/messages'
 import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
 import { AccessDeniedError } from '@/app/api/_auth/access'

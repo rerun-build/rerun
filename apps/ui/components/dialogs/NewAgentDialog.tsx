@@ -1,6 +1,6 @@
 'use client'
 
-import type { NewAgentRequest } from '@rerun/ui/new-agent'
+import type { NewAgentRequest } from '@moldwright/ui/new-agent'
 import { useTranslations } from 'next-intl'
 
 import { readAgentJobAction } from '@/app/api/_actions/onboarding.actions'

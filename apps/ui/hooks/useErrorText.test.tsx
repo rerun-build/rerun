@@ -6,7 +6,7 @@ import type { Refusal } from '@/hooks/useErrorText'
 
 vi.mock('next-intl', async () => {
     const { createTranslator } = await import('use-intl')
-    const { loadMessages } = await import('@rerun/i18n/messages')
+    const { loadMessages } = await import('@moldwright/i18n/messages')
     const translator = createTranslator({ locale: 'fr', messages: await loadMessages('fr'), namespace: 'errors' })
     return { useTranslations: () => translator }
 })

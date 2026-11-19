@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@moldwright/contracts'
 import { clientOf } from './client-platform'
 
 const FIRST_IOS_BUILD_ENV: Partial<Record<Provider, string>> = {

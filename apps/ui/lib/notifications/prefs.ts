@@ -1,4 +1,4 @@
-import { normalizeNotificationPrefs, type EmailCategory } from '@rerun/contracts'
+import { normalizeNotificationPrefs, type EmailCategory } from '@moldwright/contracts'
 import type { NotificationKind } from '@/lib/engine/types'
 
 export {
@@ -23,7 +23,7 @@ export {
     type NotificationPrefs,
     type NotificationPrefsPatch,
     type NotificationScope,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 export const NOTIFICATION_EMAILS_PAUSED = true
 

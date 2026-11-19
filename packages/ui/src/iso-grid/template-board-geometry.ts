@@ -1,4 +1,4 @@
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
+import type { TemplateAgent, TemplateConnector } from '@moldwright/contracts'
 
 import { CABLE_DRAW_MS } from './components/TileLinks'
 import { BLOCK_HEIGHT, GRID_SIZE, TILE_H, TILE_W, hashUnit, isoPosition, tileTopLift } from './iso'

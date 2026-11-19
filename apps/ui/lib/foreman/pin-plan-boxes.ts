@@ -1,4 +1,4 @@
-import { asRecord } from '@rerun/contracts'
+import { asRecord } from '@moldwright/contracts'
 import type { StreamTextTransform, TextStreamPart, ToolSet } from 'ai'
 
 function canonicalBox(box: unknown, names: readonly string[]): string {

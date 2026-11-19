@@ -9,7 +9,7 @@ process.env.RERUN_DATA_DIR = dataDir
 const { describe, expect, it, beforeAll } = await import('vitest')
 const { skillTools } = await import('./skills.js')
 const { workspaceDir, skillDir } = await import('../../config/paths.js')
-const { TEXT_FILE_PAGE_CHARS } = await import('@rerun/contracts')
+const { TEXT_FILE_PAGE_CHARS } = await import('@moldwright/contracts')
 
 const id = 'testagent'
 const ctx = { agent: { id } } as any

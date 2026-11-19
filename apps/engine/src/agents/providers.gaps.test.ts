@@ -40,12 +40,12 @@ vi.mock('ai-sdk-provider-claude-code', async importOriginal => {
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const { generateText, tool } = await import('ai')
 const { z } = await import('zod')
-const { agentConfigSchema, connectionConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema, connectionConfigSchema } = await import('@moldwright/contracts')
 const { CLAUDE_HARNESS_ENV, CODEX_HARNESS_OVERRIDES, CODEX_ONE_SHOT_INSTRUCTIONS, modelFor, resolveModel } = await import('./providers.js')
 const { applyCaching } = await import('./caching.js')
 const { codexHomeDir, workspaceDir } = await import('../config/paths.js')
 
-type Provider = import('@rerun/contracts').Provider
+type Provider = import('@moldwright/contracts').Provider
 
 function agentOn(provider: Provider, model: string, keys: Record<string, string> | null, connectionExtra: Record<string, unknown> = {}) {
     const connection = keys

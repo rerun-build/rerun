@@ -3,9 +3,9 @@
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { CHROME_SIZE } from '@rerun/ui/chrome'
-import type { OrbGaze } from '@rerun/ui/foreman'
-import { useResolvedIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { CHROME_SIZE } from '@moldwright/ui/chrome'
+import type { OrbGaze } from '@moldwright/ui/foreman'
+import { useResolvedIsMobile } from '@moldwright/ui/primitives/use-is-mobile'
 
 import { Orb } from '@/components/foreman/Orb'
 import { PARKED_ORB_SIZE, PARKED_ORB_SIZE_MOBILE } from '@/components/foreman/constants'

@@ -3,14 +3,14 @@ import { Webhook } from 'standardwebhooks'
 import { phoneOwnerId } from '@/app/api/_services/phone-ownership.service'
 import { markWhatsAppReplied, markWhatsAppUnreachable, setWhatsAppOptOut } from '@/lib/whatsapp/recipient'
 import { applyWhatsAppFailure, applyWhatsAppProgress, loadWhatsAppMessageOwner } from '@/lib/whatsapp/store'
-import { captureServer, deterministicUuid } from '@rerun/analytics/server'
+import { captureServer, deterministicUuid } from '@moldwright/analytics/server'
 import { POST } from './route'
 
 const getUserById = vi.fn()
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ auth: { admin: { getUserById: (id: string) => getUserById(id) } } }) }))
 vi.mock('@/app/api/_services/phone-ownership.service', () => ({ phoneOwnerId: vi.fn() }))
-vi.mock('@rerun/analytics/server', async importOriginal => ({ ...(await importOriginal<object>()), captureServer: vi.fn() }))
+vi.mock('@moldwright/analytics/server', async importOriginal => ({ ...(await importOriginal<object>()), captureServer: vi.fn() }))
 vi.mock('@/lib/whatsapp/recipient', () => ({ markWhatsAppReplied: vi.fn(), markWhatsAppUnreachable: vi.fn(), setWhatsAppOptOut: vi.fn() }))
 vi.mock('@/lib/whatsapp/store', () => ({ applyWhatsAppFailure: vi.fn(), applyWhatsAppProgress: vi.fn(), loadWhatsAppMessageOwner: vi.fn() }))
 

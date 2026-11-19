@@ -1,4 +1,4 @@
-import { readableToolError } from '@rerun/contracts'
+import { readableToolError } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { englishTranslator } from '@/lib/i18n/english-translator'

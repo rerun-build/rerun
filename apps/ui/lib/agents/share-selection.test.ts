@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AGENT_SHARE_INCLUDE_NONE, agentShareIncludeSchema, resolveShareInclude, shareContents, shareExcludePaths, type AgentArchivePlan } from '@rerun/contracts'
+import { AGENT_SHARE_INCLUDE_NONE, agentShareIncludeSchema, resolveShareInclude, shareContents, shareExcludePaths, type AgentArchivePlan } from '@moldwright/contracts'
 
 function entry(path: string, over: Partial<AgentArchivePlan['files'][number]> = {}): AgentArchivePlan['files'][number] {
     return { path, bytes: 100, flagged: [], defaultExcluded: false, note: '', ...over }

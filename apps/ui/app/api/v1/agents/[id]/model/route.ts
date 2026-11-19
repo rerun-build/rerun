@@ -1,6 +1,6 @@
 import { setAgentModel } from '@/app/api/_services/agent-model.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { setAgentModelSchema } from '@rerun/contracts'
+import { setAgentModelSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

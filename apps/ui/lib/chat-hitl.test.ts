@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@rerun/contracts'
+import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@moldwright/contracts'
 import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeTakeoverResult } from './chat-hitl'
 import { parseAttachments } from './chat/attachments-marker'
 

@@ -1,4 +1,4 @@
-import { connectTargetSchema, mcpServerViewSchema, type ConnectTarget, type McpServerView } from '@rerun/contracts'
+import { connectTargetSchema, mcpServerViewSchema, type ConnectTarget, type McpServerView } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

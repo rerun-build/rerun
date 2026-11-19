@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryDigestSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
+import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryDigestSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@moldwright/contracts'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')

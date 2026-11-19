@@ -1,4 +1,4 @@
-import type { AiConnectionsView } from '@rerun/contracts'
+import type { AiConnectionsView } from '@moldwright/contracts'
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 

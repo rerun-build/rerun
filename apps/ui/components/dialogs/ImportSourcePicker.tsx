@@ -2,7 +2,7 @@
 
 import { IMPORT_SOURCES, type ImportSourceId } from '@/lib/agent-import/sources'
 import { cn } from '@/lib/utils'
-import { MODEL_ICONS } from '@rerun/ui/beams'
+import { MODEL_ICONS } from '@moldwright/ui/beams'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import type { ReactNode } from 'react'

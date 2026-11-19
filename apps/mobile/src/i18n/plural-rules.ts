@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, matchLocale, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, matchLocale, type Locale } from '@moldwright/i18n'
 
 type PluralCategory = 'zero' | 'one' | 'two' | 'few' | 'many' | 'other'
 

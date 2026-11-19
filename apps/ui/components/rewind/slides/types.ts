@@ -1,4 +1,4 @@
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 
 export type RewindSlideProps = {
     payload: RewindPayload

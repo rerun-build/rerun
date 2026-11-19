@@ -7,7 +7,7 @@ import {
     type DesktopShellCapability,
     type DesktopShellIdentity,
     type DesktopShellPlatform,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 export const CHANNEL = __RERUN_CHANNEL__
 

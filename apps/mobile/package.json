@@ -8,9 +8,9 @@
         "@posthog/react-native-plugin": "^2.13.1",
         "@react-native-google-signin/google-signin": "^16.2.0",
         "@react-native-masked-view/masked-view": "0.3.2",
-        "@rerun/contracts": "workspace:*",
-        "@rerun/db": "workspace:*",
-        "@rerun/i18n": "workspace:*",
+        "@moldwright/contracts": "workspace:*",
+        "@moldwright/db": "workspace:*",
+        "@moldwright/i18n": "workspace:*",
         "@supabase/supabase-js": "^2.119.0",
         "ai": "6.0.330",
         "expo": "~58.0.23",
@@ -60,7 +60,7 @@
         "use-intl": "^4.15.0"
     },
     "devDependencies": {
-        "@rerun/analytics": "workspace:*",
+        "@moldwright/analytics": "workspace:*",
         "@testing-library/react-native": "^14.1.0",
         "@types/jest": "30.0.0",
         "eslint": "^9.39.5",
@@ -76,7 +76,7 @@
         "lint": "expo lint",
         "ts-check": "tsc --noEmit",
         "test": "jest",
-        "eas-build-post-install": "pnpm --filter @rerun/contracts build"
+        "eas-build-post-install": "pnpm --filter @moldwright/contracts build"
     },
     "private": true
 }

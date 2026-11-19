@@ -1,5 +1,5 @@
-import type { ScheduledRun, TriggerPayload } from '@rerun/contracts'
-import { fullDateTime } from '@rerun/i18n/format'
+import type { ScheduledRun, TriggerPayload } from '@moldwright/contracts'
+import { fullDateTime } from '@moldwright/i18n/format'
 import * as Clipboard from 'expo-clipboard'
 import { useState, type ReactNode } from 'react'
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native'

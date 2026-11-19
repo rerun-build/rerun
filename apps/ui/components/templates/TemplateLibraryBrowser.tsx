@@ -1,8 +1,8 @@
 'use client'
 
-import { templateCategoryLabel, type TemplateCategoryCopy, type TemplateStatus } from '@rerun/contracts'
-import { brandIconFilter } from '@rerun/ui/brand-icon'
-import { HScrollFade, ScrollFade } from '@rerun/ui/primitives'
+import { templateCategoryLabel, type TemplateCategoryCopy, type TemplateStatus } from '@moldwright/contracts'
+import { brandIconFilter } from '@moldwright/ui/brand-icon'
+import { HScrollFade, ScrollFade } from '@moldwright/ui/primitives'
 import { type ComponentProps, type ReactNode, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ConnectorLogo } from '@/components/templates/TemplateConnectorLogos'

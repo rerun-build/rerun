@@ -1,5 +1,5 @@
-import { agentIdOf, argsOf, readableToolError, toolHeadline, toolLabelOf } from '@rerun/contracts'
-import { formatNumber } from '@rerun/i18n/format'
+import { agentIdOf, argsOf, readableToolError, toolHeadline, toolLabelOf } from '@moldwright/contracts'
+import { formatNumber } from '@moldwright/i18n/format'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from 'react-native'
 import Animated, { Easing, FadeIn, FadeInUp, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ModelMessage } from 'ai'
-import { agentConfigSchema, quickRepliesOf, quickReplyDraft, quickReplyPromisesValue } from '@rerun/contracts'
+import { agentConfigSchema, quickRepliesOf, quickReplyDraft, quickReplyPromisesValue } from '@moldwright/contracts'
 import { QuickRepliesSplitter, createQuickRepliesCapture, offersQuickReplies, parseQuickRepliesBlock, quickRepliesCall, withoutQuickRepliesCalls } from './quick-replies-stream.js'
 
 const BLOCK = '<quick_replies>\nFind 100 more\nExport them as CSV\n</quick_replies>'

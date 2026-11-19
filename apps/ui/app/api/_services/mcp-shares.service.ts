@@ -1,4 +1,4 @@
-import { resolveShareInclude, type AgentShareInclude } from '@rerun/contracts'
+import { resolveShareInclude, type AgentShareInclude } from '@moldwright/contracts'
 import { assertAgentInWorkspace, keepVisible, type Actor } from '@/app/api/_auth/access'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { assertCanManageShare, shareManageableAgentIds } from '@/lib/agents/share-access'

@@ -1,4 +1,4 @@
-import { activeRunSchema, agentViewSchema, conversationMessageSchema, conversationSchema, messageFeedbackEntrySchema, skillProposalSchema, skillProposalsListSchema, type AgentView, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
+import { activeRunSchema, agentViewSchema, conversationMessageSchema, conversationSchema, messageFeedbackEntrySchema, skillProposalSchema, skillProposalsListSchema, type AgentView, type Conversation, type ConversationMessage, type MessageFeedbackCategory, type MessageFeedbackEntry, type MessageFeedbackRating, type MessageFeedbackScope, type SkillProposal, type SkillProposalDecision } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

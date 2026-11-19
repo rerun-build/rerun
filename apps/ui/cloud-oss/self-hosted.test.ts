@@ -11,7 +11,7 @@ import { DEFAULT_SENDERS, DEFAULT_WHATSAPP_FROM } from './senders'
 import { SERVERS_ENABLED } from './servers'
 import { SUPPORT_CHAT_ENABLED } from './support'
 
-describe('the self-hosted side of @rerun/cloud', () => {
+describe('the self-hosted side of @moldwright/cloud', () => {
     it('is not Moldwright Cloud and sells nothing', () => {
         expect(RERUN_CLOUD).toBe(false)
         expect(BILLING_ENABLED).toBe(false)

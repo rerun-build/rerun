@@ -1,6 +1,6 @@
 'use client'
 
-import type { TemplateConnector, TemplateStoryStep } from '@rerun/contracts'
+import type { TemplateConnector, TemplateStoryStep } from '@moldwright/contracts'
 import { useEffect, useMemo, useState } from 'react'
 
 import { cn } from '../cn'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { isSetupAnswered } from '@rerun/contracts'
+import { isSetupAnswered } from '@moldwright/contracts'
 import { getAgentDetailAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { invalidateAgentContext } from '@/hooks/useAgentContext'
 import { AgentSetupFields, type AgentSetupDraft } from '@/components/agent/AgentSetupFields'

@@ -1,6 +1,6 @@
 'use client'
 
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled } from '@moldwright/cloud/billing'
 import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'

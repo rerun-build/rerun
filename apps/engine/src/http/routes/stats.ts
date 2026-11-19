@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { isValidStatsCombo, statsQuerySchema } from '@rerun/contracts'
+import { isValidStatsCombo, statsQuerySchema } from '@moldwright/contracts'
 import { aggregateStats } from '../../db/repos/stats.js'
 
 const RANGE_MS: Record<string, number> = {

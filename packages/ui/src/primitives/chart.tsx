@@ -4,7 +4,7 @@ import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import type { TooltipValueType } from "recharts"
 
-import { formatNumber } from "@rerun/i18n/format"
+import { formatNumber } from "@moldwright/i18n/format"
 
 import { cn } from "../cn"
 import { useUiLocale } from "../locale"

@@ -51,10 +51,10 @@ vi.mock('../memory/store.js', () => ({
 }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, recallMemories, recallSection } = await import('./systemPrompt.js')
 const recallContext = async (agent: Parameters<typeof recallMemories>[0], userText: string, history?: ModelMessage[]) => recallSection(await recallMemories(agent, userText), history)
-const { contextTextPart } = await import('@rerun/contracts')
+const { contextTextPart } = await import('@moldwright/contracts')
 
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
 const { getSharedDb } = await import('../db/sharedDb.js')

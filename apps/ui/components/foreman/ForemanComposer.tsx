@@ -1,7 +1,7 @@
 'use client'
 
 import type { ChatStatus } from 'ai'
-import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, type ComponentProps, type RefObject } from 'react'
 

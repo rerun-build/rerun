@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs'
 import path from 'node:path'
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@rerun/emails'
+import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@moldwright/emails'
 
 const STRUCTURAL_COLOURS = new Set(['#ffffff'])
 

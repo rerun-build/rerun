@@ -1,4 +1,4 @@
-import { type AgentArchivePlan, type TemplateAgent, agentArchivePlanSchema } from '@rerun/contracts'
+import { type AgentArchivePlan, type TemplateAgent, agentArchivePlanSchema } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { agentKeyFromName, archiveAgentNames, archivePath, archivesFromRow, projectAgent } from './archives'
 

@@ -1,4 +1,4 @@
-import type { HubRerunCredit } from '@rerun/contracts'
+import type { HubRerunCredit } from '@moldwright/contracts'
 
 export function isAiStatusHubTool(name: string): name is 'rerun_credit' {
     return name === 'rerun_credit'

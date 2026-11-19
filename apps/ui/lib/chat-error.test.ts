@@ -1,5 +1,5 @@
 import { englishTranslator } from '@/lib/i18n/english-translator'
-import { loadMessages } from '@rerun/i18n/messages'
+import { loadMessages } from '@moldwright/i18n/messages'
 import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
 import { chatErrorTitle as titleIn, classifyChatError, describeSubscriptionLimit, friendlyError as friendlyIn, isBudgetExhausted, stripErrorPrefix, installInFlightOf, subscriptionLimitMessage, subscriptionLimitTitle, teammateRunOf, unwrapChatError, type ChatErrorKind, type SubscriptionLimit } from './chat-error'

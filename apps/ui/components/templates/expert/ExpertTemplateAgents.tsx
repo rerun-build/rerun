@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { Badge, type BadgeTone } from '@rerun/ui/primitives'
+import { Badge, type BadgeTone } from '@moldwright/ui/primitives'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'

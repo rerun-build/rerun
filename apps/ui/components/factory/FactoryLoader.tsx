@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { FactoryJobState, FactorySnapshot } from '@rerun/contracts'
+import type { FactoryJobState, FactorySnapshot } from '@moldwright/contracts'
 import { JOB_STATE_VIEW } from './factory-state'
 import { loaderView } from './factory-loader'
 

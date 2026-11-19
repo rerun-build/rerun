@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const edition = vi.hoisted(() => ({ cloud: true }))
-vi.mock('@rerun/cloud/edition', () => ({
+vi.mock('@moldwright/cloud/edition', () => ({
     get RERUN_CLOUD() {
         return edition.cloud
     },

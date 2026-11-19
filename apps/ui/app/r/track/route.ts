@@ -1,1 +1,1 @@
-export { affiliateTrack as POST } from '@rerun/cloud/affiliate'
+export { affiliateTrack as POST } from '@moldwright/cloud/affiliate'

@@ -1,4 +1,4 @@
-import { DEFAULT_WHATSAPP_FROM } from '@rerun/cloud/senders'
+import { DEFAULT_WHATSAPP_FROM } from '@moldwright/cloud/senders'
 import { birdConfig } from '@/lib/bird/config'
 import type { WhatsAppComponent, WhatsAppLanguage } from './templates'
 

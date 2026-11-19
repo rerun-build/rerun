@@ -1,4 +1,4 @@
-import { CHAT_ATTACHMENTS_DIR, uniqueAttachmentName } from '@rerun/contracts'
+import { CHAT_ATTACHMENTS_DIR, uniqueAttachmentName } from '@moldwright/contracts'
 
 import { ApiError, clientHeader, hubHeaders } from '@/api/client'
 import type { FileOwner } from '@/api/files'

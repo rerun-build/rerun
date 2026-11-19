@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-process-env-')
 
 const { afterEach, describe, expect, it } = await import('vitest')
 const { rm } = await import('node:fs/promises')
-const { agentConfigSchema } = await import('@rerun/contracts')
+const { agentConfigSchema } = await import('@moldwright/contracts')
 const { agentProcessEnv } = await import('./process-env.js')
 const { agentDataDbPath, dataDir, sharedDbPath, workspaceDir } = await import('../config/paths.js')
 const { writeSharedEnv } = await import('./shared-env.js')

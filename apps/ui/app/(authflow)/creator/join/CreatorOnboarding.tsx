@@ -4,7 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { StepTransition, StepperBar, useStepper } from '@rerun/ui/steps'
+import { StepTransition, StepperBar, useStepper } from '@moldwright/ui/steps'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'

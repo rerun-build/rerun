@@ -1,4 +1,4 @@
-import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
+import { FOREMAN_DISPLAY_NAME } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 import { useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'

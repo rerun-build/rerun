@@ -1,4 +1,4 @@
-import { accountDeletionStatusSchema, meSchema, workspaceSummarySchema, type Me, type WorkspaceSummary } from '@rerun/contracts'
+import { accountDeletionStatusSchema, meSchema, workspaceSummarySchema, type Me, type WorkspaceSummary } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

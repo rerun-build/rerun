@@ -2,7 +2,7 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
-import { AppAccountPicker } from '@rerun/cloud/apps.client'
+import { AppAccountPicker } from '@moldwright/cloud/apps.client'
 import { AuthMethodPicker, methodKindKey } from '@/components/services/AuthMethodPicker'
 import { ComposioConnect } from '@/components/services/ComposioConnect'
 import { ManagedConnect } from '@/components/services/ManagedConnect'
@@ -11,7 +11,7 @@ import { useServiceSetupDriver } from '@/components/services/service-setup-drive
 import { openPendingSignInPopup } from '@/components/services/sign-in-popup'
 import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
-import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
+import { isAppSlug, type AppSlug } from '@moldwright/cloud/apps'
 import type { AppTarget, AuthMethodSummary, ComposioTarget, ManagedTarget, OAuthTarget } from '@/lib/services/types'
 import { ArrowLeftIcon, CheckCircle2Icon, ExternalLinkIcon, Loader2Icon } from '@/lib/icons'
 import { useEffect, useMemo, useRef, useState } from 'react'

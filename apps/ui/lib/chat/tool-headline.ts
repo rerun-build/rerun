@@ -1,1 +1,1 @@
-export { agentIdOf, argsOf, toolHeadline } from '@rerun/contracts'
+export { agentIdOf, argsOf, toolHeadline } from '@moldwright/contracts'

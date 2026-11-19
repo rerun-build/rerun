@@ -1,8 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { STEP_TRANSITION } from '@rerun/ui/steps'
-import { TourScene } from '@rerun/ui/tour'
+import { STEP_TRANSITION } from '@moldwright/ui/steps'
+import { TourScene } from '@moldwright/ui/tour'
 import { motion } from 'motion/react'
 
 const TITLE_BAND = 210

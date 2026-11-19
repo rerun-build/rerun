@@ -9,7 +9,7 @@ import type { SharedFileRef } from '@/components/brain/useSharedFilesTree'
 import { brainSlugify } from '@/lib/brain/labels'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import type { BrainPageDetail } from '@/lib/engine/client'
-import type { BrainPageSummary, BrainPageType } from '@rerun/contracts'
+import type { BrainPageSummary, BrainPageType } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 

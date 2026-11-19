@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentConversationsOverview, type AgentStatus, type BoardAgent, type Box } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentConversationsOverview, type AgentStatus, type BoardAgent, type Box } from '@moldwright/contracts'
 
 import type { StatusLine } from '@/components/ui/status'
 import { translatorFor } from '@/i18n/translator'

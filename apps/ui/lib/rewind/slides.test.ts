@@ -1,4 +1,4 @@
-import type { RewindPayload } from '@rerun/contracts'
+import type { RewindPayload } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 import { REWIND_SLIDE_IDS, rewindSlides } from './slides'
 

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { createClient } from '@libsql/client'
-import { FOREMAN_AGENT_ID, RERUN_CONNECTION_ID, type EngineDoctor, type EngineDoctorCheck } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, RERUN_CONNECTION_ID, type EngineDoctor, type EngineDoctorCheck } from '@moldwright/contracts'
 import { dbPath, sharedDbPath, systemDbPath } from '../config/paths.js'
 import { listAgentIndex } from '../db/repos/agents.js'
 import { sqliteVersion } from '../db/ladder.js'

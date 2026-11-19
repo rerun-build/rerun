@@ -1,6 +1,6 @@
 'use client'
 
-import { useResolvedIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { useResolvedIsMobile } from '@moldwright/ui/primitives/use-is-mobile'
 import { AuthStageBoard } from './AuthStageBoard'
 
 const centerScrim =

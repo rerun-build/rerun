@@ -1,6 +1,6 @@
-import type { Usage } from '@rerun/contracts'
+import type { Usage } from '@moldwright/contracts'
 import type { LanguageModelUsage, UIMessageChunk, UIMessageStreamWriter } from 'ai'
-import { QUICK_REPLIES_TOOL, withHitlVersion } from '@rerun/contracts'
+import { QUICK_REPLIES_TOOL, withHitlVersion } from '@moldwright/contracts'
 import { canonicalHitlName, isHitlToolName } from '../tools/builtin/hitl.js'
 import type { QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import type { AgentRun, RunOutcome } from './loop.js'

@@ -12,7 +12,7 @@ import type { ForemanPlacement } from '@/lib/foreman-layout'
 import { LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
 import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
-import { type ForemanAnchor, ForemanHeaderBar } from '@rerun/ui/foreman'
+import { type ForemanAnchor, ForemanHeaderBar } from '@moldwright/ui/foreman'
 
 type PositionChoice = ForemanAnchor
 

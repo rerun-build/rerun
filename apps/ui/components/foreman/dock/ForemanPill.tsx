@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { BorderBeam, type BorderBeamProps } from '@rerun/ui'
-import { ChromeBar } from '@rerun/ui/chrome'
+import { BorderBeam, type BorderBeamProps } from '@moldwright/ui'
+import { ChromeBar } from '@moldwright/ui/chrome'
 
 import { cn } from '@/lib/utils'
 

@@ -7,7 +7,7 @@ import { TemplateLibraryDialog } from '@/components/templates/TemplateLibraryDia
 import { IsoBoard } from '@/components/builder/IsoBoard'
 import { BuilderToolbar } from '@/components/builder/BuilderToolbar'
 import { BoardCornerActions } from '@/components/layout/BoardCornerActions'
-import { Stripes } from '@rerun/ui/primitives'
+import { Stripes } from '@moldwright/ui/primitives'
 import { getSharedTemplateAction } from '@/app/api/_actions/template.actions'
 import { useLibraryViewerSignals } from '@/lib/templates/useLibraryViewerSignals'
 import { useOnboardingStore } from '@/stores/onboarding.store'

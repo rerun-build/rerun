@@ -2,10 +2,10 @@
 
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
-import { Logo } from '@rerun/ui/logo'
+import { Logo } from '@moldwright/ui/logo'
 import type { ElementType, ReactNode } from 'react'
 import { AuthScene } from './AuthScene'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import { useTranslations } from 'next-intl'
 
 export function AuthShell({

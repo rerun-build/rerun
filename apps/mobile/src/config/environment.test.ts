@@ -1,5 +1,5 @@
 import { environmentAtLaunch, environmentForChannel } from '@/config/environment'
-import { PRODUCTION, STAGING } from '@rerun/cloud-mobile/environments'
+import { PRODUCTION, STAGING } from '@moldwright/cloud-mobile/environments'
 
 describe('environmentForChannel', () => {
     it('binds a store build to the environment of its update channel', () => {

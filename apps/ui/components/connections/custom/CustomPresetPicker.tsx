@@ -2,7 +2,7 @@
 
 import { Field } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { CustomPreset } from '@rerun/contracts'
+import type { CustomPreset } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 
 const OTHER = 'other'

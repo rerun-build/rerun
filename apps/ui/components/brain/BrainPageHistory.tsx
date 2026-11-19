@@ -12,7 +12,7 @@ import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { ArrowLeftIcon } from '@/lib/icons'
 import { fullDateTime, shortRelativeTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
-import type { BrainPage, BrainRevision } from '@rerun/contracts'
+import type { BrainPage, BrainRevision } from '@moldwright/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 

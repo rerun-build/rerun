@@ -1,1 +1,1 @@
-export { Tabs, TabsContent, TabsList, TabsTrigger } from '@rerun/ui/primitives'
+export { Tabs, TabsContent, TabsList, TabsTrigger } from '@moldwright/ui/primitives'

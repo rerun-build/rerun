@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CONNECTION_MODELS, OPENCODE_SNAPSHOT, toProviderModel, type ProviderModel } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, OPENCODE_SNAPSHOT, toProviderModel, type ProviderModel } from '@moldwright/contracts'
 import type { BoxConnection } from '@/lib/engine/types'
 import { connectMethod, enabledModels, offeredModels, opencodeModelRows, pricePerMillion, sourceSummary } from './ai-sources'
 import { englishTranslator } from '@/lib/i18n/english-translator'

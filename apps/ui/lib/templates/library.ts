@@ -7,7 +7,7 @@ import {
     type TemplatePricingModel,
     type TemplateStatus,
     templateImageSchema,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 import { z } from 'zod'
 import { agentsFromRow, connectorsFromRow } from './document'
 import { archiveAgentNames, archivesFromRow } from './archives'

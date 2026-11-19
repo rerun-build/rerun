@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { providerSchema } from '@rerun/contracts'
+import { providerSchema } from '@moldwright/contracts'
 import { deleteSchedule, listSchedules, readSchedule, scheduleExists, updateScheduleAt, writeSchedule } from '../../schedules/loader.js'
 import { isValidCron, isValidTimezone } from '../../schedules/cron.js'
 import { fireSchedule } from '../../runtime/scheduler.js'

@@ -1,4 +1,4 @@
-import { hitlVersionOf, type HitlKind, type PendingHitl } from '@rerun/contracts'
+import { hitlVersionOf, type HitlKind, type PendingHitl } from '@moldwright/contracts'
 import type { ReactNode } from 'react'
 
 import type { ComposerAttachment } from '../attachments'

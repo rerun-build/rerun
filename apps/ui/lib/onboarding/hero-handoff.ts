@@ -1,4 +1,4 @@
-import { AGENT_NAME_MAX, MAX_APPS_AT_CREATION } from '@rerun/ui/new-agent/reading'
+import { AGENT_NAME_MAX, MAX_APPS_AT_CREATION } from '@moldwright/ui/new-agent/reading'
 
 const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/
 

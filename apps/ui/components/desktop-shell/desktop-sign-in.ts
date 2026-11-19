@@ -1,6 +1,6 @@
 'use client'
 
-import type { DesktopSignInProvider } from '@rerun/contracts'
+import type { DesktopSignInProvider } from '@moldwright/contracts'
 import { useSyncExternalStore } from 'react'
 import { desktopShell } from '@/lib/desktop-shell/client'
 

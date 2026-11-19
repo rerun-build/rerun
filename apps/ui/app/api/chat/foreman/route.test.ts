@@ -1,19 +1,19 @@
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { isPhoneStepPending } from '@rerun/cloud/phone.server'
-import { logRerunUsage } from '@rerun/cloud/billing.server'
+import { isPhoneStepPending } from '@moldwright/cloud/phone.server'
+import { logRerunUsage } from '@moldwright/cloud/billing.server'
 import { saveForemanConversation } from '@/lib/foreman/conversation'
 import { prepareScript } from '@/lib/foreman/scripted'
 import { loadForemanState } from '@/lib/foreman/state'
 import { createForemanTurn } from '@/lib/foreman/turn'
-import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
+import { PHONE_REQUIRED_MESSAGE } from '@moldwright/cloud/phone'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { BILLING_ENABLED } from '@rerun/cloud/billing'
+import { BILLING_ENABLED } from '@moldwright/cloud/billing'
 import { POST } from './route'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
-vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
-vi.mock('@rerun/cloud/billing.server', async importOriginal => ({ ...(await importOriginal<typeof import('@rerun/cloud/billing.server')>()), logRerunUsage: vi.fn() }))
+vi.mock('@moldwright/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
+vi.mock('@moldwright/cloud/billing.server', async importOriginal => ({ ...(await importOriginal<typeof import('@moldwright/cloud/billing.server')>()), logRerunUsage: vi.fn() }))
 vi.mock('@/lib/foreman/conversation', () => ({ engineSessionOf: vi.fn().mockResolvedValue(null), loadForemanConversation: vi.fn(), saveForemanConversation: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('@/lib/foreman/state', () => ({ loadForemanState: vi.fn() }))
 vi.mock('@/lib/foreman/scripted', () => ({ prepareScript: vi.fn(), runScript: vi.fn() }))

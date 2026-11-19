@@ -1,4 +1,4 @@
-import type { AddableProvider, AiConnectionKind, AiConnectionsView } from '@rerun/contracts'
+import type { AddableProvider, AiConnectionKind, AiConnectionsView } from '@moldwright/contracts'
 import { Fragment } from 'react'
 import { useTranslations } from 'use-intl'
 

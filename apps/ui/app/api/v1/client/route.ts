@@ -1,6 +1,6 @@
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
-import type { ClientConfig, ClientPlatform, ClientServer } from '@rerun/contracts'
+import type { ClientConfig, ClientPlatform, ClientServer } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

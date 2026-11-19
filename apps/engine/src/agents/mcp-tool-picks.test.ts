@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-mcp-picks-'))
 
 const { describe, expect, it } = await import('vitest')
 const { mkdir } = await import('node:fs/promises')
-const { mcpServerSchema } = await import('@rerun/contracts')
+const { mcpServerSchema } = await import('@moldwright/contracts')
 const { agentRoutes } = await import('../http/routes/agents.js')
 const { agentConfigSchema } = await import('./types.js')
 const { writeAgentConfig } = await import('./config-write.js')

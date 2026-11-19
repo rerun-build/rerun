@@ -2,7 +2,7 @@ import { actorFromContext } from '@/app/api/_auth/access'
 import { installService } from '@/app/api/_services/services.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { serviceKeyParam, toInstallResultView } from '@/app/api/v1/_lib/service-view'
-import { installServiceInputSchema } from '@rerun/contracts'
+import { installServiceInputSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

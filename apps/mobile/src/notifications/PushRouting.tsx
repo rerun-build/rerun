@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
 import { useEffect, useRef } from 'react'

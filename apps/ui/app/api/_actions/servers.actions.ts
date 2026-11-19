@@ -2,7 +2,7 @@
 
 import { requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { attachServerManually, createPairingToken, detachWorkspaceServer, readWorkspaceServer, ServerPairingError, type WorkspaceServer } from '@/app/api/_services/servers.service'
-import { SERVERS_ENABLED } from '@rerun/cloud/servers'
+import { SERVERS_ENABLED } from '@moldwright/cloud/servers'
 import { failure, failureOf, type ActionFailure, type ErrorCode } from '@/lib/i18n/action-error'
 
 type Result<T> = ({ ok: true } & T) | ActionFailure

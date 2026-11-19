@@ -1,4 +1,4 @@
-import type { DesktopWindowState } from '@rerun/contracts'
+import type { DesktopWindowState } from '@moldwright/contracts'
 import { desktopShell } from './client'
 
 let windowState: DesktopWindowState | null = null

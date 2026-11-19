@@ -16,7 +16,7 @@ const { afterEach, describe, expect, it } = await import('vitest')
 const { HostBreaker } = await import('../host-breaker.js')
 const { workspaceDir } = await import('../../config/paths.js')
 const { webTools } = await import('./web.js')
-const { FOREMAN_HUB_TOKEN_HEADER } = await import('@rerun/contracts')
+const { FOREMAN_HUB_TOKEN_HEADER } = await import('@moldwright/contracts')
 
 const originalFetch = globalThis.fetch
 

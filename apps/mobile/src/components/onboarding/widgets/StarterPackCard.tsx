@@ -1,4 +1,4 @@
-import { MAX_STARTER_PICKS } from '@rerun/contracts'
+import { MAX_STARTER_PICKS } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'

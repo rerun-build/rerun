@@ -5,7 +5,7 @@ import {
     mcpSessionStateListSchema,
     mcpReconnectResultSchema,
     mcpReconnectEventSchema,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 describe('mcp session contract', () => {
     it('accepts each of the four states, with and without an error class', () => {

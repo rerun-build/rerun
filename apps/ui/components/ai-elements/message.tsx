@@ -16,8 +16,8 @@ import { createContext, memo, useCallback, useContext, useEffect, useMemo, useSt
 import { Streamdown } from 'streamdown'
 import { useTranslations } from 'next-intl'
 
-export { Message, MessageContent } from '@rerun/ui/chat'
-export type { MessageProps, MessageContentProps } from '@rerun/ui/chat'
+export { Message, MessageContent } from '@moldwright/ui/chat'
+export type { MessageProps, MessageContentProps } from '@moldwright/ui/chat'
 
 export type MessageActionsProps = ComponentProps<'div'>
 

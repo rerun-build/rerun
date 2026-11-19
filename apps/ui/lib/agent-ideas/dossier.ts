@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { BrainPage } from '@rerun/contracts'
+import type { BrainPage } from '@moldwright/contracts'
 
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'

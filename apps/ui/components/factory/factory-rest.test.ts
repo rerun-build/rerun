@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { TILE_H, routeTileLinks } from '@rerun/ui/iso-grid'
+import { TILE_H, routeTileLinks } from '@moldwright/ui/iso-grid'
 
 import { atDistance, centreOf, inScanner, lineUp, podPath, restDistances, settles, sphereShapes, tileShapes, toWorld, workSpot } from './factory-rest'
 import { LOOP_MS, factoryScene } from './factory-scene'

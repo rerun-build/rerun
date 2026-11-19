@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AddonKey } from '@rerun/cloud/billing'
+import type { AddonKey } from '@moldwright/cloud/billing'
 
 export const AGENT_LIMIT_TRIGGER = 'entitlement_gate'
 

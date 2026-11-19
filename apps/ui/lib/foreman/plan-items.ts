@@ -1,5 +1,5 @@
-import { asRecord } from '@rerun/contracts'
-import { TRIAL_ACTIVE_AGENTS } from '@rerun/cloud/billing'
+import { asRecord } from '@moldwright/contracts'
+import { TRIAL_ACTIVE_AGENTS } from '@moldwright/cloud/billing'
 import { asString, asStringArray, requireString } from '@/lib/mcp/args'
 import type { ForemanPlanBox, ForemanPlanItem } from './phase'
 import type { PlanItemKind } from './tool-defs'

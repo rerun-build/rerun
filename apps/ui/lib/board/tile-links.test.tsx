@@ -2,7 +2,7 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { TileLinks, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { TileLinks, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
 import { factoryScene } from '@/components/factory/factory-scene'
 
 const tile = (id: string, col: number, row: number): Tile => ({ id, position: { col, row }, span: 2, style: { color: '#fff' } })

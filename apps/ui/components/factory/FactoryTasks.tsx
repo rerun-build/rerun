@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
-import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
+import type { FactoryJob, FactorySnapshot } from '@moldwright/contracts'
 import { cn } from '@/lib/utils'
 import { JOB_STATE_VIEW, groupOf } from './factory-state'
 

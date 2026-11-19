@@ -1,4 +1,4 @@
-import type { InstalledServiceView } from '@rerun/contracts'
+import type { InstalledServiceView } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'

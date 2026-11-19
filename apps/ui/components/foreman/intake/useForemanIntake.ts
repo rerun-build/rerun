@@ -1,6 +1,6 @@
 'use client'
 
-import type { IntakeKind, TemplateCategory } from '@rerun/contracts'
+import type { IntakeKind, TemplateCategory } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 

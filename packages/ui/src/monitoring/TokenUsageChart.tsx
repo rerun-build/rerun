@@ -1,9 +1,9 @@
 'use client'
 
-import { formatDate, formatNumber } from '@rerun/i18n/format'
+import { formatDate, formatNumber } from '@moldwright/i18n/format'
 import { useCallback, useMemo } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts'
-import type { EngineUsageBucket } from '@rerun/contracts'
+import type { EngineUsageBucket } from '@moldwright/contracts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../primitives/chart'
 import { CHART_FALLBACK_COLOR, CHART_PALETTE, chartColorAt } from './chart-palette'
 import { cn } from '../cn'

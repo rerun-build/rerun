@@ -1,4 +1,4 @@
-import { CLIENT_PLATFORMS, deviceTokenSchema, formatClientHeader, parseClientHeader } from '@rerun/contracts'
+import { CLIENT_PLATFORMS, deviceTokenSchema, formatClientHeader, parseClientHeader } from '@moldwright/contracts'
 import { Platform } from 'react-native'
 
 import { clientHeader } from '@/api/client'

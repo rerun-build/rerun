@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compareShellVersions, desktopShellScheme, desktopShellUserAgentToken, parseDesktopShellUserAgent } from '@rerun/contracts'
+import { compareShellVersions, desktopShellScheme, desktopShellUserAgentToken, parseDesktopShellUserAgent } from '@moldwright/contracts'
 
 describe('the desktop User-Agent token', () => {
     it('round-trips through the server’s parser', () => {

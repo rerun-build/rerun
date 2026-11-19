@@ -1,4 +1,4 @@
-import { coworkerFilesSchema, installedServiceSchema, routinesViewSchema, skillSummariesViewSchema, type CoworkerFiles, type InstalledServiceView, type RoutineKind, type RoutineView, type SkillSummary } from '@rerun/contracts'
+import { coworkerFilesSchema, installedServiceSchema, routinesViewSchema, skillSummariesViewSchema, type CoworkerFiles, type InstalledServiceView, type RoutineKind, type RoutineView, type SkillSummary } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

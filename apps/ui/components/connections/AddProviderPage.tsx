@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
 import { connectMethod, providerGuide, providerPitch, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
-import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

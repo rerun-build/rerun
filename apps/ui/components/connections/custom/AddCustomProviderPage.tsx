@@ -9,10 +9,10 @@ import { MODELS_ON_AT_CONNECT, isHttpUrl, presetsFor, probeProblemMessage } from
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import { suggestName, uniqueName } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
-import { CONNECTION_TOKEN_KEY, type CustomPreset } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, type CustomPreset } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 

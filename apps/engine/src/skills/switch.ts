@@ -1,4 +1,4 @@
-import type { AgentConfig } from '@rerun/contracts'
+import type { AgentConfig } from '@moldwright/contracts'
 import { readAgentConfig } from '../agents/loader.js'
 import { withAgentLock } from '../agents/lock.js'
 import { writeAgentConfig } from '../agents/config-write.js'

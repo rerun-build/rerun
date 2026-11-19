@@ -4,7 +4,7 @@ import { FriendlyCell } from '@/components/data/FriendlyCell'
 import { isNumericKind, type FriendlyColumn } from '@/lib/data/friendly-columns'
 import { cellInputText } from '@/lib/data/views'
 import { cn } from '@/lib/utils'
-import { formatCell, type CellContext } from '@rerun/ui/chat'
+import { formatCell, type CellContext } from '@moldwright/ui/chat'
 import { useState, type ReactNode } from 'react'
 
 type EditableCellProps = {

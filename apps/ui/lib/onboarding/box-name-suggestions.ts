@@ -1,4 +1,4 @@
-import { isTemplateCategory, SOFTWARE_STUDIO, type TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, SOFTWARE_STUDIO, type TemplateCategory } from '@moldwright/contracts'
 
 export const INDUSTRY_BOX_NAMES: Record<TemplateCategory, string[]> = {
     agencies: ['Clients', 'Marketing', 'New Business', 'Operations', 'Finance', 'Personal'],

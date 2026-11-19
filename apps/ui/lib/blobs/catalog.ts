@@ -1,4 +1,4 @@
-import { ILLUSTRATION_ENTRIES } from '@rerun/cloud/illustrations'
+import { ILLUSTRATION_ENTRIES } from '@moldwright/cloud/illustrations'
 
 export type BlobColor =
     | 'amber'

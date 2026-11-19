@@ -1,4 +1,4 @@
-import type { GoalLineForm, GoalVerdict, RunGoal } from '@rerun/contracts'
+import type { GoalLineForm, GoalVerdict, RunGoal } from '@moldwright/contracts'
 
 const REST_PATTERNS = {
     'pull-url': /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/,

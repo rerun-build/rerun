@@ -10,7 +10,7 @@ const { cardTools } = await import('./cards.js')
 const { getAgentDb } = await import('../../db/agentDb.js')
 const { getSharedDb, recordTableOwnership } = await import('../../db/sharedDb.js')
 const { sharedDir, workspaceDir } = await import('../../config/paths.js')
-const { tableCardSchema, fileCardSchema, CARD_MAX_CELL_CHARS, CARD_MAX_COLUMNS, CARD_MAX_MEDIA_CHARS } = await import('@rerun/contracts')
+const { tableCardSchema, fileCardSchema, CARD_MAX_CELL_CHARS, CARD_MAX_COLUMNS, CARD_MAX_MEDIA_CHARS } = await import('@moldwright/contracts')
 
 const AGENT = 'agent-cards'
 const tools = cardTools({ agent: { id: AGENT } } as any)

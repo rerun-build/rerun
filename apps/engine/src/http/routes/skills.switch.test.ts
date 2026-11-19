@@ -12,7 +12,7 @@ const { createAgent } = await import('../../agents/factory.js')
 const { duplicateAgent } = await import('../../agents/duplicate.js')
 const { setSkillEnabled } = await import('../../skills/switch.js')
 const { configPath } = await import('../../config/paths.js')
-const { skillsListSchema } = await import('@rerun/contracts')
+const { skillsListSchema } = await import('@moldwright/contracts')
 const { getAgent } = await import('../../agents/registry.js')
 const { buildSkillIndex } = await import('../../skills/index.js')
 

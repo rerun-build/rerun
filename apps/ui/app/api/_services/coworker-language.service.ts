@@ -4,7 +4,7 @@ import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { patchAgent } from '@/lib/engine/client'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { DEFAULT_LOCALE, isStableLocale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, isStableLocale } from '@moldwright/i18n'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function coworkerLanguageFor(supabase: SupabaseClient<Database>, workspaceId: number): Promise<string | null> {

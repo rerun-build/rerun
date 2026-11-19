@@ -1,4 +1,4 @@
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import type { FileUIPart } from 'ai'
 
 import { uploadChatFile } from '@/api/uploads'

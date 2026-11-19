@@ -2,8 +2,8 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 import * as React from 'react'
-import { isSetupAnswered } from '@rerun/contracts'
-import { Stripes } from '@rerun/ui/primitives'
+import { isSetupAnswered } from '@moldwright/contracts'
+import { Stripes } from '@moldwright/ui/primitives'
 import { AgentSetupFields, type AgentSetupDraft } from '@/components/agent/AgentSetupFields'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'

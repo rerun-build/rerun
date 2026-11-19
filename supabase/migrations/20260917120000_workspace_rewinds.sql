@@ -6,7 +6,7 @@ create table public.workspace_rewinds (
     id uuid primary key default gen_random_uuid(),
     workspace_id bigint not null references public.workspaces(id) on delete cascade,
     week_start date not null,
-    -- A RewindPayload from @rerun/contracts, versioned by its own `version` field.
+    -- A RewindPayload from @moldwright/contracts, versioned by its own `version` field.
     payload jsonb not null,
     created_at timestamptz not null default now(),
     unique (workspace_id, week_start)

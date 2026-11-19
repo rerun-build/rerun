@@ -1,6 +1,6 @@
 'use client'
 
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES } from '@moldwright/contracts'
 import type { UploadEntry } from '@/lib/files/upload'
 import { uploadUrl, type UploadTarget } from '@/lib/files/upload-url'
 import { UploadAbortedError, UploadHttpError, UploadNetworkError, xhrUpload, type XhrUploadHandle } from '@/lib/files/upload-client'

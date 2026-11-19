@@ -1,6 +1,6 @@
 import { generateObject } from 'ai'
 import { z } from 'zod'
-import { BUDGET_OPTIONS, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from '@rerun/ui/experts/options'
+import { BUDGET_OPTIONS, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from '@moldwright/ui/experts/options'
 import { openrouter } from '@/lib/ai/openrouter'
 import type { ExpertSource } from './source'
 

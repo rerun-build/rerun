@@ -1,4 +1,4 @@
-import { agentArchiveMcpAuthSchema, agentArchiveRedactionSchema, type AgentArchivePlan, type TemplateAgent } from '@rerun/contracts'
+import { agentArchiveMcpAuthSchema, agentArchiveRedactionSchema, type AgentArchivePlan, type TemplateAgent } from '@moldwright/contracts'
 import { z } from 'zod'
 import { randomUuid } from '@/lib/random-uuid'
 

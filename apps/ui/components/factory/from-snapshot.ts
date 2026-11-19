@@ -1,5 +1,5 @@
-import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Tile, type TileLink } from '@rerun/ui/iso-grid'
-import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
+import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Tile, type TileLink } from '@moldwright/ui/iso-grid'
+import type { FactoryJob, FactorySnapshot } from '@moldwright/contracts'
 import { BAY, BOSS, BOSS_ID, type CabinetView, copySeat, FEATURE_CELLS, type FactoryFrame, PLANNER_CELLS, PLAN_TANK, type PlanView, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
 
 export type SnapshotFrame = FactoryFrame & { blocked: { issue: number; reason: string }[]; cracked: number[]; notAnswering: boolean; lastBeatMs: number }

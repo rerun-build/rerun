@@ -3,8 +3,8 @@
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { exchangeClaudeSubscriptionAction, startClaudeOAuthAction } from '@/app/api/_actions/workspace-connection.actions'
 import { trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
-import type { AiConnectionSurface } from '@rerun/analytics'
-import { claudeTokenIssue } from '@rerun/contracts'
+import type { AiConnectionSurface } from '@moldwright/analytics'
+import { claudeTokenIssue } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState } from 'react'
 

@@ -1,4 +1,4 @@
-import type { WorkspaceSummary } from '@rerun/contracts'
+import type { WorkspaceSummary } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { View } from 'react-native'

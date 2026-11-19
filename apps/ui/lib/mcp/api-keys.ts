@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { Database } from '@/app/api/database.types'
-import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isWorkspaceApiEntitled } from '@moldwright/cloud/billing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createHash, randomBytes } from 'node:crypto'

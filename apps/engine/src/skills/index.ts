@@ -1,4 +1,4 @@
-import type { AgentConfig } from '@rerun/contracts'
+import type { AgentConfig } from '@moldwright/contracts'
 import { listSkillSummaries } from './loader.js'
 import { disabledSkillSet } from './switch.js'
 

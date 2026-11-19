@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { KnowledgeBaseTab, WorkspaceDialogPanel } from '@/lib/settings/panels'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 
 type PanelFocus = { connectionId?: string; reconnect?: boolean; addProvider?: Exclude<Provider, 'rerun'>; tab?: KnowledgeBaseTab; table?: string; view?: string; page?: string }
 

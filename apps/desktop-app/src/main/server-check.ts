@@ -1,4 +1,4 @@
-import { compareShellVersions, type DesktopServerConfig } from '@rerun/contracts'
+import { compareShellVersions, type DesktopServerConfig } from '@moldwright/contracts'
 
 export type ServerCheck =
     | { status: 'ok'; config: DesktopServerConfig }

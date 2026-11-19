@@ -3,7 +3,7 @@
 import { getAgentChatTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
 import { saveTextFile, type SaveFileResult } from '@/app/api/_services/file.service'
 import * as engine from '@/lib/engine/client'
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
 
 export type FileEntry = {
     name: string

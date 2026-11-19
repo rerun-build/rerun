@@ -1,4 +1,4 @@
-import type { MessageAuthor } from '@rerun/contracts'
+import type { MessageAuthor } from '@moldwright/contracts'
 import type { ModelMessage } from 'ai'
 
 type AuthoredRow = { role: string; authorId: string | null; authorName: string | null }

@@ -1,5 +1,5 @@
 import type { Configuration } from 'electron-builder'
-import { desktopShellScheme } from '@rerun/contracts'
+import { desktopShellScheme } from '@moldwright/contracts'
 import { buildSettings } from './build-config'
 import { CHANNEL_IDENTITIES } from './src/shared/channels'
 

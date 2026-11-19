@@ -1,4 +1,4 @@
-import { foremanIndustryResultSchema, foremanLeadResultSchema, foremanTrialResultSchema, type ForemanIntakeRequest, type TemplateCategory } from '@rerun/contracts'
+import { foremanIndustryResultSchema, foremanLeadResultSchema, foremanTrialResultSchema, type ForemanIntakeRequest, type TemplateCategory } from '@moldwright/contracts'
 import type { UIMessage } from 'ai'
 
 import { api } from '@/api/client'

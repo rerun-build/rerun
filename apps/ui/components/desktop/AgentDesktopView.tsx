@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
-import type { DesktopApp, DesktopViewMode } from '@rerun/contracts'
+import type { DesktopApp, DesktopViewMode } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

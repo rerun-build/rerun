@@ -21,7 +21,7 @@ import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
 import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import { customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@moldwright/contracts'
 import { refusal, refusalOf, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 type Refusal = { success: false } & ActionRefusal

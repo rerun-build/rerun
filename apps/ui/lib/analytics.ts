@@ -1,4 +1,4 @@
-import { startAnalytics, startSessionReplay, stopAnalytics } from '@rerun/analytics/client'
+import { startAnalytics, startSessionReplay, stopAnalytics } from '@moldwright/analytics/client'
 
 const NON_ANALYTICS_PREFIXES = ['/render/', '/og/', '/desktop-view']
 

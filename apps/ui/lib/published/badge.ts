@@ -1,4 +1,4 @@
-import { R_PATH } from '@rerun/ui/logo'
+import { R_PATH } from '@moldwright/ui/logo'
 
 const LANDING_URL = 'https://rerun.build'
 const REPORT_EMAIL = 'help@rerun.build'

@@ -3,7 +3,7 @@
 import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
 import { transcribeVoiceRecording } from '@/lib/voice/client'
-import type { QuestionVoice, QuestionVoiceStatus } from '@rerun/ui/chat'
+import type { QuestionVoice, QuestionVoiceStatus } from '@moldwright/ui/chat'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

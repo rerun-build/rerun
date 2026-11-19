@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { CaptchaProof, CaptchaProvider } from '@/lib/auth/captcha-proof'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 
 type SiteverifyAnswer = { success?: boolean; 'error-codes'?: string[] }
 

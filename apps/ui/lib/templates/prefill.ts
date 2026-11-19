@@ -1,4 +1,4 @@
-import { TEMPLATE_CATEGORIES, type TemplateCategory, type TemplateFaqItem } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES, type TemplateCategory, type TemplateFaqItem } from '@moldwright/contracts'
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import { openrouter } from '@/lib/ai/openrouter'

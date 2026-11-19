@@ -4,8 +4,8 @@ import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAc
 import { invalidateLoadedAgentContexts } from '@/hooks/useAgentContext'
 import { connectionMethod, trackAiConnectionConnected, trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { BoxConnection, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import type { AiConnectionSurface } from '@rerun/analytics'
-import { track } from '@rerun/analytics/client'
+import type { AiConnectionSurface } from '@moldwright/analytics'
+import { track } from '@moldwright/analytics/client'
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
 
 type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; opencodeOffered: boolean; customOffered: boolean; loaded: boolean }

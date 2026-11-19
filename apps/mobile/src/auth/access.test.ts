@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type Box } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type Box } from '@moldwright/contracts'
 
 import { AI_PROVIDERS_ADMIN_ONLY, BOX_MANAGE_REASON, boxForNewCoworker, canManage, isAdminRole, knownCoworkerAccess, manageableBoxes, manageLock, manageReason, NO_MANAGED_BOX, newCoworkerBlocker, OPEN_LOCK, UNKNOWN_ACCESS } from '@/auth/access'
 

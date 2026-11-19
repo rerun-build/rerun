@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { connectionSummarySchema } from '@rerun/contracts'
-import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
+import { connectionSummarySchema } from '@moldwright/contracts'
+import { ENGLISH_MESSAGES } from '@moldwright/i18n/messages/en'
 import { createTranslator } from 'use-intl'
 import { isModelEnabled, offeredModels } from '@/lib/engine/ai-sources'
 import { isHttpUrl, presetsFor, probeProblemMessage } from './custom-endpoint'

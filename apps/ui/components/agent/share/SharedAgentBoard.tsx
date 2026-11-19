@@ -1,7 +1,7 @@
 'use client'
 
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
-import { TemplateCardBoard } from '@rerun/ui/iso-grid'
+import type { TemplateAgent, TemplateConnector } from '@moldwright/contracts'
+import { TemplateCardBoard } from '@moldwright/ui/iso-grid'
 import { useMemo } from 'react'
 
 const SHARE_MAX_ZOOM = 3

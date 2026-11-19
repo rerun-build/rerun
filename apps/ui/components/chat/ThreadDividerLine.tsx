@@ -1,1 +1,1 @@
-export { ThreadDividerDot, ThreadDividerLine, ThreadDividerLink } from '@rerun/ui/chat'
+export { ThreadDividerDot, ThreadDividerLine, ThreadDividerLink } from '@moldwright/ui/chat'

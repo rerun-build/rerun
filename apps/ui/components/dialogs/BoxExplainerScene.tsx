@@ -1,7 +1,7 @@
 'use client'
 
 import { useBoxExplainerWalk } from '@/components/dialogs/useBoxExplainerWalk'
-import { TourScene } from '@rerun/ui/tour'
+import { TourScene } from '@moldwright/ui/tour'
 
 export function BoxExplainerScene({ band, className }: { band: number; className?: string }) {
     const phase = useBoxExplainerWalk()

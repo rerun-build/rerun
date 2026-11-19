@@ -11,7 +11,7 @@ import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { AGENT_SHEET_VIEWS, agentSheetViewOf, type AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
 import { ChevronLeftIcon, XIcon } from '@/lib/icons'
-import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { AgentBuddy } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 

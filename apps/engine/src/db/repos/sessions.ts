@@ -1,5 +1,5 @@
 import { and, desc, eq } from 'drizzle-orm'
-import type { SessionSource } from '@rerun/contracts'
+import type { SessionSource } from '@moldwright/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { sessions, type SessionRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'

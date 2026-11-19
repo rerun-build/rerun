@@ -1,4 +1,4 @@
-import { opencodeUsageSchema, planLimitWindowSchema, type PlanLimitWindow, type PlanLimits } from '@rerun/contracts'
+import { opencodeUsageSchema, planLimitWindowSchema, type PlanLimitWindow, type PlanLimits } from '@moldwright/contracts'
 import { latestReadings, saveReadings } from './plan-readings.js'
 
 const readings = new Map<string, PlanLimits>()

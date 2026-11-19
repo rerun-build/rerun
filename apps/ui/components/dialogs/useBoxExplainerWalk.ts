@@ -1,7 +1,7 @@
 'use client'
 
-import { TOUR_AGENTS_PHASE, useTourBeat } from '@rerun/ui/tour'
-import { usePrefersReducedMotion } from '@rerun/ui/iso-grid'
+import { TOUR_AGENTS_PHASE, useTourBeat } from '@moldwright/ui/tour'
+import { usePrefersReducedMotion } from '@moldwright/ui/iso-grid'
 import { useState } from 'react'
 
 const WALK_BEATS: readonly { hold: number }[] = [{ hold: 2600 }]

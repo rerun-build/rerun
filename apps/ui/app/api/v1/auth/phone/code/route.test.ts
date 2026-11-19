@@ -4,7 +4,7 @@ const startPhoneSignIn = vi.fn()
 vi.mock('@/app/api/_services/phone-sign-in.service', () => ({ startPhoneSignIn: (...args: unknown[]) => startPhoneSignIn(...args) }))
 vi.mock('@/supabase/server', () => ({ createClient: async () => ({}), getRequestAccessToken: async () => null }))
 
-vi.mock('@rerun/cloud/app-review', () => ({
+vi.mock('@moldwright/cloud/app-review', () => ({
     isAppReviewNumber: (phone: string) => !!process.env.APP_REVIEW_PHONE && phone === process.env.APP_REVIEW_PHONE,
     isAppReviewSignIn: (phone: string, code: string) => !!process.env.APP_REVIEW_PHONE && phone === process.env.APP_REVIEW_PHONE && !!process.env.APP_REVIEW_CODE && code === process.env.APP_REVIEW_CODE,
 }))

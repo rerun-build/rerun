@@ -1,4 +1,4 @@
-import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { MAX_STARTER_PICKS, STARTER_PACKS, starterPack } from './starter-packs'

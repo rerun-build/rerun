@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { SERVICE_CATEGORIES, type ServiceCategory } from '@rerun/contracts'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@moldwright/contracts'
 
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '../forms/command'
 import { Chip } from '../primitives/chip'

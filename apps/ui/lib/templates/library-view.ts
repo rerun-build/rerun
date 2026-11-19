@@ -1,4 +1,4 @@
-import { TEMPLATE_CATEGORIES, type TemplateCategory, type TemplateConnector } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES, type TemplateCategory, type TemplateConnector } from '@moldwright/contracts'
 import { isInMyLibrary, type LibraryCreator, type LibraryTemplate } from './library'
 
 export type LibraryView = { kind: 'discover' } | { kind: 'foryou' } | { kind: 'all' } | { kind: 'mine' } | { kind: 'category'; category: TemplateCategory } | { kind: 'app'; slug: string } | { kind: 'creator'; slug: string }

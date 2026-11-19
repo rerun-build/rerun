@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { PROFILE_NAME_MAX } from '@/lib/auth/user-profile'
 import { ImageIcon, Loader2Icon, Trash2, Upload, UserRoundIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { CardAvatar } from '@rerun/ui/chat'
+import { CardAvatar } from '@moldwright/ui/chat'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'

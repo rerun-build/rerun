@@ -1,13 +1,13 @@
 import type { Database } from '@/app/api/database.types'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
-import { drawPriceArm } from '@rerun/cloud/billing'
+import { drawPriceArm } from '@moldwright/cloud/billing'
 import { routes } from '@/lib/routes'
-import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
-import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@rerun/contracts'
+import { EXPERIMENT_COOKIE } from '@moldwright/analytics/experiments'
+import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@moldwright/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { User } from '@supabase/supabase-js'
-import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
+import { LOCALE_COOKIE, resolveLocale } from '@moldwright/i18n'
 import { NextResponse, type NextRequest } from 'next/server'
 
 function shouldStartAnonymousSession(request: NextRequest): boolean {

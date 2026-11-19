@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { listConnectorCatalogAction } from '@/app/api/_actions/template.actions'
-import type { ConnectorCatalog } from '@rerun/ui/new-agent'
+import type { ConnectorCatalog } from '@moldwright/ui/new-agent'
 
 let loaded: ConnectorCatalog | null = null
 let loading: Promise<ConnectorCatalog> | null = null

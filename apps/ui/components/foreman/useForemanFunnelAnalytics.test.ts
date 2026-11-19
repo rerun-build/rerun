@@ -1,9 +1,9 @@
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { emit, emitOwnAsk, viewTrialStep } from './useForemanFunnelAnalytics'
 
-vi.mock('@rerun/analytics/client', () => ({ track: vi.fn() }))
+vi.mock('@moldwright/analytics/client', () => ({ track: vi.fn() }))
 
 let seen: Set<string>
 const once = (key: string) => (seen.has(key) ? false : (seen.add(key), true))

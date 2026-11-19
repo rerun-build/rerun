@@ -1,13 +1,13 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../app/api/database.types'
-import { templateDocumentSchema, type TemplateAgent, type TemplateDocument } from '@rerun/contracts'
+import { templateDocumentSchema, type TemplateAgent, type TemplateDocument } from '@moldwright/contracts'
 import { AGENT_ARCHIVE_BUCKET, archivePath, type TemplateAgentArchive } from '../lib/templates/archives'
 import { removeCapturedAgent } from '../lib/templates/capture'
 import { rowToDocument, TEMPLATE_DOC_COLUMNS, type TemplateRow } from '../lib/templates/document'
 import { uploadPrivateFile } from '../lib/storage/private'
 import { createTemplate, updateTemplateBySlug } from '../lib/templates/write'
 import { createServiceRoleClient } from '../supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@rerun/db/helpers'
+import { selectMany, selectMaybeSingle } from '@moldwright/db/helpers'
 
 const SLUG = 'zz-verify-scratch-template'
 

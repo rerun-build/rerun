@@ -1,4 +1,4 @@
-import { Skeleton } from "@rerun/ui/primitives"
+import { Skeleton } from "@moldwright/ui/primitives"
 
 import { cn } from "@/lib/utils"
 import { PANEL_CARD } from "@/components/ui/panel-row"

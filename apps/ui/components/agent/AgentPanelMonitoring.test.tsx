@@ -2,7 +2,7 @@
 import { act, createElement, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { StatsMetric, StatsPoint, StatsQuery, UsageTimeRange } from '@rerun/contracts'
+import type { StatsMetric, StatsPoint, StatsQuery, UsageTimeRange } from '@moldwright/contracts'
 
 const values = vi.hoisted(() => ({ current: {} as Partial<Record<StatsMetric, number>> }))
 
@@ -28,7 +28,7 @@ vi.mock('@/components/ui/tooltip', () => {
     }
 })
 
-vi.mock('@rerun/ui/monitoring', () => ({
+vi.mock('@moldwright/ui/monitoring', () => ({
     StatsChart: (props: { metric: string; chartType: string; points: StatsPoint[] | null; lowerIsBetter?: boolean }) =>
         createElement('div', { 'data-chart': `${props.metric}:${props.chartType}`, 'data-points': JSON.stringify(props.points), 'data-lower': props.lowerIsBetter ? 'yes' : 'no' }),
     TokenUsageChart: () => createElement('div'),

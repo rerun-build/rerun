@@ -1,5 +1,5 @@
-import { cellText, formatText, isNumericFormat, isTruthyCell, type TableCard } from '@rerun/contracts'
-import { formatNumber } from '@rerun/i18n/format'
+import { cellText, formatText, isNumericFormat, isTruthyCell, type TableCard } from '@moldwright/contracts'
+import { formatNumber } from '@moldwright/i18n/format'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'

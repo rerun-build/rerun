@@ -1,4 +1,4 @@
-import { teamEmptyStateOf, type TeamEmptyStateAction, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamEmptyStateRow, type TeamPulse } from '@rerun/contracts'
+import { teamEmptyStateOf, type TeamEmptyStateAction, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamEmptyStateRow, type TeamPulse } from '@moldwright/contracts'
 import { useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useTranslations } from 'use-intl'

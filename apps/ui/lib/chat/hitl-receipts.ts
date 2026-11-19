@@ -1,4 +1,4 @@
-import { stripBridgePrefix } from '@rerun/contracts'
+import { stripBridgePrefix } from '@moldwright/contracts'
 
 import { hitlKindOf } from '@/lib/chat-hitl'
 

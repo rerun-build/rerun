@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { FactoryDepartment, FactorySnapshot } from '@rerun/contracts'
+import type { FactoryDepartment, FactorySnapshot } from '@moldwright/contracts'
 import { cn } from '@/lib/utils'
 import { FactoryBucket } from './FactoryBucket'
 import { FactoryInspector } from './FactoryInspector'

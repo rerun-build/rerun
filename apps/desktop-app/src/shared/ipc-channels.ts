@@ -1,4 +1,4 @@
-import type { DesktopShellCapability, DesktopShellChannel, DesktopShellPlatform } from '@rerun/contracts'
+import type { DesktopShellCapability, DesktopShellChannel, DesktopShellPlatform } from '@moldwright/contracts'
 
 export const IPC = {
     bootstrap: 'rerun-shell:bootstrap',

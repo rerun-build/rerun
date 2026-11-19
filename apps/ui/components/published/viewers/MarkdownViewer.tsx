@@ -1,7 +1,7 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { relativeDate } from '@/lib/data/friendly-columns'
 import { FileTextIcon } from '@/lib/icons'
-import { Markdown } from '@rerun/ui/markdown'
+import { Markdown } from '@moldwright/ui/markdown'
 import { ViewerPage, ViewerTopBar } from './ViewerChrome'
 
 export const DOCUMENT_CLASS = [

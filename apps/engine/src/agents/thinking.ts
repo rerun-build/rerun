@@ -1,4 +1,4 @@
-import type { Provider, AgentConfig } from '@rerun/contracts'
+import type { Provider, AgentConfig } from '@moldwright/contracts'
 import type { streamText } from 'ai'
 import { REASONING_REQUEST } from './openrouter-reasoning.js'
 import { reasoningProviderOptions } from './reasoning.js'

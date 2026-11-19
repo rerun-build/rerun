@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { factoryDigestSchema } from '@rerun/contracts'
+import { factoryDigestSchema } from '@moldwright/contracts'
 
 const base = () => ({
     stations: [],

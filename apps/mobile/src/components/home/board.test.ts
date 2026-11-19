@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type BoardAgent } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type BoardAgent } from '@moldwright/contracts'
 
 import { byRecency, foremanOnBoard, lineOf, minutesSince, moodStatus, moveIn, sectionOf, recentCoworkers, sectionsByBox, toHomeCoworkers, withPinned } from '@/components/home/board'
 

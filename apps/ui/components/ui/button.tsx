@@ -1,1 +1,1 @@
-export { Button, buttonVariants } from '@rerun/ui/primitives'
+export { Button, buttonVariants } from '@moldwright/ui/primitives'

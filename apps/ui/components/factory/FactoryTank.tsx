@@ -1,6 +1,6 @@
 'use client'
 
-import { type Tile } from '@rerun/ui/iso-grid'
+import { type Tile } from '@moldwright/ui/iso-grid'
 
 import { centreOf, toWorld } from './factory-rest'
 import { type CabinetView } from './factory-scene'

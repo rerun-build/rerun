@@ -1,1 +1,1 @@
-export * from '@rerun/ui/iso-grid/iso'
+export * from '@moldwright/ui/iso-grid/iso'

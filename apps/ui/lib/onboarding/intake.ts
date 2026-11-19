@@ -1,9 +1,9 @@
-import { kindCategory, type IntakeKind, type TemplateCategory } from '@rerun/contracts'
+import { kindCategory, type IntakeKind, type TemplateCategory } from '@moldwright/contracts'
 
 import type { ShownPlan } from '@/components/foreman/widgets/plan-card'
 import { DEFAULT_BOX_NAMES, divisionExamples } from '@/lib/onboarding/box-name-suggestions'
 
-export { DEFAULT_ROLES, INDUSTRY_ROLES, INTAKE_INDUSTRIES, looksLikeSite, rolesForIndustry } from '@rerun/contracts'
+export { DEFAULT_ROLES, INDUSTRY_ROLES, INTAKE_INDUSTRIES, looksLikeSite, rolesForIndustry } from '@moldwright/contracts'
 
 export type ForemanIntake = {
     companyUrl: string | null

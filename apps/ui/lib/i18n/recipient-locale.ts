@@ -1,7 +1,7 @@
 import type { Database } from '@/app/api/database.types'
 import { I18N_RELEASED } from '@/lib/features'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { DEFAULT_LOCALE, isStableLocale, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, isStableLocale, type Locale } from '@moldwright/i18n'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function recipientLocale(supabase: SupabaseClient<Database>, userId: string, workspaceId: number | null): Promise<Locale> {

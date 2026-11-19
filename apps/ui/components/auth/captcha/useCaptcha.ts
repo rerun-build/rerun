@@ -4,7 +4,7 @@ import { CaptchaError, type GetCaptchaToken } from '@/components/auth/captcha/ca
 import type { CaptchaWidget } from '@/components/auth/captcha/captcha-widget'
 import { mountHcaptcha } from '@/components/auth/captcha/hcaptcha-widget'
 import { mountTurnstile } from '@/components/auth/captcha/turnstile-widget'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

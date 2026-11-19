@@ -1,7 +1,7 @@
 'use client'
 
-import type { TemplateConnector } from '@rerun/contracts'
-import { type BoardAgent, TemplateBoardPreview } from '@rerun/ui/iso-grid'
+import type { TemplateConnector } from '@moldwright/contracts'
+import { type BoardAgent, TemplateBoardPreview } from '@moldwright/ui/iso-grid'
 
 import { CARD_BACKGROUND, CARD_HEIGHT, CARD_MAX_ZOOM, CARD_THEME, CARD_WIDTH, type CardTheme } from '@/lib/og/size'
 

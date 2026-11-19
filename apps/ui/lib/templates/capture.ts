@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { isSetupAnswered, type AgentArchivePlan } from '@rerun/contracts'
+import { isSetupAnswered, type AgentArchivePlan } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { patchAgent, planAgentArchive } from '@/lib/engine/client'

@@ -1,7 +1,7 @@
-import { inputDefSchema, mcpServerNameSchema, SERVICE_CATEGORIES, type InputDef } from '@rerun/contracts'
+import { inputDefSchema, mcpServerNameSchema, SERVICE_CATEGORIES, type InputDef } from '@moldwright/contracts'
 import { z } from 'zod'
 
-export { inputDefSchema, inputOptionSchema, type InputDef, type InputOption } from '@rerun/contracts'
+export { inputDefSchema, inputOptionSchema, type InputDef, type InputOption } from '@moldwright/contracts'
 
 export const mcpOAuthSchema = z.object({
     scopes: z.array(z.string()).optional(),
@@ -67,7 +67,7 @@ export const authMethodSchema = z.object({
 })
 export type AuthMethod = z.infer<typeof authMethodSchema>
 
-export { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@rerun/contracts'
+export { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@moldwright/contracts'
 
 function deriveKind(m: { inputs: InputDef[]; mcpServers: McpServerTemplate[] }): AuthMethod['kind'] {
     if (m.mcpServers.some(s => s.oauth)) return 'oauth'

@@ -23,9 +23,9 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
     NEXT_TELEMETRY_DISABLED=1
 COPY . .
 RUN --mount=type=cache,id=rerun-pnpm-store,target=/pnpm-store \
-    pnpm install --frozen-lockfile --store-dir /pnpm-store --filter rerun... --filter @rerun/contracts
+    pnpm install --frozen-lockfile --store-dir /pnpm-store --filter rerun... --filter @moldwright/contracts
 RUN --mount=type=cache,id=rerun-ui-next-cache,target=/app/apps/ui/.next/cache \
-    pnpm --filter @rerun/contracts build && pnpm --filter rerun build
+    pnpm --filter @moldwright/contracts build && pnpm --filter rerun build
 
 FROM base
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000

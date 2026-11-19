@@ -2,7 +2,7 @@ import { deleteAiConnection, updateAiConnection } from '@/app/api/_services/ai-c
 import { connectionTarget } from '@/app/api/v1/ai-connections/_lib/target'
 import { answeringConnectionErrors } from '@/app/api/v1/_lib/ai-connection-errors'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { RERUN_CONNECTION_ID, updateConnectionSchema } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, updateConnectionSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -4,7 +4,7 @@ import path from 'node:path'
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { factorySnapshotSchema, type FactoryJob, type FactorySnapshot } from '@rerun/contracts'
+import { factorySnapshotSchema, type FactoryJob, type FactorySnapshot } from '@moldwright/contracts'
 import { FactoryTopBar } from './FactoryTopBar'
 import { SAMPLE_TEXT } from './FactoryTasks'
 

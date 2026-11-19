@@ -56,7 +56,7 @@ const PACKAGED_APP = join(DESKTOP_DIR, `release/dev/mac-${process.arch}/Rerun De
 
 function buildShell(packaged) {
     log(`Building apps/desktop-app (development channel${packaged ? ', packaged' : ''}).`)
-    execFileSync('pnpm', ['--filter', '@rerun/contracts', 'build'], { cwd: REPO_ROOT, stdio: ['ignore', 'ignore', 'inherit'] })
+    execFileSync('pnpm', ['--filter', '@moldwright/contracts', 'build'], { cwd: REPO_ROOT, stdio: ['ignore', 'ignore', 'inherit'] })
     const env = { ...process.env, RERUN_DESKTOP_CHANNEL: 'dev', RERUN_DESKTOP_E2E: '1', CSC_IDENTITY_AUTO_DISCOVERY: 'false' }
     execFileSync('pnpm', ['run', packaged ? 'package:dir' : 'build'], { cwd: DESKTOP_DIR, stdio: ['ignore', 'ignore', 'inherit'], env })
 }

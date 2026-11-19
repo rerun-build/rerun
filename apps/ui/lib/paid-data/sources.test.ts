@@ -1,4 +1,4 @@
-import { paidCallReceipt, paidDataSourceOf, paidDataSourcesByTurn } from '@rerun/contracts'
+import { paidCallReceipt, paidDataSourceOf, paidDataSourcesByTurn } from '@moldwright/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { toApiMessages, type HistoryMessage } from '@/lib/chat/engine-history'

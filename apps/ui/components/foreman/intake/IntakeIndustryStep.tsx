@@ -1,7 +1,7 @@
 'use client'
 
-import { CustomOptionRow, OptionRow } from '@rerun/ui/chat'
-import type { IntakeKind } from '@rerun/contracts'
+import { CustomOptionRow, OptionRow } from '@moldwright/ui/chat'
+import type { IntakeKind } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 

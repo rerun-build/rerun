@@ -1,7 +1,7 @@
 'use client'
 
 import { ExternalLink } from 'lucide-react'
-import type { FactoryJob } from '@rerun/contracts'
+import type { FactoryJob } from '@moldwright/contracts'
 import { formatEndedAt } from './FactoryTasks'
 import { bucketJobs, bucketRow, isRejected, type Bucket } from './factory-bucket'
 import { JOB_STATE_VIEW } from './factory-state'

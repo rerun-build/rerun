@@ -2,7 +2,7 @@ import { mcpToolNameFor, resolveTransport } from './mcp.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
 import { loadToken } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
-import type { Provider } from '@rerun/contracts'
+import type { Provider } from '@moldwright/contracts'
 import type { LoadedAgent } from '../agents/types.js'
 
 export function describeConnectorState(state: ConnectorServerState, states: Map<string, ConnectorServerState>): string {

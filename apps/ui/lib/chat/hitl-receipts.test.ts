@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { billedMicrosOf } from '@rerun/contracts'
+import { billedMicrosOf } from '@moldwright/contracts'
 
 import { hitlCallBefore } from './hitl-receipts'
 

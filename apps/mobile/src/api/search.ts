@@ -1,4 +1,4 @@
-import { conversationHitSchema, type ConversationHit } from '@rerun/contracts'
+import { conversationHitSchema, type ConversationHit } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

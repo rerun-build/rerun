@@ -2,7 +2,7 @@
 
 import type { ComponentType } from 'react'
 import { useTranslations } from 'next-intl'
-import { LinkedInIcon, WhatsAppIcon } from '@rerun/ui/experts'
+import { LinkedInIcon, WhatsAppIcon } from '@moldwright/ui/experts'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { appInfo } from '@/lib/apps/catalog'
 import type { AppSlug } from '@/lib/apps/types'

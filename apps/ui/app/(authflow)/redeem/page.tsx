@@ -1,1 +1,1 @@
-export { RedeemPage as default } from '@rerun/cloud/redeem'
+export { RedeemPage as default } from '@moldwright/cloud/redeem'

@@ -28,7 +28,7 @@ vi.mock('../../runtime/hub.js', () => ({
 }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { FOREMAN_INTENT_PART } = await import('@rerun/contracts')
+const { FOREMAN_INTENT_PART } = await import('@moldwright/contracts')
 const { foremanTools } = await import('./foreman.js')
 
 type Spec = { name: string; description?: string; inputSchema?: Record<string, unknown>; kind?: 'hub' | 'intent'; serial?: boolean }

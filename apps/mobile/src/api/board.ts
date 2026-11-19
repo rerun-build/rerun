@@ -1,4 +1,4 @@
-import { agentConversationsOverviewSchema, boardAgentSchema, boxSchema, createdCoworkerSchema, type AgentConversationsOverview, type BoardAgent, type Box, type CreateCoworkerInput, type CreatedCoworker } from '@rerun/contracts'
+import { agentConversationsOverviewSchema, boardAgentSchema, boxSchema, createdCoworkerSchema, type AgentConversationsOverview, type BoardAgent, type Box, type CreateCoworkerInput, type CreatedCoworker } from '@moldwright/contracts'
 
 import { api } from '@/api/client'
 

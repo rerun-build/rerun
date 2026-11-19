@@ -1,4 +1,4 @@
-import type { CardLayout, EngineDbGroup, TableView } from '@rerun/contracts'
+import type { CardLayout, EngineDbGroup, TableView } from '@moldwright/contracts'
 import type { EngineDbColumn } from '@/lib/engine/types'
 import { ImagesIcon, KanbanIcon, ListIcon, TableIcon, type LucideIcon } from '@/lib/icons'
 import type { SqlValue } from '@/lib/data/source'

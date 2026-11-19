@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { SCENE_HEIGHT, SCENE_WIDTH } from '@rerun/emails'
+import { SCENE_HEIGHT, SCENE_WIDTH } from '@moldwright/emails'
 import type { Database } from '@/app/api/database.types'
 import { boardImageUrl } from '@/lib/og/board-image'
 import { loadTeam, teamBoardScene, type TeamMember, type TeamStatus } from '@/lib/og/team-board'

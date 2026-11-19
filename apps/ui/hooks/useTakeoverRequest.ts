@@ -6,7 +6,7 @@ import { finishTakeoverAction } from '@/app/api/_actions/desktop.actions'
 import type { TakeoverRequestState } from '@/components/chat/TakeoverAsk'
 import { serializeTakeoverResult, type TakeoverRequest } from '@/lib/chat-hitl'
 import { useDesktopStore } from '@/stores/desktop.store'
-import { siteOf } from '@rerun/contracts'
+import { siteOf } from '@moldwright/contracts'
 
 export type TakeoverAskInput = { callId: string; request: TakeoverRequest }
 

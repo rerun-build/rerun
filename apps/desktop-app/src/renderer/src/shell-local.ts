@@ -1,4 +1,4 @@
-import type { DesktopShellPlatform, DesktopUpdateState } from '@rerun/contracts'
+import type { DesktopShellPlatform, DesktopUpdateState } from '@moldwright/contracts'
 import type { FindRequest, FindResult, ServerConnectResult, ServerInfo } from '../../shared/ipc-channels'
 
 export type ShellLocalApi = {

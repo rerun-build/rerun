@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, pendingMcpSignIn, serializeMcpSignInResult, type McpServerView } from '@rerun/contracts'
+import { HITL_CANCELLED, pendingMcpSignIn, serializeMcpSignInResult, type McpServerView } from '@moldwright/contracts'
 import { Image } from 'expo-image'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'

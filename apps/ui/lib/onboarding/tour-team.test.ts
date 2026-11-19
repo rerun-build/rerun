@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { TOUR_AGENT_IDS, TOUR_HANDOFFS } from '@rerun/ui/tour/board'
-import { TOUR_TEAM_BEATS, TOUR_TEAM_STILL_BEAT, TOUR_TEAMMATES, tourTeamStateAt } from '@rerun/ui/tour/team'
+import { TOUR_AGENT_IDS, TOUR_HANDOFFS } from '@moldwright/ui/tour/board'
+import { TOUR_TEAM_BEATS, TOUR_TEAM_STILL_BEAT, TOUR_TEAMMATES, tourTeamStateAt } from '@moldwright/ui/tour/team'
 
 const HANDOFF_HOLD_MS = 5_000
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { usePrefersReducedMotion } from '@rerun/ui/iso-grid'
+import { usePrefersReducedMotion } from '@moldwright/ui/iso-grid'
 import { AnimatePresence, motion, type Transition } from 'motion/react'
 
 import type { DiscoveriesState, DiscoveryEntry } from '@/lib/company/explore/findings'

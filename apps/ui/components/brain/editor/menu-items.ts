@@ -1,7 +1,7 @@
 import type { SharedFileRef } from '@/components/brain/useSharedFilesTree'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { CodeIcon, FileIcon, Heading2, Heading3, LinkIcon, ListIcon, ListOrdered, ListTodo, MinusIcon, Quote, TypeIcon } from '@/lib/icons'
-import type { BrainPageSummary } from '@rerun/contracts'
+import type { BrainPageSummary } from '@moldwright/contracts'
 import type { useTranslations } from 'next-intl'
 
 import type { FileLinkAttrs } from './file-link'

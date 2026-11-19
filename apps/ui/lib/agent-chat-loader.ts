@@ -1,4 +1,4 @@
-import { isToolPart, toolNameOf } from '@rerun/contracts'
+import { isToolPart, toolNameOf } from '@moldwright/contracts'
 import { countSubRuns, isSubRunLive, pairSubRuns, subRunTroubleLabel, titledSubRun, type SubRunCopy } from '@/lib/chat/sub-run-progress'
 
 export type ActivityCopy = (

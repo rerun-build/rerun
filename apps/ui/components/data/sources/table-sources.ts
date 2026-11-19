@@ -1,4 +1,4 @@
-import { TABLE_SOURCES_MAX_ROWS, emailVerdictStatus, paidDataSourceOfCall, type EmailVerdictStatus, type PaidSource, type TableSourcesRequest, type TableSourcesResult } from '@rerun/contracts'
+import { TABLE_SOURCES_MAX_ROWS, emailVerdictStatus, paidDataSourceOfCall, type EmailVerdictStatus, type PaidSource, type TableSourcesRequest, type TableSourcesResult } from '@moldwright/contracts'
 
 type Row = Record<string, unknown>
 type RequestCell = TableSourcesRequest['rows'][number][string]

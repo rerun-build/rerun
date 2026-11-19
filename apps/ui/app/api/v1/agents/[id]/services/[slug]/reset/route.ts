@@ -2,7 +2,7 @@ import { actorFromContext } from '@/app/api/_auth/access'
 import { resetServiceConnection } from '@/app/api/_services/services.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { serviceKeyParam } from '@/app/api/v1/_lib/service-view'
-import type { ResetConnectionView } from '@rerun/contracts'
+import type { ResetConnectionView } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

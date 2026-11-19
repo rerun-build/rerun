@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Card } from '@rerun/ui/primitives'
+import { Badge, Card } from '@moldwright/ui/primitives'
 import { motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 

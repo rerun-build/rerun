@@ -1,7 +1,7 @@
 'use client'
 
-import { TemplateBoardPreview, type BoardAgent } from '@rerun/ui/iso-grid'
-import type { TemplateConnector } from '@rerun/contracts'
+import { TemplateBoardPreview, type BoardAgent } from '@moldwright/ui/iso-grid'
+import type { TemplateConnector } from '@moldwright/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 

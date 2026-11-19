@@ -1,6 +1,6 @@
 'use client'
 
-import { Orb, type OrbActivity } from '@rerun/ui/foreman'
+import { Orb, type OrbActivity } from '@moldwright/ui/foreman'
 import { LayoutGroup, motion } from 'motion/react'
 import { useId, type ReactNode } from 'react'
 

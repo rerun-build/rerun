@@ -2,7 +2,7 @@ import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/own
 import { loadMe } from '@/app/api/_services/me.service'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
-import { resolveLocale } from '@rerun/i18n'
+import { resolveLocale } from '@moldwright/i18n'
 import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic'

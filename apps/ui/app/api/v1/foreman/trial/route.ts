@@ -1,5 +1,5 @@
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import type { ForemanTrialResult } from '@rerun/contracts'
+import type { ForemanTrialResult } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

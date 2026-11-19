@@ -2,7 +2,7 @@
 
 import { LAYOUT_ICONS } from '@/lib/data/views'
 import { cn } from '@/lib/utils'
-import type { CardLayout } from '@rerun/contracts'
+import type { CardLayout } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 
 type LayoutTileProps = {

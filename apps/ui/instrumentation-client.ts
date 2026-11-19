@@ -1,5 +1,5 @@
-import { rememberAttribution } from '@rerun/analytics/client'
-import { analyticsAllowed, detectConsentStatus } from '@rerun/contracts'
+import { rememberAttribution } from '@moldwright/analytics/client'
+import { analyticsAllowed, detectConsentStatus } from '@moldwright/contracts'
 import { isAnalyticsSurface, startAppAnalytics, startAppSessionReplay } from '@/lib/analytics'
 
 rememberAttribution()

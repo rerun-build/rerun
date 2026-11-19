@@ -7,7 +7,7 @@ process.env.RERUN_API_KEY = ''
 
 const { describe, expect, it, beforeAll } = await import('vitest')
 const { mkdir } = await import('node:fs/promises')
-const { TABLE_SOURCES_MAX_ROWS } = await import('@rerun/contracts')
+const { TABLE_SOURCES_MAX_ROWS } = await import('@moldwright/contracts')
 const { createServer } = await import('../server.js')
 const { agentConfigSchema } = await import('../../agents/types.js')
 const { writeAgentConfig } = await import('../../agents/config-write.js')

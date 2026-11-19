@@ -1,6 +1,6 @@
 'use client'
 
-import { useStepper } from '@rerun/ui/steps'
+import { useStepper } from '@moldwright/ui/steps'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { CreateTemplateTitleStep } from '@/components/dialogs/CreateTemplateTitleStep'

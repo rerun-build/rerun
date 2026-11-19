@@ -1,6 +1,6 @@
 'use client'
 
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import { useTranslations } from 'next-intl'
 
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'

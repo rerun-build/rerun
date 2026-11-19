@@ -1,6 +1,6 @@
 import type { LucideIcon } from '@/lib/icons'
 import { Boxes, Clapperboard, Home, Layers, ListChecks, Megaphone, Scale, ShoppingBagIcon, TrendingUpIcon, UserPlus } from '@/lib/icons'
-import type { TemplateCategory } from '@rerun/contracts'
+import type { TemplateCategory } from '@moldwright/contracts'
 
 export const TEMPLATE_CATEGORY_ICONS: Record<TemplateCategory, LucideIcon> = {
     agencies: Megaphone,

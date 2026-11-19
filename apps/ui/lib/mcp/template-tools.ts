@@ -5,7 +5,7 @@ import {
     TEMPLATE_CATEGORIES,
     TEMPLATE_PRICING_MODELS,
     TEMPLATE_TITLE_MAX_LENGTH,
-} from '@rerun/contracts'
+} from '@moldwright/contracts'
 
 export const TEMPLATE_TOOL_DEFS = [
     {

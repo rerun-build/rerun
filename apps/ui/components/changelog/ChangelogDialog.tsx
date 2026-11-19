@@ -1,6 +1,6 @@
 'use client'
 
-import { StepTransition, useStepper } from '@rerun/ui/steps'
+import { StepTransition, useStepper } from '@moldwright/ui/steps'
 import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 

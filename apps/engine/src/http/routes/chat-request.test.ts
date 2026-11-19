@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { agentConfigSchema, chatRequestSchema } from '@rerun/contracts'
+import { agentConfigSchema, chatRequestSchema } from '@moldwright/contracts'
 
 describe('chatRequestSchema thinkingLevel', () => {
     it('accepts low, medium and high', () => {

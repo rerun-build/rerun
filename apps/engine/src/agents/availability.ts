@@ -1,4 +1,4 @@
-import { DEFAULT_PROVIDER_MODEL, RERUN_CONNECTION_ID, RERUN_MODEL, cliServesModel, opencodeServesModel, type AgentConfig, type Provider } from '@rerun/contracts'
+import { DEFAULT_PROVIDER_MODEL, RERUN_CONNECTION_ID, RERUN_MODEL, cliServesModel, opencodeServesModel, type AgentConfig, type Provider } from '@moldwright/contracts'
 import { liveOpencodeProviderModels } from '../connections/opencode-catalog.js'
 import { readCliModels } from '../connections/cli-models.js'
 import { readBoxDefault, writeBoxDefault } from '../connections/default.js'

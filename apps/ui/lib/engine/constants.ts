@@ -1,4 +1,4 @@
-import { RERUN_MODELS, type RerunTier } from '@rerun/contracts'
+import { RERUN_MODELS, type RerunTier } from '@moldwright/contracts'
 
 export const ENGINE_DEFAULT_PORT = 3000
 
@@ -26,4 +26,4 @@ export const RERUN_TIER_REASONING: Partial<Record<RerunTier, { effort: 'low' }>>
     fast: { effort: 'low' },
 }
 
-export { SELF_IMPROVEMENT_KEYS as ENGINE_SELF_IMPROVEMENT_KEYS, TOOL_KEYS as ENGINE_TOOL_KEYS } from '@rerun/contracts'
+export { SELF_IMPROVEMENT_KEYS as ENGINE_SELF_IMPROVEMENT_KEYS, TOOL_KEYS as ENGINE_TOOL_KEYS } from '@moldwright/contracts'

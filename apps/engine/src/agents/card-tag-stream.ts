@@ -1,5 +1,5 @@
 import type { LanguageModelMiddleware } from 'ai'
-import { HITL_TOOL_NAMES } from '@rerun/contracts'
+import { HITL_TOOL_NAMES } from '@moldwright/contracts'
 import { logger } from '../lib/logger.js'
 
 export const CARD_TAG_NAMES = Object.keys(HITL_TOOL_NAMES)

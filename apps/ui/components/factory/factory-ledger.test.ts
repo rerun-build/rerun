@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
+import type { FactoryJob, FactorySnapshot } from '@moldwright/contracts'
 import { buildLedger, chainOf, chipCounts, filterLedger } from './factory-ledger'
 
 const NOW = Date.parse('2026-11-14T12:00:00Z')

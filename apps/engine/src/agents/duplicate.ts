@@ -1,7 +1,7 @@
 import { cp, mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { relative, resolve, sep } from 'node:path'
-import { agentDuplicateResultSchema, type AgentDuplicateResult, type DuplicateAgentInput, type McpServer } from '@rerun/contracts'
+import { agentDuplicateResultSchema, type AgentDuplicateResult, type DuplicateAgentInput, type McpServer } from '@moldwright/contracts'
 import { agentDir, agentsDir, dataDir, skillsDir, soulPath, workspaceDir } from '../config/paths.js'
 import { newId } from '../lib/ids.js'
 import { badRequest } from '../lib/errors.js'

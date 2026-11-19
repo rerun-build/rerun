@@ -1,5 +1,5 @@
-import type { TemplateConnector } from '@rerun/contracts'
-import { brandIconFilter } from '@rerun/ui/brand-icon'
+import type { TemplateConnector } from '@moldwright/contracts'
+import { brandIconFilter } from '@moldwright/ui/brand-icon'
 import { useTranslations } from 'next-intl'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'

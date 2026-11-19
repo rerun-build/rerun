@@ -1,6 +1,6 @@
 import { tool, type LanguageModelMiddleware, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { isRecord } from '@rerun/contracts'
+import { isRecord } from '@moldwright/contracts'
 import { loopToolNameFor } from '../runtime/tool-repair.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, type McpCatalogEntry } from './mcp-search.js'
 

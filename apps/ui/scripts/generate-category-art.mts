@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { fal } from '@fal-ai/client'
 import sharp from 'sharp'
-import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@moldwright/contracts'
 
 const MODEL = 'openai/gpt-image-2'
 const WIDTH = 480

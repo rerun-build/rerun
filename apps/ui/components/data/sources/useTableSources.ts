@@ -1,7 +1,7 @@
 'use client'
 
 import type { DataSource } from '@/lib/data/source'
-import { TABLE_SOURCES_MAX_ROWS } from '@rerun/contracts'
+import { TABLE_SOURCES_MAX_ROWS } from '@moldwright/contracts'
 import { useCallback, useEffect, useState } from 'react'
 import { resolveTableSources, sourcesRequestRows, type RowSources } from './table-sources'
 

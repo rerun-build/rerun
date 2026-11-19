@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Stripes } from '@rerun/ui/primitives'
+import { Badge, Stripes } from '@moldwright/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 
 import type { ThreadRow } from '@/app/api/_services/conversation.service'

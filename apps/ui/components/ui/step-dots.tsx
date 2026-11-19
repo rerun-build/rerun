@@ -1,1 +1,1 @@
-export { StepDots } from '@rerun/ui/chat'
+export { StepDots } from '@moldwright/ui/chat'

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
 import { ArrowLeftIcon } from '@/lib/icons'

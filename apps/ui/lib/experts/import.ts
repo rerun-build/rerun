@@ -1,14 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { randomExpertBannerUrl } from '@rerun/db'
+import { randomExpertBannerUrl } from '@moldwright/db'
 import { rehostAvatar, rehostBanner } from './rehost'
 import { enrichExpert } from './enrich'
 import { scrapeProfile } from './scrape'
 import { detectExpertSource } from './source'
 import { canonicalXUrl, xUsername } from './x-scrape'
 import { isValidTimeZone } from './schedule/window'
-import { slugifyExpertName } from '@rerun/ui/experts/options'
+import { slugifyExpertName } from '@moldwright/ui/experts/options'
 
 export type ImportResult =
     | { url: string; ok: true; slug: string; name: string }

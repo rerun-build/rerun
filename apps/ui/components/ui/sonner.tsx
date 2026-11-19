@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { useIsMobile } from "@rerun/ui/primitives/use-is-mobile"
+import { useIsMobile } from "@moldwright/ui/primitives/use-is-mobile"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon, XIcon } from '@/lib/icons'
 
 const Toaster = ({ ...props }: ToasterProps) => {

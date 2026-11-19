@@ -3,7 +3,7 @@ import { BUILD_PHASE } from './build'
 import { DISCOVER_PHASE } from './discover'
 import { PLAN_PHASE } from './plan'
 import type { ActiveForemanPhase, PhaseSpec } from './spec'
-import { TRIAL_PHASE } from '@rerun/cloud/foreman'
+import { TRIAL_PHASE } from '@moldwright/cloud/foreman'
 
 export type { ActiveForemanPhase, PhaseSpec } from './spec'
 export { phaseTools } from './spec'

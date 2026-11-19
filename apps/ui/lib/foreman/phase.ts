@@ -1,8 +1,8 @@
-import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
+import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@moldwright/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
-import type { PriceArm } from '@rerun/cloud/billing'
-import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import type { PriceArm } from '@moldwright/cloud/billing'
+import { RERUN_CLOUD } from '@moldwright/cloud/edition'
 import type { ForemanAgentRow, ForemanSpaceRow } from './board-map'
 import type { KickoffIntent } from './kickoff-marker'
 

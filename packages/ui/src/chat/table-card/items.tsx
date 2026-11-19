@@ -1,4 +1,4 @@
-import type { CardFields } from '@rerun/contracts'
+import type { CardFields } from '@moldwright/contracts'
 
 import { cn } from '../../cn'
 import { Badge } from '../../primitives'

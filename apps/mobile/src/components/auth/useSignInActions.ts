@@ -1,4 +1,4 @@
-import { reachableChannels, type PhoneChannel } from '@rerun/contracts'
+import { reachableChannels, type PhoneChannel } from '@moldwright/contracts'
 import { useState } from 'react'
 import { useTranslations } from 'use-intl'
 

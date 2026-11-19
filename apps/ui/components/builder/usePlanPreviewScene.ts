@@ -1,6 +1,6 @@
 'use client'
 
-import { usePrefersReducedMotion } from '@rerun/ui/iso-grid'
+import { usePrefersReducedMotion } from '@moldwright/ui/iso-grid'
 import { useEffect, useMemo, useState } from 'react'
 
 import type { ShownPlan } from '@/components/foreman/widgets/plan-card'

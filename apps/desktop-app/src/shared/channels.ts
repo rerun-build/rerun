@@ -1,4 +1,4 @@
-import type { DesktopShellChannel } from '@rerun/contracts'
+import type { DesktopShellChannel } from '@moldwright/contracts'
 
 export const CHANNEL_IDENTITIES: Record<DesktopShellChannel, { appId: string; productName: string; executableName: string }> = {
     stable: { appId: 'build.rerun.desktop', productName: 'Rerun', executableName: 'rerun' },

@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-cx-loader-'))
 process.env.RERUN_API_KEY = ''
 
 const { beforeEach, describe, expect, it, vi } = await import('vitest')
-const { connectionSummarySchema } = await import('@rerun/contracts')
+const { connectionSummarySchema } = await import('@moldwright/contracts')
 const { mkdir, rm, writeFile } = await import('node:fs/promises')
 const { boxDefaultPath, connectionConfigPath, connectionDir, connectionEnvPath, connectionsDir, connectionsMigratedPath } = await import('../config/paths.js')
 const { connectionExists, isConnected, listConnectionIds, loadConnectionFromDisk, toSummary } = await import('./loader.js')

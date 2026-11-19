@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 import { Check, MinusIcon } from '@/lib/icons'
-import { BorderBeam } from "@rerun/ui"
+import { BorderBeam } from "@moldwright/ui"
 
 import { cn } from "@/lib/utils"
 

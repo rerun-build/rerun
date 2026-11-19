@@ -90,7 +90,7 @@ delegator's ledger is left to the next job.
 | Gauge: plan window | per cent used, reset time | Can. `components/connections/PlanLimitsBlock.tsx`, `lib/engine/ai-sources.ts`, `apps/engine/src/connections/plan-limits.ts`. Only the window shown by the connection; which window the owner wants here (weekly) is a choice for the build. |
 | Gauge: sign-in minutes | minutes left | Cannot as a number on a screen found. The delegator reads it from `list_ai_connections` (`renewal_hold`); not checked whether the app has the expiry. |
 | Run cost | tokens in, cached, out | Contract has `inputTokens`, `outputTokens`, `cachedInputTokens` (`packages/contracts/src/stats.ts`); whether the single run read returns them per run was not checked in `routes/runs.ts`. |
-| Goal verdict | met or not met and why | Can. `runs.ts` returns `goal` (`runGoalRecordSchema` in `@rerun/contracts`) on the list and the single run. |
+| Goal verdict | met or not met and why | Can. `runs.ts` returns `goal` (`runGoalRecordSchema` in `@moldwright/contracts`) on the list and the single run. |
 | The beat | counts per state, ended today, time of last beat | Cannot. Written by `heartbeat` in `dispatch.py` to `/state/heartbeat`. Also gives "delegator not answering" its clock. |
 | Links | issue and PR URL | Built from numbers and the repository; the repository name is not in any datum above. |
 

@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import type { AgentStatus, BoardAgent } from '@rerun/ui/iso-grid'
+import type { AgentStatus, BoardAgent } from '@moldwright/ui/iso-grid'
 import { z } from 'zod'
 
 import { CARD_HEIGHT, CARD_THEME, CARD_THEMES, CARD_WIDTH } from './size'

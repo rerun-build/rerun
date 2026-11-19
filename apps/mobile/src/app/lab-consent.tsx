@@ -1,4 +1,4 @@
-import { sleep } from '@rerun/contracts'
+import { sleep } from '@moldwright/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { View } from 'react-native'
 

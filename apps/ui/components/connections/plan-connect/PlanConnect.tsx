@@ -1,6 +1,6 @@
 'use client'
 
-import type { AiConnectionSurface } from '@rerun/analytics'
+import type { AiConnectionSurface } from '@moldwright/analytics'
 
 import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { useClaudeOAuth } from '@/components/connections/use-claude-oauth'

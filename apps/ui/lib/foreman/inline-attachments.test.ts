@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { appendAttachmentsRef, buildAttachmentsRef } from '@/lib/chat/attachments-marker'
-import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@moldwright/contracts'
 
 vi.mock('server-only', () => ({}))
 

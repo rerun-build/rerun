@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { ImageResponse } from 'next/og'
 import type { ReactNode } from 'react'
 
-import { badgeFromType, markdownToPlainText } from '@rerun/ui/experts/options'
+import { badgeFromType, markdownToPlainText } from '@moldwright/ui/experts/options'
 import { R_PATH } from '@/components/layout/Logo'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createServiceRoleClient } from '@/supabase/serviceRole'

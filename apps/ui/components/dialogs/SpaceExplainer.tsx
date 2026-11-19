@@ -2,7 +2,7 @@
 
 import { BoxExplainerScene } from '@/components/dialogs/BoxExplainerScene'
 import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
-import { useRenderedFrame } from '@rerun/ui/iso-grid'
+import { useRenderedFrame } from '@moldwright/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import type { CSSProperties } from 'react'
 

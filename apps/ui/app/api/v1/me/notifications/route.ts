@@ -1,6 +1,6 @@
 import { patchNotificationPrefs, readNotificationPrefs } from '@/app/api/_services/notification-prefs.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import { notificationPrefsPatchSchema } from '@rerun/contracts'
+import { notificationPrefsPatchSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

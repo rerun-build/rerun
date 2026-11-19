@@ -20,7 +20,7 @@ vi.mock('./notify.js', async importOriginal => {
 
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { rm } = await import('node:fs/promises')
-const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
+const { RERUN_CONNECTION_ID } = await import('@moldwright/contracts')
 const { connectionRoutes } = await import('../http/routes/connections.js')
 const { agentsDir, connectionsDir } = await import('../config/paths.js')
 const { ensureRerunConnection } = await import('../connections/store.js')

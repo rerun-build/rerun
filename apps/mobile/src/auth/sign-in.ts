@@ -1,4 +1,4 @@
-import { appSessionSchema, emailCodePreparedSchema, meSchema, phoneCodeSentSchema, signInRefusalSchema, type Me, type PhoneChannel, type PhoneCodeRequest } from '@rerun/contracts'
+import { appSessionSchema, emailCodePreparedSchema, meSchema, phoneCodeSentSchema, signInRefusalSchema, type Me, type PhoneChannel, type PhoneCodeRequest } from '@moldwright/contracts'
 
 import { api, ApiError } from '@/api/client'
 import { supabase } from '@/auth/supabase'

@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@moldwright/contracts'
 import { failInterruptedRuns, type InterruptedRun } from '../db/repos/runs.js'
 import { listAgentIndex, resetBusyAgents } from '../db/repos/agents.js'
 import { failInterruptedSkillProposals } from '../db/repos/skill-proposals.js'

@@ -1,7 +1,7 @@
 'use client'
 
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
-import { ChromePill } from '@rerun/ui/chrome'
+import { ChromePill } from '@moldwright/ui/chrome'
 import { LogInIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'

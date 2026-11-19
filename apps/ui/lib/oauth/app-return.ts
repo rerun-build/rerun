@@ -1,4 +1,4 @@
-import { desktopShellScheme, type DesktopShellChannel } from '@rerun/contracts'
+import { desktopShellScheme, type DesktopShellChannel } from '@moldwright/contracts'
 
 export const APP_RETURN_URL = 'rerun://oauth/callback'
 

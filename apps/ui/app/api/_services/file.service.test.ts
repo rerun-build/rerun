@@ -1,7 +1,7 @@
 import * as engine from '@/lib/engine/client'
 import { hashText } from '@/lib/files/editable'
 import type { EngineConnection } from '@/lib/engine/types'
-import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
+import { MAX_TEXT_WRITE_CHARS } from '@moldwright/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { saveTextFile } from './file.service'

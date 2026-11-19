@@ -1,4 +1,4 @@
-import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, type TemplateCategory } from '@moldwright/contracts'
 
 import { INDUSTRY_GLOSS } from './industry'
 

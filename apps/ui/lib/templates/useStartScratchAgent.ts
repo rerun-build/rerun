@@ -1,7 +1,7 @@
 'use client'
 
 import { useBoardStore } from '@/stores/board.store'
-import { track } from '@rerun/analytics/client'
+import { track } from '@moldwright/analytics/client'
 
 export type ScratchAgent = { name: string; serviceSlugs: string[]; kickoff: string; suggestionId: string | null }
 

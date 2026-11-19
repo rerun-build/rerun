@@ -4,7 +4,7 @@ import { emailRefused } from '@/app/api/v1/auth/_lib/refusal'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { callerIp } from '@/lib/auth/caller-ip'
 import { normalizeEmail } from '@/lib/email'
-import { emailCodeRequestSchema } from '@rerun/contracts'
+import { emailCodeRequestSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

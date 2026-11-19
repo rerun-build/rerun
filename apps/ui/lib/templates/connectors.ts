@@ -1,4 +1,4 @@
-import type { TemplateConnector } from '@rerun/contracts'
+import type { TemplateConnector } from '@moldwright/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { loadServiceCatalog } from './catalog'

@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { PauseIcon, Play } from '@/lib/icons'
 import { formatVoiceDuration } from '@/lib/voice/duration'
 import { PEAK_COUNT } from '@/lib/voice/peaks'
-import { BorderBeam } from '@rerun/ui'
+import { BorderBeam } from '@moldwright/ui'
 import { useTranslations } from 'next-intl'
 
 type VoiceMessageBubbleProps = {

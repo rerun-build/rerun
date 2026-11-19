@@ -1,7 +1,7 @@
 'use client'
 
-import { track } from '@rerun/analytics/client'
-import { DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
+import { track } from '@moldwright/analytics/client'
+import { DEFAULT_CONNECTION_MODELS } from '@moldwright/contracts'
 
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { OfferBoardPanel } from '@/components/dialogs/subscription-offer/OfferBoardPanel'

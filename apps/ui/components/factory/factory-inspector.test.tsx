@@ -2,7 +2,7 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { FactoryJob } from '@rerun/contracts'
+import type { FactoryJob } from '@moldwright/contracts'
 import { FactoryInspector } from './FactoryInspector'
 
 const NOW = Date.parse('2026-11-14T12:00:00Z')

@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { IsoGridProps } from '@rerun/ui/iso-grid'
+import type { IsoGridProps } from '@moldwright/ui/iso-grid'
 import { DROP_REFUSAL_MS, DropHint } from '../../../../packages/ui/src/iso-grid/components/DropHint'
 
 const box = { left: 10, top: 20, width: 56, height: 28 }

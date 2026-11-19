@@ -1,1 +1,1 @@
-export * from '@rerun/cloud/ui-icons'
+export * from '@moldwright/cloud/ui-icons'

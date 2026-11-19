@@ -2,7 +2,7 @@ import { addAiConnection, readAiConnectionsView } from '@/app/api/_services/ai-c
 import { answeringConnectionErrors } from '@/app/api/v1/_lib/ai-connection-errors'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { aiConnectionsForClient } from '@/app/api/v1/_lib/legacy-client'
-import { CONNECTION_TOKEN_KEY, createAiConnectionInputSchema } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, createAiConnectionInputSchema } from '@moldwright/contracts'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,4 +1,4 @@
-import type { MessageAuthor } from '@rerun/contracts'
+import type { MessageAuthor } from '@moldwright/contracts'
 import { env } from '../config/env.js'
 import { nowIso } from '../lib/ids.js'
 import { logger } from '../lib/logger.js'

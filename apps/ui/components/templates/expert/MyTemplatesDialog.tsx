@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { EmptyState } from '@/components/ui/empty-state'
 import { LayersIcon } from '@/lib/icons'
 import { useCreatorStore } from '@/stores/creator.store'
-import { CreatorPayoutsPanel, CreatorRevenuePanel, CreatorSidebarFooter, useCreatorPayouts } from '@rerun/cloud/marketplace.client'
+import { CreatorPayoutsPanel, CreatorRevenuePanel, CreatorSidebarFooter, useCreatorPayouts } from '@moldwright/cloud/marketplace.client'
 import { expertCaptureActions } from './expertCaptureActions'
 import { ExpertTemplateList } from './ExpertTemplateList'
 import { MyTemplateEditor } from './MyTemplateEditor'

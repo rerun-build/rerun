@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { routeTileLinks } from '@rerun/ui/iso-grid'
+import { routeTileLinks } from '@moldwright/ui/iso-grid'
 
 import { FactoryOverlay } from './FactoryOverlay'
 import { formatLeft } from './FactoryHold'

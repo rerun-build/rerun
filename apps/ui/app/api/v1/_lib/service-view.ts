@@ -4,7 +4,7 @@ import { getCatalogServicesBySlugs, getServiceDetails } from '@/app/api/_service
 import { appOrigin } from '@/lib/managed/oauth'
 import { mintConnectTicket } from '@/lib/oauth/mobile-ticket'
 import type { InstallResult, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
-import { type DesktopShellChannel, type InstallResultView, type PendingAuth, type ResolvedService, type ServiceSearchResultView, parseDesktopShellUserAgent, parseServiceRegistryKey } from '@rerun/contracts'
+import { type DesktopShellChannel, type InstallResultView, type PendingAuth, type ResolvedService, type ServiceSearchResultView, parseDesktopShellUserAgent, parseServiceRegistryKey } from '@moldwright/contracts'
 
 function pendingAuthOf(target: { oauth?: unknown; managed?: unknown; composio?: unknown; app?: unknown }): PendingAuth | null {
     if (target.app) return 'app'

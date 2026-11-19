@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { factoryJobStateSchema, type FactoryJob, type FactorySnapshot } from '@rerun/contracts'
+import { factoryJobStateSchema, type FactoryJob, type FactorySnapshot } from '@moldwright/contracts'
 import { buildLedger, chipCounts } from './factory-ledger'
 import { barModel } from './factory-metrics'
 import { sceneFromSnapshot } from './from-snapshot'

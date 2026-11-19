@@ -4,7 +4,7 @@ import { setBoxPlan } from '@/lib/engine/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 import { assertModelEntitled, pushBoxPlan } from './engine-plan.service'
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
+vi.mock('@moldwright/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn() }))
