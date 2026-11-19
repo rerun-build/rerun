@@ -125,9 +125,9 @@ run() {
     if ex 20 ps --status running --services 2>/dev/null | grep -qx engine; then
         echo 0 > "$OUT/skips"
         skips=0
-        chore mirror /data/tools/bin/mirror refresh rerun
-        chore janitor /data/tools/bin/wt janitor --apply
-        chore tools-update /data/tools/bin/tools-update
+        chore mirror node dist/cli/bin.js shared-env run /data/tools/bin/mirror refresh rerun
+        chore janitor node dist/cli/bin.js shared-env run /data/tools/bin/wt janitor --apply
+        chore tools-update node dist/cli/bin.js shared-env run /data/tools/bin/tools-update
         ex "$SENSE_CAP" exec -T engine /data/tools/bin/sense > "$OUT/.sense" 2>/dev/null
         if [ "$(wc -c < "$OUT/.sense")" -le 262144 ] && head -c 13 "$OUT/.sense" | grep -q '^{"version":1' && tail -c 3 "$OUT/.sense" | grep -q '}'; then
             factory=$(cat "$OUT/.sense")

@@ -27,9 +27,9 @@ case "$*" in
     cat > "$S/copied"; exit 0 ;;
   *"exec -T engine /data/tools/bin/sense"*)
     cat "$S/sense_out" 2>/dev/null; exit 0 ;;
-  *"exec -T engine /data/tools/bin/mirror"*) n=mirror ;;
-  *"exec -T engine /data/tools/bin/wt janitor"*) n=janitor ;;
-  *"exec -T engine /data/tools/bin/tools-update"*) n=tools-update ;;
+  *"exec -T engine node dist/cli/bin.js shared-env run /data/tools/bin/mirror"*) n=mirror ;;
+  *"exec -T engine node dist/cli/bin.js shared-env run /data/tools/bin/wt janitor"*) n=janitor ;;
+  *"exec -T engine node dist/cli/bin.js shared-env run /data/tools/bin/tools-update"*) n=tools-update ;;
   *"system df"*)
     echo "Images 3.2GB"; echo "Containers 0B"; echo "Local Volumes 10.5GB"; echo "Build Cache 1.1GB"; exit 0 ;;
   *"ps -a"*"project=rerun "*|*"ps -a"*"project=rerun")
@@ -229,7 +229,7 @@ class Keeper(unittest.TestCase):
         self.assertIn("mirror exit 1: mirror broke here", done.stdout)
         self.assertEqual(self.hk(), {"mirror": 1, "tools-update": 0})
         self.assertEqual(self.data()["engine"], "running")
-        ran = [c for c in self.docker_calls() if "exec -T engine /data/tools/bin/" in c and "sense" not in c]
+        ran = [c for c in self.docker_calls() if "shared-env run /data/tools/bin/" in c and "sense" not in c]
         self.assertEqual(len(ran), 2)
         self.assertTrue(all("--project-directory %s -f %s/docker-compose.yml" % (self.repo, self.repo) in c for c in ran))
 
