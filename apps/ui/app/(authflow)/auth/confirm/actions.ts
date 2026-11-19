@@ -32,5 +32,5 @@ export async function confirmLogin(formData: FormData) {
 
     const pendingInvite = cookieStore.get(PENDING_INVITE_COOKIE)?.value
     if (pendingInvite) cookieStore.delete(PENDING_INVITE_COOKIE)
-    redirect(internalPath(pendingInvite, routes.home))
+    redirect(internalPath(pendingInvite, routes.board))
 }

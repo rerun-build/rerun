@@ -14,6 +14,7 @@ import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { readHeroAgentApps, readHeroAgentName } from '@/lib/onboarding/hero-handoff'
 import { useResumePendingStart } from '@/lib/onboarding/useResumePendingStart'
+import { routes } from '@/lib/routes'
 import { nameAgentFromPromptAction } from '@/app/api/_actions/onboarding.actions'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { BOX_FIRST_INTRO, ClaimSpaceDialog, type ClaimSpaceTarget } from '@/components/dialogs/ClaimSpaceDialog'
@@ -230,7 +231,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         const foremanTakesOver = !workspace.is_sandbox && !workspace.onboarded_at
         void (async () => {
             const name = readHeroAgentName(searchParams) ?? (await nameAgentFromPromptAction(prompt))
-            router.replace('/')
+            router.replace(routes.board)
             setPendingFirstAgent({ name, serviceSlugs: readHeroAgentApps(searchParams), kickoff: prompt })
             if (foremanTakesOver) {
                 markFirstAgentFromPrompt()

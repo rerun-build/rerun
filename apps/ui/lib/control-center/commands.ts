@@ -20,6 +20,7 @@ export const CONTROL_COMMAND_IDS = [
     'notifications',
     'shortcuts',
     'whats_new',
+    'board',
     'factory',
 ] as const
 
@@ -62,6 +63,7 @@ export function buildControlCommands(gates: ControlGates, reasons: ControlReason
         gates.assistantReady && command('ask_assistant', 'actions', 'Ask the assistant', ['help', 'foreman', 'chat']),
         SUPPORT_CHAT_ENABLED && command('contact_support', 'actions', 'Contact Support', ['help', 'chat', 'crisp', 'contact', 'bug', 'question', 'talk to us']),
         command('recenter_board', 'actions', 'Recenter the board', ['camera', 'zoom', 'fit', 'reset view']),
+        command('board', 'actions', 'Board', ['workspace', 'agents', 'boxes', 'canvas']),
         command('factory', 'actions', 'Factory', ['line', 'delegator', 'builds', 'pipeline']),
         command('toggle_theme', 'actions', gates.darkTheme ? 'Switch to light theme' : 'Switch to dark theme', ['appearance', 'mode', 'dark', 'light']),
 

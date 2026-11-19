@@ -18,7 +18,7 @@ import { useDesktopSignInWaiting } from '@/components/desktop-shell/desktop-sign
 
 export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlone: boolean; showGoogle: boolean }) {
     const searchParams = useSearchParams()
-    const next = internalPath(searchParams.get('next'), routes.home)
+    const next = internalPath(searchParams.get('next'), routes.board)
     const router = useRouter()
     const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'
     const passwordOnly = searchParams.get('method') === 'password'

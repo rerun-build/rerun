@@ -28,7 +28,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     if (invite.status === 'not_found') return <Shell title={t('notFound.title')} message={t('notFound.message')} />
     if (invite.status === 'unavailable') {
         const joinedWorkspaceId = await joinedWorkspaceForInvitationAction(token)
-        if (joinedWorkspaceId !== null) redirect(`${routes.home}?${WORKSPACE_PARAM}=${joinedWorkspaceId}`)
+        if (joinedWorkspaceId !== null) redirect(`${routes.board}?${WORKSPACE_PARAM}=${joinedWorkspaceId}`)
         return <Shell title={t('unavailable.title')} message={t('unavailable.message')} />
     }
     if (invite.status === 'expired') return <Shell title={t('expired.title')} message={t('expired.message')} />
@@ -41,5 +41,5 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     const result = await acceptInvitationAction(token)
     if (!result.ok) return <Shell title={t('joinFailed')} message={result.code ? tErrors(result.code, result.params as never) : result.error} />
 
-    redirect(`${routes.home}?${WORKSPACE_PARAM}=${result.workspaceId}`)
+    redirect(`${routes.board}?${WORKSPACE_PARAM}=${result.workspaceId}`)
 }

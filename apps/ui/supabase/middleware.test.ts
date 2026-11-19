@@ -113,7 +113,7 @@ describe('updateSession', () => {
 
         const response = await updateSession(new NextRequest('https://app.rerun.build/auth'))
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board')
         expect(response.cookies.get(AUTH_COOKIE)?.value).toBe('refreshed')
         expect(response.cookies.get(AUTH_COOKIE)?.maxAge).toBe(SET_OPTIONS.maxAge)
     })
@@ -259,6 +259,12 @@ describe('updateSession', () => {
 
         it('is sent to /auth from the home page on a request that may not start a session', async () => {
             const response = await updateSession(new NextRequest('https://app.rerun.build/'))
+
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
+        })
+
+        it('is sent to /auth from the board', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/board'))
 
             expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
         })

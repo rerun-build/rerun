@@ -13,6 +13,7 @@ import { buildControlCommands, type ControlCommand, type ControlCommandId } from
 import { openCrisp } from '@/lib/crisp'
 import { parseQuery, searchItems } from '@/lib/control-center/search'
 import { BellIcon, BoxIcon, BrainIcon, CirclePlusIcon, CreditCardIcon, FocusCenterIcon, FolderIcon, GridIcon, HeadsetIcon, KeyboardIcon, KeyIcon, LockKeyholeIcon, MegaphoneIcon, MessageCircle, MessageCircleQuestionIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { routes } from '@/lib/routes'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
@@ -50,6 +51,7 @@ const COMMAND_ICONS: Record<ControlCommandId, ComponentType<{ className?: string
     ask_assistant: MessageCircleQuestionIcon,
     contact_support: HeadsetIcon,
     recenter_board: FocusCenterIcon,
+    board: BoxIcon,
     factory: GridIcon,
     toggle_theme: SunIcon,
     workspace: SettingsIcon,
@@ -220,7 +222,8 @@ export function ControlCenter() {
         ask_assistant: () => (text ? useForemanStore.getState().askForeman(query.trim()) : useForemanStore.getState().toggle()),
         contact_support: () => openCrisp(session?.user?.email),
         recenter_board: () => useBoardStore.getState().recenterBoard(),
-        factory: () => router.push('/factory'),
+        board: () => router.push(routes.board),
+        factory: () => router.push(routes.home),
         toggle_theme: () => setTheme(darkTheme ? 'light' : 'dark'),
         workspace: () => useWorkspaceSettingsStore.getState().openWorkspacePanel('workspace'),
         members: () => useWorkspaceSettingsStore.getState().openWorkspacePanel('members'),

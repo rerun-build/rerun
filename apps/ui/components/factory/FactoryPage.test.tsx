@@ -34,7 +34,7 @@ vi.mock('@/stores/board.store', () => ({
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: mocks.workspace }) }))
 
 import { SIDE_PANEL_GAP, loadSidePanelWidth } from '@/lib/side-panel-width'
-import FactoryPage from './page'
+import { FactoryPage } from './FactoryPage'
 
 const NOW = Date.parse('2026-11-14T12:00:00Z')
 const iso = (ms: number) => new Date(ms).toISOString()

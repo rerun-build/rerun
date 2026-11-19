@@ -42,7 +42,7 @@ function backToAccount(request: Request, linkError?: { code: string; provider: O
         [ACCOUNT_PARAM]: 'sign-in',
         ...(linkError ? { [ACCOUNT_LINK_ERROR_PARAM]: linkError.code, [ACCOUNT_LINK_PROVIDER_PARAM]: linkError.provider } : {}),
     })
-    const response = NextResponse.redirect(publicUrl(request, `${routes.home}?${params}`))
+    const response = NextResponse.redirect(publicUrl(request, `${routes.board}?${params}`))
     response.cookies.delete(LINK_INTENT_COOKIE)
     return response
 }
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
         if (!error && data.session) {
             const pendingInvite = linking ? undefined : cookieStore.get(PENDING_INVITE_COOKIE)?.value
             const authReturn = linking ? undefined : readAuthReturnCookie(cookieStore.get(AUTH_RETURN_COOKIE)?.value)
-            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, internalPath(pendingInvite ?? authReturn, routes.home))))
+            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, internalPath(pendingInvite ?? authReturn, routes.board))))
 
             if (pendingInvite) {
                 response.cookies.delete(PENDING_INVITE_COOKIE)
