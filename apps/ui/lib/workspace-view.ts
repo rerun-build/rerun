@@ -32,8 +32,6 @@ export function rememberWorkspaceView(view: WorkspaceView): void {
 }
 
 export type WorkspaceViewContext = {
-    // The Simple view is released to this account.
-    enabled: boolean
     preference: WorkspaceView | null
     // A workspace still in its onboarding, or one waiting for a machine: the onboarding draws on the
     // board, and a waitlist has nothing to list.
@@ -47,7 +45,6 @@ export type WorkspaceViewContext = {
 // The frame on screen. Anything that needs the grid wins over the preference, which comes back on its
 // own once the grid is no longer needed.
 export function resolveWorkspaceView(context: WorkspaceViewContext): WorkspaceView {
-    if (!context.enabled) return 'board'
     if (context.onboarding || context.waitlisted) return 'board'
     if (context.placing || context.boxless) return 'board'
     return context.preference ?? 'board'

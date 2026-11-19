@@ -35,7 +35,6 @@ import { VoiceUserMessage } from '@/components/chat/VoiceUserMessage'
 import { WebhookRunBlock } from '@/components/chat/WebhookRunBlock'
 import { ServiceInstalledBlock } from '@/components/services/ServiceInstalledBlock'
 import { PublishedChatCard } from '@/components/published/PublishedChatCard'
-import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { parseAttachments } from '@/lib/chat/attachments-marker'
 import { hitlKindOf, parseHitlReply } from '@/lib/chat-hitl'
 import type { HitlCallPart } from '@/lib/chat/hitl-receipts'
@@ -166,7 +165,6 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     const t = useTranslations('chat')
     const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
-    const publishedAccess = usePublishedAccessEnabled()
     const sources = message.role === 'assistant' ? messageSources(message) : []
     const install = message.role === 'user' ? parseInstallMessage(messageText(message)) : null
     const hitlReply = message.role === 'user' && !install ? parseHitlReply(messageText(message)) : null
@@ -267,7 +265,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                     if (out?.status === 'needs_auth') return { kind: 'standalone', key, node: <NeedsAuthCard agentId={agentId} slug={out.slug} name={out.name} /> }
                 }
                 // What a coworker published, and who can open it, where it said so.
-                if (publishedAccess && toolName === 'rerun_hub_publish_file' && toolPart.state === 'output-available') {
+                if (toolName === 'rerun_hub_publish_file' && toolPart.state === 'output-available') {
                     const out = parseHubOutput<PublishResult>(toolPart.output)
                     if (out?.status === 'published' && out.slug) return { kind: 'standalone', key, node: <PublishedChatCard agentId={agentId} result={out} /> }
                 }

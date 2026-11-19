@@ -2,7 +2,6 @@
 
 import { AGENT_TABS } from '@/components/agent/agent-tabs'
 import { AgentViewBody } from '@/components/agent/sheet/AgentViewBody'
-import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { SidePanelTabSwitcher } from '@/components/layout/SidePanelTabSwitcher'
 import { Button } from '@/components/ui/button'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
@@ -38,10 +37,8 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
     const isTemplateAuthor = useIsTemplateAuthor()
     const mood = useAgentBuddyMood(agent.id)
     const servicesNeedConfig = useConnectorServices(agent.id).needsConfig
-    const publishedAccess = usePublishedAccessEnabled()
-    // The install editor is the template author's, and the Published tab waits for its launch:
-    // anyone else sent there lands on the screen's first tab.
-    const hidden = (id: AgentViewTab) => (id === 'setup' && !isTemplateAuthor) || (id === 'published' && !publishedAccess) || !!withoutTabs?.includes(id)
+    // The install editor is the template author's: anyone else sent there lands on the screen's first tab.
+    const hidden = (id: AgentViewTab) => (id === 'setup' && !isTemplateAuthor) || !!withoutTabs?.includes(id)
     const siblings: readonly AgentViewTab[] = AGENT_SHEET_VIEWS[agentSheetViewOf(tab)]
     const shown: AgentViewTab = hidden(tab) ? (siblings.find(id => !hidden(id)) ?? siblings[0]) : tab
     const view = agentSheetViewOf(shown)

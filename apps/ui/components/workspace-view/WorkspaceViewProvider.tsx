@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, type ReactNode } from 'react'
 
-import { useSimpleViewEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { resolveWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -25,9 +24,8 @@ export function useWorkspaceViewPreference(): WorkspaceView | null {
     return chosen ?? initial
 }
 
-/** The frame the workspace is drawn in right now, and whether this account may switch at all. */
-export function useWorkspaceView(): { view: WorkspaceView; enabled: boolean } {
-    const enabled = useSimpleViewEnabled()
+/** The frame the workspace is drawn in right now. */
+export function useWorkspaceView(): { view: WorkspaceView } {
     const preference = useWorkspaceViewPreference()
     const { workspace } = useSession()
     const guided = useForemanStore(s => s.funnel === 'guided')
@@ -35,6 +33,6 @@ export function useWorkspaceView(): { view: WorkspaceView; enabled: boolean } {
     const placing = useBoardStore(s => s.placement !== null || s.placingAgentId !== null)
     const boxless = useBoardStore(s => s.hydrated && s.spaces.length === 0)
     const onboarding = guided || (!!workspace && !workspace.onboarded_at && !workspace.is_sandbox)
-    const view = resolveWorkspaceView({ enabled, preference, onboarding, waitlisted, placing, boxless })
-    return { view, enabled }
+    const view = resolveWorkspaceView({ preference, onboarding, waitlisted, placing, boxless })
+    return { view }
 }

@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 import { updatePublishPolicyAction } from '@/app/api/_actions/publish.actions'
 import { updateWorkspaceAction } from '@/app/api/_actions/workspace.actions'
-import { useLanguagePacksEnabled, usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PublishPolicyField, usePublishPolicyDraft } from '@/components/published/PublishPolicyField'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
@@ -42,9 +41,7 @@ export function WorkspaceSettingsDialog({ open, onOpenChange, fallbackIconUrl }:
     const t = useTranslations('workspace.settings')
     const { workspace, refreshWorkspace } = useSession()
     const isAdmin = useIsWorkspaceAdmin()
-    const publishedAccess = usePublishedAccessEnabled()
-    const languagePacks = useLanguagePacksEnabled()
-    const policy = usePublishPolicyDraft(open && publishedAccess && !!workspace && !workspace.is_sandbox)
+    const policy = usePublishPolicyDraft(open && !!workspace && !workspace.is_sandbox)
     if (!workspace) return null
 
     const save = async (formData: FormData): Promise<ActionResult> => {
@@ -64,7 +61,7 @@ export function WorkspaceSettingsDialog({ open, onOpenChange, fallbackIconUrl }:
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
-                {open && <WorkspaceSettingsForm workspace={workspace} fallbackIconUrl={fallbackIconUrl} onSave={save} onCancel={() => onOpenChange(false)} extra={policyField} showLanguage={languagePacks} disabledReason={isAdmin ? undefined : t('adminOnly')} />}
+                {open && <WorkspaceSettingsForm workspace={workspace} fallbackIconUrl={fallbackIconUrl} onSave={save} onCancel={() => onOpenChange(false)} extra={policyField} showLanguage disabledReason={isAdmin ? undefined : t('adminOnly')} />}
             </DialogContent>
         </Dialog>
     )

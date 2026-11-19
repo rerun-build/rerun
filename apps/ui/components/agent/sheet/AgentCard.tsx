@@ -54,7 +54,6 @@ type AgentCardProps = {
     onShare: () => void
     onDelete: () => void
     onOpenComputer: () => void
-    computerEnabled: boolean
     working: boolean
     servicesNeedConfig: boolean
     // Why what needs the machine is out of reach: the workspace is paused or has none yet.
@@ -67,7 +66,7 @@ type AgentCardProps = {
  * Who the coworker is, what it has at hand and the screen it is looking at. A glance, never a full
  * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
  */
-export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason, presentation = 'floating' }: AgentCardProps) {
+export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, working, servicesNeedConfig, needsMachineReason, presentation = 'floating' }: AgentCardProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
     const canManage = useCanManageAgent(agent.id)
@@ -98,7 +97,7 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
                         <DestinationRow key={tab} tab={tab} onClick={event => onOpen(tab, event.currentTarget, 'row')} />
                     ))}
                 </div>
-                {computerEnabled && <AgentComputerThumbnail key={`${agent.id}:${needsMachineReason}`} agentId={agent.id} working={working} disabledReason={needsMachineReason} onOpen={onOpenComputer} />}
+                <AgentComputerThumbnail key={`${agent.id}:${needsMachineReason}`} agentId={agent.id} working={working} disabledReason={needsMachineReason} onOpen={onOpenComputer} />
             </div>
             <div className="shrink-0 space-y-2 border-t border-border p-3">
                 <div className="grid grid-cols-2 gap-2">

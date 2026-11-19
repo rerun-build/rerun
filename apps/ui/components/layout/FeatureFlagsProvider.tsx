@@ -3,40 +3,15 @@
 import { createContext, useContext, useMemo, type PropsWithChildren } from 'react'
 import { APP_SLUGS, type AppSlug } from '@rerun/cloud/apps'
 
-export type FeatureFlags = { computer: boolean; published: boolean; i18n?: boolean; vault?: boolean; simpleView?: boolean; remoteComputers?: boolean; apps: Partial<Record<AppSlug, boolean>> }
+export type FeatureFlags = { apps: Partial<Record<AppSlug, boolean>> }
 
-// Tout à `false` par défaut : un composant rendu hors du provider, comme les menus de toolbar
-// repris par le kit de marque, tombe du côté masqué sans avoir à le dire.
-const FeatureFlagsContext = createContext<FeatureFlags>({ computer: false, published: false, apps: {} })
+// No paid app by default: a component rendered outside the provider, like the toolbar menus the brand
+// kit reuses, falls on the hidden side without having to say so.
+const FeatureFlagsContext = createContext<FeatureFlags>({ apps: {} })
 
-export function FeatureFlagsProvider({ computer, published, i18n = false, vault = false, simpleView = false, remoteComputers = false, apps, children }: PropsWithChildren<FeatureFlags>) {
-    const value = useMemo(() => ({ computer, published, i18n, vault, simpleView, remoteComputers, apps }), [computer, published, i18n, vault, simpleView, remoteComputers, apps])
+export function FeatureFlagsProvider({ apps, children }: PropsWithChildren<FeatureFlags>) {
+    const value = useMemo(() => ({ apps }), [apps])
     return <FeatureFlagsContext.Provider value={value}>{children}</FeatureFlagsContext.Provider>
-}
-
-export function useComputerEnabled() {
-    return useContext(FeatureFlagsContext).computer
-}
-
-export function usePublishedAccessEnabled() {
-    return useContext(FeatureFlagsContext).published
-}
-
-export function useLanguagePacksEnabled() {
-    return useContext(FeatureFlagsContext).i18n ?? false
-}
-
-export function useVaultEnabled() {
-    return useContext(FeatureFlagsContext).vault ?? false
-}
-
-// Computers: the dialog of the workspace menu, linking from the desktop app, `#` in the composer.
-export function useRemoteComputersEnabled() {
-    return useContext(FeatureFlagsContext).remoteComputers ?? false
-}
-
-export function useSimpleViewEnabled() {
-    return useContext(FeatureFlagsContext).simpleView ?? false
 }
 
 export function usePaidAppEnabled(slug: AppSlug) {

@@ -24,7 +24,6 @@ import { ProfilePanel } from '@/components/account/ProfilePanel'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
 import { DIALOG_TABS_CONTENT } from '@/components/dialogs/DialogTabs'
-import { useLanguagePacksEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PHONE_ENABLED } from '@rerun/cloud/phone'
 import { PhoneChangeForm } from '@rerun/cloud/phone.client'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -271,9 +270,8 @@ const TAB_CONTENT: Record<AccountTab, () => ReactNode> = {
 export function AccountDialog() {
     const { open, tab: requestedTab, setOpen, setTab } = useAccountStore()
     const t = useTranslations('account')
-    const showLanguage = useLanguagePacksEnabled()
     const showDesktop = useSyncExternalStore(noSubscription, () => desktopShell('settings') !== null, () => false)
-    const tab = (requestedTab === 'language' && !showLanguage) || (requestedTab === 'desktop' && !showDesktop) ? 'profile' : requestedTab
+    const tab = requestedTab === 'desktop' && !showDesktop ? 'profile' : requestedTab
     const { description } = useAccountTabText(tab)
     const TabContent = TAB_CONTENT[tab]
 
@@ -283,7 +281,7 @@ export function AccountDialog() {
                 <AccountTabs
                     tab={tab}
                     onTabChange={setTab}
-                    showLanguage={showLanguage}
+                    showLanguage
                     showDesktop={showDesktop}
                     header={
                         <DialogHeaderBar icon={UserRoundIcon} title={t('title')} description={description} />

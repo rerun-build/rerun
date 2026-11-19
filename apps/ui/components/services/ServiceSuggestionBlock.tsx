@@ -3,7 +3,6 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { getCatalogServicesBySlugsAction, getServiceAlternativesAction, getServiceDetailsAction } from '@/app/api/_actions/services.actions'
 import { attachVaultEntryAction, coworkerVaultAction } from '@/app/api/_actions/vault.actions'
-import { useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ServiceAlternatives } from '@/components/services/ServiceAlternatives'
 import { connectsInOneClick, ServiceConfigForm } from '@/components/services/ServiceConfigForm'
@@ -94,7 +93,6 @@ function buildSummary(resolved: ResolvedService[], statuses: Record<string, Card
 }
 
 export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: ServiceSuggestionBlockProps) {
-    const vaultEnabled = useVaultEnabled()
     // The caller rebuilds this array on every one of its renders, so keying the load below on its
     // identity would re-fetch and reset the cards each time. Key on the content instead.
     const servicesKey = services.map(s => `${s.slug}\0${s.reason ?? ''}`).join('\x01')
@@ -112,7 +110,7 @@ export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: Se
                 Promise.all(slugs.map(slug => getServiceDetailsAction(agentId, slug))),
                 getCatalogServicesBySlugsAction(slugs),
                 getServiceAlternativesAction(slugs),
-                vaultEnabled ? coworkerVaultAction(agentId) : null,
+                coworkerVaultAction(agentId),
             ])
             if (cancelled) return
             const iconBySlug = new Map(catalog.map(c => [c.slug, c.icon]))
@@ -122,7 +120,7 @@ export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: Se
         return () => {
             cancelled = true
         }
-    }, [agentId, servicesKey, vaultEnabled])
+    }, [agentId, servicesKey])
 
     useEffect(() => {
         if (!resolved || resolved.length > 0 || answeredEmptyRef.current) return

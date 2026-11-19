@@ -5,7 +5,6 @@ import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVau
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { vaultFlag } from '@/flags'
 import { findWorkspaceEngine } from './workspace-engine.service'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
@@ -21,7 +20,6 @@ import {
     renameVaultEntry,
     shareVaultEntry,
     vaultEntryUsage,
-    vaultWritesEnabled,
     coworkerVault,
 } from './vault.service'
 
@@ -29,7 +27,6 @@ vi.mock('server-only', () => ({}))
 vi.mock('@/lib/vault/copies', () => ({ dropMigrationCopy: vi.fn(async () => {}) }))
 vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async () => {}) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsVaultRename: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
 vi.mock('@/lib/engine/vault-client', () => ({
@@ -126,14 +123,6 @@ describe('the Vault of a box', () => {
     it('is out of reach on a box whose engine keeps none', async () => {
         vi.mocked(supportsVault).mockResolvedValue(false)
         await expect(listVault(admin)).rejects.toBeInstanceOf(VaultUnavailableError)
-    })
-
-    it('takes new connectors for everyone and for the engine itself, on a box that keeps a Vault', async () => {
-        expect(await vaultWritesEnabled(conn, admin)).toBe(true)
-        expect(await vaultWritesEnabled(conn, workspace)).toBe(true)
-        expect(vaultFlag).not.toHaveBeenCalled()
-        vi.mocked(supportsVault).mockResolvedValue(false)
-        expect(await vaultWritesEnabled(conn, admin)).toBe(false)
     })
 })
 

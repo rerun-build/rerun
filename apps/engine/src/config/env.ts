@@ -40,20 +40,12 @@ export function setEnv(values: Partial<Pick<Env, 'RERUN_API_KEY' | 'RERUN_HUB_BA
     if (cached) cached = { ...cached, ...values }
 }
 
-// Until the desktop is released a box has no screen, no computer tools and installs none of its
-// packages. Flipping this opens it on every box at its next update.
-const DESKTOP_RELEASED = true
-
+// `RERUN_DESKTOP=off` keeps the screen, the computer tools and their packages off this box.
 export function desktopEnabled(): boolean {
-    const flag = env().RERUN_DESKTOP
-    return flag === 'on' || (DESKTOP_RELEASED && flag !== 'off')
+    return env().RERUN_DESKTOP !== 'off'
 }
 
-// Until computers are released a box refuses their socket and offers no `remote_*` tool. Flipping
-// this opens them on every box at its next update.
-const REMOTE_COMPUTERS_RELEASED = true
-
+// `RERUN_REMOTE_COMPUTERS=off` refuses the computers' socket and offers no `remote_*` tool.
 export function remoteComputersEnabled(): boolean {
-    const flag = env().RERUN_REMOTE_COMPUTERS
-    return flag === 'on' || (REMOTE_COMPUTERS_RELEASED && flag !== 'off')
+    return env().RERUN_REMOTE_COMPUTERS !== 'off'
 }

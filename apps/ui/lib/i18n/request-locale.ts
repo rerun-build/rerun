@@ -1,9 +1,8 @@
 import 'server-only'
 
-import { i18nFlag } from '@/flags'
 import { TIME_ZONE_COOKIE, validTimeZone } from '@/lib/i18n/time-zone'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
-import { DEFAULT_LOCALE, LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@rerun/i18n'
+import { LOCALE_COOKIE, matchLocale, PSEUDO_LOCALE, resolveLocale, type AppLocale } from '@rerun/i18n'
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
 
@@ -24,9 +23,7 @@ export const requestLocale = cache(async (): Promise<AppLocale> => {
     if (cookie === PSEUDO_LOCALE && process.env.NODE_ENV !== 'production') return PSEUDO_LOCALE
 
     const userLocale = matchLocale(cookie) ? null : await storedAccountLocale(cookieStore)
-    const locale = resolveLocale({ userLocale, cookie, acceptLanguage: (await headers()).get('accept-language') })
-    if (locale === DEFAULT_LOCALE) return locale
-    return (await i18nFlag()) ? locale : DEFAULT_LOCALE
+    return resolveLocale({ userLocale, cookie, acceptLanguage: (await headers()).get('accept-language') })
 })
 
 export async function requestTimeZone(): Promise<string | undefined> {

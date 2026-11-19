@@ -1,7 +1,6 @@
 'use client'
 
 import { useAgentTabs } from '@/components/agent/agent-tabs'
-import { useComputerEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
@@ -97,7 +96,6 @@ export function ControlCenter() {
     const { workspace, session } = useSession()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const { needsMachineReason } = useWorkspaceAccess()
-    const desktopEnabled = useComputerEnabled()
     const isTemplateAuthor = useIsTemplateAuthor()
     const assistantReady = useForemanStore(s => selectForemanVisible(s) && s.funnel === 'companion')
     const assistantOpen = useForemanStore(selectForemanOpen)
@@ -307,20 +305,18 @@ export function ControlCenter() {
         const tabRows = searchItems(tabs, text).map((tab): ControlRow => ({ id: `tab-${tab.id}`, label: tab.label, detail: tab.description, leading: { kind: 'icon', icon: tab.icon }, onSelect: run(() => board.focusAgentOnBoard(agent.id, tab.id)) }))
 
         const actions: (ControlRow & { keywords?: string[] })[] = []
-        if (desktopEnabled) {
-            actions.push({
-                id: 'agent-desktop',
-                label: t('agent.desktop'),
-                detail: t('agent.desktopDetail'),
-                keywords: ['screen', 'browser', 'computer'],
-                leading: { kind: 'icon', icon: MonitorIcon },
-                disabledReason: needsMachineReason,
-                onSelect: run(() => {
-                    board.focusAgentOnBoard(agent.id)
-                    useDesktopStore.getState().openDesktop(agent.id)
-                }),
-            })
-        }
+        actions.push({
+            id: 'agent-desktop',
+            label: t('agent.desktop'),
+            detail: t('agent.desktopDetail'),
+            keywords: ['screen', 'browser', 'computer'],
+            leading: { kind: 'icon', icon: MonitorIcon },
+            disabledReason: needsMachineReason,
+            onSelect: run(() => {
+                board.focusAgentOnBoard(agent.id)
+                useDesktopStore.getState().openDesktop(agent.id)
+            }),
+        })
         if (spaces.length > 1) {
             const enter = drill({ kind: 'move', agentId: agent.id })
             actions.push({ id: 'agent-move', label: t('agent.move'), detail: boxName(agent.spaceId), keywords: ['box', 'team'], leading: { kind: 'icon', icon: BoxIcon }, onSelect: enter, onDrill: enter })

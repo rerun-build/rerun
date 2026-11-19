@@ -602,9 +602,6 @@ importers:
       fflate:
         specifier: ^0.8.2
         version: 0.8.3
-      flags:
-        specifier: ^4.3.0
-        version: 4.3.0(@opentelemetry/api@1.9.1)(next@16.4.6)(react-dom@19.2.4)(react@19.2.4)
       input-otp:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@19.2.4)(react@19.2.4)
@@ -2361,11 +2358,6 @@ packages:
     dependencies:
       '@noble/ciphers': 1.3.0
     dev: true
-
-  /@edge-runtime/cookies@5.0.2:
-    resolution: {integrity: sha512-Sd8LcWpZk/SWEeKGE8LT6gMm5MGfX/wm+GPnh1eBEtCpya3vYqn37wYknwAHw92ONoyyREl1hJwxV/Qx2DWNOg==}
-    engines: {node: '>=16'}
-    dev: false
 
   /@electric-sql/client@1.0.14:
     resolution: {integrity: sha512-LtPAfeMxXRiYS0hyDQ5hue2PjljUiK9stvzsVyVb4nwxWQxfOWTSF42bHTs/o5i3x1T4kAQ7mwHpxa4A+f8X7Q==}
@@ -14909,31 +14901,6 @@ packages:
       locate-path: 6.0.0
       path-exists: 4.0.0
     dev: true
-
-  /flags@4.3.0(@opentelemetry/api@1.9.1)(next@16.4.6)(react-dom@19.2.4)(react@19.2.4):
-    resolution: {integrity: sha512-e4L4QBxGCMNTFzwleCBP1dSl4tET6t3Iv2REfMtBdfMNsD700s0LbgDgS8SsxkRpWrtJamRhsVqaqUwZaCyhtQ==}
-    peerDependencies:
-      '@opentelemetry/api': ^1.7.0
-      next: 16.4.6
-      react: '*'
-      react-dom: '*'
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      next:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-    dependencies:
-      '@edge-runtime/cookies': 5.0.2
-      '@opentelemetry/api': 1.9.1
-      jose: 5.10.0
-      next: 16.4.6(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@20.19.41)(react-dom@19.2.4)(react@19.2.4)
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-    dev: false
 
   /flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}

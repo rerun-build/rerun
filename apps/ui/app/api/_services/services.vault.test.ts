@@ -7,7 +7,7 @@ import { createVaultItem, detachVaultItem, getVaultItem, patchVaultItem } from '
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { assertCanChangeItem, vaultWritesEnabled } from './vault.service'
+import { assertCanChangeItem } from './vault.service'
 import { supportsVault } from '@/lib/engine/client'
 import { installService, resetServiceConnection, uninstallService } from './services.service'
 
@@ -28,7 +28,6 @@ vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({
 vi.mock('./vault.service', async () => ({
     VaultUnavailableError: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).VaultUnavailableError,
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
-    vaultWritesEnabled: vi.fn(async () => true),
     vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1', workspaceId: 7 }, byEngineId: new Map() })),
     assertCanChangeItem: vi.fn(async () => {}),
 }))
@@ -54,7 +53,6 @@ const entry = (over: Partial<RegistryEntry> = {}): RegistryEntry => ({ status: '
 beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(readRegistry).mockResolvedValue({ services: {} })
-    vi.mocked(vaultWritesEnabled).mockResolvedValue(true)
     vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'services' ? { data: { manifest: MANIFEST, enabled: true } } : undefined)).client)
 })
 
@@ -128,21 +126,13 @@ describe('installService on a box that keeps a Vault', () => {
     })
 })
 
-describe('installService on a box without a Vault, or with the feature off', () => {
+describe('installService on a box without a Vault', () => {
     it('never reads the registry for the Vault on a box that keeps none', async () => {
         vi.mocked(supportsVault).mockResolvedValue(false)
         await installService('agent-1', 'linear', {}, 'oauth')
         expect(compileService).toHaveBeenCalled()
         expect(readRegistry).not.toHaveBeenCalled()
         vi.mocked(supportsVault).mockResolvedValue(true)
-    })
-
-    it('installs in the coworker folder as before', async () => {
-        vi.mocked(vaultWritesEnabled).mockResolvedValue(false)
-        await installService('agent-1', 'linear', {}, 'oauth')
-        expect(compileService).toHaveBeenCalled()
-        expect(compileIntoVault).not.toHaveBeenCalled()
-        expect(createVaultItem).not.toHaveBeenCalled()
     })
 })
 

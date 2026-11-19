@@ -8,11 +8,10 @@ import { LayoutGridIcon } from '@/lib/icons'
 import { useWorkspaceViewStore } from '@/stores/workspace-view.store'
 
 // A plain row of the workspace menu, like the theme's: the icons take the click, the menu stays open on
-// the view it switched to. Absent for an account the Simple view is not released to.
+// the view it switched to.
 export function ViewMenuRow() {
     const t = useTranslations('workspaceView.switch')
-    const { view, enabled } = useWorkspaceView()
-    if (!enabled) return null
+    const { view } = useWorkspaceView()
     return (
         <div className="flex items-center gap-2 px-1.5 py-1 text-sm text-muted-foreground">
             <LayoutGridIcon className="size-4" />

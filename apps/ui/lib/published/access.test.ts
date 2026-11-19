@@ -1,28 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { coworkerAccessMessage, effectivePolicy, humanMayGrant, inviteAllows, resolveCoworkerAccess, shownPolicy } from './access'
+import { coworkerAccessMessage, effectivePolicy, humanMayGrant, inviteAllows, resolveCoworkerAccess } from './access'
 
 describe('effectivePolicy', () => {
-    it('keeps every link public before the launch for a workspace that picked nothing', () => {
-        expect(effectivePolicy(null, false)).toBe('legacy')
-        expect(effectivePolicy(null, true)).toBe('people')
-        expect(effectivePolicy('never', false)).toBe('never')
-        expect(effectivePolicy('bogus', true)).toBe('people')
-    })
-})
-
-describe('shownPolicy', () => {
-    it('shows what a coworker does for a workspace that picked nothing', () => {
-        expect(shownPolicy(null, false)).toBe('anyone')
-        expect(shownPolicy(null, true)).toBe('people')
-        expect(shownPolicy('people', false)).toBe('people')
-        expect(shownPolicy('never', true)).toBe('never')
+    it('gives the default policy to a workspace that picked none', () => {
+        expect(effectivePolicy(null)).toBe('people')
+        expect(effectivePolicy('never')).toBe('never')
+        expect(effectivePolicy('bogus')).toBe('people')
     })
 })
 
 describe('resolveCoworkerAccess', () => {
-    it('starts a new link for the members, or public before the launch', () => {
+    it('starts a new link for the members', () => {
         expect(resolveCoworkerAccess({ policy: 'people' })).toEqual({ access: 'workspace', requestedAccess: null })
-        expect(resolveCoworkerAccess({ policy: 'legacy' })).toEqual({ access: 'public', requestedAccess: null })
     })
 
     it('keeps the current access on a republish that names none', () => {

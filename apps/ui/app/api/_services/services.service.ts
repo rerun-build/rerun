@@ -11,7 +11,7 @@ import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachV
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { decompileMigrationCopy } from '@/lib/vault/copies'
-import { VaultUnavailableError, assertCanChangeItem, rethrowConflict, vaultContext, vaultWritesEnabled, type VaultContext } from '@/app/api/_services/vault.service'
+import { VaultUnavailableError, assertCanChangeItem, rethrowConflict, vaultContext, type VaultContext } from '@/app/api/_services/vault.service'
 import { AccessDeniedError } from '@/app/api/_auth/access'
 import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
 import { AppError } from '@/lib/i18n/action-error'
@@ -524,7 +524,7 @@ type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemI
 
 // Where an install goes. The Vault item the coworker already draws this account from, which only
 // someone allowed to change it for every coworker using it may compile again. A new account goes to
-// the Vault when the box keeps one and the feature is on, unless the coworker already holds the app
+// the Vault when the box keeps one, unless the coworker already holds the app
 // in its own folder (it is reconfigured where it is) or its sign-in is one the Vault does not hold yet.
 async function vaultInstallTarget(agentId: string, key: string, methodKind: string, actor?: Actor): Promise<VaultInstallTarget | null> {
     const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
@@ -532,7 +532,7 @@ async function vaultInstallTarget(agentId: string, key: string, methodKind: stri
     if (!(await supportsVault(conn))) return null
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (entry && !entry.vaultItemId) return null
-    if (!entry && (!VAULT_METHOD_KINDS.has(methodKind) || !(await vaultWritesEnabled(conn, actor)))) return null
+    if (!entry && !VAULT_METHOD_KINDS.has(methodKind)) return null
     // An entry of the Vault is never compiled into a sign-in the Vault does not hold yet.
     if (entry?.vaultItemId && !VAULT_METHOD_KINDS.has(methodKind)) throw new AccessDeniedError('vaultMethodUnsupported')
     const ctx = await vaultContext(actor)

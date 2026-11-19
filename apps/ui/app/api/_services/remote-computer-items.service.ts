@@ -6,17 +6,14 @@ import { resolveMemberIdentities } from '@/app/api/_services/members.service'
 import { hasLinkedComputers, listWorkspaceComputers, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
 import type { ComputerItem, ComputersList, ComputerStatus } from '@/lib/computers/types'
 import { AppError } from '@/lib/i18n/action-error'
-import { REMOTE_COMPUTERS_RELEASED } from '@/lib/features'
-import { releasedOrEarlyAccess } from '@/flags'
 
 // A visitor who has not created an account has a workspace too, and no computers.
 export function assertComputersFor(ctx: WorkspaceContext): void {
     if (ctx.authUser.is_anonymous) throw new AppError('computersOff')
 }
 
-// The flag, for a caller known by its bearer token (the iOS app) rather than by the browser's cookies.
 export function computersOpenTo(ctx: WorkspaceContext): boolean {
-    return !ctx.authUser.is_anonymous && releasedOrEarlyAccess(REMOTE_COMPUTERS_RELEASED, ['rerun.local'])({ entities: { user: ctx.userEmail ? { email: ctx.userEmail.toLowerCase() } : undefined } })
+    return !ctx.authUser.is_anonymous
 }
 
 // An admin, or the person who linked it.

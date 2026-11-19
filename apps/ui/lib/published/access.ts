@@ -1,5 +1,3 @@
-import { PUBLISHED_ACCESS_RELEASED } from '@/lib/features'
-
 export const PUBLISHED_ACCESS_MODES = ['public', 'workspace', 'password', 'invited'] as const
 export type PublishedAccess = (typeof PUBLISHED_ACCESS_MODES)[number]
 
@@ -7,10 +5,6 @@ export const PUBLISH_POLICIES = ['people', 'anyone', 'never'] as const
 export type PublishPolicy = (typeof PUBLISH_POLICIES)[number]
 
 export const DEFAULT_PUBLISH_POLICY: PublishPolicy = 'people'
-
-// Before the launch, a workspace that never picked a policy publishes like it always did: every
-// link public, whoever asks. Picking one in the settings (early access) opts the workspace in.
-export type EffectivePolicy = PublishPolicy | 'legacy'
 
 export function isPublishedAccess(value: unknown): value is PublishedAccess {
     return typeof value === 'string' && (PUBLISHED_ACCESS_MODES as readonly string[]).includes(value)
@@ -20,22 +14,14 @@ export function isPublishPolicy(value: unknown): value is PublishPolicy {
     return typeof value === 'string' && (PUBLISH_POLICIES as readonly string[]).includes(value)
 }
 
-export function effectivePolicy(stored: string | null | undefined, released = PUBLISHED_ACCESS_RELEASED): EffectivePolicy {
-    if (isPublishPolicy(stored)) return stored
-    return released ? DEFAULT_PUBLISH_POLICY : 'legacy'
-}
-
-// What the settings show: before the launch, a workspace that picked nothing lets its coworkers
-// make links public, so that is the choice ticked, and picking another one is a change to save.
-export function shownPolicy(stored: string | null | undefined, released = PUBLISHED_ACCESS_RELEASED): PublishPolicy {
-    const policy = effectivePolicy(stored, released)
-    return policy === 'legacy' ? 'anyone' : policy
+export function effectivePolicy(stored: string | null | undefined): PublishPolicy {
+    return isPublishPolicy(stored) ? stored : DEFAULT_PUBLISH_POLICY
 }
 
 export type AccessResolution = { access: PublishedAccess; requestedAccess: 'public' | null }
 
 type CoworkerRequest = {
-    policy: EffectivePolicy
+    policy: PublishPolicy
     requested?: PublishedAccess
     current?: { access: PublishedAccess; requestedAccess: 'public' | null }
 }
@@ -46,16 +32,16 @@ type CoworkerRequest = {
 export function resolveCoworkerAccess({ policy, requested, current }: CoworkerRequest): AccessResolution {
     if (!requested) {
         if (current) return current
-        return { access: policy === 'legacy' ? 'public' : 'workspace', requestedAccess: null }
+        return { access: 'workspace', requestedAccess: null }
     }
     if (requested !== 'public') return { access: requested, requestedAccess: null }
-    if (policy === 'legacy' || policy === 'anyone' || current?.access === 'public') return { access: 'public', requestedAccess: null }
+    if (policy === 'anyone' || current?.access === 'public') return { access: 'public', requestedAccess: null }
 
     const fallback = current?.access ?? 'workspace'
     return { access: fallback, requestedAccess: policy === 'people' ? 'public' : null }
 }
 
-export function humanMayGrant(policy: EffectivePolicy, access: PublishedAccess): boolean {
+export function humanMayGrant(policy: PublishPolicy, access: PublishedAccess): boolean {
     return access !== 'public' || policy !== 'never'
 }
 

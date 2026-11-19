@@ -14,7 +14,7 @@ import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
 import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
-import { useEnabledPaidApps, useRemoteComputersEnabled, useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
 import { ComputersDialog } from '@/components/computers/ComputersDialog'
 import { VaultDialog } from '@/components/vault/VaultDialog'
 import { vaultSignedOutCountAction } from '@/app/api/_actions/vault.actions'
@@ -116,16 +116,14 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const [powerAction, setPowerAction] = useState<PowerAction | null>(null)
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace))
-    const vaultEnabled = useVaultEnabled()
-    const computersEnabled = useRemoteComputersEnabled()
     // Brain, AI providers and the Vault all live on the workspace's machine, and a workspace gets one
     // only once it is on a plan.
     const needsPlan = useNeedsPlanToConnect()
     // Entries of the Vault waiting on a sign-in: read on mount and each time the menu opens.
     const [vaultSignedOut, setVaultSignedOut] = useState(0)
     const refreshVaultSignedOut = useCallback(() => {
-        if (vaultEnabled) void vaultSignedOutCountAction().then(setVaultSignedOut)
-    }, [vaultEnabled])
+        void vaultSignedOutCountAction().then(setVaultSignedOut)
+    }, [])
     useEffect(refreshVaultSignedOut, [refreshVaultSignedOut])
     const credit = useRerunCredit()
     // A list beside the menu has no room on a phone: there the header unfolds it in place instead.
@@ -276,23 +274,19 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     {t('aiProviders')}
                 </DropdownMenuItem>
             </DisabledWithReason>
-            {vaultEnabled && (
-                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
-                    <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
-                        <LockIcon className="size-4" />
-                        {t('vault')}
-                        {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
-                    </DropdownMenuItem>
-                </DisabledWithReason>
-            )}
-            {computersEnabled && (
-                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
-                    <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
-                        <MonitorIcon className="size-4" />
-                        {t('computers')}
-                    </DropdownMenuItem>
-                </DisabledWithReason>
-            )}
+            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
+                    <LockIcon className="size-4" />
+                    {t('vault')}
+                    {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+                </DropdownMenuItem>
+            </DisabledWithReason>
+            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
+                    <MonitorIcon className="size-4" />
+                    {t('computers')}
+                </DropdownMenuItem>
+            </DisabledWithReason>
             {apiKeysItem}
             {SERVERS_ENABLED && (
                 <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
@@ -488,16 +482,14 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
             <ApiKeysDialog open={panel === 'api_keys'} onOpenChange={open => setPanel(open ? 'api_keys' : null)} />
             {SERVERS_ENABLED && <ServersDialog open={serversOpen} onOpenChange={setServersOpen} />}
             <AiProvidersDialog open={panel === 'ai_providers'} onOpenChange={open => setPanel(open ? 'ai_providers' : null)} />
-            {vaultEnabled && (
-                <VaultDialog
-                    open={panel === 'vault'}
-                    onOpenChange={open => {
-                        setPanel(open ? 'vault' : null)
-                        if (!open) refreshVaultSignedOut()
-                    }}
-                />
-            )}
-            {computersEnabled && <ComputersDialog open={panel === 'computers'} onOpenChange={open => setPanel(open ? 'computers' : null)} />}
+            <VaultDialog
+                open={panel === 'vault'}
+                onOpenChange={open => {
+                    setPanel(open ? 'vault' : null)
+                    if (!open) refreshVaultSignedOut()
+                }}
+            />
+            <ComputersDialog open={panel === 'computers'} onOpenChange={open => setPanel(open ? 'computers' : null)} />
             <KnowledgeBaseDialog open={panel === 'knowledge_base'} onOpenChange={open => setPanel(open ? 'knowledge_base' : null)} />
             <PaidAppDialogs apps={paidApps} />
             <WorkspacePowerDialog action={powerAction} onOpenChange={open => setPowerAction(open ? powerAction : null)} />

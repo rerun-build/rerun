@@ -85,7 +85,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     const purchase = useTemplateFlowStore(s => s.purchase)
     const hydrated = useBoardStore(s => s.hydrated)
     const hydrate = useBoardStore(s => s.hydrate)
-    const { view, enabled: simpleViewEnabled } = useWorkspaceView()
+    const { view } = useWorkspaceView()
     // Under `md` the Simple view is the phone's Home, the coworker's panel opening over it as on the
     // board. Unknown until the window is measured, so neither frame mounts for a frame on the wrong side.
     const phone = useResolvedIsMobile(FOREMAN_COLUMN_QUERY)
@@ -355,7 +355,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     useSessionsRealtime(hydrated)
     useNotificationsRealtime(hydrated ? workspace?.id : undefined)
     useUnseenRunsSync(hydrated ? workspace?.id : undefined, user?.id)
-    useCoworkerPreviewsSync(hydrated && simpleViewEnabled ? workspace?.id : undefined)
+    useCoworkerPreviewsSync(hydrated ? workspace?.id : undefined)
 
     // The page load names no workspace, so the server prefetched the stored one. A tab pinned
     // elsewhere shows neither those spaces nor an empty board in their place (the recruit

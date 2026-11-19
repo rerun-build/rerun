@@ -12,7 +12,6 @@ export function useAccountTabText(tab: AccountTab) {
     return { label: t(`${TAB_KEYS[tab]}.label`), description: t(`${TAB_KEYS[tab]}.description`) }
 }
 
-// The language tab only shows once the language packs are out: before that every account reads English.
 // The desktop tab only inside the desktop app.
 export function AccountTabs({ showLanguage, showDesktop = false, ...props }: { tab: AccountTab; onTabChange: (tab: AccountTab) => void; header: ReactNode; children: ReactNode; showLanguage: boolean; showDesktop?: boolean }) {
     const t = useTranslations('account.tabs')

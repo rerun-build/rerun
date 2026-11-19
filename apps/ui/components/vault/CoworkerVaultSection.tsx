@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 
 import { attachVaultEntryAction, coworkerVaultAction, detachVaultEntryAction } from '@/app/api/_actions/vault.actions'
 import type { CoworkerVault } from '@/app/api/_services/vault.service'
-import { useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { PanelList, PanelSection } from '@/components/ui/panel-list'
@@ -23,7 +22,6 @@ type Change = (item: VaultItemSummary, attach: boolean) => Promise<void>
 
 // The coworker's side of the Vault, read with the tab and again each time its list changes.
 export function useCoworkerVault(agentId: string, revision: number, onChanged: () => Promise<void>, onError: (message: string) => void) {
-    const enabled = useVaultEnabled()
     const t = useTranslations('agent.agentPanelServices')
     const errorText = useErrorText()
     const [vault, setVault] = useState<CoworkerVault | null>(null)
@@ -32,8 +30,8 @@ export function useCoworkerVault(agentId: string, revision: number, onChanged: (
     const read = useCallback(async () => setVault(await coworkerVaultAction(agentId)), [agentId])
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (enabled) void read()
-    }, [enabled, read, revision])
+        void read()
+    }, [read, revision])
 
     const change: Change = async (item, attach) => {
         setBusy(item.id)
@@ -43,7 +41,7 @@ export function useCoworkerVault(agentId: string, revision: number, onChanged: (
         setBusy(null)
     }
 
-    return { vault: enabled ? vault : null, busy, change }
+    return { vault, busy, change }
 }
 
 type Rows = { vault: CoworkerVault | null; busy: string | null; change: Change; disabledReason?: string }

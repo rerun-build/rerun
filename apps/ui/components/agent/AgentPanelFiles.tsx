@@ -20,7 +20,6 @@ import { FileDetail } from '@/components/files/FileDetail'
 import { FileGrid } from '@/components/files/FileGrid'
 import { FilesEmptyState } from '@/components/files/FilesEmptyState'
 import { useSiblingFiles } from '@/components/files/useSiblingFiles'
-import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { ShareDialog } from '@/components/published/ShareDialog'
 import { openPublishedHref } from '@/lib/published/links'
 import { useTranslations } from 'next-intl'
@@ -39,7 +38,6 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
     const [dragOver, setDragOver] = useState(false)
     const [published, setPublished] = useState<PublishedFile[]>([])
     const [contentRevision, setContentRevision] = useState(0)
-    const publishedAccess = usePublishedAccessEnabled()
     const [sharingSlug, setSharingSlug] = useState<string | null>(null)
     // A published page belongs to a coworker's row, which the Chief of Staff does not have.
     const canPublish = agentId !== FOREMAN_AGENT_ID
@@ -104,8 +102,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
         }
         await loadPublished()
         // A new link starts with the access the workspace gives it: the share dialog is where it changes.
-        if (publishedAccess && result.slug) setSharingSlug(result.slug)
-    }, [agentId, currentPath, loadPublished, publishedAccess, t, errorText])
+        if (result.slug) setSharingSlug(result.slug)
+    }, [agentId, currentPath, loadPublished, t, errorText])
 
     const handleUnpublish = useCallback(async (name: string) => {
         const filePath = currentPath ? `${currentPath}/${name}` : name
@@ -195,8 +193,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                         publicUrl={publishedByName[openFile.name]}
                         onPublish={canPublish ? () => void handlePublish(openFile.name) : undefined}
                         onUnpublish={canPublish ? () => void handleUnpublish(openFile.name) : undefined}
-                        onShareSettings={publishedAccess && publishedFileByName[openFile.name] ? () => setSharingSlug(publishedFileByName[openFile.name].slug) : undefined}
-                        openUrl={publishedAccess && publishedFileByName[openFile.name] ? openPublishedHref(publishedFileByName[openFile.name].slug) : undefined}
+                        onShareSettings={publishedFileByName[openFile.name] ? () => setSharingSlug(publishedFileByName[openFile.name].slug) : undefined}
+                        openUrl={publishedFileByName[openFile.name] ? openPublishedHref(publishedFileByName[openFile.name].slug) : undefined}
                     />
                 ) : (
                     <div
@@ -273,16 +271,14 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                 )}
             </PanelSteps>
             <UploadTray items={uploads.items} totalProgress={uploads.totalProgress} onCancel={uploads.cancel} onRetry={uploads.retry} onDismiss={uploads.active ? uploads.cancelAll : uploads.clearFinished} />
-            {publishedAccess && (
-                <ShareDialog
-                    open={sharingSlug !== null}
-                    onOpenChange={open => !open && setSharingSlug(null)}
-                    slug={sharingSlug}
-                    initial={published.find(file => file.slug === sharingSlug) ?? null}
-                    onChanged={() => void loadPublished()}
-                    onUnpublished={() => void loadPublished()}
-                />
-            )}
+            <ShareDialog
+                open={sharingSlug !== null}
+                onOpenChange={open => !open && setSharingSlug(null)}
+                slug={sharingSlug}
+                initial={published.find(file => file.slug === sharingSlug) ?? null}
+                onChanged={() => void loadPublished()}
+                onUnpublished={() => void loadPublished()}
+            />
         </div>
     )
 }

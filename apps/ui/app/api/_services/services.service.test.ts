@@ -4,7 +4,6 @@ import { compileService, decompileService } from '@/lib/services/compiler'
 import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
 import { deleteVaultItem, patchVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { compileIntoVault } from '@/lib/vault/install'
-import { vaultWritesEnabled } from '@/app/api/_services/vault.service'
 import { AppError } from '@/lib/i18n/action-error'
 import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
@@ -39,7 +38,6 @@ vi.mock('@/lib/engine/vault-client', async importOriginal => ({
 vi.mock('@/lib/vault/install', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/vault/install')>()), compileIntoVault: vi.fn() }))
 vi.mock('@/app/api/_services/vault.service', async importOriginal => ({
     ...(await importOriginal<typeof import('@/app/api/_services/vault.service')>()),
-    vaultWritesEnabled: vi.fn(async () => false),
     vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1' }, byEngineId: new Map() })),
 }))
 vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toVectorLiteral: vi.fn() }))
@@ -147,7 +145,6 @@ describe('installService with a key the app refuses', () => {
         vi.mocked(compileService).mockResolvedValue({ toolNames: [], oauth: null, managed: null, composio: { toolkit: 'gmail', serverName: 'gmail' }, app: null })
         vi.mocked(getMcpServerStatuses).mockResolvedValue([])
         vi.mocked(supportsVault).mockResolvedValue(false)
-        vi.mocked(vaultWritesEnabled).mockResolvedValue(false)
     })
 
     it('refuses the install, takes the server back off the coworker and leaves the app to configure', async () => {
@@ -216,7 +213,6 @@ describe('installService with a key the app refuses', () => {
     it('empties the Vault item and leaves it to configure', async () => {
         useRegistry({ services: {} })
         vi.mocked(supportsVault).mockResolvedValue(true)
-        vi.mocked(vaultWritesEnabled).mockResolvedValue(true)
         vi.mocked(compileIntoVault).mockResolvedValue({ ...compiledBuffer, item: { id: 'item-1', envKeys: ['RERUN_SVC_BUFFER_BUFFER_KEY'] } } as never)
         vi.mocked(getMcpServerStatuses).mockResolvedValue([refused])
 
@@ -230,7 +226,6 @@ describe('installService with a key the app refuses', () => {
     it('deletes the Vault item of an account the install had just added', async () => {
         useRegistry({ services: {} })
         vi.mocked(supportsVault).mockResolvedValue(true)
-        vi.mocked(vaultWritesEnabled).mockResolvedValue(true)
         vi.mocked(compileIntoVault).mockResolvedValue({ ...compiledBuffer, item: { id: 'item-1', envKeys: ['RERUN_SVC_LINEAR_KEY_LINEAR_KEY'] } } as never)
         vi.mocked(getMcpServerStatuses).mockResolvedValue([refused])
 

@@ -2,7 +2,6 @@
 
 import { SHOW_PSEUDO, type LanguageChoice } from '@/components/account/LanguagePanel'
 import { useLanguageChoice } from '@/components/account/useLanguageChoice'
-import { useLanguagePacksEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Languages } from '@/lib/icons'
 import { localeNativeName, PSEUDO_LOCALE, stableLocales } from '@rerun/i18n'
@@ -14,12 +13,6 @@ const SUBMENU_WIDTH = 160 // w-40
 const VIEWPORT_MARGIN = 8
 
 export function LanguageMenuRow() {
-    const enabled = useLanguagePacksEnabled()
-    if (!enabled) return null
-    return <LanguageMenu />
-}
-
-function LanguageMenu() {
     const t = useTranslations('layout')
     const tLanguage = useTranslations('account.language')
     const { value, change } = useLanguageChoice()

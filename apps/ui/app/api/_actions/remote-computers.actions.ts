@@ -10,11 +10,9 @@ import type { ComputersList } from '@/lib/computers/types'
 import { assertComputersFor, canManageComputer, mentionComputerItems, workspaceComputerItems } from '@/app/api/_services/remote-computer-items.service'
 import { EngineRequestError } from '@/lib/engine/client'
 import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
-import { remoteComputersFlag } from '@/flags'
 
 async function computersContext(): Promise<WorkspaceContext> {
     const ctx = await requireWorkspaceContext()
-    if (!(await remoteComputersFlag().catch(() => false))) throw new AppError('computersOff')
     assertComputersFor(ctx)
     return ctx
 }

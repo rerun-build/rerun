@@ -4,11 +4,9 @@ import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultI
 
 import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
-import { vaultFlag } from '@/flags'
 import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
-import { VAULT_RELEASED } from '@/lib/features'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
@@ -74,15 +72,6 @@ export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
     if (withForeman) coworkers.unshift(FOREMAN_VAULT_COWORKER)
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
-}
-
-// New connectors go to the Vault once the box keeps one and the feature is on for whoever installs.
-// The engine's own calls (a coworker installing for itself) follow the release alone.
-export async function vaultWritesEnabled(conn: EngineConnection, actor?: Actor): Promise<boolean> {
-    if (!(await supportsVault(conn))) return false
-    if (VAULT_RELEASED) return true
-    if (actor?.kind === 'workspace') return false
-    return vaultFlag().catch(() => false)
 }
 
 function requireAdmin(actor: Actor): void {

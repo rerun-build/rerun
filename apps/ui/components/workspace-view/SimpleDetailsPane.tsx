@@ -6,7 +6,6 @@ import { useMemo } from 'react'
 import { AgentLockedOverlay } from '@/components/agent/AgentLockedOverlay'
 import { AgentCard } from '@/components/agent/sheet/AgentCard'
 import { AgentView } from '@/components/agent/sheet/AgentView'
-import { useComputerEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { DetailsColumn } from '@/components/workspace-view/DetailsColumn'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
@@ -35,7 +34,6 @@ export function SimpleDetailsPane({ agent, open, slideIn, screen, onScreenChange
     const sessions = useBoardStore(s => s.sessions)
     const working = useMemo(() => sessions.some(s => s.agentId === agent.id && s.status === 'working'), [sessions, agent.id])
     const servicesNeedConfig = useConnectorServices(agent.id).needsConfig
-    const computerEnabled = useComputerEnabled()
     const openDesktop = useDesktopStore(s => s.openDesktop)
     const { access, needsMachineReason } = useWorkspaceAccess()
     // A paused workspace has nothing to read on any screen; a coworker switched off keeps its Settings,
@@ -54,7 +52,6 @@ export function SimpleDetailsPane({ agent, open, slideIn, screen, onScreenChange
                     onShare={onShare}
                     onDelete={onDelete}
                     onOpenComputer={() => openDesktop(agent.id)}
-                    computerEnabled={computerEnabled}
                     working={working}
                     servicesNeedConfig={servicesNeedConfig}
                     needsMachineReason={needsMachineReason}

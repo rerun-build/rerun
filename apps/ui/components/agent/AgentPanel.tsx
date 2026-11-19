@@ -10,7 +10,6 @@ import { FloatingPill, FloatingSurface, Scrim, TopVeil } from '@/components/agen
 import { ShareAgentDialog } from '@/components/agent/share/ShareAgentDialog'
 import { AgentDesktopView } from '@/components/desktop/AgentDesktopView'
 import { DeleteAgentDialog } from '@/components/dialogs/DeleteAgentDialog'
-import { useComputerEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { SidePanel } from '@/components/layout/SidePanel'
 import { Button } from '@/components/ui/button'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
@@ -46,7 +45,6 @@ export function AgentPanel() {
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const selectAgent = useBoardStore(s => s.selectAgent)
     const sessions = useBoardStore(s => s.sessions)
-    const desktopEnabled = useComputerEnabled()
     const openDesktop = useDesktopStore(s => s.openDesktop)
     const { access, needsMachineReason } = useWorkspaceAccess()
     const workspacePaused = access !== 'live'
@@ -211,7 +209,6 @@ export function AgentPanel() {
                             onShare={() => setShareOpen(true)}
                             onDelete={() => setDeleteOpen(true)}
                             onOpenComputer={() => openComputer(agent.id)}
-                            computerEnabled={desktopEnabled}
                             working={working}
                             servicesNeedConfig={servicesNeedConfig}
                             needsMachineReason={needsMachineReason}

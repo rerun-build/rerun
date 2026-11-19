@@ -4,7 +4,7 @@ import { assertAgentInWorkspace, isAdminActor, requireLightSessionActor, visible
 import { requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { EMAIL_DELIVERY } from '@rerun/cloud/email'
-import { isPublishPolicy, isPublishedAccess, shownPolicy, type PublishPolicy } from '@/lib/published/access'
+import { effectivePolicy, isPublishPolicy, isPublishedAccess, type PublishPolicy } from '@/lib/published/access'
 import {
     closePublicLinks,
     countPublicLinks,
@@ -125,7 +125,7 @@ export async function getPublishSettingsAction(): Promise<PublishSettings | null
             selectMaybeSingle(supabase, 'workspaces', ['publish_policy'] as const, { id: workspace.id }),
             countPublicLinks(workspace.id),
         ])
-        return { policy: shownPolicy(data?.publish_policy), publicLinks, invitesAvailable: EMAIL_DELIVERY }
+        return { policy: effectivePolicy(data?.publish_policy), publicLinks, invitesAvailable: EMAIL_DELIVERY }
     } catch {
         return null
     }

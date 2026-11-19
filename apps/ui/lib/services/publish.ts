@@ -12,8 +12,8 @@ import {
     isPublishedAccess,
     resolveCoworkerAccess,
     type AccessResolution,
-    type EffectivePolicy,
     type PublishedAccess,
+    type PublishPolicy,
 } from '@/lib/published/access'
 import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedRawFileUrl, publishedSiteOrigin, rendersAsPage, slugPrefix, suffixedSlug } from '@/lib/published/host'
 import { normalizeInvites } from '@/lib/published/invites'
@@ -63,7 +63,7 @@ async function resolveAgent(agentId: string): Promise<AgentContext> {
     return { engineAgentId: agent.engine_agent_id, spaceId: agent.space_id, workspaceId: agent.workspace_id, conn }
 }
 
-export async function workspacePublishPolicy(workspaceId: number): Promise<EffectivePolicy> {
+export async function workspacePublishPolicy(workspaceId: number): Promise<PublishPolicy> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['publish_policy'] as const, { id: workspaceId })
     return effectivePolicy(data?.publish_policy)
 }

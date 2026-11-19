@@ -20,7 +20,7 @@ function stubBrowser(stored?: string) {
 
 afterEach(() => vi.unstubAllGlobals())
 
-const ready: WorkspaceViewContext = { enabled: true, preference: 'simple', onboarding: false, waitlisted: false, placing: false, boxless: false }
+const ready: WorkspaceViewContext = { preference: 'simple', onboarding: false, waitlisted: false, placing: false, boxless: false }
 
 describe('workspace view preference', () => {
     it('reads the two views it writes, and nothing else', () => {
@@ -60,10 +60,6 @@ describe('resolveWorkspaceView', () => {
     it('follows the preference once nothing needs the grid', () => {
         expect(resolveWorkspaceView(ready)).toBe('simple')
         expect(resolveWorkspaceView({ ...ready, preference: 'board' })).toBe('board')
-    })
-
-    it('stays on the board for an account the view is not released to, whatever it chose', () => {
-        expect(resolveWorkspaceView({ ...ready, enabled: false })).toBe('board')
     })
 
     it('stays on the board by default', () => {
