@@ -531,5 +531,64 @@ class PlanGate(FactoryCase):
             self.assertIn("cannot read", out)
 
 
+class PrOpenRetry(FactoryCase):
+    def setUp(self):
+        super().setUp()
+        self.body = os.path.join(self.tmp, "body.md")
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n")
+        self.creates = []
+
+    def pr_open(self, results):
+        pending = list(results)
+        top = os.path.join(self.tmp, "top")
+        os.makedirs(top, exist_ok=True)
+
+        def fake_run(cmd, *a, **k):
+            if cmd[:3] == [F.GH, "pr", "create"]:
+                self.creates.append(cmd)
+                rc, out, err = pending.pop(0)
+                return subprocess.CompletedProcess(cmd, rc, out, err)
+            if cmd[:2] == [F.GH, "pr"]:
+                return subprocess.CompletedProcess(cmd, 0, "[]", "")
+            if cmd[1:2] == ["diff"]:
+                return subprocess.CompletedProcess(cmd, 0, "tools/factory/factory.py\n", "")
+            if cmd[1:2] == ["rev-list"]:
+                return subprocess.CompletedProcess(cmd, 0, "1\n", "")
+            if cmd[1:2] == ["log"] or cmd[1:2] == ["status"]:
+                return subprocess.CompletedProcess(cmd, 0, "", "")
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+
+        ctx = (top, FULL, "chunk/1572-1", "dev", "1572", "1")
+        with mock.patch.object(F, "wt_context", lambda: ctx), mock.patch.object(F, "is_clone", lambda t: False), \
+                mock.patch.object(F, "token_shapes", lambda *a: []), mock.patch.object(F, "api", lambda *a, **k: {}), \
+                mock.patch.object(F, "preflight_lines", lambda *a: None), mock.patch.object(F, "preflight_lint", lambda *a: None), \
+                mock.patch.object(F, "run", fake_run), mock.patch.object(F.time, "sleep") as sleep:
+            code, out = self.call(F.cmd_pr_open, ["--title", "T", "--body-file", self.body])
+        return code, out, [c.args[0] for c in sleep.call_args_list]
+
+    def test_pr_open_retries_when_github_says_submitted_too_quickly(self):
+        slow = (1, "", "GraphQL: was submitted too quickly (createPullRequest)")
+        code, out, sleeps = self.pr_open([slow, slow, (0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(self.creates), 3)
+        self.assertEqual(sleeps, [60, 120])
+        self.assertIn("PR https://github.com/x/y/pull/9", out)
+
+    def test_pr_open_gives_up_after_four_tries(self):
+        slow = (1, "", "was submitted too quickly on three tries")
+        code, out, sleeps = self.pr_open([slow] * 4)
+        self.assertEqual(code, 1, out)
+        self.assertEqual(len(self.creates), 4)
+        self.assertEqual(sleeps, [60, 120, 240])
+        self.assertIn("(tried 4 times over 7 minutes)", out)
+
+    def test_pr_open_other_failure_is_not_retried(self):
+        code, out, sleeps = self.pr_open([(1, "", "HTTP 422 Validation Failed")])
+        self.assertEqual(code, 1, out)
+        self.assertEqual(len(self.creates), 1)
+        self.assertEqual(sleeps, [])
+        self.assertNotIn("tried 4 times", out)
+
+
 if __name__ == "__main__":
     unittest.main()
