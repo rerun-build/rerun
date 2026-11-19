@@ -154,6 +154,10 @@ The engine could not reach the server of a **Custom endpoint** connection. The m
 
 If the model answers but forgets its instructions, its context is too small. See [Your own model](/self-host/models#your-own-model).
 
+## A coworker on your own model answers "Custom endpoint refused the request"
+
+The server of a **Custom endpoint** connection answered 402 (Payment Required). The message ends with what the server said, for example that its account has used all its credits or reached its spending limit. This is the account at that provider, not your Rerun credit: add credits there, or pick another model for the coworker.
+
 ## The Chief of Staff does not answer
 
 With `OPENROUTER_API_KEY` set, the Chief of Staff walks a new workspace through its onboarding on that key: look for `[llm]` or OpenRouter errors in `docker compose logs app`, an empty balance or a spending limit on the key stops it too.

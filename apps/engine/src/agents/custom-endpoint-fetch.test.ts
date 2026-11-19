@@ -19,14 +19,24 @@ describe('customEndpointFetch', () => {
     it("keeps xAI's own sentence on a 402 instead of the bare status text", async () => {
         const error = await refusalOf(answering(402, JSON.stringify({ code: 'The caller does not have permission to execute the specified operation', error: XAI_NO_CREDITS }), 'Payment Required'))
         expect(APICallError.isInstance(error)).toBe(true)
-        expect((error as Error).message).toBe(`Provider returned error: ${XAI_NO_CREDITS}`)
+        expect((error as Error).message).toBe(`Custom endpoint refused the request: ${XAI_NO_CREDITS}`)
         expect((error as APICallError).statusCode).toBe(402)
         expect(classifyProviderError('custom', error)).not.toBe('rerun_budget_exhausted')
     })
 
     it('names the status when the 402 has no body', async () => {
         const error = await refusalOf(answering(402, '', 'Payment Required'))
-        expect((error as Error).message).toBe('Provider returned error: Payment Required')
+        expect((error as Error).message).toBe('Custom endpoint refused the request: Payment Required')
+    })
+
+    it('names the status when a proxy answers the 402 with a page', async () => {
+        const error = await refusalOf(answering(402, '<!DOCTYPE html><html><body><h1>Payment required</h1></body></html>', 'Payment Required'))
+        expect((error as Error).message).toBe('Custom endpoint refused the request: Payment Required')
+    })
+
+    it('keeps a long plain answer down to a sentence', async () => {
+        const error = await refusalOf(answering(402, 'x'.repeat(5_000), 'Payment Required'))
+        expect((error as Error).message).toBe(`Custom endpoint refused the request: ${'x'.repeat(500)}…`)
     })
 
     it('leaves any other answer untouched', async () => {

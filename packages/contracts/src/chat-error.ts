@@ -43,6 +43,10 @@ export const OPENCODE_GO_LIMIT = 'OpenCode Go limit reached'
 // exceeded your current quota", and the second one is also Gemini's plain per-minute rate limit.
 export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
 
+// What the engine stores when a custom endpoint answers 402, ahead of the server's own sentence. What
+// a 402 means is up to each server, so the chat shows that sentence as it is.
+export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
+
 // Claude Code builds its own sentence: "You've hit your ${limit}" with the limit named after the
 // window that ran out (`session limit`, `weekly limit`, `Opus limit`, `Sonnet limit`), optionally
 // followed by " · resets <time>". The older wording ("Claude AI usage limit reached|<epoch>") is
@@ -99,11 +103,11 @@ export const ENGINE_SESSION_NOT_FOUND = 'session not found for this agent'
 export const SESSION_NOT_FOUND = 'session_not_found'
 
 // A bare 402 is the Rerun proxy's: the SDK drops its `rerun_budget_exhausted` body for the status
-// text. A custom endpoint's 402 comes as the provider's own refusal, which can quote a "402" of its
-// own (a team id) and says nothing of the Rerun credit.
+// text. A custom endpoint's 402 comes under the engine's own sentence: what the server wrote after it
+// can quote a "402" of its own (a team id) and says nothing of the Rerun credit.
 function isRerunCreditRefusal(m: string): boolean {
     if (m.includes('rerun_budget_exhausted')) return true
-    if (m.includes('provider returned error')) return false
+    if (m.includes(CUSTOM_ENDPOINT_REFUSED.toLowerCase())) return false
     return m.includes('payment required') || m.includes('402')
 }
 

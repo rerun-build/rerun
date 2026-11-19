@@ -471,6 +471,8 @@ as `Authorization: Bearer`. The connection counts as connected as soon as it has
   and the computer tools are not offered.
 - A run that cannot reach the server fails with "Could not reach the custom endpoint at
   host:port (ECONNREFUSED)".
+- A run the server answers with a 402 fails with "Custom endpoint refused the request: " followed by
+  the server's own sentence (cut at 500 characters), or by "Payment Required" when it sent none.
 
 ```json
 { "name": "Ollama", "provider": "custom", "baseUrl": "http://localhost:11434/v1", "models": ["qwen3:4b"], "contextWindow": 32768, "vision": false, "keys": {} }
