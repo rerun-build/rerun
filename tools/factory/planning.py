@@ -76,6 +76,8 @@ def brief_lines(issue, repo):
         "",
         f"Cut it into child issues in the cut format of #333. This issue is the parent: open no other parent. Each child starts with `PLAN READY (cut of #{number}; facts read on dev at <sha>)` and has `**Part of**: #{number}`, `**Worker**: coder` (or one of {OTHER_WORKERS} when the plan names that type for the slice), `**Test file**`, `**Test through**` (the public interface the done-test calls), `**Files**` (allowed paths, one path per bullet), `**Change**` (written against the code on dev, with functions and lines, one bullet per ask), `**Done-test**` (written first and seen failing), `**Run**` (each line run once on dev before filing), `**Size**: small|medium|large` (small: one or two files and under 40 changed lines; large: four or more files or a new module) and `**Depends on**` (issue numbers or `none`).",
         "",
+        "Keep the dependency chains short: a child names in **Depends on** only a child whose code it needs, so most children can start at once. The cut shape comment shows the longest chain.",
+        "",
         "The runner has no `uvx`: lint is no Run line, Factory tools CI runs ruff.",
         "",
         "Compute on dev, before filing, every number a done-test asserts. Two children name the same file only when one depends on the other. The done-test calls the feature only through that public interface (a function the module exports, an HTTP route or a CLI command) and mock nothing of the module's own internals; only a boundary the repository already fakes (the network, the clock, the model) may be faked. Each Change says: add no comments in code.",
@@ -387,11 +389,31 @@ def width(parsed, open_numbers, held):
     return rows
 
 
-def width_text(numbers, rows, held, unread):
+def chain(parsed):
+    cut = {p["number"] for p in parsed}
+    deps = {p["number"]: [d for d in p["deps"] if d in cut] for p in parsed}
+
+    def back(n, path):
+        best = [n]
+        for d in deps.get(n, []):
+            if d in path:
+                continue
+            got = back(d, path | {n}) + [n]
+            if (len(got), -got[0]) > (len(best), -best[0]):
+                best = got
+        return best
+
+    paths = [back(n, set()) for n in sorted(cut)]
+    return min(paths, key=lambda c: (-len(c), c[-1], c[0])) if paths else []
+
+
+def width_text(numbers, rows, held, unread, longest=None):
     lines = ["## Cut shape", "", "Children: %s" % ", ".join("#%d" % k for k in numbers), "",
              "| Type | Children | Can start at once |", "|---|---|---|"]
     lines += ["| %s | %d | %d |" % row for row in rows]
     lines.append("| all | %d | %d |" % (sum(r[1] for r in rows), sum(r[2] for r in rows)))
+    if longest is not None:
+        lines += ["", "Longest chain: %d (%s)" % (len(longest), " -> ".join("#%d" % k for k in longest))]
     if held:
         lines += ["", "Not labelled `factory`, refused by the checks: %s" % ", ".join("#%d" % k for k in sorted(held))]
     if unread:
@@ -1116,7 +1138,7 @@ class Station:
                 except Exception:
                     open_numbers, unread = None, True
             held = {int(k) for k in faulty}
-            text = width_text(kids, width(parsed, open_numbers, held), held, unread)
+            text = width_text(kids, width(parsed, open_numbers, held), held, unread, longest=chain(parsed))
             if self.store.get_all("plan:%d" % n).get("width") == text:
                 return
             self.gh(["issue", "comment", str(n), "-R", self.repo, "--body", text])
