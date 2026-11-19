@@ -14,7 +14,8 @@
         "protectedTitle": "Korumalı sayfa",
         "protectedDescription": "Paylaşan: {workspace}. Açmak için giriş yapın veya e-postanızı onaylayın.",
         "publishedBy": "Yayınlayan: {agent}, {workspace}",
-        "publishedByUnknown": "Yayınlayan: bir coworker, {workspace}"
+        "publishedByUnknown": "Yayınlayan: bir coworker, {workspace}",
+        "untitled": "Yayınlanan sayfa"
     },
     "publishedAuth": {
         "metaTitle": "Bir sayfa açın",
@@ -47,5 +48,8 @@
             "subtitle": "{workspace} üyeleri için",
             "continue": "Rerun ile devam et"
         }
+    },
+    "publishedSite": {
+        "notFound": "Bulunamadı"
     }
 }

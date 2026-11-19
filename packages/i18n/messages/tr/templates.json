@@ -557,5 +557,6 @@
         "lapsed": "Aboneliğiniz sona erdi. Bu şablonun kurduğu coworker'lar devre dışı.",
         "billedTo": "Fatura: {workspace}. Rerun planınız zaten etkin.",
         "yours": "Sizin şablonunuz, ücret yok."
-    }
+    },
+    "boardAlt": "{title} coworker panosu"
 }

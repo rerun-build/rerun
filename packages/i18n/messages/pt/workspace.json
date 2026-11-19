@@ -15,7 +15,8 @@
         "noLogoFound": "Nenhum logo encontrado neste endereço",
         "pickIllustration": "Ou escolha uma ilustração",
         "showLess": "Mostrar menos",
-        "showAll": "Mostrar todas as {count}"
+        "showAll": "Mostrar todas as {count}",
+        "illustrationOption": "Ilustração {number}"
     },
     "access": {
         "paused": "Assine para restaurar seu workspace primeiro",

@@ -306,5 +306,8 @@
             "cta": "Karşılaştırmayı görün"
         }
     },
-    "composerPlaceholder": "Bir mesaj gönderin..."
+    "composerPlaceholder": "Bir mesaj gönderin...",
+    "dialog": {
+        "close": "Kapat"
+    }
 }

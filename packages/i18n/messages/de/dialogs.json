@@ -677,5 +677,20 @@
         "title": "Wähle eine Box",
         "description": "Der neue Coworker kommt dort auf einen freien Platz.",
         "coworkers": "{count, plural, =0 {Noch keine Coworker} one {# Coworker} other {# Coworker}}"
+    },
+    "mcpConnect": {
+        "otherClient": "Andere",
+        "labels": {
+            "terminal": "Terminal",
+            "shellProfile": "Shell-Profil",
+            "coworkerPanel": "Coworker-Panel, MCP, Neu",
+            "serverUrl": "Server-URL",
+            "header": "Header",
+            "stdioClients": "Clients, die nur stdio können"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI. Die ChatGPT-App akzeptiert nur OAuth-Verbindungen, ein Schlüssel bringt dir dort nichts.",
+            "coworkerReach": "Gibt einem deiner Coworker denselben Zugriff auf diesen Workspace wie einem externen Client."
+        }
     }
 }

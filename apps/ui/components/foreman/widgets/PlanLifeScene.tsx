@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { planCardScene } from '@/lib/foreman/plan-scene'
+import { usePlanSceneLabels } from '@/lib/foreman/usePlanSceneLabels'
 import type { PlanLifeBeat, PlanLifeStage } from '@/lib/foreman/plan-life'
 import { CircleCheckIcon, InboxIcon, Loader2Icon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -55,7 +56,8 @@ function ActivityLine({ beat, tick }: { beat: PlanLifeBeat; tick: number }) {
 // agent, simply stands there.
 export function PlanLifeScene({ group, script, waiting }: { group: PlanGroup; script: PlanBeats | null; waiting: boolean }) {
     const { beat, tick, animated } = usePlanLife(script, waiting)
-    const scene = useMemo(() => planCardScene(group, { animated }), [group, animated])
+    const sceneLabels = usePlanSceneLabels()
+    const scene = useMemo(() => planCardScene(group, { animated, labels: sceneLabels }), [group, animated, sceneLabels])
     const name = group.items[0].name
 
     const tiles = useMemo(() => scene.tiles.map((tile, rank) => (rank === 0 ? { ...tile, style: agentTileStyle(beat.status, name) } : tile)), [scene, beat.status, name])

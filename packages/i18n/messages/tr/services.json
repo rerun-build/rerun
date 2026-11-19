@@ -14,7 +14,12 @@
             "rightAway": "Hemen",
             "everyFewHours": "Birkaç saatte bir kontrol edilir"
         },
-        "unavailable": "{app} bu çalışma alanında henüz kullanılamıyor."
+        "unavailable": "{app} bu çalışma alanında henüz kullanılamıyor.",
+        "wakeEvents": {
+            "message_received": "Bir mesaj geldiğinde",
+            "accepted_invitation": "Bir davet kabul edildiğinde",
+            "invitation_received": "Bir davet alındığında"
+        }
     },
     "authMethod": {
         "label": {

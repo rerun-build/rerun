@@ -80,7 +80,11 @@
         "schedule.everyMinutes": "{count} is a number of minutes, such as 15.",
         "schedule.everyWeekday": "{day} is a weekday name such as Monday; {time} a clock time such as 9:00 AM.",
         "schedule.monthly": "{day} is a day of the month, a number such as 1 or 15; {time} a clock time.",
-        "agentPanelServices.vaultBadge": "Marks an app this coworker gets from the workspace Vault. Keep \"Vault\" as is."
+        "agentPanelServices.vaultBadge": "Marks an app this coworker gets from the workspace Vault. Keep \"Vault\" as is.",
+        "agentPanelMcp.count": "Above the list of MCP servers of a coworker.",
+        "agentPanelTriggers.count": "Above the list of triggers of a coworker.",
+        "agentPanelScheduled.count": "Above the list of scheduled tasks of a coworker.",
+        "agentPanelSkills.count": "Above the list of skills of a coworker."
     },
     "agentCard": {
         "destinations": {
@@ -221,7 +225,8 @@
         "new": "New",
         "emptyTitle": "No MCP servers yet",
         "emptyDescription": "MCP servers give your coworker extra tools beyond built-in apps. Add one to extend what it can do.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# MCP server} other {# MCP servers}}"
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Discovery failed",
@@ -426,7 +431,8 @@
         "emptyDescription": "A trigger gives your coworker a public URL. Whenever another service calls it, the coworker runs with the payload it received.",
         "summary": "{methods} · {count, plural, one {# call} other {# calls}}",
         "paused": "paused",
-        "neverCalled": "Never called yet"
+        "neverCalled": "Never called yet",
+        "count": "{count, plural, one {# trigger} other {# triggers}}"
     },
     "triggerEditor": {
         "saveFailed": "Failed to save",
@@ -512,7 +518,8 @@
             "testRun": "Test Run",
             "saveChanges": "Save changes",
             "create": "Create task"
-        }
+        },
+        "count": "{count, plural, one {# scheduled task} other {# scheduled tasks}}"
     },
     "taskNotifyField": {
         "label": "Notify me",
@@ -660,7 +667,8 @@
         "newSkill": "New",
         "emptyTitle": "No skills yet",
         "emptyDescription": "Skills are reusable step-by-step instructions your coworker learns, so it performs recurring tasks the same way every time.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# skill} other {# skills}}"
     },
     "shareAgentDialog": {
         "titleLink": "Your share link",

@@ -44,10 +44,10 @@ export function intakeBoxes(industry: string | null | undefined): string[] {
  * The board of someone who arrived on a template or a shared coworker, before anything is built: the
  * default divisions, and what they came for already sitting in the first one.
  */
-export function arrivalPreviewPlan(title: string): ShownPlan {
+export function arrivalPreviewPlan(title: string, localizeBoxName: (name: string) => string = name => name): ShownPlan {
     return {
         title: 'Your company',
-        groups: intakeBoxes(null).map((name, index) => ({ key: `arrival-${index}-${name}`, name, role: '', items: index === 0 ? [{ key: 'arrival', name: title, role: '', when: '' }] : [] })),
+        groups: intakeBoxes(null).map(localizeBoxName).map((name, index) => ({ key: `arrival-${index}-${name}`, name, role: '', items: index === 0 ? [{ key: 'arrival', name: title, role: '', when: '' }] : [] })),
     }
 }
 

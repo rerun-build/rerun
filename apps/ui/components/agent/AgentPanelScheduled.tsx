@@ -132,7 +132,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     return (
         <PanelSteps stepKey={stepKey} depth={stepDepth}>
             <div className="flex flex-col h-full">
-                <PanelListHeader count={list.routines.length} noun="scheduled task">
+                <PanelListHeader countLabel={t('count', { count: list.routines.length })}>
                     {newButton}
                 </PanelListHeader>
 

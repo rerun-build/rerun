@@ -17,5 +17,9 @@
         "creators": "İçerik üreticileri",
         "productivity": "Verimlilik",
         "other": "Diğer"
+    },
+    "connectors": {
+        "none": "Uygulama gerekmez",
+        "label": "Uygulamalar: {apps}"
     }
 }

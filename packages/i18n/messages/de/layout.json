@@ -105,6 +105,7 @@
         "aiProviders": "KI-Anbieter",
         "vault": "Vault",
         "vaultSignedOut": "Eine App im Vault ist abgemeldet",
+        "computers": "Computer",
         "servers": "Server",
         "billing": "Abrechnung",
         "newWorkspace": "Neuer Workspace",
@@ -119,8 +120,7 @@
         "adminPanel": "Admin-Bereich",
         "notifications": "Benachrichtigungen",
         "account": "Konto",
-        "signOut": "Abmelden",
-        "computers": "Computer"
+        "signOut": "Abmelden"
     },
     "update": {
         "reload": "Neu laden",
@@ -212,5 +212,9 @@
     "dashboard": {
         "metaTitle": "Dashboard",
         "metaDescription": "Deine Boxes und Coworker auf Rerun."
+    },
+    "site": {
+        "title": "Rerun | Lass KI deine Aufgaben erledigen, sogar im Schlaf",
+        "description": "Wähle einen startklaren KI-Agenten aus der Bibliothek oder bau deinen eigenen, verbinde deine Tools, und er läuft rund um die Uhr auf deiner eigenen privaten Maschine in der Cloud. {trialDays} Tage gratis testen."
     }
 }

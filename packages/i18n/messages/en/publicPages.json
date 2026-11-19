@@ -7,7 +7,9 @@
         "publishedAuth.signedInAs": "{email} is the visitor's address, {workspace} the name of the workspace that owns the page.",
         "gate.open": "Button that opens a protected page.",
         "gate.password.subtitle": "{workspace} is the name of the workspace that shared the page.",
-        "gate.members.subtitle": "{workspace} is the name of the workspace whose members can open the page."
+        "gate.members.subtitle": "{workspace} is the name of the workspace whose members can open the page.",
+        "publishedView.untitled": "Title of the link preview of a page a coworker published, when the page has no title of its own.",
+        "publishedSite.notFound": "Plain text body of the 404 answer of a published page or file that does not exist or may not be opened."
     },
     "linkOff": {
         "title": "This link no longer works",
@@ -24,7 +26,8 @@
         "protectedTitle": "Protected page",
         "protectedDescription": "Shared by {workspace}. Sign in or confirm your email to open it.",
         "publishedBy": "Published by {agent} at {workspace}",
-        "publishedByUnknown": "Published by a coworker at {workspace}"
+        "publishedByUnknown": "Published by a coworker at {workspace}",
+        "untitled": "Published page"
     },
     "publishedAuth": {
         "metaTitle": "Open a page",
@@ -57,5 +60,8 @@
             "subtitle": "For {workspace} members",
             "continue": "Continue with Rerun"
         }
+    },
+    "publishedSite": {
+        "notFound": "Not found"
     }
 }

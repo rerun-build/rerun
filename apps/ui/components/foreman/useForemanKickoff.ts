@@ -11,6 +11,7 @@ import { buildKickoffMarker, encodeIntent, type KickoffIntent } from '@/lib/fore
 import { type ForemanArrival, type ForemanPhase } from '@/lib/foreman/phase'
 import type { ForemanSurface } from '@/lib/foreman/surface'
 import { arrivalPreviewPlan } from '@/lib/onboarding/intake'
+import { useBoxNameLocalizer } from '@/lib/onboarding/useBoxNameSuggestions'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -74,6 +75,7 @@ export async function settleBuiltFunnel(): Promise<'skipped' | 'companion'> {
 export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (text: string) => void; messageCount: number; restoreDone: boolean }) {
     const { workspace, phoneStep } = useSession()
     const searchParams = useSearchParams()
+    const localizeBoxName = useBoxNameLocalizer()
     const funnel = useForemanStore(state => state.funnel)
     const [firstName, setFirstName] = useState<string | null>(null)
     // Ce avec quoi ils sont arrivés, nommé par le serveur. Dans le store et pas ici : la colonne en
@@ -113,7 +115,7 @@ export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (
                 setFirstName(state.firstName?.trim() || null)
                 store.setArrival(state.arrival ?? null)
                 // Rien n'est encore construit : ce qu'ils ont cliqué est posé sur le board, éteint.
-                if (state.arrival && !state.arrival.installed && state.phase !== 'discover') store.setIntakePreview(arrivalPreviewPlan(state.arrival.coworker ?? state.arrival.title))
+                if (state.arrival && !state.arrival.installed && state.phase !== 'discover') store.setIntakePreview(arrivalPreviewPlan(state.arrival.coworker ?? state.arrival.title, localizeBoxName))
 
                 // Plus d'engine dans le pool : le mur de waitlist prend l'écran et rien ne part.
                 if (state.phase === 'waitlist') {
@@ -136,7 +138,7 @@ export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (
                 setSettled(identity)
             })
             .catch(() => useForemanStore.getState().setFunnel('companion'))
-    }, [identity, searchParams])
+    }, [identity, searchParams, localizeBoxName])
 
     const start = useCallback(() => {
         if (greeted.current) return

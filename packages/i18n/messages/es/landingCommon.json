@@ -306,5 +306,8 @@
             "cta": "Ver la comparación"
         }
     },
-    "composerPlaceholder": "Enviar un mensaje..."
+    "composerPlaceholder": "Enviar un mensaje...",
+    "dialog": {
+        "close": "Cerrar"
+    }
 }

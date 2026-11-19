@@ -139,7 +139,8 @@
         "new": "Neu",
         "emptyTitle": "Noch keine MCP-Server",
         "emptyDescription": "MCP-Server geben deinem Coworker zusätzliche Tools über die eingebauten Apps hinaus. Füge einen hinzu, um seine Möglichkeiten zu erweitern.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# MCP-Server} other {# MCP-Server}}"
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Erkennung fehlgeschlagen",
@@ -344,7 +345,8 @@
         "emptyDescription": "Ein Auslöser gibt deinem Coworker eine öffentliche URL. Ruft ein anderer Dienst sie auf, läuft der Coworker mit den empfangenen Nutzdaten.",
         "summary": "{methods} · {count, plural, one {# Aufruf} other {# Aufrufe}}",
         "paused": "pausiert",
-        "neverCalled": "Noch nie aufgerufen"
+        "neverCalled": "Noch nie aufgerufen",
+        "count": "{count, plural, one {# Auslöser} other {# Auslöser}}"
     },
     "triggerEditor": {
         "saveFailed": "Speichern fehlgeschlagen",
@@ -430,7 +432,8 @@
             "testRun": "Testlauf",
             "saveChanges": "Änderungen speichern",
             "create": "Aufgabe erstellen"
-        }
+        },
+        "count": "{count, plural, one {# geplante Aufgabe} other {# geplante Aufgaben}}"
     },
     "taskNotifyField": {
         "label": "Benachrichtige mich",
@@ -578,7 +581,8 @@
         "newSkill": "Neu",
         "emptyTitle": "Noch keine Skills",
         "emptyDescription": "Skills sind wiederverwendbare Schritt-für-Schritt-Anleitungen, die dein Coworker lernt, damit er wiederkehrende Aufgaben jedes Mal gleich erledigt.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# Skill} other {# Skills}}"
     },
     "shareAgentDialog": {
         "titleLink": "Dein Freigabelink",

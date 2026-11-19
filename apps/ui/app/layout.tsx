@@ -14,12 +14,12 @@ import { OpenInDesktopPrompt } from "@/components/desktop-shell/OpenInDesktopPro
 import { PageAttentionWatcher } from "@/components/layout/PageAttentionWatcher";
 import { ShellTitleBar } from "@/components/desktop-shell/ShellTitleBar";
 import { requestDesktopShell } from "@/lib/desktop-shell/server";
-import { DESKTOP_SHELL_ATTRIBUTE } from "@rerun/contracts";
+import { DESKTOP_SHELL_ATTRIBUTE, TRIAL_DAYS } from "@rerun/contracts";
 import { DomMutationGuard } from "@rerun/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { TimeZoneCookie } from "@/components/layout/TimeZoneCookie";
 import { UiLocaleProvider } from "@rerun/ui/locale";
 
@@ -35,42 +35,47 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: site.title,
-    template: site.titleTemplate,
-  },
-  description: site.description,
-  applicationName: site.name,
-  keywords: ["Rerun", "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
-  authors: [{ name: site.name }],
-  metadataBase: new URL(site.url),
-  // iOS Safari otherwise wraps what looks like a phone number or an address in a link before React
-  // hydrates, and the markup no longer matches the server's (React error #418).
-  formatDetection: { telephone: false, email: false, address: false },
-  // Next resolves the OpenGraph and Twitter titles against their own template, never against
-  // `title.template`, so the suffix has to be declared here for child pages to inherit it.
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    title: { default: site.title, template: site.titleTemplate },
-    description: site.description,
-    images: [
-      { url: site.ogImage, ...site.ogImageSize, alt: site.title },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: { default: site.title, template: site.titleTemplate },
-    description: site.description,
-    images: [site.ogImage],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: site.name,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("layout.site");
+  const title = t("title");
+  const description = t("description", { trialDays: TRIAL_DAYS });
+  return {
+    title: {
+      default: title,
+      template: site.titleTemplate,
+    },
+    description,
+    applicationName: site.name,
+    keywords: ["Rerun", "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
+    authors: [{ name: site.name }],
+    metadataBase: new URL(site.url),
+    // iOS Safari otherwise wraps what looks like a phone number or an address in a link before React
+    // hydrates, and the markup no longer matches the server's (React error #418).
+    formatDetection: { telephone: false, email: false, address: false },
+    // Next resolves the OpenGraph and Twitter titles against their own template, never against
+    // `title.template`, so the suffix has to be declared here for child pages to inherit it.
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      title: { default: title, template: site.titleTemplate },
+      description,
+      images: [
+        { url: site.ogImage, ...site.ogImageSize, alt: title },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: { default: title, template: site.titleTemplate },
+      description,
+      images: [site.ogImage],
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: site.name,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [

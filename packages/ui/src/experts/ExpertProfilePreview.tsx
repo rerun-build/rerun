@@ -9,6 +9,7 @@ import { ExpertAvailability } from './ExpertAvailability'
 import { ChipList, SocialLinks } from './expert-profile-parts'
 import { badgeTone } from './options'
 import type { Expert } from './types'
+import { useExpertLabels } from './useExpertLabels'
 import { useKitTranslations } from '../locale'
 
 const HIRE_CLASSNAME = 'w-full rounded-lg dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black'
@@ -18,6 +19,7 @@ const HIRE_CLASSNAME = 'w-full rounded-lg dark:bg-white dark:text-black dark:hov
 // card will look like.
 export function ExpertProfilePreview({ expert, action }: { expert: Expert; action?: ReactNode }) {
     const t = useKitTranslations()
+    const labels = useExpertLabels()
     const subtitle = expert.location ?? ''
 
     return (
@@ -40,7 +42,7 @@ export function ExpertProfilePreview({ expert, action }: { expert: Expert; actio
                             <h2 className="font-heading text-xl font-semibold text-foreground">{expert.name}</h2>
                             <ExpertAvailability availability={expert.availability} />
                             <Badge tone={badgeTone(expert.badge)} size="sm">
-                                {expert.badge}
+                                {labels.badge(expert.badge)}
                             </Badge>
                         </div>
                         {subtitle && <p className="mt-1 text-sm text-foreground/50">{subtitle}</p>}
@@ -48,8 +50,8 @@ export function ExpertProfilePreview({ expert, action }: { expert: Expert; actio
 
                     {expert.bio && <Markdown content={expert.bio} className="text-sm text-foreground/70" />}
 
-                    <ChipList title={t('experts.wizard.skills')} items={expert.skills} />
-                    <ChipList title={t('experts.wizard.languages')} items={expert.languages} />
+                    <ChipList title={t('experts.wizard.skills')} items={expert.skills.map(labels.skill)} />
+                    <ChipList title={t('experts.wizard.languages')} items={expert.languages.map(labels.language)} />
 
                     {expert.budget && (
                         <div>

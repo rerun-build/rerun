@@ -111,7 +111,7 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
     return (
         <PanelSteps stepKey={stepKey} depth={stepDepth}>
             <div className="flex flex-col h-full">
-                <PanelListHeader count={triggers.length} noun="trigger">
+                <PanelListHeader countLabel={t('count', { count: triggers.length })}>
                     {newButton}
                 </PanelListHeader>
 

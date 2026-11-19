@@ -557,5 +557,6 @@
         "lapsed": "Votre abonnement a pris fin. Les coworkers installés par ce template sont désactivés.",
         "billedTo": "Facturé à {workspace}. Votre plan Rerun est déjà actif.",
         "yours": "Votre template, sans frais."
-    }
+    },
+    "boardAlt": "Board des coworkers de {title}"
 }

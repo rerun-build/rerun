@@ -212,5 +212,9 @@
     "dashboard": {
         "metaTitle": "Pano",
         "metaDescription": "Rerun'da Boxes ve coworker'larınız."
+    },
+    "site": {
+        "title": "Rerun | Görevlerinizi yapay zekaya yaptırın, siz uyurken bile",
+        "description": "Kütüphaneden çalışmaya hazır bir yapay zeka ajanı seçin veya kendinizinkini oluşturun, araçlarınızı bağlayın; buluttaki size özel makinenizde 7/24 çalışsın. {trialDays} gün ücretsiz deneme."
     }
 }

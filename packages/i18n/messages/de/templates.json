@@ -557,5 +557,6 @@
         "lapsed": "Dein Abo ist beendet. Die Coworker, die diese Vorlage installiert hat, sind deaktiviert.",
         "billedTo": "Abgerechnet an {workspace}. Dein Rerun-Tarif ist bereits aktiv.",
         "yours": "Deine Vorlage, kostenlos."
-    }
+    },
+    "boardAlt": "Coworker-Board von {title}"
 }

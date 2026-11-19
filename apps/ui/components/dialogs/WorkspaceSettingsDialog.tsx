@@ -262,11 +262,11 @@ function IllustrationGrid({ selectedUrl, onPick }: { selectedUrl: string | undef
     return (
         <div className="space-y-2">
             <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
-                {blobs.map(blob => {
+                {blobs.map((blob, index) => {
                     const selected = blob.url === selectedUrl
                     return (
-                        <button key={blob.file} type="button" onClick={() => onPick(blob.file)} aria-pressed={selected} className={cn('relative aspect-square overflow-hidden rounded-lg border transition-colors', selected ? 'border-foreground ring-1 ring-foreground' : 'border-border hover:border-foreground/40')}>
-                            <img src={blob.url} alt={blob.desc} className="size-full object-cover" />
+                        <button key={blob.file} type="button" onClick={() => onPick(blob.file)} aria-pressed={selected} aria-label={t('illustrationOption', { number: index + 1 })} className={cn('relative aspect-square overflow-hidden rounded-lg border transition-colors', selected ? 'border-foreground ring-1 ring-foreground' : 'border-border hover:border-foreground/40')}>
+                            <img src={blob.url} alt="" className="size-full object-cover" />
                             {selected && (
                                 <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-foreground">
                                     <CheckIcon className="size-2.5 text-background" />

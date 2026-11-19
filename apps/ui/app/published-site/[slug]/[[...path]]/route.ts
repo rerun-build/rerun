@@ -27,6 +27,7 @@ import { resolveSitePath, siteObjectKey } from '@/lib/published/site-path'
 import { PUBLISHED_BUCKET } from '@/lib/services/publish'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { getTranslations } from 'next-intl/server'
 
 // What `<slug>.rerun.site` serves, reached only through the host rewrite in proxy.ts: the site's
 // files once the visitor may open the link, and the reserved `/__rerun/` paths (the gate's forms,
@@ -45,8 +46,9 @@ const OG_CACHE_CONTROL = 'public, max-age=300'
 
 type Params = { params: Promise<{ slug: string; path?: string[] }> }
 
-function notFound(): Response {
-    return new Response('Not found', { status: 404, headers: { ...BASE_HEADERS, 'Cache-Control': 'no-store' } })
+async function notFound(): Promise<Response> {
+    const t = await getTranslations('publicPages.publishedSite')
+    return new Response(t('notFound'), { status: 404, headers: { ...BASE_HEADERS, 'Cache-Control': 'no-store' } })
 }
 
 function isStreamedMedia(contentType: string): boolean {
@@ -107,13 +109,14 @@ async function streamMedia(entry: PublishedEntry, request: Request, key: string,
 }
 
 async function previewMetaFor(entry: PublishedEntry, request: Request) {
-    const [brand, { data: agent }] = await Promise.all([
+    const [brand, { data: agent }, t] = await Promise.all([
         loadWorkspaceBrand(entry.workspace_id),
         selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }),
+        getTranslations('publicPages.publishedView'),
     ])
     return {
-        title: entry.title ?? 'Published page',
-        description: agent?.name ? `Published by ${agent.name} at ${brand.name}` : `Published at ${brand.name}`,
+        title: entry.title ?? t('untitled'),
+        description: agent?.name ? t('publishedBy', { agent: agent.name, workspace: brand.name }) : t('publishedByUnknown', { workspace: brand.name }),
         image: previewImageUrl(entry, originOf(entry.slug, request)),
         url: `${originOf(entry.slug, request)}/`,
     }
@@ -205,14 +208,15 @@ async function logoDataUrl(url: string | null): Promise<string | null> {
 
 async function serveOgImage(entry: PublishedEntry): Promise<Response> {
     const locked = entry.access !== 'public'
-    const [brand, { data: agent }, thumbnail] = await Promise.all([
+    const [brand, { data: agent }, thumbnail, t] = await Promise.all([
         loadWorkspaceBrand(entry.workspace_id),
         selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }),
         locked ? null : thumbnailDataUrl(entry.thumbnail_key),
+        getTranslations('publicPages.publishedView'),
     ])
     const image = await publishedOgImage({
         locked,
-        title: entry.title ?? 'Published page',
+        title: entry.title ?? t('untitled'),
         workspaceName: brand.name,
         workspaceIconUrl: await logoDataUrl(brand.iconUrl),
         coworkerName: agent?.name ?? null,

@@ -11,6 +11,7 @@ import { PANEL_CARD } from '@/components/ui/panel-row'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { planLifeScript } from '@/lib/foreman/plan-life'
 import { planCardScene } from '@/lib/foreman/plan-scene'
+import { usePlanSceneLabels } from '@/lib/foreman/usePlanSceneLabels'
 import { ChevronLeftIcon, ChevronRightIcon, CircleCheckIcon, ClockIcon, MinusIcon, PencilIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { readPlan, type PlanGroup, type PlanItem } from './plan-card'
@@ -86,7 +87,8 @@ function useCarouselEdges(cards: number) {
 }
 
 function PlanBoxScene({ group, animated, framed }: { group: PlanGroup; animated: boolean; framed: boolean }) {
-    const scene = useMemo(() => planCardScene(group, { animated }), [group, animated])
+    const sceneLabels = usePlanSceneLabels()
+    const scene = useMemo(() => planCardScene(group, { animated, labels: sceneLabels }), [group, animated, sceneLabels])
     // The camera is only fitted on mount: a Box that widens for its second agent has to be framed
     // again, so it is remounted at its new size.
     const slots = Math.max(1, group.items.length)

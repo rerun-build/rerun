@@ -105,6 +105,7 @@
         "aiProviders": "Fournisseurs d'IA",
         "vault": "Vault",
         "vaultSignedOut": "Une app du Vault est déconnectée",
+        "computers": "Ordinateurs",
         "servers": "Serveurs",
         "billing": "Facturation",
         "newWorkspace": "Nouveau workspace",
@@ -119,8 +120,7 @@
         "adminPanel": "Panneau d'admin",
         "notifications": "Notifications",
         "account": "Compte",
-        "signOut": "Se déconnecter",
-        "computers": "Ordinateurs"
+        "signOut": "Se déconnecter"
     },
     "update": {
         "reload": "Recharger",
@@ -212,5 +212,9 @@
     "dashboard": {
         "metaTitle": "Tableau de bord",
         "metaDescription": "Vos Boxes et vos coworkers sur Rerun."
+    },
+    "site": {
+        "title": "Rerun | Vos tâches faites par l'IA, même pendant votre sommeil",
+        "description": "Choisissez un agent IA prêt à l'emploi dans la bibliothèque ou créez le vôtre, connectez vos outils, et il tourne 24h/24, 7j/7 sur votre propre machine privée dans le cloud. Essai gratuit de {trialDays} jours."
     }
 }

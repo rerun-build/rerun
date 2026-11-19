@@ -4,7 +4,8 @@
         "settings.fallbackName": "Shown in place of the workspace's name when it has none.",
         "settings.showAll": "Button expanding the grid of illustrations. {count} is how many there are.",
         "access.paused": "Tooltip of a disabled control while the workspace is paused (its plan ended and its machine was archived).",
-        "access.sandboxNone": "Why a settings command is disabled in an expert's sandbox workspace: it has no settings, members or billing of its own."
+        "access.sandboxNone": "Why a settings command is disabled in an expert's sandbox workspace: it has no settings, members or billing of its own.",
+        "settings.illustrationOption": "Screen reader label of one tile in a grid of abstract illustrations to pick as the workspace icon. {number} is its position in the grid."
     },
     "settings": {
         "coworkersLanguage": "Coworkers' language",
@@ -22,7 +23,8 @@
         "noLogoFound": "No logo found at this address",
         "pickIllustration": "Or pick an illustration",
         "showLess": "Show less",
-        "showAll": "Show all {count}"
+        "showAll": "Show all {count}",
+        "illustrationOption": "Illustration {number}"
     },
     "access": {
         "paused": "Subscribe to restore your workspace first",

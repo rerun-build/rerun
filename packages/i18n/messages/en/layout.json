@@ -25,7 +25,9 @@
         "providerStatus.headlineLong.one": "Same as headline.one, with a second sentence, on wide screens.",
         "providerStatus.headlineLong.many": "Same as headline.many, with a second sentence, on wide screens.",
         "workspaceMenu.summary.limits": "Under the workspace name. {agents} is a number. {seats} is already translated (\"3 seats\").",
-        "workspaceMenu.summary.limitsUnlimited": "Under the workspace name, when the plan has no coworker limit. {seats} is already translated (\"3 seats\")."
+        "workspaceMenu.summary.limitsUnlimited": "Under the workspace name, when the plan has no coworker limit. {seats} is already translated (\"3 seats\").",
+        "site.title": "Browser tab title and link preview title of the app's pages that have none of their own. Keep \"Rerun | \" at the start.",
+        "site.description": "Meta description of the app's pages, shown under the title in search results and link previews. {trialDays} is a number of days."
     },
     "loading": "Loading...",
     "theme": "Theme",
@@ -240,5 +242,9 @@
     "dashboard": {
         "metaTitle": "Dashboard",
         "metaDescription": "Your Boxes and coworkers on Rerun."
+    },
+    "site": {
+        "title": "Rerun | Get your tasks done by AI, even while you sleep",
+        "description": "Pick a ready-to-run AI agent from the library or build your own, connect your tools, and it runs 24/7 on your own private machine in the cloud. Free {trialDays}-day trial."
     }
 }

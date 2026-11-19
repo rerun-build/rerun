@@ -5,7 +5,7 @@ import { CopyLine } from '@/components/dialogs/CopyLine'
 import { McpClientPicker } from '@/components/dialogs/McpClientPicker'
 import { DocsLink } from '@/components/ui/docs-link'
 import { Field } from '@/components/ui/field'
-import { KEY_PLACEHOLDER, mcpClientDocs, mcpClientSnippets, type McpClientId } from '@/lib/mcp/connect'
+import { KEY_PLACEHOLDER, mcpClientDocs, mcpClientSnippets, type McpClientId, type McpSnippet } from '@/lib/mcp/connect'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -14,7 +14,9 @@ import { useState } from 'react'
 // panel is readable before anyone has created one.
 export function McpSnippets({ mcpUrl, apiKey = KEY_PLACEHOLDER }: { mcpUrl: string; apiKey?: string }) {
     const t = useTranslations('dialogs.copy')
+    const tConnect = useTranslations('dialogs.mcpConnect')
     const [client, setClient] = useState<McpClientId>('claude-code')
+    const labelOf = (snippet: McpSnippet) => (typeof snippet.label === 'string' ? tConnect(`labels.${snippet.label}`) : snippet.label.file)
 
     return (
         <div className="min-w-0 overflow-hidden rounded-lg border border-border/60 bg-muted/20">
@@ -24,11 +26,14 @@ export function McpSnippets({ mcpUrl, apiKey = KEY_PLACEHOLDER }: { mcpUrl: stri
             </div>
 
             <div className="space-y-2.5 p-3">
-                {mcpClientSnippets(client, mcpUrl, apiKey).map(snippet => (
-                    <Field key={snippet.label} label={snippet.label} helperText={snippet.hint}>
-                        {snippet.block ? <CopyBlock value={snippet.value} label={t('snippet', { label: snippet.label })} /> : <CopyLine value={snippet.value} label={t('snippet', { label: snippet.label })} />}
-                    </Field>
-                ))}
+                {mcpClientSnippets(client, mcpUrl, apiKey).map(snippet => {
+                    const label = labelOf(snippet)
+                    return (
+                        <Field key={label} label={label} helperText={snippet.hint && tConnect(`hints.${snippet.hint}`)}>
+                            {snippet.block ? <CopyBlock value={snippet.value} label={t('snippet', { label })} /> : <CopyLine value={snippet.value} label={t('snippet', { label })} />}
+                        </Field>
+                    )
+                })}
 
                 <DocsLink path={mcpClientDocs(client)}>{t('fullGuide')}</DocsLink>
             </div>

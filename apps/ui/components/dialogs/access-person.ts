@@ -12,8 +12,6 @@ export function personLabel(profile: AuthorProfile | null, email: string | null,
 
 export const asIs = (path: string) => path
 
-export const BOX_ACCESS_ADMIN_ONLY = 'Only an admin can change who can access a Box'
-
 type RemovalOutcome = 'admin' | 'restricted' | 'manage' | 'use'
 
 // What a change of access does to the person, as the confirmation dialogs print it.

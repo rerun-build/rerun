@@ -74,7 +74,14 @@
         "isoGrid.status.restoring": "Status of a coworker while its paused workspace is being brought back.",
         "isoGrid.untitledBox": "Name shown on a Box (a group of coworkers on the board) that has no name.",
         "isoGrid.tileAria": "Screen reader label of a coworker block on the board. {name} is the coworker, {state} its status word, {toHandle} how many conversations wait on the user, {results} how many finished results are unread.",
-        "newAgent.appsPicker.categories": "Filter chips over a list of apps a coworker can use: the kind of app."
+        "newAgent.appsPicker.categories": "Filter chips over a list of apps a coworker can use: the kind of app.",
+        "tour.boxes.marketing": "Name of a Box (a group of coworkers for one part of a business) drawn on the board of the product tour. Short: it is written on the board.",
+        "tour.boxes.sales": "Name of a Box drawn on the board of the product tour. Short.",
+        "tour.boxes.ops": "Name of a Box drawn on the board of the product tour: operations, back office. Short.",
+        "tour.roles.headOfGrowth": "Job title under the name of an invented teammate (Théo) on a cursor badge of the product tour. Short.",
+        "tour.roles.accountExecutive": "Job title of an invented salesperson (Sofia) on a cursor badge of the product tour. Short.",
+        "tour.roles.operationsSpecialist": "Job title of an invented teammate (Noah) on a cursor badge of the product tour. Short.",
+        "experts.skills.agentDesign": "Skills an AI automation expert offers, picked in their marketplace profile. Keep technical terms (RAG, MCP, API, CRM) as they are."
     },
     "close": "Close",
     "chat": {
@@ -288,6 +295,24 @@
         },
         "preview": {
             "hire": "Hire"
+        },
+        "skills": {
+            "agentDesign": "Agent Design",
+            "workflowAutomation": "Workflow Automation",
+            "ragKnowledgeBases": "RAG & Knowledge Bases",
+            "integrationsApis": "Integrations & APIs",
+            "mcpServers": "MCP Servers",
+            "promptEngineering": "Prompt Engineering",
+            "dataPipelines": "Data Pipelines",
+            "chatbotsSupport": "Chatbots & Support",
+            "voiceAgents": "Voice Agents",
+            "leadGenOutreach": "Lead Gen & Outreach",
+            "crmAutomation": "CRM Automation",
+            "webScraping": "Web Scraping",
+            "ecommerceAutomation": "E-commerce Automation",
+            "analyticsReporting": "Analytics & Reporting",
+            "fineTuning": "Fine-tuning",
+            "noCodeAutomation": "No-code Automation"
         }
     },
     "foreman": {
@@ -562,5 +587,17 @@
         },
         "approve": "Approve",
         "edit": "Edit"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "Marketing",
+            "sales": "Sales",
+            "ops": "Ops"
+        },
+        "roles": {
+            "headOfGrowth": "Head of growth",
+            "accountExecutive": "Account executive",
+            "operationsSpecialist": "Operations specialist"
+        }
     }
 }

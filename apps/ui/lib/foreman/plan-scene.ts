@@ -22,9 +22,16 @@ export type PlanScene = {
     landedAt: number
 }
 
+// What a screen reader hears for a piece of the scene, in the reader's language (usePlanSceneLabels).
+// Left out, it hears the bare names.
+export type PlanSceneLabels = { planned: (name: string) => string; plannedBox: string }
+
+const BARE_NAMES: PlanSceneLabels = { planned: name => name, plannedBox: '' }
+
 export type PlanSceneOptions = {
     /** False under reduced motion: the scene is simply there. */
     animated?: boolean
+    labels?: PlanSceneLabels
     /**
      * The Boxes that exist for real. They keep their place in the rosette, which is what makes the
      * ones after them fall where the server will put them, but they are no longer drawn: the real
@@ -98,7 +105,7 @@ function anchorsIn(rect: NewSpaceRect, count: number): GridPosition[] {
     return anchors
 }
 
-export function planScene(plan: ShownPlan, { animated = true, built = [] }: PlanSceneOptions = {}): PlanScene {
+export function planScene(plan: ShownPlan, { animated = true, built = [], labels = BARE_NAMES }: PlanSceneOptions = {}): PlanScene {
     const containers: Container[] = []
     const tiles: Tile[] = []
     const placed: SpaceRect[] = []
@@ -127,7 +134,7 @@ export function planScene(plan: ShownPlan, { animated = true, built = [] }: Plan
             row_start: rect.rowStart,
             col_end: rect.colEnd,
             row_end: rect.rowEnd,
-            ariaLabel: group.name ? `${group.name}, planned` : 'Planned Box',
+            ariaLabel: group.name ? labels.planned(group.name) : labels.plannedBox,
             ...(animated ? { justPlaced: true, dropStyle: 'draw' as const, dropDuration: BOX_DRAW_MS, dropDelay: boxDelay } : {}),
         })
         landedAt = Math.max(landedAt, boxDelay + BOX_DRAW_MS)
@@ -144,7 +151,7 @@ export function planScene(plan: ShownPlan, { animated = true, built = [] }: Plan
                 style: agentTileStyle('idle', item.name),
                 selectable: false,
                 draggable: false,
-                ariaLabel: `${item.name}, planned`,
+                ariaLabel: labels.planned(item.name),
                 ...(animated ? { justPlaced: true, dropDelay } : {}),
             })
             landedAt = Math.max(landedAt, dropDelay + TILE_DROP_MS)
@@ -183,7 +190,7 @@ const CARD_BOX_MARGIN = 1
 const CARD_AGENT_GAP = 1
 const CARD_BOX_ID = 'plan-card:box'
 
-export function planCardScene(group: PlanGroup, { animated = true }: { animated?: boolean } = {}): Pick<PlanScene, 'containers' | 'tiles'> {
+export function planCardScene(group: PlanGroup, { animated = true, labels = BARE_NAMES }: Pick<PlanSceneOptions, 'animated' | 'labels'> = {}): Pick<PlanScene, 'containers' | 'tiles'> {
     const slots = Math.max(1, group.items.length)
 
     return {
@@ -197,7 +204,7 @@ export function planCardScene(group: PlanGroup, { animated = true }: { animated?
                 col_end: CARD_BOX_MARGIN * 2 + slots * AGENT_SPAN + (slots - 1) * CARD_AGENT_GAP - 1,
                 row_end: CARD_BOX_MARGIN * 2 + AGENT_SPAN - 1,
                 ghost: group.items.length === 0,
-                ariaLabel: group.name ? `${group.name}, planned` : 'Planned Box',
+                ariaLabel: group.name ? labels.planned(group.name) : labels.plannedBox,
                 ...(animated ? { justPlaced: true, dropStyle: 'draw' as const, dropDuration: BOX_DRAW_MS } : {}),
             },
         ],
@@ -209,7 +216,7 @@ export function planCardScene(group: PlanGroup, { animated = true }: { animated?
             style: agentTileStyle('idle', item.name),
             selectable: false,
             draggable: false,
-            ariaLabel: `${item.name}, planned`,
+            ariaLabel: labels.planned(item.name),
             ...(animated ? { justPlaced: true, dropDelay: AGENT_LAG + rank * AGENT_STEP } : {}),
         })),
     }

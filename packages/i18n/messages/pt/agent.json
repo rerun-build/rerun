@@ -139,7 +139,8 @@
         "new": "Novo",
         "emptyTitle": "Nenhum servidor MCP ainda",
         "emptyDescription": "Servidores MCP dão ao seu coworker ferramentas extras além dos apps nativos. Adicione um para ampliar o que ele pode fazer.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# servidor MCP} other {# servidores MCP}}"
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Falha na descoberta",
@@ -344,7 +345,8 @@
         "emptyDescription": "Um gatilho dá ao seu coworker uma URL pública. Sempre que outro serviço a chama, o coworker roda com o conteúdo recebido.",
         "summary": "{methods} · {count, plural, one {# chamada} other {# chamadas}}",
         "paused": "pausado",
-        "neverCalled": "Nunca chamado"
+        "neverCalled": "Nunca chamado",
+        "count": "{count, plural, one {# gatilho} other {# gatilhos}}"
     },
     "triggerEditor": {
         "saveFailed": "Falha ao salvar",
@@ -430,7 +432,8 @@
             "testRun": "Testar",
             "saveChanges": "Salvar alterações",
             "create": "Criar tarefa"
-        }
+        },
+        "count": "{count, plural, one {# tarefa agendada} other {# tarefas agendadas}}"
     },
     "taskNotifyField": {
         "label": "Me avisar",
@@ -578,7 +581,8 @@
         "newSkill": "Nova",
         "emptyTitle": "Nenhuma skill ainda",
         "emptyDescription": "Skills são instruções passo a passo reutilizáveis que seu coworker aprende, para fazer tarefas recorrentes sempre do mesmo jeito.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# skill} other {# skills}}"
     },
     "shareAgentDialog": {
         "titleLink": "Seu link de compartilhamento",

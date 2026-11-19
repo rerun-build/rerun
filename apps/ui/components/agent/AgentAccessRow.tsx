@@ -1,7 +1,7 @@
 'use client'
 
 import { coworkerAccessSummary } from '@/components/agent/access-summary'
-import { BOX_ACCESS_ADMIN_ONLY } from '@/components/dialogs/access-person'
+import { useBoxAccessCopy } from '@/components/dialogs/access-person'
 import { BoxAccessDialog } from '@/components/dialogs/BoxAccessDialog'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
@@ -18,6 +18,7 @@ import { useState } from 'react'
 export function AgentAccessRow({ agent }: { agent: Pick<IsoAgent, 'id' | 'spaceId'> }) {
     const t = useTranslations('agent')
     const tSummary = useTranslations('agent.accessSummary')
+    const { adminOnly } = useBoxAccessCopy()
     const isAdmin = useIsWorkspaceAdmin()
     const access = useAgentAccess(agent.id)
     const space = useBoardStore(s => s.spaces.find(candidate => candidate.id === agent.spaceId))
@@ -34,7 +35,7 @@ export function AgentAccessRow({ agent }: { agent: Pick<IsoAgent, 'id' | 'spaceI
                 title={title}
                 description={detail}
                 actions={
-                    <TooltipDisabledReason reason={isAdmin ? undefined : BOX_ACCESS_ADMIN_ONLY}>
+                    <TooltipDisabledReason reason={isAdmin ? undefined : adminOnly}>
                         <Button type="button" size="sm" variant="outline" disabled={!isAdmin} onClick={() => setDialogOpen(true)}>
                             {t('agentAccessRow.manage')}
                         </Button>

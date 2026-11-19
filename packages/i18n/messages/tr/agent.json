@@ -139,7 +139,8 @@
         "new": "Yeni",
         "emptyTitle": "Henüz MCP sunucusu yok",
         "emptyDescription": "MCP sunucuları, coworker'ınıza yerleşik uygulamaların ötesinde ek araçlar sağlar. Yapabileceklerini genişletmek için bir tane ekleyin.",
-        "appBadge": "Uygulama"
+        "appBadge": "Uygulama",
+        "count": "{count, plural, one {# MCP sunucusu} other {# MCP sunucusu}}"
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Keşif başarısız oldu",
@@ -344,7 +345,8 @@
         "emptyDescription": "Tetikleyici, coworker'ınıza herkese açık bir URL verir. Başka bir servis bu URL'yi çağırdığında coworker, aldığı verilerle çalışır.",
         "summary": "{methods} · {count, plural, one {# çağrı} other {# çağrı}}",
         "paused": "duraklatıldı",
-        "neverCalled": "Henüz hiç çağrılmadı"
+        "neverCalled": "Henüz hiç çağrılmadı",
+        "count": "{count, plural, one {# tetikleyici} other {# tetikleyici}}"
     },
     "triggerEditor": {
         "saveFailed": "Kaydedilemedi",
@@ -430,7 +432,8 @@
             "testRun": "Test et",
             "saveChanges": "Değişiklikleri kaydet",
             "create": "Görev oluştur"
-        }
+        },
+        "count": "{count, plural, one {# zamanlanmış görev} other {# zamanlanmış görev}}"
     },
     "taskNotifyField": {
         "label": "Bana bildir",
@@ -578,7 +581,8 @@
         "newSkill": "Yeni",
         "emptyTitle": "Henüz skill yok",
         "emptyDescription": "Skill'ler, coworker'ınızın öğrendiği yeniden kullanılabilir adım adım talimatlardır; böylece tekrarlayan görevleri her seferinde aynı şekilde yapar.",
-        "appBadge": "Uygulama"
+        "appBadge": "Uygulama",
+        "count": "{count, plural, one {# skill} other {# skill}}"
     },
     "shareAgentDialog": {
         "titleLink": "Paylaşım bağlantınız",

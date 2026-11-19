@@ -8,6 +8,7 @@ import { TOUR_TEAM_BEATS, TOUR_TEAM_STILL_BEAT, tourTeamStateAt } from './tour-t
 import { ISO_DIM_MS } from '../iso-grid/iso'
 import { agentTileStyle } from '../iso-grid/presets'
 import { usePrefersReducedMotion } from '../iso-grid/hooks/usePrefersReducedMotion'
+import { useKitTranslations } from '../locale'
 import type { Tile, TileLink } from '../iso-grid/types'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -59,13 +60,14 @@ export type TourStage = {
 // is being read, and a decor has nothing to read.
 export function useTourStage({ phase, active, modelShot, focused = isTourFocusPhase(phase) }: { phase: number; active: boolean; modelShot: TourModelShot | null; focused?: boolean }): TourStage {
     const still = usePrefersReducedMotion()
+    const t = useKitTranslations()
     const { rendered, landing } = usePlateau(phase)
     // The model marks are lit from the frame they land on and are never put out again: the halo is
     // part of the mark, like its logo, not a spotlight the slides take turns pointing at it. Read off
     // the rendered phase and not the slide's, so the four marks keep their halo all the way through
     // the fade that takes them off instead of going dark a beat before they leave.
     const lit = rendered >= TOUR_MODEL_PHASE
-    const board = useMemo(() => boardForPhase(rendered, { animatedPhase: still ? null : landing, lit, focused, livePhase: phase }), [rendered, phase, still, landing, lit, focused])
+    const board = useMemo(() => boardForPhase(rendered, { animatedPhase: still ? null : landing, lit, focused, livePhase: phase, t }), [rendered, phase, still, landing, lit, focused, t])
 
     // The agents wake once the phase that carries them has been reached, never before: a board of
     // Boxes with nothing in them has nobody to put to work. Held on the rendered phase, or seven

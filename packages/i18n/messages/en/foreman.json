@@ -37,7 +37,9 @@
         "threads.back": "Accessible label of the back button above a thread.",
         "threads.untitled": "Title of a thread the person just opened with New task, before they wrote anything in it.",
         "header.conversations": "Tooltip and label of the clock button that lists every conversation with the Chief of Staff.",
-        "history.title": "Title of the list of every conversation with the Chief of Staff: General and its threads."
+        "history.title": "Title of the list of every conversation with the Chief of Staff: General and its threads.",
+        "plan.scene.planned": "Screen reader label of a Box or a coworker drawn on the board as part of a plan, not built yet. {name} is its name.",
+        "plan.scene.plannedBox": "Screen reader label of a Box with no name drawn on the board as part of a plan, not built yet."
     },
     "welcome": {
         "title": "Hey, ready to hand off your first task?",
@@ -221,7 +223,11 @@
         "change": "Change something",
         "standingBy": "Standing by",
         "lifeWorking": "Working on it",
-        "lifeDelivered": "Handed over to you"
+        "lifeDelivered": "Handed over to you",
+        "scene": {
+            "planned": "{name}, planned",
+            "plannedBox": "Planned Box"
+        }
     },
     "starterPack": {
         "title": "Your starter team",

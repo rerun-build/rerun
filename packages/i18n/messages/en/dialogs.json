@@ -74,7 +74,14 @@
         "subscriptionOffer.key.add": "Button: save the pasted API key.",
         "viewSettings.groupByRequired": "Form error of a board view: the user must pick the column whose distinct values become the board's columns.",
         "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it.",
-        "boxPicker.description": "Dialog shown in the Simple view when the workspace has several Boxes: the person picks the Box a coworker they are creating joins."
+        "boxPicker.description": "Dialog shown in the Simple view when the workspace has several Boxes: the person picks the Box a coworker they are creating joins.",
+        "mcpConnect.otherClient": "Last button of the row of MCP clients (Claude Code, ChatGPT, Cursor, Rerun): any other client.",
+        "mcpConnect.labels.terminal": "Label above a command to run in a terminal.",
+        "mcpConnect.labels.shellProfile": "Label above a line to add to the shell startup file (~/.zshrc, ~/.bashrc).",
+        "mcpConnect.labels.coworkerPanel": "Where to paste the config: the path of clicks in the app (coworker panel, then the MCP tab, then the New button).",
+        "mcpConnect.labels.header": "An HTTP header to send with each request.",
+        "mcpConnect.labels.stdioClients": "Label above a command for MCP clients that only support the stdio transport. Keep \"stdio\" as it is.",
+        "mcpConnect.hints.codexCliOnly": "Under the ChatGPT command: it works in the Codex CLI, not in the ChatGPT app."
     },
     "account": {
         "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
@@ -754,5 +761,20 @@
         "title": "Choose a Box",
         "description": "The new coworker joins it, on a free spot.",
         "coworkers": "{count, plural, =0 {No coworker yet} one {# coworker} other {# coworkers}}"
+    },
+    "mcpConnect": {
+        "otherClient": "Other",
+        "labels": {
+            "terminal": "Terminal",
+            "shellProfile": "Shell profile",
+            "coworkerPanel": "Coworker panel, MCP, New",
+            "serverUrl": "Server URL",
+            "header": "Header",
+            "stdioClients": "Clients that only speak stdio"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI. The ChatGPT app only takes OAuth connections, so a key gets you nowhere there.",
+            "coworkerReach": "Gives one of your coworkers the same reach over this workspace as an outside client."
+        }
     }
 }

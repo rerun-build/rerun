@@ -4,6 +4,7 @@ import { TOUR_CURSOR_OFFSETS, TOUR_TEAMMATES, type TourTeammate } from './tour-t
 import { tourAgentWorldCenter } from './tour-board'
 import { CursorMark } from '../cursors'
 import { usePrefersReducedMotion } from '../iso-grid/hooks/usePrefersReducedMotion'
+import { useKitTranslations } from '../locale'
 import { useIsMobile } from '../primitives/use-is-mobile'
 import { AnimatePresence, arc, motion } from 'motion/react'
 
@@ -62,6 +63,7 @@ export function TourBoardCursors({ at, present, zoom }: { at: Record<string, str
 // A phone has no room for the two-line badge: dropping the role there falls back to the compact
 // live-cursor mark, which keeps three names readable side by side instead of three overlapping pills.
 function TourCursor({ cursor, zoom, reducedMotion, compact }: { cursor: PositionedTeammate; zoom: number; reducedMotion: boolean; compact: boolean }) {
+    const t = useKitTranslations()
     const gesture = CURSOR_GESTURES[cursor.id] ?? DEFAULT_CURSOR_GESTURE
     const destinationKey = `${cursor.x}:${cursor.y}`
     const screenScale = CURSOR_SCALE / zoom
@@ -94,7 +96,7 @@ function TourCursor({ cursor, zoom, reducedMotion, compact }: { cursor: Position
                 animate={reducedMotion ? { x: 0, y: 0 } : { x: gesture.x, y: gesture.y }}
                 transition={reducedMotion ? { duration: 0 } : { duration: 3, delay: gesture.delay, ease: 'easeInOut' }}
             >
-                <CursorMark name={cursor.name} role={compact ? undefined : cursor.role} color={cursor.color} photoUrl={cursor.photo} />
+                <CursorMark name={cursor.name} role={compact ? undefined : t(`tour.roles.${cursor.roleKey}`)} color={cursor.color} photoUrl={cursor.photo} />
             </motion.div>
         </motion.div>
     )

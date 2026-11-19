@@ -2,6 +2,7 @@ import { Icon } from '@/components/ui/icon'
 import { LayersIcon } from '@/lib/icons'
 import type { TemplateCardImage } from '@/lib/templates/card-image'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 // The thumbnail of a template card, shared by the grid card and the featured one. A board comes as
 // a pair of captures and is swapped in CSS: these cards are rendered on the server, so reading the
@@ -9,6 +10,8 @@ import { cn } from '@/lib/utils'
 export function TemplateCardThumbnail({ image, fit = 'cover', fade, className, children }: { image: TemplateCardImage | null; fit?: 'cover' | 'contain'; fade?: 'bottom' | 'row'; className?: string; children?: React.ReactNode }) {
     // Spelled out rather than interpolated: Tailwind only sees class names it can read in the source.
     const objectFit = fit === 'contain' ? 'object-contain' : 'object-cover'
+    const t = useTranslations('templates')
+    const alt = image?.kind === 'board' ? t('boardAlt', { title: image.alt }) : image?.alt
 
     return (
         <div
@@ -32,11 +35,11 @@ export function TemplateCardThumbnail({ image, fit = 'cover', fade, className, c
             {image ? (
                 <>
                     {image.lightSrc && (
-                        <img src={image.lightSrc} alt={image.alt} loading="lazy" decoding="async" className={cn('block size-full dark:hidden', objectFit)} />
+                        <img src={image.lightSrc} alt={alt} loading="lazy" decoding="async" className={cn('block size-full dark:hidden', objectFit)} />
                     )}
                     <img
                         src={image.src}
-                        alt={image.alt}
+                        alt={alt}
                         loading="lazy"
                         decoding="async"
                         className={cn('size-full', image.lightSrc && 'hidden dark:block', objectFit)}

@@ -35,6 +35,7 @@ const defaultValues: FormValues = { name: '', iconFile: '', members: [], memberD
 export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('dialogs.createWorkspace')
     const tCommon = useTranslations('common')
+    const tSettings = useTranslations('workspace.settings')
     const errorText = useErrorText()
     const { index: step, direction, goForward, back, reset: resetStepper } = useStepper(STEPS.length)
     const current = STEPS[step]
@@ -142,17 +143,18 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
 
                                 {current === 'Icon' && (
                                     <div className="grid grid-cols-5 gap-2">
-                                        {BLOB_ILLUSTRATIONS.map(blob => (
+                                        {BLOB_ILLUSTRATIONS.map((blob, index) => (
                                             <button
                                                 key={blob.file}
                                                 type="button"
                                                 onClick={() => form.setValue('iconFile', blob.file)}
+                                                aria-label={tSettings('illustrationOption', { number: index + 1 })}
                                                 className={cn(
                                                     'relative aspect-square overflow-hidden rounded-lg border transition-colors',
                                                     iconFile === blob.file ? 'border-foreground ring-1 ring-foreground' : 'border-border hover:border-foreground/40',
                                                 )}
                                             >
-                                                <img src={blob.url} alt={blob.desc} className="size-full object-cover" />
+                                                <img src={blob.url} alt="" className="size-full object-cover" />
                                                 {iconFile === blob.file && (
                                                     <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground">
                                                         <CheckIcon className="size-2.5 text-background" />

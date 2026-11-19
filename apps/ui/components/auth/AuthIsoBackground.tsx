@@ -1,6 +1,8 @@
 'use client'
 
 import { IsoGrid } from '@rerun/ui/iso-grid'
+import { useKitTranslations } from '@rerun/ui/locale'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 import type { AgentLink, IsoAgent, SpacePublic } from '@/lib/board/types'
 import { containerFromSpace, tileFromAgent } from '@/lib/board/iso-adapter'
@@ -16,10 +18,9 @@ import { useStageScript } from './useStageScript'
 
 // Disposition locale, volontairement plus aérée que la démo dashboard (agents collés) : un grand
 // space et des agents espacés d'une case (chaque agent occupe un bloc 2×2, AGENT_SPAN=2).
-const DEMO_SPACE: SpacePublic = {
+const DEMO_SPACE: Omit<SpacePublic, 'name'> = {
     id: 'auth-space-1',
     workspace_id: 1,
-    name: 'Growth Ops',
     col_start: 2,
     row_start: 2,
     col_end: 11,
@@ -86,7 +87,10 @@ const SCRIPTED_LINKS = new Map<string, AgentLink>([
 ])
 
 export function AuthIsoBackground() {
+    const t = useTranslations('auth.isoBackground')
+    const tKit = useKitTranslations()
     const { statuses, hotLinks } = useStageScript({ script: AUTH_ISO_SCRIPT, enabled: true })
+    const container = useMemo(() => containerFromSpace({ ...DEMO_SPACE, name: t('boxName') }, tKit), [t, tKit])
 
     const agents = useMemo(
         () => DEMO_AGENTS.map(agent => ({ ...agent, status: statuses[agent.id] ?? agent.status })),
@@ -107,7 +111,7 @@ export function AuthIsoBackground() {
     return (
         <IsoGrid
             tiles={agents.map(a => tileFromAgent(a))}
-            containers={[containerFromSpace(DEMO_SPACE)]}
+            containers={[container]}
             liveLinks={links}
             selectedTileId={selectedId}
             worldAnchor={{ left: '50%', top: '50%' }}

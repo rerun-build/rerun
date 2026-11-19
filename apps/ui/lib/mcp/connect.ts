@@ -35,16 +35,22 @@ export function mcpRemoteCommand(url: string, key: string): string {
 
 export type McpClientId = 'claude-code' | 'chatgpt' | 'cursor' | 'rerun' | 'other'
 
+export type McpSnippetLabel = 'terminal' | 'shellProfile' | 'coworkerPanel' | 'serverUrl' | 'header' | 'stdioClients'
+
+export type McpSnippetHint = 'codexCliOnly' | 'coworkerReach'
+
+// `label` is a key of the `dialogs.mcpConnect.labels` messages, or a file path shown as it is.
 // `block` marks a snippet that is a config to paste rather than a command to run, so it renders
 // multi-line instead of on a single scrollable row.
-export type McpSnippet = { label: string; value: string; block?: boolean; hint?: string }
+export type McpSnippet = { label: McpSnippetLabel | { file: string }; value: string; block?: boolean; hint?: McpSnippetHint }
 
-export const MCP_CLIENTS: { id: McpClientId; label: string; docs: string }[] = [
-    { id: 'claude-code', label: 'Claude Code', docs: '/api/connect#claude-code' },
-    { id: 'chatgpt', label: 'ChatGPT', docs: '/api/connect#codex' },
-    { id: 'cursor', label: 'Cursor', docs: '/api/connect#cursor' },
-    { id: 'rerun', label: 'Rerun', docs: '/api/connect#a-rerun-coworker' },
-    { id: 'other', label: 'Other', docs: '/api/connect#any-other-client' },
+// `brand` is null for the catch-all entry, whose name the picker translates.
+export const MCP_CLIENTS: { id: McpClientId; brand: string | null; docs: string }[] = [
+    { id: 'claude-code', brand: 'Claude Code', docs: '/api/connect#claude-code' },
+    { id: 'chatgpt', brand: 'ChatGPT', docs: '/api/connect#codex' },
+    { id: 'cursor', brand: 'Cursor', docs: '/api/connect#cursor' },
+    { id: 'rerun', brand: 'Rerun', docs: '/api/connect#a-rerun-coworker' },
+    { id: 'other', brand: null, docs: '/api/connect#any-other-client' },
 ]
 
 export function mcpClientDocs(client: McpClientId): string {
@@ -66,32 +72,32 @@ function rerunAgentConfig(url: string, key: string): string {
 export function mcpClientSnippets(client: McpClientId, url: string, key: string): McpSnippet[] {
     switch (client) {
         case 'claude-code':
-            return [{ label: 'Terminal', value: claudeMcpAddCommand(url, key) }]
+            return [{ label: 'terminal', value: claudeMcpAddCommand(url, key) }]
         case 'chatgpt':
             return [
-                { label: 'Shell profile', value: `export ${CODEX_KEY_ENV}="${key}"` },
+                { label: 'shellProfile', value: `export ${CODEX_KEY_ENV}="${key}"` },
                 {
-                    label: 'Terminal',
+                    label: 'terminal',
                     value: `codex mcp add ${SERVER_NAME} --url ${url} --bearer-token-env-var ${CODEX_KEY_ENV}`,
-                    hint: 'Codex CLI. The ChatGPT app only takes OAuth connections, so a key gets you nowhere there.',
+                    hint: 'codexCliOnly',
                 },
             ]
         case 'cursor':
-            return [{ label: '~/.cursor/mcp.json', value: cursorConfig(url, key), block: true }]
+            return [{ label: { file: '~/.cursor/mcp.json' }, value: cursorConfig(url, key), block: true }]
         case 'rerun':
             return [
                 {
-                    label: 'Coworker panel, MCP, New',
+                    label: 'coworkerPanel',
                     value: rerunAgentConfig(url, key),
                     block: true,
-                    hint: 'Gives one of your coworkers the same reach over this workspace as an outside client.',
+                    hint: 'coworkerReach',
                 },
             ]
         case 'other':
             return [
-                { label: 'Server URL', value: url },
-                { label: 'Header', value: `Authorization: ${authorizationHeader(key)}` },
-                { label: 'Clients that only speak stdio', value: mcpRemoteCommand(url, key) },
+                { label: 'serverUrl', value: url },
+                { label: 'header', value: `Authorization: ${authorizationHeader(key)}` },
+                { label: 'stdioClients', value: mcpRemoteCommand(url, key) },
             ]
     }
 }

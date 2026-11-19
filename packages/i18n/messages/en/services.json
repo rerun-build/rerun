@@ -12,7 +12,10 @@
         "list.needsSetup": "Badge of an app installed but not configured yet.",
         "suggestion.notNow": "Button that skips connecting this app for now.",
         "suggestion.skipped": "State of an app the user chose not to connect.",
-        "categories": "Filter chips over the catalog of apps a coworker can connect: the kind of app."
+        "categories": "Filter chips over the catalog of apps a coworker can connect: the kind of app.",
+        "appAccount.wakeEvents.message_received": "Switch under \"Wake this coworker when\": a LinkedIn or WhatsApp message arrives.",
+        "appAccount.wakeEvents.accepted_invitation": "Switch under \"Wake this coworker when\": someone accepts a LinkedIn connection invitation.",
+        "appAccount.wakeEvents.invitation_received": "Switch under \"Wake this coworker when\": a LinkedIn connection invitation is received."
     },
     "appAccount": {
         "addAccount": "Add account",
@@ -29,7 +32,12 @@
             "rightAway": "Right away",
             "everyFewHours": "Checked every few hours"
         },
-        "unavailable": "{app} is not available on this workspace yet."
+        "unavailable": "{app} is not available on this workspace yet.",
+        "wakeEvents": {
+            "message_received": "A message arrives",
+            "accepted_invitation": "An invitation is accepted",
+            "invitation_received": "An invitation is received"
+        }
     },
     "authMethod": {
         "label": {

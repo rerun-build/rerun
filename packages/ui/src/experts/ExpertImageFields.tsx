@@ -11,6 +11,7 @@ import { ExpertBannerPicker } from './ExpertBannerPicker'
 import { badgeTone } from './options'
 import type { ExpertBadge } from './options'
 import type { ExpertUpload } from './types'
+import { useExpertLabels } from './useExpertLabels'
 import { useKitTranslations } from '../locale'
 import type { KitTranslator } from '../kit-translator'
 
@@ -38,6 +39,7 @@ export function ExpertImageFields({
     badge,
 }: ExpertImageFieldsProps) {
     const t = useKitTranslations()
+    const labels = useExpertLabels()
     const [bannerOpen, setBannerOpen] = React.useState(false)
     const [avatarOpen, setAvatarOpen] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
@@ -58,7 +60,7 @@ export function ExpertImageFields({
                             {badge && (
                                 <div className="absolute top-3 right-3">
                                     <Badge tone={badgeTone(badge)} size="sm">
-                                        {badge}
+                                        {labels.badge(badge)}
                                     </Badge>
                                 </div>
                             )}

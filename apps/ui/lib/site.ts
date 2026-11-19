@@ -2,8 +2,8 @@ import { TRIAL_DAYS } from '@rerun/contracts'
 
 export const site = {
     name: 'Rerun',
-    title: 'Rerun | Get your tasks done by AI, even while you sleep',
     titleTemplate: '%s | Rerun',
+    // The web app manifest's, which no request locale reaches. Every page reads the `layout.site` messages.
     description:
         `Pick a ready-to-run AI agent from the library or build your own, connect your tools, and it runs 24/7 on your own private machine in the cloud. Free ${TRIAL_DAYS}-day trial.`,
     url: 'https://app.rerun.build',

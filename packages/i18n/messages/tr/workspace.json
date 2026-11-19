@@ -15,7 +15,8 @@
         "noLogoFound": "Bu adreste logo bulunamadı",
         "pickIllustration": "Veya bir illüstrasyon seçin",
         "showLess": "Daha az göster",
-        "showAll": "Tümünü göster ({count})"
+        "showAll": "Tümünü göster ({count})",
+        "illustrationOption": "İllüstrasyon {number}"
     },
     "access": {
         "paused": "Önce çalışma alanınızı geri yüklemek için abone olun",

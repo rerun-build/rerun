@@ -17,5 +17,9 @@
         "creators": "Criadores",
         "productivity": "Produtividade",
         "other": "Outros"
+    },
+    "connectors": {
+        "none": "Nenhum app necessário",
+        "label": "Apps: {apps}"
     }
 }

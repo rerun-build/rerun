@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import type { ShownPlan } from '@/components/foreman/widgets/plan-card'
 import { planScene, settledPlanScene, type PlanScene } from '@/lib/foreman/plan-scene'
+import { usePlanSceneLabels } from '@/lib/foreman/usePlanSceneLabels'
 import type { SpaceRect } from '@/lib/board/space-layout'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -19,15 +20,16 @@ import { useForemanStore } from '@/stores/foreman.store'
 export function useSettlingPlanScene(plan: ShownPlan | null, built?: SpaceRect[]): PlanScene | null {
     const still = usePrefersReducedMotion()
     const animated = !still
+    const labels = usePlanSceneLabels()
     const [settledFor, setSettledFor] = useState<PlanScene | null>(null)
 
     const landed = useMemo(() => {
         if (!plan) return null
-        const scene = planScene(plan, { animated, built })
+        const scene = planScene(plan, { animated, built, labels })
         // Une organisation sans division ne se dessine pas : il ne resterait que la pastille, posée
         // sur une grille nue, à annoncer ce qui n'arrive pas.
         return scene.containers.length ? scene : null
-    }, [plan, animated, built])
+    }, [plan, animated, built, labels])
 
     // La bascule est portée par le minuteur seul : une scène qui change n'est plus celle qui s'était
     // posée, donc elle redevient opaque sans qu'on ait à la remettre à zéro.

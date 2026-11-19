@@ -211,6 +211,24 @@
         },
         "preview": {
             "hire": "Contratar"
+        },
+        "skills": {
+            "agentDesign": "Diseño de agentes",
+            "workflowAutomation": "Automatización de flujos de trabajo",
+            "ragKnowledgeBases": "RAG y bases de conocimiento",
+            "integrationsApis": "Integraciones y API",
+            "mcpServers": "Servidores MCP",
+            "promptEngineering": "Ingeniería de prompts",
+            "dataPipelines": "Pipelines de datos",
+            "chatbotsSupport": "Chatbots y soporte",
+            "voiceAgents": "Agentes de voz",
+            "leadGenOutreach": "Generación de leads y prospección",
+            "crmAutomation": "Automatización de CRM",
+            "webScraping": "Web scraping",
+            "ecommerceAutomation": "Automatización de e-commerce",
+            "analyticsReporting": "Analítica e informes",
+            "fineTuning": "Fine-tuning",
+            "noCodeAutomation": "Automatización no-code"
         }
     },
     "foreman": {
@@ -485,5 +503,17 @@
         },
         "approve": "Aprobar",
         "edit": "Editar"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "Marketing",
+            "sales": "Ventas",
+            "ops": "Operaciones"
+        },
+        "roles": {
+            "headOfGrowth": "Head of growth",
+            "accountExecutive": "Ejecutiva de cuentas",
+            "operationsSpecialist": "Especialista en operaciones"
+        }
     }
 }

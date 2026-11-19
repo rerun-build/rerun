@@ -677,5 +677,20 @@
         "title": "Bir Box seçin",
         "description": "Yeni coworker boş bir yere, bu Box'a katılır.",
         "coworkers": "{count, plural, =0 {Henüz coworker yok} one {# coworker} other {# coworker}}"
+    },
+    "mcpConnect": {
+        "otherClient": "Diğer",
+        "labels": {
+            "terminal": "Terminal",
+            "shellProfile": "Kabuk profili",
+            "coworkerPanel": "Coworker paneli, MCP, Yeni",
+            "serverUrl": "Sunucu URL'si",
+            "header": "Başlık",
+            "stdioClients": "Yalnızca stdio destekleyen istemciler"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI. ChatGPT uygulaması yalnızca OAuth bağlantılarını kabul eder, bu yüzden orada anahtar işe yaramaz.",
+            "coworkerReach": "Coworker'larınızdan birine bu çalışma alanında dış bir istemciyle aynı erişimi verir."
+        }
     }
 }

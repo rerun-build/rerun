@@ -10,6 +10,8 @@ import { useKitTranslations } from '../locale'
 
 interface MultiSelectProps {
     options: readonly string[]
+    // What the reader sees for a value, when the stored values are not the words to show.
+    optionLabel?: (option: string) => string
     value: string[]
     onChange: (value: string[]) => void
     label?: string
@@ -19,7 +21,7 @@ interface MultiSelectProps {
     disabled?: boolean
 }
 
-export function MultiSelect({ options, value, onChange, label, optional, helperText, placeholder, disabled }: MultiSelectProps) {
+export function MultiSelect({ options, optionLabel = option => option, value, onChange, label, optional, helperText, placeholder, disabled }: MultiSelectProps) {
     const t = useKitTranslations()
     const [open, setOpen] = React.useState(false)
     const [query, setQuery] = React.useState('')
@@ -32,7 +34,7 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
         onChange(value.filter(item => item !== option))
     }
 
-    const filtered = options.filter(option => option.toLowerCase().includes(query.trim().toLowerCase()))
+    const filtered = options.filter(option => optionLabel(option).toLowerCase().includes(query.trim().toLowerCase()))
 
     return (
         <Field label={label} optional={optional} helperText={helperText}>
@@ -57,11 +59,11 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
                         ) : (
                             value.map(item => (
                                 <span key={item} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
-                                    {item}
+                                    {optionLabel(item)}
                                     <span
                                         role="button"
                                         tabIndex={-1}
-                                        aria-label={t('forms.remove', { item })}
+                                        aria-label={t('forms.remove', { item: optionLabel(item) })}
                                         onClick={event => {
                                             event.stopPropagation()
                                             remove(item)
@@ -110,7 +112,7 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
                                                 selected ? 'text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                                             )}
                                         >
-                                            {option}
+                                            {optionLabel(option)}
                                             {selected && <Check className="size-4 text-primary" />}
                                         </button>
                                     )

@@ -79,7 +79,8 @@
         "expert.row.agents": "How many coworkers the template holds (\"agent\" is the word this screen uses).",
         "payouts.stateLabels.not_started": "Badge of a creator's Stripe payout account: payouts not configured yet.",
         "payouts.requirements": "What Stripe still needs from a template creator before paying them, one item of a list.",
-        "payouts.saleKinds.recurring": "Badge of a sale in the creator's revenue table: a monthly subscription payment."
+        "payouts.saleKinds.recurring": "Badge of a sale in the creator's revenue table: a monthly subscription payment.",
+        "boardAlt": "Alt text of a template's thumbnail: a picture of the board of coworkers it installs. {title} is the template's name."
     },
     "price": {
         "free": "Free",
@@ -619,5 +620,6 @@
         "lapsed": "Your subscription ended. The coworkers this template installed are disabled.",
         "billedTo": "Billed to {workspace}. Your Rerun plan is already active.",
         "yours": "Your template, no charge."
-    }
+    },
+    "boardAlt": "{title} coworker board"
 }

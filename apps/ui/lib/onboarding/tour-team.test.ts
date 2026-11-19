@@ -1,3 +1,4 @@
+import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
 import { describe, expect, it } from 'vitest'
 
 import { TOUR_AGENT_IDS, TOUR_HANDOFFS } from '@rerun/ui/tour/board'
@@ -7,7 +8,7 @@ const HANDOFF_HOLD_MS = 5_000
 
 describe('TOUR_TEAM_BEATS', () => {
     it('gives every teammate the role shown under their name', () => {
-        expect(TOUR_TEAMMATES.map(({ name, role }) => [name, role])).toEqual([
+        expect(TOUR_TEAMMATES.map(({ name, roleKey }) => [name, ENGLISH_MESSAGES.kit.tour.roles[roleKey]])).toEqual([
             ['Théo', 'Head of growth'],
             ['Sofia', 'Account executive'],
             ['Noah', 'Operations specialist'],

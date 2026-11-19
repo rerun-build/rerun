@@ -13,14 +13,16 @@ import { PANEL_CARD, PANEL_CARD_INTERACTIVE } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { appInfo } from '@/lib/apps/catalog'
+import type { WakeEvent as LinkedinWakeEvent } from '@/lib/apps/linkedin/wake-events'
 import type { AppSlug } from '@/lib/apps/types'
+import type { WakeEvent as WhatsappWakeEvent } from '@/lib/apps/whatsapp/wake-events'
 import { MessageSquareIcon, PlusIcon, UserCheck, UserPlus } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
 
 const PICKABLE = new Set(['connected', 'paused', 'needs_reconnect'])
 
-const WAKE_ROWS: Record<AppSlug, { event: string; icon: typeof MessageSquareIcon; timing: 'rightAway' | 'everyFewHours' }[]> = {
+const WAKE_ROWS: Record<AppSlug, { event: LinkedinWakeEvent | WhatsappWakeEvent; icon: typeof MessageSquareIcon; timing: 'rightAway' | 'everyFewHours' }[]> = {
     linkedin: [
         { event: 'message_received', icon: MessageSquareIcon, timing: 'rightAway' },
         { event: 'accepted_invitation', icon: UserCheck, timing: 'everyFewHours' },
@@ -78,7 +80,7 @@ function AppAccountPickerBody({
     const t = useTranslations('services.appAccount')
     if (!overview) return <SkeletonPanelRows rows={2} className="p-0" />
 
-    const { name: appName, providerLabel, wakeEventLabels } = appInfo(slug)
+    const { name: appName, providerLabel } = appInfo(slug)
     const wake = binding?.wakeOnEvents ?? []
     const toggleEvent = (event: string, on: boolean) => onWakeChange(on ? [...wake, event] : wake.filter(current => current !== event))
 
@@ -139,10 +141,10 @@ function AppAccountPickerBody({
                             <label key={row.event} className="flex cursor-pointer items-center gap-3 px-3 py-2.5">
                                 <row.icon className="size-4 shrink-0 text-muted-foreground" />
                                 <span className="flex min-w-0 flex-1 flex-col">
-                                    <span className="text-sm">{wakeEventLabels[row.event]}</span>
+                                    <span className="text-sm">{t(`wakeEvents.${row.event}`)}</span>
                                     <span className="text-[11px] text-muted-foreground">{t(`timing.${row.timing}`)}</span>
                                 </span>
-                                <Switch checked={wake.includes(row.event)} disabled={pending !== null} onCheckedChange={on => toggleEvent(row.event, on)} aria-label={wakeEventLabels[row.event]} />
+                                <Switch checked={wake.includes(row.event)} disabled={pending !== null} onCheckedChange={on => toggleEvent(row.event, on)} aria-label={t(`wakeEvents.${row.event}`)} />
                             </label>
                         ))}
                     </div>

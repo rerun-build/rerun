@@ -139,7 +139,8 @@
         "new": "Nouveau",
         "emptyTitle": "Aucun serveur MCP pour l'instant",
         "emptyDescription": "Les serveurs MCP donnent à votre coworker des outils en plus des apps intégrées. Ajoutez-en un pour étendre ce qu'il sait faire.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# serveur MCP} other {# serveurs MCP}}"
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Échec de la découverte",
@@ -344,7 +345,8 @@
         "emptyDescription": "Un trigger donne à votre coworker une URL publique. Chaque fois qu'un autre service l'appelle, le coworker se lance avec les données reçues.",
         "summary": "{methods} · {count, plural, one {# appel} other {# appels}}",
         "paused": "en pause",
-        "neverCalled": "Jamais appelé"
+        "neverCalled": "Jamais appelé",
+        "count": "{count, plural, one {# trigger} other {# triggers}}"
     },
     "triggerEditor": {
         "saveFailed": "Échec de l'enregistrement",
@@ -430,7 +432,8 @@
             "testRun": "Tester",
             "saveChanges": "Enregistrer",
             "create": "Créer la tâche"
-        }
+        },
+        "count": "{count, plural, one {# tâche planifiée} other {# tâches planifiées}}"
     },
     "taskNotifyField": {
         "label": "Me prévenir",
@@ -578,7 +581,8 @@
         "newSkill": "Nouveau",
         "emptyTitle": "Aucun skill pour l'instant",
         "emptyDescription": "Les skills sont des instructions pas à pas réutilisables que votre coworker apprend, pour accomplir les tâches récurrentes toujours de la même façon.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "count": "{count, plural, one {# skill} other {# skills}}"
     },
     "shareAgentDialog": {
         "titleLink": "Votre lien de partage",

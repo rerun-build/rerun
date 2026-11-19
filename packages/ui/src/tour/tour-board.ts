@@ -1,6 +1,7 @@
 import { SPACE_COLOR, agentTileStyle, connectorTileStyle } from '../iso-grid/presets'
 import type { Container, Tile, TileLink } from '../iso-grid/types'
 import { GRID_SIZE, TILE_H, TILE_W, hashUnit, isoPosition } from '../iso-grid/iso'
+import { englishKitTranslator, type KitTranslator } from '../kit-translator'
 
 // The board the onboarding tour builds, one slide at a time. Five phases, and the board is a **pure
 // function of the phase index**: the lab can jump straight to the last one, reduced motion renders
@@ -50,7 +51,7 @@ const mark = (file: string) => `/onboarding/tour/board/${file}`
 // hanging off Marketing ends up exactly one free cell off the face it plugs into. The extra cell over
 // the arms is taken on the **north-west**, the one side that costs nothing: the arms hang off the
 // south and east, and the west corner the wide shot is fitted on belongs to Sales.
-type TourBox = { id: string; name: string; col_start: number; row_start: number; col_end: number; row_end: number }
+type TourBox = { id: string; nameKey: 'marketing' | 'sales' | 'ops'; col_start: number; row_start: number; col_end: number; row_end: number }
 
 // A triangle: Marketing at the apex, Sales and Ops side by side underneath it. Equal col + row is
 // equal screen height, so the two lower Boxes land on exactly the same line, and col minus row being
@@ -73,9 +74,9 @@ type TourBox = { id: string; name: string; col_start: number; row_start: number;
 // the screen's vertical axis: Marketing folds onto itself, Sales becomes Ops. Every tile below has a
 // twin one line away, and moving one without its twin is what breaks the composition.
 export const TOUR_BOXES: readonly TourBox[] = [
-    { id: 'tour-marketing', name: 'Marketing', col_start: 0, row_start: 0, col_end: 4, row_end: 4 },
-    { id: 'tour-sales', name: 'Sales', col_start: 4, row_start: 11, col_end: 8, row_end: 15 },
-    { id: 'tour-ops', name: 'Ops', col_start: 11, row_start: 4, col_end: 15, row_end: 8 },
+    { id: 'tour-marketing', nameKey: 'marketing', col_start: 0, row_start: 0, col_end: 4, row_end: 4 },
+    { id: 'tour-sales', nameKey: 'sales', col_start: 4, row_start: 11, col_end: 8, row_end: 15 },
+    { id: 'tour-ops', nameKey: 'ops', col_start: 11, row_start: 4, col_end: 15, row_end: 8 },
 ]
 
 // Two agents per Box, always on the **anti-diagonal** of its rectangle (equal col + row), never on
@@ -255,19 +256,20 @@ export type TourBoard = {
 // `livePhase` is the phase the slide actually tells, which is only ever lower than the phase the
 // board is rendered at: everything above it is on its way out, and is drawn in retreat until the
 // caller drops it. Left out, it is the rendered phase and nothing is on its way out.
-export type TourBoardOptions = { animatedPhase: number | null; lit?: boolean; focused?: boolean; livePhase?: number }
+export type TourBoardOptions = { animatedPhase: number | null; lit?: boolean; focused?: boolean; livePhase?: number; t?: KitTranslator }
 
-function containerFor(box: TourBox, index: number, animated: boolean, dimmed: boolean): Container {
+function containerFor(box: TourBox, index: number, animated: boolean, dimmed: boolean, t: KitTranslator): Container {
+    const name = t(`tour.boxes.${box.nameKey}`)
     return {
         id: box.id,
         dimmed,
-        label: box.name,
+        label: name,
         color: SPACE_COLOR,
         col_start: box.col_start,
         row_start: box.row_start,
         col_end: box.col_end,
         row_end: box.row_end,
-        ariaLabel: `Box: ${box.name}`,
+        ariaLabel: t('isoGrid.boxAria', { name }),
         justPlaced: animated,
         dropDelay: animated ? index * BOX_STEP : undefined,
         // The first slide gives each part of the business its own Box, so the footprint is drawn
@@ -312,7 +314,7 @@ function connectorTile(connector: TourConnector, delay: number | null, lit: bool
     }
 }
 
-export function boardForPhase(phase: number, { animatedPhase, lit = false, focused = false, livePhase }: TourBoardOptions = { animatedPhase: null }): TourBoard {
+export function boardForPhase(phase: number, { animatedPhase, lit = false, focused = false, livePhase, t = englishKitTranslator }: TourBoardOptions = { animatedPhase: null }): TourBoard {
     const current = Math.min(Math.max(phase, 0), LAST_TOUR_PHASE)
     const live = Math.min(livePhase ?? current, current)
     // The other half of the close-up. Cropping alone does not isolate the Box: the shot hangs high
@@ -324,7 +326,7 @@ export function boardForPhase(phase: number, { animatedPhase, lit = false, focus
     // the very moment the camera pulls back, and reading the shot first would light it up again for
     // the length of the move before it goes.
     const dimmed = (tileId: string, tilePhase: number) => (focused && !FOCUS_TILE_IDS.has(tileId)) || tilePhase > live
-    const containers = TOUR_BOXES.map((box, index) => containerFor(box, index, animatedPhase === 0, focused && box.id !== FOCUS_BOX_ID))
+    const containers = TOUR_BOXES.map((box, index) => containerFor(box, index, animatedPhase === 0, focused && box.id !== FOCUS_BOX_ID, t))
 
     const tiles: Tile[] = []
     const links: TileLink[] = []

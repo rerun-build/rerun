@@ -557,5 +557,6 @@
         "lapsed": "Tu suscripción terminó. Los coworkers que instaló esta plantilla están desactivados.",
         "billedTo": "Se factura a {workspace}. Tu plan de Rerun ya está activo.",
         "yours": "Tu plantilla, sin coste."
-    }
+    },
+    "boardAlt": "Tablero de coworkers de {title}"
 }

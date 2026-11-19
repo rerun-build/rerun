@@ -14,7 +14,12 @@
             "rightAway": "Sofort",
             "everyFewHours": "Alle paar Stunden geprüft"
         },
-        "unavailable": "{app} ist in diesem Workspace noch nicht verfügbar."
+        "unavailable": "{app} ist in diesem Workspace noch nicht verfügbar.",
+        "wakeEvents": {
+            "message_received": "Eine Nachricht eintrifft",
+            "accepted_invitation": "Eine Einladung angenommen wird",
+            "invitation_received": "Eine Einladung eingeht"
+        }
     },
     "authMethod": {
         "label": {

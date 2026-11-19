@@ -211,6 +211,24 @@
         },
         "preview": {
             "hire": "İşe al"
+        },
+        "skills": {
+            "agentDesign": "Ajan tasarımı",
+            "workflowAutomation": "İş akışı otomasyonu",
+            "ragKnowledgeBases": "RAG ve bilgi tabanları",
+            "integrationsApis": "Entegrasyonlar ve API'ler",
+            "mcpServers": "MCP sunucuları",
+            "promptEngineering": "Prompt mühendisliği",
+            "dataPipelines": "Veri hatları",
+            "chatbotsSupport": "Sohbet botları ve destek",
+            "voiceAgents": "Sesli ajanlar",
+            "leadGenOutreach": "Müşteri adayı ve erişim",
+            "crmAutomation": "CRM otomasyonu",
+            "webScraping": "Web kazıma",
+            "ecommerceAutomation": "E-ticaret otomasyonu",
+            "analyticsReporting": "Analitik ve raporlama",
+            "fineTuning": "İnce ayar",
+            "noCodeAutomation": "Kodsuz otomasyon"
         }
     },
     "foreman": {
@@ -485,5 +503,17 @@
         },
         "approve": "Onayla",
         "edit": "Düzenle"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "Pazarlama",
+            "sales": "Satış",
+            "ops": "Operasyon"
+        },
+        "roles": {
+            "headOfGrowth": "Büyüme lideri",
+            "accountExecutive": "Satış temsilcisi",
+            "operationsSpecialist": "Operasyon uzmanı"
+        }
     }
 }

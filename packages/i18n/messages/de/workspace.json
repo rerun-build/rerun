@@ -15,7 +15,8 @@
         "noLogoFound": "Kein Logo unter dieser Adresse",
         "pickIllustration": "Oder wähle eine Illustration",
         "showLess": "Weniger anzeigen",
-        "showAll": "Alle {count} anzeigen"
+        "showAll": "Alle {count} anzeigen",
+        "illustrationOption": "Illustration {number}"
     },
     "access": {
         "paused": "Schließe zuerst ein Abo ab, um ihn wiederherzustellen",

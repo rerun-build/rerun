@@ -181,7 +181,11 @@
         "change": "Etwas ändern",
         "standingBy": "Bereit",
         "lifeWorking": "Arbeitet daran",
-        "lifeDelivered": "An dich übergeben"
+        "lifeDelivered": "An dich übergeben",
+        "scene": {
+            "planned": "{name}, geplant",
+            "plannedBox": "Geplante Box"
+        }
     },
     "starterPack": {
         "title": "Dein Starter-Team",

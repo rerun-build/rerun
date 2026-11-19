@@ -105,6 +105,7 @@
         "aiProviders": "Provedores de IA",
         "vault": "Vault",
         "vaultSignedOut": "Um app do Vault está desconectado",
+        "computers": "Computadores",
         "servers": "Servidores",
         "billing": "Cobrança",
         "newWorkspace": "Novo workspace",
@@ -119,8 +120,7 @@
         "adminPanel": "Painel de admin",
         "notifications": "Notificações",
         "account": "Conta",
-        "signOut": "Sair",
-        "computers": "Computadores"
+        "signOut": "Sair"
     },
     "update": {
         "reload": "Recarregar",
@@ -212,5 +212,9 @@
     "dashboard": {
         "metaTitle": "Painel",
         "metaDescription": "Suas Boxes e coworkers no Rerun."
+    },
+    "site": {
+        "title": "Rerun | Suas tarefas feitas pela IA, até enquanto você dorme",
+        "description": "Escolha um agente de IA pronto na biblioteca ou crie o seu, conecte suas ferramentas, e ele roda 24/7 na sua própria máquina privada na nuvem. Teste grátis de {trialDays} dias."
     }
 }

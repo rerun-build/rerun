@@ -10,14 +10,14 @@
 // Everything here is a constant, like tour-board.ts: the slide renders on the server first, so a
 // position or a beat drawn at random would move between the server HTML and the first client paint.
 
-export type TourTeammate = { id: string; name: string; role: string; color: string; home: string; photo: string }
+export type TourTeammate = { id: string; name: string; roleKey: 'headOfGrowth' | 'accountExecutive' | 'operationsSpecialist'; color: string; home: string; photo: string }
 
 const portrait = (id: string) => `/onboarding/tour/team/${id}.webp`
 
 export const TOUR_TEAMMATES: readonly TourTeammate[] = [
-    { id: 'theo', name: 'Théo', role: 'Head of growth', color: 'hsl(210 80% 52%)', home: 'tour-social', photo: portrait('theo') },
-    { id: 'sofia', name: 'Sofia', role: 'Account executive', color: 'hsl(340 68% 52%)', home: 'tour-research', photo: portrait('sofia') },
-    { id: 'noah', name: 'Noah', role: 'Operations specialist', color: 'hsl(150 55% 38%)', home: 'tour-docs', photo: portrait('noah') },
+    { id: 'theo', name: 'Théo', roleKey: 'headOfGrowth', color: 'hsl(210 80% 52%)', home: 'tour-social', photo: portrait('theo') },
+    { id: 'sofia', name: 'Sofia', roleKey: 'accountExecutive', color: 'hsl(340 68% 52%)', home: 'tour-research', photo: portrait('sofia') },
+    { id: 'noah', name: 'Noah', roleKey: 'operationsSpecialist', color: 'hsl(150 55% 38%)', home: 'tour-docs', photo: portrait('noah') },
 ]
 
 // Two people are already there when the loop starts over, never one: the slide has to read as a

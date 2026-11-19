@@ -179,7 +179,7 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
             <div className="flex flex-col h-full">
                 <input ref={fileInputRef} type="file" accept=".md,.markdown" className="hidden" onChange={handleUploadFile} />
                 <input ref={folderInputRef} type="file" multiple className="hidden" onChange={handleUploadFolder} {...{ webkitdirectory: '' }} />
-                <PanelListHeader count={skills.length} noun="skill">
+                <PanelListHeader countLabel={t('count', { count: skills.length })}>
                     {actionButtons}
                 </PanelListHeader>
                 {importError && <p className="px-3 py-2 text-xs text-destructive border-b border-border whitespace-pre-line">{importError}</p>}

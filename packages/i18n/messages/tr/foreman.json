@@ -181,7 +181,11 @@
         "change": "Bir şeyi değiştir",
         "standingBy": "Hazır bekliyor",
         "lifeWorking": "Üzerinde çalışıyor",
-        "lifeDelivered": "Size teslim edildi"
+        "lifeDelivered": "Size teslim edildi",
+        "scene": {
+            "planned": "{name}, planlandı",
+            "plannedBox": "Planlanan Box"
+        }
     },
     "starterPack": {
         "title": "Başlangıç ekibiniz",

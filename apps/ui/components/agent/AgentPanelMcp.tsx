@@ -126,7 +126,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     return (
         <PanelSteps stepKey={stepKey} depth={stepDepth}>
             <div className="flex flex-col h-full">
-                <PanelListHeader count={servers.length} noun="MCP server">
+                <PanelListHeader countLabel={t('count', { count: servers.length })}>
                     {newButton}
                 </PanelListHeader>
 

@@ -14,6 +14,7 @@ import { Field } from '../forms'
 import { StepTransition, useStepper } from '../steps'
 import { ExpertImageFields } from './ExpertImageFields'
 import { ExpertProfilePreview } from './ExpertProfilePreview'
+import { useExpertLabels } from './useExpertLabels'
 import { availabilityDot, badgeFromType, BUDGET_OPTIONS, LANGUAGE_OPTIONS, SKILL_OPTIONS } from './options'
 import { EXPERT_AVAILABILITIES, EXPERT_TYPES, buildEditExpertSchema, type EditExpertValues } from './schema'
 import { initialsFromName, type Expert, type ExpertUpload, type OwnerExpert } from './types'
@@ -100,6 +101,7 @@ export function toExpertPreview(expert: Expert, values: EditExpertValues): Exper
 
 export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploadBanner, onSubmit, submitLabel, submittingLabel, previewAction, renderHeader }: ExpertProfileWizardProps) {
     const t = useKitTranslations()
+    const labels = useExpertLabels()
     const [error, setError] = React.useState<string | null>(null)
     const schema = React.useMemo(() => buildEditExpertSchema(key => t(`experts.validation.${key}`)), [t])
 
@@ -292,7 +294,7 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
                                         name="skills"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <MultiSelect label={t('experts.wizard.skills')} optional options={SKILL_OPTIONS} value={field.value} onChange={field.onChange} placeholder={t('experts.wizard.skillsPlaceholder')} />
+                                                <MultiSelect label={t('experts.wizard.skills')} optional options={SKILL_OPTIONS} optionLabel={labels.skill} value={field.value} onChange={field.onChange} placeholder={t('experts.wizard.skillsPlaceholder')} />
                                             </FormItem>
                                         )}
                                     />
@@ -302,7 +304,7 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
                                         name="languages"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <MultiSelect label={t('experts.wizard.languages')} optional options={LANGUAGE_OPTIONS} value={field.value} onChange={field.onChange} placeholder={t('experts.wizard.languagesPlaceholder')} />
+                                                <MultiSelect label={t('experts.wizard.languages')} optional options={LANGUAGE_OPTIONS} optionLabel={labels.language} value={field.value} onChange={field.onChange} placeholder={t('experts.wizard.languagesPlaceholder')} />
                                             </FormItem>
                                         )}
                                     />
