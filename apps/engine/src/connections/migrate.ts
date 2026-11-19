@@ -11,7 +11,7 @@ import { logger } from '../lib/logger.js'
 import { nowIso } from '../lib/ids.js'
 import { readBoxDefault, writeBoxDefault } from './default.js'
 import { listConnectionIds, loadConnectionFromDisk } from './loader.js'
-import { createConnection, ensureRerunConnection, patchConnection } from './store.js'
+import { createConnection, ensureMoldwrightConnection, patchConnection } from './store.js'
 import type { LoadedConnection } from './types.js'
 
 type LegacyAgentConfig = { name: string; provider: Provider; openrouterBaseUrl?: string; openrouterModels?: string[] }
@@ -87,7 +87,7 @@ async function renameAliasedModels(): Promise<void> {
 
 export async function reconcileConnections(): Promise<void> {
     await mkdir(connectionsDir(), { recursive: true })
-    await ensureRerunConnection()
+    await ensureMoldwrightConnection()
     await renameAliasedModels()
 }
 

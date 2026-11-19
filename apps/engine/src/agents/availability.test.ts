@@ -12,7 +12,7 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { rm } = await import('node:fs/promises')
 const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL, agentConfigSchema } = await import('@moldwright/contracts')
 const { connectionsDir } = await import('../config/paths.js')
-const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
+const { createConnection, ensureMoldwrightConnection } = await import('../connections/store.js')
 const { getConnection } = await import('../connections/registry.js')
 const { clearAgentCache } = await import('./registry.js')
 const { clearBoxDefault, readBoxDefault, writeBoxDefault } = await import('../connections/default.js')
@@ -58,7 +58,7 @@ describe('isUsable', () => {
     })
 
     it('reads the keyless Rerun connection off the hub configuration', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         expect(isUsable(await getConnection(RERUN_CONNECTION_ID), RERUN_MODEL)).toBe(true)
     })
 
@@ -90,7 +90,7 @@ describe('resolveAutomationModel', () => {
     })
 
     it('falls back to Rerun before any other connection', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         await connect('anthropic', { ANTHROPIC_API_KEY: 'k' })
         const claude = await connect('claude', {})
         const agent = await makeAgent(claude.id, 'claude', 'opus')
@@ -127,28 +127,28 @@ describe('resolveAutomationModel', () => {
 
 describe('boxDefaultModel', () => {
     it('answers what the owner set', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const anthropic = await connect('anthropic', { ANTHROPIC_API_KEY: 'k' })
         await writeBoxDefault({ connectionId: anthropic.id, model: 'claude-opus-4-8' })
         expect(await boxDefaultModel()).toMatchObject({ provider: 'anthropic', model: 'claude-opus-4-8' })
     })
 
     it('skips a default whose credential is gone', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const claude = await connect('claude', {})
         await writeBoxDefault({ connectionId: claude.id, model: 'opus' })
         expect(await boxDefaultModel()).toMatchObject({ provider: 'rerun', model: RERUN_MODEL })
     })
 
     it('skips a default naming a model the connection no longer offers', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const anthropic = await connect('anthropic', { ANTHROPIC_API_KEY: 'k' }, ['claude-sonnet-4-6'])
         await writeBoxDefault({ connectionId: anthropic.id, model: 'claude-opus-4-8' })
         expect(await boxDefaultModel()).toMatchObject({ provider: 'rerun', model: RERUN_MODEL })
     })
 
     it('falls back to Rerun when nothing was ever set', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         expect(await boxDefaultModel()).toMatchObject({ provider: 'rerun', model: RERUN_MODEL })
     })
 
@@ -159,14 +159,14 @@ describe('boxDefaultModel', () => {
 
 describe('resolveConfiguredModel', () => {
     it('follows the box default when the agent named no model', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const anthropic = await connect('anthropic', { ANTHROPIC_API_KEY: 'k' })
         await writeBoxDefault({ connectionId: anthropic.id, model: 'claude-opus-4-8' })
         expect(await resolveConfiguredModel((await boxDefaultAgent()).config)).toMatchObject({ provider: 'anthropic', model: 'claude-opus-4-8' })
     })
 
     it('ignores a leftover connectionId sitting next to a null model', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const anthropic = await connect('anthropic', { ANTHROPIC_API_KEY: 'k' })
         const stale = await connect('claude', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
         await writeBoxDefault({ connectionId: anthropic.id, model: 'claude-opus-4-8' })
@@ -175,7 +175,7 @@ describe('resolveConfiguredModel', () => {
     })
 
     it('returns a pin as asked even when its credential was pulled, rather than swapping it', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const claude = await connect('claude', {})
         expect(await resolveConfiguredModel((await makeAgent(claude.id, 'claude', 'opus')).config)).toMatchObject({ connection: claude, provider: 'claude', model: 'opus' })
     })
@@ -191,7 +191,7 @@ describe('resolveConfiguredModel', () => {
 
 describe('resolveAutomationModel over a box-default agent', () => {
     it('runs the box default when the automation names no model of its own', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const anthropic = await connect('anthropic', { ANTHROPIC_API_KEY: 'k' })
         await writeBoxDefault({ connectionId: anthropic.id, model: 'claude-opus-4-8' })
         expect(await resolveAutomationModel(await boxDefaultAgent(), undefined)).toEqual({ connectionId: anthropic.id, provider: 'anthropic', model: 'claude-opus-4-8' })
@@ -219,7 +219,7 @@ describe('a ChatGPT plan that leaves models out', () => {
     })
 
     it('runs a refused stored default on a served model of the same connection, not on Rerun', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const codex = await chatgpt()
         await writeBoxDefault({ connectionId: codex.id, model: 'gpt-6-sol' })
         expect(await boxDefaultModel()).toMatchObject({ connection: { id: codex.id }, provider: 'codex', model: 'gpt-6-luna' })

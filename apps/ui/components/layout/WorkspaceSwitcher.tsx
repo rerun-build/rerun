@@ -32,7 +32,7 @@ import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEnt
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
-import { useRerunCredit } from '@/hooks/useRerunCredit'
+import { useMoldwrightCredit } from '@/hooks/useMoldwrightCredit'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useCreatorStore } from '@/stores/creator.store'
@@ -107,7 +107,7 @@ export function WorkspaceSwitcher() {
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
     const guided = useForemanStore(state => state.funnel === 'guided')
-    const credit = useRerunCredit()
+    const credit = useMoldwrightCredit()
 
     const sandbox = workspace?.is_sandbox ?? true
     useEffect(() => {

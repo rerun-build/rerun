@@ -18,7 +18,7 @@ export function WorkspaceTile({ brand }: { brand: GateBrand }) {
     )
 }
 
-export function RerunTile() {
+export function MoldwrightTile() {
     return (
         <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/5 text-foreground">
             <svg viewBox="0 0 512 512" className="size-6">
@@ -28,7 +28,7 @@ export function RerunTile() {
     )
 }
 
-function MadeWithRerun({ className }: { className?: string }) {
+function MadeWithMoldwright({ className }: { className?: string }) {
     const t = useTranslations('published.gate')
     return (
         <a
@@ -58,7 +58,7 @@ export function GateScreen({ brand, lock, mark, title, subtitle, children }: { b
                 </div>
                 {children && <div className="flex w-full flex-col gap-2.5">{children}</div>}
             </div>
-            <MadeWithRerun className="absolute right-4 bottom-4 max-md:right-1/2 max-md:translate-x-1/2" />
+            <MadeWithMoldwright className="absolute right-4 bottom-4 max-md:right-1/2 max-md:translate-x-1/2" />
         </main>
     )
 }

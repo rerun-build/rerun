@@ -100,7 +100,7 @@ export async function deleteConnection(id: string): Promise<void> {
     await rm(connectionDir(id), { recursive: true, force: true })
 }
 
-export async function ensureRerunConnection(): Promise<void> {
+export async function ensureMoldwrightConnection(): Promise<void> {
     await mkdir(connectionsDir(), { recursive: true })
     if (connectionExists(RERUN_CONNECTION_ID)) {
         const { models } = (await getConnection(RERUN_CONNECTION_ID)).config

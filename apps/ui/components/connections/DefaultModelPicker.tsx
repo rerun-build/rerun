@@ -5,7 +5,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PowerBars } from '@/components/ui/power-bars'
 import { isPremiumModelEntitled } from '@moldwright/cloud/billing'
-import { PREMIUM_MODEL_BILLING_TRIGGER, enabledModels, isModelLocked, isUsable, modelName, modelDescription, type RerunCredit } from '@/lib/engine/ai-sources'
+import { PREMIUM_MODEL_BILLING_TRIGGER, enabledModels, isModelLocked, isUsable, modelName, modelDescription, type MoldwrightCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { CheckIcon } from '@/lib/icons'
@@ -19,7 +19,7 @@ import { useState, type ReactNode } from 'react'
 type DefaultModelPickerProps = {
     connections: BoxConnection[]
     current: BoxDefault
-    credit: RerunCredit
+    credit: MoldwrightCredit
     onPick: (pick: BoxDefault) => void
     children: ReactNode
 }

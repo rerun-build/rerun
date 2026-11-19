@@ -5,7 +5,7 @@ import { DotSpinner } from '@/components/ui/dot-spinner'
 import { AddProviderItem, SUBSCRIPTION_PROVIDERS, SubscriptionNudge, SubscriptionPitch, type AddableProvider, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
-import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, usePlanWindowsSummary, useRerunCreditDetail } from '@/components/agent/PlanLimitHint'
+import { PlanLimitDetail, PlanLimitHint, MoldwrightCreditHint, usePlanWindowsSummary, useMoldwrightCreditDetail } from '@/components/agent/PlanLimitHint'
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -13,7 +13,7 @@ import { useAgentModel } from '@/hooks/useAgentModel'
 import { useAvailableModels, type ConnectionGroup } from '@/hooks/useAvailableModels'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { refusedModelReason } from '@/lib/engine/model-groups'
-import { useRerunCredit } from '@/hooks/useRerunCredit'
+import { useMoldwrightCredit } from '@/hooks/useMoldwrightCredit'
 import { PREMIUM_MODEL_BILLING_TRIGGER, pillUsage } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
@@ -39,7 +39,7 @@ type ModelSelectorProps = {
 export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey }: ModelSelectorProps) {
     const t = useTranslations('agent.modelSelector')
     const tShared = useTranslations('agent.modelsShared')
-    const creditDetail = useRerunCreditDetail()
+    const creditDetail = useMoldwrightCreditDetail()
     const windowsSummary = usePlanWindowsSummary()
     const [open, setOpen] = useState(false)
     const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
@@ -48,7 +48,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const canManageCoworker = useCanManageAgent(agentId)
     const isBoardCoworker = useBoardStore(state => state.agents.some(agent => agent.id === agentId))
     const canSetDefault = canManageCoworker || !isBoardCoworker
-    const rerunCredit = useRerunCredit()
+    const rerunCredit = useMoldwrightCredit()
     const openAiProviders = useWorkspaceSettingsStore(state => state.openAiProviders)
     const addAiProvider = useWorkspaceSettingsStore(state => state.addAiProvider)
     const pickerRequestedFor = useModelPickerStore(state => state.openFor)
@@ -205,7 +205,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                     <span className="flex min-w-0 items-center gap-1.5">
                                         <ProviderIcon provider={group.provider} className="size-3.5 shrink-0" />
                                         <span className="truncate">{group.label}</span>
-                                        {group.connectionId === RERUN_CONNECTION_ID ? <RerunCreditHint credit={rerunCredit} /> : <PlanLimitHint windows={group.planWindows} provider={group.provider} />}
+                                        {group.connectionId === RERUN_CONNECTION_ID ? <MoldwrightCreditHint credit={rerunCredit} /> : <PlanLimitHint windows={group.planWindows} provider={group.provider} />}
                                     </span>
                                 }
                             >

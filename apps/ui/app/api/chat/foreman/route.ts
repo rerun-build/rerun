@@ -4,7 +4,7 @@ import { foremanClientSchema } from '@moldwright/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPhoneStepPending } from '@moldwright/cloud/phone.server'
-import { logRerunUsage, meteredFetch, type OpenRouterUsage } from '@moldwright/cloud/billing.server'
+import { logMoldwrightUsage, meteredFetch, type OpenRouterUsage } from '@moldwright/cloud/billing.server'
 import { MICROS_PER_USD } from '@moldwright/cloud/billing'
 import { engineSessionOf, loadForemanConversation, saveForemanConversation } from '@/lib/foreman/conversation'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
@@ -89,7 +89,7 @@ export async function POST(req: Request): Promise<Response> {
 
     const settle = (usage: OpenRouterUsage) => {
         if (typeof usage.cost !== 'number') return
-        void logRerunUsage({
+        void logMoldwrightUsage({
             workspaceId: ctx.workspace.id,
             model: FOREMAN_MODEL_ID,
             tier: 'smart',
