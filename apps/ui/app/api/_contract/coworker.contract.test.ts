@@ -5,7 +5,7 @@ import { z } from 'zod'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { ServiceRegistry } from '@/lib/services/registry'
-import { callRoute, contractContext, expectContract } from '@/test/mobile-contract'
+import { callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
 import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema } from '@/test/shipped-ios'
 import { fakeSupabase, tableResolver, type FakeSupabase, type SupabaseResolver } from '@/test/supabase-fake'
 
@@ -63,7 +63,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => ({
     getAuthUser: async () => state.ctx?.authUser,
     getSessionWorkspace: async (): Promise<SessionWorkspace> => {
         const ctx = state.ctx as WorkspaceContext
-        return { supabase: ctx.supabase, user: { id: ctx.userId, workspace_id: ctx.workspace.id, email_notification_prefs: null, locale: null }, workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
+        return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
     },
 }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({

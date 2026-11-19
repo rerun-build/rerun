@@ -1,4 +1,4 @@
-import { CONTRACT_WORKSPACE, callRoute, contractContext, expectContract } from '@/test/mobile-contract'
+import { CONTRACT_WORKSPACE, callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
 import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, mobileApi } from '@rerun/contracts'
 import { createUIMessageStream, createUIMessageStreamResponse, simulateReadableStream, type UIMessage, type UIMessageChunk } from 'ai'
 import { MockLanguageModelV3 } from 'ai/test'
@@ -46,7 +46,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => {
         getAuthUser: async () => state.ctx?.authUser,
         getSessionWorkspace: async (): ReturnType<typeof original.getSessionWorkspace> => {
             const ctx = state.ctx!
-            return { supabase: ctx.supabase, user: { id: ctx.userId, workspace_id: ctx.workspace.id, email_notification_prefs: null, locale: null }, workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
+            return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
         },
     }
 })

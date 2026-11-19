@@ -5,7 +5,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { BrainPageDetail } from '@/lib/engine/client'
 import type { EngineMessage, EngineRun, EngineSkillProposal } from '@/lib/engine/types'
-import { callRoute, contractContext, expectContract } from '@/test/mobile-contract'
+import { callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
 import { fakeSupabase, tableResolver, writeMethodOf, type FakeSupabase, type SupabaseResolver } from '@/test/supabase-fake'
 
 type Tables = Database['public']['Tables']
@@ -42,7 +42,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => ({
     getAuthUser: async () => state.ctx?.authUser,
     getSessionWorkspace: async (): Promise<SessionWorkspace> => ({
         supabase: state.db!.client,
-        user: { id: 'user-ada', workspace_id: 7, email_notification_prefs: null, locale: null },
+        user: contractSessionUser('user-ada', 7),
         workspaceRefused: false,
         membership: { role: 'admin', box_scope: 'all' },
     }),

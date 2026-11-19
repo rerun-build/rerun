@@ -3,6 +3,7 @@ import { parseJsonEventStream, uiMessageChunkSchema, type UIMessageChunk } from 
 import { expect } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
+import type { getSessionWorkspace } from '@/supabase/session/getServerSession'
 import type { FakeSupabase } from '@/test/supabase-fake'
 import { z } from 'zod'
 
@@ -76,7 +77,9 @@ export const CONTRACT_WORKSPACE = {
     id: 7,
     name: 'Atelier Nord',
     icon_url: null,
+    created_at: '2026-11-02T09:00:00.000Z',
     plan: 'pro',
+    stripe_customer_id: null,
     max_agents: 10,
     max_seats: 5,
     model_access: 'all',
@@ -84,11 +87,25 @@ export const CONTRACT_WORKSPACE = {
     subscription_status: 'active',
     current_period_end: '2026-12-19T09:00:00.000Z',
     trial_ends_at: null,
+    rerun_used_micros: 0,
+    rerun_budget_micros: 0,
+    rerun_topup_micros: 0,
+    rerun_period_anchor: null,
+    rerun_credit_paused_at: null,
     is_sandbox: false,
+    boxes_disabled_at: null,
+    boxes_archived_at: null,
     onboarded_at: '2026-11-02T09:00:00.000Z',
     price_arm: null,
     locale: 'en',
 } satisfies WorkspaceContext['workspace']
+
+type SessionUser = NonNullable<Awaited<ReturnType<typeof getSessionWorkspace>>['user']>
+
+// The caller's `users` row as a session holds it, for the tests that stand in for the session.
+export function contractSessionUser(id: string, workspaceId: number): SessionUser {
+    return { id, created_at: '2026-11-02T09:00:00.000Z', workspace_id: workspaceId, email_notification_prefs: null, account_role: 'member', expert_profile_id: null, signed_up_at: '2026-11-02T09:00:00.000Z', locale: null }
+}
 
 // The caller the routes run for: an admin of workspace 7 unless told otherwise, reading through the
 // fake database of the test.
