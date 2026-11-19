@@ -28,6 +28,9 @@ class BuildAsks(unittest.TestCase):
         self.assertIn("git diff origin/dev...HEAD", b)
         self.assertIn("ASK <n>: <file>:<line>", b)
 
+    def test_the_build_brief_has_a_blocked_exit_for_an_ask_without_a_hunk(self):
+        self.assertIn("BLOCKED: plan: ask <n> <why>", self.brief())
+
 
 if __name__ == "__main__":
     unittest.main()
