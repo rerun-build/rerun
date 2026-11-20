@@ -1,3 +1,5 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
+
 import { BOX_NOT_FOUND, assertSpaceAccess, isAdminActor, type Actor } from '@/app/api/_auth/access'
 import { ensureWorkspaceNamed, resolveBoxName } from '@/app/api/_services/naming.service'
 import { ensureWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
@@ -159,15 +161,39 @@ export async function renameBox(actor: Actor, spaceId: string, newName: string):
     if (error) throw new AppError('renameBoxFailedBecause', { message: error.message })
 }
 
+const DETACH_BATCH = 2000
+
 // Deleting a Box no longer takes a machine down with it, so the agents drawn in it would be
 // dropped from Supabase by the cascade while the engine kept running them forever: their
 // schedules would keep firing and keep spending. An empty Box is the only one that can go.
+async function assertBoxHoldsNoCoworkers(supabase: SupabaseClient<Database>, spaceId: string): Promise<void> {
+    const { data: agents } = await selectCount(supabase, 'agents', { space_id: spaceId })
+    if (agents) throw new AppError('boxStillHoldsCoworkers', { count: agents })
+}
+
+// The foreign key would null every notification of the Box in the delete itself, past the
+// statement timeout once its coworkers have run on a schedule for a while (RER-214).
+async function detachBoxNotifications(supabase: SupabaseClient<Database>, spaceId: string): Promise<void> {
+    for (;;) {
+        const { data: boundary, error: readError } = await selectMany(supabase, 'notifications', ['created_at'] as const, { space_id: spaceId }, { column: 'created_at', ascending: true }, 1, DETACH_BATCH - 1)
+        if (readError) throw new AppError('deleteBoxFailedBecause', { message: readError.message })
+
+        const detach = supabase.from('notifications').update<Database['public']['Tables']['notifications']['Update']>({ space_id: null }).eq('space_id', spaceId)
+        const last = boundary?.[0]?.created_at
+        const { error } = await (last ? detach.lte('created_at', last) : detach)
+        if (error) throw new AppError('deleteBoxFailedBecause', { message: error.message })
+        if (!last) return
+    }
+}
+
 export async function deleteBox(actor: Actor, spaceId: string): Promise<void> {
     await assertSpaceAccess(spaceId, 'manage', actor)
 
     const supabase = createServiceRoleClient()
-    const { data: agents } = await selectCount(supabase, 'agents', { space_id: spaceId })
-    if (agents) throw new AppError('boxStillHoldsCoworkers', { count: agents })
+    await assertBoxHoldsNoCoworkers(supabase, spaceId)
+    await detachBoxNotifications(supabase, spaceId)
+    // A coworker moved into the Box while its notifications were being detached would go with it.
+    await assertBoxHoldsNoCoworkers(supabase, spaceId)
 
     const { error } = await supabase.from('spaces').delete().eq('id', spaceId)
     if (error) throw new AppError('deleteBoxFailedBecause', { message: error.message })
