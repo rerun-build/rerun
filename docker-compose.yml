@@ -39,7 +39,8 @@ services:
       context: .
       dockerfile: apps/engine/Dockerfile
     environment:
-      RERUN_API_KEY: ${RERUN_ENGINE_API_KEY}
+      # An engine without a key answers every call: compose refuses to start one.
+      RERUN_API_KEY: ${RERUN_ENGINE_API_KEY:?RERUN_ENGINE_API_KEY is empty, run node scripts/self-host-check.mjs first}
       RERUN_HUB_BASE_URL: http://app:3000
       RERUN_LOG_LEVEL: ${RERUN_LOG_LEVEL:-info}
     ports:

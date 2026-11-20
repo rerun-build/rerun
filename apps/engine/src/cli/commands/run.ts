@@ -1,6 +1,7 @@
 import type { Server } from 'node:http'
 import { serve } from '@hono/node-server'
 import { createServer } from '../../http/server.js'
+import { answersWithoutKeyBeyondThisMachine } from '../../http/auth.js'
 import { DESKTOP_WS_PATH, REMOTE_WS_PATH } from '@rerun/contracts'
 import { desktopUpgradeHandler } from '../../desktop/bridge.js'
 import { attachUpgradeRouter } from '../../http/upgrade.js'
@@ -58,6 +59,9 @@ export async function runCommand(): Promise<void> {
     const serverOptions = { requestTimeout: 30 * 60 * 1000, headersTimeout: 60_000 }
     const server = serve({ fetch: createServer().fetch, port: RERUN_PORT, hostname: RERUN_HOST, serverOptions }, info => {
         logger.info({ port: info.port, host: RERUN_HOST, authenticated: Boolean(RERUN_API_KEY) }, 'rerun-engine listening')
+        if (answersWithoutKeyBeyondThisMachine(RERUN_HOST, RERUN_API_KEY)) {
+            logger.warn({ port: info.port, host: RERUN_HOST }, `no RERUN_API_KEY: this engine answers every call on ${RERUN_HOST} without a key`)
+        }
         void pairWithHub()
     })
     attachUpgradeRouter(server as Server, {

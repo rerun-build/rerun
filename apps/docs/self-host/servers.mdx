@@ -89,7 +89,7 @@ For an engine you start without a pairing token, click **Enter address and key**
 
 Such an engine does not learn the app's address from a pairing, so start it with two variables of your own:
 
-- `RERUN_API_KEY`, a long random string, the key you enter in the dialog. An engine started with no key and no pairing token answers every call without asking for one.
+- `RERUN_API_KEY`, a long random string, the key you enter in the dialog. An engine started with no key and no pairing token answers every call without asking for one, and says so in a warning at start.
 - `RERUN_HUB_BASE_URL`, the address the server reaches your app at. Without it, the engine cannot call the app back: no notifications, no Rerun models, no embeddings, no web search.
 
 ```bash

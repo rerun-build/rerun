@@ -193,6 +193,8 @@ node scripts/self-host-check.mjs
 
 It generates the secrets left empty (`RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET`, `BOARD_IMAGE_SECRET`, `MOBILE_OAUTH_TICKET_SECRET` and `UNSUBSCRIBE_SECRET`), checks the required values, then asks Supabase whether the schema is in place and `SUPABASE_SECRET_KEY` is the secret key. It stops with a plain message on anything only you can fix, warns when `OPENROUTER_API_KEY` is empty, and prints the exact command to start.
 
+Without it, `RERUN_ENGINE_API_KEY` stays empty and `docker compose` refuses every command, `up`, `down` and `logs` included: `RERUN_ENGINE_API_KEY is empty, run node scripts/self-host-check.mjs first`. An engine without a key would answer anyone who reaches its port.
+
 ## 5. Start Rerun
 
 <Tabs>
@@ -297,6 +299,8 @@ docker compose up -d --build
 ```
 
 On `master`, `git pull` brings the latest version. Read the **Upgrade** section of its [release notes](https://github.com/rerun-build/rerun/releases) first: a patch (`v0.15.1`) only asks to pull, a minor (`v0.16.0`) lists what to change by hand.
+
+If you started Rerun without running the check, `RERUN_ENGINE_API_KEY` is still empty and `docker compose` now stops on `RERUN_ENGINE_API_KEY is empty`, even for `down`. Run `node scripts/self-host-check.mjs`, then `docker compose up -d --build`: the engine starts again with its key.
 
 The engine migrates its data-dir on start. When a release adds database migrations, apply them too: `npx supabase db push` for a project on supabase.com, the same command with `--yes --db-url` and the address from [Install](#2-set-up-supabase) for open source Supabase, or `npx supabase migration up` for the local stack.
 

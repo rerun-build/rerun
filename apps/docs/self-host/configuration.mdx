@@ -34,7 +34,7 @@ Rerun reads its settings from `.env` at the root of your clone. `.env.example` l
 
 | Variable | Required | Default | What it does |
 | --- | --- | --- | --- |
-| `RERUN_ENGINE_API_KEY` | Generated | empty | The key shared by the app and the engine docker compose starts next to it. The app calls the engine with it, and the engine calls the app back with it. |
+| `RERUN_ENGINE_API_KEY` | Generated | empty | The key shared by the app and the engine docker compose starts next to it. The app calls the engine with it, and the engine calls the app back with it. `docker compose` refuses every command while it is empty. |
 | `RERUN_ENGINE_PORT` | Optional | `3001` | The port docker compose publishes that engine on, on this machine. |
 | `RERUN_ENGINE_BROWSER_URL` | Optional | `http://localhost:3001` | The address a browser reaches that engine at, to watch a coworker's screen. The app reads it when it opens a screen, so a change only needs `docker compose up -d`. On a server, its `https` domain. See [On a server](/self-host/install#on-a-server). |
 
@@ -194,7 +194,7 @@ An engine started by hand, on a [server](/self-host/servers), reads these. The i
 | `RERUN_HUB_URL` | empty | The address of your app. With a pairing token, the server attaches itself there. |
 | `RERUN_PAIR_TOKEN` | empty | The one-time token from **Servers > Add server**. |
 | `RERUN_PUBLIC_URL` | empty | The address the app reaches this server at. Without it, the app uses the address the pairing request came from, as `http://` on port 3000. |
-| `RERUN_API_KEY` | empty | The engine's key. When empty, a server with a pairing token makes one up and keeps it in `/data/engine.key`. Without a key and without a pairing token, the engine answers every call without asking for one. |
+| `RERUN_API_KEY` | empty | The engine's key. When empty, a server with a pairing token makes one up and keeps it in `/data/engine.key`. Without a key and without a pairing token, the engine answers every call without asking for one, and logs a warning at start when it listens beyond `127.0.0.1`. |
 | `RERUN_HUB_BASE_URL` | empty | Where the engine calls the app back: notifications, the Rerun models, embeddings, web search and the app's tools. A paired server learns it from the pairing and keeps it in `/data/hub.json`. A server you [enter by hand](/self-host/servers#enter-a-server-by-hand) needs it. |
 | `RERUN_DATA_DIR` | `/data` in the image | Where the engine keeps everything. Mount a volume there. |
 | `RERUN_HOST` | `0.0.0.0` | The interface the engine listens on. |
