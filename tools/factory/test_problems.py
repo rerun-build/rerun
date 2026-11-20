@@ -49,6 +49,12 @@ class Find(unittest.TestCase):
                                "ended #3": "job #3 ended rejected: VERDICT: REJECT @abc: y; pull request #41"})
         self.assertEqual(self.find(problems.Watch(), jobs, open_issues=None), {})
 
+    def test_a_job_that_ended_and_was_cut_into_children_is_no_problem(self):
+        ended = job(1, "failed", reason="20 passes in a row failed in state building")
+        self.assertEqual(self.find(problems.Watch(), [ended, job(2, "merged", body="**Part of**: #1")], open_issues={1}), {})
+        self.assertEqual(self.find(problems.Watch(), [ended], open_issues={1}),
+                         {"ended #1": "job #1 ended failed: 20 passes in a row failed in state building; pull request none"})
+
     def test_the_line_is_idle_after_ten_beats_with_work_and_no_run_and_keeps_the_first_line(self):
         w = problems.Watch()
         queued = [job(5, "queued")]
