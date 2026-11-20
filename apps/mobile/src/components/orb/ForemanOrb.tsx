@@ -1,10 +1,10 @@
 import { useEffect, useId } from 'react'
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
-import Animated, { Easing, cancelAnimation, useAnimatedStyle, useFrameCallback, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
+import Animated, { Easing, cancelAnimation, useAnimatedReaction, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
 import Svg, { Circle, ClipPath, Defs, Ellipse, G, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg'
 
 import { BUDDY_FACE_CENTER, BuddyFace, buddyEyeLine } from '@/components/buddy/BuddyFace'
-import { useBlinkScale } from '@/components/buddy/motion'
+import { useBlinkScale, useBuddyClock } from '@/components/buddy/motion'
 import { ORB_CENTER as CENTER, ORB_RADIUS as RADIUS, advance, layerTransform, restingPose, startClock } from '@/components/orb/orb-motion'
 
 // Ported from packages/ui/src/foreman (Orb, ForemanBall, foreman-face, the `glass` material): the
@@ -102,20 +102,27 @@ export function ForemanOrb({ size, state = 'idle', facing = 'left', animated = t
     useEffect(() => {
         lifeInput.value = { thinking, facing }
     }, [thinking, facing, lifeInput])
-    const life = useFrameCallback(frame => {
-        const dt = Math.min((frame.timeSincePreviousFrame ?? 16) / 1000, 0.05)
-        const { thinking: busy, facing: side } = lifeInput.value
-        clock.modify(current => {
-            'worklet'
-            pose.value = advance(current, dt, busy, side)
-            return current
-        }, false)
-    }, false)
+    // The ball lives on the buddies' clock: it moves as often as they do, and stops with them when
+    // the screen they are on is covered.
+    const buddyClock = useBuddyClock()
+    const ticking = living ? buddyClock : null
+    useAnimatedReaction(
+        () => (ticking ? ticking.value : null),
+        (now, before) => {
+            if (now === null || before === null) return
+            const dt = Math.min(now - before, 0.05)
+            const { thinking: busy, facing: side } = lifeInput.value
+            clock.modify(current => {
+                'worklet'
+                pose.value = advance(current, dt, busy, side)
+                return current
+            }, false)
+        }
+    )
     useEffect(() => {
-        life.setActive(living)
         // A ball stopped halfway through a spin would be left without a face.
         if (!living) pose.set(restingPose(facing))
-    }, [living, facing, life, pose])
+    }, [living, facing, pose])
 
     const unit = size / (RADIUS * 2)
     const mood = thinking ? 'working' : 'idle'

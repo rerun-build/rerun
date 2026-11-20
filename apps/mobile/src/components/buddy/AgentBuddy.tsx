@@ -86,33 +86,37 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
     const faceDepth = geometry.depth / faceScale
     const blinks = motion !== null && buddyBlinks(eyes, mood)
     const face = (part: FacePart) => <BuddyFace uid={uid} eyes={eyes} mouth={mouth} mood={mood} depth={faceDepth} light={resting ? shade(identity, 0.35) : '#ffffff'} lit={!small} tint={resting ? identity : box.color} part={part} />
-    const faceOnWall = <G transform={svgTransform(multiplied(wall, faceFrame))}>{face(blinks ? 'still' : 'all')}</G>
+    const faceDrawn = multiplied(wall, faceFrame)
+    const faceOnWall = <G transform={svgTransform(faceDrawn)}>{face(blinks ? 'still' : 'all')}</G>
+    const lids = motion && blinks && (
+        <BuddyLids {...frame} drawn={faceDrawn} eyeLine={buddyEyeLine({ mouth, mood, depth: faceDepth })} blinkOffset={motion.blinkOffset}>
+            {face('blinking')}
+        </BuddyLids>
+    )
 
     return (
         <View pointerEvents="none" style={[{ width: size, height: size, transform: facing === 'right' ? [{ scaleX: -1 }] : undefined, opacity: mood === 'asleep' ? 0.8 : 1 }, style]}>
             {motion?.kind ? (
-                <MovingBox {...box} {...frame} motion={motion} wall={wall} working={mood === 'working'}>
+                <MovingBox {...box} {...frame} motion={motion} wall={wall} working={mood === 'working'} lids={lids}>
                     {faceOnWall}
                 </MovingBox>
             ) : (
-                <Svg ref={svgRef} viewBox={viewBox} width="100%" height="100%">
-                    <Defs>
-                        <ClipPath id={`${uid}-body-clip`}>
-                            <Path d={wallsOutline(geometry)} />
-                        </ClipPath>
-                    </Defs>
-                    <G clipPath={`url(#${uid}-body-clip)`}>
-                        <Walls {...box} />
-                        {faceOnWall}
-                    </G>
-                    <TopFace {...box} />
-                    <TopEdge geometry={geometry} />
-                </Svg>
-            )}
-            {motion && blinks && (
-                <BuddyLids {...frame} motion={motion} wall={wall} wallDepth={geometry.depth} faceFrame={faceFrame} eyeLine={buddyEyeLine({ mouth, mood, depth: faceDepth })}>
-                    {face('blinking')}
-                </BuddyLids>
+                <>
+                    <Svg ref={svgRef} viewBox={viewBox} width="100%" height="100%">
+                        <Defs>
+                            <ClipPath id={`${uid}-body-clip`}>
+                                <Path d={wallsOutline(geometry)} />
+                            </ClipPath>
+                        </Defs>
+                        <G clipPath={`url(#${uid}-body-clip)`}>
+                            <Walls {...box} />
+                            {faceOnWall}
+                        </G>
+                        <TopFace {...box} />
+                        <TopEdge geometry={geometry} />
+                    </Svg>
+                    {lids}
+                </>
             )}
         </View>
     )
@@ -130,20 +134,15 @@ function Layer({ viewBox, children }: { viewBox: string; children: ReactNode }) 
     )
 }
 
-type BuddyLidsProps = LayerFrame & { motion: BuddyMotion; wall: Matrix; wallDepth: number; faceFrame: Matrix; eyeLine: number; children: ReactNode }
+// `drawn` is where the face stands in the drawing: on its wall, at its own scale.
+type BuddyLidsProps = LayerFrame & { drawn: Matrix; eyeLine: number; blinkOffset: number; children: ReactNode }
 
-// The eyes that blink, in a view of their own over the buddy: its transform closes them onto their
-// line and keeps them on the wall while it stretches.
-function BuddyLids({ viewBox, unit, centre, motion, wall, wallDepth, faceFrame, eyeLine, children }: BuddyLidsProps) {
-    const stretch = useStretch(motion)
-    const blink = useBlinkScale(motion.blinkOffset)
-    const drawn = multiplied(wall, faceFrame)
+// The eyes that blink, in a view of their own over the face: its transform closes them onto their
+// line, and moves for nothing else.
+function BuddyLids({ viewBox, unit, centre, drawn, eyeLine, blinkOffset, children }: BuddyLidsProps) {
+    const blink = useBlinkScale(blinkOffset)
     const undrawn = inverted(drawn)
-    const lids = useAnimatedStyle(() => {
-        const stretched = multiplied(multiplied(wall, stretchedFrom(wallDepth, stretch.value)), faceFrame)
-        const closed = multiplied(stretched, stretchedFrom(eyeLine, blink.value))
-        return { transform: layerTransform(multiplied(closed, undrawn), unit, centre) }
-    })
+    const lids = useAnimatedStyle(() => ({ transform: layerTransform(multiplied(multiplied(drawn, stretchedFrom(eyeLine, blink.value)), undrawn), unit, centre) }))
     return (
         <Animated.View style={[StyleSheet.absoluteFill, lids]}>
             <Layer viewBox={viewBox}>
@@ -213,12 +212,12 @@ function TopEdge({ geometry }: { geometry: BoxGeometry }) {
     return <Path d={topDiamond(geometry).d} fill="none" stroke="#fff" strokeOpacity={0.2} strokeWidth={0.7} />
 }
 
-type MovingBoxProps = Box & LayerFrame & { motion: BuddyMotion; wall: Matrix; working: boolean; children: ReactNode }
+type MovingBoxProps = Box & LayerFrame & { motion: BuddyMotion; wall: Matrix; working: boolean; lids: ReactNode; children: ReactNode }
 
 // The block of a buddy that bobs or shudders, in layers: the walls grow from the floor behind a
-// window cut to their outline, the face (`children`) stretches with its wall, the top rides on them
-// and, at work, a band of light crosses it.
-function MovingBox({ viewBox, unit, centre, motion, wall, working, children, ...box }: MovingBoxProps) {
+// window cut to their outline, the face (`children`) and its `lids` stretch with their wall, the top
+// rides on them and, at work, a band of light crosses it.
+function MovingBox({ viewBox, unit, centre, motion, wall, working, lids, children, ...box }: MovingBoxProps) {
     const { uid, geometry } = box
     const { base, depth, halfW, halfH } = geometry
     const topCenter = boxTop(geometry)
@@ -247,6 +246,7 @@ function MovingBox({ viewBox, unit, centre, motion, wall, working, children, ...
                 </Animated.View>
                 <Animated.View style={[StyleSheet.absoluteFill, onWall]}>
                     <Layer viewBox={viewBox}>{children}</Layer>
+                    {lids}
                 </Animated.View>
             </MaskedView>
             <Animated.View style={[StyleSheet.absoluteFill, riding]}>

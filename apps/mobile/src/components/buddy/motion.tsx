@@ -5,6 +5,11 @@ import { interpolate, useDerivedValue, useFrameCallback, useReducedMotion, useSh
 // list of them never bobs nor blinks in step.
 const Clock = createContext<SharedValue<number> | null>(null)
 
+// A buddy moves 60 times a second at most: on a 120 Hz screen the frame in between is one nobody
+// sees, and it costs as much as the other.
+const TICK_SECONDS = 1 / 60
+const TICK_SLACK = 0.002
+
 // `resting`: true while the buddies under this clock are out of sight (a screen covered by another):
 // the clock stands still, and nothing drawn from it moves on the UI thread.
 export function BuddyClock({ children, resting }: { children: ReactNode; resting?: SharedValue<boolean> }) {
@@ -12,9 +17,16 @@ export function BuddyClock({ children, resting }: { children: ReactNode; resting
     const reducedMotion = useReducedMotion()
     useFrameCallback(frame => {
         if (resting?.value) return
-        seconds.value = frame.timeSinceFirstFrame / 1000
+        const now = frame.timeSinceFirstFrame / 1000
+        if (now - seconds.value < TICK_SECONDS - TICK_SLACK) return
+        seconds.value = now
     }, !reducedMotion)
     return <Clock value={reducedMotion ? null : seconds}>{children}</Clock>
+}
+
+// The clock itself, for whatever moves with the buddies and stops with them. Null when nothing moves.
+export function useBuddyClock() {
+    return use(Clock)
 }
 
 export type BuddyMotion = { kind: 'bob' | 'shudder' | null; offset: number; blinkOffset: number }
