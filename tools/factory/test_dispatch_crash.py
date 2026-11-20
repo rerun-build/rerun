@@ -24,11 +24,21 @@ class Crash(Base):
       self.assertEqual(self.d.store.get_job("5")["errors"], 1)
       self.assertIn("#5 queued: TypeError", self.out.getvalue())
 
-  def test_twenty_unexpected_exceptions_in_a_row_end_the_job_failed(self):
+  def test_twenty_failed_passes_inside_two_hours_leave_the_job_in_its_state(self):
       with unittest.mock.patch.object(D.Dispatcher, "step", side_effect=RuntimeError("odd")):
           self.tick(20)
+      self.assertNotEqual(self.state(), "failed")
+      self.assertEqual(self.d.store.get_job("5")["errors"], 20)
+
+  def test_twenty_unexpected_exceptions_in_a_row_end_the_job_failed(self):
+      with unittest.mock.patch.object(D.Dispatcher, "step", side_effect=RuntimeError("odd")):
+          self.tick(19)
+          self.w.clock += D.FAIL_AFTER_S
+          self.tick()
       self.assertEqual(self.state(), "failed")
-      self.assertIn("20 passes in a row failed", self.d.store.get_job("5")["reason"])
+      reason = self.d.store.get_job("5")["reason"]
+      self.assertIn("20 passes in a row failed", reason)
+      self.assertIn("RuntimeError", reason)
 
   def test_an_unexpected_exception_in_intake_is_logged_and_the_jobs_still_step(self):
       self.tick()
