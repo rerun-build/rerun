@@ -257,7 +257,7 @@ class Pass:
         joined = set()
         if modelled:
             calls = self.poll(repo, rules, listed, cap, calls)
-            room = 0 if self.cfg.get("held") else settings.get("model_runs", 5) - self.sent_since(start)
+            room = 0 if self.cfg.get("held") or self.cfg.get("held_plan") else settings.get("model_runs", 5) - self.sent_since(start)
         for issue in listed:
             if skipped(issue, rules) or kind(issue, rules) == "problem":
                 continue

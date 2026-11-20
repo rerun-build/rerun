@@ -53,7 +53,8 @@
         {
           "id": "b5e4deb4-fd07-427a-88cf-fba69fde503b",
           "name": "code",
-          "runs": 6
+          "runs": 6,
+          "provider": "openrouter"
         },
         {
           "id": "53dbe014-5b95-4cf9-853f-de3a3507030a",
@@ -67,12 +68,14 @@
         {
           "id": "0d0e33bb-171a-4625-bc13-80de03eb0475",
           "name": "LINUS",
-          "runs": 3
+          "runs": 3,
+          "provider": "openrouter"
         },
         {
           "id": "71dfdea8-3482-4f3f-b091-ed4b16a69b99",
           "name": "BRUCE",
-          "runs": 3
+          "runs": 3,
+          "provider": "openrouter"
         }
       ]
     },

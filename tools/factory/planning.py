@@ -1206,7 +1206,7 @@ class Station:
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
                                      "number,title,labels,createdAt", "--limit", "1000"]))
         records = self.records()
-        held = bool(self.cfg.get("held"))
+        held = bool(self.cfg.get("held") or self.cfg.get("held_plan"))
         if held != self.held:
             log("-", "planning: sends held, no plan starts" if held else "planning: sends free again")
             self.held = held

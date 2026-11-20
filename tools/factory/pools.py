@@ -1,5 +1,6 @@
 def _coworkers(items):
-    return [{"id": c["id"], "name": c["name"], "runs": c.get("runs", 1)} for c in items]
+    return [dict({"id": c["id"], "name": c["name"], "runs": c.get("runs", 1)}, **({"provider": c["provider"]} if c.get("provider") else {}))
+            for c in items]
 
 
 def types(cfg):
@@ -31,12 +32,22 @@ def max_jobs(cfg, worker):
     return None if t is None else t["max_jobs"]
 
 
+def provider_of(cfg, agent):
+    for t in types(cfg).values():
+        for c in t.get("coworkers", []):
+            if c.get("id") == agent:
+                return c.get("provider") or "claude"
+    return "claude"
+
+
 def free_copies(cfg, worker, running, exclude=()):
     t = types(cfg).get(worker)
     if t is None or cfg.get("held"):
         return []
     out = []
     for c in [c for c in t["coworkers"] if c["id"] not in exclude]:
+        if cfg.get("held_plan") and (c.get("provider") or "claude") == "claude":
+            continue
         taken = {1 if k is None else k for i, k in running if i == c["id"]}
         if len([1 for i, _ in running if i == c["id"]]) >= c["runs"]:
             continue
