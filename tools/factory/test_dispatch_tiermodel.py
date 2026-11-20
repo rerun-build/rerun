@@ -78,7 +78,7 @@ class TierModel(T.Base):
 
     def test_no_tier_models_sends_todays_args(self):
         self.tick()
-        self.assertEqual(set(self.args[0]), {"agentId", "message", "waitSeconds", "goal"})
+        self.assertEqual(set(self.args[0]), {"agentId", "message", "waitSeconds", "goal", "copyIndex"})
 
     def test_bad_table_is_logged_and_sends_no_model(self):
         self.cfg["tiers"] = SHIPPED["tiers"]
