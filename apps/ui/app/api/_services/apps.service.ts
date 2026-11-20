@@ -399,9 +399,12 @@ async function advance(supabase: Client, slug: AppSlug, workspaceId: number, use
     const sameAccount = previous?.provider_account_id === result.accountId
     if (!sameAccount) {
         const { error } = await supabase.from('app_connections').update<Database['public']['Tables']['app_connections']['Update']>({ provider_account_id: result.accountId, provider_webhook_id: null, provider_webhook_secret: null }).eq('id', connectionId)
+        // Linkup hands an account it already holds back to a second sign-in of the same number or
+        // profile, and the index lets one live connection hold it across every workspace.
         if (error?.code === '23505') {
             await updateConnection(supabase, connectionId, { status: reconnecting ? 'needs_reconnect' : 'deleted' })
-            throw new AppActionError('duplicate', 'appAccountAlreadyConnected', { provider: appDefinition(slug).providerLabel })
+            const { data: holder } = await selectMany(supabase, 'app_connections', ['id'] as const, { workspace_id: workspaceId, app_slug: slug, provider_account_id: result.accountId, status: [...SLOT_HOLDING_STATUSES], id: { neq: connectionId } }, undefined, 1)
+            throw new AppActionError('duplicate', holder?.length ? 'appAccountAlreadyConnected' : 'appAccountInOtherWorkspace', { provider: appDefinition(slug).providerLabel })
         }
         if (error) throw new Error(error.message)
         // A reconnect that came back as a new account leaves the old one billed at Linkup.

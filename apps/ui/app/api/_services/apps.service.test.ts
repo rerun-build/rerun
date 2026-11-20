@@ -4,11 +4,12 @@ import type { Actor } from '@/app/api/_auth/access'
 import { assertAgentAccess } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { fakeSupabase, writeMethodOf, type FakeSupabase } from '@/test/supabase-fake'
+import { fakeSupabase, tableResolver, writeMethodOf, type FakeSupabase } from '@/test/supabase-fake'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { createLifetimeAddonsCheckout, removeLifetimeAddonSlot, resumeLifetimeAddons } from '@/ee/services/lifetime-addons.service'
+import { deleteAccount, submitCheckpoint } from '@/lib/apps/linkup/client'
 import { addPaidSlot } from '@/lib/apps/stripe-slots'
-import { addAppSlot, attachAgentToConnection, getAppsOverview, removeAppSlot } from './apps.service'
+import { addAppSlot, attachAgentToConnection, getAppsOverview, removeAppSlot, submitAppCheckpoint } from './apps.service'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -31,6 +32,7 @@ vi.mock('@/ee/services/lifetime-addons.service', () => ({
 }))
 vi.mock('@/lib/apps/stripe-slots', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/stripe-slots')>()), addPaidSlot: vi.fn(), addTrialSlot: vi.fn() }))
 vi.mock('@/lib/apps/analytics', () => ({ reportWorkspaceEvent: vi.fn() }))
+vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), submitCheckpoint: vi.fn(), deleteAccount: vi.fn() }))
 
 // An API key carries no browser session: the member it acts for arrives as the actor.
 const KEY_ACTOR: Actor = { kind: 'user', userId: 'u-1', workspaceId: 7, role: 'member', boxScope: 'all' }
@@ -160,5 +162,37 @@ describe('slots of a lifetime workspace', () => {
 
         await expect(removeAppSlot('linkedin')).rejects.toMatchObject({ code: 'appSlotInUse' })
         expect(removeLifetimeAddonSlot).not.toHaveBeenCalled()
+    })
+})
+
+// Linkup keeps one account per WhatsApp number or LinkedIn profile and hands it back to a second
+// sign-in, which the unique index on provider_account_id then refuses (RER-171).
+describe('an account Linkup already holds', () => {
+    const CONNECTING = { id: 'conn-new', workspace_id: 7, app_slug: 'whatsapp', status: 'connecting', provider_account_id: 'acc-pending', provider_webhook_id: null, label: null }
+
+    function linkupHandsBack(accountId: string, otherRows: object[]) {
+        const rows = tableResolver({ app_connections: [CONNECTING, ...otherRows] })
+        supabase = fakeSupabase((table, calls) => {
+            const update = calls.find(call => call.method === 'update')
+            if (update && 'provider_account_id' in (update.args[0] as object)) return { error: { code: '23505', message: 'duplicate key value violates unique constraint "app_connections_provider_account_idx"' } }
+            return rows(table, calls)
+        })
+        vi.mocked(requireWorkspaceContext).mockResolvedValue({ workspace: { id: 7 }, userId: 'u-1', supabase: supabase.client } as never)
+        vi.mocked(submitCheckpoint).mockResolvedValue({ status: 'connected', accountId })
+    }
+
+    it('says the account is connected to another workspace when this one does not hold it', async () => {
+        linkupHandsBack('acc-taken', [{ id: 'conn-elsewhere', workspace_id: 8, app_slug: 'whatsapp', status: 'connected', provider_account_id: 'acc-taken', label: '+33 6 00 00 00 00' }])
+
+        await expect(submitAppCheckpoint('whatsapp', 'conn-new')).rejects.toMatchObject({ reason: 'duplicate', code: 'appAccountInOtherWorkspace', params: { provider: 'WhatsApp' } })
+        expect(supabase.writes('app_connections')).toContainEqual(expect.objectContaining({ payload: expect.objectContaining({ status: 'deleted' }) }))
+        expect(deleteAccount).not.toHaveBeenCalled()
+    })
+
+    it('says the account is already in this workspace when one of its connections holds it', async () => {
+        linkupHandsBack('acc-taken', [{ id: 'conn-old', workspace_id: 7, app_slug: 'whatsapp', status: 'connected', provider_account_id: 'acc-taken', label: '+33 6 00 00 00 00' }])
+
+        await expect(submitAppCheckpoint('whatsapp', 'conn-new')).rejects.toMatchObject({ reason: 'duplicate', code: 'appAccountAlreadyConnected', params: { provider: 'WhatsApp' } })
+        expect(deleteAccount).not.toHaveBeenCalled()
     })
 })
