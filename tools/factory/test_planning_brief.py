@@ -55,6 +55,11 @@ class BriefTest(unittest.TestCase):
     def test_length(self):
         self.assertLess(len(self.text), 3400)
 
+    def test_a_child_that_depends_on_another_gets_no_proven_branch(self):
+        self.assertIn("a child that depends on another gets no **Proven branch** line", planning.CUT_RULES)
+        self.assertNotIn("starts from that child's `plan/<n>`", planning.CUT_RULES)
+        self.assertIn("once the child is filed, push it as `plan/<child>` and add its `**Proven branch**` line above `**Depends on**`, as the rule above says;", planning.CUT_RULES)
+
 
 if __name__ == "__main__":
     unittest.main()

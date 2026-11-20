@@ -113,7 +113,7 @@ Every risk the plan lists has its answer and its failsafe carried by children: n
 Before you file a child:
 - Write its body to a file and run `python3 -I tools/factory/issuecheck.py <file>` in your dev checkout. File it only when it prints OK.
 - Write its done-test and run it on today's dev. It must fail, and for the reason the plan gives.
-- Write the change that makes it pass, and run the done-test and every Run line with it. Put none of that code in the issue: once the child is filed, push it as `plan/<child>` and add its `**Proven branch**` line above `**Depends on**`, as the rule above says; a child that depends on another starts from that child's `plan/<n>`. If you cannot make it pass inside the child's Files, the Files or the plan are wrong: fix the list, or end BLOCKED: plan.
+- Write the change that makes it pass, and run the done-test and every Run line with it. Put none of that code in the issue: once the child is filed, push it as `plan/<child>` and add its `**Proven branch**` line above `**Depends on**`, as the rule above says; a child that depends on another gets no **Proven branch** line, because its dependency merges as other commits and the dispatcher then finds the dependency's files outside Files; it is built from dev after the dependency merges. If you cannot make it pass inside the child's Files, the Files or the plan are wrong: fix the list, or end BLOCKED: plan.
 - Search dev for every value, name and version the change alters; every file that pins one is in Files.
 - Every Run line is inside the `**Run**` block, exactly as you ran it.
 - The Change names functions; a line number is only a hint beside the name.
