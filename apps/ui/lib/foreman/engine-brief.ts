@@ -45,7 +45,7 @@ const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountTo
 // The account MCP server tells an outside assistant that adding to the Vault stays in the app. The
 // Chief of Staff adds through add_vault_entry and opens the Vault on what is left for the user.
 const VAULT_ADDING_IN_THE_APP = 'Adding an entry, signing it in and typing its credentials happen in the Rerun app (workspace menu, Vault), never here.'
-const VAULT_ADDING_BY_THE_FOREMAN = 'Nothing is ever typed here: add an entry with add_vault_entry, and open_vault on one that waits on a sign-in or a key.'
+const VAULT_ADDING_BY_THE_FOREMAN = 'Nothing is ever typed here: add an entry with add_vault_entry, a key with request_secret and its vault option, and open_vault on one that waits on a sign-in.'
 
 function foremanVaultDef(def: ForemanToolDef): ForemanToolDef {
     return { ...def, description: def.description.replace(VAULT_ADDING_IN_THE_APP, VAULT_ADDING_BY_THE_FOREMAN) }

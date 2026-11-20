@@ -16,6 +16,8 @@ export type SecretRequestBlockProps = {
     secrets: SecretRequestItem[]
     reason?: string
     existingKeys?: string[]
+    // The values go to the workspace's Vault rather than to the coworker's own variables.
+    toVault?: boolean
     onSubmit: (values: Record<string, string>) => Promise<void> | void
     onSkip?: () => void
     // The close button, when it must mean something else than Skip. Falls back to Skip.
@@ -26,7 +28,7 @@ export type SecretRequestBlockProps = {
     className?: string
 }
 
-export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmit, onSkip, onDismiss, disabled, inline, className }: SecretRequestBlockProps) {
+export function SecretRequestBlock({ secrets, reason, existingKeys = [], toVault = false, onSubmit, onSkip, onDismiss, disabled, inline, className }: SecretRequestBlockProps) {
     const t = useKitTranslations()
     const blankValues = Object.fromEntries(secrets.map(item => [item.key, '']))
     const form = useForm<Record<string, string>>({ defaultValues: blankValues })
@@ -123,7 +125,7 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
             {error && <p className="text-xs text-destructive">{error}</p>}
 
             <div className="flex items-center justify-between gap-3">
-                <p className="text-xs leading-snug text-muted-foreground/70">{t('chat.secret.storageNote')}</p>
+                <p className="text-xs leading-snug text-muted-foreground/70">{toVault ? t('chat.secret.vaultNote') : t('chat.secret.storageNote')}</p>
                 <div className="flex shrink-0 items-center gap-2">
                     {onSkip && (
                         <Button size="sm" variant="outline" disabled={locked} onClick={skip} data-hitl="skip">

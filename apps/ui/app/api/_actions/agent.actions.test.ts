@@ -15,6 +15,9 @@ const mocks = vi.hoisted(() => ({
     renameAgent: vi.fn(),
     deleteAgent: vi.fn(),
     getWorkspaceConnection: vi.fn(),
+    requireWorkspaceContext: vi.fn(),
+    engineSessionOf: vi.fn(),
+    saveSecretsToVault: vi.fn(),
 }))
 
 const { AppError } = await vi.importActual<typeof import('@/lib/i18n/action-error')>('@/lib/i18n/action-error')
@@ -22,13 +25,16 @@ class AccessDeniedError extends AppError {}
 
 vi.mock('@/app/api/_auth/access', () => ({
     AccessDeniedError,
+    actorFromContext: (ctx: { userId: string; role: string; workspace: { id: number } }) => ({ kind: 'user', userId: ctx.userId, workspaceId: ctx.workspace.id, role: ctx.role, boxScope: 'all' }),
     assertAgentInWorkspace: mocks.assertAgentInWorkspace,
     assertSessionInWorkspace: mocks.assertSessionInWorkspace,
     requireLightSessionActor: mocks.requireLightSessionActor,
     visibleAgentIds: mocks.visibleAgentIds,
     keepVisible: <T,>(rows: T[], visible: 'all' | Set<string>, idOf: (row: T) => string) => (visible === 'all' ? rows : rows.filter(row => visible.has(idOf(row)))),
 }))
-vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: vi.fn() }))
+vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: vi.fn(), requireWorkspaceContext: mocks.requireWorkspaceContext }))
+vi.mock('@/lib/foreman/conversation', () => ({ engineSessionOf: mocks.engineSessionOf }))
+vi.mock('@/app/api/_services/vault-install.service', () => ({ saveSecretsToVault: mocks.saveSecretsToVault }))
 vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: mocks.getAgentChatTarget, resolveRunTarget: mocks.resolveRunTarget, sessionRowOf: vi.fn() }))
 vi.mock('@/app/api/_services/agent.service', () => ({ moveAgentToBox: mocks.moveAgentToBox, duplicateAgent: mocks.duplicateAgent, renameAgent: mocks.renameAgent, deleteAgent: mocks.deleteAgent }))
 vi.mock('@/app/api/_services/agent-activation.service', () => ({ activateAgent: vi.fn() }))
@@ -244,6 +250,52 @@ describe('answerSecretRequestAction', () => {
         mocks.assertSessionInWorkspace.mockRejectedValue(new Error('Session not found'))
 
         await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret' })).resolves.toEqual({ success: false, error: 'Session not found' })
+        expect(engine.updateAgentKeys).not.toHaveBeenCalled()
+    })
+})
+
+describe('answerForemanSecretRequestAction', () => {
+    const request = (input: Record<string, unknown>) => [{ id: 'm1', role: 'assistant', parts: [{ type: 'tool-request_secret', toolCallId: 'call-1', input: { secrets: [{ key: 'OPENAI_API_KEY', label: 'OpenAI key' }], ...input } }] }]
+
+    beforeEach(() => {
+        mocks.requireWorkspaceContext.mockResolvedValue({ userId: 'user-2', role: 'member', workspace: { id: 7 } })
+        mocks.engineSessionOf.mockResolvedValue({ engineSessionId: 'es-foreman' })
+        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
+        mocks.saveSecretsToVault.mockResolvedValue({ id: 'item-openai', name: 'OpenAI key' })
+    })
+
+    // Where the key goes is read off the request on the engine, and written with the rights of the
+    // person who typed it.
+    it('sends the key to the Vault when its form asked for it, and names the entry', async () => {
+        vi.mocked(engine.getSessionMessages).mockResolvedValue(request({ vault: { name: 'OpenAI key', agentIds: ['agent-lea'] } }) as never)
+
+        await expect(actions.answerForemanSecretRequestAction('conv-1', { OPENAI_API_KEY: 'sk-test' })).resolves.toEqual({ success: true, vaultEntry: { id: 'item-openai', name: 'OpenAI key' } })
+        expect(mocks.saveSecretsToVault).toHaveBeenCalledWith({ name: 'OpenAI key', agentIds: ['agent-lea'] }, { OPENAI_API_KEY: 'sk-test' }, expect.objectContaining({ userId: 'user-2', workspaceId: 7, role: 'member' }))
+        expect(engine.updateAgentKeys).not.toHaveBeenCalled()
+    })
+
+    it('keeps a key its form did not send to the Vault in its own variables', async () => {
+        vi.mocked(engine.getSessionMessages).mockResolvedValue(request({}) as never)
+
+        await expect(actions.answerForemanSecretRequestAction('conv-1', { OPENAI_API_KEY: 'sk-test' })).resolves.toEqual({ success: true })
+        expect(engine.updateAgentKeys).toHaveBeenCalledWith(conn, 'foreman', { set: { OPENAI_API_KEY: 'sk-test' } })
+        expect(mocks.saveSecretsToVault).not.toHaveBeenCalled()
+    })
+
+    it('refuses a key the request does not name, before anything reaches the Vault', async () => {
+        vi.mocked(engine.getSessionMessages).mockResolvedValue(request({ vault: { name: 'OpenAI key' } }) as never)
+
+        await expect(actions.answerForemanSecretRequestAction('conv-1', { OTHER_KEY: 'x' })).resolves.toMatchObject({ success: false, code: 'secretNotRequested' })
+        expect(mocks.saveSecretsToVault).not.toHaveBeenCalled()
+    })
+
+    it('never lets a coworker form choose the Vault', async () => {
+        mocks.assertSessionInWorkspace.mockResolvedValue({ id: 'session-1', agent_id: AGENT, engine_session_id: 'es-1' })
+        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
+        vi.mocked(engine.getSessionMessages).mockResolvedValue(request({ vault: { name: 'OpenAI key', sharedWithAll: true } }) as never)
+
+        await expect(actions.answerSecretRequestAction('session-1', { OPENAI_API_KEY: 'sk-test' })).resolves.toMatchObject({ success: false, code: 'secretNotRequested' })
+        expect(mocks.saveSecretsToVault).not.toHaveBeenCalled()
         expect(engine.updateAgentKeys).not.toHaveBeenCalled()
     })
 })

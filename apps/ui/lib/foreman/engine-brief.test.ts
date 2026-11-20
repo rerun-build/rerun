@@ -58,6 +58,11 @@ describe('foremanEngineBrief', () => {
         for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name)).toBe(true)
     })
 
+    it('keeps a key off the phone, which cannot draw the Vault form', () => {
+        expect(foremanEngineBrief({ ...state, client: 'ios' } as ForemanState, { vault: true }).instructions).toContain('mobile app, which cannot show a form')
+        expect(foremanEngineBrief(state, { vault: true }).instructions).not.toContain('mobile app, which cannot show a form')
+    })
+
     it('reads the Vault in a check-in, and changes nothing in it', () => {
         const names = foremanCheckinBrief(state, 'pulse', { vault: true }).tools.map(tool => tool.name)
         expect(names).toContain('list_vault')

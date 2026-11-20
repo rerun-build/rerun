@@ -10,6 +10,7 @@ export {
     pendingMcpSignIn,
     pendingQuestions,
     pendingSecrets,
+    pendingSecretVault,
     pendingServices,
     pendingSpend,
     pendingTakeover,

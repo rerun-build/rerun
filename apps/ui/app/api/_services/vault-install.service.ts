@@ -1,12 +1,12 @@
 import 'server-only'
 
 import { paidAppFlags } from '@rerun/cloud/apps.server'
-import type { VaultItemSummary } from '@rerun/contracts'
+import type { SecretVaultTarget, VaultItemSummary } from '@rerun/contracts'
 
 import { AccessDeniedError, type Actor } from '@/app/api/_auth/access'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_SLUGS, isAppSlug, type AppSlug } from '@/lib/apps/types'
-import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems } from '@/lib/engine/vault-client'
+import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { appTarget, getMethod, missingRequiredInputs, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { slugify } from '@/lib/slugify'
@@ -15,7 +15,7 @@ import { selectMany } from '@/supabase/supabase-helpers'
 import { newServiceInstanceId } from '@/lib/services/instances'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
-import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, rethrowConflict, vaultContext } from './vault.service'
+import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, rethrowConflict, shareVaultEntry, vaultContext } from './vault.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
 
 export type VaultAddResult =
@@ -145,6 +145,10 @@ export type AddVaultSecretInput = { name: string; key: string; value: string; ag
 // A free secret: one variable, read by the attached coworkers in their shell. Its value is never
 // shown again.
 export async function addVaultSecret(input: AddVaultSecretInput, actor?: Actor): Promise<VaultItemSummary> {
+    return addVaultSecrets({ name: input.name, env: { [input.key.trim()]: input.value }, agentIds: input.agentIds }, actor)
+}
+
+async function addVaultSecrets(input: { name: string; env: Record<string, string>; agentIds?: string[] }, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
     const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
@@ -153,11 +157,37 @@ export async function addVaultSecret(input: AddVaultSecretInput, actor?: Actor):
         createVaultItem(ctx.conn, {
             kind: 'secret',
             name: input.name,
-            env: { [input.key.trim()]: input.value },
+            env: input.env,
             agentIds: coworkers.map(c => c.engineAgentId),
             createdBy,
         }),
     )
+}
+
+// The model never reads the names of an entry's variables, so a key it asks to replace is matched by
+// name when the entry has it, or taken as the one key of an entry that holds a single one.
+async function replaceVaultKeys(entryId: string, values: Record<string, string>, actor: Actor): Promise<VaultItemSummary> {
+    const ctx = await vaultContext(actor)
+    const current = await getVaultItem(ctx.conn, entryId)
+    await assertCanChangeItem(ctx.actor, current, ctx)
+    if (current.kind === 'service') throw new AccessDeniedError('vaultKeysUnknown')
+    const keys = Object.keys(values)
+    const known = keys.every(key => current.envKeys.includes(key))
+    const single = !known && keys.length === 1 && current.envKeys.length === 1
+    if (!known && !single) throw new AccessDeniedError('vaultKeysUnknown')
+    await updateVaultItemEnv(ctx.conn, entryId, { set: single ? { [current.envKeys[0]]: values[keys[0]] } : values })
+    return getVaultItem(ctx.conn, entryId)
+}
+
+// What the Chief of Staff's form typed, sent where it asked, with the rights of the person who typed
+// it: the keys of an entry replaced, a custom MCP server whose headers they fill, or a new secret.
+export async function saveSecretsToVault(target: SecretVaultTarget, values: Record<string, string>, actor: Actor): Promise<VaultItemSummary> {
+    if (target.entryId) return replaceVaultKeys(target.entryId, values, actor)
+    const server = target.mcpServer
+    const item = server
+        ? await addVaultMcp({ name: target.name ?? 'MCP server', url: server.url, headers: server.headers.map(({ header, key }) => ({ name: header, value: values[key] ?? '' })), agentIds: target.agentIds }, actor)
+        : await addVaultSecrets({ name: target.name ?? Object.keys(values).join(', '), env: values, agentIds: target.agentIds }, actor)
+    return target.sharedWithAll ? shareVaultEntry(item.id, true, actor) : item
 }
 
 export type AddVaultMcpInput = {

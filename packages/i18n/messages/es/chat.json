@@ -467,7 +467,8 @@
         "keys": {
             "title": "Claves",
             "meta": "{stored} de {total} guardadas",
-            "note": "Guardadas en la Box. El coworker solo ve los nombres."
+            "note": "Guardadas en la Box. El coworker solo ve los nombres.",
+            "vaultNote": "Guardado en el Vault. El Chief of Staff solo ve los nombres."
         },
         "approvals": {
             "title": {

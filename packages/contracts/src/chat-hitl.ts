@@ -27,6 +27,16 @@ export type SecretRequestItem = {
     docsUrl?: string
 }
 
+// Where the Chief of Staff's form sends the values instead of its own variables: a new secret of the
+// Vault, a custom MCP server whose headers they fill, or the keys of an entry already there.
+export type SecretVaultTarget = {
+    entryId?: string
+    name?: string
+    agentIds?: string[]
+    sharedWithAll?: boolean
+    mcpServer?: { url: string; headers: { header: string; key: string }[] }
+}
+
 export type ServiceSuggestionItem = { slug: string; reason?: string }
 
 export type TakeoverRequest = { url: string; reason: string }
@@ -147,10 +157,16 @@ function questionsCarryOptionObjects(input: Record<string, unknown>): boolean {
     })
 }
 
+// A client that knows only version 1 of the form writes the values to the variables of the agent: one
+// that goes to the Vault has to look unknown to it.
+const SECRET_VAULT_VERSION = 2
+
 export function withHitlVersion<T>(toolName: string | undefined, input: T): T {
-    if (!toolName || hitlKindOf(toolName) !== 'question') return input
+    const kind = toolName ? hitlKindOf(toolName) : null
+    if (kind !== 'question' && kind !== 'secret') return input
     if (!input || typeof input !== 'object' || Array.isArray(input)) return input
     const record = input as Record<string, unknown>
+    if (kind === 'secret') return hitlVersionOf(record) >= SECRET_VAULT_VERSION || !pendingSecretVault(record) ? input : ({ ...record, v: SECRET_VAULT_VERSION } as T)
     if (hitlVersionOf(record) >= QUESTION_OPTIONS_VERSION || !questionsCarryOptionObjects(record)) return input
     return { ...record, v: QUESTION_OPTIONS_VERSION } as T
 }
@@ -210,6 +226,37 @@ export function pendingSecrets(input: Record<string, unknown>): SecretRequestIte
         .filter(item => item.key.length > 0)
 }
 
+const SECRET_KEY = /^[A-Z][A-Z0-9_]*$/
+
+export function pendingSecretVault(input: Record<string, unknown>): SecretVaultTarget | null {
+    const raw = coerceJsonArray(input.vault)
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+    const vault = raw as Record<string, unknown>
+    const text = (value: unknown) => (typeof value === 'string' && value.trim() ? value.trim() : undefined)
+    const agentIds = coerceJsonArray(vault.agentIds)
+    const server = (coerceJsonArray(vault.mcpServer) ?? null) as Record<string, unknown> | null
+    const headers = server && typeof server === 'object' ? coerceJsonArray(server.headers) : null
+    const mcpServer =
+        server && typeof server === 'object' && text(server.url) && Array.isArray(headers)
+            ? {
+                  url: text(server.url) as string,
+                  headers: headers.flatMap(value => {
+                      const item = (value ?? {}) as { header?: unknown; key?: unknown }
+                      const header = text(item.header)
+                      const key = text(item.key)
+                      return header && key && SECRET_KEY.test(key) ? [{ header, key }] : []
+                  }),
+              }
+            : undefined
+    return {
+        ...(text(vault.entryId) ? { entryId: text(vault.entryId) } : {}),
+        ...(text(vault.name) ? { name: text(vault.name) } : {}),
+        ...(Array.isArray(agentIds) ? { agentIds: agentIds.filter((id): id is string => typeof id === 'string' && id.length > 0) } : {}),
+        ...(typeof vault.sharedWithAll === 'boolean' ? { sharedWithAll: vault.sharedWithAll } : {}),
+        ...(mcpServer?.headers.length ? { mcpServer } : {}),
+    }
+}
+
 export function pendingServices(input: Record<string, unknown>): ServiceSuggestionItem[] {
     const services = coerceJsonArray(input.services)
     if (!Array.isArray(services)) return []
@@ -253,11 +300,16 @@ export function parseTakeoverResult(text: string): { url: string | null } | null
 }
 
 // Resumes the run with the names of the variables that were filled, never a value: the
-// credentials go straight to the engine's agent .env and must not reach the conversation.
-export function serializeSecretResult(secrets: SecretRequestItem[], providedKeys: string[]): string {
+// credentials go straight to the engine's agent .env, or to the Vault entry named, and must not
+// reach the conversation.
+export function serializeSecretResult(secrets: SecretRequestItem[], providedKeys: string[], vaultEntry?: { id: string; name: string }): string {
     const provided = new Set(providedKeys)
-    const lines = secrets.map(item => `- ${item.key}: ${provided.has(item.key) ? 'provided (stored as a coworker variable)' : 'skipped'}`)
-    return `Credential setup result:\n${lines.join('\n')}\n\nReference a provided variable as \${KEY} in an MCP server config (headers, url, env, args) or in a command. Never ask for the value itself: it is not available to you.`
+    const stored = vaultEntry ? 'provided (stored in the Vault)' : 'provided (stored as a coworker variable)'
+    const lines = secrets.map(item => `- ${item.key}: ${provided.has(item.key) ? stored : 'skipped'}`)
+    const next = vaultEntry
+        ? `The Vault entry "${vaultEntry.name}" (entryId ${vaultEntry.id}) holds them now, for the coworkers it is lent to. Read it in list_vault.`
+        : 'Reference a provided variable as ${KEY} in an MCP server config (headers, url, env, args) or in a command.'
+    return `Credential setup result:\n${lines.join('\n')}\n\n${next} Never ask for the value itself: it is not available to you.`
 }
 
 // A reset the user walked away from is not the same as never touching the connector: the agent
@@ -407,9 +459,9 @@ export function parseServiceSetupResult(text: string): ServiceSetupEntry[] | nul
     return entries.every(entry => entry !== null) ? (entries as ServiceSetupEntry[]) : null
 }
 
-const SECRET_RESULT = /^Credential setup result:\n([\s\S]*)\n\nReference a provided variable as/
+const SECRET_RESULT = /^Credential setup result:\n([\s\S]*)\n\n(?:Reference a provided variable as|The Vault entry )/
 // Transcripts written before the copy said "coworker" still carry "an agent variable".
-const SECRET_LINE = /^- (\S+): (provided \(stored as (?:an agent|a coworker) variable\)|skipped)$/
+const SECRET_LINE = /^- (\S+): (provided \(stored (?:as (?:an agent|a coworker) variable|in the Vault)\)|skipped)$/
 
 export function parseSecretResult(text: string): { key: string; provided: boolean }[] | null {
     const match = SECRET_RESULT.exec(text.trim())

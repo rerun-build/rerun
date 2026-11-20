@@ -242,6 +242,28 @@ describe('request_mcp_sign_in', () => {
     })
 })
 
+describe('request_secret to the Vault', () => {
+    const foremanSecret = () => requestSecretTool({ turnOrder: 'message-first', agent: { config: { kind: 'foreman' } } } as any).request_secret as any
+    const coworkerSecret = () => requestSecretTool({ turnOrder: 'message-first', agent: { config: { kind: 'agent' } } } as any).request_secret as any
+    const secrets = [{ key: 'OPENAI_API_KEY', label: 'OpenAI key' }]
+
+    it('lets the Chief of Staff send a new secret, a custom MCP server or an existing entry to the Vault', () => {
+        const schema = foremanSecret().inputSchema
+        expect(schema.safeParse({ secrets, vault: { name: 'OpenAI key', agentIds: ['agent-lea'] } }).data.vault).toEqual({ name: 'OpenAI key', agentIds: ['agent-lea'] })
+        expect(schema.safeParse({ secrets, vault: { name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'OPENAI_API_KEY' }] } } }).success).toBe(true)
+        expect(schema.safeParse({ secrets, vault: { entryId: 'item-openai' } }).success).toBe(true)
+        expect(schema.safeParse({ secrets, vault: null }).success).toBe(true)
+        expect(foremanSecret().description).toContain('Vault')
+    })
+
+    it('never lets a coworker choose the Vault', () => {
+        const parsed = coworkerSecret().inputSchema.safeParse({ secrets, vault: { name: 'OpenAI key', sharedWithAll: true } })
+        expect(parsed.success).toBe(true)
+        expect(parsed.data).not.toHaveProperty('vault')
+        expect(coworkerSecret().description).not.toContain('Vault')
+    })
+})
+
 describe('request_secret input schema', () => {
     it('accepts a batch of credentials with optional help and docs', () => {
         const result = requestSecretSchema().safeParse({

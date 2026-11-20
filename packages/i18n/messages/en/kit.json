@@ -142,6 +142,7 @@
             "placeholder": "Paste the value",
             "whereToFind": "Where to find it",
             "storageNote": "Stored on your engine as a coworker variable. Never sent to the model.",
+            "vaultNote": "Saved in your workspace's Vault. Never sent to the model.",
             "skip": "Skip",
             "saving": "Saving…",
             "save": "Save"

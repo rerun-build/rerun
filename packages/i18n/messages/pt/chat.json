@@ -467,7 +467,8 @@
         "keys": {
             "title": "Chaves",
             "meta": "{stored} de {total} salvas",
-            "note": "Salvas na Box. O coworker só vê os nomes."
+            "note": "Salvas na Box. O coworker só vê os nomes.",
+            "vaultNote": "Salvo no Vault. O Chief of Staff só vê os nomes."
         },
         "approvals": {
             "title": {

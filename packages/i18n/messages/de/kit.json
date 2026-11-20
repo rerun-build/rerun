@@ -58,6 +58,7 @@
             "placeholder": "Wert einfügen",
             "whereToFind": "Wo du ihn findest",
             "storageNote": "Auf deiner Engine als Coworker-Variable gespeichert. Wird nie an das Modell gesendet.",
+            "vaultNote": "Im Vault deines Workspaces gespeichert. Wird nie an das Modell gesendet.",
             "skip": "Überspringen",
             "saving": "Wird gespeichert…",
             "save": "Speichern"

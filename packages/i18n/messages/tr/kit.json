@@ -58,6 +58,7 @@
             "placeholder": "Değeri yapıştırın",
             "whereToFind": "Nerede bulunur",
             "storageNote": "Motorunuzda bir coworker değişkeni olarak saklanır. Modele asla gönderilmez.",
+            "vaultNote": "Workspace'inizin Vault'unda saklanır. Modele asla gönderilmez.",
             "skip": "Atla",
             "saving": "Kaydediliyor…",
             "save": "Kaydet"

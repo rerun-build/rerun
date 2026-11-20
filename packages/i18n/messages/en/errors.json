@@ -506,6 +506,7 @@
     "vaultConflictEveryone": "Every coworker already gets {name} from another Vault entry shared with everyone",
     "vaultConflictSomeone": "A coworker already gets {name} from another Vault entry",
     "vaultMcpTarget": "Give the server either an address or a command",
+    "vaultKeysUnknown": "This Vault entry holds other keys. Change them in the Vault.",
     "saveAnswerFailed": "We could not save that. Try again.",
     "notYourCompanySite": "{domain} is not your company's site. Enter yours, or skip.",
     "computerNameInvalid": "Give the computer a name of 1 to 100 characters.",

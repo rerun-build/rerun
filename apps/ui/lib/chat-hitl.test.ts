@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@rerun/contracts'
-import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingSpend, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeSpendDecision, serializeTakeoverResult } from './chat-hitl'
+import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingSecretVault, pendingServices, pendingSpend, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeSpendDecision, serializeTakeoverResult } from './chat-hitl'
 import { parseAttachments } from './chat/attachments-marker'
 
 describe('pendingQuestions', () => {
@@ -61,7 +61,28 @@ describe('pendingQuestions', () => {
     })
 })
 
+describe('pendingSecretVault', () => {
+    it('reads where the form sends the values, and nothing when it is the agent', () => {
+        expect(pendingSecretVault({ secrets: [] })).toBeNull()
+        expect(pendingSecretVault({ vault: '{"name":"OpenAI key","agentIds":["a1"],"sharedWithAll":false}' })).toEqual({ name: 'OpenAI key', agentIds: ['a1'], sharedWithAll: false })
+        expect(pendingSecretVault({ vault: { entryId: ' item-1 ' } })).toEqual({ entryId: 'item-1' })
+    })
+
+    it('keeps only the headers of a server that name a variable', () => {
+        const vault = pendingSecretVault({ vault: { name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN' }, { header: 'X-Bad', key: 'lower' }] } } })
+        expect(vault?.mcpServer).toEqual({ url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN' }] })
+    })
+})
+
 describe('withHitlVersion', () => {
+    // A build that only knows the first form would write a Vault key into the Chief of Staff's own variables.
+    it('raises a form whose values go to the Vault past what older clients draw', () => {
+        const toVault = { secrets: [{ key: 'A_KEY', label: 'A key' }], vault: { name: 'A' } }
+        expect(withHitlVersion('request_secret', toVault)).toEqual({ ...toVault, v: 2 })
+        const toAgent = { secrets: [{ key: 'A_KEY', label: 'A key' }] }
+        expect(withHitlVersion('request_secret', toAgent)).toBe(toAgent)
+    })
+
     it('stamps v2 on an ask_user call that writes an option as an object', () => {
         const input = { questions: [{ question: 'Which?', options: [{ label: 'A', description: 'first' }, 'B'] }] }
         expect(withHitlVersion('ask_user', input)).toEqual({ ...input, v: 2 })
@@ -309,6 +330,13 @@ describe('parseHitlReply', () => {
             { question: 'Only files?', answers: [], attachments: ['chat-uploads/mfx2k3a3-Ij56Kl-logo.svg'] },
         ]
         expect(parseHitlReply(serializeAnswers(answers))).toEqual({ kind: 'question', answers })
+    })
+
+    it('reads back credentials the Vault took, by name only', () => {
+        const text = serializeSecretResult([{ key: 'OPENAI_API_KEY', label: 'OpenAI key' }], ['OPENAI_API_KEY'], { id: 'item-openai', name: 'OpenAI key' })
+        expect(text).toContain('entryId item-openai')
+        expect(text).not.toContain('${KEY}')
+        expect(parseHitlReply(text)).toEqual({ kind: 'secret', entries: [{ key: 'OPENAI_API_KEY', provided: true }] })
     })
 
     it('reads back credentials by name only', () => {

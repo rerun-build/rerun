@@ -58,6 +58,7 @@
             "placeholder": "Collez la valeur",
             "whereToFind": "Où le trouver",
             "storageNote": "Stocké sur votre engine comme variable du coworker. Jamais envoyé au modèle.",
+            "vaultNote": "Enregistré dans le Vault de votre workspace. Jamais envoyé au modèle.",
             "skip": "Passer",
             "saving": "Enregistrement…",
             "save": "Enregistrer"

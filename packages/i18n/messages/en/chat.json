@@ -578,7 +578,8 @@
         "keys": {
             "title": "Keys",
             "meta": "{stored} of {total} stored",
-            "note": "Stored on the Box. The coworker only sees the names."
+            "note": "Stored on the Box. The coworker only sees the names.",
+            "vaultNote": "Stored in the Vault. The Chief of Staff only sees the names."
         },
         "approvals": {
             "title": {

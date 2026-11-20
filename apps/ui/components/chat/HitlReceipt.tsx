@@ -12,7 +12,7 @@ import { SpendReceipt } from '@/components/chat/spend/SpendReceipt'
 import { Icon } from '@/components/ui/icon'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
-import { pendingApprovals, pendingComputerAccess, pendingQuestions, pendingSecrets, pendingServices, type HitlReply, type QuestionAnswer, type ServiceSetupEntry, type ServiceSetupOutcome } from '@/lib/chat-hitl'
+import { pendingApprovals, pendingComputerAccess, pendingQuestions, pendingSecrets, pendingSecretVault, pendingServices, type HitlReply, type QuestionAnswer, type ServiceSetupEntry, type ServiceSetupOutcome } from '@/lib/chat-hitl'
 import { humanizeToolSegment } from '@/lib/chat/connector-tools'
 import { hitlCallInput, type HitlCallPart } from '@/lib/chat/hitl-receipts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
@@ -44,7 +44,7 @@ export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false
         case 'question':
             return <AnswersReceipt answers={reply.answers} input={call ? input : null} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />
         case 'secret':
-            return <SecretsReceipt entries={reply.entries} labels={new Map(pendingSecrets(input).map(secret => [secret.key, secret.label]))} />
+            return <SecretsReceipt entries={reply.entries} labels={new Map(pendingSecrets(input).map(secret => [secret.key, secret.label]))} inVault={!!pendingSecretVault(input)} />
         case 'approval':
             return <ApprovalsReceipt decisions={reply.decisions} details={call ? new Map(pendingApprovals(input).map(item => [item.action, item.detail])) : new Map()} />
         case 'mcp':
@@ -218,7 +218,7 @@ function AnswersReceipt({ answers, input, agentId, rawUrlFor, readFile }: Answer
     )
 }
 
-function SecretsReceipt({ entries, labels }: { entries: { key: string; provided: boolean }[]; labels: Map<string, string> }) {
+function SecretsReceipt({ entries, labels, inVault }: { entries: { key: string; provided: boolean }[]; labels: Map<string, string>; inVault: boolean }) {
     const t = useTranslations('chat.receipt')
     const stored = entries.filter(entry => entry.provided).length
     return (
@@ -237,7 +237,7 @@ function SecretsReceipt({ entries, labels }: { entries: { key: string; provided:
                     </div>
                 )
             })}
-            <p className="px-3 py-2 text-[11px] text-muted-foreground">{t('keys.note')}</p>
+            <p className="px-3 py-2 text-[11px] text-muted-foreground">{inVault ? t('keys.vaultNote') : t('keys.note')}</p>
         </ReceiptCard>
     )
 }

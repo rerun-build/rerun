@@ -52,6 +52,8 @@ Each pause comes from a [capability](/agents/configure#capabilities): **Ask you 
 
 When a coworker needs an API key, it never asks for it in the chat. It opens a masked form, and the value goes straight into the coworker's variables, on your workspace's machine. It is never sent to the model.
 
+The [Chief of Staff](/chief-of-staff)'s form can send the value to the [Vault](/vault) instead, when you ask it to keep a key there: the value goes straight to the Vault entry, with your rights, and the Chief of Staff only learns which entry holds it.
+
 The coworker learns which variable name was filled and nothing else. It then references it as `${VARIABLE_NAME}` in an app config or a command, and the value resolves on the machine at run time.
 
 <Warning>

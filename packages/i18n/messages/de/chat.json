@@ -467,7 +467,8 @@
         "keys": {
             "title": "Schlüssel",
             "meta": "{stored} von {total} gespeichert",
-            "note": "Auf der Box gespeichert. Der Coworker sieht nur die Namen."
+            "note": "Auf der Box gespeichert. Der Coworker sieht nur die Namen.",
+            "vaultNote": "Im Vault gespeichert. Der Chief of Staff sieht nur die Namen."
         },
         "approvals": {
             "title": {

@@ -467,7 +467,8 @@
         "keys": {
             "title": "Anahtarlar",
             "meta": "{stored} / {total} kaydedildi",
-            "note": "Box üzerinde saklanır. Coworker yalnızca adları görür."
+            "note": "Box üzerinde saklanır. Coworker yalnızca adları görür.",
+            "vaultNote": "Vault'ta saklandı. Chief of Staff yalnızca adları görür."
         },
         "approvals": {
             "title": {

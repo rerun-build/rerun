@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 
-import { AccessDeniedError, assertAgentInWorkspace, assertSessionInWorkspace, keepVisible, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
+import { AccessDeniedError, actorFromContext, assertAgentInWorkspace, assertSessionInWorkspace, keepVisible, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
 import { getAgentChatTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
@@ -74,7 +74,9 @@ import {
 import { type ParsedSchedule, parseSchedule } from '@/lib/ai/parse-schedule'
 import type { TableListResult } from '@/lib/data/source'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
-import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
+import { findPendingHitl, pendingSecrets, pendingSecretVault } from '@/lib/chat-hitl'
+import { saveSecretsToVault } from '@/app/api/_services/vault-install.service'
+import type { Actor } from '@/app/api/_auth/access'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
 import type { CoworkerLook, ReasoningEffort, StatsQuery, UsageTimeRange } from '@rerun/contracts'
 import { coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
@@ -300,25 +302,36 @@ export async function answerSecretRequestAction(sessionId: string, values: Recor
     }
 }
 
-// The same answer in a conversation with the Chief of Staff, one of the caller's own threads.
-export async function answerForemanSecretRequestAction(conversationId: string, values: Record<string, string>): Promise<SuccessResult> {
+// The same answer in a conversation with the Chief of Staff, one of the caller's own threads. Its form
+// may send the values to the Vault, with the caller's rights: the answer then names the entry.
+export async function answerForemanSecretRequestAction(conversationId: string, values: Record<string, string>): Promise<SuccessResult & { vaultEntry?: { id: string; name: string } }> {
     try {
-        const conversation = await engineSessionOf(await requireWorkspaceContext(), conversationId)
+        const ctx = await requireWorkspaceContext()
+        const conversation = await engineSessionOf(ctx, conversationId)
         if (!conversation) throw new AccessDeniedError('secretNotRequested')
-        await writeRequestedSecrets(await getAgentChatTarget(FOREMAN_AGENT_ID), conversation.engineSessionId, values)
-        return { success: true }
+        const vaultEntry = await writeRequestedSecrets(await getAgentChatTarget(FOREMAN_AGENT_ID), conversation.engineSessionId, values, actorFromContext(ctx))
+        return { success: true, ...(vaultEntry ? { vaultEntry } : {}) }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
     }
 }
 
-async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType<typeof getAgentChatTarget>>, engineSessionId: string | null, values: Record<string, string>): Promise<void> {
+// Where the values go is read off the pending request on the engine, never from the caller: only the
+// Chief of Staff's form can name the Vault, and only the person typing them gives it their rights.
+async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType<typeof getAgentChatTarget>>, engineSessionId: string | null, values: Record<string, string>, vaultActor?: Actor): Promise<{ id: string; name: string } | null> {
     const messages = engineSessionId ? transformEngineMessages(await engineGetSessionMessages(conn, engineAgentId, engineSessionId)) : []
     const pending = findPendingHitl(messages)
     const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
     const keys = Object.keys(values)
     if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError('secretNotRequested')
-    await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
+    const vault = pending?.kind === 'secret' ? pendingSecretVault(pending.input) : null
+    if (!vault) {
+        await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
+        return null
+    }
+    if (engineAgentId !== FOREMAN_AGENT_ID || !vaultActor) throw new AccessDeniedError('secretNotRequested')
+    const item = await saveSecretsToVault(vault, values, vaultActor)
+    return { id: item.id, name: item.name }
 }
 
 // --- Data tab (agent's private SQLite database, read-only) ---

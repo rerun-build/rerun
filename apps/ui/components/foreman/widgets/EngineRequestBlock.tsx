@@ -11,7 +11,7 @@ import { McpSignInBlock } from '@/components/chat/McpSignInBlock'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
-import { HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingSecrets, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
+import { HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingSecrets, pendingSecretVault, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
 import type { UploadTarget } from '@/lib/files/upload-url'
 import type { PendingWidget } from '@/lib/foreman/pending-widget'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -61,6 +61,7 @@ export function EngineRequestBlock({ request, answerAttachments, onAnswer, onDis
                     agentId={FOREMAN_AGENT_ID}
                     sessionId={conversationId}
                     secrets={pendingSecrets(input)}
+                    toVault={!!pendingSecretVault(input)}
                     reason={typeof input.reason === 'string' ? input.reason : undefined}
                     onDone={onAnswer}
                     onSkip={() => onAnswer(HITL_CANCELLED.secret)}

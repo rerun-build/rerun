@@ -467,7 +467,8 @@
         "keys": {
             "title": "Clés",
             "meta": "{stored} sur {total} enregistrées",
-            "note": "Enregistrées sur la Box. Le coworker ne voit que les noms."
+            "note": "Enregistrées sur la Box. Le coworker ne voit que les noms.",
+            "vaultNote": "Enregistré dans le Vault. Le Chief of Staff ne voit que les noms."
         },
         "approvals": {
             "title": {
