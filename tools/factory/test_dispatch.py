@@ -606,6 +606,27 @@ class Flow(Base):
         self.assertEqual(len(tries), 2)
         self.assertEqual(self.state(), "merged")
 
+
+    def test_external_merge_with_moved_head_does_not_set_own_merge(self):
+        self.to_checks()
+        self.w.workflows[HEAD] = [wf("ci", "success")]
+        gh, failed = self.w.gh, []
+        def moved_head(args):
+            a = list(args)
+            if a[:2] == ["pr", "merge"]:
+                failed.append(a)
+                raise D.Error("gh pr merge failed: exit 1")
+            if a[:2] == ["pr", "view"] and failed:
+                return json.dumps({"state": "MERGED", "headRefOid": "9876543210fedcba"})
+            return gh(a)
+        self.w.gh = moved_head
+        self.tick(1, fresh=True)
+        self.assertEqual(len(failed), 1)
+        j = self.d.store.get_job("5")
+        self.assertEqual(j["state"], "merged")
+        self.assertFalse(j.get("own_merge"))
+        self.assertEqual(j["reason"], "merged outside the delegator")
+        self.assertEqual([c for c in self.w.gh_calls if c[:3] == ["issue", "comment", "5"] and "merged pull request" in c[-1]], [])
     def test_cancelled_run_without_a_success_of_its_workflow_does_not_merge(self):
         self.to_checks()
         self.w.workflows[HEAD] = [wf("ci", "success", wid=1), wf("e2e", "cancelled", wid=2)]

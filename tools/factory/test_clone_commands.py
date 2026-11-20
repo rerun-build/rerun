@@ -250,7 +250,7 @@ class CloneCommands(CloneCase):
     def merge_dev(self, pr):
         def fake_api(path, *a, **k):
             return [] if path.endswith("/files?per_page=100") else {"default_branch": "main"} if path == "repos/" + FULL else pr
-        with mock.patch.object(F, "api", fake_api):
+        with mock.patch.dict(os.environ, {"FACTORY_DISPATCHER": "1"}), mock.patch.object(F, "api", fake_api):
             return self.call(F.cmd_merge_dev, [T.REPO, "9"])
 
     def test_merge_dev_on_a_pull_request_merged_earlier_says_so_and_exits_0(self):

@@ -1021,6 +1021,8 @@ def jev_risk(title, files, need):
 
 
 def cmd_merge_dev(a):
+    if os.environ.get("FACTORY_DISPATCHER") != "1":
+        die("merge-dev is restricted to the factory dispatcher.")
     if len(a) < 2:
         die("usage: merge-dev <repo> <PR> [--note 'one-line verdict, posted on the PR']")
     full, n = repo_full(a[0]), a[1].lstrip("#")

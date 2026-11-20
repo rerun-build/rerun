@@ -418,7 +418,8 @@ class Compose(unittest.TestCase):
         with open(os.path.join(here, "..", "..", "deploy", "vps", "factory-dispatcher.yml"), encoding="utf-8") as f:
             c = f.read()
         self.assertIn('command: ["python3", "-u", "/app/launch.py"]', c)
-        for need in ("../../tools/factory:/app:ro", "factory-dispatcher-data:/state", "FACTORY_DATA_DIR: /state", "read_only: true",
+        for need in ("../../tools/factory:/app:ro", "factory-dispatcher-data:/state", "FACTORY_DATA_DIR: /state",
+                     'FACTORY_DISPATCHER: "1"', "read_only: true",
                      "cap_drop:\n      - ALL", "no-new-privileges:true", "mem_limit: 512m", "cpus: 0.5", "- /tmp",
                      "stop_grace_period: 150s"):
             self.assertIn(need, c)

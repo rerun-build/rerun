@@ -157,6 +157,15 @@ class Installs(unittest.TestCase):
         r = self.install(a, A)
         self.assertNotIn(self.key, r.stdout + r.stderr)
 
+    def test_install_removes_stale_merge_dev_wrapper(self):
+        a = tree(os.path.join(self.tmp, "A"))
+        os.makedirs(os.path.join(self.pre, "bin"), exist_ok=True)
+        stale = os.path.join(self.pre, "bin", "merge-dev")
+        open(stale, "w").close()
+        r = self.install(a, A)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertFalse(os.path.exists(stale))
+
 
 class AutoInstall(T.FactoryCase):
     def setUp(self):

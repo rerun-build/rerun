@@ -1810,12 +1810,16 @@ class Dispatcher:
         try:
             self.gh(["pr", "merge", str(j["pr"]), "-R", self.repo, "--merge", "--match-head-commit", j["head"], "--delete-branch"])
         except Error:
-            if json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") != "MERGED":
+            pr = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state,headRefOid"]))
+            if pr.get("state") != "MERGED":
                 tries = j.get("merge_refused", 0) + 1
                 if tries < MERGE_TRIES:
                     j["merge_refused"] = tries
                     return self.save(j, "merge of #%s at %s refused (%d of %d), tried again next beat" % (j["pr"], j["head"][:7], tries, MERGE_TRIES))
                 return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
+            if pr.get("headRefOid") != j["head"]:
+                j.update(relabelled=True, commented=True)
+                return self.end(j, "merged", "merged outside the delegator")
         j["own_merge"] = True
         self.close_earlier(j)
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
@@ -1834,9 +1838,13 @@ class Dispatcher:
 
     def dev_hold(self, j):
         r = self.resolver.records(self).get("dev red")
-        if r is None or r.get("filed") == j["issue"]:
+        if r is not None and r.get("filed") == j["issue"]:
             return None
-        return r.get("issue")
+        dev = [x for x in self.jobs() if x.get("dev_result") in ("green", "red") and x.get("dev_since") is not None]
+        latest = max(dev, key=lambda x: x["dev_since"], default=None)
+        if latest and latest["dev_result"] == "red":
+            return r["issue"] if r and r.get("issue") is not None else latest["issue"]
+        return r.get("issue") if r is not None else None
 
     def dev_healed(self, sha, failed):
         if not failed:

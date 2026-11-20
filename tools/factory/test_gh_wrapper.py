@@ -33,9 +33,13 @@ class Wrapper(unittest.TestCase):
         with open(self.app, "w") as f:
             f.write("app\n%d\n" % until)
 
-    def run_gh(self, *args, fails="", stdin="", wrote=""):
+    def run_gh(self, *args, fails="", stdin="", wrote="", dispatcher="1"):
         env = dict(os.environ, FACTORY_GH_KEY=self.key, FACTORY_GH_APP=self.app, FACTORY_GH_REAL=self.real,
                    LOG=self.log, APP_FAILS=fails, APP_WROTE=wrote)
+        if dispatcher is None:
+            env.pop("FACTORY_DISPATCHER", None)
+        else:
+            env["FACTORY_DISPATCHER"] = dispatcher
         return subprocess.run(["sh", WRAPPER] + list(args), input=stdin, capture_output=True, text=True, env=env)
 
     def calls(self):
@@ -113,6 +117,14 @@ class Wrapper(unittest.TestCase):
     def test_no_key_file_stops_before_anything_runs(self):
         os.remove(self.key)
         self.assertEqual(self.run_gh("issue", "view", "5").returncode, 78)
+
+    def test_non_dispatcher_cannot_merge_pull_requests(self):
+        self.app_token(time.time() + 3600)
+        for args in (["pr", "merge", "5"], ["api", "-X", "PUT", "repos/o/r/pulls/5/merge"]):
+            p = self.run_gh(*args, dispatcher=None)
+            self.assertEqual(p.returncode, 64, args)
+            self.assertIn("factory dispatcher", p.stderr)
+        self.assertFalse(os.path.exists(self.log))
 
 
 if __name__ == "__main__":

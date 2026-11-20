@@ -9,6 +9,7 @@ services:
     command: ["python3", "-u", "/app/launch.py"]
     environment:
       FACTORY_DATA_DIR: /state
+      FACTORY_DISPATCHER: "1"
       HOME: /tmp
       DISPATCH_ACCOUNT_URL: ${FACTORY_ACCOUNT_URL:?set FACTORY_ACCOUNT_URL in deploy/vps/.env}
       FACTORY_KEEPER_FILE: /keeper/machine.json

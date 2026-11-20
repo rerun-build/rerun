@@ -236,7 +236,8 @@ class WtDoneCleans(FactoryCase):
             return subprocess.CompletedProcess(cmd, 0, "", "")
 
         green = [{"name": "ci", "status": "completed", "conclusion": "success", "id": 1, "url": ""}]
-        with mock.patch.object(F, "api", fake_api), mock.patch.object(F, "run", fake_run), mock.patch.object(F, "checks", lambda *a: green):
+        with mock.patch.dict(os.environ, {"FACTORY_DISPATCHER": "1"}), mock.patch.object(F, "api", fake_api), \
+                mock.patch.object(F, "run", fake_run), mock.patch.object(F, "checks", lambda *a: green):
             return self.call(F.cmd_merge_dev, [REPO, "9"])
 
 

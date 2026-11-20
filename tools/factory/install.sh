@@ -31,6 +31,7 @@ if [ -z "$VERSION" ]; then
     sed "s#/data/tools/factory#$PREFIX/factory#g" "$w" > "$PREFIX/bin/$n"
     chmod 755 "$PREFIX/bin/$n"
   done
+  rm -f "$PREFIX/bin/merge-dev"
   SHA=$(git -C "$HERE" rev-parse HEAD 2>/dev/null || echo unknown)
   printf '%s %s\n' "$SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PREFIX/.factory-installed.tmp"
   mv "$PREFIX/.factory-installed.tmp" "$PREFIX/factory-installed"
@@ -115,6 +116,7 @@ for w in "$DEST"/.bin/*; do
   cp "$w" "$PREFIX/bin/.$n.tmp"
   mv -f "$PREFIX/bin/.$n.tmp" "$PREFIX/bin/$n"
 done
+rm -f "$PREFIX/bin/merge-dev"
 echo "$VERSION $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PREFIX/.installed.tmp"
 mv -f "$PREFIX/.installed.tmp" "$PREFIX/factory-installed"
 echo "installed factory-$VERSION as the current copy (previous: $(readlink "$PREFIX/factory-previous" 2>/dev/null || echo none))"
