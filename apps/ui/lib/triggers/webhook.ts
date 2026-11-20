@@ -1,4 +1,5 @@
 import { getAppOrigin } from '@/lib/app-origin'
+import { triggerPath } from './trigger-path'
 
 export const MAX_TRIGGER_BODY_BYTES = 1_048_576
 
@@ -31,6 +32,6 @@ export async function readBodyCapped(req: Request, maxBytes: number): Promise<st
 // The public URL of a trigger, built server-side. TriggerUrlField builds the same path in the
 // browser from window.location.origin instead: the origin the user is looking at is the one they
 // should paste into the other service.
-export async function triggerWebhookUrl(agentId: string, slug: string, token: string): Promise<string> {
-    return `${await getAppOrigin()}/api/t/${agentId}/${slug}/${token}`
+export async function triggerWebhookUrl(agentId: string, workspaceId: number, slug: string, token: string): Promise<string> {
+    return `${await getAppOrigin()}${triggerPath(agentId, workspaceId, slug, token)}`
 }

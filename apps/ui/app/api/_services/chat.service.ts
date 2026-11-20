@@ -3,6 +3,7 @@ import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/own
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
 import { seedSessionTitle } from '@/lib/chat/session-title'
+import { parseTriggerTarget } from '@/lib/triggers/trigger-path'
 import { getRunSteps, listRuns } from '@/lib/engine/client'
 import type { EngineConnection, EngineRun, SessionSource } from '@/lib/engine/types'
 import { FOREMAN_AGENT_ID, type SessionKind, type Usage } from '@rerun/contracts'
@@ -102,8 +103,13 @@ function buildTarget(row: NonNullable<Awaited<ReturnType<typeof fetchAgentRow>>>
 // public URL, which the engine verifies against the trigger file. So this skips the workspace
 // comparison on purpose, and answers null rather than throwing, because every failure on that
 // route has to come back as the same opaque 404.
-export async function resolveAgentTargetForTrigger(agentId: string): Promise<AgentChatTarget | null> {
-    const row = await fetchAgentRow(agentId)
+export async function resolveAgentTargetForTrigger(segment: string): Promise<AgentChatTarget | null> {
+    const target = parseTriggerTarget(segment)
+    if (target.kind === 'foreman') {
+        const engine = await findWorkspaceEngine(target.workspaceId)
+        return engine ? { engineAgentId: FOREMAN_AGENT_ID, conn: engine.conn } : null
+    }
+    const row = await fetchAgentRow(target.agentId)
     if (!row || row.disabled_at || !row.engine_agent_id) return null
     const engine = await findWorkspaceEngine(row.workspace_id)
     if (!engine) return null

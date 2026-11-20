@@ -325,7 +325,7 @@ describe('the paid apps and the Chief of Staff', () => {
         useRegistry({ services: {} })
         workspacePlan = 'base'
 
-        await expect(installService('foreman', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro connects to a coworker, not to the Chief of Staff.')
+        await expect(installService('foreman', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro connects to a coworker, not to the Chief of Staff')
         expect(compileService).not.toHaveBeenCalled()
     })
 })

@@ -222,7 +222,7 @@ function defaultContentType(body: string): string {
 // The public URL carries the token, so it stands in for it rather than being returned next to
 // it: nothing here should invite the caller to recompose the URL by hand. It is built from the
 // Rerun agent id, not the engine's local one, since that is what /api/t/... resolves.
-async function projectTrigger(agentId: string, trigger: EngineTrigger) {
+async function projectTrigger(agentId: string, workspaceId: number, trigger: EngineTrigger) {
     return {
         slug: trigger.slug,
         name: trigger.name,
@@ -234,7 +234,7 @@ async function projectTrigger(agentId: string, trigger: EngineTrigger) {
         model: trigger.model,
         lastFiredAt: trigger.lastFiredAt,
         fireCount: trigger.fireCount,
-        url: trigger.token ? await triggerWebhookUrl(agentId, trigger.slug, trigger.token) : null,
+        url: trigger.token ? await triggerWebhookUrl(agentId, workspaceId, trigger.slug, trigger.token) : null,
     }
 }
 
@@ -695,7 +695,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const agentId = requireString(args.agentId, 'agentId')
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
             const triggers = await engineListTriggers(conn, engineAgentId)
-            return { triggers: await Promise.all(triggers.map(trigger => projectTrigger(agentId, trigger))) }
+            return { triggers: await Promise.all(triggers.map(trigger => projectTrigger(agentId, workspaceId, trigger))) }
         }
 
         case 'upsert_trigger': {
@@ -713,7 +713,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             }
 
             if (slug) {
-                return await projectTrigger(agentId, await engineUpdateTrigger(conn, engineAgentId, slug, shared))
+                return await projectTrigger(agentId, workspaceId, await engineUpdateTrigger(conn, engineAgentId, slug, shared))
             }
 
             const trigger = await engineCreateTrigger(conn, engineAgentId, {
@@ -726,7 +726,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             })
             await followCoworker(actorUserId, agentId)
 
-            return await projectTrigger(agentId, trigger)
+            return await projectTrigger(agentId, workspaceId, trigger)
         }
 
         case 'test_trigger': {
@@ -766,7 +766,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const agentId = requireString(args.agentId, 'agentId')
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
             const trigger = await engineRotateTriggerToken(conn, engineAgentId, requireString(args.slug, 'slug'))
-            return { ...(await projectTrigger(agentId, trigger)), note: 'The previous URL no longer fires. Update every service configured with it.' }
+            return { ...(await projectTrigger(agentId, workspaceId, trigger)), note: 'The previous URL no longer fires. Update every service configured with it.' }
         }
 
         case 'delete_trigger': {

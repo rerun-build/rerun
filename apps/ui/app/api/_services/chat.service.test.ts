@@ -232,6 +232,12 @@ describe('resolveAgentTargetForTrigger', () => {
         mocks.findWorkspaceEngine.mockResolvedValue(null)
         await expect(resolveAgentTargetForTrigger('a1')).resolves.toBeNull()
     })
+
+    it('resolves the Chief of Staff of the workspace its webhook names, without an agent row', async () => {
+        await expect(resolveAgentTargetForTrigger('foreman.42')).resolves.toEqual({ engineAgentId: 'foreman', conn })
+        expect(mocks.findWorkspaceEngine).toHaveBeenCalledWith(42)
+        expect(mocks.selectMaybeSingleWithJoins).not.toHaveBeenCalled()
+    })
 })
 
 function run(id: string, sessionId: string, status: string, startedAt: string, error: string | null = null) {

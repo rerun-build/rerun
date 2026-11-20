@@ -30,7 +30,7 @@ export async function checkinReaderOf(workspaceId: number, metadata: Notificatio
     return (await visibleAgentIds(actor)) === 'all' ? memberId : null
 }
 
-async function foremanNameOf(workspaceId: number): Promise<string> {
+export async function foremanNameOf(workspaceId: number): Promise<string> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_onboarding', ['answers'] as const, { workspace_id: workspaceId })
     const answers = data?.answers as { foreman?: { name?: unknown } } | null
     return sanitizeForemanName(answers?.foreman?.name) ?? FOREMAN_DISPLAY_NAME

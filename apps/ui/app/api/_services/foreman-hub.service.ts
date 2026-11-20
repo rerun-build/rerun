@@ -4,7 +4,7 @@ import { isAdminActor, type Actor } from '@/app/api/_auth/access'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
 import { dispatchBoxTool } from '@/lib/foreman/box-tools'
-import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES } from '@/lib/foreman/engine-brief'
+import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, accountToolNameOf } from '@/lib/foreman/engine-brief'
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { FOREMAN_NAME_MAX, sanitizeForemanName } from '@/lib/foreman/name'
 import { saveForemanName } from '@/lib/foreman/profile'
@@ -35,7 +35,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (BOX_TOOL_NAMES.has(tool)) return dispatchBoxTool({ workspaceId, userId, actor }, tool, args)
     if (FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(tool)) return dispatchWorkspaceOnboardingTool({ supabase: createServiceRoleClient(), userId, workspace: { id: workspaceId }, actor }, tool, args)
 
-    return dispatchAccountTool(actor, tool, args, { actorUserId: actor.kind === 'user' ? actor.userId : null })
+    return dispatchAccountTool(actor, accountToolNameOf(tool), args, { actorUserId: actor.kind === 'user' ? actor.userId : null })
 }
 
 async function founderOf(workspaceId: number): Promise<string> {

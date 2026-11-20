@@ -90,7 +90,7 @@ describe('POST /api/hub', () => {
         const response = await POST(hubRequest({ agent: 'engine-agent', body: { tool: 'search_services', args: { query: 'gmail' } } }))
 
         expect(response.status).toBe(200)
-        expect(dispatchHubTool).toHaveBeenCalledWith('agent-1', 'search_services', { query: 'gmail' }, WORKSPACE_ID)
+        expect(dispatchHubTool).toHaveBeenCalledWith('agent-1', 'search_services', { query: 'gmail' }, WORKSPACE_ID, { kind: 'workspace', workspaceId: WORKSPACE_ID })
         expect(dispatchAccountTool).not.toHaveBeenCalled()
     })
 
@@ -101,7 +101,7 @@ describe('POST /api/hub', () => {
         const response = await POST(hubRequest({ agent: 'engine-agent', body: { tool: 'team_status', args: {} } }))
 
         expect(response.status).toBe(200)
-        expect(dispatchTeamHubTool).toHaveBeenCalledWith('agent-1', WORKSPACE_ID, 'team_status', {})
+        expect(dispatchTeamHubTool).toHaveBeenCalledWith('agent-1', WORKSPACE_ID, 'team_status', {}, { kind: 'workspace', workspaceId: WORKSPACE_ID })
         expect(dispatchHubTool).not.toHaveBeenCalled()
         expect(dispatchAccountTool).not.toHaveBeenCalled()
     })
@@ -174,6 +174,43 @@ describe('POST /api/hub', () => {
         expect(dispatchAccountTool).toHaveBeenCalledWith({ kind: 'workspace', workspaceId: WORKSPACE_ID }, 'list_agents', {}, { actorUserId: null })
     })
 
+    // Its own coworker tools reach a routine or a webhook run, which carries no token, as the
+    // workspace: nothing else does once the token is required.
+    it('runs the foreman’s own coworker tools without a token, as the workspace, and nothing else', async () => {
+        vi.stubEnv('FOREMAN_HUB_TOKEN_REQUIRED', '')
+        vi.mocked(dispatchTeamHubTool).mockResolvedValue({ agents: [] })
+
+        const install = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool: 'service_install', args: { slug: 'gmail' } } }))
+        expect(install.status).toBe(200)
+        expect(dispatchHubTool).toHaveBeenCalledWith(FOREMAN_AGENT_ID, 'service_install', { slug: 'gmail' }, WORKSPACE_ID, { kind: 'workspace', workspaceId: WORKSPACE_ID })
+
+        const team = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool: 'team_status', args: {} } }))
+        expect(team.status).toBe(200)
+        expect(dispatchTeamHubTool).toHaveBeenCalledWith(FOREMAN_AGENT_ID, WORKSPACE_ID, 'team_status', {}, { kind: 'workspace', workspaceId: WORKSPACE_ID })
+
+        vi.clearAllMocks()
+        for (const tool of ['list_agents', 'publish_file']) {
+            const refused = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool, args: {} } }))
+            expect(refused.status).toBe(403)
+        }
+        expect(dispatchHubTool).not.toHaveBeenCalled()
+        expect(dispatchTeamHubTool).not.toHaveBeenCalled()
+        expect(dispatchAccountTool).not.toHaveBeenCalled()
+    })
+
+    it('runs the foreman’s own coworker tools with the access of the member its token names', async () => {
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { role: 'member', box_scope: 'assigned' }, error: null })
+        vi.mocked(dispatchTeamHubTool).mockResolvedValue({ runs: [] })
+        const token = mintForemanHubToken(WORKSPACE_ID, 'user-7')
+        const member = { kind: 'user', userId: 'user-7', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'assigned' }
+
+        expect((await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool: 'service_install', args: { slug: 'gmail' } } }))).status).toBe(200)
+        expect(dispatchHubTool).toHaveBeenCalledWith(FOREMAN_AGENT_ID, 'service_install', { slug: 'gmail' }, WORKSPACE_ID, member)
+
+        expect((await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool: 'team_list_runs', args: { agentId: 'a1' } } }))).status).toBe(200)
+        expect(dispatchTeamHubTool).toHaveBeenCalledWith(FOREMAN_AGENT_ID, WORKSPACE_ID, 'team_list_runs', { agentId: 'a1' }, member)
+    })
+
     it('runs a member’s foreman turn with that member’s access, not the workspace’s', async () => {
         vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { role: 'member', box_scope: 'assigned' }, error: null })
 
@@ -200,7 +237,7 @@ describe('POST /api/hub', () => {
         expect(read.status).toBe(200)
         expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
 
-        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'upsert_schedule', 'db_execute', 'set_name', 'create_boxes', 'install_template']) {
+        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'upsert_schedule', 'coworker_db_execute', 'set_name', 'create_boxes', 'install_template']) {
             const write = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool, args: {} } }))
             expect(write.status).toBe(403)
         }

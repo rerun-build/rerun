@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from '@/app/api/_services/workspace-owner.service'
 import { ensureSessionRow } from '@/app/api/_services/chat.service'
-import { sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
+import { pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
 import { loadPresence } from '@/app/api/_services/presence.service'
 import { captureServer } from '@rerun/analytics/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -59,6 +59,7 @@ let participants: string[] = []
 let prefsOf: Record<string, unknown> = {}
 let incidentOpens = true
 let resolvedUsers: string[] = []
+let foremanThread: { id: string; user_id: string } | null = null
 
 function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table === 'engine_pool') {
@@ -87,6 +88,8 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table === 'rpc:open_notification_incident') return { data: incidentOpens }
     if (table === 'rpc:resolve_notification_incidents') return { data: resolvedUsers }
     if (table === 'workspace_getting_started') return { data: [] }
+    if (table === 'foreman_conversations' && !writeMethodOf(calls)) return { data: foremanThread }
+    if (table === 'workspace_onboarding') return { data: null }
     return undefined
 }
 
@@ -113,6 +116,7 @@ describe('POST /api/webhooks/engine', () => {
         prefsOf = {}
         incidentOpens = true
         resolvedUsers = []
+        foremanThread = null
         emailFlags.paused = false
         db = fakeSupabase(resolve)
         Object.assign(db.client, { auth: { admin: { getUserById: async (id: string) => ({ data: { user: { email: `${id}@rerun.test` } } }) } } })
@@ -414,6 +418,28 @@ describe('POST /api/webhooks/engine', () => {
             await POST(request(notification({ event: 'agent.schedule.completed', kind: 'done', source: 'schedule', metadata: { scheduleSlug: 'weekly' } })))
 
             expect(sendIncidentResolvedEmail).not.toHaveBeenCalled()
+        })
+
+        it('stores a heads-up of the foreman for the member whose thread it ran in, and pushes it', async () => {
+            sandbox = false
+            foremanThread = { id: 'thread-1', user_id: 'user-2' }
+
+            const response = await POST(request(notification({ agentId: FOREMAN_AGENT_ID, message: 'Your weekly digest is ready' })))
+
+            expect(response.status).toBe(202)
+            const insert = db.chainsOn('notifications').flat().find(call => call.method === 'insert')
+            expect(insert?.args[0]).toMatchObject({ workspace_id: WORKSPACE_ID, engine_agent_id: FOREMAN_AGENT_ID, engine_session_id: 'engine-session', kind: 'info', recipients: { 'user-2': 'mine' } })
+            expect(pushNotification).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ agentId: FOREMAN_AGENT_ID, agentName: 'Chief of Staff', conversationId: 'thread-1', recipients: { 'user-2': 'mine' } }))
+        })
+
+        it('keeps a question the foreman stopped on in its column, out of the inbox', async () => {
+            sandbox = false
+            foremanThread = { id: 'thread-1', user_id: 'user-2' }
+
+            await POST(request(notification({ agentId: FOREMAN_AGENT_ID, kind: 'question', metadata: { toolName: 'ask_user', toolCallId: 'call-1' } })))
+
+            expect(db.chainsOn('notifications')).toHaveLength(0)
+            expect(pushNotification).not.toHaveBeenCalled()
         })
 
         it('treats a foreman event as a no-op', async () => {

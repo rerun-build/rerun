@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 vi.mock('server-only', () => ({}))
 
-import { foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
+import { accountToolNameOf, foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
 import type { ForemanState } from './phase'
 
 const state = {
@@ -52,7 +52,7 @@ describe('foremanEngineBrief', () => {
 
     it('gives the orchestrator the library, the setup handoff, triggers, SQL and shares', () => {
         const kinds = Object.fromEntries(brief.tools.map(tool => [tool.name, tool.kind]))
-        for (const name of ['list_templates', 'install_template', 'install_shared_agent', 'start_agent_setup', 'analyze_website', 'upsert_trigger', 'test_trigger', 'db_query', 'space_db_query', 'create_agent_share', 'read_skill_file', 'list_connectors']) expect(kinds[name]).toBe('hub')
+        for (const name of ['list_templates', 'install_template', 'install_shared_agent', 'start_agent_setup', 'analyze_website', 'upsert_trigger', 'test_trigger', 'coworker_db_query', 'space_db_query', 'create_agent_share', 'read_skill_file', 'list_connectors']) expect(kinds[name]).toBe('hub')
         expect(kinds.open_template_card).toBe('intent')
     })
 
@@ -90,6 +90,17 @@ describe('foremanEngineBrief', () => {
     it('has no two tools with the same name', () => {
         const names = brief.tools.map(tool => tool.name)
         expect(new Set(names).size).toBe(names.length)
+    })
+
+    // The foreman's own database answers to the engine's db_query and db_execute: a hub tool under the
+    // same name would be replaced by it on the box.
+    it('names the tools that reach a coworker database apart from its own', () => {
+        const names = brief.tools.map(tool => tool.name)
+        for (const engineName of ['db_query', 'db_execute', 'db_schema']) expect(names).not.toContain(engineName)
+        expect(names).toEqual(expect.arrayContaining(['coworker_db_query', 'coworker_db_execute']))
+        expect(brief.tools.find(tool => tool.name === 'coworker_db_query')?.description).toContain('coworker_db_execute')
+        expect(accountToolNameOf('coworker_db_execute')).toBe('db_execute')
+        expect(accountToolNameOf('space_db_query')).toBe('space_db_query')
     })
 
     it('hands every hub tool it declares to the hub allowlist', () => {

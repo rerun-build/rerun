@@ -3,7 +3,7 @@
 import { z } from 'zod'
 
 import { AccessDeniedError, assertAgentInWorkspace, assertSessionInWorkspace, keepVisible, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
-import { requireWorkspaceId } from '@/app/api/_auth/ownership'
+import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
 import { getAgentChatTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
@@ -78,6 +78,7 @@ import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
 import type { CoworkerLook, StatsQuery, UsageTimeRange } from '@rerun/contracts'
 import { coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
+import { engineSessionOf } from '@/lib/foreman/conversation'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode, type SuccessResult } from '@/lib/i18n/action-error'
@@ -190,6 +191,18 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
     }
 }
 
+// What the Chief of Staff may spend without asking changes what it is, like a coworker's: it takes
+// `manage`, a workspace admin, where its other settings take any member (resolveRunTarget).
+export async function allowForemanPaidDataAction(): Promise<SuccessResult> {
+    try {
+        const { conn, engineAgentId } = await getAgentChatTarget(FOREMAN_AGENT_ID, 'manage')
+        await enginePatchAgent(conn, engineAgentId, { paidDataAlwaysAllow: true })
+        return { success: true }
+    } catch (err) {
+        return { success: false, ...refusalOf(err, 'updateCoworkerFailed') }
+    }
+}
+
 // A connector owns its MCP servers: install and uninstall write them through the compiler, which
 // calls the engine directly. Editing one from the panel would leave the registry describing a
 // footprint that no longer exists, so this path refuses to touch them.
@@ -278,17 +291,32 @@ export async function updateAgentKeysAction(agentId: string, body: { set?: Recor
 export async function answerSecretRequestAction(sessionId: string, values: Record<string, string>): Promise<SuccessResult> {
     try {
         const session = await assertSessionInWorkspace(sessionId)
-        const { conn, engineAgentId } = await getAgentChatTarget(session.agent_id)
-        const messages = session.engine_session_id ? transformEngineMessages(await engineGetSessionMessages(conn, engineAgentId, session.engine_session_id)) : []
-        const pending = findPendingHitl(messages)
-        const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
-        const keys = Object.keys(values)
-        if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError('secretNotRequested')
-        await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
+        await writeRequestedSecrets(await getAgentChatTarget(session.agent_id), session.engine_session_id, values)
         return { success: true }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
     }
+}
+
+// The same answer in a conversation with the Chief of Staff, one of the caller's own threads.
+export async function answerForemanSecretRequestAction(conversationId: string, values: Record<string, string>): Promise<SuccessResult> {
+    try {
+        const conversation = await engineSessionOf(await requireWorkspaceContext(), conversationId)
+        if (!conversation) throw new AccessDeniedError('secretNotRequested')
+        await writeRequestedSecrets(await getAgentChatTarget(FOREMAN_AGENT_ID), conversation.engineSessionId, values)
+        return { success: true }
+    } catch (err) {
+        return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
+    }
+}
+
+async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType<typeof getAgentChatTarget>>, engineSessionId: string | null, values: Record<string, string>): Promise<void> {
+    const messages = engineSessionId ? transformEngineMessages(await engineGetSessionMessages(conn, engineAgentId, engineSessionId)) : []
+    const pending = findPendingHitl(messages)
+    const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
+    const keys = Object.keys(values)
+    if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError('secretNotRequested')
+    await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
 }
 
 // --- Data tab (agent's private SQLite database, read-only) ---

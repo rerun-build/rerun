@@ -1,6 +1,6 @@
-import { workspaceActor } from '@/app/api/_auth/access'
+import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { getAgent } from '@/lib/engine/client'
-import { resolveAgentTarget } from './chat.service'
+import { getAgentChatTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
 
 const TEAM_READS = {
@@ -17,8 +17,8 @@ export function isTeamHubTool(name: string): name is TeamTool {
     return Object.hasOwn(TEAM_READS, name)
 }
 
-async function assertTeamSwitchedOn(callerAgentId: string, workspaceId: number): Promise<void> {
-    const { conn, engineAgentId } = await resolveAgentTarget(callerAgentId, workspaceActor(workspaceId))
+async function assertTeamSwitchedOn(callerAgentId: string, actor: Actor): Promise<void> {
+    const { conn, engineAgentId } = await getAgentChatTarget(callerAgentId, 'use', actor)
     const { config } = await getAgent(conn, engineAgentId)
     if (!config.tools.team) throw new Error('Reading other coworkers is switched off for this coworker.')
 }
@@ -29,8 +29,10 @@ function withoutTriggerUrls(result: unknown): unknown {
     return { triggers: triggers.map(({ url: _url, ...trigger }) => trigger) }
 }
 
-export async function dispatchTeamHubTool(callerAgentId: string, workspaceId: number, name: TeamTool, args: Record<string, unknown>): Promise<unknown> {
-    await assertTeamSwitchedOn(callerAgentId, workspaceId)
-    const result = await dispatchAccountTool(workspaceActor(workspaceId), TEAM_READS[name], args)
+// `actor` is the workspace for a coworker of the box, and the member a foreman's turn speaks for, who
+// reads only the Boxes they see.
+export async function dispatchTeamHubTool(callerAgentId: string, workspaceId: number, name: TeamTool, args: Record<string, unknown>, actor: Actor = workspaceActor(workspaceId)): Promise<unknown> {
+    await assertTeamSwitchedOn(callerAgentId, actor)
+    const result = await dispatchAccountTool(actor, TEAM_READS[name], args)
     return name === 'team_list_triggers' ? withoutTriggerUrls(result) : result
 }

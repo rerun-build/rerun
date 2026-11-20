@@ -442,7 +442,9 @@ export async function installService(
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
     if (manifest.authMethods.some(method => method.kind === 'app')) {
-        if (agentId === FOREMAN_AGENT_ID) throw new Error(`${manifest.name} connects to a coworker, not to the Chief of Staff.`)
+        // The account an app connection acts with is bound to a coworker's row (app_connection_agents),
+        // which the Chief of Staff does not have.
+        if (agentId === FOREMAN_AGENT_ID) throw new Error(`${manifest.name} connects to a coworker, not to the Chief of Staff: attach it to the coworker that needs it with attach_connector.`)
         if (!(await arePaidAppsOfferedTo(agentId))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
     }
 
@@ -756,8 +758,8 @@ function asStringRecord(v: unknown): Record<string, string> {
 // The caller is the engine, authenticated by its Box key, so there is no browser session to
 // resolve a workspace from: the route hands over the one it authenticated. Without it every
 // registry read below fails authorization and the agent is told its live connectors are absent.
-export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number): Promise<unknown> {
-    const actor = workspaceActor(workspaceId)
+// `actor` is the workspace for a coworker of the box, and the member a foreman's turn speaks for.
+export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number, actor: Actor = workspaceActor(workspaceId)): Promise<unknown> {
     switch (name) {
         case 'service_search':
             return searchServices(agentId, asString(args.query), asString(args.category), actor)
@@ -785,7 +787,7 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
         // The engine addresses agents by its own local ids, so only the hub can build a trigger's
         // public URL. No DB read: the caller already proved it owns this agent's engine.
         case 'trigger_url':
-            return { url: await triggerWebhookUrl(agentId, requireString(args.slug, 'slug'), requireString(args.token, 'token')) }
+            return { url: await triggerWebhookUrl(agentId, workspaceId, requireString(args.slug, 'slug'), requireString(args.token, 'token')) }
         case 'search_docs':
             return searchDocs(requireString(args.query, 'query'))
         default:

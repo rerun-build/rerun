@@ -19,7 +19,7 @@ import { emailReasonSentence } from '@/lib/notifications/reason-copy'
 import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
 import { boardStatusOfKind } from '@/lib/og/team-board'
 import { openForemanRoutineThread, setForemanConversationStatus } from '@/lib/foreman/conversation'
-import { isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
+import { foremanNameOf, isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -60,6 +60,7 @@ export async function recordNotification(token: string, payload: NotificationPay
             return { ok: true }
         }
         await applyForemanStatus(engine.workspaceId, payload)
+        if (isForemanNotice(payload)) await announceForemanNotice(supabase, engine, { ...payload, kind: 'info' })
         return { ok: true }
     }
 
@@ -180,6 +181,53 @@ async function applyForemanStatus(workspaceId: number, payload: NotificationPayl
     const kind = storedKind(payload)
     const status = kind ? completionStatus({ ...payload, kind }) : null
     if (status && payload.sessionId) await setForemanConversationStatus(workspaceId, payload.sessionId, status)
+}
+
+// What the foreman's notify_user sends: a heads-up, not a run stopping on a question, which its
+// reader answers in the column they are looking at.
+function isForemanNotice(payload: NotificationPayload): boolean {
+    return payload.event === 'agent.notification' && storedKind(payload) === 'info' && !payload.metadata?.toolName
+}
+
+// A heads-up of the foreman reaches the member whose thread it ran in, the way a coworker's reaches
+// whoever started its run: stored for their inbox, pushed and emailed by their own preferences.
+async function announceForemanNotice(supabase: ServiceRoleClient, engine: { workspaceId: number; isSandbox: boolean }, notification: StoredNotification): Promise<void> {
+    if (!notification.sessionId) return
+    try {
+        const { data: thread } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id', 'user_id'] as const, { workspace_id: engine.workspaceId, engine_session_id: notification.sessionId })
+        if (!thread) return
+        const { data: reader } = await selectMaybeSingle(supabase, 'users', ['email_notification_prefs'] as const, { id: thread.user_id })
+        const members: RoutedMember[] = [{ id: thread.user_id, prefs: reader?.email_notification_prefs ?? null }]
+        const recipients = computeRecipients({ agentId: FOREMAN_AGENT_ID, kind: 'info', source: null, authorId: thread.user_id, participantIds: [thread.user_id], taskSlug: null }, members)
+        if (!Object.keys(recipients).length) return
+
+        const { data: stored, error } = await supabase
+            .from('notifications')
+            .insert<NotificationInsert>({
+                workspace_id: engine.workspaceId,
+                engine_agent_id: FOREMAN_AGENT_ID,
+                engine_session_id: notification.sessionId,
+                engine_run_id: notification.runId ?? null,
+                event: notification.event,
+                kind: notification.kind,
+                message: notification.message,
+                metadata: (notification.metadata ?? null) as unknown as NotificationInsert['metadata'],
+                recipients: recipients as unknown as NotificationInsert['recipients'],
+                notified_at: notification.timestamp,
+            })
+            .select('id')
+            .single()
+        if (error || !stored) {
+            console.error('[notification] failed to store a heads-up of the foreman', error)
+            return
+        }
+        if (engine.isSandbox) return
+        const agentName = await foremanNameOf(engine.workspaceId)
+        if (!NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: null, agentName, notification, recipients, members })
+        await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: FOREMAN_AGENT_ID, agentName, conversationId: thread.id, sourceKey: `foreman-notice:${stored.id}`, notification, recipients, members })
+    } catch (err) {
+        console.error('[notification] failed to announce a heads-up of the foreman', err)
+    }
 }
 
 function isCancelled(notification: StoredNotification): boolean {

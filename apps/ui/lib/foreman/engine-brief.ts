@@ -24,7 +24,22 @@ export const FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES: ReadonlySet<string> = new Set
 // the same way.
 const SERIAL_TOOL_NAMES = new Set<string>(['create_agent', 'create_boxes', 'install_template', 'install_shared_agent', 'invite_members'])
 
-const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))]
+// The foreman holds a database of its own under the engine's db_query and db_execute, the names every
+// coworker has: the account tools that reach a coworker's database take another name on its belt, so
+// neither replaces the other. The account MCP server keeps the original names.
+const BELT_NAMES: Readonly<Record<string, string>> = { db_query: 'coworker_db_query', db_execute: 'coworker_db_execute' }
+const ACCOUNT_NAMES: Readonly<Record<string, string>> = Object.fromEntries(Object.entries(BELT_NAMES).map(([account, belt]) => [belt, account]))
+const RENAMED_MENTION = /(?<!\w)(db_query|db_execute)(?!\w)/g
+
+export function accountToolNameOf(beltName: string): string {
+    return ACCOUNT_NAMES[beltName] ?? beltName
+}
+
+function onBelt(def: ForemanToolDef): ForemanToolDef {
+    return { ...def, name: BELT_NAMES[def.name] ?? def.name, description: def.description.replace(RENAMED_MENTION, name => BELT_NAMES[name]) }
+}
+
+const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))].map(onBelt)
 
 export const FOREMAN_ENGINE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set(HUB_TOOL_DEFS.map(def => def.name))
 
@@ -47,7 +62,7 @@ export const FOREMAN_READ_TOOL_NAMES: ReadonlySet<string> = new Set([
     'list_agent_connectors',
     'list_connectors',
     'list_tables',
-    'db_query',
+    'coworker_db_query',
     'list_space_tables',
     'space_db_query',
     'list_agent_shares',
