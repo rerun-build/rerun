@@ -4,6 +4,7 @@ import { AnimatePresence } from 'motion/react'
 import { useCallback, useState, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 
 import type { TakeoverRequestState } from '@/components/chat/TakeoverAsk'
 import { DesktopScreenLoader } from '@/components/desktop/DesktopScreenLoader'
@@ -37,7 +38,8 @@ type ChatScreenProps = {
 // The coworker's screen as the last block of the run that uses it, with the takeover it asks for.
 export function ChatScreen({ agentId, active, takeoverAsk, onTakeoverDone, onTakeoverSkip, ...block }: ChatScreenProps) {
     const takeover = useTakeoverRequest(agentId, takeoverAsk, onTakeoverDone, onTakeoverSkip)
-    const selected = useBoardStore(s => s.selectedAgentId === agentId)
+    // The Chief of Staff's thread is in its column, never in a coworker's sheet of the board.
+    const selected = useBoardStore(s => s.selectedAgentId === agentId) || agentId === FOREMAN_AGENT_ID
     if (!active || !selected) return block.fallback
     return <ScreenBlock agentId={agentId} takeover={takeover} {...block} />
 }

@@ -60,15 +60,20 @@ describe('foremanDockFeed', () => {
 
 describe('foremanNudge', () => {
     it('holds up the first question and counts the others', () => {
-        expect(foremanNudge(question)).toEqual({ id: 'c1', kind: 'question', title: 'Which shop?', detail: null, more: 1 })
+        expect(foremanNudge(question, '')).toEqual({ id: 'c1', kind: 'question', title: 'Which shop?', detail: null, more: 1 })
     })
 
     it('holds up the action waiting for approval', () => {
-        expect(foremanNudge(approval)).toEqual({ id: 'c2', kind: 'approval', title: 'Pause Shop Radar', detail: 'Until the token is renewed', more: 0 })
+        expect(foremanNudge(approval, '')).toEqual({ id: 'c2', kind: 'approval', title: 'Pause Shop Radar', detail: 'Until the token is renewed', more: 0 })
     })
 
     it('holds up what it would run on a computer, with the reason under it', () => {
         const computer: PendingWidget = { toolName: 'request_computer_access', toolCallId: 'c3', input: { computer: '#studio-pc', reason: 'Render the teaser', commands: ['ffmpeg -i day2.mov teaser.mp4'], paths: ['~/Movies'] } }
-        expect(foremanNudge(computer)).toEqual({ id: 'c3', kind: 'approval', title: 'ffmpeg -i day2.mov teaser.mp4', detail: 'Render the teaser', more: 1 })
+        expect(foremanNudge(computer, '')).toEqual({ id: 'c3', kind: 'approval', title: 'ffmpeg -i day2.mov teaser.mp4', detail: 'Render the teaser', more: 1 })
+    })
+
+    it('holds up any other request under the line the scroll cue reads, with its reason', () => {
+        const secret: PendingWidget = { toolName: 'request_secret', toolCallId: 'c4', input: { secrets: [{ key: 'STRIPE_KEY' }], reason: 'To read your payouts' } }
+        expect(foremanNudge(secret, 'An API key is needed')).toEqual({ id: 'c4', kind: 'approval', title: 'An API key is needed', detail: 'To read your payouts', more: 0 })
     })
 })

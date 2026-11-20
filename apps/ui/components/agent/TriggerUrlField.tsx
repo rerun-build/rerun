@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { CheckIcon, CopyIcon, Loader2Icon, RotateCwIcon } from '@/lib/icons'
+import { triggerPath } from '@/lib/triggers/trigger-path'
+import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
@@ -15,7 +17,7 @@ import { useEffect, useState } from 'react'
 // React reports as a hydration mismatch and repairs by throwing the subtree away. The origin is
 // picked up after mount instead, so both sides start from the same relative path.
 function useTriggerUrl(agentId: string, slug: string, token: string): string {
-    const path = `/api/t/${agentId}/${slug}/${token}`
+    const path = triggerPath(agentId, useSession().workspace?.id ?? 0, slug, token)
     const [origin, setOrigin] = useState('')
     useEffect(() => setOrigin(window.location.origin), [])
     return `${origin}${path}`

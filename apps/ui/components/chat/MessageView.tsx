@@ -53,7 +53,7 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, parseJobEnd, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, parseJobEnd, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources, type TableCard as TableCardData } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -136,6 +136,8 @@ export type MessageViewProps = {
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess
+    // Where a table card opens when its coworker is not on the board: the Chief of Staff's card.
+    onOpenTable?: (card: TableCardData) => void
     // A caller's own rendering for a tool step, tried before everything below. `undefined` falls
     // through to the normal collapsed step, `null` hides it, a node replaces it. The foreman's
     // widgets come in through here, so this file keeps knowing nothing about them.
@@ -161,7 +163,7 @@ export function UnderText({ children }: { children: ReactNode }) {
     return children
 }
 
-function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, spentMicros, spendRunning, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
+function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, spentMicros, spendRunning, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, onOpenTable, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
     const t = useTranslations('chat')
     const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
@@ -285,7 +287,10 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 // collapsed tool step entirely. A payload we cannot read falls back to it.
                 if (toolName === 'card_table' && toolPart.state === 'output-available') {
                     const card = tableCardSchema.safeParse(parseHubOutput(toolPart.output))
-                    if (card.success) return { kind: 'standalone', key, node: <TableCard agentId={agentId} card={card.data} rawUrlFor={rawUrlFor} /> }
+                    if (card.success) {
+                        const table = card.data
+                        return { kind: 'standalone', key, node: <TableCard agentId={agentId} card={table} rawUrlFor={rawUrlFor} onOpen={onOpenTable && (() => onOpenTable(table))} /> }
+                    }
                 }
                 // A picture Codex generated on a ChatGPT plan comes back shaped like a file card.
                 if ((toolName === 'card_file' || toolName === 'image_generation') && toolPart.state === 'output-available') {

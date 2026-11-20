@@ -1,13 +1,13 @@
-import { hitlInputIsUsable, hitlKindOf, stripBridgePrefix } from '@rerun/contracts'
+import { HITL_TOOL_NAMES, hitlInputIsUsable, hitlKindOf, stripBridgePrefix } from '@rerun/contracts'
 import { lastAssistantMessageIsCompleteWithToolCalls, type ChatStatus, type UIMessage } from 'ai'
 
 import { isForemanWidgetTool, type ForemanWidgetToolName } from './tool-defs'
 
-// The questions the engine foreman can stop on. They are the engine's own ask_user,
-// request_approval and request_computer_access, answered by a user message rather than a tool result.
-export type EngineHitlToolName = 'ask_user' | 'request_approval' | 'request_computer_access'
+// The requests the engine foreman can stop on: every one a coworker can, each answered by a user
+// message rather than a tool result.
+export type EngineHitlToolName = keyof typeof HITL_TOOL_NAMES
 
-const ENGINE_HITL_TOOLS = new Set<string>(['ask_user', 'request_approval', 'request_computer_access'])
+const ENGINE_HITL_TOOLS = new Set<string>(Object.keys(HITL_TOOL_NAMES))
 
 /** `output` is what the engine added to the card it delivered (the computer card reads its rule from it). */
 export type PendingWidget = { toolName: ForemanWidgetToolName | EngineHitlToolName; toolCallId: string; input: unknown; output?: unknown }
@@ -83,7 +83,7 @@ export function findPendingEngineHitl(messages: UIMessage[], status: ChatStatus)
         const rawName = part.type === 'dynamic-tool' ? part.toolName : part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : null
         if (!rawName || !part.toolCallId) continue
         const kind = hitlKindOf(rawName)
-        if (kind !== 'question' && kind !== 'approval' && kind !== 'computer') continue
+        if (!kind) continue
         const input = (part.input ?? part.rawInput ?? {}) as Record<string, unknown>
         if (!hitlInputIsUsable(kind, input)) return null
         return { toolName: stripBridgePrefix(rawName) as EngineHitlToolName, toolCallId: part.toolCallId, input, output: part.output }

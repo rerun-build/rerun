@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
-import type { DesktopApp, DesktopViewMode } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type DesktopApp, type DesktopViewMode } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import { DesktopDialog } from '@/components/dialogs/DesktopDialog'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { MonitorIcon } from '@/lib/icons'
+import { useForemanName } from '@/hooks/useForemanName'
 import { useBoardStore } from '@/stores/board.store'
 import { useDesktopStore, type TakeoverTarget } from '@/stores/desktop.store'
 
@@ -31,17 +32,20 @@ async function connect(agentId: string, takeover: TakeoverTarget | null): Promis
 }
 
 // The screen of the agent whose sheet is open, in a dialog to drive it. Watching it happens in that
-// agent's chat. It follows the sheet: another agent, or no sheet at all, closes it.
+// agent's chat. It follows the sheet: another agent, or no sheet at all, closes it. The Chief of
+// Staff has no sheet: its screen is opened from its column and stays until it is closed.
 export function AgentDesktopView() {
     const t = useTranslations('desktop.session')
+    const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
     const agentId = useDesktopStore(s => s.agentId)
     const takeover = useDesktopStore(s => s.takeover)
     const close = useDesktopStore(s => s.close)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
-    const agentName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
+    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
+    const agentName = agentId === FOREMAN_AGENT_ID ? foremanName : coworkerName
 
     useEffect(() => {
-        if (agentId && selectedAgentId !== agentId) close()
+        if (agentId && agentId !== FOREMAN_AGENT_ID && selectedAgentId !== agentId) close()
     }, [agentId, selectedAgentId, close])
 
     return (

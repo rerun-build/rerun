@@ -303,9 +303,9 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         if (!notificationId || notificationLinkOpened.current || !hydrated) return
         notificationLinkOpened.current = true
         clearSearchParams('notification')
-        void selectMaybeSingle(createClient(), 'notifications', ['agent_id', 'engine_session_id', 'engine_run_id'] as const, { id: notificationId }).then(({ data }) => {
+        void selectMaybeSingle(createClient(), 'notifications', ['agent_id', 'engine_agent_id', 'engine_session_id', 'engine_run_id'] as const, { id: notificationId }).then(({ data }) => {
             if (!data) return
-            void openConversationFromNotification({ agentId: data.agent_id, engineSessionId: data.engine_session_id, engineRunId: data.engine_run_id })
+            void openConversationFromNotification({ agentId: data.agent_id, engineAgentId: data.engine_agent_id, engineSessionId: data.engine_session_id, engineRunId: data.engine_run_id })
         })
     }, [searchParams, hydrated])
 

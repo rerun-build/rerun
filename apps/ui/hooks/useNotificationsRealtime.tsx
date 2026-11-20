@@ -1,5 +1,6 @@
 'use client'
 
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 import type { NotificationKind } from '@/lib/engine/types'
@@ -11,6 +12,7 @@ import { openConversationFromNotification } from '@/lib/notifications/open-conve
 import { isScheduledSource, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { deliveryFor, recipientReason } from '@/lib/notifications/routing'
 import { useBoardStore } from '@/stores/board.store'
+import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -58,17 +60,17 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             // another tab goes quiet too, which is rare enough.
             if (kind === 'done' && isWatching(row.agent_id)) return
 
+            const fromForeman = row.engine_agent_id === FOREMAN_AGENT_ID
             const agent = row.agent_id ? useBoardStore.getState().agents.find(a => a.id === row.agent_id) : undefined
-            const agentName = agent?.name ?? copyRef.current.t('coworker')
+            const agentName = fromForeman ? (useForemanStore.getState().name ?? FOREMAN_DISPLAY_NAME) : (agent?.name ?? copyRef.current.t('coworker'))
             const scheduled = isScheduledSource(row.source)
             const title = scheduled ? copyRef.current.t('scheduledTask', { name: agentName }) : agentName
             const message = noticeText(row, copyRef.current.tNotices)
 
             const status = kind === 'done' ? FINISHED_STATUS : ANNOUNCED_STATUS[kind]
             const shown = normalizeNotificationPrefs(prefsRef.current).toast && !!status
-            const openConversation = row.agent_id
-                ? () => openConversationFromNotification({ agentId: row.agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id })
-                : undefined
+            const openConversation =
+                row.agent_id || fromForeman ? () => openConversationFromNotification({ agentId: row.agent_id, engineAgentId: row.engine_agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id }) : undefined
             if (shown && status) {
                 useNotificationsStore.getState().announce({
                     id: row.id,

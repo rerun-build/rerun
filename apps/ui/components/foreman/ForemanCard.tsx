@@ -23,8 +23,8 @@ const TILES: { tile: CardDestination; screen: AgentViewTab }[] = [
     { tile: 'scheduled', screen: 'scheduled' },
 ]
 
-// What needs a row or a place on the board: a published page, a webhook address.
-const WITHOUT_TABS: readonly AgentViewTab[] = ['published', 'triggers']
+// A published page belongs to a coworker of the board, which the foreman is not.
+const WITHOUT_TABS: readonly AgentViewTab[] = ['published']
 
 const BREADCRUMB_ORB_SIZE = 16
 
@@ -84,6 +84,7 @@ export function ForemanCard({ lead, onClose, active = true, children }: { lead?:
                     </div>
                     <div className="shrink-0 space-y-1.5 px-3 pb-3">
                         <DestinationRow tab="files" onClick={() => setScreen('files')} />
+                        <DestinationRow tab="data" onClick={() => setScreen('data')} />
                         {admin && <ForemanCheckinsRow active={active} onOpen={() => setScreen('checkins')} />}
                     </div>
                     {children}

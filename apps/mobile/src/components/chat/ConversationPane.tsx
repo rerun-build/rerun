@@ -239,7 +239,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])
     const paidSourcesByTurn = useMemo(() => paidDataSourcesByTurn(chat.messages), [chat.messages])
     // The live screen stands in for the run's status while the run works on it.
-    const screenShown = coworker.kind === 'coworker' && chat.history === 'ready' && ((chat.busy && runOnScreen) || !!takeoverPending)
+    const screenShown = chat.history === 'ready' && ((chat.busy && runOnScreen) || !!takeoverPending)
     const screen = useAgentScreen(coworker.id, screenShown && onScreen && focused)
     const screenUnavailable = screen.status === 'error' || screen.status === 'disconnected'
     const screenInThread = screenShown && (!screenUnavailable || !!takeoverPending)

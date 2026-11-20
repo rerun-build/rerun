@@ -24,9 +24,10 @@ type FloatingMessageProps = {
     showQuickReplies?: boolean
     onSendMessage?: MessageViewProps['onSendMessage']
     onDraftReply?: MessageViewProps['onDraftReply']
+    onOpenTable?: MessageViewProps['onOpenTable']
 }
 
-export function FloatingMessage({ message, index, isActive, rawUrlFor, readFile, sharedFiles, renderToolPart, mentions, onStopTask, onRegenerate, onRateMessage, feedbackRating, hitlCall, showQuickReplies, onSendMessage, onDraftReply }: FloatingMessageProps) {
+export function FloatingMessage({ message, index, isActive, rawUrlFor, readFile, sharedFiles, renderToolPart, mentions, onStopTask, onRegenerate, onRateMessage, feedbackRating, hitlCall, showQuickReplies, onSendMessage, onDraftReply, onOpenTable }: FloatingMessageProps) {
     const reducedMotion = useReducedMotion()
 
     return (
@@ -37,8 +38,9 @@ export function FloatingMessage({ message, index, isActive, rawUrlFor, readFile,
         >
             {/* Le même rendu que le chat d'un agent : texte, reasoning, appels d'outil groupés,
                 cartes de table. Sans `agentId`, puisque le Foreman n'en est pas un : il ouvrirait
-                les panneaux d'un coworker du board qui n'existe pas. */}
-            <MessageView message={message} isActive={isActive} rawUrlFor={rawUrlFor} readFile={readFile} sharedFiles={sharedFiles} renderToolPart={renderToolPart} mentions={mentions} onStopTask={onStopTask} onRegenerate={onRegenerate} onRateMessage={onRateMessage} feedbackRating={feedbackRating} hitlCall={hitlCall} showQuickReplies={showQuickReplies} onSendMessage={onSendMessage} onDraftReply={onDraftReply} />
+                les panneaux d'un coworker du board qui n'existe pas. Ses tableaux s'ouvrent sur sa
+                propre carte (`onOpenTable`). */}
+            <MessageView message={message} isActive={isActive} rawUrlFor={rawUrlFor} readFile={readFile} sharedFiles={sharedFiles} renderToolPart={renderToolPart} mentions={mentions} onStopTask={onStopTask} onRegenerate={onRegenerate} onRateMessage={onRateMessage} feedbackRating={feedbackRating} hitlCall={hitlCall} showQuickReplies={showQuickReplies} onSendMessage={onSendMessage} onDraftReply={onDraftReply} onOpenTable={onOpenTable} />
         </motion.div>
     )
 }

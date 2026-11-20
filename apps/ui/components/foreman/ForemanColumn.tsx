@@ -2,7 +2,7 @@
 
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { track } from '@rerun/analytics/client'
-import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES, type TableCard } from '@rerun/contracts'
 import { cancelSubRunAction } from '@/app/api/_actions/agent.actions'
 import { readFileAction } from '@/app/api/_actions/file.actions'
 import { readWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actions'
@@ -63,6 +63,7 @@ import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
@@ -96,6 +97,19 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
             useBoardStore.setState({ agentSkillFocus: { agentId: FOREMAN_AGENT_ID, slug } })
             const store = useForemanStore.getState()
             store.setCardScreen('skills')
+            if (pinned) useSimpleDetailsStore.getState().setWanted(true)
+            else store.setTab('routines')
+        },
+        [pinned]
+    )
+    // A table it showed opens where a coworker's would: its own on the Data screen of its card, a
+    // shared one in the workspace's knowledge base.
+    const openCardTable = useCallback(
+        (card: TableCard) => {
+            if (card.scope === 'shared') return useWorkspaceSettingsStore.getState().openKnowledgeBase('database', card.table, card.view)
+            useBoardStore.setState({ agentDataFocus: { agentId: FOREMAN_AGENT_ID, table: card.table, view: card.view } })
+            const store = useForemanStore.getState()
+            store.setCardScreen('data')
             if (pinned) useSimpleDetailsStore.getState().setWanted(true)
             else store.setTab('routines')
         },
@@ -512,6 +526,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                                 onWidgetAnswer={answerWidget}
                                 onWidgetDismiss={dismissWidget}
                                 skillProposals={transcriptProposals}
+                                onOpenTable={hasCard ? openCardTable : undefined}
                                 pending={pendingWidget}
                                 answerAttachments={answerAttachments}
                                 nextSteps={nextSteps}

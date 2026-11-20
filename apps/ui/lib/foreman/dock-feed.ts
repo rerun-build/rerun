@@ -54,9 +54,16 @@ export function foremanDockFeed({ messages, busy, pending, failed, copy }: FeedI
 
 export type ForemanNudge = { id: string; kind: 'question' | 'approval'; title: string; detail: string | null; more: number }
 
-/** The one line of a pending question or approval the parked Foreman holds up. */
-export function foremanNudge(pending: PendingWidget): ForemanNudge {
+/**
+ * The one line of a pending request the parked Foreman holds up. `label` is what the scroll cue says
+ * of a request that is neither a question nor an approval (a key, an app, paid data, the browser).
+ */
+export function foremanNudge(pending: PendingWidget, label: string): ForemanNudge {
     const input = (pending.input ?? {}) as Record<string, unknown>
+    if (pending.toolName !== 'ask_user' && pending.toolName !== 'request_approval' && pending.toolName !== 'request_computer_access') {
+        const reason = typeof input.reason === 'string' && input.reason.trim() ? input.reason.trim() : null
+        return { id: pending.toolCallId, kind: 'approval', title: label, detail: reason, more: 0 }
+    }
     // What it would run or open on the computer is the thing to judge, the reason comes under it.
     if (pending.toolName === 'request_computer_access') {
         const request = pendingComputerAccess(input)

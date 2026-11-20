@@ -79,8 +79,9 @@ The card opens the screens a coworker's card opens, on what the Chief of Staff k
 | **Apps** | The apps of the library it works with, the entries of the [Vault](/vault) attached to it and its MCP servers, as on a coworker's **Apps** tab. An app connected here goes to the Vault, attached to the Chief of Staff. An admin can also ask it to add or remove one itself: it declares the app, and you finish the sign-in here. See [Apps](/agents/apps) |
 | **Skills** | The skills it follows. See [Skills](/agents/skills) |
 | **Knowledge** | What it remembers. See [Memory](/concepts#memory) |
-| **Routines** | Its own scheduled tasks |
+| **Routines** | Its own scheduled tasks and webhook triggers. See [Automations](/agents/automations) |
 | **Files** | The files of its own folder |
+| **Database** | The tables of its own database, and the views it saved on them. See [Data](/agents/data) |
 
 Every member of the workspace reads those screens. Changing its apps, skills, knowledge and routines takes a workspace admin. As with a coworker, any member adds, edits and deletes its files, and starts one of its routines with **Run now**.
 
@@ -88,9 +89,9 @@ Its skills and its knowledge belong to the workspace, not to one member: what it
 
 Like a coworker, it proposes to keep a way of working as a skill: a row above the field of its chat, with **Remember** to write the skill and **No**. Deciding takes a workspace admin. See [Skills](/agents/skills).
 
-A routine of its own runs with nobody in front of it, so it works there like a coworker (files, web, its apps, the coworkers it can call) and creates or changes nothing in the workspace. Its routines are listed with the coworkers' in the list under the card, under the name **Chief of Staff**: click one to open it on the card's **Routines** screen.
+A routine or a webhook trigger of its own runs with nobody in front of it, so it works there like a coworker (files, web, its apps, its database, the coworkers it can call) and creates or changes nothing in the workspace. Its routines are listed with the coworkers' in the list under the card, under the name **Chief of Staff**: click one to open it on the card's **Routines** screen.
 
-Each run of one of its routines opens a thread in **General**, named after the routine, for the member who follows the Chief of Staff, which whoever scheduled the routine does, in its chat or on its card. When several members follow it, the thread goes to the one who joined the workspace first, and to the founder of the workspace when nobody follows it. It sends no inbox notification and no email.
+Each run of one of its routines or webhooks opens a thread in **General**, named after it, for the member who follows the Chief of Staff, which whoever scheduled the routine does, in its chat or on its card. When several members follow it, the thread goes to the one who joined the workspace first, and to the founder of the workspace when nobody follows it. A run sends no inbox notification and no email of its own: only what the Chief of Staff flags for you does, see below.
 
 When the next step is obvious, its answer ends on up to three short replies under the message: click one and it is sent as your own message, word for word. A reply that still needs something from you (a link, a name) is put in the field for you to finish instead.
 
@@ -151,7 +152,12 @@ Ask in plain words. The Chief of Staff does the work itself, then puts a row und
 | **Install a template** | Installs a free template from the library into a Box. For a paid template, it opens the template card so you buy it yourself. See [Templates](/templates/install) |
 | **Set up apps** | Finds the app in the library and attaches it, then leaves you a row to sign in from the coworker's **Apps** tab. It never asks for a password or a key in the chat. See [Apps](/agents/apps) |
 | **Brief a coworker** | Sends it a task, follows the run and reports back |
-| **Schedule or trigger work** | Creates scheduled tasks and webhook triggers. See [Automations](/agents/automations) |
+| **Schedule or trigger work** | Creates scheduled tasks and webhook triggers, on a coworker or on itself. See [Automations](/agents/automations) |
+| **Keep data** | Stores what it collects in a database of its own and shows it as a table in the chat, whose button opens the table on its card. See [Data](/agents/data) |
+| **Connect an app to itself** | Searches the library and installs an app on itself, or shows you a card to sign in or enter a key. A key it needs outside the library is asked in a form whose value never enters the chat. See [Apps](/agents/apps) |
+| **Buy data** | Buys [paid data](/agents/configure#paid-data) on the Rerun credit once you approved the cost on its card, like a coworker |
+| **Flag something for you** | Sends you a notification about its conversation when something needs your eyes, by your notification settings. See [Choose what reaches you](/agents/human-in-the-loop#choose-what-reaches-you) |
+| **Work on its screen** | Opens a browser and apps on the machine's screen, which you watch in its chat, and hands you the browser when a page needs you |
 | **Explain a run** | Reads the run history of a coworker and says why something failed |
 | **Keep the Brain** | Writes a page when you tell it a fact, accepts or dismisses what your coworkers proposed once you decide, and opens a page for you. See [Brain](/brain) |
 | **Work on your computer** | Runs a command, reads or writes files, or starts a long job on a computer you linked, named with `#`, once you said yes. See [Computers](/computers) |
@@ -164,9 +170,9 @@ It answers questions about Rerun from this documentation rather than from memory
 ### What it does not do
 
 - It changes nothing inside the settings panels it opens: you set those yourself. The exception is the model a coworker runs on, which it can set.
-- It cannot be rewritten, duplicated or deleted, and it has no webhook trigger, no published page and no database of its own. Only its name changes, see [Its name](#its-name).
+- It cannot be rewritten, duplicated or deleted, and it publishes no page. Only its name changes, see [Its name](#its-name).
 - It takes no [paid app](/billing#paid-apps): those connect to a coworker.
-- It never asks for a secret in the chat.
+- It never asks for a secret in the chat: a key goes through its form.
 
 ## Getting started
 

@@ -10,11 +10,10 @@ import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { ThreadBranch } from '@/components/agent/sheet/ThreadBranch'
 import { Conversation, ConversationContent, ConversationScrollButton, type ConversationHandle } from '@/components/ai-elements/conversation'
 import { Message, MessageContent } from '@/components/ai-elements/message'
-import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
 import { mentionTokensOf } from '@/components/chat/MentionAutocomplete'
 import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
 import { ChatActivityLoader } from '@/components/chat/ChatActivityLoader'
-import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBlock'
+import { ChatScreen } from '@/components/chat/ChatScreen'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
@@ -22,11 +21,11 @@ import type { FileAccess } from '@/components/chat/FileCard'
 import { useArriveByTop } from '@/hooks/useArriveByTop'
 import { useMessageTimes } from '@/hooks/useMessageTimes'
 import type { ChatErrorKind } from '@/lib/chat-error'
-import { hitlKindOf, pendingApprovals, serializeApprovalDecisions } from '@/lib/chat-hitl'
+import { HITL_CANCELLED, hitlKindOf, pendingTakeover } from '@/lib/chat-hitl'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
-import { FOREMAN_AGENT_ID, type MessageFeedbackRating } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, runUsesScreen, screenSite, type MessageFeedbackRating, type TableCard } from '@rerun/contracts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
 import type { UploadTarget } from '@/lib/files/upload-url'
 import { isEngineHitl, type PendingWidget } from '@/lib/foreman/pending-widget'
@@ -45,7 +44,7 @@ import { FloatingMessage } from './FloatingMessage'
 import { ForemanActivityIndicator } from './ForemanActivityIndicator'
 import { useForemanMentionAgents } from './useForemanMentionAgents'
 import { ForemanWelcome } from './ForemanWelcome'
-import { EngineQuestionWidget } from './widgets/EngineQuestionWidget'
+import { EngineRequestBlock } from './widgets/EngineRequestBlock'
 import { planAgentShortcuts } from './widgets/agent-picks'
 import { renderForemanWidget, type AnswerWidget, type DismissWidget } from './widgets/renderForemanWidget'
 import { skillProposalRow, type ForemanSkillProposals } from './widgets/skill-proposal-row'
@@ -88,6 +87,8 @@ type ForemanChatLayerProps = {
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess
+    /** Where a table it showed opens: its own card, or the workspace's knowledge base for a shared one. */
+    onOpenTable?: (card: TableCard) => void
     /** General's threads, each under the message it was opened after. Only General has them. */
     threads?: ThreadRow[]
     onOpenThread?: (sessionId: string) => void
@@ -109,7 +110,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onOpenTable, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const tName = useTranslations('workspaceView.foreman')
     // A reply its message ends on is sent as the user's own message, word for word.
     const sendQuickReply = onSuggestion ? ({ text }: { text: string }) => onSuggestion(text) : undefined
@@ -136,6 +137,12 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
         () => (engineHitl && engineHitlKind ? { key: engineHitl.toolCallId, summary: summarizePendingHitl(engineHitlKind, (engineHitl.input ?? {}) as Record<string, unknown>, tHitlCue), blockRef: pendingRef } : null),
         [engineHitl, engineHitlKind, pendingRef, tHitlCue]
     )
+    // Its screen, as in a coworker's chat: the live view stands in for the loader while the run works
+    // on it, and a browser it hands over is that screen with the takeover on it.
+    const takeoverAsk = engineHitl?.toolName === 'request_takeover' ? { callId: engineHitl.toolCallId, request: pendingTakeover((engineHitl.input ?? {}) as Record<string, unknown>) } : null
+    const runOnScreen = useMemo(() => runUsesScreen(messages), [messages])
+    const screenShown = (!!streaming && runOnScreen) || !!takeoverAsk
+    const [root, setRoot] = useState<HTMLDivElement | null>(null)
     // `null` fait disparaître la part, `undefined` la rend à son étape d'outil normale : la question
     // de l'engine se dessine après le dernier message et sort donc de la pile. Le littéral compte :
     // un composant qui rend `null` laisserait, lui, un nœud vide dans la pile.
@@ -177,6 +184,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
     const empty = visible.length === 0 && !error && threadRows.leading.length === 0
     const greeting = empty && guided
     const restoring = empty && !guided && !restored
+    const activityLoader = streaming || greeting ? <ChatActivityLoader message={visible.at(-1)} indicator={<ForemanActivityIndicator />} /> : null
 
     let notice: ReactNode = null
     if (error) {
@@ -192,7 +200,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
     }
 
     return (
-        <div className={cn('pointer-events-auto relative w-full', className)} style={{ contain: 'paint' }}>
+        <div ref={setRoot} className={cn('pointer-events-auto relative w-full', className)} style={{ contain: 'paint' }}>
             {/* Posé par-dessus la pile plutôt que dedans : il la trouve vide, et en sortant il se
                 fond sur le premier message qui arrive au lieu de lui disputer la hauteur. */}
             <AnimatePresence>
@@ -244,25 +252,14 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
                                     showQuickReplies={index === visible.length - 1 && !streaming && !engineHitl && !nextSteps?.length}
                                     onSendMessage={sendQuickReply}
                                     onDraftReply={onPrefill}
+                                    onOpenTable={onOpenTable}
                                 />,
                                 ...(threadBranches(threadRows.after.get(index)) ?? []),
                             ])
                         )}
-                        {engineHitl && onWidgetAnswer && (
+                        {engineHitl && onWidgetAnswer && !takeoverAsk && (
                             <motion.div key={engineHitl.toolCallId} ref={pendingRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
-                                {engineHitl.toolName === 'ask_user' ? (
-                                    <EngineQuestionWidget
-                                        input={engineHitl.input}
-                                        target={answerAttachments?.target ?? null}
-                                        maxFileSize={answerAttachments?.maxFileSize}
-                                        onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)}
-                                        onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))}
-                                    />
-                                ) : engineHitl.toolName === 'request_computer_access' ? (
-                                    <ComputerAccessBlock input={(engineHitl.input ?? {}) as Record<string, unknown>} output={engineHitl.output} onReply={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} />
-                                ) : (
-                                    <ActionApprovalBlock inline approvals={pendingApprovals((engineHitl.input ?? {}) as Record<string, unknown>)} onSubmit={decisions => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, serializeApprovalDecisions(decisions))} />
-                                )}
+                                <EngineRequestBlock request={engineHitl} answerAttachments={answerAttachments} onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))} />
                             </motion.div>
                         )}
                         {nextSteps && nextSteps.length > 0 && !streaming && (
@@ -273,7 +270,22 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
                         {/* Pendant l'accueil, le premier tour n'est souvent pas encore parti (le
                             workspace se prépare) : le loader se montre quand même, sinon l'écran a
                             l'air figé jusqu'au premier token. */}
-                        {(streaming || greeting) && <ChatActivityLoader message={visible.at(-1)} indicator={<ForemanActivityIndicator />} />}
+                        {screenShown && onWidgetAnswer ? (
+                            <ChatScreen
+                                agentId={FOREMAN_AGENT_ID}
+                                active={!orbPaused}
+                                site={screenSite(messages, takeoverAsk?.request.url ?? null)}
+                                takeoverAsk={takeoverAsk}
+                                onTakeoverDone={summary => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, summary)}
+                                onTakeoverSkip={() => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, HITL_CANCELLED.takeover)}
+                                scroller={scroller}
+                                floatingHost={root}
+                                arriveRef={takeoverAsk ? pendingRef : undefined}
+                                fallback={activityLoader}
+                            />
+                        ) : (
+                            activityLoader
+                        )}
                         {notice}
                     </ConversationContent>
                 </div>

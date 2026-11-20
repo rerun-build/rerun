@@ -1,20 +1,35 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
+import { findForemanThreadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { useBoardStore } from '@/stores/board.store'
+import { useForemanStore } from '@/stores/foreman.store'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 type OpenConversationArgs = {
     agentId: string | null
+    engineAgentId?: string | null
     engineSessionId: string | null
     engineRunId: string | null
+}
+
+// The Chief of Staff has no agent row: its notification names it by its engine id, and the
+// conversation it is about is one of the reader's threads in its column.
+async function openForemanThread(engineSessionId: string | null): Promise<void> {
+    const store = useForemanStore.getState()
+    store.setTab('assistant')
+    const threadId = engineSessionId ? await findForemanThreadAction(engineSessionId) : null
+    if (threadId) store.openThread(threadId)
 }
 
 // Opens the conversation tied to a notification: selects the agent and forces its panel onto the
 // conversation tab, then, once the engine session id is resolved to the DB session id, drives the
 // chat to the exact conversation. The tab is forced before the lookup so a notification without a
 // resolvable session still lands on the chat rather than on whatever tab was left active.
-export async function openConversationFromNotification({ agentId, engineSessionId, engineRunId }: OpenConversationArgs): Promise<void> {
+export async function openConversationFromNotification({ agentId, engineAgentId, engineSessionId, engineRunId }: OpenConversationArgs): Promise<void> {
+    if (engineAgentId === FOREMAN_AGENT_ID) return openForemanThread(engineSessionId)
     if (!agentId) return
 
     useBoardStore.getState().openAgentChat(agentId)

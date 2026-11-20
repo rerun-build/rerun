@@ -15,6 +15,8 @@ import { ForemanReplyBubble } from '@/components/foreman/dock/ForemanReplyBubble
 import { useForemanVoice } from '@/components/foreman/dock/useForemanVoice'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
+import { hitlKindOf } from '@/lib/chat-hitl'
+import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { foremanNudge } from '@/lib/foreman/dock-feed'
 import { type ForemanCorner, loadForemanOrbCorner, rememberForemanOrbCorner, resolveCorner } from '@/lib/foreman-layout'
 import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
@@ -141,7 +143,12 @@ export function ForemanDock() {
         inputRef.current?.focus()
     }, [focusRequest, open, pillVisible])
 
-    const nudge = useMemo(() => (dock.pending ? foremanNudge(dock.pending) : null), [dock.pending])
+    const tHitlCue = useTranslations('chat.hitlCue')
+    const nudge = useMemo(() => {
+        if (!dock.pending) return null
+        const kind = hitlKindOf(dock.pending.toolName)
+        return foremanNudge(dock.pending, kind ? summarizePendingHitl(kind, (dock.pending.input ?? {}) as Record<string, unknown>, tHitlCue).label : '')
+    }, [dock.pending, tHitlCue])
     const [laterNudgeId, setLaterNudgeId] = useState<string | null>(null)
     const reply = dock.failed ? { id: 'failed', text: t('failedReply') } : dock.reply
     const [dismissedReplyId, setDismissedReplyId] = useState<string | null>(null)
