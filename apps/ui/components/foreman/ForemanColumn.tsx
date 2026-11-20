@@ -16,6 +16,7 @@ import { arrivalStepOf } from '@/components/foreman/arrival/flow'
 import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
+import { Orb } from '@/components/foreman/Orb'
 import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
 import { ForemanCard } from '@/components/foreman/ForemanCard'
 import { ForemanDetails } from '@/components/foreman/ForemanDetails'
@@ -491,7 +492,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             onShowGeneral={backToGeneral}
                             onOpenThread={openThread}
                             onNewTask={startNewChat}
-                            end={<DetailsToggle label={tView('card', foremanName)} />}
+                            start={<DetailsToggle label={tView('card', foremanName)} avatar={<Orb size={24} facing="right" />} />}
                             history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
                         />
                     ) : (

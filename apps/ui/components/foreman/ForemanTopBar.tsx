@@ -19,17 +19,18 @@ type ForemanTopBarProps = {
     onShowGeneral: () => void
     onOpenThread: (id: string) => void
     onNewTask: () => void
-    /** The button to every conversation and the list it opens. */
+    /** What opens the bar: the button to the Chief of Staff's card. */
+    start?: ReactNode
+    /** The button to every conversation and the list it opens, at the end of the bar. */
     history?: ReactNode
-    end?: ReactNode
 }
 
 /**
  * The Chief of Staff's bar in the Simple view's middle, the one a coworker's chat has: General pinned
- * first, then the threads opened here, kept across reloads, then what sits at the end. The store says
+ * first, then the threads opened here, kept across reloads, between its card button and its history. The store says
  * which conversation is on screen; the tabs follow it, whoever opened it (+, the history, a notification).
  */
-export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShowGeneral, onOpenThread, onNewTask, history, end }: ForemanTopBarProps) {
+export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShowGeneral, onOpenThread, onNewTask, start, history }: ForemanTopBarProps) {
     const t = useTranslations('foreman.threads')
     const generalTitle = t('general')
     const untitled = t('untitled')
@@ -75,11 +76,11 @@ export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShow
 
     return (
         <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
-            {history}
+            {start}
             <div className="min-w-0 flex-1">
                 <OpenChatsTabs tabs={shownTabs} activeIndex={activeIndex} onSelect={show} onClose={close} onCreate={onNewTask} statusOf={tab => (tab.id ? rowById.get(tab.id)?.status : undefined)} />
             </div>
-            {end}
+            {history}
         </div>
     )
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { memo, useMemo } from 'react'
 
@@ -46,8 +47,6 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
     const locked = !!agent && (access !== 'live' || !!agent.disabledAt)
     const attentionCount = useMemo(() => sessions.filter(s => s.agentId === selectedAgentId && ATTENTION_STATUSES.has(s.status)).length, [sessions, selectedAgentId])
 
-    const headerEnd = <DetailsToggle label={t('card')} />
-
     return (
         <section aria-label={agent?.name} className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background">
             {openedAgentIds.map(id => (
@@ -61,7 +60,7 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
                         onCloseChats={() => onChatsChange(null)}
                         onOpenChats={() => onChatsChange('all')}
                         chatsAttention={selectedAgentId === id ? attentionCount : 0}
-                        headerEnd={headerEnd}
+                        headerStart={<DetailsToggle label={t('card')} avatar={<AgentBuddy agentId={id} size={28} facing="right" />} />}
                         openSessionRequest={selectedAgentId === id ? openSessionRequest : null}
                         onOpenSessionConsumed={onOpenSessionConsumed}
                         newThreadRequest={newThreadFor === id}
@@ -82,12 +81,12 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
 
 const TAB_WIDTHS = ['w-16', 'w-28']
 
-// The docked chat's frame: the conversations button, the tabs, the card button, the conversation's column, the composer.
+// The docked chat's frame: the card button, the tabs, the conversations button, the conversation's column, the composer.
 function ChatPaneSkeleton() {
     return (
         <div aria-hidden className="flex h-full flex-col">
             <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
-                <Skeleton className="size-8 rounded-md" />
+                <Skeleton className="size-9 rounded-md" />
                 <div className="flex min-w-0 flex-1 items-center gap-1 px-3">
                     {TAB_WIDTHS.map(width => (
                         <Skeleton key={width} className={cn('h-7 rounded-md', width)} />

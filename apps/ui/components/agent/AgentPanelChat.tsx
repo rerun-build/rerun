@@ -55,15 +55,15 @@ type AgentPanelChatProps = {
     onOpenChats?: () => void
     chatsAttention?: number
     // `floating`: the panel over the board, its tabs under the pills that float above the thread.
-    // `docked`: a column of its own, its tabs a header in the flow, with `headerEnd` at their right.
+    // `docked`: a column of its own, its tabs a header in the flow, with `headerStart` at their left and the conversations button at their right.
     presentation?: 'floating' | 'docked'
-    headerEnd?: ReactNode
+    headerStart?: ReactNode
     // Asked from outside the chat (a menu of the Simple view's list): a new conversation, once.
     newThreadRequest?: boolean
     onNewThreadConsumed?: () => void
 }
 
-export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, onOpenChats, chatsAttention = 0, presentation = 'floating', headerEnd, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
+export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, onOpenChats, chatsAttention = 0, presentation = 'floating', headerStart, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
     const t = useTranslations('agent.agentPanelChat')
     const tView = useTranslations('workspaceView.chat')
     const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
@@ -268,6 +268,8 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         <div className={cn('flex flex-col h-full', docked && '[--chat-column:48rem]')}>
             {docked ? (
                 <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
+                    {headerStart}
+                    <div className="min-w-0 flex-1">{openChatsTabs}</div>
                     <Popover open={chats !== null} onOpenChange={open => (open ? onOpenChats?.() : onCloseChats())}>
                         <TooltipLabeled label={tView('allConversations')}>
                             <PopoverTrigger asChild>
@@ -281,7 +283,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                         </TooltipLabeled>
                         {/* A menu item or a dialog that opens the list hands the focus back to where it came from: only a click outside or Escape closes it. A field keeps its own Escape. */}
                         <PopoverContent
-                            align="start"
+                            align="end"
                             onFocusOutside={event => event.preventDefault()}
                             onEscapeKeyDown={event => isTypingTarget(event.target) && event.preventDefault()}
                             className="max-h-[min(36rem,var(--radix-popover-content-available-height))] w-[min(340px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0"
@@ -289,8 +291,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             {chatsList}
                         </PopoverContent>
                     </Popover>
-                    <div className="min-w-0 flex-1">{openChatsTabs}</div>
-                    {headerEnd}
                 </div>
             ) : (
                 <>

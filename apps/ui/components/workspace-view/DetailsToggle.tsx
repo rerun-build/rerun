@@ -1,20 +1,29 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import type { ReactNode } from 'react'
+
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { useDetailsOpen } from '@/components/workspace-view/useDetailsOpen'
-import { PanelRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 
-/** At the end of the chat's bar: opens or closes the column beside it, for a coworker and the Chief of Staff alike. */
-export function DetailsToggle({ label }: { label: string }) {
+/**
+ * At the start of the chat's bar: the coworker's buddy, or the Chief of Staff's orb, which opens or
+ * closes the card beside the chat. A plain button: the kit's shrinks every svg inside it to an icon's size.
+ */
+export function DetailsToggle({ label, avatar }: { label: string; avatar: ReactNode }) {
     const open = useDetailsOpen()
     return (
         <TooltipLabeled label={label}>
-            <Button variant="ghost" size="icon-sm" aria-label={label} aria-pressed={open} onClick={() => useSimpleDetailsStore.getState().setWanted(!open)} className={cn(open && 'bg-accent')}>
-                <PanelRightIcon className="size-4" />
-            </Button>
+            <button
+                type="button"
+                aria-label={label}
+                aria-pressed={open}
+                onClick={() => useSimpleDetailsStore.getState().setWanted(!open)}
+                className={cn('flex size-9 shrink-0 items-center justify-center rounded-md transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 dark:hover:bg-muted/50', open && 'bg-accent')}
+            >
+                {avatar}
+            </button>
         </TooltipLabeled>
     )
 }

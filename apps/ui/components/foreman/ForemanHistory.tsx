@@ -58,7 +58,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                 </PopoverTrigger>
             </TooltipLabeled>
             {/* A React child of the header, whose pointer down drags the column and resizes its sheet: a press in the list stops here. */}
-            <PopoverContent align={inBar ? 'start' : 'end'} onPointerDown={event => event.stopPropagation()} className="max-h-[min(32rem,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0">
+            <PopoverContent align="end" onPointerDown={event => event.stopPropagation()} className="max-h-[min(32rem,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0">
                 <div className="flex min-h-0 flex-col">
                     <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 pt-3 pb-1">
                         <span className="flex items-center gap-2 pl-1 text-sm font-semibold">
