@@ -1,8 +1,8 @@
 {
     "switch": {
         "label": "Vista",
-        "board": "3D",
-        "simple": "Simple"
+        "board": "Tablero",
+        "simple": "Clásica"
     },
     "list": {
         "label": "Coworkers",

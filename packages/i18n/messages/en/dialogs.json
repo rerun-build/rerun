@@ -74,7 +74,7 @@
         "subscriptionOffer.key.add": "Button: save the pasted API key.",
         "viewSettings.groupByRequired": "Form error of a board view: the user must pick the column whose distinct values become the board's columns.",
         "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it.",
-        "boxPicker.description": "Dialog shown in the Simple view when the workspace has several Boxes: the person picks the Box a coworker they are creating joins.",
+        "boxPicker.description": "Dialog shown in the classic view when the workspace has several Boxes: the person picks the Box a coworker they are creating joins.",
         "mcpConnect.otherClient": "Last button of the row of MCP clients (Claude Code, ChatGPT, Cursor, Rerun): any other client.",
         "mcpConnect.labels.terminal": "Label above a command to run in a terminal.",
         "mcpConnect.labels.shellProfile": "Label above a line to add to the shell startup file (~/.zshrc, ~/.bashrc).",

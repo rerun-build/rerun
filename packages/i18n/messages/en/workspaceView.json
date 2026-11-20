@@ -1,14 +1,14 @@
 {
     "_context": {
-        "switch.label": "Name of the setting that picks how the workspace is drawn: as the 3D board, or as the Simple view (a list of coworkers beside the chat).",
-        "switch.board": "The isometric 3D board of the workspace. Keep it short, it labels an icon.",
-        "switch.simple": "The Simple view of the workspace: a list of coworkers on the left, the chat in the middle. Keep it short, it labels an icon.",
+        "switch.label": "Name of the setting that picks how the workspace is drawn: as the isometric board, or as the classic view (a list of coworkers beside the chat).",
+        "switch.board": "The isometric board of the workspace, where coworkers sit on Boxes. Keep it short, it labels an icon and a tile of the onboarding.",
+        "switch.simple": "The classic view of the workspace: a list of coworkers on the left, the chat in the middle. Keep it short, it labels an icon and a tile of the onboarding.",
         "list.label": "Accessible name of the list of the workspace's coworkers.",
         "list.newBox": "Tooltip and accessible name of the button that creates a Box (a group of coworkers) from the list's header.",
         "list.emptyBox": "Shown under a Box of the list that holds no coworker yet.",
         "list.boxMore": "Accessible name of the '…' button on a Box's header in the list. {name} is the Box's name.",
         "tile.more": "Accessible name of the '…' button on a coworker's row. {name} is the coworker's name.",
-        "chat.pick": "Shown in the middle of the Simple view when no coworker is open.",
+        "chat.pick": "Shown in the middle of the classic view when no coworker is open.",
         "line.workingOn": "Status line under a coworker's name: it is running, {detail} is the title of its conversation or its description.",
         "line.asleepAbout": "Status line under a coworker's name: its machine is off, {about} is its description.",
         "line.waiting": "Line under a coworker's name in the list, when it waits on the person and its conversation has no title.",
@@ -33,8 +33,8 @@
     },
     "switch": {
         "label": "View",
-        "board": "3D",
-        "simple": "Simple"
+        "board": "Board",
+        "simple": "Classic"
     },
     "list": {
         "label": "Coworkers",

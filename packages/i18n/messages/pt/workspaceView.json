@@ -1,8 +1,8 @@
 {
     "switch": {
         "label": "Visualização",
-        "board": "3D",
-        "simple": "Simples"
+        "board": "Quadro",
+        "simple": "Clássica"
     },
     "list": {
         "label": "Coworkers",

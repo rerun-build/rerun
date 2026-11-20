@@ -1,8 +1,8 @@
 {
     "switch": {
         "label": "Görünüm",
-        "board": "3D",
-        "simple": "Basit"
+        "board": "Pano",
+        "simple": "Klasik"
     },
     "list": {
         "label": "Coworker'lar",
