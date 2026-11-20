@@ -89,6 +89,9 @@ class Brief(unittest.TestCase):
         self.assertIn("The last line of your answer is exactly `CAUSES: <n> changes` or `CAUSES: none`", self.text)
         self.assertIn("CAUSES: <n> changes", self.text)
 
+    def test_the_brief_asks_for_one_change_bullet_per_branch(self):
+        self.assertIn("One Change bullet per branch", self.text.split("Filing rules:")[1])
+
     def test_the_brief_says_where_each_kind_of_change_is_filed(self):
         self.assertIn("**Cause**: <group>", self.text)
         self.assertIn("`factory`", self.text)
