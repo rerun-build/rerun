@@ -282,13 +282,20 @@ export function blankSqlLiterals(sql: string): string {
 const FILE_ACCESS_FUNCTIONS = /\b(readfile|writefile|fsdir|load_extension)\b/i
 const VACUUM_INTO = /\bvacuum\b[\s\S]*\binto\b/i
 
+const INTERNAL_TABLE_REF = /(?:^|[^A-Za-z0-9_])(?:["`[]?_rerun_\w+["`\]]?)/i
+
 export function assertNoSqlFileAccess(sql: string): void {
     const bare = blankSqlStringsAndComments(sql)
     if (FILE_ACCESS_FUNCTIONS.test(bare) || VACUUM_INTO.test(bare)) throw new Error('File access is not allowed in SQL.')
 }
 
+export function assertNoInternalTables(sql: string): void {
+    if (INTERNAL_TABLE_REF.test(blankSqlStringsAndComments(sql))) throw new Error('Internal _rerun_* tables cannot be accessed through SQL.')
+}
+
 export function assertReadOnlySql(sql: string): void {
     assertNoSqlFileAccess(sql)
+    assertNoInternalTables(sql)
     const bare = blankSqlLiterals(sql)
     if (!/^\s*(select|with)\b/i.test(bare)) throw new Error('Only a SELECT (or WITH … SELECT) can run here. Use the execute endpoint to change data.')
     if (WRITE_KEYWORDS.test(bare)) throw new Error('This statement writes. Use the execute endpoint instead.')
@@ -296,9 +303,11 @@ export function assertReadOnlySql(sql: string): void {
 
 export function assertNoAttach(sql: string): void {
     assertNoSqlFileAccess(sql)
-    if (/\battach\b/i.test(blankSqlLiterals(sql))) throw new Error('ATTACH is not allowed. Each database is reached through its own tools.')
+    assertNoInternalTables(sql)
+    const bare = blankSqlLiterals(sql)
+    if (/\battach\b/i.test(bare)) throw new Error('ATTACH is not allowed. Each database is reached through its own tools.')
+    if (/\bpragma\b/i.test(bare)) throw new Error('PRAGMA statements are not allowed.')
 }
-
 export type QueryResult = { columns: string[]; rows: Record<string, unknown>[]; rowCount: number; truncated: boolean }
 
 export async function queryStore(client: Client, sql: string, params: SqlParam[], limit: number): Promise<QueryResult> {

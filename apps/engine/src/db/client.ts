@@ -11,7 +11,8 @@ let database: LibSQLDatabase<typeof schema> | null = null
 
 function init() {
     mkdirSync(dataDir(), { recursive: true })
-    client = createClient({ url: `file:${dbPath()}` })
+    client = createClient({ url: `file:${dbPath()}`, timeout: 5000 })
+    void client.execute('PRAGMA journal_mode = WAL').catch(() => {})
     database = drizzle(client, { schema })
 }
 

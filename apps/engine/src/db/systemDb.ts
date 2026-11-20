@@ -9,6 +9,7 @@ import { scheduleBackfillPaidSources } from '../paid-data/backfill.js'
 const schema = { sessions, messages, runs, runSteps, toolCalls, compactionCheckpoints, skillProposals }
 
 export type SystemDb = { client: Client; db: LibSQLDatabase<typeof schema> }
+type PooledSystemDb = SystemDb & { abort: AbortController; backfill: Promise<void> }
 
 const SYSTEM_DDL = `
 PRAGMA journal_mode = WAL;
@@ -144,7 +145,7 @@ CREATE INDEX IF NOT EXISTS skill_proposals_session_idx ON skill_proposals(sessio
 CREATE INDEX IF NOT EXISTS skill_proposals_agent_idx ON skill_proposals(agent_id);
 `
 
-const pool = new Map<string, SystemDb>()
+const pool = new Map<string, PooledSystemDb>()
 const opening = new Map<string, Promise<SystemDb>>()
 
 async function ensureSessionSourceColumn(client: Client): Promise<void> {
@@ -321,11 +322,12 @@ export async function migrateSystemDb(client: Client, file: string): Promise<voi
 
 async function open(id: string): Promise<SystemDb> {
     mkdirSync(agentDataDir(id), { recursive: true })
-    const client = createClient({ url: `file:${systemDbPath(id)}` })
+    const client = createClient({ url: `file:${systemDbPath(id)}`, timeout: 5000 })
     await migrateSystemDb(client, systemDbPath(id))
-    const entry: SystemDb = { client, db: drizzle(client, { schema }) }
+    const abort = new AbortController()
+    const backfill = scheduleBackfillPaidSources(client, id, abort.signal)
+    const entry: PooledSystemDb = { client, db: drizzle(client, { schema }), abort, backfill }
     pool.set(id, entry)
-    scheduleBackfillPaidSources(client, id)
     return entry
 }
 
@@ -347,6 +349,7 @@ export function closeSystemDb(id: string): void {
     const entry = pool.get(id)
     if (!entry) return
     pool.delete(id)
+    entry.abort.abort()
     try {
         entry.client.close()
     } catch {}

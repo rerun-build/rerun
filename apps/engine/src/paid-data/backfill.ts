@@ -61,27 +61,38 @@ async function backfillDone(client: Client): Promise<boolean> {
     return rs.rows.length > 0
 }
 
-export async function backfillPaidSources(client: Client): Promise<void> {
-    if (await backfillDone(client)) return
+export async function backfillPaidSources(client: Client, signal?: AbortSignal): Promise<void> {
+    if (signal?.aborted || (await backfillDone(client))) return
     const names = (await client.execute('SELECT DISTINCT tool_name FROM tool_calls')).rows.map(row => String(row.tool_name)).filter(name => isPaidDataTool(stripBridgePrefix(name)))
     let indexed = 0
     for (let offset = 0; names.length; offset += PAGE) {
+        if (signal?.aborted) return
         const page = await client.execute({
             sql: `SELECT id, agent_id, tool_call_id, tool_name, input_json, result_json, created_at FROM tool_calls WHERE tool_name IN (${names.map(() => '?').join(', ')}) ORDER BY created_at, id LIMIT ? OFFSET ?`,
             args: [...names, PAGE, offset],
         })
         for (const row of page.rows) {
-            await backfillCall(client, row).catch(err => logger.warn({ err: String(err), toolCallId: row.tool_call_id }, 'could not index a past paid data call'))
+            if (signal?.aborted) return
+            await backfillCall(client, row).catch(err => {
+                if (!signal?.aborted) logger.warn({ err: String(err), toolCallId: row.tool_call_id }, 'could not index a past paid data call')
+            })
             indexed += 1
         }
         if (page.rows.length < PAGE) break
     }
+    if (signal?.aborted) return
     await client.execute({ sql: 'INSERT OR REPLACE INTO system_meta (key, value) VALUES (?, ?)', args: [BACKFILL_DONE_KEY, new Date().toISOString()] })
     if (indexed) logger.info({ indexed }, 'indexed the past paid data calls')
 }
 
 let queue: Promise<void> = Promise.resolve()
 
-export function scheduleBackfillPaidSources(client: Client, agentId: string): void {
-    queue = queue.then(() => backfillPaidSources(client)).catch(err => logger.warn({ err: String(err), agentId }, 'could not index the past paid data calls'))
+export function scheduleBackfillPaidSources(client: Client, agentId: string, signal?: AbortSignal): Promise<void> {
+    const task = queue
+        .then(() => backfillPaidSources(client, signal))
+        .catch(err => {
+            if (!signal?.aborted && !String(err).includes('CLIENT_CLOSED')) logger.warn({ err: String(err), agentId }, 'could not index the past paid data calls')
+        })
+    queue = task
+    return task
 }

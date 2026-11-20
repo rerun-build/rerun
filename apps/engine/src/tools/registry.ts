@@ -34,7 +34,6 @@ import { pooledMcpServers, pooledMcpToolSet } from './mcp-pool.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog, mcpToolsAreDeferred, type McpCatalogEntry } from './mcp-search.js'
 import { mcpCallTool } from './mcp-wire.js'
 import { CLI_PROVIDERS } from '../agents/providers.js'
-import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 
 export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; heldBackMcp?: McpCatalogEntry[]; close: () => Promise<void> }> {
@@ -91,7 +90,6 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
         heldBackMcp,
         close: async () => {
             computer?.release()
-            closeAgentDb(ctx.agent.id)
         },
     }
 }

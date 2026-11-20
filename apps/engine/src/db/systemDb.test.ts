@@ -5,11 +5,15 @@ import { resolve } from 'node:path'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-systemdb-'))
 process.env.RERUN_API_KEY = ''
 
-const { describe, expect, it } = await import('vitest')
+const { describe, expect, it, vi } = await import('vitest')
 const { createClient } = await import('@libsql/client')
 const { SYSTEM_DB_MIGRATIONS, closeSystemDb, getSystemDb, systemDbExists } = await import('./systemDb.js')
 const { migrateSqlite, sqliteVersion } = await import('./ladder.js')
 const { agentDataDir, systemDbPath } = await import('../config/paths.js')
+const { logger } = await import('../lib/logger.js')
+const { getAgentDb } = await import('./agentDb.js')
+const { buildTools } = await import('../tools/registry.js')
+const { agentConfigSchema } = await import('../agents/types.js')
 
 async function columnsOf(agentId: string, table: string): Promise<string[]> {
     const { client } = await getSystemDb(agentId)
@@ -214,6 +218,47 @@ describe('getSystemDb pooling', () => {
         const entry = await getSystemDb('double-close')
         entry.client.close()
         expect(() => closeSystemDb('double-close')).not.toThrow()
+    })
+
+    it('does not throw CLIENT_CLOSED when closeSystemDb races scheduleBackfillPaidSources or when one of two concurrent runs closes its toolset', async () => {
+        const warnSpy = vi.spyOn(logger, 'warn')
+        try {
+            const seeded = await getSystemDb('race-backfill')
+            await seeded.client.execute("DELETE FROM system_meta WHERE key = 'paid_backfill_done'")
+            await seeded.client.execute(
+                "INSERT INTO tool_calls (id, run_id, agent_id, session_id, step_number, tool_call_id, tool_name, input_json, result_json, is_error, created_at) VALUES ('tc1', 'r1', 'race-backfill', 's1', 1, 'call1', 'apollo_people_search', '{}', '{}', 0, '2026-01-01T00:00:00Z')",
+            )
+            await closeSystemDb('race-backfill')
+
+            await getSystemDb('race-backfill')
+            await closeSystemDb('race-backfill')
+            for (let i = 0; i < 10; i++) {
+                const { promise, resolve: done } = Promise.withResolvers<void>()
+                setImmediate(done)
+                await promise
+            }
+            const closedWarns = warnSpy.mock.calls.filter(call => JSON.stringify(call).includes('CLIENT_CLOSED') || JSON.stringify(call).includes('past paid data calls'))
+            expect(closedWarns).toEqual([])
+
+            const agent = {
+                id: 'concurrent-db-agent',
+                config: agentConfigSchema.parse({ name: 'cdb' }),
+                soul: '',
+                install: '',
+                env: {},
+                resolved: { provider: 'rerun' as const, model: 'rerun-max', connection: null },
+            }
+            const ctx = { agent, sessionId: 's1', logger, provider: 'rerun' as const, model: 'rerun-max', turnOrder: 'message-first' as const }
+            const built1 = await buildTools(ctx as never)
+            const built2 = await buildTools(ctx as never)
+            const dbClient = await getAgentDb(agent.id)
+            await dbClient.execute('CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY)')
+            await built1.close()
+            await expect(dbClient.execute('SELECT count(*) FROM items')).resolves.toBeDefined()
+            await built2.close()
+        } finally {
+            warnSpy.mockRestore()
+        }
     })
 })
 

@@ -258,12 +258,12 @@ describe('buildTools', () => {
         })
     })
 
-    it('closes the agent database, with or without MCP', async () => {
+    it('releases computer resources on close without closing pooled agent database', async () => {
         for (const extra of [{ mcpServers: [{ name: 'linear', url: 'https://l.example/mcp' }] }, {}]) {
             state.dbClosed.length = 0
             const { close } = await buildTools(ctxWith(extra))
             await close()
-            expect(state.dbClosed).toEqual(['reg-agent'])
+            expect(state.dbClosed).toEqual([])
         }
     })
 })
