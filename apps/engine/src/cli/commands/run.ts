@@ -12,7 +12,7 @@ import { reconcileVault } from '../../vault/apply.js'
 import { ensureForeman } from '../../agents/foreman.js'
 import { startScheduler } from '../../runtime/scheduler.js'
 import { reconcileInterruptedRuns } from '../../runtime/reconcile.js'
-import { installBrowserInBackground, installDesktopInBackground, updateCliToolsInBackground } from './update.js'
+import { installBrowserInBackground, installDesktopInBackground, installPipInBackground, updateCliToolsInBackground } from './update.js'
 import { CODEX_VERSION } from '../../runtime/codex-cli.js'
 import { listConnections } from '../../connections/registry.js'
 import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
@@ -38,6 +38,7 @@ export async function runCommand(): Promise<void> {
     await reconcileInterruptedRuns()
     if (await installBrowserInBackground()) logger.info('chromium missing: installing it in the background')
     if (installDesktopInBackground()) logger.info('desktop missing: installing it in the background')
+    if (installPipInBackground()) logger.info('pip missing: installing it in the background')
     const cliTools = updateCliToolsInBackground()
     if (cliTools === 'spawned') logger.info({ codex: CODEX_VERSION }, 'codex CLI off its pin: installing it in the background')
     if (cliTools === 'no-root') logger.warn({ codex: CODEX_VERSION }, 'codex CLI off its pin and the service user cannot sudo: run `sudo rerun update-cli-tools`')

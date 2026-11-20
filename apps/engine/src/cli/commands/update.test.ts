@@ -143,7 +143,7 @@ vi.mock('./release.js', async importOriginal => ({
 }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
-const { installBrowser, installBrowserCommand, installBrowserInBackground, installDesktop, installDesktopInBackground, installLayoutCommand, removeLegacyClaudeCli, rollbackCommand, updateCliTools, updateCliToolsInBackground, updateCommand } = await import('./update.js')
+const { installBrowser, installBrowserCommand, installBrowserInBackground, installDesktop, installDesktopInBackground, installLayoutCommand, installPip, installPipInBackground, removeLegacyClaudeCli, rollbackCommand, updateCliTools, updateCliToolsInBackground, updateCommand } = await import('./update.js')
 const { CODEX_VERSION } = await import('../../runtime/codex-cli.js')
 const { readLastUpdate, writeLastUpdate } = await import('../../runtime/last-update.js')
 const { lastUpdatePath } = await import('../../config/paths.js')
@@ -151,6 +151,8 @@ const { lastUpdatePath } = await import('../../config/paths.js')
 const INSTALL_BROWSER = `${process.execPath} ${resolve(import.meta.dirname, '../bin.js')} install-browser`
 const INSTALL_DESKTOP = `${process.execPath} ${resolve(import.meta.dirname, '../bin.js')} install-desktop`
 const DESKTOP_APT = 'env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends openbox x11vnc xdotool thunar xfce4-terminal adwaita-icon-theme tint2 hsetroot curl maim'
+const INSTALL_PIP = `${process.execPath} ${resolve(import.meta.dirname, '../bin.js')} install-pip`
+const PIP_APT = 'env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends python3-pip'
 const UPDATE_CLI_TOOLS = `${process.execPath} ${resolve(import.meta.dirname, '../bin.js')} update-cli-tools`
 const CODEX = `@openai/codex@${CODEX_VERSION}`
 const CODEX_VERSION_CHECK = '/usr/bin/codex --version'
@@ -217,12 +219,13 @@ describe('updateCommand from a git checkout', () => {
             INSTALL_BROWSER,
             UPDATE_CLI_TOOLS,
             INSTALL_DESKTOP,
+            INSTALL_PIP,
             '<prepareDataDir>',
             'command -v systemctl',
             'command -v sudo',
             'sudo systemctl restart rerun',
         ])
-        expect(state.cwds.slice(0, 5)).toEqual([ROOT, ROOT, ROOT, ROOT, ROOT])
+        expect(state.cwds.slice(0, 7)).toEqual([ROOT, ROOT, ROOT, ROOT, ROOT, ROOT, ROOT])
         expect(out).toContain('migrated data dir')
         expect(out).toContain('restarted rerun')
         expect(out).toContain('\n$ git pull --ff-only\n')
@@ -316,6 +319,7 @@ describe('updateCommand from an artifact', () => {
         `${process.execPath} ${NEW_BIN} install-browser`,
         `${process.execPath} ${NEW_BIN} update-cli-tools`,
         `${process.execPath} ${NEW_BIN} install-desktop`,
+        `${process.execPath} ${NEW_BIN} install-pip`,
         `<switchCurrent ${RELEASE_ROOT} ${TARGET}>`,
         `<installLayout ${RELEASE_ROOT}>`,
         `<prune ${RELEASE_ROOT}>`,
@@ -519,20 +523,22 @@ describe('updateCommand from an artifact', () => {
         expect(readLastUpdate()).toMatchObject({ status: 'error' })
     })
 
-    it('carries on past a browser or desktop install that fails', async () => {
+    it('carries on past a browser, desktop or pip install that fails', async () => {
         state.layout = RELEASE_LAYOUT
-        state.failing = [`${process.execPath} ${NEW_BIN} install-browser`, `${process.execPath} ${NEW_BIN} install-desktop`]
+        state.failing = [`${process.execPath} ${NEW_BIN} install-browser`, `${process.execPath} ${NEW_BIN} install-desktop`, `${process.execPath} ${NEW_BIN} install-pip`]
         await updateCommand([...ARTIFACT_ARGS, '--no-restart'])
         expect(out).toContain('chromium install failed (continuing)')
         expect(out).toContain('desktop install failed (continuing)')
+        expect(out).toContain('pip install failed (continuing)')
         expect(state.calls).toContain(`<switchCurrent ${RELEASE_ROOT} ${TARGET}>`)
     })
 
-    it('leaves the desktop out on a box whose desktop is switched off', async () => {
+    it('leaves the desktop out on a box whose desktop is switched off, and still installs pip', async () => {
         state.layout = RELEASE_LAYOUT
         state.desktop = false
         await updateCommand([...ARTIFACT_ARGS, '--no-restart'])
         expect(state.calls).not.toContain(`${process.execPath} ${NEW_BIN} install-desktop`)
+        expect(state.calls).toContain(`${process.execPath} ${NEW_BIN} install-pip`)
     })
 
     it('refuses an artifact on an image', async () => {
@@ -743,6 +749,75 @@ describe('installDesktop', () => {
         expect(state.spawned).toEqual([])
         await updateCommand([])
         expect(state.calls).not.toContain(INSTALL_DESKTOP)
+    })
+})
+
+// RER-178: the boxes came with python3 and no pip, so a coworker could not add a library it needed.
+describe('installPip', () => {
+    const onLinux = () => vi.spyOn(process, 'platform', 'get').mockReturnValue('linux')
+
+    it('does nothing off Linux', () => {
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin')
+        installPip()
+        expect(state.calls).toEqual([])
+    })
+
+    it('leaves a box that already has pip alone', () => {
+        onLinux()
+        installPip()
+        expect(state.calls).toEqual(['command -v apt-get', 'command -v python3', 'command -v pip3'])
+        expect(out).toContain('pip already installed')
+    })
+
+    it('does nothing on a machine without python3', () => {
+        onLinux()
+        state.failing = ['command -v python3']
+        installPip()
+        expect(state.calls).toEqual(['command -v apt-get', 'command -v python3'])
+    })
+
+    it('refreshes the package lists and installs python3-pip through sudo when pip is missing', () => {
+        onLinux()
+        state.failing = ['command -v pip3']
+        installPip()
+        expect(state.calls.slice(-3)).toEqual(['sudo -n true', 'sudo -n apt-get update -qq', `sudo -n ${PIP_APT}`])
+    })
+
+    it('installs directly as root', () => {
+        onLinux()
+        asUser(0)
+        state.failing = ['command -v pip3']
+        installPip()
+        expect(state.calls.slice(-2)).toEqual(['apt-get update -qq', PIP_APT])
+    })
+
+    it('skips without passwordless sudo, and carries on past a failing install', () => {
+        onLinux()
+        state.failing = ['command -v pip3', 'sudo -n true']
+        installPip()
+        expect(out).toContain('skipping pip')
+        state.calls = []
+        state.failing = ['command -v pip3', 'sudo -n apt-get update']
+        installPip()
+        expect(out).toContain('pip install failed (continuing)')
+    })
+
+    it('is started in the background by an engine that boots without it, and only then', () => {
+        expect(installPipInBackground()).toBe(false)
+        onLinux()
+        expect(installPipInBackground()).toBe(false)
+        state.failing = ['command -v pip3']
+        expect(installPipInBackground()).toBe(true)
+        expect(state.spawned).toEqual([{ line: INSTALL_PIP, options: { stdio: 'ignore', detached: true } }])
+    })
+
+    it('does not depend on the desktop being switched on', async () => {
+        state.desktop = false
+        onLinux()
+        state.failing = ['command -v pip3']
+        expect(installPipInBackground()).toBe(true)
+        await updateCommand(['--no-restart'])
+        expect(state.calls).toContain(INSTALL_PIP)
     })
 })
 

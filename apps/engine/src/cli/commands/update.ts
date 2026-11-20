@@ -106,6 +106,36 @@ export function installDesktopInBackground(): boolean {
     return true
 }
 
+// Debian ships python3 without pip, so a coworker's script could not add the library it needed
+// (RER-178). Kept in step with the list in the installer of the boxes (cloud/infra/engine/install.sh).
+const PIP_PACKAGES = ['python3-pip']
+
+const pipInstallable = (): boolean => process.platform === 'linux' && hasCommand('apt-get') && hasCommand('python3')
+
+export function installPip(): void {
+    if (!pipInstallable()) return
+    if (hasCommand('pip3')) {
+        process.stdout.write('pip already installed\n')
+        return
+    }
+    if (!isRoot() && !canSudo()) {
+        process.stdout.write('no passwordless sudo available: skipping pip\n')
+        return
+    }
+    try {
+        asRoot(['apt-get', 'update', '-qq'])
+        asRoot(['env', 'DEBIAN_FRONTEND=noninteractive', 'apt-get', 'install', '-y', '-qq', '--no-install-recommends', ...PIP_PACKAGES])
+    } catch (err) {
+        continuing('pip install', err)
+    }
+}
+
+export function installPipInBackground(): boolean {
+    if (!pipInstallable() || hasCommand('pip3')) return false
+    spawn(process.execPath, [CLI_ENTRY, 'install-pip'], { stdio: 'ignore', detached: true }).unref()
+    return true
+}
+
 // An engine can come up without the browser its build expects: the updater that installed it ran
 // the previous release's code, which knew another package. A child process keeps the server
 // answering during the ~170 MB download.
@@ -260,6 +290,11 @@ async function updateFromGit(layout: Layout, noRestart: boolean): Promise<void> 
             continuing('desktop install', err)
         }
     }
+    try {
+        run(process.execPath, [CLI_ENTRY, 'install-pip'], { cwd: root })
+    } catch (err) {
+        continuing('pip install', err)
+    }
 
     await prepareDataDir()
     process.stdout.write('migrated data dir\n')
@@ -351,6 +386,11 @@ async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart:
             } catch (err) {
                 continuing('desktop install', err)
             }
+        }
+        try {
+            run(process.execPath, [bin, 'install-pip'])
+        } catch (err) {
+            continuing('pip install', err)
         }
 
         const previous = switchCurrent(root, target)

@@ -7,7 +7,7 @@ import { skillCommand } from './commands/skill.js'
 import { scheduleCommand } from './commands/schedule.js'
 import { mcpCommand } from './commands/mcp.js'
 import { doctorCommand } from './commands/doctor.js'
-import { installBrowserCommand, installDesktop, installLayoutCommand, rollbackCommand, updateCliTools, updateCommand } from './commands/update.js'
+import { installBrowserCommand, installDesktop, installLayoutCommand, installPip, rollbackCommand, updateCliTools, updateCommand } from './commands/update.js'
 import { serviceCommand } from './commands/service.js'
 import { restoreFinalizeCommand } from './commands/restore-finalize.js'
 
@@ -33,6 +33,7 @@ Usage:
   rerun install-layout            Write the launcher and the systemd units for the release layout
   rerun install-browser           Install Chromium for the browser tool
   rerun install-desktop           Install the window manager and VNC server behind the Computer
+  rerun install-pip               Install pip, so the coworkers can add the Python libraries they need
   rerun update-cli-tools          Install the Codex CLI this release pins
   rerun start | stop | restart    Control the systemd service
   rerun status                    Show the service status
@@ -68,6 +69,8 @@ async function main() {
             return installBrowserCommand()
         case 'install-desktop':
             return installDesktop()
+        case 'install-pip':
+            return installPip()
         case 'update-cli-tools':
             return updateCliTools()
         case 'start':

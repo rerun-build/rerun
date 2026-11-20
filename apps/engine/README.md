@@ -127,13 +127,14 @@ rerun rollback                  Go back to the previous release and restart the 
 rerun install-layout            Write the launcher and the systemd units for the release layout
 rerun install-browser           Install Chromium for the browser tool
 rerun install-desktop           Install the window manager and VNC server behind the screen
+rerun install-pip               Install pip, so the coworkers can add the Python libraries they need
 rerun update-cli-tools          Install the Codex CLI this release pins
 rerun start | stop | restart    Control the systemd service
 rerun status                    Show the service status
 rerun logs [--no-follow]        Tail the service logs
 ```
 
-`rerun run` also installs a missing Chromium, desktop packages or Codex CLI in the background.
+`rerun run` also installs a missing Chromium, desktop packages, pip or Codex CLI in the background.
 
 ## HTTP API
 
