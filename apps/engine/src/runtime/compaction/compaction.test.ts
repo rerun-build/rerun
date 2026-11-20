@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { ModelMessage } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
+import { generateText, type ModelMessage } from 'ai'
 import { modelContextWindow } from '@rerun/contracts'
 import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_TRIGGER_RATIO } from './config.js'
 import { estimateTokens } from './estimate.js'
@@ -216,8 +217,58 @@ describe('withoutReasoning', () => {
     it('hands back the very same message when there is nothing to drop', () => {
         const plain = userText('hello')
         const call = assistantCall('c1')
+        const referenced = { role: 'assistant', content: [{ type: 'text', text: 'Done.', providerOptions: { openai: { itemId: 'msg_1', phase: 'final_answer' } } }] } as ModelMessage
 
         expect(withoutReasoning(plain)).toBe(plain)
         expect(withoutReasoning(call)).toBe(call)
+        expect(withoutReasoning(referenced)).toBe(referenced)
+    })
+
+    // RER-138: a step of an OpenAI reasoning model, as the box stored it. Replayed without its reasoning
+    // item, the call still went out as a reference to its stored item, which OpenAI refuses on every
+    // later message of the conversation: "Item 'fc_…' of type 'function_call' was provided without its
+    // required 'reasoning' item: 'rs_…'".
+    const REASONING_ID = 'rs_033c4a0c6a47b33a006afbf3fd0c0c87d29fd7d570d1efe98b'
+    const CALL_ID = 'fc_033c4a0c6a47b33a006afbf402050887d289123a4d7a05bdf3'
+    const reasonedStep = {
+        role: 'assistant',
+        content: [
+            { type: 'reasoning', text: '', providerOptions: { openai: { itemId: REASONING_ID, reasoningEncryptedContent: 'gAAAAABq-encrypted' } } },
+            { type: 'tool-call', toolCallId: 'call_1', toolName: 'brain_search', input: { query: 'invoices' }, providerOptions: { openai: { itemId: CALL_ID } } },
+            { type: 'text', text: 'Found them.', providerOptions: { openai: { itemId: 'msg_1', phase: 'final_answer' } } },
+        ],
+    } as ModelMessage
+
+    it('drops the OpenAI item ids of a step whose reasoning it drops, and keeps the rest', () => {
+        expect(withoutReasoning(reasonedStep)).toEqual({
+            role: 'assistant',
+            content: [
+                { type: 'tool-call', toolCallId: 'call_1', toolName: 'brain_search', input: { query: 'invoices' } },
+                { type: 'text', text: 'Found them.', providerOptions: { openai: { phase: 'final_answer' } } },
+            ],
+        })
+    })
+
+    it('sends OpenAI the replayed call in full, never as a reference to an item that needs its reasoning', async () => {
+        let body: { input: Array<{ type?: string; id?: string; call_id?: string }> } | null = null
+        const openai = createOpenAI({
+            apiKey: 'sk-test',
+            fetch: async (_url, init) => {
+                body = JSON.parse(String(init?.body))
+                return new Response(JSON.stringify({ error: { message: 'captured' } }), { status: 400 })
+            },
+        })
+        const history: ModelMessage[] = [
+            userText('find the invoices'),
+            reasonedStep,
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: 'call_1', toolName: 'brain_search', output: { type: 'text', value: '2 found' } }] } as ModelMessage,
+            userText('and the overdue ones?'),
+        ]
+
+        await generateText({ model: openai('gpt-6-luna'), messages: history.map(withoutReasoning), maxRetries: 0 }).catch(() => undefined)
+
+        const input = body!.input
+        expect(input.some(item => item.type === 'item_reference')).toBe(false)
+        expect(input).toContainEqual(expect.objectContaining({ type: 'function_call', call_id: 'call_1', name: 'brain_search' }))
     })
 })
