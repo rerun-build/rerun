@@ -137,6 +137,9 @@ def proven_line(body):
     return m.group(1) if m else None
 
 
+PROVEN_COMPARE = '{files: [.files[].filename], messages: [.commits[].commit.message], patches: [.files[] | (.patch // "")]}'
+
+
 def issue_run(body):
     m = re.search(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```", plain(body))
     return " ; ".join(l.strip() for l in m.group(1).strip().split("\n") if l.strip()) if m else "the Run command of the issue"
@@ -1294,13 +1297,32 @@ class Dispatcher:
         if branch != plan:
             return self.end(j, "returned", "plan: **Proven branch** names %s, not %s" % (branch, plan))
         try:
-            sha = json.loads(self.gh(["api", "repos/%s/git/ref/heads/%s" % (self.repo, plan)]))["object"]["sha"]
-        except (Error, ValueError, KeyError, TypeError):
-            return self.end(j, "returned", "plan: the proven branch %s is not on GitHub" % plan)
+            raw = self.gh(["api", "repos/%s/git/ref/heads/%s" % (self.repo, plan)])
+        except Error as e:
+            if "Not Found" in str(e):
+                return self.end(j, "returned", "plan: the proven branch %s is not on GitHub" % plan)
+            log(j["issue"], "the proven branch %s was not read, the job waits for the next beat: %s" % (plan, e))
+            return None
         try:
-            compare = json.loads(self.gh(["api", "repos/%s/compare/dev...%s" % (self.repo, sha), "--jq", "[.files[].filename]"]))
-        except (Error, ValueError, TypeError) as e:
-            return self.end(j, "returned", "plan: the proven branch %s cannot be compared with dev: %s" % (plan, e))
+            sha = json.loads(raw)["object"]["sha"]
+        except (ValueError, KeyError, TypeError) as e:
+            log(j["issue"], "the proven branch %s was not read, the job waits for the next beat: %s" % (plan, e))
+            return None
+        try:
+            cmp = json.loads(self.gh(["api", "repos/%s/compare/dev...%s" % (self.repo, sha), "--jq", PROVEN_COMPARE]))
+            if not isinstance(cmp, dict) or any(not isinstance(cmp.get(k), list) for k in ("files", "messages", "patches")):
+                raise ValueError("the compare answer is not a dict of files, messages and patches")
+        except (Error, ValueError) as e:
+            log(j["issue"], "the proven branch %s was not compared with dev, the job waits for the next beat: %s" % (plan, e))
+            return None
+        compare = cmp["files"]
+        workflow = [f for f in compare if re.search(factory.WF, f)]
+        if workflow:
+            return self.end(j, "returned", "plan: the proven branch changes workflow files, which are Rob's: %s" % ", ".join(workflow))
+        if any(re.search(r"co-authored-by|generated with", str(m), re.I) for m in cmp["messages"]):
+            return self.end(j, "returned", "plan: a commit of the proven branch %s has an AI trailer" % plan)
+        if any(factory.TOKEN_SHAPE.search(str(x)) for x in cmp["messages"] + cmp["patches"]):
+            return self.end(j, "returned", "plan: the proven branch %s holds the shape of a GitHub token" % plan)
         allowed = [p for p in j.get("paths") or []]
         outside = [f for f in compare if not any(f == p or f.startswith(p.rstrip("/") + "/") or fnmatch.fnmatchcase(f, p) for p in allowed)]
         if outside:
@@ -1309,7 +1331,11 @@ class Dispatcher:
         try:
             self.gh(["api", "-X", "POST", "repos/%s/git/refs" % self.repo, "-f", "ref=refs/heads/%s" % head, "-f", "sha=%s" % sha])
         except Error as e:
-            log(j["issue"], "ref %s not created, going on to the pull request: %s" % (head, e))
+            log(j["issue"], "branch %s not made, so it is moved to %s: %s" % (head, sha[:7], e))
+            try:
+                self.gh(["api", "-X", "PATCH", "repos/%s/git/refs/heads/%s" % (self.repo, head), "-f", "sha=%s" % sha, "-F", "force=true"])
+            except Error as e2:
+                return self.end(j, "blocked", "the branch %s could not be set to %s: %s" % (head, sha[:7], e2))
         notes = [
             "The change is the one pushed as `%s` at %s." % (plan, sha[:7]),
             "Proven on dev by the planner: the done-test failed there and passes at `%s`." % sha[:7],
@@ -1320,8 +1346,18 @@ class Dispatcher:
         ]
         sections = ["%s\n- %s" % (heading, note) for heading, note in zip(factory.PR_HEADS, notes)]
         body = "\n\n".join(["Job: %s#%s, chunk p" % (self.repo, j["issue"])] + sections + ["Closes #%s" % j["issue"]])
-        out = self.gh(["pr", "create", "-R", self.repo, "--base", "dev", "--head", head, "--title", "%s (#%s)" % (j["title"], j["issue"]), "--body", body])
-        pr = int(str(out).strip().rsplit("/", 1)[1])
+        try:
+            out = self.gh(["pr", "create", "-R", self.repo, "--base", "dev", "--head", head, "--title", "%s (#%s)" % (j["title"], j["issue"]), "--body", body])
+            found = re.search(r"/pull/(\d+)", str(out))
+            if not found:
+                raise Error("no pull request link in the answer: %s" % gist(out, 200))
+            pr = int(found.group(1))
+        except Error as e:
+            try:
+                listed = json.loads(self.gh(["pr", "list", "-R", self.repo, "--head", head, "--state", "open", "--json", "number"]))
+                pr = int(listed[0]["number"])
+            except (Error, ValueError, KeyError, IndexError, TypeError):
+                return self.end(j, "blocked", "the pull request from %s could not be opened: %s" % (head, e))
         log(j["issue"], "pull request #%s from the proven branch %s" % (pr, plan))
         self.to(j, "review_wait", "pull request #%s from the proven branch %s" % (pr, plan), pr=pr, proven=sha, head_branch=head)
 
