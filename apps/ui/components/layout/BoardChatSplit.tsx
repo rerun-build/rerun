@@ -87,9 +87,9 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
             style={{ '--foreman-dock-w': `${placement.dockWidth}px` } as CSSProperties}
             className={cn(
                 'relative h-dvh w-full overflow-hidden p-0 md:p-2 bg-frame flex flex-col [--board-inset:0px] md:[--board-inset:9px]',
-                // In the Simple view the list keeps its width (its sidebar's 288px, see SimpleWorkspace, and the
-                // card's border) and the column takes the rest of the frame, its padding taken off.
-                simple ? '[--simple-list-track:290px] [--foreman-dock-track:calc(100vw-1rem-var(--simple-list-track))]' : '[--foreman-dock-track:min(var(--foreman-dock-w),60vw)]'
+                // In the Simple view the list keeps the width dragged in SimpleWorkspace (--simple-list-w, written
+                // here, plus the card's border) and the column takes the rest of the frame, its padding taken off.
+                simple ? '[--simple-list-track:calc(var(--simple-list-w,288px)+2px)] [--foreman-dock-track:calc(100vw-1rem-var(--simple-list-track))]' : '[--foreman-dock-track:min(var(--foreman-dock-w),60vw)]'
             )}
         >
             {onboarded && <ProviderStatusBanner />}
@@ -100,6 +100,8 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
                     // Lu depuis le hook plutôt qu'écrit `motion-reduce:md:transition-none`, dont les deux
                     // variants ne se départagent que par l'ordre source.
                     visible && (reduceMotion ? 'md:transition-none' : 'md:transition-[grid-template-columns]'),
+                    // While the list is dragged its track follows the pointer, not an animation.
+                    'in-data-resizing:md:transition-none',
                     // Des pistes, jamais une custom property : sans `@property` une variable CSS n'est
                     // pas interpolée et la colonne sauterait au lieu de s'ouvrir. Toujours trois, une de
                     // chaque côté du board, pour que passer d'un dock à l'autre reste une interpolation.

@@ -7,7 +7,7 @@ import {
     getSidePanelMaxWidth,
     parseSidePanelWidth,
 } from './side-panel-width'
-import { DETAILS_COLUMN_WIDTH } from './workspace-view'
+import { DETAILS_COLUMN_WIDTH, SIMPLE_LIST_WIDTH } from './workspace-view'
 
 describe('side panel width', () => {
     it('caps its desktop maximum at 800px or 60 percent of the viewport', () => {
@@ -40,5 +40,12 @@ describe('side panel width', () => {
         expect(getSidePanelMaxWidth(1280, DETAILS_COLUMN_WIDTH)).toBe(576)
         expect(parseSidePanelWidth(null, 1440, DETAILS_COLUMN_WIDTH)).toBe(400)
         expect(parseSidePanelWidth(null, 1440)).toBe(SIDE_PANEL_DEFAULT_WIDTH)
+    })
+
+    it("keeps the Simple view's list between 240px and 420px, and to 35 percent of a narrow window", () => {
+        expect(parseSidePanelWidth(null, 1440, SIMPLE_LIST_WIDTH)).toBe(288)
+        expect(clampSidePanelWidth(600, 1440, SIMPLE_LIST_WIDTH)).toBe(420)
+        expect(clampSidePanelWidth(600, 768, SIMPLE_LIST_WIDTH)).toBe(268)
+        expect(clampSidePanelWidth(100, 1440, SIMPLE_LIST_WIDTH)).toBe(240)
     })
 })

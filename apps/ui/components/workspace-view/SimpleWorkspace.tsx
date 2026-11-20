@@ -8,6 +8,7 @@ import type { ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
 import { ShareAgentDialog } from '@/components/agent/share/ShareAgentDialog'
 import { AgentDesktopView } from '@/components/desktop/AgentDesktopView'
 import { DeleteAgentDialog } from '@/components/dialogs/DeleteAgentDialog'
+import { SidePanelResizeHandle } from '@/components/layout/SidePanelResizeHandle'
 import type { CoworkerTileActions } from '@/components/workspace-view/CoworkerTile'
 import { SimpleChatPane } from '@/components/workspace-view/SimpleChatPane'
 import { SimpleDetailsPane } from '@/components/workspace-view/SimpleDetailsPane'
@@ -17,7 +18,7 @@ import { useForemanInCenter } from '@/components/workspace-view/useForemanInCent
 import { useAgentSheetView, type AgentSheetRequest } from '@/hooks/useAgentSheetView'
 import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { cn } from '@/lib/utils'
-import { FOREMAN_OPENED, initialOpenOf } from '@/lib/workspace-view'
+import { FOREMAN_OPENED, SIMPLE_LIST_WIDTH, initialOpenOf } from '@/lib/workspace-view'
 import { useBoardStore } from '@/stores/board.store'
 import { useCoworkerPreviewsStore } from '@/stores/coworker-previews.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
@@ -47,6 +48,9 @@ function mostRecentCoworker(): string | null {
     return [...agents].map(agent => ({ id: agent.id, latest: previews[agent.id] ?? null })).sort(byRecency)[0]?.id ?? null
 }
 
+// The list's width is also the track BoardChatSplit gives it beside the Chief of Staff: both read it from there.
+const splitOf = (list: HTMLElement) => list.closest<HTMLElement>('[data-foreman-split]') ?? list
+
 /**
  * The Simple view: the coworkers listed on the left, the open one's chat in the middle, its card on
  * the right. It reads and
@@ -56,6 +60,7 @@ function mostRecentCoworker(): string | null {
 export function SimpleWorkspace() {
     const { workspace } = useSession()
     const workspaceId = workspace?.id
+    const listRef = useRef<HTMLDivElement>(null)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const agents = useBoardStore(s => s.agents)
     const previewsLoaded = useCoworkerPreviewsStore(s => s.loaded)
@@ -158,8 +163,9 @@ export function SimpleWorkspace() {
             {workspace?.is_sandbox && <Stripes fade="edges" edgeWidth={104} color="rgb(245 158 11 / 0.16)" />}
             {/* Its widths are the list's track in BoardChatSplit, where the Chief of Staff takes the rest. */}
             {/* With the Chief of Staff in the middle the card is the list's width: its own edge is the line. */}
-            <div className={cn('relative h-full w-72 shrink-0 bg-sidebar', !foremanInCenter && 'border-r border-border')}>
+            <div ref={listRef} className={cn('relative h-full w-[var(--simple-list-w,18rem)] shrink-0 bg-sidebar', !foremanInCenter && 'border-r border-border')}>
                 <SimpleSidebar onOpenCoworker={openCoworker} actionsFor={actionsFor} />
+                <SidePanelResizeHandle panelRef={listRef} config={SIMPLE_LIST_WIDTH} widthVar="--simple-list-w" edge="right" look="line" varTarget={splitOf} />
             </div>
             {/* Hidden rather than unmounted while the Chief of Staff has the middle: a reply streaming keeps going. */}
             <div className={foremanInCenter ? 'hidden' : 'contents'}>

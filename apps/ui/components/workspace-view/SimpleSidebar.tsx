@@ -114,7 +114,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 </TooltipDisabledReason>
             </div>
 
-            <nav ref={setListElement} aria-label={t('label')} className="min-h-0 flex-1 overflow-y-auto px-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
+            <nav ref={setListElement} aria-label={t('label')} className="mr-2 min-h-0 flex-1 overflow-y-auto pl-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
                 <div className="space-y-0.5 pb-2">
                     <ForemanTile />
                     {!previewsLoaded ? (

@@ -67,6 +67,10 @@ export function initialOpenOf({ remembered, agentIds, foremanVisible, mostRecent
 // the middle is what the view is for.
 export const DETAILS_COLUMN_WIDTH: PanelWidthConfig = { storageKey: 'rerun:simple-details-width', defaultWidth: 400, min: 320, max: 800, maxViewportRatio: 0.45 }
 
+// The list on the left of the Simple view, dragged by its right edge. Never more than 35% of the window:
+// at 768px a list at its maximum would leave the chat too little.
+export const SIMPLE_LIST_WIDTH: PanelWidthConfig = { storageKey: 'rerun:simple-list-width', defaultWidth: 288, min: 240, max: 420, maxViewportRatio: 0.35 }
+
 // From `xl` the card sits beside the chat; under it, it lies over the chat and starts closed.
 export const DETAILS_BESIDE_QUERY = '(min-width: 1280px)'
 
