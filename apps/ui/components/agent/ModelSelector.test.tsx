@@ -290,6 +290,18 @@ describe('ModelSelector reasoning effort', REIMPORT_TIMEOUT, () => {
         expect(pill()).toContain('Opus 5.5 · High')
     })
 
+    // The level sits by the model's name: in the settings button it widened it and pushed the star out
+    // of the column the other rows keep it in.
+    it('writes the picked level by the name, not in the settings button', async () => {
+        await mount('level-label')
+        await openPicker()
+        await pickEffort('Opus 5.5', 'High')
+        await openPicker()
+        const gear = document.querySelector<HTMLButtonElement>('button[aria-label="Reasoning of Opus 5.5"]')!
+        expect(gear.textContent).toBe('')
+        expect(gear.closest('[data-slot="command-item"]')!.textContent).toContain('High')
+    })
+
     it('keeps the bare model name on Default', async () => {
         await mount('default-level')
         await openPicker()

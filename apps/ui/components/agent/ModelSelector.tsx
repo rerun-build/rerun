@@ -27,7 +27,7 @@ import { track } from '@rerun/analytics/client'
 import { acceptsReasoningEffort, REASONING_EFFORTS, RERUN_CONNECTION_ID, type ReasoningEffort } from '@rerun/contracts'
 import { useIsMobile } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type SyntheticEvent } from 'react'
 
 const EFFORT_LEVELS = [null, ...REASONING_EFFORTS] as const
 const EFFORT_KEY = { default: 'effortDefault', low: 'effortLow', medium: 'effortMedium', high: 'effortHigh' } as const
@@ -50,10 +50,9 @@ function ReasoningEffortMenu({ modelName, effort, onPick }: { modelName: string;
                     type="button"
                     tabIndex={-1}
                     aria-label={t('reasoningOf', { model: modelName })}
-                    className="inline-flex shrink-0 items-center gap-1 rounded px-1 py-0.5 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:text-foreground hover:opacity-100 aria-expanded:bg-muted aria-expanded:opacity-100"
+                    className="inline-flex shrink-0 items-center rounded px-1 py-0.5 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:text-foreground hover:opacity-100 aria-expanded:bg-muted aria-expanded:opacity-100"
                     onClick={keepInSubmenu}
                 >
-                    {effort && <span className="text-[11px]">{t(EFFORT_KEY[effort])}</span>}
                     <Settings2Icon className="size-3.5" />
                 </button>
             </PopoverTrigger>
@@ -84,6 +83,20 @@ function ReasoningEffortMenu({ modelName, effort, onPick }: { modelName: string;
                 ))}
             </PopoverContent>
         </Popover>
+    )
+}
+
+// The star, the reasoning settings and the power bars each keep a fixed column at the end of every row,
+// empty when the row has none, so they line up across rows. 17px is the width of the small PowerBars.
+export function ModelRowControls({ star, effortMenu, power }: { star?: ReactNode; effortMenu?: ReactNode; power?: number }) {
+    return (
+        <span className="flex shrink-0 items-center gap-2">
+            <span className="flex w-3.5 justify-center">{star}</span>
+            <span className="flex w-6 justify-center">{effortMenu}</span>
+            <span className="flex w-[17px] justify-end">
+                <PowerBars power={power} />
+            </span>
+        </span>
     )
 }
 
@@ -320,11 +333,13 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                             <CommandGroup>
                                 <TooltipDisabledReason reason={canSetDefault || followsBoxDefault ? undefined : tShared('boxManageReason')} side="right" className="flex w-full">
                                     <CommandItem className="flex-1" value="workspace default model" data-checked={showingBoxDefault} disabled={!canSetDefault && !followsBoxDefault} onSelect={useBoxDefault}>
-                                        <span className="min-w-0 flex-1 truncate">{t('workspaceDefault')}</span>
-                                        <span className="shrink-0 text-[11px] whitespace-nowrap text-muted-foreground">{modelLabel(boxDefaultPick.model)}</span>
+                                        <span className="flex min-w-0 flex-1 flex-col">
+                                            <span className="truncate">{t('workspaceDefault')}</span>
+                                            <span className="truncate text-[11px] text-muted-foreground">{modelLabel(boxDefaultPick.model)}</span>
+                                        </span>
                                         {/* The star says what the agent runs by default, not what this conversation picked, so
                                             it stays filled while an override is in force. */}
-                                        {followsBoxDefault && <StarIcon className="size-3.5 text-primary [&_polygon]:fill-current" />}
+                                        <ModelRowControls star={followsBoxDefault && <StarIcon className="size-3.5 text-primary [&_polygon]:fill-current" />} />
                                     </CommandItem>
                                 </TooltipDisabledReason>
                             </CommandGroup>
@@ -350,7 +365,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                         return (
                                             <TooltipDisabledReason key={m.id} reason={disabledReason} side="right" className="flex w-full">
                                                 <CommandItem className="flex-1" value={`${group.label} ${m.label} ${m.id}`} disabled>
-                                                    <ModelTierRow label={m.label} description={m.description} power={m.power} />
+                                                    <ModelTierRow label={m.label} description={m.description} trailing={<ModelRowControls power={m.power} />} />
                                                 </CommandItem>
                                             </TooltipDisabledReason>
                                         )
@@ -393,6 +408,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                         </TooltipLabeled>
                                     )
                                     const effortMenu = acceptsReasoningEffort(group.provider, m.id) ? <ReasoningEffortMenu modelName={m.label} effort={levelOfRow} onPick={level => selectModel(group, m.id, level)} /> : null
+                                    const effortLabel = levelOfRow && <span className="shrink-0 text-[11px] text-muted-foreground">{t(EFFORT_KEY[levelOfRow])}</span>
+                                    const controls = <ModelRowControls star={defaultStar} effortMenu={effortMenu} power={m.power} />
                                     if (m.description) {
                                         return (
                                             <CommandItem
@@ -405,11 +422,10 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                 <ModelTierRow
                                                     label={m.label}
                                                     description={m.description}
-                                                    power={m.power}
                                                     trailing={
                                                         <>
-                                                            {defaultStar}
-                                                            {effortMenu}
+                                                            {effortLabel}
+                                                            {controls}
                                                         </>
                                                     }
                                                 />
@@ -425,9 +441,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                             onSelect={() => selectModel(group, m.id, levelOfRow)}
                                         >
                                             <span className="min-w-0 flex-1 truncate">{m.label}</span>
-                                            {defaultStar}
-                                            {effortMenu}
-                                            <PowerBars power={m.power} />
+                                            {effortLabel}
+                                            {controls}
                                         </CommandItem>
                                     )
                                 })}
