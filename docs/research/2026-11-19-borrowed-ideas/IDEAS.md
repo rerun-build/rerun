@@ -21,6 +21,9 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 | 11 | Two competing plans for large issues, scored by the review panel | the patterns guide (Best-of-N) | later | planning |
 | 12 | A review finding is checked against the code before it starts a fix round | the patterns guide (specialist review) | later | review station |
 | 13 | Prebuilt, role-specific packets for the fetches coworkers repeat | code mode's principle, worked through with ChatGPT | next, after 5 | dispatcher packets |
+| 14 | Find content a run receives twice (brief, packet, files, earlier turns) | ChatGPT review of this file | next, after 13 | factory measurements |
+| 15 | Model and effort per station decided by our own outcomes, with rework cost by cause | ChatGPT review of this file | later | factory measurements, tiers |
+| 16 | A small fixed replay set to compare factory changes on the same tasks | ChatGPT review of this file | later | factory evaluation |
 
 ## 1. Code mode for Claude Code coworkers (done, #1618)
 
@@ -55,6 +58,7 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 - **What:** Code-Mode-MCP's usage screen lists which tools put the most tokens into the context (for example "playwright browser snapshot, 239 calls, about 358k tokens"). That is where to cut.
 - **Ours:** add a per-tool breakdown to the factory's measurements, beside the per-job-type table of `BASELINE.md`: for each tool or shell program, calls and tokens of its results across recent coworker runs, read from the runs the engine already keeps.
 - **Expected:** full issue bodies from `gh issue view`, whole-file reads and long `git diff` output near the top (a guess until measured). Then cap or trim the biggest in the engine or the briefs, and measure again.
+- **Three numbers, not one:** total input tokens, cached against uncached input, and the money each costs (cached input is billed at a fraction of the price). A million cached tokens can cost less than a much smaller uncached source; cuts are ranked by money, not by token count. `fires` already keeps `tokens_in`, `tokens_out` and `cache_read` per run (`tools/factory/tokenstats.py`).
 
 ## 6. Step down near the weekly limit instead of stopping (next)
 
@@ -74,6 +78,7 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 - **What:** modelplan publishes, per model, the best-value effort and what one step up buys and costs (for example "+4.8 ability at ×1.37 cost"), from public benchmarks and official prices, through a free read-only API (`modelplan.ai/v1/client`, data under CC BY-SA, credit required).
 - **Ours:** the factory picks a model and thinking level per station by hand in `tools/factory/dispatch.json`. A factory step could read that data and propose changes with the numbers behind them, as a pull request a person or the factory accepts.
 - **Waits on:** idea 6, which uses the same model-and-effort steps.
+- **Published data is the starting guess, not the authority:** once idea 15 has enough runs, the factory's own cost per accepted issue per station decides; public benchmarks only seed a station that has no runs yet.
 
 ## 9. Frugal's rules for the other stations (later)
 
@@ -98,6 +103,7 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 - **Ours today:** a reviewer's findings go straight to the builder as a fix round.
 - **Change:** a cheap model (Haiku or Sonnet) confirms each finding against the diff and the code, with the line that proves it, before the fix round is sent; unconfirmed findings are recorded, not sent.
 - **Measure:** fix rounds per green issue (1.4 build and fix runs per green issue on 2026-11-19, threshold 1.3) and findings dropped as unconfirmed.
+- **Two outcomes kept apart:** a finding shown false (the code proves it wrong) and a finding not confirmed (no proof either way). Only false ones count against the reviewer; unconfirmed ones are kept and looked at again if the same spot fails later.
 
 ## 13. Prebuilt, role-specific packets (next, after idea 5)
 
@@ -109,6 +115,29 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
   - prover: what must be proven and the evidence the dispatcher collected itself.
 - **Freshness:** every packet names what it was built from (dev commit, pull request head, issue edit time); a packet whose source moved is rebuilt, never reused. A packet only carries facts the dispatcher read itself, with their source; it never states that something passed.
 - **Measure:** per role, input tokens and steps per run before and after, and the repeated fetches idea 5 counted; keep a packet part only if runs get cheaper without more fix rounds.
+
+## 14. Content a run receives twice (next, after idea 13)
+
+- **What:** a coworker's input comes through several channels: the engine's system prompt, the factory brief, packets, files read through shell commands, and earlier turns. The same text can arrive through two of them, and every later step re-reads it.
+- **Change:** a diagnostic over recent runs that finds text repeated across those channels, names each source and its token size, and separates repetition that must stay (critical rules the coworker has to see) from accidental duplication (the same code or issue text in a packet and again from a shell read).
+- **Measure:** duplicate input tokens per run, and the cost of the run, before and after removing the accidental ones; no drop in quality allowed.
+
+## 15. Model and effort per station from our own outcomes (later)
+
+- **What:** public benchmarks cannot tell which model is best at our stations on our code. The deciding number is cost per accepted issue, per station, not cost per token or a benchmark score.
+- **Ours today:** the data mostly exists. `fires` keeps tokens and cache reads per run with model and thinking level; `failures` keeps each failure's station, coworker, model, tier, plan run and brief; `changes` keeps the before and after verdict of each change the factory makes to itself; `tools/factory/causes.py` names failure causes.
+- **Change:** one report per station and model (and thinking level): runs, cost, fix rounds, review findings, acceptance and time to green. Included: rework cost per accepted issue split by its cause and the station it started at (an incomplete plan, a missed ask, a build fault, a false review finding, a test environment problem, a stale packet), so a good builder handed poor plans is not mistaken for a weak builder.
+- **Decision rule:** a station's model changes only when its cost per accepted issue is better over enough runs; idea 8's published data only seeds stations with no history.
+
+## 16. A small fixed replay set (later)
+
+- **What:** comparing a change against recent production runs is noisy: the tasks differ, so a cheaper setting may just have had easier work.
+- **Change:** a handful of past tasks with a fixed starting commit, the original asks, known acceptance and a reproducible test setup. A significant change (rules, models, effort, packets, review) runs the same set before and after, compared on cost per accepted result, correctness, fix rounds, wrong acceptances, wrong rejections and time.
+- **Limit:** a separate evaluation run on demand, never a stage in every job; it costs model runs, so it is used for changes big enough to matter.
+
+## Order of work
+
+From the ChatGPT review of this file (2026-11-20), checked against the factory's data: idea 5 (where the waste is, in money), 13 (packets that remove it), 3 (finish the planner trial), 14 (duplication), 15 (station choice from our outcomes), 12 and 7 (review), 16 (replay set). Nothing new is added to this list until some of these have results.
 
 ## The guide, mapped to the factory
 
