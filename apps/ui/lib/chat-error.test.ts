@@ -109,6 +109,16 @@ describe('classifyChatError', () => {
         expect(classifyChatError('rerun_budget_exhausted')).toBe('budget')
     })
 
+    // RER-138: an OpenAI refusal quotes item ids in hex, and one of them held "402". The chat showed
+    // the Rerun credit notice to someone running on their own OpenAI key.
+    it('reads a 402 only as a status, never inside an id or a message index', () => {
+        const refusal = "ProviderRefusedError: Provider returned error: Item 'fc_033c4a0c6a47b33a006afbf402050887d289123a4d7a05bdf3' of type 'function_call' was provided without its required 'reasoning' item: 'rs_033c4a0c6a47b33a006afbf3fd0c0c87d29fd7d570d1efe98b'."
+        expect(classifyChatError(refusal)).toBe('provider_error')
+        expect(classifyChatError('ProviderRefusedError: Provider returned error: messages.402.content.0: text content blocks must be non-empty')).toBe('provider_error')
+        expect(classifyChatError('AI_APICallError: 402 Payment Required')).toBe('budget')
+        expect(classifyChatError('Engine error: the hub answered 402.')).toBe('budget')
+    })
+
     // Anthropic refusing a signed thinking block the engine replayed against another tool list. It
     // reads "Provider returned error" too, but switching models does not help: a fresh run does.
     it('tells a rejected thinking replay apart from a refusal', () => {
