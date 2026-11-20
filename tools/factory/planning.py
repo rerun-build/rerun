@@ -91,6 +91,8 @@ def brief_lines(issue, repo):
         "",
         "Do not label a child `factory` and do not touch the label `factory-plan`: the dispatcher does both.",
         "",
+        "A decision of the parent that binds the cutter to an action (close a pull request, post a comment, edit another issue) is yours: do it right after the children are filed and before your last line.",
+        "",
         "Your last line is `CUT: #a, #b` naming the children you filed, or `BLOCKED: <one sentence>` when the issue cannot be cut.",
     ]
     return lines

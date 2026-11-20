@@ -39,6 +39,11 @@ class BriefTest(unittest.TestCase):
         self.assertTrue(self.text.endswith("or `BLOCKED: <one sentence>` when the issue cannot be cut."))
         self.assertIn("CUT: #a, #b", self.text)
 
+    def test_the_cut_brief_carries_out_actions_the_parent_binds_on_the_cutter(self):
+        binding = "A decision of the parent that binds the cutter to an action (close a pull request, post a comment, edit another issue) is yours: do it right after the children are filed and before your last line."
+        self.assertIn(binding + "\n\nYour last line is `CUT: #a, #b`", self.text)
+        self.assertLess(self.text.index("binds the cutter to an action"), self.text.index("CUT: #a, #b"))
+
     def test_the_plan_brief_asks_for_every_ask_in_a_slice_or_out_of_scope(self):
         text = planning.plan_brief(ISSUE, REPO)
         self.assertIn("Number every ask of the issue", text)
@@ -48,7 +53,7 @@ class BriefTest(unittest.TestCase):
         self.assertIn("add no comments in code", self.text)
 
     def test_length(self):
-        self.assertLess(len(self.text), 3200)
+        self.assertLess(len(self.text), 3400)
 
 
 if __name__ == "__main__":
