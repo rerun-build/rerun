@@ -83,10 +83,12 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     config.selfImprovement.enabled = false
                     // Pinned from the run rather than copied from the config: a parent following the
                     // box default would hand the child a null model, and the child would resolve the
-                    // box default again instead of the model this turn is actually running on.
+                    // box default again instead of the model this turn is actually running on. The effort
+                    // is the turn's too: the parent's saved one was picked for its own model.
                     config.connectionId = ctx.agent.resolved.connection?.id ?? null
                     config.provider = ctx.provider
                     config.model = ctx.model
+                    config.effort = ctx.effort ?? null
                     const child = await createAgent({ config, soul: ctx.agent.soul, keys: ctx.agent.env })
                     child.hubAgentId = ctx.agent.id
                     const taskSignal = registerSubRunStop(current.id)

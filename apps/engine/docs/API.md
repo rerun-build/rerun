@@ -38,7 +38,7 @@ are open:
 - `GET` itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`,
   `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
   `/runs/:rid/tasks/:taskId/cancel`;
-- a `PATCH` that only carries `connectionId`, `provider`, `model`, `proactive` and `paidDataAlwaysAllow`;
+- a `PATCH` that only carries `connectionId`, `provider`, `model`, `effort`, `proactive` and `paidDataAlwaysAllow`;
 - `GET /checkins`, its check-ins and their settings, and `POST /checkins/run`, a check-in now (see
   [Check-ins](#check-ins));
 - what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
@@ -610,6 +610,12 @@ A new `name` is rewritten wherever the other agents mention the old one; a new `
 { "connectionId": null, "provider": null, "model": null }
 ```
 
+`effort` is how long the pinned model thinks before it answers: `low`, `medium` or `high`, or `null` for the provider's own default. It belongs to the model it was set with: a `PATCH` that changes `model` or `connectionId` without naming an `effort` puts it back to `null`. A model that takes no effort (the `rerun` tiers, OpenCode, custom endpoints, Haiku 4.5) runs without one whatever the config says.
+
+```json
+{ "connectionId": "abc...", "provider": "anthropic", "model": "claude-opus-5-5", "effort": "high" }
+```
+
 ### `DELETE /agents/:id`
 
 Closes its screen and takeover, unloads it, detaches it from every Vault item, removes the index row and deletes `agents/<id>/` recursively.
@@ -778,6 +784,7 @@ the assistant and tool messages, and runs the curator when `selfImprovement.enab
   "connectionId": "abc...",
   "provider": "claude",
   "model": "opus",
+  "effort": "high",
   "source": "dashboard",
   "author": { "id": "user-uuid", "name": "Ana", "timezone": "Europe/Paris" },
   "callableAgentIds": ["abc...", "def..."],
@@ -791,6 +798,9 @@ Only `message` is required.
 - `connectionId`, `provider` and `model` override the agent's own for this turn only; omit them to
   run on what `config.json` carries. A connection that cannot serve the model is not silently
   substituted here: that repair only happens for automations.
+- `effort` is the level for this turn: `low`, `medium`, `high`, or `null` for the provider's default.
+  Omitted, the turn runs at the agent's own `effort` when it runs on the agent's own model, and at
+  the provider's default otherwise. A model that takes no effort ignores it.
 - `source` names where the conversation comes from: `dashboard` (default), `builder`, `schedule`,
   `agent`, `delegate`, `api`, `trigger`.
 - `author` is the person who typed, kept on the message (the engine has no users of its own). Every

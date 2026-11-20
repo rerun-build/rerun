@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { acceptsReasoningEffort, agentConfigSchema } from '@rerun/contracts'
 import { applyCaching } from './caching.js'
-import { mergeProviderOptions, reasoningProviderOptions } from './reasoning.js'
+import { effortProviderOptions, mergeProviderOptions, reasoningProviderOptions, runEffort } from './reasoning.js'
 
 describe('reasoning provider options on OpenCode', () => {
     it('asks the way the format asks, and nothing on the chat format', () => {
@@ -48,5 +49,66 @@ describe('reasoning provider options', () => {
         expect(merged).toEqual({ anthropic: { thinking: { type: 'adaptive', display: 'summarized' } } })
         expect(cached.messages.filter(m => m.providerOptions?.anthropic)).toHaveLength(1)
         expect(cached.messages.at(-1)?.role).toBe('user')
+    })
+})
+
+describe('which models take an effort', () => {
+    it('lets the API and subscription models pick one, never the Rerun tiers nor OpenCode', () => {
+        expect(acceptsReasoningEffort('claude', 'claude-opus-5-5')).toBe(true)
+        expect(acceptsReasoningEffort('anthropic', 'claude-sonnet-5-5')).toBe(true)
+        expect(acceptsReasoningEffort('claude', 'claude-haiku-4-5')).toBe(false)
+        expect(acceptsReasoningEffort('anthropic', 'claude-haiku-4-5-20251001')).toBe(false)
+        expect(acceptsReasoningEffort('codex', 'gpt-6-sol')).toBe(true)
+        expect(acceptsReasoningEffort('openai', 'gpt-6.2-astra')).toBe(true)
+        expect(acceptsReasoningEffort('google', 'gemini-4-argon')).toBe(true)
+        expect(acceptsReasoningEffort('openrouter', 'anthropic/claude-opus-5.5')).toBe(true)
+        expect(acceptsReasoningEffort('openrouter', 'moonshotai/kimi-k3.1-pro')).toBe(false)
+        expect(acceptsReasoningEffort('rerun', 'rerun-fast')).toBe(false)
+        expect(acceptsReasoningEffort('opencode', 'go/kimi-k3')).toBe(false)
+        expect(acceptsReasoningEffort('custom', 'gpt-6-sol')).toBe(false)
+    })
+})
+
+describe('the effort of a run', () => {
+    const agent = { config: agentConfigSchema.parse({ name: 'ada', provider: 'claude', model: 'claude-opus-5-5', effort: 'high' }) }
+
+    it('takes the conversation pick first, null included', () => {
+        expect(runEffort(agent, { model: 'claude-opus-5-5', effort: 'low' }, 'claude', 'claude-opus-5-5')).toBe('low')
+        expect(runEffort(agent, { model: 'claude-opus-5-5', effort: null }, 'claude', 'claude-opus-5-5')).toBeNull()
+    })
+
+    it("falls back to the agent's effort only on the model it was picked for", () => {
+        expect(runEffort(agent, undefined, 'claude', 'claude-opus-5-5')).toBe('high')
+        expect(runEffort(agent, { model: 'claude-opus-5-5' }, 'claude', 'claude-opus-5-5')).toBe('high')
+        // A backup or a routine pinned elsewhere runs on its own model's default.
+        expect(runEffort(agent, { model: 'gpt-6-sol' }, 'codex', 'gpt-6-sol')).toBeNull()
+    })
+
+    it('never sends one to a model that takes none', () => {
+        expect(runEffort(agent, { model: 'rerun-fast', effort: 'high' }, 'rerun', 'rerun-fast')).toBeNull()
+    })
+})
+
+describe('effort provider options', () => {
+    it('asks each API in its own words', () => {
+        expect(effortProviderOptions('anthropic', 'high')).toEqual({ anthropic: { effort: 'high' } })
+        expect(effortProviderOptions('openai', 'low')).toEqual({ openai: { reasoningEffort: 'low', forceReasoning: true } })
+        expect(effortProviderOptions('google', 'medium')).toEqual({ google: { thinkingConfig: { includeThoughts: true, thinkingLevel: 'medium' } } })
+        expect(effortProviderOptions('codex', 'high')).toEqual({ 'codex-app-server': { effort: 'high' } })
+    })
+
+    it('adds nothing on Default, so the request stays the one sent before', () => {
+        for (const provider of ['anthropic', 'openai', 'google', 'codex', 'claude', 'openrouter', 'rerun'] as const) {
+            expect(effortProviderOptions(provider, null)).toBeUndefined()
+            const today = reasoningProviderOptions(provider)
+            expect(mergeProviderOptions(today, effortProviderOptions(provider, null))).toEqual(today)
+        }
+    })
+
+    it('keeps the reasoning summary and the Codex thread beside the effort', () => {
+        const google = mergeProviderOptions(reasoningProviderOptions('google'), effortProviderOptions('google', 'high'))
+        expect(google).toEqual({ google: { thinkingConfig: { includeThoughts: true, thinkingLevel: 'high' } } })
+        const codex = mergeProviderOptions(effortProviderOptions('codex', 'low'), { 'codex-app-server': { threadId: 't-1' } })
+        expect(codex).toEqual({ 'codex-app-server': { effort: 'low', threadId: 't-1' } })
     })
 })

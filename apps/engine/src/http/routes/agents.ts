@@ -126,8 +126,12 @@ agentRoutes.patch('/:id', async c => {
     const patch = Object.fromEntries(Object.entries(validated).filter(([field]) => field in body))
     const agent = await withAgentLock(id, async () => {
         const current = agentConfigSchema.parse(JSON.parse(await readFile(configPath(id), 'utf8')))
+        // An effort was picked for one model: a caller that moves the agent to another one without
+        // naming an effort (the iPhone app, the box default) gets the new model's own default.
+        const modelChanged = ('model' in patch && patch.model !== current.model) || ('connectionId' in patch && patch.connectionId !== current.connectionId)
         const next = agentConfigSchema.parse({
             ...current,
+            ...(modelChanged && !('effort' in patch) ? { effort: null } : {}),
             ...patch,
             mcpServers: current.mcpServers,
             tools: { ...current.tools, ...(body.tools as object | undefined) },

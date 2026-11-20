@@ -120,6 +120,11 @@ describe('foremanGuard', () => {
         expect((await call('PATCH', '/agents/foreman/', JSON.stringify({ model: 'rerun-max' }))).status).toBe(200)
     })
 
+    it('allows a PATCH that pins the model with its effort, or clears the effort alone', async () => {
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify({ connectionId: 'c', provider: 'anthropic', model: 'claude-opus-5-5', effort: 'high' }))).status).toBe(200)
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify({ effort: null }))).status).toBe(200)
+    })
+
     it('refuses a model-only PATCH aimed at a sub-route', async () => {
         expect((await call('PATCH', '/agents/foreman/tools', JSON.stringify({ model: 'x' }))).status).toBe(403)
     })

@@ -149,12 +149,12 @@ async function readConfig(staging: string, id: string, name: string, displayName
     // not been through its own INSTALL.md yet, so it starts pending again, in no conversation.
     const setup = { ...parsed.setup, completedAt: null, sessionId: null }
     // The pair the author ran on belongs to their box, not to this one: their pinned model may cost
-    // ten times what this owner picked, or not be offered here at all. All three fields go, which is
+    // ten times what this owner picked, or not be offered here at all. All three fields go, with the effort picked for that model, which is
     // what `followBoxDefault` writes when someone asks for the box default by hand, and it leaves a
     // copy exactly where an agent created from scratch starts.
     // Spending credit without asking is the source owner's choice for their own workspace: the
     // copy asks its new owner first, whatever an archive made before the scrub says.
-    return rebindAgentId({ ...parsed, kind: 'user', name, displayName: displayName || parsed.displayName, setup, connectionId: null, provider: null, model: null, paidDataAlwaysAllow: false }, id)
+    return rebindAgentId({ ...parsed, kind: 'user', name, displayName: displayName || parsed.displayName, setup, connectionId: null, provider: null, model: null, effort: null, paidDataAlwaysAllow: false }, id)
 }
 
 async function readManifestMcpAuth(id: string): Promise<AgentArchiveMcpAuth[] | null> {

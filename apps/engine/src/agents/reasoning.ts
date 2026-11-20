@@ -1,7 +1,9 @@
 import type { streamText } from 'ai'
-import type { Provider } from '@rerun/contracts'
+import { acceptsReasoningEffort, type Provider, type ReasoningEffort } from '@rerun/contracts'
 import { opencodeModel } from '../connections/opencode-catalog.js'
 import { behaviourOf } from './opencode.js'
+import type { ModelOverride } from './providers.js'
+import type { LoadedAgent } from './types.js'
 
 type ProviderOptions = NonNullable<Parameters<typeof streamText>[0]['providerOptions']>
 
@@ -34,4 +36,32 @@ export function mergeProviderOptions(base: ProviderOptions | undefined, extra: P
         merged[provider] = { ...merged[provider], ...options }
     }
     return merged
+}
+
+// The effort a run asks for. The conversation's pick wins; without one, the agent's own effort goes
+// with the model it was picked for, so a backup, a handover or a routine pinned to another model runs
+// on that model's default. A model that takes no effort never gets one.
+export function runEffort(agent: Pick<LoadedAgent, 'config'>, override: ModelOverride | undefined, provider: Provider, model: string): ReasoningEffort | null {
+    const effort = override?.effort !== undefined ? override.effort : model === agent.config.model ? agent.config.effort : null
+    return effort && acceptsReasoningEffort(provider, model) ? effort : null
+}
+
+// The effort in each API's own words. The CLIs and OpenRouter take theirs elsewhere (see
+// `resolveModel`). `forceReasoning`: the OpenAI SDK only sends an effort to the models it knows to
+// reason, a list the GPT-6 ids are not on yet. Google's object is whole because the merge is one
+// level deep and would otherwise drop `includeThoughts`.
+export function effortProviderOptions(provider: Provider, effort: ReasoningEffort | null): ProviderOptions | undefined {
+    if (!effort) return undefined
+    switch (provider) {
+        case 'anthropic':
+            return { anthropic: { effort } }
+        case 'openai':
+            return { openai: { reasoningEffort: effort, forceReasoning: true } }
+        case 'google':
+            return { google: { thinkingConfig: { includeThoughts: true, thinkingLevel: effort } } }
+        case 'codex':
+            return { 'codex-app-server': { effort } }
+        default:
+            return undefined
+    }
 }

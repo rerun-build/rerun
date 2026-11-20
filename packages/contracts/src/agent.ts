@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { coworkerLookSchema } from './coworker-look.js'
 import { OPENCODE_DEFAULT_MODEL } from './opencode.js'
+import { reasoningEffortSchema } from './reasoning-effort.js'
 
 // Tools surface as "<server>_<tool>" and CLI providers key their config records by server name, so
 // anything outside this set (a dot, a space) makes every run of the agent fail at settings
@@ -176,6 +177,9 @@ export const agentConfigSchema = z.object({
     // the second, whatever stale connectionId or provider sits next to it: a pin is a model, those
     // two only say where to run it.
     model: z.string().nullable().default(null),
+    // How long that model thinks, set with it: a patch that changes the model without naming an
+    // effort drops it. Null leaves the provider's default.
+    effort: reasoningEffortSchema.nullable().default(null),
     verbosity: verbositySchema.default('normal'),
     // The language of the agent's workspace, a short BCP 47 tag ("fr"): what it writes in when a run
     // was not started by a person and nobody has written in the session yet. The hub writes it from

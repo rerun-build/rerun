@@ -49,6 +49,15 @@ describe('PATCH /agents/:id', () => {
         expect(config.model).toBe('acme/router-large')
     })
 
+    it('keeps the effort with the model it was picked for, and drops it when the model changes', async () => {
+        expect((await patchConfig({ model: 'acme/router-large', effort: 'high' })).config.effort).toBe('high')
+        expect((await patchConfig({ verbosity: 'concise' })).config.effort).toBe('high')
+        expect((await patchConfig({ model: 'acme/router-large' })).config.effort).toBe('high')
+        expect((await patchConfig({ connectionId: 'cnx-other', provider: 'anthropic', model: 'claude-sonnet-5-5' })).config.effort).toBeNull()
+        expect((await patchConfig({ model: 'claude-opus-5-5', effort: 'low' })).config.effort).toBe('low')
+        expect((await patchConfig({ connectionId: null, provider: null, model: null })).config.effort).toBeNull()
+    })
+
     it('rejects a verbosity level that is not one of the four', async () => {
         const app = createServer()
         const res = await app.request(`/agents/${id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ verbosity: 'chatty' }) })

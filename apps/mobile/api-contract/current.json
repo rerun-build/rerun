@@ -1747,6 +1747,16 @@
                                                         "displayName": {
                                                             "type": "string"
                                                         },
+                                                        "effort": {
+                                                            "default": null,
+                                                            "enum": [
+                                                                "low",
+                                                                "medium",
+                                                                "high"
+                                                            ],
+                                                            "nullable": true,
+                                                            "type": "string"
+                                                        },
                                                         "enabled": {
                                                             "default": true,
                                                             "type": "boolean"

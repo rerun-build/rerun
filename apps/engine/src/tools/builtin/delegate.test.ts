@@ -128,6 +128,19 @@ describe('delegate_tasks', () => {
         expect(runs.started[0].child.config.connectionId).toBeNull()
     })
 
+    it('runs the child at the effort of the turn that started it', async () => {
+        const { ctx } = ctxWith({ effort: 'high' })
+        await delegate(ctx, [{ task: 't' }])
+        expect(runs.started[0].child.config.effort).toBe('high')
+    })
+
+    it('leaves out the parent\'s saved effort when the turn runs without one', async () => {
+        const { ctx } = ctxWith()
+        ctx.agent.config.effort = 'high'
+        await delegate(ctx, [{ task: 't' }])
+        expect(runs.started[0].child.config.effort).toBeNull()
+    })
+
     it('puts the context above the task behind a separator', async () => {
         const { ctx } = ctxWith()
         await delegate(ctx, [{ task: 'Do A', context: 'Background' }, { task: 'Do B' }])

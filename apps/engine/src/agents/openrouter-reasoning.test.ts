@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chunkReasoningDelta, openrouterReasoningMiddleware, reasoningFetch, responseReasoning } from './openrouter-reasoning.js'
+import { chunkReasoningDelta, openrouterReasoningMiddleware, reasoningFetch, reasoningFetchFor, responseReasoning } from './openrouter-reasoning.js'
 
 const chunk = (delta: Record<string, unknown>) => ({ type: 'raw', rawValue: { choices: [{ index: 0, delta }] } })
 
@@ -106,6 +106,25 @@ describe('OpenRouter reasoning', () => {
         expect(JSON.parse(sent[0])).toEqual({ model: 'qwen', reasoning: { enabled: true }, usage: { include: true } })
         expect(JSON.parse(sent[1])).toEqual({ model: 'qwen', reasoning: { effort: 'high' }, usage: { include: true } })
         expect(sent[2]).toBe('not json')
+    })
+
+    it("asks for the agent's effort when one is picked, and exactly what it asked before when none is", async () => {
+        const sent: string[] = []
+        const original = globalThis.fetch
+        globalThis.fetch = (async (_input: unknown, init?: { body?: unknown }) => {
+            sent.push(String(init?.body))
+            return new Response('{}')
+        }) as typeof fetch
+
+        try {
+            await reasoningFetchFor('high')('https://openrouter.ai/api/v1/chat/completions', { method: 'POST', body: JSON.stringify({ model: 'anthropic/claude-opus-5.5' }) })
+            await reasoningFetchFor(null)('https://openrouter.ai/api/v1/chat/completions', { method: 'POST', body: JSON.stringify({ model: 'anthropic/claude-opus-5.5' }) })
+        } finally {
+            globalThis.fetch = original
+        }
+
+        expect(JSON.parse(sent[0])).toEqual({ model: 'anthropic/claude-opus-5.5', reasoning: { effort: 'high' }, usage: { include: true } })
+        expect(JSON.parse(sent[1])).toEqual({ model: 'anthropic/claude-opus-5.5', reasoning: { enabled: true }, usage: { include: true } })
     })
 
     // The usage frame is the last chunk of the stream, after the one carrying the finish reason:

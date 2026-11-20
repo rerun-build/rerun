@@ -1,7 +1,7 @@
 import { streamText, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
 import { RERUN_CONNECTION_ID, contextTextPart, pendingComputerAccess, providerSwitchEntry, type ContextOccupancy, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
-import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
+import { effortProviderOptions, mergeProviderOptions, reasoningProviderOptions, runEffort } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
 import { createInRunCompactor } from './compaction/in-run.js'
 import { repairToolPairs } from './compaction/repair.js'
@@ -522,7 +522,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const t0 = Date.now()
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
+        const effort = runEffort(baseAgent, runOverride, provider, model)
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null
@@ -599,7 +600,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             writer?.write({ type: 'data-compaction', id: cliCompactionId, data: compaction })
             if (compaction.status === 'done') logger.info({ agent: agent.id, session: sessionId, run: run.id, tokensRecovered: compaction.tokensRecovered }, 'context compacted by the CLI')
         }
-        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, readOnly, onClaudeCompaction })
+        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, readOnly, effort, onClaudeCompaction })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.
@@ -612,7 +613,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             model: languageModel,
             system: cached.system,
             messages: cached.messages,
-            providerOptions: mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
+            providerOptions: mergeProviderOptions(mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model)), effortProviderOptions(provider, effort)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
             tools,
             activeTools: sentNames,
             abortSignal: controller.signal,

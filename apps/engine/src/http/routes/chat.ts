@@ -35,7 +35,7 @@ chatRoutes.post('/chat', async c => {
     if (claim && 'inFlight' in claim) return c.json({ error: 'the installation is already under way in another conversation', code: 'install_in_flight', sessionId: claim.inFlight }, 409)
     const session = claim ? claim.session : await resolveSession(agentId, body.sessionId, source)
     if (!session) return c.json({ error: ENGINE_SESSION_NOT_FOUND }, 404)
-    const override = { connectionId: body.connectionId, provider: body.provider, model: body.model }
+    const override = { connectionId: body.connectionId, provider: body.provider, model: body.model, effort: body.effort }
     const runId = newId()
     const holder = claimSession(session.id, runId, body.author?.id)
     if (holder) {

@@ -1,4 +1,4 @@
-import type { CheckinReason, MessageAuthor, Provider } from '@rerun/contracts'
+import type { CheckinReason, MessageAuthor, Provider, ReasoningEffort } from '@rerun/contracts'
 import type { UIMessageStreamWriter } from 'ai'
 import type { TurnOrder } from '../agents/turn-order.js'
 import type { LoadedAgent } from '../agents/types.js'
@@ -35,6 +35,8 @@ export type RunContext = {
     logger: Logger
     provider: Provider
     model: string
+    // The effort this turn runs at (see `runEffort`), handed to the delegates it starts.
+    effort?: ReasoningEffort | null
     turnOrder: TurnOrder
     author?: MessageAuthor
     writer?: UIMessageStreamWriter

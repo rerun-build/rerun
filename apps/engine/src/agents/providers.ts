@@ -13,7 +13,7 @@ import {
     type LocalTool,
 } from 'ai-sdk-provider-codex-cli'
 import type { ZodObject, ZodRawShape, ZodType } from 'zod'
-import type { ContextOccupancy, McpServer, Provider } from '@rerun/contracts'
+import type { ContextOccupancy, McpServer, Provider, ReasoningEffort } from '@rerun/contracts'
 import { env } from '../config/env.js'
 import { codexPath } from '../runtime/codex-cli.js'
 import { codexHomeDir } from '../config/paths.js'
@@ -31,7 +31,7 @@ import { createQuickRepliesCapture, type QuickRepliesCapture } from './quick-rep
 import { createFakeToolCallGuard } from './fake-tool-call-stream.js'
 import { createCardTagGuard } from './card-tag-stream.js'
 import { cardTagStopHook } from './claude-card-nudge.js'
-import { openrouterReasoningMiddleware, reasoningFetch } from './openrouter-reasoning.js'
+import { openrouterReasoningMiddleware, reasoningFetchFor } from './openrouter-reasoning.js'
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
 import { opencodeLanguageModel } from './opencode.js'
@@ -257,8 +257,9 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; readOnly?: boolean }
 
 // What a run hands its model beyond the tools: the prompt and the screenshots for the CLIs, the
-// conversation for OpenCode.
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; readOnly?: boolean; onClaudeCompaction?: (compaction: ClaudeCompaction) => void }
+// conversation for OpenCode. `effort` reaches the transports that take it in their settings or their
+// request (the Claude CLI, OpenRouter); the others read it from the run's provider options.
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; readOnly?: boolean; effort?: ReasoningEffort | null; onClaudeCompaction?: (compaction: ClaudeCompaction) => void }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -435,7 +436,8 @@ function registryFor(agent: LoadedAgent, tools?: ToolSet, mcpServers?: McpServer
 
 // A run's model, as asked for. The provider is the connection's — the override only ever names a
 // connection and a model, and `runtime/loop.ts` derives the provider from the resolved connection.
-export type ModelOverride = { connectionId?: string; provider?: Provider; model?: string }
+// `effort` is the one picked for this conversation; absent, the run takes the agent's own.
+export type ModelOverride = { connectionId?: string; provider?: Provider; model?: string; effort?: ReasoningEffort | null }
 
 // `agent.resolved` already applied the agent's pin, the box default and the fallbacks, so it is
 // what a caller with no override of its own (compaction, curator, vision, memory reconcile) means.
@@ -464,7 +466,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, readOnly, onClaudeCompaction }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, readOnly, effort, onClaudeCompaction }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     // `wrapLanguageModel` runs the list from the end: the guard sits nearest the model, so no other
     // middleware ever reads a fake tool call, the card tags go next, and the quick replies read the
@@ -478,7 +480,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     }
     if (provider === 'claude') {
         const capture = claudeContextCapture(agent.resolved.connection?.id, onClaudeCompaction)
-        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
+        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model, effort ? { effort } : undefined)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
     }
     // OpenCode runs in Rerun's own loop, on the SDK of whichever format the model is served on.
@@ -490,7 +492,8 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     // wired here rather than in the registry: the one-shot calls that go through `modelFor`
     // (compaction, curator, vision, memory reconcile) have no one to show a thought to.
     if (provider === 'rerun' || provider === 'openrouter') {
-        const openrouter = openaiChat({ ...openrouterCompatibleOptions(agent, provider), fetch: provider === 'openrouter' ? cacheBreakpointsFetch(reasoningFetch) : reasoningFetch })
+        const withReasoning = reasoningFetchFor(provider === 'openrouter' ? (effort ?? null) : null)
+        const openrouter = openaiChat({ ...openrouterCompatibleOptions(agent, provider), fetch: provider === 'openrouter' ? cacheBreakpointsFetch(withReasoning) : withReasoning })
         return { model: wrapLanguageModel({ model: openrouter.languageModel(model), middleware: [openrouterStreamRetryMiddleware, openrouterReasoningMiddleware, replies.middleware, cardTags, guard] }), close: noClose, quickReplies: replies.read }
     }
     // The reasoning a DeepSeek or a vLLM server streams back comes as `reasoning_content`, read the

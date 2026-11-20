@@ -40,9 +40,9 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
 // configuration, or drives its own screen.
 const FOREMAN_OPEN_FAMILIES = /^\/agents\/foreman\/(memories|skills|skill-proposals|schedules|triggers|data|desktop)(\/.*)?$/
 
-// The model, the check-ins and whether paid data asks before spending are the fields of its
-// configuration a person sets through this route.
-const FOREMAN_PATCHABLE_FIELDS = new Set(['connectionId', 'provider', 'model', 'proactive', 'paidDataAlwaysAllow'])
+// The model, its effort, the check-ins and whether paid data asks before spending are the fields
+// of its configuration a person sets through this route.
+const FOREMAN_PATCHABLE_FIELDS = new Set(['connectionId', 'provider', 'model', 'effort', 'proactive', 'paidDataAlwaysAllow'])
 
 async function patchesOnlyItsSettings(c: Parameters<MiddlewareHandler>[0]): Promise<boolean> {
     const body = (await c.req.json().catch(() => null)) as unknown

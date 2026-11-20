@@ -1,4 +1,5 @@
 import type { createOpenAI } from '@ai-sdk/openai'
+import type { ReasoningEffort } from '@rerun/contracts'
 import type { LanguageModelMiddleware } from 'ai'
 
 type FetchFunction = NonNullable<NonNullable<Parameters<typeof createOpenAI>[0]>['fetch']>
@@ -35,18 +36,24 @@ export function closesReasoning(part: { type: string; delta?: unknown }): boolea
 /**
  * OpenRouter carries reasoning in a `reasoning` field of the delta, which the OpenAI chat wire
  * format has no room for. `@ai-sdk/openai` sends the request, so the field has to be added on its
- * way out, and the usage frame asked for in the same pass.
+ * way out, and the usage frame asked for in the same pass. An effort picked for the agent asks for
+ * that much reasoning instead of what the model decides on its own.
  */
-export const reasoningFetch: FetchFunction = async (input, init) => {
-    if (typeof init?.body !== 'string') return fetch(input, init)
-    let body: Record<string, unknown>
-    try {
-        body = JSON.parse(init.body) as Record<string, unknown>
-    } catch {
-        return fetch(input, init)
+export function reasoningFetchFor(effort: ReasoningEffort | null): FetchFunction {
+    const reasoning = effort ? { effort } : REASONING_REQUEST
+    return async (input, init) => {
+        if (typeof init?.body !== 'string') return fetch(input, init)
+        let body: Record<string, unknown>
+        try {
+            body = JSON.parse(init.body) as Record<string, unknown>
+        } catch {
+            return fetch(input, init)
+        }
+        return fetch(input, { ...init, body: JSON.stringify({ ...body, usage: body.usage ?? USAGE_REQUEST, reasoning: body.reasoning ?? reasoning }) })
     }
-    return fetch(input, { ...init, body: JSON.stringify({ ...body, usage: body.usage ?? USAGE_REQUEST, reasoning: body.reasoning ?? REASONING_REQUEST }) })
 }
+
+export const reasoningFetch: FetchFunction = reasoningFetchFor(null)
 
 function reasoningOf(delta: unknown): string | undefined {
     if (!delta || typeof delta !== 'object') return undefined

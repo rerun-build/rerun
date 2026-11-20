@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { providerSchema } from './agent.js'
+import { reasoningEffortSchema } from './reasoning-effort.js'
 import { sessionSourceSchema } from './session.js'
 import { foremanBriefSchema } from './foreman.js'
 
@@ -33,6 +34,9 @@ export const chatRequestSchema = z.object({
     connectionId: z.string().optional(),
     provider: providerSchema.optional(),
     model: z.string().optional(),
+    // The effort picked for this conversation. Absent, the run takes the agent's own when it runs
+    // the agent's model; null asks for the provider's default.
+    effort: reasoningEffortSchema.nullable().optional(),
     source: sessionSourceSchema.optional(),
     // Read only when the target is the foreman; any other agent ignores it.
     foreman: foremanBriefSchema.optional(),
