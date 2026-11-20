@@ -152,6 +152,7 @@ Ask in plain words. The Chief of Staff does the work itself, then puts a row und
 | **Install a template** | Installs a free template from the library into a Box. For a paid template, it opens the template card so you buy it yourself. See [Templates](/templates/install) |
 | **Set up apps** | Finds the app in the library and attaches it, then leaves you a row to sign in from the coworker's **Apps** tab. It never asks for a password or a key in the chat. See [Apps](/agents/apps) |
 | **Brief a coworker** | Sends it a task, follows the run and reports back |
+| **Answer your inbox** | Answers the questions, approvals and skill proposals your coworkers left waiting on you, in your name, once you told it what to say. See [Answer your inbox](#answer-your-inbox) |
 | **Schedule or trigger work** | Creates scheduled tasks and webhook triggers, on a coworker or on itself. See [Automations](/agents/automations) |
 | **Keep data** | Stores what it collects in a database of its own and shows it as a table in the chat, whose button opens the table on its card. See [Data](/agents/data) |
 | **Connect an app to itself** | Searches the library and installs an app on itself, or shows you a card to sign in or enter a key. A key it needs outside the library is asked in a form whose value never enters the chat. See [Apps](/agents/apps) |
@@ -167,12 +168,23 @@ Ask in plain words. The Chief of Staff does the work itself, then puts a row und
 
 It answers questions about Rerun from this documentation rather than from memory, so what you read here is what it tells you.
 
+### Answer your inbox
+
+Ask it what is waiting on you, to clear your inbox, or tell it what to answer ("say yes to the email approval, tell the writer to keep it casual"). It reads the cards your coworkers stopped on, in the Boxes you reach, and answers them in your name exactly as the [inbox](/agents/human-in-the-loop#notifications) would: the coworker gets back to work and the line leaves your inbox. Then it tells you, card by card, what it answered.
+
+- **Questions, approvals and skill proposals**: it answers the ones you gave it the answer to, or clearly decided already. When it is not sure, it asks you first instead of guessing.
+- **A spend** (paid data, Rerun credit): it asks for your yes in its chat before approving it.
+- **A key, an app to connect, an MCP sign-in, a browser takeover or access to a computer**: these stay with you. It tells you which coworker waits on which one.
+
+In the coworker's conversation, its answer sits beside the Chief of Staff's orb, signed with its name and yours, such as **Chief of Staff for Ada**, and the coworker knows the answer came through it. A [check-in](#check-ins) can tell you what waits on you, but it answers nothing on its own.
+
 ### What it does not do
 
 - It changes nothing inside the settings panels it opens: you set those yourself. The exception is the model a coworker runs on, which it can set.
 - It cannot be rewritten, duplicated or deleted, and it publishes no page. Only its name changes, see [Its name](#its-name).
 - It takes no [paid app](/billing#paid-apps): those connect to a coworker.
 - It never asks for a secret in the chat: a key goes through its form.
+- It never enters a key, signs in to an app or takes a browser in your name, and approves a spend only once you said yes in its chat.
 
 ## Getting started
 
