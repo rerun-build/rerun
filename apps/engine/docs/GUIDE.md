@@ -244,6 +244,8 @@ Each agent can declare MCP servers in `config.mcpServers`. On a run they are con
 
 A server that needs a credential never carries it inline: it references an agent variable as `${KEY}`, resolved from the agent `.env` at connect time (`src/tools/mcp-resolve.ts`). The agent gets that value into the `.env` by calling `request_secret`, which pauses the run and shows the user a masked form; the UI writes the values through `PATCH /agents/:id/keys` and the agent is told only which variable names were filled. The secret never enters the conversation.
 
+A tool that fails reaches the model with the server's own error text. The structured part of an error result is dropped rather than checked against the tool's output schema, so a server whose errors do not fit that schema still says why the call failed (`callMcpTool`, `src/tools/mcp.ts`).
+
 Every tool sent to the model costs its name, description and JSON schema on each step of the run. When the MCP tools of an agent weigh more than 40,000 characters (`MCP_EAGER_PAYLOAD_CHARS`, about 10,000 tokens), the engine's own loop stops sending them (`src/tools/mcp-search.ts`, `src/tools/mcp-wire.ts`):
 
 - the system prompt lists each server with its number of tools, and the agent gets two more tools, `mcp_search` and `mcp_call`;

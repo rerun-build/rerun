@@ -8,6 +8,7 @@ import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.j
 import { spentPlanWindow } from '../connections/plan-limits.js'
 import type { LoadedConnection } from '../connections/types.js'
 import { opencodeUserAgent } from '../runtime/build-info.js'
+import { refusalMessageOf, refusalResponse } from '../lib/refusal-body.js'
 import { googleToolSchemaMiddleware } from './google-tool-schema.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
 import { opencodeChatReasoningMiddleware } from './opencode-stream.js'
@@ -53,16 +54,6 @@ function goLimitMessage(window: PlanLimitWindow): string {
     return `${OPENCODE_GO_LIMIT}: ${WINDOW_NAME[window.kind]} window${reset}`
 }
 
-function messageOf(text: string): string {
-    try {
-        const body = JSON.parse(text) as { error?: { message?: unknown } | string; message?: unknown }
-        const message = typeof body.error === 'string' ? body.error : (body.error?.message ?? body.message)
-        if (typeof message === 'string' && message) return message
-    } catch {
-    }
-    return text.trim()
-}
-
 type RefusalContext = { connection: LoadedConnection | null; model: OpencodeModel }
 
 async function rewrittenRefusal(status: number, original: string, { connection, model }: RefusalContext): Promise<string | null> {
@@ -83,14 +74,8 @@ async function rewrittenRefusal(status: number, original: string, { connection, 
 async function withRewrittenRefusal(response: Response, context: RefusalContext): Promise<Response> {
     if (response.ok) return response
     const text = await response.text()
-    const message = await rewrittenRefusal(response.status, messageOf(text), context)
-    const headers = new Headers(response.headers)
-    headers.delete('content-length')
-    headers.delete('content-encoding')
-    if (!message) return new Response(text, { status: response.status, statusText: response.statusText, headers })
-    headers.set('content-type', 'application/json')
-    const body = { type: 'error', error: { type: 'opencode_error', message, code: response.status, status: 'OPENCODE_ERROR' } }
-    return new Response(JSON.stringify(body), { status: response.status, statusText: response.statusText, headers })
+    const message = await rewrittenRefusal(response.status, refusalMessageOf(text), context)
+    return refusalResponse(response, text, message, 'opencode')
 }
 
 export function opencodeFetch({ sessionId, ...context }: RefusalContext & { sessionId: string }, inner: FetchFunction = fetch): FetchFunction {

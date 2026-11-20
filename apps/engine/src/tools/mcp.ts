@@ -3,7 +3,9 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { Provider } from '@moldwright/contracts'
 import { CLI_PROVIDERS, type LoadedAgent, type McpServer } from '../agents/types.js'
 import { workspaceDir } from '../config/paths.js'
@@ -47,17 +49,41 @@ function buildTransport(server: McpServer, spawn: McpSpawn): Transport | null {
     return new SSEClientTransport(url, headers ? { requestInit: { headers } } : undefined)
 }
 
+export const MAX_TOOL_PAGES = 50
+
+async function listAllTools(client: Client): Promise<McpTool[]> {
+    const tools: McpTool[] = []
+    const seenCursors = new Set<string>()
+    let cursor: string | undefined
+    for (let pages = 0; pages < MAX_TOOL_PAGES; pages++) {
+        const page = await client.listTools(cursor ? { cursor } : undefined)
+        tools.push(...page.tools)
+        if (page.tools.length === 0) break
+        cursor = page.nextCursor && !seenCursors.has(page.nextCursor) ? page.nextCursor : undefined
+        if (!cursor) break
+        seenCursors.add(cursor)
+    }
+    return tools
+}
+
 export async function openMcpClient(server: McpServer, spawn: McpSpawn): Promise<{ client: Client; tools: McpTool[] }> {
     const transport = buildTransport(server, spawn)
     if (!transport) throw new Error(`server "${server.name}" needs a command (stdio) or a url (sse/http)`)
     const client = new Client({ name: 'rerun-engine', version: '1.0.0' })
     try {
         await client.connect(transport)
-        return { client, tools: (await client.listTools()).tools }
+        return { client, tools: await listAllTools(client) }
     } catch (e) {
         await client.close().catch(() => {})
         throw e
     }
+}
+
+export async function callMcpTool(client: Client, name: string, args: Record<string, unknown>, options?: RequestOptions): Promise<McpCallResult> {
+    const result = await client.request({ method: 'tools/call', params: { name, arguments: args } }, CallToolResultSchema, options)
+    if (!result.isError || result.structuredContent === undefined) return result
+    const { structuredContent: _structuredContent, ...error } = result
+    return error
 }
 
 export function modelReadyMcpTool(serverName: string, tool: McpTool): McpTool {

@@ -40,9 +40,11 @@
             "usage": "{plan}-Nutzungslimit erreicht",
             "opencodeCredits": "OpenCode-Guthaben aufgebraucht",
             "opencodeWindow": "OpenCode Go: {window, select, weekly {Wochenlimit} other {Monatslimit}} erreicht",
-            "opencode": "OpenCode-Go-Limit erreicht"
+            "opencode": "OpenCode-Go-Limit erreicht",
+            "openaiCredits": "OpenAI-API-Guthaben aufgebraucht"
         },
         "messages": {
+            "openaiCredits": "Dein OpenAI-API-Konto hat kein Guthaben mehr. Lade Guthaben auf platform.openai.com auf oder stell diesen Coworker auf ein anderes Modell um.",
             "opencodeCredits": "Kein Console-Guthaben mehr. Lade Guthaben auf opencode.ai auf oder wähle ein Go-Modell, um weiterzumachen.",
             "opencodeWindowResets": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Es wird {resetsAt} zurückgesetzt; wechsle bis dahin zu einem Console-Modell oder einem anderen Anbieter.",
             "opencodeWindow": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Wechsle zu einem Console-Modell oder einem anderen Anbieter, bis es zurückgesetzt wird.",

@@ -33,6 +33,11 @@ export function isAuthError(message?: string): boolean {
     return /\b401\b|unauthor/i.test(message ?? '')
 }
 
+export function serverCarriesCredential(server: McpServer): boolean {
+    const holdsPlaceholder = (value: string | undefined) => value?.includes('${') === true
+    return Object.keys(server.headers).length > 0 || holdsPlaceholder(server.url) || holdsPlaceholder(server.command) || server.args.some(holdsPlaceholder)
+}
+
 export async function discoverDeviceAuth(mcpUrl: string): Promise<DeviceAuth> {
     const origin = new URL(mcpUrl).origin
     const res = await fetch(`${origin}/.well-known/oauth-protected-resource`)

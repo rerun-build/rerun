@@ -1,7 +1,6 @@
 import { createProviderRegistry, wrapLanguageModel, type LanguageModel, type ToolSet } from 'ai'
 import type { GoalVerdict, RunGoal } from '@moldwright/contracts'
 import { goalStopHook } from './claude-goal-hook.js'
-import { Agent as UndiciAgent } from 'undici'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
@@ -40,6 +39,7 @@ import { openrouterReasoningMiddleware, reasoningFetchFor } from './openrouter-r
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
 import { opencodeLanguageModel } from './opencode.js'
+import { customEndpointFetch } from './custom-endpoint-fetch.js'
 import { opencodeChatReasoningMiddleware, opencodeUsageMiddleware } from './opencode-stream.js'
 import { agentProcessEnv } from './process-env.js'
 import { BRIDGE_SERVER_NAME, CLI_PROVIDERS, type LoadedAgent } from './types.js'
@@ -115,7 +115,8 @@ export const CODEX_HARNESS_OVERRIDES: CodexConfigOverrides = {
     'features.goals': false,
     'features.tool_suggest': false,
     'features.hooks': false,
-    'features.code_mode': false,
+    'features.code_mode.enabled': false,
+    'features.code_mode.direct_only_tool_namespaces': [`mcp__${BRIDGE_SERVER_NAME}`],
     'features.shell_tool': false,
     'features.unified_exec': false,
     'shell_environment_policy.inherit': 'all',
@@ -366,16 +367,11 @@ function openrouterCompatibleOptions(agent: LoadedAgent, provider: 'rerun' | 'op
     }
 }
 
-const CUSTOM_ENDPOINT_PATIENCE_MS = 60 * 60_000
-const customEndpointDispatcher = new UndiciAgent({ headersTimeout: CUSTOM_ENDPOINT_PATIENCE_MS, bodyTimeout: CUSTOM_ENDPOINT_PATIENCE_MS })
-
-const customEndpointFetch: typeof fetch = (input, init) => fetch(input, { ...init, dispatcher: customEndpointDispatcher } as RequestInit)
-
 function customOptions(agent: LoadedAgent): Parameters<typeof createOpenAI>[0] {
     return {
         apiKey: connectionEnv(agent)[CONNECTION_TOKEN_KEY.custom] || 'none',
         baseURL: (agent.resolved.connection?.config.baseUrl ?? '').trim().replace(/\/+$/, ''),
-        fetch: customEndpointFetch,
+        fetch: customEndpointFetch(),
     }
 }
 

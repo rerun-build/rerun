@@ -20,6 +20,7 @@ import { recordRefusedModel } from '../connections/cli-models.js'
 import { refreshCodexPlanLimits } from '../connections/codex-plan-limits.js'
 import { armPlanLimitLatch, clearPlanLimitLatch } from '../connections/plan-limits.js'
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
+import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
 import type { LoadedAgent } from '../agents/types.js'
@@ -55,7 +56,7 @@ import { sessionLabels } from '../agents/session-labels.js'
 import { stepWithScreenshots } from './screenshots.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
 import { emitRunTerminal } from './run-events.js'
-import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
+import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
 import { createLiveCounter, type LiveCounter } from './live-counter.js'
 import { readSharedEnvSync, secretValuesOf } from '../agents/shared-env.js'
 
@@ -260,6 +261,7 @@ type Settlement =
     | { kind: 'cancelled' }
 
 async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: string, override: ModelOverride | undefined, writer: UIMessageStreamWriter | undefined, runId: string | undefined, trigger: RunTrigger): Promise<AgentRun> {
+    const startedAt = Date.now()
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = registerRunAbort(run.id, baseAgent.id, writer)
     const author = trigger.source === 'chat' ? trigger.author : undefined
@@ -293,6 +295,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             void refreshCodexPlanLimits(connection)
         }
         if (provider === 'opencode') void refreshOpencodePlanLimits(connection)
+        if (provider === 'claude') refreshClaudePlanLimitsAfterRun(connection, startedAt)
     }
 
     const closeSafely = async (): Promise<void> => {
@@ -367,6 +370,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             if (settlement.errorCode === RUN_ERROR_CODES.refused) settlement = { ...settlement, error: new ProviderRefusedError(refusalReason(settlement.error)) }
             const unreachable = provider === 'custom' ? unreachableEndpointError(connection?.config.baseUrl, settlement.error) : null
             if (unreachable) settlement = { ...settlement, error: unreachable }
+            const outOfCredits = settlement.errorCode === RUN_ERROR_CODES.usageLimit ? openAiCreditsError(provider, settlement.error) : null
+            if (outOfCredits) settlement = { ...settlement, error: outOfCredits }
             const errorCode = settlement.errorCode ?? null
             const errorMessage = errorMessageOf(settlement.error)
             forgetCodexThread(agent.id, sessionId)

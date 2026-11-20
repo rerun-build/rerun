@@ -11,6 +11,7 @@ import { CODEX_VERSION, installedCodexVersion } from '../../runtime/codex-cli.js
 import { asRoot, canSudo, hasCommand, isRoot, run } from './exec.js'
 import {
     type Artifact,
+    cleanAptCache,
     downloadArtifact,
     extractArtifact,
     installLayout,
@@ -237,6 +238,27 @@ async function updateFromGit(layout: Layout, noRestart: boolean): Promise<void> 
     finishUpdate(noRestart)
 }
 
+function freeRegenerableSpace(root: string): void {
+    try {
+        for (const name of pruneReleases(root)) process.stdout.write(`removed release ${name}\n`)
+    } catch (err) {
+        continuing('release prune', err)
+    }
+    try {
+        for (const path of sweepRootCaches()) process.stdout.write(`removed cache ${path}\n`)
+    } catch (err) {
+        continuing('root cache sweep', err)
+    }
+    if (hasCommand('apt-get')) {
+        try {
+            cleanAptCache()
+            process.stdout.write('cleaned apt cache\n')
+        } catch (err) {
+            continuing('apt cache clean', err)
+        }
+    }
+}
+
 async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart: boolean): Promise<void> {
     if (layout.kind === 'image') throw new Error('an image does not take release artifacts: pull the new image instead')
     const root = layout.root
@@ -249,7 +271,13 @@ async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart:
         if (layout.kind === 'release' && previousUpdate?.status !== 'restarting' && previousUpdate?.status !== 'running') {
             for (const path of sweepLegacyCheckout(root)) process.stdout.write(`removed legacy ${path}\n`)
         }
-        requireFreeSpace(releasesDir(root), artifact.bytes)
+        try {
+            requireFreeSpace(releasesDir(root), artifact.bytes)
+        } catch (err) {
+            process.stdout.write(`${err instanceof Error ? err.message : String(err)}, freeing regenerable space\n`)
+            freeRegenerableSpace(root)
+            requireFreeSpace(releasesDir(root), artifact.bytes)
+        }
 
         const target = releaseDir(root, artifact.commit)
         if (existsSync(target)) {

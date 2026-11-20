@@ -8,7 +8,7 @@ import { agentProcessEnv } from '../agents/process-env.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 import { isAuthError } from './mcp-auth.js'
-import { mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
+import { callMcpTool, mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
 
 export const MCP_IDLE_MS = 10 * 60 * 1000
 export const MCP_CONNECT_TIMEOUT_MS = 20_000
@@ -114,7 +114,7 @@ function isConnectionLost(error: unknown): boolean {
 async function callOn(live: Live, name: string, args: Record<string, unknown>, options?: RequestOptions): Promise<CallResult> {
     live.entry.inFlight++
     try {
-        return await live.session.client.callTool({ name, arguments: args }, undefined, options)
+        return await callMcpTool(live.session.client, name, args, options)
     } finally {
         live.entry.inFlight--
         arm(live.key, live.entry)
