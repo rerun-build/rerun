@@ -427,9 +427,10 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     // The one way in for anything created: the grid's placement queue in the 3D view, a Box in the
     // Simple view. There, a coworker asked from a Box goes to it (a copy to its original's), a
     // workspace with a single Box the caller manages uses it, and with several the caller picks one
-    // (BoxPickerDialog).
+    // (BoxPickerDialog). A workspace without any Box yet draws its first one on the grid, as the board
+    // does: the placement takes the screen, and the list comes back once the Box has landed.
     requestCreation: (request, viewer) => {
-        if (get().creationFrame === 'board') {
+        if (get().creationFrame === 'board' || get().spaces.length === 0) {
             if (request.kind === 'scratch') get().beginAgentPlacement(request.draft, request.spaceId ?? null)
             else if (request.kind === 'template') get().beginTemplatePlacement(request)
             else if (request.kind === 'share') get().beginAgentSharePlacement(request)

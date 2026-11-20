@@ -37,16 +37,15 @@ export type WorkspaceViewContext = {
     // board, and a waitlist has nothing to list.
     onboarding: boolean
     waitlisted: boolean
-    // A coworker or a template is being dropped on the grid, or the workspace has no Box to list from.
+    // A coworker or a template is being dropped on the grid.
     placing: boolean
-    boxless: boolean
 }
 
 // The frame on screen. Anything that needs the grid wins over the preference, which comes back on its
 // own once the grid is no longer needed.
 export function resolveWorkspaceView(context: WorkspaceViewContext): WorkspaceView {
     if (context.onboarding || context.waitlisted) return 'board'
-    if (context.placing || context.boxless) return 'board'
+    if (context.placing) return 'board'
     return context.preference ?? 'board'
 }
 

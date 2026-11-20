@@ -523,6 +523,13 @@ describe('requestCreation', () => {
             expect(actions.installSharedAgentAction).toHaveBeenCalledTimes(1)
         })
 
+        it('draws the first Box on the grid when the workspace has none yet', () => {
+            useBoardStore.setState({ spaces: [] })
+            useBoardStore.getState().requestCreation(scratch, ADMIN)
+            expect(useBoardStore.getState().placement).toMatchObject({ source: { kind: 'scratch' }, labels: ['Scout'] })
+            expect(actions.createAgentWithSetupAction).not.toHaveBeenCalled()
+        })
+
         it('refuses a Box the caller only uses, even when asked for it', () => {
             useBoardStore.setState({ spaces: [space('used', 0, 7)] })
             useBoardStore.getState().requestCreation({ ...scratch, spaceId: 'used' }, MEMBER)

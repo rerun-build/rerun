@@ -31,8 +31,7 @@ export function useWorkspaceView(): { view: WorkspaceView } {
     const guided = useForemanStore(s => s.funnel === 'guided')
     const waitlisted = useForemanStore(s => s.waitlisted)
     const placing = useBoardStore(s => s.placement !== null || s.placingAgentId !== null)
-    const boxless = useBoardStore(s => s.hydrated && s.spaces.length === 0)
     const onboarding = guided || (!!workspace && !workspace.onboarded_at && !workspace.is_sandbox)
-    const view = resolveWorkspaceView({ preference, onboarding, waitlisted, placing, boxless })
+    const view = resolveWorkspaceView({ preference, onboarding, waitlisted, placing })
     return { view }
 }
