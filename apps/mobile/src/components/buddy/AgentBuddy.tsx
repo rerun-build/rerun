@@ -1,14 +1,17 @@
 import { useId, type ReactNode, type Ref } from 'react'
-import { View, type StyleProp, type ViewStyle } from 'react-native'
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import Animated, { useAnimatedStyle, useReducedMotion } from 'react-native-reanimated'
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg'
 
+import { layerTransform, type Matrix } from '@/components/orb/orb-motion'
 import { useTheme } from '@/theme/theme'
 
-import { BUDDY_FACE_CENTER, BuddyFace } from './BuddyFace'
-import { BUDDY_GEOMETRY, boxTop, leftWallPlane, roundedDiamond, wallsOutline, type BoxGeometry } from './geometry'
+import { BUDDY_FACE_CENTER, BuddyFace, buddyBlinks, buddyEyeLine, type FacePart } from './BuddyFace'
+import { BUDDY_GEOMETRY, boxTop, leftWallPlane, roundedDiamond, wallsOutline, type BoxGeometry, type Point } from './geometry'
 import { buddyColor, buddyEyes, buddyMouth, hashUnit, shade, type BuddyEyes, type BuddyLook, type BuddyMood } from './look'
 import { useBuddyLookOf } from './looks'
-import { BuddyMotionScope, GrowsFrom, RidesOnWalls, Sweep } from './motion'
+import { BuddyMotionScope, GrowsFrom, RidesOnWalls, Sweep, useBlinkScale, useStretch } from './motion'
+import { inverted, multiplied, stretchedFrom, svgTransform } from './wall-motion'
 
 // Ported from packages/ui/src/iso-grid/components/buddy (AgentBuddy, BuddyArt, RoundedBox): an
 // agent's buddy away from the board, the same block, colour and eyes, the ones its coworker was
@@ -47,6 +50,7 @@ type AgentBuddyProps = {
 export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, facing = 'left', style, svgRef }: AgentBuddyProps) {
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const theme = useTheme()
+    const reducedMotion = useReducedMotion()
     const small = size < SMALL_BELOW
     const geometry = small ? SMALL_GEOMETRY : BUDDY_GEOMETRY
     const worn = useBuddyLookOf(agentId)
@@ -61,11 +65,19 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
     const identity = buddyColor(agentId, look)
     const top = resting ? shade(identity, mood === 'asleep' ? -0.6 : -0.12) : body
     const faceScale = small ? SMALL_FACE_SCALE : 1
-    const motion = animated ? { kind: mood === 'working' ? ('bob' as const) : mood === 'error' ? ('shudder' as const) : null, offset: hashUnit(agentId, 7) * 4, blinkOffset: hashUnit(agentId, 9) * 4.6 } : null
+    const motion = animated && mood !== 'asleep' ? { kind: mood === 'working' ? ('bob' as const) : mood === 'error' ? ('shudder' as const) : null, offset: hashUnit(agentId, 7) * 4, blinkOffset: hashUnit(agentId, 9) * 4.6 } : null
+
+    const eyes = buddyEyes(agentId, look)
+    const mouth = buddyMouth(agentId, look)
+    const wall = leftWallPlane(geometry)
+    const faceFrame: Matrix = [faceScale, 0, 0, faceScale, BUDDY_FACE_CENTER * (1 - faceScale), 0]
+    const faceDepth = geometry.depth / faceScale
+    const blinks = motion !== null && !reducedMotion && buddyBlinks(eyes, mood)
+    const face = (part: FacePart) => <BuddyFace uid={uid} eyes={eyes} mouth={mouth} mood={mood} depth={faceDepth} light={resting ? shade(identity, 0.35) : '#ffffff'} lit={!small} tint={resting ? identity : body} part={part} />
 
     return (
         <View pointerEvents="none" style={[{ width: size, height: size, transform: facing === 'right' ? [{ scaleX: -1 }] : undefined, opacity: mood === 'asleep' ? 0.8 : 1 }, style]}>
-            <BuddyMotionScope motion={mood === 'asleep' ? null : motion}>
+            <BuddyMotionScope motion={motion}>
                 <Svg ref={svgRef} viewBox={viewBox} width="100%" height="100%">
                     <RoundedBox
                         uid={uid}
@@ -75,28 +87,66 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
                         topLight={mood === 'idle' ? 0.12 : 0.22}
                         rim={mood === 'idle' ? 0.22 : 0.32}
                         left={
-                            <G transform={leftWallPlane(geometry)}>
+                            <G transform={svgTransform(wall)}>
                                 <GrowsFrom y={geometry.depth}>
-                                    <G transform={faceScale === 1 ? undefined : `translate(${BUDDY_FACE_CENTER * (1 - faceScale)} 0) scale(${faceScale})`}>
-                                        <BuddyFace
-                                            uid={uid}
-                                            eyes={buddyEyes(agentId, look)}
-                                            mouth={buddyMouth(agentId, look)}
-                                            mood={mood}
-                                            depth={geometry.depth / faceScale}
-                                            light={resting ? shade(identity, 0.35) : '#ffffff'}
-                                            lit={!small}
-                                            tint={resting ? identity : body}
-                                        />
-                                    </G>
+                                    <G transform={svgTransform(faceFrame)}>{face(blinks ? 'still' : 'all')}</G>
                                 </GrowsFrom>
                             </G>
                         }
                         working={mood === 'working'}
                     />
                 </Svg>
+                {motion && blinks && (
+                    <BuddyLids
+                        viewBox={viewBox}
+                        unit={size / side}
+                        centre={{ x: geometry.base.x, y: blockCentreY }}
+                        wall={wall}
+                        wallDepth={geometry.depth}
+                        faceFrame={faceFrame}
+                        eyeLine={buddyEyeLine({ mouth, mood, depth: faceDepth })}
+                        blinkOffset={motion.blinkOffset}
+                    >
+                        {face('blinking')}
+                    </BuddyLids>
+                )}
             </BuddyMotionScope>
         </View>
+    )
+}
+
+type BuddyLidsProps = {
+    viewBox: string
+    // Points per unit of the drawing, and the point of the drawing at the middle of the view.
+    unit: number
+    centre: Point
+    wall: Matrix
+    wallDepth: number
+    faceFrame: Matrix
+    eyeLine: number
+    blinkOffset: number
+    children: ReactNode
+}
+
+// The eyes that blink, in a view of their own over the buddy. Its transform closes them onto their
+// line and keeps them on the wall while it stretches, so a blink costs neither a commit of the tree
+// nor a new painting of the buddy.
+function BuddyLids({ viewBox, unit, centre, wall, wallDepth, faceFrame, eyeLine, blinkOffset, children }: BuddyLidsProps) {
+    const { stretch } = useStretch()
+    const blink = useBlinkScale(blinkOffset)
+    const drawn = multiplied(wall, faceFrame)
+    const undrawn = inverted(drawn)
+    const lids = useAnimatedStyle(() => {
+        const stretched = multiplied(multiplied(wall, stretchedFrom(wallDepth, stretch())), faceFrame)
+        const closed = multiplied(stretched, stretchedFrom(eyeLine, blink.value))
+        return { transform: layerTransform(multiplied(closed, undrawn), unit, centre) }
+    })
+    return (
+        <Animated.View style={[StyleSheet.absoluteFill, lids]}>
+            <Svg viewBox={viewBox} width="100%" height="100%">
+                <G transform={svgTransform(drawn)}>{children}</G>
+            </Svg>
+        </Animated.View>
     )
 }
 

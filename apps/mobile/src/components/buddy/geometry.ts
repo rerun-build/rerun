@@ -1,3 +1,5 @@
+import type { Matrix } from '@/components/orb/orb-motion'
+
 import { BUDDY_HEIGHT_RATIO } from './look'
 
 export type Point = { x: number; y: number }
@@ -72,6 +74,6 @@ export function boxTop(geometry: BoxGeometry): Point {
 
 // The front-left wall's own plane: x runs along its bottom edge (0…halfW), y down from its top
 // edge (0…depth). Anything drawn inside reads as painted on that wall.
-export function leftWallPlane({ base, halfW, halfH, depth }: BoxGeometry) {
-    return `translate(${base.x - halfW} ${base.y - depth}) matrix(1 ${halfH / halfW} 0 1 0 0)`
+export function leftWallPlane({ base, halfW, halfH, depth }: BoxGeometry): Matrix {
+    return [1, halfH / halfW, 0, 1, base.x - halfW, base.y - depth]
 }

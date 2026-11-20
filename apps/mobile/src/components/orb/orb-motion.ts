@@ -21,13 +21,16 @@ export function restPose(facing: OrbFacing) {
 // [a b c d e f] as in SVG's matrix().
 export type Matrix = [number, number, number, number, number, number]
 
-// The `transform` of a view centred on the origin of what it draws, moved by `matrix`: `scale` is how
-// many points one of its units takes. A view's transform never goes through a commit of the tree nor
-// redraws what is inside, which a matrix set on an SVG group does on every frame.
-export function layerTransform(matrix: Matrix, scale: number) {
+// The `transform` of a view whose drawing is moved by `matrix`: `centre` is the point of the drawing
+// that sits at the middle of the view, `scale` how many points one of its units takes. A view's
+// transform never goes through a commit of the tree nor redraws what is inside, which a matrix set on
+// an SVG group does on every frame.
+export function layerTransform(matrix: Matrix, scale: number, centre: { x: number; y: number } = { x: 0, y: 0 }) {
     'worklet'
     const [a, b, c, d, e, f] = matrix
-    return [{ matrix: [a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, e * scale, f * scale, 0, 1] }]
+    const dx = a * centre.x + c * centre.y + e - centre.x
+    const dy = b * centre.x + d * centre.y + f - centre.y
+    return [{ matrix: [a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, dx * scale, dy * scale, 0, 1] }]
 }
 
 // The face carried by a ball turned by `yaw` (to the right) and `pitch` (upwards): it slides over the

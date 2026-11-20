@@ -38,6 +38,14 @@ describe('orb motion', () => {
         expect(moved(0, 10)).toEqual({ x: 20.5, y: 30 })
     })
 
+    it('moves a layer around the point its view is centred on', () => {
+        const halved: [number, number, number, number, number, number] = [1, 0, 0, 0.5, 0, 5]
+        const [{ matrix }] = layerTransform(halved, 2, { x: 5, y: 20 })
+        expect(matrix[12]).toBe(0)
+        expect(matrix[13]).toBe(-10)
+        expect(layerTransform(halved, 2, { x: 5, y: 10 })[0].matrix[13]).toBe(0)
+    })
+
     it('spins the whole ball while it thinks', () => {
         const clock = startClock()
         let hidden = false

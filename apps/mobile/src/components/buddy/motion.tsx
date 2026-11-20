@@ -39,7 +39,7 @@ const SHUDDER = { period: 2.4, at: [0, 0.6, 0.66, 0.72, 0.78, 0.84, 1], stretch:
 const BLINK = { period: 4.6, at: [0, 0.92, 0.95, 1], scale: [1, 1, 0.08, 1] }
 const SWEEP_PERIOD = 2.6
 
-function useStretch() {
+export function useStretch() {
     const clock = use(Clock)
     const motion = use(Motion)
     const keys = motion?.kind === 'bob' ? BOB : motion?.kind === 'shudder' ? SHUDDER : null
@@ -66,20 +66,6 @@ export function RidesOnWalls({ depth, children }: { depth: number; children: Rea
     const { stretch, still } = useStretch()
     const animatedProps = useAnimatedProps(() => ({ matrix: liftedBy((1 - stretch()) * depth) }))
     if (still) return <G>{children}</G>
-    return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
-}
-
-// The eyes squashed from the line `y`, as one.
-export function Blinking({ y, children }: { y: number; children: ReactNode }) {
-    const clock = use(Clock)
-    const motion = use(Motion)
-    const offset = motion?.blinkOffset ?? 0
-    const animatedProps = useAnimatedProps(() => {
-        if (!clock || !motion) return { matrix: stretchedFrom(y, 1) }
-        const phase = ((clock.value + offset) % BLINK.period) / BLINK.period
-        return { matrix: stretchedFrom(y, interpolate(phase, BLINK.at, BLINK.scale)) }
-    })
-    if (!clock || !motion) return <G>{children}</G>
     return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
 }
 
