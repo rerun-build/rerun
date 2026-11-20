@@ -12,9 +12,8 @@ concurrency:
 jobs:
   route:
     if: >-
-      github.repository == 'rerun-build/rerun' ||
-      (github.repository_owner == 'special-place-ai-heaven' &&
-       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
+      github.repository_owner == 'special-place-ai-heaven' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     name: Pick runners
     runs-on: ubuntu-latest
     permissions:
@@ -49,9 +48,8 @@ jobs:
   check:
     needs: route
     if: >-
-      github.repository == 'rerun-build/rerun' ||
-      (github.repository_owner == 'special-place-ai-heaven' &&
-       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
+      github.repository_owner == 'special-place-ai-heaven' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     name: Typecheck and lint
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON_LIGHT || needs.route.outputs.light || '"ubuntu-latest"') }}
     steps:
@@ -71,9 +69,8 @@ jobs:
   tests:
     needs: route
     if: >-
-      github.repository == 'rerun-build/rerun' ||
-      (github.repository_owner == 'special-place-ai-heaven' &&
-       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
+      github.repository_owner == 'special-place-ai-heaven' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:
@@ -94,7 +91,9 @@ jobs:
       - run: pnpm --filter ${{ matrix.part.filter }} run test --maxWorkers=4
 
   migrations:
-    if: github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven'
+    if: >-
+      github.repository_owner == 'special-place-ai-heaven' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     name: Migrations and seed on a fresh database
     runs-on: ubuntu-latest
     steps:
@@ -121,7 +120,10 @@ jobs:
           test "$(printf '%s\n' "select count(*) from public.engine_pool where engine_api_key = '$key';" | db)" = 1
 
   docker-inputs:
-    if: (github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven') && github.event_name == 'pull_request'
+    if: >-
+      github.repository_owner == 'special-place-ai-heaven' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Docker inputs changed
     runs-on: ubuntu-latest
     outputs:
@@ -141,7 +143,7 @@ jobs:
   images:
     needs: docker-inputs
     if: >-
-      !cancelled() && (github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven') &&
+      !cancelled() && github.repository_owner == 'special-place-ai-heaven' &&
       ((github.event_name == 'push' && github.ref != 'refs/heads/dev') || needs.docker-inputs.outputs.changed == 'true')
     name: Docker images build
     runs-on: ubuntu-latest
@@ -155,7 +157,6 @@ jobs:
           file: apps/engine/Dockerfile
           push: false
           cache-from: type=gha,scope=engine
-          cache-to: type=gha,mode=max,scope=engine
       - name: App
         uses: docker/build-push-action@v6
         with:
@@ -167,4 +168,3 @@ jobs:
             NEXT_PUBLIC_SUPABASE_URL=http://localhost:54421
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=ci
           cache-from: type=gha,scope=app
-          cache-to: type=gha,mode=max,scope=app

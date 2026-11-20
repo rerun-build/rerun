@@ -10,8 +10,7 @@ jobs:
   frozen:
     if: >-
       github.repository_owner == 'special-place-ai-heaven' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.head_ref, 'chunk/')
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Refactor commits leave tests alone
     runs-on: ubuntu-latest
     timeout-minutes: 10

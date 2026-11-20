@@ -15,8 +15,7 @@ jobs:
   prove:
     if: >-
       github.repository_owner == 'special-place-ai-heaven' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.head_ref, 'chunk/')
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Done-test red before green
     runs-on: ubuntu-latest
     timeout-minutes: 40

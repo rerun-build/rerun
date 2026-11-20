@@ -306,5 +306,32 @@ class RunnerScripts(unittest.TestCase):
         self.assertEqual(sum("/app/status_report.py" in c for c in calls), 4)
 
 
+class CiWorkflowGates(unittest.TestCase):
+    def workflow(self, name):
+        p = os.path.join(VPS, "..", "..", ".github", "workflows", name)
+        with open(p, encoding="utf-8") as f:
+            return f.read()
+
+    def test_ci_workflow_guards_self_hosted_runners_against_fork_prs_and_skips_pr_cache_writes(self):
+        ci = self.workflow("ci.yml")
+        self.assertNotIn("rerun-build/rerun", ci)
+        self.assertNotIn("cache-to:", ci)
+        for name in ("route:", "check:", "tests:"):
+            idx = ci.index("  " + name)
+            block = ci[idx:idx + 350]
+            self.assertIn("github.event.pull_request.head.repo.full_name == github.repository", block, name)
+
+    def test_gate_workflows_avoid_shell_globbing_and_run_on_every_same_repo_pr_branch(self):
+        nc = self.workflow("no-comments.yml")
+        self.assertIn("git diff -z", nc)
+        self.assertIn("xargs -0", nc)
+        self.assertNotIn("$(cat ", nc)
+        for wf_name in ("red-green.yml", "refactor-frozen.yml"):
+            text = self.workflow(wf_name)
+            self.assertNotIn("startsWith(github.head_ref, 'chunk/')", text, wf_name)
+        ft = self.workflow("factory-tools.yml")
+        self.assertIn("github.event.pull_request.head.repo.full_name == github.repository", ft)
+
+
 if __name__ == "__main__":
     unittest.main()
