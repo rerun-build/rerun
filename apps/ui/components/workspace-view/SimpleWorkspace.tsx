@@ -64,7 +64,7 @@ export function SimpleWorkspace() {
     const chats = chatsOf && chatsOf.agentId === selectedAgentId ? chatsOf.filter : null
     const [newThreadFor, setNewThreadFor] = useState<string | null>(null)
     const [openSessionRequest, setOpenSessionRequest] = useState<{ sessionId: string; title: string; runId: string | null } | null>(null)
-    const [deleteOpen, setDeleteOpen] = useState(false)
+    const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null)
     const [shareOpen, setShareOpen] = useState(false)
     const besideChat = useDetailsBesideChat()
     const detailsOpen = useDetailsOpen()
@@ -144,6 +144,7 @@ export function SimpleWorkspace() {
                 if (agent) useBoardStore.getState().requestCreation({ kind: 'duplicate', agentId, agentName: agent.name, spaceId: agent.spaceId }, viewer)
             },
             onMoveToBox: spaceId => useBoardStore.getState().moveAgentToBox(agentId, spaceId, viewer),
+            onDelete: () => setDeleteAgentId(agentId),
         }),
         [openCoworker, viewer]
     )
@@ -186,14 +187,19 @@ export function SimpleWorkspace() {
                         if (!besideChat) setDetailsWanted(false)
                     }}
                     onShare={() => setShareOpen(true)}
-                    onDelete={() => setDeleteOpen(true)}
+                    onDelete={() => setDeleteAgentId(agent.id)}
                 />
             )}
-            {agent && (
-                <>
-                    <DeleteAgentDialog agentId={agent.id} agentName={agent.name} open={deleteOpen} onOpenChange={setDeleteOpen} />
-                    <ShareAgentDialog agentId={agent.id} agentName={agent.name} open={shareOpen} onOpenChange={setShareOpen} />
-                </>
+            {agent && <ShareAgentDialog agentId={agent.id} agentName={agent.name} open={shareOpen} onOpenChange={setShareOpen} />}
+            {deleteAgentId && (
+                <DeleteAgentDialog
+                    agentId={deleteAgentId}
+                    agentName={agents.find(a => a.id === deleteAgentId)?.name}
+                    open
+                    onOpenChange={open => {
+                        if (!open) setDeleteAgentId(null)
+                    }}
+                />
             )}
             <AgentDesktopView />
         </div>

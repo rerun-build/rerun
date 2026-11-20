@@ -39,7 +39,8 @@ export function DeleteAgentDialog({ agentId, agentName, children, open: controll
 
     const handleDelete = () => {
         removeAgent(agentId)
-        selectAgent(null)
+        // Deleted from a list's menu, it may not be the coworker open beside it.
+        if (useBoardStore.getState().selectedAgentId === agentId) selectAgent(null)
         handleOpenChange(false)
     }
 

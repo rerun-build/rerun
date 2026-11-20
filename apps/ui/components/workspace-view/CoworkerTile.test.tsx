@@ -8,7 +8,8 @@ import type { CoworkerPreview } from '@/stores/coworker-previews.store'
 
 // The menu reads the Boxes from the board; the tile itself does not.
 vi.mock('@/stores/board.store', () => ({ useBoardStore: (select: (state: { spaces: never[] }) => unknown) => select({ spaces: [] }) }))
-vi.mock('@/hooks/useBoxAccess', () => ({ useCanManageAgent: () => true, useManageableSpaceIds: () => new Set() }))
+const access = vi.hoisted(() => ({ canManage: true }))
+vi.mock('@/hooks/useBoxAccess', () => ({ useCanManageAgent: () => access.canManage, useManageableSpaceIds: () => new Set() }))
 vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: ({ mood }: { mood: string }) => createElement('span', { 'data-mood': mood }) }))
 
 const { CoworkerTile } = await import('@/components/workspace-view/CoworkerTile')
@@ -19,7 +20,7 @@ const preview = (patch: Partial<CoworkerPreview> = {}): CoworkerPreview => ({ se
 let container: HTMLDivElement
 let root: Root
 const onOpen = vi.fn()
-const actions = { onNewConversation: vi.fn(), onAllConversations: vi.fn(), onOpenCard: vi.fn(), onDuplicate: vi.fn(), onMoveToBox: vi.fn() }
+const actions = { onNewConversation: vi.fn(), onAllConversations: vi.fn(), onOpenCard: vi.fn(), onDuplicate: vi.fn(), onMoveToBox: vi.fn(), onDelete: vi.fn() }
 
 async function render(props: { agent?: IsoAgent; preview?: CoworkerPreview; selected?: boolean; unseen?: boolean }) {
     await act(async () => root.render(createElement(CoworkerTile, { agent: props.agent ?? agent(), preview: props.preview, viewerId: 'me', selected: props.selected ?? false, unseen: props.unseen ?? false, onOpen, actions })))
@@ -35,6 +36,8 @@ beforeEach(() => {
     document.body.append(container)
     root = createRoot(container)
     onOpen.mockReset()
+    actions.onDelete.mockReset()
+    access.canManage = true
 })
 
 afterEach(async () => {
@@ -125,4 +128,29 @@ describe('CoworkerTile', () => {
         await render({ preview: preview() })
         expect(container.querySelector('button[aria-label="More for Scout"]')).not.toBeNull()
     })
+
+    it('deletes the coworker from its menu', async () => {
+        await render({ preview: preview() })
+        await openMoreMenu()
+        const remove = menuItem('Delete')
+        expect(remove?.getAttribute('data-variant')).toBe('destructive')
+        await act(async () => remove!.click())
+        expect(actions.onDelete).toHaveBeenCalledOnce()
+    })
+
+    it('keeps the deletion visible but disabled for someone who does not manage the Box', async () => {
+        access.canManage = false
+        await render({ preview: preview() })
+        await openMoreMenu()
+        expect(menuItem('Delete')?.hasAttribute('data-disabled')).toBe(true)
+    })
 })
+
+async function openMoreMenu() {
+    const trigger = container.querySelector<HTMLButtonElement>('button[aria-label="More for Scout"]')!
+    await act(async () => {
+        trigger.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerType: 'mouse' }))
+    })
+}
+
+const menuItem = (label: string) => [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(item => item.textContent === label)

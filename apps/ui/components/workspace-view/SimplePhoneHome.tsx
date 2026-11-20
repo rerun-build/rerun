@@ -6,6 +6,7 @@ import { AgentBuddy, buddyMoodOfStatus } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { DeleteAgentDialog } from '@/components/dialogs/DeleteAgentDialog'
 import { BoardCornerActions } from '@/components/layout/BoardCornerActions'
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
@@ -52,6 +53,7 @@ export function SimplePhoneHome() {
     const [pins, setPins] = useState<string[]>([])
     const [grouping, setGrouping] = useState<ListGrouping>('recent')
     const [collapsed, setCollapsed] = useState<string[]>([])
+    const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null)
 
     useEffect(() => {
         if (!workspaceId) return
@@ -84,6 +86,7 @@ export function SimplePhoneHome() {
             if (agent) useBoardStore.getState().requestCreation({ kind: 'duplicate', agentId, agentName: agent.name, spaceId: agent.spaceId }, viewer)
         },
         onMoveToBox: spaceId => useBoardStore.getState().moveAgentToBox(agentId, spaceId, viewer),
+        onDelete: () => setDeleteAgentId(agentId),
         pin: { pinned: pins.includes(agentId), onToggle: () => changePins(togglePin(pins, agentId)) },
     })
 
@@ -178,6 +181,16 @@ export function SimplePhoneHome() {
             <Button variant="outline" size="icon" aria-label={t('list.search')} onClick={openControlCenter} className="absolute right-4 bottom-[calc(1rem+var(--consent-inset))] z-40 size-11 rounded-full bg-background/80 backdrop-blur-xl">
                 <SearchIcon className="size-5" />
             </Button>
+            {deleteAgentId && (
+                <DeleteAgentDialog
+                    agentId={deleteAgentId}
+                    agentName={agents.find(a => a.id === deleteAgentId)?.name}
+                    open
+                    onOpenChange={open => {
+                        if (!open) setDeleteAgentId(null)
+                    }}
+                />
+            )}
         </div>
     )
 }

@@ -13,7 +13,7 @@ import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { IsoAgent } from '@/lib/board/types'
-import { ArrowRightIcon, CopyPlusIcon, EllipsisIcon, MessageCircle, PanelRightIcon, PlusIcon, StarIcon } from '@/lib/icons'
+import { ArrowRightIcon, CopyPlusIcon, EllipsisIcon, MessageCircle, PanelRightIcon, PlusIcon, StarIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import type { CoworkerPreview } from '@/stores/coworker-previews.store'
@@ -26,6 +26,7 @@ export type CoworkerTileActions = {
     onOpenCard?: () => void
     onDuplicate: () => void
     onMoveToBox: (spaceId: string) => void
+    onDelete: () => void
     // On the phone's list, where a coworker is pinned to the top.
     pin?: { pinned: boolean; onToggle: () => void }
 }
@@ -177,6 +178,13 @@ function TileItems({ agent, actions, kit: { Item, Separator, Sub, SubTrigger, Su
                     )}
                 </SubContent>
             </Sub>
+            <Separator />
+            <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
+                <Item variant="destructive" disabled={!canManage} onSelect={actions.onDelete} className="w-full gap-2 whitespace-nowrap">
+                    <Trash2Icon className="size-4" />
+                    {tMenu('delete')}
+                </Item>
+            </TooltipDisabledReason>
         </>
     )
 }
