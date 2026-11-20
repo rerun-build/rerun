@@ -1859,7 +1859,7 @@ class Dispatcher:
             runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, head)])).get("workflow_runs") or []
         except (Error, ValueError, KeyError, TypeError, AttributeError):
             return None
-        passed = {r.get("workflow_id") for r in runs if r.get("conclusion") == "success"}
+        passed = {r.get("workflow_id") for r in runs if r.get("conclusion") == "success" and r.get("workflow_id") is not None}
         return head if checks_verdict(runs)[0] == "OK" and failed <= passed else None
 
     def dev_results(self):
@@ -1874,8 +1874,9 @@ class Dispatcher:
                 self.save(j, "merge commit %s" % sha[:7])
             runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["merge_sha"])])).get("workflow_runs") or []
             verdict, why = checks_verdict(runs)
-            failed = {r.get("workflow_id") for r in runs if r.get("conclusion") in ("failure", "timed_out")}
-            healed = self.dev_healed(j["merge_sha"], failed) if verdict == "FAIL" else None
+            passed_on_merge = {r.get("workflow_id") for r in runs if r.get("conclusion") in OK_CONCLUSIONS}
+            unproven = {r.get("workflow_id") for r in runs if r.get("workflow_id") not in passed_on_merge}
+            healed = self.dev_healed(j["merge_sha"], unproven) if verdict == "FAIL" else None
             if verdict == "OK":
                 result = "green"
             elif healed:

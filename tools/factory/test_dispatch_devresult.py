@@ -1,6 +1,9 @@
 import json
+import os
+import sys
 import unittest
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from test_dispatch import Base, HEAD, wf
 
 SHA = "feedface12345678"
@@ -134,6 +137,33 @@ class DevHeals(Base):
         self.later_dev("success", status="diverged")
         self.merged()
         self.w.workflows[SHA] = [wf("ci", "failure", wid=1)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+
+    def test_dev_healed_requires_cancelled_workflow_on_merge_sha_to_pass_on_head(self):
+        self.later_dev("success")
+        self.w.workflows[self.LATER] = [wf("ci", "success", wid=1)]
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=1), wf("Images", "cancelled", wid=2)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+        self.w.workflows[self.LATER] = [wf("ci", "success", wid=1), wf("Images", "success", wid=2)]
+        self.tick()
+        self.assertEqual(self.data()["dev_result"], "green")
+
+    def test_dev_healed_requires_startup_failure_workflow_on_merge_sha_to_pass_on_head(self):
+        self.later_dev("success")
+        self.w.workflows[self.LATER] = [wf("ci", "success", wid=1)]
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=1), wf("Images", "startup_failure", wid=2)]
+        self.tick(2)
+        self.assertEqual(self.data()["dev_result"], "red")
+
+    def test_skipped_workflow_on_head_does_not_heal_unproven_workflow_on_merge_sha(self):
+        self.later_dev("success")
+        self.w.workflows[self.LATER] = [wf("ci", "success", wid=1), wf("Images", "skipped", wid=2)]
+        self.merged()
+        self.w.workflows[SHA] = [wf("ci", "failure", wid=1), wf("Images", "cancelled", wid=2)]
         self.tick(2)
         self.assertEqual(self.data()["dev_result"], "red")
 
