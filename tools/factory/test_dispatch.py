@@ -358,6 +358,44 @@ class Checks(Base):
         self.assertEqual(self.state(), "failed")
         self.assertIn("running: image", self.w.issue(5)["comments"][-1])
         self.assertEqual(self.w.merges, [])
+    def test_checks_waits_until_ci_and_gate_workflows_have_registered(self):
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dispatch.json")) as f:
+            required = json.load(f)["required_workflows"]
+        runs = [{"id": 1, "workflow_id": 1, "name": "No stubs or switched-off tests", "status": "completed", "conclusion": "success"}]
+        self.assertEqual(D.checks_verdict(runs, required)[0], "WAIT")
+
+        all_runs = [
+            {"id": 1, "workflow_id": 1, "name": "No stubs or switched-off tests", "status": "completed", "conclusion": "success"},
+            {"id": 2, "workflow_id": 2, "name": "CI", "status": "completed", "conclusion": "success"},
+            {"id": 3, "workflow_id": 3, "name": "No comments in code", "status": "completed", "conclusion": "success"},
+            {"id": 4, "workflow_id": 4, "name": "Done-test red before green", "status": "completed", "conclusion": "skipped"},
+            {"id": 5, "workflow_id": 5, "name": "Refactor commits leave tests alone", "status": "completed", "conclusion": "skipped"},
+        ]
+        self.assertEqual(D.checks_verdict(all_runs, required), ("OK", None))
+
+        ci_skipped = [
+            dict(r, conclusion="skipped") if r["name"] == "CI" else r for r in all_runs
+        ]
+        self.assertEqual(D.checks_verdict(ci_skipped, required), ("WAIT", "CI not successful"))
+
+        self.to_checks()
+        self.cfg["required_workflows"] = required
+        self.w.workflows[HEAD] = [wf("CI", "success", wid=1), wf("No comments in code", "success", wid=2)]
+        self.tick()
+        self.assertEqual(self.state(), "checks")
+        self.assertEqual(self.w.merges, [])
+
+        self.w.workflows[HEAD] = [
+            wf("CI", "success", wid=1),
+            wf("No comments in code", "success", wid=2),
+            wf("No stubs or switched-off tests", "success", wid=3),
+            wf("Done-test red before green", "skipped", wid=4),
+            wf("Refactor commits leave tests alone", "skipped", wid=5),
+        ]
+        self.tick(3)
+        self.assertEqual(self.state(), "merged")
+        self.assertEqual(len(self.w.merges), 1)
+
 
 
 class Intake(Base):

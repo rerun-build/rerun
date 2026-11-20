@@ -4,7 +4,7 @@ OWN = "scripts/no-stubs/"
 KINDS = (
     ("stub", re.compile(r"\bNotImplementedError\b|\btodo!\s*\(|\bunimplemented!\s*\(|['\"]not implemented['\"]", re.I)),
     ("focused test", re.compile(r"\b(?:it|test|describe)\.only\s*\(")),
-    ("skipped test", re.compile(r"\b(?:it|test|describe)\.skip\s*\(|\bx(?:it|describe|test)\s*\(|@unittest\.skip\s*\(|@pytest\.mark\.skip\s*\(")),
+    ("skipped test", re.compile(r"\b(?:it|test|describe)\.(?:skip|todo)\s*\(|\bx(?:it|describe|test)\s*\(|@unittest\.skip\s*\(|@pytest\.mark\.skip\s*\(")),
 )
 HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)")
 

@@ -49,6 +49,12 @@ class Check(unittest.TestCase):
 
     def test_each_hit_names_its_line_number_in_the_new_file(self):
         self.assertEqual(check.find(DIFF)[0]["line"], 2)
+    def test_catches_vitest_it_todo(self):
+        diff = "+++ b/t.test.ts\n+  it.todo('later')\n+  test.todo('tomorrow')\n+  describe.todo('suite')\n"
+        hits = check.find(diff)
+        self.assertEqual(len(hits), 3)
+        self.assertTrue(all(h["kind"] == "skipped test" for h in hits))
+
 
 
 if __name__ == "__main__":

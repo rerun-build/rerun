@@ -27,6 +27,13 @@
   },
   "proof": true,
   "fast_checks": {"names": ["Typecheck and lint", "No comments in code", "Factory tools tests"], "start_s": 120, "wait_s": 900, "fixes": 2},
+  "required_workflows": [
+    "CI",
+    "No comments in code",
+    "No stubs or switched-off tests",
+    "Done-test red before green",
+    "Refactor commits leave tests alone"
+  ],
   "cache_life": {
     "subscription": 3600,
     "key": 300

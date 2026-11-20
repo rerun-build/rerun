@@ -501,7 +501,7 @@ failures.SOURCES.update(building=(first_brief, build_brief, final_state), review
                         proving=(proof_brief, final_state), fixing=(fix_brief, senior_brief, final_state), returned=(replan_brief,))
 
 
-def checks_verdict(runs):
+def checks_verdict(runs, required=()):
     if not runs:
         return "WAIT", "no workflow runs yet"
     pending = ciwait.unfinished(runs)
@@ -515,8 +515,12 @@ def checks_verdict(runs):
              and not (r.get("conclusion") == "cancelled" and r.get("workflow_id") in passed)]
     if other:
         return "WAIT", "not passed: " + ", ".join("%s %s" % (r["name"], r.get("conclusion")) for r in other)
+    missing = [name for name in required if name not in {r.get("name") for r in runs}]
+    if missing:
+        return "WAIT", "waiting for workflow: " + ", ".join(missing)
+    if "CI" in required and not any(r.get("name") == "CI" and r.get("conclusion") == "success" for r in runs):
+        return "WAIT", "CI not successful"
     return "OK", None
-
 
 def failed_ids(runs):
     latest = {}
@@ -1761,7 +1765,7 @@ class Dispatcher:
             return self.to(j, "review_wait", "head moved from %s to %s after the review: reviewed again" % (j["head"][:7], now_head[:7]))
         data = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["head"])]))
         runs = data.get("workflow_runs") or []
-        verdict, why = checks_verdict(runs)
+        verdict, why = checks_verdict(runs, self.cfg.get("required_workflows") or ())
         if verdict == "FAIL" and j.get("checks_rerun") != j["head"] and failed_ids(runs):
             ids = failed_ids(runs)
             for rid in ids:
