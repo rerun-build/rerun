@@ -10,4 +10,4 @@ NET=$(unquote "$(sed -n 's/^CODE_INTEL_NETWORK=//p' deploy/vps/.env 2>/dev/null 
 
 docker compose -f deploy/vps/code-intel.yml ps --all --format '{{.Service}} {{.State}}'
 
-docker run --rm --network "$NET" --user 1001:1001 -e CODE_Q_CONFIG=/data/tools/etc/code-q.json -v "$DATA/tools:/data/tools:ro" -v "$DATA/work/repos:/data/work/repos:ro" node:26-alpine node /data/tools/factory/code-q.mjs --status
+docker run --rm --network "$NET" --user 1001:1001 -e CODE_Q_CONFIG=/data/tools/etc/code-q.json -v "$DATA/tools:/data/tools:ro" -v "$DATA/work/repos:/data/work/repos:ro" node:26-alpine node /data/tools/factory-current/code-q.mjs --status

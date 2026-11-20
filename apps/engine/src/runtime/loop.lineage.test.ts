@@ -103,6 +103,11 @@ describe('run lineage', () => {
         expect(row?.branch).toBe('job/7')
     })
 
+    it('stores the copy number a trigger carries', async () => {
+        const { row } = await runWith('hello', { source: 'chat', lineage: { copyIndex: 2 } })
+        expect(row?.copyIndex).toBe(2)
+    })
+
     it('takes the job ref from a JOB message and puts it on the context', async () => {
         const { row } = await runWith('JOB rerun#42\nbuild it', { source: 'chat', author: { id: 'user-1', name: 'Rob' } })
         expect(row?.jobRef).toBe('rerun#42')

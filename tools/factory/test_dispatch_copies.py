@@ -60,6 +60,12 @@ class Copies(unittest.TestCase):
         self.assertIn("`timeoutMs` set above the default of 120000", b)
         self.assertIn("never chain them with the commit or `pr-open`", b)
 
+    def test_the_build_brief_asks_for_one_diff_line_per_change_bullet(self):
+        b = D.build_brief({"issue": 7, "title": "Fix x", "round": 1})
+        self.assertIn("## Asks", b)
+        self.assertIn("git diff origin/dev...HEAD", b)
+        self.assertIn("A Change bullet you cannot point to in that diff is not done: do it before pr-open.", b)
+
     def test_the_replan_brief_runs_issuecheck_before_saving(self):
         b = D.replan_brief({"issue": 7, "title": "Fix x", "reason": "r"}, "o/r", 1)
         self.assertIn("tools/factory/issuecheck.py", b)

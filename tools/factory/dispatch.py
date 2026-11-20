@@ -26,6 +26,7 @@ import inboxsort
 import labelcheck
 import instructions
 import limits
+import machine
 import plancheck
 import planners
 import planning
@@ -48,6 +49,7 @@ import waits
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WAIT_S = 1
+FAIL_AFTER_S = 7200
 RUNNING = states.RUNNING
 END = states.END
 BACK = states.BACK
@@ -133,6 +135,9 @@ def issue_files(body):
 def proven_line(body):
     m = re.search(r"(?m)^\*\*Proven branch\*\*:\s*(\S+)\s*$", plain(body))
     return m.group(1) if m else None
+
+
+PROVEN_COMPARE = '{files: [.files[].filename], messages: [.commits[].commit.message], patches: [.files[] | (.patch // "")]}'
 
 
 def issue_run(body):
@@ -223,6 +228,17 @@ def ui_job(j):
     return any(UI_PATH.search(p) and not NOT_WEB.match(p) for p in issue_files(j.get("body")).split(", "))
 
 
+def build_asks(j):
+    asks = proof.change_asks(j.get("body"))
+    if not asks:
+        return []
+    return [
+        'The asks of the Change, in order:',
+        *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
+        '',
+    ]
+
+
 def build_brief(j):
     return "\n".join([
         'One job, sent by the dispatcher and not by Boss: %s #%s, "%s". You work alone on it: call no other coworker, not Boss either, and send no question to Rob.' % (where(j), j["issue"], j["title"]),
@@ -235,8 +251,9 @@ def build_brief(j):
         '2. Where the issue names a done-test, write it first and see it fail. Then make the change, in the files the issue names and nowhere else.',
         NO_COMMENTS,
         *([WEB_GUIDE] if ui_job(j) else []),
+        *build_asks(j),
         '3. Run only the test files you touched, with the worker pool capped at 2. No full suite. Then run the lint and the type check of every package the change touched (`pnpm --filter <package> lint`, `pnpm --filter <package> ts-check`), and for Python files under `tools/factory` run `ruff check` on them where ruff is installed; fix what they report before opening the pull request. Lint warnings do not block; lint errors do. Give the lint and the type check each a shell call of their own, with `timeoutMs` set above the default of 120000 (the limit is 600000); never chain them with the commit or `pr-open`.',
-        '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s".' % (j["issue"], j["issue"]),
+        '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s". The body also holds a section `## Asks` with one line per **Change** bullet of the issue, `ASK <n>: <file>:<line>`, where `git diff origin/dev...HEAD` does it. A Change bullet you cannot point to in that diff is not done: do it before pr-open. If a bullet has no hunk of its own (such as an ask that only forbids something), end with `BLOCKED: plan: ask <n> <why>` instead of pointing it at an unrelated line.' % (j["issue"], j["issue"]),
         '5. Leave the worktree open. It is closed after the merge by a sweep.',
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
@@ -534,6 +551,11 @@ class Dispatcher:
         self.parked_at, self.parked_set, self.parked_logged = None, set(), set()
         self.others, self.extra = list, dict
         self.store = ledger_store.Store(cfg["ledger_file"])
+        try:
+            self.store.claim(self.repo, self.home)
+        except ledger_store.Refused:
+            self.store.close()
+            raise
         self.weights = weights.load()
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
@@ -542,6 +564,7 @@ class Dispatcher:
         self.beat_line = ""
         del HEARD[:]
         self.resolver = resolver.Resolver(log, problem_brief)
+        self.machine = None
         self.renewal_unreadable = False
         self.connections = None
         self.plan_week_full = False
@@ -1313,13 +1336,32 @@ class Dispatcher:
         if branch != plan:
             return self.end(j, "returned", "plan: **Proven branch** names %s, not %s" % (branch, plan))
         try:
-            sha = json.loads(self.gh(["api", "repos/%s/git/ref/heads/%s" % (self.repo, plan)]))["object"]["sha"]
-        except (Error, ValueError, KeyError, TypeError):
-            return self.end(j, "returned", "plan: the proven branch %s is not on GitHub" % plan)
+            raw = self.gh(["api", "repos/%s/git/ref/heads/%s" % (self.repo, plan)])
+        except Error as e:
+            if "Not Found" in str(e):
+                return self.end(j, "returned", "plan: the proven branch %s is not on GitHub" % plan)
+            log(j["issue"], "the proven branch %s was not read, the job waits for the next beat: %s" % (plan, e))
+            return None
         try:
-            compare = json.loads(self.gh(["api", "repos/%s/compare/dev...%s" % (self.repo, sha), "--jq", "[.files[].filename]"]))
-        except (Error, ValueError, TypeError) as e:
-            return self.end(j, "returned", "plan: the proven branch %s cannot be compared with dev: %s" % (plan, e))
+            sha = json.loads(raw)["object"]["sha"]
+        except (ValueError, KeyError, TypeError) as e:
+            log(j["issue"], "the proven branch %s was not read, the job waits for the next beat: %s" % (plan, e))
+            return None
+        try:
+            cmp = json.loads(self.gh(["api", "repos/%s/compare/dev...%s" % (self.repo, sha), "--jq", PROVEN_COMPARE]))
+            if not isinstance(cmp, dict) or any(not isinstance(cmp.get(k), list) for k in ("files", "messages", "patches")):
+                raise ValueError("the compare answer is not a dict of files, messages and patches")
+        except (Error, ValueError) as e:
+            log(j["issue"], "the proven branch %s was not compared with dev, the job waits for the next beat: %s" % (plan, e))
+            return None
+        compare = cmp["files"]
+        workflow = [f for f in compare if re.search(factory.WF, f)]
+        if workflow:
+            return self.end(j, "returned", "plan: the proven branch changes workflow files, which are Rob's: %s" % ", ".join(workflow))
+        if any(re.search(r"co-authored-by|generated with", str(m), re.I) for m in cmp["messages"]):
+            return self.end(j, "returned", "plan: a commit of the proven branch %s has an AI trailer" % plan)
+        if any(factory.TOKEN_SHAPE.search(str(x)) for x in cmp["messages"] + cmp["patches"]):
+            return self.end(j, "returned", "plan: the proven branch %s holds the shape of a GitHub token" % plan)
         allowed = [p for p in j.get("paths") or []]
         outside = [f for f in compare if not any(f == p or f.startswith(p.rstrip("/") + "/") or fnmatch.fnmatchcase(f, p) for p in allowed)]
         if outside:
@@ -1328,7 +1370,11 @@ class Dispatcher:
         try:
             self.gh(["api", "-X", "POST", "repos/%s/git/refs" % self.repo, "-f", "ref=refs/heads/%s" % head, "-f", "sha=%s" % sha])
         except Error as e:
-            log(j["issue"], "ref %s not created, going on to the pull request: %s" % (head, e))
+            log(j["issue"], "branch %s not made, so it is moved to %s: %s" % (head, sha[:7], e))
+            try:
+                self.gh(["api", "-X", "PATCH", "repos/%s/git/refs/heads/%s" % (self.repo, head), "-f", "sha=%s" % sha, "-F", "force=true"])
+            except Error as e2:
+                return self.end(j, "blocked", "the branch %s could not be set to %s: %s" % (head, sha[:7], e2))
         notes = [
             "The change is the one pushed as `%s` at %s." % (plan, sha[:7]),
             "Proven on dev by the planner: the done-test failed there and passes at `%s`." % sha[:7],
@@ -1339,8 +1385,18 @@ class Dispatcher:
         ]
         sections = ["%s\n- %s" % (heading, note) for heading, note in zip(factory.PR_HEADS, notes)]
         body = "\n\n".join(["Job: %s#%s, chunk p" % (self.repo, j["issue"])] + sections + ["Closes #%s" % j["issue"]])
-        out = self.gh(["pr", "create", "-R", self.repo, "--base", "dev", "--head", head, "--title", "%s (#%s)" % (j["title"], j["issue"]), "--body", body])
-        pr = int(str(out).strip().rsplit("/", 1)[1])
+        try:
+            out = self.gh(["pr", "create", "-R", self.repo, "--base", "dev", "--head", head, "--title", "%s (#%s)" % (j["title"], j["issue"]), "--body", body])
+            found = re.search(r"/pull/(\d+)", str(out))
+            if not found:
+                raise Error("no pull request link in the answer: %s" % gist(out, 200))
+            pr = int(found.group(1))
+        except Error as e:
+            try:
+                listed = json.loads(self.gh(["pr", "list", "-R", self.repo, "--head", head, "--state", "open", "--json", "number"]))
+                pr = int(listed[0]["number"])
+            except (Error, ValueError, KeyError, IndexError, TypeError):
+                return self.end(j, "blocked", "the pull request from %s could not be opened: %s" % (head, e))
         log(j["issue"], "pull request #%s from the proven branch %s" % (pr, plan))
         self.to(j, "review_wait", "pull request #%s from the proven branch %s" % (pr, plan), pr=pr, proven=sha, head_branch=head)
 
@@ -1749,6 +1805,22 @@ class Dispatcher:
             return None
         return r.get("issue")
 
+    def dev_healed(self, sha, failed):
+        if not failed:
+            return None
+        try:
+            head = json.loads(self.gh(["api", "repos/%s/git/ref/heads/dev" % self.repo]))["object"]["sha"]
+            if head == sha:
+                return None
+            status = json.loads(self.gh(["api", "repos/%s/compare/%s...%s?per_page=1" % (self.repo, sha, head), "--jq", "{status}"])).get("status")
+            if status != "ahead":
+                return None
+            runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, head)])).get("workflow_runs") or []
+        except (Error, ValueError, KeyError, TypeError, AttributeError):
+            return None
+        passed = {r.get("workflow_id") for r in runs if r.get("conclusion") == "success"}
+        return head if checks_verdict(runs)[0] == "OK" and failed <= passed else None
+
     def dev_results(self):
         for j in self.jobs():
             if j["state"] != "merged" or not j.get("own_merge") or j.get("dev_result") in ("green", "unproved"):
@@ -1761,8 +1833,13 @@ class Dispatcher:
                 self.save(j, "merge commit %s" % sha[:7])
             runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["merge_sha"])])).get("workflow_runs") or []
             verdict, why = checks_verdict(runs)
+            failed = {r.get("workflow_id") for r in runs if r.get("conclusion") in ("failure", "timed_out")}
+            healed = self.dev_healed(j["merge_sha"], failed) if verdict == "FAIL" else None
             if verdict == "OK":
                 result = "green"
+            elif healed:
+                result, why = "green", "dev green again at %s, a later commit that contains this merge" % healed[:7]
+                j["dev_healed_by"] = healed
             elif verdict == "FAIL":
                 result = "red"
             elif j.get("dev_result") == "red":
@@ -2027,14 +2104,33 @@ class Dispatcher:
                     self.replan(j)
                 if j.get("errors"):
                     j["errors"] = 0
+                    j.pop("failing_since", None)
+                    j.pop("last_error", None)
                     self.save(j, "pass ok")
             except Exception as e:
                 clean = False
-                log(j["issue"], "%s: %s" % (j["state"], e if isinstance(e, Error) else type(e).__name__))
+                j["last_error"] = str(e) if isinstance(e, Error) else type(e).__name__
+                log(j["issue"], "%s: %s" % (j["state"], j["last_error"]))
                 j["errors"] = j.get("errors", 0) + 1
+                j.setdefault("failing_since", self.now())
                 self.save(j, "pass failed")
-                if j["errors"] >= 20 and j["state"] not in END:
-                    self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
+                if j["errors"] >= 20 and self.now() - j["failing_since"] >= FAIL_AFTER_S and j["state"] not in END:
+                    self.end(j, "failed", "20 passes in a row failed in state %s: %s" % (j["state"], j["last_error"]))
+        try:
+            p = machine.path()
+            self.machine = machine.read(self.now(), p) if p else None
+        except Exception as e:
+            clean = False
+            self.machine = None
+            log("-", "machine: %s" % type(e).__name__)
+        if self.machine is not None:
+            try:
+                self.own_readings = getattr(self, "own_readings", None) or machine.Own()
+                own_rows = self.own_readings.get(self.gh, self.repo, self.now(), os.environ.get("FACTORY_CODE_SHA"))
+                self.machine["readings"] = (self.machine["readings"] + own_rows)[-machine.MAX_READINGS:]
+            except Exception as e:
+                clean = False
+                log("-", "machine: %s" % type(e).__name__)
         heard, HEARD[:] = list(HEARD), []
         known = set(self.resolver.records(self, closed=True))
         try:
@@ -2143,6 +2239,12 @@ class Dispatcher:
                 log(f["issue"], "label fix: " + f["did"])
         except Exception as e:  # noqa: BLE001
             out["label_fixed_error"] = type(e).__name__
+        try:
+            out["gaps_closed"] = labelcheck.close_gaps(self.gh, self.repo, self.store, out["label_drift"], data)
+            for f in out["gaps_closed"]:
+                log(f["issue"], "gap issue: %s, keeps #%d" % (f["did"], f["keep"]))
+        except Exception as e:  # noqa: BLE001
+            out["gaps_closed_error"] = type(e).__name__
         return out
 
     def report_line(self):
@@ -2156,7 +2258,7 @@ class Dispatcher:
         try:
             snap = snapshot.build_snapshot(self.store, self.cfg, now, held, beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats),
-                                           plan=renewal.plan(self.connections, now))
+                                           plan=renewal.plan(self.connections, now), machine=self.machine)
             digest.alarm(self.store, snap.get("digest"), now)
             snap.update(self.extra())
             status = self.status(snap)
@@ -2224,7 +2326,8 @@ def main(argv=None):
         return 1
     if os.environ.get("FACTORY_START_CHECK") != "0" and ask_refresh(gh, cfg["repo"], set()):
         return REFRESH_EXIT
-    d = Dispatcher(cfg, account, gh)
+    import lines
+    d = lines.Lines(cfg, account, gh, mod=sys.modules[__name__])
     log("-", "dispatcher started: %d builders, %d reviewers, label %s, repo %s" % (
         len(pools.types(cfg).get("coder", {}).get("coworkers", [])), len(pools.types(cfg).get("reviewer", {}).get("coworkers", [])), cfg.get("label", "factory"), cfg["repo"]))
     if a.cmd == "once":

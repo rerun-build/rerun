@@ -96,4 +96,9 @@ describe('run labels', () => {
         expect(opts.calls[0]?.labels?.RERUN_JOB).toBe('rerun#7')
         expect(opts.calls[0]?.labels?.RERUN_BRANCH).toBe('job/7')
     })
+
+    it('reads the copy number from the run lineage', async () => {
+        await runWith('hello', { source: 'chat', lineage: { copyIndex: 2 } })
+        expect(opts.calls[0]?.labels?.RERUN_COPY).toBe('2')
+    })
 })

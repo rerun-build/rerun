@@ -113,6 +113,73 @@ class Fix(unittest.TestCase):
         self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [])
 
 
+class Gaps(unittest.TestCase):
+    DUP = {"duplicate_gaps": [{"parent": 5, "keep": 12, "older": [10, 11]}]}
+    KEPT = "**Part of**: #5\n**Repairs**: #7\n**Repairs**: #8\n"
+
+    def setUp(self):
+        Fix.setUp(self)
+        self.bodies = {12: self.KEPT, 10: "**Part of**: #5\n**Repairs**: #7\n", 11: "**Part of**: #5\n**Repairs**: none\n"}
+
+    def gh(self, args):
+        self.calls.append(args)
+        if args[:2] == ["issue", "view"]:
+            return json.dumps({"body": self.bodies.get(int(args[2]), "**Part of**: #5\n")})
+        return ""
+
+    def closes(self):
+        return [c for c in self.calls if c[:2] == ["issue", "close"]]
+
+    def run_twice(self, dup=None, d=None):
+        first = labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data())
+        return first, labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data())
+
+    def test_the_first_sight_is_a_dry_run_and_the_next_closes_once_as_not_planned(self):
+        first, second = self.run_twice()
+        self.assertEqual([x["did"] for x in first], ["would close", "would close"])
+        self.assertEqual([x["did"] for x in second], ["closed", "closed"])
+        c = self.closes()[0]
+        self.assertEqual(c[:5], ["issue", "close", "10", "-R", "o/r"])
+        self.assertEqual(c[c.index("--reason") + 1], "not planned")
+        self.assertIn("#12", " ".join(c))
+        self.assertEqual(labelcheck.close_gaps(self.gh, "o/r", self.s, self.DUP, data()), [])
+        self.assertEqual(len(self.closes()), 2)
+
+    def test_an_older_gap_issue_with_work_of_its_own_is_left_open(self):
+        d = data(jobs={"10": job("building", relabelled=False)}, kv={"plan:11": {"state": "cut"}})
+        self.assertEqual(self.run_twice(d=d), ([], []))
+        d = data(kv={"accept:10": {"state": "running"}, "plan:11": {"state": "planning"}})
+        self.assertEqual(self.run_twice(d=d), ([], []))
+        self.assertEqual(self.closes(), [])
+
+    def test_an_older_one_with_a_repair_the_newest_lacks_is_kept_open(self):
+        self.bodies[10] = "**Part of**: #5\n**Repairs**: #9\n"
+        first, second = self.run_twice()
+        self.assertEqual(first[0], {"issue": 10, "keep": 12, "did": "left open: it lists repairs #9 that #12 does not"})
+        self.assertNotIn(10, [x["issue"] for x in second if x["did"] == "closed"])
+        self.assertEqual([c[2] for c in self.closes()], ["11"])
+
+    def test_a_kept_issue_not_part_of_the_parent_closes_nothing(self):
+        self.bodies[12] = "**Repairs**: #7\n"
+        first, second = self.run_twice()
+        self.assertTrue(all(x["did"].startswith("left open: #12 does not say") for x in first))
+        self.assertEqual(self.closes(), [])
+
+    def test_a_new_kept_issue_or_a_busy_spell_means_a_fresh_dry_run(self):
+        labelcheck.close_gaps(self.gh, "o/r", self.s, self.DUP, data())
+        self.bodies[13] = self.KEPT
+        newer = {"duplicate_gaps": [{"parent": 5, "keep": 13, "older": [10, 11]}]}
+        self.assertEqual([x["did"] for x in labelcheck.close_gaps(self.gh, "o/r", self.s, newer, data())], ["would close"] * 2)
+        labelcheck.close_gaps(self.gh, "o/r", self.s, newer, data(kv={"plan:10": {"state": "planning"}, "plan:11": {"state": "planning"}}))
+        self.assertEqual([x["did"] for x in labelcheck.close_gaps(self.gh, "o/r", self.s, newer, data())], ["would close"] * 2)
+        self.assertEqual(self.closes(), [])
+
+    def test_work_is_capped_per_post(self):
+        dup = {"duplicate_gaps": [{"parent": 5, "keep": 12, "older": list(range(20, 40))}]}
+        first, second = self.run_twice(dup=dup)
+        self.assertEqual((len(first), len(second)), (labelcheck.FIXES, labelcheck.FIXES))
+
+
 class Read(unittest.TestCase):
     def test_reads_open_issues_with_labels_in_one_call(self):
         calls = []

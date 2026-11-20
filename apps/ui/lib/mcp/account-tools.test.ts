@@ -111,6 +111,35 @@ describe('send_message goal', () => {
     })
 })
 
+describe('send_message copyIndex', () => {
+    const actor = { kind: 'workspace', workspaceId: 7 } as never
+
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-own', contentLocked: false } as never)
+        vi.mocked(engineChat).mockResolvedValue(new Response('down', { status: 503 }))
+    })
+
+    it('hands the copy number to chat()', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi', copyIndex: 2 })).rejects.toThrow(/could not be reached/)
+        expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ copyIndex: 2 })
+    })
+
+    it('refuses 1.5 as invalid_copy_index without starting a run', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi', copyIndex: 1.5 })).rejects.toThrow(/invalid_copy_index/)
+        expect(engineChat).not.toHaveBeenCalled()
+    })
+
+    it('sends no copyIndex key without one', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi' })).rejects.toThrow(/could not be reached/)
+        expect(vi.mocked(engineChat).mock.calls[0][2]).not.toHaveProperty('copyIndex')
+    })
+
+    it('advertises copyIndex on send_message', () => {
+        expect(ACCOUNT_TOOL_DEFS.find(tool => tool.name === 'send_message')?.inputSchema.properties).toHaveProperty('copyIndex')
+    })
+})
+
 describe('send_message model and effort', () => {
     const actor = { kind: 'workspace', workspaceId: 7 } as never
 

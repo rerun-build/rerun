@@ -76,6 +76,11 @@ class Brief(unittest.TestCase):
         self.assertIn("```json\n" + json.dumps([{"run": "r1", "n": 1}], indent=1), self.text)
         self.assertIn("o/r", self.text)
 
+    def test_the_brief_asks_to_list_every_test_the_change_breaks(self):
+        self.assertIn("each test whose assertion the change breaks goes into Files", self.text)
+        self.assertGreater(self.text.index("each test whose assertion the change breaks goes into Files"),
+                           self.text.index("Filing rules:"))
+
     def test_the_brief_names_the_answer_form_the_culprits_and_the_last_lines(self):
         for c in causes.CULPRITS:
             self.assertIn(c, self.text)
@@ -83,6 +88,9 @@ class Brief(unittest.TestCase):
             self.assertIn(part, self.text)
         self.assertIn("The last line of your answer is exactly `CAUSES: <n> changes` or `CAUSES: none`", self.text)
         self.assertIn("CAUSES: <n> changes", self.text)
+
+    def test_the_brief_asks_for_one_change_bullet_per_branch(self):
+        self.assertIn("One Change bullet per branch", self.text.split("Filing rules:")[1])
 
     def test_the_brief_says_where_each_kind_of_change_is_filed(self):
         self.assertIn("**Cause**: <group>", self.text)

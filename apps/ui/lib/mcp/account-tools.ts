@@ -468,6 +468,7 @@ const AGENT_TOOL_DEFS = [
                 waitSeconds: { type: 'number', description: 'How long to wait for the answer. Default 120, max 600.' },
                 model: { type: 'string', minLength: 1, maxLength: 100, description: 'Model for this run only, inside the coworker\'s own provider.' },
                 thinkingLevel: { type: 'string', enum: ['low', 'medium', 'high'] },
+                copyIndex: { type: 'integer', minimum: 1, maximum: 64, description: 'Copy number of this run among parallel runs of the same coworker; the run sees it as RERUN_COPY.' },
                 contextSize: { type: 'string', enum: ['small', 'medium', 'large', 'off'], description: 'When this run compacts its context: small at 240k, medium at 480k, large at 940k tokens, off never. Default: the coworker\'s own setting, else small.' },
                 goal: {
                     type: 'object',

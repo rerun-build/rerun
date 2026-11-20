@@ -1,4 +1,4 @@
-import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, types, unittest
+import contextlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, time, types, unittest
 from unittest import mock
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -529,6 +529,89 @@ class PlanGate(FactoryCase):
             code, out, made = self.new(body, comments)
             self.assertEqual((code, made), (2, False), out)
             self.assertIn("cannot read", out)
+
+
+class PrOpenRetry(FactoryCase):
+    def setUp(self):
+        super().setUp()
+        self.body = os.path.join(self.tmp, "body.md")
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n")
+        self.creates = []
+        self.created_bodies = []
+
+    def pr_open(self, results):
+        pending = list(results)
+        path = self.wt("1572", "1")
+        self.commit(path, "notes.txt", "x\n")
+        git(path, "remote", "set-url", "origin", "https://github.com/" + FULL + ".git")
+        git(path, "remote", "set-url", "--push", "origin", self.origin)
+        issue = {"number": 1572, "body": "**Files**\n- `notes.txt`\n"}
+        real_run = F.run
+
+        def fake_run(cmd, *a, **k):
+            if cmd[0] == F.GH and cmd[1:2] == ["api"]:
+                return subprocess.CompletedProcess(cmd, 0, json.dumps(issue), "")
+            if cmd[:3] == [F.GH, "pr", "create"]:
+                self.creates.append(cmd)
+                with open(cmd[cmd.index("--body-file") + 1]) as f:
+                    self.created_bodies.append(f.read())
+                rc, out, err = pending.pop(0)
+                return subprocess.CompletedProcess(cmd, rc, out, err)
+            if cmd[0] == F.GH:
+                return subprocess.CompletedProcess(cmd, 0, "[]", "")
+            if cmd[:2] == [F.GIT, "fetch"]:
+                return subprocess.CompletedProcess(cmd, 0, "", "")
+            return real_run(cmd, *a, **k)
+
+        old = os.getcwd()
+        os.chdir(path)
+        self.addCleanup(os.chdir, old)
+        real_sleep, waits = time.sleep, []
+
+        def fake_sleep(seconds):
+            if sys._getframe(1).f_code.co_filename == F.__file__:
+                waits.append(seconds)
+            else:
+                real_sleep(seconds)
+
+        with mock.patch.object(F, "run", fake_run), mock.patch.object(F.time, "sleep", fake_sleep):
+            code, out = self.call(F.cmd_pr_open, ["--title", "T", "--body-file", self.body])
+        return code, out, waits
+
+    def test_pr_open_retries_when_github_says_submitted_too_quickly(self):
+        slow = (1, "", "GraphQL: was submitted too quickly (createPullRequest)")
+        code, out, sleeps = self.pr_open([slow, slow, (0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(self.creates), 3)
+        self.assertEqual(sleeps, [60, 120])
+        self.assertIn("PR https://github.com/x/y/pull/9", out)
+
+    def test_pr_open_gives_up_after_four_tries(self):
+        slow = (1, "", "was submitted too quickly on three tries")
+        code, out, sleeps = self.pr_open([slow] * 4)
+        self.assertEqual(code, 1, out)
+        self.assertEqual(len(self.creates), 4)
+        self.assertEqual(sleeps, [60, 120, 240])
+        self.assertIn("(tried 4 times over 7 minutes)", out)
+
+    def test_pr_open_adds_the_closes_line_when_the_body_lacks_it(self):
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n")
+        code, out, sleeps = self.pr_open([(0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.created_bodies[0].rstrip().endswith("Closes #1572"), self.created_bodies[0])
+
+    def test_pr_open_keeps_one_closes_line(self):
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n\nCloses #1572\n")
+        code, out, sleeps = self.pr_open([(0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(re.findall(r"(?mi)^Closes #1572\s*$", self.created_bodies[0])), 1, self.created_bodies[0])
+
+    def test_pr_open_other_failure_is_not_retried(self):
+        code, out, sleeps = self.pr_open([(1, "", "HTTP 422 Validation Failed")])
+        self.assertEqual(code, 1, out)
+        self.assertEqual(len(self.creates), 1)
+        self.assertEqual(sleeps, [])
+        self.assertNotIn("tried 4 times", out)
 
 
 if __name__ == "__main__":

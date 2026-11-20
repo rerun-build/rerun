@@ -48,7 +48,7 @@ def bar(jobs, fires, escaped, now):
     out = {}
     for name, span in (("day", 86400), ("week", 7 * 86400)):
         solved = [j for j in jobs if 0 <= now - j["merged_at"] <= span]
-        green = [j for j in solved if j.get("dev_result") == "green"]
+        green = [j for j in solved if j.get("dev_result") == "green" and not j.get("dev_healed_by")]
         window = [f for f in fires if 0 <= now - f["at"] <= span]
         tokens = sum(f.get("tokens") or 0 for f in window)
         units = sum(f.get("units") or 0 for f in window)

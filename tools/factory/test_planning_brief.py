@@ -39,11 +39,16 @@ class BriefTest(unittest.TestCase):
         self.assertTrue(self.text.endswith("or `BLOCKED: <one sentence>` when the issue cannot be cut."))
         self.assertIn("CUT: #a, #b", self.text)
 
+    def test_the_plan_brief_asks_for_every_ask_in_a_slice_or_out_of_scope(self):
+        text = planning.plan_brief(ISSUE, REPO)
+        self.assertIn("Number every ask of the issue", text)
+        self.assertIn("Does every numbered ask stand in a slice or under Out of scope?", text)
+
     def test_no_comments_rule(self):
         self.assertIn("add no comments in code", self.text)
 
     def test_length(self):
-        self.assertLess(len(self.text), 2700)
+        self.assertLess(len(self.text), 3200)
 
 
 if __name__ == "__main__":

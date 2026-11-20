@@ -3,10 +3,12 @@ import argparse, base64, json, os, signal, subprocess, sys, tempfile, threading,
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import applypatch as AP, batch as BT, checkout as CO, engine as E, evidence as EV, factory as F, ghclient as GH, intake as IN, limits as L, roster, publish as PB, followups as FU, readyq as RQ, store as S, testrun as TR, trigger as T, wake
+import applypatch as AP, batch as BT, checkout as CO, engine as E, evidence as EV, factory as F, ghclient as GH, intake as IN, limits as L, roster, publish as PB, followups as FU, readyq as RQ, repo_events as RE, store as S, testrun as TR, trigger as T, wake
 from publish import body as pr_body
 
 POLL_S = 30
+REPO_OVERLAP_S = 300
+REPO_LOOKBACK_S = 6 * 3600
 INBOX_NAME = "inbox"
 
 def log(msg):
@@ -152,7 +154,8 @@ class ChainFailed(Exception):
 
 
 class Runner:
-    def __init__(self, eng, st, cfg, tokens, clock=time.time, open_pr=lambda *a: None, evidence=None, issues=None, pr_by_head=None, compare_diff=None):
+    def __init__(self, eng, st, cfg, tokens, clock=time.time, open_pr=lambda *a: None, evidence=None, issues=None, pr_by_head=None, compare_diff=None, repo=None):
+        self.repo = repo
         self.open_pr, self.evidence, self.issues, self.pr_by_head, self.compare_diff = open_pr, evidence, issues, pr_by_head, compare_diff
         self.eng, self.st, self.cfg, self.tokens, self.clock = eng, st, cfg, tokens, clock
         self.by_slug = {e["slug"]: e for e in cfg["triggers"]}
@@ -167,6 +170,7 @@ class Runner:
             except (E.EngineError, T.TriggerError) as e:
                 log("read of run %s failed, will retry: %s" % (f["run_id"], e))
         self.see_merges()
+        self.see_repo()
         self.sweep_leases()
         self.start_queued()
         self.start_ready()
@@ -322,6 +326,47 @@ class Runner:
             if pr and pr["merged"]:
                 for c in done:
                     self.st.set_ready_state(job, c, "merged")
+
+    def see_repo(self):
+        if not self.repo:
+            return
+        now = self.clock()
+        at = iso(now)
+        kv = self.st.get_all("-")
+        last = kv.get("repo_since")
+        if last is None:
+            self.st.set("-", "repo_origin", at)
+            self.st.set("-", "repo_since", at)
+            return
+        floor = iso(now - REPO_LOOKBACK_S)
+        back = iso(L.ts(last) - REPO_OVERLAP_S)
+        since = max(kv.get("repo_origin", last), back, floor)
+        if since == floor and floor > back:
+            log("repository look-back cut to %s: events before it are not read" % since)
+        try:
+            branches = []
+            for b in RE.WATCHED:
+                sha = self.repo.branch_sha(b)
+                branches.append({"branch": b, "sha": sha, "ci": F.ci_state(self.repo.checks(sha))})
+            merged = self.repo.merged_prs("main", since) + self.repo.merged_prs("dev", since)
+            issues = self.repo.issues_since(since)
+            with open(os.path.join(HERE, "roster.json"), encoding="utf-8") as f:
+                ros = roster.load(f.read())
+        except (GH.GhError, OSError, KeyError, TypeError, ValueError) as e:
+            log("repository look failed, cursor kept at %s: %s: %s" % (last, type(e).__name__, e))
+            return
+        self.st.db.execute("BEGIN IMMEDIATE")
+        try:
+            got = RE.wakes(self.st, ros, branches, merged, issues)
+            for w in got:
+                self.st.enqueue(w["job"], w["stage"], "", w["payload"])
+            self.st.set("-", "repo_since", at)
+            self.st.db.execute("COMMIT")
+        except BaseException:
+            self.st.db.execute("ROLLBACK")
+            raise
+        if got:
+            log("repository look queued %s" % ", ".join("%s %s" % (w["stage"], w["job"]) for w in got))
 
     def requeue(self, f):
         if f["chunk"]:
@@ -485,7 +530,7 @@ def build(cfg=None, eng=None, clock=time.time, gh=None):
     eng = eng or E.Engine()
     tokens = T.ensure_triggers(eng, cfg)
     st = S.Store(store_path(cfg))
-    return Runner(eng, st, cfg, tokens, clock, open_pr=gh.open_pr, issues=gh, pr_by_head=lambda b: gh.pr_by_head(b), compare_diff=getattr(gh, "compare_diff", None), evidence=lambda f: stage_evidence(gh, st, f))
+    return Runner(eng, st, cfg, tokens, clock, open_pr=gh.open_pr, issues=gh, pr_by_head=lambda b: gh.pr_by_head(b), compare_diff=getattr(gh, "compare_diff", None), evidence=lambda f: stage_evidence(gh, st, f), repo=gh if cfg.get("repo_events") else None)
 
 def unmerged_receipts(st, job):
     merged = {c for (c,) in st.db.execute("SELECT chunk FROM ready_chunks WHERE job=? AND state='merged'", (job,))}

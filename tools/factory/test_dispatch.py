@@ -36,6 +36,8 @@ class World:
         self.open_prs = []
         self.branches = {}
         self.compare_files = []
+        self.compare_messages, self.compare_patches = [], []
+        self.ref_exists, self.patch_error, self.pr_create_error, self.ref_error = False, None, None, None
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
@@ -217,15 +219,25 @@ class World:
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
         if a[0] == "api" and "/compare/dev..." in a[1]:
-            return json.dumps(self.compare_files)
+            return json.dumps({"files": self.compare_files, "messages": self.compare_messages, "patches": self.compare_patches})
         if a[0] == "api" and "/git/ref/heads/" in a[1]:
+            if self.ref_error:
+                raise D.Error(self.ref_error)
             name = a[1].split("/git/ref/heads/", 1)[1]
             if name not in self.branches:
                 raise D.Error("gh api failed: exit 1: Not Found")
             return json.dumps({"object": {"sha": self.branches[name]}})
         if a[0] == "api" and "-X" in a and a[a.index("-X") + 1] == "POST" and any(x.endswith("/git/refs") for x in a):
+            if self.ref_exists:
+                raise D.Error("gh api failed: exit 1: Reference already exists")
+            return "{}"
+        if a[0] == "api" and "-X" in a and a[a.index("-X") + 1] == "PATCH" and any("/git/refs/heads/" in x for x in a):
+            if self.patch_error:
+                raise D.Error(self.patch_error)
             return "{}"
         if a[:2] == ["pr", "create"]:
+            if self.pr_create_error:
+                raise D.Error(self.pr_create_error)
             return "https://github.com/o/r/pull/42"
         if a[0] == "api" and "/compare/" in a[1]:
             return "[]"
@@ -1011,7 +1023,9 @@ class Hardening(Base):
     def test_a_read_that_keeps_failing_ends_the_job(self):
         self.tick()
         self.w.runs.clear()
-        self.tick(20)
+        self.tick(19)
+        self.w.clock += D.FAIL_AFTER_S
+        self.tick()
         self.assertEqual(self.state(), "failed")
 
 
@@ -1140,7 +1154,7 @@ class Heartbeat(Base):
         self.assertEqual(line, "1970-01-01T00:16:40Z beat 2 | waiting 1, queued 0, building 1, review_wait 0, reviewing 0, "
                                "fix_wait 0, fixing 0, checks 0, proof_wait 0, proving 0 | ended today: merged 1, blocked 0, failed 0, returned 0,"
                                " rejected 0 | by type: coder ready 0 running 1 waiting 1, reviewer ready 0 running 0 waiting 0, "
-                               "researcher ready 0 running 0 waiting 0, designer ready 0 running 0 waiting 0 | features: none | "
+                               "researcher ready 0 running 0 waiting 0, designer ready 0 running 0 waiting 0, security ready 0 running 0 waiting 0, data ready 0 running 0 waiting 0, contracts ready 0 running 0 waiting 0 | features: none | "
                                "unreadable 0, dead waits 0 | problems 0 open, 0 owner")
         self.assertIn(line, self.out.getvalue().splitlines())
         
