@@ -126,6 +126,56 @@ class Beat(Base):
         self.assertNotIn("machine", self.w.reports[-1]["digest"])
 
 
+class Alarm(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        self.p = os.path.join(self.dir.name, "machine.json")
+
+    def test_a_fresh_file_or_no_setting_gives_no_alarm_and_a_bad_or_stale_one_names_it(self):
+        self.assertEqual(machine.alarm(None), {})
+        self.assertEqual(machine.alarm(machine.read(NOW, put(self.p, json.dumps(DOC), 60))), {})
+        missing = machine.alarm(machine.read(NOW, os.path.join(self.dir.name, "none")))
+        self.assertTrue(missing["keeper silent"].startswith("no keeper file: keeper file missing."))
+        put(self.p, json.dumps(DOC), 901)
+        stale = machine.alarm(machine.read(NOW, self.p))
+        self.assertTrue(stale["keeper silent"].startswith("keeper file made 2026-11-19T10:00:00Z, older than 900 s"))
+        self.assertEqual(machine.alarm(machine.read(NOW + 300, self.p)), stale)
+
+
+class Silent(Base):
+    def setUp(self):
+        super().setUp()
+        self.w.report_answer = {}
+        self.p = os.path.join(self.dir.name, "machine.json")
+        cw = lambda ids: [{"id": i, "name": i.upper(), "runs": 1} for i in ids]
+        self.cfg["types"] = {"coder": {"max_jobs": 8, "coworkers": cw(["b1", "b2"])}, "reviewer": {"coworkers": cw(["r1", "r2"])},
+                             "resolver": {"coworkers": [{"id": "h1", "name": "HOUSE", "runs": 2}]}}
+        self.cfg["resolver"] = {"detect": True, "resolve": True}
+        env = mock.patch.dict(os.environ, {machine.ENV: self.p})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def test_a_stale_file_opens_keeper_silent_once_never_sends_it_and_fresh_closes_it(self):
+        put(self.p, json.dumps(DOC), 901, self.w.clock)
+        self.tick(12)
+        [p] = [p for p in self.w.problems if p["title"] == "Factory problem: keeper silent"]
+        self.assertEqual(self.w.edits(p["number"]), [])
+        self.assertEqual(self.d.resolver.records(self.d)["keeper silent"]["state"], "notice")
+        self.assertEqual([a for a, _, _ in self.w.sends if a == "h1"], [])
+        self.assertEqual(self.d.resolver.waiting(self.d), 0)
+        put(self.p, json.dumps(DOC), 60, self.w.clock)
+        self.tick(2)
+        self.assertEqual(p["state"], "OPEN")
+        self.tick()
+        self.assertEqual(p["state"], "CLOSED")
+
+    def test_without_the_keeper_setting_no_keeper_problem_opens(self):
+        os.environ.pop(machine.ENV)
+        self.tick(3)
+        self.assertEqual([p for p in self.w.problems if "keeper" in p["title"]], [])
+
+
 class Compose(unittest.TestCase):
     def test_the_dispatcher_mounts_the_keeper_folder_read_only_and_names_the_file(self):
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "deploy", "vps", "factory-dispatcher.yml")) as f:
