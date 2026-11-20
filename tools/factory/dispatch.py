@@ -49,6 +49,7 @@ import waits
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WAIT_S = 1
+FAIL_AFTER_S = 7200
 RUNNING = states.RUNNING
 END = states.END
 BACK = states.BACK
@@ -2028,14 +2029,18 @@ class Dispatcher:
                     self.replan(j)
                 if j.get("errors"):
                     j["errors"] = 0
+                    j.pop("failing_since", None)
+                    j.pop("last_error", None)
                     self.save(j, "pass ok")
             except Exception as e:
                 clean = False
-                log(j["issue"], "%s: %s" % (j["state"], e if isinstance(e, Error) else type(e).__name__))
+                j["last_error"] = str(e) if isinstance(e, Error) else type(e).__name__
+                log(j["issue"], "%s: %s" % (j["state"], j["last_error"]))
                 j["errors"] = j.get("errors", 0) + 1
+                j.setdefault("failing_since", self.now())
                 self.save(j, "pass failed")
-                if j["errors"] >= 20 and j["state"] not in END:
-                    self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
+                if j["errors"] >= 20 and self.now() - j["failing_since"] >= FAIL_AFTER_S and j["state"] not in END:
+                    self.end(j, "failed", "20 passes in a row failed in state %s: %s" % (j["state"], j["last_error"]))
         try:
             p = machine.path()
             self.machine = machine.read(self.now(), p) if p else None

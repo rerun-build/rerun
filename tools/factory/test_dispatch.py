@@ -1011,7 +1011,9 @@ class Hardening(Base):
     def test_a_read_that_keeps_failing_ends_the_job(self):
         self.tick()
         self.w.runs.clear()
-        self.tick(20)
+        self.tick(19)
+        self.w.clock += D.FAIL_AFTER_S
+        self.tick()
         self.assertEqual(self.state(), "failed")
 
 
