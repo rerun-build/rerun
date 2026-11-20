@@ -197,7 +197,7 @@ def _run_stats(store, now):
             "avgRunS": round(sum(took) / len(took), 1) if took else None}
 
 
-def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planning=None, plan=None):
+def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planning=None, plan=None, machine=None):
     names = pools.names(cfg)
     all_jobs = store.jobs()
     live = [j for j in all_jobs if j["state"] not in END]
@@ -223,6 +223,9 @@ def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planni
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
             "endedToday": ended_today, "epics": _epics(store, kept, read_epic),
             "digest": digest.build(store, cfg, now, plan=plan), "runStats": _run_stats(store, now)}
+    if machine is not None:
+        snap["machine"] = machine
+        snap["digest"]["machine"] = machine
     if plan:
         snap["plan"] = plan
     if planning:
