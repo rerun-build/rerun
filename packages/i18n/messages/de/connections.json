@@ -208,7 +208,10 @@
         "count": "{on} von {total}",
         "availableEmpty": "Zieh ein Modell hierher, damit Coworker es nutzen können.",
         "hidden": "Ausgeschaltet",
-        "hiddenEmpty": "Zieh ein Modell hierher, um es von Coworkern fernzuhalten."
+        "hiddenEmpty": "Zieh ein Modell hierher, um es von Coworkern fernzuhalten.",
+        "search": "Modelle suchen",
+        "matches": "{count, plural, one {# Treffer} other {# Treffer}}",
+        "noMatch": "Kein Modell passt zu „{query}“."
     },
     "opencode": {
         "goTitle": "In OpenCode Go enthalten",

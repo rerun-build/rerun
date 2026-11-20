@@ -280,7 +280,10 @@
         "count": "{on} of {total}",
         "availableEmpty": "Drag a model here so coworkers can use it.",
         "hidden": "Turned off",
-        "hiddenEmpty": "Drag a model here to keep coworkers off it."
+        "hiddenEmpty": "Drag a model here to keep coworkers off it.",
+        "search": "Search models",
+        "matches": "{count, plural, one {# match} other {# matches}}",
+        "noMatch": "No model matches “{query}”."
     },
     "opencode": {
         "goTitle": "Included in OpenCode Go",
