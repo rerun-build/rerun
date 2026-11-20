@@ -1,6 +1,7 @@
 import json
 import re
 
+import authors
 import cutshape
 import escapes
 import labelcheck
@@ -35,6 +36,8 @@ def due(jobs):
 def plan(comments):
     found = None
     for c in comments:
+        if not authors.trusted_author(c):
+            continue
         body = c.get("body") or ""
         if body.startswith("## Plan"):
             found = body

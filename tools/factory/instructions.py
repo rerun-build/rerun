@@ -2,6 +2,7 @@ import hashlib
 import json
 import re
 
+import authors
 import pools
 
 FORMS = ({"prefix": "VERDICT: ", "rest": "sentence"},)
@@ -159,9 +160,11 @@ class Station:
 
     def intake(self, busy):
         found = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", "instructions", "--state", "open",
-                                    "--json", "number,title,body", "--limit", "20"]))
+                                    "--json", "number,title,body,author", "--limit", "20"]))
         records = self.records()
         for issue in sorted(found, key=lambda i: i["number"]):
+            if not authors.trusted_author(issue) and "author" in issue:
+                continue
             n = issue["number"]
             if records.get(n, {}).get("state") not in (None, "unsent"):
                 continue

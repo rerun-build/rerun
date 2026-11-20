@@ -3,6 +3,7 @@ import argparse, datetime, fnmatch, hashlib, json, os, re, signal, subprocess, s
 import acceptance
 import affinity
 import apptoken
+import authors
 import backlog
 import briefs
 import causes
@@ -804,9 +805,9 @@ class Dispatcher:
         if all(r <= 0 for r in rooms.values()):
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
-                                     "--json", "number,title,labels,body", "--limit", "100"]))
+                                     "--json", "number,title,labels,body,author", "--limit", "100"]))
         paused = {i["number"] for i in issues if PAUSED in {x.get("name") for x in i.get("labels") or [] if isinstance(x, dict)}}
-        issues = [i for i in issues if i["number"] not in paused]
+        issues = [i for i in issues if i["number"] not in paused and (authors.trusted_author(i) or "author" not in i)]
         for i in issues:
             old = self.store.get_job(str(i["number"]))
             if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):

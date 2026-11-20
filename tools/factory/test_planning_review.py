@@ -55,7 +55,7 @@ class Station(Base):
                 return "https://github.com/o/r/issues/%d\n" % n
             if args[:2] == ["issue", "view"] and int(args[2]) in self.questions:
                 q = self.questions[int(args[2])]
-                return json.dumps({"state": q["state"], "comments": [{"body": c} for c in q["comments"]]})
+                return json.dumps({"state": q["state"], "comments": [{"body": c, "author": {"login": "special-place-administrator"}} for c in q["comments"]]})
             if args[:2] == ["issue", "view"] and "--json" in args and "number" in args[args.index("--json") + 1]:
                 return json.dumps({"number": int(args[2]), "title": "c", "body": self.child_body, "labels": []})
             if args[0] == "api" and "/compare/" in args[1]:
@@ -227,9 +227,8 @@ class Ask(Station):
 
     def test_own_words_and_no_answer_are_both_read(self):
         q = {"issue": 7, "options": ["a", "b"]}
-        self.assertEqual(planning.answer_of(q, {"comments": [{"body": "ANSWER: only on weekdays"}]}), "#7: in his own words, only on weekdays")
+        self.assertEqual(planning.answer_of(q, {"comments": [{"body": "ANSWER: only on weekdays", "author": {"login": "special-place-administrator"}}]}), "#7: in his own words, only on weekdays")
         self.assertIn("it is not his decision", planning.answer_of(q, {"comments": []}))
-
 
 class Repair(Station):
     BAD = BODY.replace("true", "python3 -m pytest tools/factory/test_x.py")

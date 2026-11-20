@@ -199,7 +199,7 @@ class World:
         if a[:2] == ["issue", "view"]:
             i = self.issue(a[2])
             return json.dumps({"title": i.get("title", ""), "state": i.get("state", "OPEN"), "body": i["body"],
-                               "comments": [{"body": c} for c in i["comments"]]})
+                               "comments": [{"body": c, "author": {"login": "special-place-administrator"}} for c in i["comments"]]})
         if a[:2] == ["issue", "close"]:
             self.closed.append((int(a[2]), a[a.index("--comment") + 1]))
             for i in self.issues:

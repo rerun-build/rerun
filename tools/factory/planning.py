@@ -4,6 +4,7 @@ import hashlib
 import json
 import re
 
+import authors
 import cutshape
 import handover
 import notes
@@ -274,6 +275,8 @@ def question_issue(parent, note):
 def answer_of(question, view):
     options = question.get("options") or []
     for c in reversed(view.get("comments") or []):
+        if not authors.is_rob(c):
+            continue
         found = ANSWER.findall(c.get("body") or "")
         if not found:
             continue
@@ -779,9 +782,9 @@ class Station:
 
     def latest_plan(self, n):
         view = json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,body,comments"]))
-        plans = [c.get("body") or "" for c in view.get("comments", []) if (c.get("body") or "").startswith("## Plan")]
+        plans = [c.get("body") or "" for c in view.get("comments", [])
+                 if authors.trusted_author(c) and (c.get("body") or "").startswith("## Plan")]
         return plans[-1] if plans else None
-
     def free_critic(self, r):
         kind = r.get("type", "planner")
         t = pools.types(self.cfg).get(kind)
@@ -1174,7 +1177,8 @@ class Station:
         if queued >= self.cfg.get("planning", {}).get("max_queue", MAX_QUEUE):
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
-                                     "number,title,labels,createdAt", "--limit", "1000"]))
+                                     "number,title,labels,createdAt,author", "--limit", "1000"]))
+        issues = [i for i in issues if authors.trusted_author(i) or "author" not in i]
         records = self.records()
         held = bool(self.cfg.get("held") or self.cfg.get("held_plan"))
         if held != self.held:

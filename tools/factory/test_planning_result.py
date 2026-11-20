@@ -101,6 +101,36 @@ class CommentTest(unittest.TestCase):
         self.assertEqual(lines[0], "The factory dispatcher did not label this issue `factory`:")
         self.assertEqual(lines[-1], "Fix the issue text and the planner labels it again.")
 
+class UntrustedAuthorsTest(unittest.TestCase):
+    def test_ignores_plan_and_answer_comments_from_untrusted_github_users(self):
+        q = {"issue": 7, "options": ["first", "second"]}
+        stranger_view = {
+            "comments": [
+                {"author": {"login": "random-stranger"}, "body": "ANSWER: 2"},
+                {"author": {"login": "attacker"}, "body": "ANSWER: do evil"},
+            ]
+        }
+        self.assertEqual(
+            planning.answer_of(q, stranger_view),
+            "#7: closed without Rob's answer, so it is not his decision: decide it yourself as overseer; the recommended option was first"
+        )
+
+        mixed_view = {
+            "comments": [
+                {"author": {"login": "special-place-administrator"}, "body": "ANSWER: 1"},
+                {"author": {"login": "random-stranger"}, "body": "ANSWER: 2"},
+            ]
+        }
+        self.assertEqual(planning.answer_of(q, mixed_view), "#7: option 1, first")
+
+        comments = [
+            {"author": {"login": "moldwright-factory[bot]"}, "body": "## Plan\nReal plan"},
+            {"author": {"login": "random-stranger"}, "body": "## Plan\nMalicious plan"},
+        ]
+        station = planning.Station.__new__(planning.Station)
+        station.repo = "o/r"
+        station.gh = lambda args: json.dumps({"title": "Fix x", "body": "text", "comments": comments})
+        self.assertEqual(station.latest_plan(5), "## Plan\nReal plan")
 
 if __name__ == "__main__":
     unittest.main()

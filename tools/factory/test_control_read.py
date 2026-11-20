@@ -76,7 +76,7 @@ class Read(unittest.TestCase):
         self.control(gh).tick(1)
         self.assertEqual(gh.calls, [[
             "issue", "list", "-R", "o/r", "--state", "open", "--search", "Factory control in:title",
-            "--json", "number,title,body", "--limit", "20",
+            "--json", "number,title,body,author", "--limit", "20",
         ]])
         self.assertEqual(runs(self.cfg), {"code": 6, "LARRY": 1, "LINUS": 3})
         self.assertEqual(self.store.events(), [])
@@ -101,6 +101,14 @@ class Read(unittest.TestCase):
 
     def test_an_issue_with_another_title_is_ignored(self):
         gh = Fake([self.row({"copies": {"code": 4}}, title="Factory controls"), {"number": 3, "body": "x"}])
+        self.control(gh).tick(1)
+        self.assertEqual(runs(self.cfg), {"code": 6, "LARRY": 1, "LINUS": 3})
+        self.assertEqual(self.store.events(), [])
+        self.assertEqual(gh.comments(), [])
+
+    def test_an_issue_by_an_untrusted_author_is_ignored(self):
+        r = dict(self.row({"copies": {"code": 4}}), author={"login": "random-stranger"})
+        gh = Fake([r])
         self.control(gh).tick(1)
         self.assertEqual(runs(self.cfg), {"code": 6, "LARRY": 1, "LINUS": 3})
         self.assertEqual(self.store.events(), [])

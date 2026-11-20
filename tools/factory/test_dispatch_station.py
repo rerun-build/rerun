@@ -5,8 +5,8 @@ from test_dispatch import World
 
 BOSS = "39311ebf-8324-42a4-8ab4-770acd1653f2"
 PLANNER = {"coworkers": [{"id": BOSS, "name": "Boss", "runs": 1}]}
-BACKLOG = [{"number": 40, "title": "Floor", "labels": [{"name": "P1"}], "createdAt": "2026-11-15T02:00:00Z"},
-           {"number": 41, "title": "Crash", "labels": [{"name": "bug"}], "createdAt": "2026-11-15T02:01:00Z"}]
+BACKLOG = [{"number": 40, "title": "Floor", "labels": [{"name": "P1"}], "createdAt": "2026-11-15T02:00:00Z", "author": {"login": "special-place-administrator"}},
+           {"number": 41, "title": "Crash", "labels": [{"name": "bug"}], "createdAt": "2026-11-15T02:01:00Z", "author": {"login": "special-place-administrator"}}]
 
 
 class StationWorld(World):
@@ -20,7 +20,7 @@ class StationWorld(World):
 
     def gh(self, args):
         a = list(args)
-        if a[:2] == ["issue", "list"] and "--json" in a and a[a.index("--json") + 1] == "number,title,labels,createdAt":
+        if a[:2] == ["issue", "list"] and "--json" in a and a[a.index("--json") + 1] in ("number,title,labels,createdAt", "number,title,labels,createdAt,author"):
             self.gh_calls.append(a)
             return json.dumps(BACKLOG)
         if a[:2] == ["issue", "list"] and "--search" in a:

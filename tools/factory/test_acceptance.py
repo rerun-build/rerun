@@ -32,11 +32,22 @@ class DueTests(unittest.TestCase):
 
 class PlanTests(unittest.TestCase):
     def test_plan_reads_the_latest_plan_comment(self):
-        cs = [{"body": "## Plan\nold"}, {"body": "chatter"}, {"body": "## Plan\nnew"}, {"body": "later chatter"}]
+        cs = [{"body": "## Plan\nold", "author": {"login": "special-place-administrator"}},
+              {"body": "chatter", "author": {"login": "special-place-administrator"}},
+              {"body": "## Plan\nnew", "author": {"login": "moldwright-factory[bot]"}},
+              {"body": "later chatter", "author": {"login": "special-place-administrator"}}]
         self.assertEqual(acceptance.plan(cs), "## Plan\nnew")
-        self.assertIsNone(acceptance.plan([{"body": "x"}]))
+        self.assertIsNone(acceptance.plan([{"body": "x", "author": {"login": "special-place-administrator"}}]))
         self.assertIsNone(acceptance.plan([]))
 
+    def test_ignores_plan_comments_from_untrusted_github_users(self):
+        comments = [
+            {"author": {"login": "moldwright-factory[bot]"}, "body": "## Plan\nReal plan"},
+            {"author": {"login": "random-stranger"}, "body": "## Plan\nMalicious plan"},
+        ]
+        self.assertEqual(acceptance.plan(comments), "## Plan\nReal plan")
+        stranger_only = [{"author": {"login": "random-stranger"}, "body": "## Plan\nMalicious plan"}]
+        self.assertIsNone(acceptance.plan(stranger_only))
 
 class BriefTests(unittest.TestCase):
     def text(self, plan_text="## Plan\nstep"):
