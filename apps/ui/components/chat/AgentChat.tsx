@@ -226,7 +226,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         () =>
             new DefaultChatTransport({
                 api: '/api/chat',
-                body: () => ({ agentId, sessionId: sessionIdRef.current, connectionId: modelSelectionRef.current.connectionId, model: modelSelectionRef.current.model, ...bodyRef.current }),
+                body: () => ({ agentId, sessionId: sessionIdRef.current, connectionId: modelSelectionRef.current.connectionId, model: modelSelectionRef.current.model, effort: modelSelectionRef.current.effort, ...bodyRef.current }),
                 // Send the message being posted, never the transcript: the engine holds the
                 // conversation, and a research session's tool outputs alone blow past the 10MB
                 // body cap the Next proxy enforces on /api/chat.

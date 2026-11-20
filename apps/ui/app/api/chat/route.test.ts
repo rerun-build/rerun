@@ -121,6 +121,22 @@ describe('POST /api/chat', () => {
         expect(vi.mocked(engine.chat).mock.calls[0][2]).toMatchObject({ callableAgentIds: ['engine-agent', 'engine-other'] })
     })
 
+    it('hands the engine the reasoning effort picked with the model, and drops one it does not know', async () => {
+        vi.mocked(engine.chat).mockImplementation(async () => streaming('run-4'))
+
+        await settle(POST(request({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'high' })))
+        await settle(POST(request({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: null })))
+        await settle(POST(request({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'extreme' })))
+        await settle(POST(request({})))
+
+        const sent = vi.mocked(engine.chat).mock.calls.map(call => call[2])
+        expect(sent[0]).toMatchObject({ model: 'claude-opus-5-5', effort: 'high' })
+        expect(sent[1]).toMatchObject({ effort: null })
+        expect(sent[2].effort).toBeUndefined()
+        // Nothing picked: the body the engine gets is the one it got before the setting existed.
+        expect(JSON.parse(JSON.stringify(sent[3]))).not.toHaveProperty('effort')
+    })
+
     it('refuses the send when what the author reaches cannot be read, rather than opening every coworker', async () => {
         vi.mocked(callableEngineAgentIds).mockRejectedValue(new Error('database down'))
 

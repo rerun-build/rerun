@@ -14,7 +14,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, SESSION_NOT_FOUND, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, SESSION_NOT_FOUND, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -22,6 +22,7 @@ type ChatRequestBody = {
     text?: unknown
     connectionId?: string
     model?: string
+    effort?: unknown
     source?: SessionSource
     queued?: boolean
     // `general` opens the coworker's main conversation when no `sessionId` names it yet. Read only
@@ -67,6 +68,9 @@ export async function POST(request: Request) {
     }
 
     const { agentId, connectionId, model, source, queued } = body
+    // A level this hub does not know is dropped rather than refused: the message still goes, on the
+    // coworker's own effort.
+    const effort = reasoningEffortSchema.nullable().optional().catch(undefined).parse(body.effort)
     let { sessionId } = body
 
     if (typeof agentId !== 'string') {
@@ -134,7 +138,7 @@ export async function POST(request: Request) {
     for (let attempt = 0; attempt < 2; attempt++) {
         try {
             console.log(`[CHAT START] agent=${agentId} session=${sessionId ?? '(new)'} inputLength=${text.length}${queued ? ' queued' : ''}`)
-            engineRes = await startChat(target.conn, target.engineAgentId, { sessionId: engineSessionId, message: text, connectionId, model, source, author, callableAgentIds: await callablePromise, install: !!install && !sessionId, userLanguage: install && !sessionId ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            engineRes = await startChat(target.conn, target.engineAgentId, { sessionId: engineSessionId, message: text, connectionId, model, effort, source, author, callableAgentIds: await callablePromise, install: !!install && !sessionId, userLanguage: install && !sessionId ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             return Response.json({ error: `Engine error: ${err instanceof Error ? err.message : 'Failed to start chat'}` }, { status: 502 })
         }

@@ -76,7 +76,7 @@ import type { TableListResult } from '@/lib/data/source'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
-import type { CoworkerLook, StatsQuery, UsageTimeRange } from '@rerun/contracts'
+import type { CoworkerLook, ReasoningEffort, StatsQuery, UsageTimeRange } from '@rerun/contracts'
 import { coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
 import { engineSessionOf } from '@/lib/foreman/conversation'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
@@ -232,8 +232,9 @@ export async function getAgentKeysAction(agentId: string): Promise<{ keys: strin
 // `connectionId` / `model` are the pin the agent carries, null when it picked nothing and follows
 // the Box default. `resolved*` is what the engine would actually run it on, which is the pin when
 // there is one and the Box default otherwise. `loaded` keeps "the fetch failed" apart from
-// "this agent chose nothing": both leave the pin null and they are not the same state.
-export type ModelSelectorContext = { connectionId: string | null; model: string | null; resolvedConnectionId: string | null; resolvedModel: string | null; loaded: boolean }
+// "this agent chose nothing": both leave the pin null and they are not the same state. `effort` goes
+// with the pinned model, null on the provider's default.
+export type ModelSelectorContext = { connectionId: string | null; model: string | null; effort: ReasoningEffort | null; resolvedConnectionId: string | null; resolvedModel: string | null; loaded: boolean }
 
 // The guided-setup state the chat needs before it can decide between the composer and the
 // install button. An engine that cannot be reached, or one too old to know about INSTALL.md,
@@ -255,6 +256,7 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
             model: {
                 connectionId: detail.config.connectionId ?? null,
                 model: detail.config.model ?? null,
+                effort: detail.config.effort ?? null,
                 resolvedConnectionId: detail.resolvedConnectionId ?? null,
                 resolvedModel: detail.resolvedModel ?? null,
                 loaded: true,
@@ -270,7 +272,7 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
                       },
         }
     } catch {
-        return { model: { connectionId: null, model: null, resolvedConnectionId: null, resolvedModel: null, loaded: false }, setup: null }
+        return { model: { connectionId: null, model: null, effort: null, resolvedConnectionId: null, resolvedModel: null, loaded: false }, setup: null }
     }
 }
 

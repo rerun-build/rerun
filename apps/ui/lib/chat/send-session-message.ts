@@ -13,7 +13,7 @@ export async function sendSessionMessage({ agentId, sessionId, text, model }: Se
         const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ agentId, sessionId, text, connectionId: model?.connectionId, model: model?.model, queued: true }),
+            body: JSON.stringify({ agentId, sessionId, text, connectionId: model?.connectionId, model: model?.model, effort: model?.effort, queued: true }),
         })
         await res.body?.cancel().catch(() => {})
         if (res.ok) return 'sent'
@@ -29,7 +29,7 @@ export async function sendForemanThreadMessage({ sessionId, text, model }: Omit<
         const res = await fetch('/api/chat/foreman/engine', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId, kind: 'thread', text, connectionId: model?.connectionId, model: model?.model, queued: true }),
+            body: JSON.stringify({ sessionId, kind: 'thread', text, connectionId: model?.connectionId, model: model?.model, effort: model?.effort, queued: true }),
         })
         await res.body?.cancel().catch(() => {})
         if (res.ok) return 'sent'

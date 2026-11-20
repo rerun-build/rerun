@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type SessionKind } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, reasoningEffortSchema, type SessionKind } from '@rerun/contracts'
 
 import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
@@ -24,7 +24,7 @@ import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
 // does for an agent. The model is picked as
 // for an agent, a Claude or Codex subscription included, which the hub cannot reach.
 
-type EngineForemanBody = { sessionId?: unknown; text?: unknown; connectionId?: unknown; model?: unknown; queued?: unknown; kind?: unknown }
+type EngineForemanBody = { sessionId?: unknown; text?: unknown; connectionId?: unknown; model?: unknown; effort?: unknown; queued?: unknown; kind?: unknown }
 
 // `X-Session-Id` is the conversation the message landed in: the one the client named, unless it
 // opened a General that another tab had opened a moment before.
@@ -72,6 +72,7 @@ export async function POST(req: Request): Promise<Response> {
     embedTextShared(ctx.workspace.id, text).catch(() => {})
     const connectionId = typeof body.connectionId === 'string' ? body.connectionId : undefined
     const model = typeof body.model === 'string' ? body.model : undefined
+    const effort = reasoningEffortSchema.nullable().optional().catch(undefined).parse(body.effort)
     const queued = body.queued === true
 
     // The zone only helps the Chief of Staff: a request it cannot be read from still sends.
@@ -106,7 +107,7 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, timezone), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, effort, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, timezone), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the
             // foreman, which only exists beside a machine.

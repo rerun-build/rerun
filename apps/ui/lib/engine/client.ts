@@ -41,6 +41,7 @@ import {
     type AgentImportResult,
     type ForemanBrief,
     type MessageAuthor,
+    type ReasoningEffort,
     brainPageResponseSchema,
     brainPagesListSchema,
     brainProposalCountSchema,
@@ -521,7 +522,7 @@ export async function getSessionMessages(conn: EngineConnection, agentId: string
 
 // Returns the raw fetch Response so the caller can read the `x-session-id`
 // header and pipe the SSE body straight through to the browser.
-export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[] }): Promise<Response> {
+export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; effort?: ReasoningEffort | null; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[] }): Promise<Response> {
     return fetchEngine(`${conn.baseUrl}/agents/${encodeURIComponent(agentId)}/chat`, {
         method: 'POST',
         headers: buildHeaders(conn),

@@ -1,5 +1,6 @@
 'use client'
 
+import { reasoningEffortSchema, type ReasoningEffort } from '@rerun/contracts'
 import { useCallback, useSyncExternalStore } from 'react'
 
 // Per-agent model selection used as a per-message override. Kept in localStorage
@@ -8,9 +9,10 @@ import { useCallback, useSyncExternalStore } from 'react'
 // message without mutating the agent's persisted default config.
 //
 // An empty selection ({}) means "no override" — the engine falls back to the
-// agent's configured connection and model.
+// agent's configured connection and model. `effort` goes with the model: null asks for the
+// provider's default, absent lets the engine take the agent's own.
 
-export type ModelSelection = { connectionId?: string; model?: string }
+export type ModelSelection = { connectionId?: string; model?: string; effort?: ReasoningEffort | null }
 
 function storageKey(agentId: string) {
     return `rerun-agent-model-${agentId}`
@@ -25,7 +27,9 @@ function load(agentId: string): ModelSelection {
         const raw = localStorage.getItem(storageKey(agentId))
         if (!raw) return {}
         const parsed = JSON.parse(raw) as ModelSelection & { provider?: string }
-        return parsed.connectionId ? { connectionId: parsed.connectionId, model: parsed.model } : {}
+        if (!parsed.connectionId) return {}
+        const effort = reasoningEffortSchema.nullable().safeParse(parsed.effort)
+        return { connectionId: parsed.connectionId, model: parsed.model, ...(effort.success ? { effort: effort.data } : {}) }
     } catch {
         return {}
     }
