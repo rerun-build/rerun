@@ -16,7 +16,7 @@ vi.mock('node:child_process', () => ({
     execFileSync: (command: string, args: string[]) => (command === 'sh' && args[1] === 'command -v codex' ? '/usr/local/bin/codex\n' : ''),
 }))
 
-const { CODEX_VERSION, codexOffPin, codexPath, parseCodexVersion } = await import('./codex-cli.js')
+const { CODEX_VERSION, codexHasAgentsSwitch, codexOffPin, codexPath, parseCodexVersion } = await import('./codex-cli.js')
 
 const ENGINE_DIR = resolve(import.meta.dirname, '../..')
 const BOX_INSTALLER = '../../cloud/infra/engine/install.sh'
@@ -61,6 +61,18 @@ describe('codexOffPin', () => {
         expect(codexOffPin(null)).toBe(false)
         expect(codexOffPin(CODEX_VERSION)).toBe(false)
         expect(codexOffPin('0.159.3')).toBe(true)
+    })
+})
+
+describe('codexHasAgentsSwitch', () => {
+    it('is true from the first Codex that reads `[agents].enabled`, the pinned one included', () => {
+        expect(codexHasAgentsSwitch('0.145.0')).toBe(true)
+        expect(codexHasAgentsSwitch(CODEX_VERSION)).toBe(true)
+    })
+
+    it('is false for an older Codex, which refuses to start on that key, and for one it could not read', () => {
+        expect(codexHasAgentsSwitch('0.144.6')).toBe(false)
+        expect(codexHasAgentsSwitch(null)).toBe(false)
     })
 })
 

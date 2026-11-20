@@ -15,7 +15,7 @@ import {
 import type { ZodObject, ZodRawShape, ZodType } from 'zod'
 import type { ContextOccupancy, McpServer, Provider, ReasoningEffort } from '@rerun/contracts'
 import { env } from '../config/env.js'
-import { codexPath } from '../runtime/codex-cli.js'
+import { codexHasAgentsSwitch, codexPath } from '../runtime/codex-cli.js'
 import { codexHomeDir } from '../config/paths.js'
 import { CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { childProcessEnv, envOverlay } from '../lib/child-env.js'
@@ -138,6 +138,13 @@ export const CODEX_HARNESS_OVERRIDES: CodexConfigOverrides = {
     'shell_environment_policy.ignore_default_excludes': true,
     ...Object.fromEntries(CODEX_DISABLED_FEATURES.map(feature => [`features.${feature}`, false])),
     ...CODEX_SKILL_OVERRIDES,
+}
+
+// The model catalog picks a sub-agent version per model, and that beats the two `multi_agent`
+// features: on 0.170 every turn ran with spawn_agent until `[agents].enabled` closed it (read back
+// as `multi_agent_version: disabled`). Only for a Codex that knows the switch: an older one dies on it.
+function codexHarnessOverrides(): CodexConfigOverrides {
+    return codexHasAgentsSwitch() ? { ...CODEX_HARNESS_OVERRIDES, 'agents.enabled': false } : CODEX_HARNESS_OVERRIDES
 }
 
 function openaiChat(options: Parameters<typeof createOpenAI>[0]) {
@@ -356,7 +363,7 @@ function codexExecProvider(agent: LoadedAgent) {
             // Codex's own prompt is a coding agent's, several thousand tokens on every call that no
             // cache ever holds. Each caller brings its own instructions in the user turn. `instructions`
             // was read back against 0.160; `base_instructions` is swallowed there.
-            configOverrides: { ...CODEX_HARNESS_OVERRIDES, instructions: CODEX_ONE_SHOT_INSTRUCTIONS },
+            configOverrides: { ...codexHarnessOverrides(), instructions: CODEX_ONE_SHOT_INSTRUCTIONS },
         },
     })
 }
@@ -387,7 +394,7 @@ function codexAppServerProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers:
                 prefix_mcp_tool_names: true,
                 [`mcp_servers.${BRIDGE_SERVER_NAME}.tool_timeout_sec`]: BRIDGE_TOOL_TIMEOUT_SEC,
                 model_reasoning_summary: 'auto',
-                ...CODEX_HARNESS_OVERRIDES,
+                ...codexHarnessOverrides(),
                 ...(agent.config.tools.web ? { web_search: 'live' } : {}),
             },
             mcpServers: codexMcpConfig(tools, mcpServers),

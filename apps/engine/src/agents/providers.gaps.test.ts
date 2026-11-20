@@ -25,6 +25,13 @@ vi.mock('ai-sdk-provider-codex-cli', async importOriginal => {
     }
 })
 
+const codexCli = vi.hoisted(() => ({ hasAgentsSwitch: false }))
+
+vi.mock('../runtime/codex-cli.js', async importOriginal => ({
+    ...(await importOriginal<typeof import('../runtime/codex-cli.js')>()),
+    codexHasAgentsSwitch: () => codexCli.hasAgentsSwitch,
+}))
+
 const claudeCalls = vi.hoisted(() => [] as Array<{ defaultSettings: Record<string, any> }>)
 
 vi.mock('ai-sdk-provider-claude-code', async importOriginal => {
@@ -103,6 +110,7 @@ beforeEach(() => {
     globalThis.fetch = fetchMock as unknown as typeof fetch
     codexAppServerCalls.length = 0
     claudeCalls.length = 0
+    codexCli.hasAgentsSwitch = false
 })
 
 afterEach(() => {
@@ -321,6 +329,23 @@ describe('resolveModel on the claude subscription', () => {
 })
 
 describe('resolveModel on the codex subscription', () => {
+    it('closes the native sub-agents of a Codex that knows the switch, on both transports', () => {
+        codexCli.hasAgentsSwitch = true
+        resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), {}, {}, [], { system: 'You are Rerun.' })
+        const oneShot = modelFor(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' })) as any
+
+        expect(codexAppServerCalls[0]!.defaultSettings.configOverrides['agents.enabled']).toBe(false)
+        expect(oneShot.settings.configOverrides['agents.enabled']).toBe(false)
+    })
+
+    it('leaves the switch out for an older Codex, which would refuse to start on it', () => {
+        resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), {}, {}, [], { system: 'You are Rerun.' })
+        const oneShot = modelFor(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' })) as any
+
+        expect(codexAppServerCalls[0]!.defaultSettings.configOverrides).not.toHaveProperty('agents.enabled')
+        expect(oneShot.settings.configOverrides).not.toHaveProperty('agents.enabled')
+    })
+
     it('streams through the app-server, with the run prompt as its base instructions', async () => {
         const tools = { fs_read: tool({ description: 'read', inputSchema: z.object({ path: z.string() }), execute: async () => 'ok' }) }
         const resolved = resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), { model: 'gpt-5.5-mini' }, tools, [], { system: 'You are Rerun.' })

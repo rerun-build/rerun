@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process'
+import { statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
+import { compareShellVersions } from '@rerun/contracts'
 import { env } from '../config/env.js'
 import { detectLayout } from './layout.js'
 
@@ -61,4 +63,28 @@ export function installedCodexVersion(): string | null {
     } catch {
         return null
     }
+}
+
+// `[agents].enabled`, the switch that closes Codex's own sub-agents, exists from this version on. An
+// older Codex reads `agents` as a table of roles and refuses to start on a boolean there.
+const CODEX_AGENTS_SWITCH_SINCE = '0.145.0'
+
+const versionByBinary = new Map<string, string>()
+
+// `--version` costs a process, so it is asked once per binary and again when an update replaces the
+// file. A read that failed is not kept: it says nothing about the next one.
+function runningCodexVersion(): string | null {
+    const { cmd, args } = codexCommand()
+    const file = args[0] ?? cmd
+    const info = statSync(file, { throwIfNoEntry: false })
+    const key = `${file}:${info?.ino ?? 0}:${info?.ctimeMs ?? 0}`
+    const known = versionByBinary.get(key)
+    if (known) return known
+    const version = installedCodexVersion()
+    if (version) versionByBinary.set(key, version)
+    return version
+}
+
+export function codexHasAgentsSwitch(version: string | null = runningCodexVersion()): boolean {
+    return version !== null && compareShellVersions(version, CODEX_AGENTS_SWITCH_SINCE) >= 0
 }
