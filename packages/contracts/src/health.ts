@@ -66,6 +66,10 @@ export const ENGINE_CAPABILITY_VAULT_RENAME = 'vault.rename'
 // is renamed into an instance of its own, so another account of the app can join it on a coworker.
 export const ENGINE_CAPABILITY_VAULT_INSTANCE = 'vault.instance'
 
+// The Chief of Staff manages the Vault: its brief may carry up to 128 tools, and its request_secret
+// may hand the values to the Vault rather than to its own variables.
+export const ENGINE_CAPABILITY_FOREMAN_VAULT = 'foreman.vault'
+
 // The engine accepts linked computers on `/remote/ws` and answers `/remote/computers`.
 export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 

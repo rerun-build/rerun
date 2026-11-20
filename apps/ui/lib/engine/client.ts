@@ -22,6 +22,7 @@ import {
     ENGINE_CAPABILITY_VAULT,
     ENGINE_CAPABILITY_VAULT_INSTANCE,
     ENGINE_CAPABILITY_VAULT_RENAME,
+    ENGINE_CAPABILITY_FOREMAN_VAULT,
     ENGINE_CAPABILITY_REMOTE_COMPUTERS,
     engineDbGroupsSchema,
     engineRowUpdateResultSchema,
@@ -725,6 +726,11 @@ export async function supportsVaultRename(conn: EngineConnection): Promise<boole
 // An account added before its app took several accounts can move to an instance of its own.
 export async function supportsVaultInstance(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT_INSTANCE)
+}
+
+// The Chief of Staff manages the Vault, and its brief may carry more than 64 tools.
+export async function supportsForemanVault(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_VAULT)
 }
 
 // The Chief of Staff wakes on its own, and its settings and log answer under /checkins.

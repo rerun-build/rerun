@@ -7,7 +7,7 @@ import { SETTINGS_PANELS, SETTINGS_PANEL_LABELS } from '@/lib/settings/panels'
 import { WrenchIcon } from '@/lib/icons'
 import { toolIconOf } from '@/lib/tool-meta'
 import { ACCOUNT_TOOL_NAMES } from '@/lib/mcp/account-tools'
-import { ALL_PLAN_KINDS, FOREMAN_BOX_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_WIDGET_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_CLIENT_TOOL_NAMES, FOREMAN_MCP_TOOL_NAMES, FOREMAN_TOOL_DEFS, FOREMAN_TOOL_NAMES, showPlanDef, showTemplatesDef } from './tool-defs'
+import { ALL_PLAN_KINDS, FOREMAN_BOX_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_WIDGET_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_CLIENT_TOOL_NAMES, FOREMAN_MCP_TOOL_NAMES, FOREMAN_VAULT_TOOL_NAMES, FOREMAN_TOOL_DEFS, FOREMAN_TOOL_NAMES, showPlanDef, showTemplatesDef } from './tool-defs'
 
 // The belts are assembled from places that know nothing about each other: names borrowed from the
 // MCP server, Box tools dispatched onto server actions, and tools the browser resolves. A name that
@@ -30,13 +30,18 @@ describe('foreman tool defs', () => {
     })
 
     it('only borrows names the MCP server really serves', () => {
-        expect(FOREMAN_MCP_TOOL_NAMES.filter(name => !ACCOUNT_TOOL_NAMES.includes(name))).toEqual([])
+        expect([...FOREMAN_MCP_TOOL_NAMES, ...FOREMAN_VAULT_TOOL_NAMES].filter(name => !ACCOUNT_TOOL_NAMES.includes(name))).toEqual([])
+    })
+
+    // The engine belt shows them in the chat like any other tool: none falls back on the wrench.
+    it('draws every Vault tool with an icon of its own', () => {
+        expect(FOREMAN_VAULT_TOOL_NAMES.filter(name => toolIconOf(name) === WrenchIcon)).toEqual([])
     })
 
     // The onboarding gets to know them and lays a plan out: everything that acts on the workspace is
     // the engine foreman's, once the build has claimed the machine.
     it('hands the onboarding belt nothing that acts on the workspace', () => {
-        const workspaceTools = [...FOREMAN_MCP_TOOL_NAMES, ...FOREMAN_BOX_TOOL_DEFS.map(def => def.name), 'install_template', 'install_shared_agent', 'start_agent_setup', 'list_templates']
+        const workspaceTools = [...FOREMAN_MCP_TOOL_NAMES, ...FOREMAN_VAULT_TOOL_NAMES, ...FOREMAN_BOX_TOOL_DEFS.map(def => def.name), 'install_template', 'install_shared_agent', 'start_agent_setup', 'list_templates']
         expect(workspaceTools.filter(name => (FOREMAN_TOOL_NAMES as readonly string[]).includes(name))).toEqual([])
     })
 

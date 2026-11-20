@@ -28,6 +28,8 @@ const engine = vi.hoisted(() => ({
     listRuns: vi.fn<typeof import('@/lib/engine/client').listRuns>(),
     listSkillProposals: vi.fn<typeof import('@/lib/engine/client').listSkillProposals>(),
     getRunSteps: vi.fn<typeof import('@/lib/engine/client').getRunSteps>(),
+    // The box's /health is not part of the conversation under test.
+    supportsForemanVault: vi.fn(async () => false),
 }))
 
 vi.mock('@/app/api/_auth/ownership', async importOriginal => ({

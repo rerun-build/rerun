@@ -172,10 +172,18 @@ function greetingBlock(state: ForemanState): string {
     ].join('\n')
 }
 
+// Only for a box that hands the Chief of Staff the Vault tools: on another one the same words would
+// send it after tools it does not hold.
+const VAULT_NOTE = `The Vault keeps every app account, custom MCP server and secret of the workspace once, and lends it to the coworkers that need it:
+- list_vault shows each entry, whether it works (status), which coworkers hold it, and whether the person you are talking to may change it (canChange). Read it before plugging an app into a coworker, and when a coworker says it cannot reach an app: an entry waiting on a sign-in is the usual cause.
+- When the Vault already holds a working account of an app, lend it with attach_vault_entry rather than declaring the app again. share_vault_entry gives it to every coworker, including the ones added later; detach_vault_entry takes it back from one, and the entry stays in the Vault.
+- delete_vault_entry erases an entry for every coworker that holds it. Read in list_vault who loses it, name them in request_approval, and call it with confirm: true only once they approved.
+- You act with the rights of the person you are talking to. When a Vault tool refuses, say what it takes (an admin, or Can manage on the coworker's Box) rather than trying again.`
+
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
-export function foremanEngineInstructions(state: ForemanState, { greeting = false }: { greeting?: boolean } = {}): string {
-    const blocks = [engineCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, checklistBlock(state.gettingStarted), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+export function foremanEngineInstructions(state: ForemanState, { greeting = false, vault = false }: { greeting?: boolean; vault?: boolean } = {}): string {
+    const blocks = [engineCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, vault ? VAULT_NOTE : null, checklistBlock(state.gettingStarted), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

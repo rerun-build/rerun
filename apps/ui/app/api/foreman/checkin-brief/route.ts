@@ -1,6 +1,7 @@
 import { checkinBriefRequestSchema } from '@rerun/contracts'
 
-import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
+import { supportsForemanVault } from '@/lib/engine/client'
 import { founderContext } from '@/lib/foreman/checkin-context'
 import { foremanCheckinBrief } from '@/lib/foreman/engine-brief'
 import { mintForemanHubToken } from '@/lib/foreman/hub-token'
@@ -22,5 +23,8 @@ export async function POST(req: Request): Promise<Response> {
     if (!ctx) return Response.json({ error: 'This workspace has no member to read it for.' }, { status: 404 })
     const state = await loadForemanState(ctx, null)
     const hubToken = mintForemanHubToken(engine.workspaceId, null, Date.now(), 'read')
-    return Response.json({ ...foremanCheckinBrief(state, parsed.data.reason), ...(hubToken ? { hubToken } : {}) })
+    const vault = await getWorkspaceConnection(engine.workspaceId)
+        .then(supportsForemanVault)
+        .catch(() => false)
+    return Response.json({ ...foremanCheckinBrief(state, parsed.data.reason, { vault }), ...(hubToken ? { hubToken } : {}) })
 }

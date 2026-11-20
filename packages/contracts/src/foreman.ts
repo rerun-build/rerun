@@ -35,9 +35,11 @@ export type ForemanToolSpec = z.infer<typeof foremanToolSpecSchema>
 
 // What the hub hands the foreman on every turn: its instructions and its tools. Both live in the
 // hub so that changing either is a hub deploy, never a fleet update.
+// A box without ENGINE_CAPABILITY_FOREMAN_VAULT refuses a brief of more than 64 tools.
+export const FOREMAN_LEGACY_MAX_TOOLS = 64
 export const foremanBriefSchema = z.object({
     instructions: z.string().min(1),
-    tools: z.array(foremanToolSpecSchema).max(64).default([]),
+    tools: z.array(foremanToolSpecSchema).max(128).default([]),
     hubToken: z.string().min(1).optional(),
 })
 export type ForemanBrief = z.infer<typeof foremanBriefSchema>

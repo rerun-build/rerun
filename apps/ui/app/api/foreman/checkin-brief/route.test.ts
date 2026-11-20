@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { supportsForemanVault } from '@/lib/engine/client'
 import { founderContext } from '@/lib/foreman/checkin-context'
 import { verifyForemanHubToken } from '@/lib/foreman/hub-token'
 import { loadForemanState } from '@/lib/foreman/state'
 
 vi.mock('server-only', () => ({}))
-vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn() }))
+vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(), getWorkspaceConnection: vi.fn().mockResolvedValue({ baseUrl: 'https://box.test' }) }))
+vi.mock('@/lib/engine/client', () => ({ supportsForemanVault: vi.fn() }))
 vi.mock('@/lib/foreman/checkin-context', () => ({ founderContext: vi.fn() }))
 vi.mock('@/lib/foreman/state', () => ({ loadForemanState: vi.fn() }))
 
@@ -25,6 +27,7 @@ describe('POST /api/foreman/checkin-brief', () => {
         vi.mocked(authenticateEngineToken).mockImplementation(async token => (token === 'engine-key' ? { workspaceId: WORKSPACE_ID, isSandbox: false } : null))
         vi.mocked(founderContext).mockResolvedValue({ workspace: { id: WORKSPACE_ID } } as never)
         vi.mocked(loadForemanState).mockResolvedValue(state as never)
+        vi.mocked(supportsForemanVault).mockResolvedValue(false)
     })
 
     afterEach(() => vi.unstubAllEnvs())
@@ -48,6 +51,15 @@ describe('POST /api/foreman/checkin-brief', () => {
         for (const name of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'set_name', 'focus_agent', 'install_template']) expect(brief.tools.map(tool => tool.name)).not.toContain(name)
         expect(brief.tools.every(tool => tool.kind === 'hub')).toBe(true)
         expect(verifyForemanHubToken(brief.hubToken, WORKSPACE_ID)).toMatchObject({ ws: WORKSPACE_ID, scope: 'read' })
+    })
+
+    it('reads the Vault only on a box whose Chief of Staff manages it', async () => {
+        const names = async () => ((await (await POST(request({ reason: 'pulse' }))).json()) as { tools: { name: string }[] }).tools.map(tool => tool.name)
+        expect(await names()).not.toContain('list_vault')
+        vi.mocked(supportsForemanVault).mockResolvedValue(true)
+        const withVault = await names()
+        expect(withVault).toContain('list_vault')
+        for (const name of ['attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'delete_vault_entry']) expect(withVault).not.toContain(name)
     })
 
     it('says so when the workspace has nobody to read it for', async () => {

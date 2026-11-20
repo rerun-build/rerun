@@ -1,10 +1,11 @@
-import { foremanBriefSchema } from '@rerun/contracts'
+import { FOREMAN_LEGACY_MAX_TOOLS, foremanBriefSchema } from '@rerun/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 vi.mock('server-only', () => ({}))
 
-import { accountToolNameOf, foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
+import { accountToolNameOf, foremanCheckinBrief, foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
+import { FOREMAN_VAULT_TOOL_NAMES } from './tool-defs'
 import type { ForemanState } from './phase'
 
 const state = {
@@ -32,6 +33,30 @@ describe('foremanEngineBrief', () => {
 
     it('is a brief the engine accepts', () => {
         expect(() => foremanBriefSchema.parse(brief)).not.toThrow()
+        expect(() => foremanBriefSchema.parse(foremanEngineBrief(state, { vault: true }))).not.toThrow()
+    })
+
+    // A box that has not been updated refuses every message past 64 tools.
+    it('stays within what a box without the Vault tools accepts', () => {
+        expect(brief.tools.length).toBeLessThanOrEqual(FOREMAN_LEGACY_MAX_TOOLS)
+    })
+
+    it('hands the Vault tools and their rules only to a box that takes them', () => {
+        const names = brief.tools.map(tool => tool.name)
+        for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(names).not.toContain(name)
+        expect(brief.instructions).not.toContain('list_vault')
+
+        const withVault = foremanEngineBrief(state, { vault: true })
+        const kinds = Object.fromEntries(withVault.tools.map(tool => [tool.name, tool.kind]))
+        for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(kinds[name]).toBe('hub')
+        expect(withVault.instructions).toContain('list_vault')
+        for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name)).toBe(true)
+    })
+
+    it('reads the Vault in a check-in, and changes nothing in it', () => {
+        const names = foremanCheckinBrief(state, 'pulse', { vault: true }).tools.map(tool => tool.name)
+        expect(names).toContain('list_vault')
+        for (const name of FOREMAN_VAULT_TOOL_NAMES.filter(name => name !== 'list_vault')) expect(names).not.toContain(name)
     })
 
     it('runs the workspace tools on the hub and the board gestures in the browser', () => {

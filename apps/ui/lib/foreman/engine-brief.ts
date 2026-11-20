@@ -3,7 +3,7 @@ import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contra
 import type { ForemanState } from './phase'
 import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
-import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
+import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
 
 // The belt of the foreman that runs on the engine. Everything the hub executes goes through
 // POST /api/hub; the board gestures only reach the browser, as transient data parts, so nothing
@@ -41,7 +41,18 @@ function onBelt(def: ForemanToolDef): ForemanToolDef {
 
 const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_INBOX_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))].map(onBelt)
 
-export const FOREMAN_ENGINE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set(HUB_TOOL_DEFS.map(def => def.name))
+const VAULT_HUB_TOOL_DEFS: ForemanToolDef[] = FOREMAN_VAULT_TOOL_NAMES.map(accountToolDef)
+
+// What the box can take beyond the belt every box takes: `vault` is a box with ENGINE_CAPABILITY_FOREMAN_VAULT.
+export type ForemanBoxFeatures = { vault?: boolean }
+
+function hubToolDefs({ vault = false }: ForemanBoxFeatures): ForemanToolDef[] {
+    return vault ? [...HUB_TOOL_DEFS, ...VAULT_HUB_TOOL_DEFS] : HUB_TOOL_DEFS
+}
+
+// The tools the hub runs for a box, whatever it can take: a turn the box started on an older brief
+// still reaches them.
+export const FOREMAN_ENGINE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set([...HUB_TOOL_DEFS, ...VAULT_HUB_TOOL_DEFS].map(def => def.name))
 
 // What a check-in may call on the hub: reads, nothing that creates, changes, sends or runs anything.
 // Named one by one, so a tool added to the belt stays out of a check-in until someone puts it here.
@@ -68,6 +79,7 @@ export const FOREMAN_READ_TOOL_NAMES: ReadonlySet<string> = new Set([
     'list_agent_shares',
     'search_docs',
     'list_pending_cards',
+    'list_vault',
 ])
 
 function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSpec {
@@ -76,16 +88,18 @@ function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSp
 
 // The brief of a check-in: its charter, and only the hub tools that read. No board gesture: nobody
 // is watching.
-export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason): ForemanBrief {
+export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason, features: ForemanBoxFeatures = {}): ForemanBrief {
     return {
         instructions: foremanCheckinInstructions(state, reason),
-        tools: HUB_TOOL_DEFS.filter(def => FOREMAN_READ_TOOL_NAMES.has(def.name)).map(def => spec(def, 'hub')),
+        tools: hubToolDefs(features)
+            .filter(def => FOREMAN_READ_TOOL_NAMES.has(def.name))
+            .map(def => spec(def, 'hub')),
     }
 }
 
-export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } = {}): ForemanBrief {
+export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } & ForemanBoxFeatures = {}): ForemanBrief {
     return {
         instructions: foremanEngineInstructions(state, options),
-        tools: [...HUB_TOOL_DEFS.map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
+        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
     }
 }

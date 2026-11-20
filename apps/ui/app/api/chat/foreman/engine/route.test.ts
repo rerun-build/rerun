@@ -22,7 +22,7 @@ vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
 vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn(), supportsForemanVault: vi.fn().mockResolvedValue(false) }))
 vi.mock('@/lib/foreman/conversation', () => ({
     cancelForemanSessionRuns: vi.fn(),
     engineSessionOf: vi.fn().mockResolvedValue(null),
@@ -116,7 +116,7 @@ describe('/api/chat/foreman/engine', () => {
 
             expect(response.status).toBe(200)
             expect(writeAnswers).toHaveBeenCalledWith(expect.anything(), { industry: 'saas', onboarding: { teamDone: true, greetPending: false } }, false)
-            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), { greeting: true })
+            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ greeting: true }))
             expect(vi.mocked(startChat).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(writeAnswers).mock.invocationCallOrder[0])
         })
 
@@ -149,7 +149,7 @@ describe('/api/chat/foreman/engine', () => {
 
             await POST(post())
 
-            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), { greeting: false })
+            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ greeting: false }))
             expect(writeAnswers).not.toHaveBeenCalled()
         })
     })
