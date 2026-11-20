@@ -78,5 +78,10 @@
         "test": "jest",
         "eas-build-post-install": "pnpm --filter @rerun/contracts build"
     },
+    "reanimated": {
+        "staticFeatureFlags": {
+            "IOS_SYNCHRONOUSLY_UPDATE_UI_PROPS": true
+        }
+    },
     "private": true
 }
