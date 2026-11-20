@@ -110,6 +110,18 @@ class Finish(unittest.TestCase):
         for line in ("Children: #601, #602, #603", "| coder | 2 | 1 |", "| researcher | 1 | 1 |", "| all | 3 | 2 |"):
             self.assertIn(line, text)
 
+    def test_the_cut_shape_names_the_longest_chain(self):
+        r = Rig(bodies={602: body(602).replace("**Depends on**: none", "**Depends on**: #601"),
+                        603: body(603).replace("**Depends on**: none", "**Depends on**: #602")})
+        r.status = {"status": "done", "output": "CUT: #601, #602, #603"}
+        r.station.once(2)
+        self.assertEqual(len(r.shape()), 1)
+        self.assertIn("| all | 3 | 1 |\n\nLongest chain: 3 (#601 -> #602 -> #603)", r.shape()[0])
+        r = Rig()
+        r.status = {"status": "done", "output": "CUT: #602, #601"}
+        r.station.once(2)
+        self.assertIn("Longest chain: 1 (#601)", r.shape()[0])
+
     def test_an_open_outside_dependency_waits(self):
         r = Rig(bodies={601: body(601).replace("**Depends on**: none", "**Depends on**: #700"),
                         602: body(602).replace("**Depends on**: none", "**Depends on**: #701")},
