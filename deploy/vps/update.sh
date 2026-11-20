@@ -57,17 +57,18 @@ fi
 echo "== 2/4 images"
 docker compose pull
 
+wait_drained
+
 echo "== 3/4 database migrations"
 PW=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$SUPABASE_DIR/.env" | tail -n 1 | sed "s/^'\(.*\)'\$/\1/; s/^\"\(.*\)\"\$/\1/")
 [ -n "$PW" ] || { echo "No POSTGRES_PASSWORD in $SUPABASE_DIR/.env"; exit 1; }
-NET=$(docker inspect "$SUPABASE_DB_CONTAINER" -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}')
-SUPABASE_DB_URL="postgresql://postgres:$PW@db:5432/postgres?sslmode=disable"
-export SUPABASE_DB_URL
-docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp -e SUPABASE_DB_URL node:26 \
-    sh -c "npx -y $SUPABASE_CLI db push --include-all --yes --db-url \"\$SUPABASE_DB_URL\""
-unset PW SUPABASE_DB_URL
-
-wait_drained
+NETS=$(docker inspect "$SUPABASE_DB_CONTAINER" -f '{{range $k,$v := .NetworkSettings.Networks}}{{println $k}}{{end}}' | sed '/^$/d')
+NET=$(printf '%s\n' "$NETS" | grep -E 'supabase|default' | head -n 1 || true)
+[ -n "$NET" ] || NET=$(printf '%s\n' "$NETS" | head -n 1)
+export PW
+docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp -e PW node:26 \
+    node -e 'const { spawnSync } = require("node:child_process"); const url = `postgresql://postgres:${encodeURIComponent(process.env.PW || "")}@db:5432/postgres?sslmode=disable`; process.exit(spawnSync("npx", ["-y", process.argv[1], "db", "push", "--include-all", "--yes", "--db-url", url], { stdio: "inherit", env: { ...process.env, PW: "" } }).status ?? 1)' "$SUPABASE_CLI"
+unset PW
 echo "== 4/4 restart"
 if docker compose config --services | grep -qx factory-dispatcher; then
     OLD=$(docker ps -aq --filter label=com.docker.compose.project=rerun-factory)

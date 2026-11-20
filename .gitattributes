@@ -4,3 +4,6 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 Dockerfile* text eol=lf
+*.Dockerfile text eol=lf
+tools/factory/** text eol=lf
+scripts/** text eol=lf
