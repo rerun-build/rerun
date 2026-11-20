@@ -189,7 +189,7 @@ class World:
             return json.dumps([{"number": p["number"], "title": p["title"], "body": p["body"], "labels": [{"name": x} for x in p["labels"]]}
                                for p in self.problems if p["state"] == "OPEN"])
         if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
-            return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
+            return json.dumps([{"number": i["number"], "title": i["title"], "body": i.get("body", ""), "labels": i["labels"], "createdAt": i.get("createdAt", "")}
                                for i in self.issues if i.get("labels")])
         if a[:2] == ["issue", "list"] and "--label" not in a:
             return json.dumps([{"number": n} for n in sorted(self.open_numbers)])
@@ -388,7 +388,8 @@ class Depends(Base):
         return {"number": n, "title": title or "t%d" % n, "body": ready("intro\nmore", line), "comments": []}
 
     def open_calls(self):
-        return [c for c in self.w.gh_calls if c[:2] == ["issue", "list"] and "--label" not in c and "--search" not in c and "number,labels,title" not in c]
+        return [c for c in self.w.gh_calls if c[:2] == ["issue", "list"] and "--label" not in c and "--search" not in c
+                and not any(x.startswith("number,labels,title") for x in c)]
 
     def test_waits_while_dependency_is_open_then_is_taken(self):
         self.w.issues = [self.job(5, "#7")]

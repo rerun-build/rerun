@@ -2272,7 +2272,8 @@ class Dispatcher:
             out["registry_error"] = type(e).__name__
             return out
         try:
-            out["label_drift"] = labelcheck.check(labelcheck.read(self.gh, self.repo), data, rows)
+            issues = labelcheck.read(self.gh, self.repo)
+            out["label_drift"] = labelcheck.check(issues, data, rows)
         except Exception as e:  # noqa: BLE001
             out["label_drift_error"] = type(e).__name__
             return out
@@ -2283,7 +2284,7 @@ class Dispatcher:
         except Exception as e:  # noqa: BLE001
             out["label_fixed_error"] = type(e).__name__
         try:
-            out["gaps_closed"] = labelcheck.close_gaps(self.gh, self.repo, self.store, out["label_drift"], data)
+            out["gaps_closed"] = labelcheck.close_gaps(self.gh, self.repo, self.store, out["label_drift"], data, issues)
             for f in out["gaps_closed"]:
                 log(f["issue"], "gap issue: %s, keeps #%d" % (f["did"], f["keep"]))
         except Exception as e:  # noqa: BLE001

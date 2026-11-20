@@ -10,12 +10,14 @@ TRIES = 3
 LIMIT = "1000"
 PAUSED = "factory-paused"
 GAPS = re.compile(r"^Gaps of #(\d+):")
+PART_OF = re.compile(r"Part of\W*#(\d+)\b")
+HEADING = re.compile(r"(?m)^\s*(?:#{1,6}\s+|\d+\.\s+\*\*|\*\*)(?!Part of\b|Repairs\b)([^*\n]+)")
 END_LABEL = {"merged": "factory-done", "superseded": "factory-done", "unsolvable": "factory-unsolvable"}
 LISTS = ("plan_label_no_plan", "ready_label_ended_job", "parked_but_moving", "duplicate_gaps", "ended_unlabelled")
 
 
 def read(gh, repo):
-    return json.loads(gh(["issue", "list", "-R", repo, "--state", "open", "--limit", LIMIT, "--json", "number,labels,title"]))
+    return json.loads(gh(["issue", "list", "-R", repo, "--state", "open", "--limit", LIMIT, "--json", "number,labels,title,body"]))
 
 
 def names(i):
@@ -80,30 +82,54 @@ IDLE_PLAN = ("blocked", "lost")
 DONE_ACCEPT = ("accepted", "closed")
 
 
-def busy(n, data):
+def open_parents(issues):
+    parents = set()
+    for i in issues or ():
+        for m in PART_OF.finditer(i.get("body") or ""):
+            parents.add(int(m.group(1)))
+    return parents
+
+
+def busy(n, data, children=()):
+    if children and not isinstance(children, (set, frozenset)):
+        children = open_parents(children)
     j = data["jobs"].get(str(n))
     plan = (data["kv"].get("plan:%d" % n) or {}).get("state")
     accept = (data["kv"].get("accept:%d" % n) or {}).get("state")
+    recheck = (data["kv"].get("recheck:%d" % n) or {}).get("state")
+    classify = data["kv"].get("classify:%d" % n) or {}
     return ((j is not None and j["state"] not in states.END) or (plan is not None and plan not in IDLE_PLAN)
-            or (accept is not None and accept not in DONE_ACCEPT))
+            or (accept is not None and accept not in DONE_ACCEPT) or recheck in ("sending", "running")
+            or classify.get("state") == "running" or bool(classify.get("run")) or n in children)
 
 
 def body(gh, repo, n):
     return json.loads(gh(["issue", "view", str(n), "-R", repo, "--json", "body"])).get("body") or ""
 
 
+def gap_headings(text):
+    return [" ".join(m.group(1).strip().rstrip(":").lower().split()) for m in HEADING.finditer(text or "")]
+
 def covered(gh, repo, dup, n):
     kept = body(gh, repo, dup["keep"])
     if not re.search(r"Part of\W*#%d\b" % dup["parent"], kept):
         return "#%d does not say it is part of #%d" % (dup["keep"], dup["parent"])
-    extra = set(escapes.repairs(body(gh, repo, n))) - set(escapes.repairs(kept))
+    old = body(gh, repo, n)
+    old_repairs = escapes.repairs(old)
+    if not old_repairs:
+        return "it has no **Repairs** numbers to compare"
+    extra = set(old_repairs) - set(escapes.repairs(kept))
     if extra:
         return "it lists repairs %s that #%d does not" % (", ".join("#%d" % x for x in sorted(extra)), dup["keep"])
+    old_heads, kept_heads = gap_headings(old), gap_headings(kept)
+    if old_heads != kept_heads:
+        return "its gap headings differ from #%d" % dup["keep"]
     return None
 
 
-def close_gaps(gh, repo, store, drift, data):
+def close_gaps(gh, repo, store, drift, data, issues=None):
     out, used = [], 0
+    children = open_parents(issues)
     for dup in drift.get("duplicate_gaps") or []:
         for n in dup["older"]:
             job = "gapclose:%d" % n
@@ -111,7 +137,7 @@ def close_gaps(gh, repo, store, drift, data):
             tries = int(rec.get("tries") or 0)
             if rec.get("closed") or rec.get("kept") or tries >= TRIES:
                 continue
-            if busy(n, data):
+            if busy(n, data, children):
                 if rec.get("seen"):
                     store.set(job, "seen", "")
                 continue

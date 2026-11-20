@@ -3,8 +3,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import labelcheck
 
 
-def issue(n, *labels, title="t"):
-    return {"number": n, "title": title, "labels": [{"name": x} for x in labels]}
+def issue(n, *labels, title="t", body=""):
+    return {"number": n, "title": title, "body": body, "labels": [{"name": x} for x in labels]}
 
 
 def job(state, relabelled=True):
@@ -119,20 +119,20 @@ class Gaps(unittest.TestCase):
 
     def setUp(self):
         Fix.setUp(self)
-        self.bodies = {12: self.KEPT, 10: "**Part of**: #5\n**Repairs**: #7\n", 11: "**Part of**: #5\n**Repairs**: none\n"}
+        self.bodies = {12: self.KEPT, 10: "**Part of**: #5\n**Repairs**: #7\n", 11: "**Part of**: #5\n**Repairs**: #8\n"}
 
     def gh(self, args):
         self.calls.append(args)
         if args[:2] == ["issue", "view"]:
-            return json.dumps({"body": self.bodies.get(int(args[2]), "**Part of**: #5\n")})
+            return json.dumps({"body": self.bodies.get(int(args[2]), "**Part of**: #5\n**Repairs**: #7\n")})
         return ""
 
     def closes(self):
         return [c for c in self.calls if c[:2] == ["issue", "close"]]
 
-    def run_twice(self, dup=None, d=None):
-        first = labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data())
-        return first, labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data())
+    def run_twice(self, dup=None, d=None, issues=None):
+        first = labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data(), issues=issues)
+        return first, labelcheck.close_gaps(self.gh, "o/r", self.s, dup or self.DUP, d or data(), issues=issues)
 
     def test_the_first_sight_is_a_dry_run_and_the_next_closes_once_as_not_planned(self):
         first, second = self.run_twice()
@@ -179,6 +179,45 @@ class Gaps(unittest.TestCase):
         first, second = self.run_twice(dup=dup)
         self.assertEqual((len(first), len(second)), (labelcheck.FIXES, labelcheck.FIXES))
 
+    def test_close_gaps_keeps_older_gap_issue_when_repairs_is_none(self):
+        dup = {"duplicate_gaps": [{"parent": 1, "keep": 11, "older": [10]}]}
+        self.bodies = {10: "**Part of**: #1\n**Repairs**: none\n", 11: "**Part of**: #1\n**Repairs**: #2\n"}
+        first, second = self.run_twice(dup=dup)
+        self.assertEqual(first, [{"issue": 10, "keep": 11, "did": "left open: it has no **Repairs** numbers to compare"}])
+        self.assertEqual(second, [])
+        self.assertEqual(self.s.get_all("gapclose:10")["kept"], "1")
+        self.assertEqual(self.closes(), [])
+
+    def test_close_gaps_keeps_older_gap_issue_when_headings_differ(self):
+        self.bodies[10] = "**Part of**: #5\n## Missing mobile layout\n**Repairs**: #7\n"
+        self.bodies[11] = "**Part of**: #5\n## Broken webhook retry\n**Repairs**: #8\n"
+        self.bodies[12] = "**Part of**: #5\n## Broken webhook retry\n**Repairs**: #7\n**Repairs**: #8\n"
+        first, second = self.run_twice()
+        self.assertEqual(first[0], {"issue": 10, "keep": 12, "did": "left open: its gap headings differ from #12"})
+        self.assertEqual(self.s.get_all("gapclose:10")["kept"], "1")
+        self.assertEqual([c[2] for c in self.closes()], ["11"])
+        self.bodies[14] = "**Part of**: #5\n## Missing   Mobile Layout:\n**Repairs**: #7\n"
+        self.bodies[15] = self.bodies[10]
+        same, closed = self.run_twice(dup={"duplicate_gaps": [{"parent": 5, "keep": 14, "older": [15]}]})
+        self.assertEqual(([x["did"] for x in same], [x["did"] for x in closed]), (["would close"], ["closed"]))
+
+    def test_busy_counts_recheck_classify_and_open_children(self):
+        for d in (
+            data(kv={"recheck:10": {"state": "sending"}, "recheck:11": {"state": "running"}}),
+            data(kv={"classify:10": {"state": "running"}, "classify:11": {"run": "run-1"}}),
+        ):
+            self.assertEqual(self.run_twice(d=d), ([], []))
+        self.assertTrue(labelcheck.busy(10, data(kv={"recheck:10": {"state": "sending"}})))
+        self.assertTrue(labelcheck.busy(10, data(kv={"recheck:10": {"state": "running"}})))
+        self.assertFalse(labelcheck.busy(10, data(kv={"recheck:10": {"state": "fresh"}})))
+        self.assertTrue(labelcheck.busy(10, data(kv={"classify:10": {"state": "running"}})))
+        self.assertTrue(labelcheck.busy(10, data(kv={"classify:10": {"run": "r1"}})))
+        self.assertFalse(labelcheck.busy(10, data(kv={"classify:10": {"run": ""}})))
+        kids = [issue(99, body="**Part of**: #10\n"), issue(100, body="Part of #11\n")]
+        self.assertTrue(labelcheck.busy(10, data(), kids))
+        self.assertFalse(labelcheck.busy(12, data(), kids))
+        self.assertEqual(self.run_twice(issues=kids), ([], []))
+        self.assertEqual(self.closes(), [])
 
 class Read(unittest.TestCase):
     def test_reads_open_issues_with_labels_in_one_call(self):
@@ -191,7 +230,7 @@ class Read(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertIn("--state", calls[0])
         self.assertEqual(calls[0][calls[0].index("--state") + 1], "open")
-
+        self.assertEqual(calls[0][calls[0].index("--json") + 1], "number,labels,title,body")
 
 if __name__ == "__main__":
     unittest.main()

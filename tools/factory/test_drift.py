@@ -1,6 +1,5 @@
-import json
-import unittest
-
+import json, os, sys, unittest
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import drift
 
 BODY = """PLAN READY (cut of #1; facts read on dev at 1234567)
