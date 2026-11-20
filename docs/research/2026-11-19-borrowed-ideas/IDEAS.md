@@ -20,6 +20,7 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 | 10 | One script calling many tools, for product coworkers with many connected apps | UTCP code-mode | later | engine (product) |
 | 11 | Two competing plans for large issues, scored by the review panel | the patterns guide (Best-of-N) | later | planning |
 | 12 | A review finding is checked against the code before it starts a fix round | the patterns guide (specialist review) | later | review station |
+| 13 | Prebuilt, role-specific packets for the fetches coworkers repeat | code mode's principle, worked through with ChatGPT | next, after 5 | dispatcher packets |
 
 ## 1. Code mode for Claude Code coworkers (done, #1618)
 
@@ -97,6 +98,17 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 - **Ours today:** a reviewer's findings go straight to the builder as a fix round.
 - **Change:** a cheap model (Haiku or Sonnet) confirms each finding against the diff and the code, with the line that proves it, before the fix round is sent; unconfirmed findings are recorded, not sent.
 - **Measure:** fix rounds per green issue (1.4 build and fix runs per green issue on 2026-11-19, threshold 1.3) and findings dropped as unconfirmed.
+
+## 13. Prebuilt, role-specific packets (next, after idea 5)
+
+- **The principle taken from code mode:** move repeated preparation out of the model's turns and into deterministic code. Scripting tool calls inside a run is not the lever for us: coworkers make almost no tool-server calls (0.0% of 382 engine-loop calls, `docs/research/2026-11-19-code-mode/BASELINE.md`), and most input is re-reading (95-96% cached). A packet the dispatcher prepares in Python before the run removes fetches the coworker would otherwise make step by step, each one re-read on every later step.
+- **Ours today:** `tools/factory/packet.py` (`retry_packet`: a failed run's output, cut to a budget, for the next try), `tools/factory/reviewpacket.py` (`review_diff`: the diff from git for the reviewer), and #1580 (open: "the packet hands over the dev code inside one budget"). Plan freshness is already checked against dev by the recheck (`FRESH:` or `CORRECTED:` with the dev commit).
+- **Change:** idea 5 names the fetches coworkers repeat most and their token cost; each one worth it moves into a packet, built per role, never one large dump:
+  - builder: the task, its asks and done-test, the code it names at the dev commit, its limits;
+  - reviewer: the diff, the asks, the CI results for that exact commit, the code around the change;
+  - prover: what must be proven and the evidence the dispatcher collected itself.
+- **Freshness:** every packet names what it was built from (dev commit, pull request head, issue edit time); a packet whose source moved is rebuilt, never reused. A packet only carries facts the dispatcher read itself, with their source; it never states that something passed.
+- **Measure:** per role, input tokens and steps per run before and after, and the repeated fetches idea 5 counted; keep a packet part only if runs get cheaper without more fix rounds.
 
 ## The guide, mapped to the factory
 
