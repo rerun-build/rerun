@@ -58,10 +58,16 @@ function slotTotal(overview: AppsOverview): number {
     return Math.max(overview.stripeSlots + (overview.subscriberTrialEndsAt ? 1 : 0), overview.connections.length)
 }
 
-// Why nothing new can be connected right now, if so.
-function blockedReason(t: AppsTranslator, overview: AppsOverview): string | undefined {
+function workspaceBlockedReason(t: AppsTranslator, overview: AppsOverview): string | undefined {
     if (!overview.subscribed) return t('blocked.notSubscribed')
     if (overview.paused) return t('blocked.paused')
+    return undefined
+}
+
+// Why nothing new can be connected right now, if so.
+function blockedReason(t: AppsTranslator, overview: AppsOverview): string | undefined {
+    const workspaceBlocked = workspaceBlockedReason(t, overview)
+    if (workspaceBlocked) return workspaceBlocked
     if (overview.allowance === 'buy_slot' && overview.workspaceTrialing) return t(overview.lifetime ? 'blocked.lifetimeTrialSlot' : 'blocked.trialSlot', { provider: appInfo(overview.slug).providerLabel })
     return undefined
 }
@@ -216,6 +222,9 @@ export function AccountsScreen({ overview, pending, onConnectStart, onReconnect,
     const { reason: blocked, adminOnly: blockedForMember } = useBlockedReason(overview)
     const adminOnly = blockedForMember ? blocked : undefined
     const freeSlots = overview.allowance === 'buy_slot' ? 0 : Math.max(1, total - used)
+    const awaitingSlot = overview.connections.some(isAwaitingSlot)
+    // The trial's one-slot cap is for a new account: an account already connected may get its slot back.
+    const resumeBlocked = adminOnly ?? workspaceBlockedReason(t, overview)
 
     return (
         <>
@@ -227,7 +236,19 @@ export function AccountsScreen({ overview, pending, onConnectStart, onReconnect,
                 )}
                 <div className="space-y-1.5">
                     {overview.connections.map(connection => (
-                        <AccountRow key={connection.id} slug={overview.slug} connection={connection} busy={pending === connection.id} reconnectBlocked={overview.paused} adminOnly={adminOnly} lifetime={overview.lifetime} onReconnect={onReconnect} onDisconnect={onDisconnect} />
+                        <AccountRow
+                            key={connection.id}
+                            overview={overview}
+                            connection={connection}
+                            busy={pending === connection.id}
+                            slotPending={pending === 'slot'}
+                            reconnectBlocked={overview.paused}
+                            resumeBlocked={resumeBlocked}
+                            adminOnly={adminOnly}
+                            onReconnect={onReconnect}
+                            onDisconnect={onDisconnect}
+                            onAddSlot={onAddSlot}
+                        />
                     ))}
                     {Array.from({ length: freeSlots }, (_, index) => (
                         <OpenSlotRow
@@ -239,7 +260,7 @@ export function AccountsScreen({ overview, pending, onConnectStart, onReconnect,
                             giveBack={canGiveBack(overview, !!adminOnly) ? <GiveBackSlot overview={overview} pending={pending === 'slot'} onConfirm={onRemoveSlot} /> : null}
                         />
                     ))}
-                    {freeSlots === 0 && <AddSlotRow overview={overview} blocked={blocked} pending={pending === 'slot'} onAddSlot={onAddSlot} />}
+                    {freeSlots === 0 && !awaitingSlot && <AddSlotRow overview={overview} blocked={blocked} pending={pending === 'slot'} onAddSlot={onAddSlot} />}
                 </div>
             </PanelScroller>
             <footer className="border-t px-4 py-3 text-xs text-muted-foreground">
@@ -363,8 +384,9 @@ function AccountStatus({ connection }: { connection: AppConnectionView }) {
         )
     }
     if (connection.status === 'paused') {
+        // The Resume button beside it already says so, and a phone has no room for both.
         return (
-            <Badge size="xs" tone="orange" className="shrink-0">
+            <Badge size="xs" tone="orange" className={cn('shrink-0', isAwaitingSlot(connection) && 'max-sm:hidden')}>
                 {t('paused')}
             </Badge>
         )
@@ -376,34 +398,45 @@ function AccountStatus({ connection }: { connection: AppConnectionView }) {
     )
 }
 
+// Paused for want of a paid slot: buying one brings it back.
+function isAwaitingSlot(connection: AppConnectionView): boolean {
+    return connection.status === 'paused' && connection.pauseReason !== 'rate_limited'
+}
+
 function accountSummary(t: AppsTranslator, slug: AppSlug, connection: AppConnectionView): string {
     const provider = appInfo(slug).providerLabel
     if (connection.status === 'needs_reconnect') return connection.pauseReason === 'workspace_paused' ? t('accounts.summary.signedOutWhilePaused') : t('accounts.summary.signedOut', { provider })
-    if (connection.status === 'paused') return connection.pauseReason === 'rate_limited' ? t('accounts.summary.rateLimited', { provider }) : t('accounts.summary.unpaid')
+    if (isAwaitingSlot(connection)) return t('accounts.summary.unpaid')
+    if (connection.status === 'paused') return t('accounts.summary.rateLimited', { provider })
     if (connection.agents.length === 0) return t('accounts.summary.unused')
     return t('accounts.summary.usedBy', { names: connection.agents.map(agent => agent.name).join(', ') })
 }
 
 function AccountRow({
-    slug,
+    overview,
     connection,
     busy,
+    slotPending,
     reconnectBlocked,
+    resumeBlocked,
     adminOnly,
-    lifetime,
     onReconnect,
     onDisconnect,
+    onAddSlot,
 }: {
-    slug: AppSlug
+    overview: AppsOverview
     connection: AppConnectionView
-    lifetime: boolean
     busy: boolean
+    slotPending: boolean
     reconnectBlocked: boolean
+    resumeBlocked?: string
     adminOnly?: string
     onReconnect: (connection: AppConnectionView) => void
     onDisconnect: (connection: AppConnectionView) => void
+    onAddSlot: () => void
 }) {
     const t = useTranslations('apps')
+    const { slug, lifetime } = overview
     const { providerLabel } = appInfo(slug)
     const name = connection.label ?? t('accounts.defaultName', { provider: providerLabel })
     return (
@@ -414,6 +447,20 @@ function AccountRow({
             actions={
                 <>
                     <AccountStatus connection={connection} />
+                    {isAwaitingSlot(connection) &&
+                        (resumeBlocked ? (
+                            <TooltipDisabledReason reason={resumeBlocked}>
+                                <Button size="xs" variant="outline" disabled>
+                                    {t('accounts.resume')}
+                                </Button>
+                            </TooltipDisabledReason>
+                        ) : (
+                            <AddSlotConfirm overview={overview} pending={slotPending} onAddSlot={onAddSlot}>
+                                <Button size="xs" variant="outline" loading={slotPending}>
+                                    {t('accounts.resume')}
+                                </Button>
+                            </AddSlotConfirm>
+                        ))}
                     {connection.status === 'needs_reconnect' && (
                         <TooltipDisabledReason reason={adminOnly}>
                             <Button size="xs" variant="outline" disabled={reconnectBlocked || !!adminOnly} loading={busy} onClick={() => onReconnect(connection)}>

@@ -144,6 +144,7 @@
         },
         "defaultName": "{provider} account",
         "reconnect": "Reconnect",
+        "resume": "Resume",
         "disconnectLabel": "Disconnect {name}",
         "disconnectTitle": "Disconnect {name}?",
         "disconnectDescription": "Its coworkers lose their {provider} tools right away. The slot stays on your plan until you remove it from Billing.",

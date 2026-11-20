@@ -126,6 +126,7 @@
         },
         "defaultName": "{provider}-Konto",
         "reconnect": "Neu verbinden",
+        "resume": "Reaktivieren",
         "disconnectLabel": "{name} trennen",
         "disconnectTitle": "{name} trennen?",
         "disconnectDescription": "Seine Coworker verlieren sofort ihre {provider}-Tools. Der Platz bleibt in deinem Plan, bis du ihn unter Abrechnung entfernst.",

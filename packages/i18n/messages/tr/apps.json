@@ -126,6 +126,7 @@
         },
         "defaultName": "{provider} hesabı",
         "reconnect": "Yeniden bağla",
+        "resume": "Yeniden etkinleştir",
         "disconnectLabel": "Bağlantıyı kes: {name}",
         "disconnectTitle": "{name} bağlantısı kesilsin mi?",
         "disconnectDescription": "Coworker'ları {provider} araçlarını hemen kaybeder. Yer, Faturalandırma'dan kaldırana kadar planınızda kalır.",

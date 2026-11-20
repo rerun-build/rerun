@@ -126,6 +126,7 @@
         },
         "defaultName": "Compte {provider}",
         "reconnect": "Reconnecter",
+        "resume": "Réactiver",
         "disconnectLabel": "Déconnecter {name}",
         "disconnectTitle": "Déconnecter {name} ?",
         "disconnectDescription": "Ses coworkers perdent leurs outils {provider} immédiatement. L’emplacement reste sur votre plan jusqu’à ce que vous le retiriez dans Facturation.",

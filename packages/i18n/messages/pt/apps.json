@@ -126,6 +126,7 @@
         },
         "defaultName": "Conta {provider}",
         "reconnect": "Reconectar",
+        "resume": "Reativar",
         "disconnectLabel": "Desconectar {name}",
         "disconnectTitle": "Desconectar {name}?",
         "disconnectDescription": "Os coworkers dela perdem as ferramentas {provider} na hora. A vaga continua no seu plano até você removê-la em Cobrança.",

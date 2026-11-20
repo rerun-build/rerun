@@ -126,6 +126,7 @@
         },
         "defaultName": "Cuenta de {provider}",
         "reconnect": "Reconectar",
+        "resume": "Reactivar",
         "disconnectLabel": "Desconectar {name}",
         "disconnectTitle": "¿Desconectar {name}?",
         "disconnectDescription": "Sus coworkers pierden sus herramientas de {provider} al instante. El espacio sigue en tu plan hasta que lo quites en Facturación.",
