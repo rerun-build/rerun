@@ -1,4 +1,4 @@
-import { advance, facePose, restPose, restingPose, startClock } from '@/components/orb/orb-motion'
+import { advance, facePose, layerTransform, restPose, restingPose, startClock } from '@/components/orb/orb-motion'
 
 describe('orb motion', () => {
     it('rests the face where the web puts it', () => {
@@ -27,6 +27,15 @@ describe('orb motion', () => {
         }
         expect(pose.face).not.toEqual(rest.face)
         expect(pose.sheen[4]).toBeGreaterThanOrEqual(0)
+    })
+
+    it('moves a layer the way the matrix moves its drawing', () => {
+        const [{ matrix }] = layerTransform([0.9, 0.18, 0, 1, 41, 40], 0.5)
+        const moved = (x: number, y: number) => ({ x: matrix[0] * x + matrix[4] * y + matrix[12], y: matrix[1] * x + matrix[5] * y + matrix[13] })
+        expect(moved(0, 0)).toEqual({ x: 20.5, y: 20 })
+        expect(moved(10, 0).x).toBeCloseTo(29.5)
+        expect(moved(10, 0).y).toBeCloseTo(21.8)
+        expect(moved(0, 10)).toEqual({ x: 20.5, y: 30 })
     })
 
     it('spins the whole ball while it thinks', () => {

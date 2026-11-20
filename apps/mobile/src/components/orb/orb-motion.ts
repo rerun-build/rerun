@@ -18,8 +18,17 @@ export function restPose(facing: OrbFacing) {
     return { yaw: facing === 'left' ? REST_YAW : -REST_YAW, pitch: REST_PITCH }
 }
 
-// A `matrix` prop for react-native-svg, [a b c d e f] as in SVG's matrix().
+// [a b c d e f] as in SVG's matrix().
 export type Matrix = [number, number, number, number, number, number]
+
+// The `transform` of a view centred on the origin of what it draws, moved by `matrix`: `scale` is how
+// many points one of its units takes. A view's transform never goes through a commit of the tree nor
+// redraws what is inside, which a matrix set on an SVG group does on every frame.
+export function layerTransform(matrix: Matrix, scale: number) {
+    'worklet'
+    const [a, b, c, d, e, f] = matrix
+    return [{ matrix: [a, b, 0, 0, c, d, 0, 0, 0, 0, 1, 0, e * scale, f * scale, 0, 1] }]
+}
 
 // The face carried by a ball turned by `yaw` (to the right) and `pitch` (upwards): it slides over the
 // sphere, flattens as it nears the rim and is gone once it has turned to the far side. The web's

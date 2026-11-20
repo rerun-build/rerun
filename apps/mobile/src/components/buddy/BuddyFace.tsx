@@ -43,6 +43,20 @@ function star(x: number, y: number, r: number) {
     return `M${x} ${y - r} L${x + i} ${y - i} L${x + r} ${y} L${x + i} ${y + i} L${x} ${y + r} L${x - i} ${y + i} L${x - r} ${y} L${x - i} ${y - i} Z`
 }
 
+// A buddy that waits looks up, one that works looks down at what it does.
+function gazeDrop(mood: BuddyMood) {
+    return mood === 'waiting' ? -1.6 : mood === 'working' ? 1 : 0
+}
+
+function hasMouth(mouth: BuddyMouth, mood: BuddyMood) {
+    return mouth !== 'none' || mood === 'error' || mood === 'waiting'
+}
+
+// The line the eyes sit on, the one they squash onto when they blink.
+export function buddyEyeLine({ mouth, mood, depth }: Pick<BuddyFaceProps, 'mouth' | 'mood' | 'depth'>) {
+    return depth * (hasMouth(mouth, mood) ? 0.38 : 0.45) + gazeDrop(mood)
+}
+
 type Paints = { ink: string; white: string; pupil: string; glass: string; lens: string; light: string; heart: string }
 type Paint = (own: string) => string
 
@@ -120,7 +134,7 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
     if (mood === 'error' && style !== 'visor' && style !== 'shades' && style !== 'glasses') return solid(paint => <Pair y={baseY}>{({ x, y }) => cross(x, y, paint(P.ink))}</Pair>)
 
     const lookX = mood === 'working' ? 1 : 0
-    const lookY = mood === 'waiting' ? -1.6 : mood === 'working' ? 1 : 0
+    const lookY = gazeDrop(mood)
     const y = baseY + lookY
     const at = (x: number) => x + lookX
 
@@ -318,13 +332,12 @@ type BuddyFaceProps = {
 }
 
 export function BuddyFace({ uid, eyes, mouth, mood, depth, light, lit, tint }: BuddyFaceProps) {
-    const hasMouth = mouth !== 'none' || mood === 'error' || mood === 'waiting'
-    const eyeY = depth * (hasMouth ? 0.38 : 0.45)
+    const eyeY = buddyEyeLine({ mouth, mood, depth }) - gazeDrop(mood)
     return (
         <>
             {lit && <EyeDefs uid={uid} y={eyeY} tint={tint} light={light} />}
             <Eyes style={eyes} mood={mood} y={eyeY} light={light} uid={uid} lit={lit} />
-            {hasMouth && mood !== 'asleep' && <Mouth mouth={mouth} mood={mood} y={eyeY + 6.6} />}
+            {hasMouth(mouth, mood) && mood !== 'asleep' && <Mouth mouth={mouth} mood={mood} y={eyeY + 6.6} />}
         </>
     )
 }

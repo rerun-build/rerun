@@ -1,5 +1,5 @@
 import { createContext, use, type ComponentType, type ReactNode } from 'react'
-import Animated, { interpolate, useAnimatedProps, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
+import Animated, { interpolate, useAnimatedProps, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { G, Rect, type GProps } from 'react-native-svg'
 
 import { liftedBy, stretchedFrom } from './wall-motion'
@@ -81,6 +81,18 @@ export function Blinking({ y, children }: { y: number; children: ReactNode }) {
     })
     if (!clock || !motion) return <G>{children}</G>
     return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
+}
+
+// How open the eyes stand, 1 until they blink: `offset` keeps two faces from blinking together, null
+// holds them open. The value only changes while they close and open again, so nothing that reads it
+// runs in between.
+export function useBlinkScale(offset: number | null) {
+    const clock = use(Clock)
+    return useDerivedValue(() => {
+        if (!clock || offset === null) return 1
+        const phase = ((clock.value + offset) % BLINK.period) / BLINK.period
+        return interpolate(phase, BLINK.at, BLINK.scale)
+    })
 }
 
 // A band of light crossing the top while the agent works.
