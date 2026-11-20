@@ -90,7 +90,7 @@ async function namingTheClash<T>(actor: Actor, write: () => Promise<T>): Promise
 }
 
 // The entry once changed, as list_vault shows it.
-async function entryAfter(actor: Actor, entryId: string) {
+export async function entryAfter(actor: Actor, entryId: string) {
     const vault = await readVault(actor)
     if (!vault.available) return vault
     return vault.entries.find(entry => entry.id === entryId) ?? vault.paidAccounts.find(account => account.id === entryId) ?? null

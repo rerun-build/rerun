@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { saveForemanName } from '@/lib/foreman/profile'
 
-const mocks = vi.hoisted(() => ({ inviteMember: vi.fn() }))
+const mocks = vi.hoisted(() => ({ inviteMember: vi.fn(), addVaultService: vi.fn(), addVaultMcp: vi.fn(), shareVaultEntry: vi.fn(), entryAfter: vi.fn() }))
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/foreman/profile', () => ({ saveForemanName: vi.fn() }))
@@ -14,6 +14,9 @@ vi.mock('@/lib/foreman/inbox-tools', () => ({ dispatchInboxTool: vi.fn(async () 
 vi.mock('@/lib/foreman/onboarding-tools', () => ({ dispatchWorkspaceOnboardingTool: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/app/api/_services/members.service', () => ({ inviteMember: mocks.inviteMember }))
+vi.mock('@/app/api/_services/vault-install.service', () => ({ addVaultService: mocks.addVaultService, addVaultMcp: mocks.addVaultMcp }))
+vi.mock('@/app/api/_services/vault.service', () => ({ shareVaultEntry: mocks.shareVaultEntry }))
+vi.mock('@/app/api/_services/mcp-vault.service', () => ({ entryAfter: mocks.entryAfter }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: async () => ({ data: { id: 7, name: 'Acme', max_seats: 5 } }) }))
 
 const { dispatchForemanHubTool } = await import('./foreman-hub.service')
@@ -78,5 +81,32 @@ describe('the inbox tools', () => {
         await dispatchForemanHubTool(member, 'answer_card', { sessionId: 's1', action: 'approve' })
         expect(dispatchInboxTool).toHaveBeenNthCalledWith(1, member, 'list_pending_cards', {})
         expect(dispatchInboxTool).toHaveBeenNthCalledWith(2, member, 'answer_card', { sessionId: 's1', action: 'approve' })
+    })
+})
+
+describe('add_vault_entry', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+        mocks.addVaultService.mockResolvedValue({ status: 'needs_auth', item: { id: 'item-notion' } })
+        mocks.addVaultMcp.mockResolvedValue({ id: 'item-docs' })
+        mocks.entryAfter.mockImplementation(async (_actor: unknown, id: string) => ({ id, status: 'needs_auth' }))
+    })
+
+    it('adds an app with no value, lent to the coworkers named, and answers the entry as list_vault shows it', async () => {
+        await expect(dispatchForemanHubTool(member, 'add_vault_entry', { kind: 'app', slug: 'notion', agentIds: ['agent-lea'] })).resolves.toEqual({ id: 'item-notion', status: 'needs_auth' })
+        expect(mocks.addVaultService).toHaveBeenCalledWith({ slug: 'notion', agentIds: ['agent-lea'] }, member)
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('adds a custom MCP server and shares it with every coworker when asked', async () => {
+        await dispatchForemanHubTool(admin, 'add_vault_entry', { kind: 'mcp', name: 'Company docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true })
+        expect(mocks.addVaultMcp).toHaveBeenCalledWith({ name: 'Company docs', url: 'https://docs.acme.test/mcp', command: undefined, args: [], agentIds: [] }, admin)
+        expect(mocks.shareVaultEntry).toHaveBeenCalledWith('item-docs', true, admin)
+    })
+
+    it('refuses a kind it does not know and an app without its slug', async () => {
+        await expect(dispatchForemanHubTool(admin, 'add_vault_entry', { kind: 'secret' })).rejects.toThrow('kind')
+        await expect(dispatchForemanHubTool(admin, 'add_vault_entry', { kind: 'app' })).rejects.toThrow('slug')
+        expect(mocks.addVaultService).not.toHaveBeenCalled()
     })
 })

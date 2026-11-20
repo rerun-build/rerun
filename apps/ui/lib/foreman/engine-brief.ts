@@ -3,7 +3,7 @@ import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contra
 import type { ForemanState } from './phase'
 import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
-import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
+import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
 
 // The belt of the foreman that runs on the engine. Everything the hub executes goes through
 // POST /api/hub; the board gestures only reach the browser, as transient data parts, so nothing
@@ -16,6 +16,7 @@ import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS
 // it on the hub, never to the foreman that takes over once the team is built.
 
 const ENGINE_INTENT_TOOL_NAMES = new Set<ForemanClientToolName>(['focus_agent', 'show_agents', 'open_settings', 'open_connector_setup', 'open_template_card', 'recenter_board', 'open_brain_page'])
+const VAULT_INTENT_TOOL_NAMES = new Set<ForemanClientToolName>(['open_vault'])
 
 export const FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES: ReadonlySet<string> = new Set(['analyze_website', 'list_templates', 'install_template', 'install_shared_agent', 'start_agent_setup'])
 
@@ -41,7 +42,16 @@ function onBelt(def: ForemanToolDef): ForemanToolDef {
 
 const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_INBOX_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))].map(onBelt)
 
-const VAULT_HUB_TOOL_DEFS: ForemanToolDef[] = FOREMAN_VAULT_TOOL_NAMES.map(accountToolDef)
+// The account MCP server tells an outside assistant that adding to the Vault stays in the app. The
+// Chief of Staff adds through add_vault_entry and opens the Vault on what is left for the user.
+const VAULT_ADDING_IN_THE_APP = 'Adding an entry, signing it in and typing its credentials happen in the Rerun app (workspace menu, Vault), never here.'
+const VAULT_ADDING_BY_THE_FOREMAN = 'Nothing is ever typed here: add an entry with add_vault_entry, and open_vault on one that waits on a sign-in or a key.'
+
+function foremanVaultDef(def: ForemanToolDef): ForemanToolDef {
+    return { ...def, description: def.description.replace(VAULT_ADDING_IN_THE_APP, VAULT_ADDING_BY_THE_FOREMAN) }
+}
+
+const VAULT_HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_VAULT_TOOL_NAMES.map(accountToolDef).map(foremanVaultDef), ...FOREMAN_VAULT_TOOL_DEFS]
 
 // What the box can take beyond the belt every box takes: `vault` is a box with ENGINE_CAPABILITY_FOREMAN_VAULT.
 export type ForemanBoxFeatures = { vault?: boolean }
@@ -100,6 +110,6 @@ export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason, 
 export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } & ForemanBoxFeatures = {}): ForemanBrief {
     return {
         instructions: foremanEngineInstructions(state, options),
-        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
+        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name) || (options.vault && VAULT_INTENT_TOOL_NAMES.has(def.name))).map(def => spec(def, 'intent'))],
     }
 }

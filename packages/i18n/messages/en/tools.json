@@ -124,6 +124,8 @@
         "share_vault_entry": "Share Vault Entry",
         "rename_vault_entry": "Rename Vault Entry",
         "delete_vault_entry": "Delete Vault Entry",
+        "add_vault_entry": "Add to the Vault",
+        "open_vault": "Open the Vault",
         "send_message": "Message Coworker",
         "list_pending_cards": "Read Your Inbox",
         "answer_card": "Answer Card",

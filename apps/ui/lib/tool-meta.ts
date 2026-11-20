@@ -198,6 +198,8 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     share_vault_entry: Share2Icon,
     rename_vault_entry: PencilIcon,
     delete_vault_entry: Trash2Icon,
+    add_vault_entry: PlusIcon,
+    open_vault: LockIcon,
     send_message: SendIcon,
     list_pending_cards: InboxIcon,
     answer_card: MailCheckIcon,

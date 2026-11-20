@@ -61,6 +61,31 @@ export const FOREMAN_MCP_TOOL_NAMES = [
 // tools (supportsForemanVault).
 export const FOREMAN_VAULT_TOOL_NAMES = ['list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'rename_vault_entry', 'delete_vault_entry'] as const
 
+// What the Chief of Staff adds to the Vault beyond the account MCP server, which leaves adding an
+// entry to the app: the sign-in and the credentials still happen there, in the Vault it opens with
+// open_vault, or in a request_secret form.
+export const FOREMAN_VAULT_TOOL_DEFS = [
+    {
+        name: 'add_vault_entry',
+        description:
+            'Add an entry to the Vault, lent at once to the coworkers you name, or to every coworker. kind "app" adds an app of the Rerun library by its slug (from search_connectors); kind "mcp" adds a custom MCP server, by its https address or by the command the machine starts. No credential ever goes through here. The answer is the entry as list_vault shows it: one whose status is needs_auth (a sign-in) or needs_config (a key) waits on the user, so call open_vault on it and they finish it there; never ask them for the credential yourself. A custom MCP server that needs a key in a header is not added here: open_vault without an entry, and they add it from there. A paid app (LinkedIn Pro, WhatsApp Pro) is not added here: open_vault without an entry, and they add it from there.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                kind: { type: 'string', enum: ['app', 'mcp'] },
+                slug: { type: 'string', description: 'For kind app: the library slug.' },
+                name: { type: 'string', description: 'For kind mcp: what people read, like "Company docs".' },
+                url: { type: 'string', description: 'For kind mcp: the https address of a remote server.' },
+                command: { type: 'string', description: 'For kind mcp: the command the machine starts, instead of a url.' },
+                args: { type: 'array', items: { type: 'string' }, description: 'For kind mcp with a command: its arguments.' },
+                agentIds: { type: 'array', items: { type: 'string' }, description: 'The coworkers to lend it to, from list_vault. Leave it out to keep it in the Vault for later.' },
+                sharedWithAll: { type: 'boolean', description: 'True to give it to every coworker, including the ones added later. Admins only.' },
+            },
+            required: ['kind'],
+        },
+    },
+] as const
+
 // No MCP tool covers the Boxes, but the app's own server actions do, so these three are declared
 // here and dispatched onto them.
 export const FOREMAN_BOX_TOOL_DEFS = [
@@ -599,6 +624,15 @@ export const FOREMAN_CLIENT_TOOL_DEFS = [
             type: 'object',
             properties: { slug: { type: 'string', description: 'Slug of the template to open.' } },
             required: ['slug'],
+        },
+    },
+    {
+        name: 'open_vault',
+        description:
+            'Open the Vault in front of the user, on one of its entries when you pass entryId: that is where they sign in to an entry that waits on it (status needs_auth or needs_config), connect again one that expired, or add a paid app. You cannot sign in for them, so say in one line what to do there and wait. Without entryId it opens on the list.',
+        inputSchema: {
+            type: 'object',
+            properties: { entryId: { type: 'string', description: 'The id of an entry or of a paid account, from list_vault.' } },
         },
     },
     {

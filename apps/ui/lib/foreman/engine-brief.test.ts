@@ -43,13 +43,18 @@ describe('foremanEngineBrief', () => {
 
     it('hands the Vault tools and their rules only to a box that takes them', () => {
         const names = brief.tools.map(tool => tool.name)
-        for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(names).not.toContain(name)
+        for (const name of [...FOREMAN_VAULT_TOOL_NAMES, 'add_vault_entry', 'open_vault']) expect(names).not.toContain(name)
         expect(brief.instructions).not.toContain('list_vault')
 
         const withVault = foremanEngineBrief(state, { vault: true })
         const kinds = Object.fromEntries(withVault.tools.map(tool => [tool.name, tool.kind]))
         for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(kinds[name]).toBe('hub')
         expect(withVault.instructions).toContain('list_vault')
+        expect(kinds.add_vault_entry).toBe('hub')
+        expect(kinds.open_vault).toBe('intent')
+        expect(kinds).not.toHaveProperty('request_secret')
+        expect(withVault.tools.find(tool => tool.name === 'list_vault')?.description).toContain('add_vault_entry')
+        expect(withVault.tools.find(tool => tool.name === 'list_vault')?.description).not.toContain('never here')
         for (const name of FOREMAN_VAULT_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name)).toBe(true)
     })
 

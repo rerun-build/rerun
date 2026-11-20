@@ -3,6 +3,9 @@ import 'server-only'
 import { isAdminActor, type Actor } from '@/app/api/_auth/access'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
+import { entryAfter } from '@/app/api/_services/mcp-vault.service'
+import { addVaultMcp, addVaultService } from '@/app/api/_services/vault-install.service'
+import { shareVaultEntry } from '@/app/api/_services/vault.service'
 import { dispatchBoxTool } from '@/lib/foreman/box-tools'
 import { dispatchInboxTool } from '@/lib/foreman/inbox-tools'
 import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, accountToolNameOf } from '@/lib/foreman/engine-brief'
@@ -30,6 +33,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (tool === 'set_name') return setName(actor, args)
     if (tool === 'invite_members') return inviteMembers(actor, args)
     if (INBOX_TOOL_NAMES.has(tool)) return dispatchInboxTool(actor, tool, args)
+    if (tool === 'add_vault_entry') return addVaultEntry(actor, args)
 
     // The turn speaks for the member who wrote it: a Box they create is theirs to manage, a coworker
     // lands only in a Box they manage, and only their Boxes are listed. A turn with nobody behind it
@@ -53,6 +57,23 @@ async function setName(actor: Actor, args: Record<string, unknown>): Promise<{ n
     if (!name) throw new Error(`That name cannot be used: 1 to ${FOREMAN_NAME_MAX} letters, digits, spaces, dots, apostrophes or hyphens.`)
     await saveForemanName({ supabase: createServiceRoleClient(), workspace: { id: actor.workspaceId } }, name)
     return { name }
+}
+
+// Added with the checks of the Vault's own Add page, then left for the user to sign in to: no value
+// ever comes through here.
+async function addVaultEntry(actor: Actor, args: Record<string, unknown>) {
+    const agentIds = asStringArray(args.agentIds)
+    const kind = asString(args.kind)
+    let entryId: string
+    if (kind === 'app') {
+        entryId = (await addVaultService({ slug: requireString(args.slug, 'slug'), agentIds }, actor)).item.id
+    } else if (kind === 'mcp') {
+        entryId = (await addVaultMcp({ name: requireString(args.name, 'name'), url: asString(args.url), command: asString(args.command), args: asStringArray(args.args), agentIds }, actor)).id
+    } else {
+        throw new Error('kind must be "app" or "mcp".')
+    }
+    if (args.sharedWithAll === true) await shareVaultEntry(entryId, true, actor)
+    return entryAfter(actor, entryId)
 }
 
 const MAX_INVITES = 10

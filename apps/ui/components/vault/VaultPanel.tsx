@@ -43,11 +43,13 @@ type Props = {
     onChanged: () => Promise<void>
     // The lab has no session to read the catalog with.
     loadPopularApps?: () => Promise<VaultCatalogApp[]>
+    // An entry or a paid account to open on, as list_vault names it.
+    initialEntryId?: string
 }
 
-export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularApps }: Props) {
+export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularApps, initialEntryId }: Props) {
     const t = useTranslations('vault')
-    const [page, setPage] = useState<VaultPage>({ kind: 'list' })
+    const [page, setPage] = useState<VaultPage>(initialEntryId ? { kind: 'detail', id: initialEntryId } : { kind: 'list' })
     const [query, setQuery] = useState('')
     // Kept here rather than in the empty state, which unmounts on every trip to the Add page.
     const [popularApps, setPopularApps] = useState<VaultCatalogApp[] | null>(null)
@@ -62,7 +64,7 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
 
     // Derived rather than synced: an entry deleted here, or gone on a reload, drops the panel back to the list.
     const selected = page.kind === 'detail' ? listing?.entries.find(entry => entry.id === page.id) : undefined
-    const selectedPaid = page.kind === 'paid' ? paid.find(account => account.connectionId === page.connectionId) : undefined
+    const selectedPaid = page.kind === 'paid' || page.kind === 'detail' ? paid.find(account => account.connectionId === (page.kind === 'paid' ? page.connectionId : page.id)) : undefined
     const stepKey = page.kind === 'add' ? 'add' : (selected?.id ?? selectedPaid?.connectionId ?? 'list')
     const back = () => setPage({ kind: 'list' })
 

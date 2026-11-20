@@ -21,7 +21,8 @@ type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 
 // What the workspace menu knows and a tool call does not: which of its sections exist here. The
 // session lives in a React context, so the caller reads it and hands it over.
-export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean }
+// `vaultOpen`: the workspace menu opens the Vault only on an active plan or trial.
+export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {
     const choices = Object.entries(labels).map(([id, label]) => `${id} ("${label}")`)
@@ -112,6 +113,13 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
             const slug = asString(input, 'slug')
             if (!agentId || !slug) return { ok: false, error: 'open_connector_setup needs agentId and slug.' }
             return { ok: true, note: `A row leading to the Apps tab is under your message. Tell them to connect ${slug} from there, and do not ask for the credential yourself.` }
+        }
+
+        case 'open_vault': {
+            if (!gates.vaultOpen) return { ok: false, error: 'The Vault opens on an active plan or trial, and this workspace has none. Say so, and offer to open the billing panel instead.' }
+            const entryId = asString(input, 'entryId')
+            useWorkspaceSettingsStore.getState().openVault(entryId ?? undefined)
+            return { ok: true, note: entryId ? 'The Vault is open on that entry in front of the user. They sign in or type the key there themselves: say in one line what to do, then wait.' : 'The Vault is open in front of the user. Wait for them rather than walking them through it.' }
         }
 
         case 'open_template_card': {

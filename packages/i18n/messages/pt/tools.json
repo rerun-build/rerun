@@ -117,6 +117,8 @@
         "share_vault_entry": "Compartilhar item do Vault",
         "rename_vault_entry": "Renomear item do Vault",
         "delete_vault_entry": "Excluir item do Vault",
+        "add_vault_entry": "Adicionar ao Vault",
+        "open_vault": "Abrir o Vault",
         "send_message": "Mensagem ao coworker",
         "list_pending_cards": "Ler sua caixa de entrada",
         "answer_card": "Responder a um cartão",

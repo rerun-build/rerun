@@ -117,6 +117,8 @@
         "share_vault_entry": "Vault girdisini paylaş",
         "rename_vault_entry": "Vault girdisini yeniden adlandır",
         "delete_vault_entry": "Vault girdisini sil",
+        "add_vault_entry": "Vault'a ekle",
+        "open_vault": "Vault'u aç",
         "send_message": "Coworker'a mesaj gönder",
         "list_pending_cards": "Gelen kutunuzu okuyun",
         "answer_card": "Kartı yanıtla",
