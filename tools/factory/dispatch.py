@@ -2089,6 +2089,14 @@ class Dispatcher:
             clean = False
             self.machine = None
             log("-", "machine: %s" % type(e).__name__)
+        if self.machine is not None:
+            try:
+                self.own_readings = getattr(self, "own_readings", None) or machine.Own()
+                own_rows = self.own_readings.get(self.gh, self.repo, self.now(), os.environ.get("FACTORY_CODE_SHA"))
+                self.machine["readings"] = (self.machine["readings"] + own_rows)[-machine.MAX_READINGS:]
+            except Exception as e:
+                clean = False
+                log("-", "machine: %s" % type(e).__name__)
         heard, HEARD[:] = list(HEARD), []
         known = set(self.resolver.records(self, closed=True))
         try:
