@@ -73,7 +73,7 @@ export function cardTools(ctx: RunContext): ToolSet {
         }),
         card_file: tool({
             description:
-                'Show the user one or several files as preview tiles in the conversation, which they can click to open. Use it when you produced or updated files they should look at, and always before you ask them to review, approve or choose among files: every candidate of a choice (the three images, the slides of a carousel) goes in the same call, in the order you will refer to them. A file of your workspace takes scope \'agent\', a file of the shared space (one a sub-coworker or another coworker wrote there) takes scope \'shared\'. This does not read the files for you: use fs_read or shared_read for that.',
+                'Show the user one or several files as preview tiles in the conversation, which they can click to open. Use it when you produced or updated files they should look at, and always before you ask them to review, approve or choose among files: every candidate of a choice (the three images, the slides of a carousel) goes in the same call, in the order you will refer to them. A file of your workspace takes scope \'agent\', a file of the shared space (one another coworker wrote there) takes scope \'shared\'. This does not read the files for you: use fs_read or shared_read for that.',
             inputSchema: z.object({
                 files: jsonTolerantArray(
                     z

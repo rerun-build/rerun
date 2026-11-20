@@ -99,7 +99,20 @@ export const installPath = (id: string) => resolve(agentDir(id), 'INSTALL.md')
 
 export const agentEnvPath = (id: string) => resolve(agentDir(id), '.env')
 
-export const workspaceDir = (id: string) => resolve(agentDir(id), 'workspace')
+// A delegate works on the files of the coworker that spawned it: for as long as its task runs, its
+// workspace is that coworker's. Kept in memory only, so nothing on disk points from one agent to
+// another and deleting the delegate's folder never reaches the files it worked on.
+const lentWorkspaces = new Map<string, string>()
+
+export function lendWorkspace(ownerId: string, borrowerId: string): void {
+    lentWorkspaces.set(borrowerId, ownerId)
+}
+
+export function returnWorkspace(borrowerId: string): void {
+    lentWorkspaces.delete(borrowerId)
+}
+
+export const workspaceDir = (id: string) => resolve(agentDir(lentWorkspaces.get(id) ?? id), 'workspace')
 
 export const agentDataDir = (id: string) => resolve(agentDir(id), 'data')
 

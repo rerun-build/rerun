@@ -276,6 +276,12 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).toContain('coworker_db_query')
     })
 
+    it('tells the foreman its sub-coworkers work in its workspace, on its files', async () => {
+        const prompt = await buildSystemPrompt(foreman())
+
+        expect(prompt).toContain('they work in your workspace, on your files')
+    })
+
     it('carries what it keeps of its own, like a coworker: skills, routines, memories and connected services', async () => {
         sources.text = { skills: 'SKILL INDEX', schedules: 'SCHEDULE INDEX', triggers: 'TRIGGER INDEX', memory: 'MEMORY INDEX', mcp: 'MCP INDEX' }
         const prompt = await buildSystemPrompt(foreman({ tools: { trigger: false } }))

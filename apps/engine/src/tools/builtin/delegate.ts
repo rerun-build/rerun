@@ -7,7 +7,7 @@ import { deleteAgentIndex } from '../../db/repos/agents.js'
 import { createSession } from '../../db/repos/sessions.js'
 import { closeSystemDb } from '../../db/systemDb.js'
 import { closeAgentDb } from '../../db/agentDb.js'
-import { agentDir } from '../../config/paths.js'
+import { agentDir, lendWorkspace, returnWorkspace } from '../../config/paths.js'
 import { newId } from '../../lib/ids.js'
 import { runAgent } from '../../runtime/loop.js'
 import type { RunContext } from '../../runtime/context.js'
@@ -32,7 +32,7 @@ export function delegateTools(ctx: RunContext): ToolSet {
     return {
         delegate_tasks: tool({
             description:
-                'Delegate one or more self-contained subtasks to fresh ephemeral sub-coworkers. Pass several independent tasks to run them in parallel and finish faster; pass a single task when the work must stay sequential. Each sub-coworker inherits your tools, model and keys, runs its task to completion in its own workspace, and returns its final answer. Use this to decompose work without polluting your own context. Sub-agents cannot delegate further, and they cannot show anything to the user: the files they produce for you are in the shared space, at the paths their result lists, and it is up to you to show them with card_file and scope \'shared\' before you ask the user anything about them.',
+                'Delegate one or more self-contained subtasks to fresh ephemeral sub-coworkers. Pass several independent tasks to run them in parallel and finish faster; pass a single task when the work must stay sequential. Each sub-coworker inherits your tools, model and keys, works in your workspace on the same files as you, runs its task to completion, and returns its final answer. It knows nothing of this conversation: its task and context say all it needs and name the files to read. Tasks running in parallel must not write the same file. Use this to decompose work without polluting your own context. Sub-agents cannot delegate further, and they cannot show anything to the user: the files they produce for you are in your workspace, at the paths their result lists, and it is up to you to show them with card_file before you ask the user anything about them.',
             inputSchema: z.object({
                 tasks: z
                     .array(
@@ -62,9 +62,6 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     config.tools.delegate = false
                     // A card is addressed to the user, and nobody reads a delegate's session.
                     config.tools.cards = false
-                    // The delegate's workspace dies with its task: the shared space is the only
-                    // place a file it produced survives, so it gets the tools to write there.
-                    config.tools.shared = true
                     // Nobody can answer a delegate either: a question would end its run on a wait
                     // nobody sees, and the caller would get an empty result.
                     config.tools.askUser = false
@@ -93,6 +90,9 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     child.hubAgentId = ctx.agent.id
                     const taskSignal = registerSubRunStop(current.id)
                     try {
+                        // Its task names the caller's files by their path, and what it writes is for
+                        // the caller: it works where the caller does, not in a folder that dies with it.
+                        lendWorkspace(ctx.agent.id, child.id)
                         const session = await createSession(child.id, `delegated: ${task.slice(0, 80)}`, undefined, 'delegate')
                         const prompt = context ? `${context}\n\n---\n\n${task}` : task
                         const run = await runAgent(child, session.id, prompt)
@@ -104,6 +104,7 @@ export function delegateTools(ctx: RunContext): ToolSet {
                         return text
                     } finally {
                         unregisterSubRunStop(current.id)
+                        returnWorkspace(child.id)
                         unloadAgent(child.id)
                         closeSystemDb(child.id)
                         closeAgentDb(child.id)

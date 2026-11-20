@@ -80,7 +80,7 @@ beforeEach(() => {
 // The schemas ride along on every step of every run: the budget is what the whole set may cost a
 // prompt (a ratchet, set just above what the set weighs today and lowered as families move on
 // demand), and the per-tool cap is what the OpenAI chat API accepts for a description.
-const TOOL_PAYLOAD_CHARS_BUDGET = 73_550
+const TOOL_PAYLOAD_CHARS_BUDGET = 73_700
 const TOOL_DESCRIPTION_CHARS_CAP = 1_024
 
 describe('tool payload', () => {

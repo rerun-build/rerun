@@ -124,6 +124,14 @@ describe('a sub-coworker', () => {
         delegate.config.ephemeral = true
         expect(systemPromptText(await buildSystemPrompt(delegate, { source: 'chat' }, 'rerun'))).not.toContain('<turn_order>')
     })
+
+    it('knows it works in the workspace of its caller, on the files its task names', async () => {
+        const delegate = agentFor('rerun', CONFIGS.full)
+        delegate.config.ephemeral = true
+        const rules = sectionOf(systemPromptText(await buildSystemPrompt(delegate, { source: 'chat' }, 'rerun')), 'sub_agent_rules') ?? ''
+        expect(rules).toContain('You work in the workspace of the coworker that called you')
+        expect(rules).not.toContain('deleted the moment your task ends')
+    })
 })
 
 describe('the cards that close a turn', () => {

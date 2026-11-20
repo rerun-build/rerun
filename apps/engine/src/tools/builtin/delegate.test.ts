@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 import { vi } from 'vitest'
@@ -7,10 +7,10 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-delegate-'))
 process.env.RERUN_API_KEY = ''
 
 type Child = { id: string; config: any; soul: string; env: Record<string, string> }
-type Script = { text?: string; error?: string; throws?: string; gate?: Promise<void> }
+type Script = { text?: string; error?: string; throws?: string; gate?: Promise<void>; reads?: string; writes?: string }
 
 const runs = vi.hoisted(() => ({
-    started: [] as Array<{ child: Child; sessionId: string; prompt: string }>,
+    started: [] as Array<{ child: Child; sessionId: string; prompt: string; cwd: string; read?: string }>,
     script: (_prompt: string): Script => ({ text: 'done' }),
     active: 0,
     maxActive: 0,
@@ -18,8 +18,13 @@ const runs = vi.hoisted(() => ({
 
 vi.mock('../../runtime/loop.js', () => ({
     runAgent: async (child: Child, sessionId: string, prompt: string) => {
-        runs.started.push({ child, sessionId, prompt })
+        const { agentProcessEnv } = await import('../../agents/process-env.js')
+        const { filesystemTools } = await import('./filesystem.js')
         const script = runs.script(prompt)
+        const fs = filesystemTools({ agent: child } as any) as any
+        const read = script.reads ? String(await fs.fs_read.execute({ path: script.reads }, { toolCallId: 'r', messages: [] })) : undefined
+        if (script.writes) await fs.fs_write.execute({ path: script.writes, content: `written by ${child.id}` }, { toolCallId: 'w', messages: [] })
+        runs.started.push({ child, sessionId, prompt, cwd: agentProcessEnv(child as any).cwd, read })
         if (script.throws) throw new Error(script.throws)
         runs.active += 1
         runs.maxActive = Math.max(runs.maxActive, runs.active)
@@ -41,7 +46,7 @@ const { beforeAll, beforeEach, describe, expect, it } = await import('vitest')
 const { migrate } = await import('../../db/migrate.js')
 const { listAgentIndex } = await import('../../db/repos/agents.js')
 const { agentConfigSchema } = await import('../../agents/types.js')
-const { agentDir } = await import('../../config/paths.js')
+const { agentDir, workspaceDir } = await import('../../config/paths.js')
 const { delegateTools } = await import('./delegate.js')
 
 type Written = { type: string; id: string; data: { tasks: Array<{ status: string; title: string }> } }
@@ -98,6 +103,57 @@ describe('delegate_tasks', () => {
         expect(ctx.agent.config.selfImprovement.enabled).toBe(true)
     })
 
+    it('runs the child in the workspace of its caller, so a path its task names is the caller\'s file', async () => {
+        const { ctx } = ctxWith()
+        mkdirSync(resolve(workspaceDir('boss'), 'docs/contracts'), { recursive: true })
+        writeFileSync(resolve(workspaceDir('boss'), 'docs/contracts/BUILD-V2.md'), '# contracts')
+        runs.script = () => ({ text: 'done', reads: 'docs/contracts/BUILD-V2.md' })
+        await delegate(ctx, [{ task: 'Read docs/contracts/BUILD-V2.md first, then implement packages/brain' }])
+        expect(runs.started[0].cwd).toBe(workspaceDir('boss'))
+        expect(runs.started[0].read).toContain('# contracts')
+    })
+
+    it('leaves what the child wrote with its caller, and deletes only the child', async () => {
+        const { ctx } = ctxWith()
+        mkdirSync(workspaceDir('boss'), { recursive: true })
+        writeFileSync(resolve(workspaceDir('boss'), 'notes.md'), 'kept')
+        runs.script = () => ({ text: 'done', writes: 'packages/brain/index.ts' })
+        await delegate(ctx, [{ task: 'Implement packages/brain' }])
+        const { child } = runs.started[0]
+        expect(readFileSync(resolve(workspaceDir('boss'), 'packages/brain/index.ts'), 'utf8')).toBe(`written by ${child.id}`)
+        expect(readFileSync(resolve(workspaceDir('boss'), 'notes.md'), 'utf8')).toBe('kept')
+        expect(existsSync(agentDir(child.id))).toBe(false)
+        expect(workspaceDir(child.id)).toBe(resolve(agentDir(child.id), 'workspace'))
+    })
+
+    it('gives the caller its workspace back when the child fails to start', async () => {
+        const { ctx } = ctxWith()
+        mkdirSync(workspaceDir('boss'), { recursive: true })
+        writeFileSync(resolve(workspaceDir('boss'), 'notes.md'), 'kept')
+        runs.script = () => ({ throws: 'no model' })
+        await delegate(ctx, [{ task: 't' }])
+        const { child, cwd } = runs.started[0]
+        expect(cwd).toBe(workspaceDir('boss'))
+        expect(workspaceDir(child.id)).toBe(resolve(agentDir(child.id), 'workspace'))
+        expect(await listAgentIndex()).toEqual([])
+        expect(readFileSync(resolve(workspaceDir('boss'), 'notes.md'), 'utf8')).toBe('kept')
+    })
+
+    it('puts every parallel child in that same workspace', async () => {
+        const { ctx } = ctxWith()
+        runs.script = prompt => ({ text: 'done', writes: `${prompt}/out.md` })
+        await delegate(ctx, [{ task: 'a' }, { task: 'b' }, { task: 'c' }])
+        expect(new Set(runs.started.map(run => run.cwd))).toEqual(new Set([workspaceDir('boss')]))
+        for (const name of ['a', 'b', 'c']) expect(existsSync(resolve(workspaceDir('boss'), name, 'out.md'))).toBe(true)
+    })
+
+    it('tells the caller its sub-coworkers work on its own files', () => {
+        const { ctx } = ctxWith()
+        const { description } = delegateTools(ctx).delegate_tasks as { description: string }
+        expect(description).toContain('works in your workspace on the same files as you')
+        expect(description).not.toContain('shared space')
+    })
+
     it('makes the hub know the child as the coworker that delegated', async () => {
         const { ctx } = ctxWith()
         await delegate(ctx, [{ task: 't' }])
@@ -111,14 +167,6 @@ describe('delegate_tasks', () => {
         ctx.agent.config.paidDataAlwaysAllow = true
         await delegate(ctx, [{ task: 't' }])
         expect(runs.started[0].child.config.tools.paidData).toBe(true)
-    })
-
-    it('hands the child the shared tools even when the parent has them off', async () => {
-        const { ctx } = ctxWith()
-        ctx.agent.config.tools.shared = false
-        await delegate(ctx, [{ task: 't' }])
-        expect(runs.started[0].child.config.tools.shared).toBe(true)
-        expect(ctx.agent.config.tools.shared).toBe(false)
     })
 
     it('pins no connection when the parent resolved none', async () => {
