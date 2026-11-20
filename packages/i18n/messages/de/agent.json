@@ -459,7 +459,18 @@
         "coworkerDefault": "Coworker-Standard",
         "setCoworkerDefault": "Als Coworker-Standard festlegen",
         "makeDefault": "{model} zum Standard dieses Coworkers machen",
-        "refused": "{model} · {reason}. Wähle unten ein anderes Modell."
+        "refused": "{model} · {reason}. Wähle unten ein anderes Modell.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "Denkaufwand",
+        "reasoningOf": "Denkaufwand von {model}",
+        "effortDefault": "Standard",
+        "effortLow": "Niedrig",
+        "effortMedium": "Mittel",
+        "effortHigh": "Hoch",
+        "effortDefaultHint": "Wahl des Anbieters",
+        "effortLowHint": "Schnelle Antworten",
+        "effortMediumHint": "Ausgewogen",
+        "effortHighHint": "Denkt länger nach"
     },
     "modelPickerProviders": {
         "pitch": {

@@ -459,7 +459,18 @@
         "coworkerDefault": "Coworker varsayılanı",
         "setCoworkerDefault": "Coworker varsayılanı yap",
         "makeDefault": "{model} bu coworker'ın varsayılanı olsun",
-        "refused": "{model} · {reason}. Aşağıdan başka bir model seçin."
+        "refused": "{model} · {reason}. Aşağıdan başka bir model seçin.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "Akıl yürütme",
+        "reasoningOf": "{model} akıl yürütmesi",
+        "effortDefault": "Varsayılan",
+        "effortLow": "Düşük",
+        "effortMedium": "Orta",
+        "effortHigh": "Yüksek",
+        "effortDefaultHint": "Sağlayıcının seçimi",
+        "effortLowHint": "Hızlı yanıtlar",
+        "effortMediumHint": "Dengeli",
+        "effortHighHint": "Daha uzun düşünür"
     },
     "modelPickerProviders": {
         "pitch": {

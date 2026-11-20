@@ -459,7 +459,18 @@
         "coworkerDefault": "Predeterminado del coworker",
         "setCoworkerDefault": "Usar como predeterminado del coworker",
         "makeDefault": "Hacer de {model} el modelo predeterminado de este coworker",
-        "refused": "{model} · {reason}. Elige otro modelo abajo."
+        "refused": "{model} · {reason}. Elige otro modelo abajo.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "Razonamiento",
+        "reasoningOf": "Razonamiento de {model}",
+        "effortDefault": "Predeterminado",
+        "effortLow": "Bajo",
+        "effortMedium": "Medio",
+        "effortHigh": "Alto",
+        "effortDefaultHint": "Elección del proveedor",
+        "effortLowHint": "Respuestas rápidas",
+        "effortMediumHint": "Equilibrado",
+        "effortHighHint": "Piensa más tiempo"
     },
     "modelPickerProviders": {
         "pitch": {

@@ -459,7 +459,18 @@
         "coworkerDefault": "Padrão do coworker",
         "setCoworkerDefault": "Definir como padrão do coworker",
         "makeDefault": "Tornar {model} o padrão deste coworker",
-        "refused": "{model} · {reason}. Escolha outro modelo abaixo."
+        "refused": "{model} · {reason}. Escolha outro modelo abaixo.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "Raciocínio",
+        "reasoningOf": "Raciocínio de {model}",
+        "effortDefault": "Padrão",
+        "effortLow": "Baixo",
+        "effortMedium": "Médio",
+        "effortHigh": "Alto",
+        "effortDefaultHint": "Escolha do provedor",
+        "effortLowHint": "Respostas rápidas",
+        "effortMediumHint": "Equilibrado",
+        "effortHighHint": "Pensa por mais tempo"
     },
     "modelPickerProviders": {
         "pitch": {

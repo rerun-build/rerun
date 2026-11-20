@@ -63,6 +63,21 @@ Click the model pill in the message box to change the model. The picker lists:
 
 Picking a model from the chat changes it for that conversation only. To change what the coworker runs by default, click the star next to a model (**Set as coworker default**), or pick **Workspace default** to make it follow the workspace again. Only an admin or a manager of the coworker's Box can change its default.
 
+### Reasoning effort
+
+A model that can think for more or less time has a settings icon on its row. Click it to open **Reasoning** and pick how long the model thinks before it answers:
+
+| Level | What it does |
+| --- | --- |
+| **Default** | The provider's own choice, the level the model runs at when nothing is set |
+| **Low** | Quick answers |
+| **Medium** | Balanced |
+| **High** | Thinks longer, which takes more time and more of your plan or credit |
+
+Picking a level also picks that model for the conversation, and the pill shows it next to the model's name (**Opus 5.5 · High**). The star saves the level with the model as the coworker's default. Switching the coworker to another model resets its level to **Default**.
+
+The setting exists for every Claude model except Haiku 4.5, through a subscription, an Anthropic key or OpenRouter, for the OpenAI models through ChatGPT, an API key or OpenRouter, and for the Google models through an API key or OpenRouter. The **Rerun** models, OpenCode and custom endpoints have no settings icon: they run at the level their provider picks.
+
 <Note>
   Connecting your own subscription or API key needs an active plan or a running trial. The picker offers **Start free trial** or **Subscribe** until then.
 </Note>

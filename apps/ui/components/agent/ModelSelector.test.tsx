@@ -48,7 +48,7 @@ const CLAUDE_DEFAULT = {
     customOffered: false,
 }
 
-const modelContext = (model: Record<string, unknown>) => ({ model: { connectionId: null, model: null, resolvedConnectionId: null, resolvedModel: null, loaded: true, ...model }, setup: null })
+const modelContext = (model: Record<string, unknown>) => ({ model: { connectionId: null, model: null, effort: null, resolvedConnectionId: null, resolvedModel: null, loaded: true, ...model }, setup: null })
 const FAILED_READ = modelContext({ loaded: false })
 const FOLLOWS_CLAUDE = modelContext({ resolvedConnectionId: 'claude-1', resolvedModel: 'claude-sonnet-5-5' })
 
@@ -133,7 +133,7 @@ describe('ModelSelector override', REIMPORT_TIMEOUT, () => {
     it('repoints a pin that no longer resolves at the Box default, not at Rerun', async () => {
         mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'gone', model: 'gpt-6-astra', resolvedConnectionId: 'gone', resolvedModel: 'gpt-6-astra' }))
         await mount('stale-pin')
-        expect(storedOverride('stale-pin')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5' })
+        expect(storedOverride('stale-pin')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5', effort: null })
     })
 })
 
@@ -199,7 +199,7 @@ describe('ModelSelector opened by a notice', REIMPORT_TIMEOUT, () => {
         await requestPicker('tab-1')
         await pickModel('Opus 5.5')
         expect(onPicked).toHaveBeenCalledTimes(1)
-        expect(storedOverride('noticed')).toEqual({ connectionId: 'claude-1', model: 'claude-opus-5-5' })
+        expect(storedOverride('noticed')).toEqual({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: null })
     })
 
     it('waits for the coworker to follow the Box before saying the Box default was picked', async () => {
@@ -241,7 +241,114 @@ describe('ModelSelector opened by a notice', REIMPORT_TIMEOUT, () => {
         mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'gone', model: 'gpt-6-astra', resolvedConnectionId: 'gone', resolvedModel: 'gpt-6-astra' }))
         const onPicked = vi.fn()
         await mount('repointed', undefined, { pickerKey: 'tab-1', onPicked })
-        expect(storedOverride('repointed')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5' })
+        expect(storedOverride('repointed')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5', effort: null })
         expect(onPicked).not.toHaveBeenCalled()
+    })
+})
+
+// The settings icon of a model row opens the Reasoning submenu; a level picked there picks the row
+// with it. A model that takes no effort (the Rerun tiers) has no icon at all.
+describe('ModelSelector reasoning effort', REIMPORT_TIMEOUT, () => {
+    beforeEach(() => {
+        vi.resetModules()
+        localStorage.clear()
+        mocks.getAgentContextAction.mockResolvedValue(FOLLOWS_CLAUDE)
+        mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
+        mocks.updateAgentConfigAction.mockReset()
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    const pill = () => container!.querySelector('button')!.textContent
+
+    async function pickEffort(model: string, level: string) {
+        const gear = document.querySelector<HTMLButtonElement>(`button[aria-label="Reasoning of ${model}"]`)
+        expect(gear).not.toBeNull()
+        await act(async () => gear!.click())
+        await settle()
+        const option = [...document.querySelectorAll<HTMLButtonElement>('button')].find(button => !container!.contains(button) && button.textContent?.startsWith(level) && button.querySelector('svg'))
+        expect(option).toBeDefined()
+        await act(async () => option!.click())
+        await settle()
+    }
+
+    it('offers a level on the Claude models and none on the Rerun tiers', async () => {
+        await mount('icons')
+        await openPicker()
+        const gears = [...document.querySelectorAll('button[aria-label^="Reasoning of"]')].map(button => button.getAttribute('aria-label'))
+        expect(gears).toEqual(['Reasoning of Sonnet 5.5', 'Reasoning of Opus 5.5'])
+    })
+
+    it('picks the model with the level, and the pill says it', async () => {
+        await mount('high')
+        await openPicker()
+        await pickEffort('Opus 5.5', 'High')
+        expect(storedOverride('high')).toEqual({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'high' })
+        expect(pill()).toContain('Opus 5.5 · High')
+    })
+
+    it('keeps the bare model name on Default', async () => {
+        await mount('default-level')
+        await openPicker()
+        await pickEffort('Opus 5.5', 'Default')
+        expect(storedOverride('default-level')).toEqual({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: null })
+        expect(pill()).not.toContain('·')
+    })
+
+    it('makes the level part of the coworker default with the star', async () => {
+        await mount('starred')
+        await openPicker()
+        await pickEffort('Opus 5.5', 'Medium')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Opus 5.5 this coworker\'s default"]')
+        await act(async () => star!.click())
+        await settle()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('starred', { connectionId: 'claude-1', model: 'claude-opus-5-5', provider: 'claude', effort: 'medium' })
+    })
+
+    it("offers the star again on the coworker's model picked at another level", async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'low', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-opus-5-5' }))
+        await mount('relevel')
+        await openPicker()
+        expect(document.querySelector('button[aria-label="Make Opus 5.5 this coworker\'s default"]')).toBeNull()
+        await pickEffort('Opus 5.5', 'High')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Opus 5.5 this coworker\'s default"]')
+        expect(star).not.toBeNull()
+        await act(async () => star!.click())
+        await settle()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('relevel', { connectionId: 'claude-1', model: 'claude-opus-5-5', provider: 'claude', effort: 'high' })
+    })
+
+    // An engine older than the setting answers 403 to the field on the Chief of Staff.
+    it('sends no effort with a star on the Default level when none was saved', async () => {
+        await mount('bare-star')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Opus 5.5 this coworker\'s default"]')
+        await act(async () => star!.click())
+        await settle()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('bare-star', { connectionId: 'claude-1', model: 'claude-opus-5-5', provider: 'claude' })
+    })
+
+    it('clears a saved level when the star goes back to Default', async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'low', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-opus-5-5' }))
+        await mount('unlevel')
+        await openPicker()
+        await pickEffort('Opus 5.5', 'Default')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Opus 5.5 this coworker\'s default"]')
+        await act(async () => star!.click())
+        await settle()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('unlevel', { connectionId: 'claude-1', model: 'claude-opus-5-5', provider: 'claude', effort: null })
+    })
+
+    it("shows the coworker's own level when the conversation picked nothing", async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: 'low', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-opus-5-5' }))
+        await mount('pinned-level')
+        expect(pill()).toContain('Opus 5.5 · Low')
+        expect(storedOverride('pinned-level')).toBeNull()
     })
 })

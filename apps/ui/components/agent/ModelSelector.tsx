@@ -18,14 +18,74 @@ import { useRerunCredit } from '@/hooks/useRerunCredit'
 import { pillUsage } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
-import { ChevronDownIcon, Settings2Icon, StarIcon } from '@/lib/icons'
+import { CheckIcon, ChevronDownIcon, Settings2Icon, StarIcon } from '@/lib/icons'
+import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { useModelPickerStore } from '@/stores/model-picker.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { track } from '@rerun/analytics/client'
-import { RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { acceptsReasoningEffort, REASONING_EFFORTS, RERUN_CONNECTION_ID, type ReasoningEffort } from '@rerun/contracts'
+import { useIsMobile } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react'
+
+const EFFORT_LEVELS = [null, ...REASONING_EFFORTS] as const
+const EFFORT_KEY = { default: 'effortDefault', low: 'effortLow', medium: 'effortMedium', high: 'effortHigh' } as const
+const EFFORT_HINT_KEY = { default: 'effortDefaultHint', low: 'effortLowHint', medium: 'effortMediumHint', high: 'effortHighHint' } as const
+
+// The submenu lives in a portal, but React still bubbles its events up to the model row beneath it:
+// a click would pick the row without its level, and cmdk would read the arrows and Enter.
+const keepInSubmenu = (e: SyntheticEvent) => e.stopPropagation()
+
+// The settings icon of a model row that takes an effort, and the Reasoning submenu it opens beside
+// the picker (under the row on a phone, where the side has no room). Picking a level picks the row.
+function ReasoningEffortMenu({ modelName, effort, onPick }: { modelName: string; effort: ReasoningEffort | null; onPick: (effort: ReasoningEffort | null) => void }) {
+    const t = useTranslations('agent.modelSelector')
+    const isMobile = useIsMobile()
+    const [open, setOpen] = useState(false)
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <button
+                    type="button"
+                    tabIndex={-1}
+                    aria-label={t('reasoningOf', { model: modelName })}
+                    className="inline-flex shrink-0 items-center gap-1 rounded px-1 py-0.5 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:text-foreground hover:opacity-100 aria-expanded:bg-muted aria-expanded:opacity-100"
+                    onClick={keepInSubmenu}
+                >
+                    {effort && <span className="text-[11px]">{t(EFFORT_KEY[effort])}</span>}
+                    <Settings2Icon className="size-3.5" />
+                </button>
+            </PopoverTrigger>
+            <PopoverContent
+                side={isMobile ? 'bottom' : 'right'}
+                align={isMobile ? 'end' : 'start'}
+                sideOffset={isMobile ? 4 : 12}
+                className="w-60 gap-0 p-1"
+                onClick={keepInSubmenu}
+                onPointerMove={keepInSubmenu}
+                onKeyDown={keepInSubmenu}
+            >
+                <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">{t('reasoning')}</p>
+                {EFFORT_LEVELS.map(level => (
+                    <button
+                        key={level ?? 'default'}
+                        type="button"
+                        onClick={() => {
+                            setOpen(false)
+                            onPick(level)
+                        }}
+                        className="flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
+                    >
+                        <span className="flex-1">{t(EFFORT_KEY[level ?? 'default'])}</span>
+                        <span className="text-xs text-muted-foreground">{t(EFFORT_HINT_KEY[level ?? 'default'])}</span>
+                        <CheckIcon className={cn('size-3.5 shrink-0', level === effort ? 'opacity-100' : 'opacity-0')} />
+                    </button>
+                ))}
+            </PopoverContent>
+        </Popover>
+    )
+}
 
 type ModelSelectorProps = {
     agentId: string
@@ -60,7 +120,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const windowsSummary = usePlanWindowsSummary()
     const [open, setOpen] = useState(false)
     const openedOnRequestRef = useRef(false)
-    const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
+    const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, pinnedEffort, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
         useAvailableModels(agentId)
     const { selection, select } = useAgentModel(agentId)
     // Picking a model for this conversation stays open: only what the coworker runs by default is
@@ -76,6 +136,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
 
     const model = selection.model ?? pinnedModel ?? resolvedModel
     const connectionId = selection.connectionId ?? pinnedConnectionId ?? resolvedConnectionId
+    // As the engine reads it: the conversation's level, else the coworker's on the model it was set for.
+    const effort = selection.model && selection.effort !== undefined ? selection.effort : model === pinnedModel ? pinnedEffort : null
     const hasAvailable = availableGroups.length > 0
     const connectedProviders = useMemo(() => new Set(availableGroups.map(group => group.provider)), [availableGroups])
     const claudePlanOffered = useClaudePlanOffered()
@@ -109,8 +171,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         if (loading || active || !hasAvailable || engineResolvesModel) return
         const fallback = connectionOf(model, connectionId) ?? availableGroups.find(group => group.connectionId === boxDefaultPick?.connectionId) ?? availableGroups[0]
         const nextModel = model && fallback.models.some(m => m.id === model) ? model : fallback.defaultModel
-        select({ connectionId: fallback.connectionId, model: nextModel })
-    }, [loading, active, hasAvailable, engineResolvesModel, availableGroups, connectionOf, boxDefaultPick, model, connectionId, select])
+        select({ connectionId: fallback.connectionId, model: nextModel, effort: nextModel === model ? effort : null })
+    }, [loading, active, hasAvailable, engineResolvesModel, availableGroups, connectionOf, boxDefaultPick, model, connectionId, effort, select])
 
     // With nothing to pick from, the request lands where a model gets set up.
     useEffect(() => {
@@ -164,9 +226,20 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         onRefusedModelChange?.(refusedMessage)
     }, [loading, active, engineResolvesModel, hasAvailable, hasOwnConnection, connectionId, refusedMessage, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange])
 
+    // The level a row shows and keeps when it is picked: the conversation's on the current row, the
+    // coworker's on its default, the provider's everywhere else.
+    const rowEffort = useCallback(
+        (group: ConnectionGroup, rowModel: string): ReasoningEffort | null => {
+            if (!acceptsReasoningEffort(group.provider, rowModel)) return null
+            if (active?.connectionId === group.connectionId && model === rowModel) return effort
+            return pinnedConnectionId === group.connectionId && pinnedModel === rowModel ? pinnedEffort : null
+        },
+        [active, model, effort, pinnedConnectionId, pinnedModel, pinnedEffort]
+    )
+
     const selectModel = useCallback(
-        (group: ConnectionGroup, nextModel: string) => {
-            select({ connectionId: group.connectionId, model: nextModel })
+        (group: ConnectionGroup, nextModel: string, nextEffort: ReasoningEffort | null) => {
+            select({ connectionId: group.connectionId, model: nextModel, effort: nextEffort })
             closeOnPick()
         },
         [select, closeOnPick]
@@ -198,7 +271,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const usageLabel = !usage || !active ? null : usageOfCredit ? creditDetail(rerunCredit) : windowsSummary(usage.windows, active.provider)
     const usageDetail = !usage || !active ? null : usageOfCredit ? usageLabel : <PlanLimitDetail windows={active.planWindows} provider={active.provider} />
 
-    const label = !hasAvailable ? t('setUp') : engineResolvesModel ? t('defaultLabel', { model: modelText }) : !active ? t('select') : modelText
+    const activeEffort = active && model ? rowEffort(active, model) : null
+    const label = !hasAvailable ? t('setUp') : engineResolvesModel ? t('defaultLabel', { model: modelText }) : !active ? t('select') : activeEffort ? t('pillWithEffort', { model: modelText, effort: t(EFFORT_KEY[activeEffort]) }) : modelText
 
     const trigger = (
         <PopoverTrigger asChild>
@@ -267,7 +341,10 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                 }
                             >
                                 {group.models.map(m => {
-                                    const isDefault = pinnedConnectionId === group.connectionId && pinnedModel === m.id
+                                    const levelOfRow = rowEffort(group, m.id)
+                                    // The default is a model and its level: the coworker's model on another level
+                                    // offers the star again, to save that level.
+                                    const isDefault = pinnedConnectionId === group.connectionId && pinnedModel === m.id && levelOfRow === pinnedEffort
                                     const disabledReason = group.connectionId === RERUN_CONNECTION_ID && rerunCredit.paused ? tShared('creditPaused') : m.unavailable
                                     if (disabledReason) {
                                         return (
@@ -308,13 +385,14 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                 onClick={e => {
                                                     e.preventDefault()
                                                     e.stopPropagation()
-                                                    setDefault(group.connectionId, m.id, group.provider)
+                                                    setDefault(group.connectionId, m.id, group.provider, levelOfRow)
                                                 }}
                                             >
                                                 <StarIcon className="size-3.5" />
                                             </button>
                                         </TooltipLabeled>
                                     )
+                                    const effortMenu = acceptsReasoningEffort(group.provider, m.id) ? <ReasoningEffortMenu modelName={m.label} effort={levelOfRow} onPick={level => selectModel(group, m.id, level)} /> : null
                                     if (m.description) {
                                         return (
                                             <CommandItem
@@ -322,9 +400,19 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                 className="group/model"
                                                 value={`${group.label} ${m.label} ${m.id}`}
                                                 data-checked={active?.connectionId === group.connectionId && model === m.id}
-                                                onSelect={() => selectModel(group, m.id)}
+                                                onSelect={() => selectModel(group, m.id, levelOfRow)}
                                             >
-                                                <ModelTierRow label={m.label} description={m.description} power={m.power} trailing={defaultStar} />
+                                                <ModelTierRow
+                                                    label={m.label}
+                                                    description={m.description}
+                                                    power={m.power}
+                                                    trailing={
+                                                        <>
+                                                            {defaultStar}
+                                                            {effortMenu}
+                                                        </>
+                                                    }
+                                                />
                                             </CommandItem>
                                         )
                                     }
@@ -334,10 +422,11 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                             className="group/model"
                                             value={`${group.label} ${m.label} ${m.id}`}
                                             data-checked={active?.connectionId === group.connectionId && model === m.id}
-                                            onSelect={() => selectModel(group, m.id)}
+                                            onSelect={() => selectModel(group, m.id, levelOfRow)}
                                         >
                                             <span className="min-w-0 flex-1 truncate">{m.label}</span>
                                             {defaultStar}
+                                            {effortMenu}
                                             <PowerBars power={m.power} />
                                         </CommandItem>
                                     )

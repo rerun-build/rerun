@@ -5,6 +5,7 @@ import { patchAgentModel, useAgentContext } from '@/hooks/useAgentContext'
 import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import type { BoxDefault } from '@/lib/engine/types'
 import type { EngineProvider } from '@/lib/engine/types'
+import type { ReasoningEffort } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo } from 'react'
 import { connectionGroups, type ConnectionGroup } from '@/lib/engine/model-groups'
@@ -17,7 +18,7 @@ export function useAvailableModels(agentId: string) {
     const tConnections = useTranslations('connections')
 
     const agentModel = context?.model
-    const pin = { connectionId: agentModel?.connectionId ?? null, model: agentModel?.model ?? null }
+    const pin = { connectionId: agentModel?.connectionId ?? null, model: agentModel?.model ?? null, effort: agentModel?.effort ?? null }
     const resolved = { connectionId: agentModel?.resolvedConnectionId ?? null, model: agentModel?.resolvedModel ?? null }
     // An engine older than Box defaults answers no resolved model, and would reject a
     // `model: null` patch. Offering the entry would hand the user a dead button.
@@ -47,18 +48,22 @@ export function useAvailableModels(agentId: string) {
         return group ? { connectionId: group.connectionId, model: group.defaultModel } : null
     }, [boxDefault, availableGroups])
 
+    // The effort is only sent when it changes something: an engine older than the setting refuses the
+    // field on the Chief of Staff, and a new one already drops a saved effort when the model changes.
+    const savedEffort = pin.effort
     const setDefault = useCallback(
-        (connectionId: string, model: string, provider: EngineProvider) => {
-            patchAgentModel(agentId, { connectionId, model, resolvedConnectionId: connectionId, resolvedModel: model })
-            void updateAgentConfigAction(agentId, { connectionId, model, provider })
+        (connectionId: string, model: string, provider: EngineProvider, effort: ReasoningEffort | null) => {
+            patchAgentModel(agentId, { connectionId, model, effort, resolvedConnectionId: connectionId, resolvedModel: model })
+            void updateAgentConfigAction(agentId, { connectionId, model, provider, ...(effort || savedEffort ? { effort } : {}) })
         },
-        [agentId]
+        [agentId, savedEffort]
     )
 
     // Back to following the Box. All three fields go, even though a null model is what the engine
-    // switches on: a leftover connectionId would still show up in a connection's usage.
+    // switches on: a leftover connectionId would still show up in a connection's usage. The engine
+    // drops the effort with the model.
     const followBoxDefault = useCallback(() => {
-        patchAgentModel(agentId, { connectionId: null, model: null, resolvedConnectionId: boxDefaultPick?.connectionId ?? null, resolvedModel: boxDefaultPick?.model ?? null })
+        patchAgentModel(agentId, { connectionId: null, model: null, effort: null, resolvedConnectionId: boxDefaultPick?.connectionId ?? null, resolvedModel: boxDefaultPick?.model ?? null })
         return updateAgentConfigAction(agentId, { connectionId: null, provider: null, model: null })
     }, [agentId, boxDefaultPick])
 
@@ -68,6 +73,7 @@ export function useAvailableModels(agentId: string) {
         // What the agent pinned: null on both means it follows the Box.
         pinnedModel: pin.model,
         pinnedConnectionId: pin.connectionId,
+        pinnedEffort: pin.effort,
         // What it actually runs on today, pin or Box default.
         resolvedModel: resolved.model,
         resolvedConnectionId: resolved.connectionId,

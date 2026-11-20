@@ -549,7 +549,18 @@
         "coworkerDefault": "Coworker default",
         "setCoworkerDefault": "Set as coworker default",
         "makeDefault": "Make {model} this coworker's default",
-        "refused": "{model} · {reason}. Pick another model below."
+        "refused": "{model} · {reason}. Pick another model below.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "Reasoning",
+        "reasoningOf": "Reasoning of {model}",
+        "effortDefault": "Default",
+        "effortLow": "Low",
+        "effortMedium": "Medium",
+        "effortHigh": "High",
+        "effortDefaultHint": "Provider's choice",
+        "effortLowHint": "Quick answers",
+        "effortMediumHint": "Balanced",
+        "effortHighHint": "Thinks longer"
     },
     "modelPickerProviders": {
         "pitch": {
