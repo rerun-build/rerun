@@ -105,7 +105,8 @@
         },
         "goodResponse": "İyi yanıt",
         "badResponse": "Kötü yanıt",
-        "regenerate": "Yeniden oluştur"
+        "regenerate": "Yeniden oluştur",
+        "relayedFor": "{named, select, yes {{person} adına {name}} other {{person} adına Chief of Staff}}"
     },
     "installGate": {
         "title": "{name} kurulumu",

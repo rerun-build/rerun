@@ -213,6 +213,13 @@ describe('message author', () => {
         expect(legacy.metadata).not.toHaveProperty('authorId')
     })
 
+    it('says when the Chief of Staff sent a message for its author, on the web and to the app', () => {
+        const [relayed, typed] = transformEngineMessages([{ ...row('m1', 'u1'), authorVia: 'foreman' }, { ...row('m2', 'u1'), authorVia: null }])
+        expect(relayed.metadata).toMatchObject({ authorId: 'u1', relayedBy: 'foreman' })
+        expect(typed.metadata).not.toHaveProperty('relayedBy')
+        expect(toApiMessages([relayed])[0].metadata).toEqual({ createdAt: '2026-10-05T10:00:00Z', authorId: 'u1', relayedBy: 'foreman' })
+    })
+
     it('hands the author to the app, beside the attachments', () => {
         const signed: HistoryMessage = { ...user('Hello'), metadata: { authorId: 'u1' } }
         expect(toApiMessages([signed])[0].metadata).toEqual({ authorId: 'u1' })

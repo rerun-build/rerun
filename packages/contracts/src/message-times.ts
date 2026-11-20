@@ -30,7 +30,7 @@ export function splitTurnsAtBreaks<M extends { id: string }>(turns: readonly Aut
         for (const item of turn.items) {
             const current = pieces.at(-1)
             if (current && !breaks.has(item.index)) current.items.push(item)
-            else pieces.push({ key: pieces.length === 0 ? turn.key : item.message.id, authorId: turn.authorId, items: [item] })
+            else pieces.push({ key: pieces.length === 0 ? turn.key : item.message.id, authorId: turn.authorId, relayed: turn.relayed, items: [item] })
         }
         return pieces
     })

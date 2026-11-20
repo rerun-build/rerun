@@ -20,7 +20,7 @@ type ToolInvocationPart = {
 }
 type ProviderSwitchPart = { type: typeof PROVIDER_SWITCH_PART; data: ProviderSwitch }
 type UIMessagePart = TextPart | ToolInvocationPart | ProviderSwitchPart
-export type HistoryMessage = { id: string; role: 'user' | 'assistant'; parts: UIMessagePart[]; metadata?: { authorId?: string; createdAt?: string } }
+export type HistoryMessage = { id: string; role: 'user' | 'assistant'; parts: UIMessagePart[]; metadata?: { authorId?: string; createdAt?: string; relayedBy?: 'foreman' } }
 
 function safeParse(json: string | null | undefined): unknown {
     if (!json) return null
@@ -69,7 +69,7 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
         const content = safeParse(m.contentJson)
 
         if (m.role === 'user') {
-            result.push({ id: `engine-${m.id}`, role: 'user', parts: [{ type: 'text', text: extractText(content) }], metadata: { createdAt: m.createdAt, ...(m.authorId && { authorId: m.authorId }) } })
+            result.push({ id: `engine-${m.id}`, role: 'user', parts: [{ type: 'text', text: extractText(content) }], metadata: { createdAt: m.createdAt, ...(m.authorId && { authorId: m.authorId }), ...(m.authorVia === 'foreman' && { relayedBy: 'foreman' as const }) } })
             continue
         }
 
@@ -207,14 +207,16 @@ function userMessageForApi(message: HistoryMessage): ConversationMessage {
     if (scheduledRun) return { id: message.id, role: 'user', parts: [{ type: 'text', text: scheduledRun.prompt }], metadata: { ...dated, scheduledRun: { slug: scheduledRun.slug, name: scheduledRun.name } } }
 
     const authorId = message.metadata?.authorId
+    const relayedBy = message.metadata?.relayedBy
+    const authored = { ...(authorId && { authorId }), ...(relayedBy && { relayedBy }) }
     // A voice message sent with files carries the attachments marker after its voice marker.
     const attachments = parseAttachments(text)
     const voice = parseVoiceMessage(attachments?.text ?? text)
-    if (!attachments && !voice) return { id: message.id, role: 'user', parts: message.parts, ...((authorId || createdAt) && { metadata: { ...dated, ...(authorId && { authorId }) } }) }
+    if (!attachments && !voice) return { id: message.id, role: 'user', parts: message.parts, ...((authorId || createdAt) && { metadata: { ...dated, ...authored } }) }
 
     const metadata: ConversationMessageMetadata = {
         ...dated,
-        ...(authorId && { authorId }),
+        ...authored,
         ...(attachments && { attachments: attachments.paths.map(attachmentOf) }),
         ...(voice && { voice: { transcript: voice.transcript, src: voice.src, durationMs: voice.durationMs, peaks: encodePeaks(voice.peaks) } }),
     }

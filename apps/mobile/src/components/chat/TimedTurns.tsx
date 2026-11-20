@@ -36,7 +36,7 @@ export function TimedTurns({ messages, authorOf, renderMessage, from = 0, to = I
         return (
             <Fragment key={turn.key}>
                 {breaks.has(opening) && <ChatTimeSeparator createdAt={times[opening]} />}
-                {author !== undefined ? <AuthoredGroup author={author}>{views}</AuthoredGroup> : views}
+                {author !== undefined ? <AuthoredGroup author={author} relayed={turn.relayed}>{views}</AuthoredGroup> : views}
             </Fragment>
         )
     })

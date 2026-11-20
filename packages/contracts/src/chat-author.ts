@@ -8,7 +8,7 @@ export const FORMER_MEMBER: AuthorProfile = { id: 'gone', name: 'Former member' 
 type PartLike = { type: string; text?: string }
 type AuthoredMessageLike = { id: string; role: string; parts: readonly PartLike[]; metadata?: unknown }
 
-export type AuthorTurn<M> = { key: string; authorId: string | undefined; items: { message: M; index: number }[] }
+export type AuthorTurn<M> = { key: string; authorId: string | undefined; relayed: boolean; items: { message: M; index: number }[] }
 
 /**
  * Who typed a message, when someone did. A schedule, a trigger or the API leave it unsigned, and so
@@ -22,14 +22,23 @@ export function authorIdOf(message: AuthoredMessageLike): string | undefined {
     return parseInstallMessage(messageText(message)) ? undefined : authorId
 }
 
-/** Consecutive messages one person sent become one turn; everything else stands alone. */
+/** The Chief of Staff sent this message in its author's name, answering a card they were owed. */
+export function isRelayedMessage(message: AuthoredMessageLike): boolean {
+    return message.role === 'user' && (message.metadata as { relayedBy?: unknown } | null | undefined)?.relayedBy === 'foreman'
+}
+
+/**
+ * Consecutive messages one person sent become one turn; everything else stands alone. What the Chief
+ * of Staff sent for them is a turn of its own: it is not what they typed.
+ */
 export function authorTurnsOf<M extends AuthoredMessageLike>(messages: readonly M[]): AuthorTurn<M>[] {
     const turns: AuthorTurn<M>[] = []
     messages.forEach((message, index) => {
         const authorId = authorIdOf(message)
+        const relayed = authorId !== undefined && isRelayedMessage(message)
         const last = turns.at(-1)
-        if (last && authorId !== undefined && last.authorId === authorId) last.items.push({ message, index })
-        else turns.push({ key: message.id, authorId, items: [{ message, index }] })
+        if (last && authorId !== undefined && last.authorId === authorId && last.relayed === relayed) last.items.push({ message, index })
+        else turns.push({ key: message.id, authorId, relayed, items: [{ message, index }] })
     })
     return turns
 }

@@ -5,8 +5,10 @@ import { Pressable, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
+import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { foremanNameValues, useForemanName } from '@/data/useForemanName'
 import { useTheme } from '@/theme/theme'
 import { brand, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
@@ -47,9 +49,38 @@ export function AuthorAvatar({ author, size = SIZE }: { author: AuthorProfile; s
 /**
  * The web's `AuthoredGroup`: consecutive messages one person sent, signed once by their avatar at the
  * foot of the group. A `null` author is one not resolved yet: the avatar's place is held so the
- * bubbles never shift. A long press on the avatar names them, the web's hover tooltip.
+ * bubbles never shift. A long press on the avatar names them, the web's hover tooltip. `relayed`: the
+ * Chief of Staff sent them in that person's name, so it signs them, and says for whom.
  */
-export function AuthoredGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
+export function AuthoredGroup({ author, relayed = false, children }: { author: AuthorProfile | null; relayed?: boolean; children: ReactNode }) {
+    if (relayed) return <RelayedGroup author={author}>{children}</RelayedGroup>
+    return <MemberGroup author={author}>{children}</MemberGroup>
+}
+
+function RelayedGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
+    const theme = useTheme()
+    const t = useTranslations('mobileChat.messages')
+    const foremanName = useForemanName()
+    return (
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm }}>
+            <View style={{ flex: 1, minWidth: 0, gap: spacing.sm }}>
+                {children}
+                {author ? (
+                    <AppText variant="caption" numberOfLines={1} style={{ alignSelf: 'flex-end', color: theme.mutedForeground }}>
+                        {t('relayedFor', { ...foremanNameValues(foremanName), person: firstNameOf(author) })}
+                    </AppText>
+                ) : (
+                    <Skeleton style={{ alignSelf: 'flex-end', width: 112, height: 12, borderRadius: radius.sm }} />
+                )}
+            </View>
+            <View style={{ marginBottom: 20 }}>
+                <ForemanOrb size={SIZE} paused />
+            </View>
+        </View>
+    )
+}
+
+function MemberGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
     const theme = useTheme()
     const [named, setNamed] = useState(false)
     const t = useTranslations('mobileChat.messages')

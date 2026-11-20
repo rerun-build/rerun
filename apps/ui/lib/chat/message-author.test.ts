@@ -31,6 +31,16 @@ describe('authorTurnsOf', () => {
     it('never groups unsigned messages together', () => {
         expect(authorTurnsOf([user('m1'), user('m2')])).toHaveLength(2)
     })
+
+    it('keeps what the Chief of Staff sent for someone apart from what they typed', () => {
+        const relayed = { ...user('m2'), metadata: { authorId: 'u1', relayedBy: 'foreman' } }
+        const turns = authorTurnsOf([user('m1', 'u1'), relayed, user('m3', 'u1')])
+        expect(turns.map(turn => [turn.key, turn.authorId, turn.relayed])).toEqual([
+            ['m1', 'u1', false],
+            ['m2', 'u1', true],
+            ['m3', 'u1', false],
+        ])
+    })
 })
 
 describe('install guide', () => {

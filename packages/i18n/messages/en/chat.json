@@ -3,6 +3,7 @@
         "activity.buildingCoworkers": "What the onboarding is doing right now: building several AI coworkers, and how many are done.",
         "activity.runningTool": "What the coworker is doing right now. {tool} is the name of a step, e.g. 'Web Search'.",
         "activity.waitingOn": "The coworker waits for another coworker it called. {name} is that coworker's name.",
+        "message.relayedFor": "Under a message the Chief of Staff sent into a coworker's conversation in a person's name, answering the coworker's card for them. {name} is the Chief of Staff's own name when the workspace gave it one, {person} the first name of that person.",
         "activity.waitingOnSubCoworkers": "The coworker waits for the sub-tasks it delegated, and how many are done.",
         "agentChat.selectModel": "Shown under the message box when the user tries to send before an AI model is picked. The model menu sits under the message box.",
         "agentInstall.guideTitle": "{name} is the coworker's name.",
@@ -215,7 +216,8 @@
         },
         "goodResponse": "Good response",
         "badResponse": "Bad response",
-        "regenerate": "Regenerate"
+        "regenerate": "Regenerate",
+        "relayedFor": "{named, select, yes {{name} for {person}} other {Chief of Staff for {person}}}"
     },
     "installGate": {
         "title": "Set up {name}",

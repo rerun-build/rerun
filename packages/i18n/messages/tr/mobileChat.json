@@ -181,6 +181,7 @@
         "runningTool": "Çalıştırılıyor: {tool}",
         "scrollToLatest": "Son mesaja kaydır",
         "sentBy": "Gönderen: {name}",
+        "relayedFor": "{named, select, yes {{person} adına {name}} other {{person} adına Chief of Staff}}",
         "share": "Paylaş",
         "showLess": "Daha az göster",
         "showMore": "Daha fazla göster",

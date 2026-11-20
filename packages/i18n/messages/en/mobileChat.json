@@ -181,6 +181,7 @@
         "runningTool": "Running {tool}",
         "scrollToLatest": "Scroll to the latest message",
         "sentBy": "Sent by {name}",
+        "relayedFor": "{named, select, yes {{name} for {person}} other {Chief of Staff for {person}}}",
         "share": "Share",
         "showLess": "Show less",
         "showMore": "Show more",
@@ -296,6 +297,7 @@
         "brand": "Rerun"
     },
     "_context": {
+        "messages.relayedFor": "Under a message the Chief of Staff sent into a coworker's conversation in a person's name, answering the coworker's card for them. {name} is the Chief of Staff's own name when the workspace gave it one, {person} the first name of that person.",
         "foreman.away.none.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "foreman.away.onboarding.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "desktop.keys.delete": "The Backspace key of a keyboard, on a button that sends it to a remote screen.",

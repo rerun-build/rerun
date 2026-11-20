@@ -105,7 +105,8 @@
         },
         "goodResponse": "Gute Antwort",
         "badResponse": "Schlechte Antwort",
-        "regenerate": "Neu generieren"
+        "regenerate": "Neu generieren",
+        "relayedFor": "{named, select, yes {{name} für {person}} other {Chief of Staff für {person}}}"
     },
     "installGate": {
         "title": "{name} einrichten",

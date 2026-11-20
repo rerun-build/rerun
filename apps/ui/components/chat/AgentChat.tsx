@@ -1082,7 +1082,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                             return (
                                 <Fragment key={turn.key}>
                                     {timeBreaks.has(opening) && <ChatTimeSeparator createdAt={messageTimes[opening]} />}
-                                    {turn.authorId ? <AuthoredGroup author={profileOf(turn.authorId)}>{views}</AuthoredGroup> : views}
+                                    {turn.authorId ? <AuthoredGroup author={profileOf(turn.authorId)} relayed={turn.relayed}>{views}</AuthoredGroup> : views}
                                 </Fragment>
                             )
                         })}

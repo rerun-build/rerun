@@ -181,6 +181,7 @@
         "runningTool": "Executando {tool}",
         "scrollToLatest": "Ir para a última mensagem",
         "sentBy": "Enviado por {name}",
+        "relayedFor": "{named, select, yes {{name} em nome de {person}} other {Chief of Staff em nome de {person}}}",
         "share": "Compartilhar",
         "showLess": "Mostrar menos",
         "showMore": "Mostrar mais",
