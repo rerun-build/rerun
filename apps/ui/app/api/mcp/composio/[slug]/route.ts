@@ -1,7 +1,9 @@
 import { FOREMAN_AGENT_ID, SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@rerun/contracts'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
+import { ComposioApiError, composioUserId, executeTool, listToolkitTools, uploadComposioFile } from '@/lib/composio/client'
+import { boxFileLocations, resolveFileArgs, withFilePaths, type BoxFileLocation, type ComposioFile } from '@/lib/composio/files'
+import { fetchRawFile } from '@/lib/engine/client'
 import { readRegistry, upsertRegistryEntry } from '@/lib/services/registry'
 import { getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
 import { composioVaultUserId } from '@/lib/vault/composio'
@@ -91,6 +93,52 @@ async function vaultNotConnected(id: unknown, workspaceId: number, item: VaultIt
     return toolError(id, notConnectedMessage(name, slug, lost ? 'lost' : 'never'))
 }
 
+// The hub holds the whole file while it uploads it: Gmail itself stops at 20 MB.
+const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024
+
+class FileRefusal extends Error {}
+
+type BoxFileRequest = { workspaceId: number; engineAgentId: string; toolkit: string; tool: string }
+
+async function findBoxFile(ctx: BoxFileRequest, requested: string): Promise<{ location: BoxFileLocation; res: Response }> {
+    const locations = boxFileLocations(requested, ctx.engineAgentId)
+    if (locations.length === 0) throw new FileRefusal(`Give the path of a file in your workspace or in the shared space, not ${requested}.`)
+    const conn = await getWorkspaceConnection(ctx.workspaceId)
+    for (const location of locations) {
+        const res = await fetchRawFile(conn, location.base, location.path)
+        if (res.ok) return { location, res }
+        await res.body?.cancel().catch(() => {})
+        if (res.status !== 404 && res.status !== 400) throw new Error(`the box answered ${res.status} for ${requested}`)
+    }
+    throw new FileRefusal(`No file at ${requested} in your files or the shared space.`)
+}
+
+async function uploadBoxFile(ctx: BoxFileRequest, requested: string): Promise<ComposioFile> {
+    const { location, res } = await findBoxFile(ctx, requested)
+
+    const name = location.path.split('/').pop() || 'file'
+    const tooLarge = new FileRefusal(`${name} is over ${MAX_ATTACHMENT_BYTES / 1024 / 1024} MB, too large to attach.`)
+    if (Number(res.headers.get('Content-Length') ?? 0) > MAX_ATTACHMENT_BYTES) {
+        await res.body?.cancel().catch(() => {})
+        throw tooLarge
+    }
+    const bytes = new Uint8Array(await res.arrayBuffer())
+    if (bytes.byteLength > MAX_ATTACHMENT_BYTES) throw tooLarge
+
+    const contentType = res.headers.get('Content-Type')?.split(';')[0].trim() ?? ''
+    const mimetype = contentType.includes('/') ? contentType : 'application/octet-stream'
+    const s3key = await uploadComposioFile(ctx.tool, ctx.toolkit, { name, mimetype, bytes })
+    return { name, mimetype, s3key }
+}
+
+async function originalToolSchema(toolkit: string, tool: string): Promise<unknown> {
+    try {
+        return (await listToolkitTools(toolkit)).find(t => t.slug === tool)?.inputParameters
+    } catch {
+        return undefined
+    }
+}
+
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
     const { slug } = await params
 
@@ -139,7 +187,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             const tools = await listToolkitTools(toolkit)
             const allowed = allowedTools?.length ? tools.filter(t => allowedTools.includes(t.slug)) : tools
             if (allowedTools?.length && allowed.length === 0) console.warn(`[composio:${slug}] allowedTools filtered out every ${toolkit} tool`)
-            return rpcResult(id, { tools: allowed.map(t => ({ name: t.slug, description: t.description, inputSchema: t.inputParameters })) })
+            return rpcResult(id, { tools: allowed.map(t => ({ name: t.slug, description: t.description, inputSchema: withFilePaths(t.inputParameters) })) })
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Composio is unavailable'
             console.error(`[composio:${slug}] tools/list failed:`, message)
@@ -172,8 +220,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         else if (agent) userId = composioUserId(agent.id, instanceId)
         else return rpcError(id, -32603, 'This coworker does not hold that Vault entry')
 
+        let toolArgs: Record<string, unknown>
         try {
-            const out = await executeTool(name, userId, args)
+            const fileRequest = { workspaceId: engine.workspaceId, engineAgentId, toolkit, tool: name }
+            toolArgs = await resolveFileArgs(await originalToolSchema(toolkit, name), args, path => uploadBoxFile(fileRequest, path))
+        } catch (err) {
+            if (err instanceof FileRefusal) return toolError(id, err.message)
+            console.error(`[composio:${slug}] tools/call ${name}: file upload failed:`, err instanceof Error ? err.message : err)
+            return toolError(id, `${manifest.name} is temporarily unavailable. Try again later.`)
+        }
+
+        try {
+            const out = await executeTool(name, userId, toolArgs)
             if (!out.successful) {
                 const message = out.error ?? 'Tool failed'
                 if (isNotConnectedError(message)) {

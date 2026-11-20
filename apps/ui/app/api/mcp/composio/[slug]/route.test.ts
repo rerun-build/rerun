@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { ComposioApiError, composioUserId, composioVaultOwnUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
+import { ComposioApiError, composioUserId, composioVaultOwnUserId, executeTool, listToolkitTools, uploadComposioFile } from '@/lib/composio/client'
+import { fetchRawFile } from '@/lib/engine/client'
 import { readRegistry, type RegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
 import type { EngineConnection } from '@/lib/engine/types'
 import { serviceManifestSchema } from '@/lib/services/manifest'
@@ -16,7 +17,8 @@ vi.mock('@/app/api/_services/services.service', () => ({ loadManifest: vi.fn() }
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(), getWorkspaceConnection: vi.fn() }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(), upsertRegistryEntry: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(), patchVaultItem: vi.fn(async () => ({})) }))
-vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), executeTool: vi.fn(), listToolkitTools: vi.fn() }))
+vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), executeTool: vi.fn(), listToolkitTools: vi.fn(), uploadComposioFile: vi.fn() }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), fetchRawFile: vi.fn() }))
 
 const BOX_KEY = 'box-key-of-workspace-7'
 const WORKSPACE_ID = 7
@@ -310,6 +312,101 @@ describe('POST /api/mcp/composio/[slug]', () => {
             expect(body.result.content[0].text).toMatch(/expired or was revoked/)
             expect(patchVaultItem).toHaveBeenCalledWith(expect.anything(), 'item-1', { status: 'needs_auth' })
             expect(upsertRegistryEntry).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('a file of the box', () => {
+        const conn: EngineConnection = { baseUrl: 'https://box.test', apiKey: 'k' }
+        const FILE_UPLOADABLE = { type: 'object', required: ['name', 'mimetype', 's3key'], properties: { name: { type: 'string' }, s3key: { type: 'string' }, mimetype: { type: 'string' } }, file_uploadable: true }
+        const SEND_SCHEMA = { type: 'object', properties: { recipient_email: { type: 'string' }, attachment: { anyOf: [FILE_UPLOADABLE, { type: 'array', items: FILE_UPLOADABLE }] } } }
+
+        function send(attachment: unknown) {
+            return request({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'GMAIL_SEND_EMAIL', arguments: { recipient_email: 'press@hotel.test', attachment } } })
+        }
+
+        async function errorText(response: Response): Promise<string> {
+            const body = await response.json()
+            expect(body.result.isError).toBe(true)
+            return JSON.parse(body.result.content[0].text).error
+        }
+
+        function boxFile(bytes: number, type = 'application/pdf') {
+            return new Response(new Uint8Array(bytes), { status: 200, headers: { 'Content-Type': type, 'Content-Length': String(bytes) } })
+        }
+
+        beforeEach(() => {
+            vi.mocked(getWorkspaceConnection).mockResolvedValue(conn)
+            vi.mocked(listToolkitTools).mockResolvedValue([{ slug: 'GMAIL_SEND_EMAIL', name: 'Send', description: 'Send an email', inputParameters: SEND_SCHEMA }])
+            vi.mocked(fetchRawFile).mockResolvedValue(boxFile(1024))
+            vi.mocked(uploadComposioFile).mockResolvedValue('project/files/kit.pdf')
+        })
+
+        it('lists a file input as the path of a file, never as a Composio key', async () => {
+            const body = await (await POST(request({ jsonrpc: '2.0', id: 2, method: 'tools/list' }), context())).json()
+
+            const attachment = body.result.tools[0].inputSchema.properties.attachment
+            expect(attachment.anyOf[0]).toMatchObject({ type: 'string' })
+            expect(JSON.stringify(attachment)).not.toContain('s3key')
+        })
+
+        it('uploads the file of the coworker privately and sends its key to Composio', async () => {
+            const response = await POST(send('verified-kit/kit.pdf'), context())
+
+            expect(await response.json()).toMatchObject({ result: { structuredContent: { id: 'msg-1' } } })
+            expect(fetchRawFile).toHaveBeenCalledWith(conn, '/agents/engine-own/files', 'verified-kit/kit.pdf')
+            expect(uploadComposioFile).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', 'gmail', { name: 'kit.pdf', mimetype: 'application/pdf', bytes: expect.any(Uint8Array) })
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId('agent-own'), {
+                recipient_email: 'press@hotel.test',
+                attachment: { name: 'kit.pdf', mimetype: 'application/pdf', s3key: 'project/files/kit.pdf' },
+            })
+        })
+
+        it('reads an absolute path of the shared space in the shared files', async () => {
+            await POST(send(['/home/rerun/rerun/shared/content/media-kit.pdf']), context())
+
+            expect(fetchRawFile).toHaveBeenCalledWith(conn, '/shared/files', 'content/media-kit.pdf')
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId('agent-own'), expect.objectContaining({ attachment: [{ name: 'media-kit.pdf', mimetype: 'application/pdf', s3key: 'project/files/kit.pdf' }] }))
+        })
+
+        it('finds a relative path in the shared space when the coworker workspace has no such file', async () => {
+            vi.mocked(fetchRawFile).mockImplementation(async (_conn, base) => (base === '/shared/files' ? boxFile(1024) : Response.json({ error: 'file not found' }, { status: 404 })))
+
+            await POST(send('content/media-kit.pdf'), context())
+
+            expect(vi.mocked(fetchRawFile).mock.calls.map(([, base, path]) => [base, path])).toEqual([
+                ['/agents/engine-own/files', 'content/media-kit.pdf'],
+                ['/shared/files', 'content/media-kit.pdf'],
+            ])
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId('agent-own'), expect.objectContaining({ attachment: { name: 'media-kit.pdf', mimetype: 'application/pdf', s3key: 'project/files/kit.pdf' } }))
+        })
+
+        it('says which file is missing once both places are looked at, and sends nothing', async () => {
+            vi.mocked(fetchRawFile).mockImplementation(async () => Response.json({ error: 'file not found' }, { status: 404 }))
+
+            const text = await errorText(await POST(send('verified-kit/gone.pdf'), context()))
+
+            expect(text).toBe('No file at verified-kit/gone.pdf in your files or the shared space.')
+            expect(vi.mocked(fetchRawFile).mock.calls.map(([, base]) => base)).toEqual(['/agents/engine-own/files', '/shared/files'])
+            expect(uploadComposioFile).not.toHaveBeenCalled()
+            expect(executeTool).not.toHaveBeenCalled()
+        })
+
+        it('refuses a file over the limit before reading it, and sends nothing', async () => {
+            vi.mocked(fetchRawFile).mockResolvedValue(new Response(null, { status: 200, headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(26 * 1024 * 1024) } }))
+
+            const text = await errorText(await POST(send('films/trip.mp4'), context()))
+
+            expect(text).toBe('trip.mp4 is over 25 MB, too large to attach.')
+            expect(uploadComposioFile).not.toHaveBeenCalled()
+            expect(executeTool).not.toHaveBeenCalled()
+        })
+
+        it('refuses the workspace of another coworker without reading it', async () => {
+            const text = await errorText(await POST(send('/home/rerun/rerun/agents/engine-foreign/workspace/kit.pdf'), context()))
+
+            expect(text).toMatch(/^Give the path of a file in your workspace or in the shared space/)
+            expect(fetchRawFile).not.toHaveBeenCalled()
+            expect(executeTool).not.toHaveBeenCalled()
         })
     })
 })

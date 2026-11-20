@@ -13,6 +13,7 @@
 // A Vault entry connected in the Vault gets `<namespace>_vault_<workspaces.id>_<itemId>`: the box
 // names its entries, so the workspace the hub authenticated is what keeps two of them apart.
 
+import { createHash } from 'node:crypto'
 import { SERVICE_INSTANCE_ID_RE } from '@rerun/contracts'
 
 const COMPOSIO_API_BASE = 'https://backend.composio.dev/api/v3.1'
@@ -140,6 +141,21 @@ export async function listToolkitTools(toolkit: string): Promise<ComposioTool[]>
         }
         throw err
     }
+}
+
+export type ComposioFileUpload = { name: string; mimetype: string; bytes: Uint8Array<ArrayBuffer> }
+
+// A tool that takes a file reads it from Composio's own storage, by the key this returns. The
+// presigned URL is the storage's, so the PUT carries no Composio key.
+export async function uploadComposioFile(toolSlug: string, toolkit: string, file: ComposioFileUpload): Promise<string> {
+    const { key, new_presigned_url: url } = await composioFetch<{ key?: string; new_presigned_url?: string }>('/files/upload/request', {
+        method: 'POST',
+        body: JSON.stringify({ filename: file.name, mimetype: file.mimetype, md5: createHash('md5').update(file.bytes).digest('hex'), tool_slug: toolSlug, toolkit_slug: toolkit }),
+    })
+    if (!key || !url) throw new ComposioApiError(502, 'Composio upload response is missing the key or the upload URL')
+    const res = await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.mimetype }, body: file.bytes })
+    if (!res.ok) throw new ComposioApiError(res.status, `Composio file upload of ${file.name} failed (${res.status})`)
+    return key
 }
 
 export type ComposioExecuteResult = { successful: boolean; data: unknown; error: string | null }
