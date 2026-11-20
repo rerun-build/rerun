@@ -8,8 +8,9 @@ remote_name="$1"
 push_url="$2"
 fetch_url=$(git remote get-url "$remote_name" 2>/dev/null || true)
 
+# Matched against PUBLIC_REPOS in scripts/security-start.mjs: update both files on rename.
 points_to_public_repo() {
-    printf '%s\n' "$1" | grep -Eiq 'github\.com[:/]rerun-build/rerun(\.git)?/?$'
+    printf '%s\n' "$1" | grep -Eiq 'github\.com[:/](special-place-ai-heaven/moldwright|rerun-build/rerun)(\.git)?/?$'
 }
 
 if ! points_to_public_repo "$push_url" && ! points_to_public_repo "$fetch_url"; then
@@ -65,7 +66,7 @@ if [ -z "$findings" ]; then
 fi
 
 {
-    echo "Push refused: it goes to the public repository rerun-build/rerun and mentions a vulnerability:"
+    echo "Push refused: it goes to the public repository special-place-ai-heaven/moldwright and mentions a vulnerability:"
     printf '%s' "$findings" | sed 's/^/    /'
     echo
     echo "Everything pushed there is public at once, branches included. A vulnerability fix goes to the"

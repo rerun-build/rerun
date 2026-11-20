@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawnSync } from 'node:child_process'
+import { pathToFileURL } from 'node:url'
 
-const PUBLIC_REPO = 'rerun-build/rerun'
-const PUBLIC_URL = /github\.com[:/]rerun-build\/rerun(\.git)?\/?$/i
+// @preserve Matched against points_to_public_repo in scripts/git-hooks/pre-push: update both files on rename.
+export const PUBLIC_REPO = 'special-place-ai-heaven/moldwright'
+export const PUBLIC_REPOS = [PUBLIC_REPO, 'rerun-build/rerun']
+export const PUBLIC_URL = new RegExp(`github\\.com[:/](?:${PUBLIC_REPOS.map(slug => slug.replace(/\//g, '\\/')).join('|')})(\\.git)?\\/?$`, 'i')
 const BLOCKED_PUSH_URL = 'no-push://this-workspace-holds-a-vulnerability-fix-push-to-the-advisory-fork'
 const SEVERITIES = ['low', 'medium', 'high', 'critical']
 const FORK_READY_ATTEMPTS = 30
@@ -62,7 +65,7 @@ function parseArgs(argv) {
 function checkWorkspace() {
     if (!gitSucceeds('rev-parse', '--is-inside-work-tree')) fail('Run it inside a checkout of the repository.')
     const originUrl = gitValue('remote', 'get-url', 'origin')
-    if (!PUBLIC_URL.test(originUrl)) fail(`origin is not ${PUBLIC_REPO} (${originUrl || 'no origin'}).`)
+    if (!PUBLIC_URL.test(originUrl)) fail(`origin is not ${PUBLIC_REPOS.join(' or ')} (${originUrl || 'no origin'}).`)
 
     const existing = gitValue('config', '--get', 'rerun.securityAdvisory')
     if (existing) fail(`This workspace already holds the fix of ${existing}. Start another one in a new workspace.`)
@@ -127,17 +130,18 @@ function lockWorkspace(ghsaId, cloneUrl) {
     return remote
 }
 
-const options = parseArgs(process.argv.slice(2))
-const originUrl = checkWorkspace()
-const advisory = openAdvisory(options)
-if (advisory.state !== 'draft' && advisory.state !== 'triage') {
-    fail(`${advisory.ghsa_id} is ${advisory.state}: only a draft or triaged advisory takes a fix.`)
-}
-const fork = privateFork(advisory, originUrl)
-waitForFork(fork.clone_url)
-const remote = lockWorkspace(advisory.ghsa_id, fork.clone_url)
+function main(argv = process.argv.slice(2)) {
+    const options = parseArgs(argv)
+    const originUrl = checkWorkspace()
+    const advisory = openAdvisory(options)
+    if (advisory.state !== 'draft' && advisory.state !== 'triage') {
+        fail(`${advisory.ghsa_id} is ${advisory.state}: only a draft or triaged advisory takes a fix.`)
+    }
+    const fork = privateFork(advisory, originUrl)
+    waitForFork(fork.clone_url)
+    const remote = lockWorkspace(advisory.ghsa_id, fork.clone_url)
 
-console.log(`
+    console.log(`
 Advisory ${advisory.ghsa_id} (${advisory.state}, private): ${advisory.html_url}
 Private fork: ${fork.html_url}
 
@@ -148,3 +152,8 @@ Next:
   2. git push
   3. gh pr create --repo ${fork.full_name} --base dev
   4. Once Rerun Cloud runs the fix, merge and publish from the advisory page.`)
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main()
+}
