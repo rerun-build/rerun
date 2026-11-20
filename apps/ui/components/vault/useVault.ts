@@ -6,6 +6,7 @@ import { listVaultAction, vaultPaidAccountsAction } from '@/app/api/_actions/vau
 import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
 import type { VaultListing } from '@/app/api/_services/vault.service'
 import { useErrorText } from '@/hooks/useErrorText'
+import { usePaidAppsStore } from '@/stores/paid-apps.store'
 
 // The workspace's Vault while its dialog is open: read when it opens, read again after every change,
 // since an attachment refused by the engine or a sign-in that just landed is only known there.
@@ -26,10 +27,13 @@ export function useVault(open: boolean) {
         if (accounts.ok) setPaid(accounts.result)
     }, [errorText])
 
+    // Bumped by a paid app's window when an account connects: the Vault lists it without being reopened.
+    const paidAppsRevision = usePaidAppsStore(s => s.revision)
+
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         if (open) void reload()
-    }, [open, reload])
+    }, [open, reload, paidAppsRevision])
 
     return { listing, paid, error, reload }
 }

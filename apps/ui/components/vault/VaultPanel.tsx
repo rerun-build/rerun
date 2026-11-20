@@ -28,6 +28,8 @@ import type { VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import { VaultAppTile } from './VaultAppTile'
 import { VaultCoworkerFaces, type VaultUsage } from './VaultCoworkerFaces'
 import { matchesVaultQuery, vaultGroupOf } from './vault-text'
+import type { AppSlug } from '@/lib/apps/types'
+import { usePaidAppsStore } from '@/stores/paid-apps.store'
 
 type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'paid'; connectionId: string } | { kind: 'add'; app?: VaultCatalogApp; addKind?: VaultAddKind }
 
@@ -49,6 +51,14 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
     const [query, setQuery] = useState('')
     // Kept here rather than in the empty state, which unmounts on every trip to the Add page.
     const [popularApps, setPopularApps] = useState<VaultCatalogApp[] | null>(null)
+    const openPaidApp = usePaidAppsStore(s => s.openApp)
+    // A paid app picked on the Add page connects in its own window: the account it adds opens here once the Vault lists it.
+    const [awaitingPaid, setAwaitingPaid] = useState<{ slug: AppSlug; known: string[] } | null>(null)
+    const landedPaid = awaitingPaid ? paid.find(account => account.slug === awaitingPaid.slug && !awaitingPaid.known.includes(account.connectionId)) : undefined
+    if (landedPaid) {
+        setAwaitingPaid(null)
+        setPage({ kind: 'paid', connectionId: landedPaid.connectionId })
+    }
 
     // Derived rather than synced: an entry deleted here, or gone on a reload, drops the panel back to the list.
     const selected = page.kind === 'detail' ? listing?.entries.find(entry => entry.id === page.id) : undefined
@@ -91,6 +101,11 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
                             initialApp={page.app}
                             initialKind={page.addKind}
                             onBack={back}
+                            onPaidApp={slug => {
+                                setAwaitingPaid({ slug, known: paid.map(account => account.connectionId) })
+                                back()
+                                openPaidApp(slug)
+                            }}
                             onAdded={async id => {
                                 await onChanged()
                                 setPage({ kind: 'detail', id })

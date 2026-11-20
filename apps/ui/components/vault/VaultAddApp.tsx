@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { vaultCatalogAction } from '@/app/api/_actions/vault.actions'
 import type { VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import type { VaultListing } from '@/app/api/_services/vault.service'
+import type { AppSlug } from '@/lib/apps/types'
 import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceSetupDriverProvider } from '@/components/services/service-setup-driver'
 import { Icon } from '@/components/ui/icon'
@@ -29,9 +30,10 @@ const SEARCH_DELAY_MS = 250
 // Adding an app to the Vault: pick it in the catalog, then sign in or type its key once. Who uses it is
 // picked next, on the entry itself.
 // The empty Vault opens it on an app already picked, or on the MCP or secret form.
-type Props = { listing: VaultListing; initialApp?: VaultCatalogApp; initialKind?: VaultAddKind; onBack: () => void; onAdded: (itemId: string) => Promise<void> }
+// A paid app's sign-in, slots and billing stay in its own window: `onPaidApp` opens it.
+type Props = { listing: VaultListing; initialApp?: VaultCatalogApp; initialKind?: VaultAddKind; onBack: () => void; onAdded: (itemId: string) => Promise<void>; onPaidApp: (slug: AppSlug) => void }
 
-export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, onAdded }: Props) {
+export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, onAdded, onPaidApp }: Props) {
     const t = useTranslations('vault')
     const [picked, setPicked] = useState<VaultCatalogApp | null>(initialApp ?? null)
     const [kind, setKind] = useState<VaultAddKind>(initialKind)
@@ -56,7 +58,7 @@ export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, 
                         />
                     </div>
                     {kind === 'app' ? (
-                        <VaultCatalog onPick={setPicked} />
+                        <VaultCatalog onPick={app => (app.paidApp ? onPaidApp(app.paidApp) : setPicked(app))} />
                     ) : (
                         <PanelScroller className="p-4">{kind === 'mcp' ? <VaultAddMcp onAdded={onAdded} /> : <VaultAddSecret onAdded={onAdded} />}</PanelScroller>
                     )}

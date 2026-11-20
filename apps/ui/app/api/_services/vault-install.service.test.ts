@@ -1,11 +1,16 @@
+import { paidAppFlags } from '@rerun/cloud/apps.server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createVaultItem } from '@/lib/engine/vault-client'
-import { addVaultMcp, addVaultSecret, vaultServerName } from './vault-install.service'
+import { selectMany } from '@/supabase/supabase-helpers'
+import { addVaultMcp, addVaultSecret, vaultCatalog, vaultServerName } from './vault-install.service'
+import { toAuthMethodSummaries } from './services.service'
 import { assertManagesCoworker } from './vault.service'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn() }))
+vi.mock('@rerun/cloud/apps.server', () => ({ paidAppFlags: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ createVaultItem: vi.fn(async (_c: unknown, input: Record<string, unknown>) => ({ id: 'new', ...input })), attachVaultItem: vi.fn(), getVaultItem: vi.fn(), listVaultItems: vi.fn() }))
 vi.mock('./services.service', () => ({ loadManifest: vi.fn(), toAuthMethodSummaries: vi.fn() }))
 vi.mock('./vault.service', async () => ({
@@ -17,6 +22,103 @@ vi.mock('./vault.service', async () => ({
 }))
 
 beforeEach(() => vi.clearAllMocks())
+
+const MCP_HEADERS = { 'x-rerun-key': '${RERUN_API_KEY}', 'x-rerun-agent': '${agent.id}' }
+
+const WHATSAPP_PRO = {
+    slug: 'whatsapp-pro',
+    name: 'WhatsApp Pro',
+    icon: null,
+    category: 'crm',
+    summary: 'Read and answer WhatsApp conversations',
+    manifest: {
+        slug: 'whatsapp-pro',
+        name: 'WhatsApp Pro',
+        summary: 'Read and answer WhatsApp conversations',
+        category: 'crm',
+        authMethods: [
+            {
+                id: 'app',
+                kind: 'app',
+                label: 'Pick a WhatsApp number',
+                recommended: true,
+                inputs: [],
+                envKeys: [],
+                app: { appSlug: 'whatsapp' },
+                mcpServers: [{ name: 'whatsapp_pro', transport: 'http', url: '${RERUN_HUB_BASE_URL}/api/mcp/apps/whatsapp', headers: MCP_HEADERS, args: [], env: {} }],
+            },
+        ],
+    },
+}
+
+const GMAIL = {
+    slug: 'gmail',
+    name: 'Gmail',
+    icon: null,
+    category: 'productivity',
+    summary: 'Read and send email',
+    manifest: {
+        slug: 'gmail',
+        name: 'Gmail',
+        summary: 'Read and send email',
+        category: 'productivity',
+        authMethods: [
+            {
+                id: 'composio',
+                kind: 'composio',
+                label: 'Connect with Google',
+                recommended: true,
+                inputs: [],
+                envKeys: [],
+                composio: { toolkit: 'gmail', allowedTools: [], authConfigId: 'ac_1' },
+                mcpServers: [{ name: 'gmail', transport: 'http', url: '${RERUN_HUB_BASE_URL}/api/mcp/composio/gmail', headers: MCP_HEADERS, args: [], env: {} }],
+            },
+        ],
+    },
+}
+
+// The page of the catalog, and the paid apps' own rows the Vault reads beside it when nothing is searched.
+function catalogRows(page: unknown[]) {
+    vi.mocked(selectMany).mockImplementation((async (_client: unknown, _table: unknown, _columns: unknown, filters: { slug?: string[] }) => ({
+        data: Array.isArray(filters.slug) ? [WHATSAPP_PRO].filter(row => filters.slug?.includes(row.slug)) : page,
+        error: null,
+    })) as never)
+}
+
+describe('vaultCatalog', () => {
+    beforeEach(() => {
+        catalogRows([WHATSAPP_PRO, GMAIL])
+        vi.mocked(toAuthMethodSummaries).mockImplementation(manifest => manifest.authMethods.map(method => ({ id: method.id, label: method.label, kind: method.kind, recommended: method.recommended, inputs: method.inputs, requiresSecrets: false })))
+    })
+
+    it('offers a paid app the plan sells, to be connected in its own window', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
+        const apps = await vaultCatalog('whatsapp')
+        expect(apps).toEqual([expect.objectContaining({ slug: 'whatsapp-pro', paidApp: 'whatsapp', authMethods: [] })])
+    })
+
+    it('leaves a paid app out where the plan does not sell it', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({})
+        expect(await vaultCatalog('whatsapp')).toEqual([])
+        expect(await vaultCatalog()).toEqual([])
+    })
+
+    it('still leaves out an app whose sign-in needs a coworker to start from', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
+        expect((await vaultCatalog()).map(app => app.slug)).not.toContain('gmail')
+    })
+
+    it('puts the paid apps first when nothing is searched, even past the first page by name', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
+        catalogRows([])
+        expect((await vaultCatalog()).map(app => app.slug)).toEqual(['whatsapp-pro'])
+    })
+
+    it('lists a paid app once when the first page holds it too', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
+        expect((await vaultCatalog()).filter(app => app.slug === 'whatsapp-pro')).toHaveLength(1)
+    })
+})
 
 describe('addVaultSecret', () => {
     it('stores one variable, attached to the coworkers picked', async () => {

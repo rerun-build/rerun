@@ -1,10 +1,13 @@
 import 'server-only'
 
+import { paidAppFlags } from '@rerun/cloud/apps.server'
 import type { VaultItemSummary } from '@rerun/contracts'
 
 import { AccessDeniedError, type Actor } from '@/app/api/_auth/access'
+import { appInfo } from '@/lib/apps/catalog'
+import { APP_SLUGS, isAppSlug, type AppSlug } from '@/lib/apps/types'
 import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems } from '@/lib/engine/vault-client'
-import { getMethod, missingRequiredInputs, serviceManifestSchema } from '@/lib/services/manifest'
+import { appTarget, getMethod, missingRequiredInputs, serviceManifestSchema } from '@/lib/services/manifest'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -88,21 +91,25 @@ export async function reconfigureVaultService(itemId: string, values: Record<str
     return resultOf(item, toAuthMethodSummaries(manifest))
 }
 
-export type VaultCatalogApp = { slug: string; name: string; icon: string | null; category: string; summary: string; multiInstance: boolean; authMethods: AuthMethodSummary[] }
+// `paidApp`: a paid app (LinkedIn Pro, WhatsApp Pro), connected in its own window rather than in the Vault's form.
+export type VaultCatalogApp = { slug: string; name: string; icon: string | null; category: string; summary: string; multiInstance: boolean; authMethods: AuthMethodSummary[]; paidApp?: AppSlug }
 
 const CATALOG_COLUMNS = ['slug', 'name', 'icon', 'category', 'summary', 'manifest'] as const
 
 type CatalogRow = { slug: string; name: string; icon: string | null; category: string; summary: string; manifest: unknown }
 
 // The catalog as the Vault offers it: no coworker to read installs from, and only the sign-in methods
-// the Vault holds. An app none of whose methods it holds is left out until it does.
-function toVaultCatalogApps(rows: CatalogRow[]): VaultCatalogApp[] {
+// the Vault holds, plus the paid apps the plan sells. Any other app is left out until the Vault holds its sign-in.
+function toVaultCatalogApps(rows: CatalogRow[], paidApps: Set<AppSlug>): VaultCatalogApp[] {
     return rows.flatMap(row => {
         const parsed = serviceManifestSchema.safeParse(row.manifest)
         if (!parsed.success) return []
+        const app = { slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance }
+        const paidApp = parsed.data.authMethods.map(method => appTarget(method)?.appSlug).find(isAppSlug)
+        if (paidApp) return paidApps.has(paidApp) ? [{ ...app, authMethods: [], paidApp }] : []
         const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_DIALOG_METHOD_KINDS.has(method.kind))
         if (authMethods.length === 0) return []
-        return [{ slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance, authMethods }]
+        return [{ ...app, authMethods }]
     })
 }
 
@@ -111,8 +118,16 @@ export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
     const text = sanitizeIlike(query ?? '')
     const pattern = `%${text}%`
     const filters = text ? { enabled: true, or: { name: { ilike: pattern }, slug: { ilike: pattern } } } : { enabled: true }
-    const { data } = await selectMany(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }, 60)
-    return toVaultCatalogApps(data ?? [])
+    const flags = await paidAppFlags()
+    const paidApps = APP_SLUGS.filter(slug => flags[slug])
+    // Browsed without a query, the page holds the first apps by name: the paid ones are read on their own and come first.
+    const pinnedSlugs = text ? [] : paidApps.map(slug => appInfo(slug).serviceSlug)
+    const [{ data: page }, { data: pinned }] = await Promise.all([
+        selectMany(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }, 60),
+        pinnedSlugs.length ? selectMany(supabase, 'services', CATALOG_COLUMNS, { enabled: true, slug: pinnedSlugs }) : Promise.resolve({ data: [] }),
+    ])
+    const rows = [...(pinned ?? []), ...(page ?? []).filter(row => !pinnedSlugs.includes(row.slug))]
+    return toVaultCatalogApps(rows, new Set(paidApps))
 }
 
 // What an empty Vault offers first. The catalog is sorted by name, so its own first apps would be
@@ -121,7 +136,7 @@ const VAULT_POPULAR_SLUGS = ['notion', 'slack', 'hubspot', 'linear', 'github', '
 
 export async function vaultPopularApps(): Promise<VaultCatalogApp[]> {
     const { data } = await selectMany(createServiceRoleClient(), 'services', CATALOG_COLUMNS, { enabled: true, slug: VAULT_POPULAR_SLUGS })
-    const apps = toVaultCatalogApps(data ?? [])
+    const apps = toVaultCatalogApps(data ?? [], new Set())
     return VAULT_POPULAR_SLUGS.flatMap(slug => apps.filter(app => app.slug === slug))
 }
 
