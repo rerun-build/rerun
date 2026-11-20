@@ -15,10 +15,26 @@ class Rules(unittest.TestCase):
         self.assertNotIn(planning.RULES, planning.plan_brief(ISSUE, "o/r", reader={}))
         self.assertNotIn(planning.RULES, planning.plan_brief(ISSUE, "o/r", reader={"rules": False}))
 
-    def test_the_rules_keep_the_run_small_and_the_facts_exact(self):
-        for words in ("Batch", "never read an unchanged file again", "not, never, only"):
-            self.assertIn(words, planning.RULES)
-
+    def test_station_send_includes_rules_only_when_configured_and_records_version_in_kv(self):
+        import tempfile, store as S
+        with tempfile.TemporaryDirectory() as d:
+            st = S.Store(os.path.join(d, "plan.db"))
+            sent = []
+            def account(tool, args):
+                if tool == "send_message":
+                    sent.append(args)
+                return {"runId": "r1"}
+            cfg = {
+                "repo": "o/r",
+                "types": {"planner": {"coworkers": [{"id": "a1", "name": "Boss", "runs": 1}]}},
+                "planning": {"rules": True, "plan_by": ["Boss"], "cut_by": ["Boss"]}
+            }
+            station = planning.Station(cfg, st, account, lambda args: "{}", lambda: 1000.0)
+            station.send(ISSUE, ("a1", 1))
+            self.assertEqual(len(sent), 1)
+            self.assertIn(planning.RULES, sent[0]["message"])
+            self.assertEqual(st.get_all("plan:7")["rules"], planning.RULES_V)
+            st.close()
     def test_the_live_config_turns_them_on_for_the_planner(self):
         with open(DISPATCH, encoding="utf-8") as f:
             self.assertIs(json.load(f)["planning"].get("rules"), True)
