@@ -7,6 +7,8 @@ import { installService, markServiceNeedsConfig } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/services/compiler', () => ({ compileService: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
 vi.mock('./agent.service', () => ({ createAgent: vi.fn() }))
 vi.mock('./services.service', () => ({ installService: vi.fn(), markServiceNeedsConfig: vi.fn(), toAuthMethodSummaries: vi.fn(() => []) }))
 
@@ -14,6 +16,7 @@ const oauthMethod = { id: 'oauth', kind: 'oauth', mcpServers: [{ name: 'linear',
 const keyMethod = { id: 'key', kind: 'key', inputs: [{ key: 'TOKEN', label: 'Token', secret: true, required: true }], mcpServers: [{ name: 'linear', transport: 'http', url: 'https://mcp.linear.test/mcp' }] }
 const oneWay = serviceManifestSchema.parse({ slug: 'linear', name: 'Linear', authMethods: [oauthMethod] })
 const severalWays = serviceManifestSchema.parse({ slug: 'linear', name: 'Linear', authMethods: [oauthMethod, keyMethod] })
+const paidApp = serviceManifestSchema.parse({ slug: 'linkedin-pro', name: 'LinkedIn Pro', authMethods: [{ id: 'app', kind: 'app', app: { appSlug: 'linkedin' }, mcpServers: [{ name: 'linkedin_pro', transport: 'http', url: 'https://hub.test/api/mcp/apps/linkedin' }] }] })
 
 beforeEach(() => {
     vi.clearAllMocks()
@@ -21,12 +24,20 @@ beforeEach(() => {
 })
 
 describe('declareService', () => {
-    it("compiles a coworker's app in its own folder, or leaves it to configure", async () => {
+    it("goes through the install that knows the Vault for a coworker's app, pending when its owner has a way to pick", async () => {
         await expect(declareService('agent-1', oneWay)).resolves.toBe('compiled')
-        expect(compileService).toHaveBeenCalledWith('agent-1', oneWay, {}, 'oauth', undefined, undefined)
+        expect(installService).toHaveBeenCalledWith('agent-1', 'linear', {}, 'oauth', undefined, { pending: false })
 
+        vi.mocked(installService).mockResolvedValue({ status: 'needs_config', key: 'linear', slug: 'linear', name: 'Linear', authMethods: [], message: '' })
         await expect(declareService('agent-1', severalWays)).resolves.toBe('needs_config')
-        expect(markServiceNeedsConfig).toHaveBeenCalledWith('agent-1', 'linear', undefined, undefined, undefined)
+        expect(installService).toHaveBeenLastCalledWith('agent-1', 'linear', {}, undefined, undefined, { pending: true })
+        expect(compileService).not.toHaveBeenCalled()
+        expect(markServiceNeedsConfig).not.toHaveBeenCalled()
+    })
+
+    it("keeps a paid app in the coworker's own folder", async () => {
+        await expect(declareService('agent-1', paidApp)).resolves.toBe('compiled')
+        expect(compileService).toHaveBeenCalledWith('agent-1', paidApp, {}, 'app', undefined, undefined)
         expect(installService).not.toHaveBeenCalled()
     })
 

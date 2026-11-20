@@ -9,6 +9,8 @@ An app is a ready-made integration from the Rerun library: Stripe, Gmail, Notion
   No credential ever goes through the API. `attach_connector` takes no secret, by design. Never ask anyone for an API key, a password or a token: the account owner finishes the connection in the Rerun app.
 </Warning>
 
+On a machine that keeps a [Vault](/vault), an app declared on a coworker goes to the Vault, attached to that coworker only, and waits there for its sign-in. The two [paid apps](/billing#paid-apps) stay in the coworker's own folder.
+
 The [Chief of Staff](/chief-of-staff) holds apps too. `list_agent_connectors`, `attach_connector` and `detach_connector` take `foreman` as `agentId` for it. Its apps live in the [Vault](/vault), attached to it, so `attach_connector` needs a machine that keeps a Vault, and the two [paid apps](/billing#paid-apps) stay with coworkers.
 
 ## search_connectors
@@ -75,7 +77,7 @@ Declares an app on a coworker.
   Add another account of an app that supports several. Ignored for an app limited to one account.
 </ParamField>
 
-When the app needs no credential and no sign-in, it is installed right away. Otherwise it is recorded as pending, and the account owner finishes the connection from the Rerun app, in the coworker panel under **Apps**, or on the Chief of Staff's card for an app declared on it.
+When the app needs no credential and no sign-in, it is installed right away. Otherwise it is recorded as pending, and the account owner finishes the connection from the Rerun app, in the coworker panel under **Apps**, or on the Chief of Staff's card for an app declared on it. An app the coworker already gets from the Vault is left as it is, with its current status.
 
 The response carries the resulting `status`, the `key` of the account it declared, the available `authMethods` when one is still pending, and a `message` describing what is left to do.
 
@@ -85,7 +87,7 @@ The response carries the resulting `status`, the `key` of the account it declare
 
 ## detach_connector
 
-Removes an app from a coworker: its tools, its credentials and the skill it installed.
+Removes an app from a coworker: its tools, its credentials and the skill it installed. For an app the coworker gets from the Vault, it only detaches the coworker: the account stays in the Vault. An entry shared with every coworker is refused, it is changed from the Vault.
 
 <ParamField body="agentId" type="string" required />
 <ParamField body="key" type="string">

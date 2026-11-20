@@ -1,6 +1,8 @@
 import type { Actor } from '@/app/api/_auth/access'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { compileService } from '@/lib/services/compiler'
 import { type ServiceManifest, autoInstallableMethod, serviceManifestSchema } from '@/lib/services/manifest'
+import { readRegistry } from '@/lib/services/registry'
 import type { ServiceChecklistItem } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
@@ -29,17 +31,26 @@ export async function installServiceSlugs(agentId: string, slugs: string[], acto
 // finish-setup wizard so the user picks a method and fills it in. `instance` declares another
 // account of the app instead of its base one.
 export async function declareService(agentId: string, manifest: ServiceManifest, actor?: Actor, instance?: ServiceInstanceSeed): Promise<'compiled' | 'needs_config'> {
+    const key = instance?.key ?? manifest.slug
+    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const held = (await readRegistry(conn, engineAgentId)).services[key]
+    // An account the Vault already lends the coworker (shared with every coworker) is declared as it
+    // is: installing it again would rewrite it for all of them, or be refused and stop the creation.
+    if (held?.vaultItemId) return held.status === 'needs_config' ? 'needs_config' : 'compiled'
+
     const method = autoInstallableMethod(manifest)
-    // The Chief of Staff keeps its apps in the Vault only, which installService writes.
-    if (agentId === FOREMAN_AGENT_ID) {
-        const { status } = await installService(agentId, instance?.key ?? manifest.slug, {}, method?.id, actor, { pending: !method })
+    // A paid app never goes to the Vault, and installService would refuse it outright on a plan
+    // without paid apps, failing the rest of a coworker's creation over it.
+    const paidApp = manifest.authMethods.some(candidate => candidate.kind === 'app')
+    if (!paidApp || agentId === FOREMAN_AGENT_ID) {
+        const { status } = await installService(agentId, key, {}, method?.id, actor, { pending: !method })
         return status === 'needs_config' ? 'needs_config' : 'compiled'
     }
     if (method) {
         await compileService(agentId, manifest, {}, method.id, actor, instance)
         return 'compiled'
     }
-    await markServiceNeedsConfig(agentId, instance?.key ?? manifest.slug, undefined, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
+    await markServiceNeedsConfig(agentId, key, undefined, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
     return 'needs_config'
 }
 
