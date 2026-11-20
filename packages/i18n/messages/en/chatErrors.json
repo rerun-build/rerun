@@ -13,12 +13,20 @@
         "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider.",
         "limits.messages.openaiCredits": "The OpenAI API is a product name, billed apart from a ChatGPT subscription: its account is topped up with prepaid credits. Keep platform.openai.com as it is.",
         "limits.messages.anthropicCredits": "The Anthropic API is billed apart from a Claude subscription: its account is topped up with prepaid credits. The Anthropic Console and Billing are names of Anthropic's site and its page.",
-        "anthropicKeyNotScoped.message": "An Anthropic API key belongs to an organization, which holds workspaces. The Anthropic Console is the name of Anthropic's site."
+        "anthropicKeyNotScoped.message": "An Anthropic API key belongs to an organization, which holds workspaces. The Anthropic Console is the name of Anthropic's site.",
+        "opencodePrivacy.region": "OpenCode is an AI provider; the OpenCode console is its site. Privacy and Global are the names of a settings page and an option there, keep them in English.",
+        "opencodePrivacy.training": "OpenCode is an AI provider; the OpenCode console is its site. Privacy is the name of a settings page there, keep it in English.",
+        "limits.messages.opencodeNoGo": "OpenCode Go is the name of a paid plan, Console the pay-as-you-go side of OpenCode. Both are product names."
     },
     "generic": "Something went wrong. Try sending your message again.",
     "modelAtCapacity": {
         "title": "Model at capacity",
         "message": "This model has no room right now. Try again in a moment or pick another model."
+    },
+    "opencodePrivacy": {
+        "title": "Blocked by your OpenCode settings",
+        "region": "Your OpenCode account only allows models hosted in Europe and the United States. Select Global under Privacy in the OpenCode console, or pick another model.",
+        "training": "Your OpenCode account turns away models that train on what they are sent. Allow them under Privacy in the OpenCode console, or pick another model."
     },
     "anthropicKeyNotScoped": {
         "title": "Anthropic key not tied to a workspace",
@@ -59,6 +67,7 @@
             "claudeSession": "{plan} session limit reached",
             "usage": "{plan} usage limit reached",
             "opencodeCredits": "OpenCode credits used up",
+            "opencodeNoGo": "No OpenCode Go subscription",
             "opencodeWindow": "OpenCode Go {window, select, weekly {weekly} other {monthly}} limit reached",
             "opencode": "OpenCode Go limit reached",
             "openaiCredits": "OpenAI API credits used up",
@@ -68,6 +77,7 @@
             "openaiCredits": "Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.",
             "anthropicCredits": "Your Anthropic API account has no credits left. Add credits in the Anthropic Console under Billing, or switch this coworker to another model.",
             "opencodeCredits": "No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.",
+            "opencodeNoGo": "This OpenCode key has no active Go subscription, so every Go model is refused, free ones included. Subscribe to OpenCode Go, or pick a Console model or another provider.",
             "opencodeWindowResets": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. It resets {resetsAt}; switch to a Console model or another provider until then.",
             "opencodeWindow": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. Switch to a Console model or another provider until it resets.",
             "modelUnavailable": "This connection can't run {model}. Pick another model to keep going.",

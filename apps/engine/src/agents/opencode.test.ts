@@ -216,6 +216,11 @@ describe('what a refused OpenCode run is classified as', () => {
         expect(classifyProviderError('opencode', error(400, 'Provider returned error: OpenCode no longer offers GLM-5'))).toBe(RUN_ERROR_CODES.refused)
         expect(classifyProviderError('opencode', new TypeError('fetch failed'))).toBeNull()
     })
+
+    it('reads a key without Go as a model the plan does not include, and a privacy setting as a refusal', () => {
+        expect(classifyProviderError('opencode', error(403, 'An active OpenCode Go subscription is required to use OpenCode Go models.'))).toBe(RUN_ERROR_CODES.modelNotInPlan)
+        expect(classifyProviderError('opencode', error(400, 'This OpenCode Go model is hosted outside Europe and the United States. Select Global at https://opencode.ai/console/org_X/settings/privacy#regions to use it.'))).toBe(RUN_ERROR_CODES.refused)
+    })
 })
 
 describe('the usage OpenCode reports', () => {

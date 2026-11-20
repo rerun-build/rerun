@@ -1,4 +1,4 @@
-import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
+import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_PRIVACY_REFUSAL, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
 // The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
@@ -44,9 +44,11 @@ function modelNotInPlan(message: string): string | undefined {
 }
 
 // The engine rewrites what OpenCode answers into these two sentences (see `opencodeFetch`): its own
-// wording names neither the plan nor the window.
+// wording names neither the plan nor the window. A key without a Go subscription is refused every Go
+// model, free ones included, in OpenCode's own words.
 function opencodeLimit(message: string, m: string): SubscriptionLimit | null {
     if (m.includes(OPENCODE_CREDITS_USED_UP.toLowerCase())) return { plan: 'opencode', scope: 'credits' }
+    if (m.includes('active opencode go subscription is required')) return { plan: 'opencode', scope: 'not_in_plan' }
     if (!m.includes(OPENCODE_GO_LIMIT.toLowerCase())) return null
     const scope = m.includes('weekly') ? 'weekly' : m.includes('monthly') ? 'monthly' : 'session'
     return withReset({ plan: 'opencode', scope }, message)
@@ -82,19 +84,21 @@ type ExplainedKind = Exclude<TitledKind, 'run_in_flight'>
 
 const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'overloaded', 'context_window', 'provider_error', 'thinking_replay', 'interrupted', 'session_gone']
 
-type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits'
-type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'opencodeCredits' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
+type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits'
+type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
 
 // The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
-export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | 'anthropicKeyNotScoped.title' | 'anthropicKeyNotScoped.message' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
+export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | 'anthropicKeyNotScoped.title' | 'anthropicKeyNotScoped.message' | 'opencodePrivacy.title' | 'opencodePrivacy.region' | 'opencodePrivacy.training' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
 
 function opencodeLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.scope === 'credits') return t('limits.messages.opencodeCredits')
+    if (limit.scope === 'not_in_plan') return t('limits.messages.opencodeNoGo')
     return limit.resetsAt ? t('limits.messages.opencodeWindowResets', { window: limit.scope, resetsAt: limit.resetsAt }) : t('limits.messages.opencodeWindow', { window: limit.scope })
 }
 
 function opencodeLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.scope === 'credits') return t('limits.titles.opencodeCredits')
+    if (limit.scope === 'not_in_plan') return t('limits.titles.opencodeNoGo')
     if (limit.scope === 'weekly' || limit.scope === 'monthly') return t('limits.titles.opencodeWindow', { window: limit.scope })
     return t('limits.titles.opencode')
 }
@@ -150,12 +154,19 @@ export function isAnthropicKeyNotScoped(kind: ChatErrorKind, message: string): b
     return kind === 'unauthorized' && ANTHROPIC_KEY_NOT_SCOPED.test(message)
 }
 
+// Another model may well run, so the notice still offers one, but it says which OpenCode setting
+// turned this one away: "switch to another model" alone sent people round the whole catalog.
+function isOpencodePrivacyRefusal(kind: ChatErrorKind, message: string): boolean {
+    return kind === 'provider_error' && OPENCODE_PRIVACY_REFUSAL.test(message)
+}
+
 // A generic error has no headline worth more than its own text, so it gets none.
 export function chatErrorTitle(kind: ChatErrorKind, message: string, t: ChatErrorCopy): string | null {
     if (kind === 'generic') return null
     if (kind === 'usage_limit') return subscriptionLimitTitle(describeSubscriptionLimit(message), t)
     if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.title')
     if (isAnthropicKeyNotScoped(kind, message)) return t('anthropicKeyNotScoped.title')
+    if (isOpencodePrivacyRefusal(kind, message)) return t('opencodePrivacy.title')
     return t(`titles.${kind}`)
 }
 
@@ -168,6 +179,7 @@ export function friendlyError(message: string, t: ChatErrorCopy): string {
     if (kind === 'usage_limit') return subscriptionLimitMessage(describeSubscriptionLimit(message), t)
     if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.message')
     if (isAnthropicKeyNotScoped(kind, message)) return t('anthropicKeyNotScoped.message')
+    if (isOpencodePrivacyRefusal(kind, message)) return /trains on request data/i.test(message) ? t('opencodePrivacy.training') : t('opencodePrivacy.region')
     if (isExplainedKind(kind)) return t(`messages.${kind}`)
     return stripErrorPrefix(message) || t('generic')
 }

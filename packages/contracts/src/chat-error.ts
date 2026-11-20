@@ -57,7 +57,7 @@ export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
 // once they are spent), Codex "The 'gpt-6-astra' model is not supported when using Codex with a
 // ChatGPT account". Shared with the engine's `classifyProviderError`, so both ends agree.
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|active opencode go subscription is required|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names OpenAI: the engine's sentence, or OpenAI's own one,
 // which points at platform.openai.com. An OpenAI-compatible gateway answering `insufficient_quota`
@@ -77,7 +77,12 @@ export const ANTHROPIC_KEY_NOT_SCOPED = /not scoped to a workspace/i
 // window that ran out. The chat words both the same way, but the engine reports it under its own
 // code: waiting for a reset does not bring the model back, and the funnel must not read it as a
 // spent quota.
-export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found/i
+export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found|active opencode go subscription is required/i
+
+// OpenCode turns a Go model away when the account's privacy settings exclude it: served outside
+// Europe and the United States, or by an endpoint that trains on what it is sent. Only the account
+// owner can change that, in the OpenCode console, so the chat names the setting.
+export const OPENCODE_PRIVACY_REFUSAL = /this opencode go model (?:is hosted outside|trains on request data)/i
 
 // Claude Code reports a dead OAuth token as "Failed to authenticate. API Error: 401 Invalid bearer
 // token", OpenRouter as "No auth credentials found".

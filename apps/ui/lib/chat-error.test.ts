@@ -311,6 +311,36 @@ describe('OpenCode limits', () => {
     })
 })
 
+// What OpenCode answers an account whose settings or plan turn a Go model away, as the engine stores it
+// (RER-139). The generic "switch to another model" sent people round every model of the catalog.
+describe('OpenCode account refusals', () => {
+    const region = 'ProviderRefusedError: Provider returned error: This OpenCode Go model is hosted outside Europe and the United States. Select Global at https://opencode.ai/console/org_X/settings/privacy#regions to use it.'
+    const training = 'ProviderRefusedError: Provider returned error: This OpenCode Go model trains on request data. Turn on "Allow paid endpoints that train on request data" at https://opencode.ai/console/org_X/settings/privacy#training to use it.'
+    const noGo = 'AI_APICallError: An active OpenCode Go subscription is required to use OpenCode Go models.'
+    const genericRefusal = 'The model provider refused this request, and sending it again will get the same answer. Switch to another model to keep going.'
+
+    it('names the privacy setting that blocks the model, and keeps the switch to another model', () => {
+        expect(classifyChatError(region)).toBe('provider_error')
+        expect(chatErrorTitle('provider_error', region)).toBe('Blocked by your OpenCode settings')
+        expect(friendlyError(region)).toBe('Your OpenCode account only allows models hosted in Europe and the United States. Select Global under Privacy in the OpenCode console, or pick another model.')
+        expect(chatErrorTitle('provider_error', training)).toBe('Blocked by your OpenCode settings')
+        expect(friendlyError(training)).toBe('Your OpenCode account turns away models that train on what they are sent. Allow them under Privacy in the OpenCode console, or pick another model.')
+    })
+
+    it('reads a key without Go as a plan that does not include the model, not as a retry', () => {
+        expect(classifyChatError(noGo)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(noGo)).toEqual({ plan: 'opencode', scope: 'not_in_plan' })
+        expect(chatErrorTitle('usage_limit', noGo)).toBe('No OpenCode Go subscription')
+        expect(friendlyError(noGo)).toBe('This OpenCode key has no active Go subscription, so every Go model is refused, free ones included. Subscribe to OpenCode Go, or pick a Console model or another provider.')
+    })
+
+    it('leaves any other refusal on the generic copy', () => {
+        const other = 'ProviderRefusedError: Provider returned error: Upstream request failed: [invalid_request_error] Invalid request'
+        expect(chatErrorTitle('provider_error', other)).toBe('The model could not answer')
+        expect(friendlyError(other)).toBe(genericRefusal)
+    })
+})
+
 describe('chatErrorTitle', () => {
     const titleOf = (message: string) => chatErrorTitle(classifyChatError(message), message)
 

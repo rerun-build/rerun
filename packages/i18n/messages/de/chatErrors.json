@@ -4,6 +4,11 @@
         "title": "Modell ausgelastet",
         "message": "Dieses Modell hat gerade keine Kapazität. Versuch es gleich noch einmal oder wähle ein anderes Modell."
     },
+    "opencodePrivacy": {
+        "title": "Durch deine OpenCode-Einstellungen blockiert",
+        "region": "Dein OpenCode-Konto erlaubt nur Modelle, die in Europa und den USA gehostet werden. Wähle Global unter Privacy in der OpenCode-Konsole oder wähle ein anderes Modell.",
+        "training": "Dein OpenCode-Konto lehnt Modelle ab, die mit den gesendeten Daten trainieren. Erlaube sie unter Privacy in der OpenCode-Konsole oder wähle ein anderes Modell."
+    },
     "anthropicKeyNotScoped": {
         "title": "Anthropic-Schlüssel ohne Workspace",
         "message": "Dieser Schlüssel gilt für alle Workspaces seiner Anthropic-Organisation. Erstelle in der Anthropic Console einen Schlüssel in einem einzelnen Workspace und verbinde ihn neu."
@@ -43,6 +48,7 @@
             "claudeSession": "{plan}-Sitzungslimit erreicht",
             "usage": "{plan}-Nutzungslimit erreicht",
             "opencodeCredits": "OpenCode-Guthaben aufgebraucht",
+            "opencodeNoGo": "Kein OpenCode-Go-Abo",
             "opencodeWindow": "OpenCode Go: {window, select, weekly {Wochenlimit} other {Monatslimit}} erreicht",
             "opencode": "OpenCode-Go-Limit erreicht",
             "openaiCredits": "OpenAI-API-Guthaben aufgebraucht",
@@ -52,6 +58,7 @@
             "openaiCredits": "Dein OpenAI-API-Konto hat kein Guthaben mehr. Lade Guthaben auf platform.openai.com auf oder stell diesen Coworker auf ein anderes Modell um.",
             "anthropicCredits": "Dein Anthropic-API-Konto hat kein Guthaben mehr. Lade in der Anthropic Console unter Billing Guthaben auf oder stell diesen Coworker auf ein anderes Modell um.",
             "opencodeCredits": "Kein Console-Guthaben mehr. Lade Guthaben auf opencode.ai auf oder wähle ein Go-Modell, um weiterzumachen.",
+            "opencodeNoGo": "Dieser OpenCode-Schlüssel hat kein aktives Go-Abo, daher wird jedes Go-Modell abgelehnt, auch die kostenlosen. Abonniere OpenCode Go oder wähle ein Console-Modell oder einen anderen Anbieter.",
             "opencodeWindowResets": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Es wird {resetsAt} zurückgesetzt; wechsle bis dahin zu einem Console-Modell oder einem anderen Anbieter.",
             "opencodeWindow": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Wechsle zu einem Console-Modell oder einem anderen Anbieter, bis es zurückgesetzt wird.",
             "modelUnavailable": "Diese Verbindung kann {model} nicht ausführen. Wähle ein anderes Modell, um weiterzumachen.",

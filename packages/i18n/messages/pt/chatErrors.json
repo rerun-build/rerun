@@ -4,6 +4,11 @@
         "title": "Modelo sem capacidade",
         "message": "Este modelo está sem espaço agora. Tente de novo em instantes ou escolha outro modelo."
     },
+    "opencodePrivacy": {
+        "title": "Bloqueado pelas suas configurações do OpenCode",
+        "region": "Sua conta OpenCode só permite modelos hospedados na Europa e nos Estados Unidos. Selecione Global em Privacy no console do OpenCode ou escolha outro modelo.",
+        "training": "Sua conta OpenCode recusa modelos que treinam com o que recebem. Permita-os em Privacy no console do OpenCode ou escolha outro modelo."
+    },
     "anthropicKeyNotScoped": {
         "title": "Chave da Anthropic sem workspace",
         "message": "Esta chave vale para todos os workspaces da sua organização na Anthropic. Crie uma chave dentro de um único workspace no console da Anthropic e conecte de novo."
@@ -43,6 +48,7 @@
             "claudeSession": "Limite de sessão do {plan} atingido",
             "usage": "Limite de uso do {plan} atingido",
             "opencodeCredits": "Créditos OpenCode esgotados",
+            "opencodeNoGo": "Sem assinatura do OpenCode Go",
             "opencodeWindow": "Limite {window, select, weekly {semanal} other {mensal}} do OpenCode Go atingido",
             "opencode": "Limite do OpenCode Go atingido",
             "openaiCredits": "Créditos da API da OpenAI esgotados",
@@ -52,6 +58,7 @@
             "openaiCredits": "Sua conta da API da OpenAI não tem mais créditos. Adicione créditos em platform.openai.com ou mude este coworker para outro modelo.",
             "anthropicCredits": "Sua conta da API da Anthropic não tem mais créditos. Adicione créditos no console da Anthropic, em Billing, ou mude este coworker para outro modelo.",
             "opencodeCredits": "Não há mais créditos Console. Adicione créditos em opencode.ai ou escolha um modelo Go para continuar.",
+            "opencodeNoGo": "Esta chave OpenCode não tem uma assinatura Go ativa, então todos os modelos Go são recusados, inclusive os gratuitos. Assine o OpenCode Go ou escolha um modelo Console ou outro provedor.",
             "opencodeWindowResets": "Seu plano OpenCode Go atingiu o limite {window, select, weekly {semanal} monthly {mensal} other {de 5 horas}}. Ele é renovado {resetsAt}; até lá, mude para um modelo Console ou outro provedor.",
             "opencodeWindow": "Seu plano OpenCode Go atingiu o limite {window, select, weekly {semanal} monthly {mensal} other {de 5 horas}}. Mude para um modelo Console ou outro provedor até a renovação.",
             "modelUnavailable": "Esta conexão não consegue executar {model}. Escolha outro modelo para continuar.",

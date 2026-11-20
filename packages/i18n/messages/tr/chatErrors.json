@@ -4,6 +4,11 @@
         "title": "Model kapasitesi dolu",
         "message": "Bu modelde şu anda yer yok. Birazdan tekrar deneyin veya başka bir model seçin."
     },
+    "opencodePrivacy": {
+        "title": "OpenCode ayarlarınız tarafından engellendi",
+        "region": "OpenCode hesabınız yalnızca Avrupa ve Amerika Birleşik Devletleri'nde barındırılan modellere izin veriyor. OpenCode konsolunda Privacy altında Global'i seçin veya başka bir model seçin.",
+        "training": "OpenCode hesabınız, kendisine gönderilenlerle eğitilen modelleri reddediyor. OpenCode konsolunda Privacy altında bunlara izin verin veya başka bir model seçin."
+    },
     "anthropicKeyNotScoped": {
         "title": "Anthropic anahtarı bir çalışma alanına bağlı değil",
         "message": "Bu anahtar, Anthropic kuruluşunun tüm çalışma alanlarında geçerli. Anthropic Console'da tek bir çalışma alanı içinde anahtar oluşturun, ardından yeniden bağlanın."
@@ -43,6 +48,7 @@
             "claudeSession": "{plan} oturum sınırına ulaşıldı",
             "usage": "{plan} kullanım sınırına ulaşıldı",
             "opencodeCredits": "OpenCode kredileri tükendi",
+            "opencodeNoGo": "OpenCode Go aboneliği yok",
             "opencodeWindow": "OpenCode Go {window, select, weekly {haftalık} other {aylık}} sınırına ulaşıldı",
             "opencode": "OpenCode Go sınırına ulaşıldı",
             "openaiCredits": "OpenAI API kredileri tükendi",
@@ -52,6 +58,7 @@
             "openaiCredits": "OpenAI API hesabınızda kredi kalmadı. platform.openai.com üzerinden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
             "anthropicCredits": "Anthropic API hesabınızda kredi kalmadı. Anthropic Console'da Billing bölümünden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
             "opencodeCredits": "Console kredisi kalmadı. opencode.ai üzerinden kredi ekleyin veya devam etmek için bir Go modeli seçin.",
+            "opencodeNoGo": "Bu OpenCode anahtarının etkin bir Go aboneliği yok, bu yüzden ücretsizler dahil tüm Go modelleri reddediliyor. OpenCode Go'ya abone olun veya bir Console modeli ya da başka bir sağlayıcı seçin.",
             "opencodeWindowResets": "OpenCode Go planınız {window, select, weekly {haftalık} monthly {aylık} other {5 saatlik}} sınırına ulaştı. Sıfırlanma zamanı: {resetsAt}. O zamana kadar bir Console modeline veya başka bir sağlayıcıya geçin.",
             "opencodeWindow": "OpenCode Go planınız {window, select, weekly {haftalık} monthly {aylık} other {5 saatlik}} sınırına ulaştı. Sıfırlanana kadar bir Console modeline veya başka bir sağlayıcıya geçin.",
             "modelUnavailable": "Bu bağlantı {model} modelini çalıştıramıyor. Devam etmek için başka bir model seçin.",

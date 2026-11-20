@@ -90,7 +90,9 @@ Paste an OpenCode key (it starts with `oc_sk_`, get one at [opencode.ai/auth](ht
 - **Go**, the subscription: its models are switched on when you connect, and cost nothing on top of the plan. The picker shows them with an **Included** badge, and the connection shows the plan's 5-hour, weekly and monthly limits.
 - **Console**, paid per token from your OpenCode credits: its models (Claude, GPT, Gemini and more) start switched off, with a **Credits** badge and their price per million tokens.
 
-The Go catalog also carries models OpenCode serves for nothing, marked **Free**. They are listed but start switched off, because a free endpoint can train on what it is sent: switch on the ones you want your coworkers to use for rough work. One of them, Iceman Contributor Free, answers with an error until the OpenCode account allows endpoints that train on request data, in its own console. The free models of the Console catalog are not offered: OpenCode refuses them to an API key and answers "subscribe to OpenCode Go".
+The Go catalog also carries models OpenCode serves for nothing, marked **Free**. They are listed but start switched off, because a free endpoint can train on what it is sent: switch on the ones you want your coworkers to use for rough work. OpenCode serves every Go model, the free ones included, only to a key whose account has an active Go subscription: without one, the chat says **No OpenCode Go subscription**. The free models of the Console catalog are not offered: OpenCode refuses them to an API key and answers "subscribe to OpenCode Go".
+
+The **Privacy** settings of the OpenCode account also decide which Go models it may use. A model hosted outside Europe and the United States (DeepSeek, for one) runs only once **Global** is selected there, and a model that trains on what it is sent (Muse Spark, Iceman Contributor Free) only once endpoints that train on request data are allowed. Until then the chat says **Blocked by your OpenCode settings** and names the setting.
 
 A model sold on both sides appears twice, once per catalog. OpenCode runs inside the engine itself, with no command-line tool.
 

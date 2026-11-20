@@ -158,6 +158,13 @@ If the model answers but forgets its instructions, its context is too small. See
 
 The server of a **Custom endpoint** connection answered 402 (Payment Required). The message ends with what the server said, for example that its account has used all its credits or reached its spending limit. This is the account at that provider, not your Rerun credit: add credits there, or pick another model for the coworker.
 
+## A coworker on OpenCode answers "Blocked by your OpenCode settings" or "No OpenCode Go subscription"
+
+OpenCode turned the model away because of the OpenCode account, not Rerun:
+
+- **Blocked by your OpenCode settings**: the account's **Privacy** settings exclude this model. Select **Global** there for a model hosted outside Europe and the United States, or allow endpoints that train on request data for a model that does, then send the message again. See [OpenCode](/self-host/models#opencode).
+- **No OpenCode Go subscription**: the key's account has no active Go plan, so every Go model is refused, the free ones included. Subscribe to OpenCode Go, or pick a Console model (paid from your OpenCode credits) or another provider.
+
 ## The Chief of Staff does not answer
 
 With `OPENROUTER_API_KEY` set, the Chief of Staff walks a new workspace through its onboarding on that key: look for `[llm]` or OpenRouter errors in `docker compose logs app`, an empty balance or a spending limit on the key stops it too.
