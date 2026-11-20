@@ -29,6 +29,8 @@ export const messageSchema = z.object({
     toolCallsJson: z.string().nullable(),
     // Absent on an engine older than message attribution, null when nobody typed the message.
     authorId: z.string().nullish(),
+    // Who sent it for that author, `foreman` for the Chief of Staff. Absent on an older engine.
+    authorVia: z.string().nullish(),
     createdAt: z.string(),
 })
 export type Message = z.infer<typeof messageSchema>

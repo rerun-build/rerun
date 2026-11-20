@@ -1,5 +1,5 @@
 import { remoteComputersNote } from './remote-computers-note.js'
-import { contextTexts, type Provider, type Verbosity } from '@rerun/contracts'
+import { contextTexts, type MessageAuthor, type Provider, type Verbosity } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { buildSkillIndex } from '../skills/index.js'
 import { buildScheduleIndex } from '../schedules/index.js'
@@ -179,6 +179,13 @@ export function userLanguageBlock(language: string | undefined): string {
 
 export function userBlock(name: string | undefined): string {
     return name ? section('user', `${name}: the person you are talking to, as their account names them. Call them by it, and sign with it what goes out under their name.`) : ''
+}
+
+// The member the message is signed with did not type it: the Chief of Staff answered for them.
+export function relayedBlock(author: MessageAuthor | undefined): string {
+    if (author?.via !== 'foreman') return ''
+    const forWhom = author.name ? ` for ${author.name}` : ''
+    return section('relayed', `The Chief of Staff of the workspace sent this message${forWhom}, answering in their name what you asked them. Take it as their answer, and say it came through the Chief of Staff when you report back to them.`)
 }
 
 export function nowBlock(now: Date = new Date()): string {

@@ -11,6 +11,9 @@ export const messageAuthorSchema = z.object({
     id: z.string().min(1).max(64),
     name: z.string().min(1).max(80).optional(),
     timezone: z.string().min(1).max(64).optional(),
+    // Set when the Chief of Staff sent the message in this person's name, answering a card they were
+    // owed. An engine that predates it drops it, and the message reads as theirs.
+    via: z.enum(['foreman']).optional(),
 })
 
 // How an app with no cookie (the mobile app) tells the hub the time zone of the device.

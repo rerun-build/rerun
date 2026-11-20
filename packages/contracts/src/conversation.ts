@@ -93,6 +93,8 @@ export const conversationMessageMetadataSchema = z.object({
     // The text carries the bare prompt or guide, so an app older than these fields shows a bubble.
     scheduledRun: z.object({ slug: z.string(), name: z.string() }).optional(),
     install: z.object({ agentName: z.string() }).optional(),
+    // The Chief of Staff answered in the name of `authorId`. An app older than it shows the author's own bubble.
+    relayedBy: z.literal('foreman').optional(),
 })
 export type ConversationMessageMetadata = z.infer<typeof conversationMessageMetadataSchema>
 

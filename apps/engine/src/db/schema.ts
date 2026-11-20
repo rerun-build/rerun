@@ -29,6 +29,7 @@ export const messages = sqliteTable('messages', {
     createdAt: text('created_at').notNull(),
     authorId: text('author_id'),
     authorName: text('author_name'),
+    authorVia: text('author_via'),
 })
 
 export const runs = sqliteTable('runs', {

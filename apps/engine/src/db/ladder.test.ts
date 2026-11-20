@@ -116,6 +116,10 @@ describe('sqlite ladders', () => {
               7,
               "run-checkin",
             ],
+            [
+              8,
+              "message-author-via",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -303,6 +307,19 @@ describe('system.db v6 to v7', () => {
         expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
         await SYSTEM_DB_MIGRATIONS[6].up(client)
         expect((await client.execute('SELECT id, checkin_json FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', checkin_json: null }])
+    })
+})
+
+describe('system.db v7 to v8', () => {
+    it('adds who sent a message for its author, leaves the messages already there sent by their author, and replays without harm', async () => {
+        const client = freshFile('v7-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 7), 'v7-system.db')
+        expect(await columns(client, 'messages')).not.toContain('author_via')
+        await client.execute("INSERT INTO messages (id, session_id, role, content_json, created_at, author_id, author_name) VALUES ('m1', 's1', 'user', '\"yes\"', '2026-11-20', 'u1', 'Ada')")
+        await migrateSystemDb(client, 'v7-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[7].up(client)
+        expect((await client.execute('SELECT author_id, author_via FROM messages')).rows.map(row => ({ ...row }))).toEqual([{ author_id: 'u1', author_via: null }])
     })
 })
 

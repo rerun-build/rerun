@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { CLIENT_PLATFORMS, type ClientPlatform } from './client.js'
-import { conversationMessageSchema } from './conversation.js'
+import { conversationMessageMetadataSchema, conversationMessageSchema } from './conversation.js'
 import { proactiveSchema } from './agent.js'
 import { TEMPLATE_CATEGORIES } from './template-display.js'
 
@@ -127,12 +127,16 @@ export const FOREMAN_KICKOFF_MARKER = '[[foreman:start]]'
 export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string(), greet: z.boolean().optional(), name: z.string().optional() })
 export type ForemanStateResponse = z.infer<typeof foremanStateSchema>
 
+// The Chief of Staff's own conversations never hold a message it sent for someone, so they keep the
+// shape the shipped builds read: a change inside a branch of the answer's `anyOf` reads to them as a new branch.
+const foremanMessageSchema = conversationMessageSchema.extend({ metadata: conversationMessageMetadataSchema.omit({ relayedBy: true }).optional() })
+
 // GET /api/chat/foreman/engine: the caller's General with the engine's foreman, null before they
 // first spoke in it. With `?sessionId=`, that conversation, General or a thread.
 export const foremanEngineConversationSchema = z
-    .looseObject({ sessionId: z.string(), title: z.string().nullable().optional(), messages: z.array(conversationMessageSchema), activeRunId: z.string().nullable().optional() })
+    .looseObject({ sessionId: z.string(), title: z.string().nullable().optional(), messages: z.array(foremanMessageSchema), activeRunId: z.string().nullable().optional() })
     .nullable()
-export const foremanEngineMessagesSchema = z.object({ messages: z.array(conversationMessageSchema) })
+export const foremanEngineMessagesSchema = z.object({ messages: z.array(foremanMessageSchema) })
 
 const templateCategorySchema = z.enum(TEMPLATE_CATEGORIES)
 

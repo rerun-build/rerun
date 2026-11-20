@@ -7,7 +7,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-system-prompt-
 const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
 const { SKILL_STYLE } = await import('../skills/style.js')
-const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
+const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, relayedBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
 
 // The tests read the prompt as the model does, both blocks joined.
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
@@ -272,6 +272,13 @@ describe('current time', () => {
         expect(userBlock('Yassine')).toMatch(/^<user>\nYassine: the person you are talking to/)
         expect(userBlock('Yassine')).toContain('sign with it what goes out under their name')
         expect(userBlock(undefined)).toBe('')
+    })
+
+    it('says when the Chief of Staff answered for the user, and only then', () => {
+        expect(relayedBlock({ id: 'u1', name: 'Ada', via: 'foreman' })).toMatch(/^<relayed>\nThe Chief of Staff of the workspace sent this message for Ada, answering in their name/)
+        expect(relayedBlock({ id: 'u1', via: 'foreman' })).toContain('sent this message, answering')
+        expect(relayedBlock({ id: 'u1', name: 'Ada' })).toBe('')
+        expect(relayedBlock(undefined)).toBe('')
     })
 })
 

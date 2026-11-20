@@ -189,6 +189,9 @@ const SKILL_PROPOSAL_MODEL_COLUMNS = ['connection_id TEXT', 'provider TEXT', 'mo
 
 const MESSAGE_AUTHOR_COLUMNS = ['author_id TEXT', 'author_name TEXT']
 
+// Who sent a message in its author's name: the Chief of Staff answering a coworker's card for them.
+const MESSAGE_AUTHOR_VIA_COLUMNS = ['author_via TEXT']
+
 // What a step wrote into the prompt cache and what it cost: the two numbers that tell whether a
 // turn reused the one before it, which the run row cannot say.
 const RUN_STEP_CACHE_COST_COLUMNS = ['cache_write_tokens INTEGER', 'cost_micros INTEGER']
@@ -309,6 +312,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'run-checkin',
         up: async client => {
             await ensureColumns(client, 'runs', RUN_CHECKIN_COLUMNS)
+        },
+    },
+    {
+        version: 8,
+        id: 'message-author-via',
+        up: async client => {
+            await ensureColumns(client, 'messages', MESSAGE_AUTHOR_VIA_COLUMNS)
         },
     },
 ]

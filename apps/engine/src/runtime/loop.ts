@@ -22,7 +22,7 @@ import { armPlanLimitLatch, clearPlanLimitLatch } from '../connections/plan-limi
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
 import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
-import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
+import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, relayedBlock, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
 import type { LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
 import { answeringModel } from '../agents/rerun-upstream.js'
@@ -578,7 +578,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         // replays is then byte for byte the prompt the provider already cached. Only the signature
         // stays out of the row, `signHistoryMessage` puts it back on a shared conversation.
         // A shared conversation already signs each turn with its sender.
-        const suffix = [recall, shared ? '' : userBlock(author?.name), userLanguageBlock(trigger.source === 'chat' ? trigger.userLanguage : undefined), nowBlock()].filter(Boolean).join('\n\n')
+        const suffix = [recall, shared ? '' : userBlock(author?.name), relayedBlock(author), userLanguageBlock(trigger.source === 'chat' ? trigger.userLanguage : undefined), nowBlock()].filter(Boolean).join('\n\n')
         const context = suffix ? [contextTextPart(suffix)] : []
         if (!handover) {
             appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)

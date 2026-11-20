@@ -22,6 +22,7 @@ export async function appendMessage(agentId: string, sessionId: string, message:
         createdAt: nowIso(),
         authorId: author?.id ?? null,
         authorName: author?.name ?? null,
+        authorVia: author?.via ?? null,
     }
     const { db, client } = await getSystemDb(agentId)
     await db.insert(messages).values(row)

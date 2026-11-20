@@ -806,7 +806,9 @@ Only `message` is required.
 - `author` is the person who typed, kept on the message (the engine has no users of its own). Every
   message to any coworker also records them in the foreman's `members` table: their name, the IANA
   `timezone` of their device (one Intl does not know is dropped, and a message without one keeps the
-  zone already on file), and when they first and last wrote.
+  zone already on file), and when they first and last wrote. `author.via: "foreman"` says the Chief
+  of Staff sent the message in that person's name, answering a card of the coworker: it is kept on the
+  message (`authorVia`) and the coworker reads it in a `<relayed>` block of its turn.
 - `callableAgentIds` narrows the coworkers `call_agent` offers to the ones the author reaches; absent,
   every coworker can be called.
 - `install: true` on a new conversation starts the agent's guided setup there, and `userLanguage`
@@ -858,10 +860,10 @@ One session, same shape. `404 { "error": "session not found" }` when it belongs 
 Full transcript of a session (ordered). `404` if the session does not belong to the agent.
 
 ```json
-{ "messages": [ { "id": "...", "sessionId": "...", "role": "user", "contentJson": "\"hi\"", "toolCallsJson": null, "authorId": "user-uuid", "authorName": "Ana", "createdAt": "..." } ] }
+{ "messages": [ { "id": "...", "sessionId": "...", "role": "user", "contentJson": "\"hi\"", "toolCallsJson": null, "authorId": "user-uuid", "authorName": "Ana", "authorVia": null, "createdAt": "..." } ] }
 ```
 
-`role` is `user` | `assistant` | `tool`. `contentJson` is the JSON-encoded AI SDK message content (string for user text; arrays of parts for assistant/tool).
+`role` is `user` | `assistant` | `tool`. `authorVia` is `foreman` on a message the Chief of Staff sent for its author, null otherwise. `contentJson` is the JSON-encoded AI SDK message content (string for user text; arrays of parts for assistant/tool).
 
 ---
 
