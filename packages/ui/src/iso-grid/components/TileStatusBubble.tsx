@@ -9,6 +9,8 @@ import { tileStatusLabel } from '../status-label'
 
 const ENTER_MS = 200
 const EXIT_MS = 140
+// Top edge of the bubble, from the top of the tile.
+export const STATUS_BUBBLE_TOP = -24
 
 type Props = {
     // La tile survolée, null quand le curseur n'est sur rien. Une tile sans statut (au repos) vaut
@@ -60,7 +62,7 @@ export const TileStatusBubble = memo(function TileStatusBubble({ tile, worldOffs
             {/* Posée contre la pointe nord du bloc, pas au-dessus de lui : c'est une étiquette
                 attachée à la tuile. Elle prend la place des badges `hand`/`lock`, que TileBlock
                 efface pendant ce temps — deux signes pour un seul état se bousculent. */}
-            <div className="absolute left-1/2" style={{ top: -24, transform: 'translateX(-50%)' }}>
+            <div className="absolute left-1/2" style={{ top: STATUS_BUBBLE_TOP, transform: 'translateX(-50%)' }}>
                 {/* Le fond `soft` du Badge n'est qu'une teinte à 12%, donc transparent : posé sur un
                     bloc de couleur, le mot devient illisible. La surface opaque est ce calque-ci, la
                     teinte du ton reste par-dessus. */}

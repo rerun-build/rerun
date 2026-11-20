@@ -8,6 +8,7 @@ import { BLOCK_HEIGHT, DEFAULT_SPAN, TILE_H, TILE_W, buddyFootprintShare, isoPos
 import type { Tile, TileResults } from '../types'
 import { RESULTS_GREEN } from './TileCountdownBadge'
 import { BUDDY_BADGE_GAP } from './TileBuddy'
+import { STATUS_BUBBLE_TOP } from './TileStatusBubble'
 import { FlagCheckeredIcon } from '../../icons'
 
 const CARD_ROWS = 3
@@ -24,7 +25,7 @@ type Props = {
 // rest as a count. The pill under it does not move, so nothing here repeats the delay.
 export const TileResultsCard = memo(function TileResultsCard({ tile, worldOffset, reducedMotion }: Props) {
     const results = tile?.style.results
-    if (!tile || !results || results.count === 0 || tile.style.badge) return null
+    if (!tile || !results || results.count === 0 || tile.style.badge === 'lock') return null
 
     const span = tile.span ?? DEFAULT_SPAN
     const pos = isoPosition(tile.position.col, tile.position.row)
@@ -32,12 +33,15 @@ export const TileResultsCard = memo(function TileResultsCard({ tile, worldOffset
     const headTop = tile.style.buddy
         ? ((span * TILE_H) / 2) * (1 - buddyFootprintShare(tile.style)) - tileTopLift(tile.style, span) - BUDDY_BADGE_GAP
         : -(tile.style.depth ?? BLOCK_HEIGHT) - 18
+    // A tile with a status shows its bubble on hover too, higher than the pill: the card rests on the
+    // top of the bubble's box, whose line box already leaves room above the bubble itself.
+    const cardBottom = tile.style.status ? Math.min(headTop - CARD_GAP, STATUS_BUBBLE_TOP - tileTopLift(tile.style, span)) : headTop - CARD_GAP
     return (
         <div
             className="pointer-events-none absolute"
             style={{
                 left: pos.left + worldOffset.left + TILE_W / 2,
-                top: pos.top + worldOffset.top + headTop - CARD_GAP,
+                top: pos.top + worldOffset.top + cardBottom,
                 transform: 'translate(-50%, -100%)',
                 zIndex: 99990,
             }}

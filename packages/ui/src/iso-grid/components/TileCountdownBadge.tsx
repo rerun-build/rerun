@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ClockIcon, FlagCheckeredIcon } from '../../icons'
+import { ClockIcon, FlagCheckeredIcon, HandIcon } from '../../icons'
 import { countdownShort, isCountdownSoon, resultsCount } from '../countdown'
 import { useCountdownNow } from '../hooks/useCountdownNow'
 import type { TileCountdown, TileResults } from '../types'
@@ -10,8 +10,8 @@ import { useKitTranslations } from '../../locale'
 export const RESULTS_GREEN = '#34d399'
 
 // The pill above the head: what is waiting to be seen, then what comes next. Results come first,
-// they want you now.
-export function TileCountdownBadge({ countdown, results }: { countdown?: TileCountdown; results?: TileResults }) {
+// they want you now. `waiting` puts the hand of a coworker waiting on you in front of its results.
+export function TileCountdownBadge({ countdown, results, waiting = false }: { countdown?: TileCountdown; results?: TileResults; waiting?: boolean }) {
     const t = useKitTranslations()
     const now = useCountdownNow(countdown?.at ?? 0)
     const remainingMs = countdown && now != null ? countdown.at - now : 0
@@ -21,6 +21,12 @@ export function TileCountdownBadge({ countdown, results }: { countdown?: TileCou
 
     return (
         <span className="iso-buddy-label flex h-[11px] items-center gap-1 rounded-full px-1 text-[7px] font-medium whitespace-nowrap tabular-nums">
+            {waiting && showsResults && (
+                <>
+                    <HandIcon className="size-[8px] shrink-0 text-cyan-400" />
+                    <span aria-hidden className="h-[6px] w-px shrink-0 bg-current opacity-30" />
+                </>
+            )}
             {showsResults && (
                 <span className="flex shrink-0 items-center gap-0.5 font-semibold">
                     <FlagCheckeredIcon className="size-[8px] shrink-0" style={{ color: RESULTS_GREEN }} />

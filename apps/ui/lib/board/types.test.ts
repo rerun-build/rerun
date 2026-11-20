@@ -12,6 +12,7 @@ describe('computeAgentStatus', () => {
 
     it('keeps the loudest session of the lot', () => {
         expect(computeAgentStatus([session('idle'), session('awaiting_question')], true)).toBe('waiting_human')
+        expect(computeAgentStatus([session('idle'), session('awaiting_ack')], true)).toBe('waiting_human')
         expect(computeAgentStatus([session('awaiting_question'), session('working')], true)).toBe('working')
     })
 })

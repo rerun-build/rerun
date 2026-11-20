@@ -129,6 +129,9 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
     // Pendant du TileStatusBubble que l'IsoGrid pose au-dessus de la tile survolée.
     const statusBubbleShowing = !ghost && !!hovered && !!s.status
     const badgeTop = buddy ? (AH / 2) * (1 - buddyFootprintShare(s)) - rise - BUDDY_BADGE_GAP : -18
+    // A coworker waiting on you can have finished other work too: the hand moves into the results
+    // pill instead of hiding it.
+    const waitingWithResults = s.badge === 'hand' && !!s.results?.count
 
     return (
         <div
@@ -180,7 +183,7 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
                 se pose à sa place et dit en toutes lettres ce que le pictogramme suggérait. Le fondu
                 est porté par l'enveloppe, le clignotement restant sur l'élément intérieur — les deux
                 jouent sur l'opacité et se disputeraient le même élément. */}
-            {s.badge === 'hand' && (
+            {s.badge === 'hand' && !waitingWithResults && (
                 <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center" style={{ top: badgeTop, opacity: statusBubbleShowing ? 0 : 1, transition: `opacity ${BADGE_FADE_MS}ms ease ${statusBubbleShowing ? 0 : BADGE_RETURN_DELAY_MS}ms` }}>
                     {/* 2.5 itérations : finit pile sur la keyframe 50% (opacité 1 = base), donc le
                         gel est invisible et aucun fill-mode n'est nécessaire. */}
@@ -197,9 +200,9 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
                 </div>
             )}
 
-            {(s.countdown || s.results) && !s.badge && !ghost && (
+            {(s.countdown || s.results) && (!s.badge || waitingWithResults) && !ghost && (
                 <div className="absolute inset-x-0 flex justify-center" style={{ top: badgeTop, transform: 'translateY(-50%)', opacity: statusBubbleShowing ? 0 : 1, transition: `opacity ${BADGE_FADE_MS}ms ease ${statusBubbleShowing ? 0 : BADGE_RETURN_DELAY_MS}ms` }}>
-                    <TileCountdownBadge countdown={s.countdown} results={s.results} />
+                    <TileCountdownBadge countdown={waitingWithResults ? undefined : s.countdown} results={s.results} waiting={waitingWithResults} />
                 </div>
             )}
 

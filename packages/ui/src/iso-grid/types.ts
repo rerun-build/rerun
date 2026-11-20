@@ -57,8 +57,8 @@ export type TileStyle = {
     // Something this tile is due to do, counted down above it where the hand and the lock sit. A
     // `badge` takes the spot when both are set.
     countdown?: TileCountdown
-    // What it finished that you have not opened yet. Shares the countdown's pill, before the delay,
-    // and the same rule: a `badge` takes the spot.
+    // What it finished that you have not opened yet. Shares the countdown's pill, before the delay.
+    // The lock takes the spot; the hand moves into the pill instead of hiding it.
     results?: TileResults
     // Draws the tile as a buddy: a thick rounded block with a face, its top in the agent's colour,
     // its name in a frosted label. `true` takes every trait from the tile id; an object pins some.
