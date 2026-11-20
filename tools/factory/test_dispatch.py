@@ -36,6 +36,8 @@ class World:
         self.open_prs = []
         self.branches = {}
         self.compare_files = []
+        self.compare_messages, self.compare_patches = [], []
+        self.ref_exists, self.patch_error, self.pr_create_error, self.ref_error = False, None, None, None
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
@@ -217,15 +219,25 @@ class World:
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
         if a[0] == "api" and "/compare/dev..." in a[1]:
-            return json.dumps(self.compare_files)
+            return json.dumps({"files": self.compare_files, "messages": self.compare_messages, "patches": self.compare_patches})
         if a[0] == "api" and "/git/ref/heads/" in a[1]:
+            if self.ref_error:
+                raise D.Error(self.ref_error)
             name = a[1].split("/git/ref/heads/", 1)[1]
             if name not in self.branches:
                 raise D.Error("gh api failed: exit 1: Not Found")
             return json.dumps({"object": {"sha": self.branches[name]}})
         if a[0] == "api" and "-X" in a and a[a.index("-X") + 1] == "POST" and any(x.endswith("/git/refs") for x in a):
+            if self.ref_exists:
+                raise D.Error("gh api failed: exit 1: Reference already exists")
+            return "{}"
+        if a[0] == "api" and "-X" in a and a[a.index("-X") + 1] == "PATCH" and any("/git/refs/heads/" in x for x in a):
+            if self.patch_error:
+                raise D.Error(self.patch_error)
             return "{}"
         if a[:2] == ["pr", "create"]:
+            if self.pr_create_error:
+                raise D.Error(self.pr_create_error)
             return "https://github.com/o/r/pull/42"
         if a[0] == "api" and "/compare/" in a[1]:
             return "[]"

@@ -58,7 +58,7 @@ class ProvenTest(Base):
         self.assertEqual(job["pr"], 42)
         self.assertEqual(job["head_branch"], "chunk/5-p")
         self.assertEqual(len(self.pr_creates()), 1)
-        self.assertIn("ref chunk/5-p not created, going on to the pull request", self.log_text())
+        self.assertIn("branch chunk/5-p not made, so it is moved to sha5aaa", self.log_text())
 
     def test_the_proven_job_goes_through_review_checks_and_proof_and_merges(self):
         self.tick(2)
