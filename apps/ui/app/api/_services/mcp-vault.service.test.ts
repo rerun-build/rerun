@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     attachVaultEntry: vi.fn(),
     detachVaultEntry: vi.fn(),
     shareVaultEntry: vi.fn(),
+    renameVaultEntry: vi.fn(),
     deleteVaultEntry: vi.fn(),
     vaultPaidAccounts: vi.fn(),
     attachVaultPaidAccount: vi.fn(),
@@ -31,6 +32,7 @@ vi.mock('./vault.service', () => ({
     attachVaultEntry: mocks.attachVaultEntry,
     detachVaultEntry: mocks.detachVaultEntry,
     shareVaultEntry: mocks.shareVaultEntry,
+    renameVaultEntry: mocks.renameVaultEntry,
     deleteVaultEntry: mocks.deleteVaultEntry,
     VaultConflictError,
     VaultUnavailableError,
@@ -224,6 +226,22 @@ describe('share_vault_entry', () => {
         mocks.shareVaultEntry.mockRejectedValueOnce(new Error('Only an admin can do this'))
 
         await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail', sharedWithAll: true })).rejects.toThrow('Only an admin')
+    })
+})
+
+describe('rename_vault_entry', () => {
+    it('names an account and gives it back the name of its sign-in with null', async () => {
+        await dispatchVaultTool(ADMIN, 'rename_vault_entry', { entryId: 'item-gmail', name: 'Sales inbox' })
+        await dispatchVaultTool(ADMIN, 'rename_vault_entry', { entryId: 'item-gmail', name: null })
+
+        expect(mocks.renameVaultEntry).toHaveBeenNthCalledWith(1, 'item-gmail', 'Sales inbox', ADMIN)
+        expect(mocks.renameVaultEntry).toHaveBeenNthCalledWith(2, 'item-gmail', null, ADMIN)
+    })
+
+    it('refuses a paid account and a name that is no string', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'rename_vault_entry', { entryId: 'conn-1', name: 'Mine' })).rejects.toThrow('paid app account')
+        await expect(dispatchVaultTool(ADMIN, 'rename_vault_entry', { entryId: 'item-gmail', name: 42 })).rejects.toThrow('name')
+        expect(mocks.renameVaultEntry).not.toHaveBeenCalled()
     })
 })
 

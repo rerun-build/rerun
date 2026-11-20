@@ -122,6 +122,7 @@
         "attach_vault_entry": "Lend from the Vault",
         "detach_vault_entry": "Take Back from the Vault",
         "share_vault_entry": "Share Vault Entry",
+        "rename_vault_entry": "Rename Vault Entry",
         "delete_vault_entry": "Delete Vault Entry",
         "send_message": "Message Coworker",
         "list_pending_cards": "Read Your Inbox",

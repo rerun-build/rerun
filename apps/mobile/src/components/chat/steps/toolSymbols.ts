@@ -125,6 +125,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     attach_vault_entry: 'link',
     detach_vault_entry: 'link',
     share_vault_entry: 'share',
+    rename_vault_entry: 'pencil',
     delete_vault_entry: 'trash',
     send_message: 'send',
     list_pending_cards: 'inbox',

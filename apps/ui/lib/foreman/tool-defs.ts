@@ -59,7 +59,7 @@ export const FOREMAN_MCP_TOOL_NAMES = [
 
 // The account MCP tools of the Vault, handed over only to a box that can take a brief of more than 64
 // tools (supportsForemanVault).
-export const FOREMAN_VAULT_TOOL_NAMES = ['list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'delete_vault_entry'] as const
+export const FOREMAN_VAULT_TOOL_NAMES = ['list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'rename_vault_entry', 'delete_vault_entry'] as const
 
 // No MCP tool covers the Boxes, but the app's own server actions do, so these three are declared
 // here and dispatched onto them.

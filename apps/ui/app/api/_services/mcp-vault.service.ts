@@ -6,7 +6,7 @@ import type { Actor } from '@/app/api/_auth/access'
 import { requireConfirmation, requireString } from '@/lib/mcp/args'
 import { dispatchShareTool } from './mcp-shares.service'
 import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from './vault-apps.service'
-import { attachVaultEntry, deleteVaultEntry, detachVaultEntry, listVault, shareVaultEntry, VaultConflictError, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
+import { attachVaultEntry, deleteVaultEntry, detachVaultEntry, listVault, renameVaultEntry, shareVaultEntry, VaultConflictError, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
 import { NoEngineError } from './workspace-engine.service'
 
 const UNAVAILABLE = {
@@ -129,6 +129,14 @@ async function shareEntry(actor: Actor, args: Record<string, unknown>) {
     return entryAfter(actor, entryId)
 }
 
+async function renameEntry(actor: Actor, args: Record<string, unknown>) {
+    const entryId = requireString(args.entryId, 'entryId')
+    if (args.name !== null && typeof args.name !== 'string') throw new Error('name must be a string, or null to give the account back the name its sign-in reported.')
+    if (await paidAccount(actor, entryId)) throw new Error('A paid app account keeps the name of its connection: it is not renamed here.')
+    await renameVaultEntry(entryId, args.name, actor)
+    return entryAfter(actor, entryId)
+}
+
 async function deleteEntry(actor: Actor, args: Record<string, unknown>) {
     const entryId = requireString(args.entryId, 'entryId')
     if (await paidAccount(actor, entryId)) throw new Error('A paid app account has its own subscription: take it back from its coworkers with detach_vault_entry, and end it in the Rerun app.')
@@ -148,6 +156,8 @@ export async function dispatchVaultTool(actor: Actor, name: string, args: Record
             return detachEntry(actor, args)
         case 'share_vault_entry':
             return shareEntry(actor, args)
+        case 'rename_vault_entry':
+            return renameEntry(actor, args)
         case 'delete_vault_entry':
             return deleteEntry(actor, args)
         default:

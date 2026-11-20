@@ -1,6 +1,6 @@
 ---
 title: "Vault"
-description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, lend them out and delete them."
+description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, lend them out, rename and delete them."
 ---
 
 The [Vault](/vault) is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added, the MCP servers you registered, and the accounts of paid apps. These tools act with the access of the member who created the key, the same rules as the app: see [Who can do what](/vault#who-can-do-what).
@@ -76,6 +76,20 @@ Gives a Vault entry to every coworker, including the ones added later, or takes 
 </ParamField>
 
 A paid account is lent coworker by coworker and cannot be shared with every coworker. Returns the entry as `list_vault` shows it.
+
+## rename_vault_entry
+
+Gives the account of an app a name of its own, like `Acme org` or `Personal`. The name replaces the account line wherever the app is shown, and signing in again keeps it. Needs the right to change the entry (`canChange` in `list_vault`).
+
+<ParamField body="entryId" type="string" required>
+  The `id` of an app entry, from `list_vault`.
+</ParamField>
+
+<ParamField body="name" type="string | null" required>
+  Up to 60 characters. `null` gives the account back the name its sign-in reported.
+</ParamField>
+
+Only the account of an app is renamed: a secret, a custom MCP server and a paid account are refused. Returns the entry as `list_vault` shows it.
 
 ## delete_vault_entry
 

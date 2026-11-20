@@ -50,6 +50,19 @@ export const VAULT_TOOL_DEFS = [
         },
     },
     {
+        name: 'rename_vault_entry',
+        description:
+            'Give the account of an app in the Vault a name of its own, like "Acme org" or "Personal", up to 60 characters: it replaces the account line wherever the app is shown, and signing in again keeps it. Pass name null to give it back the name its sign-in reported. Only an app account is renamed, not a secret, a custom MCP server or a paid app account. Needs the right to change the entry (canChange in list_vault). Returns the entry as list_vault shows it.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                entryId: { type: 'string', description: 'The id of an app entry, from list_vault.' },
+                name: { type: ['string', 'null'], maxLength: 60 },
+            },
+            required: ['entryId', 'name'],
+        },
+    },
+    {
         name: 'delete_vault_entry',
         description:
             'Delete a Vault entry for good: every coworker that got it loses it, its credentials are erased and a Composio account behind it is disconnected. Read who loses it in list_vault first and tell the account owner. Admins only. A paid app account has its own subscription and is not deleted here: take it back from coworkers with detach_vault_entry, and end it in the Rerun app. Returns the coworkers that lost it. Requires confirm: true.',

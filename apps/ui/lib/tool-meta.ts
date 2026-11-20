@@ -196,6 +196,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     attach_vault_entry: LinkIcon,
     detach_vault_entry: Link2OffIcon,
     share_vault_entry: Share2Icon,
+    rename_vault_entry: PencilIcon,
     delete_vault_entry: Trash2Icon,
     send_message: SendIcon,
     list_pending_cards: InboxIcon,

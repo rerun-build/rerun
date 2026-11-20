@@ -16,7 +16,7 @@ const LABELLED_TOOLS = [
     'rerun_hub_service_uninstall', 'rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'rerun_hub_search_docs', 'task_complete', 'list_spaces',
     'list_agents', 'get_agent', 'create_agent', 'update_agent', 'delete_agent', 'list_ai_connections', 'set_default_model', 'list_skills',
     'get_skill', 'upsert_skill', 'delete_skill', 'list_schedules', 'upsert_schedule', 'run_schedule_now', 'delete_schedule', 'list_runs', 'get_run',
-    'search_connectors', 'list_agent_connectors', 'attach_connector', 'detach_connector', 'list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'delete_vault_entry', 'send_message', 'list_pending_cards', 'answer_card', 'create_boxes', 'build_team', 'write_agent',
+    'search_connectors', 'list_agent_connectors', 'attach_connector', 'detach_connector', 'list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'rename_vault_entry', 'delete_vault_entry', 'send_message', 'list_pending_cards', 'answer_card', 'create_boxes', 'build_team', 'write_agent',
     'rename_box', 'delete_box', 'focus_agent', 'show_agents', 'open_connector_setup', 'open_settings', 'recenter_board', 'open_brain_page',
     'read_attachment', 'search_docs', 'analyze_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
     'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',

@@ -115,6 +115,7 @@
         "attach_vault_entry": "Vault'tan ödünç ver",
         "detach_vault_entry": "Vault'a geri al",
         "share_vault_entry": "Vault girdisini paylaş",
+        "rename_vault_entry": "Vault girdisini yeniden adlandır",
         "delete_vault_entry": "Vault girdisini sil",
         "send_message": "Coworker'a mesaj gönder",
         "list_pending_cards": "Gelen kutunuzu okuyun",

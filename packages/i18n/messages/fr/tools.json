@@ -115,6 +115,7 @@
         "attach_vault_entry": "Prêter depuis le Vault",
         "detach_vault_entry": "Reprendre au Vault",
         "share_vault_entry": "Partager une entrée du Vault",
+        "rename_vault_entry": "Renommer une entrée du Vault",
         "delete_vault_entry": "Supprimer une entrée du Vault",
         "send_message": "Écrire à un coworker",
         "list_pending_cards": "Lire votre boîte de réception",
