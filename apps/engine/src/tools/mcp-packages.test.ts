@@ -121,7 +121,7 @@ describe('withInstalledPackage', () => {
     it('runs npm, and the install scripts of the package with it, without the engine configuration', async () => {
         await installInBackground('mcp-tool@1.0.0')
         const [env] = npm.envs
-        expect(env?.PATH).toBe(process.env.PATH)
+        expect(env?.PATH).toContain(process.env.PATH)
         expect(env).not.toHaveProperty('RERUN_API_KEY')
         expect(env).not.toHaveProperty('RERUN_DATA_DIR')
     })

@@ -49,6 +49,16 @@ describe('childProcessEnv', () => {
         expect(childProcessEnv({ PATH: '/agent/bin', LINEAR_API_KEY: 'lin', RERUN_WORKSPACE: '/w' }, { RERUN_WORKSPACE: '/ws' })).toMatchObject({ PATH: '/agent/bin', LINEAR_API_KEY: 'lin', RERUN_WORKSPACE: '/ws' })
         expect(childProcessEnv({})).not.toHaveProperty('RERUN_API_KEY')
     })
+
+    // RER-178: a command pip installed for the coworker answered `command not found`.
+    it('puts the user bin folder pip installs commands into at the head of the PATH, once', () => {
+        vi.stubEnv('HOME', '/home/rerun')
+        vi.stubEnv('PATH', '/usr/bin')
+        expect(childProcessEnv({}).PATH).toBe('/home/rerun/.local/bin:/usr/bin')
+        vi.stubEnv('PATH', '/usr/bin:/home/rerun/.local/bin')
+        expect(childProcessEnv({}).PATH).toBe('/usr/bin:/home/rerun/.local/bin')
+        expect(childProcessEnv({ PATH: '/agent/bin' }).PATH).toBe('/agent/bin')
+    })
 })
 
 describe('envOverlay', () => {

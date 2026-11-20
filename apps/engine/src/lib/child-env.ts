@@ -1,3 +1,5 @@
+import { delimiter, join } from 'node:path'
+
 // What a process started for an agent may see of the engine's own environment: the user, the
 // paths, the locale, the display and the network settings. Never the engine's configuration
 // (RERUN_API_KEY, RERUN_PAIR_TOKEN, RERUN_HUB_BASE_URL, RERUN_DATA_DIR…), which a command the
@@ -14,8 +16,18 @@ export function inheritedEnv(source: NodeJS.ProcessEnv = process.env): Record<st
     return env
 }
 
+// pip puts the commands of a package (yt-dlp, cairosvg) in ~/.local/bin, which the PATH systemd
+// gives the service leaves out (RER-178).
+function withUserBin(env: Record<string, string>): Record<string, string> {
+    if (!env.HOME || !env.PATH) return env
+    const userBin = join(env.HOME, '.local', 'bin')
+    const entries = env.PATH.split(delimiter)
+    if (entries.includes(userBin)) return env
+    return { ...env, PATH: [userBin, ...entries].join(delimiter) }
+}
+
 export function childProcessEnv(agentEnv: Record<string, string>, extra: Record<string, string> = {}): Record<string, string> {
-    return { ...inheritedEnv(), ...agentEnv, ...extra }
+    return { ...withUserBin(inheritedEnv()), ...agentEnv, ...extra }
 }
 
 // For a spawner that merges its `env` option over process.env itself: every engine variable absent

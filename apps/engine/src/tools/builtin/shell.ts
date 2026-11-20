@@ -20,7 +20,7 @@ export function shellTools(ctx: RunContext, run: ShellRunner = execAsync): ToolS
     const breaker = ctx.hostBreaker ?? new HostBreaker()
     return {
         shell_exec: tool({
-            description: 'Run a shell command inside the coworker workspace, which is the working directory (pwd) and whose absolute path is in the RERUN_WORKSPACE environment variable. Use this to inspect your workspace, run scripts, and install tools you need. Your files live here, not under install paths like /opt/rerun.',
+            description: 'Run a shell command in the coworker workspace, the working directory (pwd), whose absolute path is in $RERUN_WORKSPACE. Use it to inspect your workspace, run scripts and install what you need: pip install <lib>, sudo apt-get update && sudo apt-get install -y <pkg>. Your files live here, not under install paths like /opt/rerun.',
             inputSchema: z.object({
                 command: z.string().describe('The shell command to execute'),
                 timeoutMs: z.number().int().positive().max(600_000).default(120_000),

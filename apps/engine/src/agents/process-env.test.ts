@@ -33,6 +33,12 @@ describe('agentProcessEnv', () => {
         expect(env.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
     })
 
+    // RER-178: Debian's Python refused every `pip install`, so the coworker could not add Pillow.
+    it('lets pip install past an externally managed Python, unless the agent .env says otherwise', () => {
+        expect(agentProcessEnv(agent({ sharedDb: false })).env.PIP_BREAK_SYSTEM_PACKAGES).toBe('1')
+        expect(agentProcessEnv(agent({ sharedDb: false }, { PIP_BREAK_SYSTEM_PACKAGES: '0' })).env.PIP_BREAK_SYSTEM_PACKAGES).toBe('0')
+    })
+
     it('leaves process.env out, so each caller decides what the process inherits', () => {
         expect(agentProcessEnv(agent({ sharedDb: false })).env.PATH).toBeUndefined()
     })

@@ -56,6 +56,6 @@ describe('shell_exec child environment', () => {
         expect(options.env).not.toHaveProperty('RERUN_HUB_BASE_URL')
         expect(options.env).not.toHaveProperty('RERUN_DATA_DIR')
         expect(options.env?.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
-        expect(options.env?.PATH).toBe(process.env.PATH)
+        expect(options.env?.PATH).toContain(process.env.PATH)
     })
 })

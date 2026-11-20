@@ -187,6 +187,8 @@ Every coworker of a workspace runs on the [same machine](/concepts#workspace). E
 
 The file tools stay inside the coworker's folder. Its terminal does not: a command sees the whole machine, the other coworkers' programs included.
 
+A coworker installs what a script lacks when it needs it. On a machine that has Python and pip, as Rerun Cloud computers do, `pip install` puts a Python library in the system user's own folder, where every coworker of the workspace can import it and run the commands it brings. On a machine where sudo works, `sudo apt-get install` adds a system package. To turn `pip install` off for one coworker, set `PIP_BREAK_SYSTEM_PACKAGES=0` in its `.env`.
+
 ### Skills that start or stop programs
 
 Because every coworker sees every running program, a command that stops programs by name stops them for the whole workspace. A skill that runs `pkill -f xfreerdp` or `killall xfreerdp` before starting its own session also closes the session another coworker has open.

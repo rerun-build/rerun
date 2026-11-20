@@ -12,6 +12,11 @@ export function agentVariables(agent: VariableHolder): Record<string, string> {
     return { ...agent.env, ...vaultEnvFor(agent) }
 }
 
+// Debian marks its Python as externally managed (PEP 668), so a plain `pip install` is refused and
+// the coworker gave up on the library it needed (RER-178). On a box, without root, pip then falls
+// back to the user's own site. The coworker's `.env` can override it.
+const COWORKER_DEFAULTS: Record<string, string> = { PIP_BREAK_SYSTEM_PACKAGES: '1' }
+
 // What every process an agent starts must see, whether shell_exec spawns it or a CLI provider's
 // own shell does: the agent's .env plus the paths the system prompt names. The base is left to the
 // caller: `childProcessEnv` in lib/child-env.ts for the engine's own spawns, the provider's own
@@ -24,7 +29,7 @@ export function agentProcessEnv(agent: VariableHolder, { vault = true }: { vault
     const cwd = workspaceDir(agent.id)
     mkdirSync(cwd, { recursive: true })
     mkdirSync(agentDataDir(agent.id), { recursive: true })
-    const env: Record<string, string> = { ...(vault ? agentVariables(agent) : agent.env), RERUN_AGENT_DB: agentDataDbPath(agent.id), RERUN_WORKSPACE: cwd }
+    const env: Record<string, string> = { ...COWORKER_DEFAULTS, ...(vault ? agentVariables(agent) : agent.env), RERUN_AGENT_DB: agentDataDbPath(agent.id), RERUN_WORKSPACE: cwd }
     if (agent.config.tools.sharedDb) {
         mkdirSync(sharedDbDir(), { recursive: true })
         env.RERUN_SHARED_DB = sharedDbPath()

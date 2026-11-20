@@ -206,7 +206,7 @@ describe('pooled MCP tools', () => {
         const stdio = byTarget.node.options as { command: string; args: string[]; env: Record<string, string>; cwd: string }
         expect(stdio.args).toEqual(['srv.js'])
         expect(stdio.cwd).toBe(workspaceDir('mcp-agent'))
-        expect(stdio.env).toMatchObject({ TOKEN: 't', AGENT_KEY: 'a', PATH: process.env.PATH, HOME: process.env.HOME, RERUN_WORKSPACE: workspaceDir('mcp-agent') })
+        expect(stdio.env).toMatchObject({ TOKEN: 't', AGENT_KEY: 'a', PATH: expect.stringContaining(process.env.PATH!), HOME: process.env.HOME, RERUN_WORKSPACE: workspaceDir('mcp-agent') })
         expect(stdio.env.MCP_TEST_INHERITED).toBeUndefined()
         expect(stdio.env).not.toHaveProperty('RERUN_API_KEY')
         expect(stdio.env).not.toHaveProperty('RERUN_DATA_DIR')

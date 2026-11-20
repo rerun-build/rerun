@@ -271,7 +271,7 @@ describe('modelFor', () => {
             cwd: workspaceDir('agent-codex'),
             configOverrides: { ...CODEX_HARNESS_OVERRIDES, instructions: CODEX_ONE_SHOT_INSTRUCTIONS },
         })
-        expect(model.settings.env).toMatchObject({ CODEX_HOME: codexHomeDir('codex-cnx'), AGENT_SECRET: 's', RERUN_WORKSPACE: workspaceDir('agent-codex'), PATH: process.env.PATH })
+        expect(model.settings.env).toMatchObject({ CODEX_HOME: codexHomeDir('codex-cnx'), AGENT_SECRET: 's', RERUN_WORKSPACE: workspaceDir('agent-codex'), PATH: expect.stringContaining(process.env.PATH!) })
         expect(model.settings.env).toMatchObject({ RERUN_API_KEY: '', RERUN_HUB_BASE_URL: '', RERUN_DATA_DIR: '' })
     })
 
