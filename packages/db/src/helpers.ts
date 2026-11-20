@@ -42,6 +42,20 @@ export type WithJoins<T extends TableName, J extends Record<string, JoinConfig<a
 export type JoinFilters<J extends Record<string, JoinConfig<any, any>>> = {
     [K in keyof J]?: J[K] extends JoinConfig<infer TJ, any> ? Filters<TJ> : never
 }
+export type OrderBySpec<T extends TableName> =
+    | { column: keyof TableRow<T>; ascending?: boolean }
+    | readonly { column: keyof TableRow<T>; ascending?: boolean }[]
+
+function applyOrderBy<T extends TableName, Q extends { order(column: string, options?: { ascending?: boolean }): Q }>(query: Q, orderBy?: OrderBySpec<T>): Q {
+    if (!orderBy) return query
+    const specs = Array.isArray(orderBy) ? orderBy : [orderBy]
+    let current = query
+    for (const spec of specs) {
+        current = current.order(spec.column as string, { ascending: spec.ascending ?? true })
+    }
+    return current
+}
+
 
 function quoteOrValue(v: unknown): string {
     const s = String(v)
@@ -183,14 +197,10 @@ export async function selectMaybeSingle<T extends TableName, K extends keyof Tab
     return { data: data as Pick<TableRow<T>, S[number]> | null, error }
 }
 
-export async function selectMany<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }, limit?: number, offset?: number) {
+export async function selectMany<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: OrderBySpec<T>, limit?: number, offset?: number) {
     let query = supabase.from(table).select(selection.join(','))
     query = applyFilters(query, filters)
-
-    if (orderBy) {
-        query = query.order(orderBy.column as string, { ascending: orderBy.ascending ?? true })
-    }
-
+    query = applyOrderBy(query, orderBy)
     if (offset !== undefined) {
         const endRange = offset + (limit || 50) - 1
         query = query.range(offset, endRange)
@@ -202,7 +212,7 @@ export async function selectMany<T extends TableName, K extends keyof TableRow<T
     return { data: data as Pick<TableRow<T>, S[number]>[] | null, error }
 }
 
-export async function selectAll<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }) {
+export async function selectAll<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: OrderBySpec<T>) {
     const allData: Pick<TableRow<T>, S[number]>[] = []
     let offset = 0
     const limit = 1000
@@ -267,7 +277,7 @@ export async function selectMaybeSingleWithJoins<T extends TableName, K extends 
     return { data: data as (Pick<TableRow<T>, S[number]> & WithJoins<T, J>) | null, error }
 }
 
-export async function selectManyWithJoins<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[], J extends Record<string, JoinConfig<any, any>>>(supabase: SupabaseClient<Database>, table: T, selection: S, joins: J, filters: Filters<T>, joinFilters?: JoinFilters<J>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }, limit?: number, offset?: number) {
+export async function selectManyWithJoins<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[], J extends Record<string, JoinConfig<any, any>>>(supabase: SupabaseClient<Database>, table: T, selection: S, joins: J, filters: Filters<T>, joinFilters?: JoinFilters<J>, orderBy?: OrderBySpec<T>, limit?: number, offset?: number) {
     let joinSelections = Object.entries(joins).map(([alias, config]) => `${alias}:${config.foreignKey}(${Array.isArray(config.columns) ? config.columns.join(',') : config.columns})`)
 
     joinSelections = applyJoinFilters(joinSelections, joins, joinFilters)
@@ -310,9 +320,7 @@ export async function selectManyWithJoins<T extends TableName, K extends keyof T
         }
     }
 
-    if (orderBy) {
-        query = query.order(orderBy.column as string, { ascending: orderBy.ascending ?? true })
-    }
+    query = applyOrderBy(query, orderBy)
 
     if (offset !== undefined) {
         const endRange = offset + (limit || 50) - 1

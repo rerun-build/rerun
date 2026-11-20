@@ -93,6 +93,21 @@ describe('selectMany', () => {
 
         expect(db.chains[0].map(call => call.method)).toEqual(['from', 'select', 'limit'])
     })
+    it('orders by multiple columns when given an array of order specs', async () => {
+        const db = fakeSupabase()
+        await selectMany(
+            db.client,
+            'services',
+            ['slug', 'name', 'category'] as const,
+            { enabled: true },
+            [{ column: 'category' }, { column: 'name', ascending: false }],
+        )
+
+        expect(db.chains[0].map(call => call.method)).toEqual(['from', 'select', 'eq', 'order', 'order'])
+        expect(db.chains[0][3].args).toEqual(['category', { ascending: true }])
+        expect(db.chains[0][4].args).toEqual(['name', { ascending: false }])
+    })
+
 })
 
 describe('selectAll', () => {

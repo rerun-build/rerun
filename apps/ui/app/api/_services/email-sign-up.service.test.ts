@@ -12,8 +12,12 @@ const EMAIL = 'ada@example.com'
 const IP = '203.0.113.7'
 
 const stored = (state: { exists?: boolean; blocked?: boolean; claimed?: boolean; existsError?: boolean; claimError?: boolean; invited?: boolean }) => {
-    supabase = fakeSupabase(table => {
-        if (table === 'workspace_invitations') return { data: state.invited ? [{ id: 'invite-1' }] : [] }
+    supabase = fakeSupabase((table, calls) => {
+        if (table === 'workspace_invitations') {
+            const isSingle = calls.some(c => c.method === 'maybeSingle' || c.method === 'single')
+            if (isSingle) return { data: state.invited ? { id: 'invite-1' } : null }
+            return { data: state.invited ? [{ id: 'invite-1' }] : [] }
+        }
         if (table === 'rpc:check_email_exists') return state.existsError ? { error: { message: 'down' } } : { data: state.exists ?? false }
         if (table === 'rpc:email_domain_is_blocked') return { data: state.blocked ?? false }
         if (table === 'rpc:claim_email_sign_up') return state.claimError ? { error: { message: 'down' } } : { data: state.claimed ?? true }
