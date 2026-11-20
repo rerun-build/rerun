@@ -1,3 +1,4 @@
+import calendar
 import json
 import math
 import os
@@ -154,3 +155,84 @@ def alarm(m):
         return {SILENT: "no keeper file: %s. %s" % (m["readings"][0]["reason"], HOW)}
     return {SILENT: "keeper file made %s, older than %d s: every keeper value shows as unknown. %s" % (
         m["fileMadeAt"] or "at an unknown time", STALE_S, HOW)}
+
+
+OWN_EVERY_S = 600
+OWN_NAMES = ("tools_dev_commit", "dispatcher_commit", "api_remaining", "api_reset_at", "runs_queued", "runs_running",
+             "queue_wait_oldest_s", "image_commit", "image_build")
+
+
+def epoch(s):
+    return calendar.timegm(time.strptime(s[:19], "%Y-%m-%dT%H:%M:%S"))
+
+
+def iso(t):
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
+
+
+def api(gh, path, memo):
+    if path not in memo:
+        memo[path] = json.loads(gh(["api", path]) or "null")
+    return memo[path]
+
+
+def own(gh, repo, now, code_sha):
+    memo = {}
+
+    def get(path):
+        return api(gh, path, memo)
+
+    def queued():
+        return get("repos/%s/actions/runs?status=queued&per_page=100" % repo)
+
+    def image_commit():
+        apps = get("repos/%s/commits?sha=dev&path=apps&per_page=1" % repo)[0]
+        pkgs = get("repos/%s/commits?sha=dev&path=packages&per_page=1" % repo)[0]
+        return max((apps, pkgs), key=lambda c: epoch(c["commit"]["committer"]["date"]))["sha"]
+
+    def image_build():
+        runs = [r for r in get("repos/%s/actions/runs?head_sha=%s&per_page=100" % (repo, image_commit()))["workflow_runs"]
+                if r.get("name") == "Images"]
+        if not runs:
+            return "none"
+        r = max(runs, key=lambda x: epoch(x["created_at"]))
+        if r.get("status") != "completed":
+            return "running"
+        return "green" if r.get("conclusion") == "success" else "red"
+
+    def oldest():
+        rows = queued()["workflow_runs"]
+        return max(0, int(now - min(epoch(r["created_at"]) for r in rows))) if rows else 0
+
+    def core():
+        return get("rate_limit")["resources"]["core"]
+
+    takers = {
+        "tools_dev_commit": lambda: get("repos/%s/commits?sha=dev&path=tools/factory&per_page=1" % repo)[0]["sha"],
+        "dispatcher_commit": lambda: code_sha,
+        "api_remaining": lambda: int(core()["remaining"]),
+        "api_reset_at": lambda: iso(int(core()["reset"])),
+        "runs_queued": lambda: int(queued()["total_count"]),
+        "runs_running": lambda: int(get("repos/%s/actions/runs?status=in_progress&per_page=1" % repo)["total_count"]),
+        "queue_wait_oldest_s": oldest,
+        "image_commit": image_commit,
+        "image_build": image_build,
+    }
+    out = []
+    for name in OWN_NAMES:
+        try:
+            e = {"name": name, "value": takers[name](), "reason": None}
+        except Exception as x:
+            e = {"name": name, "value": None, "reason": type(x).__name__}
+        out.append(reading(e, "dispatcher"))
+    return out
+
+
+class Own:
+    def __init__(self):
+        self.rows, self.at = None, None
+
+    def get(self, gh, repo, now, code_sha):
+        if self.rows is None or now - self.at >= OWN_EVERY_S:
+            self.rows, self.at = own(gh, repo, now, code_sha), now
+        return self.rows
