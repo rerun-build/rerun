@@ -33,6 +33,17 @@ flowchart TB
 
 Boxes arrange coworkers, the machine runs them all: the shared folder and the shared database are common to every coworker, whichever Box it sits in, and each app of the Vault reaches the coworkers you switch it on for.
 
+## Backups
+
+Rerun backs up the machine of every paid workspace each night: the coworkers, their memories, skills and sessions, the files, the shared database and the Vault. A backup is encrypted and stored away from the machine.
+
+- It is taken during the night of your time zone, at 02:00 UTC until Rerun knows it. The coworkers pause while it is taken, usually less than a minute, and a coworker in the middle of a run is never cut off: the backup waits for the run to end.
+- Each backup is kept for 7 days, and the one of the night from Saturday to Sunday for 4 weeks.
+- A workspace in its trial or paused is not backed up. A paused workspace is saved once, for 90 days: see [Cancelling](/billing#cancelling).
+- The backups are not in the app. If something went wrong on your machine, write to [help@rerun.build](mailto:help@rerun.build) and we restore it.
+
+A self-hosted Rerun backs up nothing on its own: see [Backups](/self-host/servers#backups).
+
 ## Chief of Staff
 
 The assistant every workspace comes with. It works like a coworker, with skills, knowledge, routines and apps of its own, and it reaches further than one: it works on the whole workspace. It builds your first team with you, creates and briefs coworkers, follows their runs, keeps the Brain with you and answers your questions about Rerun. It also checks in on its own, and writes to you when something is worth your time. You can give it a name. See [Chief of Staff](/chief-of-staff).
