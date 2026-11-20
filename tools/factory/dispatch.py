@@ -517,6 +517,11 @@ class Dispatcher:
         self.parked_at, self.parked_set, self.parked_logged = None, set(), set()
         self.others, self.extra = list, dict
         self.store = ledger_store.Store(cfg["ledger_file"])
+        try:
+            self.store.claim(self.repo, self.home)
+        except ledger_store.Refused:
+            self.store.close()
+            raise
         self.weights = weights.load()
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
@@ -2279,7 +2284,8 @@ def main(argv=None):
         return 1
     if os.environ.get("FACTORY_START_CHECK") != "0" and ask_refresh(gh, cfg["repo"], set()):
         return REFRESH_EXIT
-    d = Dispatcher(cfg, account, gh)
+    import lines
+    d = lines.Lines(cfg, account, gh, mod=sys.modules[__name__])
     log("-", "dispatcher started: %d builders, %d reviewers, label %s, repo %s" % (
         len(pools.types(cfg).get("coder", {}).get("coworkers", [])), len(pools.types(cfg).get("reviewer", {}).get("coworkers", [])), cfg.get("label", "factory"), cfg["repo"]))
     if a.cmd == "once":
