@@ -1,4 +1,4 @@
-import os, sys, tempfile, unittest
+import json, os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import planning
 import registry
@@ -138,6 +138,43 @@ class Rows(Base):
         self.kv("classify:16", run="", issue="{}")
         self.assertEqual(self.row(15)["step"], "intake")
         self.assertIsNone(self.row(16))
+
+    def test_accepted_parent_wins_over_older_returned_job_and_fresh_started_beats_stale_move(self):
+        self.job(10, "returned", at="2026-11-19T08:00:00Z")
+        self.kv("accept:10", state="accepted")
+        self.assertEqual(self.row(10)["step"], "done")
+        self.job(101, "returned", at="2026-11-19T08:00:00Z")
+        self.kv("accept:101", state="gaps", why="gap #102")
+        self.assertEqual(self.row(101)["step"], "problem")
+        self.kv("plan:20", state="planning", agent="p1", started="2026-11-19T11:59:50Z")
+        self.s.db.execute("UPDATE moves SET at='2026-11-19T10:00:00Z' WHERE job='plan:20'")
+        r = self.row(20)
+        self.assertEqual(r["handover"]["since"], "2026-11-19T11:59:50Z")
+        self.assertFalse(registry.stuck(r, NOW, {}))
+
+    def test_planning_beats_idle_accept_gaps_and_left(self):
+        self.kv("accept:21", state="gaps", why="gap #22")
+        self.kv("plan:21", state="planning", agent="p1", started="2026-11-19T11:55:00Z")
+        self.assertEqual((self.row(21)["station"], self.row(21)["step"]), ("plan", "planning"))
+        self.kv("accept:23", state="left", sends="3")
+        self.kv("plan:23", state="planning", agent="p1", started="2026-11-19T11:55:00Z")
+        self.assertEqual((self.row(23)["station"], self.row(23)["step"]), ("plan", "planning"))
+        self.kv("plan:24", state="cut")
+        self.kv("accept:24", state="gaps", why="gap #25")
+        self.assertEqual((self.row(24)["station"], self.row(24)["step"], self.row(24)["handover"]["status"]),
+                         ("accept", "acceptance", "back"))
+
+    def test_import_json_round_trips_moves(self):
+        f = os.path.join(os.path.dirname(self.s.path), "state.json")
+        self.s.db.execute("INSERT INTO kv VALUES('plan:30','state','planned')")
+        with open(f, "w") as fh:
+            json.dump({"jobs": {}, "kv": {"accept:31": {"state": "gaps", "why": "gap #32"}},
+                       "moves": {"accept:31": {"state": "gaps", "prev": "running", "at": "2026-11-19T09:30:00Z"}}}, fh)
+        self.s.import_json(f)
+        self.assertEqual(self.s.moved("accept:31"),
+                         {"state": "gaps", "prev": "running", "at": "2026-11-19T09:30:00Z"})
+        self.assertEqual(self.s.moved("plan:30")["state"], "planned")
+        self.assertEqual(self.row(31)["handover"]["since"], "2026-11-19T09:30:00Z")
 
 
 class Summary(Base):

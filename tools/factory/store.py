@@ -417,10 +417,10 @@ class Store:
         try:
             try:
                 with open(path) as fh:
-                    entries = json.load(fh).get("jobs", {})
+                    doc = json.load(fh)
             except FileNotFoundError:
-                entries = {}
-            for key, job in entries.items():
+                doc = {}
+            for key, job in (doc.get("jobs") or {}).items():
                 state = job.get("state")
                 if state not in JOB_STATES:
                     raise ValueError(f"job {key}: unknown state {state!r}")
@@ -428,7 +428,18 @@ class Store:
                     continue
                 self._write_job(str(key), state, job, "imported", None, None)
                 n += 1
-            self.set("-", "imported_json", now())
+            for job, items in (doc.get("kv") or {}).items():
+                if isinstance(items, dict):
+                    self.set_many(str(job), items.items())
+            for job, m in (doc.get("moves") or {}).items():
+                if isinstance(m, dict) and m.get("state") and m.get("at"):
+                    self.db.execute("INSERT INTO moves VALUES(?,?,?,?) ON CONFLICT(job) DO UPDATE SET "
+                                    "state=excluded.state, prev=excluded.prev, at=excluded.at",
+                                    (str(job), str(m["state"]), m.get("prev"), str(m["at"])))
+            at = now()
+            self.db.execute("INSERT OR IGNORE INTO moves(job, state, prev, at) "
+                            "SELECT job, v, NULL, ? FROM kv WHERE k='state'", (at,))
+            self.set("-", "imported_json", at)
             self.db.execute("COMMIT")
         except BaseException:
             self.db.execute("ROLLBACK")

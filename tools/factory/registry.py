@@ -38,7 +38,7 @@ KV_STATUS = {
 }
 KEYS = ("state", "started", "why", "name", "agent", "sends", "run", "fire")
 LIVE_KV = {"plan": set(STEPS["plan"]) - {"cut", "blocked", "lost"}, "recheck": {"sending", "running"},
-           "accept": set(STEPS["accept"]) - {"accepted", "closed"}, "instr": {"review", "unsent"}}
+           "accept": set(STEPS["accept"]) - {"accepted", "closed", "gaps", "left"}, "instr": {"review", "unsent"}}
 
 
 def iso(v):
@@ -116,15 +116,16 @@ def kv_row(station, n, rec, stamp):
         status = "retry" if int(rec.get("sends") or 0) > 0 else "sent"
     hand = None
     if status:
-        hand = {"status": status, "from": (stamp or {}).get("prev"), "to": state,
-                "since": (stamp or {}).get("at") or iso(rec.get("started")), "why": rec.get("why") or None,
-                "by": rec.get("name") or rec.get("agent")}
+        at, started = (stamp or {}).get("at"), iso(rec.get("started"))
+        since = max(filter(None, (at, started)), default=None) if status == "taken" else (at or started)
+        hand = {"status": status, "from": (stamp or {}).get("prev"), "to": state, "since": since,
+                "why": rec.get("why") or None, "by": rec.get("name") or rec.get("agent")}
     return {"issue": n, "station": station, "state": state, "step": STEPS[station][state], "handover": hand,
             "live": state in LIVE_KV[station]}
 
 
 ORDER = (("recheck", True), ("job", True), ("accept", True), ("plan", True), ("instr", True), ("classify", True),
-         ("job", False), ("accept", False), ("plan", False), ("instr", False), ("recheck", False))
+         ("accept", "accepted"), ("job", False), ("accept", False), ("plan", False), ("instr", False), ("recheck", False))
 
 
 def rows(data, now):
@@ -137,10 +138,10 @@ def rows(data, now):
         r = kv_row(station, n, rec, data["moves"].get(key))
         if r:
             cand.setdefault(n, []).append(r)
+    rank = {k: i for i, k in enumerate(ORDER)}
     out = []
     for n, rs in cand.items():
-        rank = {(s, live): i for i, (s, live) in enumerate(ORDER)}
-        out.append(min(rs, key=lambda r: rank.get((r["station"], r["live"]), len(ORDER))))
+        out.append(min(rs, key=lambda r: rank.get((r["station"], "accepted" if r["station"] == "accept" and r["state"] == "accepted" else r["live"]), len(ORDER))))
     return sorted(out, key=lambda r: (len(r["issue"]), r["issue"]))
 
 

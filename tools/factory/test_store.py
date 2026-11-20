@@ -131,6 +131,18 @@ class TestStore(unittest.TestCase):
         self.assertEqual(self.s.import_json(os.path.join(self.d.name, "none.json")), 0)
         self.assertIsNotNone(self.s.db.execute("SELECT v FROM kv WHERE job='-' AND k='imported_json'").fetchone())
 
+
+    def test_import_json_backfills_moves(self):
+        f = os.path.join(self.d.name, "state.json")
+        self.s.db.execute("INSERT INTO kv VALUES('plan:7','state','revise')")
+        doc = {"jobs": {}, "kv": {"accept:8": {"state": "gaps", "sends": 1}, "plan:9": {"state": "planned"}},
+               "moves": {"accept:8": {"state": "gaps", "prev": "running", "at": "2026-01-02T03:04:05Z"}}}
+        with open(f, "w") as fh:
+            json.dump(doc, fh)
+        self.s.import_json(f)
+        self.assertEqual(self.s.moved("accept:8"), {"state": "gaps", "prev": "running", "at": "2026-01-02T03:04:05Z"})
+        self.assertEqual(self.s.moved("plan:9")["state"], "planned")
+        self.assertEqual(self.s.moved("plan:7")["state"], "revise")
     def test_old_ledger_gains_typed_columns(self):
         self.s.db.execute("ALTER TABLE fires DROP COLUMN steps_at")
         self.s.close()
