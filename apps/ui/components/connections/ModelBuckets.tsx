@@ -2,12 +2,13 @@
 
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { DetailBlock } from '@/components/connections/DetailBlock'
+import { Input } from '@/components/ui/input'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { cliUnavailableReason, isModelEnabled, offeredModels } from '@/lib/engine/ai-sources'
 import type { CatalogModel } from '@/lib/engine/models'
 import type { BoxConnection } from '@/lib/engine/types'
-import { EyeOffIcon, PlusIcon, StarIcon } from '@/lib/icons'
+import { EyeOffIcon, PlusIcon, SearchIcon, StarIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID } from '@moldwright/contracts'
 import { BorderBeam } from '@moldwright/ui'
@@ -18,6 +19,12 @@ import { createPortal } from 'react-dom'
 type Bucket = 'available' | 'hidden'
 
 const MODEL_GRID = 'grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1.5'
+const SEARCH_FROM = 25
+
+function matchesWords(model: CatalogModel, words: string[]) {
+    const haystack = `${model.label} ${model.id}`.toLowerCase()
+    return words.every(word => haystack.includes(word))
+}
 
 function beamAngle(modelId: string) {
     let hash = 0
@@ -27,12 +34,12 @@ function beamAngle(modelId: string) {
 
 function ChipFace({ model, muted, lifted, corner }: { model: CatalogModel; muted?: boolean; lifted?: boolean; corner?: ReactNode }) {
     return (
-        <span className={cn('relative flex w-full flex-col gap-2 rounded-md border bg-background p-3', muted && 'text-muted-foreground', lifted && 'cursor-grabbing shadow-lg ring-1 ring-foreground/10')}>
+        <span title={`${model.label}\n${model.id}`} className={cn('relative flex w-full flex-col gap-2 rounded-md border bg-background p-3', muted && 'text-muted-foreground', lifted && 'cursor-grabbing shadow-lg ring-1 ring-foreground/10')}>
             <span className="flex h-5 items-end justify-between gap-2">
                 <PowerBars power={model.power} size="md" className={muted ? 'opacity-50' : ''} />
                 {corner}
             </span>
-            <span className="truncate text-xs font-medium">{model.label}</span>
+            <span className="line-clamp-2 min-h-8 text-xs leading-4 font-medium break-words">{model.label}</span>
             {!muted && <BorderBeam angle={beamAngle(model.id)} outset={1} />}
         </span>
     )
@@ -58,7 +65,7 @@ function ModelChip({
     const MoveIcon = bucket === 'available' ? EyeOffIcon : PlusIcon
 
     const chip = (
-        <div ref={setNodeRef} {...listeners} {...attributes} className={cn('group/chip touch-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring', lockReason ? 'cursor-not-allowed' : 'cursor-grab', isDragging && 'opacity-30')}>
+        <div ref={setNodeRef} data-model-id={model.id} {...listeners} {...attributes} className={cn('group/chip touch-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring', lockReason ? 'cursor-not-allowed' : 'cursor-grab', isDragging && 'opacity-30')}>
             <ChipFace
                 model={model}
                 muted={bucket === 'hidden' || !!unavailable}
@@ -117,10 +124,16 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
     const t = useTranslations('connections.models')
     const tConnections = useTranslations('connections')
     const [dragging, setDragging] = useState<CatalogModel | null>(null)
+    const [query, setQuery] = useState('')
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }), useSensor(KeyboardSensor))
     const offered = offeredModels(connection)
     const available = offered.filter(m => isModelEnabled(connection, m.id))
     const hidden = offered.filter(m => !isModelEnabled(connection, m.id))
+    const searchable = offered.length >= SEARCH_FROM
+    const words = searchable ? query.toLowerCase().split(/\s+/).filter(Boolean) : []
+    const shownAvailable = available.filter(m => matchesWords(m, words))
+    const shownHidden = hidden.filter(m => matchesWords(m, words))
+    const noMatch = t('noMatch', { query: query.trim() })
 
     if (connection.id === RERUN_CONNECTION_ID || offered.length <= 1) {
         if (available.length === 0 || (available.length === 1 && connection.provider !== 'custom')) return null
@@ -157,6 +170,25 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
     return (
         <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={e => setDragging(offered.find(m => m.id === e.active.id) ?? null)} onDragEnd={onDragEnd} onDragCancel={() => setDragging(null)}>
             <div className="space-y-4">
+                {searchable && (
+                    <div className="relative">
+                        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            aria-label={t('search')}
+                            placeholder={t('search')}
+                            value={query}
+                            onChange={event => setQuery(event.target.value)}
+                            onKeyDown={event => {
+                                if (event.key !== 'Escape' || !query) return
+                                event.preventDefault()
+                                event.stopPropagation()
+                                setQuery('')
+                            }}
+                            className="h-8 pl-8 text-xs"
+                        />
+                    </div>
+                )}
                 <ModelZone
                     bucket="available"
                     title={t('available')}
@@ -165,10 +197,10 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
                             {t('count', { on: available.length, total: offered.length })}
                         </span>
                     }
-                    empty={t('availableEmpty')}
-                    count={available.length}
+                    empty={words.length ? noMatch : t('availableEmpty')}
+                    count={shownAvailable.length}
                 >
-                    {available.map(model => (
+                    {shownAvailable.map(model => (
                         <ModelChip
                             key={model.id}
                             model={model}
@@ -180,8 +212,14 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
                         />
                     ))}
                 </ModelZone>
-                <ModelZone bucket="hidden" title={t('hidden')} empty={t('hiddenEmpty')} count={hidden.length}>
-                    {hidden.map(model => (
+                <ModelZone
+                    bucket="hidden"
+                    title={t('hidden')}
+                    aside={words.length > 0 && <span className="text-[11px] text-muted-foreground">{t('matches', { count: shownHidden.length })}</span>}
+                    empty={words.length ? noMatch : t('hiddenEmpty')}
+                    count={shownHidden.length}
+                >
+                    {shownHidden.map(model => (
                         <ModelChip key={model.id} model={model} bucket="hidden" isDefault={false} unavailable={cliUnavailableReason(connection, model.id, tConnections)} onMove={() => move(model.id, 'available')} />
                     ))}
                 </ModelZone>

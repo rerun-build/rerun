@@ -208,7 +208,10 @@
         "count": "{on} de {total}",
         "availableEmpty": "Arrastra un modelo aquí para que los coworkers puedan usarlo.",
         "hidden": "Desactivados",
-        "hiddenEmpty": "Arrastra un modelo aquí para que los coworkers no lo usen."
+        "hiddenEmpty": "Arrastra un modelo aquí para que los coworkers no lo usen.",
+        "search": "Buscar modelos",
+        "matches": "{count, plural, one {# coincidencia} other {# coincidencias}}",
+        "noMatch": "Ningún modelo coincide con «{query}»."
     },
     "opencode": {
         "goTitle": "Incluido en OpenCode Go",
