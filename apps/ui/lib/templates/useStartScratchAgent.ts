@@ -3,9 +3,8 @@
 import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useBoardStore } from '@/stores/board.store'
 import { track } from '@rerun/analytics/client'
-import type { CoworkerLook } from '@rerun/contracts'
 
-export type ScratchAgent = { name: string; serviceSlugs: string[]; kickoff: string; suggestionId: string | null; look?: CoworkerLook }
+export type ScratchAgent = { name: string; serviceSlugs: string[]; kickoff: string; suggestionId: string | null }
 
 // The agent described in the New agent dialog, on its way to the board: a name, the apps it starts
 // with and its first job, then straight to grid placement, or into a Box from the Simple view.
@@ -19,8 +18,8 @@ export function useStartScratchAgent() {
     const viewer = useBoxViewer()
     const isFirstAgent = useBoardStore(s => s.spaces.length === 0)
 
-    return ({ name, serviceSlugs, kickoff, suggestionId, look }: ScratchAgent, spaceId: string | null = null) => {
-        requestCreation({ kind: 'scratch', draft: { name: name.trim(), serviceSlugs, kickoff, look }, spaceId }, viewer)
+    return ({ name, serviceSlugs, kickoff, suggestionId }: ScratchAgent, spaceId: string | null = null) => {
+        requestCreation({ kind: 'scratch', draft: { name: name.trim(), serviceSlugs, kickoff }, spaceId }, viewer)
         if (isFirstAgent) track('first_agent_created', { template: suggestionId ? `suggestion:${suggestionId}` : 'scratch' })
     }
 }

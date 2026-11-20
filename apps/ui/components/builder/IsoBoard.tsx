@@ -339,7 +339,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                 const offsets = step.positions.map(p => ({ col: p.col - PLACEHOLDER_CONTAINER.col_start, row: p.row - PLACEHOLDER_CONTAINER.row_start }))
                 if (placement.source.kind === 'scratch') {
                     const draft = placement.source.draft
-                    setPendingFirstAgent({ name: draft.name, description: draft.description, serviceSlugs: draft.serviceSlugs, kickoff: draft.kickoff, look: draft.look, offset: offsets[0] })
+                    setPendingFirstAgent({ name: draft.name, description: draft.description, serviceSlugs: draft.serviceSlugs, kickoff: draft.kickoff, offset: offsets[0] })
                 } else if (placement.source.kind === 'share') {
                     // Rien à parker de plus que le token : la fiche se recharge toute seule au retour
                     // et refait franchir la porte du placement, cette fois sur un vrai Space.
@@ -398,8 +398,6 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         }
         return byAgent
     }, [unseenGroups])
-    // A coworker dressed while it was being made lands wearing it.
-    const placementLook = placement?.source.kind === 'scratch' ? placement.source.draft.look : undefined
     const boardTiles = useMemo(() => {
         const placed = agents.map(a => boxTileFor(tileFromAgent(a, a.id === justPlacedAgentId, attentionCounts[a.id] ?? 0, workspaceAccess, nextRuns[a.id], resultsByAgent[a.id], tKit), manageableSpaceIds.has(a.spaceId)))
         if (!placement) return placed
@@ -407,9 +405,9 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         const reserved = placement.placed
             .map((position, index) => ({ position, index }))
             .filter(({ position }) => !agents.some(a => a.position.col === position.col && a.position.row === position.row))
-            .map(({ position, index }) => ({ id: `__reserved__${index}`, position, span: AGENT_SPAN, style: { ...agentTileStyle('idle', placement.labels[index]), ...(placementLook && { buddy: placementLook }), opacity: 0.6 }, selectable: false, draggable: false }))
+            .map(({ position, index }) => ({ id: `__reserved__${index}`, position, span: AGENT_SPAN, style: { ...agentTileStyle('idle', placement.labels[index]), opacity: 0.6 }, selectable: false, draggable: false }))
         return [...placed, ...reserved]
-    }, [agents, attentionCounts, justPlacedAgentId, placement, placementLook, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds, tKit])
+    }, [agents, attentionCounts, justPlacedAgentId, placement, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds, tKit])
     const tiles = useMemo(() => (planPreview ? [...boardTiles, ...planPreview.tiles] : boardTiles), [planPreview, boardTiles])
     const computedLinks = useMemo(() => linksFromSessions(sessions, liveLinks), [sessions, liveLinks])
     const placingTile = useMemo(() => (placement ? { span: AGENT_SPAN, style: agentTileStyle('idle', placementLabel(placement)) } : undefined), [placement])

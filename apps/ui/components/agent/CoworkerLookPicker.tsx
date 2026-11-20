@@ -60,17 +60,16 @@ function Choice({ selected, label, disabled, onClick, children }: { selected: bo
 }
 
 type CoworkerLookPickerProps = {
-    // The coworker, or the draft of one: the look it wears while `look` is null is hashed from it.
+    // The coworker: the look it wears while `look` is null is hashed from it.
     agentId: string
     look: CoworkerLook | null
     onChange: (look: CoworkerLook | null) => void
     disabled?: boolean
-    previewSize?: number
 }
 
 // The colour, the eyes and the mouth of a coworker's buddy, all in view under a preview of it. Each
 // face is drawn in the colour chosen, so a choice is read on the face it will be.
-export function CoworkerLookPicker({ agentId, look, onChange, disabled, previewSize = 64 }: CoworkerLookPickerProps) {
+export function CoworkerLookPicker({ agentId, look, onChange, disabled }: CoworkerLookPickerProps) {
     const t = useTranslations('agent.coworkerLook')
     const shown = look ?? hashedBuddyLook(agentId)
     const choose = (patch: Partial<CoworkerLook>) => onChange({ ...shown, ...patch })
@@ -79,7 +78,7 @@ export function CoworkerLookPicker({ agentId, look, onChange, disabled, previewS
         <div className="flex w-full flex-col gap-4">
             <div className="flex flex-wrap items-center gap-4">
                 <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-2">
-                    <AgentBuddy agentId={agentId} look={shown} size={previewSize} alive />
+                    <AgentBuddy agentId={agentId} look={shown} size={64} alive />
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => onChange({ eyes: pick(COWORKER_EYES), mouth: pick(COWORKER_MOUTHS), color: pick(COWORKER_COLORS) })}>

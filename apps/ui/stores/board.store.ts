@@ -56,7 +56,7 @@ export function refuseUnmanagedBox() {
 
 // Brouillon d'agent en attente de placement : le modal récolte ces champs, puis on entre en
 // mode placement. L'agent n'est créé (engine + DB) qu'au drop, une fois l'espace déduit de la tuile.
-export type PendingAgentDraft = { name: string; description?: string; serviceSlugs: string[]; kickoff?: string; look?: CoworkerLook }
+export type PendingAgentDraft = { name: string; description?: string; serviceSlugs: string[]; kickoff?: string }
 
 // Ce que le placement va poser : un agent parti de zéro, les agents capturés d'une template, ou
 // l'agent unique qu'un lien de partage porte.
@@ -287,7 +287,7 @@ async function createFromSource(store: Creator, source: PlacementSource, space: 
     try {
         if (source.kind === 'scratch') {
             const draft = source.draft
-            const res = await createAgentWithSetupAction({ serviceSlugs: draft.serviceSlugs, name: draft.name, description: draft.description, look: draft.look, workspaceId: space.workspace_id as number, spaceId: space.id, col: position?.col, row: position?.row })
+            const res = await createAgentWithSetupAction({ serviceSlugs: draft.serviceSlugs, name: draft.name, description: draft.description, workspaceId: space.workspace_id as number, spaceId: space.id, col: position?.col, row: position?.row })
             if (!res.ok) return
             // Le plan plafonne les agents actifs, pas les agents créés : celui-ci est
             // complet mais ne tournera pas tant qu'un slot ne s'est pas libéré.

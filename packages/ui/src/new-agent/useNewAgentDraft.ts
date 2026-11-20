@@ -1,6 +1,5 @@
 'use client'
 
-import type { CoworkerLook } from '@rerun/contracts'
 import { useState } from 'react'
 
 import { type AppSelection, closestSuggestion, NO_APP_SELECTION, selectedApps, toggleApp } from './apps'
@@ -25,11 +24,7 @@ export type NewAgentDraft = { text: string; pinned: PinnedName | null; picked: s
 export const EMPTY_DRAFT: NewAgentDraft = { text: '', pinned: null, picked: null, editing: false, scheduleOpen: false, apps: NO_APP_SELECTION, schedule: DESCRIBED }
 
 // `scheduled` says a timing goes with the job, read in the description or chosen in the planner.
-export type NewAgentRequest = { name: string; serviceSlugs: string[]; kickoff: string; suggestionId: string | null; scheduled: boolean; look?: CoworkerLook }
-
-// A name given before the job was described: it holds whatever is written or picked after it, and
-// renaming it goes back to whoever gave it.
-export type ChosenAgentName = { value: string; onRename: (name: string) => void }
+export type NewAgentRequest = { name: string; serviceSlugs: string[]; kickoff: string; suggestionId: string | null; scheduled: boolean }
 
 function settled(reading: Promise<JobReading>, fallback: JobReading): Promise<JobReading> {
     return Promise.race([reading, new Promise<JobReading>(resolve => setTimeout(() => resolve(fallback), SETTLE_MS))])
@@ -48,7 +43,7 @@ export function suggestionsOnOffer(suggestions: AgentSuggestion[], offset: numbe
 // for it, to open on.
 //
 // Nothing is created here: `onCreate` receives the agent as described.
-export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed, chosenName }: { suggestions: AgentSuggestion[]; shown?: number; read: JobReader; onCreate: (agent: NewAgentRequest) => void; seed?: { draft: NewAgentDraft; reading?: JobReading }; chosenName?: ChosenAgentName }) {
+export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed }: { suggestions: AgentSuggestion[]; shown?: number; read: JobReader; onCreate: (agent: NewAgentRequest) => void; seed?: { draft: NewAgentDraft; reading?: JobReading } }) {
     const [draft, setDraft] = useState(seed?.draft ?? EMPTY_DRAFT)
     const [creating, setCreating] = useState(false)
     const [previewed, setPreviewed] = useState<AgentSuggestion | null>(null)
@@ -59,7 +54,7 @@ export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed, cho
     const offered = suggestionsOnOffer(suggestions, offset, shown)
     const pickedSuggestion = suggestions.find(suggestion => suggestion.id === draft.picked) ?? null
     const declaredName = declaredAgentName(draft.text)
-    const name = chosenName?.value ?? draft.pinned?.name ?? declaredName ?? reading.name
+    const name = draft.pinned?.name ?? declaredName ?? reading.name
     const described = draft.text.trim() !== ''
     const apps = selectedApps(pickedSuggestion?.apps ?? [], reading.apps, draft.apps)
     const closest = described && !draft.picked ? (closestSuggestion(apps, offered)?.id ?? null) : null
@@ -77,11 +72,6 @@ export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed, cho
 
     function rename(next: string) {
         const name = next.slice(0, AGENT_NAME_MAX).trimEnd()
-        if (chosenName) {
-            if (name) chosenName.onRename(name)
-            setDraft(current => ({ ...current, editing: false }))
-            return
-        }
         setDraft(current => ({ ...current, editing: false, pinned: name ? { name, from: 'rename' } : null }))
     }
 
@@ -90,7 +80,7 @@ export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed, cho
         setCreating(true)
         const latest = pending ? await settled(settle(), reading) : reading
         onCreate({
-            name: chosenName?.value ?? draft.pinned?.name ?? declaredName ?? latest.name ?? fallbackAgentName(draft.text),
+            name: draft.pinned?.name ?? declaredName ?? latest.name ?? fallbackAgentName(draft.text),
             serviceSlugs: selectedApps(pickedSuggestion?.apps ?? [], latest.apps, draft.apps),
             kickoff: buildKickoff(draft.text, draft.schedule, timeZone),
             suggestionId: draft.picked,
@@ -125,8 +115,6 @@ export function useNewAgentDraft({ suggestions, shown, read, onCreate, seed, cho
         described,
         pending,
         editing: draft.editing,
-        // What a step that unmounts this hook keeps, to hand back as `seed` when it comes back.
-        kept: { draft: { ...draft, editing: false, scheduleOpen: false }, reading: pending ? undefined : reading },
         composer: {
             text: draft.text,
             onText: write,

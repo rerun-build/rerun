@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { z } from 'zod'
-import { coworkerLookSchema } from '@rerun/contracts'
 import type { PendingAgentDraft } from './board.store'
 
 // The first-agent draft captured during onboarding, persisted (store + localStorage) so it survives
@@ -19,7 +18,6 @@ const pendingFirstAgentSchema = z.object({
     description: z.string().optional(),
     serviceSlugs: z.array(z.string()),
     kickoff: z.string().optional(),
-    look: coworkerLookSchema.optional().catch(undefined),
     offset: spaceOffsetSchema.optional(),
 })
 

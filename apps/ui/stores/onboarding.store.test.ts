@@ -53,15 +53,6 @@ describe('onboarding store rehydration', () => {
         expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: null, pendingTemplate: TEMPLATE, pendingTemplateLink: null })
     })
 
-    it('keeps the look the first coworker was dressed in, and the draft when only its look is stale', async () => {
-        const look = { eyes: 'heart', mouth: 'cat', color: '#00b862' }
-        const dressed = await loadStore({ pendingFirstAgent: { ...DRAFT, look }, parkedAt: FRESH })
-        expect(dressed.useOnboardingStore.getState().pendingFirstAgent).toEqual({ ...DRAFT, look })
-
-        const stale = await loadStore({ pendingFirstAgent: { ...DRAFT, look: { ...look, color: '#f59e0b' } }, parkedAt: FRESH })
-        expect(stale.useOnboardingStore.getState().pendingFirstAgent).toEqual(DRAFT)
-    })
-
     it('rejects an offset that is not a whole cell', async () => {
         const { useOnboardingStore } = await loadStore({ pendingFirstAgent: { ...DRAFT, offset: { col: 1.5, row: 0 } }, parkedAt: FRESH })
         expect(useOnboardingStore.getState().pendingFirstAgent).toBeNull()

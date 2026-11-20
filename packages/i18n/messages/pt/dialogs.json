@@ -291,16 +291,10 @@
     },
     "newAgent": {
         "title": "Novo coworker",
-        "description": "Dê um nome ao seu coworker, escolha a aparência dele e depois descreva o trabalho.",
+        "description": "Descreva o trabalho, ou comece de uma sugestão ou de um template.",
         "headingNamed": "O que {name} deve fazer?",
         "heading": "O que seu novo coworker deve fazer?",
-        "suggestionsForBox": "Ou comece de um escolhido para {boxName}",
-        "nameHeading": "Dê um nome ao seu novo coworker",
-        "nameLabel": "Nome do coworker",
-        "lookHeading": "Como é {name}?",
-        "jobHeading": "Olá, sou {name}. O que devo fazer?",
-        "continue": "Continuar",
-        "back": "Voltar"
+        "suggestionsForBox": "Ou comece de um escolhido para {boxName}"
     },
     "renameAgent": {
         "title": "Renomear coworker",
