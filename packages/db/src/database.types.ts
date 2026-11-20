@@ -3596,6 +3596,112 @@ export type Database = {
           },
         ]
       }
+      workspace_backups: {
+        Row: {
+          bytes: number | null
+          created_at: string
+          data_version: number | null
+          engine_commit: string | null
+          error_message: string | null
+          expires_at: string | null
+          finished_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["workspace_backup_kind"]
+          object_key: string
+          raw_bytes: number | null
+          restore_error: string | null
+          restore_started_at: string | null
+          restore_status:
+            | Database["public"]["Enums"]["workspace_backup_restore_status"]
+            | null
+          restored_at: string | null
+          restored_to_instance_id: string | null
+          sha256: string | null
+          source_box: string
+          source_host_id: string | null
+          source_host_name: string
+          status: Database["public"]["Enums"]["workspace_backup_status"]
+          timezone: string | null
+          workspace_id: number
+        }
+        Insert: {
+          bytes?: number | null
+          created_at?: string
+          data_version?: number | null
+          engine_commit?: string | null
+          error_message?: string | null
+          expires_at?: string | null
+          finished_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["workspace_backup_kind"]
+          object_key: string
+          raw_bytes?: number | null
+          restore_error?: string | null
+          restore_started_at?: string | null
+          restore_status?:
+            | Database["public"]["Enums"]["workspace_backup_restore_status"]
+            | null
+          restored_at?: string | null
+          restored_to_instance_id?: string | null
+          sha256?: string | null
+          source_box: string
+          source_host_id?: string | null
+          source_host_name: string
+          status?: Database["public"]["Enums"]["workspace_backup_status"]
+          timezone?: string | null
+          workspace_id: number
+        }
+        Update: {
+          bytes?: number | null
+          created_at?: string
+          data_version?: number | null
+          engine_commit?: string | null
+          error_message?: string | null
+          expires_at?: string | null
+          finished_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["workspace_backup_kind"]
+          object_key?: string
+          raw_bytes?: number | null
+          restore_error?: string | null
+          restore_started_at?: string | null
+          restore_status?:
+            | Database["public"]["Enums"]["workspace_backup_restore_status"]
+            | null
+          restored_at?: string | null
+          restored_to_instance_id?: string | null
+          sha256?: string | null
+          source_box?: string
+          source_host_id?: string | null
+          source_host_name?: string
+          status?: Database["public"]["Enums"]["workspace_backup_status"]
+          timezone?: string | null
+          workspace_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_backups_restored_to_instance_id_fkey"
+            columns: ["restored_to_instance_id"]
+            isOneToOne: false
+            referencedRelation: "engine_pool"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_backups_source_host_id_fkey"
+            columns: ["source_host_id"]
+            isOneToOne: false
+            referencedRelation: "engine_hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_backups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_getting_started: {
         Row: {
           done_at: string
@@ -4209,6 +4315,9 @@ export type Database = {
         | "restoring"
         | "restored"
         | "failed"
+      workspace_backup_kind: "daily" | "weekly"
+      workspace_backup_restore_status: "restoring" | "restored" | "failed"
+      workspace_backup_status: "running" | "done" | "skipped" | "failed"
       workspace_role: "admin" | "member"
     }
     CompositeTypes: {
@@ -4416,6 +4525,9 @@ export const Constants = {
         "restored",
         "failed",
       ],
+      workspace_backup_kind: ["daily", "weekly"],
+      workspace_backup_restore_status: ["restoring", "restored", "failed"],
+      workspace_backup_status: ["running", "done", "skipped", "failed"],
       workspace_role: ["admin", "member"],
     },
   },
