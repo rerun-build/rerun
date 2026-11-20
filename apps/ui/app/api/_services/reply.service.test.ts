@@ -20,14 +20,15 @@ vi.mock('@/app/api/_services/chat.service', () => ({
     claimWaitingSession: vi.fn(async () => claimed),
     updateSessionStatus: vi.fn(),
 }))
-vi.mock('@/app/api/_services/conversation.service', () => ({ readSessionTranscript: async () => ({ messages: transcript, updatedAt: null }) }))
+vi.mock('@/app/api/_services/conversation.service', () => ({ readSessionTranscript: vi.fn(async () => ({ messages: transcript, updatedAt: null })) }))
 // The queue's retries are start-chat's, covered by the tests of /api/chat.
 vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: (...args: unknown[]) => engineChat(...args) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: async () => ({ data: { status } }) }))
 
-const { replyToConversation } = await import('./reply.service')
-const { claimWaitingSession, recordMessageSent, updateSessionStatus } = await import('@/app/api/_services/chat.service')
+const { replyAs, replyToConversation } = await import('./reply.service')
+const { claimWaitingSession, getExistingSession, recordMessageSent, updateSessionStatus } = await import('@/app/api/_services/chat.service')
+const { readSessionTranscript } = await import('@/app/api/_services/conversation.service')
 
 const ctx = {} as never
 const approvalCard = (toolCallId: string) => [{ role: 'assistant', parts: [{ type: 'tool-request_approval', toolCallId, input: { approvals: [{ action: 'Send 12 emails' }] } }] }]
@@ -95,5 +96,14 @@ describe('replyToConversation', () => {
 
     it('reads a conversation of another workspace as missing', async () => {
         await expect(replyToConversation(ctx, 'elsewhere', { action: 'approve', toolCallId: 'call-1' })).rejects.toBeInstanceOf(AuthorizationError)
+    })
+
+    it('answers in the name of the member a Chief of Staff turn speaks for, reading the card as that member', async () => {
+        const member = { kind: 'user', userId: 'u-2', workspaceId: 7, role: 'member', boxScope: 'all' } as const
+        await replyAs(member, { id: 'u-2', name: 'Ada', via: 'foreman' }, 'conv-1', { action: 'approve', toolCallId: 'call-1' })
+        expect(getExistingSession).toHaveBeenCalledWith('conv-1', member)
+        expect(readSessionTranscript).toHaveBeenCalledWith('conv-1', member)
+        expect(engineChat.mock.calls[0][2]).toMatchObject({ author: { id: 'u-2', name: 'Ada', via: 'foreman' } })
+        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', 'u-2', expect.stringContaining('**APPROVED**'))
     })
 })

@@ -1,4 +1,4 @@
-import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
+import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { claimWaitingSession, getExistingSession, recordMessageSent, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { readSessionTranscript } from '@/app/api/_services/conversation.service'
@@ -9,15 +9,19 @@ import { replyTextOf } from '@/lib/chat/reply-text'
 import { refusal } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { ENGINE_SESSION_NOT_FOUND, findPendingHitl, needsHuman, sessionStatusSchema, type ConversationReply, type ConversationReplyResult, type SessionStatus } from '@rerun/contracts'
+import { ENGINE_SESSION_NOT_FOUND, findPendingHitl, needsHuman, sessionStatusSchema, type ConversationReply, type ConversationReplyResult, type MessageAuthor, type SessionStatus } from '@rerun/contracts'
 
 const alreadyAnswered = () => new ApiError(409, refusal('requestAlreadyAnswered'))
 
 // Answers a conversation without anyone watching the stream: the run goes on on the engine, which
 // keeps it apart from whoever reads it, and the person sees its end in a push or in the app.
-export async function replyToConversation(ctx: WorkspaceContext, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
-    const actor = actorFromContext(ctx)
-    const author = messageAuthorOf(ctx)
+export function replyToConversation(ctx: WorkspaceContext, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
+    return replyAs(actorFromContext(ctx), messageAuthorOf(ctx), sessionId, reply)
+}
+
+// The same answer from a caller with no browser session: the Chief of Staff answering a card in the
+// name of the member it speaks for, whose author says so (`via`).
+export async function replyAs(actor: Actor, author: MessageAuthor, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
     const session = await getExistingSession(sessionId, actor)
     // Without an engine session the engine would open a new conversation instead of answering this one.
     if (!session.engineSessionId) throw new ApiError(404, refusal('conversationNotFound'))
@@ -27,7 +31,7 @@ export async function replyToConversation(ctx: WorkspaceContext, sessionId: stri
     let pending: ReturnType<typeof findPendingHitl> = null
     let waitingAs: SessionStatus | null = null
     if (toolCallId) {
-        const [{ data: row }, { messages }] = await Promise.all([selectMaybeSingle(createServiceRoleClient(), 'sessions', ['status'] as const, { id: session.sessionId }), readSessionTranscript(session.sessionId)])
+        const [{ data: row }, { messages }] = await Promise.all([selectMaybeSingle(createServiceRoleClient(), 'sessions', ['status'] as const, { id: session.sessionId }), readSessionTranscript(session.sessionId, actor)])
         const status = sessionStatusSchema.safeParse(row?.status)
         waitingAs = status.success && needsHuman(status.data) ? status.data : null
         pending = waitingAs ? findPendingHitl(messages) : null

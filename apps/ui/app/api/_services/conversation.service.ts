@@ -12,6 +12,7 @@ import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, list
 import type { EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -174,8 +175,12 @@ export async function listAgentConversations(ctx: WorkspaceContext, agentId: str
 }
 
 // The workspace's coworkers whose Box the caller reaches: every list of conversations stops there.
-async function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; name: string }[]> {
-    const [{ data, error }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id }), visibleSpaceIds(actorFromContext(ctx))])
+function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; name: string }[]> {
+    return agentsReachedBy(actorFromContext(ctx), ctx.supabase)
+}
+
+async function agentsReachedBy(actor: Actor, supabase: SupabaseClient<Database>): Promise<{ id: string; name: string }[]> {
+    const [{ data, error }, spaces] = await Promise.all([selectMany(supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: actor.workspaceId }), visibleSpaceIds(actor)])
     if (error) throw error
     return keepVisible(data ?? [], spaces, agent => agent.space_id)
 }
@@ -313,6 +318,31 @@ export async function listWorkspaceToHandle(ctx: WorkspaceContext): Promise<ToHa
     return { items, total: counted.data ?? items.length }
 }
 
+export type PendingCard = { sessionId: string; agentId: string; agentName: string; title: string; status: string; updatedAt: string; peek: PendingRequestPeek }
+
+const PENDING_CARDS_PAGE = 20
+
+// The cards the caller's coworkers stopped on, each with what it asks, for the Chief of Staff to
+// answer in their name. Only the requests that block a run: a heads-up or an error asks for nothing.
+// The Chief of Staff's own threads have no agent row, so they never show here.
+export async function listPendingCards(actor: Actor): Promise<PendingCard[]> {
+    const supabase = createServiceRoleClient()
+    const namesById = new Map((await agentsReachedBy(actor, supabase)).map(agent => [agent.id, agent.name]))
+    if (namesById.size === 0) return []
+
+    const { data, error } = await selectMany(supabase, 'sessions', TO_HANDLE_COLUMNS, { agent_id: [...namesById.keys()], status: [...BLOCKING_STATUSES] }, { column: 'updated_at', ascending: false }, PENDING_CARDS_PAGE)
+    if (error) throw error
+
+    const cards = await Promise.all(
+        (data ?? []).map(async (row): Promise<PendingCard | null> => {
+            const peek = await readPendingRequest(row.id, actor).catch(() => null)
+            if (!peek) return null
+            return { sessionId: row.id, agentId: row.agent_id, agentName: namesById.get(row.agent_id) ?? 'Coworker', title: row.title, status: row.status, updatedAt: row.updated_at, peek }
+        })
+    )
+    return cards.filter(card => card !== null)
+}
+
 // Acknowledging without answering, the same write the board store makes behind « Mark as read ».
 // `'all'` empties what the caller reaches, which is what the button of that name promises even when
 // the list it sits above only showed a page. The agent filter is what scopes the write; the
@@ -373,8 +403,8 @@ export async function readSessionMessages(sessionId: string): Promise<HistoryMes
 
 // The transcript with the time the session row last changed, read before the messages: a change
 // landing between the two leaves the time older than the messages, never newer.
-export async function readSessionTranscript(sessionId: string): Promise<{ messages: HistoryMessage[]; updatedAt: string | null }> {
-    const ctx = await getSessionEngineContext(sessionId)
+export async function readSessionTranscript(sessionId: string, actor?: Actor): Promise<{ messages: HistoryMessage[]; updatedAt: string | null }> {
+    const ctx = await getSessionEngineContext(sessionId, actor)
     if (!ctx || !ctx.engineSessionId) return { messages: [], updatedAt: ctx?.updatedAt ?? null }
 
     const messages = await getSessionMessages(ctx.conn, ctx.engineAgentId, ctx.engineSessionId)
@@ -383,8 +413,8 @@ export async function readSessionTranscript(sessionId: string): Promise<{ messag
 
 // What the conversation waits on, read the way the chat would read it when opened. Without its
 // proposals, the request is still worth showing.
-export async function readPendingRequest(sessionId: string): Promise<PendingRequestPeek> {
-    const ctx = await getSessionEngineContext(sessionId)
+export async function readPendingRequest(sessionId: string, actor?: Actor): Promise<PendingRequestPeek> {
+    const ctx = await getSessionEngineContext(sessionId, actor)
     if (!ctx || !ctx.engineSessionId) return pendingRequestPeek([])
     const { conn, engineAgentId, engineSessionId } = ctx
     const [messages, proposals] = await Promise.all([getSessionMessages(conn, engineAgentId, engineSessionId).then(transformEngineMessages), listSkillProposals(conn, engineAgentId, engineSessionId).catch(() => [])])

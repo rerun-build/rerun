@@ -9,7 +9,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentConversations, listPendingCards, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
 import { EMPTY_SESSION_SNAPSHOT } from '@/lib/chat/session-snapshot'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
@@ -145,6 +145,42 @@ describe('listWorkspaceConversationOverview', () => {
         expect(await listWorkspaceConversationOverview(ctx)).toEqual([])
         expect(selectMany).toHaveBeenCalledTimes(1)
         expect(rpc).not.toHaveBeenCalled()
+    })
+})
+
+describe('listPendingCards', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    const memberActor: Actor = { kind: 'user', userId: 'member', workspaceId: 7, role: 'member', boxScope: 'assigned' }
+    const conn = { baseUrl: 'https://engine.test', apiKey: null }
+    const question = { role: 'assistant', parts: [{ type: 'text', text: 'Which tone?' }, { type: 'tool-ask_user', toolCallId: 'call-q', state: 'input-available', input: { questions: [{ question: 'Which tone?', options: ['Formal', 'Casual'] }] } }] }
+
+    it("reads the cards of the coworkers the member reaches, each with what it asks, as that member", async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue({} as never)
+        vi.mocked(visibleSpaceIds).mockResolvedValueOnce(new Set(['open']))
+        vi.mocked(selectMany)
+            .mockResolvedValueOnce({ data: [{ id: 'a', name: 'Writer', space_id: 'open' }, { id: 'hidden', name: 'Hidden', space_id: 'closed' }], error: null } as never)
+            .mockResolvedValueOnce({ data: [{ id: 's1', agent_id: 'a', title: 'Newsletter', status: 'awaiting_question', updated_at: '2026-11-20T10:00:00Z' }], error: null } as never)
+        vi.mocked(getSessionEngineContext).mockResolvedValue({ agentId: 'a', conn, engineAgentId: 'engine-a', engineSessionId: 'engine-s1' })
+        vi.mocked(getSessionMessages).mockResolvedValue([] as never)
+        vi.mocked(transformEngineMessages).mockReturnValue([question] as never)
+        vi.mocked(listSkillProposals).mockResolvedValue([])
+
+        const cards = await listPendingCards(memberActor)
+
+        expect(vi.mocked(selectMany).mock.calls[1][3]).toEqual({ agent_id: ['a'], status: ['awaiting_question', 'awaiting_approval', 'awaiting_connector'] })
+        expect(getSessionEngineContext).toHaveBeenCalledWith('s1', memberActor)
+        expect(cards).toEqual([{ sessionId: 's1', agentId: 'a', agentName: 'Writer', title: 'Newsletter', status: 'awaiting_question', updatedAt: '2026-11-20T10:00:00Z', peek: expect.objectContaining({ pending: expect.objectContaining({ kind: 'question', toolCallId: 'call-q' }), ask: 'Which tone?' }) }])
+    })
+
+    it('leaves out a card it could not read rather than failing the whole list', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue({} as never)
+        vi.mocked(selectMany)
+            .mockResolvedValueOnce({ data: [{ id: 'a', name: 'Writer', space_id: null }], error: null } as never)
+            .mockResolvedValueOnce({ data: [{ id: 's1', agent_id: 'a', title: 'Gone', status: 'awaiting_approval', updated_at: '2026-11-20T10:00:00Z' }], error: null } as never)
+        vi.mocked(getSessionEngineContext).mockRejectedValue(new Error('engine away'))
+
+        expect(await listPendingCards(adminActor)).toEqual([])
     })
 })
 

@@ -7,6 +7,7 @@ import { dispatchHubTool } from '@/app/api/_services/services.service'
 import { dispatchTeamHubTool } from '@/app/api/_services/team-hub.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
 import { mintForemanHubToken } from '@/lib/foreman/hub-token'
+import { dispatchInboxTool } from '@/lib/foreman/inbox-tools'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 import { POST } from './route'
@@ -20,6 +21,7 @@ vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: vi.fn().mo
 vi.mock('@/lib/foreman/onboarding-tools', () => ({ dispatchWorkspaceOnboardingTool: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
+vi.mock('@/lib/foreman/inbox-tools', () => ({ dispatchInboxTool: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn().mockReturnValue({}) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn() }))
 
@@ -237,10 +239,21 @@ describe('POST /api/hub', () => {
         expect(read.status).toBe(200)
         expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
 
-        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'upsert_schedule', 'coworker_db_execute', 'set_name', 'create_boxes', 'install_template']) {
+        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'upsert_schedule', 'coworker_db_execute', 'set_name', 'create_boxes', 'install_template', 'answer_card']) {
             const write = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool, args: {} } }))
             expect(write.status).toBe(403)
         }
         expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
+        expect(dispatchInboxTool).not.toHaveBeenCalled()
+    })
+
+    it('lets a check-in read what waits on the user, without answering it', async () => {
+        vi.mocked(dispatchInboxTool).mockResolvedValue({ cards: [] })
+        const token = mintForemanHubToken(WORKSPACE_ID, null, Date.now(), 'read')
+
+        const read = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: token, body: { tool: 'list_pending_cards', args: {} } }))
+
+        expect(read.status).toBe(200)
+        expect(dispatchInboxTool).toHaveBeenCalledWith({ kind: 'workspace', workspaceId: WORKSPACE_ID }, 'list_pending_cards', {})
     })
 })

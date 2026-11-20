@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
     getSessionEngineContext: vi.fn(),
     getAgentChatTarget: vi.fn(),
-    clearSkillProposalAttention: vi.fn(async () => {}),
+    decideCoworkerSkillProposal: vi.fn(),
     requireWorkspaceContext: vi.fn(),
     foremanSessionEngineContext: vi.fn(),
     clearForemanSkillProposalAttention: vi.fn(async () => {}),
@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
     decideSkillProposal: vi.fn(),
 }))
 
-vi.mock('@/app/api/_services/chat.service', () => ({ getSessionEngineContext: mocks.getSessionEngineContext, getAgentChatTarget: mocks.getAgentChatTarget, clearSkillProposalAttention: mocks.clearSkillProposalAttention }))
+vi.mock('@/app/api/_services/chat.service', () => ({ getSessionEngineContext: mocks.getSessionEngineContext, getAgentChatTarget: mocks.getAgentChatTarget, decideCoworkerSkillProposal: mocks.decideCoworkerSkillProposal }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/ownership')>()), requireWorkspaceContext: mocks.requireWorkspaceContext }))
 vi.mock('@/lib/foreman/conversation', () => ({ foremanSessionEngineContext: mocks.foremanSessionEngineContext, clearForemanSkillProposalAttention: mocks.clearForemanSkillProposalAttention }))
 vi.mock('@/lib/engine/client', () => ({ listSkillProposals: mocks.listSkillProposals, decideSkillProposal: mocks.decideSkillProposal }))
@@ -50,7 +50,7 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
         expect(await decideSkillProposalAction('conversation-1', 'p1', 'accept')).toEqual({ success: true, proposal })
         expect(mocks.getAgentChatTarget).toHaveBeenCalledWith('foreman', 'manage')
         expect(mocks.decideSkillProposal).toHaveBeenCalledWith(conn, 'foreman', 'p1', 'accept')
-        expect(mocks.clearSkillProposalAttention).not.toHaveBeenCalled()
+        expect(mocks.decideCoworkerSkillProposal).not.toHaveBeenCalled()
     })
 
     it('stops its thread from waiting once the proposal is decided, without failing the decision when that cannot be done', async () => {
@@ -72,9 +72,9 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
         await listSkillProposalsAction('session-1')
         expect(mocks.listSkillProposals).toHaveBeenCalledWith(conn, 'e1', 's1')
         expect(mocks.foremanSessionEngineContext).not.toHaveBeenCalled()
-        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'e1' })
-        await decideSkillProposalAction('session-1', 'p1', 'accept')
-        expect(mocks.clearSkillProposalAttention).toHaveBeenCalledWith('session-1', 'agent-1', 's1')
+        mocks.decideCoworkerSkillProposal.mockResolvedValue(proposal)
+        expect(await decideSkillProposalAction('session-1', 'p1', 'accept')).toEqual({ success: true, proposal })
+        expect(mocks.decideCoworkerSkillProposal).toHaveBeenCalledWith({ agentId: 'agent-1', conn, engineAgentId: 'e1', engineSessionId: 's1' }, 'session-1', 'p1', 'accept')
         expect(mocks.clearForemanSkillProposalAttention).not.toHaveBeenCalled()
     })
 })

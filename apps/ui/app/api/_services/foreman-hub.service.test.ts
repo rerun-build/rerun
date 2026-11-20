@@ -10,12 +10,14 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ ser
 vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: vi.fn(async () => 'u-founder') }))
 vi.mock('@/app/api/_services/mcp-account.service', () => ({ dispatchAccountTool: vi.fn() }))
 vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
+vi.mock('@/lib/foreman/inbox-tools', () => ({ dispatchInboxTool: vi.fn(async () => ({ cards: [] })) }))
 vi.mock('@/lib/foreman/onboarding-tools', () => ({ dispatchWorkspaceOnboardingTool: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/app/api/_services/members.service', () => ({ inviteMember: mocks.inviteMember }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: async () => ({ data: { id: 7, name: 'Acme', max_seats: 5 } }) }))
 
 const { dispatchForemanHubTool } = await import('./foreman-hub.service')
+const { dispatchInboxTool } = await import('@/lib/foreman/inbox-tools')
 
 const admin = { kind: 'user', userId: 'u-admin', workspaceId: 7, role: 'admin', boxScope: 'all' } as const
 const member = { kind: 'user', userId: 'u-member', workspaceId: 7, role: 'member', boxScope: 'all' } as const
@@ -65,5 +67,16 @@ describe('invite_members', () => {
         await expect(dispatchForemanHubTool(admin, 'invite_members', { emails: [] })).rejects.toThrow(/confirmed/)
         await expect(dispatchForemanHubTool(admin, 'invite_members', { emails: Array.from({ length: 11 }, (_, i) => `p${i}@acme.test`) })).rejects.toThrow(/at most 10/)
         expect(mocks.inviteMember).not.toHaveBeenCalled()
+    })
+})
+
+describe('the inbox tools', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    it('hands the cards and their answers to the inbox, as the member the turn speaks for', async () => {
+        await expect(dispatchForemanHubTool(member, 'list_pending_cards', {})).resolves.toEqual({ cards: [] })
+        await dispatchForemanHubTool(member, 'answer_card', { sessionId: 's1', action: 'approve' })
+        expect(dispatchInboxTool).toHaveBeenNthCalledWith(1, member, 'list_pending_cards', {})
+        expect(dispatchInboxTool).toHaveBeenNthCalledWith(2, member, 'answer_card', { sessionId: 's1', action: 'approve' })
     })
 })

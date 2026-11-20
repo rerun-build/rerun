@@ -4,8 +4,8 @@ import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { parseTriggerTarget } from '@/lib/triggers/trigger-path'
-import { getRunSteps, listRuns } from '@/lib/engine/client'
-import type { EngineConnection, EngineRun, SessionSource } from '@/lib/engine/types'
+import { decideSkillProposal, getRunSteps, listRuns } from '@/lib/engine/client'
+import type { EngineConnection, EngineRun, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { FOREMAN_AGENT_ID, type SessionKind, type Usage } from '@rerun/contracts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectManyWithJoins, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
@@ -256,12 +256,21 @@ export async function clearSkillProposalAttention(sessionId: string, agentId: st
     await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' }).eq('id', sessionId).eq('status', 'awaiting_approval')
 }
 
+// Remembering a rule, or not, from a coworker's conversation: `manage` on its Box, then the wait the
+// proposal raised is cleared. A decision the engine refuses leaves the conversation as it was.
+export async function decideCoworkerSkillProposal(target: SessionEngineContext, sessionId: string, proposalId: string, decision: 'accept' | 'dismiss', actor?: Actor): Promise<EngineSkillProposal> {
+    await resolveAgentTarget(target.agentId, actor, 'manage')
+    const proposal = await decideSkillProposal(target.conn, target.engineAgentId, proposalId, decision)
+    await clearSkillProposalAttention(sessionId, target.agentId, target.engineSessionId).catch(() => {})
+    return proposal
+}
+
 // `updatedAt`: the session row's, read before anything else of the conversation (a coworker's only).
 export type SessionEngineContext = { agentId: string; conn: EngineConnection; engineAgentId: string; engineSessionId: string | null; updatedAt?: string }
 
 // Full engine context for a Supabase session (used to replay history).
-export async function getSessionEngineContext(sessionId: string): Promise<SessionEngineContext | null> {
-    const actor = requireLightSessionActor()
+export async function getSessionEngineContext(sessionId: string, caller?: Actor): Promise<SessionEngineContext | null> {
+    const actor = caller ? Promise.resolve(caller) : requireLightSessionActor()
     const [session, engine] = await Promise.all([assertSessionInWorkspace(sessionId, actor), actor.then(a => findWorkspaceEngine(a.workspaceId))])
     if (!session.engine_agent_id) return null
     if (!engine) throw new NoEngineError()

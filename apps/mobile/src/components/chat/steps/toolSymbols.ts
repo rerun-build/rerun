@@ -122,6 +122,8 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     attach_connector: 'link',
     detach_connector: 'trash',
     send_message: 'send',
+    list_pending_cards: 'inbox',
+    answer_card: 'mail-check',
     create_boxes: 'package',
     build_team: 'users',
     write_agent: 'pencil',

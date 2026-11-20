@@ -136,6 +136,39 @@ export const FOREMAN_DOCS_TOOL_DEFS = [
     },
 ] as const
 
+// The cards the coworkers left waiting on the user, answered in the user's name exactly as their
+// inbox would (lib/foreman/inbox-tools.ts). Only a turn with a member behind it may answer.
+export const FOREMAN_INBOX_TOOL_DEFS = [
+    {
+        name: 'list_pending_cards',
+        description:
+            'List the cards the coworkers left waiting on the user, newest first: questions, approvals, spends, apps or credentials to connect, skill proposals. Each card gives its conversation (sessionId and toolCallId), the coworker, what it asks in its own words, the choices it offered, and answeredBy: "answer_card" when you can answer it, "user" with why when only they can. Use it when the user asks what is waiting on them, to clear their inbox, or to give a coworker an answer.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        name: 'answer_card',
+        description:
+            'Answer one card a coworker left waiting on the user, in their name, as they would from their inbox: the coworker\'s run resumes, the line leaves their inbox, and its conversation shows you answered for them. Read the card with list_pending_cards first and pass its sessionId and toolCallId. A question takes action "reply", with the answer in text, or one answer per question in answers when the card asks several; an approval or a spend takes "approve" or "decline"; a skill proposal takes "approve" (remember it) or "decline" with its proposalId. Answer only what the user told you, or what they clearly decided already: when you are not sure, ask them with ask_user first, never guess. Approving a spend of money (paid data, Rerun credit) needs their explicit yes in this conversation: ask with request_approval naming the coworker and the spend, then call with userApproved: true once they approved. Credentials, apps to connect, server sign-ins, a browser takeover and computer access stay with the user.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                sessionId: { type: 'string', description: 'The conversation the card waits in, from list_pending_cards.' },
+                toolCallId: { type: 'string', description: 'The card, from list_pending_cards. Required for every card but a skill proposal. A card answered meanwhile is refused.' },
+                action: { type: 'string', enum: ['reply', 'approve', 'decline'] },
+                text: { type: 'string', description: 'The answer to a question card, worded the way the user gave it.' },
+                answers: {
+                    type: 'array',
+                    description: 'For a card with several questions: one answer per question, the question copied as list_pending_cards gave it.',
+                    items: { type: 'object', properties: { question: { type: 'string' }, answer: { type: 'string' } }, required: ['question', 'answer'] },
+                },
+                proposalId: { type: 'string', description: 'The skill proposal to decide, from list_pending_cards.' },
+                userApproved: { type: 'boolean', description: 'True only once the user approved this spend with request_approval in this conversation.' },
+            },
+            required: ['sessionId', 'action'],
+        },
+    },
+] as const
+
 // A Record rather than a list, so a tab added to the panel fails to compile here instead of reaching
 // the model with no hint of what it shows.
 const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {

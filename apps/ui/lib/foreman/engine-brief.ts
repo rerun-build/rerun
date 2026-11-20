@@ -3,7 +3,7 @@ import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contra
 import type { ForemanState } from './phase'
 import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
-import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
+import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
 
 // The belt of the foreman that runs on the engine. Everything the hub executes goes through
 // POST /api/hub; the board gestures only reach the browser, as transient data parts, so nothing
@@ -39,7 +39,7 @@ function onBelt(def: ForemanToolDef): ForemanToolDef {
     return { ...def, name: BELT_NAMES[def.name] ?? def.name, description: def.description.replace(RENAMED_MENTION, name => BELT_NAMES[name]) }
 }
 
-const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))].map(onBelt)
+const HUB_TOOL_DEFS: ForemanToolDef[] = [...FOREMAN_MCP_TOOL_NAMES.map(accountToolDef), ...FOREMAN_BOX_TOOL_DEFS, ...FOREMAN_DOCS_TOOL_DEFS, ...FOREMAN_SELF_TOOL_DEFS, ...FOREMAN_INBOX_TOOL_DEFS, ...FOREMAN_ONBOARDING_TOOL_DEFS.filter(def => FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(def.name))].map(onBelt)
 
 export const FOREMAN_ENGINE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set(HUB_TOOL_DEFS.map(def => def.name))
 
@@ -67,6 +67,7 @@ export const FOREMAN_READ_TOOL_NAMES: ReadonlySet<string> = new Set([
     'space_db_query',
     'list_agent_shares',
     'search_docs',
+    'list_pending_cards',
 ])
 
 function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSpec {
