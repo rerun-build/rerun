@@ -13,6 +13,7 @@ import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../conne
 import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import { awaitPendingPlanLimits } from '../../connections/plan-limits-pending.js'
 import { probeCustomEndpoint, refreshCustomCatalog, refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
+import { refreshProviderCatalog, refreshStaleProviderCatalogs } from '../../connections/provider-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { sendNotification } from '../../runtime/notify.js'
 import { logger } from '../../lib/logger.js'
@@ -35,6 +36,7 @@ connectionRoutes.get('/', async c => {
     refreshStaleOpencodePlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     refreshStaleCustomCatalogs(connections)
+    refreshStaleProviderCatalogs(connections)
     return c.json({ connections: connections.map(toSummary), default: await readBoxDefault() })
 })
 
@@ -59,7 +61,7 @@ connectionRoutes.post('/probe', async c => {
 connectionRoutes.post('/', async c => {
     const body = createConnectionSchema.parse(await c.req.json())
     const connection = await createConnection(body)
-    await readCliModelsBeforeAdopting(connection)
+    await Promise.all([readCliModelsBeforeAdopting(connection), refreshProviderCatalog(connection)])
     await adoptBoxDefault(connection)
     announceConnected(connection)
     return c.json(toSummary(connection), 201)
@@ -70,7 +72,7 @@ connectionRoutes.patch('/:id', async c => {
     if (!connectionExists(id)) return c.json({ error: 'connection not found' }, 404)
     const patch = updateConnectionSchema.parse(await c.req.json())
     const connection = await patchConnection(id, patch)
-    if (patch.baseUrl !== undefined) await refreshCustomCatalog(connection)
+    if (patch.baseUrl !== undefined) await Promise.all([refreshCustomCatalog(connection), refreshProviderCatalog(connection)])
     const boxDefault = await readBoxDefault()
     if (boxDefault?.connectionId === id && !servesModel(connection, boxDefault.model)) await writeBoxDefault({ connectionId: id, model: defaultModelOf(connection) })
     return c.json(toSummary(connection))
@@ -82,6 +84,7 @@ connectionRoutes.patch('/:id/keys', async c => {
     const body = updateConnectionKeysSchema.parse(await c.req.json())
     const keys = await updateConnectionKeys(id, body)
     const connection = await getConnection(id)
+    void refreshProviderCatalog(connection)
     await readCliModelsBeforeAdopting(connection)
     await adoptBoxDefault(connection)
     announceConnected(connection)

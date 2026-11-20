@@ -106,8 +106,10 @@ export function isHiddenModel(connectionId: string, model: string): boolean {
 
 function catalogOf(source: BoxConnection): CatalogModel[] {
     if (source.providerModels) return source.providerModels.map(m => ({ id: m.id, label: m.label }))
-    if (source.discoveredModels) return source.discoveredModels.map(m => ({ id: m.id, label: m.id }))
-    return catalogFor(source.provider).models
+    const fallback = catalogFor(source.provider).models
+    if (!source.discoveredModels) return fallback
+    const known = new Map(fallback.map(m => [m.id, m]))
+    return source.discoveredModels.map(m => known.get(m.id) ?? { id: m.id, label: m.label ?? modelLabel(m.id), power: modelPower(m.id) })
 }
 
 export function offeredModels(source: BoxConnection): CatalogModel[] {

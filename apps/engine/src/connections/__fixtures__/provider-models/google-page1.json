@@ -1,0 +1,7 @@
+{
+    "models": [
+        { "name": "models/gemini-4-argon", "displayName": "Gemini 4 Argon", "inputTokenLimit": 1048576, "supportedGenerationMethods": ["generateContent", "countTokens"] },
+        { "name": "models/gemini-embedding-002", "displayName": "Gemini Embedding", "inputTokenLimit": 8192, "supportedGenerationMethods": ["embedContent"] }
+    ],
+    "nextPageToken": "page-2"
+}

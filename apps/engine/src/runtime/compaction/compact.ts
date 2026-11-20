@@ -1,4 +1,5 @@
 import { customContextWindow, customMeasuredContextWindow } from '../../connections/custom-catalog.js'
+import { providerContextWindow } from '../../connections/provider-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
@@ -89,7 +90,7 @@ async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefi
 export function runContextWindow(model: string, provider: Provider, connection?: LoadedConnection | null): number | undefined {
     if (provider === 'opencode') return opencodeModel(model)?.contextWindow ?? modelContextWindow(model, provider)
     if (provider === 'custom') return customContextWindow(connection, model)
-    return modelContextWindow(model, provider)
+    return providerContextWindow(connection, model) ?? modelContextWindow(model, provider)
 }
 
 export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): CompactPoint {

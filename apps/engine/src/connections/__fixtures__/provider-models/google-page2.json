@@ -1,0 +1,7 @@
+{
+    "models": [
+        { "name": "models/gemini-4-carbon", "displayName": "Gemini 4 Carbon", "inputTokenLimit": 2097152, "supportedGenerationMethods": ["generateContent"] },
+        { "name": "models/gemini-3.8-flash-preview-tts", "displayName": "Gemini 3.8 Flash TTS", "inputTokenLimit": 8192, "supportedGenerationMethods": ["generateContent"] },
+        { "name": "models/imagen-5", "displayName": "Imagen 5", "supportedGenerationMethods": ["predict"] }
+    ]
+}

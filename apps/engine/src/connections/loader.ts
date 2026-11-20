@@ -10,6 +10,7 @@ import { readCliModels } from './cli-models.js'
 import { readPlanLimits } from './plan-limits.js'
 import { opencodeProviderModels } from './opencode-catalog.js'
 import { customDiscoveredModels } from './custom-catalog.js'
+import { providerDiscoveredModels } from './provider-catalog.js'
 import type { LoadedConnection } from './types.js'
 
 export function connectionExists(id: string): boolean {
@@ -49,6 +50,6 @@ export function toSummary(connection: LoadedConnection): ConnectionSummary {
         signIn: connection.config.provider === 'claude' ? claudeSignInLeft(connection) : null,
         cliModels: readCliModels(connection.id),
         providerModels: connection.config.provider === 'opencode' ? opencodeProviderModels() : null,
-        discoveredModels: connection.config.provider === 'custom' ? customDiscoveredModels(connection.id) : null,
+        discoveredModels: connection.config.provider === 'custom' ? customDiscoveredModels(connection.id) : providerDiscoveredModels(connection.id),
     }
 }

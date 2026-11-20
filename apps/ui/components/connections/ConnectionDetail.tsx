@@ -88,7 +88,7 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
                     <ModelBuckets connection={connection} defaultModel={defaultModel} onModelsChange={models => void patch({ models })} />
                 )}
                 {isOpenRouter && <BaseUrlField baseUrl={connection.baseUrl ?? ''} onCommit={value => void patch({ baseUrl: value })} />}
-                {isOpenRouter && connection.connected && <CustomModelList models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={catalog.models.map(m => m.id)} />}
+                {isOpenRouter && connection.connected && <CustomModelList models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={[...catalog.models, ...(connection.discoveredModels ?? [])].map(m => m.id)} />}
                 {isCustom && <CustomModelList hint={t.rich('customModels.serverHint', { mono: chunks => <span className="font-mono">{chunks}</span> })} placeholder={t('customModels.idPlaceholder')} models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={[...connection.models, ...(connection.discoveredModels ?? []).map(m => m.id)]} />}
                 {isCustom && <CustomEndpointSettings key={connection.id} connection={connection} onPatch={next => void patch(next)} />}
                 </fieldset>

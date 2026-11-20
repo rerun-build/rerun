@@ -30,6 +30,16 @@ vi.mock('../../connections/opencode-catalog.js', async importOriginal => {
         liveOpencodeProviderModels: () => (opencodeLive.models ? actual.opencodeProviderModels().filter(model => opencodeLive.models!.includes(model.id)) : null),
     }
 })
+const providerLive = vi.hoisted(() => ({ models: null as { id: string; label?: string; contextWindow: number | null }[] | null, byId: new Map<string, unknown[]>() }))
+vi.mock('../../connections/provider-catalog.js', () => ({
+    refreshProviderCatalog: async (connection: { id: string; config: { provider: string } }) => {
+        if (providerLive.models && connection.config.provider !== 'claude') providerLive.byId.set(connection.id, providerLive.models)
+    },
+    refreshStaleProviderCatalogs: () => {},
+    providerDiscoveredModels: (id: string) => providerLive.byId.get(id) ?? null,
+    providerContextWindow: () => undefined,
+    forgetProviderCatalog: (id: string) => providerLive.byId.delete(id),
+}))
 vi.mock('../../connections/opencode-plan-limits.js', () => ({ refreshOpencodePlanLimits: async () => {}, refreshStaleOpencodePlanLimits: () => {}, forgetOpencodePlanLimitsAttempt: () => {}, pendingOpencodePlanLimits: () => undefined }))
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
 const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID } = await import('@moldwright/contracts')
@@ -82,6 +92,8 @@ beforeEach(async () => {
     codexCli.models = []
     opencodeLive.models = null
     opencodeLive.refreshed = 0
+    providerLive.models = null
+    providerLive.byId.clear()
     unloadConnection(RERUN_CONNECTION_ID)
     await clearBoxDefault()
     await rm(connectionsDir(), { recursive: true, force: true })
@@ -414,5 +426,25 @@ describe('plan limits on the list', () => {
             pendingReads.delete(claude.id)
             vi.useRealTimers()
         }
+    })
+})
+
+describe('live provider model lists', () => {
+    it('lists what the provider API offers, leaves new models off, and lets one be turned on and served', async () => {
+        providerLive.models = [{ id: 'google/gemini-4-carbon', label: 'Google: Gemini 4 Carbon', contextWindow: 2_000_000 }]
+        const res = await post('/', { name: 'Router', provider: 'openrouter', models: ['anthropic/claude-sonnet-5.5'], keys: { OPENROUTER_API_KEY: 'sk-or-secret' } })
+        const created = (await res.json()) as Summary & { discoveredModels: { id: string }[] | null }
+        expect(created.discoveredModels?.map(model => model.id)).toEqual(['google/gemini-4-carbon'])
+        expect(created.models).toEqual(['anthropic/claude-sonnet-5.5'])
+        expect((await put('/default', { connectionId: created.id, model: 'google/gemini-4-carbon' })).status).toBe(400)
+
+        await patch(`/${created.id}`, { models: ['anthropic/claude-sonnet-5.5', 'google/gemini-4-carbon'] })
+        expect((await put('/default', { connectionId: created.id, model: 'google/gemini-4-carbon' })).status).toBe(200)
+    })
+
+    it('carries no live list while the read has not succeeded, so the fixed list stands in', async () => {
+        const created = (await (await post('/', { name: 'OpenAI', provider: 'openai', keys: { OPENAI_API_KEY: 'sk-openai' } })).json()) as Summary
+        const { connections } = (await (await connectionRoutes.request('/')).json()) as { connections: (Summary & { discoveredModels: unknown })[] }
+        expect(connections.find(c => c.id === created.id)?.discoveredModels).toBeNull()
     })
 })

@@ -22,6 +22,7 @@ import { forgetPlanLimits } from './plan-limits.js'
 import { forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'
 import { forgetClaudePlanLimitsAttempt } from './claude-plan-limits.js'
 import { forgetCustomCatalog } from './custom-catalog.js'
+import { forgetProviderCatalog } from './provider-catalog.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
 
@@ -63,7 +64,10 @@ export async function patchConnection(id: string, patch: UpdateConnectionInput):
         const next = connectionConfigSchema.parse({ ...current.config, ...patch })
         assertCustomHasBaseUrl(next)
         await writeConfig(id, next)
-        if (next.baseUrl !== current.config.baseUrl) forgetCustomCatalog(id)
+        if (next.baseUrl !== current.config.baseUrl) {
+            forgetCustomCatalog(id)
+            forgetProviderCatalog(id)
+        }
         return reloadConnection(id)
     })
 }
@@ -81,6 +85,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         forgetOpencodePlanLimitsAttempt(id)
         forgetClaudePlanLimitsAttempt(id)
         forgetCustomCatalog(id)
+        forgetProviderCatalog(id)
         forgetCredentialRejected(id)
         await reloadConnection(id)
         return Object.keys(next).sort()
@@ -99,6 +104,7 @@ export async function deleteConnection(id: string): Promise<void> {
     forgetOpencodePlanLimitsAttempt(id)
     forgetClaudePlanLimitsAttempt(id)
     forgetCustomCatalog(id)
+    forgetProviderCatalog(id)
     forgetCredentialRejected(id)
     await rm(connectionDir(id), { recursive: true, force: true })
 }

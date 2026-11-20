@@ -1,0 +1,87 @@
+{
+    "object": "list",
+    "data": [
+        {
+            "id": "gpt-6-sol",
+            "object": "model",
+            "created": 1790000000,
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-7-preview",
+            "object": "model",
+            "created": 1795000000,
+            "owned_by": "openai"
+        },
+        {
+            "id": "text-embedding-4-large",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "tts-2-hd",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "whisper-2",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "dall-e-4",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "omni-moderation-latest",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-image-2",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-6-audio-preview",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-6-realtime",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-6-transcribe",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "sora-2",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "gpt-6-search-preview",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "computer-use-preview",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "babbage-002",
+            "object": "model",
+            "owned_by": "openai"
+        },
+        {
+            "id": "davinci-002",
+            "object": "model",
+            "owned_by": "openai"
+        }
+    ]
+}

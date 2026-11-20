@@ -12,6 +12,7 @@ import { listConnections } from '../../connections/registry.js'
 import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
+import { refreshStaleProviderCatalogs } from '../../connections/provider-catalog.js'
 import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import { restorePlanLimits } from '../../connections/plan-limits.js'
@@ -41,6 +42,7 @@ export async function runCommand(): Promise<void> {
             refreshStaleOpencodePlanLimits(connections)
             if (connections.some(connection => connection.config.provider === 'opencode')) void refreshOpencodeCatalog()
             refreshStaleCustomCatalogs(connections)
+            refreshStaleProviderCatalogs(connections)
         })
         .catch(err => logger.warn({ err: String(err) }, 'plan limits boot read skipped'))
     const stopScheduler = startScheduler()

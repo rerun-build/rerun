@@ -3,11 +3,21 @@ import { RERUN_MODELS, providerSchema, type Provider } from './agent.js'
 import { OPENCODE_DEFAULT_MODEL, isFreeOpencodeModel, providerModelSchema, type ProviderModel } from './opencode.js'
 import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
+const withoutCredentials = (value: string): boolean => {
+    if (!URL.canParse(value)) return true
+    const url = new URL(value)
+    return !url.username && !url.password
+}
+
+export const connectionBaseUrlSchema = z.url().refine(withoutCredentials, { message: 'The base URL must not carry a username or password' }).or(z.literal(''))
+
+const storedBaseUrlSchema = z.url().or(z.literal(''))
+
 export const connectionConfigSchema = z.object({
     name: z.string().min(1),
     provider: providerSchema,
     models: z.array(z.string()).default([]),
-    baseUrl: z.url().or(z.literal('')).optional(),
+    baseUrl: storedBaseUrlSchema.optional(),
     extraModels: z.array(z.string()).default([]),
     contextWindow: z.number().int().positive().nullable().optional(),
     vision: z.boolean().optional(),
@@ -58,7 +68,7 @@ export function opencodeServesModel(provider: Provider, providerModels: Provider
     return providerModels.some(model => model.id === id)
 }
 
-export const discoveredModelSchema = z.object({ id: z.string(), contextWindow: z.number().nullable() })
+export const discoveredModelSchema = z.object({ id: z.string(), contextWindow: z.number().nullable(), label: z.string().optional(), price: providerModelSchema.shape.price.optional() })
 export type DiscoveredModel = z.infer<typeof discoveredModelSchema>
 
 export const connectionSummarySchema = connectionConfigSchema.extend({
@@ -86,7 +96,7 @@ export const createConnectionSchema = z.object({
     name: z.string().min(1),
     provider: providerSchema,
     models: z.array(z.string()).default([]),
-    baseUrl: z.url().or(z.literal('')).optional(),
+    baseUrl: connectionBaseUrlSchema.optional(),
     extraModels: z.array(z.string()).default([]),
     contextWindow: z.number().int().positive().nullable().optional(),
     vision: z.boolean().optional(),
@@ -97,7 +107,7 @@ export type CreateConnectionInput = z.infer<typeof createConnectionSchema>
 export const updateConnectionSchema = z.object({
     name: z.string().min(1).optional(),
     models: z.array(z.string()).optional(),
-    baseUrl: z.url().or(z.literal('')).optional(),
+    baseUrl: connectionBaseUrlSchema.optional(),
     extraModels: z.array(z.string()).optional(),
     contextWindow: z.number().int().positive().nullable().optional(),
     vision: z.boolean().optional(),
@@ -293,7 +303,7 @@ export const createAiConnectionInputSchema = z
         provider: addableProviderSchema,
         apiKey: z.string().trim().optional(),
         name: z.string().trim().min(1).optional(),
-        baseUrl: z.url().or(z.literal('')).optional(),
+        baseUrl: connectionBaseUrlSchema.optional(),
         models: z.array(z.string().trim().min(1)).optional(),
     })
     .refine(input => input.provider === 'custom' || !!input.apiKey, { message: 'An API key is required', path: ['apiKey'] })
