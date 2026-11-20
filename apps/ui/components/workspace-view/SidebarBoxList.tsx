@@ -195,9 +195,9 @@ function SortableTile({ agent, draggable, landingBefore, children }: { agent: Is
 // What follows the pointer: the coworker as it reads in the list, without its line and menus.
 function TileGhost({ agent }: { agent: IsoAgent }) {
     return (
-        <div className="flex w-68 cursor-grabbing items-center gap-2.5 rounded-lg border border-border bg-background py-2 pr-3 pl-2 shadow-lg">
-            <AgentBuddy agentId={agent.id} mood={agent.disabledAt ? 'asleep' : 'idle'} size={32} facing="right" className="shrink-0" />
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">{agent.name}</span>
+        <div className="flex w-[calc(var(--simple-list-w,18rem)-1rem)] cursor-grabbing items-center gap-3 rounded-lg border border-border bg-background py-2.5 pr-3 pl-2 shadow-lg">
+            <AgentBuddy agentId={agent.id} mood={agent.disabledAt ? 'asleep' : 'idle'} size={36} facing="right" className="shrink-0" />
+            <span className="min-w-0 flex-1 truncate text-[15px] leading-5 font-medium">{agent.name}</span>
         </div>
     )
 }
@@ -205,7 +205,7 @@ function TileGhost({ agent }: { agent: IsoAgent }) {
 function BoxGhost({ section }: { section: SidebarSection<IsoAgent, SpacePublic> }) {
     const tMenu = useTranslations('builder.contextMenu')
     return (
-        <div className="flex h-8 w-68 cursor-grabbing items-center gap-1.5 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground shadow-lg">
+        <div className="flex h-9 w-[calc(var(--simple-list-w,18rem)-1rem)] cursor-grabbing items-center gap-1.5 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground shadow-lg">
             <ChevronDownIcon className="size-3 shrink-0" />
             <span className="truncate">{section.box.name?.trim() || tMenu('untitledBox')}</span>
             <span className="shrink-0 text-muted-foreground/60 tabular-nums">{section.members.length}</span>

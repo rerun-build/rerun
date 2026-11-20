@@ -22,14 +22,14 @@ export function ForemanTile() {
             type="button"
             aria-current={open ? 'true' : undefined}
             onClick={() => useForemanStore.getState().openInCenter()}
-            className={cn('flex w-full items-center gap-2.5 rounded-lg py-2 pr-2 pl-2 text-left transition-colors', open ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/60')}
+            className={cn('flex w-full items-center gap-3 rounded-lg py-2.5 pr-2 pl-2 text-left transition-colors', open ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/60')}
         >
-            <span className="flex size-8 shrink-0 items-center justify-center">
-                <Orb size={26} state={foremanOrbState({ open, activity })} facing="right" />
+            <span className="flex size-9 shrink-0 items-center justify-center">
+                <Orb size={30} state={foremanOrbState({ open, activity })} facing="right" />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium">{t('name', foremanName)}</span>
-                <span className="block truncate text-xs text-muted-foreground">{t('line')}</span>
+                <span className="block truncate text-[15px] leading-5 font-medium">{t('name', foremanName)}</span>
+                <span className="block truncate text-[13px] leading-[18px] text-muted-foreground">{t('line')}</span>
             </span>
         </button>
     )

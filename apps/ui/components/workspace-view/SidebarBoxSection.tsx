@@ -38,7 +38,7 @@ export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog,
         <section ref={drag?.ref} style={drag?.style} aria-label={label} className={cn('rounded-lg transition-colors', drag?.dragging && 'opacity-40', drag?.target && 'bg-accent/40 ring-1 ring-border')}>
             <ContextMenu>
                 <ContextMenuTrigger asChild>
-                    <div {...drag?.handle} className="group relative flex h-8 items-center rounded-md transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50">
+                    <div {...drag?.handle} className="group relative flex h-9 items-center rounded-md transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50">
                         <button type="button" aria-expanded={!collapsed} onClick={onToggle} className="flex h-full min-w-0 flex-1 items-center gap-1.5 pr-8 pl-2 text-left text-xs font-medium text-muted-foreground">
                             <ChevronDownIcon className={cn('size-3 shrink-0 transition-transform', collapsed && '-rotate-90')} />
                             <span className="truncate">{label}</span>
@@ -51,7 +51,7 @@ export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog,
                                     variant="ghost"
                                     size="icon-sm"
                                     aria-label={t('boxMore', { name: label })}
-                                    className="absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100"
+                                    className="absolute top-1.5 right-1 size-6 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100"
                                 >
                                     <EllipsisIcon className="size-3.5" />
                                 </Button>
@@ -70,7 +70,7 @@ export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog,
                 (members.length === 0 ? (
                     <p className="py-1.5 pl-7 text-xs text-muted-foreground/60">{t('emptyBox')}</p>
                 ) : (
-                    <ul className="space-y-0.5">
+                    <ul className="space-y-1">
                         {members.map(agent => (
                             <li key={agent.id}>{renderTile(agent)}</li>
                         ))}

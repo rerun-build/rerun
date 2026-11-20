@@ -115,7 +115,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
             </div>
 
             <nav ref={setListElement} aria-label={t('label')} className="mr-2 min-h-0 flex-1 overflow-y-auto pl-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
-                <div className="space-y-0.5 pb-2">
+                <div className="space-y-1 pb-2">
                     <ForemanTile />
                     {!previewsLoaded ? (
                         <TileSkeletons />
@@ -229,10 +229,10 @@ function SidebarFoot() {
 
 function TileSkeletons() {
     return (
-        <div aria-hidden className="space-y-0.5">
+        <div aria-hidden className="space-y-1">
             {Array.from({ length: TILE_SKELETONS }, (_, index) => (
-                <div key={index} className="flex items-center gap-2.5 px-2 py-2">
-                    <Skeleton className="size-8 shrink-0 rounded-md" />
+                <div key={index} className="flex items-center gap-3 px-2 py-2.5">
+                    <Skeleton className="size-9 shrink-0 rounded-md" />
                     <div className="min-w-0 flex-1 space-y-1.5">
                         <Skeleton className="h-3.5 w-24" />
                         <Skeleton className="h-3 w-40 max-w-full" />
