@@ -13,7 +13,7 @@ ISSUE = {"number": 5, "title": "Fix x", "body": ready(), "comments": [], "labels
          "createdAt": "2026-11-01T00:00:00Z"}
 FLOOR = {"number": 612, "title": "Floor: show the queue", "body": "SECRET BODY"}
 TWO_STAGE = {"plan_by": ["Boss"], "cut_by": ["Scope Shaper", "IKE"]}
-BRIEF_SHA256 = "5e7f22cba10f160869368b005ed74158c6926234690b8d2aa82f08db0a4a933d"
+BRIEF_SHA256 = "d47ca9a858e217c996439ceb1c12f1d89b0b3084b27a70aa8f217de81afd2b7a"
 
 
 def settings(planning_cfg):
@@ -148,6 +148,11 @@ class Cut(Base):
         for part in ("check command of every assumption", "risk without an answer", "Write the change that makes it pass",
                      "every file that pins one is in Files", "inside the `**Run**` block", "**Size**"):
             self.assertIn(part, text)
+
+    def test_the_cut_brief_asks_for_one_behaviour_per_bullet(self):
+        text = planning.cut_brief(FLOOR, "o/rerun", PLAN)
+        self.assertIn("one behaviour per bullet", text)
+        self.assertIn("\"the same rule\"", text)
 
     def test_how_the_builder_starts_is_no_change_bullet(self):
         self.assertIn("how the builder starts (a branch to merge, a command to run, a pull request to open) is no Change bullet", planning.CUT_RULES)
