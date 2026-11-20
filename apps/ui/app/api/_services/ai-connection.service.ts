@@ -133,31 +133,30 @@ async function assertPublicBaseUrl(baseUrl: string | undefined): Promise<void> {
 }
 
 // OpenCode runs inside the engine's own loop, so a machine on an older engine would store the key and
-// fail every run with it.
+// fail every run with it. A workspace with no machine yet is offered it like any provider: plugging
+// one in claims its machine, which runs the current engine.
 export async function isOpencodeOffered(conn: EngineConnection | null | undefined): Promise<boolean> {
-    return !!conn && (await supportsOpencode(conn))
-}
-
-export async function isOpencodeOfferedTo(workspaceId: number): Promise<boolean> {
-    return isOpencodeOffered((await findWorkspaceEngine(workspaceId))?.conn)
+    return !conn || (await supportsOpencode(conn))
 }
 
 // A custom endpoint is run by the engine's own loop too, and probed by it: an older engine would
-// refuse the provider outright.
+// refuse the provider outright. Offered without a machine yet, for the same reason as OpenCode.
 export async function isCustomOffered(conn: EngineConnection | null | undefined): Promise<boolean> {
-    return !!conn && (await supportsCustomProvider(conn))
-}
-
-export async function isCustomOfferedTo(workspaceId: number): Promise<boolean> {
-    return isCustomOffered((await findWorkspaceEngine(workspaceId))?.conn)
+    return !conn || (await supportsCustomProvider(conn))
 }
 
 // `opencodeOffered`: whether this workspace's engine runs OpenCode. `customOffered`: whether it runs
 // custom endpoints.
 export type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
 
+// A workspace whose machine is not claimed yet has nothing plugged in, and is offered every provider.
 export async function listAiConnectionsWithOffers(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
-    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId, { fresh }), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
+    const engine = await findWorkspaceEngine(workspaceId)
+    const [list, opencodeOffered, customOffered] = await Promise.all([
+        engine ? listAiConnections(workspaceId, { fresh }) : { connections: [], default: null, backups: NO_BOX_BACKUPS },
+        isOpencodeOffered(engine?.conn).catch(() => false),
+        isCustomOffered(engine?.conn).catch(() => false),
+    ])
     return { ...list, opencodeOffered, customOffered }
 }
 

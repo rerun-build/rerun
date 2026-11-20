@@ -214,6 +214,20 @@ describe('custom endpoints', () => {
         expect(await addable({ 'x-rerun-client': 'ios/1.4.0 (49)' })).not.toContain('custom')
     })
 
+    it('are offered with OpenCode to a workspace whose machine is not claimed yet, since plugging one in claims it', async () => {
+        vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
+        vi.stubEnv('MOBILE_IOS_CUSTOM_BUILD', '50')
+        findWorkspaceEngine.mockResolvedValue(null)
+        expect(await addable({ 'x-rerun-client': 'ios/1.5.0 (50)' })).toEqual(['claude', 'codex', 'opencode', 'anthropic', 'openai', 'google', 'openrouter', 'custom'])
+    })
+
+    it('are offered with OpenCode in the web list of a workspace whose machine is not claimed yet', async () => {
+        const { listAiConnectionsWithOffers } = await import('@/app/api/_services/ai-connection.service')
+        findWorkspaceEngine.mockResolvedValue(null)
+        expect(await listAiConnectionsWithOffers(1)).toMatchObject({ connections: [], default: null, opencodeOffered: true, customOffered: true })
+        expect(engine.listConnections).not.toHaveBeenCalled()
+    })
+
     it('take no key, and keep the models the endpoint listed', async () => {
         cloud = false
         engine.supportsCustomProvider.mockResolvedValue(true)
