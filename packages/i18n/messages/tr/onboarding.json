@@ -70,6 +70,10 @@
         "copied": "Kopyalandı",
         "skip": "Atla"
     },
+    "view": {
+        "title": "Ekibinizi nasıl görmek istersiniz?",
+        "hint": "Workspace menünüzden istediğiniz zaman değiştirin"
+    },
     "trial": {
         "title": "Ücretsiz denemenizi başlatın",
         "description": "Coworker'larınız deneme başladığı anda çalışmaya başlar.",

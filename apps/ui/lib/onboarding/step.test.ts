@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import { needsOnboarding, onboardingStep, type NeedsOnboardingInput } from './step'
 
-const ANSWERED: ForemanAnswers = { company_url: 'https://acme.com', industry: 'saas', position: 'Founder / CEO', onboarding: { teamDone: true } }
+const ANSWERED: ForemanAnswers = { company_url: 'https://acme.com', industry: 'saas', position: 'Founder / CEO', onboarding: { teamDone: true, view: 'board' } }
 
 describe('onboardingStep', () => {
     const step = (answers: ForemanAnswers, entitled = false, billing = true) => onboardingStep({ answers, entitled, billing })
@@ -22,6 +22,11 @@ describe('onboardingStep', () => {
         expect(step({ company_url: 'https://acme.com', industry: 'other', onboarding: { industryLabel: 'Bakery' } })).toBe('role')
         expect(step({ company_url: 'https://acme.com', industry: 'saas', position: '  ' })).toBe('role')
         expect(step({ company_url: 'https://acme.com', industry: 'saas', position: 'Sales' })).toBe('team')
+    })
+
+    it('asks how to see the workspace once the team is done', () => {
+        expect(step({ ...ANSWERED, onboarding: { teamDone: true } })).toBe('view')
+        expect(step({ ...ANSWERED, onboarding: { teamDone: true, view: 'simple' } })).toBe('trial')
     })
 
     it('asks for the trial once the questions are answered, unless the workspace is already entitled', () => {

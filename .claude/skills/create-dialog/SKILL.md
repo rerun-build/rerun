@@ -78,6 +78,7 @@ one line, under the tabs.
 - Header: `StepDialogHeader icon={…}` (`apps/ui/components/dialogs/StepDialogHeader.tsx`), the `DialogHeaderBar` with the progress bars under the title. In a `SplitDialogContent` the column has no padding of its own: header first, then the body in a `p-4` wrapper, the plain `DialogFooter` at the bottom (`CreateTemplateDialog.tsx`).
 - `StepTransition` remounts its whole subtree at every step: a hook that has to survive going from one step to the next is declared in the shell.
 - Two entry points that walk through the same wizard share the body AND the footer in a single component (see `CaptureStepPanel`).
+- A step answered by one click (a single choice among tiles, cards or rows) moves on to the next step on that click: no Continue button to press after it. The pick shows as selected for a beat (~250 ms), then the step changes; Back is how a person changes their mind. A Continue button stays only where the answer takes more than one click (several picks, a typed field, an "Other" input).
 
 ## Exception: the 2-column frame
 

@@ -1,4 +1,5 @@
 import type { WorkType } from '@/lib/onboarding/work-types'
+import type { WorkspaceView } from '@/lib/workspace-view'
 import type { TemplateCategory } from '@rerun/contracts'
 
 // The shape of `workspace_onboarding.answers`, written by the foreman's save_profile and read by the
@@ -39,6 +40,8 @@ export type WelcomeProgress = {
     // What they typed under "Other", kept verbatim beside the bucket it was filed into.
     industryLabel?: string
     teamDone?: boolean
+    // The way they chose to see the workspace. The device keeps the preference itself: this only says the question was answered.
+    view?: WorkspaceView
     // Set when the onboarding hands over, cleared by the one turn in which the Chief of Staff speaks first.
     greetPending?: boolean
 }

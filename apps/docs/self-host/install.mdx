@@ -40,7 +40,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
 
     The project ref is the part before `.supabase.co` in the project URL.
 
-    4. In **Authentication > Sign In / Providers**, leave **Allow anonymous sign-ins** off and keep **Confirm email** on. Every page of Rerun asks for an account: a visitor signs in or signs up first, then answers four questions about their company before landing on the board.
+    4. In **Authentication > Sign In / Providers**, leave **Allow anonymous sign-ins** off and keep **Confirm email** on. Every page of Rerun asks for an account: a visitor signs in or signs up first, then answers a few questions about their company and picks the board or the classic view before landing in the app.
     5. In **Authentication > Emails > SMTP Settings**, turn on **Custom SMTP** and enter your SMTP server. This step is required: on the Free plan, a project that keeps Supabase's own mailer cannot edit its email templates, so the email arrives without the code. That mailer also sends only 2 emails an hour, and only to the members of your Supabase organization.
     6. Once SMTP is saved, in **Authentication > Email Templates**, paste the content of `supabase/templates/magic_link.html` from your clone into **Magic Link**, **Confirm signup** and **Change Email Address**, with the subject `Your Rerun code`. Rerun signs people in with a 6-digit code, and Supabase's default templates only carry a link.
     7. In **Authentication > URL Configuration**, set the **Site URL** to the address people open, the same as `NEXT_PUBLIC_APP_URL` below.

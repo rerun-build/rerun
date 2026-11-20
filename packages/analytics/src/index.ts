@@ -214,8 +214,9 @@ export interface AnalyticsEventMap {
     onboarding_step_viewed: { step: string }
     // `via` is only on the plan step, which closes four ways: the plan card confirmed, a template
     // picked on its own card, coworkers hired off the starter pack, or the one coworker they
-    // described instead of picking. `skipped` on the welcome page's site and team steps.
-    onboarding_step_completed: { step: string; via?: 'plan_card' | 'template' | 'starter_pack' | 'custom'; skipped?: boolean }
+    // described instead of picking. `skipped` on the welcome page's site and team steps, `view` on its
+    // step that picks the board or the classic view.
+    onboarding_step_completed: { step: string; via?: 'plan_card' | 'template' | 'starter_pack' | 'custom'; skipped?: boolean; view?: 'board' | 'simple' }
     // The welcome page handed over to the Chief of Staff. `engine` is false when they went in while
     // their machine had not answered yet.
     onboarding_completed: { engine: boolean }

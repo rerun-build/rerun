@@ -14,6 +14,7 @@ import { readAnswers, saveFirstName, writeAnswers } from '@/lib/foreman/profile'
 import { failure, failureOf } from '@/lib/i18n/action-error'
 import { takeIntakeCall } from '@/lib/onboarding/anonymous-intake-quota'
 import type { ForemanIntake } from '@/lib/onboarding/intake'
+import { parseWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import type { ActionResult } from './space.actions'
 
 // The welcome page's answers, each written the moment it is given so a reload resumes on the next
@@ -162,6 +163,18 @@ export async function finishWelcomeTeamAction(): Promise<ActionResult> {
     try {
         const ctx = await welcomeContext()
         await saveAnswers(ctx, answers => withProgress(answers, { teamDone: true }))
+        return { ok: true }
+    } catch (err) {
+        return failureOf(err, 'saveAnswerFailed')
+    }
+}
+
+export async function saveWelcomeViewAction(view: WorkspaceView): Promise<ActionResult> {
+    try {
+        const chosen = parseWorkspaceView(view)
+        if (!chosen) return failure('saveAnswerFailed')
+        const ctx = await welcomeContext()
+        await saveAnswers(ctx, answers => withProgress(answers, { view: chosen }))
         return { ok: true }
     } catch (err) {
         return failureOf(err, 'saveAnswerFailed')

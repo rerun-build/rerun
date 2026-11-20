@@ -7,7 +7,9 @@
         "team.description": "The AI coworkers of the workspace work for every person invited to it.",
         "role.description": "The first AI coworker built for them will work for the person in that role.",
         "engine.greetingNamed": "{name} is the first name of the person. Said by the Chief of Staff, the AI assistant of the workspace, when it wakes up at the end of the onboarding.",
-        "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up."
+        "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up.",
+        "view.title": "Title of the onboarding step that asks how the person wants to see their workspace: as the isometric board (Boxes and coworkers drawn in 3D) or as the classic view (a list of coworkers beside the chat). 'Your team' means their AI coworkers.",
+        "view.hint": "Line under the two tiles of the step, followed by a picture of the small switch that changes the view later, found in the menu of the workspace."
     },
     "metaTitle": "Welcome",
     "back": "Back",
@@ -79,6 +81,10 @@
         "copy": "Copy",
         "copied": "Copied",
         "skip": "Skip"
+    },
+    "view": {
+        "title": "How do you want to see your team?",
+        "hint": "Switch anytime from your workspace menu"
     },
     "trial": {
         "title": "Start your free trial",

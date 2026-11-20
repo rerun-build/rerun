@@ -70,6 +70,10 @@
         "copied": "Copiado",
         "skip": "Pular"
     },
+    "view": {
+        "title": "Como você quer ver sua equipe?",
+        "hint": "Mude quando quiser no menu do seu workspace"
+    },
     "trial": {
         "title": "Comece seu teste grátis",
         "description": "Seus coworkers começam a trabalhar assim que ele começa.",

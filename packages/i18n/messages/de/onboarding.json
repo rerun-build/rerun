@@ -70,6 +70,10 @@
         "copied": "Kopiert",
         "skip": "Überspringen"
     },
+    "view": {
+        "title": "Wie möchtest du dein Team sehen?",
+        "hint": "Jederzeit im Menü deines Workspace umschalten"
+    },
     "trial": {
         "title": "Starte deine kostenlose Testphase",
         "description": "Deine Coworker legen los, sobald sie beginnt.",

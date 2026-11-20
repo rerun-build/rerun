@@ -1,10 +1,10 @@
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 
-// The welcome page asks four questions, then starts the trial and the machine. Nothing records
+// The welcome page asks five questions, then starts the trial and the machine. Nothing records
 // which step someone stands on: it is read off what the workspace already holds, so a reload, a
 // second tab or a return the next day lands where they really are.
 
-export const ONBOARDING_STEPS = ['site', 'industry', 'role', 'team', 'trial', 'engine'] as const
+export const ONBOARDING_STEPS = ['site', 'industry', 'role', 'team', 'view', 'trial', 'engine'] as const
 
 export type OnboardingStep = (typeof ONBOARDING_STEPS)[number]
 
@@ -21,6 +21,7 @@ export function onboardingStep({ answers, entitled, billing }: OnboardingStepInp
     if (!answers.industry) return 'industry'
     if (!answers.position?.trim()) return 'role'
     if (!progress.teamDone) return 'team'
+    if (!progress.view) return 'view'
     if (billing && !entitled) return 'trial'
     return 'engine'
 }

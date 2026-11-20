@@ -1,7 +1,7 @@
 'use client'
 
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
-import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction } from '@/app/api/_actions/welcome.actions'
+import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
@@ -12,10 +12,12 @@ import { RoleStep, type RoleAnswer } from '@/components/onboarding/welcome/RoleS
 import { SiteStep } from '@/components/onboarding/welcome/SiteStep'
 import { TeamStep, type SentInvite } from '@/components/onboarding/welcome/TeamStep'
 import { TrialStep } from '@/components/onboarding/welcome/TrialStep'
+import { ViewStep } from '@/components/onboarding/welcome/ViewStep'
 import { useErrorText } from '@/hooks/useErrorText'
 import type { ActionFailure } from '@/lib/i18n/action-error'
 import { rolesForIndustry } from '@/lib/onboarding/intake'
 import type { OnboardingStep } from '@/lib/onboarding/step'
+import { rememberWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import { useBillingStore } from '@/stores/billing.store'
 import { track } from '@rerun/analytics/client'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
@@ -34,15 +36,18 @@ export type WelcomeAnswers = {
     invites: SentInvite[]
 }
 
-type QuestionStep = 'site' | 'industry' | 'role' | 'team'
+type QuestionStep = 'site' | 'industry' | 'role' | 'team' | 'view'
 
-const QUESTIONS: QuestionStep[] = ['site', 'industry', 'role', 'team']
+const QUESTIONS: QuestionStep[] = ['site', 'industry', 'role', 'team', 'view']
+
+// How long a picked tile shows its check before the next step takes its place.
+const PICKED_BEAT_MS = 250
 
 // How long the machine gets to answer before the page offers to try again or go in anyway.
 const ENGINE_PATIENCE_MS = 90_000
 const ENGINE_POLL_MS = 2_000
 
-// The four questions, one at a time in the onboarding dialog: each answer is saved as it is given and
+// The five questions, one at a time in the onboarding dialog: each answer is saved as it is given and
 // moves to the next. A number still owed after a Google sign-up is asked first. Then the trial,
 // through today's checkout, and the machine, whose milestones the Chief of Staff's orb reads out
 // before it hands them over to the app. `afterQuestions` is the step the server resolved for the end
@@ -79,13 +84,13 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         setStep(target)
     }
 
-    const saved = (result: { ok: true } | ActionFailure, completed: QuestionStep, target: OnboardingStep, skipped = false) => {
+    const saved = (result: { ok: true } | ActionFailure, completed: QuestionStep, target: OnboardingStep, skipped = false, view?: WorkspaceView) => {
         setSaving(null)
         if (!result.ok) {
             setError(errorText(result))
             return false
         }
-        track('onboarding_step_completed', { step: completed, skipped })
+        track('onboarding_step_completed', { step: completed, skipped, ...(view ? { view } : {}) })
         go(target)
         return true
     }
@@ -123,7 +128,15 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     const finishTeam = async () => {
         setSaving('answer')
         setError(null)
-        saved(await finishWelcomeTeamAction(), 'team', afterQuestions, invites.length === 0)
+        saved(await finishWelcomeTeamAction(), 'team', 'view', invites.length === 0)
+    }
+
+    // Kept on this device as the view the app opens in once the onboarding is done.
+    const pickView = async (view: WorkspaceView) => {
+        setError(null)
+        rememberWorkspaceView(view)
+        const [result] = await Promise.all([saveWelcomeViewAction(view), new Promise(resolve => setTimeout(resolve, PICKED_BEAT_MS))])
+        return saved(result, 'view', afterQuestions, false, view)
     }
 
     const billingOpen = useBillingStore(state => state.open)
@@ -213,8 +226,10 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         <RoleStep industry={industry.other ? guess : industry.industry} answer={role} onChange={setRole} onSubmit={() => void submitRole()} onBack={back} saving={answering} error={error} />
     ) : step === 'team' ? (
         <TeamStep invites={invites} onInvited={sent => setInvites(current => [...current, sent])} onDone={() => void finishTeam()} onBack={back} saving={answering} error={error} />
+    ) : step === 'view' ? (
+        <ViewStep onPick={pickView} onBack={back} error={error} />
     ) : step === 'trial' ? (
-        <TrialStep onBack={() => go('team')} onStart={startTrial} />
+        <TrialStep onBack={() => go('view')} onStart={startTrial} />
     ) : (
         <EngineStep firstName={firstName} progress={engine} error={error} onRetry={() => void startEngine()} onEnter={() => void enter()} entering={entering} />
     )
