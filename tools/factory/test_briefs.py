@@ -30,6 +30,12 @@ class Briefs(unittest.TestCase):
         self.assertIn("/data/tools/bin/wt new rerun 7 d2", briefs.design_brief(again))
         self.assertIn("/data/tools/bin/wt new rerun 7 r1", briefs.research_brief(self.J))
 
+    def test_the_resolver_brief_runs_issuecheck_before_filing(self):
+        b = briefs.resolver_brief("o/r", "ended #1", {"issue": 7, "evidence": "e"})
+        self.assertIn("Before you file such an issue, write its body to a file", b)
+        self.assertIn("run `python3 -I tools/factory/issuecheck.py <file>` from the root of a dev checkout", b)
+        self.assertIn("When issuecheck does not print OK, fix the faults it lists and run it again; never file a body it rejected.", b)
+
 
 if __name__ == "__main__":
     unittest.main()

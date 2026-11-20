@@ -41,6 +41,7 @@ def resolver_brief(repo, key, p):
         'Find the cause and remove it, so that the dispatcher stops seeing the problem. You may edit the text and the labels of issues and comment on them, '
         'push a fix to the branch of an existing job\'s pull request (merge dev in, no rebase), open a factory issue in the cut format for a code fix and label it `factory`, '
         'and re-run CI with the gh CLI (`gh run rerun <id> --failed`).',
+        'Before you file such an issue, write its body to a file and run `python3 -I tools/factory/issuecheck.py <file>` from the root of a dev checkout; file it only when it prints OK. When issuecheck does not print OK, fix the faults it lists and run it again; never file a body it rejected.',
         'Never add or remove the labels `factory-problem`, `owner`, `factory` or `factory-blocked`: the dispatcher reads them, so ask for a change with a DO line.',
         'You may never push to dev, merge, force-push, touch workflow files under `.github/workflows`, touch secrets or key files, or run anything on the server.',
         '',
