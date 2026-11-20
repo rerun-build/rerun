@@ -128,9 +128,6 @@ const rawServiceManifestSchema = z.object({
     envKeys: z.array(envKeyMappingSchema).default([]),
     skills: z.array(serviceSkillSchema).default([]),
     authMethods: z.array(authMethodSchema).default([]),
-    // An account connector (Gmail, Notion) a coworker can hold twice, each with its own sign-in.
-    // Never set on a paid app: its account belongs to the workspace and is billed by the slot.
-    multiInstance: z.boolean().default(false),
 })
 
 export const serviceManifestSchema = rawServiceManifestSchema.transform(m => ({
@@ -221,6 +218,35 @@ export function composioTarget(method: AuthMethod): { toolkit: string; serverNam
     const serverName = method.mcpServers[0]?.name
     if (!serverName) return null
     return { toolkit: method.composio.toolkit, serverName }
+}
+
+export function isPaidApp(manifest: ServiceManifest): boolean {
+    return manifest.authMethods.some(method => method.kind === 'app')
+}
+
+const INPUT_REFERENCE = /\$\{(?:basic:)?input\.([A-Za-z0-9_]+)(?::input\.([A-Za-z0-9_]+))?\}/g
+const SIGN_IN_KINDS = new Set<AuthMethod['kind']>(['oauth', 'managed', 'composio'])
+
+function referencedInputs(text: string): Set<string> {
+    return new Set([...text.matchAll(INPUT_REFERENCE)].flatMap(([, first, second]) => (second ? [first, second] : [first])))
+}
+
+// A coworker can hold several accounts of an app only when each stays apart: its secrets reach the
+// coworker through its own servers, renamed per account. A key the shared skill reads from the
+// environment, or a value the skill quotes, would always be the first account's. A paid app is billed
+// by the slot, and an app with nothing to connect has no account to add.
+export function takesSeveralAccounts(manifest: ServiceManifest): boolean {
+    if (isPaidApp(manifest)) return false
+    if (manifest.skills.some(skill => referencedInputs(skill.body).size > 0)) return false
+    const secretsOf = (method: AuthMethod) => method.inputs.filter(input => input.secret).map(input => input.key)
+    const connecting = manifest.authMethods.filter(method => SIGN_IN_KINDS.has(method.kind) || secretsOf(method).length > 0)
+    return (
+        connecting.length > 0 &&
+        connecting.every(method => {
+            const reachServers = referencedInputs(JSON.stringify(method.mcpServers))
+            return secretsOf(method).every(key => reachServers.has(key))
+        })
+    )
 }
 
 // The paid app a method plugs the coworker into, if any. Nothing to sign in per coworker: the

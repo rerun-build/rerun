@@ -7,7 +7,7 @@ import { AccessDeniedError, type Actor } from '@/app/api/_auth/access'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_SLUGS, isAppSlug, type AppSlug } from '@/lib/apps/types'
 import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems } from '@/lib/engine/vault-client'
-import { appTarget, getMethod, missingRequiredInputs, serviceManifestSchema } from '@/lib/services/manifest'
+import { appTarget, getMethod, missingRequiredInputs, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -50,7 +50,7 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
     if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
 
     const sameApp = (await listVaultItems(ctx.conn)).filter(item => item.slug === manifest.slug)
-    const instanceId = manifest.multiInstance && sameApp.length > 0 ? newServiceInstanceId(sameApp.flatMap(item => item.instanceId ?? [])) : undefined
+    const instanceId = takesSeveralAccounts(manifest) && sameApp.length > 0 ? newServiceInstanceId(sameApp.flatMap(item => item.instanceId ?? [])) : undefined
     const label = instanceId ? `${manifest.name} ${sameApp.length + 1}` : undefined
     const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
     const values = input.values ?? {}
@@ -104,7 +104,7 @@ function toVaultCatalogApps(rows: CatalogRow[], paidApps: Set<AppSlug>): VaultCa
     return rows.flatMap(row => {
         const parsed = serviceManifestSchema.safeParse(row.manifest)
         if (!parsed.success) return []
-        const app = { slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance }
+        const app = { slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: takesSeveralAccounts(parsed.data) }
         const paidApp = parsed.data.authMethods.map(method => appTarget(method)?.appSlug).find(isAppSlug)
         if (paidApp) return paidApps.has(paidApp) ? [{ ...app, authMethods: [], paidApp }] : []
         const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_DIALOG_METHOD_KINDS.has(method.kind))

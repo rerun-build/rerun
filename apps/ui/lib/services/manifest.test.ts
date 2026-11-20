@@ -1,4 +1,4 @@
-import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema } from '@/lib/services/manifest'
+import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
 import { describe, expect, it } from 'vitest'
 
 const linkedinManifest = {
@@ -48,12 +48,48 @@ describe('composio manifests', () => {
     })
 })
 
-describe('multiInstance', () => {
-    it('defaults to a single account', () => {
-        expect(serviceManifestSchema.parse(linkedinManifest).multiInstance).toBe(false)
+describe('takesSeveralAccounts', () => {
+    const apiKey = { key: 'API_KEY', label: 'Key', secret: true, required: true }
+
+    it('lets a coworker hold several accounts of an app whose secrets reach its own servers, whatever an old manifest still says', () => {
+        expect(takesSeveralAccounts(serviceManifestSchema.parse(linkedinManifest))).toBe(true)
+        const getxapi = serviceManifestSchema.parse({ slug: 'getxapi', name: 'GetXAPI', multiInstance: false, inputs: [{ ...apiKey, key: 'GETXAPI_KEY' }], mcpServers: [{ name: 'getxapi', transport: 'stdio', command: 'npx', env: { GETXAPI_KEY: '${input.GETXAPI_KEY}' } }] })
+        expect(takesSeveralAccounts(getxapi)).toBe(true)
+        const basic = serviceManifestSchema.parse({ slug: 'b', name: 'B', inputs: [{ ...apiKey, key: 'USER' }, { ...apiKey, key: 'PASS' }], mcpServers: [{ name: 'b', transport: 'http', url: 'https://b.test/mcp', headers: { Authorization: 'Basic ${basic:input.USER:input.PASS}' } }] })
+        expect(takesSeveralAccounts(basic)).toBe(true)
     })
 
-    it('keeps the flag when the manifest sets it', () => {
-        expect(serviceManifestSchema.parse({ ...linkedinManifest, multiInstance: true }).multiInstance).toBe(true)
+    it('keeps a paid app to one account', () => {
+        const paid = serviceManifestSchema.parse({ slug: 'whatsapp-pro', name: 'WhatsApp Pro', multiInstance: true, authMethods: [{ id: 'app', label: 'Pick a number', kind: 'app', app: { appSlug: 'whatsapp' }, mcpServers: [{ name: 'whatsapp_pro', transport: 'http', url: 'https://hub.test/api/mcp/apps/whatsapp' }] }] })
+        expect(takesSeveralAccounts(paid)).toBe(false)
+    })
+
+    it('keeps to one account an app whose key the skill reads from the environment', () => {
+        const fathom = serviceManifestSchema.parse({
+            slug: 'fathom',
+            name: 'Fathom',
+            skills: [{ name: 'fathom-usage', description: '', body: 'curl -H "X-Api-Key: $FATHOM_API_KEY"' }],
+            authMethods: [
+                { id: 'oauth', kind: 'oauth', mcpServers: [{ name: 'fathom', transport: 'http', url: 'https://fathom.test/mcp', oauth: {} }] },
+                { id: 'api-key', kind: 'key', inputs: [{ ...apiKey, key: 'FATHOM_API_KEY' }], envKeys: [{ key: 'FATHOM_API_KEY', fromInput: 'FATHOM_API_KEY' }] },
+            ],
+        })
+        expect(takesSeveralAccounts(fathom)).toBe(false)
+    })
+
+    it('keeps to one account an app whose skill quotes a value of the account', () => {
+        const unipile = serviceManifestSchema.parse({
+            slug: 'unipile',
+            name: 'Unipile',
+            skills: [{ name: 'unipile-usage', description: '', body: 'Base URL: `https://${input.UNIPILE_DSN}/api/v1`' }],
+            inputs: [{ ...apiKey, key: 'UNIPILE_API_KEY' }, { key: 'UNIPILE_DSN', label: 'DSN', required: true }],
+            mcpServers: [{ name: 'unipile', transport: 'http', url: 'https://unipile.test/mcp', headers: { 'X-API-KEY': '${input.UNIPILE_API_KEY}' } }],
+        })
+        expect(takesSeveralAccounts(unipile)).toBe(false)
+    })
+
+    it('offers no second account of an app with nothing to connect', () => {
+        const mdn = serviceManifestSchema.parse({ slug: 'mozilla', name: 'MDN', mcpServers: [{ name: 'mdn', transport: 'http', url: 'https://mdn.test/mcp' }] })
+        expect(takesSeveralAccounts(mdn)).toBe(false)
     })
 })

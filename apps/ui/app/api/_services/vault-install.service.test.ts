@@ -1,10 +1,11 @@
 import { paidAppFlags } from '@rerun/cloud/apps.server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createVaultItem } from '@/lib/engine/vault-client'
+import { createVaultItem, listVaultItems } from '@/lib/engine/vault-client'
 import { selectMany } from '@/supabase/supabase-helpers'
-import { addVaultMcp, addVaultSecret, vaultCatalog, vaultServerName } from './vault-install.service'
-import { toAuthMethodSummaries } from './services.service'
+import { serviceManifestSchema } from '@/lib/services/manifest'
+import { addVaultMcp, addVaultSecret, addVaultService, vaultCatalog, vaultServerName } from './vault-install.service'
+import { loadManifest, toAuthMethodSummaries } from './services.service'
 import { assertManagesCoworker } from './vault.service'
 
 vi.mock('server-only', () => ({}))
@@ -117,6 +118,42 @@ describe('vaultCatalog', () => {
     it('lists a paid app once when the first page holds it too', async () => {
         vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
         expect((await vaultCatalog()).filter(app => app.slug === 'whatsapp-pro')).toHaveLength(1)
+    })
+})
+
+const GETXAPI = serviceManifestSchema.parse({
+    slug: 'getxapi',
+    name: 'GetXAPI',
+    inputs: [{ key: 'GETXAPI_KEY', label: 'GetXAPI API key', type: 'password', secret: true, required: true }],
+    mcpServers: [{ name: 'getxapi', transport: 'stdio', command: 'npx', args: ['-y', '@getxapi/mcp@latest'], env: { GETXAPI_KEY: '${input.GETXAPI_KEY}' } }],
+})
+
+describe('addVaultService', () => {
+    beforeEach(() => {
+        vi.mocked(loadManifest).mockResolvedValue(GETXAPI)
+        vi.mocked(toAuthMethodSummaries).mockReturnValue([])
+    })
+
+    it('gives the second account of any app its own server and variables, so both fit on one coworker', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([{ id: 'first', slug: 'getxapi' }] as never)
+        await addVaultService({ slug: 'getxapi', values: { GETXAPI_KEY: 'key-2' } })
+
+        const input = vi.mocked(createVaultItem).mock.calls[0][1]
+        const instanceId = input.instanceId as string
+        expect(instanceId).toMatch(/^[a-z0-9]{6}$/)
+        expect(input).toMatchObject({ slug: 'getxapi', label: 'GetXAPI 2' })
+        expect(input.mcpServers?.map(server => server.name)).toEqual([`getxapi-${instanceId}`])
+        expect(input.env).toEqual({ [`RERUN_SVC_GETXAPI_${instanceId.toUpperCase()}_GETXAPI_KEY`]: 'key-2' })
+    })
+
+    it('keeps the plain names for the first account', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([])
+        await addVaultService({ slug: 'getxapi', values: { GETXAPI_KEY: 'key-1' } })
+
+        const input = vi.mocked(createVaultItem).mock.calls[0][1]
+        expect(input).not.toHaveProperty('instanceId')
+        expect(input.mcpServers?.map(server => server.name)).toEqual(['getxapi'])
+        expect(input.env).toEqual({ RERUN_SVC_GETXAPI_GETXAPI_KEY: 'key-1' })
     })
 })
 

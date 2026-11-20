@@ -44,6 +44,7 @@ import { connectionModels, readModelPin, type ModelPin } from '@/lib/mcp/model-p
 import { projectRun } from '@/lib/mcp/run-projection'
 import { truncateField } from '@/lib/mcp/truncate'
 import { describeSkillFiles, normalizeSkillFilePath, planSkillFileRemovals, readSkillReferenceFile, removeSkillFiles } from '@/lib/skills/reference-files'
+import { takesSeveralAccounts } from '@/lib/services/manifest'
 import { connectorSkillOwners, readRegistry } from '@/lib/services/registry'
 import { slugify } from '@/lib/slugify'
 import { MAX_TRIGGER_BODY_BYTES, triggerWebhookUrl } from '@/lib/triggers/webhook'
@@ -916,7 +917,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const [, manifest] = await Promise.all([getAgentChatTarget(agentId, 'manage', actor), loadManifest(slug)])
             if (!manifest || manifest.slug !== slug) throw new Error(`Unknown app "${slug}". Use search_connectors to find the right slug.`)
 
-            const instance = args.newInstance === true && manifest.multiInstance ? await allocateServiceInstance(agentId, manifest, actor) : undefined
+            const instance = args.newInstance === true && takesSeveralAccounts(manifest) ? await allocateServiceInstance(agentId, manifest, actor) : undefined
             const key = instance?.key ?? manifest.slug
             const declared = await declareService(agentId, manifest, actor, instance)
 

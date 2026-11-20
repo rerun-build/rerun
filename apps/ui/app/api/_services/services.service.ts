@@ -19,7 +19,7 @@ import type { EngineConnection } from '@/lib/engine/types'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { type ServiceInstanceTarget, compileService, decompileService } from '@/lib/services/compiler'
 import { embedText, toVectorLiteral } from '@/lib/services/embed'
-import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema } from '@/lib/services/manifest'
+import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, isPaidApp, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
 import { instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
 import { isPublishedAccess } from '@/lib/published/access'
 import { searchDocs } from '@/lib/foreman/search-docs'
@@ -151,8 +151,8 @@ function toSearchResult(s: CatalogRow, installed: Map<string, AgentServiceStatus
         installed: status === 'active',
         installStatus: status,
         verified: Boolean(s.verified),
-        multiInstance: manifest.multiInstance,
-        ...(manifest.authMethods.some(method => method.kind === 'app') ? { paidApp: true } : {}),
+        multiInstance: takesSeveralAccounts(manifest),
+        ...(isPaidApp(manifest) ? { paidApp: true } : {}),
         ...(similarity === undefined ? {} : { similarity }),
     }
 }
@@ -419,7 +419,7 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
         managed,
         composio,
         app,
-        multiInstance: manifest.multiInstance,
+        multiInstance: takesSeveralAccounts(manifest),
         instances,
     }
 }
@@ -427,8 +427,8 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
 // Install a service using the chosen auth method (falls back to the default). Returns
 // needs_config (without compiling) when the method's required inputs are missing, so the
 // caller (chat renderer / settings panel) can show the config form.
-// `newInstance` adds another account next to the ones the coworker holds, only for an app whose
-// manifest allows it: anywhere else it is ignored and the base account is (re)installed.
+// `newInstance` adds another account next to the ones the coworker holds, for an app that takes
+// several: anywhere else it is ignored and the base account is (re)installed.
 // `pending` leaves the app waiting for its owner even when nothing is missing: an app declared
 // through the API with several ways to connect is theirs to choose.
 export async function installService(
@@ -441,7 +441,7 @@ export async function installService(
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
-    if (manifest.authMethods.some(method => method.kind === 'app')) {
+    if (isPaidApp(manifest)) {
         // The account an app connection acts with is bound to a coworker's row (app_connection_agents),
         // which the Chief of Staff does not have.
         if (agentId === FOREMAN_AGENT_ID) throw new Error(`${manifest.name} connects to a coworker, not to the Chief of Staff: attach it to the coworker that needs it with attach_connector.`)
@@ -466,7 +466,7 @@ export async function installService(
         : null
     const { toolNames, oauth, managed, composio, app } = intoVault ?? (await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined))
     const keyTyped = method.kind === 'key' && method.inputs.some(input => input.secret && values[input.key]?.trim())
-    if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && manifest.multiInstance), actor, vaultItem: intoVault?.item ?? null })
+    if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && takesSeveralAccounts(manifest)), actor, vaultItem: intoVault?.item ?? null })
     if (oauth) {
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, oauth, message: `${manifest.name} needs the user to sign in. A Connect button has been shown to them.` }
     }
@@ -564,9 +564,9 @@ async function markVaultNeedsConfig(target: VaultInstallTarget, manifest: Servic
 // Which registry entry an install writes: null for the base account, a fresh key for a new
 // account, or the existing extra account the caller addressed by its key (keeping its label).
 async function installTarget(agentId: string, manifest: ServiceManifest, slugOrKey: string, newInstance: boolean, actor?: Actor): Promise<ServiceInstanceSeed | null> {
-    if (newInstance && manifest.multiInstance) return allocateServiceInstance(agentId, manifest, actor)
+    if (newInstance && takesSeveralAccounts(manifest)) return allocateServiceInstance(agentId, manifest, actor)
     const { instanceId } = parseServiceRegistryKey(slugOrKey)
-    if (!instanceId || !manifest.multiInstance) return null
+    if (!instanceId || !takesSeveralAccounts(manifest)) return null
     const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
     const reg = await readRegistry(conn, engineAgentId)
     return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, reg, manifest.slug) }

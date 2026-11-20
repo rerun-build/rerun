@@ -1,7 +1,7 @@
 import type { Actor } from '@/app/api/_auth/access'
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { compileService } from '@/lib/services/compiler'
-import { type ServiceManifest, autoInstallableMethod, serviceManifestSchema } from '@/lib/services/manifest'
+import { type ServiceManifest, autoInstallableMethod, isPaidApp, serviceManifestSchema } from '@/lib/services/manifest'
 import { readRegistry } from '@/lib/services/registry'
 import type { ServiceChecklistItem } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -41,7 +41,7 @@ export async function declareService(agentId: string, manifest: ServiceManifest,
     const method = autoInstallableMethod(manifest)
     // A paid app never goes to the Vault, and installService would refuse it outright on a plan
     // without paid apps, failing the rest of a coworker's creation over it.
-    const paidApp = manifest.authMethods.some(candidate => candidate.kind === 'app')
+    const paidApp = isPaidApp(manifest)
     if (!paidApp || agentId === FOREMAN_AGENT_ID) {
         const { status } = await installService(agentId, key, {}, method?.id, actor, { pending: !method })
         return status === 'needs_config' ? 'needs_config' : 'compiled'

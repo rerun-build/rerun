@@ -52,11 +52,11 @@ const bufferKeyInput = { key: 'BUFFER_KEY', type: 'password', label: 'Buffer per
 const bufferServer = { env: {}, url: 'https://mcp.buffer.com/mcp', args: [], name: 'buffer', headers: { Authorization: 'Bearer ${input.BUFFER_KEY}' }, transport: 'http' }
 const MANIFESTS: Record<string, unknown> = {
     buffer: { slug: 'buffer', name: 'Buffer', inputs: [bufferKeyInput], mcpServers: [bufferServer] },
-    'linear-key': { slug: 'linear-key', name: 'Linear', multiInstance: true, inputs: [{ ...bufferKeyInput, key: 'LINEAR_KEY' }], mcpServers: [{ ...bufferServer, name: 'linear', headers: { Authorization: 'Bearer ${input.LINEAR_KEY}' } }] },
+    'linear-key': { slug: 'linear-key', name: 'Linear', inputs: [{ ...bufferKeyInput, key: 'LINEAR_KEY' }], mcpServers: [{ ...bufferServer, name: 'linear', headers: { Authorization: 'Bearer ${input.LINEAR_KEY}' } }] },
     'public-mcp': { slug: 'public-mcp', name: 'Public MCP', mcpServers: [{ ...bufferServer, name: 'public-mcp', headers: {} }] },
     'optional-key': { slug: 'optional-key', name: 'Optional Key', inputs: [{ ...bufferKeyInput, key: 'OPTIONAL_KEY', required: false }], mcpServers: [{ ...bufferServer, name: 'optional-key', headers: { Authorization: 'Bearer ${input.OPTIONAL_KEY}' } }] },
     'stdio-tool': { slug: 'stdio-tool', name: 'Stdio Tool', inputs: [{ ...bufferKeyInput, key: 'TOOL_KEY' }], mcpServers: [{ name: 'stdio-tool', command: 'npx', args: ['stdio-tool'], env: { TOOL_KEY: '${input.TOOL_KEY}' } }] },
-    gmail: { slug: 'gmail', name: 'Gmail', multiInstance: true, authMethods: [composioMethod] },
+    gmail: { slug: 'gmail', name: 'Gmail', authMethods: [composioMethod] },
     'linkedin-pro': { slug: 'linkedin-pro', name: 'LinkedIn Pro', authMethods: [composioMethod] },
     'whatsapp-pro': { slug: 'whatsapp-pro', name: 'WhatsApp Pro', authMethods: [appMethod] },
 }
@@ -105,19 +105,29 @@ describe('installService', () => {
         expect(instance).toMatchObject({ key: result.key, label: 'Gmail 2' })
     })
 
-    it('ignores newInstance on an app limited to one account', async () => {
-        useRegistry({ services: {} })
-        const result = await installService('agent', 'linkedin-pro', {}, undefined, undefined, { newInstance: true })
+    it('allocates a new account of an app with a key, like any app but a paid one', async () => {
+        useRegistry({ services: { 'stdio-tool': entry() } })
+        const result = await installService('agent', 'stdio-tool', { TOOL_KEY: 'second' }, undefined, undefined, { newInstance: true })
 
-        expect(result.key).toBe('linkedin-pro')
+        expect(result.key).toMatch(/^stdio-tool@[a-z0-9]{6}$/)
+        expect(vi.mocked(compileService).mock.calls[0][5]).toMatchObject({ key: result.key, label: 'Stdio Tool 2' })
+    })
+
+    it('ignores newInstance on a paid app', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime'
+        const result = await installService('agent', 'whatsapp-pro', {}, undefined, undefined, { newInstance: true })
+
+        expect(result.key).toBe('whatsapp-pro')
         expect(vi.mocked(compileService).mock.calls[0][5]).toBeUndefined()
     })
 
-    it('reinstalls the base account when an instance key names an app limited to one account', async () => {
+    it('reinstalls the base account when an instance key names a paid app', async () => {
         useRegistry({ services: {} })
-        const result = await installService('agent', 'linkedin-pro@abc123')
+        workspacePlan = 'lifetime'
+        const result = await installService('agent', 'whatsapp-pro@abc123')
 
-        expect(result.key).toBe('linkedin-pro')
+        expect(result.key).toBe('whatsapp-pro')
         expect(vi.mocked(compileService).mock.calls[0][5]).toBeUndefined()
     })
 

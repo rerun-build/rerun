@@ -47,8 +47,9 @@ const SPACES = [
     { id: 'box-foreign', name: 'Theirs', workspace_id: FOREIGN_WORKSPACE_ID, visibility: 'workspace' },
 ]
 
-function gmailManifest(multiInstance: boolean): ServiceManifest {
-    return { slug: 'gmail', name: 'Gmail', multiInstance } as ServiceManifest
+function gmailManifest(paidApp = false): ServiceManifest {
+    const server = { name: 'gmail', transport: 'http', url: 'https://hub.test/api/mcp/gmail' }
+    return { slug: 'gmail', name: 'Gmail', skills: [], authMethods: [{ id: 'connect', kind: paidApp ? 'app' : 'composio', inputs: [], mcpServers: [server] }] } as unknown as ServiceManifest
 }
 
 function installed(key: string, label?: string): InstalledService {
@@ -164,28 +165,28 @@ describe('dispatchAccountTool', () => {
         })
 
         it('declares the base account without newInstance', async () => {
-            vi.mocked(loadManifest).mockResolvedValue(gmailManifest(true))
+            vi.mocked(loadManifest).mockResolvedValue(gmailManifest())
 
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'agent-own', slug: 'gmail' })).resolves.toMatchObject({ key: 'gmail', slug: 'gmail', label: 'me@work.com' })
 
             expect(allocateServiceInstance).not.toHaveBeenCalled()
             expect(getAgentChatTarget).toHaveBeenCalledWith('agent-own', 'manage', ACTOR)
-            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(true), ACTOR, undefined)
+            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(), ACTOR, undefined)
         })
 
         // list_agent_connectors and detach_connector reach it too: what it can drop, it can take back.
         it('declares an app on the Chief of Staff, and sends its owner to its card', async () => {
-            vi.mocked(loadManifest).mockResolvedValue(gmailManifest(true))
+            vi.mocked(loadManifest).mockResolvedValue(gmailManifest())
 
             const result = await dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'foreman', slug: 'gmail' })
 
             expect(getAgentChatTarget).toHaveBeenCalledWith('foreman', 'manage', ACTOR)
-            expect(declareService).toHaveBeenCalledWith('foreman', gmailManifest(true), ACTOR, undefined)
+            expect(declareService).toHaveBeenCalledWith('foreman', gmailManifest(), ACTOR, undefined)
             expect(result).toMatchObject({ key: 'gmail', status: 'needs_auth', message: expect.stringContaining("the Chief of Staff's card, Apps") })
         })
 
-        it('declares another account of an app that supports several', async () => {
-            vi.mocked(loadManifest).mockResolvedValue(gmailManifest(true))
+        it('declares another account of an app', async () => {
+            vi.mocked(loadManifest).mockResolvedValue(gmailManifest())
 
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'agent-own', slug: 'gmail', newInstance: true })).resolves.toMatchObject({
                 key: 'gmail@k3x9ab',
@@ -194,16 +195,16 @@ describe('dispatchAccountTool', () => {
                 status: 'needs_auth',
             })
 
-            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(true), ACTOR, NEW_ACCOUNT)
+            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(), ACTOR, NEW_ACCOUNT)
         })
 
-        it('ignores newInstance on an app limited to one account', async () => {
-            vi.mocked(loadManifest).mockResolvedValue(gmailManifest(false))
+        it('ignores newInstance on a paid app', async () => {
+            vi.mocked(loadManifest).mockResolvedValue(gmailManifest(true))
 
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'agent-own', slug: 'gmail', newInstance: true })).resolves.toMatchObject({ key: 'gmail' })
 
             expect(allocateServiceInstance).not.toHaveBeenCalled()
-            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(false), ACTOR, undefined)
+            expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(true), ACTOR, undefined)
         })
 
         it('refuses an app the catalog does not know', async () => {
