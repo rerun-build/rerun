@@ -92,6 +92,13 @@ describe('classifyChatError', () => {
         expect(classifyChatError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')).toBe('provider_error')
     })
 
+    it('tells a custom endpoint 402 apart from the Moldwright credit', () => {
+        expect(classifyChatError('AI_APICallError: Provider returned error: Your team 4021a7 has either used all available credits or reached its monthly spending limit.')).toBe('provider_error')
+        expect(classifyChatError('AI_APICallError: Provider returned error: Payment Required')).toBe('provider_error')
+        expect(classifyChatError('AI_APICallError: Payment Required')).toBe('budget')
+        expect(classifyChatError('rerun_budget_exhausted')).toBe('budget')
+    })
+
     it('tells a rejected thinking replay apart from a refusal', () => {
         const fromApi = 'ProviderRefusedError: Provider returned error: messages.25.content.0: Invalid `signature` in `thinking` block. The block is bound to a different conversation. The `tools` list differs from the one this block was created with.'
         const pastedWithoutBackticks = 'ProviderRefusedError: Provider returned error: messages.402.content.0: Invalid signature in thinking block. The block is bound to a different conversation.'
@@ -187,6 +194,28 @@ describe('describeSubscriptionLimit', () => {
             resetsAt: '4:44 PM',
         })
         expect(friendlyError("AI_APICallError: You've hit your session limit · resets 6:50pm (UTC)")).toContain('It refills at 6:50pm (UTC)')
+    })
+
+    it('names an OpenAI API account out of credits', () => {
+        const noCredits = 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.'
+        expect(classifyChatError(noCredits)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(noCredits)).toEqual({ plan: 'openai', scope: 'credits' })
+        expect(chatErrorTitle('usage_limit', noCredits)).toBe('OpenAI API credits used up')
+        expect(friendlyError(noCredits)).toBe('Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.')
+    })
+
+    it('names OpenAI on the sentence the engine stores', () => {
+        const stored = 'OpenAiCreditsError: OpenAI API credits used up: You exceeded your current quota, please check your plan and billing details.'
+        expect(classifyChatError(stored)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'openai', scope: 'credits' })
+        expect(chatErrorTitle('usage_limit', stored)).toBe('OpenAI API credits used up')
+    })
+
+    it('does not send an OpenAI-compatible gateway out of credits to OpenAI', () => {
+        for (const message of ['AI_APICallError: You have no credits remaining on this gateway.', 'Provider returned error: {"error":{"code":"insufficient_quota","message":"Quota used"}}']) {
+            expect(classifyChatError(message)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(message).plan).toBeNull()
+        }
     })
 
     it('falls back to a plan-less description when nothing names a vendor', () => {
@@ -311,6 +340,7 @@ describe('the English copy of a spent subscription', () => {
         [{ plan: 'claude', scope: 'model', modelName: 'Opus' }, 'Claude Opus limit reached', 'Your Claude plan has reached its Opus limit. The other Claude models still run: switch to one of them.'],
         [{ plan: 'claude', scope: 'session', resetsAt: '3pm' }, 'Claude session limit reached', 'Your Claude plan has used up its current usage window. It refills at 3pm; switch this coworker to another model in the meantime.'],
         [{ plan: 'chatgpt', scope: 'session' }, 'ChatGPT usage limit reached', 'Your ChatGPT plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime.'],
+        [{ plan: 'openai', scope: 'credits' }, 'OpenAI API credits used up', 'Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.'],
     ]
 
     it.each(cases)('%o', (limit, title, message) => {

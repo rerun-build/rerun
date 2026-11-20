@@ -19,6 +19,7 @@ vi.mock('./exec.js', async importOriginal => ({
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const {
     artifactArgs,
+    cleanAptCache,
     currentLink,
     defaultLayoutOptions,
     downloadArtifact,
@@ -262,6 +263,14 @@ describe('sweepRootCaches', () => {
 
     it('leaves the rest of /root/.cache alone: a service running as root keeps its Chromium there', () => {
         expect(ROOT_CACHE_DIRS).not.toContain('/root/.cache')
+    })
+})
+
+describe('cleanAptCache', () => {
+    it('lets apt drop its downloaded packages, as root', () => {
+        rootCalls.length = 0
+        cleanAptCache()
+        expect(rootCalls).toEqual([{ line: 'apt-get clean', input: undefined }])
     })
 })
 

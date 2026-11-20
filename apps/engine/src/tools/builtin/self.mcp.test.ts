@@ -198,7 +198,7 @@ describe('mcp_login', () => {
     it('reports a server that offers no device sign-in', async () => {
         await seedServers([{ name: 'linear', url: 'https://l.example/mcp' }])
         mocks.auth.discoverDeviceAuth.mockRejectedValue(new Error('this MCP server does not advertise a device-code OAuth flow'))
-        expect(await call('mcp_login', { name: 'linear' })).toBe('Could not start sign-in for "linear": this MCP server does not advertise a device-code OAuth flow')
+        expect(await call('mcp_login', { name: 'linear' })).toBe('Could not start sign-in for "linear": this MCP server does not advertise a device-code OAuth flow. Unless the user already skipped its Connect card, call request_mcp_sign_in with name "linear" and end your turn. If they did, tell them it can only be connected from that card or from the Apps panel of this coworker.')
         expect(mocks.auth.savePending).not.toHaveBeenCalled()
     })
 })
@@ -261,6 +261,16 @@ describe('mcp_status', () => {
         mocks.probes.set('local', { ok: false, transport: 'stdio', toolNames: [], error: 'spawn npx ENOENT' })
         expect((await call('mcp_status', {})).split('\n')).toEqual(['connected linear (http): 2 tools — linear_a, linear_b', 'failed local (stdio): spawn npx ENOENT'])
         expect(mocks.probed.every(p => p.env === agentEnv)).toBe(true)
+    })
+
+    it('sends a server that asks for sign-in to the Connect card', async () => {
+        await seedServers([{ name: 'getmcp', url: 'https://g.example/mcp' }, { name: 'keyed', url: 'https://k.example/mcp', headers: { Authorization: 'Bearer ${KEY}' } }])
+        mocks.probes.set('getmcp', { ok: false, transport: 'http', toolNames: [], error: 'Streamable HTTP error: Error POSTing to endpoint: Missing OAuth access token (HTTP 401)' })
+        mocks.probes.set('keyed', { ok: false, transport: 'http', toolNames: [], error: 'Unauthorized (HTTP 401)' })
+        expect((await call('mcp_status', {})).split('\n')).toEqual([
+            'needs sign-in getmcp (http): call request_mcp_sign_in with name "getmcp" and end your turn',
+            'failed keyed (http): Unauthorized (HTTP 401)',
+        ])
     })
 
     it('names the tools the way the CLI of the run shows them', async () => {

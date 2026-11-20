@@ -40,9 +40,11 @@
             "usage": "Limite d'utilisation {plan} atteinte",
             "opencodeCredits": "Crédits OpenCode épuisés",
             "opencodeWindow": "Limite {window, select, weekly {hebdomadaire} other {mensuelle}} OpenCode Go atteinte",
-            "opencode": "Limite OpenCode Go atteinte"
+            "opencode": "Limite OpenCode Go atteinte",
+            "openaiCredits": "Crédits de l'API OpenAI épuisés"
         },
         "messages": {
+            "openaiCredits": "Votre compte API OpenAI n'a plus de crédits. Ajoutez des crédits sur platform.openai.com, ou passez ce coworker sur un autre modèle.",
             "opencodeCredits": "Plus aucun crédit Console. Ajoutez des crédits sur opencode.ai, ou choisissez un modèle Go pour continuer.",
             "opencodeWindowResets": "Votre forfait OpenCode Go a atteint sa limite {window, select, weekly {hebdomadaire} monthly {mensuelle} other {de 5 heures}}. Réinitialisation : {resetsAt}. D'ici là, passez à un modèle Console ou à un autre fournisseur.",
             "opencodeWindow": "Votre forfait OpenCode Go a atteint sa limite {window, select, weekly {hebdomadaire} monthly {mensuelle} other {de 5 heures}}. Passez à un modèle Console ou à un autre fournisseur jusqu'à sa réinitialisation.",

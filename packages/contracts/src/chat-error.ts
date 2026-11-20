@@ -26,8 +26,12 @@ export function stripErrorPrefix(message: string): string {
 export const OPENCODE_CREDITS_USED_UP = 'OpenCode Console credits used up'
 export const OPENCODE_GO_LIMIT = 'OpenCode Go limit reached'
 
+export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
+
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|openai api credits used up|no credits remaining|insufficient_quota/i
+
+export const OPENAI_API_CREDITS = /openai api credits used up|no credits remaining.*platform\.openai\.com/i
 
 export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found/i
 
@@ -43,11 +47,17 @@ const THINKING_REPLAY_REJECTED = /invalid `?signature`? in `?thinking`? block/i
 export const ENGINE_SESSION_NOT_FOUND = 'session not found for this agent'
 export const SESSION_NOT_FOUND = 'session_not_found'
 
+function isMoldwrightCreditRefusal(m: string): boolean {
+    if (m.includes('rerun_budget_exhausted')) return true
+    if (m.includes('provider returned error')) return false
+    return m.includes('payment required') || m.includes('402')
+}
+
 export function classifyChatError(message: string): ChatErrorKind {
     const m = message.toLowerCase()
     if (!m) return 'generic'
     if (THINKING_REPLAY_REJECTED.test(m)) return 'thinking_replay'
-    if (m.includes('rerun_budget_exhausted') || m.includes('payment required') || m.includes('402')) return 'budget'
+    if (isMoldwrightCreditRefusal(m)) return 'budget'
     if (m.includes('run_in_flight')) return 'run_in_flight'
     if (m.includes(SESSION_NOT_FOUND) || m.includes(ENGINE_SESSION_NOT_FOUND)) return 'session_gone'
     if (SUBSCRIPTION_LIMIT.test(m)) return 'usage_limit'

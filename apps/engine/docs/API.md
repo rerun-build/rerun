@@ -155,6 +155,21 @@ cannot be renamed or deleted, only re-curated.
 `connected` says whether the credential is present, without disclosing it. `default` is the box
 default model (see below), `null` when nobody set one.
 
+`planLimits` is the last reading of a subscription's usage windows (`session` for the five-hour
+one, `weekly`, `monthly`, `model` for a per-model bucket), with `capturedAt`, or `null` before any.
+Readings are kept in memory and taken:
+
+- `claude`: in the CLI's Stop hook when a run ends well, from `https://api.anthropic.com/api/oauth/usage`
+  after a run that ended without one, and from the same endpoint on this list, on `ai_status` and at
+  boot when the last reading or attempt is more than 5 minutes old, so usage spent outside Moldwright
+  (Claude Desktop, Claude Code) shows without a run. Only a connection made through the sign-in
+  is read: a token pasted from `claude setup-token` lacks the scope and has no reading.
+- `codex`: from a short app-server session at the end of every run, and on this list, on
+  `ai_status` and at boot when the last attempt is more than 5 minutes old.
+- `opencode`: see OpenCode connections below.
+
+The list answers with the reading it holds, after waiting at most 5 seconds for one already under way.
+
 ### `PUT /connections/default`
 
 The connection and model every agent that named none of its own runs on. One record for the whole

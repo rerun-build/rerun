@@ -10,7 +10,8 @@
         "limits.messages.opencodeWindowResets": "{window} is the limit's period: weekly, monthly, or a 5-hour window. {resetsAt} is a time written by the provider in English, e.g. 'Nov 6, 3:00 PM UTC'.",
         "limits.messages.weeklyResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
         "limits.messages.sessionResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
-        "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider."
+        "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider.",
+        "limits.messages.openaiCredits": "The OpenAI API is a product name, billed apart from a ChatGPT subscription: its account is topped up with prepaid credits. Keep platform.openai.com as it is."
     },
     "generic": "Something went wrong. Try sending your message again.",
     "modelAtCapacity": {
@@ -53,9 +54,11 @@
             "usage": "{plan} usage limit reached",
             "opencodeCredits": "OpenCode credits used up",
             "opencodeWindow": "OpenCode Go {window, select, weekly {weekly} other {monthly}} limit reached",
-            "opencode": "OpenCode Go limit reached"
+            "opencode": "OpenCode Go limit reached",
+            "openaiCredits": "OpenAI API credits used up"
         },
         "messages": {
+            "openaiCredits": "Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.",
             "opencodeCredits": "No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.",
             "opencodeWindowResets": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. It resets {resetsAt}; switch to a Console model or another provider until then.",
             "opencodeWindow": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. Switch to a Console model or another provider until it resets.",

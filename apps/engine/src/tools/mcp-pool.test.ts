@@ -48,12 +48,12 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
         async listTools() {
             return { tools: mcp.listed.map(name => ({ name, inputSchema: { type: 'object' } })) }
         }
-        async callTool(request: { name: string }, _schema: unknown, options: unknown) {
-            mcp.calls.push({ target: this.target, name: request.name, options })
+        async request({ params }: { params: { name: string } }, _schema: unknown, options: unknown) {
+            mcp.calls.push({ target: this.target, name: params.name, options })
             if (mcp.callGate) await mcp.callGate
             if (mcp.rejections.length) throw mcp.rejections.shift()
             if (mcp.answer) return mcp.answer
-            return { content: [{ type: 'text', text: `${request.name} ran` }] }
+            return { content: [{ type: 'text', text: `${params.name} ran` }] }
         }
         async close() {
             mcp.closed.push(this.target)

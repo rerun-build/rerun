@@ -165,6 +165,10 @@ export function sweepRootCaches(dirs: readonly string[] = ROOT_CACHE_DIRS): stri
     return [...dirs]
 }
 
+export function cleanAptCache(): void {
+    asRoot(['apt-get', 'clean'])
+}
+
 export function trimRootFilesystem(): void {
     asRoot(['fstrim', '--quiet-unsupported', '/'])
 }

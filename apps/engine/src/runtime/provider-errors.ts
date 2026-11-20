@@ -1,5 +1,5 @@
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, PROVIDER_OVERLOADED, SUBSCRIPTION_LIMIT, type Provider } from '@moldwright/contracts'
+import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@moldwright/contracts'
 
 export const RUN_ERROR_CODES = {
     usageLimit: 'provider_usage_limit',
@@ -132,6 +132,31 @@ export function refusalReason(error: unknown): string | null {
     return /^provider returned error$/i.test(error.message.trim()) ? null : error.message
 }
 
+function providerErrorCodeOf(error: unknown): string | null {
+    const cause = RetryError.isInstance(error) ? error.lastError : error
+    if (APICallError.isInstance(cause)) {
+        const body = (cause.data ?? (cause.responseBody ? parseJson(cause.responseBody) : null)) as { error?: { code?: unknown } } | null
+        return typeof body?.error?.code === 'string' ? body.error.code : null
+    }
+    if (cause instanceof Error || typeof cause !== 'object' || cause === null) return null
+    const code = (cause as { error?: { code?: unknown } }).error?.code
+    return typeof code === 'string' ? code : null
+}
+
+class OpenAiCreditsError extends Error {
+    constructor(reason: string) {
+        super(`${OPENAI_API_CREDITS_USED_UP}: ${reason}`)
+        this.name = 'OpenAiCreditsError'
+    }
+}
+
+export function openAiCreditsError(provider: Provider, error: unknown): OpenAiCreditsError | null {
+    if (provider !== 'openai') return null
+    if (providerErrorCodeOf(error) !== 'insufficient_quota' && !/no credits remaining/i.test(errorText(error))) return null
+    const cause = RetryError.isInstance(error) ? error.lastError : error
+    return new OpenAiCreditsError(stripErrorPrefix(errorMessageOf(cause)))
+}
+
 function apiCallErrorCode(error: unknown): RunErrorCode | null {
     if (!APICallError.isInstance(error)) return null
     const data = error.data as { exitCode?: unknown; code?: unknown } | undefined
@@ -143,7 +168,7 @@ function apiCallErrorCode(error: unknown): RunErrorCode | null {
 }
 
 export function classifyProviderError(provider: Provider, error: unknown): RunErrorCode | null {
-    const text = `${errorText(error)} ${upstreamReason(error) ?? ''}`
+    const text = `${errorText(error)} ${upstreamReason(error) ?? ''} ${providerErrorCodeOf(error) ?? ''}`
     if (MODEL_NOT_IN_PLAN.test(text)) return RUN_ERROR_CODES.modelNotInPlan
     if (SUBSCRIPTION_LIMIT.test(text)) return RUN_ERROR_CODES.usageLimit
     if (LoadAPIKeyError.isInstance(error)) return RUN_ERROR_CODES.unauthorized

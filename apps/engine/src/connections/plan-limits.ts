@@ -56,6 +56,21 @@ export function planLimitWindowsFromClaude(usage: ClaudePlanUsage | null | undef
     return [...claudeWindow('session', null, limits.five_hour), ...claudeWindow('weekly', null, limits.seven_day), ...models]
 }
 
+type ClaudeLimit = { kind?: string; percent?: number | null; resets_at?: string | null; scope?: { model?: { display_name?: string | null } | null } | null } | null
+
+export type ClaudeUsageAnswer = Omit<NonNullable<ClaudePlanUsage['rate_limits']>, 'model_scoped'> & { limits?: ClaudeLimit[] | null }
+
+export function planLimitWindowsFromClaudeUsage(answer: ClaudeUsageAnswer | null | undefined): PlanLimitWindow[] {
+    if (!answer || typeof answer !== 'object') return []
+    const modelScoped = (Array.isArray(answer.limits) ? answer.limits : []).flatMap(limit => {
+        const name = limit?.kind === 'weekly_scoped' ? limit.scope?.model?.display_name : null
+        return name ? [{ display_name: name, utilization: limit?.percent ?? null, resets_at: limit?.resets_at ?? null }] : []
+    })
+    return planLimitWindowsFromClaude({
+        rate_limits: { five_hour: answer.five_hour, seven_day: answer.seven_day, seven_day_opus: answer.seven_day_opus, seven_day_sonnet: answer.seven_day_sonnet, model_scoped: modelScoped },
+    })
+}
+
 type CodexWindow = { usedPercent?: number | null; windowDurationMins?: number | null; resetsAt?: number | null } | null
 
 export type CodexRateLimits = { rateLimits?: { primary?: CodexWindow; secondary?: CodexWindow } | null }

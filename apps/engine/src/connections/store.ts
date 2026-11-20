@@ -20,6 +20,7 @@ import { withConnectionLock } from './lock.js'
 import { forgetCliModels } from './cli-models.js'
 import { forgetPlanLimits } from './plan-limits.js'
 import { forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'
+import { forgetClaudePlanLimitsAttempt } from './claude-plan-limits.js'
 import { forgetCustomCatalog } from './custom-catalog.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
@@ -78,6 +79,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         forgetPlanLimits(id)
         forgetCliModels(id)
         forgetOpencodePlanLimitsAttempt(id)
+        forgetClaudePlanLimitsAttempt(id)
         forgetCustomCatalog(id)
         forgetCredentialRejected(id)
         await reloadConnection(id)
@@ -95,6 +97,7 @@ export async function deleteConnection(id: string): Promise<void> {
     forgetPlanLimits(id)
     forgetCliModels(id)
     forgetOpencodePlanLimitsAttempt(id)
+    forgetClaudePlanLimitsAttempt(id)
     forgetCustomCatalog(id)
     forgetCredentialRejected(id)
     await rm(connectionDir(id), { recursive: true, force: true })

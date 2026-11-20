@@ -1,6 +1,6 @@
 import { mcpToolNameFor, resolveTransport } from './mcp.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
-import { loadToken } from './mcp-auth.js'
+import { loadToken, serverCarriesCredential } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
 import type { Provider } from '@moldwright/contracts'
 import type { LoadedAgent } from '../agents/types.js'
@@ -28,11 +28,13 @@ export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, hel
     if (agent.config.mcpServers.length === 0) return ''
     const states = await connectorServerStates(agent.id)
     const toolCounts = heldBack ? mcpServerToolCounts(heldBack) : null
+    const { enabled, allowToolInstall } = agent.config.selfImprovement
+    const signInStep = enabled && allowToolInstall ? 'call request_mcp_sign_in with its name and end your turn' : 'ask the user to connect it from the Apps panel of this coworker'
     const lines = await Promise.all(
         agent.config.mcpServers.map(async server => {
             const transport = resolveTransport(server)
             const state = states.get(server.name)
-            let auth = 'not authenticated — call mcp_login if its tools fail'
+            let auth = transport === 'stdio' ? 'local command' : serverCarriesCredential(server) ? 'authenticated with a key in its url' : `not signed in — if its tools answer that sign-in is required, ${signInStep}`
             if (state) auth = connectorAuth(state, states)
             else if (Object.keys(server.headers).length > 0) auth = 'authenticated via request headers'
             else if (await loadToken(agent.id, server.name).catch(() => null)) auth = 'authenticated (OAuth)'

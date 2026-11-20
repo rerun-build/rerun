@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { PROVIDER_LABELS, creditsFromMicros, type HubMoldwrightCredit, type Provider } from '@moldwright/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
+import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { readBoxDefault } from '../../connections/default.js'
 import { toSummary } from '../../connections/loader.js'
@@ -60,6 +61,7 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: async () => {
                 const connections = await listConnections()
+                refreshStaleClaudePlanLimits(connections)
                 refreshStaleCodexPlanLimits(connections)
                 refreshStaleOpencodePlanLimits(connections)
                 const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readMoldwrightCredit(ctx), answeringModel(ctx.provider, ctx.model)])

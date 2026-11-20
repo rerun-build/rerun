@@ -13,8 +13,9 @@ const { mcpDir, mcpTokenPath, workspaceDir } = await import('../config/paths.js'
 
 type Server = { name: string; transport?: 'stdio' | 'sse' | 'http'; command?: string; url?: string; args: string[]; env: Record<string, string>; headers: Record<string, string> }
 
-function agentWith(id: string, servers: Array<Partial<Server> & { name: string }>, suggestService = true) {
-    return { id, env: {}, config: { tools: { suggestService }, mcpServers: servers.map(s => ({ args: [], env: {}, headers: {}, ...s })) } } as any
+function agentWith(id: string, servers: Array<Partial<Server> & { name: string }>, suggestService = true, allowToolInstall = true) {
+    const selfImprovement = { enabled: true, allowToolInstall, allowSoulEdit: true, autoMemory: true }
+    return { id, env: {}, config: { tools: { suggestService }, selfImprovement, mcpServers: servers.map(s => ({ args: [], env: {}, headers: {}, ...s })) } } as any
 }
 
 async function writeRegistry(id: string, services: Record<string, unknown>): Promise<void> {
@@ -43,8 +44,20 @@ describe('buildMcpIndex', () => {
         expect(index.split('\n\n')[1].split('\n')).toEqual([
             '- headered (http): authenticated via request headers',
             '- oauthed (sse): authenticated (OAuth)',
-            '- local (stdio): not authenticated — call mcp_login if its tools fail',
+            '- local (stdio): local command',
         ])
+    })
+
+    it('sends a server without a sign-in to the Connect card, or to the Apps panel when the agent has no card', async () => {
+        const servers = [{ name: 'getmcp', url: 'https://g.example/mcp' }]
+        expect(await buildMcpIndex(agentWith('idx-signin', servers))).toContain('- getmcp (http): not signed in — if its tools answer that sign-in is required, call request_mcp_sign_in with its name and end your turn')
+        expect(await buildMcpIndex(agentWith('idx-signin-off', servers, true, false))).toContain('- getmcp (http): not signed in — if its tools answer that sign-in is required, ask the user to connect it from the Apps panel of this coworker')
+    })
+
+    it('does not send a server dialed with a key in its url to the Connect card', async () => {
+        const index = await buildMcpIndex(agentWith('idx-keyed-url', [{ name: 'keyed', url: 'https://k.example/mcp?key=${KEY}' }]))
+        expect(index).toContain('- keyed (http): authenticated with a key in its url')
+        expect(index).not.toContain('request_mcp_sign_in')
     })
 
     it('gives the tool name format of the model the run is on', async () => {
@@ -67,12 +80,12 @@ describe('buildMcpIndex', () => {
         expect(index.split('\n\n')[1].split('\n')).toEqual(['- linear (http): authenticated via request headers, 2 tools', '- down (http): authenticated via request headers, 0 tools'])
     })
 
-    it('treats an unreadable token or an unusable server name as not authenticated', async () => {
+    it('treats an unreadable token or an unusable server name as not signed in', async () => {
         await mkdir(mcpDir('idx-broken'), { recursive: true })
         await writeFile(mcpTokenPath('idx-broken', 'corrupt'), '{', 'utf8')
         const index = await buildMcpIndex(agentWith('idx-broken', [{ name: 'corrupt', url: 'https://c.example/mcp' }, { name: 'bad/name', url: 'https://b.example/mcp' }]))
-        expect(index).toContain('- corrupt (http): not authenticated')
-        expect(index).toContain('- bad/name (http): not authenticated')
+        expect(index).toContain('- corrupt (http): not signed in')
+        expect(index).toContain('- bad/name (http): not signed in')
     })
 
     it('takes a catalog app server status from the registry, not from its hub headers', async () => {
