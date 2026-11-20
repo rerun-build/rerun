@@ -9,14 +9,22 @@ process.env.RERUN_DATA_DIR = dataDir
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example.com'
 process.env.RERUN_API_KEY = 'hub-key'
 
-const draft = { value: { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' } as unknown, fail: false }
+const draft = { noObject: false, plainText: 'Pull the numbers, write it, send it.', value: { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' } as unknown, fail: false }
 
 vi.mock('../agents/structured.js', () => ({
     generateStructured: async () => {
         if (draft.fail) throw new Error('model is down')
+        if (draft.noObject) throw new NoObjectGeneratedError({ message: 'No object generated', text: 'prose', response: undefined as never, usage: undefined as never, finishReason: 'stop' })
         return draft.value
     },
 }))
+
+vi.mock('ai', async importOriginal => ({
+    ...(await importOriginal<typeof import('ai')>()),
+    generateText: async () => ({ text: `  ${draft.plainText}\n` }),
+}))
+
+const { NoObjectGeneratedError } = await import('ai')
 
 const calls = { writtenBy: [] as any[], cliAuth: [] as { provider: string; connection: string | undefined }[], codexSync: [] as (string | undefined)[] }
 
@@ -80,6 +88,7 @@ beforeEach(() => {
     calls.cliAuth = []
     calls.codexSync = []
     draft.fail = false
+    draft.noObject = false
     draft.value = { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' }
 })
 
@@ -124,6 +133,44 @@ describe('applySkillProposal', () => {
         const after = await getSkillProposal(id, row.id)
         expect(after?.status).toBe('failed')
         expect(after?.error).toBe('model is down')
+    })
+
+    it('writes the body from a plain-text pass when the provider cannot produce JSON', async () => {
+        draft.noObject = true
+        draft.plainText = 'Pull the numbers, write it, send it.'
+        const row = await accepted({ mode: 'create', slug: null, title: 'Plain text report' })
+
+        await applySkillProposal(agent, row)
+
+        const written = await readFile(resolve(skillDir(id, 'plain-text-report'), 'SKILL.md'), 'utf8')
+        expect(written).toContain('name: Plain text report')
+        expect(written).toContain('description: Always end a post with a CTA')
+        expect(written).toContain('Pull the numbers, write it, send it.')
+        expect((await getSkillProposal(id, row.id))?.status).toBe('applied')
+    })
+
+    it('keeps the name and description of the skill it edits on the plain-text pass', async () => {
+        await writeSkillFolder(id, { slug: 'plain-edit', name: 'Plain edit', description: 'Original description', body: 'Original body.', files: [] })
+        draft.noObject = true
+        draft.plainText = 'Revised body.'
+        const row = await accepted({ mode: 'edit', slug: 'plain-edit', title: 'Something else' })
+
+        await applySkillProposal(agent, row)
+
+        const written = await readFile(resolve(skillDir(id, 'plain-edit'), 'SKILL.md'), 'utf8')
+        expect(written).toContain('name: Plain edit')
+        expect(written).toContain('description: Original description')
+        expect(written).toContain('Revised body.')
+    })
+
+    it('marks the proposal failed when the plain-text pass comes back empty', async () => {
+        draft.noObject = true
+        draft.plainText = '   '
+        const row = await accepted({ mode: 'create', slug: null, title: 'Empty draft' })
+
+        await applySkillProposal(agent, row)
+
+        expect((await getSkillProposal(id, row.id))?.status).toBe('failed')
     })
 
     it('fails when the target skill was deleted between proposal and click', async () => {
