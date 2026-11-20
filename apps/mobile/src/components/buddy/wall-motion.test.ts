@@ -1,4 +1,4 @@
-import { inverted, liftedBy, multiplied, stretchedFrom } from '@/components/buddy/wall-motion'
+import { inverted, multiplied, stretchedFrom } from '@/components/buddy/wall-motion'
 import type { Matrix } from '@/components/orb/orb-motion'
 
 function applied([a, b, c, d, e, f]: number[], x: number, y: number) {
@@ -8,7 +8,6 @@ function applied([a, b, c, d, e, f]: number[], x: number, y: number) {
 describe('wall motion', () => {
     it('leaves the walls alone at rest', () => {
         expect(stretchedFrom(10, 1)).toEqual([1, 0, 0, 1, 0, 0])
-        expect(liftedBy(0)).toEqual([1, 0, 0, 1, 0, 0])
     })
 
     it('grows the walls from their floor line', () => {
@@ -33,11 +32,5 @@ describe('wall motion', () => {
         expect(applied(closing, onTheLine.x, onTheLine.y).y).toBeCloseTo(onTheLine.y)
         expect(applied(closing, above.x, above.y).x).toBeCloseTo(above.x)
         expect(applied(closing, above.x, above.y).y).toBeCloseTo(onTheLine.y - 3 * 0.08)
-    })
-
-    it('lifts the top by as much as the walls grew', () => {
-        const depth = 20
-        const stretch = 1.2
-        expect(applied(liftedBy((1 - stretch) * depth), 0, 5).y).toBeCloseTo(1)
     })
 })

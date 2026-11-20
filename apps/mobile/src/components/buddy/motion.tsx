@@ -1,12 +1,5 @@
-import { createContext, use, type ComponentType, type ReactNode } from 'react'
-import Animated, { interpolate, useAnimatedProps, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
-import { G, Rect, type GProps } from 'react-native-svg'
-
-import { liftedBy, stretchedFrom } from './wall-motion'
-
-// G takes a `matrix` and hands it to the native group as is; its typings only list the shorthands.
-const AnimatedMatrixG = Animated.createAnimatedComponent(G as ComponentType<GProps & { matrix?: number[] }>)
-const AnimatedRect = Animated.createAnimatedComponent(Rect)
+import { createContext, use, type ReactNode } from 'react'
+import { interpolate, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 
 // One clock for every buddy on screen, in seconds. Each buddy reads it with its own offset, so a
 // list of them never bobs nor blinks in step.
@@ -26,12 +19,6 @@ export function BuddyClock({ children, resting }: { children: ReactNode; resting
 
 export type BuddyMotion = { kind: 'bob' | 'shudder' | null; offset: number; blinkOffset: number }
 
-const Motion = createContext<BuddyMotion | null>(null)
-
-export function BuddyMotionScope({ motion, children }: { motion: BuddyMotion | null; children: ReactNode }) {
-    return <Motion value={motion}>{children}</Motion>
-}
-
 // The web keyframes iso-buddy-bob-wall and iso-buddy-shudder-wall: how tall the walls stand, the
 // top riding on them.
 const BOB = { period: 1.2, at: [0, 0.35, 0.62, 0.78, 1], stretch: [1, 1.2, 0.92, 1.02, 1] }
@@ -39,57 +26,42 @@ const SHUDDER = { period: 2.4, at: [0, 0.6, 0.66, 0.72, 0.78, 0.84, 1], stretch:
 const BLINK = { period: 4.6, at: [0, 0.92, 0.95, 1], scale: [1, 1, 0.08, 1] }
 const SWEEP_PERIOD = 2.6
 
-export function useStretch() {
+// Each of these is a value read off the clock, for a view to move by its transform. A value that
+// stands still is not handed the clock at all: holding it would run its worklet on every frame. One
+// that keeps its value between two frames wakes nothing that reads it.
+
+// How tall the walls stand, 1 at rest.
+export function useStretch(motion: BuddyMotion | null) {
     const clock = use(Clock)
-    const motion = use(Motion)
     const keys = motion?.kind === 'bob' ? BOB : motion?.kind === 'shudder' ? SHUDDER : null
     const offset = motion?.offset ?? 0
-    const stretch = () => {
-        'worklet'
-        if (!clock || !keys) return 1
-        const phase = ((clock.value + offset) % keys.period) / keys.period
+    const ticking = keys ? clock : null
+    return useDerivedValue(() => {
+        if (!ticking || !keys) return 1
+        const phase = ((ticking.value + offset) % keys.period) / keys.period
         return interpolate(phase, keys.at, keys.stretch)
-    }
-    return { stretch, still: !clock || !keys }
-}
-
-// Scales its children's height from the horizontal line `y`, the way a wall grows from the floor.
-export function GrowsFrom({ y, children }: { y: number; children: ReactNode }) {
-    const { stretch, still } = useStretch()
-    const animatedProps = useAnimatedProps(() => ({ matrix: stretchedFrom(y, stretch()) }))
-    if (still) return <G>{children}</G>
-    return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
-}
-
-// The top face, lifted by as much as the walls under it grew.
-export function RidesOnWalls({ depth, children }: { depth: number; children: ReactNode }) {
-    const { stretch, still } = useStretch()
-    const animatedProps = useAnimatedProps(() => ({ matrix: liftedBy((1 - stretch()) * depth) }))
-    if (still) return <G>{children}</G>
-    return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
+    })
 }
 
 // How open the eyes stand, 1 until they blink: `offset` keeps two faces from blinking together, null
-// holds them open. The value only changes while they close and open again, so nothing that reads it
-// runs in between.
+// holds them open.
 export function useBlinkScale(offset: number | null) {
     const clock = use(Clock)
+    const ticking = offset === null ? null : clock
     return useDerivedValue(() => {
-        if (!clock || offset === null) return 1
-        const phase = ((clock.value + offset) % BLINK.period) / BLINK.period
+        if (!ticking || offset === null) return 1
+        const phase = ((ticking.value + offset) % BLINK.period) / BLINK.period
         return interpolate(phase, BLINK.at, BLINK.scale)
     })
 }
 
-// A band of light crossing the top while the agent works.
-export function Sweep({ x, y, width, height, fill }: { x: number; y: number; width: number; height: number; fill: string }) {
+// How far the band of light has crossed the top of a buddy at work, from 0 to 1.
+export function useSweep(working: boolean) {
     const clock = use(Clock)
-    const motion = use(Motion)
-    const animatedProps = useAnimatedProps(() => {
-        if (!clock || !motion) return { x: x - 60 }
-        const phase = (clock.value % SWEEP_PERIOD) / SWEEP_PERIOD
-        const eased = phase < 0.5 ? 2 * phase * phase : 1 - (-2 * phase + 2) ** 2 / 2
-        return { x: x - 60 + eased * 160 }
+    const ticking = working ? clock : null
+    return useDerivedValue(() => {
+        if (!ticking) return 0
+        const phase = (ticking.value % SWEEP_PERIOD) / SWEEP_PERIOD
+        return phase < 0.5 ? 2 * phase * phase : 1 - (-2 * phase + 2) ** 2 / 2
     })
-    return <AnimatedRect animatedProps={animatedProps} y={y} width={width} height={height} fill={fill} />
 }
