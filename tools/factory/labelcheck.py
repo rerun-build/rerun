@@ -82,9 +82,15 @@ IDLE_PLAN = ("blocked", "lost")
 DONE_ACCEPT = ("accepted", "closed")
 
 
+GAPS_TITLE = re.compile(r"^Gaps of #(\d+)\b")
+
+
 def open_parents(issues):
     parents = set()
     for i in issues or ():
+        m = GAPS_TITLE.match(i.get("title") or "")
+        if m:
+            parents.add(int(m.group(1)))
         for m in PART_OF.finditer(i.get("body") or ""):
             parents.add(int(m.group(1)))
     return parents

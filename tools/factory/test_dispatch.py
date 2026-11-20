@@ -176,7 +176,7 @@ class World:
             return ""
         if a[:2] == ["issue", "list"] and "--search" in a and any(x.startswith("Part of #") for x in a):
             return json.dumps(self.open_children if self.search_finds else [])
-        if a[:2] == ["issue", "list"] and "--search" not in a and "--label" not in a and "number,body" in a:
+        if a[:2] == ["issue", "list"] and "--search" not in a and "--label" not in a and ("number,body" in a or "number,title,body" in a):
             return json.dumps(self.open_children)
         if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
             return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])

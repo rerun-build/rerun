@@ -3,6 +3,7 @@ import re
 
 import cutshape
 import escapes
+import labelcheck
 import pools
 
 DONE = ("merged", "superseded")
@@ -125,13 +126,12 @@ class Station:
         return [(r["agent"], int(r["copy"])) for r in self.live().values()]
 
     def open_children(self, n):
-        raw = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number,body",
+        raw = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number,title,body",
                                   "--limit", str(OPEN_LIMIT)]))
         if len(raw) >= OPEN_LIMIT:
             self.log(n, "acceptance waits: the open issue list reached %d, so not every open child can be seen" % OPEN_LIMIT)
             return raw
-        pattern = re.compile(r"Part of\W*#%d\b" % n)
-        return [i for i in raw if pattern.search(i.get("body") or "")]
+        return [i for i in raw if n in labelcheck.open_parents((i,))]
 
     def closed_children(self, n):
         raw = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed", "--search",
@@ -247,6 +247,10 @@ class Station:
         return self.store.get_all(job)
 
     def accept(self, n, line):
+        if self.open_children(n):
+            self.store.set("accept:%d" % n, "state", "gaps")
+            self.log(n, "acceptance deferred: open children or gap issues remain")
+            return
         name = self.name(n)
         self.gh(["issue", "close", str(n), "-R", self.repo, "--comment", "Accepted by %s.\n%s" % (name, line)])
         self.store.set("accept:%d" % n, "state", "accepted")

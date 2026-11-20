@@ -1,7 +1,10 @@
 import json
+import os
 import sqlite3
+import sys
 import unittest
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from test_dispatch import Base, HEAD, World, ready, wf
 
 ACCEPTOR = {"coworkers": [{"id": "a1", "name": "BARBARA", "runs": 1}]}
@@ -166,6 +169,40 @@ class Acceptance(Base):
         self.merge_child()
         self.tick(12)
         self.assertEqual(self.sent_to("a1"), [])
+
+
+    def test_an_open_gaps_of_title_issue_without_part_of_holds_the_parent(self):
+        self.w.open_children = [{"number": 30, "title": "Gaps of #9: missing menu", "body": "The menu is missing.\n"}]
+        self.merge_child()
+        self.tick(12)
+        self.assertEqual(self.sent_to("a1"), [])
+        self.assertIsNone(self.kv("accept:9", "state"))
+
+    def test_a_gap_or_child_opened_before_close_aborts_the_closure(self):
+        self.merge_child()
+        self.tick_until(lambda: self.sent_to("a1"))
+        gh = self.d.acceptance.gh
+        injected = []
+
+        def racing_gh(args):
+            a = list(args)
+            if a[:2] == ["issue", "list"] and "--state" in a and a[a.index("--state") + 1] == "open" and "number,title,body" in a and not injected:
+                injected.append(True)
+                self.w.open_children = [{"number": 30, "title": "Gaps of #9: missing menu", "body": "No Part of line.\n"}]
+            return gh(a)
+        self.d.acceptance.gh = racing_gh
+        self.w.finish("a1", "checked\nACCEPTED: every ask holds on dev")
+        self.tick()
+        self.assertEqual(self.w.closed, [])
+        self.assertEqual(self.kv("accept:9", "state"), "gaps")
+        self.tick(12)
+        self.assertEqual(len(self.sent_to("a1")), 1)
+        self.w.open_children = []
+        self.tick_until(lambda: len(self.sent_to("a1")) == 2)
+        self.w.finish("a1", "checked\nACCEPTED: every ask holds on dev")
+        self.tick()
+        self.assertEqual(self.w.closed, [(9, "Accepted by BARBARA.\nACCEPTED: every ask holds on dev")])
+        self.assertEqual(self.kv("accept:9", "state"), "accepted")
 
     def test_the_brief_asks_for_one_issue_per_parent_listing_every_gap(self):
         self.merge_child()

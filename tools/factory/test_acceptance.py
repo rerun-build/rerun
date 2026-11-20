@@ -146,5 +146,90 @@ class CrashTests(unittest.TestCase):
         revived = st.revive(12, self.store.get_all("accept:12"))
         self.assertEqual((revived["state"], revived["revived"], revived["sends"]), ("unsent", "1", "0"))
 
+
+    def test_does_not_restart_or_accept_parent_while_gaps_of_title_issue_is_open_or_child_reopens_mid_run(self):
+        open_issues, closed, logs = [{"number": 99, "title": "Gaps of #10: missing validation", "body": "Needs validation."}], [], []
+        runs = {"r1": {"status": "done", "output": "checked\nACCEPTED: every ask met"}}
+
+        def gh(args):
+            if args[:2] == ["issue", "list"] and "--state" in args and args[args.index("--state") + 1] == "open":
+                fields = args[args.index("--json") + 1].split(",")
+                return json.dumps([{k: i[k] for k in fields if k in i} for i in open_issues])
+            if args[:2] == ["issue", "list"]:
+                return "[]"
+            if args[:2] == ["issue", "close"]:
+                closed.append(int(args[2]))
+                return ""
+            return json.dumps(dict(PARENT, number=10, state="OPEN", comments=[]))
+
+        def account(cmd, args):
+            if cmd == "send_message":
+                return {"runId": "r1"}
+            if cmd == "get_run":
+                return runs[args["runId"]]
+            return {}
+
+        st = acceptance.Station(self.cfg, self.store, account, gh, lambda: self.now, lambda n, m: logs.append((n, m)))
+        self.assertEqual(st.open_children(10), [{"number": 99, "title": "Gaps of #10: missing validation", "body": "Needs validation."}])
+        self.assertEqual(st.open_children(1), [])
+
+        kids = [job(11, "merged", 10, 70)]
+        st.once(1, kids)
+        self.assertEqual(self.store.get_all("accept:10"), {})
+
+        open_issues.clear()
+        st.once(1, kids)
+        self.assertEqual(self.store.get_all("accept:10")["state"], "running")
+
+        open_issues.append({"number": 12, "title": "Follow-up slice", "body": "**Part of**: #10\n"})
+        st.once(2, kids)
+        self.assertEqual(closed, [])
+        self.assertEqual(self.store.get_all("accept:10")["state"], "gaps")
+
+        open_issues[:] = [{"number": 99, "title": "Gaps of #10: missing validation", "body": "Needs validation."}]
+        st.once(6, kids)
+        self.assertEqual(self.store.get_all("accept:10")["state"], "gaps")
+
+        open_issues.clear()
+        st.once(11, kids)
+        self.assertEqual(self.store.get_all("accept:10")["state"], "running")
+        st.once(12, kids)
+        self.assertEqual(closed, [10])
+        self.assertEqual(self.store.get_all("accept:10")["state"], "accepted")
+
+    def test_accept_rechecks_open_children_immediately_before_close(self):
+        open_issues, closed, list_calls = [], [], []
+
+        def gh(args):
+            if args[:2] == ["issue", "list"] and "--state" in args and args[args.index("--state") + 1] == "open":
+                list_calls.append(len(open_issues))
+                if len(list_calls) == 2:
+                    open_issues.append({"number": 99, "title": "Gaps of #10: created before close", "body": ""})
+                fields = args[args.index("--json") + 1].split(",")
+                return json.dumps([{k: i[k] for k in fields if k in i} for i in open_issues])
+            if args[:2] == ["issue", "list"]:
+                return "[]"
+            if args[:2] == ["issue", "close"]:
+                closed.append(int(args[2]))
+                return ""
+            return json.dumps(dict(PARENT, number=10, state="OPEN", comments=[]))
+
+        def account(cmd, _args):
+            if cmd == "send_message":
+                return {"runId": "r1"}
+            if cmd == "get_run":
+                return {"status": "done", "output": "checked\nACCEPTED: every ask met"}
+            return {}
+
+        st = acceptance.Station(self.cfg, self.store, account, gh, lambda: self.now, lambda *a: None)
+        kids = [job(11, "merged", 10, 70)]
+        st.once(1, kids)
+        self.assertEqual(list_calls, [0])
+        self.assertEqual(self.store.get_all("accept:10")["state"], "running")
+        st.once(2, kids)
+        self.assertEqual(len(list_calls), 2)
+        self.assertEqual(closed, [])
+        self.assertEqual(self.store.get_all("accept:10")["state"], "gaps")
+
 if __name__ == "__main__":
     unittest.main()

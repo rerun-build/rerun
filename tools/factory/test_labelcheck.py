@@ -213,8 +213,9 @@ class Gaps(unittest.TestCase):
         self.assertTrue(labelcheck.busy(10, data(kv={"classify:10": {"state": "running"}})))
         self.assertTrue(labelcheck.busy(10, data(kv={"classify:10": {"run": "r1"}})))
         self.assertFalse(labelcheck.busy(10, data(kv={"classify:10": {"run": ""}})))
-        kids = [issue(99, body="**Part of**: #10\n"), issue(100, body="Part of #11\n")]
+        kids = [issue(99, body="**Part of**: #10\n"), issue(100, title="Gaps of #11: missing validation", body="Needs validation.\n")]
         self.assertTrue(labelcheck.busy(10, data(), kids))
+        self.assertTrue(labelcheck.busy(11, data(), kids))
         self.assertFalse(labelcheck.busy(12, data(), kids))
         self.assertEqual(self.run_twice(issues=kids), ([], []))
         self.assertEqual(self.closes(), [])
