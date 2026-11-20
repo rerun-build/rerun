@@ -139,6 +139,8 @@ Status words: **done** (merged), **trial** (live and being measured), **next** (
 
 From the ChatGPT review of this file (2026-11-20), checked against the factory's data: idea 5 (where the waste is, in money), 13 (packets that remove it), 3 (finish the planner trial), 14 (duplication), 15 (station choice from our outcomes), 12 and 7 (review), 16 (replay set). Nothing new is added to this list until some of these have results.
 
+One line kept from that review: the factory may change its own code through the normal controls (review, tests, CI, merge rules); the rules agents operate under (the `CLAUDE.md` files, the constitution, the gates themselves) change only by the owner. Automatic improvement of the factory is allowed; automatic loosening of its governing rules is not.
+
 ## The guide, mapped to the factory
 
 As of 2026-11-19, the factory already runs builder and verifier separation (builder never reviews its own work, prover is not the reviewer, BARBARA accepts against the original asks, CI and "Done-test red before green" on the real commit, required last lines `PR:`, `VERDICT:`, `PROOF:`), independent lanes (the cut's Files, Depends on and worker per child, path leases, CI on dev as integration), a plan review panel close to a council, specialist review (LINUS, BRUCE; risk routing queued as #1587), explicit states (`tools/factory/states.py`, the registry), evidence in the ledger, failure handling (timeouts, bounded retries, failure causes, the resolver, dev red self-heal) and cost per green issue in the digest. Its gaps are ideas 11 and 12, idea 7, and coworker shell commands running in the engine's container (recorded under secure-claude-code below).
