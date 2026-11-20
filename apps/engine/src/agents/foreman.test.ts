@@ -114,12 +114,51 @@ describe('foreman', () => {
         expect(names).toEqual(expect.arrayContaining(['memory_write', 'memory_recall', 'skill_create', 'skill_propose', 'schedule_create', 'verbosity_set']))
     })
 
-    it('cannot rewrite who it is, install on the box, or take what needs a place on the board', async () => {
+    it('cannot rewrite who it is or install on the box', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['soul_update', 'tool_install', 'mcp_register', 'request_mcp_sign_in', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'install_complete']) expect(names).not.toContain(name)
-        expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+        for (const name of ['soul_update', 'tool_install', 'mcp_register', 'install_complete']) expect(names).not.toContain(name)
+    })
+
+    it('holds every tool of a coworker on top of its account tools', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        expect(names).toEqual(
+            expect.arrayContaining([
+                'db_query',
+                'db_execute',
+                'trigger_create',
+                'team_status',
+                'ai_status',
+                'notify_user',
+                'suggest_service',
+                'request_secret',
+                'rerun_hub_service_search',
+                'rerun_hub_service_install',
+                'card_file',
+                'card_table',
+                'table_view_save',
+            ]),
+        )
+        expect((await getAgent(FOREMAN_AGENT_ID)).config.tools).toEqual(expect.objectContaining({ db: true, trigger: true, team: true, aiProviders: true, notify: true, hub: true, suggestService: true, requestSecret: true, paidData: true, computer: true }))
+    })
+
+    it('publishes nothing and searches the docs through its brief only', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        for (const name of ['rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'rerun_hub_search_docs']) expect(names).not.toContain(name)
+    })
+
+    it('keeps whether paid data asks before spending across a reboot', async () => {
+        const foreman = await getAgent(FOREMAN_AGENT_ID)
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...foreman.config, paidDataAlwaysAllow: true })
+        await ensureForeman()
+        expect((await getAgent(FOREMAN_AGENT_ID)).config.paidDataAlwaysAllow).toBe(true)
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...(await getAgent(FOREMAN_AGENT_ID)).config, paidDataAlwaysAllow: false })
+        await ensureForeman()
     })
 
     it('works on the computers people linked, as any coworker', async () => {
@@ -129,14 +168,6 @@ describe('foreman', () => {
         await close()
         await forgetComputer('c1')
         expect(names).toEqual(expect.arrayContaining(['remote_exec', 'remote_file_read', 'request_computer_access']))
-    })
-
-    it('shows the files it made, without the table cards', async () => {
-        const { tools, close } = await foremanToolSet()
-        const names = Object.keys(tools)
-        await close()
-        expect(names).toContain('card_file')
-        for (const name of ['card_table', 'table_view_save', 'table_view_delete']) expect(names).not.toContain(name)
     })
 
     // The CLI bridge only exposes a tool whose input schema is zod: a JSON Schema passed through as
@@ -235,10 +266,14 @@ describe('foreman routes', () => {
         ['PATCH', '/agents/foreman', { model: 'rerun-max', soul: 'hijacked' }],
         ['DELETE', '/agents/foreman', undefined],
         ['POST', '/agents/foreman/duplicate', { name: 'copy' }],
-        ['POST', '/agents/foreman/triggers', { name: 'hook' }],
         ['GET', '/agents/foreman/archive', undefined],
     ])('refuses %s %s', async (method, path, body) => {
         expect((await request(method, path, body)).status).toBe(403)
+    })
+
+    it('opens its webhook triggers and its database like a coworker', async () => {
+        expect((await request('GET', '/agents/foreman/triggers')).status).toBe(200)
+        expect((await request('GET', '/agents/foreman/data/tables')).status).toBe(200)
     })
 
     it('lets the hub read the conversations', async () => {
@@ -262,14 +297,14 @@ describe('foreman routes', () => {
 
     it('keeps the servers connected to it and its response length across a reboot', async () => {
         const servers = [{ name: 'linear', url: 'https://mcp.linear.app/mcp' }]
-        await writeAgentConfig(FOREMAN_AGENT_ID, { ...(await getAgent(FOREMAN_AGENT_ID)).config, mcpServers: servers as never, verbosity: 'concise', description: 'hijacked', tools: { ...(await getAgent(FOREMAN_AGENT_ID)).config.tools, trigger: true } })
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...(await getAgent(FOREMAN_AGENT_ID)).config, mcpServers: servers as never, verbosity: 'concise', description: 'hijacked', tools: { ...(await getAgent(FOREMAN_AGENT_ID)).config.tools, trigger: false } })
 
         await ensureForeman()
         const { config } = await getAgent(FOREMAN_AGENT_ID)
         expect(config.mcpServers.map(server => server.name)).toEqual(['linear'])
         expect(config.verbosity).toBe('concise')
         expect(config.description).not.toBe('hijacked')
-        expect(config.tools.trigger).toBe(false)
+        expect(config.tools.trigger).toBe(true)
 
         await writeAgentConfig(FOREMAN_AGENT_ID, { ...config, mcpServers: [], verbosity: 'normal' })
         await ensureForeman()

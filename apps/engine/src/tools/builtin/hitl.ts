@@ -174,9 +174,9 @@ export function takeoverSummary(input: Record<string, unknown> | undefined): str
     return reason ? `Needs you in the browser: ${reason}` : 'The coworker needs you in the browser'
 }
 
-// Nobody watches a delegate, and the foreman's chat has no card for it.
+// Nobody watches a delegate.
 export function offersTakeover(config: AgentConfig): boolean {
-    return config.tools.browser && !config.ephemeral && config.kind !== 'foreman' && desktopAvailable()
+    return config.tools.browser && !config.ephemeral && desktopAvailable()
 }
 
 // The rules on options and on what goes in the card live in the `asking_the_user` section of the

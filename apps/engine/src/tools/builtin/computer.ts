@@ -54,9 +54,9 @@ type Done = { status: 'done'; screen: [number, number] } & ({ screenshotId: stri
 
 const refused = (reason: string): Refused => ({ status: 'refused', reason })
 
-// Nobody watches a delegate, and the foreman has no screen to show.
+// Nobody watches a delegate.
 export function offersComputer(config: AgentConfig): boolean {
-    return config.tools.computer && !config.ephemeral && config.kind !== 'foreman' && computerAvailable()
+    return config.tools.computer && !config.ephemeral && computerAvailable()
 }
 
 // Decided on the model the run uses, not on the agent's setting: driving a screen means reading its

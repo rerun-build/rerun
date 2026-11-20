@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, TOOL_KEYS, type AgentConfig, type ToolKey } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, TOOL_KEYS, type AgentConfig } from '@rerun/contracts'
 import { configPath, soulPath, workspaceDir } from '../config/paths.js'
 import { writeAgentConfig } from './config-write.js'
 import { agentConfigSchema } from './types.js'
@@ -12,17 +12,11 @@ const FOREMAN_SOUL = `# Chief of Staff
 You are the Chief of Staff of this Rerun workspace: the assistant that sets up and runs the user's team of coworkers from outside the board. Answer in the user's language, lead with the result, and keep it short.
 `
 
-// The orchestrator works on the box like any coworker (files, shell, web, sub-agents, its own memory,
-// skills and routines, the company brain, which it keeps rather than proposes to), on the account
-// through the tools the hub hands it, and on the computers people linked. What stays off is what
-// needs a place on the board (a webhook address, an installation) or the catalog a coworker installs
-// from. Of the cards it keeps only the file tiles: the user cannot reach the server, so a file it
-// made is seen there or not at all. Its message ends on the replies a person sends in one click, like
-// a coworker's.
-const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'memory', 'sharedDb', 'skills', 'schedule', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards', 'remoteComputers', 'quickReplies'])
-
+// The orchestrator holds every tool a coworker holds, switched on as a coworker's are by default, on
+// top of the account tools the hub hands it. Where one of them works differently for it, the
+// difference is written where the tool is built (the brain, the hub catalog).
 function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
-    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, FOREMAN_TOOL_KEYS.has(key)]))
+    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, true]))
     return agentConfigSchema.parse({
         ...kept,
         name: FOREMAN_AGENT_ID,
@@ -36,15 +30,15 @@ function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
     })
 }
 
-type KeptSettings = Pick<AgentConfig, 'connectionId' | 'provider' | 'model' | 'mcpServers' | 'verbosity' | 'proactive'>
+type KeptSettings = Pick<AgentConfig, 'connectionId' | 'provider' | 'model' | 'mcpServers' | 'verbosity' | 'proactive' | 'paidDataAlwaysAllow'>
 
 // What a person, or the foreman itself, set on it: the model it runs on, the servers connected to
-// it, how long its answers are and whether it checks in on its own. Everything else is the code's,
-// so it is all a reboot keeps.
+// it, how long its answers are, whether it checks in on its own and whether paid data still asks
+// before spending. Everything else is the code's, so it is all a reboot keeps.
 async function keptSettings(): Promise<Partial<KeptSettings>> {
     try {
-        const { connectionId, provider, model, mcpServers, verbosity, proactive } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
-        return { connectionId, provider, model, mcpServers, verbosity, proactive }
+        const { connectionId, provider, model, mcpServers, verbosity, proactive, paidDataAlwaysAllow } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
+        return { connectionId, provider, model, mcpServers, verbosity, proactive, paidDataAlwaysAllow }
     } catch {
         return {}
     }

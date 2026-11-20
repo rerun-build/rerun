@@ -143,9 +143,9 @@ describe('offersComputer', () => {
         expect(offersComputer(config())).toBe(false)
     })
 
-    it('skips a delegate nobody watches and the foreman', () => {
+    it('skips a delegate nobody watches, and goes to the foreman like a coworker', () => {
         expect(offersComputer(config({ ephemeral: true }))).toBe(false)
-        expect(offersComputer(config({ kind: 'foreman' }))).toBe(false)
+        expect(offersComputer(config({ kind: 'foreman' }))).toBe(true)
     })
 })
 

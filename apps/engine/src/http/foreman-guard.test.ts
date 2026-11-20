@@ -54,6 +54,15 @@ describe('foremanGuard', () => {
         ['DELETE', '/agents/foreman/mcp/linear/token'],
         ['GET', '/agents/foreman/keys'],
         ['PATCH', '/agents/foreman/keys'],
+        ['GET', '/agents/foreman/triggers'],
+        ['POST', '/agents/foreman/triggers'],
+        ['POST', '/agents/foreman/triggers/new-lead/rotate'],
+        ['GET', '/agents/foreman/data/tables'],
+        ['POST', '/agents/foreman/data/query'],
+        ['POST', '/agents/foreman/data/execute'],
+        ['POST', '/agents/foreman/desktop/session'],
+        ['POST', '/agents/foreman/desktop/takeover'],
+        ['DELETE', '/agents/foreman/desktop/takeover'],
     ])('lets %s %s through', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -64,16 +73,13 @@ describe('foremanGuard', () => {
     })
 
     it.each([
-        ['POST', '/agents/foreman/data/query'],
-        ['GET', '/agents/foreman/triggers'],
-        ['POST', '/agents/foreman/triggers'],
         ['DELETE', '/agents/foreman'],
         ['POST', '/agents/foreman/duplicate'],
         ['GET', '/agents/foreman/archive'],
         ['GET', '/agents/foreman/archive/plan'],
         ['POST', '/agents/foreman/automations/activate'],
         ['GET', '/agents/foreman/tools'],
-        ['GET', '/agents/foreman/desktop'],
+        ['GET', '/agents/foreman/desktopx'],
         ['GET', '/agents/foreman/mcp-servers'],
         ['POST', '/agents/foreman/mcp/linear/token'],
         ['GET', '/agents/foreman/memoriesx'],
@@ -105,13 +111,17 @@ describe('foremanGuard', () => {
         expect((await call('PATCH', '/agents/foreman', '{}')).status).toBe(200)
     })
 
+    it('allows a PATCH that lets paid data spend without asking', async () => {
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify({ paidDataAlwaysAllow: true }))).status).toBe(200)
+    })
+
     it('allows a PATCH that only pins the model', async () => {
         expect((await call('PATCH', '/agents/foreman', JSON.stringify({ connectionId: 'c', provider: 'rerun', model: 'rerun-max' }))).status).toBe(200)
         expect((await call('PATCH', '/agents/foreman/', JSON.stringify({ model: 'rerun-max' }))).status).toBe(200)
     })
 
     it('refuses a model-only PATCH aimed at a sub-route', async () => {
-        expect((await call('PATCH', '/agents/foreman/triggers', JSON.stringify({ model: 'x' }))).status).toBe(403)
+        expect((await call('PATCH', '/agents/foreman/tools', JSON.stringify({ model: 'x' }))).status).toBe(403)
     })
 
     it('leaves every other agent untouched', async () => {

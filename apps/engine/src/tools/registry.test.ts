@@ -116,6 +116,7 @@ describe('buildTools', () => {
     it('offers request_takeover only where a person can be shown the screen', async () => {
         expect(await namesOf(ctxWith())).toContain('request_takeover')
         expect(await namesOf(ctxWith({ ephemeral: true }))).not.toContain('request_takeover')
+        expect(await namesOf(ctxWith({ kind: 'foreman' }))).toContain('request_takeover')
         state.desktop = false
         const names = await namesOf(ctxWith())
         expect(names).toContain('browser_navigate')
@@ -126,7 +127,7 @@ describe('buildTools', () => {
         expect(await namesOf(ctxWith())).toEqual(expect.arrayContaining(['computer', 'computer_open_app']))
         expect(await namesOf(ctxWith({ tools: { computer: false } }))).not.toContain('computer')
         expect(await namesOf(ctxWith({ ephemeral: true }))).not.toContain('computer')
-        expect(await namesOf(ctxWith({ kind: 'foreman' }))).not.toContain('computer')
+        expect(await namesOf(ctxWith({ kind: 'foreman' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'claude' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'codex' }))).toContain('computer')
         // Decided on the model the run uses: an OpenCode model that cannot see never gets the screen.

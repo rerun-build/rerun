@@ -272,7 +272,8 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).toContain(sharedDir())
         expect(prompt).toContain('agent_files_')
         expect(prompt).toContain('<asking_the_user>')
-        expect(prompt).not.toContain('<database>')
+        expect(prompt).toContain('<database>')
+        expect(prompt).toContain('coworker_db_query')
     })
 
     it('carries what it keeps of its own, like a coworker: skills, routines, memories and connected services', async () => {

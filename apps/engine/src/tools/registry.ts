@@ -20,10 +20,10 @@ import { browserTools } from './builtin/browser.js'
 import { visionTools } from './builtin/vision.js'
 import { computerTools, runOffersComputer } from './builtin/computer.js'
 import { notifyTools } from './builtin/notify.js'
-import { hubTools } from './builtin/hub.js'
+import { foremanHubTools, hubTools } from './builtin/hub.js'
 import { paidDataTools } from './builtin/paid-data.js'
 import { paidDataOffered } from '../paid-data/price.js'
-import { cardTools, foremanCardTools } from './builtin/cards.js'
+import { cardTools } from './builtin/cards.js'
 import { askUserTool, offersTakeover, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { installTools } from './builtin/install.js'
 import { foremanTools } from './builtin/foreman.js'
@@ -45,7 +45,8 @@ import { readComputers } from '../remote/store.js'
 // What a check-in of the Chief of Staff may call: it reads the workspace and suggests, nothing more.
 // A list of names rather than of families, so a tool added to a family later is refused until it is
 // named here. Shell, sub-coworkers, calls to coworkers, the browser and the computers, the cards that
-// ask someone, every write and the MCP servers stay out.
+// ask someone, every write and the MCP servers stay out, and so do the team, the credit and the
+// catalog: a check-in reads them through the hub tools of its brief.
 export const CHECKIN_TOOL_NAMES: ReadonlySet<string> = new Set([
     'fs_read',
     'fs_list',
@@ -68,6 +69,10 @@ export const CHECKIN_TOOL_NAMES: ReadonlySet<string> = new Set([
     'brain_proposals',
     'schedule_list',
     'schedule_get',
+    'trigger_list',
+    'trigger_get',
+    'db_query',
+    'db_schema',
     'shared_db_query',
     'shared_db_schema',
     'report_to_member',
@@ -87,6 +92,8 @@ function checkinTools(ctx: RunContext): ToolSet {
         ...(cfg.skills ? skillTools(ctx) : {}),
         ...(cfg.brain ? foremanBrainTools() : {}),
         ...(cfg.schedule ? scheduleTools(ctx) : {}),
+        ...(cfg.trigger ? triggerTools(ctx) : {}),
+        ...(cfg.db ? dbTools(ctx) : {}),
         ...(cfg.sharedDb ? sharedDbTools(ctx) : {}),
         ...reportToMemberTool(ctx),
     }
@@ -103,7 +110,8 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     if (ctx.readOnly) return { tools: ctx.agent.config.kind === 'foreman' ? capToolSet(checkinTools(ctx), ctx.agent.id) : {}, close: async () => closeAgentDb(ctx.agent.id) }
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
-    if (ctx.agent.config.kind === 'foreman') Object.assign(tools, foremanTools(ctx), agentFilesTools())
+    const accountTools = ctx.agent.config.kind === 'foreman' ? foremanTools(ctx) : {}
+    Object.assign(tools, accountTools, ctx.agent.config.kind === 'foreman' ? agentFilesTools() : {})
     if (cfg.filesystem) Object.assign(tools, filesystemTools(ctx))
     if (cfg.shared) Object.assign(tools, sharedTools(ctx))
     if (cfg.shell) Object.assign(tools, shellTools(ctx))
@@ -131,9 +139,9 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     // Only once a computer is linked: a coworker of a workspace without one carries none of these.
     if (cfg.remoteComputers && remoteComputersEnabled() && (await readComputers()).length > 0) Object.assign(tools, remoteComputerTools(ctx))
     if (cfg.notify) Object.assign(tools, notifyTools(ctx))
-    if (cfg.hub) Object.assign(tools, hubTools(ctx))
+    if (cfg.hub) Object.assign(tools, ctx.agent.config.kind === 'foreman' ? foremanHubTools(ctx) : hubTools(ctx))
     if (cfg.paidData && (await paidDataOffered())) Object.assign(tools, paidDataTools(ctx))
-    if (cfg.cards) Object.assign(tools, ctx.agent.config.kind === 'foreman' ? foremanCardTools(ctx) : cardTools(ctx))
+    if (cfg.cards) Object.assign(tools, cardTools(ctx))
     if (cfg.askUser) Object.assign(tools, askUserTool(ctx))
     if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
@@ -143,6 +151,9 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))
     // Any tool's result can be cut and saved, so the way to read the rest is always there.
     Object.assign(tools, toolResultReadTool(ctx.agent.id))
+    // The hub names the foreman's account tools apart from the engine's (coworker_db_query beside
+    // db_query): one sharing a name would be replaced here without a word.
+    for (const name of Object.keys(accountTools)) if (tools[name] !== accountTools[name]) ctx.logger.warn({ tool: name }, 'an engine tool replaced a foreman account tool of the same name')
 
     // The connections are the pool's, kept across runs: the run's close leaves them open.
     let heldBackMcp: McpCatalogEntry[] | undefined

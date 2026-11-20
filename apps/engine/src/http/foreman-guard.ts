@@ -5,7 +5,8 @@ import type { MiddlewareHandler } from 'hono'
 // over HTTP: no rename, no soul, no tool switch, no deletion, no copy. The hub may talk to it, read
 // it, its conversations and its runs, stop a run or one of its delegated tasks, pin the model it
 // runs on, and manage what it keeps of its own like any coworker: its files, memories, skills,
-// routines and the servers connected to it, start a check-in and read their log.
+// routines, webhooks, database, screen and the servers connected to it, start a check-in and read
+// their log.
 const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'GET', path: /^\/agents\/foreman$/ },
     { method: 'POST', path: /^\/agents\/foreman\/chat$/ },
@@ -35,11 +36,13 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'POST', path: /^\/agents\/foreman\/checkins\/run$/ },
 ]
 
-// Whole routers, every method: each one only reads and writes files beside the configuration.
-const FOREMAN_OPEN_FAMILIES = /^\/agents\/foreman\/(memories|skills|skill-proposals|schedules)(\/.*)?$/
+// Whole routers, every method: each one only reads and writes what it keeps beside the
+// configuration, or drives its own screen.
+const FOREMAN_OPEN_FAMILIES = /^\/agents\/foreman\/(memories|skills|skill-proposals|schedules|triggers|data|desktop)(\/.*)?$/
 
-// The model and the check-ins are the fields of its configuration a person sets through this route.
-const FOREMAN_PATCHABLE_FIELDS = new Set(['connectionId', 'provider', 'model', 'proactive'])
+// The model, the check-ins and whether paid data asks before spending are the fields of its
+// configuration a person sets through this route.
+const FOREMAN_PATCHABLE_FIELDS = new Set(['connectionId', 'provider', 'model', 'proactive', 'paidDataAlwaysAllow'])
 
 async function patchesOnlyItsSettings(c: Parameters<MiddlewareHandler>[0]): Promise<boolean> {
     const body = (await c.req.json().catch(() => null)) as unknown

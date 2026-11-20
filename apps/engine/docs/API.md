@@ -38,16 +38,16 @@ are open:
 - `GET` itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`,
   `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
   `/runs/:rid/tasks/:taskId/cancel`;
-- a `PATCH` that only carries `connectionId`, `provider`, `model` and `proactive`;
+- a `PATCH` that only carries `connectionId`, `provider`, `model`, `proactive` and `paidDataAlwaysAllow`;
 - `GET /checkins`, its check-ins and their settings, and `POST /checkins/run`, a check-in now (see
   [Check-ins](#check-ins));
 - what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
-  `/skill-proposals` and `/schedules`, `PATCH /mcp-servers`, `GET /mcp-servers/status`,
-  `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
+  `/skill-proposals`, `/schedules`, `/triggers`, `/data` and `/desktop`, `PATCH /mcp-servers`,
+  `GET /mcp-servers/status`, `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
 
 Anything else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`:
-deleting, duplicating or archiving it, changing its name, soul or tool switches, and its triggers,
-data, tools and desktop routes.
+deleting, duplicating or archiving it, changing its name, soul or tool switches, and its tools
+route.
 
 ---
 

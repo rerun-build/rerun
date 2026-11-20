@@ -267,6 +267,9 @@ const FOREMAN_OPERATING_NOTES =
 const FOREMAN_SHOWING_FILES_NOTE =
     "The user cannot reach this server: a path means nothing to them, and a link to one opens nothing. Every file they should see (an image, slides, a document, what a sub-coworker produced for you) goes in a card_file call, which draws it as tiles they open and download: scope 'agent' for your own workspace, 'shared' for the shared space. A file in a coworker's own workspace is shown by that coworker, so ask it with send_message. Never write a server path in your message, and never tell the user to open the server, a folder or an admin access to get a file."
 
+const FOREMAN_COWORKER_DATABASES_NOTE =
+    "That private database is yours. Each coworker's own database is another one, reached with coworker_db_query and coworker_db_execute, passing its id: never confuse the two."
+
 // What a coworker keeps between two conversations, read fresh for each run: its skills, routines,
 // triggers, memories and connected services, each as the section the prompt carries.
 async function ownStateSections(agent: LoadedAgent, provider: Provider, heldBackMcp: Promise<McpCatalogEntry[] | undefined>) {
@@ -332,11 +335,14 @@ async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promi
 async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provider: Provider, order: TurnOrder, heldBackMcp: Promise<McpCatalogEntry[] | undefined>): Promise<SystemPrompt> {
     const cfg = agent.config.tools
     const learns = agent.config.selfImprovement.enabled
-    const [own, sharedDbSchema, brain] = await Promise.all([
+    const [own, dbSchema, sharedDbSchema, brain] = await Promise.all([
         ownStateSections(agent, provider, heldBackMcp),
+        cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
+    const computer = runOffersComputer(agent.config, provider, agent.resolved.model, agent.resolved.connection)
+    const takeover = offersTakeover(agent.config)
     const operating = [FOREMAN_OPERATING_NOTES, cfg.skills && learns ? SKILL_PROPOSAL_REMINDER : '', cfg.skills && cfg.memory ? WHERE_IT_BELONGS_NOTE : ''].filter(Boolean).join(' ')
     const foremanComputers = await remoteComputersNote(cfg.remoteComputers)
     const stable = [
@@ -345,10 +351,14 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('environment', foremanEnvironmentNote(agent.id)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', operating),
+        cfg.hub ? section('service_catalog', serviceCatalogNote(computer, takeover, cfg.paidData)) : '',
+        cfg.paidData ? section('paid_data', paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval)) : '',
+        computer ? section('computer', computerNote(takeover, provider === 'codex', cfg.paidData, cfg.hub, cfg.requestSecret)) : '',
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
-        section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
+        cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
+        section('asking_the_user', `${askingNote(cfg, computer)} ${showBeforeAskingNote(cfg.cards)}`),
         offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
-        turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config), foremanComputers !== null)),
+        turnOrderSection(order, turnClosers(agent, takeover, foremanComputers !== null)),
         section('verbosity', verbosityNote(agent.config.verbosity, learns)),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),
         unattendedSection(trigger, cfg),
@@ -361,6 +371,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('company_brain', brain),
         foremanComputers ? section('linked_computers', foremanComputers) : '',
         own.memory,
+        cfg.db ? section('database', `${databaseNote(cfg.sharedDb)} ${FOREMAN_COWORKER_DATABASES_NOTE}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
         section('current_time', currentTimeNote()),
