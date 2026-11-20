@@ -1,3 +1,4 @@
+import cutshape
 import states
 
 ENDED = ("blocked", "failed", "rejected")
@@ -27,6 +28,7 @@ class Watch:
                 "The resolver re-runs the failed run (`gh run rerun <id> --failed`) when the failure is not from this change, "
                 "or files the fix as a factory issue and ends with FILED: #<n>. Only that issue is merged while dev is red."
             ) % ((latest.get("merge_sha") or "-")[:7], latest.get("pr") or "-", latest["issue"], latest.get("dev_why") or "-")
+        parents = {cutshape.parse({"number": j["issue"], "body": j.get("body") or ""})["parent"] for j in jobs}
         for j in jobs:
             n, st = j["issue"], j["state"]
             if j.get("checkout_failed") and (st not in states.END or (
@@ -34,7 +36,7 @@ class Watch:
                 out["checkout failed #%d" % n] = j["checkout_failed"]
             if st == "waiting" and any(d[1] not in states.PROBLEM for d in j.get("dead") or []):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
-            elif ended(j, since) and open_issues is not None and n in open_issues:
+            elif ended(j, since) and open_issues is not None and n in open_issues and n not in parents:
                 out["ended #%d" % n] = "job #%d ended %s: %s; pull request %s" % (
                     n, st, j.get("reason") or "-", "#%s" % j["pr"] if j.get("pr") else "none")
             work = work or st in states.QUEUE
