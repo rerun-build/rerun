@@ -139,6 +139,98 @@ class TestStore(unittest.TestCase):
         self.assertEqual(cols["steps_at"], "TEXT")
         self.assertEqual(cols["steps"], "INTEGER")
 
+    def test_set_many_orders_state_last_and_rolls_back_mid_write(self):
+        seen = []
+        real = self.s.set
+
+        def spy(job, k, v):
+            seen.append(k)
+            return real(job, k, v)
+
+        self.s.set = spy
+        self.s.set_many("accept:10", [("state", "running"), ("agent", "a1"), ("fire", 1)])
+        self.s.set = real
+        self.assertEqual(seen, ["agent", "fire", "state"])
+        self.assertEqual(self.s.get_all("accept:10"), {"agent": "a1", "fire": "1", "state": "running"})
+        self.assertEqual(self.s.moved("accept:10")["state"], "running")
+
+        self.s.db.execute(
+            "CREATE TEMP TRIGGER kill_second AFTER INSERT ON kv "
+            "WHEN (SELECT COUNT(*) FROM kv WHERE job=NEW.job) >= 2 "
+            "BEGIN SELECT RAISE(ABORT, 'killed mid-write'); END")
+        with self.assertRaises(Exception):
+            for k, v in (("state", "running"), ("agent", "a1")):
+                self.s.set("torn:1", k, v)
+        self.assertEqual(self.s.get_all("torn:1"), {"state": "running"})
+
+        with self.assertRaises(Exception):
+            self.s.set_many("clean:1", [("state", "running"), ("agent", "a1"), ("fire", 2)])
+        self.assertEqual(self.s.get_all("clean:1"), {})
+        self.assertIsNone(self.s.moved("clean:1"))
+        self.assertFalse(self.s.db.in_transaction)
+
+    def test_intent_set_and_forget_are_atomic_and_nest_inside_dequeue_to_intent(self):
+        self.s.set("p:1", "state", "planned")
+        self.s.db.execute(
+            "CREATE TEMP TRIGGER kill_moves AFTER INSERT ON moves "
+            "WHEN NEW.job='p:2' BEGIN SELECT RAISE(ABORT, 'killed before moves'); END")
+        with self.assertRaises(Exception):
+            self.s.set("p:2", "state", "planned")
+        self.assertEqual(self.s.get_all("p:2"), {})
+        self.assertIsNone(self.s.moved("p:2"))
+
+        self.s.db.execute(
+            "CREATE TEMP TRIGGER kill_forget AFTER DELETE ON moves "
+            "WHEN OLD.job='p:1' BEGIN SELECT RAISE(ABORT, 'killed mid-forget'); END")
+        with self.assertRaises(Exception):
+            self.s.forget("p:1")
+        self.assertEqual(self.s.get_all("p:1"), {"state": "planned"})
+        self.assertIsNotNone(self.s.moved("p:1"))
+
+        self.s.db.execute(
+            "CREATE TEMP TRIGGER kill_intent AFTER UPDATE ON ready_chunks "
+            "WHEN NEW.job='60' BEGIN SELECT RAISE(ABORT, 'killed mid-intent'); END")
+        with self.assertRaises(Exception):
+            self.s.intent("60", "c1", "build")
+        self.assertEqual(self.s.pending("60"), [])
+        self.assertIsNone(self.s.get_ready("60", "c1"))
+
+        self.s.db.execute("DROP TRIGGER kill_intent")
+        qid = self.s.enqueue("60", "build", "c1")
+        fid = self.s.dequeue_to_intent(qid, "60", "c1", "build", lease_paths=["a.py"], lease_expires="2099-01-01T00:00:00Z")
+        self.assertEqual([p["id"] for p in self.s.pending("60")], [fid])
+        self.assertEqual(self.s.queued(), [])
+
+    def test_fire_batch_rolls_back_all_chunks_and_fires_atomically_on_crash(self):
+        import runner_loop as R
+        from test_batch_run import Eng, T0
+        cfg = {"poll_s": 30, "run_limit_s": 600, "stall_s": 0, "token_file": os.path.join(self.d.name, "t.json"),
+               "store_file": os.path.join(self.d.name, "batch.db"),
+               "triggers": [{"stage": "build", "coworker": "CODE", "agent": "ag1", "slug": "factory-build"}]}
+        eng = Eng()
+        eng.now = T0
+        r = R.build(cfg, eng, clock=lambda: T0)
+        self.addCleanup(r.st.close)
+        for c in "AB":
+            r.st.add_ready("j", c, paths=[c + ".py"])
+        r.st.db.execute(
+            "CREATE TEMP TRIGGER kill_second_lease AFTER INSERT ON leases "
+            "WHEN NEW.chunk='B' BEGIN SELECT RAISE(ABORT, 'killed mid-pre-fire'); END")
+        with self.assertRaises(Exception):
+            r.fire_batch(r.st.ready_list())
+        self.assertEqual(r.st.pending("j"), [])
+        self.assertEqual(r.st.open_leases(), [])
+        self.assertEqual(sorted(c["chunk"] for c in r.st.ready_list("j")), ["A", "B"])
+
+        r.st.db.execute("DROP TRIGGER kill_second_lease")
+        r.st.db.execute(
+            "CREATE TEMP TRIGGER kill_second_fired AFTER UPDATE OF status ON fires "
+            "WHEN NEW.chunk='B' AND NEW.status='running' BEGIN SELECT RAISE(ABORT, 'killed mid-post-fire'); END")
+        with self.assertRaises(Exception):
+            r.fire_batch(r.st.ready_list())
+        statuses = [row[0] for row in r.st.db.execute("SELECT status FROM fires ORDER BY chunk").fetchall()]
+        self.assertEqual(statuses, ["intent", "intent"])
+
 
 if __name__ == "__main__":
     unittest.main()

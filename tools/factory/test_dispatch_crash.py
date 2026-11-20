@@ -1,7 +1,7 @@
 import os, sys, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dispatch as D
-from test_dispatch import Base, ready
+from test_dispatch import Base, iso, ready
 
 
 class Crash(Base):
@@ -52,6 +52,32 @@ class Crash(Base):
           self.tick()
       self.assertIn("reconcile: OSError", self.out.getvalue())
       self.assertEqual(self.state(), "building")
+
+  def test_recovers_or_requeues_job_left_in_sending_without_run_id_after_crash(self):
+      self.d = self.new()
+      ts = iso(self.w.clock)
+      fid_a = self.d.store.intent("5", "", "build", coworker="B1", at=ts)
+      self.d.store.put_job("5", "building", {"issue": 5, "title": "Fix x", "body": ready(), "agent": "b1", "copy": 1,
+                                             "sending": "build", "run": None, "fire_id": fid_a, "intent_at": ts})
+      self.w.runs["r_adopt"] = {"status": "running"}
+      self.w.order.append(("r_adopt", "b1"))
+      self.w.sent_at["r_adopt"] = self.w.clock
+      self.tick()
+      j_a = self.d.store.get_job("5")
+      self.assertEqual((j_a["state"], j_a["run"], j_a["sending"]), ("building", "r_adopt", None))
+      self.assertEqual(self.w.rows("SELECT status, run_id FROM fires WHERE id=?", fid_a), [("running", "r_adopt")])
+      self.assertFalse(j_a.get("errors"))
+
+      self.w.issues.append({"number": 6, "title": "Fix y", "body": ready(), "comments": []})
+      fid_b = self.d.store.intent("6", "", "build", coworker="B2", at=ts)
+      self.d.store.put_job("6", "building", {"issue": 6, "title": "Fix y", "body": ready(), "agent": "b2", "copy": 1,
+                                             "sending": "build", "run": None, "fire_id": fid_b, "intent_at": ts})
+      j_b = self.d.store.get_job("6")
+      self.d.finished_run(j_b)
+      j_b = self.d.store.get_job("6")
+      self.assertEqual((j_b["state"], j_b["sending"]), ("queued", None))
+      self.assertEqual(self.w.rows("SELECT status FROM fires WHERE id=?", fid_b), [("lost",)])
+      self.assertFalse(j_b.get("errors"))
 
 
 if __name__ == "__main__":

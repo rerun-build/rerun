@@ -159,6 +159,36 @@ class Start(unittest.TestCase):
         self.assertEqual([e for e in r.edits() if e[0] == "12"],
                          [("12", "factory-plan"), ("12", "-factory-plan"), ("12", "factory-plan")])
 
+    def test_set_many_rolls_back_all_kv_fields_if_interrupted_mid_write(self):
+        r = Rig()
+        self.addCleanup(r.store.close)
+        self.addCleanup(r.dir.cleanup)
+        r.store.db.execute(
+            "CREATE TEMP TRIGGER kill_second AFTER INSERT ON kv "
+            "WHEN (SELECT COUNT(*) FROM kv WHERE job=NEW.job) >= 2 "
+            "BEGIN SELECT RAISE(ABORT, 'killed mid-write'); END")
+
+        with self.assertRaises(Exception):
+            for k, v in (("state", "sending"), ("agent", P1), ("copy", 1)):
+                r.store.set("plan:99", k, v)
+        self.assertEqual(r.store.get_all("plan:99"), {"state": "sending"})
+        with self.assertRaises(KeyError):
+            r.station.running()
+        r.store.forget("plan:99")
+
+        with self.assertRaises(Exception):
+            r.station.send(BACKLOG[0], (P1, 1))
+        self.assertEqual(r.store.get_all("plan:11"), {})
+        self.assertEqual(r.station.running(), [])
+
+        r.cfg["planning"] = {"plan_by": ["One"], "cut_by": ["Two"], "recheck": {"tries": 1}}
+        r.station = planning.Station(r.cfg, r.store, r.account, lambda a: "a" * 40 if "commits/dev" in str(a) else r.gh(a), lambda: 1000.0)
+        r.store.put_job("7", "waiting", {"issue": 7, "title": "Fix 7", "body": "", "recheck": True, "rechecks": 1})
+        with self.assertRaises(Exception):
+            r.station.send_recheck(r.store.get_job("7"))
+        self.assertEqual(r.store.get_all("recheck:7"), {})
+        self.assertEqual(r.station.running(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -472,21 +472,23 @@ class Runner:
         job, ids = batch[0]["job"], [c["chunk"] for c in batch]
         exp = iso(self.clock() + 2 * self.cfg.get("run_limit_s", 600))
         payload = {"job": job, "stage": "build", "chunks": ids}
-        fid = self.st.dequeue_to_intent(self.st.enqueue(job, "build", ids[0], payload), job, ids[0], "build",
-                                        ent.get("coworker", ""), ent["slug"], batch[0]["paths"], exp)
-        fids = [fid]
-        for c in batch[1:]:
-            self.st.grant_lease(job, c["chunk"], c["paths"], exp, attempt=self.st.attempts(job, c["chunk"]))
-            fids.append(self.st.intent(job, c["chunk"], "build", ent.get("coworker", ""), ent["slug"]))
-        for c in ids:
-            self.st.set_ready_state(job, c, "running")
+        with self.st._tx():
+            fid = self.st.dequeue_to_intent(self.st.enqueue(job, "build", ids[0], payload), job, ids[0], "build",
+                                            ent.get("coworker", ""), ent["slug"], batch[0]["paths"], exp)
+            fids = [fid]
+            for c in batch[1:]:
+                self.st.grant_lease(job, c["chunk"], c["paths"], exp, attempt=self.st.attempts(job, c["chunk"]))
+                fids.append(self.st.intent(job, c["chunk"], "build", ent.get("coworker", ""), ent["slug"]))
+            for c in ids:
+                self.st.set_ready_state(job, c, "running")
         try:
             run_id, _ = T.fire(self.eng, ent["agent"], ent["slug"], token, payload)
         except T.TriggerError as e:
             log("fire of batch %s failed (kept as intents): %s" % (ids, e))
             return None
-        for f in fids:
-            self.st.fired(f, run_id)
+        with self.st._tx():
+            for f in fids:
+                self.st.fired(f, run_id)
         return run_id
 
     def start_ready(self):

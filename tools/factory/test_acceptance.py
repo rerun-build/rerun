@@ -1,6 +1,6 @@
-import unittest
-
-import acceptance
+import json, os, sys, tempfile, unittest
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import acceptance, store as S
 
 
 def job(n, state, parent=None, pr=None, title=None):
@@ -92,6 +92,59 @@ class OutcomeTests(unittest.TestCase):
         self.assertEqual(acceptance.outcome("```\nACCEPTED: fake\n```\n")[0], "none")
         self.assertEqual(acceptance.outcome("ACCEPTED: real\n```\nGAPS: #3\n```\n"), ("accepted", [], "ACCEPTED: real"))
 
+
+
+class CrashTests(unittest.TestCase):
+    def setUp(self):
+        self.d = tempfile.TemporaryDirectory()
+        self.addCleanup(self.d.cleanup)
+        self.store = S.Store(os.path.join(self.d.name, "a.db"))
+        self.addCleanup(self.store.close)
+        self.cfg = {"repo": "o/r", "types": {"acceptor": {"coworkers": [{"id": "a1", "name": "BARBARA", "runs": 1}]}}}
+        self.now = 1000.0
+
+    def station(self):
+        def gh(args):
+            if args[:2] == ["issue", "list"]:
+                return "[]"
+            return json.dumps(dict(PARENT, state="OPEN", comments=[]))
+
+        return acceptance.Station(self.cfg, self.store, lambda *a: {"runId": "r1", "status": "running"}, gh, lambda: self.now, lambda *a: None)
+
+    def test_set_many_rolls_back_all_kv_fields_if_interrupted_mid_write(self):
+        st = self.station()
+        self.store.db.execute(
+            "CREATE TEMP TRIGGER kill_second AFTER INSERT ON kv "
+            "WHEN (SELECT COUNT(*) FROM kv WHERE job=NEW.job) >= 2 "
+            "BEGIN SELECT RAISE(ABORT, 'killed mid-write'); END")
+
+        with self.assertRaises(Exception):
+            for k, v in (("state", "running"), ("agent", "a1"), ("copy", 1), ("fire", 1)):
+                self.store.set("accept:11", k, v)
+        self.assertEqual(self.store.get_all("accept:11"), {"state": "running"})
+        with self.assertRaises(KeyError):
+            st.once(1, [])
+        self.store.forget("accept:11")
+
+        with self.assertRaises(Exception):
+            st.send(10, PARENT, KIDS, ("a1", 1), {})
+        self.assertEqual(self.store.get_all("accept:10"), {})
+        st.once(1, [])
+
+    def test_revive_interrupted_mid_write_keeps_left_state_without_burning_revival(self):
+        st = self.station()
+        self.store.set_many("accept:12", (("sends", 2), ("left_at", 100.0), ("state", "left")))
+        self.now = 100.0 + acceptance.REVIVE_S + 1
+        self.store.db.execute(
+            "CREATE TEMP TRIGGER kill_revive AFTER INSERT ON kv "
+            "WHEN NEW.job='accept:12' AND NEW.k='revived' "
+            "BEGIN SELECT RAISE(ABORT, 'killed mid-revive'); END")
+        with self.assertRaises(Exception):
+            st.revive(12, self.store.get_all("accept:12"))
+        self.assertEqual(self.store.get_all("accept:12"), {"sends": "2", "left_at": "100.0", "state": "left"})
+        self.store.db.execute("DROP TRIGGER kill_revive")
+        revived = st.revive(12, self.store.get_all("accept:12"))
+        self.assertEqual((revived["state"], revived["revived"], revived["sends"]), ("unsent", "1", "0"))
 
 if __name__ == "__main__":
     unittest.main()

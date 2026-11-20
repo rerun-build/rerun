@@ -166,5 +166,18 @@ class Cut(Base):
         self.assertTrue({"Boss", "Scope Shaper", "IKE"} <= names)
 
 
+    def test_cut_interrupted_mid_write_keeps_previous_planned_record_whole(self):
+        self.build(TWO_STAGE)
+        self.addCleanup(self.store.close)
+        self.planned()
+        before = self.store.get_all("plan:5")
+        self.store.db.execute(
+            "CREATE TEMP TRIGGER kill_cut AFTER UPDATE ON kv "
+            "WHEN NEW.job='plan:5' AND NEW.k='run' "
+            "BEGIN SELECT RAISE(ABORT, 'killed mid-cut'); END")
+        with self.assertRaises(Exception):
+            self.station.cut(5, before)
+        self.assertEqual(self.store.get_all("plan:5"), before)
+
 if __name__ == "__main__":
     unittest.main()

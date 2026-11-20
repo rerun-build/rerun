@@ -1,4 +1,4 @@
-import fcntl, json, os, sqlite3, time
+import contextlib, fcntl, json, os, sqlite3, time
 from gist import gist
 
 import states
@@ -93,6 +93,21 @@ class Store:
         self.db.close()
         self._lock.close()
 
+    @contextlib.contextmanager
+    def _tx(self):
+        own = not self.db.in_transaction
+        if own:
+            self.db.execute("BEGIN IMMEDIATE")
+        try:
+            yield
+        except BaseException:
+            if own:
+                self.db.execute("ROLLBACK")
+            raise
+        else:
+            if own:
+                self.db.execute("COMMIT")
+
     def claim(self, project, home):
         row = self.db.execute("SELECT v FROM kv WHERE job='-' AND k='project_of'").fetchone()
         if row is not None and row[0] != project:
@@ -104,14 +119,15 @@ class Store:
             self.set("-", "project_of", project)
 
     def intent(self, job, chunk, stage, coworker="", slug="", at=None, model=None, thinking=None):
-        n = self.db.execute("SELECT COUNT(*) FROM fires WHERE job=? AND chunk=? AND stage=?",
-                            (job, chunk, stage)).fetchone()[0]
-        cur = self.db.execute(
-            "INSERT INTO fires(job,chunk,stage,coworker,slug,intent_at,refire,model,thinking) VALUES(?,?,?,?,?,?,?,?,?)",
-            (job, chunk, stage, coworker, slug, at or now(), n, model, thinking))
-        self._seen(job, chunk)
-        self.db.execute("UPDATE ready_chunks SET attempts=MAX(attempts,?) WHERE job=? AND chunk=?", (n, job, chunk))
-        return cur.lastrowid
+        with self._tx():
+            n = self.db.execute("SELECT COUNT(*) FROM fires WHERE job=? AND chunk=? AND stage=?",
+                                (job, chunk, stage)).fetchone()[0]
+            cur = self.db.execute(
+                "INSERT INTO fires(job,chunk,stage,coworker,slug,intent_at,refire,model,thinking) VALUES(?,?,?,?,?,?,?,?,?)",
+                (job, chunk, stage, coworker, slug, at or now(), n, model, thinking))
+            self._seen(job, chunk)
+            self.db.execute("UPDATE ready_chunks SET attempts=MAX(attempts,?) WHERE job=? AND chunk=?", (n, job, chunk))
+            return cur.lastrowid
 
     def fired(self, fire_id, run_id):
         self.db.execute("UPDATE fires SET run_id=?, status='running' WHERE id=? AND status='intent'",
@@ -159,18 +175,26 @@ class Store:
         return [i for i in ids if i not in known]
 
     def set(self, job, k, v):
-        self.db.execute("INSERT INTO kv VALUES(?,?,?) ON CONFLICT(job,k) DO UPDATE SET v=excluded.v", (job, k, str(v)))
-        if k == "state":
-            self.db.execute("INSERT INTO moves VALUES(?,?,NULL,?) ON CONFLICT(job) DO UPDATE SET prev=moves.state, "
-                            "state=excluded.state, at=excluded.at WHERE moves.state != excluded.state", (job, str(v), now()))
+        with self._tx():
+            self.db.execute("INSERT INTO kv VALUES(?,?,?) ON CONFLICT(job,k) DO UPDATE SET v=excluded.v", (job, k, str(v)))
+            if k == "state":
+                self.db.execute("INSERT INTO moves VALUES(?,?,NULL,?) ON CONFLICT(job) DO UPDATE SET prev=moves.state, "
+                                "state=excluded.state, at=excluded.at WHERE moves.state != excluded.state", (job, str(v), now()))
+
+    def set_many(self, job, items):
+        ordered = [(k, v) for k, v in items if k != "state"] + [(k, v) for k, v in items if k == "state"]
+        with self._tx():
+            for k, v in ordered:
+                self.set(job, k, v)
 
     def moved(self, job):
         r = self.db.execute("SELECT state, prev, at FROM moves WHERE job=?", (job,)).fetchone()
         return dict(r) if r else None
 
     def forget(self, job):
-        self.db.execute("DELETE FROM kv WHERE job=?", (job,))
-        self.db.execute("DELETE FROM moves WHERE job=?", (job,))
+        with self._tx():
+            self.db.execute("DELETE FROM kv WHERE job=?", (job,))
+            self.db.execute("DELETE FROM moves WHERE job=?", (job,))
 
     def get_all(self, job):
         return {r["k"]: r["v"] for r in self.db.execute("SELECT k,v FROM kv WHERE job=?", (job,))}
@@ -201,16 +225,11 @@ class Store:
         return {r[0] for r in self.db.execute("SELECT run_id FROM fires WHERE run_id IS NOT NULL")}
 
     def dequeue_to_intent(self, queue_id, job, chunk, stage, coworker="", slug="", lease_paths=None, lease_expires=None):
-        self.db.execute("BEGIN IMMEDIATE")
-        try:
+        with self._tx():
             fid = self.intent(job, chunk, stage, coworker, slug)
             self.dequeue(queue_id)
             if lease_paths is not None:
                 self.grant_lease(job, chunk, lease_paths, lease_expires, attempt=self.attempts(job, chunk))
-            self.db.execute("COMMIT")
-        except BaseException:
-            self.db.execute("ROLLBACK")
-            raise
         return fid
 
     def add_ready(self, job, chunk, paths=(), builder="", deps=(), at=None):

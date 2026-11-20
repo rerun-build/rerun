@@ -188,9 +188,8 @@ class Station:
         sends = int(row.get("sends", 0)) + 1
         message = brief(self.repo, parent, plan(parent.get("comments") or []), children, others, cut)
         fire = self.store.intent(job, "", "accept", coworker=name)
-        for k, v in (("state", "running"), ("agent", agent), ("copy", copy), ("started", self.now()), ("run", ""),
-                     ("fire", fire), ("sends", sends), ("name", name)):
-            self.store.set(job, k, v)
+        self.store.set_many(job, (("agent", agent), ("copy", copy), ("started", self.now()), ("run", ""),
+                                  ("fire", fire), ("sends", sends), ("name", name), ("state", "running")))
         args = {"agentId": agent, "message": message, "waitSeconds": 1,
                 "goal": {"lastLineForms": [dict(f) for f in FORMS], "turnLimit": 3}}
         try:
@@ -236,16 +235,14 @@ class Station:
             self.store.set("accept:%d" % n, "state", "unsent")
             self.log(n, "acceptance: %s; asked once more" % why)
         else:
-            self.store.set("accept:%d" % n, "state", "left")
-            self.store.set("accept:%d" % n, "left_at", self.now())
+            self.store.set_many("accept:%d" % n, (("left_at", self.now()), ("state", "left")))
             self.log(n, "acceptance left: %s" % why)
 
     def revive(self, n, row):
         if row.get("revived") or (row.get("left_at") and self.now() - float(row["left_at"]) < REVIVE_S):
             return row
         job = "accept:%d" % n
-        for k, v in (("revived", 1), ("sends", 0), ("state", "unsent")):
-            self.store.set(job, k, v)
+        self.store.set_many(job, (("revived", 1), ("sends", 0), ("state", "unsent")))
         self.log(n, "acceptance gets one fresh round after it was left")
         return self.store.get_all(job)
 

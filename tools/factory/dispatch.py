@@ -1157,7 +1157,33 @@ class Dispatcher:
             return proof_brief(j, j["pr"], j["head"], j["asks"])
         return (senior_brief if j.get("level") and not j.get("same_round") else fix_brief)(j, j["pr"], j["review"])
 
+    def recover_sending(self, j, immediate=True):
+        if not j.get("fire_id") or not j.get("intent_at"):
+            return self.end(j, "blocked", "sending '%s' was cut off before its intent was recorded; whether it arrived is unknown, so it is not sent again" % j["sending"])
+        got = self.account("list_runs", {"agentId": j["agent"]})
+        runs = got.get("runs", []) if isinstance(got, dict) else got or []
+        known, since = self.store.known_run_ids(), j.get("intent_at")
+        mine = sorted((r for r in runs if isinstance(r, dict) and (r.get("runId") or r.get("id")) not in known
+                       and r.get("startedAt") and since and clocks.L.ts(r["startedAt"]) >= clocks.L.ts(since)),
+                      key=lambda r: clocks.L.ts(r["startedAt"]))
+        if mine:
+            rid = mine[0].get("runId") or mine[0].get("id")
+            self.store.fired(j["fire_id"], rid)
+            j.update(run=rid, sending=None)
+            self.save(j, "adopted run " + rid)
+            return log(j["issue"], "%s: run %s found in the run list" % (j["state"], rid))
+        if not immediate:
+            j["lost_beats"] = j.get("lost_beats", 0) + 1
+            if j["lost_beats"] < LOST_BEATS:
+                return self.save(j, "no run yet for '%s' (beat %d)" % (j["sending"], j["lost_beats"]))
+            self.store.abandon(j["fire_id"], "no run found after %d beats" % LOST_BEATS)
+            return self.transient(j, "'%s' went out without a run id and no run followed" % j["sending"])
+        self.store.abandon(j["fire_id"], "send interrupted before run id")
+        return self.transient(j, "send interrupted before run id")
+
     def finished_run(self, j):
+        if j.get("run") is None and j.get("sending"):
+            return self.recover_sending(j)
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
@@ -1321,25 +1347,7 @@ class Dispatcher:
         return None
 
     def lost_run(self, j):
-        if not j.get("fire_id") or not j.get("intent_at"):
-            return self.end(j, "blocked", "sending '%s' was cut off before its intent was recorded; whether it arrived is unknown, so it is not sent again" % j["sending"])
-        got = self.account("list_runs", {"agentId": j["agent"]})
-        runs = got.get("runs", []) if isinstance(got, dict) else got or []
-        known, since = self.store.known_run_ids(), j.get("intent_at")
-        mine = sorted((r for r in runs if isinstance(r, dict) and (r.get("runId") or r.get("id")) not in known
-                       and r.get("startedAt") and since and clocks.L.ts(r["startedAt"]) >= clocks.L.ts(since)),
-                      key=lambda r: clocks.L.ts(r["startedAt"]))
-        if mine:
-            rid = mine[0].get("runId") or mine[0].get("id")
-            self.store.fired(j["fire_id"], rid)
-            j.update(run=rid, sending=None)
-            self.save(j, "adopted run " + rid)
-            return log(j["issue"], "%s: run %s found in the run list" % (j["state"], rid))
-        j["lost_beats"] = j.get("lost_beats", 0) + 1
-        if j["lost_beats"] < LOST_BEATS:
-            return self.save(j, "no run yet for '%s' (beat %d)" % (j["sending"], j["lost_beats"]))
-        self.store.abandon(j["fire_id"], "no run found after %d beats" % LOST_BEATS)
-        self.transient(j, "'%s' went out without a run id and no run followed" % j["sending"])
+        return self.recover_sending(j, immediate=False)
 
     def not_met_reason(self, j, out):
         if j.get("not_met") and not final_line(out, ("BLOCKED:",)):
