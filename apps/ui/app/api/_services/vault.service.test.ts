@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
-import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultInstance, supportsVaultRename } from '@/lib/engine/client'
+import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, instanceVaultItem, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { serviceManifestSchema } from '@/lib/services/manifest'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { findWorkspaceEngine } from './workspace-engine.service'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
+import { loadManifest } from './services.service'
 import {
     VaultConflictError,
     VaultUnavailableError,
@@ -28,7 +30,7 @@ vi.mock('@/lib/vault/copies', () => ({ dropMigrationCopy: vi.fn(async () => {}) 
 vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async () => {}) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
-vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsVaultRename: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsVaultRename: vi.fn(), supportsVaultInstance: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
 vi.mock('@/lib/engine/vault-client', () => ({
     listVaultItems: vi.fn(),
     getVaultItem: vi.fn(),
@@ -37,7 +39,9 @@ vi.mock('@/lib/engine/vault-client', () => ({
     patchVaultItem: vi.fn(async () => ({ id: 'item-1' })),
     deleteVaultItem: vi.fn(),
     getVaultItemUsage: vi.fn(),
+    instanceVaultItem: vi.fn(),
 }))
+vi.mock('./services.service', () => ({ loadManifest: vi.fn() }))
 
 const WORKSPACE = 7
 const conn = { baseUrl: 'https://engine.test', apiKey: null }
@@ -92,6 +96,7 @@ beforeEach(() => {
     vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn, managed: true })
     vi.mocked(supportsVault).mockResolvedValue(true)
     vi.mocked(supportsVaultRename).mockResolvedValue(true)
+    vi.mocked(supportsVaultInstance).mockResolvedValue(true)
     vi.mocked(supportsForemanCoworker).mockResolvedValue(false)
     vi.mocked(getVaultItem).mockResolvedValue(item() as never)
     vi.mocked(listVaultItems).mockResolvedValue([item(), item({ id: 'item-2', agentIds: ['e-alice', 'e-carol'] }), item({ id: 'item-3', sharedWithAll: true, agentIds: [] })] as never)
@@ -232,6 +237,81 @@ describe('attaching', () => {
 
             expect(vi.mocked(attachVaultItem).mock.calls.slice(1).map(call => call[1])).toEqual(['never-signed-in', 'signed-out', 'shared-pending'])
             expect(deleteVaultItem).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('an account added before its app took several accounts', () => {
+        const GETXAPI = serviceManifestSchema.parse({
+            slug: 'getxapi',
+            name: 'GetXAPI',
+            inputs: [{ key: 'GETXAPI_KEY', label: 'GetXAPI API key', type: 'password', secret: true, required: true }],
+            mcpServers: [{ name: 'getxapi', transport: 'stdio', command: 'npx', args: ['-y', '@getxapi/mcp@latest'], env: { GETXAPI_KEY: '${input.GETXAPI_KEY}' } }],
+        })
+        const legacy = (id: string, over: Record<string, unknown> = {}) =>
+            item({ id, slug: 'getxapi', name: 'GetXAPI', tokens: [], envKeys: ['RERUN_SVC_GETXAPI_GETXAPI_KEY'], mcpServers: [{ name: 'getxapi', args: [], env: {}, headers: {} }], ...over })
+        const clash = (with_: string, kind = 'env', name = 'RERUN_SVC_GETXAPI_GETXAPI_KEY') =>
+            new EngineRequestError(`rerun-engine PUT /vault/second/agents/e-alice failed: 409 ${JSON.stringify({ error: 'x', conflicts: [{ agentId: 'e-alice', itemId: with_, kind, name }] })}`, 409)
+
+        beforeEach(() => {
+            vi.mocked(loadManifest).mockResolvedValue(GETXAPI)
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { agentIds: ['e-bob'], customLabel: 'Compte X de Rerun' }) as never)
+            vi.mocked(listVaultItems).mockResolvedValue([legacy('first', { agentIds: ['e-alice'] }), legacy('second', { agentIds: ['e-bob'] }), legacy('third', { agentIds: [], instanceId: 'zz11zz', label: 'GetXAPI 2' })] as never)
+            vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first')).mockResolvedValue(legacy('second') as never)
+            vi.mocked(instanceVaultItem).mockImplementation(async (_conn, id, input) => legacy(id, { instanceId: input.instanceId }) as never)
+            vi.mocked(getVaultItemUsage).mockResolvedValue(['e-bob'])
+        })
+
+        it('gets an instance of its own, then joins the coworker holding the first account', async () => {
+            await attachVaultEntry('second', 'alice', managerOfA)
+
+            const [, id, input] = vi.mocked(instanceVaultItem).mock.calls[0]
+            const instanceId = input.instanceId
+            expect(id).toBe('second')
+            expect(instanceId).toMatch(/^[a-z0-9]{6}$/)
+            expect(instanceId).not.toBe('zz11zz')
+            expect(input).toEqual({
+                instanceId,
+                label: 'GetXAPI 3',
+                servers: { getxapi: `getxapi-${instanceId}` },
+                env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: `RERUN_SVC_GETXAPI_${instanceId.toUpperCase()}_GETXAPI_KEY` },
+            })
+            expect(dropMigrationCopy).toHaveBeenCalledWith(conn, 'e-bob', 'getxapi', expect.objectContaining({ id: 'second' }))
+            expect(vi.mocked(attachVaultItem).mock.calls.map(call => call[1])).toEqual(['second', 'second'])
+        })
+
+        it('keeps the label its sign-in wrote', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { label: 'theo@example.com' }) as never)
+            await attachVaultEntry('second', 'alice', managerOfA)
+            expect(vi.mocked(instanceVaultItem).mock.calls[0][2]).not.toHaveProperty('label')
+        })
+
+        it('still refuses a clash with another app, a paid app, an app that keeps one account and a box that cannot rename', async () => {
+            const refused = async () => {
+                vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first')).mockResolvedValue(legacy('second') as never)
+                await expect(attachVaultEntry('second', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
+            }
+            vi.mocked(listVaultItems).mockResolvedValue([legacy('first', { slug: 'twitter' }), legacy('second')] as never)
+            await refused()
+            vi.mocked(listVaultItems).mockResolvedValue([legacy('first'), legacy('second')] as never)
+
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { app: { appSlug: 'linkedin-pro', serverName: 'getxapi' } }) as never)
+            await refused()
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second') as never)
+
+            vi.mocked(loadManifest).mockResolvedValue(serviceManifestSchema.parse({ ...GETXAPI, skills: [{ name: 'usage', description: '', body: 'Call with ${input.GETXAPI_KEY}' }] }))
+            await refused()
+            vi.mocked(loadManifest).mockResolvedValue(GETXAPI)
+
+            vi.mocked(supportsVaultInstance).mockResolvedValue(false)
+            await refused()
+
+            expect(instanceVaultItem).not.toHaveBeenCalled()
+        })
+
+        it('leaves an account that already has an instance as it is', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { instanceId: 'ab12cd' }) as never)
+            await expect(attachVaultEntry('second', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
+            expect(instanceVaultItem).not.toHaveBeenCalled()
         })
     })
 

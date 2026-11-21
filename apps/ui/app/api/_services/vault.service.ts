@@ -4,9 +4,11 @@ import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultI
 
 import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
-import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultInstance, supportsVaultRename } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
-import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, instanceVaultItem, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { instanceRenames, newServiceInstanceId } from '@/lib/services/instances'
+import { takesSeveralAccounts } from '@/lib/services/manifest'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
@@ -198,15 +200,52 @@ export async function attachVaultEntry(itemId: string, agentId: string, actor?: 
     const ctx = await vaultContext(actor)
     const coworker = await assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === agentId))
     const item = await readItem(ctx, itemId)
-    const twins = isRegistryItem(item) && item.status === 'active' ? await detachPendingTwins(ctx, item, coworker.engineAgentId) : []
     try {
-        const attached = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, itemId, coworker.engineAgentId))
+        return await lendVaultEntry(ctx, item, coworker.engineAgentId)
+    } catch (err) {
+        const renamed = err instanceof VaultConflictError ? await withOwnInstance(ctx, item, err.conflicts) : null
+        if (!renamed) throw err
+        return lendVaultEntry(ctx, renamed, coworker.engineAgentId)
+    }
+}
+
+async function lendVaultEntry(ctx: VaultContext, item: VaultItemSummary, engineAgentId: string): Promise<VaultItemSummary> {
+    const twins = isRegistryItem(item) && item.status === 'active' ? await detachPendingTwins(ctx, item, engineAgentId) : []
+    try {
+        const attached = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, item.id, engineAgentId))
         for (const twin of twins) if (twin.agentIds.length === 0 && neverSignedIn(twin)) await deleteVaultItem(ctx.conn, twin.id)
         return attached
     } catch (err) {
-        for (const twin of twins) await attachVaultItem(ctx.conn, twin.id, coworker.engineAgentId).catch(undo => console.warn(`[vault] entry ${twin.id} left off ${coworker.engineAgentId}:`, undo instanceof Error ? undo.message : undo))
+        for (const twin of twins) await attachVaultItem(ctx.conn, twin.id, engineAgentId).catch(undo => console.warn(`[vault] entry ${twin.id} left off ${engineAgentId}:`, undo instanceof Error ? undo.message : undo))
         throw err
     }
+}
+
+// An account added before its app took several accounts holds the app's bare names, and clashes with
+// the account of the app the coworker already has. It moves to an instance of its own, under the names
+// a second account is compiled with today. The coworkers holding it keep it under those names, and the
+// copy a migration left in their folder under the old key goes, as on a detach, or it would come back.
+// Null when the clash is anything else: another app, a paid app, or a box that cannot rename.
+async function withOwnInstance(ctx: VaultContext, item: VaultItemSummary, conflicts: VaultConflict['conflicts']): Promise<VaultItemSummary | null> {
+    if (!isRegistryItem(item) || item.instanceId || item.app) return null
+    const key = vaultRegistryKey(item)
+    const vault = await listVaultItems(ctx.conn)
+    const sameAccountNames = (itemId: string) => vault.some(other => other.id === itemId && isRegistryItem(other) && vaultRegistryKey(other) === key)
+    if (!conflicts.every(conflict => conflict.kind !== 'skill' && sameAccountNames(conflict.itemId))) return null
+    // Loaded here rather than at the top: services.service imports this module.
+    const { loadManifest } = await import('./services.service')
+    const manifest = await loadManifest(item.slug)
+    if (!manifest || !takesSeveralAccounts(manifest) || !(await supportsVaultInstance(ctx.conn))) return null
+
+    const sameApp = vault.filter(other => other.slug === item.slug)
+    const instanceId = newServiceInstanceId(sameApp.flatMap(other => other.instanceId ?? []))
+    const labels = new Set(sameApp.flatMap(other => other.label ?? []))
+    let ordinal = 2
+    while (labels.has(`${manifest.name} ${ordinal}`)) ordinal++
+    const renames = instanceRenames(item.slug, item.mcpServers.map(server => server.name), item.envKeys, instanceId)
+    const renamed = await rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label: `${manifest.name} ${ordinal}` }), ...renames }))
+    for (const holder of await getVaultItemUsage(ctx.conn, item.id)) await dropMigrationCopy(ctx.conn, holder, key, item)
+    return renamed
 }
 
 // The coworker's own install of the app still waiting on its sign-in sits on the same registry key as

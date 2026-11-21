@@ -3,6 +3,7 @@ import {
     vaultItemSummarySchema,
     vaultItemUsageSchema,
     type CreateVaultItemInput,
+    type InstanceVaultItemInput,
     type UpdateVaultItemEnvInput,
     type UpdateVaultItemInput,
     type VaultDeleteResult,
@@ -41,6 +42,11 @@ export async function patchVaultItem(conn: EngineConnection, id: string, patch: 
 
 export async function updateVaultItemEnv(conn: EngineConnection, id: string, input: UpdateVaultItemEnvInput): Promise<string[]> {
     return request(conn, `${itemPath(id)}/env`, { method: 'PATCH', body: JSON.stringify(input) }, d => keysSchema.parse(d).keys)
+}
+
+// Only once the box says so (`supportsVaultInstance`): an older one answers 404.
+export async function instanceVaultItem(conn: EngineConnection, id: string, input: InstanceVaultItemInput): Promise<VaultItemSummary> {
+    return request(conn, `${itemPath(id)}/instance`, { method: 'POST', body: JSON.stringify(input) }, d => vaultItemSummarySchema.parse(d))
 }
 
 export async function attachVaultItem(conn: EngineConnection, id: string, engineAgentId: string): Promise<VaultItemSummary> {

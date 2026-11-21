@@ -20,6 +20,7 @@ import {
     type ForemanCheckins,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_VAULT,
+    ENGINE_CAPABILITY_VAULT_INSTANCE,
     ENGINE_CAPABILITY_VAULT_RENAME,
     ENGINE_CAPABILITY_REMOTE_COMPUTERS,
     engineDbGroupsSchema,
@@ -719,6 +720,11 @@ export async function supportsVault(conn: EngineConnection): Promise<boolean> {
 // A Vault item keeps the name a person gave it apart from the label its sign-ins write.
 export async function supportsVaultRename(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT_RENAME)
+}
+
+// An account added before its app took several accounts can move to an instance of its own.
+export async function supportsVaultInstance(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT_INSTANCE)
 }
 
 // The Chief of Staff wakes on its own, and its settings and log answer under /checkins.

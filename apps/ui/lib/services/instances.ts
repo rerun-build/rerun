@@ -34,6 +34,17 @@ export function defaultInstanceEnvVar(slug: string, instanceId: string | undefin
     return `RERUN_SVC_${scope}_${sanitizeEnvPart(inputKey)}`
 }
 
+// The names an account added before its app took several accounts moves to when it gets an instance:
+// those a second account of the app is compiled with.
+export function instanceRenames(slug: string, servers: string[], envKeys: string[], instanceId: string): { servers: Record<string, string>; env: Record<string, string> } {
+    const basePrefix = defaultInstanceEnvVar(slug, undefined, '')
+    const instancePrefix = defaultInstanceEnvVar(slug, instanceId, '')
+    return {
+        servers: Object.fromEntries(servers.map(name => [name, instanceServerName(name, instanceId)])),
+        env: Object.fromEntries(envKeys.map(key => [key, key.startsWith(basePrefix) ? `${instancePrefix}${key.slice(basePrefix.length)}` : instanceEnvVar(key, instanceId)])),
+    }
+}
+
 // "Gmail 2", "Gmail 3"… the first number no other account of the app already shows.
 export function ordinalInstanceLabel(serviceName: string, reg: ServiceRegistry, slug: string): string {
     const labels = new Set(entriesOfSlug(reg, slug).map(({ entry }) => entry.label))
