@@ -349,6 +349,17 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).toContain('<bridged_tools>')
         expect(prompt).toContain('a message written before a call does not reach the user as your message')
     })
+
+    // The note that sends coworkers to the board's buttons told the Chief of Staff, who holds
+    // create_agent, that it could not create one, and it refused (RER-228).
+    it('never tells the Chief of Staff it cannot create a coworker, in chat or in a check-in', async () => {
+        const checkin = { source: 'checkin', slug: 'checkin', name: 'Check-in', reason: 'pulse' } as const
+        for (const prompt of [await buildSystemPrompt(foreman()), await buildSystemPrompt(foreman(), checkin)]) {
+            expect(prompt).toContain('<vocabulary>')
+            expect(prompt).not.toContain('You cannot create')
+        }
+        expect(await buildSystemPrompt(agentWith({}))).toContain('You cannot create, rename or delete a coworker')
+    })
 })
 
 describe('recallContext', () => {

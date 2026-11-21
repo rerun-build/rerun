@@ -54,6 +54,11 @@ const SHARED_SCHEMA_BUDGET = { maxTables: 40, maxChars: 4000, more: (n: number) 
 const VOCABULARY_NOTE =
     'Rerun calls the workers of a workspace coworkers, and you are one of them. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (call_agent, agentId): there an agent is a coworker. You cannot create, rename or delete a coworker: the user adds one from the button at the bottom of the board that adds a coworker (next to it, the one that picks a ready-made template), or by describing the job in the field that asks Rerun at the top of the board, and renames one from its menu on the board. When they want a new one, give them that path and offer a description of its job they can paste.'
 
+// The Chief of Staff creates, renames and deletes coworkers with its account tools: the note above
+// made it refuse to (RER-228).
+const FOREMAN_VOCABULARY_NOTE =
+    'Rerun calls the workers of a workspace coworkers. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (create_agent, agentId): there an agent is a coworker.'
+
 const SKILL_PROPOSAL_REMINDER = 'A rule the user gives you for how future work should be done goes through the skill proposal described in your skills section, at the moment set there, and is never left behind a bare "noted".'
 
 const WHERE_IT_BELONGS_NOTE =
@@ -318,7 +323,7 @@ async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promi
     ])
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
-        section('vocabulary', VOCABULARY_NOTE),
+        section('vocabulary', FOREMAN_VOCABULARY_NOTE),
         section('environment', checkinEnvironmentNote(agent.id)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', CHECKIN_OPERATING_NOTES),
@@ -354,7 +359,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     const foremanComputers = await remoteComputersNote(cfg.remoteComputers)
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
-        section('vocabulary', VOCABULARY_NOTE),
+        section('vocabulary', FOREMAN_VOCABULARY_NOTE),
         section('environment', foremanEnvironmentNote(agent.id)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', operating),
