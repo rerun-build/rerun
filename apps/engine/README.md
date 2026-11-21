@@ -151,6 +151,7 @@ GET|POST /connections   PUT|DELETE /connections/default   POST /connections/prob
 PATCH|DELETE /connections/:id   PATCH /connections/:id/keys   GET /connections/:id/usage
 
 GET|POST /vault   GET|PATCH|DELETE /vault/:id   PATCH /vault/:id/env   GET /vault/:id/usage
+POST /vault/:id/instance
 PUT|DELETE /vault/:id/agents/:agentId   PUT|DELETE /vault/:id/tokens/:server
 
 GET|POST /agents   POST /agents/import   GET|PATCH|DELETE /agents/:id   GET /agents/:id/tools

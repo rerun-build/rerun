@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, serviceRegistryKey, type VaultConflict, type VaultItemSummary } from '@rerun/contracts'
 
 import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -225,9 +225,32 @@ async function lendVaultEntry(ctx: VaultContext, item: VaultItemSummary, engineA
 // the account of the app the coworker already has. It moves to an instance of its own, under the names
 // a second account is compiled with today. The coworkers holding it keep it under those names, and the
 // copy a migration left in their folder under the old key goes, as on a detach, or it would come back.
-// Null when the clash is anything else: another app, a paid app, or a box that cannot rename.
+// Null when the clash is anything else: another app, a paid app, or a box that cannot rename. Null
+// too for a caller who may attach but not change the account: the rename reaches every coworker
+// holding it. The box's own key renames as it shares and deletes, as an admin.
 async function withOwnInstance(ctx: VaultContext, item: VaultItemSummary, conflicts: VaultConflict['conflicts']): Promise<VaultItemSummary | null> {
-    if (!isRegistryItem(item) || item.instanceId || item.app) return null
+    if (!isRegistryItem(item) || item.app) return null
+    if (!isAdminActor(ctx.actor) && !(await canChangeItem(ctx.actor, item, ctx))) return null
+    const renamed = item.instanceId ? await finishInstance(ctx, item, item.instanceId) : await startInstance(ctx, item, conflicts)
+    if (!renamed) return null
+    const bareKey = serviceRegistryKey(item.slug)
+    const holders = await getVaultItemUsage(ctx.conn, item.id).catch(() => renamed.agentIds)
+    for (const holder of holders) await dropMigrationCopy(ctx.conn, holder, bareKey, item).catch(err => console.warn(`[vault] copy of ${holder} left in place:`, err instanceof Error ? err.message : err))
+    return renamed
+}
+
+// A rename the box was stopped in once the account had its instance: its old variables are still
+// beside the new ones and keep clashing, and only a call with the same instance takes them away.
+async function finishInstance(ctx: VaultContext, item: VaultItemSummary & { slug: string }, instanceId: string): Promise<VaultItemSummary | null> {
+    const renames = instanceRenames(item.slug, item.tokens, item.envKeys, instanceId)
+    const ownServers = new Set(item.mcpServers.map(server => server.name))
+    const env = Object.fromEntries(Object.entries(renames.env).filter(([, to]) => item.envKeys.includes(to)))
+    const servers = Object.fromEntries(Object.entries(renames.servers).filter(([, to]) => ownServers.has(to)))
+    if (Object.keys(env).length === 0 || !(await supportsVaultInstance(ctx.conn))) return null
+    return rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, servers, env }))
+}
+
+async function startInstance(ctx: VaultContext, item: VaultItemSummary & { slug: string }, conflicts: VaultConflict['conflicts']): Promise<VaultItemSummary | null> {
     const key = vaultRegistryKey(item)
     const vault = await listVaultItems(ctx.conn)
     const sameAccountNames = (itemId: string) => vault.some(other => other.id === itemId && isRegistryItem(other) && vaultRegistryKey(other) === key)
@@ -243,9 +266,7 @@ async function withOwnInstance(ctx: VaultContext, item: VaultItemSummary, confli
     let ordinal = 2
     while (labels.has(`${manifest.name} ${ordinal}`)) ordinal++
     const renames = instanceRenames(item.slug, item.mcpServers.map(server => server.name), item.envKeys, instanceId)
-    const renamed = await rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label: `${manifest.name} ${ordinal}` }), ...renames }))
-    for (const holder of await getVaultItemUsage(ctx.conn, item.id)) await dropMigrationCopy(ctx.conn, holder, key, item)
-    return renamed
+    return rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label: `${manifest.name} ${ordinal}` }), ...renames }))
 }
 
 // The coworker's own install of the app still waiting on its sign-in sits on the same registry key as

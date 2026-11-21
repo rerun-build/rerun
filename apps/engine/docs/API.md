@@ -65,7 +65,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -81,7 +81,7 @@ version the folder is at against the one this build takes it to.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
-  Vault item takes `customLabel`), and `desktop`
+  Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,
@@ -1707,6 +1707,32 @@ Change anything but the kind, the attachments and the secrets: `slug`, `name`, `
 
 `{ "set": { "KEY": "value" }, "remove": ["OTHER"] }`. Answers the names the item now holds:
 `{ "keys": ["KEY"] }`.
+
+### `POST /vault/:id/instance`
+
+Only when `GET /health` lists `vault.instance`. Gives the account of an app (`kind: "service"`) an
+instance of its own, so it can sit on a coworker beside another account of the same app:
+
+```json
+{
+  "instanceId": "ab12cd",
+  "label": "GetXAPI 2",
+  "servers": { "getxapi": "getxapi-ab12cd" },
+  "env": { "RERUN_SVC_GETXAPI_GETXAPI_KEY": "RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY" }
+}
+```
+
+`instanceId` is six lowercase letters or digits; `label`, `servers` and `env` are optional. The
+engine renames the item's servers (old name to new name), its variables and every `${VAR}` of its
+servers that reads them, the `serverName` of its `oauth`, `managed`, `composio` or `app`, and its
+tokens, then records `instanceId` (and `label` when given). Values and tokens never leave the box.
+A name the item does not hold is ignored. Answers the item.
+
+`400` for an item that already has another instance or is not the account of an app, `409`
+`vault_conflict` when the new names clash on a coworker, the item then left as it was. A call
+stopped half way leaves an item that works: one stopped before the item took its instance is made
+again, one stopped after is finished by the same call with the same `instanceId`, which is
+otherwise a no-op.
 
 ### `PUT /vault/:id/agents/:agentId` · `DELETE /vault/:id/agents/:agentId`
 

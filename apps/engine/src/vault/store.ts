@@ -26,7 +26,7 @@ import { logger } from '../lib/logger.js'
 import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
 import { BRIDGE_SERVER_NAME } from '../agents/types.js'
 import { findVaultConflicts, VaultConflictError } from './conflicts.js'
-import { listVaultTokenServers, renameVaultTokens } from './tokens.js'
+import { clearVaultToken, copyVaultTokens, listVaultTokenServers } from './tokens.js'
 import type { LoadedVaultItem } from './types.js'
 
 // Every write that changes who holds what (an item, its servers, its variables, its attachments)
@@ -236,15 +236,18 @@ function renamedTarget<T extends { serverName: string }>(target: T | undefined, 
     return target ? { ...target, serverName: servers[target.serverName] ?? target.serverName } : undefined
 }
 
-// Written so that a crash at any step leaves an item that still works and a call that can be made
-// again: the new variables join the old ones, the tokens move, `item.json` switches to the new names,
-// and only then do the old variables go.
+// Written so that a crash at any step leaves an item that still works: the new variables join the old
+// ones and the tokens are copied under the new names, `item.json` switches to them, and only then do
+// the old variables and tokens go. A call stopped before the switch is made again from the start,
+// under any instance; one stopped after it is finished by a call with the same instance.
 export async function instanceVaultItem(id: string, input: InstanceVaultItemInput): Promise<LoadedVaultItem> {
     const { instanceId, label, servers: serverRenames, env: envRenames } = instanceVaultItemSchema.parse(input)
     return withVaultLock(async () => {
         const current = await getVaultItem(id)
-        const env = Object.fromEntries(Object.entries(envRenames).filter(([from]) => from in current.env))
+        const env = Object.fromEntries(Object.entries(envRenames).filter(([from, to]) => from !== to && from in current.env))
+        const ownServers = new Set(current.config.mcpServers.map(server => server.name))
         if (current.config.instanceId === instanceId) {
+            for (const [from, to] of Object.entries(serverRenames)) if (ownServers.has(to) && !ownServers.has(from)) await clearVaultToken(id, from)
             const leftovers = Object.keys(env).filter(from => env[from] in current.env)
             if (leftovers.length === 0) return current
             await writeEnvFile(vaultItemEnvPath(id), Object.fromEntries(Object.entries(current.env).filter(([key]) => !leftovers.includes(key))))
@@ -253,8 +256,7 @@ export async function instanceVaultItem(id: string, input: InstanceVaultItemInpu
         if (current.config.instanceId) throw badRequest(`Vault item ${id} already has an instance`)
         if (current.config.kind !== 'service') throw badRequest('Only the account of an app takes an instance')
 
-        const ownServers = new Set(current.config.mcpServers.map(server => server.name))
-        const servers = Object.fromEntries(Object.entries(serverRenames).filter(([from]) => ownServers.has(from)))
+        const servers = Object.fromEntries(Object.entries(serverRenames).filter(([from, to]) => from !== to && ownServers.has(from)))
         // A new name already held is one a call stopped half way wrote next to the old one.
         const targets = new Set(Object.values(env))
         const nextEnv: Record<string, string> = {}
@@ -275,9 +277,11 @@ export async function instanceVaultItem(id: string, input: InstanceVaultItemInpu
         await assertNoConflicts({ id, config, env: nextEnv })
 
         await writeEnvFile(vaultItemEnvPath(id), { ...current.env, ...nextEnv })
-        await renameVaultTokens(id, servers)
+        await copyVaultTokens(id, servers)
         await writeItemConfig(id, config)
         await writeEnvFile(vaultItemEnvPath(id), nextEnv)
+        const renamed = new Set(config.mcpServers.map(server => server.name))
+        for (const from of Object.keys(servers)) if (!renamed.has(from)) await clearVaultToken(id, from)
         return reload(id)
     })
 }

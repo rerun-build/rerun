@@ -459,6 +459,41 @@ describe('an account given its own instance', () => {
         expect(cleaned.envKeys).toEqual(['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY'])
     })
 
+    it('keeps the token when a call stopped before the switch is made again under another instance', async () => {
+        const item = await createItem(getxapi([], 'key'))
+        expect((await send('PUT', `/vault/${item.id}/tokens/getxapi`, { accessToken: 'at-live' })).status).toBe(200)
+        await writeFile(vaultItemEnvPath(item.id), 'RERUN_SVC_GETXAPI_GETXAPI_KEY=key\nRERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY=key\n')
+        await writeFile(vaultTokenPath(item.id, 'getxapi-ab12cd'), await readFile(vaultTokenPath(item.id, 'getxapi'), 'utf8'))
+        forgetVaultCache()
+
+        const stopped = await json<Summary>(await send('GET', `/vault/${item.id}`))
+        expect(stopped.mcpServers.map(server => server.name)).toEqual(['getxapi'])
+        expect(stopped.tokens).toContain('getxapi')
+
+        const res = await send('POST', `/vault/${item.id}/instance`, {
+            instanceId: 'zz99zz',
+            servers: { getxapi: 'getxapi-zz99zz' },
+            env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: 'RERUN_SVC_GETXAPI_ZZ99ZZ_GETXAPI_KEY' },
+        })
+        expect(res.status).toBe(200)
+        expect(JSON.parse(await readFile(vaultTokenPath(item.id, 'getxapi-zz99zz'), 'utf8')).accessToken).toBe('at-live')
+        expect(existsSync(vaultTokenPath(item.id, 'getxapi'))).toBe(false)
+    })
+
+    it('takes the old variables and tokens away when a call stopped after the switch is made again', async () => {
+        const item = await createItem(getxapi([], 'key'))
+        expect((await send('PUT', `/vault/${item.id}/tokens/getxapi`, { accessToken: 'at-live' })).status).toBe(200)
+        expect((await send('POST', `/vault/${item.id}/instance`, renames)).status).toBe(200)
+        await writeFile(vaultItemEnvPath(item.id), 'RERUN_SVC_GETXAPI_GETXAPI_KEY=key\nRERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY=key\n')
+        await writeFile(vaultTokenPath(item.id, 'getxapi'), await readFile(vaultTokenPath(item.id, 'getxapi-ab12cd'), 'utf8'))
+        forgetVaultCache()
+
+        const finished = await json<Summary>(await send('POST', `/vault/${item.id}/instance`, renames))
+        expect(finished.envKeys).toEqual(['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY'])
+        expect(finished.tokens).toEqual(['getxapi-ab12cd'])
+        expect(JSON.parse(await readFile(vaultTokenPath(item.id, 'getxapi-ab12cd'), 'utf8')).accessToken).toBe('at-live')
+    })
+
     it('refuses another instance, a malformed one, and anything but the account of an app', async () => {
         const item = await createItem(getxapi([], 'key'))
         expect((await send('POST', `/vault/${item.id}/instance`, { instanceId: 'NOT-ok' })).status).toBe(400)

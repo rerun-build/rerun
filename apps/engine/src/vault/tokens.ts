@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { mkdir, readFile, readdir, rename, rm } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rm } from 'node:fs/promises'
 import { isPathSegment, vaultItemPath, vaultTokenPath, vaultTokensDir } from '../config/paths.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import type { StoredToken } from '../tools/mcp-auth.js'
@@ -31,14 +31,13 @@ export async function clearVaultToken(itemId: string, server: string): Promise<v
     await rm(vaultTokenPath(itemId, server), { force: true })
 }
 
-// A token found already under its new name was moved by a call stopped half way: it is kept.
-export async function renameVaultTokens(itemId: string, servers: Record<string, string>): Promise<void> {
+// Copied, not moved: until `item.json` names the new servers, the old names are the ones a run reads.
+export async function copyVaultTokens(itemId: string, servers: Record<string, string>): Promise<void> {
     for (const [from, to] of Object.entries(servers)) {
         if (!isPathSegment(from) || !isPathSegment(to)) continue
         const source = vaultTokenPath(itemId, from)
         if (!existsSync(source)) continue
-        if (existsSync(vaultTokenPath(itemId, to))) await rm(source, { force: true })
-        else await rename(source, vaultTokenPath(itemId, to))
+        await writeFileAtomic(vaultTokenPath(itemId, to), await readFile(source, 'utf8'), { mode: 0o600 })
     }
 }
 

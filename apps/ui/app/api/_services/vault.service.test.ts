@@ -262,7 +262,7 @@ describe('attaching', () => {
         })
 
         it('gets an instance of its own, then joins the coworker holding the first account', async () => {
-            await attachVaultEntry('second', 'alice', managerOfA)
+            await attachVaultEntry('second', 'alice', admin)
 
             const [, id, input] = vi.mocked(instanceVaultItem).mock.calls[0]
             const instanceId = input.instanceId
@@ -312,6 +312,49 @@ describe('attaching', () => {
             vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { instanceId: 'ab12cd' }) as never)
             await expect(attachVaultEntry('second', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
             expect(instanceVaultItem).not.toHaveBeenCalled()
+        })
+
+        it('is renamed only by who may change it: an admin, the box, or whoever manages every coworker holding it', async () => {
+            await expect(attachVaultEntry('second', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
+            expect(instanceVaultItem).not.toHaveBeenCalled()
+
+            vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first')).mockResolvedValue(legacy('second') as never)
+            await attachVaultEntry('second', 'alice', workspace)
+            expect(instanceVaultItem).toHaveBeenCalledTimes(1)
+
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { agentIds: [] }) as never)
+            vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first')).mockResolvedValue(legacy('second') as never)
+            await attachVaultEntry('second', 'alice', managerOfA)
+            expect(instanceVaultItem).toHaveBeenCalledTimes(2)
+        })
+
+        it('finishes a rename the box was stopped in, with the same instance, then joins', async () => {
+            const halfRenamed = legacy('second', {
+                agentIds: ['e-bob'],
+                instanceId: 'ab12cd',
+                envKeys: ['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY', 'RERUN_SVC_GETXAPI_GETXAPI_KEY'],
+                tokens: ['getxapi', 'getxapi-ab12cd'],
+                mcpServers: [{ name: 'getxapi-ab12cd', args: [], env: {}, headers: {} }],
+            })
+            vi.mocked(getVaultItem).mockResolvedValue(halfRenamed as never)
+
+            await attachVaultEntry('second', 'alice', admin)
+
+            expect(instanceVaultItem).toHaveBeenCalledWith(conn, 'second', {
+                instanceId: 'ab12cd',
+                servers: { getxapi: 'getxapi-ab12cd' },
+                env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: 'RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY' },
+            })
+            expect(dropMigrationCopy).toHaveBeenCalledWith(conn, 'e-bob', 'getxapi', expect.objectContaining({ id: 'second' }))
+            expect(vi.mocked(attachVaultItem).mock.calls.map(call => call[1])).toEqual(['second', 'second'])
+        })
+
+        it('still joins when a copy left by the migration cannot be dropped', async () => {
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+            vi.mocked(dropMigrationCopy).mockRejectedValueOnce(new Error('engine unreachable'))
+            await expect(attachVaultEntry('second', 'alice', admin)).resolves.toMatchObject({ id: 'second' })
+            expect(warn).toHaveBeenCalledWith('[vault] copy of e-bob left in place:', 'engine unreachable')
+            warn.mockRestore()
         })
     })
 
