@@ -62,6 +62,10 @@ export const ENGINE_CAPABILITY_VAULT = 'vault'
 // its sign-ins write.
 export const ENGINE_CAPABILITY_VAULT_RENAME = 'vault.rename'
 
+// The box answers `POST /vault/:id/instance`: an account added before its app took several accounts
+// is renamed into an instance of its own, so another account of the app can join it on a coworker.
+export const ENGINE_CAPABILITY_VAULT_INSTANCE = 'vault.instance'
+
 // The engine accepts linked computers on `/remote/ws` and answers `/remote/computers`.
 export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 

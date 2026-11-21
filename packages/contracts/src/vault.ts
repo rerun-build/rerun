@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { MCP_SERVER_NAME_RE, mcpServerSchema, strictMcpServerSchema } from './agent.js'
+import { MCP_SERVER_NAME_RE, mcpServerNameSchema, mcpServerSchema, strictMcpServerSchema } from './agent.js'
+import { SERVICE_INSTANCE_ID_RE } from './service.js'
 
 // The workspace's Vault: an account signed in once (or a key typed once) on the box, then attached
 // to the coworkers that use it. The secret half of an item (its `.env` and its OAuth tokens) never
@@ -139,6 +140,17 @@ export const updateVaultItemEnvSchema = z.object({
     remove: z.array(z.string()).default([]),
 })
 export type UpdateVaultItemEnvInput = z.input<typeof updateVaultItemEnvSchema>
+
+// An account added before its app took several accounts, given its own instance so it can sit beside
+// another account of the app: the hub names the new servers and variables, the box renames what it
+// holds, values and tokens included, since the hub never reads them.
+export const instanceVaultItemSchema = z.object({
+    instanceId: z.string().regex(SERVICE_INSTANCE_ID_RE),
+    label: z.string().trim().min(1).max(200).optional(),
+    servers: z.record(z.string(), mcpServerNameSchema).default({}),
+    env: z.record(z.string(), vaultEnvKeySchema).default({}),
+})
+export type InstanceVaultItemInput = z.input<typeof instanceVaultItemSchema>
 
 // The coworkers that lose an item if it goes: the attached ones, or every one when it is shared.
 export const vaultItemUsageSchema = z.object({ agentIds: z.array(z.string()) })

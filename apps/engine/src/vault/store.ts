@@ -6,11 +6,13 @@ import {
     redactVaultValue,
     vaultItemConfigSchema,
     type CreateVaultItemInput,
+    type InstanceVaultItemInput,
     type UpdateVaultItemEnvInput,
     type UpdateVaultItemInput,
     type VaultItemConfig,
     type VaultItemSummary,
     createVaultItemSchema,
+    instanceVaultItemSchema,
     updateVaultItemEnvSchema,
     updateVaultItemSchema,
 } from '@rerun/contracts'
@@ -24,7 +26,7 @@ import { logger } from '../lib/logger.js'
 import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
 import { BRIDGE_SERVER_NAME } from '../agents/types.js'
 import { findVaultConflicts, VaultConflictError } from './conflicts.js'
-import { listVaultTokenServers } from './tokens.js'
+import { listVaultTokenServers, renameVaultTokens } from './tokens.js'
 import type { LoadedVaultItem } from './types.js'
 
 // Every write that changes who holds what (an item, its servers, its variables, its attachments)
@@ -210,6 +212,72 @@ export async function updateVaultItemEnv(id: string, input: UpdateVaultItemEnvIn
         await assertNoConflicts({ id, config: current.config, env })
         await writeEnvFile(vaultItemEnvPath(id), env)
         await writeItemConfig(id, { ...current.config, updatedAt: nowIso() })
+        return reload(id)
+    })
+}
+
+const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
+
+function renamedServers(config: VaultItemConfig, servers: Record<string, string>, env: Record<string, string>): VaultItemConfig['mcpServers'] {
+    const swap = (value: string) => value.replace(PLACEHOLDER, (whole, name: string) => (env[name] ? `\${${env[name]}}` : whole))
+    const swapRecord = (record: Record<string, string>) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, swap(value)]))
+    return config.mcpServers.map(server => ({
+        ...server,
+        name: servers[server.name] ?? server.name,
+        ...(server.url === undefined ? {} : { url: swap(server.url) }),
+        ...(server.command === undefined ? {} : { command: swap(server.command) }),
+        args: server.args.map(swap),
+        env: swapRecord(server.env),
+        headers: swapRecord(server.headers),
+    }))
+}
+
+function renamedTarget<T extends { serverName: string }>(target: T | undefined, servers: Record<string, string>): T | undefined {
+    return target ? { ...target, serverName: servers[target.serverName] ?? target.serverName } : undefined
+}
+
+// Written so that a crash at any step leaves an item that still works and a call that can be made
+// again: the new variables join the old ones, the tokens move, `item.json` switches to the new names,
+// and only then do the old variables go.
+export async function instanceVaultItem(id: string, input: InstanceVaultItemInput): Promise<LoadedVaultItem> {
+    const { instanceId, label, servers: serverRenames, env: envRenames } = instanceVaultItemSchema.parse(input)
+    return withVaultLock(async () => {
+        const current = await getVaultItem(id)
+        const env = Object.fromEntries(Object.entries(envRenames).filter(([from]) => from in current.env))
+        if (current.config.instanceId === instanceId) {
+            const leftovers = Object.keys(env).filter(from => env[from] in current.env)
+            if (leftovers.length === 0) return current
+            await writeEnvFile(vaultItemEnvPath(id), Object.fromEntries(Object.entries(current.env).filter(([key]) => !leftovers.includes(key))))
+            return reload(id)
+        }
+        if (current.config.instanceId) throw badRequest(`Vault item ${id} already has an instance`)
+        if (current.config.kind !== 'service') throw badRequest('Only the account of an app takes an instance')
+
+        const ownServers = new Set(current.config.mcpServers.map(server => server.name))
+        const servers = Object.fromEntries(Object.entries(serverRenames).filter(([from]) => ownServers.has(from)))
+        // A new name already held is one a call stopped half way wrote next to the old one.
+        const targets = new Set(Object.values(env))
+        const nextEnv: Record<string, string> = {}
+        for (const [key, value] of Object.entries(current.env)) if (!targets.has(key) || key in env) nextEnv[env[key] ?? key] = value
+        const config = vaultItemConfigSchema.parse({
+            ...current.config,
+            mcpServers: renamedServers(current.config, servers, env),
+            oauth: renamedTarget(current.config.oauth, servers),
+            managed: renamedTarget(current.config.managed, servers),
+            composio: renamedTarget(current.config.composio, servers),
+            app: renamedTarget(current.config.app, servers),
+            instanceId,
+            ...(label ? { label } : {}),
+            updatedAt: nowIso(),
+        })
+        assertServers(config)
+        if (new Set(config.mcpServers.map(server => server.name)).size !== config.mcpServers.length) throw badRequest('Two servers of one item cannot share a name')
+        await assertNoConflicts({ id, config, env: nextEnv })
+
+        await writeEnvFile(vaultItemEnvPath(id), { ...current.env, ...nextEnv })
+        await renameVaultTokens(id, servers)
+        await writeItemConfig(id, config)
+        await writeEnvFile(vaultItemEnvPath(id), nextEnv)
         return reload(id)
     })
 }

@@ -177,6 +177,31 @@ describe('preparing a Vault server', () => {
         expect(prepared).not.toHaveProperty('vaultItemId')
     })
 
+    it('hands each account of one app its own key once the later one took an instance', async () => {
+        const a = await createAgent('Two accounts')
+        const getxapi = (key: string) => ({
+            kind: 'service',
+            slug: 'getxapi',
+            name: 'GetXAPI',
+            env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: key },
+            mcpServers: [{ name: 'getxapi', command: 'npx', args: ['-y', '@getxapi/mcp'], env: { GETXAPI_KEY: '${RERUN_SVC_GETXAPI_GETXAPI_KEY}' } }],
+        })
+        await createItem({ ...getxapi('key-first'), agentIds: [a] })
+        const second = await createItem(getxapi('key-second'))
+        const renamed = await send('POST', `/vault/${second}/instance`, {
+            instanceId: 'ab12cd',
+            servers: { getxapi: 'getxapi-ab12cd' },
+            env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: 'RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY' },
+        })
+        expect(renamed.status).toBe(200)
+        expect((await send('PUT', `/vault/${second}/agents/${a}`)).status).toBe(200)
+
+        const agent = await loaded(a)
+        const prepared = await Promise.all(agentMcpServers(agent).map(server => prepareMcpServer(agent.id, server, agentProcessEnv(agent).env)))
+        expect(Object.fromEntries(prepared.map(server => [server.name, server.env?.GETXAPI_KEY]))).toEqual({ getxapi: 'key-first', 'getxapi-ab12cd': 'key-second' })
+        expect(vaultEnvFor(agent)).toEqual({ RERUN_SVC_GETXAPI_GETXAPI_KEY: 'key-first', RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY: 'key-second' })
+    })
+
     it('names the calling coworker in ${RERUN_AGENT_ID}, the one a delegate works for', async () => {
         const a = await createAgent('Caller')
         await createItem({ kind: 'mcp', name: 'Tracker', agentIds: [a], mcpServers: [{ name: 'tracker', url: 'https://t.test/mcp?agent=${RERUN_AGENT_ID}' }] })

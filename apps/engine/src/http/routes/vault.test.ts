@@ -401,3 +401,84 @@ describe('conflicts', () => {
         expect(items).toHaveLength(1)
     })
 })
+
+describe('an account given its own instance', () => {
+    const getxapi = (agentIds: string[], key: string) => ({
+        kind: 'service',
+        slug: 'getxapi',
+        name: 'GetXAPI',
+        agentIds,
+        mcpServers: [{ name: 'getxapi', command: 'npx', args: ['-y', '@getxapi/mcp'], env: { GETXAPI_KEY: '${RERUN_SVC_GETXAPI_GETXAPI_KEY}' } }],
+        env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: key },
+    })
+    const renames = {
+        instanceId: 'ab12cd',
+        label: 'GetXAPI 2',
+        servers: { getxapi: 'getxapi-ab12cd' },
+        env: { RERUN_SVC_GETXAPI_GETXAPI_KEY: 'RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY' },
+    }
+
+    it('renames its servers, variables and tokens, then joins a coworker holding another account of the app', async () => {
+        const atlas = await createAgent('Atlas')
+        const scout = await createAgent('Scout')
+        await createItem(getxapi([atlas], 'key-first'))
+        const second = await createItem(getxapi([scout], 'key-second'))
+        expect((await send('PUT', `/vault/${second.id}/tokens/getxapi`, { accessToken: 'at-2' })).status).toBe(200)
+        expect((await send('PUT', `/vault/${second.id}/agents/${atlas}`)).status).toBe(409)
+
+        const res = await send('POST', `/vault/${second.id}/instance`, renames)
+        expect(res.status).toBe(200)
+        const renamed = await json<Summary & { instanceId?: string; mcpServers: { name: string; env: Record<string, string> }[] }>(res)
+        expect(renamed).toMatchObject({ instanceId: 'ab12cd', label: 'GetXAPI 2', envKeys: ['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY'], tokens: ['getxapi-ab12cd'], agentIds: [scout] })
+        expect(renamed.mcpServers).toEqual([expect.objectContaining({ name: 'getxapi-ab12cd', env: { GETXAPI_KEY: '${RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY}' } })])
+        expect(await readFile(vaultItemEnvPath(second.id), 'utf8')).toContain('RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY=key-second')
+        expect(JSON.parse(await readFile(vaultTokenPath(second.id, 'getxapi-ab12cd'), 'utf8')).accessToken).toBe('at-2')
+        expect(existsSync(vaultTokenPath(second.id, 'getxapi'))).toBe(false)
+
+        expect((await send('PUT', `/vault/${second.id}/agents/${atlas}`)).status).toBe(200)
+        const { items } = await json<{ items: Summary[] }>(await send('GET', `/vault?agent=${atlas}`))
+        expect(items.map(item => item.mcpServers[0].name).sort()).toEqual(['getxapi', 'getxapi-ab12cd'])
+    })
+
+    it('can be called again, and finishes a call stopped half way', async () => {
+        const atlas = await createAgent('Atlas')
+        const item = await createItem(getxapi([atlas], 'key'))
+        await writeFile(vaultItemEnvPath(item.id), 'RERUN_SVC_GETXAPI_GETXAPI_KEY=key\nRERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY=key\n')
+        forgetVaultCache()
+
+        expect((await send('POST', `/vault/${item.id}/instance`, renames)).status).toBe(200)
+        const again = await send('POST', `/vault/${item.id}/instance`, renames)
+        expect(again.status).toBe(200)
+        expect((await json<Summary>(again)).envKeys).toEqual(['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY'])
+
+        const config = JSON.parse(await readFile(vaultItemPath(item.id), 'utf8'))
+        await writeFile(vaultItemEnvPath(item.id), 'RERUN_SVC_GETXAPI_GETXAPI_KEY=key\nRERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY=key\n')
+        await writeFile(vaultItemPath(item.id), JSON.stringify(config))
+        forgetVaultCache()
+        const cleaned = await json<Summary>(await send('POST', `/vault/${item.id}/instance`, renames))
+        expect(cleaned.envKeys).toEqual(['RERUN_SVC_GETXAPI_AB12CD_GETXAPI_KEY'])
+    })
+
+    it('refuses another instance, a malformed one, and anything but the account of an app', async () => {
+        const item = await createItem(getxapi([], 'key'))
+        expect((await send('POST', `/vault/${item.id}/instance`, { instanceId: 'NOT-ok' })).status).toBe(400)
+        expect((await send('POST', `/vault/${item.id}/instance`, renames)).status).toBe(200)
+        expect((await send('POST', `/vault/${item.id}/instance`, { ...renames, instanceId: 'zz99zz' })).status).toBe(400)
+        const key = await createItem(secret('Stripe', { STRIPE_KEY: 'sk' }))
+        expect((await send('POST', `/vault/${key.id}/instance`, { instanceId: 'mn78op' })).status).toBe(400)
+    })
+
+    it('refuses new names another account already holds on a coworker, and leaves the account as it was', async () => {
+        const atlas = await createAgent('Atlas')
+        const first = await createItem(getxapi([], 'key-first'))
+        expect((await send('POST', `/vault/${first.id}/instance`, renames)).status).toBe(200)
+        expect((await send('PUT', `/vault/${first.id}/agents/${atlas}`)).status).toBe(200)
+        const second = await createItem(getxapi([atlas], 'key-second'))
+
+        const clash = await send('POST', `/vault/${second.id}/instance`, { ...renames, instanceId: 'ij56kl' })
+        expect(clash.status).toBe(409)
+        const after = await json<Summary & { instanceId?: string }>(await send('GET', `/vault/${second.id}`))
+        expect(after.instanceId).toBeUndefined()
+        expect(after.envKeys).toEqual(['RERUN_SVC_GETXAPI_GETXAPI_KEY'])
+    })
+})

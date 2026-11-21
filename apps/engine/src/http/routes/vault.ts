@@ -7,6 +7,7 @@ import {
     deleteVaultItem,
     detachVaultItem,
     getVaultItem,
+    instanceVaultItem,
     listVaultItems,
     toVaultSummary,
     updateVaultItem,
@@ -67,6 +68,13 @@ vaultRoutes.patch('/:id/env', async c => {
     const input = await c.req.json()
     const item = await changing(id, () => updateVaultItemEnv(id, input))
     return c.json({ keys: Object.keys(item.env).sort() })
+})
+
+vaultRoutes.post('/:id/instance', async c => {
+    const id = c.req.param('id')
+    if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
+    const input = await c.req.json()
+    return c.json(await toVaultSummary(await changing(id, () => instanceVaultItem(id, input))))
 })
 
 vaultRoutes.put('/:id/agents/:agentId', async c => {
