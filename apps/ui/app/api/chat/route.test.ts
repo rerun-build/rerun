@@ -1,4 +1,5 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
+import { AuthorizationError } from '@/app/api/_auth/errors'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, recordMessageSent, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
@@ -60,6 +61,7 @@ describe('POST /api/chat', () => {
 
         expect(response.status).toBe(404)
         expect(getExistingSession).not.toHaveBeenCalled()
+        expect(embedTextShared).not.toHaveBeenCalled()
         expect(engine.chat).not.toHaveBeenCalled()
     })
 
@@ -164,6 +166,29 @@ describe('POST /api/chat', () => {
         expect(response.status).toBe(404)
         expect(await response.json()).toEqual({ error: 'session_not_found' })
         expect(engine.chat).not.toHaveBeenCalled()
+    })
+
+    it('answers not found for a conversation the caller cannot reach, as for one that does not exist', async () => {
+        vi.mocked(getExistingSession).mockRejectedValue(new AuthorizationError('sessionNotFound'))
+
+        const response = await settle(POST(request({})))
+
+        expect(response.status).toBe(404)
+        expect(await response.json()).toEqual({ error: 'session_not_found' })
+        expect(engine.chat).not.toHaveBeenCalled()
+    })
+
+    it('still answers a 500 when the conversation could not be read at all', async () => {
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        vi.mocked(getExistingSession).mockRejectedValue(new Error('connection reset'))
+
+        const response = await settle(POST(request({})))
+
+        expect(response.status).toBe(500)
+        expect(await response.json()).toEqual({ error: 'Failed to resolve session' })
+        expect(log).toHaveBeenCalled()
+        expect(engine.chat).not.toHaveBeenCalled()
+        log.mockRestore()
     })
 
     it('answers the engine refusing a session it does not hold with the same code, not its raw text', async () => {

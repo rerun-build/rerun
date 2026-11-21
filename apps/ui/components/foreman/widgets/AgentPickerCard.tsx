@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { isConversationId } from '@/lib/chat/conversation-id'
 import { useBoardStore } from '@/stores/board.store'
 import { createClient } from '@/supabase/client'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 import type { AgentPick } from './agent-picks'
 import { AgentPickerList, type AgentPickerRow } from './AgentPickerList'
@@ -24,8 +25,12 @@ export function openAgentPick({ agentId, tab, conversationId, runId }: AgentPick
     }
     // The model handed the engine's session id rather than the conversation's: opened as is, every
     // message in that chat fails. Its row is found by that id; with none, the chat stays on the tab.
-    void createClient().from('sessions').select('id').eq('agent_id', agentId).eq('engine_session_id', conversationId).maybeSingle().then(({ data }) => {
-        if (data) useBoardStore.getState().setPendingOpenSession({ agentId, sessionId: data.id, runId })
+    void selectMaybeSingle(createClient(), 'sessions', ['id'] as const, { agent_id: agentId, engine_session_id: conversationId }).then(({ data, error }) => {
+        if (error) console.warn(`[FOREMAN PICK] agent=${agentId} session=${conversationId} could not be looked up:`, error)
+        // The answer can come back after the user went on to another coworker: opened then, it would
+        // pull them back to this one's chat.
+        const current = useBoardStore.getState()
+        if (data && current.selectedAgentId === agentId) current.setPendingOpenSession({ agentId, sessionId: data.id, runId })
     })
 }
 
