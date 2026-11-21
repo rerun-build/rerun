@@ -71,8 +71,8 @@ type SessionRow = Row<'sessions'> & { agent: Pick<Tables['agents']['Row'], 'work
 const agents: AgentRow[] = [{ id: 'agent-scout', name: 'Scout', workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-02T09:05:00.000Z', space: { visibility: 'workspace' } }]
 const spaces: Row<'spaces'>[] = [{ id: 'space-sales', workspace_id: 7, name: 'Sales', visibility: 'workspace', created_at: '2026-11-02T09:00:00.000Z' }]
 const sessions: SessionRow[] = [
-    { id: 'session-general', agent_id: 'agent-scout', engine_session_id: 'eng-session-1', kind: 'general', title: 'General', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout' } },
-    { id: 'session-ledger', agent_id: 'agent-ledger', engine_session_id: 'eng-session-9', kind: 'thread', title: 'Invoices', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-ledger' } },
+    { id: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', agent_id: 'agent-scout', engine_session_id: 'eng-session-1', kind: 'general', title: 'General', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout' } },
+    { id: '9c2e7a41-6d3b-4f80-b1a5-7e4d2c9f0a83', agent_id: 'agent-ledger', engine_session_id: 'eng-session-9', kind: 'thread', title: 'Invoices', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-ledger' } },
 ]
 const engine_pool: Row<'engine_pool'>[] = [{ id: 'pool-1', engine_host: 'box-001.rerun.internal', engine_api_key: 'key', provider_server_id: 'srv-1', claimed_by_workspace_id: 7 }]
 const foreman_conversations: Row<'foreman_conversations'>[] = [
@@ -175,9 +175,9 @@ describe('a coworker chat', () => {
 
     it('streams the answer of a conversation that goes on', async () => {
         const { POST } = await import('@/app/api/chat/route')
-        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: 'session-general', text: 'Which bakeries did we not call yet?', source: 'mobile' } })
+        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', text: 'Which bakeries did we not call yet?', source: 'mobile' } })
         const answer = answerOf(await expectContract(mobileApi.sendChatMessage, res))
-        expect(res.headers.get('X-Session-Id')).toBe('session-general')
+        expect(res.headers.get('X-Session-Id')).toBe('5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10')
         expect(res.headers.get('X-Run-Id')).toBe('run-8')
         expect(answer.text).toBe('Three bakeries have not been called yet.')
         expect(answer.types).toEqual(expect.arrayContaining(['reasoning-delta', 'tool-input-available', 'tool-output-available', 'data-compaction']))
@@ -197,7 +197,7 @@ describe('a coworker chat', () => {
         engine.chat.mockImplementation(async () => engineBusy('user-ada'))
         engine.reconnectRun.mockImplementation(async () => engineReplay())
         const { POST } = await import('@/app/api/chat/route')
-        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: 'session-general', text: 'Which bakeries did we not call yet?' } })
+        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', text: 'Which bakeries did we not call yet?' } })
         await expectContract(mobileApi.sendChatMessage, res)
         expect(res.headers.get('X-Run-Id')).toBe('run-7')
     })
@@ -205,7 +205,7 @@ describe('a coworker chat', () => {
     it('answers 409 run_in_flight when a teammate holds the conversation', async () => {
         engine.chat.mockImplementation(async () => engineBusy('user-grace'))
         const { POST } = await import('@/app/api/chat/route')
-        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: 'session-general', text: 'Any news?' } })
+        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', text: 'Any news?' } })
         expect(res.status).toBe(409)
         expect(await expectContract(mobileApi.sendChatMessage, res, 409)).toEqual({ error: 'run_in_flight', runId: 'run-7', startedAt: '2026-11-19T08:59:30.000Z', heldByTeammate: true })
     })
@@ -213,14 +213,14 @@ describe('a coworker chat', () => {
     it('answers 404 session_not_found when the engine lost the conversation', async () => {
         engine.chat.mockImplementation(async () => Response.json({ error: ENGINE_SESSION_NOT_FOUND }, { status: 404 }))
         const { POST } = await import('@/app/api/chat/route')
-        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: 'session-general', text: 'Still there?' } })
+        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', text: 'Still there?' } })
         expect(res.status).toBe(404)
         expect(await expectContract(mobileApi.sendChatMessage, res, 404)).toEqual({ error: 'session_not_found' })
     })
 
     it('answers 404 session_not_found for a conversation of another coworker', async () => {
         const { POST } = await import('@/app/api/chat/route')
-        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: 'session-ledger', text: 'Still there?' } })
+        const res = await callRoute(POST, mobileApi.sendChatMessage, { body: { agentId: 'agent-scout', sessionId: '9c2e7a41-6d3b-4f80-b1a5-7e4d2c9f0a83', text: 'Still there?' } })
         expect(res.status).toBe(404)
         expect(await expectContract(mobileApi.sendChatMessage, res, 404)).toEqual({ error: 'session_not_found' })
         expect(engine.chat).not.toHaveBeenCalled()

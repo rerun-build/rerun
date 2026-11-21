@@ -9,6 +9,7 @@ import { embedTextShared } from '@/lib/services/embed'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
+import { isConversationId } from '@/lib/chat/conversation-id'
 import { installSessionTitle, parseInstallMessage } from '@/lib/chat/install-marker'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
@@ -87,6 +88,13 @@ export async function POST(request: Request) {
     // its model: asked for now, it is under way by the time the engine does.
     embedTextShared(workspaceId, text).catch(() => {})
 
+    // Not a conversation row's id (an engine session id carried into a chat link, typically): the
+    // lookup would fail on the uuid column and answer a 500 the user can only retry.
+    if (sessionId && !isConversationId(sessionId)) {
+        console.warn(`[CHAT SESSION INVALID] agent=${agentId} session=${sessionId}`)
+        return sessionNotFound()
+    }
+
     // The conversation the request names is looked up while the coworker is: neither read waits on
     // the other. Its failure is answered further down, where it is awaited.
     const namedSession = sessionId && agentId !== FOREMAN_AGENT_ID ? getExistingSession(sessionId, actor) : null
@@ -119,7 +127,8 @@ export async function POST(request: Request) {
         let existing: Awaited<ReturnType<typeof getExistingSession>>
         try {
             existing = await (namedSession ?? getExistingSession(sessionId, actor))
-        } catch {
+        } catch (err) {
+            console.error(`[CHAT SESSION] agent=${agentId} session=${sessionId} could not be resolved:`, err)
             return Response.json({ error: 'Failed to resolve session' }, { status: 500 })
         }
         // A tab of one coworker holding another one's conversation: the engine would answer with a
