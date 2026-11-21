@@ -1,0 +1,13 @@
+{
+    "states": {
+        "done": "Completato",
+        "error": "Non riuscito",
+        "question": "Domanda",
+        "approval": "Richiede approvazione",
+        "connector": "Serve un'app",
+        "info": "Aggiornamento"
+    },
+    "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
+    "fallbackAgent": "il tuo coworker"
+}

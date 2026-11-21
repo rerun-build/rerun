@@ -1,0 +1,519 @@
+{
+    "close": "Chiudi",
+    "chat": {
+        "actionApproval": {
+            "title": "Approvazione richiesta",
+            "previous": "Approvazione precedente",
+            "next": "Approvazione successiva",
+            "decline": "Non ora",
+            "explain": "Explicar",
+            "approve": "Approva",
+            "approved": "Approvato"
+        },
+        "alert": {
+            "title": "Notifica",
+            "markAsRead": "Segna come letto"
+        },
+        "approval": {
+            "title": "Approvazione richiesta: {label}",
+            "responded": "Risposta: <b>{choice}</b>",
+            "choices": {
+                "once": "Consenti una volta",
+                "session": "Questa sessione",
+                "always": "Sempre",
+                "deny": "Nega"
+            }
+        },
+        "decline": {
+            "placeholder": "Perché no? (opzionale)",
+            "back": "Indietro",
+            "confirm": "Conferma"
+        },
+        "question": {
+            "typeAnswer": "Scrivi la tua risposta…",
+            "somethingElse": "Altro",
+            "attachFiles": "Allega file",
+            "dropFiles": "Rilascia i file per allegarli",
+            "record": "Rispondi con la voce",
+            "useRecording": "Usa questa registrazione",
+            "discardRecording": "Scarta la registrazione",
+            "selectAll": "Seleziona tutte quelle pertinenti",
+            "dismiss": "Ignora le domande",
+            "skip": "Salta",
+            "submit": "Invia risposte",
+            "next": "Domanda successiva"
+        },
+        "reasoning": {
+            "thinking": "Sto pensando...",
+            "thoughtFor": "Ha riflettuto per {duration}",
+            "thought": "Riflessione"
+        },
+        "secret": {
+            "saveFailed": "Impossibile salvare le credenziali",
+            "titleOne": "Credenziale necessaria",
+            "titleMany": "Credenziali necessarie",
+            "dismiss": "Ignora richiesta credenziali",
+            "storedAs": "Salvato come {key}",
+            "replacePlaceholder": "Già salvato. Inserisci un valore per sostituirlo",
+            "placeholder": "Incolla il valore",
+            "whereToFind": "Dove trovarlo",
+            "storageNote": "Salvato sul tuo engine come variabile del coworker. Non viene mai inviato al modello.",
+            "skip": "Salta",
+            "saving": "Salvataggio…",
+            "save": "Salva"
+        },
+        "skillProposal": {
+            "remembering": "Memorizzazione",
+            "remembered": "Memorizzato",
+            "failed": "Impossibile memorizzare",
+            "retry": "Riprova",
+            "dismiss": "Ignora",
+            "notRemembered": "Non memorizzato",
+            "remember": "Ricorda",
+            "no": "No, grazie",
+            "view": "Vedi",
+            "hideDetails": "Nascondi dettagli",
+            "showDetails": "Mostra dettagli"
+        },
+        "steps": {
+            "previous": "Passaggio precedente",
+            "next": "Passaggio successivo",
+            "goTo": "Vai al passaggio {step}"
+        },
+        "table": {
+            "boxDatabase": "Database della Box",
+            "coworkerDatabase": "Database del coworker",
+            "rows": "{count, plural, one {# riga} other {# righe}}",
+            "columnsHidden": "alcune colonne nascoste",
+            "groupedBy": "raggruppato per {column}",
+            "open": "Apri database",
+            "empty": "Ancora nessuna riga.",
+            "more": "+ {count} altre",
+            "rating": "{value} su 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "Ingrandisci",
+        "zoomOut": "Riduci",
+        "recenter": "Ricentra",
+        "recenterView": "Ricentra la vista"
+    },
+    "consent": {
+        "rejectAll": "Rifiuta tutto",
+        "acceptAll": "Accetta tutto",
+        "region": "Consenso cookie",
+        "title": "Cookie",
+        "short": "Usiamo cookie analitici. <policy>Informativa cookie</policy>",
+        "long": "Usiamo cookie analitici per capire come viene usato Rerun. I cookie necessari per l'accesso, la chat di supporto e le preferenze restano sempre attivi. <policy>Informativa cookie</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "La tua identità",
+                    "description": "Foto, banner, nome e come lavori."
+                },
+                "about": {
+                    "title": "Chi sei",
+                    "description": "Dove sei e cosa fai."
+                },
+                "pricing": {
+                    "title": "Tariffe e disponibilità",
+                    "description": "La tua disponibilità e un'idea delle tariffe."
+                },
+                "expertise": {
+                    "title": "La tua expertise",
+                    "description": "Skill e lingue con cui lavori. Opzionale."
+                },
+                "links": {
+                    "title": "Link e pubblicazione",
+                    "description": "Aggiungi i link, poi pubblica il profilo."
+                }
+            },
+            "name": "Nome",
+            "namePlaceholder": "es. Mira Labs",
+            "email": "E-mail",
+            "emailHelper": "Privata. Solo il team Rerun può vederla.",
+            "type": "Tipo",
+            "location": "Luogo",
+            "locationPlaceholder": "es. Milano",
+            "bio": "Bio",
+            "bioPlaceholder": "Cosa costruisci e chi aiuti.",
+            "availability": "Disponibilità",
+            "budget": "Budget",
+            "budgetPlaceholder": "Seleziona un intervallo",
+            "skills": "Skill",
+            "skillsPlaceholder": "Seleziona skill",
+            "languages": "Lingue",
+            "languagesPlaceholder": "Seleziona lingue",
+            "website": "Sito web",
+            "back": "Indietro",
+            "continue": "Continua"
+        },
+        "types": {
+            "studio": {
+                "title": "Studio",
+                "description": "Agenzia o team che costruisce per i clienti"
+            },
+            "freelancer": {
+                "title": "Freelance",
+                "description": "Indipendente che lavora da solo"
+            },
+            "expert": {
+                "title": "Esperto",
+                "description": "Specialista che offre consulenza e guida"
+            }
+        },
+        "availability": {
+            "tooltip": "{label} · {hint}",
+            "available": {
+                "label": "Disponibile",
+                "hint": "Accetta nuovi progetti ora"
+            },
+            "soon": {
+                "label": "Disponibile a breve",
+                "hint": "Si libera a breve"
+            },
+            "unavailable": {
+                "label": "Non disponibile",
+                "hint": "Al completo per ora"
+            }
+        },
+        "validation": {
+            "nameRequired": "Il nome è obbligatorio",
+            "nameTooLong": "Il nome è troppo lungo",
+            "nameInvalid": "Il nome non può contenere < o >",
+            "emailRequired": "L'email è obbligatoria",
+            "emailInvalid": "Email non valida",
+            "bioTooLong": "La bio è troppo lunga",
+            "budgetInvalid": "Budget non valido",
+            "skillInvalid": "Skill non valida",
+            "languageInvalid": "Lingua non valida"
+        },
+        "images": {
+            "title": "Foto e banner",
+            "drop": "Rilascia",
+            "dropBanner": "Rilascia il banner",
+            "dropPhoto": "Rilascia la foto",
+            "upload": "Carica",
+            "uploading": "Caricamento…",
+            "changeBanner": "Cambia banner",
+            "uploadPhoto": "Carica foto",
+            "remove": "Rimuovi",
+            "notAnImage": "Scegli un file immagine."
+        },
+        "card": {
+            "location": "Luogo",
+            "status": "Stato",
+            "links": "Link",
+            "namePlaceholder": "Il tuo nome",
+            "rolePlaceholder": "Esperto Rerun"
+        },
+        "preview": {
+            "hire": "Assumi"
+        },
+        "skills": {
+            "agentDesign": "Progettazione agenti",
+            "workflowAutomation": "Automazione workflow",
+            "ragKnowledgeBases": "RAG e basi di conoscenza",
+            "integrationsApis": "Integrazioni e API",
+            "mcpServers": "Server MCP",
+            "promptEngineering": "Prompt engineering",
+            "dataPipelines": "Pipeline di dati",
+            "chatbotsSupport": "Chatbot e supporto",
+            "voiceAgents": "Agenti vocali",
+            "leadGenOutreach": "Lead generation e outreach",
+            "crmAutomation": "Automazione CRM",
+            "webScraping": "Web scraping",
+            "ecommerceAutomation": "Automazione e-commerce",
+            "analyticsReporting": "Analisi e reportistica",
+            "fineTuning": "Fine-tuning",
+            "noCodeAutomation": "Automazione no-code"
+        }
+    },
+    "foreman": {
+        "orbLabel": "Chiedi al tuo Chief of Staff",
+        "tabsLabel": "Chief of Staff",
+        "empty": {
+            "title": "Chiedi qualsiasi cosa sul workspace",
+            "description": "Il tuo Chief of Staff costruisce e gestisce i coworker con te"
+        },
+        "header": {
+            "closeChat": "Chiudi la chat",
+            "resize": "Ridimensiona la chat"
+        },
+        "tabs": {
+            "assistant": "Chiedi",
+            "tasks": "Attività",
+            "routines": "Routine",
+            "card": "Scheda"
+        },
+        "periods": {
+            "running": "In corso",
+            "morning": "Stamattina",
+            "afternoon": "Questo pomeriggio",
+            "tonight": "Stasera",
+            "tomorrow": "Domani",
+            "week": "Questa settimana",
+            "later": "Più tardi",
+            "paused": "In pausa"
+        },
+        "routines": {
+            "setupFirst": "Completa prima la configurazione",
+            "pause": "Metti in pausa {name}",
+            "resume": "Riprendi {name}",
+            "nameLabel": "Nome routine",
+            "runningJustNow": "In corso · <1m",
+            "runningMinutes": "In corso · {minutes}m",
+            "runningHours": "In corso · {hours}h",
+            "startsNow": "Parte ora",
+            "startsInMinutes": "Parte tra {minutes}m",
+            "startsInHours": "Parte tra {hours}h"
+        },
+        "agentPicker": {
+            "openTab": "Apri {tab} per {name}"
+        }
+    },
+    "forms": {
+        "optional": "Opzionale",
+        "hidePassword": "Nascondi password",
+        "showPassword": "Mostra password",
+        "select": "Seleziona…",
+        "search": "Digita per cercare…",
+        "noResults": "Nessun risultato",
+        "dropFile": "Rilascia il file qui",
+        "remove": "Rimuovi {item}"
+    },
+    "primitives": {
+        "loading": "Caricamento",
+        "scrollLeft": "Scorri a sinistra",
+        "scrollRight": "Scorri a destra",
+        "carousel": {
+            "previous": "Precedente {label}",
+            "next": "Successivo {label}",
+            "goTo": "Vai a {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "Conteggio",
+            "totalTokens": "Token totali",
+            "inputTokens": "Token in input",
+            "outputTokens": "Token in output",
+            "cachedInputTokens": "Token in cache",
+            "reasoningTokens": "Token di ragionamento",
+            "cost": "Costo",
+            "avgDurationMs": "Durata media",
+            "errorCount": "Errori",
+            "errorRate": "Tasso di errore"
+        },
+        "live": "In diretta",
+        "runStatus": {
+            "running": "In corso",
+            "done": "Completato",
+            "error": "Errore",
+            "cancelled": "Annullato"
+        },
+        "runs": {
+            "emptyTitle": "Ancora nessuna esecuzione",
+            "emptyDescription": "Ogni esecuzione del coworker viene registrata qui",
+            "steps": "{count, plural, one {# passaggio} other {# passaggi}}",
+            "tokens": "{tokens} token"
+        },
+        "agentStatus": {
+            "idle": "Inattivo",
+            "working": "Al lavoro",
+            "error": "Errore",
+            "waiting_human": "In attesa di te",
+            "offline": "Non in linea",
+            "empty": "Nessun coworker da mostrare."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} esecuzioni",
+                "runSteps": "{count} passaggi",
+                "toolCalls": "{count} chiamate strumento",
+                "sessions": "{count} sessioni"
+            },
+            "other": "Altro",
+            "loading": "Caricamento...",
+            "noData": "Nessun dato in questo periodo."
+        },
+        "usage": {
+            "input": "Ingresso",
+            "output": "Uscita",
+            "cached": "In cache",
+            "cost": "Costo",
+            "tokens": "Token",
+            "totalCost": "Costo totale",
+            "totalTokens": "Token totali",
+            "runs": "{count, plural, one {# esecuzione} other {# esecuzioni}}",
+            "noUsage": "Nessun utilizzo in questo periodo."
+        }
+    },
+    "inbox": {
+        "title": "Notifiche",
+        "resize": "Ridimensiona le notifiche",
+        "close": "Chiudi le notifiche",
+        "preferences": "Preferenze",
+        "preferencesUnavailable": "Le preferenze non sono disponibili qui",
+        "markAllRead": "Segna tutto come letto",
+        "nothingToMark": "Niente da segnare come letto",
+        "markRead": "Segna come letto",
+        "noUpdates": "Nessun aggiornamento",
+        "pillLabel": "Notifiche: {summary}",
+        "pillLabelEmpty": "Notifiche: nessun aggiornamento",
+        "needsYouRow": "Ha bisogno di te",
+        "needsYouCount": "{count, plural, one {# ti serve} other {# ti servono}}",
+        "doneCount": "{count, plural, one {# completata} other {# completate}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> ti serve} other {<b>#</b> ti servono}}",
+        "doneRich": "{count, plural, one {<b>#</b> completata} other {<b>#</b> completate}}",
+        "newUpdates": "{count, plural, one {<b>#</b> nuovo aggiornamento} other {<b>#</b> nuovi aggiornamenti}}",
+        "running": "{count, plural, one {<n>#</n> attività in corso} other {<n>#</n> attività in corso}}",
+        "empty": {
+            "title": "Niente da gestire",
+            "description": "Quando un coworker ha bisogno di te o completa un'attività, finisce qui."
+        },
+        "sections": {
+            "needsYou": "Ti serve",
+            "headsUps": "Avvisi",
+            "errors": "Errori",
+            "done": "Completate"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} ti ha fatto una domanda",
+            "awaiting_approval": "{agent} richiede la tua approvazione",
+            "awaiting_connector": "{agent} ha bisogno di un'app collegata",
+            "waiting_human": "{agent} ti sta aspettando",
+            "awaiting_ack": "{agent} ha segnalato qualcosa per te",
+            "error": "{agent} ha avuto un errore",
+            "done": "{agent} ha completato l'esecuzione"
+        }
+    },
+    "richText": {
+        "bold": "Grassetto",
+        "italic": "Corsivo",
+        "heading": "Titolo",
+        "subheading": "Sottotitolo",
+        "bulletList": "Elenco puntato",
+        "numberedList": "Elenco numerato",
+        "quote": "Citazione",
+        "inlineCode": "Codice inline",
+        "codeBlock": "Blocco di codice",
+        "link": "Collegamento",
+        "linkPrompt": "URL del link"
+    },
+    "theme": {
+        "label": "Tema",
+        "options": {
+            "system": "Sistema",
+            "light": "Chiaro",
+            "dark": "Scuro"
+        }
+    },
+    "newAgent": {
+        "create": "Crea {name}",
+        "createCoworker": "Crea coworker",
+        "apps": "App",
+        "pickedApps": "App: {apps}",
+        "or": "Oppure",
+        "browseTemplates": "Sfoglia template",
+        "job": {
+            "placeholder": "Descrivi l'attività come la spiegheresti a un collega.",
+            "label": "Cosa deve fare il nuovo coworker?"
+        },
+        "name": {
+            "placeholder": "Dai un nome al coworker",
+            "label": "Nome del coworker"
+        },
+        "forYou": {
+            "heading": "Oppure parti da una scelta per te",
+            "closeToIdea": "Vicino alla tua idea",
+            "otherIdeas": "Altre idee"
+        },
+        "appsPicker": {
+            "search": "Cerca app",
+            "all": "Tutte",
+            "empty": "Nessuna app con questo nome.",
+            "limit": "Fino a {max} app per iniziare. Il coworker potrà collegarne altre dopo.",
+            "categories": {
+                "payments": "Pagamenti",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analisi",
+                "dev": "Sviluppo",
+                "productivity": "Produttività",
+                "other": "Altro"
+            }
+        },
+        "schedule": {
+            "button": "Pianifica",
+            "readFromDescription": "Letto dalla descrizione",
+            "onASchedule": "Su pianificazione",
+            "custom": "Personalizzato",
+            "noSchedule": "Nessuna pianificazione",
+            "onDemand": "Solo quando lo chiedo",
+            "timeOfDay": "Orario",
+            "presets": {
+                "weekday": {
+                    "label": "Ogni giorno feriale alle 9:00",
+                    "detail": "Da lunedì a venerdì"
+                },
+                "monday": {
+                    "label": "Ogni lunedì alle 9:00",
+                    "detail": "Una volta a settimana"
+                }
+            },
+            "everyDay": "Ogni giorno alle {time}",
+            "everyWeekday": "Ogni giorno feriale alle {time}",
+            "everyDays": "Ogni {days} alle {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "Board coworker",
+        "addBlock": "Aggiungi un blocco su questo lato",
+        "status": {
+            "idle": "Inattivo",
+            "working": "Al lavoro",
+            "error": "Errore",
+            "offline": "Non in linea",
+            "waiting_human": "Ti aspetta",
+            "disabled": "Disattivato",
+            "paused": "In pausa",
+            "restoring": "Ripristino"
+        },
+        "countdown": {
+            "seconds": "{count} s",
+            "minutes": "{count} min",
+            "hours": "{count} h",
+            "days": "{count}g"
+        },
+        "untitledBox": "Box senza nome",
+        "boxAria": "Box {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} one {, # da gestire} other {, # da gestire}}{results, plural, =0 {} one {, # nuovo risultato} other {, # nuovi risultati}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "In corso",
+            "approval": "Ti serve",
+            "success": "Completato",
+            "done": "Completato"
+        },
+        "approve": "Approva",
+        "edit": "Modifica"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "Marketing",
+            "sales": "Vendite",
+            "ops": "Ops"
+        },
+        "roles": {
+            "headOfGrowth": "Head of growth",
+            "accountExecutive": "Account executive",
+            "operationsSpecialist": "Specialista operations"
+        }
+    }
+}

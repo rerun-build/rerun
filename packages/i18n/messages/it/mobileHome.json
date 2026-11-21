@@ -1,0 +1,123 @@
+{
+    "title": "Coworker",
+    "loadFailed": "Non siamo riusciti a caricare i coworker.",
+    "retry": "Riprova",
+    "empty": "Nessun coworker ancora.",
+    "loadingCoworkers": "Caricamento coworker",
+    "newCoworker": "Nuovo coworker",
+    "untitledBox": "Box senza titolo",
+    "teammate": "Collega",
+    "pinned": {
+        "dragToReorder": "Trascina per riordinare",
+        "done": "Fine",
+        "unpin": "Rimuovi pin",
+        "details": "Dettagli coworker",
+        "edit": "Modifica pin",
+        "unreadLabel": "{name}, non letto"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Apre la conversazione",
+        "pin": "Fissa",
+        "unpin": "Rimuovi pin",
+        "pinToTop": "Fissa in alto"
+    },
+    "line": {
+        "paused": "In pausa",
+        "waiting": "Ti aspetta",
+        "error": "Qualcosa è andato storto",
+        "working": "Al lavoro",
+        "workingOn": "Al lavoro · {detail}",
+        "asleep": "Inattivo",
+        "asleepAbout": "Inattivo · {about}",
+        "you": "Tu: {message}"
+    },
+    "foreman": {
+        "askAnything": "Chiedi qualsiasi cosa"
+    },
+    "header": {
+        "account": "Profilo"
+    },
+    "account": {
+        "preferences": "Preferenze",
+        "contactSupport": "Contatta il supporto",
+        "signOut": "Esci",
+        "subscriptionTitle": "Annulla prima l'abbonamento",
+        "subscriptionMessage": "{workspaces} si rinnova ancora. Annullalo da Fatturazione su rerun.build, poi elimina l'account.",
+        "deleteTitle": "Eliminare il tuo account?",
+        "deleteMessage": "Lasci i workspace che condividi. Un workspace solo tuo si ferma per sempre, con coworker e file. Non si può annullare.",
+        "delete": "Elimina",
+        "cancel": "Annulla",
+        "reauthTitle": "Accedi di nuovo per eliminare l'account",
+        "reauthMessage": "Per sicurezza, eliminare l'account richiede un accesso recente. Accedi di nuovo, poi eliminalo da qui.",
+        "deleteFailedTitle": "Impossibile eliminare l'account",
+        "deleteFailedMessage": "Riprova tra un momento.",
+        "leaveServerTitle": "Uscire da {host}?",
+        "leaveServerMessage": "Verrai disconnesso e Rerun si riaprirà su Rerun Cloud.",
+        "leaveServer": "Esci"
+    },
+    "workspace": {
+        "untitled": "Il mio workspace",
+        "menuLabel": "Workspace {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Cerca",
+        "back": "Indietro",
+        "placeholder": "Cerca coworker e conversazioni",
+        "askRerun": "Chiedi al Chief of Staff",
+        "quotedAsk": "«{query}»",
+        "coworkers": "Coworker",
+        "conversations": "Conversazioni",
+        "noCoworker": "Nessun coworker con quel nome.",
+        "newConversation": "Nuova conversazione",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Notifiche",
+        "bellLabel": "Notifiche, {count}",
+        "close": "Chiudi",
+        "settings": "Impostazioni notifiche",
+        "markAllRead": "Segna tutto come letto",
+        "markAllTitle": "Segnare tutto come letto?",
+        "markAllMessage": "{count, plural, one {# elemento} other {# elementi}} lasceranno questo elenco. Anche le richieste in attesa di risposta verranno cancellate, senza essere evase.",
+        "cancel": "Annulla",
+        "running": "{count, plural, one {# attività in corso} other {# attività in corso}}",
+        "loadFailed": "Non siamo riusciti a caricare le notifiche.",
+        "retry": "Riprova",
+        "emptyTitle": "Niente da gestire",
+        "emptyDescription": "Quando un coworker ha bisogno di te o finisce un'attività, compare qui.",
+        "undo": "Annulla",
+        "ok": "OK",
+        "sections": {
+            "needsYou": "Ti serve",
+            "headsUps": "Avvisi",
+            "errors": "Errori",
+            "done": "Completato"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} ti ha fatto una domanda",
+            "awaiting_approval": "{agent} chiede la tua approvazione",
+            "awaiting_connector": "{agent} ha bisogno di un'app collegata",
+            "waiting_human": "{agent} ti sta aspettando",
+            "awaiting_ack": "{agent} ha segnalato qualcosa per te",
+            "error": "{agent} ha avuto un errore",
+            "done": "{agent} ha finito l'esecuzione"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Letto",
+            "markRead": "Segna come letto",
+            "opensConversation": "Apre la conversazione",
+            "unfollow": "Smetti di seguire le attività pianificate",
+            "unfollowed": "Non segui più le attività pianificate di {name}.",
+            "mute": "Silenzia {name}",
+            "muted": "{name} è silenziato.",
+            "settings": "Impostazioni notifiche",
+            "cancel": "Annulla"
+        }
+    }
+}

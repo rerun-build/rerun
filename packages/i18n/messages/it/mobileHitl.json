@@ -1,0 +1,154 @@
+{
+    "actions": {
+        "notNow": "Non ora",
+        "explain": "Explicar",
+        "skip": "Salta",
+        "connect": "Collega",
+        "connecting": "Connessione…",
+        "continue": "Continua",
+        "loading": "Caricamento…",
+        "openOnWeb": "Apri sul web",
+        "back": "Indietro",
+        "confirm": "Conferma",
+        "send": "Invia",
+        "next": "Avanti",
+        "save": "Salva",
+        "saving": "Salvataggio…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {Domanda in attesa} one {Domanda in attesa} other {# domande in attesa}}",
+        "approval": "{count, plural, =0 {Approvazione richiesta} one {Approvazione richiesta} other {# approvazioni richieste}}",
+        "secret": "{count, plural, =0 {Credenziale richiesta} one {Credenziale richiesta} other {# credenziali richieste}}",
+        "mcpNamed": "Accedi a {name}",
+        "mcp": "Accesso richiesto",
+        "service": "{count, plural, =0 {App da collegare} one {App da collegare} other {# app da collegare}}",
+        "takeover": "Tocca a te sullo schermo",
+        "jumpTo": "{label}, vai",
+        "spend": "Spesa da approvare",
+        "computer": "Approva un comando su #{computer}"
+    },
+    "alert": {
+        "label": "Notifica",
+        "failed": "Impossibile segnarla come letta. Riprova.",
+        "marking": "Segnatura…",
+        "markAsRead": "Segna come letta"
+    },
+    "approval": {
+        "label": "Approvazione richiesta",
+        "approved": "Approvato",
+        "approve": "Approva"
+    },
+    "decline": {
+        "placeholder": "Perché no? (facoltativo)",
+        "reason": "Motivo"
+    },
+    "fallback": {
+        "replyBelow": "Rispondi sotto, oppure",
+        "needsYou": "{name} ha bisogno di te"
+    },
+    "steps": {
+        "previous": "Passo precedente",
+        "next": "Passo successivo",
+        "goTo": "Vai al passo {step} di {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "Accesso richiesto",
+        "connected": "Collegato",
+        "signInNeeded": "Accesso richiesto",
+        "unreachable": "Irraggiungibile",
+        "customServer": "Server MCP personalizzato",
+        "customServerAt": "Server MCP personalizzato · {host}",
+        "signInTo": "Accedi a {name}",
+        "loadFailed": "Impossibile caricare questo server. Collegalo sul web o salta."
+    },
+    "question": {
+        "dismiss": "Ignora domande",
+        "selectAll": "Seleziona tutte le opzioni che valgono",
+        "typeAnswer": "Scrivi la risposta…",
+        "somethingElse": "Altro",
+        "yourAnswer": "La tua risposta",
+        "record": "Rispondi con la voce",
+        "useRecording": "Usa questa registrazione",
+        "discardRecording": "Scarta la registrazione",
+        "retryRecording": "Riprova la trascrizione",
+        "uploadFailed": "Non se pudieron adjuntar esos file. Riprova."
+    },
+    "secret": {
+        "labelOne": "Credenziale richiesta",
+        "labelMany": "Credenziali richieste",
+        "dismiss": "Ignora richiesta credenziali",
+        "storedAs": "Salvata come {key}",
+        "alreadySaved": "Già salvata. Digita per sostituirla",
+        "paste": "Incolla il valore",
+        "whereToFind": "Dove trovarla",
+        "storedNote": "Salvata sulla Box come variabile del coworker. Mai inviata al modello.",
+        "saveFailed": "Impossibile salvare le credenziali"
+    },
+    "service": {
+        "label": "App da collegare",
+        "loadFailed": "Impossibile caricare le app. Collegale sul web o saltale.",
+        "loading": "Caricamento app…",
+        "webOnly": "Questa app sceglie l'account sul web. Collegala lì o salta.",
+        "connectFailed": "Impossibile collegare l'app",
+        "connected": "{name} collegata",
+        "notFound": "Non trovata nel catalogo, saltata.",
+        "skipped": "Saltata."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "Hai saltato le domande",
+            "service": "Hai chiuso la configurazione app",
+            "secret": "Hai rifiutato di condividere le chiavi",
+            "mcp": "Hai saltato l'accesso",
+            "takeover": "Hai lasciato il browser al coworker"
+        },
+        "answer": "Risposta",
+        "answers": "Risposte",
+        "answeredCount": "{answered} di {total} con risposta",
+        "skipped": "Saltato",
+        "approval": "Approvazione",
+        "approvals": "Approvazioni",
+        "approvalCount": "{approved} approvate, {declined} non ora",
+        "approved": "Approvato",
+        "notNow": "Non ora",
+        "quotedNote": "«{note}»",
+        "connected": "Collegato",
+        "notReconnected": "Non riconnesso",
+        "notFound": "Non trovato",
+        "apps": "App",
+        "appsConnected": "{connected} di {total} collegate",
+        "instead": "{name} (al posto di {replaced})",
+        "keys": "Chiavi",
+        "keysStored": "{stored} di {total} salvate",
+        "stored": "Salvato",
+        "storedOnBox": "Salvato sulla Box. Il coworker vede solo i nomi.",
+        "mcpServer": "Server MCP",
+        "handedBackOn": "Hai restituito il browser su {url}",
+        "handedBack": "Hai restituito il browser",
+        "spend": "Dati a pagamento",
+        "approvedOnce": "Approvato una volta",
+        "alwaysAllowed": "Sempre consentito"
+    },
+    "spend": {
+        "estimatedTotal": "Totale stimato",
+        "creditsUnit": "{count, plural, one {credito} other {crediti}}",
+        "creditsShort": "Restano solo {amount} {count, plural, one {credit} other {credits}}: aggiungi credit sul web o scegli non ora.",
+        "alwaysAllow": "Consenti sempre",
+        "approveOnce": "Approva una volta",
+        "addCredits": "Aggiungi credit",
+        "alwaysAllowFailed": "Impossibile attivare «Spendi senza chiedere». Questa approvazione resta valida, fino alla stima."
+    },
+    "computer": {
+        "runOn": "Esegui su #{computer}",
+        "filesOn": "Usa i file su #{computer}",
+        "deny": "Rifiuta",
+        "allow": "Consenti",
+        "alwaysProgram": "Consenti sempre {program}",
+        "alwaysFolder": "Consenti sempre questa cartella",
+        "interpreterWarning": "Consentire sempre {program} consente qualsiasi codice venga eseguito",
+        "alwaysFailed": "Impossibile salvare la regola sul computer: consentito solo per questa volta.",
+        "inFolder": "In {folder}",
+        "folderNote": "“Consenti sempre” consente ogni file in {folder}"
+    }
+}

@@ -1,0 +1,80 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "Qual è il sito della tua azienda?",
+                "description": "Lo leggiamo per capire cosa vendi e a chi."
+            },
+            "industry": {
+                "title": "In che settore lavori?",
+                "description": "Decide quali team mettiamo sulla board."
+            },
+            "role": {
+                "title": "E cosa fai lì?",
+                "description": "Decide chi creiamo per te per primo."
+            },
+            "name": {
+                "title": "Ultima cosa: il tuo nome?",
+                "description": "Così non parliamo con un workspace."
+            }
+        },
+        "progress": "Domanda {current} di {total}",
+        "website": {
+            "label": "Sito aziendale",
+            "placeholder": "acme.com",
+            "none": "Non ho un sito"
+        },
+        "industry": {
+            "placeholder": "Il tuo settore"
+        },
+        "industries": {
+            "agencies": "Agenzie",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Vendite",
+            "recruiting": "Selezione del personale",
+            "real-estate": "Immobiliare",
+            "legal": "Legale e compliance",
+            "creators": "Creator",
+            "productivity": "Produttività",
+            "other": "Altro"
+        },
+        "role": {
+            "placeholder": "Responsabile crescita"
+        },
+        "name": {
+            "placeholder": "Marco"
+        },
+        "back": "Indietro",
+        "next": "Avanti",
+        "continue": "Continua",
+        "saveFailed": "Impossibile salvare. Riprova."
+    },
+    "setup": {
+        "starting": {
+            "title": "Configurazione del tuo workspace",
+            "body": "Il tuo Chief of Staff si sta svegliando…"
+        },
+        "failed": {
+            "title": "Non è andata a buon fine",
+            "body": "Non si è perso nulla. Riprova tra un momento."
+        },
+        "blocked": {
+            "title": "Questo workspace non può partire qui",
+            "body": "Completa la configurazione su {host}."
+        },
+        "tryAgain": "Riprova"
+    },
+    "waitlist": {
+        "title": "Siamo al completo",
+        "body": "Ogni macchina è occupata. Sei in lista d'attesa: le risposte sono salvate e si apre da solo appena si libera un posto."
+    },
+    "noPlan": {
+        "title": "Questo workspace è in pausa",
+        "body": "Cambia workspace o account dai menu in alto."
+    },
+    "update": {
+        "title": "Aggiornamento richiesto",
+        "body": "Questa versione non è più supportata."
+    }
+}

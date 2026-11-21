@@ -1,0 +1,88 @@
+{
+    "title": "Vault",
+    "description": "Accedi una volta a un'app, poi scegli i coworker che la usano.",
+    "search": "Cerca nel Vault",
+    "noMatch": "Nessun risultato",
+    "groups": {
+        "apps": "Apps"
+    },
+    "add": "Aggiungi",
+    "emptyTitle": "Accedi una volta, condividi con i tuoi coworker",
+    "otherApp": "Altra app",
+    "row": {
+        "everyone": "Tutti i coworker",
+        "everyoneShort": "Tutti",
+        "unused": "Nessun coworker ancora",
+        "usedBy": "{names}",
+        "usedByMore": "{names} e {count, plural, one {# altro} other {# altri}}"
+    },
+    "status": {
+        "needsAuth": "Disconnettida",
+        "needsConfig": "Sin configura"
+    },
+    "detail": {
+        "back": "Torna al Vault",
+        "signedOut": "Disconnesso: i suoi coworker non possono usare {name} finché qualcuno non accede di nuovo.",
+        "notSetUp": "{name} ancora non è configurada.",
+        "reconnect": "Riconnetti",
+        "everyone": "Tutti i coworker",
+        "everyoneHint": "Anche i coworker aggiunti in seguito la riceveranno.",
+        "coworkers": "Coworkers",
+        "noCoworkers": "Ancora non c'è coworkers en questo workspace.",
+        "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworker}} nelle Boxes che non vedi",
+        "variables": "Variables",
+        "reconnectFromCoworker": "Riconnettila dalla scheda App di un coworker che la usa.",
+        "rename": "Rinomina account",
+        "accountName": "Nome dell'account",
+        "namePlaceholder": "Dai un nome a questo account"
+    },
+    "delete": {
+        "button": "Elimina",
+        "title": "Elimina {name}?",
+        "loses": "Questi coworker la perdono: {names}.",
+        "nobody": "Nessun coworker la usa.",
+        "confirm": "Elimina",
+        "deleted": "{name} eliminiente"
+    },
+    "reasons": {
+        "adminOnly": "Solo un admin può farlo",
+        "manageBox": "Non gestiscis la Box de questo coworker",
+        "manageAny": "Gestisci una Box per aggiungere al Vault",
+        "paidAppEveryone": "Un'app a pagamento si collega coworker per coworker",
+        "updateBox": "La macchina del tuo workspace potrà rinominare gli account dopo il prossimo aggiornamento"
+    },
+    "addPage": {
+        "title": "Aggiungi al Vault",
+        "search": "Cerca apps",
+        "mcp": "Server MCP",
+        "secret": "Secreto"
+    },
+    "errors": {
+        "changeFailed": "Impossibile salvare la modifica"
+    },
+    "addSecret": {
+        "name": "Nome",
+        "namePlaceholder": "Chiave live di Stripe",
+        "variable": "Variable",
+        "variableHint": "I coworker la leggono con questo nome.",
+        "variableInvalid": "Lettere, cifre e trattini bassi, senza iniziare con una cifra",
+        "value": "Valor",
+        "valueHint": "Non viene mai mostrato di nuovo.",
+        "add": "Aggiungi secreto"
+    },
+    "addMcp": {
+        "name": "Nome",
+        "namePlaceholder": "Documentazione aziendale",
+        "target": "Indirizzo o comando",
+        "targetHint": "Un indirizzo https, oppure il comando che la macchina avvia.",
+        "header": "Cabecera",
+        "headerValue": "Valor",
+        "add": "Aggiungi server"
+    },
+    "paid": {
+        "badge": "A pagamento",
+        "managedInApp": "Accesso, slot e fatturazione si gestiscono nella finestra {provider} del menu App.",
+        "paused": "En pausa",
+        "connecting": "Connettindo"
+    }
+}

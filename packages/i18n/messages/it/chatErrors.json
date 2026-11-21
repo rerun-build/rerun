@@ -1,0 +1,71 @@
+{
+    "generic": "Qualcosa è andato storto. Prova a inviare di nuovo il messaggio.",
+    "modelAtCapacity": {
+        "title": "Modello al limite",
+        "message": "Questo modello non ha posto in questo momento. Riprova tra poco o scegli un altro modello."
+    },
+    "anthropicKeyNotScoped": {
+        "title": "Clave de Anthropic senza workspace",
+        "message": "Questa chiave vale per tutti i workspace della sua organizzazione Anthropic. Crea una chiave all'interno di un solo workspace nella Console Anthropic, poi ricollegala."
+    },
+    "titles": {
+        "budget": "Credit Rerun esauriti",
+        "unauthorized": "Connessione disconnessa",
+        "overloaded": "Provider sovraccarico",
+        "context_window": "Conversazione troppo lunga",
+        "provider_error": "Il modello non ha potuto rispondere",
+        "thinking_replay": "L'esecuzione non ha potuto continuare",
+        "interrupted": "Esecuzione interrotta",
+        "run_in_flight": "Questa conversazione è ancora occupata",
+        "session_gone": "Conversazione non disponibile"
+    },
+    "messages": {
+        "budget": "Credit Rerun esauriti per questo periodo. Aggiungi credit o attendi il reset mensile.",
+        "unauthorized": "Questa connessione va riconnessa prima che il coworker possa eseguire.",
+        "overloaded": "Il provider è sovraccarico in questo momento. Riprova tra poco.",
+        "context_window": "Questa conversazione non entra più nel modello e reinviarla darà lo stesso risultato. Passa a un modello con contesto più ampio, oppure avvia una nuova conversazione.",
+        "provider_error": "Il provider del modello ha rifiutato la richiesta e reinviarla darà la stessa risposta. Passa a un altro modello per continuare.",
+        "thinking_replay": "Il motore ha riprodotto questo turno in un modo che il provider rifiuta. È un bug del motore, non del modello: cambiare modello non aiuta. Riprova e aggiorna il motore se continua.",
+        "interrupted": "L'esecuzione è stata interrotta prima di finire.",
+        "session_gone": "Questo coworker non raggiunge più questa conversazione, quindi il messaggio non è stato inviato. Avvia una nuova conversazione per continuare."
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "Limite di utilizzo raggiunto",
+            "modelUnavailable": "{model} non disponibile",
+            "anyModelUnavailable": "Modello non disponibile",
+            "modelNotInPlan": "{model} non è nel piano {plan}",
+            "anyModelNotInPlan": "Modello non nel piano {plan}",
+            "credits": "Credit di utilizzo {plan} esauriti",
+            "spend": "Limite di spesa {plan} raggiunto",
+            "window": "Limite {window, select, weekly {settimanale} other {mensile}} {plan} raggiunto",
+            "model": "Limite {model} {plan} raggiunto",
+            "claudeSession": "Limite sessione {plan} raggiunto",
+            "usage": "Limite di utilizzo {plan} raggiunto",
+            "opencodeCredits": "Credit OpenCode esauriti",
+            "opencodeWindow": "Limite {window, select, weekly {settimanale} other {mensile}} OpenCode Go raggiunto",
+            "opencode": "Limite OpenCode Go raggiunto",
+            "openaiCredits": "Crediti API OpenAI esauriti",
+            "anthropicCredits": "Crediti API Anthropic esauriti"
+        },
+        "messages": {
+            "openaiCredits": "Il tuo account API OpenAI non ha più crediti. Aggiungi crediti su platform.openai.com, oppure passa questo coworker a un altro modello.",
+            "anthropicCredits": "Il tuo account API Anthropic non ha più crediti. Aggiungi crediti nella Console Anthropic, in Billing, oppure passa questo coworker a un altro modello.",
+            "opencodeCredits": "Nessun credit Console rimasto. Aggiungi credit su opencode.ai, oppure scegli un modello Go per continuare.",
+            "opencodeWindowResets": "Il piano OpenCode Go ha raggiunto il limite {window, select, weekly {settimanale} monthly {mensile} other {di 5 ore}}. Si resetta {resetsAt}; passa a un modello Console o a un altro provider fino ad allora.",
+            "opencodeWindow": "Il piano OpenCode Go ha raggiunto il limite {window, select, weekly {settimanale} monthly {mensile} other {di 5 ore}}. Passa a un modello Console o a un altro provider fino al reset.",
+            "modelUnavailable": "Questa connessione non può eseguire {model}. Scegli un altro modello per continuare.",
+            "anyModelUnavailable": "Questa connessione non può eseguire questo modello. Scegli un altro modello per continuare.",
+            "modelNotInPlan": "Il piano {plan} non include {model}. Scegli un altro modello per continuare.",
+            "anyModelNotInPlan": "Il piano {plan} non include questo modello. Scegli un altro modello per continuare.",
+            "usageLimit": "Questo abbonamento ha raggiunto il limite di utilizzo. Passa a un altro modello o attendi il reset del limite.",
+            "credits": "Il piano {plan} ha esaurito i credit di utilizzo. Scegli un modello incluso nel piano per continuare.",
+            "spend": "L'organizzazione ha raggiunto il limite di spesa mensile {plan}. Un admin può alzarlo; nel frattempo passa questo coworker a un altro modello.",
+            "weeklyResets": "Il piano {plan} ha raggiunto il limite settimanale. Si resetta {resetsAt}; passa questo coworker a un altro modello fino ad allora.",
+            "weekly": "Il piano {plan} ha raggiunto il limite settimanale. Passa questo coworker a un altro modello fino al cambio settimana.",
+            "model": "Il piano {plan} ha raggiunto il limite {model}. Gli altri modelli {plan} funzionano ancora: passa a uno di quelli.",
+            "sessionResets": "Il piano {plan} ha esaurito la finestra di utilizzo corrente. Si ricarica {resetsAt}; passa questo coworker a un altro modello nel frattempo.",
+            "session": "Il piano {plan} ha esaurito la finestra di utilizzo corrente. Si ricarica da sola; passa questo coworker a un altro modello nel frattempo."
+        }
+    }
+}

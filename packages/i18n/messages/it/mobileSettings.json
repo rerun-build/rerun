@@ -1,0 +1,119 @@
+{
+    "preferences": {
+        "title": "Preferenze",
+        "close": "Chiudi",
+        "yourAccount": "Il tuo account",
+        "workspace": "Workspace",
+        "aiProviders": "Provider AI",
+        "appearance": "Aspetto",
+        "appearanceSystem": "Sistema",
+        "appearanceLight": "Chiaro",
+        "appearanceDark": "Scuro",
+        "coworkers": "Coworker",
+        "groupRecent": "Recenti",
+        "groupByBox": "Per box",
+        "language": "Lingua",
+        "notifications": "Notifiche",
+        "pushOff": "Push disattivato",
+        "support": "Supporto",
+        "contactSupport": "Contatta il supporto",
+        "privacy": "Informativa sulla privacy",
+        "terms": "Termini di servizio",
+        "about": "Informazioni",
+        "version": "Versione",
+        "environment": "Ambiente",
+        "signOut": "Esci",
+        "deleteAccount": "Elimina account",
+        "server": "Server remoto"
+    },
+    "notifications": {
+        "title": "Notifiche",
+        "saveFailed": "Impossibile salvare",
+        "tryAgainShortly": "Riprova tra un momento.",
+        "loadFailed": "Impossibile caricare le impostazioni. Riprova tra un momento.",
+        "push": {
+            "label": "Notifiche push",
+            "off": "Spento",
+            "turnOn": "Attiva",
+            "openSettings": "{platform, select, android {Apri impostazioni Android} other {Apri impostazioni iOS}}",
+            "footnote": "{platform, select, android {Nulla qui sotto arriva a questo telefono finché le push non sono attive.} other {Nulla qui sotto arriva a questo iPhone finché le push non sono attive.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "Messaggi dei coworker",
+                "description": "Quando un coworker ha bisogno di te o ha qualcosa da dirti."
+            },
+            "silent": {
+                "name": "Attività completate",
+                "description": "Quando un coworker finisce un'attività, senza suono."
+            }
+        },
+        "scopeTitle": "Avvisami su",
+        "recommended": "Consigliato",
+        "scopes": {
+            "everything": {
+                "label": "Tutto",
+                "detail": "Ogni esecuzione nel workspace, chiunque l'abbia avviata."
+            },
+            "mine": {
+                "label": "Le mie esecuzioni e ciò che seguo",
+                "detail": "Esecuzioni che avvio, conversazioni in cui sono, coworker che seguo."
+            },
+            "needed": {
+                "label": "Solo quando mi serve",
+                "detail": "Domande, approvazioni ed errori nelle mie esecuzioni. Un completamento resta silenzioso."
+            },
+            "nothing": {
+                "label": "Niente",
+                "detail": "Controllo la inbox da solo."
+            }
+        },
+        "email": {
+            "label": "E-mail",
+            "footnote": "Quando serve mentre sei assente. Un'email per incidente, mai una per esecuzione."
+        },
+        "perCoworker": {
+            "title": "Per ogni coworker",
+            "add": "Aggiungi coworker",
+            "pickTitle": "Ogni esecuzione di questo coworker ti raggiunge",
+            "cancel": "Annulla",
+            "empty": "Ogni coworker segue la regola sopra.",
+            "detail": "Si imposta anche dai dettagli di ogni coworker.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Segue le attività",
+            "yourSetting": "La tua impostazione"
+        },
+        "accountEmails": {
+            "title": "Email account",
+            "billing": "Prova e fatturazione",
+            "product": "Aggiornamenti prodotto"
+        },
+        "modes": {
+            "default": {
+                "label": "Predefinito",
+                "hint": "Segue la tua impostazione."
+            },
+            "everything": {
+                "label": "Tutta l'attività",
+                "hint": "Ogni esecuzione, chiunque l'abbia avviata."
+            },
+            "muted": {
+                "label": "Silenziato",
+                "hint": "Niente. La board lo mostra comunque."
+            }
+        },
+        "coworker": {
+            "title": "Avvisami su {name}",
+            "yourSetting": "La tua impostazione",
+            "quotedScope": "«{scope}»",
+            "follow": "Segui le attività pianificate",
+            "nothingScheduled": "Nessuna pianificazione ancora.",
+            "scheduled": "{count} pianificate, ti raggiungono come le tue esecuzioni.",
+            "reachYou": "Ti raggiungono come le tue esecuzioni.",
+            "tasksTitle": "Attività pianificate",
+            "tasksFailed": "Impossibile caricare le attività. Riprova tra un momento.",
+            "taskSwitch": "Avvisami su {name}",
+            "muted": "{name} è silenziato."
+        }
+    }
+}

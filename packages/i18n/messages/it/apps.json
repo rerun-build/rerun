@@ -1,0 +1,218 @@
+{
+    "menu": {
+        "label": "App"
+    },
+    "linkedToRerun": "{provider} collegato a Rerun",
+    "slotPrice": {
+        "monthly": "{price}/mese",
+        "yearly": "{price}/anno"
+    },
+    "blocked": {
+        "notSubscribed": "Abbonati prima a Rerun",
+        "paused": "Il workspace è in pausa",
+        "trialSlot": "Una prova occupa uno slot {provider}. Passa a un piano superiore per aggiungerne.",
+        "lifetimeTrialSlot": "La tua prova gratuita include uno slot {provider}. Aggiungine altri al termine della prova.",
+        "adminOnly": "Solo un admin può gestire le app a pagamento"
+    },
+    "slots": {
+        "footer": "<b>{used} di {total, plural, one {# slot} other {# slot}} usati</b>, {description}",
+        "subscriberTrial": "il primo gratis fino al {date}, poi {price}",
+        "workspaceTrial": "0 $ durante la prova, fatturato con il piano dopo",
+        "paid": "{price} ciascuno, fatturato con il piano",
+        "lifetime": "{price} ciascuno, con fatturazione mensile",
+        "lifetimeTrial": "gratis durante la prova, poi {price} ciascuno",
+        "lifetimeEnding": "scadono il {date}"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "Gratis per {days} giorni",
+            "detail": "Poi {price} per account, fatturato con il piano"
+        },
+        "workspaceTrial": {
+            "headline": "0 $ durante la prova",
+            "detail": "Poi {price} per account, fatturato con il piano"
+        },
+        "lifetimeTrial": {
+            "detail": "Poi {price} per account, con fatturazione mensile"
+        },
+        "freeSlot": {
+            "headline": "Uno slot ti aspetta",
+            "detail": "È già nel tuo piano",
+            "detailLifetime": "Già incluso nei tuoi slot mensili",
+            "detailLifetimeEnding": "I tuoi slot scadono il {date}"
+        },
+        "buySlot": {
+            "headline": "{price} per profilo collegato",
+            "detail": "Aggiunto al piano, addebitato oggi per il resto del periodo"
+        },
+        "lifetimeSlot": {
+            "detail": "Fatturato mensilmente, separato dal tuo piano lifetime"
+        }
+    },
+    "connectHint": {
+        "reconnect": "Accedi di nuovo come {label}",
+        "subscriberTrial": "Gratis per {days} giorni, poi {price}",
+        "workspaceTrial": "0 $ durante la prova, poi {price} con il piano",
+        "default": "L'account con cui agiscono i coworker"
+    },
+    "addSlot": {
+        "title": "Aggiungere uno slot {provider}?",
+        "description": "{price} viene aggiunto al piano. Oggi paghi quanto resta del periodo in corso.",
+        "descriptionLifetime": "{price} viene aggiunto ai tuoi slot mensili. Oggi ti viene addebitato quanto resta del mese.",
+        "confirm": "Aggiungi slot",
+        "button": "Aggiungi uno slot",
+        "startTrial": "Inizia la prova gratuita"
+    },
+    "intro": {
+        "connect": "Collega {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "I tuoi coworker fanno prospezione dal tuo account LinkedIn. Scrive, si collegano e fanno follow-up per te.",
+            "whatsapp": "I tuoi coworker rispondono dal tuo numero WhatsApp. Leggono la conversazione, rispondono e fanno follow-up per te."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "Messaggi e inviti",
+                "text": "Scrive ai prospect e fa follow-up, nei limiti giornalieri di LinkedIn."
+            },
+            "linkedinSearch": {
+                "title": "Ricerca e lettura profili",
+                "text": "Trova le persone giuste e legge il profilo prima di scrivere."
+            },
+            "linkedinReplies": {
+                "title": "Si attiva alle risposte",
+                "text": "Una risposta o un invito accettato avvia subito il coworker."
+            },
+            "whatsappReplies": {
+                "title": "Risposte e follow-up",
+                "text": "Risponde a chi ti scrive, con testo, file e messaggi vocali."
+            },
+            "whatsappMessages": {
+                "title": "Si attiva ai messaggi",
+                "text": "Un nuovo messaggio avvia subito il coworker."
+            },
+            "whatsappCareful": {
+                "title": "Cauto con il tuo numero",
+                "text": "Resta nei limiti giornalieri di WhatsApp e non scrive a sconosciuti."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "Il workspace è in pausa, quindi gli account {provider} sono disconnessi. Ripristina il workspace, poi riconnettili.",
+        "freeSlot": "Slot libero",
+        "freeSlotHint": {
+            "subscriberTrial": "Collega un account, gratis per {days} giorni",
+            "workspaceTrial": "Collega un account, 0 $ durante la prova",
+            "default": "Collega un account {provider} per occuparlo"
+        },
+        "addAnother": "Aggiungi un altro account",
+        "addAnotherHint": "Aggiunge uno slot a {price} al piano",
+        "addAnotherHintLifetime": "Aggiunge uno slot a {price}",
+        "status": {
+            "connected": "Pronto",
+            "needsReconnect": "Accedi di nuovo",
+            "paused": "In pausa",
+            "connecting": "Connessione",
+            "disconnected": "Disconnesso"
+        },
+        "summary": {
+            "signedOutWhilePaused": "Disconnesso mentre il workspace era in pausa",
+            "signedOut": "{provider} ha disconnesso questo account",
+            "rateLimited": "In pausa per un giorno, {provider} ha chiesto di rallentare",
+            "unpaid": "Lo slot non è pagato",
+            "unused": "Nessun coworker lo usa ancora. Sceglilo nei Servizi di un coworker.",
+            "usedBy": "Usato da {names}"
+        },
+        "defaultName": "Account {provider}",
+        "reconnect": "Riconnetti",
+        "disconnectLabel": "Scollega {name}",
+        "disconnectTitle": "Scollegare {name}?",
+        "disconnectDescription": "I coworker perdono subito gli strumenti {provider}. Lo slot resta nel piano finché non lo rimuovi da Fatturazione.",
+        "disconnectDescriptionLifetime": "I suoi coworker perdono subito gli strumenti {provider}. Lo slot rimane tuo finché non lo restituisci qui.",
+        "disconnect": "Scollega",
+        "disconnectTooltip": "Scollega questo account",
+        "giveBack": "Restituisci",
+        "giveBackTitle": "Restituire questo slot {provider}?",
+        "giveBackDescription": "Non verrà più fatturato dal prossimo rinnovo e rimarrà utilizzabile fino ad allora."
+    },
+    "success": {
+        "connectedIcon": "{provider} collegato",
+        "title": "{app} attivo",
+        "body": "<b>{label}</b> è collegato. Sceglilo nei Servizi di un coworker per metterlo al lavoro.",
+        "yourAccount": "Il tuo account",
+        "done": "Fine"
+    },
+    "linkedin": {
+        "method": {
+            "password": "Email e password",
+            "cookie": "Cookie di sessione"
+        },
+        "cookieLabel": "Cookie di sessione (li_at)",
+        "cookieHelp": "Per un account che apri con Google o Apple. Copia il cookie li_at di linkedin.com dal browser.",
+        "emailLabel": "Email LinkedIn",
+        "emailPlaceholder": "mario@azienda.it",
+        "passwordLabel": "Password LinkedIn",
+        "passwordPlaceholder": "La tua password LinkedIn",
+        "signInFrom": "Accedi da",
+        "signInFromHelp": "LinkedIn si fida di un accesso dal paese in cui lavori di solito.",
+        "searchCountry": "Cerca un paese",
+        "noCountry": "Nessun paese trovato",
+        "neverStored": "Rerun non conserva mai password o cookie.",
+        "connect": "Collega",
+        "approval": {
+            "figureLabel": "Un telefono con la richiesta di accesso, il tasto di approvazione illuminato",
+            "title": "Approva sul telefono",
+            "body": "LinkedIn ha inviato una richiesta di accesso al telefono. Apri l'app LinkedIn e tocca <b>Sì</b>.",
+            "approved": "L'ho approvata",
+            "polling": "In attesa della tua approvazione",
+            "slow": "Ancora nulla? Controlla l'app LinkedIn, poi tocca sotto."
+        },
+        "code": {
+            "title": "Inserisci il codice",
+            "description": "Il codice a {length} cifre {where}.",
+            "where": {
+                "authenticator": "dall'app di autenticazione",
+                "sentTo": "che LinkedIn ha inviato al tuo {sentTo}",
+                "sms": "che LinkedIn ha inviato via SMS",
+                "email": "che LinkedIn ha inviato via email"
+            },
+            "resend": "Invia un nuovo codice",
+            "verify": "Verifica"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "Numero WhatsApp",
+            "invalidPhone": "Non sembra un numero completo.",
+            "linkBy": "Collegalo con",
+            "linkByQr": "Scansioni un codice mostrato qui con il telefono.",
+            "linkByCode": "Se questa pagina è aperta su quel telefono: digiti un codice in WhatsApp.",
+            "method": {
+                "qr": "Scansiona un QR code",
+                "code": "Digita un codice"
+            },
+            "linkedDevice": "Rerun entra come dispositivo collegato, come WhatsApp Web. Il telefono continua a funzionare come sempre.",
+            "submit": "Ottieni il codice"
+        },
+        "link": {
+            "steps": {
+                "open": "Apri WhatsApp sul telefono",
+                "settings": "Impostazioni, poi Dispositivi collegati, poi Collega un dispositivo",
+                "pointQr": "Punta il telefono verso questo codice",
+                "typeCode": "Tocca Collega con numero di telefono, poi digita questo codice"
+            },
+            "expiredTitle": "Questo codice è scaduto",
+            "scanTitle": "Scansiona con WhatsApp",
+            "typeTitle": "Digita questo codice in WhatsApp",
+            "expiredBody": "I codici durano tre minuti. Richiedine uno nuovo, poi collega subito il telefono.",
+            "onPhone": "Sul telefono di <b>{phone}</b>",
+            "waiting": "In attesa del telefono",
+            "switchToCode": "Digita un codice invece",
+            "switchToQr": "Scansiona un QR code invece",
+            "newCode": "Nuovo codice",
+            "codeLabel": "Codice {code}",
+            "qrAlt": "QR code per collegare WhatsApp"
+        }
+    }
+}

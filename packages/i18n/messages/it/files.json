@@ -1,0 +1,97 @@
+{
+    "detail": {
+        "readOnly": "Questo file è in sola lettura",
+        "stillLoading": "Caricamento file in corso",
+        "previousFile": "File precedente",
+        "nextFile": "File successivo",
+        "editNotText": "Qui si possono modificare solo file di testo.",
+        "editTruncated": "Questo file supera {limit} caratteri e non si può modificare qui. Scaricalo o chiedi al coworker di modificarlo.",
+        "editBinary": "Questo file non è testo: modificarlo qui lo corromperebbe."
+    },
+    "actions": {
+        "truncated": "Troncato",
+        "edit": "Modifica",
+        "download": "Scarica",
+        "deleteFile": "Elimina file"
+    },
+    "delete": {
+        "title": "Eliminare {name}?",
+        "file": "Il file viene eliminato dalla box. Non si può annullare.",
+        "folder": "La cartella e tutto il contenuto vengono eliminati dalla box. Non si può annullare."
+    },
+    "editor": {
+        "unsaved": "Non salvato",
+        "cancel": "Annulla",
+        "noChanges": "Nessuna modifica da salvare",
+        "save": "Salva modifiche",
+        "conflictTitle": "{name} è cambiato sulla Box",
+        "conflictDescription": "Qualcuno, o un coworker, ha scritto su questo file dopo che l'hai aperto. Salvare ora sostituisce la loro versione con la tua.",
+        "overwrite": "Sovrascrivi",
+        "keepTheirs": "Mantieni la loro",
+        "discardTitle": "Scartare le modifiche?",
+        "discardDescription": "Le modifiche a {name} non sono ancora salvate. Chiudendo l'editor le perdi.",
+        "discard": "Scarta modifiche",
+        "keepEditing": "Continua a modificare"
+    },
+    "preview": {
+        "noPreview": "Nessuna anteprima per questo tipo di file",
+        "download": "Scarica",
+        "readFailed": "Impossibile leggere questo file",
+        "showSource": "Mostra sorgente",
+        "showRendered": "Mostra come pagina"
+    },
+    "publish": {
+        "publish": "Pubblica",
+        "publishPublicly": "Pubblica pubblicamente",
+        "publishedLink": "Link pubblicato",
+        "publicLink": "Link pubblico",
+        "open": "Apri",
+        "openPublicLink": "Apri link pubblico",
+        "copyLink": "Copia link",
+        "copyPublicLink": "Copia link pubblico",
+        "shareSettings": "Impostazioni condivisione",
+        "unpublish": "Rimuovi pubblicazione",
+        "unshare": "Rimuovi condivisione",
+        "unpublishTitle": "Rimuovere pubblicazione di {name}?",
+        "unshareTitle": "Rimuovere condivisione di {name}?",
+        "unpublishDescription": "Il link smette di funzionare subito, per chiunque lo abbia.",
+        "unshareDescription": "Il link pubblico smette di funzionare subito. Chi lo ha riceve un 404."
+    },
+    "empty": {
+        "title": "Cartella vuota",
+        "goUp": "Livello superiore"
+    },
+    "grid": {
+        "parentDirectory": "Cartella superiore",
+        "openFolder": "Apri cartella",
+        "open": "Apri",
+        "download": "Scarica",
+        "rename": "Rinomina",
+        "delete": "Elimina",
+        "published": "Pubblicato"
+    },
+    "list": {
+        "newName": "Nuovo nome",
+        "dropHere": "Trascina file o cartelle qui per caricarli",
+        "name": "Nome",
+        "size": "Dimensione",
+        "type": "Tipo",
+        "empty": "Ancora nulla. Tutto ciò che un coworker scarica, crea o modifica per tutto il workspace finisce in questa cartella, così come ciò che trascini su questa pagina.",
+        "actionsFor": "Azioni per {name}",
+        "folder": "Cartella",
+        "file": "Documento"
+    },
+    "uploadOutcome": {
+        "allFailed": "Caricamento non riuscito",
+        "someFailed": "{failed} di {total, plural, one {# file} other {# file}} non caricati",
+        "uploaded": "{count, plural, one {# file caricato} other {# file caricati}}",
+        "sessionExpired": "Sessione scaduta. Ricarica la pagina e riprova.",
+        "tooLarge": "Questo file è troppo grande per il caricamento.",
+        "retryLater": "Caricamento non riuscito. Riprova tra un momento.",
+        "networkFailed": "Caricamento non riuscito. Controlla la connessione e riprova.",
+        "oversized": "{names}{more, plural, =0 {} one { e altri #} other { e altri #}} {count, plural, one {supera} other {superano}} il limite di {limit} MB.",
+        "machineUpdating": "La macchina del workspace era in aggiornamento. Riprova il caricamento.",
+        "engineUpdateNeeded": "Questo workspace gira su una macchina che serve un aggiornamento engine per file oltre {limit} MB. Si aggiorna da sola: riprova tra qualche minuto.",
+        "machineUnreachable": "Impossibile caricare {name}. La macchina potrebbe essere irraggiungibile."
+    }
+}

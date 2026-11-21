@@ -1,0 +1,25 @@
+{
+    "price": {
+        "free": "Gratis",
+        "monthly": "{amount}/mese",
+        "useForFree": "Usa gratis",
+        "hire": "{count, plural, one {Assumi questo coworker · {price}} other {Assumi questi # coworker · {price}}}",
+        "hireCard": "Assumi · {price}"
+    },
+    "categories": {
+        "agencies": "Agenzie",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Vendite",
+        "recruiting": "Selezione del personale",
+        "real-estate": "Immobiliare",
+        "legal": "Legale e compliance",
+        "creators": "Creator",
+        "productivity": "Produttività",
+        "other": "Altro"
+    },
+    "connectors": {
+        "none": "Nessuna app richiesta",
+        "label": "App: {apps}"
+    }
+}

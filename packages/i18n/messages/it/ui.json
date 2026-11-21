@@ -1,0 +1,57 @@
+{
+    "close": "Chiudi",
+    "back": "Indietro",
+    "moreOptions": "Altre opzioni",
+    "deleteConfirmTitle": "Eliminare {label}?",
+    "command": {
+        "title": "Palette comandi",
+        "description": "Cerca un comando da eseguire..."
+    },
+    "combobox": {
+        "placeholder": "Seleziona un'opzione",
+        "placeholderMultiple": "Seleziona opzioni",
+        "search": "Cerca…",
+        "empty": "Nessun risultato",
+        "selected": "Selezionate",
+        "remove": "Rimuovi {option}",
+        "reorder": "Riordina {option}"
+    },
+    "filter": {
+        "search": "Cerca {label}…",
+        "empty": "Nessuna corrispondenza",
+        "clear": "Cancella"
+    },
+    "phone": {
+        "code": "Prefisso internazionale, digita un codice o un paese",
+        "noCountry": "Nessun paese trovato"
+    },
+    "powerBars": "Potenza {filled} su {max}",
+    "markdown": {
+        "openEditor": "Apri l'editor completo",
+        "done": "Fine"
+    },
+    "upload": {
+        "menu": "Carica",
+        "files": "Carica file",
+        "folder": "Carica cartella",
+        "failed": "Caricamento non riuscito",
+        "finishing": "Completamento",
+        "waiting": "In attesa · {size}",
+        "progress": "Avanzamento caricamento",
+        "uploadingFile": "Caricamento di {name}",
+        "totalProgress": "Avanzamento totale",
+        "retry": "Riprova",
+        "cancel": "Annulla",
+        "cancelAll": "Annulla tutto",
+        "dismiss": "Ignora",
+        "headingFailed": "{failed} di {total} file non caricati",
+        "headingDone": "{count, plural, one {# file caricato} other {# file caricati}}",
+        "headingUploading": "Caricamento {current} di {total}",
+        "more": "+ altri {count}"
+    },
+    "waveform": {
+        "live": "Forma d'onda audio in diretta",
+        "processing": "Elaborazione audio",
+        "idle": "Forma d'onda audio inattiva"
+    }
+}

@@ -1,0 +1,288 @@
+{
+    "composer": {
+        "attach": "Allega",
+        "camera": "Fotocamera",
+        "coworkers": "Coworker",
+        "discardRecording": "Scarta registrazione",
+        "files": "File",
+        "modelLabel": "Modello, {model}",
+        "photos": "Foto",
+        "recordVoice": "Registra un messaggio vocale",
+        "removeAttachment": "Rimuovi {name}",
+        "retryRecording": "Riprova a inviare la registrazione",
+        "send": "Invia",
+        "sendRecording": "Invia la registrazione",
+        "sendTo": "Invia a {name}",
+        "skills": "Skill",
+        "stop": "Ferma",
+        "tooLargeBody": "{files}: massimo {megabytes} MB.",
+        "tooLargeTitle": "{count, plural, one {Questo file è troppo grande} other {Questi file sono troppo grandi}}",
+        "tooManyBody": "Massimo {max}: {files} esclusi.",
+        "tooManyTitle": "Troppi file",
+        "computers": "Computer",
+        "offline": "offline"
+    },
+    "desktop": {
+        "connecting": "Connessione allo schermo…",
+        "dropping": "Lo schermo continua a cadere. Riprova tra un momento.",
+        "handingBack": "Restituzione…",
+        "keys": {
+            "delete": "Canc",
+            "return": "Invio",
+            "tab": "Tab"
+        },
+        "retry": "Riprova",
+        "screen": "Schermo",
+        "screenOf": "Schermo di {name}",
+        "type": "Digita",
+        "typePlaceholder": "Digita sullo schermo",
+        "unreachable": "Impossibile raggiungere lo schermo."
+    },
+    "empty": {
+        "asleep": "Inattivo. Un messaggio lo sveglia.",
+        "loading": "Caricamento",
+        "pulseCoworkers": "{count, plural, one {# coworker} other {# coworker}}",
+        "pulseWorking": "{count} al lavoro ora",
+        "sendToCoworker": "Invia un messaggio a questo coworker",
+        "startTitle": "Inizia una conversazione",
+        "starters": {
+            "capabilities": "In cosa puoi aiutarmi?",
+            "recentWork": "Riassumi il lavoro recente",
+            "projectFiles": "Rivedi i file del progetto",
+            "tools": "A quali strumenti hai accesso?"
+        },
+        "team": {
+            "greeting": "Ciao, sono il tuo Chief of Staff",
+            "greetingNamed": "Ciao {firstName}, sono il tuo Chief of Staff",
+            "greetingWithTeam": "{greeting}. Ecco il tuo team.",
+            "emptySubtitle": "Non hai ancora coworker. Dimmi un compito che vorresti delegare e creo il primo.",
+            "buildPrompt": "Creami un coworker che ",
+            "buildFirst": {
+                "title": "Crea il mio primo coworker",
+                "description": "Descrivi il compito in una frase"
+            },
+            "template": {
+                "title": "Parti da un template",
+                "description": "Coworker pronti per il tuo tipo di business",
+                "send": "Mostrami template adatti al mio business"
+            },
+            "guide": {
+                "title": "Come funziona?",
+                "description": "Coworker, Boxes, routine, in due minuti",
+                "send": "Come funziona Rerun?"
+            },
+            "checkWorking": {
+                "title": "Cosa sta facendo {name}?",
+                "description": "Al lavoro ora",
+                "send": "Cosa sta facendo {mention} in questo momento?"
+            },
+            "checkIdle": {
+                "title": "Cosa ha fatto {name} oggi?",
+                "description": "Riprendi le ultime esecuzioni",
+                "send": "Cosa ha fatto {mention} oggi?"
+            },
+            "handOff": {
+                "title": "Dai un compito a {name}",
+                "description": "Lo preparo e lo seguo",
+                "prefill": "Chiedi a {mention} di "
+            },
+            "build": {
+                "title": "Crea un nuovo coworker",
+                "description": "Per un compito che nessuno nel team fa ancora"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "Collega ChatGPT",
+        "connectClaude": "Collega Claude",
+        "creditsBody": "Hai esaurito i credit Rerun per questo periodo. Paghi già Claude o ChatGPT? Fai girare i coworker su quel piano, senza costi extra qui.",
+        "creditsTitle": "Credit Rerun",
+        "fallbackTitle": "Qualcosa è andato storto",
+        "reconnect": "Riconnetti",
+        "switchModel": "Cambia modello",
+        "tryAgain": "Riprova"
+    },
+    "feedback": {
+        "cancel": "Annulla",
+        "categories": {
+            "did_not_follow": "Non ha seguito la mia richiesta",
+            "incomplete": "Risposta incompleta",
+            "memory": "Problema con la memoria",
+            "not_factual": "Non corretta nei fatti",
+            "other": "Altro",
+            "too_slow": "Troppo lenta",
+            "tool_error": "Errore strumento o connessione",
+            "ui_bug": "Bug interfaccia",
+            "wrong_tool": "Strumento o app sbagliati"
+        },
+        "categoryLabel": "Che tipo di problema vuoi segnalare?",
+        "disclaimer": "Inviando questo report condividi la conversazione con il team Rerun per migliorare i coworker.",
+        "negativePlaceholder": "Cosa non ti ha soddisfatto in questa risposta?",
+        "negativeTitle": "Feedback negativo",
+        "positivePlaceholder": "Cosa ti ha soddisfatto in questa risposta?",
+        "removeFailed": "Impossibile rimuovere il feedback",
+        "saveFailed": "Impossibile salvare il feedback",
+        "skip": "Salta",
+        "submit": "Invia"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "Questo workspace non ha una macchina al momento. Controlla su {host}.",
+                "title": "Rerun non è in esecuzione"
+            },
+            "onboarding": {
+                "body": "Completa la configurazione su {host}.",
+                "title": "Rerun sta configurando il workspace"
+            }
+        },
+        "retry": "Riprova",
+        "role": "Il tuo Chief of Staff",
+        "unreachableBody": "Controlla la connessione e riprova.",
+        "unreachableTitle": "Impossibile raggiungere Rerun"
+    },
+    "header": {
+        "back": "Indietro",
+        "conversationCount": "{count, plural, one {# conversazione} other {# conversazioni}}",
+        "conversations": "Conversazioni",
+        "coworkerDetails": "Dettagli coworker",
+        "earlier": "Precedenti",
+        "general": "Generale",
+        "identityLabel": "{name}, {title}",
+        "newChat": "Nuova chat",
+        "newConversation": "Nuova conversazione",
+        "newThread": "Nuovo thread",
+        "sections": {
+            "needs-you": "Ti serve",
+            "new": "Non letto",
+            "running": "In corso"
+        },
+        "threadCount": "{count, plural, one {# thread} other {# thread}}",
+        "threads": "Thread"
+    },
+    "markdown": {
+        "code": "codice",
+        "copied": "Copiato",
+        "copy": "Copia",
+        "draft": "Bozza",
+        "image": "Immagine"
+    },
+    "messages": {
+        "askRerun": "Chiedi al Chief of Staff",
+        "badResponse": "Risposta scarsa",
+        "compacting": "Compattazione",
+        "copy": "Copia",
+        "goodResponse": "Buona risposta",
+        "needsYourAnswer": "Serve la tua risposta",
+        "open": "Apri {name}",
+        "photo": "Foto",
+        "regenerate": "Rigenera",
+        "replyBelow": "Rispondi sotto.",
+        "runningTool": "Esecuzione {tool}",
+        "scrollToLatest": "Vai all'ultimo messaggio",
+        "sentBy": "Inviato da {name}",
+        "share": "Condividi",
+        "showLess": "Mostra meno",
+        "showMore": "Mostra di più",
+        "thinking": "Sto pensando"
+    },
+    "origins": {
+        "copied": "Copiato",
+        "copy": "Copia",
+        "installComplete": "Installazione completata",
+        "installGuideOf": "Guida installazione {name}",
+        "installStarted": "Installazione avviata",
+        "noPayload": "Nessun payload",
+        "payload": "Contenuto",
+        "prompt": "Prompt",
+        "promptOf": "Prompt {name}",
+        "scheduledRun": "Esecuzione pianificata",
+        "startedBy": "Questa sessione è stata avviata da <strong>{name}</strong>",
+        "truncated": "troncato",
+        "viewDetails": "Vedi dettagli",
+        "viewGuide": "Vedi guida",
+        "viewPayload": "Vedi payload",
+        "viewPrompt": "Vedi prompt",
+        "webhookReceived": "Webhook ricevuto",
+        "jobEnded": "Attività terminata su #{computer}",
+        "viewReport": "Visualizza report",
+        "reportOf": "Cosa ha riportato #{computer}"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# fonte} other {# fonti}}",
+        "emailsVerified": "{valid} di {checked, plural, one {# email} other {# email}} verificate",
+        "title": "Fonti"
+    },
+    "pane": {
+        "answerPlaceholder": "Rispondi a {name}",
+        "attachFailed": "Impossibile allegare i file",
+        "defaultModel": "Predefinito · {model}",
+        "foremanPlaceholder": "Chiedi qualsiasi cosa al Chief of Staff",
+        "loadFailed": "Impossibile caricare questa conversazione.",
+        "loading": "Caricamento conversazione",
+        "messagePlaceholder": "Messaggio a {name}",
+        "newPlaceholder": "Su cosa lavoriamo?",
+        "openBrowser": "Apri browser",
+        "retry": "Riprova",
+        "stopTaskFailed": "Impossibile fermare questa attività",
+        "takeControl": "Prendi il controllo"
+    },
+    "queued": {
+        "attachmentsOnly": "Solo allegati",
+        "badge": "In coda",
+        "remove": "Rimuovi messaggio in coda",
+        "sendNow": "Invia ora",
+        "sendNowStops": "Invia ora, interrompe l'esecuzione in corso"
+    },
+    "runPhase": {
+        "label": "{name} · {phase}",
+        "thinking": "Sto pensando",
+        "waking": "Sveglia",
+        "working": "Al lavoro"
+    },
+    "screen": {
+        "disconnected": "Lo schermo non c'è più",
+        "error": "Lo schermo non è disponibile",
+        "handBackFailed": "Impossibile restituire il browser",
+        "resize": "Ridimensiona lo schermo"
+    },
+    "skillUpdateFailed": "Impossibile aggiornare la skill",
+    "takeover": {
+        "closing": "Chiusura…",
+        "done": "Fine",
+        "openAgain": "Apri di nuovo",
+        "openBrowser": "Apri browser",
+        "opened": "Il browser è aperto sul desktop del coworker. Torna qui quando hai finito.",
+        "opensBrowser": "Apre il browser del coworker, per guidarlo tu.",
+        "opensSite": "Apre {site} nel browser del coworker, per guidarlo tu.",
+        "privacy": "Ciò a cui accedi resta nel browser di questo coworker sulla tua macchina.",
+        "skip": "Salta",
+        "skipTakeover": "Salta il controllo del browser"
+    },
+    "threadBranch": {
+        "needs": "Ti serve",
+        "error": "Errore",
+        "running": "In corso",
+        "open": "Apri thread {title}",
+        "opener": {
+            "schedule": "Esecuzione pianificata · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Richiesto da {name}",
+            "askedByUnknown": "Richiesto da un altro coworker",
+            "started": "Ha avviato un thread"
+        }
+    },
+    "voice": {
+        "copyTranscript": "Copia trascrizione",
+        "hideTranscript": "Nascondi trascrizione",
+        "pause": "Pausa",
+        "play": "Riproduci messaggio vocale",
+        "recording": "Registrazione",
+        "seek": "Cerca",
+        "sendFailed": "Impossibile inviare la registrazione.",
+        "sending": "Invio registrazione",
+        "silent": "Non si sente nulla in quella registrazione.",
+        "transcript": "Trascrizione",
+        "waitingForMicrophone": "In attesa del microfono…"
+    }
+}

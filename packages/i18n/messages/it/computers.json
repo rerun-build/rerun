@@ -1,0 +1,96 @@
+{
+    "title": "Computer",
+    "description": "I tuoi computer, dove i coworker eseguono comandi e attività lunghe",
+    "thisComputer": {
+        "heading": "Questo computer",
+        "offer": "Consenti ai coworker di eseguire comandi e attività lunghe qui",
+        "offerLong": "I coworker possono eseguire comandi e attività lunghe qui, ogni nuovo programma con la tua approvazione",
+        "link": "Collega",
+        "inWorkspace": "in {workspace}",
+        "pause": "Metti in pausa",
+        "pauseHint": "Nulla verrà eseguito qui finché non riprendi",
+        "folder": "Cartella di lavoro",
+        "changeFolder": "Modifica",
+        "unlink": "Scollega questo computer",
+        "unlinkTitle": "Scollegare questo computer?",
+        "unlinkBody": "I coworker di {workspace} non eseguiranno più nulla qui. Potrai ricollegarlo in seguito.",
+        "unlinkConfirm": "Scollega",
+        "noKeychain": "Questo sistema non ha un portachiavi: il collegamento è salvato in un file leggibile solo dal tuo account."
+    },
+    "linked": "Collegato",
+    "linkFromApp": "Collega un computer dall'app desktop.",
+    "getTheApp": "Scarica l'app",
+    "lastSeen": "Ultima attività {when}",
+    "neverConnected": "Non ancora connesso",
+    "engineNeedsUpdate": "I computer saranno disponibili con il prossimo aggiornamento della macchina di questo workspace. Fino ad allora risulteranno offline.",
+    "engineUnreachable": "La macchina del workspace non risponde: i computer risultano offline per ora.",
+    "managersOnly": "Solo un amministratore o la persona che lo ha collegato può modificarlo",
+    "settingsNeedEngine": "Disponibile quando la macchina del workspace risponderà",
+    "empty": {
+        "title": "Nessun computer collegato",
+        "body": "I coworker eseguono carichi pesanti sulla tua macchina: video, modelli locali, la tua GPU.",
+        "getApp": "Scarica l'app desktop"
+    },
+    "status": {
+        "online": "Online",
+        "busy": "{count, plural, one {Un'attività in esecuzione} other {# attività in esecuzione}}",
+        "paused": "In pausa",
+        "offline": "Offline"
+    },
+    "modes": {
+        "ask": {
+            "label": "Chiedi ogni volta",
+            "description": "Ogni comando attende una conferma"
+        },
+        "remember": {
+            "label": "Chiedi, poi ricorda",
+            "description": "Consenti sempre un programma una volta approvato"
+        },
+        "full": {
+            "label": "Accesso completo",
+            "description": "Esegue senza chiedere, tranne per le cartelle riservate"
+        }
+    },
+    "detail": {
+        "back": "Torna ai computer",
+        "linkedBy": "Collegato da {name}",
+        "offlineSince": "Offline da {when}. I coworker lo segnalano invece di eseguire comandi.",
+        "neverConnected": "Non ancora connesso. Risulterà online quando l'app Rerun sarà in esecuzione.",
+        "paused": "Messo in pausa dal computer stesso. Nulla verrà eseguito finché non sarà ripreso da lì.",
+        "approvals": "Approvazioni",
+        "commands": "Comandi",
+        "modeLabel": "Modalità di approvazione",
+        "unattended": "Senza nessuno in chat",
+        "unattendedHint": "Pianificazioni, trigger, altri coworker e il termine di un'attività possono usarlo",
+        "alwaysAllowed": "Sempre consentito",
+        "nothingAllowed": "Ancora nulla. Scegli “Consenti sempre” in un'approvazione nella chat.",
+        "interpreterWarning": "Consentire un interprete consente qualsiasi codice esso esegua",
+        "stopAllowing": "Non consentire più {label}",
+        "screen": "Schermo",
+        "screenOn": "Attivo. I coworker possono vedere e usare lo schermo, una conversazione alla volta.",
+        "screenOff": "Disattivato. Può essere attivato solo dall'app Rerun su questo computer.",
+        "machine": "Macchina",
+        "system": "Sistema",
+        "processor": "Processore",
+        "graphics": "Scheda grafica",
+        "memory": "Memoria",
+        "folder": "Cartella",
+        "remove": "Rimuovi computer",
+        "removeTitle": "Rimuovere {name}?",
+        "removeBody": "I coworker non eseguiranno più nulla su di esso. Le sue regole verranno eliminate e potrà essere ricollegato dall'app desktop.",
+        "removeConfirm": "Rimuovi",
+        "jobs": "Attività"
+    },
+    "linkDialog": {
+        "title": "Collega questo computer",
+        "description": "I coworker di questo workspace potranno eseguire comandi qui",
+        "name": "Nome",
+        "handle": "Nella chat: <handle></handle>",
+        "everyone": "Tutti in questo workspace possono usarlo tramite i propri coworker",
+        "approval": "Ogni nuovo programma richiederà prima la tua approvazione",
+        "pauseAnyTime": "Metti in pausa o scollega in qualsiasi momento da qui o dalla barra di sistema",
+        "cancel": "Annulla",
+        "link": "Collega",
+        "linked": "Collegato. I coworker possono raggiungerlo come #{handle}"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun usa la libreria foto per allegare immagini a un messaggio.",
+        "NSCameraUsageDescription": "Rerun usa la fotocamera per allegare una foto a un messaggio.",
+        "NSMicrophoneUsageDescription": "Rerun usa il microfono per registrare messaggi vocali."
+    }
+}
