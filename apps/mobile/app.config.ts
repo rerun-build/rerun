@@ -74,7 +74,7 @@ const paidTeam = process.env.RERUN_PAID_TEAM === '1'
 // them. The English prompts of app.json stay the default for any other language. Android only lists an
 // app under its per-app language setting once the app declares them (localeConfig), and switches the
 // language in place rather than restarting the screen.
-const APP_LANGUAGES = ['en', 'fr', 'es', 'pt-BR', 'de', 'tr'] as const
+const APP_LANGUAGES = ['en', 'fr', 'es', 'pt-BR', 'de', 'it', 'tr'] as const
 
 function withLanguages(config: ConfigContext['config']): ConfigContext['config'] {
     return {

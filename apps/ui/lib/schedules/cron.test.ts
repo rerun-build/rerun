@@ -66,6 +66,7 @@ describe('in the reader\'s language', () => {
         expect(humanCron('0 9 * * *', 'pt')).toBe('Às 09:00')
         expect(humanCron('0 9 * * *', 'de')).toBe('Um 09:00')
         expect(humanCron('0 9 * * *', 'tr')).toBe('Saat 09:00')
+        expect(humanCron('0 9 * * *', 'it')).toBe('Alle 09:00')
     })
 
     it('keeps cronstrue in English for a language without a pack', () => {

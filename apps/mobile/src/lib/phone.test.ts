@@ -29,6 +29,8 @@ describe('phone helpers', () => {
         expect(countryByCode('FR', 'de').name).toBe('Frankreich')
         expect(countryByCode('DE', 'tr').name).toBe('Almanya')
         expect(countryByCode('AC', 'tr').name).toBe('Ascension Adası')
+        expect(countryByCode('DE', 'it').name).toBe('Germania')
+        expect(countryByCode('AC', 'it').name).toBe('Isola di Ascensione')
     })
 
     it('names the countries the Brazilian way, not the European one the ISO table ships', () => {

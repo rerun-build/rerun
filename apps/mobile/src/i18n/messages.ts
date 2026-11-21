@@ -90,6 +90,21 @@ import trMobileSettings from '@rerun/i18n/messages/tr/mobileSettings.json'
 import trMobileSteps from '@rerun/i18n/messages/tr/mobileSteps.json'
 import trSubRuns from '@rerun/i18n/messages/tr/subRuns.json'
 import trTools from '@rerun/i18n/messages/tr/tools.json'
+import itChatErrors from '@rerun/i18n/messages/it/chatErrors.json'
+import itErrors from '@rerun/i18n/messages/it/errors.json'
+import itMobileAuth from '@rerun/i18n/messages/it/mobileAuth.json'
+import itMobileCards from '@rerun/i18n/messages/it/mobileCards.json'
+import itMobileChat from '@rerun/i18n/messages/it/mobileChat.json'
+import itMobileCommon from '@rerun/i18n/messages/it/mobileCommon.json'
+import itMobileCoworker from '@rerun/i18n/messages/it/mobileCoworker.json'
+import itMobileHitl from '@rerun/i18n/messages/it/mobileHitl.json'
+import itMobileHome from '@rerun/i18n/messages/it/mobileHome.json'
+import itMobileOnboarding from '@rerun/i18n/messages/it/mobileOnboarding.json'
+import itMobileProviders from '@rerun/i18n/messages/it/mobileProviders.json'
+import itMobileSettings from '@rerun/i18n/messages/it/mobileSettings.json'
+import itMobileSteps from '@rerun/i18n/messages/it/mobileSteps.json'
+import itSubRuns from '@rerun/i18n/messages/it/subRuns.json'
+import itTools from '@rerun/i18n/messages/it/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
 const english = { chatErrors: enChatErrors, errors: enErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
@@ -98,10 +113,11 @@ const spanish = { chatErrors: esChatErrors, errors: esErrors, mobileAuth: esMobi
 const portuguese = { chatErrors: ptChatErrors, errors: ptErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
 const german = { chatErrors: deChatErrors, errors: deErrors, mobileAuth: deMobileAuth, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
 const turkish = { chatErrors: trChatErrors, errors: trErrors, mobileAuth: trMobileAuth, mobileCards: trMobileCards, mobileChat: trMobileChat, mobileCommon: trMobileCommon, mobileCoworker: trMobileCoworker, mobileHitl: trMobileHitl, mobileHome: trMobileHome, mobileOnboarding: trMobileOnboarding, mobileProviders: trMobileProviders, mobileSettings: trMobileSettings, mobileSteps: trMobileSteps, subRuns: trSubRuns, tools: trTools }
+const italian = { chatErrors: itChatErrors, errors: itErrors, mobileAuth: itMobileAuth, mobileCards: itMobileCards, mobileChat: itMobileChat, mobileCommon: itMobileCommon, mobileCoworker: itMobileCoworker, mobileHitl: itMobileHitl, mobileHome: itMobileHome, mobileOnboarding: itMobileOnboarding, mobileProviders: itMobileProviders, mobileSettings: itMobileSettings, mobileSteps: itMobileSteps, subRuns: itSubRuns, tools: itTools }
 
 export type MobileMessages = typeof english
 
-const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish }
+const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish, it: italian }
 
 const merged = new Map<Locale, MobileMessages>()
 
