@@ -1,4 +1,5 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
+import { AuthorizationError } from '@/app/api/_auth/errors'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, recordMessageSent, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
@@ -30,8 +31,10 @@ vi.mock('@/lib/engine/client', () => ({ chat: vi.fn(), reconnectRun: vi.fn(), ca
 const busy = () => Response.json({ runId: 'run-1', startedAt: null }, { status: 409 })
 const streaming = (runId: string, sessionId = 'engine-session') => new Response('data: {}\n\n', { headers: { 'Content-Type': 'text/event-stream', 'x-run-id': runId, 'x-session-id': sessionId } })
 
+const SESSION = '4dfbb571-8f9a-4ff2-810c-11e414cb8569'
+
 function request(body: Record<string, unknown>) {
-    return new Request('https://rerun.test/api/chat', { method: 'POST', body: JSON.stringify({ agentId: 'agent', sessionId: 'session', text: 'ship it', ...body }) })
+    return new Request('https://rerun.test/api/chat', { method: 'POST', body: JSON.stringify({ agentId: 'agent', sessionId: SESSION, text: 'ship it', ...body }) })
 }
 
 // The route sleeps between retries; without fake timers the queued cases would take 25 seconds.
@@ -45,12 +48,21 @@ describe('POST /api/chat', () => {
         vi.clearAllMocks()
         vi.useFakeTimers()
         vi.mocked(resolveAgentTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } })
-        vi.mocked(getExistingSession).mockResolvedValue({ sessionId: 'session', agentId: 'agent', engineSessionId: 'engine-session' })
+        vi.mocked(getExistingSession).mockResolvedValue({ sessionId: SESSION, agentId: 'agent', engineSessionId: 'engine-session' })
         vi.mocked(callableEngineAgentIds).mockResolvedValue(undefined)
     })
 
     afterEach(() => {
         vi.useRealTimers()
+    })
+
+    it('answers not found, without a lookup, for an engine session id sent as the conversation', async () => {
+        const response = await POST(request({ sessionId: '3ovpbq4znpvo17t1in2bs' }))
+
+        expect(response.status).toBe(404)
+        expect(getExistingSession).not.toHaveBeenCalled()
+        expect(embedTextShared).not.toHaveBeenCalled()
+        expect(engine.chat).not.toHaveBeenCalled()
     })
 
     it('hands the caller it read once to the checks on the coworker and on the conversation', async () => {
@@ -60,7 +72,7 @@ describe('POST /api/chat', () => {
 
         const actor = { kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' }
         expect(resolveAgentTarget).toHaveBeenCalledWith('agent', actor)
-        expect(getExistingSession).toHaveBeenCalledWith('session', actor)
+        expect(getExistingSession).toHaveBeenCalledWith(SESSION, actor)
     })
 
     it('asks for the embedding of the message as it comes in, for the recall the coworker runs before its model', async () => {
@@ -147,13 +159,36 @@ describe('POST /api/chat', () => {
     })
 
     it('refuses a conversation of another coworker without reaching the engine', async () => {
-        vi.mocked(getExistingSession).mockResolvedValue({ sessionId: 'session', agentId: 'other-agent', engineSessionId: 'other-engine-session' })
+        vi.mocked(getExistingSession).mockResolvedValue({ sessionId: SESSION, agentId: 'other-agent', engineSessionId: 'other-engine-session' })
 
         const response = await settle(POST(request({})))
 
         expect(response.status).toBe(404)
         expect(await response.json()).toEqual({ error: 'session_not_found' })
         expect(engine.chat).not.toHaveBeenCalled()
+    })
+
+    it('answers not found for a conversation the caller cannot reach, as for one that does not exist', async () => {
+        vi.mocked(getExistingSession).mockRejectedValue(new AuthorizationError('sessionNotFound'))
+
+        const response = await settle(POST(request({})))
+
+        expect(response.status).toBe(404)
+        expect(await response.json()).toEqual({ error: 'session_not_found' })
+        expect(engine.chat).not.toHaveBeenCalled()
+    })
+
+    it('still answers a 500 when the conversation could not be read at all', async () => {
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        vi.mocked(getExistingSession).mockRejectedValue(new Error('connection reset'))
+
+        const response = await settle(POST(request({})))
+
+        expect(response.status).toBe(500)
+        expect(await response.json()).toEqual({ error: 'Failed to resolve session' })
+        expect(log).toHaveBeenCalled()
+        expect(engine.chat).not.toHaveBeenCalled()
+        log.mockRestore()
     })
 
     it('answers the engine refusing a session it does not hold with the same code, not its raw text', async () => {
@@ -250,7 +285,7 @@ describe('POST /api/chat', () => {
             const response = await settle(POST(request({})))
 
             expect(response.status).toBe(200)
-            expect(recordMessageSent).toHaveBeenCalledWith('session', 'me', 'ship it')
+            expect(recordMessageSent).toHaveBeenCalledWith(SESSION, 'me', 'ship it')
         })
 
         it('keeps nothing of an install, which opens with its guide', async () => {
