@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { CopyChip } from '@/components/dialogs/CopyChip'
 import { Input } from '@/components/ui/input'
 import { DELETE_ACCOUNT_CONFIRMATION } from '@/lib/auth/account-deletion'
 import { Loader2Icon } from '@/lib/icons'
@@ -12,6 +13,7 @@ export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: 
     const t = useTranslations('dialogs.deleteAccount')
     const tCommon = useTranslations('common')
     const [confirmText, setConfirmText] = useState('')
+    const confirmInput = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         if (!open) setConfirmText('')
@@ -28,9 +30,10 @@ export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: 
                 </AlertDialogHeader>
                 <div className="grid gap-2">
                     <p className="text-sm text-muted-foreground">
-                        {t.rich('typeToConfirm', { word: DELETE_ACCOUNT_CONFIRMATION, strong: chunks => <span className="font-medium text-foreground">{chunks}</span> })}
+                        {t.rich('typeToConfirm', { word: DELETE_ACCOUNT_CONFIRMATION, strong: () => <CopyChip value={DELETE_ACCOUNT_CONFIRMATION} pasteTarget={confirmInput} /> })}
                     </p>
                     <Input
+                        ref={confirmInput}
                         value={confirmText}
                         onChange={event => setConfirmText(event.target.value)}
                         onKeyDown={event => {

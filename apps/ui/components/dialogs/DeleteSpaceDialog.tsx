@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
     AlertDialog,
@@ -12,6 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { CopyChip } from '@/components/dialogs/CopyChip'
 import { Input } from '@/components/ui/input'
 import { useCanManageSpace } from '@/hooks/useBoxAccess'
 import { useTranslations } from 'next-intl'
@@ -30,6 +31,7 @@ export function DeleteSpaceDialog({ open, onOpenChange, onConfirm, spaceName, ag
     const t = useTranslations('dialogs.deleteBox')
     const tCommon = useTranslations('common')
     const [confirmText, setConfirmText] = useState('')
+    const confirmInput = useRef<HTMLInputElement>(null)
     const canManage = useCanManageSpace(spaceId)
     const refused = !!spaceId && !canManage
 
@@ -52,9 +54,10 @@ export function DeleteSpaceDialog({ open, onOpenChange, onConfirm, spaceName, ag
                 {spaceName && !holdsAgents && (
                     <div className="grid gap-2">
                         <p className="text-sm text-muted-foreground">
-                            {t.rich('typeToConfirm', { name: spaceName, strong: chunks => <span className="font-medium text-foreground">{chunks}</span> })}
+                            {t.rich('typeToConfirm', { name: spaceName, strong: () => <CopyChip value={spaceName} pasteTarget={confirmInput} /> })}
                         </p>
                         <Input
+                            ref={confirmInput}
                             value={confirmText}
                             onChange={e => setConfirmText(e.target.value)}
                             onKeyDown={e => {

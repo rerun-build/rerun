@@ -1,13 +1,14 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxAccessCopy } from '@/components/dialogs/access-person'
+import { CopyChip } from '@/components/dialogs/CopyChip'
 import { useBoardStore } from '@/stores/board.store'
 
 type DeleteAgentDialogProps = {
@@ -26,6 +27,7 @@ export function DeleteAgentDialog({ agentId, agentName, children, open: controll
     const selectAgent = useBoardStore(s => s.selectAgent)
     const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
     const [confirmText, setConfirmText] = useState('')
+    const confirmInput = useRef<HTMLInputElement>(null)
     const open = controlledOpen ?? uncontrolledOpen
     const canManage = useCanManageAgent(agentId)
 
@@ -54,8 +56,9 @@ export function DeleteAgentDialog({ agentId, agentName, children, open: controll
                 </AlertDialogHeader>
                 {agentName && (
                     <div className="grid gap-2">
-                        <p className="text-sm text-muted-foreground">{t.rich('typeToConfirm', { name: agentName, b: chunks => <span className="font-medium text-foreground">{chunks}</span> })}</p>
+                        <p className="text-sm text-muted-foreground">{t.rich('typeToConfirm', { name: agentName, b: () => <CopyChip value={agentName} pasteTarget={confirmInput} /> })}</p>
                         <Input
+                            ref={confirmInput}
                             value={confirmText}
                             onChange={e => setConfirmText(e.target.value)}
                             onKeyDown={e => {
