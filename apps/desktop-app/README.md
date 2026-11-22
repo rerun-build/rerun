@@ -100,7 +100,13 @@ follows the server the window shows, not only the configured one.
   the screen, glued to an edge (`/coworker-dock`), on top of every app and every desktop. The page
   draws the rail; outside it the clicks go through (`setIgnoreMouseEvents` with forwarding, a pointer
   poll on Linux). The main window publishes the coworkers and their counts (`coworkerDock.publish`),
-  so the dock follows its workspace and its badge; a click on a buddy or on "+" goes back to it. A
+  so the dock follows its workspace and its badge; a click on a buddy or on "+" goes back to it. The
+  Chief of Staff is published first (`COWORKER_DOCK_FOREMAN_ID`), drawn as its orb, and its click opens
+  its conversation. With `coworkerDockArrange`, a buddy dragged up or down changes the order
+  (`coworkerDock.reorder`), a right-click on a buddy hides it and "Show in Dock" brings it back. The
+  order and the hidden coworkers live in `settings.json` (`coworkerDock.arrangements`), for each
+  server and workspace (`workspaceKey`), the 20 last ones; a new coworker shows until it is hidden,
+  and the order of the sidebar never moves. A
   workspace without coworkers publishes nothing, and "+" carries the reason it is disabled
   (`createBlockedReason`). A full navigation of the main window that publishes nothing again within
   10 s (the offline page, sign-in) hides the dock. The edge, the position along it, how tall the rail
