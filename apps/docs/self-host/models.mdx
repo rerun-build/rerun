@@ -56,6 +56,8 @@ Under **Your API keys**, pick **Custom endpoint** to run coworkers on a model yo
 | **Mistral** | `https://api.mistral.ai/v1` | your Mistral key |
 | **DeepSeek** | `https://api.deepseek.com/v1` | your DeepSeek key |
 
+A reasoning model's thinking, such as DeepSeek's or Mistral Large's (`mistral-large-latest`), shows in the chat as the coworker's reasoning, apart from its answer.
+
 The engine is the one that calls the server, so the address has to work from the engine, not from your browser. With the Docker Compose setup, `localhost` inside the engine container is the container itself: Rerun tries `host.docker.internal` for you when `localhost` does not answer, and the address that worked is the one saved.
 
 <Warning>
