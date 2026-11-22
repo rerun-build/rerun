@@ -1,5 +1,5 @@
 import { useId, type ReactNode, type Ref } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import { StyleSheet, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native'
 import Animated, { useAnimatedStyle, useReducedMotion } from 'react-native-reanimated'
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg'
 
@@ -9,8 +9,9 @@ import { useTheme } from '@/theme/theme'
 
 import { BUDDY_FACE_CENTER, BuddyFace, buddyBlinks, buddyEyeLine, type FacePart } from './BuddyFace'
 import { BUDDY_GEOMETRY, boxTop, leftWallPlane, roundedDiamond, wallsOutline, type BoxGeometry, type Point } from './geometry'
-import { buddyColor, buddyEyes, buddyMouth, hashUnit, shade, type BuddyEyes, type BuddyLook, type BuddyMood } from './look'
+import { buddyColor, buddyEyes, buddyMaterial, buddyMouth, hashUnit, MATERIAL_RADIUS, MATERIAL_SIDE, shade, type BuddyEyes, type BuddyLook, type BuddyMaterial, type BuddyMood, type ChromeTint } from './look'
 import { useBuddyLookOf } from './looks'
+import { ChromeGlints, ChromeTopDefs, ChromeWalls, ClayDents, Fibres, fibresOf, GlassFloor, GlassGlint, KnitDefs, KnitTop, KnitWalls } from './material'
 import { useBlinkScale, useStretch, useSweep, type BuddyMotion } from './motion'
 import { inverted, multiplied, stretchedFrom, svgTransform } from './wall-motion'
 
@@ -33,6 +34,10 @@ const SMALL_EYES: Partial<Record<BuddyEyes, BuddyEyes>> = { glasses: 'round', sh
 const MARGIN = 2
 
 const STATE_COLOR: Record<'working' | 'error' | 'waiting', string> = { working: '#f59e0b', error: '#ef4444', waiting: '#06b6d4' }
+
+// What tints a chrome block: the coworker's colour barely, a state hard enough to read.
+const CHROME_IDLE_SHARE = 0.2
+const CHROME_STATE_SHARE = 0.42
 
 // The band of light waits left of the top, then crosses it.
 const SWEEP_START = -60
@@ -63,19 +68,33 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
     const theme = useTheme()
     const reducedMotion = useReducedMotion()
     const small = size < SMALL_BELOW
-    const geometry = small ? SMALL_GEOMETRY : BUDDY_GEOMETRY
     const worn = useBuddyLookOf(agentId)
     const look = small ? smallLook(agentId, worn) : worn
-
+    const material = buddyMaterial(look)
+    const classic = material === 'classic'
+    const standing = small ? SMALL_GEOMETRY : BUDDY_GEOMETRY
+    const geometry = { ...standing, radius: MATERIAL_RADIUS[material] ?? standing.radius }
     const side = geometry.halfW * 2 + MARGIN * 2
+
     const blockCentreY = geometry.base.y - geometry.depth / 2
     const viewBox = `${geometry.base.x - side / 2} ${blockCentreY - side / 2} ${side} ${side}`
     const frame: LayerFrame = { viewBox, unit: size / side, centre: { x: geometry.base.x, y: blockCentreY } }
 
-    const body = mood === 'idle' ? theme.buddyBody : mood === 'asleep' ? theme.buddyAsleep : STATE_COLOR[mood]
     const resting = mood === 'idle' || mood === 'asleep'
     const identity = buddyColor(agentId, look)
-    const box: Box = { uid, geometry, color: body, top: resting ? shade(identity, mood === 'asleep' ? -0.6 : -0.12) : body, topLight: mood === 'idle' ? 0.12 : 0.22, rim: mood === 'idle' ? 0.22 : 0.32 }
+    const body = mood === 'idle' ? (classic ? theme.buddyBody : identity) : mood === 'asleep' ? theme.buddyAsleep : STATE_COLOR[mood]
+    const chromeTint: ChromeTint = mood === 'idle' ? { color: identity, share: CHROME_IDLE_SHARE } : { color: body, share: CHROME_STATE_SHARE }
+    const box: Box = {
+        uid,
+        geometry,
+        color: body,
+        top: resting ? shade(identity, mood === 'asleep' ? -0.6 : classic ? -0.12 : 0.06) : body,
+        topLight: mood === 'idle' ? 0.12 : 0.22,
+        rim: mood === 'idle' ? 0.22 : 0.32,
+        material,
+        chromeTint,
+        fibres: fibresOf(material, size / side),
+    }
     const faceScale = small ? SMALL_FACE_SCALE : 1
     const motion: BuddyMotion | null = animated && !reducedMotion && mood !== 'asleep' ? { kind: mood === 'working' ? 'bob' : mood === 'error' ? 'shudder' : null, offset: hashUnit(agentId, 7) * 4, blinkOffset: hashUnit(agentId, 9) * 4.6 } : null
 
@@ -108,12 +127,13 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, faci
                                 <Path d={wallsOutline(geometry)} />
                             </ClipPath>
                         </Defs>
+                        {material === 'glass' && <GlassFloor geometry={geometry} />}
                         <G clipPath={`url(#${uid}-body-clip)`}>
                             <Walls {...box} />
                             {faceOnWall}
                         </G>
                         <TopFace {...box} />
-                        <TopEdge geometry={geometry} />
+                        <TopEdge geometry={geometry} material={material} />
                     </Svg>
                     {lids}
                 </>
@@ -154,13 +174,16 @@ function BuddyLids({ viewBox, unit, centre, drawn, eyeLine, blinkOffset, childre
 
 // A thick, soft block: the rounded diamond swept down. The fold between the two visible walls is a
 // gradient, the way light turns around a rounded edge. Only the top moves; the walls stretch under it.
-type Box = { uid: string; geometry: BoxGeometry; color: string; top: string; topLight: number; rim: number }
+type Box = { uid: string; geometry: BoxGeometry; color: string; top: string; topLight: number; rim: number; material: BuddyMaterial; chromeTint: ChromeTint; fibres?: ImageSourcePropType }
 
 function topDiamond(geometry: BoxGeometry) {
     return roundedDiamond(boxTop(geometry), geometry.halfW, geometry.halfH, geometry.radius)
 }
 
-function Walls({ uid, geometry, color }: Box) {
+function Walls({ uid, geometry, color, material, chromeTint, fibres }: Box) {
+    const wall = leftWallPlane(geometry)
+    if (material === 'chrome') return <ChromeWalls uid={uid} geometry={geometry} tint={chromeTint} wall={wall} />
+    const glass = material === 'glass'
     const { halfW, halfH, depth } = geometry
     const topCenter = boxTop(geometry)
     const { sideInset } = topDiamond(geometry)
@@ -171,45 +194,78 @@ function Walls({ uid, geometry, color }: Box) {
         <>
             <Defs>
                 <LinearGradient id={`${uid}-side`} x1={x0} x2={x1} y1="0" y2="0" gradientUnits="userSpaceOnUse">
-                    <Stop offset="0" stopColor={shade(color, -0.1)} />
-                    <Stop offset="0.44" stopColor={shade(color, -0.26)} />
-                    <Stop offset="0.56" stopColor={shade(color, -0.46)} />
-                    <Stop offset="1" stopColor={shade(color, -0.6)} />
+                    {MATERIAL_SIDE[material].map(([offset, amount]) => (
+                        <Stop key={offset} offset={offset} stopColor={shade(color, amount)} />
+                    ))}
                 </LinearGradient>
                 <LinearGradient id={`${uid}-side-shade`} x1="0" y1={topCenter.y} x2="0" y2={geometry.base.y + halfH} gradientUnits="userSpaceOnUse">
                     <Stop offset="0" stopColor="#000" stopOpacity={0} />
                     <Stop offset="1" stopColor="#000" stopOpacity={0.35} />
                 </LinearGradient>
             </Defs>
-            <Rect {...fill} fill={`url(#${uid}-side)`} />
-            <Rect {...fill} fill={`url(#${uid}-side-shade)`} />
+            <Rect {...fill} fill={`url(#${uid}-side)`} fillOpacity={glass ? 0.62 : 1} />
+            <Rect {...fill} fill={`url(#${uid}-side-shade)`} fillOpacity={glass ? 0.4 : 1} />
+            {material === 'knit' && (
+                <>
+                    <KnitDefs uid={uid} color={color} />
+                    <KnitWalls uid={uid} geometry={geometry} wall={wall} />
+                </>
+            )}
+            {fibres && (
+                <>
+                    <Defs>
+                        <ClipPath id={`${uid}-fibres-clip`}>
+                            <Rect {...fill} />
+                        </ClipPath>
+                    </Defs>
+                    <G clipPath={`url(#${uid}-fibres-clip)`}>
+                        <Fibres source={fibres} />
+                    </G>
+                </>
+            )}
         </>
     )
 }
 
-function TopFace({ uid, geometry, top, topLight, rim }: Box) {
+function TopFace({ uid, geometry, color, top, topLight, rim, material, chromeTint, fibres }: Box) {
     const { d } = topDiamond(geometry)
+    const glass = material === 'glass'
+    const chrome = material === 'chrome'
     return (
         <>
+            {chrome ? (
+                <ChromeTopDefs uid={uid} tint={chromeTint} />
+            ) : (
+                <Defs>
+                    <RadialGradient id={`${uid}-top`} cx="42%" cy="35%" r="75%">
+                        <Stop offset="0" stopColor={shade(top, glass ? 0.5 : topLight)} />
+                        <Stop offset="1" stopColor={shade(top, glass ? 0.1 : -0.04)} />
+                    </RadialGradient>
+                </Defs>
+            )}
             <Defs>
-                <RadialGradient id={`${uid}-top`} cx="42%" cy="35%" r="75%">
-                    <Stop offset="0" stopColor={shade(top, topLight)} />
-                    <Stop offset="1" stopColor={shade(top, -0.04)} />
-                </RadialGradient>
                 <ClipPath id={`${uid}-top-clip`}>
                     <Path d={d} />
                 </ClipPath>
             </Defs>
-            <Path d={d} fill={`url(#${uid}-top)`} />
+            {material === 'knit' && <KnitDefs uid={`${uid}-top`} color={color} />}
+            <Path d={d} fill={`url(#${uid}-top)`} fillOpacity={glass ? 0.72 : 1} />
             <G clipPath={`url(#${uid}-top-clip)`}>
-                <Path d={d} fill="none" stroke="#fff" strokeOpacity={rim * 0.7} strokeWidth={2.2} translateY={1.4} />
+                {material === 'classic' && <Path d={d} fill="none" stroke="#fff" strokeOpacity={rim * 0.7} strokeWidth={2.2} translateY={1.4} />}
+                {material === 'knit' && <KnitTop uid={`${uid}-top`} geometry={geometry} />}
+                {material === 'clay' && <ClayDents geometry={geometry} />}
+                {chrome && <ChromeGlints uid={uid} geometry={geometry} />}
+                {glass && <GlassGlint geometry={geometry} />}
+                {fibres && <Fibres source={fibres} />}
             </G>
         </>
     )
 }
 
-function TopEdge({ geometry }: { geometry: BoxGeometry }) {
-    return <Path d={topDiamond(geometry).d} fill="none" stroke="#fff" strokeOpacity={0.2} strokeWidth={0.7} />
+function TopEdge({ geometry, material }: { geometry: BoxGeometry; material: BuddyMaterial }) {
+    if (material === 'classic') return <Path d={topDiamond(geometry).d} fill="none" stroke="#fff" strokeOpacity={0.2} strokeWidth={0.7} />
+    if (material === 'chrome') return <Path d={topDiamond(geometry).d} fill="none" stroke="#fff" strokeOpacity={0.9} strokeWidth={0.55} />
+    return null
 }
 
 type MovingBoxProps = Box & LayerFrame & { motion: BuddyMotion; wall: Matrix; working: boolean; lids: ReactNode; children: ReactNode }
@@ -231,6 +287,11 @@ function MovingBox({ viewBox, unit, centre, motion, wall, working, lids, childre
 
     return (
         <>
+            {box.material === 'glass' && (
+                <Layer viewBox={viewBox}>
+                    <GlassFloor geometry={geometry} />
+                </Layer>
+            )}
             <MaskedView
                 style={StyleSheet.absoluteFill}
                 maskElement={
@@ -277,7 +338,7 @@ function MovingBox({ viewBox, unit, centre, motion, wall, working, lids, childre
                     </MaskedView>
                 )}
                 <Layer viewBox={viewBox}>
-                    <TopEdge geometry={geometry} />
+                    <TopEdge geometry={geometry} material={box.material} />
                 </Layer>
             </Animated.View>
         </>
