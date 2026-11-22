@@ -12,3 +12,9 @@ export function openInboxItem(item: Pick<InboxItem, 'id' | 'agentId' | 'latestSe
     board.setPendingOpenSession({ agentId: item.agentId, sessionId: item.latestSessionId ?? item.id, runId: null })
     if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
 }
+
+// A finished run is marked seen with the other runs of its task; a request is put aside, as « Mark as read » of the inbox does.
+export function markInboxItemRead(item: Pick<InboxItem, 'id' | 'sessionIds'>): void {
+    if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
+    else useBoardStore.getState().setSessionStatus(item.id, 'idle')
+}

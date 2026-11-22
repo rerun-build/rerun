@@ -15,7 +15,7 @@ import { useTabSignals } from '@/hooks/useTabSignals'
 import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import type { AnnouncedNotification } from '@/lib/notifications/announcement'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
-import { openInboxItem } from '@/lib/notifications/open-inbox-item'
+import { markInboxItemRead, openInboxItem } from '@/lib/notifications/open-inbox-item'
 import { reasonSentence } from '@/lib/notifications/reason-copy'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -38,7 +38,6 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
     const hydrated = useBoardStore(s => s.hydrated)
-    const setSessionStatus = useBoardStore(s => s.setSessionStatus)
     const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
     const { items, sessions } = useInboxItems()
     // Until its notification is read, a row may well be someone else's: it waits rather than flashes.
@@ -126,13 +125,6 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         board.focusAgentOnBoard(agentId, 'chat')
         board.setPendingOpenSession({ agentId, sessionId, runId: peek.engineRunId })
     }, [])
-    const markRead = useCallback(
-        (item: InboxItem) => {
-            if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
-            else setSessionStatus(item.id, 'idle')
-        },
-        [setSessionStatus]
-    )
     const markAllRead = useCallback(() => {
         markSessionsHandled(items.filter(i => !i.sessionIds).map(i => i.id))
         void useUnseenRunsStore.getState().markAllSeen()
@@ -190,7 +182,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
                 onMarkRead={
                     row
                         ? () => {
-                              markRead(row)
+                              markInboxItemRead(row)
                               setView(null)
                           }
                         : undefined
@@ -207,7 +199,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
             onOpenChange={open => show(open ? 'hub' : null)}
             pulse={pulse}
             onOpenItem={openItem}
-            onMarkRead={markRead}
+            onMarkRead={markInboxItemRead}
             onMarkAllRead={markAllRead}
             onOpenSettings={openSettings}
             announcement={announcement}

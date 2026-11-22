@@ -10,7 +10,8 @@ import { inboxCount, useInboxItems, type InboxItem } from '@/hooks/useInboxItems
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { desktopShell } from '@/lib/desktop-shell/client'
 import { foremanDockEntry } from '@/lib/desktop-shell/coworker-dock'
-import { openInboxItem } from '@/lib/notifications/open-inbox-item'
+import { dockNotesOf } from '@/lib/desktop-shell/coworker-dock-notes'
+import { markInboxItemRead, openInboxItem } from '@/lib/notifications/open-inbox-item'
 import { sidebarSections } from '@/lib/workspace-view'
 import { useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
@@ -50,12 +51,15 @@ function Publisher() {
 
     const foreman = useMemo(() => (foremanVisible ? foremanDockEntry({ feed: foremanFeed, activity: foremanActivity, name: foremanName }) : null), [foremanVisible, foremanFeed, foremanActivity, foremanName])
 
+    // The shell that predates the notes would drop them anyway.
+    const withNotes = desktopShell('coworkerDockNotes') !== null
     // A workspace without coworkers (a new account in onboarding) has no dock to show.
     const workspaceKey = workspace ? String(workspace.id) : undefined
-    const state = useMemo<CoworkerDockState>(
-        () => (coworkers.length > 0 ? { coworkers: foreman ? [foreman, ...coworkers] : coworkers, createBlockedReason: needsMachineReason, workspaceKey } : null),
-        [coworkers, foreman, needsMachineReason, workspaceKey]
-    )
+    const state = useMemo<CoworkerDockState>(() => {
+        if (coworkers.length === 0) return null
+        const shown = { coworkers: foreman ? [foreman, ...coworkers] : coworkers, createBlockedReason: needsMachineReason, workspaceKey }
+        return withNotes ? { ...shown, notes: onEngine ? dockNotesOf(items) : [] } : shown
+    }, [coworkers, foreman, needsMachineReason, workspaceKey, withNotes, onEngine, items])
     const published = useRef('')
     useEffect(() => {
         const key = JSON.stringify(state)
@@ -87,9 +91,20 @@ function Publisher() {
             else useBoardStore.getState().openAgentChat(agentId)
         })
         const stopCreate = dock.onCreate(() => useBuilderDialogsStore.getState().openNewAgent())
+        const itemOf = (noteId: string) => itemsRef.current.find(item => item.id === noteId)
+        const stopOpenNote = dock.onOpenNote?.(noteId => {
+            const item = itemOf(noteId)
+            if (item) openInboxItem(item)
+        })
+        const stopMarkRead = dock.onMarkRead?.(noteId => {
+            const item = itemOf(noteId)
+            if (item) markInboxItemRead(item)
+        })
         return () => {
             stopOpen()
             stopCreate()
+            stopOpenNote?.()
+            stopMarkRead?.()
         }
     }, [])
 
