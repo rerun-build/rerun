@@ -6,6 +6,7 @@
 // dock is clicked. Whether it floats over another app in full screen, and lets the clicks around the
 // rail through, is checked by hand on a real desktop.
 
+import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { COWORKERS, seedDemoWorkspace } from '../../../scripts/docs-media/demo-workspace.mjs'
@@ -38,10 +39,59 @@ const dockWindow = (app) =>
     })
 const mainVisible = (app) => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].isVisible())
 
+// The buddies of the rail from top to bottom, by the name each one reads out.
+const RAIL_CONTROLS = ['Move', 'New coworker', 'Show coworkers']
+const railNames = (dock) =>
+    dock.evaluate((controls) => [...document.querySelectorAll('[data-coworker-dock] button[aria-label]')].map((button) => button.getAttribute('aria-label')).filter((name) => !controls.includes(name)), RAIL_CONTROLS)
+
+const readDockSettings = async (app) => {
+    const folder = await app.evaluate(({ app: electron }) => electron.getPath('userData'))
+    return JSON.parse(readFileSync(join(folder, 'settings.json'), 'utf8')).coworkerDock ?? {}
+}
+
+const sidebarOrders = async (admin, workspaceId) => {
+    const { data } = await admin.from('agents').select('id, sidebar_order').eq('workspace_id', workspaceId).order('id')
+    return data
+}
+
+// Playwright cannot click a native menu: the templates the shell builds are kept, and an item's own
+// click is called, as the menu would.
+const recordDockMenus = (app) =>
+    app.evaluate(({ Menu }) => {
+        if (globalThis.__dockMenus) return
+        globalThis.__dockMenus = []
+        const build = Menu.buildFromTemplate.bind(Menu)
+        Menu.buildFromTemplate = (template) => {
+            const menu = build(template)
+            globalThis.__dockMenus.push({ template, menu })
+            return menu
+        }
+    })
+
+// `labels`: the item, after the submenus that lead to it.
+async function clickDockMenuItem(app, labels) {
+    await waitUntil(() => app.evaluate(() => globalThis.__dockMenus.length), (count) => count > 0, 'the shell opens its menu')
+    const found = await app.evaluate((_electron, path) => {
+        const { template, menu } = globalThis.__dockMenus.pop()
+        globalThis.__dockMenus.length = 0
+        menu.closePopup()
+        let items = template
+        let item = null
+        for (const label of path) {
+            item = items.find((entry) => entry.label === label) ?? null
+            items = item?.submenu ?? []
+        }
+        if (!item?.click) return template.map((entry) => entry.label ?? entry.type)
+        item.click()
+        return true
+    }, labels)
+    if (found !== true) throw new Error(`Check failed: the menu has no such item (${JSON.stringify(found)})`)
+}
+
 const LEAD_SCOUT = COWORKERS.leadScout
 const LEAD_SCOUT_SESSION = 'demo-session-lead-scout'
 
-export default async function coworkerDockScenario({ app, page, step, base, admin, workspaceId, account }) {
+export default async function coworkerDockScenario({ app, page, step, base, admin, workspaceId, account, shell }) {
     const { data: pool } = await admin.from('engine_pool').select('engine_api_key').eq('claimed_by_workspace_id', workspaceId).single()
     await seedDemoWorkspace({ admin, workspaceId, userId: account.userId, email: account.email, apiKey: pool.engine_api_key, dataDir: join(REPO_ROOT, '.context/verify/engine-data') })
     // A cold `next dev` compiles the home on this first visit, past the default 30 seconds.
@@ -51,6 +101,7 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     const initial = await page.evaluate(() => window.rerunShell.settings.get())
     check(initial.coworkerDock === true, 'the dock is on by default')
     check((await page.evaluate(() => window.rerunShell.capabilities)).includes('coworkerDock'), 'the shell says it has a dock')
+    check((await page.evaluate(() => window.rerunShell.capabilities)).includes('coworkerDockArrange'), 'and that it keeps the order and the hidden coworkers')
 
     const dock = await waitUntil(() => app.windows().find((candidate) => isDock(candidate.url())), Boolean, 'the dock window opens', 60_000)
     await dock.getByRole('button', { name: LEAD_SCOUT.name }).waitFor({ timeout: 30_000 })
@@ -83,6 +134,63 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     await page.getByText(LEAD_SCOUT.name).first().waitFor()
     await waitUntil(() => leadScoutButton.innerText(), (text) => text.trim() === '', 'opening the conversation clears the pip')
     await step('conversation opened from the dock')
+
+    // The Chief of Staff leads the rail, drawn as its orb, and opens its conversation.
+    const foremanButton = dock.locator('button:has([data-dock-foreman])')
+    check((await railNames(dock))[0] === (await foremanButton.getAttribute('aria-label')), 'the Chief of Staff leads the rail')
+    const foremanLine = page.getByText('All three, start with Lead Scout.').first()
+    const leadScoutComposer = page.getByPlaceholder(`Message ${LEAD_SCOUT.name}...`)
+    check(await leadScoutComposer.isVisible(), 'the conversation of Lead Scout is open before the click')
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].hide())
+    await foremanButton.click()
+    await waitUntil(() => mainVisible(app), Boolean, 'the main window comes back for the Chief of Staff')
+    await foremanLine.waitFor({ timeout: 30_000 })
+    await waitUntil(() => leadScoutComposer.isVisible(), (visible) => !visible, 'the conversation of Lead Scout makes way for the Chief of Staff')
+    check(true, 'a click on the Chief of Staff opens its conversation')
+    await step('Chief of Staff opened from the dock')
+
+    // A buddy dragged to the top of the rail stays there: the shell keeps the order in its settings.
+    const sidebarBefore = await sidebarOrders(admin, workspaceId)
+    const railBefore = await railNames(dock)
+    const last = railBefore.at(-1)
+    const from = await dock.getByRole('button', { name: last, exact: true }).boundingBox()
+    const to = await foremanButton.boundingBox()
+    await dock.mouse.move(from.x + from.width / 2, from.y + from.height / 2)
+    await dock.mouse.down()
+    await dock.mouse.move(from.x + from.width / 2, to.y + 2, { steps: 12 })
+    await dock.mouse.move(to.x + to.width / 2, to.y + 2, { steps: 2 })
+    await dock.mouse.up()
+    const reordered = await waitUntil(() => railNames(dock), (names) => names[0] === last, `${last} moves to the top of the rail`)
+    const shownIds = (view) => view.state.coworkers.map((coworker) => coworker.id)
+    const savedView = await waitUntil(() => dock.evaluate(() => window.rerunShell.coworkerDock.get()), (view) => view.state.coworkers[0].name === last, 'the shell keeps the order the rail was dragged to')
+    const stored = await readDockSettings(app)
+    check(Object.values(stored.arrangements ?? {}).some((arrangement) => arrangement.order[0] === shownIds(savedView)[0]), `the order is written in the settings of the app (${JSON.stringify(stored.arrangements)})`)
+    check(JSON.stringify(await sidebarOrders(admin, workspaceId)) === JSON.stringify(sidebarBefore), 'the order of the sidebar is untouched')
+    await step('dock reordered', { target: dock })
+
+    // Right-click on a buddy: its menu hides it from the dock, the app still has it.
+    await recordDockMenus(app)
+    await dock.getByRole('button', { name: LEAD_SCOUT.name }).click({ button: 'right' })
+    await clickDockMenuItem(app, [`Hide ${LEAD_SCOUT.name} from Dock`])
+    await waitUntil(() => railNames(dock), (names) => !names.includes(LEAD_SCOUT.name), 'the hidden coworker leaves the rail')
+    check(await page.getByText(LEAD_SCOUT.name).first().isVisible(), 'the hidden coworker stays in the app')
+    await step('coworker hidden from the dock', { target: dock })
+
+    // The two windows reloaded: the dock keeps its order and the hidden coworker.
+    await page.goto(base, { waitUntil: 'domcontentloaded' })
+    await page.waitForSelector('[data-foreman-split]', { timeout: 60_000 })
+    await dock.reload()
+    const afterReload = await waitUntil(() => railNames(dock), (names) => names.length > 0, 'the dock draws again after the reload')
+    check(afterReload[0] === last && !afterReload.includes(LEAD_SCOUT.name), `the order and the hidden coworker survive a reload (${afterReload.join(', ')})`)
+
+    // "Show in Dock" brings it back, where it was.
+    await dock.getByRole('button', { name: last, exact: true }).click({ button: 'right' })
+    await clickDockMenuItem(app, ['Show in Dock', LEAD_SCOUT.name])
+    const restored = await waitUntil(() => railNames(dock), (names) => names.includes(LEAD_SCOUT.name), 'Show in Dock brings the coworker back')
+    check(restored.join() === reordered.join(), `back at its place in the order (${restored.join(', ')})`)
+    await shell.setSystemTheme('dark')
+    await step('dock reordered, dark', { target: dock })
+    await shell.setSystemTheme('light')
 
     // The "+" opens New coworker in the main window.
     await dock.getByRole('button', { name: 'New coworker' }).click()

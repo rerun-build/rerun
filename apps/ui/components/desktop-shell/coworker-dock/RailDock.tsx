@@ -1,5 +1,8 @@
 'use client'
 
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import type { CoworkerDockCoworker, CoworkerDockEdge } from '@rerun/contracts'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 
@@ -23,17 +26,51 @@ function FoldedTab({ coworkers, edge, onToggleCollapsed }: Pick<DockProps, 'cowo
     )
 }
 
+type BuddyListProps = Pick<DockProps, 'coworkers' | 'edge' | 'onOpen' | 'onMenu'>
+
+// Up and down only: the rail is one buddy wide.
+function SortableBuddy({ coworker, edge, onOpen, onMenu }: { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge } & Pick<DockProps, 'onOpen' | 'onMenu'>) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: coworker.id, attributes: { role: 'group' } })
+    return (
+        <div ref={setNodeRef} style={{ transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined, transition }} {...attributes} {...listeners} className={cn('relative touch-none outline-none', isDragging && 'z-10 cursor-grabbing opacity-80')}>
+            <DockBuddy coworker={coworker} edge={edge} onOpen={onOpen} onMenu={onMenu} />
+        </div>
+    )
+}
+
+// A click still opens the coworker: the drag starts once the pointer has moved a few pixels.
+function SortableBuddies({ coworkers, edge, onOpen, onMenu, onReorder, onDraggingChange }: BuddyListProps & Required<Pick<DockProps, 'onReorder'>> & Pick<DockProps, 'onDraggingChange'>) {
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+    const ids = coworkers.map(coworker => coworker.id)
+    const end = ({ active, over }: DragEndEvent) => {
+        onDraggingChange?.(false)
+        if (!over || active.id === over.id) return
+        onReorder(arrayMove(ids, ids.indexOf(String(active.id)), ids.indexOf(String(over.id))))
+    }
+    return (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={() => onDraggingChange?.(true)} onDragEnd={end} onDragCancel={() => onDraggingChange?.(false)}>
+            <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+                {coworkers.map(coworker => (
+                    <SortableBuddy key={coworker.id} coworker={coworker} edge={edge} onOpen={onOpen} onMenu={onMenu} />
+                ))}
+            </SortableContext>
+        </DndContext>
+    )
+}
+
 /** One rail glued to the edge, a buddy per coworker, the "+" at the bottom. */
-export function RailDock({ coworkers, edge, collapsed, createBlockedReason, onOpen, onCreate, onToggleCollapsed, onGrab }: DockProps) {
+export function RailDock({ coworkers, edge, collapsed, createBlockedReason, onOpen, onMenu, onReorder, onDraggingChange, onCreate, onToggleCollapsed, onGrab }: DockProps) {
     if (collapsed) return <FoldedTab coworkers={coworkers} edge={edge} onToggleCollapsed={onToggleCollapsed} />
     return (
         <div className={cn('flex max-h-full min-h-0 flex-col items-center gap-1 px-1 pt-1 pb-1.5', SURFACE, edge === 'right' ? 'rounded-l-2xl border-r-0' : 'rounded-r-2xl border-l-0')}>
             <DockGrip onGrab={onGrab} onToggleCollapsed={onToggleCollapsed} />
             <ScrollFade fadeSize={28} className="min-h-0 overscroll-contain [scrollbar-width:none]">
                 <div className="flex flex-col items-center gap-0.5">
-                    {coworkers.map(coworker => (
-                        <DockBuddy key={coworker.id} coworker={coworker} edge={edge} onOpen={onOpen} />
-                    ))}
+                    {onReorder ? (
+                        <SortableBuddies coworkers={coworkers} edge={edge} onOpen={onOpen} onMenu={onMenu} onReorder={onReorder} onDraggingChange={onDraggingChange} />
+                    ) : (
+                        coworkers.map(coworker => <DockBuddy key={coworker.id} coworker={coworker} edge={edge} onOpen={onOpen} onMenu={onMenu} />)
+                    )}
                 </div>
             </ScrollFade>
             <span className="my-0.5 h-px w-6 shrink-0 bg-border" />

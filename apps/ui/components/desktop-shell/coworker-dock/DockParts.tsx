@@ -5,7 +5,9 @@ import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 
+import { Orb } from '@/components/foreman/Orb'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
+import { foremanDockOrbState, isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
 import { GripVerticalIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
@@ -16,6 +18,11 @@ export type DockProps = {
     // Why "+" is disabled, shown on hover; none when it works.
     createBlockedReason?: string | null
     onOpen: (coworker: CoworkerDockCoworker) => void
+    // Right-click on a coworker: the shell's menu, which can hide it.
+    onMenu: (coworker: CoworkerDockCoworker) => void
+    // The coworkers in the order they were dragged to; absent, they cannot be dragged.
+    onReorder?: (agentIds: string[]) => void
+    onDraggingChange?: (dragging: boolean) => void
     onCreate: () => void
     onToggleCollapsed: () => void
     onGrab: (event: ReactPointerEvent) => void
@@ -39,11 +46,38 @@ export function CountPip({ count, tone = 'brand', className }: { count: number; 
     )
 }
 
-export function DockBuddy({ coworker, edge, onOpen }: { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge; onOpen: (coworker: CoworkerDockCoworker) => void }) {
+const BUDDY_SIZE = 34
+
+function ForemanBuddy({ coworker, edge }: { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge }) {
+    return (
+        <span data-dock-foreman className="relative flex size-[34px] items-center justify-center">
+            <Orb size={BUDDY_SIZE - 6} state={foremanDockOrbState(coworker.mood)} facing={edge === 'right' ? 'left' : 'right'} />
+            <CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} className="absolute -top-1 -right-1" />
+        </span>
+    )
+}
+
+type DockBuddyProps = { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge; onOpen: (coworker: CoworkerDockCoworker) => void; onMenu: (coworker: CoworkerDockCoworker) => void }
+
+export function DockBuddy({ coworker, edge, onOpen, onMenu }: DockBuddyProps) {
     return (
         <TooltipLabeled side={inward(edge)} label={coworker.name}>
-            <button type="button" onClick={() => onOpen(coworker)} aria-label={coworker.name} className="flex shrink-0 items-center justify-center rounded-xl p-1 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
-                <AgentBuddy agentId={coworker.id} mood={coworker.mood} size={34} facing={edge === 'right' ? 'left' : 'right'} badge={<CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} />} />
+            <button
+                type="button"
+                onClick={() => onOpen(coworker)}
+                onContextMenu={event => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onMenu(coworker)
+                }}
+                aria-label={coworker.name}
+                className="flex shrink-0 items-center justify-center rounded-xl p-1 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+                {isForemanDockEntry(coworker) ? (
+                    <ForemanBuddy coworker={coworker} edge={edge} />
+                ) : (
+                    <AgentBuddy agentId={coworker.id} mood={coworker.mood} size={BUDDY_SIZE} facing={edge === 'right' ? 'left' : 'right'} badge={<CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} />} />
+                )}
             </button>
         </TooltipLabeled>
     )

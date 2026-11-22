@@ -1,17 +1,21 @@
 'use client'
 
-import type { CoworkerDockCoworker, CoworkerDockState } from '@rerun/contracts'
+import { COWORKER_DOCK_FOREMAN_ID, type CoworkerDockCoworker, type CoworkerDockState } from '@rerun/contracts'
 import { buddyMoodOfStatus } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 
+import { useForemanName } from '@/hooks/useForemanName'
 import { inboxCount, useInboxItems, type InboxItem } from '@/hooks/useInboxItems'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { desktopShell } from '@/lib/desktop-shell/client'
+import { foremanDockEntry } from '@/lib/desktop-shell/coworker-dock'
 import { openInboxItem } from '@/lib/notifications/open-inbox-item'
 import { sidebarSections } from '@/lib/workspace-view'
 import { useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
-import { useForemanStore } from '@/stores/foreman.store'
+import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
+import { useSession } from '@/supabase/session/SessionProvider'
 
 const subscribe = () => () => {}
 const hasDock = () => desktopShell('coworkerDock') !== null
@@ -30,6 +34,11 @@ function Publisher() {
     const onEngine = useForemanStore(s => s.surface === 'engine')
     const { items } = useInboxItems()
     const { needsMachineReason } = useWorkspaceAccess()
+    const { workspace } = useSession()
+    const foremanVisible = useForemanStore(selectForemanVisible)
+    const foremanFeed = useForemanStore(s => s.dock)
+    const foremanActivity = useForemanStore(s => s.activity)
+    const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
 
     const coworkers = useMemo<CoworkerDockCoworker[]>(() => {
         const pending = new Map<string, number>()
@@ -39,8 +48,14 @@ function Publisher() {
             .map(agent => ({ id: agent.id, name: agent.name, mood: buddyMoodOfStatus(agent.status, !!agent.disabledAt), pending: pending.get(agent.id) ?? 0 }))
     }, [agents, spaces, items, onEngine])
 
+    const foreman = useMemo(() => (foremanVisible ? foremanDockEntry({ feed: foremanFeed, activity: foremanActivity, name: foremanName }) : null), [foremanVisible, foremanFeed, foremanActivity, foremanName])
+
     // A workspace without coworkers (a new account in onboarding) has no dock to show.
-    const state = useMemo<CoworkerDockState>(() => (coworkers.length > 0 ? { coworkers, createBlockedReason: needsMachineReason } : null), [coworkers, needsMachineReason])
+    const workspaceKey = workspace ? String(workspace.id) : undefined
+    const state = useMemo<CoworkerDockState>(
+        () => (coworkers.length > 0 ? { coworkers: foreman ? [foreman, ...coworkers] : coworkers, createBlockedReason: needsMachineReason, workspaceKey } : null),
+        [coworkers, foreman, needsMachineReason, workspaceKey]
+    )
     const published = useRef('')
     useEffect(() => {
         const key = JSON.stringify(state)
@@ -65,6 +80,8 @@ function Publisher() {
         const dock = desktopShell('coworkerDock')?.coworkerDock
         if (!dock) return
         const stopOpen = dock.onOpen(agentId => {
+            // Like the Chief of Staff's tile of the sidebar: the conversation on screen stays, with the question the dock counts.
+            if (agentId === COWORKER_DOCK_FOREMAN_ID) return useForemanStore.getState().openInCenter()
             const item = mostUrgent(itemsRef.current, agentId)
             if (item) openInboxItem(item)
             else useBoardStore.getState().openAgentChat(agentId)

@@ -25,6 +25,19 @@ function dockApi() {
     return desktopShell('coworkerDock')?.coworkerDock ?? null
 }
 
+// A shell that keeps the person's order: older ones show the coworkers as the main window sends them.
+function reorderApi() {
+    const dock = desktopShell('coworkerDockArrange')?.coworkerDock
+    return dock?.reorder ? (agentIds: string[]) => dock.reorder?.(agentIds) : null
+}
+
+// The order a drag left, shown until the shell sends the view it saved.
+function inOrder<C extends { id: string }>(coworkers: C[], order: string[] | null): C[] {
+    if (!order) return coworkers
+    const rank = new Map(order.map((id, index) => [id, index]))
+    return [...coworkers].sort((a, b) => (rank.get(a.id) ?? order.length) - (rank.get(b.id) ?? order.length))
+}
+
 /** The desktop app's coworker dock: a window as tall as the screen, glued to its edge, where only the rail takes the pointer. Its top and bottom edges set how tall it may grow. */
 export function CoworkerDock() {
     const [view, setView] = useState<CoworkerDockView | null>(null)
@@ -32,6 +45,7 @@ export function CoworkerDock() {
     const [dragSize, setDragSize] = useState<RailSize | null>(null)
     const [edgeDrag, setEdgeDrag] = useState<EdgeDrag | null>(null)
     const [hoveredHalf, setHoveredHalf] = useState<EdgeSide | null>(null)
+    const [droppedOrder, setDroppedOrder] = useState<string[] | null>(null)
     const railRef = useRef<HTMLDivElement>(null)
     const hovering = useRef(false)
     const dragging = useRef(false)
@@ -43,6 +57,7 @@ export function CoworkerDock() {
         return dock.onChange(next => {
             setDragY(null)
             setDragSize(null)
+            setDroppedOrder(null)
             setView(next)
         })
     }, [])
@@ -162,6 +177,11 @@ export function CoworkerDock() {
     const maxHeight = edgeDrag?.maxHeight ?? (dragSize ? dragSize.maxHeight : view.maxHeight)
     const position = edgeDrag ? { [edgeDrag.side === 'top' ? 'bottom' : 'top']: `${edgeDrag.anchor}px` } : { top: `${y * 100}%`, transform: `translateY(-${y * 100}%)` }
     const resetSize = () => dockApi()?.resize({ y: view.y, maxHeight: null })
+    const reorder = reorderApi()
+    const draggingBuddy = (active: boolean) => {
+        dragging.current = active
+        report()
+    }
     return (
         <main data-coworker-dock className="relative h-dvh overflow-hidden select-none">
             <div className={cn('pointer-events-none absolute top-4 bottom-4', edge === 'right' ? 'right-0' : 'left-0')}>
@@ -189,11 +209,21 @@ export function CoworkerDock() {
                     }}
                 >
                     <RailDock
-                        coworkers={view.state.coworkers}
+                        coworkers={inOrder(view.state.coworkers, droppedOrder)}
                         edge={edge}
                         collapsed={collapsed}
                         createBlockedReason={view.state.createBlockedReason}
                         onOpen={coworker => dockApi()?.open(coworker.id)}
+                        onMenu={coworker => dockApi()?.showMenu(coworker.id)}
+                        onReorder={
+                            reorder
+                                ? agentIds => {
+                                      setDroppedOrder(agentIds)
+                                      reorder(agentIds)
+                                  }
+                                : undefined
+                        }
+                        onDraggingChange={draggingBuddy}
                         onCreate={() => dockApi()?.create()}
                         onToggleCollapsed={() => dockApi()?.setCollapsed(!collapsed)}
                         onGrab={grab}
