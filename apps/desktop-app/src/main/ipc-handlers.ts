@@ -75,6 +75,7 @@ export function registerIpcHandlers(): void {
     handle(IPC.coworkerDockResize, ['app'], coworkerDockHandlers.resize)
     handle(IPC.coworkerDockSetCollapsed, ['app'], coworkerDockHandlers.setCollapsed)
     handle(IPC.coworkerDockShowMenu, ['app'], coworkerDockHandlers.showMenu)
+    handle(IPC.coworkerDockReorder, ['app'], coworkerDockHandlers.reorder)
     handle(IPC.coworkerDockSetInteractive, ['app'], coworkerDockHandlers.setInteractive)
     handle(IPC.localeSet, ['app'], (_event, locale: string) => setShellLocale(String(locale).slice(0, 16)))
 

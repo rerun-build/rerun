@@ -27,7 +27,8 @@ export type ShellSettings = {
     coworkerDock?: StoredCoworkerDock
 }
 
-export type StoredCoworkerDock = { enabled?: boolean; edge?: 'left' | 'right'; y?: number; maxHeight?: number | null; displayId?: number; collapsed?: boolean }
+// `arrangements`: the order and the hidden coworkers of each server and workspace (coworker-dock-arrangement).
+export type StoredCoworkerDock = { enabled?: boolean; edge?: 'left' | 'right'; y?: number; maxHeight?: number | null; displayId?: number; collapsed?: boolean; arrangements?: unknown }
 
 const FILE_NAME = 'settings.json'
 

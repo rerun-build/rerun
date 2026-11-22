@@ -130,6 +130,8 @@
         "expand": "Déplier",
         "moveLeft": "Placer sur le bord gauche",
         "moveRight": "Placer sur le bord droit",
-        "hide": "Masquer le dock"
+        "hide": "Masquer le dock",
+        "hideCoworker": "Masquer {name} du dock",
+        "showInDock": "Afficher dans le dock"
     }
 }

@@ -95,6 +95,7 @@ if (bootstrap?.audience === 'app') {
                         ? {
                               coworkers: state.coworkers.map((coworker) => ({ id: String(coworker.id), name: String(coworker.name), mood: String(coworker.mood), pending: Number(coworker.pending) || 0 })),
                               createBlockedReason: typeof state.createBlockedReason === 'string' ? state.createBlockedReason : null,
+                              workspaceKey: typeof state.workspaceKey === 'string' ? state.workspaceKey : undefined,
                           }
                         : null,
                 ),
@@ -107,7 +108,8 @@ if (bootstrap?.audience === 'app') {
             drop: (point) => void ipcRenderer.invoke(IPC.coworkerDockDrop, { x: Number(point.x), y: Number(point.y), railY: point.railY === undefined ? undefined : Number(point.railY) }),
             resize: (placement) => void ipcRenderer.invoke(IPC.coworkerDockResize, { y: Number(placement.y), maxHeight: placement.maxHeight === null ? null : Number(placement.maxHeight) }),
             setCollapsed: (collapsed) => void ipcRenderer.invoke(IPC.coworkerDockSetCollapsed, collapsed === true),
-            showMenu: () => void ipcRenderer.invoke(IPC.coworkerDockShowMenu),
+            showMenu: (agentId) => void ipcRenderer.invoke(IPC.coworkerDockShowMenu, typeof agentId === 'string' ? agentId : undefined),
+            reorder: (agentIds) => void ipcRenderer.invoke(IPC.coworkerDockReorder, Array.isArray(agentIds) ? agentIds.map(String) : []),
             setInteractive: (interactive, rect) =>
                 void ipcRenderer.invoke(IPC.coworkerDockSetInteractive, interactive === true, rect ? { x: Number(rect.x), y: Number(rect.y), width: Number(rect.width), height: Number(rect.height) } : undefined),
         },

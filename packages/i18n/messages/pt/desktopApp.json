@@ -130,6 +130,8 @@
         "expand": "Expandir",
         "moveLeft": "Mover para a borda esquerda",
         "moveRight": "Mover para a borda direita",
-        "hide": "Ocultar dock"
+        "hide": "Ocultar dock",
+        "hideCoworker": "Ocultar {name} do dock",
+        "showInDock": "Mostrar no dock"
     }
 }

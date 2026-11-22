@@ -130,6 +130,8 @@
         "expand": "Genişlet",
         "moveLeft": "Sol Kenara Taşı",
         "moveRight": "Sağ Kenara Taşı",
-        "hide": "Dock'u Gizle"
+        "hide": "Dock'u Gizle",
+        "hideCoworker": "{name} öğesini Dock'tan Gizle",
+        "showInDock": "Dock'ta Göster"
     }
 }

@@ -130,6 +130,8 @@
         "expand": "Ausklappen",
         "moveLeft": "An den linken Rand",
         "moveRight": "An den rechten Rand",
-        "hide": "Dock ausblenden"
+        "hide": "Dock ausblenden",
+        "hideCoworker": "{name} im Dock ausblenden",
+        "showInDock": "Im Dock anzeigen"
     }
 }

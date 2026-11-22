@@ -162,6 +162,8 @@
         "expand": "Expand",
         "moveLeft": "Move to Left Edge",
         "moveRight": "Move to Right Edge",
-        "hide": "Hide Dock"
+        "hide": "Hide Dock",
+        "hideCoworker": "Hide {name} from Dock",
+        "showInDock": "Show in Dock"
     }
 }

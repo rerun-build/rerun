@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer', 'coworkerDock'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer', 'coworkerDock', 'coworkerDockArrange'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -139,17 +139,23 @@ export type CoworkerDockMood = (typeof COWORKER_DOCK_MOODS)[number]
 // the same items the badge of the app icon adds up.
 export type CoworkerDockCoworker = { id: string; name: string; mood: CoworkerDockMood; pending: number }
 
+// The Chief of Staff's entry among the coworkers, first unless the person moved it. A shell without
+// `coworkerDockArrange` shows it like any other, and its click comes back through `onOpen`.
+export const COWORKER_DOCK_FOREMAN_ID = 'chief-of-staff'
+
 // Published by the main window; null once it shows no workspace (signed out, another page) or a
 // workspace without coworkers. `createBlockedReason`: why "+" is disabled (a paused workspace), as
-// the main window says it.
-export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlockedReason?: string | null } | null
+// the main window says it. `workspaceKey`: the workspace shown, under which the shell keeps the order
+// and the hidden coworkers the person chose (`coworkerDockArrange` capability).
+export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlockedReason?: string | null; workspaceKey?: string } | null
 
 export type CoworkerDockEdge = 'left' | 'right'
 
 // The shortest the rail gets when its edge is dragged: the grip, one coworker and the "+".
 export const COWORKER_DOCK_MIN_HEIGHT = 120
 
-// What the dock window draws: the coworkers, and where the person put the rail. `y` is the middle of
+// What the dock window draws: the coworkers, in the order the person chose and without the ones they
+// hid (`coworkerDockArrange`), and where the person put the rail. `y` is the middle of
 // the rail, from 0 (top of the screen) to 1 (bottom). `maxHeight`: how tall the person let the rail
 // grow, in pixels, before its coworkers scroll; null, it grows with them up to the screen.
 export type CoworkerDockView = { state: CoworkerDockState; edge: CoworkerDockEdge; y: number; collapsed: boolean; maxHeight: number | null }
@@ -294,7 +300,10 @@ export type DesktopShellApi = {
         // The top or the bottom edge of the rail was dragged: its new height limit, and where it now stands.
         resize(placement: { y: number; maxHeight: number | null }): void
         setCollapsed(collapsed: boolean): void
-        showMenu(): void
+        // `agentId`: the coworker right-clicked, whose menu also hides it (`coworkerDockArrange`).
+        showMenu(agentId?: string): void
+        // `coworkerDockArrange` capability: the coworkers shown, in the order they were dragged to.
+        reorder?(agentIds: string[]): void
         // The window lets clicks through to the apps under it, except over the rail. `rect` is the
         // rail, in the window's coordinates.
         setInteractive(interactive: boolean, rect?: { x: number; y: number; width: number; height: number }): void

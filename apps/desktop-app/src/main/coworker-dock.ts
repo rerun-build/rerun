@@ -1,6 +1,7 @@
-import { BrowserWindow, Menu, screen, type IpcMainInvokeEvent, type WebContents } from 'electron'
+import { BrowserWindow, Menu, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions, type WebContents } from 'electron'
 import { COWORKER_DOCK_MOODS, COWORKER_DOCK_PATH, type CoworkerDockCoworker, type CoworkerDockMood, type CoworkerDockState, type CoworkerDockView } from '@rerun/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
+import { arrangeDock, arrangementKey, cleanArrangements, EMPTY_ARRANGEMENT, reorderArrangement, setHidden, withArrangement, type DockArrangement } from './coworker-dock-arrangement'
 import { clamp01, dockBounds, dockDisplay, dockMaxHeight, dropPlacement, pointInRect, storedDockPlacement, type DockPlacement } from './coworker-dock-placement'
 import { currentServer, getMainWindow, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { t } from './messages'
@@ -39,9 +40,29 @@ function savePlacement(patch: StoredCoworkerDock): void {
     updateSettings({ coworkerDock: { ...readSettings().coworkerDock, ...patch } })
 }
 
+// The person's order and hidden coworkers for the workspace on screen; none from a web app that
+// does not say which workspace it shows.
+function currentArrangement(): { key: string; arrangement: DockArrangement } | null {
+    const server = currentServer()
+    if (!state?.workspaceKey || !server) return null
+    const key = arrangementKey(server, state.workspaceKey)
+    return { key, arrangement: cleanArrangements(readSettings().coworkerDock?.arrangements)[key] ?? EMPTY_ARRANGEMENT }
+}
+
+function saveArrangement(key: string, arrangement: DockArrangement): void {
+    savePlacement({ arrangements: withArrangement(cleanArrangements(readSettings().coworkerDock?.arrangements), key, arrangement) })
+    sendView()
+}
+
+function shownState(): CoworkerDockState {
+    const current = currentArrangement()
+    if (!state || !current) return state
+    return { ...state, coworkers: arrangeDock(state.coworkers, current.arrangement) }
+}
+
 function view(): CoworkerDockView {
     const { edge, y, collapsed, maxHeight } = placement()
-    return { state, edge, y, collapsed, maxHeight }
+    return { state: shownState(), edge, y, collapsed, maxHeight }
 }
 
 function liveWindow(): BrowserWindow | null {
@@ -190,9 +211,36 @@ function moveToEdge(edge: 'left' | 'right'): void {
     sendView()
 }
 
-function popupMenu(window: BrowserWindow): void {
+function setCoworkerHidden(agentId: string, hidden: boolean): void {
+    const current = currentArrangement()
+    if (current) saveArrangement(current.key, setHidden(current.arrangement, agentId, hidden))
+}
+
+// A menu reads `&` as the mark of its access key: doubled, "R&D" keeps it.
+function menuLabel(name: string): string {
+    return name.replaceAll('&', '&&')
+}
+
+// Right-clicked on a coworker, its menu hides it; every menu lists them all, to bring one back.
+function arrangeItems(agentId: string | null): MenuItemConstructorOptions[] {
+    const current = currentArrangement()
+    if (!state || !current) return []
+    const hidden = new Set(current.arrangement.hidden)
+    const clicked = state.coworkers.find((coworker) => coworker.id === agentId)
+    return [
+        ...(clicked ? [{ label: t('dock.hideCoworker', { name: menuLabel(clicked.name) }), click: () => setCoworkerHidden(clicked.id, true) }] : []),
+        {
+            label: t('dock.showInDock'),
+            submenu: state.coworkers.map((coworker) => ({ label: menuLabel(coworker.name), type: 'checkbox' as const, checked: !hidden.has(coworker.id), click: () => setCoworkerHidden(coworker.id, !hidden.has(coworker.id)) })),
+        },
+        { type: 'separator' },
+    ]
+}
+
+function popupMenu(window: BrowserWindow, agentId: string | null): void {
     const { edge, collapsed } = placement()
     Menu.buildFromTemplate([
+        ...arrangeItems(agentId),
         { label: collapsed ? t('dock.expand') : t('dock.collapse'), click: () => setCollapsed(!collapsed) },
         edge === 'right' ? { label: t('dock.moveLeft'), click: () => moveToEdge('left') } : { label: t('dock.moveRight'), click: () => moveToEdge('right') },
         { type: 'separator' },
@@ -214,11 +262,12 @@ function cleanCoworker(raw: unknown): CoworkerDockCoworker | null {
 
 function cleanState(raw: unknown): CoworkerDockState {
     if (!raw || typeof raw !== 'object' || !Array.isArray((raw as { coworkers?: unknown }).coworkers)) return null
-    const { coworkers: rawCoworkers, createBlockedReason } = raw as { coworkers: unknown[]; createBlockedReason?: unknown }
+    const { coworkers: rawCoworkers, createBlockedReason, workspaceKey } = raw as { coworkers: unknown[]; createBlockedReason?: unknown; workspaceKey?: unknown }
     const coworkers = rawCoworkers.slice(0, MAX_COWORKERS).map(cleanCoworker)
     return {
         coworkers: coworkers.filter((coworker): coworker is CoworkerDockCoworker => coworker !== null),
         createBlockedReason: typeof createBlockedReason === 'string' && createBlockedReason ? createBlockedReason.slice(0, 300) : null,
+        ...(typeof workspaceKey === 'string' && workspaceKey ? { workspaceKey: workspaceKey.slice(0, 100) } : {}),
     }
 }
 
@@ -295,9 +344,15 @@ export const coworkerDockHandlers = {
     setCollapsed: (event: IpcMainInvokeEvent, collapsed: unknown) => {
         if (fromDock(event)) setCollapsed(collapsed === true)
     },
-    showMenu: (event: IpcMainInvokeEvent) => {
+    showMenu: (event: IpcMainInvokeEvent, agentId: unknown) => {
         const window = fromDock(event)
-        if (window) popupMenu(window)
+        if (window) popupMenu(window, typeof agentId === 'string' && agentId ? agentId : null)
+    },
+    reorder: (event: IpcMainInvokeEvent, agentIds: unknown) => {
+        const current = currentArrangement()
+        if (!fromDock(event) || !Array.isArray(agentIds) || !state || !current) return
+        const shown = agentIds.filter((id): id is string => typeof id === 'string')
+        saveArrangement(current.key, reorderArrangement(current.arrangement, shown, state.coworkers.map((coworker) => coworker.id)))
     },
     setInteractive: (event: IpcMainInvokeEvent, wanted: unknown, rect: unknown) => {
         if (!fromDock(event)) return
