@@ -212,11 +212,12 @@ Updates a coworker. Every field is optional and only what you pass changes.
 <ParamField body="setup" type="object" />
 
 <ParamField body="look" type="object | null">
-  How the coworker's character looks on the board and everywhere else it appears: `{ "eyes", "mouth", "color" }`, all three required. Pass `null` to give it back the look drawn from its id.
+  How the coworker's character looks on the board and everywhere else it appears: `{ "eyes", "mouth", "color", "material" }`, `material` optional and the other three required. Pass `null` to give it back the look drawn from its id.
 
   - `eyes`: `pill`, `round`, `happy`, `googly`, `visor`, `sleepy`, `wink`, `pixel`, `star`, `heart`, `dot`, `brows`, `cyclops`, `shades`, `glasses`, `sparkle` or `line`
   - `mouth`: `none`, `smile`, `open`, `cat` or `flat`
   - `color`: `#0f52ff`, `#4fb800`, `#f0127f`, `#7a2cf5`, `#e935c1`, `#3b32e8`, `#00b862` or `#a81fe0`
+  - `material`: `classic` (the default, the plain block), `fluffy`, `plush`, `felt`, `knit`, `clay`, `rubber`, `glass` or `chrome`
 
   Amber, red and cyan are refused: on the board they mean working, in error and waiting for you. An invalid look is refused before anything else in the call is written.
 </ParamField>

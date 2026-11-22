@@ -1,4 +1,4 @@
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { SHARE_TOOL_DEFS } from './share-tools'
 import { TEMPLATE_TOOL_DEFS } from './template-tools'
 import { VAULT_TOOL_DEFS } from './vault-tools'
@@ -149,8 +149,8 @@ const AGENT_TOOL_DEFS = [
                 setup: SETUP_PROPERTY,
                 look: {
                     type: ['object', 'null'],
-                    description: 'How its buddy looks on the board and everywhere else: the colour of its top, its eyes and its mouth. Pass null to give it back the look drawn from its id. Amber, red and cyan are not offered: on the board they mean working, broken and waiting.',
-                    properties: { eyes: { type: 'string', enum: [...COWORKER_EYES] }, mouth: { type: 'string', enum: [...COWORKER_MOUTHS] }, color: { type: 'string', enum: [...COWORKER_COLORS] } },
+                    description: 'How its buddy looks on the board and everywhere else: the colour of its top, its eyes, its mouth and the material its block is made of (classic, the default, is the plain block). Pass null to give it back the look drawn from its id. Amber, red and cyan are not offered: on the board they mean working, broken and waiting.',
+                    properties: { eyes: { type: 'string', enum: [...COWORKER_EYES] }, mouth: { type: 'string', enum: [...COWORKER_MOUTHS] }, color: { type: 'string', enum: [...COWORKER_COLORS] }, material: { type: 'string', enum: [...COWORKER_MATERIALS] } },
                     required: ['eyes', 'mouth', 'color'],
                 },
             },

@@ -1190,6 +1190,20 @@
                                                         ],
                                                         "type": "string"
                                                     },
+                                                    "material": {
+                                                        "enum": [
+                                                            "classic",
+                                                            "fluffy",
+                                                            "plush",
+                                                            "felt",
+                                                            "knit",
+                                                            "clay",
+                                                            "rubber",
+                                                            "glass",
+                                                            "chrome"
+                                                        ],
+                                                        "type": "string"
+                                                    },
                                                     "mouth": {
                                                         "enum": [
                                                             "none",
@@ -1310,6 +1324,20 @@
                                                     "glasses",
                                                     "sparkle",
                                                     "line"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "material": {
+                                                "enum": [
+                                                    "classic",
+                                                    "fluffy",
+                                                    "plush",
+                                                    "felt",
+                                                    "knit",
+                                                    "clay",
+                                                    "rubber",
+                                                    "glass",
+                                                    "chrome"
                                                 ],
                                                 "type": "string"
                                             },
@@ -1671,6 +1699,20 @@
                                                                 "glasses",
                                                                 "sparkle",
                                                                 "line"
+                                                            ],
+                                                            "type": "string"
+                                                        },
+                                                        "material": {
+                                                            "enum": [
+                                                                "classic",
+                                                                "fluffy",
+                                                                "plush",
+                                                                "felt",
+                                                                "knit",
+                                                                "clay",
+                                                                "rubber",
+                                                                "glass",
+                                                                "chrome"
                                                             ],
                                                             "type": "string"
                                                         },
@@ -2176,6 +2218,20 @@
                                                     "glasses",
                                                     "sparkle",
                                                     "line"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "material": {
+                                                "enum": [
+                                                    "classic",
+                                                    "fluffy",
+                                                    "plush",
+                                                    "felt",
+                                                    "knit",
+                                                    "clay",
+                                                    "rubber",
+                                                    "glass",
+                                                    "chrome"
                                                 ],
                                                 "type": "string"
                                             },

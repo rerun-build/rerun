@@ -37,9 +37,16 @@ describe('update_agent, the look of a coworker', () => {
         expect(patchAgent).not.toHaveBeenCalled()
     })
 
+    it('dresses it in a material', async () => {
+        await dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, material: 'chrome' } })
+
+        expect(setAgentLook).toHaveBeenCalledWith('agent-own', { ...LOOK, material: 'chrome' })
+    })
+
     it('refuses a colour that means a state, or a part it cannot wear, before changing anything', async () => {
         await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', name: 'Renamed', look: { ...LOOK, color: '#ef4444' } })).rejects.toThrow(/color one of/)
         await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, eyes: 'laser' } })).rejects.toThrow(/eyes one of/)
+        await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, material: 'velvet' } })).rejects.toThrow(/material one of/)
 
         expect(renameAgent).not.toHaveBeenCalled()
         expect(setAgentLook).not.toHaveBeenCalled()

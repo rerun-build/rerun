@@ -290,17 +290,18 @@ describe('a coworker in the mobile app', () => {
 
         it('dresses it in a look, then gives it back its own, without asking its engine', async () => {
             const { PATCH } = await import('@/app/api/v1/agents/[id]/route')
-            const look = { eyes: 'heart', mouth: 'cat', color: '#00b862' } as const
+            const look = { eyes: 'heart', mouth: 'cat', color: '#00b862', material: 'fluffy' } as const
             expect(await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: { look } }))).toBeUndefined()
             expect(await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: { look: null } }))).toBeUndefined()
             expect(state.db?.writes('agents')).toEqual([expect.objectContaining({ method: 'update', payload: { look } }), expect.objectContaining({ method: 'update', payload: { look: null } })])
             expect(engine.patchAgent).not.toHaveBeenCalled()
         })
 
-        it('refuses a body that changes nothing, or a colour that means a state', async () => {
+        it('refuses a body that changes nothing, a colour that means a state, or a material it does not know', async () => {
             const { PATCH } = await import('@/app/api/v1/agents/[id]/route')
             await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: {} }), 400)
             await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: { look: { eyes: 'heart', mouth: 'cat', color: '#f59e0b' as '#00b862' } } }), 400)
+            await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: { look: { eyes: 'heart', mouth: 'cat', color: '#00b862', material: 'velvet' as 'fluffy' } } }), 400)
             expect(state.db?.writes('agents')).toEqual([])
         })
 

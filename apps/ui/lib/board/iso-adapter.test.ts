@@ -22,7 +22,7 @@ describe('containerFromSpace', () => {
 })
 
 const agent: IsoAgent = { id: 'a1', name: 'Nova', handle: 'nova', description: null, templateId: null, status: 'idle', position: { col: 2, row: 2 }, workspaceId: 1, spaceId: 's1', disabledAt: null, disabledReason: null }
-const LOOK = { eyes: 'heart', mouth: 'cat', color: '#00b862' } as const
+const LOOK = { eyes: 'heart', mouth: 'cat', color: '#00b862', material: 'glass' } as const
 
 describe('tileFromAgent, the look of its buddy', () => {
     it('leaves the buddy to its id when nobody dressed the coworker', () => {

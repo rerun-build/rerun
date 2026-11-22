@@ -280,7 +280,7 @@ function connectorView({ key, slug, name, label, status }: InstalledService) {
 
 function readLook(value: unknown) {
     const parsed = coworkerLookSchema.nullable().safeParse(value)
-    if (!parsed.success) throw new Error(`look must be null or { eyes, mouth, color } with eyes one of ${coworkerLookSchema.shape.eyes.options.join(', ')}; mouth one of ${coworkerLookSchema.shape.mouth.options.join(', ')}; color one of ${coworkerLookSchema.shape.color.options.join(', ')}.`)
+    if (!parsed.success) throw new Error(`look must be null or { eyes, mouth, color, material? } with eyes one of ${coworkerLookSchema.shape.eyes.options.join(', ')}; mouth one of ${coworkerLookSchema.shape.mouth.options.join(', ')}; color one of ${coworkerLookSchema.shape.color.options.join(', ')}; material one of ${coworkerLookSchema.shape.material.unwrap().options.join(', ')}.`)
     return parsed.data
 }
 
