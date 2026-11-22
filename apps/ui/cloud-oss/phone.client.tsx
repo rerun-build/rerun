@@ -7,7 +7,7 @@ export function PhoneChangeForm(_props: { onChanged: () => Promise<void> }) {
     return null
 }
 
-export function PhoneSignIn(_props: { onSignedIn: (created: boolean) => void | Promise<void>; onStepChange?: (step: 'phone' | 'code') => void; beforePhone?: ReactNode; afterPhone?: ReactNode; phoneLastUsed?: boolean }) {
+export function PhoneSignIn(_props: { onSignedIn: (created: boolean) => void | Promise<void>; onStepChange?: (step: 'phone' | 'code') => void; beforePhone?: ReactNode; afterPhone?: ReactNode; phoneLastUsed?: boolean; skipCaptcha?: boolean }) {
     return null
 }
 

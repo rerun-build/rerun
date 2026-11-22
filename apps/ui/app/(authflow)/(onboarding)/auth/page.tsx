@@ -3,6 +3,7 @@ import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/Onb
 import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
 import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'
 import { referrerOfCode } from '@/ee/services/referral-attach.service'
+import { isTellaAutoCapture } from '@/lib/auth/tella-auto-capture'
 import { detectInAppBrowser, detectMobileOs } from '@/lib/in-app-browser'
 import { getTranslations } from 'next-intl/server'
 import { cookies, headers } from 'next/headers'
@@ -12,7 +13,8 @@ import { AuthPageMethods } from './AuthPageMethods'
 // Where the number sits is picked here, from the request, so a phone never paints the computer's
 // layout first, nor an in-app browser the Google button it cannot use. Apple is drawn everywhere.
 export default async function AuthPage() {
-    const userAgent = (await headers()).get('user-agent') ?? ''
+    const requestHeaders = await headers()
+    const userAgent = requestHeaders.get('user-agent') ?? ''
     const phoneLeadsAlone = detectMobileOs(userAgent) !== null
     const showGoogle = !detectInAppBrowser(userAgent)
     const t = await getTranslations('auth.page')
@@ -23,7 +25,7 @@ export default async function AuthPage() {
                 {referrer && <ReferralInvite referrer={referrer} />}
                 <OnboardingHeading title={t('title')} subtitle={t('subtitle')} />
                 <Suspense fallback={null}>
-                    <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} />
+                    <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} skipCaptcha={isTellaAutoCapture(requestHeaders)} />
                 </Suspense>
                 <p className="text-center text-xs text-muted-foreground">
                     <AuthTerms />

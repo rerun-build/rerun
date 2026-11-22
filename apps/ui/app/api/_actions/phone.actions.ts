@@ -83,7 +83,7 @@ export async function sendPhoneSignInCodeAction(input: z.input<typeof signInSend
 
     const requestHeaders = await headers()
     const ip = callerIp(requestHeaders)
-    if (!(await verifyCaptcha(parsed.data.captcha, ip))) return refused('captcha_failed')
+    if (!(await verifyCaptcha(parsed.data.captcha, requestHeaders))) return refused('captcha_failed')
 
     const result = await startPhoneSignIn(phone, parsed.data.channel, ip, callerLanguage(requestHeaders))
     return result.ok ? result : sendRefused(result, parsed.data)

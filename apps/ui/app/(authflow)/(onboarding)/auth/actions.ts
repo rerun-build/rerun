@@ -31,8 +31,9 @@ const preparationRefused = (reason: EmailPreparationFailure) => ({ ...failure(EM
 // What every ask for a code goes through before Supabase hears of it: the robot check, then the pace
 // of the network behind the caller. `null` when the caller may go on.
 async function refuseCodeAsk(captcha: CaptchaProof | undefined): Promise<{ ip: string; refusal: EmailPreparationFailure | null }> {
-    const ip = callerIp(await headers())
-    if (!(await verifyCaptcha(captcha, ip))) return { ip, refusal: 'captcha_failed' }
+    const requestHeaders = await headers()
+    const ip = callerIp(requestHeaders)
+    if (!(await verifyCaptcha(captcha, requestHeaders))) return { ip, refusal: 'captcha_failed' }
     if (!(await claimEmailCodeAsk(ip))) return { ip, refusal: 'too_many_codes' }
     return { ip, refusal: null }
 }

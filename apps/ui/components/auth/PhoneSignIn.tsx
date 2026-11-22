@@ -22,16 +22,18 @@ export function PhoneSignIn({
     beforePhone,
     afterPhone,
     phoneLastUsed,
+    skipCaptcha = false,
 }: {
     onSignedIn: (created: boolean) => void | Promise<void>
     onStepChange?: (step: PhoneCodeStep) => void
     beforePhone?: ReactNode
     afterPhone?: ReactNode
     phoneLastUsed?: boolean
+    skipCaptcha?: boolean
 }) {
     const t = useTranslations('auth.phone')
     const errorText = useErrorText()
-    const { containerRef, challenging, getToken } = useCaptcha()
+    const { containerRef, challenging, getToken } = useCaptcha({ skipped: skipCaptcha })
 
     const sendCode = async (request: PhoneCodeRequest) => {
         track('signup_method_selected', { method: 'phone', in_app_browser: detectInAppBrowser(navigator.userAgent) ?? undefined })

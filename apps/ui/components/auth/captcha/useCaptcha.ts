@@ -28,8 +28,9 @@ function appendSlot(container: HTMLElement): HTMLDivElement {
 // it fails or stays silent, the visitor is handed an hCaptcha puzzle instead of an error, and keeps
 // it for the next sends of this form, since Cloudflare would most likely turn them away again.
 // The puzzle's script is only fetched for those visitors. Without any site key, as on a local
-// stack, there is no check at all.
-export function useCaptcha() {
+// stack, there is no check at all. `skipped` comes from the page, which read in the request a
+// header this JavaScript never sees (Tella Auto Capture, which cannot solve a captcha).
+export function useCaptcha({ skipped = false }: { skipped?: boolean } = {}) {
     const containerRef = useRef<HTMLDivElement>(null)
     const turnstile = useRef<{ widget: CaptchaWidget; slot: HTMLDivElement } | null>(null)
     const puzzle = useRef<{ widget: CaptchaWidget; slot: HTMLDivElement } | null>(null)
@@ -41,7 +42,7 @@ export function useCaptcha() {
 
     useEffect(() => {
         const container = containerRef.current
-        if (!container) return
+        if (!container || skipped) return
         if (TURNSTILE_SITE_KEY) {
             const slot = appendSlot(container)
             turnstile.current = { slot, widget: mountTurnstile(slot, TURNSTILE_SITE_KEY, setTurnstileInteractive, TURNSTILE_SILENT_TIMEOUT_MS) }
@@ -54,7 +55,7 @@ export function useCaptcha() {
             puzzle.current?.slot.remove()
             puzzle.current = null
         }
-    }, [])
+    }, [skipped])
 
     const solvePuzzle = useCallback(async (): Promise<string> => {
         const container = containerRef.current
@@ -81,7 +82,7 @@ export function useCaptcha() {
     }, [resolvedTheme])
 
     const getToken = useCallback<GetCaptchaToken>(async () => {
-        if (!TURNSTILE_SITE_KEY && !HCAPTCHA_SITE_KEY) return undefined
+        if (skipped || (!TURNSTILE_SITE_KEY && !HCAPTCHA_SITE_KEY)) return undefined
         if (TURNSTILE_SITE_KEY && !turnstileFailed.current) {
             try {
                 if (!turnstile.current) throw new CaptchaError('turnstile', 'captcha_failed', 'unmounted')
@@ -98,7 +99,7 @@ export function useCaptcha() {
             }
         }
         return { provider: 'hcaptcha', token: await solvePuzzle() }
-    }, [solvePuzzle])
+    }, [skipped, solvePuzzle])
 
     return { containerRef, challenging: turnstileInteractive || puzzleShown, getToken }
 }

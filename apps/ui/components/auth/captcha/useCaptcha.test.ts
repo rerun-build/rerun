@@ -80,10 +80,10 @@ afterEach(async () => {
     vi.useRealTimers()
 })
 
-async function mount() {
+async function mount(options?: { skipped?: boolean }) {
     const { useCaptcha } = await import('./useCaptcha')
     function Form() {
-        const { containerRef, challenging, getToken } = useCaptcha()
+        const { containerRef, challenging, getToken } = useCaptcha(options)
         captcha = { getToken, challenging }
         return createElement('div', { ref: containerRef })
     }
@@ -97,6 +97,17 @@ async function settle() {
 }
 
 describe('useCaptcha', () => {
+    it('loads no check and hands over no token when the page skipped the captcha', async () => {
+        await mount({ skipped: true })
+
+        await expect(captcha.getToken()).resolves.toBeUndefined()
+        await settle()
+        expect(document.head.appendChild).not.toHaveBeenCalled()
+        expect(turnstile.render).not.toHaveBeenCalled()
+        expect(hcaptcha.render).not.toHaveBeenCalled()
+        expect(captcha.challenging).toBe(false)
+    })
+
     it('hands over the token of the invisible check when Cloudflare vouches for the visitor', async () => {
         await mount()
         const token = captcha.getToken()

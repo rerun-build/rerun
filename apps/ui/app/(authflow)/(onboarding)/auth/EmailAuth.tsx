@@ -17,11 +17,21 @@ import type { ReactNode } from 'react'
 // then Supabase mails the code. The intent cookie is only set when the server did open it: an
 // existing account signing in on a new browser soon after its signup would otherwise be counted
 // twice. A code mailed again keeps the cookie the first one set.
-export default function EmailAuth({ beforeEmail, onStepChange, onSignedIn }: { beforeEmail?: ReactNode; onStepChange: (step: EmailCodeStep) => void; onSignedIn: () => void }) {
+export default function EmailAuth({
+    beforeEmail,
+    onStepChange,
+    onSignedIn,
+    skipCaptcha = false,
+}: {
+    beforeEmail?: ReactNode
+    onStepChange: (step: EmailCodeStep) => void
+    onSignedIn: () => void
+    skipCaptcha?: boolean
+}) {
     const searchParams = useSearchParams()
     const errorText = useErrorText()
     const supabase = createClient()
-    const { containerRef, challenging, getToken } = useCaptcha()
+    const { containerRef, challenging, getToken } = useCaptcha({ skipped: skipCaptcha })
 
     const sendCode = (email: string) =>
         trackEmailSend(async () => {

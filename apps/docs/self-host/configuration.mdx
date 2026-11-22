@@ -116,6 +116,7 @@ Sign-in codes go out through Supabase unless you set up that hook. See [Set up S
 | `TURNSTILE_SECRET_KEY` | Optional | empty | Its secret key. Set both or neither: a secret without the site key refuses every sign-up. |
 | `NEXT_PUBLIC_HCAPTCHA_SITE_KEY` | Optional | empty | The site key of an hCaptcha puzzle, shown to a visitor Turnstile could not vouch for, or to every visitor when Turnstile is not set. Baked in by the build. |
 | `HCAPTCHA_SECRET_KEY` | Optional | empty | Its secret key. Set both or neither. Without any captcha secret, no captcha. |
+| `TELLA_AUTO_CAPTURE_SECRET` | Optional | empty | The "Capture identification" value of a Tella workspace. A request carrying it in the `x-tella-auto-capture` header signs in without the captcha. Empty: no exception. |
 | `STAGING_PASSWORD` | Optional | empty | Puts every page behind a browser password prompt (HTTP Basic Auth, any user name). `/api/*` stays open, so engines and webhooks keep working. |
 
 ## Optional services

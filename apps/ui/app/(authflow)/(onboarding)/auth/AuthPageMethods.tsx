@@ -24,7 +24,7 @@ import { useDesktopSignInWaiting } from '@/components/desktop-shell/desktop-sign
 
 const PATH_BASE = 'http://next.invalid'
 
-export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlone: boolean; showGoogle: boolean }) {
+export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha }: { phoneLeadsAlone: boolean; showGoogle: boolean; skipCaptcha: boolean }) {
     const searchParams = useSearchParams()
     const tRetry = useTranslations('auth.oauthRetry')
     // A Google or Apple sign-in that failed upstream comes back to `/`, which sends it here with the
@@ -85,8 +85,8 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
                         </>
                     )
                 }
-                phone={PHONE_ENABLED ? surroundings => <PhoneSignIn onSignedIn={enter} onStepChange={step => funnel.setStep(signupStep('phone', step === 'code'))} {...surroundings} /> : undefined}
-                email={beforeEmail => <EmailAuth beforeEmail={beforeEmail} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} onSignedIn={enter} />}
+                phone={PHONE_ENABLED ? surroundings => <PhoneSignIn onSignedIn={enter} onStepChange={step => funnel.setStep(signupStep('phone', step === 'code'))} skipCaptcha={skipCaptcha} {...surroundings} /> : undefined}
+                email={beforeEmail => <EmailAuth beforeEmail={beforeEmail} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} onSignedIn={enter} skipCaptcha={skipCaptcha} />}
             />
             <DesktopServerLink />
         </>

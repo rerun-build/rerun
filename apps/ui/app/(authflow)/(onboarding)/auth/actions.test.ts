@@ -25,7 +25,7 @@ describe('prepareEmailSignIn', () => {
     it('opens the account of a normalized address, for the caller behind the edge', async () => {
         expect(await prepareEmailSignIn({ email: '  Ada@Example.com ', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: true, created: true })
 
-        expect(mocks.verifyCaptcha).toHaveBeenCalledWith({ provider: 'turnstile', token: 'token' }, '203.0.113.7')
+        expect(mocks.verifyCaptcha).toHaveBeenCalledWith({ provider: 'turnstile', token: 'token' }, expect.any(Headers))
         expect(mocks.ensureEmailAccount).toHaveBeenCalledWith('ada@example.com', '203.0.113.7')
     })
 
