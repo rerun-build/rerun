@@ -103,7 +103,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'create_agent',
         description:
-            'Create a coworker. `soul` is its system prompt in markdown — who it is, what it owns, how it works — and it is the single most important field, so write it properly rather than leaving it empty. Model, tool families and self-improvement flags can be set here, in one call: a coworker created with defaults may rewrite its own prompt and install its own tools, so pass selfImprovement explicitly when that is not what you want. The coworker is placed on the account board and is immediately visible in the app.',
+            'Create a coworker. `soul` is its system prompt in markdown — who it is, what it owns, how it works — and it is the single most important field, so write it properly rather than leaving it empty. Its model can be set here, in the same call. Leave `tools` and `selfImprovement` out: a new coworker gets every capability, including improving its own prompt and installing its own tools, and that is what the user expects. Pass them only to switch off what the user explicitly asked to switch off, and then switch it off there rather than forbidding it in the soul. The coworker is placed on the account board and is immediately visible in the app.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -114,10 +114,14 @@ const AGENT_TOOL_DEFS = [
                 connectors: { type: 'array', items: { type: 'string' }, description: 'Optional catalog slugs to declare on the coworker (see attach_connector). The response gives each one its real status.' },
                 ...MODEL_PIN_PROPERTIES,
                 verbosity: { type: 'string', description: 'How long its answers to the user are: minimal | concise | normal | detailed. Defaults to normal, the model native behaviour. It shapes the prose only, never how much work the coworker does.' },
-                tools: { type: 'object', description: 'Capability families, all on by default, e.g. {"shell": false, "browser": false}.', additionalProperties: { type: 'boolean' } },
+                tools: {
+                    type: 'object',
+                    description: 'Capability families, all on by default. Leave it out unless the user explicitly asks to switch a family off, even when the coworker seems not to need one: the user said "no browser", pass {"browser": false}.',
+                    additionalProperties: { type: 'boolean' },
+                },
                 selfImprovement: {
                     type: 'object',
-                    description: 'Defaults to everything on. {"allowSoulEdit": false, "allowToolInstall": false} pins the coworker to the prompt and tools you gave it.',
+                    description: 'All on by default: the coworker improves its own prompt and installs the tools its work needs. Leave it out unless the user explicitly asks to switch allowSoulEdit or allowToolInstall off.',
                     additionalProperties: { type: 'boolean' },
                 },
                 setup: SETUP_PROPERTY,
@@ -128,7 +132,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'update_agent',
         description:
-            'Update a coworker. Every field is optional and only what you pass is changed. Use `soul` to rewrite its prompt, `tools` to toggle capability families (e.g. {"browser": false}). To change what it runs on, read list_ai_connections first and pass `connectionId` with `model`; the response then carries `runsOn`, the connection and model it really resolves to, which is what to report. Renaming moves the handle too: it is re-derived from the new `name`, and every @oldhandle written into the other coworkers (souls, skills, scheduled tasks, memories) is rewritten to the new one. Pass `handle` only to set a call key that differs from the name. Pass `spaceId` to move the coworker to another Box.',
+            'Update a coworker. Every field is optional and only what you pass is changed. Use `soul` to rewrite its prompt. Never change `tools` or `selfImprovement` unless the user explicitly asked for that change. To change what it runs on, read list_ai_connections first and pass `connectionId` with `model`; the response then carries `runsOn`, the connection and model it really resolves to, which is what to report. Renaming moves the handle too: it is re-derived from the new `name`, and every @oldhandle written into the other coworkers (souls, skills, scheduled tasks, memories) is rewritten to the new one. Pass `handle` only to set a call key that differs from the name. Pass `spaceId` to move the coworker to another Box.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -144,8 +148,16 @@ const AGENT_TOOL_DEFS = [
                 soul: { type: 'string', description: 'Full replacement of the system prompt, in markdown.' },
                 ...MODEL_PIN_PROPERTIES,
                 verbosity: { type: 'string', description: 'How long its answers to the user are: minimal | concise | normal | detailed. Defaults to normal, the model native behaviour. It shapes the prose only, never how much work the coworker does.' },
-                tools: { type: 'object', description: 'Capability families to toggle, e.g. {"shell": false, "browser": true}.', additionalProperties: { type: 'boolean' } },
-                selfImprovement: { type: 'object', description: 'e.g. {"allowSoulEdit": false}.', additionalProperties: { type: 'boolean' } },
+                tools: {
+                    type: 'object',
+                    description: 'Capability families to switch, only when the user explicitly asks: the user said "give it the browser back", pass {"browser": true}; "take its shell away", {"shell": false}.',
+                    additionalProperties: { type: 'boolean' },
+                },
+                selfImprovement: {
+                    type: 'object',
+                    description: 'Only when the user explicitly asks to switch allowSoulEdit or allowToolInstall.',
+                    additionalProperties: { type: 'boolean' },
+                },
                 setup: SETUP_PROPERTY,
                 look: {
                     type: ['object', 'null'],

@@ -134,20 +134,20 @@ Creates a coworker and places it on the board. It is visible in the app immediat
 </ParamField>
 
 <ParamField body="tools" type="object">
-  Capability families, all on by default, for example `{"shell": false, "browser": false}`. See [Configure a coworker](/agents/configure) for the list.
+  Capability families, all on by default. Leave it out unless the user explicitly asks to switch a family off, even when the coworker seems not to need one: they said "no browser", pass `{"browser": false}`. See [Configure a coworker](/agents/configure) for the list.
 </ParamField>
 
 <ParamField body="selfImprovement" type="object">
-  Defaults to everything on. `{"allowSoulEdit": false, "allowToolInstall": false}` pins the coworker to the prompt and the tools you gave it.
+  All on by default: the coworker improves its own prompt and installs the tools its work needs. Leave it out unless the user explicitly asks to switch `allowSoulEdit` or `allowToolInstall` off. See [Self-improvement](/agents/configure#self-improvement).
 </ParamField>
 
 <ParamField body="setup" type="object">
   The guided setup this coworker runs on the account of whoever installs it from a template. `required` is a boolean and is mandatory inside the object. `prompt` is required when `required` is `true`, and is addressed to the coworker, not to the user.
 </ParamField>
 
-<Warning>
-  A coworker created with defaults may rewrite its own prompt and install its own tools. Pass `selfImprovement` explicitly when that is not what you want.
-</Warning>
+<Note>
+  A coworker created without `tools` and `selfImprovement` gets every capability, which is what a user expects. Switch one off only when the user asked for it, in `tools` or `selfImprovement` rather than with a rule in the soul: a coworker missing its shell or its browser cannot do part of its work, and does not say why.
+</Note>
 
 ```json Response
 {
@@ -206,9 +206,11 @@ Updates a coworker. Every field is optional and only what you pass changes.
 </ParamField>
 
 <ParamField body="tools" type="object">
-  Capability families to toggle, for example `{"shell": false, "browser": true}`.
+  Capability families to switch, only when the user explicitly asks: they said "take its shell away", pass `{"shell": false}`.
 </ParamField>
-<ParamField body="selfImprovement" type="object" />
+<ParamField body="selfImprovement" type="object">
+  Only when the user explicitly asks to switch `allowSoulEdit` or `allowToolInstall`.
+</ParamField>
 <ParamField body="setup" type="object" />
 
 <ParamField body="look" type="object | null">

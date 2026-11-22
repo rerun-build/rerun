@@ -52,6 +52,30 @@ describe('account tool defs', () => {
         expect(missing).toEqual([])
     })
 
+    // Models copy what these descriptions suggest: an example of a switched-off family, or a
+    // warning that the defaults are risky, became coworkers created without their shell, browser
+    // or self-improvement while the user had asked for none of it (RER-253).
+    describe.each(['create_agent', 'update_agent'])('%s capabilities', name => {
+        const tool = ACCOUNT_TOOL_DEFS.find(candidate => candidate.name === name) as {
+            description: string
+            inputSchema: { properties: Record<string, { description?: string }> }
+        }
+        const texts = [tool.description, tool.inputSchema.properties.tools.description ?? '', tool.inputSchema.properties.selfImprovement.description ?? '']
+
+        it('switches a capability off only when the user explicitly asks', () => {
+            expect(tool.inputSchema.properties.tools.description).toMatch(/explicitly asks/)
+            expect(tool.inputSchema.properties.selfImprovement.description).toMatch(/explicitly asks/)
+        })
+
+        it('never recommends switching one off', () => {
+            expect(texts.filter(text => /pass selfImprovement explicitly|pins the coworker/i.test(text))).toEqual([])
+        })
+
+        it('ties every switched-off example to a request of the user', () => {
+            expect(texts.filter(text => /": false/.test(text) && !/the user (said|asked)/i.test(text))).toEqual([])
+        })
+    })
+
     it('advertises paginated skill reference reads', () => {
         const read = ACCOUNT_TOOL_DEFS.find(tool => tool.name === 'read_skill_file') as {
             description: string
