@@ -97,6 +97,15 @@
         "newCoworker": "Yeni coworker",
         "move": "Taşı",
         "show": "Coworker'ları göster",
-        "resize": "Yeniden boyutlandır"
+        "resize": "Yeniden boyutlandır",
+        "allNotifications": "Tüm bildirimler",
+        "allCoworkers": "Tüm coworker'lar",
+        "nothingWaiting": "Sizi bekleyen bir şey yok.",
+        "openInRerun": "Rerun'da aç",
+        "replyTo": "{name} adlı coworker'a yanıt verin",
+        "send": "Gönder",
+        "markRead": "Okundu olarak işaretle",
+        "dismiss": "Kapat",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {soru soruyor} awaiting_approval {onayınızı bekliyor} done {bitirdi} error {takıldı} other {size ihtiyaç duyuyor}}</verb>"
     }
 }

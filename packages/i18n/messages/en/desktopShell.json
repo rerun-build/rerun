@@ -130,6 +130,15 @@
         "newCoworker": "New coworker",
         "move": "Move",
         "show": "Show coworkers",
-        "resize": "Resize"
+        "resize": "Resize",
+        "allNotifications": "All notifications",
+        "allCoworkers": "All coworkers",
+        "nothingWaiting": "Nothing waiting for you.",
+        "openInRerun": "Open in Rerun",
+        "replyTo": "Reply to {name}",
+        "send": "Send",
+        "markRead": "Mark as read",
+        "dismiss": "Dismiss",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {asks} awaiting_approval {needs your go} done {finished} error {is stuck} other {needs you}}</verb>"
     }
 }

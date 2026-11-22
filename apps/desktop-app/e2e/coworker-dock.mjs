@@ -104,32 +104,38 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     check((await page.evaluate(() => window.rerunShell.capabilities)).includes('coworkerDockArrange'), 'and that it keeps the order and the hidden coworkers')
 
     const dock = await waitUntil(() => app.windows().find((candidate) => isDock(candidate.url())), Boolean, 'the dock window opens', 60_000)
-    await dock.getByRole('button', { name: LEAD_SCOUT.name }).waitFor({ timeout: 30_000 })
+    await dock.getByRole('button', { name: LEAD_SCOUT.name, exact: true }).waitFor({ timeout: 30_000 })
     const box = await waitUntil(() => dockWindow(app), (value) => value?.visible, 'the dock window shows')
     check(box.onTop && box.allWorkspaces && !box.focusable, `it floats on top, on every desktop, without taking the focus (${JSON.stringify(box)})`)
     check(box.bounds.x + box.bounds.width === box.workArea.x + box.workArea.width && box.bounds.height === box.workArea.height, 'it is glued to the right edge, as tall as the screen')
     const strip = await dock.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--shell-titlebar-h').trim())
     check(strip === '0px', 'the dock has no title strip')
-    for (const coworker of Object.values(COWORKERS)) await dock.getByRole('button', { name: coworker.name }).waitFor()
+    for (const coworker of Object.values(COWORKERS)) await dock.getByRole('button', { name: coworker.name, exact: true }).waitFor()
     check(true, 'one buddy per coworker')
     await step('dock', { target: dock })
 
     // A coworker starts working: its buddy moves.
     await admin.from('sessions').update({ status: 'working' }).eq('agent_id', LEAD_SCOUT.id).eq('engine_session_id', LEAD_SCOUT_SESSION)
-    const leadScoutBuddy = dock.getByRole('button', { name: LEAD_SCOUT.name }).locator('[data-buddy-motion]')
+    const leadScoutBuddy = dock.getByRole('button', { name: LEAD_SCOUT.name, exact: true }).locator('[data-buddy-motion]')
     await waitUntil(() => leadScoutBuddy.getAttribute('data-buddy-motion').catch(() => null), (motion) => motion === 'bob', 'the buddy of a working coworker moves')
     await step('a coworker at work', { target: dock })
 
     // It finishes: a pip counts the run waiting for the person.
     await admin.from('sessions').update({ status: 'idle' }).eq('agent_id', LEAD_SCOUT.id).eq('engine_session_id', LEAD_SCOUT_SESSION)
     await admin.from('notifications').insert({ workspace_id: workspaceId, agent_id: LEAD_SCOUT.id, engine_session_id: LEAD_SCOUT_SESSION, kind: 'done', message: 'Found 14 new agencies', recipients: [account.userId] })
-    const leadScoutButton = dock.getByRole('button', { name: LEAD_SCOUT.name })
+    const leadScoutButton = dock.getByRole('button', { name: LEAD_SCOUT.name, exact: true })
     await waitUntil(() => leadScoutButton.innerText(), (text) => text.trim() === '1', 'a pip appears on the coworker that finished')
     await step('a run waits', { target: dock })
 
-    // A click on it brings the main window up on its conversation, and the pip goes.
+    // A click on it opens its notes on the dock; "Open in Rerun" brings the main window up on its
+    // conversation, and the pip goes.
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].hide())
     await leadScoutButton.click()
+    const openInRerun = dock.getByRole('button', { name: 'Open in Rerun' })
+    await openInRerun.waitFor()
+    check(!(await mainVisible(app)), 'the main window stays away while the notes show on the dock')
+    await step('notes of a coworker on the dock', { target: dock })
+    await openInRerun.click()
     await waitUntil(() => mainVisible(app), Boolean, 'the main window comes back')
     await page.getByText(LEAD_SCOUT.name).first().waitFor()
     await waitUntil(() => leadScoutButton.innerText(), (text) => text.trim() === '', 'opening the conversation clears the pip')
@@ -268,7 +274,7 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     await dock.getByRole('button', { name: 'Show coworkers' }).waitFor()
     await step('dock collapsed', { target: dock })
     await dock.getByRole('button', { name: 'Show coworkers' }).click()
-    await dock.getByRole('button', { name: LEAD_SCOUT.name }).waitFor()
+    await dock.getByRole('button', { name: LEAD_SCOUT.name, exact: true }).waitFor()
 
     // Off in the settings, the window goes; on again, it comes back where it was.
     const off = await page.evaluate(() => window.rerunShell.settings.set({ coworkerDock: false }))

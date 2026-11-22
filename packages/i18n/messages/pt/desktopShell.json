@@ -97,6 +97,15 @@
         "newCoworker": "Novo coworker",
         "move": "Mover",
         "show": "Mostrar coworkers",
-        "resize": "Redimensionar"
+        "resize": "Redimensionar",
+        "allNotifications": "Todas as notificações",
+        "allCoworkers": "Todos os coworkers",
+        "nothingWaiting": "Nada esperando por você.",
+        "openInRerun": "Abrir no Rerun",
+        "replyTo": "Responder a {name}",
+        "send": "Enviar",
+        "markRead": "Marcar como lido",
+        "dismiss": "Dispensar",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {pergunta} awaiting_approval {precisa do seu ok} done {terminou} error {está travado} other {precisa de você}}</verb>"
     }
 }

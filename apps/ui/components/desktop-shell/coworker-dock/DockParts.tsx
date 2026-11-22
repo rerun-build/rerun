@@ -8,7 +8,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Orb } from '@/components/foreman/Orb'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { foremanDockOrbState, isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
-import { GripVerticalIcon, PlusIcon } from '@/lib/icons'
+import { GripVerticalIcon, InboxIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
 export type DockProps = {
@@ -26,6 +26,8 @@ export type DockProps = {
     onCreate: () => void
     onToggleCollapsed: () => void
     onGrab: (event: ReactPointerEvent) => void
+    // The shells that show the notes on the dock: the button that lists everyone's, and whose card is open.
+    inbox?: { active: string | 'all' | null; onOpen: () => void }
 }
 
 // The side a tooltip opens to: towards the middle of the screen, away from the edge.
@@ -57,9 +59,10 @@ function ForemanBuddy({ coworker, edge }: { coworker: CoworkerDockCoworker; edge
     )
 }
 
-type DockBuddyProps = { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge; onOpen: (coworker: CoworkerDockCoworker) => void; onMenu: (coworker: CoworkerDockCoworker) => void }
+// `active`: its card is open on the dock. `data-coworker` is where a bubble or the card points.
+type DockBuddyProps = { coworker: CoworkerDockCoworker; edge: CoworkerDockEdge; active?: boolean; onOpen: (coworker: CoworkerDockCoworker) => void; onMenu: (coworker: CoworkerDockCoworker) => void }
 
-export function DockBuddy({ coworker, edge, onOpen, onMenu }: DockBuddyProps) {
+export function DockBuddy({ coworker, edge, active = false, onOpen, onMenu }: DockBuddyProps) {
     return (
         <TooltipLabeled side={inward(edge)} label={coworker.name}>
             <button
@@ -71,7 +74,8 @@ export function DockBuddy({ coworker, edge, onOpen, onMenu }: DockBuddyProps) {
                     onMenu(coworker)
                 }}
                 aria-label={coworker.name}
-                className="flex shrink-0 items-center justify-center rounded-xl p-1 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                data-coworker={coworker.id}
+                className={cn('flex shrink-0 items-center justify-center rounded-xl p-1 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none', active && 'bg-accent')}
             >
                 {isForemanDockEntry(coworker) ? (
                     <ForemanBuddy coworker={coworker} edge={edge} />
@@ -99,6 +103,27 @@ export function DockAdd({ edge, blockedReason, onCreate }: { edge: CoworkerDockE
                 </button>
             </TooltipLabeled>
         </TooltipDisabledReason>
+    )
+}
+
+export function DockInbox({ edge, total, active, onOpen }: { edge: CoworkerDockEdge; total: number; active: boolean; onOpen: () => void }) {
+    const t = useTranslations('desktopShell.coworkerDock')
+    return (
+        <TooltipLabeled side={inward(edge)} label={t('allNotifications')}>
+            <button
+                type="button"
+                data-dock-inbox
+                onClick={onOpen}
+                aria-label={t('allNotifications')}
+                className={cn(
+                    'relative flex size-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    active && 'bg-accent text-foreground'
+                )}
+            >
+                <InboxIcon className="size-4" />
+                <CountPip count={total} className="absolute -top-0.5 -right-0.5 h-3.5 min-w-3.5 text-[9px]" />
+            </button>
+        </TooltipLabeled>
     )
 }
 
