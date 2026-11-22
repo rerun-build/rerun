@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer', 'coworkerDock', 'coworkerDockArrange'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer', 'coworkerDock', 'coworkerDockArrange', 'coworkerDockNotes'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -143,11 +143,32 @@ export type CoworkerDockCoworker = { id: string; name: string; mood: CoworkerDoc
 // `coworkerDockArrange` shows it like any other, and its click comes back through `onOpen`.
 export const COWORKER_DOCK_FOREMAN_ID = 'chief-of-staff'
 
+// One line of the inbox of the app, shown on the dock (`coworkerDockNotes` capability). `status` is a
+// session status or `done`, a run the person has not seen. `text`: what the coworker said or asks.
+// `sessionId`: the conversation the dock reads and answers; null when only the engine's id is known.
+// `count`: the runs of one scheduled task folded into a `done` note.
+export type CoworkerDockNote = {
+    id: string
+    agentId: string
+    status: string
+    title: string
+    text: string | null
+    updatedAt: string | null
+    sessionId: string | null
+    engineSessionId: string | null
+    count?: number
+}
+
+export const COWORKER_DOCK_MAX_NOTES = 50
+
 // Published by the main window; null once it shows no workspace (signed out, another page) or a
 // workspace without coworkers. `createBlockedReason`: why "+" is disabled (a paused workspace), as
 // the main window says it. `workspaceKey`: the workspace shown, under which the shell keeps the order
-// and the hidden coworkers the person chose (`coworkerDockArrange` capability).
-export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlockedReason?: string | null; workspaceKey?: string } | null
+// and the hidden coworkers the person chose (`coworkerDockArrange` capability), and which the dock's
+// own requests name. `notes`: kept by the shells with `coworkerDockNotes` only.
+export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlockedReason?: string | null; workspaceKey?: string; notes?: CoworkerDockNote[] } | null
+
+export type CoworkerDockRect = { x: number; y: number; width: number; height: number }
 
 export type CoworkerDockEdge = 'left' | 'right'
 
@@ -306,7 +327,19 @@ export type DesktopShellApi = {
         reorder?(agentIds: string[]): void
         // The window lets clicks through to the apps under it, except over the rail. `rect` is the
         // rail, in the window's coordinates.
-        setInteractive(interactive: boolean, rect?: { x: number; y: number; width: number; height: number }): void
+        setInteractive(interactive: boolean, rect?: CoworkerDockRect): void
+        // `coworkerDockNotes` capability, from here to the end.
+        // Main window: "Open in Rerun" on a note of the dock, the shell already brought the window up.
+        onOpenNote?(callback: (noteId: string) => void): Unsubscribe
+        // Main window: a note was marked as read, or answered, from the dock.
+        onMarkRead?(callback: (noteId: string) => void): Unsubscribe
+        // Dock window.
+        openNote?(noteId: string): void
+        markRead?(noteId: string): void
+        // As `setInteractive`, over several places at once: the rail, the bubbles, the card.
+        setInteractiveRegions?(interactive: boolean, rects: CoworkerDockRect[]): void
+        // While the card is open the window takes the keys, for its fields, without bringing the app forward.
+        setFocusable?(focusable: boolean): void
     }
     // Only with the `remoteComputer` capability.
     remoteComputer?: {
