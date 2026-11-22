@@ -2,9 +2,9 @@ import { COWORKER_DOCK_MIN_HEIGHT, type CoworkerDockEdge } from '@rerun/contract
 import type { StoredCoworkerDock } from './settings'
 
 // Where the coworker dock stands, without Electron: the window is a strip as tall as the display's
-// work area, glued to one edge, wide enough for the rail and the name that shows on hover.
+// work area, glued to one edge, wide enough for the rail and the card that opens beside it.
 
-export const DOCK_WINDOW_WIDTH = 260
+export const DOCK_WINDOW_WIDTH = 440
 
 // The rail never sits flush against the top or the bottom of the screen: the same margin the page
 // keeps when it follows the pointer.

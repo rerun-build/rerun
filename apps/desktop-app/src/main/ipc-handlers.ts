@@ -77,6 +77,10 @@ export function registerIpcHandlers(): void {
     handle(IPC.coworkerDockShowMenu, ['app'], coworkerDockHandlers.showMenu)
     handle(IPC.coworkerDockReorder, ['app'], coworkerDockHandlers.reorder)
     handle(IPC.coworkerDockSetInteractive, ['app'], coworkerDockHandlers.setInteractive)
+    handle(IPC.coworkerDockOpenNote, ['app'], coworkerDockHandlers.openNote)
+    handle(IPC.coworkerDockMarkRead, ['app'], coworkerDockHandlers.markRead)
+    handle(IPC.coworkerDockSetRegions, ['app'], coworkerDockHandlers.setRegions)
+    handle(IPC.coworkerDockSetFocusable, ['app'], coworkerDockHandlers.setFocusable)
     handle(IPC.localeSet, ['app'], (_event, locale: string) => setShellLocale(String(locale).slice(0, 16)))
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))

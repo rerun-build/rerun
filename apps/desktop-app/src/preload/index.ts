@@ -96,6 +96,7 @@ if (bootstrap?.audience === 'app') {
                               coworkers: state.coworkers.map((coworker) => ({ id: String(coworker.id), name: String(coworker.name), mood: String(coworker.mood), pending: Number(coworker.pending) || 0 })),
                               createBlockedReason: typeof state.createBlockedReason === 'string' ? state.createBlockedReason : null,
                               workspaceKey: typeof state.workspaceKey === 'string' ? state.workspaceKey : undefined,
+                              notes: Array.isArray(state.notes) ? state.notes.map((note) => ({ ...note })) : undefined,
                           }
                         : null,
                 ),
@@ -112,6 +113,17 @@ if (bootstrap?.audience === 'app') {
             reorder: (agentIds) => void ipcRenderer.invoke(IPC.coworkerDockReorder, Array.isArray(agentIds) ? agentIds.map(String) : []),
             setInteractive: (interactive, rect) =>
                 void ipcRenderer.invoke(IPC.coworkerDockSetInteractive, interactive === true, rect ? { x: Number(rect.x), y: Number(rect.y), width: Number(rect.width), height: Number(rect.height) } : undefined),
+            onOpenNote: (callback) => subscribe<string>(IPC_EVENTS.coworkerDockOpenNote, callback),
+            onMarkRead: (callback) => subscribe<string>(IPC_EVENTS.coworkerDockMarkRead, callback),
+            openNote: (noteId) => void ipcRenderer.invoke(IPC.coworkerDockOpenNote, String(noteId)),
+            markRead: (noteId) => void ipcRenderer.invoke(IPC.coworkerDockMarkRead, String(noteId)),
+            setInteractiveRegions: (interactive, rects) =>
+                void ipcRenderer.invoke(
+                    IPC.coworkerDockSetRegions,
+                    interactive === true,
+                    Array.isArray(rects) ? rects.map((rect) => ({ x: Number(rect.x), y: Number(rect.y), width: Number(rect.width), height: Number(rect.height) })) : [],
+                ),
+            setFocusable: (focusable) => void ipcRenderer.invoke(IPC.coworkerDockSetFocusable, focusable === true),
         },
         remoteComputer: {
             getState: () => ipcRenderer.invoke(IPC.remoteComputerGetState) as Promise<DesktopRemoteComputerState>,

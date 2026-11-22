@@ -48,6 +48,10 @@ export const IPC = {
     coworkerDockShowMenu: 'rerun-shell:coworker-dock:show-menu',
     coworkerDockReorder: 'rerun-shell:coworker-dock:reorder',
     coworkerDockSetInteractive: 'rerun-shell:coworker-dock:set-interactive',
+    coworkerDockOpenNote: 'rerun-shell:coworker-dock:open-note',
+    coworkerDockMarkRead: 'rerun-shell:coworker-dock:mark-read',
+    coworkerDockSetRegions: 'rerun-shell:coworker-dock:set-regions',
+    coworkerDockSetFocusable: 'rerun-shell:coworker-dock:set-focusable',
 } as const
 
 export const IPC_EVENTS = {
@@ -65,6 +69,8 @@ export const IPC_EVENTS = {
     coworkerDockView: 'rerun-shell:event:coworker-dock-view',
     coworkerDockOpen: 'rerun-shell:event:coworker-dock-open',
     coworkerDockCreate: 'rerun-shell:event:coworker-dock-create',
+    coworkerDockOpenNote: 'rerun-shell:event:coworker-dock-open-note',
+    coworkerDockMarkRead: 'rerun-shell:event:coworker-dock-mark-read',
 } as const
 
 export type AppBootstrap = {

@@ -1,8 +1,9 @@
 import { BrowserWindow, Menu, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions, type WebContents } from 'electron'
-import { COWORKER_DOCK_MOODS, COWORKER_DOCK_PATH, type CoworkerDockCoworker, type CoworkerDockMood, type CoworkerDockState, type CoworkerDockView } from '@rerun/contracts'
+import { COWORKER_DOCK_PATH, type CoworkerDockRect, type CoworkerDockState, type CoworkerDockView } from '@rerun/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { arrangeDock, arrangementKey, cleanArrangements, EMPTY_ARRANGEMENT, reorderArrangement, setHidden, withArrangement, type DockArrangement } from './coworker-dock-arrangement'
 import { clamp01, dockBounds, dockDisplay, dockMaxHeight, dropPlacement, pointInRect, storedDockPlacement, type DockPlacement } from './coworker-dock-placement'
+import { cleanDockState, cleanRect, cleanRects } from './coworker-dock-state'
 import { currentServer, getMainWindow, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { t } from './messages'
 import { partitionFor } from './server'
@@ -10,17 +11,15 @@ import { readSettings, updateSettings, type StoredCoworkerDock } from './setting
 import { decideNavigation } from './url-policy'
 
 // The coworkers on the edge of the screen, above every app: a transparent strip as tall as the
-// display, glued to an edge. The page draws the rail; outside it, clicks go through to the apps under.
-// The main window tells what to show (`publish`), so the dock follows its workspace and its badge.
+// display, glued to an edge. The page draws the rail, the bubbles and the card; outside them, clicks
+// go through to the apps under. The main window tells what to show (`publish`), so the dock follows
+// its workspace and its badge.
 
-const MAX_COWORKERS = 100
 // The main window left its workspace (a page reloading, the offline page, sign-in): the dock waits
 // for it to publish again before it goes, so a reload does not make it blink.
 const HIDE_DELAY_MS = 10_000
 // Linux has no forwarded mouse moves on a window that lets clicks through: the pointer is polled.
 const LINUX_POLL_MS = 100
-
-type Rect = { x: number; y: number; width: number; height: number }
 
 let dockWindow: BrowserWindow | null = null
 let state: CoworkerDockState = null
@@ -28,7 +27,7 @@ let publisher: WebContents | null = null
 let hideTimer: ReturnType<typeof setTimeout> | null = null
 let interactive = false
 let pageWantsInput = false
-let railRect: Rect | null = null
+let regions: CoworkerDockRect[] = []
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let watchingDisplays = false
 
@@ -92,8 +91,8 @@ function pollPointer(): void {
     if (!window || !window.isVisible()) return
     const bounds = window.getBounds()
     const pointer = screen.getCursorScreenPoint()
-    const overRail = railRect !== null && pointInRect({ x: pointer.x - bounds.x, y: pointer.y - bounds.y }, railRect)
-    setInteractiveNow(pageWantsInput || overRail)
+    const point = { x: pointer.x - bounds.x, y: pointer.y - bounds.y }
+    setInteractiveNow(pageWantsInput || regions.some((region) => pointInRect(point, region)))
 }
 
 function watchDisplays(): void {
@@ -117,7 +116,10 @@ function createDockWindow(origin: string): BrowserWindow {
         minimizable: false,
         maximizable: false,
         fullscreenable: false,
+        // Focusable only while its card is open (`setFocusable`). On macOS a panel takes the keys
+        // without bringing the app forward: the app the person works in stays where it is.
         focusable: false,
+        ...(process.platform === 'darwin' ? { type: 'panel' } : {}),
         skipTaskbar: true,
         alwaysOnTop: true,
         transparent: true,
@@ -187,7 +189,7 @@ export function resetCoworkerDock(): void {
     dockWindow = null
     state = null
     publisher = null
-    railRect = null
+    regions = []
     pageWantsInput = false
 }
 
@@ -248,29 +250,6 @@ function popupMenu(window: BrowserWindow, agentId: string | null): void {
     ]).popup({ window })
 }
 
-function cleanCoworker(raw: unknown): CoworkerDockCoworker | null {
-    if (!raw || typeof raw !== 'object') return null
-    const { id, name, mood, pending } = raw as Record<string, unknown>
-    if (typeof id !== 'string' || !id) return null
-    return {
-        id: id.slice(0, 100),
-        name: String(name ?? '').slice(0, 200),
-        mood: (COWORKER_DOCK_MOODS as readonly string[]).includes(String(mood)) ? (mood as CoworkerDockMood) : 'idle',
-        pending: Math.max(0, Math.min(9999, Math.floor(Number(pending)) || 0)),
-    }
-}
-
-function cleanState(raw: unknown): CoworkerDockState {
-    if (!raw || typeof raw !== 'object' || !Array.isArray((raw as { coworkers?: unknown }).coworkers)) return null
-    const { coworkers: rawCoworkers, createBlockedReason, workspaceKey } = raw as { coworkers: unknown[]; createBlockedReason?: unknown; workspaceKey?: unknown }
-    const coworkers = rawCoworkers.slice(0, MAX_COWORKERS).map(cleanCoworker)
-    return {
-        coworkers: coworkers.filter((coworker): coworker is CoworkerDockCoworker => coworker !== null),
-        createBlockedReason: typeof createBlockedReason === 'string' && createBlockedReason ? createBlockedReason.slice(0, 300) : null,
-        ...(typeof workspaceKey === 'string' && workspaceKey ? { workspaceKey: workspaceKey.slice(0, 100) } : {}),
-    }
-}
-
 // What the main window (and only it: another window of the app shows its own workspace) publishes.
 function publish(event: IpcMainInvokeEvent, raw: unknown): void {
     if (event.sender !== getMainWindow()?.webContents) return
@@ -288,7 +267,7 @@ function publish(event: IpcMainInvokeEvent, raw: unknown): void {
             if (publisher === sender) scheduleHide()
         })
     }
-    const next = cleanState(raw)
+    const next = cleanDockState(raw)
     if (!next) return scheduleHide()
     state = next
     cancelHide()
@@ -304,13 +283,6 @@ function fromDock(event: IpcMainInvokeEvent): BrowserWindow | null {
 function toMainWindow(channel: string, ...args: unknown[]): void {
     showMainWindow()
     getMainWindow()?.webContents.send(channel, ...args)
-}
-
-function cleanRect(raw: unknown): Rect | null {
-    if (!raw || typeof raw !== 'object') return null
-    const { x, y, width, height } = raw as Record<string, unknown>
-    const values = [x, y, width, height].map(Number)
-    return values.every(Number.isFinite) ? { x: values[0], y: values[1], width: values[2], height: values[3] } : null
 }
 
 export const coworkerDockHandlers = {
@@ -356,9 +328,40 @@ export const coworkerDockHandlers = {
     },
     setInteractive: (event: IpcMainInvokeEvent, wanted: unknown, rect: unknown) => {
         if (!fromDock(event)) return
-        pageWantsInput = wanted === true
-        railRect = cleanRect(rect) ?? railRect
-        if (process.platform === 'linux') pollPointer()
-        else setInteractiveNow(pageWantsInput)
+        const railRect = cleanRect(rect)
+        applyInteractive(wanted === true, railRect ? [railRect] : regions)
     },
+    setRegions: (event: IpcMainInvokeEvent, wanted: unknown, rects: unknown) => {
+        if (fromDock(event)) applyInteractive(wanted === true, cleanRects(rects))
+    },
+    openNote: (event: IpcMainInvokeEvent, noteId: unknown) => {
+        if (!fromDock(event) || typeof noteId !== 'string' || !noteId) return
+        toMainWindow(IPC_EVENTS.coworkerDockOpenNote, noteId.slice(0, 200))
+    },
+    // The main window stays where it is: only its inbox changes.
+    markRead: (event: IpcMainInvokeEvent, noteId: unknown) => {
+        if (!fromDock(event) || typeof noteId !== 'string' || !noteId) return
+        getMainWindow()?.webContents.send(IPC_EVENTS.coworkerDockMarkRead, noteId.slice(0, 200))
+    },
+    setFocusable: (event: IpcMainInvokeEvent, focusable: unknown) => {
+        const window = fromDock(event)
+        if (!window) return
+        if (focusable === true) {
+            window.setFocusable(true)
+            // On Windows, Electron puts a focusable window back in the taskbar.
+            if (process.platform === 'win32') window.setSkipTaskbar(true)
+            window.focus()
+            window.webContents.focus()
+            return
+        }
+        if (window.isFocused()) window.blur()
+        window.setFocusable(false)
+    },
+}
+
+function applyInteractive(wanted: boolean, next: CoworkerDockRect[]): void {
+    pageWantsInput = wanted
+    regions = next
+    if (process.platform === 'linux') pollPointer()
+    else setInteractiveNow(pageWantsInput)
 }
