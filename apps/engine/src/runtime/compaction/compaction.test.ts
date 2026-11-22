@@ -6,7 +6,7 @@ import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_TRIGGER_RATIO } from './confi
 import { estimateTokens } from './estimate.js'
 import { tailStartIndex } from './split.js'
 import { pruneToolOutputs } from './prune.js'
-import { repairToolPairs } from './repair.js'
+import { repairToolPairs, withToolResultsInToolMessages } from './repair.js'
 import { compactionThreshold, withoutReasoning } from './compact.js'
 
 function assistantCall(id: string, name = 'shell_exec'): ModelMessage {
@@ -154,6 +154,54 @@ describe('repairToolPairs', () => {
         expect(out).toHaveLength(2)
         expect(out[0]).toEqual(input[0])
         expect(out[1]).toEqual(input[1])
+    })
+})
+
+// A turn as a run on Claude Code stores it: the CLI ran the tool, so the call and its result are both
+// provider-executed and both sit in the assistant message.
+const CLAUDE_CODE_TURN: ModelMessage[] = [
+    userText('What is in notes.txt?'),
+    {
+        role: 'assistant',
+        content: [
+            { type: 'tool-call', toolCallId: 'toolu_01QwE', toolName: 'mcp__rerun__read_file', input: { path: 'notes.txt' }, providerExecuted: true },
+            { type: 'tool-result', toolCallId: 'toolu_01QwE', toolName: 'mcp__rerun__read_file', output: { type: 'text', value: 'hi' } },
+            { type: 'text', text: 'notes.txt contains "hi".' },
+        ],
+    } as ModelMessage,
+    userText('thanks'),
+]
+
+async function openAiChatBodyOf(messages: ModelMessage[]): Promise<{ messages: Array<{ role: string; content?: unknown; tool_calls?: Array<{ id: string }>; tool_call_id?: string }> }> {
+    let body = ''
+    const provider = createOpenAI({ apiKey: 'k', baseURL: 'https://api.mistral.ai/v1', fetch: async (_url, init) => {
+        body = String(init?.body)
+        return new Response(JSON.stringify({ id: 'x', object: 'chat.completion', created: 0, model: 'm', choices: [{ index: 0, finish_reason: 'stop', message: { role: 'assistant', content: 'ok' } }] }), { headers: { 'Content-Type': 'application/json' } })
+    } })
+    await generateText({ model: provider.chat('mistral-large-latest'), messages, maxRetries: 0 })
+    return JSON.parse(body)
+}
+
+describe('withToolResultsInToolMessages', () => {
+    it('answers every call of a Claude Code turn in the OpenAI chat format', async () => {
+        const sent = await openAiChatBodyOf(repairToolPairs(withToolResultsInToolMessages(CLAUDE_CODE_TURN)))
+
+        expect(sent.messages.map(m => m.role)).toEqual(['user', 'assistant', 'tool', 'assistant', 'user'])
+        expect(sent.messages[1].tool_calls?.map(call => call.id)).toEqual(['toolu_01QwE'])
+        expect(sent.messages[2]).toMatchObject({ tool_call_id: 'toolu_01QwE', content: 'hi' })
+        expect(sent.messages[3].content).toBe('notes.txt contains "hi".')
+    })
+
+    it('leaves a call without an answer when the turn is sent as it is stored', async () => {
+        const sent = await openAiChatBodyOf(repairToolPairs(CLAUDE_CODE_TURN))
+
+        expect(sent.messages.map(m => m.role)).toEqual(['user', 'assistant', 'user'])
+        expect(sent.messages[1].tool_calls).toHaveLength(1)
+    })
+
+    it('leaves the turns of a tool Rerun ran untouched', () => {
+        const turn = [userText('ls'), assistantCall('c1'), toolResult('c1', 'a.txt')]
+        expect(withToolResultsInToolMessages(turn)).toEqual(turn)
     })
 })
 

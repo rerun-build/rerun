@@ -166,7 +166,7 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
     const priorSummary: ModelMessage | null = cp ? (JSON.parse(cp.summaryJson) as ModelMessage) : null
     const live: ModelMessage[] = rows.flatMap(r => {
         const message = withoutQuickRepliesCalls(withoutReasoning({ role: r.role, content: JSON.parse(r.contentJson) } as ModelMessage))
-        if (!message) return []
+        if (!message || (Array.isArray(message.content) && message.content.length === 0)) return []
         return [signSenders ? signHistoryMessage(message, r) : message]
     })
     const working = priorSummary ? [priorSummary, ...live] : live

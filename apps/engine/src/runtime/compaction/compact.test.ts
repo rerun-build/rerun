@@ -132,6 +132,18 @@ describe('prepareRunHistory', () => {
         expect(await prepareRunHistory(ctx, 'system')).toEqual([{ role: 'assistant', content: [{ type: 'text', text: 'answer' }] }])
     })
 
+    // A turn cut off while the model was still thinking: replayed empty, Mistral refuses the whole
+    // request ("Assistant message must have either content or tool_calls").
+    it('drops a stored turn that held nothing but reasoning', async () => {
+        state.rows = [row(0, 'user', [{ type: 'text', text: 'hi' }]), row(1, 'assistant', [{ type: 'reasoning', text: 'The user said hi.' }]), row(2, 'user', [{ type: 'text', text: 'again' }])]
+        const { ctx } = context('no-such-model')
+
+        expect(await prepareRunHistory(ctx, 'system')).toEqual([
+            { role: 'user', content: [{ type: 'text', text: 'hi' }] },
+            { role: 'user', content: [{ type: 'text', text: 'again' }] },
+        ])
+    })
+
     // The old tool's calls fill stored turns; a model that reads them imitates a call that no
     // longer exists. A call-first turn held nothing but the call, and goes with it.
     it('drops the calls of the old quick replies tool, and the turn that only held one', async () => {

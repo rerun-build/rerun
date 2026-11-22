@@ -4,7 +4,7 @@ import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { effortProviderOptions, mergeProviderOptions, reasoningProviderOptions, runEffort } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
 import { createInRunCompactor } from './compaction/in-run.js'
-import { repairToolPairs } from './compaction/repair.js'
+import { repairToolPairs, withToolResultsInToolMessages } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { CLI_PROVIDERS, resolveModel, type ModelOverride } from '../agents/providers.js'
 import type { ClaudeCompaction } from '../agents/claude-context.js'
@@ -23,7 +23,7 @@ import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.j
 import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, relayedBlock, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
-import type { LoadedAgent } from '../agents/types.js'
+import { OPENAI_CHAT_PROVIDERS, type LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
 import { answeringModel } from '../agents/rerun-upstream.js'
 import { listAgentIndex, setAgentStatus } from '../db/repos/agents.js'
@@ -565,7 +565,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
         const toolChars = toolPayloadChars(sentTools)
-        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars))
+        const stored = await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars)
+        const history = repairToolPairs(OPENAI_CHAT_PROVIDERS.has(provider) ? withToolResultsInToolMessages(stored) : stored)
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)

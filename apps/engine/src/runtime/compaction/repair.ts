@@ -15,6 +15,46 @@ function stubResult(call: ToolCallPart): ToolResultPart {
     return { type: 'tool-result', toolCallId: call.toolCallId, toolName: call.toolName, output: { type: 'text', value: '[tool result unavailable: omitted during context compaction]' } }
 }
 
+function withoutProviderExecuted(part: unknown): unknown {
+    if (!isToolCallPart(part) || !('providerExecuted' in part)) return part
+    const { providerExecuted: _providerExecuted, ...call } = part as ToolCallPart & { providerExecuted?: boolean }
+    return call
+}
+
+// A Claude Code or Codex run leaves each tool the CLI ran as a call and its result side by side in the
+// assistant message. The OpenAI chat format has no place for a result there: the SDK drops it and
+// sends the call alone, which Mistral refuses outright. The assistant message is cut at each result,
+// which goes into a tool message of its own, the way a tool Rerun ran is replayed.
+export function withToolResultsInToolMessages(messages: ModelMessage[]): ModelMessage[] {
+    return messages.flatMap(message => {
+        const content = message.content as unknown
+        if (message.role !== 'assistant' || !Array.isArray(content) || !content.some(isToolResultPart)) return [message]
+        const split: ModelMessage[] = []
+        let assistant: unknown[] = []
+        let results: ToolResultPart[] = []
+        const flushAssistant = () => {
+            if (assistant.length > 0) split.push({ ...message, content: assistant } as ModelMessage)
+            assistant = []
+        }
+        const flushResults = () => {
+            if (results.length > 0) split.push({ role: 'tool', content: results } as ModelMessage)
+            results = []
+        }
+        for (const part of content) {
+            if (isToolResultPart(part)) {
+                flushAssistant()
+                results.push(part)
+            } else {
+                flushResults()
+                assistant.push(withoutProviderExecuted(part))
+            }
+        }
+        flushAssistant()
+        flushResults()
+        return split
+    })
+}
+
 export function repairToolPairs(messages: ModelMessage[]): ModelMessage[] {
     const callIds = new Set<string>()
     const resultIds = new Set<string>()
