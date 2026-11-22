@@ -46,6 +46,7 @@ export type {
     TileResults,
     TileResultItem,
     BuddyEyes,
+    BuddyMaterial,
     BuddyMouth,
     BuddyMood,
     BuddyLook,

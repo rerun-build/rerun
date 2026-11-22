@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { HistoryIcon, RefreshCwIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS, type CoworkerLook } from '@rerun/contracts'
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, type CoworkerLook } from '@rerun/contracts'
 import { AgentBuddy, BUDDY_FACE_CENTER, BUDDY_GEOMETRY, BuddyFace, hashedBuddyLook } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useId, type ReactNode } from 'react'
@@ -67,8 +67,9 @@ type CoworkerLookPickerProps = {
     disabled?: boolean
 }
 
-// The colour, the eyes and the mouth of a coworker's buddy, all in view under a preview of it. Each
-// face is drawn in the colour chosen, so a choice is read on the face it will be.
+// The colour, the material, the eyes and the mouth of a coworker's buddy, all in view under a preview
+// of it. Each material is the buddy itself made of it, and each face is drawn in the colour chosen,
+// so a choice is read on the buddy it will be.
 export function CoworkerLookPicker({ agentId, look, onChange, disabled }: CoworkerLookPickerProps) {
     const t = useTranslations('agent.coworkerLook')
     const shown = look ?? hashedBuddyLook(agentId)
@@ -78,10 +79,10 @@ export function CoworkerLookPicker({ agentId, look, onChange, disabled }: Cowork
         <div className="flex w-full flex-col gap-4">
             <div className="flex flex-wrap items-center gap-4">
                 <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-2">
-                    <AgentBuddy agentId={agentId} look={shown} size={64} alive />
+                    <AgentBuddy agentId={agentId} look={shown} size={80} alive />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => onChange({ eyes: pick(COWORKER_EYES), mouth: pick(COWORKER_MOUTHS), color: pick(COWORKER_COLORS) })}>
+                    <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => onChange({ eyes: pick(COWORKER_EYES), mouth: pick(COWORKER_MOUTHS), color: pick(COWORKER_COLORS), material: pick(COWORKER_MATERIALS) })}>
                         <RefreshCwIcon className="size-3.5" />
                         {t('shuffle')}
                     </Button>
@@ -110,6 +111,15 @@ export function CoworkerLookPicker({ agentId, look, onChange, disabled }: Cowork
                             />
                         )
                     })}
+                </div>
+            </Field>
+            <Field label={t('material')}>
+                <div className="grid grid-cols-5 gap-1.5">
+                    {COWORKER_MATERIALS.map(material => (
+                        <Choice key={material} label={t(`materialOptions.${material}`)} selected={(shown.material ?? 'classic') === material} disabled={disabled} onClick={() => choose({ material })}>
+                            <AgentBuddy agentId={agentId} look={{ ...shown, material }} size={52} animated={false} />
+                        </Choice>
+                    ))}
                 </div>
             </Field>
             <Field label={t('eyes')}>

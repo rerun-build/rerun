@@ -879,10 +879,22 @@
     },
     "coworkerLook": {
         "color": "Renk",
+        "material": "Malzeme",
         "eyes": "Gözler",
         "mouth": "Ağız",
         "shuffle": "Rastgele",
         "reset": "Varsayılan",
+        "materialOptions": {
+            "classic": "Klasik",
+            "fluffy": "Tüylü",
+            "plush": "Pelüş",
+            "felt": "Keçe",
+            "knit": "Örgü",
+            "clay": "Oyun hamuru",
+            "rubber": "Kauçuk",
+            "glass": "Cam",
+            "chrome": "Krom"
+        },
         "colors": {
             "blue": "Mavi",
             "indigo": "Çivit",

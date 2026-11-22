@@ -969,10 +969,22 @@
     },
     "coworkerLook": {
         "color": "Color",
+        "material": "Material",
         "eyes": "Eyes",
         "mouth": "Mouth",
         "shuffle": "Shuffle",
         "reset": "Default",
+        "materialOptions": {
+            "classic": "Classic",
+            "fluffy": "Fluffy",
+            "plush": "Plush",
+            "felt": "Felt",
+            "knit": "Knit",
+            "clay": "Clay",
+            "rubber": "Rubber",
+            "glass": "Glass",
+            "chrome": "Chrome"
+        },
         "colors": {
             "blue": "Blue",
             "indigo": "Indigo",

@@ -69,6 +69,8 @@ export type BuddyEyes = CoworkerLook['eyes']
 
 export type BuddyMouth = CoworkerLook['mouth']
 
+export type BuddyMaterial = NonNullable<CoworkerLook['material']>
+
 export type BuddyMood = 'idle' | 'working' | 'error' | 'waiting' | 'asleep'
 
 // What makes one buddy look like itself. Anything left out is drawn from the tile id, so a board
@@ -76,6 +78,7 @@ export type BuddyMood = 'idle' | 'working' | 'error' | 'waiting' | 'asleep'
 export type BuddyLook = {
     eyes?: BuddyEyes
     mouth?: BuddyMouth
+    material?: BuddyMaterial
     // Hex colour the agent wears while it rests.
     color?: string
     // Pins the mood. Left out, it is read from the tile's effects: an agent that is switched off or

@@ -8,6 +8,7 @@ import type { TileStyle } from '../types'
 import { useKitTranslations } from '../../locale'
 import { tileStatusLabel } from '../status-label'
 import { BUDDY_GEOMETRY, BUDDY_VIEW, BuddyArt } from './buddy/BuddyArt'
+import { useBuddyZoom } from './buddy/buddy-zoom'
 import { BUDDY_STATE_COLOR, buddyColor, buddyLook, buddyMood, type BuddyMood } from './buddy/buddy-look'
 
 // A tile drawn as a buddy standing on its footprint. What keeps it from looking pasted on is what
@@ -65,6 +66,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
     useBuddyBlinks()
     const t = useKitTranslations()
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+    const zoom = useBuddyZoom()
     const look = buddyLook(style)
     const mood = ghost ? 'asleep' : buddyMood(style)
     const plain = ghost ? (ghost.valid ? 'var(--iso-tile-muted)' : '#ef4444') : undefined
@@ -144,7 +146,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
                 }}
             >
                 <svg viewBox={`${BUDDY_VIEW.x} ${BUDDY_VIEW.y} ${BUDDY_VIEW.w} ${BUDDY_VIEW.h}`} width="100%" height="100%" style={{ overflow: 'visible' }}>
-                    <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} />
+                    <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} detail={unit * zoom} />
                 </svg>
             </div>
 

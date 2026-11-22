@@ -12,6 +12,7 @@ import { BeamRing } from './components/BeamRing'
 import { ContainerBlock } from './components/ContainerBlock'
 import { ContainerDrawPreview } from './components/ContainerDrawPreview'
 import { ContainerAddHandles } from './components/ContainerAddHandles'
+import { BuddyZoomProvider, detailZoom } from './components/buddy/buddy-zoom'
 import { useTouchGestures } from './hooks/useTouchGestures'
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion'
 import { useOnScreen } from './hooks/useOnScreen'
@@ -1370,12 +1371,14 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
                         return <BeamRing box={tileBox(sel.position.col, sel.position.row, span, worldOffset)} zIndex={tileZ(sel.position.col, sel.position.row, span, 10000)} span={span} />
                     })()}
 
-                {placedTiles.map(tile => {
-                    const isDragging = dragState?.tileId === tile.id
-                    const carried = !!boxDrag && tile.containerId === boxDrag.containerId
-                    const dragPosition = isDragging && dragGhostCell ? dragGhostCell : carried ? { col: tile.position.col + boxDrag.delta.col, row: tile.position.row + boxDrag.delta.row } : undefined
-                    return <TileBlock key={tile.id} tile={tile} selected={tile.id === selectedTileId} hovered={tile.id === hoveredTile?.id} isDragging={isDragging} dragPosition={dragPosition} worldOffset={worldOffset} onSelect={onTileSelect} reducedMotion={reducedMotion} paused={paused || !onScreen} justPlaced={tile.justPlaced} />
-                })}
+                <BuddyZoomProvider zoom={detailZoom(zoom)}>
+                    {placedTiles.map(tile => {
+                        const isDragging = dragState?.tileId === tile.id
+                        const carried = !!boxDrag && tile.containerId === boxDrag.containerId
+                        const dragPosition = isDragging && dragGhostCell ? dragGhostCell : carried ? { col: tile.position.col + boxDrag.delta.col, row: tile.position.row + boxDrag.delta.row } : undefined
+                        return <TileBlock key={tile.id} tile={tile} selected={tile.id === selectedTileId} hovered={tile.id === hoveredTile?.id} isDragging={isDragging} dragPosition={dragPosition} worldOffset={worldOffset} onSelect={onTileSelect} reducedMotion={reducedMotion} paused={paused || !onScreen} justPlaced={tile.justPlaced} />
+                    })}
+                </BuddyZoomProvider>
 
                 {/* Ce que dit la couleur du bloc survolé. Rendue en frère des tiles et non dans
                     TileBlock : le bloc pose son propre contexte d'empilement, la pastille passerait

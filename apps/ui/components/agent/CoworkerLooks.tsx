@@ -2,21 +2,21 @@
 
 import type { IsoAgent } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
-import { BuddyLooksProvider, type BuddyEyes, type BuddyLook, type BuddyMouth } from '@rerun/ui/iso-grid'
+import { BuddyLooksProvider, type BuddyEyes, type BuddyLook, type BuddyMaterial, type BuddyMouth } from '@rerun/ui/iso-grid'
 import { useMemo, type ReactNode } from 'react'
 
 // The agents array changes with every status; the looks almost never. Selecting this string keeps
 // every buddy of the page from drawing again each time a coworker starts or ends a run.
 function looksSignature(agents: IsoAgent[]) {
-    return agents.flatMap(agent => (agent.look ? [`${agent.id} ${agent.look.eyes} ${agent.look.mouth} ${agent.look.color}`] : [])).join('\n')
+    return agents.flatMap(agent => (agent.look ? [`${agent.id} ${agent.look.eyes} ${agent.look.mouth} ${agent.look.color} ${agent.look.material ?? 'classic'}`] : [])).join('\n')
 }
 
 function looksOf(signature: string) {
     if (!signature) return new Map<string, BuddyLook>()
     return new Map<string, BuddyLook>(
         signature.split('\n').map(line => {
-            const [id, eyes, mouth, color] = line.split(' ')
-            return [id, { eyes: eyes as BuddyEyes, mouth: mouth as BuddyMouth, color }]
+            const [id, eyes, mouth, color, material] = line.split(' ')
+            return [id, { eyes: eyes as BuddyEyes, mouth: mouth as BuddyMouth, color, material: material as BuddyMaterial }]
         }),
     )
 }

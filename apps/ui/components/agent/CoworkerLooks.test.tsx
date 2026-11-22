@@ -41,6 +41,14 @@ describe('CoworkerLooks', () => {
         expect(plain).not.toContain('#00b862')
     })
 
+    it('carries the material it was given, and leaves the block of a look without one classic', async () => {
+        board.agents = [{ id: 'furry', look: { eyes: 'heart', mouth: 'cat', color: '#00b862', material: 'fluffy' } }, { id: 'plain', look: { eyes: 'heart', mouth: 'cat', color: '#00b862' } }]
+        const [furry, plain] = await renderBuddies({ agentId: 'furry', size: 64 }, { agentId: 'plain', size: 64 })
+
+        expect(furry).toContain('feTurbulence')
+        expect(plain).not.toContain('feTurbulence')
+    })
+
     it('draws the look a picker previews over the one the coworker wears', async () => {
         board.agents = [{ id: 'dressed', look: { eyes: 'heart', mouth: 'cat', color: '#00b862' } }]
         const [preview] = await renderBuddies({ agentId: 'dressed', size: 64, look: { eyes: 'round', mouth: 'none', color: '#f0127f' } })

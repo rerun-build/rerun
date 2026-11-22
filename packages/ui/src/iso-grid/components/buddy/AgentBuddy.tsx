@@ -84,7 +84,7 @@ export function AgentBuddy({ agentId, look: shownLook, mood = 'idle', size, anim
             }
         >
             <svg viewBox={viewBox} width="100%" height="100%" style={{ overflow: 'visible', transform: facing === 'right' ? 'scaleX(-1)' : undefined }}>
-                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId, look) : look} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} />
+                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId, look) : look} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} detail={size / side} />
             </svg>
             {badge && <span className={cn('absolute -bottom-1 flex', facing === 'right' ? '-left-1' : '-right-1')}>{badge}</span>}
         </span>
