@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
+import { APICallError, generateText, LoadAPIKeyError, RetryError } from 'ai'
 import { classifyChatError, describeSubscriptionLimit } from '@rerun/contracts'
 import { classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, refusalReason, RUN_ERROR_CODES, STREAM_CUT_RAW_REASON, unreachableEndpointError, upstreamReason } from './provider-errors.js'
 import { RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
@@ -248,6 +249,20 @@ describe('refusalReason', () => {
         expect(refusalReason(openRouterRefusal(JSON.stringify({ message: SCHEMA_REFUSAL })))).toBe(SCHEMA_REFUSAL)
         expect(refusalReason(apiError({ statusCode: 400, message: 'Provider returned error', responseBody: JSON.stringify({ error: { message: 'Provider returned error' } }) }))).toBeNull()
         expect(refusalReason(apiError({ statusCode: 400 }))).toBeNull()
+    })
+
+    it('keeps the reason Mistral puts at the root of its 400', async () => {
+        const reason = 'Not the same number of function calls and responses: tool call(s) toolu_01AbC got no result before the next user message'
+        const body = JSON.stringify({ object: 'error', message: reason, type: 'invalid_request_message_order', param: null, code: '3230', raw_status_code: 400 })
+        const mistral = createOpenAI({ apiKey: 'k', baseURL: 'https://api.mistral.ai/v1', fetch: async () => new Response(body, { status: 400, statusText: 'Bad Request', headers: { 'Content-Type': 'application/json' } }) })
+        const refusal = await generateText({ model: mistral.chat('mistral-large-latest'), prompt: 'hi', maxRetries: 0 }).catch(error => error)
+        expect(classifyProviderError('custom', refusal)).toBe(RUN_ERROR_CODES.refused)
+        expect(refusalReason(refusal)).toBe(reason)
+    })
+
+    it('says nothing more when the root message is only the status text', () => {
+        expect(refusalReason(apiError({ statusCode: 400, message: 'Bad Request', responseBody: JSON.stringify({ object: 'error', message: 'Bad Request' }) }))).toBe('Bad Request')
+        expect(upstreamReason(apiError({ statusCode: 400, message: 'Bad Request', responseBody: JSON.stringify({ object: 'error', message: 'Bad Request' }) }))).toBeNull()
     })
 })
 

@@ -138,17 +138,18 @@ function parseJson(text: string): unknown {
 
 // OpenRouter answers a refusal with its own "Provider returned error" and puts what the model provider
 // said in `error.metadata.raw`, often a JSON body of its own. The SDK's parsed `data` drops `metadata`,
-// so it is read from the raw response body.
+// so it is read from the raw response body. Mistral puts its `message` at the root of the body, where
+// the SDK does not look either.
 export function upstreamReason(error: unknown): string | null {
     if (!APICallError.isInstance(error) || !error.responseBody) return null
-    const body = parseJson(error.responseBody) as { error?: { message?: unknown; metadata?: { raw?: unknown } } } | null
+    const body = parseJson(error.responseBody) as { error?: { message?: unknown; metadata?: { raw?: unknown } }; message?: unknown } | null
     const raw = body?.error?.metadata?.raw
     if (typeof raw === 'string') {
         const nested = parseJson(raw) as { message?: unknown; error?: { message?: unknown } } | null
         const message = nested?.message ?? nested?.error?.message
         return typeof message === 'string' ? message : raw
     }
-    const message = body?.error?.message
+    const message = body?.error?.message ?? body?.message
     return typeof message === 'string' && message !== error.message ? message : null
 }
 
