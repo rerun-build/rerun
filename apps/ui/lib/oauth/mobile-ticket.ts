@@ -7,8 +7,9 @@ import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
 // app claims with its own bearer afterwards, so a leaked ticket can only open a sign-in the user was
 // already being shown. `jti` names that row: a ticket is spent the moment its sign-in starts.
 // The service is either an account of a catalog app (`key`, its registry key: the bare slug or
-// `<slug>@<instanceId>`) or a server registered outside the catalog (`server`, its engine name).
-type ConnectSubject = { key: string; server?: undefined } | { server: string; key?: undefined }
+// `<slug>@<instanceId>`) or a server registered outside the catalog (`server`, its engine name), or
+// an entry of the workspace's Vault (`vaultItem`, with an empty `agentId`), which no coworker may hold yet.
+type ConnectSubject = { key: string; server?: undefined; vaultItem?: undefined } | { server: string; key?: undefined; vaultItem?: undefined } | { vaultItem: string; key?: undefined; server?: undefined }
 // `desktop` is the channel of the desktop app that asked, whose URL scheme the sign-in returns to;
 // absent, it returns to the iOS app.
 export type ConnectTicket = { kind: 'ticket'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number; desktop?: DesktopShellChannel } & ConnectSubject
@@ -16,7 +17,7 @@ export type ConnectTicket = { kind: 'ticket'; jti: string; agentId: string; work
 // What the callback authorizes itself with, for the same reason: it runs in that session-less
 // browser too. It rides in the OAuth context cookie, which the browser holds, hence the signature.
 // It names the same row as the ticket, where the callback leaves what the provider handed over.
-export type CallbackGrant = { kind: 'grant'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number; desktop?: DesktopShellChannel }
+export type CallbackGrant = { kind: 'grant'; jti: string; agentId: string; vaultItem?: string; workspaceId: number; userId: string; exp: number; desktop?: DesktopShellChannel }
 
 const TICKET_TTL_MS = 120_000
 // The provider's own screens (password, 2FA) sit between start and callback, so the grant lives
@@ -65,9 +66,9 @@ export function mintCallbackGrant(grant: Omit<CallbackGrant, 'exp' | 'kind'>): s
 }
 
 // `undefined` is the web flow, where the agent names its workspace (requireAgentWorkspaceId).
-export function callbackGrant(ctx: { agentId: string; mobileGrant?: string }): CallbackGrant | undefined {
+export function callbackGrant(ctx: { agentId: string; mobileGrant?: string; vault?: { itemId: string } }): CallbackGrant | undefined {
     if (ctx.mobileGrant === undefined) return undefined
     const grant = open<CallbackGrant>(ctx.mobileGrant, 'sign-in grant')
-    if (grant.kind !== 'grant' || grant.agentId !== ctx.agentId) throw new Error('Invalid sign-in grant')
+    if (grant.kind !== 'grant' || grant.agentId !== ctx.agentId || grant.vaultItem !== ctx.vault?.itemId) throw new Error('Invalid sign-in grant')
     return grant
 }

@@ -6,7 +6,7 @@ import { desktopShell } from './client'
 // browser signs in and the callback parks the token, the app is handed back a claim through its URL
 // scheme, and this page claims it with its own session.
 
-export type DesktopServiceTarget = { agentId: string; key: string } | { agentId: string; server: string }
+export type DesktopServiceTarget = { agentId: string; key: string } | { agentId: string; server: string } | { vaultItemId: string }
 
 export type DesktopServiceSignIn = { ok: true } | ({ ok: false; error: string } & Refusal)
 
@@ -18,6 +18,7 @@ export function desktopServiceSignInAvailable(): boolean {
 }
 
 function routeOf(target: DesktopServiceTarget): string {
+    if ('vaultItemId' in target) return `/api/vault/${encodeURIComponent(target.vaultItemId)}`
     const agent = `/api/v1/agents/${encodeURIComponent(target.agentId)}`
     return 'key' in target ? `${agent}/services/${encodeURIComponent(target.key)}` : `${agent}/mcp/${encodeURIComponent(target.server)}`
 }

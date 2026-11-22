@@ -1,7 +1,8 @@
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
 import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
-import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
+import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type ExchangedToken, type OAuthContext, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
+import type { McpTokenBundle } from '@/lib/engine/client'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
@@ -23,6 +24,20 @@ async function htmlResult(result: CallbackResult, serverName?: string): Promise<
     if (result.ok) return oauthPopupResponse({ channel: 'mcp-oauth', message: { type: 'mcp-oauth-success', ...target }, label: 'Connected. You can close this window.' })
     const { ok: _ok, ...failure } = result
     return oauthPopupResponse({ channel: 'mcp-oauth', message: { type: 'mcp-oauth-error', ...target, ...failure }, label: await popupFailureLabel(failure) })
+}
+
+// `ctx.clientSecret` is only ever a dynamically registered client's, which belongs to that registration alone.
+function tokenBundle(ctx: OAuthContext, token: ExchangedToken): McpTokenBundle {
+    return {
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        expiresAt: token.expiresAt,
+        scope: token.scope,
+        tokenEndpoint: ctx.tokenEndpoint,
+        clientId: ctx.clientId,
+        clientSecret: ctx.clientSecret,
+        obtainedAt: Date.now(),
+    }
 }
 
 // OAuth redirect target on our own domain. Exchanges the code for tokens, writes the bundle
@@ -59,22 +74,21 @@ export async function GET(req: Request) {
         mobile = ctx.mobileGrant !== undefined
         serverName = ctx.serverName
         if (ctx.vault) {
+            // From the desktop app, the sign-in ends in the system browser, which has no session: the
+            // token waits under the grant for the app to claim it with its own.
+            const vaultGrant = callbackGrant(ctx)
+            if (vaultGrant) {
+                desktop = vaultGrant.desktop
+                await parkSignIn(vaultGrant, { kind: 'mcp', serverName: ctx.serverName, mcpUrl: ctx.mcpUrl, token: tokenBundle(ctx, await exchangeCode(ctx, code)) })
+                return finish({ ok: true, claim: vaultGrant.jti })
+            }
             // The member who started it, still allowed to add to this workspace's Vault.
             const actor = await requireLightSessionActor()
             if (actor.workspaceId !== ctx.vault.workspaceId) throw new AppError('signInOtherWorkspace')
             const vaultCtx = await vaultContext(actor)
             await assertCanAdd(actor)
             const token = await exchangeCode(ctx, code)
-            await putVaultToken(vaultCtx.conn, ctx.vault.itemId, ctx.serverName, {
-                accessToken: token.accessToken,
-                refreshToken: token.refreshToken,
-                expiresAt: token.expiresAt,
-                scope: token.scope,
-                tokenEndpoint: ctx.tokenEndpoint,
-                clientId: ctx.clientId,
-                clientSecret: engineClientSecret(ctx),
-                obtainedAt: Date.now(),
-            })
+            await putVaultToken(vaultCtx.conn, ctx.vault.itemId, ctx.serverName, { ...tokenBundle(ctx, token), clientSecret: engineClientSecret(ctx) })
             return finish({ ok: true })
         }
         const grant = callbackGrant(ctx)
@@ -83,17 +97,7 @@ export async function GET(req: Request) {
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await getAgentChatTarget(ctx.agentId, 'manage', actor)
-        const token = await exchangeCode(ctx, code)
-        const bundle = {
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken,
-            expiresAt: token.expiresAt,
-            scope: token.scope,
-            tokenEndpoint: ctx.tokenEndpoint,
-            clientId: ctx.clientId,
-            clientSecret: ctx.clientSecret,
-            obtainedAt: Date.now(),
-        }
+        const bundle = tokenBundle(ctx, await exchangeCode(ctx, code))
         if (grant) {
             await parkSignIn(grant, { kind: 'mcp', serverName: ctx.serverName, mcpUrl: ctx.mcpUrl, token: bundle })
             return finish({ ok: true, claim: grant.jti })

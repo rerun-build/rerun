@@ -68,14 +68,20 @@ export function requestingDesktop(req: Request): DesktopShellChannel | undefined
     return parseDesktopShellUserAgent(req.headers.get('user-agent'))?.channel
 }
 
-export function connectUrl(req: Request, ctx: WorkspaceContext, agentId: string, key: string): string {
-    const ticket = mintConnectTicket({ agentId, key, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) })
+function startUrl(req: Request, ticket: string): string {
     return `${appOrigin(req)}/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`
 }
 
+export function connectUrl(req: Request, ctx: WorkspaceContext, agentId: string, key: string): string {
+    return startUrl(req, mintConnectTicket({ agentId, key, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) }))
+}
+
 export function mcpConnectUrl(req: Request, ctx: WorkspaceContext, agentId: string, server: string): string {
-    const ticket = mintConnectTicket({ agentId, server, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) })
-    return `${appOrigin(req)}/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`
+    return startUrl(req, mintConnectTicket({ agentId, server, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) }))
+}
+
+export function vaultConnectUrl(req: Request, member: { workspaceId: number; userId: string }, itemId: string): string {
+    return startUrl(req, mintConnectTicket({ agentId: '', vaultItem: itemId, workspaceId: member.workspaceId, userId: member.userId, desktop: requestingDesktop(req) }))
 }
 
 export function toInstallResultView(result: InstallResult, req: Request, ctx: WorkspaceContext, agentId: string): InstallResultView {

@@ -11,6 +11,9 @@ import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthori
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { mintCallbackGrant, verifyConnectTicket, type ConnectTicket } from '@/lib/oauth/mobile-ticket'
 import { openPendingGrant } from '@/lib/oauth/pending-grant'
+import { vaultContext } from '@/app/api/_services/vault.service'
+import { getVaultItem } from '@/lib/engine/vault-client'
+import { AppError } from '@/lib/i18n/action-error'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +26,7 @@ function redirect(url: string, cookie?: Cookie): NextResponse {
     return res
 }
 
-async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverName: string; url: string; mobileGrant: string }): Promise<NextResponse> {
+async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverName: string; url: string; mobileGrant: string; vault?: OAuthContext['vault'] }): Promise<NextResponse> {
     const metadata = await discoverAuthServer(target.url)
     const clientInfo = await resolveClient(metadata, target.url, req)
     if (!clientInfo?.clientId) throw new Error('No OAuth client available for this provider')
@@ -39,6 +42,7 @@ async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverN
         clientSecret: clientInfo.clientSecret,
         redirectUri: callbackUrl(req),
         mobileGrant: target.mobileGrant,
+        ...(target.vault ? { vault: target.vault } : {}),
     }
     return redirect(buildAuthorizeUrl(metadata, ctx, challenge, state), { name: OAUTH_COOKIE_PREFIX + state, value: encodeContext(ctx), path: OAUTH_COOKIE_PATH })
 }
@@ -56,13 +60,21 @@ export async function GET(req: Request) {
     }
 
     const { agentId, workspaceId, userId, jti } = ticket
-    // The ticket is only minted for someone who manages the coworker's Box, and its claim checks that again.
+    // The ticket is only minted for someone who manages the coworker's Box, or who may add to the Vault
+    // for an entry, and its claim checks that again.
     const actor = workspaceActor(workspaceId)
     try {
         // The ticket is spent here: the row it opens is where the callback parks the token, and what
         // the app claims afterwards with its bearer.
         await openPendingGrant(ticket)
-        const mobileGrant = mintCallbackGrant({ agentId, workspaceId, userId, jti, desktop: ticket.desktop })
+        const mobileGrant = mintCallbackGrant({ agentId, vaultItem: ticket.vaultItem, workspaceId, userId, jti, desktop: ticket.desktop })
+
+        if (ticket.vaultItem !== undefined) {
+            const { conn } = await vaultContext(actor)
+            const item = await getVaultItem(conn, ticket.vaultItem)
+            if (!item.oauth) throw new AppError('vaultEntryOtherServer')
+            return await mcpOAuthRedirect(req, { agentId, serverName: item.oauth.serverName, url: item.oauth.url, mobileGrant, vault: { itemId: item.id, workspaceId } })
+        }
 
         // The server's url is read off the agent now, never carried from the app: it is where the
         // token will be sent.

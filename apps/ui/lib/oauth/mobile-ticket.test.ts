@@ -74,4 +74,12 @@ describe('callback grant', () => {
         expect(() => callbackGrant({ agentId: 'agent-2', mobileGrant })).toThrow('Invalid sign-in grant')
         expect(() => callbackGrant({ agentId: 'agent-1', mobileGrant: mintConnectTicket(TICKET) })).toThrow('Invalid sign-in grant')
     })
+
+    it('binds a grant of the Vault to its entry, and keeps it apart from the grants of coworkers', () => {
+        const vaultGrant = mintCallbackGrant({ agentId: '', vaultItem: 'item-1', workspaceId: 42, userId: 'user-1', jti: 'row-1' })
+        expect(callbackGrant({ agentId: '', vault: { itemId: 'item-1' }, mobileGrant: vaultGrant })).toMatchObject({ vaultItem: 'item-1', jti: 'row-1' })
+        expect(() => callbackGrant({ agentId: '', vault: { itemId: 'item-2' }, mobileGrant: vaultGrant })).toThrow('Invalid sign-in grant')
+        expect(() => callbackGrant({ agentId: '', mobileGrant: vaultGrant })).toThrow('Invalid sign-in grant')
+        expect(() => callbackGrant({ agentId: '', vault: { itemId: 'item-1' }, mobileGrant: mintCallbackGrant({ agentId: '', workspaceId: 42, userId: 'user-1', jti: 'row-1' }) })).toThrow('Invalid sign-in grant')
+    })
 })

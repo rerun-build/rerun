@@ -6,7 +6,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { decodeComposioContext } from '@/lib/composio/oauth'
 import { decodeContext } from '@/lib/mcp-oauth'
-import { mintConnectTicket } from '@/lib/oauth/mobile-ticket'
+import { callbackGrant, mintConnectTicket } from '@/lib/oauth/mobile-ticket'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const getCustomMcpServer = vi.fn()
@@ -18,6 +18,10 @@ vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(a
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/app/api/_services/vault.service', async importOriginal => ({
+    ...(await importOriginal<typeof import('@/app/api/_services/vault.service')>()),
+    vaultContext: vi.fn(async (actor: unknown) => ({ actor, conn: { baseUrl: 'https://engine.test', apiKey: null }, coworkers: [], byEngineId: new Map() })),
+}))
 vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), composioConfigured: () => true, initiateConnectedAccount: vi.fn() }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
@@ -68,6 +72,36 @@ describe('GET /api/oauth/mobile/start, for a server registered outside the catal
         const location = new URL(res.headers.get('location')!)
         expect(`${location.protocol}//${location.host}${location.pathname}`).toBe('rerun://oauth/callback')
         expect(location.searchParams.get('status')).toBe('error')
+    })
+})
+
+describe('GET /api/oauth/mobile/start, for an entry of the Vault', () => {
+    const vaultTicket = () => mintConnectTicket({ agentId: '', vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
+
+    it("reads the entry's server off the Vault and leaves the context cookie in this browser, bound to the entry", async () => {
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', oauth: { serverName: 'notion', url: 'https://mcp.notion.com/mcp' } } as never)
+
+        const res = await open(vaultTicket())
+
+        expect(res.status).toBe(302)
+        expect(new URL(res.headers.get('location')!).origin).toBe('https://linear.app')
+        expect(getVaultItem).toHaveBeenCalledWith({ baseUrl: 'https://engine.test', apiKey: null }, 'item-1')
+        const [cookie] = res.cookies.getAll()
+        expect(cookie.name).toMatch(/^mcp_oauth_/)
+        const ctx = decodeContext(cookie.value)
+        expect(ctx).toMatchObject({ agentId: '', serverName: 'notion', mcpUrl: 'https://mcp.notion.com/mcp', vault: { itemId: 'item-1', workspaceId: 7 } })
+        expect(callbackGrant(ctx)).toMatchObject({ vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
+    })
+
+    it('ends in the desktop app with the reason when the entry has no sign-in', async () => {
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1' } as never)
+
+        const res = await open(vaultTicket())
+
+        const location = new URL(res.headers.get('location')!)
+        expect(location.protocol).toBe('rerun-desktop:')
+        expect(location.searchParams.get('status')).toBe('error')
+        expect(res.cookies.getAll()).toEqual([])
     })
 })
 

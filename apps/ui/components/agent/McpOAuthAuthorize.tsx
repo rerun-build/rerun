@@ -85,9 +85,10 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
         if (!discovery) return
         setState('authorizing')
         setError(null)
-        // The desktop app's browser hand-off names a coworker; a Vault entry signs in through the popup.
-        if (!vaultItemId && desktopServiceSignInAvailable()) {
-            const target = serviceKey ? { agentId, key: serviceKey } : { agentId, server: serverName }
+        // The desktop app opens the provider in the system browser, which never sees a cookie set in
+        // the app: the sign-in goes there through a ticket.
+        if (desktopServiceSignInAvailable()) {
+            const target = vaultItemId ? { vaultItemId } : serviceKey ? { agentId, key: serviceKey } : { agentId, server: serverName }
             const result = await signInThroughBrowser(target, t('authorizationFailed'))
             if (result.ok) {
                 setState('authorized')
@@ -129,7 +130,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
 
     const autoStartedRef = useRef(false)
     useEffect(() => {
-        if (!autoStart || state !== 'ready' || autoStartedRef.current || ((vaultItemId || !desktopServiceSignInAvailable()) && (!pendingPopup || pendingPopup.closed))) return
+        if (!autoStart || state !== 'ready' || autoStartedRef.current || (!desktopServiceSignInAvailable() && (!pendingPopup || pendingPopup.closed))) return
         autoStartedRef.current = true
         startAuth()
         // eslint-disable-next-line react-hooks/exhaustive-deps

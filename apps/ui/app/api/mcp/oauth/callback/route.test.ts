@@ -416,5 +416,40 @@ describe('GET /api/mcp/oauth/callback with a Vault', () => {
             expect(await res.text()).toContain('another workspace')
             expect(exchangeCode).not.toHaveBeenCalled()
         })
+
+        describe('from the desktop app, finished in the system browser', () => {
+            const VAULT_GRANT = (vaultItem = 'item-1') => mintCallbackGrant({ agentId: '', vaultItem, workspaceId: SESSION_WORKSPACE, userId: 'user-1', jti: 'row-1', desktop: 'stable' })
+
+            beforeEach(() => {
+                vi.mocked(getServerSession).mockResolvedValue({ user: null, workspaceRefused: false } as never)
+            })
+
+            it('parks the token for the app to claim, with no session in that browser', async () => {
+                withContext({ ...VAULT_CONTEXT, mobileGrant: VAULT_GRANT() })
+
+                const res = await callback({ code: 'code-1', state: STATE })
+
+                expect(res.status).toBe(302)
+                const location = new URL(res.headers.get('location') ?? '')
+                expect(location.protocol).toBe('rerun-desktop:')
+                expect(location.searchParams.get('status')).toBe('success')
+                expect(location.searchParams.get('claim')).toBe('row-1')
+                expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1', vaultItem: 'item-1' }), { kind: 'mcp', serverName: 'acme', mcpUrl: CONTEXT.mcpUrl, token: expect.objectContaining({ accessToken: 'access', tokenEndpoint: CONTEXT.tokenEndpoint }) })
+                expect(putVaultToken).not.toHaveBeenCalled()
+                expect(deletesStateCookie(res)).toBe(true)
+            })
+
+            it('refuses a grant minted for another entry, or for a coworker', async () => {
+                for (const mobileGrant of [VAULT_GRANT('item-2'), GRANT({ agentId: '' })]) {
+                    withContext({ ...VAULT_CONTEXT, mobileGrant })
+
+                    const res = await callback({ code: 'code-1', state: STATE })
+
+                    expect(new URL(res.headers.get('location') ?? '').searchParams.get('message')).toBe('Invalid sign-in grant')
+                }
+                expect(exchangeCode).not.toHaveBeenCalled()
+                expect(parkSignIn).not.toHaveBeenCalled()
+            })
+        })
     })
 })
