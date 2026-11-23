@@ -360,7 +360,7 @@ describe('run loop paths', () => {
 
             const pending = runAgent(await getAgent(id), session.id, 'stop early', undefined, undefined, row.id).catch(e => e)
             await new Promise(r => setTimeout(r, 20))
-            expect(abortRun(row.id)).toBe(true)
+            expect(abortRun(row.id)).not.toBeNull()
             release()
 
             expect(await pending).toBeInstanceOf(Error)

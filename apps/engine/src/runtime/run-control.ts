@@ -1,4 +1,4 @@
-type RunHandle = { controller: AbortController; agentId: string; cancel?: () => void }
+type RunHandle = { controller: AbortController; agentId: string; cancel?: () => Promise<void> }
 
 const controllers = new Map<string, RunHandle>()
 
@@ -20,7 +20,7 @@ export function registerRunAbort(runId: string, agentId: string): AbortControlle
 // The abort signal alone is not enough to stop a hung run: the codex provider ignores it until its
 // turn has actually started, which is exactly the case when an expired token wedges the handshake.
 // The run loop registers here what it takes to really close itself down.
-export function setRunCancel(runId: string, cancel: () => void): void {
+export function setRunCancel(runId: string, cancel: () => Promise<void>): void {
     const handle = controllers.get(runId)
     if (handle) handle.cancel = cancel
 }
@@ -62,14 +62,15 @@ export function sessionClaimCount(): number {
     return sessionClaims.size
 }
 
-export function abortRun(runId: string): boolean {
+// Null for a run that is not live here. Resolves once the transcript holds what the stopped run did:
+// the conversation is only freed then, or the next message would read a history missing that turn.
+export function abortRun(runId: string): Promise<void> | null {
     const handle = controllers.get(runId)
-    if (!handle) return false
+    if (!handle) return null
     controllers.delete(runId)
-    releaseSession(runId)
     handle.controller.abort()
     // Closes the run for good: writes its terminal row, tells the hub, and tears the provider
     // process down. Without it a provider that ignores the abort keeps the conversation "working".
-    handle.cancel?.()
-    return true
+    const stored = handle.cancel?.() ?? Promise.resolve()
+    return stored.catch(() => {}).then(() => releaseSession(runId))
 }

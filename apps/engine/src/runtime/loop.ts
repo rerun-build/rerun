@@ -45,6 +45,7 @@ import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
 import { runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
+import { stoppedTurn } from './stopped-turn.js'
 import { streamedTurn } from './streamed-turn.js'
 import { registerRunAbort, setRunCancel, unregisterRunAbort } from './run-control.js'
 import { runCurator } from './curator.js'
@@ -321,6 +322,20 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         resolveSettled = resolve
     })
 
+    let resolveStored!: () => void
+    const storedPromise = new Promise<void>(resolve => {
+        resolveStored = resolve
+    })
+
+    const storeMessages = async (messages: ModelMessage[]): Promise<MessageRow[]> => {
+        const rows: MessageRow[] = []
+        for (const message of messages) {
+            const row = await appendMessage(agent.id, sessionId, message).catch(() => undefined)
+            if (row) rows.push(row)
+        }
+        return rows
+    }
+
     // Each switch line this attempt opened with sits beside its first answer, where a reload puts it
     // back. With nothing written, they wait for the next message the run stores.
     const storeSwitches = async (rows: MessageRow[]): Promise<Map<string, unknown[]>> => {
@@ -336,6 +351,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     // The subscription is out and a backup is free: the run goes on there instead of failing. The
     // session stays claimed and the run stays open, so nothing can slip in between the two.
     const handOver = async (to: RunModel): Promise<AttemptOutcome> => {
+        resolveStored()
         if (!(await closeSafely()) && provider === 'codex') forgetCodexThread(agent.id, sessionId)
         void cliAuthP?.then(release => release(), () => {})
         const from = { connection, provider, model }
@@ -353,17 +369,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         return outcome
     }
 
-    // The one and only terminal path of a run. `streamText` gives no guarantee that `onFinish` or
-    // `onError` is ever called -- a CLI provider that wedges on an expired token simply stops
-    // streaming -- so every way a turn can end funnels here, and the guard makes a second arrival
-    // a no-op instead of a duplicate row write and a duplicate hub event.
-    const settle = async (settlement: Settlement): Promise<AttemptOutcome> => {
-        if (settled) return settledPromise
-        settled = true
-        // An error part does not end `streamText`: it would go on calling the model and the tools of a
-        // run Stop no longer reaches.
-        if (settlement.kind === 'error') attempt.abort()
-
+    const endRun = async (settlement: Settlement): Promise<AttemptOutcome> => {
         await appendP.catch(() => {})
 
         let outcome: RunOutcome
@@ -374,11 +380,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         if (settlement.kind === 'done') {
             const messages = canonicalizeHitlNames(settlement.messages)
-            const rows: MessageRow[] = []
-            for (const message of messages) {
-                const row = await appendMessage(agent.id, sessionId, message).catch(() => undefined)
-                if (row) rows.push(row)
-            }
+            const rows = await storeMessages(messages)
             const answerRow = rows.findLast(row => row.role === 'assistant')
             pending = findPendingHitl(messages)
             const sidecar = await storeSwitches(rows)
@@ -402,6 +404,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             outcome = pending ? { kind: 'done', awaitingHuman: true } : { kind: 'done' }
         } else if (settlement.kind === 'cancelled') {
             forgetCodexThread(agent.id, sessionId)
+            const stoppedBy = trigger.source === 'chat' && trigger.calledBy !== undefined ? 'the user or the calling coworker' : 'the user'
+            await writeSidecar(await storeSwitches(await storeMessages(stoppedTurn(streamed.messages(), stoppedBy))))
             if (partialResults.length) await appendMessage(agent.id, sessionId, { role: 'assistant', content: partialResultsNote(partialResults) }).catch(() => {})
             await cancelRun(agent.id, run.id).catch(() => {})
             outcome = { kind: 'cancelled' }
@@ -431,17 +435,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             }
             // A turn that failed mid-flight still said things worth keeping; without this the user
             // loses everything the agent had already produced.
-            const rows: MessageRow[] = []
-            for (const message of canonicalizeHitlNames(settlement.messages ?? [])) {
-                const row = await appendMessage(agent.id, sessionId, message).catch(() => undefined)
-                if (row) rows.push(row)
-            }
-            await writeSidecar(await storeSwitches(rows))
+            await writeSidecar(await storeSwitches(await storeMessages(canonicalizeHitlNames(settlement.messages ?? []))))
             const backup = errorCode === RUN_ERROR_CODES.usageLimit && connection && !controller.signal.aborted ? await pickBackup(tried) : null
             if (backup) return handOver(backup)
             await failRun(agent.id, run.id, errorMessage).catch(() => {})
             outcome = { kind: 'error', error: errorMessage, errorCode }
         }
+        resolveStored()
 
         await setAgentStatus(agent.id, 'idle').catch(() => {})
         // Codex only writes its rotated token to auth.json once the CLI has exited, so the next run
@@ -486,6 +486,20 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         return outcome
     }
 
+    // The one and only terminal path of a run. `streamText` gives no guarantee that `onFinish` or
+    // `onError` is ever called -- a CLI provider that wedges on an expired token simply stops
+    // streaming -- so every way a turn can end funnels here, and the guard makes a second arrival
+    // a no-op instead of a duplicate row write and a duplicate hub event.
+    const settle = async (settlement: Settlement): Promise<AttemptOutcome> => {
+        if (settled) return settledPromise
+        settled = true
+        // An error part does not end `streamText`: it would go on calling the model and the tools of a
+        // run Stop no longer reaches.
+        if (settlement.kind === 'error') attempt.abort()
+        // Stop waits on the transcript: an end that fails on the way must still let it through.
+        return endRun(settlement).finally(resolveStored)
+    }
+
     // A subscription already out sends the turn straight to a backup, and the conversation says so
     // once; a turn served again by the subscription it had left says it is back.
     const servedOpening = async (): Promise<RunModel> => {
@@ -511,6 +525,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     // until its turn has started, which is exactly the state an expired token leaves it in.
     setRunCancel(run.id, () => {
         void settle({ kind: 'cancelled' }).catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'run cancel failed'))
+        return storedPromise
     })
 
     try {

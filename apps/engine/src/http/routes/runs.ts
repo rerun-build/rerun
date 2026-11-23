@@ -30,7 +30,8 @@ runRoutes.post('/:rid/cancel', async c => {
     const rid = c.req.param('rid')!
     const run = await getRun(agentId, rid)
     if (!run || run.agentId !== agentId) return c.json({ error: 'run not found' }, 404)
-    const aborted = abortRun(rid)
+    const stopping = abortRun(rid)
+    const aborted = stopping !== null
     if (run.status === 'running') {
         await cancelRun(agentId, rid)
         // When the run loop is still there it announces its own end. When it is not -- the process
@@ -49,6 +50,7 @@ runRoutes.post('/:rid/cancel', async c => {
             })
         }
     }
+    await stopping
     return c.json({ ok: true, aborted })
 })
 

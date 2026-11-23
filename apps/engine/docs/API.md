@@ -1451,9 +1451,10 @@ it shares that number with a model step.
 
 ### `POST /agents/:id/runs/:rid/cancel`
 
-Stops the run. `{ "ok": true, "aborted": true }`, `aborted` false when no live loop held it (a row
-left over from a restart): the row is closed `cancelled` anyway and the app is told, so the
-conversation does not stay "working".
+Stops the run. `{ "ok": true, "aborted": true }`, answered once the stopped turn is stored: the
+conversation keeps what the run had said and done, without the card it had put up. `aborted` is false
+when no live loop held it (a row left over from a restart): the row is closed `cancelled` anyway and
+the app is told, so the conversation does not stay "working".
 
 ### `POST /agents/:id/runs/:rid/tasks/:taskId/cancel`
 

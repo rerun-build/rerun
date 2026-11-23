@@ -190,7 +190,7 @@ export async function followSubRun(
         while (true) {
             const next = await Promise.race([iterator.next(), stopped])
             if ('stopReason' in next) {
-                abortRun(run.runId)
+                await abortRun(run.runId)
                 await run.settled
                 return { text, stopReason: next.stopReason }
             }
@@ -204,7 +204,7 @@ export async function followSubRun(
                     continue
                 }
                 if ('stopReason' in ended) {
-                    abortRun(run.runId)
+                    await abortRun(run.runId)
                     await run.settled
                     return { text, stopReason: ended.stopReason }
                 }

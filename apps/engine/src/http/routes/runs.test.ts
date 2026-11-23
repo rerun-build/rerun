@@ -27,7 +27,7 @@ const { getRun, startRun } = await import('../../db/repos/runs.js')
 const { appendMessage } = await import('../../db/repos/messages.js')
 const { insertRunStep, insertToolCall } = await import('../../db/repos/telemetry.js')
 const { getSystemDb } = await import('../../db/systemDb.js')
-const { registerRunAbort, unregisterRunAbort, activeRunCount } = await import('../../runtime/run-control.js')
+const { registerRunAbort, setRunCancel, unregisterRunAbort, activeRunCount } = await import('../../runtime/run-control.js')
 const { registerRun } = await import('../../runtime/stream.js')
 const { registerSubRunStop } = await import('../../tools/builtin/sub-run-watch.js')
 
@@ -243,6 +243,26 @@ describe('POST /agents/:id/runs/:rid/cancel', () => {
         expect(controller.signal.aborted).toBe(true)
         expect(activeRunCount()).toBe(0)
         expect((await getRun(id, rid))?.status).toBe('cancelled')
+        expect(sent).toEqual([])
+    })
+
+    it('answers once the stopped turn is stored, a second stop announcing nothing', async () => {
+        const rid = await seedRun(id, sessionId)
+        registerRunAbort(rid, 'agent-1')
+        let stored!: () => void
+        setRunCancel(rid, () => new Promise(resolve => (stored = resolve)))
+
+        let answered = false
+        const first = cancel(rid).then(res => {
+            answered = true
+            return res.json()
+        })
+        await vi.waitFor(async () => expect((await getRun(id, rid))?.status).toBe('cancelled'))
+        expect(await (await cancel(rid)).json()).toEqual({ ok: true, aborted: false })
+        expect(answered).toBe(false)
+
+        stored()
+        expect(await first).toEqual({ ok: true, aborted: true })
         expect(sent).toEqual([])
     })
 

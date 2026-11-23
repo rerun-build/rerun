@@ -7,7 +7,10 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-settle-'))
 
 // Captured instead of sent: the assertions are about what the hub is told, which is the only thing
 // that moves a conversation off "working".
-const { sent, stream, partial, proposal } = vi.hoisted(() => ({
+const { sent, stream, partial, proposal, prompts, storage, ending } = vi.hoisted(() => ({
+    prompts: [] as string[],
+    storage: { delayMs: 0 },
+    ending: { fails: false },
     sent: [] as Array<Record<string, unknown>>,
     stream: { parts: [] as unknown[], hang: false },
     partial: { push: false },
@@ -21,6 +24,17 @@ vi.mock('./notify.js', async importOriginal => {
         sendNotification: async (input: Record<string, unknown>) => {
             sent.push(input)
             return { delivered: true }
+        },
+    }
+})
+
+vi.mock('../db/repos/messages.js', async importOriginal => {
+    const actual = await importOriginal<typeof import('../db/repos/messages.js')>()
+    return {
+        ...actual,
+        appendMessage: async (...args: Parameters<typeof actual.appendMessage>) => {
+            if (storage.delayMs && args[2].role !== 'user') await new Promise(resolve => setTimeout(resolve, storage.delayMs))
+            return actual.appendMessage(...args)
         },
     }
 })
@@ -40,18 +54,25 @@ vi.mock('../agents/providers.js', async importOriginal => {
         ...actual,
         resolveModel: () => ({
             model: new MockLanguageModelV3({
-                doStream: async () => ({
-                    stream: new ReadableStream({
-                        start(controller) {
-                            for (const part of stream.parts) controller.enqueue(part)
-                            // A provider that wedges never closes its stream: no finish part, no
-                            // error part, no callback of any kind.
-                            if (!stream.hang) controller.close()
-                        },
-                    }),
-                }),
+                doStream: async (options: { prompt: unknown }) => {
+                    prompts.push(JSON.stringify(options.prompt))
+                    return {
+                        stream: new ReadableStream({
+                            start(controller) {
+                                for (const part of stream.parts) controller.enqueue(part)
+                                // A provider that wedges never closes its stream: no finish part, no
+                                // error part, no callback of any kind.
+                                if (!stream.hang) controller.close()
+                            },
+                        }),
+                    }
+                },
             }),
             close: async () => {},
+            contextUsage: () => {
+                if (ending.fails) throw new Error('context usage unreadable')
+                return undefined
+            },
         }),
     }
 })
@@ -66,6 +87,8 @@ const { getAgent } = await import('../agents/registry.js')
 const { createSession } = await import('../db/repos/sessions.js')
 const { getRun } = await import('../db/repos/runs.js')
 const { listMessages } = await import('../db/repos/messages.js')
+const { findPendingHitl } = await import('../tools/builtin/hitl.js')
+const { stoppedCallResult, stoppedTurnNote } = await import('./stopped-turn.js')
 const { STREAM_CUT_RAW_REASON } = await import('./provider-errors.js')
 const { runAgent } = await import('./loop.js')
 const { abortRun, claimSession, sessionClaim } = await import('./run-control.js')
@@ -100,6 +123,9 @@ describe('a run always reaches a terminal state', () => {
         stream.hang = false
         partial.push = false
         proposal.push = false
+        prompts.length = 0
+        storage.delayMs = 0
+        ending.fails = false
     })
 
     // A spent Codex subscription arrives as a plain finish, not as an error. Taken at face value it
@@ -179,7 +205,7 @@ describe('a run always reaches a terminal state', () => {
         const agent = await getAgent(id)
         const run = await runAgent(agent, session.id, 'hang')
 
-        expect(abortRun(run.runId)).toBe(true)
+        expect(abortRun(run.runId)).not.toBeNull()
         const outcome = await run.settled
 
         expect(outcome.kind).toBe('cancelled')
@@ -242,11 +268,130 @@ describe('a run always reaches a terminal state', () => {
 
         const session = await createSession(id, 'hang with results')
         const run = await runAgent(await getAgent(id), session.id, 'hang')
-        expect(abortRun(run.runId)).toBe(true)
+        expect(abortRun(run.runId)).not.toBeNull()
         expect((await run.settled).kind).toBe('cancelled')
 
         const kept = JSON.stringify(await listMessages(id, session.id))
         expect(kept).toContain('Run stopped by the user')
         expect(kept).toContain('four brands found')
+    })
+
+    it('lets Stop free the conversation of a run whose end failed on the way', async () => {
+        ending.fails = true
+        stream.parts = textTurn({ unified: 'stop' })
+        const session = await createSession(id, 'ends badly')
+        const run = await runAgent(await getAgent(id), session.id, 'go')
+        claimSession(session.id, run.runId)
+        await vi.waitFor(async () => expect((await listMessages(id, session.id)).map(row => row.role)).toContain('assistant'))
+
+        await abortRun(run.runId)
+        expect(sessionClaim(session.id)).toBeNull()
+    })
+
+    describe('a run stopped half way', () => {
+        const said = [
+            { type: 'stream-start', warnings: [] },
+            { type: 'text-start', id: '0' },
+            { type: 'text-delta', id: '0', delta: 'Snipd gave 11 snips.' },
+            { type: 'text-end', id: '0' },
+        ]
+        const call = (toolCallId: string, toolName: string) => ({ type: 'tool-call', toolCallId, toolName, input: '{}', providerExecuted: true, dynamic: true })
+        const answer = (toolCallId: string, toolName: string) => ({ type: 'tool-result', toolCallId, toolName, result: { episodes: 3 }, dynamic: true })
+
+        async function stopAfter(parts: unknown[], calledBy?: string) {
+            stream.hang = true
+            stream.parts = parts
+            const session = await createSession(id, 'digest')
+            const agent = await getAgent(id)
+            const run = await runAgent(agent, session.id, 'Digest: run', undefined, undefined, undefined, { source: 'chat', calledBy })
+            await vi.waitFor(() => expect(prompts).toHaveLength(1))
+            await new Promise(resolve => setTimeout(resolve, 50))
+            return { run, agent, sessionId: session.id }
+        }
+
+        const stored = async (sessionId: string) => (await listMessages(id, sessionId)).map(row => ({ role: row.role, content: JSON.parse(row.contentJson) }))
+
+        async function nextPrompt(agent: Awaited<ReturnType<typeof getAgent>>, sessionId: string) {
+            stream.hang = false
+            stream.parts = textTurn({ unified: 'stop' })
+            const next = await runAgent(agent, sessionId, 'Why is this')
+            await next.settled
+            return prompts.at(-1)!
+        }
+
+        it('keeps what it said and did, and the next turn reads it', async () => {
+            const { run, agent, sessionId } = await stopAfter([...said, call('c1', 'mcp__snipd__snips_list'), answer('c1', 'mcp__snipd__snips_list')])
+
+            await abortRun(run.runId)
+            expect((await run.settled).kind).toBe('cancelled')
+
+            const kept = await stored(sessionId)
+            expect(kept.map(message => message.role)).toEqual(['user', 'assistant', 'tool', 'assistant'])
+            expect(JSON.stringify(kept)).toContain('"episodes":3')
+
+            const prompt = await nextPrompt(agent, sessionId)
+            expect(prompt).toContain('Snipd gave 11 snips.')
+            expect(prompt).toContain('"episodes":3')
+            expect(prompt).toContain(stoppedTurnNote('the user'))
+        })
+
+        it('holds the next message until the turn is stored', async () => {
+            storage.delayMs = 150
+            const { run, agent, sessionId } = await stopAfter(said)
+            claimSession(sessionId, run.runId)
+
+            const stopping = abortRun(run.runId)
+            expect(claimSession(sessionId, 'next')).toBe(run.runId)
+            await stopping
+            expect(sessionClaim(sessionId)).toBeNull()
+
+            expect(await nextPrompt(agent, sessionId)).toContain('Snipd gave 11 snips.')
+        })
+
+        it('does not say the user stopped a run another coworker called', async () => {
+            const { run, sessionId } = await stopAfter([...said, call('c1', 'mcp__gmail__GMAIL_SEND_EMAIL')], 'caller')
+            await abortRun(run.runId)
+
+            const kept = JSON.stringify(await stored(sessionId))
+            expect(kept).toContain(stoppedTurnNote('the user or the calling coworker'))
+            expect(kept).toContain(stoppedCallResult('the user or the calling coworker'))
+        })
+
+        it('says which call was cut before its result', async () => {
+            const { run, agent, sessionId } = await stopAfter([...said, call('c1', 'mcp__gmail__GMAIL_SEND_EMAIL')])
+            await abortRun(run.runId)
+
+            expect(await nextPrompt(agent, sessionId)).toContain(stoppedCallResult('the user'))
+        })
+
+        it('leaves no card waiting', async () => {
+            const { run, sessionId } = await stopAfter([...said, call('c1', 'mcp__rerun__ask_user'), answer('c1', 'mcp__rerun__ask_user')])
+            await abortRun(run.runId)
+
+            const kept = await stored(sessionId)
+            expect(findPendingHitl(kept as never)).toBeNull()
+            expect(JSON.stringify(kept)).toContain('Snipd gave 11 snips.')
+        })
+
+        it('stores nothing of a turn that had only thought', async () => {
+            const { run, sessionId } = await stopAfter([
+                { type: 'stream-start', warnings: [] },
+                { type: 'reasoning-start', id: 'r' },
+                { type: 'reasoning-delta', id: 'r', delta: 'Let me see.' },
+            ])
+            await abortRun(run.runId)
+
+            expect((await stored(sessionId)).map(message => message.role)).toEqual(['user'])
+        })
+
+        it('keeps the turn beside the results of its delegated tasks', async () => {
+            partial.push = true
+            const { run, sessionId } = await stopAfter(said)
+            await abortRun(run.runId)
+
+            const kept = JSON.stringify(await stored(sessionId))
+            expect(kept.match(/Snipd gave 11 snips/g)).toHaveLength(1)
+            expect(kept.match(/four brands found/g)).toHaveLength(1)
+        })
     })
 })

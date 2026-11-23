@@ -154,6 +154,21 @@ describe('a card and the message written after it', () => {
         expect(message.parts[0]).toMatchObject({ state: 'output-available', output: { pages: ['Rerun AI'] } })
     })
 
+    it('shows a stopped turn without the note its model reads, the cut call as a failure', () => {
+        const row = (id: string, role: 'assistant' | 'tool', content: unknown[], minute: number) => ({ id, sessionId: 's1', role, contentJson: JSON.stringify(content), toolCallsJson: null, createdAt: at(minute) })
+        const messages = transformEngineMessages([
+            row('a1', 'assistant', [{ type: 'text', text: 'Reading your snips.' }, { type: 'tool-call', toolCallId: 'c1', toolName: 'snips_list', input: {} }], 1),
+            row('t1', 'tool', [{ type: 'tool-result', toolCallId: 'c1', toolName: 'snips_list', output: { type: 'error-text', value: 'Stopped by the user before the result came back.' } }], 2),
+            row('a2', 'assistant', [{ type: 'text', text: 'This turn was stopped here by the user.', providerOptions: { rerun: { context: true } } }], 3),
+        ])
+        expect(messages.map(message => message.parts)).toEqual([
+            [
+                { type: 'text', text: 'Reading your snips.' },
+                { type: 'tool-snips_list', toolCallId: 'c1', toolName: 'snips_list', state: 'output-error', input: {}, errorText: 'Stopped by the user before the result came back.' },
+            ],
+        ])
+    })
+
     it('reads a row stored as a plain string as one text block', () => {
         const [message] = transformEngineMessages([{ id: 'a1', sessionId: 's1', role: 'assistant', contentJson: JSON.stringify('Done.'), toolCallsJson: null, createdAt: at(1) }])
         expect(message.parts).toEqual([{ type: 'text', text: 'Done.' }])
