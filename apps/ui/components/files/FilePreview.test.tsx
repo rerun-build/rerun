@@ -39,4 +39,25 @@ describe('FilePreview', () => {
     it('keeps any other text file as plain source', () => {
         expect(preview('notes.txt', '# not a heading')).toContain('<pre')
     })
+
+    it('offers a binary behind an unknown extension as a download instead of drawing its bytes', () => {
+        const markup = preview('export.dat', 'PK\u0003\u0004\u0000\u0000[Content_Types].xml\uFFFD\uFFFD')
+
+        expect(markup).not.toContain('<pre')
+        expect(markup).toContain('download="export.dat"')
+    })
+
+    it('still draws a Windows-1252 CSV read as utf8, its accents lost but its rows readable', () => {
+        const markup = preview('prospects.csv', 'Soci�t�;Pr�nom;Ville\nBoulangerie G�n�rale;H�l�ne;Orl�ans\n')
+
+        expect(markup).toContain('<pre')
+        expect(markup).toContain('Boulangerie')
+    })
+
+    it('offers an Excel workbook as a download, never as its zip bytes', () => {
+        const markup = preview('ranked.xlsx', '')
+
+        expect(markup).not.toContain('<pre')
+        expect(markup).toContain('download="ranked.xlsx"')
+    })
 })

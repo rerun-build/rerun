@@ -47,7 +47,9 @@ export function FilePreview({ fileName, content, rawUrl, loading }: FilePreviewP
             </div>
         )
     }
-    if (kind === 'text' && content !== null) {
+    // An extension we do not know can still hide a binary: a zip or OLE package carries NUL bytes, so it is
+    // offered as a download. A text file in another encoding still draws, its accents as U+FFFD.
+    if (kind === 'text' && content !== null && !content.includes('\u0000')) {
         const format = textPreviewFormat(fileName)
         if (format === 'plain') return <SourceText content={content} />
         return <RenderedText key={fileName} fileName={fileName} format={format} content={content} />

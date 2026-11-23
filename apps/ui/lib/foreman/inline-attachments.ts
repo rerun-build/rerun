@@ -61,7 +61,7 @@ async function inlineAttachment(ctx: FilesContext, sessionId: string, path: stri
     }
 
     const text = await blob.text()
-    // filePreviewKind answers text for any extension it does not know, a docx or an xlsx included.
+    // filePreviewKind answers text for any extension it does not know, a binary one included.
     if (text.includes('\u0000')) return null
     const truncated = text.length > TEXT_FILE_PAGE_CHARS
     return { type: 'text', text: `<file name="${name}"${truncated ? ' truncated="true"' : ''}>\n${text.slice(0, TEXT_FILE_PAGE_CHARS)}\n</file>` }

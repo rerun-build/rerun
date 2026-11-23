@@ -19,6 +19,17 @@ describe('filePreviewKind', () => {
         expect(filePreviewKind('font.woff2')).toBe('binary')
     })
 
+    it('never reads an office document as text', () => {
+        for (const name of ['ranked.xlsx', 'Budget.XLS', 'brief.docx', 'deck.pptx', 'sheet.ods', 'report.numbers']) {
+            expect(filePreviewKind(name)).toBe('document')
+        }
+        expect(fileTypeIcon('ranked.xlsx')).toBeNull()
+    })
+
+    it('reads a .key file as text, a PEM key more often than a Keynote deck', () => {
+        expect(filePreviewKind('server.key')).toBe('text')
+    })
+
     it('reads anything unknown or without extension as text', () => {
         expect(filePreviewKind('notes.md')).toBe('text')
         expect(filePreviewKind('Dockerfile')).toBe('text')
