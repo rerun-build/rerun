@@ -1,3 +1,4 @@
+import { asSchema } from 'ai'
 import { describe, expect, it } from 'vitest'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpToolCatalog } from './mcp-search.js'
 import { mcpCallTool, mcpWireMiddleware } from './mcp-wire.js'
@@ -131,5 +132,19 @@ describe('mcp_call', () => {
         const { error } = await fallback.execute({ tool: 'linear_delete_everything' }, { toolCallId: 'c', messages: [] })
         expect(error).toContain('No tool of your MCP servers is named "linear_delete_everything"')
         expect(error).toContain(MCP_SEARCH_TOOL)
+    })
+
+    // RER-224: a closed `arguments` leaves `{}` as its only valid value, and a model that keeps to the schema sends just that.
+    it('lets the model put any argument in the call', async () => {
+        const schema = (await asSchema(mcpCallTool()[MCP_CALL_TOOL].inputSchema).jsonSchema) as { required: string[]; properties: { arguments: { type: string; additionalProperties: unknown } } }
+        expect(schema.properties.arguments).toMatchObject({ type: 'object', additionalProperties: true })
+        expect(schema.required).toEqual(['tool'])
+    })
+
+    it('turns down a call with no tool name before running it, and keeps the arguments of one that has it', async () => {
+        const { validate } = asSchema(mcpCallTool()[MCP_CALL_TOOL].inputSchema)
+        expect(await validate!({})).toMatchObject({ success: false })
+        expect(await validate!(null)).toMatchObject({ success: false })
+        expect(await validate!({ tool: 'linear_delete_everything', arguments: { a: 1 } })).toEqual({ success: true, value: { tool: 'linear_delete_everything', arguments: { a: 1 } } })
     })
 })

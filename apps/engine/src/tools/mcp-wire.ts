@@ -1,4 +1,4 @@
-import { tool, type LanguageModelMiddleware, type ToolSet } from 'ai'
+import { jsonSchema, tool, type LanguageModelMiddleware, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { isRecord } from '@rerun/contracts'
 import { loopToolNameFor } from '../runtime/tool-repair.js'
@@ -88,15 +88,32 @@ export function mcpWireMiddleware(catalog: McpCatalogEntry[]): LanguageModelMidd
     }
 }
 
+// Only checks the name: arguments of any shape still get the answer that the tool does not exist.
+const mcpCallInput = z.looseObject({ tool: z.string() })
+
 // Only reached by a call the middleware could not hand to a tool: the name is not one of the agent's.
 export function mcpCallTool(): ToolSet {
     return {
         [MCP_CALL_TOOL]: tool({
             description: `Run a tool of your connected MCP servers. Give its exact name as ${MCP_SEARCH_TOOL} returned it, and its arguments as the input schema ${MCP_SEARCH_TOOL} returned for it describes them.`,
-            inputSchema: z.object({
-                tool: z.string().describe('Exact name of the tool, "<server>_<tool>".'),
-                arguments: z.looseObject({}).optional().describe("The tool's arguments, following its input schema."),
-            }),
+            // The model is sent this JSON schema, not zod's: the AI SDK would close `arguments` (`additionalProperties: false`), leaving `{}` as its only valid value.
+            inputSchema: jsonSchema<{ tool: string; arguments?: Record<string, unknown> }>(
+                {
+                    type: 'object',
+                    properties: {
+                        tool: { type: 'string', description: 'Exact name of the tool, "<server>_<tool>".' },
+                        arguments: { type: 'object', additionalProperties: true, description: "The tool's arguments, following its input schema." },
+                    },
+                    required: ['tool'],
+                    additionalProperties: false,
+                },
+                {
+                    validate: async value => {
+                        const parsed = await mcpCallInput.safeParseAsync(value)
+                        return parsed.success ? { success: true, value: parsed.data } : { success: false, error: parsed.error }
+                    },
+                },
+            ),
             execute: async ({ tool: asked }) => ({ error: `No tool of your MCP servers is named "${asked}". Nothing was run. Call ${MCP_SEARCH_TOOL} to find the tool and its input schema.` }),
         }),
     }
