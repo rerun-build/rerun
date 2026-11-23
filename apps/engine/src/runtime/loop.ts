@@ -263,6 +263,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     const startedAt = Date.now()
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = handover?.controller ?? registerRunAbort(run.id, baseAgent.id)
+    // Its own signal rather than the run's: a turn handed over to a backup goes on in the same run.
+    const attempt = new AbortController()
+    const attemptSignal = AbortSignal.any([controller.signal, attempt.signal])
     const author = trigger.source === 'chat' ? trigger.author : undefined
     const readOnly = runsReadOnly(trigger)
     const tried = handover?.tried ?? new Set<string>()
@@ -357,6 +360,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     const settle = async (settlement: Settlement): Promise<AttemptOutcome> => {
         if (settled) return settledPromise
         settled = true
+        // An error part does not end `streamText`: it would go on calling the model and the tools of a
+        // run Stop no longer reaches.
+        if (settlement.kind === 'error') attempt.abort()
 
         await appendP.catch(() => {})
 
@@ -523,7 +529,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
         const effort = runEffort(baseAgent, runOverride, provider, model)
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null
@@ -617,7 +623,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             providerOptions: mergeProviderOptions(mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model)), effortProviderOptions(provider, effort)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
             tools,
             activeTools: sentNames,
-            abortSignal: controller.signal,
+            abortSignal: attemptSignal,
             experimental_repairToolCall: repairToolCall,
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),
             // The step that writes the message a bare card is missing gets no tool: `toolChoice`

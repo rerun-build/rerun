@@ -272,7 +272,7 @@ Lifecycle of a run:
 4. Start a `runs` row (`running`), mark the agent `busy`, claim the session (one run per session at a time).
 5. Stream the model, executing tools each step and recording each step and tool call.
 6. On finish: persist the assistant + tool messages, mark `idle`, close the `runs` row (`done`), notify the app, and run the **curator**.
-7. On error: the row ends `error`. A run stopped through `POST /agents/:id/runs/:rid/cancel` ends `cancelled`; one cut by a restart is closed `error` at the next boot.
+7. On error: the row ends `error`, and the model stream and the tools still in flight are stopped. A run stopped through `POST /agents/:id/runs/:rid/cancel` ends `cancelled`; one cut by a restart is closed `error` at the next boot.
 
 `POST /agents/:id/chat` drives the loop over HTTP as a **stream** (SSE, AI SDK UI message stream). The session id and the run id come back in the `x-session-id` and `x-run-id` headers, and a client that lost the stream picks it up again with `GET /agents/:id/runs/:rid/stream`.
 

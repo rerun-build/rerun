@@ -6,10 +6,11 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-backup-'))
 
 // Each connection answers its own way: the test says which one is out of its subscription.
-const { sent, answers, prompts } = vi.hoisted(() => ({
+const { sent, answers, prompts, signals } = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
     answers: new Map<string, 'limit' | 'limit-after-text' | 'limit-after-tools' | 'ok'>(),
     prompts: [] as Array<{ connectionId: string; prompt: string }>,
+    signals: [] as AbortSignal[],
 }))
 
 vi.mock('./notify.js', async importOriginal => {
@@ -23,7 +24,12 @@ vi.mock('./notify.js', async importOriginal => {
     }
 })
 
-vi.mock('../tools/registry.js', () => ({ buildTools: async () => ({ tools: {}, close: async () => {} }) }))
+vi.mock('../tools/registry.js', () => ({
+    buildTools: async (ctx: { abortSignal: AbortSignal }) => {
+        signals.push(ctx.abortSignal)
+        return { tools: {}, close: async () => {} }
+    },
+}))
 
 const finish = { type: 'finish', finishReason: { unified: 'stop' }, usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 } }
 
@@ -85,6 +91,7 @@ const { clearBoxBackups, writeBoxBackups } = await import('../connections/backup
 const { armPlanLimitLatch, clearPlanLimitLatch, isPlanLimitLatched } = await import('../connections/plan-limits.js')
 const { runAgent } = await import('./loop.js')
 const { sessionClaim } = await import('./run-control.js')
+const { mergeRunStream } = await import('./run-stream-merge.js')
 
 const id = 'backupagent'
 let primary: string
@@ -138,6 +145,7 @@ describe('a turn whose subscription runs out moves to a backup', () => {
     afterEach(async () => {
         sent.length = 0
         prompts.length = 0
+        signals.length = 0
         answers.clear()
         for (const connection of [primary, backup, second]) clearPlanLimitLatch(connection)
         await clearBoxBackups()
@@ -174,6 +182,31 @@ describe('a turn whose subscription runs out moves to a backup', () => {
         const completions = sent.filter(n => n.event === 'agent.message.completed')
         expect(completions).toHaveLength(1)
         expect(completions[0].kind).not.toBe('error')
+    })
+
+    it('stops what is left of the first attempt, and only that', async () => {
+        answers.set(primary, 'limit')
+
+        const { outcome } = await send('draft the report')
+
+        expect(outcome.kind).toBe('done')
+        expect(signals.map(signal => signal.aborted)).toEqual([true, false])
+    })
+
+    it('shows the chat no abort before the answer of the backup', async () => {
+        answers.set(primary, 'limit')
+
+        const { run } = await send('draft the report')
+        const types: string[] = []
+        let merged!: ReadableStream<{ type: string }>
+        mergeRunStream({ merge: (stream: typeof merged) => (merged = stream), write() {} } as never, run)
+        const reader = merged.getReader()
+        for (let next = await reader.read(); !next.done; next = await reader.read()) types.push(next.value.type)
+
+        expect(types).not.toContain('abort')
+        expect(types).not.toContain('error')
+        expect(types).toContain('text-delta')
+        expect(types.at(-1)).toBe('finish')
     })
 
     it('keeps what the first model said and asks the backup to carry on', async () => {

@@ -62,8 +62,9 @@ export function withQuickReplies(stream: ReadableStream<UIMessageChunk>, read: (
 const isCleanFinish = (finishReason: string | undefined): boolean => finishReason === undefined || finishReason === 'stop' || finishReason === 'tool-calls'
 
 // What the chat must not see from an attempt that may hand its turn to a backup: the error and the
-// failed finish of a subscription that ran out. Held until the attempt says how it ended.
-const mayBeHandedOver = (chunk: UIMessageChunk): boolean => chunk.type === 'error' || (chunk.type === 'finish' && !isCleanFinish(chunk.finishReason))
+// failed finish of a subscription that ran out, and the abort that stops what is left of its stream.
+// Held until the attempt says how it ended.
+const mayBeHandedOver = (chunk: UIMessageChunk): boolean => chunk.type === 'error' || chunk.type === 'abort' || (chunk.type === 'finish' && !isCleanFinish(chunk.finishReason))
 
 export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled: Promise<AttemptOutcome>, continueWith?: (next: AgentRun) => ReadableStream<UIMessageChunk>): ReadableStream<UIMessageChunk> {
     let reader = body.getReader()
@@ -101,7 +102,11 @@ export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled:
                     void carryOn(outcome.next)
                     return
                 }
-                for (const chunk of held.splice(0)) controller.enqueue(chunk)
+                for (const chunk of held.splice(0)) {
+                    // A failed run aborts its own stream: to the chat it failed, nobody stopped it.
+                    if (outcome?.kind === 'error' && chunk.type === 'abort') continue
+                    controller.enqueue(chunk)
+                }
                 if (outcome?.kind === 'error') controller.enqueue({ type: 'error', errorText: outcome.error ?? 'The run failed.' })
                 close()
             }

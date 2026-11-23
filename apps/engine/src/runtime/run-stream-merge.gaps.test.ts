@@ -250,7 +250,7 @@ describe('a turn handed to a backup', () => {
             model: 'opus',
             settled: next.settled,
             attempt: Promise.resolve({ kind: 'handover', next }),
-            result: { toUIMessageStream: () => fromChunks([{ type: 'start' }, { type: 'text-delta', id: '0', delta: 'from the first' }, { type: 'error', errorText: 'usage limit reached' }, { type: 'finish', finishReason: 'error' } as UIMessageChunk]) },
+            result: { toUIMessageStream: () => fromChunks([{ type: 'start' }, { type: 'text-delta', id: '0', delta: 'from the first' }, { type: 'error', errorText: 'usage limit reached' }, { type: 'abort' }, { type: 'finish', finishReason: 'error' } as UIMessageChunk]) },
         } as unknown as AgentRun
         let merged: ReadableStream<UIMessageChunk> | undefined
         mergeRunStream({ merge: (stream: ReadableStream<UIMessageChunk>) => (merged = stream), write() {} } as unknown as UIMessageStreamWriter, first)
@@ -259,5 +259,20 @@ describe('a turn handed to a backup', () => {
 
         expect(chunks.map(chunk => chunk.type)).toEqual(['start', 'text-delta', 'start', 'data-provider-switch', 'text-delta', 'finish'])
         expect(chunks[3]).toEqual({ type: 'data-provider-switch', data: change })
+    })
+
+    it.each([
+        ['error', { kind: 'error', error: 'boom' }, ['start', 'error', 'error']],
+        ['stop', { kind: 'cancelled' }, ['start', 'error', 'abort']],
+    ])('shows the abort of a run only when a person stopped it: %s', async (_, outcome, types) => {
+        const run = {
+            runId: 'r1',
+            attempt: Promise.resolve(outcome),
+            result: { toUIMessageStream: () => fromChunks([{ type: 'start' }, { type: 'error', errorText: 'boom' }, { type: 'abort' }]) },
+        } as unknown as AgentRun
+        let merged: ReadableStream<UIMessageChunk> | undefined
+        mergeRunStream({ merge: (stream: ReadableStream<UIMessageChunk>) => (merged = stream), write() {} } as unknown as UIMessageStreamWriter, run)
+
+        expect((await drain(merged!)).map(chunk => chunk.type)).toEqual(types)
     })
 })
