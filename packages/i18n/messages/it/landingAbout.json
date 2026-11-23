@@ -1,0 +1,50 @@
+{
+    "metaTitle": "Chi è Rerun: l'azienda dietro i tuoi Coworker IA",
+    "metaDescription": "Rerun crea Coworker IA che usano il tuo piano ChatGPT o Claude. Open source, self-hostable, gestito da Reunit SA in Lussemburgo.",
+    "eyebrow": "Chi siamo",
+    "headline": "Creiamo i coworker che avremmo voluto assumere.",
+    "lede": "Rerun offre a ogni team Coworker IA per vendite, supporto, marketing e amministrazione. Lavorano nelle tue app, con ChatGPT o Claude, crediti o la tua chiave API.",
+    "mission": {
+        "label": "Perché Rerun",
+        "title": "Affida il lavoro, non un workflow.",
+        "first": "La maggior parte dei tool IA ti chiede di disegnare diagrammi o stare in chat. Un Coworker assume invece un ruolo: legge cosa ha scritto il team, apre le tue app sul suo schermo, lavora a orario e chiede conferma prima di azioni importanti.",
+        "second": "Un piccolo team dovrebbe poter assumere questo aiuto in pochi minuti, invitare tutti senza costi extra e farlo lavorare anche a laptop chiuso."
+    },
+    "principles": {
+        "label": "Come è costruito",
+        "title": "Tre scelte fondamentali.",
+        "items": {
+            "machine": {
+                "title": "Una macchina per workspace",
+                "body": "Ogni workspace ha una macchina dedicata, ospitata in Germania. I tuoi Coworker lavorano lì giorno e notte, isolati da ogni altro cliente."
+            },
+            "openSource": {
+                "title": "Open source",
+                "body": "Rerun è open source con licenza AGPL-3.0. Leggi il codice, segui ogni modifica oppure ospitalo sul tuo server."
+            },
+            "yourModel": {
+                "title": "Il tuo modello e piano",
+                "body": "I Coworker funzionano con il piano ChatGPT o Claude che già paghi, con i crediti inclusi o con la tua chiave API."
+            }
+        }
+    },
+    "company": {
+        "label": "L'azienda",
+        "title": "Operativa dal Lussemburgo.",
+        "body": "Rerun è sviluppato e gestito da Reunit SA, una société anonyme registrata in Lussemburgo, al 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Fondata da <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "Contattaci",
+        "title": "Parla con noi.",
+        "email": "Domande, stampa o partnership: <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Documentazione",
+            "brandKit": "Brand kit",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

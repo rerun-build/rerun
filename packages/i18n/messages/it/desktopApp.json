@@ -1,0 +1,128 @@
+{
+    "menu": {
+        "app": {
+            "about": "Informazioni su {name}",
+            "hide": "Ocultar {name}",
+            "hideOthers": "Nascondi altre",
+            "showAll": "Mostra tutto",
+            "quit": "Esci da {name}",
+            "checkForUpdates": "Cerca actualizaciones…",
+            "changeServer": "Cambia server…"
+        },
+        "file": {
+            "title": "File",
+            "closeWindow": "Chiudi finestra",
+            "newWindow": "Nuova finestra"
+        },
+        "edit": {
+            "title": "Modifica",
+            "undo": "Deshacer",
+            "redo": "Rehacer",
+            "cut": "Cortar",
+            "copy": "Copiar",
+            "paste": "Pegar",
+            "pasteAndMatchStyle": "Incolla e adatta lo stile",
+            "delete": "Elimina",
+            "selectAll": "Seleziona tutto",
+            "find": "Cerca…"
+        },
+        "view": {
+            "title": "Ver",
+            "reload": "Recargar",
+            "forceReload": "Ricarica forzata",
+            "toggleDevTools": "Strumenti per sviluppatori",
+            "actualSize": "Dimensioni effettive",
+            "zoomIn": "Acercar",
+            "zoomOut": "Alejar",
+            "toggleFullScreen": "Schermo intero"
+        },
+        "window": {
+            "title": "Ventana",
+            "minimize": "Minimizar",
+            "zoom": "Zoom",
+            "front": "Porta tutto in primo piano"
+        },
+        "help": {
+            "title": "Ayuda",
+            "docs": "Documentazione"
+        }
+    },
+    "offline": {
+        "title": "Impossibile raggiungere Rerun",
+        "body": "Controlla la connessione. L'app si ricollega da sola a {host}.",
+        "unavailable": "{host} non risponde al momento. L'app riprova da sola.",
+        "retry": "Riprova"
+    },
+    "incompatible": {
+        "title": "Actualiza Rerun per continua",
+        "body": "Questa versione dell'app è troppo vecchia per {host}.",
+        "download": "Scarica l'ultima versione",
+        "downloading": "Download dell'aggiornamento… {percent}%",
+        "restart": "Reiniciar per actualizar"
+    },
+    "unload": {
+        "message": "Lasciare questa pagina?",
+        "detail": "Un coworker sta ancora lavorando oppure un file ha modifiche non salvate.",
+        "leave": "Salir",
+        "stay": "Quedarme"
+    },
+    "find": {
+        "placeholder": "Cerca nella pagina",
+        "matches": "{active} de {total}",
+        "noMatches": "Nessun risultato",
+        "previous": "Risultato precedente",
+        "next": "Risultato successivo",
+        "close": "Chiudi"
+    },
+    "server": {
+        "title": "Conéctate a tu server",
+        "description": "Inserisci l'indirizzo del server Rerun che usi.",
+        "label": "Indirizzo del server",
+        "connect": "Connetti",
+        "invalid": "Inserisci un indirizzo come rerun.example.com.",
+        "unreachable": "Nessuna risposta a questo indirizzo.",
+        "notRerun": "Questo indirizzo non è un server Rerun.",
+        "tooOld": "Questo server richiede la versione {version} dell'app o successiva.",
+        "insecure": "Questo indirizzo non è cifrato. Usa https:// a meno che il server non giri su questo computer.",
+        "useRerunCloud": "Usa Rerun Cloud",
+        "cancel": "Annulla"
+    },
+    "updates": {
+        "upToDate": "Sei aggiornato",
+        "upToDateDetail": "Rerun {version} è l'ultima versione.",
+        "failed": "Non se pudieron cerca actualizaciones",
+        "readyToInstall": "Rerun {version} è listo per installase",
+        "readyDetail": "L'app si riavvia per completare l'aggiornamento.",
+        "restartNow": "Reiniciar ora",
+        "later": "Più tarde"
+    },
+    "tray": {
+        "open": "Apri {name}",
+        "waiting": "{count, plural, one {# ti aspetta} other {# ti aspettano}}",
+        "openAtLogin": "Apri al login",
+        "stillRunning": "{name} continua a funzionare qui. Chiudilo da questa icona.",
+        "quickAsk": "Domanda rapida",
+        "quickAskVoice": "Domanda rapida vocale"
+    },
+    "context": {
+        "addToDictionary": "Aggiungi al diccionario",
+        "openLink": "Apri il link nel browser",
+        "copyLink": "Copia link",
+        "copyImage": "Copia immagine",
+        "saveImage": "Salvar imagen"
+    },
+    "computer": {
+        "defaultName": "Il mio computer",
+        "chooseFolder": "Scegli la cartella in cui lavorano i coworker",
+        "trayOnline": "Questo computer: online",
+        "trayOffline": "Questo computer: offline",
+        "trayPaused": "Questo computer: in pausa",
+        "trayJobs": "{count, plural, one {Questo computer: # attività in esecuzione} other {Questo computer: # attività in esecuzione}}",
+        "pause": "Metti in pausa i coworker su questo computer",
+        "resume": "Riprendi i coworker su questo computer",
+        "quitWithJobs": "{count, plural, one {Un'attività di un coworker è in esecuzione su questo computer} other {# attività di coworker sono in esecuzione su questo computer}}",
+        "quitWithJobsDetail": "Uscire da Rerun la interromperà. Chiudi la finestra per mantenerla in esecuzione.",
+        "quitAnyway": "Esci comunque",
+        "keepRunning": "Mantieni in esecuzione"
+    }
+}

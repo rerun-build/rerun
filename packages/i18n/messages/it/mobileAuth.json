@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "Benvenuto in Rerun",
+        "continueWithApple": "Continua con Apple",
+        "continueWithGoogle": "Continua con Google",
+        "continueWithPhone": "Continua con il telefono",
+        "continueWithEmail": "Continua con l'email",
+        "or": "Oppure",
+        "welcome": "Benvenuto in Rerun",
+        "ownServer": "Usa il tuo server",
+        "useCloud": "Usa Rerun Cloud"
+    },
+    "back": "Indietro",
+    "phone": {
+        "title": "Il tuo numero di telefono",
+        "unsupportedCountry": "Non possiamo ancora inviare codici in questo paese.",
+        "consent": "Continuando, accetti di essere contattato da Rerun su WhatsApp o SMS.",
+        "sendByWhatsapp": "Invia via WhatsApp",
+        "sendBySms": "Invia via SMS",
+        "countryLabel": "Paese, {name}",
+        "numberLabel": "Numero di telefono"
+    },
+    "email": {
+        "title": "Continua con l'email",
+        "label": "E-mail",
+        "placeholder": "tu@azienda.com",
+        "send": "Invia codice"
+    },
+    "code": {
+        "title": "Inserisci il codice",
+        "sentByPhone": "Inviato via {channel} a {number}",
+        "sentByEmail": "Inviato a {email}",
+        "fieldLabel": "Codice di verifica",
+        "continue": "Continua",
+        "resendIn": "Reinvia codice tra {seconds}s",
+        "resend": "Reinvia codice",
+        "switchChannel": "Invia via {channel} invece",
+        "differentNumber": "Usa un altro numero",
+        "differentEmail": "Usa un'altra email"
+    },
+    "country": {
+        "search": "Cerca",
+        "searchLabel": "Cerca paesi"
+    },
+    "errors": {
+        "generic": "Qualcosa è andato storto. Riprova.",
+        "offline": "Non siamo riusciti a raggiungere Rerun. Controlla la connessione e riprova.",
+        "session": "Non siamo riusciti ad aprire la sessione. Riprova.",
+        "apple": "Non siamo riusciti ad accedere con Apple. Riprova.",
+        "google": "Non siamo riusciti ad accedere con Google. Riprova.",
+        "phone": {
+            "taken": "Questo numero accede già a un altro account Rerun.",
+            "same_number": "È già il numero del tuo account.",
+            "not_required": "Il numero è già verificato.",
+            "too_soon": "Un codice è già in arrivo. Attendi un momento prima di richiederne uno nuovo.",
+            "too_many": "Troppi codici richiesti per questo numero. Riprova più tardi.",
+            "invalid_number": "Inserisci un numero di cellulare valido.",
+            "unsupported_country": "Non possiamo ancora inviare codici in questo paese. Usa email o Google.",
+            "undeliverable": "Non siamo riusciti a consegnare un codice a questo numero. Prova l'altro canale, oppure email o Google.",
+            "blocked": "Non possiamo inviare un codice a questo numero. Usa email o Google.",
+            "rate_limited": "Troppi tentativi su questo numero. Riprova più tardi.",
+            "wrong_code": "Codice errato o scaduto.",
+            "expired": "Codice scaduto. Richiedine uno nuovo.",
+            "unavailable": "Non siamo riusciti a raggiungere il telefono. Riprova o usa l'altro canale.",
+            "busy": "L'accesso via telefono è occupato. Usa email o Google.",
+            "captcha_failed": "Non siamo riusciti a verificare che non sei un robot. Riprova.",
+            "signed_out": "Crea prima il tuo account."
+        },
+        "email": {
+            "invalid_email": "Inserisci un'email valida",
+            "captcha_failed": "Non siamo riusciti a verificare che non sei un robot. Riprova.",
+            "blocked_domain": "Questo dominio email non è accettato. Usa un altro indirizzo.",
+            "too_many": "Troppi account creati dalla tua rete. Riprova più tardi.",
+            "too_many_codes": "Troppi codici richiesti dalla tua rete. Riprova più tardi.",
+            "unavailable": "Non siamo riusciti a inviare il codice. Riprova.",
+            "rate_limited": "Troppi codici richiesti per questo indirizzo. Riprova più tardi.",
+            "wrong_code": "Codice errato o scaduto."
+        }
+    },
+    "consent": {
+        "title": "I tuoi coworker girano su AI",
+        "body": "Per fare le tue attività, Rerun invia messaggi, foto, vocali, file e siti ai provider AI: OpenAI, Anthropic e Google tramite OpenRouter, e qualsiasi provider che colleghi tu.",
+        "noTraining": "I provider di Rerun non addestrano sui tuoi dati.",
+        "privacy": "Informativa sulla privacy",
+        "notNow": "Non ora",
+        "agree": "Accetta e continua"
+    },
+    "server": {
+        "title": "Il tuo server Rerun",
+        "address": "Indirizzo server",
+        "connect": "Connetti",
+        "problems": {
+            "invalid": "Inserisci l'indirizzo del server Rerun.",
+            "insecure": "Usa https:// fuori dalla rete locale.",
+            "unreachable": "Impossibile raggiungere questo server.",
+            "not-rerun": "Questo indirizzo non è un server Rerun.",
+            "outdated": "Aggiorna questo server Rerun per usarlo dall'app."
+        }
+    }
+}

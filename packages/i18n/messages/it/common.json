@@ -1,0 +1,16 @@
+{
+    "save": "Salva",
+    "saving": "Salvataggio",
+    "cancel": "Annulla",
+    "somethingWentWrong": "Qualcosa è andato storto. Riprova.",
+    "backToDashboard": "Torna alla dashboard",
+    "notFound": {
+        "title": "Pagina non trovata",
+        "body": "Questa pagina non esiste o si è spostata. Ti riportiamo in carreggiata."
+    },
+    "crash": {
+        "title": "Qualcosa è andato storto",
+        "body": "Questa pagina ha incontrato un errore imprevisto. I tuoi coworker e il loro lavoro sono al sicuro. Ricarica per riprendere da dove eri rimasto.",
+        "reload": "Ricarica"
+    }
+}

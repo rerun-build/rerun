@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# passo} other {# passi}}",
+        "stepsWithFailures": "{count, plural, one {# passo} other {# passi}}, {failed} non riusciti",
+        "failed": "{failed} non riusciti"
+    },
+    "tool": {
+        "input": "Ingresso",
+        "error": "Errore",
+        "output": "Uscita",
+        "completedInMs": "Completato in {ms} ms",
+        "completedInSeconds": "Completato in {seconds}s"
+    },
+    "reasoning": {
+        "thinking": "Sto pensando...",
+        "thought": "Ragionamento"
+    },
+    "compaction": {
+        "running": "Compattazione contesto…",
+        "failed": "Compattazione contesto non riuscita",
+        "done": "Contesto compattato",
+        "summarized": "{count} messaggi precedenti riassunti",
+        "recovered": "~{count} token recuperati"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# errore} other {# errori}}",
+        "idle": "Inattivo da {minutes} min",
+        "stop": "Ferma questa attività",
+        "failed": "Non riuscito",
+        "stopped": "Interrotto, lavoro parziale conservato",
+        "earlier": "+{count} precedenti",
+        "verbs": {
+            "web_search": "Ricerca {summary}",
+            "web_fetch": "Lettura {summary}",
+            "browser_navigate": "Navigazione {summary}",
+            "shell_exec": "Esecuzione {summary}",
+            "fs_read": "Lettura {summary}",
+            "fs_write": "Scrittura {summary}",
+            "fs_edit": "Modifica {summary}"
+        }
+    }
+}

@@ -1,0 +1,86 @@
+{
+    "access": {
+        "boxManage": "Solo un admin o un manager di questa Box può modificarlo.",
+        "aiProvidersAdminOnly": "Solo un admin può modificare i provider AI.",
+        "noManagedBox": "Ti serve una Box che gestisci per aggiungere un coworker. Creane una su {host}, oppure chiedi a un admin.",
+        "boxesFailed": "Non siamo riusciti a caricare le Boxes. Riprova tra un momento.",
+        "noBoxYet": "Questo workspace non ha ancora una Box. Creane una su {host}."
+    },
+    "page": {
+        "loadFailed": "Impossibile caricare. Riprova tra un momento."
+    },
+    "details": {
+        "back": "Indietro",
+        "more": "Altro",
+        "delete": "Elimina coworker",
+        "edit": "Modifica",
+        "files": "File",
+        "apps": "App",
+        "routines": "Routine",
+        "computer": "Schermo",
+        "notifications": "Notifiche",
+        "working": "Al lavoro",
+        "idle": "Inattivo",
+        "off": "Spento",
+        "none": "Nessuna",
+        "appsToConnect": "{count} da collegare",
+        "appsConnected": "{count} collegate",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} attive",
+        "renameTitle": "Rinomina",
+        "save": "Salva",
+        "renameFailed": "Impossibile rinominare",
+        "deleteTitle": "Eliminare {name}?",
+        "deleteMessage": "Elimina definitivamente il coworker e i suoi dati. Non si può annullare.",
+        "deleteConfirm": "Elimina",
+        "deleteFailed": "Impossibile eliminare"
+    },
+    "apps": {
+        "title": "App",
+        "status": {
+            "needsSignIn": "Serve accesso",
+            "needsSetup": "Serve configurazione",
+            "error": "Errore"
+        },
+        "connect": "Collega",
+        "empty": "Nessuna app ancora.",
+        "askInChat": "Chiedi a {name} in chat di aggiungere un'app.",
+        "connectFailed": "Impossibile collegare {name}"
+    },
+    "files": {
+        "title": "File",
+        "media": "File multimediali",
+        "docs": "Documenti",
+        "earlier": "Precedenti",
+        "thisMonth": "Questo mese",
+        "open": "Apri {name}",
+        "fileFallback": "documento",
+        "noMedia": "Nessun media",
+        "noDocs": "Nessun documento",
+        "emptyHint": "Ciò che crea {name} comparirà qui.",
+        "truncated": "Solo i file più recenti. Tutti sono sul web."
+    },
+    "routines": {
+        "title": "Routine",
+        "once": "Una volta, {date}",
+        "webhook": "Webhook",
+        "empty": "Nessuna routine ancora.",
+        "askInChat": "Chiedi a {name} in chat di configurarne una.",
+        "turnOnFailed": "Impossibile attivare {name}",
+        "turnOffFailed": "Impossibile disattivare {name}"
+    },
+    "create": {
+        "title": "Nuovo coworker",
+        "nameLabel": "Nome",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "Cosa deve fare?",
+        "descriptionPlaceholder": "Trova agenzie di marketing a Milano e prepara una prima email a ciascuna",
+        "descriptionHelp": "Il suo primo compito. Inizia subito.",
+        "boxLabel": "Box",
+        "submit": "Crea",
+        "pausedTitle": "{name} è in pausa",
+        "pausedMessage": "Il piano non ha slot coworker liberi. Passa a Pro su rerun.build per coworker illimitati.",
+        "failed": "Impossibile creare il coworker"
+    }
+}

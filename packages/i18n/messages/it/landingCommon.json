@@ -1,0 +1,313 @@
+{
+    "site": {
+        "title": "Rerun: dipendenti IA sul tuo piano ChatGPT o Claude",
+        "description": "Assumi dipendenti IA per vendite, supporto e marketing. Usano ChatGPT o Claude, crediti o la tua API key. Prova gratuita di {trialDays} giorni."
+    },
+    "nav": {
+        "items": {
+            "features": "Funzionalità",
+            "useCases": "Casi d'uso",
+            "industries": "Settori",
+            "templates": "Template",
+            "pricing": "Prezzi",
+            "community": "Comunità",
+            "resources": "Risorse"
+        },
+        "features": {
+            "coworkers": {
+                "label": "Coworkers",
+                "description": "Assegnagli un compito e ti riporta il lavoro fatto."
+            },
+            "coworker-manager": {
+                "label": "Manager dei coworker",
+                "description": "Di' cosa ti serve e avvisa il Coworker giusto."
+            },
+            "computer-use": {
+                "label": "Uso del computer",
+                "description": "Lavora nelle tue app come farebbe una persona."
+            },
+            "tools": {
+                "label": "{count}+ strumenti inclusi",
+                "description": "Gmail, Stripe, HubSpot e qualsiasi server MCP."
+            },
+            "human-in-the-loop": {
+                "label": "Validazione umana",
+                "description": "Chiedono prima di qualsiasi cosa importante."
+            },
+            "runs-24-7": {
+                "label": "Attivo 24/7, in Europa",
+                "description": "Notte, weekend, portatile spento: continua a girare."
+            },
+            "second-brain": {
+                "label": "Secondo cervello",
+                "description": "Conosce la tua offerta, il tuo mercato e il tuo tono."
+            },
+            "workspaces": {
+                "label": "Workspaces",
+                "description": "Un account, un workspace per ogni business."
+            },
+            "invite-your-team": {
+                "label": "Invita tutto il team",
+                "description": "Tutti, senza costi extra, sulla stessa board."
+            },
+            "coworkers-work-together": {
+                "label": "Coworkers che collaborano",
+                "description": "Uno trova i lead, il successivo gli scrive."
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "Agenzia",
+                "description": "Nuovi clienti, delivery e report per i clienti."
+            },
+            "freelancers": {
+                "label": "Freelance",
+                "description": "Il back office che non hai mai avuto tempo di fare."
+            },
+            "ecommerce": {
+                "label": "E-commerce",
+                "description": "Ordini, scorte, recensioni e concorrenza."
+            },
+            "real-estate": {
+                "label": "Immobiliare",
+                "description": "Venditori, richieste, annunci e affitti."
+            },
+            "startups": {
+                "label": "Startup",
+                "description": "Pipeline, lanci, metriche e supporto."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Churn, feedback, release e inbound."
+            },
+            "legal": {
+                "label": "Legale e compliance",
+                "description": "Contratti, obblighi, scadenze e audit."
+            },
+            "recruiting": {
+                "label": "Recruiting e HR",
+                "description": "Screening, colloqui e follow-up candidati."
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "Trova lead",
+                "description": "Annunci di lavoro, organico e il tuo CRM incrociati."
+            },
+            "trackSales": {
+                "label": "Monitora le vendite",
+                "description": "Ricavi, pipeline e il foglio, ogni mattina."
+            },
+            "runAds": {
+                "label": "Gestisci le ads",
+                "description": "Spesa letta ogni giorno, quelle in perdita in pausa."
+            },
+            "watchCompetitors": {
+                "label": "Osserva i concorrenti",
+                "description": "I loro prezzi, i loro lanci, le tue gap sulle keyword."
+            },
+            "createContent": {
+                "label": "Crea contenuti",
+                "description": "Dalla query in calo al post ripubblicato."
+            },
+            "postSocial": {
+                "label": "Pubblica sui social",
+                "description": "Un post ogni mattina, commenti risposti."
+            },
+            "replyCustomers": {
+                "label": "Rispondi ai clienti",
+                "description": "Thread non letti ordinati e risposti con il tuo tono."
+            },
+            "triageInbox": {
+                "label": "Smista la inbox",
+                "description": "Etichettati, bozze pronte, due lasciati a te."
+            },
+            "prepareMeetings": {
+                "label": "Prepara i meeting",
+                "description": "Un brief su chi incontri, prima di ogni call."
+            },
+            "trackOrders": {
+                "label": "Traccia gli ordini",
+                "description": "Ritardi individuati, i clienti avvisati per primi."
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "Esperti",
+                "description": "Sfoglia builder di coworker verificati e assumili."
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "Entra nella community e ricevi aiuto in tempo reale."
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "Documentazione",
+                "description": "Costruisci, collega e pubblica i tuoi coworker."
+            },
+            "blog": {
+                "label": "Blog",
+                "description": "Novità prodotto, guide e playbook sui coworker."
+            }
+        },
+        "faq": "FAQ",
+        "solution": "Soluzione",
+        "trialCta": "Inizia la prova a $0",
+        "openMenu": "Apri il menu",
+        "closeMenu": "Chiudi il menu",
+        "menu": "Menu",
+        "main": "Principale",
+        "starOnGithub": "Metti una stella su GitHub",
+        "login": "Accedi",
+        "download": "Scarica",
+        "openWebApp": "Apri l'app web",
+        "browseAll": {
+            "label": "Sfoglia tutti i template",
+            "description": "L'intera libreria, ogni categoria in una pagina."
+        },
+        "becomeExpert": "Diventa esperto",
+        "startFree": "Inizia gratis",
+        "goToApp": "Vai all'app",
+        "logo": {
+            "brandKit": "Vedi il brand kit",
+            "copy": "Copia il logo (SVG)",
+            "download": "Scarica il logo"
+        }
+    },
+    "github": {
+        "star": "Star",
+        "ariaStar": "Metti una stella a Rerun su GitHub",
+        "ariaCount": "Rerun su GitHub, {count} stelle"
+    },
+    "heroCta": "Inizia ora gratis",
+    "finalCta": {
+        "proof": "{count}+ business girano su Rerun",
+        "titleLead": "Assumi Coworkers sul <switch></switch>",
+        "titleTail": "piano <mark>che paghi già.</mark>",
+        "steps": {
+            "plug": "Collega il tuo abbonamento",
+            "hire": "Configura i tuoi Coworkers",
+            "run": "Gestisci il business con i Coworkers"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun è ora open source<wide> sotto AGPL-3.0</wide>",
+        "cta": "Mettici una stella su GitHub"
+    },
+    "footer": {
+        "ctaTitle": "Il tuo primo coworker è<br></br>a tre minuti",
+        "ctaButton": "Inizia gratis",
+        "tagline": "Gestisci il lavoro con i coworker. Creali, guardali lavorare e tieni tutto sotto controllo.",
+        "productHuntAlt": "Rerun - Coworker IA open source che fanno davvero il lavoro | Product Hunt",
+        "columns": {
+            "features": "Funzionalità",
+            "industries": "Settori",
+            "solutions": "Soluzioni",
+            "compare": "Confronti",
+            "guides": "Guide",
+            "resources": "Risorse",
+            "legal": "Legale"
+        },
+        "resources": {
+            "about": "Chi siamo",
+            "docs": "Docs",
+            "github": "GitHub",
+            "pricing": "Prezzi",
+            "support": "Supporto",
+            "templates": "Template",
+            "compare": "Confronti",
+            "blog": "Blog",
+            "findExpert": "Trova un esperto",
+            "becomeExpert": "Diventa esperto",
+            "whatsNew": "Novità",
+            "brandKit": "Kit del brand",
+            "community": "Comunità",
+            "affiliate": "Programma affiliati",
+            "partnerBadge": "Badge partner"
+        },
+        "compareLink": "Rerun vs {name}",
+        "guides": {
+            "aiEmployees": "Dipendenti IA",
+            "smallBusiness": "Agenti IA per piccole imprese",
+            "cost": "Costo di un dipendente IA",
+            "noCode": "Builder di agenti IA no-code",
+            "n8n": "Alternative a n8n",
+            "personal": "Agenti IA personali",
+            "hermes": "Alternative a Hermes"
+        },
+        "legal": {
+            "terms": "Termini di servizio",
+            "refunds": "Politica di rimborso",
+            "acceptableUse": "Uso accettabile",
+            "creatorTerms": "Termini per creator",
+            "privacy": "Informativa sulla privacy",
+            "cookies": "Politica cookie",
+            "dpa": "DPA"
+        },
+        "copyright": "© {year} Rerun di {legalName}. Tutti i diritti riservati.",
+        "language": "Lingua",
+        "categories": {
+            "agencies": "Agenzie",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Vendite",
+            "recruiting": "Selezione",
+            "real-estate": "Immobiliare",
+            "legal": "Legale e compliance",
+            "creators": "Creator",
+            "productivity": "Produttività",
+            "other": "Altro"
+        },
+        "cookieSettings": "Impostazioni cookie"
+    },
+    "discord": "Entra nel nostro Discord",
+    "tabNudge": {
+        "firstCoworker": "3 min al tuo primo coworker",
+        "allDay": "Coworker attivi 24/7 per te",
+        "welcomeGuest": "Bentornato. Il tuo primo coworker è a 3 minuti.",
+        "welcomeMember": "Bentornato. I tuoi coworker stanno girando nell'app.",
+        "start": "Inizia gratis",
+        "goToApp": "Vai all'app",
+        "dismiss": "Chiudi"
+    },
+    "notFound": {
+        "homeAria": "Home Rerun",
+        "title": "Questa pagina è uscita dal copione.",
+        "body": "La pagina che cerchi non esiste o si è spostata. Ti rimettiamo in carreggiata.",
+        "back": "Torna alla home"
+    },
+    "crash": {
+        "title": "Qualcosa è andato storto.",
+        "body": "Questa pagina ha avuto un errore inatteso. Ricaricala per riprendere da dove eri.",
+        "reload": "Ricarica",
+        "back": "Torna alla home"
+    },
+    "og": {
+        "default": {
+            "line1": "Fai completare",
+            "line2": "i compiti all'IA",
+            "accent": "Anche mentre dormi."
+        },
+        "experts": {
+            "line1": "Assumi i migliori",
+            "accent": "esperti IA",
+            "cta": "Assumi un esperto",
+            "hire": "Assumi",
+            "badges": {
+                "Studio": "Studio",
+                "Freelancer": "Freelance",
+                "Expert": "Expert"
+            }
+        },
+        "compare": {
+            "vs": "Rerun vs",
+            "cta": "Vedi il confronto"
+        }
+    },
+    "composerPlaceholder": "Invia un messaggio...",
+    "dialog": {
+        "close": "Chiudi"
+    }
+}

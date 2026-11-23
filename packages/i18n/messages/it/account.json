@@ -1,0 +1,93 @@
+{
+    "title": "Profilo",
+    "tabs": {
+        "profile": {
+            "label": "Profilo",
+            "description": "La tua foto e il tuo nome, come li vedono i colleghi."
+        },
+        "signIn": {
+            "label": "Accesso",
+            "description": "I modi in cui puoi accedere a questo account."
+        },
+        "language": {
+            "label": "Lingua",
+            "description": "La lingua che Rerun usa con te."
+        },
+        "desktop": {
+            "label": "App desktop",
+            "description": "Come si comporta l'app di Rerun su questo computer."
+        },
+        "delete": {
+            "label": "Elimina account",
+            "description": "Chiudi il tuo account Rerun per sempre."
+        }
+    },
+    "language": {
+        "field": "Lingua",
+        "automatic": "Automatica",
+        "automaticHint": "Segue il browser: {language}.",
+        "failed": "Impossibile cambiare la lingua. Riprova."
+    },
+    "profile": {
+        "photo": "Foto",
+        "photoHelp": "Visibile ai colleghi, accanto ai tuoi messaggi e al cursore.",
+        "dropPhoto": "Trascina la tua foto",
+        "changePhoto": "Cambia foto",
+        "uploadPhoto": "Carica foto",
+        "removePhoto": "Rimuovi",
+        "name": "Nome",
+        "namePlaceholder": "es. Ada Lovelace",
+        "save": "Salva",
+        "notAnImage": "Scegli un file immagine.",
+        "nameUpdated": "Nome aggiornato",
+        "failed": "Qualcosa è andato storto. Riprova."
+    },
+    "signIn": {
+        "email": {
+            "title": "E-mail",
+            "empty": "Non collegata. Aggiungine una per accedere con un codice inviato alla tua casella."
+        },
+        "phone": {
+            "title": "Telefono",
+            "empty": "Non collegato. Aggiungi un numero per accedere con un codice via WhatsApp o SMS.",
+            "otherAccount": "Questo numero accede a un altro account Rerun. Cambialo per accedere qui con il telefono."
+        },
+        "change": "Cambia",
+        "add": "Aggiungi",
+        "connect": "Collega",
+        "disconnect": "Scollega",
+        "connected": "Collegato",
+        "notConnected": "Non collegato.",
+        "onlyMethod": "{provider} è l'unico metodo di accesso collegato a questo account.",
+        "disconnectTitle": "Scollegare {provider}?",
+        "disconnectDescription": "Non potrai più accedere a questo account con {provider}. Gli altri metodi di accesso restano attivi.",
+        "linkError": {
+            "identityTaken": "Questo account {provider} accede già a un altro account Rerun.",
+            "denied": "{provider} non è stato collegato.",
+            "failed": "Impossibile collegare {provider}. Riprova."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Workspace condivisi",
+                "description": "Lasci ogni workspace che condividi con i colleghi. Resta a loro, con i coworker e i file."
+            },
+            "own": {
+                "title": "I tuoi workspace",
+                "description": "Un workspace in cui sei solo tu si ferma per sempre: i coworker vengono spenti e la macchina viene eliminata con i file."
+            },
+            "signIn": {
+                "title": "Accesso",
+                "description": "Vieni disconnesso ovunque. Email, account Google e numero di telefono tornano liberi, così puoi iscriverti di nuovo più avanti."
+            }
+        },
+        "blocker": {
+            "current": "L'abbonamento si rinnova ancora. Annullalo da Fatturazione prima di eliminare l'account.",
+            "other": "L'abbonamento si rinnova ancora. Passa a questo workspace e annullalo da Fatturazione prima di eliminare l'account.",
+            "openBilling": "Apri fatturazione"
+        },
+        "submit": "Elimina account",
+        "failed": "Impossibile eliminare il tuo account."
+    }
+}

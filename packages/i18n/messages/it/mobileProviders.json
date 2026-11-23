@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "Indietro",
+        "close": "Chiudi"
+    },
+    "badge": {
+        "creditsUsedUp": "Credit esauriti",
+        "signInAgain": "Accedi di nuovo",
+        "keyRejected": "Chiave rifiutata",
+        "keyMissing": "Chiave mancante",
+        "ready": "Pronto"
+    },
+    "usage": {
+        "agentsFallBack": "{agents} torneranno al modello predefinito del workspace.",
+        "automationsFallBack": "{count, plural, one {1 automazione} other {# automazioni}} torneranno al modello predefinito del workspace.",
+        "agentsAndAutomationsFallBack": "{agents} e {count, plural, one {1 automazione} other {# automazioni}} torneranno al modello predefinito del workspace.",
+        "holdsDefault": "È il modello predefinito del workspace, che viene rimosso: ogni coworker senza modello proprio torna a Rerun.",
+        "nothingRuns": "La credenziale viene rimossa. Non gira nulla su di essa."
+    },
+    "list": {
+        "title": "Provider AI",
+        "notAnswering": "La macchina di questo workspace non risponde. Riprova tra un momento.",
+        "defaultModel": "Modello predefinito",
+        "included": "Incluso",
+        "subscriptions": "I tuoi abbonamenti",
+        "subscriptionsPitch": "Usi già Claude Code o Codex? I coworker possono girare sul tuo piano.",
+        "addSubscription": "Aggiungi abbonamento",
+        "apiKeys": "Le tue chiavi API",
+        "apiKeysPitch": "Paghi il provider direttamente, a token.",
+        "addApiKey": "Aggiungi chiave API",
+        "via": "Via {name}",
+        "creditsUsedUpPickModel": "I credit Rerun sono esauriti fino al {backOn}, quindi i coworker senza modello proprio sono in pausa. Scegli un altro modello per tenerli attivi.",
+        "creditsUsedUpAddSource": "I credit Rerun sono esauriti fino al {backOn}, quindi i coworker senza modello proprio sono in pausa. Aggiungi un piano o una chiave API per tenerli attivi.",
+        "defaultBroken": "I coworker senza modello proprio sono fermi. Correggi {name} o scegli un altro modello.",
+        "signInAgain": "Accedi di nuovo",
+        "addKey": "Aggiungi chiave"
+    },
+    "add": {
+        "addSubscription": "Aggiungi abbonamento",
+        "addApiKey": "Aggiungi chiave API",
+        "addProvider": "Aggiungi un provider",
+        "subscriptions": "Abbonamenti",
+        "apiKeys": "Chiavi API"
+    },
+    "defaultModel": {
+        "title": "Modello predefinito",
+        "changeFailed": "Impossibile cambiare il modello predefinito"
+    },
+    "detail": {
+        "name": "Nome",
+        "removeButton": "Rimuovi {name}",
+        "saveFailed": "Salvataggio non riuscito",
+        "renameTitle": "Rinomina",
+        "renameMessage": "Mostrato nel selettore modello di ogni coworker.",
+        "keySaveFailed": "Salvataggio credenziale non riuscito",
+        "removeTitle": "Rimuovere {name}?",
+        "removeConfirm": "Rimuovi",
+        "deleteFailed": "Eliminazione connessione non riuscita"
+    },
+    "credit": {
+        "title": "Credit di questo mese",
+        "percent": "{percent} %",
+        "usedUp": "I coworker su Rerun sono in pausa finché i credit non tornano {backOn}. Scegli un altro modello predefinito per tenerli attivi.",
+        "included": "Incluso nel piano Rerun. Nessuna chiave, niente da configurare."
+    },
+    "reconnect": {
+        "signInRejected": "Questo accesso è stato rifiutato. I coworker che lo usano sono fermi finché non accedi di nuovo.",
+        "signInExpired": "Questo accesso è scaduto. I coworker che lo usano sono fermi finché non accedi di nuovo.",
+        "signInAgain": "Accedi di nuovo",
+        "keyRejected": "Questa chiave è stata rifiutata. I coworker che la usano sono fermi finché non ne incolli una nuova.",
+        "keyMissing": "Nessuna chiave salvata. I coworker che la usano sono fermi finché non ne incolli una.",
+        "keyLabel": "Chiave API",
+        "keyPlaceholder": "Incolla la chiave",
+        "save": "Salva"
+    },
+    "planUsage": {
+        "title": "Utilizzo piano",
+        "empty": "L'utilizzo compare qui dopo la prossima esecuzione su questo piano.",
+        "percent": "{percent} %"
+    },
+    "models": {
+        "title": "I coworker possono usare",
+        "enabledCount": "{enabled} di {total}",
+        "lockDefault": "Modello predefinito",
+        "lockCustom": "Modello personalizzato. Rimuovilo sotto.",
+        "lockLast": "I coworker hanno bisogno di almeno un modello da questa fonte."
+    },
+    "baseUrl": {
+        "label": "Base URL personalizzata",
+        "help": "Invia le richieste al tuo router compatibile OpenRouter",
+        "save": "Salva"
+    },
+    "customModels": {
+        "title": "Modelli personalizzati",
+        "remove": "Rimuovi",
+        "addLabel": "Aggiungi un modello",
+        "addHelp": "Qualsiasi id modello OpenRouter, es. x-ai/grok-4.",
+        "add": "Aggiungi"
+    },
+    "apiKey": {
+        "name": "Nome",
+        "keyLabel": "Chiave API",
+        "keyPlaceholder": "Incolla la chiave",
+        "connect": "Collega"
+    },
+    "modelSheet": {
+        "close": "Chiudi",
+        "title": "Seleziona modello",
+        "notAnswering": "La macchina di questo workspace non risponde. Riprova tra un momento.",
+        "workspaceDefault": "Predefinito workspace",
+        "addProvider": "Aggiungi un provider"
+    },
+    "ending": {
+        "coworkersStart": "I coworker ripartono",
+        "nameIt": "Assegna un nome",
+        "connectionName": "Nome connessione",
+        "nameHelp": "Mostrato nel selettore modello di ogni coworker.",
+        "saving": "Salvataggio…",
+        "done": "Fine"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "È una chiave API Anthropic. Aggiungila come connessione Anthropic (API).",
+        "claudeTokenIsCode": "È il codice da Claude. Clicca prima Ottieni token, poi incolla il codice qui.",
+        "approve": "Approva Rerun su Claude",
+        "open": "Apri Claude",
+        "openAgain": "Apri di nuovo Claude",
+        "pasteStep": "Incolla il codice",
+        "codeLabel": "Codice da Claude",
+        "checking": "Verifica codice…",
+        "paste": "Incolla",
+        "connect": "Collega"
+    },
+    "chatgpt": {
+        "allowStep": "Consenti accesso con codice in ChatGPT",
+        "openSettings": "Apri impostazioni ChatGPT",
+        "alreadyOn": "È già attivo",
+        "adminSwitches": "Il tuo admin ChatGPT lo attiva per tutto il workspace.",
+        "onPlusOrPro": "Ho Plus o Pro",
+        "onBusiness": "ChatGPT Business o Enterprise?",
+        "enterStep": "Inserisci il codice su OpenAI",
+        "copied": "Copiato",
+        "copyAdminMessage": "Copia un messaggio per loro",
+        "adminMessage": "Ciao! Potresti attivare \"Device code authorization for Codex\" nelle impostazioni workspace ChatGPT? Mi serve per collegare il mio piano ChatGPT a Rerun.",
+        "copyCode": "Copia codice",
+        "openOpenAI": "Apri OpenAI",
+        "enterHint": "Inseriscilo sulla pagina OpenAI e approva. Questa schermata lo rileva da sola.",
+        "gettingCode": "Ottenimento codice…",
+        "getNewCode": "Ottieni un nuovo codice",
+        "getCode": "Ottieni codice",
+        "stuck": {
+            "expiredAdmin": "Il codice è scaduto. Probabilmente l'admin non ha ancora consentito l'accesso con codice.",
+            "errorAdmin": "Errore sulla pagina OpenAI? Probabilmente l'admin non ha ancora consentito l'accesso con codice.",
+            "expiredSetting": "Il codice è scaduto. L'accesso con codice è probabilmente ancora disattivo: attivalo in <link>Settings → Security</link>, poi ottieni un nuovo codice.",
+            "errorSetting": "Errore sulla pagina OpenAI? L'accesso con codice è probabilmente ancora disattivo: attivalo in <link>Settings → Security</link>, poi inserisci di nuovo il codice."
+        }
+    },
+    "connect": {
+        "renameFailed": "Rinomina connessione non riuscita",
+        "startFailed": "Impossibile avviare la connessione",
+        "notSignedIn": "Non connesso",
+        "createFailed": "Creazione connessione non riuscita"
+    },
+    "oauth": {
+        "unfinished": "L'accesso non è terminato. Riprova.",
+        "authorizationFailed": "Autorizzazione non riuscita",
+        "startFailed": "Impossibile avviare l'accesso"
+    }
+}

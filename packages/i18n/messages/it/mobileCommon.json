@@ -1,0 +1,29 @@
+{
+    "time": {
+        "today": "Oggi",
+        "yesterday": "Ieri",
+        "now": "ora",
+        "minutesAgo": "{count} min",
+        "hoursAgo": "{count} h",
+        "daysAgo": "{count}g"
+    },
+    "actions": {
+        "close": "Chiudi",
+        "cancel": "Annulla",
+        "done": "Fine",
+        "share": "Condividi",
+        "update": "Aggiorna"
+    },
+    "errors": {
+        "tryAgainShortly": "Riprova tra un momento.",
+        "generic": "Qualcosa è andato storto. Riprova.",
+        "requestFailed": "Richiesta non riuscita ({status})",
+        "uploadFailed": "Caricamento non riuscito ({status})"
+    },
+    "unread": "Non letto",
+    "viewer": {
+        "shareFailed": "Impossibile condividere il file",
+        "noPreview": "Nessuna anteprima per questo file. Condividilo per aprirlo in un'altra app.",
+        "position": "{index} / {total}"
+    }
+}

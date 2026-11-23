@@ -1,0 +1,277 @@
+{
+    "seo": {
+        "title": "Prezzi",
+        "headline": "Un piano. Tutto incluso.",
+        "description": "Un piano Rerun da {price}/mese: agenti e utenti illimitati, macchina privata, ogni app ed esecuzioni illimitate. Prova gratis di {trialDays} giorni.",
+        "breadcrumbHome": "Pagina iniziale"
+    },
+    "hero": {
+        "eyebrow": "Prezzi",
+        "description": "Prova Rerun gratis per {trialDays} giorni. Poi scegli quanti Coworkers ti servono e invita tutto il team."
+    },
+    "price": {
+        "perMonth": "/mese",
+        "perMonthBilledYearly": "/mese, fatturati {total}/anno",
+        "once": "una tantum"
+    },
+    "billing": {
+        "label": "Periodo di fatturazione",
+        "monthly": "Mensile",
+        "yearly": "Annuale",
+        "discount": "-{percent} %"
+    },
+    "tiers": {
+        "trial": {
+            "name": "Prova gratuita",
+            "description": "Metti al lavoro i tuoi primi Coworkers e scopri cosa sanno fare.",
+            "control": "Serve una carta per iniziare la prova e non viene addebitato nulla per {trialDays} giorni. Annulla prima e non paghi nulla.",
+            "cta": "Inizia la prova gratuita di {trialDays} giorni",
+            "featuresLabel": "La prova gratuita include",
+            "features": {
+                "agents": "<b>Fino a {agents} Coworkers</b> per delegare i primi compiti",
+                "seats": "<b>Posti illimitati</b> per provarlo con il team",
+                "credits": "<b>{credits, plural, one {# credito} other {# crediti}} gratis</b> per provare",
+                "models": "Gli stessi <b>modelli smart</b> di Pro",
+                "privacy": "I tuoi dati restano in un <b>workspace privato e protetto</b>",
+                "apps": "<b>{connectors}+ app e MCP</b> in cui i tuoi Coworkers possono lavorare",
+                "byom": "Collega il <b>tuo abbonamento IA</b> o la tua API key"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "Per i team che mettono i Coworkers al lavoro ogni giorno.",
+            "cta": "Inizia",
+            "featuresLabel": "Tutto della prova gratuita, più",
+            "features": {
+                "coworkers": "<b>Coworkers illimitati</b> al lavoro per te, fianco a fianco",
+                "seats": "<b>Posti illimitati</b>, senza costi per utente",
+                "team": "Gestisci i Coworkers con <b>tutto il team</b>",
+                "credits": "<b>{credits, plural, one {# credito} other {# crediti}} offerti</b>, ogni mese",
+                "autopilot": "Metti il business su <b>Autopilot</b>"
+            },
+            "creditsNote": "Ricarica quando vuoi"
+        }
+    },
+    "socialApps": {
+        "label": "Add-on",
+        "caption": "Accesso completo al tuo account, come faresti tu.",
+        "lede": "Tutto ciò che fai a mano, i tuoi Coworkers possono farlo.",
+        "details": "Cosa permette {app} ai tuoi Coworkers",
+        "add": "Aggiungi {app}",
+        "price": "<b>+{price}</b>/mese",
+        "can": {
+            "linkedin_slot": {
+                "search": "Cerca persone, leggi i profili",
+                "invite": "Invia e accetta inviti",
+                "message": "Messaggia, leggi ogni conversazione",
+                "post": "Pubblica, commenta e reagisci"
+            },
+            "whatsapp_slot": {
+                "send": "Invia messaggi, file, note vocali",
+                "reply": "Leggi e rispondi a ogni chat",
+                "check": "Verifica se un numero è su WhatsApp"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "Azienda",
+        "description": "Per grandi organizzazioni con requisiti propri",
+        "features": {
+            "everything": "Tutto in Rerun",
+            "infrastructure": "Infrastruttura personalizzata",
+            "infrastructureDetail": "Dedicata o self-hosted: i tuoi Coworkers girano dove serve all'organizzazione.",
+            "support": "Supporto dedicato",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "Contatta le vendite",
+        "ctaNote": "Prezzi su misura, adattati alla tua organizzazione"
+    },
+    "plan": {
+        "tagline": "Tutto ciò che ti serve per mettere i Coworkers al lavoro",
+        "from": "Da",
+        "flexible": "Aggiungi Coworkers o crediti quando ti servono.",
+        "cta": "Inizia la prova gratuita",
+        "trialNote": "Prova gratuita di {trialDays} giorni · carta richiesta, {free} oggi",
+        "included": "Incluso",
+        "alsoIncluded": "Anche incluso",
+        "features": {
+            "coworkers": {
+                "label": "Coworkers illimitati",
+                "caption": "Tutti i Coworkers che ti servono, fianco a fianco, ciascuno con il suo ruolo e i suoi strumenti."
+            },
+            "machine": {
+                "label": "La tua macchina",
+                "caption": "Un computer privato nel cloud dove vive ogni Coworker del workspace, condividendo file e dati. Solo tuo."
+            },
+            "seats": {
+                "label": "Posti illimitati",
+                "caption": "Tutto il team sullo stesso workspace, senza costo per posto."
+            },
+            "byoAi": {
+                "label": "Porta la tua IA",
+                "caption": "Opzionale: la tua key, il tuo abbonamento o un modello locale."
+            },
+            "apps": {
+                "label": "{connectors}+ app",
+                "caption": "Tutti gli strumenti pronti da collegare, più qualsiasi MCP o API."
+            },
+            "delegate": {
+                "label": "Delega qualsiasi compito",
+                "caption": "Passa il lavoro ripetitivo. I tuoi Coworkers lo fanno h24."
+            },
+            "invite": {
+                "label": "Invita i colleghi",
+                "caption": "Condividi il workspace e costruite i Coworkers insieme."
+            }
+        }
+    },
+    "addons": {
+        "label": "Add-on",
+        "title": "Cresci un pezzo alla volta.",
+        "lede": "Gli add-on sono quantità sul piano che hai già, non un altro tier. Prendine uno quando serve, toglilo quando non serve.",
+        "items": {
+            "credit_pack": {
+                "title": "Credit Rerun",
+                "unit": "+{credits, plural, one {# credito} other {# crediti}}/mese",
+                "caption": "Più crediti per i modelli che ospitiamo, oltre al piano."
+            }
+        }
+    },
+    "comparison": {
+        "badge": "Confronto",
+        "title": "Perché la gente passa a Rerun.",
+        "compareWith": "Confronta Rerun con",
+        "fullComparison": "Leggi il confronto completo Rerun vs {competitor}",
+        "allComparisons": "Tutti i confronti",
+        "alsoCompared": "Anche confrontato",
+        "versus": "Rerun vs {competitor}"
+    },
+    "faq": {
+        "label": "FAQ prezzi",
+        "title": "Domande sulla fattura.",
+        "items": {
+            "basePlan": {
+                "question": "Cosa ottengo con il piano base?",
+                "answer": "Coworkers illimitati, la tua macchina privata nel cloud, posti illimitati e {credits, plural, one {# credito} other {# crediti}} ogni mese, più ogni app, ogni template ed esecuzioni illimitate. Nessuna funzione è bloccata dietro un tier superiore."
+            },
+            "trial": {
+                "question": "C'è una prova gratuita?",
+                "answer": "Sì, {trialDays} giorni con {agents} coworker e {trialCredits, plural, one {# credito} other {# crediti}}. Serve una carta, oggi si addebita {free}, e il piano parte il giorno {trialDays}. Costruisci il primo team, guardalo lavorare e decidi dopo. Annulla prima della fine della prova e non viene addebitato nulla."
+            },
+            "perTask": {
+                "question": "Addebitate per compito o per esecuzione?",
+                "answer": "No. I tuoi Coworkers possono girare ogni ora di ogni giorno allo stesso prezzo fisso, quanti ne costruisci. Le esecuzioni non vengono mai contate."
+            },
+            "ownAi": {
+                "question": "Posso usare il mio abbonamento IA o le mie API key?",
+                "answer": "Sì. Collega il tuo abbonamento Claude o ChatGPT, le tue API key o un modello locale, e i modelli non ti costano nulla da parte nostra. I crediti inclusi ci sono per quando preferisci di no."
+            },
+            "whereRun": {
+                "question": "Dove girano davvero i miei Coworkers?",
+                "answer": "Sul tuo computer privato nel cloud, uno per workspace, dove vivono i Coworkers e restano i tuoi dati. Al suo interno li organizzi in Boxes, per team, cliente o progetto, quanti ne vuoi."
+            },
+            "addons": {
+                "question": "Come funzionano gli add-on?",
+                "answer": "Non sono un altro piano. I crediti Rerun si pagano una volta e non scadono: comprane altri quando ti servono."
+            },
+            "removeAddon": {
+                "question": "Cosa succede quando rimuovo un add-on?",
+                "answer": "Tieni ciò che hai pagato fino alla fine del periodo di fatturazione, e l'importo minore si applica dalla fattura successiva. Nulla si interrompe a metà mese."
+            },
+            "cancel": {
+                "question": "Posso annullare in qualsiasi momento?",
+                "answer": "Sì, con un clic dalle impostazioni di fatturazione, senza preavviso e senza email da mandare. La politica di rimborso spiega il resto."
+            },
+            "taxes": {
+                "question": "Le tasse sono incluse nel prezzo?",
+                "answer": "I prezzi sono mostrati IVA esclusa. IVA o sales tax, quando si applicano al tuo paese, si calcolano e si aggiungono al checkout."
+            },
+            "enterprise": {
+                "question": "Avete prezzi Enterprise?",
+                "answer": "Sì. Infrastruttura dedicata o self-hosted, SSO, SLA e supporto dedicato, prezzati per la tua organizzazione. Scrivici a help@rerun.build."
+            }
+        }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Offerta lifetime Rerun",
+            "description": "Paga {price} una sola volta e tieni Rerun a vita: coworker e colleghi illimitati sulla tua macchina privata, con la tua IA."
+        },
+        "eyebrow": "Offerta a vita",
+        "headline": "Rerun a vita, con un solo pagamento",
+        "description": "Coworker e colleghi illimitati sulla tua macchina privata. Un solo pagamento, nessun abbonamento.",
+        "price": {
+            "once": "una sola volta",
+            "instead": "invece di <s>{monthly} al mese</s>"
+        },
+        "cta": "Ottieni l'accesso a vita",
+        "tiers": {
+            "label": "Precios",
+            "title": "Ammortizzato in {months, plural, one {# mese} other {# mesi}}",
+            "lede": "Il piano mensile costa {monthly} al mese. L'offerta a vita costa {price}, una sola volta.",
+            "pro": {
+                "description": "Paghi ogni mese, finché usi Rerun.",
+                "control": "Sono {yearly} all'anno e {threeYears} in 3 anni.",
+                "featuresLabel": "Pro include"
+            },
+            "lifetime": {
+                "name": "A vita",
+                "description": "Paghi una volta e tieni Rerun per sempre.",
+                "control": "Ammortizzato in {months, plural, one {# mese} other {# mesi}}. Niente da rinnovare.",
+                "featuresLabel": "L'offerta a vita include",
+                "features": {
+                    "coworkers": "<b>Coworkers ilimitados</b> trabajando per ti, codo a codo",
+                    "seats": "<b>Posti illimitati</b>, nessun costo per utente",
+                    "machine": "La tua <b>macchina privata</b>, in funzione giorno e notte",
+                    "ownAi": "Tu propia IA: <b>una clave de API</b> o <b>tu abbonamento de ChatGPT</b>",
+                    "noCredits": "Credito Rerun <b>non incluso</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Incluido",
+            "title": "La tua IA, il tuo team, i tuoi tempi"
+        },
+        "steps": {
+            "label": "Come funziona",
+            "title": "Tres passaggios, dos minutos",
+            "pay": {
+                "title": "Paghi una volta",
+                "body": "Paghi su Stripe in meno di un minuto."
+            },
+            "code": {
+                "title": "Ricevi il tuo codice",
+                "body": "Compare subito dopo il pagamento e arriva nella tua casella di posta."
+            },
+            "redeem": {
+                "title": "Canjéalo",
+                "body": "Accedi, incolla il codice e il tuo workspace passa al piano a vita."
+            }
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Domande",
+            "subscribed": {
+                "question": "Pago già un piano mensile. Posso passare?",
+                "answer": "Sì. Scrivi a help@rerun.build prima di riscattare il codice e spostiamo il tuo workspace sul piano a vita."
+            },
+            "workspaces": {
+                "question": "Un codice può sbloccare più workspace?",
+                "answer": "Un codice attiva un solo workspace. Acquista un codice per ogni workspace."
+            },
+            "ownAi": {
+                "question": "Con qué IA trabajan mis coworkers?",
+                "answer": "La tua: una chiave API del provider che scegli oppure il tuo abbonamento ChatGPT. Il credito Rerun non fa parte dell'offerta."
+            },
+            "notIncluded": {
+                "question": "Qué non è incluido?",
+                "answer": "Il credito Rerun, l'IA che fatturiamo in base all'uso. I tuoi coworker funzionano invece con la tua chiave API o con il tuo abbonamento ChatGPT."
+            },
+            "updates": {
+                "question": "Ricevo le nuove funzioni?",
+                "answer": "Sì. Un workspace a vita usa lo stesso Rerun di tutti gli altri workspace, aggiornamenti inclusi."
+            }
+        }
+    }
+}

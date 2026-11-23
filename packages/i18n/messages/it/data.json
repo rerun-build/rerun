@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Tabella non trovata",
+        "deleteRowsFailed": "Eliminazione righe non riuscita",
+        "saveRowFailed": "Impossibile salvare questa riga",
+        "deleteTableFailed": "Eliminazione tabella non riuscita",
+        "purgeTableFailed": "Svuotamento tabella non riuscito",
+        "addViewFailed": "Impossibile aggiungere questa vista",
+        "deleteViewFailed": "Impossibile eliminare questa vista",
+        "unavailable": "Database non disponibile",
+        "tryAgain": "Riprova",
+        "rowCount": "{count, plural, one {{total} riga} other {{total} righe}}",
+        "rowCountFound": "{count, plural, one {{total} riga trovata} other {{total} righe trovate}}",
+        "noRows": "Nessuna riga",
+        "noSearchMatch": "Nessuna riga corrisponde a questa ricerca.",
+        "tableEmpty": "Questa tabella è vuota."
+    },
+    "pagination": {
+        "count": "Conteggio <value>{count}</value>",
+        "rowsPerPage": "Righe per pagina",
+        "perPage": "{size} per pagina",
+        "range": "{range} di {total}",
+        "firstPage": "Prima pagina",
+        "previousPage": "Pagina precedente",
+        "nextPage": "Pagina successiva",
+        "lastPage": "Ultima pagina"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {# selezionate}}",
+        "deleteRowTitle": "Eliminare questa riga?",
+        "deleteRowsTitle": "Eliminare {count} righe?",
+        "deleteRowDescription": "La riga viene rimossa dalla tabella in modo definitivo. Non si può annullare.",
+        "deleteRowsDescription": "Le righe vengono rimosse dalla tabella in modo definitivo. Non si può annullare.",
+        "delete": "Elimina",
+        "clearSelection": "Cancella selezione",
+        "search": "Cerca",
+        "searchRows": "Cerca righe",
+        "clearSearch": "Cancella ricerca",
+        "tableActions": "Azioni tabella",
+        "export": "Esporta",
+        "purgeTable": "Svuota tabella",
+        "deleteTable": "Elimina tabella"
+    },
+    "viewBar": {
+        "allRows": "Tutte le righe",
+        "viewOptions": "Opzioni di {name}",
+        "editView": "Modifica vista",
+        "deleteView": "Elimina vista",
+        "addView": "Aggiungi vista",
+        "addNewView": "Aggiungi una nuova vista",
+        "expand": "Espandi",
+        "deleteViewTitle": "Eliminare la vista \"{name}\"?",
+        "deleteViewDescription": "Sparisce solo la vista. Le righe della tabella restano intatte."
+    },
+    "layouts": {
+        "table": "Tabella",
+        "list": "Elenco",
+        "gallery": "Galleria",
+        "board": "Kanban"
+    },
+    "table": {
+        "selectAllRows": "Seleziona tutte le righe in questa pagina",
+        "selectRow": "Seleziona riga",
+        "sources": "Fonti"
+    },
+    "cell": {
+        "yes": "Sì",
+        "no": "Falso"
+    },
+    "board": {
+        "moveFailed": "Impossibile spostare questa riga",
+        "unavailable": "Board non disponibile",
+        "showMore": "Mostra altre {count}"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Verificata",
+                "detail": "Casella esistente"
+            },
+            "unconfirmed": {
+                "label": "Non confermata",
+                "detail": "Casella non confermata"
+            },
+            "invalid": {
+                "label": "Non valida",
+                "detail": "Casella inesistente"
+            }
+        },
+        "openSource": "Apri la fonte",
+        "verified": "Verificata",
+        "row": "Riga",
+        "cellLabel": "Fonti: {names}"
+    },
+    "shared": {
+        "emptyTitle": "Nessuna tabella condivisa ancora",
+        "emptyDescription": "Ogni coworker del workspace legge e scrive questo database. Quando serve un record comune (catalogo, coda, elenco su cui lavorano più coworker), creano tabelle qui che puoi consultare quando vuoi.",
+        "unreachable": "Impossibile raggiungere la macchina di questo workspace."
+    }
+}

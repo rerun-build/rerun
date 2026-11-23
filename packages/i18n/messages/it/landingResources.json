@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Texture per banner",
+        "description": "Texture banner gratuite per il tuo profilo expert Rerun: scarica uno sfondo pronto e aggiungilo alla pagina expert pubblica in un minuto."
+    },
+    "banners": {
+        "eyebrow": "Per gli expert",
+        "title": "Texture per banner",
+        "description": "Un set di texture fluid-glass che usiamo per i profili expert Rerun. Gratis da scaricare e usare come preferisci.",
+        "download": "Scarica",
+        "downloadFile": "Scarica {file}",
+        "alts": {
+            "lime-glass-crumple": "Vetro verde lime brillante, fogli piegati",
+            "pastel-holographic-knot": "Nastri di vetro pastello olografico annodati",
+            "blue-glass-crystal": "Vetro cristallino blu elettrico a faccette",
+            "violet-lime-swirl": "Vortice di vetro viola e verde lime",
+            "crimson-fluid-blob": "Blob fluido lucido cremisi e magenta",
+            "amber-droplet-blob": "Gocce di vetro ambra-arancio, rilievi lucidi",
+            "amber-chrome-swirl": "Vortici cromati arancio e nero",
+            "dark-lime-crumple": "Vetro nero accartocciato con venature verde acido",
+            "pastel-iridescent-bloom": "Fiore di vetro pastello olografico iridescente",
+            "violet-lime-vortex": "Tunnel a vortice di vetro viola e verde lime",
+            "lavender-glass-vortex": "Vortice di vetro lavanda",
+            "violet-lime-crystal": "Pezzi di vetro cristallino viola e verde",
+            "pink-swirl-vortex": "Vortice di vetro rosa acceso e rosso",
+            "violet-lime-knot": "Anelli a toro di vetro viola e verde lime",
+            "lavender-glass-crystal": "Vetro cristallino lavanda a faccette",
+            "blue-chrome-knot": "Anelli a toro cromati blu",
+            "blue-plasma-smoke": "Fumo al plasma blu elettrico sul vetro",
+            "violet-iridescent-vortex": "Vortice iridescente viola",
+            "dark-lime-knot": "Nodi di vetro nero con bagliore verde acido",
+            "pastel-holographic-vortex": "Vortice pastello olografico",
+            "blue-liquid-ripple": "Vetro liquido blu iridescente ondulato",
+            "blue-glass-bloom": "Fiore di petali arricciati in vetro cobalto",
+            "blue-chrome-vortex": "Vortice di vetro cromato blu",
+            "pastel-holographic-smoke": "Fumo sottile di vetro olografico pastello",
+            "crimson-swirl-vortex": "Vortice cremisi e magenta",
+            "amethyst-crystal-facets": "Faccette cristalline ametista",
+            "violet-iridescent-crumple": "Pezzi di cristallo iridescente viola accartocciati",
+            "violet-glossy-bloom": "Fiore di petali di vetro viola lucido",
+            "violet-lime-fluid-blob": "Blob fluidi lucidi viola e verde acido",
+            "dark-green-swirl-vortex": "Vortice lucido verde scuro e nero"
+        }
+    }
+}

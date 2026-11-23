@@ -1,0 +1,80 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {Apri Chat per {name}} actions {Apri Da gestire per {name}} services {Apri App per {name}} mcp {Apri MCP per {name}} skills {Apri Skill per {name}} data {Apri Database per {name}} memories {Apri Knowledge per {name}} files {Apri File per {name}} scheduled {Apri Routine per {name}} triggers {Apri Trigger per {name}} other {{name}}}"
+    },
+    "connect": {
+        "added": "{name} aggiunto",
+        "connectedNote": "Collegato, il coworker può usarlo",
+        "signInNote": "Accedi una volta così il coworker può usarlo",
+        "connected": "Collegato",
+        "signingIn": "Accesso…",
+        "signIn": "Accedi",
+        "signInNeeded": "Accesso richiesto",
+        "unreachable": "Irraggiungibile",
+        "couldNotConnect": "Impossibile collegare {name}",
+        "notAdded": "Non aggiunto",
+        "customServer": "Server MCP personalizzato",
+        "customServerAt": "Server MCP personalizzato · {host}",
+        "connecting": "Connessione…",
+        "connect": "Collega",
+        "installed": "{name} installato",
+        "availableNextTurn": "Disponibile al prossimo turno: {tools}"
+    },
+    "event": {
+        "notification": "Ti ha inviato una notifica",
+        "setUp": "{name} è configurato",
+        "setupComplete": "Configurazione completata",
+        "schedules": "{count, plural, one {# pianificazione attiva} other {# pianificazioni attive}}",
+        "triggers": "{count, plural, one {# trigger attivo} other {# trigger attivi}}",
+        "newBrainPage": "Nuova pagina Brain: {title}",
+        "brainChange": "Modifica al Brain: {title}",
+        "proposedNote": "Proposta in revisione. Nulla cambia finché qualcuno non la accetta.",
+        "undone": "Annullato: {title}",
+        "undoneNote": "È tornata la versione precedente.",
+        "undo": "Annulla",
+        "undoFailed": "Impossibile annullare questa modifica",
+        "tryAgainShortly": "Riprova tra un momento."
+    },
+    "brain": {
+        "saved": "Brain aggiornato: {title}",
+        "created": "Nuova pagina Brain: {title}",
+        "deleted": "Rimosso dal Brain: {title}",
+        "accepted": "Modifica accettata: {title}",
+        "acceptedBy": "Accettata la modifica di {name}: {title}",
+        "dismissed": "Modifica ignorata: {title}",
+        "dismissedBy": "Ignorata la modifica di {name}: {title}",
+        "notes": {
+            "saved": "Salvato. Ogni coworker lo legge dalla prossima esecuzione.",
+            "deleted": "Nessun coworker lo legge più. La cronologia resta.",
+            "accepted": "Salvato. Ogni coworker lo legge dalla prossima esecuzione.",
+            "dismissed": "La pagina è invariata."
+        }
+    },
+    "file": {
+        "open": "Apri {name}",
+        "title": "{count, plural, =0 {File} one {File} other {# file}}",
+        "size": {
+            "b": "{value} o",
+            "kb": "{value} kB",
+            "mb": "{value} Mo"
+        }
+    },
+    "skill": {
+        "remembering": "Memorizzazione",
+        "remembered": "Memorizzato",
+        "failed": "Impossibile memorizzare",
+        "retry": "Riprova",
+        "dismiss": "Ignora",
+        "notRemembered": "Non memorizzato",
+        "remember": "Memorizza",
+        "no": "No, grazie",
+        "hideDetails": "Nascondi dettagli",
+        "showDetails": "Mostra dettagli"
+    },
+    "sources": {
+        "count": "{count, plural, one {# fonte} other {# fonti}}"
+    },
+    "table": {
+        "partial": "{shown} di {total}"
+    }
+}

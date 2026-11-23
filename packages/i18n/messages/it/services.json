@@ -1,0 +1,149 @@
+{
+    "appAccount": {
+        "addAccount": "Aggiungi account",
+        "connectTitle": "Collega un account {provider}",
+        "connectHint": "Collegato una volta per il workspace, poi ogni coworker può agire con esso.",
+        "connect": "Collega {provider}",
+        "actsAs": "Agisce come",
+        "accountName": "Account {provider}",
+        "selected": "Questo coworker agisce con questo account",
+        "appAccount": "Account {app}",
+        "needsAttention": "Richiede attenzione in {app}",
+        "wakeWhen": "Attiva questo coworker quando",
+        "timing": {
+            "rightAway": "Subito",
+            "everyFewHours": "Controllato ogni poche ore"
+        },
+        "unavailable": "{app} non è ancora disponibile in questo workspace.",
+        "wakeEvents": {
+            "message_received": "Arriva un messaggio",
+            "accepted_invitation": "Un invito viene accettato",
+            "invitation_received": "Viene ricevuto un invito"
+        }
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "Accedi",
+            "key": "Chiave API",
+            "stdio": "Locale",
+            "app": "Account workspace",
+            "other": "Collega"
+        },
+        "description": {
+            "oauth": "Accedi tramite un popup sicuro.",
+            "key": "Incolla una chiave API del servizio.",
+            "stdio": "Gira in locale sul tuo engine.",
+            "app": "Scegli un account collegato al workspace.",
+            "other": "Nessuna credenziale richiesta."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "Autorizzazione non riuscita",
+        "startFailed": "Avvio connessione non riuscito",
+        "startOAuthFailed": "Avvio OAuth non riuscito",
+        "connectedAs": "Collegato come {account}",
+        "connected": "Collegato",
+        "retry": "Riprova",
+        "secureTitle": "Connessione sicura",
+        "secureBody": "Questa connessione è gestita da un partner di fiducia.",
+        "waiting": "In attesa di autorizzazione…",
+        "connect": "Collega"
+    },
+    "credentialGuide": {
+        "title": "Come ottenere la tua {label}"
+    },
+    "customMcp": {
+        "custom": "Personalizzato",
+        "connect": "Collega",
+        "edit": "Modifica {name}",
+        "remove": "Rimuovi {name}",
+        "removeTitle": "Rimuovere {name}?",
+        "removeDescription": "Il coworker perde tutti gli strumenti esposti da questo server e l'accesso viene cancellato.",
+        "removeConfirm": "Rimuovi",
+        "status": {
+            "connected": "Collegato · {count, plural, one {# strumento} other {# strumenti}}",
+            "needsAuth": "Accesso richiesto",
+            "unreachable": "Irraggiungibile",
+            "noAnswer": "Il server non ha risposto."
+        }
+    },
+    "requestApp": {
+        "required": "Descrivi l'app che ti serve",
+        "sent": "Richiesta inviata. Grazie, la esaminiamo.",
+        "title": "Richiedi un'app",
+        "description": "Dicci quale app ti serve e come la useresti. Pensiamo noi al resto.",
+        "placeholder": "Descrivi l'app che ti serve…",
+        "cancel": "Annulla",
+        "send": "Invia richiesta"
+    },
+    "alternatives": {
+        "label": "Funziona anche con"
+    },
+    "configForm": {
+        "configured": "{name} configurato",
+        "connectTitle": "Collega {name}",
+        "signInOAuth": "Accedi a {name} così il tuo agent può usarlo.",
+        "signInManaged": "Accedi con {name} così il tuo agent può usarlo. Rerun gestisce la connessione per te.",
+        "setUp": "Configura {name}",
+        "authentication": "Autenticazione",
+        "backToMethods": "Torna ai metodi",
+        "connecting": "Connessione…",
+        "connect": "Collega",
+        "installing": "Installazione…",
+        "chooseAccount": "Scegli un account",
+        "install": "Installa",
+        "noTarget": "Questo servizio richiede l'accesso ma non ha restituito un target di connessione.",
+        "missingFields": "Mancano ancora alcuni campi obbligatori."
+    },
+    "fields": {
+        "selectPlaceholder": "Seleziona…"
+    },
+    "installed": {
+        "title": "{name} installato",
+        "nextTurn": "Disponibile al prossimo turno: {tools}"
+    },
+    "list": {
+        "emptyTitle": "Nessuna app trovata",
+        "emptyDescription": "Nessuna app corrisponde alla ricerca.",
+        "request": "Richiedi un'app",
+        "installed": "Installata",
+        "addAccount": "Aggiungi account",
+        "needsSignIn": "Serve accesso",
+        "needsSetup": "Serve configurazione",
+        "removeApp": "Rimuovi app",
+        "finishSetup": "Completa configurazione",
+        "install": "Installa"
+    },
+    "suggestion": {
+        "loading": "Caricamento app suggerite…",
+        "loadFailed": "Impossibile caricare {name}.",
+        "notFoundSkipped": "Non trovata nel catalogo, saltata.",
+        "notNow": "Non ora",
+        "connect": "Collega",
+        "cancel": "Annulla",
+        "connected": "{name} collegata",
+        "reconnect": "Riconnetti",
+        "notFound": "Non trovata nel catalogo.",
+        "skipped": "Saltata.",
+        "skip": "Salta",
+        "finish": "Fine",
+        "nextApp": "App successiva",
+        "fromVault": "Già nel Vault",
+        "useAccount": "Usa {label}",
+        "connectNew": "Nuovo account"
+    },
+    "signInPopup": {
+        "connecting": "Connessione a {name}…"
+    },
+    "categories": {
+        "payments": "Pagamenti",
+        "ecommerce": "E-commerce",
+        "crm": "CRM",
+        "marketing": "Marketing",
+        "seo": "SEO",
+        "analytics": "Analisi",
+        "dev": "Sviluppo",
+        "productivity": "Produttività",
+        "other": "Altro"
+    }
+}

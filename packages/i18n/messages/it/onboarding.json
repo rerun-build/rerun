@@ -1,0 +1,106 @@
+{
+    "metaTitle": "Benvenuto",
+    "back": "Indietro",
+    "continue": "Continua",
+    "site": {
+        "title": "Qual è il tuo sito web?",
+        "titleNamed": "Ciao {name}, qual è il tuo sito web?",
+        "description": "Lo leggiamo per comporre il tuo team.",
+        "label": "Sito web aziendale",
+        "placeholder": "acme.com",
+        "continue": "Continua",
+        "skip": "Non ne ho uno"
+    },
+    "industry": {
+        "title": "Qual è il tuo settore?",
+        "description": "Il tuo team si adatta a esso.",
+        "other": "Altro",
+        "otherLabel": "Il tuo settore",
+        "otherPlaceholder": "Panificio, studio dentistico, palestra…"
+    },
+    "role": {
+        "title": "Qual è il tuo ruolo?",
+        "description": "Il tuo primo coworker lavorerà per te.",
+        "other": "Altro",
+        "otherLabel": "Il tuo ruolo",
+        "otherPlaceholder": "Head of Growth"
+    },
+    "roles": {
+        "founderAgencyOwner": "Fondatore / Titolare di agenzia",
+        "accountOrClientLead": "Account o referente clienti",
+        "marketingCreative": "Marketing / Creativo",
+        "operations": "Operations",
+        "founderStoreOwner": "Fondatore / Titolare di negozio",
+        "marketingGrowth": "Marketing / Growth",
+        "customerCare": "Assistenza clienti",
+        "operationsLogistics": "Operations / Logistica",
+        "founderCeo": "Founder / CEO",
+        "productOrEngineering": "Prodotto o Ingegneria",
+        "salesOrSupport": "Vendite o Supporto",
+        "salesRepOrAe": "Commerciale o Account Executive",
+        "salesLeadership": "Responsabile vendite",
+        "marketingDemandGen": "Marketing / Demand generation",
+        "recruiter": "Recruiter",
+        "talentOrHrLead": "Responsabile HR o Talent",
+        "founderBroker": "Fondatore / Broker",
+        "agent": "Agente",
+        "propertyOrPortfolioManager": "Property manager o gestione immobili",
+        "marketing": "Marketing",
+        "founderPartner": "Fondatore / Partner",
+        "lawyerOrCounsel": "Avvocato o consulente legale",
+        "paralegalOrLegalOps": "Paralegale o legal ops",
+        "businessDevelopment": "Business development",
+        "creatorFounder": "Creator / Fondatore",
+        "editorOrWriter": "Editor o redattore",
+        "communityOrSocial": "Community o social media",
+        "sponsorshipsBusiness": "Sponsorizzazioni / Business",
+        "financeOrAdmin": "Finanza o Amministrazione",
+        "projectOrTeamLead": "Project manager o team lead",
+        "sales": "Vendite"
+    },
+    "team": {
+        "title": "Invita il tuo team",
+        "description": "I tuoi coworker lavorano per tutti voi.",
+        "label": "Email di un collega",
+        "placeholder": "nome@azienda.it",
+        "invite": "Invita",
+        "invited": "Invitato",
+        "link": "Link di invito",
+        "copy": "Copia",
+        "copied": "Copiato",
+        "skip": "Salta"
+    },
+    "trial": {
+        "title": "Inizia la prova gratuita",
+        "description": "I tuoi coworker iniziano a lavorare non appena comincia.",
+        "start": "Inizia la mia prova gratuita"
+    },
+    "engine": {
+        "title": "Configurazione del tuo workspace",
+        "milestones": {
+            "trial": "Conferma della prova…",
+            "machine": "Prenotazione della tua macchina…",
+            "engine": "Attivazione del tuo Chief of Staff…"
+        },
+        "ready": "Costruiamo il tuo team insieme.",
+        "greeting": "Ciao, sono il tuo Chief of Staff",
+        "greetingNamed": "Ciao {name}, sono il tuo Chief of Staff",
+        "failed": "La configurazione della macchina richiede più tempo del previsto.",
+        "retry": "Riprova",
+        "enterAnyway": "Entra comunque",
+        "enter": "Iniziamo",
+        "wait": "Un momento"
+    },
+    "industries": {
+        "agencies": "Agenzie",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Vendite",
+        "recruiting": "Recruiting",
+        "real-estate": "Immobiliare",
+        "legal": "Legale e compliance",
+        "creators": "Creator",
+        "productivity": "Produttività",
+        "other": "Altro"
+    }
+}

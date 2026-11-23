@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "Desktop di {name}",
+        "titleFallback": "Computer",
+        "description": "Lo schermo su cui lavora questo coworker. Ciò che fai qui, lo vede dopo.",
+        "takeoverDescription": "Sei nel browser del tuo coworker. Premi Fine quando può continuare.",
+        "takeoverHoldsBrowser": "Il browser del tuo coworker è già aperto per questa richiesta.",
+        "clipboardDenied": "Il browser non ha permesso a Rerun di leggere gli appunti.",
+        "disconnectedDescription": "La connessione alla macchina si è chiusa. Nulla è andato perso.",
+        "reconnect": "Riconnetti",
+        "tryAgain": "Riprova"
+    },
+    "screen": {
+        "connecting": "Connessione allo schermo...",
+        "unavailable": "Lo schermo non è disponibile",
+        "wentAway": "Lo schermo non c'è più",
+        "resize": "Ridimensiona lo schermo"
+    },
+    "notch": {
+        "browser": "Browser web",
+        "closeBrowser": "Chiudi browser",
+        "files": "File",
+        "terminal": "Terminale",
+        "paste": "Incolla",
+        "done": "Fine",
+        "close": "Chiudi"
+    },
+    "screenCard": {
+        "openBrowser": "Apri browser",
+        "takeControl": "Prendi il controllo"
+    }
+}

@@ -1,0 +1,94 @@
+{
+    "update": {
+        "ready": "Rerun {version} è listo",
+        "description": "Riavvia l'app per usare la nuova versione.",
+        "restart": "Reiniciar"
+    },
+    "downloads": {
+        "done": "{filename} descargado",
+        "failed": "Non è stato possibile scarica {filename}",
+        "show": "Mostra nella cartella"
+    },
+    "handoff": {
+        "title": "Accedi en {app}",
+        "body": "Continuare su {app} come {account}?",
+        "continue": "Continua",
+        "switchAccount": "Usa un altro account",
+        "doneTitle": "Torna su {app}",
+        "doneBody": "{app} completa l'accesso da solo. Puoi chiudere questa scheda.",
+        "codeHint": "Se {app} non si è aperta, incolla questo codice al suo interno:",
+        "copyCode": "Copia il codice",
+        "failed": "Impossibile far accedere l'app. Riprova.",
+        "invalidTitle": "Questo link è scaduto",
+        "invalidBody": "Riavvia l'accesso dall'app desktop."
+    },
+    "signIn": {
+        "waitingTitle": "Continua nel browser",
+        "waitingBody": "Accedi nella finestra del browser che si è aperta, poi torna qui.",
+        "reopen": "Riapri il browser",
+        "pasteCode": "Incolla invece un codice",
+        "codeLabel": "Codice dal browser",
+        "submit": "Accedi",
+        "back": "Indietro",
+        "errors": {
+            "expired": "Questo codice è scaduto. Ricomincia.",
+            "invalid": "Questo codice non è valido. Inizia di nuovo.",
+            "state-mismatch": "Questo accesso è stato avviato da un'altra finestra. Ricomincia.",
+            "network": "Impossibile raggiungere Rerun. Controlla la connessione.",
+            "cancelled": "L'accesso è stato annullato."
+        }
+    },
+    "settings": {
+        "openAtLogin": "Apri al login",
+        "openAtLoginMac": "Rerun si avvia con il Mac, nella barra dei menu.",
+        "openAtLoginOther": "Rerun si avvia con il computer, nell'area di notifica.",
+        "closeToTray": "Continua a funzionare quando è chiusa",
+        "closeToTrayHint": "Chiudendo la finestra, Rerun resta nell'area di notifica e le notifiche continuano ad arrivare.",
+        "updates": "Actualizaciones",
+        "version": "Rerun {version}",
+        "checking": "Ricerca di aggiornamenti…",
+        "downloading": "Download dell'aggiornamento… {percent}%",
+        "updateFailed": "Non se pudieron cerca actualizaciones.",
+        "check": "Cerca actualizaciones",
+        "restart": "Reiniciar per actualizar a {version}",
+        "quickAsk": "Domanda rapida",
+        "quickAskHint": "{shortcut} apri un campo per tu Chief of Staff da cualquier app.",
+        "quickAskOn": "Apre un campo per il tuo Chief of Staff da qualsiasi app.",
+        "quickAskOff": "Disattivato. Registra una scorciatoia per attivarlo.",
+        "shortcut": {
+            "record": "Registra scorciatoia",
+            "typing": "Digita una scorciatoia",
+            "tryAnother": "Provane un'altra",
+            "recordingHint": "Esc annulla, ⌫ disattiva",
+            "change": "Scorciatoia {keys}, clicca per modificare",
+            "needsModifier": "Aggiungi un tasto modificatore, come {key}",
+            "reserved": "{keys} è usato da {owner, select, spotlight {Spotlight} finder {Ricerca Finder} inputSources {sorgenti di input} appSwitcher {il selettore app} screenshot {istantanee schermo} windowMenu {il menu Finestra} system {il sistema} other {ogni app}}",
+            "taken": "{keys} è già usato da un'altra app"
+        },
+        "quickAskVoice": "Domanda rapida vocale",
+        "quickAskVoiceOn": "Parla con il tuo Chief of Staff da qualsiasi app."
+    },
+    "openInApp": {
+        "title": "Aprire questa pagina in {app}?",
+        "open": "Apri"
+    },
+    "quickAsk": {
+        "placeholder": "Chiedi al tuo Chief of Staff…",
+        "hint": "Invio per inviare, Esc per chiudere",
+        "send": "Invia",
+        "holdToTalk": "Tieni premuto <key>Spazio</key> per parlare",
+        "releaseToSend": "Rilascia per inviare, Esc per annullare",
+        "sent": "Inviato al tuo Chief of Staff",
+        "nothingHeard": "Nessun suono rilevato. Tieni premuto Spazio e parla.",
+        "transcriptionFailed": "Impossibile convertire l'audio in testo. Riprova o scrivi.",
+        "micDeniedTitle": "Rerun non può sentirti",
+        "micDeniedBody": "Consenti il microfono per Rerun nelle impostazioni di sistema.",
+        "openSettings": "Apri Impostazioni",
+        "typeInstead": "Scrivi invece",
+        "toggleHint": "Invio per inviare, Esc per annullare",
+        "cancel": "Annulla"
+    },
+    "server": {
+        "otherServer": "Usa un altro server Rerun"
+    }
+}

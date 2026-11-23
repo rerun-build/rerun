@@ -1,0 +1,55 @@
+{
+    "linkOff": {
+        "title": "Questo link non funziona più",
+        "subtitle": "Chi l'ha condiviso l'ha disattivato."
+    },
+    "unsubscribe": {
+        "title": "Preferenze email",
+        "subtitle": "Aggiorna quali email Rerun ti invia. Nessun accesso richiesto.",
+        "subtitleRuns": "Scegli se i tuoi coworker possono inviarti email. Nessun accesso richiesto.",
+        "invalid": "Questo link di disiscrizione non è valido o è scaduto.",
+        "logIn": "Accedi per gestire le preferenze"
+    },
+    "publishedView": {
+        "protectedTitle": "Pagina protetta",
+        "protectedDescription": "Condivisa da {workspace}. Accedi o conferma la tua email per aprirla.",
+        "publishedBy": "Pubblicata da {agent} in {workspace}",
+        "publishedByUnknown": "Pubblicata da un coworker in {workspace}",
+        "untitled": "Pagina pubblicata"
+    },
+    "publishedAuth": {
+        "metaTitle": "Apri una pagina",
+        "noAccess": "Non hai accesso",
+        "signedInAs": "Accesso come {email}. Questa pagina è per i membri di {workspace}.",
+        "signedInAsOther": "Accesso con un altro account. Questa pagina è per i membri di {workspace}."
+    },
+    "gate": {
+        "open": "Apri",
+        "errors": {
+            "limited": "Troppi tentativi. Attendi qualche minuto.",
+            "password": "Password errata",
+            "code": "Codice errato o scaduto",
+            "email": "Inserisci un'email valida"
+        },
+        "password": {
+            "subtitle": "{workspace} ha protetto questa pagina con una password",
+            "placeholder": "Parola d'accesso"
+        },
+        "code": {
+            "title": "Controlla la casella",
+            "subtitle": "Se {email} può aprire questa pagina, un codice è in arrivo",
+            "otherEmail": "Usa un'altra email"
+        },
+        "email": {
+            "subtitle": "Conferma la tua email per aprirla",
+            "submit": "Invia codice"
+        },
+        "members": {
+            "subtitle": "Per i membri di {workspace}",
+            "continue": "Continua con Rerun"
+        }
+    },
+    "publishedSite": {
+        "notFound": "Non trovato"
+    }
+}
