@@ -2,15 +2,16 @@ import { visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
-import { NoEngineError } from '@/app/api/_services/workspace-engine.service'
+import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { listBrainProposalsAction, loadBrainAction, setBrainFilesMetaAction } from './brain.actions'
+import { createBrainSkillAction, listBrainProposalsAction, listBrainSkillsAction, loadBrainAction, setBrainFilesMetaAction } from './brain.actions'
 import { listWorkspaceTablesAction } from './workspace-db.actions'
 import { listWorkspaceFilesAction } from './workspace-file.actions'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
-vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: (ctx: unknown) => ctx, visibleSpaceIds: vi.fn() }))
+vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: (ctx: unknown) => ctx, visibleSpaceIds: vi.fn(), manageableSpaceIds: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
 vi.mock('@/app/api/_services/coworker-box.service', () => ({ syncCoworkerBoxes: vi.fn() }))
 const rows = vi.hoisted(() => ({ spaces: [] as unknown[], agents: [] as unknown[] }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: async (_client: unknown, table: string) => ({ data: table === 'spaces' ? rows.spaces : rows.agents }) }))
@@ -30,6 +31,8 @@ vi.mock('@/lib/engine/client', () => ({
     countBrainProposals: vi.fn(),
     listBrainPages: vi.fn(),
     listBrainFileMeta: vi.fn(),
+    listBrainSkills: vi.fn(async () => []),
+    createBrainSkill: vi.fn(),
     setBrainFileMeta: vi.fn(),
     listBrainProposals: vi.fn(),
     listDbTables: vi.fn(),
@@ -129,8 +132,25 @@ describe('the Boxes the Brain files under', () => {
             ],
             coworkers: [{ id: 'a1', name: 'Lead Finder', handle: 'lead-finder', spaceId: 'b1' }],
             files: [{ path: 'deck.pdf', kind: 'file', tags: ['acme'], createdBy: 'user:theo', spaceId: 'b1', createdAt: '2026-01-01' }],
+            skills: [],
+            skillsAvailable: true,
         })
         expect(syncCoworkerBoxes).toHaveBeenCalledWith(7)
+    })
+
+    it('reads the skills of an engine from before them as none, and not to be written', async () => {
+        vi.mocked(visibleSpaceIds).mockResolvedValue('all')
+        vi.mocked(engine.listBrainSkills).mockRejectedValueOnce(new engine.EngineRequestError('rerun-engine GET /brain/skills failed: 404', 404))
+        expect(await loadBrainAction()).toMatchObject({ available: true, skills: [], skillsAvailable: false })
+        vi.mocked(engine.listBrainSkills).mockRejectedValueOnce(new engine.EngineRequestError('rerun-engine GET /brain/skills failed: 404', 404))
+        expect(await listBrainSkillsAction()).toMatchObject({ available: false, skills: [] })
+    })
+
+    it('names the skill already in the Brain when a new one takes its name', async () => {
+        vi.mocked(getWorkspaceConnection).mockResolvedValueOnce(conn)
+        vi.mocked(engine.createBrainSkill).mockRejectedValue(new engine.EngineRequestError('rerun-engine POST /brain/skills failed: 409', 409))
+        await expect(createBrainSkillAction({ name: 'Weekly report', description: '', body: 'Steps.' })).resolves.toMatchObject({ ok: false, code: 'brainSkillExists', params: { name: 'Weekly report' } })
+        expect(engine.createBrainSkill).toHaveBeenCalledWith(conn, { name: 'Weekly report', description: '', body: 'Steps.', author: 'user:theo@example.com' })
     })
 
     it('reads the files of an engine from before filing as unfiled', async () => {

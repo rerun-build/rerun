@@ -1,16 +1,18 @@
 'use server'
 
-import { actorFromContext, visibleSpaceIds } from '@/app/api/_auth/access'
+import { actorFromContext, manageableSpaceIds, visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import type { BrainBox, BrainCoworker } from '@/lib/brain/items'
+import { connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { selectMany } from '@/supabase/supabase-helpers'
-import { brainFilesMetaWriteSchema, brainItemMetaPatchSchema, type BrainFileMeta, type BrainItemMetaPatch, type BrainPageSummary, type BrainPageType, type BrainProposal, type BrainRevision } from '@rerun/contracts'
-import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
+import { brainFilesMetaWriteSchema, brainItemMetaPatchSchema, type BrainFileMeta, type BrainItemMetaPatch, type BrainPageSummary, type BrainPageType, type BrainProposal, type BrainRevision, type BrainSkill, type SkillSummary } from '@rerun/contracts'
+import { failure, failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
 
 // A box that predates the brain answers 404 on every /brain route: the dialog shows an "update
 // your box" state rather than an error.
@@ -25,12 +27,12 @@ async function authorContext() {
 // A workspace gets its machine when its first coworker is built: until then, an onboarding user who
 // opens the Brain reaches a workspace with nowhere to keep it.
 export type BrainOverview =
-    | { available: true; pages: BrainPageSummary[]; openProposals: number; boxes: BrainBox[]; coworkers: BrainCoworker[]; files: BrainFileMeta[] }
+    | { available: true; pages: BrainPageSummary[]; openProposals: number; boxes: BrainBox[]; coworkers: BrainCoworker[]; files: BrainFileMeta[]; skills: BrainSkill[]; skillsAvailable: boolean }
     | { available: false; reason: 'no_machine' | 'outdated' }
 
 // The Boxes the person can open, in the order of the sidebar, and the coworkers sitting in them: a
 // Box they cannot open stays out of the Brain's list, and its items read as filed for everyone.
-async function readBoxes(): Promise<{ boxes: BrainBox[]; coworkers: BrainCoworker[]; workspaceId: number }> {
+async function readBoxes(): Promise<{ boxes: BrainBox[]; coworkers: BrainCoworker[]; engineAgentIds: Map<string, string>; workspaceId: number }> {
     const ctx = await requireWorkspaceContext()
     const visible = await visibleSpaceIds(actorFromContext(ctx))
     const [spaces, agents] = await Promise.all([
@@ -42,8 +44,10 @@ async function readBoxes(): Promise<{ boxes: BrainBox[]; coworkers: BrainCoworke
         .filter(space => canSee(space.id))
         .sort((a, b) => (a.sidebar_order ?? Number.MAX_SAFE_INTEGER) - (b.sidebar_order ?? Number.MAX_SAFE_INTEGER) || (a.created_at ?? '').localeCompare(b.created_at ?? ''))
         .map(space => ({ id: space.id, name: space.name?.trim() || null }))
-    const coworkers = (agents.data ?? []).filter(agent => canSee(agent.space_id)).map(agent => ({ id: agent.id, name: agent.name, handle: agent.handle ?? null, spaceId: agent.space_id }))
-    return { boxes, coworkers, workspaceId: ctx.workspace.id }
+    const seen = (agents.data ?? []).filter(agent => canSee(agent.space_id))
+    const coworkers = seen.map(agent => ({ id: agent.id, name: agent.name, handle: agent.handle ?? null, spaceId: agent.space_id }))
+    const engineAgentIds = new Map(seen.flatMap(agent => (agent.engine_agent_id ? [[agent.id, agent.engine_agent_id] as const] : [])))
+    return { boxes, coworkers, engineAgentIds, workspaceId: ctx.workspace.id }
 }
 
 // An engine from before filing answers 404 here: its files read as unfiled.
@@ -52,6 +56,16 @@ async function readFileMeta(conn: EngineConnection): Promise<BrainFileMeta[]> {
         return await engine.listBrainFileMeta(conn)
     } catch (err) {
         if (isMissingRoute(err)) return []
+        throw err
+    }
+}
+
+// An engine from before the Brain's skills answers 404 here: null, so nothing offers to write one.
+async function readBrainSkills(conn: EngineConnection): Promise<BrainSkill[] | null> {
+    try {
+        return await engine.listBrainSkills(conn)
+    } catch (err) {
+        if (isMissingRoute(err)) return null
         throw err
     }
 }
@@ -68,9 +82,15 @@ export async function listBrainFileMetaAction(): Promise<BrainFileMeta[] | null>
 export async function loadBrainAction(): Promise<BrainOverview> {
     try {
         const conn = await requireWorkspaceConnection()
-        const [pages, openProposals, files, { boxes, coworkers, workspaceId }] = await Promise.all([engine.listBrainPages(conn), engine.countBrainProposals(conn), readFileMeta(conn), readBoxes()])
+        const [pages, openProposals, files, skills, { boxes, coworkers, workspaceId }] = await Promise.all([
+            engine.listBrainPages(conn),
+            engine.countBrainProposals(conn),
+            readFileMeta(conn),
+            readBrainSkills(conn),
+            readBoxes(),
+        ])
         await syncCoworkerBoxes(workspaceId)
-        return { available: true, pages, openProposals, boxes, coworkers, files }
+        return { available: true, pages, openProposals, boxes, coworkers, files, skills: skills ?? [], skillsAvailable: skills !== null }
     } catch (err) {
         if (err instanceof NoEngineError) return { available: false, reason: 'no_machine' }
         if (isMissingRoute(err)) return { available: false, reason: 'outdated' }
@@ -190,5 +210,88 @@ export async function decideBrainProposalAction(
         return { ok: true, proposal }
     } catch (err) {
         return failureOf(err, 'updateBrainProposalFailed')
+    }
+}
+
+// --- Skills of the Brain ---
+// Every coworker of the box uses them. Writing one takes what writing a page takes; sharing a
+// coworker's own skill takes managing that coworker, since the skill leaves its folder.
+
+export type BrainSkillResult = { ok: true; skill: BrainSkill } | ActionFailure
+
+const isConflict = (err: unknown) => err instanceof engine.EngineRequestError && err.status === 409
+
+// For a coworker's Skills tab: the Brain's skills and the coworkers who put them there. `available`
+// is false on an engine from before them.
+export async function listBrainSkillsAction(): Promise<{ available: boolean; skills: BrainSkill[]; coworkers: BrainCoworker[] } | null> {
+    try {
+        const [skills, { coworkers }] = await Promise.all([readBrainSkills(await requireWorkspaceConnection()), readBoxes()])
+        return { available: skills !== null, skills: skills ?? [], coworkers }
+    } catch {
+        return null
+    }
+}
+
+export async function createBrainSkillAction(input: { name: string; description: string; body: string }): Promise<BrainSkillResult> {
+    try {
+        const { conn, author } = await authorContext()
+        return { ok: true, skill: await engine.createBrainSkill(conn, { ...input, author }) }
+    } catch (err) {
+        return isConflict(err) ? failure('brainSkillExists', { name: input.name }) : failureOf(err, 'saveBrainSkillFailed')
+    }
+}
+
+export async function updateBrainSkillAction(slug: string, patch: { description?: string; body?: string }): Promise<BrainSkillResult> {
+    try {
+        return { ok: true, skill: await engine.updateBrainSkill(await requireWorkspaceConnection(), slug, patch) }
+    } catch (err) {
+        return failureOf(err, 'saveBrainSkillFailed')
+    }
+}
+
+export async function deleteBrainSkillAction(slug: string): Promise<{ ok: boolean } & Partial<ActionRefusal>> {
+    try {
+        await engine.deleteBrainSkill(await requireWorkspaceConnection(), slug)
+        return { ok: true }
+    } catch (err) {
+        return { ok: false, ...refusalOf(err, 'deleteBrainSkillFailed') }
+    }
+}
+
+// What each coworker the person can see holds of its own, apps' skills left out: they stay the app's.
+export type ShareableSkills = { coworker: BrainCoworker; canShare: boolean; skills: SkillSummary[] }
+
+export async function listShareableSkillsAction(): Promise<ShareableSkills[]> {
+    try {
+        const ctx = await requireWorkspaceContext()
+        const [conn, { coworkers, engineAgentIds }, manageable] = await Promise.all([requireWorkspaceConnection(), readBoxes(), manageableSpaceIds(actorFromContext(ctx))])
+        const lists = await Promise.all(
+            coworkers.map(async coworker => {
+                const engineAgentId = engineAgentIds.get(coworker.id)
+                if (!engineAgentId) return null
+                const read = await Promise.all([engine.listSkills(conn, engineAgentId), readRegistry(conn, engineAgentId)]).catch(() => null)
+                if (!read) return null
+                const [skills, registry] = read
+                const fromApps = connectorSkillSlugs(registry)
+                const own = skills.filter(skill => !fromApps.has(skill.slug)).map(({ slug, name, description }) => ({ slug, name, description }))
+                const canShare = manageable === 'all' || manageable.has(coworker.spaceId)
+                return own.length > 0 ? { coworker, canShare, skills: own } : null
+            })
+        )
+        return lists.filter(list => list !== null)
+    } catch {
+        return []
+    }
+}
+
+export async function shareSkillToBrainAction(agentId: string, slug: string): Promise<BrainSkillResult> {
+    try {
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { coworkers } = await readBoxes()
+        const coworker = coworkers.find(item => item.id === agentId)
+        const author = `agent:${coworker?.handle ?? coworker?.name ?? engineAgentId}`
+        return { ok: true, skill: await engine.shareSkillToBrain(conn, engineAgentId, slug, author) }
+    } catch (err) {
+        return isConflict(err) ? failure('brainSkillShareTaken', { slug }) : failureOf(err, 'shareBrainSkillFailed')
     }
 }

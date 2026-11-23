@@ -46,6 +46,11 @@ import {
     type ReasoningEffort,
     brainPageResponseSchema,
     brainPagesListSchema,
+    brainSkillSchema,
+    brainSkillsListSchema,
+    type BrainSkill,
+    type BrainSkillCreate,
+    type BrainSkillUpdate,
     brainProposalCountSchema,
     brainProposalResponseSchema,
     brainProposalsListSchema,
@@ -1022,6 +1027,32 @@ export async function writeBrainPage(conn: EngineConnection, slug: string, body:
 
 export async function setBrainPageMeta(conn: EngineConnection, slug: string, patch: BrainItemMetaPatch): Promise<BrainPageDetail> {
     return request(conn, `/brain/pages/${encodeURIComponent(slug)}/meta`, { method: 'PATCH', body: JSON.stringify(patch) }, d => brainPageResponseSchema.parse(d))
+}
+
+// The skills of the Brain, used by every coworker of the box. A box that predates them answers 404.
+export async function listBrainSkills(conn: EngineConnection): Promise<BrainSkill[]> {
+    return request(conn, '/brain/skills', { method: 'GET' }, d => brainSkillsListSchema.parse(d).skills)
+}
+
+export async function readBrainSkill(conn: EngineConnection, slug: string): Promise<BrainSkill> {
+    return request(conn, `/brain/skills/${encodeURIComponent(slug)}`, { method: 'GET' }, d => brainSkillSchema.parse(d))
+}
+
+export async function createBrainSkill(conn: EngineConnection, input: BrainSkillCreate): Promise<BrainSkill> {
+    return request(conn, '/brain/skills', { method: 'POST', body: JSON.stringify(input) }, d => brainSkillSchema.parse(d))
+}
+
+export async function updateBrainSkill(conn: EngineConnection, slug: string, patch: BrainSkillUpdate): Promise<BrainSkill> {
+    return request(conn, `/brain/skills/${encodeURIComponent(slug)}`, { method: 'PATCH', body: JSON.stringify(patch) }, d => brainSkillSchema.parse(d))
+}
+
+export async function deleteBrainSkill(conn: EngineConnection, slug: string): Promise<void> {
+    await request(conn, `/brain/skills/${encodeURIComponent(slug)}`, { method: 'DELETE' }, () => null)
+}
+
+// Moves the coworker's own skill into the Brain: it leaves the coworker's folder.
+export async function shareSkillToBrain(conn: EngineConnection, engineAgentId: string, slug: string, author: string): Promise<BrainSkill> {
+    return request(conn, '/brain/skills/share', { method: 'POST', body: JSON.stringify({ agentId: engineAgentId, slug, author }) }, d => brainSkillSchema.parse(d))
 }
 
 // How the Brain files the shared folder: tags, who added each file and its Box.
