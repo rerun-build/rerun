@@ -23,7 +23,7 @@ import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.j
 import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, relayedBlock, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
-import { OPENAI_CHAT_PROVIDERS, type LoadedAgent } from '../agents/types.js'
+import type { LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
 import { answeringModel } from '../agents/rerun-upstream.js'
 import { listAgentIndex, setAgentStatus } from '../db/repos/agents.js'
@@ -566,7 +566,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
         const toolChars = toolPayloadChars(sentTools)
         const stored = await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars)
-        const history = repairToolPairs(OPENAI_CHAT_PROVIDERS.has(behaviourOf(provider, model)) ? withToolResultsInToolMessages(stored) : stored)
+        const history = repairToolPairs(CLI_PROVIDERS.has(provider) ? stored : withToolResultsInToolMessages(stored))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)

@@ -13,10 +13,6 @@ export const BRIDGE_SERVER_NAME = 'rerun'
 // Rerun's tools reach them bridged as an MCP server rather than through the AI SDK `tools` param.
 export const CLI_PROVIDERS = new Set<Provider>(['claude', 'codex'])
 
-// Providers whose models Rerun reaches in the OpenAI chat format (`@ai-sdk/openai`'s `.chat()`). Read on
-// `behaviourOf`, so an OpenCode model served on the `chat` wire counts as one.
-export const OPENAI_CHAT_PROVIDERS = new Set<Provider>(['custom', 'openrouter', 'rerun'])
-
 export type LoadedAgent = {
     id: string
     config: AgentConfig

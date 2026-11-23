@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { createAnthropic } from '@ai-sdk/anthropic'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
-import { generateText, type ModelMessage } from 'ai'
+import { generateText, type LanguageModel, type ModelMessage } from 'ai'
 import { modelContextWindow } from '@rerun/contracts'
 import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_TRIGGER_RATIO } from './config.js'
 import { estimateTokens } from './estimate.js'
@@ -183,6 +185,50 @@ async function openAiChatBodyOf(messages: ModelMessage[]): Promise<{ messages: A
     return JSON.parse(body)
 }
 
+// A turn as a run on Codex stores it, its own web search included.
+const CODEX_WEB_SEARCH = { type: 'webSearch', id: 'exec-1', query: 'bridge height', action: { type: 'search', query: null, queries: ['bridge height'] }, results: [{ type: 'text_result', title: 'bridge height', url: 'https://example.com' }] }
+const CODEX_TURN: ModelMessage[] = [
+    userText('Search, then list the files.'),
+    {
+        role: 'assistant',
+        content: [
+            { type: 'tool-call', toolCallId: 'exec-1', toolName: 'web_search', input: { ...CODEX_WEB_SEARCH, query: '', action: null, results: null }, providerExecuted: true },
+            { type: 'tool-result', toolCallId: 'exec-1', toolName: 'web_search', output: { type: 'json', value: CODEX_WEB_SEARCH } },
+            { type: 'tool-call', toolCallId: 'exec-2', toolName: 'shell_exec', input: { command: 'ls' }, providerExecuted: true },
+            { type: 'tool-result', toolCallId: 'exec-2', toolName: 'shell_exec', output: { type: 'text', value: 'a.txt' } },
+            { type: 'text', text: 'Done.' },
+        ],
+    } as ModelMessage,
+    userText('thanks'),
+]
+
+type WireFetch = typeof globalThis.fetch
+
+async function wireBodyOf(model: (fetch: WireFetch) => LanguageModel, messages: ModelMessage[]): Promise<Record<string, unknown>> {
+    let body: string | undefined
+    const fetch = (async (_url, init) => {
+        body = String(init?.body)
+        return new Response('{}', { status: 400 })
+    }) as WireFetch
+    const refused: unknown = await generateText({ model: model(fetch), messages, maxRetries: 0 }).catch((error: unknown) => error)
+    if (body === undefined) throw refused
+    return JSON.parse(body)
+}
+
+const anthropicModel = (fetch: WireFetch) => createAnthropic({ apiKey: 'k', fetch })('claude-opus-5-5')
+const openAiModel = (fetch: WireFetch) => createOpenAI({ apiKey: 'k', fetch })('gpt-6-sol')
+const googleModel = (fetch: WireFetch) => createGoogleGenerativeAI({ apiKey: 'k', fetch })('gemini-3-pro')
+
+type AnthropicBlock = { type: string; id?: string; tool_use_id?: string }
+
+function anthropicBlocksOf(body: Record<string, unknown>): string[][] {
+    return (body.messages as Array<{ content: AnthropicBlock[] }>).map(message => message.content.map(block => [block.type, block.id ?? block.tool_use_id].filter(Boolean).join(' ')))
+}
+
+function openAiItemsOf(body: Record<string, unknown>): Array<string | undefined> {
+    return (body.input as Array<{ type?: string; role?: string; call_id?: string }>).map(item => (item.call_id ? `${item.type} ${item.call_id}` : item.role))
+}
+
 describe('withToolResultsInToolMessages', () => {
     it('answers every call of a Claude Code turn in the OpenAI chat format', async () => {
         const sent = await openAiChatBodyOf(repairToolPairs(withToolResultsInToolMessages(CLAUDE_CODE_TURN)))
@@ -203,6 +249,70 @@ describe('withToolResultsInToolMessages', () => {
     it('leaves the turns of a tool Rerun ran untouched', () => {
         const turn = [userText('ls'), assistantCall('c1'), toolResult('c1', 'a.txt')]
         expect(withToolResultsInToolMessages(turn)).toEqual(turn)
+    })
+
+    // RER-270: the Anthropic SDK takes a provider-executed `web_search` for Anthropic's own.
+    it('answers every call of a Codex turn in the Anthropic format', async () => {
+        const body = await wireBodyOf(anthropicModel, repairToolPairs(withToolResultsInToolMessages(CODEX_TURN)))
+
+        expect(anthropicBlocksOf(body)).toEqual([['text'], ['tool_use exec-1'], ['tool_result exec-1'], ['tool_use exec-2'], ['tool_result exec-2'], ['text'], ['text']])
+        expect(JSON.stringify(body)).toContain('https://example.com')
+    })
+
+    it('answers every call of a Codex turn in the OpenAI responses format', async () => {
+        const body = await wireBodyOf(openAiModel, repairToolPairs(withToolResultsInToolMessages(CODEX_TURN)))
+
+        expect(openAiItemsOf(body)).toEqual([
+            'user',
+            'function_call exec-1',
+            'function_call_output exec-1',
+            'function_call exec-2',
+            'function_call_output exec-2',
+            'assistant',
+            'user',
+        ])
+    })
+
+    it('answers every call of a Codex turn in the Google format', async () => {
+        const body = await wireBodyOf(googleModel, repairToolPairs(withToolResultsInToolMessages(CODEX_TURN)))
+
+        const parts = (body.contents as Array<{ parts: Array<Record<string, unknown>> }>).flatMap(content => content.parts)
+        expect(parts.flatMap(part => Object.keys(part)).filter(key => key.startsWith('function'))).toEqual(['functionCall', 'functionResponse', 'functionCall', 'functionResponse'])
+    })
+
+    // A plan that runs out during the first tool leaves a call and no result at all.
+    it('keeps the call of a turn cut before its first result', async () => {
+        const turn = [
+            userText('search'),
+            { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 'exec-1', toolName: 'web_search', input: { type: 'webSearch', query: '' }, providerExecuted: true }] } as ModelMessage,
+            userText('thanks'),
+        ]
+        const sent = repairToolPairs(withToolResultsInToolMessages(turn))
+
+        expect(anthropicBlocksOf(await wireBodyOf(anthropicModel, sent))).toEqual([['text'], ['tool_use exec-1'], ['tool_result exec-1', 'text']])
+        expect(openAiItemsOf(await wireBodyOf(openAiModel, sent))).toEqual(['user', 'function_call exec-1', 'function_call_output exec-1', 'user'])
+    })
+
+    // Anthropic refuses a tool_use whose tool_result is not in the very next message.
+    it('puts a result that came late right after its call', async () => {
+        const turn = [
+            userText('both'),
+            {
+                role: 'assistant',
+                content: [
+                    { type: 'tool-call', toolCallId: 'a', toolName: 'shell_exec', input: {}, providerExecuted: true },
+                    { type: 'tool-call', toolCallId: 'b', toolName: 'shell_exec', input: {}, providerExecuted: true },
+                    { type: 'tool-result', toolCallId: 'a', toolName: 'shell_exec', output: { type: 'text', value: '1' } },
+                    { type: 'text', text: 'One is back.' },
+                    { type: 'tool-result', toolCallId: 'b', toolName: 'shell_exec', output: { type: 'text', value: '2' } },
+                    { type: 'text', text: 'Both are.' },
+                ],
+            } as ModelMessage,
+            userText('thanks'),
+        ]
+        const body = await wireBodyOf(anthropicModel, repairToolPairs(withToolResultsInToolMessages(turn)))
+
+        expect(anthropicBlocksOf(body)).toEqual([['text'], ['tool_use a', 'tool_use b'], ['tool_result a', 'tool_result b'], ['text', 'text'], ['text']])
     })
 })
 
