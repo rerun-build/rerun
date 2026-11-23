@@ -42,11 +42,12 @@ const WORKSPACE_ID = 7
 const OTHER_WORKSPACE_ID = 99
 let sandbox = true
 
-type AgentRow = { id: string; name: string; space_id: string; workspace_id: number; engine_agent_id: string }
+type AgentRow = { id: string; name: string; space_id: string | null; kind: 'coworker' | 'foreman'; workspace_id: number; engine_agent_id: string }
 
 const AGENTS: AgentRow[] = [
-    { id: 'agent-own', name: 'Scout', space_id: 'space-1', workspace_id: WORKSPACE_ID, engine_agent_id: 'engine-own' },
-    { id: 'agent-foreign', name: 'Spy', space_id: 'space-9', workspace_id: OTHER_WORKSPACE_ID, engine_agent_id: 'engine-foreign' },
+    { id: 'agent-own', name: 'Scout', space_id: 'space-1', kind: 'coworker', workspace_id: WORKSPACE_ID, engine_agent_id: 'engine-own' },
+    { id: 'agent-foreign', name: 'Spy', space_id: 'space-9', kind: 'coworker', workspace_id: OTHER_WORKSPACE_ID, engine_agent_id: 'engine-foreign' },
+    { id: 'agent-cos', name: 'Chief of Staff', space_id: null, kind: 'foreman', workspace_id: WORKSPACE_ID, engine_agent_id: FOREMAN_AGENT_ID },
 ]
 
 function eqValue(calls: readonly SupabaseCall[], column: string): unknown {
@@ -54,12 +55,11 @@ function eqValue(calls: readonly SupabaseCall[], column: string): unknown {
 }
 
 const MEMBERS = ['user-1', 'user-2']
-let session: { id: string; source: string; title?: string; automation_name?: string | null } | null = null
+let session: { id: string; source: string; title?: string; automation_name?: string | null; owner_user_id?: string | null } | null = null
 let participants: string[] = []
 let prefsOf: Record<string, unknown> = {}
 let incidentOpens = true
 let resolvedUsers: string[] = []
-let foremanThread: { id: string; user_id: string } | null = null
 
 function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table === 'engine_pool') {
@@ -68,7 +68,7 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
     }
     if (table === 'agents') {
         const match = AGENTS.find(agent => agent.workspace_id === eqValue(calls, 'workspace_id') && agent.engine_agent_id === eqValue(calls, 'engine_agent_id'))
-        return { data: match ? { id: match.id, name: match.name, space_id: match.space_id } : null }
+        return { data: match ? { id: match.id, name: match.name, space_id: match.space_id, kind: match.kind } : null }
     }
     if (table === 'notifications') return { data: { id: 'notification-1' } }
     if (table === 'sessions' && !writeMethodOf(calls)) return { data: session }
@@ -88,7 +88,6 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table === 'rpc:open_notification_incident') return { data: incidentOpens }
     if (table === 'rpc:resolve_notification_incidents') return { data: resolvedUsers }
     if (table === 'workspace_getting_started') return { data: [] }
-    if (table === 'foreman_conversations' && !writeMethodOf(calls)) return { data: foremanThread }
     if (table === 'workspace_onboarding') return { data: null }
     return undefined
 }
@@ -116,7 +115,6 @@ describe('POST /api/webhooks/engine', () => {
         prefsOf = {}
         incidentOpens = true
         resolvedUsers = []
-        foremanThread = null
         emailFlags.paused = false
         db = fakeSupabase(resolve)
         Object.assign(db.client, { auth: { admin: { getUserById: async (id: string) => ({ data: { user: { email: `${id}@rerun.test` } } }) } } })
@@ -420,35 +418,51 @@ describe('POST /api/webhooks/engine', () => {
             expect(sendIncidentResolvedEmail).not.toHaveBeenCalled()
         })
 
-        it('stores a heads-up of the foreman for the member whose thread it ran in, and pushes it', async () => {
+        it('stores a heads-up of the Chief of Staff for the member whose thread it ran in, and pushes it under its name', async () => {
             sandbox = false
-            foremanThread = { id: 'thread-1', user_id: 'user-2' }
+            session = { id: 'thread-1', source: 'dashboard', owner_user_id: 'user-2' }
 
             const response = await POST(request(notification({ agentId: FOREMAN_AGENT_ID, message: 'Your weekly digest is ready' })))
 
             expect(response.status).toBe(202)
             const insert = db.chainsOn('notifications').flat().find(call => call.method === 'insert')
-            expect(insert?.args[0]).toMatchObject({ workspace_id: WORKSPACE_ID, engine_agent_id: FOREMAN_AGENT_ID, engine_session_id: 'engine-session', kind: 'info', recipients: { 'user-2': 'mine' } })
+            expect(insert?.args[0]).toMatchObject({ workspace_id: WORKSPACE_ID, agent_id: 'agent-cos', space_id: null, engine_agent_id: FOREMAN_AGENT_ID, engine_session_id: 'engine-session', kind: 'info', recipients: { 'user-2': 'mine' } })
             expect(pushNotification).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ agentId: FOREMAN_AGENT_ID, agentName: 'Chief of Staff', conversationId: 'thread-1', recipients: { 'user-2': 'mine' } }))
         })
 
-        it('keeps a question the foreman stopped on in its column, out of the inbox', async () => {
+        it('tells only the member who holds the thread that the Chief of Staff is waiting on them, with buttons', async () => {
             sandbox = false
-            foremanThread = { id: 'thread-1', user_id: 'user-2' }
+            session = { id: 'thread-1', source: 'dashboard', owner_user_id: 'user-2' }
+            participants = ['user-1']
 
             await POST(request(notification({ agentId: FOREMAN_AGENT_ID, kind: 'question', metadata: { toolName: 'ask_user', toolCallId: 'call-1' } })))
 
-            expect(db.chainsOn('notifications')).toHaveLength(0)
-            expect(pushNotification).not.toHaveBeenCalled()
+            const insert = db.chainsOn('notifications').flat().find(call => call.method === 'insert')
+            expect(insert?.args[0]).toMatchObject({ agent_id: 'agent-cos', kind: 'question', recipients: { 'user-2': 'mine' } })
+            expect(pushNotification).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ agentId: FOREMAN_AGENT_ID, conversationId: 'thread-1', recipients: { 'user-2': 'mine' } }))
         })
 
-        it('treats a foreman event as a no-op', async () => {
-            const response = await POST(request(notification({ agentId: FOREMAN_AGENT_ID, event: 'agent.message.completed', kind: 'done' })))
+        it('tells nobody about a run of the Chief of Staff whose thread the hub does not know', async () => {
+            sandbox = false
+            session = null
+
+            await POST(request(notification({ agentId: FOREMAN_AGENT_ID, kind: 'error' })))
+
+            const insert = db.chainsOn('notifications').flat().find(call => call.method === 'insert')
+            expect(insert?.args[0]).toMatchObject({ agent_id: 'agent-cos', recipients: {} })
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+        })
+
+        it('marks the thread of a finished run of the Chief of Staff, and never counts it as a run of the team', async () => {
+            sandbox = false
+            session = { id: 'thread-1', source: 'dashboard', owner_user_id: 'user-2' }
+
+            const response = await POST(request(notification({ agentId: FOREMAN_AGENT_ID, event: 'agent.message.completed', kind: 'done', metadata: { authorId: 'user-2' } })))
 
             expect(response.status).toBe(202)
-            expect(db.chainsOn('agents')).toHaveLength(0)
-            expect(db.chainsOn('notifications')).toHaveLength(0)
-            expect(db.chainsOn('sessions')).toHaveLength(0)
+            const update = db.writes('sessions').find(write => write.method === 'update')
+            expect(update?.payload).toEqual({ status: 'idle' })
+            expect(captureServer).not.toHaveBeenCalled()
         })
     })
 })

@@ -68,19 +68,23 @@ vi.mock('@rerun/cloud/billing.server', async importOriginal => ({ ...(await impo
 vi.mock('@ai-sdk/openai-compatible', () => ({ createOpenAICompatible: () => () => state.model }))
 
 type AgentRow = Row<'agents'> & { space: Pick<Tables['spaces']['Row'], 'visibility'> }
-type SessionRow = Row<'sessions'> & { agent: Pick<Tables['agents']['Row'], 'workspace_id' | 'space_id' | 'engine_agent_id'> }
+type SessionRow = Row<'sessions'> & { agent: Pick<Tables['agents']['Row'], 'workspace_id' | 'space_id' | 'engine_agent_id'> & Partial<Pick<Tables['agents']['Row'], 'kind'>> }
 
-const agents: AgentRow[] = [{ id: 'agent-scout', name: 'Scout', workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-02T09:05:00.000Z', space: { visibility: 'workspace' } }]
+const agents: (AgentRow | Row<'agents'>)[] = [
+    { id: 'agent-scout', name: 'Scout', kind: 'coworker', workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-02T09:05:00.000Z', space: { visibility: 'workspace' } },
+    { id: 'agent-cos', name: 'Chief of Staff', kind: 'foreman', workspace_id: 7, space_id: null, engine_agent_id: FOREMAN_AGENT_ID, disabled_at: null, disabled_reason: null, created_at: '2026-11-02T09:00:00.000Z' },
+]
+const foremanAgent = { workspace_id: 7, space_id: null, engine_agent_id: FOREMAN_AGENT_ID, kind: 'foreman' as const }
 const spaces: Row<'spaces'>[] = [{ id: 'space-sales', workspace_id: 7, name: 'Sales', visibility: 'workspace', created_at: '2026-11-02T09:00:00.000Z' }]
 const sessions: SessionRow[] = [
     { id: '5b1f0c62-2f7e-4d55-9a0e-3c8a1e7d4b10', agent_id: 'agent-scout', engine_session_id: 'eng-session-1', kind: 'general', title: 'General', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-scout' } },
     { id: '9c2e7a41-6d3b-4f80-b1a5-7e4d2c9f0a83', agent_id: 'agent-ledger', engine_session_id: 'eng-session-9', kind: 'thread', title: 'Invoices', status: 'idle', agent: { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'eng-ledger' } },
+    { id: 'fm-general', agent_id: 'agent-cos', owner_user_id: 'user-ada', engine_session_id: 'eng-fm-1', kind: 'general', title: 'General', status: 'idle', updated_at: '2026-11-18T16:00:00.000Z', agent: foremanAgent },
+    { id: 'fm-thread', agent_id: 'agent-cos', owner_user_id: 'user-ada', engine_session_id: 'eng-fm-2', kind: 'thread', title: 'Quarterly plan', status: 'idle', updated_at: '2026-11-17T10:00:00.000Z', agent: foremanAgent },
 ]
+const coworkerSessions = sessions.filter(session => session.agent_id !== 'agent-cos')
 const engine_pool: Row<'engine_pool'>[] = [{ id: 'pool-1', engine_host: 'box-001.rerun.internal', engine_api_key: 'key', provider_server_id: 'srv-1', claimed_by_workspace_id: 7 }]
-const foreman_conversations: Row<'foreman_conversations'>[] = [
-    { id: 'fm-general', workspace_id: 7, user_id: 'user-ada', backend: 'engine', engine_session_id: 'eng-fm-1', kind: 'general', title: null, messages: null, status: 'idle', updated_at: '2026-11-18T16:00:00.000Z' },
-    { id: 'fm-thread', workspace_id: 7, user_id: 'user-ada', backend: 'engine', engine_session_id: 'eng-fm-2', kind: 'thread', title: 'Quarterly plan', messages: null, status: 'idle', updated_at: '2026-11-17T10:00:00.000Z' },
-]
+const foreman_conversations: Row<'foreman_conversations'>[] = []
 const workspace_onboarding: Row<'workspace_onboarding'>[] = [{ workspace_id: 7, answers: { company_name: 'Atelier Nord', foreman: { language: 'en' } } }]
 
 const tables = { agents, spaces, sessions, engine_pool, foreman_conversations, workspace_onboarding, space_members: [], workspaces: [{ id: 7, waitlisted_at: null, boxes_archived_at: null }] }
@@ -274,7 +278,7 @@ describe('the Chief of Staff on the engine', () => {
     })
 
     it('answers null before anyone spoke in General', async () => {
-        seed({ foreman_conversations: [] })
+        seed({ sessions: coworkerSessions })
         const { GET } = await import('@/app/api/chat/foreman/engine/route')
         expect(await expectContract(mobileApi.getForemanConversation, await callRoute(GET, mobileApi.getForemanConversation))).toBeNull()
     })
@@ -309,7 +313,7 @@ describe('the Chief of Staff on the engine', () => {
         const res = await callRoute(POST, mobileApi.sendForemanMessage, { body: { sessionId: 'fm-new-thread', text: 'Plan the launch week', kind: 'thread' } })
         await expectContract(mobileApi.sendForemanMessage, res)
         expect(res.headers.get('X-Session-Id')).toBe('fm-new-thread')
-        expect(state.db?.writes('foreman_conversations')[0]).toMatchObject({ method: 'insert', payload: { id: 'fm-new-thread', engine_session_id: 'eng-fm-3', kind: 'thread' } })
+        expect(state.db?.writes('sessions')[0]).toMatchObject({ method: 'insert', payload: { id: 'fm-new-thread', agent_id: 'agent-cos', owner_user_id: 'user-ada', engine_session_id: 'eng-fm-3', kind: 'thread' } })
     })
 
     it('answers 409 run_in_flight for a queued message the engine is not free for', async () => {

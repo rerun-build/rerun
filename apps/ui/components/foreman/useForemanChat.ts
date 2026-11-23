@@ -207,7 +207,7 @@ export function useForemanChat() {
         messages: engineChat.messages,
         fetchMessages: fetchOpenTranscript,
         setMessages: setEngineMessages,
-        row: { table: 'foreman_conversations', id: sessionId, channelId: `foreman-transcript-${sessionId}`, enabled: onEngine },
+        row: { table: 'sessions', id: sessionId, channelId: `foreman-transcript-${sessionId}`, enabled: onEngine },
     })
 
     // `streaming` couvre aussi bien un outil qui tourne qu'une réponse qui s'écrit : c'est le dernier

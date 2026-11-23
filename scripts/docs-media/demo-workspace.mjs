@@ -423,20 +423,35 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, email, api
 
     await engine('GET', '/agents/foreman/sessions')
     writeConversation(dataDir, 'foreman', FOREMAN_SESSION, FOREMAN_SESSION.turns)
+    // Its conversations hang off its agent row, which the reset above took away with the coworkers.
+    const [foreman] = await check(admin.from('agents').insert({ workspace_id: workspaceId, kind: 'foreman', space_id: null, name: 'Chief of Staff', engine_agent_id: 'foreman' }).select('id'), 'write the Chief of Staff')
+    const [general] = await check(
+        admin.from('sessions').insert({
+            agent_id: foreman.id,
+            owner_user_id: userId,
+            kind: 'general',
+            engine_session_id: FOREMAN_SESSION.id,
+            status: 'idle',
+            source: 'dashboard',
+            title: 'General',
+            created_at: FOREMAN_SESSION.turns[0].at,
+            updated_at: FOREMAN_SESSION.turns.at(-1).at,
+        }).select('id'),
+        'open the Chief of Staff conversation',
+    )
     await check(
         admin.from('foreman_conversations').insert({
+            id: general.id,
             workspace_id: workspaceId,
             user_id: userId,
             backend: 'engine',
             kind: 'general',
             engine_session_id: FOREMAN_SESSION.id,
             status: 'idle',
-            title: FOREMAN_SESSION.title,
-            first_message: FOREMAN_SESSION.turns[0].content[0].text,
             created_at: FOREMAN_SESSION.turns[0].at,
             updated_at: FOREMAN_SESSION.turns.at(-1).at,
         }),
-        'open the Chief of Staff conversation',
+        'copy it for the shipped builds',
     )
 
     for (const page of BRAIN_PAGES) {

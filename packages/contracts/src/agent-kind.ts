@@ -66,6 +66,12 @@ export function agentKindOfEngineId(engineAgentId: string): AgentKind {
     return engineAgentId === FOREMAN_AGENT_ID ? 'foreman' : 'coworker'
 }
 
+// How the apps and the notification rules name a coworker: its row, or `foreman` for the Chief of
+// Staff, whose row differs from one workspace to the next and whom the shipped apps open by that name.
+export function agentAddress(agent: { id: string; kind: AgentKind }): string {
+    return agent.kind === 'foreman' ? FOREMAN_AGENT_ID : agent.id
+}
+
 export function agentKindPolicy(kind: AgentKind): AgentKindPolicy {
     return AGENT_KIND_POLICY[kind]
 }

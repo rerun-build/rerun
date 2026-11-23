@@ -52,16 +52,19 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             const reason = recipientReason(row.recipients, userIdRef.current)
             if (!reason) return
             if (kind === 'done' && reason !== 'legacy') void useUnseenRunsStore.getState().refresh()
+            const fromForeman = row.engine_agent_id === FOREMAN_AGENT_ID
+            // The Chief of Staff answers and asks in its own column: in the browser, only its heads-ups
+            // reach further, under no coworker of the board.
+            if (fromForeman && kind !== 'info') return
             // A row stored by a hub that predates recipients names nobody: a quiet toast, never a sound.
-            const delivery = reason === 'legacy' ? 'toast' : deliveryFor(prefsRef.current, reason, kind, row.agent_id)
+            const delivery = reason === 'legacy' ? 'toast' : deliveryFor(prefsRef.current, reason, kind, fromForeman ? FOREMAN_AGENT_ID : row.agent_id)
             if (delivery === 'none') return
             // A run finishing in the conversation panel the user is looking at is already on screen.
             // The panel is known per coworker, not per conversation: a run of the same coworker in
             // another tab goes quiet too, which is rare enough.
             if (kind === 'done' && isWatching(row.agent_id)) return
 
-            const fromForeman = row.engine_agent_id === FOREMAN_AGENT_ID
-            const agent = row.agent_id ? useBoardStore.getState().agents.find(a => a.id === row.agent_id) : undefined
+            const agent = row.agent_id && !fromForeman ? useBoardStore.getState().agents.find(a => a.id === row.agent_id) : undefined
             const agentName = fromForeman ? (useForemanStore.getState().name ?? FOREMAN_DISPLAY_NAME) : (agent?.name ?? copyRef.current.t('coworker'))
             const scheduled = isScheduledSource(row.source)
             const title = scheduled ? copyRef.current.t('scheduledTask', { name: agentName }) : agentName
@@ -74,7 +77,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             if (shown && status) {
                 useNotificationsStore.getState().announce({
                     id: row.id,
-                    agentId: row.agent_id,
+                    agentId: fromForeman ? null : row.agent_id,
                     status,
                     headline: kind === 'error' ? errorHeadline(row, tErrorsRef.current) : message,
                     message,

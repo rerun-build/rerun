@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ update: vi.fn(), listSkillProposals: vi.fn(), 
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ update: mocks.update }) }) }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), selectMaybeSingleWithJoins: vi.fn() }))
 vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({ FIRST_MESSAGE_MAX_CHARS: 200, GENERAL_SESSION_TITLE: 'General' }))
@@ -29,7 +29,8 @@ beforeEach(() => {
             filters.push([column, value])
             return chain
         },
-        then: (resolve: (result: { error: null }) => void) => resolve({ error: null }),
+        select: () => chain,
+        then: (resolve: (result: { data: []; error: null }) => void) => resolve({ data: [], error: null }),
     }
     mocks.update.mockReturnValue(chain)
     mocks.listSkillProposals.mockResolvedValue([proposal('accepted')])

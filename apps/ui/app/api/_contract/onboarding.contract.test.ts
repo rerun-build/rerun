@@ -299,7 +299,7 @@ describe('the onboarding of the mobile app', () => {
         })
 
         describe('the lead coworker', () => {
-            const scout: Rows<'agents'>[number] = { id: 'agent-scout', name: 'Scout', workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'scout', disabled_at: null, disabled_reason: null }
+            const scout: Rows<'agents'>[number] = { id: 'agent-scout', name: 'Scout', kind: 'coworker', workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'scout', disabled_at: null, disabled_reason: null }
 
             it('starts its install on the engine and answers its conversation', async () => {
                 tables.agents = [scout]
@@ -340,12 +340,13 @@ describe('the onboarding of the mobile app', () => {
         })
 
         it("lists the caller's engine conversations of the foreman, the latest first", async () => {
-            tables.foreman_conversations = [
-                { id: 'fc-general', workspace_id: 7, user_id: 'user-ada', backend: 'engine', kind: 'general', title: null, status: 'idle', first_message: null, engine_session_id: 'engine-general', created_at: '2026-11-18T09:00:00.000Z', updated_at: '2026-11-18T09:30:00.000Z' },
-                { id: 'fc-thread', workspace_id: 7, user_id: 'user-ada', backend: 'engine', kind: 'thread', title: null, status: 'awaiting_approval', first_message: 'Find me twenty agencies in Lille', engine_session_id: 'engine-thread', created_at: '2026-11-18T10:00:00.000Z', updated_at: '2026-11-18T10:05:00.000Z' },
-                { id: 'fc-hub', workspace_id: 7, user_id: 'user-ada', backend: 'hub', kind: 'thread', title: 'Onboarding', status: 'idle', first_message: null, engine_session_id: null, created_at: '2026-11-17T09:00:00.000Z', updated_at: '2026-11-18T11:00:00.000Z' },
-                { id: 'fc-grace', workspace_id: 7, user_id: 'user-grace', backend: 'engine', kind: 'general', title: null, status: 'idle', first_message: null, engine_session_id: 'engine-grace', created_at: '2026-11-18T09:00:00.000Z', updated_at: '2026-11-18T12:00:00.000Z' },
+            tables.agents = [{ id: 'agent-cos', name: 'Chief of Staff', kind: 'foreman', workspace_id: 7, space_id: null, engine_agent_id: 'foreman' }]
+            tables.sessions = [
+                { id: 'fc-general', agent_id: 'agent-cos', owner_user_id: 'user-ada', kind: 'general', title: 'General', status: 'idle', first_message: null, engine_session_id: 'engine-general', created_at: '2026-11-18T09:00:00.000Z', updated_at: '2026-11-18T09:30:00.000Z' },
+                { id: 'fc-thread', agent_id: 'agent-cos', owner_user_id: 'user-ada', kind: 'thread', title: 'Find me twenty agencies in Lille', status: 'awaiting_approval', first_message: 'Find me twenty agencies in Lille', engine_session_id: 'engine-thread', created_at: '2026-11-18T10:00:00.000Z', updated_at: '2026-11-18T10:05:00.000Z' },
+                { id: 'fc-grace', agent_id: 'agent-cos', owner_user_id: 'user-grace', kind: 'general', title: 'General', status: 'idle', first_message: null, engine_session_id: 'engine-grace', created_at: '2026-11-18T09:00:00.000Z', updated_at: '2026-11-18T12:00:00.000Z' },
             ]
+            tables.foreman_conversations = [{ id: 'fc-hub', workspace_id: 7, user_id: 'user-ada', backend: 'hub', kind: 'thread', title: 'Onboarding', status: 'idle', first_message: null, engine_session_id: null, created_at: '2026-11-17T09:00:00.000Z', updated_at: '2026-11-18T11:00:00.000Z' }]
             const { GET } = await import('@/app/api/v1/foreman/conversations/route')
             const conversations = (await expectContract(mobileApi.listForemanConversations, await callRoute(GET, mobileApi.listForemanConversations, { client: oldBuild }))) as { id: string; title: string; status: string; kind?: string }[]
             expect(conversations.map(({ id, title, status, kind }) => ({ id, title, status, kind }))).toEqual([

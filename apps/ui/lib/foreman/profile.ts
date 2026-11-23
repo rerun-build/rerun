@@ -6,8 +6,9 @@ import { ensureWorkspaceNamed } from '@/app/api/_services/naming.service'
 import { requestCompanyBrainSeed, requestCompanyExplore } from '@/lib/brain/request-seed'
 import { companySiteUrl } from '@/lib/company/firecrawl'
 import { asString, asStringArray } from '@/lib/mcp/args'
-import { isTemplateCategory } from '@rerun/contracts'
+import { FOREMAN_DISPLAY_NAME, isTemplateCategory } from '@rerun/contracts'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { ensureForemanAgentRow } from './agent-row'
 import { foremanUseCases } from './phase'
 import type { ForemanAnswers, ForemanProfile } from './phase'
 
@@ -56,11 +57,15 @@ export async function mergeForeman(ctx: AnswersScope, patch: ForemanProfile): Pr
 }
 
 // `null` gives the Chief of Staff back its default name.
+// Written on its agent row too, where its notifications, emails and pushes read it.
 export async function saveForemanName(ctx: AnswersScope, name: string | null): Promise<void> {
     const answers = await readAnswers(ctx)
     const foreman: ForemanProfile = { ...answers.foreman, name: name ?? undefined }
     if (!name) delete foreman.name
     await writeAnswers(ctx, { ...answers, foreman }, false)
+    const agentId = await ensureForemanAgentRow(ctx.supabase, ctx.workspace.id)
+    const { error } = await ctx.supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ name: name ?? FOREMAN_DISPLAY_NAME }).eq('id', agentId)
+    if (error) throw new Error(`Failed to rename the Chief of Staff: ${error.message}`)
 }
 
 // The first name lives on the auth user, beside the one Google writes, because that is where every

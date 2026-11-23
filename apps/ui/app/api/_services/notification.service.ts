@@ -1,6 +1,6 @@
 import { realEmail } from '@/lib/auth/placeholder-email'
 import { after } from 'next/server'
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { agentAddress, agentKindPolicy, type AgentKind } from '@rerun/contracts'
 
 import { boxAccessOf, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
@@ -18,8 +18,8 @@ import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
 import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
 import { boardStatusOfKind } from '@/lib/og/team-board'
-import { openForemanRoutineThread, setForemanConversationStatus } from '@/lib/foreman/conversation'
-import { foremanNameOf, isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
+import { copyToShippedForemanRow, openForemanRoutineThread } from '@/lib/foreman/conversation'
+import { isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -48,26 +48,11 @@ export async function recordNotification(token: string, payload: NotificationPay
     const engine = await authenticateEngineToken(token)
     if (!engine) return { ok: false, status: 401, error: 'Unauthorized' }
 
-    // The foreman answers in the column the user is looking at: none of its runs is inbox news, an
-    // email, or the first agent run that counts as activation. Where a run stopped still shows, on
-    // its thread in General.
-    if (payload.agentId === FOREMAN_AGENT_ID) {
-        // A session the engine opened on its own is a routine of the foreman's, or a check-in that
-        // decided to speak: either way it becomes a thread, the second one waiting to be read.
-        if (payload.event === 'agent.session.created') {
-            if (isCheckinAnnouncement(payload)) await openCheckinThread(engine.workspaceId, payload, { push: !engine.isSandbox })
-            else if (payload.sessionId) await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run')
-            return { ok: true }
-        }
-        await applyForemanStatus(engine.workspaceId, payload)
-        if (isForemanNotice(payload)) await announceForemanNotice(supabase, engine, { ...payload, kind: 'info' })
-        return { ok: true }
-    }
-
-    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: engine.workspaceId, engine_agent_id: payload.agentId })
+    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id', 'kind'] as const, { workspace_id: engine.workspaceId, engine_agent_id: payload.agentId })
 
     if (payload.event === 'agent.session.created') {
-        if (agent?.id && payload.sessionId) await mirrorSession(supabase, engine.workspaceId, agent.id, payload)
+        if (agent?.kind === 'foreman') await openForemanSession(engine, payload)
+        else if (agent?.id && payload.sessionId) await mirrorSession(supabase, engine.workspaceId, agent.id, payload)
         return { ok: true }
     }
 
@@ -78,11 +63,13 @@ export async function recordNotification(token: string, payload: NotificationPay
     // A stopped run still has to clear the conversation's "working" state, but it is not news: the
     // person who pressed Stop does not need "Run finished" in their inbox and in their mailbox.
     if (isCancelled(notification)) {
-        await applySessionStatus(supabase, agent?.id ?? null, notification)
+        await applySessionStatus(supabase, agent ?? null, notification)
         return { ok: true }
     }
+    // What the apps and the notification rules call this coworker.
+    const address = agent ? agentAddress(agent) : null
 
-    const audience = await resolveAudience(supabase, engine.workspaceId, agent ?? null, notification)
+    const audience = await resolveAudience(supabase, engine.workspaceId, agent ? { ...agent, address: agentAddress(agent) } : null, notification)
     const recipients = computeRecipients(audience.event, audience.members)
 
     const { data: stored, error } = await supabase.from('notifications').insert<NotificationInsert>({
@@ -106,7 +93,7 @@ export async function recordNotification(token: string, payload: NotificationPay
 
     // The engine is the source of truth for run completion. Mirror it onto the session
     // status so the UI unsticks from 'working' even when the SSE stream was cut. Best-effort.
-    await applySessionStatus(supabase, agent?.id ?? null, notification)
+    await applySessionStatus(supabase, agent ?? null, notification)
     // After the response: a model call must not hold the engine's webhook open.
     after(() => retitleAutomatedRun(supabase, agent?.id ?? null, notification))
     const reply = agentReplyOf(notification)
@@ -114,14 +101,15 @@ export async function recordNotification(token: string, payload: NotificationPay
     const engineSessionId = notification.sessionId
     if (reply && agentId && engineSessionId) after(() => recordAgentReply(agentId, engineSessionId, reply))
 
-    if (!engine.isSandbox) await reportChatRun(engine.workspaceId, agent?.id ?? notification.agentId, notification)
+    // A run of the Chief of Staff says nothing about whether the team the workspace hired is put to use.
+    if (!engine.isSandbox && agent?.kind !== 'foreman') await reportChatRun(engine.workspaceId, agent?.id ?? notification.agentId, notification)
 
     // Best-effort: a delivery failure must never fail the webhook, the notification is already
     // stored. A sandbox workspace keeps its in-app notifications but never emails anyone.
-    if (!engine.isSandbox && !NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: agent?.id ?? null, agentName: agent?.name ?? 'your coworker', notification, recipients, members: audience.members })
+    if (!engine.isSandbox && !NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: address, boardAgentId: agent?.space_id ? agent.id : null, agentName: agent?.name ?? 'your coworker', notification, recipients, members: audience.members })
     if (!engine.isSandbox) {
         const sourceKey = incidentKeyFor({ event: notification.event, kind: notification.kind, agentId: notification.agentId, source: notification.source, metadata: notification.metadata, sessionId: notification.sessionId })
-        await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: agent?.id ?? null, agentName: agent?.name ?? 'your coworker', conversationId: audience.conversationId, sourceKey, notification, recipients, members: audience.members })
+        await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: address, agentName: agent?.name ?? 'your coworker', conversationId: audience.conversationId, sourceKey, notification, recipients, members: audience.members })
     }
 
     return { ok: true }
@@ -177,65 +165,21 @@ async function mirrorSession(supabase: ServiceRoleClient, workspaceId: number, a
     }
 }
 
-async function applyForemanStatus(workspaceId: number, payload: NotificationPayload): Promise<void> {
-    const kind = storedKind(payload)
-    const status = kind ? completionStatus({ ...payload, kind }) : null
-    if (status && payload.sessionId) await setForemanConversationStatus(workspaceId, payload.sessionId, status)
-}
-
-// What the foreman's notify_user sends: a heads-up, not a run stopping on a question, which its
-// reader answers in the column they are looking at.
-function isForemanNotice(payload: NotificationPayload): boolean {
-    return payload.event === 'agent.notification' && storedKind(payload) === 'info' && !payload.metadata?.toolName
-}
-
-// A heads-up of the foreman reaches the member whose thread it ran in, the way a coworker's reaches
-// whoever started its run: stored for their inbox, pushed and emailed by their own preferences.
-async function announceForemanNotice(supabase: ServiceRoleClient, engine: { workspaceId: number; isSandbox: boolean }, notification: StoredNotification): Promise<void> {
-    if (!notification.sessionId) return
-    try {
-        const { data: thread } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id', 'user_id'] as const, { workspace_id: engine.workspaceId, engine_session_id: notification.sessionId })
-        if (!thread) return
-        const { data: reader } = await selectMaybeSingle(supabase, 'users', ['email_notification_prefs'] as const, { id: thread.user_id })
-        const members: RoutedMember[] = [{ id: thread.user_id, prefs: reader?.email_notification_prefs ?? null }]
-        const recipients = computeRecipients({ agentId: FOREMAN_AGENT_ID, kind: 'info', source: null, authorId: thread.user_id, participantIds: [thread.user_id], taskSlug: null }, members)
-        if (!Object.keys(recipients).length) return
-
-        const { data: stored, error } = await supabase
-            .from('notifications')
-            .insert<NotificationInsert>({
-                workspace_id: engine.workspaceId,
-                engine_agent_id: FOREMAN_AGENT_ID,
-                engine_session_id: notification.sessionId,
-                engine_run_id: notification.runId ?? null,
-                event: notification.event,
-                kind: notification.kind,
-                message: notification.message,
-                metadata: (notification.metadata ?? null) as unknown as NotificationInsert['metadata'],
-                recipients: recipients as unknown as NotificationInsert['recipients'],
-                notified_at: notification.timestamp,
-            })
-            .select('id')
-            .single()
-        if (error || !stored) {
-            console.error('[notification] failed to store a heads-up of the foreman', error)
-            return
-        }
-        if (engine.isSandbox) return
-        const agentName = await foremanNameOf(engine.workspaceId)
-        if (!NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: null, agentName, notification, recipients, members })
-        await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: FOREMAN_AGENT_ID, agentName, conversationId: thread.id, sourceKey: `foreman-notice:${stored.id}`, notification, recipients, members })
-    } catch (err) {
-        console.error('[notification] failed to announce a heads-up of the foreman', err)
-    }
+// A session the engine opened on its own for the Chief of Staff is a routine of its own, or a
+// check-in that decided to speak: either way it becomes a thread of the member who reads it, the
+// second one waiting to be read. What its runs say then takes the way of every coworker's.
+async function openForemanSession(engine: { workspaceId: number; isSandbox: boolean }, payload: NotificationPayload): Promise<void> {
+    if (isCheckinAnnouncement(payload)) await openCheckinThread(engine.workspaceId, payload, { push: !engine.isSandbox })
+    else if (payload.sessionId) await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run')
 }
 
 function isCancelled(notification: StoredNotification): boolean {
     return (notification.metadata as { status?: unknown } | null)?.status === 'cancelled'
 }
 
-async function applySessionStatus(supabase: ServiceRoleClient, agentId: string | null, notification: StoredNotification): Promise<void> {
+async function applySessionStatus(supabase: ServiceRoleClient, agent: { id: string; kind: AgentKind } | null, notification: StoredNotification): Promise<void> {
     const status = completionStatus(notification)
+    const agentId = agent?.id
     if (!status || !agentId || !notification.sessionId) return
     try {
         let query = supabase.from('sessions').update<SessionUpdate>({ status }, { count: 'exact' }).eq('agent_id', agentId).eq('engine_session_id', notification.sessionId)
@@ -243,8 +187,9 @@ async function applySessionStatus(supabase: ServiceRoleClient, agentId: string |
         // `done`. An `info` notification does not stop the run, so that `done` does arrive, seconds
         // later: without this guard it would clear the acknowledgement the notification just asked for.
         if (status === 'idle') query = query.neq('status', 'awaiting_ack')
-        const { error, count } = await query
+        const { data: updated, error, count } = await query.select('id')
         if (error) console.error('[notification] failed to update session status', error)
+        if (agent.kind === 'foreman') for (const row of updated ?? []) await copyToShippedForemanRow(row.id)
         // Postgres does not fail an UPDATE that matches nothing, so an unmirrored session would
         // silently keep whatever status it ends up with.
         else if (count === 0 && status !== 'idle') console.warn('[notification] no session row for', { agentId, engineSessionId: notification.sessionId, status })
@@ -297,13 +242,18 @@ export async function membersReachingBox(supabase: ServiceRoleClient, workspaceI
 // and the source that tells a cron from a chat. Every id is checked against the workspace members
 // who reach the coworker's Box, so an engine can never route a notification to someone outside it,
 // nor to a member the Box is closed to.
-async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number, agent: { id: string; space_id: string | null } | null, notification: StoredNotification): Promise<Audience> {
+async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number, agent: { id: string; space_id: string | null; kind: AgentKind; address: string } | null, notification: StoredNotification): Promise<Audience> {
     const agentId = agent?.id ?? null
     const [{ data: session }, { data: memberships }] = await Promise.all([
-        agentId && notification.sessionId ? selectMaybeSingle(supabase, 'sessions', ['id', 'source'] as const, { agent_id: agentId, engine_session_id: notification.sessionId }) : Promise.resolve({ data: null }),
+        agentId && notification.sessionId ? selectMaybeSingle(supabase, 'sessions', ['id', 'source', 'owner_user_id'] as const, { agent_id: agentId, engine_session_id: notification.sessionId }) : Promise.resolve({ data: null }),
         selectMany(supabase, 'workspace_members', ['user_id', 'role', 'box_scope'] as const, { workspace_id: workspaceId }),
     ])
-    const reaching = await membersReachingBox(supabase, workspaceId, agent?.space_id ?? null, memberships ?? [])
+    // A conversation held by one member is theirs alone, and a run of a coworker whose conversations
+    // are private reaches nobody when the hub does not know whose it is.
+    const reaching =
+        agent && agentKindPolicy(agent.kind).conversations === 'per-member'
+            ? (memberships ?? []).filter(m => m.user_id === session?.owner_user_id)
+            : await membersReachingBox(supabase, workspaceId, agent?.space_id ?? null, memberships ?? [])
     const memberIds = new Set(reaching.map(m => m.user_id))
     const [{ data: participants }, { data: users }] = await Promise.all([
         session ? selectMany(supabase, 'session_participants', ['user_id'] as const, { session_id: session.id }, { column: 'last_message_at', ascending: false }) : Promise.resolve({ data: [] }),
@@ -312,13 +262,15 @@ async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number,
 
     const participantIds = (participants ?? []).map(p => p.user_id).filter(id => memberIds.has(id))
     const claimed = notification.metadata?.authorId
-    // A question or a heads-up names nobody on older engines: the last one to write is who is waiting.
-    const authorId = typeof claimed === 'string' && memberIds.has(claimed) ? claimed : (participantIds[0] ?? null)
+    // A question or a heads-up names nobody on older engines: the last one to write is who is waiting,
+    // and in a conversation one member holds, that member.
+    const owner = session?.owner_user_id && memberIds.has(session.owner_user_id) ? session.owner_user_id : null
+    const authorId = typeof claimed === 'string' && memberIds.has(claimed) ? claimed : (participantIds[0] ?? owner)
     // An event without a source is a HITL stop or a notify_user: the session knows what started it.
     const source = (notification.source ?? session?.source ?? null) as SessionSource | null
 
     const slug = notification.metadata?.scheduleSlug ?? notification.metadata?.triggerSlug
-    const event: RoutedEvent = { agentId, kind: notification.kind, source, authorId, participantIds, taskSlug: typeof slug === 'string' ? slug : null }
+    const event: RoutedEvent = { agentId: agent?.address ?? null, kind: notification.kind, source, authorId, participantIds, taskSlug: typeof slug === 'string' ? slug : null }
     const members = (users ?? []).map(u => ({ id: u.id, prefs: u.email_notification_prefs }))
     return { event, source, members: await withOwnerFollow(supabase, workspaceId, event, members), conversationId: session?.id ?? null }
 }
@@ -343,7 +295,9 @@ async function withOwnerFollow(supabase: ServiceRoleClient, workspaceId: number,
 type IncidentContext = {
     workspaceId: number
     notificationId: string
+    // What the notification rules call the coworker, and its tile when it has one on the board.
     agentId: string | null
+    boardAgentId: string | null
     agentName: string
     notification: StoredNotification
     recipients: NotificationRecipients
@@ -449,9 +403,9 @@ async function resolveIncidents(supabase: ServiceRoleClient, context: IncidentCo
 }
 
 // One board capture per notification whoever it goes to, asked for by the first email that leaves.
-function lazyBanner(supabase: ServiceRoleClient, { workspaceId, agentId, notification }: IncidentContext): () => Promise<string | undefined> {
+function lazyBanner(supabase: ServiceRoleClient, { workspaceId, boardAgentId, notification }: IncidentContext): () => Promise<string | undefined> {
     let banner: Promise<string | undefined> | undefined
-    return () => (banner ??= agentId ? emailBoardBanner(supabase, workspaceId, { [agentId]: boardStatusOfKind(notification.kind) }, BANNER_WARM_INLINE_MS) : Promise.resolve(undefined))
+    return () => (banner ??= boardAgentId ? emailBoardBanner(supabase, workspaceId, { [boardAgentId]: boardStatusOfKind(notification.kind) }, BANNER_WARM_INLINE_MS) : Promise.resolve(undefined))
 }
 
 async function dropIncident(supabase: ServiceRoleClient, userId: string, key: string): Promise<void> {
