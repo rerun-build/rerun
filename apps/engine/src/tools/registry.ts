@@ -121,7 +121,9 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     if (cfg.memory) Object.assign(tools, memoryTools(ctx))
     if (cfg.db) Object.assign(tools, dbTools(ctx))
     if (cfg.sharedDb) Object.assign(tools, sharedDbTools(ctx))
-    if (cfg.brain) Object.assign(tools, ctx.agent.config.kind === 'foreman' ? foremanBrainTools() : brainTools(ctx))
+    // Called by a coworker, nobody of the workspace is behind the Chief of Staff: it proposes to the
+    // brain as a coworker does, rather than writing it.
+    if (cfg.brain) Object.assign(tools, ctx.agent.config.kind === 'foreman' && !ctx.called ? foremanBrainTools() : brainTools(ctx))
     if (cfg.skills) Object.assign(tools, skillTools(ctx))
     if (cfg.skills && ctx.agent.config.selfImprovement.enabled) Object.assign(tools, skillProposeTool(ctx))
     if (ctx.agent.config.selfImprovement.enabled) Object.assign(tools, selfTools(ctx))

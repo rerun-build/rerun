@@ -2,7 +2,7 @@ import { realEmail } from '@/lib/auth/placeholder-email'
 import { after } from 'next/server'
 import { agentAddress, agentKindPolicy, type AgentKind } from '@rerun/contracts'
 
-import { boxAccessOf, toAccessLevel } from '@/app/api/_auth/access'
+import { boxAccessOf, memberActor, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
 import type { Database } from '@/app/api/database.types'
 import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
@@ -169,8 +169,12 @@ async function mirrorSession(supabase: ServiceRoleClient, workspaceId: number, a
 // check-in that decided to speak: either way it becomes a thread of the member who reads it, the
 // second one waiting to be read. What its runs say then takes the way of every coworker's.
 async function openForemanSession(engine: { workspaceId: number; isSandbox: boolean }, payload: NotificationPayload): Promise<void> {
-    if (isCheckinAnnouncement(payload)) await openCheckinThread(engine.workspaceId, payload, { push: !engine.isSandbox })
-    else if (payload.sessionId) await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run')
+    if (isCheckinAnnouncement(payload)) return openCheckinThread(engine.workspaceId, payload, { push: !engine.isSandbox })
+    if (!payload.sessionId) return
+    // A coworker that called it on someone's behalf: the thread is that member's, while they still are one.
+    const authorId = typeof payload.metadata?.authorId === 'string' ? payload.metadata.authorId : null
+    const author = authorId ? await memberActor(engine.workspaceId, authorId).catch(() => null) : null
+    await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run', author ? { userId: authorId, status: 'working' } : undefined, (payload.source ?? 'schedule') as SessionSource)
 }
 
 function isCancelled(notification: StoredNotification): boolean {

@@ -77,7 +77,13 @@ describe('recordNotification for the Chief of Staff', () => {
     it('opens a thread for the conversation a routine of its own started, named after the routine', async () => {
         expect(await recordNotification('token', { event: 'agent.session.created', agentId: 'foreman', sessionId: 'engine-2', title: 'schedule: monday-review', source: 'schedule', timestamp: '2026-11-18T09:00:00.000Z' } as never)).toEqual({ ok: true })
         expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ workspace_id: 7, engine_agent_id: 'foreman' })
-        expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-2', 'schedule: monday-review')
+        expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-2', 'schedule: monday-review', undefined, 'schedule')
+    })
+
+    it('opens the conversation a coworker started with it as a thread of the member behind the call', async () => {
+        const called = { event: 'agent.session.created', agentId: 'foreman', sessionId: 'engine-3', title: 'from scout: the figures', source: 'agent', originAgentId: 'scout', metadata: { authorId: 'ana' }, timestamp: '2026-11-23T09:00:00.000Z' }
+        expect(await recordNotification('token', called as never)).toEqual({ ok: true })
+        expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-3', 'from scout: the figures', { userId: 'ana', status: 'working' }, 'agent')
     })
 
     it('opens a check-in that decided to speak as a thread waiting to be read, pushed outside a sandbox', async () => {

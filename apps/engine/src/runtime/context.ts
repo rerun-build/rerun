@@ -62,6 +62,8 @@ export type RunContext = {
     userTurnStored?: Promise<unknown>
     // See `runsUnattended`.
     unattended?: boolean
+    // Called by another coworker through call_agent, nobody of the workspace behind it.
+    called?: boolean
     // See `runsReadOnly`.
     readOnly?: boolean
     // See `offersTeamRequests`.

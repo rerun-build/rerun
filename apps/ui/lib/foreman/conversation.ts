@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionSource, type SessionStatus } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
 import { workspaceFounderUserId, type WorkspaceContext } from '@/app/api/_auth/ownership'
@@ -305,7 +305,7 @@ async function routineReaderOf(workspaceId: number): Promise<string | null> {
 // opened none, the engine telling it a second time included.
 export type ForemanThreadTarget = { userId: string | null; status: SessionStatus }
 
-export async function openForemanRoutineThread(workspaceId: number, engineSessionId: string, title: string, target?: ForemanThreadTarget): Promise<{ id: string; userId: string } | null> {
+export async function openForemanRoutineThread(workspaceId: number, engineSessionId: string, title: string, target?: ForemanThreadTarget, source: SessionSource = 'schedule'): Promise<{ id: string; userId: string } | null> {
     const supabase = createServiceRoleClient()
     try {
         const agentId = await ensureForemanAgentRow(supabase, workspaceId)
@@ -315,7 +315,7 @@ export async function openForemanRoutineThread(workspaceId: number, engineSessio
         if (!userId) return null
         const { data, error } = await supabase
             .from('sessions')
-            .insert<SessionInsert>({ agent_id: agentId, owner_user_id: userId, engine_session_id: engineSessionId, kind: 'thread', status: target?.status ?? 'working', source: 'schedule', title: seedSessionTitle(title), automation_name: title })
+            .insert<SessionInsert>({ agent_id: agentId, owner_user_id: userId, engine_session_id: engineSessionId, kind: 'thread', status: target?.status ?? 'working', source, title: seedSessionTitle(title), automation_name: source === 'schedule' || source === 'trigger' ? title : null })
             .select('id')
             .single()
         if (error || !data) {

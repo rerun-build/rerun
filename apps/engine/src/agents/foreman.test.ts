@@ -107,6 +107,15 @@ describe('foreman', () => {
         expect(names).not.toContain('brain_propose')
     })
 
+    it('works the brain as a coworker does when a coworker called it: no deleting, no deciding', async () => {
+        const agent = await foremanWithBrief()
+        const { tools, close } = await buildTools({ agent, sessionId: 's1', logger, provider: 'rerun', model: 'rerun-max', called: true })
+        const names = Object.keys(tools)
+        await close()
+        expect(names).toContain('brain_propose')
+        for (const name of ['brain_delete', 'brain_proposals', 'brain_decide']) expect(names).not.toContain(name)
+    })
+
     it('keeps a memory, skills and routines of its own, like a coworker', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)

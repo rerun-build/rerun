@@ -1,3 +1,4 @@
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { getAgent } from '../../agents/registry.js'
@@ -10,6 +11,12 @@ import type { AgentRow } from '../../db/schema.js'
 import { beginSubRun, endSubRun, followSubRun, renderSubRunOutcome, snapshotSubRun, startHeartbeat, type SubRunProgress } from './sub-run-watch.js'
 
 type CallProgress = SubRunProgress & { agentName: string; sessionId?: string }
+
+// The Chief of Staff lives outside the agent index but answers a call like any coworker: under its
+// fixed id, as the workspace's assistant, run with what a coworker holds (no account tools).
+export function withForeman(index: AgentRow[]): AgentRow[] {
+    return [...index, { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, status: 'idle', createdAt: '' }]
+}
 
 // Every coworker on the machine but the caller and the delegates, narrowed to the ones the person
 // behind the run reaches when the hub says who that is.
@@ -75,6 +82,8 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                 // Mirrored on the hub before the run starts: a HITL call stops the run without any
                 // completion event, so its `awaiting_*` status has nowhere to land if the session
                 // row only appears later, when someone opens the conversation.
+                // The member behind the calling run, when one is: a conversation of the Chief of Staff is
+                // the thread of one member, and the hub opens it for them.
                 await sendNotification({
                     event: 'agent.session.created',
                     kind: 'info',
@@ -85,6 +94,7 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                     title: session.title,
                     source: 'agent',
                     originAgentId: ctx.agent.id,
+                    ...(ctx.author?.id ? { metadata: { authorId: ctx.author.id } } : {}),
                 })
 
                 const prompt = context ? `${context}\n\n---\n\n${message}` : message

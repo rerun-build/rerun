@@ -203,9 +203,10 @@ export async function callableEngineAgentIds(actor: Actor): Promise<string[] | u
     const map = await spaceAccessMap(actor)
     const visible = [...map].filter(([, access]) => access !== 'none').map(([id]) => id)
     if (visible.length === map.size) return undefined
-    if (visible.length === 0) return []
+    // Every member reaches the Chief of Staff, whatever Boxes they reach.
+    if (visible.length === 0) return [FOREMAN_AGENT_ID]
     const { data: agents } = await selectAll(createServiceRoleClient(), 'agents', ['engine_agent_id'] as const, { workspace_id: actor.workspaceId, space_id: visible })
-    return (agents ?? []).flatMap(agent => (agent.engine_agent_id ? [agent.engine_agent_id] : []))
+    return [...(agents ?? []).flatMap(agent => (agent.engine_agent_id ? [agent.engine_agent_id] : [])), FOREMAN_AGENT_ID]
 }
 
 export function keepVisible<T>(rows: T[], visible: 'all' | Set<string>, idOf: (row: T) => string | null | undefined): T[] {

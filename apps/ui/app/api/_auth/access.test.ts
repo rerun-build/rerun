@@ -300,19 +300,19 @@ describe('callableEngineAgentIds', () => {
         await expect(callableEngineAgentIds(member('all'))).resolves.toBeUndefined()
     })
 
-    it('lists the engine ids of the coworkers in the Boxes a member reaches', async () => {
+    it('lists the engine ids of the coworkers in the Boxes a member reaches, and the Chief of Staff', async () => {
         mocks.selectAll.mockResolvedValueOnce(spaces([{ id: 'open', ...openBox }, { id: 'closed', ...restrictedBox }]))
         mocks.selectAll.mockResolvedValueOnce({ data: [{ engine_agent_id: 'engine-open' }, { engine_agent_id: null }], error: null })
         mocks.selectMany.mockResolvedValue({ data: [], error: null })
 
-        await expect(callableEngineAgentIds(member('all'))).resolves.toEqual(['engine-open'])
+        await expect(callableEngineAgentIds(member('all'))).resolves.toEqual(['engine-open', 'foreman'])
         expect(mocks.selectAll.mock.calls[1][3]).toEqual({ workspace_id: 1, space_id: ['open'] })
     })
 
-    it('lists nobody for a member who reaches no Box at all', async () => {
+    it('lists only the Chief of Staff for a member who reaches no Box at all', async () => {
         mocks.selectAll.mockResolvedValueOnce(spaces([{ id: 'closed', ...restrictedBox }]))
         mocks.selectMany.mockResolvedValue({ data: [], error: null })
-        await expect(callableEngineAgentIds(member('assigned'))).resolves.toEqual([])
+        await expect(callableEngineAgentIds(member('assigned'))).resolves.toEqual(['foreman'])
         expect(mocks.selectAll).toHaveBeenCalledOnce()
     })
 })

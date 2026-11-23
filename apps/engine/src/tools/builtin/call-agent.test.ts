@@ -32,7 +32,7 @@ vi.doMock('../../agents/registry.js', () => ({
     getAgent: async (id: string) => ({ id, config: { name: 'Bob', enabled: true, tools: { callAgent: true }, selfImprovement: { enabled: true } } }),
 }))
 
-const { resolveTargetAgent, callAgentTools, callTargetsOf } = await import('./call-agent.js')
+const { resolveTargetAgent, callAgentTools, callTargetsOf, withForeman } = await import('./call-agent.js')
 const { getSystemDb } = await import('../../db/systemDb.js')
 
 const agents = () => listAgentIndex()
@@ -81,6 +81,19 @@ describe('callTargetsOf', () => {
 
     it('offers nobody to someone who reaches no other coworker', async () => {
         expect(callTargetsOf(await agents(), 'agent-a', [])).toEqual([])
+    })
+
+    it('offers the Chief of Staff beside the coworkers, by its name or its id, and never to itself', async () => {
+        const targets = callTargetsOf(withForeman(await agents()), 'agent-a')
+        expect(targets.map(a => a.id)).toEqual(['agent-b', 'agent-c', 'foreman'])
+        expect(resolveTargetAgent('Chief of Staff', targets)).toEqual({ agent: expect.objectContaining({ id: 'foreman' }) })
+        expect(resolveTargetAgent('foreman', targets)).toEqual({ agent: expect.objectContaining({ id: 'foreman' }) })
+        expect(callTargetsOf(withForeman(await agents()), 'foreman').map(a => a.id)).not.toContain('foreman')
+    })
+
+    it('keeps the Chief of Staff for someone kept out of every Box only when the hub names it', async () => {
+        expect(callTargetsOf(withForeman(await agents()), 'agent-a', ['foreman']).map(a => a.id)).toEqual(['foreman'])
+        expect(callTargetsOf(withForeman(await agents()), 'agent-a', ['agent-c']).map(a => a.id)).toEqual(['agent-c'])
     })
 })
 

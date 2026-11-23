@@ -36,7 +36,7 @@ import { touchSession } from '../db/repos/sessions.js'
 import { logger } from '../lib/logger.js'
 import { newId, nowIso } from '../lib/ids.js'
 import { buildTools } from '../tools/registry.js'
-import { callTargetsOf } from '../tools/builtin/call-agent.js'
+import { callTargetsOf, withForeman } from '../tools/builtin/call-agent.js'
 import { toolPayloadChars } from '../tools/payload.js'
 import { sentToolNames } from '../tools/mcp-search.js'
 import { mcpWireMiddleware } from '../tools/mcp-wire.js'
@@ -545,13 +545,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
         const effort = runEffort(baseAgent, runOverride, provider, model)
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, teamRequests: offersTeamRequests(trigger) }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, called: trigger.source === 'chat' && trigger.calledBy !== undefined, teamRequests: offersTeamRequests(trigger) }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null
         void setRunContext(agent.id, run.id, { provider, model, triggerSource: trigger.source, triggerSlug }).catch(() => {})
 
-        const callTargetsP = agent.config.tools.callAgent ? listAgentIndex().then(idx => callTargetsOf(idx, agent.id, callableAgentIds)) : Promise.resolve([])
+        const callTargetsP = agent.config.tools.callAgent ? listAgentIndex().then(idx => callTargetsOf(withForeman(idx), agent.id, callableAgentIds)) : Promise.resolve([])
         const toolsP = callTargetsP.then(callTargets => {
             ctx.callTargets = callTargets
             return buildTools(ctx)
