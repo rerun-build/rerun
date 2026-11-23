@@ -67,7 +67,12 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
         return { data: { claimed_by_workspace_id: WORKSPACE_ID, workspace: { id: WORKSPACE_ID, is_sandbox: sandbox } } }
     }
     if (table === 'agents') {
-        const match = AGENTS.find(agent => agent.workspace_id === eqValue(calls, 'workspace_id') && agent.engine_agent_id === eqValue(calls, 'engine_agent_id'))
+        // A coworker by its engine id in its workspace, the Chief of Staff by its kind there, or any row by its id.
+        const match = AGENTS.find(agent =>
+            eqValue(calls, 'id') !== undefined
+                ? agent.id === eqValue(calls, 'id')
+                : agent.workspace_id === eqValue(calls, 'workspace_id') && (eqValue(calls, 'kind') !== undefined ? agent.kind === eqValue(calls, 'kind') : agent.engine_agent_id === eqValue(calls, 'engine_agent_id')),
+        )
         return { data: match ? { id: match.id, name: match.name, space_id: match.space_id, kind: match.kind } : null }
     }
     if (table === 'notifications') return { data: { id: 'notification-1' } }
