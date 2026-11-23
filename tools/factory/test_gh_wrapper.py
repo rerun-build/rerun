@@ -114,6 +114,66 @@ class Wrapper(unittest.TestCase):
         self.assertEqual(p.returncode, 64)
         self.assertFalse(os.path.exists(self.log))
 
+    def assert_refused(self, p, name="@linus"):
+        self.assertEqual(p.returncode, 65, p.stderr)
+        self.assertEqual(p.stderr.strip(), "gh wrapper: GitHub notifies every @name, so write names without @ "
+                                            "(found: %s). Nothing was posted." % name)
+        self.assertFalse(os.path.exists(self.log))
+
+    def test_a_body_naming_someone_with_an_at_is_refused(self):
+        self.assert_refused(self.run_gh("issue", "comment", "5", "--body", "Failsafe: @linus reviews against the Files list"))
+        self.assert_refused(self.run_gh("pr", "create", "-t", "Fix", "-b", "(@linus) checks"))
+        self.assert_refused(self.run_gh("pr", "edit", "5", "--title=ask @Linus-T now"), "@Linus-T")
+
+    def test_a_refused_body_is_refused_with_the_app_token_too(self):
+        self.app_token(time.time() + 3600)
+        self.assert_refused(self.run_gh("pr", "review", "5", "--approve", "--body", "@linus fine"))
+
+    def test_a_body_file_naming_someone_is_refused(self):
+        body = os.path.join(self.dir.name, "body.md")
+        with open(body, "w") as f:
+            f.write("# Plan\n\nReviewer: @linus\n")
+        self.assert_refused(self.run_gh("issue", "create", "--title", "T", "--body-file", body))
+        self.assert_refused(self.run_gh("issue", "edit", "5", "-F", body))
+        self.assert_refused(self.run_gh("issue", "edit", "5", "--body-file=" + body))
+
+    def test_a_body_from_stdin_naming_someone_is_refused(self):
+        for form in (["--body-file", "-"], ["-F", "-"], ["--body-file=-"]):
+            self.assert_refused(self.run_gh("issue", "comment", "5", *form, stdin="ok\n@linus said so\n"))
+        self.app_token(time.time() + 3600)
+        self.assert_refused(self.run_gh("pr", "comment", "5", "--body-file", "-", stdin="@linus\n"))
+
+    def test_an_api_body_field_naming_someone_is_refused(self):
+        self.assert_refused(self.run_gh("api", "repos/o/r/issues/5/comments", "-f", "body=hi @linus"))
+        self.assert_refused(self.run_gh("api", "repos/o/r/issues/5/comments", "--raw-field=body=@linus"))
+        self.assert_refused(self.run_gh("api", "repos/o/r/issues", "-F", "title=ask @linus"))
+        self.assert_refused(self.run_gh("api", "repos/o/r/issues/5/comments", "-F", "body=@-", stdin="@linus\n"))
+        data = os.path.join(self.dir.name, "data.json")
+        with open(data, "w") as f:
+            f.write('{"body": "cc @linus"}')
+        self.assert_refused(self.run_gh("api", "repos/o/r/issues/5/comments", "--input", data))
+
+    def test_shas_backticks_and_emails_are_posted(self):
+        body = ("Built at @4a9cf597 by a@b.com.\nInstall `@types/node` first.\n```\n@linus inside a fence\n```\n"
+                "VERDICT: ACCEPT @abcdef1\n")
+        p = self.run_gh("issue", "comment", "5", "--body", body)
+        self.assertEqual((p.returncode, p.stdout), (0, "ok shared\n"), p.stderr)
+        p = self.run_gh("api", "repos/o/r/issues/5/comments", "-f", "body=see @4a9cf597", "-f", "note=@linus")
+        self.assertEqual(p.returncode, 0, p.stderr)
+
+    def test_an_allowed_stdin_body_still_reaches_gh(self):
+        p = self.run_gh("read", "-", stdin="plain\n")
+        self.assertEqual(p.stdout, "plain\nok shared\n")
+        self.app_token(time.time() + 3600)
+        p = self.run_gh("read", "--body-file", "-", stdin="mail a@b.com\n")
+        self.assertEqual(p.stdout, "mail a@b.com\nok app\n")
+        p = self.run_gh("issue", "comment", "5", "--body-file", "-", stdin="mail a@b.com at @4a9cf597\n")
+        self.assertEqual((p.returncode, p.stdout), (0, "ok app\n"), p.stderr)
+
+    def test_a_read_is_never_checked(self):
+        p = self.run_gh("issue", "view", "5", "--json", "body", "-t", "@linus")
+        self.assertEqual((p.returncode, p.stdout), (0, "ok shared\n"))
+
     def test_no_key_file_stops_before_anything_runs(self):
         os.remove(self.key)
         self.assertEqual(self.run_gh("issue", "view", "5").returncode, 78)
