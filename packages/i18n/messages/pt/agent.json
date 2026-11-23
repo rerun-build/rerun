@@ -594,7 +594,12 @@
         "emptyTitle": "Nenhuma skill ainda",
         "emptyDescription": "Skills são instruções passo a passo reutilizáveis que seu coworker aprende, para fazer tarefas recorrentes sempre do mesmo jeito.",
         "appBadge": "App",
-        "count": "{count, plural, one {# skill} other {# skills}}"
+        "count": "{count, plural, one {# skill} other {# skills}}",
+        "ownGroup": "Só {name}",
+        "brainGroup": "Do Brain",
+        "toBrain": "Para o Brain",
+        "toBrainHint": "Mova para o Brain, onde todos os coworkers podem usá-la",
+        "sharedToBrain": "{name} está no Brain"
     },
     "shareAgentDialog": {
         "titleLink": "Seu link de compartilhamento",

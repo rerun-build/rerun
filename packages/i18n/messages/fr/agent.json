@@ -594,7 +594,12 @@
         "emptyTitle": "Aucun skill pour l'instant",
         "emptyDescription": "Les skills sont des instructions pas à pas réutilisables que votre coworker apprend, pour accomplir les tâches récurrentes toujours de la même façon.",
         "appBadge": "App",
-        "count": "{count, plural, one {# skill} other {# skills}}"
+        "count": "{count, plural, one {# skill} other {# skills}}",
+        "ownGroup": "Seulement {name}",
+        "brainGroup": "Du Brain",
+        "toBrain": "Vers le Brain",
+        "toBrainHint": "Le déplacer dans le Brain, où tous les coworkers peuvent l'utiliser",
+        "sharedToBrain": "{name} est dans le Brain"
     },
     "shareAgentDialog": {
         "titleLink": "Votre lien de partage",

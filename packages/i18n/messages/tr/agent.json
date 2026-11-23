@@ -594,7 +594,12 @@
         "emptyTitle": "Henüz skill yok",
         "emptyDescription": "Skill'ler, coworker'ınızın öğrendiği yeniden kullanılabilir adım adım talimatlardır; böylece tekrarlayan görevleri her seferinde aynı şekilde yapar.",
         "appBadge": "Uygulama",
-        "count": "{count, plural, one {# skill} other {# skill}}"
+        "count": "{count, plural, one {# skill} other {# skill}}",
+        "ownGroup": "Yalnızca {name}",
+        "brainGroup": "Brain'den",
+        "toBrain": "Brain'e taşı",
+        "toBrainHint": "Her coworker'ın kullanabileceği Brain'e taşıyın",
+        "sharedToBrain": "{name} artık Brain'de"
     },
     "shareAgentDialog": {
         "titleLink": "Paylaşım bağlantınız",

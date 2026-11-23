@@ -88,7 +88,10 @@
         "agentPanelMcp.count": "Above the list of MCP servers of a coworker.",
         "agentPanelTriggers.count": "Above the list of triggers of a coworker.",
         "agentPanelScheduled.count": "Above the list of scheduled tasks of a coworker.",
-        "agentPanelSkills.count": "Above the list of skills of a coworker."
+        "agentPanelSkills.count": "Above the list of skills of a coworker.",
+        "agentPanelSkills.ownGroup": "Heading of the skills only this coworker has. {name} is the coworker's name.",
+        "agentPanelSkills.brainGroup": "Heading of the skills shared by every coworker, kept in the Brain (the workspace's shared knowledge, a product name).",
+        "agentPanelSkills.toBrain": "Short button: moves this skill into the Brain so every coworker can use it."
     },
     "agentCard": {
         "destinations": {
@@ -684,7 +687,12 @@
         "emptyTitle": "No skills yet",
         "emptyDescription": "Skills are reusable step-by-step instructions your coworker learns, so it performs recurring tasks the same way every time.",
         "appBadge": "App",
-        "count": "{count, plural, one {# skill} other {# skills}}"
+        "count": "{count, plural, one {# skill} other {# skills}}",
+        "ownGroup": "Only {name}",
+        "brainGroup": "From the Brain",
+        "toBrain": "To the Brain",
+        "toBrainHint": "Move it to the Brain, where every coworker can use it",
+        "sharedToBrain": "{name} is in the Brain"
     },
     "shareAgentDialog": {
         "titleLink": "Your share link",

@@ -2,15 +2,22 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { importSkillAction, listSkillsAction } from '@/app/api/_actions/agent.actions'
-import { setAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
+import { listBrainSkillsAction, shareSkillToBrainAction } from '@/app/api/_actions/brain.actions'
+import { invalidateAllAgentSkillSummaries, setAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
 import { SkillEditor } from '@/components/agent/skills/SkillEditor'
+import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineSkillWithSource } from '@/lib/engine/types'
-import { BlocksIcon, FileTextIcon, FolderUpIcon, Layers, Loader2Icon, PlusIcon, UploadIcon } from '@/lib/icons'
+import { brainAuthorLabel } from '@/lib/brain/labels'
+import { coworkerOfAuthor, type BrainCoworker } from '@/lib/brain/items'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
+import type { BrainSkill } from '@rerun/contracts'
+import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { BlocksIcon, BrainIcon, FileTextIcon, FolderUpIcon, Layers, Loader2Icon, PlusIcon, Share2Icon, UploadIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
@@ -24,17 +31,27 @@ import { toast } from 'sonner'
 
 type AgentPanelSkillsProps = {
     agentId: string
+    agentName: string
     focusSlug?: string | null
     onFocusConsumed?: () => void
 }
 
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string; readOnly: boolean }
 
-export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentPanelSkillsProps) {
+export function AgentPanelSkills({ agentId, agentName, focusSlug, onFocusConsumed }: AgentPanelSkillsProps) {
     const t = useTranslations('agent.agentPanelSkills')
+    const tBrain = useTranslations('brain')
+    const openBrainSkill = useWorkspaceSettingsStore(s => s.openBrainSkill)
     const errorText = useErrorText()
     const boxManageReason = useBoxManageReason(agentId)
     const [skills, setSkills] = useState<EngineSkillWithSource[]>([])
+    // The Brain's skills the coworker uses: one of its own under the same slug wins over it.
+    const [brainSkills, setBrainSkills] = useState<BrainSkill[]>([])
+    const [coworkers, setCoworkers] = useState<BrainCoworker[]>([])
+    // False on a box from before the Brain's skills: there is nowhere to move one to.
+    const [brainAvailable, setBrainAvailable] = useState(false)
+    const [confirmingShare, setConfirmingShare] = useState<EngineSkillWithSource | null>(null)
+    const [sharing, setSharing] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [view, setView] = useState<View>({ mode: 'list' })
     const [importing, setImporting] = useState(false)
@@ -55,9 +72,14 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
 
     const load = useCallback(async () => {
         setLoading(true)
-        const list = await listSkillsAction(agentId)
+        const [list, brain] = await Promise.all([listSkillsAction(agentId), listBrainSkillsAction()])
+        const own = new Set(list.map(skill => skill.slug))
+        const fromBrain = (brain?.skills ?? []).filter(skill => !own.has(skill.slug))
         setSkills(list)
-        setAgentSkillSummaries(agentId, list)
+        setBrainSkills(fromBrain)
+        setCoworkers(brain?.coworkers ?? [])
+        setBrainAvailable(brain?.available ?? false)
+        setAgentSkillSummaries(agentId, [...list, ...fromBrain])
         // Resolved here rather than in an effect: the row carries the readOnly flag, so the drill-in
         // has to wait for the list anyway.
         const requested = requestedSlugRef.current
@@ -66,10 +88,11 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
             consumeRequestedRef.current?.()
             const skill = list.find(s => s.slug === requested)
             if (skill) setView({ mode: 'edit', slug: skill.slug, readOnly: skill.fromConnector })
+            else if (fromBrain.some(s => s.slug === requested)) openBrainSkill(requested)
             else toast.error(t('notFound'), { description: requested })
         }
         setLoading(false)
-    }, [agentId, t])
+    }, [agentId, t, openBrainSkill])
 
     useEffect(() => {
         load()
@@ -122,6 +145,33 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
             setImporting(false)
         }
     }, [agentId, load, t, errorText])
+
+    const shareToBrain = useCallback(
+        async (skill: EngineSkillWithSource) => {
+            setSharing(skill.slug)
+            const result = await shareSkillToBrainAction(agentId, skill.slug)
+            setSharing(null)
+            setConfirmingShare(null)
+            if (!result.ok) {
+                toast.error(errorText(result))
+                return
+            }
+            toast.success(t('sharedToBrain', { name: skill.name }))
+            invalidateAllAgentSkillSummaries()
+            void load()
+        },
+        [agentId, load, t, errorText],
+    )
+
+    const authorBadge = (skill: BrainSkill) => {
+        if (!skill.author) return null
+        const coworker = coworkerOfAuthor(skill.author, coworkers)
+        return (
+            <Badge size="xs" tone="neutral" glow={false} className="max-w-32" leading={coworker ? <AgentBuddy agentId={coworker.id} size={12} animated={false} facing="right" /> : undefined}>
+                <span className="truncate">{coworker?.name ?? brainAuthorLabel(skill.author, tBrain)}</span>
+            </Badge>
+        )
+    }
 
     const actionButtons = (
         <div className="flex items-center gap-1.5">
@@ -179,13 +229,13 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
             <div className="flex flex-col h-full">
                 <input ref={fileInputRef} type="file" accept=".md,.markdown" className="hidden" onChange={handleUploadFile} />
                 <input ref={folderInputRef} type="file" multiple className="hidden" onChange={handleUploadFolder} {...{ webkitdirectory: '' }} />
-                <PanelListHeader countLabel={t('count', { count: skills.length })}>
+                <PanelListHeader countLabel={t('count', { count: skills.length + brainSkills.length })}>
                     {actionButtons}
                 </PanelListHeader>
                 {importError && <p className="px-3 py-2 text-xs text-destructive border-b border-border whitespace-pre-line">{importError}</p>}
                 {importNotice && <p className="px-3 py-2 text-xs text-muted-foreground border-b border-border">{importNotice}</p>}
 
-                {skills.length === 0 ? (
+                {skills.length === 0 && brainSkills.length === 0 ? (
                     <EmptyState
                         icon={Layers}
                         title={t('emptyTitle')}
@@ -193,34 +243,83 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
                         action={actionButtons}
                     />
                 ) : (
-                    <PanelScroller>
-                        <PanelList>
-                            {skills.map(skill => (
-                                <PanelRow
-                                    key={skill.slug}
-                                    onClick={() => setView({ mode: 'edit', slug: skill.slug, readOnly: skill.fromConnector })}
-                                    title={skill.name}
-                                    description={skill.description}
-                                    meta={
-                                        <>
-                                            {skill.files.length > 0 && (
-                                                <Badge size="xs" tone="neutral" glow={false} leading={<FileTextIcon className="size-2.5" />}>
-                                                    {skill.files.length}
-                                                </Badge>
-                                            )}
-                                            {skill.fromConnector && (
-                                                <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
-                                                    {t('appBadge')}
-                                                </Badge>
-                                            )}
-                                        </>
-                                    }
-                                />
-                            ))}
-                        </PanelList>
+                    <PanelScroller className="space-y-5">
+                        {skills.length > 0 && (
+                            <section className="space-y-1.5">
+                                <h3 className="px-1 text-xs font-medium text-muted-foreground">{t('ownGroup', { name: agentName })}</h3>
+                                <PanelList>
+                                    {skills.map(skill => (
+                                        <PanelRow
+                                            key={skill.slug}
+                                            onClick={() => setView({ mode: 'edit', slug: skill.slug, readOnly: skill.fromConnector })}
+                                            title={skill.name}
+                                            description={skill.description}
+                                            meta={
+                                                <>
+                                                    {skill.files.length > 0 && (
+                                                        <Badge size="xs" tone="neutral" glow={false} leading={<FileTextIcon className="size-2.5" />}>
+                                                            {skill.files.length}
+                                                        </Badge>
+                                                    )}
+                                                    {skill.fromConnector && (
+                                                        <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
+                                                            {t('appBadge')}
+                                                        </Badge>
+                                                    )}
+                                                </>
+                                            }
+                                            actions={
+                                                brainAvailable &&
+                                                !skill.fromConnector && (
+                                                    <TooltipDisabledReason reason={manageReason}>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            disabled={!canManage || sharing !== null}
+                                                            loading={sharing === skill.slug}
+                                                            onClick={event => {
+                                                                event.stopPropagation()
+                                                                setConfirmingShare(skill)
+                                                            }}
+                                                            title={t('toBrainHint')}
+                                                        >
+                                                            <Share2Icon className="size-3.5" /> {t('toBrain')}
+                                                        </Button>
+                                                    </TooltipDisabledReason>
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                </PanelList>
+                            </section>
+                        )}
+                        {brainSkills.length > 0 && (
+                            <section className="space-y-1.5">
+                                <h3 className="flex items-center gap-1.5 px-1 text-xs font-medium text-muted-foreground">
+                                    <BrainIcon className="size-3.5" /> {t('brainGroup')}
+                                </h3>
+                                <PanelList>
+                                    {brainSkills.map(skill => (
+                                        <PanelRow key={skill.slug} onClick={() => openBrainSkill(skill.slug)} title={skill.name} description={skill.description} meta={authorBadge(skill)} />
+                                    ))}
+                                </PanelList>
+                            </section>
+                        )}
                     </PanelScroller>
                 )}
             </div>
+            <ConfirmDialog
+                open={confirmingShare !== null}
+                onOpenChange={open => !open && setConfirmingShare(null)}
+                pending={sharing !== null}
+                title={tBrain('skills.shareConfirmTitle', { name: confirmingShare?.name ?? '' })}
+                description={tBrain('skills.shareConfirmDescription', { coworker: agentName })}
+                confirmLabel={tBrain('skills.shareConfirm')}
+                confirmVariant="default"
+                onConfirm={() => {
+                    if (confirmingShare) void shareToBrain(confirmingShare)
+                }}
+            />
         </PanelSteps>
     )
 }

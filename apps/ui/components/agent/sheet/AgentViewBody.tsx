@@ -41,7 +41,7 @@ export function AgentViewBody({ agent, tab, onOpenSession }: AgentViewBodyProps)
         case 'mcp':
             return <AgentPanelMcp agentId={agent.id} />
         case 'skills':
-            return <AgentPanelSkills key={agent.id} agentId={agent.id} focusSlug={agentSkillFocus?.agentId === agent.id ? agentSkillFocus.slug : null} onFocusConsumed={clearAgentSkillFocus} />
+            return <AgentPanelSkills key={agent.id} agentId={agent.id} agentName={agent.name} focusSlug={agentSkillFocus?.agentId === agent.id ? agentSkillFocus.slug : null} onFocusConsumed={clearAgentSkillFocus} />
         case 'memories':
             return <AgentPanelMemories agentId={agent.id} />
         case 'files':
