@@ -12,6 +12,8 @@
         "limits.messages.sessionResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
         "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider.",
         "limits.messages.openaiCredits": "The OpenAI API is a product name, billed apart from a ChatGPT subscription: its account is topped up with prepaid credits. Keep platform.openai.com as it is.",
+        "limits.messages.chatgptCredits": "A ChatGPT workspace is a company account at OpenAI, billed in credits. It is not the Rerun workspace.",
+        "limits.messages.chatgptSpend": "A ChatGPT workspace is a company account at OpenAI, whose owner sets a spend cap. It is not the Rerun workspace.",
         "limits.messages.anthropicCredits": "The Anthropic API is billed apart from a Claude subscription: its account is topped up with prepaid credits. The Anthropic Console and Billing are names of Anthropic's site and its page.",
         "anthropicKeyNotScoped.message": "An Anthropic API key belongs to an organization, which holds workspaces. The Anthropic Console is the name of Anthropic's site.",
         "opencodePrivacy.region": "OpenCode is an AI provider; the OpenCode console is its site. Privacy and Global are the names of a settings page and an option there, keep them in English.",
@@ -76,6 +78,8 @@
         "messages": {
             "openaiCredits": "Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.",
             "anthropicCredits": "Your Anthropic API account has no credits left. Add credits in the Anthropic Console under Billing, or switch this coworker to another model.",
+            "chatgptCredits": "Your ChatGPT workspace has no credits left. Add credits in ChatGPT or ask its owner to, or switch this coworker to another model.",
+            "chatgptSpend": "Your ChatGPT workspace has reached its spend cap. Its owner can raise it; switch this coworker to another model in the meantime.",
             "opencodeCredits": "No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.",
             "opencodeNoGo": "This OpenCode key has no active Go subscription, so every Go model is refused, free ones included. Subscribe to OpenCode Go, or pick a Console model or another provider.",
             "opencodeWindowResets": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. It resets {resetsAt}; switch to a Console model or another provider until then.",

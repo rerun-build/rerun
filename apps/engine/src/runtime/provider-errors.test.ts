@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createOpenAI } from '@ai-sdk/openai'
 import { APICallError, generateText, LoadAPIKeyError, RetryError } from 'ai'
 import { classifyChatError, describeSubscriptionLimit } from '@rerun/contracts'
-import { classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, refusalReason, RUN_ERROR_CODES, STREAM_CUT_RAW_REASON, unreachableEndpointError, upstreamReason } from './provider-errors.js'
+import { chatGptWorkspaceError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, refusalReason, RUN_ERROR_CODES, STREAM_CUT_RAW_REASON, unreachableEndpointError, upstreamReason } from './provider-errors.js'
 import { RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 
 const apiError = (init: { statusCode?: number; message?: string; data?: unknown; isRetryable?: boolean; responseBody?: string }) =>
@@ -148,6 +148,30 @@ describe('classifyProviderError', () => {
 
     it('reads an error event of the OpenAI Responses stream', () => {
         expect(classifyProviderError('openai', openAiStreamError('model_not_found', MODEL_NOT_FOUND))).toBe(RUN_ERROR_CODES.modelNotInPlan)
+    })
+
+    // Codex 0.171's own sentences for a ChatGPT workspace, with no status nor code beside them (RER-249).
+    const CODEX_WORKSPACE_SENTENCES = [
+        'Your workspace is out of credits. Add credits to continue.',
+        'Your workspace is out of credits. Ask your workspace owner to refill in order to continue.',
+        'You hit your spend cap set in your workspace. Increase your spend cap to continue.',
+        'You hit your spend cap set by the owner of your workspace. Ask an owner to increase your spend cap to continue.',
+    ]
+
+    it.each(CODEX_WORKSPACE_SENTENCES)('reads a ChatGPT workspace that cannot spend any more as a spent plan: %s', message => {
+        expect(classifyProviderError('codex', new Error(message))).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    it.each(CODEX_WORKSPACE_SENTENCES)('names ChatGPT only when the run went through Codex: %s', message => {
+        const stored = chatGptWorkspaceError('codex', new Error(message))
+        expect(stored?.message).toBe(`ChatGPT workspace limit reached: ${message}`)
+        expect(classifyProviderError('codex', stored)).toBe(RUN_ERROR_CODES.usageLimit)
+        expect(chatGptWorkspaceError('custom', apiError({ statusCode: 400, message }))).toBeNull()
+        expect(chatGptWorkspaceError('openai', new Error(message))).toBeNull()
+    })
+
+    it('leaves a Codex limit that is not the workspace one as it is', () => {
+        expect(chatGptWorkspaceError('codex', new Error("You've hit your usage limit. Upgrade to Pro or try again at 4:44 PM."))).toBeNull()
     })
 
     // Read off the four failed runs of a box whose OpenAI key had no credits: stored without a code,

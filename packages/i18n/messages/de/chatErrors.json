@@ -57,6 +57,8 @@
         "messages": {
             "openaiCredits": "Dein OpenAI-API-Konto hat kein Guthaben mehr. Lade Guthaben auf platform.openai.com auf oder stell diesen Coworker auf ein anderes Modell um.",
             "anthropicCredits": "Dein Anthropic-API-Konto hat kein Guthaben mehr. Lade in der Anthropic Console unter Billing Guthaben auf oder stell diesen Coworker auf ein anderes Modell um.",
+            "chatgptCredits": "Dein ChatGPT-Workspace hat kein Guthaben mehr. Lade in ChatGPT Guthaben auf oder bitte den Inhaber darum, oder stell diesen Coworker auf ein anderes Modell um.",
+            "chatgptSpend": "Dein ChatGPT-Workspace hat sein Ausgabenlimit erreicht. Der Inhaber kann es erhöhen; stell diesen Coworker solange auf ein anderes Modell um.",
             "opencodeCredits": "Kein Console-Guthaben mehr. Lade Guthaben auf opencode.ai auf oder wähle ein Go-Modell, um weiterzumachen.",
             "opencodeNoGo": "Dieser OpenCode-Schlüssel hat kein aktives Go-Abo, daher wird jedes Go-Modell abgelehnt, auch die kostenlosen. Abonniere OpenCode Go oder wähle ein Console-Modell oder einen anderen Anbieter.",
             "opencodeWindowResets": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Es wird {resetsAt} zurückgesetzt; wechsle bis dahin zu einem Console-Modell oder einem anderen Anbieter.",

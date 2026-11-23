@@ -57,6 +57,8 @@
         "messages": {
             "openaiCredits": "OpenAI API hesabınızda kredi kalmadı. platform.openai.com üzerinden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
             "anthropicCredits": "Anthropic API hesabınızda kredi kalmadı. Anthropic Console'da Billing bölümünden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
+            "chatgptCredits": "ChatGPT çalışma alanınızda kredi kalmadı. ChatGPT'den kredi ekleyin, sahibinden isteyin veya bu coworker'ı başka bir modele geçirin.",
+            "chatgptSpend": "ChatGPT çalışma alanınız harcama sınırına ulaştı. Sahibi sınırı yükseltebilir; bu arada bu coworker'ı başka bir modele geçirin.",
             "opencodeCredits": "Console kredisi kalmadı. opencode.ai üzerinden kredi ekleyin veya devam etmek için bir Go modeli seçin.",
             "opencodeNoGo": "Bu OpenCode anahtarının etkin bir Go aboneliği yok, bu yüzden ücretsizler dahil tüm Go modelleri reddediliyor. OpenCode Go'ya abone olun veya bir Console modeli ya da başka bir sağlayıcı seçin.",
             "opencodeWindowResets": "OpenCode Go planınız {window, select, weekly {haftalık} monthly {aylık} other {5 saatlik}} sınırına ulaştı. Sıfırlanma zamanı: {resetsAt}. O zamana kadar bir Console modeline veya başka bir sağlayıcıya geçin.",

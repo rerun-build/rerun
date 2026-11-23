@@ -43,6 +43,11 @@ export const OPENCODE_GO_LIMIT = 'OpenCode Go limit reached'
 // exceeded your current quota", and the second one is also Gemini's plain per-minute rate limit.
 export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
 
+// What the engine stores, ahead of Codex's own sentence, when the ChatGPT workspace a Codex sign-in
+// bills is out of credits or at its spend cap. Codex's words alone say "workspace", and a gateway
+// quoting them is not ChatGPT: only the engine knows the run went through Codex.
+export const CHATGPT_WORKSPACE_LIMIT = 'ChatGPT workspace limit reached'
+
 // What the engine stores when a custom endpoint answers 402, ahead of the server's own sentence. What
 // a 402 means is up to each server, so the chat shows that sentence as it is.
 export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
@@ -57,7 +62,7 @@ export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
 // once they are spent), Codex "The 'gpt-6-astra' model is not supported when using Codex with a
 // ChatGPT account". Shared with the engine's `classifyProviderError`, so both ends agree.
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|active opencode go subscription is required|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|active opencode go subscription is required|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low|workspace is out of credits\. (?:add credits to continue|ask your workspace owner)|hit your spend cap set (?:in|by)/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names OpenAI: the engine's sentence, or OpenAI's own one,
 // which points at platform.openai.com. An OpenAI-compatible gateway answering `insufficient_quota`
@@ -72,6 +77,11 @@ export const ANTHROPIC_API_CREDITS = /credit balance is too low to access the an
 // for it, then every message needs an `anthropic-workspace-id` header the engine does not send. The
 // key has to be replaced, so it reads as a connection to redo, not as a refusal.
 export const ANTHROPIC_KEY_NOT_SCOPED = /not scoped to a workspace/i
+
+// The subsets of `SUBSCRIPTION_LIMIT` Codex says of the ChatGPT workspace it bills, which is not the
+// Rerun one: its credits are spent, or it reached the spend cap its owner set.
+export const CHATGPT_WORKSPACE_CREDITS = /workspace is out of credits\. (?:add credits to continue|ask your workspace owner)/i
+export const CHATGPT_SPEND_CAP = /hit your spend cap set (?:in|by)/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names a model the plan does not include, rather than a
 // window that ran out. The chat words both the same way, but the engine reports it under its own

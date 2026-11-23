@@ -8,7 +8,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-backup-'))
 // Each connection answers its own way: the test says which one is out of its subscription.
 const { sent, answers, prompts, signals } = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
-    answers: new Map<string, 'limit' | 'limit-after-text' | 'limit-after-tools' | 'ok'>(),
+    answers: new Map<string, 'limit' | 'limit-after-text' | 'limit-after-tools' | 'workspace-credits' | 'ok'>(),
     prompts: [] as Array<{ connectionId: string; prompt: string }>,
     signals: [] as AbortSignal[],
 }))
@@ -54,6 +54,7 @@ vi.mock('../agents/providers.js', async importOriginal => {
                 )
             if (answer === 'ok') parts.push({ type: 'text-start', id: '1' }, { type: 'text-delta', id: '1', delta: `answered by ${agent.resolved.model}` }, { type: 'text-end', id: '1' }, finish)
             else if (answer === 'limit-after-text') parts.push({ ...finish, finishReason: { unified: 'other', raw: 'usage_limit_exceeded' } })
+            else if (answer === 'workspace-credits') parts.push({ type: 'error', error: new Error('Your workspace is out of credits. Add credits to continue.') })
             else parts.push({ type: 'error', error: new Error("You've hit your session limit · resets 4:40pm") })
             return {
                 model: new MockLanguageModelV3({
@@ -88,6 +89,7 @@ const { getRun } = await import('../db/repos/runs.js')
 const { listMessages } = await import('../db/repos/messages.js')
 const { createConnection } = await import('../connections/store.js')
 const { clearBoxBackups, writeBoxBackups } = await import('../connections/backups.js')
+const { forgetCredentialRejected, recordCredentialRejected } = await import('../connections/credential-rejections.js')
 const { armPlanLimitLatch, clearPlanLimitLatch, isPlanLimitLatched } = await import('../connections/plan-limits.js')
 const { runAgent } = await import('./loop.js')
 const { sessionClaim } = await import('./run-control.js')
@@ -147,7 +149,10 @@ describe('a turn whose subscription runs out moves to a backup', () => {
         prompts.length = 0
         signals.length = 0
         answers.clear()
-        for (const connection of [primary, backup, second]) clearPlanLimitLatch(connection)
+        for (const connection of [primary, backup, second]) {
+            clearPlanLimitLatch(connection)
+            forgetCredentialRejected(connection)
+        }
         await clearBoxBackups()
     })
 
@@ -259,6 +264,19 @@ describe('a turn whose subscription runs out moves to a backup', () => {
         const attempts = await chain(run)
 
         expect(attempts.at(-1)).toMatchObject({ providerSwitch: { to: { connectionId: second } } })
+    })
+
+    it('carries a turn whose ChatGPT workspace ran out of credits on to the first backup its provider accepts', async () => {
+        answers.set(primary, 'workspace-credits')
+        recordCredentialRejected(backup)
+
+        const { outcome, run } = await send('draft the report')
+        const attempts = await chain(run)
+
+        expect(outcome.kind).toBe('done')
+        expect(isPlanLimitLatched(primary)).toBe(true)
+        expect(attempts).toHaveLength(2)
+        expect(attempts[1]).toMatchObject({ providerSwitch: { to: { connectionId: second } } })
     })
 
     it('walks the list when the backup runs out too, then fails once every plan is out', async () => {

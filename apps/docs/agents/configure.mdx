@@ -98,9 +98,9 @@ Open a connection to rename it, sign in again or replace its key, and choose whi
 
 ### Backups
 
-When the Claude or ChatGPT plan a coworker runs on hits its usage limit (the 5-hour or the weekly limit), the coworker carries on with the first backup in the list, in the same conversation, without losing what it already did. A line in the chat says which model took over, and until when if the plan already gave its reset time, for example **Claude limit reached · GPT-6 Sol until 4:40 PM** or **Claude limit reached · GPT-6 Sol**. Once the plan resets, the next message runs on it again and the chat says **Claude reset. Back on Opus 5.5.**
+When the Claude or ChatGPT plan a coworker runs on hits its usage limit (the 5-hour or the weekly limit), or its ChatGPT workspace runs out of credits or reaches its spend cap, the coworker carries on with the first backup in the list, in the same conversation, without losing what it already did. A line in the chat says which model took over, and until when if the plan already gave its reset time, for example **Claude limit reached · GPT-6 Sol until 4:40 PM** or **Claude limit reached · GPT-6 Sol**. Once the plan resets, the next message runs on it again and the chat says **Claude reset. Back on Opus 5.5.**
 
-- Backups are tried in their order. One on the plan that ran out, one at its own limit or one that is not connected is skipped.
+- Backups are tried in their order. One on the plan that ran out, one at its own limit, one that is not connected or one whose provider turned its key or sign-in away is skipped.
 - They apply to every coworker, whether it follows the default model or has one of its own, and to scheduled runs: a schedule fires on a backup instead of waiting for the reset.
 - You can add up to 5 backups.
 - **Rerun credit as last resort** is off by default. Switched on, the coworker moves to Rerun only once every plan in the list is out, and the credit is never spent otherwise.

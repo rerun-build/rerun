@@ -1,5 +1,5 @@
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { ANTHROPIC_KEY_NOT_SCOPED, CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
+import { ANTHROPIC_KEY_NOT_SCOPED, CHATGPT_SPEND_CAP, CHATGPT_WORKSPACE_CREDITS, CHATGPT_WORKSPACE_LIMIT, CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
 import { isRerunBudgetError, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 
 export const RUN_ERROR_CODES = {
@@ -189,6 +189,23 @@ export function openAiCreditsError(provider: Provider, error: unknown): OpenAiCr
     if (providerErrorCodeOf(error) !== 'insufficient_quota' && !/no credits remaining/i.test(errorText(error))) return null
     const cause = RetryError.isInstance(error) ? error.lastError : error
     return new OpenAiCreditsError(stripErrorPrefix(errorMessageOf(cause)))
+}
+
+// A ChatGPT workspace, billed by a Codex sign-in, out of credits or at its spend cap. Stored under
+// the sentence the chat names ChatGPT by: Codex only says "workspace", which reads as Rerun's own.
+class ChatGptWorkspaceError extends Error {
+    constructor(reason: string) {
+        super(`${CHATGPT_WORKSPACE_LIMIT}: ${reason}`)
+        this.name = 'ChatGptWorkspaceError'
+    }
+}
+
+export function chatGptWorkspaceError(provider: Provider, error: unknown): ChatGptWorkspaceError | null {
+    if (provider !== 'codex') return null
+    const text = errorText(error)
+    if (!CHATGPT_WORKSPACE_CREDITS.test(text) && !CHATGPT_SPEND_CAP.test(text)) return null
+    const cause = RetryError.isInstance(error) ? error.lastError : error
+    return new ChatGptWorkspaceError(stripErrorPrefix(errorMessageOf(cause)))
 }
 
 function apiCallErrorCode(error: unknown): RunErrorCode | null {

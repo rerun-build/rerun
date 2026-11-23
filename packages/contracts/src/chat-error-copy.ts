@@ -1,4 +1,4 @@
-import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_PRIVACY_REFUSAL, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
+import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, CHATGPT_SPEND_CAP, CHATGPT_WORKSPACE_CREDITS, CHATGPT_WORKSPACE_LIMIT, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_PRIVACY_REFUSAL, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
 // The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
@@ -62,6 +62,10 @@ export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     if (opencode) return opencode
     if (OPENAI_API_CREDITS.test(message)) return { plan: 'openai', scope: 'credits' }
     if (ANTHROPIC_API_CREDITS.test(message)) return { plan: 'anthropic', scope: 'credits' }
+    if (m.includes(CHATGPT_WORKSPACE_LIMIT.toLowerCase())) {
+        if (CHATGPT_WORKSPACE_CREDITS.test(message)) return { plan: 'chatgpt', scope: 'credits' }
+        if (CHATGPT_SPEND_CAP.test(message)) return { plan: 'chatgpt', scope: 'spend' }
+    }
     const codex = m.includes('codex') || m.includes('chatgpt')
     if (m.includes('requires usage credits')) return { plan: 'claude', scope: 'not_in_plan', modelName: modelNotInPlan(message) }
     if (m.includes('not supported when using codex') || m.includes('does not exist or you do not have access')) return { plan: codex ? 'chatgpt' : null, scope: 'not_in_plan', modelName: modelNotInPlan(message) }
@@ -85,7 +89,7 @@ type ExplainedKind = Exclude<TitledKind, 'run_in_flight'>
 const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'overloaded', 'context_window', 'provider_error', 'thinking_replay', 'interrupted', 'session_gone']
 
 type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits'
-type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
+type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'chatgptCredits' | 'chatgptSpend' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
 
 // The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
 export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | 'anthropicKeyNotScoped.title' | 'anthropicKeyNotScoped.message' | 'opencodePrivacy.title' | 'opencodePrivacy.region' | 'opencodePrivacy.training' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
@@ -116,6 +120,8 @@ export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorC
         return model ? t('limits.messages.modelNotInPlan', { plan, model }) : t('limits.messages.anyModelNotInPlan', { plan })
     }
     if (!limit.plan) return t('limits.messages.usageLimit')
+    if (limit.plan === 'chatgpt' && limit.scope === 'credits') return t('limits.messages.chatgptCredits')
+    if (limit.plan === 'chatgpt' && limit.scope === 'spend') return t('limits.messages.chatgptSpend')
     const plan = PLAN_LABELS[limit.plan]
     if (limit.scope === 'credits') return t('limits.messages.credits', { plan })
     if (limit.scope === 'spend') return t('limits.messages.spend', { plan })

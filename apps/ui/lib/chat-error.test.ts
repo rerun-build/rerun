@@ -265,6 +265,35 @@ describe('describeSubscriptionLimit', () => {
         expect(isAnthropicKeyNotScoped('unauthorized', 'AI_APICallError: invalid x-api-key')).toBe(false)
     })
 
+    // What the engine stores for a Codex run whose ChatGPT workspace, not the Rerun one, cannot spend (RER-249).
+    it('names a ChatGPT workspace out of credits', () => {
+        for (const sentence of ['Your workspace is out of credits. Add credits to continue.', 'Your workspace is out of credits. Ask your workspace owner to refill in order to continue.']) {
+            const stored = `ChatGptWorkspaceError: ChatGPT workspace limit reached: ${sentence}`
+            expect(classifyChatError(stored)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'chatgpt', scope: 'credits' })
+            expect(chatErrorTitle('usage_limit', stored)).toBe('ChatGPT usage credits used up')
+            expect(friendlyError(stored)).toBe('Your ChatGPT workspace has no credits left. Add credits in ChatGPT or ask its owner to, or switch this coworker to another model.')
+        }
+    })
+
+    it('names a ChatGPT workspace at its spend cap', () => {
+        for (const sentence of ['You hit your spend cap set in your workspace. Increase your spend cap to continue.', 'You hit your spend cap set by the owner of your workspace. Ask an owner to increase your spend cap to continue.']) {
+            const stored = `ChatGptWorkspaceError: ChatGPT workspace limit reached: ${sentence}`
+            expect(classifyChatError(stored)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'chatgpt', scope: 'spend' })
+            expect(chatErrorTitle('usage_limit', stored)).toBe('ChatGPT spend limit reached')
+            expect(friendlyError(stored)).toBe('Your ChatGPT workspace has reached its spend cap. Its owner can raise it; switch this coworker to another model in the meantime.')
+        }
+    })
+
+    it('does not send an endpoint quoting Codex to ChatGPT, whatever its status', () => {
+        for (const message of ['AI_APICallError: Your workspace is out of credits. Add credits to continue.', 'Error: Custom endpoint refused the request: Your workspace is out of credits. Add credits to continue.', 'AI_APICallError: You hit your spend cap set in your workspace. Increase your spend cap to continue.']) {
+            expect(classifyChatError(message)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(message).plan).toBeNull()
+            expect(chatErrorTitle('usage_limit', message)).toBe('Usage limit reached')
+        }
+    })
+
     it('does not send an OpenAI-compatible gateway out of credits to OpenAI', () => {
         for (const message of ['AI_APICallError: You have no credits remaining on this gateway.', 'Provider returned error: {"error":{"code":"insufficient_quota","message":"Quota used"}}']) {
             expect(classifyChatError(message)).toBe('usage_limit')

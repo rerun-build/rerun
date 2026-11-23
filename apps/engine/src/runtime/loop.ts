@@ -54,7 +54,7 @@ import { stepWithScreenshots } from './screenshots.js'
 import { costMicrosFrom } from './step-cost.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
 import { emitRunTerminal } from './run-events.js'
-import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
+import { chatGptWorkspaceError, ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
 import { armBudgetLatch, clearBudgetLatch, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 import { agentMcpServers } from '../vault/runtime.js'
 
@@ -415,7 +415,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             if (settlement.errorCode === RUN_ERROR_CODES.refused) settlement = { ...settlement, error: new ProviderRefusedError(refusalReason(settlement.error)) }
             const unreachable = provider === 'custom' ? unreachableEndpointError(connection?.config.baseUrl, settlement.error) : null
             if (unreachable) settlement = { ...settlement, error: unreachable }
-            const outOfCredits = settlement.errorCode === RUN_ERROR_CODES.usageLimit ? openAiCreditsError(provider, settlement.error) : null
+            const outOfCredits = settlement.errorCode === RUN_ERROR_CODES.usageLimit ? (openAiCreditsError(provider, settlement.error) ?? chatGptWorkspaceError(provider, settlement.error)) : null
             if (outOfCredits) settlement = { ...settlement, error: outOfCredits }
             const errorCode = settlement.errorCode ?? null
             const errorMessage = errorMessageOf(settlement.error)

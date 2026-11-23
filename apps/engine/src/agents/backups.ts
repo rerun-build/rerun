@@ -1,5 +1,6 @@
 import { RERUN_CONNECTION_ID, type ProviderSwitch } from '@rerun/contracts'
 import { readBoxBackups } from '../connections/backups.js'
+import { isCredentialRejected } from '../connections/credential-rejections.js'
 import { isPlanLimitLatched, spentPlanWindow } from '../connections/plan-limits.js'
 import { findConnection } from '../connections/registry.js'
 import { isBudgetLatched } from '../runtime/budget-latch.js'
@@ -9,11 +10,12 @@ import type { LoadedAgent } from './types.js'
 
 // The next model a turn can move to once the subscription it ran on is out: the listed backups in
 // their order, then the Rerun credit when the owner switched it on. A backup on a connection already
-// tried is skipped whatever its model, since the limit belongs to the subscription.
+// tried is skipped whatever its model, since the limit belongs to the subscription, and so is one whose
+// provider turned its credential away: the turn would only fail on another error.
 export async function pickBackup(tried: ReadonlySet<string>): Promise<RunModel | null> {
     const { backups, rerunCreditLastResort } = await readBoxBackups()
     for (const backup of backups) {
-        if (tried.has(backup.connectionId) || isPlanLimitLatched(backup.connectionId)) continue
+        if (tried.has(backup.connectionId) || isPlanLimitLatched(backup.connectionId) || isCredentialRejected(backup.connectionId)) continue
         const connection = await findConnection(backup.connectionId)
         if (connection && isUsable(connection, backup.model)) return { connection, provider: connection.config.provider, model: backup.model }
     }

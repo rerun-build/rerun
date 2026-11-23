@@ -27,6 +27,7 @@ vi.mock('./availability.js', () => ({
 }))
 
 const { pickBackup, switchOpeningTurn, limitReached } = await import('./backups.js')
+const { forgetCredentialRejected, recordCredentialRejected } = await import('../connections/credential-rejections.js')
 
 function connect(id: string, usable = true, provider = 'claude') {
     state.connections.set(id, { id, usable, provider })
@@ -41,6 +42,18 @@ describe('pickBackup', () => {
         state.backups = { backups: ['tried', 'latched', 'broken', 'ok', 'later'].map(connectionId => ({ connectionId, model: 'm' })), rerunCreditLastResort: false }
 
         expect(await pickBackup(new Set(['tried']))).toMatchObject({ connection: { id: 'ok' }, model: 'm' })
+    })
+
+    it('skips a backup whose provider turned its key away, until it is renewed', async () => {
+        for (const id of ['refused', 'ok']) connect(id)
+        state.latched = new Set()
+        state.backups = { backups: ['refused', 'ok'].map(connectionId => ({ connectionId, model: 'm' })), rerunCreditLastResort: false }
+
+        recordCredentialRejected('refused')
+        expect(await pickBackup(new Set())).toMatchObject({ connection: { id: 'ok' } })
+
+        forgetCredentialRejected('refused')
+        expect(await pickBackup(new Set())).toMatchObject({ connection: { id: 'refused' } })
     })
 
     it('falls back on the Rerun credit only when it is switched on and the budget is not spent', async () => {

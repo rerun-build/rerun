@@ -57,6 +57,8 @@
         "messages": {
             "openaiCredits": "Votre compte API OpenAI n'a plus de crédits. Ajoutez des crédits sur platform.openai.com, ou passez ce coworker sur un autre modèle.",
             "anthropicCredits": "Votre compte API Anthropic n'a plus de crédits. Ajoutez des crédits dans la console Anthropic, rubrique Billing, ou passez ce coworker sur un autre modèle.",
+            "chatgptCredits": "Votre workspace ChatGPT n'a plus de crédits. Ajoutez-en dans ChatGPT ou demandez à son propriétaire, ou passez ce coworker sur un autre modèle.",
+            "chatgptSpend": "Votre workspace ChatGPT a atteint son plafond de dépenses. Son propriétaire peut le relever ; en attendant, passez ce coworker sur un autre modèle.",
             "opencodeCredits": "Plus aucun crédit Console. Ajoutez des crédits sur opencode.ai, ou choisissez un modèle Go pour continuer.",
             "opencodeNoGo": "Cette clé OpenCode n'a aucun abonnement Go actif : tous les modèles Go sont refusés, gratuits compris. Abonnez-vous à OpenCode Go, ou choisissez un modèle Console ou un autre fournisseur.",
             "opencodeWindowResets": "Votre forfait OpenCode Go a atteint sa limite {window, select, weekly {hebdomadaire} monthly {mensuelle} other {de 5 heures}}. Réinitialisation : {resetsAt}. D'ici là, passez à un modèle Console ou à un autre fournisseur.",
