@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), openForemanRoutineThread: vi.fn(), openCheckinThread: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), openForemanRoutineThread: vi.fn(), openCheckinThread: vi.fn(), ensureForemanAgentRow: vi.fn() }))
 
 vi.mock('next/server', () => ({ after: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({}))
@@ -12,6 +12,7 @@ vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn() }))
 vi.mock('./notification-audience.service', () => ({ writeNotificationPrefs: vi.fn() }))
 vi.mock('./presence.service', () => ({ loadPresence: vi.fn() }))
 vi.mock('./workspace-engine.service', () => ({ authenticateEngineToken: mocks.authenticateEngineToken }))
+vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: mocks.ensureForemanAgentRow }))
 vi.mock('@/lib/foreman/conversation', () => ({ copyToShippedForemanRow: vi.fn(), openForemanRoutineThread: mocks.openForemanRoutineThread }))
 vi.mock('@/lib/foreman/checkin-thread', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/foreman/checkin-thread')>()), openCheckinThread: mocks.openCheckinThread }))
 vi.mock('./workspace-owner.service', () => ({ resolveWorkspaceMemberEmail: vi.fn(), resolveWorkspaceOwner: vi.fn() }))
@@ -71,12 +72,13 @@ describe('recordNotification for the Chief of Staff', () => {
         mocks.openCheckinThread.mockReset()
         mocks.authenticateEngineToken.mockResolvedValue({ workspaceId: 7, isSandbox: false })
         mocks.selectMaybeSingle.mockResolvedValue({ data: foremanRow, error: null })
+        mocks.ensureForemanAgentRow.mockReset().mockResolvedValue('agent-cos')
     })
 
     // A routine of its own: the engine opened the session, nobody typed in it.
     it('opens a thread for the conversation a routine of its own started, named after the routine', async () => {
         expect(await recordNotification('token', { event: 'agent.session.created', agentId: 'foreman', sessionId: 'engine-2', title: 'schedule: monday-review', source: 'schedule', timestamp: '2026-11-18T09:00:00.000Z' } as never)).toEqual({ ok: true })
-        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ workspace_id: 7, engine_agent_id: 'foreman' })
+        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ id: 'agent-cos' })
         expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-2', 'schedule: monday-review', undefined, 'schedule')
     })
 
@@ -90,6 +92,16 @@ describe('recordNotification for the Chief of Staff', () => {
         const announced = { event: 'agent.session.created', kind: 'info', agentId: 'foreman', sessionId: 'engine-5', message: 'Your invoices coworker failed three nights in a row.', title: 'Invoices keep failing', source: 'schedule', metadata: { checkin: { reason: 'pulse' }, memberId: 'ana', aboutAgentIds: [] }, timestamp: '2026-11-19T09:00:00.000Z' }
         expect(await recordNotification('token', announced as never)).toEqual({ ok: true })
         expect(mocks.openCheckinThread).toHaveBeenCalledWith(7, announced, { push: true })
+        expect(mocks.openForemanRoutineThread).not.toHaveBeenCalled()
+    })
+
+    // Its conversations are each member's own: without its row, nothing says whose one is.
+    it('drops what it says when its row cannot be had, rather than tell the whole workspace', async () => {
+        mocks.ensureForemanAgentRow.mockRejectedValue(new Error('down'))
+        mocks.selectMany.mockReset()
+        const finished = { event: 'agent.run.completed', kind: 'info', agentId: 'foreman', sessionId: 'engine-6', runId: 'run-6', message: 'Done', timestamp: '2026-11-23T09:00:00.000Z' }
+        expect(await recordNotification('token', finished as never)).toEqual({ ok: true })
+        expect(mocks.selectMany).not.toHaveBeenCalled()
         expect(mocks.openForemanRoutineThread).not.toHaveBeenCalled()
     })
 })

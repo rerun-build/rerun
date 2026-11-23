@@ -1,6 +1,6 @@
 import { realEmail } from '@/lib/auth/placeholder-email'
 import { after } from 'next/server'
-import { agentAddress, agentKindPolicy, type AgentKind } from '@rerun/contracts'
+import { agentAddress, agentKindOfEngineId, agentKindPolicy, type AgentKind } from '@rerun/contracts'
 
 import { boxAccessOf, memberActor, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
@@ -28,6 +28,7 @@ import { recordAgentReply } from './session-preview.service'
 import { writeNotificationPrefs } from './notification-audience.service'
 import { loadPresence } from './presence.service'
 import { authenticateEngineToken } from './workspace-engine.service'
+import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from './workspace-owner.service'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import { emailTranslator } from '@rerun/emails/i18n'
@@ -48,7 +49,10 @@ export async function recordNotification(token: string, payload: NotificationPay
     const engine = await authenticateEngineToken(token)
     if (!engine) return { ok: false, status: 401, error: 'Unauthorized' }
 
-    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id', 'kind'] as const, { workspace_id: engine.workspaceId, engine_agent_id: payload.agentId })
+    const agent = await notifyingAgent(supabase, engine.workspaceId, payload.agentId)
+    // The Chief of Staff's conversations are each member's own: without its row, nothing says whose
+    // this one is, and it is dropped rather than sent to the whole workspace.
+    if (!agent && agentKindOfEngineId(payload.agentId) === 'foreman') return { ok: true }
 
     if (payload.event === 'agent.session.created') {
         if (agent?.kind === 'foreman') await openForemanSession(engine, payload)
@@ -175,6 +179,20 @@ async function openForemanSession(engine: { workspaceId: number; isSandbox: bool
     const authorId = typeof payload.metadata?.authorId === 'string' ? payload.metadata.authorId : null
     const author = authorId ? await memberActor(engine.workspaceId, authorId).catch(() => null) : null
     await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run', author ? { userId: authorId, status: 'working' } : undefined, (payload.source ?? 'schedule') as SessionSource)
+}
+
+// The coworker the engine speaks for. The Chief of Staff's row is written with its workspace, and
+// again here if it ever went missing.
+async function notifyingAgent(supabase: ServiceRoleClient, workspaceId: number, engineAgentId: string): Promise<{ id: string; name: string; space_id: string | null; kind: AgentKind } | null> {
+    if (agentKindOfEngineId(engineAgentId) === 'foreman') {
+        const rowId = await ensureForemanAgentRow(supabase, workspaceId).catch((err: unknown) => {
+            console.error('[notification] no row for the Chief of Staff', err)
+            return null
+        })
+        if (!rowId) return null
+        return (await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id', 'kind'] as const, { id: rowId })).data
+    }
+    return (await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id', 'kind'] as const, { workspace_id: workspaceId, engine_agent_id: engineAgentId })).data
 }
 
 function isCancelled(notification: StoredNotification): boolean {

@@ -72,22 +72,23 @@ export async function copyToShippedForemanRow(sessionId: string): Promise<void> 
             { id: sessionId },
         )
         if (!session?.owner_user_id || session.agent?.kind !== 'foreman') return
-        const { error } = await supabase.from('foreman_conversations').upsert<ConversationInsert>(
-            {
-                id: session.id,
-                workspace_id: session.agent.workspace_id,
-                user_id: session.owner_user_id,
-                backend: 'engine',
-                engine_session_id: session.engine_session_id,
-                kind: session.kind,
-                title: session.kind === 'general' ? null : session.title,
-                status: session.status,
-                first_message: session.first_message,
-                created_at: session.created_at,
-                updated_at: session.updated_at,
-            },
-            { onConflict: 'id' },
-        )
+        const copy = {
+            engine_session_id: session.engine_session_id,
+            kind: session.kind,
+            title: session.kind === 'general' ? null : session.title,
+            status: session.status,
+            first_message: session.first_message,
+            updated_at: session.updated_at,
+        }
+        const owner = { id: session.id, workspace_id: session.agent.workspace_id, user_id: session.owner_user_id }
+        // The id comes from the client: a row of that id that is not this conversation's copy (someone
+        // else's, or a conversation the hub kept) is never taken over.
+        const inserted = await supabase
+            .from('foreman_conversations')
+            .upsert<ConversationInsert>({ ...owner, ...copy, backend: 'engine', created_at: session.created_at }, { onConflict: 'id', ignoreDuplicates: true })
+        const { error } = inserted.error
+            ? inserted
+            : await supabase.from('foreman_conversations').update<ConversationUpdate>(copy).eq('id', owner.id).eq('workspace_id', owner.workspace_id).eq('user_id', owner.user_id).eq('backend', 'engine')
         if (error) console.error('[foreman] failed to copy the conversation for the shipped builds', error)
     } catch (err) {
         console.error('[foreman] failed to copy the conversation for the shipped builds', err)
