@@ -4,7 +4,18 @@ export const BLOCKED_SOURCE_PREFIX = 'Source closed for this run:'
 const URL_IN_COMMAND = /https?:\/\/[^\s"'<>|;&)]+/gi
 const HTTP_FAILURE_IN_OUTPUT = /\bHTTP\/[0-9.]+\s+(401|403|407|429|5\d\d)\b|\bERROR (401|403|407|429|5\d\d)\b/
 
-export type HostAttempt = { text: string; failed: boolean }
+const REFUSED = '(?:401|403|407|429|5\\d\\d)'
+const FAILURE_IN_FAILED_COMMAND = new RegExp([`\\bHTTP Error ${REFUSED}\\b`, `\\breturned error: ${REFUSED}\\b`, `\\b${REFUSED} (?:Client|Server) Error\\b`, `\\b(?:Client|Server) error '${REFUSED}\\b`, `\\bstatus code ${REFUSED}\\b`, `\\bClientResponseError: ${REFUSED}\\b`, '\\bconnection (?:was )?(?:reset|refused|aborted|broken|timed out|closed)\\b', '\\b(?:operation|read|connect) timed out\\b', '\\bfailed to connect\\b|\\bcannot connect to host\\b|\\bfetch failed\\b|\\bserver disconnected\\b|<urlopen error\\b', '\\bcould not resolve\\b|\\bname or service not known\\b|\\btemporary failure in name resolution\\b|\\bnodename nor servname\\b', '^\\[?(?:DOMException \\[)?[\\w.]*(?:RemoteDisconnected|ConnectionError|ConnectError|SSLError|TimeoutError|ConnectTimeout|ReadTimeout)\\b', '\\b(?:ECONNRESET|ECONNREFUSED|ECONNABORTED|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH|ENOTFOUND|EAI_AGAIN)\\b|\\bUND_ERR_\\w+_TIMEOUT\\b|\\bnet::ERR_', '\\bcurl: \\((?:5|6|7|28|35|52|55|56|92)\\)(?! The requested URL returned error)'].join('|'), 'im')
+const CURL_ERROR = /\bcurl: \(\d+\)/
+// 22 of curl and 8 of wget are left out: they say a 404 as much as a 403.
+const NETWORK_EXIT_CODES: [RegExp, Set<number>][] = [
+    [/\bcurl\b/, new Set([5, 6, 7, 28, 35, 52, 55, 56, 92])],
+    [/\bwget\b/, new Set([4, 5])],
+    [/\btimeout\s/, new Set([124])],
+]
+
+// null: the attempt failed before reaching the host, so it neither counts against it nor clears it.
+export type HostAttempt = { text: string; failed: boolean | null }
 
 /**
  * Counts consecutive failures per host within one run. A host that refused the threshold in a row
@@ -55,12 +66,21 @@ export function httpFailureInOutput(text: string): boolean {
     return HTTP_FAILURE_IN_OUTPUT.test(text)
 }
 
+// `curl -s` fails without a word, so its exit code is all there is to read. An exception counts only
+// where it is raised, at the start of a line: a script that handles ConnectionError names it too.
+export function networkFailureInCommand({ command, exitCode, output }: { command: string; exitCode?: number | string; output: string }): boolean {
+    if (httpFailureInOutput(output) || FAILURE_IN_FAILED_COMMAND.test(output)) return true
+    if (CURL_ERROR.test(output)) return false
+    return typeof exitCode === 'number' && NETWORK_EXIT_CODES.some(([tool, codes]) => tool.test(command) && codes.has(exitCode))
+}
+
 export async function withHostBreaker(breaker: HostBreaker, hosts: string[], attempt: () => Promise<HostAttempt>): Promise<string> {
     if (hosts.length === 0) return (await attempt()).text
     for (const host of hosts) {
         if (!breaker.check(host).open) return breaker.blockedMessage(host)
     }
     const { text, failed } = await attempt()
+    if (failed === null) return text
     const trailers: string[] = []
     for (const host of hosts) {
         const count = breaker.record(host, !failed)

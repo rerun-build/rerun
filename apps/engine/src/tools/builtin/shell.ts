@@ -5,14 +5,14 @@ import { z } from 'zod'
 import { assertCommandAllowed } from '../sandbox.js'
 import { agentProcessEnv } from '../../agents/process-env.js'
 import { childProcessEnv } from '../../lib/child-env.js'
-import { HostBreaker, hostsOf, httpFailureInOutput, withHostBreaker, type HostAttempt } from '../host-breaker.js'
+import { HostBreaker, hostsOf, httpFailureInOutput, networkFailureInCommand, withHostBreaker, type HostAttempt } from '../host-breaker.js'
 import type { RunContext } from '../../runtime/context.js'
 
 export type ShellRunner = (command: string, options: ExecOptions) => Promise<{ stdout: string; stderr: string }>
 
 const execAsync = promisify(exec) as unknown as ShellRunner
 
-type ShellError = { stdout?: string; stderr?: string; message: string; killed?: boolean; signal?: string }
+type ShellError = { stdout?: string; stderr?: string; message: string; code?: number | string; killed?: boolean; signal?: string }
 
 export function shellTools(ctx: RunContext, run: ShellRunner = execAsync): ToolSet {
     const { cwd, env: agentEnv } = agentProcessEnv(ctx.agent)
@@ -37,7 +37,9 @@ export function shellTools(ctx: RunContext, run: ShellRunner = execAsync): ToolS
                         const err = e as ShellError
                         const timedOut = err.killed === true && err.signal === 'SIGTERM'
                         const head = timedOut ? `Command timed out after ${Math.round(timeoutMs / 1000)} s and was killed` : `Command failed: ${err.message}`
-                        return { text: `${head}\n${err.stdout ?? ''}\n${err.stderr ?? ''}`.slice(0, 50_000), failed: true }
+                        const output = `${err.stdout ?? ''}\n${err.stderr ?? ''}`
+                        const failed = timedOut || networkFailureInCommand({ command, exitCode: err.code, output }) ? true : null
+                        return { text: `${head}\n${output}`.slice(0, 50_000), failed }
                     }
                 })
             },
