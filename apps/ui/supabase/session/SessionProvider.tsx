@@ -462,7 +462,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
     usePresenceHeartbeat(!!user?.id)
 
     const signOut = async () => {
-        await supabase.auth.signOut()
+        await supabase.auth.signOut({ scope: 'local' })
         router.push(routes.auth)
     }
 

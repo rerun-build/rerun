@@ -11,7 +11,7 @@ export function SwitchAccountButton({ returnTo }: { returnTo: string }) {
 
     const switchAccount = async () => {
         setLoading(true)
-        await createClient().auth.signOut()
+        await createClient().auth.signOut({ scope: 'local' })
         window.location.href = `/auth?next=${encodeURIComponent(returnTo)}`
     }
 

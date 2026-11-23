@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     rows: {} as Record<string, unknown>,
     urlWorkspace: null as number | null,
     tabWorkspace: null as number | null,
+    signOut: vi.fn<(options?: { scope: string }) => Promise<void>>(async () => {}),
 }))
 
 // Every read waits until the test lets it through: what the provider shows before that came from
@@ -30,7 +31,7 @@ vi.mock('@/supabase/client', () => ({
                 mocks.onAuth = callback
                 return { data: { subscription: { unsubscribe: () => {} } } }
             },
-            signOut: async () => {},
+            signOut: mocks.signOut,
         },
     }),
 }))
@@ -188,5 +189,14 @@ describe('SessionProvider without it', () => {
         await authEvent('INITIAL_SESSION', null)
         expect(readTables()).toEqual([])
         expect(seen.user).toBeNull()
+    })
+})
+
+describe('SessionProvider signing out', () => {
+    it('closes the session of this browser only', async () => {
+        await mount(INITIAL)
+        await authEvent('INITIAL_SESSION', 'u1')
+        await act(async () => seen.signOut())
+        expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({ scope: 'local' })
     })
 })

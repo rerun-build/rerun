@@ -13,7 +13,7 @@ export function InviteMismatch({ inviteEmail, currentEmail, workspaceName }: { i
 
     const switchAccount = async () => {
         setLoading(true)
-        await supabase.auth.signOut()
+        await supabase.auth.signOut({ scope: 'local' })
         window.location.href = `/auth?email=${encodeURIComponent(inviteEmail)}&next=${encodeURIComponent(window.location.pathname)}`
     }
 

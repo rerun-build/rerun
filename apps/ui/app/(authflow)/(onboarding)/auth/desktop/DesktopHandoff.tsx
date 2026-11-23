@@ -75,7 +75,7 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     const switchAccount = async () => {
         setSwitching(true)
-        await createClient().auth.signOut()
+        await createClient().auth.signOut({ scope: 'local' })
         window.location.href = `/auth?next=${encodeURIComponent(signInRoute())}`
     }
 
