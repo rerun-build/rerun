@@ -1,9 +1,11 @@
 import type { ModelMessage } from 'ai'
 import { isContextPart } from '@rerun/contracts'
+import { behaviourOf } from '../../agents/opencode.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import type { ModelOverride } from '../../agents/providers.js'
 import { newId } from '../../lib/ids.js'
 import type { RunContext } from '../context.js'
+import { withoutReasoning } from '../replayed-reasoning.js'
 import { compactionThreshold, recordCompactionUsage, runContextWindow, summarizeMiddle, summaryMessageOf } from './compact.js'
 import { COMPACTION_TAIL_TOKEN_BUDGET } from './config.js'
 import { estimateTokens } from './estimate.js'
@@ -23,7 +25,7 @@ export type InRunCompactionInput = { messages: ModelMessage[]; steps: ReadonlyAr
 /** Returns the messages the next step is sent, or `undefined` when they go as they are. */
 export type InRunCompactor = (input: InRunCompactionInput) => Promise<ModelMessage[] | undefined>
 
-type Compacted = { summary: ModelMessage; coveredCount: number }
+type Compacted = { summary: ModelMessage; coveredCount: number; keptUntil: number }
 
 export type InRunCompactorOptions = { system: string; toolChars: number; override?: ModelOverride; initialMessages: ModelMessage[] }
 
@@ -65,6 +67,7 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
     if (!contextWindow) return undefined
     const threshold = compactionThreshold(contextWindow, ctx.provider)
     const turnIndex = turnIndexOf(initialMessages)
+    const bindsThinking = behaviourOf(ctx.provider, ctx.model) === 'anthropic'
 
     let compacted: Compacted | undefined
     // After a summary, done or failed, the next waits for the context to grow by another tail's
@@ -76,11 +79,16 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
     // The request the summary covers is sent again right after it.
     const pinnedOf = (messages: ModelMessage[], coveredCount: number): ModelMessage[] => (turnIndex !== undefined && turnIndex < coveredCount ? [messages[turnIndex]] : [])
 
+    // Anthropic binds a thought to everything that came before it and refuses it once the summary has
+    // replaced that. The thoughts produced behind the summary are bound to it: they stay.
+    const tailOf = (messages: ModelMessage[], { coveredCount, keptUntil }: Compacted): ModelMessage[] =>
+        messages.slice(coveredCount).map((message, i) => (bindsThinking && coveredCount + i < keptUntil ? withoutReasoning(message) : message))
+
     // The SDK hands every step the full list again, so the summary is put back each time.
     const viewOf = (messages: ModelMessage[]): { view: ModelMessage[]; synthetic: number } => {
         if (!compacted) return { view: messages, synthetic: 0 }
         const pinned = pinnedOf(messages, compacted.coveredCount)
-        return { view: [compacted.summary, ...pinned, ...messages.slice(compacted.coveredCount)], synthetic: 1 + pinned.length }
+        return { view: [compacted.summary, ...pinned, ...tailOf(messages, compacted)], synthetic: 1 + pinned.length }
     }
 
     return async ({ messages, steps, stepNumber }) => {
@@ -108,7 +116,7 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
             const middle = pruneToolOutputs(view, cut).messages.slice(0, cut)
             const summary = await summarizeMiddle(ctx, override, middle)
             await recordCompactionUsage(ctx, stepNumber, summary)
-            compacted = { summary: summaryMessageOf(IN_RUN_SUMMARY_PREAMBLE, summary.text), coveredCount }
+            compacted = { summary: summaryMessageOf(IN_RUN_SUMMARY_PREAMBLE, summary.text), coveredCount, keptUntil: messages.length }
             // Weighed against what the steps carried before the summary, not against the pruned copy
             // the summary was written from, where a large result is down to a line.
             const tokensRecovered = Math.max(0, estimateTokens(view.slice(0, cut)) - estimateTokens([compacted.summary, ...pinned]))

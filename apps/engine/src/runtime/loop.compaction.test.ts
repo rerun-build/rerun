@@ -102,6 +102,18 @@ function dumpTurn(toolCallId: string): unknown[] {
     ]
 }
 
+function reasonedDumpTurn(toolCallId: string): unknown[] {
+    const [start, call, finish] = dumpTurn(toolCallId)
+    return [
+        start,
+        { type: 'reasoning-start', id: 'r' },
+        { type: 'reasoning-delta', id: 'r', delta: `thought of ${toolCallId}` },
+        { type: 'reasoning-end', id: 'r', providerMetadata: { anthropic: { signature: `signed-${toolCallId}` } } },
+        call,
+        finish,
+    ]
+}
+
 function textTurn(text: string): unknown[] {
     return [
         { type: 'stream-start', warnings: [] },
@@ -153,5 +165,25 @@ describe('compaction in the middle of a run', () => {
         const run = await getRun(id, started.runId)
         expect(run?.costMicros).toBe(2000)
         expect(run?.inputTokens).toBe(12)
+    })
+
+    // RER-278: the Anthropic API refuses a thought whose start of conversation the summary replaced.
+    it('replays no thought signed before the summary to Anthropic, and the later ones again', async () => {
+        stream.turns = [reasonedDumpTurn('call-1'), reasonedDumpTurn('call-2'), reasonedDumpTurn('call-3'), reasonedDumpTurn('call-4'), textTurn('All dumped.')]
+        stream.calls = []
+        const session = await createSession(id, 'dump everything')
+        const started = await runAgent(await getAgent(id), session.id, 'dump everything', { provider: 'anthropic', model: 'claude-sonnet-5-5' })
+
+        expect(await started.settled).toEqual({ kind: 'done' })
+        const [, , third, fourth, fifth] = stream.calls.map(call => JSON.stringify(call.prompt))
+        expect(third).toContain('signed-call-2')
+        expect(fourth).toContain(IN_RUN_SUMMARY_PREAMBLE)
+        expect(fourth).toContain('DUMP-')
+        expect(fourth).not.toContain('signed-call')
+        expect(fifth).toContain('signed-call-4')
+        expect(fifth).not.toContain('signed-call-3')
+
+        const stored = (await listMessages(id, session.id)).map(row => row.contentJson).join('\n')
+        for (const call of ['call-1', 'call-2', 'call-3', 'call-4']) expect(stored).toContain(`signed-${call}`)
     })
 })

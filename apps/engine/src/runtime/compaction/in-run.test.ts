@@ -37,6 +37,8 @@ vi.mock('../../db/repos/telemetry.js', () => ({
 }))
 
 const { afterEach, describe, expect, it } = await import('vitest')
+const { thoughtsOf } = await import('../__fixtures__/thoughts.js')
+const { withoutReasoning } = await import('../replayed-reasoning.js')
 const { createInRunCompactor, IN_RUN_SUMMARY_PREAMBLE, turnIndexOf } = await import('./in-run.js')
 
 // gpt-4o's window is 128k, so the run is compacted past 96k estimated tokens.
@@ -235,6 +237,110 @@ describe('createInRunCompactor', () => {
         expect(state.prompts).toHaveLength(2)
         expect(sent?.[1]).toEqual(REQUEST)
     })
+})
+
+// Anthropic signs a thought with everything that came before it and the thought it followed, and
+// refuses a request where either changed ("The block is bound to a different conversation").
+function anthropicApi() {
+    const signed = new Map<string, { prefix: string; previous: string | undefined }>()
+    const signatureOf = (part: unknown) => (part as { providerOptions?: { anthropic?: { signature?: string } } }).providerOptions?.anthropic?.signature
+    const prefixOf = (messages: ModelMessage[]) => JSON.stringify(messages.map(withoutReasoning))
+    const signaturesOf = (messages: ModelMessage[]) =>
+        messages.flatMap((message, index) => (Array.isArray(message.content) ? message.content : []).filter(part => part.type === 'reasoning').map(part => ({ index, signature: signatureOf(part)! })))
+
+    return {
+        check(sent: ModelMessage[]) {
+            signaturesOf(sent).forEach(({ index, signature }, i, all) => {
+                const bound = signed.get(signature)!
+                if (bound.prefix !== prefixOf(sent.slice(0, index))) throw new Error(`Invalid signature in thinking block at messages.${index}: content before it was rewritten`)
+                if (i > 0 && bound.previous !== all[i - 1].signature) throw new Error(`Invalid signature in thinking block at messages.${index}: the thought before it is missing`)
+            })
+        },
+        answer(sent: ModelMessage[], index: number): ModelMessage[] {
+            const signature = `sig-${index}`
+            signed.set(signature, { prefix: prefixOf(sent), previous: signaturesOf(sent).at(-1)?.signature })
+            return reasonedStep(index, signature)
+        },
+    }
+}
+
+function reasonedStep(index: number, signature: string): ModelMessage[] {
+    const [call, result] = toolStep(index)
+    return [{ role: 'assistant', content: [{ type: 'reasoning', text: `thought ${index}`, providerOptions: { anthropic: { signature } } }, ...(call.content as never[])] }, result]
+}
+
+async function runOnAnthropic(stepCount: number, provider = 'anthropic', model = 'claude-sonnet-5-5') {
+    const api = anthropicApi()
+    const { ctx, writes } = context(provider, model)
+    const compact = compactorFor(ctx)
+    const views: ModelMessage[][] = []
+    let messages = OPENING
+    for (let stepNumber = 0; stepNumber < stepCount; stepNumber++) {
+        const sent = (await compact({ messages, steps: noSteps, stepNumber })) ?? messages
+        api.check(sent)
+        views.push(sent)
+        messages = [...messages, ...api.answer(sent, stepNumber)]
+    }
+    const compactedAt = views.findIndex(view => JSON.stringify(view[0]).includes(IN_RUN_SUMMARY_PREAMBLE))
+    return { views, writes, compactedAt }
+}
+
+describe('the signed thinking of a run on the Anthropic API', () => {
+    it('is not replayed behind the summary that rewrote what it was signed against', async () => {
+        const { views, compactedAt } = await runOnAnthropic(20)
+
+        expect(thoughtsOf(views[compactedAt - 1])).toHaveLength(compactedAt - 1)
+        expect(thoughtsOf(views[compactedAt])).toEqual([])
+        expect(views[compactedAt].at(-2)).toMatchObject({ role: 'assistant', content: [{ type: 'tool-call', toolCallId: `c${compactedAt - 1}` }] })
+        expect(views[compactedAt].at(-1)).toMatchObject({ role: 'tool', content: [{ toolCallId: `c${compactedAt - 1}` }] })
+    })
+
+    it('is replayed once the summary is there, behind a kept tail that never moves again', async () => {
+        const { views, compactedAt } = await runOnAnthropic(20)
+        const later = views[compactedAt + 2]
+
+        expect(later.slice(0, views[compactedAt].length)).toEqual(views[compactedAt])
+        expect(thoughtsOf(later)).toEqual([`thought ${compactedAt}`, `thought ${compactedAt + 1}`])
+    })
+
+    it('is dropped again by every later summary', async () => {
+        state.summaries = ['FIRST SUMMARY', 'SECOND SUMMARY']
+        const { views, compactedAt } = await runOnAnthropic(45)
+        const compactedAgainAt = views.findIndex(view => JSON.stringify(view[0]).includes('SECOND SUMMARY'))
+
+        expect(compactedAgainAt).toBeGreaterThan(compactedAt)
+        expect(thoughtsOf(views[compactedAgainAt - 1])).not.toEqual([])
+        expect(thoughtsOf(views[compactedAgainAt])).toEqual([])
+        expect(thoughtsOf(views[compactedAgainAt + 1])).toEqual([`thought ${compactedAgainAt}`])
+    })
+
+    it('stays as it was when a later summary fails', async () => {
+        state.summaries = ['FIRST SUMMARY', new Error('model overloaded')]
+        const { writes } = await runOnAnthropic(34)
+
+        expect(writes.map(write => write.data.status).slice(0, 4)).toEqual(['running', 'done', 'running', 'error'])
+    })
+
+    it('is dropped on an OpenCode model served in the Anthropic format', async () => {
+        const { views, compactedAt } = await runOnAnthropic(20, 'opencode', 'go/claude-haiku-5-5')
+
+        expect(thoughtsOf(views[compactedAt])).toEqual([])
+    })
+})
+
+// OpenAI chains a call to the reasoning item it came from, Google signs the call itself: neither
+// binds a thought to the messages before it.
+it.each([
+    ['openai', 'gpt-4o'],
+    ['google', 'gemini-3.8-flash'],
+])('keeps the thinking of the kept tail on %s', async (provider, model) => {
+    const compact = compactorFor(context(provider, model).ctx)
+    const messages = [...OPENING, ...Array.from({ length: 16 }, (_, i) => reasonedStep(i, `sig-${i}`)).flat()]
+
+    const sent = await compact({ messages, steps: noSteps, stepNumber: 16 })
+
+    expect(state.prompts).toHaveLength(1)
+    expect(thoughtsOf(sent)).toContain('thought 15')
 })
 
 describe('turnIndexOf', () => {

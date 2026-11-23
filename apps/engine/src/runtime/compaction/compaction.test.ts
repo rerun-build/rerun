@@ -7,7 +7,8 @@ import { estimateTokens } from './estimate.js'
 import { tailStartIndex } from './split.js'
 import { pruneToolOutputs } from './prune.js'
 import { repairToolPairs, withToolResultsInToolMessages } from './repair.js'
-import { compactionThreshold, withoutReasoning } from './compact.js'
+import { withoutReasoning } from '../replayed-reasoning.js'
+import { compactionThreshold } from './compact.js'
 
 function assistantCall(id: string, name = 'shell_exec'): ModelMessage {
     return { role: 'assistant', content: [{ type: 'tool-call', toolCallId: id, toolName: name, input: { command: 'ls' } }] } as ModelMessage
