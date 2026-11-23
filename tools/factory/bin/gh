@@ -17,7 +17,7 @@ fi
 
 MODE=''
 case "$1 $2" in
-    "issue create"|"issue edit"|"issue comment"|"pr create"|"pr edit"|"pr comment"|"pr review") MODE=cli ;;
+    "issue create"|"issue edit"|"issue comment"|"issue close"|"pr create"|"pr edit"|"pr comment"|"pr review"|"pr close") MODE=cli ;;
     "api "*) MODE=api ;;
 esac
 SAVED=''
@@ -38,8 +38,8 @@ take() {
     case "$1" in
         text) printf '%s\n' "$2" ;;
         file) case "$2" in -|/dev/stdin) cat "$IN" ;; *) cat -- "$2" ;; esac 2>/dev/null ;;
-        raw) case "$2" in body=*|title=*) printf '%s\n' "${2#*=}" ;; esac ;;
-        field) case "$2" in body=@*|title=@*) take file "${2#*=@}" ;; body=*|title=*) printf '%s\n' "${2#*=}" ;; esac ;;
+        raw) case "$2" in body=*|title=*|query=*) printf '%s\n' "${2#*=}" ;; esac ;;
+        field) case "$2" in body=@*|title=@*|query=@*) take file "${2#*=@}" ;; body=*|title=*|query=*) printf '%s\n' "${2#*=}" ;; esac ;;
     esac
 }
 
@@ -48,14 +48,17 @@ posted() {
     for a in "$@"; do
         if [ -n "$want" ]; then take "$want" "$a"; want=''; continue; fi
         case "$MODE $a" in
-            "cli --body"|"cli -b"|"cli --title"|"cli -t") want=text ;;
+            "cli --body"|"cli -b"|"cli --title"|"cli -t"|"cli --comment"|"cli -c") want=text ;;
             "cli --body-file"|"cli -F"|"api --input") want=file ;;
             "api -f"|"api --raw-field") want=raw ;;
             "api -F"|"api --field") want=field ;;
-            "cli --body="*|"cli --title="*) take text "${a#*=}" ;;
+            "cli --body="*|"cli --title="*|"cli --comment="*) take text "${a#*=}" ;;
             "cli --body-file="*|"api --input="*) take file "${a#*=}" ;;
             "api --raw-field="*) take raw "${a#*=}" ;;
             "api --field="*) take field "${a#*=}" ;;
+            "cli -b"?*) take text "${a#-b}" ;;
+            "cli -t"?*) take text "${a#-t}" ;;
+            "cli -c"?*) take text "${a#-c}" ;;
         esac
     done
 }
