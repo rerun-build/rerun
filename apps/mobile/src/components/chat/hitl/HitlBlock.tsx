@@ -10,11 +10,12 @@ import { HITL_WIDGETS } from './widgets'
 // text otherwise.
 export function HitlBlock(props: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
-    const { pending, webUrl } = props
+    const { pending, webUrl, onDismiss } = props
     const widget = widgetFor(pending, HITL_WIDGETS)
     if (widget) return widget.render(props)
     const { symbol, label } = summarizePendingHitl(pending.kind, pending.input, t)
-    return <FallbackCard symbol={symbol} label={label} ask={firstAsk(pending.kind, pending.input)} webUrl={webUrl} />
+    const isSecret = pending.kind === 'secret'
+    return <FallbackCard symbol={symbol} label={label} ask={firstAsk(pending.kind, pending.input)} webUrl={webUrl} replyHere={!isSecret} onClose={isSecret ? onDismiss : undefined} />
 }
 
 // A call from an engine newer than the app, which the app cannot even name.

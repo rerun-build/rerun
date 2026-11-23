@@ -461,6 +461,7 @@
     "vaultConflictSomeone": "Um coworker já recebe {name} de outra entrada do Vault",
     "vaultMcpTarget": "Informe um endereço ou um comando para o servidor",
     "vaultKeysUnknown": "Este item do Vault guarda outras chaves. Altere-as no Vault.",
+    "vaultHeaderValueMissing": "Preencha cada chave que este servidor lê.",
     "saveAnswerFailed": "Não conseguimos salvar isso. Tente de novo.",
     "notYourCompanySite": "{domain} não é o site da sua empresa. Digite o seu, ou pule.",
     "computerNameInvalid": "Dê ao computador um nome de 1 a 100 caracteres.",

@@ -1,6 +1,6 @@
 import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contracts'
 
-import type { ForemanState } from './phase'
+import { isMobileApp, type ForemanState } from './phase'
 import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
 import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
@@ -110,6 +110,6 @@ export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason, 
 export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } & ForemanBoxFeatures = {}): ForemanBrief {
     return {
         instructions: foremanEngineInstructions(state, options),
-        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name) || (options.vault && VAULT_INTENT_TOOL_NAMES.has(def.name))).map(def => spec(def, 'intent'))],
+        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name) || (options.vault && !isMobileApp(state) && VAULT_INTENT_TOOL_NAMES.has(def.name))).map(def => spec(def, 'intent'))],
     }
 }

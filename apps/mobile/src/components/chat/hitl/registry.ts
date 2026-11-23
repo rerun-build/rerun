@@ -31,3 +31,10 @@ export function widgetFor(pending: PendingHitl, widgets: HitlWidgets): HitlWidge
     if (!widget || hitlVersionOf(pending.input) > widget.maxVersion) return null
     return widget
 }
+
+// A block the app draws is answered inside it, so the composer steps aside as on the web. The fallback
+// card keeps it: typing is the only way to answer what the app cannot draw. A key never goes there, so
+// a request for one the app cannot draw is answered on the web.
+export function replacesComposer(pending: PendingHitl | null, widgets: HitlWidgets): boolean {
+    return pending !== null && (pending.kind === 'secret' || widgetFor(pending, widgets) !== null)
+}

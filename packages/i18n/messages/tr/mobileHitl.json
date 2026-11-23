@@ -45,6 +45,7 @@
     },
     "fallback": {
         "replyBelow": "Aşağıdan yanıtlayın veya",
+        "typeOnWeb": "Bunu web'deki Rerun'dan yazın, asla bu sohbete değil.",
         "needsYou": "{name} sizi bekliyor"
     },
     "steps": {

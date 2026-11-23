@@ -15,7 +15,7 @@ import { selectMany } from '@/supabase/supabase-helpers'
 import { newServiceInstanceId } from '@/lib/services/instances'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
-import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, rethrowConflict, shareVaultEntry, vaultContext } from './vault.service'
+import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, requireAdmin, rethrowConflict, vaultContext } from './vault.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
 
 export type VaultAddResult =
@@ -148,9 +148,10 @@ export async function addVaultSecret(input: AddVaultSecretInput, actor?: Actor):
     return addVaultSecrets({ name: input.name, env: { [input.key.trim()]: input.value }, agentIds: input.agentIds }, actor)
 }
 
-async function addVaultSecrets(input: { name: string; env: Record<string, string>; agentIds?: string[] }, actor?: Actor): Promise<VaultItemSummary> {
+async function addVaultSecrets(input: { name: string; env: Record<string, string>; agentIds?: string[]; sharedWithAll?: boolean }, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
+    if (input.sharedWithAll) requireAdmin(ctx.actor)
     const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
     const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
     return rethrowConflict(ctx, () =>
@@ -159,6 +160,7 @@ async function addVaultSecrets(input: { name: string; env: Record<string, string
             name: input.name,
             env: input.env,
             agentIds: coworkers.map(c => c.engineAgentId),
+            ...(input.sharedWithAll ? { sharedWithAll: true } : {}),
             createdBy,
         }),
     )
@@ -181,13 +183,15 @@ async function replaceVaultKeys(entryId: string, values: Record<string, string>,
 
 // What the Chief of Staff's form typed, sent where it asked, with the rights of the person who typed
 // it: the keys of an entry replaced, a custom MCP server whose headers they fill, or a new secret.
+// The share goes in with the creation, never after it: a refusal leaves the form answerable, so an
+// entry already kept would come back as a duplicate on the next try.
 export async function saveSecretsToVault(target: SecretVaultTarget, values: Record<string, string>, actor: Actor): Promise<VaultItemSummary> {
     if (target.entryId) return replaceVaultKeys(target.entryId, values, actor)
-    const server = target.mcpServer
-    const item = server
-        ? await addVaultMcp({ name: target.name ?? 'MCP server', url: server.url, headers: server.headers.map(({ header, key }) => ({ name: header, value: values[key] ?? '' })), agentIds: target.agentIds }, actor)
-        : await addVaultSecrets({ name: target.name ?? Object.keys(values).join(', '), env: values, agentIds: target.agentIds }, actor)
-    return target.sharedWithAll ? shareVaultEntry(item.id, true, actor) : item
+    const { agentIds, sharedWithAll, mcpServer: server } = target
+    if (server && (server.headers.some(({ key }) => !values[key]) || Object.keys(values).some(key => !server.headers.some(header => header.key === key)))) throw new AccessDeniedError('vaultHeaderValueMissing')
+    if (!server) return addVaultSecrets({ name: target.name ?? Object.keys(values).join(', '), env: values, agentIds, sharedWithAll }, actor)
+    const headers = server.headers.map(({ header, key, prefix }) => ({ name: header, value: prefix ? `${prefix.trim()} ${values[key]}` : values[key] }))
+    return addVaultMcp({ name: target.name ?? 'MCP server', url: server.url, headers, agentIds, sharedWithAll }, actor)
 }
 
 export type AddVaultMcpInput = {
@@ -199,6 +203,8 @@ export type AddVaultMcpInput = {
     // Headers whose values are secrets: kept in the entry's `.env`, the server only names them.
     headers?: Array<{ name: string; value: string }>
     agentIds?: string[]
+    // Admins only.
+    sharedWithAll?: boolean
 }
 
 const SERVER_NAME_MAX = 64
@@ -217,6 +223,7 @@ function headerVariable(server: string, header: string): string {
 export async function addVaultMcp(input: AddVaultMcpInput, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
+    if (input.sharedWithAll) requireAdmin(ctx.actor)
     const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
     const url = input.url?.trim()
     const command = input.command?.trim()
@@ -240,6 +247,7 @@ export async function addVaultMcp(input: AddVaultMcpInput, actor?: Actor): Promi
             ...(url && Object.keys(headers).length === 0 ? { oauth: { serverName, url } } : {}),
             env,
             agentIds: coworkers.map(c => c.engineAgentId),
+            ...(input.sharedWithAll ? { sharedWithAll: true } : {}),
             createdBy,
         }),
     )

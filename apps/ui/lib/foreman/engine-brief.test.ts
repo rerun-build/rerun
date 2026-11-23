@@ -63,6 +63,13 @@ describe('foremanEngineBrief', () => {
         expect(foremanEngineBrief(state, { vault: true }).instructions).not.toContain('mobile app, which cannot show a form')
     })
 
+    it('leaves open_vault off the phone, which cannot open the Vault', () => {
+        const names = (client: string) => foremanEngineBrief({ ...state, client } as ForemanState, { vault: true }).tools.map(tool => tool.name)
+        expect(names('ios')).not.toContain('open_vault')
+        expect(names('ios')).toContain('add_vault_entry')
+        expect(names('web')).toContain('open_vault')
+    })
+
     it('reads the Vault in a check-in, and changes nothing in it', () => {
         const names = foremanCheckinBrief(state, 'pulse', { vault: true }).tools.map(tool => tool.name)
         expect(names).toContain('list_vault')

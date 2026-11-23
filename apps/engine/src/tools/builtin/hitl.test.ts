@@ -256,6 +256,15 @@ describe('request_secret to the Vault', () => {
         expect(foremanSecret().description).toContain('Vault')
     })
 
+    it('refuses a server whose headers do not name every key of the form, each once', () => {
+        const schema = foremanSecret().inputSchema
+        const server = (headers: object[]) => ({ secrets, vault: { name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers } } })
+        expect(schema.safeParse(server([{ header: 'Authorization', key: 'OPENAI_API_KEY', prefix: 'Bearer' }])).success).toBe(true)
+        expect(schema.safeParse(server([{ header: 'Authorization', key: 'OTHER_KEY' }])).success).toBe(false)
+        expect(schema.safeParse(server([{ header: 'Authorization', key: 'OPENAI_API_KEY' }, { header: 'X-Key', key: 'OPENAI_API_KEY' }])).success).toBe(false)
+        expect(schema.safeParse({ secrets: [...secrets, { key: 'EXTRA_KEY', label: 'Extra' }], vault: { mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'OPENAI_API_KEY' }] } } }).success).toBe(false)
+    })
+
     it('never lets a coworker choose the Vault', () => {
         const parsed = coworkerSecret().inputSchema.safeParse({ secrets, vault: { name: 'OpenAI key', sharedWithAll: true } })
         expect(parsed.success).toBe(true)

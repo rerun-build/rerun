@@ -4,12 +4,14 @@ import { saveAgentKeys } from '@/api/agent-keys'
 import { installService, resolveServices } from '@/api/services'
 import { runConnect } from '@/lib/oauth-connect'
 
+import { HitlBlock } from './HitlBlock'
 import { SecretWidget } from './SecretWidget'
 import { ServiceWidget } from './ServiceWidget'
 
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('expo-image', () => ({ Image: () => null }))
 jest.mock('expo-web-browser', () => ({ openBrowserAsync: jest.fn() }))
+jest.mock('react-native-webview', () => ({ WebView: () => null }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_token: 't' }, me: { workspace: { id: 7 } } }) }))
 jest.mock('@/api/agent-keys', () => ({ fetchAgentKeys: jest.fn().mockResolvedValue({ keys: ['OLD_KEY'] }), saveAgentKeys: jest.fn().mockResolvedValue({ keys: [] }) }))
 jest.mock('@/api/services', () => ({ resolveServices: jest.fn(), installService: jest.fn() }))
@@ -35,6 +37,18 @@ describe('SecretWidget', () => {
         await render(<SecretWidget {...secret} />)
         await fireEvent.press(screen.getByLabelText('Skip'))
         expect(secret.onAnswer).toHaveBeenCalledWith('[User declined to provide the credentials]')
+    })
+})
+
+describe('a key request the app cannot draw', () => {
+    it('sends it to the web, never to the chat', async () => {
+        const secret = props('secret', { v: 2, secrets: [{ key: 'API_KEY', label: 'API key' }], vault: { name: 'API key' } })
+        await render(<HitlBlock {...secret} />)
+        expect(screen.getByText('Type it from Rerun on the web, never in this chat.')).toBeTruthy()
+        expect(screen.queryByText('Reply below, or')).toBeNull()
+        await fireEvent.press(screen.getByLabelText('Dismiss credential request'))
+        expect(secret.onDismiss).toHaveBeenCalledTimes(1)
+        expect(secret.onAnswer).not.toHaveBeenCalled()
     })
 })
 

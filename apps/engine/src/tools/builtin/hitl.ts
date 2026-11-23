@@ -274,40 +274,66 @@ const secretVaultSchema = z
         mcpServer: nullTolerantOptional(
             z.object({
                 url: z.string().url().describe('The https address of the custom MCP server.'),
-                headers: jsonTolerantArray(z.array(z.object({ header: z.string().min(1).describe('The header the server reads, like Authorization.'), key: SECRET_KEY.describe('The key of the secret its value comes from.') })).min(1).max(8)),
+                headers: jsonTolerantArray(
+                    z
+                        .array(
+                            z.object({
+                                header: z.string().min(1).describe('The header the server reads, like Authorization.'),
+                                key: SECRET_KEY.describe('The key in secrets its value comes from. Every key of secrets fills one header.'),
+                                prefix: nullTolerantOptional(z.string().min(1).max(20)).describe('A word the header carries before the value typed, like Bearer for "Authorization: Bearer <token>". The user then pastes only the token.'),
+                            }),
+                        )
+                        .min(1)
+                        .max(8),
+                ),
             }),
         ).describe('For a new custom MCP server that needs a key in a header: the entry is that server, its headers filled from the form.'),
     })
     .describe("Send the values to the workspace's Vault rather than to your own variables.")
+
+// A value no header reads would be typed for nothing, and a header with no field would reach the
+// server empty.
+function headersMatchSecrets(input: { secrets: { key: string }[]; vault?: unknown }): boolean {
+    const headers = (input.vault as z.infer<typeof secretVaultSchema> | null | undefined)?.mcpServer?.headers
+    if (!headers) return true
+    const keys = input.secrets.map(secret => secret.key)
+    const headerKeys = headers.map(header => header.key)
+    return new Set(headerKeys).size === headerKeys.length && headerKeys.length === keys.length && keys.every(key => headerKeys.includes(key))
+}
 
 const FOREMAN_VAULT_SECRET_NOTE =
     "With vault set, the values go to the workspace's Vault instead, with the rights of the person who types them: a new secret named vault.name, lent to vault.agentIds or to every coworker, a custom MCP server when vault.mcpServer is set, or the keys of an existing entry replaced when vault.entryId is set. That is how a key the user asks to keep in the Vault, or to give to coworkers, is added without it entering the chat."
 
 export function requestSecretTool(ctx: Pick<RunContext, 'turnOrder'> & { agent?: Pick<RunContext['agent'], 'config'> }): ToolSet {
     const foreman = ctx.agent?.config.kind === 'foreman'
+    const secretInput = secretInputSchema(foreman)
     return {
         request_secret: hitlTool(
             ctx.turnOrder,
             `Ask the user for one or more credentials (API key, token, password) through a secure masked form, then END YOUR TURN. NEVER ask anyone to paste a secret into the chat: the conversation is stored and sent to the model, this form is not. Each value the user enters is written straight into your coworker variables on the engine and is NEVER shown to you: you only get back the names of the variables that were filled. Reference a filled variable as \${KEY} in an MCP server config (headers, url, env, args) or in a shell command; that placeholder is resolved at run time. Use suggest_service instead when the service exists in the Rerun catalog; use this tool for anything else that needs a key. Group every credential you need for the same setup into a single call.${foreman ? ` ${FOREMAN_VAULT_SECRET_NOTE}` : ''}`,
-            z.object({
-                secrets: jsonTolerantArray(
-                    z
-                        .array(
-                            z.object({
-                                key: SECRET_KEY.describe('The environment variable name the value is stored under, SCREAMING_SNAKE_CASE (e.g. LINEAR_API_KEY). This is the name you later reference as ${KEY}.'),
-                                label: z.string().min(1).describe('Short human label for the field, a few words (e.g. "Linear API key"). Not a sentence.'),
-                                help: nullTolerantOptional(z.string().max(300)).describe('Optional single short line telling the user where to find this value. Any longer explanation goes in your message.'),
-                                docsUrl: nullTolerantOptional(z.string().url()).describe('Optional link to the page where the user can create or copy this credential.'),
-                            }),
-                        )
-                        .min(1)
-                        .max(8),
-                ).describe('Every credential needed for this setup, requested together in one form.'),
-                reason: nullTolerantOptional(z.string().max(300)).describe('One short line shown above the form explaining what these credentials are for.'),
-                ...(foreman ? { vault: nullTolerantOptional(secretVaultSchema) } : {}),
-            }),
+            foreman ? secretInput.refine(headersMatchSecrets, 'vault.mcpServer.headers must name every key of secrets, each once, and nothing else.') : secretInput,
         ),
     }
+}
+
+function secretInputSchema(foreman: boolean) {
+    return z.object({
+        secrets: jsonTolerantArray(
+            z
+                .array(
+                    z.object({
+                        key: SECRET_KEY.describe('The environment variable name the value is stored under, SCREAMING_SNAKE_CASE (e.g. LINEAR_API_KEY). This is the name you later reference as ${KEY}.'),
+                        label: z.string().min(1).describe('Short human label for the field, a few words (e.g. "Linear API key"). Not a sentence.'),
+                        help: nullTolerantOptional(z.string().max(300)).describe('Optional single short line telling the user where to find this value. Any longer explanation goes in your message.'),
+                        docsUrl: nullTolerantOptional(z.string().url()).describe('Optional link to the page where the user can create or copy this credential.'),
+                    }),
+                )
+                .min(1)
+                .max(8),
+        ).describe('Every credential needed for this setup, requested together in one form.'),
+        reason: nullTolerantOptional(z.string().max(300)).describe('One short line shown above the form explaining what these credentials are for.'),
+        ...(foreman ? { vault: nullTolerantOptional(secretVaultSchema) } : {}),
+    })
 }
 
 // Registered alongside mcp_register rather than through the tool catalog: it only makes sense to an

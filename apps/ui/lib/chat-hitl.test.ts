@@ -72,6 +72,11 @@ describe('pendingSecretVault', () => {
         const vault = pendingSecretVault({ vault: { name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN' }, { header: 'X-Bad', key: 'lower' }] } } })
         expect(vault?.mcpServer).toEqual({ url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN' }] })
     })
+
+    it('keeps the word a header carries before the value', () => {
+        const vault = pendingSecretVault({ vault: { mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN', prefix: 'Bearer' }] } } })
+        expect(vault?.mcpServer?.headers).toEqual([{ header: 'Authorization', key: 'DOCS_TOKEN', prefix: 'Bearer' }])
+    })
 })
 
 describe('withHitlVersion', () => {

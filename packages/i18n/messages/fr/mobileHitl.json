@@ -45,6 +45,7 @@
     },
     "fallback": {
         "replyBelow": "Répondez ci-dessous, ou",
+        "typeOnWeb": "Saisissez-la depuis Rerun sur le web, jamais dans ce chat.",
         "needsYou": "{name} a besoin de vous"
     },
     "steps": {

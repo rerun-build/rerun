@@ -461,6 +461,7 @@
     "vaultConflictSomeone": "Bir coworker {name} değerini zaten başka bir Vault kaydından alıyor",
     "vaultMcpTarget": "Sunucuya bir adres veya bir komut verin",
     "vaultKeysUnknown": "Bu Vault girdisi başka anahtarlar içeriyor. Bunları Vault'ta değiştirin.",
+    "vaultHeaderValueMissing": "Bu sunucunun okuduğu her anahtarı doldurun.",
     "saveAnswerFailed": "Bunu kaydedemedik. Tekrar deneyin.",
     "notYourCompanySite": "{domain} şirketinizin sitesi değil. Kendi sitenizi girin veya atlayın.",
     "computerNameInvalid": "Bilgisayara 1 ile 100 karakter arasında bir ad verin.",

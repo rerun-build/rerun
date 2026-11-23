@@ -76,7 +76,7 @@ export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
 }
 
-function requireAdmin(actor: Actor): void {
+export function requireAdmin(actor: Actor): void {
     if (!isAdminActor(actor)) throw new AccessDeniedError('vaultAdminOnly')
 }
 

@@ -55,7 +55,7 @@ import { LinkAuthorScope } from './link-origin'
 import { PendingHitlPill } from './hitl/PendingHitlPill'
 import { QueuedMessagePill } from './QueuedMessagePill'
 import { RISE_IN, ScrollToEndButton, SINK_OUT } from './ScrollToEndButton'
-import { widgetFor } from './hitl/registry'
+import { replacesComposer } from './hitl/registry'
 import { HITL_WIDGETS } from './hitl/widgets'
 import { mentionAgentsOf } from './mentions'
 import { runPhase, stepGroupShowsActivity } from './run-phase'
@@ -218,9 +218,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     // teammate: what acts on the run waits for the hub's own copy.
     const settled = chat.fresh && !chat.busy && !chat.error
     const pending = !settled || status === 'idle' ? null : findPendingHitl(chat.messages, dismissedCallId)
-    // A block the app draws is answered inside it, so the composer steps aside as on the web. The
-    // fallback card keeps it: typing is the only way to answer what the app cannot draw.
-    const replacesComposer = pending !== null && widgetFor(pending, HITL_WIDGETS) !== null
+    const composerReplaced = replacesComposer(pending, HITL_WIDGETS)
     // Scrolled up past the whole block: the cue says what waits down the thread, as on the web.
     const blockOutOfSight = pending !== null && blockHeight > 0 && fold.pastBlock
     const [acknowledged, setAcknowledged] = useState<string | null>(null)
@@ -235,7 +233,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const lift = useKeyboardLift(keyboard.height, insets.bottom, !empty)
     const raisedAtRest = empty ? 0 : keyboardRaise
     // A takeover the app can draw is asked on the screen it is about, not in a block of its own.
-    const takeoverPending = pending?.kind === 'takeover' && replacesComposer ? pending : null
+    const takeoverPending = pending?.kind === 'takeover' && composerReplaced ? pending : null
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])
     const paidSourcesByTurn = useMemo(() => paidDataSourcesByTurn(chat.messages), [chat.messages])
     // The live screen stands in for the run's status while the run works on it.
@@ -542,7 +540,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                     </Animated.View>
                 )}
 
-                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: replacesComposer && !alert ? 0 : spacing.sm }}>
+                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: composerReplaced && !alert ? 0 : spacing.sm }}>
                     {alert && (
                         <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
                             <AlertWidget
@@ -569,7 +567,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                     )}
                     {/* The composer's glass goes blank under a parent below full opacity, and when it is laid while
                         moving: it comes back in place once a block is answered, and only leaves with a slide. */}
-                    {!replacesComposer && (
+                    {!composerReplaced && (
                         <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
                             <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
                         </Animated.View>

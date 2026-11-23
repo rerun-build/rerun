@@ -1,6 +1,7 @@
 import { paidAppFlags } from '@rerun/cloud/apps.server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { EngineRequestError } from '@/lib/engine/client'
 import { createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { serviceManifestSchema } from '@/lib/services/manifest'
@@ -16,7 +17,8 @@ vi.mock('@/lib/engine/vault-client', () => ({ createVaultItem: vi.fn(async (_c: 
 vi.mock('./services.service', () => ({ loadManifest: vi.fn(), toAuthMethodSummaries: vi.fn() }))
 vi.mock('./vault.service', async () => ({
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
-    vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1', workspaceId: 7 }, conn: {}, coworkers: [{ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box' }], byEngineId: new Map() })),
+    requireAdmin: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).requireAdmin,
+    vaultContext: vi.fn(async (actor?: unknown) => ({ actor: actor ?? { kind: 'user', userId: 'user-1', workspaceId: 7 }, conn: {}, coworkers: [{ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box' }], byEngineId: new Map() })),
     assertCanAdd: vi.fn(async () => {}),
     assertCanChangeItem: vi.fn(async () => {}),
     assertManagesCoworker: vi.fn(async (_actor: unknown, coworker: unknown) => coworker),
@@ -210,7 +212,41 @@ describe('saveSecretsToVault', () => {
 
     it('gives it to every coworker when asked', async () => {
         await saveSecretsToVault({ name: 'OpenAI key', sharedWithAll: true }, { OPENAI_API_KEY: 'sk-1' }, ACTOR)
-        expect(shareVaultEntry).toHaveBeenCalledWith('new', true, ACTOR)
+        expect(createVaultItem).toHaveBeenCalledWith({}, expect.objectContaining({ kind: 'secret', sharedWithAll: true }))
+        expect(shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('refuses a share with every coworker to a member before writing anything', async () => {
+        const member = { ...ACTOR, role: 'member' } as const
+        await expect(saveSecretsToVault({ name: 'OpenAI key', sharedWithAll: true }, { OPENAI_API_KEY: 'sk-1' }, member)).rejects.toThrow('Only an admin')
+        expect(createVaultItem).not.toHaveBeenCalled()
+        expect(shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('refuses it to a member for an MCP server too, whoever calls', async () => {
+        const member = { ...ACTOR, role: 'member' } as const
+        await expect(addVaultMcp({ name: 'Docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true }, member)).rejects.toThrow('Only an admin')
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('writes nothing more when the names clash with an entry every coworker gets', async () => {
+        vi.mocked(createVaultItem).mockRejectedValueOnce(new EngineRequestError(`rerun-engine POST /vault failed: 409 ${JSON.stringify({ error: 'x', conflicts: [{ agentId: '*', itemId: 'item-1', kind: 'env', name: 'OPENAI_API_KEY' }] })}`, 409))
+        await expect(saveSecretsToVault({ name: 'OpenAI key', sharedWithAll: true }, { OPENAI_API_KEY: 'sk-1' }, ACTOR)).rejects.toThrow('Every coworker already gets')
+        expect(createVaultItem).toHaveBeenCalledTimes(1)
+        expect(shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('refuses a server whose header has no value, or a value no header reads, before writing anything', async () => {
+        const target = { name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN' }] } }
+        await expect(saveSecretsToVault(target, { OTHER_KEY: 'x' }, ACTOR)).rejects.toThrow('every key')
+        await expect(saveSecretsToVault(target, { DOCS_TOKEN: 't', OTHER_KEY: 'x' }, ACTOR)).rejects.toThrow('every key')
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('puts the prefix of a header before the value typed', async () => {
+        await saveSecretsToVault({ name: 'Docs', mcpServer: { url: 'https://docs.acme.test/mcp', headers: [{ header: 'Authorization', key: 'DOCS_TOKEN', prefix: 'Bearer' }] } }, { DOCS_TOKEN: 't' }, ACTOR)
+        const input = vi.mocked(createVaultItem).mock.calls[0][1] as { env: Record<string, string> }
+        expect(Object.values(input.env)).toEqual(['Bearer t'])
     })
 
     it('makes a custom MCP server whose headers the form fills', async () => {

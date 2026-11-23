@@ -34,7 +34,8 @@ export type SecretVaultTarget = {
     name?: string
     agentIds?: string[]
     sharedWithAll?: boolean
-    mcpServer?: { url: string; headers: { header: string; key: string }[] }
+    // `prefix`: a word the header carries before the value typed, like Bearer.
+    mcpServer?: { url: string; headers: { header: string; key: string; prefix?: string }[] }
 }
 
 export type ServiceSuggestionItem = { slug: string; reason?: string }
@@ -241,10 +242,11 @@ export function pendingSecretVault(input: Record<string, unknown>): SecretVaultT
             ? {
                   url: text(server.url) as string,
                   headers: headers.flatMap(value => {
-                      const item = (value ?? {}) as { header?: unknown; key?: unknown }
+                      const item = (value ?? {}) as { header?: unknown; key?: unknown; prefix?: unknown }
                       const header = text(item.header)
                       const key = text(item.key)
-                      return header && key && SECRET_KEY.test(key) ? [{ header, key }] : []
+                      const prefix = text(item.prefix)
+                      return header && key && SECRET_KEY.test(key) ? [{ header, key, ...(prefix ? { prefix } : {}) }] : []
                   }),
               }
             : undefined

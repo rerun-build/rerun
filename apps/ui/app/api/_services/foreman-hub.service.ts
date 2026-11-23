@@ -64,15 +64,17 @@ async function setName(actor: Actor, args: Record<string, unknown>): Promise<{ n
 async function addVaultEntry(actor: Actor, args: Record<string, unknown>) {
     const agentIds = asStringArray(args.agentIds)
     const kind = asString(args.kind)
+    const sharedWithAll = args.sharedWithAll === true
+    if (sharedWithAll && !isAdminActor(actor)) throw new Error('Only an admin gives an entry to every coworker. Add it for the coworkers you name instead, or ask an admin.')
     let entryId: string
     if (kind === 'app') {
         entryId = (await addVaultService({ slug: requireString(args.slug, 'slug'), agentIds }, actor)).item.id
+        if (sharedWithAll) await shareVaultEntry(entryId, true, actor)
     } else if (kind === 'mcp') {
-        entryId = (await addVaultMcp({ name: requireString(args.name, 'name'), url: asString(args.url), command: asString(args.command), args: asStringArray(args.args), agentIds }, actor)).id
+        entryId = (await addVaultMcp({ name: requireString(args.name, 'name'), url: asString(args.url), command: asString(args.command), args: asStringArray(args.args), agentIds, sharedWithAll }, actor)).id
     } else {
         throw new Error('kind must be "app" or "mcp".')
     }
-    if (args.sharedWithAll === true) await shareVaultEntry(entryId, true, actor)
     return entryAfter(actor, entryId)
 }
 

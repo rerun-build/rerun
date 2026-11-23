@@ -1,6 +1,6 @@
 import type { PendingHitl } from '@rerun/contracts'
 
-import { widgetFor, type HitlWidgets } from './registry'
+import { replacesComposer, widgetFor, type HitlWidgets } from './registry'
 import { askOf, firstAsk } from './summary'
 
 const question = (input: Record<string, unknown>): PendingHitl => ({ kind: 'question', toolCallId: 'call-1', input, output: undefined })
@@ -15,6 +15,21 @@ describe('widgetFor', () => {
 
     it('leaves a kind without a widget to the fallback', () => {
         expect(widgetFor({ kind: 'approval', toolCallId: 'call-2', input: { approvals: [] }, output: undefined }, widgets)).toBeNull()
+    })
+})
+
+describe('replacesComposer', () => {
+    const secret = (input: Record<string, unknown>): PendingHitl => ({ kind: 'secret', toolCallId: 'call-3', input, output: undefined })
+
+    it('keeps the composer for a question the app cannot draw, and takes it away from one it draws', () => {
+        expect(replacesComposer(null, widgets)).toBe(false)
+        expect(replacesComposer(question({ questions: [], v: 2 }), widgets)).toBe(false)
+        expect(replacesComposer(question({ questions: [] }), widgets)).toBe(true)
+    })
+
+    it('takes it away from any request for a key, drawn or not', () => {
+        expect(replacesComposer(secret({ secrets: [], v: 2 }), { secret: { maxVersion: 1, render: () => null } })).toBe(true)
+        expect(replacesComposer(secret({ secrets: [] }), {})).toBe(true)
     })
 })
 

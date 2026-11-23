@@ -100,8 +100,19 @@ describe('add_vault_entry', () => {
 
     it('adds a custom MCP server and shares it with every coworker when asked', async () => {
         await dispatchForemanHubTool(admin, 'add_vault_entry', { kind: 'mcp', name: 'Company docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true })
-        expect(mocks.addVaultMcp).toHaveBeenCalledWith({ name: 'Company docs', url: 'https://docs.acme.test/mcp', command: undefined, args: [], agentIds: [] }, admin)
-        expect(mocks.shareVaultEntry).toHaveBeenCalledWith('item-docs', true, admin)
+        expect(mocks.addVaultMcp).toHaveBeenCalledWith({ name: 'Company docs', url: 'https://docs.acme.test/mcp', command: undefined, args: [], agentIds: [], sharedWithAll: true }, admin)
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('shares an app with every coworker when asked', async () => {
+        await dispatchForemanHubTool(admin, 'add_vault_entry', { kind: 'app', slug: 'notion', sharedWithAll: true })
+        expect(mocks.shareVaultEntry).toHaveBeenCalledWith('item-notion', true, admin)
+    })
+
+    it('refuses to give an entry to every coworker for a member, before adding it', async () => {
+        await expect(dispatchForemanHubTool(member, 'add_vault_entry', { kind: 'mcp', name: 'Company docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true })).rejects.toThrow('Only an admin')
+        expect(mocks.addVaultMcp).not.toHaveBeenCalled()
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
     })
 
     it('refuses a kind it does not know and an app without its slug', async () => {

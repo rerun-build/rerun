@@ -184,7 +184,7 @@ const VAULT_NOTE = `The Vault keeps every app account, custom MCP server and sec
 
 // The app shipped before the Vault form draws it as a question to answer in the composer, which would
 // put the key in the chat.
-const VAULT_ON_PHONE_NOTE = 'They are in the mobile app, which cannot show a form that sends a key to the Vault: never call request_secret with its vault option here. Say in one line that they type the key from Rerun on the web, where this conversation is too, and never ask for it in this chat.'
+const VAULT_ON_PHONE_NOTE = 'They are in the mobile app, which cannot show a form that sends a key to the Vault: never call request_secret with its vault option here. Say in one line that they type the key from Rerun on the web, where this conversation is too, and never ask for it in this chat. open_vault does not open anything here either: an entry that waits on a sign-in is finished in the Vault, from Rerun on the web.'
 
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
