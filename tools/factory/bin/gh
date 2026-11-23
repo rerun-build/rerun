@@ -15,9 +15,85 @@ if [ "${FACTORY_DISPATCHER:-}" != "1" ]; then
     fi
 fi
 
+MODE=''
+case "$1 $2" in
+    "issue create"|"issue edit"|"issue comment"|"pr create"|"pr edit"|"pr comment"|"pr review") MODE=cli ;;
+    "api "*) MODE=api ;;
+esac
+SAVED=''
+for a in "$@"; do
+    case "$a" in -|*=-|*=@-|@-|*/dev/stdin) SAVED=1; break ;; esac
+done
+WORK=''
+IN=''
+
+start() {
+    WORK=$(mktemp -d) || return 1
+    trap 'rm -rf "$WORK"' EXIT
+    trap 'exit 143' TERM INT
+    if [ -n "$SAVED" ]; then IN=$WORK/in; cat > "$IN"; fi
+}
+
+take() {
+    case "$1" in
+        text) printf '%s\n' "$2" ;;
+        file) case "$2" in -|/dev/stdin) cat "$IN" ;; *) cat -- "$2" ;; esac 2>/dev/null ;;
+        raw) case "$2" in body=*|title=*) printf '%s\n' "${2#*=}" ;; esac ;;
+        field) case "$2" in body=@*|title=@*) take file "${2#*=@}" ;; body=*|title=*) printf '%s\n' "${2#*=}" ;; esac ;;
+    esac
+}
+
+posted() {
+    want=''
+    for a in "$@"; do
+        if [ -n "$want" ]; then take "$want" "$a"; want=''; continue; fi
+        case "$MODE $a" in
+            "cli --body"|"cli -b"|"cli --title"|"cli -t") want=text ;;
+            "cli --body-file"|"cli -F"|"api --input") want=file ;;
+            "api -f"|"api --raw-field") want=raw ;;
+            "api -F"|"api --field") want=field ;;
+            "cli --body="*|"cli --title="*) take text "${a#*=}" ;;
+            "cli --body-file="*|"api --input="*) take file "${a#*=}" ;;
+            "api --raw-field="*) take raw "${a#*=}" ;;
+            "api --field="*) take field "${a#*=}" ;;
+        esac
+    done
+}
+
+mention() {
+    awk '
+        /^[ \t]*(```|~~~)/ { fence = !fence; next }
+        fence { next }
+        {
+            s = $0
+            gsub(/`[^`]*`/, "", s)
+            s = " " s
+            while (match(s, /[^A-Za-z0-9_.\/`-]@[A-Za-z0-9][A-Za-z0-9-]*/)) {
+                t = substr(s, RSTART + 2, RLENGTH - 2)
+                s = substr(s, RSTART + RLENGTH)
+                if (!(t ~ /^[0-9a-fA-F]+$/ && length(t) >= 7)) { print "@" t; exit }
+            }
+        }' "$1"
+}
+
+if [ -n "$MODE$SAVED" ] && ! start; then
+    [ -z "$MODE" ] || { echo "gh wrapper: no temporary folder to check the text in. Nothing was posted." >&2; exit 75; }
+    WORK=''
+fi
+if [ -n "$MODE" ]; then
+    posted "$@" > "$WORK/posted"
+    found=$(mention "$WORK/posted")
+    if [ -n "$found" ]; then
+        echo "gh wrapper: GitHub notifies every @name, so write names without @ (found: $found). Nothing was posted." >&2
+        exit 65
+    fi
+fi
+
 shared() {
     GH_TOKEN=$(tr -d '\r\n' < "$KEY"); export GH_TOKEN
-    exec "$REAL" "$@"
+    [ -n "$WORK" ] || exec "$REAL" "$@"
+    if [ -n "$IN" ]; then "$REAL" "$@" < "$IN"; else "$REAL" "$@"; fi
+    exit $?
 }
 
 APP_TOKEN=''
@@ -28,19 +104,12 @@ fi
 case "$APP_UNTIL" in ''|*[!0-9]*) shared "$@" ;; esac
 [ -n "$APP_TOKEN" ] && [ "$(date +%s)" -lt $((APP_UNTIL - 300)) ] || shared "$@"
 
-WORK=$(mktemp -d) || shared "$@"
-trap 'rm -rf "$WORK"' EXIT
-trap 'exit 143' TERM INT
-SAVED=''
-for a in "$@"; do
-    case "$a" in -|*=-|*=@-|@-|*/dev/stdin) SAVED=1; break ;; esac
-done
-[ -z "$SAVED" ] || cat > "$WORK/in"
+[ -n "$WORK" ] || start || shared "$@"
 
 run_with() {
     T=$1
     shift
-    if [ -n "$SAVED" ]; then GH_TOKEN=$T "$REAL" "$@" < "$WORK/in"; else GH_TOKEN=$T "$REAL" "$@"; fi
+    if [ -n "$IN" ]; then GH_TOKEN=$T "$REAL" "$@" < "$IN"; else GH_TOKEN=$T "$REAL" "$@"; fi
 }
 
 { run_with "$APP_TOKEN" "$@" 2> "$WORK/err"; echo $? > "$WORK/rc"; } | tee "$WORK/out"
