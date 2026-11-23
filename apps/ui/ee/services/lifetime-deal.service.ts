@@ -7,7 +7,6 @@ import type { Database } from '@/app/api/database.types'
 import { sendLifetimeCodeEmail } from '@/app/api/_services/email.service'
 import { getAppOrigin } from '@/lib/app-origin'
 import { requestLocale } from '@/lib/i18n/request-locale'
-import { landingUrl } from '@/lib/site'
 import { affiliateReferralMetadata } from '@/ee/lib/billing/affiliate'
 import { LIFETIME_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
 import { LIFETIME_PLAN_SLUG } from '@/ee/lib/billing/plans'
@@ -18,11 +17,11 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 type CodeInsert = Database['public']['Tables']['invitation_codes']['Insert']
 type CodeUpdate = Database['public']['Tables']['invitation_codes']['Update']
 
-// The lifetime plan sold on rerun.build/lifetime, without AppSumo in between. The payment buys the
+// The lifetime plan sold on an unlisted page of the landing, without AppSumo in between. The payment buys the
 // same one-use code AppSumo hands out, redeemed on the same /redeem page.
 export const LIFETIME_DEAL_KIND = 'lifetime_deal'
 
-export async function createLifetimeCheckoutUrl(): Promise<string> {
+export async function createLifetimeCheckoutUrl(cancelUrl: string): Promise<string> {
     const origin = await getAppOrigin()
     // The locale travels with the payment: the webhook that emails the code has no browser to read it from.
     const metadata: Stripe.MetadataParam = { kind: LIFETIME_DEAL_KIND, locale: await requestLocale(), ...(await affiliateReferralMetadata()) }
@@ -42,7 +41,7 @@ export async function createLifetimeCheckoutUrl(): Promise<string> {
         metadata,
         // {CHECKOUT_SESSION_ID} is a Stripe literal, not a template hole to interpolate.
         success_url: `${origin}/redeem?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: landingUrl('/lifetime'),
+        cancel_url: cancelUrl,
     })
     if (!checkout.url) throw new Error('Stripe did not return a checkout URL')
     return checkout.url

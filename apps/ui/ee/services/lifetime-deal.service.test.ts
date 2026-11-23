@@ -37,13 +37,14 @@ describe('lifetimeCodeOf', () => {
 
 describe('createLifetimeCheckoutUrl', () => {
     it('sells the lifetime price once, credits the affiliate, keeps the buyer language and comes back to /redeem', async () => {
-        await expect(createLifetimeCheckoutUrl()).resolves.toBe('https://checkout.stripe.test/cs_1')
+        await expect(createLifetimeCheckoutUrl('https://rerun.test/deal')).resolves.toBe('https://checkout.stripe.test/cs_1')
         expect(vi.mocked(stripe.checkout.sessions.create).mock.calls[0][0]).toMatchObject({
             mode: 'payment',
             line_items: [{ price: 'price_lifetime', quantity: 1 }],
             metadata: { kind: 'lifetime_deal', locale: 'fr', affonso_referral: 'ref_1' },
             payment_intent_data: { metadata: { kind: 'lifetime_deal', locale: 'fr', affonso_referral: 'ref_1' } },
             success_url: 'https://app.rerun.test/redeem?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: 'https://rerun.test/deal',
         })
     })
 })
