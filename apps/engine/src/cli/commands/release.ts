@@ -252,6 +252,8 @@ export function layoutFiles(root: string, options: LayoutOptions): LayoutFile[] 
                 `WorkingDirectory=${current}`,
                 `EnvironmentFile=-${options.config}`,
                 `ExecStart=${options.node} ${releaseBin(current)} run`,
+                // A command of a coworker that fills the memory is killed alone, the engine and its other runs stay.
+                'OOMPolicy=continue',
                 'Restart=always',
                 'RestartSec=3',
                 '',

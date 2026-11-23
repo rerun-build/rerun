@@ -309,6 +309,7 @@ describe('layoutFiles and installLayout', () => {
         expect(unit.content).toContain('User=rerun\n')
         expect(unit.content).toContain('OnFailure=rerun-rollback.service\n')
         expect(unit.content).toContain('StartLimitBurst=5\n')
+        expect(unit.content).toContain('OOMPolicy=continue\n')
         expect(rollback.content).toContain('ROOT="/opt/rerun"')
         expect(rollback.content).toContain('rm -f "$ROOT/previous"')
         expect(rollback.content).toContain('systemctl start "$SERVICE"')
