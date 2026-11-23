@@ -201,6 +201,7 @@
         "idle": "Inactive depuis {minutes} min",
         "stopTask": "Arrêter cette tâche",
         "stopped": "Arrêtée, travail partiel conservé",
+        "stoppedWithRun": "Arrêtée avec l'exécution",
         "failed": "Échec",
         "earlier": "+{count} plus tôt",
         "verbs": {

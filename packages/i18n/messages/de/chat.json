@@ -201,6 +201,7 @@
         "idle": "Seit {minutes} Min. inaktiv",
         "stopTask": "Aufgabe stoppen",
         "stopped": "Gestoppt, Teilergebnis behalten",
+        "stoppedWithRun": "Mit der Ausführung gestoppt",
         "failed": "Fehlgeschlagen",
         "earlier": "+{count} frühere",
         "verbs": {

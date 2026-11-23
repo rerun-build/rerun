@@ -11,6 +11,7 @@ type FloatingMessageProps = {
     message: UIMessage
     index: number
     isActive?: boolean
+    settled?: MessageViewProps['settled']
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: MessageViewProps['sharedFiles']
@@ -27,7 +28,7 @@ type FloatingMessageProps = {
     onOpenTable?: MessageViewProps['onOpenTable']
 }
 
-export function FloatingMessage({ message, index, isActive, rawUrlFor, readFile, sharedFiles, renderToolPart, mentions, onStopTask, onRegenerate, onRateMessage, feedbackRating, hitlCall, showQuickReplies, onSendMessage, onDraftReply, onOpenTable }: FloatingMessageProps) {
+export function FloatingMessage({ message, index, isActive, settled, rawUrlFor, readFile, sharedFiles, renderToolPart, mentions, onStopTask, onRegenerate, onRateMessage, feedbackRating, hitlCall, showQuickReplies, onSendMessage, onDraftReply, onOpenTable }: FloatingMessageProps) {
     const reducedMotion = useReducedMotion()
 
     return (
@@ -40,7 +41,7 @@ export function FloatingMessage({ message, index, isActive, rawUrlFor, readFile,
                 cartes de table. Sans `agentId`, puisque le Foreman n'en est pas un : il ouvrirait
                 les panneaux d'un coworker du board qui n'existe pas. Ses tableaux s'ouvrent sur sa
                 propre carte (`onOpenTable`). */}
-            <MessageView message={message} isActive={isActive} rawUrlFor={rawUrlFor} readFile={readFile} sharedFiles={sharedFiles} renderToolPart={renderToolPart} mentions={mentions} onStopTask={onStopTask} onRegenerate={onRegenerate} onRateMessage={onRateMessage} feedbackRating={feedbackRating} hitlCall={hitlCall} showQuickReplies={showQuickReplies} onSendMessage={onSendMessage} onDraftReply={onDraftReply} onOpenTable={onOpenTable} />
+            <MessageView message={message} isActive={isActive} settled={settled} rawUrlFor={rawUrlFor} readFile={readFile} sharedFiles={sharedFiles} renderToolPart={renderToolPart} mentions={mentions} onStopTask={onStopTask} onRegenerate={onRegenerate} onRateMessage={onRateMessage} feedbackRating={feedbackRating} hitlCall={hitlCall} showQuickReplies={showQuickReplies} onSendMessage={onSendMessage} onDraftReply={onDraftReply} onOpenTable={onOpenTable} />
         </motion.div>
     )
 }

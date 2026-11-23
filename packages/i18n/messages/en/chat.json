@@ -312,6 +312,7 @@
         "idle": "Idle {minutes} min",
         "stopTask": "Stop this task",
         "stopped": "Stopped, partial work kept",
+        "stoppedWithRun": "Stopped with the run",
         "failed": "Failed",
         "earlier": "+{count} earlier",
         "verbs": {

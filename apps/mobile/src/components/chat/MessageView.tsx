@@ -66,6 +66,8 @@ type MessageViewProps = {
     message: UIMessage
     isLastAssistant: boolean
     running: boolean
+    // The run that wrote the message is over: nothing it delegated can still be live.
+    settled?: boolean
     // The coworker whose files a card points at; the Foreman's live elsewhere, and its cards stay steps.
     agentId: string | null
     // Where the conversation's uploads sit, a voice message's recording among them.
@@ -102,7 +104,7 @@ export const MessageView = memo(MessageViewBody, (previous, next) => {
     return true
 })
 
-function MessageViewBody({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources }: MessageViewProps) {
+function MessageViewBody({ message, isLastAssistant, running, settled = false, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources }: MessageViewProps) {
     noteRender('MessageView')
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
@@ -139,7 +141,7 @@ function MessageViewBody({ message, isLastAssistant, running, agentId, fileOwner
     // A shortcut the Foreman draws before it writes about it, shown under that text as on the web.
     let underText: Block[] = []
     const lastPart = message.parts.length - 1
-    const subRuns = pairSubRuns(message.parts as { type: string; id?: string; toolCallId?: string; toolName?: string; data?: unknown }[])
+    const subRuns = pairSubRuns(message.parts as { type: string; id?: string; toolCallId?: string; toolName?: string; data?: unknown }[], { settled })
     const flushText = (key: string) => {
         if (!buffer.trim()) return
         blocks.push({ key, node: <AssistantMessage text={buffer} showActions={false} owner={fileOwner} /> })

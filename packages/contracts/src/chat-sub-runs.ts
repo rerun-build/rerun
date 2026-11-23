@@ -5,6 +5,7 @@ export const SUB_RUN_FAILURE_STREAK = 3
 export const SUB_RUN_LONG_CALL_MS = 20_000
 // The engine sends the last characters of a sub-run's text, not the first: PREVIEW_LENGTH in sub-run-watch.ts.
 export const SUB_RUN_PREVIEW_LENGTH = 600
+export const SUB_RUN_STOPPED_BY_USER = 'stopped by the user'
 
 export type SubRunStatus = 'queued' | 'running' | 'done' | 'error' | 'stopped' | 'dispatched'
 
@@ -51,6 +52,7 @@ export type SubRunCopy = (
         | 'headline.messageSent'
         | 'headline.calling'
         | 'headline.callFailed'
+        | 'headline.callStopped'
         | 'headline.callAnswered'
         | 'headline.building'
         | 'headline.buildFailed'
@@ -61,7 +63,8 @@ export type SubRunCopy = (
         | 'headline.coworkersBuilt'
         | 'headline.openFromBoard'
         | 'headline.tasksDone'
-        | 'headline.doneAndFailed',
+        | 'headline.doneAndFailed'
+        | 'headline.doneAndStopped',
     values?: Record<string, string | number>
 ) => string
 
@@ -84,6 +87,12 @@ export function titledSubRun(progress: SubRunProgress, t: SubRunCopy): SubRunPro
     return { ...progress, tasks: progress.tasks.map((task, index) => (task.title ? task : { ...task, title: untitled(index) })) }
 }
 
+// The client that stops a run cuts its own stream, so the last state of each task never reaches it.
+function settleSubRuns(progress: SubRunProgress): SubRunProgress {
+    if (!progress.tasks.some(isSubRunLive)) return progress
+    return { ...progress, tasks: progress.tasks.map(task => (isSubRunLive(task) ? { ...task, status: 'stopped' } : task)) }
+}
+
 export type SubRunPairing = {
     byToolCallId: Map<string, SubRunProgress>
     /** Keyed by the data part id: progress no tool row could take, which has to render on its own. */
@@ -95,15 +104,17 @@ export type SubRunPairing = {
  * id with the part. A CLI provider (claude, codex) cannot: its MCP bridge gives the tool an id of its
  * own, so what is left after the exact matches is paired by order, kind by kind. The engine emits
  * one part per call, before its first await, which keeps both lists in the same order.
+ *
+ * `settled`: the run that wrote the message is over, so no task of it can still be live.
  */
-export function pairSubRuns(parts: readonly PartLike[]): SubRunPairing {
+export function pairSubRuns(parts: readonly PartLike[], { settled = false }: { settled?: boolean } = {}): SubRunPairing {
     const byToolCallId = new Map<string, SubRunProgress>()
     const orphans = new Map<string, SubRunProgress>()
 
     const progressById = new Map<string, SubRunProgress>()
     for (const part of parts) {
         const progress = part.id ? subRunProgressOf(part) : null
-        if (progress) progressById.set(part.id!, progress)
+        if (progress) progressById.set(part.id!, settled ? settleSubRuns(progress) : progress)
     }
 
     const unpairedToolCallIds: Record<SubRunProgress['kind'], string[]> = { delegate: [], 'call-agent': [] }
@@ -209,6 +220,7 @@ export function subRunHeadline(progress: SubRunProgress, live: boolean, toolName
         const name = call.title
         if (call.status === 'dispatched') return { label: t('headline.messageSent', { name }) }
         if (live) return { label: t('headline.calling', { name }), summary: `${progressLabel(call, t)}${trouble}` }
+        if (call.status === 'stopped') return { label: `${t('headline.callStopped', { name })}${duration}` }
         return { label: `${t(call.status === 'error' ? 'headline.callFailed' : 'headline.callAnswered', { name })}${duration}` }
     }
 
@@ -221,5 +233,6 @@ export function subRunHeadline(progress: SubRunProgress, live: boolean, toolName
     }
     if (live) return { label: t(building ? 'headline.buildingTeam' : 'headline.delegating', { count: counts.total }), summary: `${t('headline.doneOfTotal', { done: counts.done + counts.failed, total: counts.total })}${trouble}` }
     if (counts.failed === 0) return building ? { label: `${t('headline.coworkersBuilt', { count: counts.total })}${duration}`, summary: t('headline.openFromBoard') } : { label: `${t('headline.tasksDone', { count: counts.total })}${duration}` }
+    if (!tasks.some(task => task.status === 'error')) return { label: `${t('headline.doneAndStopped', { done: counts.done, stopped: counts.failed })}${duration}` }
     return { label: `${t('headline.doneAndFailed', { done: counts.done, failed: counts.failed })}${duration}` }
 }

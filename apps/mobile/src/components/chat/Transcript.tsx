@@ -54,7 +54,7 @@ export const Transcript = memo(function Transcript({ messages, from, to, busy, a
                 authorOf={authorOf}
                 renderMessage={(message, index, stamp) => (
                     <Fragment key={message.id}>
-                        <MessageView message={message} isLastAssistant={index === lastAssistant} running={busy && (index >= turnStart || index === lastAssistant)} agentId={agentId} fileOwner={fileOwner} coworkerName={coworkerName} hiddenCallId={hiddenCallId} skillProposals={skillProposals} onStopTask={onStopTask} onRegenerate={index === lastAssistant ? onRegenerate : undefined} rating={ratingOf(message.id)} onRate={onRate} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
+                        <MessageView message={message} isLastAssistant={index === lastAssistant} running={busy && (index >= turnStart || index === lastAssistant)} settled={!busy || index < turnStart} agentId={agentId} fileOwner={fileOwner} coworkerName={coworkerName} hiddenCallId={hiddenCallId} skillProposals={skillProposals} onStopTask={onStopTask} onRegenerate={index === lastAssistant ? onRegenerate : undefined} rating={ratingOf(message.id)} onRate={onRate} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
                         {branches(threadRows.after.get(index))}
                     </Fragment>
                 )}

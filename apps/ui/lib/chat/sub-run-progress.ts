@@ -9,6 +9,7 @@ export {
     SUB_RUN_LONG_CALL_MS,
     SUB_RUN_PREVIEW_LENGTH,
     SUB_RUN_STALLED_AFTER_MS,
+    SUB_RUN_STOPPED_BY_USER,
     SUB_RUN_TOOL_NAMES,
     subRunDurationSeconds,
     subRunHeadline,

@@ -13,6 +13,7 @@
         "messageSent": "Mesaj gönderildi: {name}",
         "calling": "Çağrılıyor: {name}",
         "callFailed": "{name} başarısız oldu",
+        "callStopped": "{name} durduruldu",
         "callAnswered": "{name} yanıt verdi",
         "building": "Oluşturuluyor: {name}",
         "buildFailed": "{name} oluşturulamadı",
@@ -23,6 +24,7 @@
         "coworkersBuilt": "{count, plural, =0 {# coworker} one {# coworker} other {# coworker}} oluşturuldu",
         "openFromBoard": "Panodan birini açın",
         "tasksDone": "{count, plural, =0 {# görev} one {# görev} other {# görev}} tamamlandı",
-        "doneAndFailed": "{done} tamamlandı · {failed} başarısız"
+        "doneAndFailed": "{done} tamamlandı · {failed} başarısız",
+        "doneAndStopped": "{done} tamamlandı · {stopped} durduruldu"
     }
 }

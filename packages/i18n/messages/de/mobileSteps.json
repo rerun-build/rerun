@@ -28,6 +28,7 @@
         "stop": "Aufgabe stoppen",
         "failed": "Fehlgeschlagen",
         "stopped": "Gestoppt, Teilergebnis behalten",
+        "stoppedWithRun": "Mit der Ausführung gestoppt",
         "earlier": "+{count} frühere",
         "verbs": {
             "web_search": "Sucht {summary}",

@@ -201,6 +201,7 @@
         "idle": "{minutes} dk boşta",
         "stopTask": "Bu görevi durdur",
         "stopped": "Durduruldu, yapılan kısım korundu",
+        "stoppedWithRun": "Çalıştırmayla birlikte durduruldu",
         "failed": "Başarısız",
         "earlier": "+{count} önceki",
         "verbs": {

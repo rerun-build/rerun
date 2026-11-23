@@ -24,6 +24,13 @@ describe('pairSubRuns', () => {
         expect(pairing.orphans.size).toBe(0)
     })
 
+    it('leaves no task live once the run is over, paired or not', () => {
+        const parts = [delegateTool('toolu_01'), { type: 'data-delegate', id: '7', data: { tasks: [{ title: 'A', status: 'done', steps: 1 }, { title: 'B', status: 'running', steps: 1 }, { title: 'C', status: 'queued', steps: 0 }, { title: 'D', status: 'error', steps: 1 }] } }, callAgentData('9', 'Growth')]
+        const statuses = (pairing: ReturnType<typeof pairSubRuns>) => [...pairing.byToolCallId.values(), ...pairing.orphans.values()].map(progress => progress.tasks.map(task => task.status))
+        expect(statuses(pairSubRuns(parts))).toEqual([['done', 'running', 'queued', 'error'], ['running']])
+        expect(statuses(pairSubRuns(parts, { settled: true }))).toEqual([['done', 'stopped', 'stopped', 'error'], ['stopped']])
+    })
+
     it('keeps each kind on its own tool', () => {
         const pairing = pairSubRuns([callAgentTool('toolu_01'), delegateTool('toolu_02'), callAgentTool('toolu_03'), callAgentData('a', 'Growth'), delegateData('b', 'Research'), callAgentData('c', 'Ops')])
         expect(titles(pairing)).toEqual({ toolu_01: 'Growth', toolu_02: 'Research', toolu_03: 'Ops' })
@@ -124,6 +131,11 @@ describe('subRunHeadline', () => {
         expect(subRunHeadline({ kind: 'delegate', tasks }, false, 'delegate_tasks', t)).toEqual({ label: '2 done · 1 failed' })
     })
 
+    it('counts stopped tasks as stopped, unless one really failed', () => {
+        expect(subRunHeadline({ kind: 'delegate', tasks: [task('A', 'done'), task('B', 'stopped'), task('C', 'stopped')] }, false, 'delegate_tasks', t)).toEqual({ label: '1 done · 2 stopped' })
+        expect(subRunHeadline({ kind: 'delegate', tasks: [task('A', 'stopped'), task('B', 'error')] }, false, 'delegate_tasks', t)).toEqual({ label: '0 done · 2 failed' })
+    })
+
     it('reports a message handed to a coworker', () => {
         expect(subRunHeadline({ kind: 'call-agent', tasks: [task('Growth', 'dispatched')] }, false, 'call_agent', t)).toEqual({ label: 'Message sent to Growth' })
     })
@@ -146,6 +158,7 @@ describe('subRunHeadline', () => {
         expect(subRunHeadline({ kind: 'call-agent', tasks: [task('Growth', 'running')] }, true, 'call_agent', t)).toEqual({ label: 'Calling Growth', summary: 'Step 2' })
         expect(subRunHeadline({ kind: 'call-agent', tasks: [task('Growth', 'done')] }, false, 'call_agent', t)).toEqual({ label: 'Growth answered' })
         expect(subRunHeadline({ kind: 'call-agent', tasks: [task('Growth', 'error')] }, false, 'call_agent', t)).toEqual({ label: 'Growth failed' })
+        expect(subRunHeadline({ kind: 'call-agent', tasks: [task('Growth', 'stopped')] }, false, 'call_agent', t)).toEqual({ label: 'Growth stopped' })
     })
 })
 

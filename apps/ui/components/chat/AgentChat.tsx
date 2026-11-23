@@ -1045,6 +1045,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                         key={message.id}
                                         message={message}
                                         isActive={isActive}
+                                        settled={!isLast || !showLoader}
                                         isLastAssistant={mi === lastAssistant}
                                         agentId={agentId}
                                         pendingHitlToolCallId={pendingHitl?.toolCallId}

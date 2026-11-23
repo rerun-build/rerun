@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { MessageView } from '@/components/chat/MessageView'
 import { AppText } from '@/components/ui/AppText'
-import { ALL_DONE, ALL_FAILED, callAgentMessage, cliDelegateMessage, delegateMessage, LIVE_END_AT, liveTasksAt, LOOPING, ONE_CUT, QUEUED, RUNNING, STALLED, STOPPED_ONE } from '@/mocks/delegate'
+import { ALL_DONE, ALL_FAILED, callAgentMessage, cliDelegateMessage, delegateMessage, LIVE_END_AT, liveTasksAt, LOOPING, ONE_CUT, QUEUED, RUNNING, STALLED, STOPPED_ONE, STOPPED_WITH_RUN } from '@/mocks/delegate'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
@@ -17,7 +17,7 @@ import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
 const DONE = { state: 'output-available' as const, output: 'Done' }
 
-const SCENARIOS: Record<string, { label: string; message: UIMessage }> = {
+const SCENARIOS: Record<string, { label: string; message: UIMessage; settled?: boolean }> = {
     running: { label: 'Running', message: delegateMessage('running', RUNNING) },
     retries: { label: 'Retries', message: delegateMessage('retries', LOOPING) },
     stalled: { label: 'Stalled', message: delegateMessage('stalled', STALLED) },
@@ -26,9 +26,12 @@ const SCENARIOS: Record<string, { label: string; message: UIMessage }> = {
     done: { label: 'Done', message: delegateMessage('done', ALL_DONE, DONE) },
     partial: { label: 'Partial', message: delegateMessage('partial', ONE_CUT, DONE) },
     stopped: { label: 'Stopped', message: delegateMessage('stopped', STOPPED_ONE, DONE) },
+    stoppedRun: { label: 'Stopped with the run', message: delegateMessage('stoppedRun', STOPPED_WITH_RUN) },
+    cutStream: { label: 'Run stopped from this device', message: delegateMessage('cutStream', QUEUED), settled: true },
     failed: { label: 'Failed', message: delegateMessage('failed', ALL_FAILED, { state: 'output-error', errorText: 'Every task failed to start.' }) },
     call: { label: 'Call a coworker', message: callAgentMessage('call', 'Growth', { status: 'running', steps: 3, toolCalls: 4, activity: 'web_search', idleMs: 3_000, startedAt: Date.now() }) },
     answered: { label: 'Coworker answered', message: callAgentMessage('answered', 'Growth', { status: 'done', steps: 6, toolCalls: 8, startedAt: 0, finishedAt: 42_000 }, DONE) },
+    callStopped: { label: 'Called coworker stopped', message: callAgentMessage('callStopped', 'Growth', { status: 'stopped', steps: 3, toolCalls: 4, startedAt: 0, finishedAt: 12_000 }) },
 }
 
 // The web's scripted delegation, replayed in a loop: each round mounts a new message, as a new delegation would.
@@ -48,8 +51,8 @@ function LiveScenario() {
     return <Scenario key={round} message={delegateMessage(`live-${round}`, tasks, live ? { state: 'input-available' } : DONE)} />
 }
 
-function Scenario({ message }: { message: UIMessage }) {
-    return <MessageView message={message} isLastAssistant={false} running={false} agentId={null} fileOwner={null} coworkerName="Scout" hiddenCallId={null} />
+function Scenario({ message, settled }: { message: UIMessage; settled?: boolean }) {
+    return <MessageView message={message} isLastAssistant={false} running={false} settled={settled} agentId={null} fileOwner={null} coworkerName="Scout" hiddenCallId={null} />
 }
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
@@ -80,13 +83,13 @@ export default function LabDelegate() {
                 )}
                 {picked ? (
                     <Group title={picked.label}>
-                        <Scenario message={picked.message} />
+                        <Scenario message={picked.message} settled={picked.settled} />
                     </Group>
                 ) : (
                     !scenario &&
-                    Object.entries(SCENARIOS).map(([id, { label, message }]) => (
+                    Object.entries(SCENARIOS).map(([id, { label, message, settled }]) => (
                         <Group key={id} title={label}>
-                            <Scenario message={message} />
+                            <Scenario message={message} settled={settled} />
                         </Group>
                     ))
                 )}

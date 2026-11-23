@@ -55,6 +55,8 @@ const SCROLL_FADE = 56
 type ForemanChatLayerProps = {
     messages: UIMessage[]
     streaming?: boolean
+    /** A run of its own is still held, whether or not this tab follows its stream yet: a reload reads the run before picking it up. */
+    runHeld?: boolean
     /** Le tunnel d'onboarding, où c'est le Foreman qui parle le premier. */
     guided?: boolean
     /** La conversation du serveur est arrivée. Avant, une pile vide ne veut encore rien dire. */
@@ -110,7 +112,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onOpenTable, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, runHeld = false, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onOpenTable, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const tName = useTranslations('workspaceView.foreman')
     // A reply its message ends on is sent as the user's own message, word for word.
     const sendQuickReply = onSuggestion ? ({ text }: { text: string }) => onSuggestion(text) : undefined
@@ -239,6 +241,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
                                     message={message}
                                     index={index}
                                     isActive={streaming && index === visible.length - 1}
+                                    settled={index < visible.length - 1 || !(streaming || runHeld)}
                                     rawUrlFor={rawUrlFor}
                                     readFile={readFile}
                                     sharedFiles={sharedFiles}

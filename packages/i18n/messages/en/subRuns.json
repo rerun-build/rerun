@@ -9,7 +9,9 @@
         "headline.buildingTeam": "The onboarding builds several AI coworkers at once.",
         "headline.doneOfTotal": "How many delegated tasks have finished out of all of them.",
         "headline.openFromBoard": "Under 'N coworkers built': open one of them from the board of the workspace.",
-        "headline.doneAndFailed": "Delegated tasks that finished and that failed."
+        "headline.doneAndFailed": "Delegated tasks that finished and that failed.",
+        "headline.doneAndStopped": "Delegated tasks that finished and that were stopped along with the run that delegated them, or by hand.",
+        "headline.callStopped": "{name} is a coworker called by another one, stopped along with the run that called it."
     },
     "untitledTask": "Sub-coworker {index}",
     "untitledAgent": "Coworker",
@@ -25,6 +27,7 @@
         "messageSent": "Message sent to {name}",
         "calling": "Calling {name}",
         "callFailed": "{name} failed",
+        "callStopped": "{name} stopped",
         "callAnswered": "{name} answered",
         "building": "Building {name}",
         "buildFailed": "{name} could not be built",
@@ -35,6 +38,7 @@
         "coworkersBuilt": "{count, plural, =0 {# coworker} one {# coworker} other {# coworkers}} built",
         "openFromBoard": "Open one from the board",
         "tasksDone": "{count, plural, =0 {# task} one {# task} other {# tasks}} done",
-        "doneAndFailed": "{done} done · {failed} failed"
+        "doneAndFailed": "{done} done · {failed} failed",
+        "doneAndStopped": "{done} done · {stopped} stopped"
     }
 }

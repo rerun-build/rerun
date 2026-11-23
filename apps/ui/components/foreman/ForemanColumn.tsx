@@ -521,6 +521,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                                 orbPaused={!open}
                                 messages={messages}
                                 streaming={busy}
+                                runHeld={activeRunId !== null}
                                 guided={guided}
                                 restored={restoreDone}
                                 error={noticeError}

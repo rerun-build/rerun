@@ -1,4 +1,4 @@
-import { formatElapsed, isSubRunFailing, isSubRunLive, isSubRunStalled, stripBridgePrefix, subRunOutcome, toolLabelOf, type SubRunCall, type SubRunTask } from '@rerun/contracts'
+import { formatElapsed, isSubRunFailing, isSubRunLive, isSubRunStalled, stripBridgePrefix, SUB_RUN_STOPPED_BY_USER, subRunOutcome, toolLabelOf, type SubRunCall, type SubRunTask } from '@rerun/contracts'
 import { useEffect, useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import Animated, { cancelAnimation, Easing, FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
@@ -194,7 +194,7 @@ function Outcome({ task }: { task: SubRunTask }) {
         return result ? <OutcomeLine symbol="check" color={TONES.green[theme.scheme]} label={result} /> : null
     }
     if (task.status === 'error') return <OutcomeLine symbol="x" color={TONES.red[theme.scheme]} label={task.error || t('failed')} />
-    if (task.status === 'stopped') return <OutcomeLine symbol="stop-fill" size={10} color={theme.mutedForeground} label={t('stopped')} />
+    if (task.status === 'stopped') return <OutcomeLine symbol="stop-fill" size={10} color={theme.mutedForeground} label={task.error === SUB_RUN_STOPPED_BY_USER ? t('stopped') : t('stoppedWithRun')} />
     return null
 }
 

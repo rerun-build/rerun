@@ -201,6 +201,7 @@
         "idle": "Parado há {minutes} min",
         "stopTask": "Parar esta tarefa",
         "stopped": "Parado, trabalho parcial mantido",
+        "stoppedWithRun": "Parada com a execução",
         "failed": "Falhou",
         "earlier": "+{count} anteriores",
         "verbs": {

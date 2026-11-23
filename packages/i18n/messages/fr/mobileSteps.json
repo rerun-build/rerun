@@ -28,6 +28,7 @@
         "stop": "Arrêter cette tâche",
         "failed": "Échec",
         "stopped": "Arrêtée, travail partiel conservé",
+        "stoppedWithRun": "Arrêtée avec l'exécution",
         "earlier": "+{count} plus tôt",
         "verbs": {
             "web_search": "Recherche {summary}",

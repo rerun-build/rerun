@@ -28,6 +28,7 @@
         "stop": "Bu görevi durdur",
         "failed": "Başarısız",
         "stopped": "Durduruldu, yapılan kısım korundu",
+        "stoppedWithRun": "Çalıştırmayla birlikte durduruldu",
         "earlier": "+{count} önceki",
         "verbs": {
             "web_search": "Aranıyor: {summary}",

@@ -117,6 +117,11 @@ export const STOPPED_ONE: SubRunTask[] = [
     { ...RUNNING[1], id: 't-web-fr', title: 'Web francophone' },
 ]
 
+export const STOPPED_WITH_RUN: SubRunTask[] = [
+    ...RUNNING.map(task => (task.status === 'done' ? task : { ...task, status: 'stopped' as const, error: 'stopped along with the calling run', finishedAt: at(13), idleMs: undefined, activity: undefined })),
+    { id: 't-suppliers', title: 'Supplier shortlist', status: 'stopped', steps: 0, toolCalls: 0, failures: 0, error: 'stopped along with the calling run', finishedAt: at(13) },
+]
+
 export const STALLED: SubRunTask[] = RUNNING.map(task => (task.title === 'Pricing & MOQ' ? { ...task, idleMs: 7 * MINUTE, calls: [{ tool: 'web_search', summary: 'contract manufacturer pectin gummies EU MOQ', elapsedMs: 7 * MINUTE }] } : task))
 
 export const QUEUED: SubRunTask[] = [

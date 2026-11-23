@@ -13,6 +13,7 @@
         "messageSent": "Message envoyé à {name}",
         "calling": "Appel de {name}",
         "callFailed": "{name} a échoué",
+        "callStopped": "{name} a été arrêté",
         "callAnswered": "{name} a répondu",
         "building": "Création de {name}",
         "buildFailed": "{name} n'a pas pu être créé",
@@ -23,6 +24,7 @@
         "coworkersBuilt": "{count, plural, =0 {# coworker créé} one {# coworker créé} other {# coworkers créés}}",
         "openFromBoard": "Ouvrez-en un depuis le plateau",
         "tasksDone": "{count, plural, =0 {# tâche terminée} one {# tâche terminée} other {# tâches terminées}}",
-        "doneAndFailed": "{done} terminées · {failed} en échec"
+        "doneAndFailed": "{done} terminées · {failed} en échec",
+        "doneAndStopped": "{done} terminées · {stopped} arrêtées"
     }
 }

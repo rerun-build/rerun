@@ -100,6 +100,8 @@ function FeedbackAction({ rating, current, onRate }: { rating: MessageFeedbackRa
 export type MessageViewProps = {
     message: { id: string; role: UIMessage['role']; parts: readonly MessagePartLike[] }
     isActive?: boolean
+    // The run that wrote the message is over: nothing it delegated can still be live.
+    settled?: boolean
     // Only the thread's last assistant message draws the coworker beside its steps.
     isLastAssistant?: boolean
     agentId?: string
@@ -163,7 +165,7 @@ export function UnderText({ children }: { children: ReactNode }) {
     return children
 }
 
-function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, spentMicros, spendRunning, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, onOpenTable, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
+function MessageViewInner({ message, isActive = false, settled = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, spentMicros, spendRunning, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, onOpenTable, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
     const t = useTranslations('chat')
     const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
@@ -177,7 +179,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     // A voice message sent with files carries the attachments marker after its voice marker.
     const attachments = message.role === 'user' && !install && !hitlReply && !automated ? parseAttachments(messageText(message)) : null
     const voice = message.role === 'user' && !install && !hitlReply && !automated ? parseVoiceMessage(attachments?.text ?? messageText(message)) : null
-    const subRuns = pairSubRuns(message.parts)
+    const subRuns = pairSubRuns(message.parts, { settled })
     const quickReplies = showQuickReplies && onSendMessage ? quickRepliesOf(message).filter(reply => onDraftReply || quickReplyDraft(reply) === null) : []
     const onStopTask = stopTaskOverride ?? (activeRunId && agentId ? (taskId: string) => void cancelSubRunAction(agentId, activeRunId, taskId) : undefined)
 

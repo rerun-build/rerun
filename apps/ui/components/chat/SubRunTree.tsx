@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatElapsed } from '@/hooks/useElapsed'
 import type { ToolDisplay } from '@/hooks/useToolDisplay'
 import { stripBridgePrefix } from '@/lib/chat/bridge-name'
-import { isSubRunFailing, isSubRunLive, isSubRunStalled, subRunOutcome, type SubRunCall, type SubRunTask } from '@/lib/chat/sub-run-progress'
+import { isSubRunFailing, isSubRunLive, isSubRunStalled, SUB_RUN_STOPPED_BY_USER, subRunOutcome, type SubRunCall, type SubRunTask } from '@/lib/chat/sub-run-progress'
 import { CheckIcon, ChevronRightIcon, ClockIcon, SquareIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
@@ -182,10 +182,11 @@ function Outcome({ task }: { task: SubRunTask }) {
         )
     }
     if (task.status === 'error' || task.status === 'stopped') {
+        const stoppedLabel = task.error === SUB_RUN_STOPPED_BY_USER ? t('stopped') : t('stoppedWithRun')
         return (
             <p className={cn('flex h-6 items-center gap-2.5 pl-0.5 text-xs', task.status === 'error' ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground')}>
                 {task.status === 'error' ? <XIcon className="size-3.5 shrink-0" /> : <SquareIcon className="size-3 shrink-0" />}
-                <span className="truncate">{task.status === 'stopped' ? t('stopped') : task.error || t('failed')}</span>
+                <span className="truncate">{task.status === 'stopped' ? stoppedLabel : task.error || t('failed')}</span>
             </p>
         )
     }

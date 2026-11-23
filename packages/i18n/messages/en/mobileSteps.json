@@ -28,6 +28,7 @@
         "stop": "Stop this task",
         "failed": "Failed",
         "stopped": "Stopped, partial work kept",
+        "stoppedWithRun": "Stopped with the run",
         "earlier": "+{count} earlier",
         "verbs": {
             "web_search": "Searching {summary}",

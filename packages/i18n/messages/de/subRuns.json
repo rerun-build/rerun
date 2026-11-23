@@ -13,6 +13,7 @@
         "messageSent": "Nachricht an {name} gesendet",
         "calling": "{name} wird aufgerufen",
         "callFailed": "{name} ist fehlgeschlagen",
+        "callStopped": "{name} wurde gestoppt",
         "callAnswered": "{name} hat geantwortet",
         "building": "{name} wird erstellt",
         "buildFailed": "{name} konnte nicht erstellt werden",
@@ -23,6 +24,7 @@
         "coworkersBuilt": "{count, plural, =0 {# Coworker} one {# Coworker} other {# Coworker}} erstellt",
         "openFromBoard": "Öffne einen über das Board",
         "tasksDone": "{count, plural, =0 {# Aufgaben} one {# Aufgabe} other {# Aufgaben}} erledigt",
-        "doneAndFailed": "{done} erledigt · {failed} fehlgeschlagen"
+        "doneAndFailed": "{done} erledigt · {failed} fehlgeschlagen",
+        "doneAndStopped": "{done} erledigt · {stopped} gestoppt"
     }
 }
