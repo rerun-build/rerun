@@ -10,6 +10,7 @@ import { useWorkspaceView } from '@/components/workspace-view/WorkspaceViewProvi
 import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
 import { useResolvedIsMobile } from '@rerun/ui/primitives'
 import { ForemanDock } from '@/components/foreman/ForemanDock'
+import { useForemanSurfaceOnFirstBox } from '@/components/foreman/useForemanSurfaceOnFirstBox'
 import { PhoneVerificationDialog } from '@rerun/cloud/phone.client'
 import { PostPaymentDialog, TemplatePurchaseSuccessDialog } from '@rerun/cloud/billing.client'
 import { AgentShareDeepLinkDialog } from '@/components/dialogs/AgentShareDeepLinkDialog'
@@ -351,6 +352,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     useAgentSchedulesSync(hydrated ? workspace?.id : undefined)
     useAgentsRealtime(hydrated ? workspace?.id : undefined)
     useSpacesRealtime(hydrated ? workspace?.id : undefined)
+    useForemanSurfaceOnFirstBox()
     useSpaceAccessSync(hydrated ? workspace?.id : undefined)
     useSessionsRealtime(hydrated)
     useNotificationsRealtime(hydrated ? workspace?.id : undefined)
