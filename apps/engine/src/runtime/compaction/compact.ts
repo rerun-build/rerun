@@ -28,6 +28,12 @@ const SUMMARY_PREAMBLE =
 const SUMMARY_SYSTEM =
     'You compress a coworker conversation transcript into a dense handoff summary. Preserve facts, decisions, file paths, identifiers, command outputs, error messages, and anything needed to continue the work. Use these sections: Historical Task Snapshot, Completed Actions, Blocked / Open Issues, Pending User Asks. Be concise; drop pleasantries and redundant detail. Never invent information.'
 
+const SUMMARY_TITLE = 'Historical Task Snapshot'
+
+// A transcript mostly ends on a tool result, and a model left with nothing after it may carry on the
+// work or answer the user instead of summarising.
+const SUMMARY_REQUEST = `The transcript above is over: do not continue it, call no tool and answer nobody in it. Write the handoff summary now, starting with the line "## ${SUMMARY_TITLE}". Keep the section titles in English whatever the language of the transcript.`
+
 // A summary of a long history on a slow model takes minutes, so the ceiling is generous: it only has
 // to keep a provider that never answers from holding the run, which then goes on uncompacted.
 const COMPACTION_TIMEOUT_MS = 15 * 60 * 1000
@@ -69,7 +75,7 @@ export async function summarizeMiddle(ctx: RunContext, override: ModelOverride |
             generateText({
                 model: modelFor(ctx.agent, override, undefined, undefined, { sessionId: ctx.sessionId }),
                 system: SUMMARY_SYSTEM,
-                prompt: serializeForSummary(middle),
+                prompt: `<transcript>\n${serializeForSummary(middle)}\n</transcript>\n\n${SUMMARY_REQUEST}`,
                 temperature: 0,
                 maxOutputTokens: COMPACTION_SUMMARY_TOKENS_CEILING,
                 abortSignal: signal,
@@ -83,6 +89,7 @@ export async function summarizeMiddle(ctx: RunContext, override: ModelOverride |
 }
 
 export function summaryMessageOf(preamble: string, text: string): ModelMessage {
+    if (!text.toLowerCase().includes(SUMMARY_TITLE.toLowerCase())) throw new Error(`the model wrote ${text.length} characters that are not a summary, starting ${JSON.stringify(text.slice(0, 100))}`)
     return { role: 'user', content: `${preamble}\n\n${text}` }
 }
 

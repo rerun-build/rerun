@@ -4,6 +4,8 @@ import { vi } from 'vitest'
 
 process.env.RERUN_API_KEY = ''
 
+const { summary } = vi.hoisted(() => ({ summary: (text: string) => `## Historical Task Snapshot\n${text}` }))
+
 const state = vi.hoisted(() => ({
     summaries: [] as Array<string | Error>,
     prompts: [] as string[],
@@ -17,7 +19,7 @@ vi.mock('../../agents/providers.js', async () => {
             new MockLanguageModelV3({
                 doGenerate: async options => {
                     state.prompts.push(JSON.stringify(options.prompt))
-                    const next = state.summaries.shift() ?? 'SUMMARY'
+                    const next = state.summaries.shift() ?? summary('SUMMARY')
                     if (next instanceof Error) throw next
                     return {
                         content: [{ type: 'text', text: next }],
@@ -104,7 +106,7 @@ describe('createInRunCompactor', () => {
         expect(state.prompts).toHaveLength(1)
         expect(state.prompts[0]).toContain('THE REQUEST')
         expect(state.prompts[0]).toContain('[pruned] shell_exec output')
-        expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\nSUMMARY` })
+        expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\n${summary('SUMMARY')}` })
         expect(sent?.[1]).toEqual(REQUEST)
         expect(sent?.slice(2)).toEqual(messages.slice(messages.length - (sent?.length ?? 0) + 2))
         expect(sent?.[2].role).toBe('assistant')
@@ -148,7 +150,7 @@ describe('createInRunCompactor', () => {
 
         await compact({ messages: runOf(12), steps: noSteps, stepNumber: 12 })
 
-        expect(state.steps).toEqual([expect.objectContaining({ runId: 'run-1', stepNumber: 12, finishReason: 'compaction', inputTokens: 900, outputTokens: 40, toolCallCount: 0, textLength: 'SUMMARY'.length })])
+        expect(state.steps).toEqual([expect.objectContaining({ runId: 'run-1', stepNumber: 12, finishReason: 'compaction', inputTokens: 900, outputTokens: 40, toolCallCount: 0, textLength: summary('SUMMARY').length })])
     })
 
     // The SDK rebuilds the full list for every step: without the summary put back, the next step
@@ -167,7 +169,7 @@ describe('createInRunCompactor', () => {
     })
 
     it('folds the earlier summary into the next one once the run fills up again', async () => {
-        state.summaries = ['FIRST SUMMARY', 'SECOND SUMMARY']
+        state.summaries = [summary('FIRST SUMMARY'), summary('SECOND SUMMARY')]
         const { ctx, writes } = context()
         const compact = compactorFor(ctx)
         await compact({ messages: runOf(12), steps: noSteps, stepNumber: 12 })
@@ -177,7 +179,7 @@ describe('createInRunCompactor', () => {
         expect(state.prompts).toHaveLength(2)
         expect(state.prompts[1]).toContain('FIRST SUMMARY')
         expect(state.prompts[1]).toContain('THE REQUEST')
-        expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\nSECOND SUMMARY` })
+        expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\n${summary('SECOND SUMMARY')}` })
         expect(sent?.[1]).toEqual(REQUEST)
         expect(sent?.[2].role).toBe('assistant')
         expect(writes.filter(w => w.data.status === 'done')).toHaveLength(2)
@@ -236,6 +238,22 @@ describe('createInRunCompactor', () => {
         const sent = await compact({ messages: runOf(15), steps: noSteps, stepNumber: 15 })
         expect(state.prompts).toHaveLength(2)
         expect(sent?.[1]).toEqual(REQUEST)
+    })
+
+    it('refuses a summary that is none, and waits for the run to grow before trying again', async () => {
+        state.summaries = ['<shell_exec command="ls">']
+        const { ctx, writes, logger } = context()
+        const compact = compactorFor(ctx)
+
+        expect(await compact({ messages: runOf(12), steps: noSteps, stepNumber: 12 })).toBeUndefined()
+        expect(await compact({ messages: runOf(12), steps: noSteps, stepNumber: 13 })).toBeUndefined()
+        expect(state.prompts).toHaveLength(1)
+        expect(writes.map(w => w.data.status)).toEqual(['running', 'error'])
+        expect(logger.error).toHaveBeenCalledWith(expect.objectContaining({ err: expect.stringContaining('not a summary') }), 'mid-run compaction failed')
+        expect(state.steps).toHaveLength(1)
+
+        const sent = await compact({ messages: runOf(15), steps: noSteps, stepNumber: 15 })
+        expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\n${summary('SUMMARY')}` })
     })
 })
 
@@ -304,7 +322,7 @@ describe('the signed thinking of a run on the Anthropic API', () => {
     })
 
     it('is dropped again by every later summary', async () => {
-        state.summaries = ['FIRST SUMMARY', 'SECOND SUMMARY']
+        state.summaries = [summary('FIRST SUMMARY'), summary('SECOND SUMMARY')]
         const { views, compactedAt } = await runOnAnthropic(45)
         const compactedAgainAt = views.findIndex(view => JSON.stringify(view[0]).includes('SECOND SUMMARY'))
 
@@ -315,7 +333,7 @@ describe('the signed thinking of a run on the Anthropic API', () => {
     })
 
     it('stays as it was when a later summary fails', async () => {
-        state.summaries = ['FIRST SUMMARY', new Error('model overloaded')]
+        state.summaries = [summary('FIRST SUMMARY'), new Error('model overloaded')]
         const { writes } = await runOnAnthropic(34)
 
         expect(writes.map(write => write.data.status).slice(0, 4)).toEqual(['running', 'done', 'running', 'error'])

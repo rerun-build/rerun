@@ -8,12 +8,14 @@ process.env.RERUN_API_KEY = ''
 
 type Row = { id: string; role: string; contentJson: string; createdAt: string }
 
+const { SUMMARY } = vi.hoisted(() => ({ SUMMARY: '## Historical Task Snapshot\nCondensed history.' }))
+
 const state = vi.hoisted(() => ({
     rows: [] as Row[],
     checkpoint: null as null | { summaryJson: string; throughCreatedAt: string },
     afterArgs: [] as Array<string | undefined>,
     saved: [] as unknown[],
-    summary: '  Condensed history.  ' as string | Error,
+    summary: `  ${SUMMARY}  ` as string | Error,
     prompts: [] as Array<Record<string, unknown>>,
     cliAuth: [] as Array<{ provider: string; beforeSummary: number }>,
     steps: [] as Array<Record<string, unknown>>,
@@ -105,7 +107,7 @@ afterEach(() => {
     state.checkpoint = null
     state.afterArgs = []
     state.saved = []
-    state.summary = '  Condensed history.  '
+    state.summary = `  ${SUMMARY}  `
     state.prompts = []
     state.cliAuth = []
     state.steps = []
@@ -232,7 +234,7 @@ describe('prepareRunHistory', () => {
         expect(saved.throughMessageId).toBe('m9')
         expect(saved.throughCreatedAt).toBe(state.rows[9].createdAt)
         expect(saved.summaryMessage.role).toBe('user')
-        expect(saved.summaryMessage.content).toMatch(/^The following is a compacted summary[\s\S]*\n\nCondensed history\.$/)
+        expect(saved.summaryMessage.content).toMatch(/^The following is a compacted summary[\s\S]*\n\n## Historical Task Snapshot\nCondensed history\.$/)
 
         expect(history).toEqual([saved.summaryMessage, { role: 'user', content: '10'.padEnd(CHUNK, '.') }, { role: 'assistant', content: '11'.padEnd(CHUNK, '.') }])
 
@@ -293,6 +295,39 @@ describe('prepareRunHistory', () => {
         expect(writes.map(w => w.data.status)).toEqual(['running', 'error'])
         expect(writes[1].id).toBe(writes[0].id)
         expect(logger.error).toHaveBeenCalledWith(expect.objectContaining({ agent: 'compact-agent', err: expect.stringContaining('model overloaded') }), 'compaction failed')
+    })
+
+    // A model that reads a transcript ending on a tool result may carry it on or answer it. Saved, that
+    // text would be all that is left of the conversation.
+    it.each([
+        ['a tool call', '<｜｜DSML｜｜ calls>\n<｜｜DSML｜｜ invoke name="shell_exec">\n<｜｜DSML｜｜ parameter name="command" string="true">ls</｜｜DSML｜｜ parameter>\n</｜｜DSML｜｜ invoke>\n</｜｜DSML｜｜ calls>'],
+        ['a tool call in another markup', '<shell_exec command="ls">'],
+        ['an answer to the user', "Yes, it's possible. Here's how it works."],
+        ['nothing', '   '],
+    ])('goes on uncompacted when the model wrote %s instead of a summary', async (_, text) => {
+        state.rows = longHistory()
+        state.summary = text
+        const { ctx, writes, logger } = context('gpt-4o', { runId: 'run-1' })
+
+        const history = await prepareRunHistory(ctx, 'system')
+
+        expect(history).toHaveLength(12)
+        expect(state.saved).toHaveLength(0)
+        expect(writes.map(w => w.data.status)).toEqual(['running', 'error'])
+        expect(logger.error).toHaveBeenCalledWith(expect.objectContaining({ err: expect.stringContaining(`not a summary, starting ${JSON.stringify(text.trim().slice(0, 100))}`) }), 'compaction failed')
+        expect(state.steps).toEqual([expect.objectContaining({ runId: 'run-1', finishReason: 'compaction' })])
+    })
+
+    it('closes the transcript and asks for the summary after it', async () => {
+        state.rows = longHistory()
+        const { ctx } = context()
+
+        await prepareRunHistory(ctx, 'system')
+
+        const messages = state.prompts[0].prompt as Array<{ role: string; content: Array<{ text: string }> }>
+        const text = messages.at(-1)!.content[0].text
+        expect(text.startsWith('<transcript>\n[user]')).toBe(true)
+        expect(text.slice(text.lastIndexOf('</transcript>'))).toContain('## Historical Task Snapshot')
     })
 
     it('gives up at once on a run that was already stopped', async () => {

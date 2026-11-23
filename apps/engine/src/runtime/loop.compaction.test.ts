@@ -48,7 +48,7 @@ vi.mock('../agents/providers.js', async importOriginal => {
                 doGenerate: async options => {
                     summaries.push(JSON.stringify(options.prompt))
                     return {
-                        content: [{ type: 'text', text: 'RUN SUMMARY' }],
+                        content: [{ type: 'text', text: '## Historical Task Snapshot\nRUN SUMMARY' }],
                         finishReason: { unified: 'stop', raw: 'stop' },
                         usage: { inputTokens: { total: 700, noCache: 700, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 30, text: 30, reasoning: 0 } },
                         warnings: [],
