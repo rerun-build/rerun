@@ -1,5 +1,7 @@
+import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
+import { thoughtsOf } from './__fixtures__/thoughts.js'
 import { createScreenshotStore, stepWithScreenshots, withScreenshots } from './screenshots.js'
 
 const picture = (label: string) => ({ image: Buffer.from(label), mediaType: 'image/jpeg' })
@@ -139,5 +141,69 @@ describe('stepWithScreenshots', () => {
         const store = createScreenshotStore()
         const messages = [toolResult('c1', { screenshotId: store.add(picture('screen')) })]
         expect(stepWithScreenshots(messages, store, 'opencode', 'go/deepseek-v4-pro')).toEqual({})
+    })
+})
+
+// Anthropic binds a thought to everything before it, and a dropped picture leaves a message that was
+// already sent: RER-278.
+describe('the signed thinking of a run that looks at its screen', () => {
+    const step = (store: ReturnType<typeof createScreenshotStore>, index: number, pictures = 1): ModelMessage[] => [
+        {
+            role: 'assistant',
+            content: [
+                { type: 'reasoning', text: `thought ${index}`, providerOptions: { anthropic: { signature: `sig-${index}` } } },
+                ...Array.from({ length: pictures }, (_, i) => ({ type: 'tool-call' as const, toolCallId: `c${index}-${i}`, toolName: 'computer', input: {} })),
+            ],
+        },
+        {
+            role: 'tool',
+            content: Array.from({ length: pictures }, (_, i) => ({ type: 'tool-result' as const, toolCallId: `c${index}-${i}`, toolName: 'computer', output: { type: 'json' as const, value: { screenshotId: store.add(picture(`${index}-${i}`)) } } })),
+        },
+    ]
+    const run = (store: ReturnType<typeof createScreenshotStore>, count: number): ModelMessage[] => [{ role: 'user', content: 'go' }, ...Array.from({ length: count }, (_, index) => step(store, index)).flat()]
+    const sentTo = (messages: ModelMessage[], store: ReturnType<typeof createScreenshotStore>, provider: Provider = 'anthropic', model = 'claude-sonnet-5-5') => stepWithScreenshots(messages, store, provider, model).messages!
+
+    it('is replayed as long as every picture is still there', () => {
+        const store = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(store, 6), store))).toEqual(['thought 0', 'thought 1', 'thought 2', 'thought 3', 'thought 4', 'thought 5'])
+    })
+
+    it('is dropped up to the step whose picture made the older ones leave', () => {
+        const store = createScreenshotStore()
+        const sent = sentTo(run(store, 7), store)
+        expect(thoughtsOf(sent)).toEqual([])
+        expect(sent.filter(message => message.role === 'assistant')).toHaveLength(7)
+    })
+
+    it('is replayed again behind that step, and stays until pictures leave again', () => {
+        const store = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(store, 10), store))).toEqual(['thought 7', 'thought 8', 'thought 9'])
+        const longer = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(longer, 11), longer))).toEqual([])
+        const again = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(again, 12), again))).toEqual(['thought 11'])
+    })
+
+    it('counts the pictures of one step as a single step', () => {
+        const store = createScreenshotStore()
+        const messages: ModelMessage[] = [{ role: 'user', content: 'go' }, ...run(store, 5).slice(1), ...step(store, 5, 3), ...step(store, 6)]
+        expect(thoughtsOf(sentTo(messages, store))).toEqual(['thought 6'])
+    })
+
+    it('is left as a summary kept it once the step that made the pictures leave was summarised', () => {
+        const store = createScreenshotStore()
+        const messages = run(store, 9)
+        const behindTheSummary: ModelMessage[] = [{ role: 'user', content: 'summary' }, ...messages.slice(-4)]
+        expect(thoughtsOf(sentTo(behindTheSummary, store))).toEqual(['thought 7', 'thought 8'])
+    })
+
+    it('is dropped on an OpenCode model served in the Anthropic format', () => {
+        const store = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(store, 7), store, 'opencode', 'go/claude-haiku-5-5'))).toEqual([])
+    })
+
+    it.each(['openai', 'google'] as const)('is kept on %s, which does not bind it to what came before', provider => {
+        const store = createScreenshotStore()
+        expect(thoughtsOf(sentTo(run(store, 7), store, provider, 'any'))).toHaveLength(7)
     })
 })

@@ -3,6 +3,7 @@ import { behaviourOf, modelSeesImages } from '../agents/opencode.js'
 import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
+import { withoutReasoning } from './replayed-reasoning.js'
 
 // Dropped in one go rather than one per step: every eviction rewrites the prompt from that picture
 // on, and a provider's prefix cache only survives when that happens rarely.
@@ -14,6 +15,8 @@ export type StoredScreenshot = { image: Buffer; mediaType: string }
 export type ScreenshotStore = {
     add: (screenshot: StoredScreenshot) => string
     get: (id: string) => StoredScreenshot | undefined
+    /** The picture that last made older ones leave. */
+    evictedBy: () => string | undefined
 }
 
 // A tool result is frozen into the conversation the moment it is produced, so a picture put there
@@ -21,14 +24,19 @@ export type ScreenshotStore = {
 // pictures live here for the length of the run, and each model call gets the recent ones attached.
 export function createScreenshotStore(): ScreenshotStore {
     const kept = new Map<string, StoredScreenshot>()
+    let evictedBy: string | undefined
     return {
         add: screenshot => {
             const id = newId()
             kept.set(id, screenshot)
-            if (kept.size > MAX_KEPT) for (const stale of [...kept.keys()].slice(0, kept.size - KEPT_AFTER_EVICTION)) kept.delete(stale)
+            if (kept.size > MAX_KEPT) {
+                for (const stale of [...kept.keys()].slice(0, kept.size - KEPT_AFTER_EVICTION)) kept.delete(stale)
+                evictedBy = id
+            }
             return id
         },
         get: id => kept.get(id),
+        evictedBy: () => evictedBy,
     }
 }
 
@@ -39,14 +47,18 @@ const CHAT_COMPLETIONS_PROVIDERS = new Set<Provider>(['rerun', 'openrouter', 'cu
 
 type ToolResultPart = Extract<Exclude<Extract<ModelMessage, { role: 'tool' }>['content'][number], { type: 'tool-approval-response' }>, { type: 'tool-result' }>
 
-function screenshotOf(part: { type: string }, store: ScreenshotStore): { id: string; screenshot: StoredScreenshot; result: unknown } | null {
+function screenshotNamedIn(part: { type: string }): { id: string; result: unknown } | null {
     if (part.type !== 'tool-result') return null
     const { output } = part as ToolResultPart
     if (output.type !== 'json') return null
     const id = (output.value as { screenshotId?: unknown } | null)?.screenshotId
-    if (typeof id !== 'string') return null
-    const screenshot = store.get(id)
-    return screenshot ? { id, screenshot, result: output.value } : null
+    return typeof id === 'string' ? { id, result: output.value } : null
+}
+
+function screenshotOf(part: { type: string }, store: ScreenshotStore): { id: string; screenshot: StoredScreenshot; result: unknown } | null {
+    const named = screenshotNamedIn(part)
+    const screenshot = named && store.get(named.id)
+    return screenshot ? { ...named, screenshot } : null
 }
 
 export function withScreenshots(messages: ModelMessage[], store: ScreenshotStore, delivery: ScreenshotDelivery): ModelMessage[] {
@@ -85,9 +97,20 @@ export function withScreenshots(messages: ModelMessage[], store: ScreenshotStore
     })
 }
 
+// A picture that leaves changes a message Anthropic has already read, and Anthropic refuses a thought
+// once what came before it changed. The thoughts produced behind that step never saw the picture: they
+// stay.
+function withoutThoughtsBoundToDroppedPictures(messages: ModelMessage[], store: ScreenshotStore): ModelMessage[] {
+    const evictedBy = store.evictedBy()
+    const evictionIndex = evictedBy ? messages.findIndex(message => message.role === 'tool' && message.content.some(part => screenshotNamedIn(part)?.id === evictedBy)) : -1
+    return messages.map((message, i) => (i < evictionIndex ? withoutReasoning(message) : message))
+}
+
 // A model that cannot see never gets the picture: OpenCode would drop it without a word, and the
 // model would answer about a screen it never saw.
 export function stepWithScreenshots(messages: ModelMessage[], store: ScreenshotStore | undefined, provider: Provider, model = '', connection?: LoadedConnection | null): { messages?: ModelMessage[] } {
     if (!store || !modelSeesImages(provider, model, connection)) return {}
-    return { messages: withScreenshots(messages, store, CHAT_COMPLETIONS_PROVIDERS.has(behaviourOf(provider, model)) ? 'user-message' : 'tool-result') }
+    const behaviour = behaviourOf(provider, model)
+    const replayed = behaviour === 'anthropic' ? withoutThoughtsBoundToDroppedPictures(messages, store) : messages
+    return { messages: withScreenshots(replayed, store, CHAT_COMPLETIONS_PROVIDERS.has(behaviour) ? 'user-message' : 'tool-result') }
 }
