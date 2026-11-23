@@ -12,12 +12,18 @@ permissions:
   issues: read
 
 jobs:
+  route:
+    uses: ./.github/workflows/route.yml
+    secrets:
+      RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+
   prove:
+    needs: route
     if: >-
       github.repository_owner == 'special-place-ai-heaven' &&
       github.event.pull_request.head.repo.full_name == github.repository
     name: Done-test red before green
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.route.outputs.heavy || '"ubuntu-latest"') }}
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4

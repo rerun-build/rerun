@@ -15,10 +15,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  route:
+    uses: ./.github/workflows/route.yml
+    secrets:
+      RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+
   image:
+    needs: route
     if: github.repository_owner == 'special-place-ai-heaven'
     name: ${{ matrix.name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.route.outputs.heavy || '"ubuntu-latest"') }}
     strategy:
       fail-fast: false
       matrix:
