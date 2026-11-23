@@ -58,7 +58,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
 }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
-const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, pooledMcpCount, releaseAgentMcp } = await import('./mcp-pool.js')
+const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, MCP_TOOL_TIMEOUT_MS, acquireMcp, closeAllMcp, pooledMcpCount, pooledMcpToolSet, releaseAgentMcp } = await import('./mcp-pool.js')
 
 type Server = Parameters<typeof acquireMcp>[1]
 
@@ -211,5 +211,14 @@ describe('releaseAgentMcp', () => {
         await settle()
         expect(mcp.closed).toEqual(['https://gh.example/mcp', 'https://linear.example/mcp'])
         expect(pooledMcpCount()).toBe(1)
+    })
+})
+
+describe('pooledMcpToolSet', () => {
+    it('gives a call to the server the same wait as the CLI relay does', async () => {
+        const options: unknown[] = []
+        const tools = pooledMcpToolSet([{ agentId: 'a1', name: 'apify', tools: [{ name: 'call-actor', inputSchema: { type: 'object' } }], call: async (_name, _args, opts) => (options.push(opts), { content: [] }) }])
+        await tools['apify_call-actor']!.execute!({}, { toolCallId: 't1', messages: [] })
+        expect(options).toEqual([{ timeout: MCP_TOOL_TIMEOUT_MS }])
     })
 })

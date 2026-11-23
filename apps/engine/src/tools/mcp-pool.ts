@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import type { ToolSet } from 'ai'
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import { DEFAULT_REQUEST_TIMEOUT_MSEC, type RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import { agentProcessEnv } from '../agents/process-env.js'
 import { agentMcpServers } from '../vault/runtime.js'
@@ -16,6 +16,10 @@ export const MCP_IDLE_MS = 10 * 60 * 1000
 // A server that has not answered by then is left out of this run rather than holding it up. Its
 // attempt is dropped too, so the next run dials it afresh instead of waiting on the same one.
 export const MCP_CONNECT_TIMEOUT_MS = 20_000
+// How long a call waits on someone else's server, whichever provider made it. A server that
+// stalls (Apify's call-actor did, RER-243) then hands the model an error it can act on within the
+// minute, rather than holding the whole run, the chat on "Thinking…", for as long as the CLI allows.
+export const MCP_TOOL_TIMEOUT_MS = DEFAULT_REQUEST_TIMEOUT_MSEC
 
 type CallResult = McpCallResult
 type Session = { client: Client; tools: McpTool[] }
@@ -144,7 +148,7 @@ export function pooledMcpToolSet(servers: PooledMcp[]): ToolSet {
     for (const server of servers)
         Object.assign(
             tools,
-            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))
+            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args, { timeout: MCP_TOOL_TIMEOUT_MS }))
         )
     return tools
 }

@@ -48,6 +48,10 @@ A longer result is saved whole in the coworker's workspace. The coworker reads i
 
 On a ChatGPT subscription, its own client calls the apps, and their results are not cut.
 
+## A call that never answers
+
+A call to an app that has not answered after 60 seconds is dropped, and the coworker is told so: it can check on the work another way, try a smaller request, or tell you what it could not get. It never waits on a silent app for the rest of its task. On a ChatGPT subscription, its own client decides how long it waits.
+
 ## Send a file through an app
 
 A coworker attaches or uploads a file of its own workspace or of the shared space through the apps connected with Composio: an email attachment in Gmail or Outlook, a file uploaded to Google Drive, OneDrive or SharePoint, a photo or a video for Instagram, LinkedIn or YouTube. It names the file by its path, relative or absolute: a relative path is looked for in its workspace first, then in the shared space. Rerun hands the file to the service for that one call, without ever making it public. A file can weigh up to 25 MB; Gmail itself stops at 20 MB for all the attachments of one email.

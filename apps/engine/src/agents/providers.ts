@@ -22,6 +22,7 @@ import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
+import { MCP_TOOL_TIMEOUT_MS } from '../tools/mcp-pool.js'
 import { claudeContextCapture, type ClaudeCompaction, type ClaudeContextCapture } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
@@ -209,7 +210,7 @@ export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = []
         allowedTools.push(...names.map(n => `mcp__${BRIDGE_SERVER_NAME}__${n}`))
     }
     for (const server of mcpServers) {
-        const entry = server.relay ? relayMcpServer(server.relay, BRIDGE_TOOL_TIMEOUT_SEC * 1000) : nativeMcpEntry(server)
+        const entry = server.relay ? relayMcpServer(server.relay, MCP_TOOL_TIMEOUT_MS) : nativeMcpEntry(server)
         if (!entry || server.name === BRIDGE_SERVER_NAME) continue
         servers[server.name] = entry
         allowedTools.push(`mcp__${server.name}`)

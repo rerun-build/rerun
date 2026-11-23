@@ -4,6 +4,9 @@ import { z } from 'zod'
 import type { McpServer } from '@rerun/contracts'
 import { CLAUDE_COMPACTION_ENV, CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig } from './providers.js'
 import { askUserTool, canonicalBridgeName, canonicalHitlName, isHitlToolName, requestApprovalTool } from '../tools/builtin/hitl.js'
+import { MCP_TOOL_TIMEOUT_MS } from '../tools/mcp-pool.js'
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 
 const HITL_CTX = { agent: { config: { tools: { cards: true } } } } as any
 
@@ -51,6 +54,21 @@ describe('claudeMcpConfig', () => {
         expect(mcpServers.discord).toMatchObject({ type: 'sdk', name: 'discord' })
         expect(mcpServers.gh).toEqual({ type: 'http', url: 'https://gh.example/mcp', headers: {} })
         expect(allowedTools).toEqual(['mcp__discord', 'mcp__gh'])
+    })
+
+    // RER-243: Apify's call-actor never answered, and the relay waited the 3600 s meant for Rerun's own
+    // tools: an hour of "Thinking…" before the coworker could try anything else.
+    it('waits on a relayed server as long as any provider does, not as long as on Rerun tools', async () => {
+        const timeouts: unknown[] = []
+        const relay = { agentId: 'a1', name: 'apify', tools: [{ name: 'call-actor', inputSchema: { type: 'object' as const } }], call: async (_name: string, _args: unknown, options?: { timeout?: number }) => (timeouts.push(options?.timeout), { content: [] }) }
+        const { mcpServers } = claudeMcpConfig(undefined, [{ ...server({ name: 'apify', url: 'https://mcp.apify.com' }), relay }])
+        const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
+        await (mcpServers.apify as { instance: { connect: (t: unknown) => Promise<void> } }).instance.connect(serverSide)
+        const client = new Client({ name: 'cli', version: '1.0.0' })
+        await client.connect(clientSide)
+        await client.callTool({ name: 'call-actor', arguments: {} })
+        expect(timeouts).toEqual([MCP_TOOL_TIMEOUT_MS])
+        expect(MCP_TOOL_TIMEOUT_MS).toBe(60_000)
     })
 
     it('ignores servers with neither command nor url, and the reserved "rerun" name', () => {
