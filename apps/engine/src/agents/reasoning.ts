@@ -18,12 +18,16 @@ const REASONING_OPTIONS: Partial<Record<Provider, ProviderOptions>> = {
     google: { google: { thinkingConfig: { includeThoughts: true } } },
 }
 
+// Claude 4.5 answers 400 to adaptive thinking; every later Claude model takes it.
+const takesAdaptiveThinking = (model: string) => !/claude-(?:haiku|sonnet|opus)-4-5/.test(model)
+
 // An OpenCode model is asked the way its format asks, and only when OpenCode says it reasons: the
 // chat format has no field for it, the model reasons or not on its own.
 export function reasoningProviderOptions(provider: Provider, model = ''): ProviderOptions | undefined {
-    if (provider !== 'opencode') return REASONING_OPTIONS[provider]
-    if (!opencodeModel(model)?.reasoning) return undefined
-    return REASONING_OPTIONS[behaviourOf(provider, model)]
+    if (provider === 'opencode' && !opencodeModel(model)?.reasoning) return undefined
+    const behaviour = behaviourOf(provider, model)
+    if (behaviour === 'anthropic' && !takesAdaptiveThinking(model)) return undefined
+    return REASONING_OPTIONS[behaviour]
 }
 
 // One level deep on purpose: `openai` already carries the `promptCacheKey` that applyCaching put

@@ -11,6 +11,14 @@ describe('reasoning provider options on OpenCode', () => {
         expect(reasoningProviderOptions('opencode', 'go/deepseek-v4-pro')).toBeUndefined()
         expect(reasoningProviderOptions('opencode', 'go/unknown')).toBeUndefined()
     })
+
+    it.each(['console/claude-haiku-4-5', 'console/claude-sonnet-4-5', 'console/claude-opus-4-5'])('asks no thinking of %s', model => {
+        expect(reasoningProviderOptions('opencode', model)).toBeUndefined()
+    })
+
+    it.each(['console/claude-opus-4-6', 'console/claude-sonnet-4-6', 'console/claude-opus-5-5', 'go/qwen3.8-max'])('still asks %s', model => {
+        expect(reasoningProviderOptions('opencode', model)).toEqual(reasoningProviderOptions('anthropic'))
+    })
 })
 
 describe('reasoning provider options', () => {
@@ -18,6 +26,14 @@ describe('reasoning provider options', () => {
         expect(reasoningProviderOptions('anthropic')).toEqual({ anthropic: { thinking: { type: 'adaptive', display: 'summarized' } } })
         expect(reasoningProviderOptions('openai')).toEqual({ openai: { reasoningSummary: 'auto' } })
         expect(reasoningProviderOptions('google')).toEqual({ google: { thinkingConfig: { includeThoughts: true } } })
+    })
+
+    it.each(['claude-haiku-4-5', 'claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929', 'claude-opus-4-5-20251101'])('asks no thinking of %s, which refuses adaptive', model => {
+        expect(reasoningProviderOptions('anthropic', model)).toBeUndefined()
+    })
+
+    it.each(['claude-sonnet-4-6', 'claude-opus-4-8', 'claude-haiku-5-5', 'claude-sonnet-5-5', 'claude-opus-5-5', 'claude-fable-5-2'])('asks %s for adaptive thinking', model => {
+        expect(reasoningProviderOptions('anthropic', model)).toEqual({ anthropic: { thinking: { type: 'adaptive', display: 'summarized' } } })
     })
 
     it('leaves the providers that are configured elsewhere alone', () => {

@@ -3,6 +3,7 @@ import { streamText, tool } from 'ai'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { HITL_ACK, hitlStepLacksMessage, hitlTurnIsOver } from '../tools/builtin/hitl.js'
+import { sse } from './__fixtures__/anthropic-sse.js'
 import { reasoningProviderOptions } from './reasoning.js'
 
 type SentBody = {
@@ -10,8 +11,6 @@ type SentBody = {
     tool_choice?: { type: string }
     messages: { role: string; content: string | { type: string; signature?: string }[] }[]
 }
-
-const sse = (events: object[]) => events.map(event => `event: ${(event as { type: string }).type}\ndata: ${JSON.stringify(event)}\n\n`).join('')
 
 const messageStart = { type: 'message_start', message: { id: 'msg_1', type: 'message', role: 'assistant', model: 'claude-sonnet-5-5', content: [], stop_reason: null, stop_sequence: null, usage: { input_tokens: 10, output_tokens: 1 } } }
 const messageEnd = (stopReason: string) => [
