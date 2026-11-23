@@ -22,7 +22,7 @@ import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
-import { MCP_TOOL_TIMEOUT_MS } from '../tools/mcp-pool.js'
+import { MCP_TOOL_CALL_OPTIONS, MCP_TOOL_TIMEOUT_MS } from '../tools/mcp-pool.js'
 import { claudeContextCapture, type ClaudeCompaction, type ClaudeContextCapture } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
@@ -165,12 +165,15 @@ function bridgeableTools(tools: ToolSet): ToolSet {
     return out
 }
 
+// A server the pool could not reach is dialed by the CLI itself, and waited on no longer than a relayed
+// one: its `timeout` overrides the hour `MCP_TOOL_TIMEOUT` gives the bridge.
 function nativeMcpEntry(server: McpServer): McpServerConfig | null {
     const kind = resolveTransport(server)
-    if (kind === 'stdio') return server.command ? { type: 'stdio', command: server.command, args: server.args, env: server.env } : null
+    const timeout = MCP_TOOL_TIMEOUT_MS
+    if (kind === 'stdio') return server.command ? { type: 'stdio', command: server.command, args: server.args, env: server.env, timeout } : null
     if (!server.url) return null
-    if (kind === 'http') return { type: 'http', url: server.url, headers: server.headers }
-    return { type: 'sse', url: server.url, headers: server.headers }
+    if (kind === 'http') return { type: 'http', url: server.url, headers: server.headers, timeout }
+    return { type: 'sse', url: server.url, headers: server.headers, timeout }
 }
 
 export type ScreenshotLookup = (id: string) => StoredScreenshot | undefined
@@ -210,7 +213,7 @@ export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = []
         allowedTools.push(...names.map(n => `mcp__${BRIDGE_SERVER_NAME}__${n}`))
     }
     for (const server of mcpServers) {
-        const entry = server.relay ? relayMcpServer(server.relay, MCP_TOOL_TIMEOUT_MS) : nativeMcpEntry(server)
+        const entry = server.relay ? relayMcpServer(server.relay, MCP_TOOL_CALL_OPTIONS) : nativeMcpEntry(server)
         if (!entry || server.name === BRIDGE_SERVER_NAME) continue
         servers[server.name] = entry
         allowedTools.push(`mcp__${server.name}`)

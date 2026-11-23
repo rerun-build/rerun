@@ -18,21 +18,21 @@ describe('claudeMcpConfig', () => {
     it('maps a stdio server to a command entry and allows the whole server', () => {
         const stdio = server({ name: 'files', command: 'mcp-files', args: ['--root', '/tmp'], env: { TOKEN: 'x' } })
         const { mcpServers, allowedTools } = claudeMcpConfig(undefined, [stdio])
-        expect(mcpServers.files).toEqual({ type: 'stdio', command: 'mcp-files', args: ['--root', '/tmp'], env: { TOKEN: 'x' } })
+        expect(mcpServers.files).toEqual({ type: 'stdio', command: 'mcp-files', args: ['--root', '/tmp'], env: { TOKEN: 'x' }, timeout: MCP_TOOL_TIMEOUT_MS })
         expect(allowedTools).toContain('mcp__files')
     })
 
     it('maps an http server with headers', () => {
         const http = server({ name: 'api', transport: 'http', url: 'https://mcp.example.com', headers: { Authorization: 'Bearer t' } })
         const { mcpServers, allowedTools } = claudeMcpConfig(undefined, [http])
-        expect(mcpServers.api).toEqual({ type: 'http', url: 'https://mcp.example.com', headers: { Authorization: 'Bearer t' } })
+        expect(mcpServers.api).toEqual({ type: 'http', url: 'https://mcp.example.com', headers: { Authorization: 'Bearer t' }, timeout: MCP_TOOL_TIMEOUT_MS })
         expect(allowedTools).toEqual(['mcp__api'])
     })
 
     it('maps an sse server', () => {
         const sse = server({ name: 'stream', transport: 'sse', url: 'https://mcp.example.com/sse' })
         const { mcpServers } = claudeMcpConfig(undefined, [sse])
-        expect(mcpServers.stream).toEqual({ type: 'sse', url: 'https://mcp.example.com/sse', headers: {} })
+        expect(mcpServers.stream).toEqual({ type: 'sse', url: 'https://mcp.example.com/sse', headers: {}, timeout: MCP_TOOL_TIMEOUT_MS })
     })
 
     it('bridges Zod builtin tools via the rerun in-process server, drops jsonSchema tools', () => {
@@ -52,7 +52,7 @@ describe('claudeMcpConfig', () => {
         const relay = { agentId: 'a1', name: 'discord', tools: [], call: async () => ({ content: [] }) }
         const { mcpServers, allowedTools } = claudeMcpConfig(undefined, [{ ...server({ name: 'discord', command: 'npx', args: ['-y', 'mcp-discord'] }), relay }, server({ name: 'gh', url: 'https://gh.example/mcp' })])
         expect(mcpServers.discord).toMatchObject({ type: 'sdk', name: 'discord' })
-        expect(mcpServers.gh).toEqual({ type: 'http', url: 'https://gh.example/mcp', headers: {} })
+        expect(mcpServers.gh).toEqual({ type: 'http', url: 'https://gh.example/mcp', headers: {}, timeout: MCP_TOOL_TIMEOUT_MS })
         expect(allowedTools).toEqual(['mcp__discord', 'mcp__gh'])
     })
 

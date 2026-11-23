@@ -12,6 +12,7 @@ const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.j
 const { CallToolRequestSchema, ListToolsRequestSchema } = await import('@modelcontextprotocol/sdk/types.js')
 const { callMcpTool } = await import('./mcp.js')
 const { relayMcpServer } = await import('./mcp-relay.js')
+const { MCP_TOOL_CALL_OPTIONS } = await import('./mcp-pool.js')
 
 type CallResult = Awaited<ReturnType<typeof callMcpTool>>
 
@@ -64,10 +65,42 @@ describe('callMcpTool', () => {
     // The relay lists the tool without its output schema, which a result it cuts could not meet.
     it('lets the CLI behind the relay read the reason', async () => {
         const kie = await kieClient(REFUSED)
-        const { instance } = relayMcpServer({ agentId: 'kie-agent', name: 'kie-ai', tools: [GENERATE], call: (name, args) => callMcpTool(kie, name, args) }, 1234)
+        const { instance } = relayMcpServer({ agentId: 'kie-agent', name: 'kie-ai', tools: [GENERATE], call: (name, args) => callMcpTool(kie, name, args) }, { timeout: 1234 })
         const cli = await link(instance)
 
         expect((await cli.listTools()).tools[0].outputSchema).toBeUndefined()
         expect(await cli.callTool({ name: 'generate', arguments: {} })).toEqual({ isError: true, content: REFUSED.content })
+    })
+})
+
+// RER-243: Apify's call-actor runs as long as its actor does. The wait only gives up on a server that
+// has gone quiet, never on one still reporting progress.
+describe('the wait on a call', () => {
+    const SILENCE_MS = 400
+    const WORK_MS = 1200
+
+    async function jobClient(progressEveryMs: number | null) {
+        const server = new Server({ name: 'apify', version: '1.0.0' }, { capabilities: { tools: {} } })
+        server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [{ name: 'call-actor', inputSchema: { type: 'object' as const } }] }))
+        server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+            const progressToken = request.params._meta?.progressToken
+            const started = Date.now()
+            while (Date.now() - started < WORK_MS) {
+                await new Promise(resolve => setTimeout(resolve, progressEveryMs ?? WORK_MS))
+                if (progressEveryMs !== null && progressToken !== undefined) await extra.sendNotification({ method: 'notifications/progress', params: { progressToken, progress: Date.now() - started } })
+            }
+            return { content: [{ type: 'text' as const, text: 'actor finished' }] }
+        })
+        return link(server)
+    }
+
+    it('keeps waiting on a server that reports progress past the silence it allows', async () => {
+        const client = await jobClient(50)
+        expect(await callMcpTool(client, 'call-actor', {}, { ...MCP_TOOL_CALL_OPTIONS, timeout: SILENCE_MS })).toEqual({ content: [{ type: 'text', text: 'actor finished' }] })
+    })
+
+    it('gives up on a server that stays silent', async () => {
+        const client = await jobClient(null)
+        await expect(callMcpTool(client, 'call-actor', {}, { ...MCP_TOOL_CALL_OPTIONS, timeout: SILENCE_MS })).rejects.toThrow('Request timed out')
     })
 })

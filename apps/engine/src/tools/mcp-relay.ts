@@ -1,4 +1,5 @@
 import { McpServer as SdkMcpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { McpSdkServerConfigWithInstance } from 'ai-sdk-provider-claude-code'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
@@ -15,13 +16,13 @@ export type RunMcpServer = McpServer & { relay?: PooledMcp }
 // connection as the model made it. The listed schemas go through `modelReadyMcpTool`: the CLI never
 // hands the model a tool whose schema has a root `anyOf`, so the mail server's send_email,
 // reply_to_email and continue_email_thread answered "No such tool available".
-export function relayMcpServer(relay: PooledMcp, toolTimeoutMs: number): McpSdkServerConfigWithInstance {
+export function relayMcpServer(relay: PooledMcp, callOptions: RequestOptions): McpSdkServerConfigWithInstance {
     const server = new SdkMcpServer({ name: relay.name, version: '1.0.0' }, { capabilities: { tools: {} } })
     const tools = relay.tools.map(tool => withoutOutputSchema(modelReadyMcpTool(relay.name, tool)))
     server.server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }))
     server.server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
         try {
-            const result = await relay.call(request.params.name, request.params.arguments ?? {}, { signal: extra.signal, timeout: toolTimeoutMs })
+            const result = await relay.call(request.params.name, request.params.arguments ?? {}, { ...callOptions, signal: extra.signal })
             return await capRelayedResult(relay.agentId, mcpToolNameFor('claude', relay.name, request.params.name), result)
         } catch (error) {
             return { isError: true, content: [{ type: 'text' as const, text: error instanceof Error ? error.message : String(error) }] }

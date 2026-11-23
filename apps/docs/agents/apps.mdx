@@ -50,7 +50,7 @@ On a ChatGPT subscription, its own client calls the apps, and their results are 
 
 ## A call that never answers
 
-A call to an app that has not answered after 60 seconds is dropped, and the coworker is told so: it can check on the work another way, try a smaller request, or tell you what it could not get. It never waits on a silent app for the rest of its task. On a ChatGPT subscription, its own client decides how long it waits.
+A call to an app that has gone 60 seconds without answering or reporting progress is dropped. The coworker is told the app may still be doing the work, so it checks whether it took effect before trying again, tries a smaller request, or tells you what it could not get. An app that keeps reporting progress is waited on for up to an hour. On a ChatGPT subscription, its own client decides how long it waits.
 
 ## Send a file through an app
 

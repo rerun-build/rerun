@@ -15,6 +15,7 @@ const mcp = vi.hoisted(() => ({
     hanging: new Set<string>(),
     clients: [] as Array<{ target: string; onclose?: () => void }>,
     callGate: null as Promise<void> | null,
+    callError: null as Error | null,
 }))
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
@@ -48,6 +49,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
         async request({ params }: { params: { name: string } }, _schema: unknown, options: unknown) {
             mcp.calls.push({ target: this.target, name: params.name, options })
             if (mcp.callGate) await mcp.callGate
+            if (mcp.callError) throw mcp.callError
             return { content: [{ type: 'text', text: `${params.name} ran` }] }
         }
         async close() {
@@ -58,7 +60,8 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
 }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
-const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, MCP_TOOL_TIMEOUT_MS, acquireMcp, closeAllMcp, pooledMcpCount, pooledMcpToolSet, releaseAgentMcp } = await import('./mcp-pool.js')
+const { McpError, ErrorCode } = await import('@modelcontextprotocol/sdk/types.js')
+const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, MCP_TOOL_CALL_OPTIONS, MCP_TOOL_TIMEOUT_MS, acquireMcp, closeAllMcp, pooledMcpCount, pooledMcpToolSet, releaseAgentMcp } = await import('./mcp-pool.js')
 
 type Server = Parameters<typeof acquireMcp>[1]
 
@@ -75,6 +78,7 @@ beforeEach(async () => {
     mcp.failing.clear()
     mcp.hanging.clear()
     mcp.callGate = null
+    mcp.callError = null
 })
 
 afterEach(() => {
@@ -197,6 +201,23 @@ describe('closeAllMcp', () => {
 })
 
 describe('releaseAgentMcp', () => {
+    // RER-243: the drop only stops the wait here, so the model is told to check before it calls again,
+    // rather than run a second actor or send a second email.
+    it('tells the model a call it gave up on may still be carried out', async () => {
+        const pooled = await acquireMcp('a1', server('apify'), spawn)
+        mcp.callError = new McpError(ErrorCode.RequestTimeout, 'Request timed out', { timeout: MCP_TOOL_TIMEOUT_MS })
+        await expect(pooled!.call('call-actor', {}, MCP_TOOL_CALL_OPTIONS)).rejects.toThrow(
+            'apify gave no answer and no progress for 60 s, so the call was dropped here, but the server may still be carrying it out: check whether it took effect before calling it again.'
+        )
+    })
+
+    it("leaves the error of a call its run cancelled as it is", async () => {
+        const pooled = await acquireMcp('a1', server('apify'), spawn)
+        const cancelled = new McpError(ErrorCode.RequestTimeout, 'run cancelled')
+        mcp.callError = cancelled
+        await expect(pooled!.call('call-actor', {}, { ...MCP_TOOL_CALL_OPTIONS, signal: AbortSignal.abort('run cancelled') })).rejects.toBe(cancelled)
+    })
+
     it("closes the agent's connections, sparing the servers it still declares and other agents", async () => {
         await acquireMcp('a1', server('gh'), spawn)
         await acquireMcp('a1', server('linear'), spawn)
@@ -219,6 +240,7 @@ describe('pooledMcpToolSet', () => {
         const options: unknown[] = []
         const tools = pooledMcpToolSet([{ agentId: 'a1', name: 'apify', tools: [{ name: 'call-actor', inputSchema: { type: 'object' } }], call: async (_name, _args, opts) => (options.push(opts), { content: [] }) }])
         await tools['apify_call-actor']!.execute!({}, { toolCallId: 't1', messages: [] })
-        expect(options).toEqual([{ timeout: MCP_TOOL_TIMEOUT_MS }])
+        expect(options).toEqual([MCP_TOOL_CALL_OPTIONS])
+        expect(MCP_TOOL_CALL_OPTIONS).toMatchObject({ timeout: MCP_TOOL_TIMEOUT_MS, resetTimeoutOnProgress: true, maxTotalTimeout: 60 * 60 * 1000 })
     })
 })

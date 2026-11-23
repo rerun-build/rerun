@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import type { ToolSet } from 'ai'
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { DEFAULT_REQUEST_TIMEOUT_MSEC, type RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import { agentProcessEnv } from '../agents/process-env.js'
 import { agentMcpServers } from '../vault/runtime.js'
@@ -16,10 +17,23 @@ export const MCP_IDLE_MS = 10 * 60 * 1000
 // A server that has not answered by then is left out of this run rather than holding it up. Its
 // attempt is dropped too, so the next run dials it afresh instead of waiting on the same one.
 export const MCP_CONNECT_TIMEOUT_MS = 20_000
-// How long a call waits on someone else's server, whichever provider made it. A server that
-// stalls (Apify's call-actor did, RER-243) then hands the model an error it can act on within the
-// minute, rather than holding the whole run, the chat on "Thinking…", for as long as the CLI allows.
+// How long a call waits on someone else's server without a word from it, whichever provider made it.
+// A server that stalls (Apify's call-actor did, RER-243) then hands the model an error it can act on
+// within the minute, rather than holding the whole run, the chat on "Thinking…", for an hour.
 export const MCP_TOOL_TIMEOUT_MS = DEFAULT_REQUEST_TIMEOUT_MSEC
+// A server that keeps reporting progress is still working, and is waited on up to the hour the CLI
+// gives any tool.
+export const MCP_TOOL_MAX_MS = 60 * 60 * 1000
+// The SDK only asks the server for progress (a `progressToken`) when the call has an `onprogress`.
+export const MCP_TOOL_CALL_OPTIONS: RequestOptions = { timeout: MCP_TOOL_TIMEOUT_MS, resetTimeoutOnProgress: true, maxTotalTimeout: MCP_TOOL_MAX_MS, onprogress: () => {} }
+
+// The SDK files a run's cancellation under the same code: only a real timeout is reworded. The server
+// heard of the drop at most, so the work may well go on there.
+function droppedCall(server: string, error: unknown, options?: RequestOptions): unknown {
+    if (!(error instanceof McpError) || error.code !== ErrorCode.RequestTimeout || options?.signal?.aborted) return error
+    const silence = Math.round((options?.timeout ?? DEFAULT_REQUEST_TIMEOUT_MSEC) / 1000)
+    return new Error(`${server} gave no answer and no progress for ${silence} s, so the call was dropped here, but the server may still be carrying it out: check whether it took effect before calling it again.`)
+}
 
 type CallResult = McpCallResult
 type Session = { client: Client; tools: McpTool[] }
@@ -118,6 +132,8 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
             live.entry.inFlight++
             try {
                 return await callMcpTool(live.session.client, name, args, options)
+            } catch (error) {
+                throw droppedCall(server.name, error, options)
             } finally {
                 live.entry.inFlight--
                 arm(live.key, live.entry)
@@ -148,7 +164,7 @@ export function pooledMcpToolSet(servers: PooledMcp[]): ToolSet {
     for (const server of servers)
         Object.assign(
             tools,
-            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args, { timeout: MCP_TOOL_TIMEOUT_MS }))
+            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args, MCP_TOOL_CALL_OPTIONS))
         )
     return tools
 }

@@ -28,7 +28,7 @@ const { join } = await import('node:path')
 type Relay = Parameters<typeof relayMcpServer>[0]
 
 async function clientOf(relay: Relay) {
-    const { instance } = relayMcpServer(relay, 1234)
+    const { instance } = relayMcpServer(relay, { timeout: 1234 })
     const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
     await instance.connect(serverSide)
     const client = new Client({ name: 'cli', version: '1.0.0' })
