@@ -1,10 +1,10 @@
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { putMcpToken } from '@/lib/engine/client'
 import type { ParkedSignIn } from '@/lib/oauth/pending-grant'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { finishParkedSignIn } from './oauth-claim.service'
 
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), markManagedAuthorized: vi.fn(), markServiceAuthorized: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), deleteMcpToken: vi.fn(), supportsVault: vi.fn(async () => false) }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
@@ -21,7 +21,7 @@ function parkedMcp(patch: Partial<Extract<ParkedSignIn, { kind: 'mcp' }>> = {}):
 describe('finishParkedSignIn', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        vi.mocked(getAgentChatTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent' } as never)
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent' } as never)
         vi.stubEnv('RERUN_ASANA_MCP_CLIENT_ID', 'asana-id')
         vi.stubEnv('RERUN_ASANA_MCP_CLIENT_SECRET', 'asana-secret')
         vi.stubEnv('RERUN_GITHUB_MCP_CLIENT_ID', 'gh-id')
@@ -35,7 +35,7 @@ describe('finishParkedSignIn', () => {
     it('reads the Asana secret from the environment at the claim, the parked bundle never held it', async () => {
         await finishParkedSignIn('agent-1', ACTOR, parkedMcp())
 
-        expect(getAgentChatTarget).toHaveBeenCalledWith('agent-1', 'manage', ACTOR)
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', 'manage', ACTOR)
         expect(putMcpToken).toHaveBeenCalledWith(CONN, 'engine-agent', 'asana', { ...TOKEN, clientId: 'asana-id', clientSecret: 'asana-secret' })
     })
 

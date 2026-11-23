@@ -1,18 +1,18 @@
 import 'server-only'
 import { actorFromContext, type AccessLevel } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { resolveAgentTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
+import { resolveRunTarget } from '@/app/api/_services/chat.service'
 import { ApiError } from '@/lib/api-error'
 import { refusal } from '@/lib/i18n/action-error'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
 import { connectionGroups } from '@/lib/engine/model-groups'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
-import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
+import { type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
 
-// The foreman has no agent row, so it resolves the way the web's picker resolves it, and stays every
-// member's own to set. A coworker's model is part of what it is: setting it takes `manage`.
-const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => (agentId === FOREMAN_AGENT_ID ? resolveRunTarget(agentId) : resolveAgentTarget(agentId, actorFromContext(ctx), access))
+// A coworker's model is part of what it is: setting it takes `manage`. On one whose conversations are
+// each member's own it stays every member's to set, as the web's picker has it.
+const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => resolveRunTarget(agentId, access, actorFromContext(ctx))
 
 const choiceOf = (connectionId: string | null | undefined, model: string | null | undefined): ModelChoice | null => (connectionId && model ? { connectionId, model } : null)
 

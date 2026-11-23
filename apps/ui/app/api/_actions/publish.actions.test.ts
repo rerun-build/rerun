@@ -31,7 +31,7 @@ const MEMBER: Actor = { kind: 'user', userId: 'user-2', workspaceId: 1, role: 'm
 describe('publishFileAction', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ workspace_id: 1, space_id: 'space', engine_agent_id: 'engine-agent' })
+        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ id: 'agent-1', workspace_id: 1, kind: 'coworker', space_id: 'space', engine_agent_id: 'engine-agent' })
     })
 
     it('publishes an owned agent file without a billing entitlement check', async () => {
@@ -115,7 +115,7 @@ describe('links reached by their slug', () => {
 
     it('lets a member who uses the coworker unpublish its link', async () => {
         vi.mocked(requireLightSessionActor).mockResolvedValue(MEMBER)
-        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ workspace_id: 1, space_id: 'space', engine_agent_id: 'engine-agent' })
+        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ id: 'agent-1', workspace_id: 1, kind: 'coworker', space_id: 'space', engine_agent_id: 'engine-agent' })
 
         await expect(unpublishLinkAction('report')).resolves.toEqual({ ok: true })
         expect(unpublishInWorkspace).toHaveBeenCalledWith(1, 'report')

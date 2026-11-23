@@ -58,6 +58,8 @@ function deletesStateCookie(res: Response) {
     return header.includes(`${COOKIE}=;`) && header.includes('Path=/api/mcp/oauth') && header.includes('Expires=Thu, 01 Jan 1970')
 }
 
+let foremanWorkspace = 0
+
 beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('MOBILE_OAUTH_TICKET_SECRET', 'test-secret')
@@ -65,7 +67,13 @@ beforeEach(() => {
     memberOfAgentWorkspace = true
     role = 'admin'
     jar = {}
-    const db = fakeSupabase(table => {
+    const db = fakeSupabase((table, calls) => {
+        const filtered = (column: string, value: unknown) => calls.some(call => call.method === 'eq' && call.args[0] === column && call.args[1] === value)
+        if (table === 'agents' && filtered('kind', 'foreman')) {
+            foremanWorkspace = calls.find(call => call.method === 'eq' && call.args[0] === 'workspace_id')?.args[1] as number
+            return { data: { id: 'cos-1' } }
+        }
+        if (table === 'agents' && filtered('id', 'cos-1')) return { data: { id: 'cos-1', workspace_id: foremanWorkspace, kind: 'foreman', space_id: null, engine_agent_id: 'foreman', template_id: null, disabled_at: null, disabled_reason: null, space: null } }
         if (table === 'agents') return { data: { workspace_id: agentWorkspace, space_id: 'space-1', engine_agent_id: 'engine-agent', template_id: null, disabled_at: null, disabled_reason: null, workspaces: { subscription_status: 'active', is_sandbox: false }, space: { visibility: 'workspace' } } }
         if (table === 'spaces') return { data: { id: 'space-1', workspace_id: agentWorkspace, visibility: 'workspace' } }
         if (table === 'workspace_members') return { data: memberOfAgentWorkspace ? { user_id: 'user-1', role, box_scope: 'all' } : null }

@@ -4,7 +4,7 @@ import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionStat
 import type { UIMessage } from 'ai'
 
 import { workspaceFounderUserId, type WorkspaceContext } from '@/app/api/_auth/ownership'
-import { FIRST_MESSAGE_MAX_CHARS, GENERAL_SESSION_TITLE, lastRunError, listSessionRuns, readUsageSeed, type SessionUsageSeed } from '@/app/api/_services/chat.service'
+import { FIRST_MESSAGE_MAX_CHARS, GENERAL_SESSION_TITLE, GeneralAlreadyOpenError, lastRunError, listSessionRuns, readUsageSeed, type GeneralSession, type SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
@@ -241,22 +241,14 @@ export async function engineSessionOf(ctx: WorkspaceContext, sessionId: string):
     return hub ? { backend: 'hub', engineSessionId: null } : null
 }
 
-type ForemanGeneral = { id: string; engineSessionId: string | null }
-
 // This person's General, once they have spoken in it.
-export async function findForemanGeneral(ctx: WorkspaceContext): Promise<ForemanGeneral | null> {
+export async function findForemanGeneral(ctx: WorkspaceContext): Promise<GeneralSession | null> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'sessions', ['id', 'engine_session_id'] as const, { ...(await ownedBy(ctx)), kind: 'general' })
     return data ? { id: data.id, engineSessionId: data.engine_session_id } : null
 }
 
-// Thrown when a General is inserted for a member who already has one: two tabs raced to open it, and
-// the one that lost is told which row won so the message can start over there.
-export class ForemanGeneralAlreadyOpenError extends Error {
-    constructor(readonly general: ForemanGeneral) {
-        super('General already open')
-    }
-}
-
+// Throws GeneralAlreadyOpenError when a General is inserted for a member who already has one: two
+// tabs raced to open it, and the one that lost is told which row won so the message can start over there.
 export async function startEngineConversation(ctx: WorkspaceContext, sessionId: string, engineSessionId: string, firstText: string, kind: SessionKind): Promise<void> {
     const supabase = createServiceRoleClient()
     const seed = stripVoiceMarker(stripAttachmentsRef(firstText)).trim()
@@ -273,7 +265,7 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
     if (error) {
         if (kind === 'general' && error.code === UNIQUE_VIOLATION) {
             const general = await findForemanGeneral(ctx)
-            if (general && general.id !== sessionId) throw new ForemanGeneralAlreadyOpenError(general)
+            if (general && general.id !== sessionId) throw new GeneralAlreadyOpenError(general)
         }
         throw new Error(error.message)
     }
@@ -289,13 +281,6 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
             if (data?.length) await copyToShippedForemanRow(sessionId)
         })
         .catch(() => {})
-}
-
-// What the list of conversations sorts on, so it has to move on every turn.
-export async function touchForemanConversation(sessionId: string): Promise<void> {
-    const supabase = createServiceRoleClient()
-    await supabase.from('sessions').update<SessionUpdate>({ updated_at: new Date().toISOString(), status: 'working' }).eq('id', sessionId)
-    await copyToShippedForemanRow(sessionId)
 }
 
 // Who reads what a routine of the foreman did: a member who follows it, as the one who scheduled it

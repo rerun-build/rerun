@@ -4,7 +4,7 @@ import type { Actor } from '@/app/api/_auth/access'
 import { fakeSupabase } from '@/test/supabase-fake'
 
 const mocks = vi.hoisted(() => ({
-    getAgentChatTarget: vi.fn(),
+    resolveAgentTarget: vi.fn(),
     resolveRunTarget: vi.fn(),
     assertAgentInWorkspace: vi.fn(),
     assertSessionInWorkspace: vi.fn(),
@@ -35,7 +35,7 @@ vi.mock('@/app/api/_auth/access', () => ({
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: vi.fn(), requireWorkspaceContext: mocks.requireWorkspaceContext }))
 vi.mock('@/lib/foreman/conversation', () => ({ engineSessionOf: mocks.engineSessionOf }))
 vi.mock('@/app/api/_services/vault-install.service', () => ({ saveSecretsToVault: mocks.saveSecretsToVault }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: mocks.getAgentChatTarget, resolveRunTarget: mocks.resolveRunTarget, sessionRowOf: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: mocks.resolveAgentTarget, resolveRunTarget: mocks.resolveRunTarget, sessionRowOf: vi.fn() }))
 vi.mock('@/app/api/_services/agent.service', () => ({ moveAgentToBox: mocks.moveAgentToBox, duplicateAgent: mocks.duplicateAgent, renameAgent: mocks.renameAgent, deleteAgent: mocks.deleteAgent }))
 vi.mock('@/app/api/_services/agent-activation.service', () => ({ activateAgent: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: mocks.getWorkspaceConnection }))
@@ -73,7 +73,7 @@ const AGENT = 'agent-1'
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
+    mocks.resolveAgentTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
     mocks.resolveRunTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
     mocks.requireLightSessionActor.mockResolvedValue(MEMBER)
 })
@@ -87,7 +87,7 @@ describe('the level each action asks of the Box', () => {
         await actions.renameAgentAction(AGENT, 'Scout')
         await actions.deleteAgentAction(AGENT)
 
-        expect(mocks.getAgentChatTarget.mock.calls).toEqual([
+        expect(mocks.resolveAgentTarget.mock.calls).toEqual([
             [AGENT, 'manage'],
             [AGENT, 'manage'],
             [AGENT, 'manage'],
@@ -104,7 +104,7 @@ describe('the level each action asks of the Box', () => {
         await actions.deleteAgentTableRowsAction(AGENT, 'leads', [1])
         await actions.activateAgentAutomationsAction(AGENT)
 
-        expect(mocks.getAgentChatTarget.mock.calls).toEqual([
+        expect(mocks.resolveAgentTarget.mock.calls).toEqual([
             [AGENT, 'manage'],
             [AGENT, 'manage'],
             [AGENT, 'manage'],
@@ -116,18 +116,18 @@ describe('the level each action asks of the Box', () => {
         await actions.listAgentRoutinesAction(AGENT)
         await actions.testScheduleAction(AGENT, 'daily')
 
-        expect(mocks.getAgentChatTarget.mock.calls).toEqual([[AGENT], [AGENT], [AGENT]])
+        expect(mocks.resolveAgentTarget.mock.calls).toEqual([[AGENT], [AGENT], [AGENT]])
     })
 
     it('reports a member who only uses the Box, without reaching the engine', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new AccessDeniedError('boxManagerOnly'))
+        mocks.resolveAgentTarget.mockRejectedValue(new AccessDeniedError('boxManagerOnly'))
 
         await expect(actions.createSkillAction(AGENT, { name: 'Brief', description: 'd', body: 'b' })).resolves.toEqual({ success: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(engine.createSkill).not.toHaveBeenCalled()
     })
 
     it('says a coworker\'s routines could not be read, rather than that it has none', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new Error('engine unreachable'))
+        mocks.resolveAgentTarget.mockRejectedValue(new Error('engine unreachable'))
 
         await expect(actions.listAgentRoutinesAction(AGENT)).resolves.toBeNull()
     })
@@ -230,7 +230,7 @@ describe('answerSecretRequestAction', () => {
 
     it('stores the key the coworker asked for with use alone', async () => {
         await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret' })).resolves.toEqual({ success: true })
-        expect(mocks.getAgentChatTarget).toHaveBeenCalledWith(AGENT)
+        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith(AGENT)
         expect(engine.updateAgentKeys).toHaveBeenCalledWith(conn, 'engine-1', { set: { API_KEY: 'secret' } })
     })
 
@@ -260,7 +260,7 @@ describe('answerForemanSecretRequestAction', () => {
     beforeEach(() => {
         mocks.requireWorkspaceContext.mockResolvedValue({ userId: 'user-2', role: 'member', workspace: { id: 7 } })
         mocks.engineSessionOf.mockResolvedValue({ engineSessionId: 'es-foreman' })
-        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
+        mocks.resolveAgentTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
         mocks.saveSecretsToVault.mockResolvedValue({ id: 'item-openai', name: 'OpenAI key' })
     })
 
@@ -291,7 +291,7 @@ describe('answerForemanSecretRequestAction', () => {
 
     it('never lets a coworker form choose the Vault', async () => {
         mocks.assertSessionInWorkspace.mockResolvedValue({ id: 'session-1', agent_id: AGENT, engine_session_id: 'es-1' })
-        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
+        mocks.resolveAgentTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
         vi.mocked(engine.getSessionMessages).mockResolvedValue(request({ vault: { name: 'OpenAI key', sharedWithAll: true } }) as never)
 
         await expect(actions.answerSecretRequestAction('session-1', { OPENAI_API_KEY: 'sk-test' })).resolves.toMatchObject({ success: false, code: 'secretNotRequested' })

@@ -21,6 +21,9 @@ export type AgentKindPolicy = {
     installable: boolean
     // Sits in a cell of the board, inside a Box.
     onBoard: boolean
+    // Who reaches it: the members of its Box at their level on it, or every member of the workspace,
+    // with its admins (and the workspace itself) managing it.
+    reach: 'box' | 'workspace'
     // Listed by `team_status`, the check-in digest and the other coworkers' roster of their team.
     inTeamStatus: boolean
     // `shared`: everyone who sees the coworker reads its conversations. `per-member`: each member
@@ -41,6 +44,7 @@ export const AGENT_KIND_POLICY: Record<AgentKind, AgentKindPolicy> = {
         soulEditable: true,
         installable: true,
         onBoard: true,
+        reach: 'box',
         inTeamStatus: true,
         conversations: 'shared',
         look: 'buddy',
@@ -54,6 +58,7 @@ export const AGENT_KIND_POLICY: Record<AgentKind, AgentKindPolicy> = {
         soulEditable: false,
         installable: false,
         onBoard: false,
+        reach: 'workspace',
         inTeamStatus: false,
         conversations: 'per-member',
         look: 'orb',
@@ -72,6 +77,8 @@ export function agentAddress(agent: { id: string; kind: AgentKind }): string {
     return agent.kind === 'foreman' ? FOREMAN_AGENT_ID : agent.id
 }
 
+// A kind this code does not know (a row a newer hub wrote) is held to a coworker's rules: reached
+// through its Box, which it does not sit in.
 export function agentKindPolicy(kind: AgentKind): AgentKindPolicy {
-    return AGENT_KIND_POLICY[kind]
+    return AGENT_KIND_POLICY[kind] ?? AGENT_KIND_POLICY.coworker
 }

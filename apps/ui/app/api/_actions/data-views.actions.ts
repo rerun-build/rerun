@@ -1,7 +1,7 @@
 'use server'
 
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import * as engine from '@/lib/engine/client'
 import type { DataScope } from '@/lib/data/source'
 import type { EngineConnection } from '@/lib/engine/types'
@@ -14,7 +14,7 @@ type ActionResult<T = object> = ({ success: true } & T) | ({ success: false } & 
 // one and the one its agents share. Ownership is settled here, in the scope, never by the caller.
 async function resolve(scope: DataScope): Promise<{ conn: EngineConnection; base: string }> {
     if (scope.kind === 'shared') return { conn: await requireWorkspaceConnection(), base: engine.SPACE_DATA_BASE }
-    const { conn, engineAgentId } = await getAgentChatTarget(scope.agentId)
+    const { conn, engineAgentId } = await resolveAgentTarget(scope.agentId)
     return { conn, base: engine.agentDataBase(engineAgentId) }
 }
 

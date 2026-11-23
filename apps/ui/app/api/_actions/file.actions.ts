@@ -1,6 +1,6 @@
 'use server'
 
-import { getAgentChatTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
 import { saveTextFile, type SaveFileResult } from '@/app/api/_services/file.service'
 import * as engine from '@/lib/engine/client'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
@@ -13,7 +13,7 @@ export type FileEntry = {
 }
 
 export async function listFilesAction(agentId: string, relativePath = '', showHidden = false): Promise<{ entries: FileEntry[]; path: string }> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId)
     const entries = await engine.listFiles(conn, `/agents/${engineAgentId}/files`, relativePath || '.')
     const mapped: FileEntry[] = entries
         .filter(e => showHidden || !e.name.startsWith('.'))
@@ -28,14 +28,14 @@ export async function readFileAction(agentId: string, filePath: string): Promise
 }
 
 export async function writeFileAction(agentId: string, filePath: string, content: string, baseHash: string | null): Promise<SaveFileResult> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId)
     return saveTextFile(conn, `/agents/${engineAgentId}/files`, filePath, content, baseHash)
 }
 
 // Thumbnails only need the first few lines. Slicing here keeps the browser payload tiny even
 // though the engine hands us a 100k page.
 export async function readFileHeadAction(agentId: string, filePath: string): Promise<string> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId)
     const { content } = await engine.readFileText(conn, `/agents/${engineAgentId}/files`, filePath)
     return content.slice(0, 600)
 }
@@ -46,6 +46,6 @@ export async function deleteFileAction(agentId: string, filePath: string): Promi
 }
 
 export async function renameFileAction(agentId: string, oldPath: string, newPath: string): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId)
     await engine.moveFile(conn, `/agents/${engineAgentId}/files`, oldPath, newPath)
 }

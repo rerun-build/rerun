@@ -19,7 +19,7 @@ export type KickoffResult = { ok: true; sessionId: string; runId: string | null 
 export async function startKickoff(agentId: string, input: { kickoff?: string; description?: string }, author: MessageAuthor, actor?: Actor): Promise<KickoffResult> {
     let target: Awaited<ReturnType<typeof resolveAgentTarget>>
     try {
-        target = await resolveAgentTarget(agentId, actor)
+        target = await resolveAgentTarget(agentId, 'use', actor)
     } catch (err) {
         return { ok: false, error: err instanceof Error ? err.message : 'Coworker not found', agentGone: true }
     }

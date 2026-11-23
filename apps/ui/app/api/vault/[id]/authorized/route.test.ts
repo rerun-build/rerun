@@ -7,7 +7,7 @@ const claimSignIn = vi.fn()
 vi.mock('@/lib/oauth/pending-grant', () => ({ claimSignIn: (...args: unknown[]) => claimSignIn(...args), SIGN_IN_EXPIRED: 'Sign-in expired, please retry', SignInClaimError: class SignInClaimError extends Error {} }))
 vi.mock('@/app/api/_services/vault.service', () => ({ vaultContext: vi.fn(), assertCanAdd: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(), putVaultToken: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ markServiceAuthorized: vi.fn(), markManagedAuthorized: vi.fn(), markComposioAuthorized: vi.fn() }))
 
 const { POST } = await import('./route')

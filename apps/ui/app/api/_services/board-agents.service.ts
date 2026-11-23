@@ -50,6 +50,6 @@ export async function readAgentView(ctx: WorkspaceContext, agentId: string): Pro
     const agent: BoardAgent = { ...boardAgentFromRow(row), access }
     if (agent.disabledAt) return { agent, detail: null, locked: false }
 
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
     return { agent, detail: await engineGetAgent(conn, engineAgentId), locked: false }
 }

@@ -24,7 +24,7 @@ export async function deleteCoworker(ctx: WorkspaceContext, agentId: string): Pr
 }
 
 export async function listCoworkerRoutines(ctx: WorkspaceContext, agentId: string): Promise<RoutinesView> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actorFromContext(ctx))
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actorFromContext(ctx))
     const [schedules, triggers, locale] = await Promise.all([listSchedules(conn, engineAgentId), listTriggers(conn, engineAgentId), recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id)])
     return {
         routines: [
@@ -43,12 +43,12 @@ export async function listCoworkerRoutines(ctx: WorkspaceContext, agentId: strin
 }
 
 export async function listCoworkerSkills(ctx: WorkspaceContext, agentId: string): Promise<SkillSummariesView> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actorFromContext(ctx))
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actorFromContext(ctx))
     return { skills: await listSkillSummaries(conn, engineAgentId) }
 }
 
 export async function setCoworkerRoutineEnabled(ctx: WorkspaceContext, agentId: string, kind: RoutineKind, slug: string, enabled: boolean): Promise<void> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actorFromContext(ctx), 'manage')
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actorFromContext(ctx))
     if (kind === 'schedule') await updateSchedule(conn, engineAgentId, slug, { enabled })
     else await updateTrigger(conn, engineAgentId, slug, { enabled })
 }
@@ -75,7 +75,7 @@ const kindOf = (name: string): CoworkerFile['kind'] => (MEDIA_EXTENSIONS.has(nam
 const isHidden = (name: string) => name.startsWith('.')
 
 export async function listCoworkerFiles(ctx: WorkspaceContext, agentId: string): Promise<CoworkerFiles> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actorFromContext(ctx))
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actorFromContext(ctx))
     const base = `/agents/${engineAgentId}/files`
     const files: CoworkerFile[] = []
     let level = ['']

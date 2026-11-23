@@ -1,4 +1,4 @@
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { markManagedAuthorized } from '@/app/api/_services/services.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, decodeManagedContext, exchangeManagedCode } from '@/lib/managed/oauth'
@@ -80,7 +80,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId, 'manage', ctx.workspaceId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
-        const { conn, engineAgentId } = await getAgentChatTarget(ctx.agentId, 'manage', actor)
+        const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, 'manage', actor)
         const token = await exchangeManagedCode(provider.oauth, clientId, clientSecret, ctx, code)
         const email = provider.oauth.accountEmail ? await provider.oauth.accountEmail(token.accessToken).catch(() => undefined) : undefined
 

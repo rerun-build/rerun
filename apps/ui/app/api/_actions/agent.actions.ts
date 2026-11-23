@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { AccessDeniedError, actorFromContext, assertAgentInWorkspace, assertSessionInWorkspace, keepVisible, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
-import { getAgentChatTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { followCoworker } from '@/app/api/_services/notification-audience.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
@@ -157,7 +157,7 @@ export async function setAgentLookAction(agentId: string, look: CoworkerLook | n
 
 export async function getAgentDetailAction(agentId: string): Promise<EngineAgentDetail | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineGetAgent(conn, engineAgentId)
     } catch {
         return null
@@ -166,7 +166,7 @@ export async function getAgentDetailAction(agentId: string): Promise<EngineAgent
 
 export async function listAgentToolsAction(agentId: string): Promise<EngineToolFamily[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineListAgentTools(conn, engineAgentId)
     } catch {
         return []
@@ -178,7 +178,7 @@ export async function listAgentToolsAction(agentId: string): Promise<EngineToolF
 // unreachable box, or an engine too old to know the route, must not turn a skip into an error.
 export async function activateAgentAutomationsAction(agentId: string): Promise<void> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineActivateAgentAutomations(conn, engineAgentId)
     } catch {}
 }
@@ -197,7 +197,7 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
 // `manage`, a workspace admin, where its other settings take any member (resolveRunTarget).
 export async function allowForemanPaidDataAction(): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(FOREMAN_AGENT_ID, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(FOREMAN_AGENT_ID, 'manage')
         await enginePatchAgent(conn, engineAgentId, { paidDataAlwaysAllow: true })
         return { success: true }
     } catch (err) {
@@ -210,7 +210,7 @@ export async function allowForemanPaidDataAction(): Promise<SuccessResult> {
 // footprint that no longer exists, so this path refuses to touch them.
 export async function patchAgentMcpServersAction(agentId: string, body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<SuccessResult & { detail?: EngineAgentDetail }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const owned = connectorMcpServerNames(await readRegistry(conn, engineAgentId))
         const touched = [...(body.upsert ?? []).map(s => s.name), ...(body.remove ?? [])]
         const claimed = touched.find(name => owned.has(name))
@@ -224,7 +224,7 @@ export async function patchAgentMcpServersAction(agentId: string, body: { upsert
 
 export async function getAgentKeysAction(agentId: string): Promise<{ keys: string[]; engineKeys: string[] }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         return await engineGetAgentKeys(conn, engineAgentId)
     } catch {
         return { keys: [], engineKeys: [] }
@@ -280,7 +280,7 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
 
 export async function updateAgentKeysAction(agentId: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineUpdateAgentKeys(conn, engineAgentId, body)
         return { success: true }
     } catch (err) {
@@ -295,7 +295,7 @@ export async function updateAgentKeysAction(agentId: string, body: { set?: Recor
 export async function answerSecretRequestAction(sessionId: string, values: Record<string, string>): Promise<SuccessResult> {
     try {
         const session = await assertSessionInWorkspace(sessionId)
-        await writeRequestedSecrets(await getAgentChatTarget(session.agent_id), session.engine_session_id, values)
+        await writeRequestedSecrets(await resolveAgentTarget(session.agent_id), session.engine_session_id, values)
         return { success: true }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
@@ -309,7 +309,7 @@ export async function answerForemanSecretRequestAction(conversationId: string, v
         const ctx = await requireWorkspaceContext()
         const conversation = await engineSessionOf(ctx, conversationId)
         if (!conversation) throw new AccessDeniedError('secretNotRequested')
-        const vaultEntry = await writeRequestedSecrets(await getAgentChatTarget(FOREMAN_AGENT_ID), conversation.engineSessionId, values, actorFromContext(ctx))
+        const vaultEntry = await writeRequestedSecrets(await resolveAgentTarget(FOREMAN_AGENT_ID), conversation.engineSessionId, values, actorFromContext(ctx))
         return { success: true, ...(vaultEntry ? { vaultEntry } : {}) }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
@@ -318,7 +318,7 @@ export async function answerForemanSecretRequestAction(conversationId: string, v
 
 // Where the values go is read off the pending request on the engine, never from the caller: only the
 // Chief of Staff's form can name the Vault, and only the person typing them gives it their rights.
-async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType<typeof getAgentChatTarget>>, engineSessionId: string | null, values: Record<string, string>, vaultActor?: Actor): Promise<{ id: string; name: string } | null> {
+async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType<typeof resolveAgentTarget>>, engineSessionId: string | null, values: Record<string, string>, vaultActor?: Actor): Promise<{ id: string; name: string } | null> {
     const messages = engineSessionId ? transformEngineMessages(await engineGetSessionMessages(conn, engineAgentId, engineSessionId)) : []
     const pending = findPendingHitl(messages)
     const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
@@ -339,9 +339,9 @@ async function writeRequestedSecrets({ conn, engineAgentId }: Awaited<ReturnType
 // Resolving the coworker fails with messages written for the user (inactive, not found); the engine
 // call fails with transport details that are not.
 export async function listAgentTablesAction(agentId: string): Promise<TableListResult> {
-    let target: Awaited<ReturnType<typeof getAgentChatTarget>>
+    let target: Awaited<ReturnType<typeof resolveAgentTarget>>
     try {
-        target = await getAgentChatTarget(agentId)
+        target = await resolveAgentTarget(agentId)
     } catch (err) {
         if (err instanceof NoEngineError) return { success: true, tables: [] }
         return { success: false, ...(err instanceof Error && err.message ? refusalOf(err) : refusal('agentDbUnreachable')) }
@@ -355,7 +355,7 @@ export async function listAgentTablesAction(agentId: string): Promise<TableListR
 
 export async function readAgentTableRowsAction(agentId: string, table: string, params: ReadDbTableRowsParams): Promise<EngineDbRows | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineReadDbTableRows(conn, agentDataBase(engineAgentId), table, params)
     } catch {
         return null
@@ -364,7 +364,7 @@ export async function readAgentTableRowsAction(agentId: string, table: string, p
 
 export async function deleteAgentTableRowsAction(agentId: string, table: string, rowids: (number | string)[]): Promise<SuccessResult & { deleted?: number }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const { deleted } = await engineDeleteDbTableRows(conn, agentDataBase(engineAgentId), table, rowids)
         return { success: true, deleted }
     } catch (err) {
@@ -374,7 +374,7 @@ export async function deleteAgentTableRowsAction(agentId: string, table: string,
 
 export async function dropAgentTableAction(agentId: string, table: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineDropDbTable(conn, agentDataBase(engineAgentId), table)
         return { success: true }
     } catch (err) {
@@ -392,7 +392,7 @@ function describeDataError(err: unknown, fallback: ErrorCode): ActionRefusal {
 
 export async function purgeAgentTableAction(agentId: string, table: string): Promise<SuccessResult & { deleted?: number }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const { deleted } = await enginePurgeDbTable(conn, agentDataBase(engineAgentId), table)
         return { success: true, deleted }
     } catch (err) {
@@ -405,7 +405,7 @@ export async function purgeAgentTableAction(agentId: string, table: string): Pro
 export async function readAgentMonitoringAction(agentId: string, usageRange: UsageTimeRange, queries: StatsQuery[]): Promise<{ usage: EngineUsageBucket[] | null; stats: (EngineStatsPoint[] | null)[] }> {
     try {
         const parsed = queries.map(query => statsQuerySchema.parse(query))
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const [usage, stats] = await Promise.all([
             engineGetAgentUsage(conn, engineAgentId, usageRange).catch(() => null),
             Promise.all(parsed.map(query => engineGetAgentStats(conn, engineAgentId, query).catch(() => null))),
@@ -427,7 +427,7 @@ async function connectorSkillError(conn: EngineConnection, engineAgentId: string
 
 export async function listSkillsAction(agentId: string): Promise<EngineSkillWithSource[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const [skills, registry] = await Promise.all([engineListSkills(conn, engineAgentId), readRegistry(conn, engineAgentId)])
         const fromConnector = connectorSkillSlugs(registry)
         return skills.map(s => ({ ...s, fromConnector: fromConnector.has(s.slug) }))
@@ -440,7 +440,7 @@ export async function listSkillsAction(agentId: string): Promise<EngineSkillWith
 // `null` when the engine could not answer, so the `/` menu does not claim the agent has no skill.
 export async function listSkillSummariesAction(agentId: string): Promise<EngineSkillSummary[] | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineListSkillSummaries(conn, engineAgentId)
     } catch {
         return null
@@ -449,7 +449,7 @@ export async function listSkillSummariesAction(agentId: string): Promise<EngineS
 
 export async function getSkillAction(agentId: string, slug: string): Promise<EngineSkill | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineGetSkill(conn, engineAgentId, slug)
     } catch {
         return null
@@ -458,7 +458,7 @@ export async function getSkillAction(agentId: string, slug: string): Promise<Eng
 
 export async function createSkillAction(agentId: string, params: { name: string; description: string; body: string }): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const skill = await engineCreateSkill(conn, engineAgentId, params)
         return { success: true, skill }
     } catch (err) {
@@ -468,7 +468,7 @@ export async function createSkillAction(agentId: string, params: { name: string;
 
 export async function importSkillAction(agentId: string, content: string, files: EngineSkillFilePayload[] = []): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const skill = await engineImportSkill(conn, engineAgentId, content, files)
         return { success: true, skill }
     } catch (err) {
@@ -478,7 +478,7 @@ export async function importSkillAction(agentId: string, content: string, files:
 
 export async function readSkillFileAction(agentId: string, slug: string, path: string): Promise<{ content: string; truncated: boolean } | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const page = await engineReadFileText(conn, skillFilesBase(engineAgentId, slug), path)
         return { content: page.content, truncated: page.truncated ?? page.content.length >= TEXT_FILE_PAGE_CHARS }
     } catch {
@@ -488,7 +488,7 @@ export async function readSkillFileAction(agentId: string, slug: string, path: s
 
 export async function writeSkillFileAction(agentId: string, slug: string, path: string, content: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
         await engineWriteFileText(conn, skillFilesBase(engineAgentId, slug), path, content)
@@ -500,7 +500,7 @@ export async function writeSkillFileAction(agentId: string, slug: string, path: 
 
 export async function deleteSkillFileAction(agentId: string, slug: string, path: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
         await engineDeleteFile(conn, skillFilesBase(engineAgentId, slug), path)
@@ -512,7 +512,7 @@ export async function deleteSkillFileAction(agentId: string, slug: string, path:
 
 export async function downloadSkillArchiveAction(agentId: string, slug: string): Promise<SuccessResult & { base64?: string }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const buffer = await engineFetchSkillArchive(conn, engineAgentId, slug)
         return { success: true, base64: Buffer.from(buffer).toString('base64') }
     } catch (err) {
@@ -522,7 +522,7 @@ export async function downloadSkillArchiveAction(agentId: string, slug: string):
 
 export async function updateSkillAction(agentId: string, slug: string, patch: { description?: string; body?: string }): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
         const skill = await engineUpdateSkill(conn, engineAgentId, slug, patch)
@@ -534,7 +534,7 @@ export async function updateSkillAction(agentId: string, slug: string, patch: { 
 
 export async function deleteSkillAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
         await engineDeleteSkill(conn, engineAgentId, slug)
@@ -548,7 +548,7 @@ export async function deleteSkillAction(agentId: string, slug: string): Promise<
 
 export async function listMemoriesAction(agentId: string): Promise<EngineMemory[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineListMemories(conn, engineAgentId)
     } catch {
         return []
@@ -557,7 +557,7 @@ export async function listMemoriesAction(agentId: string): Promise<EngineMemory[
 
 export async function createMemoryAction(agentId: string, params: { content: string; kind?: string; tags?: string[] }): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineCreateMemory(conn, engineAgentId, params)
         return { success: true }
     } catch (err) {
@@ -567,7 +567,7 @@ export async function createMemoryAction(agentId: string, params: { content: str
 
 export async function recallMemoriesAction(agentId: string, query: string, limit = 5): Promise<EngineMemory[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineRecallMemories(conn, engineAgentId, { query, limit })
     } catch {
         return []
@@ -576,7 +576,7 @@ export async function recallMemoriesAction(agentId: string, query: string, limit
 
 export async function deleteMemoryAction(agentId: string, memoryId: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineDeleteMemory(conn, engineAgentId, memoryId)
         return { success: true }
     } catch (err) {
@@ -586,7 +586,7 @@ export async function deleteMemoryAction(agentId: string, memoryId: string): Pro
 
 export async function clearMemoriesAction(agentId: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineClearMemories(conn, engineAgentId)
         return { success: true }
     } catch (err) {
@@ -641,7 +641,7 @@ export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> 
 // read, which is not a coworker without any: the list on screen stays.
 export async function listAgentRoutinesAction(agentId: string): Promise<WorkspaceRoutines | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const [routines, canRename] = await Promise.all([routinesOf(conn, agentId, engineAgentId, new Date()), supportsScheduleRename(conn)])
         return { routines: routines.sort(byNextRun), canRename }
     } catch {
@@ -682,7 +682,7 @@ function byNextRun(a: WorkspaceRoutine, b: WorkspaceRoutine): number {
 
 export async function getScheduleAction(agentId: string, slug: string): Promise<{ schedule: EngineSchedule; canRename: boolean } | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const [schedule, canRename] = await Promise.all([engineGetSchedule(conn, engineAgentId, slug), supportsScheduleRename(conn)])
         return { schedule, canRename }
     } catch {
@@ -692,7 +692,7 @@ export async function getScheduleAction(agentId: string, slug: string): Promise<
 
 export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const schedule = await engineCreateSchedule(conn, engineAgentId, params)
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, schedule }
@@ -703,7 +703,7 @@ export async function createScheduleAction(agentId: string, params: ScheduleCrea
 
 export async function updateScheduleAction(agentId: string, slug: string, patch: ScheduleUpdateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const schedule = await engineUpdateSchedule(conn, engineAgentId, slug, patch)
         // A box that predates renaming drops the unknown field and still answers 200.
         if (patch.name !== undefined && schedule.name !== patch.name.trim()) return { success: false, ...refusal('renameRoutineNeedsUpdate') }
@@ -724,7 +724,7 @@ export async function parseScheduleAction(input: string, ctx: { nowIso: string; 
 
 export async function testScheduleAction(agentId: string, slug: string): Promise<SuccessResult & { runId?: string; sessionId?: string }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const { runId, sessionId } = await engineRunScheduleNow(conn, engineAgentId, slug)
         return { success: true, runId, sessionId }
     } catch (err) {
@@ -734,7 +734,7 @@ export async function testScheduleAction(agentId: string, slug: string): Promise
 
 export async function deleteScheduleAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineDeleteSchedule(conn, engineAgentId, slug)
         return { success: true }
     } catch (err) {
@@ -748,7 +748,7 @@ export async function deleteScheduleAction(agentId: string, slug: string): Promi
 
 export async function listTriggersAction(agentId: string): Promise<EngineTrigger[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineListTriggers(conn, engineAgentId)
     } catch {
         return []
@@ -760,7 +760,7 @@ const OUTCOME_RUNS = 100
 // How each scheduled task and trigger of the coworker last ended, keyed by `outcomeKey`.
 export async function listTaskOutcomesAction(agentId: string): Promise<Record<string, TaskOutcome>> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return latestOutcomes(await engineListRuns(conn, engineAgentId, { limit: OUTCOME_RUNS }))
     } catch {
         return {}
@@ -769,7 +769,7 @@ export async function listTaskOutcomesAction(agentId: string): Promise<Record<st
 
 export async function getTriggerAction(agentId: string, slug: string): Promise<EngineTrigger | null> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineGetTrigger(conn, engineAgentId, slug)
     } catch {
         return null
@@ -778,7 +778,7 @@ export async function getTriggerAction(agentId: string, slug: string): Promise<E
 
 export async function createTriggerAction(agentId: string, params: TriggerCreateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const trigger = await engineCreateTrigger(conn, engineAgentId, params)
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, trigger }
@@ -789,7 +789,7 @@ export async function createTriggerAction(agentId: string, params: TriggerCreate
 
 export async function updateTriggerAction(agentId: string, slug: string, patch: TriggerUpdateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const trigger = await engineUpdateTrigger(conn, engineAgentId, slug, patch)
         return { success: true, trigger }
     } catch (err) {
@@ -799,7 +799,7 @@ export async function updateTriggerAction(agentId: string, slug: string, patch: 
 
 export async function rotateTriggerTokenAction(agentId: string, slug: string): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const trigger = await engineRotateTriggerToken(conn, engineAgentId, slug)
         return { success: true, trigger }
     } catch (err) {
@@ -809,7 +809,7 @@ export async function rotateTriggerTokenAction(agentId: string, slug: string): P
 
 export async function deleteTriggerAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         await engineDeleteTrigger(conn, engineAgentId, slug)
         return { success: true }
     } catch (err) {
@@ -825,7 +825,7 @@ export async function deleteTriggerAction(agentId: string, slug: string): Promis
 
 export async function listRunsAction(agentId: string, limit?: number): Promise<EngineRun[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineListRuns(conn, engineAgentId, { limit })
     } catch {
         return []
@@ -843,7 +843,7 @@ export async function getRunAction(agentId: string, runId: string): Promise<Engi
 
 export async function getRunStepsAction(agentId: string, runId: string): Promise<EngineRunStep[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineGetRunSteps(conn, engineAgentId, runId)
     } catch {
         return []
@@ -852,7 +852,7 @@ export async function getRunStepsAction(agentId: string, runId: string): Promise
 
 export async function getRunToolsAction(agentId: string, runId: string): Promise<EngineToolCall[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         return await engineGetRunTools(conn, engineAgentId, runId)
     } catch {
         return []
@@ -883,7 +883,7 @@ export async function cancelSubRunAction(agentId: string, runId: string, taskId:
 
 async function runsForSessionTitle(agentId: string, title: string): Promise<EngineRun[]> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
         const [runs, sessions] = await Promise.all([engineListRuns(conn, engineAgentId), engineListSessions(conn, engineAgentId)])
         const sessionIds = new Set(sessions.filter(s => s.title === title).map(s => s.id))
         return runs.filter(r => r.sessionId && sessionIds.has(r.sessionId)).sort((a, b) => (b.startedAt ?? '').localeCompare(a.startedAt ?? ''))

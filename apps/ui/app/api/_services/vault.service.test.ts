@@ -104,6 +104,8 @@ beforeEach(() => {
         fakeSupabase((table, calls) => {
             if (table === 'agents') {
                 const id = filterValue(calls, 'id')
+                if (filterValue(calls, 'kind') === 'foreman') return { data: { id: 'cos-1' } }
+                if (id === 'cos-1') return { data: { id: 'cos-1', workspace_id: WORKSPACE, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' } }
                 if (id) {
                     const row = AGENTS.find(agent => agent.id === id)
                     return { data: row ? { workspace_id: WORKSPACE, space_id: row.space_id, engine_agent_id: row.engine_agent_id } : null }

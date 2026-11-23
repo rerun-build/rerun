@@ -48,7 +48,7 @@ describe('startAgentSetup', () => {
 
         await startAgentSetup({ ...BASE, actor: member } as never, { agents: [{ agentId: 'agent-1', message: 'Triage the inbox' }] })
 
-        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', member)
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', 'use', member)
         expect(callableEngineAgentIds).toHaveBeenCalledWith(member)
         expect(engineChat.mock.calls[0][2]).toMatchObject({ callableAgentIds: ['engine-1'] })
     })
@@ -171,7 +171,7 @@ describe('startAgentSetup', () => {
 
         // The engine is only ever asked about the one that can actually work.
         expect(resolveAgentTarget).toHaveBeenCalledTimes(1)
-        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', { kind: 'workspace', workspaceId: 7 })
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', 'use', { kind: 'workspace', workspaceId: 7 })
 
         expect(result.next).toContain('1 agent(s) are working')
         expect(result.next).toContain('1 are built but have no free slot')

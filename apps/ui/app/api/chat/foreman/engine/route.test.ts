@@ -1,10 +1,11 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
+import { GeneralAlreadyOpenError, recordMessageSent, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { startChat } from '@/lib/chat/start-chat'
 import { cancelRun } from '@/lib/engine/client'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
-import { cancelForemanSessionRuns, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
+import { cancelForemanSessionRuns, copyToShippedForemanRow, findForemanGeneral, loadForemanConversation, loadForemanConversationById, startEngineConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
 import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
 import { loadForemanState } from '@/lib/foreman/state'
@@ -19,23 +20,28 @@ vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedVa
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
 vi.mock('@/lib/foreman/hub-token', () => ({ mintForemanHubToken: vi.fn(() => null) }))
 vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
-vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn() }))
+vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn(() => ({ id: 'user-1', name: 'Ada' })) }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: vi.fn() }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({
+    resolveAgentTarget: vi.fn(),
+    recordMessageSent: vi.fn(),
+    GeneralAlreadyOpenError: class GeneralAlreadyOpenError extends Error {
+        constructor(readonly general: { id: string; engineSessionId: string }) {
+            super('General already open')
+        }
+    },
+}))
 vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn(), supportsForemanVault: vi.fn().mockResolvedValue(false) }))
 vi.mock('@/lib/foreman/conversation', () => ({
     cancelForemanSessionRuns: vi.fn(),
     engineSessionOf: vi.fn().mockResolvedValue(null),
     findForemanGeneral: vi.fn().mockResolvedValue(null),
-    ForemanGeneralAlreadyOpenError: class ForemanGeneralAlreadyOpenError extends Error {
-        constructor(readonly general: { id: string; engineSessionId: string | null }) {
-            super('General already open')
-        }
-    },
     loadForemanConversation: vi.fn(),
     loadForemanConversationById: vi.fn(),
     startEngineConversation: vi.fn(),
-    touchForemanConversation: vi.fn(),
+    copyToShippedForemanRow: vi.fn(),
 }))
 vi.mock('@/lib/foreman/engine-brief', () => ({ foremanEngineBrief: vi.fn() }))
 vi.mock('@/lib/foreman/profile', () => ({ readAnswers: vi.fn(), writeAnswers: vi.fn() }))
@@ -51,6 +57,7 @@ function onTheEngine() {
     vi.mocked(isPhoneStepPending).mockResolvedValue(false)
     vi.mocked(resolveForemanSurface).mockResolvedValue('engine' as never)
     vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'https://engine.test', apiKey: null } as never)
+    vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'foreman' } as never)
     vi.mocked(callableEngineAgentIds).mockResolvedValue([])
 }
 
@@ -94,7 +101,7 @@ describe('/api/chat/foreman/engine', () => {
     it('hands the engine the coworkers the member reaches, so call_agent names no other', async () => {
         vi.mocked(isPhoneStepPending).mockResolvedValue(false)
         vi.mocked(resolveForemanSurface).mockResolvedValue('engine' as never)
-        vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'https://engine.test', apiKey: null } as never)
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'foreman' } as never)
         vi.mocked(callableEngineAgentIds).mockResolvedValue(['engine-open'])
         vi.mocked(startChat).mockResolvedValue(new Response('', { status: 500 }))
 
@@ -196,7 +203,8 @@ describe('/api/chat/foreman/engine', () => {
             const response = await POST(post({ kind: 'general' }))
 
             expect(vi.mocked(startChat).mock.calls[0][2]).toMatchObject({ sessionId: 'engine-general' })
-            expect(touchForemanConversation).toHaveBeenCalledWith('general')
+            expect(recordMessageSent).toHaveBeenCalledWith('general', 'user-1', 'ship it')
+            expect(copyToShippedForemanRow).toHaveBeenCalledWith('general')
             expect(startEngineConversation).not.toHaveBeenCalled()
             expect(response.headers.get('X-Session-Id')).toBe('general')
         })
@@ -204,13 +212,13 @@ describe('/api/chat/foreman/engine', () => {
         it('starts the message over on the General another tab opened meanwhile, and stops the orphan run', async () => {
             vi.mocked(findForemanGeneral).mockResolvedValue(null)
             vi.mocked(startChat).mockResolvedValueOnce(engineStream('engine-orphan', 'run-orphan')).mockResolvedValueOnce(engineStream('engine-winner', 'run-winner'))
-            vi.mocked(startEngineConversation).mockRejectedValueOnce(new ForemanGeneralAlreadyOpenError({ id: 'winner', engineSessionId: 'engine-winner' }))
+            vi.mocked(startEngineConversation).mockRejectedValueOnce(new GeneralAlreadyOpenError({ id: 'winner', engineSessionId: 'engine-winner' }))
 
             const response = await POST(post({ kind: 'general' }))
 
             expect(cancelRun).toHaveBeenCalledWith(expect.anything(), expect.any(String), 'run-orphan')
             expect(vi.mocked(startChat).mock.calls[1][2]).toMatchObject({ sessionId: 'engine-winner' })
-            expect(touchForemanConversation).toHaveBeenCalledWith('winner')
+            expect(recordMessageSent).toHaveBeenCalledWith('winner', 'user-1', 'ship it')
             expect(response.headers.get('X-Session-Id')).toBe('winner')
             expect(response.headers.get('X-Run-Id')).toBe('run-winner')
         })

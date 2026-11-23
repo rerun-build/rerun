@@ -15,7 +15,7 @@ import { installService } from './services.service'
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('./agent.service', () => ({ createAgent: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/compiler', () => ({
     compileService: vi.fn(async () => ({ toolNames: ['notion'], oauth: { serverName: 'notion', url: 'https://mcp.notion.test' }, managed: null, composio: null, app: null })),
     decompileService: vi.fn(),

@@ -38,18 +38,20 @@ vi.mock('@/supabase/serviceRole', () => ({
 }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectManyWithJoins: mocks.selectManyWithJoins, selectMaybeSingle: mocks.selectMaybeSingle, selectSingle: vi.fn(), selectCount: vi.fn(), selectMany: mocks.selectMany, selectAll: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ listRuns: mocks.listRuns, getRunSteps: vi.fn() }))
+vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: async () => 'cos-1' }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: mocks.findWorkspaceEngine, NoEngineError: class NoEngineError extends Error {} }))
 
 const { AuthorizationError } = await import('@/app/api/_auth/ownership')
 const { AccessDeniedError, workspaceActor } = await import('@/app/api/_auth/access')
 type Actor = import('@/app/api/_auth/access').Actor
-const { clearSkillProposalAttention, findIdleSessions, getAgentChatTarget, lastRunError, resolveAgentTarget, resolveAgentTargetForTrigger, resolveRunTarget, summarizeSessionRuns } = await import('./chat.service')
+const { clearSkillProposalAttention, findIdleSessions, lastRunError, resolveAgentTarget, resolveAgentTargetForTrigger, resolveRunTarget, summarizeSessionRuns } = await import('./chat.service')
 
 const conn = { baseUrl: 'https://engine', apiKey: 'k' }
 
 type AgentRow = {
     workspace_id: number
-    space_id: string
+    kind: 'coworker' | 'foreman'
+    space_id: string | null
     engine_agent_id: string | null
     disabled_at: string | null
     disabled_reason: string | null
@@ -62,7 +64,7 @@ const member = (boxScope: 'all' | 'assigned'): Actor => ({ kind: 'user', userId:
 let row: AgentRow | null
 
 beforeEach(() => {
-    row = { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } }
+    row = { workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } }
     mocks.requireLightSessionActor.mockReset().mockResolvedValue(admin)
     mocks.selectMaybeSingle.mockReset().mockResolvedValue({ data: null, error: null })
     mocks.selectMaybeSingleWithJoins.mockReset().mockImplementation(async () => ({ data: row, error: null }))
@@ -78,23 +80,23 @@ describe('resolveAgentTarget', () => {
 
     it('reads the machine of the caller, never the one of the agent it was asked about', async () => {
         row = { ...row!, workspace_id: 2 }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toBeInstanceOf(AuthorizationError)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toBeInstanceOf(AuthorizationError)
         expect(mocks.findWorkspaceEngine).toHaveBeenCalledWith(1)
     })
 
     it('reports a workspace without a machine', async () => {
         mocks.findWorkspaceEngine.mockResolvedValue(null)
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow()
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toThrow()
     })
 
     it('skips the session lookup when the caller passes an actor, an API key or a v1 context', async () => {
-        await expect(resolveAgentTarget('a1', workspaceActor(1), 'manage')).resolves.toMatchObject({ engineAgentId: 'e1' })
+        await expect(resolveAgentTarget('a1', 'manage', workspaceActor(1))).resolves.toMatchObject({ engineAgentId: 'e1' })
         expect(mocks.requireLightSessionActor).not.toHaveBeenCalled()
         expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
     })
 
     it('refuses an agent of another workspace than the actor one', async () => {
-        await expect(resolveAgentTarget('a1', workspaceActor(2))).rejects.toBeInstanceOf(AuthorizationError)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(2))).rejects.toBeInstanceOf(AuthorizationError)
     })
 
     it('refuses an agent of another workspace than the session one', async () => {
@@ -104,69 +106,70 @@ describe('resolveAgentTarget', () => {
 
     it('refuses an agent that does not exist', async () => {
         row = null
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toBeInstanceOf(AuthorizationError)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toBeInstanceOf(AuthorizationError)
     })
 
     it('lets a member use a coworker of an open Box, and refuses a change with a reason', async () => {
-        await expect(resolveAgentTarget('a1', member('all'))).resolves.toMatchObject({ engineAgentId: 'e1' })
-        const refused = await resolveAgentTarget('a1', member('all'), 'manage').catch(e => e)
+        await expect(resolveAgentTarget('a1', 'use', member('all'))).resolves.toMatchObject({ engineAgentId: 'e1' })
+        const refused = await resolveAgentTarget('a1', 'manage', member('all')).catch(e => e)
         expect(refused).toBeInstanceOf(AccessDeniedError)
     })
 
     it('hides a coworker of a Box the member does not reach, as missing rather than forbidden', async () => {
         row = { ...row!, space: { visibility: 'restricted' } }
-        const restricted = await resolveAgentTarget('a1', member('all')).catch(e => e)
+        const restricted = await resolveAgentTarget('a1', 'use', member('all')).catch(e => e)
         expect(restricted).toBeInstanceOf(AuthorizationError)
         expect(restricted).not.toBeInstanceOf(AccessDeniedError)
 
         row = { ...row, space: { visibility: 'workspace' } }
-        await expect(resolveAgentTarget('a1', member('assigned'))).rejects.toThrow('Coworker not found')
+        await expect(resolveAgentTarget('a1', 'use', member('assigned'))).rejects.toThrow('Coworker not found')
     })
 
     it('lets a member who manages the Box change the coworker, and reads that grant on the Box', async () => {
         row = { ...row!, space: { visibility: 'restricted' } }
         mocks.selectMaybeSingle.mockResolvedValue({ data: { access: 'manage' }, error: null })
-        await expect(resolveAgentTarget('a1', member('assigned'), 'manage')).resolves.toMatchObject({ engineAgentId: 'e1' })
+        await expect(resolveAgentTarget('a1', 'manage', member('assigned'))).resolves.toMatchObject({ engineAgentId: 'e1' })
         expect(mocks.selectMaybeSingle.mock.calls[0][1]).toBe('space_members')
         expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ space_id: 'box-1', user_id: 'u2' })
     })
 
     it('tells a plan-limited agent apart from a revoked template', async () => {
         row = { ...row!, disabled_at: '2026-09-01', disabled_reason: 'plan_limit' }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow(/no free coworker slot/)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toThrow(/no free coworker slot/)
 
         row = { ...row, disabled_reason: null }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow(/no free coworker slot/)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toThrow(/no free coworker slot/)
 
         row = { ...row, disabled_reason: 'template_revoked' }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow(/template subscription it came from has ended/)
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toThrow(/template subscription it came from has ended/)
     })
 
     it('refuses an agent the engine does not know yet', async () => {
         row = { ...row!, engine_agent_id: null }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow('Coworker not configured or not found')
+        await expect(resolveAgentTarget('a1', 'use', workspaceActor(1))).rejects.toThrow('Coworker not configured or not found')
     })
 })
 
-describe('the foreman as a target', () => {
-    const signedIn = (role: 'admin' | 'member', anonymous = false) => mocks.requireWorkspaceContext.mockResolvedValue({ workspace: { id: 1 }, role, authUser: { is_anonymous: anonymous } })
+describe('the Chief of Staff as a target', () => {
+    const signedIn = (role: 'admin' | 'member') => mocks.requireLightSessionActor.mockResolvedValue(role === 'admin' ? admin : member('assigned'))
     const foremanTarget = { conn, engineAgentId: 'foreman' }
 
     beforeEach(() => {
-        mocks.findWorkspaceEngine.mockResolvedValue({ conn })
+        row = { workspace_id: 1, kind: 'foreman', space_id: null, engine_agent_id: 'foreman', disabled_at: null, disabled_reason: null, space: null }
     })
 
-    it('lets any member read what it keeps, with no agent row read', async () => {
+    it('is its row, reached by its name in the caller workspace', async () => {
         signedIn('member')
-        await expect(getAgentChatTarget('foreman')).resolves.toEqual(foremanTarget)
-        expect(mocks.selectMaybeSingleWithJoins).not.toHaveBeenCalled()
+        await expect(resolveAgentTarget('foreman')).resolves.toEqual(foremanTarget)
+        expect(mocks.selectMaybeSingleWithJoins.mock.calls[0][4]).toEqual({ id: 'cos-1' })
+        await expect(resolveAgentTarget('cos-1')).resolves.toEqual(foremanTarget)
     })
 
     it('lets a workspace admin change what it keeps, and tells a member it may not', async () => {
         signedIn('admin')
-        await expect(getAgentChatTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)
+        await expect(resolveAgentTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)
         signedIn('member')
-        await expect(getAgentChatTarget('foreman', 'manage')).rejects.toBeInstanceOf(AccessDeniedError)
+        await expect(resolveAgentTarget('foreman', 'manage')).rejects.toBeInstanceOf(AccessDeniedError)
     })
 
     it('keeps its runs, its model and its chat files open to every member', async () => {
@@ -174,34 +177,29 @@ describe('the foreman as a target', () => {
         await expect(resolveRunTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)
     })
 
-    it('does not exist for an anonymous visitor', async () => {
-        signedIn('admin', true)
-        await expect(getAgentChatTarget('foreman')).rejects.toBeInstanceOf(AuthorizationError)
-        await expect(resolveRunTarget('foreman')).rejects.toBeInstanceOf(AuthorizationError)
+    it('keeps the runs of a coworker to the level asked', async () => {
+        row = { workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } }
+        mocks.requireLightSessionActor.mockResolvedValue(member('all'))
+        await expect(resolveRunTarget('a1', 'manage')).rejects.toBeInstanceOf(AccessDeniedError)
     })
 
-    // Its apps pass the caller they checked, an OAuth callback the workspace once the session was held to it.
     it('takes the actor a caller passes, to the same rule', async () => {
-        mocks.requireWorkspaceContext.mockClear()
-        await expect(getAgentChatTarget('foreman', 'use', member('assigned'))).resolves.toEqual(foremanTarget)
-        await expect(getAgentChatTarget('foreman', 'manage', member('all'))).rejects.toBeInstanceOf(AccessDeniedError)
-        await expect(getAgentChatTarget('foreman', 'manage', admin)).resolves.toEqual(foremanTarget)
-        await expect(getAgentChatTarget('foreman', 'manage', workspaceActor(1))).resolves.toEqual(foremanTarget)
-        expect(mocks.requireWorkspaceContext).not.toHaveBeenCalled()
-        expect(mocks.selectMaybeSingleWithJoins).not.toHaveBeenCalled()
+        await expect(resolveAgentTarget('foreman', 'use', member('assigned'))).resolves.toEqual(foremanTarget)
+        await expect(resolveAgentTarget('foreman', 'manage', member('all'))).rejects.toBeInstanceOf(AccessDeniedError)
+        await expect(resolveAgentTarget('foreman', 'manage', admin)).resolves.toEqual(foremanTarget)
+        await expect(resolveAgentTarget('foreman', 'manage', workspaceActor(1))).resolves.toEqual(foremanTarget)
+        expect(mocks.requireLightSessionActor).not.toHaveBeenCalled()
     })
 
-    // Talking to it, or anything else a coworker's row carries, stays with its own routes.
-    it('is no coworker row to the resolver every other route goes through', async () => {
-        row = null
-        await expect(resolveAgentTarget('foreman', workspaceActor(1), 'manage')).rejects.toBeInstanceOf(AuthorizationError)
-        await expect(resolveAgentTarget('foreman', admin)).rejects.toBeInstanceOf(AuthorizationError)
+    it('refuses the Chief of Staff of another workspace', async () => {
+        row = { ...row!, workspace_id: 2 }
+        await expect(resolveAgentTarget('cos-1', 'use', admin)).rejects.toBeInstanceOf(AuthorizationError)
     })
 
     it('has nothing to reach on a workspace with no machine', async () => {
         signedIn('admin')
         mocks.findWorkspaceEngine.mockResolvedValue(null)
-        await expect(getAgentChatTarget('foreman')).rejects.toThrow()
+        await expect(resolveAgentTarget('foreman')).rejects.toThrow()
     })
 })
 

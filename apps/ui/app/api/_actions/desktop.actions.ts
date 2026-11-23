@@ -1,8 +1,8 @@
 'use server'
 
-import { FOREMAN_AGENT_ID, desktopAppSchema, desktopViewModeSchema, takeoverUrlSchema, type DesktopApp, type DesktopViewMode, type TakeoverResult } from '@rerun/contracts'
+import { desktopAppSchema, desktopViewModeSchema, takeoverUrlSchema, type DesktopApp, type DesktopViewMode, type TakeoverResult } from '@rerun/contracts'
 
-import { assertAgentInWorkspace, assertAgentOrForemanAccess, deniedCode, type DeniedCode } from '@/app/api/_auth/access'
+import { assertAgentInWorkspace, deniedCode, type DeniedCode } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { DesktopUnavailableError, desktopSocketUrl, resolveWorkspaceDesktop, type WorkspaceDesktop } from '@/app/api/_services/desktop.service'
 import { NoEngineError } from '@/app/api/_services/workspace-engine.service'
@@ -28,13 +28,8 @@ async function memberDesktop(): Promise<WorkspaceDesktop> {
     return resolveWorkspaceDesktop(ctx.workspace.id)
 }
 
-// The Chief of Staff has its own screen on the machine, under its fixed id, which every member
-// reaches like the rest of its conversations.
+// The screen of a coworker, the Chief of Staff's included, under its id on the machine.
 async function engineAgentId(agentId: string): Promise<string> {
-    if (agentId === FOREMAN_AGENT_ID) {
-        await assertAgentOrForemanAccess(agentId, 'use')
-        return FOREMAN_AGENT_ID
-    }
     const agent = await assertAgentInWorkspace(agentId)
     if (!agent.engine_agent_id) throw new DesktopUnavailableError('coworkerNotOnMachine')
     return agent.engine_agent_id

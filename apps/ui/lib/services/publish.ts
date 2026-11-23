@@ -54,7 +54,7 @@ type AgentContext = {
 
 // Resolve the calling agent (trusted: agentId comes from the Hub-authenticated x-rerun-agent
 // header) to its engine connection + the workspace/space ids used for keying and isolation.
-// Dedicated resolver on purpose: getAgentChatTarget doesn't expose workspace_id/space_id.
+// Dedicated resolver on purpose: resolveAgentTarget doesn't expose workspace_id/space_id.
 async function resolveAgent(agentId: string): Promise<AgentContext> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id', 'workspace_id'] as const, { id: agentId })

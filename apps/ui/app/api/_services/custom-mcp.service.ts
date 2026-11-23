@@ -1,5 +1,5 @@
 import type { AccessLevel, Actor } from '@/app/api/_auth/access'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { installedFromRegistry } from '@/app/api/_services/services.service'
 import { deleteMcpToken, getAgent, getMcpServerStatuses, patchMcpServers } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
@@ -42,7 +42,7 @@ export async function customMcpServersOf(conn: EngineConnection, engineAgentId: 
 }
 
 function targetOf(agentId: string, actor: Actor | undefined, access: AccessLevel = 'use') {
-    return getAgentChatTarget(agentId, access, actor)
+    return resolveAgentTarget(agentId, access, actor)
 }
 
 // The catalog apps and the servers registered outside it, read off one registry so the two lists

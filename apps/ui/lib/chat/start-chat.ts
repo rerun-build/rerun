@@ -1,7 +1,7 @@
 import { chat } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 
-type ChatParams = Parameters<typeof chat>[2]
+export type ChatParams = Parameters<typeof chat>[2]
 
 // A queued message leaves the moment the conversation reads as free on the client, but the engine
 // only drops its session claim once the run has written its transcript and torn its provider down,

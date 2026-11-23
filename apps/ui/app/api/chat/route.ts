@@ -1,14 +1,13 @@
 import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/errors'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getExistingSession, recordMessageSent, resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { createSessionRow, ensureSessionRow, findGeneralSession, getExistingSession, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { requestTimeZone } from '@/lib/i18n/request-locale'
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
-import { cancelRun, reconnectRun } from '@/lib/engine/client'
-import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
+import { sendTurn } from '@/lib/chat/send-turn'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { isConversationId } from '@/lib/chat/conversation-id'
 import { installSessionTitle, parseInstallMessage } from '@/lib/chat/install-marker'
@@ -16,7 +15,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, SESSION_NOT_FOUND, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, SESSION_NOT_FOUND, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -99,13 +98,13 @@ export async function POST(request: Request) {
 
     // The conversation the request names is looked up while the coworker is: neither read waits on
     // the other. Its failure is answered further down, where it is awaited.
-    const namedSession = sessionId && agentId !== FOREMAN_AGENT_ID ? getExistingSession(sessionId, actor) : null
+    const namedSession = sessionId ? getExistingSession(sessionId, actor) : null
     namedSession?.catch(() => {})
 
-    // The foreman is talked to on its own route, which writes its brief and keeps each member's
-    // conversations apart.
-    const target = agentId === FOREMAN_AGENT_ID ? null : await resolveAgentTarget(agentId, actor).catch(() => null)
-    if (!target) {
+    // The Chief of Staff is talked to on its own route, which writes its brief and keeps each
+    // member's conversations apart.
+    const target = await resolveAgentTarget(agentId, 'use', actor).catch(() => null)
+    if (!target || target.engineAgentId === FOREMAN_AGENT_ID) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
     }
 
@@ -145,118 +144,38 @@ export async function POST(request: Request) {
         engineSessionId = existing.engineSessionId ?? undefined
     }
 
-    let engineRes!: Response
-    let supabaseSessionId!: string
-    // Two passes at most: when another tab opened General between the lookup above and the insert
-    // below, the message is sent again on the General that won.
-    for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-            console.log(`[CHAT START] agent=${agentId} session=${sessionId ?? '(new)'} inputLength=${text.length}${queued ? ' queued' : ''}`)
-            engineRes = await startChat(target.conn, target.engineAgentId, { sessionId: engineSessionId, message: text, connectionId, model, effort, source, author, callableAgentIds: await callablePromise, install: !!install && !sessionId, userLanguage: install && !sessionId ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }, queued ? QUEUED_RETRY_DELAYS_MS : null)
-        } catch (err) {
-            return Response.json({ error: `Engine error: ${err instanceof Error ? err.message : 'Failed to start chat'}` }, { status: 502 })
-        }
-
-        // The engine allows a single live run per conversation. A 409 means this send raced one that
-        // is already under way — nearly always the same answer delivered twice by an interactive block.
-        // Tail the run in flight instead of starting a second one: the caller gets a normal stream, and
-        // the duplicate text is dropped on purpose (it would only repeat what the agent is answering).
-        if (engineRes.status === 409) {
-            const busy = (await engineRes.json().catch(() => null)) as { code?: string; sessionId?: string; runId?: string; startedAt?: string | null; authorId?: string | null } | null
-            // The agent's install already runs in another conversation: the chat opens that one rather
-            // than a second install. Its row is mirrored here in case the run that opened it never got
-            // that far.
-            if (busy?.code === 'install_in_flight' && busy.sessionId && install) {
-                const installSessionId = await ensureSessionRow(agentId, busy.sessionId, sessionTitleSeed, { source })
-                return Response.json({ error: 'install_in_flight', sessionId: installSessionId }, { status: 409 })
-            }
-            console.warn(`[CHAT BUSY] agent=${agentId} session=${sessionId ?? '(new)'} run=${busy?.runId ?? '?'} input=${JSON.stringify(text.slice(0, 200))}`)
-            // `run_in_flight` rather than a sentence: the chat turns it into a notice with a Stop
-            // button and puts the text back in the composer, instead of a red box with nothing to click.
-            // A run a teammate started is answering their message, not this one: tailing it would drop
-            // text nobody has read. The chat queues it behind that run instead.
-            const heldByTeammate = Boolean(busy?.authorId) && busy?.authorId !== author.id
-            const busyResponse = () => Response.json({ error: 'run_in_flight', runId: busy?.runId ?? null, startedAt: busy?.startedAt ?? null, heldByTeammate }, { status: 409 })
-            // A queued message carries text nobody has read yet, so it is never dropped: the chat puts
-            // it back in the queue and sends it again once the conversation frees up. The same goes
-            // for a message sent again on the General that won a race: the run it meets there is
-            // answering the other tab's text, not a copy of this one.
-            if (queued || heldByTeammate || !busy?.runId || attempt > 0) return busyResponse()
-            engineRes = await reconnectRun(target.conn, target.engineAgentId, busy.runId).catch(() => new Response(null, { status: 204 }))
-            if (engineRes.status === 204 || !engineRes.ok || !engineRes.body) {
-                return busyResponse()
-            }
-            const headers = new Headers()
-            headers.set('Content-Type', engineRes.headers.get('content-type') ?? 'text/event-stream')
-            headers.set('x-vercel-ai-ui-message-stream', engineRes.headers.get('x-vercel-ai-ui-message-stream') ?? 'v1')
-            if (sessionId) headers.set('X-Session-Id', sessionId)
-            headers.set('X-Run-Id', busy.runId)
-            return new Response(engineRes.body, { headers })
-        }
-
-        if (!engineRes.ok || !engineRes.body) {
-            const errBody = await engineRes.text().catch(() => '')
-            if (engineRes.status === 404 && errBody.includes(ENGINE_SESSION_NOT_FOUND)) {
-                console.warn(`[CHAT SESSION GONE] agent=${agentId} session=${sessionId ?? '(new)'} engineSession=${engineSessionId ?? '?'}`)
-                return sessionNotFound()
-            }
-            return Response.json({ error: `Engine error: ${engineRes.status} ${errBody}` }, { status: 502 })
-        }
-
-        // The engine returns the (possibly newly created) session id as a header.
-        const resolvedEngineSessionId = engineRes.headers.get('x-session-id') ?? engineSessionId
-
-        // Map to the Supabase session row the UI tracks.
-        if (!sessionId) {
-            if (!resolvedEngineSessionId) {
-                return Response.json({ error: 'Engine did not return a session id' }, { status: 502 })
-            }
-            try {
-                supabaseSessionId = await createSessionRow(agentId, resolvedEngineSessionId, sessionTitleSeed, null, source, general ? 'general' : 'thread', install ? null : sessionTitleSeed)
-            } catch (err) {
-                // Another tab opened General a moment ago: the run just started belongs to no row. It is
-                // cancelled, and the message starts over on the General that won.
-                if (err instanceof GeneralAlreadyOpenError && attempt === 0) {
-                    console.warn(`[CHAT GENERAL RACE] agent=${agentId} orphan=${resolvedEngineSessionId} general=${err.general.engineSessionId}`)
-                    void engineRes.body?.cancel().catch(() => {})
-                    const orphanRunId = engineRes.headers.get('x-run-id')
-                    if (orphanRunId) void cancelRun(target.conn, target.engineAgentId, orphanRunId).catch(() => {})
-                    sessionId = err.general.id
-                    engineSessionId = err.general.engineSessionId
-                    continue
-                }
-                return Response.json({ error: 'Failed to persist session' }, { status: 500 })
-            }
+    const isNew = !sessionId
+    return sendTurn({
+        target,
+        text,
+        author,
+        queued: queued === true,
+        engine: async () => ({ connectionId, model, effort, source, callableAgentIds: await callablePromise, install: !!install && isNew, userLanguage: install && isNew ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }),
+        conversationId: sessionId,
+        engineSessionId,
+        log: `agent=${agentId}`,
+        preview: install ? null : text,
+        sessionGone: sessionNotFound,
+        // The agent's install already runs in another conversation: the chat opens that one rather
+        // than a second install. Its row is mirrored here in case the run that opened it never got
+        // that far.
+        answerBusy: async busy => {
+            if (busy?.code !== 'install_in_flight' || !busy.sessionId || !install) return null
+            const installSessionId = await ensureSessionRow(agentId, busy.sessionId, sessionTitleSeed, { source })
+            return Response.json({ error: 'install_in_flight', sessionId: installSessionId }, { status: 409 })
+        },
+        open: async newEngineSessionId => {
+            const rowId = await createSessionRow(agentId, newEngineSessionId, sessionTitleSeed, null, source, general ? 'general' : 'thread', install ? null : sessionTitleSeed)
             // General keeps its name; a thread is named after what it opens with, unless someone
             // renamed it while the title was being written.
             if (!install && !general) {
                 generateSessionTitle(sessionTitleSeed)
                     .then(async title => {
-                        const supabase = createServiceRoleClient()
-                        await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', supabaseSessionId).eq('title', seedSessionTitle(sessionTitleSeed))
+                        await createServiceRoleClient().from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', rowId).eq('title', seedSessionTitle(sessionTitleSeed))
                     })
                     .catch(() => {})
             }
-        } else {
-            supabaseSessionId = sessionId
-            if (resolvedEngineSessionId && resolvedEngineSessionId !== engineSessionId) {
-                // Backfill the engine session id if we didn't have it yet.
-                const supabase = createServiceRoleClient()
-                await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ engine_session_id: resolvedEngineSessionId }).eq('id', supabaseSessionId).then()
-            }
-        }
-        break
-    }
-
-    // An install opens with its guide, which is nobody's message.
-    await recordMessageSent(supabaseSessionId, author.id, install ? null : text)
-
-    const headers = new Headers()
-    headers.set('Content-Type', engineRes.headers.get('content-type') ?? 'text/event-stream')
-    headers.set('x-vercel-ai-ui-message-stream', engineRes.headers.get('x-vercel-ai-ui-message-stream') ?? 'v1')
-    headers.set('X-Session-Id', supabaseSessionId)
-    const runId = engineRes.headers.get('x-run-id')
-    if (runId) headers.set('X-Run-Id', runId)
-
-    return new Response(engineRes.body, { headers })
+            return rowId
+        },
+    })
 }

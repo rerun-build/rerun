@@ -11,7 +11,7 @@ import type { InstalledService } from '@/lib/services/types'
 
 import { changeAgentHandle, createAgent, deleteAgent, renameAgent } from './agent.service'
 import { declareService } from './agent-setup.service'
-import { ensureSessionRow, getAgentChatTarget, resolveAgentTarget } from './chat.service'
+import { ensureSessionRow, resolveAgentTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
 import { allocateServiceInstance, listInstalledServices, loadManifest, uninstallService } from './services.service'
 
@@ -20,7 +20,7 @@ vi.mock('@/lib/engine/client')
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), getConnectionForAgent: vi.fn(), getWorkspaceConnection: vi.fn() }))
 vi.mock('./agent.service', () => ({ changeAgentHandle: vi.fn(), createAgent: vi.fn(), deleteAgent: vi.fn(), moveAgentToBox: vi.fn(), renameAgent: vi.fn() }))
 vi.mock('./agent-setup.service', () => ({ declareService: vi.fn(), installServiceSlugs: vi.fn() }))
-vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn(), getAgentChatTarget: vi.fn(), resolveAgentTarget: vi.fn() }))
+vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn(), resolveAgentTarget: vi.fn() }))
 vi.mock('./services.service', () => ({
     allocateServiceInstance: vi.fn(),
     listCatalogServices: vi.fn(),
@@ -149,7 +149,7 @@ describe('dispatchAccountTool', () => {
 
         beforeEach(() => {
             vi.mocked(resolveAgentTarget).mockResolvedValue({} as never)
-            vi.mocked(getAgentChatTarget).mockResolvedValue({} as never)
+            vi.mocked(resolveAgentTarget).mockResolvedValue({} as never)
             vi.mocked(declareService).mockResolvedValue('compiled')
             vi.mocked(allocateServiceInstance).mockResolvedValue(NEW_ACCOUNT)
             vi.mocked(listInstalledServices).mockResolvedValue({ services: [installed('gmail', 'me@work.com'), installed('gmail@k3x9ab', 'Gmail 2')] })
@@ -170,7 +170,7 @@ describe('dispatchAccountTool', () => {
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'agent-own', slug: 'gmail' })).resolves.toMatchObject({ key: 'gmail', slug: 'gmail', label: 'me@work.com' })
 
             expect(allocateServiceInstance).not.toHaveBeenCalled()
-            expect(getAgentChatTarget).toHaveBeenCalledWith('agent-own', 'manage', ACTOR)
+            expect(resolveAgentTarget).toHaveBeenCalledWith('agent-own', 'manage', ACTOR)
             expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(), ACTOR, undefined)
         })
 
@@ -180,7 +180,7 @@ describe('dispatchAccountTool', () => {
 
             const result = await dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'foreman', slug: 'gmail' })
 
-            expect(getAgentChatTarget).toHaveBeenCalledWith('foreman', 'manage', ACTOR)
+            expect(resolveAgentTarget).toHaveBeenCalledWith('foreman', 'manage', ACTOR)
             expect(declareService).toHaveBeenCalledWith('foreman', gmailManifest(), ACTOR, undefined)
             expect(result).toMatchObject({ key: 'gmail', status: 'needs_auth', message: expect.stringContaining("the Chief of Staff's card, Apps") })
         })
@@ -343,7 +343,7 @@ describe('dispatchAccountTool', () => {
                 memories: [{ content: 'Prefers tea', kind: 'preference', tags: ['food', 3] }, { content: 'Lives in Lyon' }, { content: 'Runs a bakery', kind: 'fact' }],
             })
 
-            expect(resolveAgentTarget).toHaveBeenCalledWith('agent-own', actor, 'manage')
+            expect(resolveAgentTarget).toHaveBeenCalledWith('agent-own', 'manage', actor)
             expect(vi.mocked(createMemory).mock.calls.map(call => call[2])).toEqual([{ content: 'Prefers tea', kind: 'preference', tags: ['food'] }, { content: 'Lives in Lyon' }, { content: 'Runs a bakery', kind: 'fact' }])
             expect(out).toEqual({ written: 2, ids: ['m1', 'm3'], failed: [{ index: 1, error: 'hub down' }] })
         })

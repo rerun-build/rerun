@@ -2,7 +2,7 @@ import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type Vaul
 
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug } from '@rerun/cloud/apps'
 import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
@@ -96,7 +96,7 @@ export function toAuthMethodSummaries(manifest: ServiceManifest): AuthMethodSumm
 // along: a declared entry still waiting for a sign-in is not an installed connector.
 async function installedStatuses(agentId: string, actor?: Actor): Promise<Map<string, AgentServiceStatus>> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'use', actor)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
         const reg = await readRegistry(conn, engineAgentId)
         const slugs = new Set(Object.keys(reg.services).map(key => parseServiceRegistryKey(key).slug))
         return new Map([...slugs].map(slug => [slug, primaryStatusOfSlug(reg, slug) as AgentServiceStatus]))
@@ -114,7 +114,7 @@ async function installedStatuses(agentId: string, actor?: Actor): Promise<Map<st
 // (used when an install is triggered but required inputs are still missing). Records the
 // chosen method so the config form re-opens on the right one.
 export async function markServiceNeedsConfig(agentId: string, key: string, authMethodId?: string, actor?: Actor, seed?: { instanceId: string; label: string }): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     // Pending: no engine footprint yet (empty mcpServers/envKeys/skills).
     await upsertRegistryEntry(conn, engineAgentId, key, { status: 'needs_config', config: {}, authMethodId, mcpServers: [], envKeys: [], skills: [], ...seed, installedAt: new Date().toISOString() })
 }
@@ -123,7 +123,7 @@ export async function markServiceNeedsConfig(agentId: string, key: string, authM
 // instances.
 export async function allocateServiceInstance(agentId: string, manifest: ServiceManifest, actor?: Actor): Promise<ServiceInstanceSeed | null> {
     if (!usesInstances(manifest)) return null
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     return nextServiceInstance(manifest, heldAccounts(await readRegistry(conn, engineAgentId), manifest.slug))
 }
 
@@ -378,7 +378,7 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
     let label: string | undefined
     let instances: ServiceDetails['instances'] = []
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'use', actor)
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
         const reg = await readRegistry(conn, engineAgentId)
         const entry = resolveRegistryEntry(reg, slugOrKey)?.entry
         label = entry && vaultAccountLabel(entry)
@@ -501,7 +501,7 @@ type KeyInstall = {
 async function refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount, actor, vaultItem }: KeyInstall): Promise<void> {
     const remoteServers = method.mcpServers.filter(server => server.url).map(server => (instance ? instanceServerName(server.name, instance.instanceId) : server.name))
     if (remoteServers.length === 0) return
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const statuses = await getMcpServerStatuses(conn, engineAgentId, remoteServers).catch(() => null)
     if (!statuses?.some(server => server.status === 'needs_auth')) return
 
@@ -524,7 +524,7 @@ type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemI
 // the Vault when the box keeps one, unless the coworker already holds the app
 // in its own folder (it is reconfigured where it is) or its sign-in is one the Vault does not hold yet.
 async function vaultInstallTarget(agentId: string, key: string, methodKind: string, actor?: Actor): Promise<VaultInstallTarget | null> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     // A box without a Vault takes the path it always took, with no read more than the capability.
     if (!(await supportsVault(conn))) return null
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
@@ -562,7 +562,7 @@ async function installTarget(agentId: string, manifest: ServiceManifest, slugOrK
     if (newInstance) return allocateServiceInstance(agentId, manifest, actor)
     const { instanceId } = parseServiceRegistryKey(slugOrKey)
     if (!instanceId || !usesInstances(manifest)) return null
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const reg = await readRegistry(conn, engineAgentId)
     return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, heldAccounts(reg, manifest.slug)) }
 }
@@ -570,7 +570,7 @@ async function installTarget(agentId: string, manifest: ServiceManifest, slugOrK
 // Flip an OAuth service to active after the user completes the sign-in popup (the callback
 // route has already written the token to the engine token store).
 export async function markServiceAuthorized(agentId: string, key: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (entry) await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active' })
 }
@@ -578,7 +578,7 @@ export async function markServiceAuthorized(agentId: string, key: string, actor?
 // Flip a managed service to active and record the connected account label, after the managed
 // OAuth callback wrote the token to the engine token store.
 export async function markManagedAuthorized(agentId: string, key: string, accountEmail?: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (!entry) return
     const managed = { provider: entry.managed?.provider ?? '', serverName: entry.managed?.serverName ?? '', ...(accountEmail ? { accountEmail } : {}) }
@@ -588,7 +588,7 @@ export async function markManagedAuthorized(agentId: string, key: string, accoun
 // Flip a Composio service to active once its connected account is verified ACTIVE. The
 // connectedAccountId is what uninstall/reconnect later delete at Composio to revoke access.
 export async function markComposioAuthorized(agentId: string, key: string, connectedAccountId: string, accountLabel?: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (!entry) return
     const composio = { toolkit: entry.composio?.toolkit ?? '', serverName: entry.composio?.serverName ?? '', connectedAccountId, ...(accountLabel ? { accountLabel } : {}), ...(entry.composio?.userId ? { userId: entry.composio.userId } : {}) }
@@ -601,7 +601,7 @@ export async function markComposioAuthorized(agentId: string, key: string, conne
 // token to drop — it keeps working until the user actually submits new values, since
 // compileService is idempotent and the submit overwrites in place.
 export async function resetServiceConnection(agentId: string, key: string, actor?: Actor): Promise<ResetConnectionResult> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (!entry) return { mode: 'config' }
 
@@ -643,7 +643,7 @@ export async function resetServiceConnection(agentId: string, key: string, actor
 }
 
 export async function listInstalledServices(agentId: string, actor?: Actor): Promise<{ services: InstalledService[] }> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'use', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
     return { services: await installedFromRegistry(await readRegistry(conn, engineAgentId)) }
 }
 
@@ -688,7 +688,7 @@ export async function installedFromRegistry(reg: ServiceRegistry): Promise<Insta
 // then drop the registry entry. needs_config entries have an empty footprint → no-op
 // teardown, just the registry removal.
 export async function uninstallService(agentId: string, key: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const reg = await readRegistry(conn, engineAgentId)
     const entry = reg.services[key]
     // An entry shared with every coworker cannot be taken from one of them: it is changed in the Vault,

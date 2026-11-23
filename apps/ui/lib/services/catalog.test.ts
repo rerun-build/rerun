@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { compileServiceParts } from './compiler'
 import { type ServiceManifest, isPaidApp, serviceManifestSchema, takesSeveralAccounts, usesInstances } from './manifest'
 
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/lib/composio/client', () => ({ deleteConnectedAccount: vi.fn() }))
 
 const NOTHING_TO_CONNECT = ['autodesk', 'clerk', 'crypto-com', 'godaddy', 'malwarebytes', 'microsoft', 'mozilla', 'nuxt', 'solana', 'trivago', 'ziprecruiter']

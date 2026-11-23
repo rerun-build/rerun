@@ -6,7 +6,7 @@ import { compileServiceParts } from '@/lib/services/compiler'
 import { VAULT_AGENT_REF, accountSkillsOf, compileIntoVault, vaultSkills } from './install'
 
 vi.mock('server-only', () => ({}))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/lib/composio/client', () => ({ deleteConnectedAccount: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ createSkill: vi.fn(), deleteMcpToken: vi.fn(), deleteSkill: vi.fn(), listSkills: vi.fn(), patchMcpServers: vi.fn(), updateAgentKeys: vi.fn(), updateSkill: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({

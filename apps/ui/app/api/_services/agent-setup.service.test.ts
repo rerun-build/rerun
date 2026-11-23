@@ -8,7 +8,7 @@ import { installService, markServiceNeedsConfig } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/services/compiler', () => ({ compileService: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
 vi.mock('./agent.service', () => ({ createAgent: vi.fn() }))
 vi.mock('./services.service', () => ({ installService: vi.fn(), markServiceNeedsConfig: vi.fn(), toAuthMethodSummaries: vi.fn(() => []) }))

@@ -13,7 +13,7 @@ import { installService, resetServiceConnection, uninstallService } from './serv
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async (agentId: string) => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: agentId === 'foreman' ? 'foreman' : 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async (agentId: string) => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: agentId === 'foreman' ? 'foreman' : 'engine-agent' })) }))
 vi.mock('@/lib/services/compiler', () => ({
     compileService: vi.fn(async () => ({ toolNames: ['linear'], oauth: null, managed: null, composio: null, app: null })),
     decompileService: vi.fn(),

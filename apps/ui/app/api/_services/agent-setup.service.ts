@@ -1,5 +1,5 @@
 import type { Actor } from '@/app/api/_auth/access'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { compileService } from '@/lib/services/compiler'
 import { type ServiceManifest, autoInstallableMethod, isPaidApp, serviceManifestSchema } from '@/lib/services/manifest'
 import { readRegistry } from '@/lib/services/registry'
@@ -33,7 +33,7 @@ export async function installServiceSlugs(agentId: string, slugs: string[], acto
 // account of the app instead of its base one.
 export async function declareService(agentId: string, manifest: ServiceManifest, actor?: Actor, instance?: ServiceInstanceSeed): Promise<'compiled' | 'needs_config'> {
     const key = instance?.key ?? manifest.slug
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     const held = (await readRegistry(conn, engineAgentId)).services[key]
     // An account the Vault already lends the coworker (shared with every coworker) is declared as it
     // is: installing it again would rewrite it for all of them, or be refused and stop the creation.

@@ -70,7 +70,7 @@ async function browserLanguage(): Promise<string | undefined> {
 
 async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean, agentName: string | undefined): Promise<HandoffResult> {
     try {
-        const [{ conn, engineAgentId }, callableAgentIds] = await Promise.all([resolveAgentTarget(agentId, actor), callableEngineAgentIds(actor)])
+        const [{ conn, engineAgentId }, callableAgentIds] = await Promise.all([resolveAgentTarget(agentId, 'use', actor), callableEngineAgentIds(actor)])
         const written = fresh ? { message, title: message, ranItsOwnInstall: false } : await messageFor(conn, engineAgentId, message, agentName)
 
         const userLanguage = written.ranItsOwnInstall ? await browserLanguage() : undefined

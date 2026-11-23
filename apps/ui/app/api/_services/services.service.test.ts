@@ -6,7 +6,7 @@ import { deleteVaultItem, patchVaultItem, updateVaultItemEnv } from '@/lib/engin
 import { compileIntoVault } from '@/lib/vault/install'
 import { AppError } from '@/lib/i18n/action-error'
 import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector } from '@rerun/cloud/apps.server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -14,7 +14,7 @@ import { searchDocs } from '@/lib/foreman/search-docs'
 import { dispatchHubTool, getServiceDetails, installService, installedFromRegistry, listInstalledServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async () => ({ conn: {}, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: {}, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/compiler', () => ({
     compileService: vi.fn(async () => ({ toolNames: [], oauth: null, managed: null, composio: { toolkit: 'gmail', serverName: 'gmail' }, app: null })),
     decompileService: vi.fn(),
@@ -380,7 +380,7 @@ describe('access level', () => {
     const MEMBER = { kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'all' } as const
 
     beforeEach(() => {
-        vi.mocked(getAgentChatTarget).mockClear()
+        vi.mocked(resolveAgentTarget).mockClear()
         useRegistry({ services: { gmail: entry() } })
     })
 
@@ -389,7 +389,7 @@ describe('access level', () => {
         await searchServices('agent', undefined, undefined, MEMBER)
         await getServiceDetails('agent', 'gmail', MEMBER).catch(() => null)
 
-        for (const call of vi.mocked(getAgentChatTarget).mock.calls) expect(call).toEqual(['agent', 'use', MEMBER])
+        for (const call of vi.mocked(resolveAgentTarget).mock.calls) expect(call).toEqual(['agent', 'use', MEMBER])
     })
 
     it('asks manage to install, reset, authorize or uninstall', async () => {
@@ -397,7 +397,7 @@ describe('access level', () => {
         await resetServiceConnection('agent', 'gmail', MEMBER)
         await markServiceAuthorized('agent', 'gmail', MEMBER)
 
-        expect(vi.mocked(getAgentChatTarget).mock.calls).toEqual([
+        expect(vi.mocked(resolveAgentTarget).mock.calls).toEqual([
             ['agent', 'manage', MEMBER],
             ['agent', 'manage', MEMBER],
             ['agent', 'manage', MEMBER],
@@ -407,7 +407,7 @@ describe('access level', () => {
     it('runs a hub call from the engine as the workspace itself', async () => {
         await dispatchHubTool('agent', 'service_list_installed', {}, 7)
 
-        expect(getAgentChatTarget).toHaveBeenCalledWith('agent', 'use', { kind: 'workspace', workspaceId: 7 })
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent', 'use', { kind: 'workspace', workspaceId: 7 })
     })
 })
 
@@ -418,7 +418,7 @@ describe('search_docs', () => {
 
         await expect(dispatchHubTool('agent', 'search_docs', { query: 'webhook trigger' }, 7)).resolves.toEqual(answer)
         expect(searchDocs).toHaveBeenCalledWith('webhook trigger')
-        expect(getAgentChatTarget).not.toHaveBeenCalled()
+        expect(resolveAgentTarget).not.toHaveBeenCalled()
     })
 
     it('refuses a search without a query', async () => {

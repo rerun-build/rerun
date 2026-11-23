@@ -1,15 +1,16 @@
 import { FOREMAN_AGENT_ID, reasoningEffortSchema, type SessionKind } from '@rerun/contracts'
 
 import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
+import { resolveAgentTarget, type AgentChatTarget } from '@/app/api/_services/chat.service'
+import { sendTurn } from '@/lib/chat/send-turn'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { requestTimeZone } from '@/lib/i18n/request-locale'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
-import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { embedTextShared } from '@/lib/services/embed'
-import { cancelRun, reconnectRun, supportsForemanVault } from '@/lib/engine/client'
-import { cancelForemanSessionRuns, engineSessionOf, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
+import { cancelRun, supportsForemanVault } from '@/lib/engine/client'
+import { cancelForemanSessionRuns, copyToShippedForemanRow, engineSessionOf, findForemanGeneral, loadForemanConversation, loadForemanConversationById, startEngineConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
@@ -25,17 +26,6 @@ import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
 // for an agent, a Claude or Codex subscription included, which the hub cannot reach.
 
 type EngineForemanBody = { sessionId?: unknown; text?: unknown; connectionId?: unknown; model?: unknown; effort?: unknown; queued?: unknown; kind?: unknown }
-
-// `X-Session-Id` is the conversation the message landed in: the one the client named, unless it
-// opened a General that another tab had opened a moment before.
-function streamResponse(engineRes: Response, runId: string | null, sessionId: string): Response {
-    const headers = new Headers()
-    headers.set('Content-Type', engineRes.headers.get('content-type') ?? 'text/event-stream')
-    headers.set('x-vercel-ai-ui-message-stream', engineRes.headers.get('x-vercel-ai-ui-message-stream') ?? 'v1')
-    if (runId) headers.set('X-Run-Id', runId)
-    headers.set('X-Session-Id', sessionId)
-    return new Response(engineRes.body, { headers })
-}
 
 function requestedKind(kind: unknown): SessionKind | null {
     return kind === 'general' || kind === 'thread' ? kind : null
@@ -101,65 +91,40 @@ export async function POST(req: Request): Promise<Response> {
         }
     }
 
-    // Two rounds at most: the second one continues the General another tab opened during the first.
-    for (let attempt = 0; attempt < 2; attempt++) {
-        let engineRes: Response
-        let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
-        try {
-            conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, effort, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting, vault: await supportsForemanVault(conn) }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx, timezone), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
-        } catch (err) {
-            // The machine went away under a conversation that was already going: the browser hides the
-            // foreman, which only exists beside a machine.
-            if (err instanceof NoEngineError) return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
-            return Response.json({ error: `Engine error: ${err instanceof Error ? err.message : 'Failed to start chat'}` }, { status: 502 })
-        }
+    let target: AgentChatTarget
+    try {
+        target = await resolveAgentTarget(FOREMAN_AGENT_ID, 'use', actorFromContext(ctx))
+    } catch (err) {
+        // The machine went away under a conversation that was already going: the browser hides the
+        // foreman, which only exists beside a machine.
+        if (err instanceof NoEngineError) return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
+        return Response.json({ error: `Engine error: ${err instanceof Error ? err.message : 'Failed to start chat'}` }, { status: 502 })
+    }
 
-        // Same contract as an agent chat. A send that raced a run already under way tails that run
-        // instead of starting a second one; a queued message carries text nobody has read yet, so it is
-        // handed back for the column to queue again rather than dropped.
-        if (engineRes.status === 409) {
-            const busy = (await engineRes.json().catch(() => null)) as { runId?: string; startedAt?: string | null } | null
-            const busyResponse = () => Response.json({ error: 'run_in_flight', runId: busy?.runId ?? null, startedAt: busy?.startedAt ?? null }, { status: 409 })
-            if (queued || !busy?.runId) return busyResponse()
-            const tail = await reconnectRun(conn, FOREMAN_AGENT_ID, busy.runId).catch(() => null)
-            if (!tail || tail.status === 204 || !tail.ok || !tail.body) return busyResponse()
-            return streamResponse(tail, busy.runId, sessionId)
-        }
-        if (!engineRes.ok || !engineRes.body) {
-            const errBody = await engineRes.text().catch(() => '')
-            return Response.json({ error: `Engine error: ${engineRes.status} ${errBody}` }, { status: 502 })
-        }
-        if (greeting && attempt === 0) {
+    return sendTurn({
+        target,
+        text,
+        author: messageAuthorOf(ctx, timezone),
+        queued,
+        // Its brief is written by the hub on every turn: the instructions and the tools of where the
+        // workspace stands now, with a token that carries this member's rights.
+        engine: async () => ({ connectionId, model, effort, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting, vault: await supportsForemanVault(target.conn) }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }),
+        conversationId: sessionId,
+        engineSessionId: existing?.engineSessionId ?? undefined,
+        log: 'agent=foreman',
+        preview: greeting ? null : text,
+        // The first words the welcome page left owed are spent once the engine took the turn.
+        started: async () => {
+            if (!greeting) return
             const answers = await readAnswers(ctx)
             await writeAnswers(ctx, { ...answers, onboarding: { ...answers.onboarding, greetPending: false } }, false)
-        }
-
-        if (existing) {
-            await touchForemanConversation(sessionId)
-        } else {
-            const engineSessionId = engineRes.headers.get('x-session-id')
-            if (!engineSessionId) return Response.json({ error: 'Engine did not return a session id' }, { status: 502 })
-            try {
-                await startEngineConversation(ctx, sessionId, engineSessionId, text, kind)
-            } catch (err) {
-                // Another tab opened General a moment ago: the run just started belongs to no row. It
-                // is cancelled, and the message starts over on the General that won.
-                if (err instanceof ForemanGeneralAlreadyOpenError && attempt === 0) {
-                    void engineRes.body.cancel().catch(() => {})
-                    const orphanRunId = engineRes.headers.get('x-run-id')
-                    if (orphanRunId) void cancelRun(conn, FOREMAN_AGENT_ID, orphanRunId).catch(() => {})
-                    sessionId = err.general.id
-                    existing = { backend: 'engine', engineSessionId: err.general.engineSessionId }
-                    continue
-                }
-                return Response.json({ error: 'Failed to persist the conversation' }, { status: 500 })
-            }
-        }
-
-        return streamResponse(engineRes, engineRes.headers.get('x-run-id'), sessionId)
-    }
-    return Response.json({ error: 'Failed to persist the conversation' }, { status: 500 })
+        },
+        open: async engineSessionId => {
+            await startEngineConversation(ctx, sessionId, engineSessionId, text, kind)
+            return sessionId
+        },
+        recorded: copyToShippedForemanRow,
+    })
 }
 
 // The conversation the column opens on: this person's General on the engine. With a session id,

@@ -60,7 +60,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
     const [threads, general, target] = await Promise.all([
         selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'thread', source: sources, updated_at: before ? { lte: before } : undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
         filter === 'all' && !before ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'general' }) : { data: [], error: null },
-        readsEngine ? resolveAgentTarget(agentId, caller).catch(() => null) : null,
+        readsEngine ? resolveAgentTarget(agentId, 'use', caller).catch(() => null) : null,
     ])
     if (threads.error) throw threads.error
     const threadRows = threads.data ?? []
@@ -429,7 +429,7 @@ export async function adoptEngineSession(agentId: string, engineSessionId: strin
     const { data: existing } = await selectMaybeSingle(supabase, 'sessions', ['id'] as const, { agent_id: agentId, engine_session_id: engineSessionId })
     if (existing) return existing.id
 
-    const target = await resolveAgentTarget(agentId, caller)
+    const target = await resolveAgentTarget(agentId, 'use', caller)
     const session = (await getSession(target.conn, target.engineAgentId, engineSessionId)) ?? (await listSessions(target.conn, target.engineAgentId)).find(s => s.id === engineSessionId)
     // A row is only ever a mirror of a session this agent holds: the column is unique across
     // workspaces, so a made-up id would otherwise squat another workspace's session.

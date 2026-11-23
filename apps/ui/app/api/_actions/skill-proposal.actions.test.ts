@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
     getSessionEngineContext: vi.fn(),
-    getAgentChatTarget: vi.fn(),
+    resolveAgentTarget: vi.fn(),
     decideCoworkerSkillProposal: vi.fn(),
     requireWorkspaceContext: vi.fn(),
     foremanSessionEngineContext: vi.fn(),
@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
     decideSkillProposal: vi.fn(),
 }))
 
-vi.mock('@/app/api/_services/chat.service', () => ({ getSessionEngineContext: mocks.getSessionEngineContext, getAgentChatTarget: mocks.getAgentChatTarget, decideCoworkerSkillProposal: mocks.decideCoworkerSkillProposal }))
+vi.mock('@/app/api/_services/chat.service', () => ({ getSessionEngineContext: mocks.getSessionEngineContext, resolveAgentTarget: mocks.resolveAgentTarget, decideCoworkerSkillProposal: mocks.decideCoworkerSkillProposal }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/ownership')>()), requireWorkspaceContext: mocks.requireWorkspaceContext }))
 vi.mock('@/lib/foreman/conversation', () => ({ foremanSessionEngineContext: mocks.foremanSessionEngineContext, clearForemanSkillProposalAttention: mocks.clearForemanSkillProposalAttention }))
 vi.mock('@/lib/engine/client', () => ({ listSkillProposals: mocks.listSkillProposals, decideSkillProposal: mocks.decideSkillProposal }))
@@ -30,7 +30,7 @@ beforeEach(() => {
     mocks.foremanSessionEngineContext.mockResolvedValue({ conn, engineSessionId: 'engine-1' })
     mocks.listSkillProposals.mockResolvedValue([proposal])
     mocks.decideSkillProposal.mockResolvedValue(proposal)
-    mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
+    mocks.resolveAgentTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
 })
 
 describe('the skill proposals of a conversation with the Chief of Staff', () => {
@@ -48,7 +48,7 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
 
     it('lets a workspace admin decide one, touching no coworker session', async () => {
         expect(await decideSkillProposalAction('conversation-1', 'p1', 'accept')).toEqual({ success: true, proposal })
-        expect(mocks.getAgentChatTarget).toHaveBeenCalledWith('foreman', 'manage')
+        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('foreman', 'manage')
         expect(mocks.decideSkillProposal).toHaveBeenCalledWith(conn, 'foreman', 'p1', 'accept')
         expect(mocks.decideCoworkerSkillProposal).not.toHaveBeenCalled()
     })
@@ -62,7 +62,7 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
     })
 
     it('refuses a member who cannot change what it keeps', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new AccessDeniedError())
+        mocks.resolveAgentTarget.mockRejectedValue(new AccessDeniedError())
         expect(await decideSkillProposalAction('conversation-1', 'p1', 'accept')).toMatchObject({ success: false, denied: 'forbidden' })
         expect(mocks.decideSkillProposal).not.toHaveBeenCalled()
     })

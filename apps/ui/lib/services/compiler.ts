@@ -1,5 +1,5 @@
 import type { Actor } from '@/app/api/_auth/access'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { createSkill, deleteMcpToken, deleteSkill, listSkills, patchMcpServers, updateAgentKeys, updateSkill } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import type { InputDef, McpServerTemplate, ServiceManifest, ServiceSkill } from './manifest'
@@ -202,7 +202,7 @@ export async function compileService(
     actor?: Actor,
     instance?: ServiceInstanceTarget,
 ): Promise<CompileResult> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     // A recompile of an existing account keeps the label it already has (an email, or its ordinal).
     const instanceFields = instance ? await instanceRegistryFields(conn, engineAgentId, manifest, instance) : {}
     const compiled = compileServiceParts(manifest, values, authMethodId, engineAgentId, instanceFields)

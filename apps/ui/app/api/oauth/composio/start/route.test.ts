@@ -11,9 +11,9 @@ import { fakeSupabase } from '@/test/supabase-fake'
 import { POST } from './route'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/app/api/_auth/access', () => ({ assertAgentOrForemanAccess: vi.fn(async () => ({ kind: 'workspace', workspaceId: 7 })) }))
+vi.mock('@/app/api/_auth/access', () => ({ assertAgentAccess: vi.fn(async () => ({ actor: { kind: 'workspace', workspaceId: 7 } })) }))
 vi.mock('@/app/api/_services/services.service', () => ({ loadManifest: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/registry', () => ({
     readRegistry: vi.fn(),
     resolveRegistryEntry: (registry: ServiceRegistry, key: string) => (registry.services[key] ? { key, entry: registry.services[key] } : null),

@@ -264,7 +264,7 @@ export async function buildTeam({ ctx, state, emit, signal }: BuildTeamOptions):
 // with no slot cannot be reached yet, and it still installs as its author wrote it.
 async function focusInstall(workspaceId: number, agentId: string, focus: string): Promise<void> {
     try {
-        const { conn, engineAgentId } = await resolveAgentTarget(agentId, workspaceActor(workspaceId), 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', workspaceActor(workspaceId))
         const detail = await engineGetAgent(conn, engineAgentId)
         if (!detail.install.trim()) return
         await patchAgent(conn, engineAgentId, { install: installWithFocus(detail.install, focus) })

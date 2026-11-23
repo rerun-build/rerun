@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 // The database tab of a coworker reads its table list here. A failed read once came back as an
 // empty list, which the tab drew as "No tables yet" for a coworker whose table was right there.
 
-const mocks = vi.hoisted(() => ({ getAgentChatTarget: vi.fn(), listDbTables: vi.fn() }))
+const mocks = vi.hoisted(() => ({ resolveAgentTarget: vi.fn(), listDbTables: vi.fn() }))
 
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: mocks.getAgentChatTarget, resolveRunTarget: vi.fn(), sessionRowOf: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: mocks.resolveAgentTarget, resolveRunTarget: vi.fn(), sessionRowOf: vi.fn() }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), listDbTables: mocks.listDbTables }))
 
 const { NoEngineError } = await import('@/app/api/_services/workspace-engine.service')
@@ -18,7 +18,7 @@ const prospects = { name: 'prospects', columns: [{ name: 'id', type: 'INTEGER', 
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getAgentChatTarget.mockResolvedValue(target)
+    mocks.resolveAgentTarget.mockResolvedValue(target)
 })
 
 describe('listAgentTablesAction', () => {
@@ -29,7 +29,7 @@ describe('listAgentTablesAction', () => {
     })
 
     it('reads a workspace without a machine yet as an empty database', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new NoEngineError())
+        mocks.resolveAgentTarget.mockRejectedValue(new NoEngineError())
         await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: true, tables: [] })
     })
 
@@ -44,12 +44,12 @@ describe('listAgentTablesAction', () => {
     })
 
     it('passes on why the coworker cannot be reached', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new Error('This coworker is inactive: your plan has no free coworker slot. Activate it from the coworker panel.'))
+        mocks.resolveAgentTarget.mockRejectedValue(new Error('This coworker is inactive: your plan has no free coworker slot. Activate it from the coworker panel.'))
         await expect(listAgentTablesAction('agent-1')).resolves.toEqual({
             success: false,
             error: 'This coworker is inactive: your plan has no free coworker slot. Activate it from the coworker panel.',
         })
-        mocks.getAgentChatTarget.mockRejectedValue(new AuthorizationError('coworkerNotFound'))
+        mocks.resolveAgentTarget.mockRejectedValue(new AuthorizationError('coworkerNotFound'))
         await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Coworker not found', code: 'coworkerNotFound' })
     })
 })

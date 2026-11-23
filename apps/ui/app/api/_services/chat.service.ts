@@ -1,12 +1,12 @@
-import { COWORKER_NOT_FOUND, actorFromContext, assertSessionInWorkspace, enforce, foremanAccessOf, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
-import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
+import { COWORKER_NOT_FOUND, agentAccessFor, agentRowIdOf, assertSessionInWorkspace, enforce, requireLightSessionActor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
+import { AuthorizationError } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { parseTriggerTarget } from '@/lib/triggers/trigger-path'
 import { decideSkillProposal, getRunSteps, listRuns } from '@/lib/engine/client'
 import type { EngineConnection, EngineRun, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
-import { FOREMAN_AGENT_ID, type SessionKind, type Usage } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind, type SessionKind, type Usage } from '@rerun/contracts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectManyWithJoins, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
 import { isPlanLimited } from './capacity.service'
@@ -22,56 +22,36 @@ export type AgentChatTarget = {
 // Ownership and access gate. This is the single chokepoint for the agent server actions, /api/chat,
 // the v1 routes and the MCP account server, all of which then talk to the engine/DB via the
 // service-role client (which bypasses RLS), so we re-establish object-level authz in code: the agent
-// has to sit in the caller's workspace, and in a Box the caller reaches at the level asked (`use` to
-// talk to it and read it, `manage` to change what it is). `actor` is passed in when the caller is not
-// the browser session: a v1 route's context, an API key or a foreman turn (the workspace itself).
-export async function resolveAgentTarget(agentId: string, actor?: Actor, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
-    // The agent row doesn't depend on the caller, and the caller's machine only on its workspace, so
-    // all three are read at once. The machine read before the ownership check is the caller's own.
-    const callerActor = actor ? Promise.resolve(actor) : requireLightSessionActor()
-    const [resolvedActor, row, engine] = await Promise.all([callerActor, fetchAgentRow(agentId), callerActor.then(a => findWorkspaceEngine(a.workspaceId))])
-    if (!row || row.workspace_id !== resolvedActor.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    enforce(row.space_id ? await spaceAccessFor(resolvedActor, { id: row.space_id, workspace_id: row.workspace_id, visibility: row.space?.visibility ?? null }) : 'none', access, COWORKER_NOT_FOUND)
+// has to sit in the caller's workspace, and the caller has to reach it at the level asked (`use` to
+// talk to it and read it, `manage` to change what it is), by the rule of its kind: its Box, or for
+// the Chief of Staff the workspace. `foreman` names the caller's Chief of Staff. Without `actor` it is
+// the signed-in browser session; a v1 route, an API key, an OAuth callback or a foreman turn pass theirs.
+export async function resolveAgentTarget(agentId: string, access: AccessLevel = 'use', actor?: Actor): Promise<AgentChatTarget> {
+    return resolveTarget(agentId, () => access, actor)
+}
+
+// What reads or stops a run, picks a model or carries the files of a chat message. On a coworker
+// whose conversations are each member's own, every member does those whatever level the caller asks
+// for, and its model is the one setting any of them may change.
+export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use', actor?: Actor): Promise<AgentChatTarget> {
+    return resolveTarget(agentId, kind => (agentKindPolicy(kind).conversations === 'per-member' ? 'use' : access), actor)
+}
+
+async function resolveTarget(agentId: string, accessFor: (kind: AgentKind) => AccessLevel, actor?: Actor): Promise<AgentChatTarget> {
+    // The caller's machine only depends on its workspace, so it is read beside the row. The machine
+    // read before the ownership check is the caller's own.
+    const resolvedActor = actor ?? (await requireLightSessionActor())
+    const [row, engine] = await Promise.all([agentRowIdOf(agentId, resolvedActor.workspaceId).then(fetchAgentRow), findWorkspaceEngine(resolvedActor.workspaceId)])
+    if (!row) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    enforce(await agentAccessFor(resolvedActor, row), accessFor(row.kind), COWORKER_NOT_FOUND)
     return buildTarget(row, engine)
-}
-
-// The caller's way to a coworker, the foreman included: what a coworker's screens read and change
-// (its memories, skills, routines, apps, connected servers, files) is the same for both. Without
-// `actor` it is the signed-in browser session; the apps pass theirs, an OAuth callback included.
-export async function getAgentChatTarget(agentId: string, access: AccessLevel = 'use', actor?: Actor): Promise<AgentChatTarget> {
-    if (agentId === FOREMAN_AGENT_ID) return actor ? foremanTargetFor(actor, access) : foremanTarget(access)
-    return resolveAgentTarget(agentId, actor, access)
-}
-
-// The foreman has no agent row and sits in no Box: it lives on the workspace's engine under a fixed
-// id. Any signed-in member of the workspace reaches it; changing what it keeps of its own takes a
-// workspace admin, the one level that manages every Box. Talking to it stays with its own route,
-// which is where its brief is written.
-async function foremanTarget(access: AccessLevel): Promise<AgentChatTarget> {
-    const ctx = await requireWorkspaceContext()
-    if (ctx.authUser.is_anonymous) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    return foremanTargetFor(actorFromContext(ctx), access)
-}
-
-async function foremanTargetFor(actor: Actor, access: AccessLevel): Promise<AgentChatTarget> {
-    enforce(foremanAccessOf(actor), access, COWORKER_NOT_FOUND)
-    const engine = await findWorkspaceEngine(actor.workspaceId)
-    if (!engine) throw new NoEngineError()
-    return { conn: engine.conn, engineAgentId: FOREMAN_AGENT_ID }
-}
-
-// What reads or stops a run, picks a model or carries the files of a chat message. On the foreman
-// every member does those, whatever level the caller asks for: its conversations are each member's
-// own, and its model is the one setting any of them may change.
-export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
-    return getAgentChatTarget(agentId, agentId === FOREMAN_AGENT_ID ? 'use' : access)
 }
 
 async function fetchAgentRow(agentId: string) {
     const { data } = await selectMaybeSingleWithJoins(
         createServiceRoleClient(),
         'agents',
-        ['workspace_id', 'space_id', 'engine_agent_id', 'disabled_at', 'disabled_reason'] as const,
+        ['workspace_id', 'kind', 'space_id', 'engine_agent_id', 'disabled_at', 'disabled_reason'] as const,
         {
             space: { table: 'spaces', foreignKey: 'spaces', columns: ['visibility'] },
         } as const,
@@ -140,10 +120,19 @@ export class GeneralAlreadyOpenError extends Error {
 // General shows a thread under the message it opened with: the hub keeps that much of it, and no more.
 export const FIRST_MESSAGE_MAX_CHARS = 300
 
+// A conversation of a coworker whose conversations are each member's own is opened by its own route,
+// which names the member who holds it: a row written here would be shared with every member. A row
+// that is not there is left to the foreign key.
+async function opensSharedConversations(agentId: string): Promise<boolean> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'agents', ['kind'] as const, { id: agentId })
+    return !data || agentKindPolicy(data.kind).conversations === 'shared'
+}
+
 // Persist a Supabase session row pointing at the engine-created session. A `general` row is the
 // coworker's main conversation: fixed title, one per coworker, and no opening message to show.
 export async function createSessionRow(agentId: string, engineSessionId: string, title: string, originAgentId?: string | null, source?: SessionSource, kind: SessionKind = 'thread', firstMessage?: string | null): Promise<string> {
     const supabase = createServiceRoleClient()
+    if (!(await opensSharedConversations(agentId))) throw new AuthorizationError(COWORKER_NOT_FOUND)
 
     const { data: session, error } = await supabase
         .from('sessions')
@@ -187,6 +176,10 @@ export async function findGeneralSession(agentId: string): Promise<GeneralSessio
 // already there keeps the status it earned rather than being pushed back to `working`.
 export async function ensureSessionRow(agentId: string, engineSessionId: string, title: string, options?: { source?: SessionSource; originAgentId?: string | null; status?: SessionStatus }): Promise<string | null> {
     const supabase = createServiceRoleClient()
+    if (!(await opensSharedConversations(agentId))) {
+        console.error('[sessions] refused to mirror a conversation of a coworker that holds them per member', { agentId, engineSessionId })
+        return null
+    }
 
     const { error } = await supabase.from('sessions').upsert<Database['public']['Tables']['sessions']['Insert']>(
         {
@@ -259,7 +252,7 @@ export async function clearSkillProposalAttention(sessionId: string, agentId: st
 // Remembering a rule, or not, from a coworker's conversation: `manage` on its Box, then the wait the
 // proposal raised is cleared. A decision the engine refuses leaves the conversation as it was.
 export async function decideCoworkerSkillProposal(target: SessionEngineContext, sessionId: string, proposalId: string, decision: 'accept' | 'dismiss', actor?: Actor): Promise<EngineSkillProposal> {
-    await resolveAgentTarget(target.agentId, actor, 'manage')
+    await resolveAgentTarget(target.agentId, 'manage', actor)
     const proposal = await decideSkillProposal(target.conn, target.engineAgentId, proposalId, decision)
     await clearSkillProposalAttention(sessionId, target.agentId, target.engineSessionId).catch(() => {})
     return proposal

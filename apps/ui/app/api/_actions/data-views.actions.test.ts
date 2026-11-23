@@ -1,11 +1,11 @@
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import * as engine from '@/lib/engine/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { readTableSourcesAction } from './data-views.actions'
 
 vi.mock('@/app/api/_auth/workspace-target', () => ({ requireWorkspaceConnection: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ SPACE_DATA_BASE: '/shared/data', agentDataBase: (id: string) => `/agents/${id}/data`, readTableSources: vi.fn() }))
 
 const conn = { baseUrl: 'https://engine.test', apiKey: 'box-key' }
@@ -15,7 +15,7 @@ describe('readTableSourcesAction', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         vi.mocked(requireWorkspaceConnection).mockResolvedValue(conn as never)
-        vi.mocked(getAgentChatTarget).mockResolvedValue({ conn, engineAgentId: 'engine-agent' } as never)
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn, engineAgentId: 'engine-agent' } as never)
     })
 
     it('asks the database of the scope', async () => {
@@ -33,7 +33,7 @@ describe('readTableSourcesAction', () => {
     })
 
     it('answers null when the scope cannot be reached', async () => {
-        vi.mocked(getAgentChatTarget).mockRejectedValue(new Error('No agent'))
+        vi.mocked(resolveAgentTarget).mockRejectedValue(new Error('No agent'))
         await expect(readTableSourcesAction({ kind: 'agent', agentId: 'gone' }, rows)).resolves.toBeNull()
         expect(engine.readTableSources).not.toHaveBeenCalled()
     })

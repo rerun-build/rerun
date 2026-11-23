@@ -10,10 +10,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getSessionWorkspace, getSessionWorkspace: mocks.getSessionWorkspace }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
+vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: async () => 'cos-1' }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectMany: mocks.selectMany, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
-const { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
+const { AccessDeniedError, assertAgentAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
 type Actor = import('./access').Actor
 
 const admin: Actor = { kind: 'user', userId: 'u-admin', workspaceId: 1, role: 'admin', boxScope: 'all' }
@@ -93,7 +94,7 @@ describe('assertAgentAccess', () => {
         mocks.selectMaybeSingle.mockReset()
     })
 
-    const agent = { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1' }
+    const agent = { id: 'a1', workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }
 
     it('hands back the agent and the level for a member of an open Box', async () => {
         readsAnswering({ agents: agent, spaces: { id: 'box-1', ...openBox } })
@@ -132,27 +133,37 @@ describe('assertAgentAccess', () => {
     })
 })
 
-describe('assertAgentOrForemanAccess', () => {
+describe('assertAgentAccess on the Chief of Staff', () => {
+    const foreman = (workspaceId: number) => ({ id: 'cos-1', workspace_id: workspaceId, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' })
+
     beforeEach(() => {
         mocks.getSessionWorkspace.mockReset()
         mocks.selectMaybeSingle.mockReset()
     })
 
-    it('lets every member use the Chief of Staff and an admin change it, with no agent row read', async () => {
-        await expect(assertAgentOrForemanAccess('foreman', 'use', member('assigned'))).resolves.toEqual(member('assigned'))
-        await expect(assertAgentOrForemanAccess('foreman', 'manage', admin)).resolves.toEqual(admin)
-        await expect(assertAgentOrForemanAccess('foreman', 'manage', workspaceActor(1))).resolves.toEqual(workspaceActor(1))
-        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    it('lets every member use it and an admin change it, by its name or its row', async () => {
+        readsAnswering({ agents: foreman(1) })
+        await expect(assertAgentAccess('foreman', 'use', member('assigned'))).resolves.toMatchObject({ access: 'use', agent: { id: 'cos-1' } })
+        await expect(assertAgentAccess('cos-1', 'use', member('assigned'))).resolves.toMatchObject({ access: 'use' })
+        await expect(assertAgentAccess('foreman', 'manage', admin)).resolves.toMatchObject({ access: 'manage' })
+        await expect(assertAgentAccess('foreman', 'manage', workspaceActor(1))).resolves.toMatchObject({ access: 'manage' })
+        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ id: 'cos-1' })
     })
 
-    it('refuses a change of the Chief of Staff to a member, with a reason it can show', async () => {
-        const error = await assertAgentOrForemanAccess('foreman', 'manage', member('all')).catch(e => e)
+    it('refuses a change of it to a member, with a reason they can show', async () => {
+        readsAnswering({ agents: foreman(1) })
+        const error = await assertAgentAccess('foreman', 'manage', member('all')).catch((e: unknown) => e)
         expect(error).toBeInstanceOf(AccessDeniedError)
     })
 
-    it("holds a coworker to its Box", async () => {
-        readsAnswering({ agents: { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...restrictedBox } })
-        await expect(assertAgentOrForemanAccess('a1', 'use', member('all'))).rejects.toThrow('Coworker not found')
+    it('refuses the one of another workspace', async () => {
+        readsAnswering({ agents: foreman(2) })
+        await expect(assertAgentAccess('cos-1', 'use', admin)).rejects.toThrow('Coworker not found')
+    })
+
+    it('holds a coworker to its Box', async () => {
+        readsAnswering({ agents: { id: 'a1', workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...restrictedBox } })
+        await expect(assertAgentAccess('a1', 'use', member('all'))).rejects.toThrow('Coworker not found')
     })
 })
 
@@ -165,7 +176,7 @@ describe('requireAgentWorkspaceId', () => {
     })
 
     it("holds the Chief of Staff's sign-in to the workspace it started in, not to the one the session last picked", async () => {
-        readsAnswering({ workspace_members: { role: 'admin', box_scope: 'all' } })
+        readsAnswering({ workspace_members: { role: 'admin', box_scope: 'all' }, agents: { id: 'cos-1', workspace_id: 2, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' } })
         await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).resolves.toBe(2)
         const [, table, , filters] = mocks.selectMaybeSingle.mock.calls[0]
         expect(table).toBe('workspace_members')
@@ -173,7 +184,7 @@ describe('requireAgentWorkspaceId', () => {
     })
 
     it('refuses the Chief of Staff to a member of that workspace, and to someone who left it', async () => {
-        readsAnswering({ workspace_members: { role: 'member', box_scope: 'all' } })
+        readsAnswering({ workspace_members: { role: 'member', box_scope: 'all' }, agents: { id: 'cos-1', workspace_id: 2, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' } })
         await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).rejects.toBeInstanceOf(AccessDeniedError)
         readsAnswering({})
         await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).rejects.toThrow('Coworker not found')
@@ -186,7 +197,7 @@ describe('requireAgentWorkspaceId', () => {
     })
 
     it("answers a coworker's own workspace, whatever the sign-in names", async () => {
-        readsAnswering({ agents: { workspace_id: 3, space_id: 'box-1', engine_agent_id: 'e1' }, workspace_members: { role: 'admin', box_scope: 'all' }, spaces: { id: 'box-1', workspace_id: 3, visibility: 'workspace' } })
+        readsAnswering({ agents: { id: 'a1', workspace_id: 3, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }, workspace_members: { role: 'admin', box_scope: 'all' }, spaces: { id: 'box-1', workspace_id: 3, visibility: 'workspace' } })
         await expect(requireAgentWorkspaceId('a1', 'manage', 2)).resolves.toBe(3)
     })
 })
@@ -198,12 +209,13 @@ describe('assertSessionInWorkspace', () => {
         mocks.selectMaybeSingleWithJoins.mockReset()
     })
 
-    const row = (workspaceId: number | null) => ({ id: 'se1', agent_id: 'a1', engine_session_id: 'es1', agent: workspaceId === null ? null : { workspace_id: workspaceId, space_id: 'box-1', engine_agent_id: 'e1' } })
+    const row = (workspaceId: number | null, owner: string | null = null) => ({ id: 'se1', agent_id: 'a1', engine_session_id: 'es1', owner_user_id: owner, agent: workspaceId === null ? null : { workspace_id: workspaceId, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' } })
+    const foremanRow = (owner: string) => ({ id: 'se2', agent_id: 'cos-1', engine_session_id: 'es2', owner_user_id: owner, agent: { workspace_id: 1, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' } })
 
     it('returns a session whose agent sits in a Box the caller reaches, from one read joined to its agent', async () => {
         mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: row(1), error: null })
         readsAnswering({ spaces: { id: 'box-1', ...openBox } })
-        await expect(assertSessionInWorkspace('se1', member('all'))).resolves.toEqual({ id: 'se1', agent_id: 'a1', engine_session_id: 'es1', engine_agent_id: 'e1' })
+        await expect(assertSessionInWorkspace('se1', member('all'))).resolves.toEqual({ id: 'se1', agent_id: 'a1', engine_session_id: 'es1', engine_agent_id: 'e1', owner_user_id: null })
         const [, table, , joins, filters] = mocks.selectMaybeSingleWithJoins.mock.calls[0]
         expect(table).toBe('sessions')
         expect(joins.agent.foreignKey).toBe('agents!sessions_agent_id_fkey')
@@ -224,6 +236,15 @@ describe('assertSessionInWorkspace', () => {
         await expect(assertSessionInWorkspace('se1', admin)).rejects.toBeInstanceOf(AuthorizationError)
         mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: null, error: null })
         await expect(assertSessionInWorkspace('se1', admin)).rejects.toThrow('Session not found')
+    })
+
+    it("opens a conversation with the Chief of Staff to the member who holds it, and to nobody else, an admin or the workspace included", async () => {
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: foremanRow('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', member('assigned'))).resolves.toMatchObject({ id: 'se2', engine_agent_id: 'foreman', owner_user_id: 'u-member' })
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: foremanRow('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', admin)).rejects.toThrow('Session not found')
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: foremanRow('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', workspaceActor(1))).rejects.toThrow('Session not found')
     })
 
     it('refuses an id that is not a uuid as a session that does not exist', async () => {

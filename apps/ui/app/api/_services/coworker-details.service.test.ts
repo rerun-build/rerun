@@ -110,14 +110,14 @@ describe('coworker details', () => {
         await setCoworkerRoutineEnabled(ctx, 'a1', 'trigger', 'stripe', true)
         expect(mocks.updateSchedule).toHaveBeenCalledWith({ host: 'box' }, 'eng-1', 'digest', { enabled: false })
         expect(mocks.updateTrigger).toHaveBeenCalledWith({ host: 'box' }, 'eng-1', 'stripe', { enabled: true })
-        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('a1', actor, 'manage')
+        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('a1', 'manage', actor)
     })
 
     it('reads the routines, skills and files at the use level', async () => {
         mocks.listSchedules.mockResolvedValue([])
         mocks.listTriggers.mockResolvedValue([])
         await listCoworkerRoutines(ctx, 'a1')
-        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('a1', actor)
+        expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('a1', 'use', actor)
     })
 
     it('reads the default rule for a coworker the caller never set', async () => {

@@ -3,7 +3,7 @@
 import { actorFromContext, manageableSpaceIds, visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
@@ -287,7 +287,7 @@ export async function listShareableSkillsAction(): Promise<ShareableSkills[]> {
 
 export async function shareSkillToBrainAction(agentId: string, slug: string): Promise<BrainSkillResult> {
     try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const { coworkers } = await readBoxes()
         const coworker = coworkers.find(item => item.id === agentId)
         const author = `agent:${coworker?.handle ?? coworker?.name ?? engineAgentId}`

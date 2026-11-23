@@ -325,7 +325,7 @@ describe('the Chief of Staff on the engine', () => {
         const res = await pending
         vi.useRealTimers()
         expect(res.status).toBe(409)
-        expect(await expectContract(mobileApi.sendForemanMessage, res, 409)).toEqual({ error: 'run_in_flight', runId: 'run-7', startedAt: '2026-11-19T08:59:30.000Z' })
+        expect(await expectContract(mobileApi.sendForemanMessage, res, 409)).toEqual({ error: 'run_in_flight', runId: 'run-7', startedAt: '2026-11-19T08:59:30.000Z', heldByTeammate: false })
     })
 
     it('answers 409 hub_conversation for a conversation the hub kept', async () => {

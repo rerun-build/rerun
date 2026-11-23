@@ -2,7 +2,7 @@ import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { getAgent } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { getAgentChatTarget } from './chat.service'
+import { resolveAgentTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
 
 const TEAM_READS = {
@@ -20,7 +20,7 @@ export function isTeamHubTool(name: string): name is TeamTool {
 }
 
 async function assertTeamSwitchedOn(callerAgentId: string, actor: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(callerAgentId, 'use', actor)
+    const { conn, engineAgentId } = await resolveAgentTarget(callerAgentId, 'use', actor)
     const { config } = await getAgent(conn, engineAgentId)
     if (!config.tools.team) throw new Error('Reading other coworkers is switched off for this coworker.')
 }

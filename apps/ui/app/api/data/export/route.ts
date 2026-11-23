@@ -1,4 +1,4 @@
-import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import * as engine from '@/lib/engine/client'
 import { rowFilterSchema } from '@rerun/contracts'
@@ -24,7 +24,7 @@ async function read(req: Request) {
 
         const { conn, base } = shared
             ? { conn: await requireWorkspaceConnection(), base: engine.SPACE_DATA_BASE }
-            : await getAgentChatTarget(agentId!).then(t => ({ conn: t.conn, base: engine.agentDataBase(t.engineAgentId) }))
+            : await resolveAgentTarget(agentId!).then(t => ({ conn: t.conn, base: engine.agentDataBase(t.engineAgentId) }))
         const res = await engine.exportDbTable(conn, base, table, { format, sort, dir, q, where })
         if (!res.ok || !res.body) {
             return Response.json({ error: 'Export failed' }, { status: res.status === 404 ? 404 : 502 })

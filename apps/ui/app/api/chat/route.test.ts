@@ -71,7 +71,7 @@ describe('POST /api/chat', () => {
         await settle(POST(request({})))
 
         const actor = { kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' }
-        expect(resolveAgentTarget).toHaveBeenCalledWith('agent', actor)
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent', 'use', actor)
         expect(getExistingSession).toHaveBeenCalledWith(SESSION, actor)
     })
 

@@ -41,7 +41,7 @@ export async function replyAs(actor: Actor, author: MessageAuthor, sessionId: st
     const text = replyTextOf(reply, pending)
     if (!text) throw new ApiError(400, refusal('invalidRequest'))
 
-    const [target, callableAgentIds] = await Promise.all([resolveAgentTarget(session.agentId, actor), callableEngineAgentIds(actor)])
+    const [target, callableAgentIds] = await Promise.all([resolveAgentTarget(session.agentId, 'use', actor), callableEngineAgentIds(actor)])
     if (waitingAs && !(await claimWaitingSession(session.sessionId, waitingAs))) throw alreadyAnswered()
     // An answer the engine did not take gives the card back, a 409 included: were it left working
     // with no run behind it, nothing would ever move it again. A run really under way sets it itself.

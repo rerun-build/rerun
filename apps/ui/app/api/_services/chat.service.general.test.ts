@@ -53,7 +53,7 @@ describe('createSessionRow', () => {
         const refused = await createSessionRow('a1', 'engine-2', 'Hello', null, 'builder', 'general').catch(err => err)
         expect(refused).toBeInstanceOf(GeneralAlreadyOpenError)
         expect(refused.general).toEqual({ id: 'row-first', engineSessionId: 'engine-first' })
-        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ agent_id: 'a1', kind: 'general' })
+        expect(mocks.selectMaybeSingle.mock.calls.at(-1)?.[3]).toEqual({ agent_id: 'a1', kind: 'general' })
     })
 
     it('still fails a thread the database refused', async () => {

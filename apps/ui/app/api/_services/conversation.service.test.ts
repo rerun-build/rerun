@@ -27,7 +27,7 @@ vi.mock('@/lib/chat/engine-history', () => ({ transformEngineMessages: vi.fn() }
 const ctx = { userId: 'admin', role: 'admin', boxScope: 'all', supabase: {}, workspace: { id: 7 } } as unknown as WorkspaceContext
 const memberCtx = { ...ctx, userId: 'member', role: 'member' } as WorkspaceContext
 const adminActor: Actor = { kind: 'user', userId: 'admin', workspaceId: 7, role: 'admin', boxScope: 'all' }
-const reached = (agent = { workspace_id: 7, space_id: 'space-1', engine_agent_id: 'engine-agent' }) => ({ actor: adminActor, access: 'manage' as const, agent })
+const reached = (agent = { id: 'agent-1', workspace_id: 7, kind: 'coworker' as const, space_id: 'space-1', engine_agent_id: 'engine-agent' }) => ({ actor: adminActor, access: 'manage' as const, agent })
 
 function session(agentId: string, id: string, updatedAt: string, status = 'idle') {
     return { id, agent_id: agentId, title: `${id} title`, status, updated_at: updatedAt, created_at: updatedAt, engine_session_id: `engine-${id}`, source: 'dashboard', kind: 'thread' }
@@ -273,7 +273,7 @@ describe('renameSession', () => {
     function sessions(renamed: { id: string }[] = [{ id: 'session-1' }]) {
         const db = fakeSupabase(() => ({ data: renamed }))
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
-        vi.mocked(assertSessionInWorkspace).mockResolvedValue({ id: 'session-1', agent_id: 'a', engine_session_id: 'engine-1', engine_agent_id: 'engine-agent', updated_at: '2026-11-19T08:00:00Z' })
+        vi.mocked(assertSessionInWorkspace).mockResolvedValue({ id: 'session-1', agent_id: 'a', engine_session_id: 'engine-1', engine_agent_id: 'engine-agent', updated_at: '2026-11-19T08:00:00Z', owner_user_id: null })
         return db
     }
 
@@ -403,7 +403,7 @@ describe('adoptEngineSession', () => {
         await expect(adoptEngineSession('agent-1', 'es-1', 'Title')).resolves.toBe('new-session')
 
         expect(assertAgentAccess).toHaveBeenCalledWith('agent-1', 'use', undefined)
-        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', adminActor)
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', 'use', adminActor)
         expect(listSessions).not.toHaveBeenCalled()
 
         expect(vi.mocked(selectMaybeSingle).mock.calls[1][1]).toBe('agents')

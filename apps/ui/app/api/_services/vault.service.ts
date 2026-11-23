@@ -2,7 +2,7 @@ import 'server-only'
 
 import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, serviceRegistryKey, type VaultConflict, type VaultItemSummary, type VaultSkill } from '@rerun/contracts'
 
-import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
+import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultInstance, supportsVaultRename } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
@@ -396,10 +396,6 @@ export async function coworkerVault(agentId: string, actor?: Actor): Promise<Cow
 }
 
 async function vaultHolder(agentId: string, actor: Actor): Promise<{ engineAgentId: string | null; access: BoxAccess }> {
-    if (agentId === FOREMAN_AGENT_ID) {
-        await assertAgentOrForemanAccess(agentId, 'use', actor)
-        return { engineAgentId: FOREMAN_AGENT_ID, access: foremanAccessOf(actor) }
-    }
     const { agent, access } = await assertAgentAccess(agentId, 'use', actor)
     return { engineAgentId: agent.engine_agent_id, access }
 }
