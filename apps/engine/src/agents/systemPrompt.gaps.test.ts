@@ -360,6 +360,31 @@ describe('buildSystemPrompt for the foreman', () => {
         }
         expect(await buildSystemPrompt(agentWith({}))).toContain('You cannot create, rename or delete a coworker')
     })
+
+    // A coworker that had never heard of the Chief of Staff read its absence from team_status as proof
+    // that there was none, and sent people to a field the board does not have (RER-273).
+    it('tells a coworker the workspace has a Chief of Staff that team_status never lists', async () => {
+        const prompt = await buildSystemPrompt(agentWith({}))
+        expect(prompt).toContain('Every workspace comes with a Chief of Staff')
+        expect(prompt).toContain('team_status never lists it')
+        expect(prompt).not.toContain('at the top of the board')
+        expect(await buildSystemPrompt(foreman())).not.toContain('Every workspace comes with a Chief of Staff')
+    })
+
+    const vocabularyOf = async (hub: boolean) => (await buildSystemPrompt(agentWith({ tools: { hub } }))).match(/<vocabulary>[\s\S]*?<\/vocabulary>/)?.[0]
+
+    it('sends a coworker to the documentation search only when it has it, and to the docs site otherwise', async () => {
+        const withHub = await vocabularyOf(true)
+        expect(withHub).toContain('call rerun_hub_search_docs in that same turn')
+        expect(withHub).not.toContain('docs.rerun.build')
+        const withoutHub = await vocabularyOf(false)
+        expect(withoutHub).toContain('https://docs.rerun.build/chief-of-staff')
+        expect(withoutHub).not.toContain('rerun_hub_search_docs')
+    })
+
+    it('does not take every unknown name for the Chief of Staff', async () => {
+        for (const hub of [true, false]) expect(await vocabularyOf(hub)).toContain('Any other name you do not know may be a person or a Box')
+    })
 })
 
 describe('recallContext', () => {

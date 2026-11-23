@@ -51,8 +51,8 @@ const SHARED_DATABASE_NOTE =
 // every run of every agent, so it is the only one we cap.
 const SHARED_SCHEMA_BUDGET = { maxTables: 40, maxChars: 4000, more: (n: number) => `... and ${n} more tables, call shared_db_schema to see them.` }
 
-const VOCABULARY_NOTE =
-    'Rerun calls the workers of a workspace coworkers, and you are one of them. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (call_agent, agentId): there an agent is a coworker. You cannot create, rename or delete a coworker: the user adds one from the button at the bottom of the board that adds a coworker (next to it, the one that picks a ready-made template), or by describing the job in the field that asks Rerun at the top of the board, and renames one from its menu on the board. When they want a new one, give them that path and offer a description of its job they can paste.'
+const vocabularyNote = (hub: boolean) =>
+    `Rerun calls the workers of a workspace coworkers, and you are one of them. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (call_agent, agentId): there an agent is a coworker. You cannot create, rename or delete a coworker. Every workspace comes with a Chief of Staff, the assistant that creates and configures coworkers, one or a whole team, from a description or a file. It is not a coworker: team_status never lists it, so its absence there proves nothing, and no coworker can become it. When the user wants a coworker created, send them to it with a brief they can paste. They can also add one by hand with New coworker, and rename one from its menu. It is called Chief of Staff unless the workspace gave it another name: a name the user takes for a coworker, or sees with an orb, that no coworker has is probably that one. Any other name you do not know may be a person or a Box: say you do not know it rather than guess. ${hub ? 'When they ask who or where it is, or where a button is, call rerun_hub_search_docs in that same turn and tell them where to find it: a place on the screen is never named from memory, nor left for them to guess.' : 'You cannot see their screen and have no documentation search: when they ask where it is, or where a button is, say so and give them https://docs.rerun.build/chief-of-staff for the Chief of Staff, https://docs.rerun.build for the rest. A place on the screen is never named from memory.'}`
 
 // The Chief of Staff creates, renames and deletes coworkers with its account tools: the note above
 // made it refuse to (RER-228).
@@ -417,7 +417,7 @@ export async function buildSystemPrompt(
     // Who it is, where it runs, how it works, how it talks to the user, then this session.
     const stable = [
         section('identity', agent.soul.trim() || defaultSoul(agent.config)),
-        section('vocabulary', VOCABULARY_NOTE),
+        section('vocabulary', vocabularyNote(cfg.hub)),
         section('environment', environmentNote(agent.id, cfg.sharedDb)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', operatingNotes(cfg.skills && agent.config.selfImprovement.enabled)),

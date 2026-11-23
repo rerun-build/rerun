@@ -10,7 +10,7 @@ export function teamTools(ctx: RunContext): ToolSet {
     const call = (name: string, args: Record<string, unknown>) => callHub(ctx.agent, name, args)
     return {
         team_status: tool({
-            description: 'See every coworker of the workspace right now: id, name, handle, status (working, waiting_human, error, idle, offline, switched_off, unconfigured), runs in flight, conversations waiting on a person, and the last finished run with its error. Start here to audit the team. Read-only.',
+            description: 'See every coworker (not the Chief of Staff) right now: id, name, handle, status (working, waiting_human, error, idle, offline, switched_off, unconfigured), runs in flight, conversations waiting on a person, and the last finished run with its error. Start here to audit the team. Read-only.',
             inputSchema: z.object({ agentId: agentId.optional().describe('Optional: restrict to one coworker.') }),
             execute: args => call('team_status', args),
         }),
