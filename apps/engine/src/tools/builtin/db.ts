@@ -33,7 +33,7 @@ export function dbTools(ctx: RunContext): ToolSet {
         }),
         db_execute: tool({
             description:
-                'Execute SQL that changes your private database: CREATE/ALTER/DROP tables, or INSERT/UPDATE/DELETE rows. Pass a single statement in sql, or an ordered list of statements to run together atomically in one transaction (ideal for migrations). Use ? placeholders with params for values.',
+                'Execute SQL that changes your private database: CREATE/ALTER/DROP tables, or INSERT/UPDATE/DELETE rows. Pass one statement in sql, or an ordered list in statements to run atomically in one transaction (a CREATE TABLE and its INSERTs), never both. Use ? placeholders with params for values.',
             inputSchema: z.object({
                 sql: z.string().optional().describe('A single SQL statement to run'),
                 params: paramSchema.describe('Values bound to ? placeholders in sql, in order'),

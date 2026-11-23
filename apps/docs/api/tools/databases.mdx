@@ -62,7 +62,7 @@ Changes the coworker private database: `CREATE`, `ALTER`, `DROP` a table, or `IN
   Several statements applied atomically in one transaction. Each entry needs `sql` and may carry `params`. This is the right way to lay out a whole schema.
 </ParamField>
 
-Pass either `sql` or `statements`. The call fails if you pass neither.
+Pass either `sql` or `statements`, never both. The call fails, and runs nothing, if you pass both or neither.
 
 ```json Request arguments
 {

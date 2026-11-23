@@ -331,6 +331,9 @@ export type ExecuteInput = { sql?: string; params: SqlParam[]; statements?: { sq
 export type ExecuteResult = { statements: number; rowsAffected: number; lastInsertRowid: string | null }
 
 export async function executeStore(client: Client, input: ExecuteInput): Promise<ExecuteResult> {
+    if (input.sql && input.statements && input.statements.length > 0) {
+        throw new Error('Pass either sql or statements, not both: nothing was run. Put every statement in statements, in the order they must run.')
+    }
     if (input.statements && input.statements.length > 0) {
         for (const s of input.statements) assertNoAttach(s.sql)
         const results = await withBusyRetry(() =>

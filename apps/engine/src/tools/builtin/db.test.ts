@@ -51,6 +51,15 @@ describe('db tools', () => {
         expect(await run('db_query', { sql: 'SELECT count(*) AS c FROM notes WHERE n >= 20' })).toBe('1 row(s)\n[{"c":0}]')
     })
 
+    it('refuses sql and statements together and runs neither, instead of dropping sql', async () => {
+        const out = await run('db_execute', {
+            sql: 'CREATE TABLE IF NOT EXISTS books (asin TEXT PRIMARY KEY, title TEXT)',
+            statements: [{ sql: 'INSERT INTO books (asin, title) VALUES (?, ?)', params: ['0486220311', 'Chemistry Experiments for Children'] }],
+        })
+        expect(out).toBe('Execution failed: Pass either sql or statements, not both: nothing was run. Put every statement in statements, in the order they must run.')
+        expect(await run('db_schema', {})).not.toMatch(/books/)
+    })
+
     it('asks for sql or statements when it gets neither', async () => {
         expect(await run('db_execute', {})).toBe('Execution failed: Provide either sql or statements.')
         expect(await run('db_execute', { statements: [] })).toBe('Execution failed: Provide either sql or statements.')

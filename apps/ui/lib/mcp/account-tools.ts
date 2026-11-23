@@ -487,7 +487,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'db_execute',
         description:
-            'Change the coworker private database: CREATE / ALTER / DROP a table, or INSERT / UPDATE / DELETE rows. This is how you give a coworker its tables up front instead of hoping it creates them on its first run. Pass one `sql` statement, or `statements` to run several atomically in a single transaction (the right way to lay out a schema). It is plain SQLite, so column types are TEXT, INTEGER, REAL, BLOB or NUMERIC.',
+            'Change the coworker private database: CREATE / ALTER / DROP a table, or INSERT / UPDATE / DELETE rows. This is how you give a coworker its tables up front instead of hoping it creates them on its first run. Pass one `sql` statement, or `statements` to run several atomically in a single transaction (the right way to lay out a schema), never both. It is plain SQLite, so column types are TEXT, INTEGER, REAL, BLOB or NUMERIC.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -531,7 +531,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'space_db_execute',
         description:
-            'Change the database shared by every coworker of the workspace: CREATE / ALTER / DROP a table, or INSERT / UPDATE / DELETE rows. This is how you lay out the common tables a group of coworkers works from, before any of them runs. Every coworker sees the result immediately, so prefer CREATE TABLE IF NOT EXISTS and do not drop a table the coworkers already fill. Pass one `sql` statement, or `statements` to run several atomically in a single transaction. It is plain SQLite, so column types are TEXT, INTEGER, REAL, BLOB or NUMERIC.',
+            'Change the database shared by every coworker of the workspace: CREATE / ALTER / DROP a table, or INSERT / UPDATE / DELETE rows. This is how you lay out the common tables a group of coworkers works from, before any of them runs. Every coworker sees the result immediately, so prefer CREATE TABLE IF NOT EXISTS and do not drop a table the coworkers already fill. Pass one `sql` statement, or `statements` to run several atomically in a single transaction, never both. It is plain SQLite, so column types are TEXT, INTEGER, REAL, BLOB or NUMERIC.',
         inputSchema: {
             type: 'object',
             properties: {

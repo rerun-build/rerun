@@ -50,7 +50,7 @@ export function sharedDbTools(ctx: RunContext): ToolSet {
         }),
         shared_db_execute: tool({
             description:
-                'Execute SQL that changes the shared database of this space: CREATE/ALTER/DROP tables, or INSERT/UPDATE/DELETE rows. Every coworker of this space sees the result immediately, so always CREATE TABLE IF NOT EXISTS, never drop or alter a table you did not create, and never delete rows you did not insert. Pass a single statement in sql, or an ordered list of statements to run together atomically in one transaction. Use ? placeholders with params for values.',
+                'Execute SQL that changes the shared database of this space: CREATE/ALTER/DROP tables, or INSERT/UPDATE/DELETE rows. Every coworker of this space sees the result immediately, so always CREATE TABLE IF NOT EXISTS, never drop or alter a table you did not create, and never delete rows you did not insert. Pass one statement in sql, or an ordered list in statements to run atomically in one transaction, never both. Use ? placeholders with params for values.',
             inputSchema: z.object({
                 sql: z.string().optional().describe('A single SQL statement to run'),
                 params: paramSchema.describe('Values bound to ? placeholders in sql, in order'),

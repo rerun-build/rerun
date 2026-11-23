@@ -1128,8 +1128,8 @@ A read-only statement (anything that writes is refused). `limit` defaults to 100
 
 ### `POST <base>/execute`
 
-One statement (`sql` + `params`), or several in one batch (`statements: [{ sql, params }]`).
-`ATTACH` is refused.
+One statement (`sql` + `params`), or several in one batch (`statements: [{ sql, params }]`), never
+both: a request with both runs nothing and answers 400. `ATTACH` is refused.
 
 ```json
 { "statements": 1, "rowsAffected": 3, "lastInsertRowid": "42" }
