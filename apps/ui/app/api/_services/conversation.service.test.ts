@@ -544,7 +544,7 @@ describe('listAgentSessions', () => {
     it('reads the newest threads in order with a limit, and the General apart', async () => {
         history({ threads: [session('a', 't1', minutesAgo(5))], general: [{ ...session('a', 'g', minutesAgo(9000)), kind: 'general' }] })
 
-        const entries = await listAgentSessions('a', adminActor)
+        const { entries } = await listAgentSessions('a', adminActor)
 
         expect(historyCall(f => f.kind === 'thread')?.slice(3)).toEqual([{ agent_id: 'a', kind: 'thread', source: undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT])
         expect(entries.map(e => [e.id, e.kind])).toEqual([
@@ -570,7 +570,7 @@ describe('listAgentSessions', () => {
         history({ threads: fullPageOf('schedule'), mirrored: fromPeers.map(s => s.id) })
         vi.mocked(listSessions).mockResolvedValue(fromPeers as never)
 
-        const entries = await listAgentSessions('a', adminActor)
+        const { entries } = await listAgentSessions('a', adminActor)
 
         expect(entries.filter(e => e.id === null)).toEqual([])
         expect(entries).toHaveLength(SESSION_HISTORY_LIMIT)
@@ -580,7 +580,7 @@ describe('listAgentSessions', () => {
         history({ threads: fullPageOf('schedule'), mirrored: [] })
         vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1)), engineSession('too-old', minutesAgo(SESSION_HISTORY_LIMIT + 50)), engineSession('mine', minutesAgo(1), null)] as never)
 
-        const entries = await listAgentSessions('a', adminActor)
+        const { entries } = await listAgentSessions('a', adminActor)
 
         expect(entries.filter(e => e.id === null).map(e => e.engineSessionId)).toEqual(['fresh'])
         expect(entries).toHaveLength(SESSION_HISTORY_LIMIT)
@@ -590,7 +590,7 @@ describe('listAgentSessions', () => {
         history({})
         vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1))] as never)
 
-        expect(await listAgentSessions('a', adminActor, 'automations')).toEqual([])
+        expect((await listAgentSessions('a', adminActor, 'automations')).entries).toEqual([])
     })
 
     it('asks the Box only for a filter that can keep a conversation another coworker opened', async () => {
@@ -609,9 +609,47 @@ describe('listAgentSessions', () => {
         history({})
         vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1))] as never)
 
-        expect(await listAgentSessions('a', adminActor, 'chats')).toEqual([])
+        expect((await listAgentSessions('a', adminActor, 'chats')).entries).toEqual([])
         expect(listSessions).not.toHaveBeenCalled()
-        expect((await listAgentSessions('a', adminActor, 'all')).map(e => e.engineSessionId)).toEqual(['fresh'])
+        expect((await listAgentSessions('a', adminActor, 'all')).entries.map(e => e.engineSessionId)).toEqual(['fresh'])
+    })
+
+    it('reads the next page up to its cursor, without the General again', async () => {
+        const before = minutesAgo(250)
+        history({ threads: [session('a', 'older', minutesAgo(300))], general: [{ ...session('a', 'g', minutesAgo(9000)), kind: 'general' }] })
+
+        const page = await listAgentSessions('a', adminActor, 'all', before)
+
+        expect(historyCall(f => f.kind === 'thread')?.[3]).toMatchObject({ updated_at: { lte: before } })
+        expect(historyCall(f => f.kind === 'general')).toBeUndefined()
+        expect(page).toEqual({ entries: [expect.objectContaining({ id: 'older' })], before: null })
+    })
+
+    it('points to the oldest thread it returns while older ones may remain', async () => {
+        history({ threads: fullPageOf('schedule') })
+        expect((await listAgentSessions('a', adminActor)).before).toBe(minutesAgo(SESSION_HISTORY_LIMIT - 1))
+
+        history({ threads: [session('a', 't1', minutesAgo(5))] })
+        expect((await listAgentSessions('a', adminActor)).before).toBeNull()
+    })
+
+    it('points before the thread a conversation another coworker opened pushed out of the page', async () => {
+        history({ threads: fullPageOf('schedule'), mirrored: [] })
+        vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1))] as never)
+
+        const page = await listAgentSessions('a', adminActor)
+
+        expect(page.entries.map(e => e.engineSessionId)).not.toContain('engine-schedule-199')
+        expect(page.before).toBe(minutesAgo(SESSION_HISTORY_LIMIT - 2))
+    })
+
+    it('past the first page, lists the conversations another coworker opened in its window that have no row yet', async () => {
+        history({ threads: [session('a', 'older', minutesAgo(150))], mirrored: ['adopted'] })
+        vi.mocked(listSessions).mockResolvedValue([engineSession('newer', minutesAgo(50)), engineSession('adopted', minutesAgo(120)), engineSession('lone', minutesAgo(130))] as never)
+
+        const { entries } = await listAgentSessions('a', adminActor, 'all', minutesAgo(100))
+
+        expect(entries.filter(e => e.id === null).map(e => e.engineSessionId)).toEqual(['lone'])
     })
 })
 

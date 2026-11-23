@@ -37,7 +37,8 @@
         "emptyAutomations": "Noch keine Automation.",
         "running": "Läuft",
         "startedBy": "Gestartet von {name}",
-        "moreFor": "Mehr zu {title}"
+        "moreFor": "Mehr zu {title}",
+        "loadOlderFailed": "Ältere Threads konnten nicht geladen werden. Erneut versuchen"
     },
     "agentComputerThumbnail": {
         "working": "Arbeitet an seinem Computer",

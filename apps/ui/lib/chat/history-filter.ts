@@ -4,6 +4,8 @@ import { z } from 'zod'
 export const sessionHistoryFilterSchema = z.enum(['all', 'chats', 'automations'])
 export type SessionHistoryFilter = z.infer<typeof sessionHistoryFilterSchema>
 
+export const historyCursorSchema = z.iso.datetime({ offset: true }).optional()
+
 const AUTOMATED_SOURCES: readonly SessionSource[] = ['schedule', 'trigger']
 
 export const isAutomatedSource = (source: SessionSource) => AUTOMATED_SOURCES.includes(source)

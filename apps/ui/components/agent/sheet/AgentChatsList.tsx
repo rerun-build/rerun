@@ -3,7 +3,7 @@
 import { InboxRow } from '@rerun/ui/inbox'
 import { Badge, ScrollFade } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { adoptEngineSessionAction, listAgentSessionsAction } from '@/app/api/_actions/session.actions'
 import type { SessionHistoryEntry } from '@/app/api/_services/conversation.service'
@@ -13,6 +13,7 @@ import { Chip } from '@/components/ui/chip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAttentionSessions } from '@/hooks/useAttentionSessions'
+import { useLoadMoreOnScroll } from '@/hooks/useLoadMoreOnScroll'
 import { isAutomatedSource, sourcesOf } from '@/lib/chat/history-filter'
 import { CalendarClock, CheckCheckIcon, EllipsisIcon, LoaderIcon, MessageCircle, PencilIcon, PlusIcon, WebhookIcon, XIcon } from '@/lib/icons'
 import { messageDayLabel, messageTime } from '@/lib/time'
@@ -52,22 +53,63 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     // What runs right now comes from the board's live statuses, not from the history.
     const sessions = useBoardStore(s => s.sessions)
 
-    // Each chip reads its own newest conversations: a busy coworker has far more than one page.
+    // Each chip reads its own newest conversations, then the older ones a page at a time as the list
+    // scrolls: a busy coworker has thousands of them.
     const historyFilter = filter === 'needs' ? null : filter
+    const [olderBefore, setOlderBefore] = useState<string | null>(null)
+    const [loadingOlder, setLoadingOlder] = useState(false)
+    const [olderFailed, setOlderFailed] = useState(false)
+    // Bumped when the chip changes, so a page asked for the previous chip is dropped on arrival.
+    const requestRef = useRef(0)
+    const loadingOlderRef = useRef(false)
+    const scrollRef = useRef<HTMLDivElement | null>(null)
+    const sentinelRef = useRef<HTMLDivElement | null>(null)
+
     useEffect(() => {
         if (!historyFilter) return
-        let alive = true
+        const request = ++requestRef.current
         listAgentSessionsAction(agentId, historyFilter)
-            .then(entries => alive && setHistory(entries))
-            .catch(() => alive && setHistory([]))
-        return () => {
-            alive = false
-        }
+            .then(page => {
+                if (requestRef.current !== request) return
+                setHistory(page.entries)
+                setOlderBefore(page.before)
+            })
+            .catch(() => requestRef.current === request && setHistory([]))
     }, [agentId, historyFilter])
     const chooseFilter = (next: ChatsFilter) => {
-        if (next !== filter && next !== 'needs') setHistory(null)
+        if (next !== filter) requestRef.current++
+        if (next !== filter && next !== 'needs') {
+            setHistory(null)
+            setOlderBefore(null)
+            setOlderFailed(false)
+        }
         setFilter(next)
     }
+
+    const loadOlder = useCallback(async () => {
+        if (!historyFilter || !olderBefore || loadingOlderRef.current) return
+        loadingOlderRef.current = true
+        setLoadingOlder(true)
+        const request = requestRef.current
+        try {
+            const page = await listAgentSessionsAction(agentId, historyFilter, olderBefore)
+            if (requestRef.current !== request) return
+            // The thread on the edge of two pages comes back on both.
+            const known = new Set((history ?? []).map(entry => entry.engineSessionId))
+            const older = page.entries.filter(entry => entry.kind !== 'general' && !known.has(entry.engineSessionId))
+            setHistory(entries => {
+                const loaded = new Set((entries ?? []).map(entry => entry.engineSessionId))
+                return [...(entries ?? []), ...older.filter(entry => !loaded.has(entry.engineSessionId))]
+            })
+            setOlderBefore(older.length > 0 ? page.before : null)
+        } catch {
+            if (requestRef.current === request) setOlderFailed(true)
+        } finally {
+            loadingOlderRef.current = false
+            setLoadingOlder(false)
+        }
+    }, [agentId, historyFilter, olderBefore, history])
+    useLoadMoreOnScroll({ sentinelRef, rootRef: scrollRef, enabled: !!historyFilter && history !== null && !!olderBefore && !loadingOlder && !olderFailed, loaded: history?.length ?? 0, loadMore: loadOlder })
 
     const waitingIds = useMemo(() => new Set(attention.map(item => item.id)), [attention])
     const runningIds = useMemo(() => new Set(sessions.filter(s => s.agentId === agentId && s.status === 'working').map(s => s.id)), [sessions, agentId])
@@ -150,7 +192,7 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                     </ConfirmDialog>
                 )}
             </div>
-            <ScrollFade className="max-h-[420px] min-h-0 px-2 pb-2">
+            <ScrollFade scrollRef={scrollRef} className="max-h-[420px] min-h-0 px-2 pb-2">
                 <div className="space-y-0.5">
                     {(filter === 'all' || filter === 'needs') &&
                         inboxItems.map(item => <InboxRow key={item.id} item={item} onOpen={() => onSelect(item.id, item.title)} onMarkRead={() => setSessionStatus(item.id, 'idle')} />)}
@@ -171,6 +213,18 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                                         rename={rename}
                                     />
                                 ))}
+                            </div>
+                        ))}
+                    {listsHistory &&
+                        history !== null &&
+                        olderBefore &&
+                        (olderFailed ? (
+                            <Button variant="ghost" size="sm" className="mx-auto my-1 flex h-auto whitespace-normal text-center text-xs text-muted-foreground" onClick={() => setOlderFailed(false)}>
+                                {t('loadOlderFailed')}
+                            </Button>
+                        ) : (
+                            <div ref={sentinelRef} className="min-h-px">
+                                {loadingOlder && <ChatsSkeleton rows={2} />}
                             </div>
                         ))}
                     {filter === 'all' && history !== null && shown.length === 0 && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyThreads')}</p>}
@@ -274,10 +328,10 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: ChatRowPro
 
 const SKELETON_WIDTHS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-3/5']
 
-export function ChatsSkeleton() {
+export function ChatsSkeleton({ rows = SKELETON_WIDTHS.length }: { rows?: number }) {
     return (
         <>
-            {SKELETON_WIDTHS.map((width, i) => (
+            {SKELETON_WIDTHS.slice(0, rows).map((width, i) => (
                 <div key={i} className="flex items-center gap-2.5 px-2.5 py-2.5">
                     <Skeleton className={cn('h-3.5', width)} />
                     <Skeleton className="ml-auto h-3 w-6 shrink-0" />

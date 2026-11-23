@@ -37,7 +37,8 @@
         "emptyAutomations": "Nenhuma automação ainda.",
         "running": "Em execução",
         "startedBy": "Iniciado por {name}",
-        "moreFor": "Mais opções de {title}"
+        "moreFor": "Mais opções de {title}",
+        "loadOlderFailed": "Não foi possível carregar os tópicos mais antigos. Tentar novamente"
     },
     "agentComputerThumbnail": {
         "working": "Trabalhando no computador",

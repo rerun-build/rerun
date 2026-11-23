@@ -37,7 +37,8 @@
         "emptyAutomations": "Aucune exécution automatique pour l’instant.",
         "running": "En cours",
         "startedBy": "Lancé par {name}",
-        "moreFor": "Plus d’actions pour {title}"
+        "moreFor": "Plus d’actions pour {title}",
+        "loadOlderFailed": "Impossible de charger les fils plus anciens. Réessayer"
     },
     "agentComputerThumbnail": {
         "working": "Travaille sur son ordinateur",

@@ -127,7 +127,8 @@
         "emptyAutomations": "No automated run yet.",
         "running": "Running",
         "startedBy": "Started by {name}",
-        "moreFor": "More for {title}"
+        "moreFor": "More for {title}",
+        "loadOlderFailed": "Couldn't load older threads. Try again"
     },
     "agentComputerThumbnail": {
         "working": "Working on its computer",

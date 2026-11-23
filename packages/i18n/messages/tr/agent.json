@@ -37,7 +37,8 @@
         "emptyAutomations": "Henüz otomatik çalıştırma yok.",
         "running": "Çalışıyor",
         "startedBy": "Başlatan: {name}",
-        "moreFor": "Diğer işlemler: {title}"
+        "moreFor": "Diğer işlemler: {title}",
+        "loadOlderFailed": "Eski konular yüklenemedi. Tekrar dene"
     },
     "agentComputerThumbnail": {
         "working": "Bilgisayarında çalışıyor",

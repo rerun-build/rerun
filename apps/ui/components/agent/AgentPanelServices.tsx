@@ -1,6 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
+import { useLoadMoreOnScroll } from '@/hooks/useLoadMoreOnScroll'
 import { FOREMAN_AGENT_ID, parseServiceRegistryKey } from '@rerun/contracts'
 
 import { getServiceAlternativesAction, getServiceDetailsAction, installServiceAction, listCatalogServicesAction, resetServiceConnectionAction, searchServicesAction, uninstallServiceAction } from '@/app/api/_actions/services.actions'
@@ -360,16 +361,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         [browseServices, statusBySlug],
     )
 
-    // Load more browse pages while the sentinel is visible. The observer is recreated whenever
-    // the loaded set grows so it re-fires when a short page leaves the sentinel still in view.
-    useEffect(() => {
-        if (isSearchActive || !browseHasMore) return
-        const el = sentinelRef.current
-        if (!el) return
-        const io = new IntersectionObserver(entries => entries[0].isIntersecting && loadMoreBrowse(), { rootMargin: '200px' })
-        io.observe(el)
-        return () => io.disconnect()
-    }, [isSearchActive, browseHasMore, browseServices.length, loadMoreBrowse])
+    useLoadMoreOnScroll({ sentinelRef, enabled: !isSearchActive && browseHasMore, loaded: browseServices.length, loadMore: loadMoreBrowse })
 
     const signInUrl = customStep?.kind === 'connect' ? customStep.server.signInUrl : null
     if (customStep?.kind === 'connect' && signInUrl) {

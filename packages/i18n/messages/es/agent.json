@@ -37,7 +37,8 @@
         "emptyAutomations": "Aún no hay ejecuciones automáticas.",
         "running": "En curso",
         "startedBy": "Iniciado por {name}",
-        "moreFor": "Más opciones de {title}"
+        "moreFor": "Más opciones de {title}",
+        "loadOlderFailed": "No se pudieron cargar los hilos anteriores. Reintentar"
     },
     "agentComputerThumbnail": {
         "working": "Trabajando en su computadora",

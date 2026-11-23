@@ -38,13 +38,17 @@ export type SessionHistoryEntry = {
 const HISTORY_COLUMNS = ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const
 
 // PostgREST caps a select at 1000 rows, and a busy coworker runs thousands of routines: the history
-// is the newest threads of the filter, read in order.
+// is read a page of the newest threads of the filter at a time.
 export const SESSION_HISTORY_LIMIT = 200
+
+// `before` reads the next page: the threads updated at or before it, the one on the edge coming back
+// on both pages. Null once there is nothing older.
+export type SessionHistoryPage = { entries: SessionHistoryEntry[]; before: string | null }
 
 // Session history for an agent: Supabase-mirrored sessions merged with
 // engine-only sessions that were initiated by another agent (call_agent),
 // so those show up in the history like regular ones until adopted.
-export async function listAgentSessions(agentId: string, actor?: Actor, filter: SessionHistoryFilter = 'all'): Promise<SessionHistoryEntry[]> {
+export async function listAgentSessions(agentId: string, actor?: Actor, filter: SessionHistoryFilter = 'all', before?: string): Promise<SessionHistoryPage> {
     const { actor: caller } = await assertAgentAccess(agentId, 'use', actor)
 
     const supabase = createServiceRoleClient()
@@ -54,8 +58,8 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
     const readsEngine = !sources || sources.includes('agent')
 
     const [threads, general, target] = await Promise.all([
-        selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'thread', source: sources }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
-        filter === 'all' ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'general' }) : { data: [], error: null },
+        selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'thread', source: sources, updated_at: before ? { lte: before } : undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
+        filter === 'all' && !before ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'general' }) : { data: [], error: null },
         readsEngine ? resolveAgentTarget(agentId, caller).catch(() => null) : null,
     ])
     if (threads.error) throw threads.error
@@ -63,7 +67,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
     const supabaseRows = [...(general.data ?? []), ...threadRows]
 
     const engineSessions = target ? await listSessions(target.conn, target.engineAgentId).catch(() => []) : []
-    const unmirrored = await engineOnlySessions(supabase, agentId, engineSessions, threadRows, sources)
+    const unmirrored = await engineOnlySessions(supabase, agentId, engineSessions, threadRows, sources, before)
 
     const engineOriginIds = [...new Set(unmirrored.map(s => s.originAgentId).filter((v): v is string => !!v))]
     const supabaseOriginIds = [...new Set(supabaseRows.map(r => r.origin_agent_id).filter((v): v is string => !!v))]
@@ -118,20 +122,32 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
     ]
 
     const byNewest = (a: SessionHistoryEntry, b: SessionHistoryEntry) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    const newestThreads = entries.filter(entry => entry.kind !== 'general').sort(byNewest).slice(0, SESSION_HISTORY_LIMIT)
-    return [...entries.filter(entry => entry.kind === 'general'), ...newestThreads].sort(byNewest)
+    const allThreads = entries.filter(entry => entry.kind !== 'general').sort(byNewest)
+    const newestThreads = allThreads.slice(0, SESSION_HISTORY_LIMIT)
+    // What the cut leaves out is older than the last thread kept, so the next page brings it back.
+    const hasOlder = threadRows.length === SESSION_HISTORY_LIMIT || allThreads.length > SESSION_HISTORY_LIMIT
+    return {
+        entries: [...entries.filter(entry => entry.kind === 'general'), ...newestThreads].sort(byNewest),
+        before: hasOlder ? (newestThreads.at(-1)?.updatedAt ?? null) : null,
+    }
 }
 
-// The engine's sessions another coworker opened on this one that have no row yet. When the page is
-// full it holds only the newest rows, so an engine session older than the page is left out, and the
-// ones inside its window are checked against the table rather than against the page.
-async function engineOnlySessions(supabase: SupabaseClient<Database>, agentId: string, engineSessions: EngineSession[], page: { engine_session_id: string; updated_at: string }[], sources: SessionSource[] | undefined): Promise<EngineSession[]> {
+// The engine's sessions another coworker opened on this one that have no row yet, within the page:
+// not newer than `before`, and not older than its oldest row when the page is full (the next one
+// reads those). Past the first page, or on a full one, the page is not every row of the filter, so
+// the candidates are checked against the table rather than against the page.
+async function engineOnlySessions(supabase: SupabaseClient<Database>, agentId: string, engineSessions: EngineSession[], page: { engine_session_id: string; updated_at: string }[], sources: SessionSource[] | undefined, before: string | undefined): Promise<EngineSession[]> {
     const onPage = new Set(page.map(row => row.engine_session_id))
-    const candidates = engineSessions.filter(s => s.originAgentId && !onPage.has(s.id) && (!sources || sources.includes(s.source)))
-    if (page.length < SESSION_HISTORY_LIMIT || candidates.length === 0) return candidates
+    const newest = before ? new Date(before).getTime() : Infinity
+    const candidates = engineSessions.filter(s => s.originAgentId && !onPage.has(s.id) && (!sources || sources.includes(s.source)) && new Date(s.updatedAt).getTime() <= newest)
+    const pageFull = page.length === SESSION_HISTORY_LIMIT
+    if ((!pageFull && !before) || candidates.length === 0) return candidates
 
-    const oldest = Math.min(...page.map(row => new Date(row.updated_at).getTime()))
-    const inWindow = candidates.filter(s => new Date(s.updatedAt).getTime() >= oldest).slice(0, SESSION_HISTORY_LIMIT)
+    const oldest = pageFull ? Math.min(...page.map(row => new Date(row.updated_at).getTime())) : -Infinity
+    const inWindow = candidates
+        .filter(s => new Date(s.updatedAt).getTime() >= oldest)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        .slice(0, SESSION_HISTORY_LIMIT)
     if (inWindow.length === 0) return []
     const { data, error } = await selectMany(supabase, 'sessions', ['engine_session_id'] as const, { agent_id: agentId, engine_session_id: inWindow.map(s => s.id) })
     if (error) throw error
@@ -184,7 +200,7 @@ export async function listAgentThreads(agentId: string, actor?: Actor): Promise<
 // The app's list of a coworker's conversations: the history, plus what the inbox knows of each one,
 // whether a run finished since the caller last opened it, and what a waiting one asks.
 export async function listAgentConversations(ctx: WorkspaceContext, agentId: string): Promise<Conversation[]> {
-    const entries = await listAgentSessions(agentId, actorFromContext(ctx))
+    const { entries } = await listAgentSessions(agentId, actorFromContext(ctx))
     const waiting = entries.flatMap(entry => (entry.id && needsHuman(entry.status) ? [{ id: entry.id, agent_id: entry.agentId, engine_session_id: entry.engineSessionId, title: entry.title, updated_at: entry.updatedAt }] : []))
     const filter = attentionNotificationsFilter(waiting)
 
