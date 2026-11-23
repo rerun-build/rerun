@@ -255,6 +255,17 @@ describe('prepareRunHistory', () => {
         expect(state.prompts).toHaveLength(1)
     })
 
+    it('points the checkpoint at the last row summarised when a stored turn is left out', async () => {
+        const [first, ...rest] = longHistory()
+        state.rows = [first, { ...row(0, 'assistant', [{ type: 'reasoning', text: 'cut while thinking' }]), id: 'cut' }, ...rest]
+        const { ctx, writes } = context()
+
+        await prepareRunHistory(ctx, 'system')
+
+        expect((state.saved[0] as { throughMessageId: string }).throughMessageId).toBe('m9')
+        expect(writes[1].data.messagesCompacted).toBe(10)
+    })
+
     it('folds the prior summary into the new one and points the checkpoint at the right row', async () => {
         state.checkpoint = { summaryJson: JSON.stringify({ role: 'user', content: 'EARLIER SUMMARY' }), throughCreatedAt: 't' }
         state.rows = longHistory()

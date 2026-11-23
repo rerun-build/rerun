@@ -164,12 +164,13 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
     const cp = await getLatestCheckpoint(agentId, ctx.sessionId)
     const rows = await listMessagesAfter(agentId, ctx.sessionId, cp?.throughCreatedAt)
     const priorSummary: ModelMessage | null = cp ? (JSON.parse(cp.summaryJson) as ModelMessage) : null
-    const live: ModelMessage[] = rows.flatMap(r => {
+    const live = rows.flatMap(r => {
         const message = withoutQuickRepliesCalls(withoutReasoning({ role: r.role, content: JSON.parse(r.contentJson) } as ModelMessage))
         if (!message || (Array.isArray(message.content) && message.content.length === 0)) return []
-        return [signSenders ? signHistoryMessage(message, r) : message]
+        return [{ row: r, message: signSenders ? signHistoryMessage(message, r) : message }]
     })
-    const working = priorSummary ? [priorSummary, ...live] : live
+    const liveMessages = live.map(entry => entry.message)
+    const working = priorSummary ? [priorSummary, ...liveMessages] : liveMessages
 
     const contextWindow = runContextWindow(ctx.model, ctx.provider, ctx.agent.resolved.connection)
     if (!contextWindow) return working
@@ -177,8 +178,8 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
 
     const offset = priorSummary ? 1 : 0
     const tailStart = tailStartIndex(working, COMPACTION_TAIL_TOKEN_BUDGET)
-    const newThroughRowIndex = tailStart - 1 - offset
-    if (newThroughRowIndex < 0) return working
+    const newThroughIndex = tailStart - 1 - offset
+    if (newThroughIndex < 0) return working
 
     const checkpointId = newId()
     ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'running' } })
@@ -190,13 +191,13 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
         const summary = await summarizeMiddle(ctx, override, middle)
         await recordCompactionUsage(ctx, 0, summary)
         const summaryMessage = summaryMessageOf(SUMMARY_PREAMBLE, summary.text)
-        const throughRow = rows[newThroughRowIndex]
+        const throughRow = live[newThroughIndex].row
         await saveCheckpoint(agentId, ctx.sessionId, { summaryMessage, throughMessageId: throughRow.id, throughCreatedAt: throughRow.createdAt })
 
         const view = repairToolPairs([summaryMessage, ...tail])
         const tokensRecovered = Math.max(0, estimateTokens(middle) - estimateTokens([summaryMessage]))
-        ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'done', messagesCompacted: newThroughRowIndex + 1, tokensRecovered } })
-        ctx.logger.info({ agent: agentId, session: ctx.sessionId, messagesCompacted: newThroughRowIndex + 1, tokensRecovered, usage: summary.usage }, 'context compacted')
+        ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'done', messagesCompacted: newThroughIndex + 1, tokensRecovered } })
+        ctx.logger.info({ agent: agentId, session: ctx.sessionId, messagesCompacted: newThroughIndex + 1, tokensRecovered, usage: summary.usage }, 'context compacted')
         return view
     } catch (error) {
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'error' } })

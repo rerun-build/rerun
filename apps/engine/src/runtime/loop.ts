@@ -566,7 +566,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
         const toolChars = toolPayloadChars(sentTools)
         const stored = await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars)
-        const history = repairToolPairs(OPENAI_CHAT_PROVIDERS.has(provider) ? withToolResultsInToolMessages(stored) : stored)
+        const history = repairToolPairs(OPENAI_CHAT_PROVIDERS.has(behaviourOf(provider, model)) ? withToolResultsInToolMessages(stored) : stored)
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
