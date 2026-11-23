@@ -7,7 +7,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-system-prompt-
 const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
 const { SKILL_STYLE } = await import('../skills/style.js')
-const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, relayedBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
+const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, calledByBlock, currentTimeNote, nowBlock, relayedBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
 
 // The tests read the prompt as the model does, both blocks joined.
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
@@ -289,6 +289,34 @@ describe('current time', () => {
         expect(relayedBlock({ id: 'u1', via: 'foreman' })).toContain('sent this message, answering')
         expect(relayedBlock({ id: 'u1', name: 'Ada' })).toBe('')
         expect(relayedBlock(undefined)).toBe('')
+    })
+
+    it('tells a called coworker who calls it, and that the user did not write the message', () => {
+        const waited = calledByBlock({ source: 'chat', calledBy: { id: 'agent-a', name: 'executive_assistant', waiting: true } })
+        expect(waited).toMatch(/^<called_by>\nYour colleague executive_assistant \(id: agent-a\), a coworker of this workspace, sent this message with call_agent/)
+        expect(waited).toContain('The user did not write it')
+        expect(waited).toContain('your final message is returned to it')
+        expect(waited).toContain('Never call it back to check that it sent this')
+        expect(waited).not.toContain('only when your instructions ask you to report to it')
+
+        const dispatched = calledByBlock({ source: 'chat', calledBy: { id: 'agent-a', name: 'executive_assistant', waiting: false } })
+        expect(dispatched).not.toContain('is returned to it')
+        expect(dispatched).toContain('not waiting for an answer')
+        expect(dispatched).toContain('only when your instructions ask you to report to it')
+        expect(dispatched).toContain('Never call it back to check that it sent this')
+    })
+
+    it('calls the Chief of Staff by the name coworkers know it by, and never asks them to call it back', () => {
+        const block = calledByBlock({ source: 'chat', calledBy: { id: 'foreman', name: 'foreman', waiting: false } })
+        expect(block).toMatch(/^<called_by>\nThe Chief of Staff of the workspace sent this message with call_agent/)
+        expect(block).not.toContain('id: foreman')
+        expect(block).not.toMatch(/call it back/i)
+    })
+
+    it('says nothing of a caller when the user, a schedule or a relayed answer started the turn', () => {
+        expect(calledByBlock({ source: 'chat' })).toBe('')
+        expect(calledByBlock({ source: 'chat', author: { id: 'u1', via: 'foreman' } })).toBe('')
+        expect(calledByBlock({ source: 'schedule', slug: 's', name: 'S' })).toBe('')
     })
 })
 

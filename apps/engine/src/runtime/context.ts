@@ -7,11 +7,14 @@ import type { Logger } from '../lib/logger.js'
 import type { HostBreaker } from '../tools/host-breaker.js'
 import type { ScreenshotStore } from './screenshots.js'
 
+// The coworker that started the run with call_agent. `waiting`: it blocks on the answer.
+export type CalledBy = { id: string; name: string; waiting: boolean }
+
 // `checkin`: the Chief of Staff woke on its own (checkins/run.ts). Its session keeps the `schedule`
 // source, which the published apps know; only the run's `trigger_source` says `checkin`. `slug` and
 // `name` are those of the routine that asked for it, or the check-in's own.
 export type RunTrigger =
-    | { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string }
+    | { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: CalledBy }
     | { source: 'schedule'; slug: string; name: string }
     | { source: 'trigger'; slug: string; name: string }
     | { source: 'job'; computer: string; jobId: string }

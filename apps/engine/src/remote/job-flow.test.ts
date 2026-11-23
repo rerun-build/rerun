@@ -157,7 +157,7 @@ describe('runsUnattended', () => {
     it('counts the end of a job as a run with no one in the chat', () => {
         expect(runsUnattended({ source: 'job', computer: 'studio-pc', jobId: 'j' })).toBe(true)
         expect(runsUnattended({ source: 'schedule', slug: 's', name: 'S' })).toBe(true)
-        expect(runsUnattended({ source: 'chat', calledBy: 'agent-2' })).toBe(true)
+        expect(runsUnattended({ source: 'chat', calledBy: { id: 'agent-2', name: 'Bob', waiting: false } })).toBe(true)
         expect(runsUnattended({ source: 'chat' })).toBe(false)
     })
 })

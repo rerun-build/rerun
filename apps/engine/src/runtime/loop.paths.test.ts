@@ -202,6 +202,27 @@ describe('run loop paths', () => {
         clearBudgetLatch()
     })
 
+    describe('a run another coworker started', () => {
+        const lastUserTurn = (call: Record<string, unknown>) => JSON.stringify((call.prompt as Array<{ role: string }>).filter(m => m.role === 'user').at(-1))
+
+        it('shows the model who called it, stored with the turn as context', async () => {
+            stream.parts = textTurn('Done.')
+            const { sessionId } = await run('Execute row 1', { agentId: quietId, trigger: { source: 'chat', calledBy: { id: 'agent-a', name: 'executive_assistant', waiting: false } } })
+
+            expect(lastUserTurn(stream.calls[0])).toContain('<called_by>')
+            expect(lastUserTurn(stream.calls[0])).toContain('executive_assistant (id: agent-a)')
+            const parts = JSON.parse((await listMessages(quietId, sessionId)).find(m => m.role === 'user')!.contentJson) as Array<{ text: string; providerOptions?: { rerun?: { context?: boolean } } }>
+            expect(parts[0].text).toBe('Execute row 1')
+            expect(parts.find(part => part.text.includes('<called_by>'))?.providerOptions?.rerun?.context).toBe(true)
+        })
+
+        it('leaves a turn of the user without it', async () => {
+            stream.parts = textTurn('Done.')
+            await run('Execute row 1', { agentId: quietId, trigger: { source: 'chat' } })
+            expect(lastUserTurn(stream.calls[0])).not.toContain('called_by')
+        })
+    })
+
     describe('MCP tools held back', () => {
         type ToolPart = { type: string; toolName: string; input?: unknown; output?: unknown }
         const ran: Array<{ tool: string; args: unknown }> = []

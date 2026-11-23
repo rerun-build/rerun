@@ -1,5 +1,5 @@
 import { remoteComputersNote } from './remote-computers-note.js'
-import { contextTexts, type MessageAuthor, type Provider, type Verbosity } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, contextTexts, type MessageAuthor, type Provider, type Verbosity } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { buildSkillIndex } from '../skills/index.js'
 import { buildScheduleIndex } from '../schedules/index.js'
@@ -191,6 +191,18 @@ export function relayedBlock(author: MessageAuthor | undefined): string {
     if (author?.via !== 'foreman') return ''
     const forWhom = author.name ? ` for ${author.name}` : ''
     return section('relayed', `The Chief of Staff of the workspace sent this message${forWhom}, answering in their name what you asked them. Take it as their answer, and say it came through the Chief of Staff when you report back to them.`)
+}
+
+// A coworker called by another one gets its message as a user turn: without this it reads its
+// colleague as the user, refuses what only that colleague may ask, and calls it back to check.
+export function calledByBlock(trigger: RunTrigger): string {
+    if (trigger.source !== 'chat' || !trigger.calledBy) return ''
+    const { id, name, waiting } = trigger.calledBy
+    const byForeman = id === FOREMAN_AGENT_ID
+    const caller = byForeman ? 'The Chief of Staff of the workspace' : `Your colleague ${name} (id: ${id}), a coworker of this workspace,`
+    const answer = waiting ? 'It is waiting: your final message is returned to it, so answer there.' : `It is not waiting for an answer.${byForeman ? '' : ' Call it back only when your instructions ask you to report to it.'}`
+    const noCheck = byForeman ? '' : ' Never call it back to check that it sent this.'
+    return section('called_by', `${caller} sent this message with call_agent. The user did not write it and is not in this conversation. ${answer}${noCheck}`)
 }
 
 export function nowBlock(now: Date = new Date()): string {

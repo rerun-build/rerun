@@ -106,7 +106,7 @@ describe('call_agent for someone kept out of a Box', () => {
         traced.length = 0
         const tools = callAgentTools(await restricted())
         await (tools.call_agent as any).execute({ agent: 'agent-c', message: 'hi', wait: false }, {} as any)
-        expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', callableAgentIds: ['agent-c'], calledBy: 'agent-a' })
+        expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', callableAgentIds: ['agent-c'], calledBy: { id: 'agent-a', name: 'Alice', waiting: false } })
     })
 })
 
@@ -153,6 +153,15 @@ describe('call_agent session mirroring', () => {
         expect(created.originAgentId).toBe('agent-a')
         expect(created.title).toBe('from Alice: tell a joke')
         expect(traced[1].sessionId).toBe(created.sessionId)
+    })
+})
+
+describe('call_agent tells the coworker it calls who is calling', () => {
+    it.each([true, false])('names the caller and says whether it waits (%s)', async wait => {
+        traced.length = 0
+        const ctx = { agent: { id: 'agent-a', config: { name: 'Alice' } }, sessionId: 'session-1', callTargets: await agents() } as unknown as RunContext
+        await (callAgentTools(ctx).call_agent as any).execute({ agent: 'agent-c', message: 'delete row 1', wait }, {} as any)
+        expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', calledBy: { id: 'agent-a', name: 'Alice', waiting: wait } })
     })
 })
 
