@@ -172,6 +172,16 @@ describe('skills section', () => {
         expect(without).not.toContain('The card never carries your explanation')
     })
 
+    it('takes a skipped question as an answer, never as a go-ahead', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ askUser: true }), { source: 'chat' })
+        const section = prompt.slice(prompt.indexOf('<asking_the_user>'), prompt.indexOf('</asking_the_user>'))
+        expect(section).toContain('a skip is never a yes: state in one line the assumption you made in its place, deliver what they asked for')
+        expect(section).toContain('When it was a question (is this possible, did it work), answer it from what you know and what you can read, then end the turn')
+        expect(section).toContain('Until they ask for something to be built, every tool call after a skip only reads')
+        expect(section).toContain('even as a test you would clean up, is building what they did not ask for')
+        expect(section).toContain('Nothing is built, created, run or scheduled that they did not ask for')
+    })
+
     it('places the card below the message, whichever comes first in the reply', async () => {
         for (const provider of ['claude', 'codex'] as const) {
             const prompt = await buildSystemPrompt(agentWith({ askUser: true }), { source: 'chat' }, provider)
