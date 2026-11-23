@@ -297,7 +297,7 @@ export async function membersReachingBox(supabase: ServiceRoleClient, workspaceI
 // and the source that tells a cron from a chat. Every id is checked against the workspace members
 // who reach the coworker's Box, so an engine can never route a notification to someone outside it,
 // nor to a member the Box is closed to.
-async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number, agent: { id: string; space_id: string } | null, notification: StoredNotification): Promise<Audience> {
+async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number, agent: { id: string; space_id: string | null } | null, notification: StoredNotification): Promise<Audience> {
     const agentId = agent?.id ?? null
     const [{ data: session }, { data: memberships }] = await Promise.all([
         agentId && notification.sessionId ? selectMaybeSingle(supabase, 'sessions', ['id', 'source'] as const, { agent_id: agentId, engine_session_id: notification.sessionId }) : Promise.resolve({ data: null }),

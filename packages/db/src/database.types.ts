@@ -104,11 +104,12 @@ export type Database = {
           engine_agent_id: string | null
           handle: string | null
           id: string
+          kind: Database["public"]["Enums"]["agent_kind"]
           look: Json | null
           name: string
           row: number
           sidebar_order: number | null
-          space_id: string
+          space_id: string | null
           status: Database["public"]["Enums"]["agent_status"]
           template_id: string | null
           workspace_id: number
@@ -123,11 +124,12 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["agent_kind"]
           look?: Json | null
           name: string
           row?: number
           sidebar_order?: number | null
-          space_id: string
+          space_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
           workspace_id: number
@@ -142,11 +144,12 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["agent_kind"]
           look?: Json | null
           name?: string
           row?: number
           sidebar_order?: number | null
-          space_id?: string
+          space_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
           workspace_id?: number
@@ -2635,6 +2638,7 @@ export type Database = {
           last_message_author_id: string | null
           last_message_from: string | null
           origin_agent_id: string | null
+          owner_user_id: string | null
           outcome: Database["public"]["Enums"]["session_outcome"] | null
           source: Database["public"]["Enums"]["session_source"]
           status: Database["public"]["Enums"]["session_status"]
@@ -2654,6 +2658,7 @@ export type Database = {
           last_message_author_id?: string | null
           last_message_from?: string | null
           origin_agent_id?: string | null
+          owner_user_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
           source?: Database["public"]["Enums"]["session_source"]
           status?: Database["public"]["Enums"]["session_status"]
@@ -2673,6 +2678,7 @@ export type Database = {
           last_message_author_id?: string | null
           last_message_from?: string | null
           origin_agent_id?: string | null
+          owner_user_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
           source?: Database["public"]["Enums"]["session_source"]
           status?: Database["public"]["Enums"]["session_status"]
@@ -2699,6 +2705,13 @@ export type Database = {
             columns: ["origin_agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_owner_user_id_fkey"
+            columns: ["owner_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -4328,6 +4341,7 @@ export type Database = {
       visible_space_ids: { Args: never; Returns: string[] }
     }
     Enums: {
+      agent_kind: "coworker" | "foreman"
       account_role: "member" | "expert"
       agent_service_status: "active" | "needs_config" | "error"
       agent_status: "idle" | "working" | "error" | "waiting_human" | "offline"
@@ -4530,6 +4544,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_kind: ["coworker", "foreman"],
       account_role: ["member", "expert"],
       agent_service_status: ["active", "needs_config", "error"],
       agent_status: ["idle", "working", "error", "waiting_human", "offline"],

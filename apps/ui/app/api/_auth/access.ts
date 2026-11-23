@@ -102,7 +102,9 @@ export async function spaceAccessFor(actor: Actor, space: { id: string; workspac
     return boxAccessOf(actor, space, await grantOf(actor, space.id))
 }
 
-export async function readSpaceAccess(actor: Actor, spaceId: string): Promise<BoxAccess> {
+// A row with no Box (the Chief of Staff) is reached through its own rule, never through this one.
+export async function readSpaceAccess(actor: Actor, spaceId: string | null): Promise<BoxAccess> {
+    if (!spaceId) return 'none'
     const { data: space } = await selectMaybeSingle(createServiceRoleClient(), 'spaces', ['id', 'workspace_id', 'visibility'] as const, { id: spaceId })
     if (!space) return 'none'
     return spaceAccessFor(actor, space)
@@ -122,7 +124,7 @@ export async function assertSpaceAccess(spaceId: string, need: AccessLevel, acto
     return { actor: resolved, access }
 }
 
-export async function assertAgentAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<{ actor: Actor; access: BoxAccess; agent: { workspace_id: number; space_id: string; engine_agent_id: string | null } }> {
+export async function assertAgentAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<{ actor: Actor; access: BoxAccess; agent: { workspace_id: number; space_id: string | null; engine_agent_id: string | null } }> {
     const resolved = actor ?? (await requireLightSessionActor())
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id'] as const, { id: agentId })
@@ -201,7 +203,7 @@ export function keepVisible<T>(rows: T[], visible: 'all' | Set<string>, idOf: (r
 
 // Asserts the caller reaches the agent at the level asked. Returns the row so callers don't fetch it
 // twice. Replaces the workspace-only check: reaching the workspace no longer means reaching the Box.
-export async function assertAgentInWorkspace(agentId: string, need: AccessLevel = 'use', actor?: Actor): Promise<{ workspace_id: number; space_id: string; engine_agent_id: string | null }> {
+export async function assertAgentInWorkspace(agentId: string, need: AccessLevel = 'use', actor?: Actor): Promise<{ workspace_id: number; space_id: string | null; engine_agent_id: string | null }> {
     return (await assertAgentAccess(agentId, need, actor)).agent
 }
 

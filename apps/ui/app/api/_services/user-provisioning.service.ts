@@ -8,6 +8,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 
 // Just-in-time provisioning: the first time an authenticated user is seen, seed
 // their workspace, user row and owner membership. The request client only reads the users row;
@@ -95,6 +96,9 @@ export async function provisionUser(
         role: 'admin',
     })
     if (membershipError) console.error('Error creating membership', membershipError)
+
+    // Never blocks the workspace: a row missing here is written the first time it is needed.
+    await ensureForemanAgentRow(serviceSupabase, workspace.id).catch(err => console.error('[workspace] failed to write the Chief of Staff', err))
 
     // An account is born signed up: its allowance and its phone step come with it.
     await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)

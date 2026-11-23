@@ -3,6 +3,7 @@
 import { agentFromRow } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 export function useAgentsRealtime(workspaceId: number | undefined) {
     useRealtimeSubscription('agents', {
@@ -10,10 +11,10 @@ export function useAgentsRealtime(workspaceId: number | undefined) {
         filter: workspaceId ? { column: 'workspace_id', value: workspaceId } : undefined,
         enabled: !!workspaceId,
         onInsert: row => {
-            useBoardStore.getState()._onAgentInsert(agentFromRow(row))
+            if (sitsInABox(row)) useBoardStore.getState()._onAgentInsert(agentFromRow(row))
         },
         onUpdate: row => {
-            useBoardStore.getState()._onAgentUpdate(agentFromRow(row))
+            if (sitsInABox(row)) useBoardStore.getState()._onAgentUpdate(agentFromRow(row))
         },
         onDelete: row => {
             useBoardStore.getState()._onAgentDelete(row.id)

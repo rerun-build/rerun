@@ -74,7 +74,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
 
     const byEngineId = new Map<string, { id: string; name: string }>()
     if (engineOriginIds.length > 0) {
-        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { engine_agent_id: { in: engineOriginIds } })
+        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { workspace_id: caller.workspaceId, engine_agent_id: { in: engineOriginIds } })
         for (const a of data ?? []) if (a.engine_agent_id) byEngineId.set(a.engine_agent_id, { id: a.id, name: a.name })
     }
 
@@ -227,7 +227,7 @@ function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; name: str
 }
 
 async function agentsReachedBy(actor: Actor, supabase: SupabaseClient<Database>): Promise<{ id: string; name: string }[]> {
-    const [{ data, error }, spaces] = await Promise.all([selectMany(supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: actor.workspaceId }), visibleSpaceIds(actor)])
+    const [{ data, error }, spaces] = await Promise.all([selectMany(supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: actor.workspaceId, kind: 'coworker' }), visibleSpaceIds(actor)])
     if (error) throw error
     return keepVisible(data ?? [], spaces, agent => agent.space_id)
 }

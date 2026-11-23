@@ -186,7 +186,7 @@ async function findIdleAgents(supabase: Client, now: Date): Promise<Map<number, 
         supabase,
         'agents',
         ['id', 'workspace_id', 'name', 'created_at'] as const,
-        { created_at: { gte: since(now, LIFECYCLE_SEQUENCES.agent_idle.maxAgeMs, lifecycleFloor()) }, disabled_at: { isNull: true } },
+        { kind: 'coworker', created_at: { gte: since(now, LIFECYCLE_SEQUENCES.agent_idle.maxAgeMs, lifecycleFloor()) }, disabled_at: { isNull: true } },
         { column: 'created_at', ascending: true },
         CANDIDATE_LIMIT,
     )
@@ -353,7 +353,7 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
         selectAll(supabase, 'workspace_onboarding', ['workspace_id', 'answers'] as const, { workspace_id: allWorkspaceIds }, { column: 'workspace_id' }),
         // Rows rather than a count per workspace: one query beats one per workspace.
         selectAll(supabase, 'workspace_members', ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: allWorkspaceIds }, { column: 'created_at' }),
-        selectAll(supabase, 'agents', ['workspace_id'] as const, { workspace_id: allWorkspaceIds }, { column: 'id' }),
+        selectAll(supabase, 'agents', ['workspace_id'] as const, { workspace_id: allWorkspaceIds, kind: 'coworker' }, { column: 'id' }),
     ])
 
     const answersByWorkspace = new Map((onboardingRows ?? []).map(row => [row.workspace_id, row.answers]))

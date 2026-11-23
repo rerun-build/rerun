@@ -11,7 +11,7 @@ import { selectMany } from '@/supabase/supabase-helpers'
 export async function syncCoworkerBoxes(workspaceId: number): Promise<void> {
     try {
         const supabase = createServiceRoleClient()
-        const { data: agents, error } = await selectMany(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { workspace_id: workspaceId })
+        const { data: agents, error } = await selectMany(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { workspace_id: workspaceId, kind: 'coworker' })
         if (error) throw error
         const boxes = Object.fromEntries((agents ?? []).filter(agent => agent.engine_agent_id).map(agent => [agent.engine_agent_id as string, agent.space_id]))
         await setBrainAgentBoxes(await getWorkspaceConnection(workspaceId), boxes)

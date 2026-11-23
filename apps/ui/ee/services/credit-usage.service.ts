@@ -26,7 +26,7 @@ export async function getCreditUsage(supabase: SupabaseClient<Database>, actor: 
     const { data: workspace } = await selectSingle(supabase, 'workspaces', ['rerun_period_anchor', 'subscription_status', 'trial_ends_at'] as const, { id: workspaceId })
     const period = creditPeriod(workspace ?? { rerun_period_anchor: null, subscription_status: null, trial_ends_at: null }, now)
 
-    const [{ data: rows, error }, { data: agents }] = await Promise.all([supabase.rpc('rerun_credit_usage', { p_workspace_id: workspaceId, p_since: period.start.toISOString() }), selectAll(supabase, 'agents', ['id', 'name', 'engine_agent_id'] as const, { workspace_id: workspaceId, engine_agent_id: { notNull: true } })])
+    const [{ data: rows, error }, { data: agents }] = await Promise.all([supabase.rpc('rerun_credit_usage', { p_workspace_id: workspaceId, p_since: period.start.toISOString() }), selectAll(supabase, 'agents', ['id', 'name', 'engine_agent_id'] as const, { workspace_id: workspaceId, kind: 'coworker', engine_agent_id: { notNull: true } })])
     if (error) throw new Error(error.message)
 
     return summarizeCreditUsage(rows ?? [], agents ?? [], period, now)

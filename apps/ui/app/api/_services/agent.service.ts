@@ -11,7 +11,7 @@ import {
     updateSchedule,
 } from '@/lib/engine/client'
 import type { EngineAgentConfigPatch } from '@/lib/engine/types'
-import type { CoworkerLook } from '@rerun/contracts'
+import { agentKindPolicy, type CoworkerLook } from '@rerun/contracts'
 import { AGENT_SPAN, UNPLACED_COL, agentsOverlap, isPlaced } from '@/lib/board/iso'
 import type { GridPosition } from '@/lib/board/types'
 import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
@@ -22,6 +22,7 @@ import { sanitizeIdentifier } from '@/lib/utils'
 import { duplicateAgentName } from '@/lib/copy-name'
 import { PLAN_LIMIT_REASON, hasFreeAgentSlot } from './capacity.service'
 import { getSpaceConnection } from './space.service'
+import { getWorkspaceConnection } from './workspace-engine.service'
 import { AppError, failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 type CreateAgentParams = {
@@ -369,10 +370,10 @@ export async function duplicateAgent(params: DuplicateAgentParams): Promise<Dupl
 // whatever the user had switched off themselves switched off.
 export async function pauseAgentSchedules(id: string): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id })
+    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'workspace_id'] as const, { id })
     if (!agent?.engine_agent_id) return
 
-    const conn = await getSpaceConnection(agent.space_id)
+    const conn = await getWorkspaceConnection(agent.workspace_id)
     const schedules = await listSchedules(conn, agent.engine_agent_id)
     const paused: string[] = []
 
@@ -386,10 +387,10 @@ export async function pauseAgentSchedules(id: string): Promise<void> {
 
 export async function resumeAgentSchedules(id: string): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id', 'disabled_schedule_slugs'] as const, { id })
+    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'workspace_id', 'disabled_schedule_slugs'] as const, { id })
     if (!agent?.engine_agent_id || agent.disabled_schedule_slugs.length === 0) return
 
-    const conn = await getSpaceConnection(agent.space_id)
+    const conn = await getWorkspaceConnection(agent.workspace_id)
     for (const slug of agent.disabled_schedule_slugs) {
         await updateSchedule(conn, agent.engine_agent_id, slug, { enabled: true })
     }
@@ -404,12 +405,12 @@ export async function resumeAgentSchedules(id: string): Promise<void> {
 // would be offered in the UI while call_agent still only answers to the old one.
 export async function renameAgent(id: string, newName: string) {
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'handle'] as const, { id })
-    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
+    const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'kind', 'engine_agent_id', 'handle'] as const, { id })
+    if (!agent || !agentKindPolicy(agent.kind).soulEditable) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = await deriveUniqueHandle(supabase, agent.workspace_id, newName, id)
     if (agent.engine_agent_id) {
-        const conn = await getSpaceConnection(agent.space_id)
+        const conn = await getWorkspaceConnection(agent.workspace_id)
         await enginePatchAgent(conn, agent.engine_agent_id, { name: handle, displayName: newName })
     }
 
@@ -429,8 +430,8 @@ export async function setAgentLook(id: string, look: CoworkerLook | null) {
 // references the same way it does for a rename.
 export async function changeAgentHandle(id: string, requestedHandle: string) {
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'name', 'handle'] as const, { id })
-    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
+    const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'kind', 'engine_agent_id', 'name', 'handle'] as const, { id })
+    if (!agent || !agentKindPolicy(agent.kind).soulEditable) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = sanitizeIdentifier(requestedHandle).replace(/^_+|_+$/g, '')
     if (!handle) throw new AppError('handleUnusable', { handle: requestedHandle })
@@ -443,7 +444,7 @@ export async function changeAgentHandle(id: string, requestedHandle: string) {
     }
 
     if (agent.engine_agent_id) {
-        const conn = await getSpaceConnection(agent.space_id)
+        const conn = await getWorkspaceConnection(agent.workspace_id)
         await enginePatchAgent(conn, agent.engine_agent_id, { name: handle })
     }
 
@@ -456,14 +457,14 @@ export async function changeAgentHandle(id: string, requestedHandle: string) {
 export async function deleteAgent(id: string) {
     const supabase = createServiceRoleClient()
 
-    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id })
+    const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'workspace_id', 'kind'] as const, { id })
 
-    if (!agent) {
+    if (!agent || !agentKindPolicy(agent.kind).deletable) {
         throw new AppError(COWORKER_NOT_FOUND)
     }
 
     if (agent.engine_agent_id) {
-        const conn = await getSpaceConnection(agent.space_id)
+        const conn = await getWorkspaceConnection(agent.workspace_id)
         await engineDeleteAgent(conn, agent.engine_agent_id).catch(() => {})
     }
 

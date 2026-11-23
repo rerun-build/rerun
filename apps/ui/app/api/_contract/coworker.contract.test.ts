@@ -89,9 +89,9 @@ const THREAD = 'f6e5d4c3-b2a1-4f0e-9d8c-7b6a5f4e3d2c'
 const CREATED: Record<string, string> = { agents: '0a9b8c7d-6e5f-4a3b-8c1d-2e3f4a5b6c7d', sessions: '1b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e' }
 
 const agents: Rows<'agents'> = [
-    { id: SCOUT, name: 'Scout', handle: 'scout', description: 'Finds leads in Lyon', template_id: 'lead-finder', status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-03T10:00:00.000Z' },
-    { id: LEDGER, name: 'Ledger', handle: 'ledger', description: null, template_id: null, status: 'idle', col: 2, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'ledger', disabled_at: '2026-11-15T10:00:00.000Z', disabled_reason: 'plan_limit', created_at: '2026-11-04T10:00:00.000Z' },
-    { id: STRANGER, name: 'Scout', handle: 'scout', description: null, template_id: null, status: 'idle', col: 0, row: 0, workspace_id: 9, space_id: '9c8b7a6f-5e4d-4c3b-8a2f-1e0d9c8b7a6f', engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-05T10:00:00.000Z' },
+    { id: SCOUT, name: 'Scout', handle: 'scout', kind: 'coworker', description: 'Finds leads in Lyon', template_id: 'lead-finder', status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-03T10:00:00.000Z' },
+    { id: LEDGER, name: 'Ledger', handle: 'ledger', kind: 'coworker', description: null, template_id: null, status: 'idle', col: 2, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'ledger', disabled_at: '2026-11-15T10:00:00.000Z', disabled_reason: 'plan_limit', created_at: '2026-11-04T10:00:00.000Z' },
+    { id: STRANGER, name: 'Scout', handle: 'scout', kind: 'coworker', description: null, template_id: null, status: 'idle', col: 0, row: 0, workspace_id: 9, space_id: '9c8b7a6f-5e4d-4c3b-8a2f-1e0d9c8b7a6f', engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-05T10:00:00.000Z' },
 ]
 const spaces: Rows<'spaces'> = [{ id: SPACE, workspace_id: 7, name: 'Sales', visibility: 'workspace', col_start: 0, row_start: 0, col_end: 7, row_end: 7, created_at: '2026-11-02T09:00:00.000Z' }]
 const sessions: Rows<'sessions'> = [

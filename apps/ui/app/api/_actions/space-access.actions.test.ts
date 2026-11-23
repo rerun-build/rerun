@@ -214,9 +214,9 @@ describe('revokeSpaceAccessAction', () => {
 describe('listMemberAccessAction', () => {
     const boxes = [space('open'), space('closed', 'restricted'), space('named', 'restricted'), space('managed')]
     const agents = [
-        { id: 'a1', workspace_id: WORKSPACE_ID, space_id: 'open' },
-        { id: 'a2', workspace_id: WORKSPACE_ID, space_id: 'open' },
-        { id: 'a3', workspace_id: WORKSPACE_ID, space_id: 'closed' },
+        { id: 'a1', workspace_id: WORKSPACE_ID, kind: 'coworker', space_id: 'open' },
+        { id: 'a2', workspace_id: WORKSPACE_ID, kind: 'coworker', space_id: 'open' },
+        { id: 'a3', workspace_id: WORKSPACE_ID, kind: 'coworker', space_id: 'closed' },
     ]
 
     it('gives an admin every Box of a member, with where each level comes from', async () => {

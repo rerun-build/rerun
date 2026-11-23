@@ -86,6 +86,7 @@ describe('freeAgentSlots', () => {
             ['from', 'agents'],
             ['select', '*', { count: 'exact', head: true }],
             ['eq', 'workspace_id', 1],
+            ['eq', 'kind', 'coworker'],
             ['is', 'disabled_at', null],
         ])
     })

@@ -103,7 +103,7 @@ async function hasOwnProvider(conn: EngineConnection): Promise<boolean> {
 }
 
 async function hasSchedule(supabase: ServiceRoleClient, conn: EngineConnection, workspaceId: number): Promise<boolean> {
-    const { data: agents } = await selectMany(supabase, 'agents', ['engine_agent_id'] as const, { workspace_id: workspaceId, engine_agent_id: { notNull: true } })
+    const { data: agents } = await selectMany(supabase, 'agents', ['engine_agent_id'] as const, { workspace_id: workspaceId, kind: 'coworker', engine_agent_id: { notNull: true } })
     const engineAgentIds = (agents ?? []).flatMap(agent => (agent.engine_agent_id ? [agent.engine_agent_id] : []))
     const lists = await Promise.all(engineAgentIds.map(id => listSchedules(conn, id, { signal: AbortSignal.timeout(ENGINE_CHECK_TIMEOUT_MS) }).catch(() => [])))
     return lists.some(list => list.length > 0)

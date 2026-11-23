@@ -29,6 +29,7 @@ import { agentFromRow, computeAgentStatus } from '../lib/board/types'
 import { AGENT_SPAN, isPlaced } from '@/lib/board/iso'
 import { fetchLiveSessions, sweepZombieSessions } from '@/lib/board/live-sessions'
 import type { AgentSchedule } from '@/lib/board/next-runs'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 // La Box dans laquelle une tuile est posée se lit sur le plan : un agent est dessiné à ses propres
 // col/row quelle que soit la Box qui le possède, donc c'est la géométrie qui décide de qui l'a.
@@ -357,12 +358,12 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     hydrate: async (workspaceId: number) => {
         const [agentsResult, spacesResult, grantsResult] = await Promise.all([
-            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order', 'look'] as const, { workspace_id: workspaceId }),
+            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order', 'look'] as const, { workspace_id: workspaceId, kind: 'coworker' }),
             selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at', 'visibility', 'sidebar_order'] as const, { workspace_id: workspaceId }),
             selectMany(supabase, 'space_members', ['space_id', 'user_id', 'access'] as const, { workspace_id: workspaceId }),
         ])
 
-        const dbAgents = agentsResult.data ? agentsResult.data.map(agentFromRow) : []
+        const dbAgents = (agentsResult.data ?? []).filter(sitsInABox).map(agentFromRow)
         const dbSpaces = spacesResult.data ?? []
 
         const agentIds = dbAgents.map(a => a.id)

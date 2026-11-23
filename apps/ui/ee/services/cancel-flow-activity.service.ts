@@ -51,7 +51,7 @@ export async function loadCancelFlowActivity(workspaceId: number): Promise<Cance
     if (!engine) return null
 
     const supabase = createServiceRoleClient()
-    const { data: rows } = await selectMany(supabase, 'agents', ['id', 'name', 'engine_agent_id'] as const, { workspace_id: workspaceId, engine_agent_id: { notNull: true }, disabled_at: { isNull: true } })
+    const { data: rows } = await selectMany(supabase, 'agents', ['id', 'name', 'engine_agent_id'] as const, { workspace_id: workspaceId, kind: 'coworker', engine_agent_id: { notNull: true }, disabled_at: { isNull: true } })
     const agents = (rows ?? []).flatMap(row => (row.engine_agent_id ? [{ id: row.id, name: row.name, engineAgentId: row.engine_agent_id }] : []))
 
     const weekStart = Date.now() - WEEK_MS

@@ -88,7 +88,8 @@ export type IsoAgent = {
     look?: CoworkerLook | null
 }
 
-type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'> & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order' | 'look'>>
+// A tile of the board: a coworker, always in a Box.
+type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'disabled_at' | 'disabled_reason'> & { space_id: string } & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order' | 'look'>>
 
 export function agentFromRow(row: AgentRowFields): IsoAgent {
     return {

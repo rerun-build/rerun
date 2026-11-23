@@ -18,7 +18,7 @@ export type WelcomeState = { needed: boolean; step: OnboardingStep; answers: For
 export async function readWelcomeState(ctx: WorkspaceContext): Promise<WelcomeState> {
     const [answers, { data: agentCount }, { data: workspace }, cookieStore, firstName] = await Promise.all([
         readAnswers(ctx),
-        selectCount(ctx.supabase, 'agents', { workspace_id: ctx.workspace.id }),
+        selectCount(ctx.supabase, 'agents', { workspace_id: ctx.workspace.id, kind: 'coworker' }),
         selectMaybeSingle(ctx.supabase, 'workspaces', ['boxes_archived_at'] as const, { id: ctx.workspace.id }),
         cookies(),
         accountFirstName(ctx.authUser),

@@ -25,8 +25,8 @@ vi.mock('@/supabase/server', () => ({
 vi.mock('@/supabase/session/getServerSession', async importOriginal => ({ ...(await importOriginal<typeof import('@/supabase/session/getServerSession')>()), getAuthUser: async () => state.ctx?.authUser }))
 
 const agents: Rows<'agents'> = [
-    { id: 'agent-scout', name: 'Scout', handle: 'scout', description: 'Finds leads in Lyon', template_id: 'lead-finder', status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: 'space-sales', disabled_at: null, disabled_reason: null },
-    { id: 'agent-ledger', name: 'Ledger', handle: 'ledger', description: null, template_id: null, status: 'idle', col: 1, row: 0, workspace_id: 7, space_id: 'space-sales', disabled_at: '2026-11-15T10:00:00.000Z', disabled_reason: 'plan_limit' },
+    { id: 'agent-scout', name: 'Scout', handle: 'scout', kind: 'coworker', description: 'Finds leads in Lyon', template_id: 'lead-finder', status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: 'space-sales', disabled_at: null, disabled_reason: null },
+    { id: 'agent-ledger', name: 'Ledger', handle: 'ledger', kind: 'coworker', description: null, template_id: null, status: 'idle', col: 1, row: 0, workspace_id: 7, space_id: 'space-sales', disabled_at: '2026-11-15T10:00:00.000Z', disabled_reason: 'plan_limit' },
 ]
 const spaces: Rows<'spaces'> = [{ id: 'space-sales', workspace_id: 7, name: 'Sales', created_at: '2026-11-02T09:00:00.000Z', visibility: 'workspace' }]
 const sessions: Rows<'sessions'> = [{ id: 'session-1', agent_id: 'agent-scout', origin_agent_id: null, status: 'waiting_human', updated_at: new Date().toISOString() }]

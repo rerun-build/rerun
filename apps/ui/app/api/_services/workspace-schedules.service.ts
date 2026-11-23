@@ -12,7 +12,7 @@ export async function listWorkspaceSchedules(actor: Actor): Promise<AgentSchedul
     const { workspaceId } = actor
     const supabase = createServiceRoleClient()
     const [{ data: agents }, { data: workspace }, spaces] = await Promise.all([
-        selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'disabled_at', 'space_id'] as const, { workspace_id: workspaceId }),
+        selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'disabled_at', 'space_id'] as const, { workspace_id: workspaceId, kind: 'coworker' }),
         selectMaybeSingle(supabase, 'workspaces', ['boxes_disabled_at', 'boxes_archived_at'] as const, { id: workspaceId }),
         visibleSpaceIds(actor),
     ])

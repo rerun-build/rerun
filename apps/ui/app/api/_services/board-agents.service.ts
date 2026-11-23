@@ -6,6 +6,7 @@ import { agentFromRow, computeAgentStatus } from '@/lib/board/types'
 import { getAgent as engineGetAgent } from '@/lib/engine/client'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { AgentView, BoardAgent } from '@rerun/contracts'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 const AGENT_COLUMNS = ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'disabled_at', 'disabled_reason', 'look'] as const
 
@@ -26,9 +27,9 @@ async function boxAccessOfSpace(actor: Actor): Promise<(spaceId: string) => BoxA
 // here, it comes from the health poll, so a Box that does not answer never holds up the list.
 export async function listBoardAgents(ctx: WorkspaceContext): Promise<BoardAgent[]> {
     const actor = actorFromContext(ctx)
-    const [{ data, error }, accessOf] = await Promise.all([selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }), boxAccessOfSpace(actor)])
+    const [{ data, error }, accessOf] = await Promise.all([selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id, kind: 'coworker' }, { column: 'created_at' }), boxAccessOfSpace(actor)])
     if (error) throw error
-    const agents = (data ?? []).flatMap(row => {
+    const agents = (data ?? []).filter(sitsInABox).flatMap(row => {
         const access = accessOf(row.space_id)
         return access === 'none' ? [] : [{ ...boardAgentFromRow(row), access }]
     })
@@ -44,7 +45,7 @@ export async function readAgentView(ctx: WorkspaceContext, agentId: string): Pro
     const actor = actorFromContext(ctx)
     const [{ data: row, error }, { access }] = await Promise.all([selectMaybeSingle(ctx.supabase, 'agents', AGENT_COLUMNS, { id: agentId }), assertAgentAccess(agentId, 'use', actor)])
     if (error) throw error
-    if (!row || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
+    if (!row || !sitsInABox(row) || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
 
     const agent: BoardAgent = { ...boardAgentFromRow(row), access }
     if (agent.disabledAt) return { agent, detail: null, locked: false }

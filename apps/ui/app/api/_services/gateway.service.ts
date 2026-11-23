@@ -5,6 +5,7 @@ import type { EngineConnection } from '@/lib/engine/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle, selectMany } from '@/supabase/supabase-helpers'
 import { findWorkspaceEngine } from './workspace-engine.service'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 // Result of verifying that a Space points at a real, reachable rerun-engine whose
 // RERUN_API_KEY we hold. Used at Space creation time to block invalid Spaces.
@@ -99,12 +100,12 @@ export async function checkAllAgentsHealth(actor: Actor): Promise<AgentHealthRes
     const supabase = createServiceRoleClient()
 
     const [{ data: workspaceAgents }, { data: workspace }, accessBySpace] = await Promise.all([
-        selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'space_id'] as const, { workspace_id: workspaceId }),
+        selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'space_id'] as const, { workspace_id: workspaceId, kind: 'coworker' }),
         selectMaybeSingle(supabase, 'workspaces', ['boxes_disabled_at', 'boxes_archived_at'] as const, { id: workspaceId }),
         spaceAccessMap(actor),
     ])
     const spaceIds = [...accessBySpace].filter(([, access]) => access !== 'none').map(([id]) => id)
-    const agents = (workspaceAgents ?? []).filter(agent => (accessBySpace.get(agent.space_id) ?? 'none') !== 'none')
+    const agents = (workspaceAgents ?? []).filter(sitsInABox).filter(agent => (accessBySpace.get(agent.space_id) ?? 'none') !== 'none')
 
     if (agents.length === 0) return { statuses: {}, links: [], spaceIds }
 

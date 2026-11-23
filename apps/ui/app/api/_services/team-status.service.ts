@@ -27,7 +27,7 @@ async function readAgentRuns(conn: EngineConnection, engineAgentId: string): Pro
 
 export async function readTeamStatus(workspaceId: number, { spaceId, agentId }: { spaceId?: string; agentId?: string } = {}) {
     const supabase = createServiceRoleClient()
-    const [{ data: agents }, { data: workspace }] = await Promise.all([selectMany(supabase, 'agents', TEAM_AGENT_COLUMNS, { workspace_id: workspaceId, ...(spaceId ? { space_id: spaceId } : {}), ...(agentId ? { id: agentId } : {}) }, { column: 'created_at' }), selectMaybeSingle(supabase, 'workspaces', ['boxes_disabled_at', 'boxes_archived_at'] as const, { id: workspaceId })])
+    const [{ data: agents }, { data: workspace }] = await Promise.all([selectMany(supabase, 'agents', TEAM_AGENT_COLUMNS, { workspace_id: workspaceId, kind: 'coworker', ...(spaceId ? { space_id: spaceId } : {}), ...(agentId ? { id: agentId } : {}) }, { column: 'created_at' }), selectMaybeSingle(supabase, 'workspaces', ['boxes_disabled_at', 'boxes_archived_at'] as const, { id: workspaceId })])
     const checkedAt = new Date().toISOString()
     if (!agents?.length) return { checkedAt, agents: [] }
 

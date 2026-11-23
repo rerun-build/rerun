@@ -8,6 +8,7 @@ import { selectMany } from '@/supabase/supabase-helpers'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 import type { ActionResult } from '@/app/api/_actions/space.actions'
+import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 
 // A sandbox is a workspace flagged is_sandbox with unlimited agents and no billing, reserved for
 // expert accounts. It reuses the whole workspace/space/engine stack: exactly one Space backed by a
@@ -125,6 +126,9 @@ async function createSandboxWorkspace(userId: string): Promise<number | ActionFa
         role: 'admin',
     })
     if (membershipError) return { ok: false, error: membershipError.message }
+
+    // Never blocks the workspace: a row missing here is written the first time it is needed.
+    await ensureForemanAgentRow(supabase, workspaceId).catch(err => console.error('[workspace] failed to write the Chief of Staff', err))
 
     return workspaceId
 }

@@ -5,15 +5,15 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 import { activateAgent, NO_FREE_SLOT_ERROR, reactivateAgentsAfterRestore, reconcileAgentActivation, stopAgentsOnEngine, wakePlanLimitedAgents } from './agent-activation.service'
 import { pauseAgentSchedules, resumeAgentSchedules } from './agent.service'
-import { getSpaceConnection } from './space.service'
+import { getWorkspaceConnection } from './workspace-engine.service'
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ patchAgent: vi.fn() }))
 vi.mock('./agent.service', () => ({ pauseAgentSchedules: vi.fn(), resumeAgentSchedules: vi.fn() }))
-vi.mock('./space.service', () => ({ getSpaceConnection: vi.fn() }))
+vi.mock('./workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn() }))
 
-type Agent = { id: string; workspace_id: number; disabled_at: string | null; disabled_reason: string | null; engine_agent_id: string | null; space_id: string }
+type Agent = { id: string; workspace_id: number; kind: 'coworker' | 'foreman'; disabled_at: string | null; disabled_reason: string | null; engine_agent_id: string | null; space_id: string | null }
 
 let workspace: { max_agents: number | null; subscription_status: string | null }
 let agents: Agent[]
@@ -28,7 +28,7 @@ function idFilter(calls: readonly SupabaseCall[]): unknown {
 }
 
 function agent(id: string, overrides: Partial<Agent> = {}): Agent {
-    return { id, workspace_id: 1, disabled_at: null, disabled_reason: null, engine_agent_id: `eng_${id}`, space_id: 'space_1', ...overrides }
+    return { id, workspace_id: 1, kind: 'coworker', disabled_at: null, disabled_reason: null, engine_agent_id: `eng_${id}`, space_id: 'space_1', ...overrides }
 }
 
 beforeEach(() => {
@@ -39,14 +39,15 @@ beforeEach(() => {
     db = fakeSupabase((table, calls) => {
         if (table === 'workspaces') return { data: workspace }
         if (table !== 'agents' || writeMethodOf(calls)) return undefined
-        const active = agents.filter(row => !row.disabled_at)
+        const onlyCoworkers = calls.some(call => call.method === 'eq' && call.args[0] === 'kind' && call.args[1] === 'coworker')
+        const active = agents.filter(row => !row.disabled_at && (!onlyCoworkers || row.kind === 'coworker'))
         if (selectedColumns(calls) === '*') return { count: active.length }
         const byId = idFilter(calls)
         if (byId) return { data: agents.find(row => row.id === byId) ?? null }
         return { data: active }
     })
     vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
-    vi.mocked(getSpaceConnection).mockResolvedValue({ url: 'http://box' } as never)
+    vi.mocked(getWorkspaceConnection).mockResolvedValue({ url: 'http://box' } as never)
 })
 
 describe('reconcileAgentActivation', () => {
@@ -60,6 +61,12 @@ describe('reconcileAgentActivation', () => {
         const [update] = db.writes('agents')
         expect(update.payload).toEqual({ disabled_at: expect.any(String), disabled_reason: 'plan_limit' })
         expect(update.filters.map(call => call.args)).toEqual([['id', ['a3', 'a4']]])
+    })
+
+    it('never counts nor switches off the Chief of Staff', async () => {
+        agents = [agent('cos', { kind: 'foreman', space_id: null, engine_agent_id: 'foreman' }), agent('a1'), agent('a2'), agent('a3')]
+
+        await expect(reconcileAgentActivation(1)).resolves.toEqual(['a3'])
     })
 
     it('switches off every agent when the plan is gone', async () => {

@@ -9,6 +9,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { failure, failureOf, type ErrorCode } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 const BOX_ACCESS_ADMIN_ONLY = 'adminOnlyBoxAccess' satisfies ErrorCode
 
@@ -143,12 +144,12 @@ export async function listMemberAccessAction(targetUserId: string): Promise<Acti
 
         const [{ data: spaceRows }, { data: agentRows }, { data: grantRows }] = await Promise.all([
             selectAll(supabase, 'spaces', ['id', 'workspace_id', 'name', 'visibility'] as const, { workspace_id: workspace.id }, { column: 'created_at', ascending: true }),
-            selectAll(supabase, 'agents', ['space_id'] as const, { workspace_id: workspace.id }),
+            selectAll(supabase, 'agents', ['space_id'] as const, { workspace_id: workspace.id, kind: 'coworker' }),
             selectAll(supabase, 'space_members', ['space_id', 'access'] as const, { user_id: targetUserId, workspace_id: workspace.id }),
         ])
 
         const agentCount = new Map<string, number>()
-        for (const agent of agentRows ?? []) agentCount.set(agent.space_id, (agentCount.get(agent.space_id) ?? 0) + 1)
+        for (const agent of (agentRows ?? []).filter(sitsInABox)) agentCount.set(agent.space_id, (agentCount.get(agent.space_id) ?? 0) + 1)
         const grantOf = new Map((grantRows ?? []).map(row => [row.space_id, toAccessLevel(row.access)]))
         const boxScope = toBoxScope(target.box_scope)
         const actor = { kind: 'user' as const, userId: targetUserId, workspaceId: workspace.id, role: target.role, boxScope }

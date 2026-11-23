@@ -64,8 +64,8 @@ const agentInBox = { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 
 const spaces: Row<'spaces'>[] = [{ id: 'space-sales', workspace_id: 7, name: 'Sales', visibility: 'workspace', created_at: '2026-11-02T09:00:00.000Z' }]
 
 const agents: (Row<'agents'> & { space: Row<'spaces'> })[] = [
-    { id: AGENT, name: 'Scout', handle: 'scout', ...agentInBox, disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
-    { id: 'agent-other-workspace', name: 'Intruder', handle: 'intruder', workspace_id: 9, space_id: 'space-other', engine_agent_id: 'intruder', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
+    { id: AGENT, name: 'Scout', handle: 'scout', kind: 'coworker', ...agentInBox, disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
+    { id: 'agent-other-workspace', name: 'Intruder', handle: 'intruder', kind: 'coworker', workspace_id: 9, space_id: 'space-other', engine_agent_id: 'intruder', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
 ]
 
 const sessions: (Row<'sessions'> & { agent: Row<'agents'> })[] = [

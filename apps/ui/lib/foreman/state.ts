@@ -21,6 +21,7 @@ import { stampWorkspaceOnboarded } from './profile'
 import { readGettingStartedItems } from '@/app/api/_services/getting-started.service'
 import { progressOf } from '@/lib/onboarding/getting-started'
 import { foremanPhase, isNamedReadyMade, type ArrivingIntent, type ForemanAnswers, type ForemanState } from './phase'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 // The reads behind a phase: the profile the foreman keeps on the workspace, and the two tables the
 // board map is drawn from. Kept apart from the phase rule itself, which is pure and tested as such.
@@ -62,7 +63,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     const [onboarding, { data: spaces }, { data: agents }, reach, firstName] = await Promise.all([
         selectMaybeSingle(ctx.supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: ctx.workspace.id }),
         selectMany(ctx.supabase, 'spaces', SPACE_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
-        selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
+        selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id, kind: 'coworker' }, { column: 'created_at' }),
         isAdminActor(actor) ? Promise.resolve(null) : spaceAccessMap(actor),
         accountFirstName(ctx.authUser),
     ])
@@ -70,7 +71,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     // workspace: a member with nothing open to them is not a workspace to onboard.
     const visibleSpaces = reach ? (spaces ?? []).flatMap(space => (reach.get(space.id) ?? 'none') === 'none' ? [] : [{ ...space, access: reach.get(space.id) as 'use' | 'manage' }]) : (spaces ?? [])
     const visibleSpaceIds = new Set(visibleSpaces.map(space => space.id))
-    const visibleAgents = reach ? (agents ?? []).filter(agent => visibleSpaceIds.has(agent.space_id)) : (agents ?? [])
+    const visibleAgents = (agents ?? []).filter(sitsInABox).filter(agent => !reach || visibleSpaceIds.has(agent.space_id))
 
     const answers = readAnswers(onboarding.data?.answers)
     // Read back through the same rule it was written with: the name goes into the prompt on every turn.

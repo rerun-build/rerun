@@ -13,6 +13,7 @@ import { connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { brainFilesMetaWriteSchema, brainItemMetaPatchSchema, type BrainFileMeta, type BrainItemMetaPatch, type BrainPageSummary, type BrainPageType, type BrainProposal, type BrainRevision, type BrainSkill, type SkillSummary } from '@rerun/contracts'
 import { failure, failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 // A box that predates the brain answers 404 on every /brain route: the dialog shows an "update
 // your box" state rather than an error.
@@ -37,14 +38,14 @@ async function readBoxes(): Promise<{ boxes: BrainBox[]; coworkers: BrainCoworke
     const visible = await visibleSpaceIds(actorFromContext(ctx))
     const [spaces, agents] = await Promise.all([
         selectMany(ctx.supabase, 'spaces', ['id', 'name', 'sidebar_order', 'created_at'] as const, { workspace_id: ctx.workspace.id }),
-        selectMany(ctx.supabase, 'agents', ['id', 'name', 'handle', 'space_id', 'engine_agent_id'] as const, { workspace_id: ctx.workspace.id }),
+        selectMany(ctx.supabase, 'agents', ['id', 'name', 'handle', 'space_id', 'engine_agent_id'] as const, { workspace_id: ctx.workspace.id, kind: 'coworker' }),
     ])
     const canSee = (spaceId: string) => visible === 'all' || visible.has(spaceId)
     const boxes = (spaces.data ?? [])
         .filter(space => canSee(space.id))
         .sort((a, b) => (a.sidebar_order ?? Number.MAX_SAFE_INTEGER) - (b.sidebar_order ?? Number.MAX_SAFE_INTEGER) || (a.created_at ?? '').localeCompare(b.created_at ?? ''))
         .map(space => ({ id: space.id, name: space.name?.trim() || null }))
-    const seen = (agents.data ?? []).filter(agent => canSee(agent.space_id))
+    const seen = (agents.data ?? []).filter(sitsInABox).filter(agent => canSee(agent.space_id))
     const coworkers = seen.map(agent => ({ id: agent.id, name: agent.name, handle: agent.handle ?? null, spaceId: agent.space_id }))
     const engineAgentIds = new Map(seen.flatMap(agent => (agent.engine_agent_id ? [[agent.id, agent.engine_agent_id] as const] : [])))
     return { boxes, coworkers, engineAgentIds, workspaceId: ctx.workspace.id }

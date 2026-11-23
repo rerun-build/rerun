@@ -20,6 +20,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectSingl
 vi.mock('@/lib/copy-name', () => ({ duplicateAgentName: vi.fn() }))
 vi.mock('./capacity.service', () => ({ PLAN_LIMIT_REASON: 'plan_limit', hasFreeAgentSlot: vi.fn() }))
 vi.mock('./space.service', () => ({ getSpaceConnection: vi.fn().mockResolvedValue('conn') }))
+vi.mock('./workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn().mockResolvedValue('conn') }))
 
 describe('renameAgent', () => {
     const update = vi.fn()
@@ -34,7 +35,7 @@ describe('renameAgent', () => {
         eq.mockResolvedValue({ error: null })
         update.mockReturnValue({ eq })
         vi.mocked(createServiceRoleClient).mockReturnValue({ from: () => ({ update }) } as never)
-        vi.mocked(selectSingle).mockResolvedValue({ data: { workspace_id: 7, space_id: 'box', engine_agent_id: 'eng1', handle: 'scout' } } as never)
+        vi.mocked(selectSingle).mockResolvedValue({ data: { workspace_id: 7, kind: 'coworker', engine_agent_id: 'eng1', handle: 'scout' } } as never)
     })
 
     it('moves the handle with the name, on both sides', async () => {
@@ -79,7 +80,7 @@ describe('changeAgentHandle', () => {
         eq.mockResolvedValue({ error: null })
         update.mockReturnValue({ eq })
         vi.mocked(createServiceRoleClient).mockReturnValue({ from: () => ({ update }) } as never)
-        vi.mocked(selectSingle).mockResolvedValue({ data: { workspace_id: 7, space_id: 'box', engine_agent_id: 'eng1', name: 'Scout', handle: 'scout' } } as never)
+        vi.mocked(selectSingle).mockResolvedValue({ data: { workspace_id: 7, kind: 'coworker', engine_agent_id: 'eng1', name: 'Scout', handle: 'scout' } } as never)
         vi.mocked(selectMany).mockResolvedValue({ data: [{ id: 'a1', handle: 'scout' }] } as never)
     })
 

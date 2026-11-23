@@ -15,6 +15,7 @@ import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll } from '@/supabase/supabase-helpers'
 import { findWorkspaceEngine, NoEngineError } from './workspace-engine.service'
+import { sitsInABox } from '@/lib/agents/in-box'
 
 // The workspace's Vault, seen from the hub: who may do what (plan, section 4.5) and the box's ids of
 // coworkers turned into the hub's. Every value stays on the box; nothing here reads one.
@@ -67,10 +68,10 @@ export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     if (!engine) throw new NoEngineError()
     if (!(await supportsVault(engine.conn))) throw new VaultUnavailableError()
     const [{ data }, withForeman] = await Promise.all([
-        selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId }),
+        selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId, kind: 'coworker' }),
         supportsForemanCoworker(engine.conn),
     ])
-    const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
+    const coworkers = (data ?? []).filter(sitsInABox).flatMap(row => (row.engine_agent_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
     if (withForeman) coworkers.unshift(FOREMAN_VAULT_COWORKER)
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
 }

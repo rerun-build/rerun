@@ -20,6 +20,7 @@ import { applyCoworkerLanguage } from '@/app/api/_services/coworker-language.ser
 import { isStableLocale } from '@rerun/i18n'
 import { failure } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
+import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 
 async function requireUserId(): Promise<string> {
     const { user } = await getServerSession()
@@ -149,6 +150,9 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
         role: 'admin',
     })
     if (membershipError) return { ok: false, error: membershipError.message }
+
+    // Never blocks the workspace: a row missing here is written the first time it is needed.
+    await ensureForemanAgentRow(supabase, workspaceId).catch(err => console.error('[workspace] failed to write the Chief of Staff', err))
 
     // Without it the workspace starts at zero and its trial adds nothing: every Rerun model answers
     // "credits used up" on the first message, though none was ever used.
