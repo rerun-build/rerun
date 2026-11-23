@@ -5,7 +5,7 @@ description: Keep apps/ui/components organized by feature (agent/, space/, chat/
 
 # sort-components: organize UI components by feature
 
-The components in `apps/ui/components/` must **always** be placed in a subfolder by **functional domain**, never left flat at the root. That root had ended up with 56 flat files; it was reorganized. This skill is for **maintaining** that organization: placing a new component correctly, or re-sorting when it overflows again.
+The components in `apps/ui/components/` live in a subfolder by **functional domain**, not flat at the root. This skill places a new component correctly, or re-sorts when the root fills up again.
 
 ## Canonical structure
 
@@ -31,7 +31,7 @@ apps/ui/components/
 3. Otherwise, sort by **feature**: it concerns an agent → `agent/`; a space → `space/`; chat sessions/blocks → `chat/`; a modal → `dialogs/`; the global shell → `layout/`.
 4. When in doubt between feature and type, **the feature wins** (group by domain, not by technical nature).
 
-> NEVER create a `.tsx` file directly at the root of `components/`.
+> A new `.tsx` file goes in a feature folder, not at the root of `components/`.
 
 ## Import conventions
 

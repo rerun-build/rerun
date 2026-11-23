@@ -24,7 +24,7 @@ Before digging, make sure the bug is not already known or fixed:
   `rerun-build/rerun-monorepo-archive`; what Rerun Cloud runs differently lives in `cloud/`
   (`git -C cloud log`, repo `rerun-build/rerun-cloud`).
 - Search Notion for a card with the same symptom (done or in progress).
-- A fix found: check it reached where the bug was seen. Is the commit on `master`? Is the app's
+- A fix found: check it reached where the bug was seen. Is the commit on `dev`? Is the app's
   `/api/version` (staging or prod) at or after it? Does the customer's engine box run a version
   that includes it? On mobile, does the build in the customer's hands include it?
   - Not shipped yet: the answer is "fixed in <PR>, not deployed to <env>". Stop there.

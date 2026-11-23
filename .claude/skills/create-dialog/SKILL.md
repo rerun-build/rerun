@@ -1,13 +1,13 @@
 ---
 name: create-dialog
-description: "Create a dialog in apps/ui with the existing primitives, on a single column: DialogContent for a short form, PanelDialogContent for a dialog that holds a list (AiProvidersDialog model). The 2-column frame (SplitDialogContent) is now only an exception for a live preview. Use whenever you create or redesign a dialog in the app."
+description: "Create a dialog in apps/ui with the existing primitives, on a single column: DialogContent for a short form, PanelDialogContent for a dialog that holds a list (AiProvidersDialog model). The 2-column frame (SplitDialogContent) is only for a live preview. Use whenever you create or redesign a dialog in the app."
 ---
 
 # create-dialog: create a dialog that follows the house pattern
 
-Every new dialog is **on a single column**. Two-column dialogs with an explainer on the right were judged heavy (feedback from 14/10/2026).
+Every new dialog is **on a single column**: a two-column dialog with an explainer on the right reads as heavy.
 
-**No invented building blocks.** A dialog is assembled from what the kit (`/render/kit`, `app/render/kit/surfaces/`) already shows: `PanelRow`, `PanelList`, `PanelSection`, `PanelSteps`, `EmptyState`, `Alert`, `Badge`, `Icon`, `Progress`, `Field`, `Button`. No hardcoded brand color, no halo, colored avatar, homemade chip or tile, no added animation: a "handmade" look reads as AI slop.
+**No invented building blocks.** A dialog is assembled from what the UI kit (`/render/kit` in the Rerun Cloud admin app, see `apps/ui/AGENTS.md`) already shows: `PanelRow`, `PanelList`, `PanelSection`, `PanelSteps`, `EmptyState`, `Alert`, `Badge`, `Icon`, `Progress`, `Field`, `Button`. No hardcoded brand color, no halo, colored avatar, homemade chip or tile, no added animation: a "handmade" look reads as AI slop.
 
 ## Two frames, both already exist
 
@@ -64,7 +64,7 @@ Every new dialog is **on a single column**. Two-column dialogs with an explainer
 
 ## Exception: the 2-column frame
 
-`SplitDialogContent` is now only for a **live preview that reflects the input** (e.g. `CreateAgentPreview` with `IsoGrid`). Never for a static explainer. The existing 2-column dialogs (`CreateSpaceDialog`, `CreateTemplateDialog`, `CaptureAgentsDialog`…) stay as they are until someone reworks them.
+`SplitDialogContent` is only for a **live preview that reflects the input** (e.g. `CreateAgentPreview` with `IsoGrid`). Never for a static explainer. The existing 2-column dialogs (`CreateSpaceDialog`, `CreateTemplateDialog`, `CaptureAgentsDialog`…) stay as they are until someone reworks them.
 
 Simple confirmations (delete, clear, close tab) stay on `ConfirmDialog`.
 

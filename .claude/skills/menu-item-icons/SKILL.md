@@ -45,8 +45,8 @@ Decision shortcut: **if you hesitate between two glyphs, or if you have to expla
 
 ## Choosing the glyph
 
-- Go through the `nucleo-icons` skill: if the right glyph is not in the shim, add it from the pack, do not take the least bad one already imported.
-- Banned icons: `Sparkles`, `BotIcon`, `Plug` (see the project memory). A coworker is drawn with `AgentBuddy`, never with a generic icon.
+- If the right glyph is not in the `@/lib/icons` shim, add it from the Nucleo pack; do not take the least bad one already imported.
+- Banned icons: `Sparkles`, `BotIcon`, `Plug`. A coworker is drawn with `AgentBuddy`, never with a generic icon.
 - An icon you cannot find in the pack is a signal for "no icon", not for an approximate glyph.
 
 ## Skeleton

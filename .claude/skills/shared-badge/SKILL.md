@@ -10,7 +10,7 @@ All of Rerun's pills come out of **a single component**: `Badge` (`packages/ui/s
 ## Canonical reference
 
 - `packages/ui/src/primitives/badge.tsx`: the component. Props `size` (`xs | sm | md | lg`, default `md`), `fill` (`soft | outline`), `tone`, `pattern`, `animated`, `glow`, `shimmer`.
-- `packages/ui/src/styles.css` (~l.151): the `--badge-fg` / `--badge-soft` tokens per tone. **A pill's color is changed there, never in the calling component.**
+- `packages/ui/src/styles.css` (`.badge-beam--<tone>`): the `--badge-fg` / `--badge-soft` tokens per tone. **A pill's color is changed there, never in the calling component.**
 - Wrappers that are already official, to reuse rather than redoing a mapping:
   - `apps/ui/app/admin/_badges.tsx` → `StatusBadge` / `StatusBadgeButton` (all the admin tables).
   - `packages/ui/src/monitoring/AgentRunLogs.tsx` → `RunStatusBadge` + `RUN_STATUS_META`.

@@ -4,7 +4,7 @@ The 12 « Harness Use Case » cards (10/21 to 10/26/2026) all come from template
 
 ## Principles
 
-- **Real runs**, in the sandbox Box, with `send_message`. Never a simulated replay or a judge model: that was the approach of #1505, abandoned.
+- **Real runs**, in the sandbox Box, with `send_message`. Never a simulated replay or a judge model.
 - **I judge on the tool calls** (`get_run` with `includeToolCalls: true`), not on the text. A number in the deliverable without the call that produced it counts as invented.
 - **One session per run**, except when a scenario follows on from a deliverable (S4, S5): it then resumes the session of a successful S1 run.
 - **The fictional owner's data is real**: a real small business in the niche, with its site, its public account, its country. Never `example.com` or "Acme". I pick it in Phase 1 and keep it for the whole bench.
@@ -20,7 +20,7 @@ Paid data spends the workspace's real credit, with no approval card: in every te
 | Model | Scenarios | Billed on |
 |---|---|---|
 | Rerun Max (`rerun` / `rerun-max`) | all | the sandbox's Rerun credit |
-| A model from another family | S1 only | a subscription of the sandbox (Claude `sonnet-5`, ChatGPT/Codex) found in `list_ai_connections`, otherwise Rerun Smart |
+| A model from another family | S1 only | a subscription of the sandbox (a Claude model, ChatGPT/Codex) found in `list_ai_connections`, otherwise Rerun Smart |
 
 Rerun Max is the trial model, the quickest to deliver without checking. The second model matters because 7 of the 12 customers ran on Codex or Claude, and they failed differently (too rigid, too many questions).
 

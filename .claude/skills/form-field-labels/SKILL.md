@@ -13,7 +13,7 @@ The chosen design (the only one): **`text-xs font-medium text-muted-foreground`*
 
 - `apps/ui/components/ui/field.tsx`: the component. Two orientations (`column` by default, `row` for Switch/Checkbox), + `optional` / `helperText` / `error` / `htmlFor` slots.
 - `apps/ui/components/ui/input.tsx` and `textarea.tsx`: `Input` and `Textarea` **delegate** their `label` prop to `Field`. So `<Input label="…" />` already produces the right title, never wrap it on top of that.
-- Examples of good usage: `apps/ui/app/admin/blog/BlogPostDialog.tsx` (Select + Combobox), `apps/ui/components/dialogs/CreateAgentDialog.tsx`.
+- Example of good usage: `apps/ui/components/account/LanguagePanel.tsx` (Field + Select).
 
 ## Rule
 

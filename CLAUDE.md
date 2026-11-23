@@ -45,9 +45,9 @@ When a design is proposed (mockup, preview, screenshot), it shows the small-scre
 
 # Verify in the app before calling it done
 
-Rerun has paying customers: a change that shows anywhere (a screen, a dialog, a button, a flow, an
+A change that shows anywhere (a screen, a dialog, a button, a flow, an
 API route the UI calls, the mobile app) is not done until it has been seen working in the running
-app. Tests and the typecheck are not enough. Follow the `verify-in-app` skill without being asked:
+app. Tests and the typecheck are not enough:
 
 - run it on the local stack only (`pnpm db:start`, `pnpm cloud env:local`), never on production
 - `pnpm verify:ui` signs in, captures every width in both themes and reports console errors,
@@ -127,9 +127,8 @@ of `apps/ui/vitest.config.ts` for the tests. A checkout without `cloud/` builds 
 - What Rerun Cloud runs differently (its machine pool, the plans it sells, its support chat) is
   reached only through `@moldwright/cloud/<domain>`. A new symbol there gets its self-hosted twin in
   `apps/ui/cloud-oss/`, with the behaviour of a self-hosted install.
-- Directories named `ee` or `(ee)` (billing and plans, the Rerun credit and its managed models, the
-  template marketplace) are public under the commercial license of `apps/ui/ee/LICENSE`. The open
-  source build never switches them on: its `@moldwright/cloud/billing` sells nothing.
+- This build carries no billing code: `apps/ui/cloud-oss/billing.ts` sets `BILLING_ENABLED = false`
+  and its `@moldwright/cloud/billing` sells nothing.
 - A test of public code that checks Rerun Cloud's behaviour pins the `@moldwright/cloud/*` module it reads
   (`vi.mock`), so it passes with and without `cloud/`.
 
@@ -157,7 +156,7 @@ form a GitHub stack, so each diff shows one step and the chain stays reviewable 
   the base (`gh pr edit --base <base>`).
 - Merge one pull request at a time: the next one is merged only once it targets the base
   (`gh pr view <n> --json baseRefName`). Merged while it still targets the branch below, it lands in
-  that branch instead of the base (#85 and #86, 11/11/2026). The repository deletes a merged branch,
+  that branch instead of the base. The repository deletes a merged branch,
   so GitHub retargets the next pull request on its own.
 
 # Security fixes

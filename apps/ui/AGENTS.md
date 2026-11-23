@@ -74,9 +74,8 @@ variable (prod, local), la porte n'existe pas. Logique dans `lib/staging-gate.ts
 | **Session**   | Conversation avec un Agent. Historique persistant côté engine (`engine_session_id`), contexte maintenu.                                        |
 | **Files**     | Le dossier partagé du **workspace**, commun à tous ses agents quelle que soit leur Box. Chaque agent a en plus le sien.                        |
 
-> **Une Box n'est pas une machine.** Depuis `22a2a276` (« one workspace, one machine »), `spaces` ne
-> porte plus qu'un rectangle et un nom : `engine_host`, `engine_api_key`, `pool_instance_id` et
-> `workspaces.max_spaces` ont été droppées. Tout ce qui touche à l'hébergement, l'isolation, les
+> **Une Box n'est pas une machine.** `spaces` ne porte qu'un rectangle et un nom ; l'hôte, la clé et
+> l'instance du pool sont sur `engine_pool`. Tout ce qui touche à l'hébergement, l'isolation, les
 > credentials, le dossier et la base partagés appartient à la machine du workspace, jamais à une Box.
 
 > **Wording vs code** : le concept s'appelle **Box** partout dans l'UI, mais le code garde `spaces` / `space_id` / `Space*` (table, colonnes, routes, composants). Ne renomme pas le technique.

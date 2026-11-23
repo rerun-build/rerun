@@ -5,7 +5,7 @@ description: Keep component files small and split — one main component per fil
 
 # split-components — one component per file, short files
 
-Companion to [sort-components]: `sort-components` places files **in the right feature folder** ; this skill keeps **each file short and focused**. The real problem: files that balloon (`CreateAgentDialog.tsx` = 813 lines, `AgentChat.tsx` = 645) because several big components + their logic + their types get piled into one place. It becomes unreadable, impossible to review in a diff, and painful to change.
+Companion to [sort-components]: `sort-components` places files **in the right feature folder**; this skill keeps **each file short and focused**. Files balloon when several big components, their logic and their types pile into one place; they become unreadable, hard to review in a diff, and painful to change.
 
 ## Rule
 
@@ -34,7 +34,7 @@ In other words: the "one component per file" rule targets **feature** components
 3. **Rewrite imports** with the absolute alias (`@/components/...`), never fragile `./Foo`.
 4. Pull logic out into a hook / helper if the file is still heavy after extracting the components.
 5. **Verify**: `cd apps/ui && npx tsc --noEmit` → exit 0 (all imports resolve).
-6. Diff: moves should show up cleanly; don't reformat the whole file along the way (see [[prettier-not-uniform-apps-ui]] — fix indentation by hand, no global `prettier --write` that bloats the diff).
+6. Diff: moves should show up cleanly. Prettier is not uniform across `apps/ui`: fix indentation by hand, never `prettier --write` on a whole file.
 
 ## Before creating a new component
 
