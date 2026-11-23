@@ -231,27 +231,25 @@ function referencedInputs(text: string): Set<string> {
     return new Set([...text.matchAll(INPUT_REFERENCE)].flatMap(([, first, second]) => (second ? [first, second] : [first])))
 }
 
-// A coworker can hold several accounts of an app only when each stays apart: its secrets reach the
-// coworker through its own servers, renamed per account. A key the shared skill reads from the
-// environment, or a value the skill quotes, would always be the first account's. A paid app is billed
-// by the slot, and an app with nothing to connect has no account to add.
+// An app with nothing to connect has no second account to add, and a paid app keeps one per coworker.
 export function takesSeveralAccounts(manifest: ServiceManifest): boolean {
     if (isPaidApp(manifest)) return false
-    if (manifest.skills.some(skill => referencedInputs(skill.body).size > 0)) return false
-    const secretsOf = (method: AuthMethod) => method.inputs.filter(input => input.secret).map(input => input.key)
-    const connecting = manifest.authMethods.filter(method => SIGN_IN_KINDS.has(method.kind) || secretsOf(method).length > 0)
-    return (
-        connecting.length > 0 &&
-        connecting.every(method => {
-            const reachServers = referencedInputs(JSON.stringify(method.mcpServers))
-            return secretsOf(method).every(key => reachServers.has(key))
-        })
-    )
+    return manifest.authMethods.some(method => SIGN_IN_KINDS.has(method.kind) || method.inputs.some(input => input.secret))
 }
 
 // Whether each account of the app is an instance of its own, with its own servers and variables.
 export function usesInstances(manifest: ServiceManifest): boolean {
     return takesSeveralAccounts(manifest)
+}
+
+// Whether a skill speaks of one account: it reads a variable the account sets, or quotes a value of
+// it. Such a skill cannot be shared by two accounts of the app.
+export function skillQuotesAccount(skill: ServiceSkill, method: AuthMethod): boolean {
+    return referencedInputs(skill.body).size > 0 || method.envKeys.some(({ key }) => variablePattern(key).test(skill.body))
+}
+
+export function variablePattern(name: string): RegExp {
+    return new RegExp(`(?<![A-Za-z0-9_])${name}(?![A-Za-z0-9_])`, 'g')
 }
 
 // The paid app a method plugs the coworker into, if any. Nothing to sign in per coworker: the

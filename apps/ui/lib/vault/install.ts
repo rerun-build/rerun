@@ -1,12 +1,12 @@
 import 'server-only'
 
-import type { VaultItemSummary, VaultSkill } from '@rerun/contracts'
+import { type VaultItemSummary, type VaultSkill, vaultAccountLabel } from '@rerun/contracts'
 
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, createVaultItem, getVaultItem, patchVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
-import { type CompileResult, compileServiceParts } from '@/lib/services/compiler'
+import { type AccountRef, type CompileResult, compileServiceParts } from '@/lib/services/compiler'
 import type { ServiceInstanceTarget } from '@/lib/services/instances'
-import type { ServiceManifest, ServiceSkill } from '@/lib/services/manifest'
+import { type ServiceManifest, type ServiceSkill, getMethod, skillQuotesAccount } from '@/lib/services/manifest'
 import { slugify } from '@/lib/slugify'
 
 // What `${agent.id}` becomes in a Vault item: the engine resolves it to whichever coworker calls.
@@ -34,6 +34,19 @@ export function vaultSkills(skills: ServiceSkill[]): VaultSkill[] {
     return out
 }
 
+// The first account of an app is only spoken of by a name a person gave it: any other label on it is
+// the box's own, like the coworker it came from.
+function accountOf(item: Pick<VaultItemSummary, 'instanceId' | 'label' | 'customLabel'>): AccountRef {
+    return item.instanceId ? { instanceId: item.instanceId, label: vaultAccountLabel(item) } : { label: item.customLabel }
+}
+
+// The skills of an account whose name or instance changed, or null when none of them speaks of it.
+export function accountSkillsOf(manifest: ServiceManifest, item: Pick<VaultItemSummary, 'authMethodId' | 'config' | 'instanceId' | 'label' | 'customLabel' | 'skills'>): VaultSkill[] | null {
+    const method = getMethod(manifest, item.authMethodId)
+    if (item.skills.length === 0 || !manifest.skills.some(skill => skillQuotesAccount(skill, method))) return null
+    return vaultSkills(compileServiceParts(manifest, item.config, method.id, VAULT_AGENT_REF, accountOf(item)).skills)
+}
+
 export type VaultInstall = {
     conn: EngineConnection
     manifest: ServiceManifest
@@ -51,7 +64,8 @@ export type VaultInstall = {
 // held on the box for every coworker attached to it.
 export async function compileIntoVault(install: VaultInstall): Promise<CompileResult & { item: VaultItemSummary }> {
     const { conn, manifest, values, authMethodId, instance, itemId, engineAgentId } = install
-    const compiled = compileServiceParts(manifest, values, authMethodId, VAULT_AGENT_REF, instance?.instanceId)
+    const current = itemId ? await getVaultItem(conn, itemId) : null
+    const compiled = compileServiceParts(manifest, values, authMethodId, VAULT_AGENT_REF, current ? accountOf(current) : { instanceId: instance?.instanceId, label: instance?.label })
     const fields = {
         status: compiled.status,
         authMethodId: compiled.authMethodId,
@@ -62,10 +76,9 @@ export async function compileIntoVault(install: VaultInstall): Promise<CompileRe
     const targets = { oauth: compiled.oauth, managed: compiled.managed, composio: compiled.composio, app: compiled.app }
 
     let item: VaultItemSummary
-    if (itemId) {
+    if (itemId && current) {
         // A recompile only adds or replaces values: a secret left blank in the form keeps the one held.
         // Another sign-in method is another set of variables, and the old ones go.
-        const current = await getVaultItem(conn, itemId)
         const stale = current.authMethodId !== compiled.authMethodId ? current.envKeys.filter(key => !(key in compiled.env)) : []
         if (Object.keys(compiled.env).length > 0 || stale.length > 0) await updateVaultItemEnv(conn, itemId, { set: compiled.env, remove: stale })
         item = await patchVaultItem(conn, itemId, { ...fields, ...targets })

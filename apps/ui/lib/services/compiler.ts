@@ -5,7 +5,7 @@ import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import type { InputDef, McpServerTemplate, ServiceManifest, ServiceSkill } from './manifest'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { type ServiceInstanceTarget, defaultInstanceEnvVar, heldAccounts, instanceEnvVar, instanceServerName, ordinalInstanceLabel } from './instances'
-import { appTarget, composioTarget, getMethod, managedTarget, oauthServer } from './manifest'
+import { appTarget, composioTarget, getMethod, managedTarget, oauthServer, skillQuotesAccount, variablePattern } from './manifest'
 import { type RegistryEntry, readRegistry, registryFootprint, upsertRegistryEntry } from './registry'
 
 // Substitution context shared by every template string in a compile pass. Non-secret
@@ -105,9 +105,27 @@ export type CompiledService = CompileResult & {
     status: 'active' | 'needs_auth'
 }
 
+// Which account of an app an install is for: none of it on the only account the coworker holds.
+export type AccountRef = { instanceId?: string; label?: string }
+
+// A skill shared by every account of the app, unless it speaks of one account. Then each account after
+// the first has a copy of its own, and the description says whose it is: it is all the model reads
+// before it picks a skill.
+function accountSkill(manifest: ServiceManifest, skill: ServiceSkill, account: AccountRef): ServiceSkill {
+    const { instanceId, label } = account
+    if (!instanceId && !label) return skill
+    const whose = `For the ${manifest.name} account "${label ?? instanceId}" only: each ${manifest.name} account has its own skill. When several accounts fit and the user has not said which one, ask before acting.`
+    return {
+        name: instanceId ? instanceServerName(skill.name, instanceId) : skill.name,
+        description: [skill.description, whose].filter(Boolean).join(skill.description.endsWith('.') ? ' ' : '. '),
+        body: skill.body,
+    }
+}
+
 // `agentRef` is what `${agent.id}` becomes: the coworker's own engine id for an install in its
 // folder, `${RERUN_AGENT_ID}` for a Vault item, which the engine resolves to whichever coworker calls.
-export function compileServiceParts(manifest: ServiceManifest, values: Record<string, string>, authMethodId: string | undefined, agentRef: string, instanceId?: string): CompiledService {
+export function compileServiceParts(manifest: ServiceManifest, values: Record<string, string>, authMethodId: string | undefined, agentRef: string, account: AccountRef = {}): CompiledService {
+    const { instanceId } = account
     const method = getMethod(manifest, authMethodId)
     const inputMap = new Map(method.inputs.map(i => [i.key, i]))
     const envKeyByInput = new Map(method.envKeys.map(m => [m.fromInput, m.key]))
@@ -126,7 +144,10 @@ export function compileServiceParts(manifest: ServiceManifest, values: Record<st
         if (instanceId && method.kind === 'composio') server.headers = { ...server.headers, 'x-rerun-instance': instanceId }
         return server
     })
-    const skills = manifest.skills.map(skill => ({ ...skill, body: substitute(skill.body, ctx) }))
+    const skills = manifest.skills.map(skill => {
+        const body = method.envKeys.reduce((text, { key }) => text.replace(variablePattern(key), explicitVar(key)), substitute(skill.body, ctx))
+        return skillQuotesAccount(skill, method) ? accountSkill(manifest, { ...skill, body }, account) : { ...skill, body }
+    })
 
     // Secrets: the union of the method's explicit envKeys, any secret input referenced by an mcp
     // template, and the Basic credentials derived from them.
@@ -182,7 +203,9 @@ export async function compileService(
     instance?: ServiceInstanceTarget,
 ): Promise<CompileResult> {
     const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
-    const compiled = compileServiceParts(manifest, values, authMethodId, engineAgentId, instance?.instanceId)
+    // A recompile of an existing account keeps the label it already has (an email, or its ordinal).
+    const instanceFields = instance ? await instanceRegistryFields(conn, engineAgentId, manifest, instance) : {}
+    const compiled = compileServiceParts(manifest, values, authMethodId, engineAgentId, instanceFields)
 
     // 1. Secrets → engine .env (never Supabase, never cleartext in config.json).
     if (Object.keys(compiled.env).length > 0) {
@@ -205,8 +228,6 @@ export async function compileService(
     //    fails the agent still has working tools). Only non-secret config is stored,
     //    plus the footprint (mcpServers/envKeys/skills) so uninstall can reverse it.
     const registryKey = instance?.key ?? manifest.slug
-    // A recompile of an existing account keeps the label it already has (an email, or its ordinal).
-    const instanceFields = instance ? await instanceRegistryFields(conn, engineAgentId, manifest, instance) : {}
     const { oauth, managed, composio, app } = compiled
 
     await upsertRegistryEntry(conn, engineAgentId, registryKey, {

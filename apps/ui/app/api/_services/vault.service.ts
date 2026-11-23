@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, serviceRegistryKey, type VaultConflict, type VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, serviceRegistryKey, type VaultConflict, type VaultItemSummary, type VaultSkill } from '@rerun/contracts'
 
 import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -254,7 +254,6 @@ async function startInstance(ctx: VaultContext, item: VaultItemSummary & { slug:
     const vault = await listVaultItems(ctx.conn)
     const sameAccountNames = (itemId: string) => vault.some(other => other.id === itemId && isRegistryItem(other) && vaultRegistryKey(other) === key)
     if (!conflicts.every(conflict => conflict.kind !== 'skill' && sameAccountNames(conflict.itemId))) return null
-    // Loaded here rather than at the top: services.service imports this module.
     const { loadManifest } = await import('./services.service')
     const manifest = await loadManifest(item.slug)
     const instance = manifest && nextServiceInstance(manifest, vault.filter(other => other.slug === item.slug))
@@ -262,7 +261,15 @@ async function startInstance(ctx: VaultContext, item: VaultItemSummary & { slug:
 
     const { instanceId, label } = instance
     const renames = instanceRenames(item.slug, item.mcpServers.map(server => server.name), item.envKeys, instanceId)
-    return rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label }), ...renames }))
+    // Before the rename, so that one stopped half way clashes again and is made from the start.
+    const skills = await accountSkills({ ...item, instanceId, label: item.label ?? label })
+    if (skills) await patchVaultItem(ctx.conn, item.id, { skills })
+    try {
+        return await rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label }), ...renames }))
+    } catch (err) {
+        if (skills) await patchVaultItem(ctx.conn, item.id, { skills: item.skills }).catch(undo => console.warn(`[vault] skills of ${item.id} left renamed:`, undo instanceof Error ? undo.message : undo))
+        throw err
+    }
 }
 
 // The coworker's own install of the app still waiting on its sign-in sits on the same registry key as
@@ -310,7 +317,16 @@ export async function renameVaultEntry(itemId: string, name: string | null, acto
     await assertCanChangeItem(ctx.actor, item, ctx)
     if (item.kind !== 'service') throw new Error('Only the account of an app is renamed')
     if (!(await supportsVaultRename(ctx.conn))) throw new AppError('vaultRenameUnsupported')
-    return patchVaultItem(ctx.conn, itemId, { customLabel: name?.trim() || null })
+    const customLabel = name?.trim() || null
+    const skills = await accountSkills({ ...item, customLabel: customLabel ?? undefined })
+    return patchVaultItem(ctx.conn, itemId, { customLabel, ...(skills ? { skills } : {}) })
+}
+
+// Loaded here rather than at the top: services.service imports this module.
+async function accountSkills(item: VaultItemSummary): Promise<VaultSkill[] | null> {
+    const [{ loadManifest }, { accountSkillsOf }] = await Promise.all([import('./services.service'), import('@/lib/vault/install')])
+    const manifest = item.slug ? await loadManifest(item.slug) : null
+    return manifest && accountSkillsOf(manifest, item)
 }
 
 // The coworkers that lose the entry if it goes, those the caller sees by name and the others counted.

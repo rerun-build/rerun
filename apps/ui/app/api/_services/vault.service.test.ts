@@ -285,7 +285,7 @@ describe('attaching', () => {
             expect(vi.mocked(instanceVaultItem).mock.calls[0][2]).not.toHaveProperty('label')
         })
 
-        it('still refuses a clash with another app, a paid app, an app that keeps one account and a box that cannot rename', async () => {
+        it('still refuses a clash with another app, a paid app, an app with nothing to connect and a box that cannot rename', async () => {
             const refused = async () => {
                 vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first')).mockResolvedValue(legacy('second') as never)
                 await expect(attachVaultEntry('second', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
@@ -298,7 +298,7 @@ describe('attaching', () => {
             await refused()
             vi.mocked(getVaultItem).mockResolvedValue(legacy('second') as never)
 
-            vi.mocked(loadManifest).mockResolvedValue(serviceManifestSchema.parse({ ...GETXAPI, skills: [{ name: 'usage', description: '', body: 'Call with ${input.GETXAPI_KEY}' }] }))
+            vi.mocked(loadManifest).mockResolvedValue(serviceManifestSchema.parse({ ...GETXAPI, authMethods: [], inputs: [] }))
             await refused()
             vi.mocked(loadManifest).mockResolvedValue(GETXAPI)
 
@@ -306,6 +306,24 @@ describe('attaching', () => {
             await refused()
 
             expect(instanceVaultItem).not.toHaveBeenCalled()
+        })
+
+        it('rewrites the skill that quotes its variables before the rename, and puts it back when the box refuses', async () => {
+            const usage = { slug: 'getxapi-usage', name: 'getxapi-usage', description: 'How', body: 'curl $GETXAPI_KEY' }
+            vi.mocked(loadManifest).mockResolvedValue(serviceManifestSchema.parse({ ...GETXAPI, authMethods: [], envKeys: [{ key: 'GETXAPI_KEY', fromInput: 'GETXAPI_KEY' }], skills: [usage] }))
+            vi.mocked(getVaultItem).mockResolvedValue(legacy('second', { envKeys: ['GETXAPI_KEY'], skills: [usage] }) as never)
+
+            await attachVaultEntry('second', 'alice', admin)
+
+            const { instanceId } = vi.mocked(instanceVaultItem).mock.calls[0][2]
+            expect(patchVaultItem).toHaveBeenCalledExactlyOnceWith(conn, 'second', { skills: [expect.objectContaining({ slug: `getxapi-usage-${instanceId}`, body: `curl $GETXAPI_KEY_${instanceId.toUpperCase()}`, description: expect.stringContaining('"GetXAPI 3"') })] })
+            expect(vi.mocked(patchVaultItem).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(instanceVaultItem).mock.invocationCallOrder[0])
+
+            vi.mocked(patchVaultItem).mockClear()
+            vi.mocked(attachVaultItem).mockReset().mockRejectedValueOnce(clash('first'))
+            vi.mocked(instanceVaultItem).mockRejectedValueOnce(new Error('engine unreachable'))
+            await expect(attachVaultEntry('second', 'alice', admin)).rejects.toThrow('engine unreachable')
+            expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'second', { skills: [usage] })
         })
 
         it('leaves an account that already has an instance as it is', async () => {

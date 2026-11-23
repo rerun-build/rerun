@@ -1,4 +1,4 @@
-import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
+import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, skillQuotesAccount, takesSeveralAccounts } from '@/lib/services/manifest'
 import { describe, expect, it } from 'vitest'
 
 const linkedinManifest = {
@@ -64,7 +64,7 @@ describe('takesSeveralAccounts', () => {
         expect(takesSeveralAccounts(paid)).toBe(false)
     })
 
-    it('keeps to one account an app whose key the skill reads from the environment', () => {
+    it('lets a coworker hold several accounts of an app whose skill reads a key or quotes a value, one skill each', () => {
         const fathom = serviceManifestSchema.parse({
             slug: 'fathom',
             name: 'Fathom',
@@ -74,10 +74,9 @@ describe('takesSeveralAccounts', () => {
                 { id: 'api-key', kind: 'key', inputs: [{ ...apiKey, key: 'FATHOM_API_KEY' }], envKeys: [{ key: 'FATHOM_API_KEY', fromInput: 'FATHOM_API_KEY' }] },
             ],
         })
-        expect(takesSeveralAccounts(fathom)).toBe(false)
-    })
+        expect(takesSeveralAccounts(fathom)).toBe(true)
+        expect(fathom.authMethods.map(method => skillQuotesAccount(fathom.skills[0], method))).toEqual([false, true])
 
-    it('keeps to one account an app whose skill quotes a value of the account', () => {
         const unipile = serviceManifestSchema.parse({
             slug: 'unipile',
             name: 'Unipile',
@@ -85,7 +84,14 @@ describe('takesSeveralAccounts', () => {
             inputs: [{ ...apiKey, key: 'UNIPILE_API_KEY' }, { key: 'UNIPILE_DSN', label: 'DSN', required: true }],
             mcpServers: [{ name: 'unipile', transport: 'http', url: 'https://unipile.test/mcp', headers: { 'X-API-KEY': '${input.UNIPILE_API_KEY}' } }],
         })
-        expect(takesSeveralAccounts(unipile)).toBe(false)
+        expect(takesSeveralAccounts(unipile)).toBe(true)
+        expect(skillQuotesAccount(unipile.skills[0], unipile.authMethods[0])).toBe(true)
+    })
+
+    it('reads a variable by its whole name, never inside a longer one', () => {
+        const method = defaultMethod(serviceManifestSchema.parse({ slug: 'c', name: 'C', inputs: [apiKey], envKeys: [{ key: 'API_KEY', fromInput: 'API_KEY' }] }))
+        const quotes = (body: string) => skillQuotesAccount({ name: 's', description: '', body }, method)
+        expect([quotes('use $API_KEY'), quotes('use ${API_KEY}'), quotes('use $OLD_API_KEY'), quotes('use $API_KEY_ID')]).toEqual([true, true, false, false])
     })
 
     it('offers no second account of an app with nothing to connect', () => {

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { attachVaultItem, createVaultItem, getVaultItem, patchVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { serviceManifestSchema } from '@/lib/services/manifest'
 import { compileServiceParts } from '@/lib/services/compiler'
-import { VAULT_AGENT_REF, compileIntoVault, vaultSkills } from './install'
+import { VAULT_AGENT_REF, accountSkillsOf, compileIntoVault, vaultSkills } from './install'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
@@ -57,9 +57,56 @@ describe('compileServiceParts', () => {
     })
 
     it('suffixes the servers and variables of an extra account', () => {
-        const parts = compileServiceParts(manifest, values, 'api-token', VAULT_AGENT_REF, 'k3x9ab')
+        const parts = compileServiceParts(manifest, values, 'api-token', VAULT_AGENT_REF, { instanceId: 'k3x9ab' })
         expect(parts.servers[0].name).toBe('atlassian-k3x9ab')
         expect(Object.keys(parts.env)).toEqual(['RERUN_SVC_ATLASSIAN_K3X9AB_ATLASSIAN_API_TOKEN'])
+    })
+})
+
+const clay = serviceManifestSchema.parse({
+    name: 'Clay',
+    slug: 'clay',
+    skills: [
+        { name: 'clay-usage', description: 'How to use Clay', body: 'POST to $CLAY_WEBHOOK_URL with `CLAY_API_KEY`.' },
+        { name: 'clay-writing', description: 'How to write', body: 'Short sentences.' },
+    ],
+    inputs: ['CLAY_WEBHOOK_URL', 'CLAY_API_KEY'].map(key => ({ key, label: key, secret: true, required: true })),
+    envKeys: ['CLAY_WEBHOOK_URL', 'CLAY_API_KEY'].map(key => ({ key, fromInput: key })),
+})
+const clayValues = { CLAY_WEBHOOK_URL: 'https://hook.test', CLAY_API_KEY: 'sk' }
+
+describe('a skill that speaks of one account', () => {
+    it('is the catalog one for the only account', () => {
+        expect(compileServiceParts(clay, clayValues, undefined, VAULT_AGENT_REF).skills).toEqual(clay.skills)
+    })
+
+    it('has a copy per extra account, with its variables and whose it is, next to the shared ones', () => {
+        const { skills, env } = compileServiceParts(clay, clayValues, undefined, VAULT_AGENT_REF, { instanceId: 'k3x9ab', label: 'Clay 2' })
+        expect(Object.keys(env)).toEqual(['CLAY_WEBHOOK_URL_K3X9AB', 'CLAY_API_KEY_K3X9AB'])
+        expect(skills[0]).toMatchObject({ name: 'clay-usage-k3x9ab', body: 'POST to $CLAY_WEBHOOK_URL_K3X9AB with `CLAY_API_KEY_K3X9AB`.' })
+        expect(skills[0].description).toMatch(/^How to use Clay\. For the Clay account "Clay 2" only: .* ask before acting\.$/)
+        expect(skills[1]).toEqual(clay.skills[1])
+    })
+
+    it('quotes the values of its own account', () => {
+        const { skills } = compileServiceParts(manifest, { ...values, ATLASSIAN_EMAIL: 'sales@acme.test' }, 'api-token', VAULT_AGENT_REF, { instanceId: 'k3x9ab', label: 'Sales' })
+        expect(skills[0]).toMatchObject({ name: 'Jira triage-k3x9ab', body: 'Use the tools for sales@acme.test.' })
+    })
+
+    const held = { config: {}, skills: [{ slug: 'clay-usage', name: 'clay-usage', description: '', body: 'x' }] }
+
+    it('follows the name given to the account, the first one included', () => {
+        const extra = accountSkillsOf(clay, { ...held, instanceId: 'k3x9ab', label: 'Clay 2', customLabel: 'Sales' })
+        expect(extra?.[0]).toMatchObject({ slug: 'clay-usage-k3x9ab', description: expect.stringContaining('account "Sales"') })
+        const base = accountSkillsOf(clay, { ...held, label: 'Writer', customLabel: 'Ops' })
+        expect(base?.[0]).toMatchObject({ slug: 'clay-usage', body: clay.skills[0].body, description: expect.stringContaining('account "Ops"') })
+        expect(accountSkillsOf(clay, { ...held, label: 'Writer' })?.[0].description).toBe('How to use Clay')
+    })
+
+    it('leaves alone an app whose skills speak of no account', () => {
+        const plain = serviceManifestSchema.parse({ ...clay, authMethods: [], skills: [clay.skills[1]] })
+        expect(accountSkillsOf(plain, { ...held, instanceId: 'k3x9ab' })).toBeNull()
+        expect(accountSkillsOf(clay, { ...held, skills: [], instanceId: 'k3x9ab' })).toBeNull()
     })
 })
 
