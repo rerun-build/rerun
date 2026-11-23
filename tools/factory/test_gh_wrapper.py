@@ -174,6 +174,32 @@ class Wrapper(unittest.TestCase):
         p = self.run_gh("issue", "view", "5", "--json", "body", "-t", "@linus")
         self.assertEqual((p.returncode, p.stdout), (0, "ok shared\n"))
 
+    def test_close_comments_attached_flags_and_graphql_queries_are_checked(self):
+        refused = (
+            ["issue", "close", "5", "--comment", "hi @linus"],
+            ["pr", "close", "5", "-c", "hi @linus"],
+            ["issue", "close", "5", "--comment=hi @linus"],
+            ["pr", "close", "5", "--comment=hi @linus"],
+            ["issue", "comment", "5", "-b@linus"],
+            ["pr", "create", "-tFix", "-b(@linus) checks"],
+            ["pr", "close", "5", "-c@linus"],
+            ["pr", "review", "5", "--comment", "-b", "hi @linus"],
+            ["pr", "review", "5", "-c", "-b", "hi @linus"],
+            ["pr", "review", "5", "--approve", "-b@linus"],
+            ["api", "graphql", "-f", 'query=mutation{addComment(input:{body:"@linus"})}'],
+            ["api", "graphql", "-F", 'query=mutation{addComment(input:{body:"@linus"})}'],
+            ["api", "graphql", "--raw-field=query=mutation{addComment(input:{body:\"@linus\"})}"],
+            ["api", "graphql", "--field", 'query=mutation{addComment(input:{body:"@linus"})}'],
+        )
+        for args in refused:
+            self.assert_refused(self.run_gh(*args))
+        p = self.run_gh("issue", "close", "5", "--comment",
+                        "Closing: labelled stale for 14 days or more with no change.")
+        self.assertEqual((p.returncode, p.stdout), (0, "ok shared\n"), p.stderr)
+        p = self.run_gh("api", "graphql", "-f",
+                        'query=mutation{addComment(input:{body:"see @4a9cf597 and a@b.com"})}')
+        self.assertEqual(p.returncode, 0, p.stderr)
+
     def test_no_key_file_stops_before_anything_runs(self):
         os.remove(self.key)
         self.assertEqual(self.run_gh("issue", "view", "5").returncode, 78)
