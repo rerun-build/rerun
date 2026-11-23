@@ -45,6 +45,7 @@ vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toV
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
+vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: vi.fn(async () => 'foreman-row') }))
 vi.mock('@rerun/cloud/apps.server', () => ({ syncAppConnector: vi.fn(async () => 0), unbindAgent: vi.fn() }))
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 
@@ -325,20 +326,31 @@ describe('installService on a lifetime workspace', () => {
 
 // The account a paid app acts with is bound to a coworker's row, which the Chief of Staff does not have.
 describe('the paid apps and the Chief of Staff', () => {
-    it('leaves them out of its catalog, whatever the plan', async () => {
+    const ACTOR = { kind: 'workspace', workspaceId: 7 } as const
+
+    it('lists them in its catalog on a plan that sells them', async () => {
         useRegistry({ services: {} })
         workspacePlan = 'base'
-        const { results } = await searchServices('foreman')
+        const { results } = await searchServices('foreman', undefined, undefined, ACTOR)
+
+        expect(results.map(r => r.slug)).toEqual(['gmail', 'notion', 'whatsapp-pro'])
+    })
+
+    it('leaves them out on a plan that does not', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime_restricted'
+        const { results } = await searchServices('foreman', undefined, undefined, ACTOR)
 
         expect(results.map(r => r.slug)).toEqual(['gmail', 'notion'])
     })
 
-    it('refuses to install one on it', async () => {
+    it('installs one on it, bound to its row', async () => {
         useRegistry({ services: {} })
         workspacePlan = 'base'
+        vi.mocked(compileService).mockResolvedValueOnce({ toolNames: [], oauth: null, managed: null, composio: null, app: { appSlug: 'whatsapp', serverName: 'whatsapp_pro' } } as never)
 
-        await expect(installService('foreman', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro connects to a coworker, not to the Chief of Staff')
-        expect(compileService).not.toHaveBeenCalled()
+        await expect(installService('foreman', 'whatsapp-pro', {}, undefined, ACTOR)).resolves.toMatchObject({ status: 'needs_auth', slug: 'whatsapp-pro' })
+        expect(vi.mocked(syncAppConnector).mock.calls.at(-1)?.slice(1)).toEqual(['foreman-row', 'whatsapp'])
     })
 })
 

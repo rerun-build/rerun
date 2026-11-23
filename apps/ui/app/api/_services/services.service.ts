@@ -1,6 +1,6 @@
 import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 
-import { workspaceActor, type Actor, agentRowIdOf } from '@/app/api/_auth/access'
+import { requireLightSessionActor, workspaceActor, type Actor, agentRowIdOf } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
@@ -11,7 +11,7 @@ import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachV
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { decompileMigrationCopy } from '@/lib/vault/copies'
-import { VaultUnavailableError, assertCanChangeItem, rethrowConflict, vaultContext, type VaultContext } from '@/app/api/_services/vault.service'
+import { assertCanChangeItem, rethrowConflict, vaultContext, type VaultContext } from '@/app/api/_services/vault.service'
 import { AccessDeniedError } from '@/app/api/_auth/access'
 import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
 import { AppError } from '@/lib/i18n/action-error'
@@ -158,7 +158,7 @@ function toSearchResult(s: CatalogRow, installed: Map<string, AgentServiceStatus
 // service surfaces even with no shared keywords. Falls back to substring matching when
 // there's no query or no embedding key configured — nothing breaks before the backfill.
 export async function searchServices(agentId: string, query?: string, category?: string, actor?: Actor): Promise<{ results: ServiceSearchResult[] }> {
-    const [installed, paidApps] = await Promise.all([installedStatuses(agentId, actor), arePaidAppsOfferedTo(agentId)])
+    const [installed, paidApps] = await Promise.all([installedStatuses(agentId, actor), arePaidAppsOfferedTo(agentId, actor)])
     const results = await searchCatalog(installed, query, category)
     return { results: paidApps ? results : withoutPaidApps(results) }
 }
@@ -169,13 +169,21 @@ export function withoutPaidApps(results: ServiceSearchResult[]): ServiceSearchRe
     return results.filter(result => !result.paidApp)
 }
 
-// The Chief of Staff takes none: the account a paid app acts with is bound to a coworker's row.
-async function arePaidAppsOfferedTo(agentId: string): Promise<boolean> {
-    if (agentId === FOREMAN_AGENT_ID) return false
-    const supabase = createServiceRoleClient()
-    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })
+// The row a paid app's account is bound to (app_connection_agents): a coworker's own, and the Chief
+// of Staff's, which the app calls by its address. Read once its caller passed the access check.
+async function appHolderOf(agentId: string, actor?: Actor): Promise<{ id: string; workspace_id: number } | null> {
+    if (agentId === FOREMAN_AGENT_ID) {
+        const workspaceId = (actor ?? (await requireLightSessionActor())).workspaceId
+        return { id: await agentRowIdOf(agentId, workspaceId), workspace_id: workspaceId }
+    }
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'agents', ['id', 'workspace_id'] as const, { id: agentId })
+    return data
+}
+
+async function arePaidAppsOfferedTo(agentId: string, actor?: Actor): Promise<boolean> {
+    const agent = await appHolderOf(agentId, actor)
     if (!agent) return true
-    const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['plan'] as const, { id: agent.workspace_id })
+    const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan'] as const, { id: agent.workspace_id })
     return arePaidAppsOffered(workspace)
 }
 
@@ -437,20 +445,13 @@ export async function installService(
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
-    if (isPaidApp(manifest)) {
-        // The account an app connection acts with is bound to a coworker's row (app_connection_agents),
-        // which the Chief of Staff does not have.
-        if (agentId === FOREMAN_AGENT_ID) throw new Error(`${manifest.name} connects to a coworker, not to the Chief of Staff: attach it to the coworker that needs it with attach_connector.`)
-        if (!(await arePaidAppsOfferedTo(agentId))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
-    }
+    if (isPaidApp(manifest) && !(await arePaidAppsOfferedTo(agentId, actor))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
 
     const instance = await installTarget(agentId, manifest, slugOrKey, Boolean(opts?.newInstance), actor)
     const key = instance?.key ?? manifest.slug
     const method = getMethod(manifest, authMethodId)
     const missing = missingRequiredInputs(method, values)
     const vault = await vaultInstallTarget(agentId, key, method.kind, actor)
-    // Outside the Vault an app lives under a coworker's row, which the Chief of Staff does not have.
-    if (!vault && agentId === FOREMAN_AGENT_ID) throw new VaultUnavailableError()
     if (missing.length > 0 || opts?.pending) {
         if (vault) await rethrowConflict(vault.ctx, () => markVaultNeedsConfig(vault, manifest, method.id, instance))
         else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
@@ -474,7 +475,7 @@ export async function installService(
     }
     if (app) {
         // A coworker that already picked an account (a reinstall) is ready at once.
-        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), agentId, app.appSlug) : 0
+        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), (await appHolderOf(agentId, actor))?.id ?? agentId, app.appSlug) : 0
         if (accounts === 0) {
             return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, app, message: `${manifest.name} needs the user to pick the account you act with. A picker has been shown to them.` }
         }
@@ -610,7 +611,7 @@ export async function resetServiceConnection(agentId: string, key: string, actor
     // bound keeps working while the picker is open, since closing it without a pick changes nothing.
     if (entry.app?.serverName) {
         const app = { appSlug: entry.app.appSlug, serverName: entry.app.serverName }
-        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), agentId, app.appSlug) : 0
+        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), (await appHolderOf(agentId, actor))?.id ?? agentId, app.appSlug) : 0
         if (accounts === 0) await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', app })
         return { mode: 'auth', app }
     }
@@ -700,9 +701,8 @@ export async function uninstallService(agentId: string, key: string, actor?: Act
     if (entry?.vaultItemId && !(await decompileMigrationCopy(conn, engineAgentId, key, entry, reg))) await detachVaultItem(conn, entry.vaultItemId, engineAgentId)
     else await removeRegistryEntry(conn, engineAgentId, key)
     if (entry?.app && isAppSlug(entry.app.appSlug)) {
-        const supabase = createServiceRoleClient()
-        const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })
-        if (agent) await unbindAgent(supabase, agent.workspace_id, agentId, entry.app.appSlug)
+        const agent = await appHolderOf(agentId, actor)
+        if (agent) await unbindAgent(createServiceRoleClient(), agent.workspace_id, agent.id, entry.app.appSlug)
     }
 }
 

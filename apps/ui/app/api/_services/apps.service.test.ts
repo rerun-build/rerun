@@ -54,7 +54,7 @@ function workspaceHoldsTheAccount(holds: boolean) {
 
 beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(assertAgentAccess).mockResolvedValue({ actor: KEY_ACTOR } as never)
+    vi.mocked(assertAgentAccess).mockImplementation(async agentId => ({ actor: KEY_ACTOR, agent: { id: agentId } }) as never)
     vi.mocked(requireWorkspaceContext).mockRejectedValue(new Error('no browser session'))
 })
 
@@ -93,7 +93,7 @@ describe('the accounts of a coworker', () => {
         supabase = fakeSupabase(tableResolver({ app_connection_agents: bindings, app_connections: CONNECTIONS }))
         vi.mocked(requireWorkspaceContext).mockResolvedValue({ workspace: { id: 7 }, userId: 'u-1', supabase: supabase.client } as never)
         vi.mocked(createServiceRoleClient).mockReturnValue(supabase.client)
-        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ engine_agent_id: 'engine-1' } as never)
+        vi.mocked(assertAgentInWorkspace).mockImplementation(async agentId => ({ id: agentId, engine_agent_id: 'engine-1' }) as never)
         vi.mocked(createTrigger).mockImplementation(async (_conn, _agent, { name }) => ({ slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''), token: 'tok' }) as never)
     }
 

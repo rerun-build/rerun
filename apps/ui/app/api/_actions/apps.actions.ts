@@ -1,5 +1,6 @@
 'use server'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { z } from 'zod'
 import { paidAppFlag } from '@rerun/cloud/apps.server'
 import { requireAdminContext } from '@/app/api/_auth/ownership'
@@ -57,6 +58,8 @@ async function runAsAdmin<T>(slug: AppSlug, fallback: ErrorCode, body: () => Pro
 
 const appSlug = z.enum(APP_SLUGS)
 const id = z.string().uuid()
+// A coworker by its row, or the Chief of Staff by its address.
+const agentRef = z.union([z.literal(FOREMAN_AGENT_ID), id])
 const country = z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/)
 
 const linkedinConnectSchema = z.union([
@@ -119,27 +122,27 @@ export async function disconnectAppConnectionAction(slug: AppSlug, connectionId:
 }
 
 export async function getAgentAppAccountsAction(slug: AppSlug, agentId: string): Promise<Result<AgentAppAccount[]>> {
-    return run(slug, 'loadCoworkerAccountFailed', () => getAgentAppAccounts(slug, id.parse(agentId)))
+    return run(slug, 'loadCoworkerAccountFailed', () => getAgentAppAccounts(slug, agentRef.parse(agentId)))
 }
 
 // Picking an account is the coworker's whole sign-in for a paid app: its service goes active here.
 export async function attachAgentToConnectionAction(slug: AppSlug, agentId: string, connectionId: string): Promise<Result<null>> {
     return run(slug, 'attachAccountFailed', async () => {
-        await attachAgentToConnection(slug, id.parse(agentId), id.parse(connectionId))
+        await attachAgentToConnection(slug, agentRef.parse(agentId), id.parse(connectionId))
         return null
     })
 }
 
 export async function detachAgentFromConnectionAction(slug: AppSlug, agentId: string, connectionId: string): Promise<Result<null>> {
     return run(slug, 'detachAccountFailed', async () => {
-        await detachAgentFromConnection(slug, id.parse(agentId), id.parse(connectionId))
+        await detachAgentFromConnection(slug, agentRef.parse(agentId), id.parse(connectionId))
         return null
     })
 }
 
 export async function setAgentWakeEventsAction(slug: AppSlug, agentId: string, connectionId: string, events: string[]): Promise<Result<null>> {
     return run(slug, 'saveEventsFailed', async () => {
-        await setAgentWakeEvents(slug, id.parse(agentId), id.parse(connectionId), z.array(z.string()).max(10).parse(events))
+        await setAgentWakeEvents(slug, agentRef.parse(agentId), id.parse(connectionId), z.array(z.string()).max(10).parse(events))
         return null
     })
 }

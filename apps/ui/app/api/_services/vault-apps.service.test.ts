@@ -38,7 +38,7 @@ beforeEach(() => {
     vi.mocked(paidAppFlag).mockImplementation(async slug => slug === 'linkedin')
     vi.mocked(selectMany).mockImplementation((async (_client: unknown, table: string) => ({ data: TABLES[table] ?? [], error: null })) as never)
     vi.mocked(visibleSpaceIds).mockResolvedValue(new Set(['box-a']) as never)
-    vi.mocked(assertAgentAccess).mockResolvedValue({ actor } as never)
+    vi.mocked(assertAgentAccess).mockImplementation(async agentId => ({ actor, agent: { id: agentId } }) as never)
 })
 
 describe('vaultPaidAccounts', () => {
@@ -50,6 +50,17 @@ describe('vaultPaidAccounts', () => {
         ])
         const query = vi.mocked(selectMany).mock.calls.find(call => call[1] === 'app_connections')
         expect(query?.[3]).toMatchObject({ workspace_id: 7, app_slug: ['linkedin'] })
+    })
+
+    it('names the Chief of Staff by its address, seen by every member', async () => {
+        const tables: Record<string, unknown[]> = {
+            ...TABLES,
+            app_connection_agents: [...TABLES.app_connection_agents, { agent_id: 'cos-row', connection_id: 'conn-b' }],
+            agents: [...TABLES.agents, { id: 'cos-row', kind: 'foreman', space_id: null }],
+        }
+        vi.mocked(selectMany).mockImplementation((async (_client: unknown, table: string) => ({ data: tables[table] ?? [], error: null })) as never)
+        const accounts = await vaultPaidAccounts(actor)
+        expect(accounts[1]).toMatchObject({ connectionId: 'conn-b', agentIds: ['foreman'], hiddenAgents: 0 })
     })
 
     it('lists nothing when no paid app is switched on', async () => {

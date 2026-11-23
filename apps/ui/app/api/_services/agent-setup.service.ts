@@ -5,7 +5,7 @@ import { type ServiceManifest, autoInstallableMethod, isPaidApp, serviceManifest
 import { readRegistry } from '@/lib/services/registry'
 import type { ServiceChecklistItem } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
+import { type CoworkerLook } from '@rerun/contracts'
 import { selectSingle } from '@/supabase/supabase-helpers'
 import { createAgent } from './agent.service'
 import type { ServiceInstanceSeed } from '@/lib/services/instances'
@@ -45,7 +45,7 @@ export async function declareService(agentId: string, manifest: ServiceManifest,
     const paidApp = isPaidApp(manifest)
     // Compiled again, the connector would wait for an account it already has.
     if (paidApp && held?.status === 'active') return 'compiled'
-    if (!paidApp || agentId === FOREMAN_AGENT_ID) {
+    if (!paidApp) {
         const { status } = await installService(agentId, key, {}, method?.id, actor, { pending: !method })
         return status === 'needs_config' ? 'needs_config' : 'compiled'
     }

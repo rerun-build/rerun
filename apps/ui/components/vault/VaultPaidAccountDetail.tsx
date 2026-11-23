@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 
 import { attachVaultPaidAccountAction, detachVaultPaidAccountAction } from '@/app/api/_actions/vault.actions'
@@ -28,8 +27,7 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
     const t = useTranslations('vault')
     const errorText = useErrorText()
     const [busy, setBusy] = useState<string | null>(null)
-    // A paid account is bound to a coworker's row, which the Chief of Staff does not have.
-    const coworkers = listing.coworkers.filter(coworker => coworker.id !== FOREMAN_AGENT_ID)
+    const coworkers = listing.coworkers
 
     const toggle = async (agentId: string, on: boolean) => {
         setBusy(agentId)

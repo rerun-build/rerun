@@ -2,7 +2,7 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { useLoadMoreOnScroll } from '@/hooks/useLoadMoreOnScroll'
-import { FOREMAN_AGENT_ID, parseServiceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey } from '@rerun/contracts'
 
 import { getServiceAlternativesAction, getServiceDetailsAction, installServiceAction, listCatalogServicesAction, resetServiceConnectionAction, searchServicesAction, uninstallServiceAction } from '@/app/api/_actions/services.actions'
 import { getAgentDetailAction, patchAgentMcpServersAction } from '@/app/api/_actions/agent.actions'
@@ -102,8 +102,6 @@ const BROWSE_PAGE_SIZE = 60
 // same ServiceConfigForm shown inline in chat, so config is identical on both sides.
 export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const boxManageReason = useBoxManageReason(agentId)
-    // The account a paid app acts with is bound to a coworker's row, which the Chief of Staff does not have.
-    const takesPaidApps = agentId !== FOREMAN_AGENT_ID
     const t = useTranslations('agent.agentPanelServices')
     const tServices = useTranslations('services')
     const errorText = useErrorText()
@@ -159,12 +157,12 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         browseOffsetRef.current = offset + page.length
         setBrowseServices(prev => {
             const seen = new Set(prev.map(s => s.slug))
-            return [...prev, ...page.filter(s => !seen.has(s.slug) && (takesPaidApps || !s.paidApp))]
+            return [...prev, ...page.filter(s => !seen.has(s.slug))]
         })
         setBrowseHasMore(page.length === BROWSE_PAGE_SIZE)
         setBrowseLoading(false)
         browseLoadingRef.current = false
-    }, [browseHasMore, selectedCategory, takesPaidApps])
+    }, [browseHasMore, selectedCategory])
 
     const resetBrowse = useCallback(() => {
         browseOffsetRef.current = 0

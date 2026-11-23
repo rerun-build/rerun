@@ -157,10 +157,11 @@ describe('the Chief of Staff, which holds its apps in the Vault only', () => {
         expect(compileIntoVault).not.toHaveBeenCalled()
     })
 
-    it('connects nothing on a box without a Vault, where an app would need a coworker row', async () => {
+    it('keeps an app in its own folder on a box without a Vault, like a coworker', async () => {
         vi.mocked(supportsVault).mockResolvedValueOnce(false)
-        await expect(installService('foreman', 'linear', {}, 'oauth')).rejects.toMatchObject({ code: 'vaultUnavailable' })
-        expect(compileService).not.toHaveBeenCalled()
+        await installService('foreman', 'linear', {}, 'oauth')
+        expect(compileService).toHaveBeenCalled()
+        expect(compileIntoVault).not.toHaveBeenCalled()
     })
 
     it('detaches itself from the entry on uninstall, and leaves the account in the Vault', async () => {

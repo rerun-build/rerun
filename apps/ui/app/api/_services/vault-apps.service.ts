@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { paidAppFlag, unbindAgent } from '@rerun/cloud/apps.server'
+import { agentAddress, agentKindPolicy } from '@rerun/contracts'
 
 import { assertAgentAccess, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { appInfo } from '@/lib/apps/catalog'
@@ -35,13 +36,20 @@ export async function vaultPaidAccounts(actor?: Actor): Promise<VaultPaidAccount
     const connections = rows ?? []
     if (connections.length === 0) return []
     const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['agent_id', 'connection_id'] as const, { connection_id: connections.map(connection => connection.id) })
-    const { data: agents } = bindings?.length ? await selectMany(supabase, 'agents', ['id', 'space_id'] as const, { id: bindings.map(binding => binding.agent_id) }) : { data: [] }
+    const { data: agents } = bindings?.length ? await selectMany(supabase, 'agents', ['id', 'kind', 'space_id'] as const, { id: bindings.map(binding => binding.agent_id) }) : { data: [] }
     const visible = await visibleSpaceIds(resolved)
-    const spaceOf = new Map((agents ?? []).map(agent => [agent.id, agent.space_id]))
-    const sees = (agentId: string) => visible === 'all' || visible.has(spaceOf.get(agentId) ?? '')
+    const rowOf = new Map((agents ?? []).map(agent => [agent.id, agent]))
+    // The Vault names each coworker by the id the app calls it by: the Chief of Staff by its address,
+    // which every member reaches.
+    const listed = (agentId: string): string | null => {
+        const agent = rowOf.get(agentId)
+        if (!agent) return null
+        if (agentKindPolicy(agent.kind).reach === 'workspace') return agentAddress(agent)
+        return visible === 'all' || visible.has(agent.space_id ?? '') ? agent.id : null
+    }
     return connections.map(connection => {
         const bound = (bindings ?? []).filter(binding => binding.connection_id === connection.id).map(binding => binding.agent_id)
-        const seen = bound.filter(sees)
+        const seen = bound.flatMap(agentId => listed(agentId) ?? [])
         const slug = connection.app_slug as AppSlug
         return { slug, name: appInfo(slug).name, serviceSlug: appInfo(slug).serviceSlug, connectionId: connection.id, label: connection.label, status: connection.status as AppConnectionStatus, agentIds: seen, hiddenAgents: bound.length - seen.length }
     })
@@ -58,12 +66,12 @@ export async function attachVaultPaidAccount(slug: AppSlug, connectionId: string
 // The coworker stops acting with the account, which stays connected. Its other accounts of the app
 // keep their wake-ups, and the connector only goes with the last one.
 export async function detachVaultPaidAccount(slug: AppSlug, connectionId: string, agentId: string, actor?: Actor): Promise<void> {
-    const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
+    const { actor: resolved, agent } = await assertAgentAccess(agentId, 'manage', actor)
     const supabase = createServiceRoleClient()
-    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
+    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agent.id, app_slug: slug })
     if (!bindings?.some(binding => binding.connection_id === connectionId)) return
     if (bindings.length > 1) return detachAgentFromConnection(slug, agentId, connectionId, resolved)
     await uninstallService(agentId, appInfo(slug).serviceSlug, resolved)
     // A binding whose connector was already gone outlives the uninstall: drop it here.
-    await unbindAgent(supabase, resolved.workspaceId, agentId, slug)
+    await unbindAgent(supabase, resolved.workspaceId, agent.id, slug)
 }
