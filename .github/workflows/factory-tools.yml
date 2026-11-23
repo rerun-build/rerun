@@ -15,12 +15,18 @@ permissions:
   contents: read
 
 jobs:
+  route:
+    uses: ./.github/workflows/route.yml
+    secrets:
+      RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+
   test:
+    needs: route
     if: >-
       github.repository_owner == 'special-place-ai-heaven' &&
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     name: Factory tools tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.route.outputs.light || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - name: Lint
