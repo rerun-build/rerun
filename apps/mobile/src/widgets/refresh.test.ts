@@ -5,7 +5,7 @@ jest.mock('./CrewWidget', () => ({ __esModule: true, default: { updateSnapshot: 
 jest.mock('expo-widgets', () => ({ widgetsDirectory: 'file:///group/widgets/' }))
 const mockActivity = jest.fn()
 jest.mock('./live-activity', () => ({ syncCrewActivity: async (props: unknown) => mockActivity(props) }))
-const mockDrawn = new Set(['file:///group/widgets/buddy-closer-waiting.png'])
+const mockDrawn = new Set(['file:///group/widgets/buddy-closer-waiting-64.png'])
 jest.mock('expo-file-system', () => ({
     File: class {
         mockUri: string
@@ -30,7 +30,7 @@ describe('refreshWidgets', () => {
         expect(mockBoard).toHaveBeenCalledWith({ accessToken: 'token', workspaceId: 7 })
         const props = mockSnapshot.mock.calls[0][0]
         expect(props.members.map((member: { id: string; face: string }) => [member.id, member.face])).toEqual([
-            ['closer', 'file:///group/widgets/buddy-closer-waiting.png'],
+            ['closer', 'file:///group/widgets/buddy-closer-waiting-64.png'],
             ['scout', ''],
         ])
         expect(mockActivity).toHaveBeenCalledWith(props)

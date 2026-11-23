@@ -31,7 +31,16 @@ export type CrewWidgetProps = {
 
 export const EMPTY_CREW_WIDGET: CrewWidgetProps = { headline: '', crewLabel: '', needsYouLabel: '', count: 0, countCaption: '', asksLine: '', othersLine: '', members: [] }
 
-export const faceFileName = (agentId: string, state: CrewState) => `buddy-${agentId.replace(/[^\w-]/g, '')}-${state}.png`
+// The buddy drawn for the widgets, in points. iOS saves it at the screen's scale: 192 px on a 3x iPhone, the
+// largest seen drawn in the Live Activity (RER-221). At 264, 312 and 720 px it shows a grey block instead, so
+// the 104 pt face of the small widget is a little soft rather than missing.
+export const FACE_SIZE = 64
+
+// The size is in the name so that a face saved at another size is drawn again rather than kept.
+export const faceFileName = (agentId: string, state: CrewState) => `buddy-${agentId.replace(/[^\w-]/g, '')}-${state}-${FACE_SIZE}.png`
+
+// A face saved by an older version of the app, at another size (or with no size in its name, all at 720 px).
+export const isStaleFace = (fileName: string) => /^buddy-.*\.png$/.test(fileName) && !fileName.endsWith(`-${FACE_SIZE}.png`)
 
 function headlineOf(waiting: number, working: number, t: HomeTranslator): string {
     if (waiting && working) return t('widgets.headline.both', { waiting, working })

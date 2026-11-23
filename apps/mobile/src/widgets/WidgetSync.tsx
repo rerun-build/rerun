@@ -1,7 +1,7 @@
 import type { CrewState } from '@rerun/contracts'
-import { File } from 'expo-file-system'
+import { Directory, File } from 'expo-file-system'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { View } from 'react-native'
+import { PixelRatio, Platform, View } from 'react-native'
 import type Svg from 'react-native-svg'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
@@ -9,13 +9,16 @@ import type { HomeCoworker } from '@/components/home/board'
 import { translatorFor } from '@/i18n/translator'
 
 import CrewWidget from './CrewWidget'
-import { crewWidgetPropsOf, faceFileName, type CrewWidgetProps } from './crew-props'
+import { crewWidgetPropsOf, FACE_SIZE, faceFileName, isStaleFace, type CrewWidgetProps } from './crew-props'
 import { syncCrewActivity } from './live-activity'
 import { facesDirectory } from './refresh'
 
-const FACE_SIZE = 120
 // The buddy grows into place when it mounts: drawn before then, the picture would catch it halfway.
 const FACE_SETTLE_MS = 900
+
+// iOS reads the size of the picture in points and crops it to the drawing; Android reads pixels and fits the
+// drawing into them, so it needs the screen's density to stay sharp.
+const FACE_EXPORT_SIZE = Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(FACE_SIZE) : FACE_SIZE
 
 type Face = { id: string; state: CrewState; file: File }
 
@@ -40,12 +43,23 @@ function FacePicture({ face, onDone }: { face: Face; onDone: (uri: string) => vo
                 base64 => {
                     face.file.write(base64, { encoding: 'base64' }).catch(error => console.warn('[widgets] a face was not saved', error)).finally(() => onDone(face.file.uri))
                 },
-                { width: FACE_SIZE * 2, height: FACE_SIZE * 2 }
+                { width: FACE_EXPORT_SIZE, height: FACE_EXPORT_SIZE }
             )
         }, FACE_SETTLE_MS)
         return () => clearTimeout(timer)
     }, [face, onDone])
     return <AgentBuddy agentId={face.id} mood={face.state} size={FACE_SIZE} animated={false} svgRef={svg} />
+}
+
+function deleteStaleFaces() {
+    if (!facesDirectory) return
+    try {
+        for (const entry of new Directory(facesDirectory).list()) {
+            if (entry instanceof File && isStaleFace(entry.name)) entry.delete()
+        }
+    } catch (error) {
+        console.warn('[widgets] old faces were not deleted', error)
+    }
 }
 
 // The widgets show what the Home shows: each time its coworkers change, the widgets get the same crew,
@@ -56,6 +70,8 @@ export function WidgetSync({ coworkers }: { coworkers: HomeCoworker[] }) {
     const next = useMemo(() => missingFaces(props, tried)[0] ?? null, [props, tried])
     const pushed = useRef('')
     const drawn = useCallback((uri: string) => setTried(current => new Set(current).add(uri)), [])
+
+    useEffect(deleteStaleFaces, [])
 
     useEffect(() => {
         if (next) return

@@ -1,7 +1,7 @@
 import type { HomeCoworker } from '@/components/home/board'
 import { translatorFor } from '@/i18n/translator'
 
-import { crewWidgetPropsOf } from './crew-props'
+import { crewWidgetPropsOf, FACE_SIZE, isStaleFace } from './crew-props'
 
 const NOW = Date.parse('2026-11-19T12:00:00Z')
 
@@ -39,7 +39,7 @@ describe('crewWidgetPropsOf', () => {
     it('opens the conversation each coworker waits or works in, and points at its face for its state', () => {
         const [member] = crewWidgetPropsOf([coworker('closer', 'waiting_human', 'Approve 12 emails', '2026-11-19T11:59:00Z')], t, 'file:///group/widgets', NOW).members
         expect(member.url).toBe('rerun://chat/conv-closer?to=closer')
-        expect(member.face).toBe('file:///group/widgets/buddy-closer-waiting.png')
+        expect(member.face).toBe('file:///group/widgets/buddy-closer-waiting-64.png')
     })
 
     it('says all is done when nobody works nor waits, and draws no face without the shared folder', () => {
@@ -51,5 +51,14 @@ describe('crewWidgetPropsOf', () => {
     it('counts two coworkers waiting in the plural', () => {
         const props = crewWidgetPropsOf([coworker('closer', 'waiting_human', 'A', '2026-11-19T11:59:00Z'), coworker('scout', 'waiting_human', 'B', '2026-11-19T11:58:00Z')], t, null, NOW)
         expect(props.headline).toBe('2 need you')
+    })
+})
+
+describe('isStaleFace', () => {
+    it('picks the faces saved at another size, or before the size was in the name, and nothing else', () => {
+        expect(isStaleFace('buddy-closer-waiting.png')).toBe(true)
+        expect(isStaleFace(`buddy-closer-waiting-${FACE_SIZE + 1}.png`)).toBe(true)
+        expect(isStaleFace(`buddy-closer-waiting-${FACE_SIZE}.png`)).toBe(false)
+        expect(isStaleFace('timeline.json')).toBe(false)
     })
 })
