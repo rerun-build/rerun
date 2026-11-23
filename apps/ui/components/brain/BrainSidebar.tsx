@@ -13,14 +13,17 @@ import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { isCardType } from '@/lib/brain/labels'
 import { humanizeTableName } from '@/lib/data/table-name'
 import type { EngineDbTable } from '@/lib/engine/types'
-import { ArchiveIcon, BoxIcon, BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, UploadIcon, type LucideIcon } from '@/lib/icons'
+import { ArchiveIcon, BoxIcon, BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, LayersIcon, PlusIcon, SearchIcon, Share2Icon, TableIcon, UploadIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import type { BrainFileMeta, BrainPageSummary } from '@rerun/contracts'
+import type { BrainFileMeta, BrainPageSummary, BrainSkill } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, type ReactNode, type Ref } from 'react'
 
 type BrainSidebarProps = {
     pages: BrainPageSummary[]
+    skills?: BrainSkill[]
+    // False on a box from before the Brain's skills: nothing there can write one.
+    skillsAvailable?: boolean
     // False on a box from before the Brain: the files and the database still work there.
     pagesAvailable: boolean
     selection: BrainSelection | null
@@ -35,6 +38,8 @@ type BrainSidebarProps = {
     // Opens the import, set to file what comes in under this Box (null for everyone).
     onImport: (spaceId: string | null) => void
 }
+
+const NO_SKILLS: BrainSkill[] = []
 
 function fileIcon(file: BrainFileMeta): LucideIcon {
     if (file.kind === 'dir') return FolderIcon
@@ -169,7 +174,7 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
 
 // One tree for everything the workspace shares, as Notion keeps its pages and databases side by
 // side: what agents proposed, the company pages, the shared folder and the shared database.
-export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onImport }: BrainSidebarProps) {
+export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = false, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onImport }: BrainSidebarProps) {
     const t = useTranslations('brain.sidebar')
     const boxLabel = useBoxLabel()
     const [query, setQuery] = useState('')
@@ -187,10 +192,11 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
         if (!needle) return null
         return {
             pages: pages.filter(page => page.title.toLowerCase().includes(needle) || page.slug.includes(needle)),
+            skills: skills.filter(skill => skill.name.toLowerCase().includes(needle) || skill.slug.includes(needle)),
             files: files.knownFiles.filter(file => file.path.toLowerCase().includes(needle)).slice(0, 30),
             tables: (tables ?? []).filter(table => table.name.toLowerCase().includes(needle) || humanizeTableName(table.name).toLowerCase().includes(needle)),
         }
-    }, [query, pages, files.knownFiles, tables])
+    }, [query, pages, skills, files.knownFiles, tables])
 
     const isSelected = (page: BrainPageSummary) => (selection?.kind === 'page' || selection?.kind === 'history') && selection.slug === page.slug
     // A shop's catalogue brings up to 25 product pages: folded away, they leave the other pages in view.
@@ -265,6 +271,8 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
         )
     }
 
+    const skillRow = (skill: BrainSkill) => <SidebarRow key={skill.slug} icon={LayersIcon} label={skill.name} active={selection?.kind === 'skill' && selection.slug === skill.slug} onClick={() => onSelect({ kind: 'skill', slug: skill.slug })} />
+
     const tableRow = (table: EngineDbTable) => (
         <SidebarRow
             key={table.name}
@@ -306,6 +314,12 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                     <>
                         <SectionHeader label={t('pages')} />
                         {results.pages.length ? results.pages.map(page => pageRow(page)) : <p className="px-2 py-1 text-xs text-muted-foreground/70">{t('noPageMatches')}</p>}
+                        {results.skills.length > 0 && (
+                            <>
+                                <SectionHeader label={t('skills')} />
+                                {results.skills.map(skillRow)}
+                            </>
+                        )}
                         <SectionHeader label={t('files')} />
                         {results.files.length ? (
                             results.files.map(file => (
@@ -361,6 +375,24 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                                 )}
                                 {others.map(page => pageRow(page))}
                                 <SidebarRow icon={PlusIcon} label={t('newPage')} active={selection?.kind === 'new-page'} onClick={() => onSelect({ kind: 'new-page' })} />
+                            </>
+                        )}
+
+                        {pagesAvailable && skillsAvailable && (
+                            <>
+                                <SectionHeader
+                                    label={t('skills')}
+                                    active={selection?.kind === 'skills'}
+                                    onClick={() => onSelect({ kind: 'skills' })}
+                                    action={
+                                        <Button size="icon-xs" variant="ghost" onClick={() => onSelect({ kind: 'share-skill' })} aria-label={t('shareSkill')} title={t('shareSkill')}>
+                                            <Share2Icon />
+                                        </Button>
+                                    }
+                                />
+                                {skills.map(skillRow)}
+                                {skills.length === 0 && <p className="px-2 py-1 text-xs text-muted-foreground/70">{t('noSkills')}</p>}
+                                <SidebarRow icon={PlusIcon} label={t('newSkill')} active={selection?.kind === 'new-skill'} onClick={() => onSelect({ kind: 'new-skill' })} />
                             </>
                         )}
 

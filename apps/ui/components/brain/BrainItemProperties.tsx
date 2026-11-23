@@ -138,7 +138,7 @@ export function BrainBoxSelect({ value, boxes, onChange, className }: { value: s
 }
 
 // Who put the item in the Brain: a coworker drawn as itself, a person, or the import from the website.
-function BrainAddedBy({ author, filing }: { author: string | null; filing: BrainFiling }) {
+export function BrainAddedBy({ author, filing }: { author: string | null; filing: BrainFiling }) {
     const t = useTranslations('brain')
     if (!author) return <span className="text-muted-foreground">{t('filing.unknownAuthor')}</span>
     const coworker = coworkerOfAuthor(author, filing.coworkers)

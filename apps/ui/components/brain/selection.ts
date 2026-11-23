@@ -13,6 +13,11 @@ export type BrainSelection =
     | { kind: 'table'; name: string }
     // A Box: what its coworkers read first, and everything filed under it.
     | { kind: 'box'; spaceId: string }
+    // The skills every coworker uses: their list, one of them, a new one, or a coworker's to share.
+    | { kind: 'skills' }
+    | { kind: 'skill'; slug: string }
+    | { kind: 'new-skill' }
+    | { kind: 'share-skill' }
 
 export function selectionKey(selection: BrainSelection | null): string {
     if (!selection) return 'none'
@@ -27,6 +32,8 @@ export function selectionKey(selection: BrainSelection | null): string {
             return `table:${selection.name}`
         case 'box':
             return `box:${selection.spaceId}`
+        case 'skill':
+            return `skill:${selection.slug}`
         default:
             return selection.kind
     }
@@ -35,7 +42,7 @@ export function selectionKey(selection: BrainSelection | null): string {
 // How far the main panel has drilled in, so a step back slides the other way.
 export function selectionDepth(selection: BrainSelection | null): number {
     if (!selection) return 0
-    if (selection.kind === 'history') return 1
+    if (selection.kind === 'history' || selection.kind === 'skill' || selection.kind === 'new-skill' || selection.kind === 'share-skill') return 1
     if (selection.kind === 'folder') return selection.path.split('/').filter(Boolean).length
     if (selection.kind === 'file') return selection.path.split('/').filter(Boolean).length + 1
     return 0

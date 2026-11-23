@@ -44,6 +44,11 @@ export function invalidateAgentSkillSummaries(agentId: string) {
     if (snapshots.has(agentId) || listeners.get(agentId)?.size) void load(agentId)
 }
 
+// A skill of the Brain is in every agent's menu: changing one reads every menu again.
+export function invalidateAllAgentSkillSummaries() {
+    for (const agentId of new Set([...snapshots.keys(), ...listeners.keys()])) invalidateAgentSkillSummaries(agentId)
+}
+
 export function setAgentSkillSummaries(agentId: string, skills: EngineSkillSummary[]) {
     snapshots.set(agentId, skills.map(({ slug, name, description }) => ({ slug, name, description })))
     emit(agentId)

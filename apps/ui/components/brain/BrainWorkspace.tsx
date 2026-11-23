@@ -14,6 +14,7 @@ import { BrainProposalsPanel } from '@/components/brain/BrainProposalsPanel'
 import { BrainPublishedView } from '@/components/brain/BrainPublishedView'
 import { BrainSeedForm } from '@/components/brain/BrainSeedForm'
 import { BrainSidebar } from '@/components/brain/BrainSidebar'
+import { BrainNewSkill, BrainShareSkill, BrainSkillMissing, BrainSkillPage, BrainSkillsList } from '@/components/brain/BrainSkills'
 import { BrainChromeContext, BrainTopBar } from '@/components/brain/BrainTopBar'
 import { selectionDepth, selectionKey, type BrainSelection } from '@/components/brain/selection'
 import { useSharedFilesTree } from '@/components/brain/useSharedFilesTree'
@@ -34,8 +35,9 @@ import type { UploadEntry } from '@/lib/files/upload'
 import { importedPaths, type ImportFile } from '@/lib/brain/import'
 import { allTags, EMPTY_FILING, type BrainFiling } from '@/lib/brain/items'
 import { BrainIcon, DatabaseIcon, RefreshCwIcon, TableIcon } from '@/lib/icons'
+import { invalidateAllAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
 import { useBrainStore } from '@/stores/brain.store'
-import type { BrainFileMeta, BrainPageSummary, BrainProposal } from '@rerun/contracts'
+import type { BrainFileMeta, BrainPageSummary, BrainProposal, BrainSkill } from '@rerun/contracts'
 import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -111,6 +113,8 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
     const files = useSharedFilesTree()
 
     const pages = useMemo(() => (overview?.available ? overview.pages : []), [overview])
+    const skills = useMemo(() => (overview?.available ? overview.skills : []), [overview])
+    const skillsAvailable = overview?.available ? overview.skillsAvailable : false
     const titles = useMemo(() => new Map(pages.map(page => [page.slug, page.title])), [pages])
     const filing = useMemo<BrainFiling>(() => (overview?.available ? { boxes: overview.boxes, coworkers: overview.coworkers, files: overview.files } : EMPTY_FILING), [overview])
     const tagSuggestions = useMemo(() => allTags(pages, filing.files), [pages, filing.files])
@@ -238,6 +242,35 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         window.addEventListener('keydown', onKey, true)
         return () => window.removeEventListener('keydown', onKey, true)
     }, [])
+
+    const savedSkill = useCallback((skill: BrainSkill) => {
+        invalidateAllAgentSkillSummaries()
+        setOverview(current => {
+            if (!current?.available) return current
+            const known = current.skills.some(item => item.slug === skill.slug)
+            const next = known ? current.skills.map(item => (item.slug === skill.slug ? skill : item)) : [...current.skills, skill].sort((a, b) => a.slug.localeCompare(b.slug))
+            return { ...current, skills: next }
+        })
+    }, [])
+
+    const createdSkill = useCallback(
+        (skill: BrainSkill) => {
+            savedSkill(skill)
+            select({ kind: 'skill', slug: skill.slug })
+        },
+        [savedSkill, select],
+    )
+
+    const deletedSkill = useCallback(
+        (slug: string) => {
+            invalidateAllAgentSkillSummaries()
+            setOverview(current => (current?.available ? { ...current, skills: current.skills.filter(item => item.slug !== slug) } : current))
+            select({ kind: 'skills' })
+        },
+        [select],
+    )
+
+    const openSkills = useCallback(() => select({ kind: 'skills' }), [select])
 
     const filedFiles = useCallback((list: BrainFileMeta[]) => setOverview(current => (current?.available ? { ...current, files: list } : current)), [])
 
@@ -514,6 +547,17 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                 return <BrainFileView path={selection.path} files={files} onSelect={select} filing={filing} tagSuggestions={tagSuggestions} onFiled={filedFiles} />
             case 'box':
                 return <BrainBoxView spaceId={selection.spaceId} pages={pages} filing={filing} onSelect={select} onImport={openImport} />
+            case 'skills':
+                return <BrainSkillsList skills={skills} filing={filing} onOpen={slug => select({ kind: 'skill', slug })} onShare={() => select({ kind: 'share-skill' })} onNew={() => select({ kind: 'new-skill' })} />
+            case 'skill': {
+                const skill = skills.find(item => item.slug === selection.slug)
+                if (!skill) return <BrainSkillMissing slug={selection.slug} onOpenList={openSkills} />
+                return <BrainSkillPage key={skill.slug} skill={skill} filing={filing} onOpenList={openSkills} onSaved={savedSkill} onDeleted={deletedSkill} />
+            }
+            case 'new-skill':
+                return <BrainNewSkill onOpenList={openSkills} onCreated={createdSkill} />
+            case 'share-skill':
+                return <BrainShareSkill skills={skills} onOpenList={openSkills} onShared={savedSkill} />
             case 'database':
                 if (!tables || tables.length > 0) return <PageSkeleton />
                 return (
@@ -561,6 +605,8 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
     const sidebar = overview ? (
         <BrainSidebar
             pages={pages}
+            skills={skills}
+            skillsAvailable={skillsAvailable}
             pagesAvailable={available}
             selection={selection}
             openProposals={proposals?.length ?? (overview.available ? overview.openProposals : 0)}
