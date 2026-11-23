@@ -25,11 +25,14 @@ If the coworker is still working when the wait runs out, the call returns `statu
 
 The conversation shows up in the coworker chat in the app, like one you started there. A switched-off coworker refuses the message with the reason.
 
+The answer names the conversation twice: `sessionId` is the engine's id, the one to pass back to `send_message` to continue it; `conversationId` is the conversation as the app knows it, or `null` when the app could not record it.
+
 ```json Response
 {
   "runId": "…",
   "status": "done",
   "sessionId": "…",
+  "conversationId": "…",
   "provider": "anthropic",
   "model": "claude-sonnet-5",
   "trigger": "chat",

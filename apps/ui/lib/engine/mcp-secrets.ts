@@ -1,3 +1,5 @@
+import { isUuid } from '@rerun/contracts'
+
 // Credential values never belong in an agent's config.json: they go to the engine key store and
 // the config keeps only a ${VAR} reference, which the engine substitutes at connect time (see the
 // engine's mcp-resolve.ts, which resolves command, args, url, env and headers alike).
@@ -22,7 +24,6 @@ export function sanitize(value: string): string {
 
 const KNOWN_TOKEN_PREFIX = /^(sk-|sk_live_|sk_test_|pk_live_|rk_live_|ghp_|gho_|ghu_|ghs_|github_pat_|xox[abprs]-|xapp-|glpat-|dop_v1_|shpat_|shpss_|SG\.|AKIA|ASIA|AIza|ya29\.|hf_|nvapi-|pplx-|gsk_|eyJ)/
 const NEVER_SECRET_PREFIX = /^(-|\/|\.{1,2}\/|~\/|@[^/\s]+\/|github:|gitlab:|npm:|npx:|pypi:|file:|git\+|uvx?$|bunx?$)/i
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const HEX = /^[A-Fa-f0-9]{24,}$/
 const TOKEN_CHARSET = /^[A-Za-z0-9_\-.+/=]+$/
 // Lowercase words joined by - _ . read as a package or a slug, never as a token. This is the one
@@ -58,7 +59,7 @@ export function isSecretLike(value: string): boolean {
     if (NEVER_SECRET_PREFIX.test(candidate)) return false
     if (KNOWN_TOKEN_PREFIX.test(candidate)) return true
     if (candidate.length < 16) return false
-    if (UUID.test(candidate)) return true
+    if (isUuid(candidate)) return true
     if (HEX.test(candidate)) return true
     if (candidate.length < 24) return false
     if (!TOKEN_CHARSET.test(candidate)) return false

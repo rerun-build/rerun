@@ -1,4 +1,5 @@
 import { capabilityOfCall, PAID_DATA_TOOL, type PaidDataCapability } from './paid-data.js'
+import { isUuid } from './uuid.js'
 
 // The tools the chat's steps name, the same on every client (`labels.*` of the `tools` catalog): each
 // one draws its own icon beside it.
@@ -92,9 +93,7 @@ export function toolLabelOf(toolName: string, input: unknown, t: ToolCopy): stri
 
 const HEADLINE_ARGS = ['preview', 'command', 'path', 'query', 'url']
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-const isReadable = (value: unknown): value is string => typeof value === 'string' && !!value && !UUID_PATTERN.test(value.trim())
+const isReadable = (value: unknown): value is string => typeof value === 'string' && !!value && !isUuid(value.trim())
 
 export const argsOf = (input: unknown) => (input && typeof input === 'object' ? (input as Record<string, unknown>) : undefined)
 

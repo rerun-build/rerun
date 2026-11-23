@@ -429,7 +429,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'send_message',
         description:
-            'Talk to a coworker and get its answer. This is how you test an agent: no scheduled task needed. The call waits up to `waitSeconds` for the run to finish and returns the final text; if the coworker is still working when that runs out it returns status "running" with a runId, and the run carries on — poll get_run for the result. Pass `sessionId` to continue an earlier conversation instead of starting a fresh one.',
+            'Talk to a coworker and get its answer. This is how you test an agent: no scheduled task needed. The call waits up to `waitSeconds` for the run to finish and returns the final text; if the coworker is still working when that runs out it returns status "running" with a runId, and the run carries on — poll get_run for the result. Pass `sessionId` to continue an earlier conversation instead of starting a fresh one. The answer names the conversation twice: `sessionId` is the engine id, the one to pass back here to continue it; `conversationId` is the conversation as the app knows it, null when the app could not record it.',
         inputSchema: {
             type: 'object',
             properties: {

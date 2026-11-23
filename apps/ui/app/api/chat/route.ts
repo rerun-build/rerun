@@ -1,4 +1,5 @@
 import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
+import { AuthorizationError } from '@/app/api/_auth/errors'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getExistingSession, recordMessageSent, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
@@ -9,6 +10,7 @@ import { embedTextShared } from '@/lib/services/embed'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
+import { isConversationId } from '@/lib/chat/conversation-id'
 import { installSessionTitle, parseInstallMessage } from '@/lib/chat/install-marker'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
@@ -83,6 +85,14 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
 
+    // Not a conversation row's id (an engine session id carried into a chat link, typically): no
+    // conversation can carry it. Refused before the embedding below, which a message that is never
+    // sent would only waste.
+    if (sessionId && !isConversationId(sessionId)) {
+        console.warn(`[CHAT SESSION INVALID] agent=${agentId} session=${sessionId}`)
+        return sessionNotFound()
+    }
+
     // The coworker will ask for the embedding of this message to recall its memories, before it calls
     // its model: asked for now, it is under way by the time the engine does.
     embedTextShared(workspaceId, text).catch(() => {})
@@ -119,7 +129,11 @@ export async function POST(request: Request) {
         let existing: Awaited<ReturnType<typeof getExistingSession>>
         try {
             existing = await (namedSession ?? getExistingSession(sessionId, actor))
-        } catch {
+        } catch (err) {
+            // Missing, in another workspace, or in a Box the caller cannot use: all the same to the
+            // caller, a conversation that is not there, so the chat offers a new one instead of a retry.
+            if (err instanceof AuthorizationError) return sessionNotFound()
+            console.error(`[CHAT SESSION] agent=${agentId} session=${sessionId} could not be resolved:`, err)
             return Response.json({ error: 'Failed to resolve session' }, { status: 500 })
         }
         // A tab of one coworker holding another one's conversation: the engine would answer with a

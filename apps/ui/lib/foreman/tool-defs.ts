@@ -560,7 +560,7 @@ export const FOREMAN_CLIENT_TOOL_DEFS = [
                 conversationId: {
                     type: 'string',
                     description:
-                        'Only with `chat`: the conversation to land on, as start_agent_setup answered it for that coworker. Without it the chat opens on a new empty conversation, beside the one the coworker is already running.',
+                        'Only with `chat`: the conversation to land on, the conversationId start_agent_setup or send_message answered for that coworker (never their sessionId). Without it the chat opens on a new empty conversation, beside the one the coworker is already running.',
                 },
                 runId: { type: 'string', description: 'The run answered with that conversation, so the chat picks its stream up live rather than waiting for the transcript.' },
             },
@@ -582,7 +582,7 @@ export const FOREMAN_CLIENT_TOOL_DEFS = [
                         properties: {
                             agentId: { type: 'string' },
                             tab: { type: 'string', enum: [...AGENT_FOCUS_TABS], description: 'The tab the row opens on, named as in focus_agent. Without it the row only selects the coworker.' },
-                            conversationId: { type: 'string', description: 'Only with `chat`: the conversation the row lands on, as start_agent_setup answered it for that coworker.' },
+                            conversationId: { type: 'string', description: 'Only with `chat`: the conversation the row lands on, the conversationId start_agent_setup or send_message answered for that coworker (never their sessionId).' },
                             runId: { type: 'string', description: 'The run answered with that conversation, so the chat picks its stream up live.' },
                         },
                         required: ['agentId'],

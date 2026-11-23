@@ -233,8 +233,13 @@ export async function assertSessionInWorkspace(sessionId: string, actor?: Promis
     return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id, updated_at: session.updated_at }
 }
 
+// Postgres refusing a text that is not a uuid for the id column: no conversation can carry that id.
+const INVALID_TEXT_REPRESENTATION = '22P02'
+
+// A read that failed is thrown rather than taken for a missing session: answered as one, the chat
+// would offer a new conversation, and drop its retry, for one that is still there.
 async function readSessionWithAgent(sessionId: string) {
-    const { data } = await selectMaybeSingleWithJoins(
+    const { data, error } = await selectMaybeSingleWithJoins(
         createServiceRoleClient(),
         'sessions',
         ['id', 'agent_id', 'engine_session_id', 'updated_at'] as const,
@@ -242,6 +247,7 @@ async function readSessionWithAgent(sessionId: string) {
         { agent: { table: 'agents', foreignKey: 'agents!sessions_agent_id_fkey', columns: ['workspace_id', 'space_id', 'engine_agent_id'] } } as const,
         { id: sessionId },
     )
+    if (error && error.code !== INVALID_TEXT_REPRESENTATION) throw new Error(`Failed to read session ${sessionId}: ${error.message}`)
     return data
 }
 

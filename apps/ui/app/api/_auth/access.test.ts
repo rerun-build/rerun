@@ -225,6 +225,18 @@ describe('assertSessionInWorkspace', () => {
         mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: null, error: null })
         await expect(assertSessionInWorkspace('se1', admin)).rejects.toThrow('Session not found')
     })
+
+    it('refuses an id that is not a uuid as a session that does not exist', async () => {
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: null, error: { code: '22P02', message: 'invalid input syntax for type uuid: "3ovpbq4znpvo17t1in2bs"' } })
+        await expect(assertSessionInWorkspace('3ovpbq4znpvo17t1in2bs', admin)).rejects.toBeInstanceOf(AuthorizationError)
+    })
+
+    it('throws a read that failed, rather than answering a session that does not exist', async () => {
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: null, error: { code: '57014', message: 'canceling statement due to statement timeout' } })
+        const read = assertSessionInWorkspace('se1', admin)
+        await expect(read).rejects.toThrow('statement timeout')
+        await expect(read).rejects.not.toBeInstanceOf(AuthorizationError)
+    })
 })
 
 describe('visibleSpaceIds', () => {

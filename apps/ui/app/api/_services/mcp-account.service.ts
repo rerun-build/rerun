@@ -793,12 +793,17 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             if (!runId) throw new Error('The engine accepted the message but did not return a run id.')
             // Same reason as the foreman's setup hand-over: /chat announces no session, so without
             // this the conversation never shows up in the agent's chat.
-            if (sessionId) await recordSessionParticipant(await ensureSessionRow(agentId, sessionId, requireString(args.message, 'message'), { source: 'api', status: 'working' }), actorUserId)
+            const conversationId = sessionId ? await ensureSessionRow(agentId, sessionId, requireString(args.message, 'message'), { source: 'api', status: 'working' }) : null
+            if (conversationId) await recordSessionParticipant(conversationId, actorUserId)
 
             const run = await waitForRun(conn, engineAgentId, runId, waitSeconds)
             return {
                 ...projectRun(run),
                 sessionId: sessionId ?? run.sessionId,
+                // The engine's id above continues the conversation through send_message; this one is
+                // the conversation as the app knows it, the only id a show_agents or focus_agent row
+                // can open. Handed the engine's, the chat would send to a conversation it cannot find.
+                conversationId,
                 output: run.output ?? null,
                 ...(run.status === 'running' ? { note: `Still working after ${waitSeconds}s. The run continues — read it later with get_run.` } : {}),
             }

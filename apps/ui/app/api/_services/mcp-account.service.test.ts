@@ -2,7 +2,7 @@ import { workspaceActor } from '@/app/api/_auth/access'
 import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { agentFilesBase, chat as engineChat, createMemory, getAgent, importSkill, listConnections, listSchedules, listSkills, listTriggers, uploadFile, writeFileText } from '@/lib/engine/client'
+import { agentFilesBase, chat as engineChat, createMemory, getAgent, getRun, importSkill, listConnections, listSchedules, listSkills, listTriggers, uploadFile, writeFileText } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
@@ -11,7 +11,7 @@ import type { InstalledService } from '@/lib/services/types'
 
 import { changeAgentHandle, createAgent, deleteAgent, renameAgent } from './agent.service'
 import { declareService } from './agent-setup.service'
-import { getAgentChatTarget, resolveAgentTarget } from './chat.service'
+import { ensureSessionRow, getAgentChatTarget, resolveAgentTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
 import { allocateServiceInstance, listInstalledServices, loadManifest, uninstallService } from './services.service'
 
@@ -225,6 +225,32 @@ describe('dispatchAccountTool', () => {
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'detach_connector', { agentId: 'agent-own', slug: 'gmail', confirm: true })).resolves.toEqual({ key: 'gmail', detached: true })
 
             expect(uninstallService).toHaveBeenCalledWith('agent-own', 'gmail', ACTOR)
+        })
+    })
+
+    describe('send_message answers', () => {
+        const conn = { baseUrl: 'https://engine.test', apiKey: null }
+
+        beforeEach(() => {
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn, engineAgentId: 'engine-own' } as never)
+            vi.mocked(engineChat).mockResolvedValue(new Response(null, { status: 200, headers: { 'x-run-id': 'run-1', 'x-session-id': 'enginesession123' } }))
+            vi.mocked(getRun).mockResolvedValue({ id: 'run-1', status: 'done', sessionId: 'enginesession123', output: 'Done.' } as never)
+        })
+
+        it('answers the conversation id a chat link opens, beside the engine session id', async () => {
+            vi.mocked(ensureSessionRow).mockResolvedValue('4dfbb571-8f9a-4ff2-810c-11e414cb8569')
+
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'agent-own', message: 'Hello' })).resolves.toMatchObject({
+                sessionId: 'enginesession123',
+                conversationId: '4dfbb571-8f9a-4ff2-810c-11e414cb8569',
+            })
+            expect(ensureSessionRow).toHaveBeenCalledWith('agent-own', 'enginesession123', 'Hello', { source: 'api', status: 'working' })
+        })
+
+        it('answers no conversation id when the row could not be written', async () => {
+            vi.mocked(ensureSessionRow).mockResolvedValue(null)
+
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'agent-own', message: 'Hello' })).resolves.toMatchObject({ sessionId: 'enginesession123', conversationId: null })
         })
     })
 
