@@ -18,6 +18,7 @@ import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
+import { copyToShippedForemanRow } from '@/lib/foreman/conversation'
 
 export type SessionHistoryEntry = {
     id: string | null
@@ -439,6 +440,7 @@ export async function renameSession(sessionId: string, title: string): Promise<b
     if (!name) return false
     const session = await assertSessionInWorkspace(sessionId)
     const { data } = await createServiceRoleClient().from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title: name }).eq('id', session.id).eq('kind', 'thread').select('id')
+    if (data?.length) await copyToShippedForemanRow(session.id)
     return !!data?.length
 }
 

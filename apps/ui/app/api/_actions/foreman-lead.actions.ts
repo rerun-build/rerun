@@ -1,5 +1,6 @@
 'use server'
 
+import { agentKindPolicy } from '@rerun/contracts'
 import { actorFromContext, assertAgentInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { PLAIN_KICKOFF } from '@/lib/foreman/build-team'
@@ -21,7 +22,9 @@ async function latestConversationId(ctx: WorkspaceContext, agentId: string): Pro
 export async function readLeadInstallAction(agentId: string): Promise<{ conversationId: string | null }> {
     try {
         const ctx = await requireWorkspaceContext()
-        await assertAgentInWorkspace(agentId, 'use', actorFromContext(ctx))
+        const agent = await assertAgentInWorkspace(agentId, 'use', actorFromContext(ctx))
+        // Only a coworker has an install to run: the Chief of Staff's conversations are each member's own.
+        if (!agentKindPolicy(agent.kind).installable) return { conversationId: null }
         return { conversationId: await latestConversationId(ctx, agentId) }
     } catch {
         return { conversationId: null }
@@ -34,7 +37,8 @@ export async function readLeadInstallAction(agentId: string): Promise<{ conversa
 export async function startLeadSetupAction(agentId: string): Promise<StartLeadSetupResult> {
     try {
         const ctx = await requireWorkspaceContext()
-        await assertAgentInWorkspace(agentId, 'use', actorFromContext(ctx))
+        const agent = await assertAgentInWorkspace(agentId, 'use', actorFromContext(ctx))
+        if (!agentKindPolicy(agent.kind).installable) return failure('startCoworkerFailed')
 
         const existing = await latestConversationId(ctx, agentId)
         if (existing) return { ok: true, conversationId: existing, runId: null }
