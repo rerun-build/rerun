@@ -219,6 +219,9 @@ export function layoutFiles(root: string, options: LayoutOptions): LayoutFile[] 
                 '#!/bin/sh',
                 `# Runs once when ${options.service}.service gives up on a release: the previous one comes back.`,
                 'set -eu',
+                // systemd also runs this when a stop outlives its timeout: the release is not the problem,
+                // and starting the engine again would put it back up under a backup.
+                '[ "${MONITOR_SERVICE_RESULT:-}" != timeout ] || exit 0',
                 `ROOT="${root}"`,
                 `SERVICE="${options.service}"`,
                 '[ -L "$ROOT/previous" ] || exit 0',
@@ -255,6 +258,8 @@ export function layoutFiles(root: string, options: LayoutOptions): LayoutFile[] 
                 // A command of a coworker that fills the memory is killed alone, the engine and its other runs stay.
                 'OOMPolicy=continue',
                 'Restart=always',
+                // Otherwise systemd 254+ runs OnFailure on every crash, not only once the start limit is reached.
+                'RestartMode=direct',
                 'RestartSec=3',
                 '',
                 '[Install]',

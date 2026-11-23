@@ -310,10 +310,39 @@ describe('layoutFiles and installLayout', () => {
         expect(unit.content).toContain('OnFailure=rerun-rollback.service\n')
         expect(unit.content).toContain('StartLimitBurst=5\n')
         expect(unit.content).toContain('OOMPolicy=continue\n')
+        expect(unit.content).toContain('RestartMode=direct\n')
         expect(rollback.content).toContain('ROOT="/opt/rerun"')
         expect(rollback.content).toContain('rm -f "$ROOT/previous"')
         expect(rollback.content).toContain('systemctl start "$SERVICE"')
         expect(rollbackUnit.content).toContain('ExecStart=/usr/local/bin/rerun-rollback\n')
+    })
+
+    function runRollback(result?: string): { current: string | null; previous: string | null; systemctl: string[] } {
+        const dir = root()
+        release(dir, 'good')
+        release(dir, 'new')
+        symlinkSync('releases/new', currentLink(dir))
+        symlinkSync('releases/good', previousLink(dir))
+        const bin = resolve(dir, 'bin')
+        const log = resolve(dir, 'systemctl.log')
+        mkdirSync(bin)
+        writeFileSync(resolve(bin, 'systemctl'), `#!/bin/sh\necho "$@" >> "${log}"\n`, { mode: 0o755 })
+        const script = layoutFiles(dir, options)[1].content
+        execFileSync('sh', ['-c', script], { env: { PATH: `${bin}:${process.env.PATH}`, MONITOR_SERVICE_RESULT: result }, stdio: 'ignore' })
+        const systemctl = existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n') : []
+        return { current: link(currentLink(dir)), previous: link(previousLink(dir)), systemctl }
+    }
+
+    it('keeps the release and leaves the engine stopped when a stop took too long', () => {
+        expect(runRollback('timeout')).toEqual({ current: 'releases/new', previous: 'releases/good', systemctl: [] })
+    })
+
+    it.skipIf(process.platform !== 'linux')('puts the previous release back once when the engine keeps crashing', () => {
+        expect(runRollback('exit-code')).toEqual({ current: 'releases/good', previous: null, systemctl: ['reset-failed rerun', 'start rerun'] })
+    })
+
+    it.skipIf(process.platform !== 'linux')('puts the previous release back on a systemd that does not say why it stopped', () => {
+        expect(runRollback()).toEqual({ current: 'releases/good', previous: null, systemctl: ['reset-failed rerun', 'start rerun'] })
     })
 
     it('names the service everywhere when it is not the default', () => {
