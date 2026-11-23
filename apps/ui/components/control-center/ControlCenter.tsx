@@ -33,6 +33,8 @@ import { useEffect, useState, type ComponentType } from 'react'
 import { ControlCenterView } from './ControlCenterView'
 import type { ControlRow, ControlSection } from './types'
 import { useConversationSearch } from './useConversationSearch'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { openForemanConversation } from '@/lib/notifications/open-inbox-item'
 
 type Page = { kind: 'root' } | { kind: 'agent'; agentId: string } | { kind: 'box'; spaceId: string } | { kind: 'move'; agentId: string }
 
@@ -83,6 +85,7 @@ function isMacPlatform(): boolean {
 export function ControlCenter() {
     const t = useTranslations('layout.controlCenter')
     const foremanName = useForemanName()
+    const foremanLabel = useTranslations('workspaceView.foreman')('name', foremanName)
     const tReasons = useTranslations('workspace.access')
     const agentTabs = useAgentTabs()
     const open = useControlCenterStore(s => s.open)
@@ -203,9 +206,10 @@ export function ControlCenter() {
         conversations.hits.map(hit => ({
             id: `${section}-conversation-${hit.id}`,
             label: hit.title,
-            detail: withAgentName ? agents.find(agent => agent.id === hit.agentId)?.name : undefined,
+            detail: withAgentName ? (hit.agentId === FOREMAN_AGENT_ID ? foremanLabel : agents.find(agent => agent.id === hit.agentId)?.name) : undefined,
             leading: { kind: 'icon', icon: MessageCircle },
             onSelect: run(() => {
+                if (hit.agentId === FOREMAN_AGENT_ID) return openForemanConversation(hit.id)
                 const board = useBoardStore.getState()
                 board.focusAgentOnBoard(hit.agentId, 'chat')
                 board.setPendingOpenSession({ agentId: hit.agentId, sessionId: hit.id, runId: null, title: hit.title })

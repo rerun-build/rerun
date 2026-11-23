@@ -1,5 +1,10 @@
+import { FOREMAN_AGENT_ID, needsHuman } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { useForemanThreads } from '@/components/foreman/useForemanThreads'
+import { useForemanName } from '@/hooks/useForemanName'
+import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { useAttentionSessions, type AttentionSession } from '@/hooks/useAttentionSessions'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import type { SessionStatus } from '@/lib/board/types'
@@ -14,6 +19,10 @@ export function useInboxItems(): { items: InboxItem[]; sessions: AttentionSessio
     const agents = useBoardStore(s => s.agents)
     const sessions = useAttentionSessions()
     const unseen = useUnseenGroups()
+    // The Chief of Staff's conversations are the reader's own, and wait on nobody else.
+    const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
+    const foremanOnEngine = useForemanStore(s => selectForemanVisible(s) && s.surface === 'engine')
+    const { entries: foremanEntries } = useForemanThreads(foremanOnEngine)
 
     const items = useMemo<InboxItem[]>(() => {
         const names = new Map(agents.map(a => [a.id, a.name]))
@@ -38,8 +47,11 @@ export function useInboxItems(): { items: InboxItem[]; sessions: AttentionSessio
                 latestSessionId: group.latestSessionId,
             }]
         })
-        return [...attention, ...done]
-    }, [sessions, agents, unseen])
+        const foreman = foremanEntries.flatMap(entry =>
+            entry.id && needsHuman(entry.status) ? [{ id: entry.id, agentId: FOREMAN_AGENT_ID, agentName: foremanName, engineSessionId: entry.engineSessionId, status: entry.status, title: entry.title, message: null, updatedAt: entry.updatedAt, reason: 'mine' as const }] : []
+        )
+        return [...foreman, ...attention, ...done]
+    }, [sessions, agents, unseen, foremanEntries, foremanName])
 
     return { items, sessions }
 }

@@ -2,7 +2,7 @@
 
 import type { ComponentType } from 'react'
 import { cn } from '../cn'
-import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
+import { CoworkerFace } from './CoworkerFace'
 import { Icon } from '../primitives'
 import { ATTENTION_STATUS_META } from './attention'
 
@@ -19,5 +19,5 @@ export function BuddyPip({ icon: Glyph, className }: { icon: ComponentType<{ cla
 export function AttentionBuddy({ agentId, status }: { agentId: string; status: string }) {
     const meta = ATTENTION_STATUS_META[status] ?? ATTENTION_STATUS_META.waiting_human
     if (!agentId) return <Icon icon={meta.icon} size="sm" className={cn('rounded-full', meta.color)} />
-    return <AgentBuddy agentId={agentId} size={32} animated={false} facing="right" badge={<BuddyPip icon={meta.icon} className={meta.color} />} />
+    return <CoworkerFace agentId={agentId} size={32} badge={<BuddyPip icon={meta.icon} className={meta.color} />} />
 }

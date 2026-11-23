@@ -11,12 +11,13 @@ import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
 import type { EngineSession, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { sourcesOf, type SessionHistoryFilter } from '@/lib/chat/history-filter'
-import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, agentKindPolicy, type AgentKind, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
+import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 
 export type SessionHistoryEntry = {
     id: string | null
@@ -327,15 +328,23 @@ export async function searchWorkspaceConversations(ctx: WorkspaceContext, query:
     const text = sanitizeIlike(query)
     if (!text && !agentId) return []
 
-    const workspaceAgentIds = (await reachableAgents(ctx)).map(a => a.id)
-    const agentIds = agentId ? workspaceAgentIds.filter(id => id === agentId) : workspaceAgentIds
-    if (agentIds.length === 0) return []
+    // The Chief of Staff's conversations are the caller's own: found among theirs, under the name the apps call it by.
+    const foremanId = !agentId || agentId === FOREMAN_AGENT_ID ? await ensureForemanAgentRow(ctx.supabase, ctx.workspace.id) : null
+    const workspaceAgentIds = agentId === FOREMAN_AGENT_ID ? [] : (await reachableAgents(ctx)).map(a => a.id)
+    const agentIds = agentId && agentId !== FOREMAN_AGENT_ID ? workspaceAgentIds.filter(id => id === agentId) : workspaceAgentIds
+    if (agentIds.length === 0 && !foremanId) return []
 
-    const filters = { agent_id: agentIds, ...(text ? { title: { ilike: `%${text}%` } } : {}) }
-    const { data, error } = await selectMany(ctx.supabase, 'sessions', SEARCH_COLUMNS, filters, { column: 'updated_at', ascending: false }, text ? SEARCH_LIMIT : AGENT_RECENT_LIMIT)
-    if (error) throw error
+    const titled = text ? { title: { ilike: `%${text}%` } } : {}
+    const limit = text ? SEARCH_LIMIT : AGENT_RECENT_LIMIT
+    const [coworkers, foreman] = await Promise.all([
+        agentIds.length ? selectMany(ctx.supabase, 'sessions', SEARCH_COLUMNS, { agent_id: agentIds, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
+        foremanId ? selectMany(ctx.supabase, 'sessions', SEARCH_COLUMNS, { agent_id: foremanId, owner_user_id: ctx.userId, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
+    ])
+    if (coworkers.error) throw coworkers.error
+    if (foreman.error) throw foreman.error
 
-    return (data ?? []).map(row => ({ id: row.id, agentId: row.agent_id, title: row.title, status: row.status, updatedAt: row.updated_at }))
+    const hits = [...(coworkers.data ?? []), ...(foreman.data ?? [])].map(row => ({ id: row.id, agentId: row.agent_id === foremanId ? FOREMAN_AGENT_ID : row.agent_id, title: row.title, status: row.status, updatedAt: row.updated_at }))
+    return hits.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, limit)
 }
 
 const TO_HANDLE_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at'] as const

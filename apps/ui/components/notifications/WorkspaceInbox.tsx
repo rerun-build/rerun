@@ -15,12 +15,13 @@ import { useTabSignals } from '@/hooks/useTabSignals'
 import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import type { AnnouncedNotification } from '@/lib/notifications/announcement'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
-import { markInboxItemRead, openInboxItem } from '@/lib/notifications/open-inbox-item'
+import { markInboxItemRead, openForemanConversation, openInboxItem } from '@/lib/notifications/open-inbox-item'
 import { reasonSentence } from '@/lib/notifications/reason-copy'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 
 // Declared once, outside the inbox: a component reference the memoised rows can compare, where a render function would hand them a new element on every pass.
 function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
@@ -120,6 +121,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     const openPeekConversation = useCallback((peek: Peek) => {
         setView(null)
         const { agentId, sessionId, engineSessionId } = peek.target
+        if (agentId === FOREMAN_AGENT_ID && sessionId) return openForemanConversation(sessionId)
         if (!sessionId) return void openConversationFromNotification({ agentId, engineSessionId, engineRunId: peek.engineRunId })
         const board = useBoardStore.getState()
         board.focusAgentOnBoard(agentId, 'chat')

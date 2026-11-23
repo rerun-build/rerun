@@ -15,7 +15,7 @@ import type { KitTranslator } from '../kit-translator'
 import { AnimatedSize, StepTransition, useStepDirection } from '../steps'
 import { shortRelativeTime } from '../time'
 import { TooltipDisabledReason, TooltipLabeled } from '../Tooltip'
-import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
+import { CoworkerFace } from './CoworkerFace'
 import { ATTENTION_STATUS_META } from './attention'
 import { AttentionBuddy } from './AttentionBuddy'
 
@@ -669,7 +669,7 @@ function RunningLine({ agentIds }: { agentIds: string[] }) {
             </span>
             <span aria-hidden className="flex shrink-0 -space-x-1.5">
                 {stack.map(agentId => (
-                    <AgentBuddy key={agentId} agentId={agentId} size={18} animated={false} facing="right" />
+                    <CoworkerFace key={agentId} agentId={agentId} size={18} />
                 ))}
             </span>
         </div>
@@ -699,7 +699,7 @@ function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; com
                 {stack.length > 0 && (
                     <span aria-hidden className="flex -space-x-1.5">
                         {stack.map(agentId => (
-                            <AgentBuddy key={agentId} agentId={agentId} size={20} animated={false} facing="right" />
+                            <CoworkerFace key={agentId} agentId={agentId} size={20} />
                         ))}
                     </span>
                 )}

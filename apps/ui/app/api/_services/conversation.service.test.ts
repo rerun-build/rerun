@@ -16,6 +16,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybe
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/supabase/server', () => ({ createClient: vi.fn() }))
+vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: vi.fn(async () => 'cos-1') }))
 vi.mock('@/app/api/_auth/access', async importOriginal => {
     const actual = await importOriginal<typeof import('@/app/api/_auth/access')>()
     return { ...actual, assertAgentAccess: vi.fn(), assertSessionInWorkspace: vi.fn(), visibleSpaceIds: vi.fn(actual.visibleSpaceIds) }
@@ -468,10 +469,12 @@ describe('readSessionSnapshot', () => {
 describe('searchWorkspaceConversations', () => {
     beforeEach(() => vi.clearAllMocks())
 
-    function found(agents: { id: string }[], rows: ReturnType<typeof session>[]) {
+    // `foremanRows`: what the read of the caller's conversations with the Chief of Staff answers, when one is made.
+    function found(agents: { id: string }[], rows: ReturnType<typeof session>[], foremanRows?: ReturnType<typeof session>[]) {
         vi.mocked(selectMany)
             .mockResolvedValueOnce({ data: agents, error: null } as never)
             .mockResolvedValueOnce({ data: rows, error: null } as never)
+        if (foremanRows) vi.mocked(selectMany).mockResolvedValueOnce({ data: foremanRows, error: null } as never)
     }
 
     it('reads nothing for an empty query across the workspace', async () => {
@@ -480,12 +483,24 @@ describe('searchWorkspaceConversations', () => {
     })
 
     it("matches titles literally, newest first, within the workspace's agents", async () => {
-        found([{ id: 'a' }, { id: 'b' }], [session('a', 's1', '2026-09-18T10:00:00Z')])
+        found([{ id: 'a' }, { id: 'b' }], [session('a', 's1', '2026-09-18T10:00:00Z')], [])
 
         const hits = await searchWorkspaceConversations(ctx, '100%_off')
 
         expect(vi.mocked(selectMany).mock.calls[1].slice(3)).toEqual([{ agent_id: ['a', 'b'], title: { ilike: '%100  off%' } }, { column: 'updated_at', ascending: false }, 20])
         expect(hits).toEqual([{ id: 's1', agentId: 'a', title: 's1 title', status: 'idle', updatedAt: '2026-09-18T10:00:00Z' }])
+    })
+
+    it("finds the caller's own conversations with the Chief of Staff, under its name, newest first", async () => {
+        found([{ id: 'a' }], [session('a', 's1', '2026-09-18T10:00:00Z')], [session('cos-1', 's9', '2026-09-19T10:00:00Z')])
+
+        const hits = await searchWorkspaceConversations(ctx, 'plan')
+
+        expect(vi.mocked(selectMany).mock.calls[2][3]).toEqual({ agent_id: 'cos-1', owner_user_id: ctx.userId, title: { ilike: '%plan%' } })
+        expect(hits.map(hit => [hit.id, hit.agentId])).toEqual([
+            ['s9', 'foreman'],
+            ['s1', 'a'],
+        ])
     })
 
     it("lists an agent's latest conversations when nothing is typed", async () => {

@@ -12,6 +12,8 @@ import { useBoardStore } from '@/stores/board.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { useForemanName } from '@/hooks/useForemanName'
 
 type NotificationTab = 'coworkers' | 'account'
 
@@ -42,7 +44,9 @@ function NotificationsDialogBody() {
     const [activeTab, setActiveTab] = useState<NotificationTab>('coworkers')
 
     const tabs = TAB_VALUES.map(value => ({ value, label: t(`tabs.${value}`) }))
-    const coworkers = useMemo(() => agents.map(agent => ({ id: agent.id, name: agent.name })), [agents])
+    // The Chief of Staff's rules are kept under the name the apps call it by, beside the board's coworkers.
+    const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
+    const coworkers = useMemo(() => [{ id: FOREMAN_AGENT_ID, name: foremanName }, ...agents.map(agent => ({ id: agent.id, name: agent.name }))], [agents, foremanName])
 
     return (
         <DialogTabs
