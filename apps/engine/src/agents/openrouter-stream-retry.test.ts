@@ -122,6 +122,129 @@ describe('OpenRouter stream retry', () => {
         expect(parts.at(-1)).toEqual({ type: 'error', error: spent })
     })
 
+    describe('a cut the provider announced with an error', () => {
+        const upstream500 = { type: 'error', error: { message: 'Streaming response failed: [500] Internal server error', type: 'server_error' } }
+        // What `@ai-sdk/openai` makes of an error chunk: the error, then a finish with no raw reason.
+        const errorFinish = { type: 'finish', finishReason: { unified: 'error', raw: undefined }, usage: noUsage }
+        const failed = [streamStart, ...thought, { type: 'reasoning-end', id: 'reasoning-0' }, upstream500, errorFinish]
+        const errorsOf = (parts: any[]) => parts.filter(p => p.type === 'error')
+
+        it('keeps it from the run when the replay goes through', async () => {
+            const { parts, calls } = await run([failed, answer])
+
+            expect(calls).toBe(2)
+            expect(errorsOf(parts)).toEqual([])
+            expect(finishOf(parts)).toEqual([realFinish])
+        })
+
+        it('hands it over once, right before the failed finish, when it gives up', async () => {
+            const { parts, calls } = await run([failed, failed, failed, answer])
+
+            expect(calls).toBe(3)
+            expect(parts.at(-2)).toEqual(upstream500)
+            expect(errorsOf(parts)).toHaveLength(1)
+            expect(finishOf(parts)).toEqual([parts.at(-1)])
+            expect(parts.at(-1).finishReason.raw).toBe(STREAM_CUT_RAW_REASON)
+        })
+
+        it('keeps the reason when the replays end without one', async () => {
+            const { parts } = await run([failed, [streamStart, cutFinish], [streamStart, cutFinish]])
+
+            expect(errorsOf(parts)).toEqual([upstream500])
+        })
+
+        it('hands it over at once when the answer has started', async () => {
+            const { parts, calls } = await run([[streamStart, { type: 'text-start', id: '0' }, { type: 'text-delta', id: '0', delta: 'Here is' }, upstream500, { type: 'text-end', id: '0' }, errorFinish], answer])
+
+            expect(calls).toBe(1)
+            expect(parts.map(p => p.type)).toEqual(['stream-start', 'text-start', 'text-delta', 'error', 'text-end', 'finish'])
+        })
+
+        it.each([
+            ['no credit left', { message: 'Insufficient credits', code: 402 }],
+            ['a request turned down', { message: 'Provider returned error', code: 400 }],
+            ['a rejected key', { message: 'Unauthorized', code: 'invalid_api_key' }],
+            ['a spent plan', { message: "You've hit your usage limit", code: 429 }],
+        ])('never replays %s', async (_, error) => {
+            const refusal = { type: 'error', error }
+            const { parts, calls } = await run([[streamStart, refusal, errorFinish], answer])
+
+            expect(calls).toBe(1)
+            expect(errorsOf(parts)).toEqual([refusal])
+            expect(finishOf(parts)).toHaveLength(1)
+        })
+
+        it.each([429, '429', 502, 'server_error'])('replays an upstream that says %s', async code => {
+            const { parts, calls } = await run([[streamStart, { type: 'error', error: { message: 'Try again', code } }, errorFinish], answer])
+
+            expect(calls).toBe(2)
+            expect(errorsOf(parts)).toEqual([])
+        })
+
+        it('hands it over before a finish the provider wrote itself', async () => {
+            const { parts, calls } = await run([[streamStart, upstream500, realFinish], answer])
+
+            expect(calls).toBe(1)
+            expect(parts).toEqual([streamStart, upstream500, realFinish])
+        })
+
+        it('hands it over when the stream then goes on', async () => {
+            const { parts, calls } = await run([[streamStart, upstream500, ...answer.slice(1)], answer])
+
+            expect(calls).toBe(1)
+            expect(errorsOf(parts)).toEqual([upstream500])
+            expect(parts.findIndex(p => p.type === 'error')).toBeLessThan(parts.findIndex(p => p.type === 'text-delta'))
+        })
+
+        it('hands it over when the stream just ends', async () => {
+            const { parts } = await run([[streamStart, upstream500], answer])
+
+            expect(parts).toEqual([streamStart, upstream500])
+        })
+
+        it('drops it when the run was stopped', async () => {
+            const controller = new AbortController()
+            controller.abort()
+            const { parts, calls } = await run([failed, answer], controller.signal)
+
+            expect(calls).toBe(1)
+            expect(errorsOf(parts)).toEqual([])
+        })
+
+        it('lets the refusal of the replay speak for the step', async () => {
+            const refusal = { type: 'error', error: { message: 'Insufficient credits', code: 402 } }
+            const { parts, calls } = await run([failed, [streamStart, refusal, errorFinish], answer])
+
+            expect(calls).toBe(2)
+            expect(errorsOf(parts)).toEqual([refusal])
+        })
+
+        it('lets the error of a replay that had started answering speak for the step', async () => {
+            const upstream502 = { type: 'error', error: { message: 'Bad gateway', code: 502 } }
+            const { parts, calls } = await run([failed, [streamStart, { type: 'text-start', id: '0' }, { type: 'text-delta', id: '0', delta: 'Here is' }, upstream502, errorFinish], answer])
+
+            expect(calls).toBe(2)
+            expect(errorsOf(parts)).toEqual([upstream502])
+        })
+
+        it.each([
+            ['the first of two', { message: 'Bad gateway', code: 502 }, 'first'],
+            ['the one that will not go away', { message: 'Insufficient credits', code: 402 }, 'second'],
+        ])('hands over %s', async (_, error, kept) => {
+            const second = { type: 'error', error }
+            const { parts } = await run([[streamStart, upstream500, second, realFinish]])
+
+            expect(errorsOf(parts)).toEqual([kept === 'first' ? upstream500 : second])
+        })
+
+        it('drops it when the replay is refused for good', async () => {
+            const spent = new APICallError({ message: 'Payment Required', url: 'https://hub.test', requestBodyValues: {}, statusCode: 402, isRetryable: false })
+            const { parts } = await run([failed, { throws: spent }])
+
+            expect(errorsOf(parts)).toEqual([{ type: 'error', error: spent }])
+        })
+    })
+
     it('never replays a run that was stopped', async () => {
         const controller = new AbortController()
         controller.abort()
