@@ -12,7 +12,7 @@ import { sanitizeIlike } from '@/lib/search/ilike'
 import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
-import { newServiceInstanceId } from '@/lib/services/instances'
+import { nextServiceInstance } from '@/lib/services/instances'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, requireAdmin, rethrowConflict, vaultContext } from './vault.service'
@@ -50,8 +50,7 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
     if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
 
     const sameApp = (await listVaultItems(ctx.conn)).filter(item => item.slug === manifest.slug)
-    const instanceId = takesSeveralAccounts(manifest) && sameApp.length > 0 ? newServiceInstanceId(sameApp.flatMap(item => item.instanceId ?? [])) : undefined
-    const label = instanceId ? `${manifest.name} ${sameApp.length + 1}` : undefined
+    const instance = sameApp.length > 0 ? nextServiceInstance(manifest, sameApp) : null
     const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
     const values = input.values ?? {}
 
@@ -63,12 +62,11 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
             name: manifest.name,
             status: 'needs_config',
             authMethodId: method.id,
-            ...(instanceId ? { instanceId, label } : {}),
+            ...(instance ? { instanceId: instance.instanceId, label: instance.label } : {}),
             createdBy,
         })
     } else {
-        const instance = instanceId ? { key: `${manifest.slug}@${instanceId}`, instanceId, label } : undefined
-        item = (await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance, createdBy }))).item
+        item = (await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance: instance ?? undefined, createdBy }))).item
     }
     for (const coworker of coworkers) item = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, item.id, coworker.engineAgentId))
     return resultOf(item, toAuthMethodSummaries(manifest))

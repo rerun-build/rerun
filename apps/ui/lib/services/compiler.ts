@@ -4,7 +4,7 @@ import { createSkill, deleteMcpToken, deleteSkill, listSkills, patchMcpServers, 
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import type { InputDef, McpServerTemplate, ServiceManifest, ServiceSkill } from './manifest'
 import { deleteConnectedAccount } from '@/lib/composio/client'
-import { defaultInstanceEnvVar, instanceEnvVar, instanceServerName, ordinalInstanceLabel } from './instances'
+import { type ServiceInstanceTarget, defaultInstanceEnvVar, heldAccounts, instanceEnvVar, instanceServerName, ordinalInstanceLabel } from './instances'
 import { appTarget, composioTarget, getMethod, managedTarget, oauthServer } from './manifest'
 import { type RegistryEntry, readRegistry, registryFootprint, upsertRegistryEntry } from './registry'
 
@@ -92,10 +92,6 @@ export type CompileResult = {
     composio: { toolkit: string; serverName: string } | null
     app: { appSlug: string; serverName: string } | null
 }
-
-// An extra account of an app: its registry key (`gmail@k3x9ab`) and the id that suffixes its
-// server names and env vars, so it never overwrites the base account's.
-export type ServiceInstanceTarget = { key: string; instanceId: string }
 
 // Everything an install of one service puts on a coworker, before it is written anywhere: the
 // coworker's own folder, or a Vault item that any number of coworkers draw on.
@@ -233,7 +229,7 @@ export async function compileService(
 
 async function instanceRegistryFields(conn: EngineConnection, engineAgentId: string, manifest: ServiceManifest, instance: ServiceInstanceTarget): Promise<Pick<RegistryEntry, 'instanceId' | 'label'>> {
     const reg = await readRegistry(conn, engineAgentId)
-    const label = reg.services[instance.key]?.label ?? ordinalInstanceLabel(manifest.name, reg, manifest.slug)
+    const label = reg.services[instance.key]?.label ?? ordinalInstanceLabel(manifest.name, heldAccounts(reg, manifest.slug))
     return { instanceId: instance.instanceId, label }
 }
 

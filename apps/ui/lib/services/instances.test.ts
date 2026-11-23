@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { defaultInstanceEnvVar, instanceEnvVar, instanceRenames, instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from './instances'
+import { defaultInstanceEnvVar, heldAccounts, instanceEnvVar, instanceRenames, instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from './instances'
 import type { RegistryEntry } from './registry'
 
 const entry = (label?: string): RegistryEntry => ({ status: 'active', config: {}, mcpServers: [], envKeys: [], skills: [], installedAt: '', ...(label ? { label } : {}) })
@@ -24,9 +24,9 @@ describe('service instances', () => {
     })
 
     it('numbers a new account after the ones already shown', () => {
-        expect(ordinalInstanceLabel('Gmail', { services: { gmail: entry() } }, 'gmail')).toBe('Gmail 2')
-        expect(ordinalInstanceLabel('Gmail', { services: { gmail: entry(), 'gmail@aaaaaa': entry('Gmail 2') } }, 'gmail')).toBe('Gmail 3')
-        expect(ordinalInstanceLabel('Gmail', { services: { 'gmail@bbbbbb': entry('Gmail 3') } }, 'gmail')).toBe('Gmail 2')
+        expect(ordinalInstanceLabel('Gmail', heldAccounts({ services: { gmail: entry() } }, 'gmail'))).toBe('Gmail 2')
+        expect(ordinalInstanceLabel('Gmail', heldAccounts({ services: { gmail: entry(), 'gmail@aaaaaa': entry('Gmail 2') } }, 'gmail'))).toBe('Gmail 3')
+        expect(ordinalInstanceLabel('Gmail', heldAccounts({ services: { 'gmail@bbbbbb': entry('Gmail 3') } }, 'gmail'))).toBe('Gmail 2')
     })
 
     it('renames an account added before instances to the names a second account is compiled with', () => {

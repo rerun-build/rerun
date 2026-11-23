@@ -249,6 +249,11 @@ export function takesSeveralAccounts(manifest: ServiceManifest): boolean {
     )
 }
 
+// Whether each account of the app is an instance of its own, with its own servers and variables.
+export function usesInstances(manifest: ServiceManifest): boolean {
+    return takesSeveralAccounts(manifest)
+}
+
 // The paid app a method plugs the coworker into, if any. Nothing to sign in per coworker: the
 // account is connected once for the workspace, and the coworker only picks one.
 export function appTarget(method: AuthMethod): { appSlug: string; serverName: string } | null {

@@ -4,7 +4,8 @@ import type { VaultItemSummary, VaultSkill } from '@rerun/contracts'
 
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, createVaultItem, getVaultItem, patchVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
-import { type CompileResult, type ServiceInstanceTarget, compileServiceParts } from '@/lib/services/compiler'
+import { type CompileResult, compileServiceParts } from '@/lib/services/compiler'
+import type { ServiceInstanceTarget } from '@/lib/services/instances'
 import type { ServiceManifest, ServiceSkill } from '@/lib/services/manifest'
 import { slugify } from '@/lib/slugify'
 

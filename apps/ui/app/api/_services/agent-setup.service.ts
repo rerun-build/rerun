@@ -8,7 +8,8 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
 import { selectSingle } from '@/supabase/supabase-helpers'
 import { createAgent } from './agent.service'
-import { type ServiceInstanceSeed, installService, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
+import type { ServiceInstanceSeed } from '@/lib/services/instances'
+import { installService, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
 
 // Install each catalog service onto an agent. Services with required secrets can't be
 // auto-supplied, so they're marked needs_config and returned in the checklist for the user

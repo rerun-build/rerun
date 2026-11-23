@@ -200,10 +200,10 @@ describe('dispatchAccountTool', () => {
 
         it('ignores newInstance on a paid app', async () => {
             vi.mocked(loadManifest).mockResolvedValue(gmailManifest(true))
+            vi.mocked(allocateServiceInstance).mockResolvedValue(null)
 
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'attach_connector', { agentId: 'agent-own', slug: 'gmail', newInstance: true })).resolves.toMatchObject({ key: 'gmail' })
 
-            expect(allocateServiceInstance).not.toHaveBeenCalled()
             expect(declareService).toHaveBeenCalledWith('agent-own', gmailManifest(true), ACTOR, undefined)
         })
 

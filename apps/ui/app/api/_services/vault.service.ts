@@ -7,8 +7,7 @@ import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultInstance, supportsVaultRename } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, instanceVaultItem, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
-import { instanceRenames, newServiceInstanceId } from '@/lib/services/instances'
-import { takesSeveralAccounts } from '@/lib/services/manifest'
+import { instanceRenames, nextServiceInstance } from '@/lib/services/instances'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
@@ -258,15 +257,12 @@ async function startInstance(ctx: VaultContext, item: VaultItemSummary & { slug:
     // Loaded here rather than at the top: services.service imports this module.
     const { loadManifest } = await import('./services.service')
     const manifest = await loadManifest(item.slug)
-    if (!manifest || !takesSeveralAccounts(manifest) || !(await supportsVaultInstance(ctx.conn))) return null
+    const instance = manifest && nextServiceInstance(manifest, vault.filter(other => other.slug === item.slug))
+    if (!instance || !(await supportsVaultInstance(ctx.conn))) return null
 
-    const sameApp = vault.filter(other => other.slug === item.slug)
-    const instanceId = newServiceInstanceId(sameApp.flatMap(other => other.instanceId ?? []))
-    const labels = new Set(sameApp.flatMap(other => other.label ?? []))
-    let ordinal = 2
-    while (labels.has(`${manifest.name} ${ordinal}`)) ordinal++
+    const { instanceId, label } = instance
     const renames = instanceRenames(item.slug, item.mcpServers.map(server => server.name), item.envKeys, instanceId)
-    return rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label: `${manifest.name} ${ordinal}` }), ...renames }))
+    return rethrowConflict(ctx, () => instanceVaultItem(ctx.conn, item.id, { instanceId, ...(item.label ? {} : { label }), ...renames }))
 }
 
 // The coworker's own install of the app still waiting on its sign-in sits on the same registry key as

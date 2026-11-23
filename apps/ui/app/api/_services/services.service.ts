@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, parseServiceRegistryKey, serviceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -17,10 +17,10 @@ import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
 import { AppError } from '@/lib/i18n/action-error'
 import type { EngineConnection } from '@/lib/engine/types'
 import { getManagedProvider } from '@/lib/managed/registry'
-import { type ServiceInstanceTarget, compileService, decompileService } from '@/lib/services/compiler'
+import { compileService, decompileService } from '@/lib/services/compiler'
 import { embedText, toVectorLiteral } from '@/lib/services/embed'
-import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, isPaidApp, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema, takesSeveralAccounts } from '@/lib/services/manifest'
-import { instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
+import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, isPaidApp, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema, takesSeveralAccounts, usesInstances } from '@/lib/services/manifest'
+import { type ServiceInstanceSeed, heldAccounts, instanceServerName, nextServiceInstance, ordinalInstanceLabel } from '@/lib/services/instances'
 import { isPublishedAccess } from '@/lib/published/access'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
@@ -119,16 +119,12 @@ export async function markServiceNeedsConfig(agentId: string, key: string, authM
     await upsertRegistryEntry(conn, engineAgentId, key, { status: 'needs_config', config: {}, authMethodId, mcpServers: [], envKeys: [], skills: [], ...seed, installedAt: new Date().toISOString() })
 }
 
-export type ServiceInstanceSeed = ServiceInstanceTarget & { label: string }
-
-// A fresh key for another account of an app the coworker may already hold, labelled after the
-// accounts it already shows until its sign-in gives it an email.
-export async function allocateServiceInstance(agentId: string, manifest: ServiceManifest, actor?: Actor): Promise<ServiceInstanceSeed> {
+// Another account of an app the coworker may already hold, or null for an app whose accounts are not
+// instances.
+export async function allocateServiceInstance(agentId: string, manifest: ServiceManifest, actor?: Actor): Promise<ServiceInstanceSeed | null> {
+    if (!usesInstances(manifest)) return null
     const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
-    const reg = await readRegistry(conn, engineAgentId)
-    const taken = Object.keys(reg.services).flatMap(key => parseServiceRegistryKey(key).instanceId ?? [])
-    const instanceId = newServiceInstanceId(taken)
-    return { key: serviceRegistryKey(manifest.slug, instanceId), instanceId, label: ordinalInstanceLabel(manifest.name, reg, manifest.slug) }
+    return nextServiceInstance(manifest, heldAccounts(await readRegistry(conn, engineAgentId), manifest.slug))
 }
 
 // --- Public service functions ---
@@ -466,7 +462,7 @@ export async function installService(
         : null
     const { toolNames, oauth, managed, composio, app } = intoVault ?? (await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined))
     const keyTyped = method.kind === 'key' && method.inputs.some(input => input.secret && values[input.key]?.trim())
-    if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && takesSeveralAccounts(manifest)), actor, vaultItem: intoVault?.item ?? null })
+    if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && usesInstances(manifest)), actor, vaultItem: intoVault?.item ?? null })
     if (oauth) {
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, oauth, message: `${manifest.name} needs the user to sign in. A Connect button has been shown to them.` }
     }
@@ -564,12 +560,12 @@ async function markVaultNeedsConfig(target: VaultInstallTarget, manifest: Servic
 // Which registry entry an install writes: null for the base account, a fresh key for a new
 // account, or the existing extra account the caller addressed by its key (keeping its label).
 async function installTarget(agentId: string, manifest: ServiceManifest, slugOrKey: string, newInstance: boolean, actor?: Actor): Promise<ServiceInstanceSeed | null> {
-    if (newInstance && takesSeveralAccounts(manifest)) return allocateServiceInstance(agentId, manifest, actor)
+    if (newInstance) return allocateServiceInstance(agentId, manifest, actor)
     const { instanceId } = parseServiceRegistryKey(slugOrKey)
-    if (!instanceId || !takesSeveralAccounts(manifest)) return null
+    if (!instanceId || !usesInstances(manifest)) return null
     const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
     const reg = await readRegistry(conn, engineAgentId)
-    return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, reg, manifest.slug) }
+    return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, heldAccounts(reg, manifest.slug)) }
 }
 
 // The label of the account a coworker acts with in a paid app, '' when it has none yet, null when

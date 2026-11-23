@@ -2,8 +2,9 @@ import 'server-only'
 
 import { randomInt } from 'node:crypto'
 
-import { SERVICE_INSTANCE_ID_RE } from '@rerun/contracts'
+import { SERVICE_INSTANCE_ID_RE, parseServiceRegistryKey, serviceRegistryKey } from '@rerun/contracts'
 
+import { type ServiceManifest, usesInstances } from './manifest'
 import { type ServiceRegistry, entriesOfSlug } from './registry'
 
 const ID_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
@@ -45,10 +46,29 @@ export function instanceRenames(slug: string, servers: string[], envKeys: string
     }
 }
 
+export type HeldAccount = { instanceId?: string; label?: string }
+
+export function heldAccounts(reg: ServiceRegistry, slug: string): HeldAccount[] {
+    return entriesOfSlug(reg, slug).map(({ key, entry }) => ({ instanceId: parseServiceRegistryKey(key).instanceId, label: entry.label }))
+}
+
 // "Gmail 2", "Gmail 3"… the first number no other account of the app already shows.
-export function ordinalInstanceLabel(serviceName: string, reg: ServiceRegistry, slug: string): string {
-    const labels = new Set(entriesOfSlug(reg, slug).map(({ entry }) => entry.label))
+export function ordinalInstanceLabel(serviceName: string, held: HeldAccount[]): string {
+    const labels = new Set(held.map(account => account.label))
     let n = 2
     while (labels.has(`${serviceName} ${n}`)) n++
     return `${serviceName} ${n}`
+}
+
+// An extra account of an app: its registry key (`gmail@k3x9ab`) and the id that suffixes its
+// server names and env vars, so it never overwrites the base account's.
+export type ServiceInstanceTarget = { key: string; instanceId: string }
+export type ServiceInstanceSeed = ServiceInstanceTarget & { label: string }
+
+// The one place another account of an app gets its key, its id and the name it carries until its
+// sign-in reports one. Null for an app whose accounts are not instances.
+export function nextServiceInstance(manifest: ServiceManifest, held: HeldAccount[]): ServiceInstanceSeed | null {
+    if (!usesInstances(manifest)) return null
+    const instanceId = newServiceInstanceId(held.flatMap(account => account.instanceId ?? []))
+    return { key: serviceRegistryKey(manifest.slug, instanceId), instanceId, label: ordinalInstanceLabel(manifest.name, held) }
 }
