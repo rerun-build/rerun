@@ -1,7 +1,7 @@
 'use client'
 
 import { shortRelativeTime } from '@rerun/i18n/format'
-import { coworkerLine } from '@rerun/contracts'
+import { agentKindPolicy, coworkerLine } from '@rerun/contracts'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
@@ -24,9 +24,10 @@ export type CoworkerTileActions = {
     onNewConversation?: () => void
     onAllConversations?: () => void
     onOpenCard?: () => void
-    onDuplicate: () => void
-    onMoveToBox: (spaceId: string) => void
-    onDelete: () => void
+    // Absent for a coworker whose kind is never copied, moved between Boxes or deleted.
+    onDuplicate?: () => void
+    onMoveToBox?: (spaceId: string) => void
+    onDelete?: () => void
     // On the phone's list, where a coworker is pinned to the top.
     pin?: { pinned: boolean; onToggle: () => void }
 }
@@ -43,10 +44,12 @@ type CoworkerTileProps = {
     actions: CoworkerTileActions
     // `large`: the phone's list, at the sizes of the iOS and Android app.
     size?: 'compact' | 'large'
+    // Who it is, when its kind is not drawn as a buddy (the Chief of Staff's orb), at the tile's size.
+    avatar?: (size: number) => ReactNode
 }
 
 /** One coworker in the Simple view's list: its buddy, its name, when it last spoke, and one line of where it stands. */
-export function CoworkerTile({ agent, preview, viewerId, selected, unseen, onOpen, actions, size = 'compact' }: CoworkerTileProps) {
+export function CoworkerTile({ agent, preview, viewerId, selected, unseen, onOpen, actions, size = 'compact', avatar }: CoworkerTileProps) {
     const t = useTranslations('workspaceView')
     const locale = useLocale()
     const paused = !!agent.disabledAt
@@ -59,7 +62,7 @@ export function CoworkerTile({ agent, preview, viewerId, selected, unseen, onOpe
         <TileMenu agent={agent} actions={actions}>
             <div className={cn('group relative flex items-center rounded-lg transition-colors', selected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/60')}>
                 <button type="button" onClick={onOpen} aria-current={selected ? 'true' : undefined} className={cn('flex min-w-0 flex-1 items-center text-left', large ? 'gap-4 py-[17px] pr-12 pl-5' : 'gap-3 py-2.5 pr-1 pl-2')}>
-                    <AgentBuddy agentId={agent.id} mood={paused ? 'asleep' : 'idle'} size={large ? 48 : 36} facing="right" className="shrink-0" />
+                    {avatar ? <span className="flex shrink-0 items-center justify-center">{avatar(large ? 48 : 36)}</span> : <AgentBuddy agentId={agent.id} mood={paused ? 'asleep' : 'idle'} size={large ? 48 : 36} facing="right" className="shrink-0" />}
                     <span className={cn('min-w-0 flex-1', large && 'space-y-1')}>
                         <span className="flex items-baseline gap-2">
                             <span className={cn('min-w-0 flex-1 truncate', large ? 'text-[17px] leading-[22px] font-semibold' : 'text-[15px] leading-5 font-medium')}>{agent.name}</span>
@@ -126,6 +129,11 @@ function TileItems({ agent, actions, kit: { Item, Separator, Sub, SubTrigger, Su
     const manageable = useManageableSpaceIds()
     const otherBoxes = spaces.filter(space => space.id !== agent.spaceId && manageable.has(space.id))
     const reason = canManage ? undefined : manageReason
+    const policy = agentKindPolicy(agent.kind ?? 'coworker')
+    const duplicable = policy.duplicable && !!actions.onDuplicate
+    const onMoveToBox = policy.onBoard ? actions.onMoveToBox : undefined
+    const movable = !!onMoveToBox
+    const deletable = policy.deletable && !!actions.onDelete
     return (
         <>
             {actions.onNewConversation && (
@@ -152,39 +160,47 @@ function TileItems({ agent, actions, kit: { Item, Separator, Sub, SubTrigger, Su
                     {actions.pin.pinned ? t('unpin') : t('pin')}
                 </Item>
             )}
-            <Separator />
-            <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
-                <Item disabled={!canManage} onSelect={actions.onDuplicate} className="w-full gap-2 whitespace-nowrap">
-                    <CopyPlusIcon className="size-4" />
-                    {tMenu('duplicate')}
-                </Item>
-            </TooltipDisabledReason>
-            <Sub>
+            {(duplicable || movable) && <Separator />}
+            {duplicable && (
                 <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
-                    <SubTrigger disabled={!canManage} className="w-full gap-2 whitespace-nowrap">
-                        <ArrowRightIcon className="size-4" />
-                        {tMenu('moveToBox')}
-                    </SubTrigger>
+                    <Item disabled={!canManage} onSelect={actions.onDuplicate} className="w-full gap-2 whitespace-nowrap">
+                        <CopyPlusIcon className="size-4" />
+                        {tMenu('duplicate')}
+                    </Item>
                 </TooltipDisabledReason>
-                <SubContent>
-                    {otherBoxes.length === 0 ? (
-                        <Item disabled>{tMenu('noOtherBox')}</Item>
-                    ) : (
-                        otherBoxes.map(space => (
-                            <Item key={space.id} className="max-w-56 truncate" onSelect={() => actions.onMoveToBox(space.id)}>
-                                {space.name?.trim() || tMenu('untitledBox')}
-                            </Item>
-                        ))
-                    )}
-                </SubContent>
-            </Sub>
-            <Separator />
-            <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
-                <Item variant="destructive" disabled={!canManage} onSelect={actions.onDelete} className="w-full gap-2 whitespace-nowrap">
-                    <Trash2Icon className="size-4" />
-                    {tMenu('delete')}
-                </Item>
-            </TooltipDisabledReason>
+            )}
+            {movable && (
+                <Sub>
+                    <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
+                        <SubTrigger disabled={!canManage} className="w-full gap-2 whitespace-nowrap">
+                            <ArrowRightIcon className="size-4" />
+                            {tMenu('moveToBox')}
+                        </SubTrigger>
+                    </TooltipDisabledReason>
+                    <SubContent>
+                        {otherBoxes.length === 0 ? (
+                            <Item disabled>{tMenu('noOtherBox')}</Item>
+                        ) : (
+                            otherBoxes.map(space => (
+                                <Item key={space.id} className="max-w-56 truncate" onSelect={() => onMoveToBox(space.id)}>
+                                    {space.name?.trim() || tMenu('untitledBox')}
+                                </Item>
+                            ))
+                        )}
+                    </SubContent>
+                </Sub>
+            )}
+            {deletable && (
+                <>
+                    <Separator />
+                    <TooltipDisabledReason reason={reason} side="right" className="flex w-full">
+                        <Item variant="destructive" disabled={!canManage} onSelect={actions.onDelete} className="w-full gap-2 whitespace-nowrap">
+                            <Trash2Icon className="size-4" />
+                            {tMenu('delete')}
+                        </Item>
+                    </TooltipDisabledReason>
+                </>
+            )}
         </>
     )
 }

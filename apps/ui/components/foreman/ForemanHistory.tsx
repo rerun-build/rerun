@@ -1,10 +1,13 @@
 'use client'
 
+import { needsHuman } from '@rerun/contracts'
 import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import type { SessionHistoryEntry } from '@/app/api/_services/conversation.service'
 import { ChatRow, groupByDay } from '@/components/agent/sheet/AgentChatsList'
 import { Button } from '@/components/ui/button'
+import { Chip } from '@/components/ui/chip'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { HistoryIcon, MessageCircle, MessagesSquare, PlusIcon, XIcon } from '@/lib/icons'
@@ -30,8 +33,12 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
     const t = useTranslations('foreman.history')
     const tThreads = useTranslations('foreman.threads')
     const tHeader = useTranslations('foreman.header')
+    const tList = useTranslations('agent.agentChatsList')
     const locale = useLocale()
-    const days = groupByDay(entries, locale)
+    // As a coworker's list: every thread, or the ones waiting on the person.
+    const [filter, setFilter] = useState<'all' | 'needs'>('all')
+    const waitingEntries = entries.filter(entry => needsHuman(entry.status))
+    const days = groupByDay(filter === 'needs' ? waitingEntries : entries, locale)
     const onClose = () => onOpenChange(false)
     const pick = (action: () => void) => () => {
         action()
@@ -75,15 +82,25 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                             </Button>
                         </div>
                     </div>
+                    <div className="flex shrink-0 flex-wrap gap-1.5 px-3 pb-1.5">
+                        <Chip selected={filter === 'all'} onClick={() => setFilter('all')}>
+                            {tList('filters.all')}
+                        </Chip>
+                        <Chip selected={filter === 'needs'} onClick={() => setFilter('needs')}>
+                            {tList('filters.needs')} <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{waitingEntries.length}</span>
+                        </Chip>
+                    </div>
                     <div className="min-h-0 space-y-0.5 overflow-y-auto px-2 pb-2">
-                        <button
-                            type="button"
-                            onClick={pick(onOpenGeneral)}
-                            className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium transition-colors', activeThreadId === null ? 'bg-muted/60' : 'hover:bg-muted/40')}
-                        >
-                            <MessagesSquare className="size-3.5 text-brand-text" />
-                            {tThreads('general')}
-                        </button>
+                        {filter === 'all' && (
+                            <button
+                                type="button"
+                                onClick={pick(onOpenGeneral)}
+                                className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium transition-colors', activeThreadId === null ? 'bg-muted/60' : 'hover:bg-muted/40')}
+                            >
+                                <MessagesSquare className="size-3.5 text-brand-text" />
+                                {tThreads('general')}
+                            </button>
+                        )}
                         {days.map(({ day, entries: dayEntries }) => (
                             <div key={day} className="pb-1">
                                 <p className="px-2.5 pt-2 pb-1 text-[11px] font-medium text-muted-foreground">{day}</p>
@@ -92,7 +109,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                                 ))}
                             </div>
                         ))}
-                        {days.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('empty')}</p>}
+                        {days.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{filter === 'needs' ? tList('emptyNeeds') : t('empty')}</p>}
                     </div>
                 </div>
             </PopoverContent>

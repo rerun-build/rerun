@@ -11,7 +11,7 @@ import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
 import type { EngineSession, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { sourcesOf, type SessionHistoryFilter } from '@/lib/chat/history-filter'
-import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
+import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, agentKindPolicy, type AgentKind, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/supabase/server'
@@ -45,11 +45,23 @@ export const SESSION_HISTORY_LIMIT = 200
 // on both pages. Null once there is nothing older.
 export type SessionHistoryPage = { entries: SessionHistoryEntry[]; before: string | null }
 
+// The conversations of a coworker a caller reads: all of them, or for a coworker whose
+// conversations are each member's own, the caller's alone (none for a caller who is no member).
+function ownerFilterOf(agent: { kind: AgentKind }, caller: Actor): { filter: { owner_user_id?: string } } | null {
+    if (agentKindPolicy(agent.kind).conversations === 'shared') return { filter: {} }
+    return caller.kind === 'user' ? { filter: { owner_user_id: caller.userId } } : null
+}
+
 // Session history for an agent: Supabase-mirrored sessions merged with
 // engine-only sessions that were initiated by another agent (call_agent),
 // so those show up in the history like regular ones until adopted.
 export async function listAgentSessions(agentId: string, actor?: Actor, filter: SessionHistoryFilter = 'all', before?: string): Promise<SessionHistoryPage> {
-    const { actor: caller } = await assertAgentAccess(agentId, 'use', actor)
+    const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
+    const owner = ownerFilterOf(agent, caller)
+    if (!owner) return { entries: [], before: null }
+    // The engine's unmirrored sessions belong to whoever started them: a coworker whose conversations
+    // are each member's own lists none of them.
+    const perMember = owner.filter.owner_user_id !== undefined
 
     const supabase = createServiceRoleClient()
     const sources = sourcesOf(filter)
@@ -58,16 +70,16 @@ export async function listAgentSessions(agentId: string, actor?: Actor, filter: 
     const readsEngine = !sources || sources.includes('agent')
 
     const [threads, general, target] = await Promise.all([
-        selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'thread', source: sources, updated_at: before ? { lte: before } : undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
-        filter === 'all' && !before ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'general' }) : { data: [], error: null },
-        readsEngine ? resolveAgentTarget(agentId, 'use', caller).catch(() => null) : null,
+        selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agent.id, ...owner.filter, kind: 'thread', source: sources, updated_at: before ? { lte: before } : undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
+        filter === 'all' && !before ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agent.id, ...owner.filter, kind: 'general' }) : { data: [], error: null },
+        readsEngine && !perMember ? resolveAgentTarget(agentId, 'use', caller).catch(() => null) : null,
     ])
     if (threads.error) throw threads.error
     const threadRows = threads.data ?? []
     const supabaseRows = [...(general.data ?? []), ...threadRows]
 
     const engineSessions = target ? await listSessions(target.conn, target.engineAgentId).catch(() => []) : []
-    const unmirrored = await engineOnlySessions(supabase, agentId, engineSessions, threadRows, sources, before)
+    const unmirrored = await engineOnlySessions(supabase, agent.id, engineSessions, threadRows, sources, before)
 
     const engineOriginIds = [...new Set(unmirrored.map(s => s.originAgentId).filter((v): v is string => !!v))]
     const supabaseOriginIds = [...new Set(supabaseRows.map(r => r.origin_agent_id).filter((v): v is string => !!v))]
@@ -180,8 +192,10 @@ export const THREAD_FEED_LIMIT = 200
 // mirrors every conversation it opens on its own (`agent.session.created`), and the live state
 // comes from the board store, so there is nothing to ask the Box for here.
 export async function listAgentThreads(agentId: string, actor?: Actor): Promise<ThreadRow[]> {
-    await assertAgentAccess(agentId, 'use', actor)
-    const { data, error } = await selectMany(createServiceRoleClient(), 'sessions', THREAD_COLUMNS, { agent_id: agentId, kind: 'thread' }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT)
+    const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
+    const owner = ownerFilterOf(agent, caller)
+    if (!owner) return []
+    const { data, error } = await selectMany(createServiceRoleClient(), 'sessions', THREAD_COLUMNS, { agent_id: agent.id, kind: 'thread', ...owner.filter }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT)
     if (error) throw error
     return (data ?? []).map(row => ({
         id: row.id,

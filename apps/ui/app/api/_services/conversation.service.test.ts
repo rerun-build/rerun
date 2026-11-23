@@ -546,7 +546,8 @@ describe('listAgentSessions', () => {
 
         const { entries } = await listAgentSessions('a', adminActor)
 
-        expect(historyCall(f => f.kind === 'thread')?.slice(3)).toEqual([{ agent_id: 'a', kind: 'thread', source: undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT])
+        // The row the access check resolved, which an alias like `foreman` names too.
+        expect(historyCall(f => f.kind === 'thread')?.slice(3)).toEqual([{ agent_id: 'agent-1', kind: 'thread', source: undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT])
         expect(entries.map(e => [e.id, e.kind])).toEqual([
             ['t1', 'thread'],
             ['g', 'general'],
@@ -728,9 +729,22 @@ describe('listAgentThreads', () => {
         const threads = await listAgentThreads('a', adminActor)
 
         expect(assertAgentAccess).toHaveBeenCalledWith('a', 'use', adminActor)
-        expect(vi.mocked(selectMany).mock.calls[0].slice(3)).toEqual([{ agent_id: 'a', kind: 'thread' }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT])
+        expect(vi.mocked(selectMany).mock.calls[0].slice(3)).toEqual([{ agent_id: 'agent-1', kind: 'thread' }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT])
         expect(vi.mocked(resolveAgentTarget)).not.toHaveBeenCalled()
         expect(threads).toEqual([{ id: 's2', title: 's2 title', status: 'idle', source: 'dashboard', createdAt: '2026-11-08T10:00:00Z', updatedAt: '2026-11-08T10:00:00Z', originAgentId: null, automationName: 'Daily check', outcome: 'done', firstMessage: 'Check the funnel' }])
+    })
+
+    it("reads only the caller's own threads of the Chief of Staff, and none for an API key", async () => {
+        const foreman = { ...reached(), agent: { id: 'cos-1', workspace_id: 7, kind: 'foreman' as const, space_id: null, engine_agent_id: 'foreman' } }
+        vi.mocked(assertAgentAccess).mockResolvedValueOnce(foreman).mockResolvedValueOnce({ ...foreman, actor: { kind: 'workspace', workspaceId: 7 } })
+        vi.mocked(selectMany).mockReset().mockResolvedValue({ data: [], error: null } as never)
+
+        await listAgentThreads('foreman', adminActor)
+        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ agent_id: 'cos-1', kind: 'thread', owner_user_id: adminActor.kind === 'user' ? adminActor.userId : '' })
+
+        vi.mocked(selectMany).mockClear()
+        expect(await listAgentThreads('foreman', { kind: 'workspace', workspaceId: 7 })).toEqual([])
+        expect(selectMany).not.toHaveBeenCalled()
     })
 
     it('exposes the kind and the opening time of every conversation in the history', async () => {

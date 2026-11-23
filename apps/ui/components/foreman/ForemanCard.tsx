@@ -33,7 +33,7 @@ const WITHOUT_AGENT_SCREENS: readonly CardDestination[] = ['monitoring', 'settin
 
 const BREADCRUMB_ORB_SIZE = 16
 
-function useForemanAsAgent(): IsoAgent {
+export function useForemanAsAgent(): IsoAgent {
     const name = useTranslations('workspaceView.foreman')('name', useForemanName())
     const workspaceId = useSession().workspace?.id ?? 0
     return useMemo(() => ({ id: FOREMAN_AGENT_ID, kind: 'foreman', name, handle: null, description: null, templateId: null, status: 'idle', position: { col: 0, row: 0 }, workspaceId, spaceId: '', disabledAt: null, disabledReason: null }), [name, workspaceId])

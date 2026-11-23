@@ -2,11 +2,15 @@
 
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
-import { type ReactNode, useEffect, useMemo, useRef } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { renameSessionAction } from '@/app/api/_actions/session.actions'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { OpenChatsTabs } from '@/components/agent/sheet/OpenChatsTabs'
+import { useSessionRename } from '@/components/agent/sheet/SessionRename'
+import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialog'
 import { isGeneralTab, useSessionTabs } from '@/hooks/useSessionTabs'
+import { isTypingTarget } from '@/lib/typing-target'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 type ForemanTopBarProps = {
@@ -23,6 +27,8 @@ type ForemanTopBarProps = {
     start?: ReactNode
     /** The button to every conversation and the list it opens, at the end of the bar. */
     history?: ReactNode
+    /** On screen and in front: its keyboard shortcuts answer. */
+    active?: boolean
 }
 
 /**
@@ -30,13 +36,14 @@ type ForemanTopBarProps = {
  * first, then the threads opened here, kept across reloads, between its card button and its history. The store says
  * which conversation is on screen; the tabs follow it, whoever opened it (+, the history, a notification).
  */
-export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShowGeneral, onOpenThread, onNewTask, start, history }: ForemanTopBarProps) {
+export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShowGeneral, onOpenThread, onNewTask, start, history, active = true }: ForemanTopBarProps) {
     const t = useTranslations('foreman.threads')
     const generalTitle = t('general')
     const untitled = t('untitled')
     // The foreman's id is the same in every workspace: its tabs are kept per workspace.
     const workspaceId = useSession().workspace?.id ?? 'none'
-    const { tabs, activeIndex, selectTab, closeTab, openTab } = useSessionTabs(`${FOREMAN_AGENT_ID}:${workspaceId}`)
+    const { tabs, activeIndex, selectTab, closeTab, openTab, updateTabTitle } = useSessionTabs(`${FOREMAN_AGENT_ID}:${workspaceId}`)
+    const [pendingCloseIndex, setPendingCloseIndex] = useState<number | null>(null)
 
     // The store keeps a single draft: a "New conversation" left before anything was written in it has nothing
     // to reopen, so its tab goes with it.
@@ -63,24 +70,71 @@ export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShow
         else onOpenThread(id)
     }
 
-    const close = (index: number) => {
-        if (isGeneralTab(tabs[index])) return
-        if (index === activeIndex) {
-            const rest = tabs.filter((_, i) => i !== index)
-            const next = rest[Math.min(index, rest.length - 1)]
-            if (!next?.id || isGeneralTab(next)) onShowGeneral()
-            else onOpenThread(next.id)
+    const close = useCallback(
+        (index: number) => {
+            if (isGeneralTab(tabs[index])) return
+            if (index === activeIndex) {
+                const rest = tabs.filter((_, i) => i !== index)
+                const next = rest[Math.min(index, rest.length - 1)]
+                if (!next?.id || isGeneralTab(next)) onShowGeneral()
+                else onOpenThread(next.id)
+            }
+            closeTab(index)
+        },
+        [tabs, activeIndex, onShowGeneral, onOpenThread, closeTab]
+    )
+
+    // A thread still working asks first, as a coworker's does: closing its tab is not stopping it.
+    const requestClose = useCallback(
+        (index: number) => {
+            if (isGeneralTab(tabs[index])) return
+            const id = tabs[index]?.id
+            if (id && rowById.get(id)?.status === 'working') setPendingCloseIndex(index)
+            else close(index)
+        },
+        [tabs, rowById, close]
+    )
+
+    // Cmd/Ctrl+Backspace closes the thread on screen, outside a field where it deletes the last word.
+    useEffect(() => {
+        if (!active) return
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey || event.key !== 'Backspace') return
+            if (isTypingTarget(event.target)) return
+            event.preventDefault()
+            requestClose(activeIndex)
         }
-        closeTab(index)
-    }
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [active, requestClose, activeIndex])
+
+    // The tab takes the new title at once: the sessions channel brings it to the list.
+    const rename = useSessionRename(
+        useCallback(
+            async (id: string, title: string) => {
+                const renamed = await renameSessionAction(id, title)
+                if (renamed) updateTabTitle(id, title)
+                return renamed
+            },
+            [updateTabTitle]
+        )
+    )
 
     return (
         <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
             {start}
             <div className="min-w-0 flex-1">
-                <OpenChatsTabs tabs={shownTabs} activeIndex={activeIndex} onSelect={show} onClose={close} onCreate={onNewTask} statusOf={tab => (tab.id ? rowById.get(tab.id)?.status : undefined)} />
+                <OpenChatsTabs tabs={shownTabs} activeIndex={activeIndex} onSelect={show} onClose={requestClose} onCreate={onNewTask} rename={rename} statusOf={tab => (tab.id ? rowById.get(tab.id)?.status : undefined)} />
             </div>
             {history}
+            <CloseRunningTabDialog
+                open={pendingCloseIndex !== null}
+                onOpenChange={open => !open && setPendingCloseIndex(null)}
+                onConfirm={() => {
+                    if (pendingCloseIndex !== null) close(pendingCloseIndex)
+                    setPendingCloseIndex(null)
+                }}
+            />
         </div>
     )
 }

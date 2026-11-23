@@ -1,9 +1,10 @@
 'use client'
 
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, sleep } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 
 import { listWorkspaceRoutinesAction, type WorkspaceRoutine } from '@/app/api/_actions/agent.actions'
+import { findForemanThreadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RoutineMenu } from '@/components/routines/RoutineMenu'
 import { RoutinesSkeleton } from '@/components/routines/RoutinesSkeleton'
@@ -35,10 +36,23 @@ function openEditor(routine: WorkspaceRoutine) {
     leaveForTheBoard()
 }
 
+// The hub writes the thread of a run once the engine announces its session, a moment after it started.
+const THREAD_WAITS_MS = [0, 500, 1_000, 1_500, 2_500]
+
+// A run of one of its routines is a thread of the member who reads it: theirs opens in its chat, as it
+// does from its card; another member's stays with them.
+async function openForemanRun(engineSessionId: string) {
+    useForemanStore.getState().setTab('assistant')
+    for (const wait of THREAD_WAITS_MS) {
+        if (wait) await sleep(wait)
+        const threadId = await findForemanThreadAction(engineSessionId).catch(() => null)
+        if (threadId) return useForemanStore.getState().openThread(threadId)
+    }
+}
+
 function openRun(routine: WorkspaceRoutine, sessionId: string, runId: string) {
-    // Its run is read in its chat, where the thread shows up as soon as the engine announces it.
     if (routine.agentId === FOREMAN_AGENT_ID) {
-        useForemanStore.getState().setTab('assistant')
+        void openForemanRun(sessionId)
         return
     }
     const board = useBoardStore.getState()

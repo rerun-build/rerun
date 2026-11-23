@@ -3,13 +3,16 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
-import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox, type MentionTrigger } from '@/components/chat/MentionAutocomplete'
+import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
 import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
 import { ForemanTrialGate } from '@rerun/cloud/billing.client'
 import { useForemanMentionAgents } from '@/components/foreman/useForemanMentionAgents'
 import type { TrialStep } from '@/lib/foreman/next-steps'
 import { cn } from '@/lib/utils'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { useAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
+import { useForemanStore } from '@/stores/foreman.store'
 
 /**
  * Le pied de la colonne. Une question du Foreman attend dans la conversation, comme l'`ask_user`
@@ -26,8 +29,6 @@ import { cn } from '@/lib/utils'
 
 // Le repli de hauteur de l'agent sheet, au chiffre près : les deux pieds de panneau doivent se lire
 // pareil. `popLayout` est ce qui empêche le composer sortant et la carte entrante de se pousser.
-// The Chief of Staff has no skill of its own: `/` is not one of its symbols.
-const FOREMAN_MENTION_TRIGGERS: readonly MentionTrigger[] = ['@', '#']
 
 const SLOT_MOTION = {
     initial: { height: 0, opacity: 0 },
@@ -48,15 +49,21 @@ type ForemanComposerSlotProps = Omit<ForemanComposerProps, keyof ForemanComposer
     ref?: Ref<HTMLDivElement>
 }
 
+const NO_SKILLS: ReturnType<typeof useAgentSkillSummaries> = []
+
 export function ForemanComposerSlot({ aside, trialGate, framed = false, above, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
     const bare = aside && !trialGate
 
     const { composerRef } = composer
     const mentionAgents = useForemanMentionAgents()
+    // Its skills, as a coworker's `/` offers them: on an engine that keeps none of its own, the list is empty.
+    const hasCard = useForemanStore(state => state.hasCard)
+    const skills = useAgentSkillSummaries(FOREMAN_AGENT_ID)
+    const mentionSkills = hasCard ? skills : NO_SKILLS
     // Picking a mention writes `el.value` directly, which fires no React change event.
     const syncComposer = useCallback((text: string) => composerRef.current?.sync(text), [composerRef])
     const mentionComputers = useMentionComputers()
-    const { inputRef, menu: mentionMenu, tokens: mentionTokens, commands: mentionCommands, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer, mentionComputers.computers, mentionComputers.refresh, FOREMAN_MENTION_TRIGGERS)
+    const { inputRef, menu: mentionMenu, tokens: mentionTokens, commands: mentionCommands, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, mentionSkills, syncComposer, mentionComputers.computers, mentionComputers.refresh)
     const composerShown = !trialGate && !aside
 
     // The composer folds inside an `overflow-hidden` box that would clip the menu, so the menu is

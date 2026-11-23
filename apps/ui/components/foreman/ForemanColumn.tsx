@@ -492,6 +492,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             onShowGeneral={backToGeneral}
                             onOpenThread={openThread}
                             onNewTask={startNewChat}
+                            active={open === true}
                             start={<DetailsToggle label={tView('card', foremanName)} avatar={<Orb size={24} facing="right" />} />}
                             history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
                         />
