@@ -14,7 +14,7 @@ vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: async () => '
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectMany: mocks.selectMany, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
-const { AccessDeniedError, assertAgentAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
+const { AccessDeniedError, assertAgentAccess, assertRunInReach, assertSessionInWorkspace, runSessionsInReach, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
 type Actor = import('./access').Actor
 
 const admin: Actor = { kind: 'user', userId: 'u-admin', workspaceId: 1, role: 'admin', boxScope: 'all' }
@@ -164,6 +164,38 @@ describe('assertAgentAccess on the Chief of Staff', () => {
     it('holds a coworker to its Box', async () => {
         readsAnswering({ agents: { id: 'a1', workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...restrictedBox } })
         await expect(assertAgentAccess('a1', 'use', member('all'))).rejects.toThrow('Coworker not found')
+    })
+})
+
+describe('the runs of the Chief of Staff', () => {
+    const foreman = { id: 'cos-1', workspace_id: 1, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' }
+
+    beforeEach(() => {
+        mocks.selectMaybeSingle.mockReset()
+        mocks.selectMany.mockReset()
+        readsAnswering({ agents: foreman })
+    })
+
+    it("reach the member only in their own conversations, an admin included", async () => {
+        mocks.selectMany.mockResolvedValue({ data: [{ engine_session_id: 'mine' }], error: null })
+        const reach = await runSessionsInReach('foreman', ['mine', 'theirs'], admin)
+        expect(reach.inReach('mine')).toBe(true)
+        expect(reach.inReach('theirs')).toBe(false)
+        expect(mocks.selectMany.mock.calls[0][3]).toEqual({ agent_id: 'cos-1', owner_user_id: 'u-admin', engine_session_id: ['mine', 'theirs'] })
+        expect(() => assertRunInReach(reach, { sessionId: 'theirs' })).toThrow('Coworker not found')
+    })
+
+    it('reach no API key nor coworker, which hold no conversation of it', async () => {
+        const reach = await runSessionsInReach('foreman', ['any'], workspaceActor(1))
+        expect(reach.inReach('any')).toBe(false)
+        expect(mocks.selectMany).not.toHaveBeenCalled()
+    })
+
+    it("leave a coworker's runs to whoever uses it", async () => {
+        readsAnswering({ agents: { id: 'a1', workspace_id: 1, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...openBox } })
+        const reach = await runSessionsInReach('a1', ['any'], member('all'))
+        expect(reach.inReach('any')).toBe(true)
+        expect(mocks.selectMany).not.toHaveBeenCalled()
     })
 })
 

@@ -191,7 +191,7 @@ describe('POST /api/hub', () => {
         expect(dispatchTeamHubTool).toHaveBeenCalledWith(FOREMAN_AGENT_ID, WORKSPACE_ID, 'team_status', {}, { kind: 'workspace', workspaceId: WORKSPACE_ID })
 
         vi.clearAllMocks()
-        for (const tool of ['list_agents', 'publish_file']) {
+        for (const tool of ['list_agents', 'delete_agent']) {
             const refused = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool, args: {} } }))
             expect(refused.status).toBe(403)
         }

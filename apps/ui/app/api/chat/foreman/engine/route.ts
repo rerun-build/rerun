@@ -1,6 +1,6 @@
 import { FOREMAN_AGENT_ID, reasoningEffortSchema, type SessionKind } from '@rerun/contracts'
 
-import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
+import { actorFromContext, assertRunInReach, callableEngineAgentIds, runSessionsInReach } from '@/app/api/_auth/access'
 import { resolveAgentTarget, type AgentChatTarget } from '@/app/api/_services/chat.service'
 import { sendTurn } from '@/lib/chat/send-turn'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
@@ -9,7 +9,7 @@ import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { requestTimeZone } from '@/lib/i18n/request-locale'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { embedTextShared } from '@/lib/services/embed'
-import { cancelRun, supportsForemanVault } from '@/lib/engine/client'
+import { cancelRun, getRun, supportsForemanVault } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, copyToShippedForemanRow, engineSessionOf, findForemanGeneral, loadForemanConversation, loadForemanConversationById, startEngineConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
@@ -169,7 +169,13 @@ export async function DELETE(req: Request): Promise<Response> {
         // away too. The run this tab streamed is then stopped by name, which also works on an engine
         // that cannot list the foreman's runs yet.
         if (sessionId) await cancelForemanSessionRuns(ctx, sessionId).catch(err => (runId ? undefined : Promise.reject(err)))
-        if (runId) await cancelRun(await getWorkspaceConnection(ctx.workspace.id), FOREMAN_AGENT_ID, runId)
+        if (runId) {
+            const conn = await getWorkspaceConnection(ctx.workspace.id)
+            // A run is stopped by the member whose conversation it runs in, never by another.
+            const run = await getRun(conn, FOREMAN_AGENT_ID, runId)
+            assertRunInReach(await runSessionsInReach(FOREMAN_AGENT_ID, [run.sessionId], actorFromContext(ctx)), run)
+            await cancelRun(conn, FOREMAN_AGENT_ID, runId)
+        }
     } catch (err) {
         return Response.json({ error: err instanceof Error ? err.message : 'Failed to stop the run' }, { status: 502 })
     }

@@ -2,7 +2,7 @@ import { workspaceActor } from '@/app/api/_auth/access'
 import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { agentFilesBase, chat as engineChat, createMemory, getAgent, getRun, importSkill, listConnections, listSchedules, listSkills, listTriggers, uploadFile, writeFileText } from '@/lib/engine/client'
+import { agentFilesBase, chat as engineChat, createMemory, getAgent, getRun, importSkill, listConnections, listRuns, listSchedules, listSkills, listTriggers, uploadFile, writeFileText } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
@@ -39,11 +39,14 @@ const ACTOR = { kind: 'workspace', workspaceId: WORKSPACE_ID }
 
 const AGENTS: Record<string, Record<string, unknown>> = {
     'agent-own': { workspace_id: WORKSPACE_ID, space_id: 'box-own' },
+    'agent-open': { id: 'agent-open', workspace_id: WORKSPACE_ID, kind: 'coworker', space_id: 'box-open' },
+    'cos-row': { id: 'cos-row', workspace_id: WORKSPACE_ID, kind: 'foreman', space_id: null, engine_agent_id: 'foreman' },
     'agent-foreign': { workspace_id: FOREIGN_WORKSPACE_ID, space_id: 'box-foreign' },
 }
 
 const SPACES = [
     { id: 'box-own', name: 'Sales', workspace_id: WORKSPACE_ID, visibility: 'restricted' },
+    { id: 'box-open', name: 'Support', workspace_id: WORKSPACE_ID, visibility: 'workspace' },
     { id: 'box-foreign', name: 'Theirs', workspace_id: FOREIGN_WORKSPACE_ID, visibility: 'workspace' },
 ]
 
@@ -87,15 +90,37 @@ describe('dispatchAccountTool', () => {
         })
 
         it('hands the engine the coworkers a member reaches, so the coworker cannot call into a Box closed to them', async () => {
-            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'agent-own', message: 'hi' })).rejects.toThrow(/could not be reached/)
+            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'agent-open', message: 'hi' })).rejects.toThrow(/could not be reached/)
 
-            expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: [] })
+            // No coworker of the Box closed to them, only the Chief of Staff every member reaches.
+            expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: ['foreman'] })
+        })
+
+        it("never opens nor continues a conversation of the Chief of Staff, each member's own", async () => {
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'cos-row', message: 'hi', sessionId: 'someone-else' })).rejects.toThrow(/private/)
+            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'cos-row', message: 'hi' })).rejects.toThrow(/private/)
+            expect(engineChat).not.toHaveBeenCalled()
         })
 
         it('names nobody for an API key, which reaches every Box', async () => {
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'agent-own', message: 'hi' })).rejects.toThrow(/could not be reached/)
 
             expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: undefined })
+        })
+    })
+
+    describe('the runs of the Chief of Staff', () => {
+        const run = (id: string, sessionId: string) => ({ id, sessionId, agentId: 'foreman', status: 'done', stepCount: 1, startedAt: '2026-11-23T10:00:00Z', finishedAt: null, error: null })
+
+        beforeEach(() => {
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'foreman' } as never)
+            vi.mocked(listRuns).mockResolvedValue([run('r-1', 'members-session')] as never)
+            vi.mocked(getRun).mockResolvedValue({ ...run('r-1', 'members-session'), output: 'private answer' } as never)
+        })
+
+        it('are listed to no API key, and read by none', async () => {
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'list_runs', { agentId: 'cos-row' })).resolves.toEqual({ runs: [] })
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'get_run', { agentId: 'cos-row', runId: 'r-1' })).rejects.toThrow('Coworker not found')
         })
     })
 

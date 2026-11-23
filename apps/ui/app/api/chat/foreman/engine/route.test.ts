@@ -17,7 +17,12 @@ import { DELETE, GET, POST } from './route'
 vi.mock('@/lib/i18n/request-locale', () => ({ requestTimeZone: vi.fn(async () => 'Europe/Paris') }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
 vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedValue(null) }))
-vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
+vi.mock('@/app/api/_auth/access', async importOriginal => ({
+    actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'assigned' })),
+    callableEngineAgentIds: vi.fn(),
+    assertRunInReach: (await importOriginal<typeof import('@/app/api/_auth/access')>()).assertRunInReach,
+    runSessionsInReach: vi.fn(async () => ({ inReach: (sessionId: string) => sessionId === 'session' })),
+}))
 vi.mock('@/lib/foreman/hub-token', () => ({ mintForemanHubToken: vi.fn(() => null) }))
 vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
 vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn(() => ({ id: 'user-1', name: 'Ada' })) }))
@@ -33,7 +38,7 @@ vi.mock('@/app/api/_services/chat.service', () => ({
         }
     },
 }))
-vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn(), supportsForemanVault: vi.fn().mockResolvedValue(false) }))
+vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), getRun: vi.fn(async (_conn: unknown, _agent: string, runId: string) => ({ id: runId, sessionId: runId === 'run-a' ? 'session' : 'another-members' })), reconnectRun: vi.fn(), supportsForemanVault: vi.fn().mockResolvedValue(false) }))
 vi.mock('@/lib/foreman/conversation', () => ({
     cancelForemanSessionRuns: vi.fn(),
     engineSessionOf: vi.fn().mockResolvedValue(null),
@@ -172,6 +177,14 @@ describe('/api/chat/foreman/engine', () => {
         expect(response.status).toBe(200)
         expect(order).toEqual(['session', 'run'])
         expect(cancelRun).toHaveBeenCalledWith(expect.anything(), expect.any(String), 'run-a')
+    })
+
+    it("refuses to stop a run of another member's conversation", async () => {
+        vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'https://engine.test', apiKey: null } as never)
+        const response = await DELETE(new Request(`${URL}?runId=run-b`, { method: 'DELETE' }))
+
+        expect(response.status).toBe(502)
+        expect(cancelRun).not.toHaveBeenCalled()
     })
 
     describe('General and threads', () => {

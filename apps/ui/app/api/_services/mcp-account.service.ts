@@ -1,5 +1,5 @@
-import { connectorSkillReadOnlyError, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
-import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
+import { agentKindPolicy, connectorSkillReadOnlyError, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { AccessDeniedError, assertAgentInWorkspace, assertRunInReach, callableEngineAgentIds, runSessionsInReach, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
     chat as engineChat,
@@ -779,7 +779,9 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
         case 'send_message': {
             const agentId = requireString(args.agentId, 'agentId')
-            const [{ conn, engineAgentId }, callableAgentIds] = await Promise.all([resolveAgentTarget(agentId, 'use', actor), callableEngineAgentIds(actor)])
+            const [{ conn, engineAgentId }, callableAgentIds, recipient] = await Promise.all([resolveAgentTarget(agentId, 'use', actor), callableEngineAgentIds(actor), assertAgentInWorkspace(agentId, 'use', actor)])
+            // Its conversations are each member's own, held in the app: none is opened or continued from here.
+            if (agentKindPolicy(recipient.kind).conversations === 'per-member') throw new Error('This coworker keeps each member\'s conversations private: talk to it in the Rerun app.')
             const waitSeconds = clamp(asNumber(args.waitSeconds), DEFAULT_WAIT_SECONDS, MAX_WAIT_SECONDS)
 
             const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds })
@@ -812,13 +814,15 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         case 'list_runs': {
             const { conn, engineAgentId } = await resolveAgentTarget(requireString(args.agentId, 'agentId'), 'use', actor)
             const runs = await engineListRuns(conn, engineAgentId, { limit: clamp(asNumber(args.limit), 20, 200) })
-            return { runs: runs.map(projectRun) }
+            const reach = await runSessionsInReach(requireString(args.agentId, 'agentId'), runs.map(run => run.sessionId), actor)
+            return { runs: runs.filter(run => reach.inReach(run.sessionId)).map(projectRun) }
         }
 
         case 'get_run': {
             const { conn, engineAgentId } = await resolveAgentTarget(requireString(args.agentId, 'agentId'), 'use', actor)
             const runId = requireString(args.runId, 'runId')
             const run = await engineGetRun(conn, engineAgentId, runId)
+            assertRunInReach(await runSessionsInReach(requireString(args.agentId, 'agentId'), [run.sessionId], actor), run)
             const toolCalls = args.includeToolCalls === true ? await engineGetRunTools(conn, engineAgentId, runId) : null
 
             return {

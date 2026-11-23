@@ -57,7 +57,8 @@ describe('publishFileAction', () => {
         })
         expect(assertAgentInWorkspace).toHaveBeenCalledWith('agent')
         expect(vi.mocked(assertAgentInWorkspace).mock.calls[0]).toHaveLength(1)
-        expect(publishWithThumbnail).toHaveBeenCalledWith('agent', 'report.pdf')
+        // Under the row the access check read, which the alias of the Chief of Staff resolves to.
+        expect(publishWithThumbnail).toHaveBeenCalledWith('agent-1', 'report.pdf')
     })
 
     it('still refuses publishing when ownership verification fails', async () => {

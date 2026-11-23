@@ -84,10 +84,12 @@ describe('the level each action asks of the Box', () => {
         await actions.deleteScheduleAction(AGENT, 'daily')
         await actions.updateAgentKeysAction(AGENT, { set: { API_KEY: 'x' } })
         await actions.updateAgentConfigAction(AGENT, { verbosity: 'brief' } as never)
+        await actions.updateAgentConfigAction(AGENT, { model: 'm-1' } as never)
         await actions.renameAgentAction(AGENT, 'Scout')
         await actions.deleteAgentAction(AGENT)
 
         expect(mocks.resolveAgentTarget.mock.calls).toEqual([
+            [AGENT, 'manage'],
             [AGENT, 'manage'],
             [AGENT, 'manage'],
             [AGENT, 'manage'],

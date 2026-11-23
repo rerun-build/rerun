@@ -160,6 +160,23 @@ export async function assertAgentAccess(agentId: string, need: AccessLevel, acto
     return { actor: resolved, access, agent }
 }
 
+// The runs of a coworker whose conversations are each member's own reach only the member whose
+// conversation they ran in: no other member, no API key, no coworker. The engine knows a run by its
+// session alone, so a run is in reach when its session is one of the caller's rows.
+export async function runSessionsInReach(agentId: string, engineSessionIds: string[], actor?: Actor): Promise<{ actor: Actor; agent: AccessedAgent; inReach: (engineSessionId: string) => boolean }> {
+    const { actor: resolved, agent } = await assertAgentAccess(agentId, 'use', actor)
+    if (agentKindPolicy(agent.kind).conversations !== 'per-member') return { actor: resolved, agent, inReach: () => true }
+    const wanted = [...new Set(engineSessionIds)]
+    if (resolved.kind !== 'user' || wanted.length === 0) return { actor: resolved, agent, inReach: () => false }
+    const { data } = await selectMany(createServiceRoleClient(), 'sessions', ['engine_session_id'] as const, { agent_id: agent.id, owner_user_id: resolved.userId, engine_session_id: wanted })
+    const owned = new Set((data ?? []).flatMap(row => row.engine_session_id ?? []))
+    return { actor: resolved, agent, inReach: engineSessionId => owned.has(engineSessionId) }
+}
+
+export function assertRunInReach(reach: { inReach: (engineSessionId: string) => boolean }, run: { sessionId: string }): void {
+    if (!reach.inReach(run.sessionId)) throw new AuthorizationError(COWORKER_NOT_FOUND)
+}
+
 // Every Box of the workspace with the actor's level on it, in two reads. The lists and the board use
 // it; a single Box goes through spaceAccessFor.
 export async function spaceAccessMap(actor: Actor): Promise<Map<string, BoxAccess>> {

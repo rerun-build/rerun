@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 
-import { AccessDeniedError, actorFromContext, assertAgentInWorkspace, assertSessionInWorkspace, keepVisible, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
+import { AccessDeniedError, actorFromContext, assertAgentInWorkspace, assertRunInReach, assertSessionInWorkspace, keepVisible, requireLightSessionActor, runSessionsInReach, visibleAgentIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
 import { resolveAgentTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
@@ -79,7 +79,7 @@ import { saveSecretsToVault } from '@/app/api/_services/vault-install.service'
 import type { Actor } from '@/app/api/_auth/access'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
 import type { CoworkerLook, ReasoningEffort, StatsQuery, UsageTimeRange } from '@rerun/contracts'
-import { coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
+import { agentKindPolicy, coworkerLookSchema, FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
 import { engineSessionOf } from '@/lib/foreman/conversation'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
@@ -828,10 +828,19 @@ export async function deleteTriggerAction(agentId: string, slug: string): Promis
 // listTriggerRunsAction narrow it to one routine by matching the engine sessions
 // titled `schedule: <slug>` / `trigger: <slug>`.
 
+async function assertRunReachable(agentId: string, conn: EngineConnection, engineAgentId: string, runId: string): Promise<void> {
+    const reach = await runSessionsInReach(agentId, [])
+    if (agentKindPolicy(reach.agent.kind).conversations !== 'per-member') return
+    const run = await engineGetRun(conn, engineAgentId, runId)
+    assertRunInReach(await runSessionsInReach(agentId, [run.sessionId], reach.actor), run)
+}
+
 export async function listRunsAction(agentId: string, limit?: number): Promise<EngineRun[]> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId)
-        return await engineListRuns(conn, engineAgentId, { limit })
+        const runs = await engineListRuns(conn, engineAgentId, { limit })
+        const reach = await runSessionsInReach(agentId, runs.map(run => run.sessionId))
+        return runs.filter(run => reach.inReach(run.sessionId))
     } catch {
         return []
     }
@@ -840,7 +849,9 @@ export async function listRunsAction(agentId: string, limit?: number): Promise<E
 export async function getRunAction(agentId: string, runId: string): Promise<EngineRunDetail | null> {
     try {
         const { conn, engineAgentId } = await resolveRunTarget(agentId)
-        return await engineGetRun(conn, engineAgentId, runId)
+        const run = await engineGetRun(conn, engineAgentId, runId)
+        assertRunInReach(await runSessionsInReach(agentId, [run.sessionId]), run)
+        return run
     } catch {
         return null
     }
@@ -849,6 +860,7 @@ export async function getRunAction(agentId: string, runId: string): Promise<Engi
 export async function getRunStepsAction(agentId: string, runId: string): Promise<EngineRunStep[]> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId)
+        await assertRunReachable(agentId, conn, engineAgentId, runId)
         return await engineGetRunSteps(conn, engineAgentId, runId)
     } catch {
         return []
@@ -858,6 +870,7 @@ export async function getRunStepsAction(agentId: string, runId: string): Promise
 export async function getRunToolsAction(agentId: string, runId: string): Promise<EngineToolCall[]> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId)
+        await assertRunReachable(agentId, conn, engineAgentId, runId)
         return await engineGetRunTools(conn, engineAgentId, runId)
     } catch {
         return []
@@ -869,6 +882,7 @@ export async function getRunToolsAction(agentId: string, runId: string): Promise
 export async function cancelRunAction(agentId: string, runId: string): Promise<boolean> {
     try {
         const { conn, engineAgentId } = await resolveRunTarget(agentId)
+        await assertRunReachable(agentId, conn, engineAgentId, runId)
         await engineCancelRun(conn, engineAgentId, runId)
         return true
     } catch {
@@ -879,6 +893,7 @@ export async function cancelRunAction(agentId: string, runId: string): Promise<b
 export async function cancelSubRunAction(agentId: string, runId: string, taskId: string): Promise<boolean> {
     try {
         const { conn, engineAgentId } = await resolveRunTarget(agentId)
+        await assertRunReachable(agentId, conn, engineAgentId, runId)
         await engineCancelSubRun(conn, engineAgentId, runId, taskId)
         return true
     } catch {

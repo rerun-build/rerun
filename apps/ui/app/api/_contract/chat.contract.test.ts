@@ -28,6 +28,7 @@ const engine = vi.hoisted(() => ({
     listRuns: vi.fn<typeof import('@/lib/engine/client').listRuns>(),
     listSkillProposals: vi.fn<typeof import('@/lib/engine/client').listSkillProposals>(),
     getRunSteps: vi.fn<typeof import('@/lib/engine/client').getRunSteps>(),
+    getRun: vi.fn<typeof import('@/lib/engine/client').getRun>(),
     // The box's /health is not part of the conversation under test.
     supportsForemanVault: vi.fn(async () => false),
 }))
@@ -346,6 +347,7 @@ describe('the Chief of Staff on the engine', () => {
 
     it('stops the runs of a conversation', async () => {
         engine.listRuns.mockResolvedValue([{ ...finishedRun, id: 'run-42', status: 'running', finishedAt: null }])
+        engine.getRun.mockResolvedValue({ ...finishedRun, id: 'run-42', sessionId: 'eng-fm-1', status: 'running', finishedAt: null } as never)
         const { DELETE } = await import('@/app/api/chat/foreman/engine/route')
         await expectContract(mobileApi.stopForeman, await callRoute(DELETE, mobileApi.stopForeman, { query: { sessionId: 'fm-general', runId: 'run-42' } }))
         expect(engine.cancelRun).toHaveBeenCalledWith(expect.anything(), FOREMAN_AGENT_ID, 'run-42')
