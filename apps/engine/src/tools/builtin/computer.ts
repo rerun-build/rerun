@@ -72,6 +72,7 @@ const screenWaiters = new Map<string, Set<() => void>>()
 // Covers a whole scheduled run (one to three minutes), well inside the CLIs' one-hour tool timeout.
 const SCREEN_WAIT_MS = 5 * 60_000
 const SCREEN_TAKEN = 'Another run of this coworker is using the screen right now. Carry on without it, or tell the user to retry once that run is over.'
+const RUN_OVER = 'This run is over: its hands are off the screen.'
 
 function freeScreen(agentId: string): void {
     screenOwners.delete(agentId)
@@ -177,6 +178,13 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     const releases: Array<() => void> = []
     const maxActions = CLI_PROVIDERS.has(ctx.provider) ? MAX_ACTIONS_PER_CLI_RUN : MAX_ACTIONS_PER_RUN
     let actions = 0
+    let released = false
+
+    // Nothing calls `release` a second time: what a call still in flight takes after it goes back at once.
+    const holdUntilRelease = (...holds: Array<() => void>): void => {
+        if (released) for (const release of holds) release()
+        else releases.push(...holds)
+    }
 
     // Codex's bridge carries text only, and Codex reads a picture from a file with a tool of its
     // own. Every other provider gets the picture attached by the run, under the id returned here.
@@ -199,12 +207,13 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     const takeScreen = async (signal: AbortSignal | undefined): Promise<boolean> => {
         const deadline = Date.now() + SCREEN_WAIT_MS
         for (;;) {
+            if (released) return false
             const owner = screenOwners.get(id)
             if (owner === ctx) return true
             if (!owner) {
                 screenOwners.set(id, ctx)
                 // A browser already on the screen (handed back after a sign-in) is what the run looks at.
-                releases.push(holdDesktop(id), holdOpenBrowser(id), () => {
+                holdUntilRelease(holdDesktop(id), holdOpenBrowser(id), () => {
                     if (screenOwners.get(id) === ctx) freeScreen(id)
                 })
                 return true
@@ -215,7 +224,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     }
 
     const claimScreen = async (signal: AbortSignal | undefined): Promise<Refused | null> => {
-        if (!(await takeScreen(signal))) return refused(SCREEN_TAKEN)
+        if (!(await takeScreen(signal))) return refused(released ? RUN_OVER : SCREEN_TAKEN)
         if (humanDriving(id)) return refused(HUMAN_DRIVING)
         if (actions >= maxActions) return refused(`This run has used its ${maxActions} screen actions. Tell the user where you got to and end your turn.`)
         actions++
@@ -228,11 +237,13 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
         const denied = await claimScreen(signal)
         if (denied) return denied
         return withKeyedLock(`computer:${id}`, async () => {
+            if (released) return refused(RUN_OVER)
             try {
                 const control = await controlScreen(id, signal)
                 await act(control, signal)
                 if (settleMs > 0) await sleep(settleMs, undefined, { signal })
                 const screenshot = await captureScreen(control)
+                if (released) return refused(RUN_OVER)
                 return { status: 'done' as const, screen: [screenshot.width, screenshot.height] as [number, number], ...(await keep(screenshot)) }
             } catch (err) {
                 if (signal?.aborted) throw err
@@ -245,7 +256,8 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     const openApp = async (app: DesktopApp, url: string | undefined): Promise<void> => {
         if (app === 'terminal' && !ctx.agent.config.tools.shell) throw new ControlRefusal('The terminal is off for this agent: its shell tool is disabled.')
         if (app === 'files' && !ctx.agent.config.tools.filesystem) throw new ControlRefusal('The file manager is off for this agent: its filesystem tool is disabled.')
-        if (app === 'browser') releases.push(await holdBrowser(id, url))
+        if (app === 'browser') holdUntilRelease(await holdBrowser(id, url))
+        if (released) throw new ControlRefusal(RUN_OVER)
         await openDesktopApp(id, app)
     }
 
@@ -266,6 +278,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
             }),
         },
         release: () => {
+            released = true
             for (const release of releases.splice(0)) release()
         },
     }

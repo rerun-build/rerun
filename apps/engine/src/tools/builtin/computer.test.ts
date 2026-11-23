@@ -1,4 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { resolve } from 'node:path'
 import { vi } from 'vitest'
 
 const state = vi.hoisted(() => ({
@@ -17,6 +19,8 @@ const state = vi.hoisted(() => ({
     drivingAfterTyped: null as number | null,
     drivingForPolls: 0,
     parkLongSleeps: false,
+    browserGate: null as Promise<void> | null,
+    captureGate: null as Promise<void> | null,
     vaultEnv: {} as Record<string, string>,
 }))
 
@@ -46,7 +50,11 @@ vi.mock('../../desktop/control.js', () => {
     return {
         ControlRefusal,
         controlScreen: async (agentId: string, signal?: AbortSignal) => ({ agentId, signal }),
-        captureScreen: async () => ({ image: Buffer.from(`shot-${++state.captures}`), mediaType: 'image/jpeg', width: 1280, height: 720 }),
+        captureScreen: async () => {
+            const image = Buffer.from(`shot-${++state.captures}`)
+            await state.captureGate
+            return { image, mediaType: 'image/jpeg', width: 1280, height: 720 }
+        },
         click: record('click'),
         drag: record('drag'),
         movePointer: record('move'),
@@ -78,6 +86,7 @@ vi.mock('../../desktop/takeover.js', () => ({
     holdBrowser: async (_agentId: string, url?: string) => {
         state.browserHolds++
         state.browserUrls.push(url)
+        await state.browserGate
         return () => {
             state.browserHolds--
         }
@@ -124,6 +133,8 @@ beforeEach(() => {
     state.drivingForPolls = 0
     state.openBrowser = false
     state.parkLongSleeps = false
+    state.browserGate = null
+    state.captureGate = null
     state.vaultEnv = {}
 })
 
@@ -245,9 +256,10 @@ describe('computer', () => {
         expect(await settled(act(second, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('Another run') })
         expect((await settled(act(other, { action: 'screenshot' }))).status).toBe('done')
         second.release()
-        expect(await settled(act(second, { action: 'screenshot' }))).toMatchObject({ status: 'refused' })
+        const third = build(ctxWith())
+        expect(await settled(act(third, { action: 'screenshot' }))).toMatchObject({ status: 'refused' })
         first.release()
-        expect((await settled(act(second, { action: 'screenshot' }))).status).toBe('done')
+        expect((await settled(act(third, { action: 'screenshot' }))).status).toBe('done')
         expect(state.sleeps).toContain(5 * 60_000)
     })
 
@@ -288,6 +300,65 @@ describe('computer', () => {
         await expect(waiting).rejects.toThrow('aborted')
         first.release()
         expect(agentsOnScreen()).toEqual([])
+    })
+
+    it('never takes the screen back once its run let go of it', async () => {
+        const built = build(ctxWith())
+        expect((await act(built, { action: 'screenshot' })).status).toBe('done')
+        built.release()
+
+        expect(await act(built, { action: 'left_click', coordinate: [1, 1] })).toMatchObject({ status: 'refused', reason: expect.stringContaining('over') })
+        expect(await openApp(built, { app: 'browser' })).toMatchObject({ status: 'refused' })
+        expect(state.calls).toEqual([])
+        expect(state.apps).toEqual([])
+        expect(state.screenHolds).toBe(0)
+        expect(state.browserHolds).toBe(0)
+        expect(agentsOnScreen()).toEqual([])
+        expect((await act(build(ctxWith()), { action: 'screenshot' })).status).toBe('done')
+    })
+
+    it('leaves the screen to others when its run ended while it waited for its turn', async () => {
+        state.parkLongSleeps = true
+        const first = build(ctxWith())
+        const second = build(ctxWith())
+        expect((await act(first, { action: 'screenshot' })).status).toBe('done')
+
+        const waiting = act(second, { action: 'screenshot' })
+        await new Promise(r => setImmediate(r))
+        second.release()
+        first.release()
+
+        expect(await waiting).toMatchObject({ status: 'refused', reason: expect.stringContaining('over') })
+        expect(agentsOnScreen()).toEqual([])
+    })
+
+    it('lets go of a browser that opened after its run ended', async () => {
+        let opened!: () => void
+        state.browserGate = new Promise(r => (opened = r))
+        const built = build(ctxWith())
+        const opening = openApp(built, { app: 'browser' })
+        await new Promise(r => setImmediate(r))
+        built.release()
+        opened()
+
+        expect(await opening).toMatchObject({ status: 'refused' })
+        expect(state.apps).toEqual([])
+        expect(state.browserHolds).toBe(0)
+    })
+
+    it('drops an action queued behind another one when its run ends', async () => {
+        let opened!: () => void
+        state.browserGate = new Promise(r => (opened = r))
+        const built = build(ctxWith())
+        const opening = openApp(built, { app: 'browser' })
+        const queued = act(built, { action: 'left_click', coordinate: [1, 1] })
+        await new Promise(r => setImmediate(r))
+        built.release()
+        opened()
+
+        await opening
+        expect(await queued).toMatchObject({ status: 'refused' })
+        expect(state.calls).toEqual([])
     })
 
     it('keeps its hands off while a person drives the screen, and takes it back when they stop', async () => {
@@ -372,6 +443,20 @@ describe('computer', () => {
         expect(agentsOnScreen()).toContain('a7')
         built.release()
         expect(agentsOnScreen()).not.toContain('a7')
+    })
+
+    it('leaves codex no file once the run ended during the capture', async () => {
+        let captured!: () => void
+        state.captureGate = new Promise(r => (captured = r))
+        const id = `codex-late-${process.pid}`
+        const built = build(ctxWith(id, {}, { provider: 'codex' }))
+        const taking = act(built, { action: 'screenshot' })
+        await vi.waitFor(() => expect(state.captures).toBe(1))
+        built.release()
+        captured()
+
+        expect(await taking).toMatchObject({ status: 'refused', reason: expect.stringContaining('over') })
+        expect(existsSync(resolve(tmpdir(), 'rerun-desktop', 'screens', id))).toBe(false)
     })
 
     it('hands codex its screenshot as a file to open, and removes the files when the run is over', async () => {
