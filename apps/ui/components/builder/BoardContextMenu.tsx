@@ -9,7 +9,8 @@ import { RenameAgentDialog } from '@/components/dialogs/RenameAgentDialog'
 import { RenameBoxDialog } from '@/components/dialogs/RenameBoxDialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useBoxViewer, useCanManageAgent, useCanManageSpace, useManageableSpaceIds } from '@/hooks/useBoxAccess'
-import { CopyPlusIcon, Link2, MessageCircle, PencilIcon, SettingsIcon, Trash2Icon, UsersIcon } from '@/lib/icons'
+import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
+import { CirclePlusIcon, CopyPlusIcon, Link2, MessageCircle, PencilIcon, SettingsIcon, Trash2Icon, UsersIcon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
@@ -31,9 +32,10 @@ type BoardContextMenuProps = {
     children: ReactNode
     target: BoardContextTarget | null
     onTargetClear: () => void
+    onNewCoworker: (spaceId: string) => void
 }
 
-export function BoardContextMenu({ children, target, onTargetClear }: BoardContextMenuProps) {
+export function BoardContextMenu({ children, target, onTargetClear, onNewCoworker }: BoardContextMenuProps) {
     const t = useTranslations('builder.contextMenu')
     const agents = useBoardStore(state => state.agents)
     const spaces = useBoardStore(state => state.spaces)
@@ -63,6 +65,7 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
     const canManageSpace = useCanManageSpace(targetSpace?.id)
     const manageableSpaceIds = useManageableSpaceIds()
     const viewer = useBoxViewer()
+    const { needsMachineReason } = useWorkspaceAccess()
     const agentReason = canManageAgent ? undefined : t('manageReason')
     const spaceReason = canManageSpace ? undefined : t('manageReason')
     const otherBoxes = targetAgent ? spaces.filter(space => space.id !== targetAgent.spaceId && manageableSpaceIds.has(space.id)) : []
@@ -137,6 +140,13 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
                 {targetSpace && (
                     <ContextMenuContent>
                         <ContextMenuLabel className="max-w-56 truncate pl-7">{targetSpace.name || t('untitledBox')}</ContextMenuLabel>
+                        <ContextMenuSeparator />
+                        <Forbidden reason={spaceReason ?? needsMachineReason ?? undefined}>
+                            <ContextMenuItem disabled={!canManageSpace || !!needsMachineReason} className="w-full" onSelect={() => onNewCoworker(targetSpace.id)}>
+                                <CirclePlusIcon className="size-4" />
+                                {t('newCoworker')}
+                            </ContextMenuItem>
+                        </Forbidden>
                         <ContextMenuSeparator />
                         <Forbidden reason={spaceReason}>
                             <ContextMenuItem disabled={!canManageSpace} className="w-full" onSelect={() => setRenameSpaceId(targetSpace.id)}>

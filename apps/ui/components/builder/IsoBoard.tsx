@@ -456,7 +456,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
 
     return (
         <>
-            <BoardContextMenu target={contextTarget} onTargetClear={() => setContextTarget(null)}>
+            <BoardContextMenu target={contextTarget} onTargetClear={() => setContextTarget(null)} onNewCoworker={spaceId => onRequestBoxAgent?.(spaceId)}>
                 <IsoGrid
                     key={cameraScope ?? 'anonymous'}
                     tiles={tiles}

@@ -1,5 +1,6 @@
 {
     "contextMenu": {
+        "newCoworker": "Novo coworker",
         "openChat": "Abrir chat",
         "rename": "Renomear",
         "settings": "Configurações",

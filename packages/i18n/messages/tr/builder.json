@@ -1,5 +1,6 @@
 {
     "contextMenu": {
+        "newCoworker": "Yeni coworker",
         "openChat": "Sohbeti aç",
         "rename": "Yeniden adlandır",
         "settings": "Ayarlar",

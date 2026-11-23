@@ -6,6 +6,7 @@
         "contextMenu.moveToBox": "Submenu of a coworker on the board: move it into another Box (a group of coworkers on the board).",
         "contextMenu.duplicate": "Menu item (verb): make a copy of this coworker.",
         "contextMenu.share": "Menu item (verb): share this coworker through a link.",
+        "contextMenu.newCoworker": "Menu item on a Box of the board (a group of coworkers): create a new coworker inside this Box.",
         "toolbar.placementPrompt": "Shown while the person places a coworker on the board grid. {name} is the coworker's name.",
         "toolbar.placementProgress": "A template installs several coworkers one after another: which one is being placed.",
         "toolbar.template": "Button opening the template library (ready-made coworkers).",
@@ -21,6 +22,7 @@
         "discoveries.cards.person.title": "{firstName} is the first name of the person found on LinkedIn."
     },
     "contextMenu": {
+        "newCoworker": "New coworker",
         "openChat": "Open chat",
         "rename": "Rename",
         "settings": "Settings",

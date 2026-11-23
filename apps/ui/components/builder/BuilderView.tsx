@@ -22,7 +22,7 @@ export function BuilderView({ initialSpaces = [] }: { initialSpaces?: SpacePubli
     const [libraryOpen, setLibraryOpen] = useState(false)
     // The library a first agent is recruited from has its own way out to the agent with no template.
     const [newAgentOpen, setNewAgentOpen] = useState(false)
-    // The empty Box the dialog was opened from, which the agent then lands in.
+    // The Box the dialog was opened from, which the agent then lands in.
     const [newAgentSpaceId, setNewAgentSpaceId] = useState<string | null>(null)
     const viewerSignals = useLibraryViewerSignals()
 
