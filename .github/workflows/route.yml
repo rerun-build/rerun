@@ -30,6 +30,8 @@ jobs:
           REPO: ${{ github.repository }}
           OVERRIDE_LIGHT: ${{ vars.CI_RUNS_ON_LIGHT }}
           OVERRIDE_HEAVY: ${{ vars.CI_RUNS_ON_HEAVY }}
+          ACTOR: ${{ github.actor }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
         run: |
           hosted='"ubuntu-latest"'
           light=$hosted
@@ -41,6 +43,9 @@ jobs:
             pull_request) [ "$HEAD_REPO" = "$REPO" ] || trusted=0 ;;
             *) trusted=0 ;;
           esac
+          if [ "$ACTOR" = "dependabot[bot]" ] || [ "$TRIGGERING_ACTOR" = "dependabot[bot]" ]; then
+            trusted=0
+          fi
           if [ "$trusted" = 1 ]; then
             runners=''
             if [ -n "$RUNNERS_TOKEN" ]; then
@@ -57,7 +62,11 @@ jobs:
             [ -n "$OVERRIDE_LIGHT" ] && light=$OVERRIDE_LIGHT
             [ -n "$OVERRIDE_HEAVY" ] && heavy=$OVERRIDE_HEAVY
           else
-            echo "untrusted or foreign event ($EVENT), every job runs GitHub-hosted"
+            if [ "$ACTOR" = "dependabot[bot]" ] || [ "$TRIGGERING_ACTOR" = "dependabot[bot]" ]; then
+              echo "dependabot, every job runs GitHub-hosted"
+            else
+              echo "untrusted or foreign event ($EVENT), every job runs GitHub-hosted"
+            fi
           fi
           echo "light=$light" >> "$GITHUB_OUTPUT"
           echo "heavy=$heavy" >> "$GITHUB_OUTPUT"
