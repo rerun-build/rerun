@@ -47,8 +47,8 @@ jobs:
               runners=$(GH_TOKEN="$RUNNERS_TOKEN" gh api "orgs/$ORG/actions/runners?per_page=100" 2>/dev/null) || runners=''
             fi
             if [ -n "$runners" ]; then
-              echo "$runners" | jq -r '.runners[] | "runner: \(.name) status=\(.status) busy=\(.busy) labels=\([.labels[].name] | join(","))"'
-              idle() { echo "$runners" | jq --arg c "$1" '[.runners[] | select(.status == "online" and (.busy | not) and any(.labels[]; (.name | ascii_downcase) == $c))] | length'; }
+              echo "$runners" | jq -r '(.runners // [])[] | "runner: \(.name) status=\(.status) busy=\(.busy) labels=\([.labels[].name] | join(","))"'
+              idle() { echo "$runners" | jq --arg c "$1" '[(.runners // [])[] | select(.status == "online" and (.busy | not) and any(.labels[]; (.name | ascii_downcase) == $c))] | length'; }
               [ "$(idle light)" -gt 0 ] && light='{"group":"aap-crrr","labels":["self-hosted","linux","light"]}'
               [ "$(idle heavy)" -gt 0 ] && heavy='{"group":"aap-crrr","labels":["self-hosted","linux","heavy"]}'
             else
