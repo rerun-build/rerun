@@ -13,7 +13,7 @@ import { Chip } from '@/components/ui/chip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAttentionSessions } from '@/hooks/useAttentionSessions'
-import { isAutomatedSource } from '@/lib/chat/history-filter'
+import { isAutomatedSource, sourcesOf } from '@/lib/chat/history-filter'
 import { CalendarClock, CheckCheckIcon, EllipsisIcon, LoaderIcon, MessageCircle, PencilIcon, PlusIcon, WebhookIcon, XIcon } from '@/lib/icons'
 import { messageDayLabel, messageTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
@@ -74,7 +74,8 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     const others = (history ?? []).filter(entry => entry.kind !== 'general' && (!entry.id || !waitingIds.has(entry.id)))
     const inboxItems = attention.map(item => ({ ...item, agentName }))
     const listsHistory = filter !== 'needs'
-    const shown = others.filter(entry => (filter === 'chats' ? !isAutomated(entry) : filter === 'automations' ? isAutomated(entry) : true))
+    const kept = historyFilter ? sourcesOf(historyFilter) : undefined
+    const shown = others.filter(entry => !kept || kept.includes(entry.source))
     const locale = useLocale()
     const days = groupByDay(shown, locale)
 

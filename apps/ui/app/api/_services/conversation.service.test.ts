@@ -561,7 +561,7 @@ describe('listAgentSessions', () => {
 
         vi.mocked(selectMany).mockClear()
         await listAgentSessions('a', adminActor, 'chats')
-        expect(historyCall(f => f.kind === 'thread')?.[3]).toMatchObject({ source: ['dashboard', 'builder', 'agent', 'delegate', 'api'] })
+        expect(historyCall(f => f.kind === 'thread')?.[3]).toMatchObject({ source: ['dashboard', 'builder', 'delegate', 'api'] })
         expect(historyCall(f => f.kind === 'general')).toBeUndefined()
     })
 
@@ -603,6 +603,15 @@ describe('listAgentSessions', () => {
         await listAgentSessions('a', adminActor, 'all')
         expect(resolveAgentTarget).toHaveBeenCalledTimes(1)
         expect(listSessions).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps the conversations other coworkers opened out of Chats, and in All (RER-125)', async () => {
+        history({})
+        vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1))] as never)
+
+        expect(await listAgentSessions('a', adminActor, 'chats')).toEqual([])
+        expect(listSessions).not.toHaveBeenCalled()
+        expect((await listAgentSessions('a', adminActor, 'all')).map(e => e.engineSessionId)).toEqual(['fresh'])
     })
 })
 
