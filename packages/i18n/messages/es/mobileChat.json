@@ -20,7 +20,26 @@
         "tooManyBody": "{max} como máximo: {files} no se añadieron.",
         "tooManyTitle": "Demasiados archivos",
         "computers": "Computadoras",
-        "offline": "sin conexión"
+        "offline": "sin conexión",
+        "placeholder": "@ coworker, / skill, # computadora",
+        "placeholderNoSkill": "@ coworker, # computadora",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ Mencionar a un coworker",
+                "description": "Trae a un coworker a esta conversación",
+                "empty": "Aún no hay otro coworker en este workspace"
+            },
+            "skill": {
+                "menuLabel": "/ Usar una skill",
+                "description": "Ejecuta un procedimiento guardado que tu coworker conoce",
+                "empty": "Este coworker aún no tiene skills"
+            },
+            "computer": {
+                "menuLabel": "# Usar una computadora",
+                "description": "Deja que tu coworker trabaje en una computadora vinculada",
+                "empty": "Aún no hay ninguna computadora vinculada"
+            }
+        }
     },
     "desktop": {
         "connecting": "Conectando con la pantalla…",
@@ -218,11 +237,8 @@
         "answerPlaceholder": "Responder a {name}",
         "attachFailed": "No se pudieron adjuntar los archivos",
         "defaultModel": "Predeterminado · {model}",
-        "foremanPlaceholder": "{named, select, yes {Pregunta lo que quieras a {name}} other {Pregunta lo que quieras a tu Chief of Staff}}",
         "loadFailed": "No pudimos cargar esta conversación.",
         "loading": "Cargando la conversación",
-        "messagePlaceholder": "Escribir a {name}",
-        "newPlaceholder": "¿En qué trabajamos?",
         "openBrowser": "Abrir el navegador",
         "retry": "Reintentar",
         "stopTaskFailed": "No se pudo detener esta tarea",

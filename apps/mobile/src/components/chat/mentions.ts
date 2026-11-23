@@ -12,12 +12,18 @@ export type MentionItem = ({ kind: 'agent' } & MentionAgent) | ({ kind: 'skill' 
 export type MentionTrigger = '@' | '/' | '#'
 export type MentionQuery = { trigger: MentionTrigger; query: string; start: number }
 
-export function mentionQueryAt(text: string, caret: number): MentionQuery | null {
+export const MENTION_TRIGGERS: readonly MentionTrigger[] = ['@', '/', '#']
+
+// Each symbol's strings under `mobileChat.composer.commands`.
+export const COMMAND_KEY = { '@': 'coworker', '/': 'skill', '#': 'computer' } as const
+
+// `triggers`: the symbols the composer serves; any other stays plain text.
+export function mentionQueryAt(text: string, caret: number, triggers: readonly MentionTrigger[] = MENTION_TRIGGERS): MentionQuery | null {
     const match = text.slice(0, caret).match(/(^|\s)([@/#])([\w-]*)$/)
-    return match ? { trigger: match[2] as MentionTrigger, query: match[3], start: caret - match[3].length - 1 } : null
+    if (!match || !triggers.includes(match[2] as MentionTrigger)) return null
+    return { trigger: match[2] as MentionTrigger, query: match[3], start: caret - match[3].length - 1 }
 }
 
-// `#marketing` in a draft is not a computer: with no linked computer matching, the menu stays closed.
 export function mentionItems(mention: MentionQuery, agents: MentionAgent[], skills: SkillSummary[], computers: MentionComputer[] = []): MentionItem[] {
     const query = mention.query.toLowerCase()
     if (mention.trigger === '#')
@@ -52,6 +58,13 @@ export function insertAtCaret(text: string, caret: number, token: string): { tex
     const before = text.slice(0, caret)
     const lead = before.length > 0 && !/\s$/.test(before) ? ' ' : ''
     const inserted = `${lead}${token} `
+    return { text: before + inserted + text.slice(caret), caret: caret + inserted.length }
+}
+
+// A mention symbol typed from a menu: spaced from the word before it, and left bare so its suggestions open.
+export function insertTrigger(text: string, caret: number, trigger: MentionTrigger): { text: string; caret: number } {
+    const before = text.slice(0, caret)
+    const inserted = before.length > 0 && !/\s$/.test(before) ? ` ${trigger}` : trigger
     return { text: before + inserted + text.slice(caret), caret: caret + inserted.length }
 }
 

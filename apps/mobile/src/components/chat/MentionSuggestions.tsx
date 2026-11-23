@@ -7,16 +7,17 @@ import { useGlassStyle } from '@/components/ui/GlassButton'
 import { AppText } from '@/components/ui/AppText'
 import { GlassSurface } from '@/components/ui/GlassSurface'
 import { useTheme } from '@/theme/theme'
-import { radius, spacing, withAlpha } from '@/theme/tokens'
+import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
 import { GLASS_SHADOW, GLASS_TINT_ALPHA } from './glass'
-import { mentionText, type MentionItem, type MentionTrigger } from './mentions'
+import { COMMAND_KEY, mentionText, type MentionItem, type MentionTrigger } from './mentions'
 
 const ROW = 48
 const MAX_ROWS = 5
 
-// The web composer's `@` and `/` menu, above the composer: a tap puts the token in the text.
-export function MentionSuggestions({ trigger, items, onPick }: { trigger: MentionTrigger; items: MentionItem[]; onPick: (item: MentionItem) => void }) {
+// The web composer's mention menu, above the composer: its header says what the symbol does, a bare
+// symbol with nothing to offer says so once its list is read, and a tap puts the token in the text.
+export function MentionSuggestions({ trigger, items, listRead = true, onPick }: { trigger: MentionTrigger; items: MentionItem[]; listRead?: boolean; onPick: (item: MentionItem) => void }) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const t = useTranslations('mobileChat.composer')
@@ -26,24 +27,51 @@ export function MentionSuggestions({ trigger, items, onPick }: { trigger: Mentio
     return (
         <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)}>
             <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme], overflow: 'hidden' }}>
-                <AppText variant="caption" tone="muted" medium style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
-                    {trigger === '/' ? t('skills') : trigger === '#' ? t('computers') : t('coworkers')}
-                </AppText>
-                <ScrollView style={{ maxHeight }} keyboardShouldPersistTaps="always" contentContainerStyle={{ paddingVertical: spacing.xs }}>
-                    {items.map(item => (
-                        <Pressable key={item.kind === 'skill' ? item.slug : item.id} onPress={() => onPick(item)} accessibilityRole="button" style={({ pressed }) => ({ minHeight: ROW, justifyContent: 'center', paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent' })}>
-                            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
-                                <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1 }}>
-                                    {item.name}
-                                </AppText>
-                                <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 2 }}>
-                                    {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : item.kind === 'computer' && !item.online ? `${mentionText(item)} · ${t('offline')}` : mentionText(item)}
-                                </AppText>
-                            </View>
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border }}>
+                    <CommandGlyph trigger={trigger} />
+                    <View style={{ flex: 1 }}>
+                        <AppText variant="callout" medium numberOfLines={1}>
+                            {trigger === '/' ? t('skills') : trigger === '#' ? t('computers') : t('coworkers')}
+                        </AppText>
+                        <AppText variant="footnote" tone="muted" numberOfLines={1}>
+                            {t(`commands.${COMMAND_KEY[trigger]}.description`)}
+                        </AppText>
+                    </View>
+                </View>
+                {items.length === 0 ? (
+                    listRead && (
+                        <AppText variant="callout" tone="muted" style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.md }}>
+                            {t(`commands.${COMMAND_KEY[trigger]}.empty`)}
+                        </AppText>
+                    )
+                ) : (
+                    <ScrollView style={{ maxHeight }} keyboardShouldPersistTaps="always" contentContainerStyle={{ paddingVertical: spacing.xs }}>
+                        {items.map(item => (
+                            <Pressable key={item.kind === 'skill' ? item.slug : item.id} onPress={() => onPick(item)} accessibilityRole="button" style={({ pressed }) => ({ minHeight: ROW, justifyContent: 'center', paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent' })}>
+                                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
+                                    <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1 }}>
+                                        {item.name}
+                                    </AppText>
+                                    <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 2 }}>
+                                        {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : item.kind === 'computer' && !item.online ? `${mentionText(item)} · ${t('offline')}` : mentionText(item)}
+                                    </AppText>
+                                </View>
+                            </Pressable>
+                        ))}
+                    </ScrollView>
+                )}
             </GlassSurface>
         </Animated.View>
+    )
+}
+
+function CommandGlyph({ trigger }: { trigger: MentionTrigger }) {
+    const theme = useTheme()
+    return (
+        <View style={{ width: 28, height: 28, borderRadius: 6, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, backgroundColor: theme.muted, alignItems: 'center', justifyContent: 'center' }}>
+            <AppText variant="footnote" style={{ fontFamily: fonts.mono }}>
+                {trigger}
+            </AppText>
+        </View>
     )
 }

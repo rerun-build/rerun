@@ -38,7 +38,6 @@ import { moodOf } from '@/components/ui/CoworkerAvatar'
 import { PillButton } from '@/components/ui/PillButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
-import { foremanLabelValues } from '@/data/useForemanName'
 
 import { uploadAttachments, type ComposerAttachment } from './attachments'
 import { PinnedSkillProposal } from './cards/SkillProposalRow'
@@ -57,7 +56,7 @@ import { QueuedMessagePill } from './QueuedMessagePill'
 import { RISE_IN, ScrollToEndButton, SINK_OUT } from './ScrollToEndButton'
 import { replacesComposer } from './hitl/registry'
 import { HITL_WIDGETS } from './hitl/widgets'
-import { mentionAgentsOf } from './mentions'
+import { mentionAgentsOf, type MentionTrigger } from './mentions'
 import { runPhase, stepGroupShowsActivity } from './run-phase'
 import { RunStatus } from './RunStatus'
 import { ChatScreen } from './screen/ChatScreen'
@@ -74,6 +73,8 @@ import { useKeyboardShown } from './useKeyboardShown'
 // The transcript scrolls under the suggestions and the composer, going out of focus this far above
 // them; scrolled to the end, the last message rests just above that band, sharp.
 export const BLUR_ABOVE_FOOTER = 32
+// The Chief of Staff has no skill of its own: `/` is not one of its symbols.
+const FOREMAN_MENTION_TRIGGERS: readonly MentionTrigger[] = ['@', '#']
 // How far above the end the thread still counts as at the bottom, and keeps following what comes.
 const AT_BOTTOM = 24
 // Under the fade at the top of the thread a block is not really seen, even when it is on screen.
@@ -128,6 +129,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const insets = useSafeAreaInsets()
     const t = useTranslations('mobileChat.pane')
     const tc = useTranslations('mobileCommon.errors')
+    const tComposer = useTranslations('mobileChat.composer')
     const scroll = useRef<ScrollViewInstance>(null)
     // The transcript a conversation opens on is shown already at its end; only what comes after scrolls.
     const shownTranscript = useRef(false)
@@ -392,7 +394,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const mentionComputers = useMentionComputers()
     const workspaceAgents = useWorkspaceAgents()
     const boxes = me ? (cachedBoard(me.workspace.id).read()?.boxes ?? []) : []
-    const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : []
+    const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : null
     // The web's chat notices: a dead sign-in opens the connection the coworker runs on, used-up
     // credits open the two plans. Rerun itself has no sign-in, so it opens the list.
     const runsOn = models?.resolved?.connectionId ?? models?.boxDefault?.connectionId
@@ -414,7 +416,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     })
     const regenerate = useStableCallback(() => void chat.regenerate())
     const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread }
-    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : !chat.sessionId ? t('newPlaceholder') : isForeman ? t('foremanPlaceholder', foremanLabelValues(coworker.name)) : t('messagePlaceholder', { name: coworker.name })
+    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : tComposer(isForeman ? 'placeholderNoSkill' : 'placeholder')
 
     return (
         <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
@@ -569,7 +571,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                         moving: it comes back in place once a block is answered, and only leaves with a slide. */}
                     {!composerReplaced && (
                         <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
+                            <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} triggers={isForeman ? FOREMAN_MENTION_TRIGGERS : undefined} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
                         </Animated.View>
                     )}
                 </View>

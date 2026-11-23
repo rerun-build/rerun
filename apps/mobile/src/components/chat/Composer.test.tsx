@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native'
+import type { ComponentProps } from 'react'
 import { Platform } from 'react-native'
 
 import { Composer } from './Composer'
@@ -96,5 +97,40 @@ describeOnIos('the composer glass', () => {
         const glass = screen.getByTestId('composer-glass')
         await rerender(composer('Hello', true))
         expect(screen.getByTestId('composer-glass')).toBe(glass)
+    })
+})
+
+describeOnIos('Composer mention menu', () => {
+    const renderComposer = async (value: string, props: Partial<ComponentProps<typeof Composer>> = {}) => {
+        await render(<Composer value={value} onChangeText={() => {}} onSend={() => {}} onStop={() => {}} running={false} placeholder="Message Pulse" mentionAgents={[{ id: 'pulse', name: 'Pulse', handle: 'pulse' }]} skills={[]} {...props} />)
+        await fireEvent(screen.getByTestId('composer-input'), 'focus')
+    }
+
+    it('says what a symbol does above its suggestions', async () => {
+        await renderComposer('@')
+        expect(screen.getByText('Bring a coworker into this conversation')).toBeTruthy()
+        expect(screen.getByText('Pulse')).toBeTruthy()
+    })
+
+    it('says so when a bare symbol has nothing to offer', async () => {
+        await renderComposer('/')
+        expect(screen.getByText('Run a saved how-to your coworker knows')).toBeTruthy()
+        expect(screen.getByText('This coworker has no skill yet')).toBeTruthy()
+    })
+
+    it('stays shut on a hashtag that names no computer', async () => {
+        await renderComposer('#marketing')
+        expect(screen.queryByText('Let your coworker work on a linked computer')).toBeNull()
+    })
+
+    it('does not claim there is no skill while the list is not read', async () => {
+        await renderComposer('/', { skills: null })
+        expect(screen.getByText('Run a saved how-to your coworker knows')).toBeTruthy()
+        expect(screen.queryByText('This coworker has no skill yet')).toBeNull()
+    })
+
+    it('leaves / as plain text in a composer without skills, like the Chief of Staff', async () => {
+        await renderComposer('/', { triggers: ['@', '#'] })
+        expect(screen.queryByText('Run a saved how-to your coworker knows')).toBeNull()
     })
 })

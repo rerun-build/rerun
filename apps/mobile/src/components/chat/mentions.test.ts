@@ -1,6 +1,6 @@
 import type { BoardAgent } from '@rerun/contracts'
 
-import { insertAtCaret, insertMention, mentionAgentsOf, mentionItems, mentionQueryAt, mentionText, type MentionAgent } from './mentions'
+import { insertAtCaret, insertMention, insertTrigger, mentionAgentsOf, mentionItems, mentionQueryAt, mentionText, type MentionAgent } from './mentions'
 
 const agents: MentionAgent[] = [
     { id: 'b', name: 'Bob', handle: 'sales-bob' },
@@ -58,6 +58,21 @@ describe('insertAtCaret', () => {
     it('spaces the token from the word before it', () => {
         expect(insertAtCaret('please', 6, '/cold-email')).toEqual({ text: 'please /cold-email ', caret: 19 })
         expect(insertAtCaret('', 0, '/cold-email')).toEqual({ text: '/cold-email ', caret: 12 })
+    })
+})
+
+describe('mentionQueryAt with the symbols a composer serves', () => {
+    it('leaves a symbol it does not serve as plain text', () => {
+        expect(mentionQueryAt('run /', 5, ['@', '#'])).toBeNull()
+        expect(mentionQueryAt('ask @', 5, ['@', '#'])).toEqual({ trigger: '@', query: '', start: 4 })
+    })
+})
+
+describe('insertTrigger', () => {
+    it('leaves the symbol bare, spaced from the word before it, so its suggestions open', () => {
+        expect(insertTrigger('Ask', 3, '@')).toEqual({ text: 'Ask @', caret: 5 })
+        expect(insertTrigger('Ask ', 4, '/')).toEqual({ text: 'Ask /', caret: 5 })
+        expect(insertTrigger('', 0, '#')).toEqual({ text: '#', caret: 1 })
     })
 })
 

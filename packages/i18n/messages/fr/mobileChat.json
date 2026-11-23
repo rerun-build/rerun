@@ -20,7 +20,26 @@
         "tooManyBody": "{max} au maximum : {files} non ajoutés.",
         "tooManyTitle": "Trop de fichiers",
         "computers": "Ordinateurs",
-        "offline": "hors ligne"
+        "offline": "hors ligne",
+        "placeholder": "@ coworker, / skill, # ordinateur",
+        "placeholderNoSkill": "@ coworker, # ordinateur",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ Mentionner un coworker",
+                "description": "Faites entrer un coworker dans cette conversation",
+                "empty": "Aucun autre coworker dans ce workspace pour l'instant"
+            },
+            "skill": {
+                "menuLabel": "/ Utiliser un skill",
+                "description": "Lancez un savoir-faire enregistré que votre coworker connaît",
+                "empty": "Ce coworker n'a pas encore de skill"
+            },
+            "computer": {
+                "menuLabel": "# Utiliser un ordinateur",
+                "description": "Laissez votre coworker travailler sur un ordinateur lié",
+                "empty": "Aucun ordinateur lié pour l'instant"
+            }
+        }
     },
     "desktop": {
         "connecting": "Connexion à l'écran…",
@@ -218,11 +237,8 @@
         "answerPlaceholder": "Répondre à {name}",
         "attachFailed": "Impossible de joindre les fichiers",
         "defaultModel": "Par défaut · {model}",
-        "foremanPlaceholder": "{named, select, yes {Demandez ce que vous voulez à {name}} other {Posez votre question au Chief of Staff}}",
         "loadFailed": "Impossible de charger cette conversation.",
         "loading": "Chargement de la conversation",
-        "messagePlaceholder": "Écrire à {name}",
-        "newPlaceholder": "Sur quoi travaillons-nous ?",
         "openBrowser": "Ouvrir le navigateur",
         "retry": "Réessayer",
         "stopTaskFailed": "Impossible d'arrêter cette tâche",

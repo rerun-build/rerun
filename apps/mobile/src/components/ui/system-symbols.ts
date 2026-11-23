@@ -32,6 +32,8 @@ const SYSTEM_SYMBOLS = {
     camera: 'camera',
     folder: 'folder',
     book: 'book',
+    users: 'person.2',
+    monitor: 'desktopcomputer',
     share: 'square.and.arrow.up',
     globe: 'globe',
     copy: 'doc.on.doc',

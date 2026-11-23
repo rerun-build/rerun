@@ -20,7 +20,26 @@
         "tooManyBody": "Höchstens {max}: {files} weggelassen.",
         "tooManyTitle": "Zu viele Dateien",
         "computers": "Computer",
-        "offline": "offline"
+        "offline": "offline",
+        "placeholder": "@ Coworker, / Skill, # Computer",
+        "placeholderNoSkill": "@ Coworker, # Computer",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ Coworker erwähnen",
+                "description": "Hol einen Coworker in diese Unterhaltung",
+                "empty": "Noch kein anderer Coworker in diesem Workspace"
+            },
+            "skill": {
+                "menuLabel": "/ Skill verwenden",
+                "description": "Führe eine gespeicherte Anleitung aus, die dein Coworker kennt",
+                "empty": "Dieser Coworker hat noch keinen Skill"
+            },
+            "computer": {
+                "menuLabel": "# Computer verwenden",
+                "description": "Lass deinen Coworker an einem verknüpften Computer arbeiten",
+                "empty": "Noch kein Computer verknüpft"
+            }
+        }
     },
     "desktop": {
         "connecting": "Verbinde mit dem Bildschirm…",
@@ -218,11 +237,8 @@
         "answerPlaceholder": "{name} antworten",
         "attachFailed": "Die Dateien konnten nicht angehängt werden",
         "defaultModel": "Standard · {model}",
-        "foremanPlaceholder": "{named, select, yes {Frag {name}, was du willst} other {Frag deinen Chief of Staff, was du willst}}",
         "loadFailed": "Diese Unterhaltung konnte nicht geladen werden.",
         "loading": "Unterhaltung wird geladen",
-        "messagePlaceholder": "Nachricht an {name}",
-        "newPlaceholder": "Woran sollen wir arbeiten?",
         "openBrowser": "Browser öffnen",
         "retry": "Erneut versuchen",
         "stopTaskFailed": "Diese Aufgabe konnte nicht gestoppt werden",

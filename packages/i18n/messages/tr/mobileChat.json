@@ -20,7 +20,26 @@
         "tooManyBody": "En fazla {max}: {files} dışarıda kaldı.",
         "tooManyTitle": "Çok fazla dosya",
         "computers": "Bilgisayarlar",
-        "offline": "çevrimdışı"
+        "offline": "çevrimdışı",
+        "placeholder": "@ coworker, / skill, # bilgisayar",
+        "placeholderNoSkill": "@ coworker, # bilgisayar",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ Coworker anın",
+                "description": "Bu konuşmaya bir coworker katın",
+                "empty": "Bu çalışma alanında henüz başka coworker yok"
+            },
+            "skill": {
+                "menuLabel": "/ Skill kullanın",
+                "description": "Coworker'ınızın bildiği kayıtlı bir yöntemi çalıştırın",
+                "empty": "Bu coworker'ın henüz skill'i yok"
+            },
+            "computer": {
+                "menuLabel": "# Bilgisayar kullanın",
+                "description": "Coworker'ınızın bağlı bir bilgisayarda çalışmasına izin verin",
+                "empty": "Henüz bağlı bilgisayar yok"
+            }
+        }
     },
     "desktop": {
         "connecting": "Ekrana bağlanılıyor…",
@@ -218,11 +237,8 @@
         "answerPlaceholder": "Yanıtla: {name}",
         "attachFailed": "Dosyalar eklenemedi",
         "defaultModel": "Varsayılan · {model}",
-        "foremanPlaceholder": "{named, select, yes {{name} ile istediğiniz her şeyi konuşun} other {Chief of Staff'ınıza her şeyi sorun}}",
         "loadFailed": "Bu sohbeti yükleyemedik.",
         "loading": "Sohbet yükleniyor",
-        "messagePlaceholder": "Mesaj: {name}",
-        "newPlaceholder": "Ne üzerinde çalışalım?",
         "openBrowser": "Tarayıcıyı aç",
         "retry": "Yeniden dene",
         "stopTaskFailed": "Bu görev durdurulamadı",

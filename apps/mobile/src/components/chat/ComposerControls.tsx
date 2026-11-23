@@ -5,13 +5,15 @@ import { useTranslations } from 'use-intl'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { Icon, type IconName } from '@/components/ui/Icon'
-import { MenuItem, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
+import { MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import type { Coworker } from '@/mocks/data'
 import type { Model } from '@/mocks/models'
 import { ctaRelief } from '@/theme/relief'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+
+import { COMMAND_KEY, type MentionTrigger } from './mentions'
 
 export const CONTROL = 36
 
@@ -46,7 +48,9 @@ export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: 
     )
 }
 
-export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill, disabled = false }: { onPhotos: () => void; onCamera: () => void; onFiles: () => void; skills?: SkillSummary[]; onSkill?: (slug: string) => void; disabled?: boolean }) {
+const COMMAND_ICONS = { '@': 'users', '/': 'book', '#': 'monitor' } as const
+
+export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill, commands, disabled = false }: { onPhotos: () => void; onCamera: () => void; onFiles: () => void; skills?: SkillSummary[]; onSkill?: (slug: string) => void; commands?: { triggers: readonly MentionTrigger[]; onPick: (trigger: MentionTrigger) => void }; disabled?: boolean }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.composer')
     const trigger = (
@@ -70,6 +74,13 @@ export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill, 
                             <MenuItem key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
                         ))}
                     </SubMenu>
+                )}
+                {commands && commands.triggers.length > 0 && (
+                    <MenuSection>
+                        {commands.triggers.map(trigger => (
+                            <MenuItem key={trigger} label={t(`commands.${COMMAND_KEY[trigger]}.menuLabel`)} subtitle={t(`commands.${COMMAND_KEY[trigger]}.description`)} icon={COMMAND_ICONS[trigger]} onPress={() => commands.onPick(trigger)} />
+                        ))}
+                    </MenuSection>
                 )}
             </NativeMenu>
         </View>

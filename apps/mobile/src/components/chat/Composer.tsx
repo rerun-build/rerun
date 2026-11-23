@@ -17,7 +17,7 @@ import { AttachmentStrip } from './AttachmentStrip'
 import { imageAttachment, type ComposerAttachment } from './attachments'
 import { AttachMenu, CONTROL, ModelChip, RoundButton, TargetPicker } from './ComposerControls'
 import { MentionSuggestions } from './MentionSuggestions'
-import { insertAtCaret, insertMention, mentionItems, mentionQueryAt, type MentionAgent, type MentionComputer, type MentionItem } from './mentions'
+import { insertAtCaret, insertMention, insertTrigger, MENTION_TRIGGERS, mentionItems, mentionQueryAt, type MentionAgent, type MentionComputer, type MentionItem, type MentionTrigger } from './mentions'
 import { useAttachmentPicker } from './useAttachmentPicker'
 import { useVoiceMessage, type VoiceSender } from './useVoiceMessage'
 import { VoiceRecorderBar } from './VoiceRecorderBar'
@@ -41,10 +41,13 @@ type ComposerProps = {
     canAttach?: boolean
     voice?: VoiceSender
     target?: { coworker: Coworker; choices: Coworker[]; onPick: (id: string) => void }
-    // What `/` and `@` offer, as on the web: none of either leaves its menu shut.
-    skills?: SkillSummary[]
-    mentionAgents?: MentionAgent[]
-    mentionComputers?: MentionComputer[]
+    // What `@`, `/` and `#` offer, as on the web: with none, a bare symbol says so. `null` while a list
+    // is not read yet, or could not be: the symbol then says what it does, not that nothing is there.
+    skills?: SkillSummary[] | null
+    mentionAgents?: MentionAgent[] | null
+    mentionComputers?: MentionComputer[] | null
+    // The symbols this composer serves: the Chief of Staff has no skill, so no `/`.
+    triggers?: readonly MentionTrigger[]
     autoFocus?: boolean
     // False while its page waits beside the one on screen. iOS draws no glass on a view set up off
     // screen, and never draws it later: the glass is laid again each time the composer comes on screen.
@@ -53,7 +56,7 @@ type ComposerProps = {
 }
 
 // A pill at rest, a card once in use (focused, holding text or attachments, or listening).
-export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], autoFocus, onScreen = true, ref }: ComposerProps) {
+export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], triggers = MENTION_TRIGGERS, autoFocus, onScreen = true, ref }: ComposerProps) {
     noteRender('Composer')
     const theme = useTheme()
     const glass = useGlassStyle()
@@ -75,8 +78,10 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const canSend = hasText || attachments.length > 0
     const inputText = { paddingHorizontal: expanded ? spacing.xs : canAttach ? 0 : spacing.sm, paddingVertical: (CONTROL - LINE_HEIGHT) / 2, fontFamily: fonts.regular, fontSize: 16, lineHeight: LINE_HEIGHT } as const
 
-    const mention = focused && !recording ? mentionQueryAt(value, Math.min(caret, value.length)) : null
-    const suggestions = mention ? mentionItems(mention, mentionAgents, skills, mentionComputers) : []
+    const mention = focused && !recording ? mentionQueryAt(value, Math.min(caret, value.length), triggers) : null
+    const suggestions = mention ? mentionItems(mention, mentionAgents ?? [], skills ?? [], mentionComputers ?? []) : []
+    const listRead = (mention?.trigger === '/' ? skills : mention?.trigger === '#' ? mentionComputers : mentionAgents) !== null
+    const suggestionsShown = mention !== null && (suggestions.length > 0 || mention.query === '')
 
     useEffect(() => {
         if (pendingCaret.current === null) return
@@ -94,6 +99,11 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
         if (!mention) return
         Haptics.selectionAsync()
         write(insertMention(value, Math.min(caret, value.length), mention, item))
+    }
+
+    const pickCommand = (trigger: MentionTrigger) => {
+        write(insertTrigger(value, Math.min(caret, value.length), trigger))
+        input.current?.focus()
     }
 
     const pickSkill = (slug: string) => {
@@ -152,7 +162,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
 
     return (
         <View style={{ gap: spacing.sm }}>
-            {mention && suggestions.length > 0 && <MentionSuggestions trigger={mention.trigger} items={suggestions} onPick={pickMention} />}
+            {mention && suggestionsShown && <MentionSuggestions trigger={mention.trigger} items={suggestions} listRead={listRead} onPick={pickMention} />}
             {/* The glass sits behind the composer rather than around it: laid again, it leaves the field and its focus alone. */}
             <View style={{ borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous', paddingHorizontal: expanded ? spacing.md : spacing.sm, paddingTop: expanded ? spacing.md : spacing.sm, paddingBottom: spacing.sm, gap: spacing.sm }}>
                 <GlassSurface key={`${theme.scheme}:${arrivals.count}`} testID="composer-glass" pointerEvents="none" colorScheme={theme.scheme} glassEffectStyle={glass} style={[StyleSheet.absoluteFill, { borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous' }]} />
@@ -163,7 +173,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                 )}
                 {expanded && attachments.length > 0 && <AttachmentStrip attachments={attachments} onRemove={uri => onAttachmentsChange(attachments.filter(attachment => attachment.uri !== uri))} />}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                    {!expanded && canAttach && <AttachMenu onPhotos={pickPhotos} onCamera={takePhoto} onFiles={pickFiles} skills={skills} onSkill={pickSkill} />}
+                    {!expanded && canAttach && <AttachMenu onPhotos={pickPhotos} onCamera={takePhoto} onFiles={pickFiles} skills={skills ?? []} onSkill={pickSkill} commands={{ triggers, onPick: pickCommand }} />}
                     {recorder.status === 'idle' ? (
                         <View style={{ flex: 1 }}>
                             {/* A multiline input wraps its placeholder: this one stays on a single line, cut short. */}
@@ -189,7 +199,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                             </>
                         ) : (
                             <>
-                                {canAttach && <AttachMenu onPhotos={pickPhotos} onCamera={takePhoto} onFiles={pickFiles} skills={skills} onSkill={pickSkill} />}
+                                {canAttach && <AttachMenu onPhotos={pickPhotos} onCamera={takePhoto} onFiles={pickFiles} skills={skills ?? []} onSkill={pickSkill} commands={{ triggers, onPick: pickCommand }} />}
                                 <View style={{ flex: 1 }} />
                                 {model && onOpenModel && <ModelChip model={model} onPress={onOpenModel} />}
                                 {actions}
