@@ -1,6 +1,6 @@
 import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 
-import { workspaceActor, type Actor } from '@/app/api/_auth/access'
+import { workspaceActor, type Actor, agentRowIdOf } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
@@ -748,16 +748,17 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
             await uninstallService(agentId, slug, actor)
             return { status: 'uninstalled', slug }
         }
+        // A published file belongs to a row: the Chief of Staff's, which the engine calls by its name.
         case 'publish_file':
-            return publishWithThumbnail(agentId, requireString(args.path, 'path'), asString(args.slug), {
+            return publishWithThumbnail(await agentRowIdOf(agentId, workspaceId), requireString(args.path, 'path'), asString(args.slug), {
                 access: isPublishedAccess(args.access) ? args.access : undefined,
                 invite: asStringArray(args.invite),
                 password: asString(args.password),
             })
         case 'unpublish_file':
-            return unpublishFile(agentId, { path: asString(args.path), slug: asString(args.slug) })
+            return unpublishFile(await agentRowIdOf(agentId, workspaceId), { path: asString(args.path), slug: asString(args.slug) })
         case 'list_published':
-            return listPublished(agentId)
+            return listPublished(await agentRowIdOf(agentId, workspaceId))
         // The engine addresses agents by its own local ids, so only the hub can build a trigger's
         // public URL. No DB read: the caller already proved it owns this agent's engine.
         case 'trigger_url':

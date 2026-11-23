@@ -24,9 +24,9 @@ import { useDesktopStore } from '@/stores/desktop.store'
 import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 
-// A published page belongs to a coworker of the board for now, and the Chief of Staff installs nothing.
-// Its runs are its members' own conversations: its activity shows their sum, never the list.
-const WITHOUT_TABS: readonly AgentViewTab[] = ['published', 'setup', 'logs']
+// The Chief of Staff installs nothing. Its runs are its members' own conversations: its activity shows
+// their sum, never the list.
+const WITHOUT_TABS: readonly AgentViewTab[] = ['setup', 'logs']
 
 // An engine from before `foreman.agent` refuses the Chief of Staff's activity and settings.
 const WITHOUT_AGENT_SCREENS: readonly CardDestination[] = ['monitoring', 'settings']

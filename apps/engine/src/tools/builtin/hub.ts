@@ -76,10 +76,9 @@ export function hubTools(ctx: RunContext): ToolSet {
     }
 }
 
-// The foreman searches and installs from the catalog on itself like a coworker. Publishing is not
-// its own: a published file belongs to a coworker of the board, and its docs search is the
-// search_docs of its brief.
+// The foreman searches and installs from the catalog on itself, and publishes its files, like a
+// coworker. Its docs search is the search_docs of its brief.
 export function foremanHubTools(ctx: RunContext): ToolSet {
-    const { rerun_hub_service_search, rerun_hub_service_details, rerun_hub_service_install, rerun_hub_service_list_installed, rerun_hub_service_uninstall } = hubTools(ctx)
-    return { rerun_hub_service_search, rerun_hub_service_details, rerun_hub_service_install, rerun_hub_service_list_installed, rerun_hub_service_uninstall }
+    const { rerun_hub_search_docs: _searchDocs, ...coworkerTools } = hubTools(ctx)
+    return coworkerTools
 }

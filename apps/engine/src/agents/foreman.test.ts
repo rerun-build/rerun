@@ -154,11 +154,12 @@ describe('foreman', () => {
         expect((await getAgent(FOREMAN_AGENT_ID)).config.tools).toEqual(expect.objectContaining({ db: true, trigger: true, team: true, aiProviders: true, notify: true, hub: true, suggestService: true, requestSecret: true, paidData: true, computer: true }))
     })
 
-    it('publishes nothing and searches the docs through its brief only', async () => {
+    it('publishes its files like a coworker, and searches the docs through its brief only', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'rerun_hub_search_docs']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published']))
+        expect(names).not.toContain('rerun_hub_search_docs')
     })
 
     it('keeps whether paid data asks before spending across a reboot', async () => {

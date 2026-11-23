@@ -39,8 +39,8 @@ async function reachablePublishedWorkspaceId(slug: string): Promise<number> {
 // coworker's Published tab.
 export async function listPublishedAction(agentId: string): Promise<PublishedFile[]> {
     try {
-        await assertAgentInWorkspace(agentId)
-        const { files } = await listPublished(agentId)
+        const agent = await assertAgentInWorkspace(agentId)
+        const { files } = await listPublished(agent.id)
         return files
     } catch {
         return []
@@ -68,8 +68,8 @@ export async function getPublishedAction(slug: string): Promise<PublishedFile | 
 // gives a new link, and the share dialog opens right after to change it.
 export async function publishFileAction(agentId: string, path: string): Promise<{ success: boolean; url?: string; slug?: string } & Partial<ActionRefusal>> {
     try {
-        await assertAgentInWorkspace(agentId)
-        const result = await publishWithThumbnail(agentId, path)
+        const agent = await assertAgentInWorkspace(agentId)
+        const result = await publishWithThumbnail(agent.id, path)
         return { success: true, url: result.url, slug: result.slug }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'publishFailed') }
@@ -79,8 +79,8 @@ export async function publishFileAction(agentId: string, path: string): Promise<
 // Revoke a published file by its slug: deletes the copy and makes its URL stop working.
 export async function unpublishFileAction(agentId: string, slug: string): Promise<{ success: boolean } & Partial<ActionRefusal>> {
     try {
-        await assertAgentInWorkspace(agentId)
-        await unpublishFile(agentId, { slug })
+        const agent = await assertAgentInWorkspace(agentId)
+        await unpublishFile(agent.id, { slug })
         return { success: true }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'unpublishFailed') }

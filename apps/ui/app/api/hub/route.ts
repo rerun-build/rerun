@@ -21,9 +21,9 @@ export const dynamic = 'force-dynamic'
 // The foreman's own coworker tools: it reads the team, the credit and the catalog and installs on
 // itself exactly as a coworker of the box does, so these need no token. That is what lets a routine
 // or a webhook run of the foreman, which carries no brief and so no token, still reach them, as the
-// workspace. A turn whose token names a member still acts with that member's access. Publishing
-// stays out: a published file belongs to an agent row, which the foreman does not have.
-const FOREMAN_COWORKER_HUB_TOOLS = new Set(['team_status', 'team_list_schedules', 'team_list_triggers', 'team_list_runs', 'team_get_run', 'rerun_credit', 'service_search', 'service_details', 'service_install', 'service_list_installed', 'service_uninstall', 'trigger_url'])
+// workspace. A turn whose token names a member still acts with that member's access. Its published
+// files belong to its agent row, as a coworker's to its own.
+const FOREMAN_COWORKER_HUB_TOOLS = new Set(['team_status', 'team_list_schedules', 'team_list_triggers', 'team_list_runs', 'team_get_run', 'rerun_credit', 'service_search', 'service_details', 'service_install', 'service_list_installed', 'service_uninstall', 'trigger_url', 'publish_file', 'unpublish_file', 'list_published'])
 
 export async function POST(req: Request): Promise<Response> {
     const header = req.headers.get('authorization') ?? ''
