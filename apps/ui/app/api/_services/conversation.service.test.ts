@@ -9,7 +9,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentConversations, listPendingCards, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentConversations, listAgentSessions, listPendingCards, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, SESSION_HISTORY_LIMIT, THREAD_FEED_LIMIT } from './conversation.service'
 import { EMPTY_SESSION_SNAPSHOT } from '@/lib/chat/session-snapshot'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
@@ -512,6 +512,100 @@ describe('searchWorkspaceConversations', () => {
     })
 })
 
+type HistoryRow = ReturnType<typeof session> & Record<string, unknown>
+
+// The history reads, routed by what they ask for: the newest threads, the General, the engine ids
+// already mirrored, and the notifications of the waiting ones.
+function history({ threads = [], general = [], mirrored = [], notifications = [] }: { threads?: HistoryRow[]; general?: HistoryRow[]; mirrored?: string[]; notifications?: unknown[] }) {
+    vi.mocked(selectMany).mockImplementation((async (_client: unknown, table: string, _columns: unknown, filters: Record<string, unknown>) => {
+        if (table === 'notifications') return { data: notifications, error: null }
+        if (filters.kind === 'general') return { data: general, error: null }
+        if (filters.engine_session_id) return { data: mirrored.filter(id => (filters.engine_session_id as string[]).includes(id)).map(engine_session_id => ({ engine_session_id })), error: null }
+        return { data: threads, error: null }
+    }) as never)
+}
+
+const historyCall = (match: (filters: Record<string, unknown>) => boolean) => vi.mocked(selectMany).mock.calls.find(call => call[1] === 'sessions' && match(call[3] as Record<string, unknown>))
+
+const minutesAgo = (minutes: number) => new Date(Date.parse('2026-11-23T12:00:00Z') - minutes * 60_000).toISOString()
+
+describe('listAgentSessions', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(assertAgentAccess).mockResolvedValue(reached())
+        vi.mocked(createServiceRoleClient).mockReturnValue({} as never)
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: {}, engineAgentId: 'engine-agent' } as never)
+        vi.mocked(listSessions).mockResolvedValue([])
+    })
+
+    const fullPageOf = (source: string) => Array.from({ length: SESSION_HISTORY_LIMIT }, (_, i) => ({ ...session('a', `${source}-${i}`, minutesAgo(i)), source }))
+    const engineSession = (id: string, updatedAt: string, originAgentId: string | null = 'engine-peer') => ({ id, title: `${id} title`, status: 'open', source: originAgentId ? 'agent' : 'dashboard', originAgentId, createdAt: updatedAt, updatedAt })
+
+    it('reads the newest threads in order with a limit, and the General apart', async () => {
+        history({ threads: [session('a', 't1', minutesAgo(5))], general: [{ ...session('a', 'g', minutesAgo(9000)), kind: 'general' }] })
+
+        const entries = await listAgentSessions('a', adminActor)
+
+        expect(historyCall(f => f.kind === 'thread')?.slice(3)).toEqual([{ agent_id: 'a', kind: 'thread', source: undefined }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT])
+        expect(entries.map(e => [e.id, e.kind])).toEqual([
+            ['t1', 'thread'],
+            ['g', 'general'],
+        ])
+    })
+
+    it('asks the table for the sources of the filter, and leaves the General out of a filtered list', async () => {
+        history({})
+
+        await listAgentSessions('a', adminActor, 'automations')
+        expect(historyCall(f => f.kind === 'thread')?.[3]).toMatchObject({ source: ['schedule', 'trigger'] })
+
+        vi.mocked(selectMany).mockClear()
+        await listAgentSessions('a', adminActor, 'chats')
+        expect(historyCall(f => f.kind === 'thread')?.[3]).toMatchObject({ source: ['dashboard', 'builder', 'agent', 'delegate', 'api'] })
+        expect(historyCall(f => f.kind === 'general')).toBeUndefined()
+    })
+
+    it('does not bring back as engine-only the conversations of other coworkers whose row is past the page (RER-282)', async () => {
+        const fromPeers = Array.from({ length: 300 }, (_, i) => engineSession(`peer-${i}`, minutesAgo(i * 2)))
+        history({ threads: fullPageOf('schedule'), mirrored: fromPeers.map(s => s.id) })
+        vi.mocked(listSessions).mockResolvedValue(fromPeers as never)
+
+        const entries = await listAgentSessions('a', adminActor)
+
+        expect(entries.filter(e => e.id === null)).toEqual([])
+        expect(entries).toHaveLength(SESSION_HISTORY_LIMIT)
+    })
+
+    it('still lists a conversation another coworker opened that has no row yet, inside the window of a full page', async () => {
+        history({ threads: fullPageOf('schedule'), mirrored: [] })
+        vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1)), engineSession('too-old', minutesAgo(SESSION_HISTORY_LIMIT + 50)), engineSession('mine', minutesAgo(1), null)] as never)
+
+        const entries = await listAgentSessions('a', adminActor)
+
+        expect(entries.filter(e => e.id === null).map(e => e.engineSessionId)).toEqual(['fresh'])
+        expect(entries).toHaveLength(SESSION_HISTORY_LIMIT)
+    })
+
+    it('leaves the engine-only conversations of other coworkers out of the automations', async () => {
+        history({})
+        vi.mocked(listSessions).mockResolvedValue([engineSession('fresh', minutesAgo(1))] as never)
+
+        expect(await listAgentSessions('a', adminActor, 'automations')).toEqual([])
+    })
+
+    it('asks the Box only for a filter that can keep a conversation another coworker opened', async () => {
+        history({})
+
+        await listAgentSessions('a', adminActor, 'automations')
+        expect(resolveAgentTarget).not.toHaveBeenCalled()
+        expect(listSessions).not.toHaveBeenCalled()
+
+        await listAgentSessions('a', adminActor, 'all')
+        expect(resolveAgentTarget).toHaveBeenCalledTimes(1)
+        expect(listSessions).toHaveBeenCalledTimes(1)
+    })
+})
+
 describe('listAgentConversations', () => {
     const asMember = { ...ctx, userId: 'me' } as WorkspaceContext
 
@@ -522,16 +616,12 @@ describe('listAgentConversations', () => {
         vi.mocked(createServiceRoleClient).mockReturnValue({} as never)
     })
 
-    function rows(...sessions: ReturnType<typeof session>[]) {
-        vi.mocked(selectMany).mockResolvedValueOnce({ data: sessions, error: null } as never)
-    }
-
     function unseenRuns(result: { data: { session_id: string; agent_id: string }[] | null; error: unknown }) {
         vi.mocked(createClient).mockResolvedValue({ rpc: vi.fn().mockResolvedValue(result) } as never)
     }
 
     it('marks a conversation whose run finished since the last read, for this agent only', async () => {
-        rows(session('a', 's1', '2026-10-26T10:00:00Z'), session('a', 's2', '2026-10-25T10:00:00Z'))
+        history({ threads: [session('a', 's1', '2026-10-26T10:00:00Z'), session('a', 's2', '2026-10-25T10:00:00Z')] })
         unseenRuns({ data: [{ session_id: 's1', agent_id: 'a' }, { session_id: 's2', agent_id: 'b' }], error: null })
 
         const conversations = await listAgentConversations(asMember, 'a')
@@ -543,9 +633,11 @@ describe('listAgentConversations', () => {
     })
 
     it('says what a waiting conversation asks, from the notification that flipped it', async () => {
-        rows(session('a', 's1', '2026-10-26T10:00:00Z', 'awaiting_approval'), session('a', 's2', '2026-10-25T10:00:00Z'))
+        history({
+            threads: [session('a', 's1', '2026-10-26T10:00:00Z', 'awaiting_approval'), session('a', 's2', '2026-10-25T10:00:00Z')],
+            notifications: [{ agent_id: 'a', engine_session_id: 'engine-s1', kind: 'approval', message: ' Send the email to Malt? ', metadata: null, recipients: { me: 'mine' } }],
+        })
         unseenRuns({ data: [], error: null })
-        vi.mocked(selectMany).mockResolvedValueOnce({ data: [{ agent_id: 'a', engine_session_id: 'engine-s1', kind: 'approval', message: ' Send the email to Malt? ', metadata: null, recipients: { me: 'mine' } }], error: null } as never)
 
         const conversations = await listAgentConversations(asMember, 'a')
 
@@ -553,17 +645,26 @@ describe('listAgentConversations', () => {
             ['s1', 'Send the email to Malt?'],
             ['s2', null],
         ])
-        expect(vi.mocked(selectMany).mock.calls[1][3]).toEqual({ agent_id: { in: ['a'] }, engine_session_id: { in: ['engine-s1'] }, kind: { neq: 'done' } })
+        expect(vi.mocked(selectMany).mock.calls.find(call => call[1] === 'notifications')?.[3]).toEqual({ agent_id: { in: ['a'] }, engine_session_id: { in: ['engine-s1'] }, kind: { neq: 'done' } })
     })
 
     it('leaves unseen out rather than failing when the read state cannot be fetched', async () => {
-        rows(session('a', 's1', '2026-10-26T10:00:00Z'))
+        history({ threads: [session('a', 's1', '2026-10-26T10:00:00Z')] })
         unseenRuns({ data: null, error: new Error('rpc down') })
 
         const [conversation] = await listAgentConversations(asMember, 'a')
 
         expect(conversation).not.toHaveProperty('unseen')
-        expect(selectMany).toHaveBeenCalledTimes(1)
+        expect(vi.mocked(selectMany).mock.calls.some(call => call[1] === 'notifications')).toBe(false)
+    })
+
+    it('keeps the General for the app even when it is older than every thread of the page', async () => {
+        history({ threads: Array.from({ length: SESSION_HISTORY_LIMIT }, (_, i) => session('a', `t${i}`, minutesAgo(i))), general: [{ ...session('a', 'g', '2026-01-01T00:00:00Z'), kind: 'general' }] })
+        unseenRuns({ data: [], error: null })
+
+        const conversations = await listAgentConversations(asMember, 'a')
+
+        expect(conversations.find(c => c.kind === 'general')?.id).toBe('g')
     })
 })
 
@@ -587,7 +688,7 @@ describe('listAgentThreads', () => {
 
     it('exposes the kind and the opening time of every conversation in the history', async () => {
         vi.mocked(resolveAgentTarget).mockRejectedValue(new Error('no box'))
-        vi.mocked(selectMany).mockResolvedValueOnce({ data: [{ ...session('a', 'g', '2026-11-08T10:00:00Z'), kind: 'general' }], error: null } as never)
+        history({ general: [{ ...session('a', 'g', '2026-11-08T10:00:00Z'), kind: 'general' }] })
         vi.mocked(createClient).mockResolvedValue({ rpc: vi.fn().mockResolvedValue({ data: [], error: null }) } as never)
 
         const conversations = await listAgentConversations({ ...ctx, userId: 'me' } as WorkspaceContext, 'a')
@@ -597,7 +698,7 @@ describe('listAgentThreads', () => {
 
     it('gives the app what a thread opened with, so General shows it as the web does', async () => {
         vi.mocked(resolveAgentTarget).mockRejectedValue(new Error('no box'))
-        vi.mocked(selectMany).mockResolvedValueOnce({ data: [{ ...session('a', 't', '2026-11-08T10:00:00Z'), first_message: 'Plan the posts' }], error: null } as never)
+        history({ threads: [{ ...session('a', 't', '2026-11-08T10:00:00Z'), first_message: 'Plan the posts' }] })
         vi.mocked(createClient).mockResolvedValue({ rpc: vi.fn().mockResolvedValue({ data: [], error: null }) } as never)
 
         const conversations = await listAgentConversations({ ...ctx, userId: 'me' } as WorkspaceContext, 'a')

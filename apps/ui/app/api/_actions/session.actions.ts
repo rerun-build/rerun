@@ -3,6 +3,7 @@
 import { assertSessionInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findIdleSessions, findSessionActiveRun } from '@/app/api/_services/chat.service'
+import { sessionHistoryFilterSchema, type SessionHistoryFilter } from '@/lib/chat/history-filter'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentSessions, listAgentThreads, readPendingRequest, readSessionMessages, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type ThreadRow } from '@/app/api/_services/conversation.service'
 
@@ -15,8 +16,8 @@ export async function acknowledgeSessionAlertAction(sessionId: string): Promise<
     await clearSessionAlert(sessionId)
 }
 
-export async function listAgentSessionsAction(agentId: string): Promise<SessionHistoryEntry[]> {
-    return listAgentSessions(agentId).catch(() => [])
+export async function listAgentSessionsAction(agentId: string, filter: SessionHistoryFilter = 'all'): Promise<SessionHistoryEntry[]> {
+    return listAgentSessions(agentId, undefined, sessionHistoryFilterSchema.parse(filter)).catch(() => [])
 }
 
 export async function listAgentThreadsAction(agentId: string): Promise<ThreadRow[]> {

@@ -9,7 +9,8 @@ import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
-import type { EngineSkillProposal, SessionSource } from '@/lib/engine/types'
+import type { EngineSession, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
+import { sourcesOf, type SessionHistoryFilter } from '@/lib/chat/history-filter'
 import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -34,24 +35,35 @@ export type SessionHistoryEntry = {
     firstMessage: string | null
 }
 
+const HISTORY_COLUMNS = ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const
+
+// PostgREST caps a select at 1000 rows, and a busy coworker runs thousands of routines: the history
+// is the newest threads of the filter, read in order.
+export const SESSION_HISTORY_LIMIT = 200
+
 // Session history for an agent: Supabase-mirrored sessions merged with
 // engine-only sessions that were initiated by another agent (call_agent),
 // so those show up in the history like regular ones until adopted.
-export async function listAgentSessions(agentId: string, actor?: Actor): Promise<SessionHistoryEntry[]> {
+export async function listAgentSessions(agentId: string, actor?: Actor, filter: SessionHistoryFilter = 'all'): Promise<SessionHistoryEntry[]> {
     const { actor: caller } = await assertAgentAccess(agentId, 'use', actor)
 
     const supabase = createServiceRoleClient()
+    const sources = sourcesOf(filter)
+    // Only `call_agent` opens a session on the engine alone, always with the source `agent`: a filter
+    // that leaves it out has nothing to ask the Box for.
+    const readsEngine = !sources || sources.includes('agent')
 
-    const [{ data: rows }, target] = await Promise.all([
-        selectMany(supabase, 'sessions', ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const, { agent_id: agentId }),
-        resolveAgentTarget(agentId, caller).catch(() => null),
+    const [threads, general, target] = await Promise.all([
+        selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'thread', source: sources }, { column: 'updated_at', ascending: false }, SESSION_HISTORY_LIMIT),
+        filter === 'all' ? selectMany(supabase, 'sessions', HISTORY_COLUMNS, { agent_id: agentId, kind: 'general' }) : { data: [], error: null },
+        readsEngine ? resolveAgentTarget(agentId, caller).catch(() => null) : null,
     ])
-    const supabaseRows = rows ?? []
+    if (threads.error) throw threads.error
+    const threadRows = threads.data ?? []
+    const supabaseRows = [...(general.data ?? []), ...threadRows]
 
     const engineSessions = target ? await listSessions(target.conn, target.engineAgentId).catch(() => []) : []
-
-    const mirrored = new Set(supabaseRows.map(r => r.engine_session_id))
-    const unmirrored = engineSessions.filter(s => s.originAgentId && !mirrored.has(s.id))
+    const unmirrored = await engineOnlySessions(supabase, agentId, engineSessions, threadRows, sources)
 
     const engineOriginIds = [...new Set(unmirrored.map(s => s.originAgentId).filter((v): v is string => !!v))]
     const supabaseOriginIds = [...new Set(supabaseRows.map(r => r.origin_agent_id).filter((v): v is string => !!v))]
@@ -105,7 +117,26 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
         })),
     ]
 
-    return entries.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    const byNewest = (a: SessionHistoryEntry, b: SessionHistoryEntry) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    const newestThreads = entries.filter(entry => entry.kind !== 'general').sort(byNewest).slice(0, SESSION_HISTORY_LIMIT)
+    return [...entries.filter(entry => entry.kind === 'general'), ...newestThreads].sort(byNewest)
+}
+
+// The engine's sessions another coworker opened on this one that have no row yet. When the page is
+// full it holds only the newest rows, so an engine session older than the page is left out, and the
+// ones inside its window are checked against the table rather than against the page.
+async function engineOnlySessions(supabase: SupabaseClient<Database>, agentId: string, engineSessions: EngineSession[], page: { engine_session_id: string; updated_at: string }[], sources: SessionSource[] | undefined): Promise<EngineSession[]> {
+    const onPage = new Set(page.map(row => row.engine_session_id))
+    const candidates = engineSessions.filter(s => s.originAgentId && !onPage.has(s.id) && (!sources || sources.includes(s.source)))
+    if (page.length < SESSION_HISTORY_LIMIT || candidates.length === 0) return candidates
+
+    const oldest = Math.min(...page.map(row => new Date(row.updated_at).getTime()))
+    const inWindow = candidates.filter(s => new Date(s.updatedAt).getTime() >= oldest).slice(0, SESSION_HISTORY_LIMIT)
+    if (inWindow.length === 0) return []
+    const { data, error } = await selectMany(supabase, 'sessions', ['engine_session_id'] as const, { agent_id: agentId, engine_session_id: inWindow.map(s => s.id) })
+    if (error) throw error
+    const mirrored = new Set((data ?? []).map(row => row.engine_session_id))
+    return inWindow.filter(s => !mirrored.has(s.id))
 }
 
 export type ThreadRow = {

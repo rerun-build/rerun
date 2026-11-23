@@ -13,6 +13,7 @@ import { Chip } from '@/components/ui/chip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAttentionSessions } from '@/hooks/useAttentionSessions'
+import { isAutomatedSource } from '@/lib/chat/history-filter'
 import { CalendarClock, CheckCheckIcon, EllipsisIcon, LoaderIcon, MessageCircle, PencilIcon, PlusIcon, WebhookIcon, XIcon } from '@/lib/icons'
 import { messageDayLabel, messageTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
@@ -22,7 +23,7 @@ import { ChatRowRenameField, useSessionRename, type SessionRename } from './Sess
 
 export type ChatsFilter = 'all' | 'chats' | 'automations' | 'needs'
 
-const isAutomated = (entry: SessionHistoryEntry) => entry.source === 'schedule' || entry.source === 'trigger'
+const isAutomated = (entry: SessionHistoryEntry) => isAutomatedSource(entry.source)
 
 type AgentChatsListProps = {
     agentId: string
@@ -48,18 +49,25 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     const attention = useAttentionSessions(agentId)
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
     const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
-    // The history is read once per opening: what runs right now comes from the board's live statuses.
+    // What runs right now comes from the board's live statuses, not from the history.
     const sessions = useBoardStore(s => s.sessions)
 
+    // Each chip reads its own newest conversations: a busy coworker has far more than one page.
+    const historyFilter = filter === 'needs' ? null : filter
     useEffect(() => {
+        if (!historyFilter) return
         let alive = true
-        listAgentSessionsAction(agentId)
+        listAgentSessionsAction(agentId, historyFilter)
             .then(entries => alive && setHistory(entries))
             .catch(() => alive && setHistory([]))
         return () => {
             alive = false
         }
-    }, [agentId])
+    }, [agentId, historyFilter])
+    const chooseFilter = (next: ChatsFilter) => {
+        if (next !== filter && next !== 'needs') setHistory(null)
+        setFilter(next)
+    }
 
     const waitingIds = useMemo(() => new Set(attention.map(item => item.id)), [attention])
     const runningIds = useMemo(() => new Set(sessions.filter(s => s.agentId === agentId && s.status === 'working').map(s => s.id)), [sessions, agentId])
@@ -114,16 +122,16 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                 </div>
             </div>
             <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto px-3 py-2">
-                <Chip selected={filter === 'all'} onClick={() => setFilter('all')}>
+                <Chip selected={filter === 'all'} onClick={() => chooseFilter('all')}>
                     {t('filters.all')}
                 </Chip>
-                <Chip selected={filter === 'chats'} onClick={() => setFilter('chats')}>
+                <Chip selected={filter === 'chats'} onClick={() => chooseFilter('chats')}>
                     {t('filters.chats')}
                 </Chip>
-                <Chip selected={filter === 'automations'} onClick={() => setFilter('automations')}>
+                <Chip selected={filter === 'automations'} onClick={() => chooseFilter('automations')}>
                     {t('filters.automations')}
                 </Chip>
-                <Chip selected={filter === 'needs'} onClick={() => setFilter('needs')}>
+                <Chip selected={filter === 'needs'} onClick={() => chooseFilter('needs')}>
                     {t('filters.needs')} <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{attention.length}</span>
                 </Chip>
                 {filter === 'needs' && attention.length > 0 && (

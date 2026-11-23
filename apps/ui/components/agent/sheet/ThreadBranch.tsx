@@ -12,6 +12,7 @@ import { PeekReceipt, PeekRequest, PeekSkeleton, usePeekAnswer } from '@/compone
 import { useInboxPeek } from '@/hooks/useInboxPeek'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { SessionStatus } from '@/lib/board/types'
+import { isAutomatedSource } from '@/lib/chat/history-filter'
 import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import { ArrowRight, CalendarClock, ChevronRightIcon, WebhookIcon } from '@/lib/icons'
 import { shortRelativeTime } from '@/lib/time'
@@ -60,7 +61,7 @@ const BODY_IN: Transition = { height: GROW, opacity: { duration: 0.22, ease: 'ea
 const BODY_OUT: Transition = { height: { duration: 0.28, ease: EASE }, opacity: { duration: 0.16, ease: 'easeIn' } }
 const INSTANT: Transition = { duration: 0 }
 
-const isAutomated = (thread: ThreadRow) => thread.source === 'schedule' || thread.source === 'trigger'
+const isAutomated = (thread: ThreadRow) => isAutomatedSource(thread.source)
 
 /** The coworker whose thread it is: given, a thread that waits on an answer unfolds into its request instead of opening its tab. */
 export type ThreadPeekOwner = { agentId: string; agentName: string }
