@@ -163,7 +163,8 @@ describe('call_agent with wait', () => {
         const pending = callBob({}, controller.signal)
         await new Promise(resolve => setTimeout(resolve, 10))
         controller.abort()
-        const { answer } = await pending
+        const { answer, written } = await pending
         expect(answer).toBe('(error calling Bob: (stopped: stopped along with the calling run))')
+        expect(written.at(-1)?.data).toMatchObject({ status: 'stopped' })
     })
 })

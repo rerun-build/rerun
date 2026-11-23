@@ -8,7 +8,8 @@ vi.mock('../../runtime/run-control.js', () => ({
     },
 }))
 
-const { followSubRun, snapshotSubRun, beginSubRun, abortSubRun, registerSubRunStop, unregisterSubRunStop, renderSubRunOutcome, summarizeToolInput, isFailureResult, SUB_RUN_IDLE_TIMEOUT_MS, SUB_RUN_STOPPED_BY_USER } = await import('./sub-run-watch.js')
+const { followSubRun, snapshotSubRun, beginSubRun, abortSubRun, registerSubRunStop, unregisterSubRunStop, renderSubRunOutcome, summarizeToolInput, isFailureResult, SUB_RUN_IDLE_TIMEOUT_MS, SUB_RUN_STOPPED_WITH_CALLER, endSubRun } = await import('./sub-run-watch.js')
+const { SUB_RUN_STOPPED_BY_USER } = await import('@rerun/contracts')
 const { BLOCKED_SOURCE_PREFIX } = await import('../host-breaker.js')
 type SubRunProgress = import('./sub-run-watch.js').SubRunProgress
 
@@ -225,6 +226,21 @@ describe('followSubRun', () => {
             end()
         })
         await expect(followSubRun(run, freshProgress(), { onChange: () => {} })).resolves.toEqual({ text: '', stopReason: '401 unauthorized' })
+    })
+})
+
+describe('endSubRun', () => {
+    it('tells a stop from a failure', () => {
+        const ended = (reason?: string) => {
+            const progress = freshProgress()
+            endSubRun(progress, reason)
+            return progress.status
+        }
+        expect(ended()).toBe('done')
+        expect(ended(SUB_RUN_STOPPED_BY_USER)).toBe('stopped')
+        expect(ended(SUB_RUN_STOPPED_WITH_CALLER)).toBe('stopped')
+        expect(ended('401 unauthorized')).toBe('error')
+        expect(ended('no activity for 15 min, sub-coworker stopped')).toBe('error')
     })
 })
 

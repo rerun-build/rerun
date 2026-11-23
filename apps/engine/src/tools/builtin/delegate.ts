@@ -12,7 +12,7 @@ import { newId } from '../../lib/ids.js'
 import { runAgent } from '../../runtime/loop.js'
 import type { RunContext } from '../../runtime/context.js'
 import {
-    SUB_RUN_STOPPED_BY_USER,
+    SUB_RUN_STOPPED_WITH_CALLER,
     beginSubRun,
     endSubRun,
     followSubRun,
@@ -97,7 +97,7 @@ export function delegateTools(ctx: RunContext): ToolSet {
                         const prompt = context ? `${context}\n\n---\n\n${task}` : task
                         const run = await runAgent(child, session.id, prompt)
                         const outcome = await followSubRun(run, current, { onChange: emit, parentSignal, taskSignal })
-                        endSubRun(current, outcome.stopReason, outcome.stopReason === SUB_RUN_STOPPED_BY_USER ? 'stopped' : 'error')
+                        endSubRun(current, outcome.stopReason)
                         emit()
                         const text = renderSubRunOutcome(outcome, current)
                         if (outcome.stopReason === undefined) ctx.partialResults?.push({ label: `Task ${index + 1} — ${current.title}`, text })
@@ -133,6 +133,13 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     await Promise.all(Array.from({ length: Math.min(MAX_CONCURRENCY, tasks.length) }, () => worker()))
                 } finally {
                     stopHeartbeat()
+                }
+
+                // The workers only leave a task queued when the calling run is stopped.
+                const notStarted = progress.filter(task => task.status === 'queued')
+                if (notStarted.length) {
+                    for (const task of notStarted) endSubRun(task, SUB_RUN_STOPPED_WITH_CALLER)
+                    emit()
                 }
 
                 return tasks.map((t, i) => `## Task ${i + 1} — ${t.title ?? t.task.slice(0, 80)}\n${results[i]}`).join('\n\n')

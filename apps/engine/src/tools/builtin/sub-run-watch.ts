@@ -1,4 +1,4 @@
-import { PAID_DATA_TOOL, SUB_RUN_TOOL_NAMES } from '@rerun/contracts'
+import { PAID_DATA_TOOL, SUB_RUN_STOPPED_BY_USER, SUB_RUN_TOOL_NAMES } from '@rerun/contracts'
 import { abortRun } from '../../runtime/run-control.js'
 import type { AgentRun } from '../../runtime/loop.js'
 import { BLOCKED_SOURCE_PREFIX, isFailureStatus } from '../host-breaker.js'
@@ -6,7 +6,7 @@ import { canonicalBridgeName } from './hitl.js'
 
 export const SUB_RUN_IDLE_TIMEOUT_MS = 15 * 60_000
 export const SUB_RUN_HEARTBEAT_MS = 30_000
-export const SUB_RUN_STOPPED_BY_USER = 'stopped by the user'
+export const SUB_RUN_STOPPED_WITH_CALLER = 'stopped along with the calling run'
 
 const PREVIEW_LENGTH = 600
 const RECENT_CALLS = 8
@@ -16,6 +16,7 @@ const STATUS_PREFIX = /^\[(\d{3})\]/
 const SECRET_IN_INPUT = /(bearer|token|key|secret|password)([=: ]+)\S+/gi
 const URL_TOOLS = new Set(['web_fetch', 'browser_navigate', 'download'])
 const SUB_RUN_TOOLS = new Set(Object.values(SUB_RUN_TOOL_NAMES))
+const STOP_REASONS = new Set([SUB_RUN_STOPPED_BY_USER, SUB_RUN_STOPPED_WITH_CALLER])
 
 export type SubRunCall = { tool: string; summary: string; startedAt: number; endedAt?: number; failed?: boolean }
 
@@ -100,8 +101,8 @@ export function beginSubRun(progress: SubRunProgress): void {
     progress.calls = []
 }
 
-export function endSubRun(progress: SubRunProgress, error?: string, status: 'error' | 'stopped' = 'error'): void {
-    progress.status = error === undefined ? 'done' : status
+export function endSubRun(progress: SubRunProgress, error?: string): void {
+    progress.status = error === undefined ? 'done' : STOP_REASONS.has(error) ? 'stopped' : 'error'
     progress.error = error
     progress.finishedAt = Date.now()
 }
@@ -174,7 +175,7 @@ export async function followSubRun(
         idleTimer = setTimeout(() => stop(`no activity for ${Math.round(idleTimeoutMs / 60_000)} min, sub-coworker stopped`), idleTimeoutMs)
         idleTimer.unref?.()
     }
-    const onParentAbort = () => stop('stopped along with the calling run')
+    const onParentAbort = () => stop(SUB_RUN_STOPPED_WITH_CALLER)
     const onTaskAbort = () => stop(SUB_RUN_STOPPED_BY_USER)
     if (parentSignal?.aborted) onParentAbort()
     else parentSignal?.addEventListener('abort', onParentAbort, { once: true })

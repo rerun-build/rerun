@@ -238,11 +238,37 @@ describe('delegate_tasks', () => {
     it('starts nothing when the calling run is already stopped', async () => {
         const parent = new AbortController()
         parent.abort()
-        const { ctx } = ctxWith({ abortSignal: parent.signal })
+        const { ctx, writes } = ctxWith({ abortSignal: parent.signal })
         expect(await delegate(ctx, [{ task: 'a' }, { task: 'b' }])).toBe(
             '## Task 1 — a\n(not started: the calling run was stopped)\n\n## Task 2 — b\n(not started: the calling run was stopped)',
         )
         expect(runs.started).toHaveLength(0)
+        expect(writes.at(-1)?.data.tasks.map(t => t.status)).toEqual(['stopped', 'stopped'])
+    })
+
+    it('shows every task as stopped when the calling run is stopped, started or not', async () => {
+        const gate = new Promise<void>(() => {})
+        runs.script = () => ({ text: 'ok', gate })
+        const parent = new AbortController()
+        const { ctx, writes } = ctxWith({ abortSignal: parent.signal })
+        const pending = delegate(ctx, Array.from({ length: 15 }, (_, i) => ({ task: `task ${i}` })))
+        await vi.waitFor(() => expect(runs.started).toHaveLength(4))
+        parent.abort()
+        await pending
+        expect(runs.started).toHaveLength(4)
+        expect(writes.at(-1)?.data.tasks.map(t => t.status)).toEqual(new Array(15).fill('stopped'))
+    })
+
+    it('keeps a task that failed on its own as an error when the calling run is stopped', async () => {
+        const gate = new Promise<void>(() => {})
+        runs.script = prompt => (prompt === 'bad' ? { throws: 'model exploded' } : { text: 'ok', gate })
+        const parent = new AbortController()
+        const { ctx, writes } = ctxWith({ abortSignal: parent.signal })
+        const pending = delegate(ctx, [{ task: 'bad' }, { task: 'long' }])
+        await vi.waitFor(() => expect(writes.at(-1)?.data.tasks.map(t => t.status)).toEqual(['error', 'running']))
+        parent.abort()
+        await pending
+        expect(writes.at(-1)?.data.tasks.map(t => t.status)).toEqual(['error', 'stopped'])
     })
 
     it('falls back on the tool call signal when the run has none', async () => {
