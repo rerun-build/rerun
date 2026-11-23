@@ -165,6 +165,12 @@ describe('the Chief of Staff as a target', () => {
         await expect(resolveAgentTarget('cos-1')).resolves.toEqual(foremanTarget)
     })
 
+    it('answers even with the plan-limit mark an older hub left on its row', async () => {
+        signedIn('member')
+        row = { ...row!, disabled_at: '2026-11-23', disabled_reason: 'plan_limit' }
+        await expect(resolveAgentTarget('foreman')).resolves.toEqual(foremanTarget)
+    })
+
     it('lets a workspace admin change what it keeps, and tells a member it may not', async () => {
         signedIn('admin')
         await expect(resolveAgentTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)

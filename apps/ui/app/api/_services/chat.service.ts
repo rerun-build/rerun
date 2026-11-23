@@ -71,7 +71,9 @@ function buildTarget(row: NonNullable<Awaited<ReturnType<typeof fetchAgentRow>>>
     // Every interactive path lands here, so this one line is what stops a disabled agent from
     // being talked to. The engine side only pauses schedules and flips a config flag, and a box
     // that was asleep when that ran would otherwise still answer.
-    if (row.disabled_at) throw new Error(disabledMessage(row.disabled_reason))
+    // Only a coworker of the board takes a plan slot or comes from a template: a mark an older hub left
+    // on the Chief of Staff's row never switches it off.
+    if (row.disabled_at && agentKindPolicy(row.kind).onBoard) throw new Error(disabledMessage(row.disabled_reason))
     if (!row.engine_agent_id) throw new Error('Coworker not configured or not found')
 
     if (!engine) throw new NoEngineError()
