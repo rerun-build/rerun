@@ -45,8 +45,11 @@ take() {
 
 posted() {
     want=''
+    close=''
+    case "$1 $2" in "issue close"|"pr close") close=1 ;; esac
     for a in "$@"; do
         if [ -n "$want" ]; then take "$want" "$a"; want=''; continue; fi
+        if [ -z "$close" ]; then case "$a" in --comment|-c|--comment=*|-c?*) continue ;; esac; fi
         case "$MODE $a" in
             "cli --body"|"cli -b"|"cli --title"|"cli -t"|"cli --comment"|"cli -c") want=text ;;
             "cli --body-file"|"cli -F"|"api --input") want=file ;;
@@ -59,6 +62,7 @@ posted() {
             "cli -b"?*) take text "${a#-b}" ;;
             "cli -t"?*) take text "${a#-t}" ;;
             "cli -c"?*) take text "${a#-c}" ;;
+            "cli -F"?*) take file "${a#-F}" ;;
         esac
     done
 }
