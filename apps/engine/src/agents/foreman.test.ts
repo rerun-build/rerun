@@ -295,19 +295,49 @@ describe('foreman routes', () => {
         expect((await getAgent(FOREMAN_AGENT_ID)).config.model).toBeNull()
     })
 
-    it('keeps the servers connected to it and its response length across a reboot', async () => {
+    it('keeps its servers, response length and tool switches across a reboot, not who it is', async () => {
         const servers = [{ name: 'linear', url: 'https://mcp.linear.app/mcp' }]
-        await writeAgentConfig(FOREMAN_AGENT_ID, { ...(await getAgent(FOREMAN_AGENT_ID)).config, mcpServers: servers as never, verbosity: 'concise', description: 'hijacked', tools: { ...(await getAgent(FOREMAN_AGENT_ID)).config.tools, trigger: false } })
+        const before = (await getAgent(FOREMAN_AGENT_ID)).config
+        await writeAgentConfig(FOREMAN_AGENT_ID, {
+            ...before,
+            mcpServers: servers as never,
+            verbosity: 'concise',
+            description: 'hijacked',
+            displayName: 'Boss',
+            enabled: false,
+            tools: { ...before.tools, trigger: false, hub: false, askUser: false },
+            selfImprovement: { ...before.selfImprovement, allowSoulEdit: true },
+        })
 
         await ensureForeman()
         const { config } = await getAgent(FOREMAN_AGENT_ID)
         expect(config.mcpServers.map(server => server.name)).toEqual(['linear'])
         expect(config.verbosity).toBe('concise')
+        expect(config.tools.trigger).toBe(false)
+        expect(config.tools.hub).toBe(true)
+        expect(config.tools.askUser).toBe(true)
         expect(config.description).not.toBe('hijacked')
-        expect(config.tools.trigger).toBe(true)
+        expect(config.displayName).toBe('Chief of Staff')
+        expect(config.enabled).toBe(true)
+        expect(config.selfImprovement.allowSoulEdit).toBe(false)
 
-        await writeAgentConfig(FOREMAN_AGENT_ID, { ...config, mcpServers: [], verbosity: 'normal' })
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...config, mcpServers: [], verbosity: 'normal', tools: { ...config.tools, trigger: true } })
         await ensureForeman()
+    })
+
+    it('takes a tool switch and its response length over HTTP, and keeps them across a reboot', async () => {
+        expect((await request('PATCH', '/agents/foreman', { verbosity: 'detailed', tools: { browser: false } })).status).toBe(200)
+        await ensureForeman()
+        const { config } = await getAgent(FOREMAN_AGENT_ID)
+        expect(config.verbosity).toBe('detailed')
+        expect(config.tools.browser).toBe(false)
+        expect((await request('PATCH', '/agents/foreman', { verbosity: 'normal', tools: { browser: true } })).status).toBe(200)
+    })
+
+    it('opens its activity, its tools and a conversation like a coworker', async () => {
+        expect((await request('GET', '/agents/foreman/tools')).status).toBe(200)
+        expect((await request('GET', '/agents/foreman/usage')).status).toBe(200)
+        expect((await request('GET', '/agents/foreman/stats?dataset=runs&metric=count&groupBy=status&range=7d')).status).toBe(200)
     })
 
     it('leaves the other agents alone', async () => {

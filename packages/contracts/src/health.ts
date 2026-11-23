@@ -70,6 +70,10 @@ export const ENGINE_CAPABILITY_VAULT_INSTANCE = 'vault.instance'
 // may hand the values to the Vault rather than to its own variables.
 export const ENGINE_CAPABILITY_FOREMAN_VAULT = 'foreman.vault'
 
+// The Chief of Staff answers every route of a coworker except what its kind does not do
+// (`AGENT_KIND_POLICY.foreman`): its activity, its tool switches and its response length included.
+export const ENGINE_CAPABILITY_FOREMAN_AGENT = 'foreman.agent'
+
 // The engine accepts linked computers on `/remote/ws` and answers `/remote/computers`.
 export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 

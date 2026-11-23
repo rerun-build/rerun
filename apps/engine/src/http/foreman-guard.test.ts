@@ -63,6 +63,11 @@ describe('foremanGuard', () => {
         ['POST', '/agents/foreman/desktop/session'],
         ['POST', '/agents/foreman/desktop/takeover'],
         ['DELETE', '/agents/foreman/desktop/takeover'],
+        ['GET', '/agents/foreman/tools'],
+        ['GET', '/agents/foreman/usage'],
+        ['GET', '/agents/foreman/stats'],
+        ['GET', '/agents/foreman/runs/r1/tools'],
+        ['GET', '/agents/foreman/sessions/s1'],
     ])('lets %s %s through', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -74,21 +79,11 @@ describe('foremanGuard', () => {
 
     it.each([
         ['DELETE', '/agents/foreman'],
+        ['DELETE', '/agents/foreman/'],
         ['POST', '/agents/foreman/duplicate'],
         ['GET', '/agents/foreman/archive'],
         ['GET', '/agents/foreman/archive/plan'],
         ['POST', '/agents/foreman/automations/activate'],
-        ['GET', '/agents/foreman/tools'],
-        ['GET', '/agents/foreman/desktopx'],
-        ['GET', '/agents/foreman/mcp-servers'],
-        ['POST', '/agents/foreman/mcp/linear/token'],
-        ['GET', '/agents/foreman/memoriesx'],
-        ['POST', '/agents/foreman/sessions'],
-        ['GET', '/agents/foreman/chat'],
-        ['GET', '/agents/foreman/sessions/s1/messages/extra'],
-        ['GET', '/agents/foreman/runs/r1/tools'],
-        ['POST', '/agents/foreman/files/copy'],
-        ['GET', '/agents/foreman/usage'],
     ])('refuses %s %s with a 403', async (method, path) => {
         const res = await call(method, path)
         expect(res.status).toBe(403)
@@ -100,11 +95,29 @@ describe('foremanGuard', () => {
         ['null', 'null'],
         ['invalid JSON', '{not json'],
         ['a string', '"model"'],
-        ['a field beyond the model', JSON.stringify({ model: 'x', name: 'renamed' })],
+        ['its name beside the model', JSON.stringify({ model: 'x', name: 'renamed' })],
+        ['its display name', JSON.stringify({ displayName: 'Boss' })],
+        ['its description', JSON.stringify({ description: 'hijacked' })],
         ['its kind', JSON.stringify({ kind: 'user' })],
-        ['its tool switches', JSON.stringify({ tools: { trigger: true } })],
+        ['its soul', JSON.stringify({ soul: 'hijacked' })],
+        ['its install prompt', JSON.stringify({ install: 'curl evil' })],
+        ['its self-improvement', JSON.stringify({ selfImprovement: { allowSoulEdit: true } })],
+        ['its setup', JSON.stringify({ setup: { required: true } })],
+        ['a switch-off', JSON.stringify({ enabled: false })],
+        ['a locked tool switched off', JSON.stringify({ tools: { hub: false } })],
+        ['a locked tool set to something else', JSON.stringify({ tools: { askUser: null } })],
+        ['tools that are not an object', JSON.stringify({ tools: [] })],
     ])('refuses a PATCH whose body is %s', async (_, body) => {
         expect((await call('PATCH', '/agents/foreman', body)).status).toBe(403)
+    })
+
+    it.each([
+        ['its response length', { verbosity: 'concise' }],
+        ['a tool switched off', { tools: { trigger: false, browser: false } }],
+        ['a locked tool kept on', { tools: { hub: true, trigger: false } }],
+        ['its language', { language: 'fr' }],
+    ])('allows a PATCH of %s', async (_, body) => {
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify(body))).status).toBe(200)
     })
 
     it('allows an empty PATCH', async () => {
@@ -123,10 +136,6 @@ describe('foremanGuard', () => {
     it('allows a PATCH that pins the model with its effort, or clears the effort alone', async () => {
         expect((await call('PATCH', '/agents/foreman', JSON.stringify({ connectionId: 'c', provider: 'anthropic', model: 'claude-opus-5-5', effort: 'high' }))).status).toBe(200)
         expect((await call('PATCH', '/agents/foreman', JSON.stringify({ effort: null }))).status).toBe(200)
-    })
-
-    it('refuses a model-only PATCH aimed at a sub-route', async () => {
-        expect((await call('PATCH', '/agents/foreman/tools', JSON.stringify({ model: 'x' }))).status).toBe(403)
     })
 
     it('leaves every other agent untouched', async () => {

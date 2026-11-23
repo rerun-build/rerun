@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { agentKindOfEngineId, agentKindPolicy } from '@rerun/contracts'
 import { rm } from 'node:fs/promises'
 import { prepareDataDir } from '../../datadir/ladder.js'
 import { createAgent } from '../../agents/factory.js'
@@ -44,7 +44,7 @@ export async function agentCommand(args: string[]): Promise<void> {
     if (sub === 'delete') {
         const id = args[1]
         if (!id || !agentExists(id)) throw new Error('Usage: rerun agent delete <id>')
-        if (id === FOREMAN_AGENT_ID) throw new Error('The foreman is managed by the engine and cannot be deleted')
+        if (!agentKindPolicy(agentKindOfEngineId(id)).deletable) throw new Error('The foreman is managed by the engine and cannot be deleted')
         unloadAgent(id)
         await deleteAgentIndex(id)
         await rm(agentDir(id), { recursive: true, force: true })

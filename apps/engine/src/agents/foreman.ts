@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, TOOL_KEYS, type AgentConfig } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, TOOL_KEYS, agentKindPolicy, type AgentConfig } from '@rerun/contracts'
 import { configPath, soulPath, workspaceDir } from '../config/paths.js'
 import { writeAgentConfig } from './config-write.js'
 import { agentConfigSchema } from './types.js'
@@ -12,33 +12,41 @@ const FOREMAN_SOUL = `# Chief of Staff
 You are the Chief of Staff of this Rerun workspace: the assistant that sets up and runs the user's team of coworkers from outside the board. Answer in the user's language, lead with the result, and keep it short.
 `
 
-// The orchestrator holds every tool a coworker holds, switched on as a coworker's are by default, on
-// top of the account tools the hub hands it. Where one of them works differently for it, the
-// difference is written where the tool is built (the brain, the hub catalog).
+// Who it is and what is installed on the box stay with the code: these fields are rewritten at every
+// boot and refused over HTTP. Everything else of its configuration is set like a coworker's.
+export const FOREMAN_OWNED_FIELDS = ['name', 'kind', 'ephemeral', 'enabled', 'displayName', 'description', 'selfImprovement', 'setup'] as const satisfies ReadonlyArray<keyof AgentConfig>
+
+type OwnedField = (typeof FOREMAN_OWNED_FIELDS)[number]
+type KeptSettings = Omit<AgentConfig, OwnedField>
+
+// It holds every tool a coworker holds, on by default, on top of the account tools the hub hands it.
+// A person may switch one off, except the ones its kind locks. Where a tool works differently for
+// it, the difference is written where the tool is built (the brain, the hub catalog).
+function foremanTools(kept: Partial<AgentConfig['tools']> | undefined): AgentConfig['tools'] {
+    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, kept?.[key] ?? true])) as AgentConfig['tools']
+    for (const locked of agentKindPolicy('foreman').lockedTools) tools[locked] = true
+    return tools
+}
+
 function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
-    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, true]))
     return agentConfigSchema.parse({
         ...kept,
         name: FOREMAN_AGENT_ID,
         kind: 'foreman',
         displayName: FOREMAN_DISPLAY_NAME,
-        tools,
-        // It learns like a coworker (skill proposals, memories kept on its own), but who it is and
-        // what is installed on the box stay with the code.
+        tools: foremanTools(kept.tools),
+        // It learns like a coworker (skill proposals, memories kept on its own), but cannot rewrite
+        // its soul nor install on the box.
         selfImprovement: { enabled: true, allowToolInstall: false, allowSoulEdit: false, autoMemory: true },
         setup: { required: false },
     })
 }
 
-type KeptSettings = Pick<AgentConfig, 'connectionId' | 'provider' | 'model' | 'effort' | 'mcpServers' | 'verbosity' | 'proactive' | 'paidDataAlwaysAllow'>
-
-// What a person, or the foreman itself, set on it: the model it runs on, the servers connected to
-// it, how long its answers are, whether it checks in on its own and whether paid data still asks
-// before spending. Everything else is the code's, so it is all a reboot keeps.
 async function keptSettings(): Promise<Partial<KeptSettings>> {
     try {
-        const { connectionId, provider, model, effort, mcpServers, verbosity, proactive, paidDataAlwaysAllow } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
-        return { connectionId, provider, model, effort, mcpServers, verbosity, proactive, paidDataAlwaysAllow }
+        const config: Partial<AgentConfig> = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
+        for (const field of FOREMAN_OWNED_FIELDS) delete config[field]
+        return config
     } catch {
         return {}
     }

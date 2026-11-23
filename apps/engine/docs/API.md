@@ -32,22 +32,19 @@ start. The desktop WebSocket is the one exception: it takes a signed ticket (see
 ### The Chief of Staff
 
 `foreman` is the agent id of the Chief of Staff, the built-in agent whose configuration the engine
-rewrites from code at every boot. It is not in `GET /agents`. Under `/agents/foreman` these routes
-are open:
+rewrites from code at every boot. It is not in `GET /agents`. Under `/agents/foreman` it answers
+every route a coworker answers, plus `GET /checkins` (its check-ins and their settings) and
+`POST /checkins/run` (a check-in now, see [Check-ins](#check-ins)), except what its kind does not do
+(`AGENT_KIND_POLICY.foreman` in `@rerun/contracts`):
 
-- `GET` itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`,
-  `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
-  `/runs/:rid/tasks/:taskId/cancel`;
-- a `PATCH` that only carries `connectionId`, `provider`, `model`, `effort`, `proactive` and `paidDataAlwaysAllow`;
-- `GET /checkins`, its check-ins and their settings, and `POST /checkins/run`, a check-in now (see
-  [Check-ins](#check-ins));
-- what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
-  `/skill-proposals`, `/schedules`, `/triggers`, `/data` and `/desktop`, `PATCH /mcp-servers`,
-  `GET /mcp-servers/status`, `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
+- `DELETE` itself, `POST /duplicate`, `GET /archive` and `/archive/plan`, `POST /automations/activate`;
+- a `PATCH` that carries a field the engine owns (`name`, `kind`, `ephemeral`, `enabled`,
+  `displayName`, `description`, `selfImprovement`, `setup`), a `soul` or an `install`, or that
+  switches off one of the tools its kind locks (`hub`, `cards`, `askUser`, `requestApproval`,
+  `requestSecret`, `suggestService`, `team`, `callAgent`, `notify`, `quickReplies`).
 
-Anything else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`:
-deleting, duplicating or archiving it, changing its name, soul or tool switches, and its tools
-route.
+Those answer `403 { "error": "The foreman is managed by the engine and cannot be changed" }`. A box
+that answers this way announces `foreman.agent` in `GET /health`.
 
 ---
 
@@ -65,7 +62,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -81,7 +78,8 @@ version the folder is at against the one this build takes it to.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
-  Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), and `desktop`
+  Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
+  Staff answers every coworker route but what its kind does not do, see above), and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,
