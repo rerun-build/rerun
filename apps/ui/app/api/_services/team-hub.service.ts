@@ -1,5 +1,7 @@
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { getAgent } from '@/lib/engine/client'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { getAgentChatTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
 
@@ -29,10 +31,18 @@ function withoutTriggerUrls(result: unknown): unknown {
     return { triggers: triggers.map(({ url: _url, ...trigger }) => trigger) }
 }
 
+// A coworker knows itself by its engine id, the one in the path of its own workspace: the account
+// tools read a coworker by its row.
+async function withAgentRowId(workspaceId: number, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+    if (typeof args.agentId !== 'string') return args
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'agents', ['id'] as const, { engine_agent_id: args.agentId, workspace_id: workspaceId })
+    return data ? { ...args, agentId: data.id } : args
+}
+
 // `actor` is the workspace for a coworker of the box, and the member a foreman's turn speaks for, who
 // reads only the Boxes they see.
 export async function dispatchTeamHubTool(callerAgentId: string, workspaceId: number, name: TeamTool, args: Record<string, unknown>, actor: Actor = workspaceActor(workspaceId)): Promise<unknown> {
     await assertTeamSwitchedOn(callerAgentId, actor)
-    const result = await dispatchAccountTool(actor, TEAM_READS[name], args)
+    const result = await dispatchAccountTool(actor, TEAM_READS[name], await withAgentRowId(workspaceId, args))
     return name === 'team_list_triggers' ? withoutTriggerUrls(result) : result
 }

@@ -3,12 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
 import { getAgent } from '@/lib/engine/client'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 import { dispatchTeamHubTool, isTeamHubTool } from './team-hub.service'
 
 vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
 vi.mock('@/app/api/_services/mcp-account.service', () => ({ dispatchAccountTool: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ getAgent: vi.fn() }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn() }))
 
 const WORKSPACE_ID = 7
 
@@ -21,6 +24,7 @@ describe('dispatchTeamHubTool', () => {
         vi.clearAllMocks()
         vi.mocked(getAgentChatTarget).mockResolvedValue({ conn: { baseUrl: 'https://box', apiKey: 'k' }, engineAgentId: 'engine-auditor' } as never)
         vi.mocked(dispatchAccountTool).mockResolvedValue({ ok: true })
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: null } as never)
         callerWithTeam(true)
     })
 
@@ -68,5 +72,19 @@ describe('dispatchTeamHubTool', () => {
         await dispatchTeamHubTool('foreman', WORKSPACE_ID, 'team_list_runs', { agentId: 'a1' }, member)
         expect(getAgentChatTarget).toHaveBeenCalledWith('foreman', 'use', member)
         expect(dispatchAccountTool).toHaveBeenCalledWith(member, 'list_runs', { agentId: 'a1' })
+    })
+
+    it.each(['team_status', 'team_list_schedules', 'team_list_triggers', 'team_list_runs', 'team_get_run'] as const)('finds the coworker %s names by its engine id', async name => {
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { id: 'row-1' } } as never)
+        vi.mocked(dispatchAccountTool).mockResolvedValue({ triggers: [] })
+        await dispatchTeamHubTool('auditor', WORKSPACE_ID, name, { agentId: 'engine-1', runId: 'r1' })
+        expect(selectMaybeSingle).toHaveBeenCalledWith(undefined, 'agents', ['id'], { engine_agent_id: 'engine-1', workspace_id: WORKSPACE_ID })
+        expect(dispatchAccountTool).toHaveBeenCalledWith(expect.anything(), expect.anything(), { agentId: 'row-1', runId: 'r1' })
+    })
+
+    it('leaves the id of a coworker outside the workspace to the access check', async () => {
+        vi.mocked(dispatchAccountTool).mockRejectedValue(new Error('Coworker not found'))
+        await expect(dispatchTeamHubTool('auditor', WORKSPACE_ID, 'team_list_runs', { agentId: 'engine-elsewhere' })).rejects.toThrow('Coworker not found')
+        expect(dispatchAccountTool).toHaveBeenCalledWith(expect.anything(), 'list_runs', { agentId: 'engine-elsewhere' })
     })
 })
