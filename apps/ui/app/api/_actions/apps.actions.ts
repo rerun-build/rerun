@@ -2,7 +2,6 @@
 
 import { z } from 'zod'
 import { paidAppFlag } from '@rerun/cloud/apps.server'
-import { requireLightSessionActor } from '@/app/api/_auth/access'
 import { requireAdminContext } from '@/app/api/_auth/ownership'
 import {
     AppActionError,
@@ -14,17 +13,17 @@ import {
     connectLinkedin,
     connectWhatsapp,
     disconnectConnection,
-    getAgentAppBinding,
+    detachAgentFromConnection,
+    getAgentAppAccounts,
     getAppsOverview,
     resendAppCode,
     setAgentWakeEvents,
     submitAppCheckpoint,
     type AddSlotOutcome,
-    type AgentAppBinding,
+    type AgentAppAccount,
     type AppsOverview,
     type ConnectOutcome,
 } from '@/app/api/_services/apps.service'
-import { markAppAuthorized } from '@/app/api/_services/services.service'
 import { appInfo } from '@/lib/apps/catalog'
 import type { LinkupLinkCode } from '@/lib/apps/linkup/client'
 import { APP_SLUGS, type AppSlug } from '@/lib/apps/types'
@@ -119,24 +118,28 @@ export async function disconnectAppConnectionAction(slug: AppSlug, connectionId:
     })
 }
 
-export async function getAgentAppBindingAction(slug: AppSlug, agentId: string): Promise<Result<AgentAppBinding>> {
-    return run(slug, 'loadCoworkerAccountFailed', () => getAgentAppBinding(slug, id.parse(agentId)))
+export async function getAgentAppAccountsAction(slug: AppSlug, agentId: string): Promise<Result<AgentAppAccount[]>> {
+    return run(slug, 'loadCoworkerAccountFailed', () => getAgentAppAccounts(slug, id.parse(agentId)))
 }
 
-// Picking the account is the coworker's whole sign-in for a paid app: its service goes active here.
+// Picking an account is the coworker's whole sign-in for a paid app: its service goes active here.
 export async function attachAgentToConnectionAction(slug: AppSlug, agentId: string, connectionId: string): Promise<Result<null>> {
     return run(slug, 'attachAccountFailed', async () => {
-        const actor = await requireLightSessionActor()
         await attachAgentToConnection(slug, id.parse(agentId), id.parse(connectionId))
-        const binding = await getAgentAppBinding(slug, agentId)
-        await markAppAuthorized(agentId, appInfo(slug).serviceSlug, binding?.label ?? undefined, actor)
         return null
     })
 }
 
-export async function setAgentWakeEventsAction(slug: AppSlug, agentId: string, events: string[]): Promise<Result<null>> {
+export async function detachAgentFromConnectionAction(slug: AppSlug, agentId: string, connectionId: string): Promise<Result<null>> {
+    return run(slug, 'detachAccountFailed', async () => {
+        await detachAgentFromConnection(slug, id.parse(agentId), id.parse(connectionId))
+        return null
+    })
+}
+
+export async function setAgentWakeEventsAction(slug: AppSlug, agentId: string, connectionId: string, events: string[]): Promise<Result<null>> {
     return run(slug, 'saveEventsFailed', async () => {
-        await setAgentWakeEvents(slug, id.parse(agentId), z.array(z.string()).max(10).parse(events))
+        await setAgentWakeEvents(slug, id.parse(agentId), id.parse(connectionId), z.array(z.string()).max(10).parse(events))
         return null
     })
 }

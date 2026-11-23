@@ -7,7 +7,7 @@ import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/own
 import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
-import { dropWakeTrigger } from '@/lib/apps/bindings'
+import { dropWakeTrigger, syncAppConnector, unbindAccount, unbindConnection } from '@/lib/apps/bindings'
 import { claimQuota, updateConnection, workspaceScope } from '@/lib/apps/connections'
 import { isWakeEventOf } from '@/lib/apps/catalog'
 import { loginLinkedin, type LinkedinCredentials } from '@/lib/apps/linkedin/connect'
@@ -486,67 +486,66 @@ export async function disconnectConnection(slug: AppSlug, connectionId: string):
     const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['provider_account_id', 'status'] as const, { id: connectionId, workspace_id: workspace.id, app_slug: slug })
     if (!connection || connection.status === 'deleted') throw new AuthorizationError('accountNotFound')
     if (connection.provider_account_id) await deleteAccount(connection.provider_account_id)
-    await removeBindingsOf(supabase, workspace.id, slug, [connectionId])
+    await unbindConnection(supabase, workspace.id, connectionId, slug)
     await updateConnection(supabase, connectionId, { status: 'deleted', pause_reason: null, paused_until: null })
 }
 
-async function removeBindingsOf(supabase: Client, workspaceId: number, slug: AppSlug, connectionIds: string[]): Promise<void> {
-    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['agent_id'] as const, { connection_id: connectionIds })
-    for (const binding of bindings ?? []) await dropWakeTrigger(supabase, workspaceId, binding.agent_id, slug)
-    const { error } = await supabase.from('app_connection_agents').delete().in('connection_id', connectionIds)
-    if (error) throw new Error(error.message)
-}
+// --- A coworker's accounts and their wake-ups ---
 
-// --- A coworker's account and its wake-ups ---
+export type AgentAppAccount = { connectionId: string; label: string | null; status: string; wakeOnEvents: string[] }
 
-export type AgentAppBinding = { connectionId: string; label: string | null; status: string; wakeOnEvents: string[] } | null
-
-export async function getAgentAppBinding(slug: AppSlug, agentId: string): Promise<AgentAppBinding> {
+export async function getAgentAppAccounts(slug: AppSlug, agentId: string): Promise<AgentAppAccount[]> {
     await assertAgentInWorkspace(agentId)
     const { workspace, supabase } = await requireWorkspaceContext()
-    const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id', 'wake_on_events'] as const, { agent_id: agentId, app_slug: slug })
-    if (!binding) return null
-    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['label', 'status', 'workspace_id'] as const, { id: binding.connection_id })
-    if (!connection || connection.workspace_id !== workspace.id) return null
-    return { connectionId: binding.connection_id, label: connection.label, status: connection.status, wakeOnEvents: binding.wake_on_events.filter(event => isWakeEventOf(slug, event)) }
+    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id', 'wake_on_events'] as const, { agent_id: agentId, app_slug: slug }, { column: 'created_at', ascending: true })
+    if (!bindings?.length) return []
+    const { data: connections } = await selectMany(supabase, 'app_connections', ['id', 'label', 'status'] as const, { id: bindings.map(binding => binding.connection_id), workspace_id: workspace.id, status: { neq: 'deleted' } })
+    return bindings.flatMap(binding => {
+        const connection = connections?.find(candidate => candidate.id === binding.connection_id)
+        return connection ? [{ connectionId: connection.id, label: connection.label, status: connection.status, wakeOnEvents: binding.wake_on_events.filter(event => isWakeEventOf(slug, event)) }] : []
+    })
 }
 
-// The actor comes in for a caller that holds an API key rather than a browser session.
+// One more account for the coworker, next to those it holds. The actor comes in for a caller that
+// holds an API key rather than a browser session.
 export async function attachAgentToConnection(slug: AppSlug, agentId: string, connectionId: string, actor?: Actor): Promise<void> {
     const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
     const supabase = createServiceRoleClient()
     const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['status'] as const, { id: connectionId, workspace_id: resolved.workspaceId, app_slug: slug })
     if (!connection || connection.status === 'deleted') throw new AuthorizationError('accountNotFound')
 
-    const { data: existing } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
-    if (existing?.connection_id === connectionId) return
-    if (existing) {
-        const { error } = await supabase.from('app_connection_agents').update<BindingUpdate>({ connection_id: connectionId, updated_at: new Date().toISOString() }).eq('agent_id', agentId).eq('app_slug', slug)
-        if (error) throw new Error(error.message)
-        return
-    }
-    const { error } = await supabase.from('app_connection_agents').insert<BindingInsert>({ agent_id: agentId, app_slug: slug, connection_id: connectionId })
+    const { error } = await supabase.from('app_connection_agents').upsert<BindingInsert>({ agent_id: agentId, app_slug: slug, connection_id: connectionId }, { onConflict: 'agent_id,connection_id', ignoreDuplicates: true })
     if (error) throw new Error(error.message)
+    await syncAppConnector(supabase, agentId, slug)
+}
+
+export async function detachAgentFromConnection(slug: AppSlug, agentId: string, connectionId: string, actor?: Actor): Promise<void> {
+    const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
+    const supabase = createServiceRoleClient()
+    await unbindAccount(supabase, resolved.workspaceId, agentId, connectionId, slug)
+    await syncAppConnector(supabase, agentId, slug)
 }
 
 // The hub creates the trigger on the engine, and only it knows its token: the webhook fires it as
 // any caller of its public URL would. Turning every event off removes the trigger altogether.
-export async function setAgentWakeEvents(slug: AppSlug, agentId: string, events: string[]): Promise<void> {
+export async function setAgentWakeEvents(slug: AppSlug, agentId: string, connectionId: string, events: string[]): Promise<void> {
     const owned = await assertAgentInWorkspace(agentId, 'manage')
     const { workspace, supabase } = await requireWorkspaceContext()
     const app = appDefinition(slug)
     const wanted = [...new Set(events.filter(event => isWakeEventOf(slug, event)))]
-    const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['trigger_slug'] as const, { agent_id: agentId, app_slug: slug })
+    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id', 'trigger_slug'] as const, { agent_id: agentId, app_slug: slug })
+    const binding = bindings?.find(candidate => candidate.connection_id === connectionId)
     if (!binding) throw new AppActionError('unknown', 'appPickAccountFirst', { provider: app.providerLabel })
 
-    if (wanted.length === 0) return dropWakeTrigger(supabase, workspace.id, agentId, slug)
+    if (wanted.length === 0) return dropWakeTrigger(supabase, workspace.id, agentId, connectionId, slug)
 
     let trigger = binding.trigger_slug ? { slug: binding.trigger_slug } : null
     let token: string | null = null
     if (!trigger) {
         if (!owned.engine_agent_id) throw new AppActionError('unknown', 'coworkerNotRunning')
         const conn = await getWorkspaceConnection(workspace.id)
-        const created = await engineCreateTrigger(conn, owned.engine_agent_id, { name: app.wakeTrigger.name, description: app.wakeTrigger.description, body: app.wakeTrigger.prompt(wanted), methods: ['POST'] })
+        const name = bindings?.some(other => other.trigger_slug) ? await accountTriggerName(supabase, app.wakeTrigger.name, connectionId) : app.wakeTrigger.name
+        const created = await engineCreateTrigger(conn, owned.engine_agent_id, { name, description: app.wakeTrigger.description, body: app.wakeTrigger.prompt(wanted), methods: ['POST'] })
         trigger = { slug: created.slug }
         token = created.token
     }
@@ -555,6 +554,13 @@ export async function setAgentWakeEvents(slug: AppSlug, agentId: string, events:
         .from('app_connection_agents')
         .update<BindingUpdate>({ wake_on_events: wanted, trigger_slug: trigger.slug, ...(token ? { trigger_token: token } : {}), updated_at: new Date().toISOString() })
         .eq('agent_id', agentId)
-        .eq('app_slug', slug)
+        .eq('connection_id', connectionId)
     if (error) throw new Error(error.message)
+}
+
+// The engine keeps one trigger per name: a second account's under the same name would be the first
+// one's, and turning either off would silence both.
+async function accountTriggerName(supabase: Client, name: string, connectionId: string): Promise<string> {
+    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['provider_member_id'] as const, { id: connectionId })
+    return `${name} (${connection?.provider_member_id ?? connectionId})`
 }

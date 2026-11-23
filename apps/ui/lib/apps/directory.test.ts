@@ -13,6 +13,12 @@ const whatsapp = { ...APP_INFO.whatsapp, tools: WHATSAPP_TOOLS, scopes: WHATSAPP
 
 const loadedNames = (app: typeof linkedin | typeof whatsapp) => listedTools(app).map(tool => tool.name)
 
+describe('the account a call names', () => {
+    it.each([linkedin, whatsapp])('is a parameter no tool of $name has for itself', app => {
+        expect(app.tools.filter(tool => 'account' in tool.inputSchema.properties).map(tool => tool.name)).toEqual([])
+    })
+})
+
 describe('the tools a paid app loads on every run', () => {
     it('keeps every LinkedIn tool coworkers already had, and the lookup its search filters need', () => {
         expect(loadedNames(linkedin)).toEqual([

@@ -1,6 +1,6 @@
 import type { AttachmentSummary } from '@/lib/apps/attachments'
 import type { AttachmentRef } from '@/lib/apps/linkup/client'
-import type { EnvelopeKind, LinkupEnvelope } from '@/lib/apps/linkup/envelope'
+import { WAKE_ACCOUNT_HINT, type EnvelopeKind, type LinkupEnvelope, type WakeAccount } from '@/lib/apps/linkup/envelope'
 import { WAKE_EVENT_LABELS, type WakeEvent } from './wake-events'
 
 // What a WhatsApp delivery means to the coworkers woken by it. Linkup documents the LinkedIn shape
@@ -36,14 +36,15 @@ export function attachmentBase(envelope: LinkupEnvelope): AttachmentRef {
 
 // What the coworker reads in its trigger payload: who wrote, from which number, and what. The
 // number is what every WhatsApp tool takes.
-export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[] = []): Record<string, unknown> {
+export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, account: WakeAccount, attachments: AttachmentSummary[] = []): Record<string, unknown> {
     const { event: body } = envelope
     const conversationId = body.conversation_id ?? body.metadata?.conversation_id ?? body.metadata?.conversation_urn ?? null
     const groupChat = body.is_group_chat ?? body.conversation?.is_group_chat ?? conversationId?.endsWith('@g.us') ?? false
     return {
         app: 'whatsapp',
         event,
-        account: accountLabel,
+        account: account.label,
+        accountId: account.id,
         at: body.timestamp ?? envelope.timestamp ?? null,
         from: { name: body.sender?.name ?? null, phoneNumber: numberOf(body.sender?.phone_number ?? body.sender?.jid) ?? (groupChat ? null : numberOf(conversationId ?? undefined)) },
         text: body.message_text ?? '',
@@ -65,5 +66,6 @@ export function wakeTriggerPrompt(events: WakeEvent[]): string {
         `Something happened on the WhatsApp number you work with: ${what}. The details are in the payload below.`,
         'Decide whether it calls for anything from you given your role and what you already know about this person. If it does, read the conversation with your WhatsApp tools before you answer, and never send the same message twice. In a group, answer only when the message is meant for the user. If it calls for nothing, stop without doing anything.',
         ATTACHMENTS_HINT,
+        WAKE_ACCOUNT_HINT,
     ].join('\n\n')
 }

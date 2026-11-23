@@ -12,7 +12,7 @@ import * as whatsappQuotas from './whatsapp/quotas'
 import { WHATSAPP_SCOPES, WHATSAPP_TOOLS } from './whatsapp/tools'
 import type { AttachmentSummary } from './attachments'
 import type { AttachmentRef } from './linkup/client'
-import type { EnvelopeKind, LinkupEnvelope } from './linkup/envelope'
+import type { EnvelopeKind, LinkupEnvelope, WakeAccount } from './linkup/envelope'
 import type { AppScope, AppTool } from './tools'
 import { APP_ADDON_KEYS, type AppSlug } from './types'
 
@@ -29,7 +29,7 @@ export type AppDefinition = AppInfo & {
     quotaNotice(action: string, counts: number[]): string | null
     quotaPace(action: string): string
     envelopeKind(envelope: LinkupEnvelope): EnvelopeKind
-    wakePayload(event: string, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[]): Record<string, unknown>
+    wakePayload(event: string, envelope: LinkupEnvelope, account: WakeAccount, attachments: AttachmentSummary[]): Record<string, unknown>
     // The ids a file of this envelope is downloaded with, besides its own.
     attachmentBase(envelope: LinkupEnvelope): AttachmentRef
     wakeTrigger: { name: string; description: string; prompt(events: string[]): string }

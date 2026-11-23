@@ -225,21 +225,21 @@ export function isPaidApp(manifest: ServiceManifest): boolean {
 }
 
 const INPUT_REFERENCE = /\$\{(?:basic:)?input\.([A-Za-z0-9_]+)(?::input\.([A-Za-z0-9_]+))?\}/g
-const SIGN_IN_KINDS = new Set<AuthMethod['kind']>(['oauth', 'managed', 'composio'])
+const ACCOUNT_KINDS = new Set<AuthMethod['kind']>(['oauth', 'managed', 'composio', 'app'])
 
 function referencedInputs(text: string): Set<string> {
     return new Set([...text.matchAll(INPUT_REFERENCE)].flatMap(([, first, second]) => (second ? [first, second] : [first])))
 }
 
-// An app with nothing to connect has no second account to add, and a paid app keeps one per coworker.
+// Every app takes several accounts on one coworker, unless it has nothing to connect.
 export function takesSeveralAccounts(manifest: ServiceManifest): boolean {
-    if (isPaidApp(manifest)) return false
-    return manifest.authMethods.some(method => SIGN_IN_KINDS.has(method.kind) || method.inputs.some(input => input.secret))
+    return manifest.authMethods.some(method => ACCOUNT_KINDS.has(method.kind) || method.inputs.some(input => input.secret))
 }
 
-// Whether each account of the app is an instance of its own, with its own servers and variables.
+// Whether each account of the app is an instance of its own, with its own servers and variables. The
+// accounts of a paid app share one connector, and each call names the one it acts with.
 export function usesInstances(manifest: ServiceManifest): boolean {
-    return takesSeveralAccounts(manifest)
+    return !isPaidApp(manifest) && takesSeveralAccounts(manifest)
 }
 
 // Whether a skill speaks of one account: it reads a variable the account sets, or quotes a value of

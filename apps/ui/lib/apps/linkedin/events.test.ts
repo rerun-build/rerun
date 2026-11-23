@@ -31,10 +31,11 @@ describe('envelopeKind', () => {
 
 describe('wakePayload', () => {
     it('hands the coworker the message in plain words', () => {
-        expect(wakePayload('message_received', parseEnvelope(MESSAGE)!, 'Jane Doe')).toEqual({
+        expect(wakePayload('message_received', parseEnvelope(MESSAGE)!, { label: 'Jane Doe', id: 'jane-doe' })).toEqual({
             app: 'linkedin',
             event: 'message_received',
             account: 'Jane Doe',
+            accountId: 'jane-doe',
             at: '2026-04-28T10:07:45.525693',
             inbox: 'classic',
             from: { name: 'John Doe', profileUrl: 'https://www.linkedin.com/in/ACoAAEMT' },
@@ -53,7 +54,7 @@ describe('attachments', () => {
 
     it('hands the coworker the files of a message', () => {
         const pdf: AttachmentSummary = { type: 'file', name: 'proposal.pdf', mimeType: 'application/pdf', byteSize: 184_320, durationMs: null, downloadUrl: '/v2/messages/attachment?conversation_id=c&asset_urn=a', url: null, expiresAt: null }
-        const payload = wakePayload('message_received', { account_id: 'a', event: { type: 'message', message_text: 'Voici le devis' } }, null, [pdf])
+        const payload = wakePayload('message_received', { account_id: 'a', event: { type: 'message', message_text: 'Voici le devis' } }, { label: null, id: null }, [pdf])
         expect(payload.attachments).toEqual([pdf])
     })
 })

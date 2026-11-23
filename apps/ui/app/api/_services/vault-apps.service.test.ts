@@ -3,18 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { paidAppFlag, unbindAgent } from '@rerun/cloud/apps.server'
 import type { Actor } from '@/app/api/_auth/access'
 import { assertAgentAccess, visibleSpaceIds } from '@/app/api/_auth/access'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { attachAgentToConnection } from './apps.service'
-import { installService, markAppAuthorized, uninstallService } from './services.service'
+import { selectMany } from '@/supabase/supabase-helpers'
+import { attachAgentToConnection, detachAgentFromConnection } from './apps.service'
+import { installService, uninstallService } from './services.service'
 import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts } from './vault-apps.service'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@rerun/cloud/apps.server', () => ({ paidAppFlag: vi.fn(), unbindAgent: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn(() => ({})) }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ assertAgentAccess: vi.fn(), requireLightSessionActor: vi.fn(), visibleSpaceIds: vi.fn() }))
-vi.mock('./apps.service', () => ({ attachAgentToConnection: vi.fn() }))
-vi.mock('./services.service', () => ({ installService: vi.fn(), markAppAuthorized: vi.fn(), uninstallService: vi.fn() }))
+vi.mock('./apps.service', () => ({ attachAgentToConnection: vi.fn(), detachAgentFromConnection: vi.fn() }))
+vi.mock('./services.service', () => ({ installService: vi.fn(), uninstallService: vi.fn() }))
 
 const actor: Actor = { kind: 'user', userId: 'u-1', workspaceId: 7, role: 'member', boxScope: 'all' }
 
@@ -60,12 +60,11 @@ describe('vaultPaidAccounts', () => {
 })
 
 describe('attachVaultPaidAccount', () => {
-    it('installs the connector, binds the account and marks the connector signed in', async () => {
+    it('installs the connector and adds the account', async () => {
         await attachVaultPaidAccount('linkedin', 'conn-a', 'bob', actor)
         expect(assertAgentAccess).toHaveBeenCalledWith('bob', 'manage', actor)
         expect(installService).toHaveBeenCalledWith('bob', 'linkedin-pro', {}, undefined, actor)
         expect(attachAgentToConnection).toHaveBeenCalledWith('linkedin', 'bob', 'conn-a', actor)
-        expect(markAppAuthorized).toHaveBeenCalledWith('bob', 'linkedin-pro', 'Ada', actor)
     })
 
     it('stops before anything when the caller does not manage the coworker', async () => {
@@ -77,17 +76,29 @@ describe('attachVaultPaidAccount', () => {
 })
 
 describe('detachVaultPaidAccount', () => {
-    it('removes the connector of a coworker bound to this account', async () => {
-        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { connection_id: 'conn-a' }, error: null } as never)
+    const holds = (...ids: string[]) => vi.mocked(selectMany).mockResolvedValue({ data: ids.map(connection_id => ({ connection_id })), error: null } as never)
+
+    it('takes off this account only when the coworker holds others', async () => {
+        holds('conn-a', 'conn-b')
+        await detachVaultPaidAccount('linkedin', 'conn-a', 'alice', actor)
+        expect(detachAgentFromConnection).toHaveBeenCalledWith('linkedin', 'alice', 'conn-a', actor)
+        expect(uninstallService).not.toHaveBeenCalled()
+        expect(unbindAgent).not.toHaveBeenCalled()
+    })
+
+    it('removes the connector with the last account', async () => {
+        holds('conn-a')
         await detachVaultPaidAccount('linkedin', 'conn-a', 'alice', actor)
         expect(uninstallService).toHaveBeenCalledWith('alice', 'linkedin-pro', actor)
         expect(unbindAgent).toHaveBeenCalledWith(expect.anything(), 7, 'alice', 'linkedin')
+        expect(detachAgentFromConnection).not.toHaveBeenCalled()
     })
 
-    it('leaves a coworker that moved to another account of the app alone', async () => {
-        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { connection_id: 'conn-b' }, error: null } as never)
+    it('leaves a coworker that does not hold this account alone', async () => {
+        holds('conn-b')
         await detachVaultPaidAccount('linkedin', 'conn-a', 'alice', actor)
         expect(uninstallService).not.toHaveBeenCalled()
         expect(unbindAgent).not.toHaveBeenCalled()
+        expect(detachAgentFromConnection).not.toHaveBeenCalled()
     })
 })

@@ -6,9 +6,9 @@ import { assertAgentAccess, requireLightSessionActor, visibleSpaceIds, type Acto
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_SLUGS, SLOT_HOLDING_STATUSES, type AppConnectionStatus, type AppSlug } from '@/lib/apps/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { attachAgentToConnection } from './apps.service'
-import { installService, markAppAuthorized, uninstallService } from './services.service'
+import { selectMany } from '@/supabase/supabase-helpers'
+import { attachAgentToConnection, detachAgentFromConnection } from './apps.service'
+import { installService, uninstallService } from './services.service'
 
 // The accounts of the paid apps (LinkedIn Pro, WhatsApp Pro), as the Vault lists them. They already
 // belong to the workspace, in Supabase, with their slots and their bill: the Vault only shows them and
@@ -47,24 +47,22 @@ export async function vaultPaidAccounts(actor?: Actor): Promise<VaultPaidAccount
     })
 }
 
-// What picking the account in the coworker's Apps tab does: the app's connector on the coworker if it
-// has none yet, the binding, and the connector active.
+// What ticking the account in the coworker's Apps tab does: the app's connector on the coworker if it
+// has none yet, and the account next to those it already holds.
 export async function attachVaultPaidAccount(slug: AppSlug, connectionId: string, agentId: string, actor?: Actor): Promise<void> {
     const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
-    const { serviceSlug } = appInfo(slug)
-    await installService(agentId, serviceSlug, {}, undefined, resolved)
+    await installService(agentId, appInfo(slug).serviceSlug, {}, undefined, resolved)
     await attachAgentToConnection(slug, agentId, connectionId, resolved)
-    const label = (await vaultPaidAccounts(resolved)).find(account => account.connectionId === connectionId)?.label ?? undefined
-    await markAppAuthorized(agentId, serviceSlug, label, resolved)
 }
 
-// The coworker stops acting with the account: its connector goes, which unbinds it. The account stays.
-// A coworker already moved to another account of the app keeps it.
+// The coworker stops acting with the account, which stays connected. Its other accounts of the app
+// keep their wake-ups, and the connector only goes with the last one.
 export async function detachVaultPaidAccount(slug: AppSlug, connectionId: string, agentId: string, actor?: Actor): Promise<void> {
     const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
     const supabase = createServiceRoleClient()
-    const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
-    if (binding?.connection_id !== connectionId) return
+    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
+    if (!bindings?.some(binding => binding.connection_id === connectionId)) return
+    if (bindings.length > 1) return detachAgentFromConnection(slug, agentId, connectionId, resolved)
     await uninstallService(agentId, appInfo(slug).serviceSlug, resolved)
     // A binding whose connector was already gone outlives the uninstall: drop it here.
     await unbindAgent(supabase, resolved.workspaceId, agentId, slug)

@@ -7,9 +7,12 @@
         "actsAs": "Kullanılan hesap",
         "accountName": "{provider} hesabı",
         "selected": "Bu coworker bu hesapla işlem yapar",
+        "lastAccount": "Bu coworker'ın son hesabını kaldırmak için {app} uygulamasını kaldırın",
         "appAccount": "{app} hesabı",
         "needsAttention": "{app} tarafında ilgilenilmesi gerekiyor",
         "wakeWhen": "Bu coworker'ı şu durumda uyandır",
+        "wakeWhenAccount": "{account} için bu coworker'ı şu durumda uyandır",
+        "done": "Bitti",
         "timing": {
             "rightAway": "Hemen",
             "everyFewHours": "Birkaç saatte bir kontrol edilir"

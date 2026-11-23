@@ -1,6 +1,6 @@
 import { logger, queue, schedules, task } from '@trigger.dev/sdk/v3'
 import { updateConnection } from '@/lib/apps/connections'
-import { unbindAgent } from '@/lib/apps/bindings'
+import { unbindConnection } from '@/lib/apps/bindings'
 import { deleteAccount, listAccounts } from '@/lib/apps/linkup/client'
 import { linkupNamespace } from '@/lib/apps/linkup/namespace'
 import { LINKUP_ACCOUNT_MONTHLY_USD } from '@rerun/cloud/supplier-costs'
@@ -56,8 +56,7 @@ async function reconcile({ dryRun = false }: ReconcilePayload) {
                 // An unpaid account is gone for good: it leaves its coworkers, who would otherwise
                 // keep a service pointing at nothing.
                 if (verdict.reason === 'unpaid_pause') {
-                    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['agent_id'] as const, { connection_id: row.id })
-                    if (isAppSlug(row.app_slug)) for (const binding of bindings ?? []) await unbindAgent(supabase, row.workspace_id, binding.agent_id, row.app_slug)
+                    if (isAppSlug(row.app_slug)) await unbindConnection(supabase, row.workspace_id, row.id, row.app_slug)
                     await updateConnection(supabase, row.id, { status: 'deleted', pause_reason: 'unpaid_pause' })
                 }
                 // An abandoned reconnect goes back to waiting for one; a first connection never was.

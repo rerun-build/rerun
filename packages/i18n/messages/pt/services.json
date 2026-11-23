@@ -7,9 +7,12 @@
         "actsAs": "Age como",
         "accountName": "Conta {provider}",
         "selected": "Este coworker age como esta conta",
+        "lastAccount": "Desinstale {app} para remover a última conta deste coworker",
         "appAccount": "Conta {app}",
         "needsAttention": "Requer atenção no {app}",
         "wakeWhen": "Acordar este coworker quando",
+        "wakeWhenAccount": "Acordar este coworker por {account} quando",
+        "done": "Concluído",
         "timing": {
             "rightAway": "Na hora",
             "everyFewHours": "Verificado a cada poucas horas"

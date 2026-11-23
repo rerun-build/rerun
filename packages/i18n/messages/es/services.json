@@ -7,9 +7,12 @@
         "actsAs": "Actúa como",
         "accountName": "Cuenta de {provider}",
         "selected": "Este coworker actúa con esta cuenta",
+        "lastAccount": "Desinstala {app} para quitar la última cuenta de este coworker",
         "appAccount": "Cuenta de {app}",
         "needsAttention": "Requiere atención en {app}",
         "wakeWhen": "Activar este coworker cuando",
+        "wakeWhenAccount": "Activar este coworker desde {account} cuando",
+        "done": "Listo",
         "timing": {
             "rightAway": "Al instante",
             "everyFewHours": "Se revisa cada pocas horas"

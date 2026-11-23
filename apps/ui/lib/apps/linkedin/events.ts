@@ -1,6 +1,6 @@
 import type { AttachmentSummary } from '@/lib/apps/attachments'
 import type { AttachmentRef } from '@/lib/apps/linkup/client'
-import type { EnvelopeKind, LinkupEnvelope, LinkupPerson } from '@/lib/apps/linkup/envelope'
+import { WAKE_ACCOUNT_HINT, type EnvelopeKind, type LinkupEnvelope, type LinkupPerson, type WakeAccount } from '@/lib/apps/linkup/envelope'
 import { WAKE_EVENT_LABELS, isWakeEvent, type WakeEvent } from './wake-events'
 
 export { WAKE_EVENTS, WAKE_EVENT_LABELS, isWakeEvent, type WakeEvent } from './wake-events'
@@ -35,8 +35,8 @@ export function attachmentBase(envelope: LinkupEnvelope): AttachmentRef {
 
 // What the coworker reads in its trigger payload: the event in plain words, without Linkup's URNs
 // and cursors. A file comes as a link it can open and, for a voice note, its words.
-export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[] = []): Record<string, unknown> {
-    const base = { app: 'linkedin', event, account: accountLabel, at: envelope.event.timestamp ?? envelope.timestamp ?? null }
+export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, account: WakeAccount, attachments: AttachmentSummary[] = []): Record<string, unknown> {
+    const base = { app: 'linkedin', event, account: account.label, accountId: account.id, at: envelope.event.timestamp ?? envelope.timestamp ?? null }
     if (event === 'message_received') {
         return {
             ...base,
@@ -61,5 +61,6 @@ export function wakeTriggerPrompt(events: WakeEvent[]): string {
         `Something happened on the LinkedIn account you work with: ${what}. The details are in the payload below.`,
         'Decide whether it calls for anything from you given your role and what you already know about this person. If it does, act with your LinkedIn tools (read the conversation before you reply, never send the same message twice). If it does not, stop without doing anything.',
         'A voice note comes with its transcript. Every file comes with a url that serves it for 24 hours with no sign-in, to hand as is to any tool or API that takes a file URL. When a transcript is missing, or to keep a copy in your files, pass its downloadUrl to linkedin_pro_download_attachment.',
+        WAKE_ACCOUNT_HINT,
     ].join('\n\n')
 }

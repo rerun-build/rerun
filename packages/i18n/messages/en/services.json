@@ -25,9 +25,12 @@
         "actsAs": "Acts as",
         "accountName": "{provider} account",
         "selected": "This coworker acts as this account",
+        "lastAccount": "Uninstall {app} to remove this coworker's last account",
         "appAccount": "{app} account",
         "needsAttention": "Needs attention in {app}",
         "wakeWhen": "Wake this coworker when",
+        "wakeWhenAccount": "Wake this coworker from {account} when",
+        "done": "Done",
         "timing": {
             "rightAway": "Right away",
             "everyFewHours": "Checked every few hours"

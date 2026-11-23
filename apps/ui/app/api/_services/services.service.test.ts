@@ -7,6 +7,7 @@ import { compileIntoVault } from '@/lib/vault/install'
 import { AppError } from '@/lib/i18n/action-error'
 import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
+import { syncAppConnector } from '@rerun/cloud/apps.server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { searchDocs } from '@/lib/foreman/search-docs'
@@ -44,6 +45,7 @@ vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toV
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
+vi.mock('@rerun/cloud/apps.server', () => ({ syncAppConnector: vi.fn(async () => 0), unbindAgent: vi.fn() }))
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
@@ -354,35 +356,18 @@ describe('uninstallService', () => {
 describe('resetServiceConnection', () => {
     const app = { appSlug: 'whatsapp', serverName: 'whatsapp_pro' }
 
-    function useBinding(connection: { label: string | null; status: string } | null) {
-        vi.mocked(createServiceRoleClient).mockReturnValue(
-            fakeSupabase(table => {
-                if (table === 'app_connection_agents') return { data: connection ? { connection_id: 'conn' } : null }
-                if (table === 'app_connections') return { data: connection }
-                return undefined
-            }).client,
-        )
-    }
-
-    it('keeps a paid app active while its coworker is still bound to an account', async () => {
-        useRegistry({ services: { 'whatsapp-pro': entry({ status: 'active', app: { ...app, accountLabel: 'Shop' } }) } })
-        useBinding({ label: 'Shop', status: 'connected' })
+    it('keeps a paid app as it is while its coworker still holds accounts, its connector brought in line with them', async () => {
+        useRegistry({ services: { 'whatsapp-pro': entry({ status: 'needs_auth', app }) } })
+        vi.mocked(syncAppConnector).mockResolvedValue(2)
 
         await expect(resetServiceConnection('agent', 'whatsapp-pro')).resolves.toEqual({ mode: 'auth', app })
-        expect(vi.mocked(upsertRegistryEntry).mock.calls[0][3]).toMatchObject({ status: 'active', app: { ...app, accountLabel: 'Shop' } })
-    })
-
-    it('repairs a bound coworker left waiting on a sign-in', async () => {
-        useRegistry({ services: { 'whatsapp-pro': entry({ status: 'needs_auth', app }) } })
-        useBinding({ label: 'Shop', status: 'connected' })
-
-        await resetServiceConnection('agent', 'whatsapp-pro')
-        expect(vi.mocked(upsertRegistryEntry).mock.calls[0][3]).toMatchObject({ status: 'active', app: { ...app, accountLabel: 'Shop' } })
+        expect(vi.mocked(syncAppConnector).mock.calls.at(-1)?.slice(1)).toEqual(['agent', 'whatsapp'])
+        expect(upsertRegistryEntry).not.toHaveBeenCalled()
     })
 
     it('sends a coworker with no account back to the picker', async () => {
         useRegistry({ services: { 'whatsapp-pro': entry({ status: 'active', app: { ...app, accountLabel: 'Shop' } }) } })
-        useBinding(null)
+        vi.mocked(syncAppConnector).mockResolvedValue(0)
 
         await expect(resetServiceConnection('agent', 'whatsapp-pro')).resolves.toEqual({ mode: 'auth', app })
         expect(vi.mocked(upsertRegistryEntry).mock.calls[0][3]).toMatchObject({ status: 'needs_auth', app })

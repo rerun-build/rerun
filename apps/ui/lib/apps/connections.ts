@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
-import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectMany } from '@/supabase/supabase-helpers'
 import { notifyWorkspace } from './notify'
 import { appDefinition } from './registry'
 import { APP_CONNECTION_COLUMNS, type AppSlug } from './types'
@@ -44,20 +44,46 @@ export async function updateConnection(supabase: Client, connectionId: string, u
     if (error) throw new Error(error.message)
 }
 
-export type AgentConnection =
-    | { ok: true; connection: Pick<AppConnectionRow, (typeof APP_CONNECTION_COLUMNS)[number]>; appStatus: string }
-    | { ok: false; reason: 'not_attached' | 'not_found' }
+export type AgentConnection = Pick<AppConnectionRow, (typeof APP_CONNECTION_COLUMNS)[number]>
 
-// The account a coworker acts with, read fresh on every call: a coworker's binding, the app's
-// status and the account's are all moved by other paths (a freeze, a disconnect) and the proxy is
-// the one place that has to agree with them.
-export async function agentConnection(supabase: Client, agentId: string, slug: AppSlug): Promise<AgentConnection> {
-    const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
-    if (!binding) return { ok: false, reason: 'not_attached' }
-    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', APP_CONNECTION_COLUMNS, { id: binding.connection_id })
-    if (!connection) return { ok: false, reason: 'not_found' }
-    const { data: app } = await selectMaybeSingle(supabase, 'workspace_apps', ['status'] as const, { workspace_id: connection.workspace_id, app_slug: slug })
-    return { ok: true, connection, appStatus: app?.status ?? 'uninstalled' }
+// The accounts a coworker acts with, in the order it got them, read fresh on every call: a binding
+// and the account's status are moved by other paths (a freeze, a disconnect) and the proxy is the one
+// place that has to agree with them.
+export async function agentConnections(supabase: Client, agentId: string, slug: AppSlug): Promise<AgentConnection[]> {
+    const { data: bindings } = await selectMany(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug }, { column: 'created_at', ascending: true })
+    if (!bindings?.length) return []
+    const { data: rows } = await selectMany(supabase, 'app_connections', APP_CONNECTION_COLUMNS, { id: bindings.map(binding => binding.connection_id), status: { neq: 'deleted' } })
+    return bindings.flatMap(binding => rows?.find(row => row.id === binding.connection_id) ?? [])
+}
+
+// What a call names an account by: its label, which two LinkedIn profiles can share, the provider's
+// own id of the person or the number, or ours.
+function namesAccount(account: AgentConnection, asked: string): boolean {
+    const plain = (value: string) => value.trim().toLowerCase().replace(/^\+/, '')
+    const same = (value: string | null) => value !== null && plain(value) === plain(asked)
+    return same(account.label) || same(account.provider_member_id) || same(account.id)
+}
+
+export function accountNames(accounts: AgentConnection[]): string {
+    const labels = accounts.map(account => account.label)
+    return accounts
+        .map(account => {
+            const name = account.label ?? account.provider_member_id ?? account.id
+            const shared = labels.filter(label => label === account.label).length > 1
+            return shared ? `"${account.provider_member_id ?? account.id}" (${name})` : `"${name}"`
+        })
+        .join(', ')
+}
+
+export type PickedConnection = { connection: AgentConnection } | { refusal: string }
+
+// The account a call acts with. Never one of several at random, and never another one than the call
+// names: an account taken off the coworker since is refused rather than replaced.
+export function pickConnection(accounts: AgentConnection[], asked: string | null, providerLabel: string): PickedConnection {
+    const matching = asked ? accounts.filter(account => namesAccount(account, asked)) : accounts
+    if (matching.length === 1) return { connection: matching[0] }
+    const reason = !asked ? `You act with ${accounts.length} ${providerLabel} accounts and this call names none.` : matching.length === 0 ? `You do not act with a ${providerLabel} account named "${asked}".` : `Several of your ${providerLabel} accounts are named "${asked}".`
+    return { refusal: `${reason} Nothing was sent. Pass account, one of: ${accountNames(accounts)}. If the user has not said which one, ask.` }
 }
 
 // The provider itself said stop. The account rests a day, the workspace hears about it, and the pause

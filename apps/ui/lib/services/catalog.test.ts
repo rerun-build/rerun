@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it, vi } from 'vitest'
 
 import { compileServiceParts } from './compiler'
-import { type ServiceManifest, serviceManifestSchema, takesSeveralAccounts, usesInstances } from './manifest'
+import { type ServiceManifest, isPaidApp, serviceManifestSchema, takesSeveralAccounts, usesInstances } from './manifest'
 
 vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
 vi.mock('@/lib/composio/client', () => ({ deleteConnectedAccount: vi.fn() }))
@@ -22,7 +22,12 @@ function seededManifests(): ServiceManifest[] {
         })
 }
 
-const catalog = seededManifests()
+function paidManifest(slug: string, appSlug: string): ServiceManifest {
+    const serverName = slug.replace('-', '_')
+    return serviceManifestSchema.parse({ slug, name: slug, authMethods: [{ id: 'app', kind: 'app', app: { appSlug }, mcpServers: [{ name: serverName, transport: 'http', url: `\${RERUN_HUB_BASE_URL}/api/mcp/apps/${appSlug}` }] }] })
+}
+
+const catalog = [...seededManifests(), paidManifest('linkedin-pro', 'linkedin'), paidManifest('whatsapp-pro', 'whatsapp')]
 
 function compiledAs(manifest: ServiceManifest, methodId: string, instanceId: string) {
     const method = manifest.authMethods.find(candidate => candidate.id === methodId)
@@ -37,6 +42,12 @@ describe('the whole catalog', () => {
 
     it('lets a coworker hold several accounts of every app that has one', () => {
         expect(catalog.filter(manifest => !takesSeveralAccounts(manifest)).map(manifest => manifest.slug).sort()).toEqual(NOTHING_TO_CONNECT)
+    })
+
+    it('makes each account an instance, except for the paid apps, which keep one connector', () => {
+        const single = catalog.filter(manifest => takesSeveralAccounts(manifest) && !usesInstances(manifest))
+        expect(single.map(manifest => manifest.slug).sort()).toEqual(['linkedin-pro', 'whatsapp-pro'])
+        expect(single.every(isPaidApp)).toBe(true)
     })
 
     const compiled = catalog.filter(usesInstances).flatMap(manifest => manifest.authMethods.map(method => ({ slug: manifest.slug, methodId: method.id, manifest })))

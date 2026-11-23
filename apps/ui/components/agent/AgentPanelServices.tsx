@@ -256,32 +256,6 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         [agentId, load, installed, browseServices, searchResults],
     )
 
-    // Same shortcut as onInstall, except the install allocates a fresh account instead of
-    // reopening the one the coworker already holds.
-    const onAddAccount = useCallback(
-        async (slug: string) => {
-            const details = await getServiceDetailsAction(agentId, slug)
-            if (!details) return
-            const icon = [...installed, ...browseServices, ...searchResults].find(s => s.slug === slug)?.icon ?? null
-            const target: SetupTarget = { ...toSetupTarget(details, icon, []), key: undefined, newInstance: true, initialAuthTarget: undefined }
-            setSwapError(null)
-            const single = details.authMethods.length === 1 ? details.authMethods[0] : null
-            if (single && single.inputs.length === 0) {
-                const res = await installServiceAction(agentId, slug, {}, single.id, { newInstance: true })
-                if (res.ok && res.result.status === 'needs_auth') {
-                    setSetupTarget({ ...target, key: res.result.key, newInstance: false, initialAuthTarget: pendingAuthTarget(res.result) })
-                    return
-                }
-                if (!res.ok) setError(errorText(res))
-                await load()
-                return
-            }
-            setSetupTarget(target)
-        },
-        [agentId, load, installed, browseServices, searchResults, errorText],
-    )
-
-
     // Clear the stored sign-in, then hand over to onInstall: the entry now reads needs_auth, so
     // it lands straight on Connect without recompiling anything. A paid app still bound to an
     // account stays active, so its picker is opened explicitly.
@@ -299,6 +273,33 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
             await load()
         },
         [agentId, onInstall, load, errorText],
+    )
+
+    // Same shortcut as onInstall, except the install allocates a fresh account instead of
+    // reopening the one the coworker already holds.
+    const onAddAccount = useCallback(
+        async (slug: string) => {
+            const details = await getServiceDetailsAction(agentId, slug)
+            if (!details) return
+            // The accounts of a paid app share one connector: another one is ticked in its picker.
+            if (details.authMethods.some(method => method.kind === 'app')) return onReconnect(slug)
+            const icon = [...installed, ...browseServices, ...searchResults].find(s => s.slug === slug)?.icon ?? null
+            const target: SetupTarget = { ...toSetupTarget(details, icon, []), key: undefined, newInstance: true, initialAuthTarget: undefined }
+            setSwapError(null)
+            const single = details.authMethods.length === 1 ? details.authMethods[0] : null
+            if (single && single.inputs.length === 0) {
+                const res = await installServiceAction(agentId, slug, {}, single.id, { newInstance: true })
+                if (res.ok && res.result.status === 'needs_auth') {
+                    setSetupTarget({ ...target, key: res.result.key, newInstance: false, initialAuthTarget: pendingAuthTarget(res.result) })
+                    return
+                }
+                if (!res.ok) setError(errorText(res))
+                await load()
+                return
+            }
+            setSetupTarget(target)
+        },
+        [agentId, load, installed, browseServices, searchResults, errorText, onReconnect],
     )
 
     const onUninstall = useCallback(

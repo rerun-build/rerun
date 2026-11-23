@@ -6,6 +6,10 @@ import type { AppSlug } from './apps'
 
 export async function unbindAgent(_supabase: SupabaseClient<Database>, _workspaceId: number, _agentId: string, _slug: AppSlug): Promise<void> {}
 
+export async function syncAppConnector(_supabase: SupabaseClient<Database>, _agentId: string, _slug: AppSlug): Promise<number> {
+    return 0
+}
+
 // No paid app is offered here: the self-hosted build runs without a Linkup account.
 export async function paidAppFlag(_slug: AppSlug): Promise<boolean> {
     return false

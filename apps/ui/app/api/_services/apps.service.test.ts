@@ -1,15 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { assertAgentAccess } from '@/app/api/_auth/access'
+import { assertAgentAccess, assertAgentInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, tableResolver, writeMethodOf, type FakeSupabase } from '@/test/supabase-fake'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { createLifetimeAddonsCheckout, removeLifetimeAddonSlot, resumeLifetimeAddons } from '@/ee/services/lifetime-addons.service'
 import { deleteAccount, submitCheckpoint } from '@/lib/apps/linkup/client'
+import { dropWakeTrigger, syncAppConnector, unbindAccount } from '@/lib/apps/bindings'
+import { createTrigger } from '@/lib/engine/client'
 import { addPaidSlot } from '@/lib/apps/stripe-slots'
-import { addAppSlot, attachAgentToConnection, getAppsOverview, removeAppSlot, submitAppCheckpoint } from './apps.service'
+import { addAppSlot, attachAgentToConnection, detachAgentFromConnection, getAgentAppAccounts, getAppsOverview, removeAppSlot, setAgentWakeEvents, submitAppCheckpoint } from './apps.service'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -19,6 +21,8 @@ vi.mock('@/app/api/_auth/ownership', () => ({
     requireWorkspaceContext: vi.fn(),
 }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn() }))
+vi.mock('@/lib/apps/bindings', () => ({ syncAppConnector: vi.fn(async () => 1), dropWakeTrigger: vi.fn(), unbindAccount: vi.fn(), unbindConnection: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ createTrigger: vi.fn() }))
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({
     ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()),
     stripe: (await import('@/ee/test/stripe-fake')).fakeStripe(),
@@ -63,7 +67,8 @@ describe('attachAgentToConnection', () => {
         expect(assertAgentAccess).toHaveBeenCalledWith('agent-1', 'manage', KEY_ACTOR)
         expect(requireWorkspaceContext).not.toHaveBeenCalled()
         expect(supabase.chainsOn('app_connections')[0]).toContainEqual({ table: 'app_connections', method: 'eq', args: ['workspace_id', 7] })
-        expect(supabase.writes('app_connection_agents')).toEqual([expect.objectContaining({ method: 'insert', payload: { agent_id: 'agent-1', app_slug: 'linkedin', connection_id: 'conn-a' } })])
+        expect(supabase.writes('app_connection_agents')).toEqual([expect.objectContaining({ method: 'upsert', payload: { agent_id: 'agent-1', app_slug: 'linkedin', connection_id: 'conn-a' } })])
+        expect(syncAppConnector).toHaveBeenCalledWith(supabase.client, 'agent-1', 'linkedin')
     })
 
     it('refuses an account the actor workspace does not hold', async () => {
@@ -71,6 +76,65 @@ describe('attachAgentToConnection', () => {
 
         await expect(attachAgentToConnection('linkedin', 'agent-1', 'conn-elsewhere', KEY_ACTOR)).rejects.toThrow('accountNotFound')
         expect(supabase.writes('app_connection_agents')).toEqual([])
+    })
+})
+
+describe('the accounts of a coworker', () => {
+    const BINDINGS = [
+        { agent_id: 'agent-1', app_slug: 'linkedin', connection_id: 'conn-a', wake_on_events: ['message_received'], trigger_slug: 'linkedin-events', created_at: '2026-11-01' },
+        { agent_id: 'agent-1', app_slug: 'linkedin', connection_id: 'conn-b', wake_on_events: [], trigger_slug: null, created_at: '2026-11-02' },
+    ]
+    const CONNECTIONS = [
+        { id: 'conn-a', workspace_id: 7, app_slug: 'linkedin', label: 'Ada', status: 'connected', provider_member_id: 'ada' },
+        { id: 'conn-b', workspace_id: 7, app_slug: 'linkedin', label: 'Bea', status: 'connected', provider_member_id: 'bea-martin' },
+    ]
+
+    function coworker(bindings: object[] = BINDINGS) {
+        supabase = fakeSupabase(tableResolver({ app_connection_agents: bindings, app_connections: CONNECTIONS }))
+        vi.mocked(requireWorkspaceContext).mockResolvedValue({ workspace: { id: 7 }, userId: 'u-1', supabase: supabase.client } as never)
+        vi.mocked(createServiceRoleClient).mockReturnValue(supabase.client)
+        vi.mocked(assertAgentInWorkspace).mockResolvedValue({ engine_agent_id: 'engine-1' } as never)
+        vi.mocked(createTrigger).mockImplementation(async (_conn, _agent, { name }) => ({ slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''), token: 'tok' }) as never)
+    }
+
+    it('are listed in the order it got them, each with its own wake-ups', async () => {
+        coworker()
+        expect(await getAgentAppAccounts('linkedin', 'agent-1')).toEqual([
+            { connectionId: 'conn-a', label: 'Ada', status: 'connected', wakeOnEvents: ['message_received'] },
+            { connectionId: 'conn-b', label: 'Bea', status: 'connected', wakeOnEvents: [] },
+        ])
+    })
+
+    it('wake it through a trigger each, the first under the name it always had', async () => {
+        coworker()
+        await setAgentWakeEvents('linkedin', 'agent-1', 'conn-b', ['accepted_invitation'])
+        expect(vi.mocked(createTrigger).mock.calls[0][2].name).toBe('LinkedIn events (bea-martin)')
+        expect(supabase.writes('app_connection_agents')).toEqual([expect.objectContaining({ payload: expect.objectContaining({ wake_on_events: ['accepted_invitation'], trigger_slug: 'linkedin-events-bea-martin', trigger_token: 'tok' }) })])
+        expect(supabase.chainsOn('app_connection_agents').at(-1)).toContainEqual({ table: 'app_connection_agents', method: 'eq', args: ['connection_id', 'conn-b'] })
+
+        vi.mocked(createTrigger).mockClear()
+        coworker([BINDINGS[1]])
+        await setAgentWakeEvents('linkedin', 'agent-1', 'conn-b', ['accepted_invitation'])
+        expect(vi.mocked(createTrigger).mock.calls[0][2].name).toBe('LinkedIn events')
+    })
+
+    it('change their events without a new trigger, and lose only their own when they are switched off', async () => {
+        coworker()
+        await setAgentWakeEvents('linkedin', 'agent-1', 'conn-a', ['message_received', 'invitation_received', 'not_an_event'])
+        expect(createTrigger).not.toHaveBeenCalled()
+        expect(supabase.writes('app_connection_agents')[0].payload).toMatchObject({ wake_on_events: ['message_received', 'invitation_received'], trigger_slug: 'linkedin-events' })
+
+        await setAgentWakeEvents('linkedin', 'agent-1', 'conn-a', [])
+        expect(dropWakeTrigger).toHaveBeenCalledExactlyOnceWith(supabase.client, 7, 'agent-1', 'conn-a', 'linkedin')
+        await expect(setAgentWakeEvents('linkedin', 'agent-1', 'conn-c', ['message_received'])).rejects.toMatchObject({ code: 'appPickAccountFirst' })
+    })
+
+    it('are taken off one at a time', async () => {
+        coworker()
+        await detachAgentFromConnection('linkedin', 'agent-1', 'conn-a', KEY_ACTOR)
+        expect(assertAgentAccess).toHaveBeenCalledWith('agent-1', 'manage', KEY_ACTOR)
+        expect(unbindAccount).toHaveBeenCalledExactlyOnceWith(supabase.client, 7, 'agent-1', 'conn-a', 'linkedin')
+        expect(syncAppConnector).toHaveBeenCalledWith(supabase.client, 'agent-1', 'linkedin')
     })
 })
 

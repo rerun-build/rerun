@@ -23,11 +23,11 @@ const FIRE_TIMEOUT_MS = 8_000
 const TRANSCRIBE_BUDGET_MS = 4_000
 const MIN_FIRE_TIMEOUT_MS = 2_000
 
-export type InboundConnection = { id: string; workspace_id: number; app_slug: AppSlug; label: string | null; status: string; provider_webhook_secret: string | null }
+export type InboundConnection = { id: string; workspace_id: number; app_slug: AppSlug; label: string | null; provider_member_id: string | null; status: string; provider_webhook_secret: string | null }
 
 // Linkup's account ids are unique across its platforms, so the account alone names the app.
 export async function connectionForAccount(supabase: Client, accountId: string): Promise<InboundConnection | null> {
-    const { data } = await selectMany(supabase, 'app_connections', ['id', 'workspace_id', 'app_slug', 'label', 'status', 'provider_webhook_secret'] as const, { provider_account_id: accountId, status: { neq: 'deleted' } }, { column: 'created_at', ascending: false }, 1)
+    const { data } = await selectMany(supabase, 'app_connections', ['id', 'workspace_id', 'app_slug', 'label', 'provider_member_id', 'status', 'provider_webhook_secret'] as const, { provider_account_id: accountId, status: { neq: 'deleted' } }, { column: 'created_at', ascending: false }, 1)
     const row = data?.[0]
     if (!row || !isAppSlug(row.app_slug)) return null
     return { ...row, app_slug: row.app_slug }
@@ -70,7 +70,7 @@ async function wakeSubscribers(supabase: Client, connection: InboundConnection, 
         base: definition.attachmentBase(envelope),
         budgetMs: TRANSCRIBE_BUDGET_MS,
     })
-    const body = JSON.stringify(definition.wakePayload(event, envelope, connection.label, attachments))
+    const body = JSON.stringify(definition.wakePayload(event, envelope, { label: connection.label, id: connection.provider_member_id }, attachments))
     const fireTimeoutMs = Math.max(MIN_FIRE_TIMEOUT_MS, FIRE_TIMEOUT_MS - (Date.now() - startedAt))
     const day = dayKey(new Date())
 

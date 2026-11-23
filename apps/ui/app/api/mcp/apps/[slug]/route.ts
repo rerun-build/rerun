@@ -1,8 +1,8 @@
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
 import { APP_LIST_TOOLS, APP_RUN_TOOL } from '@/lib/apps/catalog'
-import { agentConnection, connectionScope, countUsage, markNeedsReconnect, pauseForRateLimit, updateConnection } from '@/lib/apps/connections'
-import { listedTools, readDirectory, resolveRunTool } from '@/lib/apps/directory'
+import { agentConnections, connectionScope, countUsage, markNeedsReconnect, pauseForRateLimit, pickConnection, updateConnection } from '@/lib/apps/connections'
+import { listedTools, readDirectory, resolveRunTool, takeAccount } from '@/lib/apps/directory'
 import { LinkupError, runAction } from '@/lib/apps/linkup/client'
 import { appDefinition } from '@/lib/apps/registry'
 import { AppToolRefusal, missingRequired, toolParams } from '@/lib/apps/tools'
@@ -13,11 +13,17 @@ import { selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 // A paid app's MCP server, hosted by the hub. Same trust model as /api/mcp/composio/<slug>: the
 // engine proves its workspace with `x-rerun-key`, names its coworker with `x-rerun-agent`, and the
-// account the call acts with is looked up here from that coworker, never taken from the call. The
-// Linkup key stays on this server. Only the everyday tools are listed: the others are read from the
+// account the call acts with is one this coworker holds, looked up here: the call names which when
+// there are several, and can reach no other. The Linkup key stays on this server. Only the everyday tools are listed: the others are read from the
 // app's directory (lib/apps/directory.ts) and run by name.
 export const dynamic = 'force-dynamic'
 export const maxDuration = 90
+
+async function callingAgent(supabase: ReturnType<typeof createServiceRoleClient>, engineAgentId: string, workspaceId: number): Promise<{ id: string } | null> {
+    if (!engineAgentId) return null
+    const { data } = await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: workspaceId })
+    return data
+}
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
     const { slug } = await params
@@ -41,14 +47,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         return rpcResult(id, { protocolVersion: negotiatedProtocolVersion(rpcParams?.protocolVersion), capabilities: { tools: {} }, serverInfo: { name: `rerun-app-${slug}`, version: '1.0.0' } })
     }
 
+    const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
+
     if (method === 'tools/list') {
-        return rpcResult(id, { tools: listedTools(app) })
+        const supabase = createServiceRoleClient()
+        const agent = await callingAgent(supabase, engineAgentId, engine.workspaceId)
+        return rpcResult(id, { tools: listedTools(app, agent ? await agentConnections(supabase, agent.id, slug) : []) })
     }
 
     if (method !== 'tools/call') return rpcError(id, -32601, `Method not found: ${method}`)
 
     const toolName = typeof rpcParams?.name === 'string' ? rpcParams.name : ''
-    const callArguments = (rpcParams?.arguments ?? {}) as Record<string, unknown>
+    const { account, call: callArguments } = takeAccount((rpcParams?.arguments ?? {}) as Record<string, unknown>)
     if (toolName === APP_LIST_TOOLS) return toolResult(id, readDirectory(app, callArguments.scope))
 
     const call = toolName === APP_RUN_TOOL ? resolveRunTool(app, callArguments) : { tool: app.tools.find(candidate => candidate.name === toolName), args: callArguments }
@@ -57,21 +67,23 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     if (!tool) return rpcError(id, -32601, `Unknown tool: ${String(rpcParams?.name)}`)
 
     const supabase = createServiceRoleClient()
-    const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
-    const { data: agent } = engineAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
+    const agent = await callingAgent(supabase, engineAgentId, engine.workspaceId)
     if (!agent) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
 
-    const resolved = await agentConnection(supabase, agent.id, slug)
-    if (!resolved.ok) {
+    const accounts = await agentConnections(supabase, agent.id, slug)
+    if (accounts.length === 0) {
         const { data: workspaceAccounts } = await selectCount(supabase, 'app_connections', { workspace_id: engine.workspaceId, app_slug: slug, status: 'connected' })
         const attach = workspaceAccounts
             ? `No ${app.providerLabel} account is attached to you, but the workspace already has one: call suggest_service with ${app.serviceSlug} and the user picks it for you on the card.`
             : `No ${app.providerLabel} account is attached to you: call suggest_service with ${app.serviceSlug} so the user connects one.`
         return toolError(id, app.readWithoutAccount ? `${attach} ${app.readWithoutAccount}` : attach)
     }
-    const { connection, appStatus } = resolved
+    const picked = pickConnection(accounts, account, app.providerLabel)
+    if ('refusal' in picked) return toolError(id, picked.refusal)
+    const { connection } = picked
     if (connection.workspace_id !== engine.workspaceId) return rpcError(id, -32603, 'Account does not belong to the authenticated workspace')
-    if (appStatus !== 'active') return toolError(id, `${app.name} is paused while the workspace is paused. Nothing was sent.`)
+    const { data: workspaceApp } = await selectMaybeSingle(supabase, 'workspace_apps', ['status'] as const, { workspace_id: connection.workspace_id, app_slug: slug })
+    if (workspaceApp?.status !== 'active') return toolError(id, `${app.name} is paused while the workspace is paused. Nothing was sent.`)
 
     if (connection.status === 'paused' && connection.pause_reason === 'rate_limited' && connection.paused_until && new Date(connection.paused_until) <= new Date()) {
         await updateConnection(supabase, connection.id, { status: 'connected', pause_reason: null, paused_until: null })

@@ -1,5 +1,6 @@
 import { bareToolName } from '@rerun/contracts'
 import { APP_LIST_TOOLS, APP_RUN_TOOL, type AppInfo } from './catalog'
+import { accountNames, type AgentConnection } from './connections'
 import { missingRequired, toolParams, type AppScope, type AppTool } from './tools'
 
 // A paid app has more tools than a coworker should carry on every run. It loads the everyday ones,
@@ -24,11 +25,22 @@ function listed(app: AppDirectory) {
     return ({ name, description, inputSchema, quota }: AppTool): ListedTool => ({ name, description: quota ? `${description} ${app.quotaPace(quota.action)}` : description, inputSchema })
 }
 
-export function listedTools(app: AppDirectory): ListedTool[] {
+const ACCOUNT_PARAM = 'account'
+
+// Only for a coworker that holds several accounts: with one, there is nothing to name.
+function withAccount(accounts: AgentConnection[]) {
+    return (tool: ListedTool): ListedTool => {
+        if (accounts.length < 2 || tool.name === APP_LIST_TOOLS) return tool
+        const account = { type: 'string', description: `Which of your accounts acts, one of: ${accountNames(accounts)}. Ask the user when they have not said which one.` }
+        return { ...tool, inputSchema: { ...tool.inputSchema, properties: { [ACCOUNT_PARAM]: account, ...tool.inputSchema.properties }, required: [ACCOUNT_PARAM, ...(tool.inputSchema.required ?? [])] } }
+    }
+}
+
+export function listedTools(app: AppDirectory, accounts: AgentConnection[] = []): ListedTool[] {
     const scopes = scopeIndex(app)
         .map(({ scope, tools, summary, requires }) => `- ${scope} (${tools} tools${requires ? `, needs ${requires}` : ''}): ${summary}`)
         .join('\n')
-    return [
+    const tools: ListedTool[] = [
         ...app.tools.filter(tool => !tool.scope).map(listed(app)),
         {
             name: APP_LIST_TOOLS,
@@ -48,6 +60,18 @@ export function listedTools(app: AppDirectory): ListedTool[] {
             },
         },
     ]
+    return tools.map(withAccount(accounts))
+}
+
+// The account a call names, and the call without it: no tool has such a parameter. Some models lay it
+// among the parameters of a tool they run by name.
+export function takeAccount(call: Record<string, unknown>): { account: string | null; call: Record<string, unknown> } {
+    const { [ACCOUNT_PARAM]: beside, ...rest } = call
+    const nested = argumentsOf(rest.arguments)
+    const inside = nested?.[ACCOUNT_PARAM]
+    if (nested && inside !== undefined) rest.arguments = Object.fromEntries(Object.entries(nested).filter(([key]) => key !== ACCOUNT_PARAM))
+    const named = [beside, inside].find(value => typeof value === 'string' && value.trim())
+    return { account: typeof named === 'string' ? named.trim() : null, call: rest }
 }
 
 export function readDirectory(app: AppDirectory, scope: unknown) {

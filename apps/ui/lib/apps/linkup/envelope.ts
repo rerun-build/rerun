@@ -80,3 +80,9 @@ export type EnvelopeKind<E extends string = string> = { kind: 'wake'; event: E }
 export function eventIdOf(envelope: LinkupEnvelope, rawBody: string, header: string | null): string {
     return envelope.event_id || header || createHmac('sha256', 'linkup-event').update(rawBody).digest('hex')
 }
+
+// The account an event happened on, as the coworker can name it in its tools.
+export type WakeAccount = { label: string | null; id: string | null }
+
+export const WAKE_ACCOUNT_HINT =
+    'The account of the payload is the one it happened on. When your tools take an account, pass that one (or accountId when two of your accounts share a name): what comes in on an account is answered from it.'

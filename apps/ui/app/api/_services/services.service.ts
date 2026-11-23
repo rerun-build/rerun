@@ -3,8 +3,8 @@ import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type Vaul
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { getAgentChatTarget } from '@/app/api/_services/chat.service'
-import { unbindAgent } from '@rerun/cloud/apps.server'
-import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
+import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
+import { isAppSlug } from '@rerun/cloud/apps'
 import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
@@ -474,11 +474,10 @@ export async function installService(
     }
     if (app) {
         // A coworker that already picked an account (a reinstall) is ready at once.
-        const bound = isAppSlug(app.appSlug) ? await boundAccountLabel(agentId, app.appSlug) : null
-        if (bound === null) {
+        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), agentId, app.appSlug) : 0
+        if (accounts === 0) {
             return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, app, message: `${manifest.name} needs the user to pick the account you act with. A picker has been shown to them.` }
         }
-        await markAppAuthorized(agentId, key, bound || undefined, actor)
     }
     return { status: 'installed', key, slug: manifest.slug, name: manifest.name, toolNames, message: `${manifest.name} installed. Its tools become available on your next turn.` }
 }
@@ -568,26 +567,6 @@ async function installTarget(agentId: string, manifest: ServiceManifest, slugOrK
     return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, heldAccounts(reg, manifest.slug)) }
 }
 
-// The label of the account a coworker acts with in a paid app, '' when it has none yet, null when
-// the coworker picked none or its account is gone.
-async function boundAccountLabel(agentId: string, appSlug: AppSlug): Promise<string | null> {
-    const supabase = createServiceRoleClient()
-    const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: appSlug })
-    if (!binding) return null
-    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['label', 'status'] as const, { id: binding.connection_id })
-    if (!connection || connection.status === 'deleted') return null
-    return connection.label ?? ''
-}
-
-// Flip a paid app's service to active once the coworker has picked the account it acts with.
-export async function markAppAuthorized(agentId: string, key: string, accountLabel?: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
-    const entry = (await readRegistry(conn, engineAgentId)).services[key]
-    if (!entry?.app) return
-    const app = { appSlug: entry.app.appSlug, serverName: entry.app.serverName, ...(accountLabel ? { accountLabel } : {}) }
-    await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', app })
-}
-
 // Flip an OAuth service to active after the user completes the sign-in popup (the callback
 // route has already written the token to the engine token store).
 export async function markServiceAuthorized(agentId: string, key: string, actor?: Actor): Promise<void> {
@@ -631,9 +610,8 @@ export async function resetServiceConnection(agentId: string, key: string, actor
     // bound keeps working while the picker is open, since closing it without a pick changes nothing.
     if (entry.app?.serverName) {
         const app = { appSlug: entry.app.appSlug, serverName: entry.app.serverName }
-        const bound = isAppSlug(app.appSlug) ? await boundAccountLabel(agentId, app.appSlug) : null
-        if (bound === null) await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', app })
-        else await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', app: { ...app, ...(bound ? { accountLabel: bound } : {}) } })
+        const accounts = isAppSlug(app.appSlug) ? await syncAppConnector(createServiceRoleClient(), agentId, app.appSlug) : 0
+        if (accounts === 0) await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', app })
         return { mode: 'auth', app }
     }
 

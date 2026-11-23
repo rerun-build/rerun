@@ -43,6 +43,8 @@ export async function declareService(agentId: string, manifest: ServiceManifest,
     // A paid app never goes to the Vault, and installService would refuse it outright on a plan
     // without paid apps, failing the rest of a coworker's creation over it.
     const paidApp = isPaidApp(manifest)
+    // Compiled again, the connector would wait for an account it already has.
+    if (paidApp && held?.status === 'active') return 'compiled'
     if (!paidApp || agentId === FOREMAN_AGENT_ID) {
         const { status } = await installService(agentId, key, {}, method?.id, actor, { pending: !method })
         return status === 'needs_config' ? 'needs_config' : 'compiled'

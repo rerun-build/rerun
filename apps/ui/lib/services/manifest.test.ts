@@ -1,4 +1,4 @@
-import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, skillQuotesAccount, takesSeveralAccounts } from '@/lib/services/manifest'
+import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, skillQuotesAccount, takesSeveralAccounts, usesInstances } from '@/lib/services/manifest'
 import { describe, expect, it } from 'vitest'
 
 const linkedinManifest = {
@@ -59,9 +59,10 @@ describe('takesSeveralAccounts', () => {
         expect(takesSeveralAccounts(basic)).toBe(true)
     })
 
-    it('keeps a paid app to one account', () => {
+    it('lets a coworker hold several accounts of a paid app, on one connector', () => {
         const paid = serviceManifestSchema.parse({ slug: 'whatsapp-pro', name: 'WhatsApp Pro', multiInstance: true, authMethods: [{ id: 'app', label: 'Pick a number', kind: 'app', app: { appSlug: 'whatsapp' }, mcpServers: [{ name: 'whatsapp_pro', transport: 'http', url: 'https://hub.test/api/mcp/apps/whatsapp' }] }] })
-        expect(takesSeveralAccounts(paid)).toBe(false)
+        expect(takesSeveralAccounts(paid)).toBe(true)
+        expect(usesInstances(paid)).toBe(false)
     })
 
     it('lets a coworker hold several accounts of an app whose skill reads a key or quotes a value, one skill each', () => {
