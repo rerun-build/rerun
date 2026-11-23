@@ -420,17 +420,21 @@ export async function listPendingCards(actor: Actor): Promise<PendingCard[]> {
 // status filter is the race guard: a conversation back in `working` between the render and the tap
 // belongs to its run.
 export async function markSessionsHandled(ctx: WorkspaceContext, sessionIds: string[] | 'all'): Promise<void> {
-    const agentIds = (await reachableAgents(ctx)).map(a => a.id)
-    if (agentIds.length === 0) return
-
     const supabase = createServiceRoleClient()
-    let update = supabase
-        .from('sessions')
-        .update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' })
-        .in('agent_id', agentIds)
-        .in('status', [...ATTENTION_STATUSES])
-    if (sessionIds !== 'all') update = update.in('id', sessionIds)
-    await update
+    const [agentIds, chief] = await Promise.all([reachableAgents(ctx).then(agents => agents.map(a => a.id)), selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: ctx.workspace.id, kind: 'foreman' })])
+    const handled = (agentId: string[] | string, owner?: string) => {
+        let update = supabase
+            .from('sessions')
+            .update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' })
+            .in('agent_id', Array.isArray(agentId) ? agentId : [agentId])
+            .in('status', [...ATTENTION_STATUSES])
+        if (owner) update = update.eq('owner_user_id', owner)
+        if (sessionIds !== 'all') update = update.in('id', sessionIds)
+        return update.select('id')
+    }
+    if (agentIds.length) await handled(agentIds)
+    // The Chief of Staff's conversations with the caller, theirs alone to set aside.
+    if (chief.data) for (const row of (await handled(chief.data.id, ctx.userId)).data ?? []) await copyToShippedForemanRow(row.id)
 }
 
 // The name a person gives a conversation, shared by everyone who reaches it. General keeps its

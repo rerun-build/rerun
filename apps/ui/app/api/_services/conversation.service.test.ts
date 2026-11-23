@@ -217,7 +217,10 @@ describe('finalizeSession', () => {
 })
 
 describe('markSessionsHandled', () => {
-    beforeEach(() => vi.clearAllMocks())
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: null, error: null } as never)
+    })
 
     it('only clears conversations of the workspace agents, even when a foreign session id is passed', async () => {
         const db = fakeSupabase()
@@ -233,6 +236,7 @@ describe('markSessionsHandled', () => {
             ['agent_id', ['a', 'b']],
             ['status', expect.arrayContaining(['awaiting_question', 'awaiting_approval', 'awaiting_connector'])],
             ['id', ['own-session', 'foreign-session']],
+            ['id'],
         ])
     })
 
@@ -243,7 +247,7 @@ describe('markSessionsHandled', () => {
 
         await markSessionsHandled(ctx, 'all')
 
-        expect(db.writes('sessions')[0].filters.map(call => call.args[0])).toEqual(['agent_id', 'status'])
+        expect(db.writes('sessions')[0].filters.filter(call => call.method !== 'select').map(call => call.args[0])).toEqual(['agent_id', 'status'])
     })
 
     it("never clears a conversation of a coworker outside the member's Boxes, even on all", async () => {
@@ -265,6 +269,22 @@ describe('markSessionsHandled', () => {
         await markSessionsHandled(ctx, ['foreign-session'])
 
         expect(db.writes('sessions')).toHaveLength(0)
+    })
+
+    it("clears the caller's own conversations with the Chief of Staff, never another member's", async () => {
+        const db = fakeSupabase(() => ({ data: [] }))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        vi.mocked(selectMany).mockResolvedValueOnce({ data: [], error: null } as never)
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { id: 'cos' }, error: null } as never)
+
+        await markSessionsHandled(ctx, 'all')
+
+        const [write] = db.writes('sessions')
+        expect(write.filters.filter(call => call.method !== 'select').map(call => call.args)).toEqual([
+            ['agent_id', ['cos']],
+            ['status', expect.arrayContaining(['awaiting_question'])],
+            ['owner_user_id', ctx.userId],
+        ])
     })
 })
 

@@ -58,6 +58,9 @@ const MORNING_RUN_1 = 'a05f6e82-cf71-4092-93b4-5e6f708192a3'
 const MORNING_RUN_2 = 'b1607f93-d082-41a3-84c5-6f708192a3b4'
 const ELSEWHERE = 'c271809a-e193-42b4-a5d6-708192a3b4c5'
 const FEEDBACK = 'd38291ab-f2a4-43c5-86e7-8192a3b4c5d6'
+const CHIEF = 'e49302bc-03b5-44d6-97f8-92a3b4c5d6e8'
+const CHIEF_MINE = 'f5a413cd-14c6-45e7-a809-a3b4c5d6e7f9'
+const CHIEF_GRACE = '06b524de-25d7-46f8-b91a-b4c5d6e7f80a'
 
 const agentInBox = { workspace_id: 7, space_id: 'space-sales', engine_agent_id: 'scout' }
 
@@ -65,6 +68,7 @@ const spaces: Row<'spaces'>[] = [{ id: 'space-sales', workspace_id: 7, name: 'Sa
 
 const agents: (Row<'agents'> & { space: Row<'spaces'> })[] = [
     { id: AGENT, name: 'Scout', handle: 'scout', kind: 'coworker', ...agentInBox, disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
+    { id: CHIEF, name: 'Chief of Staff', handle: null, kind: 'foreman', workspace_id: 7, space_id: null, engine_agent_id: 'foreman', disabled_at: null, disabled_reason: null, space: null as never },
     { id: 'agent-other-workspace', name: 'Intruder', handle: 'intruder', kind: 'coworker', workspace_id: 9, space_id: 'space-other', engine_agent_id: 'intruder', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } },
 ]
 
@@ -73,6 +77,8 @@ const sessions: (Row<'sessions'> & { agent: Row<'agents'> })[] = [
     { id: PRICING, agent_id: AGENT, engine_session_id: 'eng-pricing', title: 'Quote for Maison Perrin', status: 'awaiting_question', kind: 'thread', source: 'dashboard', updated_at: '2026-11-19T08:30:00.000Z', agent: agentInBox },
     { id: DIGEST, agent_id: AGENT, engine_session_id: 'eng-digest', title: 'Weekly lead digest', status: 'awaiting_ack', kind: 'thread', source: 'schedule', updated_at: '2026-11-19T07:00:00.000Z', agent: agentInBox },
     { id: FOR_GRACE, agent_id: AGENT, engine_session_id: 'eng-grace', title: 'Send the Q4 deck', status: 'awaiting_approval', kind: 'thread', source: 'dashboard', updated_at: '2026-11-19T06:00:00.000Z', agent: agentInBox },
+    { id: CHIEF_MINE, agent_id: CHIEF, owner_user_id: 'user-ada', engine_session_id: 'eng-chief-ada', title: 'Your invoices coworker keeps failing', status: 'awaiting_question', kind: 'thread', source: 'schedule', updated_at: '2026-11-19T08:50:00.000Z', agent: { workspace_id: 7, space_id: null, engine_agent_id: 'foreman' } },
+    { id: CHIEF_GRACE, agent_id: CHIEF, owner_user_id: 'user-grace', engine_session_id: 'eng-chief-grace', title: 'Grace asked about the payroll', status: 'awaiting_question', kind: 'thread', source: 'dashboard', updated_at: '2026-11-19T08:55:00.000Z', agent: { workspace_id: 7, space_id: null, engine_agent_id: 'foreman' } },
     { id: ELSEWHERE, agent_id: 'agent-other-workspace', engine_session_id: 'eng-elsewhere', title: 'Bakeries of another company', status: 'idle', kind: 'thread', source: 'dashboard', updated_at: '2026-11-19T09:00:00.000Z', agent: { workspace_id: 9, space_id: 'space-other', engine_agent_id: 'intruder' } },
 ]
 
@@ -80,6 +86,8 @@ const notifications: Row<'notifications'>[] = [
     { id: 'n-pricing', agent_id: AGENT, engine_session_id: 'eng-pricing', kind: 'question', message: 'Which price list should I quote, the 2026 one or the summer promo?', metadata: { toolName: 'ask_user' }, recipients: { 'user-ada': 'mine' }, created_at: '2026-11-19T08:30:00.000Z' },
     { id: 'n-digest', agent_id: AGENT, engine_session_id: 'eng-digest', kind: 'info', message: '12 new leads this week, 3 of them in Villeurbanne.', metadata: { toolName: 'notify_user' }, recipients: { 'user-ada': 'followed' }, created_at: '2026-11-19T07:00:00.000Z' },
     { id: 'n-grace', agent_id: AGENT, engine_session_id: 'eng-grace', kind: 'approval', message: 'Send the Q4 deck to the board?', metadata: { toolName: 'request_approval' }, recipients: { 'user-grace': 'mine' }, created_at: '2026-11-19T06:00:00.000Z' },
+    { id: 'n-chief-ada', agent_id: CHIEF, engine_session_id: 'eng-chief-ada', kind: 'question', message: 'Should I pause it until Monday?', metadata: { toolName: 'ask_user' }, recipients: { 'user-ada': 'mine' }, created_at: '2026-11-19T08:50:00.000Z' },
+    { id: 'n-chief-grace', agent_id: CHIEF, engine_session_id: 'eng-chief-grace', kind: 'question', message: 'Which payroll month?', metadata: { toolName: 'ask_user' }, recipients: { 'user-grace': 'mine' }, created_at: '2026-11-19T08:55:00.000Z' },
     { id: 'n-skill', agent_id: AGENT, engine_session_id: 'eng-bakeries', kind: 'approval', message: 'Remember how to qualify a bakery?', metadata: { toolName: 'skill_propose' }, recipients: { 'user-ada': 'mine' }, created_at: '2026-11-19T08:41:00.000Z' },
 ]
 
@@ -228,7 +236,12 @@ const revertedPage: BrainPageDetail = {
 describe('a conversation in the mobile app', () => {
     beforeEach(() => {
         const rows = tableResolver(tables)
-        const resolve: SupabaseResolver = (table, calls) => (table === 'message_feedback' && writeMethodOf(calls) === 'upsert' ? { data: { id: FEEDBACK } } : rows(table, calls))
+        const resolve: SupabaseResolver = (table, calls) => {
+            if (table === 'message_feedback' && writeMethodOf(calls) === 'upsert') return { data: { id: FEEDBACK } }
+            // An update that hands back its rows: none to copy for the shipped builds here.
+            if (table === 'sessions' && writeMethodOf(calls) === 'update' && calls.some(call => call.method === 'select')) return { data: [] }
+            return rows(table, calls)
+        }
         const db = fakeSupabase(resolve)
         state.db = db
         state.ctx = contractContext(db)
@@ -458,6 +471,8 @@ describe('a conversation in the mobile app', () => {
             const inbox = await expectContract(mobileApi.getInbox, await callRoute(GET, mobileApi.getInbox))
             expect(inbox).toEqual({
                 items: [
+                    // The Chief of Staff's conversation with the caller, by its address; Grace's stays hers.
+                    { id: CHIEF_MINE, sessionId: CHIEF_MINE, sessionIds: [CHIEF_MINE], agentId: 'foreman', agentName: 'Chief of Staff', status: 'awaiting_question', title: 'Your invoices coworker keeps failing', message: 'Should I pause it until Monday?', updatedAt: '2026-11-19T08:50:00.000Z', count: 1 },
                     { id: PRICING, sessionId: PRICING, sessionIds: [PRICING], agentId: AGENT, agentName: 'Scout', status: 'awaiting_question', title: 'Quote for Maison Perrin', message: 'Which price list should I quote, the 2026 one or the summer promo?', updatedAt: '2026-11-19T08:30:00.000Z', count: 1 },
                     { id: DIGEST, sessionId: DIGEST, sessionIds: [DIGEST], agentId: AGENT, agentName: 'Scout', status: 'awaiting_ack', title: 'Weekly lead digest', message: '12 new leads this week, 3 of them in Villeurbanne.', updatedAt: '2026-11-19T07:00:00.000Z', count: 1 },
                     { id: `done:${AGENT}:schedule:morning-prospects`, sessionId: MORNING_RUN_2, sessionIds: [MORNING_RUN_2, MORNING_RUN_1], agentId: AGENT, agentName: 'Scout', status: 'done', title: 'morning-prospects', message: null, updatedAt: '2026-11-19T07:30:00.000Z', count: 2 },
@@ -469,7 +484,11 @@ describe('a conversation in the mobile app', () => {
         it('marks the rows read', async () => {
             const { POST } = await import('@/app/api/v1/inbox/read/route')
             await expectContract(mobileApi.markInboxRead, await callRoute(POST, mobileApi.markInboxRead, { body: { sessionIds: [PRICING, MORNING_RUN_2] } }))
-            expect(state.db?.writes('sessions')).toMatchObject([{ method: 'update', payload: { status: 'idle' }, filters: [{ args: ['agent_id', [AGENT]] }, { method: 'in', args: ['status', expect.arrayContaining(['awaiting_question'])] }, { args: ['id', [PRICING, MORNING_RUN_2]] }] }])
+            expect(state.db?.writes('sessions')).toMatchObject([
+                { method: 'update', payload: { status: 'idle' }, filters: [{ args: ['agent_id', [AGENT]] }, { method: 'in', args: ['status', expect.arrayContaining(['awaiting_question'])] }, { args: ['id', [PRICING, MORNING_RUN_2]] }, { method: 'select' }] },
+                // The caller's own conversations with the Chief of Staff, never another member's.
+                { method: 'update', payload: { status: 'idle' }, filters: [{ args: ['agent_id', [CHIEF]] }, { method: 'in' }, { args: ['owner_user_id', 'user-ada'] }, { args: ['id', [PRICING, MORNING_RUN_2]] }, { method: 'select' }] },
+            ])
             expect(state.db?.writes('session_reads')).toEqual([
                 {
                     method: 'upsert',

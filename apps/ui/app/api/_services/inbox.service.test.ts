@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { listWorkspaceInbox, markInboxRead } from './inbox.service'
 
-vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectCount: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectCount: vi.fn(), selectMaybeSingle: vi.fn(async () => ({ data: null, error: null })) }))
 vi.mock('@/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/app/api/_services/conversation.service', () => ({ markSessionsHandled: vi.fn() }))

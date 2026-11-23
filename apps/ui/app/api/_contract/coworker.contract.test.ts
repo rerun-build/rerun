@@ -84,6 +84,7 @@ const SPACE = '3f2b8c1e-6a4d-4e9b-8f7a-2c5d1e9b0a47'
 const SCOUT = '8d4e2a1f-3b6c-4d7e-9a8b-1c2d3e4f5a6b'
 const LEDGER = 'b7c6d5e4-f3a2-4b1c-8d9e-0f1a2b3c4d5e'
 const STRANGER = 'e1d2c3b4-a5f6-4e7d-8c9b-0a1b2c3d4e5f'
+const COS = 'd3c2b1a0-9f8e-4d7c-8b6a-5f4e3d2c1b0a'
 const GENERAL = 'c4a1e2b3-5d6f-4a7b-8c9d-0e1f2a3b4c5d'
 const THREAD = 'f6e5d4c3-b2a1-4f0e-9d8c-7b6a5f4e3d2c'
 const CREATED: Record<string, string> = { agents: '0a9b8c7d-6e5f-4a3b-8c1d-2e3f4a5b6c7d', sessions: '1b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e' }
@@ -91,6 +92,7 @@ const CREATED: Record<string, string> = { agents: '0a9b8c7d-6e5f-4a3b-8c1d-2e3f4
 const agents: Rows<'agents'> = [
     { id: SCOUT, name: 'Scout', handle: 'scout', kind: 'coworker', description: 'Finds leads in Lyon', template_id: 'lead-finder', status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-03T10:00:00.000Z' },
     { id: LEDGER, name: 'Ledger', handle: 'ledger', kind: 'coworker', description: null, template_id: null, status: 'idle', col: 2, row: 0, workspace_id: 7, space_id: SPACE, engine_agent_id: 'ledger', disabled_at: '2026-11-15T10:00:00.000Z', disabled_reason: 'plan_limit', created_at: '2026-11-04T10:00:00.000Z' },
+    { id: COS, name: 'Chief of Staff', handle: null, kind: 'foreman', description: null, template_id: null, status: 'idle', col: 0, row: 0, workspace_id: 7, space_id: null, engine_agent_id: 'foreman', disabled_at: null, disabled_reason: null, created_at: '2026-11-02T09:00:00.000Z' },
     { id: STRANGER, name: 'Scout', handle: 'scout', kind: 'coworker', description: null, template_id: null, status: 'idle', col: 0, row: 0, workspace_id: 9, space_id: '9c8b7a6f-5e4d-4c3b-8a2f-1e0d9c8b7a6f', engine_agent_id: 'scout', disabled_at: null, disabled_reason: null, created_at: '2026-11-05T10:00:00.000Z' },
 ]
 const spaces: Rows<'spaces'> = [{ id: SPACE, workspace_id: 7, name: 'Sales', visibility: 'workspace', col_start: 0, row_start: 0, col_end: 7, row_end: 7, created_at: '2026-11-02T09:00:00.000Z' }]
@@ -295,6 +297,15 @@ describe('a coworker in the mobile app', () => {
             expect(await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: SCOUT }, body: { look: null } }))).toBeUndefined()
             expect(state.db?.writes('agents')).toEqual([expect.objectContaining({ method: 'update', payload: { look } }), expect.objectContaining({ method: 'update', payload: { look: null } })])
             expect(engine.patchAgent).not.toHaveBeenCalled()
+        })
+
+        it('renames the Chief of Staff by its address, under the name the workspace gives it, without asking its engine', async () => {
+            const { PATCH } = await import('@/app/api/v1/agents/[id]/route')
+            expect(await expectContract(mobileApi.renameAgent, await callRoute(PATCH, mobileApi.renameAgent, { params: { id: 'foreman' }, body: { name: 'Nora' } }))).toBeUndefined()
+            expect(state.db?.writes('agents')).toEqual([expect.objectContaining({ method: 'update', payload: { name: 'Nora' } })])
+            expect(engine.patchAgent).not.toHaveBeenCalled()
+            const res = await callRoute(PATCH, mobileApi.renameAgent, { params: { id: 'foreman' }, body: { look: null } })
+            expect(res.ok).toBe(false)
         })
 
         it('refuses a body that changes nothing, a colour that means a state, or a material it does not know', async () => {

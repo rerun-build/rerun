@@ -1,5 +1,9 @@
 import 'server-only'
 import { actorFromContext, assertAgentAccess } from '@/app/api/_auth/access'
+import { agentKindPolicy } from '@rerun/contracts'
+import { FOREMAN_NAME_MAX, sanitizeForemanName } from '@/lib/foreman/name'
+import { saveForemanName } from '@/lib/foreman/profile'
+import { AppError } from '@/lib/i18n/action-error'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { deleteAgent, renameAgent, setAgentLook } from '@/app/api/_services/agent.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
@@ -13,9 +17,19 @@ import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotify
 // Renaming and deleting reach a coworker the engine may not answer for (switched off, not set up),
 // so they only check the caller's Box, without asking the engine.
 export async function updateCoworker(ctx: WorkspaceContext, agentId: string, input: UpdateCoworkerInput): Promise<void> {
-    await assertAgentAccess(agentId, 'manage', actorFromContext(ctx))
+    const { agent } = await assertAgentAccess(agentId, 'manage', actorFromContext(ctx))
+    // The Chief of Staff wears its orb, and its name is the one the workspace gave it.
+    if (agentKindPolicy(agent.kind).look === 'orb') return renameForeman(ctx, input)
     if (input.name !== undefined) await renameAgent(agentId, input.name)
     if (input.look !== undefined) await setAgentLook(agentId, input.look)
+}
+
+async function renameForeman(ctx: WorkspaceContext, input: UpdateCoworkerInput): Promise<void> {
+    if (input.look !== undefined) throw new AppError('updateCoworkerFailed')
+    if (input.name === undefined) return
+    const name = sanitizeForemanName(input.name)
+    if (!name) throw new AppError('foremanNameInvalid', { max: FOREMAN_NAME_MAX })
+    await saveForemanName(ctx, name)
 }
 
 export async function deleteCoworker(ctx: WorkspaceContext, agentId: string): Promise<void> {
