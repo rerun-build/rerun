@@ -13,6 +13,7 @@ import {
     type TakeoverResult,
     ENGINE_CAPABILITY_FILES_STREAM,
     ENGINE_CAPABILITY_FOREMAN_CHECKINS,
+    ENGINE_CAPABILITY_FOREMAN_AGENT,
     ENGINE_CAPABILITY_FOREMAN_COWORKER,
     ENGINE_CAPABILITY_FOREMAN_FILES,
     FOREMAN_AGENT_ID,
@@ -701,6 +702,10 @@ export async function supportsForemanFiles(conn: EngineConnection): Promise<bool
 // The box's foreman keeps memories, skills, routines and connectors of its own, and serves them.
 export async function supportsForemanCoworker(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_COWORKER)
+}
+
+export async function supportsForemanAgent(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_AGENT)
 }
 
 export async function supportsDesktop(conn: EngineConnection): Promise<boolean> {

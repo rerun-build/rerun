@@ -1,5 +1,5 @@
 import type { Database } from '@/app/api/database.types'
-import { type CoworkerLook, parseCoworkerLook } from '@rerun/contracts'
+import { type AgentKind, type CoworkerLook, parseCoworkerLook } from '@rerun/contracts'
 
 export type AgentRow = Database['public']['Tables']['agents']['Row']
 export type AgentInsert = Database['public']['Tables']['agents']['Insert']
@@ -86,6 +86,8 @@ export type IsoAgent = {
     // The look it was given, null when its buddy keeps the one hashed from its id. Absent where the
     // row was read without it.
     look?: CoworkerLook | null
+    // Absent on a tile of the board, which is always a coworker.
+    kind?: AgentKind
 }
 
 // A tile of the board: a coworker, always in a Box.

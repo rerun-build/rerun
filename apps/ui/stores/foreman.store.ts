@@ -34,6 +34,8 @@ type ForemanState = {
     tab: ForemanTab
     /** The engine's foreman keeps things of its own, so its card has screens to open. */
     hasCard: boolean
+    /** Its engine also opens the activity and the settings a coworker's card opens. */
+    hasAgentScreens: boolean
     /** The screen open on its card, null on the card itself. In the store so a routine picked in a list opens it. */
     cardScreen: ForemanCardScreen | null
     /**
@@ -127,7 +129,7 @@ type ForemanState = {
     restorePlacement: (placement: ForemanPlacement) => void
     setDropTarget: (target: ForemanPlacement | null) => void
     setTab: (tab: ForemanTab) => void
-    setHasCard: (hasCard: boolean) => void
+    setCardCapabilities: (capabilities: { card: boolean; agent: boolean }) => void
     setCardScreen: (screen: ForemanCardScreen | null) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
@@ -188,6 +190,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     dropTarget: null,
     tab: 'assistant',
     hasCard: false,
+    hasAgentScreens: false,
     cardScreen: null,
     funnel: 'unknown',
     waitlisted: false,
@@ -250,7 +253,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     },
     setDropTarget: dropTarget => set({ dropTarget }),
     setTab: tab => set({ tab }),
-    setHasCard: hasCard => set({ hasCard }),
+    setCardCapabilities: ({ card, agent }) => set({ hasCard: card, hasAgentScreens: card && agent }),
     setCardScreen: cardScreen => set({ cardScreen }),
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),

@@ -183,9 +183,14 @@ export async function activateAgentAutomationsAction(agentId: string): Promise<v
     } catch {}
 }
 
+// The model a coworker runs on, its effort included: what the model picker sets. On a coworker whose
+// conversations are each member's own, any member picks it; everything else takes `manage`.
+const MODEL_FIELDS = new Set(['connectionId', 'provider', 'model', 'effort'])
+
 export async function updateAgentConfigAction(agentId: string, patch: EngineAgentConfigPatch & { soul?: string; install?: string }): Promise<SuccessResult> {
     try {
-        const { conn, engineAgentId } = await resolveRunTarget(agentId, 'manage')
+        const onlyTheModel = Object.keys(patch).every(field => MODEL_FIELDS.has(field))
+        const { conn, engineAgentId } = onlyTheModel ? await resolveRunTarget(agentId, 'manage') : await resolveAgentTarget(agentId, 'manage')
         await enginePatchAgent(conn, engineAgentId, patch)
         return { success: true }
     } catch (err) {

@@ -17,6 +17,7 @@ import { SkeletonCardGrid } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { agentKindOfEngineId, agentKindPolicy, type ToolKey } from '@rerun/contracts'
 
 type SelfImprovementKey = (typeof ENGINE_SELF_IMPROVEMENT_KEYS)[number]
 
@@ -92,6 +93,10 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
     const [error, setError] = useState<string | null>(null)
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
+    const policy = agentKindPolicy(agentKindOfEngineId(agentId))
+    // What its kind keeps on whatever a person says: its learning settings are the engine's when its
+    // soul is, and the capabilities its kind locks.
+    const lockedBy = (family: string) => (family === 'self' ? !policy.soulEditable : policy.lockedTools.includes(family as ToolKey))
 
     useEffect(() => {
         setLoading(true)
@@ -206,8 +211,8 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                 {isPending ? (
                                     <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0 mt-1" />
                                 ) : (
-                                    <TooltipDisabledReason reason={manageReason} className="shrink-0">
-                                        <Switch checked={checked} disabled={!canManage} onCheckedChange={value => handleToggle(family.family, value)} className="shrink-0 mt-0.5" />
+                                    <TooltipDisabledReason reason={lockedBy(family.family) ? t('lockedByKind') : manageReason} className="shrink-0">
+                                        <Switch checked={checked} disabled={!canManage || lockedBy(family.family)} onCheckedChange={value => handleToggle(family.family, value)} className="shrink-0 mt-0.5" />
                                     </TooltipDisabledReason>
                                 )}
                             </div>
@@ -268,7 +273,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                                 <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0" />
                                             ) : (
                                                 <TooltipDisabledReason reason={manageReason} className="shrink-0">
-                                                    <Switch checked={!!selfImprovement[key]} disabled={!canManage} onCheckedChange={value => handleSelfImprovement(key, value)} className="shrink-0" />
+                                                    <Switch checked={!!selfImprovement[key]} disabled={!canManage || lockedBy('self')} onCheckedChange={value => handleSelfImprovement(key, value)} className="shrink-0" />
                                                 </TooltipDisabledReason>
                                             )}
                                         </label>

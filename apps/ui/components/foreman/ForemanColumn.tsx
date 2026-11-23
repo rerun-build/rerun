@@ -349,8 +349,8 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         void foremanEngineFilesAction().then(supported => {
             if (!cancelled) setFilesOnEngine(supported)
         })
-        void foremanCoworkerAction().then(supported => {
-            if (!cancelled) useForemanStore.getState().setHasCard(supported)
+        void foremanCoworkerAction().then(capabilities => {
+            if (!cancelled) useForemanStore.getState().setCardCapabilities(capabilities)
         })
         return () => {
             cancelled = true

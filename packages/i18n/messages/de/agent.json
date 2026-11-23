@@ -210,6 +210,7 @@
     "agentPanelTools": {
         "unreachable": "Die Engine dieses Coworkers war nicht erreichbar.",
         "updateFailed": "Aktualisierung fehlgeschlagen",
+        "lockedByKind": "Der Chief of Staff behält sie immer.",
         "unavailableTitle": "Fähigkeiten nicht verfügbar",
         "intro": "Wähle, was dieser Coworker tun kann. Änderungen gelten ab der nächsten Ausführung.",
         "about": "Über {capability}",

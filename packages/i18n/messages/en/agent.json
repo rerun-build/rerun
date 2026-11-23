@@ -303,6 +303,7 @@
     "agentPanelTools": {
         "unreachable": "Could not reach the engine for this coworker.",
         "updateFailed": "Failed to update",
+        "lockedByKind": "The Chief of Staff always keeps this one.",
         "unavailableTitle": "Capabilities unavailable",
         "intro": "Choose what this coworker can do. Changes apply on the next run.",
         "about": "About {capability}",

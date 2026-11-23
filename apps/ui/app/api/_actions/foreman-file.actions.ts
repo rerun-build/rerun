@@ -2,7 +2,7 @@
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { supportsForemanCoworker, supportsForemanFiles } from '@/lib/engine/client'
+import { supportsForemanAgent, supportsForemanCoworker, supportsForemanFiles } from '@/lib/engine/client'
 import { FOREMAN_FILES_BUCKET, foremanFileKey } from '@/lib/foreman/files'
 import { readForemanFile } from '@/lib/foreman/read-attachment'
 import { removePrivateFiles } from '@/lib/storage/private'
@@ -32,12 +32,15 @@ export async function foremanEngineFilesAction(): Promise<boolean> {
     }
 }
 
-/** Whether the foreman on the workspace's engine keeps skills, memories, routines and connectors of its own: what its card shows. */
-export async function foremanCoworkerAction(): Promise<boolean> {
+// What the workspace's machine opens on the Chief of Staff's card: its own things (`card`), and the
+// screens of a coworker's card besides (`agent`: its activity and its settings).
+export async function foremanCoworkerAction(): Promise<{ card: boolean; agent: boolean }> {
     try {
         const ctx = await requireWorkspaceContext()
-        return await supportsForemanCoworker(await getWorkspaceConnection(ctx.workspace.id))
+        const conn = await getWorkspaceConnection(ctx.workspace.id)
+        const [card, agent] = await Promise.all([supportsForemanCoworker(conn), supportsForemanAgent(conn)])
+        return { card, agent }
     } catch {
-        return false
+        return { card: false, agent: false }
     }
 }

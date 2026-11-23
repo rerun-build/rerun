@@ -2,7 +2,8 @@
 
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
-import { type ComponentType, type MouseEvent, useEffect, useRef, useState } from 'react'
+import { type ComponentType, type MouseEvent, type ReactNode, useEffect, useRef, useState } from 'react'
+import { agentKindPolicy } from '@rerun/contracts'
 
 import { AgentComputerThumbnail } from '@/components/agent/sheet/AgentComputerThumbnail'
 import { CoworkerNotificationBell } from '@/components/agent/sheet/CoworkerNotificationBell'
@@ -51,8 +52,9 @@ type AgentCardProps = {
     agent: IsoAgent
     onOpen: CardOpenHandler
     onClose: () => void
-    onShare: () => void
-    onDelete: () => void
+    // Absent for a coworker whose kind is never shared or deleted.
+    onShare?: () => void
+    onDelete?: () => void
     onOpenComputer: () => void
     working: boolean
     servicesNeedConfig: boolean
@@ -60,18 +62,29 @@ type AgentCardProps = {
     needsMachineReason: string | null
     // `docked`: a column of its own, its actions a ruled header in line with the chat's tabs beside it.
     presentation?: 'floating' | 'docked'
+    // Who it is, when its kind is not drawn as a buddy of a Box (the Chief of Staff's orb).
+    identity?: ReactNode
+    // The screens its machine does not open for it.
+    withoutDestinations?: readonly CardDestination[]
+    // Rows its kind adds under its own (the check-ins of the Chief of Staff).
+    extraRows?: ReactNode
+    children?: ReactNode
 }
 
 /**
  * Who the coworker is, what it has at hand and the screen it is looking at. A glance, never a full
  * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
  */
-export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, working, servicesNeedConfig, needsMachineReason, presentation = 'floating' }: AgentCardProps) {
+export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, working, servicesNeedConfig, needsMachineReason, presentation = 'floating', identity, withoutDestinations, extraRows, children }: AgentCardProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
+    const policy = agentKindPolicy(agent.kind ?? 'coworker')
     const canManage = useCanManageAgent(agent.id)
     const manageDisabledReason = needsMachineReason ?? (canManage ? null : boxManageReason)
-    const actions = <CardActions agent={agent} onShare={onShare} shareDisabledReason={manageDisabledReason} />
+    const shown = (tab: CardDestination) => !withoutDestinations?.includes(tab)
+    const footer = FOOTER.filter(shown)
+    const deletable = policy.deletable && onDelete
+    const actions = <CardActions agent={agent} onShare={policy.shareable ? onShare : undefined} shareDisabledReason={manageDisabledReason} />
     const close = (
         <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
             <XIcon className="size-4" />
@@ -85,44 +98,52 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
                     <div className="absolute right-3 top-3 z-10">{close}</div>
                 </>
             )}
-            <CardIdentity agent={agent} canRename={canManage} />
+            {identity ?? <CardIdentity agent={agent} canRename={canManage} />}
             <div className="grid shrink-0 grid-cols-4 gap-1.5 px-3 pb-3">
-                {TILES.map(tab => (
+                {TILES.filter(shown).map(tab => (
                     <DestinationTile key={tab} tab={tab} dot={tab === 'services' && servicesNeedConfig} onClick={event => onOpen(tab, event.currentTarget, 'tile')} />
                 ))}
             </div>
             <div className="shrink-0 space-y-4 px-3 pb-3">
                 <div className="space-y-1.5">
-                    {ROWS.map(tab => (
+                    {ROWS.filter(shown).map(tab => (
                         <DestinationRow key={tab} tab={tab} onClick={event => onOpen(tab, event.currentTarget, 'row')} />
                     ))}
+                    {extraRows}
                 </div>
                 <AgentComputerThumbnail key={`${agent.id}:${needsMachineReason}`} agentId={agent.id} working={working} disabledReason={needsMachineReason} onOpen={onOpenComputer} />
             </div>
-            <div className="shrink-0 space-y-2 border-t border-border p-3">
-                <div className="grid grid-cols-2 gap-2">
-                    {FOOTER.map(tab => {
-                        const Glyph = DESTINATION_ICONS[tab]
-                        return (
-                            <Button key={tab} variant="outline" size="sm" className="w-full" onClick={event => onOpen(tab, event.currentTarget, 'button')}>
-                                <Glyph className="size-4" />
-                                {t(`destinations.${tab}`)}
-                            </Button>
-                        )
-                    })}
+            {(footer.length > 0 || deletable) && (
+                <div className="shrink-0 space-y-2 border-t border-border p-3">
+                    {footer.length > 0 && (
+                        <div className={cn('grid gap-2', footer.length > 1 ? 'grid-cols-2' : 'grid-cols-1')}>
+                            {footer.map(tab => {
+                                const Glyph = DESTINATION_ICONS[tab]
+                                return (
+                                    <Button key={tab} variant="outline" size="sm" className="w-full" onClick={event => onOpen(tab, event.currentTarget, 'button')}>
+                                        <Glyph className="size-4" />
+                                        {t(`destinations.${tab}`)}
+                                    </Button>
+                                )
+                            })}
+                        </div>
+                    )}
+                    {deletable && (
+                        <TooltipDisabledReason reason={manageDisabledReason ?? undefined} className="flex w-full">
+                            <button
+                                type="button"
+                                disabled={!!manageDisabledReason}
+                                onClick={onDelete}
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-destructive/10 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/15 disabled:opacity-50 disabled:hover:bg-destructive/10"
+                            >
+                                <Trash2Icon className="size-4" />
+                                {t('delete')}
+                            </button>
+                        </TooltipDisabledReason>
+                    )}
                 </div>
-                <TooltipDisabledReason reason={manageDisabledReason ?? undefined} className="flex w-full">
-                    <button
-                        type="button"
-                        disabled={!!manageDisabledReason}
-                        onClick={onDelete}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-destructive/10 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/15 disabled:opacity-50 disabled:hover:bg-destructive/10"
-                    >
-                        <Trash2Icon className="size-4" />
-                        {t('delete')}
-                    </button>
-                </TooltipDisabledReason>
-            </div>
+            )}
+            {children}
         </>
     )
 
@@ -138,17 +159,19 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
     )
 }
 
-function CardActions({ agent, onShare, shareDisabledReason }: { agent: IsoAgent; onShare: () => void; shareDisabledReason: string | null }) {
+function CardActions({ agent, onShare, shareDisabledReason }: { agent: IsoAgent; onShare?: () => void; shareDisabledReason: string | null }) {
     const t = useTranslations('agent.agentCard')
     return (
         <div className="flex items-center gap-0.5">
             <CoworkerNotificationBell agentId={agent.id} name={agent.name} />
-            <TooltipDisabledReason reason={shareDisabledReason ?? undefined}>
-                <Button variant="ghost" size="sm" disabled={!!shareDisabledReason} onClick={onShare} className="text-muted-foreground">
-                    <Link2 className="size-4" />
-                    {t('share')}
-                </Button>
-            </TooltipDisabledReason>
+            {onShare && (
+                <TooltipDisabledReason reason={shareDisabledReason ?? undefined}>
+                    <Button variant="ghost" size="sm" disabled={!!shareDisabledReason} onClick={onShare} className="text-muted-foreground">
+                        <Link2 className="size-4" />
+                        {t('share')}
+                    </Button>
+                </TooltipDisabledReason>
+            )}
         </div>
     )
 }

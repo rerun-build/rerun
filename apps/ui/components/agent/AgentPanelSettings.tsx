@@ -18,7 +18,9 @@ import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
-import { VERBOSITY_LEVELS } from '@rerun/contracts'
+import { VERBOSITY_LEVELS, agentKindPolicy } from '@rerun/contracts'
+import { renameForemanAction } from '@/app/api/_actions/foreman-name.actions'
+import { useForemanStore } from '@/stores/foreman.store'
 import type { IsoAgent } from '@/lib/board/types'
 import type { EngineVerbosity } from '@/lib/engine/types'
 import { useBoardStore } from '@/stores/board.store'
@@ -47,6 +49,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const openNotifications = useNotificationsStore(s => s.openNotifications)
     const canManage = useCanManageAgent(agent.id)
     const manageReason = canManage ? undefined : boxManageReason
+    const policy = agentKindPolicy(agent.kind ?? 'coworker')
     const [name, setName] = useState(agent.name)
     const [loading, setLoading] = useState(true)
     const [saved, setSaved] = useState(false)
@@ -67,8 +70,17 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
             setName(agent.name)
             return
         }
-        if (trimmed !== agent.name) renameAgent(agent.id, trimmed)
-    }, [name, agent.id, agent.name, renameAgent])
+        if (trimmed === agent.name) return
+        // The Chief of Staff's name is the workspace's, written on the hub: its engine keeps its own.
+        if (agent.kind === 'foreman') {
+            void renameForemanAction(trimmed).then(result => {
+                if (result.ok) useForemanStore.getState().setName(result.name)
+                else setError(errorText(result))
+            })
+            return
+        }
+        renameAgent(agent.id, trimmed)
+    }, [name, agent.id, agent.name, agent.kind, renameAgent, errorText])
 
     useEffect(() => {
         setLoading(true)
@@ -93,7 +105,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
         setError(null)
         // Note: provider/model are intentionally omitted here — they are owned by the
         // in-chat ModelSelector. Including them would overwrite the user's selection.
-        const result = await updateAgentConfigAction(agent.id, { soul, verbosity })
+        const result = await updateAgentConfigAction(agent.id, policy.soulEditable ? { soul, verbosity } : { verbosity })
         if (result.success) {
             setSaved(true)
             setTimeout(() => setSaved(false), 2000)
@@ -132,11 +144,13 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     />
                 </TooltipDisabledReason>
 
-                <Field label={t('appearance')}>
-                    <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
-                        <CoworkerLookPicker agentId={agent.id} look={agent.look ?? null} onChange={look => setAgentLook(agent.id, look)} disabled={!canManage} />
-                    </TooltipDisabledReason>
-                </Field>
+                {policy.look === 'buddy' && (
+                    <Field label={t('appearance')}>
+                        <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
+                            <CoworkerLookPicker agentId={agent.id} look={agent.look ?? null} onChange={look => setAgentLook(agent.id, look)} disabled={!canManage} />
+                        </TooltipDisabledReason>
+                    </Field>
+                )}
 
                 {/* Un agent éteint ne répond plus : son détail engine est inatteignable par construction,
                     pas par panne. Seuls le renommage et la suppression restent utiles ici. */}
@@ -146,19 +160,21 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
 
                 <Form {...form}>
                     <form id={SETTINGS_FORM_ID} onSubmit={handleSave} className="flex flex-col gap-4">
-                        <FormField
-                            control={form.control}
-                            name="soul"
-                            render={({ field }) => (
-                                <FormItem className="space-y-1">
-                                    <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
-                                        <FormControl>
-                                            <MarkdownTextarea label={t('soul.label')} dialogTitle={t('soul.dialogTitle')} className="text-xs min-h-32 font-mono" placeholder={t('soul.placeholder')} {...field} disabled={!canManage} />
-                                        </FormControl>
-                                    </TooltipDisabledReason>
-                                </FormItem>
-                            )}
-                        />
+                        {policy.soulEditable && (
+                            <FormField
+                                control={form.control}
+                                name="soul"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-1">
+                                        <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
+                                            <FormControl>
+                                                <MarkdownTextarea label={t('soul.label')} dialogTitle={t('soul.dialogTitle')} className="text-xs min-h-32 font-mono" placeholder={t('soul.placeholder')} {...field} disabled={!canManage} />
+                                            </FormControl>
+                                        </TooltipDisabledReason>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <FormField
                             control={form.control}
@@ -178,9 +194,9 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     </form>
                 </Form>
 
-                <SharedLinksSection agentId={agent.id} />
+                {policy.shareable && <SharedLinksSection agentId={agent.id} />}
 
-                <AgentAccessRow agent={agent} />
+                {policy.reach === 'box' && <AgentAccessRow agent={agent} />}
 
                 <Field label={t('notifications.label')}>
                     <Button type="button" variant="outline" size="sm" className="w-full justify-start" onClick={() => openNotifications(agent.id)}>
@@ -190,11 +206,13 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                 </Field>
             </PanelEditorBody>
             <PanelEditorFooter>
-                <TooltipDisabledReason reason={manageReason}>
-                    <DeleteAgentDialog agentId={agent.id} agentName={agent.name}>
-                        <PanelDeleteButton label={t('delete')} confirm={false} disabled={!canManage} />
-                    </DeleteAgentDialog>
-                </TooltipDisabledReason>
+                {policy.deletable && (
+                    <TooltipDisabledReason reason={manageReason}>
+                        <DeleteAgentDialog agentId={agent.id} agentName={agent.name}>
+                            <PanelDeleteButton label={t('delete')} confirm={false} disabled={!canManage} />
+                        </DeleteAgentDialog>
+                    </TooltipDisabledReason>
+                )}
                 <TooltipDisabledReason reason={manageReason} className="flex-1">
                     <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canManage}>
                         {saved ? (
