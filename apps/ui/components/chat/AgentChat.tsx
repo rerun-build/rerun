@@ -37,7 +37,7 @@ import { SkeletonChat } from '@/components/ui/skeleton'
 
 import { cancelRunAction, getRunAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionActiveRun, fetchSessionMessages, finalizeSessionAction } from '@/app/api/_actions/session.actions'
-import { fetchSessionSnapshot } from '@/lib/chat/session-snapshot'
+import { fetchSessionSnapshot, fetchSessionTranscript } from '@/lib/chat/session-snapshot'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { useAgentModel } from '@/hooks/useAgentModel'
@@ -54,7 +54,6 @@ import { useSkillProposals } from '@/hooks/useSkillProposals'
 import { useModelPickerStore } from '@/stores/model-picker.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
-import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { stepGroupShowsActivity } from '@/lib/agent-chat-loader'
@@ -554,13 +553,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         clearError,
     })
 
-    const fetchOpenSession = useCallback(() => (sessionId ? fetchSessionMessages(sessionId) : Promise.resolve([])), [sessionId])
-    const catchUp = useTranscriptCatchUp({ idle: status === 'ready' && !reconnecting, messages, fetchMessages: fetchOpenSession, setMessages })
-    useRealtimeSubscription('sessions', {
-        channelId: `session-transcript-${uid}`,
-        enabled: active && !!sessionId,
-        filter: { column: 'id', value: sessionId ?? '' },
-        onUpdate: () => void catchUp(),
+    const fetchOpenSession = useCallback(() => (sessionId ? fetchSessionTranscript(sessionId) : Promise.resolve([])), [sessionId])
+    useTranscriptCatchUp({
+        idle: status === 'ready' && !reconnecting,
+        messages,
+        fetchMessages: fetchOpenSession,
+        setMessages,
+        row: { table: 'sessions', id: sessionId, channelId: `session-transcript-${uid}`, enabled: active },
     })
 
     // Whether the conversation is busy at all, this tab's own stream included. It decides the

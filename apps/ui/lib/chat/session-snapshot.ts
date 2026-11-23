@@ -24,6 +24,11 @@ export async function fetchSessionSnapshot(sessionId: string): Promise<SessionSn
     return res.ok ? ((await res.json()) as SessionSnapshot) : EMPTY_SESSION_SNAPSHOT
 }
 
+export async function fetchSessionTranscript(sessionId: string): Promise<HistoryMessage[]> {
+    const res = await fetch(`/api/sessions/${encodeURIComponent(sessionId)}/transcript`, { cache: 'no-store' })
+    return res.ok ? ((await res.json()) as HistoryMessage[]) : []
+}
+
 // The coworker's General, null until someone has spoken in it.
 export async function fetchGeneralSession(agentId: string): Promise<GeneralSession | null> {
     const res = await fetch(`/api/agents/${encodeURIComponent(agentId)}/general`, { cache: 'no-store' })

@@ -24,7 +24,6 @@ import type { ForemanBackend } from '@/lib/foreman/phase'
 import { sealPendingWidgets, withTypedAnswer } from '@/lib/foreman/seal-pending'
 import { selectForemanBackend, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import type { EngineSkillProposal } from '@/lib/engine/types'
 
 // The foreman's chat, on whichever loop serves the conversation.
@@ -203,12 +202,12 @@ export function useForemanChat() {
     })
 
     const fetchOpenTranscript = useCallback(() => fetchEngineTranscript(sessionId), [sessionId])
-    const catchUp = useTranscriptCatchUp({ idle: onEngine && engineChat.status === 'ready' && !reconnecting, messages: engineChat.messages, fetchMessages: fetchOpenTranscript, setMessages: setEngineMessages })
-    useRealtimeSubscription('foreman_conversations', {
-        channelId: `foreman-transcript-${sessionId}`,
-        enabled: onEngine && !!sessionId,
-        filter: { column: 'id', value: sessionId },
-        onUpdate: () => void catchUp(),
+    useTranscriptCatchUp({
+        idle: onEngine && engineChat.status === 'ready' && !reconnecting,
+        messages: engineChat.messages,
+        fetchMessages: fetchOpenTranscript,
+        setMessages: setEngineMessages,
+        row: { table: 'foreman_conversations', id: sessionId, channelId: `foreman-transcript-${sessionId}`, enabled: onEngine },
     })
 
     // `streaming` couvre aussi bien un outil qui tourne qu'une réponse qui s'écrit : c'est le dernier
