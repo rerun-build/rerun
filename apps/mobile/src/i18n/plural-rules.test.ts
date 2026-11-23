@@ -7,6 +7,7 @@ describe('PackPluralRules', () => {
         expect([0, 1, 2, 2_000_000].map(n => new PackPluralRules('es').select(n))).toEqual(['other', 'one', 'other', 'many'])
         expect([0, 1, 1.5, 2, 1_000_000].map(n => new PackPluralRules('pt-BR').select(n))).toEqual(['one', 'one', 'one', 'other', 'many'])
         expect([0, 1, 1.5, 2].map(n => new PackPluralRules('de').select(n))).toEqual(['other', 'one', 'other', 'other'])
+        expect([0, 1, 1.5, 2, 2_000_000].map(n => new PackPluralRules('it-IT').select(n))).toEqual(['other', 'one', 'other', 'other', 'many'])
         expect([0, 1, 1.5, 2].map(n => new PackPluralRules('tr-TR').select(n))).toEqual(['other', 'one', 'other', 'other'])
     })
 

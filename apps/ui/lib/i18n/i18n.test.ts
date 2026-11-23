@@ -24,12 +24,19 @@ describe('resolveLocale', () => {
     })
 
     it('ignores what it does not ship', () => {
-        expect(resolveLocale({ userLocale: 'it', cookie: 'xx', acceptLanguage: 'es-MX' })).toBe('es')
+        expect(resolveLocale({ userLocale: 'ja', cookie: 'xx', acceptLanguage: 'es-MX' })).toBe('es')
         expect(matchLocale('FR-ca')).toBe('fr')
         expect(matchLocale('pt-PT')).toBe('pt')
         expect(matchLocale('de-CH')).toBe('de')
         expect(matchLocale('tr-TR')).toBe('tr')
+        expect(matchLocale('it-IT')).toBe('it')
         expect(parseAcceptLanguage('*, fr;q=0')).toBeNull()
+    })
+
+    it('resolves a beta language only for whoever has it set, never from the browser', () => {
+        expect(resolveLocale({ userLocale: 'it' })).toBe('it')
+        expect(resolveLocale({ cookie: 'it', acceptLanguage: 'es' })).toBe('it')
+        expect(resolveLocale({ acceptLanguage: 'it-IT,it;q=0.9' })).toBe('en')
     })
 
     it('names each language in its own words', () => {
@@ -38,6 +45,7 @@ describe('resolveLocale', () => {
         expect(localeNativeName('pt')).toBe('Português')
         expect(localeNativeName('de')).toBe('Deutsch')
         expect(localeNativeName('tr')).toBe('Türkçe')
+        expect(localeNativeName('it')).toBe('Italiano')
         expect(localeNativeName('en')).toBe('English')
     })
 })

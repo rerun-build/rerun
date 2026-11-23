@@ -15,7 +15,7 @@ function cardinal(locale: Locale, value: number): PluralCategory {
         if (Math.floor(absolute) === 0 || Math.floor(absolute) === 1) return 'one'
         return largeRound ? 'many' : 'other'
     }
-    if (locale === 'es') {
+    if (locale === 'es' || locale === 'it') {
         if (absolute === 1) return 'one'
         return largeRound ? 'many' : 'other'
     }
