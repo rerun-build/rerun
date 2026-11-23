@@ -3,9 +3,10 @@ import { cp, lstat, readFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { connectorSkillReadOnlyError } from '@rerun/contracts'
+import { brainSkillReadOnlyError, connectorSkillReadOnlyError } from '@rerun/contracts'
 import { parseFrontmatter } from '../../skills/frontmatter.js'
-import { deleteSkill, deleteSkillFile, listSkills, readSkill, resolveSkillFile, skillExists, writeSkill, writeSkillFile } from '../../skills/loader.js'
+import { deleteSkill, deleteSkillFile, readShelfSkill, readSkill, resolveShelfSkillFile, skillExists, writeSkill, writeSkillFile, agentSkillShelf, type SkillShelf } from '../../skills/loader.js'
+import { brainSkillExists, brainSkillShelf, listUsableSkillSummaries } from '../../skills/brain.js'
 import { paginateText } from '../../files/store.js'
 import { resolveWithinReal } from '../sandbox.js'
 import { skillDir, workspaceDir } from '../../config/paths.js'
@@ -27,18 +28,28 @@ export function skillTools(ctx: RunContext): ToolSet {
         return service ? connectorSkillReadOnlyError(slug, service) : null
     }
 
+    // A coworker's own skill wins over the Brain's under the same slug, as everywhere else.
+    function shelfOf(slug: string): { shelf: SkillShelf; fromBrain: boolean } | null {
+        if (skillExists(id, slug)) return { shelf: agentSkillShelf(id), fromBrain: false }
+        if (brainSkillExists(slug)) return { shelf: brainSkillShelf(), fromBrain: true }
+        return null
+    }
+
+    // A write names a skill the coworker does not hold: the Brain's is shared and read-only here.
+    const notOwn = (slug: string): string => (brainSkillExists(slug) ? brainSkillReadOnlyError(slug) : `Skill not found: ${slug}`)
+
     return {
         skill_list: tool({
             description: 'List your skills with their descriptions.',
             inputSchema: z.object({}),
             execute: async () => {
-                const skills = await listSkills(id)
+                const skills = await listUsableSkillSummaries(id)
                 if (skills.length === 0) return 'No skills yet.'
                 const owners = await connectorSkillOwners(id)
                 return skills
                     .map(s => {
                         const service = owners.get(s.slug)
-                        const origin = service ? ` [read-only, installed by the ${service} app]` : ''
+                        const origin = s.fromBrain ? ' [read-only, shared from the Brain]' : service ? ` [read-only, installed by the ${service} app]` : ''
                         return `- ${s.name} (${s.slug}): ${s.description}${origin}`
                     })
                     .join('\n')
@@ -48,10 +59,15 @@ export function skillTools(ctx: RunContext): ToolSet {
             description: 'Read the full procedure of a skill before using it.',
             inputSchema: z.object({ slug: z.string() }),
             execute: async ({ slug }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
-                const skill = await readSkill(id, slug)
-                const service = (await connectorSkillOwners(id)).get(slug)
-                const origin = service ? `_This skill was installed by the ${service} app and is read-only._\n\n` : ''
+                const found = shelfOf(slug)
+                if (!found) return `Skill not found: ${slug}`
+                const skill = await readShelfSkill(found.shelf, slug)
+                const service = found.fromBrain ? undefined : (await connectorSkillOwners(id)).get(slug)
+                const origin = found.fromBrain
+                    ? `_This skill is shared from the Brain with every coworker and is read-only._\n\n`
+                    : service
+                      ? `_This skill was installed by the ${service} app and is read-only._\n\n`
+                      : ''
                 const files = skill.files.length
                     ? `\n\nThis skill bundles these files. Read one with skill_read_file only when the procedure above points to it — never load them all upfront.\n${skill.files.map(f => `- ${f}`).join('\n')}`
                     : ''
@@ -67,10 +83,11 @@ export function skillTools(ctx: RunContext): ToolSet {
                 offset: z.number().int().nonnegative().default(0).describe('Character offset to start at. Use the offset named in the previous page to continue.'),
             }),
             execute: async ({ slug, path, offset = 0 }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                const found = shelfOf(slug)
+                if (!found) return `Skill not found: ${slug}`
                 if (!Number.isInteger(offset) || offset < 0) return 'offset must be a non-negative integer.'
                 try {
-                    const content = await readFile(await resolveSkillFile(id, slug, path), 'utf8')
+                    const content = await readFile(await resolveShelfSkillFile(found.shelf, slug, path), 'utf8')
                     const page = paginateText(content, offset)
                     if (offset === 0 && !page.truncated) return page.content
 
@@ -91,7 +108,7 @@ export function skillTools(ctx: RunContext): ToolSet {
                 content: z.string(),
             }),
             execute: async ({ slug, path, content }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                if (!skillExists(id, slug)) return notOwn(slug)
                 const readOnly = await readOnlyReason(slug)
                 if (readOnly) return readOnly
                 try {
@@ -106,7 +123,7 @@ export function skillTools(ctx: RunContext): ToolSet {
             description: 'Delete a file bundled with a skill.',
             inputSchema: z.object({ slug: z.string(), path: z.string() }),
             execute: async ({ slug, path }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                if (!skillExists(id, slug)) return notOwn(slug)
                 const readOnly = await readOnlyReason(slug)
                 if (readOnly) return readOnly
                 try {
@@ -179,7 +196,7 @@ export function skillTools(ctx: RunContext): ToolSet {
                 replaceAll: z.boolean().default(false).describe('Replace every occurrence instead of requiring a unique match'),
             }),
             execute: async ({ slug, oldString, newString, replaceAll }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                if (!skillExists(id, slug)) return notOwn(slug)
                 const readOnly = await readOnlyReason(slug)
                 if (readOnly) return readOnly
                 if (oldString === newString) return 'oldString and newString are identical; nothing to do.'
@@ -197,7 +214,7 @@ export function skillTools(ctx: RunContext): ToolSet {
                 'Overwrites the entire skill, discarding all of its existing content. Use ONLY for a deliberate full rewrite. For ANY partial change — adding, refining or fixing part of a skill — use skill_edit instead, never this.',
             inputSchema: z.object({ slug: z.string(), description: z.string(), body: z.string() }),
             execute: async ({ slug, description, body }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                if (!skillExists(id, slug)) return notOwn(slug)
                 const readOnly = await readOnlyReason(slug)
                 if (readOnly) return readOnly
                 const current = await readSkill(id, slug)
@@ -209,7 +226,7 @@ export function skillTools(ctx: RunContext): ToolSet {
             description: 'Delete a skill you no longer need.',
             inputSchema: z.object({ slug: z.string() }),
             execute: async ({ slug }) => {
-                if (!skillExists(id, slug)) return `Skill not found: ${slug}`
+                if (!skillExists(id, slug)) return notOwn(slug)
                 const readOnly = await readOnlyReason(slug)
                 if (readOnly) return readOnly
                 await deleteSkill(id, slug)

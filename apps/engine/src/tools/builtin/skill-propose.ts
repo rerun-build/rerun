@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto'
 import { tool, type ToolSet } from 'ai'
-import { connectorSkillReadOnlyError, skillProposalInputSchema, type SkillProposalInput } from '@rerun/contracts'
+import { brainSkillReadOnlyError, connectorSkillReadOnlyError, skillProposalInputSchema, type SkillProposalInput } from '@rerun/contracts'
 import { skillExists } from '../../skills/loader.js'
+import { brainSkillExists } from '../../skills/brain.js'
 import { connectorSkillOwners } from '../../services/registry.js'
 import {
     appendSkillProposalInstruction,
@@ -41,7 +42,7 @@ export function proposalFingerprint(input: { mode: string; slug: string | null; 
 export async function proposalGuard(agentId: string, input: SkillProposalInput): Promise<string | null> {
     if (input.mode === 'edit') {
         if (!input.slug) return 'An edit proposal needs the slug of the skill to change. Nothing shown.'
-        if (!skillExists(agentId, input.slug)) return `No skill with slug "${input.slug}". Nothing shown.`
+        if (!skillExists(agentId, input.slug)) return brainSkillExists(input.slug) ? brainSkillReadOnlyError(input.slug) : `No skill with slug "${input.slug}". Nothing shown.`
         const service = (await connectorSkillOwners(agentId)).get(input.slug)
         if (service) return connectorSkillReadOnlyError(input.slug, service)
     }

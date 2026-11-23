@@ -49,6 +49,7 @@ shared/                     files every coworker reads and writes (shared_* tool
 shared-db/shared.db         SQL database every coworker shares (shared_db_* tools, /shared/data)
 brain/<slug>.md             pages of the company brain, the source of truth
 brain-db/brain.db           brain index: chunks and embeddings, links, proposals, revisions
+brain-skills/<slug>/        skills of the Brain every coworker uses, beside .brain-skills.json (author, date)
 mcp-packages/               MCP servers declared as `npx <package>`, installed once
 ```
 
@@ -177,6 +178,7 @@ data    /agents/:id/data   /shared/data
         GET /tables   POST /query /execute /sources   GET|DELETE /tables/:name   ...
 
 GET    /brain/pages   GET|PUT|DELETE /brain/pages/:slug   ...   GET /brain/proposals   POST /brain/seed
+GET|POST /brain/skills   GET|PATCH|DELETE /brain/skills/:slug   POST /brain/skills/share
 GET    /desktop   POST /agents/:id/desktop/session /apps /takeover   DELETE /agents/:id/desktop/takeover
 GET    /desktop/ws?ticket=…                  VNC WebSocket (ticket, no bearer)
 GET    /remote/computers   PUT|DELETE /remote/computers/:id   POST /remote/computers/:id/rules

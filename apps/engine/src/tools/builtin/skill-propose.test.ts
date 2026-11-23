@@ -126,6 +126,14 @@ describe('skill_propose', () => {
         expect(await listSessionSkillProposals(id, 'session-2')).toHaveLength(0)
     })
 
+    it('says a skill of the Brain is read-only rather than missing', async () => {
+        const { createBrainSkill } = await import('../../skills/brain.js')
+        await createBrainSkill({ name: 'Brand voice', description: 'Write like Acme', body: 'Short sentences.', author: 'user:ada@acme.test' })
+        const result = await propose(otherSession, { ...rule, mode: 'edit', slug: 'brand-voice' })
+        expect(result).toContain('is shared from the Brain with every coworker and is read-only')
+        expect(await listSessionSkillProposals(id, 'session-2')).toHaveLength(0)
+    })
+
     it('never proposes the same rule twice, in any conversation or any state', async () => {
         const rows = await listSessionSkillProposals(id, 'session-1')
         await transitionSkillProposal(id, rows[0].id, ['proposed'], 'dismissed')

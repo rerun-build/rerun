@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections, switchOnModels } from '../connections/migrate.js'
-import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
+import { agentsDir, boxPlanPath, brainSkillsDir, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { adoptConnectors } from '../vault/adopt.js'
 
@@ -148,6 +148,15 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
             const tmp = `${remoteComputersPath()}.tmp`
             await writeFile(tmp, `${JSON.stringify({ computers: [] }, null, 4)}\n`, { encoding: 'utf8', mode: 0o600 })
             await rename(tmp, remoteComputersPath())
+        },
+    },
+    {
+        // The skills of the Brain, shared by every coworker of the box, created empty. An engine from
+        // before this step never reads it, so its coworkers keep exactly the skills of their own folder.
+        version: 9,
+        id: 'brain-skills',
+        up: async () => {
+            await mkdir(brainSkillsDir(), { recursive: true })
         },
     },
 ]

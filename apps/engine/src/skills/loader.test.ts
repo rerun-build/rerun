@@ -47,6 +47,11 @@ describe('resolveSkillFile', () => {
         await expect(resolveSkillFile(id, '..', 'config.json')).rejects.toThrow(/escapes/)
     })
 
+    it('never reaches a dotfile of the shelf', async () => {
+        await expect(resolveSkillFile(id, 'research', '../.vault-skills.json')).rejects.toThrow(/escapes/)
+        await expect(resolveSkillFile(id, 'research', '../.staging/x/SKILL.md')).rejects.toThrow(/escapes/)
+    })
+
     it('keeps a leading slash inside the skill, since it is joined rather than resolved', async () => {
         expect(await resolveSkillFile(id, 'research', '/etc/passwd')).toBe(resolve(skillsDir(id), 'research/etc/passwd'))
     })

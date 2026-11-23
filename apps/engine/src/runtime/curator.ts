@@ -3,7 +3,8 @@ import { modelFor, type ModelOverride } from '../agents/providers.js'
 import { ensureCliAuth } from '../connections/cli-auth.js'
 import { generateStructured } from '../agents/structured.js'
 import { writeMemory, updateMemory, deleteMemory, recallMemory, type RecalledMemory } from '../memory/store.js'
-import { listSkillSummaries, type SkillSummary } from '../skills/loader.js'
+import type { SkillSummary } from '../skills/loader.js'
+import { listUsableSkillSummaries } from '../skills/brain.js'
 import { logger } from '../lib/logger.js'
 import type { LoadedAgent } from '../agents/types.js'
 
@@ -40,7 +41,7 @@ export async function runCurator(agent: LoadedAgent, sessionId: string, userText
 
     const [existing, skills] = await Promise.all([
         recallMemory(agent, `${userText}\n\n${assistantText}`, 5, { reinforce: 'none', includeDormant: true }).catch(() => []),
-        agent.config.tools.skills ? listSkillSummaries(agent.id).catch(() => []) : Promise.resolve([]),
+        agent.config.tools.skills ? listUsableSkillSummaries(agent.id).catch(() => []) : Promise.resolve([]),
     ])
     const knownIds = new Set(existing.map(m => m.id))
 

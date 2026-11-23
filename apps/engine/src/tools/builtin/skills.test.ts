@@ -258,3 +258,45 @@ describe('connector skills', () => {
         expect(await run('skill_delete', { slug: 'mine' })).toContain('Deleted skill mine')
     })
 })
+
+describe('Brain skills', () => {
+    beforeAll(async () => {
+        const { createBrainSkill } = await import('../../skills/brain.js')
+        await createBrainSkill({ name: 'Brand voice', description: 'Write like Acme', body: 'Short sentences.', author: 'user:ada@acme.test' })
+        await createBrainSkill({ name: 'Shadowed', description: 'from the Brain', body: 'Brain version.', author: 'user:ada@acme.test' })
+        await run('skill_create', { name: 'Shadowed', description: 'own', body: 'Own version.' })
+    })
+
+    it('lists them after the coworker own skills, marked as shared and read-only', async () => {
+        const list = await run('skill_list', {})
+        expect(list).toContain('- Brand voice (brand-voice): Write like Acme [read-only, shared from the Brain]')
+        expect(list).toContain('- Shadowed (shadowed): own')
+        expect(list).not.toContain('from the Brain [read-only')
+    })
+
+    it('reads one the coworker does not hold, and its own under the same slug otherwise', async () => {
+        const brand = await run('skill_read', { slug: 'brand-voice' })
+        expect(brand).toContain('shared from the Brain')
+        expect(brand).toContain('Short sentences.')
+        expect(await run('skill_read', { slug: 'shadowed' })).toContain('Own version.')
+    })
+
+    it('refuses every write to a Brain skill', async () => {
+        for (const [name, args] of [
+            ['skill_edit', { slug: 'brand-voice', oldString: 'Short', newString: 'Long' }],
+            ['skill_update', { slug: 'brand-voice', description: 'x', body: 'x' }],
+            ['skill_delete', { slug: 'brand-voice' }],
+            ['skill_write_file', { slug: 'brand-voice', path: 'notes.md', content: 'x' }],
+            ['skill_delete_file', { slug: 'brand-voice', path: 'notes.md' }],
+        ] as const) {
+            expect(await run(name, args)).toContain('is shared from the Brain with every coworker and is read-only')
+        }
+        expect(await run('skill_read', { slug: 'brand-voice' })).toContain('Short sentences.')
+    })
+
+    it('never hands out who added the Brain skills', async () => {
+        const read = await run('skill_read_file', { slug: 'brand-voice', path: '../.brain-skills.json' })
+        expect(read).toContain('Could not read')
+        expect(read).not.toContain('ada@acme.test')
+    })
+})

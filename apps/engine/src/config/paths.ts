@@ -38,6 +38,10 @@ export const brainDir = () => resolve(dataDir(), 'brain')
 
 export const brainPagePath = (slug: string) => resolve(brainDir(), `${pathSegment(slug, 'brain page slug')}.md`)
 
+// The skills every coworker of the box can use, one folder per slug like an agent's `skills/`. A
+// sibling of `brain/` and `agents/`: no page listing walks it, and no archive of a coworker carries it.
+export const brainSkillsDir = () => resolve(dataDir(), 'brain-skills')
+
 export const brainDbDir = () => resolve(dataDir(), 'brain-db')
 
 export const brainDbPath = () => resolve(brainDbDir(), 'brain.db')

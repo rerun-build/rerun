@@ -4,9 +4,10 @@ import { Readable } from 'node:stream'
 import { z } from 'zod'
 import { create } from 'tar'
 import { MAX_SKILL_FILE_BYTES, MAX_SKILL_FOLDER_BYTES, MAX_SKILL_REFERENCE_FILES, skillFilePayloadSchema } from '@rerun/contracts'
-import { deleteSkill, listSkillSummaries, listSkills, parseSkillMarkdown, readSkill, skillExists, writeSkill, writeSkillFolder } from '../../skills/loader.js'
+import { deleteSkill, listSkills, parseSkillMarkdown, readSkill, skillExists, writeSkill, writeSkillFolder } from '../../skills/loader.js'
 import { skillDir, skillsDir } from '../../config/paths.js'
 import { createFilesRouter } from './files.js'
+import { listUsableSkillSummaries } from '../../skills/brain.js'
 import { agentExists } from '../../agents/loader.js'
 import { badRequest, notFound } from '../../lib/errors.js'
 import { slugify } from '../../lib/ids.js'
@@ -52,7 +53,9 @@ skillRoutes.get('/', async c => {
     const agentId = requireAgent(c)
     // The summary leaves out each body and file list: a listing that only shows names reads one
     // frontmatter per skill instead of walking every skill folder.
-    if (c.req.query('summary') === '1') return c.json({ skills: await listSkillSummaries(agentId) })
+    // The summary is what the coworker can call on (the composer's `/` menu, the mobile app): the
+    // Brain's skills are in it, behind its own. The full list stays the coworker's own folder.
+    if (c.req.query('summary') === '1') return c.json({ skills: (await listUsableSkillSummaries(agentId)).map(({ slug, name, description }) => ({ slug, name, description })) })
     return c.json({ skills: await listSkills(agentId) })
 })
 

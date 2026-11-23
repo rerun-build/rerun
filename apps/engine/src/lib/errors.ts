@@ -13,6 +13,8 @@ export const notFound = (what: string) => new HttpError(404, `${what} not found`
 
 export const badRequest = (message: string) => new HttpError(400, message)
 
+export const conflict = (message: string) => new HttpError(409, message)
+
 export const unauthorized = (message = 'Unauthorized') => new HttpError(401, message)
 
 export const agentDisabled = () => new HttpError(403, 'This coworker is switched off and cannot run.')

@@ -8,6 +8,7 @@ import { systemDbExists } from '../db/systemDb.js'
 import { reattributePages } from '../brain/pages.js'
 import { reattributeFiles } from '../brain/files.js'
 import { renameProposalAuthor } from '../brain/proposals.js'
+import { brainSkillMarkdownFiles, reattributeBrainSkills } from '../skills/brain.js'
 import { rewriteScheduleText } from '../schedules/loader.js'
 import { rewriteTriggerText } from '../triggers/loader.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
@@ -94,6 +95,8 @@ async function rewriteAgentMentions(id: string, fromHandle: string, rewrite: (te
 export async function rewriteRenamedAgentReferences(agentId: string, fromHandle: string, toHandle: string): Promise<void> {
     const rewrite = (text: string) => replaceMention(text, fromHandle, toHandle)
     for (const id of await listAgentIdsOnDisk()) await rewriteAgentMentions(id, fromHandle, rewrite)
+    for (const path of await brainSkillMarkdownFiles().catch(() => [])) await attempt({ part: 'brain skills', path }, () => rewriteFile(path, rewrite))
+    await attempt({ part: 'brain skills' }, () => reattributeBrainSkills(`agent:${fromHandle}`, `agent:${toHandle}`))
     await attempt({ part: 'brain pages' }, () => reattributePages(`agent:${fromHandle}`, `agent:${toHandle}`))
     if (existsSync(brainDbPath())) await attempt({ part: 'brain proposals' }, () => renameProposalAuthor(agentId, toHandle))
     if (existsSync(brainDbPath())) await attempt({ part: 'brain files' }, () => reattributeFiles(`agent:${fromHandle}`, `agent:${toHandle}`))

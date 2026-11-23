@@ -384,6 +384,8 @@ The agent writes its own skills: `skill_create` / `skill_edit` for the procedure
 
 A skill installed by a **connector** is the exception: the agent reads it, never writes it. The app records each install's footprint in the agent workspace at `.rerun/services.json`, and `src/services/registry.ts` turns the `skills` of that footprint into a slug → connector map. Every writing skill tool consults it at call time, so a connector attached mid-conversation is protected from the very next tool call: `skill_update`, `skill_edit`, `skill_delete`, `skill_write_file` and `skill_delete_file` refuse by slug, `skill_create` and `skill_import` refuse on `slugify(name)` because `writeSkill` overwrites whatever sits at that slug. `skill_list` and `skill_read` say so up front, so the model does not try. The HTTP routes stay open: they are how the connector installs its own skills.
 
+**Skills of the Brain** (`brain-skills/<slug>/`, `src/skills/brain.ts`) are read by every coworker without being copied into its folder: the index of the system prompt, `skill_list`, `skill_read` and `skill_read_file` add them after the coworker's own skills, marked as shared, and a skill of its own under the same slug wins. Every writing skill tool refuses a slug only the Brain holds. A person writes them from the Brain, or moves a coworker's skill there (`POST /brain/skills/share`); they never enter an export of a coworker.
+
 Manage them over the API (`GET/POST /agents/:id/skills`, `GET/PATCH/DELETE /agents/:id/skills/:slug`, `/agents/:id/skills/:slug/files`, `GET /agents/:id/skills/:slug/archive`) or with `rerun skill list <agentId>`.
 
 ---

@@ -31,8 +31,8 @@ vi.mock('../memory/store.js', () => ({
     },
 }))
 
-vi.mock('../skills/loader.js', () => ({
-    listSkillSummaries: async () => {
+vi.mock('../skills/brain.js', () => ({
+    listUsableSkillSummaries: async () => {
         if (state.skillsFail) throw new Error('unreadable')
         return state.skills
     },

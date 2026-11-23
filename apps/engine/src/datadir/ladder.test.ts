@@ -9,7 +9,7 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { chmod, mkdir, readFile, readdir, rm, stat, symlink, writeFile } = await import('node:fs/promises')
 const { existsSync } = await import('node:fs')
 const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
-const { agentEnvPath, agentDir, agentsDir, boxPlanPath, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath, remoteComputersPath, remoteDir, vaultDir } = await import('../config/paths.js')
+const { agentEnvPath, agentDir, agentsDir, boxPlanPath, brainSkillsDir, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath, remoteComputersPath, remoteDir, vaultDir } = await import('../config/paths.js')
 const { writeEnvFile, readEnvFile } = await import('../lib/env-file.js')
 const { raw } = await import('../db/client.js')
 const { buildCommit } = await import('../runtime/build-info.js')
@@ -329,6 +329,29 @@ describe('v7 to v8: remote-computers', () => {
     })
 })
 
+describe('v8 to v9: brain-skills', () => {
+    const step = DATA_DIR_MIGRATIONS.find(s => s.id === 'brain-skills')!
+
+    beforeEach(async () => {
+        await rm(brainSkillsDir(), { recursive: true, force: true })
+    })
+
+    it('creates the empty shelf of Brain skills, from v8', async () => {
+        await writeDataVersion(8)
+        await migrateDataDir()
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
+        expect(await readdir(brainSkillsDir())).toEqual([])
+    })
+
+    it('keeps the skills already there and replays without harm', async () => {
+        await mkdir(resolve(brainSkillsDir(), 'brand-voice'), { recursive: true })
+        await writeFile(resolve(brainSkillsDir(), 'brand-voice', 'SKILL.md'), '---\nname: Brand voice\n---\nShort sentences.\n', 'utf8')
+        await step.up()
+        await step.up()
+        expect(await readFile(resolve(brainSkillsDir(), 'brand-voice', 'SKILL.md'), 'utf8')).toContain('Short sentences.')
+    })
+})
+
 // Append-only: a shipped step is never removed nor renamed, because a data-dir archived before it
 // still needs it. Updating this snapshot is the change to look at twice.
 describe('data-dir ladder', () => {
@@ -371,6 +394,10 @@ describe('data-dir ladder', () => {
             [
               8,
               "remote-computers",
+            ],
+            [
+              9,
+              "brain-skills",
             ],
           ]
         `)

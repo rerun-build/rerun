@@ -23,10 +23,11 @@ describe('curationSchema', () => {
 // Capture is the user's call, through skill_propose and the row they accept in the chat. An edit
 // reaching for a writer here would break at the import line rather than in production.
 describe('the curator never writes a skill', () => {
-    it('imports nothing from the skill loader but its summaries', () => {
+    it('imports nothing from the skill loader and the Brain but their summaries', () => {
         const source = readFileSync(new URL('./curator.ts', import.meta.url), 'utf8')
         expect(source).not.toMatch(/writeSkill|writeSkillFolder|writeSkillFile|deleteSkill|applySkillProposal|skill_(create|update|edit|propose)/)
-        expect(source).toMatch(/import \{ listSkillSummaries, type SkillSummary \} from '\.\.\/skills\/loader\.js'/)
+        expect(source).toMatch(/import type \{ SkillSummary \} from '\.\.\/skills\/loader\.js'/)
+        expect(source).toMatch(/import \{ listUsableSkillSummaries \} from '\.\.\/skills\/brain\.js'/)
     })
 })
 

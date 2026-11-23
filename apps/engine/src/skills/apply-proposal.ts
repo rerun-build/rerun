@@ -6,7 +6,8 @@ import { ensureCliAuth } from '../connections/cli-auth.js'
 import { syncCodexAuth } from '../connections/codex-auth.js'
 import { generateStructured } from '../agents/structured.js'
 import { connectorSkillOwners } from '../services/registry.js'
-import { listSkillSummaries, readSkill, skillExists, writeSkillFolder, type SkillSummary } from './loader.js'
+import { readSkill, skillExists, writeSkillFolder, type SkillSummary } from './loader.js'
+import { listUsableSkillSummaries } from './brain.js'
 import { transitionSkillProposal } from '../db/repos/skill-proposals.js'
 import { slugify } from '../lib/ids.js'
 import { SKILL_BODY_MAX_WORDS, SKILL_DESCRIPTION_MAX_CHARS, SKILL_STYLE } from './style.js'
@@ -42,7 +43,7 @@ export function applyProposalPrompt(input: {
 async function draft(agent: LoadedAgent, row: SkillProposalRow, abortSignal: AbortSignal): Promise<{ name: string; description: string; body: string; slug: string }> {
     const instructions = JSON.parse(row.instructionsJson) as string[]
     const editing = row.mode === 'edit' && row.slug ? await readSkill(agent.id, row.slug) : null
-    const others = editing ? [] : await listSkillSummaries(agent.id).catch(() => [])
+    const others = editing ? [] : await listUsableSkillSummaries(agent.id).catch(() => [])
 
     const output = await generateStructured({
         model: modelFor(agent, undefined, undefined, undefined, { sessionId: `${agent.id}:skill-proposal` }),

@@ -931,7 +931,7 @@ These routes write any skill, including one a connector installed. That is delib
 { "skills": [ { "slug": "web-research", "name": "Web Research", "description": "...", "body": "1. ...", "files": ["references/sources.md"] } ] }
 ```
 
-`?summary=1` leaves out each body and file list, for a listing that only shows names.
+`?summary=1` leaves out each body and file list, for a listing that only shows names. It is what the coworker can call on: its own skills, then the [skills of the Brain](#skills-of-the-brain) it has none of its own under. Without it, the list is the coworker's own folder only.
 
 ### `POST /agents/:id/skills`
 
@@ -1291,6 +1291,37 @@ retouched. Both answer `{ "proposal": { ... } }`, `404` for an unknown proposal.
 `{ "pages": [ { "slug", "title", "type", "content", "sources" } ] }`, at most 100 pages: writes
 each page the seed still owns and leaves the ones a person or a coworker wrote since.
 `{ "written": ["company"], "skipped": ["pricing"] }`.
+
+### Skills of the Brain
+
+Skills every coworker of the box uses, kept once in `brain-skills/<slug>/` like a coworker's own skill
+folder. A coworker reads them with `skill_list`, `skill_read` and `skill_read_file` and never writes
+them; a skill of its own under the same slug wins. `author` follows the pages (`user:<email>`,
+`agent:<handle>`), `addedAt` is when it entered the Brain, `updatedAt` its last change.
+
+### `GET /brain/skills` · `GET /brain/skills/:slug`
+
+```json
+{ "skills": [ { "slug": "brand-voice", "name": "Brand voice", "description": "...", "body": "...", "files": [], "author": "user:ada@acme.com", "addedAt": "...", "updatedAt": "..." } ] }
+```
+
+One skill answers the object alone, `404` for an unknown slug.
+
+### `POST /brain/skills`
+
+`{ "name", "description"?, "body", "author" }`: the slug comes from the name. `201` with the skill, `409` when
+the Brain already holds that slug.
+
+### `PATCH /brain/skills/:slug` · `DELETE /brain/skills/:slug`
+
+`{ "description"?, "body"? }`, the name and the author kept. `DELETE` answers `204` and takes the skill
+away from every coworker.
+
+### `POST /brain/skills/share`
+
+`{ "agentId", "slug", "author" }`: moves the coworker's own skill, with its files, into the Brain. It
+leaves the coworker's folder. `201` with the skill; `404` for an unknown coworker or skill; `409` when
+the Brain already holds that slug or when an app installed the skill.
 
 ---
 
