@@ -437,12 +437,13 @@ export async function listSkillsAction(agentId: string): Promise<EngineSkillWith
 }
 
 // The shelf alone, for the `/` menu of the composer: no body, no file list, no registry read.
-export async function listSkillSummariesAction(agentId: string): Promise<EngineSkillSummary[]> {
+// `null` when the engine could not answer, so the `/` menu does not claim the agent has no skill.
+export async function listSkillSummariesAction(agentId: string): Promise<EngineSkillSummary[] | null> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
         return await engineListSkillSummaries(conn, engineAgentId)
     } catch {
-        return []
+        return null
     }
 }
 

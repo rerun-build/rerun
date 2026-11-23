@@ -27,7 +27,23 @@
     "mentions": {
         "coworkers": "Coworkers",
         "skills": "Skills",
-        "computers": "Ordinateurs"
+        "computers": "Ordinateurs",
+        "button": "Mentionner un coworker, un skill ou un ordinateur",
+        "coworker": {
+            "action": "Mentionner un coworker",
+            "description": "Faites entrer un coworker dans cette conversation",
+            "empty": "Aucun autre coworker dans ce workspace pour l'instant"
+        },
+        "skill": {
+            "action": "Utiliser un skill",
+            "description": "Lancez un savoir-faire enregistré que votre coworker connaît",
+            "empty": "Ce coworker n'a pas encore de skill"
+        },
+        "computer": {
+            "action": "Utiliser un ordinateur",
+            "description": "Laissez votre coworker travailler sur un ordinateur lié",
+            "empty": "Aucun ordinateur lié pour l'instant"
+        }
     },
     "paidSources": {
         "count": "{count, plural, one {# source} other {# sources}}",
@@ -79,7 +95,8 @@
             "unlink": "Retirer le lien"
         },
         "subscriptionCta": "Vous payez déjà un abonnement IA ? Faites tourner ce coworker dessus.",
-        "placeholder": "Écrivez un message...",
+        "placeholder": "Tapez @ pour un coworker, / pour un skill, # pour un ordinateur",
+        "placeholderNoSkill": "Tapez @ pour un coworker, # pour un ordinateur",
         "attachmentsMissing": "Certaines pièces jointes n'ont pas été envoyées. Retirez-les et joignez-les à nouveau avant d'envoyer.",
         "attachmentsFailed": "{count, plural, one {# pièce jointe n'a pas pu être envoyée. Relancez-la ou retirez-la avant d'envoyer.} other {# pièces jointes n'ont pas pu être envoyées. Relancez-les ou retirez-les avant d'envoyer.}}",
         "noFiles": "Ce chat n'accepte pas encore de fichiers.",

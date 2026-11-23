@@ -925,7 +925,6 @@
     },
     "agentSheetChat": {
         "anotherCoworker": "another coworker",
-        "messagePlaceholder": "Message {name}...",
         "replyPlaceholder": "Reply in {title}...",
         "startedBy": "This session was started by <b>{name}</b>"
     },

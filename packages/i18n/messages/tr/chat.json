@@ -27,7 +27,23 @@
     "mentions": {
         "coworkers": "Coworker'lar",
         "skills": "Skill'ler",
-        "computers": "Bilgisayarlar"
+        "computers": "Bilgisayarlar",
+        "button": "Coworker, skill veya bilgisayar anın",
+        "coworker": {
+            "action": "Coworker anın",
+            "description": "Bu konuşmaya bir coworker katın",
+            "empty": "Bu çalışma alanında henüz başka coworker yok"
+        },
+        "skill": {
+            "action": "Skill kullanın",
+            "description": "Coworker'ınızın bildiği kayıtlı bir yöntemi çalıştırın",
+            "empty": "Bu coworker'ın henüz skill'i yok"
+        },
+        "computer": {
+            "action": "Bilgisayar kullanın",
+            "description": "Coworker'ınızın bağlı bir bilgisayarda çalışmasına izin verin",
+            "empty": "Henüz bağlı bilgisayar yok"
+        }
     },
     "paidSources": {
         "count": "{count, plural, one {# kaynak} other {# kaynak}}",
@@ -79,7 +95,8 @@
             "unlink": "Bağlantıyı kaldır"
         },
         "subscriptionCta": "Zaten bir yapay zeka aboneliğine mi ödüyorsunuz? Bu coworker'ı onunla çalıştırın.",
-        "placeholder": "Bir mesaj gönderin...",
+        "placeholder": "Coworker için @, skill için /, bilgisayar için # yazın",
+        "placeholderNoSkill": "Coworker için @, bilgisayar için # yazın",
         "attachmentsMissing": "Bazı ekler yüklenmedi. Göndermeden önce onları kaldırıp yeniden ekleyin.",
         "attachmentsFailed": "{count, plural, one {# ek yüklenemedi. Göndermeden önce yeniden deneyin veya kaldırın.} other {# ek yüklenemedi. Göndermeden önce yeniden deneyin veya kaldırın.}}",
         "noFiles": "Bu sohbet henüz dosya kabul etmiyor.",

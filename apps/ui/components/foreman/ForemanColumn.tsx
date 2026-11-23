@@ -167,7 +167,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     // Mounted the first time it opens, then kept: opening it again only slides it in.
     const [details, setDetails] = useState({ mounted: false, slideIn: false })
     if (detailsShown && !details.mounted) setDetails({ mounted: true, slideIn: restoreDone })
-    const framedPlaceholder = !pinned ? undefined : threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : tAgent('messagePlaceholder', { name: tView('name', foremanName) })
+    const framedPlaceholder = pinned && threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : undefined
 
     // The kickoff marker goes through here too, and the store turns it away like every message of
     // the funnel: the browser notification permission is only asked once the onboarding is over.
@@ -279,7 +279,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         // Un Escape tapé dans une dialog ouverte par-dessus (le compte, le checkout) ferme la dialog,
         // pas la colonne d'où elle a été ouverte.
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape' || (event.target instanceof Element && event.target.closest('[role="dialog"], [role="alertdialog"], [role="menu"]'))) return
+            if (event.key !== 'Escape' || event.defaultPrevented || (event.target instanceof Element && event.target.closest('[role="dialog"], [role="alertdialog"], [role="menu"]'))) return
             useForemanStore.getState().close()
         }
         window.addEventListener('keydown', onKeyDown)

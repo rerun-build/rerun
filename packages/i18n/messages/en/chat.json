@@ -32,7 +32,8 @@
         "composer.editor.hint": "Keyboard shortcut hint in the full-screen message editor. Keep 'Cmd + Enter' as is.",
         "composer.editor.send": "Verb, button.",
         "composer.link.open": "Verb: opens a link typed in the message box, in a new tab.",
-        "composer.placeholder": "Empty message box of the chat.",
+        "composer.placeholder": "Empty message box of the chat: says what typing @, / or # does. The symbols stay as they are.",
+        "composer.placeholderNoSkill": "Empty message box of the chat with the Chief of Staff, which has no skill: same as composer.placeholder without the / part.",
         "context.cached": "AI input tokens read from the cache.",
         "context.reasoning": "AI tokens spent thinking.",
         "context.title": "Header of a hover card: how much of the AI model's context window (memory) the conversation uses.",
@@ -138,7 +139,23 @@
     "mentions": {
         "coworkers": "Coworkers",
         "skills": "Skills",
-        "computers": "Computers"
+        "computers": "Computers",
+        "button": "Mention a coworker, a skill or a computer",
+        "coworker": {
+            "action": "Mention a coworker",
+            "description": "Bring a coworker into this conversation",
+            "empty": "No other coworker in this workspace yet"
+        },
+        "skill": {
+            "action": "Use a skill",
+            "description": "Run a saved how-to your coworker knows",
+            "empty": "This coworker has no skill yet"
+        },
+        "computer": {
+            "action": "Use a computer",
+            "description": "Let your coworker work on a linked computer",
+            "empty": "No computer linked yet"
+        }
     },
     "paidSources": {
         "count": "{count, plural, one {# source} other {# sources}}",
@@ -190,7 +207,8 @@
             "unlink": "Unlink"
         },
         "subscriptionCta": "Already paying for an AI subscription? Run this coworker on it.",
-        "placeholder": "Send a message...",
+        "placeholder": "Type @ for a coworker, / for a skill, # for a computer",
+        "placeholderNoSkill": "Type @ for a coworker, # for a computer",
         "attachmentsMissing": "Some attachments were not uploaded. Remove them and attach them again before sending.",
         "attachmentsFailed": "{count, plural, one {# attachment failed to upload. Retry or remove it before sending.} other {# attachments failed to upload. Retry or remove them before sending.}}",
         "noFiles": "This chat cannot take files yet.",

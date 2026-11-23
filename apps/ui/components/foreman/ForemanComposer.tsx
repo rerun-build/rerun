@@ -34,9 +34,9 @@ export type ForemanComposerProps = {
     placeholder?: string
 } & ForemanComposerMentionProps
 
-export type ForemanComposerMentionProps = Pick<ComponentProps<typeof ChatComposer>, 'textareaRef' | 'textareaProps' | 'mentionTokens'>
+export type ForemanComposerMentionProps = Pick<ComponentProps<typeof ChatComposer>, 'textareaRef' | 'textareaProps' | 'mentionTokens' | 'commands'>
 
-export function ForemanComposer({ sessionId, backend, status, busy, queue, onSend, onStop, onUploadingChange, composerRef, filesOnEngine, contextStats, ownEntry = false, placeholder, textareaRef, textareaProps, mentionTokens }: ForemanComposerProps) {
+export function ForemanComposer({ sessionId, backend, status, busy, queue, onSend, onStop, onUploadingChange, composerRef, filesOnEngine, contextStats, ownEntry = false, placeholder, textareaRef, textareaProps, mentionTokens, commands }: ForemanComposerProps) {
     // On the engine a file lands in the foreman's own workspace, where its tools can open the path
     // the message names. The hub foreman reads its files from the hub's bucket.
     const t = useTranslations('foreman')
@@ -58,6 +58,7 @@ export function ForemanComposer({ sessionId, backend, status, busy, queue, onSen
             textareaRef={textareaRef}
             textareaProps={textareaProps}
             mentionTokens={mentionTokens}
+            commands={commands}
             // An engine that predates the foreman's file routes would be handed a path it cannot
             // open.
             attachmentsEnabled={!ownEntry && (backend === 'hub' || filesOnEngine)}

@@ -72,7 +72,7 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending
     const body = useMemo(() => ({ source: 'builder' as const, ...(kind === 'general' && { kind }) }), [kind])
     const agentName = boardAgents.find(a => a.id === agentId)?.name ?? t('panelsShared.yourCoworker')
     // A thread keeps the default name until the hub has named it after its first message.
-    const composerPlaceholder = kind === 'general' || !sessionId || !title || title === NEW_THREAD_TITLE ? t('agentSheetChat.messagePlaceholder', { name: agentName }) : t('agentSheetChat.replyPlaceholder', { title })
+    const composerPlaceholder = kind === 'general' || !sessionId || !title || title === NEW_THREAD_TITLE ? undefined : t('agentSheetChat.replyPlaceholder', { title })
 
     const header = originAgentName ? (
         <div className="relative flex items-center gap-2 mx-3 mt-2 p-3 rounded-md border border-border bg-muted/50">

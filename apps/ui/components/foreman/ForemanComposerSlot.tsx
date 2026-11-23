@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
-import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
+import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox, type MentionTrigger } from '@/components/chat/MentionAutocomplete'
 import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
 import { ForemanTrialGate } from '@rerun/cloud/billing.client'
@@ -26,6 +26,9 @@ import { cn } from '@/lib/utils'
 
 // Le repli de hauteur de l'agent sheet, au chiffre près : les deux pieds de panneau doivent se lire
 // pareil. `popLayout` est ce qui empêche le composer sortant et la carte entrante de se pousser.
+// The Chief of Staff has no skill of its own: `/` is not one of its symbols.
+const FOREMAN_MENTION_TRIGGERS: readonly MentionTrigger[] = ['@', '#']
+
 const SLOT_MOTION = {
     initial: { height: 0, opacity: 0 },
     animate: { height: 'auto' as const, opacity: 1 },
@@ -53,7 +56,7 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, above, r
     // Picking a mention writes `el.value` directly, which fires no React change event.
     const syncComposer = useCallback((text: string) => composerRef.current?.sync(text), [composerRef])
     const mentionComputers = useMentionComputers()
-    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer, mentionComputers.computers, mentionComputers.refresh)
+    const { inputRef, menu: mentionMenu, tokens: mentionTokens, commands: mentionCommands, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer, mentionComputers.computers, mentionComputers.refresh, FOREMAN_MENTION_TRIGGERS)
     const composerShown = !trialGate && !aside
 
     // The composer folds inside an `overflow-hidden` box that would clip the menu, so the menu is
@@ -96,7 +99,7 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, above, r
             <AnimatePresence initial={false} mode="popLayout">
                 {composerShown && (
                     <motion.div key="composer" {...SLOT_MOTION} className="overflow-hidden pb-px">
-                        <ForemanComposer {...composer} ownEntry={ownEntry} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} />
+                        <ForemanComposer {...composer} ownEntry={ownEntry} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
                     </motion.div>
                 )}
             </AnimatePresence>

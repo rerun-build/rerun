@@ -835,7 +835,6 @@
     },
     "agentSheetChat": {
         "anotherCoworker": "ein anderer Coworker",
-        "messagePlaceholder": "Nachricht an {name}...",
         "replyPlaceholder": "In {title} antworten...",
         "startedBy": "Diese Sitzung wurde von <b>{name}</b> gestartet"
     },

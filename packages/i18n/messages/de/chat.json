@@ -27,7 +27,23 @@
     "mentions": {
         "coworkers": "Coworker",
         "skills": "Skills",
-        "computers": "Computer"
+        "computers": "Computer",
+        "button": "Einen Coworker, einen Skill oder einen Computer erwähnen",
+        "coworker": {
+            "action": "Coworker erwähnen",
+            "description": "Hol einen Coworker in diese Unterhaltung",
+            "empty": "Noch kein anderer Coworker in diesem Workspace"
+        },
+        "skill": {
+            "action": "Skill verwenden",
+            "description": "Führe eine gespeicherte Anleitung aus, die dein Coworker kennt",
+            "empty": "Dieser Coworker hat noch keinen Skill"
+        },
+        "computer": {
+            "action": "Computer verwenden",
+            "description": "Lass deinen Coworker an einem verknüpften Computer arbeiten",
+            "empty": "Noch kein Computer verknüpft"
+        }
     },
     "paidSources": {
         "count": "{count, plural, one {# Quelle} other {# Quellen}}",
@@ -79,7 +95,8 @@
             "unlink": "Link entfernen"
         },
         "subscriptionCta": "Du zahlst schon für ein KI-Abo? Lass diesen Coworker darüber laufen.",
-        "placeholder": "Nachricht senden...",
+        "placeholder": "Tippe @ für einen Coworker, / für einen Skill, # für einen Computer",
+        "placeholderNoSkill": "Tippe @ für einen Coworker, # für einen Computer",
         "attachmentsMissing": "Einige Anhänge wurden nicht hochgeladen. Entferne sie und hänge sie vor dem Senden erneut an.",
         "attachmentsFailed": "{count, plural, one {# Anhang wurde nicht hochgeladen. Wiederhole oder entferne ihn vor dem Senden.} other {# Anhänge wurden nicht hochgeladen. Wiederhole oder entferne sie vor dem Senden.}}",
         "noFiles": "Dieser Chat kann noch keine Dateien annehmen.",

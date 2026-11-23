@@ -8,9 +8,9 @@ import type { MentionComputer } from '@/components/chat/MentionAutocomplete'
 const FRESH_MS = 10_000
 
 // The computers `#` offers in a composer: read once, and again when `#` is typed after a while, so
-// the state beside each one is the one the box gives now.
-export function useMentionComputers(): { computers: MentionComputer[]; refresh: () => void } {
-    const [computers, setComputers] = useState<MentionComputer[]>([])
+// the state beside each one is the one the box gives now. `null` until a read has answered.
+export function useMentionComputers(): { computers: MentionComputer[] | null; refresh: () => void } {
+    const [computers, setComputers] = useState<MentionComputer[] | null>(null)
     const readAt = useRef(0)
 
     const refresh = useCallback(() => {

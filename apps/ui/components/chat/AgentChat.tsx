@@ -113,7 +113,8 @@ type AgentChatProps = {
     // it then lands on its latest message, or on the top of the question it is waiting on.
     arrival?: number
     mentionAgents?: { id: string; name: string; handle: string | null }[]
-    mentionSkills?: { slug: string; name: string; description?: string }[]
+    // `null` while the agent's skills are not read yet.
+    mentionSkills?: { slug: string; name: string; description?: string }[] | null
     sessionWorking?: boolean
     sessionIdle?: boolean
     alertPending?: boolean
@@ -172,7 +173,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         questionFormRef.current?.sync(text)
     }, [])
     const mentionComputers = useMentionComputers()
-    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, mentionSkills, syncMentionTarget, mentionComputers.computers, mentionComputers.refresh)
+    const { inputRef, menu: mentionMenu, tokens: mentionTokens, commands: mentionCommands, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, mentionSkills, syncMentionTarget, mentionComputers.computers, mentionComputers.refresh)
 
     // The field is the composer in the footer or a pending question's answer in the thread, so the
     // menu is placed against the whole chat and sits on the field wherever it is.
@@ -1170,7 +1171,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                             </motion.div>
                         ) : (
                             <motion.div key="composer" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden pb-px">
-                                <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} />
+                                <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
                                 <ComposerSubscriptionCta open={!hasOwnConnection} claudePlanOffered={isClaudePlanOffered(workspace)} onClick={connectSubscription} />
                             </motion.div>
                         )}

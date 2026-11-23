@@ -6,11 +6,9 @@ import type { EngineSkillSummary } from '@/lib/engine/types'
 
 // The `/` menu of every conversation tab of an agent lists the same skills. One store per agent
 // reads them once; what changes them says so: a run that ended (the agent may have written one),
-// a proposal that landed, the Skills tab after its own listing.
+// a proposal that landed, the Skills tab after its own listing. `null` until a listing has answered.
 
-const NONE: EngineSkillSummary[] = []
-
-const snapshots = new Map<string, EngineSkillSummary[]>()
+const snapshots = new Map<string, EngineSkillSummary[] | null>()
 const listeners = new Map<string, Set<() => void>>()
 const inflight = new Set<string>()
 
@@ -51,11 +49,11 @@ export function setAgentSkillSummaries(agentId: string, skills: EngineSkillSumma
     emit(agentId)
 }
 
-export function useAgentSkillSummaries(agentId: string): EngineSkillSummary[] {
+export function useAgentSkillSummaries(agentId: string): EngineSkillSummary[] | null {
     const subscribeToAgent = useCallback((listener: () => void) => subscribe(agentId, listener), [agentId])
     return useSyncExternalStore(
         subscribeToAgent,
-        () => snapshots.get(agentId) ?? NONE,
-        () => NONE,
+        () => snapshots.get(agentId) ?? null,
+        () => null,
     )
 }

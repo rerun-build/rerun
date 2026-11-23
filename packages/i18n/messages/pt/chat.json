@@ -27,7 +27,23 @@
     "mentions": {
         "coworkers": "Coworkers",
         "skills": "Skills",
-        "computers": "Computadores"
+        "computers": "Computadores",
+        "button": "Mencionar um coworker, uma skill ou um computador",
+        "coworker": {
+            "action": "Mencionar um coworker",
+            "description": "Traga um coworker para esta conversa",
+            "empty": "Ainda não há outro coworker neste workspace"
+        },
+        "skill": {
+            "action": "Usar uma skill",
+            "description": "Execute um procedimento salvo que seu coworker conhece",
+            "empty": "Este coworker ainda não tem skills"
+        },
+        "computer": {
+            "action": "Usar um computador",
+            "description": "Deixe seu coworker trabalhar em um computador vinculado",
+            "empty": "Nenhum computador vinculado ainda"
+        }
     },
     "paidSources": {
         "count": "{count, plural, one {# fonte} other {# fontes}}",
@@ -79,7 +95,8 @@
             "unlink": "Remover link"
         },
         "subscriptionCta": "Já paga uma assinatura de IA? Use-a para rodar este coworker.",
-        "placeholder": "Envie uma mensagem...",
+        "placeholder": "Digite @ para um coworker, / para uma skill, # para um computador",
+        "placeholderNoSkill": "Digite @ para um coworker, # para um computador",
         "attachmentsMissing": "Alguns anexos não foram enviados. Remova-os e anexe de novo antes de enviar.",
         "attachmentsFailed": "{count, plural, one {Falha no envio de # anexo. Tente de novo ou remova-o antes de enviar.} other {Falha no envio de # anexos. Tente de novo ou remova-os antes de enviar.}}",
         "noFiles": "Este chat ainda não aceita arquivos.",

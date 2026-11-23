@@ -12,6 +12,7 @@ import { deleteForemanFileAction } from '@/app/api/_actions/foreman-file.actions
 import { PromptInput, PromptInputButton, PromptInputDropOverlay, PromptInputFooter, PromptInputSubmit, PromptInputTextarea, usePromptInputAttachments } from '@/components/ai-elements/prompt-input'
 import { AttachButton, ChatAttachments } from '@/components/chat/ChatAttachments'
 import { ComposerLinkMirror } from '@/components/chat/ComposerLinkMirror'
+import { MentionCommandsButton, type MentionCommands } from '@/components/chat/MentionAutocomplete'
 import { QueuedMessagePill } from '@/components/chat/QueuedMessagePill'
 import { VoiceComposerControls } from '@/components/chat/VoiceComposerControls'
 import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
@@ -96,6 +97,8 @@ export type ChatComposerProps = {
     textareaProps?: Pick<React.ComponentProps<'textarea'>, 'onChange' | 'onSelect' | 'onKeyDown'>
     /** The `@agent` and `/skill` the caller's autocomplete can insert, drawn as tokens. */
     mentionTokens?: ComposerMention[]
+    /** The mention symbols this composer serves: with them, the footer shows the `@` that lists them. */
+    commands?: MentionCommands
     /** Told whenever an attachment is in flight: a queued message must wait for the last byte. */
     onUploadingChange?: (uploading: boolean) => void
     placeholder?: string
@@ -127,6 +130,7 @@ export function ChatComposer({
     textareaRef,
     textareaProps,
     mentionTokens,
+    commands,
     onUploadingChange,
     placeholder,
     ref,
@@ -422,7 +426,7 @@ export function ChatComposer({
                         <div className="relative w-full">
                             <PromptInputTextarea
                                 ref={inputRef}
-                                placeholder={placeholder ?? t('placeholder')}
+                                placeholder={placeholder ?? (commands && !commands.triggers.includes('/') ? t('placeholderNoSkill') : t('placeholder'))}
                                 className={cn(expandable && 'pr-9', links.hasTokens && 'text-transparent caret-foreground [scrollbar-gutter:stable]')}
                                 {...textareaProps}
                                 onChange={e => {
@@ -483,6 +487,7 @@ export function ChatComposer({
                     <div className="flex min-w-0 items-center gap-1">{modelSlot}</div>
                     <div className="flex items-center gap-1">
                         {!recording && contextSlot}
+                        {!recording && commands && <MentionCommandsButton commands={commands} />}
                         {!recording && attachmentsEnabled && <AttachButton />}
                         {voiceControlsVisible && (
                             <VoiceComposerControls

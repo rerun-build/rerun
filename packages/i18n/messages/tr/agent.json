@@ -835,7 +835,6 @@
     },
     "agentSheetChat": {
         "anotherCoworker": "başka bir coworker",
-        "messagePlaceholder": "Mesaj yazın: {name}...",
         "replyPlaceholder": "Yanıtla: {title}...",
         "startedBy": "Bu oturumu <b>{name}</b> başlattı"
     },
