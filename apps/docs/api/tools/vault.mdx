@@ -41,7 +41,7 @@ A paid account carries its `id`, `slug`, `name`, `account`, `status` (`connected
 
 ## attach_vault_entry
 
-Switches a Vault entry on for one coworker: an app account already signed in, an MCP server or a secret, so it never has to be connected twice. Works for a paid account too. Needs **Can manage** on the coworker's Box.
+Switches a Vault entry on for one coworker: an app account already signed in, an MCP server or a secret, so it never has to be connected twice. Works for a paid account too, which joins the other accounts of the app the coworker already has. Needs **Can manage** on the coworker's Box.
 
 <ParamField body="entryId" type="string" required>
   The `id` of an entry or of a paid account, from `list_vault`.

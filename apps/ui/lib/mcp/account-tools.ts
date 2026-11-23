@@ -591,7 +591,7 @@ const AGENT_TOOL_DEFS = [
             properties: {
                 agentId: CONNECTOR_HOLDER_ID,
                 slug: { type: 'string', description: 'Catalog slug, from search_connectors.' },
-                newInstance: { type: 'boolean', description: 'Add another account of the app next to the ones the coworker holds; ignored for an app that takes a single account, such as a paid app.' },
+                newInstance: { type: 'boolean', description: 'Add another account of the app next to the ones the coworker holds; ignored for an app with nothing to connect, and for a paid app, whose accounts are added with attach_vault_entry.' },
             },
             required: ['agentId', 'slug'],
         },

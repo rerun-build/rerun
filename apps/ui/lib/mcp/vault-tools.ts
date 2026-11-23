@@ -13,7 +13,7 @@ export const VAULT_TOOL_DEFS = [
     {
         name: 'attach_vault_entry',
         description:
-            'Lend a Vault entry to one coworker: an app account already signed in, a custom MCP server or a secret, so it never has to be connected twice. Works for the paid app accounts too. Needs Can manage on the coworker\'s Box. A coworker cannot get the same variable or server name from two entries: the call is refused, naming the entry it clashes with. Returns the entry as list_vault shows it.',
+            'Lend a Vault entry to one coworker: an app account already signed in, a custom MCP server or a secret, so it never has to be connected twice. Works for the paid app accounts too: one joins the other accounts of the app the coworker already has. Needs Can manage on the coworker\'s Box. A coworker cannot get the same variable or server name from two entries: the call is refused, naming the entry it clashes with. Returns the entry as list_vault shows it.',
         inputSchema: {
             type: 'object',
             properties: {
