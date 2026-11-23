@@ -28,8 +28,18 @@ class BuildAsks(unittest.TestCase):
         self.assertIn("git diff origin/dev...HEAD", b)
         self.assertIn("ASK <n>: <file>:<line>", b)
 
-    def test_the_build_brief_has_a_blocked_exit_for_an_ask_without_a_hunk(self):
-        self.assertIn("BLOCKED: plan: ask <n> <why>", self.brief())
+    def test_an_ask_without_a_hunk_gets_an_ask_none_line(self):
+        b = D.build_brief({"issue": 9, "title": "Fix y", "round": 1, "body": "\n".join([
+            "**Change** (one bullet per ask)",
+            "- Add no comments in code.",
+            "- Add the first thing.",
+        ])})
+        self.assertIn(
+            "A bullet with no hunk of its own (one that only forbids something, or states a fact about dev) "
+            "gets the line `ASK <n>: none, <why>`; never point it at an unrelated line.",
+            b,
+        )
+        self.assertNotIn("end with `BLOCKED: plan: ask <n>", b)
 
 
 if __name__ == "__main__":
