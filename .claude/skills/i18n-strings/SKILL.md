@@ -1,6 +1,6 @@
 ---
 name: i18n-strings
-description: Put every user-facing string of Rerun through the language packs (next-intl, ICU, packages/i18n) and keep the translated packs (French, Spanish, Portuguese, German, Turkish) in step. Use whenever you add or change visible text in apps/ui or packages/ui (a label, a button, a toast, an error, an empty state, a zod message), format a date or a number for the screen, extract an existing screen into a namespace, or add a language. Triggers: "translate", "i18n", "add a string", "language pack", « traduis », « ajoute une langue ».
+description: Put every user-facing string of Rerun through the language packs (next-intl, ICU, packages/i18n) and keep the translated packs (French, Spanish, Portuguese, German, Turkish, Arabic, Simplified Chinese, Hebrew) in step, with a layout that also reads right to left. Use whenever you add or change visible text in apps/ui or packages/ui (a label, a button, a toast, an error, an empty state, a zod message), format a date or a number for the screen, extract an existing screen into a namespace, or add a language. Triggers: "translate", "i18n", "add a string", "language pack", « traduis », « ajoute une langue ».
 ---
 
 # Strings through the language packs
