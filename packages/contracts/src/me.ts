@@ -43,6 +43,9 @@ export type DeviceTokenInput = z.infer<typeof deviceTokenSchema>
 // Anything else in a deep link or a push is dropped, it would land in another path of the hub.
 export const ROUTE_ID_PATTERN = /^[\w-]+$/
 
+export const pushSenderSchema = z.object({ name: z.string(), image: z.string(), state: z.string() })
+export type PushSender = z.infer<typeof pushSenderSchema>
+
 // What a push carries for the app to open the right conversation. `conversationId` is the hub's
 // conversation, null for a run with no conversation of its own. `workspaceId` is the workspace it
 // lives in, which the phone switches to first; a push sent before it existed carries none.
@@ -54,6 +57,11 @@ export const pushDataSchema = z.object({
     conversationId: z.string().regex(ROUTE_ID_PATTERN).nullable(),
     kind: z.string(),
     toolCallId: z.string().max(256).optional(),
+    // The coworker the push comes from, as the phone draws it: its name, the picture put at the left
+    // of the push and what happened in a few words. Absent from a push of no coworker, and from a hub
+    // older than the portraits. One a build cannot read is dropped: it only decorates the push, and
+    // must not cost the tap its conversation.
+    sender: pushSenderSchema.optional().catch(undefined),
 })
 export type PushData = z.infer<typeof pushDataSchema>
 
