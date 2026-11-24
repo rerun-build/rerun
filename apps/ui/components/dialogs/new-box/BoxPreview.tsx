@@ -68,8 +68,8 @@ function FloorGlow({ at, width, rising }: { at: { x: number; y: number }; width:
     const place = { left: at.x, top: at.y, width, height: width / 2 }
     return (
         <span className={cn('absolute inset-0', rising && 'animate-in fade-in-0 duration-1000')}>
-            <span className="pointer-events-none absolute hidden -translate-x-1/2 -translate-y-1/2 mix-blend-screen dark:block" style={{ ...place, background: 'radial-gradient(closest-side, rgb(104 80 252 / 0.32), rgb(104 80 252 / 0.12) 55%, transparent)' }} />
-            <span className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 mix-blend-multiply dark:hidden" style={{ ...place, background: 'radial-gradient(closest-side, rgb(104 80 252 / 0.16), rgb(104 80 252 / 0.06) 55%, transparent)' }} />
+            <span className="pointer-events-none absolute hidden -translate-x-1/2 -translate-y-1/2 mix-blend-screen dark:block" style={{ ...place, background: 'radial-gradient(closest-side in srgb, color-mix(in srgb, var(--brand-glow) 32%, transparent), color-mix(in srgb, var(--brand-glow) 12%, transparent) 55%, transparent)' }} />
+            <span className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 mix-blend-multiply dark:hidden" style={{ ...place, background: 'radial-gradient(closest-side in srgb, color-mix(in srgb, var(--brand-glow) 16%, transparent), color-mix(in srgb, var(--brand-glow) 6%, transparent) 55%, transparent)' }} />
         </span>
     )
 }

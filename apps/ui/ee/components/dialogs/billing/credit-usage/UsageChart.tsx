@@ -65,9 +65,9 @@ function Cumulative({ days, slots, balance, trial, hover, onHover, locale }: { d
             <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
                 {showMonth && <line x1="0" x2="100" y1={y(month)} y2={y(month)} className="stroke-muted-foreground/50" strokeDasharray="2 2" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
                 <line x1="0" x2="100" y1={y(whole)} y2={y(whole)} className={showMonth ? 'stroke-muted-foreground/25' : 'stroke-muted-foreground/50'} strokeDasharray="2 2" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-                {points.length > 0 && <path d={area} className="fill-[#4d34f7]/15 dark:fill-[#7a66ff]/20" />}
-                {points.length > 0 && <path d={line} fill="none" className="stroke-[#4d34f7] dark:stroke-[#7a66ff]" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
-                {points.length > 0 && <path d={`M${x(points.length - 1)},${y(running)} L${x(slots - 1)},${y(projected)}`} fill="none" className="stroke-[#4d34f7]/60 dark:stroke-[#7a66ff]/60" strokeDasharray="3 3" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
+                {points.length > 0 && <path d={area} className="fill-brand-chart/15 dark:fill-brand-chart/20" />}
+                {points.length > 0 && <path d={line} fill="none" className="stroke-brand-chart" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
+                {points.length > 0 && <path d={`M${x(points.length - 1)},${y(running)} L${x(slots - 1)},${y(projected)}`} fill="none" className="stroke-brand-chart/60" strokeDasharray="3 3" strokeWidth="2" vectorEffect="non-scaling-stroke" />}
                 {hover != null && <line x1={x(hover)} x2={x(hover)} y1="0" y2={HEIGHT} className="stroke-foreground/30" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
             </svg>
             {showMonth && (

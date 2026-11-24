@@ -5,9 +5,6 @@ import { cn } from '@/lib/utils'
 
 export type CancelMilestone = { at: number; label: string; date: Date; highlighted?: boolean }
 
-// The brand indigo is too dark to read as text on the dark theme; the badges switch to the same lilac.
-export const BRAND_TEXT = 'text-brand dark:text-[#b7a8ff]'
-
 // Not to scale: a reminder a week before a monthly renewal would sit flush against it and the two
 // labels would overlap.
 const MIDDLE_MILESTONE_RANGE = [0.35, 0.6] as const
@@ -41,10 +38,10 @@ function CalendarTile({ date, highlighted }: { date: Date; highlighted?: boolean
     const locale = useLocale()
     return (
         <div className={cn('flex w-10 flex-col overflow-hidden rounded-lg border bg-popover shadow-xs', highlighted && 'border-brand/70 shadow-brand/20 shadow-md')}>
-            <span className={cn('flex h-3.5 items-center justify-center text-[9px] leading-none font-semibold tracking-wider uppercase', highlighted ? 'bg-brand text-white' : 'bg-muted text-muted-foreground')}>
+            <span className={cn('flex h-3.5 items-center justify-center text-[9px] leading-none font-semibold tracking-wider uppercase', highlighted ? 'bg-brand text-brand-ink' : 'bg-muted text-muted-foreground')}>
                 {formatDate(date, locale, { weekday: 'short' })}
             </span>
-            <span className={cn('flex h-[1.875rem] items-center justify-center text-base leading-none font-semibold tabular-nums', highlighted ? BRAND_TEXT : 'text-foreground')}>{date.getDate()}</span>
+            <span className={cn('flex h-[1.875rem] items-center justify-center text-base leading-none font-semibold tabular-nums', highlighted ? 'text-brand-text' : 'text-foreground')}>{date.getDate()}</span>
         </div>
     )
 }

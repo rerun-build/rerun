@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 // Validated with the dataviz palette checker against both surfaces: indigo is the brand, amber stays
 // apart from it under every colour-vision deficiency.
 export const KIND_FILL: Record<CreditKind, string> = {
-    ai: 'bg-[#4d34f7] dark:bg-[#7a66ff]',
+    ai: 'bg-brand-chart',
     data: 'bg-[#c27a12] dark:bg-[#c8841f]',
 }
 

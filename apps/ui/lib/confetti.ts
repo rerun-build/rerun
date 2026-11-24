@@ -5,16 +5,21 @@ const DURATION_MS = 2500
 const EMIT_INTERVAL_MS = 60
 const EMITTERS_PER_TICK = 3
 const PARTICLES_PER_EMITTER = 2
-const COLORS = ['#ffffff', '#e5e5e5', '#a3a3a3', '#4d34f7', '#b7a8ff']
+const NEUTRALS = ['#ffffff', '#e5e5e5', '#a3a3a3']
 
 let buddyShape: Shape | null = null
 let firing = false
 
 // canvas-confetti assigne la couleur par index de particule (`colors[i % colors.length]`),
 // donc un tir de 2 particules ne verrait jamais que les 2 premières teintes de la palette.
-function rotatedColors() {
-    const offset = Math.floor(Math.random() * COLORS.length)
-    return [...COLORS.slice(offset), ...COLORS.slice(0, offset)]
+function rotated(colors: string[]) {
+    const offset = Math.floor(Math.random() * colors.length)
+    return [...colors.slice(offset), ...colors.slice(0, offset)]
+}
+
+function confettiColors() {
+    const style = getComputedStyle(document.documentElement)
+    return [...NEUTRALS, ...['--brand', '--brand-tint'].map(name => style.getPropertyValue(name).trim())]
 }
 
 export async function fireRerunConfetti() {
@@ -39,6 +44,7 @@ export async function fireRerunConfetti() {
         scalar: 3,
     }
 
+    const colors = confettiColors()
     const start = performance.now()
     let lastEmit = -Infinity
 
@@ -55,7 +61,7 @@ export async function fireRerunConfetti() {
             for (let slot = 0; slot < EMITTERS_PER_TICK; slot++) {
                 void confetti({
                     ...baseOptions,
-                    colors: rotatedColors(),
+                    colors: rotated(colors),
                     origin: { x: (slot + Math.random()) / EMITTERS_PER_TICK, y: -0.15 },
                     drift: (Math.random() - 0.5) * 1.5,
                 })

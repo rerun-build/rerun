@@ -22,7 +22,7 @@ const indicatorSizeClass: Record<CheckboxSize, string> = {
 
 const rootVariantClass: Record<CheckboxVariant, string> = {
   light: "data-[state=checked]:bg-foreground/15 data-[state=checked]:shadow-[0_0_3px_0_rgba(255,255,255,0.12)]",
-  brand: "data-[state=checked]:bg-brand/15 data-[state=checked]:shadow-[0_0_3px_0_rgba(183,168,255,0.12)]",
+  brand: "data-[state=checked]:bg-brand/15 data-[state=checked]:shadow-[0_0_3px_0_color-mix(in_srgb,var(--brand-tint)_12%,transparent)]",
 }
 
 const indicatorVariantClass: Record<CheckboxVariant, string> = {

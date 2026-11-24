@@ -40,6 +40,12 @@
   --color-charcoal-900: #202020;
   --color-brand: var(--brand);
   --color-brand-text: var(--brand-text);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-tint: var(--brand-tint);
+  --color-brand-chart: var(--brand-chart);
+  --text-color-brand: var(--brand-mark);
+  --color-bubble: var(--bubble);
+  --color-bubble-ink: var(--bubble-ink);
   --color-frame: var(--frame);
   --color-divide: var(--border);
   --radius-2xl: calc(var(--radius) * 1.8);
@@ -125,6 +131,15 @@ html:not(.dark) .progress-fill {
   /* La marque posée en texte ou en point sur le fond : #4d34f7 se perd sur le noir, le thème sombre
      reprend la lavande du badge brand. */
   --brand-text: var(--brand);
+  /* What `text-brand` draws: Rerun's indigo in both themes, the readable shade of another brand. */
+  --brand-mark: var(--brand);
+  --brand-ink: #fff;
+  --brand-tint: #b7a8ff;
+  --brand-chart: var(--brand);
+  --brand-glow: #6850fc;
+  /* The user's bubble, and what is written on it. */
+  --bubble: var(--brand);
+  --bubble-ink: #fff;
   /* Gouttière autour du panneau du dashboard : plus sombre que le fond en thème sombre, plus claire
      que lui en thème clair, pour que le panneau se détache dans les deux cas. */
   --frame: oklch(0.925 0 0);
@@ -146,6 +161,13 @@ html:not(.dark) .progress-fill {
 .dark {
   --brand: #4d34f7;
   --brand-text: #b7a8ff;
+  --brand-mark: var(--brand);
+  --brand-ink: #fff;
+  --brand-tint: #b7a8ff;
+  --brand-chart: #7a66ff;
+  --brand-glow: #6850fc;
+  --bubble: var(--brand);
+  --bubble-ink: #fff;
   --frame: oklch(0 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);

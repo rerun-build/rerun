@@ -65,7 +65,7 @@ function ClassicDrawing() {
             <div className="flex flex-1 flex-col justify-end gap-1.5 p-2">
                 <div className="h-3 w-4/5 rounded-md bg-muted" />
                 <div className="h-3 w-3/5 rounded-md bg-muted" />
-                <div className="ms-auto h-3 w-1/2 rounded-md bg-brand" />
+                <div className="ms-auto h-3 w-1/2 rounded-md bg-bubble" />
                 <div className="mt-1 h-4 rounded-md border" />
             </div>
         </div>

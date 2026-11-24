@@ -51,7 +51,7 @@ export function ExpandableMessage({ agentId, mentions, children }: ExpandableMes
             </div>
             {overflows && (
                 <button type="button" aria-expanded={expanded} onClick={() => setExpanded(open => !open)} className="mt-2 self-center opacity-80 transition-opacity hover:opacity-100">
-                    <Badge tone="white" size="xs" className="[--badge-fg:#fff]! [--badge-soft:rgba(255,255,255,0.12)]!" trailing={expanded ? <ChevronUpIcon className="size-3" /> : <ChevronDownIcon className="size-3" />}>
+                    <Badge tone="white" size="xs" className="[--badge-fg:var(--bubble-ink)]! [--badge-soft:color-mix(in_srgb,var(--bubble-ink)_12%,transparent)]!" trailing={expanded ? <ChevronUpIcon className="size-3" /> : <ChevronDownIcon className="size-3" />}>
                         {expanded ? t('showLess') : t('showMore')}
                     </Badge>
                 </button>

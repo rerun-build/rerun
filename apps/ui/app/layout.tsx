@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 import { brandIcons } from "@/lib/brand/icons";
 import { getBrand } from "@/lib/brand/server";
 import { BrandProvider } from "@/components/brand/BrandProvider";
+import { BrandStyle } from "@/components/brand/BrandStyle";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AffiliateTracking } from "@rerun/cloud/support";
@@ -113,6 +114,9 @@ export default async function RootLayout({
       {...(desktopShell ? { [DESKTOP_SHELL_ATTRIBUTE]: desktopShell.platform } : {})}
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable, notoArabic.variable, notoHebrew.variable)}
     >
+      <head>
+        <BrandStyle brand={brand} />
+      </head>
       <body className="min-h-full flex flex-col">
         {desktopShell && <ShellTitleBar />}
         <DomMutationGuard />

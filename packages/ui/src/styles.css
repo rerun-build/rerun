@@ -107,7 +107,7 @@ html[data-unattended] *::after {
 
 /* Couleurs : --beam-1 = teinte claire (celle qui "glow"), --beam-2 = base.
    Couplées forme×ton pour reproduire à l'identique les variantes d'origine. */
-.border-beam--ring.border-beam--brand { --beam-1: #b7a8ff; --beam-2: var(--color-brand, #4d34f7); }
+.border-beam--ring.border-beam--brand { --beam-1: var(--brand-tint, #b7a8ff); --beam-2: var(--color-brand, #4d34f7); }
 .border-beam--ring.border-beam--white { --beam-1: rgba(255, 255, 255, 0.55); --beam-2: #fff; }
 .border-beam--ring.border-beam--neutral { --beam-1: rgba(0, 0, 0, 0.06); --beam-2: rgba(0, 0, 0, 0.18); }
 .dark .border-beam--ring.border-beam--neutral { --beam-1: rgba(255, 255, 255, 0.08); --beam-2: rgba(255, 255, 255, 0.35); }
@@ -118,7 +118,7 @@ html[data-unattended] *::after {
 .border-beam--ring.border-beam--yellow { --beam-1: rgba(250, 204, 21, 0.6); --beam-2: #facc15; }
 html:not(.dark) .border-beam--ring.border-beam--yellow { --beam-1: rgba(202, 138, 4, 0.45); --beam-2: #ca8a04; }
 
-.border-beam--arcs.border-beam--brand { --beam-1: #b7a8ff; --beam-2: color-mix(in oklab, #b7a8ff 20%, transparent); }
+.border-beam--arcs.border-beam--brand { --beam-1: var(--brand-tint, #b7a8ff); --beam-2: color-mix(in oklab, var(--brand-tint, #b7a8ff) 20%, transparent); }
 .border-beam--arcs.border-beam--white { --beam-1: rgba(255, 255, 255, 1); --beam-2: rgba(255, 255, 255, 0.16); }
 html:not(.dark) .border-beam--arcs.border-beam--white { --beam-1: rgba(0, 0, 0, 0.9); --beam-2: rgba(0, 0, 0, 0.12); }
 .border-beam--arcs.border-beam--neutral { --beam-1: rgba(0, 0, 0, 0.4); --beam-2: rgba(0, 0, 0, 0.08); }
@@ -132,8 +132,8 @@ html:not(.dark) .border-beam--arcs.border-beam--white { --beam-1: rgba(0, 0, 0, 
 /* Badge (composant Badge) : couleur du texte (--badge-fg) + fond soft (--badge-soft)
    par ton, alignés sur les couleurs du BorderBeam. */
 .badge-beam { color: var(--badge-fg, currentColor); }
-.badge-beam--brand { --badge-fg: var(--color-brand, #4d34f7); --badge-soft: color-mix(in oklab, var(--color-brand, #4d34f7) 10%, transparent); }
-.dark .badge-beam--brand { --badge-fg: #b7a8ff; }
+.badge-beam--brand { --badge-fg: var(--brand-mark, var(--color-brand, #4d34f7)); --badge-soft: color-mix(in oklab, var(--color-brand, #4d34f7) 10%, transparent); }
+.dark .badge-beam--brand { --badge-fg: var(--brand-text, #b7a8ff); }
 .badge-beam--white { --badge-fg: #fff; --badge-soft: rgba(255, 255, 255, 0.08); }
 html:not(.dark) .badge-beam--white { --badge-fg: #111; --badge-soft: rgba(0, 0, 0, 0.05); }
 .badge-beam--neutral { --badge-fg: rgba(0, 0, 0, 0.7); --badge-soft: rgba(0, 0, 0, 0.05); }

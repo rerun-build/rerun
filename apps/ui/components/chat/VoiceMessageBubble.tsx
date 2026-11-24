@@ -28,7 +28,7 @@ export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessage
                 onClick={toggle}
                 disabled={!available || loading}
                 aria-label={playing ? t('pause') : t('play')}
-                className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-foreground transition-colors hover:bg-foreground/20 disabled:opacity-50 in-data-ink:bg-white/15 in-data-ink:text-white in-data-ink:hover:bg-white/25"
+                className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-foreground transition-colors hover:bg-foreground/20 disabled:opacity-50 in-data-ink:bg-bubble-ink/15 in-data-ink:text-bubble-ink in-data-ink:hover:bg-bubble-ink/25"
             >
                 {loading ? <Spinner /> : playing ? <PauseIcon className="size-4" /> : <Play className="size-4" />}
                 {playing && <BorderBeam animated pattern="arcs" tone="neutral" width={1} duration={3} />}
@@ -41,12 +41,12 @@ export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessage
                     seekAt((event.clientX - bounds.left) / bounds.width)
                 }}
                 aria-label={t('seek')}
-                className="flex w-32 shrink-0 cursor-pointer items-center text-foreground in-data-ink:text-white sm:w-40"
+                className="flex w-32 shrink-0 cursor-pointer items-center text-foreground in-data-ink:text-bubble-ink sm:w-40"
             >
                 <VoiceWaveform peaks={levels} progress={progress} />
             </button>
 
-            <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground in-data-ink:text-white/70">{formatVoiceDuration(playing || elapsedMs > 0 ? elapsedMs : durationMs)}</span>
+            <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground in-data-ink:text-bubble-ink/70">{formatVoiceDuration(playing || elapsedMs > 0 ? elapsedMs : durationMs)}</span>
 
             <audio {...audioProps} />
         </div>

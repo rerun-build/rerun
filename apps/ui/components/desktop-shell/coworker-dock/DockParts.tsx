@@ -42,7 +42,7 @@ export function pendingTotal(coworkers: readonly CoworkerDockCoworker[]) {
 export function CountPip({ count, tone = 'brand', className }: { count: number; tone?: 'brand' | 'error'; className?: string }) {
     if (count <= 0) return null
     return (
-        <span className={cn('flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold text-white tabular-nums ring-2 ring-popover', tone === 'error' ? 'bg-destructive' : 'bg-brand', className)}>
+        <span className={cn('flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold tabular-nums ring-2 ring-popover', tone === 'error' ? 'bg-destructive text-white' : 'bg-brand text-brand-ink', className)}>
             {count > 9 ? '9+' : count}
         </span>
     )
