@@ -11,7 +11,7 @@ import { appTarget, getMethod, missingRequiredInputs, serviceManifestSchema, tak
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany } from '@/supabase/supabase-helpers'
+import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { nextServiceInstance } from '@/lib/services/instances'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
@@ -118,10 +118,10 @@ export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
     const filters = text ? { enabled: true, or: { name: { ilike: pattern }, slug: { ilike: pattern } } } : { enabled: true }
     const flags = await paidAppFlags()
     const paidApps = APP_SLUGS.filter(slug => flags[slug])
-    // Browsed without a query, the page holds the first apps by name: the paid ones are read on their own and come first.
+    // Browsed without a query, the paid apps are read on their own and come first, ahead of the catalog by name.
     const pinnedSlugs = text ? [] : paidApps.map(slug => appInfo(slug).serviceSlug)
     const [{ data: page }, { data: pinned }] = await Promise.all([
-        selectMany(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }, 60),
+        selectAll(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }),
         pinnedSlugs.length ? selectMany(supabase, 'services', CATALOG_COLUMNS, { enabled: true, slug: pinnedSlugs }) : Promise.resolve({ data: [] }),
     ])
     const rows = [...(pinned ?? []), ...(page ?? []).filter(row => !pinnedSlugs.includes(row.slug))]

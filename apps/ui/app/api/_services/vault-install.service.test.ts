@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EngineRequestError } from '@/lib/engine/client'
 import { createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
-import { selectMany } from '@/supabase/supabase-helpers'
+import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { serviceManifestSchema } from '@/lib/services/manifest'
 import { addVaultMcp, addVaultSecret, addVaultService, saveSecretsToVault, vaultCatalog, vaultServerName } from './vault-install.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
@@ -11,7 +11,7 @@ import { assertManagesCoworker, shareVaultEntry } from './vault.service'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn() }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectAll: vi.fn(), selectMany: vi.fn() }))
 vi.mock('@rerun/cloud/apps.server', () => ({ paidAppFlags: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ createVaultItem: vi.fn(async (_c: unknown, input: Record<string, unknown>) => ({ id: 'new', ...input })), attachVaultItem: vi.fn(), getVaultItem: vi.fn(), listVaultItems: vi.fn(), updateVaultItemEnv: vi.fn() }))
 vi.mock('./services.service', () => ({ loadManifest: vi.fn(), toAuthMethodSummaries: vi.fn() }))
@@ -81,13 +81,27 @@ const GMAIL = {
     },
 }
 
-// The page of the catalog, and the paid apps' own rows the Vault reads beside it when nothing is searched.
-function catalogRows(page: unknown[]) {
+// The catalog, and the paid apps' own rows the Vault reads beside it when nothing is searched.
+function catalogRows(catalog: unknown[]) {
+    vi.mocked(selectAll).mockResolvedValue({ data: catalog, error: null } as never)
     vi.mocked(selectMany).mockImplementation((async (_client: unknown, _table: unknown, _columns: unknown, filters: { slug?: string[] }) => ({
-        data: Array.isArray(filters.slug) ? [WHATSAPP_PRO].filter(row => filters.slug?.includes(row.slug)) : page,
+        data: [WHATSAPP_PRO].filter(row => filters.slug?.includes(row.slug)),
         error: null,
     })) as never)
 }
+
+function keyApp(slug: string, name: string) {
+    return {
+        slug,
+        name,
+        icon: null,
+        category: 'productivity',
+        summary: name,
+        manifest: { slug, name, summary: name, category: 'productivity', inputs: [{ key: `${slug.toUpperCase().replace(/-/g, '_')}_KEY`, label: 'API key', type: 'password', secret: true, required: true }] },
+    }
+}
+
+const LONG_CATALOG = [...Array.from({ length: 70 }, (_, i) => keyApp(`app-${i + 1}`, `App ${String(i + 1).padStart(3, '0')}`)), keyApp('zapier', 'Zapier')]
 
 describe('vaultCatalog', () => {
     beforeEach(() => {
@@ -121,6 +135,20 @@ describe('vaultCatalog', () => {
     it('lists a paid app once when the first page holds it too', async () => {
         vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
         expect((await vaultCatalog()).filter(app => app.slug === 'whatsapp-pro')).toHaveLength(1)
+    })
+
+    it('offers every app of a long catalog when browsed, down to the end of the alphabet', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({})
+        catalogRows(LONG_CATALOG)
+        const slugs = (await vaultCatalog()).map(app => app.slug)
+        expect(slugs).toHaveLength(LONG_CATALOG.length)
+        expect(slugs).toContain('zapier')
+    })
+
+    it('returns every match of a broad search', async () => {
+        vi.mocked(paidAppFlags).mockResolvedValue({})
+        catalogRows(LONG_CATALOG.filter(row => row.name.toLowerCase().includes('a')))
+        expect((await vaultCatalog('a')).map(app => app.slug)).toContain('zapier')
     })
 })
 

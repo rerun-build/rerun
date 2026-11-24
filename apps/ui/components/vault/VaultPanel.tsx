@@ -17,7 +17,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { KeyIcon, LockKeyholeIcon, SearchIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge, ScrollFade } from '@rerun/ui/primitives'
 import { VaultAddApp, type VaultAddKind } from './VaultAddApp'
 import { VaultEmpty } from './VaultEmpty'
 import { VaultEntryDetail } from './VaultEntryDetail'
@@ -124,15 +124,17 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
                             <VaultEmpty addReason={addReason} apps={popularApps} onApps={setPopularApps} loadApps={loadPopularApps} onPick={app => setPage({ kind: 'add', app })} onAdd={addKind => setPage({ kind: 'add', addKind })} />
                         </PanelScroller>
                     ) : (
-                        <PanelScroller className="space-y-4 p-4">
-                            {listing.entries.length >= SEARCH_FROM && (
-                                <div className="relative">
-                                    <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                                    <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
-                                </div>
-                            )}
-                            <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} />
-                        </PanelScroller>
+                        <ScrollFade className="min-h-0 flex-1 p-4">
+                            <div className="space-y-4">
+                                {listing.entries.length >= SEARCH_FROM && (
+                                    <div className="relative">
+                                        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                                        <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
+                                    </div>
+                                )}
+                                <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} />
+                            </div>
+                        </ScrollFade>
                     )}
                 </PanelSteps>
             </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { ScrollFade } from '@rerun/ui/primitives'
 
 import { vaultCatalogAction } from '@/app/api/_actions/vault.actions'
 import type { VaultCatalogApp } from '@/app/api/_services/vault-install.service'
@@ -102,34 +103,36 @@ function VaultCatalog({ onPick }: { onPick: (app: VaultCatalogApp) => void }) {
                     <Input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder={t('addPage.search')} className="pl-8" aria-label={t('addPage.search')} />
                 </div>
             </div>
-            <PanelScroller className="space-y-1.5 p-3">
-                {error ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">{error}</p>
-                ) : apps === null ? (
-                    Array.from({ length: 6 }, (_, i) => (
-                        <div key={i} className="flex items-center gap-3 rounded-md border p-3">
-                            <Skeleton className="size-8 rounded-md" />
-                            <div className="flex-1 space-y-1.5">
-                                <Skeleton className="h-3.5 w-24" />
-                                <Skeleton className="h-2.5 w-48" />
+            <ScrollFade className="min-h-0 flex-1 p-3">
+                <div className="space-y-1.5">
+                    {error ? (
+                        <p className="py-6 text-center text-sm text-muted-foreground">{error}</p>
+                    ) : apps === null ? (
+                        Array.from({ length: 6 }, (_, i) => (
+                            <div key={i} className="flex items-center gap-3 rounded-md border p-3">
+                                <Skeleton className="size-8 rounded-md" />
+                                <div className="flex-1 space-y-1.5">
+                                    <Skeleton className="h-3.5 w-24" />
+                                    <Skeleton className="h-2.5 w-48" />
+                                </div>
                             </div>
-                        </div>
-                    ))
-                ) : apps.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">{t('noMatch')}</p>
-                ) : (
-                    apps.map(app => (
-                        <PanelRow
-                            key={app.slug}
-                            onClick={() => onPick(app)}
-                            leading={<Icon {...serviceIconProps(app.icon, app.category)} size="sm" />}
-                            title={app.name}
-                            description={app.summary}
-                            actions={<ChevronRightIcon className="size-4 text-muted-foreground" />}
-                        />
-                    ))
-                )}
-            </PanelScroller>
+                        ))
+                    ) : apps.length === 0 ? (
+                        <p className="py-6 text-center text-sm text-muted-foreground">{t('noMatch')}</p>
+                    ) : (
+                        apps.map(app => (
+                            <PanelRow
+                                key={app.slug}
+                                onClick={() => onPick(app)}
+                                leading={<Icon {...serviceIconProps(app.icon, app.category)} size="sm" />}
+                                title={app.name}
+                                description={app.summary}
+                                actions={<ChevronRightIcon className="size-4 text-muted-foreground" />}
+                            />
+                        ))
+                    )}
+                </div>
+            </ScrollFade>
         </div>
     )
 }
