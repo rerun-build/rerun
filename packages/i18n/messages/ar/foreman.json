@@ -1,0 +1,355 @@
+{
+    "welcome": {
+        "title": "مرحبًا، هل أنت مستعد لتسليم مهمتك الأولى؟",
+        "preparing": "جارٍ تجهيز مساحة العمل..."
+    },
+    "header": {
+        "closeDisabled": "أكمل الإعداد لإغلاق المحادثة",
+        "move": "نقل",
+        "moveChat": "نقل المحادثة",
+        "position": {
+            "dockLeft": "تثبيت يسارًا",
+            "dockRight": "تثبيت يمينًا",
+            "float": "عائم"
+        },
+        "newConversation": "محادثة جديدة",
+        "conversations": "المحادثات"
+    },
+    "threads": {
+        "general": "عام",
+        "back": "العودة إلى عام",
+        "untitled": "محادثة جديدة"
+    },
+    "history": {
+        "title": "المحادثات",
+        "close": "إغلاق",
+        "empty": "لا توجد سلاسل بعد."
+    },
+    "resize": "تغيير حجم المحادثة",
+    "modelPill": {
+        "hubReason": "تعمل هذه المحادثة دائمًا على Rerun Balanced"
+    },
+    "nextSteps": {
+        "turnOn": "تشغيل زميلي",
+        "yourInstallStarted": "بدأ تثبيت زميلك",
+        "installStarted": "بدأ تثبيت {name}",
+        "startInstallingMine": "بدء تثبيت زميلي",
+        "startInstalling": "بدء تثبيت {name}",
+        "startTrial": "بدء الفترة التجريبية المجانية",
+        "startPlan": "بدء خطتي",
+        "starting": "جارٍ البدء…",
+        "openChat": "فتح المحادثة",
+        "installFailed": "تعذّر بدء التثبيت"
+    },
+    "notification": {
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} بانتظارك.} other {Chief of Staff بانتظارك.}}"
+    },
+    "dock": {
+        "tooltip": "{named, select, yes {ابحث أو اسأل {name}} other {ابحث أو اسأل Chief of Staff}} <key>{shortcut}</key>",
+        "failedReply": "حدث خطأ ما في هذا الطلب."
+    },
+    "nudge": {
+        "approval": "يحتاج إلى موافقتك",
+        "question": "يحتاج إلى إجابتك",
+        "more": "+{count} أخرى",
+        "review": "مراجعة",
+        "answer": "إجابة",
+        "later": "لاحقًا"
+    },
+    "reply": {
+        "open": "فتح المحادثة",
+        "dismiss": "تجاهل"
+    },
+    "voice": {
+        "listening": "جارٍ الاستماع · اترك مفتاح المسافة للإرسال",
+        "transcribing": "جارٍ التفريغ النصي...",
+        "nothingHeard": "لم يُسمع أي شيء في هذا التسجيل.",
+        "sendFailed": "تعذّر إرسال رسالتك الصوتية."
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "ما الذي تم تشغيله الليلة الماضية؟",
+            "failedRun": "لماذا فشل هذا التشغيل؟",
+            "newCoworker": "أنشئ لي زميلًا جديدًا"
+        },
+        "ask": "{named, select, yes {اسأل {name}} other {اسأل Chief of Staff}}",
+        "send": "إرسال"
+    },
+    "routines": {
+        "resumeFailed": "تعذّر استئناف {name}",
+        "pauseFailed": "تعذّر إيقاف {name} مؤقتًا",
+        "renameFailed": "تعذّرت إعادة تسمية {name}",
+        "runFailed": "تعذّر تشغيل {name}",
+        "started": "بدأ {name}",
+        "emptyTitle": "لا توجد مهام دورية بعد",
+        "emptyDescription": "اطلب من زميل القيام بشيء وفق جدول (تقرير يومي، ملخص أسبوعي) وسيظهر هنا.",
+        "unknownCoworker": "زميل غير معروف",
+        "options": "خيارات {name}",
+        "rename": "إعادة التسمية",
+        "edit": "تعديل",
+        "runNow": "تشغيل الآن"
+    },
+    "ownEntry": "أعرف ما أحتاجه",
+    "ownEntryPlaceholder": "أعرف ما أحتاجه…",
+    "gettingStarted": {
+        "title": "البدء",
+        "hide": "إخفاء",
+        "pillLabel": "البدء: {done} من {total} مكتملة",
+        "steps": {
+            "phone": {
+                "title": "تحقق من رقم هاتفك",
+                "description": "أمّن حسابك وتلقَّ أخبار زملائك عبر WhatsApp أو الرسائل النصية."
+            },
+            "first_agent": {
+                "title": "أنشئ زميلك الأول",
+                "description": "عضو في الفريق يعمل أثناء غيابك."
+            },
+            "ai_provider": {
+                "title": "اربط اشتراكك في الذكاء الاصطناعي",
+                "description": "Claude أو ChatGPT أو Gemini أو مفتاح API الخاص بك."
+            },
+            "invite": {
+                "title": "ادعُ عضوًا في الفريق",
+                "description": "شارك زملاءك مع الأشخاص الذين تعمل معهم."
+            },
+            "schedule": {
+                "title": "جدول مهمة متكررة",
+                "description": "اجعل أحد زملائك يعمل تلقائيًا."
+            },
+            "payment_method": {
+                "title": "أضف وسيلة دفع",
+                "description": "أبقِ زملاءك يعملون عند انتهاء فترتك التجريبية. لن يُخصم شيء اليوم."
+            }
+        },
+        "reward": {
+            "grantedTitle": "أُضيف {days, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}} إلى فترتك التجريبية",
+            "grantedDescription": "مساحة العمل جاهزة تمامًا. استمتع بالوقت الإضافي.",
+            "claimingTitle": "جارٍ إضافة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}} إلى فترتك التجريبية",
+            "claimingDescription": "لحظة واحدة.",
+            "doneTitle": "مساحة العمل جاهزة تمامًا",
+            "doneDescription": "يمكن لزملائك العمل بمفردهم الآن.",
+            "lockedTitle": "احصل على {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}} إضافية من الفترة التجريبية المجانية",
+            "lockedDescription": "أكمل الخطوات الـ {total} أعلاه. المتبقي: {remaining}."
+        },
+        "prompts": {
+            "first_agent": "ساعدني في إنشاء زميلي الأول",
+            "ai_provider": "ساعدني في ربط اشتراكي في Claude أو ChatGPT، أو مفتاح API",
+            "invite": "ساعدني في دعوة عضو في الفريق إلى مساحة عملي",
+            "schedule": "جدول مهمة متكررة لأحد زملائي"
+        }
+    },
+    "contact": {
+        "defaultSummary": "أواجه صعوبة في إعداد زميلي الأول وأحتاج إلى مساعدة.",
+        "sentWithEmail": "أُرسل إلى فريق Rerun. سيردون في المحادثة وعلى {email}.",
+        "sent": "أُرسل إلى فريق Rerun. سيردون في المحادثة.",
+        "openChat": "فتح المحادثة",
+        "stillStuck": "لا تزال عالقًا؟ يمكن لأحد أعضاء الفريق مساعدتك.",
+        "send": "إرسال إلى الفريق",
+        "title": "تحدث إلى أحد أعضاء Rerun",
+        "description": "يصل هذا إلى الفريق مع بيانات حسابك، وسيردون عليك في المحادثة.",
+        "notNow": "ليس الآن"
+    },
+    "template": {
+        "skipped": "تم التخطي",
+        "buildingElse": "جارٍ إنشاء شيء آخر",
+        "installing": "جارٍ تثبيت هذا القالب",
+        "install": "تثبيت هذا القالب",
+        "buildElse": "أنشئ لي شيئًا آخر",
+        "buildElseDescription": "لا يناسبني أي منها. ابدأ مما أخبرتك به وصمّمه.",
+        "notNow": "ليس الآن",
+        "somethingCustom": "شيء مخصص",
+        "label": "قالب",
+        "agents": "{count, plural, zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}"
+    },
+    "question": {
+        "fallback": "سؤال واحد",
+        "skipped": "تم التخطي",
+        "neither": "لا هذا ولا ذاك",
+        "typed": "تمت الإجابة في المحادثة"
+    },
+    "plan": {
+        "defaultTitle": "زميلك الأول",
+        "skipped": "تم التخطي",
+        "confirmed": "تم التأكيد",
+        "askedChanges": "طُلبت تعديلات",
+        "goesAfter": "<label>يستهدف:</label> {need}",
+        "thisWeek": "ما تحصل عليه هذا الأسبوع",
+        "previousBox": "الـ Box السابق",
+        "nextBox": "الـ Box التالي",
+        "build": "أنشئ زميلي",
+        "change": "تغيير شيء ما",
+        "standingBy": "في الانتظار",
+        "lifeWorking": "يعمل عليه",
+        "lifeDelivered": "سُلّم إليك",
+        "scene": {
+            "planned": "{name}، مخطط له",
+            "plannedBox": "Box مخطط له"
+        }
+    },
+    "starterPack": {
+        "title": "فريقك الأول",
+        "subtitle": "اختر حتى {max}. يُعدّ كل واحد نفسه معك بمجرد وصوله إلى لوحتك.",
+        "fullTitle": "تتضمن فترتك التجريبية {max} زملاء",
+        "fullDescription": "أزل واحدًا لتأخذ هذا بدلًا منه. يمكن للآخرين الانضمام بعد اشتراكك في خطة.",
+        "pickAtLeastOne": "اختر واحدًا على الأقل",
+        "hireOne": "وظّف هذا",
+        "hireMany": "وظّف هؤلاء الـ {count}",
+        "progress": "تم اختيار {count} من {max}",
+        "picked": "تم الاختيار",
+        "trialFull": "الفترة التجريبية ممتلئة",
+        "pick": "اختيار"
+    },
+    "agentTabs": {
+        "chat": "المحادثة",
+        "actions": "للمعالجة",
+        "services": "التطبيقات",
+        "mcp": "MCP",
+        "skills": "المهارات",
+        "data": "قاعدة البيانات",
+        "memories": "المعرفة",
+        "files": "الملفات",
+        "published": "المنشور",
+        "scheduled": "المهام الدورية",
+        "triggers": "المشغّلات",
+        "tools": "القدرات",
+        "monitoring": "المراقبة",
+        "logs": "السجلات",
+        "setup": "التثبيت",
+        "settings": "الإعدادات"
+    },
+    "arrival": {
+        "youPicked": "اخترت",
+        "by": "بواسطة {name}",
+        "gestures": {
+            "account": "الحساب",
+            "trial": "فترة تجريبية مجانية",
+            "template": "القالب",
+            "installed": "مثبّت"
+        },
+        "headings": {
+            "account": {
+                "title": "اجعل {name} يعمل",
+                "description": "أنشئ حسابك وسيُثبَّت {name} لك. دون نموذج إعداد، ودون أسئلة مسبقة."
+            },
+            "phone": {
+                "title": "خطوة أخيرة",
+                "description": "أضف رقم هاتفك. {name} هو التالي."
+            },
+            "trial": {
+                "title": "جرّب {name} لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+                "description": "يُثبَّت {name} لحظة بدء فترتك التجريبية."
+            },
+            "purchase": {
+                "title": "احصل على {name}",
+                "description": "فترتك التجريبية مفعّلة. لهذا القالب سعر خاص به، ويُثبَّت مباشرة بعد الشراء."
+            },
+            "installing": {
+                "title": "جارٍ تثبيت {name}",
+                "description": "لا شيء عليك فعله هنا. يستغرق ذلك أقل من دقيقة."
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
+        "working": "{count} يعملون الآن"
+    },
+    "trialGate": {
+        "plan": "ابدأ خطتك للمتابعة.",
+        "trial": "ابدأ فترتك التجريبية المجانية للمتابعة.",
+        "talk": "تحدث إلى الفريق"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "لا حاجة إلى بطاقة",
+            "card_trial": "فترة تجريبية مجانية لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+            "paid": "استُخدمت الفترة التجريبية المجانية من قبل"
+        },
+        "titleTrial": "ابدأ فترتك التجريبية المجانية لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+        "titlePlan": "ابدأ خطتك",
+        "pitchPaidInstall": "يُثبَّت {subject} مباشرة بعد ذلك. ألغِ في أي وقت من مساحة العمل.",
+        "pitchPaidTeam": "يُبنى فريقك مباشرة بعد ذلك. ألغِ في أي وقت من مساحة العمل.",
+        "pitchCardInstall": "البطاقة مطلوبة، $0 اليوم. يُخصم {price} في {date} ما لم تلغِ قبل ذلك. يُثبَّت {subject} مباشرة بعد ذلك.",
+        "pitchCardTeam": "البطاقة مطلوبة، $0 اليوم. يُخصم {price} في {date} ما لم تلغِ قبل ذلك. يُبنى فريقك مباشرة بعد ذلك.",
+        "pitchCardlessInstall": "لا حاجة إلى بطاقة، $0 اليوم. أضف بطاقة قبل {date} للمتابعة بسعر {price}/شهريًا. يُثبَّت {subject} مباشرة بعد ذلك.",
+        "pitchCardlessTeam": "لا حاجة إلى بطاقة، $0 اليوم. أضف بطاقة قبل {date} للمتابعة بسعر {price}/شهريًا. يُبنى فريقك مباشرة بعد ذلك.",
+        "includes": "تتضمن فترتك التجريبية {agents} زملاء و{credits, plural, zero {# رصيد} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}}.",
+        "thenPay": "ثم {price} لهذا القالب، يُفوتر بشكل منفصل.",
+        "dueToday": "المستحق اليوم",
+        "withCard": "مع بطاقة",
+        "dueOn": "في {date}",
+        "then": "ثم",
+        "perMonth": "/شهريًا",
+        "today": "اليوم",
+        "todayInstall": "تبدأ فترتك التجريبية ويُثبَّت {subject}.",
+        "todayTeam": "تبدأ فترتك التجريبية ويُبنى فريقك.",
+        "reminder": "نرسل إليك بريدًا إلكترونيًا، حتى لا تنتهي فجأة.",
+        "chargeCardless": "أضف بطاقة للمتابعة بسعر {price}/شهريًا. دونها، يتوقف زملاؤك ولا يُخصم أي شيء.",
+        "chargeCard": "يُخصم {price} من البطاقة التي أضفتها، ثم كل شهر. ألغِ قبل ذلك ولن يُخصم شيء.",
+        "startingTrial": "جارٍ بدء فترتك التجريبية…",
+        "opening": "جارٍ الفتح…",
+        "startAndInstall": "ابدأ فترتي التجريبية وثبّت",
+        "startTrial": "ابدأ فترتي التجريبية المجانية",
+        "startPlan": "ابدأ خطتي"
+    },
+    "checkout": {
+        "started": "بدأت الفترة التجريبية",
+        "cardUsed": "استُخدمت هذه البطاقة لفترة تجريبية من قبل",
+        "startPlan": "ابدأ خطتي",
+        "pending": "لا يزال بانتظار Stripe",
+        "notStarted": "لم تبدأ الفترة التجريبية. لا يمكن إنشاء شيء قبل بدئها.",
+        "startTrial": "بدء الفترة التجريبية المجانية"
+    },
+    "purchase": {
+        "owned": "{title} أصبح لك",
+        "recurring": "يُفوتر شهريًا",
+        "oneTime": "شراء لمرة واحدة",
+        "billedTo": "يُفوتر على {name}، بمعزل عن خطة Rerun. يُثبَّت لحظة إتمام الدفع.",
+        "billedToWorkspace": "يُفوتر على مساحة العمل، بمعزل عن خطة Rerun. يُثبَّت لحظة إتمام الدفع.",
+        "dueToday": "المستحق اليوم",
+        "perMonth": "/شهريًا",
+        "opening": "جارٍ الفتح…",
+        "subscribe": "اشترك بـ {price}",
+        "pay": "ادفع {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "{named, select, yes {مرحبًا، أنا {name}} other {مرحبًا، أنا Chief of Staff}}",
+        "greetingNamed": "{named, select, yes {مرحبًا {firstName}، أنا {name}} other {مرحبًا {firstName}، أنا Chief of Staff}}",
+        "greetingWithTeam": "{greeting}. هذا فريقك.",
+        "emptySubtitle": "ليس لديك زملاء بعد. أخبرني بمهمة تود تسليمها وسأنشئ الأول.",
+        "buildPrompt": "أنشئ لي زميلًا ",
+        "buildFirst": {
+            "title": "أنشئ زميلي الأول",
+            "description": "صف المهمة في جملة"
+        },
+        "template": {
+            "title": "ابدأ من قالب",
+            "description": "زملاء جاهزون لنوع نشاطك التجاري",
+            "send": "اعرض لي القوالب التي تناسب نشاطي التجاري"
+        },
+        "guide": {
+            "title": "كيف يعمل هذا؟",
+            "description": "الزملاء والـ Boxes والمهام الدورية، في دقيقتين",
+            "send": "كيف يعمل Rerun؟"
+        },
+        "checkWorking": {
+            "title": "ماذا يفعل {name}؟",
+            "description": "يعمل الآن",
+            "send": "ماذا يفعل {mention} الآن؟"
+        },
+        "checkIdle": {
+            "title": "ماذا فعل {name} اليوم؟",
+            "description": "اطّلع على أحدث عمليات تشغيله",
+            "send": "ماذا فعل {mention} اليوم؟"
+        },
+        "handOff": {
+            "title": "أعطِ {name} مهمة",
+            "description": "أوجّهه وأتابعه حتى النهاية",
+            "prefill": "اطلب من {mention} أن "
+        },
+        "build": {
+            "title": "أنشئ زميلًا جديدًا",
+            "description": "لمهمة لا يقوم بها أحد في الفريق بعد"
+        }
+    }
+}

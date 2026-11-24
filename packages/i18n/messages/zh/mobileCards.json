@@ -1,0 +1,81 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {打开 {name} 的聊天} actions {打开 {name} 的待处理} services {打开 {name} 的应用} mcp {打开 {name} 的 MCP} skills {打开 {name} 的技能} data {打开 {name} 的数据库} memories {打开 {name} 的知识} files {打开 {name} 的文件} scheduled {打开 {name} 的例行任务} triggers {打开 {name} 的触发器} other {{name}}}"
+    },
+    "connect": {
+        "added": "已添加 {name}",
+        "connectedNote": "已连接，同事可以使用了",
+        "signInNote": "登录一次，同事即可使用",
+        "connected": "已连接",
+        "signingIn": "正在登录…",
+        "signIn": "登录",
+        "connectNew": "新账号",
+        "signInNeeded": "需要登录",
+        "unreachable": "无法访问",
+        "couldNotConnect": "无法连接 {name}",
+        "notAdded": "未添加",
+        "customServer": "自定义 MCP 服务器",
+        "customServerAt": "自定义 MCP 服务器 · {host}",
+        "connecting": "正在连接…",
+        "connect": "连接",
+        "installed": "已安装 {name}",
+        "availableNextTurn": "下一轮可用：{tools}"
+    },
+    "event": {
+        "notification": "向您发送了一条通知",
+        "setUp": "{name} 已设置完成",
+        "setupComplete": "设置完成",
+        "schedules": "{count, plural, other {已开启 # 个计划}}",
+        "triggers": "{count, plural, other {已开启 # 个触发器}}",
+        "newBrainPage": "新的 Brain 页面：{title}",
+        "brainChange": "Brain 的修改：{title}",
+        "proposedNote": "已提交审核。在有人接受之前不会有任何更改。",
+        "undone": "已撤销：{title}",
+        "undoneNote": "已恢复到之前的版本。",
+        "undo": "撤销",
+        "undoFailed": "无法撤销此更改",
+        "tryAgainShortly": "请稍后再试。"
+    },
+    "brain": {
+        "saved": "Brain 已更新：{title}",
+        "created": "新的 Brain 页面：{title}",
+        "deleted": "已从 Brain 中移除：{title}",
+        "accepted": "已接受更改：{title}",
+        "acceptedBy": "已接受 {name} 的更改：{title}",
+        "dismissed": "已忽略更改：{title}",
+        "dismissedBy": "已忽略 {name} 的更改：{title}",
+        "notes": {
+            "saved": "已保存。每位同事从下一次运行起都会读取它。",
+            "deleted": "不再有同事读取它。其历史记录会被保留。",
+            "accepted": "已保存。每位同事从下一次运行起都会读取它。",
+            "dismissed": "页面未更改。"
+        }
+    },
+    "file": {
+        "open": "打开 {name}",
+        "title": "{count, plural, =0 {文件} other {# 个文件}}",
+        "size": {
+            "b": "{value} B",
+            "kb": "{value} KB",
+            "mb": "{value} MB"
+        }
+    },
+    "skill": {
+        "remembering": "正在记住",
+        "remembered": "已记住",
+        "failed": "无法记住此内容",
+        "retry": "重试",
+        "dismiss": "忽略",
+        "notRemembered": "未记住",
+        "remember": "记住",
+        "no": "不",
+        "hideDetails": "隐藏详情",
+        "showDetails": "显示详情"
+    },
+    "sources": {
+        "count": "{count, plural, other {# 个来源}}"
+    },
+    "table": {
+        "partial": "{shown} / {total}"
+    }
+}

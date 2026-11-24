@@ -1,0 +1,116 @@
+{
+    "access": {
+        "short": {
+            "public": "公开",
+            "workspace": "工作区",
+            "password": "密码",
+            "invited": "受邀"
+        },
+        "hint": {
+            "public": "无需登录",
+            "workspace": "仅限已登录成员",
+            "password": "访客输入一次即可",
+            "invited": "访客需确认邮箱"
+        },
+        "label": {
+            "public": "任何拥有链接的人",
+            "workspace": "{workspace} 的成员",
+            "password": "任何拥有密码的人",
+            "invited": "仅限您邀请的人"
+        },
+        "anyoneAt": "{domain} 的任何人",
+        "workspaceFallback": "工作区"
+    },
+    "gate": {
+        "madeWith": "使用 Rerun 制作",
+        "locked": "{workspace} 的页面，已锁定",
+        "code": "验证码",
+        "switchAccount": "切换账号"
+    },
+    "viewer": {
+        "download": "下载",
+        "report": "举报",
+        "updated": "更新于{when}",
+        "slides": "{count, plural, other {# 张幻灯片}}",
+        "page": "第 {page} 页",
+        "previousSlide": "上一张",
+        "nextSlide": "下一张"
+    },
+    "csv": {
+        "meta": "{rows, plural, other {# 行}}{truncated, select, true {+} other {}} · {columns, plural, other {# 列}}",
+        "truncated": "显示前 {rows, plural, other {# 行}}。下载文件查看其余内容。"
+    },
+    "row": {
+        "more": "更多",
+        "open": "打开",
+        "copyLink": "复制链接",
+        "shareSettings": "分享设置",
+        "unpublish": "取消发布",
+        "unpublishFailed": "无法取消发布"
+    },
+    "unpublishConfirm": {
+        "title": "取消发布 {title}？",
+        "description": "链接将立即失效，所有持有该链接的人都无法再打开。",
+        "confirm": "取消发布"
+    },
+    "panel": {
+        "emptyTitle": "还没有发布任何内容",
+        "emptyDescription": "{agent} 分享的页面、报告和文件会显示在这里。",
+        "updated": "更新于{when}",
+        "copyLink": "复制链接"
+    },
+    "list": {
+        "filterAll": "全部 {count}",
+        "emptyTitle": "还没有发布任何内容",
+        "emptyDescription": "您的同事分享的页面、报告和文件会显示在这里。",
+        "fallbackCoworker": "同事"
+    },
+    "chat": {
+        "unpublished": "已取消发布",
+        "updateFailed": "无法更新链接",
+        "copy": "复制",
+        "open": "打开",
+        "fallbackCoworker": "您的同事",
+        "asksPublic": "{coworker} 希望任何拥有链接的人都能打开它",
+        "keepPrivate": "保持私密",
+        "makePublic": "设为公开",
+        "madePublicByYou": "已由您设为公开",
+        "madePublic": "已设为公开",
+        "keptFor": "仅限 {workspace} 的成员"
+    },
+    "share": {
+        "title": "分享",
+        "description": "选择谁可以打开此链接。",
+        "updateFailed": "无法更新链接",
+        "unpublishFailed": "无法取消发布",
+        "unpublish": "取消发布",
+        "publicOff": "{workspace} 已关闭此项",
+        "noEmail": "此服务器不发送邮件",
+        "passwordSet": "已设置密码",
+        "setPassword": "设置密码",
+        "password": "密码",
+        "invitePlaceholder": "邮箱或 @company.com",
+        "invite": "邀请邮箱或域名",
+        "removeInvite": "移除 {entry}",
+        "copyLink": "复制链接",
+        "copied": "已复制"
+    },
+    "policy": {
+        "label": "公开链接",
+        "people": {
+            "title": "只有人可以将链接设为公开",
+            "hint": "同事为 {workspace} 发布，设为公开前会先征求同意"
+        },
+        "anyone": {
+            "title": "同事可以将链接设为公开",
+            "hint": "由它们自行选择访问权限"
+        },
+        "never": {
+            "title": "不公开任何内容",
+            "hint": "仅限工作区、密码和受邀链接"
+        },
+        "turnOffTitle": "关闭公开链接？",
+        "turnOffDescription": "{count, plural, other {保存后，# 个公开链接将改为仅限 {workspace} 的成员访问。}}",
+        "turnOff": "关闭"
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "settings": {
+        "coworkersLanguage": "השפה של העמיתים",
+        "coworkersLanguageHint": "השפה שבה העמיתים שלך כותבים כשהם עובדים לבד, לפי לוח זמנים או טריגר.",
+        "fallbackName": "סביבת העבודה",
+        "adminOnly": "רק מנהל יכול לשנות את הגדרות סביבת העבודה",
+        "nameRequired": "חובה להזין שם",
+        "nameTooLong": "עד {max} תווים",
+        "title": "הגדרות סביבת העבודה",
+        "description": "השם והלוגו של סביבת העבודה, כפי שהצוות שלך וההזמנות שלך רואים אותם.",
+        "uploadLogo": "העלאת לוגו",
+        "name": "שם",
+        "namePlaceholder": "לדוגמה: Acme בע״מ",
+        "logoLink": "לוגו מאתר או מקישור",
+        "noLogoFound": "לא נמצא לוגו בכתובת הזו",
+        "pickIllustration": "או לבחור איור",
+        "showLess": "להציג פחות",
+        "showAll": "להציג את כל ה-{count}",
+        "illustrationOption": "איור {number}"
+    },
+    "access": {
+        "paused": "צריך להירשם למינוי כדי לשחזר קודם את סביבת העבודה שלך",
+        "restoring": "יהיה זמין אחרי שסביבת העבודה שלך תשוחזר",
+        "paymentFailed": "צריך לעדכן את אמצעי התשלום כדי לשחזר קודם את סביבת העבודה שלך",
+        "sandboxArchived": "יהיה זמין אחרי שארגז החול שלך יופעל מחדש",
+        "sandboxNone": "לארגז החול של המומחה אין הגדרות משלו",
+        "adminsOnly": "למנהלים בלבד",
+        "apiNotIncluded": "לא כלול ברמת ה-AppSumo שלך",
+        "sandboxSingleBox": "לארגז חול יש Box אחד בלבד"
+    }
+}

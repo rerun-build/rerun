@@ -1,0 +1,80 @@
+{
+    "generic": "出了点问题。请重新发送您的消息。",
+    "modelAtCapacity": {
+        "title": "模型已满载",
+        "message": "此模型目前没有可用容量。请稍后重试，或选择其他模型。"
+    },
+    "opencodePrivacy": {
+        "title": "被您的 OpenCode 设置阻止",
+        "region": "您的 OpenCode 账号只允许使用托管在欧洲和美国的模型。请在 OpenCode console 的 Privacy 中选择 Global，或选择其他模型。",
+        "training": "您的 OpenCode 账号拒绝会用所收内容进行训练的模型。请在 OpenCode console 的 Privacy 中允许它们，或选择其他模型。"
+    },
+    "anthropicKeyNotScoped": {
+        "title": "Anthropic 密钥未绑定到工作区",
+        "message": "此密钥适用于其 Anthropic 组织下的所有工作区。请在 Anthropic Console 中某个工作区内创建密钥，然后重新连接。"
+    },
+    "titles": {
+        "budget": "Rerun 积分已用完",
+        "unauthorized": "连接已退出登录",
+        "overloaded": "提供商过载",
+        "context_window": "对话过长",
+        "provider_error": "模型无法回答",
+        "thinking_replay": "运行无法继续",
+        "interrupted": "运行已中断",
+        "run_in_flight": "此对话仍在处理中",
+        "session_gone": "对话不可用"
+    },
+    "messages": {
+        "budget": "本周期的 Rerun 积分已用完。请添加积分，或等待每月重置。",
+        "unauthorized": "此连接需要重新登录，同事才能运行。",
+        "overloaded": "提供商目前过载。请稍后重试。",
+        "context_window": "此对话已超出模型的容量，再次发送也会遇到同样的问题。请切换到上下文窗口更大的模型，或开始新对话。",
+        "provider_error": "模型提供商拒绝了此请求，再次发送也会得到同样的结果。请切换到其他模型继续。",
+        "thinking_replay": "引擎重放这一轮的方式被模型提供商拒绝。这是引擎的问题，不是模型的问题：切换模型无济于事。请重试，如果问题持续出现，请更新引擎。",
+        "interrupted": "运行在完成前被中断。",
+        "session_gone": "此同事已无法访问这个对话，因此消息未发送。请开始新对话继续。"
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "已达到用量上限",
+            "modelUnavailable": "{model} 不可用",
+            "anyModelUnavailable": "模型不可用",
+            "modelNotInPlan": "{model} 不在您的 {plan} 套餐中",
+            "anyModelNotInPlan": "模型不在您的 {plan} 套餐中",
+            "credits": "{plan} 用量积分已用完",
+            "spend": "已达到 {plan} 消费上限",
+            "window": "已达到 {plan} {window, select, weekly {每周} other {每月}}上限",
+            "model": "已达到 {plan} {model} 上限",
+            "claudeSession": "已达到 {plan} 会话上限",
+            "usage": "已达到 {plan} 用量上限",
+            "opencodeCredits": "OpenCode 积分已用完",
+            "opencodeNoGo": "没有 OpenCode Go 订阅",
+            "opencodeWindow": "已达到 OpenCode Go {window, select, weekly {每周} other {每月}}上限",
+            "opencode": "已达到 OpenCode Go 上限",
+            "openaiCredits": "OpenAI API 积分已用完",
+            "anthropicCredits": "Anthropic API 积分已用完"
+        },
+        "messages": {
+            "openaiCredits": "您的 OpenAI API 账号已没有积分。请在 platform.openai.com 上添加积分，或将此同事切换到其他模型。",
+            "anthropicCredits": "您的 Anthropic API 账号已没有积分。请在 Anthropic Console 的 Billing 中添加积分，或将此同事切换到其他模型。",
+            "chatgptCredits": "您的 ChatGPT 工作区已没有积分。请在 ChatGPT 中添加积分或请其所有者添加，或将此同事切换到其他模型。",
+            "chatgptSpend": "您的 ChatGPT 工作区已达到消费上限。其所有者可以提高上限；在此期间，请将此同事切换到其他模型。",
+            "opencodeCredits": "Console 积分已用完。请在 opencode.ai 上添加积分，或选择 Go 模型继续。",
+            "opencodeNoGo": "此 OpenCode 密钥没有有效的 Go 订阅，因此所有 Go 模型都会被拒绝，包括免费模型。请订阅 OpenCode Go，或选择 Console 模型或其他提供商。",
+            "opencodeWindowResets": "您的 OpenCode Go 套餐已达到{window, select, weekly {每周} monthly {每月} other { 5 小时}}上限。它将于 {resetsAt} 重置；在此之前，请切换到 Console 模型或其他提供商。",
+            "opencodeWindow": "您的 OpenCode Go 套餐已达到{window, select, weekly {每周} monthly {每月} other { 5 小时}}上限。在重置之前，请切换到 Console 模型或其他提供商。",
+            "modelUnavailable": "此连接无法运行 {model}。请选择其他模型继续。",
+            "anyModelUnavailable": "此连接无法运行此模型。请选择其他模型继续。",
+            "modelNotInPlan": "您的 {plan} 套餐不包含 {model}。请选择其他模型继续。",
+            "anyModelNotInPlan": "您的 {plan} 套餐不包含此模型。请选择其他模型继续。",
+            "usageLimit": "此订阅已达到用量上限。请切换到其他模型，或等待上限重置。",
+            "credits": "您的 {plan} 套餐已用完用量积分。请选择套餐包含的模型继续。",
+            "spend": "您的组织已达到每月 {plan} 消费上限。管理员可以提高上限；在此期间，请将此同事切换到其他模型。",
+            "weeklyResets": "您的 {plan} 套餐已达到每周上限。它将于 {resetsAt} 重置；在此之前，请将此同事切换到其他模型。",
+            "weekly": "您的 {plan} 套餐已达到每周上限。在新的一周开始之前，请将此同事切换到其他模型。",
+            "model": "您的 {plan} 套餐已达到 {model} 上限。其他 {plan} 模型仍可运行：请切换到其中之一。",
+            "sessionResets": "您的 {plan} 套餐已用完当前用量窗口。它将于 {resetsAt} 恢复；在此期间，请将此同事切换到其他模型。",
+            "session": "您的 {plan} 套餐已用完当前用量窗口。它会自动恢复；在此期间，请将此同事切换到其他模型。"
+        }
+    }
+}

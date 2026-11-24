@@ -1,0 +1,315 @@
+{
+    "composer": {
+        "attach": "附件",
+        "camera": "相机",
+        "coworkers": "同事",
+        "discardRecording": "放弃录音",
+        "files": "文件",
+        "modelLabel": "模型，{model}",
+        "photos": "照片",
+        "recordVoice": "录制语音消息",
+        "removeAttachment": "移除 {name}",
+        "retryRecording": "重新发送录音",
+        "send": "发送",
+        "sendRecording": "发送录音",
+        "sendTo": "发送给 {name}",
+        "skills": "技能",
+        "stop": "停止",
+        "tooLargeBody": "{files}：最大 {megabytes} MB。",
+        "tooLargeTitle": "{count, plural, other {文件过大}}",
+        "tooManyBody": "最多 {max} 个：{files} 未添加。",
+        "tooManyTitle": "文件过多",
+        "computers": "电脑",
+        "offline": "离线",
+        "placeholder": "@ 同事，/ 技能，# 电脑",
+        "placeholderNoSkill": "@ 同事，# 电脑",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ 提及同事",
+                "description": "邀请一位同事加入此对话",
+                "empty": "此工作区还没有其他同事"
+            },
+            "skill": {
+                "menuLabel": "/ 使用技能",
+                "description": "运行您的同事掌握的已保存操作指南",
+                "empty": "这位同事还没有技能"
+            },
+            "computer": {
+                "menuLabel": "# 使用电脑",
+                "description": "让您的同事在已关联的电脑上工作",
+                "empty": "尚未关联电脑"
+            }
+        }
+    },
+    "desktop": {
+        "connecting": "正在连接屏幕…",
+        "dropping": "屏幕连接不断中断，请稍后重试。",
+        "handingBack": "正在交还…",
+        "keys": {
+            "delete": "删除",
+            "return": "回车",
+            "tab": "Tab"
+        },
+        "retry": "重试",
+        "screen": "屏幕",
+        "screenOf": "{name} 的屏幕",
+        "type": "输入",
+        "typePlaceholder": "在屏幕上输入",
+        "unreachable": "无法连接到屏幕。"
+    },
+    "empty": {
+        "asleep": "休眠中。发送消息即可唤醒。",
+        "loading": "加载中",
+        "pulseCoworkers": "{count, plural, other {# 位同事}}",
+        "pulseWorking": "{count} 位正在工作",
+        "sendToCoworker": "给这位同事发送消息",
+        "startTitle": "开始对话",
+        "starters": {
+            "capabilities": "你能帮我做什么？",
+            "recentWork": "总结一下你最近的工作",
+            "projectFiles": "检查我的项目文件",
+            "tools": "你可以使用哪些工具？"
+        },
+        "team": {
+            "greeting": "{named, select, yes {您好，我是 {name}} other {您好，我是您的 Chief of Staff}}",
+            "greetingNamed": "{named, select, yes {{firstName}，您好，我是 {name}} other {{firstName}，您好，我是您的 Chief of Staff}}",
+            "greetingWithTeam": "{greeting}。这是您的团队。",
+            "emptySubtitle": "您还没有同事。告诉我一项您想交出去的工作，我来创建第一位。",
+            "buildPrompt": "帮我创建一位同事，负责 ",
+            "buildFirst": {
+                "title": "创建我的第一位同事",
+                "description": "用一句话描述这项工作"
+            },
+            "template": {
+                "title": "从模板开始",
+                "description": "适合您业务类型的现成同事",
+                "send": "给我看看适合我业务的模板"
+            },
+            "guide": {
+                "title": "这是怎么运作的？",
+                "description": "两分钟了解同事、Boxes 和例行任务",
+                "send": "Rerun 是怎么运作的？"
+            },
+            "checkWorking": {
+                "title": "{name} 在做什么？",
+                "description": "正在工作",
+                "send": "{mention} 现在在做什么？"
+            },
+            "checkIdle": {
+                "title": "{name} 今天做了什么？",
+                "description": "了解它最近的运行",
+                "send": "{mention} 今天做了什么？"
+            },
+            "handOff": {
+                "title": "给 {name} 分配任务",
+                "description": "我来向它说明并跟进到底",
+                "prefill": "请 {mention} "
+            },
+            "build": {
+                "title": "创建新同事",
+                "description": "负责团队里还没人做的工作"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "连接 ChatGPT",
+        "connectClaude": "连接 Claude",
+        "creditsBody": "您本周期的 Rerun 积分已用完。已经在为 Claude 或 ChatGPT 付费？让您的同事使用该订阅运行，这里无需额外付费。",
+        "creditsTitle": "Rerun 积分",
+        "fallbackTitle": "出了点问题",
+        "reconnect": "重新连接",
+        "switchModel": "切换模型",
+        "tryAgain": "重试"
+    },
+    "feedback": {
+        "cancel": "取消",
+        "categories": {
+            "did_not_follow": "没有按我的要求做",
+            "incomplete": "回答不完整",
+            "memory": "记忆有问题",
+            "not_factual": "与事实不符",
+            "other": "其他",
+            "too_slow": "太慢",
+            "tool_error": "工具或连接错误",
+            "ui_bug": "界面问题",
+            "wrong_tool": "使用了错误的工具或应用"
+        },
+        "categoryLabel": "您想报告哪种类型的问题？",
+        "disclaimer": "提交此报告会将此对话分享给 Rerun 团队，以便我们改进您的同事。",
+        "negativePlaceholder": "这个回答哪里让您不满意？",
+        "negativeTitle": "提供负面反馈",
+        "positivePlaceholder": "这个回答哪里让您满意？",
+        "removeFailed": "无法移除您的反馈",
+        "saveFailed": "无法保存您的反馈",
+        "skip": "跳过",
+        "submit": "提交"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "此工作区目前没有机器。请在 {host} 查看。",
+                "title": "Rerun 未在运行"
+            },
+            "onboarding": {
+                "body": "请在 {host} 完成设置。",
+                "title": "Rerun 正在设置您的工作区"
+            }
+        },
+        "retry": "重试",
+        "role": "您的 Chief of Staff",
+        "unreachableBody": "请检查您的网络连接，然后重试。",
+        "unreachableTitle": "我们无法连接到 Rerun"
+    },
+    "header": {
+        "back": "返回",
+        "conversationCount": "{count, plural, other {# 个对话}}",
+        "conversations": "对话",
+        "coworkerDetails": "同事详情",
+        "earlier": "更早",
+        "general": "常规",
+        "identityLabel": "{name}，{title}",
+        "newChat": "新聊天",
+        "newConversation": "新对话",
+        "newThread": "新话题",
+        "sections": {
+            "needs-you": "需要您处理",
+            "new": "未读",
+            "running": "运行中"
+        },
+        "threadCount": "{count, plural, other {# 个话题}}",
+        "threads": "话题"
+    },
+    "markdown": {
+        "code": "代码",
+        "copied": "已复制",
+        "copy": "复制",
+        "draft": "草稿",
+        "image": "图片"
+    },
+    "messages": {
+        "askRerun": "{named, select, yes {询问 {name}} other {询问您的 Chief of Staff}}",
+        "badResponse": "回答不好",
+        "compacting": "正在压缩",
+        "copy": "复制",
+        "goodResponse": "回答很好",
+        "needsYourAnswer": "需要您回答",
+        "open": "打开 {name}",
+        "photo": "照片",
+        "regenerate": "重新生成",
+        "replyBelow": "请在下方回复。",
+        "runningTool": "正在运行 {tool}",
+        "scrollToLatest": "滚动到最新消息",
+        "sentBy": "由 {name} 发送",
+        "relayedFor": "{named, select, yes {{name} 代 {person}} other {Chief of Staff 代 {person}}}",
+        "share": "分享",
+        "showLess": "收起",
+        "showMore": "展开",
+        "thinking": "思考中"
+    },
+    "origins": {
+        "copied": "已复制",
+        "copy": "复制",
+        "installComplete": "安装完成",
+        "installGuideOf": "{name} 安装指南",
+        "installStarted": "已开始安装",
+        "noPayload": "无负载",
+        "payload": "负载",
+        "prompt": "提示词",
+        "promptOf": "{name} 提示词",
+        "scheduledRun": "计划运行",
+        "startedBy": "此会话由 <strong>{name}</strong> 发起",
+        "truncated": "已截断",
+        "viewDetails": "查看详情",
+        "viewGuide": "查看指南",
+        "viewPayload": "查看负载",
+        "viewPrompt": "查看提示词",
+        "webhookReceived": "已收到 Webhook",
+        "jobEnded": "#{computer} 上的任务已结束",
+        "viewReport": "查看报告",
+        "reportOf": "#{computer} 的报告"
+    },
+    "paidSources": {
+        "count": "{count, plural, other {# 个来源}}",
+        "emailsVerified": "{checked, plural, other {# 个邮箱}}中已验证 {valid} 个",
+        "title": "来源"
+    },
+    "pane": {
+        "answerPlaceholder": "回复 {name}",
+        "attachFailed": "无法附加文件",
+        "defaultModel": "默认 · {model}",
+        "loadFailed": "我们无法加载此对话。",
+        "loading": "正在加载对话",
+        "openBrowser": "打开浏览器",
+        "retry": "重试",
+        "stopTaskFailed": "无法停止此任务",
+        "takeControl": "接管控制"
+    },
+    "queued": {
+        "attachmentsOnly": "仅附件",
+        "badge": "排队中",
+        "remove": "移除排队消息",
+        "sendNow": "立即发送",
+        "sendNowStops": "立即发送，将停止当前运行"
+    },
+    "runPhase": {
+        "label": "{name}：{phase}",
+        "thinking": "思考中",
+        "waking": "正在唤醒",
+        "working": "工作中"
+    },
+    "screen": {
+        "disconnected": "屏幕已断开",
+        "error": "屏幕不可用",
+        "handBackFailed": "无法交还浏览器",
+        "resize": "调整屏幕大小"
+    },
+    "skillUpdateFailed": "无法更新技能",
+    "takeover": {
+        "closing": "正在关闭…",
+        "done": "完成",
+        "openAgain": "再次打开",
+        "openBrowser": "打开浏览器",
+        "opened": "浏览器已在您同事的桌面上打开。完成后请回到这里。",
+        "opensBrowser": "打开您同事的浏览器，由您来操作。",
+        "opensSite": "在您同事的浏览器中打开 {site}，由您来操作。",
+        "privacy": "您登录的内容只保留在您机器上这位同事的浏览器中。",
+        "skip": "跳过",
+        "skipTakeover": "跳过浏览器接管"
+    },
+    "threadBranch": {
+        "needs": "需要您处理",
+        "error": "错误",
+        "running": "运行中",
+        "open": "打开话题 {title}",
+        "opener": {
+            "schedule": "计划运行 · {name}",
+            "trigger": "Webhook 触发 · {name}",
+            "askedBy": "由 {name} 发起",
+            "askedByUnknown": "由另一位同事发起",
+            "started": "发起了一个话题"
+        }
+    },
+    "voice": {
+        "copyTranscript": "复制转写",
+        "hideTranscript": "隐藏转写",
+        "pause": "暂停",
+        "play": "播放语音消息",
+        "recording": "录音中",
+        "seek": "跳转",
+        "sendFailed": "无法发送该录音。",
+        "sending": "正在发送录音",
+        "silent": "该录音中听不到任何声音。",
+        "transcript": "转写",
+        "waitingForMicrophone": "正在等待麦克风…"
+    },
+    "browser": {
+        "close": "关闭",
+        "reload": "重新加载",
+        "pageActions": "{host} 的操作",
+        "share": "分享",
+        "openInBrowser": "在浏览器中打开",
+        "copyLink": "复制链接",
+        "backToChat": "返回对话",
+        "brand": "Rerun"
+    }
+}

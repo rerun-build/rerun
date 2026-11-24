@@ -1,0 +1,111 @@
+{
+    "update": {
+        "ready": "Rerun {version} جاهز",
+        "description": "أعد تشغيل التطبيق لاستخدام الإصدار الجديد.",
+        "restart": "إعادة التشغيل"
+    },
+    "downloads": {
+        "done": "تم تنزيل {filename}",
+        "failed": "تعذّر تنزيل {filename}",
+        "show": "عرض في المجلد"
+    },
+    "handoff": {
+        "title": "تسجيل الدخول إلى {app}",
+        "body": "المتابعة إلى {app} باسم {account}؟",
+        "continue": "متابعة",
+        "switchAccount": "استخدام حساب آخر",
+        "doneTitle": "العودة إلى {app}",
+        "doneBody": "سيُكمل {app} تسجيل الدخول تلقائيًا. يمكنك إغلاق علامة التبويب هذه.",
+        "codeHint": "إذا لم يُفتح {app}، فالصق فيه هذا الرمز:",
+        "copyCode": "نسخ الرمز",
+        "failed": "تعذّر تسجيل دخول التطبيق. حاول مرة أخرى.",
+        "invalidTitle": "انتهت صلاحية هذا الرابط",
+        "invalidBody": "ابدأ تسجيل الدخول من جديد من تطبيق سطح المكتب."
+    },
+    "signIn": {
+        "waitingTitle": "تابع في متصفحك",
+        "waitingBody": "سجّل الدخول في نافذة المتصفح التي فُتحت، ثم عد إلى هنا.",
+        "reopen": "فتح المتصفح مرة أخرى",
+        "pasteCode": "لصق رمز بدلًا من ذلك",
+        "codeLabel": "الرمز من المتصفح",
+        "submit": "تسجيل الدخول",
+        "back": "رجوع",
+        "errors": {
+            "expired": "انتهت صلاحية هذا الرمز. ابدأ من جديد.",
+            "invalid": "هذا الرمز غير صالح. ابدأ من جديد.",
+            "state-mismatch": "بدأ تسجيل الدخول هذا من نافذة أخرى. ابدأ من جديد.",
+            "network": "تعذّر الوصول إلى Rerun. تحقق من اتصالك.",
+            "cancelled": "تم إلغاء تسجيل الدخول."
+        }
+    },
+    "settings": {
+        "openAtLogin": "الفتح عند تسجيل الدخول",
+        "openAtLoginMac": "يبدأ Rerun مع جهاز Mac الخاص بك، في شريط القوائم.",
+        "openAtLoginOther": "يبدأ Rerun مع جهاز الكمبيوتر، في منطقة الإشعارات.",
+        "closeToTray": "مواصلة العمل عند الإغلاق",
+        "closeToTrayHint": "إغلاق النافذة يُبقي Rerun في منطقة الإشعارات، فتستمر الإشعارات في الوصول.",
+        "updates": "التحديثات",
+        "version": "Rerun {version}",
+        "checking": "جارٍ البحث عن تحديثات…",
+        "downloading": "جارٍ تنزيل التحديث… {percent}%",
+        "updateFailed": "تعذّر البحث عن تحديثات.",
+        "check": "البحث عن تحديثات",
+        "restart": "إعادة التشغيل للتحديث إلى {version}",
+        "quickAsk": "سؤال سريع",
+        "quickAskHint": "يفتح {shortcut} حقلًا لـ Chief of Staff من أي تطبيق.",
+        "quickAskOn": "يفتح حقلًا لـ Chief of Staff من أي تطبيق.",
+        "quickAskOff": "متوقف. سجّل اختصارًا لتفعيله.",
+        "shortcut": {
+            "record": "تسجيل اختصار",
+            "typing": "اكتب اختصارًا",
+            "tryAnother": "جرّب اختصارًا آخر",
+            "recordingHint": "Esc للإلغاء، ⌫ للإيقاف",
+            "change": "الاختصار {keys}، انقر للتغيير",
+            "needsModifier": "أضف مفتاح تعديل، مثل {key}",
+            "reserved": "{keys} مستخدم من قِبل {owner, select, spotlight {Spotlight} finder {بحث Finder} inputSources {مصادر الإدخال} appSwitcher {مبدّل التطبيقات} screenshot {لقطات الشاشة} windowMenu {قائمة النوافذ} system {النظام} other {كل التطبيقات}}",
+            "taken": "{keys} مستخدم من قِبل تطبيق آخر"
+        },
+        "quickAskVoice": "سؤال سريع بالصوت",
+        "quickAskVoiceOn": "تحدّث إلى Chief of Staff من أي تطبيق.",
+        "coworkerDock": "شريط الزملاء",
+        "coworkerDockHint": "زملاؤك على حافة الشاشة، فوق كل التطبيقات."
+    },
+    "openInApp": {
+        "title": "فتح هذه الصفحة في {app}؟",
+        "open": "فتح"
+    },
+    "quickAsk": {
+        "placeholder": "اسأل Chief of Staff…",
+        "hint": "Enter للإرسال، Esc للإغلاق",
+        "send": "إرسال",
+        "holdToTalk": "اضغط مطولًا على <key>المسافة</key> للتحدث",
+        "releaseToSend": "اترك للإرسال، Esc للإلغاء",
+        "sent": "أُرسل إلى Chief of Staff",
+        "nothingHeard": "لم يُسمع شيء. اضغط مطولًا على المسافة وتحدّث.",
+        "transcriptionFailed": "تعذّر تحويل ذلك إلى نص. حاول مرة أخرى، أو اكتب.",
+        "micDeniedTitle": "لا يستطيع Rerun سماعك",
+        "micDeniedBody": "اسمح لـ Rerun باستخدام الميكروفون في إعدادات النظام.",
+        "openSettings": "فتح الإعدادات",
+        "typeInstead": "الكتابة بدلًا من ذلك",
+        "toggleHint": "Enter للإرسال، Esc للإلغاء",
+        "cancel": "إلغاء"
+    },
+    "server": {
+        "otherServer": "استخدام خادم Rerun آخر"
+    },
+    "coworkerDock": {
+        "newCoworker": "زميل جديد",
+        "move": "نقل",
+        "show": "عرض الزملاء",
+        "resize": "تغيير الحجم",
+        "allNotifications": "كل الإشعارات",
+        "allCoworkers": "كل الزملاء",
+        "nothingWaiting": "لا شيء بانتظارك.",
+        "openInRerun": "فتح في Rerun",
+        "replyTo": "الرد على {name}",
+        "send": "إرسال",
+        "markRead": "تعليم كمقروء",
+        "dismiss": "تجاهل",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {يسأل} awaiting_approval {ينتظر موافقتك} done {انتهى} error {متعثّر} other {يحتاج إليك}}</verb>"
+    }
+}

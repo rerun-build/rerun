@@ -1,0 +1,35 @@
+{
+    "time": {
+        "today": "今天",
+        "yesterday": "昨天",
+        "now": "刚刚",
+        "minutesAgo": "{count}分",
+        "hoursAgo": "{count}时",
+        "daysAgo": "{count}天"
+    },
+    "actions": {
+        "close": "关闭",
+        "cancel": "取消",
+        "done": "完成",
+        "share": "分享",
+        "update": "更新"
+    },
+    "errors": {
+        "tryAgainShortly": "请稍后重试。",
+        "generic": "出了点问题，请重试。",
+        "requestFailed": "请求失败，状态码 {status}",
+        "uploadFailed": "上传失败，状态码 {status}"
+    },
+    "unread": "未读",
+    "viewer": {
+        "shareFailed": "无法分享该文件",
+        "noPreview": "此文件无法预览。分享后可在其他应用中打开。",
+        "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "已在 Vault 中",
+        "useAccount": "使用 {label}",
+        "manageBox": "您不是该同事 Box 的管理者",
+        "lendFailed": "无法使用此账号"
+    }
+}

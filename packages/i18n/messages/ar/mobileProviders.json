@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "رجوع",
+        "close": "إغلاق"
+    },
+    "badge": {
+        "creditsUsedUp": "نفد الرصيد",
+        "signInAgain": "سجّل الدخول مجددًا",
+        "keyRejected": "المفتاح مرفوض",
+        "keyMissing": "المفتاح مفقود",
+        "ready": "جاهز"
+    },
+    "usage": {
+        "agentsFallBack": "سيعود {agents} إلى النموذج الافتراضي لمساحة العمل.",
+        "automationsFallBack": "{count, plural, zero {لن تعود أي أتمتة} one {ستعود أتمتة واحدة} two {ستعود أتمتتان} few {ستعود # أتمتات} many {ستعود # أتمتة} other {ستعود # أتمتة}} إلى النموذج الافتراضي لمساحة العمل.",
+        "agentsAndAutomationsFallBack": "سيعود {agents} و{count, plural, zero {لا أتمتة} one {أتمتة واحدة} two {أتمتتان} few {# أتمتات} many {# أتمتة} other {# أتمتة}} إلى النموذج الافتراضي لمساحة العمل.",
+        "holdsDefault": "يحمل النموذج الافتراضي لمساحة العمل، وسيتم مسحه: كل زميل لم يختر نموذجًا سيعود إلى Rerun.",
+        "nothingRuns": "ستُحذف بيانات الاعتماد. لا شيء يعمل عليها."
+    },
+    "list": {
+        "title": "مزوّدو الذكاء الاصطناعي",
+        "notAnswering": "جهاز مساحة العمل هذه لا يستجيب. حاول مرة أخرى بعد قليل.",
+        "defaultModel": "النموذج الافتراضي",
+        "included": "مضمّن",
+        "subscriptions": "اشتراكاتك",
+        "subscriptionsPitch": "تستخدم Claude Code أو Codex بالفعل؟ يمكن لزملائك العمل على خطتك.",
+        "addSubscription": "إضافة اشتراك",
+        "apiKeys": "مفاتيح API الخاصة بك",
+        "apiKeysPitch": "ادفع لمزوّدك مباشرة، حسب الرموز.",
+        "addApiKey": "إضافة مفتاح API",
+        "via": "عبر {name}",
+        "creditsUsedUpPickModel": "نفد رصيد Rerun حتى يعود {backOn}، لذا توقف مؤقتًا الزملاء الذين ليس لديهم نموذج خاص. اختر نموذجًا آخر ليواصلوا العمل.",
+        "creditsUsedUpAddSource": "نفد رصيد Rerun حتى يعود {backOn}، لذا توقف مؤقتًا الزملاء الذين ليس لديهم نموذج خاص. أضف خطة أو مفتاح API ليواصلوا العمل.",
+        "defaultBroken": "توقف الزملاء الذين ليس لديهم نموذج خاص. أصلح {name} أو اختر نموذجًا آخر.",
+        "signInAgain": "سجّل الدخول مجددًا",
+        "addKey": "إضافة مفتاح"
+    },
+    "add": {
+        "addSubscription": "إضافة اشتراك",
+        "addApiKey": "إضافة مفتاح API",
+        "addProvider": "إضافة مزوّد",
+        "subscriptions": "الاشتراكات",
+        "apiKeys": "مفاتيح API"
+    },
+    "defaultModel": {
+        "title": "النموذج الافتراضي",
+        "changeFailed": "تعذّر تغيير النموذج الافتراضي"
+    },
+    "detail": {
+        "name": "الاسم",
+        "removeButton": "إزالة {name}",
+        "saveFailed": "فشل الحفظ",
+        "renameTitle": "إعادة التسمية",
+        "renameMessage": "يظهر في أداة اختيار النموذج لدى كل زميل.",
+        "keySaveFailed": "فشل حفظ بيانات الاعتماد",
+        "removeTitle": "إزالة {name}؟",
+        "removeConfirm": "إزالة",
+        "deleteFailed": "فشل حذف الاتصال"
+    },
+    "credit": {
+        "title": "رصيد هذا الشهر",
+        "percent": "{percent}%",
+        "usedUp": "توقف مؤقتًا الزملاء الذين يعملون على Rerun حتى يعود الرصيد {backOn}. اختر نموذجًا افتراضيًا آخر ليواصلوا العمل.",
+        "included": "مضمّن في خطة Rerun. لا مفتاح ولا إعداد."
+    },
+    "reconnect": {
+        "signInRejected": "رُفض تسجيل الدخول هذا. الزملاء الذين يستخدمونه متوقفون حتى تسجّل الدخول مجددًا.",
+        "signInExpired": "انتهت صلاحية تسجيل الدخول هذا. الزملاء الذين يستخدمونه متوقفون حتى تسجّل الدخول مجددًا.",
+        "signInAgain": "سجّل الدخول مجددًا",
+        "keyRejected": "رُفض هذا المفتاح. الزملاء الذين يستخدمونه متوقفون حتى تلصق مفتاحًا جديدًا.",
+        "keyMissing": "لا يوجد مفتاح محفوظ. الزملاء الذين يستخدمونه متوقفون حتى تلصق مفتاحًا.",
+        "keyLabel": "مفتاح API",
+        "keyPlaceholder": "الصق مفتاحك",
+        "save": "حفظ"
+    },
+    "planUsage": {
+        "title": "استخدام الخطة",
+        "empty": "يظهر الاستخدام هنا بعد التشغيل التالي على هذه الخطة.",
+        "percent": "{percent}%"
+    },
+    "models": {
+        "title": "يمكن لزملائك استخدام",
+        "enabledCount": "{enabled} من {total}",
+        "lockDefault": "النموذج الافتراضي",
+        "lockCustom": "نموذج مخصص. أزله أدناه.",
+        "lockLast": "يحتاج الزملاء إلى نموذج واحد على الأقل من هذا المصدر."
+    },
+    "baseUrl": {
+        "label": "عنوان URL أساسي مخصص",
+        "help": "أرسل الطلبات إلى موجّه متوافق مع OpenRouter خاص بك",
+        "save": "حفظ"
+    },
+    "customModels": {
+        "title": "نماذج مخصصة",
+        "remove": "إزالة",
+        "addLabel": "إضافة نموذج",
+        "addHelp": "أي معرّف نموذج من OpenRouter، مثل x-ai/grok-4.",
+        "add": "إضافة"
+    },
+    "apiKey": {
+        "name": "الاسم",
+        "keyLabel": "مفتاح API",
+        "keyPlaceholder": "الصق مفتاحك",
+        "connect": "ربط"
+    },
+    "modelSheet": {
+        "close": "إغلاق",
+        "title": "اختر النموذج",
+        "notAnswering": "جهاز مساحة العمل هذه لا يستجيب. حاول مرة أخرى بعد قليل.",
+        "workspaceDefault": "افتراضي مساحة العمل",
+        "addProvider": "إضافة مزوّد"
+    },
+    "ending": {
+        "coworkersStart": "يعود زملاؤك إلى العمل",
+        "nameIt": "سمّه",
+        "connectionName": "اسم الاتصال",
+        "nameHelp": "يظهر في أداة اختيار النموذج لدى كل زميل.",
+        "saving": "جارٍ الحفظ…",
+        "done": "تم"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "هذا مفتاح API من Anthropic. أضفه كاتصال Anthropic (API) بدلًا من ذلك.",
+        "claudeTokenIsCode": "هذا هو الرمز من Claude. انقر على Get token أولًا، ثم الصق الرمز هنا.",
+        "approve": "وافق على Rerun في Claude",
+        "open": "افتح Claude",
+        "openAgain": "افتح Claude مجددًا",
+        "pasteStep": "الصق الرمز",
+        "codeLabel": "الرمز من Claude",
+        "checking": "جارٍ التحقق من الرمز…",
+        "paste": "لصق",
+        "connect": "ربط"
+    },
+    "chatgpt": {
+        "allowStep": "اسمح بتسجيل الدخول بالرمز في ChatGPT",
+        "openSettings": "افتح إعدادات ChatGPT",
+        "alreadyOn": "مفعّل بالفعل",
+        "adminSwitches": "يفعّله مسؤول ChatGPT لديك لمساحة العمل بأكملها.",
+        "onPlusOrPro": "أنا على Plus أو Pro",
+        "onBusiness": "على ChatGPT Business أو Enterprise؟",
+        "enterStep": "أدخل الرمز على OpenAI",
+        "copied": "تم النسخ",
+        "copyAdminMessage": "انسخ رسالة له",
+        "adminMessage": "مرحبًا! هل يمكنك تفعيل \"Device code authorization for Codex\" في إعدادات مساحة عمل ChatGPT لدينا؟ أحتاج إليه لربط خطة ChatGPT الخاصة بي بـ Rerun.",
+        "copyCode": "نسخ الرمز",
+        "openOpenAI": "افتح OpenAI",
+        "enterHint": "أدخله في صفحة OpenAI ووافق. ستلتقطه هذه الشاشة تلقائيًا.",
+        "gettingCode": "جارٍ جلب الرمز…",
+        "getNewCode": "احصل على رمز جديد",
+        "getCode": "احصل على الرمز",
+        "stuck": {
+            "expiredAdmin": "انتهت صلاحية الرمز. على الأرجح لم يسمح المسؤول لديك بتسجيل الدخول بالرمز بعد.",
+            "errorAdmin": "خطأ في صفحة OpenAI؟ على الأرجح لم يسمح المسؤول لديك بتسجيل الدخول بالرمز بعد.",
+            "expiredSetting": "انتهت صلاحية الرمز. على الأرجح لا يزال تسجيل الدخول بالرمز معطّلًا: فعّله في <link>Settings → Security</link>، ثم احصل على رمز جديد.",
+            "errorSetting": "خطأ في صفحة OpenAI؟ على الأرجح لا يزال تسجيل الدخول بالرمز معطّلًا: فعّله في <link>Settings → Security</link>، ثم أدخل الرمز مجددًا."
+        }
+    },
+    "connect": {
+        "renameFailed": "فشلت إعادة تسمية الاتصال",
+        "startFailed": "تعذّر بدء الاتصال",
+        "notSignedIn": "لم يتم تسجيل الدخول",
+        "createFailed": "فشل إنشاء الاتصال"
+    },
+    "oauth": {
+        "unfinished": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
+        "authorizationFailed": "فشل التفويض",
+        "startFailed": "تعذّر بدء تسجيل الدخول"
+    }
+}

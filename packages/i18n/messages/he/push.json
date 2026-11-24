@@ -1,0 +1,13 @@
+{
+    "states": {
+        "done": "הושלם",
+        "error": "נכשל",
+        "question": "שאלה",
+        "approval": "ממתין לאישור",
+        "connector": "נדרשת אפליקציה",
+        "info": "עדכון"
+    },
+    "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
+    "fallbackAgent": "העמית שלך"
+}

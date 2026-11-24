@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "הטבלה לא נמצאה",
+        "deleteRowsFailed": "מחיקת השורות נכשלה",
+        "saveRowFailed": "לא ניתן לשמור את השורה הזו",
+        "deleteTableFailed": "מחיקת הטבלה נכשלה",
+        "purgeTableFailed": "ריקון הטבלה נכשל",
+        "addViewFailed": "לא ניתן להוסיף את התצוגה הזו",
+        "deleteViewFailed": "לא ניתן למחוק את התצוגה הזו",
+        "unavailable": "מסד הנתונים אינו זמין",
+        "tryAgain": "לנסות שוב",
+        "rowCount": "{count, plural, one {שורה אחת} two {{total} שורות} other {{total} שורות}}",
+        "rowCountFound": "{count, plural, one {נמצאה שורה אחת} two {נמצאו {total} שורות} other {נמצאו {total} שורות}}",
+        "noRows": "אין שורות",
+        "noSearchMatch": "אין שורה שמתאימה לחיפוש הזה.",
+        "tableEmpty": "הטבלה הזו ריקה."
+    },
+    "pagination": {
+        "count": "סך הכול <value>{count}</value>",
+        "rowsPerPage": "שורות בכל דף",
+        "perPage": "{size} בכל דף",
+        "range": "{range} מתוך {total}",
+        "firstPage": "הדף הראשון",
+        "previousPage": "הדף הקודם",
+        "nextPage": "הדף הבא",
+        "lastPage": "הדף האחרון"
+    },
+    "toolbar": {
+        "selected": "{count, plural, one {נבחרה אחת} two {נבחרו #} other {נבחרו #}}",
+        "deleteRowTitle": "למחוק את השורה הזו?",
+        "deleteRowsTitle": "למחוק {count} שורות?",
+        "deleteRowDescription": "השורה תוסר מהטבלה לצמיתות. אי אפשר לבטל את הפעולה.",
+        "deleteRowsDescription": "השורות יוסרו מהטבלה לצמיתות. אי אפשר לבטל את הפעולה.",
+        "delete": "מחיקה",
+        "clearSelection": "ניקוי הבחירה",
+        "search": "חיפוש",
+        "searchRows": "חיפוש שורות",
+        "clearSearch": "ניקוי החיפוש",
+        "tableActions": "פעולות על הטבלה",
+        "export": "ייצוא",
+        "purgeTable": "ריקון הטבלה",
+        "deleteTable": "מחיקת הטבלה"
+    },
+    "viewBar": {
+        "allRows": "כל השורות",
+        "viewOptions": "אפשרויות של {name}",
+        "editView": "עריכת התצוגה",
+        "deleteView": "מחיקת התצוגה",
+        "addView": "הוספת תצוגה",
+        "addNewView": "הוספת תצוגה חדשה",
+        "expand": "הרחבה",
+        "deleteViewTitle": "למחוק את התצוגה \"{name}\"?",
+        "deleteViewDescription": "רק התצוגה תימחק. השורות בטבלה לא ישתנו."
+    },
+    "layouts": {
+        "table": "טבלה",
+        "list": "רשימה",
+        "gallery": "גלריה",
+        "board": "לוח"
+    },
+    "table": {
+        "selectAllRows": "בחירת כל השורות בדף הזה",
+        "selectRow": "בחירת שורה",
+        "sources": "מקורות"
+    },
+    "cell": {
+        "yes": "כן",
+        "no": "לא"
+    },
+    "board": {
+        "moveFailed": "לא ניתן להעביר את השורה הזו",
+        "unavailable": "הלוח אינו זמין",
+        "showMore": "להציג עוד {count}"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "מאומת",
+                "detail": "תיבת הדואר קיימת"
+            },
+            "unconfirmed": {
+                "label": "לא אושר",
+                "detail": "תיבת הדואר לא אושרה"
+            },
+            "invalid": {
+                "label": "לא תקין",
+                "detail": "תיבת הדואר לא קיימת"
+            }
+        },
+        "openSource": "פתיחת המקור",
+        "verified": "מאומת",
+        "row": "שורה",
+        "cellLabel": "מקורות: {names}"
+    },
+    "shared": {
+        "emptyTitle": "עדיין אין טבלאות משותפות",
+        "emptyDescription": "כל העמיתים בסביבת העבודה קוראים וכותבים במסד הנתונים הזה. כשהם צריכים רשומה משותפת (קטלוג, תור, רשימה שכמה עמיתים עובדים עליה), הם יוצרים כאן טבלאות שאפשר לעיין בהן בכל עת.",
+        "unreachable": "לא ניתן להגיע למכונה של סביבת העבודה הזו."
+    }
+}

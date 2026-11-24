@@ -1,0 +1,55 @@
+{
+    "linkOff": {
+        "title": "הקישור הזה כבר לא פעיל",
+        "subtitle": "מי ששיתף אותו השבית אותו."
+    },
+    "unsubscribe": {
+        "title": "העדפות אימייל",
+        "subtitle": "לעדכן אילו אימיילים Rerun שולח לך. אין צורך להתחבר לחשבון.",
+        "subtitleRuns": "לבחור אם העמיתים שלך יכולים לשלוח לך אימייל. אין צורך להתחבר לחשבון.",
+        "invalid": "קישור ביטול המנוי הזה לא תקין או שפג תוקפו.",
+        "logIn": "להתחבר כדי לנהל את ההעדפות"
+    },
+    "publishedView": {
+        "protectedTitle": "דף מוגן",
+        "protectedDescription": "שותף על ידי {workspace}. יש להתחבר או לאשר את האימייל כדי לפתוח אותו.",
+        "publishedBy": "פורסם על ידי {agent} ב-{workspace}",
+        "publishedByUnknown": "פורסם על ידי עמית ב-{workspace}",
+        "untitled": "דף שפורסם"
+    },
+    "publishedAuth": {
+        "metaTitle": "פתיחת דף",
+        "noAccess": "אין לך גישה",
+        "signedInAs": "מחובר בתור {email}. הדף הזה מיועד לחברי {workspace}.",
+        "signedInAsOther": "מחובר בחשבון אחר. הדף הזה מיועד לחברי {workspace}."
+    },
+    "gate": {
+        "open": "לפתוח",
+        "errors": {
+            "limited": "יותר מדי ניסיונות. יש להמתין כמה דקות.",
+            "password": "סיסמה שגויה",
+            "code": "קוד שגוי או שפג תוקפו",
+            "email": "יש להזין אימייל תקין"
+        },
+        "password": {
+            "subtitle": "{workspace} הגן על הדף הזה בסיסמה",
+            "placeholder": "סיסמה"
+        },
+        "code": {
+            "title": "כדאי לבדוק את תיבת הדואר",
+            "subtitle": "אם ל-{email} יש גישה לדף הזה, קוד כבר בדרך",
+            "otherEmail": "להשתמש באימייל אחר"
+        },
+        "email": {
+            "subtitle": "יש לאשר את האימייל כדי לפתוח אותו",
+            "submit": "לשלוח קוד"
+        },
+        "members": {
+            "subtitle": "לחברי {workspace}",
+            "continue": "להמשיך עם Rerun"
+        }
+    },
+    "publishedSite": {
+        "notFound": "לא נמצא"
+    }
+}

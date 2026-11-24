@@ -1,0 +1,315 @@
+{
+    "composer": {
+        "attach": "לצרף",
+        "camera": "מצלמה",
+        "coworkers": "עמיתים",
+        "discardRecording": "למחוק את ההקלטה",
+        "files": "קבצים",
+        "modelLabel": "מודל, {model}",
+        "photos": "תמונות",
+        "recordVoice": "להקליט הודעה קולית",
+        "removeAttachment": "להסיר את {name}",
+        "retryRecording": "לנסות לשלוח שוב את ההקלטה",
+        "send": "לשלוח",
+        "sendRecording": "לשלוח את ההקלטה",
+        "sendTo": "לשלוח אל {name}",
+        "skills": "מיומנויות",
+        "stop": "לעצור",
+        "tooLargeBody": "{files}: עד {megabytes} MB.",
+        "tooLargeTitle": "{count, plural, one {הקובץ הזה גדול מדי} two {הקבצים האלה גדולים מדי} other {הקבצים האלה גדולים מדי}}",
+        "tooManyBody": "עד {max}: {files} לא נכללו.",
+        "tooManyTitle": "יותר מדי קבצים",
+        "computers": "מחשבים",
+        "offline": "לא מחובר",
+        "placeholder": "@ עמית, / מיומנות, # מחשב",
+        "placeholderNoSkill": "@ עמית, # מחשב",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ לתייג עמית",
+                "description": "להכניס עמית לשיחה הזו",
+                "empty": "עדיין אין עמית אחר בסביבת העבודה הזו"
+            },
+            "skill": {
+                "menuLabel": "/ להשתמש במיומנות",
+                "description": "להריץ מדריך שמור שהעמית שלך מכיר",
+                "empty": "לעמית הזה עדיין אין מיומנות"
+            },
+            "computer": {
+                "menuLabel": "# להשתמש במחשב",
+                "description": "לתת לעמית שלך לעבוד על מחשב מקושר",
+                "empty": "עדיין אין מחשב מקושר"
+            }
+        }
+    },
+    "desktop": {
+        "connecting": "מתחבר למסך…",
+        "dropping": "החיבור למסך ממשיך להתנתק. יש לנסות שוב בעוד רגע.",
+        "handingBack": "מחזיר…",
+        "keys": {
+            "delete": "מחיקה",
+            "return": "Enter",
+            "tab": "Tab"
+        },
+        "retry": "לנסות שוב",
+        "screen": "מסך",
+        "screenOf": "המסך של {name}",
+        "type": "להקליד",
+        "typePlaceholder": "להקליד על המסך",
+        "unreachable": "לא ניתן היה להגיע למסך."
+    },
+    "empty": {
+        "asleep": "ישן. הודעה תעיר אותו.",
+        "loading": "טוען",
+        "pulseCoworkers": "{count, plural, one {עמית אחד} two {# עמיתים} other {# עמיתים}}",
+        "pulseWorking": "{count} עובדים עכשיו",
+        "sendToCoworker": "לשלוח הודעה לעמית הזה",
+        "startTitle": "להתחיל שיחה",
+        "starters": {
+            "capabilities": "במה אתה יכול לעזור לי?",
+            "recentWork": "תסכם את העבודה האחרונה שלך",
+            "projectFiles": "תעבור על קבצי הפרויקט שלי",
+            "tools": "לאילו כלים יש לך גישה?"
+        },
+        "team": {
+            "greeting": "{named, select, yes {היי, אני {name}} other {היי, אני ה-Chief of Staff שלך}}",
+            "greetingNamed": "{named, select, yes {היי {firstName}, אני {name}} other {היי {firstName}, אני ה-Chief of Staff שלך}}",
+            "greetingWithTeam": "{greeting}. הנה הצוות שלך.",
+            "emptySubtitle": "עדיין אין לך עמיתים. ספר לי על עבודה שהיית מעביר הלאה ואבנה את הראשון.",
+            "buildPrompt": "תבנה לי עמית ש",
+            "buildFirst": {
+                "title": "לבנות את העמית הראשון שלי",
+                "description": "לתאר את העבודה במשפט"
+            },
+            "template": {
+                "title": "להתחיל מתבנית",
+                "description": "עמיתים מוכנים לסוג העסק שלך",
+                "send": "תראה לי תבניות שמתאימות לעסק שלי"
+            },
+            "guide": {
+                "title": "איך זה עובד?",
+                "description": "עמיתים, Boxes, שגרות, בשתי דקות",
+                "send": "איך Rerun עובד?"
+            },
+            "checkWorking": {
+                "title": "מה {name} עושה?",
+                "description": "עובד עכשיו",
+                "send": "מה {mention} עושה עכשיו?"
+            },
+            "checkIdle": {
+                "title": "מה {name} עשה היום?",
+                "description": "להתעדכן בהרצות האחרונות שלו",
+                "send": "מה {mention} עשה היום?"
+            },
+            "handOff": {
+                "title": "לתת ל-{name} משימה",
+                "description": "אני מתדרך אותו ומלווה עד הסוף",
+                "prefill": "תבקש מ-{mention} "
+            },
+            "build": {
+                "title": "לבנות עמית חדש",
+                "description": "לעבודה שאף אחד בצוות עוד לא עושה"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "לחבר את ChatGPT",
+        "connectClaude": "לחבר את Claude",
+        "creditsBody": "ניצלת את קרדיטי Rerun שלך לתקופה הזו. כבר משלם על Claude או ChatGPT? אפשר להריץ את העמיתים שלך על המינוי הזה, בלי עלות נוספת כאן.",
+        "creditsTitle": "קרדיטים של Rerun",
+        "fallbackTitle": "משהו השתבש",
+        "reconnect": "להתחבר מחדש",
+        "switchModel": "להחליף מודל",
+        "tryAgain": "לנסות שוב"
+    },
+    "feedback": {
+        "cancel": "ביטול",
+        "categories": {
+            "did_not_follow": "לא מילא את הבקשה שלי",
+            "incomplete": "תשובה חלקית",
+            "memory": "בעיה בזיכרון",
+            "not_factual": "לא נכון עובדתית",
+            "other": "אחר",
+            "too_slow": "איטי מדי",
+            "tool_error": "שגיאת כלי או חיבור",
+            "ui_bug": "באג בממשק",
+            "wrong_tool": "נעשה שימוש בכלי או באפליקציה הלא נכונים"
+        },
+        "categoryLabel": "איזה סוג בעיה תרצה לדווח?",
+        "disclaimer": "שליחת הדיווח הזה משתפת את השיחה עם צוות Rerun כדי שנוכל לשפר את העמיתים שלך.",
+        "negativePlaceholder": "מה לא היה טוב בתשובה הזו?",
+        "negativeTitle": "לתת משוב שלילי",
+        "positivePlaceholder": "מה היה טוב בתשובה הזו?",
+        "removeFailed": "לא ניתן היה להסיר את המשוב שלך",
+        "saveFailed": "לא ניתן היה לשמור את המשוב שלך",
+        "skip": "לדלג",
+        "submit": "לשלוח"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "לסביבת העבודה הזו אין כרגע מכונה. אפשר לבדוק ב-{host}.",
+                "title": "Rerun לא פועל"
+            },
+            "onboarding": {
+                "body": "אפשר לסיים את ההגדרה ב-{host}.",
+                "title": "Rerun מכין את סביבת העבודה שלך"
+            }
+        },
+        "retry": "לנסות שוב",
+        "role": "ה-Chief of Staff שלך",
+        "unreachableBody": "יש לבדוק את החיבור ולנסות שוב.",
+        "unreachableTitle": "לא הצלחנו להגיע ל-Rerun"
+    },
+    "header": {
+        "back": "חזרה",
+        "conversationCount": "{count, plural, one {שיחה אחת} two {# שיחות} other {# שיחות}}",
+        "conversations": "שיחות",
+        "coworkerDetails": "פרטי העמית",
+        "earlier": "קודם",
+        "general": "כללי",
+        "identityLabel": "{name}, {title}",
+        "newChat": "צ'אט חדש",
+        "newConversation": "שיחה חדשה",
+        "newThread": "שרשור חדש",
+        "sections": {
+            "needs-you": "מחכה לך",
+            "new": "לא נקראו",
+            "running": "פועל"
+        },
+        "threadCount": "{count, plural, one {שרשור אחד} two {# שרשורים} other {# שרשורים}}",
+        "threads": "שרשורים"
+    },
+    "markdown": {
+        "code": "קוד",
+        "copied": "הועתק",
+        "copy": "להעתיק",
+        "draft": "טיוטה",
+        "image": "תמונה"
+    },
+    "messages": {
+        "askRerun": "{named, select, yes {לשאול את {name}} other {לשאול את ה-Chief of Staff שלך}}",
+        "badResponse": "תשובה גרועה",
+        "compacting": "מכווץ",
+        "copy": "להעתיק",
+        "goodResponse": "תשובה טובה",
+        "needsYourAnswer": "מחכה לתשובה שלך",
+        "open": "לפתוח את {name}",
+        "photo": "תמונה",
+        "regenerate": "ליצור מחדש",
+        "replyBelow": "אפשר לענות למטה.",
+        "runningTool": "מריץ את {tool}",
+        "scrollToLatest": "לגלול להודעה האחרונה",
+        "sentBy": "נשלח על ידי {name}",
+        "relayedFor": "{named, select, yes {{name} בשם {person}} other {Chief of Staff בשם {person}}}",
+        "share": "לשתף",
+        "showLess": "להציג פחות",
+        "showMore": "להציג עוד",
+        "thinking": "חושב"
+    },
+    "origins": {
+        "copied": "הועתק",
+        "copy": "להעתיק",
+        "installComplete": "ההתקנה הושלמה",
+        "installGuideOf": "מדריך ההתקנה של {name}",
+        "installStarted": "ההתקנה התחילה",
+        "noPayload": "אין מטען",
+        "payload": "מטען",
+        "prompt": "פרומפט",
+        "promptOf": "הפרומפט של {name}",
+        "scheduledRun": "הרצה מתוזמנת",
+        "startedBy": "הסשן הזה התחיל על ידי <strong>{name}</strong>",
+        "truncated": "קוצר",
+        "viewDetails": "להציג פרטים",
+        "viewGuide": "להציג מדריך",
+        "viewPayload": "להציג מטען",
+        "viewPrompt": "להציג פרומפט",
+        "webhookReceived": "התקבל וובהוק",
+        "jobEnded": "העבודה הסתיימה ב-#{computer}",
+        "viewReport": "להציג דוח",
+        "reportOf": "מה ש-#{computer} דיווח"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {מקור אחד} two {# מקורות} other {# מקורות}}",
+        "emailsVerified": "אומתו {valid} מתוך {checked, plural, one {אימייל אחד} two {# אימיילים} other {# אימיילים}}",
+        "title": "מקורות"
+    },
+    "pane": {
+        "answerPlaceholder": "לענות ל-{name}",
+        "attachFailed": "לא ניתן היה לצרף את הקבצים",
+        "defaultModel": "ברירת מחדל · {model}",
+        "loadFailed": "לא הצלחנו לטעון את השיחה הזו.",
+        "loading": "טוען את השיחה",
+        "openBrowser": "לפתוח דפדפן",
+        "retry": "לנסות שוב",
+        "stopTaskFailed": "לא ניתן היה לעצור את המשימה הזו",
+        "takeControl": "להשתלט"
+    },
+    "queued": {
+        "attachmentsOnly": "קבצים מצורפים בלבד",
+        "badge": "בתור",
+        "remove": "להסיר את ההודעה מהתור",
+        "sendNow": "לשלוח עכשיו",
+        "sendNowStops": "לשלוח עכשיו, עוצר את ההרצה הנוכחית"
+    },
+    "runPhase": {
+        "label": "{name}: {phase}",
+        "thinking": "חושב",
+        "waking": "מתעורר",
+        "working": "עובד"
+    },
+    "screen": {
+        "disconnected": "החיבור למסך נותק",
+        "error": "המסך לא זמין",
+        "handBackFailed": "לא ניתן היה להחזיר את הדפדפן",
+        "resize": "לשנות את גודל המסך"
+    },
+    "skillUpdateFailed": "לא ניתן היה לעדכן את המיומנות",
+    "takeover": {
+        "closing": "סוגר…",
+        "done": "סיום",
+        "openAgain": "לפתוח שוב",
+        "openBrowser": "לפתוח דפדפן",
+        "opened": "הדפדפן פתוח בשולחן העבודה של העמית שלך. יש לחזור לכאן כשתסיים.",
+        "opensBrowser": "פותח את הדפדפן של העמית שלך, כדי שתשלוט בו.",
+        "opensSite": "פותח את {site} בדפדפן של העמית שלך, כדי שתשלוט בו.",
+        "privacy": "מה שתתחבר אליו נשאר בדפדפן של העמית הזה, במכונה שלך.",
+        "skip": "לדלג",
+        "skipTakeover": "לדלג על השליטה בדפדפן"
+    },
+    "threadBranch": {
+        "needs": "מחכה לך",
+        "error": "שגיאה",
+        "running": "פועל",
+        "open": "לפתוח את השרשור {title}",
+        "opener": {
+            "schedule": "הרצה מתוזמנת · {name}",
+            "trigger": "וובהוק · {name}",
+            "askedBy": "התבקש על ידי {name}",
+            "askedByUnknown": "התבקש על ידי עמית אחר",
+            "started": "פתח שרשור"
+        }
+    },
+    "voice": {
+        "copyTranscript": "להעתיק תמלול",
+        "hideTranscript": "להסתיר תמלול",
+        "pause": "להשהות",
+        "play": "להשמיע הודעה קולית",
+        "recording": "מקליט",
+        "seek": "דילוג",
+        "sendFailed": "לא ניתן היה לשלוח את ההקלטה.",
+        "sending": "שולח את ההקלטה",
+        "silent": "לא שמענו כלום בהקלטה הזו.",
+        "transcript": "תמלול",
+        "waitingForMicrophone": "ממתין למיקרופון…"
+    },
+    "browser": {
+        "close": "לסגור",
+        "reload": "לטעון מחדש",
+        "pageActions": "פעולות עבור {host}",
+        "share": "לשתף",
+        "openInBrowser": "לפתוח בדפדפן",
+        "copyLink": "להעתיק קישור",
+        "backToChat": "חזרה לשיחה",
+        "brand": "Rerun"
+    }
+}

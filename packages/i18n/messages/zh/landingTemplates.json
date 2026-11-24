@@ -1,0 +1,25 @@
+{
+    "price": {
+        "free": "免费",
+        "monthly": "{amount}/月",
+        "useForFree": "免费使用",
+        "hire": "{count, plural, other {雇用这 # 位同事 · {price}}}",
+        "hireCard": "雇用 · {price}"
+    },
+    "categories": {
+        "agencies": "代理机构",
+        "ecommerce": "电子商务",
+        "saas": "SaaS",
+        "sales": "销售",
+        "recruiting": "招聘",
+        "real-estate": "房地产",
+        "legal": "法律与合规",
+        "creators": "创作者",
+        "productivity": "效率",
+        "other": "其他"
+    },
+    "connectors": {
+        "none": "无需应用",
+        "label": "应用：{apps}"
+    }
+}

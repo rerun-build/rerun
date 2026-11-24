@@ -1,0 +1,315 @@
+{
+    "common": {
+        "footer": {
+            "tagline": "להריץ את העבודה שלך על עמיתים. לבנות אותם, לראות אותם עובדים, ולשמור עין על הכול.",
+            "copyright": "‏© 2026 Rerun",
+            "unsubscribe": "ביטול הרשמה"
+        },
+        "openConversation": "לפתוח את השיחה",
+        "openRerun": "לפתוח את Rerun",
+        "useThisCoworker": "להשתמש בעמית הזה",
+        "yourWorkspace": "סביבת העבודה שלך",
+        "dateAtTime": "{date}, {time} UTC",
+        "meta": {
+            "accessEnds": "הגישה מסתיימת",
+            "amount": "סכום",
+            "amountDue": "סכום לתשלום",
+            "archivedOn": "הועבר לארכיון ב",
+            "archivedSince": "בארכיון מאז",
+            "coworker": "עמית",
+            "coworkers": "עמיתים",
+            "coworkersSaved": "עמיתים שנשמרו",
+            "created": "נוצר",
+            "declinedOn": "נדחה ב",
+            "deletedOn": "נמחק ב",
+            "included": "כלול",
+            "lastOpened": "נפתח לאחרונה",
+            "pausedSince": "מושהה מאז",
+            "renewsOn": "מתחדש ב",
+            "run": "הרצה",
+            "runs": "הרצות",
+            "savedUntil": "נשמר עד",
+            "source": "מקור",
+            "then": "לאחר מכן",
+            "trialEnded": "הניסיון הסתיים",
+            "trialEnds": "הניסיון מסתיים",
+            "workspace": "סביבת העבודה",
+            "workspacePaused": "סביבת העבודה הושהתה"
+        }
+    },
+    "subjects": {
+        "signInCode": "קוד Rerun שלך: {code}",
+        "publishedAccessCode": "הקוד שלך לפתיחת {pageTitle}: {code}",
+        "lifetimeCode": "קוד Rerun לכל החיים שלך: {code}",
+        "workspaceInvite": "הוזמנת ל-{workspaceName} ב-Rerun",
+        "runFailed": "{agentName} נתקל בשגיאה",
+        "agentDone": "{agentName} סיים משימה",
+        "agentInfo": "{agentName} צריך את תשומת לבך",
+        "agentInput": "{agentName} צריך תשובה ממך",
+        "appNotice": "{appName}: נדרשת פעולה",
+        "incidentResolved": "{agentName} חזר לפעול כרגיל",
+        "budgetExhausted": "קרדיטי Rerun שלך נגמרו",
+        "onboardingResume": "ההגדרה של Rerun עדיין לא הסתיימה",
+        "agentRecommendations": "{count, plural, one {עמית Rerun אחד שמתאים ל-{company}} two {שני עמיתי Rerun שמתאימים ל-{company}} other {# עמיתי Rerun שמתאימים ל-{company}}}",
+        "agentIdle": "{agentName} מוכן, אבל עוד לא רץ",
+        "teamInvite": "להביא את הצוות שלך ל-{workspaceName}",
+        "automateAgent": "הרצת את {agentName} ידנית {manualRuns, plural, one {פעם אחת} two {פעמיים} other {# פעמים}}, כדאי לתזמן את ההרצה הבאה",
+        "trialStarted": "ניסיון Rerun של {trialDays} ימים פעיל",
+        "trialEnding": "{daysLeft, plural, =1 {ניסיון Rerun שלך מסתיים מחר} one {ניסיון Rerun שלך מסתיים מחר} two {ניסיון Rerun שלך מסתיים בעוד יומיים} other {ניסיון Rerun שלך מסתיים בעוד # ימים}}",
+        "trialFinalNoticeCard": "תוכנית Rerun שלך מתחילה בעוד שעתיים",
+        "trialFinalNoticeNoCard": "ניסיון Rerun שלך מסתיים בעוד שעתיים, כדאי להוסיף כרטיס כדי שהעמיתים ימשיכו לפעול",
+        "trialEndedPaymentFailed": "התשלום הראשון שלך ל-Rerun נכשל, סביבת העבודה תושהה בעוד 24 שעות",
+        "trialEndedNoCard": "ניסיון Rerun שלך הסתיים, סביבת העבודה תושהה בעוד שעתיים",
+        "paymentFailed": "התשלום שלך ל-Rerun נדחה, סביבת העבודה תושהה בעוד 24 שעות",
+        "subscriptionEnding": "{daysLeft, plural, =1 {מינוי Rerun שלך מסתיים מחר} one {מינוי Rerun שלך מסתיים מחר} two {מינוי Rerun שלך מסתיים בעוד יומיים} other {מינוי Rerun שלך מסתיים בעוד # ימים}}",
+        "archiveExpiring": "{kind, select, sandbox {סביבת הניסוי של Rerun שבארכיון תימחק ב-{date}} other {סביבת העבודה המושהית של Rerun תימחק ב-{date}}}",
+        "sandboxIdle": "סביבת הניסוי של Rerun תועבר לארכיון ב-{date} אם לא תפתח אותה",
+        "renewalReminder": "{daysLeft, plural, =1 {תוכנית Rerun שלך מתחדשת מחר} one {תוכנית Rerun שלך מתחדשת מחר} two {תוכנית Rerun שלך מתחדשת בעוד יומיים} other {תוכנית Rerun שלך מתחדשת בעוד # ימים}}",
+        "creatorPitch": "למכור את העמיתים שאתה בונה ב-Rerun"
+    },
+    "reasons": {
+        "mine": "אתה התחלת את ההרצה הזו.",
+        "participant": "אתה משתתף בשיחה הזו.",
+        "followed": "אתה עוקב אחרי המשימות המתוזמנות של {agentName}.",
+        "allActivity": "אתה מקבל את כל הפעילות של {agentName}.",
+        "everything": "אתה מקבל כל הרצה בסביבת העבודה.",
+        "workspace": "זה נוגע לסביבת העבודה שלך."
+    },
+    "signInCode": {
+        "preview": "קוד Rerun שלך הוא {code}",
+        "headingSignIn": "להתחבר ל-Rerun",
+        "headingConfirm": "לאשר את האימייל החדש שלך",
+        "bodySignIn": "יש להזין את הקוד הזה בלשונית שבה ביקשת אותו, או להשתמש בכפתור למטה כדי להתחבר מיד.",
+        "bodyConfirm": "יש להזין את הקוד הזה בהגדרות החשבון שלך ב-Rerun כדי להפוך את האימייל הזה לאימייל של החשבון.",
+        "button": "להתחבר ל-Rerun",
+        "footnoteSignIn": "הקוד והכפתור פגים בעוד {minutes, plural, one {דקה אחת} two {שתי דקות} other {# דקות}} ופועלים פעם אחת. אם לא ביקשת אותם, אפשר להתעלם מהאימייל הזה.",
+        "footnoteConfirm": "הקוד פג בעוד {minutes, plural, one {דקה אחת} two {שתי דקות} other {# דקות}} ופועל פעם אחת. אם לא ביקשת אותו, אפשר להתעלם מהאימייל הזה."
+    },
+    "publishedAccessCode": {
+        "preview": "הקוד שלך לפתיחת {pageTitle}: {code}",
+        "heading": "לפתוח את {pageTitle}",
+        "body": "{workspaceName} שיתפו איתך את העמוד הזה. יש להזין את הקוד הזה בעמוד כדי לפתוח אותו.",
+        "footnote": "הקוד פג בעוד {minutes, plural, one {דקה אחת} two {שתי דקות} other {# דקות}} ופועל פעם אחת. אם לא ביקשת אותו, אפשר להתעלם מהאימייל הזה.",
+        "untitledPage": "עמוד"
+    },
+    "lifetimeCode": {
+        "preview": "קוד Rerun לכל החיים שלך הוא {code}",
+        "heading": "הגישה לכל החיים שלך מוכנה",
+        "body": "תודה על הרכישה. הנה הקוד שלך: יש לממש אותו בסביבת העבודה שלך ב-Rerun כדי להעביר אותה לתוכנית לכל החיים.",
+        "button": "לממש את הקוד שלי",
+        "footnote": "הקוד פועל פעם אחת, בסביבת עבודה אחת. כדאי לשמור את האימייל הזה: זו הוכחת הרכישה שלך. שאלות? אפשר להשיב לאימייל הזה."
+    },
+    "workspaceInvite": {
+        "preview": "הוזמנת ל-{workspaceName} ב-Rerun",
+        "heading": "הוזמנת",
+        "bodyWithInviter": "<strong>{inviter}</strong> הזמין אותך להצטרף ל-<strong>{workspaceName}</strong> ב-Rerun.",
+        "bodyAnonymous": "הוזמנת להצטרף ל-<strong>{workspaceName}</strong> ב-Rerun.",
+        "pitch": "Rerun מנהל את העסק שלך עם עמיתי AI אוטונומיים. אפשר לקבל את ההזמנה כדי להתחיל לשתף פעולה בסביבת העבודה הזו.",
+        "button": "להצטרף ל-{workspaceName}",
+        "footnote": "ההזמנה הזו פגה בעוד 7 ימים. אם לא ציפית לה, אפשר להתעלם מהאימייל הזה."
+    },
+    "teamInvite": {
+        "preview": "להביא את הצוות שלך ל-{workspaceName}",
+        "heading": "להביא את הצוות שלך ל-{workspaceName}",
+        "firstRun": "<strong>{agentName}</strong> השלים את ההרצה המוצלחת הראשונה שלו, ואתה עדיין האדם היחיד בסביבת העבודה הזו.",
+        "access": "אם מישהו אחר צריך לקרוא את התוצאות שלו, לאשר את מה שהוא עומד לעשות, או להמשיך את תהליך העבודה שלו כשאתה לא זמין, הוא צריך גישה משלו.",
+        "button": "להזמין את הצוות שלך",
+        "footnote": "אתה מחליט מי מצטרף. שום דבר לא משותף עד שתשלח הזמנה.",
+        "fallbackAgent": "העמית שלך"
+    },
+    "runFailed": {
+        "preview": "{agentName} נתקל בשגיאה",
+        "heading": "ההרצה נכשלה",
+        "body": "העמית שלך <strong>{agentName}</strong> נעצר עם שגיאה."
+    },
+    "budgetExhausted": {
+        "preview": "קרדיטי Rerun שלך נגמרו",
+        "heading": "קרדיטי Rerun נגמרו",
+        "bodyNamed": "קרדיטי Rerun של <strong>{workspaceName}</strong> נגמרו לחודש הזה. הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד שהקרדיטים יתאפסו או עד שתוסיף קרדיטים.",
+        "bodyUnnamed": "קרדיטי Rerun של סביבת העבודה שלך נגמרו לחודש הזה. הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד שהקרדיטים יתאפסו או עד שתוסיף קרדיטים.",
+        "ownKeys": "עמיתים שמשתמשים במפתחות API משלהם ממשיכים לפעול.",
+        "button": "להוסיף קרדיטים"
+    },
+    "agentNotification": {
+        "done": {
+            "preview": "{agentName}: המשימה הושלמה",
+            "heading": "המשימה הושלמה",
+            "body": "הסוכן שלך <strong>{agentName}</strong> סיים משימה."
+        },
+        "info": {
+            "preview": "{agentName}: צריך את תשומת לבך",
+            "heading": "צריך את תשומת לבך",
+            "body": "הסוכן שלך <strong>{agentName}</strong> רוצה שתסתכל על משהו."
+        },
+        "question": {
+            "preview": "{agentName}: לעמית יש שאלה",
+            "heading": "לעמית יש שאלה",
+            "body": "הסוכן שלך <strong>{agentName}</strong> צריך תשובה כדי להמשיך."
+        },
+        "approval": {
+            "preview": "{agentName}: נדרש אישור",
+            "heading": "נדרש אישור",
+            "body": "הסוכן שלך <strong>{agentName}</strong> ממתין לאישור שלך."
+        },
+        "connector": {
+            "preview": "{agentName}: הגדרת אפליקציה",
+            "heading": "הגדרת אפליקציה",
+            "body": "הסוכן שלך <strong>{agentName}</strong> צריך שתחבר שירות."
+        }
+    },
+    "incidentResolved": {
+        "preview": "{source} של {agentName} עובד שוב",
+        "heading": "חזרה לשגרה",
+        "body": "{source} של <strong>{agentName}</strong> רץ שוב בלי בעיות. לא תקבל אימייל נוסף על זה, אלא אם זה יישבר שוב.",
+        "sources": {
+            "schedule": "התזמון \"{slug}\"",
+            "anySchedule": "משימה מתוזמנת",
+            "trigger": "הטריגר \"{slug}\"",
+            "anyTrigger": "טריגר",
+            "conversation": "שיחה"
+        }
+    },
+    "agentIdle": {
+        "preview": "{agentName} מוכן, אבל עוד לא רץ",
+        "heading": "{agentName} עוד לא רץ",
+        "body": "יצרת את <strong>{agentName}</strong> והוא אף פעם לא התחיל הרצה. כדאי לתת לו קודם משימה קטנה אחת: תוצאה שאפשר לקרוא בדקה היא מה שמראה לך אם ההגדרה נכונה לפני שמתזמנים אותו.",
+        "button": "לפתוח את {agentName}",
+        "footnote": "פתיחת העמוד הזה לא מתחילה הרצה.",
+        "createdHoursAgo": "{count, plural, one {לפני שעה} two {לפני שעתיים} other {לפני # שעות}}",
+        "createdYesterday": "אתמול",
+        "createdDaysAgo": "{count, plural, one {לפני יום} two {לפני יומיים} other {לפני # ימים}}"
+    },
+    "agentRecommendations": {
+        "preview": "{count, plural, one {עמית Rerun אחד שמתאים ל-{company}} two {שני עמיתי Rerun שמתאימים ל-{company}} other {# עמיתי Rerun שמתאימים ל-{company}}}",
+        "yourCompany": "החברה שלך",
+        "heading": "מאיפה להתחיל ב-{company}",
+        "bodyWithSite": "שיתפת את <strong>{domain}</strong> במהלך ההגדרה. לפי העבודה החוזרת שמתוארת שם והכלים שסיפרת לנו שאתה משתמש בהם, אלה ההגדרות הברורות ביותר להתחלה.",
+        "bodyWithoutSite": "לפי הכלים שסיפרת לנו שאתה משתמש בהם, אלה ההגדרות הברורות ביותר להתחלה.",
+        "button": "לעיין בספרייה",
+        "footnote": "שום דבר לא רץ עד שתבחר אחת ותבדוק את ההגדרה שלה."
+    },
+    "automateAgent": {
+        "preview": "הפעלת את {agentName} ידנית {manualRuns, plural, one {פעם אחת} two {פעמיים} other {# פעמים}}",
+        "heading": "לתת ל-{agentName} להתחיל מעצמו",
+        "body": "הפעלת את <strong>{agentName}</strong> בעצמך <strong>{manualRuns, plural, one {פעם אחת} two {פעמיים} other {# פעמים}}</strong> ב{period}, וכל אחת מההרצות הסתיימה.",
+        "workflowWorks": "תהליך העבודה עובד. עם תזמון הוא עושה את אותה עבודה בלי שתצטרך לפתוח את האפליקציה כדי להפעיל אותו.",
+        "button": "לתזמן את ההרצה הבאה",
+        "footnote": "אתה בודק את התזמון לפני שהוא נשמר, ואפשר להשהות אותו בכל עת.",
+        "periods": {
+            "lastWeek": "שבוע האחרון",
+            "lastTwoWeeks": "שבועיים האחרונים"
+        }
+    },
+    "onboardingResume": {
+        "preview": "ההגדרה של Rerun עדיין לא הסתיימה",
+        "headingNamed": "{firstName}, ההגדרה שלך עדיין לא הסתיימה",
+        "heading": "ההגדרה שלך עדיין לא הסתיימה",
+        "leftEarly": "סביבת העבודה שלך נוצרה, אבל יצאת לפני סוף ההגדרה. זה לוקח בערך דקה: האתר שלך, והכלים שאתה כבר עובד איתם.",
+        "whyItMatters": "שתי התשובות האלה קובעות אילו עמיתים Rerun מציג לך. בלעדיהן תקבל את הרשימה הכללית.",
+        "button": "לסיים את ההגדרה",
+        "footnote": "השאלות ייפתחו מחדש מעצמן כשתגיע לסביבת העבודה שלך."
+    },
+    "archiveExpiring": {
+        "preview": "{kind, select, sandbox {סביבת הניסוי של Rerun שבארכיון תימחק ב-{date}} other {סביבת העבודה המושהית של Rerun תימחק ב-{date}}}",
+        "heading": "{kind, select, sandbox {סביבת הניסוי שבארכיון תימחק ב-{date}} other {סביבת העבודה המושהית תימחק ב-{date}}}",
+        "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong> בארכיון מאז <strong>{pausedOn}</strong>. העמיתים שלה וכל מה שהם יודעים עדיין שמורים, וזה השבוע האחרון שבו הם יהיו שמורים.} other {<strong>{workspaceName}</strong> מושהית מאז <strong>{pausedOn}</strong>. העמיתים שלה וכל מה שהם יודעים עדיין שמורים, וזה השבוע האחרון שבו הם יהיו שמורים.}}",
+        "statusUnnamed": "{kind, select, sandbox {סביבת העבודה שלך בארכיון מאז <strong>{pausedOn}</strong>. העמיתים שלה וכל מה שהם יודעים עדיין שמורים, וזה השבוע האחרון שבו הם יהיו שמורים.} other {סביבת העבודה שלך מושהית מאז <strong>{pausedOn}</strong>. העמיתים שלה וכל מה שהם יודעים עדיין שמורים, וזה השבוע האחרון שבו הם יהיו שמורים.}}",
+        "deletion": "{kind, select, sandbox {ב-<strong>{date}</strong> העותק השמור יימחק לצמיתות ולא יהיה אפשר לשחזר אותו. כדאי לפתוח את סביבת הניסוי ולבקש להפעיל אותה מחדש לפני כן, כדי לקבל אותה בחזרה בדיוק כפי שהשארת אותה.} other {ב-<strong>{date}</strong> העותק השמור יימחק לצמיתות ולא יהיה אפשר לשחזר אותו. אם תירשם למינוי לפני כן, סביבת העבודה תחזור בדיוק כפי שהשארת אותה.}}",
+        "button": "{kind, select, sandbox {לפתוח את סביבת הניסוי שלי} other {להחזיר את סביבת העבודה שלי}}",
+        "footnote": "{kind, select, sandbox {זה האימייל האחרון על סביבת הניסוי הזו.} other {זה האימייל האחרון על סביבת העבודה הזו.}}"
+    },
+    "creatorInvite": {
+        "previewOutreach": "נבנה מהעבודה הציבורית שלך. אפשר לתבוע את הפרופיל ואת סביבת הניסוי שלך.",
+        "previewApplication": "התקבלת. אפשר לתבוע את סביבת הניסוי שלך ולהתחיל לבנות תבניות.",
+        "headingOutreach": "מזל טוב, {firstName}",
+        "headingApplication": "התקבלת, {firstName}",
+        "introOutreach": "הפרופיל שלך נוסף עכשיו למדריך שלנו של אנשי מקצוע שמתכננים ומפעילים עמיתי AI. מילאנו מראש את הרישום שלך מתוך העבודה הציבורית שלך.",
+        "introApplication": "בדקנו את הבקשה שלך לתוכנית Rerun Creator ונשמח מאוד לצרף אותך.",
+        "cardAlt": "כרטיס Rerun Expert של {firstName}",
+        "sandbox": "הקישור למטה יוצר את חשבון היוצר שלך ונותן לך סביבת ניסוי: סביבת עבודה ללא הגבלה שבה בונים עמיתים, שומרים אותם כתבניות ומפרסמים אותם בחנות. היוצרים שומרים את ההכנסות מכל תבנית בתשלום שהם מפרסמים.",
+        "button": "לתבוע את ה-Box שלי",
+        "conditions": "תתבקש לאשר את תנאי התוכנית לפני שסביבת הניסוי תיפתח. זה לוקח דקה. הרישום הציבורי שלך נשאר שלך לעריכה מהאפליקציה, מתי שתרצה.",
+        "fallbackLink": "אם הכפתור לא עובד, אפשר להדביק את זה בדפדפן: <link>{url}</link>",
+        "signoff": "צוות Rerun",
+        "unsubscribe": "להסיר את הפרופיל שלי"
+    },
+    "creatorPitch": {
+        "preview": "למכור את העמיתים שאתה בונה ב-Rerun",
+        "headingNamed": "{firstName}, למכור את מה שבנית",
+        "heading": "למכור את מה שבנית",
+        "bodyWithAgent": "בנית את <strong>{agentName}</strong> ב-Rerun. אם הוא פותר בעיה שיש גם לאנשים אחרים, אפשר לארוז אותו כתבנית שהם מתקינים בלחיצה אחת.",
+        "bodyWithoutAgent": "בנית עמיתים שעובדים ב-Rerun. אם אחד מהם פותר בעיה שיש גם לאנשים אחרים, אפשר לארוז אותו כתבנית שהם מתקינים בלחיצה אחת.",
+        "creator": "בתור Rerun Creator אתה קובע את המחיר, אנחנו מטפלים בתשלום ובהעברות, והקונים מקבלים הגדרה שכבר עובדת.",
+        "button": "להפוך ל-Creator",
+        "footnoteWithAgent": "אפשר להתחיל עם {agentName}, או לבנות משהו לחנות מאפס.",
+        "footnoteWithoutAgent": "אפשר להתחיל מעמית שכבר יש לך, או לבנות משהו לחנות מאפס."
+    },
+    "paymentFailed": {
+        "preview": "התשלום שלך ל-Rerun נדחה, סביבת העבודה תושהה ב-{pausedAt}",
+        "heading": "התשלום שלך נדחה",
+        "declined": "החידוש של <strong>{workspace}</strong> לא עבר ב-<strong>{date}</strong>. ייתכן שהבנק שלך פשוט מבקש ממך לאשר אותו.",
+        "declinedWithAmount": "החידוש של <strong>{workspace}</strong>, <strong>{amount}</strong>, לא עבר ב-<strong>{date}</strong>. ייתכן שהבנק שלך פשוט מבקש ממך לאשר אותו.",
+        "consequences": "סביבת העבודה שלך ממשיכה לפעול עד <strong>{pausedAt}</strong>. אחרי זה היא <strong>מושהית</strong> והעמיתים שלך נעצרים. שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד <strong>{keptUntil}</strong>. אם תשלם את החשבונית, שום דבר לא משתנה, באותה תוכנית.",
+        "button": "לשלם את החשבונית",
+        "footnote": "ננסה לחייב את הכרטיס שוב בימים הקרובים. אם אחד הניסיונות יעבור, סביבת העבודה שלך תמשיך לפעול, או תשוחזר מעצמה אם כבר הושהתה."
+    },
+    "renewalReminder": {
+        "preview": "תוכנית Rerun שלך מתחדשת ב-{date}",
+        "heading": "התוכנית שלך מתחדשת בעוד {daysLeft, plural, =1 {יום} one {יום} two {יומיים} other {# ימים}}",
+        "body": "ביקשת שנזכיר לך לפני שהתוכנית של <strong>{workspace}</strong> מתחדשת. היא מתחדשת ב-<strong>{date}</strong>, ואז מחויב הכרטיס השמור. עד התאריך הזה העמיתים שלך ממשיכים לפעול כרגיל.",
+        "button": "לבדוק את התוכנית שלי",
+        "footnote": "רוצה לבטל? אפשר לעשות זאת לפני {date} מ-Billing, בתפריט סביבת העבודה, והכרטיס שלך לא יחויב שוב."
+    },
+    "sandboxIdle": {
+        "preview": "סביבת הניסוי של Rerun תועבר לארכיון ב-{date} אם לא תפתח אותה",
+        "heading": "סביבת הניסוי שלך תועבר לארכיון ב-{date}",
+        "unused": "סביבת הניסוי שלך ב-Rerun לא נפתחה מאז <strong>{lastActive}</strong>. סביבת ניסוי מחזיקה מכונה פועלת בשבילך, ולכן סביבה שלא נעשה בה שימוש 30 יום מועברת לארכיון כדי לפנות אותה.",
+        "openBefore": "אם תפתח את סביבת הניסוי לפני <strong>{date}</strong>, שום דבר לא משתנה. אחרי התאריך הזה העמיתים שלה והנתונים שלהם נשמרים, אבל כדי לקבל אותה בחזרה צריך לבקש מאיתנו להפעיל אותה מחדש.",
+        "button": "לפתוח את סביבת הניסוי שלי"
+    },
+    "subscriptionEnding": {
+        "preview": "מינוי Rerun שלך מסתיים ב-{date}",
+        "heading": "{daysLeft, plural, =1 {המינוי שלך מסתיים מחר} one {המינוי שלך מסתיים מחר} two {המינוי שלך מסתיים בעוד יומיים} other {המינוי שלך מסתיים בעוד # ימים}}",
+        "cancelled": "המינוי של <strong>{workspace}</strong> בוטל ומסתיים ב-<strong>{date}</strong>. בתאריך הזה העמיתים שלך נעצרים וסביבת העבודה מושהית.",
+        "nothingDeleted": "שום דבר לא נמחק. העמיתים שלך, הזיכרונות, הקבצים וההיסטוריה שלהם שמורים עד <strong>{keptUntil}</strong>, והרשמה מחדש מחזירה הכול בדיוק כפי שהשארת.",
+        "button": "לשמור את המינוי שלי",
+        "footnote": "שינית את דעתך? הפעלה מחדש לפני {date} משאירה הכול פועל, בלי שום דבר לשחזר."
+    },
+    "trialEnded": {
+        "preview": "{reason, select, payment_failed {התשלום הראשון שלך ל-Rerun נכשל, סביבת העבודה תושהה ב-{pausedAt}} other {ניסיון Rerun שלך הסתיים, סביבת העבודה תושהה ב-{pausedAt}}}",
+        "heading": "{reason, select, payment_failed {התשלום הראשון שלך נכשל} other {הניסיון שלך הסתיים}}",
+        "ended": "{reason, select, payment_failed {הניסיון של <strong>{workspace}</strong> הסתיים ב-<strong>{date}</strong>, והחיוב הראשון בכרטיס שלך לא עבר. ייתכן שהבנק שלך פשוט מבקש ממך לאשר אותו.} other {הניסיון של <strong>{workspace}</strong> הסתיים ב-<strong>{date}</strong>, והעמיתים שלך נעצרו.}}",
+        "paused": "{reason, select, payment_failed {סביבת העבודה שלך <strong>תושהה ב-{pausedAt}</strong>. שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד <strong>{keptUntil}</strong>. אפשר לשלם את החשבונית לפני ההשהיה כדי שתמשיך לפעול, או להירשם למינוי בכל עת לפני כן, והכול יחזור בדיוק כפי שהשארת.} other {סביבת העבודה שלך <strong>תושהה ב-{pausedAt}</strong>. שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד <strong>{keptUntil}</strong>. אפשר להירשם למינוי בכל עת לפני כן, והכול יחזור בדיוק כפי שהשארת.}}",
+        "button": "{reason, select, payment_failed {לשלם את החשבונית} other {להתחיל את התוכנית שלי}}",
+        "footnote": "לא הזמן המתאים? אפשר להשאיר את זה, שום דבר נוסף לא יחויב. סביבת העבודה שלך נשמרת עד {keptUntil}."
+    },
+    "trialEnding": {
+        "preview": "ניסיון Rerun שלך מסתיים ב-{date}",
+        "heading": "הניסיון שלך מסתיים בעוד {daysLeft, plural, =1 {יום} one {יום} two {יומיים} other {# ימים}}",
+        "endsOn": "הניסיון של <strong>{workspace}</strong> מסתיים ב-<strong>{date}</strong>. מאז, התוכנית שלך מחויבת בכרטיס השמור בכל חודש. בלי כרטיס שמור, העמיתים שלך מפסיקים לפעול וסביבת העבודה מושהית שעתיים אחרי סוף הניסיון.",
+        "nothingDeleted": "שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד {keptUntil}, והרשמה למינוי מחזירה הכול בדיוק כפי שהשארת.",
+        "button": "להתחיל את התוכנית שלי",
+        "footnote": "לא מתכנן להמשיך? אפשר לבטל לפני {date} מ-Billing, בתפריט סביבת העבודה, ושום דבר לא יחויב."
+    },
+    "trialFinalNotice": {
+        "previewCard": "תוכנית Rerun שלך מתחילה ב-{date}",
+        "previewNoCard": "כדאי להוסיף כרטיס לפני {date} כדי שעמיתי Rerun שלך ימשיכו לפעול",
+        "heading": "הניסיון שלך מסתיים בעוד שעתיים",
+        "bodyCard": "הניסיון של <strong>{workspace}</strong> מסתיים ב-<strong>{date}</strong>. אז מתחילה התוכנית שלך, והכרטיס השמור מחויב על החודש הראשון. העמיתים שלך ממשיכים לפעול, אין צורך לעשות כלום.",
+        "noCard": "הניסיון של <strong>{workspace}</strong> מסתיים ב-<strong>{date}</strong>, ואין כרטיס שמור.",
+        "noCardPause": "בלי תוכנית, העמיתים שלך נעצרים בסוף הניסיון וסביבת העבודה <strong>מושהית ב-{pausedAt}</strong>. שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד {keptUntil}, והרשמה למינוי מחזירה הכול בדיוק כפי שהשארת.",
+        "buttonCard": "לבדוק את התוכנית שלי",
+        "buttonNoCard": "להתחיל את התוכנית שלי",
+        "footnoteCard": "לא מתכנן להמשיך? אפשר לבטל לפני {date} מ-Billing, בתפריט סביבת העבודה, והכרטיס שלך לא יחויב."
+    },
+    "trialStarted": {
+        "preview": "ניסיון Rerun של {trialDays} ימים פעיל",
+        "heading": "הניסיון שלך פעיל",
+        "body": "<strong>{workspace}</strong> בניסיון חינם של {trialDays} ימים. העמיתים שלך פועלים, התזמונים שלך מופעלים, ושום דבר לא מחויב היום.",
+        "included": "{coworkers, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}} ו-{credits, plural, one {קרדיט אחד} two {שני קרדיטים} other {# קרדיטים}}",
+        "perMonth": "{price}/חודש",
+        "button": "לפתוח את סביבת העבודה",
+        "footnoteCard": "התוכנית שלך מתחילה מעצמה ב-{date}: {price} מחויב בכרטיס שהוספת, ואז בכל חודש. לא מתכנן להמשיך? אפשר לבטל לפני {date} מ-Billing, בתפריט סביבת העבודה, ושום דבר לא יחויב.",
+        "footnoteNoCard": "אין צורך בכרטיס לניסיון. כדי להמשיך אחרי {date}, אפשר להוסיף כרטיס מ-Billing, בתפריט סביבת העבודה, והתוכנית שלך מתחילה ב-{price}/חודש. בלי כרטיס, העמיתים שלך נעצרים ושום דבר לא מחויב."
+    }
+}

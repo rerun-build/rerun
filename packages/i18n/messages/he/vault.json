@@ -1,0 +1,92 @@
+{
+    "title": "Vault",
+    "description": "מתחברים לאפליקציה פעם אחת, ואז בוחרים את העמיתים שמשתמשים בה.",
+    "search": "חיפוש ב-Vault",
+    "noMatch": "אין התאמות",
+    "groups": {
+        "apps": "אפליקציות"
+    },
+    "add": "להוסיף",
+    "emptyTitle": "מתחברים פעם אחת, משתפים עם העמיתים שלך",
+    "otherApp": "אפליקציה אחרת",
+    "row": {
+        "everyone": "כל העמיתים",
+        "everyoneShort": "כולם",
+        "unused": "עדיין אין עמית",
+        "usedBy": "{names}",
+        "usedByMore": "{names} ועוד {count, plural, one {# נוסף} two {# נוספים} other {# נוספים}}"
+    },
+    "status": {
+        "needsAuth": "מנותק",
+        "needsConfig": "לא הוגדר"
+    },
+    "detail": {
+        "back": "חזרה ל-Vault",
+        "signedOut": "מנותק: העמיתים לא יכולים להשתמש ב-{name} עד שמישהו יתחבר שוב.",
+        "notSetUp": "{name} עדיין לא הוגדר.",
+        "reconnect": "להתחבר מחדש",
+        "everyone": "כל העמיתים",
+        "everyoneHint": "גם עמיתים שיתווספו בהמשך יקבלו גישה.",
+        "coworkers": "עמיתים",
+        "noCoworkers": "עדיין אין עמיתים בסביבת העבודה הזו.",
+        "hiddenCoworkers": "{count, plural, one {# עמית} two {# עמיתים} other {# עמיתים}} ב-Boxes שאינך יכול לראות",
+        "variables": "משתנים",
+        "reconnectFromCoworker": "אפשר להתחבר מחדש מהלשונית אפליקציות של עמית שמשתמש בה.",
+        "rename": "לשנות את שם החשבון",
+        "accountName": "שם החשבון",
+        "namePlaceholder": "שם לחשבון הזה"
+    },
+    "delete": {
+        "button": "למחוק",
+        "title": "למחוק את {name}?",
+        "loses": "העמיתים האלה יאבדו את הגישה: {names}.",
+        "nobody": "אף עמית לא משתמש בזה.",
+        "confirm": "למחוק",
+        "deleted": "{name} נמחק"
+    },
+    "reasons": {
+        "adminOnly": "רק מנהל יכול לעשות את זה",
+        "manageBox": "אינך מנהל את ה-Box של העמית הזה",
+        "manageAny": "צריך לנהל Box כדי להוסיף ל-Vault",
+        "paidAppEveryone": "אפליקציה בתשלום מצורפת לכל עמית בנפרד",
+        "updateBox": "המכונה של סביבת העבודה שלך תוכל לשנות שמות של חשבונות אחרי העדכון הבא שלה"
+    },
+    "addPage": {
+        "title": "להוסיף ל-Vault",
+        "search": "חיפוש אפליקציות",
+        "mcp": "שרת MCP",
+        "secret": "סוד"
+    },
+    "errors": {
+        "changeFailed": "לא ניתן היה לשמור את השינוי"
+    },
+    "addSecret": {
+        "name": "שם",
+        "namePlaceholder": "מפתח Stripe חי",
+        "variable": "משתנה",
+        "variableHint": "העמיתים קוראים אותו בשם הזה.",
+        "variableInvalid": "אותיות, ספרות וקווים תחתונים, לא מתחיל בספרה",
+        "value": "ערך",
+        "valueHint": "הוא לא יוצג שוב לעולם.",
+        "add": "להוסיף סוד"
+    },
+    "addMcp": {
+        "name": "שם",
+        "namePlaceholder": "מסמכי החברה",
+        "target": "כתובת או פקודה",
+        "targetHint": "כתובת https, או הפקודה שהמכונה מפעילה.",
+        "header": "כותרת",
+        "headerValue": "ערך",
+        "variable": "משתנה",
+        "add": "להוסיף שרת",
+        "addServers": "{count, plural, one {להוסיף שרת אחד} two {להוסיף שני שרתים} other {להוסיף # שרתים}}",
+        "incomplete": "לכל שרת צריך שם וכתובת או פקודה",
+        "partlyAdded": "{count, plural, one {שרת אחד נוסף, הבא נכשל: {reason}} two {שני שרתים נוספו, הבא נכשל: {reason}} other {# שרתים נוספו, הבא נכשל: {reason}}}"
+    },
+    "paid": {
+        "badge": "בתשלום",
+        "managedInApp": "ההתחברות, המשבצת והחיוב שלה נמצאים בחלון {provider} של תפריט האפליקציות.",
+        "paused": "מושהה",
+        "connecting": "מתחבר"
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {לפתוח את הצ׳אט של {name}} actions {לפתוח את המשימות לטיפול של {name}} services {לפתוח את האפליקציות של {name}} mcp {לפתוח את ה-MCP של {name}} skills {לפתוח את המיומנויות של {name}} data {לפתוח את מסד הנתונים של {name}} memories {לפתוח את הידע של {name}} files {לפתוח את הקבצים של {name}} scheduled {לפתוח את השגרות של {name}} triggers {לפתוח את הטריגרים של {name}} other {{name}}}"
+    },
+    "connect": {
+        "added": "{name} נוסף",
+        "connectedNote": "מחובר, העמית יכול להשתמש בו",
+        "signInNote": "יש להתחבר פעם אחת כדי שהעמית יוכל להשתמש בו",
+        "connected": "מחובר",
+        "signingIn": "מתחבר…",
+        "signIn": "להתחבר",
+        "connectNew": "חשבון חדש",
+        "signInNeeded": "נדרשת התחברות",
+        "unreachable": "לא זמין",
+        "couldNotConnect": "לא ניתן לחבר את {name}",
+        "notAdded": "לא נוסף",
+        "customServer": "שרת MCP מותאם אישית",
+        "customServerAt": "שרת MCP מותאם אישית · {host}",
+        "connecting": "מתחבר…",
+        "connect": "לחבר",
+        "installed": "{name} הותקן",
+        "availableNextTurn": "זמין בתור הבא: {tools}"
+    },
+    "event": {
+        "notification": "שלח לך התראה",
+        "setUp": "{name} מוגדר",
+        "setupComplete": "ההגדרה הושלמה",
+        "schedules": "{count, plural, one {תזמון אחד פעיל} two {# תזמונים פעילים} other {# תזמונים פעילים}}",
+        "triggers": "{count, plural, one {טריגר אחד פעיל} two {# טריגרים פעילים} other {# טריגרים פעילים}}",
+        "newBrainPage": "דף Brain חדש: {title}",
+        "brainChange": "שינוי ב-Brain: {title}",
+        "proposedNote": "הוצע לבדיקה. שום דבר לא משתנה עד שמישהו יאשר.",
+        "undone": "בוטל: {title}",
+        "undoneNote": "הגרסה הקודמת חזרה.",
+        "undo": "לבטל",
+        "undoFailed": "לא ניתן לבטל את השינוי הזה",
+        "tryAgainShortly": "יש לנסות שוב בעוד רגע."
+    },
+    "brain": {
+        "saved": "ה-Brain עודכן: {title}",
+        "created": "דף Brain חדש: {title}",
+        "deleted": "הוסר מה-Brain: {title}",
+        "accepted": "השינוי אושר: {title}",
+        "acceptedBy": "השינוי של {name} אושר: {title}",
+        "dismissed": "השינוי נדחה: {title}",
+        "dismissedBy": "השינוי של {name} נדחה: {title}",
+        "notes": {
+            "saved": "נשמר. כל עמית יקרא אותו מההרצה הבאה שלו.",
+            "deleted": "אף עמית כבר לא קורא אותו. ההיסטוריה שלו נשמרת.",
+            "accepted": "נשמר. כל עמית יקרא אותו מההרצה הבאה שלו.",
+            "dismissed": "הדף לא השתנה."
+        }
+    },
+    "file": {
+        "open": "לפתוח את {name}",
+        "title": "{count, plural, =0 {קובץ} one {קובץ} two {# קבצים} other {# קבצים}}",
+        "size": {
+            "b": "{value} B",
+            "kb": "{value} KB",
+            "mb": "{value} MB"
+        }
+    },
+    "skill": {
+        "remembering": "שומר בזיכרון",
+        "remembered": "נשמר בזיכרון",
+        "failed": "לא ניתן לשמור את זה בזיכרון",
+        "retry": "לנסות שוב",
+        "dismiss": "לסגור",
+        "notRemembered": "לא נשמר בזיכרון",
+        "remember": "לזכור",
+        "no": "לא",
+        "hideDetails": "להסתיר פרטים",
+        "showDetails": "להציג פרטים"
+    },
+    "sources": {
+        "count": "{count, plural, one {מקור אחד} two {# מקורות} other {# מקורות}}"
+    },
+    "table": {
+        "partial": "{shown} מתוך {total}"
+    }
+}

@@ -1,0 +1,116 @@
+{
+    "access": {
+        "short": {
+            "public": "ציבורי",
+            "workspace": "סביבת העבודה",
+            "password": "סיסמה",
+            "invited": "מוזמנים"
+        },
+        "hint": {
+            "public": "ללא צורך בהתחברות",
+            "workspace": "רק חברים מחוברים",
+            "password": "המבקרים מקלידים אותה פעם אחת",
+            "invited": "המבקרים מאשרים את כתובת המייל שלהם"
+        },
+        "label": {
+            "public": "כל מי שיש לו את הקישור",
+            "workspace": "חברי {workspace}",
+            "password": "כל מי שיש לו את הסיסמה",
+            "invited": "רק אנשים שהזמנת"
+        },
+        "anyoneAt": "כל מי שב-{domain}",
+        "workspaceFallback": "סביבת העבודה"
+    },
+    "gate": {
+        "madeWith": "נוצר עם Rerun",
+        "locked": "דף של {workspace}, נעול",
+        "code": "קוד",
+        "switchAccount": "להחליף חשבון"
+    },
+    "viewer": {
+        "download": "להוריד",
+        "report": "לדווח",
+        "updated": "עודכן {when}",
+        "slides": "{count, plural, one {שקופית אחת} two {שתי שקופיות} other {# שקופיות}}",
+        "page": "עמוד {page}",
+        "previousSlide": "השקופית הקודמת",
+        "nextSlide": "השקופית הבאה"
+    },
+    "csv": {
+        "meta": "{rows, plural, one {שורה אחת} two {2 שורות} other {# שורות}}{truncated, select, true {+} other {}} · {columns, plural, one {עמודה אחת} two {2 עמודות} other {# עמודות}}",
+        "truncated": "{rows, plural, one {מוצגת השורה הראשונה} two {מוצגות 2 השורות הראשונות} other {מוצגות # השורות הראשונות}}. להמשך יש להוריד את הקובץ."
+    },
+    "row": {
+        "more": "עוד",
+        "open": "לפתוח",
+        "copyLink": "להעתיק קישור",
+        "shareSettings": "הגדרות שיתוף",
+        "unpublish": "לבטל פרסום",
+        "unpublishFailed": "לא ניתן לבטל את הפרסום"
+    },
+    "unpublishConfirm": {
+        "title": "לבטל את הפרסום של {title}?",
+        "description": "הקישור יפסיק לעבוד מיד, לכל מי שמחזיק בו.",
+        "confirm": "לבטל פרסום"
+    },
+    "panel": {
+        "emptyTitle": "עדיין לא פורסם דבר",
+        "emptyDescription": "דפים, דוחות וקבצים ש-{agent} משתף יופיעו כאן.",
+        "updated": "עודכן {when}",
+        "copyLink": "להעתיק קישור"
+    },
+    "list": {
+        "filterAll": "הכול {count}",
+        "emptyTitle": "עדיין לא פורסם דבר",
+        "emptyDescription": "דפים, דוחות וקבצים שהעמיתים שלך משתפים יופיעו כאן.",
+        "fallbackCoworker": "עמית"
+    },
+    "chat": {
+        "unpublished": "הפרסום בוטל",
+        "updateFailed": "לא ניתן לעדכן את הקישור",
+        "copy": "להעתיק",
+        "open": "לפתוח",
+        "fallbackCoworker": "העמית שלך",
+        "asksPublic": "{coworker} רוצה שכל מי שיש לו את הקישור יוכל לפתוח אותו",
+        "keepPrivate": "להשאיר פרטי",
+        "makePublic": "להפוך לציבורי",
+        "madePublicByYou": "הפכת אותו לציבורי",
+        "madePublic": "הפך לציבורי",
+        "keptFor": "נשאר לחברי {workspace}"
+    },
+    "share": {
+        "title": "שיתוף",
+        "description": "לבחור מי יכול לפתוח את הקישור הזה.",
+        "updateFailed": "לא ניתן לעדכן את הקישור",
+        "unpublishFailed": "לא ניתן לבטל את הפרסום",
+        "unpublish": "לבטל פרסום",
+        "publicOff": "כבוי עבור {workspace}",
+        "noEmail": "השרת הזה לא שולח מיילים",
+        "passwordSet": "הוגדרה סיסמה",
+        "setPassword": "להגדיר סיסמה",
+        "password": "סיסמה",
+        "invitePlaceholder": "כתובות מייל או @company.com",
+        "invite": "להזמין כתובות מייל או דומיינים",
+        "removeInvite": "להסיר את {entry}",
+        "copyLink": "להעתיק קישור",
+        "copied": "הועתק"
+    },
+    "policy": {
+        "label": "קישורים ציבוריים",
+        "people": {
+            "title": "רק אנשים יכולים להפוך קישור לציבורי",
+            "hint": "העמיתים מפרסמים עבור {workspace} ושואלים לפני שהם הופכים משהו לציבורי"
+        },
+        "anyone": {
+            "title": "העמיתים יכולים להפוך קישור לציבורי",
+            "hint": "הם בוחרים את הגישה בעצמם"
+        },
+        "never": {
+            "title": "שום דבר לא הופך לציבורי",
+            "hint": "רק קישורים לסביבת העבודה, עם סיסמה או למוזמנים"
+        },
+        "turnOffTitle": "לכבות קישורים ציבוריים?",
+        "turnOffDescription": "{count, plural, one {קישור ציבורי אחד יעבור לחברי {workspace} לאחר השמירה.} two {שני קישורים ציבוריים יעברו לחברי {workspace} לאחר השמירה.} other {# קישורים ציבוריים יעברו לחברי {workspace} לאחר השמירה.}}",
+        "turnOff": "לכבות"
+    }
+}

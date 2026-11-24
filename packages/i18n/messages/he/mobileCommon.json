@@ -1,0 +1,35 @@
+{
+    "time": {
+        "today": "היום",
+        "yesterday": "אתמול",
+        "now": "עכשיו",
+        "minutesAgo": "{count} ד׳",
+        "hoursAgo": "{count} ש׳",
+        "daysAgo": "{count} י׳"
+    },
+    "actions": {
+        "close": "לסגור",
+        "cancel": "ביטול",
+        "done": "סיום",
+        "share": "לשתף",
+        "update": "לעדכן"
+    },
+    "errors": {
+        "tryAgainShortly": "כדאי לנסות שוב בעוד רגע.",
+        "generic": "משהו השתבש. כדאי לנסות שוב.",
+        "requestFailed": "הבקשה נכשלה עם {status}",
+        "uploadFailed": "ההעלאה נכשלה עם {status}"
+    },
+    "unread": "לא נקרא",
+    "viewer": {
+        "shareFailed": "לא ניתן לשתף את הקובץ",
+        "noPreview": "אין תצוגה מקדימה לקובץ הזה. אפשר לשתף אותו כדי לפתוח אותו באפליקציה אחרת.",
+        "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "כבר ב-Vault",
+        "useAccount": "להשתמש ב-{label}",
+        "manageBox": "אין לך הרשאה לנהל את ה-Box של העמית הזה",
+        "lendFailed": "לא ניתן להשתמש בחשבון הזה"
+    }
+}

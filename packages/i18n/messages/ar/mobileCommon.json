@@ -1,0 +1,35 @@
+{
+    "time": {
+        "today": "اليوم",
+        "yesterday": "أمس",
+        "now": "الآن",
+        "minutesAgo": "{count} د",
+        "hoursAgo": "{count} س",
+        "daysAgo": "{count} ي"
+    },
+    "actions": {
+        "close": "إغلاق",
+        "cancel": "إلغاء",
+        "done": "تم",
+        "share": "مشاركة",
+        "update": "تحديث"
+    },
+    "errors": {
+        "tryAgainShortly": "حاول مرة أخرى بعد قليل.",
+        "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+        "requestFailed": "فشل الطلب بالرمز {status}",
+        "uploadFailed": "فشل الرفع بالرمز {status}"
+    },
+    "unread": "غير مقروء",
+    "viewer": {
+        "shareFailed": "تعذّرت مشاركة الملف",
+        "noPreview": "لا تتوفر معاينة لهذا الملف. شاركه لفتحه في تطبيق آخر.",
+        "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "موجود في Vault بالفعل",
+        "useAccount": "استخدم {label}",
+        "manageBox": "أنت لا تدير Box هذا الزميل",
+        "lendFailed": "تعذّر استخدام هذا الحساب"
+    }
+}

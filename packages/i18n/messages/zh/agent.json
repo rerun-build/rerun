@@ -1,0 +1,1081 @@
+{
+    "untitledBox": "未命名 Box",
+    "agentCard": {
+        "destinations": {
+            "services": "应用",
+            "skills": "技能",
+            "memories": "知识",
+            "scheduled": "例行任务",
+            "files": "文件",
+            "data": "数据库",
+            "monitoring": "活动",
+            "settings": "设置"
+        },
+        "delete": "删除此同事",
+        "share": "分享",
+        "close": "关闭卡片",
+        "nameField": "同事名称",
+        "rename": "重命名 {name}"
+    },
+    "agentChatsList": {
+        "title": "对话",
+        "newThread": "新对话",
+        "close": "关闭",
+        "filters": {
+            "all": "全部",
+            "chats": "聊天",
+            "automations": "自动化",
+            "needs": "待您处理"
+        },
+        "markAllRead": {
+            "title": "全部标为已读？",
+            "description": "{count, plural, other {# 个对话}}将从此列表中移除。仍在等待回复的请求也会被清除，且不会得到回复。",
+            "confirm": "全部标为已读"
+        },
+        "emptyNeeds": "没有需要您处理的事项。",
+        "emptyThreads": "还没有对话。",
+        "emptyAutomations": "还没有自动运行。",
+        "running": "运行中",
+        "startedBy": "由 {name} 发起",
+        "moreFor": "{title} 的更多操作",
+        "loadOlderFailed": "无法加载更早的对话，请重试"
+    },
+    "agentComputerThumbnail": {
+        "working": "正在使用电脑工作",
+        "live": "它的电脑",
+        "computer": "电脑",
+        "wentAway": "屏幕已断开"
+    },
+    "agentView": {
+        "closePanel": "关闭面板",
+        "views": {
+            "apps": "应用",
+            "skills": "技能",
+            "knowledge": "知识",
+            "files": "文件",
+            "data": "数据库",
+            "routines": "例行任务",
+            "activity": "活动",
+            "settings": "设置"
+        },
+        "tabs": {
+            "services": "应用",
+            "mcp": "MCP",
+            "skills": "技能",
+            "memories": "知识",
+            "files": "文件",
+            "published": "已发布",
+            "data": "数据库",
+            "scheduled": "定时任务",
+            "triggers": "触发器",
+            "monitoring": "监控",
+            "logs": "日志",
+            "settings": "常规",
+            "tools": "能力",
+            "setup": "安装"
+        }
+    },
+    "openChatsTabs": {
+        "closeTab": "关闭 {title}",
+        "closeTabMenu": "关闭标签页",
+        "newThread": "新对话",
+        "general": "常规"
+    },
+    "sessionRename": {
+        "rename": "重命名",
+        "label": "对话名称",
+        "failed": "无法重命名，请重试。"
+    },
+    "threadBranch": {
+        "needs": "待您处理",
+        "error": "错误",
+        "opener": {
+            "schedule": "定时运行 · {name}",
+            "trigger": "Webhook 触发 · {name}",
+            "askedBy": "由 {name} 请求",
+            "askedByUnknown": "由另一位同事请求",
+            "started": "发起了一个对话"
+        }
+    },
+    "floating": {
+        "backToChat": "返回聊天"
+    },
+    "agentPanelServices": {
+        "uninstallFailed": "卸载应用失败",
+        "removeServerFailed": "移除服务器失败",
+        "loadServerFailed": "无法从引擎加载此服务器。",
+        "alternativeLoadFailed": "无法加载 {name}。",
+        "signInHint": "登录 {host}，让同事可以使用它的工具。",
+        "searchPlaceholder": "搜索应用…",
+        "allCategories": "全部",
+        "installed": "已安装",
+        "library": "应用库",
+        "needsAuthHint": "此应用需要您先登录，同事才能使用。请点击“连接”。",
+        "needsConfigHint": "此应用需要凭据，同事才能使用。请点击“配置”进行设置。",
+        "configure": "配置",
+        "connect": "连接",
+        "account": "账号",
+        "reconnect": "重新连接",
+        "uninstall": "卸载 {name}",
+        "uninstallLabeled": "卸载 {name}（{label}）",
+        "uninstallConfirm": "卸载 {name}？",
+        "uninstallLabeledConfirm": "卸载 {name}（{label}）？",
+        "uninstallDescription": "同事将失去此服务及其工具。其连接会被撤销，重新安装时需要再次连接。",
+        "uninstallAction": "卸载",
+        "requestHint": "还没找到？我们可以添加您需要的应用。",
+        "requestApp": "申请应用",
+        "vaultBadge": "Vault",
+        "fromVault": "来自 Vault",
+        "vaultAdd": "添加",
+        "vaultShared": "每位同事都从 Vault 获取它，请在 Vault 中修改。",
+        "vaultRemove": "从此同事移除 {name}",
+        "vaultRemoveConfirm": "从此同事移除 {name}？",
+        "vaultRemoveDescription": "它仍保留在 Vault 中，供其他同事和以后使用。",
+        "vaultRemoveAction": "移除",
+        "vaultAttachFailed": "无法添加 {name}"
+    },
+    "agentPanelMcp": {
+        "unreachableTitle": "无法连接引擎",
+        "unreachableDescription": "无法连接此同事的引擎。",
+        "new": "新建",
+        "emptyTitle": "还没有 MCP 服务器",
+        "emptyDescription": "MCP 服务器能在内置应用之外为同事提供更多工具。添加一个，扩展它的能力。",
+        "appBadge": "应用",
+        "count": "{count, plural, other {# 个 MCP 服务器}}"
+    },
+    "mcpOAuthAuthorize": {
+        "discoveryFailed": "发现失败",
+        "authorizationFailed": "授权失败",
+        "startFailed": "无法启动 OAuth",
+        "discovering": "正在发现 OAuth 提供商...",
+        "connected": "已连接",
+        "retry": "重试",
+        "waiting": "正在等待授权…",
+        "connect": "连接"
+    },
+    "mcpServerEditor": {
+        "invalidName": "名称须为 1 至 64 个字符：字母、数字、下划线或连字符。",
+        "storeCredentialsFailed": "保存凭据失败",
+        "saveFailed": "保存失败",
+        "deleteFailed": "删除失败",
+        "secretWarning": "此处检测到密钥。保存时它会移至引擎，并变为 {token}。",
+        "titleReadOnly": "MCP 服务器",
+        "titleEdit": "编辑 MCP 服务器",
+        "titleNew": "新建 MCP 服务器",
+        "providedByApp": "此 MCP 服务器由应用提供，并自动管理。",
+        "name": "名称",
+        "nameHelper": "工具合并后名为“{prefix}_{tool}”。",
+        "namePrefixFallback": "名称",
+        "transport": "传输方式",
+        "command": "命令",
+        "arguments": "参数",
+        "argumentsHelper": "每行一个参数。",
+        "argumentsHelperEditable": "每行一个参数。点击高亮的 {token} 可修改其对应的值。",
+        "url": "URL",
+        "urlHelper": "点击高亮的 {token} 可修改其对应的值。",
+        "environment": "环境变量",
+        "environmentHelper": "每行一个 KEY=value。值保存在引擎上。",
+        "environmentHelperEditable": "每行一个 KEY=value。值保存在引擎上；点击高亮的 {token} 可修改其对应的值。",
+        "headers": "请求头",
+        "headersHelper": "每行一个 Header=value。随每个请求发送（用于身份验证）。",
+        "headersHelperEditable": "每行一个 Header=value。随每个请求发送（用于身份验证）。点击高亮的 {token} 可修改其对应的值。",
+        "deleteServer": "删除服务器",
+        "deleteConfirm": "删除 {name}？",
+        "deleteConfirmUnnamed": "删除此服务器？",
+        "deleteDescription": "同事将失去此服务器提供的所有工具，其保存的变量也会一并删除。",
+        "saveChanges": "保存更改",
+        "createServer": "创建服务器",
+        "nameProposed": "{source, select, address {根据地址建议，可随意重命名} other {根据软件包建议，可随意重命名}}",
+        "transportGuessed": "根据地址推断",
+        "incomplete": "请为每个服务器填写名称以及命令或地址",
+        "duplicateName": "有两个服务器都名为“{name}”",
+        "addServers": "添加 {count} 个服务器"
+    },
+    "mcpVariableToken": {
+        "editVariable": "编辑变量 {name}",
+        "statusSaved": "已保存",
+        "statusEngine": "已在引擎上设置",
+        "statusUnset": "未设置",
+        "placeholderOverride": "输入一个值以覆盖",
+        "placeholderNew": "输入一个值",
+        "helperSaved": "已保存在引擎上，不会再次显示。输入新值即可替换。",
+        "helperEngine": "由引擎环境提供。保存一个值会为此同事覆盖它。",
+        "helperUnset": "保存在引擎上，浏览器和数据库均无法访问。",
+        "remove": "移除 {name}",
+        "save": "保存",
+        "removeConfirm": "移除 {name}？",
+        "removeDescription": "该值将从引擎中删除。使用此变量的服务器会停止工作，直到您重新设置。",
+        "removeAction": "移除"
+    },
+    "agentPanelTools": {
+        "unreachable": "无法连接此同事的引擎。",
+        "updateFailed": "更新失败",
+        "lockedByKind": "Chief of Staff 始终保留此项。",
+        "unavailableTitle": "能力不可用",
+        "intro": "选择此同事可以做什么。更改将在下次运行时生效。",
+        "about": "关于{capability}",
+        "includes": "包括",
+        "selfImprovement": {
+            "allowToolInstall": {
+                "label": "安装工具和 MCP",
+                "description": "允许同事通过 npm 安装软件包并注册 MCP 服务器。"
+            },
+            "allowSoulEdit": {
+                "label": "编辑自己的灵魂",
+                "description": "允许同事改写其 SOUL.md 身份设定。"
+            },
+            "autoMemory": {
+                "label": "自动记忆",
+                "description": "每轮对话后自动整理记忆。"
+            }
+        },
+        "capabilities": {
+            "filesystem": {
+                "label": "读写文件",
+                "blurb": "处理其工作区中的文件",
+                "help": "允许同事在自己的工作区中打开、创建和编辑文件。"
+            },
+            "shell": {
+                "label": "运行命令",
+                "blurb": "在其机器上执行命令",
+                "help": "允许同事运行终端命令，以安装工具和自动化任务。"
+            },
+            "web": {
+                "label": "浏览网页",
+                "blurb": "搜索并阅读网页",
+                "help": "允许同事搜索互联网并阅读网页来查找信息。"
+            },
+            "memory": {
+                "label": "记住信息",
+                "blurb": "保存和回忆信息",
+                "help": "允许同事跨运行保存事实，并在之后回忆。"
+            },
+            "db": {
+                "label": "访问数据",
+                "blurb": "查询其数据库",
+                "help": "允许同事在自己的数据库中读写结构化数据。"
+            },
+            "brain": {
+                "label": "使用公司 Brain",
+                "blurb": "阅读公司已确认的内容",
+                "help": "允许同事搜索和阅读 Brain，即您的团队确认过的公司页面，并提出修改建议，由您审核后才会保存。"
+            },
+            "sharedDb": {
+                "label": "访问共享数据",
+                "blurb": "查询共享数据库",
+                "help": "允许同事读写工作区所有同事共享的数据库。"
+            },
+            "skills": {
+                "label": "使用技能",
+                "blurb": "运行已安装的技能",
+                "help": "允许同事使用您为专门任务安装的技能。"
+            },
+            "self": {
+                "label": "自我改进",
+                "blurb": "调整自己的设置",
+                "help": "允许同事随着时间推移完善自己的指令和配置。"
+            },
+            "schedule": {
+                "label": "安排任务",
+                "blurb": "规划之后的工作",
+                "help": "允许同事安排任务在指定时间自动运行。"
+            },
+            "trigger": {
+                "label": "响应 Webhook",
+                "blurb": "在其他应用调用时运行",
+                "help": "允许同事公开 URL，外部服务调用时即启动一次运行。"
+            },
+            "callAgent": {
+                "label": "与其他同事协作",
+                "blurb": "委派给队友",
+                "help": "允许同事将工作交给工作区的其他同事。"
+            },
+            "team": {
+                "label": "查看其他同事",
+                "blurb": "读取他们的例行任务和运行",
+                "help": "允许同事查看工作区的其他同事：他们的状态、定时任务、触发器和最近的运行，需要了解失败原因时还可查看每次运行调用的工具。它无法更改任何内容。一次运行可能包含其他同事已连接应用中的数据。"
+            },
+            "aiProviders": {
+                "label": "查看其 AI 提供商",
+                "blurb": "使用中的模型、积分和配额",
+                "help": "允许同事查看自己运行所用的 AI 提供商和模型、工作区连接的其他提供商，以及各自的剩余额度：Rerun 积分，以及 Claude、Codex 或 OpenCode 订阅的限额。它无法更改任何内容。"
+            },
+            "askUser": {
+                "label": "向您提问",
+                "blurb": "暂停并提供选项提问",
+                "help": "允许同事在继续之前暂停，并以选项的形式向您提问。"
+            },
+            "requestApproval": {
+                "label": "请求批准",
+                "blurb": "暂停等待您的同意",
+                "help": "允许同事在执行某个操作前暂停，请您批准或拒绝。"
+            },
+            "cards": {
+                "label": "在聊天中显示卡片",
+                "blurb": "内嵌预览表格或文件",
+                "help": "允许同事在对话中放入预览卡片：其某个表格的前几行，或其工作区中的文件，一键即可打开。"
+            },
+            "quickReplies": {
+                "label": "建议回复",
+                "blurb": "提供一键回复",
+                "help": "允许同事在消息末尾附上最多三条简短回复，您一键即可发送，例如“再找 100 个”。"
+            },
+            "computer": {
+                "label": "使用其电脑",
+                "blurb": "查看并操作自己的屏幕",
+                "help": "允许同事查看自己的桌面，并在浏览器、文件和终端中点击、输入和滚动，完成必须在应用或网站中手动操作的工作。您可以实时观看，当您亲自操作屏幕时它会暂停。"
+            },
+            "remoteComputers": {
+                "label": "使用已关联的电脑",
+                "blurb": "在成员关联的电脑上工作",
+                "help": "允许同事在成员通过 Rerun 桌面应用关联到工作区的电脑上运行命令、读写文件和启动长时间任务，这些电脑以 # 命名。每条命令以及允许范围之外的每个文件夹，都需要聊天中的相关人员同意，除非电脑的所有者另有设置。"
+            },
+            "paidData": {
+                "label": "潜在客户、SEO 和社交数据",
+                "blurb": "从您的 Rerun 积分中扣费",
+                "help": "允许同事查找潜在客户及其工作邮箱、电话号码和公司数据，查看搜索量、关键词建议和外链，读取 Google 搜索结果和本地商家，并读取 LinkedIn、TikTok、Instagram、X、YouTube、Facebook 和 Reddit 上的公开资料和帖子，无需订阅 Apollo、Semrush 或爬虫服务。每次调用都从您的 Rerun 积分中扣费，同事会先请您批准预估费用。"
+            },
+            "requestSecret": {
+                "label": "索取凭据",
+                "blurb": "暂停等待安全输入密钥",
+                "help": "允许同事暂停，并通过隐藏输入的表单向您索取 API 密钥或令牌。该值会保存为同事变量，绝不会进入对话。"
+            }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "无需询问即可消费",
+            "description": "跳过费用审批，让定时运行和委派任务在您不在时也能使用付费数据。"
+        }
+    },
+    "agentPanelTriggers": {
+        "new": "新建",
+        "emptyTitle": "还没有触发器",
+        "emptyDescription": "触发器为您的同事提供一个公开 URL。每当其他服务调用它，同事就会使用收到的数据运行。",
+        "summary": "{methods} · {count, plural, other {# 次调用}}",
+        "paused": "已暂停",
+        "neverCalled": "尚未被调用",
+        "count": "{count, plural, other {# 个触发器}}"
+    },
+    "triggerEditor": {
+        "saveFailed": "保存失败",
+        "rotateFailed": "轮换密钥失败",
+        "deleteFailed": "删除失败",
+        "titleEdit": "编辑触发器",
+        "titleReadOnly": "触发器",
+        "titleNew": "新建触发器",
+        "history": "历史记录",
+        "name": "名称",
+        "nameLockedHelper": "名称无法更改（它决定了 URL）。",
+        "nameHelper": "URL 由此名称生成。",
+        "namePlaceholder": "GitHub 推送",
+        "description": "描述",
+        "descriptionPlaceholder": "有提交合入 main 时触发",
+        "methods": "接受的方法",
+        "methodsGetHelper": "GET 适用于只能调用普通 URL 的服务。链接预览和浏览器访问会被忽略。",
+        "methodsHelper": "大多数服务发送 POST。",
+        "modelHelper": "此触发器触发时使用的模型。需要该提供商的 API 密钥。",
+        "enabled": "已启用",
+        "prompt": "触发器提示词",
+        "promptDialogTitle": "编辑触发器提示词",
+        "promptHelper": "调用 URL 时同事要执行的内容（每次都是新会话）。调用方的数据会附在其下方。",
+        "promptPlaceholder": "刚有一个提交合入。请审查数据中的 diff，并将摘要发到 Slack。",
+        "delete": "删除触发器",
+        "deleteConfirm": "删除 {name}？",
+        "deleteConfirmUnnamed": "删除此触发器？",
+        "deleteDescription": "其 Webhook URL 将立即停止响应，仍在调用它的服务都会开始失败。",
+        "saveChanges": "保存更改",
+        "create": "创建触发器"
+    },
+    "triggerUrlField": {
+        "label": "Webhook URL",
+        "noSecretHelper": "轮换会生成新的密钥及对应的 URL。",
+        "noSecret": "此触发器还没有密钥，因此没有 URL。",
+        "getUrl": "获取 URL",
+        "helper": "持有此 URL 的任何人都能启动运行，请将其视为密钥。复制它、在聊天中预览或在浏览器中打开都不会启动任何操作。",
+        "copy": "复制 Webhook URL",
+        "rotateConfirm": "轮换 Webhook 密钥？",
+        "rotateDescription": "当前 URL 将立即失效。您需要在所有调用此触发器的地方粘贴新的 URL。",
+        "rotateAction": "轮换",
+        "rotate": "轮换密钥"
+    },
+    "agentPanelScheduled": {
+        "new": "新建",
+        "emptyTitle": "还没有定时任务",
+        "emptyDescription": "让您的同事按计划做事（每日报告、每周摘要），周期任务就会显示在这里。",
+        "paused": "已暂停",
+        "noExecutions": "尚未执行",
+        "picker": {
+            "when": "时间",
+            "notSet": "未设置",
+            "describe": "描述计划",
+            "describePlaceholder": "每个工作日早上 8 点",
+            "update": "更新计划"
+        },
+        "editor": {
+            "saveFailed": "保存失败",
+            "runFailed": "运行任务失败",
+            "deleteFailed": "删除失败",
+            "titleEdit": "编辑任务",
+            "titleReadOnly": "任务",
+            "titleNew": "新建任务",
+            "history": "历史记录",
+            "name": "名称",
+            "nameLockedHelper": "名称无法更改（它决定了 slug）。",
+            "namePlaceholder": "每日摘要",
+            "description": "描述",
+            "descriptionPlaceholder": "早间总结",
+            "timezone": "时区",
+            "modelHelper": "此任务触发时使用的模型。需要该提供商的 API 密钥。",
+            "enabled": "已启用",
+            "prompt": "任务提示词",
+            "promptDialogTitle": "编辑任务提示词",
+            "promptHelper": "任务触发时同事执行的提示词（每次都是新会话）。",
+            "promptPlaceholder": "总结昨天的笔记，并通过邮件发给我一份摘要。",
+            "setupPendingContinue": "完成设置后即可测试运行。<link>继续设置</link>",
+            "setupPendingStart": "完成设置后即可测试运行。请先在聊天中开始设置。",
+            "delete": "删除任务",
+            "deleteConfirm": "删除 {name}？",
+            "deleteConfirmUnnamed": "删除此任务？",
+            "deleteDescription": "任务将停止触发，其计划也会被移除。已产生的运行会保留。",
+            "testRun": "测试运行",
+            "saveChanges": "保存更改",
+            "create": "创建任务"
+        },
+        "count": "{count, plural, other {# 个定时任务}}"
+    },
+    "taskNotifyField": {
+        "label": "通知我",
+        "muted": "此同事已静音"
+    },
+    "taskOutcomeFooter": {
+        "lastRun": "上次运行于 {time} 前",
+        "neverRan": "从未运行",
+        "failed": "失败",
+        "done": "完成"
+    },
+    "modelsShared": {
+        "boxManageReason": "只有此 Box 的管理员或经理可以更改",
+        "creditPaused": "Rerun 积分已暂停"
+    },
+    "modelSelector": {
+        "setUp": "设置模型",
+        "defaultLabel": "默认 · {model}",
+        "select": "选择模型",
+        "loading": "加载中",
+        "empty": "没有可用的模型",
+        "workspaceDefault": "工作区默认",
+        "coworkerDefault": "同事默认",
+        "setCoworkerDefault": "设为同事默认",
+        "makeDefault": "将 {model} 设为此同事的默认模型",
+        "refused": "{model} · {reason}。请在下方选择其他模型。",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "推理",
+        "reasoningOf": "{model} 的推理",
+        "effortDefault": "默认",
+        "effortLow": "低",
+        "effortMedium": "中",
+        "effortHigh": "高",
+        "effortDefaultHint": "由提供商决定",
+        "effortLowHint": "快速回答",
+        "effortMediumHint": "均衡",
+        "effortHighHint": "思考更久"
+    },
+    "modelPickerProviders": {
+        "pitch": {
+            "claude": {
+                "plan": "Claude Pro 或 Max",
+                "hint": "使用您的 Claude 账号登录",
+                "nudge": "已有 Claude Pro 或 Max？"
+            },
+            "codex": {
+                "plan": "ChatGPT Plus 或 Pro",
+                "hint": "使用您的 ChatGPT 账号登录",
+                "nudge": "已有 ChatGPT Plus 或 Pro？"
+            }
+        },
+        "hints": {
+            "claude": "Pro 或 Max",
+            "codex": "Plus 或 Pro",
+            "anthropic": "Claude 模型",
+            "openai": "GPT 模型",
+            "google": "Gemini 模型",
+            "openrouter": "所有模型"
+        },
+        "pitchHeading": "使用您已付费的套餐运行",
+        "connect": "连接",
+        "addProvider": "添加提供商",
+        "sections": {
+            "subscription": "订阅",
+            "api": "API 密钥"
+        },
+        "connected": "已连接",
+        "manage": "管理连接"
+    },
+    "runModelField": {
+        "label": "模型",
+        "placeholder": "选择模型",
+        "coworkerDefault": "同事默认",
+        "coworkerDefaultWithModel": "同事默认 · {model}",
+        "current": "当前"
+    },
+    "planLimitHint": {
+        "windows": {
+            "session": "会话",
+            "fiveHour": "5 小时",
+            "weekly": "每周",
+            "monthly": "每月",
+            "modelWeekly": "{label} 每周",
+            "modelWeeklyUnnamed": "模型每周"
+        },
+        "windowUsed": "{name}：已用 {percent}",
+        "windowResets": "{name}：已用 {percent}，{when}重置",
+        "paused": "已暂停",
+        "credit": {
+            "usedUpOn": "本月积分已用完，{date} 恢复",
+            "usedUpNextMonth": "本月积分已用完，下月恢复",
+            "usageOn": "本月积分：已用 {percent}%，{date} 重置",
+            "usageNextMonth": "本月积分：已用 {percent}%，下月重置"
+        }
+    },
+    "skillEditor": {
+        "titleView": "技能",
+        "titleEdit": "编辑技能",
+        "titleNew": "新建技能",
+        "download": "下载技能",
+        "connectorManaged": "此技能由应用提供，并自动管理。",
+        "name": "名称",
+        "nameLocked": "名称无法更改（它决定了 slug）。",
+        "namePlaceholder": "网络调研",
+        "description": "描述",
+        "descriptionPlaceholder": "如何调研一个主题",
+        "procedure": "步骤",
+        "procedureDialogTitle": "编辑步骤",
+        "procedurePlaceholder": "1. 确定来源\n2. 获取内容\n3. 总结",
+        "delete": "删除技能",
+        "deleteTitle": "删除 {name}？",
+        "deleteTitleUnnamed": "删除此技能？",
+        "deleteDescription": "该技能及其附带的所有文件都将从同事中移除。此操作无法撤销。",
+        "saveChanges": "保存更改",
+        "create": "创建技能",
+        "saveFailed": "保存失败",
+        "downloadFailed": "下载技能失败",
+        "deleteFailed": "删除失败"
+    },
+    "skillFileEditor": {
+        "readFailed": "无法读取此文件",
+        "saveFailed": "保存失败",
+        "deleteFailed": "删除失败",
+        "truncated": "此文件太大，无法在此编辑；仅显示前 100 000 个字符。",
+        "delete": "删除文件",
+        "deleteTitle": "删除 {path}？",
+        "deleteDescription": "该文件将从技能中移除。此操作无法撤销。",
+        "saveChanges": "保存更改"
+    },
+    "skillFilesSection": {
+        "label": "附带文件",
+        "helper": "较长的清单、素材库和语料放在这里。只有当步骤指向某个文件时，同事才会读取它。",
+        "empty": "没有附带文件。",
+        "pathRequired": "请输入文件路径，例如 references/checklist.md",
+        "createFailed": "创建文件失败",
+        "deleteFailed": "删除文件失败",
+        "deleteLabel": "删除 {path}",
+        "deleteTitle": "删除 {path}？",
+        "deleteDescription": "该文件将从技能中移除。此操作无法撤销。",
+        "add": "添加",
+        "cancel": "取消",
+        "addFile": "添加文件"
+    },
+    "agentPanelSkills": {
+        "notFound": "未找到技能",
+        "fileTooLarge": "文件过大（最大 10 MB）",
+        "importFailed": "导入技能失败",
+        "folderImportFailed": "导入失败",
+        "folderFailure": "{name}：{error}",
+        "readFolderFailed": "读取文件夹失败",
+        "imported": "已导入{count, plural, other { # 个技能}}",
+        "importedSkipped": "已导入{count, plural, other { # 个技能}}，跳过{skipped, plural, other { # 个非文本文件}}",
+        "upload": "上传",
+        "markdownFile": "Markdown 文件",
+        "skillFolder": "技能文件夹",
+        "newSkill": "新建",
+        "emptyTitle": "还没有技能",
+        "emptyDescription": "技能是同事学会的可复用分步指令，让它每次都以同样的方式完成重复性任务。",
+        "appBadge": "应用",
+        "count": "{count, plural, other {# 个技能}}",
+        "ownGroup": "仅限 {name}",
+        "brainGroup": "来自 Brain",
+        "toBrain": "移至 Brain",
+        "toBrainHint": "移至 Brain，让每位同事都能使用",
+        "sharedToBrain": "{name} 已在 Brain 中"
+    },
+    "shareAgentDialog": {
+        "titleLink": "您的分享链接",
+        "titleShare": "分享 {name}",
+        "descriptionLink": "将它发给需要副本的人，对方暂时不需要账号。",
+        "descriptionShare": "选择随副本一起带走的内容。让它成为同事的一切都已包含在内。",
+        "done": "完成",
+        "cancel": "取消",
+        "packing": "正在打包同事…",
+        "createLink": "创建链接",
+        "carried": {
+            "memories": "{count, plural, other {# 条记忆}}",
+            "database": "其数据库（{size}，未扫描密钥）",
+            "files": "{count, plural, other {# 个工作区文件}}"
+        },
+        "confirmTitle": "连同数据一起发送 {name}？",
+        "confirmDescription": "副本将包含 {items}。在您撤销之前，持有链接的任何人都能读取全部内容。"
+    },
+    "shareAgentLink": {
+        "label": "分享链接",
+        "reused": "此同事已有一个相同选项的链接，因此直接提供该链接，而不再创建第二个副本。",
+        "fresh": "持有此链接的任何人都能将此同事的副本添加到自己的看板。您可随时撤销。",
+        "copy": "复制分享链接"
+    },
+    "shareAgentOptions": {
+        "memories": "记忆",
+        "memoriesCount": "{count, plural, other {# 条记忆}} · {size}",
+        "memoriesEmpty": "还没有任何记忆",
+        "database": "同事数据库",
+        "databaseSize": "{size} · 未扫描密钥",
+        "databaseEmpty": "还没有表格",
+        "files": "工作区文件",
+        "filesCount": "{count, plural, other {# 个文件}} · {size}",
+        "filesEmpty": "还没有文件"
+    },
+    "shareAgentSafety": {
+        "title": "敏感数据会被移除",
+        "description": "无论您在上方选择什么，API 密钥、已连接账号和聊天记录都不会离开您的工作区。看起来包含凭据的文件会被丢弃，应用到达时处于未连接状态，由打开链接的人自行授权。"
+    },
+    "sharedLinksSection": {
+        "revokeFailed": "无法撤销此链接",
+        "revoked": "链接已撤销",
+        "revokedDescription": "其携带的副本已被删除。现在打开它的人将一无所获。",
+        "label": "分享链接",
+        "helper": "持有链接的任何人都能将此同事的副本添加到自己的看板。",
+        "carried": {
+            "memories": "记忆",
+            "database": "数据库",
+            "files": "文件"
+        },
+        "notUsed": "尚未使用",
+        "added": "已添加{count, plural, other { # 次}}",
+        "agentOnly": "仅同事本身，不含数据",
+        "copy": "复制分享链接",
+        "revokeTitle": "撤销此分享链接？",
+        "revokeDescription": "其携带的副本会被立即删除。已添加此同事的人仍会保留各自的副本。",
+        "revoke": "撤销",
+        "revokeLabel": "撤销此链接"
+    },
+    "sharedAgentContents": {
+        "memories": "{count, plural, other {# 条记忆}}",
+        "memoriesSubtitle": "它迄今学到的一切",
+        "database": "其数据库",
+        "databaseSubtitle": "它自己的表格，包括所有行",
+        "files": "{count, plural, other {# 个工作区文件}}",
+        "keys": "{count, plural, other {# 个 API 密钥}}",
+        "keysSubtitle": "由您填写",
+        "mcpAuth": "{count, plural, other {# 个服务需要重新登录}}",
+        "mcpAuthSubtitle": "使用您自己的账号",
+        "agentOnly": "仅同事本身",
+        "agentOnlySubtitle": "不携带任何数据",
+        "connectorsNote": "您将使用自己的账号连接这些应用。",
+        "triggersNote": "每个触发器都会获得新的 URL。"
+    },
+    "useShareAgentFlow": {
+        "failedRequest": "请求未能完成。请检查网络连接后重试。"
+    },
+    "agentTabs": {
+        "chat": {
+            "label": "聊天",
+            "description": "与此同事交谈"
+        },
+        "actions": {
+            "label": "待处理",
+            "description": "需要您关注的事项"
+        },
+        "services": {
+            "label": "应用",
+            "description": "此同事可使用的现成集成"
+        },
+        "mcp": {
+            "label": "MCP",
+            "description": "Model Context Protocol 服务器"
+        },
+        "skills": {
+            "label": "技能",
+            "description": "同事可运行的可复用技能"
+        },
+        "data": {
+            "label": "数据库",
+            "description": "此同事的数据"
+        },
+        "memories": {
+            "label": "知识",
+            "description": "此同事记住的内容"
+        },
+        "files": {
+            "label": "文件",
+            "description": "此同事的文件"
+        },
+        "published": {
+            "label": "已发布",
+            "description": "此同事发布的内容，以及谁可以打开"
+        },
+        "scheduled": {
+            "label": "例行任务",
+            "description": "周期性和定时任务"
+        },
+        "triggers": {
+            "label": "触发器",
+            "description": "被调用时启动运行的公开 URL"
+        },
+        "tools": {
+            "label": "能力",
+            "description": "此同事可使用的工具"
+        },
+        "monitoring": {
+            "label": "监控",
+            "description": "此同事的用量、费用和活动"
+        },
+        "logs": {
+            "label": "日志",
+            "description": "活动和运行日志"
+        },
+        "setup": {
+            "label": "安装",
+            "description": "有人首次安装此同事时它要做的事"
+        },
+        "settings": {
+            "label": "设置",
+            "description": "配置此同事"
+        }
+    },
+    "accessSummary": {
+        "youManage": "您管理此同事",
+        "youCanUse": "您可以使用此同事",
+        "youManageViaBox": "您通过 Box {box} 管理此同事",
+        "youCanUseViaBox": "您可以通过 Box {box} 使用此同事",
+        "viaBox": "通过 Box {box}",
+        "everyone": "工作区中的所有人",
+        "adminsOnly": "仅限管理员",
+        "peopleViaBox": "{count, plural, other {# 人}}，通过 Box {box}"
+    },
+    "agentLockedOverlay": {
+        "saved": "它的对话、记忆、技能、计划和文件都已保存。",
+        "savedUntil": "它的对话、记忆、技能、计划和文件会保存至 {date}。",
+        "paused": {
+            "title": "{name} 已随您的工作区暂停",
+            "subscribeToResume": "订阅后，{name} 会从中断的地方继续。",
+            "updatePaymentToResume": "更新付款方式后，{name} 会从中断的地方继续。",
+            "updatePayment": "更新付款方式",
+            "subscribe": "订阅以恢复"
+        },
+        "sandboxArchived": {
+            "title": "{name} 已随您的沙盒归档",
+            "requestReactivation": "在看板上申请重新激活，{name} 会从中断的地方继续。"
+        },
+        "restoring": {
+            "title": "{name} 正在恢复",
+            "description": "您的工作区正在恢复。{name} 会在一两分钟内随之醒来。"
+        },
+        "slot": {
+            "activateFailed": "无法激活此同事",
+            "backOnline": "{name} 已恢复在线",
+            "inactive": "{name} 未激活",
+            "templateEnded": "此同事所属模板的订阅已结束。重新购买该模板即可恢复。",
+            "nothingLost": "没有丢失任何内容：它的记忆、文件和技能都还在。它只需要一个空闲的同事名额即可再次运行。",
+            "fixedLimit": "此工作区的同事数量有固定上限。请联系客服提高上限。",
+            "upgradeToActivate": "升级以激活",
+            "activeCount": "{max} 位同事中有 {active} 位已激活",
+            "activating": "正在激活…",
+            "activate": "激活"
+        }
+    },
+    "panelsShared": {
+        "yourCoworker": "您的同事",
+        "closePanel": "关闭面板"
+    },
+    "agentPanel": {
+        "threads": "对话",
+        "coworkerCard": "同事卡片"
+    },
+    "agentAccessRow": {
+        "label": "访问权限",
+        "manage": "管理访问权限"
+    },
+    "agentCombobox": {
+        "unassigned": "未分配",
+        "selectMany": "选择同事",
+        "selectOne": "选择一位同事",
+        "search": "搜索同事…",
+        "empty": "未找到同事"
+    },
+    "timezoneCombobox": {
+        "placeholder": "选择时区",
+        "search": "搜索时区…",
+        "empty": "未找到时区"
+    },
+    "agentFileNavigation": {
+        "notFound": "未找到文件"
+    },
+    "agentSetupFields": {
+        "yes": "是",
+        "no": "否",
+        "resetToDefault": "重置为默认模板",
+        "useDefault": "使用默认模板",
+        "needsSetup": {
+            "label": "此同事安装后是否需要配置？",
+            "helper": "只需回答一次。安装此同事的人都会看到结果，因此未回答的同事无法发布。"
+        },
+        "instructions": {
+            "label": "安装说明",
+            "helper": "写给同事而不是用户：它会读取这些内容，并在聊天中引导用户完成。",
+            "dialogTitle": "编辑安装说明"
+        },
+        "resetConfirm": {
+            "title": "重置为默认模板？",
+            "description": "此处的内容将被默认说明替换。此操作无法撤销。",
+            "confirm": "重置"
+        }
+    },
+    "agentPanelData": {
+        "unreachable": "无法连接此同事的引擎。",
+        "emptyTitle": "还没有表格",
+        "emptyDescription": "您的同事有自己的私有数据库。当它需要存储结构化数据（联系人、结果、跟踪列表）时，会在这里创建表格，您可以随时浏览。",
+        "dialogTitle": "同事数据库",
+        "dialogDescription": "此同事的私有数据库，全屏显示。"
+    },
+    "agentSheetChat": {
+        "anotherCoworker": "另一位同事",
+        "replyPlaceholder": "在 {title} 中回复...",
+        "startedBy": "此会话由 <b>{name}</b> 发起"
+    },
+    "agentPanelChat": {
+        "notSetUp": "此同事尚未设置",
+        "setUp": "立即设置"
+    },
+    "agentPanelSetup": {
+        "unreachable": "无法连接此同事的引擎。",
+        "saveFailed": "保存失败",
+        "intro": "此同事的副本到达他人账号时没有任何凭据，也没有连接任何内容。对方首次打开时，它会自行执行这些说明。",
+        "saved": "已保存",
+        "saving": "正在保存...",
+        "save": "保存"
+    },
+    "agentPanelSettings": {
+        "unreachable": "无法连接此同事的引擎。",
+        "saveFailed": "保存失败",
+        "name": "名称",
+        "inactive": "此同事未激活，因此无法加载或更改其配置。",
+        "soul": {
+            "label": "灵魂（系统提示词）",
+            "dialogTitle": "编辑系统提示词",
+            "placeholder": "你是..."
+        },
+        "verbosity": {
+            "label": "详细程度",
+            "helper": "决定回复的长短，而不是工作量。",
+            "minimal": "极简",
+            "concise": "简洁",
+            "normal": "正常",
+            "detailed": "详细"
+        },
+        "notifications": {
+            "label": "通知",
+            "choose": "选择您要接收的通知"
+        },
+        "delete": "删除同事",
+        "saved": "已保存",
+        "save": "保存更改",
+        "appearance": "外观"
+    },
+    "coworkerLook": {
+        "color": "颜色",
+        "material": "材质",
+        "eyes": "眼睛",
+        "mouth": "嘴巴",
+        "shuffle": "随机",
+        "reset": "默认",
+        "materialOptions": {
+            "classic": "经典",
+            "fluffy": "蓬松",
+            "plush": "毛绒",
+            "felt": "毛毡",
+            "knit": "针织",
+            "clay": "黏土",
+            "rubber": "橡胶",
+            "glass": "玻璃",
+            "chrome": "镀铬"
+        },
+        "colors": {
+            "blue": "蓝色",
+            "indigo": "靛蓝",
+            "violet": "紫罗兰",
+            "purple": "紫色",
+            "pink": "粉色",
+            "rose": "玫瑰红",
+            "lime": "青柠绿",
+            "green": "绿色"
+        },
+        "eyesOptions": {
+            "pill": "胶囊眼",
+            "round": "圆眼",
+            "happy": "笑眼",
+            "googly": "滚动眼",
+            "visor": "护目镜",
+            "sleepy": "困倦眼",
+            "wink": "眨眼",
+            "pixel": "像素眼",
+            "star": "星星眼",
+            "heart": "爱心眼",
+            "dot": "豆豆眼",
+            "brows": "带眉毛的眼睛",
+            "cyclops": "独眼",
+            "shades": "墨镜",
+            "glasses": "眼镜",
+            "sparkle": "闪亮眼",
+            "line": "闭眼"
+        },
+        "mouthOptions": {
+            "none": "无嘴巴",
+            "smile": "微笑",
+            "open": "张嘴",
+            "cat": "猫咪嘴",
+            "flat": "一字嘴"
+        }
+    },
+    "agentPanelLogs": {
+        "empty": {
+            "title": "还没有运行",
+            "description": "同事的每次运行都会记录在这里，您可以逐步查看它做了什么以及原因。"
+        },
+        "tokens": "{total} 个 token",
+        "tokensShort": "{total} tok",
+        "stepCount": "{count, plural, other {# 个步骤}}",
+        "step": "第 {number} 步",
+        "noSteps": "此次运行没有记录步骤。",
+        "input": "输入",
+        "output": "输出"
+    },
+    "agentRunHistory": {
+        "tokens": "{total} 个 token",
+        "stepCount": "{count, plural, other {# 个步骤}}"
+    },
+    "agentPanelMemories": {
+        "dormant": "休眠",
+        "delete": {
+            "label": "删除记忆",
+            "confirmTitle": "删除此记忆？",
+            "confirmDescription": "同事将永久忘记它。此操作无法撤销。"
+        },
+        "recallPlaceholder": "回忆记忆...",
+        "new": "新建",
+        "clearAll": "清除所有记忆",
+        "searching": "正在搜索…",
+        "recalled": "{count, plural, other {为“{query}”回忆了 # 条}}",
+        "form": {
+            "contentPlaceholder": "用户喜欢简洁的回答。",
+            "kindPlaceholder": "类型（例如 preference）",
+            "tagsPlaceholder": "标签，用逗号分隔",
+            "save": "保存记忆"
+        },
+        "empty": {
+            "noMatches": "没有匹配项",
+            "title": "还没有记忆",
+            "description": "您的同事会在这里保存关于您和其工作的长期事实，以便在不同对话之间保持上下文。",
+            "add": "添加记忆"
+        }
+    },
+    "agentPanelMonitoring": {
+        "charts": {
+            "kpiRuns": "运行",
+            "kpiCost": "总费用",
+            "kpiTokens": "总 token 数",
+            "kpiErrorRate": "错误率",
+            "runsOverTime": "运行趋势",
+            "costOverTime": "费用趋势",
+            "avgDuration": "平均运行时长",
+            "runsByModel": "按模型统计运行",
+            "topTools": "最常用的工具调用",
+            "toolErrors": "工具错误"
+        },
+        "tokenUsage": {
+            "title": "Token 用量",
+            "subtitle": "每日 token 数"
+        },
+        "ranges": {
+            "24h": {
+                "short": "24 小时",
+                "label": "最近 24 小时"
+            },
+            "7d": {
+                "short": "7 天",
+                "label": "最近 7 天"
+            },
+            "30d": {
+                "short": "30 天",
+                "label": "最近 30 天"
+            },
+            "90d": {
+                "short": "90 天",
+                "label": "最近 90 天"
+            }
+        },
+        "empty": {
+            "title": "还没有活动",
+            "description": "此同事开始工作后，其用量、费用和运行分析将显示在这里。"
+        },
+        "expand": "展开{title}"
+    },
+    "agentPanelFiles": {
+        "publishFailed": "无法发布 {name}",
+        "dropToUpload": "拖放文件或文件夹以上传",
+        "hideHidden": "隐藏隐藏文件",
+        "showHidden": "显示隐藏文件",
+        "emptyDescription": "这是您同事的工作区。它在运行期间下载、创建或编辑的文件都保存在这里。"
+    },
+    "shareCta": {
+        "placeLabel": "放置同事",
+        "placeCaption": "放到您的看板上，即可运行。",
+        "trialAdd": "开始免费试用并添加",
+        "planAdd": "订阅 {price}/月并添加",
+        "add": "添加到我的看板"
+    },
+    "schedule": {
+        "once": "一次 · {date}",
+        "onceOn": "一次，{date}",
+        "everyMinutes": "每 {count} 分钟",
+        "everyDay": "每天 {time}",
+        "weekdays": "工作日 {time}",
+        "everyWeekday": "每{day} {time}",
+        "monthly": "每月 {day} 日 {time}"
+    },
+    "mcpJsonPaste": {
+        "link": "粘贴 JSON 配置",
+        "linkVault": "或粘贴 JSON 配置",
+        "linkAgain": "粘贴另一个 JSON",
+        "boxLabel": "MCP 服务器 JSON 配置",
+        "placeholder": "粘贴服务器 README 中的 JSON\n{example}",
+        "close": "关闭",
+        "unnamed": "未命名",
+        "keysStored": "{count, plural, other {# 个值将保存为密钥，不写入配置}}",
+        "errors": {
+            "invalidJson": "JSON 无效：{detail}",
+            "notAnObject": "请粘贴一个 JSON 对象：{example}",
+            "containerNotObject": "“mcpServers”必须是由服务器组成的对象",
+            "noServer": "未找到服务器：应为“mcpServers”、带名称的服务器，或包含“command”或“url”的服务器",
+            "emptyContainer": "“mcpServers”为空",
+            "serverNotObject": "{scope, select, named {“{server}”必须是对象} other {服务器必须是对象}}",
+            "invalidName": "“{server}”：名称只能包含字母、数字、- 和 _",
+            "unknownField": "{scope, select, named {“{server}”：未知字段 {fields}} other {未知字段 {fields}}}",
+            "notText": "{scope, select, named {“{server}”：{field} 必须是文本} other {{field} 必须是文本}}",
+            "commandAndUrl": "{scope, select, named {“{server}”同时包含 command 和 url} other {该服务器同时包含 command 和 url}}",
+            "argsNotList": "{scope, select, named {“{server}”：args 必须是文本列表} other {args 必须是文本列表}}",
+            "unknownTransport": "{scope, select, named {“{server}”：未知传输方式“{transport}”} other {未知传输方式“{transport}”}}",
+            "needsCommand": "{scope, select, named {“{server}”：stdio 服务器需要 command} other {stdio 服务器需要 command}}",
+            "needsUrl": "{scope, select, named {“{server}”：{transport} 服务器需要 url} other {{transport} 服务器需要 url}}",
+            "notMap": "{scope, select, named {“{server}”：{field} 必须是由文本值组成的对象} other {{field} 必须是由文本值组成的对象}}",
+            "unresolvedRef": "{scope, select, named {“{server}”：{field} 使用了 {ref}，请替换为实际值} other {{field} 使用了 {ref}，请替换为实际值}}",
+            "multiline": "{scope, select, named {“{server}”：{field} 必须在一行内} other {{field} 必须在一行内}}"
+        }
+    }
+}

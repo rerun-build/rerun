@@ -1,0 +1,143 @@
+{
+    "preferences": {
+        "title": "העדפות",
+        "close": "סגירה",
+        "yourAccount": "החשבון שלך",
+        "workspace": "סביבת העבודה",
+        "aiProviders": "ספקי AI",
+        "appearance": "מראה",
+        "appearanceSystem": "מערכת",
+        "appearanceLight": "בהיר",
+        "appearanceDark": "כהה",
+        "coworkers": "עמיתים",
+        "groupRecent": "אחרונים",
+        "groupByBox": "לפי Box",
+        "openLinksIn": "לפתוח קישורים ב",
+        "linksBrowser": "דפדפן",
+        "linksRerun": "Rerun",
+        "language": "שפה",
+        "notifications": "התראות",
+        "pushOff": "התראות כבויות",
+        "support": "תמיכה",
+        "contactSupport": "לפנות לתמיכה",
+        "privacy": "מדיניות פרטיות",
+        "terms": "תנאי שימוש",
+        "about": "אודות",
+        "version": "גרסה",
+        "environment": "סביבה",
+        "signOut": "להתנתק",
+        "deleteAccount": "למחוק את החשבון",
+        "server": "שרת"
+    },
+    "notifications": {
+        "title": "התראות",
+        "saveFailed": "לא ניתן היה לשמור",
+        "tryAgainShortly": "כדאי לנסות שוב בעוד רגע.",
+        "loadFailed": "לא ניתן היה לטעון את ההגדרות שלך. כדאי לנסות שוב בעוד רגע.",
+        "push": {
+            "label": "התראות פוש",
+            "off": "כבוי",
+            "turnOn": "להפעיל",
+            "openSettings": "{platform, select, android {לפתוח את הגדרות Android} other {לפתוח את הגדרות iOS}}",
+            "footnote": "{platform, select, android {שום דבר מלמטה לא יגיע לטלפון הזה עד שהתראות הפוש יופעלו.} other {שום דבר מלמטה לא יגיע ל-iPhone הזה עד שהתראות הפוש יופעלו.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "הודעות מעמיתים",
+                "description": "כשעמית צריך אותך או רוצה לומר משהו."
+            },
+            "silent": {
+                "name": "משימות שהסתיימו",
+                "description": "כשעמית מסיים משימה, בלי צליל."
+            },
+            "crew": {
+                "name": "הצוות בעבודה",
+                "description": "מי עובד ומי צריך אותך, מוצג למעלה כל עוד זה נמשך."
+            }
+        },
+        "scopeTitle": "להודיע לי על",
+        "recommended": "מומלץ",
+        "scopes": {
+            "everything": {
+                "label": "הכול",
+                "detail": "כל הרצה בסביבת העבודה, לא משנה מי התחיל אותה."
+            },
+            "mine": {
+                "label": "ההרצות שלי ומה שאני עוקב אחריו",
+                "detail": "הרצות שאני מתחיל, שיחות שאני משתתף בהן, עמיתים שאני עוקב אחריהם."
+            },
+            "needed": {
+                "label": "רק כשצריכים אותי",
+                "detail": "שאלות, אישורים ושגיאות בהרצות שלי. הרצה שהסתיימה נשארת שקטה."
+            },
+            "nothing": {
+                "label": "כלום",
+                "detail": "אני בודק את תיבת הדואר בעצמי."
+            }
+        },
+        "email": {
+            "label": "אימייל",
+            "footnote": "כשצריכים אותך ואתה לא נמצא. אימייל אחד לכל אירוע, אף פעם לא אחד לכל הרצה."
+        },
+        "perCoworker": {
+            "title": "לפי עמית",
+            "add": "להוסיף עמית",
+            "pickTitle": "כל הרצה של העמית הזה מגיעה אליך",
+            "cancel": "ביטול",
+            "empty": "כל העמיתים פועלים לפי הכלל שלמעלה.",
+            "detail": "אפשר להגדיר גם מהפרטים של כל עמית.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "עוקב אחרי משימות",
+            "yourSetting": "ההגדרה שלך"
+        },
+        "accountEmails": {
+            "title": "אימיילים של החשבון",
+            "billing": "תקופת ניסיון וחיוב",
+            "product": "עדכוני מוצר"
+        },
+        "modes": {
+            "default": {
+                "label": "ברירת מחדל",
+                "hint": "לפי ההגדרה שלך."
+            },
+            "everything": {
+                "label": "כל הפעילות",
+                "hint": "כל הרצה, לא משנה מי התחיל אותה."
+            },
+            "muted": {
+                "label": "מושתק",
+                "hint": "כלום. הלוח עדיין מציג אותו."
+            }
+        },
+        "coworker": {
+            "title": "להודיע לי על {name}",
+            "yourSetting": "ההגדרה שלך",
+            "quotedScope": "“{scope}”",
+            "follow": "לעקוב אחרי המשימות המתוזמנות שלו",
+            "nothingScheduled": "עדיין אין שום דבר מתוזמן.",
+            "scheduled": "{count, plural, one {# מתוזמנת} two {# מתוזמנות} other {# מתוזמנות}}, הן מגיעות אליך כמו ההרצות שלך.",
+            "reachYou": "הן מגיעות אליך כמו ההרצות שלך.",
+            "tasksTitle": "משימות מתוזמנות",
+            "tasksFailed": "לא ניתן היה לטעון את המשימות שלו. כדאי לנסות שוב בעוד רגע.",
+            "taskSwitch": "להודיע לי על {name}",
+            "muted": "{name} מושתק."
+        },
+        "actions": {
+            "approve": "לאשר",
+            "deny": "לדחות",
+            "answer": "לענות",
+            "reply": "להשיב",
+            "open": "לפתוח",
+            "replyPlaceholder": "התשובה שלך",
+            "send": "לשלוח"
+        },
+        "receipts": {
+            "approve": "אושר. {agent} מטפל בזה.",
+            "deny": "נדחה. {agent} לא יעשה את זה.",
+            "reply": "נשלח. {agent} מטפל בזה.",
+            "failed": "לא נשלח: {reason}",
+            "signedOut": "צריך לפתוח את Rerun כדי להתחבר שוב.",
+            "fallbackAgent": "העמית שלך"
+        }
+    }
+}

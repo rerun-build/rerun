@@ -1,0 +1,137 @@
+{
+    "menu": {
+        "app": {
+            "about": "אודות {name}",
+            "hide": "הסתרת {name}",
+            "hideOthers": "הסתרת האחרים",
+            "showAll": "הצגת הכול",
+            "quit": "יציאה מ-{name}",
+            "checkForUpdates": "בדיקת עדכונים…",
+            "changeServer": "החלפת שרת…"
+        },
+        "file": {
+            "title": "קובץ",
+            "closeWindow": "סגירת החלון",
+            "newWindow": "חלון חדש"
+        },
+        "edit": {
+            "title": "עריכה",
+            "undo": "ביטול",
+            "redo": "ביצוע מחדש",
+            "cut": "גזירה",
+            "copy": "העתקה",
+            "paste": "הדבקה",
+            "pasteAndMatchStyle": "הדבקה והתאמת סגנון",
+            "delete": "מחיקה",
+            "selectAll": "בחירת הכול",
+            "find": "חיפוש…"
+        },
+        "view": {
+            "title": "תצוגה",
+            "reload": "טעינה מחדש",
+            "forceReload": "אילוץ טעינה מחדש",
+            "toggleDevTools": "הצגה או הסתרה של כלי המפתחים",
+            "actualSize": "גודל מקורי",
+            "zoomIn": "הגדלה",
+            "zoomOut": "הקטנה",
+            "toggleFullScreen": "מעבר למסך מלא ובחזרה"
+        },
+        "window": {
+            "title": "חלון",
+            "minimize": "מזעור",
+            "zoom": "הגדלת החלון",
+            "front": "הבאת הכול לחזית"
+        },
+        "help": {
+            "title": "עזרה",
+            "docs": "תיעוד"
+        }
+    },
+    "offline": {
+        "title": "אין חיבור ל-Rerun",
+        "body": "כדאי לבדוק את החיבור. האפליקציה תתחבר מחדש ל-{host} בעצמה.",
+        "unavailable": "{host} לא עונה כרגע. האפליקציה תנסה שוב בעצמה.",
+        "retry": "לנסות שוב"
+    },
+    "incompatible": {
+        "title": "צריך לעדכן את Rerun כדי להמשיך",
+        "body": "הגרסה הזו של האפליקציה ישנה מדי עבור {host}.",
+        "download": "להוריד את הגרסה האחרונה",
+        "downloading": "העדכון בהורדה… {percent}%",
+        "restart": "להפעיל מחדש ולעדכן"
+    },
+    "unload": {
+        "message": "לעזוב את הדף?",
+        "detail": "עמית עדיין עובד, או שיש קובץ עם שינויים שלא נשמרו.",
+        "leave": "לעזוב",
+        "stay": "להישאר"
+    },
+    "find": {
+        "placeholder": "חיפוש בדף",
+        "matches": "{active} מתוך {total}",
+        "noMatches": "אין תוצאות",
+        "previous": "ההתאמה הקודמת",
+        "next": "ההתאמה הבאה",
+        "close": "סגירה"
+    },
+    "server": {
+        "title": "התחברות לשרת שלך",
+        "description": "יש להזין את הכתובת של שרת Rerun שבו אתה משתמש.",
+        "label": "כתובת השרת",
+        "connect": "להתחבר",
+        "invalid": "יש להזין כתובת כמו rerun.example.com.",
+        "unreachable": "אף אחד לא ענה בכתובת הזו.",
+        "notRerun": "הכתובת הזו אינה שרת Rerun.",
+        "tooOld": "השרת הזה דורש את גרסה {version} של האפליקציה או גרסה חדשה יותר.",
+        "insecure": "הכתובת הזו אינה מוצפנת. כדאי להשתמש ב-https:// אלא אם השרת פועל במחשב הזה.",
+        "useRerunCloud": "להשתמש ב-Rerun Cloud",
+        "cancel": "ביטול"
+    },
+    "updates": {
+        "upToDate": "הגרסה שלך עדכנית",
+        "upToDateDetail": "Rerun {version} היא הגרסה האחרונה.",
+        "failed": "לא ניתן לבדוק אם יש עדכונים",
+        "readyToInstall": "Rerun {version} מוכנה להתקנה",
+        "readyDetail": "האפליקציה תופעל מחדש כדי לסיים את העדכון.",
+        "restartNow": "להפעיל מחדש עכשיו",
+        "later": "אחר כך"
+    },
+    "tray": {
+        "open": "פתיחת {name}",
+        "waiting": "{count, plural, one {שיחה אחת ממתינה לך} two {שתי שיחות ממתינות לך} other {# שיחות ממתינות לך}}",
+        "openAtLogin": "פתיחה בכניסה למערכת",
+        "stillRunning": "{name} ממשיכה לפעול כאן. אפשר לצאת ממנה דרך הסמל הזה.",
+        "quickAsk": "שאלה מהירה",
+        "quickAskVoice": "שאלה מהירה בקול"
+    },
+    "context": {
+        "addToDictionary": "הוספה למילון",
+        "openLink": "פתיחת הקישור בדפדפן",
+        "copyLink": "העתקת הקישור",
+        "copyImage": "העתקת התמונה",
+        "saveImage": "שמירת התמונה"
+    },
+    "computer": {
+        "defaultName": "המחשב שלי",
+        "chooseFolder": "בחירת התיקייה שבה העמיתים עובדים",
+        "trayOnline": "המחשב הזה: מחובר",
+        "trayOffline": "המחשב הזה: לא מחובר",
+        "trayPaused": "המחשב הזה: מושהה",
+        "trayJobs": "{count, plural, one {המחשב הזה: משימה אחת פועלת} two {המחשב הזה: שתי משימות פועלות} other {המחשב הזה: # משימות פועלות}}",
+        "pause": "השהיית העמיתים במחשב הזה",
+        "resume": "חידוש העמיתים במחשב הזה",
+        "quitWithJobs": "{count, plural, one {משימה של עמית פועלת במחשב הזה} two {שתי משימות של עמיתים פועלות במחשב הזה} other {# משימות של עמיתים פועלות במחשב הזה}}",
+        "quitWithJobsDetail": "יציאה מ-Rerun תעצור אותן. כדי שימשיכו לפעול, עדיף לסגור את החלון.",
+        "quitAnyway": "לצאת בכל זאת",
+        "keepRunning": "להמשיך לפעול"
+    },
+    "dock": {
+        "collapse": "כיווץ",
+        "expand": "הרחבה",
+        "moveLeft": "העברה לקצה השמאלי",
+        "moveRight": "העברה לקצה הימני",
+        "hide": "הסתרת ה-Dock",
+        "hideCoworker": "הסתרת {name} מה-Dock",
+        "showInDock": "הצגה ב-Dock"
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "title": "להוריד את אפליקציית Rerun למחשב",
+    "eyebrow": "אפליקציה למחשב",
+    "headline": "Rerun על המחשב שלך",
+    "description": "העמיתים שלך בחלון משלהם, עם התראות, סמל בשורת התפריטים או במגש המערכת, ו-Quick ask.",
+    "mac": "להוריד ל-macOS",
+    "windows": "להוריד ל-Windows",
+    "linux": "להוריד ל-Linux",
+    "allPlatforms": "כל הפלטפורמות",
+    "alternatives": {
+        "macIntel": "להוריד ל-Mac עם Intel",
+        "macAppleSilicon": "להוריד ל-Mac עם Apple Silicon",
+        "windowsArm64": "להוריד ל-Windows on Arm",
+        "windowsX64": "להוריד ל-Windows x64"
+    },
+    "beta": "בטא",
+    "webApp": "Rerun פועל גם בדפדפן: <link>לפתוח את אפליקציית הרשת</link>.",
+    "platforms": {
+        "label": "הורדה",
+        "title": "macOS, Windows ו-Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 ואילך, Apple Silicon ו-Intel.",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 ואילך, x64 ו-Arm.",
+            "warning": "אפליקציית Windows עדיין לא חתומה. אם Windows מציג \"Windows הגן על המחשב שלך\", יש ללחוץ על \"מידע נוסף\" ואז על \"הפעל בכל זאת\".",
+            "x64": "x64",
+            "arm64": "Arm"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64. ה-AppImage פועל ברוב ההפצות ומתעדכן בעצמו.",
+            "appImage": "AppImage",
+            "deb": ".deb (Debian ו-Ubuntu)",
+            "rpm": ".rpm (Fedora ו-openSUSE)"
+        }
+    },
+    "features": {
+        "label": "מה האפליקציה מוסיפה",
+        "title": "כל Rerun, במרחק קיצור דרך",
+        "notifications": {
+            "title": "התראות שמחזירות אותך",
+            "body": "העמיתים שלך מגיעים אליך ברגע שאתה באפליקציה אחרת, ולחיצה פותחת את השיחה."
+        },
+        "quickAsk": {
+            "title": "Quick ask",
+            "body": "⌘⇧Space ב-Mac, Ctrl+Shift+Space ב-Windows וב-Linux: שאלה ל-Chief of Staff שלך מכל אפליקציה, והתשובה מחכה ב-Rerun."
+        },
+        "always": {
+            "title": "תמיד פועל",
+            "body": "סגירת החלון משאירה את Rerun בשורת התפריטים או במגש המערכת, עם מספר הדברים שמחכים לך על הסמל."
+        }
+    }
+}

@@ -1,0 +1,144 @@
+{
+    "title": "الزملاء",
+    "loadFailed": "تعذّر تحميل زملائك.",
+    "retry": "إعادة المحاولة",
+    "empty": "لا يوجد زملاء بعد.",
+    "loadingCoworkers": "جارٍ تحميل الزملاء",
+    "newCoworker": "زميل جديد",
+    "untitledBox": "Box بلا اسم",
+    "teammate": "عضو في الفريق",
+    "pinned": {
+        "dragToReorder": "اسحب لإعادة الترتيب",
+        "done": "تم",
+        "unpin": "إلغاء التثبيت",
+        "details": "تفاصيل الزميل",
+        "edit": "تعديل المثبّتات",
+        "unreadLabel": "{name}، غير مقروء"
+    },
+    "row": {
+        "label": "{name}، {line}",
+        "opensConversation": "يفتح المحادثة",
+        "pin": "تثبيت",
+        "unpin": "إلغاء التثبيت",
+        "pinToTop": "تثبيت في الأعلى"
+    },
+    "line": {
+        "paused": "متوقف مؤقتًا",
+        "waiting": "بانتظارك",
+        "error": "حدث خطأ ما",
+        "working": "يعمل",
+        "workingOn": "يعمل · {detail}",
+        "asleep": "نائم",
+        "asleepAbout": "نائم · {about}",
+        "you": "أنت: {message}"
+    },
+    "foreman": {
+        "askAnything": "اسأل عن أي شيء"
+    },
+    "header": {
+        "account": "الحساب"
+    },
+    "account": {
+        "preferences": "التفضيلات",
+        "contactSupport": "التواصل مع الدعم",
+        "signOut": "تسجيل الخروج",
+        "subscriptionTitle": "ألغِ الاشتراك أولًا",
+        "subscriptionMessage": "لا يزال {workspaces} يتجدد. ألغِه من الفوترة على rerun.build، ثم احذف حسابك.",
+        "deleteTitle": "حذف حسابك؟",
+        "deleteMessage": "ستغادر مساحات العمل التي تشاركها. أما مساحة العمل التي أنت وحدك فيها فتتوقف نهائيًا مع زملائها وملفاتها. لا يمكن التراجع عن ذلك.",
+        "delete": "حذف",
+        "cancel": "إلغاء",
+        "reauthTitle": "سجّل الدخول مجددًا لحذف حسابك",
+        "reauthMessage": "حفاظًا على أمانك، يتطلب حذف حسابك تسجيل دخول حديثًا. سجّل الدخول مجددًا، ثم احذفه من هنا.",
+        "deleteFailedTitle": "تعذّر حذف حسابك",
+        "deleteFailedMessage": "حاول مجددًا بعد قليل.",
+        "leaveServerTitle": "مغادرة {host}؟",
+        "leaveServerMessage": "سيتم تسجيل خروجك، وسيُعاد فتح Rerun على Rerun Cloud.",
+        "leaveServer": "مغادرة"
+    },
+    "workspace": {
+        "untitled": "مساحة عملي",
+        "menuLabel": "مساحة العمل {name}"
+    },
+    "section": {
+        "label": "{label}، {count}"
+    },
+    "search": {
+        "title": "البحث",
+        "back": "رجوع",
+        "placeholder": "ابحث في الزملاء والمحادثات",
+        "askRerun": "{named, select, yes {اسأل {name}} other {اسأل Chief of Staff}}",
+        "quotedAsk": "«{query}»",
+        "coworkers": "الزملاء",
+        "conversations": "المحادثات",
+        "noCoworker": "لا يوجد زميل بهذا الاسم.",
+        "newConversation": "محادثة جديدة",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "الإشعارات",
+        "bellLabel": "الإشعارات، {count}",
+        "close": "إغلاق",
+        "settings": "إعدادات الإشعارات",
+        "markLabel": "تعيين الإشعارات كمقروءة",
+        "markRead": "{count, plural, zero {لا إشعارات لتعيينها كمقروءة} one {تعيين إشعار واحد كمقروء} two {تعيين إشعارين كمقروءين} few {تعيين # إشعارات كمقروءة} many {تعيين # إشعارًا كمقروءة} other {تعيين # إشعار كمقروء}}",
+        "nothingToMark": "لا إشعارات لتعيينها كمقروءة",
+        "clearAll": "{count, plural, zero {مسح الكل} one {مسح الكل، ومنه طلب واحد} two {مسح الكل، ومنه طلبان} few {مسح الكل، ومنه # طلبات} many {مسح الكل، ومنه # طلبًا} other {مسح الكل، ومنه # طلب}}",
+        "clearAllTitle": "مسح كل الإشعارات؟",
+        "clearAllMessage": "{count, plural, zero {لا طلبات تنتظر ردًا.} one {يغادر طلب واحد ينتظر ردًا صندوق الوارد دون إجابة، ويظل زميلك بانتظارها.} two {يغادر طلبان ينتظران ردًا صندوق الوارد دون إجابة، ويظل زملاؤك بانتظارها.} few {تغادر # طلبات تنتظر ردًا صندوق الوارد دون إجابة، ويظل زملاؤك بانتظارها.} many {يغادر # طلبًا ينتظر ردًا صندوق الوارد دون إجابة، ويظل زملاؤك بانتظارها.} other {يغادر # طلب ينتظر ردًا صندوق الوارد دون إجابة، ويظل زملاؤك بانتظارها.}}",
+        "clearAllConfirm": "مسح الكل",
+        "cancel": "إلغاء",
+        "running": "{count, plural, zero {لا توجد مهام قيد التشغيل} one {مهمة واحدة قيد التشغيل} two {مهمتان قيد التشغيل} few {# مهام قيد التشغيل} many {# مهمة قيد التشغيل} other {# مهمة قيد التشغيل}}",
+        "loadFailed": "تعذّر تحميل إشعاراتك.",
+        "retry": "إعادة المحاولة",
+        "emptyTitle": "لا شيء يحتاج إلى معالجة",
+        "emptyDescription": "عندما يحتاجك زميل أو ينهي مهمة، يصل الأمر إلى هنا.",
+        "undo": "تراجع",
+        "ok": "حسنًا",
+        "sections": {
+            "needsYou": "يحتاجك",
+            "headsUps": "تنبيهات",
+            "errors": "الأخطاء",
+            "done": "المكتمل"
+        },
+        "sentences": {
+            "awaiting_question": "طرح عليك {agent} سؤالًا",
+            "awaiting_approval": "يحتاج {agent} إلى موافقتك",
+            "awaiting_connector": "يحتاج {agent} إلى ربط تطبيق",
+            "waiting_human": "{agent} بانتظارك",
+            "awaiting_ack": "نبّهك {agent} إلى أمر ما",
+            "error": "واجه {agent} خطأ",
+            "done": "أنهى {agent} تشغيله"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}، {detail}",
+            "read": "مقروء",
+            "markRead": "تعيين كمقروء",
+            "opensConversation": "يفتح المحادثة",
+            "unfollow": "إيقاف متابعة مهامه المجدولة",
+            "unfollowed": "لم تعد تتابع المهام المجدولة لـ {name}.",
+            "mute": "كتم {name}",
+            "muted": "تم كتم {name}.",
+            "settings": "إعدادات الإشعارات",
+            "cancel": "إلغاء"
+        }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, zero {لا أحد يحتاجك} one {واحد يحتاجك} two {اثنان يحتاجانك} few {# يحتاجونك} many {# يحتاجونك} other {# يحتاجونك}} · {working} يعملون",
+            "waiting": "{waiting, plural, zero {لا أحد يحتاجك} one {واحد يحتاجك} two {اثنان يحتاجانك} few {# يحتاجونك} many {# يحتاجونك} other {# يحتاجونك}}",
+            "working": "{working} يعملون",
+            "none": "انتهى كل شيء"
+        },
+        "crew": "الفريق",
+        "needsYou": "يحتاجك",
+        "atWork": "يعملون",
+        "allDone": "انتهى كل شيء",
+        "you": "أنت",
+        "stopped": "متوقف",
+        "minutes": "{count} د",
+        "asks": "{name} يسأل",
+        "othersAtWork": "+{count} يعملون"
+    }
+}

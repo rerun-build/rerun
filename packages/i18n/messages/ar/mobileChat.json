@@ -1,0 +1,315 @@
+{
+    "composer": {
+        "attach": "إرفاق",
+        "camera": "الكاميرا",
+        "coworkers": "الزملاء",
+        "discardRecording": "حذف التسجيل",
+        "files": "الملفات",
+        "modelLabel": "النموذج، {model}",
+        "photos": "الصور",
+        "recordVoice": "تسجيل رسالة صوتية",
+        "removeAttachment": "إزالة {name}",
+        "retryRecording": "إعادة محاولة إرسال التسجيل",
+        "send": "إرسال",
+        "sendRecording": "إرسال التسجيل",
+        "sendTo": "إرسال إلى {name}",
+        "skills": "المهارات",
+        "stop": "إيقاف",
+        "tooLargeBody": "{files}: {megabytes} ميغابايت كحد أقصى.",
+        "tooLargeTitle": "{count, plural, zero {هذه الملفات كبيرة جدًا} one {هذا الملف كبير جدًا} two {هذان الملفان كبيران جدًا} few {هذه الملفات كبيرة جدًا} many {هذه الملفات كبيرة جدًا} other {هذه الملفات كبيرة جدًا}}",
+        "tooManyBody": "{max} كحد أقصى: تم استبعاد {files}.",
+        "tooManyTitle": "ملفات كثيرة جدًا",
+        "computers": "الأجهزة",
+        "offline": "غير متصل",
+        "placeholder": "@ زميل، / مهارة، # جهاز",
+        "placeholderNoSkill": "@ زميل، # جهاز",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ الإشارة إلى زميل",
+                "description": "أضف زميلًا إلى هذه المحادثة",
+                "empty": "لا يوجد زميل آخر في مساحة العمل هذه بعد"
+            },
+            "skill": {
+                "menuLabel": "/ استخدام مهارة",
+                "description": "شغّل طريقة عمل محفوظة يعرفها زميلك",
+                "empty": "لا يملك هذا الزميل أي مهارة بعد"
+            },
+            "computer": {
+                "menuLabel": "# استخدام جهاز",
+                "description": "دع زميلك يعمل على جهاز مرتبط",
+                "empty": "لا يوجد جهاز مرتبط بعد"
+            }
+        }
+    },
+    "desktop": {
+        "connecting": "جارٍ الاتصال بالشاشة…",
+        "dropping": "الشاشة تنقطع باستمرار. أعد المحاولة بعد قليل.",
+        "handingBack": "جارٍ الإعادة…",
+        "keys": {
+            "delete": "حذف",
+            "return": "إدخال",
+            "tab": "Tab"
+        },
+        "retry": "إعادة المحاولة",
+        "screen": "الشاشة",
+        "screenOf": "شاشة {name}",
+        "type": "كتابة",
+        "typePlaceholder": "اكتب على الشاشة",
+        "unreachable": "تعذّر الوصول إلى الشاشة."
+    },
+    "empty": {
+        "asleep": "في وضع السكون. توقظه رسالة.",
+        "loading": "جارٍ التحميل",
+        "pulseCoworkers": "{count, plural, zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
+        "pulseWorking": "{count} يعملون الآن",
+        "sendToCoworker": "أرسل رسالة إلى هذا الزميل",
+        "startTitle": "ابدأ محادثة",
+        "starters": {
+            "capabilities": "بماذا يمكنك مساعدتي؟",
+            "recentWork": "لخّص عملك الأخير",
+            "projectFiles": "راجع ملفات مشروعي",
+            "tools": "ما الأدوات التي يمكنك الوصول إليها؟"
+        },
+        "team": {
+            "greeting": "{named, select, yes {مرحبًا، أنا {name}} other {مرحبًا، أنا Chief of Staff الخاص بك}}",
+            "greetingNamed": "{named, select, yes {مرحبًا {firstName}، أنا {name}} other {مرحبًا {firstName}، أنا Chief of Staff الخاص بك}}",
+            "greetingWithTeam": "{greeting}. هذا فريقك.",
+            "emptySubtitle": "ليس لديك زملاء بعد. أخبرني بمهمة تريد تفويضها وسأبني أول زميل.",
+            "buildPrompt": "ابنِ لي زميلًا ",
+            "buildFirst": {
+                "title": "بناء أول زميل لي",
+                "description": "صف المهمة في جملة واحدة"
+            },
+            "template": {
+                "title": "البدء من قالب",
+                "description": "زملاء جاهزون لنوع عملك",
+                "send": "اعرض لي القوالب المناسبة لعملي"
+            },
+            "guide": {
+                "title": "كيف يعمل هذا؟",
+                "description": "الزملاء وBoxes والمهام الروتينية، في دقيقتين",
+                "send": "كيف يعمل Rerun؟"
+            },
+            "checkWorking": {
+                "title": "ماذا يفعل {name}؟",
+                "description": "يعمل الآن",
+                "send": "ماذا يفعل {mention} الآن؟"
+            },
+            "checkIdle": {
+                "title": "ماذا فعل {name} اليوم؟",
+                "description": "اطّلع على آخر عمليات التشغيل",
+                "send": "ماذا فعل {mention} اليوم؟"
+            },
+            "handOff": {
+                "title": "أعطِ {name} مهمة",
+                "description": "أوجّهه وأتابعه حتى النهاية",
+                "prefill": "اطلب من {mention} أن "
+            },
+            "build": {
+                "title": "بناء زميل جديد",
+                "description": "لمهمة لا يتولاها أحد في الفريق بعد"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "ربط ChatGPT",
+        "connectClaude": "ربط Claude",
+        "creditsBody": "لقد استنفدت رصيد Rerun لهذه الفترة. تدفع بالفعل مقابل Claude أو ChatGPT؟ شغّل زملاءك على تلك الخطة، دون أي تكلفة إضافية هنا.",
+        "creditsTitle": "رصيد Rerun",
+        "fallbackTitle": "حدث خطأ ما",
+        "reconnect": "إعادة الربط",
+        "switchModel": "تغيير النموذج",
+        "tryAgain": "إعادة المحاولة"
+    },
+    "feedback": {
+        "cancel": "إلغاء",
+        "categories": {
+            "did_not_follow": "لم يتبع طلبي",
+            "incomplete": "رد غير مكتمل",
+            "memory": "مشكلة في الذاكرة",
+            "not_factual": "غير صحيح من حيث الوقائع",
+            "other": "أخرى",
+            "too_slow": "بطيء جدًا",
+            "tool_error": "خطأ في أداة أو اتصال",
+            "ui_bug": "خلل في الواجهة",
+            "wrong_tool": "استُخدمت أداة أو تطبيق خاطئ"
+        },
+        "categoryLabel": "ما نوع المشكلة التي تريد الإبلاغ عنها؟",
+        "disclaimer": "إرسال هذا البلاغ يشارك هذه المحادثة مع فريق Rerun حتى نتمكن من تحسين زملائك.",
+        "negativePlaceholder": "ما الذي لم يرضِك في هذا الرد؟",
+        "negativeTitle": "تقديم ملاحظات سلبية",
+        "positivePlaceholder": "ما الذي أرضاك في هذا الرد؟",
+        "removeFailed": "تعذّرت إزالة ملاحظاتك",
+        "saveFailed": "تعذّر حفظ ملاحظاتك",
+        "skip": "تخطي",
+        "submit": "إرسال"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "لا يوجد جهاز لمساحة العمل هذه حاليًا. تحقق منها على {host}.",
+                "title": "Rerun لا يعمل"
+            },
+            "onboarding": {
+                "body": "أكمل إعدادها على {host}.",
+                "title": "يُعدّ Rerun مساحة العمل الخاصة بك"
+            }
+        },
+        "retry": "إعادة المحاولة",
+        "role": "Chief of Staff الخاص بك",
+        "unreachableBody": "تحقق من اتصالك وأعد المحاولة.",
+        "unreachableTitle": "تعذّر علينا الوصول إلى Rerun"
+    },
+    "header": {
+        "back": "رجوع",
+        "conversationCount": "{count, plural, zero {لا محادثات} one {محادثة واحدة} two {محادثتان} few {# محادثات} many {# محادثة} other {# محادثة}}",
+        "conversations": "المحادثات",
+        "coworkerDetails": "تفاصيل الزميل",
+        "earlier": "سابقًا",
+        "general": "عام",
+        "identityLabel": "{name}، {title}",
+        "newChat": "محادثة جديدة",
+        "newConversation": "محادثة جديدة",
+        "newThread": "سلسلة جديدة",
+        "sections": {
+            "needs-you": "بانتظارك",
+            "new": "غير مقروءة",
+            "running": "قيد التشغيل"
+        },
+        "threadCount": "{count, plural, zero {لا سلاسل} one {سلسلة واحدة} two {سلسلتان} few {# سلاسل} many {# سلسلة} other {# سلسلة}}",
+        "threads": "السلاسل"
+    },
+    "markdown": {
+        "code": "شيفرة",
+        "copied": "تم النسخ",
+        "copy": "نسخ",
+        "draft": "مسودة",
+        "image": "صورة"
+    },
+    "messages": {
+        "askRerun": "{named, select, yes {اسأل {name}} other {اسأل Chief of Staff}}",
+        "badResponse": "رد سيئ",
+        "compacting": "جارٍ الضغط",
+        "copy": "نسخ",
+        "goodResponse": "رد جيد",
+        "needsYourAnswer": "بانتظار إجابتك",
+        "open": "فتح {name}",
+        "photo": "صورة",
+        "regenerate": "إعادة الإنشاء",
+        "replyBelow": "ردّ أدناه.",
+        "runningTool": "جارٍ تشغيل {tool}",
+        "scrollToLatest": "الانتقال إلى أحدث رسالة",
+        "sentBy": "أرسلها {name}",
+        "relayedFor": "{named, select, yes {{name} نيابةً عن {person}} other {Chief of Staff نيابةً عن {person}}}",
+        "share": "مشاركة",
+        "showLess": "عرض أقل",
+        "showMore": "عرض المزيد",
+        "thinking": "يفكّر"
+    },
+    "origins": {
+        "copied": "تم النسخ",
+        "copy": "نسخ",
+        "installComplete": "اكتمل التثبيت",
+        "installGuideOf": "دليل تثبيت {name}",
+        "installStarted": "بدأ التثبيت",
+        "noPayload": "لا توجد حمولة",
+        "payload": "الحمولة",
+        "prompt": "التعليمات",
+        "promptOf": "تعليمات {name}",
+        "scheduledRun": "تشغيل مجدول",
+        "startedBy": "بدأ هذه الجلسة <strong>{name}</strong>",
+        "truncated": "مقتطع",
+        "viewDetails": "عرض التفاصيل",
+        "viewGuide": "عرض الدليل",
+        "viewPayload": "عرض الحمولة",
+        "viewPrompt": "عرض التعليمات",
+        "webhookReceived": "تم استلام خطاف ويب",
+        "jobEnded": "انتهت المهمة على #{computer}",
+        "viewReport": "عرض التقرير",
+        "reportOf": "ما أبلغ عنه #{computer}"
+    },
+    "paidSources": {
+        "count": "{count, plural, zero {لا مصادر} one {مصدر واحد} two {مصدران} few {# مصادر} many {# مصدرًا} other {# مصدر}}",
+        "emailsVerified": "تم التحقق من {valid} من {checked, plural, zero {# رسالة بريد} one {رسالة بريد واحدة} two {رسالتي بريد} few {# رسائل بريد} many {# رسالة بريد} other {# رسالة بريد}}",
+        "title": "المصادر"
+    },
+    "pane": {
+        "answerPlaceholder": "أجب {name}",
+        "attachFailed": "تعذّر إرفاق الملفات",
+        "defaultModel": "افتراضي · {model}",
+        "loadFailed": "تعذّر علينا تحميل هذه المحادثة.",
+        "loading": "جارٍ تحميل المحادثة",
+        "openBrowser": "فتح المتصفح",
+        "retry": "إعادة المحاولة",
+        "stopTaskFailed": "تعذّر إيقاف هذه المهمة",
+        "takeControl": "تولّي التحكم"
+    },
+    "queued": {
+        "attachmentsOnly": "مرفقات فقط",
+        "badge": "في قائمة الانتظار",
+        "remove": "إزالة الرسالة المنتظرة",
+        "sendNow": "إرسال الآن",
+        "sendNowStops": "إرسال الآن، يوقف التشغيل الحالي"
+    },
+    "runPhase": {
+        "label": "{name}: {phase}",
+        "thinking": "يفكّر",
+        "waking": "يستيقظ",
+        "working": "يعمل"
+    },
+    "screen": {
+        "disconnected": "انقطعت الشاشة",
+        "error": "الشاشة غير متاحة",
+        "handBackFailed": "تعذّرت إعادة المتصفح",
+        "resize": "تغيير حجم الشاشة"
+    },
+    "skillUpdateFailed": "تعذّر تحديث المهارة",
+    "takeover": {
+        "closing": "جارٍ الإغلاق…",
+        "done": "تم",
+        "openAgain": "فتح مجددًا",
+        "openBrowser": "فتح المتصفح",
+        "opened": "المتصفح مفتوح على سطح مكتب زميلك. عُد إلى هنا عندما تنتهي.",
+        "opensBrowser": "يفتح متصفح زميلك لتتحكم فيه.",
+        "opensSite": "يفتح {site} في متصفح زميلك لتتحكم فيه.",
+        "privacy": "ما تسجّل الدخول إليه يبقى في متصفح هذا الزميل على جهازك.",
+        "skip": "تخطي",
+        "skipTakeover": "تخطي التحكم في المتصفح"
+    },
+    "threadBranch": {
+        "needs": "بانتظارك",
+        "error": "خطأ",
+        "running": "قيد التشغيل",
+        "open": "فتح السلسلة {title}",
+        "opener": {
+            "schedule": "تشغيل مجدول · {name}",
+            "trigger": "خطاف ويب · {name}",
+            "askedBy": "طلبها {name}",
+            "askedByUnknown": "طلبها زميل آخر",
+            "started": "بدأ سلسلة"
+        }
+    },
+    "voice": {
+        "copyTranscript": "نسخ النص",
+        "hideTranscript": "إخفاء النص",
+        "pause": "إيقاف مؤقت",
+        "play": "تشغيل الرسالة الصوتية",
+        "recording": "جارٍ التسجيل",
+        "seek": "تقديم",
+        "sendFailed": "تعذّر إرسال هذا التسجيل.",
+        "sending": "جارٍ إرسال التسجيل",
+        "silent": "لم نتمكن من سماع أي شيء في هذا التسجيل.",
+        "transcript": "النص",
+        "waitingForMicrophone": "في انتظار الميكروفون…"
+    },
+    "browser": {
+        "close": "إغلاق",
+        "reload": "إعادة التحميل",
+        "pageActions": "إجراءات {host}",
+        "share": "مشاركة",
+        "openInBrowser": "فتح في المتصفح",
+        "copyLink": "نسخ الرابط",
+        "backToChat": "العودة إلى المحادثة",
+        "brand": "Rerun"
+    }
+}

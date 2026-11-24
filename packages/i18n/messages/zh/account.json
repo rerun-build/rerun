@@ -1,0 +1,93 @@
+{
+    "title": "账号",
+    "tabs": {
+        "profile": {
+            "label": "个人资料",
+            "description": "您的照片和姓名，即队友看到的样子。"
+        },
+        "signIn": {
+            "label": "登录方式",
+            "description": "您可以用来登录此账号的方式。"
+        },
+        "language": {
+            "label": "语言",
+            "description": "Rerun 与您交流时使用的语言。"
+        },
+        "desktop": {
+            "label": "桌面应用",
+            "description": "Rerun 应用在这台电脑上的行为。"
+        },
+        "delete": {
+            "label": "删除账号",
+            "description": "永久关闭您的 Rerun 账号。"
+        }
+    },
+    "language": {
+        "field": "语言",
+        "automatic": "自动",
+        "automaticHint": "跟随浏览器：{language}。",
+        "failed": "无法更改语言，请重试。"
+    },
+    "profile": {
+        "photo": "照片",
+        "photoHelp": "显示给您的队友，位于您的消息和光标旁。",
+        "dropPhoto": "拖放您的照片",
+        "changePhoto": "更换照片",
+        "uploadPhoto": "上传照片",
+        "removePhoto": "移除",
+        "name": "姓名",
+        "namePlaceholder": "例如 Ada Lovelace",
+        "save": "保存",
+        "notAnImage": "请选择图片文件。",
+        "nameUpdated": "姓名已更新",
+        "failed": "出了点问题，请重试。"
+    },
+    "signIn": {
+        "email": {
+            "title": "邮箱",
+            "empty": "未连接。添加邮箱后，可通过发送到收件箱的验证码登录。"
+        },
+        "phone": {
+            "title": "手机",
+            "empty": "未连接。添加号码后，可通过 WhatsApp 或短信验证码登录。",
+            "otherAccount": "此号码已用于登录另一个 Rerun 账号。更换号码后即可在此通过手机登录。"
+        },
+        "change": "更改",
+        "add": "添加",
+        "connect": "连接",
+        "disconnect": "断开连接",
+        "connected": "已连接",
+        "notConnected": "未连接。",
+        "onlyMethod": "{provider} 是此账号唯一已连接的登录方式。",
+        "disconnectTitle": "断开 {provider}？",
+        "disconnectDescription": "您将无法再使用 {provider} 登录此账号。您的其他登录方式仍可正常使用。",
+        "linkError": {
+            "identityTaken": "此 {provider} 账号已用于登录另一个 Rerun 账号。",
+            "denied": "未连接 {provider}。",
+            "failed": "无法连接 {provider}，请重试。"
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "共享的工作区",
+                "description": "您将退出与队友共享的所有工作区。他们会保留工作区及其中的同事和文件。"
+            },
+            "own": {
+                "title": "您自己的工作区",
+                "description": "只有您一人的工作区将永久停止：其同事会被关闭，其机器及文件会被删除。"
+            },
+            "signIn": {
+                "title": "登录",
+                "description": "您将在所有设备上退出登录。您的邮箱、Google 账号和手机号将被释放，以后可以重新注册。"
+            }
+        },
+        "blocker": {
+            "current": "其订阅仍会续费。请先在账单中取消订阅，再删除账号。",
+            "other": "其订阅仍会续费。请切换到该工作区并在账单中取消订阅，再删除账号。",
+            "openBilling": "打开账单"
+        },
+        "submit": "删除账号",
+        "failed": "无法删除您的账号。"
+    }
+}

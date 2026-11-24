@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "未找到表格",
+        "deleteRowsFailed": "删除行失败",
+        "saveRowFailed": "无法保存此行",
+        "deleteTableFailed": "删除表格失败",
+        "purgeTableFailed": "清空表格失败",
+        "addViewFailed": "无法添加此视图",
+        "deleteViewFailed": "无法删除此视图",
+        "unavailable": "数据库不可用",
+        "tryAgain": "重试",
+        "rowCount": "{count, plural, other {{total} 行}}",
+        "rowCountFound": "{count, plural, other {找到 {total} 行}}",
+        "noRows": "没有行",
+        "noSearchMatch": "没有与此搜索匹配的行。",
+        "tableEmpty": "此表格为空。"
+    },
+    "pagination": {
+        "count": "总数 <value>{count}</value>",
+        "rowsPerPage": "每页行数",
+        "perPage": "每页 {size} 行",
+        "range": "第 {range} 行，共 {total} 行",
+        "firstPage": "第一页",
+        "previousPage": "上一页",
+        "nextPage": "下一页",
+        "lastPage": "最后一页"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {已选择 # 项}}",
+        "deleteRowTitle": "删除此行？",
+        "deleteRowsTitle": "删除 {count} 行？",
+        "deleteRowDescription": "该行将从表格中永久删除，且无法撤销。",
+        "deleteRowsDescription": "这些行将从表格中永久删除，且无法撤销。",
+        "delete": "删除",
+        "clearSelection": "清除选择",
+        "search": "搜索",
+        "searchRows": "搜索行",
+        "clearSearch": "清除搜索",
+        "tableActions": "表格操作",
+        "export": "导出",
+        "purgeTable": "清空表格",
+        "deleteTable": "删除表格"
+    },
+    "viewBar": {
+        "allRows": "所有行",
+        "viewOptions": "{name} 的选项",
+        "editView": "编辑视图",
+        "deleteView": "删除视图",
+        "addView": "添加视图",
+        "addNewView": "添加新视图",
+        "expand": "展开",
+        "deleteViewTitle": "删除视图“{name}”？",
+        "deleteViewDescription": "只会删除该视图，表格中的行不受影响。"
+    },
+    "layouts": {
+        "table": "表格",
+        "list": "列表",
+        "gallery": "画廊",
+        "board": "看板"
+    },
+    "table": {
+        "selectAllRows": "选择本页所有行",
+        "selectRow": "选择行",
+        "sources": "来源"
+    },
+    "cell": {
+        "yes": "是",
+        "no": "否"
+    },
+    "board": {
+        "moveFailed": "无法移动此行",
+        "unavailable": "看板不可用",
+        "showMore": "再显示 {count} 项"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "已验证",
+                "detail": "邮箱存在"
+            },
+            "unconfirmed": {
+                "label": "未确认",
+                "detail": "邮箱未确认"
+            },
+            "invalid": {
+                "label": "无效",
+                "detail": "邮箱不存在"
+            }
+        },
+        "openSource": "打开来源",
+        "verified": "已验证",
+        "row": "行",
+        "cellLabel": "来源：{names}"
+    },
+    "shared": {
+        "emptyTitle": "暂无共享表格",
+        "emptyDescription": "工作区的每位同事都会读写这个数据库。当他们需要共同的记录（目录、队列、多位同事共同处理的清单）时，会在这里创建表格，您可以随时浏览。",
+        "unreachable": "无法连接此工作区的机器。"
+    }
+}

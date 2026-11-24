@@ -1,0 +1,355 @@
+{
+    "welcome": {
+        "title": "היי, מוכן להעביר את המשימה הראשונה שלך?",
+        "preparing": "מכינים את סביבת העבודה שלך..."
+    },
+    "header": {
+        "closeDisabled": "כדי לסגור את הצ'אט צריך לסיים את ההגדרה",
+        "move": "להזיז",
+        "moveChat": "להזיז את הצ'אט",
+        "position": {
+            "dockLeft": "לעגן לשמאל",
+            "dockRight": "לעגן לימין",
+            "float": "צף"
+        },
+        "newConversation": "שיחה חדשה",
+        "conversations": "שיחות"
+    },
+    "threads": {
+        "general": "כללי",
+        "back": "חזרה לכללי",
+        "untitled": "שיחה חדשה"
+    },
+    "history": {
+        "title": "שיחות",
+        "close": "לסגור",
+        "empty": "עדיין אין שרשורים."
+    },
+    "resize": "לשנות את גודל הצ'אט",
+    "modelPill": {
+        "hubReason": "הצ'אט הזה תמיד פועל על Rerun Balanced"
+    },
+    "nextSteps": {
+        "turnOn": "להפעיל את העמית שלי",
+        "yourInstallStarted": "ההתקנה של העמית שלך התחילה",
+        "installStarted": "ההתקנה של {name} התחילה",
+        "startInstallingMine": "להתחיל להתקין את העמית שלי",
+        "startInstalling": "להתחיל להתקין את {name}",
+        "startTrial": "להתחיל תקופת ניסיון",
+        "startPlan": "להתחיל את התוכנית שלי",
+        "starting": "מתחיל…",
+        "openChat": "לפתוח צ'אט",
+        "installFailed": "לא ניתן להתחיל את ההתקנה"
+    },
+    "notification": {
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} מחכה לך.} other {ה-Chief of Staff שלך מחכה לך.}}"
+    },
+    "dock": {
+        "tooltip": "{named, select, yes {לחפש או לשאול את {name}} other {לחפש או לשאול את ה-Chief of Staff שלך}} <key>{shortcut}</key>",
+        "failedReply": "משהו השתבש בזה."
+    },
+    "nudge": {
+        "approval": "נדרש האישור שלך",
+        "question": "נדרשת התשובה שלך",
+        "more": "+{count} נוספות",
+        "review": "לבדוק",
+        "answer": "לענות",
+        "later": "אחר כך"
+    },
+    "reply": {
+        "open": "לפתוח את השיחה",
+        "dismiss": "לסגור"
+    },
+    "voice": {
+        "listening": "מקשיב · לשחרר את מקש הרווח כדי לשלוח",
+        "transcribing": "מתמלל...",
+        "nothingHeard": "לא נשמע דבר בהקלטה הזו.",
+        "sendFailed": "לא ניתן לשלוח את ההודעה הקולית שלך."
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "מה רץ אתמול בלילה?",
+            "failedRun": "למה ההרצה הזו נכשלה?",
+            "newCoworker": "תבנה לי עמית חדש"
+        },
+        "ask": "{named, select, yes {לשאול את {name}} other {לשאול את ה-Chief of Staff שלך}}",
+        "send": "לשלוח"
+    },
+    "routines": {
+        "resumeFailed": "לא ניתן לחדש את {name}",
+        "pauseFailed": "לא ניתן להשהות את {name}",
+        "renameFailed": "לא ניתן לשנות את השם של {name}",
+        "runFailed": "לא ניתן להריץ את {name}",
+        "started": "{name} התחילה",
+        "emptyTitle": "עדיין אין שגרות",
+        "emptyDescription": "אפשר לבקש מעמית לעשות משהו לפי לוח זמנים (דוח יומי, סיכום שבועי) והוא יופיע כאן.",
+        "unknownCoworker": "עמית לא ידוע",
+        "options": "אפשרויות של {name}",
+        "rename": "לשנות שם",
+        "edit": "לערוך",
+        "runNow": "להריץ עכשיו"
+    },
+    "ownEntry": "אני יודע מה אני צריך",
+    "ownEntryPlaceholder": "אני יודע מה אני צריך…",
+    "gettingStarted": {
+        "title": "צעדים ראשונים",
+        "hide": "להסתיר",
+        "pillLabel": "צעדים ראשונים: {done} מתוך {total} הושלמו",
+        "steps": {
+            "phone": {
+                "title": "לאמת את מספר הטלפון שלך",
+                "description": "לאבטח את החשבון שלך ולקבל עדכונים מהעמיתים שלך ב-WhatsApp או ב-SMS."
+            },
+            "first_agent": {
+                "title": "ליצור את העמית הראשון שלך",
+                "description": "חבר צוות שעובד גם כשאתה לא כאן."
+            },
+            "ai_provider": {
+                "title": "לחבר את מנוי ה-AI שלך",
+                "description": "Claude, ChatGPT, Gemini או מפתח API משלך."
+            },
+            "invite": {
+                "title": "להזמין חבר צוות",
+                "description": "לשתף את העמיתים שלך עם האנשים שאתה עובד איתם."
+            },
+            "schedule": {
+                "title": "לתזמן משימה חוזרת",
+                "description": "להעביר את אחד העמיתים שלך לטייס אוטומטי."
+            },
+            "payment_method": {
+                "title": "להוסיף אמצעי תשלום",
+                "description": "כדי שהעמיתים שלך ימשיכו לפעול בסוף תקופת הניסיון. היום לא מחויב דבר."
+            }
+        },
+        "reward": {
+            "grantedTitle": "{days} ימים נוספו לתקופת הניסיון שלך",
+            "grantedDescription": "סביבת העבודה שלך מוכנה. תהנה מהזמן הנוסף.",
+            "claimingTitle": "מוסיפים {days} ימים לתקופת הניסיון שלך",
+            "claimingDescription": "רק רגע.",
+            "doneTitle": "סביבת העבודה שלך מוכנה",
+            "doneDescription": "העמיתים שלך יכולים לפעול עכשיו בעצמם.",
+            "lockedTitle": "לקבל עוד {days} ימי ניסיון בחינם",
+            "lockedDescription": "להשלים את {total} הצעדים שלמעלה. נותרו {remaining}."
+        },
+        "prompts": {
+            "first_agent": "תעזור לי ליצור את העמית הראשון שלי",
+            "ai_provider": "תעזור לי לחבר את מנוי ה-Claude או ה-ChatGPT שלי, או מפתח API",
+            "invite": "תעזור לי להזמין חבר צוות לסביבת העבודה שלי",
+            "schedule": "תתזמן משימה חוזרת לאחד העמיתים שלי"
+        }
+    },
+    "contact": {
+        "defaultSummary": "נתקעתי בהגדרת העמית הראשון שלי ואני צריך עזרה.",
+        "sentWithEmail": "נשלח לצוות Rerun. הם עונים בצ'אט וב-{email}.",
+        "sent": "נשלח לצוות Rerun. הם עונים בצ'אט.",
+        "openChat": "לפתוח את הצ'אט",
+        "stillStuck": "עדיין תקוע? מישהו מהצוות יכול לעזור.",
+        "send": "לשלוח לצוות",
+        "title": "לדבר עם מישהו ב-Rerun",
+        "description": "זה נשלח לצוות יחד עם החשבון שלך, והם עונים לך בצ'אט.",
+        "notNow": "לא עכשיו"
+    },
+    "template": {
+        "skipped": "דולג",
+        "buildingElse": "בונים משהו אחר",
+        "installing": "מתקינים את התבנית הזו",
+        "install": "להתקין את התבנית הזו",
+        "buildElse": "תבנה לי משהו אחר",
+        "buildElseDescription": "אף אחת מאלה לא מתאימה. תתחיל ממה שסיפרתי לך ותעצב את זה.",
+        "notNow": "לא עכשיו",
+        "somethingCustom": "משהו מותאם אישית",
+        "label": "תבנית",
+        "agents": "{count, plural, one {סוכן אחד} two {שני סוכנים} other {# סוכנים}}"
+    },
+    "question": {
+        "fallback": "שאלה אחת",
+        "skipped": "דולג",
+        "neither": "אף אחת",
+        "typed": "נענה בצ'אט"
+    },
+    "plan": {
+        "defaultTitle": "העמית הראשון שלך",
+        "skipped": "דולג",
+        "confirmed": "אושר",
+        "askedChanges": "התבקשו שינויים",
+        "goesAfter": "<label>מכוון אל:</label> {need}",
+        "thisWeek": "מה תקבל השבוע",
+        "previousBox": "ה-Box הקודם",
+        "nextBox": "ה-Box הבא",
+        "build": "לבנות את העמית שלי",
+        "change": "לשנות משהו",
+        "standingBy": "בהמתנה",
+        "lifeWorking": "עובד על זה",
+        "lifeDelivered": "נמסר לך",
+        "scene": {
+            "planned": "{name}, מתוכנן",
+            "plannedBox": "Box מתוכנן"
+        }
+    },
+    "starterPack": {
+        "title": "צוות ההתחלה שלך",
+        "subtitle": "אפשר לבחור עד {max}. כל אחד מגדיר את עצמו איתך ברגע שהוא על הלוח שלך.",
+        "fullTitle": "תקופת הניסיון שלך כוללת {max} עמיתים",
+        "fullDescription": "כדי לקחת את זה במקום, יש להסיר אחד. האחרים יוכלו להצטרף כשתעבור לתוכנית.",
+        "pickAtLeastOne": "יש לבחור לפחות אחד",
+        "hireOne": "לגייס את זה",
+        "hireMany": "לגייס את {count} אלה",
+        "progress": "נבחרו {count} מתוך {max}",
+        "picked": "נבחר",
+        "trialFull": "תקופת הניסיון מלאה",
+        "pick": "לבחור"
+    },
+    "agentTabs": {
+        "chat": "צ'אט",
+        "actions": "לטיפול",
+        "services": "אפליקציות",
+        "mcp": "MCP",
+        "skills": "מיומנויות",
+        "data": "מסד נתונים",
+        "memories": "ידע",
+        "files": "קבצים",
+        "published": "פורסם",
+        "scheduled": "שגרות",
+        "triggers": "טריגרים",
+        "tools": "יכולות",
+        "monitoring": "ניטור",
+        "logs": "יומנים",
+        "setup": "התקנה",
+        "settings": "הגדרות"
+    },
+    "arrival": {
+        "youPicked": "בחרת",
+        "by": "מאת {name}",
+        "gestures": {
+            "account": "חשבון",
+            "trial": "תקופת ניסיון",
+            "template": "תבנית",
+            "installed": "הותקן"
+        },
+        "headings": {
+            "account": {
+                "title": "להפעיל את {name}",
+                "description": "יוצרים חשבון ו-{name} מותקן בשבילך. בלי טופס הגדרה, בלי שאלות מראש."
+            },
+            "phone": {
+                "title": "עוד צעד אחרון",
+                "description": "להוסיף את מספר הטלפון שלך. {name} הבא בתור."
+            },
+            "trial": {
+                "title": "לנסות את {name} למשך {days} ימים",
+                "description": "{name} מותקן ברגע שתקופת הניסיון שלך מתחילה."
+            },
+            "purchase": {
+                "title": "לקבל את {name}",
+                "description": "תקופת הניסיון שלך פעילה. לתבנית הזו יש מחיר משלה, והיא מותקנת מיד אחר כך."
+            },
+            "installing": {
+                "title": "מתקינים את {name}",
+                "description": "אין צורך לעשות כלום. זה לוקח פחות מדקה."
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}}",
+        "working": "{count} עובדים עכשיו"
+    },
+    "trialGate": {
+        "plan": "כדי להמשיך, יש להתחיל את התוכנית שלך.",
+        "trial": "כדי להמשיך, יש להתחיל את תקופת הניסיון החינמית.",
+        "talk": "לדבר עם הצוות"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "ללא צורך בכרטיס",
+            "card_trial": "ניסיון חינם ל-{days} ימים",
+            "paid": "כבר נוצלה תקופת ניסיון"
+        },
+        "titleTrial": "להתחיל ניסיון חינם ל-{days} ימים",
+        "titlePlan": "להתחיל את התוכנית שלך",
+        "pitchPaidInstall": "{subject} מותקן מיד אחר כך. אפשר לבטל בכל עת מסביבת העבודה.",
+        "pitchPaidTeam": "הצוות שלך נבנה מיד אחר כך. אפשר לבטל בכל עת מסביבת העבודה.",
+        "pitchCardInstall": "נדרש כרטיס, $0 היום. {price} יחויבו ב-{date} אלא אם תבטל לפני כן. {subject} מותקן מיד אחר כך.",
+        "pitchCardTeam": "נדרש כרטיס, $0 היום. {price} יחויבו ב-{date} אלא אם תבטל לפני כן. הצוות שלך נבנה מיד אחר כך.",
+        "pitchCardlessInstall": "ללא צורך בכרטיס, $0 היום. כדי להמשיך ב-{price} לחודש, יש להוסיף כרטיס לפני {date}. {subject} מותקן מיד אחר כך.",
+        "pitchCardlessTeam": "ללא צורך בכרטיס, $0 היום. כדי להמשיך ב-{price} לחודש, יש להוסיף כרטיס לפני {date}. הצוות שלך נבנה מיד אחר כך.",
+        "includes": "תקופת הניסיון שלך כוללת {agents} עמיתים ו-{credits, plural, one {קרדיט אחד} two {2 קרדיטים} other {# קרדיטים}}.",
+        "thenPay": "לאחר מכן {price} עבור התבנית הזו, בחיוב נפרד.",
+        "dueToday": "לתשלום היום",
+        "withCard": "עם כרטיס",
+        "dueOn": "ב-{date}",
+        "then": "לאחר מכן",
+        "perMonth": "/חודש",
+        "today": "היום",
+        "todayInstall": "תקופת הניסיון שלך מתחילה ו-{subject} מותקן.",
+        "todayTeam": "תקופת הניסיון שלך מתחילה והצוות שלך נבנה.",
+        "reminder": "נשלח לך מייל, כך שזה לעולם לא יסתיים בהפתעה.",
+        "chargeCardless": "כדי להמשיך ב-{price} לחודש, יש להוסיף כרטיס. בלי כרטיס, העמיתים שלך נעצרים ושום דבר לא מחויב.",
+        "chargeCard": "{price} יחויבו בכרטיס שהוספת, ולאחר מכן מדי חודש. אם תבטל לפני כן, שום דבר לא יחויב.",
+        "startingTrial": "מתחילים את תקופת הניסיון שלך…",
+        "opening": "פותח…",
+        "startAndInstall": "להתחיל את תקופת הניסיון ולהתקין",
+        "startTrial": "להתחיל את תקופת הניסיון החינמית",
+        "startPlan": "להתחיל את התוכנית שלי"
+    },
+    "checkout": {
+        "started": "תקופת הניסיון התחילה",
+        "cardUsed": "הכרטיס הזה כבר שימש לתקופת ניסיון",
+        "startPlan": "להתחיל את התוכנית שלי",
+        "pending": "עדיין מחכים ל-Stripe",
+        "notStarted": "תקופת הניסיון לא התחילה. אי אפשר לבנות דבר עד שהיא תתחיל.",
+        "startTrial": "להתחיל תקופת ניסיון"
+    },
+    "purchase": {
+        "owned": "{title} שלך",
+        "recurring": "בחיוב חודשי",
+        "oneTime": "רכישה חד-פעמית",
+        "billedTo": "בחיוב של {name}, בנפרד מתוכנית ה-Rerun שלך. היא מותקנת ברגע שהתשלום עובר.",
+        "billedToWorkspace": "בחיוב של סביבת העבודה שלך, בנפרד מתוכנית ה-Rerun שלך. היא מותקנת ברגע שהתשלום עובר.",
+        "dueToday": "לתשלום היום",
+        "perMonth": "/חודש",
+        "opening": "פותח…",
+        "subscribe": "להירשם {price}",
+        "pay": "לשלם {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "{named, select, yes {היי, אני {name}} other {היי, אני ה-Chief of Staff שלך}}",
+        "greetingNamed": "{named, select, yes {היי {firstName}, אני {name}} other {היי {firstName}, אני ה-Chief of Staff שלך}}",
+        "greetingWithTeam": "{greeting}. הנה הצוות שלך.",
+        "emptySubtitle": "עדיין אין לך עמיתים. ספר לי על עבודה שהיית מעביר הלאה, ואבנה את הראשון.",
+        "buildPrompt": "תבנה לי עמית אשר ",
+        "buildFirst": {
+            "title": "לבנות את העמית הראשון שלי",
+            "description": "לתאר את העבודה במשפט אחד"
+        },
+        "template": {
+            "title": "להתחיל מתבנית",
+            "description": "עמיתים מוכנים לסוג העסק שלך",
+            "send": "תראה לי תבניות שמתאימות לעסק שלי"
+        },
+        "guide": {
+            "title": "איך זה עובד?",
+            "description": "עמיתים, Boxes ושגרות, בשתי דקות",
+            "send": "איך Rerun עובד?"
+        },
+        "checkWorking": {
+            "title": "מה {name} עושה?",
+            "description": "עובד עכשיו",
+            "send": "מה {mention} עושה עכשיו?"
+        },
+        "checkIdle": {
+            "title": "מה {name} עשה היום?",
+            "description": "להתעדכן בהרצות האחרונות שלו",
+            "send": "מה {mention} עשה היום?"
+        },
+        "handOff": {
+            "title": "לתת ל-{name} משימה",
+            "description": "אני מתדרך אותו ומלווה עד הסוף",
+            "prefill": "תבקש מ-{mention} "
+        },
+        "build": {
+            "title": "לבנות עמית חדש",
+            "description": "לעבודה שאף אחד בצוות עוד לא עושה"
+        }
+    }
+}

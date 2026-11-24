@@ -1,0 +1,696 @@
+{
+    "account": {
+        "emailChangeNeedsCurrentAddress": "لا يزال هذا التغيير بحاجة إلى تأكيد من عنوانك الحالي.",
+        "emailUpdated": "تم تحديث البريد الإلكتروني",
+        "phoneUpdated": "تم تحديث رقم الهاتف",
+        "connectFailed": "تعذّر ربط {provider}. حاول مرة أخرى.",
+        "disconnectFailed": "تعذّر فصل {provider}. حاول مرة أخرى.",
+        "onlySignInMethod": "{provider} هو طريقة تسجيل الدخول الوحيدة المرتبطة بهذا الحساب.",
+        "disconnected": "تم فصل {provider}",
+        "changeEmail": "تغيير البريد الإلكتروني",
+        "addEmail": "إضافة بريد إلكتروني",
+        "changePhone": "تغيير رقم الهاتف",
+        "addPhone": "إضافة رقم هاتف",
+        "googleNeedsBrowser": "افتح Rerun في متصفحك لربط Google."
+    },
+    "members": {
+        "title": "الأعضاء",
+        "description": "يدير المشرفون الفوترة والأعضاء والإعدادات. ويستخدم الأعضاء الزملاء.",
+        "adminOnly": "لا يمكن إدارة الأعضاء إلا لمشرف",
+        "seatsFullOne": "مساحة العمل لديك محدودة بمقعد واحد.",
+        "seatsFull": "مساحة العمل لديك محدودة بـ {count, plural, zero {# مقعد} one {مقعد واحد} two {مقعدين} few {# مقاعد} many {# مقعدًا} other {# مقعد}}.",
+        "fallbackLabel": "عضو",
+        "nowAdmin": "أصبح {name} مشرفًا",
+        "nowMember": "أصبح {name} عضوًا",
+        "removed": "تمت إزالة {name} من مساحة العمل",
+        "unknownUser": "مستخدم غير معروف",
+        "lastAdmin": "تحتاج مساحة العمل إلى مشرف واحد على الأقل",
+        "you": "أنت",
+        "adminBadge": "مشرف",
+        "manage": "إدارة {email}",
+        "makeAdmin": "تعيين كمشرف",
+        "makeMember": "تعيين كعضو",
+        "remove": "إزالة",
+        "removeConfirm": {
+            "title": "إزالة {email}؟",
+            "description": "سيفقد الوصول إلى مساحة العمل هذه وكل ما فيها فورًا. يمكنك دعوته مجددًا لاحقًا."
+        },
+        "revokeConfirm": {
+            "title": "إلغاء الدعوة الموجّهة إلى {email}؟",
+            "description": "سيتوقف رابط الدعوة عن العمل. يمكنك إرسال رابط جديد في أي وقت.",
+            "confirm": "إلغاء"
+        },
+        "invite": {
+            "assignLater": "التعيين لاحقًا",
+            "pending": "قيد الانتظار",
+            "revoke": "إلغاء الدعوة",
+            "linkHint": "أرسل هذا الرابط إلى {email}. يعمل له وحده، ولمرة واحدة.",
+            "copyLink": "نسخ رابط الدعوة",
+            "emailLabel": "الدعوة عبر البريد الإلكتروني",
+            "emailPlaceholder": "teammate@rerun.build",
+            "boxes": "Boxes",
+            "submit": "دعوة",
+            "sent": "تم إرسال الدعوة إلى {email}"
+        },
+        "scope": {
+            "all": {
+                "label": "كل Boxes",
+                "description": "كل Box مفتوح لمساحة العمل"
+            },
+            "assigned": {
+                "label": "لا شيء، التعيين لاحقًا",
+                "description": "فقط Boxes التي تمنحها له"
+            }
+        },
+        "boxes": {
+            "title": "Boxes الخاصة بـ {person}",
+            "back": "العودة إلى الأعضاء",
+            "adminsSeeAll": "يصل المشرفون إلى كل Box",
+            "sharedField": "Boxes المشتركة مع مساحة العمل",
+            "sharedAll": "يستخدم كل Box مفتوح للجميع",
+            "sharedAssigned": "يستخدم فقط Boxes المذكورة أدناه",
+            "limit": {
+                "title": "حصر {person} في Boxes المحددة؟",
+                "confirm": "حصر"
+            },
+            "group": "Boxes",
+            "empty": "لا يوجد Box بعد",
+            "everyone": {
+                "label": "الجميع",
+                "description": "يمكنه استخدامه، فالـ Box مفتوح لمساحة العمل"
+            },
+            "coworkers": "{count, plural, zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
+            "coworkersRestricted": "{count, plural, zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}} · أشخاص محددون فقط",
+            "accessTo": "الوصول إلى {box}",
+            "restrictBox": "تقييد هذا الـ Box",
+            "restrict": {
+                "title": "تقييد {box}؟",
+                "description": "يحتفظ بالوصول {person} والأشخاص المذكورون عليه مسبقًا والمشرفون فقط.",
+                "confirm": "تقييد"
+            },
+            "removeAccess": {
+                "title": "إزالة الوصول إلى {box}؟",
+                "confirm": "إزالة"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "الاسم مطلوب",
+        "invitesFailed": "تم إنشاء مساحة العمل، لكن تعذّر إرسال {count, plural, zero {# دعوة} one {دعوة واحدة} two {دعوتين} few {# دعوات} many {# دعوة} other {# دعوة}}. رقِّ خطتك لدعوة زملاء الفريق.",
+        "steps": {
+            "name": {
+                "title": "سمِّ مساحة العمل",
+                "description": "تجمع مساحة العمل Boxes والزملاء والفريق. يمكنك تغيير اسمها لاحقًا."
+            },
+            "icon": {
+                "title": "اختر أيقونة",
+                "description": "اختر رسمًا توضيحيًا لمساحة العمل. يمكنك تغييره لاحقًا."
+            },
+            "team": {
+                "title": "ادعُ فريقك",
+                "description": "أضف زملاء الفريق للتعاون في مساحة العمل هذه."
+            }
+        },
+        "name": "الاسم",
+        "namePlaceholder": "مثال: Acme Inc.",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "teammate@rerun.build",
+        "emailHint": "يتلقى زملاء الفريق دعوة بالبريد عند إنشاء مساحة العمل. تتطلب الدعوة خطة Team أو Scale.",
+        "add": "إضافة",
+        "removeMember": "إزالة {email}",
+        "open": "فتح مساحة العمل",
+        "back": "رجوع",
+        "continue": "متابعة",
+        "creating": "جارٍ الإنشاء",
+        "create": "إنشاء مساحة العمل",
+        "preview": {
+            "you": "أنت",
+            "namePlaceholder": "اسم مساحة العمل",
+            "solo": "فردي",
+            "members": "الأعضاء",
+            "owner": "المالك"
+        }
+    },
+    "deleteAccount": {
+        "title": "حذف حسابك؟",
+        "description": "سيتم تسجيل خروجك ولن تتمكن من تسجيل الدخول إلى هذا الحساب مجددًا. مساحات العمل التي أنت وحدك فيها ستتوقف نهائيًا. لا يمكن التراجع عن ذلك.",
+        "typeToConfirm": "اكتب <strong>{word}</strong> للتأكيد.",
+        "confirm": "حذف"
+    },
+    "deleteBox": {
+        "title": "حذف Box؟",
+        "holdsCoworkers": "لا يزال هذا الـ Box يضم {count, plural, zero {# زميل. انقلهم إلى Box آخر أو احذفهم أولًا.} one {زميلًا واحدًا. انقله إلى Box آخر أو احذفه أولًا.} two {زميلين. انقلهما إلى Box آخر أو احذفهما أولًا.} few {# زملاء. انقلهم إلى Box آخر أو احذفهم أولًا.} many {# زميلًا. انقلهم إلى Box آخر أو احذفهم أولًا.} other {# زميل. انقلهم إلى Box آخر أو احذفهم أولًا.}}",
+        "description": "لا يمكن التراجع عن هذا الإجراء. سيُزال الـ Box نهائيًا.",
+        "typeToConfirm": "اكتب <strong>{name}</strong> للتأكيد.",
+        "confirm": "حذف"
+    },
+    "claimBox": {
+        "title": "Box جديد",
+        "description": "سمِّ الـ Box، أو اختر اسمًا مقترحًا.",
+        "boxFirst": {
+            "heading": "أنشئ Box أولًا",
+            "description": "سينضم إليه زميلك الجديد، وأنت من يديره."
+        }
+    },
+    "boxExplainer": {
+        "title": "ما هو Box؟",
+        "points": {
+            "room": {
+                "label": "غرفة في مساحة العمل",
+                "description": "واحد لكل فريق أو عميل أو مشروع."
+            },
+            "home": {
+                "label": "مقرّ لعدة زملاء",
+                "description": "يعيش الزملاء ويعملون جنبًا إلى جنب داخله."
+            },
+            "shared": {
+                "label": "لا شيء معزول",
+                "description": "يتشارك كل الزملاء ملفات مساحة العمل وبياناتها."
+            },
+            "free": {
+                "label": "مجاني وفوري",
+                "description": "أنشئ منها ما يحتاجه العمل."
+            }
+        }
+    },
+    "phoneVerification": {
+        "title": "خطوة أخيرة",
+        "subtitle": "أضف رقم هاتفك."
+    },
+    "boxAccess": {
+        "title": "الوصول إلى {box}",
+        "description": "ينطبق الوصول على كل زميل في هذا الـ Box",
+        "unnamedBox": "Box بلا عنوان",
+        "visibilityField": "من يمكنه استخدام هذا الـ Box",
+        "visibility": {
+            "workspace": "الجميع في مساحة العمل",
+            "restricted": "أشخاص محددون فقط"
+        },
+        "people": "الأشخاص",
+        "addPeople": "إضافة أشخاص",
+        "emptyRestricted": "لا يستخدم هذا الـ Box حاليًا إلا المشرفون.",
+        "emptyOpen": "حدّد أشخاصًا ليتمكنوا من إدارة هذا الـ Box.",
+        "restrict": {
+            "title": "تقييد {box}؟",
+            "descriptionWithPeople": "يحتفظ بالوصول الأشخاص المذكورون هنا والمشرفون فقط.",
+            "descriptionEmpty": "يحتفظ المشرفون وحدهم بالوصول إلى أن تضيف أشخاصًا.",
+            "confirm": "تقييد"
+        },
+        "admin": "مشرف",
+        "createdBox": "أنشأ هذا الـ Box",
+        "accessOf": "وصول {person}",
+        "remove": {
+            "title": "إزالة {person}؟",
+            "confirm": "إزالة",
+            "ariaLabel": "إزالة {person}"
+        },
+        "add": {
+            "title": "إضافة أشخاص",
+            "back": "العودة إلى الوصول",
+            "peopleField": "الأشخاص",
+            "placeholder": "اختر زملاء الفريق",
+            "search": "ابحث بالاسم أو البريد الإلكتروني",
+            "empty": "لم يتبقَّ أحد لإضافته",
+            "accessField": "الوصول",
+            "submit": "إضافة",
+            "submitMany": "إضافة {count, plural, zero {# شخص} one {شخص واحد} two {شخصين} few {# أشخاص} many {# شخصًا} other {# شخص}}"
+        },
+        "levels": {
+            "none": {
+                "label": "بلا وصول",
+                "description": "لا يرى هذا الـ Box"
+            },
+            "use": {
+                "label": "يمكنه الاستخدام",
+                "description": "الدردشة مع زملائه ورؤية عملهم"
+            },
+            "manage": {
+                "label": "يمكنه الإدارة",
+                "description": "وأيضًا تعديل الزملاء ونقلهم وحذفهم"
+            }
+        },
+        "teammate": "زميل فريق",
+        "adminOnly": "لا يمكن تغيير من يصل إلى Box إلا لمشرف",
+        "adminsAlways": "يملك المشرفون الوصول دائمًا",
+        "manageReason": "لا يمكن تغيير ذلك إلا لمشرف أو لمدير هذا الـ Box",
+        "outcome": {
+            "admin": "يحتفظ المشرفون بالوصول إلى كل Box؛ هذا يزيل السطر فقط.",
+            "restricted": "سيفقد الوصول إلى هذا الـ Box وزملائه فورًا.",
+            "manage": "سيتوقف عن إدارة هذا الـ Box. يبقى مفتوحًا للجميع في مساحة العمل.",
+            "use": "يزول وصوله الخاص. يبقى الـ Box مفتوحًا للجميع في مساحة العمل.",
+            "scope": "سيحتفظ فقط بـ Boxes المذكورة أدناه. كل Box مفتوح للجميع يخرج من متناوله فورًا.",
+            "level": "سيفقد الوصول إلى هذا الـ Box وزملائه فورًا."
+        }
+    },
+    "newBox": {
+        "heading": "سمِّ الـ Box الجديد",
+        "description": "الـ Box اسم على لوحتك، ومكان لترتيب زملائك حسب القسم.",
+        "creating": "جارٍ الإنشاء…",
+        "createNamed": "إنشاء {name}",
+        "create": "إنشاء Box",
+        "nameLabel": "اسم الـ Box",
+        "failed": "تعذّر إنشاء الـ Box",
+        "placeholderName": "التسويق",
+        "suggestedNames": {
+            "clients": "العملاء",
+            "marketing": "التسويق",
+            "newBusiness": "أعمال جديدة",
+            "operations": "العمليات",
+            "finance": "المالية",
+            "personal": "شخصي",
+            "store": "المتجر",
+            "customerCare": "خدمة العملاء",
+            "supplyChain": "سلسلة الإمداد",
+            "product": "المنتج",
+            "engineering": "الهندسة",
+            "support": "الدعم",
+            "sales": "المبيعات",
+            "accounts": "الحسابات",
+            "recruiting": "التوظيف",
+            "listings": "القوائم",
+            "legal": "القانونية",
+            "compliance": "الامتثال",
+            "content": "المحتوى",
+            "business": "الأعمال",
+            "community": "المجتمع",
+            "sponsors": "الرعاة",
+            "work": "العمل",
+            "projects": "المشاريع",
+            "admin": "الإدارة",
+            "ops": "التشغيل"
+        }
+    },
+    "renameBox": {
+        "title": "إعادة تسمية Box",
+        "description": "الاسم الذي تقرؤه على اللوحة. لا يعتمد عليه أي شيء آخر.",
+        "nameLabel": "الاسم",
+        "placeholder": "Box بلا عنوان",
+        "submit": "إعادة التسمية",
+        "nameRequired": "الاسم مطلوب",
+        "nameTooLong": "اجعله أقل من {max} حرفًا"
+    },
+    "newAgent": {
+        "title": "زميل جديد",
+        "description": "صِف المهمة، أو ابدأ من اقتراح أو قالب.",
+        "headingNamed": "ماذا يجب أن يفعل {name}؟",
+        "heading": "ماذا يجب أن يفعل زميلك الجديد؟",
+        "suggestionsForBox": "أو ابدأ من زميل مختار لـ {boxName}"
+    },
+    "renameAgent": {
+        "title": "إعادة تسمية الزميل",
+        "description": "الاسم الظاهر على اللوحة وفي الدردشات. ويتبعه الـ @handle.",
+        "nameLabel": "الاسم",
+        "submit": "إعادة التسمية",
+        "nameRequired": "الاسم مطلوب",
+        "nameTooLong": "اجعله أقل من {max} حرفًا"
+    },
+    "deleteAgent": {
+        "title": "حذف هذا الزميل؟",
+        "description": "سيؤدي هذا إلى حذف الزميل وبياناته على المحرك نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+        "typeToConfirm": "اكتب <b>{name}</b> للتأكيد.",
+        "confirm": "حذف"
+    },
+    "importAgent": {
+        "title": "استيراد زميل",
+        "description": "ينتقل وكيلك إلى هنا بنفسه، مع مهاراته ومهامه وذاكرته.",
+        "connectorUrl": "رابط الموصل",
+        "copyConnectorUrl": "نسخ رابط الموصل",
+        "pasteIn": "الصق في {source}",
+        "expires": "تنتهي صلاحيته خلال 24 ساعة.",
+        "copyPrompt": "نسخ الموجّه",
+        "otherSource": "آخر",
+        "grokConnectorStep": "أضف الرابط في grok.com/connectors كموصل مخصص، ثم الصق الموجّه."
+    },
+    "agentShare": {
+        "unavailable": "رابط المشاركة هذا لم يعد متاحًا",
+        "titleNamed": "إضافة {name}",
+        "title": "إضافة هذا الزميل",
+        "description": "راجع ما يفعله هذا الزميل، ثم ضعه على لوحتك.",
+        "sentBy": "أرسل لك {name} نسخة من هذا الزميل. سيعمل على Box الخاص بك.",
+        "sentBySomeone": "أرسل لك أحدهم نسخة من هذا الزميل. سيعمل على Box الخاص بك."
+    },
+    "templateDeepLink": {
+        "unavailable": "رابط القالب هذا لم يعد متاحًا",
+        "titleNamed": "تثبيت \"{title}\"",
+        "title": "تثبيت هذا القالب",
+        "description": "راجع ما يثبّته هذا القالب، ثم ضع زملاءه على لوحتك."
+    },
+    "createTemplate": {
+        "defaultDescription": "أنشئ مسودة قالب من بيئتك التجريبية. يراجعه فريق Rerun قبل نشره.",
+        "title": "قالب جديد",
+        "doneLabel": "فتح القالب",
+        "titleField": "العنوان",
+        "titlePlaceholder": "مثال: مندوب مبيعات خارجية",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · يُشتق الرابط العام من العنوان.",
+        "titleRequired": "العنوان مطلوب",
+        "continue": "متابعة"
+    },
+    "expertProfile": {
+        "title": "ملفك العام",
+        "submit": "حفظ ونشر",
+        "submitting": "جارٍ الحفظ…",
+        "saved": "تم تحديث ملفك العام."
+    },
+    "apiKeys": {
+        "title": "مفاتيح API",
+        "description": "اربط Claude Code أو أي عميل MCP بمساحة العمل هذه.",
+        "connectSection": "ربط عميل",
+        "keysSection": "المفاتيح",
+        "docsLink": "مفاتيح API",
+        "newKeyName": "اسم المفتاح الجديد",
+        "newKeyPlaceholder": "Claude Code، MacBook",
+        "create": "إنشاء مفتاح",
+        "revoked": "تم إبطال {name}",
+        "adminOnly": "لا يمكن إدارة مفاتيح API إلا لمشرف",
+        "empty": "لا يوجد مفتاح بعد. يمنح المفتاح الوصول إلى مساحة العمل كاملة، فتعامل معه ككلمة مرور.",
+        "lastUsed": "استُخدم {time}",
+        "neverUsed": "لم يُستخدم قط",
+        "revokeThisKey": "إبطال هذا المفتاح",
+        "created": {
+            "warning": "انسخ هذا المفتاح الآن. لن يظهر مرة أخرى.",
+            "copyKey": "نسخ المفتاح",
+            "dismiss": "نسخته"
+        },
+        "revoke": {
+            "title": "إبطال هذا المفتاح؟",
+            "description": "سيتوقف {name} عن العمل فورًا، وكل ما يعمل به سيفقد وصوله إلى مساحة العمل. لا يمكن استعادة المفتاح، لكن يمكنك إنشاء مفتاح آخر.",
+            "descriptionUnnamed": "سيتوقف هذا المفتاح عن العمل فورًا، وكل ما يعمل به سيفقد وصوله إلى مساحة العمل. لا يمكن استعادة المفتاح، لكن يمكنك إنشاء مفتاح آخر.",
+            "confirm": "إبطال"
+        }
+    },
+    "copy": {
+        "snippet": "نسخ {label}",
+        "fullGuide": "دليل الإعداد الكامل"
+    },
+    "servers": {
+        "title": "الخوادم",
+        "description": "الجهاز الذي يعمل عليه زملاؤك. واحد لكل مساحة عمل.",
+        "connected": "متصل",
+        "unreachable": "تعذّر الوصول",
+        "runningSummary": "{address} · {count, plural, zero {لا زملاء يعملون} one {زميل واحد يعمل} two {زميلان يعملان} few {# زملاء يعملون} many {# زميلًا يعملون} other {# زميل يعملون}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, zero {لا زملاء يعملون} one {زميل واحد يعمل} two {زميلان يعملان} few {# زملاء يعملون} many {# زميلًا يعملون} other {# زميل يعملون}} · {commit}",
+        "unreachableSummary": "{address} · لا يستطيع التطبيق الوصول إليه الآن",
+        "thisWorkspace": "خادم مساحة العمل هذه",
+        "remove": "إزالة",
+        "manualSection": "إدخال خادم يدويًا",
+        "address": "العنوان",
+        "apiKey": "مفتاح API",
+        "apiKeyPlaceholder": "RERUN_API_KEY الخاص بالمحرك",
+        "back": "رجوع",
+        "connect": "ربط",
+        "addSection": "إضافة خادم",
+        "addIntro": "يعمل زملاؤك على جهاز تملكه. شغّل هذا الأمر عليه، مع تثبيت Docker. سيتصل تلقائيًا.",
+        "publicAddress": "العنوان الذي يصل إليه التطبيق عبره (اختياري)",
+        "copyCommand": "نسخ الأمر",
+        "waiting": "في انتظار الخادم. يعمل الأمر مرة واحدة، لمدة 15 دقيقة.",
+        "enterManually": "إدخال العنوان والمفتاح",
+        "add": "إضافة خادم",
+        "removed": "تمت إزالة الخادم",
+        "confirmRemove": {
+            "title": "إزالة هذا الخادم؟",
+            "description": "سيتوقف زملاؤك عن الرد حتى يُربط خادم من جديد. كل ما يعرفونه يبقى على الجهاز: أعد ربطه لاستعادتهم.",
+            "confirm": "إزالة"
+        }
+    },
+    "aiProviders": {
+        "title": "مزوّدو الذكاء الاصطناعي",
+        "description": "الخطط ومفاتيح API التي يعمل بها زملاؤك."
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "ما يعرفه كل زميل في مساحة العمل هذه عن شركتك، والملفات والجداول التي يتشاركونها."
+    },
+    "clearMemories": {
+        "title": "مسح كل الذكريات؟",
+        "description": "سيؤدي هذا إلى حذف كل ذكريات هذا الزميل نهائيًا. لا يمكن التراجع عن ذلك.",
+        "confirm": "مسح الكل"
+    },
+    "deleteTable": {
+        "title": "حذف الجدول “{table}”؟",
+        "description": "سيؤدي هذا إلى حذف الجدول بالكامل وكل صفوفه نهائيًا. لا يمكن التراجع عن ذلك.",
+        "confirm": "حذف"
+    },
+    "purgeTable": {
+        "title": "تفريغ الجدول “{table}”؟",
+        "description": "سيؤدي هذا إلى حذف كل صفوف الجدول، بما فيها الصفوف المخفية بالبحث الحالي. يبقى الجدول وأعمدته. لا يمكن التراجع عن ذلك.",
+        "confirm": "تفريغ"
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "tabs": {
+            "coworkers": "الزملاء",
+            "account": "الحساب"
+        },
+        "descriptions": {
+            "coworkers": "ما يستحق مقاطعتك من أجله. يُحفظ تلقائيًا.",
+            "account": "اختر رسائل الحساب التي تتلقاها."
+        },
+        "pickCoworker": "اختر زميلًا"
+    },
+    "notificationPermission": {
+        "title": "هل تريد إشعارًا عندما ينتهي زميلك؟",
+        "description": "يواصل العمل بعد إغلاق هذا التبويب. سنخبرك عندما يحتاج إليك.",
+        "enable": "تفعيل الإشعارات",
+        "later": "ليس الآن"
+    },
+    "confirm": {
+        "confirm": "حذف"
+    },
+    "closeRunningTab": {
+        "title": "إغلاق هذه المحادثة؟",
+        "description": "لا يزال الوكيل يعمل على هذه المحادثة. إغلاق التبويب لن يوقف التشغيل: سيستمر في الخلفية.",
+        "confirm": "إغلاق"
+    },
+    "shortcuts": {
+        "title": "اختصارات لوحة المفاتيح",
+        "description": "تنقّل في Rerun بسرعة أكبر مع هذه الاختصارات.",
+        "groups": {
+            "general": "عام",
+            "chat": "الدردشة",
+            "files": "الملفات"
+        },
+        "actions": {
+            "controlCenter": "فتح مركز التحكم",
+            "askRerun": "{named, select, yes {اسأل {name}، خارج الدردشة} other {اسأل Chief of Staff، خارج الدردشة}}",
+            "holdToTalk": "{named, select, yes {اضغط مطولًا للتحدث إلى {name}} other {اضغط مطولًا للتحدث إلى Chief of Staff}}",
+            "searchInPage": "البحث في الصفحة",
+            "newConversation": "محادثة جديدة",
+            "closeTab": "إغلاق التبويب النشط",
+            "sendMessage": "إرسال الرسالة",
+            "newLine": "سطر جديد",
+            "previousFile": "الملف السابق",
+            "nextFile": "الملف التالي"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "قارن القيم عبر الأعمدة.",
+            "list": "صفوف تُقرأ بالاسم: أشخاص، شركات، رسائل.",
+            "gallery": "صفوف تُعرف بصورة: منتجات، عروض.",
+            "board": "صفوف تنتقل بين الحالات: مسار مبيعات، مهام."
+        },
+        "editTitle": "تعديل العرض",
+        "newTitle": "عرض جديد",
+        "description": "عرض لـ <mono>{table}</mono>. يراه كل من يفتح هذا الجدول، ويمكن للزميل رسمه في الدردشة.",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: مسار المبيعات",
+        "layout": "التخطيط",
+        "columns": "الأعمدة",
+        "columnsHint": "تبقى الأعمدة غير المحددة في الجدول، وتُخفى من هذا العرض فقط.",
+        "groupBy": "التجميع حسب",
+        "roles": {
+            "title": "العنوان",
+            "subtitle": "العنوان الفرعي",
+            "image": "الصورة",
+            "badge": "شارة",
+            "value": "القيمة",
+            "date": "التاريخ"
+        },
+        "pictureShape": "شكل الصورة",
+        "shapes": {
+            "square": "مربع",
+            "landscape": "أفقي",
+            "portrait": "عمودي"
+        },
+        "sortBy": "الترتيب حسب",
+        "insertionOrder": "ترتيب الإدراج",
+        "ascending": "تصاعدي",
+        "descending": "تنازلي",
+        "formats": "التنسيقات",
+        "formatsHint": "كيف تُقرأ كل قيمة: سعر، تاريخ، تقييم، حالة.",
+        "formatOf": "تنسيق {column}",
+        "plainFormat": "عادي",
+        "colors": "الألوان",
+        "colorsBoardHint": "تأتي الأعمدة المذكورة هنا أولًا، بهذا الترتيب.",
+        "emptyValue": "فارغ",
+        "colorOf": "لون {value}",
+        "colorOfEmpty": "لون القيم الفارغة",
+        "automaticColor": "تلقائي",
+        "create": "إنشاء العرض",
+        "none": "لا شيء",
+        "pickColumn": "اختر عمودًا",
+        "preview": "معاينة",
+        "nameRequired": "سمِّ العرض",
+        "titleColumnRequired": "اختر العمود الذي يُسمّى به كل عنصر",
+        "groupByRequired": "اختر العمود الذي تصبح قيمه أعمدة"
+    },
+    "engineWaitlist": {
+        "title": "وصلنا إلى الطاقة القصوى حاليًا",
+        "subtitle": "انضم اليوم عدد كبير من الفرق وكل الأجهزة مشغولة. أنت على قائمة الانتظار: إجاباتك محفوظة، وستُفتح هذه الصفحة تلقائيًا فور توفر جهاز.",
+        "signedInAs": "مسجّل الدخول باسم <b>{email}</b>",
+        "signOut": "تسجيل الخروج"
+    },
+    "sandboxReactivation": {
+        "title": "طلب إعادة التفعيل",
+        "description": "تعود بيئتك التجريبية بعد موافقتنا على طلبك.",
+        "asideTitle": "لماذا أُرشفت بيئتي التجريبية؟",
+        "points": {
+            "archived": {
+                "label": "أُرشفت بعد 30 يومًا دون استخدام",
+                "description": "تُبقي البيئة التجريبية جهازًا قيد التشغيل، فإن لم يفتحها أحد تُعيده."
+            },
+            "kept": {
+                "label": "لم يُحذف أي شيء",
+                "description": "زملاؤك وذاكرتهم وملفاتهم محفوظة مع الأرشيف."
+            },
+            "reviewed": {
+                "label": "نراجع كل طلب",
+                "description": "أخبرنا بما تبنيه وسنعيد بيئتك التجريبية."
+            },
+            "restored": {
+                "label": "تعود كما تركتها تمامًا",
+                "description": "بعد الموافقة، تستغرق الاستعادة بضع دقائق."
+            }
+        },
+        "noteLabel": "ماذا تخطط لبنائه؟",
+        "noteHint": "جملة أو جملتان تكفيان.",
+        "submit": "إرسال الطلب",
+        "failed": "تعذّر إرسال طلبك. يُرجى المحاولة مرة أخرى."
+    },
+    "paidApp": {
+        "slotAdded": "تمت إضافة الحصة إلى خطتك.",
+        "slotAddedTrial": "تمت إضافة الحصة، بسعر {price} خلال الفترة التجريبية.",
+        "slotRemoved": "تمت إعادة الحصة. تبقى قابلة للاستخدام حتى التجديد التالي."
+    },
+    "linkedinPro": {
+        "description": "حسابات LinkedIn التي يعمل بها زملاؤك.",
+        "connectDescription": "اربط حساب LinkedIn الذي يعمل به زملاؤك.",
+        "approvalNotSeen": "لم يرصد LinkedIn الموافقة بعد. اضغط نعم في التطبيق، ثم حاول مرة أخرى.",
+        "codeResent": "رمز جديد في الطريق إليك.",
+        "connect": {
+            "title": "ربط LinkedIn",
+            "reconnectTitle": "إعادة ربط LinkedIn",
+            "back": "العودة إلى LinkedIn Pro"
+        },
+        "checkpoint": {
+            "title": "أكّد أنه أنت",
+            "hint": "يطلب LinkedIn خطوة ثانية",
+            "cancel": "إلغاء تسجيل الدخول"
+        }
+    },
+    "whatsappPro": {
+        "description": "أرقام WhatsApp التي يعمل بها زملاؤك.",
+        "connectDescription": "اربط رقم WhatsApp الذي يعمل به زملاؤك.",
+        "connect": {
+            "title": "ربط WhatsApp",
+            "reconnectTitle": "إعادة ربط WhatsApp",
+            "back": "العودة إلى WhatsApp Pro"
+        },
+        "link": {
+            "title": "ربط الهاتف",
+            "hint": "يضيف WhatsApp تطبيق Rerun كجهاز مرتبط",
+            "cancel": "إلغاء الربط"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "شغّل زملاءك على خطة Claude أو ChatGPT الخاصة بك",
+        "titleWithoutClaude": "شغّل زملاءك على خطة ChatGPT أو مفتاح API",
+        "back": "رجوع",
+        "connect": "ربط",
+        "or": "أو",
+        "useApiKey": "استخدام مفتاح API",
+        "plans": {
+            "claude": "Claude Pro أو Max",
+            "codex": "ChatGPT Plus أو Pro"
+        },
+        "decline": {
+            "cloud": "أفضّل البقاء على أرصدة Rerun",
+            "selfHosted": "أفضّل البقاء على OpenRouter"
+        },
+        "offer": {
+            "title": "يعمل Rerun بشكل أفضل مع اشتراك Claude أو ChatGPT",
+            "description": "اربطه وسيعمل زملاؤك على الخطة التي تدفع ثمنها أصلًا.",
+            "titleWithoutClaude": "يعمل زملاؤك على ذكائك الاصطناعي الخاص",
+            "descriptionWithoutClaude": "اربط خطة ChatGPT أو مفتاح API، وسيعمل زملاؤك عليه."
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "كل شخص يجلب خطته",
+                "description": "يربط كل زميل فريق الخطة التي يدفع ثمنها. لا حساب يُتداول بينكم."
+            },
+            "password": {
+                "label": "لا يرى Rerun كلمة مرورك أبدًا",
+                "description": "توافق على ذلك في صفحة Claude أو OpenAI نفسها، ولا مكان آخر."
+            },
+            "unplug": {
+                "label": "افصله متى شئت",
+                "descriptionCloud": "افصله بنقرة واحدة وسيعود زملاؤك إلى أرصدة Rerun.",
+                "descriptionSelfHosted": "افصله بنقرة واحدة وسيعود زملاؤك إلى مفتاح OpenRouter الخاص بك."
+            }
+        },
+        "board": {
+            "title": "كل زميل على اتصال من اتصالاتك",
+            "description": "اشتراكان ومفتاح API، جنبًا إلى جنب على اللوحة نفسها.",
+            "crew": {
+                "sales": "المبيعات",
+                "customer_support": "دعم العملاء",
+                "accounting": "المحاسبة"
+            }
+        },
+        "plan": {
+            "title": "اربط خطة {name}",
+            "linked": "يعمل زملاؤك على {name}",
+            "switching": "ينتقل زملاؤك إلى {name}"
+        },
+        "key": {
+            "title": "استخدام مفتاح API",
+            "detail": "يعمل زملاؤك على مفتاحك، ويحاسبك مزوّده حسب الرموز.",
+            "opencodeTitle": "ربط OpenCode",
+            "opencodeDetail": "الصق مفتاح OpenCode: تعمل نماذج Go على خطتك، ونماذج Console على رصيدك.",
+            "field": "مفتاح API",
+            "placeholder": "الصق مفتاحك",
+            "add": "إضافة المفتاح",
+            "connecting": "جارٍ الربط…",
+            "failed": "تعذّرت إضافة المفتاح",
+            "somethingWentWrong": "حدث خطأ ما. يُرجى المحاولة مرة أخرى."
+        },
+        "connected": {
+            "title": "تم ربط {name}",
+            "planDetail": "يعمل زملاؤك الآن على خطة {name} الخاصة بك.",
+            "opencodeDetail": "يعمل زملاؤك الآن على خطة OpenCode Go الخاصة بك.",
+            "keyDetail": "يعمل زملاؤك الآن على هذا المفتاح.",
+            "done": "تم"
+        }
+    },
+    "boxPicker": {
+        "title": "اختر Box",
+        "description": "ينضم إليه الزميل الجديد، في مكان شاغر.",
+        "coworkers": "{count, plural, =0 {لا يوجد زميل بعد} zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}"
+    },
+    "mcpConnect": {
+        "otherClient": "آخر",
+        "labels": {
+            "terminal": "الطرفية",
+            "shellProfile": "ملف إعداد الـ Shell",
+            "coworkerPanel": "لوحة الزميل، MCP، جديد",
+            "serverUrl": "رابط الخادم",
+            "header": "الترويسة",
+            "stdioClients": "العملاء الذين يدعمون stdio فقط"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI. لا يقبل تطبيق ChatGPT إلا اتصالات OAuth، لذا لن يفيدك المفتاح هناك.",
+            "coworkerReach": "يمنح أحد زملائك الصلاحيات نفسها على مساحة العمل هذه التي يملكها عميل خارجي."
+        }
+    }
+}

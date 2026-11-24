@@ -1,0 +1,655 @@
+{
+    "hero": {
+        "title": {
+            "lead": "雇佣 <keep>AI <chip>同事</chip></keep>",
+            "tail": "他们像您一样工作。"
+        },
+        "subtitle": "聊天机器人告诉您该做什么，AI 同事直接把事情做完。把您已付费的大模型接入 Rerun，然后给他们分配工作。",
+        "cta": "以 {price} 开始 5 天试用",
+        "productHuntAlt": "在 Product Hunt 上支持 Rerun",
+        "trust": "{count, number}+ 位用户信赖 Rerun 来经营业务",
+        "pillLeads": {
+            "jobs": "雇佣一位",
+            "tasks": "雇佣同事来",
+            "sectors": "Rerun 服务于"
+        },
+        "tiles": {
+            "tour-research": {
+                "job": "B2B 销售代表",
+                "pill": "销售",
+                "task": "寻找新客户"
+            },
+            "tour-social": {
+                "job": "社群经理",
+                "pill": "社群经理",
+                "task": "发布社交媒体"
+            },
+            "tour-docs": {
+                "job": "客户支持",
+                "pill": "客户支持",
+                "task": "回复您的邮件"
+            },
+            "tour-invoices": {
+                "job": "行政助理",
+                "pill": "行政助理",
+                "task": "处理行政事务"
+            },
+            "tour-watch": {
+                "job": "市场分析师",
+                "pill": "市场分析师",
+                "task": "监控竞争对手"
+            },
+            "tour-writer": {
+                "job": "内容营销"
+            },
+            "tour-desk": {
+                "job": "营收分析师"
+            }
+        },
+        "boxes": {
+            "tour-marketing": "营销",
+            "tour-sales": "销售",
+            "tour-ops": "行政"
+        },
+        "handoffs": {
+            "handoff-marketing-sales": "昨天的帖子带来了 14 个咨询，其中四个留了工作邮箱。",
+            "handoff-marketing-ops": "Acme 的案例研究周四上线。他们的发票到了吗？"
+        },
+        "sources": {
+            "lead": "使用您已付费的订阅",
+            "router": "或通过<router></router>使用任何其他模型"
+        },
+        "tools": {
+            "title": "<chip>同事</chip>使用您的工具工作。",
+            "count": "{count, number}+ 项集成"
+        },
+        "screen": {
+            "hint": {
+                "tap": "轻点一位同事，看它工作",
+                "click": "点击一位同事看它工作，或询问您的 Chief of Staff"
+            },
+            "inboxSettings": "偏好设置：在您自己的工作区中可用",
+            "useCases": {
+                "find-leads": {
+                    "label": "寻找潜在客户",
+                    "ask": "找出法国刚开始招聘销售人员的 SaaS 公司。",
+                    "request": "去掉 HubSpot 里已有的公司后，还剩 26 家。我该如何排序？"
+                },
+                "post-on-social": {
+                    "label": "发布社交媒体",
+                    "ask": "把本周的博客文章改写成 X 和 Instagram 的帖子。",
+                    "request": "这个帖子串有两个开头。哪个更像您的风格？"
+                },
+                "reply-to-customers": {
+                    "label": "回复客户",
+                    "ask": "每天早上查看客服收件箱，能起草的都起草好。",
+                    "request": "发送 31 条已起草的回复"
+                },
+                "handle-admin": {
+                    "label": "处理行政事务",
+                    "ask": "每晚核对发票。只有卡住时才叫醒我。",
+                    "request": "昨晚有三张发票未能核对，共计 $4,210。Acme 和 Northwind 的卡都已过期，没有新的付款方式我无法重新扣款。"
+                },
+                "track-sales": {
+                    "label": "跟踪销售",
+                    "ask": "盯着收入，真正有变化时告诉我。",
+                    "request": "把两个下滑的客户发到 #sales"
+                },
+                "watch-competitors": {
+                    "label": "监控竞争对手",
+                    "ask": "我们的三个竞争对手有任何重要变化时告诉我。",
+                    "request": "这类变化，您希望我一看到就通知，还是汇总后再发？"
+                },
+                "create-content": {
+                    "label": "创作内容",
+                    "ask": "围绕我们最接近排上名的关键词，写本周的文章。",
+                    "request": "“Agent orchestration”排在第 11 位，每月搜索量 2,400。是重写现有文章，还是写一篇新的？"
+                }
+            },
+            "scripts": {
+                "find-leads": {
+                    "steps": {
+                        "1": "正在阅读 LinkedIn 招聘信息",
+                        "2": "与您的理想客户画像匹配",
+                        "3": "正在检查您的 CRM"
+                    },
+                    "say": "去掉您已在联系的公司后，62 条招聘信息筛出了 26 家公司。",
+                    "checks": {
+                        "linkedin": "已阅读 62 条招聘信息",
+                        "apollo": "已补全 38 家公司",
+                        "hubspot": "去掉 12 家 · 已是您的客户"
+                    },
+                    "found": "26 家公司，按匹配度前 3 名",
+                    "cards": {
+                        "forma": {
+                            "name": "Forma",
+                            "meta": "销售负责人",
+                            "line": "正在招聘 2 名客户经理"
+                        },
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "销售总监",
+                            "line": "正在巴黎组建销售团队"
+                        },
+                        "arc-labs": {
+                            "name": "Arc Labs",
+                            "meta": "销售副总裁",
+                            "line": "正在招聘 3 名销售开发代表"
+                        }
+                    },
+                    "relay": "Northstar 两小时前把入门套餐降到了 $59。可以以此作为开场。",
+                    "reply": "前 3 名看起来不错。把他们放进 HubSpot，每周一运行一次。",
+                    "routine": "每周一 9:00，只看新名单"
+                },
+                "post-on-social": {
+                    "steps": {
+                        "1": "正在阅读本周文章",
+                        "2": "正在绘制 5 张轮播图",
+                        "3": "两篇帖子排队待发"
+                    },
+                    "say": "一篇文章，两篇帖子：今天发 X 帖子串，明天 9:00 发五张图的轮播。",
+                    "checks": {
+                        "canva": "已设计 5 张幻灯片",
+                        "buffer": "已排期 2 篇帖子"
+                    },
+                    "found": "2 篇帖子，等您确认",
+                    "cards": {
+                        "x": {
+                            "name": "X 帖子串",
+                            "meta": "今天",
+                            "line": "以大家都在重复提的 20 个工单开头"
+                        },
+                        "instagram": {
+                            "name": "Instagram",
+                            "meta": "明天 9:00",
+                            "line": "5 张图，每张一个观点"
+                        }
+                    },
+                    "relay": "文章一小时前上线了。我直接从中提取了轮播内容。",
+                    "reply": "两篇都不错。以后每篇文章都这样做。",
+                    "routine": "您每发布一篇文章后"
+                },
+                "reply-to-customers": {
+                    "steps": {
+                        "1": "正在阅读 34 个未读对话",
+                        "2": "正在查找帮助文档",
+                        "3": "正在查看我们以前的回复"
+                    },
+                    "say": "34 个对话中有 31 个已根据以前的回复起草好，这三个需要您处理。",
+                    "checks": {
+                        "gmail": "已阅读 34 个对话 · 起草 31 个",
+                        "notion": "匹配到 19 篇帮助文档",
+                        "intercom": "复用了 7 次过往对话"
+                    },
+                    "found": "3 个需要您处理的对话",
+                    "cards": {
+                        "refund": {
+                            "name": "退款 #1042",
+                            "meta": "已等待 2 天",
+                            "line": "有争议的扣款，超出政策范围"
+                        },
+                        "renewal": {
+                            "name": "合同续约",
+                            "meta": "已等待 1 天",
+                            "line": "要求定制 SLA"
+                        },
+                        "export": {
+                            "name": "数据导出",
+                            "meta": "已等待 4 小时",
+                            "line": "涉及法律措辞，我不会瞎猜"
+                        }
+                    },
+                    "relay": "#1042 的退款一直没到银行，这个先别动，等我处理完。",
+                    "reply": "发送那 31 条。这三个我自己来。",
+                    "routine": "每天早上 7:30，只处理难的"
+                },
+                "handle-admin": {
+                    "steps": {
+                        "1": "正在检查 148 张已付发票",
+                        "2": "与银行流水核对",
+                        "3": "归档每张收据"
+                    },
+                    "say": "148 张收据全部归档，只有三张发票未能核对，共计 $4,210。",
+                    "checks": {
+                        "stripe": "已核对 148 张发票",
+                        "mercury": "已匹配 141 笔银行转账",
+                        "gmail": "已归档 148 张收据"
+                    },
+                    "found": "3 张发票，$4,210 卡住了",
+                    "cards": {
+                        "acme": {
+                            "name": "Acme",
+                            "meta": "#1042",
+                            "line": "卡已过期，我无法重新扣款"
+                        },
+                        "northwind": {
+                            "name": "Northwind",
+                            "meta": "#1057",
+                            "line": "卡已过期，需要绑定新卡"
+                        },
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "#1061",
+                            "line": "转账少了 $120"
+                        }
+                    },
+                    "relay": "Halden 少的 $120 是对方的银行手续费，不是少付。可以放心结案。",
+                    "reply": "那就结掉 Halden。另外两个每晚跟进。",
+                    "routine": "每晚 2:00，只在卡住时叫醒您"
+                },
+                "track-sales": {
+                    "steps": {
+                        "1": "正在汇总最近 30 天",
+                        "2": "正在阅读 54 笔进行中的交易",
+                        "3": "正在更新收入表"
+                    },
+                    "say": "本月收入增长 11%，达到 $482k，但您五笔最大的交易中有两笔倒退了。",
+                    "checks": {
+                        "stripe": "30 天内 $482k",
+                        "hubspot": "已阅读 54 笔进行中的交易",
+                        "sheets": "已更新 3 个工作表"
+                    },
+                    "found": "3 处变动，2 处是坏消息",
+                    "cards": {
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "$84,000",
+                            "line": "退回提案阶段，已过成交日期"
+                        },
+                        "vessel": {
+                            "name": "Vessel",
+                            "meta": "$61,500",
+                            "line": "从成交阶段退回谈判阶段"
+                        },
+                        "petra": {
+                            "name": "Petra",
+                            "meta": "$38,000",
+                            "line": "推进了，从提案到成交阶段"
+                        }
+                    },
+                    "relay": "Petra 推进是因为对方的销售副总裁昨天回复了。我已约好通话。",
+                    "reply": "很好。工作日有变动时提醒我。",
+                    "routine": "每个工作日 8:00，只在有变动时"
+                },
+                "watch-competitors": {
+                    "steps": {
+                        "1": "重新检查 3 个价格页面",
+                        "2": "寻找新发布",
+                        "3": "比较 212 个关键词差距"
+                    },
+                    "say": "三家中只有一家有变动，而且正是对您不利的那个：Northstar 的价格。",
+                    "checks": {
+                        "firecrawl": "已抓取 3 个价格页面",
+                        "producthunt": "发现 1 次发布",
+                        "semrush": "已比较 212 个关键词差距"
+                    },
+                    "found": "3 家竞争对手，1 处真正的变化",
+                    "cards": {
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "2 小时前",
+                            "line": "入门套餐从 $79 降到 $59，新增免费版"
+                        },
+                        "cobalt": {
+                            "name": "Cobalt",
+                            "meta": "昨天",
+                            "line": "上线了集成目录"
+                        },
+                        "tenley": {
+                            "name": "Tenley",
+                            "meta": "今天已检查",
+                            "line": "没有变化，价格未动"
+                        }
+                    },
+                    "relay": "我已经在针对他们的 $59 重写我们的价格页面。今晚出草稿。",
+                    "reply": "价格有变动时一小时内告诉我。",
+                    "routine": "价格一小时内通知，其余周五汇总"
+                },
+                "create-content": {
+                    "steps": {
+                        "1": "正在阅读 1,204 条搜索词",
+                        "2": "正在打开前 3 个结果",
+                        "3": "正在重写文章"
+                    },
+                    "say": "我重写了现有文章，而不是另写一篇排在它后面的新文章。",
+                    "checks": {
+                        "searchConsole": "已阅读 1,204 条搜索词",
+                        "firecrawl": "已打开前 3 个结果",
+                        "notion": "已起草 1,850 字"
+                    },
+                    "found": "1 篇草稿，1,850 字",
+                    "cards": {
+                        "orchestration": {
+                            "name": "Orchestration",
+                            "meta": "第 11 位",
+                            "line": "每月 2,400 次搜索，目前在第二页"
+                        },
+                        "rewrite": {
+                            "name": "重写版",
+                            "meta": "1,850 字",
+                            "line": "围绕首页结果回答的 3 个问题展开"
+                        }
+                    },
+                    "relay": "Northstar 两天前开始在这个关键词上有排名。值得重写。",
+                    "reply": "发布吧。每周二都这样做。",
+                    "routine": "每周二 10:00，最接近的关键词"
+                }
+            },
+            "chat": {
+                "customer": "客户",
+                "routineCreated": "已创建例行任务 · {routine}",
+                "relayFrom": "来自 {agent} 的消息",
+                "wantTitle": "想要一位像 {name} 这样的同事吗？",
+                "wantBody": "在您自己的应用上为您工作，5 天试用仅需 {price}。",
+                "start": "从这位同事开始"
+            },
+            "panel": {
+                "chats": "对话",
+                "card": "同事卡片",
+                "close": "关闭同事",
+                "newConversation": "新对话"
+            },
+            "foreman": {
+                "newTask": "新任务",
+                "unknown": "未知同事",
+                "running": {
+                    "prompt": "现在有哪些在运行？",
+                    "tool": "列出同事",
+                    "toolResult": "{count} 位同事",
+                    "answer": "**3 位同事**正在工作。{writer}正在起草本周的文章，{research}正在补全 40 个新潜在客户的信息，{invoices}正在处理逾期发票。"
+                },
+                "waiting": {
+                    "prompt": "谁在等我？",
+                    "tool": "查看收件箱",
+                    "toolResult": "{count} 项待处理",
+                    "answer": "**{count, plural, other {# 位同事}}**正在等您。等得最久的是{name}：{message}",
+                    "empty": "目前没有。收件箱是空的，每位同事要么在工作，要么已完成。"
+                },
+                "handoff": {
+                    "prompt": "让{writer}给{social}做简报",
+                    "ask": "让{writer}就本周的文章给{social}做简报。",
+                    "plan": "文章是{writer}的工作，发布是{social}的工作。我把它转交过去，而不是自己重写。",
+                    "tool": "给{writer}发消息",
+                    "toolResult": "已发送",
+                    "answer": "完成。{writer}正在把草稿交给{social}，由其改写成一篇 LinkedIn 帖子和一个 X 帖子串。"
+                },
+                "routines": {
+                    "chase-overdue": {
+                        "name": "催收逾期发票",
+                        "frequency": "每 4 小时"
+                    },
+                    "enrich-leads": {
+                        "name": "补全新潜在客户信息",
+                        "frequency": "每小时"
+                    },
+                    "overnight-tickets": {
+                        "name": "回复夜间工单",
+                        "frequency": "每天上午 7:00"
+                    },
+                    "competitor-digest": {
+                        "name": "每日竞品摘要",
+                        "frequency": "每天上午 8:00"
+                    },
+                    "morning-thread": {
+                        "name": "发布早间帖子串",
+                        "frequency": "每天上午 9:00"
+                    },
+                    "pipeline-digest": {
+                        "name": "销售管道摘要",
+                        "frequency": "每天下午 5:00"
+                    },
+                    "weekly-seo": {
+                        "name": "每周 SEO 报告",
+                        "frequency": "每周上午 8:00"
+                    },
+                    "churn-review": {
+                        "name": "每月流失复盘",
+                        "frequency": "每月 1 日上午 9:00"
+                    }
+                }
+            }
+        }
+    },
+    "cases": {
+        "title": "雇佣 <keep>AI <chip>同事</chip></keep>",
+        "industriesLead": "适用于",
+        "industries": {
+            "agency": "代理机构",
+            "freelancer": "自由职业者",
+            "ecommerce": "电商",
+            "real-estate": "房地产",
+            "startup": "初创公司",
+            "other": "其他"
+        },
+        "create": "创建您自己的同事",
+        "quoteByline": "<author>{name}</author>，{company} {role}",
+        "quoted": "“{quote}”",
+        "card": {
+            "tasks": "· {count, plural, other {# 项任务}}",
+            "noApps": "无需应用",
+            "apps": "应用：{list}",
+            "run": "运行同事",
+            "priceMonthly": "{price}/月"
+        }
+    },
+    "coworker": {
+        "label": "他们为何强大",
+        "title": "<keep><chip>同事</chip></keep>是能力更强的队友。",
+        "traits": {
+            "delivers": {
+                "title": "他们真正把工作做完。",
+                "body": "接入 {count, number}+ 种工具，以及 ChatGPT 或 Claude 开箱无法触及的数据。"
+            },
+            "tools": {
+                "title": "它像人一样在电脑上工作",
+                "body": "它在自己的屏幕上打开您的应用并逐步点击操作，连无法接入的应用也不例外。"
+            },
+            "always": {
+                "title": "它在自己的机器上全天候运行",
+                "body": "夜晚、周末、合上电脑：它照样运行。您的电脑关了，它的机器从不关机。"
+            },
+            "asks": {
+                "title": "自主工作，直到需要您点头",
+                "body": "它独立运行，在做任何重要的事之前会停下来。团队中任何人都可以批准。"
+            },
+            "together": {
+                "title": "同事协同工作",
+                "body": "一个寻找潜在客户，下一个给他们写信，第三个把他们录入您的 CRM。"
+            }
+        },
+        "subjectJob": "簿记员",
+        "delivers": {
+            "ask": "帮我找 50 个与我们最佳客户相似的潜在客户，并放进 HubSpot。",
+            "steps": {
+                "deals": {
+                    "label": "已阅读您 42 笔赢单交易",
+                    "elapsed": "6 秒"
+                },
+                "screen": {
+                    "label": "筛选了 312 家公司，保留最接近的 50 家",
+                    "elapsed": "1 分 12 秒"
+                },
+                "verify": {
+                    "label": "验证了 47 个工作邮箱，没有一个靠猜",
+                    "elapsed": "48 秒"
+                },
+                "create": {
+                    "label": "已创建 50 个潜在客户，负责人：您",
+                    "elapsed": "19 秒"
+                }
+            },
+            "table": {
+                "name": "潜在客户",
+                "noun": "个潜在客户",
+                "company": "公司",
+                "contact": "联系人",
+                "fit": "匹配原因",
+                "rows": {
+                    "alvera": {
+                        "company": "Alvera Logistics",
+                        "contact": "Camille Perrin · 首席运营官",
+                        "fit": "规模和技术栈与您相同"
+                    },
+                    "northbay": {
+                        "company": "Northbay Freight",
+                        "contact": "Tom Vasquez · 运营负责人",
+                        "fit": "刚迁移到 Shopify"
+                    },
+                    "kerio": {
+                        "company": "Kerio Supply",
+                        "contact": "Lena Haas · 供应链负责人",
+                        "fit": "1 月融资 400 万欧元"
+                    },
+                    "portside": {
+                        "company": "Portside Group",
+                        "contact": "Marc Dubreuil · 首席财务官",
+                        "fit": "刚离开一家竞争对手"
+                    },
+                    "mairon": {
+                        "company": "Mairon & Co.",
+                        "contact": "Sofia Lindqvist · 首席执行官",
+                        "fit": "匹配，但未找到邮箱"
+                    }
+                }
+            },
+            "reply": "HubSpot 中已有 50 个潜在客户，均参照您 42 笔赢单交易挑选。其中 47 个有我核实过的工作邮箱。另外三个我无法核实，宁可留空也不瞎猜。"
+        },
+        "tools": {
+            "windowTitle": "收件箱 - Gmail - Chromium",
+            "tab": "收件箱 (12)",
+            "available": "<strong>{count, number}</strong> 款应用可用",
+            "gmail": {
+                "search": "搜索邮件",
+                "compose": "写邮件",
+                "folders": {
+                    "inbox": "收件箱",
+                    "starred": "已加星标",
+                    "snoozed": "已延后",
+                    "sent": "已发送",
+                    "drafts": "草稿"
+                },
+                "threads": {
+                    "invoice4412": {
+                        "subject": "发票 #4412",
+                        "preview": "- 已逾期 14 天，尚未收到付款",
+                        "at": "09:12"
+                    },
+                    "payment": {
+                        "subject": "已收到付款",
+                        "preview": "- 谢谢，#4408 已结清",
+                        "at": "08:40"
+                    },
+                    "summary": {
+                        "subject": "您的每周摘要",
+                        "preview": "- 62 笔付款共收款 €14,208",
+                        "at": "07:55"
+                    },
+                    "statement": {
+                        "subject": "对账单已就绪",
+                        "preview": "- 2026 年 9 月对账单可供下载",
+                        "at": "10月1日"
+                    },
+                    "vat": {
+                        "subject": "增值税申报草稿",
+                        "preview": "- 申报前有 3 笔记录需要分类",
+                        "at": "9月30日"
+                    },
+                    "invoice4390": {
+                        "subject": "发票 #4390 已付款",
+                        "preview": "- 附上收据，感谢您的惠顾",
+                        "at": "9月28日"
+                    },
+                    "payout": {
+                        "subject": "款项正在转出",
+                        "preview": "- €3,912 将于 10 月 3 日到账",
+                        "at": "9月27日"
+                    },
+                    "card": {
+                        "subject": "信用卡账单",
+                        "preview": "- 9 月有 48 笔交易需要核对",
+                        "at": "9月25日"
+                    },
+                    "invoice4377": {
+                        "subject": "发票 #4377 已结清",
+                        "preview": "- 无需操作，上周已归档",
+                        "at": "9月24日"
+                    }
+                },
+                "newMessage": "新邮件",
+                "to": "收件人",
+                "subject": "第三次提醒：发票 #4412",
+                "typed1": "您好，发票 #4412 现已逾期 14 天。",
+                "typed2": "能否确认一下付款日期？",
+                "send": "发送",
+                "sent": "邮件已发送",
+                "undo": "撤销",
+                "view": "查看邮件"
+            }
+        },
+        "always": {
+            "box": "运营",
+            "desks": {
+                "invoices": "簿记员",
+                "inbox": "行政助理",
+                "nova": "客服专员"
+            },
+            "lines": {
+                "prep": "正在起草您 9 点的简报",
+                "tickets": "已回复 12 个工单",
+                "ready": "您的简报已准备好"
+            },
+            "place": "box-4417 · 德国法尔肯施泰因",
+            "clock": "当地时间 {time}",
+            "theme": "主题",
+            "themes": {
+                "system": "跟随系统",
+                "light": "浅色",
+                "dark": "深色"
+            }
+        },
+        "asks": {
+            "box": "财务",
+            "desk": "簿记员",
+            "requests": {
+                "figma": {
+                    "action": "续订 Figma 套餐，每年 $144",
+                    "resumes": "已续订。继续处理发票"
+                },
+                "aws": {
+                    "action": "支付 AWS 账单，$312",
+                    "resumes": "已支付。还剩 11 张发票"
+                }
+            }
+        },
+        "together": {
+            "desks": {
+                "scout": "潜在客户搜寻员",
+                "quill": "文案撰稿人",
+                "ledger": "CRM 管理员"
+            },
+            "says": {
+                "scout": "50 个新潜在客户，全都交给你。",
+                "quill": "50 封邮件已起草，交给你了。",
+                "ledger": "完成。50 个全部录入 HubSpot。"
+            }
+        },
+        "apps": {
+            "caption": "{count, number}+ 款应用，以及任何 MCP 服务器",
+            "beyond": "+{count, number}"
+        }
+    },
+    "workspaces": {
+        "your-company": {
+            "name": "您的公司",
+            "crew": "6 位同事 · 营销、财务、行政"
+        },
+        "your-second-company": {
+            "name": "您的第二家公司",
+            "crew": "3 位同事 · 销售、客服"
+        },
+        "your-side-project": {
+            "name": "您的副业项目",
+            "crew": "1 位同事 · 内容"
+        }
+    }
+}

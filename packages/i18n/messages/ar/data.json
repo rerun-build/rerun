@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "الجدول غير موجود",
+        "deleteRowsFailed": "تعذّر حذف الصفوف",
+        "saveRowFailed": "تعذّر حفظ هذا الصف",
+        "deleteTableFailed": "تعذّر حذف الجدول",
+        "purgeTableFailed": "تعذّر إفراغ الجدول",
+        "addViewFailed": "تعذّرت إضافة هذا العرض",
+        "deleteViewFailed": "تعذّر حذف هذا العرض",
+        "unavailable": "قاعدة البيانات غير متاحة",
+        "tryAgain": "حاول مجددًا",
+        "rowCount": "{count, plural, zero {{total} صف} one {صف واحد} two {صفّان} few {{total} صفوف} many {{total} صفًا} other {{total} صف}}",
+        "rowCountFound": "{count, plural, zero {لم يُعثر على صفوف} one {عُثر على صف واحد} two {عُثر على صفّين} few {عُثر على {total} صفوف} many {عُثر على {total} صفًا} other {عُثر على {total} صف}}",
+        "noRows": "لا صفوف",
+        "noSearchMatch": "لا يوجد صف يطابق هذا البحث.",
+        "tableEmpty": "هذا الجدول فارغ."
+    },
+    "pagination": {
+        "count": "العدد <value>{count}</value>",
+        "rowsPerPage": "صفوف في الصفحة",
+        "perPage": "{size} في الصفحة",
+        "range": "{range} من {total}",
+        "firstPage": "الصفحة الأولى",
+        "previousPage": "الصفحة السابقة",
+        "nextPage": "الصفحة التالية",
+        "lastPage": "الصفحة الأخيرة"
+    },
+    "toolbar": {
+        "selected": "{count, plural, zero {لا تحديد} one {تم تحديد واحد} two {تم تحديد اثنين} few {تم تحديد #} many {تم تحديد #} other {تم تحديد #}}",
+        "deleteRowTitle": "حذف هذا الصف؟",
+        "deleteRowsTitle": "حذف {count} من الصفوف؟",
+        "deleteRowDescription": "سيُحذف الصف من الجدول نهائيًا. لا يمكن التراجع عن ذلك.",
+        "deleteRowsDescription": "ستُحذف الصفوف من الجدول نهائيًا. لا يمكن التراجع عن ذلك.",
+        "delete": "حذف",
+        "clearSelection": "مسح التحديد",
+        "search": "بحث",
+        "searchRows": "البحث في الصفوف",
+        "clearSearch": "مسح البحث",
+        "tableActions": "إجراءات الجدول",
+        "export": "تصدير",
+        "purgeTable": "إفراغ الجدول",
+        "deleteTable": "حذف الجدول"
+    },
+    "viewBar": {
+        "allRows": "كل الصفوف",
+        "viewOptions": "خيارات {name}",
+        "editView": "تعديل العرض",
+        "deleteView": "حذف العرض",
+        "addView": "إضافة عرض",
+        "addNewView": "إضافة عرض جديد",
+        "expand": "توسيع",
+        "deleteViewTitle": "حذف العرض \"{name}\"؟",
+        "deleteViewDescription": "سيُحذف العرض فقط. تبقى صفوف الجدول كما هي."
+    },
+    "layouts": {
+        "table": "جدول",
+        "list": "قائمة",
+        "gallery": "معرض",
+        "board": "لوحة"
+    },
+    "table": {
+        "selectAllRows": "تحديد كل الصفوف في هذه الصفحة",
+        "selectRow": "تحديد الصف",
+        "sources": "المصادر"
+    },
+    "cell": {
+        "yes": "نعم",
+        "no": "لا"
+    },
+    "board": {
+        "moveFailed": "تعذّر نقل هذا الصف",
+        "unavailable": "اللوحة غير متاحة",
+        "showMore": "عرض {count} أخرى"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "موثّق",
+                "detail": "صندوق البريد موجود"
+            },
+            "unconfirmed": {
+                "label": "غير مؤكَّد",
+                "detail": "صندوق البريد غير مؤكَّد"
+            },
+            "invalid": {
+                "label": "غير صالح",
+                "detail": "صندوق البريد غير موجود"
+            }
+        },
+        "openSource": "افتح المصدر",
+        "verified": "موثّق",
+        "row": "صف",
+        "cellLabel": "المصادر: {names}"
+    },
+    "shared": {
+        "emptyTitle": "لا توجد جداول مشتركة بعد",
+        "emptyDescription": "كل زملاء مساحة العمل يقرؤون من قاعدة البيانات هذه ويكتبون فيها. عندما يحتاجون إلى سجل مشترك (كتالوج، أو قائمة انتظار، أو قائمة يعمل عليها عدة زملاء)، ينشئون جداول هنا يمكنك تصفّحها في أي وقت.",
+        "unreachable": "تعذّر الوصول إلى جهاز مساحة العمل هذه."
+    }
+}

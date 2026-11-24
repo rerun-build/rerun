@@ -1,0 +1,144 @@
+{
+    "title": "עמיתים",
+    "loadFailed": "לא הצלחנו לטעון את העמיתים שלך.",
+    "retry": "לנסות שוב",
+    "empty": "עדיין אין עמיתים.",
+    "loadingCoworkers": "טוען עמיתים",
+    "newCoworker": "עמית חדש",
+    "untitledBox": "Box ללא שם",
+    "teammate": "חבר צוות",
+    "pinned": {
+        "dragToReorder": "לגרור כדי לשנות סדר",
+        "done": "סיום",
+        "unpin": "לבטל הצמדה",
+        "details": "פרטי העמית",
+        "edit": "לערוך הצמדות",
+        "unreadLabel": "{name}, לא נקרא"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "פותח את השיחה",
+        "pin": "להצמיד",
+        "unpin": "לבטל הצמדה",
+        "pinToTop": "להצמיד למעלה"
+    },
+    "line": {
+        "paused": "מושהה",
+        "waiting": "מחכה לך",
+        "error": "משהו השתבש",
+        "working": "עובד",
+        "workingOn": "עובד · {detail}",
+        "asleep": "ישן",
+        "asleepAbout": "ישן · {about}",
+        "you": "אתה: {message}"
+    },
+    "foreman": {
+        "askAnything": "אפשר לשאול כל דבר"
+    },
+    "header": {
+        "account": "חשבון"
+    },
+    "account": {
+        "preferences": "העדפות",
+        "contactSupport": "פנייה לתמיכה",
+        "signOut": "להתנתק",
+        "subscriptionTitle": "קודם צריך לבטל את המנוי",
+        "subscriptionMessage": "{workspaces} עדיין מתחדש. אפשר לבטל אותו בחיוב ב-rerun.build, ואז למחוק את החשבון.",
+        "deleteTitle": "למחוק את החשבון שלך?",
+        "deleteMessage": "תעזוב את סביבות העבודה המשותפות. סביבת עבודה שרק אתה חבר בה נסגרת לתמיד, עם העמיתים והקבצים שלה. אי אפשר לבטל את זה.",
+        "delete": "למחוק",
+        "cancel": "ביטול",
+        "reauthTitle": "צריך להתחבר שוב כדי למחוק את החשבון",
+        "reauthMessage": "לביטחונך, מחיקת החשבון דורשת התחברות מחדש. יש להתחבר שוב, ואז למחוק אותו מכאן.",
+        "deleteFailedTitle": "לא ניתן למחוק את החשבון שלך",
+        "deleteFailedMessage": "כדאי לנסות שוב בעוד רגע.",
+        "leaveServerTitle": "לעזוב את {host}?",
+        "leaveServerMessage": "החשבון שלך יתנתק, ו-Rerun ייפתח מחדש ב-Rerun Cloud.",
+        "leaveServer": "לעזוב"
+    },
+    "workspace": {
+        "untitled": "סביבת העבודה שלי",
+        "menuLabel": "סביבת העבודה {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "חיפוש",
+        "back": "חזרה",
+        "placeholder": "לחפש עמיתים ושיחות",
+        "askRerun": "{named, select, yes {לשאול את {name}} other {לשאול את ה-Chief of Staff שלך}}",
+        "quotedAsk": "\"{query}\"",
+        "coworkers": "עמיתים",
+        "conversations": "שיחות",
+        "noCoworker": "אין עמית בשם הזה.",
+        "newConversation": "שיחה חדשה",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "התראות",
+        "bellLabel": "התראות, {count}",
+        "close": "לסגור",
+        "settings": "הגדרות התראות",
+        "markLabel": "לסמן התראות כנקראו",
+        "markRead": "{count, plural, one {לסמן התראה אחת כנקראה} two {לסמן שתי התראות כנקראו} other {לסמן # התראות כנקראו}}",
+        "nothingToMark": "אין התראות לסימון",
+        "clearAll": "{count, plural, one {לנקות הכול, כולל בקשה אחת} two {לנקות הכול, כולל שתי בקשות} other {לנקות הכול, כולל # בקשות}}",
+        "clearAllTitle": "לנקות את כל ההתראות?",
+        "clearAllMessage": "{count, plural, one {בקשה ממתינה אחת יוצאת מתיבת הדואר בלי תשובה, והעמית שלך ממשיך לחכות לה.} two {שתי בקשות ממתינות יוצאות מתיבת הדואר בלי תשובה, והעמיתים שלך ממשיכים לחכות להן.} other {# בקשות ממתינות יוצאות מתיבת הדואר בלי תשובה, והעמיתים שלך ממשיכים לחכות להן.}}",
+        "clearAllConfirm": "לנקות הכול",
+        "cancel": "ביטול",
+        "running": "{count, plural, one {משימה אחת פועלת} two {שתי משימות פועלות} other {# משימות פועלות}}",
+        "loadFailed": "לא הצלחנו לטעון את ההתראות שלך.",
+        "retry": "לנסות שוב",
+        "emptyTitle": "אין במה לטפל",
+        "emptyDescription": "כשעמית צריך אותך או מסיים משימה, זה מגיע לכאן.",
+        "undo": "לבטל",
+        "ok": "אישור",
+        "sections": {
+            "needsYou": "צריך אותך",
+            "headsUps": "לתשומת לבך",
+            "errors": "שגיאות",
+            "done": "הושלם"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} שאל אותך שאלה",
+            "awaiting_approval": "{agent} צריך את האישור שלך",
+            "awaiting_connector": "{agent} צריך אפליקציה מחוברת",
+            "waiting_human": "{agent} מחכה לך",
+            "awaiting_ack": "{agent} סימן משהו עבורך",
+            "error": "{agent} נתקל בשגיאה",
+            "done": "{agent} סיים את ההרצה שלו"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "נקרא",
+            "markRead": "לסמן כנקרא",
+            "opensConversation": "פותח את השיחה",
+            "unfollow": "להפסיק לעקוב אחרי המשימות המתוזמנות שלו",
+            "unfollowed": "אינך עוקב עוד אחרי המשימות המתוזמנות של {name}.",
+            "mute": "להשתיק את {name}",
+            "muted": "{name} מושתק.",
+            "settings": "הגדרות התראות",
+            "cancel": "ביטול"
+        }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, one {אחד צריך אותך} two {שניים צריכים אותך} other {# צריכים אותך}} · {working} בעבודה",
+            "waiting": "{waiting, plural, one {אחד צריך אותך} two {שניים צריכים אותך} other {# צריכים אותך}}",
+            "working": "{working} בעבודה",
+            "none": "הכול הושלם"
+        },
+        "crew": "צוות",
+        "needsYou": "צריך אותך",
+        "atWork": "בעבודה",
+        "allDone": "הכול הושלם",
+        "you": "אתה",
+        "stopped": "נעצר",
+        "minutes": "{count} ד׳",
+        "asks": "{name} שואל",
+        "othersAtWork": "+{count} בעבודה"
+    }
+}

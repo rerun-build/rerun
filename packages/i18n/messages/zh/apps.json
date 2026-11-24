@@ -1,0 +1,219 @@
+{
+    "menu": {
+        "label": "应用"
+    },
+    "linkedToRerun": "{provider} 已关联 Rerun",
+    "slotPrice": {
+        "monthly": "{price}/月",
+        "yearly": "{price}/年"
+    },
+    "blocked": {
+        "notSubscribed": "请先订阅 Rerun",
+        "paused": "您的工作区已暂停",
+        "trialSlot": "试用期包含一个 {provider} 名额。升级套餐即可添加更多。",
+        "lifetimeTrialSlot": "您的免费试用包含一个 {provider} 名额。试用结束后可添加更多。",
+        "adminOnly": "只有管理员可以管理付费应用"
+    },
+    "slots": {
+        "footer": "<b>已使用 {used} / {total, plural, other {# 个名额}}</b>，{description}",
+        "subscriberTrial": "第一个免费至 {date}，之后 {price}",
+        "workspaceTrial": "试用期内 $0，之后随套餐计费",
+        "paid": "每个 {price}，随套餐计费",
+        "lifetime": "每个 {price}，按月计费",
+        "lifetimeTrial": "试用期内免费，之后每个 {price}",
+        "lifetimeEnding": "将于 {date} 结束"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "免费 {days} 天",
+            "detail": "之后每个账号 {price}，随套餐计费"
+        },
+        "workspaceTrial": {
+            "headline": "试用期内 $0",
+            "detail": "之后每个账号 {price}，随套餐计费"
+        },
+        "lifetimeTrial": {
+            "detail": "之后每个账号 {price}，按月计费"
+        },
+        "freeSlot": {
+            "headline": "有一个名额待用",
+            "detail": "已包含在您的套餐中",
+            "detailLifetime": "已包含在您的月度名额中",
+            "detailLifetimeEnding": "您的名额将于 {date} 结束"
+        },
+        "buySlot": {
+            "headline": "每个账号 {price}",
+            "detail": "添加到您的套餐，今天按本期剩余时间计费"
+        },
+        "lifetimeSlot": {
+            "detail": "按月计费，独立于您的终身套餐"
+        }
+    },
+    "connectHint": {
+        "reconnect": "以 {label} 重新登录",
+        "subscriberTrial": "免费 {days} 天，之后 {price}",
+        "workspaceTrial": "试用期内 $0，之后随套餐 {price}",
+        "default": "您的同事用来操作的账号"
+    },
+    "addSlot": {
+        "title": "添加一个 {provider} 名额？",
+        "description": "{price} 将加入您的套餐。今天将按当前计费周期的剩余时间收费。",
+        "descriptionLifetime": "{price} 将加入您的月度名额。今天将按本月剩余时间收费。",
+        "confirm": "添加名额",
+        "button": "添加名额",
+        "startTrial": "开始免费试用"
+    },
+    "intro": {
+        "connect": "连接 {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "您的同事通过您的 LinkedIn 账号开发客户。它们替您撰写消息、建立联系并跟进。",
+            "whatsapp": "您的同事通过您的 WhatsApp 号码回复消息。它们替您阅读对话、回复并跟进。"
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "消息和邀请",
+                "text": "在 LinkedIn 的每日限额内给潜在客户写信并跟进。"
+            },
+            "linkedinSearch": {
+                "title": "搜索和查看资料",
+                "text": "找到合适的人，并在写信前先阅读其个人资料。"
+            },
+            "linkedinReplies": {
+                "title": "收到回复即唤醒",
+                "text": "一条回复或一个已接受的邀请会立即启动同事。"
+            },
+            "whatsappReplies": {
+                "title": "回复和跟进",
+                "text": "用文字、文件和语音消息回复给您发消息的人。"
+            },
+            "whatsappMessages": {
+                "title": "收到消息即唤醒",
+                "text": "一条新消息会立即启动同事。"
+            },
+            "whatsappCareful": {
+                "title": "谨慎使用您的号码",
+                "text": "遵守 WhatsApp 的每日限额，从不给陌生人发消息。"
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "您的工作区已暂停，因此其 {provider} 账号已退出登录。请先恢复工作区，再重新连接这些账号。",
+        "freeSlot": "空余名额",
+        "freeSlotHint": {
+            "subscriberTrial": "连接一个账号，免费 {days} 天",
+            "workspaceTrial": "连接一个账号，试用期内 $0",
+            "default": "连接一个 {provider} 账号来使用它"
+        },
+        "addAnother": "添加另一个账号",
+        "addAnotherHint": "为您的套餐添加一个 {price} 的名额",
+        "addAnotherHintLifetime": "添加一个 {price} 的名额",
+        "status": {
+            "connected": "就绪",
+            "needsReconnect": "重新登录",
+            "paused": "已暂停",
+            "connecting": "连接中",
+            "disconnected": "已断开"
+        },
+        "summary": {
+            "signedOutWhilePaused": "工作区暂停期间已退出登录",
+            "signedOut": "{provider} 已将此账号退出登录",
+            "rateLimited": "休息一天，{provider} 要求放慢速度",
+            "unpaid": "其名额尚未付费",
+            "unused": "还没有同事使用它。请在同事的服务中选择它。",
+            "usedBy": "使用者：{names}"
+        },
+        "defaultName": "{provider} 账号",
+        "reconnect": "重新连接",
+        "resume": "恢复",
+        "disconnectLabel": "断开 {name}",
+        "disconnectTitle": "断开 {name}？",
+        "disconnectDescription": "使用它的同事将立即失去其 {provider} 工具。在您从账单中移除之前，该名额仍保留在您的套餐中。",
+        "disconnectDescriptionLifetime": "使用它的同事将立即失去其 {provider} 工具。在您于此处退还之前，该名额仍归您所有。",
+        "disconnect": "断开",
+        "disconnectTooltip": "断开此账号",
+        "giveBack": "退还",
+        "giveBackTitle": "退还此 {provider} 名额？",
+        "giveBackDescription": "从下次续订起不再计费，在此之前仍可使用。"
+    },
+    "success": {
+        "connectedIcon": "{provider} 已连接",
+        "title": "{app} 已开启",
+        "body": "<b>{label}</b> 已连接。在同事的服务中选择它，即可投入使用。",
+        "yourAccount": "您的账号",
+        "done": "完成"
+    },
+    "linkedin": {
+        "method": {
+            "password": "邮箱和密码",
+            "cookie": "会话 Cookie"
+        },
+        "cookieLabel": "会话 Cookie (li_at)",
+        "cookieHelp": "适用于使用 Google 或 Apple 登录的账号。从浏览器中复制 linkedin.com 的 li_at Cookie。",
+        "emailLabel": "LinkedIn 邮箱",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "LinkedIn 密码",
+        "passwordPlaceholder": "您的 LinkedIn 密码",
+        "signInFrom": "登录地区",
+        "signInFromHelp": "LinkedIn 信任来自您常用工作国家的登录。",
+        "searchCountry": "搜索国家",
+        "noCountry": "未找到国家",
+        "neverStored": "Rerun 从不存储您的密码或 Cookie。",
+        "connect": "连接",
+        "approval": {
+            "figureLabel": "一部手机显示登录请求，其批准按钮已亮起",
+            "title": "在手机上批准",
+            "body": "LinkedIn 已向您的手机发送登录请求。打开 LinkedIn 应用并点击<b>是</b>。",
+            "approved": "我已批准",
+            "polling": "正在等待您的批准",
+            "slow": "还没有反应？请检查 LinkedIn 应用，然后点击下方。"
+        },
+        "code": {
+            "title": "输入验证码",
+            "description": "{where}的 {length} 位验证码。",
+            "where": {
+                "authenticator": "来自您的身份验证器应用",
+                "sentTo": "LinkedIn 发送到您{sentTo}",
+                "sms": "LinkedIn 通过短信发送",
+                "email": "LinkedIn 通过邮件发送"
+            },
+            "resend": "发送新验证码",
+            "verify": "验证"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "WhatsApp 号码",
+            "invalidPhone": "这看起来不是完整的电话号码。",
+            "linkBy": "关联方式",
+            "linkByQr": "用手机扫描此处显示的二维码。",
+            "linkByCode": "适用于在该手机上打开此页面的情况：改为在 WhatsApp 中输入验证码。",
+            "method": {
+                "qr": "扫描二维码",
+                "code": "输入验证码"
+            },
+            "linkedDevice": "Rerun 将作为关联设备加入，就像 WhatsApp Web 一样。您的手机照常使用。",
+            "submit": "获取验证码"
+        },
+        "link": {
+            "steps": {
+                "open": "在手机上打开 WhatsApp",
+                "settings": "设置 > 已关联的设备 > 关联新设备",
+                "pointQr": "用手机对准此二维码",
+                "typeCode": "改为点击“使用电话号码关联”，然后输入此验证码"
+            },
+            "expiredTitle": "此验证码已过期",
+            "scanTitle": "使用 WhatsApp 扫描",
+            "typeTitle": "在 WhatsApp 中输入此验证码",
+            "expiredBody": "验证码有效期为三分钟。请获取新的验证码，然后立即关联手机。",
+            "onPhone": "在 <b>{phone}</b> 的手机上",
+            "waiting": "正在等待手机",
+            "switchToCode": "改为输入验证码",
+            "switchToQr": "改为扫描二维码",
+            "newCode": "新验证码",
+            "codeLabel": "验证码 {code}",
+            "qrAlt": "用于关联 WhatsApp 的二维码"
+        }
+    }
+}

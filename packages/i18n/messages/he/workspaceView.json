@@ -1,0 +1,74 @@
+{
+    "switch": {
+        "label": "תצוגה",
+        "board": "לוח",
+        "simple": "קלאסית"
+    },
+    "list": {
+        "label": "עמיתים",
+        "search": "חיפוש",
+        "empty": "עדיין אין עמיתים",
+        "newBox": "Box חדש",
+        "emptyBox": "אין עמיתים",
+        "boxMore": "פעולות עבור {name}"
+    },
+    "tile": {
+        "more": "עוד עבור {name}",
+        "newConversation": "שיחה חדשה",
+        "allConversations": "כל השיחות",
+        "card": "כרטיס העמית",
+        "pin": "להצמיד למעלה",
+        "unpin": "לבטל הצמדה"
+    },
+    "chat": {
+        "allConversations": "כל השיחות",
+        "pick": "אפשר לבחור עמית מצד שמאל.",
+        "card": "כרטיס העמית"
+    },
+    "line": {
+        "paused": "מושהה",
+        "waiting": "מחכה לך",
+        "error": "משהו השתבש",
+        "working": "עובד",
+        "workingOn": "עובד · {detail}",
+        "asleep": "ישן",
+        "asleepAbout": "ישן · {about}",
+        "you": "אתה: {message}"
+    },
+    "foreman": {
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "line": "אפשר לשאול כל דבר",
+        "card": "{named, select, yes {הכרטיס של {name}} other {הכרטיס של Chief of Staff}}",
+        "rename": "לתת שם ל-Chief of Staff שלך"
+    },
+    "details": {
+        "label": "הכרטיס של {name}"
+    },
+    "phone": {
+        "pinned": "מוצמדים",
+        "recent": "אחרונים",
+        "byBox": "לפי Box",
+        "section": "{label}, {count}"
+    },
+    "checkins": {
+        "title": "בדיקות",
+        "toggle": "לבדוק מיוזמתו",
+        "next": "הבדיקה הבאה {when}",
+        "waiting": "מחכה שמישהו יכתוב קודם",
+        "off": "כבוי",
+        "unavailable": "כבוי בשרת הזה",
+        "switchedOff": "צריך להפעיל קודם את הבדיקות",
+        "recent": "אחרונות",
+        "runNow": "לבדוק עכשיו",
+        "started": "בודק. הוא יכתוב לך רק אם יש מה לומר.",
+        "empty": "עדיין אין בדיקות",
+        "reasons": {
+            "pulse": "בדיקה יומית, אין מה לומר",
+            "promise": "חזר כפי שהבטיח, אין חדש",
+            "manual": "בדק, אין מה לומר"
+        },
+        "failed": "הבדיקה לא הסתיימה",
+        "running": "בודק",
+        "stopped": "הבדיקה הופסקה"
+    }
+}

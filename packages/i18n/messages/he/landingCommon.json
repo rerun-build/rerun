@@ -1,0 +1,313 @@
+{
+    "site": {
+        "title": "Rerun: עובדי AI שפועלים על מנוי ChatGPT או Claude שלך",
+        "description": "גייסו עובדי AI למכירות, תמיכה, שיווק וניהול. הם פועלים על מנוי ChatGPT או Claude שלך, על קרדיטים כלולים או על מפתח ה-API שלך. ניסיון חינם ל-{trialDays} ימים."
+    },
+    "nav": {
+        "items": {
+            "features": "יכולות",
+            "useCases": "תרחישי שימוש",
+            "industries": "תעשיות",
+            "templates": "תבניות",
+            "pricing": "תמחור",
+            "community": "קהילה",
+            "resources": "משאבים"
+        },
+        "features": {
+            "coworkers": {
+                "label": "עמיתים",
+                "description": "נותנים לו משימה, והוא מחזיר אותה גמורה."
+            },
+            "coworker-manager": {
+                "label": "מנהל העמיתים",
+                "description": "אומרים מה צריך, והוא מעביר לעמית המתאים."
+            },
+            "computer-use": {
+                "label": "שימוש במחשב",
+                "description": "הוא עובד באפליקציות שלך כמו שאדם היה עובד."
+            },
+            "tools": {
+                "label": "יותר מ-{count} כלים כלולים",
+                "description": "Gmail, Stripe, HubSpot וכל שרת MCP."
+            },
+            "human-in-the-loop": {
+                "label": "אדם בתהליך",
+                "description": "הם שואלים לפני כל פעולה משמעותית."
+            },
+            "runs-24-7": {
+                "label": "פועל 24/7, באירופה",
+                "description": "לילות, סופי שבוע, מחשב סגור: הוא ממשיך לעבוד."
+            },
+            "second-brain": {
+                "label": "מוח שני",
+                "description": "הוא מכיר את ההצעה שלך, השוק שלך והטון שלך."
+            },
+            "workspaces": {
+                "label": "סביבות עבודה",
+                "description": "חשבון אחד, סביבת עבודה לכל עסק."
+            },
+            "invite-your-team": {
+                "label": "להזמין את כל הצוות",
+                "description": "כולם, ללא עלות נוספת, על אותו לוח."
+            },
+            "coworkers-work-together": {
+                "label": "עמיתים עובדים יחד",
+                "description": "אחד מוצא לידים, השני כותב להם."
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "סוכנות",
+                "description": "לקוחות חדשים, ביצוע ודיווח ללקוחות."
+            },
+            "freelancers": {
+                "label": "פרילנס",
+                "description": "המשרד האחורי שאף פעם לא היה לך זמן אליו."
+            },
+            "ecommerce": {
+                "label": "מסחר אלקטרוני",
+                "description": "הזמנות, מלאי, ביקורות והמתחרים."
+            },
+            "real-estate": {
+                "label": "נדל\"ן",
+                "description": "מוכרים, פניות, מודעות והשכרות."
+            },
+            "startups": {
+                "label": "סטארטאפ",
+                "description": "פייפליין, השקות, מדדים ותמיכה."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "נטישה, משוב, גרסאות ופניות נכנסות."
+            },
+            "legal": {
+                "label": "משפט ורגולציה",
+                "description": "חוזים, התחייבויות, מועדים וביקורות."
+            },
+            "recruiting": {
+                "label": "גיוס ומשאבי אנוש",
+                "description": "סינון, ראיונות ומעקב אחר מועמדים."
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "למצוא לידים",
+                "description": "מודעות דרושים, מספר עובדים וה-CRM שלך, מוצלבים."
+            },
+            "trackSales": {
+                "label": "לעקוב אחר מכירות",
+                "description": "הכנסות, פייפליין והגיליון, כל בוקר."
+            },
+            "runAds": {
+                "label": "לנהל את המודעות",
+                "description": "ההוצאה נבדקת כל יום, המפסידות מושהות."
+            },
+            "watchCompetitors": {
+                "label": "לעקוב אחר מתחרים",
+                "description": "המחירים שלהם, ההשקות שלהם, הפערים שלך במילות מפתח."
+            },
+            "createContent": {
+                "label": "ליצור תוכן",
+                "description": "מהשאילתה שיורדת ועד הפוסט שמתפרסם מחדש."
+            },
+            "postSocial": {
+                "label": "לפרסם ברשתות",
+                "description": "פוסט כל בוקר, תגובות שנענות."
+            },
+            "replyCustomers": {
+                "label": "לענות ללקוחות",
+                "description": "שיחות שלא נקראו ממוינות ונענות בטון שלך."
+            },
+            "triageInbox": {
+                "label": "למיין את תיבת הדואר",
+                "description": "מתויג, תשובות בטיוטה, שתיים נשארות לך."
+            },
+            "prepareMeetings": {
+                "label": "להכין את הפגישות",
+                "description": "תקציר קצר על מי שאתה פוגש, לפני כל שיחה."
+            },
+            "trackOrders": {
+                "label": "לעקוב אחר הזמנות",
+                "description": "המאחרות מזוהות, הלקוחות שלך מעודכנים ראשונים."
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "מומחים",
+                "description": "לעיין בבוני עמיתים מאומתים ולגייס אותם."
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "להצטרף לקהילה ולקבל עזרה בזמן אמת."
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "תיעוד",
+                "description": "לבנות, לחבר ולהשיק את העמיתים שלך."
+            },
+            "blog": {
+                "label": "בלוג",
+                "description": "חדשות מוצר, מדריכים ותסריטי עבודה לעמיתים."
+            }
+        },
+        "faq": "שאלות נפוצות",
+        "solution": "פתרון",
+        "trialCta": "להתחיל ניסיון ב-$0",
+        "openMenu": "לפתוח את התפריט",
+        "closeMenu": "לסגור את התפריט",
+        "menu": "תפריט",
+        "main": "ראשי",
+        "starOnGithub": "כוכב ב-GitHub",
+        "login": "להתחבר",
+        "download": "להוריד",
+        "openWebApp": "לפתוח את אפליקציית הרשת",
+        "browseAll": {
+            "label": "לעיין בכל התבניות",
+            "description": "כל הספרייה, כל הקטגוריות בעמוד אחד."
+        },
+        "becomeExpert": "להפוך למומחה",
+        "startFree": "להתחיל בחינם",
+        "goToApp": "לעבור לאפליקציה",
+        "logo": {
+            "brandKit": "לצפות בערכת המותג",
+            "copy": "להעתיק את הלוגו (SVG)",
+            "download": "להוריד את הלוגו"
+        }
+    },
+    "github": {
+        "star": "כוכב",
+        "ariaStar": "לתת כוכב ל-Rerun ב-GitHub",
+        "ariaCount": "Rerun ב-GitHub, {count, plural, one {כוכב אחד} two {שני כוכבים} other {# כוכבים}}"
+    },
+    "heroCta": "להתחיל עכשיו בחינם",
+    "finalCta": {
+        "proof": "יותר מ-{count} עסקים פועלים על Rerun",
+        "titleLead": "לגייס עמיתים על מנוי <switch></switch>",
+        "titleTail": "<mark>שאתה כבר משלם עליו.</mark>",
+        "steps": {
+            "plug": "לחבר את המנוי שלך",
+            "hire": "להגדיר את העמיתים שלך",
+            "run": "לנהל את העסק עם עמיתים"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun עכשיו בקוד פתוח<wide> תחת AGPL-3.0</wide>",
+        "cta": "לתת לנו כוכב ב-GitHub"
+    },
+    "footer": {
+        "ctaTitle": "העמית הראשון שלך<br></br>במרחק שלוש דקות",
+        "ctaButton": "להתחיל בחינם",
+        "tagline": "להריץ את העבודה שלך על עמיתים. לבנות אותם, לראות אותם עובדים ולשמור עין על הכול.",
+        "productHuntAlt": "Rerun - עמיתי AI בקוד פתוח שבאמת עושים את העבודה | Product Hunt",
+        "columns": {
+            "features": "יכולות",
+            "industries": "תעשיות",
+            "solutions": "פתרונות",
+            "compare": "השוואה",
+            "guides": "מדריכים",
+            "resources": "משאבים",
+            "legal": "משפטי"
+        },
+        "resources": {
+            "about": "אודות",
+            "docs": "תיעוד",
+            "github": "GitHub",
+            "pricing": "תמחור",
+            "support": "תמיכה",
+            "templates": "תבניות",
+            "compare": "השוואה",
+            "blog": "בלוג",
+            "findExpert": "למצוא מומחה",
+            "becomeExpert": "להפוך למומחה",
+            "whatsNew": "מה חדש",
+            "brandKit": "ערכת מותג",
+            "community": "קהילה",
+            "affiliate": "תוכנית שותפים",
+            "partnerBadge": "תג שותף"
+        },
+        "compareLink": "Rerun מול {name}",
+        "guides": {
+            "aiEmployees": "עובדי AI",
+            "smallBusiness": "סוכני AI לעסקים קטנים",
+            "cost": "עלות עובד AI",
+            "noCode": "בוני סוכני AI ללא קוד",
+            "n8n": "חלופות ל-n8n",
+            "personal": "סוכני AI אישיים",
+            "hermes": "חלופות ל-Hermes"
+        },
+        "legal": {
+            "terms": "תנאי שימוש",
+            "refunds": "מדיניות החזרים",
+            "acceptableUse": "שימוש מותר",
+            "creatorTerms": "תנאי יוצרים",
+            "privacy": "מדיניות פרטיות",
+            "cookies": "מדיניות עוגיות",
+            "dpa": "הסכם עיבוד נתונים"
+        },
+        "copyright": "© {year} Rerun מאת {legalName}. כל הזכויות שמורות.",
+        "language": "שפה",
+        "categories": {
+            "agencies": "סוכנויות",
+            "ecommerce": "מסחר אלקטרוני",
+            "saas": "SaaS",
+            "sales": "מכירות",
+            "recruiting": "גיוס",
+            "real-estate": "נדל\"ן",
+            "legal": "משפט ורגולציה",
+            "creators": "יוצרים",
+            "productivity": "פרודוקטיביות",
+            "other": "אחר"
+        },
+        "cookieSettings": "הגדרות עוגיות"
+    },
+    "discord": "להצטרף ל-Discord שלנו",
+    "tabNudge": {
+        "firstCoworker": "3 דקות לעמית הראשון שלך",
+        "allDay": "עמיתים שעובדים בשבילך 24/7",
+        "welcomeGuest": "ברוך שובך. העמית הראשון שלך במרחק 3 דקות.",
+        "welcomeMember": "ברוך שובך. העמיתים שלך עובדים באפליקציה.",
+        "start": "להתחיל בחינם",
+        "goToApp": "לעבור לאפליקציה",
+        "dismiss": "לסגור"
+    },
+    "notFound": {
+        "homeAria": "דף הבית של Rerun",
+        "title": "העמוד הזה יצא מהתסריט.",
+        "body": "העמוד שחיפשת לא קיים או שהועבר. בוא נחזיר אותך למסלול.",
+        "back": "חזרה לדף הבית"
+    },
+    "crash": {
+        "title": "משהו השתבש.",
+        "body": "בעמוד הזה אירעה שגיאה לא צפויה. טען אותו מחדש כדי להמשיך מאיפה שעצרת.",
+        "reload": "לטעון מחדש",
+        "back": "חזרה לדף הבית"
+    },
+    "og": {
+        "default": {
+            "line1": "המשימות שלך",
+            "line2": "נעשות בידי AI",
+            "accent": "אפילו בזמן שאתה ישן."
+        },
+        "experts": {
+            "line1": "לגייס את",
+            "accent": "מומחי ה-AI הטובים",
+            "cta": "לגייס מומחה",
+            "hire": "לגייס",
+            "badges": {
+                "Studio": "סטודיו",
+                "Freelancer": "פרילנסר",
+                "Expert": "מומחה"
+            }
+        },
+        "compare": {
+            "vs": "Rerun מול",
+            "cta": "לצפות בהשוואה"
+        }
+    },
+    "composerPlaceholder": "לשלוח הודעה...",
+    "dialog": {
+        "close": "לסגור"
+    }
+}

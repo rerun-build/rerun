@@ -1,0 +1,277 @@
+{
+    "seo": {
+        "title": "价格",
+        "headline": "一个套餐，包含一切。",
+        "description": "Rerun 套餐每月 {price} 起：不限数量的同事和席位、专属私有机器、所有应用和不限次数的运行。免费试用 {trialDays} 天。",
+        "breadcrumbHome": "首页"
+    },
+    "hero": {
+        "eyebrow": "价格",
+        "description": "免费试用 Rerun {trialDays} 天。然后选择您需要多少位同事，并邀请整个团队加入。"
+    },
+    "price": {
+        "perMonth": "/月",
+        "perMonthBilledYearly": "/月，按年计费 {total}/年",
+        "once": "一次性"
+    },
+    "billing": {
+        "label": "计费周期",
+        "monthly": "按月",
+        "yearly": "按年",
+        "discount": "-{percent}%"
+    },
+    "tiers": {
+        "trial": {
+            "name": "免费试用",
+            "description": "让您的第一批同事开始工作，看看他们能做什么。",
+            "control": "绑定银行卡即可开始试用，{trialDays} 天内不收取任何费用。在此之前取消，您无需支付任何费用。",
+            "cta": "开始 {trialDays} 天免费试用",
+            "featuresLabel": "免费试用包含",
+            "features": {
+                "agents": "<b>最多 {agents} 位同事</b>，交接您的第一批任务",
+                "seats": "<b>不限席位</b>，与团队一起试用",
+                "credits": "<b>免费 {credits, plural, other {# 积分}}</b>，供您试用",
+                "models": "与 Pro 相同的<b>智能模型</b>",
+                "privacy": "您的数据保存在<b>私有、安全的工作区</b>中",
+                "apps": "<b>{connectors}+ 个应用和 MCP</b>，供您的同事使用",
+                "byom": "连接您<b>自己的 AI 订阅</b>或 API 密钥"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "适合每天让同事投入工作的团队。",
+            "cta": "立即开始",
+            "featuresLabel": "包含免费试用的全部内容，另加",
+            "features": {
+                "coworkers": "<b>不限数量的同事</b>，并肩为您工作",
+                "seats": "<b>不限席位</b>，无按用户收费",
+                "team": "与<b>整个团队</b>一起管理您的同事",
+                "credits": "每月<b>赠送 {credits, plural, other {# 积分}}</b>",
+                "autopilot": "让您的业务进入<b>自动驾驶</b>模式"
+            },
+            "creditsNote": "随时充值"
+        }
+    },
+    "socialApps": {
+        "label": "附加项",
+        "caption": "完全访问您的账号，就像您本人一样。",
+        "lede": "您手动做的一切，您的同事都能做。",
+        "details": "{app} 让您的同事能做什么",
+        "add": "添加 {app}",
+        "price": "<b>+{price}</b>/月",
+        "can": {
+            "linkedin_slot": {
+                "search": "搜索联系人，查看个人资料",
+                "invite": "发送和接受邀请",
+                "message": "发消息，阅读所有对话",
+                "post": "发帖、评论和互动"
+            },
+            "whatsapp_slot": {
+                "send": "发送消息、文件和语音",
+                "reply": "阅读并回复所有聊天",
+                "check": "查询号码是否使用 WhatsApp"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "企业版",
+        "description": "适合有特定需求的大型组织",
+        "features": {
+            "everything": "Rerun 的全部功能",
+            "infrastructure": "定制基础设施",
+            "infrastructureDetail": "专属部署或自托管：您的同事在您的组织需要的地方运行。",
+            "support": "专属支持",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "联系销售",
+        "ctaNote": "定制价格，为您的组织量身打造"
+    },
+    "plan": {
+        "tagline": "让同事投入工作所需的一切",
+        "from": "起价",
+        "flexible": "随时按需添加同事或积分。",
+        "cta": "开始免费试用",
+        "trialNote": "{trialDays} 天免费试用 · 需绑定银行卡，今天 {free}",
+        "included": "已包含",
+        "alsoIncluded": "同样包含",
+        "features": {
+            "coworkers": {
+                "label": "不限数量的同事",
+                "caption": "需要多少同事都可以，并行运行，各有各的工作和工具。"
+            },
+            "machine": {
+                "label": "专属机器",
+                "caption": "一台云端私有电脑，您工作区的每位同事都在这里工作，共享文件和数据。仅属于您。"
+            },
+            "seats": {
+                "label": "不限席位",
+                "caption": "整个团队使用同一个工作区，无按席位收费。"
+            },
+            "byoAi": {
+                "label": "自带 AI",
+                "caption": "可选：使用您自己的密钥、订阅或本地模型。"
+            },
+            "apps": {
+                "label": "{connectors}+ 个应用",
+                "caption": "您的所有工具都可直接连接，还支持任何 MCP 或 API。"
+            },
+            "delegate": {
+                "label": "委派任何任务",
+                "caption": "把琐事交出去，您的同事全天候处理。"
+            },
+            "invite": {
+                "label": "邀请您的队友",
+                "caption": "共享您的工作区，一起打造您的同事。"
+            }
+        }
+    },
+    "addons": {
+        "label": "附加项",
+        "title": "按需逐步扩展。",
+        "lede": "不是另一个套餐等级，需要时再加。",
+        "items": {
+            "credit_pack": {
+                "title": "Rerun 积分",
+                "unit": "+{credits, plural, other {# 积分}}，永不过期",
+                "caption": "在套餐之外为我们托管的模型增加积分，一次性付费。"
+            }
+        }
+    },
+    "comparison": {
+        "badge": "对比",
+        "title": "为什么大家转用 Rerun。",
+        "compareWith": "将 Rerun 与以下产品对比",
+        "fullComparison": "阅读 Rerun 与 {competitor} 的完整对比",
+        "allComparisons": "所有对比",
+        "alsoCompared": "其他对比",
+        "versus": "Rerun 对比 {competitor}"
+    },
+    "faq": {
+        "label": "价格常见问题",
+        "title": "关于账单的问题。",
+        "items": {
+            "basePlan": {
+                "question": "基础套餐包含什么？",
+                "answer": "不限数量的同事、一台专属的云端私有机器、不限席位、每月 {credits, plural, other {# 积分}}，以及所有应用、所有模板和不限次数的运行。没有任何功能被锁在更高等级的套餐中。"
+            },
+            "trial": {
+                "question": "有免费试用吗？",
+                "answer": "有，{trialDays} 天，包含 {agents} 位同事和 {trialCredits, plural, other {# 积分}}。需要绑定银行卡，今天收取 {free}，套餐从第 {trialDays} 天开始。您可以先组建第一支团队，看它工作，再做决定。在试用结束前取消，不会产生任何费用。"
+            },
+            "perTask": {
+                "question": "按任务或按运行次数收费吗？",
+                "answer": "不。无论您创建多少同事，他们都可以每天每小时运行，价格固定不变。执行次数从不计算。"
+            },
+            "ownAi": {
+                "question": "我可以使用自己的 AI 订阅或 API 密钥吗？",
+                "answer": "可以。接入您的 Claude 或 ChatGPT 订阅、您自己的 API 密钥或本地模型，我们这边不会收取任何模型费用。如果您不想这样做，可以使用套餐包含的积分。"
+            },
+            "whereRun": {
+                "question": "我的同事实际在哪里运行？",
+                "answer": "在您专属的云端私有电脑上，每个工作区一台，您的同事在这里工作，您的数据也保存在这里。在其中，您可以按团队、客户或项目将他们分组到 Boxes 中，数量不限。"
+            },
+            "addons": {
+                "question": "附加项如何运作？",
+                "answer": "它们不是另一个套餐。Rerun 积分一次性付费且永不过期：需要时随时购买。"
+            },
+            "removeAddon": {
+                "question": "移除附加项后会怎样？",
+                "answer": "您已付费的内容会保留到计费周期结束，较低的金额从下一张账单开始生效。不会在月中中断任何服务。"
+            },
+            "cancel": {
+                "question": "可以随时取消吗？",
+                "answer": "可以，在账单设置中一键取消，无需提前通知，也无需发邮件给任何人。其余事项请参阅我们的退款政策。"
+            },
+            "taxes": {
+                "question": "价格含税吗？",
+                "answer": "所示价格不含税。如果您所在国家适用增值税或销售税，将在结账时计算并加收。"
+            },
+            "enterprise": {
+                "question": "你们提供企业版价格吗？",
+                "answer": "提供。专属或自托管的基础设施、SSO、SLA 和专属支持，根据您的组织定价。请通过 help@rerun.build 联系我们。"
+            }
+        }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Rerun 终身套餐",
+            "description": "一次性支付 {price}，终身使用 Rerun：在您专属的私有机器上，不限数量的同事和队友，使用您自己的 AI。"
+        },
+        "eyebrow": "终身套餐",
+        "headline": "一次付费，终身使用 Rerun",
+        "description": "在您专属的私有机器上，不限数量的同事和队友。一次付费，无需订阅。",
+        "price": {
+            "once": "一次性",
+            "instead": "而不是 <s>每月 {monthly}</s>"
+        },
+        "cta": "获取终身访问权限",
+        "tiers": {
+            "label": "价格",
+            "title": "{months, plural, other {# 个月}}即可回本",
+            "lede": "月度套餐每月 {monthly}。终身套餐一次性 {price}。",
+            "pro": {
+                "description": "只要您使用 Rerun，就每月付费。",
+                "control": "即每年 {yearly}，3 年共 {threeYears}。",
+                "featuresLabel": "Pro 包含"
+            },
+            "lifetime": {
+                "name": "终身",
+                "description": "一次付费，永久使用 Rerun。",
+                "control": "{months, plural, other {# 个月}}即可回本，无需续订。",
+                "featuresLabel": "终身套餐包含",
+                "features": {
+                    "coworkers": "<b>不限数量的同事</b>，并肩为您工作",
+                    "seats": "<b>不限席位</b>，无按用户收费",
+                    "machine": "专属<b>私有机器</b>，全天候运行",
+                    "ownAi": "使用您自己的 AI：<b>API 密钥</b>或<b>您的 ChatGPT 订阅</b>",
+                    "noCredits": "<b>不含</b> Rerun 积分"
+                }
+            }
+        },
+        "plan": {
+            "label": "已包含",
+            "title": "您的 AI、您的团队、您的节奏"
+        },
+        "steps": {
+            "label": "使用方式",
+            "title": "三个步骤，两分钟",
+            "pay": {
+                "title": "一次付费",
+                "body": "一分钟内在 Stripe 上完成结账。"
+            },
+            "code": {
+                "title": "获取兑换码",
+                "body": "付款后立即显示，并发送到您的邮箱。"
+            },
+            "redeem": {
+                "title": "兑换",
+                "body": "登录，粘贴兑换码，您的工作区即切换为终身套餐。"
+            }
+        },
+        "faq": {
+            "label": "常见问题",
+            "title": "问题",
+            "subscribed": {
+                "question": "我已经在付月度套餐，可以切换吗？",
+                "answer": "可以。请在兑换前写信至 help@rerun.build，我们会将您的工作区转为终身套餐。"
+            },
+            "workspaces": {
+                "question": "一个兑换码可以解锁多个工作区吗？",
+                "answer": "一个兑换码只能切换一个工作区。每个工作区需要购买一个兑换码。"
+            },
+            "ownAi": {
+                "question": "我的同事使用哪种 AI 运行？",
+                "answer": "您自己的：您所选提供商的 API 密钥，或您的 ChatGPT 订阅。Rerun 积分不包含在此套餐中。"
+            },
+            "notIncluded": {
+                "question": "哪些内容不包含在内？",
+                "answer": "Rerun 积分，即我们按用量计费的 AI。您的同事改为使用您自己的 API 密钥或 ChatGPT 订阅运行。"
+            },
+            "updates": {
+                "question": "我能获得新功能吗？",
+                "answer": "能。终身工作区运行的 Rerun 与其他所有工作区相同，包括更新。"
+            }
+        }
+    }
+}

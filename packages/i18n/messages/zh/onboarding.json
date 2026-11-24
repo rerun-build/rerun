@@ -1,0 +1,110 @@
+{
+    "metaTitle": "欢迎",
+    "back": "返回",
+    "continue": "继续",
+    "site": {
+        "title": "您的网站是什么？",
+        "titleNamed": "{name}，您好！您的网站是什么？",
+        "description": "我们会阅读它，并为您的看板配备人员。",
+        "label": "公司网站",
+        "placeholder": "acme.com",
+        "continue": "继续",
+        "skip": "我没有网站"
+    },
+    "industry": {
+        "title": "您从事哪个行业？",
+        "description": "您的团队会随之调整。",
+        "other": "其他",
+        "otherLabel": "您的行业",
+        "otherPlaceholder": "面包店、牙科诊所、健身房…"
+    },
+    "role": {
+        "title": "您在那里做什么？",
+        "description": "您的第一位同事为您工作。",
+        "other": "其他职位",
+        "otherLabel": "您的职位",
+        "otherPlaceholder": "增长负责人"
+    },
+    "roles": {
+        "founderAgencyOwner": "创始人 / 代理机构负责人",
+        "accountOrClientLead": "客户经理或客户负责人",
+        "marketingCreative": "市场 / 创意",
+        "operations": "运营",
+        "founderStoreOwner": "创始人 / 店主",
+        "marketingGrowth": "市场 / 增长",
+        "customerCare": "客户服务",
+        "operationsLogistics": "运营 / 物流",
+        "founderCeo": "创始人 / CEO",
+        "productOrEngineering": "产品或工程",
+        "salesOrSupport": "销售或支持",
+        "salesRepOrAe": "销售代表或客户主管",
+        "salesLeadership": "销售管理层",
+        "marketingDemandGen": "市场 / 需求挖掘",
+        "recruiter": "招聘专员",
+        "talentOrHrLead": "人才或 HR 负责人",
+        "founderBroker": "创始人 / 经纪人",
+        "agent": "经纪人",
+        "propertyOrPortfolioManager": "物业或资产组合经理",
+        "marketing": "市场营销",
+        "founderPartner": "创始人 / 合伙人",
+        "lawyerOrCounsel": "律师或法律顾问",
+        "paralegalOrLegalOps": "律师助理或法务运营",
+        "businessDevelopment": "商务拓展",
+        "creatorFounder": "创作者 / 创始人",
+        "editorOrWriter": "编辑或作者",
+        "communityOrSocial": "社区或社交媒体",
+        "sponsorshipsBusiness": "赞助 / 商务",
+        "financeOrAdmin": "财务或行政",
+        "projectOrTeamLead": "项目或团队负责人",
+        "sales": "销售"
+    },
+    "team": {
+        "title": "邀请您的团队",
+        "description": "您的同事为你们所有人工作。",
+        "label": "队友的邮箱",
+        "placeholder": "name@company.com",
+        "invite": "邀请",
+        "invited": "已邀请",
+        "link": "邀请链接",
+        "copy": "复制",
+        "copied": "已复制",
+        "skip": "跳过"
+    },
+    "view": {
+        "title": "您想如何查看您的团队？",
+        "hint": "随时可在工作区菜单中切换"
+    },
+    "trial": {
+        "title": "开始免费试用",
+        "description": "试用一开始，您的同事就开始工作。",
+        "start": "开始我的免费试用"
+    },
+    "engine": {
+        "title": "正在设置您的工作区",
+        "milestones": {
+            "trial": "正在确认您的试用…",
+            "machine": "正在为您预留机器…",
+            "engine": "正在唤醒您的 Chief of Staff…"
+        },
+        "ready": "让我们一起组建您的团队。",
+        "greeting": "您好，我是您的 Chief of Staff",
+        "greetingNamed": "{name}，您好，我是您的 Chief of Staff",
+        "failed": "您的机器比平时花的时间更长。",
+        "retry": "重试",
+        "enterAnyway": "仍然进入",
+        "enter": "开始吧",
+        "wait": "请稍候"
+    },
+    "industries": {
+        "agencies": "代理机构",
+        "ecommerce": "电子商务",
+        "saas": "SaaS",
+        "sales": "销售",
+        "recruiting": "招聘",
+        "real-estate": "房地产",
+        "legal": "法律与合规",
+        "creators": "创作者",
+        "productivity": "效率",
+        "other": "其他"
+    }
+}

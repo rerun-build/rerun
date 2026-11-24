@@ -1,0 +1,144 @@
+{
+    "title": "同事",
+    "loadFailed": "无法加载您的同事。",
+    "retry": "重试",
+    "empty": "还没有同事。",
+    "loadingCoworkers": "正在加载同事",
+    "newCoworker": "新同事",
+    "untitledBox": "未命名 Box",
+    "teammate": "团队成员",
+    "pinned": {
+        "dragToReorder": "拖动以排序",
+        "done": "完成",
+        "unpin": "取消置顶",
+        "details": "同事详情",
+        "edit": "编辑置顶",
+        "unreadLabel": "{name}，未读"
+    },
+    "row": {
+        "label": "{name}，{line}",
+        "opensConversation": "打开对话",
+        "pin": "置顶",
+        "unpin": "取消置顶",
+        "pinToTop": "置于顶部"
+    },
+    "line": {
+        "paused": "已暂停",
+        "waiting": "等待您处理",
+        "error": "出了点问题",
+        "working": "工作中",
+        "workingOn": "工作中 · {detail}",
+        "asleep": "休眠中",
+        "asleepAbout": "休眠中 · {about}",
+        "you": "您：{message}"
+    },
+    "foreman": {
+        "askAnything": "随便问"
+    },
+    "header": {
+        "account": "账号"
+    },
+    "account": {
+        "preferences": "偏好设置",
+        "contactSupport": "联系客服",
+        "signOut": "退出登录",
+        "subscriptionTitle": "请先取消订阅",
+        "subscriptionMessage": "{workspaces} 仍会续订。请在 rerun.build 的账单中取消，然后再删除您的账号。",
+        "deleteTitle": "删除您的账号？",
+        "deleteMessage": "您将退出与他人共享的工作区。仅有您一人的工作区将永久停止，连同其中的同事和文件。此操作无法撤销。",
+        "delete": "删除",
+        "cancel": "取消",
+        "reauthTitle": "请重新登录以删除账号",
+        "reauthMessage": "为了您的安全，删除账号需要重新登录。请重新登录后在此处删除。",
+        "deleteFailedTitle": "无法删除您的账号",
+        "deleteFailedMessage": "请稍后重试。",
+        "leaveServerTitle": "离开 {host}？",
+        "leaveServerMessage": "您将退出登录，Rerun 会在 Rerun Cloud 上重新打开。",
+        "leaveServer": "离开"
+    },
+    "workspace": {
+        "untitled": "我的工作区",
+        "menuLabel": "工作区 {name}"
+    },
+    "section": {
+        "label": "{label}，{count}"
+    },
+    "search": {
+        "title": "搜索",
+        "back": "返回",
+        "placeholder": "搜索同事和对话",
+        "askRerun": "{named, select, yes {问问 {name}} other {问问您的 Chief of Staff}}",
+        "quotedAsk": "“{query}”",
+        "coworkers": "同事",
+        "conversations": "对话",
+        "noCoworker": "没有叫这个名字的同事。",
+        "newConversation": "新对话",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "通知",
+        "bellLabel": "通知，{count}",
+        "close": "关闭",
+        "settings": "通知设置",
+        "markLabel": "将通知标为已读",
+        "markRead": "{count, plural, other {将 # 条通知标为已读}}",
+        "nothingToMark": "没有可标记的通知",
+        "clearAll": "{count, plural, other {全部清除，包括 # 个请求}}",
+        "clearAllTitle": "清除所有通知？",
+        "clearAllMessage": "{count, plural, other {# 个等待中的请求将离开收件箱且不会得到回答，您的同事会继续等待。}}",
+        "clearAllConfirm": "全部清除",
+        "cancel": "取消",
+        "running": "{count, plural, other {# 个任务运行中}}",
+        "loadFailed": "无法加载您的通知。",
+        "retry": "重试",
+        "emptyTitle": "没有待处理事项",
+        "emptyDescription": "当同事需要您或完成任务时，会显示在这里。",
+        "undo": "撤销",
+        "ok": "好",
+        "sections": {
+            "needsYou": "需要您处理",
+            "headsUps": "提醒",
+            "errors": "错误",
+            "done": "已完成"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} 向您提了一个问题",
+            "awaiting_approval": "{agent} 需要您的批准",
+            "awaiting_connector": "{agent} 需要连接一个应用",
+            "waiting_human": "{agent} 正在等您",
+            "awaiting_ack": "{agent} 为您标记了一件事",
+            "error": "{agent} 遇到了错误",
+            "done": "{agent} 完成了运行"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}，{detail}",
+            "read": "已读",
+            "markRead": "标为已读",
+            "opensConversation": "打开对话",
+            "unfollow": "不再关注其定时任务",
+            "unfollowed": "您已不再关注 {name} 的定时任务。",
+            "mute": "将 {name} 静音",
+            "muted": "{name} 已静音。",
+            "settings": "通知设置",
+            "cancel": "取消"
+        }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, other {# 个需要您}} · {working} 个工作中",
+            "waiting": "{waiting, plural, other {# 个需要您}}",
+            "working": "{working} 个工作中",
+            "none": "全部完成"
+        },
+        "crew": "团队",
+        "needsYou": "需要您",
+        "atWork": "工作中",
+        "allDone": "全部完成",
+        "you": "您",
+        "stopped": "已停止",
+        "minutes": "{count}分钟",
+        "asks": "{name} 在询问",
+        "othersAtWork": "+{count} 个工作中"
+    }
+}

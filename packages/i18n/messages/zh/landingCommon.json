@@ -1,0 +1,313 @@
+{
+    "site": {
+        "title": "Rerun：运行在您的 ChatGPT 或 Claude 套餐上的 AI 员工",
+        "description": "雇佣负责销售、客服、营销和行政的 AI 员工。他们使用您的 ChatGPT 或 Claude 套餐、附赠积分或您的 API 密钥运行。免费试用 {trialDays} 天。"
+    },
+    "nav": {
+        "items": {
+            "features": "功能",
+            "useCases": "使用场景",
+            "industries": "行业",
+            "templates": "模板",
+            "pricing": "价格",
+            "community": "社区",
+            "resources": "资源"
+        },
+        "features": {
+            "coworkers": {
+                "label": "同事",
+                "description": "交给它一项工作，它会把完成的成果交回来。"
+            },
+            "coworker-manager": {
+                "label": "同事管理器",
+                "description": "说出您的需求，它会通知合适的同事。"
+            },
+            "computer-use": {
+                "label": "电脑操作",
+                "description": "它像真人一样在您的应用里工作。"
+            },
+            "tools": {
+                "label": "内含 {count}+ 种工具",
+                "description": "Gmail、Stripe、HubSpot 以及任何 MCP 服务器。"
+            },
+            "human-in-the-loop": {
+                "label": "人工把关",
+                "description": "做任何重要的事之前，他们都会先问您。"
+            },
+            "runs-24-7": {
+                "label": "全天候运行，位于欧洲",
+                "description": "夜晚、周末、合上电脑：它照样运行。"
+            },
+            "second-brain": {
+                "label": "第二大脑",
+                "description": "它了解您的产品、您的市场和您的语气。"
+            },
+            "workspaces": {
+                "label": "工作区",
+                "description": "一个账户，每项业务一个工作区。"
+            },
+            "invite-your-team": {
+                "label": "邀请整个团队",
+                "description": "所有人都在同一个看板上，无需额外费用。"
+            },
+            "coworkers-work-together": {
+                "label": "同事协同工作",
+                "description": "一个寻找潜在客户，下一个给他们写信。"
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "代理机构",
+                "description": "新业务、交付和客户报告。"
+            },
+            "freelancers": {
+                "label": "自由职业",
+                "description": "您一直没时间处理的后台事务。"
+            },
+            "ecommerce": {
+                "label": "电商",
+                "description": "订单、库存、评价和竞争对手。"
+            },
+            "real-estate": {
+                "label": "房地产",
+                "description": "卖家、咨询、房源和租赁。"
+            },
+            "startups": {
+                "label": "初创公司",
+                "description": "销售管道、发布、指标和客服。"
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "流失、反馈、版本发布和入站线索。"
+            },
+            "legal": {
+                "label": "法务与合规",
+                "description": "合同、义务、截止日期和审计。"
+            },
+            "recruiting": {
+                "label": "招聘与人事",
+                "description": "筛选、面试和候选人跟进。"
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "寻找潜在客户",
+                "description": "招聘信息、员工规模和您的 CRM，交叉比对。"
+            },
+            "trackSales": {
+                "label": "跟踪销售",
+                "description": "每天早上更新收入、销售管道和表格。"
+            },
+            "runAds": {
+                "label": "投放广告",
+                "description": "每天查看花费，暂停亏钱的广告。"
+            },
+            "watchCompetitors": {
+                "label": "监控竞争对手",
+                "description": "他们的价格、他们的新品、您的关键词差距。"
+            },
+            "createContent": {
+                "label": "创作内容",
+                "description": "从排名下滑的搜索词到重新发布的文章。"
+            },
+            "postSocial": {
+                "label": "发布社交媒体",
+                "description": "每天早上一篇帖子，评论都有回复。"
+            },
+            "replyCustomers": {
+                "label": "回复客户",
+                "description": "未读对话按您的语气分类并回复。"
+            },
+            "triageInbox": {
+                "label": "整理收件箱",
+                "description": "已加标签，回复已起草，只留两封给您。"
+            },
+            "prepareMeetings": {
+                "label": "准备会议",
+                "description": "每次通话前，一份关于见面对象的简报。"
+            },
+            "trackOrders": {
+                "label": "跟踪订单",
+                "description": "发现延误的订单，先告知您的客户。"
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "专家",
+                "description": "浏览经过审核的同事构建者并雇佣他们。"
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "加入社区，实时获得帮助。"
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "文档",
+                "description": "构建、连接并上线您的同事。"
+            },
+            "blog": {
+                "label": "博客",
+                "description": "产品动态、指南和同事实战手册。"
+            }
+        },
+        "faq": "常见问题",
+        "solution": "解决方案",
+        "trialCta": "$0 开始试用",
+        "openMenu": "打开菜单",
+        "closeMenu": "关闭菜单",
+        "menu": "菜单",
+        "main": "主导航",
+        "starOnGithub": "在 GitHub 上加星",
+        "login": "登录",
+        "download": "下载",
+        "openWebApp": "打开网页版",
+        "browseAll": {
+            "label": "浏览全部模板",
+            "description": "完整模板库，所有类别尽在一页。"
+        },
+        "becomeExpert": "成为专家",
+        "startFree": "免费开始",
+        "goToApp": "进入应用",
+        "logo": {
+            "brandKit": "查看品牌素材",
+            "copy": "复制标志（SVG）",
+            "download": "下载标志"
+        }
+    },
+    "github": {
+        "star": "加星",
+        "ariaStar": "在 GitHub 上为 Rerun 加星",
+        "ariaCount": "GitHub 上的 Rerun，{count} 颗星"
+    },
+    "heroCta": "立即免费开始",
+    "finalCta": {
+        "proof": "{count}+ 家企业在使用 Rerun",
+        "titleLead": "雇佣同事，就用 <switch></switch>",
+        "titleTail": "套餐，<mark>您已经在付费了。</mark>",
+        "steps": {
+            "plug": "接入您的订阅",
+            "hire": "设置您的同事",
+            "run": "让同事帮您经营业务"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun 现已开源<wide>，采用 AGPL-3.0 许可</wide>",
+        "cta": "在 GitHub 上为我们加星"
+    },
+    "footer": {
+        "ctaTitle": "您的第一位同事<br></br>只需三分钟",
+        "ctaButton": "免费开始",
+        "tagline": "让同事来完成您的工作。构建他们，看着他们工作，一切尽在掌握。",
+        "productHuntAlt": "Rerun - 真正动手干活的开源 AI 同事 | Product Hunt",
+        "columns": {
+            "features": "功能",
+            "industries": "行业",
+            "solutions": "解决方案",
+            "compare": "对比",
+            "guides": "指南",
+            "resources": "资源",
+            "legal": "法律"
+        },
+        "resources": {
+            "about": "关于",
+            "docs": "文档",
+            "github": "GitHub",
+            "pricing": "价格",
+            "support": "支持",
+            "templates": "模板",
+            "compare": "对比",
+            "blog": "博客",
+            "findExpert": "寻找专家",
+            "becomeExpert": "成为专家",
+            "whatsNew": "最新动态",
+            "brandKit": "品牌素材",
+            "community": "社区",
+            "affiliate": "联盟计划",
+            "partnerBadge": "合作伙伴徽章"
+        },
+        "compareLink": "Rerun 对比 {name}",
+        "guides": {
+            "aiEmployees": "AI 员工",
+            "smallBusiness": "面向小企业的 AI 智能体",
+            "cost": "AI 员工的成本",
+            "noCode": "无代码 AI 智能体构建工具",
+            "n8n": "n8n 替代方案",
+            "personal": "个人 AI 智能体",
+            "hermes": "Hermes 替代方案"
+        },
+        "legal": {
+            "terms": "服务条款",
+            "refunds": "退款政策",
+            "acceptableUse": "可接受使用政策",
+            "creatorTerms": "创作者条款",
+            "privacy": "隐私政策",
+            "cookies": "Cookie 政策",
+            "dpa": "数据处理协议"
+        },
+        "copyright": "© {year} Rerun，由 {legalName} 出品。保留所有权利。",
+        "language": "语言",
+        "categories": {
+            "agencies": "代理机构",
+            "ecommerce": "电商",
+            "saas": "SaaS",
+            "sales": "销售",
+            "recruiting": "招聘",
+            "real-estate": "房地产",
+            "legal": "法务与合规",
+            "creators": "创作者",
+            "productivity": "效率",
+            "other": "其他"
+        },
+        "cookieSettings": "Cookie 设置"
+    },
+    "discord": "加入我们的 Discord",
+    "tabNudge": {
+        "firstCoworker": "3 分钟拥有第一位同事",
+        "allDay": "全天候为您工作的同事",
+        "welcomeGuest": "欢迎回来。您的第一位同事只需 3 分钟。",
+        "welcomeMember": "欢迎回来。您的同事正在应用中运行。",
+        "start": "免费开始",
+        "goToApp": "进入应用",
+        "dismiss": "关闭"
+    },
+    "notFound": {
+        "homeAria": "Rerun 首页",
+        "title": "这个页面跑偏了。",
+        "body": "您要找的页面不存在或已移动。我们带您回到正轨。",
+        "back": "返回首页"
+    },
+    "crash": {
+        "title": "出了点问题。",
+        "body": "此页面遇到了意外错误。重新加载即可从中断处继续。",
+        "reload": "重新加载",
+        "back": "返回首页"
+    },
+    "og": {
+        "default": {
+            "line1": "让 AI 帮您",
+            "line2": "完成任务",
+            "accent": "即使在您睡觉时。"
+        },
+        "experts": {
+            "line1": "雇佣最好的",
+            "accent": "AI 专家",
+            "cta": "雇佣专家",
+            "hire": "雇佣",
+            "badges": {
+                "Studio": "工作室",
+                "Freelancer": "自由职业者",
+                "Expert": "专家"
+            }
+        },
+        "compare": {
+            "vs": "Rerun 对比",
+            "cta": "查看对比"
+        }
+    },
+    "composerPlaceholder": "发送消息...",
+    "dialog": {
+        "close": "关闭"
+    }
+}

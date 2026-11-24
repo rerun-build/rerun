@@ -1,0 +1,74 @@
+{
+    "switch": {
+        "label": "视图",
+        "board": "看板",
+        "simple": "经典"
+    },
+    "list": {
+        "label": "同事",
+        "search": "搜索",
+        "empty": "暂无同事",
+        "newBox": "新建 Box",
+        "emptyBox": "暂无同事",
+        "boxMore": "{name} 的操作"
+    },
+    "tile": {
+        "more": "{name} 的更多操作",
+        "newConversation": "新对话",
+        "allConversations": "所有对话",
+        "card": "同事卡片",
+        "pin": "置顶",
+        "unpin": "取消置顶"
+    },
+    "chat": {
+        "allConversations": "所有对话",
+        "pick": "请在左侧选择一位同事。",
+        "card": "同事卡片"
+    },
+    "line": {
+        "paused": "已暂停",
+        "waiting": "等待您处理",
+        "error": "出了点问题",
+        "working": "工作中",
+        "workingOn": "工作中 · {detail}",
+        "asleep": "休眠中",
+        "asleepAbout": "休眠中 · {about}",
+        "you": "您：{message}"
+    },
+    "foreman": {
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "line": "有问题尽管问",
+        "card": "{named, select, yes {{name} 的卡片} other {Chief of Staff 卡片}}",
+        "rename": "为您的 Chief of Staff 命名"
+    },
+    "details": {
+        "label": "{name} 的卡片"
+    },
+    "phone": {
+        "pinned": "已置顶",
+        "recent": "最近",
+        "byBox": "按 Box",
+        "section": "{label}，{count}"
+    },
+    "checkins": {
+        "title": "例行查看",
+        "toggle": "自动查看",
+        "next": "下次查看：{when}",
+        "waiting": "等待有人先发消息",
+        "off": "已关闭",
+        "unavailable": "此服务器已关闭该功能",
+        "switchedOff": "请先开启例行查看",
+        "recent": "最近",
+        "runNow": "立即查看",
+        "started": "正在查看。只有在值得一说时才会给您发消息。",
+        "empty": "暂无查看记录",
+        "reasons": {
+            "pulse": "每日查看，无事可报",
+            "promise": "按约回来查看，无新情况",
+            "manual": "已查看，无事可报"
+        },
+        "failed": "查看未完成",
+        "running": "正在查看",
+        "stopped": "查看已停止"
+    }
+}

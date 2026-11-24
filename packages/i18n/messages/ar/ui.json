@@ -1,0 +1,57 @@
+{
+    "close": "إغلاق",
+    "back": "رجوع",
+    "moreOptions": "خيارات أخرى",
+    "deleteConfirmTitle": "{label}؟",
+    "command": {
+        "title": "لوحة الأوامر",
+        "description": "ابحث عن أمر لتشغيله..."
+    },
+    "combobox": {
+        "placeholder": "اختر خيارًا",
+        "placeholderMultiple": "اختر خيارات",
+        "search": "بحث…",
+        "empty": "لا توجد نتائج",
+        "selected": "المحدد",
+        "remove": "إزالة {option}",
+        "reorder": "إعادة ترتيب {option}"
+    },
+    "filter": {
+        "search": "البحث في {label}…",
+        "empty": "لا تطابق",
+        "clear": "مسح"
+    },
+    "phone": {
+        "code": "رمز الاتصال الدولي، اكتب رمزًا أو اسم دولة",
+        "noCountry": "لم يتم العثور على أي دولة"
+    },
+    "powerBars": "القوة {filled} من {max}",
+    "markdown": {
+        "openEditor": "فتح المحرر الكامل",
+        "done": "تم"
+    },
+    "upload": {
+        "menu": "رفع",
+        "files": "رفع ملفات",
+        "folder": "رفع مجلد",
+        "failed": "فشل الرفع",
+        "finishing": "جارٍ الإنهاء",
+        "waiting": "في الانتظار · {size}",
+        "progress": "تقدم الرفع",
+        "uploadingFile": "جارٍ رفع {name}",
+        "totalProgress": "إجمالي تقدم الرفع",
+        "retry": "إعادة المحاولة",
+        "cancel": "إلغاء",
+        "cancelAll": "إلغاء الكل",
+        "dismiss": "تجاهل",
+        "headingFailed": "فشل رفع {failed} من {total} ملفات",
+        "headingDone": "{count, plural, zero {لم يُرفع أي ملف} one {تم رفع ملف واحد} two {تم رفع ملفين} few {تم رفع # ملفات} many {تم رفع # ملفًا} other {تم رفع # ملف}}",
+        "headingUploading": "جارٍ رفع {current} من {total}",
+        "more": "+ {count} أخرى"
+    },
+    "waveform": {
+        "live": "موجة صوتية مباشرة",
+        "processing": "جارٍ معالجة الصوت",
+        "idle": "موجة صوتية خاملة"
+    }
+}

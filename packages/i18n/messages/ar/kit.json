@@ -1,0 +1,520 @@
+{
+    "close": "إغلاق",
+    "chat": {
+        "actionApproval": {
+            "title": "الموافقة مطلوبة",
+            "previous": "الموافقة السابقة",
+            "next": "الموافقة التالية",
+            "decline": "ليس الآن",
+            "explain": "توضيح",
+            "approve": "موافقة",
+            "approved": "تمت الموافقة"
+        },
+        "alert": {
+            "title": "إشعار",
+            "markAsRead": "وضع علامة مقروء"
+        },
+        "approval": {
+            "title": "الموافقة مطلوبة: {label}",
+            "responded": "تم الرد: <b>{choice}</b>",
+            "choices": {
+                "once": "السماح مرة واحدة",
+                "session": "هذه الجلسة",
+                "always": "دائمًا",
+                "deny": "رفض"
+            }
+        },
+        "decline": {
+            "placeholder": "لماذا لا؟ (اختياري)",
+            "back": "رجوع",
+            "confirm": "تأكيد"
+        },
+        "question": {
+            "typeAnswer": "اكتب إجابتك…",
+            "somethingElse": "شيء آخر",
+            "attachFiles": "إرفاق ملفات",
+            "dropFiles": "أفلت الملفات لإرفاقها",
+            "record": "أجب بصوتك",
+            "useRecording": "استخدام هذا التسجيل",
+            "discardRecording": "حذف التسجيل",
+            "selectAll": "اختر كل ما ينطبق",
+            "dismiss": "تجاهل الأسئلة",
+            "skip": "تخطي",
+            "submit": "إرسال الإجابات",
+            "next": "السؤال التالي"
+        },
+        "reasoning": {
+            "thinking": "يفكّر...",
+            "thoughtFor": "فكّر لمدة {duration}",
+            "thought": "فكّر"
+        },
+        "secret": {
+            "saveFailed": "تعذّر حفظ بيانات الاعتماد",
+            "titleOne": "بيانات اعتماد مطلوبة",
+            "titleMany": "بيانات اعتماد مطلوبة",
+            "dismiss": "تجاهل طلب بيانات الاعتماد",
+            "storedAs": "محفوظة باسم {key}",
+            "replacePlaceholder": "محفوظة بالفعل. أدخل قيمة لاستبدالها",
+            "placeholder": "الصق القيمة",
+            "whereToFind": "أين تجدها",
+            "storageNote": "تُحفظ على محرّكك كمتغير للزميل. لا تُرسل إلى النموذج أبدًا.",
+            "vaultNote": "تُحفظ في Vault مساحة العمل. لا تُرسل إلى النموذج أبدًا.",
+            "skip": "تخطي",
+            "saving": "جارٍ الحفظ…",
+            "save": "حفظ"
+        },
+        "skillProposal": {
+            "remembering": "جارٍ الحفظ في الذاكرة",
+            "remembered": "تم التذكّر",
+            "failed": "تعذّر تذكّر هذا",
+            "retry": "إعادة المحاولة",
+            "dismiss": "تجاهل",
+            "notRemembered": "لم يُحفظ",
+            "remember": "تذكّر",
+            "no": "لا",
+            "view": "عرض",
+            "hideDetails": "إخفاء التفاصيل",
+            "showDetails": "عرض التفاصيل"
+        },
+        "steps": {
+            "previous": "الخطوة السابقة",
+            "next": "الخطوة التالية",
+            "goTo": "الانتقال إلى الخطوة {step}"
+        },
+        "table": {
+            "boxDatabase": "قاعدة بيانات Box",
+            "coworkerDatabase": "قاعدة بيانات الزميل",
+            "rows": "{count, plural, zero {لا صفوف} one {صف واحد} two {صفان} few {# صفوف} many {# صفًا} other {# صف}}",
+            "columnsHidden": "بعض الأعمدة مخفية",
+            "groupedBy": "مجمّعة حسب {column}",
+            "open": "فتح قاعدة البيانات",
+            "empty": "لا توجد صفوف بعد.",
+            "more": "+ {count} أخرى",
+            "rating": "{value} من 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "تكبير",
+        "zoomOut": "تصغير",
+        "recenter": "إعادة التوسيط",
+        "recenterView": "إعادة توسيط العرض"
+    },
+    "consent": {
+        "rejectAll": "رفض الكل",
+        "acceptAll": "قبول الكل",
+        "region": "الموافقة على ملفات تعريف الارتباط",
+        "title": "ملفات تعريف الارتباط",
+        "short": "نستخدم ملفات تعريف ارتباط تحليلية. <policy>سياسة ملفات تعريف الارتباط</policy>",
+        "long": "نستخدم ملفات تعريف ارتباط تحليلية لفهم كيفية استخدام Rerun. ملفات تعريف الارتباط اللازمة لتسجيل دخولك وتشغيل محادثة الدعم وتذكّر تفضيلاتك مفعّلة دائمًا. <policy>سياسة ملفات تعريف الارتباط</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "هويتك",
+                    "description": "صورتك، والغلاف، واسمك، وطريقة عملك."
+                },
+                "about": {
+                    "title": "نبذة عنك",
+                    "description": "أين أنت وماذا تفعل."
+                },
+                "pricing": {
+                    "title": "الأسعار والتوفّر",
+                    "description": "مدى توفّرك وفكرة عن أسعارك."
+                },
+                "expertise": {
+                    "title": "خبرتك",
+                    "description": "المهارات واللغات التي تعمل بها. اختياري."
+                },
+                "links": {
+                    "title": "الروابط والنشر",
+                    "description": "أضف روابطك، ثم انشر ملفك الشخصي."
+                }
+            },
+            "name": "الاسم",
+            "namePlaceholder": "مثال: Mira Labs",
+            "email": "البريد الإلكتروني",
+            "emailHelper": "خاص. لا يراه إلا فريق Rerun.",
+            "type": "النوع",
+            "location": "الموقع",
+            "locationPlaceholder": "مثال: باريس",
+            "bio": "النبذة",
+            "bioPlaceholder": "ما تبنيه ومن تساعده.",
+            "availability": "التوفّر",
+            "budget": "الميزانية",
+            "budgetPlaceholder": "اختر نطاقًا",
+            "skills": "المهارات",
+            "skillsPlaceholder": "اختر المهارات",
+            "languages": "اللغات",
+            "languagesPlaceholder": "اختر اللغات",
+            "website": "الموقع الإلكتروني",
+            "back": "رجوع",
+            "continue": "متابعة"
+        },
+        "types": {
+            "studio": {
+                "title": "استوديو",
+                "description": "وكالة أو فريق يبني للعملاء"
+            },
+            "freelancer": {
+                "title": "مستقل",
+                "description": "شخص مستقل يعمل بمفرده"
+            },
+            "expert": {
+                "title": "خبير",
+                "description": "متخصص يقدّم المشورة والتوجيه"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "متاح",
+                "hint": "يقبل أعمالًا جديدة الآن"
+            },
+            "soon": {
+                "label": "متاح قريبًا",
+                "hint": "سيتوفّر قريبًا"
+            },
+            "unavailable": {
+                "label": "غير متاح",
+                "hint": "محجوز بالكامل حاليًا"
+            }
+        },
+        "validation": {
+            "nameRequired": "الاسم مطلوب",
+            "nameTooLong": "الاسم طويل جدًا",
+            "nameInvalid": "لا يمكن أن يحتوي الاسم على < أو >",
+            "emailRequired": "البريد الإلكتروني مطلوب",
+            "emailInvalid": "بريد إلكتروني غير صالح",
+            "bioTooLong": "النبذة طويلة جدًا",
+            "budgetInvalid": "ميزانية غير صالحة",
+            "skillInvalid": "مهارة غير صالحة",
+            "languageInvalid": "لغة غير صالحة"
+        },
+        "images": {
+            "title": "الصورة والغلاف",
+            "drop": "أفلت",
+            "dropBanner": "أفلت الغلاف",
+            "dropPhoto": "أفلت صورتك",
+            "upload": "رفع",
+            "uploading": "جارٍ الرفع…",
+            "changeBanner": "تغيير الغلاف",
+            "uploadPhoto": "رفع صورة",
+            "remove": "إزالة",
+            "notAnImage": "يُرجى اختيار ملف صورة."
+        },
+        "card": {
+            "location": "الموقع",
+            "status": "الحالة",
+            "links": "الروابط",
+            "namePlaceholder": "اسمك",
+            "rolePlaceholder": "خبير Rerun"
+        },
+        "preview": {
+            "hire": "توظيف"
+        },
+        "skills": {
+            "agentDesign": "تصميم الوكلاء",
+            "workflowAutomation": "أتمتة سير العمل",
+            "ragKnowledgeBases": "RAG وقواعد المعرفة",
+            "integrationsApis": "التكاملات وواجهات API",
+            "mcpServers": "خوادم MCP",
+            "promptEngineering": "هندسة التعليمات",
+            "dataPipelines": "خطوط البيانات",
+            "chatbotsSupport": "روبوتات المحادثة والدعم",
+            "voiceAgents": "الوكلاء الصوتيون",
+            "leadGenOutreach": "توليد العملاء المحتملين والتواصل",
+            "crmAutomation": "أتمتة CRM",
+            "webScraping": "استخراج بيانات الويب",
+            "ecommerceAutomation": "أتمتة التجارة الإلكترونية",
+            "analyticsReporting": "التحليلات والتقارير",
+            "fineTuning": "الضبط الدقيق",
+            "noCodeAutomation": "الأتمتة دون برمجة"
+        }
+    },
+    "foreman": {
+        "orbLabel": "اسأل Chief of Staff",
+        "tabsLabel": "علامات تبويب Chief of Staff",
+        "empty": {
+            "title": "اسأل أي شيء عن مساحة العمل",
+            "description": "يبني Chief of Staff زملاءك ويشغّلهم معك"
+        },
+        "header": {
+            "closeChat": "إغلاق المحادثة",
+            "resize": "تغيير حجم المحادثة"
+        },
+        "tabs": {
+            "assistant": "اسأل",
+            "tasks": "المهام",
+            "routines": "المهام الروتينية",
+            "card": "البطاقة"
+        },
+        "periods": {
+            "running": "قيد التشغيل",
+            "morning": "هذا الصباح",
+            "afternoon": "بعد الظهر",
+            "tonight": "الليلة",
+            "tomorrow": "غدًا",
+            "week": "هذا الأسبوع",
+            "later": "لاحقًا",
+            "paused": "متوقفة مؤقتًا"
+        },
+        "routines": {
+            "setupFirst": "أكمل الإعداد أولًا",
+            "pause": "إيقاف {name} مؤقتًا",
+            "resume": "استئناف {name}",
+            "nameLabel": "اسم المهمة الروتينية",
+            "runningJustNow": "قيد التشغيل · <1د",
+            "runningMinutes": "قيد التشغيل · {minutes}د",
+            "runningHours": "قيد التشغيل · {hours}س",
+            "startsNow": "تبدأ الآن",
+            "startsInMinutes": "تبدأ خلال {minutes}د",
+            "startsInHours": "تبدأ خلال {hours}س"
+        },
+        "agentPicker": {
+            "openTab": "فتح {tab} لـ {name}"
+        }
+    },
+    "forms": {
+        "optional": "اختياري",
+        "hidePassword": "إخفاء كلمة المرور",
+        "showPassword": "إظهار كلمة المرور",
+        "select": "اختر…",
+        "search": "اكتب للبحث…",
+        "noResults": "لا توجد نتائج",
+        "dropFile": "أفلت ملفك هنا",
+        "remove": "إزالة {item}"
+    },
+    "primitives": {
+        "loading": "جارٍ التحميل",
+        "scrollLeft": "التمرير لليسار",
+        "scrollRight": "التمرير لليمين",
+        "carousel": {
+            "previous": "{label} السابق",
+            "next": "{label} التالي",
+            "goTo": "الانتقال إلى {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "العدد",
+            "totalTokens": "إجمالي الرموز",
+            "inputTokens": "رموز الإدخال",
+            "outputTokens": "رموز الإخراج",
+            "cachedInputTokens": "الرموز المخزنة مؤقتًا",
+            "reasoningTokens": "رموز الاستدلال",
+            "cost": "التكلفة",
+            "avgDurationMs": "متوسط المدة",
+            "errorCount": "الأخطاء",
+            "errorRate": "معدل الأخطاء"
+        },
+        "live": "مباشر",
+        "runStatus": {
+            "running": "قيد التشغيل",
+            "done": "مكتمل",
+            "error": "خطأ",
+            "cancelled": "ملغى"
+        },
+        "runs": {
+            "emptyTitle": "لا توجد عمليات تشغيل بعد",
+            "emptyDescription": "يُسجَّل هنا كل تشغيل للزميل",
+            "steps": "{count, plural, zero {لا خطوات} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+            "tokens": "{tokens} من الرموز"
+        },
+        "agentStatus": {
+            "idle": "خامل",
+            "working": "يعمل",
+            "error": "خطأ",
+            "waiting_human": "بانتظار شخص",
+            "offline": "غير متصل",
+            "empty": "لا يوجد زملاء لعرضهم."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "عمليات التشغيل: {count}",
+                "runSteps": "خطوات التشغيل: {count}",
+                "toolCalls": "استدعاءات الأدوات: {count}",
+                "sessions": "الجلسات: {count}"
+            },
+            "other": "أخرى",
+            "loading": "جارٍ التحميل...",
+            "noData": "لا توجد بيانات في هذه الفترة."
+        },
+        "usage": {
+            "input": "الإدخال",
+            "output": "الإخراج",
+            "cached": "مخزّن مؤقتًا",
+            "cost": "التكلفة",
+            "tokens": "الرموز",
+            "totalCost": "إجمالي التكلفة",
+            "totalTokens": "إجمالي الرموز",
+            "runs": "{count, plural, zero {لا عمليات تشغيل} one {تشغيل واحد} two {تشغيلان} few {# عمليات تشغيل} many {# تشغيلًا} other {# تشغيل}}",
+            "noUsage": "لا يوجد استخدام في هذه الفترة."
+        }
+    },
+    "inbox": {
+        "title": "الإشعارات",
+        "resize": "تغيير حجم الإشعارات",
+        "close": "إغلاق الإشعارات",
+        "preferences": "التفضيلات",
+        "preferencesUnavailable": "التفضيلات غير متاحة هنا",
+        "markAllRead": "وضع علامة مقروء على الكل",
+        "nothingToMark": "لا شيء لوضع علامة مقروء عليه",
+        "markRead": "وضع علامة مقروء",
+        "noUpdates": "لا توجد تحديثات",
+        "pillLabel": "الإشعارات: {summary}",
+        "pillLabelEmpty": "الإشعارات: لا توجد تحديثات",
+        "needsYouRow": "بانتظارك",
+        "needsYouCount": "{count, plural, zero {# بانتظارك} one {# بانتظارك} two {# بانتظارك} few {# بانتظارك} many {# بانتظارك} other {# بانتظارك}}",
+        "doneCount": "{count, plural, zero {# مكتمل} one {# مكتمل} two {# مكتمل} few {# مكتمل} many {# مكتمل} other {# مكتمل}}",
+        "needsYouRich": "{count, plural, zero {<b>#</b> بانتظارك} one {<b>#</b> بانتظارك} two {<b>#</b> بانتظارك} few {<b>#</b> بانتظارك} many {<b>#</b> بانتظارك} other {<b>#</b> بانتظارك}}",
+        "doneRich": "{count, plural, zero {<b>#</b> مكتمل} one {<b>#</b> مكتمل} two {<b>#</b> مكتمل} few {<b>#</b> مكتمل} many {<b>#</b> مكتمل} other {<b>#</b> مكتمل}}",
+        "newUpdates": "{count, plural, zero {<b>#</b> تحديثات جديدة} one {<b>#</b> تحديث جديد} two {<b>#</b> تحديثان جديدان} few {<b>#</b> تحديثات جديدة} many {<b>#</b> تحديثًا جديدًا} other {<b>#</b> تحديث جديد}}",
+        "running": "{count, plural, zero {<n>#</n> مهام قيد التشغيل} one {<n>#</n> مهمة قيد التشغيل} two {<n>#</n> مهمتان قيد التشغيل} few {<n>#</n> مهام قيد التشغيل} many {<n>#</n> مهمة قيد التشغيل} other {<n>#</n> مهمة قيد التشغيل}}",
+        "empty": {
+            "title": "لا شيء للمعالجة",
+            "description": "عندما يحتاج إليك زميل أو ينهي مهمة، يظهر ذلك هنا."
+        },
+        "sections": {
+            "needsYou": "بانتظارك",
+            "headsUps": "تنبيهات",
+            "errors": "الأخطاء",
+            "done": "مكتمل"
+        },
+        "sentences": {
+            "awaiting_question": "طرح عليك {agent} سؤالًا",
+            "awaiting_approval": "{agent} يحتاج إلى موافقتك",
+            "awaiting_connector": "{agent} يحتاج إلى ربط تطبيق",
+            "waiting_human": "{agent} بانتظارك",
+            "awaiting_ack": "نبّهك {agent} إلى أمر ما",
+            "error": "واجه {agent} خطأ",
+            "done": "أنهى {agent} التشغيل"
+        }
+    },
+    "richText": {
+        "bold": "غامق",
+        "italic": "مائل",
+        "heading": "عنوان",
+        "subheading": "عنوان فرعي",
+        "bulletList": "قائمة نقطية",
+        "numberedList": "قائمة مرقّمة",
+        "quote": "اقتباس",
+        "inlineCode": "شيفرة ضمن السطر",
+        "codeBlock": "كتلة شيفرة",
+        "link": "رابط",
+        "linkPrompt": "عنوان URL للرابط"
+    },
+    "theme": {
+        "label": "المظهر",
+        "options": {
+            "system": "النظام",
+            "light": "فاتح",
+            "dark": "داكن"
+        }
+    },
+    "newAgent": {
+        "create": "إنشاء {name}",
+        "createCoworker": "إنشاء زميل",
+        "apps": "التطبيقات",
+        "pickedApps": "التطبيقات: {apps}",
+        "or": "أو",
+        "browseTemplates": "تصفّح القوالب",
+        "job": {
+            "placeholder": "صف المهمة كما لو كنت توجّه أحد أعضاء فريقك.",
+            "label": "ماذا يجب أن يفعل زميلك الجديد؟"
+        },
+        "name": {
+            "placeholder": "سمِّ زميلك",
+            "label": "اسم الزميل"
+        },
+        "forYou": {
+            "heading": "أو ابدأ بزميل اخترناه لك",
+            "closeToIdea": "قريب من فكرتك",
+            "otherIdeas": "أفكار أخرى"
+        },
+        "appsPicker": {
+            "search": "البحث في التطبيقات",
+            "all": "الكل",
+            "empty": "لا يوجد تطبيق بهذا الاسم.",
+            "limit": "حتى {max} تطبيقات للبدء. يمكن لزميلك ربط المزيد لاحقًا.",
+            "categories": {
+                "payments": "المدفوعات",
+                "ecommerce": "التجارة الإلكترونية",
+                "crm": "CRM",
+                "marketing": "التسويق",
+                "seo": "تحسين محركات البحث",
+                "analytics": "التحليلات",
+                "dev": "المطوّرون",
+                "productivity": "الإنتاجية",
+                "other": "أخرى"
+            }
+        },
+        "schedule": {
+            "button": "الجدولة",
+            "readFromDescription": "مستخلص من وصفك",
+            "onASchedule": "وفق جدول",
+            "custom": "مخصص",
+            "noSchedule": "بلا جدول",
+            "onDemand": "فقط عندما أطلب",
+            "timeOfDay": "وقت اليوم",
+            "presets": {
+                "weekday": {
+                    "label": "كل يوم عمل في 9:00",
+                    "detail": "من الاثنين إلى الجمعة"
+                },
+                "monday": {
+                    "label": "كل اثنين في 9:00",
+                    "detail": "مرة في الأسبوع"
+                }
+            },
+            "everyDay": "كل يوم في {time}",
+            "everyWeekday": "كل يوم عمل في {time}",
+            "everyDays": "كل {days} في {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "لوحة الزملاء",
+        "addBlock": "إضافة كتلة على هذا الجانب",
+        "status": {
+            "idle": "خامل",
+            "working": "يعمل",
+            "error": "خطأ",
+            "offline": "غير متصل",
+            "waiting_human": "بانتظارك",
+            "disabled": "غير نشط",
+            "paused": "متوقف مؤقتًا",
+            "restoring": "جارٍ الاستعادة"
+        },
+        "countdown": {
+            "seconds": "{count}ث",
+            "minutes": "{count}د",
+            "hours": "{count}س",
+            "days": "{count}ي"
+        },
+        "untitledBox": "Box بلا اسم",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}، {state}{toHandle, plural, =0 {} zero {} one {، # للمعالجة} two {، # للمعالجة} few {، # للمعالجة} many {، # للمعالجة} other {، # للمعالجة}}{results, plural, =0 {} zero {} one {، نتيجة جديدة واحدة} two {، نتيجتان جديدتان} few {، # نتائج جديدة} many {، # نتيجة جديدة} other {، # نتيجة جديدة}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "قيد التشغيل",
+            "approval": "بانتظارك",
+            "success": "مكتمل",
+            "done": "مكتمل"
+        },
+        "approve": "موافقة",
+        "edit": "تعديل"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "التسويق",
+            "sales": "المبيعات",
+            "ops": "العمليات"
+        },
+        "roles": {
+            "headOfGrowth": "رئيس النمو",
+            "accountExecutive": "مدير حسابات",
+            "operationsSpecialist": "أخصائي عمليات"
+        }
+    }
+}

@@ -1,0 +1,379 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "已包含",
+            "plan": "订阅方案",
+            "key": "API 密钥"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro 或 Max",
+                "hint": "使用您的 Claude 账号登录"
+            },
+            "codex": {
+                "title": "ChatGPT Plus 或 Pro",
+                "hint": "使用您的 ChatGPT 账号登录"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Claude 模型，按 token 计费"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "GPT 模型，按 token 计费"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Gemini 模型，按 token 计费"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "一个密钥，使用所有模型"
+            },
+            "opencode": {
+                "title": "OpenCode Go 或 Console",
+                "hint": "粘贴您的 OpenCode 密钥"
+            },
+            "custom": {
+                "title": "自定义端点",
+                "hint": "Ollama、LM Studio、vLLM 或任何兼容 OpenAI 的服务器"
+            }
+        },
+        "summary": "{kind} · {count, plural, other {# 个模型}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Rerun 积分已暂停",
+        "creditUsed": "本月积分已使用 {percent}%",
+        "creditUsedUpOn": "本月积分已用完，将于 {date} 恢复",
+        "creditUsedUpNextMonth": "本月积分已用完，将于下月恢复",
+        "creditBackOn": "于 {date}",
+        "creditBackNextMonth": "于下月",
+        "windows": {
+            "session": "会话",
+            "fiveHour": "5 小时",
+            "weekly": "每周",
+            "monthly": "每月",
+            "modelWeekly": "{label} 每周",
+            "modelWeeklyUnnamed": "模型每周"
+        },
+        "windowResets": "{when}重置",
+        "tiers": {
+            "fast": "快速且便宜",
+            "smart": "最聪明"
+        },
+        "opencodePlan": {
+            "go": "包含在 Go 中",
+            "console": "Console 积分",
+            "free": "免费"
+        },
+        "unavailable": {
+            "opencodeRetired": "OpenCode 已不再提供",
+            "codexOutdated": "此 Box 上的 Codex CLI 版本过旧",
+            "notInChatgptPlan": "不在您的 ChatGPT 方案中"
+        },
+        "pricePerMillion": "输入 {input} · 输出 {output} /百万",
+        "guide": {
+            "anthropic": {
+                "title": "如何获取您的 Anthropic 密钥",
+                "step1": "打开 [Anthropic Console](https://console.anthropic.com/settings/keys) 并登录。",
+                "step2": "点击 **Create Key** 并为其命名，例如“Rerun”。",
+                "step3": "复制密钥（以 `sk-ant-` 开头）并粘贴到上方。它只显示一次。"
+            },
+            "openai": {
+                "title": "如何获取您的 OpenAI 密钥",
+                "step1": "打开 [OpenAI API keys](https://platform.openai.com/api-keys) 并登录。",
+                "step2": "点击 **Create new secret key** 并为其命名，例如“Rerun”。",
+                "step3": "复制密钥（以 `sk-` 开头）并粘贴到上方。它只显示一次。"
+            },
+            "google": {
+                "title": "如何获取您的 Google 密钥",
+                "step1": "打开 [Google AI Studio](https://aistudio.google.com/apikey) 并使用您的 Google 账号登录。",
+                "step2": "点击 **Create API key** 并选择一个 Google Cloud 项目。",
+                "step3": "复制密钥并粘贴到上方。"
+            },
+            "openrouter": {
+                "title": "如何获取您的 OpenRouter 密钥",
+                "step1": "打开 [OpenRouter keys](https://openrouter.ai/keys) 并登录。",
+                "step2": "点击 **Create API Key**，如果余额为空请先充值。",
+                "step3": "复制密钥（以 `sk-or-` 开头）并粘贴到上方。它只显示一次。"
+            },
+            "opencode": {
+                "title": "如何获取您的 OpenCode 密钥",
+                "step1": "打开 [OpenCode](https://opencode.ai/auth) 并登录。",
+                "step2": "订阅 **OpenCode Go**，或充值以使用 Console 模型。",
+                "step3": "创建一个 API 密钥，复制它（以 `oc_sk_` 开头）并粘贴到上方。"
+            }
+        }
+    },
+    "noPlan": {
+        "trialText": "开始免费试用，即可连接您自己的 Claude 方案、ChatGPT 方案或 API 密钥。",
+        "subscribeText": "订阅后即可连接您自己的 Claude 方案、ChatGPT 方案或 API 密钥。",
+        "startTrial": "开始免费试用",
+        "subscribe": "订阅"
+    },
+    "baseUrl": {
+        "label": "自定义基础 URL",
+        "helper": "将请求发送到您自己的兼容 OpenRouter 的路由器",
+        "inputLabel": "OpenRouter 基础 URL"
+    },
+    "planLimits": {
+        "title": "方案用量",
+        "empty": "此方案下次运行后，用量会显示在这里。",
+        "updatedJustNow": "刚刚更新",
+        "updatedAgo": "{age}前更新",
+        "used": "已使用 {percent}",
+        "usedWithReset": "已使用 {percent}，{reset}"
+    },
+    "meter": {
+        "planLimit": "{name}限额已使用",
+        "monthlyCredits": "本月积分已使用"
+    },
+    "providerPicker": {
+        "added": "已添加"
+    },
+    "status": {
+        "paused": "已暂停",
+        "creditsUsedUp": "积分已用完",
+        "signInAgain": "重新登录",
+        "keyRejected": "密钥被拒",
+        "keyMissing": "缺少密钥",
+        "ready": "就绪"
+    },
+    "backToProviders": "返回 AI 提供商",
+    "subtitle": {
+        "included": "包含在您的方案中",
+        "apiKey": "{provider} API 密钥"
+    },
+    "key": {
+        "label": "API 密钥",
+        "placeholder": "粘贴您的密钥"
+    },
+    "name": {
+        "label": "名称",
+        "helper": "显示在每位同事的模型选择器中"
+    },
+    "becomesDefault": "这将成为工作区默认模型：所有未单独设置模型的同事都将使用它运行。",
+    "connecting": "正在连接…",
+    "errors": {
+        "nameRequired": "请为此连接命名",
+        "createFailed": "创建连接失败",
+        "renameFailed": "重命名连接失败",
+        "saveFailed": "保存失败",
+        "startFailed": "无法启动连接",
+        "saveTokenFailed": "保存令牌失败",
+        "saveConnectionFailed": "保存连接失败",
+        "codeExpired": "代码已过期，请重新开始",
+        "deleteFailed": "删除连接失败",
+        "defaultFailed": "更改默认模型失败",
+        "backupsFailed": "保存备用模型失败"
+    },
+    "addProvider": {
+        "addKey": "添加密钥"
+    },
+    "remove": {
+        "button": "移除 {name}",
+        "confirmTitle": "移除 {name}？",
+        "confirm": "移除",
+        "removed": "已移除 {name}",
+        "checking": "正在检查仍在使用它的内容…",
+        "fallBack": {
+            "agents": "{agents} 将回退到工作区默认模型。",
+            "automations": "{count, plural, other {# 个自动化}}将回退到工作区默认模型。",
+            "both": "{agents} 和 {count, plural, other {# 个自动化}}将回退到工作区默认模型。"
+        },
+        "holdsDefault": "它承载着工作区默认模型，该默认模型将被清除：所有未选择模型的同事都将回退到 Rerun。",
+        "nothingRuns": "凭据已从 Box 中移除。没有任何内容在使用它。",
+        "released": {
+            "agents": "{agents} 现在使用工作区默认模型运行。",
+            "automations": "{count, plural, other {# 个自动化}}现在使用工作区默认模型运行。",
+            "both": "{agents} 和 {count, plural, other {# 个自动化}}现在使用工作区默认模型运行。"
+        },
+        "defaultCleared": "工作区默认模型已清除。"
+    },
+    "customModels": {
+        "remove": "移除",
+        "add": "添加",
+        "addCustom": "添加自定义模型",
+        "openrouterHint": "添加任意 OpenRouter 模型 ID（例如 <mono>x-ai/grok-4</mono>）。",
+        "serverHint": "添加服务器提供但未列出的模型（例如 <mono>llama3.3:70b</mono>）。",
+        "idPlaceholder": "模型 ID"
+    },
+    "models": {
+        "title": "模型",
+        "defaultModel": "默认模型",
+        "turnOff": "关闭 {model}",
+        "turnOn": "开启 {model}",
+        "lockDefault": "这是默认模型。请先选择另一个默认模型。",
+        "lockLast": "同事至少需要此来源的一个模型。",
+        "lockCustom": "自定义模型。请在下方移除。",
+        "available": "您的同事可以使用",
+        "count": "{on} / {total}",
+        "availableEmpty": "将模型拖到这里，同事即可使用。",
+        "hidden": "已关闭",
+        "hiddenEmpty": "将模型拖到这里，同事将无法使用。"
+    },
+    "opencode": {
+        "goTitle": "包含在 OpenCode Go 中",
+        "goHint": "由您的 Go 方案支付。免费模型默认关闭，需手动开启。",
+        "consoleTitle": "Console，使用您的积分支付",
+        "consoleHint": "按 token 计费，开启后才会使用。",
+        "included": "已包含",
+        "credits": "积分",
+        "free": "免费",
+        "new": "新",
+        "noVision": "无视觉",
+        "search": "搜索模型",
+        "emptySection": "OpenCode 目前在此未列出任何模型。",
+        "noMatch": "没有与“{query}”匹配的模型。"
+    },
+    "detail": {
+        "readOnly": "{reason}。",
+        "keyReplaced": "密钥已替换",
+        "signedInAgain": "已重新登录",
+        "creditsTitle": "本月积分",
+        "topUp": "充值",
+        "creditsUsedUpOn": "使用 Rerun 运行的同事已暂停，直到积分于 {date} 恢复。充值或选择另一个默认模型，让它们继续工作。",
+        "creditsUsedUpNextMonth": "使用 Rerun 运行的同事已暂停，直到积分于下月恢复。充值或选择另一个默认模型，让它们继续工作。",
+        "creditsIncluded": "随您的 Rerun 方案附带。无需密钥，无需设置。",
+        "signInRejected": "此次登录被拒绝。使用它的同事将停止工作，直到您重新登录。",
+        "signInExpired": "此次登录已过期。使用它的同事将停止工作，直到您重新登录。",
+        "reconnected": "您的同事已重新开始工作",
+        "keyRejected": "此密钥被拒绝。使用它的同事将停止工作，直到您粘贴新的密钥。",
+        "keyMissing": "没有已保存的密钥。使用它的同事将停止工作，直到您粘贴一个密钥。"
+    },
+    "panel": {
+        "adminOnly": "只有管理员可以更改 AI 提供商",
+        "groups": {
+            "default": "默认模型",
+            "backups": "备用模型",
+            "included": "已包含",
+            "plans": "您的订阅",
+            "keys": "您的 API 密钥",
+            "noPlan": "您的订阅和 API 密钥"
+        },
+        "pitch": {
+            "plansWithOpencode": "已经在用 Claude Code、Codex 或 OpenCode？您的同事可以使用您的方案运行。",
+            "plans": "已经在用 Claude Code 或 Codex？您的同事可以使用您的方案运行。",
+            "plansWithoutClaudeWithOpencode": "已经在用 Codex 或 OpenCode？您的同事可以使用您的方案运行。",
+            "plansWithoutClaude": "已经在用 Codex？您的同事可以使用您的 ChatGPT 方案运行。",
+            "keysWithCustom": "按 token 直接向提供商付费，或运行您自己的模型。",
+            "keys": "按 token 直接向提供商付费。"
+        },
+        "default": {
+            "via": "通过 {source}。未单独设置模型的同事使用它运行。",
+            "pausedPick": "Rerun 积分已暂停，因此未单独设置模型的同事也已暂停。选择另一个模型，让它们继续工作。",
+            "pausedAdd": "Rerun 积分已暂停，因此未单独设置模型的同事也已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "usedUpOnPick": "Rerun 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
+            "usedUpOnAdd": "Rerun 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "usedUpNextMonthPick": "Rerun 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
+            "usedUpNextMonthAdd": "Rerun 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "stopped": "未单独设置模型的同事已停止工作。请修复 {source} 或选择另一个模型。",
+            "noOtherModel": "没有其他就绪的模型。请先添加订阅方案或 API 密钥。",
+            "change": "更改"
+        },
+        "backups": {
+            "add": "添加备用模型",
+            "rank": "{rank, selectordinal, other {第 # 位}} · 通过 {source}",
+            "rankNotReady": "{rank, selectordinal, other {第 # 位}} · {source} 未就绪，已跳过",
+            "moveUp": "上移 {model}",
+            "moveDown": "下移 {model}",
+            "remove": "移除 {model}",
+            "full": "最多 {max} 个备用模型",
+            "noneLeft": "没有其他就绪的模型。请先添加订阅方案或 API 密钥。",
+            "credit": {
+                "title": "以 Rerun 积分作为最后备选",
+                "description": "仅在所有方案都用完时"
+            }
+        },
+        "addSubscription": "添加订阅",
+        "addApiKey": "添加 API 密钥"
+    },
+    "chatgpt": {
+        "allowStep": "在 ChatGPT 中允许通过代码登录",
+        "openSettings": "打开 ChatGPT 设置",
+        "alreadyOn": "已经开启了",
+        "codeStep": "在 OpenAI 上输入代码",
+        "remarks": {
+            "connected": "全部就绪！",
+            "starting": "正在获取代码",
+            "expired": "那个代码已过期。",
+            "stuck": "OpenAI 仍然没有回应。",
+            "waiting": "正在等待 OpenAI",
+            "grabCode": "现在去获取一个代码。",
+            "turnOn": "只需开启一次。"
+        },
+        "setting": {
+            "path": "该设置在 ChatGPT 中的位置",
+            "settings": "设置",
+            "security": "安全",
+            "deviceCode": "为 Codex 启用设备代码授权"
+        },
+        "adminSwitches": "由您的 ChatGPT 管理员为整个工作区开启。<copy></copy>",
+        "plusOrPro": "我使用的是 Plus 或 Pro",
+        "businessQuestion": "使用 ChatGPT Business 或 Enterprise？",
+        "copyCode": "复制代码",
+        "enterCode": "在 <link>OpenAI 的页面</link>上输入并批准。此窗口会自动获取结果。",
+        "opening": "OpenAI 正在新标签页中打开",
+        "gettingCode": "正在获取代码…",
+        "newCode": "获取新代码",
+        "getCode": "获取代码",
+        "stuck": {
+            "expiredAdmin": "代码已过期。您的管理员可能尚未允许通过代码登录。<copy></copy>",
+            "errorAdmin": "OpenAI 的页面出错了？您的管理员可能尚未允许通过代码登录。<copy></copy>",
+            "expiredSelf": "代码已过期。通过代码登录可能仍处于关闭状态：请在 <link>设置 → 安全</link> 中开启，然后获取新代码。",
+            "errorSelf": "OpenAI 的页面出错了？通过代码登录可能仍处于关闭状态：请在 <link>设置 → 安全</link> 中开启，然后重新输入代码。"
+        },
+        "copied": "已复制",
+        "copyMessage": "复制一条消息发给他们",
+        "adminMessage": "您好！能否在我们的 ChatGPT 工作区设置中开启“为 Codex 启用设备代码授权”？我需要用它把我的 ChatGPT 方案连接到 Rerun。"
+    },
+    "claude": {
+        "remarks": {
+            "idle": "我就在这里等着。",
+            "waiting": "粘贴 Claude 给您的内容。",
+            "checking": "正在检查",
+            "connected": "全部就绪！"
+        },
+        "approveStep": "在 Claude 上批准 Rerun",
+        "opening": "Claude 正在新标签页中打开",
+        "openAgain": "再次打开 Claude",
+        "open": "打开 Claude",
+        "pasteStep": "粘贴代码",
+        "checkingCode": "正在检查代码…",
+        "codeAccepted": "代码已接受",
+        "codePlaceholder": "来自 Claude 的代码",
+        "paste": "粘贴",
+        "pasteHint": "使用 ⌘V 或 Ctrl+V 粘贴到输入框中。"
+    },
+    "nameStep": {
+        "title": "命名",
+        "remark": "最后一步：起个名字。",
+        "fieldLabel": "连接名称",
+        "saving": "正在保存…",
+        "done": "完成",
+        "helper": "显示在每位同事的模型选择器中。"
+    },
+    "letsGo": "开始吧",
+    "custom": {
+        "server": "服务器",
+        "other": "其他",
+        "baseUrl": "基础 URL",
+        "keyOptionalPlaceholder": "本地服务器无需填写",
+        "modelId": "模型 ID",
+        "connect": "连接",
+        "endpoint": "端点",
+        "contextWindow": "上下文窗口",
+        "contextWindowHelper": "以 token 计，适用于服务器未自行设定大小的模型",
+        "vision": "模型可识别图片",
+        "visionHelper": "截图和电脑操作需要此功能",
+        "probe": {
+            "unreachableCloud": "无法连接到 {host}。它必须是一个可以响应的公网地址。",
+            "unreachableLocal": "无法连接到 {host}。请检查服务器是否正在运行，且引擎可以访问。",
+            "unauthorized": "服务器拒绝了此密钥。请检查是否完整复制。",
+            "notListed": "此服务器未列出其模型。请输入要运行的模型 ID。",
+            "refused": "服务器拒绝了 {model}：{detail}",
+            "refusedPlain": "服务器拒绝了 {model}。",
+            "refusedUnnamedDetail": "服务器拒绝了此模型：{detail}",
+            "refusedUnnamed": "服务器拒绝了此模型。"
+        }
+    }
+}

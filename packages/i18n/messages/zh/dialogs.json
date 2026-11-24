@@ -1,0 +1,696 @@
+{
+    "account": {
+        "emailChangeNeedsCurrentAddress": "此更改仍需从您当前的邮箱地址确认。",
+        "emailUpdated": "邮箱已更新",
+        "phoneUpdated": "手机号已更新",
+        "connectFailed": "无法连接 {provider}，请重试。",
+        "disconnectFailed": "无法断开 {provider}，请重试。",
+        "onlySignInMethod": "{provider} 是此账号唯一已连接的登录方式。",
+        "disconnected": "已断开 {provider}",
+        "changeEmail": "更改邮箱",
+        "addEmail": "添加邮箱",
+        "changePhone": "更改手机号",
+        "addPhone": "添加手机号",
+        "googleNeedsBrowser": "请在浏览器中打开 Rerun 以连接 Google。"
+    },
+    "members": {
+        "title": "成员",
+        "description": "管理员管理账单、成员和设置。成员使用同事。",
+        "adminOnly": "只有管理员可以管理成员",
+        "seatsFullOne": "您的工作区限一个席位。",
+        "seatsFull": "您的工作区限 {count, plural, other {# 个席位}}。",
+        "fallbackLabel": "成员",
+        "nowAdmin": "{name} 现在是管理员",
+        "nowMember": "{name} 现在是成员",
+        "removed": "已将 {name} 移出工作区",
+        "unknownUser": "未知用户",
+        "lastAdmin": "工作区至少需要一位管理员",
+        "you": "您",
+        "adminBadge": "管理员",
+        "manage": "管理 {email}",
+        "makeAdmin": "设为管理员",
+        "makeMember": "设为成员",
+        "remove": "移除",
+        "removeConfirm": {
+            "title": "移除 {email}？",
+            "description": "对方将立即失去对此工作区及其中所有内容的访问权限。您以后可以重新邀请。"
+        },
+        "revokeConfirm": {
+            "title": "撤销对 {email} 的邀请？",
+            "description": "其邀请链接将失效。您可以随时发送新的邀请。",
+            "confirm": "撤销"
+        },
+        "invite": {
+            "assignLater": "稍后分配",
+            "pending": "待接受",
+            "revoke": "撤销邀请",
+            "linkHint": "将此链接发送给 {email}。仅对方可用，且只能使用一次。",
+            "copyLink": "复制邀请链接",
+            "emailLabel": "通过邮箱邀请",
+            "emailPlaceholder": "teammate@rerun.build",
+            "boxes": "Boxes",
+            "submit": "邀请",
+            "sent": "已向 {email} 发送邀请"
+        },
+        "scope": {
+            "all": {
+                "label": "所有 Boxes",
+                "description": "对工作区开放的所有 Box"
+            },
+            "assigned": {
+                "label": "暂无，稍后分配",
+                "description": "仅限您分配给对方的 Boxes"
+            }
+        },
+        "boxes": {
+            "title": "{person} 的 Boxes",
+            "back": "返回成员",
+            "adminsSeeAll": "管理员可以访问所有 Box",
+            "sharedField": "与工作区共享的 Boxes",
+            "sharedAll": "可使用所有对所有人开放的 Box",
+            "sharedAssigned": "仅使用下方列出的 Boxes",
+            "limit": {
+                "title": "将 {person} 限制为指定的 Boxes？",
+                "confirm": "限制"
+            },
+            "group": "Boxes",
+            "empty": "还没有 Box",
+            "everyone": {
+                "label": "所有人",
+                "description": "可以使用，此 Box 对工作区开放"
+            },
+            "coworkers": "{count, plural, other {# 位同事}}",
+            "coworkersRestricted": "{count, plural, other {# 位同事}} · 仅限选定人员",
+            "accessTo": "{box} 的访问权限",
+            "restrictBox": "限制此 Box",
+            "restrict": {
+                "title": "限制 {box}？",
+                "description": "只有 {person}、已列出的人员和管理员保留访问权限。",
+                "confirm": "限制"
+            },
+            "removeAccess": {
+                "title": "移除对 {box} 的访问权限？",
+                "confirm": "移除"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "名称为必填项",
+        "invitesFailed": "工作区已创建，但有 {count, plural, other {# 份邀请}}未能发送。请升级套餐以邀请队友。",
+        "steps": {
+            "name": {
+                "title": "为工作区命名",
+                "description": "工作区汇集您的 Boxes、同事和团队。您以后可以重命名。"
+            },
+            "icon": {
+                "title": "选择图标",
+                "description": "为您的工作区选择一个插图。您以后可以更改。"
+            },
+            "team": {
+                "title": "邀请您的团队",
+                "description": "添加队友，在此工作区中协作。"
+            }
+        },
+        "name": "名称",
+        "namePlaceholder": "例如 Acme Inc.",
+        "email": "邮箱",
+        "emailPlaceholder": "teammate@rerun.build",
+        "emailHint": "创建工作区时，队友会收到邀请邮件。邀请需要 Team 或 Scale 套餐。",
+        "add": "添加",
+        "removeMember": "移除 {email}",
+        "open": "打开工作区",
+        "back": "返回",
+        "continue": "继续",
+        "creating": "正在创建",
+        "create": "创建工作区",
+        "preview": {
+            "you": "您",
+            "namePlaceholder": "工作区名称",
+            "solo": "个人",
+            "members": "成员",
+            "owner": "所有者"
+        }
+    },
+    "deleteAccount": {
+        "title": "删除您的账号？",
+        "description": "您将退出登录，且无法再登录此账号。只有您一人的工作区将永久停止。此操作无法撤销。",
+        "typeToConfirm": "输入 <strong>{word}</strong> 以确认。",
+        "confirm": "删除"
+    },
+    "deleteBox": {
+        "title": "删除 Box？",
+        "holdsCoworkers": "此 Box 中仍有 {count, plural, other {# 位同事。请先将其移到其他 Box 或删除。}}",
+        "description": "此操作无法撤销。该 Box 将被永久删除。",
+        "typeToConfirm": "输入 <strong>{name}</strong> 以确认。",
+        "confirm": "删除"
+    },
+    "claimBox": {
+        "title": "新建 Box",
+        "description": "为 Box 命名，或选择一个建议的名称。",
+        "boxFirst": {
+            "heading": "请先创建一个 Box",
+            "description": "您的新同事会进入其中，由您管理。"
+        }
+    },
+    "boxExplainer": {
+        "title": "什么是 Box？",
+        "points": {
+            "room": {
+                "label": "工作区中的一个房间",
+                "description": "每个团队、每个客户或每个项目一个。"
+            },
+            "home": {
+                "label": "众多同事的家",
+                "description": "同事们在其中并肩生活和工作。"
+            },
+            "shared": {
+                "label": "没有任何隔阂",
+                "description": "每位同事共享工作区的文件和数据。"
+            },
+            "free": {
+                "label": "免费且即时",
+                "description": "工作需要多少就创建多少。"
+            }
+        }
+    },
+    "phoneVerification": {
+        "title": "最后一步",
+        "subtitle": "添加您的手机号。"
+    },
+    "boxAccess": {
+        "title": "{box} 的访问权限",
+        "description": "访问权限适用于此 Box 中的所有同事",
+        "unnamedBox": "未命名 Box",
+        "visibilityField": "谁可以使用此 Box",
+        "visibility": {
+            "workspace": "工作区中的所有人",
+            "restricted": "仅限选定人员"
+        },
+        "people": "人员",
+        "addPeople": "添加人员",
+        "emptyRestricted": "目前只有管理员可以使用此 Box。",
+        "emptyOpen": "指定人员，让他们管理此 Box。",
+        "restrict": {
+            "title": "限制 {box}？",
+            "descriptionWithPeople": "只有此处列出的人员和管理员保留访问权限。",
+            "descriptionEmpty": "在您添加人员之前，只有管理员保留访问权限。",
+            "confirm": "限制"
+        },
+        "admin": "管理员",
+        "createdBox": "创建了此 Box",
+        "accessOf": "{person} 的访问权限",
+        "remove": {
+            "title": "移除 {person}？",
+            "confirm": "移除",
+            "ariaLabel": "移除 {person}"
+        },
+        "add": {
+            "title": "添加人员",
+            "back": "返回访问权限",
+            "peopleField": "人员",
+            "placeholder": "选择队友",
+            "search": "按姓名或邮箱搜索",
+            "empty": "没有可添加的人了",
+            "accessField": "访问权限",
+            "submit": "添加",
+            "submitMany": "添加 {count, plural, other {# 人}}"
+        },
+        "levels": {
+            "none": {
+                "label": "无权访问",
+                "description": "看不到此 Box"
+            },
+            "use": {
+                "label": "可使用",
+                "description": "与其中的同事聊天并查看他们的工作"
+            },
+            "manage": {
+                "label": "可管理",
+                "description": "还可以编辑、移动和删除同事"
+            }
+        },
+        "teammate": "队友",
+        "adminOnly": "只有管理员可以更改谁能访问 Box",
+        "adminsAlways": "管理员始终拥有访问权限",
+        "manageReason": "只有管理员或此 Box 的管理者可以更改",
+        "outcome": {
+            "admin": "管理员保留对所有 Box 的访问权限；此操作只会移除这一行。",
+            "restricted": "对方将立即失去对此 Box 及其同事的访问权限。",
+            "manage": "对方将不再管理此 Box。此 Box 仍对工作区中的所有人开放。",
+            "use": "对方自己的访问权限将被移除。此 Box 仍对工作区中的所有人开放。",
+            "scope": "对方只保留下方列出的 Boxes。所有对所有人开放的 Box 将立即超出其访问范围。",
+            "level": "对方将立即失去对此 Box 及其同事的访问权限。"
+        }
+    },
+    "newBox": {
+        "heading": "为新 Box 命名",
+        "description": "Box 是看板上的一个名称，用于按部门整理您的同事。",
+        "creating": "正在创建…",
+        "createNamed": "创建 {name}",
+        "create": "创建 Box",
+        "nameLabel": "Box 名称",
+        "failed": "Box 创建失败",
+        "placeholderName": "市场",
+        "suggestedNames": {
+            "clients": "客户",
+            "marketing": "市场",
+            "newBusiness": "新业务",
+            "operations": "运营",
+            "finance": "财务",
+            "personal": "个人",
+            "store": "店铺",
+            "customerCare": "客户关怀",
+            "supplyChain": "供应链",
+            "product": "产品",
+            "engineering": "工程",
+            "support": "支持",
+            "sales": "销售",
+            "accounts": "客户账户",
+            "recruiting": "招聘",
+            "listings": "商品列表",
+            "legal": "法务",
+            "compliance": "合规",
+            "content": "内容",
+            "business": "业务",
+            "community": "社区",
+            "sponsors": "赞助商",
+            "work": "工作",
+            "projects": "项目",
+            "admin": "行政",
+            "ops": "运维"
+        }
+    },
+    "renameBox": {
+        "title": "重命名 Box",
+        "description": "您在看板上看到的名称。没有其他内容依赖它。",
+        "nameLabel": "名称",
+        "placeholder": "未命名 Box",
+        "submit": "重命名",
+        "nameRequired": "名称为必填项",
+        "nameTooLong": "请控制在 {max} 个字符以内"
+    },
+    "newAgent": {
+        "title": "新同事",
+        "description": "描述这份工作，或从建议或模板开始。",
+        "headingNamed": "{name} 应该做什么？",
+        "heading": "您的新同事应该做什么？",
+        "suggestionsForBox": "或从为 {boxName} 挑选的建议开始"
+    },
+    "renameAgent": {
+        "title": "重命名同事",
+        "description": "显示在看板和聊天中的名称。其 @handle 会随之更新。",
+        "nameLabel": "名称",
+        "submit": "重命名",
+        "nameRequired": "名称为必填项",
+        "nameTooLong": "请控制在 {max} 个字符以内"
+    },
+    "deleteAgent": {
+        "title": "删除此同事？",
+        "description": "这将永久删除该同事及其在引擎上的数据。此操作无法撤销。",
+        "typeToConfirm": "输入 <b>{name}</b> 以确认。",
+        "confirm": "删除"
+    },
+    "importAgent": {
+        "title": "导入同事",
+        "description": "您的智能体会自行迁移到这里，连同其技能、任务和记忆。",
+        "connectorUrl": "连接器 URL",
+        "copyConnectorUrl": "复制连接器 URL",
+        "pasteIn": "粘贴到 {source}",
+        "expires": "24 小时后过期。",
+        "copyPrompt": "复制提示词",
+        "otherSource": "其他",
+        "grokConnectorStep": "在 grok.com/connectors 中将该 URL 添加为自定义连接器，然后粘贴提示词。"
+    },
+    "agentShare": {
+        "unavailable": "此分享链接已失效",
+        "titleNamed": "添加 {name}",
+        "title": "添加此同事",
+        "description": "查看此同事的工作内容，然后将其放到您的看板上。",
+        "sentBy": "{name} 向您发送了此同事的副本。它将在您自己的 Box 上运行。",
+        "sentBySomeone": "有人向您发送了此同事的副本。它将在您自己的 Box 上运行。"
+    },
+    "templateDeepLink": {
+        "unavailable": "此模板链接已失效",
+        "titleNamed": "安装“{title}”",
+        "title": "安装此模板",
+        "description": "查看此模板会安装什么，然后将其同事放到您的看板上。"
+    },
+    "createTemplate": {
+        "defaultDescription": "从您的沙盒起草一个模板。Rerun 团队会在上线前审核。",
+        "title": "新建模板",
+        "doneLabel": "打开模板",
+        "titleField": "标题",
+        "titlePlaceholder": "例如 外呼销售开发代表",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · 公开地址根据标题生成。",
+        "titleRequired": "标题为必填项",
+        "continue": "继续"
+    },
+    "expertProfile": {
+        "title": "您的公开主页",
+        "submit": "保存并发布",
+        "submitting": "正在保存…",
+        "saved": "您的公开主页已更新。"
+    },
+    "apiKeys": {
+        "title": "API 密钥",
+        "description": "将 Claude Code 或任何 MCP 客户端连接到此工作区。",
+        "connectSection": "连接客户端",
+        "keysSection": "密钥",
+        "docsLink": "API 密钥",
+        "newKeyName": "新密钥名称",
+        "newKeyPlaceholder": "Claude Code、MacBook",
+        "create": "创建密钥",
+        "revoked": "已撤销 {name}",
+        "adminOnly": "只有管理员可以管理 API 密钥",
+        "empty": "还没有密钥。密钥拥有整个工作区的权限，请像对待密码一样对待它。",
+        "lastUsed": "使用于 {time}",
+        "neverUsed": "从未使用",
+        "revokeThisKey": "撤销此密钥",
+        "created": {
+            "warning": "请立即复制此密钥。它不会再次显示。",
+            "copyKey": "复制密钥",
+            "dismiss": "我已复制"
+        },
+        "revoke": {
+            "title": "撤销此密钥？",
+            "description": "{name} 将立即失效，所有依赖它运行的内容都将失去对工作区的访问。密钥无法恢复，但您可以创建新的密钥。",
+            "descriptionUnnamed": "此密钥将立即失效，所有依赖它运行的内容都将失去对工作区的访问。密钥无法恢复，但您可以创建新的密钥。",
+            "confirm": "撤销"
+        }
+    },
+    "copy": {
+        "snippet": "复制 {label}",
+        "fullGuide": "完整设置指南"
+    },
+    "servers": {
+        "title": "服务器",
+        "description": "您的同事运行所在的机器。每个工作区一台。",
+        "connected": "已连接",
+        "unreachable": "无法访问",
+        "runningSummary": "{address} · {count, plural, other {# 位同事正在运行}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, other {# 位同事正在运行}} · {commit}",
+        "unreachableSummary": "{address} · 应用目前无法访问它",
+        "thisWorkspace": "此工作区的服务器",
+        "remove": "移除",
+        "manualSection": "手动输入服务器",
+        "address": "地址",
+        "apiKey": "API 密钥",
+        "apiKeyPlaceholder": "引擎的 RERUN_API_KEY",
+        "back": "返回",
+        "connect": "连接",
+        "addSection": "添加服务器",
+        "addIntro": "您的同事运行在您自己的机器上。在装有 Docker 的机器上运行此命令，它会自动连接。",
+        "publicAddress": "应用访问它的地址（可选）",
+        "copyCommand": "复制命令",
+        "waiting": "正在等待服务器。此命令仅可使用一次，有效期 15 分钟。",
+        "enterManually": "输入地址和密钥",
+        "add": "添加服务器",
+        "removed": "服务器已移除",
+        "confirmRemove": {
+            "title": "移除此服务器？",
+            "description": "在重新连接服务器之前，您的同事将停止响应。他们知道的一切都保留在机器上：重新连接即可让他们回来。",
+            "confirm": "移除"
+        }
+    },
+    "aiProviders": {
+        "title": "AI 服务商",
+        "description": "您的同事运行所用的套餐和 API 密钥。"
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "此工作区每位同事对您公司的了解，以及他们共享的文件和数据表。"
+    },
+    "clearMemories": {
+        "title": "清除所有记忆？",
+        "description": "这将永久删除此同事的所有记忆。此操作无法撤销。",
+        "confirm": "全部清除"
+    },
+    "deleteTable": {
+        "title": "删除数据表“{table}”？",
+        "description": "这将永久删除整个数据表及其所有行。此操作无法撤销。",
+        "confirm": "删除"
+    },
+    "purgeTable": {
+        "title": "清空数据表“{table}”？",
+        "description": "这将删除表中的每一行，包括被当前搜索隐藏的行。数据表及其列会保留。此操作无法撤销。",
+        "confirm": "清空"
+    },
+    "notifications": {
+        "title": "通知",
+        "tabs": {
+            "coworkers": "同事",
+            "account": "账号"
+        },
+        "descriptions": {
+            "coworkers": "哪些事值得打扰您。更改会自动保存。",
+            "account": "选择您要接收哪些账号邮件。"
+        },
+        "pickCoworker": "选择一位同事"
+    },
+    "notificationPermission": {
+        "title": "同事完成时通知您？",
+        "description": "关闭此标签页后它仍会继续运行。需要您时我们会通知您。",
+        "enable": "开启通知",
+        "later": "暂不"
+    },
+    "confirm": {
+        "confirm": "删除"
+    },
+    "closeRunningTab": {
+        "title": "关闭此对话？",
+        "description": "智能体仍在处理此对话。关闭标签页不会停止运行：它会在后台继续运行。",
+        "confirm": "关闭"
+    },
+    "shortcuts": {
+        "title": "键盘快捷键",
+        "description": "使用这些快捷键在 Rerun 中更快地操作。",
+        "groups": {
+            "general": "通用",
+            "chat": "聊天",
+            "files": "文件"
+        },
+        "actions": {
+            "controlCenter": "打开控制中心",
+            "askRerun": "{named, select, yes {在聊天之外询问 {name}} other {在聊天之外询问您的 Chief of Staff}}",
+            "holdToTalk": "{named, select, yes {按住与 {name} 对话} other {按住与您的 Chief of Staff 对话}}",
+            "searchInPage": "在页面中搜索",
+            "newConversation": "新对话",
+            "closeTab": "关闭当前标签页",
+            "sendMessage": "发送消息",
+            "newLine": "换行",
+            "previousFile": "上一个文件",
+            "nextFile": "下一个文件"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "跨列比较数值。",
+            "list": "以名称识别的行：人员、公司、消息。",
+            "gallery": "以图片识别的行：产品、商品列表。",
+            "board": "在各状态间流转的行：销售管道、任务。"
+        },
+        "editTitle": "编辑视图",
+        "newTitle": "新建视图",
+        "description": "<mono>{table}</mono> 的一个视图。打开此数据表的每个人都能看到，同事也可以在聊天中绘制它。",
+        "name": "名称",
+        "namePlaceholder": "例如 销售管道",
+        "layout": "布局",
+        "columns": "列",
+        "columnsHint": "未勾选的列仍保留在数据表中，只是在此视图中隐藏。",
+        "groupBy": "分组依据",
+        "roles": {
+            "title": "标题",
+            "subtitle": "副标题",
+            "image": "图片",
+            "badge": "徽章",
+            "value": "数值",
+            "date": "日期"
+        },
+        "pictureShape": "图片形状",
+        "shapes": {
+            "square": "方形",
+            "landscape": "横向",
+            "portrait": "纵向"
+        },
+        "sortBy": "排序依据",
+        "insertionOrder": "插入顺序",
+        "ascending": "升序",
+        "descending": "降序",
+        "formats": "格式",
+        "formatsHint": "每个数值的显示方式：价格、日期、评分、状态。",
+        "formatOf": "{column} 的格式",
+        "plainFormat": "原样",
+        "colors": "颜色",
+        "colorsBoardHint": "此处列出的列排在最前，按此顺序排列。",
+        "emptyValue": "空",
+        "colorOf": "{value} 的颜色",
+        "colorOfEmpty": "空值的颜色",
+        "automaticColor": "自动",
+        "create": "创建视图",
+        "none": "无",
+        "pickColumn": "选择一列",
+        "preview": "预览",
+        "nameRequired": "请为视图命名",
+        "titleColumnRequired": "请选择用于命名每一项的列",
+        "groupByRequired": "请选择其数值将成为看板列的列"
+    },
+    "engineWaitlist": {
+        "title": "我们目前已满负荷",
+        "subtitle": "今天加入的团队太多，所有机器都已被占用。您已在候补名单中：您的回答已保存，一旦有机器空出，此页面会自动解锁。",
+        "signedInAs": "已登录为 <b>{email}</b>",
+        "signOut": "退出登录"
+    },
+    "sandboxReactivation": {
+        "title": "申请重新激活",
+        "description": "我们批准您的申请后，您的沙盒就会恢复。",
+        "asideTitle": "为什么我的沙盒被归档了？",
+        "points": {
+            "archived": {
+                "label": "闲置 30 天后归档",
+                "description": "沙盒会占用一台运行中的机器，所以无人打开的沙盒会把机器让出来。"
+            },
+            "kept": {
+                "label": "没有丢弃任何内容",
+                "description": "您的同事、他们的记忆和文件都随归档一起保存。"
+            },
+            "reviewed": {
+                "label": "我们会审核每个申请",
+                "description": "告诉我们您在构建什么，我们会恢复您的沙盒。"
+            },
+            "restored": {
+                "label": "完全恢复原样",
+                "description": "获批后，恢复只需几分钟。"
+            }
+        },
+        "noteLabel": "您打算构建什么？",
+        "noteHint": "一两句话就够了。",
+        "submit": "发送申请",
+        "failed": "无法发送您的申请，请重试。"
+    },
+    "paidApp": {
+        "slotAdded": "名额已添加到您的套餐。",
+        "slotAddedTrial": "名额已添加，试用期间 {price}。",
+        "slotRemoved": "名额已退还。在下次续费前仍可使用。"
+    },
+    "linkedinPro": {
+        "description": "您的同事用来操作的 LinkedIn 账号。",
+        "connectDescription": "连接您的同事用来操作的 LinkedIn 账号。",
+        "approvalNotSeen": "LinkedIn 尚未收到批准。请在应用中点按“是”，然后重试。",
+        "codeResent": "新的验证码正在发送中。",
+        "connect": {
+            "title": "连接 LinkedIn",
+            "reconnectTitle": "重新连接 LinkedIn",
+            "back": "返回 LinkedIn Pro"
+        },
+        "checkpoint": {
+            "title": "确认是您本人",
+            "hint": "LinkedIn 要求进行第二步验证",
+            "cancel": "取消登录"
+        }
+    },
+    "whatsappPro": {
+        "description": "您的同事用来操作的 WhatsApp 号码。",
+        "connectDescription": "关联您的同事用来操作的 WhatsApp 号码。",
+        "connect": {
+            "title": "关联 WhatsApp",
+            "reconnectTitle": "重新关联 WhatsApp",
+            "back": "返回 WhatsApp Pro"
+        },
+        "link": {
+            "title": "关联手机",
+            "hint": "WhatsApp 会将 Rerun 添加为已关联设备",
+            "cancel": "取消关联"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "让您的同事使用您的 Claude 或 ChatGPT 套餐运行",
+        "titleWithoutClaude": "让您的同事使用您的 ChatGPT 套餐或 API 密钥运行",
+        "back": "返回",
+        "connect": "连接",
+        "or": "或",
+        "useApiKey": "使用 API 密钥",
+        "plans": {
+            "claude": "Claude Pro 或 Max",
+            "codex": "ChatGPT Plus 或 Pro"
+        },
+        "decline": {
+            "cloud": "我还是继续使用 Rerun 积分",
+            "selfHosted": "我还是继续使用 OpenRouter"
+        },
+        "offer": {
+            "title": "搭配您的 Claude 或 ChatGPT 订阅，Rerun 效果更好",
+            "description": "连接后，您的同事将使用您已付费的套餐运行。",
+            "titleWithoutClaude": "您的同事使用您自己的 AI 运行",
+            "descriptionWithoutClaude": "连接您的 ChatGPT 套餐或 API 密钥，您的同事就会用它运行。"
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "每个人使用自己的套餐",
+                "description": "每位队友连接自己付费的套餐。无需共用账号。"
+            },
+            "password": {
+                "label": "Rerun 永远看不到您的密码",
+                "description": "您只在 Claude 或 OpenAI 自己的页面上授权，别无他处。"
+            },
+            "unplug": {
+                "label": "随时断开",
+                "descriptionCloud": "一键断开，您的同事将改用 Rerun 积分。",
+                "descriptionSelfHosted": "一键断开，您的同事将改用您的 OpenRouter 密钥。"
+            }
+        },
+        "board": {
+            "title": "每位同事都使用您自己的连接",
+            "description": "两个订阅和一个 API 密钥，并排出现在同一个看板上。",
+            "crew": {
+                "sales": "销售",
+                "customer_support": "客户支持",
+                "accounting": "会计"
+            }
+        },
+        "plan": {
+            "title": "连接您的 {name} 套餐",
+            "linked": "您的同事使用 {name} 运行",
+            "switching": "您的同事切换到 {name}"
+        },
+        "key": {
+            "title": "使用 API 密钥",
+            "detail": "您的同事使用您的密钥运行，由其服务商按 token 计费。",
+            "opencodeTitle": "连接 OpenCode",
+            "opencodeDetail": "粘贴您的 OpenCode 密钥：Go 模型使用您的套餐运行，Console 模型使用您的积分。",
+            "field": "API 密钥",
+            "placeholder": "粘贴您的密钥",
+            "add": "添加密钥",
+            "connecting": "正在连接…",
+            "failed": "密钥添加失败",
+            "somethingWentWrong": "出了点问题，请重试。"
+        },
+        "connected": {
+            "title": "{name} 已连接",
+            "planDetail": "您的同事现在使用您的 {name} 套餐运行。",
+            "opencodeDetail": "您的同事现在使用您的 OpenCode Go 套餐运行。",
+            "keyDetail": "您的同事现在使用此密钥运行。",
+            "done": "完成"
+        }
+    },
+    "boxPicker": {
+        "title": "选择一个 Box",
+        "description": "新同事会加入其中的一个空位。",
+        "coworkers": "{count, plural, =0 {还没有同事} other {# 位同事}}"
+    },
+    "mcpConnect": {
+        "otherClient": "其他",
+        "labels": {
+            "terminal": "终端",
+            "shellProfile": "Shell 配置文件",
+            "coworkerPanel": "同事面板、MCP、新建",
+            "serverUrl": "服务器 URL",
+            "header": "请求头",
+            "stdioClients": "仅支持 stdio 的客户端"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI。ChatGPT 应用只接受 OAuth 连接，所以在那里密钥没有用。",
+            "coworkerReach": "让您的一位同事对此工作区拥有与外部客户端相同的访问范围。"
+        }
+    }
+}

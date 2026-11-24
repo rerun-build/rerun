@@ -1,0 +1,152 @@
+{
+    "appAccount": {
+        "addAccount": "إضافة حساب",
+        "connectTitle": "ربط حساب {provider}",
+        "connectHint": "يُربط مرة واحدة لمساحة العمل، ثم يمكن لأي زميل العمل به.",
+        "connect": "ربط {provider}",
+        "actsAs": "يعمل باسم",
+        "accountName": "حساب {provider}",
+        "selected": "هذا الزميل يعمل باسم هذا الحساب",
+        "lastAccount": "ألغِ تثبيت {app} لإزالة آخر حساب لهذا الزميل",
+        "appAccount": "حساب {app}",
+        "needsAttention": "يحتاج إلى انتباه في {app}",
+        "wakeWhen": "أيقظ هذا الزميل عندما",
+        "wakeWhenAccount": "أيقظ هذا الزميل من {account} عندما",
+        "done": "تم",
+        "timing": {
+            "rightAway": "فورًا",
+            "everyFewHours": "يُتحقق منه كل بضع ساعات"
+        },
+        "unavailable": "{app} غير متاح في مساحة العمل هذه بعد.",
+        "wakeEvents": {
+            "message_received": "تصل رسالة",
+            "accepted_invitation": "تُقبل دعوة",
+            "invitation_received": "تُستلم دعوة"
+        }
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "تسجيل الدخول",
+            "key": "مفتاح API",
+            "stdio": "محلي",
+            "app": "حساب مساحة العمل",
+            "other": "ربط"
+        },
+        "description": {
+            "oauth": "سجّل الدخول عبر نافذة منبثقة آمنة.",
+            "key": "الصق مفتاح API من الخدمة.",
+            "stdio": "يعمل محليًا على المحرك الخاص بك.",
+            "app": "اختر حسابًا مرتبطًا بمساحة العمل.",
+            "other": "لا حاجة إلى بيانات اعتماد."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "فشل التفويض",
+        "startFailed": "تعذّر بدء الاتصال",
+        "startOAuthFailed": "تعذّر بدء OAuth",
+        "connectedAs": "متصل باسم {account}",
+        "connected": "متصل",
+        "retry": "إعادة المحاولة",
+        "secureTitle": "اتصال آمن",
+        "secureBody": "يتولى هذا الاتصال أحد شركائنا الموثوقين.",
+        "waiting": "في انتظار التفويض…",
+        "connect": "ربط"
+    },
+    "credentialGuide": {
+        "title": "كيف تحصل على {label}"
+    },
+    "customMcp": {
+        "custom": "مخصص",
+        "connect": "ربط",
+        "edit": "تعديل {name}",
+        "remove": "إزالة {name}",
+        "removeTitle": "إزالة {name}؟",
+        "removeDescription": "سيفقد الزميل كل الأدوات التي يوفرها هذا الخادم، وسيُمسح تسجيل دخوله.",
+        "removeConfirm": "إزالة",
+        "status": {
+            "connected": "متصل · {count, plural, zero {لا أدوات} one {أداة واحدة} two {أداتان} few {# أدوات} many {# أداة} other {# أداة}}",
+            "needsAuth": "يلزم تسجيل الدخول",
+            "unreachable": "تعذّر الوصول",
+            "noAnswer": "لم يستجب الخادم."
+        }
+    },
+    "requestApp": {
+        "required": "يرجى وصف التطبيق الذي تحتاجه",
+        "sent": "تم إرسال الطلب. شكرًا، سننظر فيه.",
+        "title": "طلب تطبيق",
+        "description": "أخبرنا بالتطبيق الذي تحتاجه وكيف ستستخدمه. وسنتولى الباقي.",
+        "placeholder": "صف التطبيق الذي تحتاجه…",
+        "cancel": "إلغاء",
+        "send": "إرسال الطلب"
+    },
+    "alternatives": {
+        "label": "يعمل أيضًا مع"
+    },
+    "configForm": {
+        "configured": "تم إعداد {name}",
+        "connectTitle": "ربط {name}",
+        "signInOAuth": "سجّل الدخول إلى {name} ليتمكن زميلك من استخدامه.",
+        "signInManaged": "سجّل الدخول باستخدام {name} ليتمكن زميلك من استخدامه. يتولى Rerun الاتصال نيابةً عنك.",
+        "setUp": "إعداد {name}",
+        "authentication": "المصادقة",
+        "backToMethods": "العودة إلى الطرق",
+        "connecting": "جارٍ الربط…",
+        "connect": "ربط",
+        "installing": "جارٍ التثبيت…",
+        "chooseAccount": "اختر حسابًا",
+        "install": "تثبيت",
+        "noTarget": "تحتاج هذه الخدمة إلى تسجيل الدخول لكنها لم تُرجع وجهة للاتصال.",
+        "missingFields": "لا تزال بعض الحقول المطلوبة ناقصة."
+    },
+    "fields": {
+        "selectPlaceholder": "اختر…"
+    },
+    "installed": {
+        "title": "تم تثبيت {name}",
+        "nextTurn": "متاح في الدور التالي: {tools}"
+    },
+    "list": {
+        "emptyTitle": "لم يُعثر على تطبيقات",
+        "emptyDescription": "لم نجد تطبيقًا يطابق بحثك.",
+        "request": "طلب تطبيق",
+        "installed": "مثبّت",
+        "addAccount": "إضافة حساب",
+        "needsSignIn": "يلزم تسجيل الدخول",
+        "needsSetup": "يلزم الإعداد",
+        "removeApp": "إزالة التطبيق",
+        "finishSetup": "إكمال الإعداد",
+        "install": "تثبيت"
+    },
+    "suggestion": {
+        "loading": "جارٍ تحميل التطبيقات المقترحة…",
+        "loadFailed": "تعذّر تحميل {name}.",
+        "notFoundSkipped": "غير موجود في الكتالوج، تم تخطيه.",
+        "notNow": "ليس الآن",
+        "connect": "ربط",
+        "cancel": "إلغاء",
+        "connected": "تم ربط {name}",
+        "reconnect": "إعادة الربط",
+        "notFound": "غير موجود في الكتالوج.",
+        "skipped": "تم التخطي.",
+        "skip": "تخطٍّ",
+        "finish": "إنهاء",
+        "nextApp": "التطبيق التالي",
+        "fromVault": "موجود بالفعل في Vault",
+        "useAccount": "استخدام {label}",
+        "connectNew": "حساب جديد"
+    },
+    "signInPopup": {
+        "connecting": "جارٍ الاتصال بـ {name}…"
+    },
+    "categories": {
+        "payments": "المدفوعات",
+        "ecommerce": "التجارة الإلكترونية",
+        "crm": "CRM",
+        "marketing": "التسويق",
+        "seo": "SEO",
+        "analytics": "التحليلات",
+        "dev": "المطوّرون",
+        "productivity": "الإنتاجية",
+        "other": "أخرى"
+    }
+}

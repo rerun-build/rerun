@@ -1,0 +1,43 @@
+{
+    "group": {
+        "steps": "{count, plural, one {שלב אחד} two {שני שלבים} other {# שלבים}}",
+        "stepsWithFailures": "{count, plural, one {שלב אחד} two {שני שלבים} other {# שלבים}}, {failed} נכשלו",
+        "failed": "{failed} נכשלו"
+    },
+    "tool": {
+        "input": "קלט",
+        "error": "שגיאה",
+        "output": "פלט",
+        "completedInMs": "הושלם תוך {ms} אלפיות שנייה",
+        "completedInSeconds": "הושלם תוך {seconds} שניות"
+    },
+    "reasoning": {
+        "thinking": "חושב...",
+        "thought": "מחשבה"
+    },
+    "compaction": {
+        "running": "ההקשר מתכווץ…",
+        "failed": "כיווץ ההקשר נכשל",
+        "done": "ההקשר כווץ",
+        "summarized": "סוכמו {count} הודעות קודמות",
+        "recovered": "שוחררו כ-{count} טוקנים"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {כישלון אחד} two {שני כישלונות} other {# כישלונות}}",
+        "idle": "לא פעיל {minutes} דק׳",
+        "stop": "לעצור את המשימה הזו",
+        "failed": "נכשלה",
+        "stopped": "נעצרה, העבודה החלקית נשמרה",
+        "stoppedWithRun": "נעצרה יחד עם ההרצה",
+        "earlier": "+{count} קודמים",
+        "verbs": {
+            "web_search": "מחפש {summary}",
+            "web_fetch": "קורא {summary}",
+            "browser_navigate": "גולש אל {summary}",
+            "shell_exec": "מריץ {summary}",
+            "fs_read": "קורא {summary}",
+            "fs_write": "כותב {summary}",
+            "fs_edit": "עורך {summary}"
+        }
+    }
+}

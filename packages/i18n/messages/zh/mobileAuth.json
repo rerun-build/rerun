@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "欢迎使用 Rerun",
+        "continueWithApple": "通过 Apple 继续",
+        "continueWithGoogle": "通过 Google 继续",
+        "continueWithPhone": "通过手机号继续",
+        "continueWithEmail": "通过邮箱继续",
+        "or": "或",
+        "welcome": "欢迎使用 Rerun",
+        "ownServer": "使用您自己的服务器",
+        "useCloud": "使用 Rerun Cloud"
+    },
+    "back": "返回",
+    "phone": {
+        "title": "您的手机号",
+        "unsupportedCountry": "我们暂时无法向该国家或地区发送验证码。",
+        "consent": "继续即表示您同意 Rerun 通过 WhatsApp 或短信与您联系。",
+        "sendByWhatsapp": "通过 WhatsApp 发送",
+        "sendBySms": "通过短信发送",
+        "countryLabel": "国家或地区，{name}",
+        "numberLabel": "手机号"
+    },
+    "email": {
+        "title": "通过邮箱继续",
+        "label": "邮箱",
+        "placeholder": "you@company.com",
+        "send": "发送验证码"
+    },
+    "code": {
+        "title": "输入验证码",
+        "sentByPhone": "已通过 {channel} 发送至 {number}",
+        "sentByEmail": "已发送至 {email}",
+        "fieldLabel": "验证码",
+        "continue": "继续",
+        "resendIn": "{seconds} 秒后重新发送",
+        "resend": "重新发送验证码",
+        "switchChannel": "改用 {channel} 发送",
+        "differentNumber": "使用其他号码",
+        "differentEmail": "使用其他邮箱"
+    },
+    "country": {
+        "search": "搜索",
+        "searchLabel": "搜索国家或地区"
+    },
+    "errors": {
+        "generic": "出了点问题，请重试。",
+        "offline": "无法连接到 Rerun。请检查网络连接后重试。",
+        "session": "无法打开您的会话，请重试。",
+        "apple": "无法通过 Apple 登录，请重试。",
+        "google": "无法通过 Google 登录，请重试。",
+        "phone": {
+            "taken": "此号码已用于登录另一个 Rerun 账号。",
+            "same_number": "这已经是您账号的号码。",
+            "not_required": "您的手机号已验证。",
+            "too_soon": "验证码正在发送中。请稍候再申请新的验证码。",
+            "too_many": "此号码申请的验证码过多，请稍后重试。",
+            "invalid_number": "请输入有效的手机号。",
+            "unsupported_country": "我们暂时无法向该国家或地区发送验证码。请改用邮箱或 Google。",
+            "undeliverable": "无法向此号码发送验证码。请尝试其他渠道，或使用邮箱或 Google。",
+            "blocked": "无法向此号码发送验证码。请改用邮箱或 Google。",
+            "rate_limited": "此号码尝试次数过多，请稍后重试。",
+            "wrong_code": "验证码错误或已过期。",
+            "expired": "验证码已过期，请重新申请。",
+            "unavailable": "无法联系到您的手机。请重试，或使用其他渠道。",
+            "busy": "手机登录当前繁忙。请改用邮箱或 Google。",
+            "captcha_failed": "无法确认您不是机器人，请重试。",
+            "signed_out": "请先创建您的账号。"
+        },
+        "email": {
+            "invalid_email": "请输入有效的邮箱",
+            "captcha_failed": "无法确认您不是机器人，请重试。",
+            "blocked_domain": "不接受此邮箱域名，请使用其他地址。",
+            "too_many": "您的网络创建的账号过多，请稍后重试。",
+            "too_many_codes": "您的网络申请的验证码过多，请稍后重试。",
+            "unavailable": "无法发送您的验证码，请重试。",
+            "rate_limited": "此地址申请的验证码过多，请稍后重试。",
+            "wrong_code": "验证码错误或已过期。"
+        }
+    },
+    "consent": {
+        "title": "您的同事由 AI 驱动",
+        "body": "为完成您的任务，Rerun 会将您的消息、照片、语音消息、文件和网站发送给 AI 服务商：通过 OpenRouter 的 OpenAI、Anthropic 和 Google，以及您自行连接的任何服务商。",
+        "noTraining": "Rerun 的服务商不会使用您的数据进行训练。",
+        "privacy": "隐私政策",
+        "notNow": "暂不",
+        "agree": "同意并继续"
+    },
+    "server": {
+        "title": "您的 Rerun 服务器",
+        "address": "服务器地址",
+        "connect": "连接",
+        "problems": {
+            "invalid": "请输入您的 Rerun 服务器地址。",
+            "insecure": "在本地网络之外请使用 https://。",
+            "unreachable": "无法连接到此服务器。",
+            "not-rerun": "此地址不是 Rerun 服务器。",
+            "outdated": "请更新此 Rerun 服务器后再从应用中使用。"
+        }
+    }
+}

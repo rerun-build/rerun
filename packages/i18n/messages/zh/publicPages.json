@@ -1,0 +1,55 @@
+{
+    "linkOff": {
+        "title": "此链接已失效",
+        "subtitle": "分享者已关闭此链接。"
+    },
+    "unsubscribe": {
+        "title": "邮件偏好",
+        "subtitle": "更新 Rerun 向您发送的邮件。无需登录账号。",
+        "subtitleRuns": "选择您的同事是否可以给您发邮件。无需登录账号。",
+        "invalid": "此退订链接无效或已过期。",
+        "logIn": "登录以管理您的偏好"
+    },
+    "publishedView": {
+        "protectedTitle": "受保护的页面",
+        "protectedDescription": "由 {workspace} 分享。请登录或确认您的邮箱后打开。",
+        "publishedBy": "由 {workspace} 的 {agent} 发布",
+        "publishedByUnknown": "由 {workspace} 的一位同事发布",
+        "untitled": "已发布的页面"
+    },
+    "publishedAuth": {
+        "metaTitle": "打开页面",
+        "noAccess": "您没有访问权限",
+        "signedInAs": "当前登录为 {email}。此页面仅供 {workspace} 的成员访问。",
+        "signedInAsOther": "当前登录的是其他账号。此页面仅供 {workspace} 的成员访问。"
+    },
+    "gate": {
+        "open": "打开",
+        "errors": {
+            "limited": "尝试次数过多，请等待几分钟。",
+            "password": "密码错误",
+            "code": "验证码错误或已过期",
+            "email": "请输入有效的邮箱"
+        },
+        "password": {
+            "subtitle": "{workspace} 已为此页面设置密码保护",
+            "placeholder": "密码"
+        },
+        "code": {
+            "title": "请查收邮件",
+            "subtitle": "如果 {email} 可以打开此页面，验证码已在发送途中",
+            "otherEmail": "使用其他邮箱"
+        },
+        "email": {
+            "subtitle": "确认您的邮箱后即可打开",
+            "submit": "发送验证码"
+        },
+        "members": {
+            "subtitle": "仅供 {workspace} 的成员访问",
+            "continue": "使用 Rerun 继续"
+        }
+    },
+    "publishedSite": {
+        "notFound": "未找到"
+    }
+}

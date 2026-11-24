@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "חזרה",
+        "close": "לסגור"
+    },
+    "badge": {
+        "creditsUsedUp": "הקרדיטים נגמרו",
+        "signInAgain": "להתחבר מחדש",
+        "keyRejected": "המפתח נדחה",
+        "keyMissing": "חסר מפתח",
+        "ready": "מוכן"
+    },
+    "usage": {
+        "agentsFallBack": "{agents} יחזרו למודל ברירת המחדל של סביבת העבודה.",
+        "automationsFallBack": "{count, plural, one {אוטומציה אחת תחזור} two {שתי אוטומציות יחזרו} other {# אוטומציות יחזרו}} למודל ברירת המחדל של סביבת העבודה.",
+        "agentsAndAutomationsFallBack": "{agents} ו{count, plural, one {אוטומציה אחת} two {שתי אוטומציות} other {־# אוטומציות}} יחזרו למודל ברירת המחדל של סביבת העבודה.",
+        "holdsDefault": "הוא משמש כמודל ברירת המחדל של סביבת העבודה, וזה מתאפס: כל עמית שלא בחר מודל חוזר ל-Rerun.",
+        "nothingRuns": "פרטי הגישה הוסרו. שום דבר לא פועל עליהם."
+    },
+    "list": {
+        "title": "ספקי AI",
+        "notAnswering": "המכונה של סביבת העבודה הזו לא מגיבה. כדאי לנסות שוב בעוד רגע.",
+        "defaultModel": "מודל ברירת מחדל",
+        "included": "כלול",
+        "subscriptions": "המינויים שלך",
+        "subscriptionsPitch": "כבר משתמש ב-Claude Code או ב-Codex? העמיתים שלך יכולים לפעול על המינוי שלך.",
+        "addSubscription": "להוסיף מינוי",
+        "apiKeys": "מפתחות ה-API שלך",
+        "apiKeysPitch": "לשלם ישירות לספק, לפי טוקן.",
+        "addApiKey": "להוסיף מפתח API",
+        "via": "דרך {name}",
+        "creditsUsedUpPickModel": "הקרדיטים של Rerun נגמרו עד שיתחדשו {backOn}, ולכן עמיתים בלי מודל משלהם מושהים. אפשר לבחור מודל אחר כדי שימשיכו.",
+        "creditsUsedUpAddSource": "הקרדיטים של Rerun נגמרו עד שיתחדשו {backOn}, ולכן עמיתים בלי מודל משלהם מושהים. אפשר להוסיף מינוי או מפתח API כדי שימשיכו.",
+        "defaultBroken": "עמיתים בלי מודל משלהם נעצרו. יש לתקן את {name} או לבחור מודל אחר.",
+        "signInAgain": "להתחבר מחדש",
+        "addKey": "להוסיף מפתח"
+    },
+    "add": {
+        "addSubscription": "להוסיף מינוי",
+        "addApiKey": "להוסיף מפתח API",
+        "addProvider": "להוסיף ספק",
+        "subscriptions": "מינויים",
+        "apiKeys": "מפתחות API"
+    },
+    "defaultModel": {
+        "title": "מודל ברירת מחדל",
+        "changeFailed": "לא ניתן לשנות את מודל ברירת המחדל"
+    },
+    "detail": {
+        "name": "שם",
+        "removeButton": "להסיר את {name}",
+        "saveFailed": "השמירה נכשלה",
+        "renameTitle": "לשנות שם",
+        "renameMessage": "מוצג בבורר המודלים של כל עמית.",
+        "keySaveFailed": "שמירת פרטי הגישה נכשלה",
+        "removeTitle": "להסיר את {name}?",
+        "removeConfirm": "להסיר",
+        "deleteFailed": "מחיקת החיבור נכשלה"
+    },
+    "credit": {
+        "title": "הקרדיטים של החודש",
+        "percent": "{percent}%",
+        "usedUp": "עמיתים שפועלים על Rerun מושהים עד שהקרדיטים יתחדשו {backOn}. אפשר לבחור מודל ברירת מחדל אחר כדי שימשיכו.",
+        "included": "כלול במינוי ה-Rerun שלך. בלי מפתח, בלי הגדרות."
+    },
+    "reconnect": {
+        "signInRejected": "ההתחברות הזו נדחתה. עמיתים שמשתמשים בה נעצרו עד שתתחבר מחדש.",
+        "signInExpired": "תוקף ההתחברות הזו פג. עמיתים שמשתמשים בה נעצרו עד שתתחבר מחדש.",
+        "signInAgain": "להתחבר מחדש",
+        "keyRejected": "המפתח הזה נדחה. עמיתים שמשתמשים בו נעצרו עד שתדביק מפתח חדש.",
+        "keyMissing": "אין מפתח שמור. עמיתים שמשתמשים בו נעצרו עד שתדביק מפתח.",
+        "keyLabel": "מפתח API",
+        "keyPlaceholder": "להדביק את המפתח שלך",
+        "save": "לשמור"
+    },
+    "planUsage": {
+        "title": "שימוש במינוי",
+        "empty": "השימוש יופיע כאן אחרי ההרצה הבאה על המינוי הזה.",
+        "percent": "{percent}%"
+    },
+    "models": {
+        "title": "העמיתים שלך יכולים להשתמש ב",
+        "enabledCount": "{enabled} מתוך {total}",
+        "lockDefault": "מודל ברירת מחדל",
+        "lockCustom": "מודל מותאם אישית. אפשר להסיר אותו למטה.",
+        "lockLast": "העמיתים צריכים לפחות מודל אחד מהמקור הזה."
+    },
+    "baseUrl": {
+        "label": "כתובת בסיס מותאמת אישית",
+        "help": "לשלוח בקשות לנתב משלך שתואם ל-OpenRouter",
+        "save": "לשמור"
+    },
+    "customModels": {
+        "title": "מודלים מותאמים אישית",
+        "remove": "להסיר",
+        "addLabel": "להוסיף מודל",
+        "addHelp": "כל מזהה מודל של OpenRouter, לדוגמה x-ai/grok-4.",
+        "add": "להוסיף"
+    },
+    "apiKey": {
+        "name": "שם",
+        "keyLabel": "מפתח API",
+        "keyPlaceholder": "להדביק את המפתח שלך",
+        "connect": "לחבר"
+    },
+    "modelSheet": {
+        "close": "לסגור",
+        "title": "בחירת מודל",
+        "notAnswering": "המכונה של סביבת העבודה הזו לא מגיבה. כדאי לנסות שוב בעוד רגע.",
+        "workspaceDefault": "ברירת המחדל של סביבת העבודה",
+        "addProvider": "להוסיף ספק"
+    },
+    "ending": {
+        "coworkersStart": "העמיתים שלך חוזרים לעבוד",
+        "nameIt": "לתת שם",
+        "connectionName": "שם החיבור",
+        "nameHelp": "מוצג בבורר המודלים של כל עמית.",
+        "saving": "שומר…",
+        "done": "סיום"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "זהו מפתח API של Anthropic. יש להוסיף אותו כחיבור Anthropic (API) במקום.",
+        "claudeTokenIsCode": "זה הקוד מ-Claude. קודם יש ללחוץ על Get token, ואז להדביק כאן את הקוד.",
+        "approve": "לאשר את Rerun ב-Claude",
+        "open": "לפתוח את Claude",
+        "openAgain": "לפתוח את Claude שוב",
+        "pasteStep": "להדביק את הקוד",
+        "codeLabel": "הקוד מ-Claude",
+        "checking": "בודק את הקוד…",
+        "paste": "להדביק",
+        "connect": "לחבר"
+    },
+    "chatgpt": {
+        "allowStep": "לאפשר התחברות עם קוד ב-ChatGPT",
+        "openSettings": "לפתוח את ההגדרות של ChatGPT",
+        "alreadyOn": "זה כבר מופעל",
+        "adminSwitches": "מנהל ה-ChatGPT שלך מפעיל את זה לכל סביבת העבודה.",
+        "onPlusOrPro": "יש לי Plus או Pro",
+        "onBusiness": "ב-ChatGPT Business או Enterprise?",
+        "enterStep": "להזין את הקוד ב-OpenAI",
+        "copied": "הועתק",
+        "copyAdminMessage": "להעתיק הודעה בשבילם",
+        "adminMessage": "היי! אפשר להפעיל את \"Device code authorization for Codex\" בהגדרות סביבת העבודה שלנו ב-ChatGPT? אני צריך את זה כדי לחבר את מינוי ה-ChatGPT שלי ל-Rerun.",
+        "copyCode": "להעתיק קוד",
+        "openOpenAI": "לפתוח את OpenAI",
+        "enterHint": "יש להזין אותו בדף של OpenAI ולאשר. המסך הזה יזהה את זה לבד.",
+        "gettingCode": "מקבל קוד…",
+        "getNewCode": "לקבל קוד חדש",
+        "getCode": "לקבל קוד",
+        "stuck": {
+            "expiredAdmin": "תוקף הקוד פג. כנראה שהמנהל שלך עדיין לא אישר התחברות עם קוד.",
+            "errorAdmin": "שגיאה בדף של OpenAI? כנראה שהמנהל שלך עדיין לא אישר התחברות עם קוד.",
+            "expiredSetting": "תוקף הקוד פג. ההתחברות עם קוד כנראה עדיין כבויה: יש להפעיל אותה ב-<link>Settings → Security</link>, ואז לקבל קוד חדש.",
+            "errorSetting": "שגיאה בדף של OpenAI? ההתחברות עם קוד כנראה עדיין כבויה: יש להפעיל אותה ב-<link>Settings → Security</link>, ואז להזין את הקוד שוב."
+        }
+    },
+    "connect": {
+        "renameFailed": "שינוי שם החיבור נכשל",
+        "startFailed": "לא ניתן להתחיל את החיבור",
+        "notSignedIn": "לא מחובר",
+        "createFailed": "יצירת החיבור נכשלה"
+    },
+    "oauth": {
+        "unfinished": "ההתחברות לא הסתיימה. כדאי לנסות שוב.",
+        "authorizationFailed": "ההרשאה נכשלה",
+        "startFailed": "לא ניתן להתחיל את ההתחברות"
+    }
+}

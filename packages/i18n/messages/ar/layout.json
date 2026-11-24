@@ -1,0 +1,222 @@
+{
+    "loading": "جارٍ التحميل...",
+    "theme": "المظهر",
+    "language": "اللغة",
+    "signIn": "تسجيل الدخول",
+    "purchaseCancelled": "تم إلغاء الشراء",
+    "help": {
+        "label": "المساعدة",
+        "contactSupport": "تواصل مع الدعم"
+    },
+    "menu": {
+        "whatsNew": "ما الجديد",
+        "gettingStarted": "البدء",
+        "docs": "المستندات",
+        "community": "المجتمع",
+        "shortcuts": "الاختصارات",
+        "installApp": "تثبيت التطبيق",
+        "desktopApp": "احصل على تطبيق سطح المكتب",
+        "hireExpert": "استعن بخبير"
+    },
+    "power": {
+        "menuItem": "إعادة تشغيل الجهاز",
+        "cancel": "إلغاء",
+        "failed": "حدث خطأ ما",
+        "restart": {
+            "title": "إعادة تشغيل الجهاز؟",
+            "description": "لن يكون أي زميل في مساحة العمل هذه متاحًا لبضع دقائق.",
+            "confirmLabel": "إعادة التشغيل",
+            "pending": "جارٍ إعادة تشغيل الجهاز…",
+            "success": "بدأت إعادة التشغيل، وسيعود الجهاز خلال بضع دقائق."
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "يواجه {providers} مشكلات.",
+            "many": "يواجه {providers} مشكلات."
+        },
+        "headlineLong": {
+            "one": "يواجه {providers} مشكلات. قد يصبح زملاؤك أبطأ أو يتعثرون.",
+            "many": "يواجه {providers} مشكلات. قد يصبح زملاؤك أبطأ أو يتعثرون."
+        },
+        "viewStatus": "عرض الحالة",
+        "dismiss": "إخفاء حالة المزوّد"
+    },
+    "sidePanel": {
+        "close": "إغلاق اللوحة",
+        "resize": "تغيير حجم اللوحة"
+    },
+    "paused": {
+        "title": "مساحة العمل متوقفة مؤقتًا.",
+        "paymentFailed": "فشل الدفع، وتوقفت مساحة العمل مؤقتًا.",
+        "saved": "زملاؤك وبياناتهم محفوظة.",
+        "savedUntil": "زملاؤك وبياناتهم محفوظة حتى {date}.",
+        "updatePayment": "تحديث وسيلة الدفع",
+        "subscribe": "اشترك للاستعادة"
+    },
+    "sandboxArchived": {
+        "title": "أُرشفت بيئة الاختبار بعد 30 يومًا دون استخدام.",
+        "requested": "تم طلب إعادة التفعيل.",
+        "declined": "رُفض طلب إعادة التفعيل.",
+        "declinedHint": "تواصل معنا إن كنت تعتقد أن هذا خطأ.",
+        "savedUntil": "زملاؤك وبياناتهم محفوظة حتى {date}.",
+        "expired": "انتهت صلاحية بياناتها المحفوظة، وستبدأ إعادة التفعيل من بيئة اختبار فارغة.",
+        "requestedReason": "نراجع طلبك",
+        "request": "طلب إعادة التفعيل"
+    },
+    "restoring": {
+        "title": "جارٍ استعادة مساحة العمل…",
+        "waitingApproved": "تمت الموافقة على إعادة التفعيل، وأنت الأول في الدور.",
+        "waitingPaid": "تم استلام الدفع، وأنت الأول في الدور.",
+        "waitingHint": "ستعود من تلقاء نفسها خلال دقائق.",
+        "failed": "تحتاج الاستعادة إلى فحص من جهتنا.",
+        "failedApproved": "تلقينا تنبيهًا ونعيد بيئة الاختبار يدويًا.",
+        "failedPaid": "تم استلام الدفع. تلقينا تنبيهًا ونعيد مساحة العمل يدويًا.",
+        "steps": {
+            "machine": "تم تخصيص جهاز",
+            "machineActive": "جارٍ تخصيص جهاز",
+            "data": "جارٍ استعادة بياناتك",
+            "agents": "جارٍ إيقاظ زملائك"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "مساحة العمل",
+        "summary": {
+            "sandbox": "بيئة اختبار الخبير",
+            "seats": "{count, plural, zero {لا مقاعد} one {مقعد واحد} two {مقعدان} few {# مقاعد} many {# مقعدًا} other {# مقعد}}",
+            "unlimitedSeats": "مقاعد غير محدودة",
+            "limits": "{agents} زملاء · {seats}",
+            "trial": "تجربة · {limits}",
+            "lifetime": "مدى الحياة · {limits}",
+            "limitsUnlimited": "زملاء بلا حدود · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "وحده المسؤول يمكنه إدارة مفاتيح API",
+            "settings": "وحده المسؤول يمكنه تغيير إعدادات مساحة العمل",
+            "servers": "وحده المسؤول يمكنه إدارة الخوادم",
+            "billing": "وحده المسؤول يمكنه إدارة الفوترة"
+        },
+        "needsPlan": "متاح بمجرد بدء تجربتك المجانية",
+        "apiKeys": "مفاتيح API و MCP",
+        "settings": "الإعدادات",
+        "members": "الأعضاء",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, zero {لا اقتراحات للمراجعة} one {اقتراح واحد للمراجعة} two {اقتراحان للمراجعة} few {# اقتراحات للمراجعة} many {# اقتراحًا للمراجعة} other {# اقتراح للمراجعة}}",
+        "aiProviders": "مزوّدو الذكاء الاصطناعي",
+        "vault": "Vault",
+        "vaultSignedOut": "تم تسجيل الخروج من أحد تطبيقات Vault",
+        "computers": "أجهزة الكمبيوتر",
+        "servers": "الخوادم",
+        "billing": "الفوترة",
+        "inviteFriends": "ادعُ أصدقاءك",
+        "freeMonth": "شهر مجاني",
+        "newWorkspace": "مساحة عمل جديدة",
+        "templates": "القوالب",
+        "myTemplates": "قوالبي",
+        "newTemplate": "قالب جديد",
+        "expert": "خبير",
+        "sandbox": "بيئة الاختبار",
+        "preparingSandbox": "جارٍ تجهيز بيئة الاختبار…",
+        "publicProfile": "الملف العام",
+        "admin": "الإدارة",
+        "adminPanel": "لوحة الإدارة",
+        "notifications": "الإشعارات",
+        "account": "الحساب",
+        "signOut": "تسجيل الخروج"
+    },
+    "update": {
+        "reload": "إعادة التحميل",
+        "available": {
+            "title": "يتوفر إصدار جديد",
+            "description": "أعد التحميل للحصول على أحدث إصدار من Rerun."
+        },
+        "required": {
+            "title": "تم تحديث Rerun",
+            "description": "إصدار جديد متاح الآن. أعد التحميل للمتابعة."
+        }
+    },
+    "controlCenter": {
+        "title": "مركز التحكم",
+        "description": "{named, select, yes {انتقل إلى وكيل أو إعداد أو محادثة، أو اسأل {name}.} other {انتقل إلى وكيل أو إعداد أو محادثة، أو اسأل الـ Chief of Staff.}}",
+        "back": "رجوع",
+        "askRerun": "{named, select, yes {اسأل {name}} other {اسأل الـ Chief of Staff}}",
+        "quotedQuery": "«{query}»",
+        "unnamedBox": "Box بلا اسم",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, zero {لا وكلاء} one {وكيل واحد} two {وكيلان} few {# وكلاء} many {# وكيلًا} other {# وكيل}}",
+        "status": {
+            "off": "متوقف",
+            "waiting_human": "يحتاج إليك",
+            "working": "يعمل",
+            "error": "خطأ",
+            "offline": "غير متصل"
+        },
+        "headings": {
+            "actions": "الإجراءات",
+            "settings": "الإعدادات",
+            "agents": "الوكلاء",
+            "needsYou": "يحتاج إليك",
+            "recent": "الأحدث",
+            "boxes": "Boxes",
+            "conversations": "المحادثات",
+            "recentConversations": "المحادثات الأخيرة",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
+            "open": "فتح",
+            "moveTo": "نقل إلى"
+        },
+        "agent": {
+            "desktop": "سطح المكتب",
+            "desktopDetail": "تحكّم في شاشة هذا الزميل",
+            "move": "نقل إلى Box آخر",
+            "notifications": "الإشعارات",
+            "notificationsDetail": "متى يتواصل معك هذا الوكيل"
+        },
+        "placeholder": {
+            "rootAssistant": "{named, select, yes {ابحث أو اسأل {name}…} other {ابحث أو اسأل الـ Chief of Staff…}}",
+            "root": "ابحث في الوكلاء والإعدادات والمحادثات…",
+            "agent": "ابحث في {name}…",
+            "agentUnknown": "ابحث في هذا الوكيل…",
+            "box": "ابحث عن وكلاء في هذا Box…",
+            "move": "اختر Box…"
+        },
+        "empty": {
+            "box": "لا يوجد وكلاء في هذا Box بعد.",
+            "noMatch": "لا توجد نتائج مطابقة."
+        },
+        "hints": {
+            "open": "فتح",
+            "more": "المزيد",
+            "searchPage": "<keys></keys> مرة أخرى للبحث في الصفحة"
+        },
+        "commands": {
+            "new_agent": "وكيل جديد",
+            "browse_templates": "تصفح القوالب",
+            "new_box": "Box جديد",
+            "ask_assistant": "{named, select, yes {اسأل {name}} other {اسأل الـ Chief of Staff}}",
+            "contact_support": "تواصل مع الدعم",
+            "recenter_board": "إعادة توسيط اللوحة",
+            "toggle_theme_light": "التبديل إلى المظهر الفاتح",
+            "toggle_theme_dark": "التبديل إلى المظهر الداكن",
+            "workspace": "إعدادات مساحة العمل",
+            "members": "الأعضاء",
+            "billing": "الفوترة",
+            "ai_providers": "مزوّدو الذكاء الاصطناعي",
+            "api_keys": "مفاتيح API و MCP",
+            "company_brain": "Brain الشركة",
+            "shared_files": "الملفات المشتركة",
+            "account": "الحساب",
+            "notifications": "الإشعارات",
+            "shortcuts": "اختصارات لوحة المفاتيح",
+            "whats_new": "ما الجديد"
+        }
+    },
+    "boxNameSuggestions": "أو اختر اسمًا",
+    "dashboard": {
+        "metaTitle": "لوحة التحكم",
+        "metaDescription": "Boxes وزملاؤك على Rerun."
+    },
+    "site": {
+        "title": "Rerun | أنجز مهامك بالذكاء الاصطناعي حتى أثناء نومك",
+        "description": "اختر وكيل ذكاء اصطناعي جاهزًا من المكتبة أو أنشئ وكيلك، واربط أدواتك، ليعمل على مدار الساعة على جهازك الخاص في السحابة. تجربة مجانية لمدة {trialDays} يومًا."
+    }
+}

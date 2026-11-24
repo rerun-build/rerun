@@ -1,0 +1,16 @@
+{
+    "save": "保存",
+    "saving": "正在保存",
+    "cancel": "取消",
+    "somethingWentWrong": "出了点问题，请重试。",
+    "backToDashboard": "返回控制台",
+    "notFound": {
+        "title": "页面不存在",
+        "body": "此页面不存在或已移动。我们带您回到正轨。"
+    },
+    "crash": {
+        "title": "出了点问题",
+        "body": "此页面遇到意外错误。您的同事及其工作都安然无恙。重新加载即可从中断处继续。",
+        "reload": "重新加载"
+    }
+}

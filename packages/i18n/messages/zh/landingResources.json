@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "横幅纹理",
+        "description": "为您的 Rerun 专家主页免费提供横幅纹理：下载现成的背景，一分钟即可添加到您的公开专家页面。"
+    },
+    "banners": {
+        "eyebrow": "面向专家",
+        "title": "横幅纹理",
+        "description": "我们为 Rerun 专家主页使用的一组流体玻璃纹理。可免费下载，随意使用。",
+        "download": "下载",
+        "downloadFile": "下载 {file}",
+        "alts": {
+            "lime-glass-crumple": "明亮的青柠绿玻璃，褶皱折叠的薄片",
+            "pastel-holographic-knot": "全息柔彩打结玻璃丝带",
+            "blue-glass-crystal": "电光蓝多面晶体玻璃",
+            "violet-lime-swirl": "紫色与青柠绿旋转玻璃漩涡",
+            "crimson-fluid-blob": "光亮的深红与洋红流体团",
+            "amber-droplet-blob": "琥珀橙玻璃水滴，光亮凸起",
+            "amber-chrome-swirl": "橙色与黑色铬金属漩涡",
+            "dark-lime-crumple": "带酸性绿纹路的黑色褶皱玻璃",
+            "pastel-iridescent-bloom": "全息柔彩虹彩玻璃花朵",
+            "violet-lime-vortex": "紫色与青柠绿玻璃漩涡隧道",
+            "lavender-glass-vortex": "薰衣草色玻璃旋转漩涡",
+            "violet-lime-crystal": "紫色与绿色晶体玻璃块",
+            "pink-swirl-vortex": "亮粉与红色玻璃旋转漩涡",
+            "violet-lime-knot": "紫色与青柠绿打结圆环",
+            "lavender-glass-crystal": "薰衣草色多面晶体玻璃",
+            "blue-chrome-knot": "蓝色铬金属打结圆环",
+            "blue-plasma-smoke": "玻璃上的电光蓝等离子烟雾",
+            "violet-iridescent-vortex": "紫色虹彩旋转漩涡",
+            "dark-lime-knot": "发出酸性绿光的黑色玻璃结",
+            "pastel-holographic-vortex": "柔彩全息旋转漩涡",
+            "blue-liquid-ripple": "虹彩蓝色波纹液态玻璃",
+            "blue-glass-bloom": "钴蓝玻璃褶边花瓣",
+            "blue-chrome-vortex": "蓝色铬金属旋转玻璃漩涡",
+            "pastel-holographic-smoke": "柔彩全息缕缕烟雾玻璃",
+            "crimson-swirl-vortex": "深红与洋红旋转漩涡",
+            "amethyst-crystal-facets": "紫水晶色晶体切面",
+            "violet-iridescent-crumple": "紫色虹彩褶皱晶体块",
+            "violet-glossy-bloom": "光亮紫色玻璃花瓣",
+            "violet-lime-fluid-blob": "紫色与酸性绿光亮流体团",
+            "dark-green-swirl-vortex": "深绿与黑色光亮旋转漩涡"
+        }
+    }
+}

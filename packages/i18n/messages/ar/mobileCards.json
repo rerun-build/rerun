@@ -1,0 +1,81 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {فتح المحادثة لـ {name}} actions {فتح المهام لـ {name}} services {فتح التطبيقات لـ {name}} mcp {فتح MCP لـ {name}} skills {فتح المهارات لـ {name}} data {فتح قاعدة البيانات لـ {name}} memories {فتح المعرفة لـ {name}} files {فتح الملفات لـ {name}} scheduled {فتح المهام الدورية لـ {name}} triggers {فتح المشغّلات لـ {name}} other {{name}}}"
+    },
+    "connect": {
+        "added": "تمت إضافة {name}",
+        "connectedNote": "متصل، يمكن للزميل استخدامه",
+        "signInNote": "سجّل الدخول مرة واحدة ليتمكن الزميل من استخدامه",
+        "connected": "متصل",
+        "signingIn": "جارٍ تسجيل الدخول…",
+        "signIn": "تسجيل الدخول",
+        "connectNew": "حساب جديد",
+        "signInNeeded": "يلزم تسجيل الدخول",
+        "unreachable": "تعذّر الوصول",
+        "couldNotConnect": "تعذّر ربط {name}",
+        "notAdded": "غير مضاف",
+        "customServer": "خادم MCP مخصص",
+        "customServerAt": "خادم MCP مخصص · {host}",
+        "connecting": "جارٍ الربط…",
+        "connect": "ربط",
+        "installed": "تم تثبيت {name}",
+        "availableNextTurn": "متاح في الدور التالي: {tools}"
+    },
+    "event": {
+        "notification": "أرسل إليك إشعارًا",
+        "setUp": "تم إعداد {name}",
+        "setupComplete": "اكتمل الإعداد",
+        "schedules": "{count, plural, zero {لا جداول مفعّلة} one {جدول واحد مفعّل} two {جدولان مفعّلان} few {# جداول مفعّلة} many {# جدولًا مفعّلًا} other {# جدول مفعّل}}",
+        "triggers": "{count, plural, zero {لا مشغّلات مفعّلة} one {مشغّل واحد مفعّل} two {مشغّلان مفعّلان} few {# مشغّلات مفعّلة} many {# مشغّلًا مفعّلًا} other {# مشغّل مفعّل}}",
+        "newBrainPage": "صفحة جديدة في Brain: {title}",
+        "brainChange": "تعديل على Brain: {title}",
+        "proposedNote": "مقترح للمراجعة. لن يتغير شيء حتى يقبله أحد.",
+        "undone": "تم التراجع: {title}",
+        "undoneNote": "عادت النسخة السابقة.",
+        "undo": "تراجع",
+        "undoFailed": "تعذّر التراجع عن هذا التعديل",
+        "tryAgainShortly": "حاول مرة أخرى بعد قليل."
+    },
+    "brain": {
+        "saved": "تم تحديث Brain: {title}",
+        "created": "صفحة جديدة في Brain: {title}",
+        "deleted": "حُذفت من Brain: {title}",
+        "accepted": "تم قبول التعديل: {title}",
+        "acceptedBy": "تم قبول تعديل {name}: {title}",
+        "dismissed": "تم رفض التعديل: {title}",
+        "dismissedBy": "تم رفض تعديل {name}: {title}",
+        "notes": {
+            "saved": "تم الحفظ. سيقرؤها كل زميل بدءًا من تشغيله التالي.",
+            "deleted": "لم يعد أي زميل يقرؤها. يُحتفظ بسجلها.",
+            "accepted": "تم الحفظ. سيقرؤها كل زميل بدءًا من تشغيله التالي.",
+            "dismissed": "لم تتغير الصفحة."
+        }
+    },
+    "file": {
+        "open": "فتح {name}",
+        "title": "{count, plural, =0 {ملف} zero {ملف} one {ملف} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}",
+        "size": {
+            "b": "{value} بايت",
+            "kb": "{value} ك.ب",
+            "mb": "{value} م.ب"
+        }
+    },
+    "skill": {
+        "remembering": "جارٍ التذكّر",
+        "remembered": "تم التذكّر",
+        "failed": "تعذّر تذكّر هذا",
+        "retry": "إعادة المحاولة",
+        "dismiss": "تجاهل",
+        "notRemembered": "لم يُحفظ",
+        "remember": "تذكّر",
+        "no": "لا",
+        "hideDetails": "إخفاء التفاصيل",
+        "showDetails": "عرض التفاصيل"
+    },
+    "sources": {
+        "count": "{count, plural, zero {لا مصادر} one {مصدر واحد} two {مصدران} few {# مصادر} many {# مصدرًا} other {# مصدر}}"
+    },
+    "table": {
+        "partial": "{shown} من {total}"
+    }
+}

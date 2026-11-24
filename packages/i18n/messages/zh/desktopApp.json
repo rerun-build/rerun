@@ -1,0 +1,137 @@
+{
+    "menu": {
+        "app": {
+            "about": "关于 {name}",
+            "hide": "隐藏 {name}",
+            "hideOthers": "隐藏其他",
+            "showAll": "全部显示",
+            "quit": "退出 {name}",
+            "checkForUpdates": "检查更新…",
+            "changeServer": "更换服务器…"
+        },
+        "file": {
+            "title": "文件",
+            "closeWindow": "关闭窗口",
+            "newWindow": "新建窗口"
+        },
+        "edit": {
+            "title": "编辑",
+            "undo": "撤销",
+            "redo": "重做",
+            "cut": "剪切",
+            "copy": "复制",
+            "paste": "粘贴",
+            "pasteAndMatchStyle": "粘贴并匹配样式",
+            "delete": "删除",
+            "selectAll": "全选",
+            "find": "查找…"
+        },
+        "view": {
+            "title": "显示",
+            "reload": "重新加载",
+            "forceReload": "强制重新加载",
+            "toggleDevTools": "切换开发者工具",
+            "actualSize": "实际大小",
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+            "toggleFullScreen": "切换全屏"
+        },
+        "window": {
+            "title": "窗口",
+            "minimize": "最小化",
+            "zoom": "缩放",
+            "front": "全部置于顶层"
+        },
+        "help": {
+            "title": "帮助",
+            "docs": "文档"
+        }
+    },
+    "offline": {
+        "title": "无法连接 Rerun",
+        "body": "请检查您的网络连接。应用会自动重新连接到 {host}。",
+        "unavailable": "{host} 暂时没有响应。应用会自动重试。",
+        "retry": "重试"
+    },
+    "incompatible": {
+        "title": "请更新 Rerun 以继续",
+        "body": "此版本的应用对 {host} 来说太旧了。",
+        "download": "下载最新版本",
+        "downloading": "正在下载更新… {percent}%",
+        "restart": "重启以更新"
+    },
+    "unload": {
+        "message": "离开此页面？",
+        "detail": "有同事仍在工作，或有文件的更改尚未保存。",
+        "leave": "离开",
+        "stay": "留下"
+    },
+    "find": {
+        "placeholder": "在页面中查找",
+        "matches": "第 {active} 个，共 {total} 个",
+        "noMatches": "无结果",
+        "previous": "上一个匹配",
+        "next": "下一个匹配",
+        "close": "关闭"
+    },
+    "server": {
+        "title": "连接到您的服务器",
+        "description": "输入您使用的 Rerun 服务器地址。",
+        "label": "服务器地址",
+        "connect": "连接",
+        "invalid": "请输入类似 rerun.example.com 的地址。",
+        "unreachable": "此地址没有响应。",
+        "notRerun": "此地址不是 Rerun 服务器。",
+        "tooOld": "此服务器需要 {version} 或更高版本的应用。",
+        "insecure": "此地址未加密。除非服务器运行在这台电脑上，否则请使用 https://。",
+        "useRerunCloud": "使用 Rerun Cloud",
+        "cancel": "取消"
+    },
+    "updates": {
+        "upToDate": "已是最新版本",
+        "upToDateDetail": "Rerun {version} 是最新版本。",
+        "failed": "无法检查更新",
+        "readyToInstall": "Rerun {version} 已可安装",
+        "readyDetail": "应用将重启以完成更新。",
+        "restartNow": "立即重启",
+        "later": "稍后"
+    },
+    "tray": {
+        "open": "打开 {name}",
+        "waiting": "{count, plural, other {# 个正在等您}}",
+        "openAtLogin": "登录时打开",
+        "stillRunning": "{name} 会在这里继续运行。可通过此图标退出。",
+        "quickAsk": "快速提问",
+        "quickAskVoice": "语音快速提问"
+    },
+    "context": {
+        "addToDictionary": "添加到词典",
+        "openLink": "在浏览器中打开链接",
+        "copyLink": "复制链接",
+        "copyImage": "复制图片",
+        "saveImage": "保存图片"
+    },
+    "computer": {
+        "defaultName": "我的电脑",
+        "chooseFolder": "选择同事工作的文件夹",
+        "trayOnline": "这台电脑：在线",
+        "trayOffline": "这台电脑：离线",
+        "trayPaused": "这台电脑：已暂停",
+        "trayJobs": "{count, plural, other {这台电脑：# 个任务正在运行}}",
+        "pause": "暂停同事使用这台电脑",
+        "resume": "恢复同事使用这台电脑",
+        "quitWithJobs": "{count, plural, other {这台电脑上有 # 个同事任务正在运行}}",
+        "quitWithJobsDetail": "退出 Rerun 会停止它。若要继续运行，请改为关闭窗口。",
+        "quitAnyway": "仍然退出",
+        "keepRunning": "继续运行"
+    },
+    "dock": {
+        "collapse": "收起",
+        "expand": "展开",
+        "moveLeft": "移到左侧边缘",
+        "moveRight": "移到右侧边缘",
+        "hide": "隐藏程序坞",
+        "hideCoworker": "从程序坞隐藏 {name}",
+        "showInDock": "在程序坞中显示"
+    }
+}

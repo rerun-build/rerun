@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "{name} 的桌面",
+        "titleFallback": "桌面",
+        "description": "这位同事工作所用的屏幕。您在这里做的操作，它之后都能看到。",
+        "takeoverDescription": "您正在同事的浏览器中。它可以继续时，请按“完成”。",
+        "takeoverHoldsBrowser": "您同事的浏览器已为此请求打开。",
+        "clipboardDenied": "您的浏览器不允许 Rerun 读取剪贴板。",
+        "disconnectedDescription": "与机器的连接已关闭，上面的内容没有丢失。",
+        "reconnect": "重新连接",
+        "tryAgain": "重试"
+    },
+    "screen": {
+        "connecting": "正在连接屏幕...",
+        "unavailable": "屏幕不可用",
+        "wentAway": "屏幕已断开",
+        "resize": "调整屏幕大小"
+    },
+    "notch": {
+        "browser": "浏览器",
+        "closeBrowser": "关闭浏览器",
+        "files": "文件",
+        "terminal": "终端",
+        "paste": "粘贴",
+        "done": "完成",
+        "close": "关闭"
+    },
+    "screenCard": {
+        "openBrowser": "打开浏览器",
+        "takeControl": "接管控制"
+    }
+}

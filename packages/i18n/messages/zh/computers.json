@@ -1,0 +1,96 @@
+{
+    "title": "电脑",
+    "description": "您自己的电脑，同事在上面运行命令和长时间任务",
+    "thisComputer": {
+        "heading": "这台电脑",
+        "offer": "允许同事在这里运行命令和长时间任务",
+        "offerLong": "同事可以在这里运行命令和长时间任务，每个新程序都需要您的批准",
+        "link": "关联",
+        "inWorkspace": "位于 {workspace}",
+        "pause": "暂停",
+        "pauseHint": "在您恢复之前，这里不会运行任何内容",
+        "folder": "工作文件夹",
+        "changeFolder": "更改",
+        "unlink": "取消关联这台电脑",
+        "unlinkTitle": "取消关联这台电脑？",
+        "unlinkBody": "{workspace} 的同事将不再在这里运行任何内容。您之后可以重新关联。",
+        "unlinkConfirm": "取消关联",
+        "noKeychain": "此系统没有钥匙串：关联信息保存在只有您的账户能读取的文件中。"
+    },
+    "linked": "已关联",
+    "linkFromApp": "请在桌面应用中关联电脑。",
+    "getTheApp": "获取应用",
+    "lastSeen": "最后在线 {when}",
+    "neverConnected": "尚未连接",
+    "engineNeedsUpdate": "电脑功能将随此工作区机器的下次更新提供，在此之前显示为离线。",
+    "engineUnreachable": "工作区的机器没有响应：电脑暂时显示为离线。",
+    "managersOnly": "只有管理员或关联它的人可以更改此项",
+    "settingsNeedEngine": "工作区的机器响应后即可使用",
+    "empty": {
+        "title": "未关联电脑",
+        "body": "同事在您自己的机器上处理繁重的工作：视频、本地模型、您的 GPU。",
+        "getApp": "获取桌面应用"
+    },
+    "status": {
+        "online": "在线",
+        "busy": "{count, plural, other {# 项任务运行中}}",
+        "paused": "已暂停",
+        "offline": "离线"
+    },
+    "modes": {
+        "ask": {
+            "label": "每次都询问",
+            "description": "每条命令都等待您的同意"
+        },
+        "remember": {
+            "label": "询问后记住",
+            "description": "信任某个程序后即可始终允许"
+        },
+        "full": {
+            "label": "完全访问",
+            "description": "无需询问即可运行，敏感文件夹除外"
+        }
+    },
+    "detail": {
+        "back": "返回电脑列表",
+        "linkedBy": "由 {name} 关联",
+        "offlineSince": "自 {when} 起离线。同事会告知这一点，而不会运行任何内容。",
+        "neverConnected": "尚未连接。在其上运行 Rerun 应用后即显示为在线。",
+        "paused": "已在电脑本机上暂停。在那里恢复之前不会运行任何内容。",
+        "approvals": "批准",
+        "commands": "命令",
+        "modeLabel": "批准模式",
+        "unattended": "无人在聊天中时",
+        "unattendedHint": "计划任务、触发器、其他同事以及任务结束时都可以使用它",
+        "alwaysAllowed": "始终允许",
+        "nothingAllowed": "暂无。请在聊天中的批准请求上选择“始终允许”。",
+        "interpreterWarning": "允许解释器即允许它运行的任何代码",
+        "stopAllowing": "停止允许 {label}",
+        "screen": "屏幕",
+        "screenOn": "已开启。同事可以查看和使用屏幕，每次一个对话。",
+        "screenOff": "已关闭。只能在这台电脑的 Rerun 应用中开启。",
+        "machine": "机器",
+        "system": "系统",
+        "processor": "处理器",
+        "graphics": "显卡",
+        "memory": "内存",
+        "folder": "文件夹",
+        "remove": "移除电脑",
+        "removeTitle": "移除 {name}？",
+        "removeBody": "同事将不再在其上运行任何内容。它的规则会被清除，之后可以从桌面应用重新关联。",
+        "removeConfirm": "移除",
+        "jobs": "任务"
+    },
+    "linkDialog": {
+        "title": "关联这台电脑",
+        "description": "此工作区的同事将能够在这里运行命令",
+        "name": "名称",
+        "handle": "在聊天中：<handle></handle>",
+        "everyone": "此工作区的每个人都可以通过他们的同事使用它",
+        "approval": "每个新程序都会先请求您的批准",
+        "pauseAnyTime": "可随时在这里或托盘中暂停或取消关联",
+        "cancel": "取消",
+        "link": "关联",
+        "linked": "已关联。同事通过 #{handle} 访问它"
+    }
+}

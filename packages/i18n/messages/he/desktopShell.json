@@ -1,0 +1,111 @@
+{
+    "update": {
+        "ready": "Rerun {version} מוכן",
+        "description": "יש להפעיל מחדש את האפליקציה כדי להשתמש בגרסה החדשה.",
+        "restart": "להפעיל מחדש"
+    },
+    "downloads": {
+        "done": "{filename} הורד",
+        "failed": "לא ניתן להוריד את {filename}",
+        "show": "להציג בתיקייה"
+    },
+    "handoff": {
+        "title": "להתחבר ל-{app}",
+        "body": "להמשיך ל-{app} בתור {account}?",
+        "continue": "להמשיך",
+        "switchAccount": "להשתמש בחשבון אחר",
+        "doneTitle": "חזרה ל-{app}",
+        "doneBody": "{app} יסיים את ההתחברות בעצמו. אפשר לסגור את הכרטיסייה הזו.",
+        "codeHint": "אם {app} לא נפתח, יש להדביק בו את הקוד הזה:",
+        "copyCode": "להעתיק את הקוד",
+        "failed": "לא ניתן לחבר את האפליקציה. יש לנסות שוב.",
+        "invalidTitle": "פג תוקף הקישור הזה",
+        "invalidBody": "יש להתחיל את ההתחברות מחדש מאפליקציית שולחן העבודה."
+    },
+    "signIn": {
+        "waitingTitle": "להמשיך בדפדפן",
+        "waitingBody": "יש להתחבר בחלון הדפדפן שנפתח, ואז לחזור לכאן.",
+        "reopen": "לפתוח שוב את הדפדפן",
+        "pasteCode": "להדביק קוד במקום",
+        "codeLabel": "קוד מהדפדפן",
+        "submit": "להתחבר",
+        "back": "חזרה",
+        "errors": {
+            "expired": "פג תוקף הקוד הזה. יש להתחיל מחדש.",
+            "invalid": "הקוד הזה לא תקין. יש להתחיל מחדש.",
+            "state-mismatch": "ההתחברות הזו התחילה מחלון אחר. יש להתחיל מחדש.",
+            "network": "לא ניתן להגיע ל-Rerun. כדאי לבדוק את החיבור.",
+            "cancelled": "ההתחברות בוטלה."
+        }
+    },
+    "settings": {
+        "openAtLogin": "לפתוח בהתחברות",
+        "openAtLoginMac": "Rerun מופעל עם ה-Mac שלך, בשורת התפריטים.",
+        "openAtLoginOther": "Rerun מופעל עם המחשב שלך, באזור ההתראות.",
+        "closeToTray": "להמשיך לפעול אחרי סגירה",
+        "closeToTrayHint": "סגירת החלון משאירה את Rerun באזור ההתראות, כך שההתראות ממשיכות להגיע.",
+        "updates": "עדכונים",
+        "version": "Rerun {version}",
+        "checking": "בודק אם יש עדכונים…",
+        "downloading": "מוריד את העדכון… {percent}%",
+        "updateFailed": "לא ניתן לבדוק אם יש עדכונים.",
+        "check": "לבדוק אם יש עדכונים",
+        "restart": "להפעיל מחדש כדי לעדכן ל-{version}",
+        "quickAsk": "שאלה מהירה",
+        "quickAskHint": "{shortcut} פותח שדה ל-Chief of Staff שלך מכל אפליקציה.",
+        "quickAskOn": "פותח שדה ל-Chief of Staff שלך מכל אפליקציה.",
+        "quickAskOff": "כבוי. יש להקליט קיצור כדי להפעיל.",
+        "shortcut": {
+            "record": "להקליט קיצור",
+            "typing": "להקיש קיצור",
+            "tryAnother": "לנסות אחר",
+            "recordingHint": "Esc מבטל, ⌫ מכבה",
+            "change": "קיצור {keys}, ללחוץ כדי לשנות",
+            "needsModifier": "יש להוסיף מקש שינוי, כמו {key}",
+            "reserved": "{keys} בשימוש של {owner, select, spotlight {Spotlight} finder {החיפוש של Finder} inputSources {מקורות הקלט} appSwitcher {מחליף האפליקציות} screenshot {צילומי המסך} windowMenu {תפריט החלון} system {המערכת} other {כל האפליקציות}}",
+            "taken": "{keys} בשימוש של אפליקציה אחרת"
+        },
+        "quickAskVoice": "שאלה מהירה בקול",
+        "quickAskVoiceOn": "לדבר עם ה-Chief of Staff שלך מכל אפליקציה.",
+        "coworkerDock": "מעגן העמיתים",
+        "coworkerDockHint": "העמיתים שלך בקצה המסך, מעל כל האפליקציות."
+    },
+    "openInApp": {
+        "title": "לפתוח את הדף הזה ב-{app}?",
+        "open": "לפתוח"
+    },
+    "quickAsk": {
+        "placeholder": "לשאול את ה-Chief of Staff שלך…",
+        "hint": "Enter לשליחה, Esc לסגירה",
+        "send": "לשלוח",
+        "holdToTalk": "יש להחזיק <key>רווח</key> כדי לדבר",
+        "releaseToSend": "לשחרר כדי לשלוח, Esc לביטול",
+        "sent": "נשלח ל-Chief of Staff שלך",
+        "nothingHeard": "לא נשמע דבר. יש להחזיק רווח ולדבר.",
+        "transcriptionFailed": "לא ניתן להמיר את זה לטקסט. יש לנסות שוב, או להקליד.",
+        "micDeniedTitle": "Rerun לא שומע אותך",
+        "micDeniedBody": "יש לאפשר ל-Rerun גישה למיקרופון בהגדרות המערכת.",
+        "openSettings": "לפתוח את ההגדרות",
+        "typeInstead": "להקליד במקום",
+        "toggleHint": "Enter לשליחה, Esc לביטול",
+        "cancel": "ביטול"
+    },
+    "server": {
+        "otherServer": "להשתמש בשרת Rerun אחר"
+    },
+    "coworkerDock": {
+        "newCoworker": "עמית חדש",
+        "move": "להזיז",
+        "show": "להציג עמיתים",
+        "resize": "לשנות גודל",
+        "allNotifications": "כל ההתראות",
+        "allCoworkers": "כל העמיתים",
+        "nothingWaiting": "אין שום דבר שממתין לך.",
+        "openInRerun": "לפתוח ב-Rerun",
+        "replyTo": "להשיב ל-{name}",
+        "send": "לשלוח",
+        "markRead": "לסמן כנקרא",
+        "dismiss": "לסגור",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {שואל} awaiting_approval {צריך את האישור שלך} done {סיים} error {נתקע} other {צריך אותך}}</verb>"
+    }
+}

@@ -1,0 +1,613 @@
+{
+    "actions": {
+        "copy": "نسخ",
+        "copied": "تم النسخ",
+        "connect": "ربط",
+        "cancel": "إلغاء",
+        "continue": "متابعة",
+        "notNow": "ليس الآن",
+        "copiedExclaim": "تم النسخ!"
+    },
+    "sources": {
+        "used": "{count, plural, zero {لم يُستخدم أي مصدر} one {استُخدم مصدر واحد} two {استُخدم مصدران} few {استُخدمت # مصادر} many {استُخدم # مصدرًا} other {استُخدم # مصدر}}"
+    },
+    "draft": {
+        "label": "مسودة"
+    },
+    "mcpServer": {
+        "failed": "تعذّر ربط {name}",
+        "notAdded": "لم تتم الإضافة",
+        "added": "تمت إضافة {name}",
+        "custom": "خادم MCP مخصص",
+        "customWithHost": "خادم MCP مخصص · {host}"
+    },
+    "mcpSignIn": {
+        "title": "سجّل الدخول إلى {name}"
+    },
+    "mentions": {
+        "coworkers": "الزملاء",
+        "skills": "المهارات",
+        "computers": "أجهزة الكمبيوتر",
+        "button": "اذكر زميلًا أو مهارة أو جهاز كمبيوتر",
+        "coworker": {
+            "action": "اذكر زميلًا",
+            "description": "أشرك زميلًا في هذه المحادثة",
+            "empty": "لا يوجد زميل آخر في مساحة العمل هذه بعد"
+        },
+        "skill": {
+            "action": "استخدم مهارة",
+            "description": "شغّل طريقة محفوظة يعرفها زميلك",
+            "empty": "لا يملك هذا الزميل أي مهارة بعد"
+        },
+        "computer": {
+            "action": "استخدم جهاز كمبيوتر",
+            "description": "دع زميلك يعمل على جهاز كمبيوتر مرتبط",
+            "empty": "لا يوجد جهاز كمبيوتر مرتبط بعد"
+        }
+    },
+    "paidSources": {
+        "count": "{count, plural, zero {لا مصادر} one {مصدر واحد} two {مصدران} few {# مصادر} many {# مصدرًا} other {# مصدر}}",
+        "emailsVerified": "تم التحقق من {valid} من أصل {checked} بريد إلكتروني"
+    },
+    "tableCard": {
+        "openDisabledReason": "افتح هذا الزميل من اللوحة لتصفح قاعدة بياناته."
+    },
+    "conversation": {
+        "emptyTitle": "لا توجد رسائل بعد",
+        "emptyDescription": "ابدأ محادثة لتظهر الرسائل هنا",
+        "scrollToLatest": "انتقل إلى آخر رسالة"
+    },
+    "brainProposal": {
+        "create": "صفحة Brain جديدة: {title}",
+        "edit": "تعديل على Brain: {title}",
+        "description": "مقترح للمراجعة. لن يتغير شيء حتى يقبله أحد.",
+        "review": "راجِع"
+    },
+    "attachments": {
+        "attach": "إرفاق ملفات",
+        "open": "فتح {name}",
+        "position": "{current} / {total}",
+        "previous": "المرفق السابق",
+        "next": "المرفق التالي",
+        "download": "تنزيل",
+        "waiting": "في الانتظار",
+        "finishing": "جارٍ الإنهاء",
+        "progress": "{percent}%",
+        "progressWithEta": "{percent}% · {eta}",
+        "fileFallback": "ملف",
+        "uploading": "جارٍ رفع {name}",
+        "retryUpload": "إعادة محاولة الرفع",
+        "cancelUpload": "إلغاء الرفع",
+        "remove": "إزالة المرفق",
+        "openMore": "{count, plural, zero {فتح المزيد} one {فتح عنصر آخر} two {فتح عنصرين آخرين} few {فتح # عناصر أخرى} many {فتح # عنصرًا آخر} other {فتح # عنصر آخر}}",
+        "uploadFailed": "فشل الرفع",
+        "uploadingProgress": "جارٍ الرفع · {percent}%",
+        "retryUploading": "إعادة محاولة رفع {name}",
+        "removeNamed": "إزالة {name}"
+    },
+    "screen": {
+        "openBrowser": "فتح المتصفح",
+        "takeControl": "تولَّ التحكم"
+    },
+    "composer": {
+        "link": {
+            "open": "فتح",
+            "unlink": "إزالة الرابط"
+        },
+        "subscriptionCta": "هل تدفع بالفعل اشتراكًا في الذكاء الاصطناعي؟ شغّل هذا الزميل عليه.",
+        "placeholder": "اكتب @ لزميل، و/ لمهارة، و# لجهاز كمبيوتر",
+        "placeholderNoSkill": "اكتب @ لزميل، و# لجهاز كمبيوتر",
+        "attachmentsMissing": "لم يتم رفع بعض المرفقات. أزلها وأرفقها مجددًا قبل الإرسال.",
+        "attachmentsFailed": "{count, plural, zero {لم يفشل رفع أي مرفق.} one {فشل رفع مرفق واحد. أعد المحاولة أو أزله قبل الإرسال.} two {فشل رفع مرفقين. أعد المحاولة أو أزلهما قبل الإرسال.} few {فشل رفع # مرفقات. أعد المحاولة أو أزلها قبل الإرسال.} many {فشل رفع # مرفقًا. أعد المحاولة أو أزلها قبل الإرسال.} other {فشل رفع # مرفق. أعد المحاولة أو أزلها قبل الإرسال.}}",
+        "noFiles": "لا تقبل هذه المحادثة الملفات بعد.",
+        "sendFailed": "تعذّر إرسال رسالتك",
+        "openEditor": "فتح المحرر الكامل",
+        "stop": "إيقاف التشغيل الحالي",
+        "editor": {
+            "title": "اكتب رسالتك",
+            "description": "مساحة لتنظيم رسالة طويلة. يبدأ Enter سطرًا جديدًا.",
+            "hint": "أرسل باستخدام Cmd + Enter",
+            "cancel": "إلغاء",
+            "send": "إرسال"
+        }
+    },
+    "message": {
+        "showLess": "عرض أقل",
+        "showMore": "عرض المزيد",
+        "openFile": "فتح {path}",
+        "branch": {
+            "previous": "الفرع السابق",
+            "next": "الفرع التالي",
+            "page": "{current} من {total}"
+        },
+        "goodResponse": "رد جيد",
+        "badResponse": "رد سيئ",
+        "regenerate": "إعادة الإنشاء",
+        "relayedFor": "{named, select, yes {{name} نيابةً عن {person}} other {Chief of Staff نيابةً عن {person}}}"
+    },
+    "installGate": {
+        "title": "إعداد {name}",
+        "inProgressTitle": "جارٍ إعداد {name}",
+        "inProgressHint": "في محادثة أخرى",
+        "facts": "{apps, plural, =0 {~{minutes} دقيقة} zero {~{minutes} دقيقة} one {تطبيق واحد · ~{minutes} دقيقة} two {تطبيقان · ~{minutes} دقيقة} few {# تطبيقات · ~{minutes} دقيقة} many {# تطبيقًا · ~{minutes} دقيقة} other {# تطبيق · ~{minutes} دقيقة}}",
+        "continue": "متابعة الإعداد",
+        "installing": "جارٍ التثبيت",
+        "install": "تثبيت {name}",
+        "skip": "تخطٍّ الآن"
+    },
+    "activity": {
+        "thinking": "جارٍ التفكير...",
+        "processing": "جارٍ معالجة طلبك...",
+        "crafting": "جارٍ صياغة الرد...",
+        "writing": "جارٍ الكتابة...",
+        "runningTool": "جارٍ تشغيل {tool}",
+        "waitingOn": "في انتظار {name}",
+        "building": "جارٍ بناء {name}",
+        "buildingCoworkers": "{count, plural, zero {لا يتم بناء أي زميل} one {جارٍ بناء زميل واحد} two {جارٍ بناء زميلين} few {جارٍ بناء # زملاء} many {جارٍ بناء # زميلًا} other {جارٍ بناء # زميل}} · اكتمل {done}",
+        "waitingOnSubCoworkers": "{count, plural, zero {لا انتظار لأي زميل فرعي} one {في انتظار زميل فرعي واحد} two {في انتظار زميلين فرعيين} few {في انتظار # زملاء فرعيين} many {في انتظار # زميلًا فرعيًا} other {في انتظار # زميل فرعي}} · اكتمل {done}"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {سؤال بانتظار الرد} zero {سؤال بانتظار الرد} one {سؤال بانتظار الرد} two {سؤالان بانتظار الرد} few {# أسئلة بانتظار الرد} many {# سؤالًا بانتظار الرد} other {# سؤال بانتظار الرد}}",
+        "approval": "{count, plural, =0 {موافقة مطلوبة} zero {موافقة مطلوبة} one {موافقة مطلوبة} two {موافقتان مطلوبتان} few {# موافقات مطلوبة} many {# موافقة مطلوبة} other {# موافقة مطلوبة}}",
+        "secret": "{count, plural, =0 {بيانات اعتماد مطلوبة} zero {بيانات اعتماد مطلوبة} one {بيانات اعتماد مطلوبة} two {مجموعتا بيانات اعتماد مطلوبتان} few {# بيانات اعتماد مطلوبة} many {# بيانات اعتماد مطلوبة} other {# بيانات اعتماد مطلوبة}}",
+        "mcpNamed": "سجّل الدخول إلى {name}",
+        "mcp": "تسجيل الدخول مطلوب",
+        "service": "{count, plural, =0 {تطبيق للربط} zero {تطبيق للربط} one {تطبيق للربط} two {تطبيقان للربط} few {# تطبيقات للربط} many {# تطبيقًا للربط} other {# تطبيق للربط}}",
+        "takeover": "دورك على الشاشة",
+        "spend": "إنفاق بانتظار الموافقة",
+        "computer": "وافق على أمر على #{computer}",
+        "feature": "طلب لإرساله إلى فريق Rerun"
+    },
+    "pendingHitl": {
+        "goTo": "{label}، انتقل إليه"
+    },
+    "reasoning": {
+        "thinking": "جارٍ التفكير...",
+        "thought": "فكرة"
+    },
+    "secretRequest": {
+        "saveFailed": "تعذّر حفظ بيانات الاعتماد"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "تم تحديث Brain: {title}",
+            "created": "صفحة Brain جديدة: {title}",
+            "deleted": "أُزيلت من Brain: {title}",
+            "accepted": "تم قبول التعديل: {title}",
+            "acceptedBy": "تم قبول تعديل {name}: {title}",
+            "dismissed": "تم رفض التعديل: {title}",
+            "dismissedBy": "تم رفض تعديل {name}: {title}"
+        },
+        "notes": {
+            "saved": "تم الحفظ. سيقرؤها كل زميل بدءًا من تشغيله التالي.",
+            "deleted": "لم يعد أي زميل يقرؤها. يُحتفظ بسجلها.",
+            "accepted": "تم الحفظ. سيقرؤها كل زميل بدءًا من تشغيله التالي.",
+            "dismissed": "لم تتغير الصفحة."
+        },
+        "undone": "تم التراجع: {title}",
+        "undoneNote": "عادت النسخة السابقة.",
+        "undo": "تراجع",
+        "open": "فتح"
+    },
+    "compaction": {
+        "running": "جارٍ ضغط السياق…",
+        "failed": "فشل ضغط السياق",
+        "done": "تم ضغط السياق",
+        "summarized": "{count, plural, zero {لم تُلخَّص أي رسالة سابقة} one {تم تلخيص رسالة سابقة واحدة} two {تم تلخيص رسالتين سابقتين} few {تم تلخيص # رسائل سابقة} many {تم تلخيص # رسالة سابقة} other {تم تلخيص # رسالة سابقة}}",
+        "recovered": "تم تحرير ~{tokens} رمز"
+    },
+    "providerSwitch": {
+        "limit": "تم بلوغ حد {plan} · {model}",
+        "limitUntil": "تم بلوغ حد {plan} · {model} حتى {time}",
+        "limitUntilDate": "تم بلوغ حد {plan} · {model} حتى {date}، {time}",
+        "back": "تمت إعادة ضبط {plan}. العودة إلى {model}."
+    },
+    "scheduledRun": {
+        "label": "تشغيل مجدول",
+        "viewPrompt": "عرض التعليمات",
+        "promptTitle": "تعليمات {name}"
+    },
+    "steps": {
+        "count": "{count, plural, zero {لا خطوات} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+        "countWithFailures": "{count, plural, zero {لا خطوات} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}، فشل منها {failed}",
+        "failed": "فشل {failed}",
+        "thinking": "جارٍ التفكير",
+        "compacting": "جارٍ الضغط"
+    },
+    "subRun": {
+        "failuresInARow": "{count} إخفاقات متتالية",
+        "idle": "خامل منذ {minutes} دقيقة",
+        "stopTask": "إيقاف هذه المهمة",
+        "stopped": "تم الإيقاف، مع الاحتفاظ بالعمل الجزئي",
+        "stoppedWithRun": "توقف مع التشغيل",
+        "failed": "فشل",
+        "earlier": "+{count} سابقة",
+        "verbs": {
+            "search": "جارٍ البحث عن {summary}",
+            "read": "جارٍ قراءة {summary}",
+            "browse": "جارٍ تصفح {summary}",
+            "run": "جارٍ تشغيل {summary}",
+            "write": "جارٍ كتابة {summary}",
+            "edit": "جارٍ تعديل {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "مقتطع",
+        "empty": "لا توجد بيانات",
+        "payload": "البيانات المستلمة"
+    },
+    "voice": {
+        "sendFailed": "تعذّر إرسال هذا التسجيل.",
+        "sendFailedHint": "أعد المحاولة أو تجاهله.",
+        "waitingForMicrophone": "في انتظار الميكروفون...",
+        "microphone": "الميكروفون...",
+        "transcribing": "جارٍ التفريغ...",
+        "hideTranscript": "إخفاء النص",
+        "transcript": "النص",
+        "copyTranscript": "نسخ النص",
+        "pause": "إيقاف مؤقت",
+        "play": "تشغيل الرسالة الصوتية",
+        "seek": "انتقال",
+        "record": "تسجيل رسالة صوتية",
+        "discard": "تجاهل",
+        "discardLabel": "تجاهل التسجيل",
+        "retry": "إعادة المحاولة",
+        "send": "إرسال",
+        "retryLabel": "إعادة محاولة إرسال التسجيل",
+        "sendLabel": "إرسال التسجيل",
+        "unsupported": "الرسائل الصوتية غير مدعومة في هذا المتصفح.",
+        "microphoneBlocked": "الوصول إلى الميكروفون محظور. اسمح به في إعدادات المتصفح للتسجيل.",
+        "noMicrophone": "لا يتوفر ميكروفون.",
+        "startFailed": "تعذّر بدء التسجيل.",
+        "nothingHeard": "لم يُسمع أي شيء في هذا التسجيل.",
+        "voiceMessageFailed": "تعذّر إرسال رسالتك الصوتية.",
+        "nothingRecorded": "لم يتم تسجيل أي شيء."
+    },
+    "agentInstall": {
+        "started": "بدأ التثبيت",
+        "complete": "اكتمل التثبيت",
+        "viewGuide": "عرض الدليل",
+        "guideTitle": "دليل تثبيت {name}"
+    },
+    "setupEvents": {
+        "notificationSent": "أرسل إليك إشعارًا",
+        "read": "مقروء",
+        "schedulesOn": "{count, plural, zero {لا جداول مفعّلة} one {جدول واحد مفعّل} two {جدولان مفعّلان} few {# جداول مفعّلة} many {# جدولًا مفعّلًا} other {# جدول مفعّل}}",
+        "triggersOn": "{count, plural, zero {لا مشغّلات مفعّلة} one {مشغّل واحد مفعّل} two {مشغّلان مفعّلان} few {# مشغّلات مفعّلة} many {# مشغّلًا مفعّلًا} other {# مشغّل مفعّل}}",
+        "setUp": "تم إعداد {name}",
+        "setupComplete": "اكتمل الإعداد",
+        "connectedHint": "مرتبط، ويمكن للزميل استخدامه",
+        "signInHint": "سجّل الدخول مرة واحدة ليتمكن الزميل من استخدامه",
+        "connected": "مرتبط",
+        "signIn": "تسجيل الدخول"
+    },
+    "takeover": {
+        "opened": "المتصفح مفتوح على سطح مكتب زميلك. عد إلى هنا عندما تنتهي.",
+        "opensSite": "يفتح {site} في متصفح زميلك لتتحكم فيه.",
+        "opens": "يفتح متصفح زميلك لتتحكم فيه.",
+        "skipLabel": "تخطي التحكم في المتصفح",
+        "privacy": "ما تسجّل الدخول إليه يبقى في متصفح هذا الزميل على جهازك.",
+        "openAgain": "فتح مجددًا",
+        "closing": "جارٍ الإغلاق…",
+        "done": "تم",
+        "skip": "تخطٍّ",
+        "openBrowser": "فتح المتصفح"
+    },
+    "video": {
+        "play": "تشغيل {name}",
+        "pause": "إيقاف {name} مؤقتًا",
+        "previewUnavailable": "المعاينة غير متاحة",
+        "openFullScreen": "فتح {name} بملء الشاشة"
+    },
+    "tool": {
+        "error": "خطأ",
+        "output": "المخرجات",
+        "input": "المدخلات",
+        "completedIn": "اكتمل في {duration}"
+    },
+    "webhookRun": {
+        "label": "تم استلام Webhook",
+        "viewPrompt": "عرض التعليمات",
+        "viewPayload": "عرض البيانات",
+        "promptTitle": "تعليمات {name}",
+        "payloadTitle": "بيانات {name}"
+    },
+    "question": {
+        "tooManyFiles": "يمكنك إرفاق {max} ملفات كحد أقصى. لم تتم إضافة {rejected}.",
+        "uploadsFailed": "{count, plural, zero {تم رفع كل المرفقات.} one {تعذّر رفع مرفق واحد. أعد المحاولة أو أزله قبل الإجابة.} two {تعذّر رفع مرفقين. أعد المحاولة أو أزلهما قبل الإجابة.} few {تعذّر رفع # مرفقات. أعد المحاولة أو أزلها قبل الإجابة.} many {تعذّر رفع # مرفقًا. أعد المحاولة أو أزلها قبل الإجابة.} other {تعذّر رفع # مرفق. أعد المحاولة أو أزلها قبل الإجابة.}}"
+    },
+    "queued": {
+        "stopping": "جارٍ إيقاف التشغيل الحالي",
+        "badge": "في قائمة الانتظار",
+        "attachmentsOnly": "مرفقات فقط",
+        "sendNowStops": "أرسل الآن، سيتوقف التشغيل الحالي",
+        "sendNow": "إرسال الآن",
+        "sendNowLabel": "إرسال الرسالة المنتظرة الآن",
+        "remove": "إزالة",
+        "removeLabel": "إزالة الرسالة المنتظرة"
+    },
+    "context": {
+        "usedLabel": "السياق المستخدم: {percent}%",
+        "title": "السياق",
+        "input": "المدخلات",
+        "cached": "من الذاكرة المؤقتة",
+        "reasoning": "التفكير",
+        "output": "المخرجات",
+        "total": "الإجمالي"
+    },
+    "feedback": {
+        "negativeTitle": "تقديم ملاحظات سلبية",
+        "positiveTitle": "تقديم ملاحظات إيجابية",
+        "categoryLabel": "ما نوع المشكلة التي تريد الإبلاغ عنها؟",
+        "categoryPlaceholder": "اختر…",
+        "detailsLabel": "يرجى تقديم التفاصيل",
+        "negativePlaceholder": "ما الذي لم يرضك في هذا الرد؟",
+        "positivePlaceholder": "ما الذي أرضاك في هذا الرد؟",
+        "disclaimer": "يشارك إرسال هذا البلاغ هذه المحادثة مع فريق Rerun لنتمكن من تحسين زملائك.",
+        "cancel": "إلغاء",
+        "submit": "إرسال",
+        "categories": {
+            "ui_bug": "خلل في الواجهة",
+            "did_not_follow": "لم يتبع طلبي",
+            "not_factual": "غير صحيح من حيث الوقائع",
+            "incomplete": "رد غير مكتمل",
+            "wrong_tool": "استُخدمت أداة أو تطبيق خاطئ",
+            "tool_error": "خطأ في الأداة أو الاتصال",
+            "too_slow": "بطيء جدًا",
+            "memory": "مشكلة في الذاكرة",
+            "other": "أخرى"
+        },
+        "removeFailed": "تعذّرت إزالة ملاحظاتك",
+        "saveFailed": "تعذّر حفظ ملاحظاتك",
+        "thanks": "شكرًا على ملاحظاتك"
+    },
+    "providerError": {
+        "fallbackTitle": "حدث خطأ ما",
+        "runInFlight": "تشغيل بدأ سابقًا لا يزال يشغل هذه المحادثة. أوقفه لإرسال رسالتك.",
+        "stop": {
+            "title": "إيقاف هذا التشغيل",
+            "cta": "إيقاف التشغيل",
+            "description": "يحرر المحادثة لرسالتك."
+        },
+        "newConversation": {
+            "title": "بدء محادثة جديدة",
+            "cta": "محادثة جديدة",
+            "description": "يفتح محادثة جديدة مع هذا الزميل."
+        },
+        "continue": {
+            "title": "متابعة التشغيل",
+            "cta": "متابعة",
+            "description": "يستأنف من حيث توقف الزميل."
+        },
+        "retry": {
+            "title": "حاول مجددًا",
+            "cta": "إعادة المحاولة",
+            "description": "يرسل رسالتك الأخيرة مرة أخرى."
+        },
+        "switch": {
+            "title": "التبديل إلى نموذج آخر",
+            "cta": "تبديل",
+            "descriptionModel": "اختر نموذجًا آخر لهذه المحادثة.",
+            "descriptionConnection": "اختر اتصالًا آخر من مساحة العمل هذه."
+        },
+        "reconnect": {
+            "title": "إعادة الربط",
+            "cta": "إعادة الربط",
+            "description": "سجّل الدخول مجددًا إلى الاتصال الذي يعمل عليه هذا الزميل.",
+            "descriptionReplaceKey": "الصق المفتاح الجديد في الاتصال الذي يعمل عليه هذا الزميل."
+        }
+    },
+    "budget": {
+        "title": "رصيد Rerun",
+        "paused": {
+            "title": "رصيد Rerun متوقف مؤقتًا",
+            "body": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة حتى يستأنفها أحد.",
+            "actionTitle": "استئناف رصيد Rerun",
+            "actionDescription": "يبدأ الإنفاق مجددًا فورًا.",
+            "cta": "استئناف"
+        },
+        "preTrial": {
+            "body": "لقد استهلكت {credits} المقدَّم مع الحساب الجديد. الاشتراك هو ما يفتح الباقي.",
+            "actionDescription": "يواصل زملاؤك العمل، ويمكنك الإلغاء في أي وقت."
+        },
+        "subscribe": {
+            "title": "اشترك الآن",
+            "cta": "اشتراك",
+            "descriptionTrial": "ينهي فترتك التجريبية اليوم. {credits} مشمول كل شهر.",
+            "description": "{credits} مشمول كل شهر."
+        },
+        "topUp": {
+            "title": "اشحن رصيد Rerun",
+            "cta": "شحن",
+            "description": "أو انتظر، يُعاد ضبطه الشهر القادم."
+        },
+        "usedUp": {
+            "noCredit": "لا تملك مساحة العمل هذه رصيد Rerun بعد.",
+            "trial": "لقد استهلكت {credits} الخاص بفترتك التجريبية المجانية.",
+            "period": "لقد استهلكت رصيد Rerun لهذه الفترة."
+        },
+        "ownConnection": {
+            "body": "عملت هذه المحادثة على Rerun، واشتراك {plan} الخاص بك مرتبط."
+        },
+        "runOn": "التشغيل على {plan}",
+        "or": "أو",
+        "connectProvider": {
+            "body": "هل تدفع بالفعل لـ Claude أو ChatGPT؟ شغّل زملاءك على هذا الاشتراك دون تكلفة إضافية هنا.",
+            "claude": "ربط Claude",
+            "chatgpt": "ربط ChatGPT"
+        },
+        "subscribeToKeepWorking": "اشترك ليواصل زملاؤك العمل.",
+        "resetsNextMonth": "يُعاد ضبطه الشهر القادم.",
+        "lifetime": {
+            "ownConnection": "تعمل خطتك مدى الحياة على ذكائك الاصطناعي الخاص، واشتراك {plan} الخاص بك مرتبط.",
+            "connectProvider": "تعمل خطتك مدى الحياة على ذكائك الاصطناعي الخاص. أضف مفتاح API أو اربط ChatGPT ليواصل زملاؤك العمل.",
+            "connectProviderWithClaude": "تعمل خطتك مدى الحياة على ذكائك الاصطناعي الخاص. أضف مفتاح API أو اربط Claude أو ChatGPT ليواصل زملاؤك العمل.",
+            "apiKeyTitle": "استخدام مفتاح API",
+            "apiKeyDescription": "Anthropic أو OpenAI أو Google أو OpenRouter أو نقطة نهاية مخصصة.",
+            "apiKeyCta": "إضافة مفتاح",
+            "body": "تعمل خطتك مدى الحياة على ذكائك الاصطناعي الخاص.",
+            "connectTitle": "اربط ذكاءك الاصطناعي",
+            "connectDescription": "مفتاح API أو ChatGPT.",
+            "connectDescriptionWithClaude": "مفتاح API أو Claude أو ChatGPT.",
+            "connectCta": "ربط"
+        },
+        "trial": {
+            "onPro": "أنت على خطة Pro.",
+            "resuming": "يستأنف زميلك المهمة.",
+            "resumingNamed": "يستأنف {name} المهمة.",
+            "title": "نفد رصيد الفترة التجريبية",
+            "stopped": "توقف {name}.",
+            "continueWithPro": "المتابعة مع Pro · {price}/شهريًا",
+            "useMyPlan": "أو استخدم اشتراكي:"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "مرتبط",
+            "skipped": "تم التخطي",
+            "notReconnected": "لم تتم إعادة الربط",
+            "notFound": "غير موجود",
+            "stored": "محفوظ",
+            "approved": "تمت الموافقة",
+            "notNow": "ليس الآن"
+        },
+        "apps": {
+            "title": "التطبيقات",
+            "meta": "{connected} من {total} مرتبطة",
+            "insteadOf": "بدلًا من {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "إجابة",
+                "other": "إجابات"
+            },
+            "meta": "تمت الإجابة على {answered} من {total}"
+        },
+        "keys": {
+            "title": "المفاتيح",
+            "meta": "{stored} من {total} محفوظة",
+            "note": "محفوظة على Box. لا يرى الزميل سوى الأسماء.",
+            "vaultNote": "محفوظة في Vault. لا يرى Chief of Staff سوى الأسماء."
+        },
+        "approvals": {
+            "title": {
+                "one": "موافقة",
+                "other": "موافقات"
+            },
+            "metaBoth": "{approved} تمت الموافقة عليها، {declined} ليس الآن",
+            "metaApproved": "{approved} تمت الموافقة عليها",
+            "metaDeclined": "{declined} ليس الآن"
+        },
+        "mcp": {
+            "title": "خادم MCP"
+        },
+        "takeover": {
+            "handedBackOn": "أعدت المتصفح على {url}",
+            "handedBack": "أعدت المتصفح"
+        },
+        "dismissed": {
+            "service": "أغلقت إعداد التطبيق",
+            "question": "تخطيت الأسئلة",
+            "secret": "رفضت مشاركة المفاتيح",
+            "mcp": "تخطيت تسجيل الدخول",
+            "takeover": "تركت المتصفح لزميلك",
+            "feature": "لم يُرسل الطلب"
+        },
+        "computer": {
+            "status": {
+                "allowed": "مسموح",
+                "always": "مسموح دائمًا",
+                "denied": "مرفوض"
+            },
+            "screen": "الشاشة والفأرة ولوحة المفاتيح"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "تعذّر إيقاف التشغيل الحالي. سيتم إرسال رسالتك عند انتهائه.",
+        "selectModel": "اختر نموذجًا للبدء: افتح قائمة النماذج أدناه.",
+        "emptyTitle": "ابدأ محادثة",
+        "emptyDescription": "أرسل رسالة إلى هذا الزميل",
+        "runStoppedResponding": "توقف التشغيل عن الاستجابة. أوقفه لإرسال رسالة أخرى.",
+        "continueWhereLeftOff": "تابع من حيث توقفت.",
+        "alwaysAllowFailed": "تعذّر تفعيل \"الإنفاق دون سؤال\". تبقى هذه الموافقة سارية حتى حد تقديرها."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, =2 {{names} كبيران جدًا للإرفاق.} zero {الملفات كبيرة جدًا للإرفاق.} one {{names} كبير جدًا للإرفاق.} two {{names} كبيران جدًا للإرفاق.} few {{names} و{more} ملفات أخرى كبيرة جدًا للإرفاق.} many {{names} و{more} ملفًا آخر كبيرة جدًا للإرفاق.} other {{names} و{more} ملف آخر كبيرة جدًا للإرفاق.}}",
+        "addFiles": "إضافة صور أو ملفات",
+        "takeScreenshot": "التقاط لقطة شاشة",
+        "noMatchingFiles": "لا توجد ملفات تطابق الأنواع المقبولة.",
+        "tooManyFiles": "يمكنك إرفاق {max} ملفات كحد أقصى. لم تتم إضافة {rejected}.",
+        "uploadFiles": "رفع ملفات",
+        "dropFiles": "أفلت الملفات لإرفاقها",
+        "placeholder": "ماذا تريد أن تعرف؟",
+        "stop": "إيقاف",
+        "submit": "إرسال"
+    },
+    "spend": {
+        "estimatedTotal": "الإجمالي التقديري",
+        "creditsUnit": "{count, plural, zero {رصيد} one {رصيد} two {رصيدان} few {أرصدة} many {رصيدًا} other {رصيد}}",
+        "creditsLeft": "متبقٍّ {amount} {count, plural, zero {رصيد} one {رصيد} two {رصيدان} few {أرصدة} many {رصيدًا} other {رصيد}}",
+        "creditsMissing": "ينقص {amount}",
+        "notNow": "ليس الآن",
+        "alwaysAllow": "السماح دائمًا",
+        "approveOnce": "الموافقة مرة واحدة",
+        "addCredits": "إضافة رصيد",
+        "receipt": {
+            "approvedOnce": "تمت الموافقة مرة واحدة",
+            "alwaysAllowed": "مسموح دائمًا",
+            "notNow": "ليس الآن",
+            "ofTotal": "/ {amount} {count, plural, zero {رصيد} one {رصيد} two {رصيدان} few {أرصدة} many {رصيدًا} other {رصيد}}"
+        }
+    },
+    "computerAccess": {
+        "titleCommand": "تشغيل أمر على <computer></computer>",
+        "titleCommands": "تشغيل {count} أوامر على <computer></computer>",
+        "titleScreen": "استخدام شاشة <computer></computer>",
+        "deny": "رفض",
+        "allow": "سماح",
+        "alwaysAllow": "السماح دائمًا لـ {program}",
+        "interpreterWarning": "السماح الدائم لـ {program} يسمح بأي كود يشغّله",
+        "alwaysFailed": "تعذّر حفظ القاعدة على الكمبيوتر: تم السماح هذه المرة فقط.",
+        "titleFiles": "{count, plural, zero {استخدام ملفات على <computer></computer>} one {استخدام ملف على <computer></computer>} two {استخدام ملفين على <computer></computer>} few {استخدام # ملفات على <computer></computer>} many {استخدام # ملفًا على <computer></computer>} other {استخدام # ملف على <computer></computer>}}",
+        "alwaysAllowFolder": "السماح دائمًا لهذا المجلد",
+        "folderNote": "يسمح \"دائمًا\" بكل ملف في {folder}",
+        "inFolder": "في {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "قيد التشغيل",
+            "succeeded": "تم",
+            "failed": "فشل",
+            "stopped": "متوقف",
+            "lost": "مفقود",
+            "offline": "الكمبيوتر غير متصل",
+            "gone": "غير متاح"
+        },
+        "stop": "إيقاف",
+        "offlineNote": "يواصل العمل هناك. سيتلقى الزميل الرد عند عودة الكمبيوتر.",
+        "lostNote": "أُغلق Rerun على الكمبيوتر أثناء التشغيل.",
+        "goneNote": "لم يعد بالإمكان قراءة هذه المهمة: أُزيل الكمبيوتر، أو لم يعد يعرف المهمة."
+    },
+    "jobEnd": {
+        "label": "انتهت المهمة على <computer>#{handle}</computer>",
+        "viewReport": "عرض التقرير",
+        "reportTitle": "ما أبلغ عنه #{computer}"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "ميزة",
+            "bug": "خلل",
+            "improvement": "تحسين"
+        },
+        "today": "<strong>اليوم:</strong> {workaround}",
+        "notNow": "ليس الآن",
+        "edit": "تعديل",
+        "done": "تم",
+        "send": "إرسال إلى الفريق",
+        "titleLabel": "العنوان",
+        "descriptionLabel": "الوصف",
+        "sent": "أُرسل إلى فريق Rerun: <muted>{title}</muted>",
+        "reviewIt": "راجعه",
+        "sendFailed": "تعذّر إرسال الطلب. حاول مجددًا."
+    }
+}

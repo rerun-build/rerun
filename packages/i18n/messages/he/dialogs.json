@@ -1,0 +1,696 @@
+{
+    "account": {
+        "emailChangeNeedsCurrentAddress": "עדיין צריך לאשר את השינוי הזה מהכתובת הנוכחית שלך.",
+        "emailUpdated": "האימייל עודכן",
+        "phoneUpdated": "מספר הטלפון עודכן",
+        "connectFailed": "לא ניתן לחבר את {provider}. כדאי לנסות שוב.",
+        "disconnectFailed": "לא ניתן לנתק את {provider}. כדאי לנסות שוב.",
+        "onlySignInMethod": "{provider} היא שיטת ההתחברות היחידה שמחוברת לחשבון הזה.",
+        "disconnected": "{provider} נותק",
+        "changeEmail": "לשנות אימייל",
+        "addEmail": "להוסיף אימייל",
+        "changePhone": "לשנות מספר טלפון",
+        "addPhone": "להוסיף מספר טלפון",
+        "googleNeedsBrowser": "יש לפתוח את Rerun בדפדפן כדי לחבר את Google."
+    },
+    "members": {
+        "title": "חברים",
+        "description": "מנהלים מנהלים את החיוב, החברים וההגדרות. חברים משתמשים בעמיתים.",
+        "adminOnly": "רק מנהל יכול לנהל חברים",
+        "seatsFullOne": "סביבת העבודה שלך מוגבלת למושב אחד.",
+        "seatsFull": "סביבת העבודה שלך מוגבלת ל{count, plural, one {מושב אחד} two {שני מושבים} other {־# מושבים}}.",
+        "fallbackLabel": "חבר",
+        "nowAdmin": "{name} הוא עכשיו מנהל",
+        "nowMember": "{name} הוא עכשיו חבר",
+        "removed": "{name} הוסר מסביבת העבודה",
+        "unknownUser": "משתמש לא ידוע",
+        "lastAdmin": "סביבת העבודה צריכה לפחות מנהל אחד",
+        "you": "אתה",
+        "adminBadge": "מנהל",
+        "manage": "לנהל את {email}",
+        "makeAdmin": "להפוך למנהל",
+        "makeMember": "להפוך לחבר",
+        "remove": "להסיר",
+        "removeConfirm": {
+            "title": "להסיר את {email}?",
+            "description": "הגישה שלו לסביבת העבודה הזו ולכל מה שבה תיחסם מיד. אפשר להזמין אותו שוב בהמשך."
+        },
+        "revokeConfirm": {
+            "title": "לבטל את ההזמנה של {email}?",
+            "description": "קישור ההזמנה שלו יפסיק לעבוד. אפשר לשלוח קישור חדש בכל עת.",
+            "confirm": "לבטל"
+        },
+        "invite": {
+            "assignLater": "שיוך בהמשך",
+            "pending": "ממתין",
+            "revoke": "לבטל את ההזמנה",
+            "linkHint": "יש לשלוח את הקישור הזה אל {email}. הוא עובד רק עבורו, פעם אחת.",
+            "copyLink": "להעתיק את קישור ההזמנה",
+            "emailLabel": "להזמין באימייל",
+            "emailPlaceholder": "teammate@rerun.build",
+            "boxes": "Boxes",
+            "submit": "להזמין",
+            "sent": "ההזמנה נשלחה אל {email}"
+        },
+        "scope": {
+            "all": {
+                "label": "כל ה-Boxes",
+                "description": "כל Box שפתוח לסביבת העבודה"
+            },
+            "assigned": {
+                "label": "אף אחד, שיוך בהמשך",
+                "description": "רק ה-Boxes שתיתן לו"
+            }
+        },
+        "boxes": {
+            "title": "ה-Boxes של {person}",
+            "back": "חזרה לחברים",
+            "adminsSeeAll": "למנהלים יש גישה לכל Box",
+            "sharedField": "Boxes שמשותפים עם סביבת העבודה",
+            "sharedAll": "משתמש בכל Box שפתוח לכולם",
+            "sharedAssigned": "משתמש רק ב-Boxes שמופיעים למטה",
+            "limit": {
+                "title": "להגביל את {person} ל-Boxes שצוינו?",
+                "confirm": "להגביל"
+            },
+            "group": "Boxes",
+            "empty": "עדיין אין Box",
+            "everyone": {
+                "label": "כולם",
+                "description": "יכול להשתמש בו, ה-Box פתוח לסביבת העבודה"
+            },
+            "coworkers": "{count, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}}",
+            "coworkersRestricted": "{count, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}} · רק אנשים שנבחרו",
+            "accessTo": "גישה אל {box}",
+            "restrictBox": "להגביל את ה-Box הזה",
+            "restrict": {
+                "title": "להגביל את {box}?",
+                "description": "רק ל-{person}, לאנשים שכבר מופיעים בו ולמנהלים תישאר גישה.",
+                "confirm": "להגביל"
+            },
+            "removeAccess": {
+                "title": "להסיר את הגישה אל {box}?",
+                "confirm": "להסיר"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "חובה להזין שם",
+        "invitesFailed": "סביבת העבודה נוצרה, אבל לא ניתן היה לשלוח {count, plural, one {הזמנה אחת} two {שתי הזמנות} other {# הזמנות}}. יש לשדרג את המינוי כדי להזמין חברי צוות.",
+        "steps": {
+            "name": {
+                "title": "לתת שם לסביבת העבודה",
+                "description": "סביבת עבודה מקבצת את ה-Boxes, העמיתים והצוות שלך. אפשר לשנות את השם בהמשך."
+            },
+            "icon": {
+                "title": "לבחור אייקון",
+                "description": "לבחור איור לסביבת העבודה שלך. אפשר לשנות אותו בהמשך."
+            },
+            "team": {
+                "title": "להזמין את הצוות",
+                "description": "להוסיף חברי צוות כדי לשתף פעולה בסביבת העבודה הזו."
+            }
+        },
+        "name": "שם",
+        "namePlaceholder": "לדוגמה: Acme בע״מ",
+        "email": "אימייל",
+        "emailPlaceholder": "teammate@rerun.build",
+        "emailHint": "חברי הצוות יקבלו הזמנה באימייל כשתיצור את סביבת העבודה. כדי להזמין צריך מינוי Team או Scale.",
+        "add": "להוסיף",
+        "removeMember": "להסיר את {email}",
+        "open": "לפתוח את סביבת העבודה",
+        "back": "חזרה",
+        "continue": "להמשיך",
+        "creating": "יוצר",
+        "create": "ליצור סביבת עבודה",
+        "preview": {
+            "you": "אתה",
+            "namePlaceholder": "שם סביבת העבודה",
+            "solo": "יחיד",
+            "members": "חברים",
+            "owner": "בעלים"
+        }
+    },
+    "deleteAccount": {
+        "title": "למחוק את החשבון שלך?",
+        "description": "תנותק ולא תוכל להתחבר שוב לחשבון הזה. סביבות עבודה שרק אתה חבר בהן ייעצרו לצמיתות. אי אפשר לבטל את הפעולה.",
+        "typeToConfirm": "יש להקליד <strong>{word}</strong> לאישור.",
+        "confirm": "למחוק"
+    },
+    "deleteBox": {
+        "title": "למחוק את ה-Box?",
+        "holdsCoworkers": "ב-Box הזה עדיין {count, plural, one {יש עמית אחד. קודם יש להעביר אותו ל-Box אחר או למחוק אותו.} two {יש שני עמיתים. קודם יש להעביר אותם ל-Box אחר או למחוק אותם.} other {יש # עמיתים. קודם יש להעביר אותם ל-Box אחר או למחוק אותם.}}",
+        "description": "אי אפשר לבטל את הפעולה. ה-Box יוסר לצמיתות.",
+        "typeToConfirm": "יש להקליד <strong>{name}</strong> לאישור.",
+        "confirm": "למחוק"
+    },
+    "claimBox": {
+        "title": "Box חדש",
+        "description": "לתת שם ל-Box, או לבחור שם מוצע.",
+        "boxFirst": {
+            "heading": "קודם ליצור Box",
+            "description": "העמית החדש שלך ייכנס אליו, ואתה תנהל אותו."
+        }
+    },
+    "boxExplainer": {
+        "title": "מה זה Box?",
+        "points": {
+            "room": {
+                "label": "חדר בסביבת העבודה",
+                "description": "אחד לכל צוות, לכל לקוח או לכל פרויקט."
+            },
+            "home": {
+                "label": "בית לעמיתים רבים",
+                "description": "העמיתים חיים ועובדים בו זה לצד זה."
+            },
+            "shared": {
+                "label": "שום דבר לא סגור",
+                "description": "כל העמיתים חולקים את הקבצים והנתונים של סביבת העבודה."
+            },
+            "free": {
+                "label": "בחינם ומיידי",
+                "description": "ליצור כמה שהעבודה צריכה."
+            }
+        }
+    },
+    "phoneVerification": {
+        "title": "עוד שלב אחד",
+        "subtitle": "להוסיף את מספר הטלפון שלך."
+    },
+    "boxAccess": {
+        "title": "גישה אל {box}",
+        "description": "הגישה חלה על כל העמיתים ב-Box הזה",
+        "unnamedBox": "Box ללא שם",
+        "visibilityField": "מי יכול להשתמש ב-Box הזה",
+        "visibility": {
+            "workspace": "כל מי שבסביבת העבודה",
+            "restricted": "רק אנשים שנבחרו"
+        },
+        "people": "אנשים",
+        "addPeople": "להוסיף אנשים",
+        "emptyRestricted": "כרגע רק מנהלים יכולים להשתמש ב-Box הזה.",
+        "emptyOpen": "אפשר לציין אנשים כדי לאפשר להם לנהל את ה-Box הזה.",
+        "restrict": {
+            "title": "להגביל את {box}?",
+            "descriptionWithPeople": "רק לאנשים שמופיעים כאן ולמנהלים תישאר גישה.",
+            "descriptionEmpty": "רק למנהלים תישאר גישה עד שתוסיף אנשים.",
+            "confirm": "להגביל"
+        },
+        "admin": "מנהל",
+        "createdBox": "יצר את ה-Box הזה",
+        "accessOf": "הגישה של {person}",
+        "remove": {
+            "title": "להסיר את {person}?",
+            "confirm": "להסיר",
+            "ariaLabel": "להסיר את {person}"
+        },
+        "add": {
+            "title": "להוסיף אנשים",
+            "back": "חזרה לגישה",
+            "peopleField": "אנשים",
+            "placeholder": "לבחור חברי צוות",
+            "search": "לחפש לפי שם או אימייל",
+            "empty": "לא נשאר אף אחד להוסיף",
+            "accessField": "גישה",
+            "submit": "להוסיף",
+            "submitMany": "{count, plural, one {להוסיף אדם אחד} two {להוסיף שני אנשים} other {להוסיף # אנשים}}"
+        },
+        "levels": {
+            "none": {
+                "label": "ללא גישה",
+                "description": "לא רואה את ה-Box הזה"
+            },
+            "use": {
+                "label": "יכול להשתמש",
+                "description": "לשוחח עם העמיתים שלו ולראות את העבודה שלהם"
+            },
+            "manage": {
+                "label": "יכול לנהל",
+                "description": "גם לערוך, להעביר ולמחוק עמיתים"
+            }
+        },
+        "teammate": "חבר צוות",
+        "adminOnly": "רק מנהל יכול לשנות מי ניגש ל-Box",
+        "adminsAlways": "למנהלים תמיד יש גישה",
+        "manageReason": "רק מנהל או מי שמנהל את ה-Box הזה יכול לשנות את זה",
+        "outcome": {
+            "admin": "למנהלים נשארת גישה לכל Box; זה רק מסיר את השורה.",
+            "restricted": "הוא יאבד מיד את הגישה ל-Box הזה ולעמיתים שלו.",
+            "manage": "הוא יפסיק לנהל את ה-Box הזה. ה-Box נשאר פתוח לכל מי שבסביבת העבודה.",
+            "use": "הגישה האישית שלו מוסרת. ה-Box נשאר פתוח לכל מי שבסביבת העבודה.",
+            "scope": "יישארו לו רק ה-Boxes שמופיעים למטה. כל Box שפתוח לכולם ייצא מיד מהישג ידו.",
+            "level": "הוא יאבד מיד את הגישה ל-Box הזה ולעמיתים שלו."
+        }
+    },
+    "newBox": {
+        "heading": "לתת שם ל-Box החדש",
+        "description": "Box הוא שם על הלוח שלך, מקום למיין בו את העמיתים לפי מחלקה.",
+        "creating": "יוצר…",
+        "createNamed": "ליצור את {name}",
+        "create": "ליצור Box",
+        "nameLabel": "שם ה-Box",
+        "failed": "יצירת ה-Box נכשלה",
+        "placeholderName": "שיווק",
+        "suggestedNames": {
+            "clients": "לקוחות",
+            "marketing": "שיווק",
+            "newBusiness": "עסקים חדשים",
+            "operations": "תפעול",
+            "finance": "כספים",
+            "personal": "אישי",
+            "store": "חנות",
+            "customerCare": "שירות לקוחות",
+            "supplyChain": "שרשרת אספקה",
+            "product": "מוצר",
+            "engineering": "פיתוח",
+            "support": "תמיכה",
+            "sales": "מכירות",
+            "accounts": "הנהלת חשבונות",
+            "recruiting": "גיוס",
+            "listings": "מודעות",
+            "legal": "משפטי",
+            "compliance": "ציות",
+            "content": "תוכן",
+            "business": "עסקים",
+            "community": "קהילה",
+            "sponsors": "ספונסרים",
+            "work": "עבודה",
+            "projects": "פרויקטים",
+            "admin": "אדמיניסטרציה",
+            "ops": "אופרציה"
+        }
+    },
+    "renameBox": {
+        "title": "לשנות את שם ה-Box",
+        "description": "השם שמופיע על הלוח. שום דבר אחר לא תלוי בו.",
+        "nameLabel": "שם",
+        "placeholder": "Box ללא שם",
+        "submit": "לשנות שם",
+        "nameRequired": "חובה להזין שם",
+        "nameTooLong": "עד {max} תווים"
+    },
+    "newAgent": {
+        "title": "עמית חדש",
+        "description": "לתאר את התפקיד, או להתחיל מהצעה או מתבנית.",
+        "headingNamed": "מה {name} צריך לעשות?",
+        "heading": "מה העמית החדש שלך צריך לעשות?",
+        "suggestionsForBox": "או להתחיל מאחד שנבחר עבור {boxName}"
+    },
+    "renameAgent": {
+        "title": "לשנות את שם העמית",
+        "description": "השם שמוצג על הלוח ובשיחות. ה-@handle שלו מתעדכן בהתאם.",
+        "nameLabel": "שם",
+        "submit": "לשנות שם",
+        "nameRequired": "חובה להזין שם",
+        "nameTooLong": "עד {max} תווים"
+    },
+    "deleteAgent": {
+        "title": "למחוק את העמית הזה?",
+        "description": "פעולה זו תמחק לצמיתות את העמית ואת הנתונים שלו במנוע. אי אפשר לבטל את הפעולה.",
+        "typeToConfirm": "יש להקליד <b>{name}</b> לאישור.",
+        "confirm": "למחוק"
+    },
+    "importAgent": {
+        "title": "לייבא עמית",
+        "description": "הסוכן שלך עובר לכאן בעצמו, עם המיומנויות, המשימות והזיכרון שלו.",
+        "connectorUrl": "כתובת המחבר",
+        "copyConnectorUrl": "להעתיק את כתובת המחבר",
+        "pasteIn": "להדביק ב-{source}",
+        "expires": "תוקף של 24 שעות.",
+        "copyPrompt": "להעתיק את הפרומפט",
+        "otherSource": "אחר",
+        "grokConnectorStep": "להוסיף את הכתובת ב-grok.com/connectors כמחבר מותאם אישית, ואז להדביק את הפרומפט."
+    },
+    "agentShare": {
+        "unavailable": "קישור השיתוף הזה כבר לא זמין",
+        "titleNamed": "להוסיף את {name}",
+        "title": "להוסיף את העמית הזה",
+        "description": "לבדוק מה העמית הזה עושה, ואז למקם אותו על הלוח שלך.",
+        "sentBy": "{name} שלח לך עותק של העמית הזה. הוא יפעל על ה-Box שלך.",
+        "sentBySomeone": "מישהו שלח לך עותק של העמית הזה. הוא יפעל על ה-Box שלך."
+    },
+    "templateDeepLink": {
+        "unavailable": "קישור התבנית הזה כבר לא זמין",
+        "titleNamed": "להתקין את \"{title}\"",
+        "title": "להתקין את התבנית הזו",
+        "description": "לבדוק מה התבנית הזו מתקינה, ואז למקם את העמיתים שלה על הלוח שלך."
+    },
+    "createTemplate": {
+        "defaultDescription": "ליצור טיוטת תבנית מה-Sandbox שלך. צוות Rerun בודק אותה לפני שהיא עולה לאוויר.",
+        "title": "תבנית חדשה",
+        "doneLabel": "לפתוח את התבנית",
+        "titleField": "כותרת",
+        "titlePlaceholder": "לדוגמה: נציג פיתוח מכירות יוצאות",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · הכתובת הציבורית נגזרת מהכותרת.",
+        "titleRequired": "חובה להזין כותרת",
+        "continue": "להמשיך"
+    },
+    "expertProfile": {
+        "title": "הפרופיל הציבורי שלך",
+        "submit": "לשמור ולפרסם",
+        "submitting": "שומר…",
+        "saved": "הפרופיל הציבורי שלך עודכן."
+    },
+    "apiKeys": {
+        "title": "מפתחות API",
+        "description": "לחבר את Claude Code או כל לקוח MCP לסביבת העבודה הזו.",
+        "connectSection": "לחבר לקוח",
+        "keysSection": "מפתחות",
+        "docsLink": "מפתחות API",
+        "newKeyName": "שם המפתח החדש",
+        "newKeyPlaceholder": "Claude Code, ה-MacBook שלי",
+        "create": "ליצור מפתח",
+        "revoked": "{name} בוטל",
+        "adminOnly": "רק מנהל יכול לנהל מפתחות API",
+        "empty": "עדיין אין מפתח. מפתח נותן גישה לכל סביבת העבודה, לכן יש להתייחס אליו כמו לסיסמה.",
+        "lastUsed": "שימוש אחרון {time}",
+        "neverUsed": "לא היה בשימוש",
+        "revokeThisKey": "לבטל את המפתח הזה",
+        "created": {
+            "warning": "יש להעתיק את המפתח עכשיו. הוא לא יוצג שוב.",
+            "copyKey": "להעתיק את המפתח",
+            "dismiss": "העתקתי אותו"
+        },
+        "revoke": {
+            "title": "לבטל את המפתח הזה?",
+            "description": "{name} יפסיק לעבוד מיד, וכל מה שפועל עליו יאבד את הגישה לסביבת העבודה. אי אפשר לשחזר את המפתח, אבל אפשר ליצור מפתח אחר.",
+            "descriptionUnnamed": "המפתח הזה יפסיק לעבוד מיד, וכל מה שפועל עליו יאבד את הגישה לסביבת העבודה. אי אפשר לשחזר את המפתח, אבל אפשר ליצור מפתח אחר.",
+            "confirm": "לבטל"
+        }
+    },
+    "copy": {
+        "snippet": "להעתיק את {label}",
+        "fullGuide": "מדריך התקנה מלא"
+    },
+    "servers": {
+        "title": "שרתים",
+        "description": "המכונה שעליה העמיתים שלך פועלים. אחת לכל סביבת עבודה.",
+        "connected": "מחובר",
+        "unreachable": "לא זמין",
+        "runningSummary": "{address} · {count, plural, one {עמית אחד פועל} two {שני עמיתים פועלים} other {# עמיתים פועלים}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, one {עמית אחד פועל} two {שני עמיתים פועלים} other {# עמיתים פועלים}} · {commit}",
+        "unreachableSummary": "{address} · האפליקציה לא מצליחה להגיע אליו כרגע",
+        "thisWorkspace": "השרת של סביבת העבודה הזו",
+        "remove": "להסיר",
+        "manualSection": "להזין שרת ידנית",
+        "address": "כתובת",
+        "apiKey": "מפתח API",
+        "apiKeyPlaceholder": "RERUN_API_KEY של המנוע",
+        "back": "חזרה",
+        "connect": "לחבר",
+        "addSection": "להוסיף שרת",
+        "addIntro": "העמיתים שלך פועלים על מכונה בבעלותך. יש להריץ עליה את הפקודה הזו, כש-Docker מותקן. היא מתחברת לבד.",
+        "publicAddress": "הכתובת שבה האפליקציה מגיעה אליו (לא חובה)",
+        "copyCommand": "להעתיק את הפקודה",
+        "waiting": "ממתין לשרת. הפקודה עובדת פעם אחת, במשך 15 דקות.",
+        "enterManually": "להזין כתובת ומפתח",
+        "add": "להוסיף שרת",
+        "removed": "השרת הוסר",
+        "confirmRemove": {
+            "title": "להסיר את השרת הזה?",
+            "description": "העמיתים שלך יפסיקו לענות עד שיחובר שרת שוב. כל מה שהם יודעים נשאר על המכונה: אפשר לחבר אותה שוב כדי להחזיר אותם.",
+            "confirm": "להסיר"
+        }
+    },
+    "aiProviders": {
+        "title": "ספקי AI",
+        "description": "המינויים ומפתחות ה-API שעליהם העמיתים שלך פועלים."
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "מה שכל עמית בסביבת העבודה הזו יודע על החברה שלך, והקבצים והטבלאות שהם חולקים."
+    },
+    "clearMemories": {
+        "title": "למחוק את כל הזיכרונות?",
+        "description": "פעולה זו מוחקת לצמיתות את כל הזיכרונות של העמית הזה. אי אפשר לבטל את הפעולה.",
+        "confirm": "למחוק הכול"
+    },
+    "deleteTable": {
+        "title": "למחוק את הטבלה “{table}”?",
+        "description": "פעולה זו מוחקת לצמיתות את כל הטבלה ואת כל השורות שלה. אי אפשר לבטל את הפעולה.",
+        "confirm": "למחוק"
+    },
+    "purgeTable": {
+        "title": "לרוקן את הטבלה “{table}”?",
+        "description": "פעולה זו מוחקת כל שורה בטבלה, כולל שורות שמוסתרות בחיפוש הנוכחי. הטבלה והעמודות שלה נשארות. אי אפשר לבטל את הפעולה.",
+        "confirm": "לרוקן"
+    },
+    "notifications": {
+        "title": "התראות",
+        "tabs": {
+            "coworkers": "עמיתים",
+            "account": "חשבון"
+        },
+        "descriptions": {
+            "coworkers": "על מה שווה להפריע לך. נשמר תוך כדי.",
+            "account": "לבחור אילו אימיילים של החשבון לקבל."
+        },
+        "pickCoworker": "לבחור עמית"
+    },
+    "notificationPermission": {
+        "title": "לקבל התראה כשהעמית שלך מסיים?",
+        "description": "הוא ממשיך לפעול גם אחרי שתסגור את הלשונית הזו. נודיע לך כשהוא צריך אותך.",
+        "enable": "להפעיל התראות",
+        "later": "לא עכשיו"
+    },
+    "confirm": {
+        "confirm": "למחוק"
+    },
+    "closeRunningTab": {
+        "title": "לסגור את השיחה הזו?",
+        "description": "הסוכן עדיין עובד על השיחה הזו. סגירת הלשונית לא תעצור את ההרצה: היא תמשיך לפעול ברקע.",
+        "confirm": "לסגור"
+    },
+    "shortcuts": {
+        "title": "קיצורי מקלדת",
+        "description": "לנוע מהר יותר ב-Rerun עם הקיצורים האלה.",
+        "groups": {
+            "general": "כללי",
+            "chat": "צ׳אט",
+            "files": "קבצים"
+        },
+        "actions": {
+            "controlCenter": "לפתוח את מרכז הבקרה",
+            "askRerun": "{named, select, yes {לשאול את {name}, מחוץ לצ׳אט} other {לשאול את ה-Chief of Staff שלך, מחוץ לצ׳אט}}",
+            "holdToTalk": "{named, select, yes {ללחוץ ממושכות כדי לדבר עם {name}} other {ללחוץ ממושכות כדי לדבר עם ה-Chief of Staff שלך}}",
+            "searchInPage": "לחפש בדף",
+            "newConversation": "שיחה חדשה",
+            "closeTab": "לסגור את הלשונית הפעילה",
+            "sendMessage": "לשלוח הודעה",
+            "newLine": "שורה חדשה",
+            "previousFile": "הקובץ הקודם",
+            "nextFile": "הקובץ הבא"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "להשוות ערכים בין עמודות.",
+            "list": "שורות שמזוהות לפי שם: אנשים, חברות, הודעות.",
+            "gallery": "שורות שמזוהות לפי תמונה: מוצרים, מודעות.",
+            "board": "שורות שעוברות בין סטטוסים: משפך, משימות."
+        },
+        "editTitle": "לערוך תצוגה",
+        "newTitle": "תצוגה חדשה",
+        "description": "תצוגה של <mono>{table}</mono>. כל מי שפותח את הטבלה הזו רואה אותה, והעמית יכול להציג אותה בצ׳אט.",
+        "name": "שם",
+        "namePlaceholder": "לדוגמה: משפך מכירות",
+        "layout": "פריסה",
+        "columns": "עמודות",
+        "columnsHint": "עמודות שלא סומנו נשארות בטבלה, רק מוסתרות מהתצוגה הזו.",
+        "groupBy": "קיבוץ לפי",
+        "roles": {
+            "title": "כותרת",
+            "subtitle": "כותרת משנה",
+            "image": "תמונה",
+            "badge": "תג",
+            "value": "ערך",
+            "date": "תאריך"
+        },
+        "pictureShape": "צורת התמונה",
+        "shapes": {
+            "square": "ריבוע",
+            "landscape": "לרוחב",
+            "portrait": "לאורך"
+        },
+        "sortBy": "מיון לפי",
+        "insertionOrder": "סדר ההוספה",
+        "ascending": "בסדר עולה",
+        "descending": "בסדר יורד",
+        "formats": "פורמטים",
+        "formatsHint": "איך כל ערך מוצג: מחיר, תאריך, דירוג, סטטוס.",
+        "formatOf": "הפורמט של {column}",
+        "plainFormat": "רגיל",
+        "colors": "צבעים",
+        "colorsBoardHint": "העמודות שמופיעות כאן באות ראשונות, בסדר הזה.",
+        "emptyValue": "ריק",
+        "colorOf": "הצבע של {value}",
+        "colorOfEmpty": "הצבע של ערכים ריקים",
+        "automaticColor": "אוטומטי",
+        "create": "ליצור תצוגה",
+        "none": "ללא",
+        "pickColumn": "לבחור עמודה",
+        "preview": "תצוגה מקדימה",
+        "nameRequired": "לתת שם לתצוגה",
+        "titleColumnRequired": "לבחור את העמודה שלפיה נקרא כל פריט",
+        "groupByRequired": "לבחור את העמודה שהערכים שלה הופכים לעמודות"
+    },
+    "engineWaitlist": {
+        "title": "אנחנו בתפוסה מלאה כרגע",
+        "subtitle": "יותר מדי צוותים הצטרפו היום וכל המכונות תפוסות. אתה ברשימת ההמתנה: התשובות שלך נשמרו, והדף הזה ייפתח לבד ברגע שתתפנה מכונה.",
+        "signedInAs": "מחובר בתור <b>{email}</b>",
+        "signOut": "להתנתק"
+    },
+    "sandboxReactivation": {
+        "title": "לבקש הפעלה מחדש",
+        "description": "ה-Sandbox שלך יחזור ברגע שנאשר את הבקשה.",
+        "asideTitle": "למה ה-Sandbox שלי הועבר לארכיון?",
+        "points": {
+            "archived": {
+                "label": "הועבר לארכיון אחרי 30 ימים ללא שימוש",
+                "description": "Sandbox מחזיק מכונה פועלת, ולכן Sandbox שאף אחד לא פותח מחזיר אותה."
+            },
+            "kept": {
+                "label": "שום דבר לא נזרק",
+                "description": "העמיתים שלך, הזיכרון שלהם והקבצים שלהם נשמרים עם הארכיון."
+            },
+            "reviewed": {
+                "label": "אנחנו בודקים כל בקשה",
+                "description": "ספר לנו מה אתה בונה ונחזיר את ה-Sandbox שלך."
+            },
+            "restored": {
+                "label": "חוזר בדיוק כפי שהשארת אותו",
+                "description": "אחרי האישור, השחזור לוקח כמה דקות."
+            }
+        },
+        "noteLabel": "מה אתה מתכנן לבנות?",
+        "noteHint": "משפט או שניים מספיקים.",
+        "submit": "לשלוח בקשה",
+        "failed": "לא ניתן לשלוח את הבקשה שלך. כדאי לנסות שוב."
+    },
+    "paidApp": {
+        "slotAdded": "המקום נוסף למינוי שלך.",
+        "slotAddedTrial": "המקום נוסף, {price} במהלך תקופת הניסיון.",
+        "slotRemoved": "המקום הוחזר. אפשר להשתמש בו עד החידוש הבא."
+    },
+    "linkedinPro": {
+        "description": "חשבונות ה-LinkedIn שאיתם העמיתים שלך פועלים.",
+        "connectDescription": "לחבר את חשבון ה-LinkedIn שאיתו העמיתים שלך פועלים.",
+        "approvalNotSeen": "LinkedIn עדיין לא קיבלה את האישור. יש ללחוץ על Yes באפליקציה, ואז לנסות שוב.",
+        "codeResent": "קוד חדש בדרך.",
+        "connect": {
+            "title": "לחבר את LinkedIn",
+            "reconnectTitle": "לחבר מחדש את LinkedIn",
+            "back": "חזרה ל-LinkedIn Pro"
+        },
+        "checkpoint": {
+            "title": "לאשר שזה אתה",
+            "hint": "LinkedIn מבקשת שלב נוסף",
+            "cancel": "לבטל את ההתחברות"
+        }
+    },
+    "whatsappPro": {
+        "description": "מספרי ה-WhatsApp שאיתם העמיתים שלך פועלים.",
+        "connectDescription": "לקשר את מספר ה-WhatsApp שאיתו העמיתים שלך פועלים.",
+        "connect": {
+            "title": "לקשר את WhatsApp",
+            "reconnectTitle": "לקשר שוב את WhatsApp",
+            "back": "חזרה ל-WhatsApp Pro"
+        },
+        "link": {
+            "title": "לקשר את הטלפון",
+            "hint": "WhatsApp מוסיפה את Rerun כמכשיר מקושר",
+            "cancel": "לבטל את הקישור"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "להריץ את העמיתים שלך על מינוי Claude או ChatGPT",
+        "titleWithoutClaude": "להריץ את העמיתים שלך על מינוי ChatGPT או מפתח API",
+        "back": "חזרה",
+        "connect": "לחבר",
+        "or": "או",
+        "useApiKey": "להשתמש במפתח API",
+        "plans": {
+            "claude": "Claude Pro או Max",
+            "codex": "ChatGPT Plus או Pro"
+        },
+        "decline": {
+            "cloud": "אני מעדיף להישאר עם הקרדיטים של Rerun",
+            "selfHosted": "אני מעדיף להישאר עם OpenRouter"
+        },
+        "offer": {
+            "title": "Rerun עובדת טוב יותר עם מינוי Claude או ChatGPT שלך",
+            "description": "מחברים אותו, והעמיתים שלך פועלים על המינוי שאתה כבר משלם עליו.",
+            "titleWithoutClaude": "העמיתים שלך פועלים על ה-AI שלך",
+            "descriptionWithoutClaude": "מחברים את מינוי ה-ChatGPT שלך או מפתח API, והעמיתים שלך פועלים עליו."
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "כל אחד מביא את שלו",
+                "description": "כל חבר צוות מחבר את המינוי שהוא משלם עליו. בלי להעביר חשבון מיד ליד."
+            },
+            "password": {
+                "label": "Rerun אף פעם לא רואה את הסיסמה שלך",
+                "description": "מאשרים בדף של Claude או של OpenAI עצמם, ובשום מקום אחר."
+            },
+            "unplug": {
+                "label": "לנתק מתי שרוצים",
+                "descriptionCloud": "מנתקים בלחיצה אחת, והעמיתים שלך חוזרים לקרדיטים של Rerun.",
+                "descriptionSelfHosted": "מנתקים בלחיצה אחת, והעמיתים שלך חוזרים למפתח ה-OpenRouter שלך."
+            }
+        },
+        "board": {
+            "title": "כל עמית על חיבור משלך",
+            "description": "שני מינויים ומפתח API, זה לצד זה על אותו לוח.",
+            "crew": {
+                "sales": "מכירות",
+                "customer_support": "שירות לקוחות",
+                "accounting": "הנהלת חשבונות"
+            }
+        },
+        "plan": {
+            "title": "לחבר את מינוי ה-{name} שלך",
+            "linked": "העמיתים שלך פועלים על {name}",
+            "switching": "העמיתים שלך עוברים ל-{name}"
+        },
+        "key": {
+            "title": "להשתמש במפתח API",
+            "detail": "העמיתים שלך פועלים על המפתח שלך, בחיוב לפי טוקן אצל הספק שלו.",
+            "opencodeTitle": "לחבר את OpenCode",
+            "opencodeDetail": "להדביק את מפתח ה-OpenCode שלך: מודלי Go פועלים על המינוי שלך, ומודלי Console על הקרדיטים שלך.",
+            "field": "מפתח API",
+            "placeholder": "להדביק את המפתח שלך",
+            "add": "להוסיף מפתח",
+            "connecting": "מתחבר…",
+            "failed": "הוספת המפתח נכשלה",
+            "somethingWentWrong": "משהו השתבש. כדאי לנסות שוב."
+        },
+        "connected": {
+            "title": "{name} מחובר",
+            "planDetail": "העמיתים שלך פועלים עכשיו על מינוי ה-{name} שלך.",
+            "opencodeDetail": "העמיתים שלך פועלים עכשיו על מינוי ה-OpenCode Go שלך.",
+            "keyDetail": "העמיתים שלך פועלים עכשיו על המפתח הזה.",
+            "done": "סיום"
+        }
+    },
+    "boxPicker": {
+        "title": "לבחור Box",
+        "description": "העמית החדש מצטרף אליו, במקום פנוי.",
+        "coworkers": "{count, plural, =0 {עדיין אין עמיתים} one {עמית אחד} two {שני עמיתים} other {# עמיתים}}"
+    },
+    "mcpConnect": {
+        "otherClient": "אחר",
+        "labels": {
+            "terminal": "טרמינל",
+            "shellProfile": "פרופיל ה-Shell",
+            "coworkerPanel": "חלונית העמית, MCP, חדש",
+            "serverUrl": "כתובת השרת",
+            "header": "כותרת HTTP",
+            "stdioClients": "לקוחות שמדברים רק stdio"
+        },
+        "hints": {
+            "codexCliOnly": "Codex CLI. אפליקציית ChatGPT מקבלת רק חיבורי OAuth, כך שמפתח לא יעזור שם.",
+            "coworkerReach": "נותן לאחד העמיתים שלך את אותה גישה לסביבת העבודה הזו כמו ללקוח חיצוני."
+        }
+    }
+}

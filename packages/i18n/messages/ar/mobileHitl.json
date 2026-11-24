@@ -1,0 +1,159 @@
+{
+    "actions": {
+        "notNow": "ليس الآن",
+        "explain": "توضيح",
+        "skip": "تخطي",
+        "connect": "ربط",
+        "connectNew": "حساب جديد",
+        "connecting": "جارٍ الربط…",
+        "continue": "متابعة",
+        "loading": "جارٍ التحميل…",
+        "openOnWeb": "فتح على الويب",
+        "back": "رجوع",
+        "confirm": "تأكيد",
+        "send": "إرسال",
+        "next": "التالي",
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {سؤال بانتظارك} zero {سؤال بانتظارك} one {سؤال بانتظارك} two {سؤالان بانتظارك} few {# أسئلة بانتظارك} many {# سؤالًا بانتظارك} other {# سؤال بانتظارك}}",
+        "approval": "{count, plural, =0 {موافقة مطلوبة} zero {موافقة مطلوبة} one {موافقة مطلوبة} two {موافقتان مطلوبتان} few {# موافقات مطلوبة} many {# موافقة مطلوبة} other {# موافقة مطلوبة}}",
+        "secret": "{count, plural, =0 {بيانات اعتماد مطلوبة} zero {بيانات اعتماد مطلوبة} one {بيانات اعتماد مطلوبة} two {مجموعتا بيانات اعتماد مطلوبتان} few {# بيانات اعتماد مطلوبة} many {# بيانات اعتماد مطلوبة} other {# بيانات اعتماد مطلوبة}}",
+        "mcpNamed": "سجّل الدخول إلى {name}",
+        "mcp": "تسجيل الدخول مطلوب",
+        "service": "{count, plural, =0 {تطبيق للربط} zero {تطبيق للربط} one {تطبيق للربط} two {تطبيقان للربط} few {# تطبيقات للربط} many {# تطبيقًا للربط} other {# تطبيق للربط}}",
+        "takeover": "دورك على الشاشة",
+        "jumpTo": "{label}، انتقل إليه",
+        "spend": "إنفاق بانتظار موافقتك",
+        "computer": "وافق على أمر على #{computer}",
+        "feature": "طلب لإرساله إلى فريق Rerun"
+    },
+    "alert": {
+        "label": "إشعار",
+        "failed": "تعذّر وضع علامة مقروء. أعد المحاولة.",
+        "marking": "جارٍ وضع العلامة…",
+        "markAsRead": "وضع علامة مقروء"
+    },
+    "approval": {
+        "label": "الموافقة مطلوبة",
+        "approved": "تمت الموافقة",
+        "approve": "موافقة"
+    },
+    "decline": {
+        "placeholder": "لماذا لا؟ (اختياري)",
+        "reason": "السبب"
+    },
+    "fallback": {
+        "replyBelow": "ردّ أدناه، أو",
+        "typeOnWeb": "اكتبه من Rerun على الويب، وليس في هذه المحادثة أبدًا.",
+        "needsYou": "{name} يحتاج إليك"
+    },
+    "steps": {
+        "previous": "الخطوة السابقة",
+        "next": "الخطوة التالية",
+        "goTo": "الانتقال إلى الخطوة {step} من {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "تسجيل الدخول مطلوب",
+        "connected": "متصل",
+        "signInNeeded": "تسجيل الدخول مطلوب",
+        "unreachable": "تعذّر الوصول",
+        "customServer": "خادم MCP مخصص",
+        "customServerAt": "خادم MCP مخصص · {host}",
+        "signInTo": "تسجيل الدخول إلى {name}",
+        "loadFailed": "تعذّر تحميل هذا الخادم. اربطه على الويب، أو تخطَّه."
+    },
+    "question": {
+        "dismiss": "تجاهل الأسئلة",
+        "selectAll": "اختر كل ما ينطبق",
+        "typeAnswer": "اكتب إجابتك…",
+        "somethingElse": "شيء آخر",
+        "yourAnswer": "إجابتك",
+        "record": "أجب بصوتك",
+        "useRecording": "استخدام هذا التسجيل",
+        "discardRecording": "حذف التسجيل",
+        "retryRecording": "إعادة محاولة التفريغ",
+        "uploadFailed": "تعذّر إرفاق هذه الملفات. أعد المحاولة."
+    },
+    "secret": {
+        "labelOne": "بيانات اعتماد مطلوبة",
+        "labelMany": "بيانات اعتماد مطلوبة",
+        "dismiss": "تجاهل طلب بيانات الاعتماد",
+        "storedAs": "محفوظة باسم {key}",
+        "alreadySaved": "محفوظة بالفعل. اكتب لاستبدالها",
+        "paste": "الصق القيمة",
+        "whereToFind": "أين تجدها",
+        "storedNote": "تُحفظ على Box الخاص بك كمتغير للزميل. لا تُرسل إلى النموذج أبدًا.",
+        "saveFailed": "تعذّر حفظ بيانات الاعتماد"
+    },
+    "service": {
+        "label": "تطبيق للربط",
+        "loadFailed": "تعذّر تحميل التطبيقات. اربطها على الويب، أو تخطَّها.",
+        "loading": "جارٍ تحميل التطبيقات…",
+        "webOnly": "يختار هذا التطبيق حسابه على الويب. اربطه هناك، أو تخطَّه.",
+        "connectFailed": "تعذّر ربط التطبيق",
+        "connected": "تم ربط {name}",
+        "notFound": "غير موجود في الكتالوج، تم تخطيه.",
+        "skipped": "تم التخطي."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "تخطيت الأسئلة",
+            "service": "أغلقت إعداد التطبيق",
+            "secret": "رفضت مشاركة المفاتيح",
+            "mcp": "تخطيت تسجيل الدخول",
+            "takeover": "تركت المتصفح لزميلك",
+            "feature": "لم يُرسل الطلب"
+        },
+        "answer": "الإجابة",
+        "answers": "الإجابات",
+        "answeredCount": "أُجيب عن {answered} من {total}",
+        "skipped": "تم التخطي",
+        "approval": "الموافقة",
+        "approvals": "الموافقات",
+        "approvalCount": "{approved} موافق عليها، {declined} ليس الآن",
+        "approved": "تمت الموافقة",
+        "notNow": "ليس الآن",
+        "quotedNote": "«{note}»",
+        "connected": "متصل",
+        "notReconnected": "لم يُعد ربطه",
+        "notFound": "غير موجود",
+        "apps": "التطبيقات",
+        "appsConnected": "تم ربط {connected} من {total}",
+        "instead": "{name} (بدلًا من {replaced})",
+        "keys": "المفاتيح",
+        "keysStored": "تم حفظ {stored} من {total}",
+        "stored": "محفوظ",
+        "storedOnBox": "محفوظة على Box. لا يرى الزميل سوى الأسماء.",
+        "mcpServer": "خادم MCP",
+        "handedBackOn": "أعدت المتصفح على {url}",
+        "handedBack": "أعدت المتصفح",
+        "spend": "بيانات مدفوعة",
+        "approvedOnce": "تمت الموافقة مرة واحدة",
+        "alwaysAllowed": "مسموح دائمًا",
+        "featureSent": "أُرسل إلى فريق Rerun: {title}"
+    },
+    "spend": {
+        "estimatedTotal": "الإجمالي التقديري",
+        "creditsUnit": "{count, plural, zero {رصيد} one {رصيد} two {رصيدان} few {أرصدة} many {رصيدًا} other {رصيد}}",
+        "creditsShort": "لم يتبقَّ سوى {amount} {count, plural, zero {رصيد} one {رصيد} two {رصيدين} few {أرصدة} many {رصيدًا} other {رصيد}}: أضف رصيدًا على الويب، أو قل ليس الآن.",
+        "alwaysAllow": "السماح دائمًا",
+        "approveOnce": "الموافقة مرة واحدة",
+        "addCredits": "إضافة رصيد",
+        "alwaysAllowFailed": "تعذّر تفعيل «الإنفاق دون سؤال». تبقى هذه الموافقة سارية في حدود تقديرها."
+    },
+    "computer": {
+        "runOn": "التشغيل على #{computer}",
+        "filesOn": "استخدام الملفات على #{computer}",
+        "deny": "رفض",
+        "allow": "سماح",
+        "alwaysProgram": "السماح دائمًا لـ {program}",
+        "alwaysFolder": "السماح دائمًا لهذا المجلد",
+        "interpreterWarning": "السماح الدائم لـ {program} يسمح بأي شيفرة يشغّلها",
+        "alwaysFailed": "تعذّر حفظ القاعدة على الجهاز: تم السماح لهذه المرة فقط.",
+        "inFolder": "في {folder}",
+        "folderNote": "«دائمًا» يسمح بكل ملف في {folder}"
+    }
+}

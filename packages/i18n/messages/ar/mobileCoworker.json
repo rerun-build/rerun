@@ -1,0 +1,88 @@
+{
+    "access": {
+        "boxManage": "لا يمكن تغيير هذا إلا لمسؤول أو مدير هذا الـ Box.",
+        "aiProvidersAdminOnly": "لا يمكن تغيير مزودي الذكاء الاصطناعي إلا لمسؤول.",
+        "noManagedBox": "تحتاج إلى Box تديره لإضافة زميل. أنشئ واحدًا على {host}، أو اطلب ذلك من مسؤول.",
+        "boxesFailed": "تعذّر تحميل الـ Boxes. حاول مجددًا بعد قليل.",
+        "noBoxYet": "لا يوجد Box في مساحة العمل هذه بعد. أنشئ واحدًا على {host}.",
+        "foremanAdminOnly": "لا يمكن تغيير Chief of Staff إلا لمسؤول."
+    },
+    "page": {
+        "loadFailed": "تعذّر التحميل. حاول مجددًا بعد قليل."
+    },
+    "details": {
+        "back": "رجوع",
+        "more": "المزيد",
+        "delete": "حذف الزميل",
+        "edit": "تعديل",
+        "files": "الملفات",
+        "apps": "التطبيقات",
+        "routines": "المهام الدورية",
+        "computer": "الحاسوب",
+        "notifications": "الإشعارات",
+        "working": "يعمل",
+        "idle": "خامل",
+        "off": "متوقف",
+        "none": "لا شيء",
+        "appsToConnect": "{count} للربط",
+        "appsConnected": "{count} مربوط",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} مفعّل",
+        "renameTitle": "إعادة التسمية",
+        "save": "حفظ",
+        "renameFailed": "تعذّرت إعادة التسمية",
+        "deleteTitle": "حذف {name}؟",
+        "deleteMessage": "سيؤدي هذا إلى حذف الزميل وبياناته نهائيًا. لا يمكن التراجع عن ذلك.",
+        "deleteConfirm": "حذف",
+        "deleteFailed": "تعذّر الحذف"
+    },
+    "apps": {
+        "title": "التطبيقات",
+        "status": {
+            "needsSignIn": "يتطلب تسجيل الدخول",
+            "needsSetup": "يتطلب الإعداد",
+            "error": "خطأ"
+        },
+        "connect": "ربط",
+        "connectNew": "حساب جديد",
+        "empty": "لا يوجد تطبيق بعد.",
+        "askInChat": "اطلب من {name} في المحادثة إضافة تطبيق.",
+        "connectFailed": "تعذّر ربط {name}"
+    },
+    "files": {
+        "title": "الملفات",
+        "media": "الوسائط",
+        "docs": "المستندات",
+        "earlier": "سابقًا",
+        "thisMonth": "هذا الشهر",
+        "open": "فتح {name}",
+        "fileFallback": "ملف",
+        "noMedia": "لا توجد وسائط",
+        "noDocs": "لا توجد مستندات",
+        "emptyHint": "ما يصنعه {name} سيظهر هنا.",
+        "truncated": "أحدث الملفات فقط. جميعها متاحة على الويب."
+    },
+    "routines": {
+        "title": "المهام الدورية",
+        "once": "مرة واحدة، {date}",
+        "webhook": "Webhook",
+        "empty": "لا توجد مهمة دورية بعد.",
+        "askInChat": "اطلب من {name} في المحادثة إعداد واحدة.",
+        "turnOnFailed": "تعذّر تفعيل {name}",
+        "turnOffFailed": "تعذّر إيقاف {name}"
+    },
+    "create": {
+        "title": "زميل جديد",
+        "nameLabel": "الاسم",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "ماذا يجب أن يفعل؟",
+        "descriptionPlaceholder": "ابحث عن وكالات تسويق في ليون وصِغ رسالة أولى لكل منها",
+        "descriptionHelp": "مهمته الأولى. يبدأ بها فورًا.",
+        "boxLabel": "Box",
+        "submit": "إنشاء",
+        "pausedTitle": "{name} متوقف مؤقتًا",
+        "pausedMessage": "لا تتضمن خطتك مكانًا متاحًا لزميل جديد. اشترك في Pro على rerun.build لزملاء بلا حدود.",
+        "failed": "تعذّر إنشاء الزميل"
+    }
+}

@@ -1,0 +1,388 @@
+{
+    "labels": {
+        "shell_exec": "الطرفية",
+        "fs_read": "قراءة ملف",
+        "fs_write": "كتابة ملف",
+        "fs_edit": "تعديل ملف",
+        "fs_list": "عرض الملفات",
+        "fs_search": "البحث في الملفات",
+        "shared_read": "قراءة ملف مشترك",
+        "shared_write": "كتابة ملف مشترك",
+        "shared_edit": "تعديل ملف مشترك",
+        "shared_list": "عرض الملفات المشتركة",
+        "shared_search": "البحث في الملفات المشتركة",
+        "browser_navigate": "تصفح الويب",
+        "computer": "استخدم حاسوبه",
+        "computer_open_app": "فتح تطبيقًا",
+        "web_fetch": "جلب صفحة",
+        "web_search": "بحث في الويب",
+        "WebSearch": "بحث في الويب",
+        "leads_people_search": "البحث عن أشخاص",
+        "leads_email_find": "البحث عن بريد إلكتروني",
+        "leads_email_verify": "التحقق من بريد إلكتروني",
+        "leads_phone_find": "البحث عن رقم هاتف",
+        "google_serp": "نتائج Google",
+        "google_maps_search": "خرائط Google",
+        "paid_data": "بيانات مدفوعة",
+        "paid_data_catalog": "كتالوج البيانات المدفوعة",
+        "paid_data_read": "قراءة بيانات مدفوعة",
+        "tool_result_read": "قراءة النتيجة كاملة",
+        "download": "تنزيل",
+        "memory_write": "حفظ في الذاكرة",
+        "memory_recall": "استرجاع من الذاكرة",
+        "brain_search": "البحث في Brain",
+        "brain_read": "قراءة Brain",
+        "brain_propose": "اقتراح على Brain",
+        "brain_write": "الكتابة في Brain",
+        "brain_delete": "الحذف من Brain",
+        "brain_proposals": "مراجعة تعديلات Brain",
+        "brain_decide": "البتّ في تعديل على Brain",
+        "vision_analyze": "تحليل صورة",
+        "delegate_tasks": "تفويض المهام",
+        "call_agent": "استدعاء زميل",
+        "team_status": "حالة الفريق",
+        "team_list_schedules": "عرض جداول زميل",
+        "team_list_triggers": "عرض مشغّلات زميل",
+        "team_list_runs": "عرض عمليات تشغيل زميل",
+        "team_get_run": "قراءة تشغيل زميل",
+        "ai_status": "التحقق من مزوّدي الذكاء الاصطناعي",
+        "schedule_list": "عرض الجداول",
+        "schedule_create": "إنشاء جدول",
+        "schedule_update": "تحديث جدول",
+        "schedule_delete": "حذف جدول",
+        "trigger_list": "عرض المشغّلات",
+        "trigger_create": "إنشاء مشغّل",
+        "trigger_get": "قراءة مشغّل",
+        "trigger_update": "تحديث مشغّل",
+        "trigger_rotate_token": "تجديد سرّ المشغّل",
+        "trigger_delete": "حذف مشغّل",
+        "skill_list": "عرض المهارات",
+        "skill_read": "قراءة مهارة",
+        "skill_read_file": "قراءة ملف مهارة",
+        "skill_write_file": "كتابة ملف مهارة",
+        "skill_delete_file": "حذف ملف مهارة",
+        "skill_create": "إنشاء مهارة",
+        "skill_import": "استيراد مهارة",
+        "skill_edit": "تعديل مهارة",
+        "skill_update": "تحديث مهارة",
+        "skill_delete": "حذف مهارة",
+        "skill_propose": "اقتراح مهارة",
+        "soul_update": "تحديث الشخصية",
+        "verbosity_set": "ضبط طول الردود",
+        "tool_install": "تثبيت أداة",
+        "mcp_register": "ربط تكامل",
+        "mcp_login": "تسجيل الدخول إلى تكامل",
+        "mcp_login_complete": "إكمال تسجيل الدخول",
+        "mcp_status": "حالة التكامل",
+        "mcp_search": "البحث عن أدوات",
+        "card_table": "عرض جدول",
+        "card_file": "عرض ملف",
+        "image_generation": "إنشاء صورة",
+        "table_view_save": "حفظ عرض جدول",
+        "table_view_delete": "حذف عرض جدول",
+        "rerun_hub_service_search": "البحث عن تطبيقات",
+        "rerun_hub_service_details": "تفاصيل التطبيق",
+        "rerun_hub_service_install": "تثبيت تطبيق",
+        "rerun_hub_service_list_installed": "عرض التطبيقات",
+        "rerun_hub_service_uninstall": "إزالة تطبيق",
+        "rerun_hub_publish_file": "نشر ملف",
+        "rerun_hub_unpublish_file": "إلغاء نشر ملف",
+        "rerun_hub_list_published": "عرض الملفات المنشورة",
+        "task_complete": "اكتملت المهمة",
+        "list_spaces": "عرض Boxes",
+        "list_agents": "عرض الزملاء",
+        "get_agent": "قراءة زميل",
+        "create_agent": "إنشاء زميل",
+        "update_agent": "تحديث زميل",
+        "delete_agent": "حذف زميل",
+        "list_ai_connections": "عرض مزوّدي الذكاء الاصطناعي",
+        "set_default_model": "تعيين النموذج الافتراضي",
+        "list_skills": "عرض المهارات",
+        "get_skill": "قراءة مهارة",
+        "upsert_skill": "كتابة مهارة",
+        "delete_skill": "حذف مهارة",
+        "list_schedules": "عرض المهام المجدولة",
+        "upsert_schedule": "جدولة مهمة",
+        "run_schedule_now": "تشغيل المهمة الآن",
+        "delete_schedule": "حذف مهمة مجدولة",
+        "list_runs": "عرض عمليات التشغيل",
+        "get_run": "قراءة تشغيل",
+        "search_connectors": "البحث عن تطبيقات",
+        "list_agent_connectors": "عرض التطبيقات",
+        "attach_connector": "إضافة تطبيق",
+        "detach_connector": "إزالة تطبيق",
+        "list_vault": "قراءة Vault",
+        "attach_vault_entry": "إعارة من Vault",
+        "detach_vault_entry": "استرجاع إلى Vault",
+        "share_vault_entry": "مشاركة عنصر من Vault",
+        "rename_vault_entry": "إعادة تسمية عنصر في Vault",
+        "delete_vault_entry": "حذف عنصر من Vault",
+        "add_vault_entry": "إضافة إلى Vault",
+        "open_vault": "فتح Vault",
+        "send_message": "مراسلة زميل",
+        "list_pending_cards": "قراءة صندوق الوارد",
+        "answer_card": "الرد على بطاقة",
+        "create_boxes": "إنشاء Boxes",
+        "build_team": "بناء الفريق",
+        "write_agent": "كتابة SOUL والتثبيت",
+        "rename_box": "إعادة تسمية Box",
+        "delete_box": "حذف Box",
+        "focus_agent": "فتح زميل",
+        "show_agents": "عرض الزملاء",
+        "open_connector_setup": "فتح إعداد التطبيق",
+        "open_settings": "فتح الإعدادات",
+        "recenter_board": "إعادة توسيط اللوحة",
+        "open_brain_page": "فتح Brain",
+        "read_attachment": "قراءة مرفق",
+        "search_docs": "البحث في المستندات",
+        "rerun_hub_search_docs": "البحث في المستندات",
+        "analyze_website": "قراءة موقع ويب",
+        "save_profile": "حفظ الملف الشخصي",
+        "save_needs": "حفظ الاحتياجات",
+        "list_templates": "تصفح القوالب",
+        "propose_plan": "كتابة الخطة",
+        "install_template": "تثبيت قالب",
+        "install_shared_agent": "تثبيت زميل مشترك",
+        "open_template_card": "فتح قالب",
+        "start_agent_setup": "تسليم الإعداد",
+        "open_checkout": "بدء التجربة",
+        "open_template_purchase": "شراء قالب",
+        "ask_choice": "سأل المستخدم",
+        "ask_either": "سأل المستخدم",
+        "ask_input": "سأل المستخدم",
+        "show_templates": "عرض القوالب",
+        "show_plan": "عرض الخطة",
+        "show_starter_pack": "عرض حزمة البداية",
+        "contact_team": "اقترح التواصل مع الفريق",
+        "ask_user": "سأل المستخدم",
+        "request_approval": "طلب موافقة",
+        "suggest_service": "اقترح تطبيقًا",
+        "request_secret": "طلب بيانات اعتماد",
+        "request_mcp_sign_in": "طلب منك تسجيل الدخول إلى خادم MCP",
+        "request_takeover": "طلب منك تولّي المتصفح",
+        "request_spend": "طلب إنفاق أرصدة",
+        "notify_user": "أرسل إليك إشعارًا",
+        "install_complete": "أكمل الإعداد",
+        "remote_computers": "اطّلع على الأجهزة المرتبطة",
+        "remote_exec": "{program, select, none {نفّذ أمرًا} other {شغّل {program}}} على #{computer}",
+        "request_computer_access": "طلب استخدام #{computer}",
+        "remote_job": "تحقق من مهمة على #{computer}",
+        "remote_file_list": "عرض الملفات على #{computer}",
+        "remote_file_read": "قرأ ملفًا على #{computer}",
+        "remote_file_write": "كتب ملفًا على #{computer}",
+        "remote_transfer": "نسخ ملفًا مع #{computer}",
+        "request_feature": "صاغ طلبًا لفريق Rerun"
+    },
+    "activities": {
+        "shell_exec": "ينفّذ أمرًا",
+        "fs_read": "يقرأ ملفًا",
+        "fs_write": "يكتب ملفًا",
+        "fs_edit": "يعدّل ملفًا",
+        "fs_list": "يعرض الملفات",
+        "fs_search": "يبحث في الملفات",
+        "shared_read": "يقرأ ملفًا مشتركًا",
+        "shared_write": "يكتب ملفًا مشتركًا",
+        "shared_edit": "يعدّل ملفًا مشتركًا",
+        "shared_list": "يعرض الملفات المشتركة",
+        "shared_search": "يبحث في الملفات المشتركة",
+        "browser_navigate": "يتصفح الويب",
+        "computer": "يستخدم حاسوبه",
+        "computer_open_app": "يفتح تطبيقًا",
+        "web_fetch": "يقرأ صفحة",
+        "web_search": "يبحث في الويب",
+        "WebSearch": "يبحث في الويب",
+        "leads_people_search": "يبحث عن أشخاص",
+        "leads_email_find": "يبحث عن بريد إلكتروني",
+        "leads_email_verify": "يتحقق من بريد إلكتروني",
+        "leads_phone_find": "يبحث عن رقم هاتف",
+        "google_serp": "يبحث في Google",
+        "google_maps_search": "يبحث في خرائط Google",
+        "download": "يُنزّل",
+        "memory_write": "يحفظ في الذاكرة",
+        "memory_recall": "يسترجع من الذاكرة",
+        "brain_search": "يبحث في Brain",
+        "brain_read": "يقرأ Brain",
+        "brain_propose": "يقترح تعديلًا على Brain",
+        "brain_write": "يكتب في Brain",
+        "vision_analyze": "ينظر إلى صورة",
+        "image_generation": "يُنشئ صورة",
+        "delegate_tasks": "يفوّض المهام",
+        "call_agent": "يستدعي زميلًا",
+        "team_status": "يتفقد الفريق",
+        "team_list_runs": "يقرأ عمليات تشغيل زميل",
+        "team_get_run": "يقرأ تشغيل زميل",
+        "ai_status": "يتحقق من مزوّدي الذكاء الاصطناعي",
+        "skill_read": "يقرأ مهارة",
+        "skill_read_file": "يقرأ مهارة",
+        "skill_create": "يُنشئ مهارة",
+        "skill_edit": "يعدّل مهارة",
+        "skill_update": "يحدّث مهارة",
+        "mcp_search": "يبحث عن أدوات",
+        "rerun_hub_service_search": "يبحث عن تطبيقات",
+        "rerun_hub_service_install": "يثبّت تطبيقًا",
+        "list_agents": "يتفقد الفريق",
+        "create_agent": "يُنشئ زميلًا",
+        "update_agent": "يحدّث زميلًا",
+        "send_message": "يراسل زميلًا",
+        "list_pending_cards": "يقرأ صندوق الوارد",
+        "answer_card": "يرد على بطاقة",
+        "build_team": "يبني الفريق",
+        "search_docs": "يبحث في المستندات",
+        "rerun_hub_search_docs": "يبحث في المستندات",
+        "analyze_website": "يقرأ الموقع",
+        "list_templates": "يتصفح القوالب",
+        "propose_plan": "يكتب الخطة",
+        "install_template": "يثبّت قالبًا",
+        "remote_computers": "يطّلع على الأجهزة المرتبطة",
+        "remote_exec": "{program, select, none {ينفّذ أمرًا} other {يشغّل {program}}} على #{computer}"
+    },
+    "paidData": {
+        "people": {
+            "search": "يبحث عن أشخاص",
+            "email": {
+                "find": "يبحث عن عناوين البريد",
+                "verify": "يتحقق من عناوين البريد"
+            },
+            "phone": {
+                "find": "يبحث عن أرقام الهواتف"
+            },
+            "enrich": "يُثري بيانات الأشخاص",
+            "identity": {
+                "resolve": "يبحث عن ملفات LinkedIn"
+            }
+        },
+        "companies": {
+            "search": "يبحث عن شركات",
+            "enrich": "يُثري بيانات الشركات",
+            "similar": "يبحث عن شركات مشابهة",
+            "jobs": {
+                "search": "يقرأ إعلانات الوظائف"
+            },
+            "news": "يقرأ أخبار الشركات"
+        },
+        "google": {
+            "serp": {
+                "organic": "يقرأ نتائج Google",
+                "maps": "يبحث في خرائط Google",
+                "local": "يقرأ الترتيب المحلي",
+                "news": "يقرأ أخبار Google"
+            },
+            "keywords": {
+                "volume": "يتحقق من أحجام البحث",
+                "ideas": "يبحث عن أفكار للكلمات المفتاحية",
+                "trends": "يقرأ مؤشرات Google"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "يسأل Perplexity"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "يقرأ الروابط الخلفية",
+                "list": "يعرض الروابط الخلفية"
+            },
+            "anchors": {
+                "list": "يقرأ نصوص الروابط"
+            },
+            "url": {
+                "metrics": "يتحقق من قوة النطاق"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "يقرأ LinkedIn",
+                "posts": "يقرأ منشورات LinkedIn"
+            },
+            "company": {
+                "profile": "يقرأ LinkedIn"
+            },
+            "post": {
+                "detail": "يقرأ منشورات LinkedIn",
+                "comments": "يقرأ تعليقات LinkedIn",
+                "reactions": "يقرأ تفاعلات LinkedIn"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "يقرأ TikTok",
+                "videos": "يقرأ فيديوهات TikTok"
+            },
+            "search": {
+                "users": "يبحث في TikTok",
+                "videos": "يبحث في TikTok"
+            },
+            "video": {
+                "detail": "يقرأ فيديوهات TikTok",
+                "comments": "يقرأ تعليقات TikTok"
+            },
+            "comment": {
+                "replies": "يقرأ تعليقات TikTok"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "يقرأ Instagram",
+                "posts": "يقرأ منشورات Instagram",
+                "reels": "يقرأ مقاطع Reels على Instagram"
+            },
+            "search": {
+                "users": "يبحث في Instagram",
+                "reels": "يبحث في Instagram"
+            },
+            "hashtag": {
+                "posts": "يقرأ وسوم Instagram"
+            },
+            "post": {
+                "detail": "يقرأ منشورات Instagram",
+                "comments": "يقرأ تعليقات Instagram"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "يقرأ X",
+                "posts": "يقرأ منشورات X"
+            },
+            "search": {
+                "posts": "يبحث في X"
+            },
+            "post": {
+                "comments": "يقرأ الردود على X"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "يقرأ YouTube",
+                "videos": "يقرأ فيديوهات YouTube"
+            },
+            "search": {
+                "videos": "يبحث في YouTube"
+            },
+            "video": {
+                "detail": "يقرأ فيديوهات YouTube",
+                "comments": "يقرأ تعليقات YouTube"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "يقرأ Facebook",
+                "posts": "يقرأ منشورات Facebook"
+            },
+            "post": {
+                "comments": "يقرأ تعليقات Facebook"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "يقرأ Reddit"
+            },
+            "post": {
+                "detail": "يقرأ Reddit"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "الأداة غير موجودة"
+    }
+}

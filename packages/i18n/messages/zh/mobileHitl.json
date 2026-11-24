@@ -1,0 +1,159 @@
+{
+    "actions": {
+        "notNow": "暂不",
+        "explain": "说明原因",
+        "skip": "跳过",
+        "connect": "连接",
+        "connectNew": "新账户",
+        "connecting": "正在连接…",
+        "continue": "继续",
+        "loading": "加载中…",
+        "openOnWeb": "在网页版打开",
+        "back": "返回",
+        "confirm": "确认",
+        "send": "发送",
+        "next": "下一步",
+        "save": "保存",
+        "saving": "正在保存…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {有问题待回答} other {# 个问题待回答}}",
+        "approval": "{count, plural, =0 {需要批准} other {# 项需要批准}}",
+        "secret": "{count, plural, =0 {需要凭据} other {需要 # 个凭据}}",
+        "mcpNamed": "登录 {name}",
+        "mcp": "需要登录",
+        "service": "{count, plural, =0 {有应用待连接} other {# 个应用待连接}}",
+        "takeover": "轮到您操作屏幕",
+        "jumpTo": "{label}，前往查看",
+        "spend": "待批准的支出",
+        "computer": "批准在 #{computer} 上运行的命令",
+        "feature": "待发送给 Rerun 团队的请求"
+    },
+    "alert": {
+        "label": "通知",
+        "failed": "无法标记为已读，请重试。",
+        "marking": "正在标记…",
+        "markAsRead": "标记为已读"
+    },
+    "approval": {
+        "label": "需要批准",
+        "approved": "已批准",
+        "approve": "批准"
+    },
+    "decline": {
+        "placeholder": "为什么不？（可选）",
+        "reason": "原因"
+    },
+    "fallback": {
+        "replyBelow": "在下方回复，或",
+        "typeOnWeb": "请在 Rerun 网页版中输入，切勿在此聊天中输入。",
+        "needsYou": "{name} 需要您"
+    },
+    "steps": {
+        "previous": "上一步",
+        "next": "下一步",
+        "goTo": "前往第 {step} 步，共 {count} 步",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "需要登录",
+        "connected": "已连接",
+        "signInNeeded": "需要登录",
+        "unreachable": "无法访问",
+        "customServer": "自定义 MCP 服务器",
+        "customServerAt": "自定义 MCP 服务器 · {host}",
+        "signInTo": "登录 {name}",
+        "loadFailed": "无法加载此服务器。请在网页版中连接，或跳过。"
+    },
+    "question": {
+        "dismiss": "关闭问题",
+        "selectAll": "选择所有适用项",
+        "typeAnswer": "输入您的回答…",
+        "somethingElse": "其他",
+        "yourAnswer": "您的回答",
+        "record": "用语音回答",
+        "useRecording": "使用此录音",
+        "discardRecording": "放弃录音",
+        "retryRecording": "重新转写",
+        "uploadFailed": "无法附加这些文件，请重试。"
+    },
+    "secret": {
+        "labelOne": "需要凭据",
+        "labelMany": "需要凭据",
+        "dismiss": "关闭凭据请求",
+        "storedAs": "保存为 {key}",
+        "alreadySaved": "已保存。输入新值可替换",
+        "paste": "粘贴值",
+        "whereToFind": "在哪里找到",
+        "storedNote": "作为同事变量保存在您的 Box 上，绝不会发送给模型。",
+        "saveFailed": "无法保存凭据"
+    },
+    "service": {
+        "label": "待连接的应用",
+        "loadFailed": "无法加载应用。请在网页版中连接，或跳过。",
+        "loading": "正在加载应用…",
+        "webOnly": "此应用需在网页版中选择账户。请在那里连接，或跳过。",
+        "connectFailed": "无法连接该应用",
+        "connected": "{name} 已连接",
+        "notFound": "目录中未找到，已跳过。",
+        "skipped": "已跳过。"
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "您跳过了这些问题",
+            "service": "您关闭了应用设置",
+            "secret": "您拒绝了分享密钥",
+            "mcp": "您跳过了登录",
+            "takeover": "您把浏览器交还给了同事",
+            "feature": "请求未发送"
+        },
+        "answer": "回答",
+        "answers": "回答",
+        "answeredCount": "已回答 {answered}/{total}",
+        "skipped": "已跳过",
+        "approval": "批准",
+        "approvals": "批准",
+        "approvalCount": "{approved} 项已批准，{declined} 项暂不",
+        "approved": "已批准",
+        "notNow": "暂不",
+        "quotedNote": "“{note}”",
+        "connected": "已连接",
+        "notReconnected": "未重新连接",
+        "notFound": "未找到",
+        "apps": "应用",
+        "appsConnected": "已连接 {connected}/{total}",
+        "instead": "{name}（替代 {replaced}）",
+        "keys": "密钥",
+        "keysStored": "已保存 {stored}/{total}",
+        "stored": "已保存",
+        "storedOnBox": "保存在 Box 上。同事只能看到名称。",
+        "mcpServer": "MCP 服务器",
+        "handedBackOn": "您在 {url} 交还了浏览器",
+        "handedBack": "您交还了浏览器",
+        "spend": "付费数据",
+        "approvedOnce": "已批准一次",
+        "alwaysAllowed": "始终允许",
+        "featureSent": "已发送给 Rerun 团队：{title}"
+    },
+    "spend": {
+        "estimatedTotal": "预计总计",
+        "creditsUnit": "{count, plural, other {积分}}",
+        "creditsShort": "仅剩 {amount} {count, plural, other {积分}}：请在网页版中充值积分，或选择暂不。",
+        "alwaysAllow": "始终允许",
+        "approveOnce": "仅批准一次",
+        "addCredits": "充值积分",
+        "alwaysAllowFailed": "无法开启“无需询问即可支出”。本次批准仍然有效，上限为预估金额。"
+    },
+    "computer": {
+        "runOn": "在 #{computer} 上运行",
+        "filesOn": "使用 #{computer} 上的文件",
+        "deny": "拒绝",
+        "allow": "允许",
+        "alwaysProgram": "始终允许 {program}",
+        "alwaysFolder": "始终允许此文件夹",
+        "interpreterWarning": "始终允许 {program} 即允许它运行的任何代码",
+        "alwaysFailed": "无法在电脑上保存此规则：仅允许了这一次。",
+        "inFolder": "位于 {folder}",
+        "folderNote": "“始终”将允许 {folder} 中的所有文件"
+    }
+}

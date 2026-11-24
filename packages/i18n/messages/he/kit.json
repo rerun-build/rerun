@@ -1,0 +1,520 @@
+{
+    "close": "לסגור",
+    "chat": {
+        "actionApproval": {
+            "title": "נדרש אישור",
+            "previous": "האישור הקודם",
+            "next": "האישור הבא",
+            "decline": "לא עכשיו",
+            "explain": "להסביר",
+            "approve": "לאשר",
+            "approved": "אושר"
+        },
+        "alert": {
+            "title": "התראה",
+            "markAsRead": "לסמן כנקרא"
+        },
+        "approval": {
+            "title": "נדרש אישור: {label}",
+            "responded": "תשובה: <b>{choice}</b>",
+            "choices": {
+                "once": "לאפשר פעם אחת",
+                "session": "בסשן הזה",
+                "always": "תמיד",
+                "deny": "לדחות"
+            }
+        },
+        "decline": {
+            "placeholder": "למה לא? (לא חובה)",
+            "back": "חזרה",
+            "confirm": "לאשר"
+        },
+        "question": {
+            "typeAnswer": "יש להקליד את התשובה שלך…",
+            "somethingElse": "משהו אחר",
+            "attachFiles": "לצרף קבצים",
+            "dropFiles": "יש לשחרר קבצים כדי לצרף אותם",
+            "record": "לענות בקול",
+            "useRecording": "להשתמש בהקלטה הזו",
+            "discardRecording": "למחוק את ההקלטה",
+            "selectAll": "יש לבחור את כל מה שמתאים",
+            "dismiss": "לסגור את השאלות",
+            "skip": "לדלג",
+            "submit": "לשלוח תשובות",
+            "next": "השאלה הבאה"
+        },
+        "reasoning": {
+            "thinking": "חושב...",
+            "thoughtFor": "חשב במשך {duration}",
+            "thought": "חשב"
+        },
+        "secret": {
+            "saveFailed": "לא ניתן היה לשמור את פרטי הגישה",
+            "titleOne": "נדרשים פרטי גישה",
+            "titleMany": "נדרשים פרטי גישה",
+            "dismiss": "לסגור את בקשת פרטי הגישה",
+            "storedAs": "נשמר בתור {key}",
+            "replacePlaceholder": "כבר נשמר. אפשר להזין ערך כדי להחליף",
+            "placeholder": "להדביק את הערך",
+            "whereToFind": "איפה למצוא את זה",
+            "storageNote": "נשמר במנוע שלך כמשתנה של העמית. לעולם לא נשלח למודל.",
+            "vaultNote": "נשמר ב-Vault של סביבת העבודה שלך. לעולם לא נשלח למודל.",
+            "skip": "לדלג",
+            "saving": "שומר…",
+            "save": "לשמור"
+        },
+        "skillProposal": {
+            "remembering": "שומר בזיכרון",
+            "remembered": "נשמר בזיכרון",
+            "failed": "לא ניתן היה לזכור את זה",
+            "retry": "לנסות שוב",
+            "dismiss": "לסגור",
+            "notRemembered": "לא נשמר",
+            "remember": "לזכור",
+            "no": "לא",
+            "view": "להציג",
+            "hideDetails": "להסתיר פרטים",
+            "showDetails": "להציג פרטים"
+        },
+        "steps": {
+            "previous": "השלב הקודם",
+            "next": "השלב הבא",
+            "goTo": "לעבור לשלב {step}"
+        },
+        "table": {
+            "boxDatabase": "מסד הנתונים של ה-Box",
+            "coworkerDatabase": "מסד הנתונים של העמית",
+            "rows": "{count, plural, one {שורה אחת} two {# שורות} other {# שורות}}",
+            "columnsHidden": "חלק מהעמודות מוסתרות",
+            "groupedBy": "מקובץ לפי {column}",
+            "open": "לפתוח את מסד הנתונים",
+            "empty": "עדיין אין שורות.",
+            "more": "+ {count} נוספים",
+            "rating": "{value} מתוך 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "להגדיל",
+        "zoomOut": "להקטין",
+        "recenter": "למרכז",
+        "recenterView": "למרכז את התצוגה"
+    },
+    "consent": {
+        "rejectAll": "לדחות הכול",
+        "acceptAll": "לאשר הכול",
+        "region": "הסכמה לעוגיות",
+        "title": "עוגיות",
+        "short": "אנחנו משתמשים בעוגיות אנליטיקה. <policy>מדיניות העוגיות</policy>",
+        "long": "אנחנו משתמשים בעוגיות אנליטיקה כדי להבין איך משתמשים ב-Rerun. העוגיות הדרושות להתחברות, לצ'אט התמיכה ולשמירת ההעדפות שלך פעילות תמיד. <policy>מדיניות העוגיות</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "הזהות שלך",
+                    "description": "התמונה, הבאנר, השם ואופן העבודה שלך."
+                },
+                "about": {
+                    "title": "עליך",
+                    "description": "איפה אתה נמצא ומה אתה עושה."
+                },
+                "pricing": {
+                    "title": "תעריפים וזמינות",
+                    "description": "הזמינות שלך והערכה של התעריפים שלך."
+                },
+                "expertise": {
+                    "title": "המומחיות שלך",
+                    "description": "המיומנויות והשפות שאתה עובד איתן. לא חובה."
+                },
+                "links": {
+                    "title": "קישורים ופרסום",
+                    "description": "להוסיף את הקישורים שלך, ואז לפרסם את הפרופיל."
+                }
+            },
+            "name": "שם",
+            "namePlaceholder": "למשל Mira Labs",
+            "email": "אימייל",
+            "emailHelper": "פרטי. רק צוות Rerun יכול לראות אותו.",
+            "type": "סוג",
+            "location": "מיקום",
+            "locationPlaceholder": "למשל תל אביב",
+            "bio": "ביוגרפיה",
+            "bioPlaceholder": "מה אתה בונה ולמי אתה עוזר.",
+            "availability": "זמינות",
+            "budget": "תקציב",
+            "budgetPlaceholder": "לבחור טווח",
+            "skills": "מיומנויות",
+            "skillsPlaceholder": "לבחור מיומנויות",
+            "languages": "שפות",
+            "languagesPlaceholder": "לבחור שפות",
+            "website": "אתר",
+            "back": "חזרה",
+            "continue": "להמשיך"
+        },
+        "types": {
+            "studio": {
+                "title": "סטודיו",
+                "description": "סוכנות או צוות שבונים עבור לקוחות"
+            },
+            "freelancer": {
+                "title": "פרילנסר",
+                "description": "עצמאי שבונה לבד"
+            },
+            "expert": {
+                "title": "מומחה",
+                "description": "מומחה שמציע ייעוץ והכוונה"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "זמין",
+                "hint": "מקבל עבודות חדשות עכשיו"
+            },
+            "soon": {
+                "label": "זמין בקרוב",
+                "hint": "מתפנה בקרוב"
+            },
+            "unavailable": {
+                "label": "לא זמין",
+                "hint": "תפוס לגמרי כרגע"
+            }
+        },
+        "validation": {
+            "nameRequired": "חובה להזין שם",
+            "nameTooLong": "השם ארוך מדי",
+            "nameInvalid": "השם לא יכול להכיל < או >",
+            "emailRequired": "חובה להזין אימייל",
+            "emailInvalid": "אימייל לא תקין",
+            "bioTooLong": "הביוגרפיה ארוכה מדי",
+            "budgetInvalid": "תקציב לא תקין",
+            "skillInvalid": "מיומנות לא תקינה",
+            "languageInvalid": "שפה לא תקינה"
+        },
+        "images": {
+            "title": "תמונה ובאנר",
+            "drop": "לשחרר",
+            "dropBanner": "לשחרר כאן את הבאנר",
+            "dropPhoto": "לשחרר כאן את התמונה",
+            "upload": "להעלות",
+            "uploading": "מעלה…",
+            "changeBanner": "להחליף באנר",
+            "uploadPhoto": "להעלות תמונה",
+            "remove": "להסיר",
+            "notAnImage": "יש לבחור קובץ תמונה."
+        },
+        "card": {
+            "location": "מיקום",
+            "status": "סטטוס",
+            "links": "קישורים",
+            "namePlaceholder": "השם שלך",
+            "rolePlaceholder": "מומחה Rerun"
+        },
+        "preview": {
+            "hire": "להעסיק"
+        },
+        "skills": {
+            "agentDesign": "עיצוב סוכנים",
+            "workflowAutomation": "אוטומציה של תהליכים",
+            "ragKnowledgeBases": "RAG ומאגרי ידע",
+            "integrationsApis": "אינטגרציות ו-API",
+            "mcpServers": "שרתי MCP",
+            "promptEngineering": "הנדסת פרומפטים",
+            "dataPipelines": "צינורות נתונים",
+            "chatbotsSupport": "צ'אטבוטים ותמיכה",
+            "voiceAgents": "סוכנים קוליים",
+            "leadGenOutreach": "השגת לידים ופנייה",
+            "crmAutomation": "אוטומציה של CRM",
+            "webScraping": "גריפת אתרים",
+            "ecommerceAutomation": "אוטומציה למסחר אלקטרוני",
+            "analyticsReporting": "אנליטיקה ודיווח",
+            "fineTuning": "כוונון עדין",
+            "noCodeAutomation": "אוטומציה ללא קוד"
+        }
+    },
+    "foreman": {
+        "orbLabel": "לשאול את ה-Chief of Staff שלך",
+        "tabsLabel": "ה-Chief of Staff",
+        "empty": {
+            "title": "אפשר לשאול כל דבר על סביבת העבודה שלך",
+            "description": "ה-Chief of Staff שלך בונה ומפעיל איתך את העמיתים שלך"
+        },
+        "header": {
+            "closeChat": "לסגור את הצ'אט",
+            "resize": "לשנות את גודל הצ'אט"
+        },
+        "tabs": {
+            "assistant": "לשאול",
+            "tasks": "משימות",
+            "routines": "שגרות",
+            "card": "כרטיס"
+        },
+        "periods": {
+            "running": "פועלות עכשיו",
+            "morning": "הבוקר",
+            "afternoon": "אחר הצהריים",
+            "tonight": "הערב",
+            "tomorrow": "מחר",
+            "week": "השבוע",
+            "later": "מאוחר יותר",
+            "paused": "מושהות"
+        },
+        "routines": {
+            "setupFirst": "יש לסיים קודם את ההגדרה",
+            "pause": "להשהות את {name}",
+            "resume": "לחדש את {name}",
+            "nameLabel": "שם השגרה",
+            "runningJustNow": "פועלת · <1 ד'",
+            "runningMinutes": "פועלת · {minutes} ד'",
+            "runningHours": "פועלת · {hours} ש'",
+            "startsNow": "מתחילה עכשיו",
+            "startsInMinutes": "מתחילה בעוד {minutes} ד'",
+            "startsInHours": "מתחילה בעוד {hours} ש'"
+        },
+        "agentPicker": {
+            "openTab": "לפתוח את {tab} של {name}"
+        }
+    },
+    "forms": {
+        "optional": "לא חובה",
+        "hidePassword": "להסתיר סיסמה",
+        "showPassword": "להציג סיסמה",
+        "select": "לבחור…",
+        "search": "להקליד כדי לחפש…",
+        "noResults": "אין תוצאות",
+        "dropFile": "לשחרר את הקובץ כאן",
+        "remove": "להסיר את {item}"
+    },
+    "primitives": {
+        "loading": "טוען",
+        "scrollLeft": "לגלול שמאלה",
+        "scrollRight": "לגלול ימינה",
+        "carousel": {
+            "previous": "{label}: הקודם",
+            "next": "{label}: הבא",
+            "goTo": "לעבור אל {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "כמות",
+            "totalTokens": "סך הטוקנים",
+            "inputTokens": "טוקני קלט",
+            "outputTokens": "טוקני פלט",
+            "cachedInputTokens": "טוקנים מהמטמון",
+            "reasoningTokens": "טוקני חשיבה",
+            "cost": "עלות",
+            "avgDurationMs": "משך ממוצע",
+            "errorCount": "שגיאות",
+            "errorRate": "שיעור שגיאות"
+        },
+        "live": "חי",
+        "runStatus": {
+            "running": "פועל",
+            "done": "הושלם",
+            "error": "שגיאה",
+            "cancelled": "בוטל"
+        },
+        "runs": {
+            "emptyTitle": "עדיין אין הרצות",
+            "emptyDescription": "כל הרצה של העמית נרשמת כאן",
+            "steps": "{count, plural, one {שלב אחד} two {# שלבים} other {# שלבים}}",
+            "tokens": "{tokens} טוקנים"
+        },
+        "agentStatus": {
+            "idle": "פנוי",
+            "working": "עובד",
+            "error": "שגיאה",
+            "waiting_human": "ממתין לאדם",
+            "offline": "לא מחובר",
+            "empty": "אין עמיתים להצגה."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} הרצות",
+                "runSteps": "{count} שלבי הרצה",
+                "toolCalls": "{count} קריאות לכלים",
+                "sessions": "{count} סשנים"
+            },
+            "other": "אחר",
+            "loading": "טוען...",
+            "noData": "אין נתונים בתקופה הזו."
+        },
+        "usage": {
+            "input": "קלט",
+            "output": "פלט",
+            "cached": "מהמטמון",
+            "cost": "עלות",
+            "tokens": "טוקנים",
+            "totalCost": "עלות כוללת",
+            "totalTokens": "סך הטוקנים",
+            "runs": "{count, plural, one {הרצה אחת} two {# הרצות} other {# הרצות}}",
+            "noUsage": "אין שימוש בתקופה הזו."
+        }
+    },
+    "inbox": {
+        "title": "התראות",
+        "resize": "לשנות את גודל ההתראות",
+        "close": "לסגור את ההתראות",
+        "preferences": "העדפות",
+        "preferencesUnavailable": "ההעדפות לא זמינות כאן",
+        "markAllRead": "לסמן הכול כנקרא",
+        "nothingToMark": "אין מה לסמן כנקרא",
+        "markRead": "לסמן כנקרא",
+        "noUpdates": "אין עדכונים",
+        "pillLabel": "התראות: {summary}",
+        "pillLabelEmpty": "התראות: אין עדכונים",
+        "needsYouRow": "מחכה לך",
+        "needsYouCount": "{count, plural, one {# מחכה לך} two {# מחכים לך} other {# מחכים לך}}",
+        "doneCount": "{count, plural, one {# הושלם} two {# הושלמו} other {# הושלמו}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> מחכה לך} two {<b>#</b> מחכים לך} other {<b>#</b> מחכים לך}}",
+        "doneRich": "{count, plural, one {<b>#</b> הושלם} two {<b>#</b> הושלמו} other {<b>#</b> הושלמו}}",
+        "newUpdates": "{count, plural, one {<b>#</b> עדכון חדש} two {<b>#</b> עדכונים חדשים} other {<b>#</b> עדכונים חדשים}}",
+        "running": "{count, plural, one {<n>#</n> משימה פועלת} two {<n>#</n> משימות פועלות} other {<n>#</n> משימות פועלות}}",
+        "empty": {
+            "title": "אין מה לטפל",
+            "description": "כשעמית צריך אותך או מסיים משימה, זה מגיע לכאן."
+        },
+        "sections": {
+            "needsYou": "מחכה לך",
+            "headsUps": "לתשומת לבך",
+            "errors": "שגיאות",
+            "done": "הושלם"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} שאל אותך שאלה",
+            "awaiting_approval": "{agent} צריך את האישור שלך",
+            "awaiting_connector": "{agent} צריך שיחברו אפליקציה",
+            "waiting_human": "{agent} מחכה לך",
+            "awaiting_ack": "{agent} סימן משהו בשבילך",
+            "error": "{agent} נתקל בשגיאה",
+            "done": "{agent} סיים את ההרצה שלו"
+        }
+    },
+    "richText": {
+        "bold": "מודגש",
+        "italic": "נטוי",
+        "heading": "כותרת",
+        "subheading": "כותרת משנה",
+        "bulletList": "רשימת תבליטים",
+        "numberedList": "רשימה ממוספרת",
+        "quote": "ציטוט",
+        "inlineCode": "קוד בשורה",
+        "codeBlock": "בלוק קוד",
+        "link": "קישור",
+        "linkPrompt": "כתובת הקישור"
+    },
+    "theme": {
+        "label": "ערכת נושא",
+        "options": {
+            "system": "מערכת",
+            "light": "בהיר",
+            "dark": "כהה"
+        }
+    },
+    "newAgent": {
+        "create": "ליצור את {name}",
+        "createCoworker": "ליצור עמית",
+        "apps": "אפליקציות",
+        "pickedApps": "אפליקציות: {apps}",
+        "or": "או",
+        "browseTemplates": "לעיין בתבניות",
+        "job": {
+            "placeholder": "לתאר את העבודה, כמו שהיית מתדרך חבר צוות.",
+            "label": "מה העמית החדש שלך צריך לעשות?"
+        },
+        "name": {
+            "placeholder": "לתת שם לעמית שלך",
+            "label": "שם העמית"
+        },
+        "forYou": {
+            "heading": "או להתחיל מאחד שנבחר בשבילך",
+            "closeToIdea": "קרוב לרעיון שלך",
+            "otherIdeas": "רעיונות נוספים"
+        },
+        "appsPicker": {
+            "search": "לחפש אפליקציות",
+            "all": "הכול",
+            "empty": "אין אפליקציה בשם הזה.",
+            "limit": "עד {max} אפליקציות בהתחלה. הסוכן שלך יוכל לחבר עוד בהמשך.",
+            "categories": {
+                "payments": "תשלומים",
+                "ecommerce": "מסחר אלקטרוני",
+                "crm": "CRM",
+                "marketing": "שיווק",
+                "seo": "SEO",
+                "analytics": "אנליטיקה",
+                "dev": "פיתוח",
+                "productivity": "פרודוקטיביות",
+                "other": "אחר"
+            }
+        },
+        "schedule": {
+            "button": "תזמון",
+            "readFromDescription": "הובן מהתיאור שלך",
+            "onASchedule": "לפי תזמון",
+            "custom": "מותאם אישית",
+            "noSchedule": "ללא תזמון",
+            "onDemand": "רק כשאני מבקש",
+            "timeOfDay": "שעה ביום",
+            "presets": {
+                "weekday": {
+                    "label": "בכל יום חול ב-9:00",
+                    "detail": "ראשון עד חמישי"
+                },
+                "monday": {
+                    "label": "בכל יום שני ב-9:00",
+                    "detail": "פעם בשבוע"
+                }
+            },
+            "everyDay": "בכל יום ב-{time}",
+            "everyWeekday": "בכל יום חול ב-{time}",
+            "everyDays": "בכל {days} ב-{time}"
+        }
+    },
+    "isoGrid": {
+        "board": "לוח העמיתים",
+        "addBlock": "להוסיף בלוק בצד הזה",
+        "status": {
+            "idle": "פנוי",
+            "working": "עובד",
+            "error": "שגיאה",
+            "offline": "לא מחובר",
+            "waiting_human": "מחכה לך",
+            "disabled": "לא פעיל",
+            "paused": "מושהה",
+            "restoring": "בשחזור"
+        },
+        "countdown": {
+            "seconds": "{count} שנ'",
+            "minutes": "{count} ד'",
+            "hours": "{count} ש'",
+            "days": "{count} י'"
+        },
+        "untitledBox": "Box ללא שם",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} one {, # לטיפול} two {, # לטיפול} other {, # לטיפול}}{results, plural, =0 {} one {, תוצאה חדשה אחת} two {, # תוצאות חדשות} other {, # תוצאות חדשות}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "פועל",
+            "approval": "מחכה לך",
+            "success": "הושלם",
+            "done": "הושלם"
+        },
+        "approve": "לאשר",
+        "edit": "לערוך"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "שיווק",
+            "sales": "מכירות",
+            "ops": "תפעול"
+        },
+        "roles": {
+            "headOfGrowth": "ראש תחום צמיחה",
+            "accountExecutive": "מנהל לקוחות",
+            "operationsSpecialist": "מומחה תפעול"
+        }
+    }
+}

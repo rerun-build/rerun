@@ -1,0 +1,143 @@
+{
+    "preferences": {
+        "title": "التفضيلات",
+        "close": "إغلاق",
+        "yourAccount": "حسابك",
+        "workspace": "مساحة العمل",
+        "aiProviders": "مزودو الذكاء الاصطناعي",
+        "appearance": "المظهر",
+        "appearanceSystem": "النظام",
+        "appearanceLight": "فاتح",
+        "appearanceDark": "داكن",
+        "coworkers": "الزملاء",
+        "groupRecent": "الأحدث",
+        "groupByBox": "حسب Box",
+        "openLinksIn": "فتح الروابط في",
+        "linksBrowser": "المتصفح",
+        "linksRerun": "Rerun",
+        "language": "اللغة",
+        "notifications": "الإشعارات",
+        "pushOff": "الإشعارات متوقفة",
+        "support": "الدعم",
+        "contactSupport": "التواصل مع الدعم",
+        "privacy": "سياسة الخصوصية",
+        "terms": "شروط الخدمة",
+        "about": "حول",
+        "version": "الإصدار",
+        "environment": "البيئة",
+        "signOut": "تسجيل الخروج",
+        "deleteAccount": "حذف الحساب",
+        "server": "الخادم"
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "saveFailed": "تعذر الحفظ",
+        "tryAgainShortly": "حاول مرة أخرى بعد قليل.",
+        "loadFailed": "تعذر تحميل إعداداتك. حاول مرة أخرى بعد قليل.",
+        "push": {
+            "label": "الإشعارات الفورية",
+            "off": "متوقفة",
+            "turnOn": "تفعيل",
+            "openSettings": "{platform, select, android {فتح إعدادات Android} other {فتح إعدادات iOS}}",
+            "footnote": "{platform, select, android {لن يصل أي مما يلي إلى هذا الهاتف حتى تفعّل الإشعارات الفورية.} other {لن يصل أي مما يلي إلى هذا الـ iPhone حتى تفعّل الإشعارات الفورية.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "رسائل الزملاء",
+                "description": "عندما يحتاجك زميل أو لديه ما يقوله."
+            },
+            "silent": {
+                "name": "المهام المنتهية",
+                "description": "عندما ينهي زميل مهمة، دون صوت."
+            },
+            "crew": {
+                "name": "الفريق في العمل",
+                "description": "من يعمل ومن يحتاجك، يبقى في الأعلى طوال المدة."
+            }
+        },
+        "scopeTitle": "أعلمني بـ",
+        "recommended": "موصى به",
+        "scopes": {
+            "everything": {
+                "label": "كل شيء",
+                "detail": "كل تشغيل في مساحة العمل، أيًا كان من بدأه."
+            },
+            "mine": {
+                "label": "عمليات التشغيل الخاصة بي وما أتابعه",
+                "detail": "عمليات التشغيل التي أبدأها، والمحادثات التي أشارك فيها، والزملاء الذين أتابعهم."
+            },
+            "needed": {
+                "label": "فقط عندما أكون مطلوبًا",
+                "detail": "الأسئلة والموافقات والأخطاء في عمليات التشغيل الخاصة بي. التشغيل المنتهي يبقى صامتًا."
+            },
+            "nothing": {
+                "label": "لا شيء",
+                "detail": "أتحقق من صندوق الوارد بنفسي."
+            }
+        },
+        "email": {
+            "label": "البريد الإلكتروني",
+            "footnote": "عندما يحتاجك الأمر وأنت غائب. رسالة واحدة لكل حادثة، وليس لكل تشغيل أبدًا."
+        },
+        "perCoworker": {
+            "title": "لكل زميل",
+            "add": "إضافة زميل",
+            "pickTitle": "يصلك كل تشغيل لهذا الزميل",
+            "cancel": "إلغاء",
+            "empty": "كل الزملاء يتبعون القاعدة أعلاه.",
+            "detail": "يمكن ضبطه أيضًا من تفاصيل كل زميل.",
+            "rowLabel": "{name}، {value}",
+            "followsTasks": "يتابع المهام",
+            "yourSetting": "إعدادك"
+        },
+        "accountEmails": {
+            "title": "رسائل الحساب",
+            "billing": "الفترة التجريبية والفوترة",
+            "product": "تحديثات المنتج"
+        },
+        "modes": {
+            "default": {
+                "label": "افتراضي",
+                "hint": "يتبع إعدادك."
+            },
+            "everything": {
+                "label": "كل الأنشطة",
+                "hint": "كل تشغيل، أيًا كان من بدأه."
+            },
+            "muted": {
+                "label": "مكتوم",
+                "hint": "لا شيء. تبقى اللوحة تعرضه."
+            }
+        },
+        "coworker": {
+            "title": "أعلمني بشأن {name}",
+            "yourSetting": "إعدادك",
+            "quotedScope": "«{scope}»",
+            "follow": "متابعة مهامه المجدولة",
+            "nothingScheduled": "لا شيء مجدول بعد.",
+            "scheduled": "{count, plural, zero {لا مهام مجدولة} one {مهمة مجدولة واحدة} two {مهمتان مجدولتان} few {# مهام مجدولة} many {# مهمة مجدولة} other {# مهمة مجدولة}}، تصلك مثل عمليات التشغيل الخاصة بك.",
+            "reachYou": "تصلك مثل عمليات التشغيل الخاصة بك.",
+            "tasksTitle": "المهام المجدولة",
+            "tasksFailed": "تعذر تحميل مهامه. حاول مرة أخرى بعد قليل.",
+            "taskSwitch": "أعلمني بشأن {name}",
+            "muted": "تم كتم {name}."
+        },
+        "actions": {
+            "approve": "موافقة",
+            "deny": "رفض",
+            "answer": "إجابة",
+            "reply": "رد",
+            "open": "فتح",
+            "replyPlaceholder": "إجابتك",
+            "send": "إرسال"
+        },
+        "receipts": {
+            "approve": "تمت الموافقة. {agent} يعمل على ذلك.",
+            "deny": "تم الرفض. لن يقوم {agent} بذلك.",
+            "reply": "تم الإرسال. {agent} يعمل على ذلك.",
+            "failed": "لم يُرسل: {reason}",
+            "signedOut": "افتح Rerun لتسجيل الدخول مجددًا.",
+            "fallbackAgent": "زميلك"
+        }
+    }
+}

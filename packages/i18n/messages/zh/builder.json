@@ -1,0 +1,134 @@
+{
+    "contextMenu": {
+        "newCoworker": "新建同事",
+        "openChat": "打开聊天",
+        "rename": "重命名",
+        "settings": "设置",
+        "share": "分享",
+        "duplicate": "复制",
+        "moveToBox": "移至 Box",
+        "noOtherBox": "没有您管理的其他 Box",
+        "delete": "删除",
+        "manageAccess": "管理访问权限",
+        "boxAccessAdminOnly": "只有管理员可以更改谁能访问 Box",
+        "manageReason": "只有此 Box 的管理员或经理可以执行此操作",
+        "untitledBox": "未命名 Box",
+        "thisCoworker": "此同事"
+    },
+    "toolbar": {
+        "placementPrompt": "点击一个格子放置 {name}",
+        "placementPromptDefault": "点击一个格子放置您的同事",
+        "placementProgress": "第 {current} 位同事，共 {total} 位",
+        "newCoworker": "新建同事",
+        "template": "模板",
+        "create": "创建",
+        "search": "搜索",
+        "unplaced": "{count} 位未放置"
+    },
+    "isoBoard": {
+        "boxCta": "探索 {name} 模板",
+        "boxCtaFallback": "探索模板",
+        "recruitFirst": "点击招募您的第一位同事",
+        "createBox": "点击创建 Box",
+        "preparingSandbox": "正在准备您的沙盒…",
+        "settingUpTemplate": "正在设置 {title}…",
+        "settingUpCoworker": "正在设置您的同事…",
+        "installTemplate": "点击安装 {title}",
+        "addBoxOnSide": "在此侧添加 Box"
+    },
+    "discoveries": {
+        "statusDigging": "正在了解 {name}",
+        "statusDone": "{name} 一览",
+        "found": "找到 {count} 项",
+        "sources": {
+            "website": "您的网站",
+            "domain": "您的域名",
+            "registry": "公开登记信息",
+            "web": "互联网"
+        },
+        "teasers": {
+            "profile": "正在阅读 {domain}…",
+            "stack": "正在查看 {domain} 的技术栈…",
+            "dns": "正在检查您的邮件服务…",
+            "registry": "正在公开登记信息中查找您…",
+            "site": "正在阅读 {domain} 的每个页面…",
+            "search": "正在网上搜索 {name}…",
+            "linkedinPerson": "正在 LinkedIn 上查找您…",
+            "linkedinCompany": "正在 LinkedIn 上查找 {name}…",
+            "googleBusiness": "正在阅读您的 Google 评价…",
+            "catalog": "正在浏览 {domain} 的商店…",
+            "synthesis": "正在整合所有信息…"
+        },
+        "cards": {
+            "identity": {
+                "title": "找到您了"
+            },
+            "audience": {
+                "title": "您的客户群体"
+            },
+            "tools": {
+                "title": "我们发现的工具"
+            },
+            "mail": {
+                "title": "您的邮箱",
+                "runsOn": "邮件服务使用 <b>{provider}</b>"
+            },
+            "social": {
+                "title": "您出现的平台"
+            },
+            "brand": {
+                "title": "您的品牌"
+            },
+            "registry": {
+                "title": "登记信息",
+                "since": "成立于 <b>{year}</b>",
+                "people": "<b>{headcount}</b> 人"
+            },
+            "person": {
+                "title": "这是您吗，{firstName}？"
+            },
+            "linkedin": {
+                "title": "您的 LinkedIn 主页",
+                "followers": "关注者",
+                "team": "团队成员"
+            },
+            "reviews": {
+                "title": "客户怎么说",
+                "count": "<n>{count}</n> 条 Google 评价"
+            },
+            "products": {
+                "title": "您销售的产品"
+            },
+            "competitors": {
+                "title": "您的竞争对手"
+            },
+            "customers": {
+                "title": "已有的客户"
+            },
+            "brain": {
+                "title": "公司 Brain",
+                "pages": "您的同事开始工作前会阅读的{count, plural, other { # 个页面}}",
+                "productsAndCompetitors": "+ {products, plural, other {# 个产品}}，{competitors, plural, other {# 个竞争对手}}",
+                "productsOnly": "+ {products, plural, other {# 个产品}}",
+                "competitorsOnly": "+ {competitors, plural, other {# 个竞争对手}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "“{name}”已创建，但未激活",
+        "createdInactiveHint": "您的套餐没有空闲的同事名额。请在同事面板中激活它。",
+        "addFailed": "无法添加此同事",
+        "lookFailed": "无法更改此同事的外观",
+        "duplicateFailed": "无法复制此同事",
+        "importFailed": "无法导入此模板",
+        "importInterrupted": "导入被中断",
+        "importInterruptedHint": "再次导入前，请先检查您的机器。",
+        "moveAgentFailed": "无法移动此同事",
+        "moveBoxFailed": "无法移动此 Box",
+        "deleteBoxFailed": "无法删除此 Box",
+        "checkConnection": "请检查网络连接后重试。",
+        "shareLinkGone": "此分享链接已失效",
+        "prepareBoxFailed": "无法准备您的 Box",
+        "startCoworkerFailed": "无法启动您的同事"
+    }
+}

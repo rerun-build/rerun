@@ -1,0 +1,379 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "مضمَّن",
+            "plan": "اشتراك",
+            "key": "مفتاح API"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro أو Max",
+                "hint": "سجّل الدخول بحساب Claude"
+            },
+            "codex": {
+                "title": "ChatGPT Plus أو Pro",
+                "hint": "سجّل الدخول بحساب ChatGPT"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "نماذج Claude، بالدفع لكل رمز"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "نماذج GPT، بالدفع لكل رمز"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "نماذج Gemini، بالدفع لكل رمز"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "كل النماذج بمفتاح واحد"
+            },
+            "opencode": {
+                "title": "OpenCode Go أو Console",
+                "hint": "الصق مفتاح OpenCode"
+            },
+            "custom": {
+                "title": "نقطة نهاية مخصصة",
+                "hint": "Ollama أو LM Studio أو vLLM أو أي خادم متوافق مع OpenAI"
+            }
+        },
+        "summary": "{kind} · {count, plural, zero {لا نماذج} one {نموذج واحد} two {نموذجان} few {# نماذج} many {# نموذجًا} other {# نموذج}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "رصيد Rerun متوقف مؤقتًا",
+        "creditUsed": "استُخدم {percent}% من رصيد هذا الشهر",
+        "creditUsedUpOn": "نفد الرصيد الشهري، يعود في {date}",
+        "creditUsedUpNextMonth": "نفد الرصيد الشهري، يعود الشهر القادم",
+        "creditBackOn": "في {date}",
+        "creditBackNextMonth": "الشهر القادم",
+        "windows": {
+            "session": "الجلسة",
+            "fiveHour": "5 ساعات",
+            "weekly": "أسبوعي",
+            "monthly": "شهري",
+            "modelWeekly": "{label} أسبوعي",
+            "modelWeeklyUnnamed": "النموذج أسبوعيًا"
+        },
+        "windowResets": "يُعاد الضبط {when}",
+        "tiers": {
+            "fast": "سريع واقتصادي",
+            "smart": "الأذكى"
+        },
+        "opencodePlan": {
+            "go": "مضمَّن في Go",
+            "console": "أرصدة Console",
+            "free": "مجاني"
+        },
+        "unavailable": {
+            "opencodeRetired": "لم يعد OpenCode يوفّره",
+            "codexOutdated": "Codex CLI قديم على هذا الـ Box",
+            "notInChatgptPlan": "غير متاح في اشتراك ChatGPT"
+        },
+        "pricePerMillion": "{input} إدخال · {output} إخراج /مليون",
+        "guide": {
+            "anthropic": {
+                "title": "كيف تحصل على مفتاح Anthropic",
+                "step1": "افتح [Anthropic Console](https://console.anthropic.com/settings/keys) وسجّل الدخول.",
+                "step2": "انقر على **Create Key** وسمِّه، مثلًا \"Rerun\".",
+                "step3": "انسخ المفتاح (يبدأ بـ `sk-ant-`) والصقه أعلاه. لا يُعرض إلا مرة واحدة."
+            },
+            "openai": {
+                "title": "كيف تحصل على مفتاح OpenAI",
+                "step1": "افتح [OpenAI API keys](https://platform.openai.com/api-keys) وسجّل الدخول.",
+                "step2": "انقر على **Create new secret key** وسمِّه، مثلًا \"Rerun\".",
+                "step3": "انسخ المفتاح (يبدأ بـ `sk-`) والصقه أعلاه. لا يُعرض إلا مرة واحدة."
+            },
+            "google": {
+                "title": "كيف تحصل على مفتاح Google",
+                "step1": "افتح [Google AI Studio](https://aistudio.google.com/apikey) وسجّل الدخول بحساب Google.",
+                "step2": "انقر على **Create API key** واختر مشروعًا في Google Cloud.",
+                "step3": "انسخ المفتاح والصقه أعلاه."
+            },
+            "openrouter": {
+                "title": "كيف تحصل على مفتاح OpenRouter",
+                "step1": "افتح [OpenRouter keys](https://openrouter.ai/keys) وسجّل الدخول.",
+                "step2": "انقر على **Create API Key**، وأضف أرصدة إن كان رصيدك فارغًا.",
+                "step3": "انسخ المفتاح (يبدأ بـ `sk-or-`) والصقه أعلاه. لا يُعرض إلا مرة واحدة."
+            },
+            "opencode": {
+                "title": "كيف تحصل على مفتاح OpenCode",
+                "step1": "افتح [OpenCode](https://opencode.ai/auth) وسجّل الدخول.",
+                "step2": "اشترك في **OpenCode Go**، أو أضف أرصدة لاستخدام نماذج Console.",
+                "step3": "أنشئ مفتاح API وانسخه (يبدأ بـ `oc_sk_`) والصقه أعلاه."
+            }
+        }
+    },
+    "noPlan": {
+        "trialText": "ابدأ تجربتك المجانية لتوصيل اشتراك Claude أو ChatGPT أو مفتاح API خاص بك.",
+        "subscribeText": "اشترك لتوصيل اشتراك Claude أو ChatGPT أو مفتاح API خاص بك.",
+        "startTrial": "ابدأ التجربة المجانية",
+        "subscribe": "اشترك"
+    },
+    "baseUrl": {
+        "label": "عنوان URL أساسي مخصص",
+        "helper": "أرسل الطلبات إلى موجّه خاص بك متوافق مع OpenRouter",
+        "inputLabel": "عنوان URL الأساسي لـ OpenRouter"
+    },
+    "planLimits": {
+        "title": "استخدام الاشتراك",
+        "empty": "يظهر الاستخدام هنا بعد التشغيل التالي على هذا الاشتراك.",
+        "updatedJustNow": "حُدّث للتو",
+        "updatedAgo": "حُدّث منذ {age}",
+        "used": "استُخدم {percent}",
+        "usedWithReset": "استُخدم {percent}، {reset}"
+    },
+    "meter": {
+        "planLimit": "المستخدم من حد {name}",
+        "monthlyCredits": "الرصيد الشهري المستخدم"
+    },
+    "providerPicker": {
+        "added": "مضاف"
+    },
+    "status": {
+        "paused": "متوقف مؤقتًا",
+        "creditsUsedUp": "نفد الرصيد",
+        "signInAgain": "سجّل الدخول مجددًا",
+        "keyRejected": "المفتاح مرفوض",
+        "keyMissing": "المفتاح مفقود",
+        "ready": "جاهز"
+    },
+    "backToProviders": "العودة إلى مزوّدي الذكاء الاصطناعي",
+    "subtitle": {
+        "included": "مضمَّن في اشتراكك",
+        "apiKey": "مفتاح API لـ {provider}"
+    },
+    "key": {
+        "label": "مفتاح API",
+        "placeholder": "الصق مفتاحك"
+    },
+    "name": {
+        "label": "الاسم",
+        "helper": "يظهر في منتقي النماذج لدى كل زميل"
+    },
+    "becomesDefault": "سيصبح هذا الافتراضي لمساحة العمل: كل زميل بلا نموذج خاص به سيعمل عليه.",
+    "connecting": "جارٍ الاتصال…",
+    "errors": {
+        "nameRequired": "أعطِ هذا الاتصال اسمًا",
+        "createFailed": "تعذّر إنشاء الاتصال",
+        "renameFailed": "تعذّرت إعادة تسمية الاتصال",
+        "saveFailed": "تعذّر الحفظ",
+        "startFailed": "تعذّر بدء الاتصال",
+        "saveTokenFailed": "تعذّر حفظ الرمز",
+        "saveConnectionFailed": "تعذّر حفظ الاتصال",
+        "codeExpired": "انتهت صلاحية الرمز، ابدأ من جديد",
+        "deleteFailed": "تعذّر حذف الاتصال",
+        "defaultFailed": "تعذّر تغيير النموذج الافتراضي",
+        "backupsFailed": "تعذّر حفظ النماذج الاحتياطية"
+    },
+    "addProvider": {
+        "addKey": "أضف مفتاحًا"
+    },
+    "remove": {
+        "button": "أزل {name}",
+        "confirmTitle": "إزالة {name}؟",
+        "confirm": "أزل",
+        "removed": "أُزيل {name}",
+        "checking": "جارٍ التحقق مما لا يزال يعمل عليه…",
+        "fallBack": {
+            "agents": "سيعود {agents} إلى النموذج الافتراضي لمساحة العمل.",
+            "automations": "{count, plural, zero {لا أتمتة} one {أتمتة واحدة} two {أتمتتان} few {# أتمتات} many {# أتمتة} other {# أتمتة}} ستعود إلى النموذج الافتراضي لمساحة العمل.",
+            "both": "سيعود {agents} و{count, plural, zero {لا أتمتة} one {أتمتة واحدة} two {أتمتتان} few {# أتمتات} many {# أتمتة} other {# أتمتة}} إلى النموذج الافتراضي لمساحة العمل."
+        },
+        "holdsDefault": "يحمل النموذج الافتراضي لمساحة العمل، وسيُمسح: كل زميل لم يختر نموذجًا يعود إلى Rerun.",
+        "nothingRuns": "تُزال بيانات الاعتماد من الـ Box. لا شيء يعمل عليه.",
+        "released": {
+            "agents": "يعمل {agents} الآن على النموذج الافتراضي لمساحة العمل.",
+            "automations": "{count, plural, zero {لا أتمتة} one {أتمتة واحدة} two {أتمتتان} few {# أتمتات} many {# أتمتة} other {# أتمتة}} تعمل الآن على النموذج الافتراضي لمساحة العمل.",
+            "both": "يعمل {agents} و{count, plural, zero {لا أتمتة} one {أتمتة واحدة} two {أتمتتان} few {# أتمتات} many {# أتمتة} other {# أتمتة}} الآن على النموذج الافتراضي لمساحة العمل."
+        },
+        "defaultCleared": "مُسح الافتراضي لمساحة العمل."
+    },
+    "customModels": {
+        "remove": "أزل",
+        "add": "أضف",
+        "addCustom": "أضف نموذجًا مخصصًا",
+        "openrouterHint": "أضف أي معرّف نموذج من OpenRouter (مثل <mono>x-ai/grok-4</mono>).",
+        "serverHint": "أضف نموذجًا يقدّمه الخادم دون أن يدرجه (مثل <mono>llama3.3:70b</mono>).",
+        "idPlaceholder": "معرّف النموذج"
+    },
+    "models": {
+        "title": "النماذج",
+        "defaultModel": "النموذج الافتراضي",
+        "turnOff": "أوقف {model}",
+        "turnOn": "شغّل {model}",
+        "lockDefault": "هذا هو النموذج الافتراضي. اختر افتراضيًا آخر أولًا.",
+        "lockLast": "يحتاج الزملاء إلى نموذج واحد على الأقل من هذا المصدر.",
+        "lockCustom": "نموذج مخصص. أزله أدناه.",
+        "available": "يمكن لزملائك استخدامها",
+        "count": "{on} من {total}",
+        "availableEmpty": "اسحب نموذجًا إلى هنا ليستخدمه الزملاء.",
+        "hidden": "متوقفة",
+        "hiddenEmpty": "اسحب نموذجًا إلى هنا لإبعاد الزملاء عنه."
+    },
+    "opencode": {
+        "goTitle": "مضمَّن في OpenCode Go",
+        "goHint": "يدفعه اشتراك Go. النماذج المجانية متوقفة حتى تشغّلها.",
+        "consoleTitle": "Console، تُدفع من أرصدتك",
+        "consoleHint": "بالدفع لكل رمز، متوقفة حتى تشغّل أحدها.",
+        "included": "مضمَّن",
+        "credits": "أرصدة",
+        "free": "مجاني",
+        "new": "جديد",
+        "noVision": "بلا رؤية",
+        "search": "ابحث في النماذج",
+        "emptySection": "لا يدرج OpenCode أي نموذج هنا حاليًا.",
+        "noMatch": "لا يوجد نموذج يطابق «{query}»."
+    },
+    "detail": {
+        "readOnly": "{reason}.",
+        "keyReplaced": "استُبدل المفتاح",
+        "signedInAgain": "تم تسجيل الدخول مجددًا",
+        "creditsTitle": "رصيد هذا الشهر",
+        "topUp": "اشحن الرصيد",
+        "creditsUsedUpOn": "الزملاء الذين يعملون على Rerun متوقفون مؤقتًا حتى يعود الرصيد في {date}. اشحن الرصيد أو اختر نموذجًا افتراضيًا آخر ليواصلوا العمل.",
+        "creditsUsedUpNextMonth": "الزملاء الذين يعملون على Rerun متوقفون مؤقتًا حتى يعود الرصيد الشهر القادم. اشحن الرصيد أو اختر نموذجًا افتراضيًا آخر ليواصلوا العمل.",
+        "creditsIncluded": "مضمَّن في اشتراك Rerun. بلا مفتاح ولا إعداد.",
+        "signInRejected": "رُفض تسجيل الدخول هذا. الزملاء الذين يستخدمونه متوقفون حتى تسجّل الدخول مجددًا.",
+        "signInExpired": "انتهت صلاحية تسجيل الدخول هذا. الزملاء الذين يستخدمونه متوقفون حتى تسجّل الدخول مجددًا.",
+        "reconnected": "يستأنف زملاؤك العمل",
+        "keyRejected": "رُفض هذا المفتاح. الزملاء الذين يستخدمونه متوقفون حتى تلصق مفتاحًا جديدًا.",
+        "keyMissing": "لا يوجد مفتاح محفوظ. الزملاء الذين يستخدمونه متوقفون حتى تلصق مفتاحًا."
+    },
+    "panel": {
+        "adminOnly": "يمكن للمسؤول فقط تغيير مزوّدي الذكاء الاصطناعي",
+        "groups": {
+            "default": "النموذج الافتراضي",
+            "backups": "الاحتياطية",
+            "included": "مضمَّن",
+            "plans": "اشتراكاتك",
+            "keys": "مفاتيح API الخاصة بك",
+            "noPlan": "اشتراكاتك ومفاتيح API الخاصة بك"
+        },
+        "pitch": {
+            "plansWithOpencode": "تستخدم Claude Code أو Codex أو OpenCode بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
+            "plans": "تستخدم Claude Code أو Codex بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
+            "plansWithoutClaudeWithOpencode": "تستخدم Codex أو OpenCode بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
+            "plansWithoutClaude": "تستخدم Codex بالفعل؟ يمكن لزملائك العمل على اشتراك ChatGPT.",
+            "keysWithCustom": "ادفع لمزوّدك مباشرة، لكل رمز، أو شغّل نموذجك الخاص.",
+            "keys": "ادفع لمزوّدك مباشرة، لكل رمز."
+        },
+        "default": {
+            "via": "عبر {source}. يعمل عليه الزملاء الذين ليس لهم نموذج خاص.",
+            "pausedPick": "رصيد Rerun متوقف مؤقتًا، لذا توقف أيضًا الزملاء الذين ليس لهم نموذج خاص. اختر نموذجًا آخر ليواصلوا العمل.",
+            "pausedAdd": "رصيد Rerun متوقف مؤقتًا، لذا توقف أيضًا الزملاء الذين ليس لهم نموذج خاص. أضف اشتراكًا أو مفتاح API ليواصلوا العمل.",
+            "usedUpOnPick": "نفد رصيد Rerun حتى يعود في {date}، لذا توقف الزملاء الذين ليس لهم نموذج خاص. اختر نموذجًا آخر ليواصلوا العمل.",
+            "usedUpOnAdd": "نفد رصيد Rerun حتى يعود في {date}، لذا توقف الزملاء الذين ليس لهم نموذج خاص. أضف اشتراكًا أو مفتاح API ليواصلوا العمل.",
+            "usedUpNextMonthPick": "نفد رصيد Rerun حتى يعود الشهر القادم، لذا توقف الزملاء الذين ليس لهم نموذج خاص. اختر نموذجًا آخر ليواصلوا العمل.",
+            "usedUpNextMonthAdd": "نفد رصيد Rerun حتى يعود الشهر القادم، لذا توقف الزملاء الذين ليس لهم نموذج خاص. أضف اشتراكًا أو مفتاح API ليواصلوا العمل.",
+            "stopped": "الزملاء الذين ليس لهم نموذج خاص متوقفون. أصلح {source} أو اختر نموذجًا آخر.",
+            "noOtherModel": "لا يوجد نموذج آخر جاهز. أضف اشتراكًا أو مفتاح API أولًا.",
+            "change": "غيّر"
+        },
+        "backups": {
+            "add": "أضف احتياطيًا",
+            "rank": "{rank, selectordinal, other {رقم #}} · عبر {source}",
+            "rankNotReady": "{rank, selectordinal, other {رقم #}} · {source} غير جاهز، تم تخطيه",
+            "moveUp": "انقل {model} للأعلى",
+            "moveDown": "انقل {model} للأسفل",
+            "remove": "أزل {model}",
+            "full": "حتى {max} نماذج احتياطية",
+            "noneLeft": "لا يوجد نموذج آخر جاهز. أضف اشتراكًا أو مفتاح API أولًا.",
+            "credit": {
+                "title": "رصيد Rerun كملاذ أخير",
+                "description": "فقط عندما تنفد كل الاشتراكات"
+            }
+        },
+        "addSubscription": "أضف اشتراكًا",
+        "addApiKey": "أضف مفتاح API"
+    },
+    "chatgpt": {
+        "allowStep": "اسمح بتسجيل الدخول بالرمز في ChatGPT",
+        "openSettings": "افتح إعدادات ChatGPT",
+        "alreadyOn": "مفعّل بالفعل",
+        "codeStep": "أدخل الرمز على OpenAI",
+        "remarks": {
+            "connected": "تم كل شيء!",
+            "starting": "جارٍ جلب رمز",
+            "expired": "انتهت صلاحية هذا الرمز.",
+            "stuck": "لا شيء من OpenAI بعد.",
+            "waiting": "بانتظار OpenAI",
+            "grabCode": "الآن احصل على رمز.",
+            "turnOn": "فعّل هذا مرة واحدة."
+        },
+        "setting": {
+            "path": "مكان الإعداد في ChatGPT",
+            "settings": "الإعدادات",
+            "security": "الأمان",
+            "deviceCode": "تفعيل تفويض رمز الجهاز لـ Codex"
+        },
+        "adminSwitches": "يفعّله مسؤول ChatGPT لمساحة العمل كلها. <copy></copy>",
+        "plusOrPro": "أنا على Plus أو Pro",
+        "businessQuestion": "على ChatGPT Business أو Enterprise؟",
+        "copyCode": "انسخ الرمز",
+        "enterCode": "أدخله في <link>صفحة OpenAI</link> ووافق. ستلتقطه هذه النافذة تلقائيًا.",
+        "opening": "يُفتح OpenAI في علامة تبويب جديدة",
+        "gettingCode": "جارٍ جلب الرمز…",
+        "newCode": "احصل على رمز جديد",
+        "getCode": "احصل على رمز",
+        "stuck": {
+            "expiredAdmin": "انتهت صلاحية الرمز. على الأرجح لم يسمح المسؤول بتسجيل الدخول بالرمز بعد. <copy></copy>",
+            "errorAdmin": "خطأ في صفحة OpenAI؟ على الأرجح لم يسمح المسؤول بتسجيل الدخول بالرمز بعد. <copy></copy>",
+            "expiredSelf": "انتهت صلاحية الرمز. على الأرجح لا يزال تسجيل الدخول بالرمز معطّلًا: فعّله في <link>الإعدادات ← الأمان</link>، ثم احصل على رمز جديد.",
+            "errorSelf": "خطأ في صفحة OpenAI؟ على الأرجح لا يزال تسجيل الدخول بالرمز معطّلًا: فعّله في <link>الإعدادات ← الأمان</link>، ثم أدخل الرمز مجددًا."
+        },
+        "copied": "تم النسخ",
+        "copyMessage": "انسخ رسالة لهم",
+        "adminMessage": "مرحبًا! هل يمكنك تفعيل \"تفويض رمز الجهاز لـ Codex\" في إعدادات مساحة عمل ChatGPT لدينا؟ أحتاجه لتوصيل اشتراك ChatGPT الخاص بي بـ Rerun."
+    },
+    "claude": {
+        "remarks": {
+            "idle": "سأنتظر هنا.",
+            "waiting": "الصق ما أعطاك إياه Claude.",
+            "checking": "جارٍ التحقق",
+            "connected": "تم كل شيء!"
+        },
+        "approveStep": "وافق على Rerun في Claude",
+        "opening": "يُفتح Claude في علامة تبويب جديدة",
+        "openAgain": "افتح Claude مجددًا",
+        "open": "افتح Claude",
+        "pasteStep": "الصق الرمز",
+        "checkingCode": "جارٍ التحقق من الرمز…",
+        "codeAccepted": "قُبل الرمز",
+        "codePlaceholder": "الرمز من Claude",
+        "paste": "الصق",
+        "pasteHint": "الصقه في الحقل بـ ⌘V أو Ctrl+V."
+    },
+    "nameStep": {
+        "title": "سمِّه",
+        "remark": "آخر شيء: اسم.",
+        "fieldLabel": "اسم الاتصال",
+        "saving": "جارٍ الحفظ…",
+        "done": "تم",
+        "helper": "يظهر في منتقي النماذج لدى كل زميل."
+    },
+    "letsGo": "هيا بنا",
+    "custom": {
+        "server": "الخادم",
+        "other": "آخر",
+        "baseUrl": "عنوان URL الأساسي",
+        "keyOptionalPlaceholder": "لا شيء لخادم محلي",
+        "modelId": "معرّف النموذج",
+        "connect": "اتصل",
+        "endpoint": "نقطة النهاية",
+        "contextWindow": "نافذة السياق",
+        "contextWindowHelper": "بالرموز، للنماذج التي لا يحدد الخادم حجمها",
+        "vision": "النماذج ترى الصور",
+        "visionHelper": "تحتاجها لقطات الشاشة والكمبيوتر",
+        "probe": {
+            "unreachableCloud": "تعذّر الوصول إلى {host}. يجب أن يكون عنوانًا عامًا يستجيب.",
+            "unreachableLocal": "تعذّر الوصول إلى {host}. تحقق من أن الخادم يعمل ويمكن للمحرك الوصول إليه.",
+            "unauthorized": "رفض الخادم هذا المفتاح. تحقق من نسخه بالكامل.",
+            "notListed": "لا يدرج هذا الخادم نماذجه. اكتب معرّف النموذج المراد تشغيله.",
+            "refused": "رفض الخادم {model}: {detail}",
+            "refusedPlain": "رفض الخادم {model}.",
+            "refusedUnnamedDetail": "رفض الخادم هذا النموذج: {detail}",
+            "refusedUnnamed": "رفض الخادم هذا النموذج."
+        }
+    }
+}

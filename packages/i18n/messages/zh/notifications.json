@@ -1,0 +1,172 @@
+{
+    "toast": {
+        "close": "关闭通知",
+        "openConversation": "打开对话",
+        "coworker": "同事",
+        "scheduledTask": "{name} · 定时任务"
+    },
+    "inbox": {
+        "unknownCoworker": "同事",
+        "detail": {
+            "close": "关闭",
+            "back": "返回",
+            "seeAll": "查看全部",
+            "seeAllCount": "查看全部 {count} 项",
+            "markRead": "标为已读",
+            "notInList": "此更新尚未出现在您的列表中",
+            "openConversation": "打开对话",
+            "noCoworker": "此更新未关联任何同事",
+            "status": {
+                "error": "错误",
+                "awaiting_question": "问题",
+                "awaiting_approval": "审批",
+                "awaiting_ack": "未读",
+                "done": "已完成",
+                "waiting_human": "等待中"
+            }
+        },
+        "peek": {
+            "close": "关闭",
+            "back": "返回",
+            "openConversation": "打开对话",
+            "showMore": "展开",
+            "showLess": "收起",
+            "sent": "已发送给 {agent}",
+            "stale": "此问题已有人回答。",
+            "openToAnswer": "打开对话进行回答。",
+            "busy": "{agent} 仍在工作，请稍后重试。",
+            "failed": "您的回答未能发送，请重试。"
+        },
+        "markAll": {
+            "label": "将通知标为已读",
+            "markRead": "{count, plural, other {将 # 条通知标为已读}}",
+            "nothingToMark": "没有可标记的通知",
+            "clearAll": "{count, plural, other {全部清除，包括 # 个请求}}",
+            "confirmTitle": "清除所有通知？",
+            "confirmDescription": "{count, plural, other {# 个等待中的请求将离开收件箱且不会得到回答，您的同事会继续等待。}}",
+            "confirm": "全部清除"
+        },
+        "rowMenu": {
+            "options": "通知选项",
+            "undo": "撤销",
+            "unfollow": "不再关注其定时任务",
+            "unfollowed": "您已不再关注 {name} 的定时任务。",
+            "mute": "静音 {name}",
+            "muted": "{name} 已静音。",
+            "settings": "通知设置"
+        },
+        "untitledSession": "未命名会话",
+        "reasons": {
+            "mine": "这次运行由您发起",
+            "participant": "您在此对话中",
+            "followed": "您关注了 {agentName} 的定时任务",
+            "allActivity": "您会收到 {agentName} 的所有活动",
+            "everything": "您会收到工作区中的每次运行",
+            "workspace": "这与您的工作区有关"
+        }
+    },
+    "settings": {
+        "scopeTitle": "通知我以下内容",
+        "recommended": "推荐",
+        "notificationsFor": "{name} 的通知",
+        "scopes": {
+            "everything": {
+                "label": "全部",
+                "detail": "工作区中的每次运行，无论由谁发起。"
+            },
+            "mine": {
+                "label": "我的运行和我关注的内容",
+                "detail": "我发起的运行、我参与的对话、我关注的同事。"
+            },
+            "needed": {
+                "label": "仅在需要我时",
+                "detail": "我的运行中的问题、审批和错误。运行完成时不打扰。"
+            },
+            "nothing": {
+                "label": "不通知",
+                "detail": "我自己查看收件箱。"
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "默认",
+                "yourSetting": "您的设置：“{scope}”。"
+            },
+            "everything": {
+                "label": "所有活动",
+                "hint": "每次运行，无论由谁发起。"
+            },
+            "muted": {
+                "label": "已静音",
+                "hint": "不通知。看板上仍会显示。"
+            }
+        },
+        "bell": {
+            "title": "{name} 的通知",
+            "follow": "关注其定时任务",
+            "noSchedule": "{name} 暂无定时任务",
+            "nothingScheduled": "暂无定时任务。",
+            "scheduled": "{count} 个定时任务，会像您自己的运行一样通知您。",
+            "allSettings": "所有通知设置"
+        },
+        "perCoworker": {
+            "title": "按同事",
+            "detail": "也可通过每位同事的铃铛图标设置。",
+            "add": "添加",
+            "allListed": "所有同事都已列出",
+            "empty": "所有同事都遵循上述规则。",
+            "following": "正在关注其定时任务",
+            "alreadyDefault": "{name} 已遵循您的设置",
+            "reset": "重置 {name}"
+        },
+        "channels": {
+            "title": "方式",
+            "toast": {
+                "label": "应用内弹窗",
+                "description": "Rerun 打开时，在收件箱上方弹出。"
+            },
+            "sound": {
+                "label": "声音",
+                "description": "仅当同事需要您或出现故障时。",
+                "play": "播放通知声音"
+            },
+            "email": {
+                "label": "电子邮件",
+                "description": "当您不在时需要您处理。每个事件一封邮件，绝不会每次运行发一封。"
+            }
+        },
+        "accountEmails": {
+            "title": "账号邮件",
+            "billing": {
+                "label": "试用与计费",
+                "description": "关于您订阅的试用提醒和计费通知。"
+            },
+            "product": {
+                "label": "产品更新",
+                "description": "新功能、使用技巧和不定期的产品资讯。"
+            }
+        },
+        "saveFailed": "无法保存您的通知设置",
+        "networkError": "网络错误"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "同事通知",
+        "email": {
+            "label": "电子邮件",
+            "description": "当您不在时，同事需要您或出现故障。每个事件一封邮件，绝不会每次运行发一封。"
+        },
+        "saveFailed": "无法保存偏好设置",
+        "saving": "正在保存…",
+        "saved": "所有更改已保存"
+    },
+    "notices": {
+        "slotsPaused": "您的方案现在有 {slots, plural, other {# 个 {provider} 席位}}，因此 {paused, plural, other {# 个已连接账号}}已暂停。请在“计费”中添加席位以恢复。",
+        "workspaceBack": "您的工作区已恢复。请在“设置 → 应用”中重新连接您的 {provider} 账号，以便同事再次使用。",
+        "trialEndsSoon": "您的免费 {provider} 席位将于 {endsAt, date, long} 结束，之后会成为您方案中的付费席位。如果不想保留，请在此之前于“设置 → 应用”中断开该账号。",
+        "trialEndedPlanInactive": "您的免费 {provider} 席位已结束，而您的方案未激活，因此 {account, select, none {该账号} other {{account}}} 已暂停。请在一周内于“计费”中添加席位以保留它，否则它将被断开连接。",
+        "trialEndedDeclined": "您的免费 {provider} 席位已结束且银行卡被拒，因此 {account, select, none {该账号} other {{account}}} 已暂停。请在一周内于“计费”中添加席位以保留它，否则它将被断开连接。",
+        "rateLimited": "{provider} 要求 {account, select, none {您的一个账号} other {{account}}} 放慢速度。同事将在 24 小时内不使用它，以确保账号安全。",
+        "signedOut": "{provider} 已将 {account, select, none {您的一个账号} other {{account}}} 退出登录。请在“设置 → 应用”中重新连接，以便同事再次使用。",
+        "budgetExhausted": "您本月的 Rerun 积分已用完。使用 Rerun 模型的定时运行和触发运行已暂停，同事也无法购买潜在客户、SEO 或社交数据，直到积分重置或您添加积分。"
+    }
+}

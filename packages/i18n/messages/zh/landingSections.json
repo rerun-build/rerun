@@ -1,0 +1,560 @@
+{
+    "jobs": {
+        "bookkeeper": "记账员",
+        "executiveAssistant": "行政助理",
+        "contentMarketer": "内容营销",
+        "outreach": "外联专员",
+        "sdr": "SDR",
+        "customerSupport": "客户支持",
+        "seoWriter": "SEO 写手",
+        "cashController": "资金管理",
+        "officeManager": "办公室经理",
+        "salesRep": "销售代表",
+        "socialManager": "社媒经理",
+        "newsletterWriter": "简报写手"
+    },
+    "heroSuggestions": {
+        "leads": {
+            "title": "线索抓取",
+            "description": "每天早上一份新的线索名单。",
+            "name": "线索搜寻",
+            "kickoff": "每天早上寻找新线索并加入我的名单"
+        },
+        "ads": {
+            "title": "广告与销售",
+            "description": "根据您自己的数据，判断该砍掉什么、该加码什么。",
+            "name": "广告观察员",
+            "kickoff": "关注我的广告支出和销售额，并标出该砍掉的部分"
+        },
+        "inbound": {
+            "title": "入站回复",
+            "description": "趁新线索热度还在时及时回复。",
+            "name": "线索回复员",
+            "kickoff": "在几分钟内而不是几小时内回复新线索"
+        },
+        "seo": {
+            "title": "SEO 写手",
+            "description": "每周调研、撰写并发布一篇文章。",
+            "name": "SEO 写手",
+            "kickoff": "每周一撰写并发布一篇文章"
+        }
+    },
+    "boards": {
+        "crew": {
+            "label": "工作区",
+            "invite": "邀请队友"
+        }
+    },
+    "plan": {
+        "cards": {
+            "model": {
+                "title": "自带模型",
+                "body": "连接您自己的 Claude 或 ChatGPT 订阅、您的 API 密钥，或使用套餐包含的 Rerun 积分。"
+            },
+            "team": {
+                "title": "为团队打造",
+                "body": "免费邀请整个团队，没有额外费用。"
+            },
+            "runs": {
+                "title": "计划任务与触发器",
+                "body": "每天早上、每周一，或在某个应用发起调用时。"
+            }
+        },
+        "machine": {
+            "connected": "已连接",
+            "usage": "本时段已用 23%，2 小时后重置",
+            "subscriptions": "您的订阅",
+            "keys": "您的 API 密钥"
+        },
+        "sources": {
+            "claude": {
+                "name": "Claude Pro 或 Max",
+                "hint": "已使用您的 Claude 账号登录"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus 或 Pro",
+                "hint": "已使用您的 ChatGPT 账号登录"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Claude 模型，按 token 计费"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "GPT 模型，按 token 计费"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Gemini 模型，按 token 计费"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "一个密钥调用所有模型"
+            }
+        },
+        "composer": "找出迪拜物流公司的 30 位 CFO。",
+        "members": {
+            "title": "成员",
+            "lead": "邀请队友在此工作区中协作。",
+            "field": "通过邮箱邀请",
+            "action": "邀请",
+            "owner": "所有者",
+            "pending": "待接受"
+        },
+        "routines": {
+            "title": "例行任务",
+            "action": "新建",
+            "items": {
+                "invoices": {
+                    "name": "催收未付发票",
+                    "when": "每个工作日 07:00 · Europe/Paris",
+                    "badge": "34 分钟后"
+                },
+                "payment": {
+                    "name": "标记付款失败",
+                    "when": "当 Stripe 调用 webhook 时",
+                    "badge": "监听中"
+                },
+                "drafts": {
+                    "name": "发布今天的三篇草稿",
+                    "when": "每天 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "欢迎新客户",
+                    "when": "当您的 CRM 调用 webhook 时",
+                    "badge": "监听中"
+                },
+                "ranking": {
+                    "name": "每周排名报告",
+                    "when": "每周五 09:00",
+                    "badge": "周五 09:00"
+                },
+                "close": {
+                    "name": "月末结账",
+                    "when": "每月最后一天 18:00",
+                    "badge": "31/10"
+                }
+            }
+        },
+        "schedule": {
+            "repeat": "重复",
+            "every": "每个工作日",
+            "hook": "Webhook URL",
+            "next": "下次运行：今天 07:00",
+            "save": "保存"
+        }
+    },
+    "steps": {
+        "label": "如何开始",
+        "title": "三个简单步骤，<br></br>免费开始。",
+        "items": {
+            "connect": {
+                "title": "连接您已付费的服务",
+                "body": "您的 Claude 或 ChatGPT 账号，登录一次即可。也可以用密钥，或套餐附带的积分。"
+            },
+            "hire": {
+                "title": "雇用一位同事",
+                "body": "从现成的同事中挑选一位并回答它的问题，或者用一句话描述工作内容。"
+            },
+            "run": {
+                "title": "同事把工作做完",
+                "body": "按计划、按触发器或按需执行，承担您会交给同事的每一项任务。"
+            }
+        },
+        "rail": {
+            "board": "看板",
+            "hire": "新同事",
+            "inbox": "收件箱",
+            "brain": "Brain",
+            "providers": "AI 提供商"
+        },
+        "connect": {
+            "label": "AI 提供商",
+            "description": "您的同事所使用的套餐和 API 密钥。",
+            "subscriptions": "您的订阅",
+            "keys": "您的 API 密钥",
+            "ready": "就绪",
+            "connect": "连接",
+            "connecting": "正在连接",
+            "sources": {
+                "chatgpt": {
+                    "name": "ChatGPT 套餐",
+                    "summary": "Codex，使用您自己的订阅。"
+                },
+                "claude": {
+                    "name": "Claude 套餐",
+                    "summary": "Claude Code，使用您自己的订阅。"
+                },
+                "google": {
+                    "name": "Google API 密钥",
+                    "summary": "Gemini 模型，按 token 计费。"
+                },
+                "openrouter": {
+                    "name": "OpenRouter API 密钥",
+                    "summary": "一个密钥调用所有模型。"
+                },
+                "anthropic": {
+                    "name": "Anthropic API 密钥",
+                    "summary": "Claude 模型，按 token 计费。"
+                }
+            }
+        },
+        "hire": {
+            "label": "新同事",
+            "description": "描述工作内容，或从为您挑选的同事开始。",
+            "job": "催收每一张未付发票，并在每周一告诉我进展。",
+            "mark": "每周一",
+            "schedule": "每周一",
+            "title": "您的新同事应该做什么？",
+            "titleNamed": "{name} 应该做什么？"
+        },
+        "board": {
+            "box": "运营",
+            "beats": {
+                "chased": "周一 7:00，已催收 3 张发票",
+                "drafted": "Acme 来信，回复已起草",
+                "closed": "Acme 已付款，发票已结清",
+                "followUp": "已按您的要求发送跟进"
+            }
+        }
+    },
+    "layer": {
+        "eyebrows": {
+            "live": "您的工作区",
+            "gains": "您的工作区",
+            "week": "典型的一周",
+            "anatomy": "什么是同事",
+            "jobs": "仍在手动完成",
+            "steps": "如何开始",
+            "cloud": "它们涵盖的工作"
+        },
+        "gainTitles": {
+            "tidy": {
+                "lead": "您的整个公司，",
+                "mid": "井井有条。"
+            },
+            "organized": {
+                "lead": "您的整个公司，",
+                "mid": "井井有条。",
+                "tail": "而且会自动保持下去。"
+            },
+            "never": {
+                "lead": "再也不用",
+                "mid": "多花一小时",
+                "tail": "整理您的业务。"
+            },
+            "once": {
+                "lead": "整理您的业务，",
+                "mid": "只需一次。",
+                "tail": "从此不再乱套。"
+            },
+            "board": {
+                "lead": "一项",
+                "mid": "看得见的业务，",
+                "tail": "而不是一个要翻找的文件夹。"
+            },
+            "mess": {
+                "lead": "二十位",
+                "mid": "同事。",
+                "tail": "完全不用替它们收拾残局。"
+            },
+            "files": {
+                "lead": "一切",
+                "mid": "各归其位，",
+                "tail": "而您从未归档过任何东西。"
+            },
+            "brief": {
+                "lead": "设置您的",
+                "mid": "工作区一次。",
+                "tail": "从此不用向同事重复交代。"
+            },
+            "workspace": {
+                "lead": "一个",
+                "mid": "懂您业务的",
+                "tail": "工作区。"
+            },
+            "concretely": {
+                "lead": "Rerun",
+                "mid": "究竟能为",
+                "tail": "您的业务带来什么？"
+            },
+            "needs": {
+                "lead": "Rerun",
+                "mid": "就是您的业务",
+                "tail": "所需的一切。"
+            }
+        },
+        "boxes": {
+            "marketing": "营销",
+            "sales": "销售",
+            "finance": "财务",
+            "admin": "行政",
+            "support": "支持"
+        },
+        "says": {
+            "posts": "本周已排好六篇帖子",
+            "founders": "今天已给 40 位创始人发邮件",
+            "invoices": "正在催收 3 张逾期发票",
+            "emails": "正在整理 41 封新邮件",
+            "demos": "本周已预约 12 场演示",
+            "inbox": "收件箱已清零"
+        },
+        "live": {
+            "tablist": "工作区步骤",
+            "steps": {
+                "boxes": {
+                    "tab": "Boxes",
+                    "title": "用 Boxes 组织您的工作",
+                    "body": "营销、销售、财务、行政。每个部门、每个客户或每个项目一个 Box。"
+                },
+                "coworkers": {
+                    "tab": "同事",
+                    "title": "雇用您需要的同事",
+                    "body": "外联、记账、支持：每位同事都进驻自己的 Box，拥有自己的记忆和应用。"
+                },
+                "brain": {
+                    "tab": "公司 Brain",
+                    "title": "整个公司共用一个 Brain",
+                    "body": "您的产品、市场和语气。写一次，每位同事在每次运行前都会读取。"
+                },
+                "workspaces": {
+                    "tab": "工作区",
+                    "title": "同时运营多个工作区",
+                    "body": "一个客户、一个品牌、一项副业。每个工作区都有自己的同事和自己的机器。"
+                }
+            },
+            "brain": "公司 Brain",
+            "workspaces": {
+                "company": "您的公司",
+                "studio": "您的第二家公司",
+                "spare": "您的副业项目"
+            },
+            "plan": "{coworkers, plural, other {# 位同事}} · {seats, plural, other {# 个席位}}",
+            "menu": {
+                "settings": "设置",
+                "invite": "邀请",
+                "brain": "Brain",
+                "aiProviders": "AI 提供商",
+                "apiKeys": "API 密钥与 MCP",
+                "pro": "PRO",
+                "billing": "账单",
+                "newWorkspace": "新建工作区"
+            }
+        },
+        "brain": {
+            "title": "Brain",
+            "search": "搜索",
+            "company": "公司",
+            "lead": "每位同事都会读取的内容。",
+            "pages": {
+                "offering": "产品",
+                "market": "市场",
+                "voice": "语气",
+                "team": "团队",
+                "stack": "技术栈"
+            },
+            "sources": {
+                "pricingPage": "定价页面",
+                "webSearch": "网页搜索",
+                "website": "网站"
+            }
+        },
+        "workspaces": {
+            "new": "新建工作区",
+            "newHint": "拥有自己的同事、自己的机器和自己的成员"
+        }
+    },
+    "testimonials": {
+        "label": "客户",
+        "title": "<keep>他们的<chip>同事</chip></keep>已经在工作了。",
+        "sub": "真实的工作区，他们自己的话。",
+        "role": "{role} ·<org>{company}</org>",
+        "carousel": "客户评价",
+        "slide": "第 {index} 条，共 {total} 条",
+        "dots": "选择一条评价",
+        "dot": "{company}，第 {index} 条评价，共 {total} 条"
+    },
+    "faq": {
+        "label": "问题",
+        "title": "常见<mark>问题</mark>。",
+        "sub": "大家在雇用第一位同事之前会问的所有问题。如果没有找到您的问题，创始人就在下方。",
+        "categories": {
+            "general": "常规",
+            "how": "工作原理",
+            "features": "功能与使用",
+            "billing": "套餐与账单"
+        },
+        "migrate": {
+            "label": "五分钟内迁移您的整套配置。",
+            "aria": "从其他工具迁移"
+        },
+        "team": {
+            "role": "联合创始人",
+            "title": "还有问题？<fade>直接问创始人。</fade>",
+            "sub": "我们只有两个人，Rerun 由我们亲手打造。给我们发邮件，或来 Discord 提问。",
+            "email": "给创始人发邮件",
+            "discord": "加入 Discord"
+        },
+        "items": {
+            "better": {
+                "question": "为什么同事做同一件事比 Claude 或 ChatGPT 更好？",
+                "answer": "因为聊天机器人止步于回答。它写好邮件，您还得自己打开标签页、复制文字、登录旧系统再发出去。同事有自己的电脑和您的应用，所以这些步骤它会自己完成，而且早上 7 点会自动开始，无需您打开任何东西。"
+            },
+            "start": {
+                "question": "我不知道先交给它什么。从哪里开始？",
+                "answer": "挑一件您每周都要重复、又最怕做的事：催收发票、整理收件箱、周一报告。本页的示例就是大家最先交出去的工作。"
+            },
+            "readyMade": {
+                "question": "可以从现成的开始吗？",
+                "answer": "可以。模板库里有为各行业预先打造的同事：代理公司、电商、SaaS、销售、招聘等。安装一个，连接您自己的应用，再修改不符合您工作方式的部分。"
+            },
+            "experts": {
+                "question": "有人能帮我设置同事吗？",
+                "answer": "可以。Rerun 专家以搭建和安装同事为业，您可以浏览并雇用其中一位。打造 Rerun 的我们两人也会在 Discord 免费解答。",
+                "link": "专家"
+            },
+            "safe": {
+                "question": "我的数据安全吗？",
+                "answer": "您的工作区拥有自己的私有机器，与其他所有客户隔离，您的数据就留在其中。我们不会用您的内容训练模型，我们调用的模型提供商也受合同约束不得这样做。"
+            },
+            "setup": {
+                "question": "我到底需要设置什么？",
+                "answer": "三件事，只需一次。连接您的业务已在使用的应用，雇用一位同事并告诉它工作内容，再说明它应该何时运行。剩下的交给它。"
+            },
+            "howLong": {
+                "question": "多久之后我的第一位同事就能开始工作？",
+                "answer": "几分钟。挑一位现成的同事，或用您自己的话描述工作，连接一两个工具，它就开始了。"
+            },
+            "where": {
+                "question": "我的同事实际在哪里运行？",
+                "answer": "在云端属于它们自己的机器上，位于欧洲，每个工作区一台，与其他所有人隔离。它始终在线，文件、记忆和数据库都保存在其中。"
+            },
+            "laptop": {
+                "question": "我合上笔记本电脑后它还会继续运行吗？",
+                "answer": "会。您的同事运行在云端自己的机器上，这台机器从不休眠。合上电脑去睡觉吧：早上 7 点的运行照常进行，您回来时结果已经在那里了。"
+            },
+            "memory": {
+                "question": "同事在两次运行之间会记得我的业务吗？",
+                "answer": "会，这正是它最大的价值。它保留自己的文件、笔记，以及对您的产品、市场和客户的了解，所以它知道 Acme 是 60 天付款，不用您说第二遍。周一，聊天机器人从零开始；您的同事则打开它已经积累了好几周的文件。"
+            },
+            "unwanted": {
+                "question": "如果同事做了我不想要的事怎么办？",
+                "answer": "它会先停下来问您。在任何重要操作之前，比如花钱、给客户发邮件或删除内容，它都会暂停并等您同意。而且每次运行都在看板上，没有什么是您事后看不到的。"
+            },
+            "tools": {
+                "question": "我的同事可以使用哪些工具？",
+                "answer": "Stripe、HubSpot、Notion、Linear、Google Drive 以及其他 {connectors}+ 款工具，还支持任何 MCP 服务器，您的同事会自行接入工作所需的工具。即使是没有连接器的工具它也能用：像您一样在自己的电脑上打开它们。"
+            },
+            "together": {
+                "question": "同事之间可以协作吗？",
+                "answer": "可以。它们会相互交接工作：一位寻找线索，下一位给线索写信，第三位归档结果。您只需提一次，整个流程就会自动运转，无需您居中协调。"
+            },
+            "watch": {
+                "question": "我可以实时看它们工作吗？",
+                "answer": "可以，这正是核心理念。所有同事都在同一个看板上，工作时实时更新，需要细节时还能查看每次运行的完整历史。"
+            },
+            "takeOver": {
+                "question": "我可以在运行中途接手吗？",
+                "answer": "可以。打开它的屏幕并接过鼠标：自己完成登录，修正它填错的字段，再交还给它。它会从那个页面继续。"
+            },
+            "wrong": {
+                "question": "出问题时我怎么知道？",
+                "answer": "它会告诉您。运行失败、有问题要问、等待批准、某个应用断开连接：每种情况都会让该同事在看板上突出显示，并按您选择的方式通过邮件或通知提醒您。"
+            },
+            "stuck": {
+                "question": "如果我不在时同事卡住了怎么办？",
+                "answer": "它会等待，您团队中的任何人都可以回复它。几秒后它就会从停下的地方继续。您也可以给它留下规则让它自行回答，这样它只会在您想亲自决定的事情上等您。"
+            },
+            "phone": {
+                "question": "我可以在手机上使用 Rerun 吗？",
+                "answer": "可以。Rerun 可以在手机浏览器中运行，并能像应用一样添加到主屏幕。看板、对话和审批都为小屏幕设计，排队时也能帮同事解除阻塞。"
+            },
+            "billing": {
+                "question": "如何计费？按人头付费吗？",
+                "answer": "从不按人头计费。每月 {price} 即可拥有无限同事、它们的私有机器，以及工作区内任意数量的队友，无需额外费用。唯一随您增长的是您的 Rerun 积分。积分不只用于我们托管的模型，也用于支付您的同事对 {connectors}+ 款工具发起的请求。"
+            },
+            "subscription": {
+                "question": "必须订阅 Claude 或 ChatGPT 吗？",
+                "answer": "不必。每个套餐都附带我们托管模型的积分，您的同事第一天就能工作，无需连接任何东西。如果您已经在为 Claude 或 ChatGPT 套餐付费，可以接入它：这些运行在我们这边不产生任何费用，我们也从不计入。"
+            },
+            "models": {
+                "question": "我可以使用哪些 AI 模型？",
+                "answer": "Claude、ChatGPT、Grok 等，并且可以为每位同事单独选择：整理收件箱用快速便宜的模型，必须做对的工作用最强的模型。"
+            },
+            "data": {
+                "question": "邮箱、电话号码等数据怎么收费？",
+                "answer": "从您的 Rerun 积分中扣除，且邮箱或电话号码只有在找到时才计费。搜索之前，您的同事会告诉您费用并等您同意。无需订阅任何数据提供商。"
+            }
+        }
+    },
+    "foreman": {
+        "role": "您的 Chief of Staff",
+        "title": "认识您最喜欢的新队友。",
+        "powers": {
+            "voice": {
+                "title": "用语音管理您的同事",
+                "detail": "按住<kbd>空格键</kbd>说出您的需求，它会转告合适的同事。"
+            },
+            "partner": {
+                "title": "积极主动的业务伙伴",
+                "detail": "它会在您开口之前行动，覆盖您的整个业务和每位同事。"
+            },
+            "autopilot": {
+                "title": "让您的业务自动运转",
+                "detail": "您不在时，它会管理您的同事，并按您的规则回复它们。"
+            }
+        },
+        "voice": {
+            "listening": "正在聆听 · 松开空格键发送",
+            "transcribing": "正在转写...",
+            "thinking": "正在思考...",
+            "running": "正在运行“给同事发消息”",
+            "space": "空格",
+            "prompts": {
+                "lastNight": "昨晚运行了什么？",
+                "failed": "那次运行为什么失败了？",
+                "build": "帮我创建一位新同事"
+            },
+            "reply": "马上办！🙌 我已请您的销售开发代表整理本周的新线索，中午前会送到您的收件箱。",
+            "open": "打开对话"
+        },
+        "partner": {
+            "thinking": "正在思考...",
+            "pastDue": "本周有 12 张发票逾期。",
+            "offer": "要我雇一位记账员每周一去催收吗？",
+            "yes": "好的，去做吧。",
+            "running": "正在运行“创建同事”",
+            "steps": "{count, plural, other {# 个步骤}}",
+            "done": "完成！您的记账员将于周一 9 点开始工作。"
+        },
+        "autopilot": {
+            "name": "Autopilot",
+            "answering": "正在回复{job}...",
+            "leftForYou": "留给您处理",
+            "answered": "已回复",
+            "rules": "按您的规则回复",
+            "now": "刚刚",
+            "waiting": "等待您处理",
+            "byAutopilot": "由 Autopilot 回复",
+            "to": "Autopilot · 致您的{job}",
+            "asks": {
+                "reminder": {
+                    "topic": "未付发票",
+                    "question": "今天给 Acme 发第三次提醒吗？",
+                    "answer": "是的，今天发。语气友好些。"
+                },
+                "leads": {
+                    "topic": "新线索",
+                    "question": "现在给 12 条新线索发邮件吗？",
+                    "answer": "是的，用四月的模板。"
+                },
+                "verify": {
+                    "topic": "线索调研",
+                    "question": "支付 {amount} 验证 50 条线索吗？",
+                    "answer": "花钱需要等您同意。"
+                }
+            }
+        }
+    }
+}

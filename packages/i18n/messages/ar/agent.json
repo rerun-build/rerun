@@ -1,0 +1,1081 @@
+{
+    "untitledBox": "Box بلا عنوان",
+    "agentCard": {
+        "destinations": {
+            "services": "التطبيقات",
+            "skills": "المهارات",
+            "memories": "المعرفة",
+            "scheduled": "الروتينات",
+            "files": "الملفات",
+            "data": "قاعدة البيانات",
+            "monitoring": "النشاط",
+            "settings": "الإعدادات"
+        },
+        "delete": "حذف هذا الزميل",
+        "share": "مشاركة",
+        "close": "إغلاق البطاقة",
+        "nameField": "اسم الزميل",
+        "rename": "إعادة تسمية {name}"
+    },
+    "agentChatsList": {
+        "title": "المحادثات",
+        "newThread": "محادثة جديدة",
+        "close": "إغلاق",
+        "filters": {
+            "all": "الكل",
+            "chats": "الدردشات",
+            "automations": "الأتمتة",
+            "needs": "تحتاجك"
+        },
+        "markAllRead": {
+            "title": "تعليم الكل كمقروء؟",
+            "description": "{count, plural, zero {لن تغادر أي محادثة} one {ستغادر محادثة واحدة} two {ستغادر محادثتان} few {ستغادر # محادثات} many {ستغادر # محادثة} other {ستغادر # محادثة}} هذه القائمة. تُمسح أيضًا الطلبات التي لا تزال تنتظر إجابة، دون الرد عليها.",
+            "confirm": "تعليم الكل كمقروء"
+        },
+        "emptyNeeds": "لا شيء ينتظرك.",
+        "emptyThreads": "لا توجد محادثات بعد.",
+        "emptyAutomations": "لا يوجد تشغيل آلي بعد.",
+        "running": "قيد التشغيل",
+        "startedBy": "بدأها {name}",
+        "moreFor": "المزيد لـ {title}",
+        "loadOlderFailed": "تعذّر تحميل المحادثات الأقدم. حاول مجددًا"
+    },
+    "agentComputerThumbnail": {
+        "working": "يعمل على حاسوبه",
+        "live": "حاسوبه",
+        "computer": "الحاسوب",
+        "wentAway": "اختفت الشاشة"
+    },
+    "agentView": {
+        "closePanel": "إغلاق اللوحة",
+        "views": {
+            "apps": "التطبيقات",
+            "skills": "المهارات",
+            "knowledge": "المعرفة",
+            "files": "الملفات",
+            "data": "قاعدة البيانات",
+            "routines": "الروتينات",
+            "activity": "النشاط",
+            "settings": "الإعدادات"
+        },
+        "tabs": {
+            "services": "التطبيقات",
+            "mcp": "MCP",
+            "skills": "المهارات",
+            "memories": "المعرفة",
+            "files": "الملفات",
+            "published": "المنشور",
+            "data": "قاعدة البيانات",
+            "scheduled": "المجدولة",
+            "triggers": "المشغّلات",
+            "monitoring": "المراقبة",
+            "logs": "السجلات",
+            "settings": "عام",
+            "tools": "القدرات",
+            "setup": "التثبيت"
+        }
+    },
+    "openChatsTabs": {
+        "closeTab": "إغلاق {title}",
+        "closeTabMenu": "إغلاق علامة التبويب",
+        "newThread": "محادثة جديدة",
+        "general": "عام"
+    },
+    "sessionRename": {
+        "rename": "إعادة تسمية",
+        "label": "اسم المحادثة",
+        "failed": "تعذّرت إعادة التسمية. حاول مجددًا."
+    },
+    "threadBranch": {
+        "needs": "تحتاجك",
+        "error": "خطأ",
+        "opener": {
+            "schedule": "تشغيل مجدول · {name}",
+            "trigger": "عبر Webhook · {name}",
+            "askedBy": "طلبها {name}",
+            "askedByUnknown": "طلبها زميل آخر",
+            "started": "بدأ محادثة"
+        }
+    },
+    "floating": {
+        "backToChat": "العودة إلى المحادثة"
+    },
+    "agentPanelServices": {
+        "uninstallFailed": "فشل إلغاء تثبيت التطبيق",
+        "removeServerFailed": "فشلت إزالة الخادم",
+        "loadServerFailed": "تعذّر تحميل هذا الخادم من المحرك.",
+        "alternativeLoadFailed": "تعذّر تحميل {name}.",
+        "signInHint": "سجّل الدخول إلى {host} ليتمكن الزميل من استخدام أدواته.",
+        "searchPlaceholder": "ابحث في التطبيقات…",
+        "allCategories": "الكل",
+        "installed": "المثبّتة",
+        "library": "المكتبة",
+        "needsAuthHint": "يتطلب هذا التطبيق تسجيل دخولك قبل أن يتمكن الزميل من استخدامه. انقر على ربط.",
+        "needsConfigHint": "يحتاج هذا التطبيق إلى بيانات اعتماد قبل أن يتمكن الزميل من استخدامه. انقر على تهيئة لإعداده.",
+        "configure": "تهيئة",
+        "connect": "ربط",
+        "account": "الحساب",
+        "reconnect": "إعادة الربط",
+        "uninstall": "إلغاء تثبيت {name}",
+        "uninstallLabeled": "إلغاء تثبيت {name} ({label})",
+        "uninstallConfirm": "إلغاء تثبيت {name}؟",
+        "uninstallLabeledConfirm": "إلغاء تثبيت {name} ({label})؟",
+        "uninstallDescription": "يفقد الزميل هذه الخدمة وأدواتها. يُلغى اتصالها، لذا تعني إعادة التثبيت الربط من جديد.",
+        "uninstallAction": "إلغاء التثبيت",
+        "requestHint": "لم تجد ما تبحث عنه؟ يمكننا إضافة التطبيق الذي تحتاجه.",
+        "requestApp": "اطلب تطبيقًا",
+        "vaultBadge": "Vault",
+        "fromVault": "من Vault",
+        "vaultAdd": "إضافة",
+        "vaultShared": "يحصل عليه كل زميل من Vault. غيّره هناك.",
+        "vaultRemove": "إزالة {name} من هذا الزميل",
+        "vaultRemoveConfirm": "إزالة {name} من هذا الزميل؟",
+        "vaultRemoveDescription": "يبقى في Vault، للزملاء الآخرين ولوقت لاحق.",
+        "vaultRemoveAction": "إزالة",
+        "vaultAttachFailed": "تعذّرت إضافة {name}"
+    },
+    "agentPanelMcp": {
+        "unreachableTitle": "تعذّر الوصول إلى المحرك",
+        "unreachableDescription": "تعذّر الوصول إلى محرك هذا الزميل.",
+        "new": "جديد",
+        "emptyTitle": "لا توجد خوادم MCP بعد",
+        "emptyDescription": "تمنح خوادم MCP زميلك أدوات إضافية تتجاوز التطبيقات المدمجة. أضف خادمًا لتوسيع ما يمكنه فعله.",
+        "appBadge": "تطبيق",
+        "count": "{count, plural, zero {# خادم MCP} one {خادم MCP واحد} two {خادما MCP} few {# خوادم MCP} many {# خادم MCP} other {# خادم MCP}}"
+    },
+    "mcpOAuthAuthorize": {
+        "discoveryFailed": "فشل الاكتشاف",
+        "authorizationFailed": "فشل التفويض",
+        "startFailed": "فشل بدء OAuth",
+        "discovering": "جارٍ اكتشاف مزوّد OAuth...",
+        "connected": "متصل",
+        "retry": "إعادة المحاولة",
+        "waiting": "في انتظار التفويض…",
+        "connect": "ربط"
+    },
+    "mcpServerEditor": {
+        "invalidName": "يجب أن يتكون الاسم من 1 إلى 64 حرفًا: أحرف أو أرقام أو شرطات سفلية أو شرطات.",
+        "storeCredentialsFailed": "فشل حفظ بيانات الاعتماد",
+        "saveFailed": "فشل الحفظ",
+        "deleteFailed": "فشل الحذف",
+        "secretWarning": "تم اكتشاف سرّ هنا. ينتقل إلى المحرك ويصبح {token} عند الحفظ.",
+        "titleReadOnly": "خادم MCP",
+        "titleEdit": "تعديل خادم MCP",
+        "titleNew": "خادم MCP جديد",
+        "providedByApp": "يوفّر تطبيق خادم MCP هذا ويُدار تلقائيًا.",
+        "name": "الاسم",
+        "nameHelper": "تُدمج الأدوات بالشكل \"{prefix}_{tool}\".",
+        "namePrefixFallback": "name",
+        "transport": "النقل",
+        "command": "الأمر",
+        "arguments": "الوسائط",
+        "argumentsHelper": "وسيط واحد في كل سطر.",
+        "argumentsHelperEditable": "وسيط واحد في كل سطر. انقر على {token} المميز لتغيير القيمة التي خلفه.",
+        "url": "URL",
+        "urlHelper": "انقر على {token} المميز لتغيير القيمة التي خلفه.",
+        "environment": "البيئة",
+        "environmentHelper": "KEY=value واحد في كل سطر. تُحفظ القيم على المحرك.",
+        "environmentHelperEditable": "KEY=value واحد في كل سطر. تُحفظ القيم على المحرك؛ انقر على {token} المميز لتغيير القيمة التي خلفه.",
+        "headers": "الترويسات",
+        "headersHelper": "Header=value واحد في كل سطر. تُرسل مع كل طلب (للمصادقة).",
+        "headersHelperEditable": "Header=value واحد في كل سطر. تُرسل مع كل طلب (للمصادقة). انقر على {token} المميز لتغيير القيمة التي خلفه.",
+        "deleteServer": "حذف الخادم",
+        "deleteConfirm": "حذف {name}؟",
+        "deleteConfirmUnnamed": "حذف هذا الخادم؟",
+        "deleteDescription": "يفقد الزميل كل أداة يوفرها هذا الخادم. وتُحذف متغيراته المحفوظة معه.",
+        "saveChanges": "حفظ التغييرات",
+        "createServer": "إنشاء الخادم",
+        "nameProposed": "{source, select, address {مقترح من العنوان، غيّر الاسم إن أردت} other {مقترح من الحزمة، غيّر الاسم إن أردت}}",
+        "transportGuessed": "مستنتج من العنوان",
+        "incomplete": "أعطِ كل خادم اسمًا وأمرًا أو عنوانًا",
+        "duplicateName": "خادمان يحملان الاسم \"{name}\"",
+        "addServers": "{count, plural, zero {إضافة # خادم} one {إضافة خادم واحد} two {إضافة خادمين} few {إضافة # خوادم} many {إضافة # خادمًا} other {إضافة # خادم}}"
+    },
+    "mcpVariableToken": {
+        "editVariable": "تعديل المتغير {name}",
+        "statusSaved": "محفوظ",
+        "statusEngine": "مضبوط على المحرك",
+        "statusUnset": "غير مضبوط",
+        "placeholderOverride": "أدخل قيمة لاستبدالها",
+        "placeholderNew": "أدخل قيمة",
+        "helperSaved": "محفوظ على المحرك ولن يُعرض مجددًا. اكتب قيمة جديدة لاستبداله.",
+        "helperEngine": "توفّره بيئة المحرك. حفظ قيمة يستبدله لهذا الزميل.",
+        "helperUnset": "يُحفظ على المحرك، بعيدًا عن المتصفح وقاعدة البيانات.",
+        "remove": "إزالة {name}",
+        "save": "حفظ",
+        "removeConfirm": "إزالة {name}؟",
+        "removeDescription": "تُحذف القيمة من المحرك. يتوقف أي خادم يستخدم هذا المتغير عن العمل حتى تضبطه مجددًا.",
+        "removeAction": "إزالة"
+    },
+    "agentPanelTools": {
+        "unreachable": "تعذّر الوصول إلى محرك هذا الزميل.",
+        "updateFailed": "فشل التحديث",
+        "lockedByKind": "يحتفظ Chief of Staff بهذه دائمًا.",
+        "unavailableTitle": "القدرات غير متاحة",
+        "intro": "اختر ما يمكن لهذا الزميل فعله. تُطبّق التغييرات في التشغيل التالي.",
+        "about": "حول {capability}",
+        "includes": "يشمل",
+        "selfImprovement": {
+            "allowToolInstall": {
+                "label": "تثبيت الأدوات وMCP",
+                "description": "السماح للزميل بتثبيت الحزم عبر npm وتسجيل خوادم MCP."
+            },
+            "allowSoulEdit": {
+                "label": "تعديل روحه",
+                "description": "السماح للزميل بإعادة كتابة هويته في SOUL.md."
+            },
+            "autoMemory": {
+                "label": "ذاكرة تلقائية",
+                "description": "تنظيم الذكريات تلقائيًا بعد كل دورة."
+            }
+        },
+        "capabilities": {
+            "filesystem": {
+                "label": "قراءة الملفات وكتابتها",
+                "blurb": "العمل على الملفات في مساحة عمله",
+                "help": "يتيح للزميل فتح الملفات وإنشاءها وتعديلها في مساحة عمله الخاصة."
+            },
+            "shell": {
+                "label": "تشغيل الأوامر",
+                "blurb": "تنفيذ الأوامر على جهازه",
+                "help": "يتيح للزميل تشغيل أوامر الطرفية لتثبيت الأدوات وأتمتة المهام."
+            },
+            "web": {
+                "label": "تصفح الويب",
+                "blurb": "البحث في صفحات الويب وقراءتها",
+                "help": "يتيح للزميل البحث في الإنترنت وقراءة صفحات الويب للعثور على المعلومات."
+            },
+            "memory": {
+                "label": "التذكّر",
+                "blurb": "حفظ المعلومات واستعادتها",
+                "help": "يتيح للزميل حفظ الحقائق عبر عمليات التشغيل واستعادتها لاحقًا."
+            },
+            "db": {
+                "label": "الوصول إلى البيانات",
+                "blurb": "الاستعلام في قاعدة بياناته",
+                "help": "يتيح للزميل قراءة البيانات المنظمة وكتابتها في قاعدة بياناته الخاصة."
+            },
+            "brain": {
+                "label": "استخدام Brain الشركة",
+                "blurb": "قراءة ما اعتمدته الشركة",
+                "help": "يتيح للزميل البحث في Brain وقراءته، وهو الصفحات التي اعتمدها فريقك عن الشركة، واقتراح تغييرات تراجعها قبل حفظ أي شيء."
+            },
+            "sharedDb": {
+                "label": "الوصول إلى البيانات المشتركة",
+                "blurb": "الاستعلام في قاعدة البيانات المشتركة",
+                "help": "يتيح للزميل قراءة قاعدة البيانات التي يتشاركها كل زملاء مساحة العمل والكتابة فيها."
+            },
+            "skills": {
+                "label": "استخدام المهارات",
+                "blurb": "تشغيل المهارات المثبّتة",
+                "help": "يتيح للزميل استخدام المهارات التي ثبّتها للمهام المتخصصة."
+            },
+            "self": {
+                "label": "تحسين نفسه",
+                "blurb": "ضبط إعداده الخاص",
+                "help": "يتيح للزميل تحسين تعليماته وتهيئته الخاصة بمرور الوقت."
+            },
+            "schedule": {
+                "label": "جدولة المهام",
+                "blurb": "التخطيط للعمل لاحقًا",
+                "help": "يتيح للزميل جدولة مهام تعمل تلقائيًا في وقت محدد."
+            },
+            "trigger": {
+                "label": "الاستجابة لـ Webhooks",
+                "blurb": "العمل عندما يستدعيه تطبيق آخر",
+                "help": "يتيح للزميل توفير روابط URL عامة تبدأ تشغيلًا عندما تستدعيها خدمة خارجية."
+            },
+            "callAgent": {
+                "label": "العمل مع زملاء آخرين",
+                "blurb": "التفويض لأعضاء الفريق",
+                "help": "يتيح للزميل تسليم العمل إلى زملاء آخرين في مساحة العمل."
+            },
+            "team": {
+                "label": "رؤية الزملاء الآخرين",
+                "blurb": "قراءة روتيناتهم وعمليات تشغيلهم",
+                "help": "يتيح للزميل الاطلاع على الزملاء الآخرين في مساحة العمل: حالتهم ومهامهم المجدولة ومشغّلاتهم وعمليات تشغيلهم الأخيرة، مع الأدوات التي استدعاها كل تشغيل عندما يحتاج إلى فهم فشل ما. لا يمكنه تغيير أي شيء. قد يحتوي التشغيل على بيانات من التطبيقات المرتبطة بالزميل الآخر."
+            },
+            "aiProviders": {
+                "label": "رؤية مزوّدي الذكاء الاصطناعي",
+                "blurb": "النموذج المستخدم والرصيد والحصص",
+                "help": "يتيح للزميل معرفة مزوّد الذكاء الاصطناعي والنموذج الذي يعمل عليه، والمزوّدين الآخرين المرتبطين بمساحة العمل، وما تبقى في كل منهم: رصيد Rerun وحدود اشتراك Claude أو Codex أو OpenCode. لا يمكنه تغيير أي شيء."
+            },
+            "askUser": {
+                "label": "طرح الأسئلة عليك",
+                "blurb": "التوقف للسؤال مع خيارات للإجابة",
+                "help": "يتيح للزميل التوقف وطرح سؤال عليك مع خيارات للإجابة قبل المتابعة."
+            },
+            "requestApproval": {
+                "label": "طلب الموافقة",
+                "blurb": "التوقف لانتظار إذنك",
+                "help": "يتيح للزميل التوقف وطلب موافقتك على إجراء أو رفضه قبل تنفيذه."
+            },
+            "cards": {
+                "label": "عرض البطاقات في المحادثة",
+                "blurb": "معاينة جدول أو ملف مباشرة",
+                "help": "يتيح للزميل وضع بطاقة معاينة في المحادثة: الصفوف الأولى من أحد جداوله، أو ملف من مساحة عمله، يمكنك فتحه بنقرة واحدة."
+            },
+            "quickReplies": {
+                "label": "اقتراح الردود",
+                "blurb": "تقديم إجابات بنقرة واحدة",
+                "help": "يتيح للزميل إنهاء رسالة بما يصل إلى ثلاثة ردود قصيرة يمكنك إرسالها بنقرة واحدة، مثل \"ابحث عن 100 أخرى\"."
+            },
+            "computer": {
+                "label": "استخدام حاسوبه",
+                "blurb": "رؤية شاشته والتحكم بها",
+                "help": "يتيح للزميل النظر إلى سطح مكتبه والنقر والكتابة والتمرير في متصفحه وملفاته وطرفيته، للأعمال التي يجب إنجازها يدويًا في تطبيق أو موقع. يمكنك مشاهدته مباشرة، ويتوقف مؤقتًا عندما تتحكم بالشاشة بنفسك."
+            },
+            "remoteComputers": {
+                "label": "استخدام الحواسيب المرتبطة",
+                "blurb": "العمل على الحواسيب التي ربطها الأشخاص",
+                "help": "يتيح للزميل تشغيل الأوامر وقراءة الملفات وكتابتها وبدء مهام طويلة على الحواسيب التي ربطها الأشخاص بمساحة العمل من تطبيق Rerun لسطح المكتب، والمسماة بـ #. كل أمر وكل مجلد خارج المسموح بها ينتظر موافقة الشخص في المحادثة، ما لم يقرر مالك الحاسوب غير ذلك."
+            },
+            "paidData": {
+                "label": "بيانات العملاء المحتملين وSEO والتواصل الاجتماعي",
+                "blurb": "تُدفع من رصيد Rerun",
+                "help": "يتيح للزميل العثور على العملاء المحتملين وبريدهم المهني وأرقام هواتفهم وبيانات شركاتهم، والتحقق من أحجام البحث وأفكار الكلمات المفتاحية والروابط الخلفية، وقراءة نتائج Google والأنشطة التجارية المحلية، وقراءة الملفات الشخصية والمنشورات العامة على LinkedIn وTikTok وInstagram وX وYouTube وFacebook وReddit، دون اشتراك في Apollo أو Semrush أو خدمة استخراج بيانات. تُدفع كل عملية من رصيد Rerun، ويطلب منك الزميل الموافقة على تكلفة تقديرية أولًا."
+            },
+            "requestSecret": {
+                "label": "طلب بيانات اعتماد",
+                "blurb": "التوقف لطلب مفتاح يُدخل بأمان",
+                "help": "يتيح للزميل التوقف وطلب مفتاح API أو رمز منك في نموذج مخفي. تُحفظ القيمة كمتغير للزميل ولا تدخل المحادثة أبدًا."
+            }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "الإنفاق دون سؤال",
+            "description": "تخطي الموافقة على التكلفة، لتتمكن عمليات التشغيل المجدولة والمهام المفوّضة من استخدام البيانات المدفوعة في غيابك."
+        }
+    },
+    "agentPanelTriggers": {
+        "new": "جديد",
+        "emptyTitle": "لا توجد مشغّلات بعد",
+        "emptyDescription": "يمنح المشغّل زميلك رابط URL عامًا. كلما استدعته خدمة أخرى، يعمل الزميل بالبيانات التي تلقاها.",
+        "summary": "{methods} · {count, plural, zero {# استدعاء} one {استدعاء واحد} two {استدعاءان} few {# استدعاءات} many {# استدعاءً} other {# استدعاء}}",
+        "paused": "متوقف",
+        "neverCalled": "لم يُستدعَ بعد",
+        "count": "{count, plural, zero {# مشغّل} one {مشغّل واحد} two {مشغّلان} few {# مشغّلات} many {# مشغّلًا} other {# مشغّل}}"
+    },
+    "triggerEditor": {
+        "saveFailed": "فشل الحفظ",
+        "rotateFailed": "فشل تدوير السر",
+        "deleteFailed": "فشل الحذف",
+        "titleEdit": "تعديل المشغّل",
+        "titleReadOnly": "المشغّل",
+        "titleNew": "مشغّل جديد",
+        "history": "السجل",
+        "name": "الاسم",
+        "nameLockedHelper": "لا يمكن تغيير الاسم (فهو يحدد URL).",
+        "nameHelper": "يُشتق URL من هذا الاسم.",
+        "namePlaceholder": "دفع GitHub",
+        "description": "الوصف",
+        "descriptionPlaceholder": "يعمل عند وصول commit إلى main",
+        "methods": "الطرق المقبولة",
+        "methodsGetHelper": "GET مخصص للخدمات التي لا تستطيع إلا استدعاء URL بسيط. تُتجاهل معاينات الروابط وزيارات المتصفح.",
+        "methodsHelper": "ترسل معظم الخدمات POST.",
+        "modelHelper": "النموذج الذي يعمل عليه هذا المشغّل عند انطلاقه. يتطلب مفتاح API الخاص بالمزوّد.",
+        "enabled": "مفعّل",
+        "prompt": "موجّه المشغّل",
+        "promptDialogTitle": "تعديل موجّه المشغّل",
+        "promptHelper": "ما يشغّله الزميل عند استدعاء URL (جلسة جديدة في كل مرة). تُرفق بيانات المستدعي أسفله.",
+        "promptPlaceholder": "وصل commit للتو. راجع الفرق في البيانات وانشر ملخصًا على Slack.",
+        "delete": "حذف المشغّل",
+        "deleteConfirm": "حذف {name}؟",
+        "deleteConfirmUnnamed": "حذف هذا المشغّل؟",
+        "deleteDescription": "يتوقف URL الخاص بـ Webhook عن الاستجابة فورًا. وكل ما لا يزال يستدعيه يبدأ بالفشل.",
+        "saveChanges": "حفظ التغييرات",
+        "create": "إنشاء المشغّل"
+    },
+    "triggerUrlField": {
+        "label": "URL الخاص بـ Webhook",
+        "noSecretHelper": "يُصدر التدوير سرًا جديدًا وURL المرتبط به.",
+        "noSecret": "لا يملك هذا المشغّل سرًا بعد، لذا لا يملك URL.",
+        "getUrl": "الحصول على URL",
+        "helper": "يمكن لأي شخص يملك هذا URL بدء تشغيل. تعامل معه كسرّ. نسخه أو معاينته في محادثة أو فتحه في متصفح لا يبدأ أي شيء.",
+        "copy": "نسخ URL الخاص بـ Webhook",
+        "rotateConfirm": "تدوير سر Webhook؟",
+        "rotateDescription": "يتوقف URL الحالي عن العمل فورًا. عليك لصق URL الجديد في كل مكان يُستدعى منه هذا المشغّل.",
+        "rotateAction": "تدوير",
+        "rotate": "تدوير السر"
+    },
+    "agentPanelScheduled": {
+        "new": "جديد",
+        "emptyTitle": "لا توجد مهام مجدولة بعد",
+        "emptyDescription": "اطلب من زميلك القيام بشيء ما وفق جدول (تقرير يومي، ملخص أسبوعي) وستظهر المهام المتكررة هنا.",
+        "paused": "متوقف",
+        "noExecutions": "لا توجد عمليات تنفيذ بعد",
+        "picker": {
+            "when": "متى",
+            "notSet": "غير محدد",
+            "describe": "صف الجدول",
+            "describePlaceholder": "كل يوم عمل الساعة 8 صباحًا",
+            "update": "تحديث الجدول"
+        },
+        "editor": {
+            "saveFailed": "فشل الحفظ",
+            "runFailed": "فشل تشغيل المهمة",
+            "deleteFailed": "فشل الحذف",
+            "titleEdit": "تعديل المهمة",
+            "titleReadOnly": "المهمة",
+            "titleNew": "مهمة جديدة",
+            "history": "السجل",
+            "name": "الاسم",
+            "nameLockedHelper": "لا يمكن تغيير الاسم (فهو يحدد المعرّف).",
+            "namePlaceholder": "ملخص يومي",
+            "description": "الوصف",
+            "descriptionPlaceholder": "ملخص الصباح",
+            "timezone": "المنطقة الزمنية",
+            "modelHelper": "النموذج الذي تعمل عليه هذه المهمة عند انطلاقها. يتطلب مفتاح API الخاص بالمزوّد.",
+            "enabled": "مفعّلة",
+            "prompt": "موجّه المهمة",
+            "promptDialogTitle": "تعديل موجّه المهمة",
+            "promptHelper": "الموجّه الذي يشغّله الزميل عند انطلاق المهمة (جلسة جديدة في كل مرة).",
+            "promptPlaceholder": "لخّص ملاحظات الأمس وأرسل لي ملخصًا بالبريد.",
+            "setupPendingContinue": "يُتاح التشغيل التجريبي بعد اكتمال الإعداد. <link>تابع الإعداد</link>",
+            "setupPendingStart": "يُتاح التشغيل التجريبي بعد اكتمال الإعداد. ابدأه من المحادثة أولًا.",
+            "delete": "حذف المهمة",
+            "deleteConfirm": "حذف {name}؟",
+            "deleteConfirmUnnamed": "حذف هذه المهمة؟",
+            "deleteDescription": "تتوقف المهمة عن الانطلاق ويُزال جدولها. تُحفظ عمليات التشغيل التي أنتجتها بالفعل.",
+            "testRun": "تشغيل تجريبي",
+            "saveChanges": "حفظ التغييرات",
+            "create": "إنشاء المهمة"
+        },
+        "count": "{count, plural, zero {# مهمة مجدولة} one {مهمة مجدولة واحدة} two {مهمتان مجدولتان} few {# مهام مجدولة} many {# مهمة مجدولة} other {# مهمة مجدولة}}"
+    },
+    "taskNotifyField": {
+        "label": "أبلغني",
+        "muted": "هذا الزميل مكتوم"
+    },
+    "taskOutcomeFooter": {
+        "lastRun": "آخر تشغيل منذ {time}",
+        "neverRan": "لم يعمل قط",
+        "failed": "فشل",
+        "done": "تم"
+    },
+    "modelsShared": {
+        "boxManageReason": "يمكن للمسؤول أو مدير هذا Box فقط تغيير هذا",
+        "creditPaused": "رصيد Rerun متوقف"
+    },
+    "modelSelector": {
+        "setUp": "إعداد نموذج",
+        "defaultLabel": "الافتراضي · {model}",
+        "select": "اختيار النموذج",
+        "loading": "جارٍ التحميل",
+        "empty": "لا توجد نماذج متاحة",
+        "workspaceDefault": "الافتراضي لمساحة العمل",
+        "coworkerDefault": "الافتراضي للزميل",
+        "setCoworkerDefault": "تعيين كافتراضي للزميل",
+        "makeDefault": "جعل {model} الافتراضي لهذا الزميل",
+        "refused": "{model} · {reason}. اختر نموذجًا آخر أدناه.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "الاستدلال",
+        "reasoningOf": "استدلال {model}",
+        "effortDefault": "افتراضي",
+        "effortLow": "منخفض",
+        "effortMedium": "متوسط",
+        "effortHigh": "مرتفع",
+        "effortDefaultHint": "اختيار المزوّد",
+        "effortLowHint": "إجابات سريعة",
+        "effortMediumHint": "متوازن",
+        "effortHighHint": "يفكر لوقت أطول"
+    },
+    "modelPickerProviders": {
+        "pitch": {
+            "claude": {
+                "plan": "Claude Pro أو Max",
+                "hint": "سجّل الدخول بحساب Claude",
+                "nudge": "لديك Claude Pro أو Max؟"
+            },
+            "codex": {
+                "plan": "ChatGPT Plus أو Pro",
+                "hint": "سجّل الدخول بحساب ChatGPT",
+                "nudge": "لديك ChatGPT Plus أو Pro؟"
+            }
+        },
+        "hints": {
+            "claude": "Pro أو Max",
+            "codex": "Plus أو Pro",
+            "anthropic": "نماذج Claude",
+            "openai": "نماذج GPT",
+            "google": "نماذج Gemini",
+            "openrouter": "كل النماذج"
+        },
+        "pitchHeading": "اعمل على الخطة التي تدفع مقابلها بالفعل",
+        "connect": "ربط",
+        "addProvider": "إضافة مزوّد",
+        "sections": {
+            "subscription": "اشتراك",
+            "api": "مفتاح API"
+        },
+        "connected": "متصل",
+        "manage": "إدارة الاتصالات"
+    },
+    "runModelField": {
+        "label": "النموذج",
+        "placeholder": "اختر نموذجًا",
+        "coworkerDefault": "الافتراضي للزميل",
+        "coworkerDefaultWithModel": "الافتراضي للزميل · {model}",
+        "current": "الحالي"
+    },
+    "planLimitHint": {
+        "windows": {
+            "session": "الجلسة",
+            "fiveHour": "5 ساعات",
+            "weekly": "أسبوعي",
+            "monthly": "شهري",
+            "modelWeekly": "{label} أسبوعي",
+            "modelWeeklyUnnamed": "النموذج أسبوعيًا"
+        },
+        "windowUsed": "{name}: استُخدم {percent}",
+        "windowResets": "{name}: استُخدم {percent}، يُعاد ضبطه {when}",
+        "paused": "متوقف",
+        "credit": {
+            "usedUpOn": "نفد الرصيد الشهري، يعود في {date}",
+            "usedUpNextMonth": "نفد الرصيد الشهري، يعود الشهر القادم",
+            "usageOn": "الرصيد الشهري: استُخدم {percent}%، يُعاد ضبطه في {date}",
+            "usageNextMonth": "الرصيد الشهري: استُخدم {percent}%، يُعاد ضبطه الشهر القادم"
+        }
+    },
+    "skillEditor": {
+        "titleView": "المهارة",
+        "titleEdit": "تعديل المهارة",
+        "titleNew": "مهارة جديدة",
+        "download": "تنزيل المهارة",
+        "connectorManaged": "يوفّر تطبيق هذه المهارة وتُدار تلقائيًا.",
+        "name": "الاسم",
+        "nameLocked": "لا يمكن تغيير الاسم (فهو يحدد المعرّف).",
+        "namePlaceholder": "بحث على الويب",
+        "description": "الوصف",
+        "descriptionPlaceholder": "كيفية البحث في موضوع",
+        "procedure": "الإجراء",
+        "procedureDialogTitle": "تعديل الإجراء",
+        "procedurePlaceholder": "1. حدد المصادر\n2. اجلبها\n3. لخّصها",
+        "delete": "حذف المهارة",
+        "deleteTitle": "حذف {name}؟",
+        "deleteTitleUnnamed": "حذف هذه المهارة؟",
+        "deleteDescription": "تُزال المهارة وكل الملفات المرفقة بها من الزميل. لا يمكن التراجع عن ذلك.",
+        "saveChanges": "حفظ التغييرات",
+        "create": "إنشاء المهارة",
+        "saveFailed": "فشل الحفظ",
+        "downloadFailed": "فشل تنزيل المهارة",
+        "deleteFailed": "فشل الحذف"
+    },
+    "skillFileEditor": {
+        "readFailed": "تعذّرت قراءة هذا الملف",
+        "saveFailed": "فشل الحفظ",
+        "deleteFailed": "فشل الحذف",
+        "truncated": "هذا الملف أكبر من أن يُعدّل هنا؛ تُعرض أول 100 000 حرف منه فقط.",
+        "delete": "حذف الملف",
+        "deleteTitle": "حذف {path}؟",
+        "deleteDescription": "يُزال الملف من المهارة. لا يمكن التراجع عن ذلك.",
+        "saveChanges": "حفظ التغييرات"
+    },
+    "skillFilesSection": {
+        "label": "الملفات المرفقة",
+        "helper": "هنا تُحفظ قوائم التحقق الطويلة وبنوك المعلومات والمجموعات النصية. لا يقرأ الزميل أحدها إلا عندما يشير إليه الإجراء.",
+        "empty": "لا توجد ملفات مرفقة.",
+        "pathRequired": "أدخل مسار ملف، مثل references/checklist.md",
+        "createFailed": "فشل إنشاء الملف",
+        "deleteFailed": "فشل حذف الملف",
+        "deleteLabel": "حذف {path}",
+        "deleteTitle": "حذف {path}؟",
+        "deleteDescription": "يُزال الملف من المهارة. لا يمكن التراجع عن ذلك.",
+        "add": "إضافة",
+        "cancel": "إلغاء",
+        "addFile": "إضافة ملف"
+    },
+    "agentPanelSkills": {
+        "notFound": "المهارة غير موجودة",
+        "fileTooLarge": "الملف كبير جدًا (10 MB كحد أقصى)",
+        "importFailed": "فشل استيراد المهارة",
+        "folderImportFailed": "فشل الاستيراد",
+        "folderFailure": "{name}: {error}",
+        "readFolderFailed": "فشلت قراءة المجلد",
+        "imported": "{count, plural, zero {لم تُستورد أي مهارة} one {تم استيراد مهارة واحدة} two {تم استيراد مهارتين} few {تم استيراد # مهارات} many {تم استيراد # مهارة} other {تم استيراد # مهارة}}",
+        "importedSkipped": "{count, plural, zero {لم تُستورد أي مهارة} one {تم استيراد مهارة واحدة} two {تم استيراد مهارتين} few {تم استيراد # مهارات} many {تم استيراد # مهارة} other {تم استيراد # مهارة}}، وتم تخطي {skipped, plural, zero {# ملف غير نصي} one {ملف غير نصي واحد} two {ملفين غير نصيين} few {# ملفات غير نصية} many {# ملفًا غير نصي} other {# ملف غير نصي}}",
+        "upload": "رفع",
+        "markdownFile": "ملف Markdown",
+        "skillFolder": "مجلد مهارة",
+        "newSkill": "جديدة",
+        "emptyTitle": "لا توجد مهارات بعد",
+        "emptyDescription": "المهارات تعليمات خطوة بخطوة قابلة لإعادة الاستخدام يتعلمها زميلك، ليؤدي المهام المتكررة بالطريقة نفسها في كل مرة.",
+        "appBadge": "تطبيق",
+        "count": "{count, plural, zero {# مهارة} one {مهارة واحدة} two {مهارتان} few {# مهارات} many {# مهارة} other {# مهارة}}",
+        "ownGroup": "{name} فقط",
+        "brainGroup": "من Brain",
+        "toBrain": "إلى Brain",
+        "toBrainHint": "انقلها إلى Brain، حيث يمكن لكل زميل استخدامها",
+        "sharedToBrain": "{name} موجودة في Brain"
+    },
+    "shareAgentDialog": {
+        "titleLink": "رابط المشاركة الخاص بك",
+        "titleShare": "مشاركة {name}",
+        "descriptionLink": "أرسله إلى من يجب أن يحصل على نسخة. لا يحتاجون إلى حساب بعد.",
+        "descriptionShare": "اختر ما ينتقل مع النسخة. كل ما يجعله زميلًا ينتقل بالفعل.",
+        "done": "تم",
+        "cancel": "إلغاء",
+        "packing": "جارٍ تجهيز الزميل…",
+        "createLink": "إنشاء رابط",
+        "carried": {
+            "memories": "{count, plural, zero {# ذكرى} one {ذكرى واحدة} two {ذكريين} few {# ذكريات} many {# ذكرى} other {# ذكرى}}",
+            "database": "قاعدة بياناته ({size}، غير مفحوصة بحثًا عن الأسرار)",
+            "files": "{count, plural, zero {# ملف من مساحة العمل} one {ملفًا واحدًا من مساحة العمل} two {ملفين من مساحة العمل} few {# ملفات من مساحة العمل} many {# ملفًا من مساحة العمل} other {# ملف من مساحة العمل}}"
+        },
+        "confirmTitle": "إرسال {name} مع بياناته؟",
+        "confirmDescription": "ستحمل النسخة {items}. يمكن لأي شخص يملك الرابط قراءة كل ذلك حتى تلغيه."
+    },
+    "shareAgentLink": {
+        "label": "رابط المشاركة",
+        "reused": "كان هناك بالفعل رابط بالإجابات نفسها لهذا الزميل، فهذا هو بدلًا من نسخة ثانية.",
+        "fresh": "يمكن لأي شخص يملك هذا الرابط إضافة نسخة من هذا الزميل إلى لوحته. ألغِه متى شئت.",
+        "copy": "نسخ رابط المشاركة"
+    },
+    "shareAgentOptions": {
+        "memories": "الذكريات",
+        "memoriesCount": "{count, plural, zero {# ذكرى} one {ذكرى واحدة} two {ذكريان} few {# ذكريات} many {# ذكرى} other {# ذكرى}} · {size}",
+        "memoriesEmpty": "لا شيء محفوظ في الذاكرة بعد",
+        "database": "قاعدة بيانات الزميل",
+        "databaseSize": "{size} · غير مفحوصة بحثًا عن الأسرار",
+        "databaseEmpty": "لا توجد جداول بعد",
+        "files": "ملفات مساحة العمل",
+        "filesCount": "{count, plural, zero {# ملف} one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}} · {size}",
+        "filesEmpty": "لا توجد ملفات بعد"
+    },
+    "shareAgentSafety": {
+        "title": "تُزال البيانات الحساسة",
+        "description": "لا تغادر مفاتيح API والحسابات المرتبطة وسجل المحادثات مساحة العمل أبدًا، مهما اخترت أعلاه. تُستبعد الملفات التي يبدو أنها تحتوي على بيانات اعتماد، وتصل التطبيقات غير مرتبطة ليفوّضها من يفتح الرابط بنفسه."
+    },
+    "sharedLinksSection": {
+        "revokeFailed": "تعذّر إلغاء هذا الرابط",
+        "revoked": "تم إلغاء الرابط",
+        "revokedDescription": "حُذفت النسخة التي كان يحملها. من يفتحه الآن لا يحصل على شيء.",
+        "label": "روابط المشاركة",
+        "helper": "يمكن لأي شخص يملك أحدها إضافة نسخة من هذا الزميل إلى لوحته.",
+        "carried": {
+            "memories": "الذكريات",
+            "database": "قاعدة البيانات",
+            "files": "الملفات"
+        },
+        "notUsed": "لم يُستخدم بعد",
+        "added": "أُضيف {count, plural, zero {# مرة} one {مرة واحدة} two {مرتين} few {# مرات} many {# مرة} other {# مرة}}",
+        "agentOnly": "الزميل فقط، بلا بيانات",
+        "copy": "نسخ رابط المشاركة",
+        "revokeTitle": "إلغاء رابط المشاركة هذا؟",
+        "revokeDescription": "تُحذف النسخة التي يحملها فورًا. من أضاف الزميل بالفعل يحتفظ بنسخته.",
+        "revoke": "إلغاء",
+        "revokeLabel": "إلغاء هذا الرابط"
+    },
+    "sharedAgentContents": {
+        "memories": "{count, plural, zero {# ذكرى} one {ذكرى واحدة} two {ذكريان} few {# ذكريات} many {# ذكرى} other {# ذكرى}}",
+        "memoriesSubtitle": "كل ما تعلمه حتى الآن",
+        "database": "قاعدة بياناته",
+        "databaseSubtitle": "جداوله الخاصة، مع صفوفها",
+        "files": "{count, plural, zero {# ملف من مساحة العمل} one {ملف واحد من مساحة العمل} two {ملفان من مساحة العمل} few {# ملفات من مساحة العمل} many {# ملفًا من مساحة العمل} other {# ملف من مساحة العمل}}",
+        "keys": "{count, plural, zero {# مفتاح API} one {مفتاح API واحد} two {مفتاحا API} few {# مفاتيح API} many {# مفتاح API} other {# مفتاح API}}",
+        "keysSubtitle": "عليك ملؤها",
+        "mcpAuth": "{count, plural, zero {# خدمة لإعادة تسجيل الدخول} one {خدمة واحدة لإعادة تسجيل الدخول} two {خدمتان لإعادة تسجيل الدخول} few {# خدمات لإعادة تسجيل الدخول} many {# خدمة لإعادة تسجيل الدخول} other {# خدمة لإعادة تسجيل الدخول}}",
+        "mcpAuthSubtitle": "على حساباتك الخاصة",
+        "agentOnly": "الزميل فقط",
+        "agentOnlySubtitle": "لا تنتقل أي بيانات معه",
+        "connectorsNote": "ستربط هذه بحساباتك الخاصة.",
+        "triggersNote": "يحصل كل منها على URL جديد خاص به."
+    },
+    "useShareAgentFlow": {
+        "failedRequest": "لم يكتمل الطلب. تحقق من اتصالك وحاول مجددًا."
+    },
+    "agentTabs": {
+        "chat": {
+            "label": "المحادثة",
+            "description": "تحدث مع هذا الزميل"
+        },
+        "actions": {
+            "label": "للمعالجة",
+            "description": "عناصر تحتاج إلى انتباهك"
+        },
+        "services": {
+            "label": "التطبيقات",
+            "description": "تكاملات جاهزة يمكن لهذا الزميل استخدامها"
+        },
+        "mcp": {
+            "label": "MCP",
+            "description": "خوادم Model Context Protocol"
+        },
+        "skills": {
+            "label": "المهارات",
+            "description": "مهارات قابلة لإعادة الاستخدام يمكن للزميل تشغيلها"
+        },
+        "data": {
+            "label": "قاعدة البيانات",
+            "description": "بيانات هذا الزميل"
+        },
+        "memories": {
+            "label": "المعرفة",
+            "description": "ما يتذكره هذا الزميل"
+        },
+        "files": {
+            "label": "الملفات",
+            "description": "ملفات هذا الزميل"
+        },
+        "published": {
+            "label": "المنشور",
+            "description": "ما نشره هذا الزميل، ومن يمكنه فتحه"
+        },
+        "scheduled": {
+            "label": "الروتينات",
+            "description": "المهام المتكررة والمجدولة"
+        },
+        "triggers": {
+            "label": "المشغّلات",
+            "description": "روابط URL عامة تبدأ تشغيلًا عند استدعائها"
+        },
+        "tools": {
+            "label": "القدرات",
+            "description": "الأدوات التي يمكن لهذا الزميل استخدامها"
+        },
+        "monitoring": {
+            "label": "المراقبة",
+            "description": "الاستخدام والتكلفة والنشاط لهذا الزميل"
+        },
+        "logs": {
+            "label": "السجلات",
+            "description": "سجلات النشاط والتشغيل"
+        },
+        "setup": {
+            "label": "التثبيت",
+            "description": "ما يفعله هذا الزميل أول مرة يثبّته فيها أحد"
+        },
+        "settings": {
+            "label": "الإعدادات",
+            "description": "تهيئة هذا الزميل"
+        }
+    },
+    "accessSummary": {
+        "youManage": "أنت تدير هذا الزميل",
+        "youCanUse": "يمكنك استخدام هذا الزميل",
+        "youManageViaBox": "أنت تدير هذا الزميل، عبر Box {box}",
+        "youCanUseViaBox": "يمكنك استخدام هذا الزميل، عبر Box {box}",
+        "viaBox": "عبر Box {box}",
+        "everyone": "الجميع في مساحة العمل",
+        "adminsOnly": "المسؤولون فقط",
+        "peopleViaBox": "{count, plural, zero {# شخص} one {شخص واحد} two {شخصان} few {# أشخاص} many {# شخصًا} other {# شخص}}، عبر Box {box}"
+    },
+    "agentLockedOverlay": {
+        "saved": "محادثاته وذاكرته ومهاراته وجداوله وملفاته محفوظة.",
+        "savedUntil": "محادثاته وذاكرته ومهاراته وجداوله وملفاته محفوظة حتى {date}.",
+        "paused": {
+            "title": "{name} متوقف مع مساحة العمل",
+            "subscribeToResume": "اشترك وسيكمل {name} من حيث توقف تمامًا.",
+            "updatePaymentToResume": "حدّث وسيلة الدفع وسيكمل {name} من حيث توقف تمامًا.",
+            "updatePayment": "تحديث وسيلة الدفع",
+            "subscribe": "الاشتراك للاستعادة"
+        },
+        "sandboxArchived": {
+            "title": "{name} مؤرشف مع بيئتك التجريبية",
+            "requestReactivation": "اطلب إعادة التفعيل من اللوحة وسيكمل {name} من حيث توقف تمامًا."
+        },
+        "restoring": {
+            "title": "{name} في طريق العودة",
+            "description": "تتم استعادة مساحة العمل. يستيقظ {name} معها خلال دقيقة أو دقيقتين."
+        },
+        "slot": {
+            "activateFailed": "تعذّر تفعيل هذا الزميل",
+            "backOnline": "عاد {name} إلى العمل",
+            "inactive": "{name} غير نشط",
+            "templateEnded": "انتهى اشتراك القالب الذي جاء منه هذا الزميل. اشترِ القالب مجددًا لإعادته.",
+            "nothingLost": "لم يُفقد أي شيء: ذكرياته وملفاته ومهاراته كلها لا تزال هنا. يحتاج فقط إلى مكان شاغر لزميل ليعمل مجددًا.",
+            "fixedLimit": "لمساحة العمل هذه حد ثابت للزملاء. تواصل مع الدعم لرفعه.",
+            "upgradeToActivate": "الترقية للتفعيل",
+            "activeCount": "{active} من {max} زملاء نشطون",
+            "activating": "جارٍ التفعيل…",
+            "activate": "تفعيل"
+        }
+    },
+    "panelsShared": {
+        "yourCoworker": "زميلك",
+        "closePanel": "إغلاق اللوحة"
+    },
+    "agentPanel": {
+        "threads": "المحادثات",
+        "coworkerCard": "بطاقة الزميل"
+    },
+    "agentAccessRow": {
+        "label": "الوصول",
+        "manage": "إدارة الوصول"
+    },
+    "agentCombobox": {
+        "unassigned": "غير معيّن",
+        "selectMany": "اختر الزملاء",
+        "selectOne": "اختر زميلًا",
+        "search": "ابحث عن الزملاء…",
+        "empty": "لم يتم العثور على زملاء"
+    },
+    "timezoneCombobox": {
+        "placeholder": "اختر المنطقة الزمنية",
+        "search": "ابحث عن منطقة زمنية…",
+        "empty": "لم يتم العثور على منطقة زمنية"
+    },
+    "agentFileNavigation": {
+        "notFound": "الملف غير موجود"
+    },
+    "agentSetupFields": {
+        "yes": "نعم",
+        "no": "لا",
+        "resetToDefault": "إعادة التعيين إلى القالب الافتراضي",
+        "useDefault": "استخدام القالب الافتراضي",
+        "needsSetup": {
+            "label": "هل يحتاج هذا الزميل إلى تهيئة بعد التثبيت؟",
+            "helper": "أجب مرة واحدة. يرى كل من يثبّت هذا الزميل النتيجة، لذا لا يمكن نشر زميل بلا إجابة."
+        },
+        "instructions": {
+            "label": "تعليمات التثبيت",
+            "helper": "موجّهة إلى الزميل، لا إلى المستخدم: يقرؤها ويرشد المستخدم خلالها في المحادثة.",
+            "dialogTitle": "تعديل تعليمات التثبيت"
+        },
+        "resetConfirm": {
+            "title": "إعادة التعيين إلى القالب الافتراضي؟",
+            "description": "يُستبدل ما هو مكتوب هنا بالتعليمات الافتراضية. لا يمكن التراجع عن ذلك.",
+            "confirm": "إعادة التعيين"
+        }
+    },
+    "agentPanelData": {
+        "unreachable": "تعذّر الوصول إلى محرك هذا الزميل.",
+        "emptyTitle": "لا توجد جداول بعد",
+        "emptyDescription": "لدى زميلك قاعدة بيانات خاصة به. عندما يحتاج إلى حفظ بيانات منظمة (جهات اتصال، نتائج، قوائم متابعة)، ينشئ هنا جداول يمكنك تصفحها في أي وقت.",
+        "dialogTitle": "قاعدة بيانات الزميل",
+        "dialogDescription": "قاعدة البيانات الخاصة بهذا الزميل، بالحجم الكامل."
+    },
+    "agentSheetChat": {
+        "anotherCoworker": "زميل آخر",
+        "replyPlaceholder": "رد في {title}...",
+        "startedBy": "بدأ <b>{name}</b> هذه الجلسة"
+    },
+    "agentPanelChat": {
+        "notSetUp": "لم يُعدّ هذا الزميل بعد",
+        "setUp": "إعداده"
+    },
+    "agentPanelSetup": {
+        "unreachable": "تعذّر الوصول إلى محرك هذا الزميل.",
+        "saveFailed": "فشل الحفظ",
+        "intro": "تصل نسخة من هذا الزميل إلى حساب شخص آخر بلا بيانات اعتماد ولا شيء مرتبط. هذه التعليمات هي ما يشغّله بنفسه أول مرة يفتحه فيها.",
+        "saved": "تم الحفظ",
+        "saving": "جارٍ الحفظ...",
+        "save": "حفظ"
+    },
+    "agentPanelSettings": {
+        "unreachable": "تعذّر الوصول إلى محرك هذا الزميل.",
+        "saveFailed": "فشل الحفظ",
+        "name": "الاسم",
+        "inactive": "هذا الزميل غير نشط، لذا لا يمكن تحميل تهيئته أو تغييرها.",
+        "soul": {
+            "label": "الروح (موجّه النظام)",
+            "dialogTitle": "تعديل موجّه النظام",
+            "placeholder": "أنت..."
+        },
+        "verbosity": {
+            "label": "الإسهاب",
+            "helper": "طول ردوده، لا مقدار العمل الذي ينجزه.",
+            "minimal": "أدنى",
+            "concise": "موجز",
+            "normal": "عادي",
+            "detailed": "مفصّل"
+        },
+        "notifications": {
+            "label": "الإشعارات",
+            "choose": "اختر ما يصلك"
+        },
+        "delete": "حذف الزميل",
+        "saved": "تم الحفظ",
+        "save": "حفظ التغييرات",
+        "appearance": "المظهر"
+    },
+    "coworkerLook": {
+        "color": "اللون",
+        "material": "الخامة",
+        "eyes": "العينان",
+        "mouth": "الفم",
+        "shuffle": "عشوائي",
+        "reset": "افتراضي",
+        "materialOptions": {
+            "classic": "كلاسيكي",
+            "fluffy": "زغبي",
+            "plush": "قطيفة",
+            "felt": "لبّاد",
+            "knit": "صوف محبوك",
+            "clay": "صلصال",
+            "rubber": "مطاط",
+            "glass": "زجاج",
+            "chrome": "كروم"
+        },
+        "colors": {
+            "blue": "أزرق",
+            "indigo": "نيلي",
+            "violet": "بنفسجي",
+            "purple": "أرجواني",
+            "pink": "وردي",
+            "rose": "زهري",
+            "lime": "ليموني",
+            "green": "أخضر"
+        },
+        "eyesOptions": {
+            "pill": "عيون بيضاوية",
+            "round": "عيون مستديرة",
+            "happy": "عيون سعيدة",
+            "googly": "عيون جاحظة",
+            "visor": "واقية",
+            "sleepy": "عيون ناعسة",
+            "wink": "غمزة",
+            "pixel": "عيون بكسلية",
+            "star": "عيون نجمية",
+            "heart": "عيون قلوب",
+            "dot": "عيون نقطية",
+            "brows": "عيون بحواجب",
+            "cyclops": "عين واحدة",
+            "shades": "نظارة شمسية",
+            "glasses": "نظارة",
+            "sparkle": "عيون لامعة",
+            "line": "عيون مغمضة"
+        },
+        "mouthOptions": {
+            "none": "بلا فم",
+            "smile": "ابتسامة",
+            "open": "فم مفتوح",
+            "cat": "فم قطة",
+            "flat": "فم مستقيم"
+        }
+    },
+    "agentPanelLogs": {
+        "empty": {
+            "title": "لا توجد عمليات تشغيل بعد",
+            "description": "يُسجَّل هنا كل تشغيل لزميلك، لتتمكن من فحص ما فعله ولماذا خطوة بخطوة."
+        },
+        "tokens": "{total} رمز",
+        "tokensShort": "{total} رمز",
+        "stepCount": "{count, plural, zero {# خطوة} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+        "step": "الخطوة {number}",
+        "noSteps": "لم تُسجّل أي خطوات لهذا التشغيل.",
+        "input": "المدخلات",
+        "output": "المخرجات"
+    },
+    "agentRunHistory": {
+        "tokens": "{total} رمز",
+        "stepCount": "{count, plural, zero {# خطوة} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}"
+    },
+    "agentPanelMemories": {
+        "dormant": "خاملة",
+        "delete": {
+            "label": "حذف الذكرى",
+            "confirmTitle": "حذف هذه الذكرى؟",
+            "confirmDescription": "ينساها الزميل نهائيًا. لا يمكن التراجع عن ذلك."
+        },
+        "recallPlaceholder": "استعادة الذكريات...",
+        "new": "جديدة",
+        "clearAll": "مسح كل الذكريات",
+        "searching": "جارٍ البحث…",
+        "recalled": "{count, plural, zero {لا ذكريات مستعادة لـ \"{query}\"} one {ذكرى واحدة مستعادة لـ \"{query}\"} two {ذكريان مستعادتان لـ \"{query}\"} few {# ذكريات مستعادة لـ \"{query}\"} many {# ذكرى مستعادة لـ \"{query}\"} other {# ذكرى مستعادة لـ \"{query}\"}}",
+        "form": {
+            "contentPlaceholder": "يفضّل المستخدم الإجابات الموجزة.",
+            "kindPlaceholder": "النوع (مثل تفضيل)",
+            "tagsPlaceholder": "وسوم، مفصولة،بفواصل",
+            "save": "حفظ الذكرى"
+        },
+        "empty": {
+            "noMatches": "لا تطابقات",
+            "title": "لا توجد ذكريات بعد",
+            "description": "يحفظ زميلك هنا حقائق طويلة المدى عنك وعن عمله، ليحافظ على السياق عبر المحادثات.",
+            "add": "إضافة ذكرى"
+        }
+    },
+    "agentPanelMonitoring": {
+        "charts": {
+            "kpiRuns": "عمليات التشغيل",
+            "kpiCost": "التكلفة الإجمالية",
+            "kpiTokens": "إجمالي الرموز",
+            "kpiErrorRate": "معدل الأخطاء",
+            "runsOverTime": "عمليات التشغيل عبر الزمن",
+            "costOverTime": "التكلفة عبر الزمن",
+            "avgDuration": "متوسط مدة التشغيل",
+            "runsByModel": "عمليات التشغيل حسب النموذج",
+            "topTools": "أكثر الأدوات استدعاءً",
+            "toolErrors": "أخطاء الأدوات"
+        },
+        "tokenUsage": {
+            "title": "استخدام الرموز",
+            "subtitle": "الرموز يوميًا"
+        },
+        "ranges": {
+            "24h": {
+                "short": "24 س",
+                "label": "آخر 24 ساعة"
+            },
+            "7d": {
+                "short": "7 أ",
+                "label": "آخر 7 أيام"
+            },
+            "30d": {
+                "short": "30 ي",
+                "label": "آخر 30 يومًا"
+            },
+            "90d": {
+                "short": "90 ي",
+                "label": "آخر 90 يومًا"
+            }
+        },
+        "empty": {
+            "title": "لا يوجد نشاط بعد",
+            "description": "ستظهر هنا تحليلات الاستخدام والتكلفة والتشغيل لهذا الزميل بمجرد أن يبدأ العمل."
+        },
+        "expand": "توسيع {title}"
+    },
+    "agentPanelFiles": {
+        "publishFailed": "تعذّر نشر {name}",
+        "dropToUpload": "أفلت الملفات أو المجلدات لرفعها",
+        "hideHidden": "إخفاء الملفات المخفية",
+        "showHidden": "إظهار الملفات المخفية",
+        "emptyDescription": "هذه مساحة عمل زميلك. تُحفظ هنا الملفات التي ينزّلها أو ينشئها أو يعدّلها خلال عمليات تشغيله."
+    },
+    "shareCta": {
+        "placeLabel": "ضع الزميل",
+        "placeCaption": "أفلته على لوحتك، جاهزًا للعمل.",
+        "trialAdd": "ابدأ التجربة المجانية وأضفه",
+        "planAdd": "اشترك بـ {price}/شهريًا وأضفه",
+        "add": "أضفه إلى لوحتي"
+    },
+    "schedule": {
+        "once": "مرة واحدة · {date}",
+        "onceOn": "مرة واحدة، {date}",
+        "everyMinutes": "كل {count} دقيقة",
+        "everyDay": "كل يوم الساعة {time}",
+        "weekdays": "أيام العمل الساعة {time}",
+        "everyWeekday": "كل {day} الساعة {time}",
+        "monthly": "شهريًا في اليوم {day} الساعة {time}"
+    },
+    "mcpJsonPaste": {
+        "link": "لصق إعداد JSON",
+        "linkVault": "أو الصق إعداد JSON",
+        "linkAgain": "لصق JSON آخر",
+        "boxLabel": "إعداد JSON لخادم MCP",
+        "placeholder": "الصق JSON من ملف README الخاص بالخادم\n{example}",
+        "close": "إغلاق",
+        "unnamed": "بلا اسم",
+        "keysStored": "{count, plural, zero {لن تُحفظ أي قيمة كمفتاح} one {ستُحفظ قيمة واحدة كمفتاح، لا في الإعداد} two {ستُحفظ قيمتان كمفتاحين، لا في الإعداد} few {ستُحفظ # قيم كمفاتيح، لا في الإعداد} many {ستُحفظ # قيمة كمفاتيح، لا في الإعداد} other {ستُحفظ # قيمة كمفاتيح، لا في الإعداد}}",
+        "errors": {
+            "invalidJson": "JSON غير صالح: {detail}",
+            "notAnObject": "الصق كائن JSON: {example}",
+            "containerNotObject": "يجب أن يكون \"mcpServers\" كائنًا يضم الخوادم",
+            "noServer": "لم يُعثر على خادم: المتوقع \"mcpServers\" أو خادم له اسم أو خادم فيه \"command\" أو \"url\"",
+            "emptyContainer": "\"mcpServers\" فارغ",
+            "serverNotObject": "{scope, select, named {يجب أن يكون \"{server}\" كائنًا} other {يجب أن يكون الخادم كائنًا}}",
+            "invalidName": "\"{server}\": يقبل الاسم الأحرف والأرقام و- و_ فقط",
+            "unknownField": "{scope, select, named {\"{server}\": حقل غير معروف {fields}} other {حقل غير معروف {fields}}}",
+            "notText": "{scope, select, named {\"{server}\": يجب أن يكون {field} نصًا} other {يجب أن يكون {field} نصًا}}",
+            "commandAndUrl": "{scope, select, named {\"{server}\" فيه command وurl معًا} other {الخادم فيه command وurl معًا}}",
+            "argsNotList": "{scope, select, named {\"{server}\": يجب أن يكون args قائمة نصوص} other {يجب أن يكون args قائمة نصوص}}",
+            "unknownTransport": "{scope, select, named {\"{server}\": نقل غير معروف \"{transport}\"} other {نقل غير معروف \"{transport}\"}}",
+            "needsCommand": "{scope, select, named {\"{server}\": يحتاج خادم stdio إلى command} other {يحتاج خادم stdio إلى command}}",
+            "needsUrl": "{scope, select, named {\"{server}\": يحتاج خادم {transport} إلى url} other {يحتاج خادم {transport} إلى url}}",
+            "notMap": "{scope, select, named {\"{server}\": يجب أن يكون {field} كائنًا من قيم نصية} other {يجب أن يكون {field} كائنًا من قيم نصية}}",
+            "unresolvedRef": "{scope, select, named {\"{server}\": يستخدم {field} المرجع {ref}، ضع القيمة الفعلية مكانه} other {يستخدم {field} المرجع {ref}، ضع القيمة الفعلية مكانه}}",
+            "multiline": "{scope, select, named {\"{server}\": يجب أن يكون {field} في سطر واحد} other {يجب أن يكون {field} في سطر واحد}}"
+        }
+    }
+}

@@ -1,0 +1,222 @@
+{
+    "loading": "טוען...",
+    "theme": "ערכת נושא",
+    "language": "שפה",
+    "signIn": "התחברות",
+    "purchaseCancelled": "הרכישה בוטלה",
+    "help": {
+        "label": "עזרה",
+        "contactSupport": "לפנות לתמיכה"
+    },
+    "menu": {
+        "whatsNew": "מה חדש",
+        "gettingStarted": "צעדים ראשונים",
+        "docs": "תיעוד",
+        "community": "קהילה",
+        "shortcuts": "קיצורי מקלדת",
+        "installApp": "להתקין את האפליקציה",
+        "desktopApp": "להוריד את אפליקציית המחשב",
+        "hireExpert": "לשכור מומחה"
+    },
+    "power": {
+        "menuItem": "להפעיל מחדש את המכונה",
+        "cancel": "ביטול",
+        "failed": "משהו השתבש",
+        "restart": {
+            "title": "להפעיל מחדש את המכונה?",
+            "description": "כל העמיתים של סביבת העבודה הזו לא יהיו זמינים לכמה דקות.",
+            "confirmLabel": "להפעיל מחדש",
+            "pending": "מפעיל מחדש את המכונה…",
+            "success": "ההפעלה מחדש התחילה, המכונה תחזור בעוד כמה דקות."
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "יש תקלות אצל {providers}.",
+            "many": "יש תקלות אצל {providers}."
+        },
+        "headlineLong": {
+            "one": "יש תקלות אצל {providers}. העמיתים שלך עלולים להיות איטיים יותר או להיכשל.",
+            "many": "יש תקלות אצל {providers}. העמיתים שלך עלולים להיות איטיים יותר או להיכשל."
+        },
+        "viewStatus": "לצפות בסטטוס",
+        "dismiss": "לסגור את סטטוס הספק"
+    },
+    "sidePanel": {
+        "close": "לסגור את החלונית",
+        "resize": "לשנות את גודל החלונית"
+    },
+    "paused": {
+        "title": "סביבת העבודה הושהתה.",
+        "paymentFailed": "התשלום נכשל, סביבת העבודה הושהתה.",
+        "saved": "העמיתים שלך והנתונים שלהם שמורים.",
+        "savedUntil": "העמיתים שלך והנתונים שלהם שמורים עד {date}.",
+        "updatePayment": "לעדכן את אמצעי התשלום",
+        "subscribe": "להירשם למינוי כדי לשחזר"
+    },
+    "sandboxArchived": {
+        "title": "ה-Sandbox הועבר לארכיון אחרי 30 ימים ללא שימוש.",
+        "requested": "התבקשה הפעלה מחדש.",
+        "declined": "ההפעלה מחדש נדחתה.",
+        "declinedHint": "אפשר לפנות אלינו אם נראה לך שזו טעות.",
+        "savedUntil": "העמיתים שלך והנתונים שלהם שמורים עד {date}.",
+        "expired": "תוקף הנתונים השמורים פג, הפעלה מחדש תתחיל מ-Sandbox ריק.",
+        "requestedReason": "אנחנו בודקים את הבקשה שלך",
+        "request": "לבקש הפעלה מחדש"
+    },
+    "restoring": {
+        "title": "משחזר את סביבת העבודה שלך…",
+        "waitingApproved": "ההפעלה מחדש אושרה, אתה ראשון בתור.",
+        "waitingPaid": "התשלום התקבל, אתה ראשון בתור.",
+        "waitingHint": "היא תחזור לבד תוך כמה דקות.",
+        "failed": "השחזור שלך דורש בדיקה מצדנו.",
+        "failedApproved": "קיבלנו התראה ואנחנו מחזירים את ה-Sandbox שלך ידנית.",
+        "failedPaid": "התשלום התקבל. קיבלנו התראה ואנחנו מחזירים את סביבת העבודה שלך ידנית.",
+        "steps": {
+            "machine": "הוקצתה מכונה",
+            "machineActive": "מקצה מכונה",
+            "data": "משחזר את הנתונים שלך",
+            "agents": "מעיר את העמיתים שלך"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "סביבת עבודה",
+        "summary": {
+            "sandbox": "Sandbox של מומחה",
+            "seats": "{count, plural, one {מושב אחד} two {שני מושבים} other {# מושבים}}",
+            "unlimitedSeats": "מושבים ללא הגבלה",
+            "limits": "{agents} עמיתים · {seats}",
+            "trial": "ניסיון · {limits}",
+            "lifetime": "לכל החיים · {limits}",
+            "limitsUnlimited": "עמיתים ללא הגבלה · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "רק מנהל יכול לנהל מפתחות API",
+            "settings": "רק מנהל יכול לשנות את הגדרות סביבת העבודה",
+            "servers": "רק מנהל יכול לנהל שרתים",
+            "billing": "רק מנהל יכול לנהל את החיוב"
+        },
+        "needsPlan": "זמין כשתקופת הניסיון החינמית שלך מתחילה",
+        "apiKeys": "מפתחות API ו-MCP",
+        "settings": "הגדרות",
+        "members": "חברים",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, one {הצעה אחת לבדיקה} two {שתי הצעות לבדיקה} other {# הצעות לבדיקה}}",
+        "aiProviders": "ספקי AI",
+        "vault": "Vault",
+        "vaultSignedOut": "אפליקציה ב-Vault מנותקת",
+        "computers": "מחשבים",
+        "servers": "שרתים",
+        "billing": "חיוב",
+        "inviteFriends": "להזמין חברים",
+        "freeMonth": "חודש חינם",
+        "newWorkspace": "סביבת עבודה חדשה",
+        "templates": "תבניות",
+        "myTemplates": "התבניות שלי",
+        "newTemplate": "תבנית חדשה",
+        "expert": "מומחה",
+        "sandbox": "Sandbox",
+        "preparingSandbox": "מכין את ה-Sandbox…",
+        "publicProfile": "פרופיל ציבורי",
+        "admin": "ניהול",
+        "adminPanel": "לוח ניהול",
+        "notifications": "התראות",
+        "account": "חשבון",
+        "signOut": "להתנתק"
+    },
+    "update": {
+        "reload": "לרענן",
+        "available": {
+            "title": "גרסה חדשה זמינה",
+            "description": "יש לרענן כדי לקבל את הגרסה האחרונה של Rerun."
+        },
+        "required": {
+            "title": "Rerun עודכן",
+            "description": "גרסה חדשה עלתה לאוויר. יש לרענן כדי להמשיך."
+        }
+    },
+    "controlCenter": {
+        "title": "מרכז הבקרה",
+        "description": "{named, select, yes {לעבור לסוכן, להגדרה או לשיחה, או לשאול את {name}.} other {לעבור לסוכן, להגדרה או לשיחה, או לשאול את ה-Chief of Staff שלך.}}",
+        "back": "חזרה",
+        "askRerun": "{named, select, yes {לשאול את {name}} other {לשאול את ה-Chief of Staff שלך}}",
+        "quotedQuery": "“{query}”",
+        "unnamedBox": "Box ללא שם",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, one {סוכן אחד} two {שני סוכנים} other {# סוכנים}}",
+        "status": {
+            "off": "כבוי",
+            "waiting_human": "מחכה לך",
+            "working": "עובד",
+            "error": "שגיאה",
+            "offline": "לא מקוון"
+        },
+        "headings": {
+            "actions": "פעולות",
+            "settings": "הגדרות",
+            "agents": "סוכנים",
+            "needsYou": "מחכה לך",
+            "recent": "אחרונים",
+            "boxes": "Boxes",
+            "conversations": "שיחות",
+            "recentConversations": "שיחות אחרונות",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
+            "open": "לפתוח",
+            "moveTo": "להעביר אל"
+        },
+        "agent": {
+            "desktop": "שולחן עבודה",
+            "desktopDetail": "להשתלט על המסך של העמית הזה",
+            "move": "להעביר ל-Box אחר",
+            "notifications": "התראות",
+            "notificationsDetail": "מתי הסוכן הזה פונה אליך"
+        },
+        "placeholder": {
+            "rootAssistant": "{named, select, yes {לחפש או לשאול את {name}…} other {לחפש או לשאול את ה-Chief of Staff שלך…}}",
+            "root": "לחפש סוכנים, הגדרות, שיחות…",
+            "agent": "לחפש ב-{name}…",
+            "agentUnknown": "לחפש בסוכן הזה…",
+            "box": "לחפש סוכנים ב-Box הזה…",
+            "move": "לבחור Box…"
+        },
+        "empty": {
+            "box": "עדיין אין סוכנים ב-Box הזה.",
+            "noMatch": "אין תוצאות."
+        },
+        "hints": {
+            "open": "לפתוח",
+            "more": "עוד",
+            "searchPage": "<keys></keys> שוב כדי לחפש בדף"
+        },
+        "commands": {
+            "new_agent": "סוכן חדש",
+            "browse_templates": "לעיין בתבניות",
+            "new_box": "Box חדש",
+            "ask_assistant": "{named, select, yes {לשאול את {name}} other {לשאול את ה-Chief of Staff שלך}}",
+            "contact_support": "לפנות לתמיכה",
+            "recenter_board": "למרכז את הלוח",
+            "toggle_theme_light": "לעבור לערכת נושא בהירה",
+            "toggle_theme_dark": "לעבור לערכת נושא כהה",
+            "workspace": "הגדרות סביבת העבודה",
+            "members": "חברים",
+            "billing": "חיוב",
+            "ai_providers": "ספקי AI",
+            "api_keys": "מפתחות API ו-MCP",
+            "company_brain": "Company Brain",
+            "shared_files": "קבצים משותפים",
+            "account": "חשבון",
+            "notifications": "התראות",
+            "shortcuts": "קיצורי מקלדת",
+            "whats_new": "מה חדש"
+        }
+    },
+    "boxNameSuggestions": "או לבחור שם",
+    "dashboard": {
+        "metaTitle": "לוח בקרה",
+        "metaDescription": "ה-Boxes והעמיתים שלך ב-Rerun."
+    },
+    "site": {
+        "title": "Rerun | משימות שה-AI מבצע בשבילך, גם כשאתה ישן",
+        "description": "לבחור סוכן AI מוכן מהספרייה או לבנות אחד משלך, לחבר את הכלים שלך, והוא פועל 24/7 על מכונה פרטית משלך בענן. ניסיון חינם ל-{trialDays} ימים."
+    }
+}

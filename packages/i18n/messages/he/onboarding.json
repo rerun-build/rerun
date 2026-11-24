@@ -1,0 +1,110 @@
+{
+    "metaTitle": "ברוכים הבאים",
+    "back": "חזרה",
+    "continue": "להמשיך",
+    "site": {
+        "title": "מה האתר שלך?",
+        "titleNamed": "היי {name}, מה האתר שלך?",
+        "description": "נקרא אותו ונאייש את הלוח שלך.",
+        "label": "אתר החברה",
+        "placeholder": "acme.com",
+        "continue": "להמשיך",
+        "skip": "אין לי אתר"
+    },
+    "industry": {
+        "title": "באיזה תחום אתה עובד?",
+        "description": "הצוות שלך משתנה בהתאם.",
+        "other": "אחר",
+        "otherLabel": "תחום העיסוק שלך",
+        "otherPlaceholder": "מאפייה, מרפאת שיניים, חדר כושר…"
+    },
+    "role": {
+        "title": "מה התפקיד שלך שם?",
+        "description": "העמית הראשון שלך עובד בשבילך.",
+        "other": "משהו אחר",
+        "otherLabel": "התפקיד שלך",
+        "otherPlaceholder": "ראש תחום צמיחה"
+    },
+    "roles": {
+        "founderAgencyOwner": "מייסד / בעל סוכנות",
+        "accountOrClientLead": "מנהל לקוחות",
+        "marketingCreative": "שיווק / קריאייטיב",
+        "operations": "תפעול",
+        "founderStoreOwner": "מייסד / בעל חנות",
+        "marketingGrowth": "שיווק / צמיחה",
+        "customerCare": "שירות לקוחות",
+        "operationsLogistics": "תפעול / לוגיסטיקה",
+        "founderCeo": "מייסד / מנכ\"ל",
+        "productOrEngineering": "מוצר או פיתוח",
+        "salesOrSupport": "מכירות או תמיכה",
+        "salesRepOrAe": "נציג מכירות או AE",
+        "salesLeadership": "הנהלת מכירות",
+        "marketingDemandGen": "שיווק / יצירת ביקוש",
+        "recruiter": "מגייס",
+        "talentOrHrLead": "מנהל גיוס או משאבי אנוש",
+        "founderBroker": "מייסד / מתווך",
+        "agent": "סוכן",
+        "propertyOrPortfolioManager": "מנהל נכסים או תיק נכסים",
+        "marketing": "שיווק",
+        "founderPartner": "מייסד / שותף",
+        "lawyerOrCounsel": "עורך דין או יועץ משפטי",
+        "paralegalOrLegalOps": "משפטן או תפעול משפטי",
+        "businessDevelopment": "פיתוח עסקי",
+        "creatorFounder": "יוצר / מייסד",
+        "editorOrWriter": "עורך או כותב",
+        "communityOrSocial": "קהילה או רשתות חברתיות",
+        "sponsorshipsBusiness": "חסויות / עסקים",
+        "financeOrAdmin": "כספים או אדמיניסטרציה",
+        "projectOrTeamLead": "ראש פרויקט או צוות",
+        "sales": "מכירות"
+    },
+    "team": {
+        "title": "להזמין את הצוות שלך",
+        "description": "העמיתים שלך עובדים בשביל כולכם.",
+        "label": "אימייל של חבר צוות",
+        "placeholder": "name@company.com",
+        "invite": "להזמין",
+        "invited": "הוזמן",
+        "link": "קישור הזמנה",
+        "copy": "להעתיק",
+        "copied": "הועתק",
+        "skip": "לדלג"
+    },
+    "view": {
+        "title": "איך תרצה לראות את הצוות שלך?",
+        "hint": "אפשר להחליף בכל רגע מתפריט סביבת העבודה"
+    },
+    "trial": {
+        "title": "להתחיל את תקופת הניסיון החינמית",
+        "description": "העמיתים שלך מתחילים לעבוד ברגע שהיא מתחילה.",
+        "start": "להתחיל ניסיון חינם"
+    },
+    "engine": {
+        "title": "מכינים את סביבת העבודה שלך",
+        "milestones": {
+            "trial": "מאשרים את תקופת הניסיון…",
+            "machine": "שומרים לך מכונה…",
+            "engine": "מעירים את ה-Chief of Staff שלך…"
+        },
+        "ready": "בוא נבנה יחד את הצוות שלך.",
+        "greeting": "היי, אני ה-Chief of Staff שלך",
+        "greetingNamed": "היי {name}, אני ה-Chief of Staff שלך",
+        "failed": "המכונה שלך לוקחת יותר זמן מהרגיל.",
+        "retry": "לנסות שוב",
+        "enterAnyway": "להיכנס בכל זאת",
+        "enter": "יאללה",
+        "wait": "רגע אחד"
+    },
+    "industries": {
+        "agencies": "סוכנויות",
+        "ecommerce": "מסחר אלקטרוני",
+        "saas": "SaaS",
+        "sales": "מכירות",
+        "recruiting": "גיוס",
+        "real-estate": "נדל\"ן",
+        "legal": "משפט ורגולציה",
+        "creators": "יוצרים",
+        "productivity": "פרודוקטיביות",
+        "other": "אחר"
+    }
+}

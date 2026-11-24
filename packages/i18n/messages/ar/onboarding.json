@@ -1,0 +1,110 @@
+{
+    "metaTitle": "مرحبًا بك",
+    "back": "رجوع",
+    "continue": "متابعة",
+    "site": {
+        "title": "ما موقعك الإلكتروني؟",
+        "titleNamed": "مرحبًا {name}، ما موقعك الإلكتروني؟",
+        "description": "نقرؤه ونجهّز لوحتك بالفريق المناسب.",
+        "label": "موقع الشركة",
+        "placeholder": "acme.com",
+        "continue": "متابعة",
+        "skip": "ليس لدي موقع"
+    },
+    "industry": {
+        "title": "ما مجال عملك؟",
+        "description": "يتغيّر فريقك بحسبه.",
+        "other": "آخر",
+        "otherLabel": "مجال عملك",
+        "otherPlaceholder": "مخبز، عيادة أسنان، نادٍ رياضي…"
+    },
+    "role": {
+        "title": "ما دورك هناك؟",
+        "description": "زميلك الأول يعمل من أجلك.",
+        "other": "دور آخر",
+        "otherLabel": "دورك",
+        "otherPlaceholder": "رئيس النمو"
+    },
+    "roles": {
+        "founderAgencyOwner": "مؤسس / مالك وكالة",
+        "accountOrClientLead": "مسؤول حسابات أو عملاء",
+        "marketingCreative": "تسويق / إبداع",
+        "operations": "العمليات",
+        "founderStoreOwner": "مؤسس / مالك متجر",
+        "marketingGrowth": "تسويق / نمو",
+        "customerCare": "خدمة العملاء",
+        "operationsLogistics": "العمليات / الخدمات اللوجستية",
+        "founderCeo": "مؤسس / رئيس تنفيذي",
+        "productOrEngineering": "المنتج أو الهندسة",
+        "salesOrSupport": "المبيعات أو الدعم",
+        "salesRepOrAe": "مندوب مبيعات أو مدير حسابات",
+        "salesLeadership": "قيادة المبيعات",
+        "marketingDemandGen": "تسويق / توليد الطلب",
+        "recruiter": "مسؤول توظيف",
+        "talentOrHrLead": "مسؤول مواهب أو موارد بشرية",
+        "founderBroker": "مؤسس / وسيط",
+        "agent": "وكيل",
+        "propertyOrPortfolioManager": "مدير عقارات أو محافظ",
+        "marketing": "التسويق",
+        "founderPartner": "مؤسس / شريك",
+        "lawyerOrCounsel": "محامٍ أو مستشار قانوني",
+        "paralegalOrLegalOps": "مساعد قانوني أو عمليات قانونية",
+        "businessDevelopment": "تطوير الأعمال",
+        "creatorFounder": "صانع محتوى / مؤسس",
+        "editorOrWriter": "محرر أو كاتب",
+        "communityOrSocial": "المجتمع أو التواصل الاجتماعي",
+        "sponsorshipsBusiness": "الرعايات / الأعمال",
+        "financeOrAdmin": "المالية أو الإدارة",
+        "projectOrTeamLead": "قائد مشروع أو فريق",
+        "sales": "المبيعات"
+    },
+    "team": {
+        "title": "ادعُ فريقك",
+        "description": "زملاؤك يعملون من أجلكم جميعًا.",
+        "label": "البريد الإلكتروني لأحد أعضاء الفريق",
+        "placeholder": "name@company.com",
+        "invite": "دعوة",
+        "invited": "تمت الدعوة",
+        "link": "رابط الدعوة",
+        "copy": "نسخ",
+        "copied": "تم النسخ",
+        "skip": "تخطي"
+    },
+    "view": {
+        "title": "كيف تريد أن ترى فريقك؟",
+        "hint": "يمكنك التبديل في أي وقت من قائمة مساحة العمل"
+    },
+    "trial": {
+        "title": "ابدأ تجربتك المجانية",
+        "description": "يبدأ زملاؤك العمل لحظة بدئها.",
+        "start": "بدء تجربتي المجانية"
+    },
+    "engine": {
+        "title": "جارٍ إعداد مساحة العمل",
+        "milestones": {
+            "trial": "جارٍ تأكيد تجربتك…",
+            "machine": "جارٍ حجز جهازك…",
+            "engine": "جارٍ إيقاظ Chief of Staff…"
+        },
+        "ready": "لنبنِ فريقك معًا.",
+        "greeting": "مرحبًا، أنا Chief of Staff الخاص بك",
+        "greetingNamed": "مرحبًا {name}، أنا Chief of Staff الخاص بك",
+        "failed": "جهازك يستغرق وقتًا أطول من المعتاد.",
+        "retry": "إعادة المحاولة",
+        "enterAnyway": "الدخول على أي حال",
+        "enter": "هيا بنا",
+        "wait": "لحظة واحدة"
+    },
+    "industries": {
+        "agencies": "الوكالات",
+        "ecommerce": "التجارة الإلكترونية",
+        "saas": "SaaS",
+        "sales": "المبيعات",
+        "recruiting": "التوظيف",
+        "real-estate": "العقارات",
+        "legal": "القانون والامتثال",
+        "creators": "صنّاع المحتوى",
+        "productivity": "الإنتاجية",
+        "other": "أخرى"
+    }
+}

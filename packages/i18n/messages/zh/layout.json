@@ -1,0 +1,222 @@
+{
+    "loading": "加载中...",
+    "theme": "主题",
+    "language": "语言",
+    "signIn": "登录",
+    "purchaseCancelled": "购买已取消",
+    "help": {
+        "label": "帮助",
+        "contactSupport": "联系支持"
+    },
+    "menu": {
+        "whatsNew": "新功能",
+        "gettingStarted": "快速入门",
+        "docs": "文档",
+        "community": "社区",
+        "shortcuts": "快捷键",
+        "installApp": "安装应用",
+        "desktopApp": "获取桌面应用",
+        "hireExpert": "聘请专家"
+    },
+    "power": {
+        "menuItem": "重启机器",
+        "cancel": "取消",
+        "failed": "出了点问题",
+        "restart": {
+            "title": "重启机器？",
+            "description": "此工作区的所有同事将在几分钟内无法访问。",
+            "confirmLabel": "重启",
+            "pending": "正在重启机器…",
+            "success": "已开始重启，机器将在几分钟后恢复。"
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "{providers} 出现故障。",
+            "many": "{providers} 出现故障。"
+        },
+        "headlineLong": {
+            "one": "{providers} 出现故障。您的同事可能会变慢或失败。",
+            "many": "{providers} 出现故障。您的同事可能会变慢或失败。"
+        },
+        "viewStatus": "查看状态",
+        "dismiss": "关闭服务商状态"
+    },
+    "sidePanel": {
+        "close": "关闭面板",
+        "resize": "调整面板大小"
+    },
+    "paused": {
+        "title": "工作区已暂停。",
+        "paymentFailed": "付款失败，工作区已暂停。",
+        "saved": "您的同事及其数据已保存。",
+        "savedUntil": "您的同事及其数据将保存至 {date}。",
+        "updatePayment": "更新付款方式",
+        "subscribe": "订阅以恢复"
+    },
+    "sandboxArchived": {
+        "title": "沙盒闲置 30 天后已归档。",
+        "requested": "已申请重新激活。",
+        "declined": "重新激活被拒绝。",
+        "declinedHint": "如果您认为这是误判，请联系我们。",
+        "savedUntil": "您的同事及其数据将保存至 {date}。",
+        "expired": "已保存的数据已过期，重新激活将从空沙盒开始。",
+        "requestedReason": "我们正在审核您的申请",
+        "request": "申请重新激活"
+    },
+    "restoring": {
+        "title": "正在恢复您的工作区…",
+        "waitingApproved": "重新激活已获批准，您排在第一位。",
+        "waitingPaid": "已收到付款，您排在第一位。",
+        "waitingHint": "几分钟内会自动恢复。",
+        "failed": "您的恢复需要我们这边检查一下。",
+        "failedApproved": "我们已收到提醒，正在手动恢复您的沙盒。",
+        "failedPaid": "已收到付款。我们已收到提醒，正在手动恢复您的工作区。",
+        "steps": {
+            "machine": "已分配机器",
+            "machineActive": "正在分配机器",
+            "data": "正在恢复您的数据",
+            "agents": "正在唤醒您的同事"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "工作区",
+        "summary": {
+            "sandbox": "专家沙盒",
+            "seats": "{count, plural, other {# 个席位}}",
+            "unlimitedSeats": "不限席位",
+            "limits": "{agents} 位同事 · {seats}",
+            "trial": "试用 · {limits}",
+            "lifetime": "终身 · {limits}",
+            "limitsUnlimited": "不限同事 · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "只有管理员可以管理 API 密钥",
+            "settings": "只有管理员可以更改工作区设置",
+            "servers": "只有管理员可以管理服务器",
+            "billing": "只有管理员可以管理账单"
+        },
+        "needsPlan": "免费试用开始后可用",
+        "apiKeys": "API 密钥和 MCP",
+        "settings": "设置",
+        "members": "成员",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, other {# 条待审核提议}}",
+        "aiProviders": "AI 服务商",
+        "vault": "Vault",
+        "vaultSignedOut": "Vault 中有应用已退出登录",
+        "computers": "电脑",
+        "servers": "服务器",
+        "billing": "账单",
+        "inviteFriends": "邀请好友",
+        "freeMonth": "免费一个月",
+        "newWorkspace": "新建工作区",
+        "templates": "模板",
+        "myTemplates": "我的模板",
+        "newTemplate": "新建模板",
+        "expert": "专家",
+        "sandbox": "沙盒",
+        "preparingSandbox": "正在准备沙盒…",
+        "publicProfile": "公开主页",
+        "admin": "管理",
+        "adminPanel": "管理后台",
+        "notifications": "通知",
+        "account": "账号",
+        "signOut": "退出登录"
+    },
+    "update": {
+        "reload": "重新加载",
+        "available": {
+            "title": "有新版本可用",
+            "description": "重新加载以获取最新的 Rerun。"
+        },
+        "required": {
+            "title": "Rerun 已更新",
+            "description": "新版本已上线。请重新加载以继续。"
+        }
+    },
+    "controlCenter": {
+        "title": "控制中心",
+        "description": "{named, select, yes {跳转到智能体、设置或对话，或询问 {name}。} other {跳转到智能体、设置或对话，或询问您的 Chief of Staff。}}",
+        "back": "返回",
+        "askRerun": "{named, select, yes {询问 {name}} other {询问您的 Chief of Staff}}",
+        "quotedQuery": "“{query}”",
+        "unnamedBox": "未命名 Box",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, other {# 个智能体}}",
+        "status": {
+            "off": "已关闭",
+            "waiting_human": "需要您处理",
+            "working": "工作中",
+            "error": "错误",
+            "offline": "离线"
+        },
+        "headings": {
+            "actions": "操作",
+            "settings": "设置",
+            "agents": "智能体",
+            "needsYou": "需要您处理",
+            "recent": "最近",
+            "boxes": "Boxes",
+            "conversations": "对话",
+            "recentConversations": "最近的对话",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
+            "open": "打开",
+            "moveTo": "移动到"
+        },
+        "agent": {
+            "desktop": "桌面",
+            "desktopDetail": "接管此同事的屏幕",
+            "move": "移动到其他 Box",
+            "notifications": "通知",
+            "notificationsDetail": "此智能体何时联系您"
+        },
+        "placeholder": {
+            "rootAssistant": "{named, select, yes {搜索或询问 {name}…} other {搜索或询问您的 Chief of Staff…}}",
+            "root": "搜索智能体、设置、对话…",
+            "agent": "在 {name} 中搜索…",
+            "agentUnknown": "在此智能体中搜索…",
+            "box": "在此 Box 中搜索智能体…",
+            "move": "选择一个 Box…"
+        },
+        "empty": {
+            "box": "此 Box 中还没有智能体。",
+            "noMatch": "没有匹配的结果。"
+        },
+        "hints": {
+            "open": "打开",
+            "more": "更多",
+            "searchPage": "再按 <keys></keys> 在页面中搜索"
+        },
+        "commands": {
+            "new_agent": "新建智能体",
+            "browse_templates": "浏览模板",
+            "new_box": "新建 Box",
+            "ask_assistant": "{named, select, yes {询问 {name}} other {询问您的 Chief of Staff}}",
+            "contact_support": "联系支持",
+            "recenter_board": "重新居中看板",
+            "toggle_theme_light": "切换到浅色主题",
+            "toggle_theme_dark": "切换到深色主题",
+            "workspace": "工作区设置",
+            "members": "成员",
+            "billing": "账单",
+            "ai_providers": "AI 服务商",
+            "api_keys": "API 密钥和 MCP",
+            "company_brain": "公司 Brain",
+            "shared_files": "共享文件",
+            "account": "账号",
+            "notifications": "通知",
+            "shortcuts": "键盘快捷键",
+            "whats_new": "新功能"
+        }
+    },
+    "boxNameSuggestions": "或选择一个名称",
+    "dashboard": {
+        "metaTitle": "仪表板",
+        "metaDescription": "您在 Rerun 上的 Boxes 和同事。"
+    },
+    "site": {
+        "title": "Rerun | 让 AI 完成您的任务，即使在您睡觉时",
+        "description": "从库中挑选一个开箱即用的 AI 智能体或自行构建，连接您的工具，它会在您云端的专属私有机器上全天候运行。免费试用 {trialDays} 天。"
+    }
+}

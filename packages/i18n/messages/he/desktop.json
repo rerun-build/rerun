@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "שולחן העבודה של {name}",
+        "titleFallback": "שולחן עבודה",
+        "description": "המסך שעליו העמית הזה עובד. מה שתעשה כאן, הוא ימצא אחר כך.",
+        "takeoverDescription": "אתה בדפדפן של העמית שלך. יש ללחוץ על סיום כשהוא יכול להמשיך.",
+        "takeoverHoldsBrowser": "הדפדפן של העמית שלך כבר פתוח לבקשה הזו.",
+        "clipboardDenied": "הדפדפן שלך לא אפשר ל-Rerun לקרוא את הלוח.",
+        "disconnectedDescription": "החיבור למכונה נסגר. שום דבר עליה לא אבד.",
+        "reconnect": "להתחבר מחדש",
+        "tryAgain": "לנסות שוב"
+    },
+    "screen": {
+        "connecting": "מתחבר למסך...",
+        "unavailable": "המסך לא זמין",
+        "wentAway": "החיבור למסך נותק",
+        "resize": "לשנות את גודל המסך"
+    },
+    "notch": {
+        "browser": "דפדפן",
+        "closeBrowser": "לסגור את הדפדפן",
+        "files": "קבצים",
+        "terminal": "טרמינל",
+        "paste": "להדביק",
+        "done": "סיום",
+        "close": "לסגור"
+    },
+    "screenCard": {
+        "openBrowser": "לפתוח דפדפן",
+        "takeControl": "להשתלט"
+    }
+}

@@ -1,0 +1,74 @@
+{
+    "switch": {
+        "label": "العرض",
+        "board": "اللوحة",
+        "simple": "كلاسيكي"
+    },
+    "list": {
+        "label": "الزملاء",
+        "search": "بحث",
+        "empty": "لا يوجد زملاء بعد",
+        "newBox": "Box جديد",
+        "emptyBox": "لا يوجد زملاء",
+        "boxMore": "إجراءات {name}"
+    },
+    "tile": {
+        "more": "المزيد لـ {name}",
+        "newConversation": "محادثة جديدة",
+        "allConversations": "كل المحادثات",
+        "card": "بطاقة الزميل",
+        "pin": "تثبيت في الأعلى",
+        "unpin": "إلغاء التثبيت"
+    },
+    "chat": {
+        "allConversations": "كل المحادثات",
+        "pick": "اختر زميلًا من القائمة.",
+        "card": "بطاقة الزميل"
+    },
+    "line": {
+        "paused": "متوقف مؤقتًا",
+        "waiting": "في انتظارك",
+        "error": "حدث خطأ ما",
+        "working": "يعمل",
+        "workingOn": "يعمل · {detail}",
+        "asleep": "نائم",
+        "asleepAbout": "نائم · {about}",
+        "you": "أنت: {message}"
+    },
+    "foreman": {
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "line": "اسأل عن أي شيء",
+        "card": "{named, select, yes {بطاقة {name}} other {بطاقة Chief of Staff}}",
+        "rename": "سمِّ Chief of Staff الخاص بك"
+    },
+    "details": {
+        "label": "بطاقة {name}"
+    },
+    "phone": {
+        "pinned": "المثبتة",
+        "recent": "الأحدث",
+        "byBox": "حسب Box",
+        "section": "{label}، {count}"
+    },
+    "checkins": {
+        "title": "المتابعات",
+        "toggle": "المتابعة من تلقاء نفسه",
+        "next": "النظرة التالية {when}",
+        "waiting": "ينتظر أن يكتب أحد أولًا",
+        "off": "متوقفة",
+        "unavailable": "معطلة على هذا الخادم",
+        "switchedOff": "فعّل المتابعات أولًا",
+        "recent": "الأحدث",
+        "runNow": "تابع الآن",
+        "started": "تجري المتابعة. لن يكتب إليك إلا إذا كان هناك ما يستحق القول.",
+        "empty": "لا متابعات بعد",
+        "reasons": {
+            "pulse": "نظرة يومية، لا جديد",
+            "promise": "عاد كما وعد، لا جديد",
+            "manual": "تمت المتابعة، لا جديد"
+        },
+        "failed": "لم تكتمل المتابعة",
+        "running": "تجري المتابعة",
+        "stopped": "أُوقفت المتابعة"
+    }
+}

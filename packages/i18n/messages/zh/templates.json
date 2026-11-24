@@ -1,0 +1,558 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "“{title}”已不再提供",
+        "buyFailed": "无法购买“{title}”",
+        "alreadyOnBoard": "“{title}”已在您的看板上",
+        "alreadyOnBoardHint": "它的同事会在您上次离开的位置打开。",
+        "notImported": "无法导入 {name}。",
+        "inactiveCount": "{count, plural, other {其中 # 位处于未激活状态：您的套餐没有空余的同事名额。}}",
+        "landed": "{count, plural, other {“{title}”中的 # 位同事已加入您的看板}}",
+        "openOne": "打开其中一位并开始安装：它会与您一起连接所需的一切。",
+        "landedInactive": "它以未激活状态加入：您的套餐没有空余的同事名额。",
+        "agentLanded": "“{name}”已加入您的看板",
+        "openIt": "打开它并开始安装：它会与您一起连接所需的一切。",
+        "webhooksMoved": "{count, plural, other {# 个 Webhook 获得了新 URL：请将您的服务指向副本自己的地址。}}",
+        "schedulesDoubled": "{count, plural, other {# 个计划任务也会在副本上运行。如果这些工作不应执行两次，请将其关闭。}}",
+        "copyReady": "它包含原版的一切，已准备好运行。",
+        "prepareBoxFailed": "无法准备您的 Box",
+        "settingUp": "正在设置“{title}”",
+        "settingUpHint": "您的同事很快会出现在看板上。",
+        "setUpFailed": "无法设置“{title}”"
+    },
+    "price": {
+        "free": "免费",
+        "monthly": "{amount}/月",
+        "useForFree": "免费使用",
+        "hire": "{count, plural, other {雇佣这 # 位同事 · {price}}}",
+        "hireCard": "雇佣 · {price}",
+        "purchased": "已购买",
+        "expired": "已过期",
+        "install": "安装",
+        "renew": "续订"
+    },
+    "connectors": {
+        "none": "无需应用",
+        "label": "应用：{names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, other {# 个模板}}",
+        "rerunTeam": "Rerun 团队",
+        "verified": "认证创作者"
+    },
+    "spotlight": {
+        "viewProfile": "查看 {name} 的主页",
+        "workWith": "与 {name} 合作",
+        "badge": "本周创作者",
+        "website": "网站",
+        "socialLabel": "{name} 的 {network}",
+        "openTemplate": "打开模板",
+        "recognizedFor": "代表作"
+    },
+    "about": {
+        "showMore": "显示更多",
+        "showLess": "收起"
+    },
+    "agentCard": {
+        "comesWith": "附带内容",
+        "apps": "应用",
+        "skills": "技能",
+        "schedules": "计划任务",
+        "webhooks": "Webhook",
+        "more": "另有 {count} 项"
+    },
+    "detail": {
+        "price": "价格",
+        "coworkers": "同事",
+        "useCases": "使用场景",
+        "alsoDoes": "{coworker}还能做",
+        "apps": "应用",
+        "setupTime": "设置时间",
+        "minutes": "{minutes} 分钟",
+        "category": "类别",
+        "about": "简介",
+        "whatYouNeed": "您需要准备",
+        "carousel": "此模板中的同事",
+        "securityTitle": "安全",
+        "securityBody": "此模板已移除凭据和私人数据。应用导入时处于未连接状态，导入后由您授权。",
+        "cancelAnytime": "可随时在账单设置中取消。"
+    },
+    "library": {
+        "title": "模板库",
+        "templates": "模板",
+        "hideDetails": "隐藏详情",
+        "newCoworker": "新同事",
+        "createCoworker": "创建新同事",
+        "viewProfile": "查看主页",
+        "filters": {
+            "app": "应用",
+            "status": "状态"
+        },
+        "search": {
+            "placeholder": "搜索模板",
+            "clear": "清除搜索"
+        },
+        "mode": {
+            "coworkers": "同事",
+            "use-cases": "使用场景"
+        },
+        "nav": {
+            "discover": "发现",
+            "all": "全部"
+        },
+        "heading": {
+            "coworkers": "{count, plural, other {# 位同事}}",
+            "useCases": "{count, plural, other {# 个使用场景}}",
+            "results": "“{query}”的搜索结果",
+            "discoverEmpty": "您创建的模板会出现在这里。",
+            "discover": "现成的同事，由亲自使用它们的人打造。",
+            "creator": "创作者"
+        },
+        "discover": {
+            "seeAll": "查看全部",
+            "creators": "创作者",
+            "creatorsSubtitle": "模板背后的人。",
+            "allCreators": "全部创作者",
+            "forYou": "为您推荐",
+            "forYouSubtitle": "匹配您的行业和您使用的应用。",
+            "featured": "精选",
+            "featuredSubtitle": "精心挑选、值得优先一看的配置。",
+            "justAdded": "最新上架",
+            "justAddedSubtitle": "Rerun 上最新发布的模板。"
+        },
+        "empty": {
+            "filtered": "没有符合这些筛选条件的模板",
+            "none": "这里还没有模板",
+            "selfHosted": "先招募一位同事，再将其保存为模板。",
+            "cloud": "自己动手构建，并在 Rerun 上出售。",
+            "become": "成为 Rerun 专家"
+        }
+    },
+    "scratch": {
+        "title": "从零开始",
+        "description": "不使用模板。为您的同事命名，然后把它放到网格上。"
+    },
+    "section": {
+        "back": "返回全部模板",
+        "filterBy": "按{title}筛选"
+    },
+    "authoring": {
+        "prefill": "智能预填",
+        "altText": "撰写替代文本",
+        "content": {
+            "title": "内容",
+            "tagline": "标语",
+            "taglineHelp": "{count}/{limit}，一句话。",
+            "taglinePlaceholder": "寻找潜在客户，撰写首次联系邮件，并持续跟进直到对方回复。",
+            "longDescription": "详细描述",
+            "longDescriptionPlaceholder": "此模板做什么、适合谁，以及运行需要什么。"
+        },
+        "faq": {
+            "title": "常见问题",
+            "hint": "显示在公开页面上，并以 FAQ 结构化数据的形式提供给搜索引擎。",
+            "empty": "还没有问题。可以预填，也可以手动添加。",
+            "question": "问题",
+            "questionPlaceholder": "我需要连接哪些账户？",
+            "answer": "回答",
+            "answerPlaceholder": "用两三句话独立回答这个问题。",
+            "remove": "删除此问题",
+            "add": "添加问题"
+        },
+        "media": {
+            "title": "媒体",
+            "videoUrl": "视频 URL",
+            "videoPlaceholder": "https://youtube.com/watch?v=… 或 Loom 链接",
+            "ogImage": "自定义 OG 图片",
+            "ogImagePlaceholder": "留空则自动生成",
+            "ogImageHelp": "仅在需要定制社交卡片时设置。",
+            "gallery": "图库",
+            "galleryHelp": "可选：卡片会改为展示同事看板。这些图片用于详情页，第一张放在最前，自动生成的一张也放在那里。请保存以生效。建议填写替代文本：这些图片会出现在被搜索引擎收录的页面上。",
+            "altCover": "替代文本（封面）",
+            "alt": "替代文本",
+            "cover": "封面",
+            "remove": "删除",
+            "dropOverlay": "拖放图片",
+            "uploading": "上传中…",
+            "drop": "将图片拖放到此处，或点击选择"
+        },
+        "meta": {
+            "title": "元数据",
+            "titleLabel": "标题",
+            "titlePlaceholder": "外呼销售开发代表",
+            "slug": "Slug",
+            "category": "类别",
+            "setupTime": "设置时间（分钟）",
+            "setupTimeHelp": "显示在公开页面上。请如实估算应用设置所需时间。",
+            "tags": "标签",
+            "tagsPlaceholder": "外联, 销售, 自动化",
+            "tagsHelp": "以逗号分隔。用于公开页面上的筛选。",
+            "metaTitle": "元标题",
+            "metaTitlePlaceholder": "{title}，AI 同事模板",
+            "metaTitleDefault": "默认使用标题",
+            "metaDescription": "元描述",
+            "metaDescriptionHelp": "{count}/{limit}，发布需要 {min} 到 {limit} 个字符。",
+            "metaDescriptionPlaceholder": "用一两句话描述，用于搜索结果。"
+        }
+    },
+    "capture": {
+        "failedRequest": "请求未能发送。请检查网络连接后重试。",
+        "steps": {
+            "select": {
+                "title": "捕获同事",
+                "description": "选择要将其文件夹变成此模板的同事。"
+            },
+            "review": {
+                "title": "安全审查",
+                "description": "检查每位同事携带的内容，确认后再捕获。"
+            },
+            "done": {
+                "title": "已捕获",
+                "description": "归档已保存，模板现在描述了这些同事。"
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "为您的模板命名",
+                "description": "确认后草稿会立即保存。",
+                "points": {
+                    "private": "发布前保持私密",
+                    "signed": "署上您的名字"
+                }
+            },
+            "select": {
+                "title": "选择您的同事",
+                "description": "同事文件夹会按当前状态生成快照。",
+                "points": {
+                    "snapshot": "是快照，而不是链接",
+                    "edits": "之后的编辑只留在您这边"
+                }
+            },
+            "review": {
+                "title": "安全审查",
+                "description": "任何内容离开 Box 之前，都会先移除密钥。",
+                "points": {
+                    "env": "清除环境变量值",
+                    "apps": "重置应用",
+                    "scan": "扫描文件和路径中的密钥",
+                    "memories": "不带走记忆"
+                }
+            },
+            "done": {
+                "title": "捕获",
+                "description": "归档会私密保存，并用于描述模板。",
+                "points": {
+                    "stored": "安全存放，他人无法访问",
+                    "warnings": "提前警告，不留意外"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "没有可捕获的同事",
+            "emptyDescription": "请先在 Box 中创建一位同事，然后再回到这里。",
+            "box": "Box",
+            "boxPlaceholder": "选择包含这些同事的 Box",
+            "boxFallback": "Box",
+            "coworkers": "同事",
+            "coworkersIn": "{box} 中的同事",
+            "search": "按名称或用户名搜索",
+            "selected": "已选择 {selected} / {total}",
+            "clear": "清除",
+            "selectAll": "全选",
+            "noMatch": "没有与此搜索匹配的同事。"
+        },
+        "review": {
+            "reviewed": "已审查 {approved} / {total, plural, other {# 位同事}}",
+            "files": "{kept} / {total} 个文件，{size}",
+            "tools": "工具",
+            "apps": "应用",
+            "skills": "技能",
+            "schedules": "计划任务",
+            "oneShot": "一次性任务",
+            "webhooks": "Webhook",
+            "memories": "记忆",
+            "memoriesNote": "已记录 {count} 条，默认不包含在归档中",
+            "removed": "导出时已移除",
+            "toProvide": "副本上需重新提供",
+            "envKeys": "环境变量键",
+            "flagged": "已标记的文件",
+            "flaggedKept": "{total} 个疑似包含凭据的文件中，仍有 {kept} 个被包含在内。它们会随归档一起带走。",
+            "flaggedOut": "{count, plural, other {# 个文件}}疑似包含凭据。它们不会被放入归档。",
+            "install": "安装",
+            "filesGroup": "文件",
+            "hideFolder": "隐藏文件夹",
+            "showFolder": "显示文件夹",
+            "kept": "已保留 {kept} / {total}",
+            "confirm": "我已审查此同事携带的内容",
+            "answerFirst": "请先回答上方的安装问题。",
+            "writeFirst": "请先撰写上方的安装说明。",
+            "flaggedTravel": "{count} 个已标记的文件会随归档一起带走。",
+            "nothingSecret": "此列表中没有不应发布的密钥。",
+            "more": "另有 {count} 项"
+        },
+        "tree": {
+            "collapse": "收起",
+            "expand": "展开",
+            "flagged": "{count} 个已标记"
+        },
+        "done": "已捕获 {count, plural, other {# 位同事}}。他们的技能、计划任务和应用现在描述了此模板。",
+        "panel": {
+            "inspect": "检查{count, plural, =0 {同事} other {# 位同事}}",
+            "reviewEach": "审查每个智能体后才能捕获（{approved}/{total}）",
+            "back": "返回",
+            "capture": "捕获"
+        },
+        "dialog": {
+            "cancel": "取消",
+            "done": "完成"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "同事（{count}）",
+            "empty": "尚未捕获任何同事。请从您的沙盒中捕获一位，以便他人安装此配置。",
+            "noRole": "尚无角色",
+            "connectors": "{count, plural, other {# 个连接器}}",
+            "setup": {
+                "guided": "引导式安装",
+                "none": "无需安装",
+                "missing": "缺少安装回答"
+            },
+            "removeTitle": "移除 {name}？",
+            "removeDescription": "从其文件夹捕获的归档也会被删除。若要重新加入该同事，需要再次捕获。",
+            "removeConfirm": "移除",
+            "removeLabel": "移除 {name}",
+            "capture": "从您的沙盒捕获",
+            "removeNote": "移除同事也会删除从其文件夹捕获的归档。若要重新加入，需要再次捕获。"
+        },
+        "list": {
+            "newTemplate": "新模板",
+            "emptyTitle": "暂无模板",
+            "emptyDescription": "只需描述一次同事配置，我们会在其上架市场前进行审核。"
+        },
+        "row": {
+            "agents": "{count, plural, other {# 个智能体}}"
+        },
+        "tabs": {
+            "details": "详情",
+            "pricing": "定价",
+            "media": "媒体",
+            "faq": "常见问题",
+            "agents": "同事"
+        },
+        "dialog": {
+            "title": "我的模板",
+            "description": "从您的沙盒起草模板，然后提交给我们。上线前我们会进行审核。",
+            "pickTitle": "选择模板",
+            "pickDescription": "或新建一个，将沙盒中的同事捕获到其中。"
+        },
+        "toasts": {
+            "saved": "模板已保存。",
+            "submitted": "已提交。我们会尽快回复您。"
+        },
+        "footer": {
+            "requirements": {
+                "title": "标题",
+                "tagline": "标语",
+                "description": "描述",
+                "metaDescription": "{min} 到 {max} 个字符的元描述",
+                "agent": "至少一位已捕获的同事",
+                "installAnswers": "每位同事都有安装回答",
+                "payouts": "一个可以接收付款的 Stripe 账户"
+            },
+            "live": "此模板已在市场上线。如需修改，请联系 Rerun 团队。",
+            "inReview": "我们正在审核此模板。撤回后可继续编辑。",
+            "withdraw": "撤回",
+            "completeChecklist": "请先完成检查清单",
+            "saveFirst": "请先保存您的更改",
+            "sentBack": "此模板已被退回",
+            "deleteTitle": "永久删除此模板？",
+            "deleteDescription": "模板、其媒体以及为其捕获的所有同事都会被删除，且无法撤销。",
+            "deleteTooltip": "永久删除此模板",
+            "deleteLabel": "删除模板",
+            "checklistLabel": "提交检查清单：已完成 {met} / {total}",
+            "ready": "可以提交",
+            "checklistHint": "模板在审核前需要具备的内容。",
+            "setUpPayouts": "设置收款",
+            "save": "保存",
+            "submit": "提交审核"
+        }
+    },
+    "pricing": {
+        "title": "定价",
+        "models": {
+            "free": "免费",
+            "one_time": "一次性购买",
+            "recurring": "按月订阅"
+        },
+        "helpers": {
+            "free": "任何拥有 Rerun 套餐的人都可以安装。",
+            "one_time": "一次性收费，买家永久拥有。",
+            "recurring": "每月收费，买家取消后访问权限终止。"
+        },
+        "modelHelp": "{helper}买家仍需有效的 Rerun 套餐才能安装模板。",
+        "priceLabel": "价格（美元）",
+        "priceHelp": "最低 {min}。之后修改价格仅对新买家生效。",
+        "payoutsTitle": "收款未启用",
+        "payoutsBody": "您现在可以保存此价格，但在启用 Stripe 收款之前，付费模板无法提交审核。",
+        "setUpPayouts": "设置收款",
+        "payout": {
+            "yourPrice": "您的价格{recurring, select, true {（每月）} other {}}",
+            "fee": "Rerun 费用（{fee}）",
+            "earn": "您的收入{recurring, select, true {（每月）} other {}}",
+            "vat": "增值税在结账时加在您的价格之上，由买家支付，绝不会从您这边扣除。无论买家在哪里，您的收入都一样。"
+        }
+    },
+    "payouts": {
+        "expired": "您的设置链接已过期，正在重新打开 Stripe。",
+        "title": "收款",
+        "subtitle": "您的付费模板收入的到账去处。",
+        "yourPrice": "您的价格",
+        "yourPriceValue": "按模板分别设置，不含增值税",
+        "commission": "Rerun 佣金",
+        "schedule": "付款周期",
+        "scheduleValue": "Stripe 标准周期",
+        "planNote": "买家仍需有效的 Rerun 套餐才能安装模板，因此购买只解锁该模板，不含其他内容。",
+        "states": {
+            "not_started": {
+                "headline": "通过您的模板获得收入",
+                "body": "Rerun 从每笔销售中收取 {fee}。款项通过 Stripe 打到您的银行账户。",
+                "cta": "设置收款"
+            },
+            "incomplete": {
+                "headline": "完成您的 Stripe 设置",
+                "body": "Stripe 还需要一些信息才能向您付款。",
+                "cta": "完成设置"
+            },
+            "pending_verification": {
+                "headline": "Stripe 正在验证您的信息",
+                "body": "通常需要几分钟。在此期间您可以继续起草模板。",
+                "cta": "查看状态"
+            },
+            "restricted": {
+                "headline": "收款已暂停",
+                "body": "Stripe 已限制此账户。您已发布的模板仍然在线，但在问题解决之前无人可以购买。",
+                "cta": "前往 Stripe 解决"
+            },
+            "ready": {
+                "headline": "您已完成收款设置",
+                "body": "为模板定价，经我们审核后即可上架销售。Rerun 从每笔销售中收取 {fee}。",
+                "cta": "打开 Stripe 控制台"
+            }
+        },
+        "stripeReported": "Stripe 反馈：{reason}",
+        "terms": "继续即表示您接受<link>市场创作者条款</link>，包括退款和拒付的处理方式。",
+        "sidebar": {
+            "payouts": "收款",
+            "revenue": "收入"
+        },
+        "stateLabels": {
+            "not_started": "未设置",
+            "incomplete": "需要操作",
+            "pending_verification": "审核中",
+            "restricted": "受限",
+            "ready": "就绪"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "企业网站",
+                "mcc": "您的业务类型"
+            },
+            "external_account": "银行账户",
+            "individual": {
+                "verification": {
+                    "document": "身份证件",
+                    "additional_document": "地址证明"
+                },
+                "id_number": "您的身份证号码",
+                "address": {
+                    "line1": "您的地址"
+                },
+                "dob": {
+                    "day": "您的出生日期"
+                }
+            },
+            "tos_acceptance": {
+                "date": "接受 Stripe 条款"
+            }
+        },
+        "saleKinds": {
+            "one_time": "一次性",
+            "recurring": "按月",
+            "refund": "退款"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 天",
+            "12m": "12 个月",
+            "all": "全部时间"
+        },
+        "noAccountTitle": "尚无收款账户",
+        "noAccountDescription": "设置收款，开始出售您的模板。",
+        "setUpPayouts": "设置收款",
+        "title": "收入",
+        "openDashboard": "打开 Stripe 控制台",
+        "youEarned": "您的收入",
+        "noSales": "此期间没有销售。",
+        "recentSales": "最近销售",
+        "date": "日期",
+        "template": "模板",
+        "type": "类型",
+        "sales": "销售额",
+        "gross": "总额",
+        "fee": "Rerun 费用",
+        "pending": "待付款",
+        "available": "当前可用",
+        "subscriptions": "{count, plural, other {# 个有效订阅}}",
+        "perMonth": "{amount}/月"
+    },
+    "categories": {
+        "agencies": "代理机构",
+        "ecommerce": "电商",
+        "saas": "SaaS",
+        "sales": "销售",
+        "recruiting": "招聘",
+        "real-estate": "房地产",
+        "legal": "法务与合规",
+        "creators": "创作者",
+        "productivity": "效率",
+        "other": "其他"
+    },
+    "status": {
+        "draft": "草稿",
+        "in_review": "审核中",
+        "published": "已发布",
+        "unlisted": "不公开列出",
+        "archived": "已归档"
+    },
+    "creatorKind": {
+        "studio": "工作室",
+        "freelancer": "自由职业者",
+        "expert": "专家"
+    },
+    "cta": {
+        "place": "{count, plural, other {放置 # 位同事}}",
+        "placeCaption": "{count, plural, other {拖到您的看板上，即可运行。}}",
+        "trialInstall": "开始免费试用并安装",
+        "trialThenSubscribe": "开始免费试用，然后以 {price}/月订阅",
+        "trialThenPay": "开始免费试用，然后支付 {price}",
+        "planInstall": "以 {plan}/月订阅并安装",
+        "planThenSubscribe": "以 {plan}/月订阅，然后以 {price}/月订阅此模板",
+        "planThenPay": "以 {plan}/月订阅，然后支付 {price}",
+        "subscribe": "以 {price}/月订阅",
+        "pay": "支付 {price}",
+        "payCaption": "此模板单独计费。",
+        "useTemplate": "使用此模板",
+        "nothingCaptured": "此模板中尚未捕获任何同事。",
+        "open": "打开 {name}",
+        "alreadyOnBoard": "已在您的看板上。",
+        "installAgain": "再次安装",
+        "sandboxCannotBuy": "请切换到工作区以购买模板。",
+        "trialBilledSeparately": "{terms}此模板单独计费。",
+        "trialUsedBilledSeparately": "您的免费试用已用完。今天开始计费；此模板单独计费。",
+        "resubscribe": "以 {price}/月重新订阅",
+        "lapsed": "您的订阅已结束。此模板安装的同事已被停用。",
+        "billedTo": "由 {workspace} 支付。您的 Rerun 套餐已生效。",
+        "yours": "您自己的模板，免费。"
+    },
+    "boardAlt": "{title} 的同事看板"
+}

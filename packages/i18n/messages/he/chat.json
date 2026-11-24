@@ -1,0 +1,613 @@
+{
+    "actions": {
+        "copy": "להעתיק",
+        "copied": "הועתק",
+        "connect": "לחבר",
+        "cancel": "ביטול",
+        "continue": "להמשיך",
+        "notNow": "לא עכשיו",
+        "copiedExclaim": "הועתק!"
+    },
+    "sources": {
+        "used": "{count, plural, one {נעשה שימוש במקור #} two {נעשה שימוש ב-# מקורות} other {נעשה שימוש ב-# מקורות}}"
+    },
+    "draft": {
+        "label": "טיוטה"
+    },
+    "mcpServer": {
+        "failed": "לא ניתן היה לחבר את {name}",
+        "notAdded": "לא נוסף",
+        "added": "{name} נוסף",
+        "custom": "שרת MCP מותאם אישית",
+        "customWithHost": "שרת MCP מותאם אישית · {host}"
+    },
+    "mcpSignIn": {
+        "title": "להתחבר אל {name}"
+    },
+    "mentions": {
+        "coworkers": "עמיתים",
+        "skills": "מיומנויות",
+        "computers": "מחשבים",
+        "button": "לאזכר עמית, מיומנות או מחשב",
+        "coworker": {
+            "action": "לאזכר עמית",
+            "description": "לצרף עמית לשיחה הזו",
+            "empty": "אין עדיין עמית נוסף בסביבת העבודה הזו"
+        },
+        "skill": {
+            "action": "להשתמש במיומנות",
+            "description": "להריץ מדריך שמור שהעמית שלך מכיר",
+            "empty": "לעמית הזה אין עדיין מיומנות"
+        },
+        "computer": {
+            "action": "להשתמש במחשב",
+            "description": "לאפשר לעמית שלך לעבוד על מחשב מקושר",
+            "empty": "אין עדיין מחשב מקושר"
+        }
+    },
+    "paidSources": {
+        "count": "{count, plural, one {מקור #} two {# מקורות} other {# מקורות}}",
+        "emailsVerified": "{valid} מתוך {checked} כתובות מייל אומתו"
+    },
+    "tableCard": {
+        "openDisabledReason": "יש לפתוח את העמית הזה מהלוח כדי לעיין במסד הנתונים שלו."
+    },
+    "conversation": {
+        "emptyTitle": "אין עדיין הודעות",
+        "emptyDescription": "התחל שיחה כדי לראות כאן הודעות",
+        "scrollToLatest": "לגלול להודעה האחרונה"
+    },
+    "brainProposal": {
+        "create": "דף חדש ב-Brain: {title}",
+        "edit": "שינוי ב-Brain: {title}",
+        "description": "הוצע לבדיקה. שום דבר לא משתנה עד שמישהו מאשר.",
+        "review": "לבדוק"
+    },
+    "attachments": {
+        "attach": "לצרף קבצים",
+        "open": "לפתוח את {name}",
+        "position": "{current} / {total}",
+        "previous": "הקובץ המצורף הקודם",
+        "next": "הקובץ המצורף הבא",
+        "download": "להוריד",
+        "waiting": "בהמתנה",
+        "finishing": "מסיים",
+        "progress": "{percent}%",
+        "progressWithEta": "{percent}% · {eta}",
+        "fileFallback": "קובץ",
+        "uploading": "מעלה את {name}",
+        "retryUpload": "לנסות להעלות שוב",
+        "cancelUpload": "לבטל את ההעלאה",
+        "remove": "להסיר את הקובץ המצורף",
+        "openMore": "לפתוח עוד {count}",
+        "uploadFailed": "ההעלאה נכשלה",
+        "uploadingProgress": "מעלה · {percent}%",
+        "retryUploading": "לנסות להעלות שוב את {name}",
+        "removeNamed": "להסיר את {name}"
+    },
+    "screen": {
+        "openBrowser": "לפתוח דפדפן",
+        "takeControl": "לקחת שליטה"
+    },
+    "composer": {
+        "link": {
+            "open": "לפתוח",
+            "unlink": "להסיר קישור"
+        },
+        "subscriptionCta": "כבר משלם על מנוי AI? אפשר להריץ עליו את העמית הזה.",
+        "placeholder": "הקלד @ לעמית, / למיומנות, # למחשב",
+        "placeholderNoSkill": "הקלד @ לעמית, # למחשב",
+        "attachmentsMissing": "חלק מהקבצים המצורפים לא הועלו. יש להסיר ולצרף אותם שוב לפני השליחה.",
+        "attachmentsFailed": "{count, plural, one {העלאת קובץ מצורף # נכשלה. יש לנסות שוב או להסיר אותו לפני השליחה.} two {העלאת # קבצים מצורפים נכשלה. יש לנסות שוב או להסיר אותם לפני השליחה.} other {העלאת # קבצים מצורפים נכשלה. יש לנסות שוב או להסיר אותם לפני השליחה.}}",
+        "noFiles": "הצ'אט הזה עדיין לא מקבל קבצים.",
+        "sendFailed": "לא ניתן היה לשלוח את ההודעה שלך",
+        "openEditor": "לפתוח את העורך המלא",
+        "stop": "לעצור את ההרצה הנוכחית",
+        "editor": {
+            "title": "כתוב את ההודעה שלך",
+            "description": "מקום לבנות הודעה ארוכה. Enter מתחיל שורה חדשה.",
+            "hint": "לשליחה: Cmd + Enter",
+            "cancel": "ביטול",
+            "send": "לשלוח"
+        }
+    },
+    "message": {
+        "showLess": "להציג פחות",
+        "showMore": "להציג עוד",
+        "openFile": "לפתוח את {path}",
+        "branch": {
+            "previous": "הענף הקודם",
+            "next": "הענף הבא",
+            "page": "{current} מתוך {total}"
+        },
+        "goodResponse": "תשובה טובה",
+        "badResponse": "תשובה גרועה",
+        "regenerate": "ליצור מחדש",
+        "relayedFor": "{named, select, yes {{name} עבור {person}} other {Chief of Staff עבור {person}}}"
+    },
+    "installGate": {
+        "title": "להגדיר את {name}",
+        "inProgressTitle": "{name} בהגדרה",
+        "inProgressHint": "בשיחה אחרת",
+        "facts": "{apps, plural, =0 {~{minutes} דק׳} one {# אפליקציה · ~{minutes} דק׳} two {# אפליקציות · ~{minutes} דק׳} other {# אפליקציות · ~{minutes} דק׳}}",
+        "continue": "להמשיך בהגדרה",
+        "installing": "מתקין",
+        "install": "להתקין את {name}",
+        "skip": "לדלג בינתיים"
+    },
+    "activity": {
+        "thinking": "חושב...",
+        "processing": "מעבד את הבקשה שלך...",
+        "crafting": "מנסח תשובה...",
+        "writing": "כותב...",
+        "runningTool": "מריץ {tool}",
+        "waitingOn": "ממתין ל-{name}",
+        "building": "בונה את {name}",
+        "buildingCoworkers": "{count, plural, one {בונה עמית #} two {בונה # עמיתים} other {בונה # עמיתים}} · {done} הושלמו",
+        "waitingOnSubCoworkers": "{count, plural, one {ממתין לתת-עמית #} two {ממתין ל-# תתי-עמיתים} other {ממתין ל-# תתי-עמיתים}} · {done} הושלמו"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {שאלה ממתינה} one {שאלה ממתינה} two {# שאלות ממתינות} other {# שאלות ממתינות}}",
+        "approval": "{count, plural, =0 {נדרש אישור} one {נדרש אישור} two {נדרשים # אישורים} other {נדרשים # אישורים}}",
+        "secret": "{count, plural, =0 {נדרשים פרטי גישה} one {נדרשים פרטי גישה} two {נדרשים # פרטי גישה} other {נדרשים # פרטי גישה}}",
+        "mcpNamed": "להתחבר אל {name}",
+        "mcp": "נדרשת התחברות",
+        "service": "{count, plural, =0 {אפליקציה לחיבור} one {אפליקציה לחיבור} two {# אפליקציות לחיבור} other {# אפליקציות לחיבור}}",
+        "takeover": "תורך על המסך",
+        "spend": "הוצאה לאישור",
+        "computer": "לאשר פקודה ב-#{computer}",
+        "feature": "בקשה לשליחה לצוות Rerun"
+    },
+    "pendingHitl": {
+        "goTo": "{label}, לעבור אליו"
+    },
+    "reasoning": {
+        "thinking": "חושב...",
+        "thought": "מחשבה"
+    },
+    "secretRequest": {
+        "saveFailed": "לא ניתן היה לשמור את פרטי הגישה"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "ה-Brain עודכן: {title}",
+            "created": "דף חדש ב-Brain: {title}",
+            "deleted": "הוסר מה-Brain: {title}",
+            "accepted": "השינוי אושר: {title}",
+            "acceptedBy": "השינוי של {name} אושר: {title}",
+            "dismissed": "השינוי נדחה: {title}",
+            "dismissedBy": "השינוי של {name} נדחה: {title}"
+        },
+        "notes": {
+            "saved": "נשמר. כל עמית קורא אותו מההרצה הבאה שלו.",
+            "deleted": "אף עמית כבר לא קורא אותו. ההיסטוריה שלו נשמרת.",
+            "accepted": "נשמר. כל עמית קורא אותו מההרצה הבאה שלו.",
+            "dismissed": "הדף לא השתנה."
+        },
+        "undone": "בוטל: {title}",
+        "undoneNote": "הגרסה הקודמת חזרה.",
+        "undo": "לבטל",
+        "open": "לפתוח"
+    },
+    "compaction": {
+        "running": "מכווץ את ההקשר…",
+        "failed": "כיווץ ההקשר נכשל",
+        "done": "ההקשר כווץ",
+        "summarized": "{count, plural, one {סוכמה הודעה קודמת #} two {סוכמו # הודעות קודמות} other {סוכמו # הודעות קודמות}}",
+        "recovered": "שוחררו ~{tokens} טוקנים"
+    },
+    "providerSwitch": {
+        "limit": "הגעת למגבלת {plan} · {model}",
+        "limitUntil": "הגעת למגבלת {plan} · {model} עד {time}",
+        "limitUntilDate": "הגעת למגבלת {plan} · {model} עד {date}, {time}",
+        "back": "{plan} התאפס. חזרה ל-{model}."
+    },
+    "scheduledRun": {
+        "label": "הרצה מתוזמנת",
+        "viewPrompt": "להציג את ההנחיה",
+        "promptTitle": "ההנחיה של {name}"
+    },
+    "steps": {
+        "count": "{count, plural, one {שלב #} two {# שלבים} other {# שלבים}}",
+        "countWithFailures": "{count, plural, one {שלב #} two {# שלבים} other {# שלבים}}, {failed} נכשלו",
+        "failed": "{failed} נכשלו",
+        "thinking": "חושב",
+        "compacting": "מכווץ"
+    },
+    "subRun": {
+        "failuresInARow": "{count} כשלים ברצף",
+        "idle": "לא פעיל {minutes} דק׳",
+        "stopTask": "לעצור את המשימה הזו",
+        "stopped": "נעצר, העבודה החלקית נשמרה",
+        "stoppedWithRun": "נעצר יחד עם ההרצה",
+        "failed": "נכשל",
+        "earlier": "+{count} קודמים",
+        "verbs": {
+            "search": "מחפש {summary}",
+            "read": "קורא {summary}",
+            "browse": "גולש ב-{summary}",
+            "run": "מריץ {summary}",
+            "write": "כותב {summary}",
+            "edit": "עורך {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "קוצר",
+        "empty": "אין תוכן",
+        "payload": "תוכן"
+    },
+    "voice": {
+        "sendFailed": "לא ניתן היה לשלוח את ההקלטה.",
+        "sendFailedHint": "לנסות שוב, או למחוק אותה.",
+        "waitingForMicrophone": "ממתין למיקרופון...",
+        "microphone": "מיקרופון...",
+        "transcribing": "מתמלל...",
+        "hideTranscript": "להסתיר תמלול",
+        "transcript": "תמלול",
+        "copyTranscript": "להעתיק תמלול",
+        "pause": "להשהות",
+        "play": "להשמיע הודעה קולית",
+        "seek": "דילוג",
+        "record": "להקליט הודעה קולית",
+        "discard": "למחוק",
+        "discardLabel": "למחוק את ההקלטה",
+        "retry": "לנסות שוב",
+        "send": "לשלוח",
+        "retryLabel": "לנסות לשלוח שוב את ההקלטה",
+        "sendLabel": "לשלוח את ההקלטה",
+        "unsupported": "הודעות קוליות לא נתמכות בדפדפן הזה.",
+        "microphoneBlocked": "הגישה למיקרופון חסומה. יש לאפשר אותה בהגדרות הדפדפן כדי להקליט.",
+        "noMicrophone": "אין מיקרופון זמין.",
+        "startFailed": "לא ניתן היה להתחיל להקליט.",
+        "nothingHeard": "לא נשמע דבר בהקלטה הזו.",
+        "voiceMessageFailed": "לא ניתן היה לשלוח את ההודעה הקולית שלך.",
+        "nothingRecorded": "שום דבר לא הוקלט."
+    },
+    "agentInstall": {
+        "started": "ההתקנה התחילה",
+        "complete": "ההתקנה הושלמה",
+        "viewGuide": "להציג מדריך",
+        "guideTitle": "מדריך ההתקנה של {name}"
+    },
+    "setupEvents": {
+        "notificationSent": "שלח לך התראה",
+        "read": "נקראה",
+        "schedulesOn": "{count, plural, one {תזמון # פעיל} two {# תזמונים פעילים} other {# תזמונים פעילים}}",
+        "triggersOn": "{count, plural, one {טריגר # פעיל} two {# טריגרים פעילים} other {# טריגרים פעילים}}",
+        "setUp": "{name} מוגדר",
+        "setupComplete": "ההגדרה הושלמה",
+        "connectedHint": "מחובר, העמית יכול להשתמש בו",
+        "signInHint": "יש להתחבר פעם אחת כדי שהעמית יוכל להשתמש בו",
+        "connected": "מחובר",
+        "signIn": "להתחבר"
+    },
+    "takeover": {
+        "opened": "הדפדפן פתוח בשולחן העבודה של העמית שלך. חזור לכאן כשתסיים.",
+        "opensSite": "פותח את {site} בדפדפן של העמית שלך, כדי שתוכל לשלוט בו.",
+        "opens": "פותח את הדפדפן של העמית שלך, כדי שתוכל לשלוט בו.",
+        "skipLabel": "לדלג על השליטה בדפדפן",
+        "privacy": "מה שאליו אתה מתחבר נשאר בדפדפן של העמית הזה במכונה שלך.",
+        "openAgain": "לפתוח שוב",
+        "closing": "סוגר…",
+        "done": "סיום",
+        "skip": "לדלג",
+        "openBrowser": "לפתוח דפדפן"
+    },
+    "video": {
+        "play": "להפעיל את {name}",
+        "pause": "להשהות את {name}",
+        "previewUnavailable": "התצוגה המקדימה לא זמינה",
+        "openFullScreen": "לפתוח את {name} במסך מלא"
+    },
+    "tool": {
+        "error": "שגיאה",
+        "output": "פלט",
+        "input": "קלט",
+        "completedIn": "הושלם תוך {duration}"
+    },
+    "webhookRun": {
+        "label": "התקבל Webhook",
+        "viewPrompt": "להציג את ההנחיה",
+        "viewPayload": "להציג את התוכן",
+        "promptTitle": "ההנחיה של {name}",
+        "payloadTitle": "התוכן של {name}"
+    },
+    "question": {
+        "tooManyFiles": "אפשר לצרף עד {max} קבצים. {rejected} לא נוספו.",
+        "uploadsFailed": "{count, plural, one {לא ניתן היה להעלות קובץ מצורף #. יש לנסות שוב או להסיר אותו לפני המענה.} two {לא ניתן היה להעלות # קבצים מצורפים. יש לנסות שוב או להסיר אותם לפני המענה.} other {לא ניתן היה להעלות # קבצים מצורפים. יש לנסות שוב או להסיר אותם לפני המענה.}}"
+    },
+    "queued": {
+        "stopping": "עוצר את ההרצה הנוכחית",
+        "badge": "בתור",
+        "attachmentsOnly": "קבצים מצורפים בלבד",
+        "sendNowStops": "לשלוח עכשיו, עוצר את ההרצה הנוכחית",
+        "sendNow": "לשלוח עכשיו",
+        "sendNowLabel": "לשלוח עכשיו את ההודעה שבתור",
+        "remove": "להסיר",
+        "removeLabel": "להסיר את ההודעה שבתור"
+    },
+    "context": {
+        "usedLabel": "הקשר בשימוש: {percent}%",
+        "title": "הקשר",
+        "input": "קלט",
+        "cached": "במטמון",
+        "reasoning": "חשיבה",
+        "output": "פלט",
+        "total": "סה״כ"
+    },
+    "feedback": {
+        "negativeTitle": "לתת משוב שלילי",
+        "positiveTitle": "לתת משוב חיובי",
+        "categoryLabel": "איזה סוג בעיה ברצונך לדווח?",
+        "categoryPlaceholder": "לבחור…",
+        "detailsLabel": "נא לפרט",
+        "negativePlaceholder": "מה לא היה טוב בתשובה הזו?",
+        "positivePlaceholder": "מה היה טוב בתשובה הזו?",
+        "disclaimer": "שליחת הדיווח משתפת את השיחה הזו עם צוות Rerun כדי שנוכל לשפר את העמיתים שלך.",
+        "cancel": "ביטול",
+        "submit": "לשלוח",
+        "categories": {
+            "ui_bug": "באג בממשק",
+            "did_not_follow": "לא מילא את הבקשה שלי",
+            "not_factual": "לא נכון עובדתית",
+            "incomplete": "תשובה לא שלמה",
+            "wrong_tool": "נעשה שימוש בכלי או באפליקציה הלא נכונים",
+            "tool_error": "שגיאת כלי או חיבור",
+            "too_slow": "איטי מדי",
+            "memory": "בעיה בזיכרון",
+            "other": "אחר"
+        },
+        "removeFailed": "לא ניתן היה להסיר את המשוב שלך",
+        "saveFailed": "לא ניתן היה לשמור את המשוב שלך",
+        "thanks": "תודה על המשוב"
+    },
+    "providerError": {
+        "fallbackTitle": "משהו השתבש",
+        "runInFlight": "הרצה שהתחילה קודם עדיין תופסת את השיחה הזו. יש לעצור אותה כדי לשלוח את ההודעה שלך.",
+        "stop": {
+            "title": "לעצור את ההרצה הזו",
+            "cta": "לעצור הרצה",
+            "description": "משחרר את השיחה להודעה שלך."
+        },
+        "newConversation": {
+            "title": "להתחיל שיחה חדשה",
+            "cta": "שיחה חדשה",
+            "description": "פותח שיחה חדשה עם העמית הזה."
+        },
+        "continue": {
+            "title": "להמשיך את ההרצה",
+            "cta": "להמשיך",
+            "description": "ממשיך מהמקום שבו העמית נקטע."
+        },
+        "retry": {
+            "title": "לנסות שוב",
+            "cta": "לנסות שוב",
+            "description": "שולח שוב את ההודעה האחרונה שלך."
+        },
+        "switch": {
+            "title": "לעבור למודל אחר",
+            "cta": "להחליף",
+            "descriptionModel": "לבחור מודל אחר לשיחה הזו.",
+            "descriptionConnection": "לבחור חיבור אחר של סביבת העבודה הזו."
+        },
+        "reconnect": {
+            "title": "להתחבר מחדש",
+            "cta": "להתחבר מחדש",
+            "description": "להתחבר שוב לחיבור שעליו העמית הזה רץ.",
+            "descriptionReplaceKey": "להדביק את המפתח החדש בחיבור שעליו העמית הזה רץ."
+        }
+    },
+    "budget": {
+        "title": "קרדיטים של Rerun",
+        "paused": {
+            "title": "הקרדיטים של Rerun מושהים",
+            "body": "העמיתים שלך לא יכולים להשתמש במודלים של Rerun או בנתונים בתשלום עד שמישהו יחדש אותם.",
+            "actionTitle": "לחדש את הקרדיטים של Rerun",
+            "actionDescription": "ההוצאה מתחדשת מיד.",
+            "cta": "לחדש"
+        },
+        "preTrial": {
+            "body": "ניצלת את {credits} שמגיעים עם חשבון חדש. מנוי פותח את השאר.",
+            "actionDescription": "העמיתים שלך ממשיכים לעבוד, אפשר לבטל בכל עת."
+        },
+        "subscribe": {
+            "title": "להירשם למנוי עכשיו",
+            "cta": "להירשם",
+            "descriptionTrial": "מסיים את תקופת הניסיון היום. {credits} כלולים בכל חודש.",
+            "description": "{credits} כלולים בכל חודש."
+        },
+        "topUp": {
+            "title": "להטעין את הקרדיטים של Rerun",
+            "cta": "להטעין",
+            "description": "או לחכות, זה מתאפס בחודש הבא."
+        },
+        "usedUp": {
+            "noCredit": "לסביבת העבודה הזו אין עדיין קרדיטים של Rerun.",
+            "trial": "ניצלת את {credits} של תקופת הניסיון החינמית.",
+            "period": "ניצלת את הקרדיטים של Rerun לתקופה הזו."
+        },
+        "ownConnection": {
+            "body": "השיחה הזו רצה על Rerun, ותוכנית {plan} שלך מחוברת."
+        },
+        "runOn": "להריץ על {plan}",
+        "or": "או",
+        "connectProvider": {
+            "body": "כבר משלם על Claude או ChatGPT? אפשר להריץ את העמיתים שלך על התוכנית הזו, ללא עלות נוספת כאן.",
+            "claude": "לחבר את Claude",
+            "chatgpt": "לחבר את ChatGPT"
+        },
+        "subscribeToKeepWorking": "יש להירשם למנוי כדי שהעמיתים שלך ימשיכו לעבוד.",
+        "resetsNextMonth": "זה מתאפס בחודש הבא.",
+        "lifetime": {
+            "ownConnection": "התוכנית לכל החיים שלך רצה על ה-AI שלך, ותוכנית {plan} שלך מחוברת.",
+            "connectProvider": "התוכנית לכל החיים שלך רצה על ה-AI שלך. יש להוסיף מפתח API, או לחבר את ChatGPT, כדי שהעמיתים שלך ימשיכו לעבוד.",
+            "connectProviderWithClaude": "התוכנית לכל החיים שלך רצה על ה-AI שלך. יש להוסיף מפתח API, או לחבר את Claude או ChatGPT, כדי שהעמיתים שלך ימשיכו לעבוד.",
+            "apiKeyTitle": "להשתמש במפתח API",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter או נקודת קצה מותאמת אישית.",
+            "apiKeyCta": "להוסיף מפתח",
+            "body": "התוכנית לכל החיים שלך רצה על ה-AI שלך.",
+            "connectTitle": "לחבר את ה-AI שלך",
+            "connectDescription": "מפתח API או ChatGPT.",
+            "connectDescriptionWithClaude": "מפתח API, Claude או ChatGPT.",
+            "connectCta": "לחבר"
+        },
+        "trial": {
+            "onPro": "אתה בתוכנית Pro.",
+            "resuming": "העמית שלך חוזר למשימה.",
+            "resumingNamed": "{name} חוזר למשימה.",
+            "title": "קרדיטי הניסיון נוצלו",
+            "stopped": "{name} נעצר.",
+            "continueWithPro": "להמשיך עם Pro · {price} לחודש",
+            "useMyPlan": "או להשתמש בתוכנית שלי:"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "מחובר",
+            "skipped": "דולג",
+            "notReconnected": "לא חובר מחדש",
+            "notFound": "לא נמצא",
+            "stored": "נשמר",
+            "approved": "אושר",
+            "notNow": "לא עכשיו"
+        },
+        "apps": {
+            "title": "אפליקציות",
+            "meta": "{connected} מתוך {total} מחוברות",
+            "insteadOf": "במקום {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "תשובה",
+                "other": "תשובות"
+            },
+            "meta": "נענו {answered} מתוך {total}"
+        },
+        "keys": {
+            "title": "מפתחות",
+            "meta": "נשמרו {stored} מתוך {total}",
+            "note": "נשמרו ב-Box. העמית רואה רק את השמות.",
+            "vaultNote": "נשמרו ב-Vault. ה-Chief of Staff רואה רק את השמות."
+        },
+        "approvals": {
+            "title": {
+                "one": "אישור",
+                "other": "אישורים"
+            },
+            "metaBoth": "{approved} אושרו, {declined} לא עכשיו",
+            "metaApproved": "{approved} אושרו",
+            "metaDeclined": "{declined} לא עכשיו"
+        },
+        "mcp": {
+            "title": "שרת MCP"
+        },
+        "takeover": {
+            "handedBackOn": "החזרת את הדפדפן ב-{url}",
+            "handedBack": "החזרת את הדפדפן"
+        },
+        "dismissed": {
+            "service": "סגרת את הגדרת האפליקציה",
+            "question": "דילגת על השאלות",
+            "secret": "סירבת לשתף את המפתחות",
+            "mcp": "דילגת על ההתחברות",
+            "takeover": "השארת את הדפדפן לעמית שלך",
+            "feature": "הבקשה לא נשלחה"
+        },
+        "computer": {
+            "status": {
+                "allowed": "הותר",
+                "always": "מותר תמיד",
+                "denied": "נדחה"
+            },
+            "screen": "מסך, עכבר ומקלדת"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "לא ניתן היה לעצור את ההרצה הנוכחית. ההודעה שלך תישלח כשהיא תסתיים.",
+        "selectModel": "יש לבחור מודל כדי להתחיל: פתח את תפריט המודלים למטה.",
+        "emptyTitle": "להתחיל שיחה",
+        "emptyDescription": "שלח הודעה לעמית הזה",
+        "runStoppedResponding": "ההרצה הפסיקה להגיב. יש לעצור אותה כדי לשלוח הודעה נוספת.",
+        "continueWhereLeftOff": "תמשיך מהמקום שבו הפסקת.",
+        "alwaysAllowFailed": "לא ניתן היה להפעיל את \"הוצאה בלי לשאול\". האישור הזה עדיין בתוקף, עד לגובה ההערכה שלו."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, one {{names} גדול מדי לצירוף.} =2 {{names} גדולים מדי לצירוף.} two {{names} גדולים מדי לצירוף.} other {{names} ועוד {more} גדולים מדי לצירוף.}}",
+        "addFiles": "להוסיף תמונות או קבצים",
+        "takeScreenshot": "לצלם מסך",
+        "noMatchingFiles": "אין קבצים שתואמים לסוגים המותרים.",
+        "tooManyFiles": "אפשר לצרף עד {max} קבצים. {rejected} לא נוספו.",
+        "uploadFiles": "להעלות קבצים",
+        "dropFiles": "שחרר קבצים כדי לצרף",
+        "placeholder": "מה תרצה לדעת?",
+        "stop": "לעצור",
+        "submit": "לשלוח"
+    },
+    "spend": {
+        "estimatedTotal": "סה״כ משוער",
+        "creditsUnit": "{count, plural, one {קרדיט} two {קרדיטים} other {קרדיטים}}",
+        "creditsLeft": "{count, plural, one {נותר {amount} קרדיט} two {נותרו {amount} קרדיטים} other {נותרו {amount} קרדיטים}}",
+        "creditsMissing": "חסרים {amount}",
+        "notNow": "לא עכשיו",
+        "alwaysAllow": "לאפשר תמיד",
+        "approveOnce": "לאשר פעם אחת",
+        "addCredits": "להוסיף קרדיטים",
+        "receipt": {
+            "approvedOnce": "אושר פעם אחת",
+            "alwaysAllowed": "מותר תמיד",
+            "notNow": "לא עכשיו",
+            "ofTotal": "/ {amount} {count, plural, one {קרדיט} two {קרדיטים} other {קרדיטים}}"
+        }
+    },
+    "computerAccess": {
+        "titleCommand": "להריץ פקודה ב-<computer></computer>",
+        "titleCommands": "להריץ {count} פקודות ב-<computer></computer>",
+        "titleScreen": "להשתמש במסך של <computer></computer>",
+        "deny": "לדחות",
+        "allow": "לאפשר",
+        "alwaysAllow": "לאפשר תמיד את {program}",
+        "interpreterWarning": "אישור קבוע ל-{program} מאפשר כל קוד שהוא מריץ",
+        "alwaysFailed": "לא ניתן היה לשמור את הכלל במחשב: הותר הפעם בלבד.",
+        "titleFiles": "{count, plural, one {להשתמש בקובץ ב-<computer></computer>} two {להשתמש ב-# קבצים ב-<computer></computer>} other {להשתמש ב-# קבצים ב-<computer></computer>}}",
+        "alwaysAllowFolder": "לאפשר תמיד את התיקייה הזו",
+        "folderNote": "“תמיד” מאפשר כל קובץ ב-{folder}",
+        "inFolder": "ב-{folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "רץ",
+            "succeeded": "הסתיים",
+            "failed": "נכשל",
+            "stopped": "נעצר",
+            "lost": "אבד",
+            "offline": "המחשב לא מחובר",
+            "gone": "לא זמין"
+        },
+        "stop": "לעצור",
+        "offlineNote": "הוא ממשיך לרוץ שם. העמית יקבל עדכון כשהמחשב יחזור.",
+        "lostNote": "Rerun נסגר במחשב בזמן שזה רץ.",
+        "goneNote": "אי אפשר עוד לקרוא את המשימה הזו: המחשב הוסר, או שהוא כבר לא מכיר אותה."
+    },
+    "jobEnd": {
+        "label": "המשימה הסתיימה ב-<computer>#{handle}</computer>",
+        "viewReport": "להציג דוח",
+        "reportTitle": "מה #{computer} דיווח"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "פיצ'ר",
+            "bug": "באג",
+            "improvement": "שיפור"
+        },
+        "today": "<strong>היום:</strong> {workaround}",
+        "notNow": "לא עכשיו",
+        "edit": "לערוך",
+        "done": "סיום",
+        "send": "לשלוח לצוות",
+        "titleLabel": "כותרת",
+        "descriptionLabel": "תיאור",
+        "sent": "נשלח לצוות Rerun: <muted>{title}</muted>",
+        "reviewIt": "לבדוק",
+        "sendFailed": "לא ניתן היה לשלוח את הבקשה. נסה שוב."
+    }
+}

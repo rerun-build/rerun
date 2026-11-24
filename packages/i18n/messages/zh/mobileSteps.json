@@ -1,0 +1,43 @@
+{
+    "group": {
+        "steps": "{count, plural, other {# 个步骤}}",
+        "stepsWithFailures": "{count, plural, other {# 个步骤}}，{failed} 个失败",
+        "failed": "{failed} 个失败"
+    },
+    "tool": {
+        "input": "输入",
+        "error": "错误",
+        "output": "输出",
+        "completedInMs": "用时 {ms} 毫秒",
+        "completedInSeconds": "用时 {seconds} 秒"
+    },
+    "reasoning": {
+        "thinking": "思考中...",
+        "thought": "已思考"
+    },
+    "compaction": {
+        "running": "正在压缩上下文…",
+        "failed": "上下文压缩失败",
+        "done": "上下文已压缩",
+        "summarized": "已总结 {count} 条较早的消息",
+        "recovered": "已释放约 {count} 个 token"
+    },
+    "subRun": {
+        "failures": "{count, plural, other {# 次失败}}",
+        "idle": "已空闲 {minutes} 分钟",
+        "stop": "停止此任务",
+        "failed": "失败",
+        "stopped": "已停止，已保留部分成果",
+        "stoppedWithRun": "已随运行一起停止",
+        "earlier": "另有 {count} 个较早步骤",
+        "verbs": {
+            "web_search": "正在搜索 {summary}",
+            "web_fetch": "正在阅读 {summary}",
+            "browser_navigate": "正在浏览 {summary}",
+            "shell_exec": "正在运行 {summary}",
+            "fs_read": "正在读取 {summary}",
+            "fs_write": "正在写入 {summary}",
+            "fs_edit": "正在编辑 {summary}"
+        }
+    }
+}

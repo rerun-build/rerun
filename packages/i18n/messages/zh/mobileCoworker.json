@@ -1,0 +1,88 @@
+{
+    "access": {
+        "boxManage": "只有此 Box 的管理员或经理可以更改此项。",
+        "aiProvidersAdminOnly": "只有管理员可以更改 AI 提供商。",
+        "noManagedBox": "您需要一个由您管理的 Box 才能添加同事。请在 {host} 创建，或联系管理员。",
+        "boxesFailed": "无法加载您的 Boxes。请稍后重试。",
+        "noBoxYet": "此工作区还没有 Box。请在 {host} 创建。",
+        "foremanAdminOnly": "只有管理员可以更改 Chief of Staff。"
+    },
+    "page": {
+        "loadFailed": "无法加载此内容。请稍后重试。"
+    },
+    "details": {
+        "back": "返回",
+        "more": "更多",
+        "delete": "删除同事",
+        "edit": "编辑",
+        "files": "文件",
+        "apps": "应用",
+        "routines": "例行任务",
+        "computer": "电脑",
+        "notifications": "通知",
+        "working": "工作中",
+        "idle": "空闲",
+        "off": "已关闭",
+        "none": "无",
+        "appsToConnect": "{count} 个待连接",
+        "appsConnected": "已连接 {count} 个",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} 个已开启",
+        "renameTitle": "重命名",
+        "save": "保存",
+        "renameFailed": "无法重命名",
+        "deleteTitle": "删除 {name}？",
+        "deleteMessage": "这将永久删除该同事及其数据，且无法撤销。",
+        "deleteConfirm": "删除",
+        "deleteFailed": "无法删除"
+    },
+    "apps": {
+        "title": "应用",
+        "status": {
+            "needsSignIn": "需要登录",
+            "needsSetup": "需要设置",
+            "error": "错误"
+        },
+        "connect": "连接",
+        "connectNew": "新账号",
+        "empty": "还没有应用。",
+        "askInChat": "在聊天中让 {name} 添加应用。",
+        "connectFailed": "无法连接 {name}"
+    },
+    "files": {
+        "title": "文件",
+        "media": "媒体",
+        "docs": "文档",
+        "earlier": "更早",
+        "thisMonth": "本月",
+        "open": "打开 {name}",
+        "fileFallback": "文件",
+        "noMedia": "没有媒体",
+        "noDocs": "没有文档",
+        "emptyHint": "{name} 制作的内容会显示在这里。",
+        "truncated": "仅显示最新的文件。全部文件可在网页端查看。"
+    },
+    "routines": {
+        "title": "例行任务",
+        "once": "一次，{date}",
+        "webhook": "Webhook",
+        "empty": "还没有例行任务。",
+        "askInChat": "在聊天中让 {name} 设置一个。",
+        "turnOnFailed": "无法开启 {name}",
+        "turnOffFailed": "无法关闭 {name}"
+    },
+    "create": {
+        "title": "新同事",
+        "nameLabel": "名称",
+        "namePlaceholder": "小探",
+        "descriptionLabel": "它应该做什么？",
+        "descriptionPlaceholder": "查找上海的营销机构，并给每家起草第一封邮件",
+        "descriptionHelp": "这是它的第一项任务，它会立即开始。",
+        "boxLabel": "Box",
+        "submit": "创建",
+        "pausedTitle": "{name} 已暂停",
+        "pausedMessage": "您的套餐没有空余的同事名额。前往 rerun.build 开通 Pro，即可拥有无限同事。",
+        "failed": "无法创建同事"
+    }
+}

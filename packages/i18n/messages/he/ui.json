@@ -1,0 +1,57 @@
+{
+    "close": "סגירה",
+    "back": "חזרה",
+    "moreOptions": "אפשרויות נוספות",
+    "deleteConfirmTitle": "{label}?",
+    "command": {
+        "title": "לוח פקודות",
+        "description": "לחפש פקודה להרצה..."
+    },
+    "combobox": {
+        "placeholder": "לבחור אפשרות",
+        "placeholderMultiple": "לבחור אפשרויות",
+        "search": "חיפוש…",
+        "empty": "לא נמצאו תוצאות",
+        "selected": "נבחרו",
+        "remove": "להסיר את {option}",
+        "reorder": "לשנות את המיקום של {option}"
+    },
+    "filter": {
+        "search": "חיפוש {label}…",
+        "empty": "אין התאמה",
+        "clear": "ניקוי"
+    },
+    "phone": {
+        "code": "קידומת מדינה, להקליד קידומת או מדינה",
+        "noCountry": "לא נמצאה מדינה"
+    },
+    "powerBars": "עוצמה {filled} מתוך {max}",
+    "markdown": {
+        "openEditor": "לפתוח את העורך המלא",
+        "done": "סיום"
+    },
+    "upload": {
+        "menu": "העלאה",
+        "files": "להעלות קבצים",
+        "folder": "להעלות תיקייה",
+        "failed": "ההעלאה נכשלה",
+        "finishing": "מסיים",
+        "waiting": "ממתין · {size}",
+        "progress": "התקדמות ההעלאה",
+        "uploadingFile": "מעלה את {name}",
+        "totalProgress": "התקדמות ההעלאה הכוללת",
+        "retry": "לנסות שוב",
+        "cancel": "ביטול",
+        "cancelAll": "לבטל הכול",
+        "dismiss": "להסתיר",
+        "headingFailed": "העלאת {failed} מתוך {total} קבצים נכשלה",
+        "headingDone": "{count, plural, one {קובץ אחד הועלה} two {שני קבצים הועלו} other {# קבצים הועלו}}",
+        "headingUploading": "מעלה {current} מתוך {total}",
+        "more": "+ עוד {count}"
+    },
+    "waveform": {
+        "live": "גל קול חי",
+        "processing": "מעבד את השמע",
+        "idle": "גל קול במנוחה"
+    }
+}

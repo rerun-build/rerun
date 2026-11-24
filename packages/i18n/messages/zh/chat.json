@@ -1,0 +1,613 @@
+{
+    "actions": {
+        "copy": "复制",
+        "copied": "已复制",
+        "connect": "连接",
+        "cancel": "取消",
+        "continue": "继续",
+        "notNow": "暂不",
+        "copiedExclaim": "已复制！"
+    },
+    "sources": {
+        "used": "使用了 {count, plural, other {# 个来源}}"
+    },
+    "draft": {
+        "label": "草稿"
+    },
+    "mcpServer": {
+        "failed": "无法连接 {name}",
+        "notAdded": "未添加",
+        "added": "已添加 {name}",
+        "custom": "自定义 MCP 服务器",
+        "customWithHost": "自定义 MCP 服务器 · {host}"
+    },
+    "mcpSignIn": {
+        "title": "登录 {name}"
+    },
+    "mentions": {
+        "coworkers": "同事",
+        "skills": "技能",
+        "computers": "电脑",
+        "button": "提及同事、技能或电脑",
+        "coworker": {
+            "action": "提及同事",
+            "description": "邀请一位同事加入此对话",
+            "empty": "此工作区还没有其他同事"
+        },
+        "skill": {
+            "action": "使用技能",
+            "description": "运行您的同事掌握的已保存操作方法",
+            "empty": "此同事还没有技能"
+        },
+        "computer": {
+            "action": "使用电脑",
+            "description": "让您的同事在已关联的电脑上工作",
+            "empty": "尚未关联电脑"
+        }
+    },
+    "paidSources": {
+        "count": "{count, plural, other {# 个来源}}",
+        "emailsVerified": "已验证 {valid}/{checked} 个邮箱"
+    },
+    "tableCard": {
+        "openDisabledReason": "请从看板打开此同事以浏览其数据库。"
+    },
+    "conversation": {
+        "emptyTitle": "暂无消息",
+        "emptyDescription": "开始对话后，消息会显示在这里",
+        "scrollToLatest": "滚动到最新消息"
+    },
+    "brainProposal": {
+        "create": "新的 Brain 页面：{title}",
+        "edit": "Brain 修改：{title}",
+        "description": "已提交审核。在有人接受之前不会有任何更改。",
+        "review": "审核"
+    },
+    "attachments": {
+        "attach": "附加文件",
+        "open": "打开 {name}",
+        "position": "{current} / {total}",
+        "previous": "上一个附件",
+        "next": "下一个附件",
+        "download": "下载",
+        "waiting": "等待中",
+        "finishing": "即将完成",
+        "progress": "{percent}%",
+        "progressWithEta": "{percent}% · {eta}",
+        "fileFallback": "文件",
+        "uploading": "正在上传 {name}",
+        "retryUpload": "重试上传",
+        "cancelUpload": "取消上传",
+        "remove": "移除附件",
+        "openMore": "打开其余 {count} 项",
+        "uploadFailed": "上传失败",
+        "uploadingProgress": "正在上传 · {percent}%",
+        "retryUploading": "重试上传 {name}",
+        "removeNamed": "移除 {name}"
+    },
+    "screen": {
+        "openBrowser": "打开浏览器",
+        "takeControl": "接管控制"
+    },
+    "composer": {
+        "link": {
+            "open": "打开",
+            "unlink": "取消链接"
+        },
+        "subscriptionCta": "已经在付费使用 AI 订阅？让此同事在它上面运行。",
+        "placeholder": "输入 @ 提及同事，/ 使用技能，# 选择电脑",
+        "placeholderNoSkill": "输入 @ 提及同事，# 选择电脑",
+        "attachmentsMissing": "部分附件未上传。请在发送前移除并重新附加。",
+        "attachmentsFailed": "{count, plural, other {# 个附件上传失败。请在发送前重试或移除。}}",
+        "noFiles": "此聊天暂不支持文件。",
+        "sendFailed": "无法发送您的消息",
+        "openEditor": "打开完整编辑器",
+        "stop": "停止当前运行",
+        "editor": {
+            "title": "撰写您的消息",
+            "description": "用来组织长消息的空间。按 Enter 换行。",
+            "hint": "按 Cmd + Enter 发送",
+            "cancel": "取消",
+            "send": "发送"
+        }
+    },
+    "message": {
+        "showLess": "收起",
+        "showMore": "展开",
+        "openFile": "打开 {path}",
+        "branch": {
+            "previous": "上一个分支",
+            "next": "下一个分支",
+            "page": "{current} / {total}"
+        },
+        "goodResponse": "回答很好",
+        "badResponse": "回答不好",
+        "regenerate": "重新生成",
+        "relayedFor": "{named, select, yes {{name} 代 {person}} other {Chief of Staff 代 {person}}}"
+    },
+    "installGate": {
+        "title": "设置 {name}",
+        "inProgressTitle": "正在设置 {name}",
+        "inProgressHint": "在另一个对话中",
+        "facts": "{apps, plural, =0 {约 {minutes} 分钟} other {# 个应用 · 约 {minutes} 分钟}}",
+        "continue": "继续设置",
+        "installing": "正在安装",
+        "install": "安装 {name}",
+        "skip": "暂时跳过"
+    },
+    "activity": {
+        "thinking": "正在思考...",
+        "processing": "正在处理您的请求...",
+        "crafting": "正在组织回答...",
+        "writing": "正在撰写...",
+        "runningTool": "正在运行 {tool}",
+        "waitingOn": "正在等待 {name}",
+        "building": "正在创建 {name}",
+        "buildingCoworkers": "正在创建 {count, plural, other {# 位同事}} · 已完成 {done} 位",
+        "waitingOnSubCoworkers": "正在等待 {count, plural, other {# 位子同事}} · 已完成 {done} 位"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {有问题待回答} =1 {有问题待回答} other {# 个问题待回答}}",
+        "approval": "{count, plural, =0 {需要审批} =1 {需要审批} other {# 项需要审批}}",
+        "secret": "{count, plural, =0 {需要凭据} =1 {需要凭据} other {需要 # 个凭据}}",
+        "mcpNamed": "登录 {name}",
+        "mcp": "需要登录",
+        "service": "{count, plural, =0 {有应用待连接} =1 {有应用待连接} other {# 个应用待连接}}",
+        "takeover": "轮到您操作屏幕",
+        "spend": "有支出待审批",
+        "computer": "审批在 #{computer} 上运行的命令",
+        "feature": "有请求待发送给 Rerun 团队"
+    },
+    "pendingHitl": {
+        "goTo": "{label}，前往查看"
+    },
+    "reasoning": {
+        "thinking": "正在思考...",
+        "thought": "思考"
+    },
+    "secretRequest": {
+        "saveFailed": "无法保存凭据"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain 已更新：{title}",
+            "created": "新的 Brain 页面：{title}",
+            "deleted": "已从 Brain 中移除：{title}",
+            "accepted": "已接受修改：{title}",
+            "acceptedBy": "已接受 {name} 的修改：{title}",
+            "dismissed": "已忽略修改：{title}",
+            "dismissedBy": "已忽略 {name} 的修改：{title}"
+        },
+        "notes": {
+            "saved": "已保存。每位同事从下次运行起都会读取它。",
+            "deleted": "不再有同事读取它。其历史记录会保留。",
+            "accepted": "已保存。每位同事从下次运行起都会读取它。",
+            "dismissed": "页面未更改。"
+        },
+        "undone": "已撤销：{title}",
+        "undoneNote": "已恢复为之前的版本。",
+        "undo": "撤销",
+        "open": "打开"
+    },
+    "compaction": {
+        "running": "正在压缩上下文…",
+        "failed": "上下文压缩失败",
+        "done": "上下文已压缩",
+        "summarized": "已总结 {count, plural, other {# 条较早的消息}}",
+        "recovered": "已释放约 {tokens} 个 token"
+    },
+    "providerSwitch": {
+        "limit": "已达到 {plan} 限额 · {model}",
+        "limitUntil": "已达到 {plan} 限额 · {model}，直到 {time}",
+        "limitUntilDate": "已达到 {plan} 限额 · {model}，直到 {date} {time}",
+        "back": "{plan} 已重置。已切回 {model}。"
+    },
+    "scheduledRun": {
+        "label": "定时运行",
+        "viewPrompt": "查看提示词",
+        "promptTitle": "{name} 提示词"
+    },
+    "steps": {
+        "count": "{count, plural, other {# 个步骤}}",
+        "countWithFailures": "{count, plural, other {# 个步骤}}，{failed} 个失败",
+        "failed": "{failed} 个失败",
+        "thinking": "正在思考",
+        "compacting": "正在压缩"
+    },
+    "subRun": {
+        "failuresInARow": "连续失败 {count} 次",
+        "idle": "空闲 {minutes} 分钟",
+        "stopTask": "停止此任务",
+        "stopped": "已停止，已保留部分成果",
+        "stoppedWithRun": "已随运行一同停止",
+        "failed": "失败",
+        "earlier": "+{count} 个较早步骤",
+        "verbs": {
+            "search": "正在搜索 {summary}",
+            "read": "正在读取 {summary}",
+            "browse": "正在浏览 {summary}",
+            "run": "正在运行 {summary}",
+            "write": "正在写入 {summary}",
+            "edit": "正在编辑 {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "已截断",
+        "empty": "无负载",
+        "payload": "负载"
+    },
+    "voice": {
+        "sendFailed": "无法发送该录音。",
+        "sendFailedHint": "请重试，或将其丢弃。",
+        "waitingForMicrophone": "正在等待麦克风...",
+        "microphone": "麦克风...",
+        "transcribing": "正在转写...",
+        "hideTranscript": "隐藏转写文本",
+        "transcript": "转写文本",
+        "copyTranscript": "复制转写文本",
+        "pause": "暂停",
+        "play": "播放语音消息",
+        "seek": "跳转",
+        "record": "录制语音消息",
+        "discard": "丢弃",
+        "discardLabel": "丢弃录音",
+        "retry": "重试",
+        "send": "发送",
+        "retryLabel": "重试发送录音",
+        "sendLabel": "发送录音",
+        "unsupported": "此浏览器不支持语音消息。",
+        "microphoneBlocked": "麦克风访问被阻止。请在浏览器设置中允许后再录音。",
+        "noMicrophone": "没有可用的麦克风。",
+        "startFailed": "无法开始录音。",
+        "nothingHeard": "该录音中听不到任何声音。",
+        "voiceMessageFailed": "无法发送您的语音消息。",
+        "nothingRecorded": "没有录到任何内容。"
+    },
+    "agentInstall": {
+        "started": "已开始安装",
+        "complete": "安装完成",
+        "viewGuide": "查看指南",
+        "guideTitle": "{name} 安装指南"
+    },
+    "setupEvents": {
+        "notificationSent": "已向您发送通知",
+        "read": "已读",
+        "schedulesOn": "已开启 {count, plural, other {# 个日程}}",
+        "triggersOn": "已开启 {count, plural, other {# 个触发器}}",
+        "setUp": "{name} 已设置完成",
+        "setupComplete": "设置完成",
+        "connectedHint": "已连接，同事可以使用",
+        "signInHint": "登录一次，同事即可使用",
+        "connected": "已连接",
+        "signIn": "登录"
+    },
+    "takeover": {
+        "opened": "浏览器已在您同事的桌面上打开。完成后请回到这里。",
+        "opensSite": "在您同事的浏览器中打开 {site}，由您操作。",
+        "opens": "打开您同事的浏览器，由您操作。",
+        "skipLabel": "跳过浏览器接管",
+        "privacy": "您登录的内容只保留在您机器上此同事的浏览器中。",
+        "openAgain": "再次打开",
+        "closing": "正在关闭…",
+        "done": "完成",
+        "skip": "跳过",
+        "openBrowser": "打开浏览器"
+    },
+    "video": {
+        "play": "播放 {name}",
+        "pause": "暂停 {name}",
+        "previewUnavailable": "无法预览",
+        "openFullScreen": "全屏打开 {name}"
+    },
+    "tool": {
+        "error": "错误",
+        "output": "输出",
+        "input": "输入",
+        "completedIn": "用时 {duration} 完成"
+    },
+    "webhookRun": {
+        "label": "已收到 Webhook",
+        "viewPrompt": "查看提示词",
+        "viewPayload": "查看负载",
+        "promptTitle": "{name} 提示词",
+        "payloadTitle": "{name} 负载"
+    },
+    "question": {
+        "tooManyFiles": "最多可附加 {max} 个文件。有 {rejected} 个未添加。",
+        "uploadsFailed": "{count, plural, other {# 个附件无法上传。请在回答前重试或移除。}}"
+    },
+    "queued": {
+        "stopping": "正在停止当前运行",
+        "badge": "排队中",
+        "attachmentsOnly": "仅附件",
+        "sendNowStops": "立即发送，将停止当前运行",
+        "sendNow": "立即发送",
+        "sendNowLabel": "立即发送排队的消息",
+        "remove": "移除",
+        "removeLabel": "移除排队的消息"
+    },
+    "context": {
+        "usedLabel": "已用上下文：{percent}%",
+        "title": "上下文",
+        "input": "输入",
+        "cached": "缓存",
+        "reasoning": "推理",
+        "output": "输出",
+        "total": "总计"
+    },
+    "feedback": {
+        "negativeTitle": "提交负面反馈",
+        "positiveTitle": "提交正面反馈",
+        "categoryLabel": "您想报告哪类问题？",
+        "categoryPlaceholder": "请选择…",
+        "detailsLabel": "请提供详细信息",
+        "negativePlaceholder": "这个回答有哪些不满意的地方？",
+        "positivePlaceholder": "这个回答有哪些满意的地方？",
+        "disclaimer": "提交此报告会将此对话分享给 Rerun 团队，以便我们改进您的同事。",
+        "cancel": "取消",
+        "submit": "提交",
+        "categories": {
+            "ui_bug": "界面 bug",
+            "did_not_follow": "没有按我的要求做",
+            "not_factual": "事实不正确",
+            "incomplete": "回答不完整",
+            "wrong_tool": "使用了错误的工具或应用",
+            "tool_error": "工具或连接错误",
+            "too_slow": "太慢",
+            "memory": "记忆问题",
+            "other": "其他"
+        },
+        "removeFailed": "无法移除您的反馈",
+        "saveFailed": "无法保存您的反馈",
+        "thanks": "感谢您的反馈"
+    },
+    "providerError": {
+        "fallbackTitle": "出了点问题",
+        "runInFlight": "之前开始的一次运行仍占用着此对话。请先停止它再发送消息。",
+        "stop": {
+            "title": "停止此次运行",
+            "cta": "停止运行",
+            "description": "释放对话以便发送您的消息。"
+        },
+        "newConversation": {
+            "title": "开始新对话",
+            "cta": "新对话",
+            "description": "与此同事开启一个全新的对话。"
+        },
+        "continue": {
+            "title": "继续运行",
+            "cta": "继续",
+            "description": "从同事中断的地方继续。"
+        },
+        "retry": {
+            "title": "重试",
+            "cta": "重试",
+            "description": "再次发送您的上一条消息。"
+        },
+        "switch": {
+            "title": "切换到其他模型",
+            "cta": "切换",
+            "descriptionModel": "为此对话选择另一个模型。",
+            "descriptionConnection": "选择此工作区的另一个连接。"
+        },
+        "reconnect": {
+            "title": "重新连接",
+            "cta": "重新连接",
+            "description": "在此同事运行所用的连接上重新登录。",
+            "descriptionReplaceKey": "在此同事运行所用的连接上粘贴新密钥。"
+        }
+    },
+    "budget": {
+        "title": "Rerun 积分",
+        "paused": {
+            "title": "Rerun 积分已暂停",
+            "body": "在有人恢复之前，您的同事无法使用 Rerun 模型或付费数据。",
+            "actionTitle": "恢复 Rerun 积分",
+            "actionDescription": "支出将立即恢复。",
+            "cta": "恢复"
+        },
+        "preTrial": {
+            "body": "您已用完新账号附带的 {credits}。订阅后即可解锁更多。",
+            "actionDescription": "您的同事会继续工作，可随时取消。"
+        },
+        "subscribe": {
+            "title": "立即订阅",
+            "cta": "订阅",
+            "descriptionTrial": "今天结束试用。每月包含 {credits}。",
+            "description": "每月包含 {credits}。"
+        },
+        "topUp": {
+            "title": "充值 Rerun 积分",
+            "cta": "充值",
+            "description": "或者等待，下月会重置。"
+        },
+        "usedUp": {
+            "noCredit": "此工作区还没有 Rerun 积分。",
+            "trial": "您已用完免费试用的 {credits}。",
+            "period": "您已用完本周期的 Rerun 积分。"
+        },
+        "ownConnection": {
+            "body": "此对话在 Rerun 上运行，而您的 {plan} 方案已连接。"
+        },
+        "runOn": "在 {plan} 上运行",
+        "or": "或",
+        "connectProvider": {
+            "body": "已经在为 Claude 或 ChatGPT 付费？让您的同事使用该方案运行，这里不额外收费。",
+            "claude": "连接 Claude",
+            "chatgpt": "连接 ChatGPT"
+        },
+        "subscribeToKeepWorking": "订阅以让您的同事继续工作。",
+        "resetsNextMonth": "下月会重置。",
+        "lifetime": {
+            "ownConnection": "您的终身方案使用您自己的 AI 运行，而您的 {plan} 方案已连接。",
+            "connectProvider": "您的终身方案使用您自己的 AI 运行。添加 API 密钥或连接 ChatGPT，让您的同事继续工作。",
+            "connectProviderWithClaude": "您的终身方案使用您自己的 AI 运行。添加 API 密钥，或连接 Claude 或 ChatGPT，让您的同事继续工作。",
+            "apiKeyTitle": "使用 API 密钥",
+            "apiKeyDescription": "Anthropic、OpenAI、Google、OpenRouter 或自定义端点。",
+            "apiKeyCta": "添加密钥",
+            "body": "您的终身方案使用您自己的 AI 运行。",
+            "connectTitle": "连接您的 AI",
+            "connectDescription": "API 密钥或 ChatGPT。",
+            "connectDescriptionWithClaude": "API 密钥、Claude 或 ChatGPT。",
+            "connectCta": "连接"
+        },
+        "trial": {
+            "onPro": "您已在使用 Pro。",
+            "resuming": "您的同事会继续完成任务。",
+            "resumingNamed": "{name} 会继续完成任务。",
+            "title": "试用积分已用完",
+            "stopped": "{name} 已停止。",
+            "continueWithPro": "继续使用 Pro · {price}/月",
+            "useMyPlan": "或使用我的方案："
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "已连接",
+            "skipped": "已跳过",
+            "notReconnected": "未重新连接",
+            "notFound": "未找到",
+            "stored": "已保存",
+            "approved": "已批准",
+            "notNow": "暂不"
+        },
+        "apps": {
+            "title": "应用",
+            "meta": "已连接 {connected}/{total}",
+            "insteadOf": "代替 {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "回答",
+                "other": "回答"
+            },
+            "meta": "已回答 {answered}/{total}"
+        },
+        "keys": {
+            "title": "密钥",
+            "meta": "已保存 {stored}/{total}",
+            "note": "保存在 Box 上。同事只能看到名称。",
+            "vaultNote": "保存在 Vault 中。Chief of Staff 只能看到名称。"
+        },
+        "approvals": {
+            "title": {
+                "one": "审批",
+                "other": "审批"
+            },
+            "metaBoth": "已批准 {approved} 项，暂不 {declined} 项",
+            "metaApproved": "已批准 {approved} 项",
+            "metaDeclined": "暂不 {declined} 项"
+        },
+        "mcp": {
+            "title": "MCP 服务器"
+        },
+        "takeover": {
+            "handedBackOn": "您已在 {url} 交还浏览器",
+            "handedBack": "您已交还浏览器"
+        },
+        "dismissed": {
+            "service": "您关闭了应用设置",
+            "question": "您跳过了问题",
+            "secret": "您拒绝分享密钥",
+            "mcp": "您跳过了登录",
+            "takeover": "您把浏览器交给了同事",
+            "feature": "请求未发送"
+        },
+        "computer": {
+            "status": {
+                "allowed": "已允许",
+                "always": "始终允许",
+                "denied": "已拒绝"
+            },
+            "screen": "屏幕、鼠标和键盘"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "无法停止当前运行。您的消息将在其结束后发送。",
+        "selectModel": "请先选择一个模型：打开下方的模型菜单。",
+        "emptyTitle": "开始对话",
+        "emptyDescription": "给此同事发送一条消息",
+        "runStoppedResponding": "此次运行已停止响应。请先停止它再发送新消息。",
+        "continueWhereLeftOff": "从上次中断的地方继续。",
+        "alwaysAllowFailed": "无法开启“无需询问即可支出”。此次批准仍然有效，以其预估金额为上限。"
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, =1 {{names} 太大，无法附加。} =2 {{names} 太大，无法附加。} other {{names} 及其他 {more} 个文件太大，无法附加。}}",
+        "addFiles": "添加照片或文件",
+        "takeScreenshot": "截图",
+        "noMatchingFiles": "没有符合可接受类型的文件。",
+        "tooManyFiles": "最多可附加 {max} 个文件。有 {rejected} 个未添加。",
+        "uploadFiles": "上传文件",
+        "dropFiles": "拖放文件以附加",
+        "placeholder": "您想了解什么？",
+        "stop": "停止",
+        "submit": "提交"
+    },
+    "spend": {
+        "estimatedTotal": "预估总计",
+        "creditsUnit": "{count, plural, other {积分}}",
+        "creditsLeft": "剩余 {amount} {count, plural, other {积分}}",
+        "creditsMissing": "还差 {amount}",
+        "notNow": "暂不",
+        "alwaysAllow": "始终允许",
+        "approveOnce": "仅批准一次",
+        "addCredits": "添加积分",
+        "receipt": {
+            "approvedOnce": "已批准一次",
+            "alwaysAllowed": "始终允许",
+            "notNow": "暂不",
+            "ofTotal": "/ {amount} {count, plural, other {积分}}"
+        }
+    },
+    "computerAccess": {
+        "titleCommand": "在 <computer></computer> 上运行一条命令",
+        "titleCommands": "在 <computer></computer> 上运行 {count} 条命令",
+        "titleScreen": "使用 <computer></computer> 的屏幕",
+        "deny": "拒绝",
+        "allow": "允许",
+        "alwaysAllow": "始终允许 {program}",
+        "interpreterWarning": "始终允许 {program} 意味着允许它运行的任何代码",
+        "alwaysFailed": "无法在电脑上保存此规则：仅允许了这一次。",
+        "titleFiles": "{count, plural, other {使用 <computer></computer> 上的 # 个文件}}",
+        "alwaysAllowFolder": "始终允许此文件夹",
+        "folderNote": "“始终”会允许 {folder} 中的所有文件",
+        "inFolder": "位于 {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "运行中",
+            "succeeded": "已完成",
+            "failed": "失败",
+            "stopped": "已停止",
+            "lost": "已中断",
+            "offline": "电脑离线",
+            "gone": "不可用"
+        },
+        "stop": "停止",
+        "offlineNote": "它会在那台电脑上继续运行。电脑恢复在线后，同事会收到结果。",
+        "lostNote": "运行期间电脑上的 Rerun 被关闭了。",
+        "goneNote": "无法再读取此任务：电脑已被移除，或它已不再记得此任务。"
+    },
+    "jobEnd": {
+        "label": "任务已在 <computer>#{handle}</computer> 上结束",
+        "viewReport": "查看报告",
+        "reportTitle": "#{computer} 的报告"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "新功能",
+            "bug": "Bug",
+            "improvement": "改进"
+        },
+        "today": "<strong>目前：</strong>{workaround}",
+        "notNow": "暂不",
+        "edit": "编辑",
+        "done": "完成",
+        "send": "发送给团队",
+        "titleLabel": "标题",
+        "descriptionLabel": "描述",
+        "sent": "已发送给 Rerun 团队：<muted>{title}</muted>",
+        "reviewIt": "审核一下",
+        "sendFailed": "请求无法发送，请重试。"
+    }
+}

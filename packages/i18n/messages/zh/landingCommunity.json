@@ -1,0 +1,510 @@
+{
+    "metadata": {
+        "layout": {
+            "title": "专家",
+            "description": "发现值得信赖的构建者和工作室，在 Rerun 上设计、上线并运行您的 AI 智能体。"
+        },
+        "directory": {
+            "title": "雇佣最好的 AI 专家",
+            "description": "与经过审核的构建者、自由职业者和工作室合作，他们设计、上线并运行真正交付成果的 AI 智能体。按技能和地区浏览 Rerun 专家。"
+        },
+        "program": {
+            "title": "成为 Rerun 专家",
+            "description": "加入 Rerun 专家计划：入驻专家目录，在免费沙盒中为客户构建智能体，保留 95% 的模板销售收入，并赚取 20% 的持续分成。"
+        }
+    },
+    "jsonLd": {
+        "home": "首页",
+        "experts": "专家"
+    },
+    "directory": {
+        "eyebrow": "{count, plural, other {# 位经过审核的专家}}",
+        "title": "找到您的 AI 专家",
+        "description": "经过审核的构建者和工作室，为您搭建最复杂的系统，让同事接入您业务所依赖的每个工具和流程。",
+        "joinAside": "加入已入驻 Rerun 的专家行列",
+        "becomeExpert": "成为专家",
+        "featured": {
+            "label": "精选",
+            "title": "最值得优先联系的专家。",
+            "carousel": "精选专家"
+        },
+        "grid": {
+            "allLabel": "全部专家",
+            "resultsLabel": "结果",
+            "title": "{count, plural, other {# 位经过审核的构建者和工作室。}}",
+            "clear": "清除筛选",
+            "empty": "没有符合这些筛选条件的专家。"
+        }
+    },
+    "filters": {
+        "facets": {
+            "type": {
+                "label": "类型",
+                "search": "搜索类型"
+            },
+            "availability": {
+                "label": "档期",
+                "search": "搜索档期"
+            },
+            "budget": {
+                "label": "预算",
+                "search": "搜索预算"
+            },
+            "skill": {
+                "label": "技能",
+                "search": "搜索技能"
+            },
+            "language": {
+                "label": "语言",
+                "search": "搜索语言"
+            }
+        },
+        "types": {
+            "studio": "工作室",
+            "freelancer": "自由职业者",
+            "expert": "专家"
+        },
+        "availabilities": {
+            "available": "可接单",
+            "soon": "即将可接单",
+            "unavailable": "暂不可接单"
+        },
+        "segment": "{label}：{value}",
+        "any": "不限",
+        "clear": "清除",
+        "noResults": "无结果",
+        "skills": {
+            "agent-design": "智能体设计",
+            "workflow-automation": "工作流自动化",
+            "rag-knowledge-bases": "RAG 与知识库",
+            "integrations-apis": "集成与 APIs",
+            "mcp-servers": "MCP 服务器",
+            "prompt-engineering": "提示词工程",
+            "data-pipelines": "数据管道",
+            "chatbots-support": "聊天机器人与客服",
+            "voice-agents": "语音智能体",
+            "lead-gen-outreach": "获客与外联",
+            "crm-automation": "CRM 自动化",
+            "web-scraping": "网页抓取",
+            "e-commerce-automation": "电商自动化",
+            "analytics-reporting": "分析与报告",
+            "fine-tuning": "模型微调",
+            "no-code-automation": "无代码自动化"
+        }
+    },
+    "card": {
+        "hire": "雇佣"
+    },
+    "hire": {
+        "title": "与 {name} 合作",
+        "description": "向对方介绍您的项目。对方会直接通过电子邮件回复。",
+        "fields": {
+            "name": "您的姓名",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "电子邮件",
+            "emailPlaceholder": "you@company.com",
+            "website": "公司网站",
+            "message": "留言",
+            "messagePlaceholder": "您在构建什么？需要哪些帮助？"
+        },
+        "submit": "发送请求",
+        "sending": "发送中...",
+        "sent": {
+            "title": "请求已发送",
+            "description": "{name} 会通过电子邮件回复您，通常在 24 小时内。",
+            "close": "关闭"
+        },
+        "validation": {
+            "nameRequired": "姓名为必填项",
+            "emailRequired": "电子邮件为必填项",
+            "emailInvalid": "电子邮件无效",
+            "urlProtocol": "必须以 http:// 或 https:// 开头",
+            "messageTooShort": "请向专家多介绍一些您的项目",
+            "messageTooLong": "留言过长"
+        },
+        "errors": {
+            "unavailable": "这位专家已无法接单。",
+            "invalid": "请检查表单后重试。",
+            "failed": "出了点问题，请重试。"
+        }
+    },
+    "program": {
+        "hero": {
+            "eyebrow": "专家计划",
+            "title": "加入 <mark></mark>Rerun 专家计划",
+            "promises": {
+                "listed": "入驻专家目录，与客户精准匹配",
+                "workspace": "获得一个免费工作区，构建您想要的一切",
+                "templates": "构建或导入同事，作为模板出售，每笔销售保留 95%",
+                "revenue": "您带来的每个客户套餐，都可赚取 20% 的持续分成"
+            },
+            "findExpert": "寻找专家",
+            "joined": "加入已入驻 Rerun 的专家行列"
+        },
+        "showcase": {
+            "label": "专家目录",
+            "title": "跻身顶尖人才之列。",
+            "lede": "已入驻 Rerun 的专家，以及客户联系前看到的个人资料。",
+            "carousel": "Rerun 专家",
+            "browseAll": "浏览全部专家"
+        },
+        "cta": {
+            "label": "专家计划",
+            "title": "成为 Rerun 专家",
+            "subtitle": "只需申请一次。我们会人工审核每份申请，并通过电子邮件告知下一步。"
+        },
+        "valueProps": {
+            "badge": "为什么选择 Rerun",
+            "title": "为什么自由职业者和工作室选择在 Rerun 上构建。",
+            "subtitle": "您交付同事，客户让它持续运行。无需租用基础设施，也不用写没人看的交接文档。",
+            "cells": {
+                "ship": {
+                    "title": "几天上线，而不是几个月",
+                    "desc": "从开箱即用的同事和 {connectorCount}+ 款应用起步，每个一键接入。首次演示前无需配置任何东西。"
+                },
+                "harness": {
+                    "title": "构建完整框架，而不只是提示词",
+                    "desc": "精确选择同事能做什么：文件、命令行、网页、记忆、专属数据库、技能。每项能力都是一个开关。"
+                },
+                "board": {
+                    "title": "交付实时看板，而不是聊天记录",
+                    "desc": "运行次数、成本、成功率以及需要人工处理的事项，全部实时显示在看板上。客户无需找您问进度，就能看到工作进展。"
+                },
+                "handoff": {
+                    "title": "放手交接，无需手把手",
+                    "desc": "在做任何敏感操作之前，同事会停下来询问您的客户。客户在应用或 Slack 中批准，您不必一直守着。"
+                },
+                "running": {
+                    "title": "您离开后，它照样运行",
+                    "desc": "同事在客户自己的机器上全天候运行，按计划或由触发器启动。无需看护，也不会半夜两点接到紧急电话。"
+                },
+                "improving": {
+                    "title": "您卖出的同事会不断进步",
+                    "desc": "它会记下对客户的了解，让您交付的工作自行变得更精准，而不是逐渐过时。"
+                }
+            }
+        },
+        "benefits": {
+            "badge": "您将获得",
+            "title": "成为 Rerun 专家，成长更快。",
+            "subtitle": "一次申请，四种方式为您已在做的工作获得报酬。",
+            "items": {
+                "listed": {
+                    "title": "入驻专家目录",
+                    "desc": "一个公开的个人资料，客户可以浏览、按技能和预算筛选，并一键联系。每份需求都会直接进入您的收件箱。"
+                },
+                "sandbox": {
+                    "title": "在沙盒中免费构建",
+                    "desc": "专家账户可获得一个沙盒，不限同事数量，也不产生费用。做原型、做演示，然后把完成的同事交给客户。"
+                },
+                "templates": {
+                    "title": "保留 95% 的模板销售收入",
+                    "desc": "将同事打包成模板，发布到市场上，每次有人安装都能获得收入。价格由您定，每笔销售保留 95%，付款由我们处理。"
+                },
+                "revenue": {
+                    "title": "您带来的每个客户，赚取 20%",
+                    "desc": "您引入的客户订阅后，只要对方一直使用，您每月都能赚取其 Rerun 套餐费用的 20%。"
+                }
+            }
+        },
+        "perks": {
+            "badge": "专家优势",
+            "title": "每位 Rerun 专家都能获得的权益。",
+            "subtitle": "只有一个等级，无需刷积分。以下是申请通过当天起的变化。",
+            "regular": {
+                "title": "普通账户",
+                "subtitle": "所有 Rerun 用户"
+            },
+            "expert": {
+                "title": "Rerun 专家",
+                "subtitle": "已加入计划"
+            },
+            "rows": {
+                "directory": {
+                    "label": "目录展示",
+                    "regular": "不展示，客户找不到您",
+                    "expert": "公开的个人资料，可被客户检索和筛选"
+                },
+                "matching": {
+                    "label": "客户匹配",
+                    "regular": "自己寻找潜在客户",
+                    "expert": "按技能和预算将客户需求推送给您"
+                },
+                "sandbox": {
+                    "label": "沙盒",
+                    "regular": "同事数量受限，每个工作区都要付费",
+                    "expert": "无限制且免费，用于构建和演示客户的同事"
+                },
+                "marketplace": {
+                    "label": "模板市场",
+                    "regular": "浏览和安装模板",
+                    "expert": "发布您的同事，每笔销售保留 95%"
+                },
+                "revenue": {
+                    "label": "收入分成",
+                    "regular": "无",
+                    "expert": "您带来的客户套餐享 20% 持续分成"
+                },
+                "community": {
+                    "label": "社区",
+                    "regular": "文档和公共支持邮箱",
+                    "expert": "专属频道，并可直接联系团队"
+                },
+                "earlyAccess": {
+                    "label": "抢先体验",
+                    "regular": "功能公开发布后才能使用",
+                    "expert": "在公开发布前体验新功能和新模型"
+                },
+                "coMarketing": {
+                    "label": "联合营销",
+                    "regular": "无",
+                    "expert": "精选展示、案例研究和发布支持"
+                }
+            }
+        },
+        "apply": {
+            "button": "申请成为专家",
+            "sent": {
+                "title": "申请已收到",
+                "description": "我们会人工审核每份申请。如果合适，您会收到一封电子邮件，其中有领取创作者账户和沙盒的链接。",
+                "close": "关闭"
+            },
+            "title": "申请加入专家计划",
+            "description": "介绍一下您自己。我们会通过电子邮件告知下一步。",
+            "fields": {
+                "name": "姓名或工作室",
+                "namePlaceholder": "Ada Lovelace",
+                "email": "电子邮件",
+                "emailPlaceholder": "you@studio.com",
+                "type": "您的工作身份",
+                "location": "所在地",
+                "locationPlaceholder": "法国巴黎",
+                "website": "网站或作品集",
+                "linkedin": "LinkedIn",
+                "x": "X"
+            },
+            "types": {
+                "freelancer": "自由职业者",
+                "studio": "工作室"
+            },
+            "submit": "提交申请",
+            "sending": "发送中...",
+            "validation": {
+                "nameRequired": "姓名为必填项",
+                "emailRequired": "电子邮件为必填项",
+                "emailInvalid": "电子邮件无效",
+                "locationTooLong": "所在地过长",
+                "urlProtocol": "必须以 http:// 或 https:// 开头"
+            },
+            "errors": {
+                "alreadyApplied": "此电子邮件已有申请记录。我们会尽快回复您。",
+                "invalid": "请检查表单后重试。",
+                "failed": "出了点问题，请重试。"
+            }
+        }
+    },
+    "visuals": {
+        "harness": {
+            "capabilities": {
+                "filesystem": {
+                    "label": "读写文件",
+                    "blurb": "处理其工作区中的文件"
+                },
+                "shell": {
+                    "label": "运行命令",
+                    "blurb": "在其 Box 中执行命令"
+                },
+                "web": {
+                    "label": "浏览网页",
+                    "blurb": "搜索并阅读网页"
+                },
+                "memory": {
+                    "label": "记住信息",
+                    "blurb": "保存并回忆信息"
+                },
+                "db": {
+                    "label": "访问数据",
+                    "blurb": "查询其数据库"
+                },
+                "skills": {
+                    "label": "使用技能",
+                    "blurb": "运行已安装的技能"
+                },
+                "self": {
+                    "label": "自我改进",
+                    "blurb": "调整自己的设置"
+                },
+                "schedule": {
+                    "label": "安排任务",
+                    "blurb": "为以后规划工作"
+                },
+                "callAgent": {
+                    "label": "与其他同事协作",
+                    "blurb": "委派给队友"
+                },
+                "askUser": {
+                    "label": "向您提问",
+                    "blurb": "暂停并提供选项让您回答"
+                },
+                "requestApproval": {
+                    "label": "请求批准",
+                    "blurb": "暂停等待您的许可"
+                }
+            }
+        },
+        "hitl": {
+            "agent": "Margo · 发票催收",
+            "question": "acme.com 有两张发票已逾期 20 天。我该怎么催收？",
+            "options": {
+                "remind": "向 billing@acme.com 发送措辞坚定的提醒",
+                "call": "先给对方的应付账款联系人打电话",
+                "escalate": "上报给客户负责人"
+            },
+            "approval": {
+                "action": "Margo 想向 acme.com 退款 $230",
+                "detail": "发票 #1042 · 有争议的费用"
+            },
+            "permission": {
+                "label": "发送电子邮件",
+                "message": "向 billing@acme.com 发送付款提醒",
+                "preview": "主题：发票 #1042：付款逾期\n\n您好，发票 #1042（$230）的到期日为 8 月 20 日。"
+            },
+            "resume": {
+                "question": "正在致电对方的应付账款联系人 · 提醒已排队",
+                "approval": "退款已发送 · 已通知客户",
+                "permission": "电子邮件已发送至 billing@acme.com"
+            }
+        },
+        "monitor": {
+            "runs": {
+                "title": "今日运行",
+                "subtitle": "实时"
+            },
+            "status": {
+                "title": "同事状态",
+                "subtitle": "{count} 位正在工作"
+            },
+            "tokens": {
+                "title": "已用 token",
+                "subtitle": "最近 7 天"
+            },
+            "success": {
+                "title": "成功率",
+                "subtitle": "滚动 24 小时"
+            },
+            "logs": {
+                "title": "运行日志",
+                "subtitle": "Jules · 入站销售"
+            },
+            "revenue": {
+                "title": "已成交收入",
+                "subtitle": "本月"
+            },
+            "agents": {
+                "a1": "Jules · 入站销售",
+                "a2": "Margo · 发票催收",
+                "a3": "Sam · 收件箱整理",
+                "a4": "Nora · 客服",
+                "a5": "Leo · 报告"
+            }
+        },
+        "triggers": {
+            "listening": "监听中",
+            "status": {
+                "triggered": "已触发",
+                "running": "运行中",
+                "done": "已完成"
+            },
+            "events": {
+                "morning": {
+                    "source": "每天早上 7:00",
+                    "action": "Sam 已整理您的收件箱"
+                },
+                "lead": {
+                    "source": "潜在客户发来新邮件",
+                    "action": "Jules 正在起草回复"
+                },
+                "payment": {
+                    "source": "一笔付款刚刚失败",
+                    "action": "Margo 正在跟进催收"
+                },
+                "signup": {
+                    "source": "新用户注册",
+                    "action": "已启动新手引导"
+                },
+                "meeting": {
+                    "source": "一场会议刚刚结束",
+                    "action": "Sam 正在撰写会议纪要"
+                }
+            }
+        },
+        "memory": {
+            "files": "{count, plural, other {个文件}}",
+            "updated": "刚刚更新",
+            "kinds": {
+                "skill": "技能",
+                "context": "背景",
+                "preference": "偏好"
+            },
+            "cards": {
+                "invoiceChasing": {
+                    "name": "发票催收",
+                    "description": "催收逾期发票，又不得罪客户。",
+                    "lines": {
+                        "1": "## 流程",
+                        "2": "1. 每天从 Stripe 拉取未付发票",
+                        "3": "2. 逾期第 7 天发送第一次提醒",
+                        "4": "3. 两次尝试后上报给客户负责人",
+                        "5": "4. 每次联系都记录在 CRM 对话中",
+                        "6": "## 例外",
+                        "7": "- 绝不催收低于 $50 的发票",
+                        "8": "- 上报前先阅读 references/tone.md"
+                    }
+                },
+                "acme": {
+                    "name": "Acme Corp",
+                    "description": "同事对这个客户的了解。",
+                    "lines": {
+                        "1": "## 账单",
+                        "2": "- 通常在第 30 天左右付款，有时更晚",
+                        "3": "- 每张发票都必须有采购订单号",
+                        "4": "- 发票寄往 ap@acme.co，而不是 Dana",
+                        "5": "## 联系人",
+                        "6": "- Dana Reyes 负责运营，一天内回复",
+                        "7": "- 上报需经过其首席运营官"
+                    }
+                },
+                "emailTone": {
+                    "name": "邮件语气",
+                    "description": "用户希望如何给潜在客户写信。",
+                    "lines": {
+                        "1": "## 语气",
+                        "2": "- 英文，正式，不用表情符号",
+                        "3": "- 以创始人身份署名，而不是助理",
+                        "4": "- 控制在 120 词以内",
+                        "5": "## 时机",
+                        "6": "- 跟进两次后停止",
+                        "7": "- 草稿准备好就发送"
+                    }
+                }
+            },
+            "rounds": {
+                "confirmed": {
+                    "label": "已确认",
+                    "text": "Acme 又在第 44 天付款",
+                    "after": "- 按 45 天账期付款，已在 3 张发票上确认"
+                },
+                "preference": {
+                    "label": "偏好",
+                    "text": "绝不在早上 9 点前给客户发邮件",
+                    "after": "- 绝不在对方当地时间早上 9 点前发送"
+                },
+                "learned": {
+                    "label": "已学到",
+                    "text": "Acme 的上报需经过其首席运营官",
+                    "after": "3. 两次尝试后上报给其首席运营官"
+                }
+            }
+        }
+    }
+}

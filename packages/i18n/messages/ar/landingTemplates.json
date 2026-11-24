@@ -1,0 +1,25 @@
+{
+    "price": {
+        "free": "مجاني",
+        "monthly": "{amount}/شهريًا",
+        "useForFree": "استخدمه مجانًا",
+        "hire": "{count, plural, zero {وظّف الزملاء · {price}} one {وظّف هذا الزميل · {price}} two {وظّف هذين الزميلين · {price}} few {وظّف هؤلاء الـ # زملاء · {price}} many {وظّف هؤلاء الـ # زميلًا · {price}} other {وظّف هؤلاء الـ # زميل · {price}}}",
+        "hireCard": "وظّف · {price}"
+    },
+    "categories": {
+        "agencies": "الوكالات",
+        "ecommerce": "التجارة الإلكترونية",
+        "saas": "SaaS",
+        "sales": "المبيعات",
+        "recruiting": "التوظيف",
+        "real-estate": "العقارات",
+        "legal": "القانون والامتثال",
+        "creators": "صنّاع المحتوى",
+        "productivity": "الإنتاجية",
+        "other": "أخرى"
+    },
+    "connectors": {
+        "none": "لا حاجة إلى تطبيقات",
+        "label": "التطبيقات: {apps}"
+    }
+}

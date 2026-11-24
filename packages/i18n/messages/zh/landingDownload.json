@@ -1,0 +1,58 @@
+{
+    "title": "下载 Rerun 桌面应用",
+    "eyebrow": "桌面应用",
+    "headline": "桌面上的 Rerun",
+    "description": "您的同事拥有独立窗口，还有通知、菜单栏或系统托盘图标，以及快速提问。",
+    "mac": "下载 macOS 版",
+    "windows": "下载 Windows 版",
+    "linux": "下载 Linux 版",
+    "allPlatforms": "所有平台",
+    "alternatives": {
+        "macIntel": "下载适用于 Intel 芯片 Mac 的版本",
+        "macAppleSilicon": "下载适用于 Apple Silicon 芯片 Mac 的版本",
+        "windowsArm64": "下载适用于 Windows on Arm 的版本",
+        "windowsX64": "下载适用于 Windows x64 的版本"
+    },
+    "beta": "测试版",
+    "webApp": "Rerun 也可以在浏览器中运行：<link>打开网页版</link>。",
+    "platforms": {
+        "label": "下载",
+        "title": "macOS、Windows 和 Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 或更高版本，支持 Apple Silicon 和 Intel。",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 或更高版本，支持 x64 和 Arm。",
+            "warning": "Windows 应用尚未签名。如果 Windows 显示“Windows 已保护你的电脑”，请点击“更多信息”，然后点击“仍要运行”。",
+            "x64": "x64",
+            "arm64": "Arm"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64。AppImage 可在大多数发行版上运行，并会自动更新。",
+            "appImage": "AppImage",
+            "deb": ".deb（Debian、Ubuntu）",
+            "rpm": ".rpm（Fedora、openSUSE）"
+        }
+    },
+    "features": {
+        "label": "应用带来的功能",
+        "title": "Rerun 的一切，一键即达",
+        "notifications": {
+            "title": "让您及时回来的通知",
+            "body": "当您在其他应用中时，同事会第一时间联系您，点击即可打开对话。"
+        },
+        "quickAsk": {
+            "title": "快速提问",
+            "body": "Mac 上按 ⌘⇧Space，Windows 和 Linux 上按 Ctrl+Shift+Space：在任何应用中向您的 Chief of Staff 提问，答案会在 Rerun 中等您。"
+        },
+        "always": {
+            "title": "始终运行",
+            "body": "关闭窗口后，Rerun 仍保留在菜单栏或系统托盘中，图标上会显示等待您处理的事项数量。"
+        }
+    }
+}

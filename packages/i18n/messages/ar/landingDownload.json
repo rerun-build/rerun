@@ -1,0 +1,58 @@
+{
+    "title": "نزّل تطبيق Rerun لسطح المكتب",
+    "eyebrow": "تطبيق سطح المكتب",
+    "headline": "Rerun على سطح مكتبك",
+    "description": "زملاؤك في نافذة خاصة بهم، مع الإشعارات وأيقونة في شريط القوائم أو علبة النظام، وميزة السؤال السريع.",
+    "mac": "نزّل لنظام macOS",
+    "windows": "نزّل لنظام Windows",
+    "linux": "نزّل لنظام Linux",
+    "allPlatforms": "جميع الأنظمة",
+    "alternatives": {
+        "macIntel": "نزّل لجهاز Mac بمعالج Intel",
+        "macAppleSilicon": "نزّل لجهاز Mac بمعالج Apple Silicon",
+        "windowsArm64": "نزّل لنظام Windows على Arm",
+        "windowsX64": "نزّل لنظام Windows x64"
+    },
+    "beta": "تجريبي",
+    "webApp": "يعمل Rerun أيضًا في متصفحك: <link>افتح تطبيق الويب</link>.",
+    "platforms": {
+        "label": "التنزيل",
+        "title": "macOS وWindows وLinux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 أو أحدث، Apple Silicon وIntel.",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 أو أحدث، x64 وArm.",
+            "warning": "تطبيق Windows غير موقّع بعد. إذا عرض Windows رسالة \"قام Windows بحماية الكمبيوتر\"، فانقر على \"مزيد من المعلومات\" ثم \"تشغيل على أي حال\".",
+            "x64": "x64",
+            "arm64": "Arm"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64. يعمل ملف AppImage على معظم التوزيعات ويحدّث نفسه تلقائيًا.",
+            "appImage": "AppImage",
+            "deb": ".deb (Debian وUbuntu)",
+            "rpm": ".rpm (Fedora وopenSUSE)"
+        }
+    },
+    "features": {
+        "label": "ما يضيفه التطبيق",
+        "title": "كل ما في Rerun على بُعد اختصار",
+        "notifications": {
+            "title": "إشعارات تعيدك إلى العمل",
+            "body": "يتواصل معك زملاؤك بمجرد انتقالك إلى تطبيق آخر، ونقرة واحدة تفتح المحادثة."
+        },
+        "quickAsk": {
+            "title": "السؤال السريع",
+            "body": "⌘⇧Space على Mac، وCtrl+Shift+Space على Windows وLinux: سؤال لـ Chief of Staff من أي تطبيق، والإجابة تنتظرك في Rerun."
+        },
+        "always": {
+            "title": "يعمل دائمًا",
+            "body": "إغلاق النافذة يُبقي Rerun في شريط القوائم أو علبة النظام، مع عدد ما ينتظرك على أيقونته."
+        }
+    }
+}

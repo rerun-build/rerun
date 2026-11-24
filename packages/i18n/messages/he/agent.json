@@ -1,0 +1,1081 @@
+{
+    "untitledBox": "Box ללא שם",
+    "agentCard": {
+        "destinations": {
+            "services": "אפליקציות",
+            "skills": "מיומנויות",
+            "memories": "ידע",
+            "scheduled": "שגרות",
+            "files": "קבצים",
+            "data": "מסד נתונים",
+            "monitoring": "פעילות",
+            "settings": "הגדרות"
+        },
+        "delete": "למחוק את העמית הזה",
+        "share": "לשתף",
+        "close": "לסגור את הכרטיס",
+        "nameField": "שם העמית",
+        "rename": "לשנות את השם של {name}"
+    },
+    "agentChatsList": {
+        "title": "שרשורים",
+        "newThread": "שרשור חדש",
+        "close": "סגירה",
+        "filters": {
+            "all": "הכול",
+            "chats": "צ'אטים",
+            "automations": "אוטומציות",
+            "needs": "מחכה לך"
+        },
+        "markAllRead": {
+            "title": "לסמן הכול כנקרא?",
+            "description": "{count, plural, one {שרשור אחד ייצא} two {שני שרשורים ייצאו} other {# שרשורים ייצאו}} מהרשימה הזו. גם בקשות שעדיין ממתינות לתשובה יימחקו, בלי לקבל תשובה.",
+            "confirm": "לסמן הכול כנקרא"
+        },
+        "emptyNeeds": "שום דבר לא מחכה לך.",
+        "emptyThreads": "עדיין אין שרשורים.",
+        "emptyAutomations": "עדיין אין הרצה אוטומטית.",
+        "running": "פועל",
+        "startedBy": "הותחל על ידי {name}",
+        "moreFor": "עוד עבור {title}",
+        "loadOlderFailed": "לא הצלחנו לטעון שרשורים ישנים יותר. כדאי לנסות שוב"
+    },
+    "agentComputerThumbnail": {
+        "working": "עובד על המחשב שלו",
+        "live": "המחשב שלו",
+        "computer": "מחשב",
+        "wentAway": "המסך נעלם"
+    },
+    "agentView": {
+        "closePanel": "לסגור את החלונית",
+        "views": {
+            "apps": "אפליקציות",
+            "skills": "מיומנויות",
+            "knowledge": "ידע",
+            "files": "קבצים",
+            "data": "מסד נתונים",
+            "routines": "שגרות",
+            "activity": "פעילות",
+            "settings": "הגדרות"
+        },
+        "tabs": {
+            "services": "אפליקציות",
+            "mcp": "MCP",
+            "skills": "מיומנויות",
+            "memories": "ידע",
+            "files": "קבצים",
+            "published": "פורסם",
+            "data": "מסד נתונים",
+            "scheduled": "מתוזמנות",
+            "triggers": "טריגרים",
+            "monitoring": "ניטור",
+            "logs": "יומנים",
+            "settings": "כללי",
+            "tools": "יכולות",
+            "setup": "התקנה"
+        }
+    },
+    "openChatsTabs": {
+        "closeTab": "לסגור את {title}",
+        "closeTabMenu": "לסגור את הלשונית",
+        "newThread": "שרשור חדש",
+        "general": "כללי"
+    },
+    "sessionRename": {
+        "rename": "לשנות שם",
+        "label": "שם השיחה",
+        "failed": "לא הצלחנו לשנות את השם. כדאי לנסות שוב."
+    },
+    "threadBranch": {
+        "needs": "מחכה לך",
+        "error": "שגיאה",
+        "opener": {
+            "schedule": "הרצה מתוזמנת · {name}",
+            "trigger": "וובהוק · {name}",
+            "askedBy": "התבקש על ידי {name}",
+            "askedByUnknown": "התבקש על ידי עמית אחר",
+            "started": "התחיל שרשור"
+        }
+    },
+    "floating": {
+        "backToChat": "חזרה לצ'אט"
+    },
+    "agentPanelServices": {
+        "uninstallFailed": "הסרת האפליקציה נכשלה",
+        "removeServerFailed": "הסרת השרת נכשלה",
+        "loadServerFailed": "לא הצלחנו לטעון את השרת הזה מהמנוע.",
+        "alternativeLoadFailed": "לא הצלחנו לטעון את {name}.",
+        "signInHint": "יש להתחבר ל-{host} כדי שהעמית יוכל להשתמש בכלים שלו.",
+        "searchPlaceholder": "חיפוש אפליקציות…",
+        "allCategories": "הכול",
+        "installed": "מותקנות",
+        "library": "ספרייה",
+        "needsAuthHint": "צריך להתחבר לאפליקציה הזו לפני שהעמית יוכל להשתמש בה. יש ללחוץ על \"להתחבר\".",
+        "needsConfigHint": "האפליקציה הזו צריכה פרטי גישה לפני שהעמית יוכל להשתמש בה. יש ללחוץ על \"להגדיר\".",
+        "configure": "להגדיר",
+        "connect": "להתחבר",
+        "account": "חשבון",
+        "reconnect": "להתחבר מחדש",
+        "uninstall": "להסיר את {name}",
+        "uninstallLabeled": "להסיר את {name} ({label})",
+        "uninstallConfirm": "להסיר את {name}?",
+        "uninstallLabeledConfirm": "להסיר את {name} ({label})?",
+        "uninstallDescription": "העמית מאבד את השירות הזה ואת הכלים שלו. החיבור שלו מבוטל, כך שהתקנה מחדש תדרוש חיבור מחדש.",
+        "uninstallAction": "להסיר",
+        "requestHint": "עדיין מחפש? נוכל להוסיף את האפליקציה שאתה צריך.",
+        "requestApp": "לבקש אפליקציה",
+        "vaultBadge": "Vault",
+        "fromVault": "מה-Vault",
+        "vaultAdd": "להוסיף",
+        "vaultShared": "כל עמית מקבל את זה מה-Vault. אפשר לשנות את זה שם.",
+        "vaultRemove": "להסיר את {name} מהעמית הזה",
+        "vaultRemoveConfirm": "להסיר את {name} מהעמית הזה?",
+        "vaultRemoveDescription": "זה נשאר ב-Vault, לשאר העמיתים ולהמשך.",
+        "vaultRemoveAction": "להסיר",
+        "vaultAttachFailed": "לא הצלחנו להוסיף את {name}"
+    },
+    "agentPanelMcp": {
+        "unreachableTitle": "המנוע לא זמין",
+        "unreachableDescription": "לא הצלחנו להגיע למנוע של העמית הזה.",
+        "new": "חדש",
+        "emptyTitle": "עדיין אין שרתי MCP",
+        "emptyDescription": "שרתי MCP נותנים לעמית שלך כלים נוספים מעבר לאפליקציות המובנות. אפשר להוסיף אחד כדי להרחיב את מה שהוא יכול לעשות.",
+        "appBadge": "אפליקציה",
+        "count": "{count, plural, one {שרת MCP אחד} two {שני שרתי MCP} other {# שרתי MCP}}"
+    },
+    "mcpOAuthAuthorize": {
+        "discoveryFailed": "האיתור נכשל",
+        "authorizationFailed": "ההרשאה נכשלה",
+        "startFailed": "הפעלת OAuth נכשלה",
+        "discovering": "מאתר את ספק ה-OAuth...",
+        "connected": "מחובר",
+        "retry": "לנסות שוב",
+        "waiting": "ממתין להרשאה…",
+        "connect": "להתחבר"
+    },
+    "mcpServerEditor": {
+        "invalidName": "השם חייב להכיל 1-64 תווים: אותיות, ספרות, קווים תחתונים או מקפים.",
+        "storeCredentialsFailed": "שמירת פרטי הגישה נכשלה",
+        "saveFailed": "השמירה נכשלה",
+        "deleteFailed": "המחיקה נכשלה",
+        "secretWarning": "זוהה כאן סוד. הוא יועבר למנוע ויהפוך ל-{token} כשתשמור.",
+        "titleReadOnly": "שרת MCP",
+        "titleEdit": "לערוך שרת MCP",
+        "titleNew": "שרת MCP חדש",
+        "providedByApp": "שרת ה-MCP הזה מגיע מאפליקציה ומנוהל אוטומטית.",
+        "name": "שם",
+        "nameHelper": "הכלים מאוחדים בתור \"{prefix}_{tool}\".",
+        "namePrefixFallback": "שם",
+        "transport": "תעבורה",
+        "command": "פקודה",
+        "arguments": "ארגומנטים",
+        "argumentsHelper": "ארגומנט אחד בכל שורה.",
+        "argumentsHelperEditable": "ארגומנט אחד בכל שורה. אפשר ללחוץ על {token} מודגש כדי לשנות את הערך שמאחוריו.",
+        "url": "URL",
+        "urlHelper": "אפשר ללחוץ על {token} מודגש כדי לשנות את הערך שמאחוריו.",
+        "environment": "סביבה",
+        "environmentHelper": "KEY=value אחד בכל שורה. הערכים נשמרים במנוע.",
+        "environmentHelperEditable": "KEY=value אחד בכל שורה. הערכים נשמרים במנוע; אפשר ללחוץ על {token} מודגש כדי לשנות את הערך שמאחוריו.",
+        "headers": "כותרות",
+        "headersHelper": "Header=value אחד בכל שורה. נשלח עם כל בקשה (לאימות).",
+        "headersHelperEditable": "Header=value אחד בכל שורה. נשלח עם כל בקשה (לאימות). אפשר ללחוץ על {token} מודגש כדי לשנות את הערך שמאחוריו.",
+        "deleteServer": "למחוק את השרת",
+        "deleteConfirm": "למחוק את {name}?",
+        "deleteConfirmUnnamed": "למחוק את השרת הזה?",
+        "deleteDescription": "העמית מאבד כל כלי שהשרת הזה חושף. המשתנים השמורים שלו נמחקים יחד איתו.",
+        "saveChanges": "לשמור שינויים",
+        "createServer": "ליצור שרת",
+        "nameProposed": "{source, select, address {הוצע לפי הכתובת, אפשר לשנות את השם} other {הוצע לפי החבילה, אפשר לשנות את השם}}",
+        "transportGuessed": "נגזר מהכתובת",
+        "incomplete": "לכל שרת צריך שם ופקודה או כתובת",
+        "duplicateName": "לשני שרתים יש אותו שם, \"{name}\"",
+        "addServers": "{count, plural, one {להוסיף שרת אחד} two {להוסיף שני שרתים} other {להוסיף # שרתים}}"
+    },
+    "mcpVariableToken": {
+        "editVariable": "לערוך את המשתנה {name}",
+        "statusSaved": "נשמר",
+        "statusEngine": "מוגדר במנוע",
+        "statusUnset": "לא מוגדר",
+        "placeholderOverride": "להזין ערך כדי לדרוס",
+        "placeholderNew": "להזין ערך",
+        "helperSaved": "נשמר במנוע ולא יוצג שוב. אפשר להקליד ערך חדש כדי להחליף אותו.",
+        "helperEngine": "מגיע מסביבת המנוע. שמירת ערך דורסת אותו עבור העמית הזה.",
+        "helperUnset": "נשמר במנוע, מחוץ להישג ידם של הדפדפן ומסד הנתונים.",
+        "remove": "להסיר את {name}",
+        "save": "לשמור",
+        "removeConfirm": "להסיר את {name}?",
+        "removeDescription": "הערך נמחק מהמנוע. כל שרת שמשתמש במשתנה הזה יפסיק לעבוד עד שתגדיר אותו שוב.",
+        "removeAction": "להסיר"
+    },
+    "agentPanelTools": {
+        "unreachable": "לא הצלחנו להגיע למנוע של העמית הזה.",
+        "updateFailed": "העדכון נכשל",
+        "lockedByKind": "ה-Chief of Staff תמיד שומר על זה.",
+        "unavailableTitle": "היכולות לא זמינות",
+        "intro": "לבחור מה העמית הזה יכול לעשות. השינויים חלים בהרצה הבאה.",
+        "about": "על {capability}",
+        "includes": "כולל",
+        "selfImprovement": {
+            "allowToolInstall": {
+                "label": "להתקין כלים ו-MCP",
+                "description": "לאפשר לעמית להתקין חבילות npm ולרשום שרתי MCP."
+            },
+            "allowSoulEdit": {
+                "label": "לערוך את הנשמה שלו",
+                "description": "לאפשר לעמית לשכתב את הזהות שלו ב-SOUL.md."
+            },
+            "autoMemory": {
+                "label": "זיכרון אוטומטי",
+                "description": "לסדר זיכרונות אוטומטית אחרי כל תור."
+            }
+        },
+        "capabilities": {
+            "filesystem": {
+                "label": "לקרוא ולכתוב קבצים",
+                "blurb": "לעבוד עם קבצים בסביבת העבודה שלו",
+                "help": "מאפשר לעמית לפתוח, ליצור ולערוך קבצים בסביבת העבודה שלו."
+            },
+            "shell": {
+                "label": "להריץ פקודות",
+                "blurb": "להריץ פקודות על המכונה שלו",
+                "help": "מאפשר לעמית להריץ פקודות טרמינל כדי להתקין כלים ולבצע משימות באופן אוטומטי."
+            },
+            "web": {
+                "label": "לגלוש באינטרנט",
+                "blurb": "לחפש ולקרוא דפי אינטרנט",
+                "help": "מאפשר לעמית לחפש באינטרנט ולקרוא דפי אינטרנט כדי למצוא מידע."
+            },
+            "memory": {
+                "label": "לזכור דברים",
+                "blurb": "לשמור מידע ולשלוף אותו",
+                "help": "מאפשר לעמית לשמור עובדות בין הרצות ולשלוף אותן אחר כך."
+            },
+            "db": {
+                "label": "לגשת לנתונים",
+                "blurb": "לתשאל את מסד הנתונים שלו",
+                "help": "מאפשר לעמית לקרוא ולכתוב נתונים מובנים במסד הנתונים שלו."
+            },
+            "brain": {
+                "label": "להשתמש במוח של החברה",
+                "blurb": "לקרוא את מה שהחברה אישרה",
+                "help": "מאפשר לעמית לחפש ולקרוא ב-Brain, העמודים שהצוות שלך אישר על החברה, ולהציע שינויים שאתה בודק לפני שמשהו נשמר."
+            },
+            "sharedDb": {
+                "label": "לגשת לנתונים משותפים",
+                "blurb": "לתשאל את מסד הנתונים המשותף",
+                "help": "מאפשר לעמית לקרוא ולכתוב במסד הנתונים שכל העמיתים בסביבת העבודה חולקים."
+            },
+            "skills": {
+                "label": "להשתמש במיומנויות",
+                "blurb": "להריץ מיומנויות מותקנות",
+                "help": "מאפשר לעמית להשתמש במיומנויות שהתקנת למשימות מתמחות."
+            },
+            "self": {
+                "label": "לשפר את עצמו",
+                "blurb": "לכוונן את ההגדרה שלו",
+                "help": "מאפשר לעמית לשפר עם הזמן את ההוראות וההגדרות שלו."
+            },
+            "schedule": {
+                "label": "לתזמן משימות",
+                "blurb": "לתכנן עבודה להמשך",
+                "help": "מאפשר לעמית לתזמן משימות שירוצו אוטומטית בשעה שנבחרה."
+            },
+            "trigger": {
+                "label": "להגיב ל-webhooks",
+                "blurb": "לפעול כשאפליקציה אחרת קוראת לו",
+                "help": "מאפשר לעמית לחשוף כתובות URL ציבוריות שמתחילות הרצה כששירות חיצוני קורא להן."
+            },
+            "callAgent": {
+                "label": "לעבוד עם עמיתים אחרים",
+                "blurb": "להאציל לחברי הצוות",
+                "help": "מאפשר לעמית להעביר עבודה לעמיתים אחרים בסביבת העבודה."
+            },
+            "team": {
+                "label": "לראות עמיתים אחרים",
+                "blurb": "לקרוא את השגרות וההרצות שלהם",
+                "help": "מאפשר לעמית לבדוק את שאר העמיתים בסביבת העבודה: הסטטוס, המשימות המתוזמנות, הטריגרים וההרצות האחרונות שלהם, עם הכלים שכל הרצה הפעילה כשהוא צריך להבין כישלון. הוא לא יכול לשנות כלום. הרצה יכולה להכיל נתונים מהאפליקציות המחוברות של העמית האחר."
+            },
+            "aiProviders": {
+                "label": "לראות את ספקי ה-AI שלו",
+                "blurb": "המודל בשימוש, קרדיט ומכסות",
+                "help": "מאפשר לעמית לבדוק על איזה ספק AI ומודל הוא פועל, אילו ספקים נוספים מחוברים לסביבת העבודה, ומה נשאר בכל אחד: קרדיט Rerun והמגבלות של מינוי Claude, Codex או OpenCode. הוא לא יכול לשנות כלום."
+            },
+            "askUser": {
+                "label": "לשאול אותך שאלות",
+                "blurb": "לעצור ולשאול עם אפשרויות תשובה",
+                "help": "מאפשר לעמית לעצור ולשאול אותך שאלה עם אפשרויות תשובה לפני שהוא ממשיך."
+            },
+            "requestApproval": {
+                "label": "לבקש אישור",
+                "blurb": "לעצור ולחכות לאישור שלך",
+                "help": "מאפשר לעמית לעצור ולבקש ממך לאשר או לדחות פעולה לפני שהיא מתבצעת."
+            },
+            "cards": {
+                "label": "להציג כרטיסים בצ'אט",
+                "blurb": "תצוגה מקדימה של טבלה או קובץ בתוך השיחה",
+                "help": "מאפשר לעמית להוסיף לשיחה כרטיס תצוגה מקדימה: השורות הראשונות של אחת הטבלאות שלו, או קובץ מסביבת העבודה שלו, שאפשר לפתוח בלחיצה אחת."
+            },
+            "quickReplies": {
+                "label": "להציע תשובות",
+                "blurb": "להציע תשובות בלחיצה אחת",
+                "help": "מאפשר לעמית לסיים הודעה בעד שלוש תשובות קצרות שאפשר לשלוח בלחיצה אחת, כמו \"תמצא עוד 100\"."
+            },
+            "computer": {
+                "label": "להשתמש במחשב שלו",
+                "blurb": "לראות ולהפעיל את המסך שלו",
+                "help": "מאפשר לעמית להסתכל על שולחן העבודה שלו וללחוץ, להקליד ולגלול בדפדפן, בקבצים ובטרמינל שלו, לעבודה שצריך לעשות ידנית באפליקציה או באתר. אפשר לצפות בו בשידור חי, והוא עוצר בזמן שאתה מפעיל את המסך בעצמך."
+            },
+            "remoteComputers": {
+                "label": "להשתמש במחשבים מקושרים",
+                "blurb": "לעבוד על המחשבים שאנשים קישרו",
+                "help": "מאפשר לעמית להריץ פקודות, לקרוא ולכתוב קבצים ולהתחיל משימות ארוכות על המחשבים שאנשים קישרו לסביבת העבודה מאפליקציית Rerun למחשב, עם שם שמתחיל ב-#. כל פקודה וכל תיקייה מחוץ לאלה המותרות ממתינות לאישור של האדם בצ'אט, אלא אם בעל המחשב קבע אחרת."
+            },
+            "paidData": {
+                "label": "לידים, SEO ונתונים חברתיים",
+                "blurb": "בתשלום מקרדיטי Rerun שלך",
+                "help": "מאפשר לעמית למצוא לקוחות פוטנציאליים, את כתובות האימייל והטלפונים שלהם בעבודה ונתוני חברות, לבדוק נפחי חיפוש, רעיונות למילות מפתח וקישורים נכנסים, לקרוא תוצאות Google ועסקים מקומיים, ולקרוא פרופילים ופוסטים ציבוריים ב-LinkedIn, TikTok, Instagram, X, YouTube, Facebook ו-Reddit, בלי מינוי ל-Apollo, Semrush או לכלי סריקה. כל קריאה משולמת מקרדיטי Rerun שלך, והעמית מבקש ממך קודם לאשר עלות משוערת."
+            },
+            "requestSecret": {
+                "label": "לבקש פרטי גישה",
+                "blurb": "לעצור ולבקש מפתח, שמוזן בצורה מאובטחת",
+                "help": "מאפשר לעמית לעצור ולבקש ממך מפתח API או טוקן בטופס מוסתר. הערך נשמר כמשתנה של העמית ואף פעם לא נכנס לשיחה."
+            }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "להוציא בלי לשאול",
+            "description": "לדלג על אישור העלות, כדי שהרצות מתוזמנות ומשימות שהואצלו יוכלו להשתמש בנתונים בתשלום כשאתה לא זמין."
+        }
+    },
+    "agentPanelTriggers": {
+        "new": "חדש",
+        "emptyTitle": "עדיין אין טריגרים",
+        "emptyDescription": "טריגר נותן לעמית שלך כתובת URL ציבורית. בכל פעם ששירות אחר קורא לה, העמית רץ עם המטען שהוא קיבל.",
+        "summary": "{methods} · {count, plural, one {קריאה אחת} two {שתי קריאות} other {# קריאות}}",
+        "paused": "מושהה",
+        "neverCalled": "עדיין לא נקרא",
+        "count": "{count, plural, one {טריגר אחד} two {שני טריגרים} other {# טריגרים}}"
+    },
+    "triggerEditor": {
+        "saveFailed": "השמירה נכשלה",
+        "rotateFailed": "החלפת הסוד נכשלה",
+        "deleteFailed": "המחיקה נכשלה",
+        "titleEdit": "לערוך טריגר",
+        "titleReadOnly": "טריגר",
+        "titleNew": "טריגר חדש",
+        "history": "היסטוריה",
+        "name": "שם",
+        "nameLockedHelper": "אי אפשר לשנות את השם (הוא קובע את ה-URL).",
+        "nameHelper": "ה-URL נגזר מהשם הזה.",
+        "namePlaceholder": "GitHub push",
+        "description": "תיאור",
+        "descriptionPlaceholder": "מופעל כשקומיט נכנס ל-main",
+        "methods": "שיטות מותרות",
+        "methodsGetHelper": "GET מיועד לשירותים שיכולים לקרוא רק לכתובת URL פשוטה. תצוגות מקדימות של קישורים וביקורים מהדפדפן לא נלקחים בחשבון.",
+        "methodsHelper": "רוב השירותים שולחים POST.",
+        "modelHelper": "המודל שהטריגר הזה רץ עליו כשהוא מופעל. דורש את מפתח ה-API של הספק.",
+        "enabled": "פעיל",
+        "prompt": "הנחיית הטריגר",
+        "promptDialogTitle": "לערוך את הנחיית הטריגר",
+        "promptHelper": "מה שהעמית מריץ כשקוראים ל-URL (סשן חדש בכל פעם). המטען של הקורא מצורף מתחתיה.",
+        "promptPlaceholder": "קומיט נכנס עכשיו. לבדוק את ה-diff במטען ולפרסם סיכום ב-Slack.",
+        "delete": "למחוק את הטריגר",
+        "deleteConfirm": "למחוק את {name}?",
+        "deleteConfirmUnnamed": "למחוק את הטריגר הזה?",
+        "deleteDescription": "כתובת ה-webhook שלו מפסיקה להגיב מיד. כל מה שעדיין קורא לה יתחיל להיכשל.",
+        "saveChanges": "לשמור שינויים",
+        "create": "ליצור טריגר"
+    },
+    "triggerUrlField": {
+        "label": "כתובת Webhook",
+        "noSecretHelper": "החלפה מנפיקה סוד חדש ואת ה-URL שמתאים לו.",
+        "noSecret": "לטריגר הזה עדיין אין סוד, ולכן אין לו URL.",
+        "getUrl": "לקבל URL",
+        "helper": "כל מי שמחזיק את ה-URL הזה יכול להתחיל הרצה. יש להתייחס אליו כאל סוד. העתקה, תצוגה מקדימה בצ'אט או פתיחה בדפדפן לא מתחילות כלום.",
+        "copy": "להעתיק את כתובת ה-webhook",
+        "rotateConfirm": "להחליף את סוד ה-webhook?",
+        "rotateDescription": "ה-URL הנוכחי מפסיק לעבוד מיד. צריך להדביק את החדש בכל מקום שממנו קוראים לטריגר הזה.",
+        "rotateAction": "להחליף",
+        "rotate": "להחליף את הסוד"
+    },
+    "agentPanelScheduled": {
+        "new": "חדש",
+        "emptyTitle": "עדיין אין משימות מתוזמנות",
+        "emptyDescription": "אפשר לבקש מהעמית שלך לעשות משהו לפי תזמון (דוח יומי, סיכום שבועי), והמשימות החוזרות יופיעו כאן.",
+        "paused": "מושהה",
+        "noExecutions": "עדיין אין הרצות",
+        "picker": {
+            "when": "מתי",
+            "notSet": "לא מוגדר",
+            "describe": "לתאר את התזמון",
+            "describePlaceholder": "כל יום חול ב-8 בבוקר",
+            "update": "לעדכן את התזמון"
+        },
+        "editor": {
+            "saveFailed": "השמירה נכשלה",
+            "runFailed": "הרצת המשימה נכשלה",
+            "deleteFailed": "המחיקה נכשלה",
+            "titleEdit": "לערוך משימה",
+            "titleReadOnly": "משימה",
+            "titleNew": "משימה חדשה",
+            "history": "היסטוריה",
+            "name": "שם",
+            "nameLockedHelper": "אי אפשר לשנות את השם (הוא קובע את ה-slug).",
+            "namePlaceholder": "סיכום יומי",
+            "description": "תיאור",
+            "descriptionPlaceholder": "סיכום בוקר",
+            "timezone": "אזור זמן",
+            "modelHelper": "המודל שהמשימה הזו רצה עליו כשהיא מופעלת. דורש את מפתח ה-API של הספק.",
+            "enabled": "פעילה",
+            "prompt": "הנחיית המשימה",
+            "promptDialogTitle": "לערוך את הנחיית המשימה",
+            "promptHelper": "ההנחיה שהעמית מריץ כשהמשימה מופעלת (סשן חדש בכל פעם).",
+            "promptPlaceholder": "לסכם את ההערות של אתמול ולשלוח לי סיכום באימייל.",
+            "setupPendingContinue": "הרצת הבדיקה תיפתח כשההגדרה תסתיים. <link>להמשיך בהגדרה</link>",
+            "setupPendingStart": "הרצת הבדיקה תיפתח כשההגדרה תסתיים. קודם יש להתחיל אותה מהצ'אט.",
+            "delete": "למחוק את המשימה",
+            "deleteConfirm": "למחוק את {name}?",
+            "deleteConfirmUnnamed": "למחוק את המשימה הזו?",
+            "deleteDescription": "המשימה מפסיקה לפעול והתזמון שלה נמחק. ההרצות שהיא כבר יצרה נשמרות.",
+            "testRun": "הרצת בדיקה",
+            "saveChanges": "לשמור שינויים",
+            "create": "ליצור משימה"
+        },
+        "count": "{count, plural, one {משימה מתוזמנת אחת} two {שתי משימות מתוזמנות} other {# משימות מתוזמנות}}"
+    },
+    "taskNotifyField": {
+        "label": "להודיע לי",
+        "muted": "העמית הזה מושתק"
+    },
+    "taskOutcomeFooter": {
+        "lastRun": "הרצה אחרונה לפני {time}",
+        "neverRan": "עוד לא רץ",
+        "failed": "נכשל",
+        "done": "הושלם"
+    },
+    "modelsShared": {
+        "boxManageReason": "רק מנהל מערכת או מנהל של ה-Box הזה יכול לשנות את זה",
+        "creditPaused": "קרדיטי Rerun מושהים"
+    },
+    "modelSelector": {
+        "setUp": "להגדיר מודל",
+        "defaultLabel": "ברירת מחדל · {model}",
+        "select": "לבחור מודל",
+        "loading": "טוען",
+        "empty": "אין מודלים זמינים",
+        "workspaceDefault": "ברירת המחדל של סביבת העבודה",
+        "coworkerDefault": "ברירת המחדל של העמית",
+        "setCoworkerDefault": "להגדיר כברירת מחדל של העמית",
+        "makeDefault": "להגדיר את {model} כברירת המחדל של העמית הזה",
+        "refused": "{model} · {reason}. אפשר לבחור מודל אחר למטה.",
+        "pillWithEffort": "{model} · {effort}",
+        "reasoning": "חשיבה",
+        "reasoningOf": "החשיבה של {model}",
+        "effortDefault": "ברירת מחדל",
+        "effortLow": "נמוכה",
+        "effortMedium": "בינונית",
+        "effortHigh": "גבוהה",
+        "effortDefaultHint": "לפי בחירת הספק",
+        "effortLowHint": "תשובות מהירות",
+        "effortMediumHint": "מאוזנת",
+        "effortHighHint": "חושב יותר זמן"
+    },
+    "modelPickerProviders": {
+        "pitch": {
+            "claude": {
+                "plan": "Claude Pro או Max",
+                "hint": "להתחבר עם חשבון Claude שלך",
+                "nudge": "יש לך Claude Pro או Max?"
+            },
+            "codex": {
+                "plan": "ChatGPT Plus או Pro",
+                "hint": "להתחבר עם חשבון ChatGPT שלך",
+                "nudge": "יש לך ChatGPT Plus או Pro?"
+            }
+        },
+        "hints": {
+            "claude": "Pro או Max",
+            "codex": "Plus או Pro",
+            "anthropic": "מודלים של Claude",
+            "openai": "מודלים של GPT",
+            "google": "מודלים של Gemini",
+            "openrouter": "כל המודלים"
+        },
+        "pitchHeading": "לפעול על התוכנית שאתה כבר משלם עליה",
+        "connect": "להתחבר",
+        "addProvider": "להוסיף ספק",
+        "sections": {
+            "subscription": "מינוי",
+            "api": "מפתח API"
+        },
+        "connected": "מחובר",
+        "manage": "לנהל חיבורים"
+    },
+    "runModelField": {
+        "label": "מודל",
+        "placeholder": "לבחור מודל",
+        "coworkerDefault": "ברירת המחדל של העמית",
+        "coworkerDefaultWithModel": "ברירת המחדל של העמית · {model}",
+        "current": "נוכחי"
+    },
+    "planLimitHint": {
+        "windows": {
+            "session": "סשן",
+            "fiveHour": "5 שעות",
+            "weekly": "שבועי",
+            "monthly": "חודשי",
+            "modelWeekly": "{label} שבועי",
+            "modelWeeklyUnnamed": "מודל שבועי"
+        },
+        "windowUsed": "{name}: נוצלו {percent}",
+        "windowResets": "{name}: נוצלו {percent}, מתאפס {when}",
+        "paused": "מושהה",
+        "credit": {
+            "usedUpOn": "הקרדיטים החודשיים נגמרו, חוזרים ב-{date}",
+            "usedUpNextMonth": "הקרדיטים החודשיים נגמרו, חוזרים בחודש הבא",
+            "usageOn": "קרדיטים חודשיים: נוצלו {percent}%, מתאפסים ב-{date}",
+            "usageNextMonth": "קרדיטים חודשיים: נוצלו {percent}%, מתאפסים בחודש הבא"
+        }
+    },
+    "skillEditor": {
+        "titleView": "מיומנות",
+        "titleEdit": "לערוך מיומנות",
+        "titleNew": "מיומנות חדשה",
+        "download": "להוריד את המיומנות",
+        "connectorManaged": "המיומנות הזו מגיעה מאפליקציה ומנוהלת אוטומטית.",
+        "name": "שם",
+        "nameLocked": "אי אפשר לשנות את השם (הוא קובע את ה-slug).",
+        "namePlaceholder": "מחקר ברשת",
+        "description": "תיאור",
+        "descriptionPlaceholder": "איך לחקור נושא",
+        "procedure": "נוהל",
+        "procedureDialogTitle": "לערוך את הנוהל",
+        "procedurePlaceholder": "1. לזהות מקורות\n2. לשלוף\n3. לסכם",
+        "delete": "למחוק את המיומנות",
+        "deleteTitle": "למחוק את {name}?",
+        "deleteTitleUnnamed": "למחוק את המיומנות הזו?",
+        "deleteDescription": "המיומנות וכל הקבצים שצורפו אליה יוסרו מהעמית. אי אפשר לבטל את זה.",
+        "saveChanges": "לשמור שינויים",
+        "create": "ליצור מיומנות",
+        "saveFailed": "השמירה נכשלה",
+        "downloadFailed": "הורדת המיומנות נכשלה",
+        "deleteFailed": "המחיקה נכשלה"
+    },
+    "skillFileEditor": {
+        "readFailed": "לא הצלחנו לקרוא את הקובץ הזה",
+        "saveFailed": "השמירה נכשלה",
+        "deleteFailed": "המחיקה נכשלה",
+        "truncated": "הקובץ הזה גדול מדי לעריכה כאן; מוצגים רק 100 000 התווים הראשונים שלו.",
+        "delete": "למחוק את הקובץ",
+        "deleteTitle": "למחוק את {path}?",
+        "deleteDescription": "הקובץ יוסר מהמיומנות. אי אפשר לבטל את זה.",
+        "saveChanges": "לשמור שינויים"
+    },
+    "skillFilesSection": {
+        "label": "קבצים מצורפים",
+        "helper": "רשימות תיוג ארוכות, מאגרים וקורפוסים נמצאים כאן. העמית קורא קובץ רק כשהנוהל מפנה אליו.",
+        "empty": "אין קבצים מצורפים.",
+        "pathRequired": "יש להזין נתיב קובץ, לדוגמה references/checklist.md",
+        "createFailed": "יצירת הקובץ נכשלה",
+        "deleteFailed": "מחיקת הקובץ נכשלה",
+        "deleteLabel": "למחוק את {path}",
+        "deleteTitle": "למחוק את {path}?",
+        "deleteDescription": "הקובץ יוסר מהמיומנות. אי אפשר לבטל את זה.",
+        "add": "להוסיף",
+        "cancel": "ביטול",
+        "addFile": "להוסיף קובץ"
+    },
+    "agentPanelSkills": {
+        "notFound": "המיומנות לא נמצאה",
+        "fileTooLarge": "הקובץ גדול מדי (עד 10 MB)",
+        "importFailed": "ייבוא המיומנות נכשל",
+        "folderImportFailed": "הייבוא נכשל",
+        "folderFailure": "{name}: {error}",
+        "readFolderFailed": "קריאת התיקייה נכשלה",
+        "imported": "{count, plural, one {יובאה מיומנות אחת} two {יובאו שתי מיומנויות} other {יובאו # מיומנויות}}",
+        "importedSkipped": "{count, plural, one {יובאה מיומנות אחת} two {יובאו שתי מיומנויות} other {יובאו # מיומנויות}}, {skipped, plural, one {דולג קובץ אחד שאינו טקסט} two {דולגו שני קבצים שאינם טקסט} other {דולגו # קבצים שאינם טקסט}}",
+        "upload": "העלאה",
+        "markdownFile": "קובץ Markdown",
+        "skillFolder": "תיקיית מיומנות",
+        "newSkill": "חדשה",
+        "emptyTitle": "עדיין אין מיומנויות",
+        "emptyDescription": "מיומנויות הן הוראות שלב אחר שלב לשימוש חוזר שהעמית שלך לומד, כדי שיבצע משימות חוזרות באותה דרך בכל פעם.",
+        "appBadge": "אפליקציה",
+        "count": "{count, plural, one {מיומנות אחת} two {שתי מיומנויות} other {# מיומנויות}}",
+        "ownGroup": "רק {name}",
+        "brainGroup": "מה-Brain",
+        "toBrain": "ל-Brain",
+        "toBrainHint": "להעביר אותה ל-Brain, שם כל עמית יכול להשתמש בה",
+        "sharedToBrain": "{name} נמצאת ב-Brain"
+    },
+    "shareAgentDialog": {
+        "titleLink": "קישור השיתוף שלך",
+        "titleShare": "לשתף את {name}",
+        "descriptionLink": "לשלוח אותו למי שצריך לקבל עותק. עדיין לא צריך להם חשבון.",
+        "descriptionShare": "לבחור מה עובר עם העותק. כל מה שהופך אותו לעמית כבר עובר.",
+        "done": "סיום",
+        "cancel": "ביטול",
+        "packing": "אורז את העמית…",
+        "createLink": "ליצור קישור",
+        "carried": {
+            "memories": "{count, plural, one {זיכרון אחד} two {שני זיכרונות} other {# זיכרונות}}",
+            "database": "מסד הנתונים שלו ({size}, לא נסרק לאיתור סודות)",
+            "files": "{count, plural, one {קובץ אחד מסביבת העבודה} two {שני קבצים מסביבת העבודה} other {# קבצים מסביבת העבודה}}"
+        },
+        "confirmTitle": "לשלוח את {name} עם הנתונים שלו?",
+        "confirmDescription": "העותק יכלול {items}. כל מי שמחזיק את הקישור יכול לקרוא את כל זה עד שתבטל אותו."
+    },
+    "shareAgentLink": {
+        "label": "קישור שיתוף",
+        "reused": "כבר היה קישור עם אותן תשובות בדיוק לעמית הזה, אז הנה הוא במקום עותק שני.",
+        "fresh": "כל מי שמחזיק את הקישור הזה יכול להוסיף עותק של העמית הזה ללוח שלו. אפשר לבטל אותו מתי שתרצה.",
+        "copy": "להעתיק את קישור השיתוף"
+    },
+    "shareAgentOptions": {
+        "memories": "זיכרונות",
+        "memoriesCount": "{count, plural, one {זיכרון אחד} two {שני זיכרונות} other {# זיכרונות}} · {size}",
+        "memoriesEmpty": "עדיין לא נשמר שום זיכרון",
+        "database": "מסד הנתונים של העמית",
+        "databaseSize": "{size} · לא נסרק לאיתור סודות",
+        "databaseEmpty": "עדיין אין טבלאות",
+        "files": "קבצים של סביבת העבודה",
+        "filesCount": "{count, plural, one {קובץ אחד} two {שני קבצים} other {# קבצים}} · {size}",
+        "filesEmpty": "עדיין אין קבצים"
+    },
+    "shareAgentSafety": {
+        "title": "נתונים רגישים מוסרים",
+        "description": "מפתחות API, חשבונות מחוברים והיסטוריית הצ'אט אף פעם לא יוצאים מסביבת העבודה שלך, לא משנה מה תבחר למעלה. קבצים שנראה שמכילים פרטי גישה מושמטים, והאפליקציות מגיעות מנותקות, כדי שמי שפותח את הקישור יאשר אותן בעצמו."
+    },
+    "sharedLinksSection": {
+        "revokeFailed": "לא הצלחנו לבטל את הקישור הזה",
+        "revoked": "הקישור בוטל",
+        "revokedDescription": "העותק שהוא הכיל נמחק. מי שפותח אותו עכשיו לא מקבל כלום.",
+        "label": "קישורי שיתוף",
+        "helper": "כל מי שמחזיק קישור יכול להוסיף עותק של העמית הזה ללוח שלו.",
+        "carried": {
+            "memories": "זיכרונות",
+            "database": "מסד נתונים",
+            "files": "קבצים"
+        },
+        "notUsed": "עדיין לא בשימוש",
+        "added": "{count, plural, one {נוסף פעם אחת} two {נוסף פעמיים} other {נוסף # פעמים}}",
+        "agentOnly": "רק העמית, בלי נתונים",
+        "copy": "להעתיק את קישור השיתוף",
+        "revokeTitle": "לבטל את קישור השיתוף הזה?",
+        "revokeDescription": "העותק שהוא מכיל נמחק מיד. מי שכבר הוסיף את העמית שומר את שלו.",
+        "revoke": "לבטל",
+        "revokeLabel": "לבטל את הקישור הזה"
+    },
+    "sharedAgentContents": {
+        "memories": "{count, plural, one {זיכרון אחד} two {שני זיכרונות} other {# זיכרונות}}",
+        "memoriesSubtitle": "כל מה שהוא למד עד עכשיו",
+        "database": "מסד הנתונים שלו",
+        "databaseSubtitle": "הטבלאות שלו, כולל השורות",
+        "files": "{count, plural, one {קובץ אחד מסביבת העבודה} two {שני קבצים מסביבת העבודה} other {# קבצים מסביבת העבודה}}",
+        "keys": "{count, plural, one {מפתח API אחד} two {שני מפתחות API} other {# מפתחות API}}",
+        "keysSubtitle": "אתה ממלא אותם",
+        "mcpAuth": "{count, plural, one {שירות אחד שצריך להתחבר אליו מחדש} two {שני שירותים שצריך להתחבר אליהם מחדש} other {# שירותים שצריך להתחבר אליהם מחדש}}",
+        "mcpAuthSubtitle": "בחשבונות שלך",
+        "agentOnly": "רק העמית",
+        "agentOnlySubtitle": "שום נתונים לא עוברים איתו",
+        "connectorsNote": "אתה תחבר אותם עם החשבונות שלך.",
+        "triggersNote": "כל אחד מקבל URL חדש משלו."
+    },
+    "useShareAgentFlow": {
+        "failedRequest": "הבקשה לא עברה. יש לבדוק את החיבור ולנסות שוב."
+    },
+    "agentTabs": {
+        "chat": {
+            "label": "צ'אט",
+            "description": "לדבר עם העמית הזה"
+        },
+        "actions": {
+            "label": "לטיפול",
+            "description": "פריטים שצריכים את תשומת לבך"
+        },
+        "services": {
+            "label": "אפליקציות",
+            "description": "אינטגרציות מוכנות שהעמית הזה יכול להשתמש בהן"
+        },
+        "mcp": {
+            "label": "MCP",
+            "description": "שרתי Model Context Protocol"
+        },
+        "skills": {
+            "label": "מיומנויות",
+            "description": "מיומנויות לשימוש חוזר שהעמית יכול להריץ"
+        },
+        "data": {
+            "label": "מסד נתונים",
+            "description": "הנתונים של העמית הזה"
+        },
+        "memories": {
+            "label": "ידע",
+            "description": "מה שהעמית הזה זוכר"
+        },
+        "files": {
+            "label": "קבצים",
+            "description": "הקבצים של העמית הזה"
+        },
+        "published": {
+            "label": "פורסם",
+            "description": "מה שהעמית הזה פרסם, ומי יכול לפתוח את זה"
+        },
+        "scheduled": {
+            "label": "שגרות",
+            "description": "משימות חוזרות ומתוזמנות"
+        },
+        "triggers": {
+            "label": "טריגרים",
+            "description": "כתובות URL ציבוריות שמתחילות הרצה כשקוראים להן"
+        },
+        "tools": {
+            "label": "יכולות",
+            "description": "כלים שהעמית הזה יכול להשתמש בהם"
+        },
+        "monitoring": {
+            "label": "ניטור",
+            "description": "שימוש, עלות ופעילות של העמית הזה"
+        },
+        "logs": {
+            "label": "יומנים",
+            "description": "יומני פעילות והרצות"
+        },
+        "setup": {
+            "label": "התקנה",
+            "description": "מה העמית הזה עושה בפעם הראשונה שמישהו מתקין אותו"
+        },
+        "settings": {
+            "label": "הגדרות",
+            "description": "להגדיר את העמית הזה"
+        }
+    },
+    "accessSummary": {
+        "youManage": "אתה מנהל את העמית הזה",
+        "youCanUse": "אתה יכול להשתמש בעמית הזה",
+        "youManageViaBox": "אתה מנהל את העמית הזה, דרך ה-Box {box}",
+        "youCanUseViaBox": "אתה יכול להשתמש בעמית הזה, דרך ה-Box {box}",
+        "viaBox": "דרך ה-Box {box}",
+        "everyone": "כל מי שבסביבת העבודה",
+        "adminsOnly": "מנהלי מערכת בלבד",
+        "peopleViaBox": "{count, plural, one {אדם אחד} two {שני אנשים} other {# אנשים}}, דרך ה-Box {box}"
+    },
+    "agentLockedOverlay": {
+        "saved": "השיחות, הזיכרון, המיומנויות, התזמונים והקבצים שלו שמורים.",
+        "savedUntil": "השיחות, הזיכרון, המיומנויות, התזמונים והקבצים שלו שמורים עד {date}.",
+        "paused": {
+            "title": "{name} מושהה יחד עם סביבת העבודה שלך",
+            "subscribeToResume": "אפשר להירשם למינוי, ו-{name} ימשיך בדיוק מאיפה שעצר.",
+            "updatePaymentToResume": "אפשר לעדכן את אמצעי התשלום, ו-{name} ימשיך בדיוק מאיפה שעצר.",
+            "updatePayment": "לעדכן תשלום",
+            "subscribe": "להירשם כדי לשחזר"
+        },
+        "sandboxArchived": {
+            "title": "{name} בארכיון יחד עם סביבת הניסוי שלך",
+            "requestReactivation": "אפשר לבקש הפעלה מחדש מהלוח, ו-{name} ימשיך בדיוק מאיפה שעצר."
+        },
+        "restoring": {
+            "title": "{name} בדרך חזרה",
+            "description": "סביבת העבודה שלך משוחזרת. {name} יתעורר יחד איתה בעוד דקה או שתיים."
+        },
+        "slot": {
+            "activateFailed": "לא הצלחנו להפעיל את העמית הזה",
+            "backOnline": "{name} חזר לפעול",
+            "inactive": "{name} לא פעיל",
+            "templateEnded": "מינוי התבנית שממנה הגיע העמית הזה הסתיים. אפשר לקנות את התבנית שוב כדי להחזיר אותו.",
+            "nothingLost": "שום דבר לא אבד: הזיכרונות, הקבצים והמיומנויות שלו עדיין כאן. הוא רק צריך מקום פנוי לעמית כדי לפעול שוב.",
+            "fixedLimit": "לסביבת העבודה הזו יש מגבלה קבועה של עמיתים. אפשר לפנות לתמיכה כדי להעלות אותה.",
+            "upgradeToActivate": "לשדרג כדי להפעיל",
+            "activeCount": "{active} מתוך {max} עמיתים פעילים",
+            "activating": "מפעיל…",
+            "activate": "להפעיל"
+        }
+    },
+    "panelsShared": {
+        "yourCoworker": "העמית שלך",
+        "closePanel": "לסגור את החלונית"
+    },
+    "agentPanel": {
+        "threads": "שרשורים",
+        "coworkerCard": "כרטיס העמית"
+    },
+    "agentAccessRow": {
+        "label": "גישה",
+        "manage": "לנהל גישה"
+    },
+    "agentCombobox": {
+        "unassigned": "לא משויך",
+        "selectMany": "לבחור עמיתים",
+        "selectOne": "לבחור עמית",
+        "search": "חיפוש עמיתים…",
+        "empty": "לא נמצאו עמיתים"
+    },
+    "timezoneCombobox": {
+        "placeholder": "לבחור אזור זמן",
+        "search": "חיפוש אזור זמן…",
+        "empty": "לא נמצא אזור זמן"
+    },
+    "agentFileNavigation": {
+        "notFound": "הקובץ לא נמצא"
+    },
+    "agentSetupFields": {
+        "yes": "כן",
+        "no": "לא",
+        "resetToDefault": "לאפס לתבנית ברירת המחדל",
+        "useDefault": "להשתמש בתבנית ברירת המחדל",
+        "needsSetup": {
+            "label": "האם צריך להגדיר את העמית הזה אחרי ההתקנה?",
+            "helper": "עונים פעם אחת. מי שמתקין את העמית הזה רואה את התוצאה, ולכן אי אפשר לפרסם עמית בלי תשובה."
+        },
+        "instructions": {
+            "label": "הוראות התקנה",
+            "helper": "נכתבות לעמית, לא למשתמש: הוא קורא אותן ומוביל את המשתמש דרכן בצ'אט.",
+            "dialogTitle": "לערוך את הוראות ההתקנה"
+        },
+        "resetConfirm": {
+            "title": "לאפס לתבנית ברירת המחדל?",
+            "description": "מה שכתוב כאן יוחלף בהוראות ברירת המחדל. אי אפשר לבטל את זה.",
+            "confirm": "לאפס"
+        }
+    },
+    "agentPanelData": {
+        "unreachable": "לא הצלחנו להגיע למנוע של העמית הזה.",
+        "emptyTitle": "עדיין אין טבלאות",
+        "emptyDescription": "לעמית שלך יש מסד נתונים פרטי משלו. כשהוא צריך לשמור נתונים מובנים (אנשי קשר, תוצאות, רשימות מעקב), הוא יוצר כאן טבלאות שאפשר לעיין בהן בכל עת.",
+        "dialogTitle": "מסד הנתונים של העמית",
+        "dialogDescription": "מסד הנתונים הפרטי של העמית הזה, בגודל מלא."
+    },
+    "agentSheetChat": {
+        "anotherCoworker": "עמית אחר",
+        "replyPlaceholder": "להשיב ב-{title}...",
+        "startedBy": "הסשן הזה הותחל על ידי <b>{name}</b>"
+    },
+    "agentPanelChat": {
+        "notSetUp": "העמית הזה עדיין לא הוגדר",
+        "setUp": "להגדיר אותו"
+    },
+    "agentPanelSetup": {
+        "unreachable": "לא הצלחנו להגיע למנוע של העמית הזה.",
+        "saveFailed": "השמירה נכשלה",
+        "intro": "עותק של הסוכן הזה מגיע לחשבון של מישהו אחר בלי פרטי גישה ובלי שום דבר מחובר. ההוראות האלה הן מה שהוא מריץ, בעצמו, בפעם הראשונה שהם פותחים אותו.",
+        "saved": "נשמר",
+        "saving": "שומר...",
+        "save": "לשמור"
+    },
+    "agentPanelSettings": {
+        "unreachable": "לא הצלחנו להגיע למנוע של העמית הזה.",
+        "saveFailed": "השמירה נכשלה",
+        "name": "שם",
+        "inactive": "העמית הזה לא פעיל, ולכן אי אפשר לטעון או לשנות את ההגדרות שלו.",
+        "soul": {
+            "label": "נשמה (הנחיית מערכת)",
+            "dialogTitle": "לערוך את הנחיית המערכת",
+            "placeholder": "אתה..."
+        },
+        "verbosity": {
+            "label": "אורך התשובות",
+            "helper": "כמה ארוכות התשובות שלו, לא כמה עבודה הוא עושה.",
+            "minimal": "מינימלי",
+            "concise": "תמציתי",
+            "normal": "רגיל",
+            "detailed": "מפורט"
+        },
+        "notifications": {
+            "label": "התראות",
+            "choose": "לבחור מה יגיע אליך"
+        },
+        "delete": "למחוק את העמית",
+        "saved": "נשמר",
+        "save": "לשמור שינויים",
+        "appearance": "מראה"
+    },
+    "coworkerLook": {
+        "color": "צבע",
+        "material": "חומר",
+        "eyes": "עיניים",
+        "mouth": "פה",
+        "shuffle": "ערבוב",
+        "reset": "ברירת מחדל",
+        "materialOptions": {
+            "classic": "קלאסי",
+            "fluffy": "פרוותי",
+            "plush": "קטיפה",
+            "felt": "לבד",
+            "knit": "סריגה",
+            "clay": "חימר",
+            "rubber": "גומי",
+            "glass": "זכוכית",
+            "chrome": "כרום"
+        },
+        "colors": {
+            "blue": "כחול",
+            "indigo": "אינדיגו",
+            "violet": "סגול-כחלחל",
+            "purple": "סגול",
+            "pink": "ורוד",
+            "rose": "ורד",
+            "lime": "ליים",
+            "green": "ירוק"
+        },
+        "eyesOptions": {
+            "pill": "עיני גלולה",
+            "round": "עיניים עגולות",
+            "happy": "עיניים שמחות",
+            "googly": "עיניים מתגלגלות",
+            "visor": "מגן עיניים",
+            "sleepy": "עיניים ישנוניות",
+            "wink": "קריצה",
+            "pixel": "עיני פיקסל",
+            "star": "עיני כוכב",
+            "heart": "עיני לב",
+            "dot": "עיני נקודה",
+            "brows": "עיניים עם גבות",
+            "cyclops": "עין אחת",
+            "shades": "משקפי שמש",
+            "glasses": "משקפיים",
+            "sparkle": "עיניים נוצצות",
+            "line": "עיניים עצומות"
+        },
+        "mouthOptions": {
+            "none": "בלי פה",
+            "smile": "חיוך",
+            "open": "פה פתוח",
+            "cat": "פה של חתול",
+            "flat": "פה ישר"
+        }
+    },
+    "agentPanelLogs": {
+        "empty": {
+            "title": "עדיין אין הרצות",
+            "description": "כל הרצה של העמית שלך מתועדת כאן, כדי שתוכל לבדוק שלב אחר שלב מה הוא עשה ולמה."
+        },
+        "tokens": "{total} טוקנים",
+        "tokensShort": "{total} טוק'",
+        "stepCount": "{count, plural, one {שלב אחד} two {שני שלבים} other {# שלבים}}",
+        "step": "שלב {number}",
+        "noSteps": "לא תועדו שלבים בהרצה הזו.",
+        "input": "קלט",
+        "output": "פלט"
+    },
+    "agentRunHistory": {
+        "tokens": "{total} טוקנים",
+        "stepCount": "{count, plural, one {שלב אחד} two {שני שלבים} other {# שלבים}}"
+    },
+    "agentPanelMemories": {
+        "dormant": "רדום",
+        "delete": {
+            "label": "למחוק זיכרון",
+            "confirmTitle": "למחוק את הזיכרון הזה?",
+            "confirmDescription": "העמית שוכח אותו לתמיד. אי אפשר לבטל את זה."
+        },
+        "recallPlaceholder": "לשלוף זיכרונות...",
+        "new": "חדש",
+        "clearAll": "למחוק את כל הזיכרונות",
+        "searching": "מחפש…",
+        "recalled": "{count, plural, one {אחד נשלף עבור \"{query}\"} two {שניים נשלפו עבור \"{query}\"} other {# נשלפו עבור \"{query}\"}}",
+        "form": {
+            "contentPlaceholder": "המשתמש מעדיף תשובות תמציתיות.",
+            "kindPlaceholder": "סוג (לדוגמה העדפה)",
+            "tagsPlaceholder": "תגיות, מופרדות,בפסיק",
+            "save": "לשמור זיכרון"
+        },
+        "empty": {
+            "noMatches": "אין התאמות",
+            "title": "עדיין אין זיכרונות",
+            "description": "העמית שלך שומר כאן עובדות לטווח ארוך עליך ועל העבודה שלו, כדי לשמור על ההקשר בין שיחות.",
+            "add": "להוסיף זיכרון"
+        }
+    },
+    "agentPanelMonitoring": {
+        "charts": {
+            "kpiRuns": "הרצות",
+            "kpiCost": "עלות כוללת",
+            "kpiTokens": "סך הטוקנים",
+            "kpiErrorRate": "שיעור שגיאות",
+            "runsOverTime": "הרצות לאורך זמן",
+            "costOverTime": "עלות לאורך זמן",
+            "avgDuration": "משך הרצה ממוצע",
+            "runsByModel": "הרצות לפי מודל",
+            "topTools": "הכלים הנפוצים ביותר",
+            "toolErrors": "שגיאות כלים"
+        },
+        "tokenUsage": {
+            "title": "שימוש בטוקנים",
+            "subtitle": "טוקנים ליום"
+        },
+        "ranges": {
+            "24h": {
+                "short": "24 ש'",
+                "label": "24 השעות האחרונות"
+            },
+            "7d": {
+                "short": "7 י'",
+                "label": "7 הימים האחרונים"
+            },
+            "30d": {
+                "short": "30 י'",
+                "label": "30 הימים האחרונים"
+            },
+            "90d": {
+                "short": "90 י'",
+                "label": "90 הימים האחרונים"
+            }
+        },
+        "empty": {
+            "title": "עדיין אין פעילות",
+            "description": "נתוני שימוש, עלות והרצות של העמית הזה יופיעו כאן ברגע שהוא יתחיל לעבוד."
+        },
+        "expand": "להרחיב את {title}"
+    },
+    "agentPanelFiles": {
+        "publishFailed": "לא הצלחנו לפרסם את {name}",
+        "dropToUpload": "לשחרר כאן קבצים או תיקיות כדי להעלות",
+        "hideHidden": "להסתיר קבצים מוסתרים",
+        "showHidden": "להציג קבצים מוסתרים",
+        "emptyDescription": "זו סביבת העבודה של העמית שלך. קבצים שהוא מוריד, יוצר או עורך במהלך ההרצות שלו נשמרים כאן."
+    },
+    "shareCta": {
+        "placeLabel": "למקם את העמית",
+        "placeCaption": "להניח אותו על הלוח שלך, מוכן לפעולה.",
+        "trialAdd": "להתחיל ניסיון חינם ולהוסיף",
+        "planAdd": "להירשם ב-{price}/חודש ולהוסיף",
+        "add": "להוסיף ללוח שלי"
+    },
+    "schedule": {
+        "once": "פעם אחת · {date}",
+        "onceOn": "פעם אחת, {date}",
+        "everyMinutes": "כל {count} דקות",
+        "everyDay": "כל יום ב-{time}",
+        "weekdays": "בימי חול ב-{time}",
+        "everyWeekday": "כל יום {day} ב-{time}",
+        "monthly": "כל חודש ביום {day} ב-{time}"
+    },
+    "mcpJsonPaste": {
+        "link": "להדביק הגדרת JSON",
+        "linkVault": "או להדביק הגדרת JSON",
+        "linkAgain": "להדביק JSON נוסף",
+        "boxLabel": "הגדרת JSON של שרת MCP",
+        "placeholder": "להדביק את ה-JSON מה-README של השרת\n{example}",
+        "close": "סגירה",
+        "unnamed": "ללא שם",
+        "keysStored": "{count, plural, one {ערך אחד יישמר כמפתח, לא בהגדרה} two {שני ערכים יישמרו כמפתחות, לא בהגדרה} other {# ערכים יישמרו כמפתחות, לא בהגדרה}}",
+        "errors": {
+            "invalidJson": "JSON לא תקין: {detail}",
+            "notAnObject": "צריך להדביק אובייקט JSON: {example}",
+            "containerNotObject": "\"mcpServers\" חייב להיות אובייקט של שרתים",
+            "noServer": "לא נמצא שרת: נדרש \"mcpServers\", שרת עם שם או שרת עם \"command\" או \"url\"",
+            "emptyContainer": "\"mcpServers\" ריק",
+            "serverNotObject": "{scope, select, named {\"{server}\" חייב להיות אובייקט} other {שרת חייב להיות אובייקט}}",
+            "invalidName": "\"{server}\": שם יכול להכיל רק אותיות, ספרות, - ו-_",
+            "unknownField": "{scope, select, named {\"{server}\": שדה לא מוכר {fields}} other {שדה לא מוכר {fields}}}",
+            "notText": "{scope, select, named {\"{server}\": {field} חייב להיות טקסט} other {{field} חייב להיות טקסט}}",
+            "commandAndUrl": "{scope, select, named {ל-\"{server}\" יש גם command וגם url} other {לשרת יש גם command וגם url}}",
+            "argsNotList": "{scope, select, named {\"{server}\": args חייב להיות רשימת טקסטים} other {args חייב להיות רשימת טקסטים}}",
+            "unknownTransport": "{scope, select, named {\"{server}\": תעבורה לא מוכרת \"{transport}\"} other {תעבורה לא מוכרת \"{transport}\"}}",
+            "needsCommand": "{scope, select, named {\"{server}\": שרת stdio צריך command} other {שרת stdio צריך command}}",
+            "needsUrl": "{scope, select, named {\"{server}\": שרת {transport} צריך url} other {שרת {transport} צריך url}}",
+            "notMap": "{scope, select, named {\"{server}\": {field} חייב להיות אובייקט של ערכי טקסט} other {{field} חייב להיות אובייקט של ערכי טקסט}}",
+            "unresolvedRef": "{scope, select, named {\"{server}\": {field} משתמש ב-{ref}, צריך לשים במקומו את הערך האמיתי} other {{field} משתמש ב-{ref}, צריך לשים במקומו את הערך האמיתי}}",
+            "multiline": "{scope, select, named {\"{server}\": {field} חייב להיות בשורה אחת} other {{field} חייב להיות בשורה אחת}}"
+        }
+    }
+}

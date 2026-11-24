@@ -1,0 +1,80 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "您公司的网站是什么？",
+                "description": "我们会读取它，了解您卖什么、卖给谁。"
+            },
+            "industry": {
+                "title": "您从事哪个行业？",
+                "description": "它决定我们在您的看板上搭建哪些团队。"
+            },
+            "role": {
+                "title": "您在公司做什么？",
+                "description": "它决定先为您打造哪位同事。"
+            },
+            "name": {
+                "title": "最后一个：您的名字？",
+                "description": "这样我们就不是在跟一个工作区说话了。"
+            }
+        },
+        "progress": "第 {current} 题，共 {total} 题",
+        "website": {
+            "label": "公司网站",
+            "placeholder": "acme.com",
+            "none": "我没有网站"
+        },
+        "industry": {
+            "placeholder": "您的行业"
+        },
+        "industries": {
+            "agencies": "代理机构",
+            "ecommerce": "电商",
+            "saas": "SaaS",
+            "sales": "销售",
+            "recruiting": "招聘",
+            "real-estate": "房地产",
+            "legal": "法律与合规",
+            "creators": "创作者",
+            "productivity": "效率",
+            "other": "其他"
+        },
+        "role": {
+            "placeholder": "增长负责人"
+        },
+        "name": {
+            "placeholder": "小明"
+        },
+        "back": "返回",
+        "next": "下一步",
+        "continue": "继续",
+        "saveFailed": "无法保存，请重试。"
+    },
+    "setup": {
+        "starting": {
+            "title": "正在设置您的工作区",
+            "body": "正在唤醒您的 Chief of Staff…"
+        },
+        "failed": {
+            "title": "没有成功",
+            "body": "没有丢失任何内容。请稍后重试。"
+        },
+        "blocked": {
+            "title": "此工作区无法在这里启动",
+            "body": "请前往 {host} 完成设置。"
+        },
+        "tryAgain": "重试"
+    },
+    "waitlist": {
+        "title": "我们目前已满负荷",
+        "body": "所有机器都已被占用。您已加入候补名单：您的回答已保存，一旦有机器空出，这里会自动开启。"
+    },
+    "noPlan": {
+        "title": "此工作区已暂停",
+        "body": "请通过上方菜单切换工作区或账号。"
+    },
+    "update": {
+        "title": "需要更新",
+        "body": "此版本已不再受支持。"
+    }
+}

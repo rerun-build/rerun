@@ -1,0 +1,143 @@
+{
+    "preferences": {
+        "title": "偏好设置",
+        "close": "关闭",
+        "yourAccount": "您的账号",
+        "workspace": "工作区",
+        "aiProviders": "AI 提供商",
+        "appearance": "外观",
+        "appearanceSystem": "跟随系统",
+        "appearanceLight": "浅色",
+        "appearanceDark": "深色",
+        "coworkers": "同事",
+        "groupRecent": "最近",
+        "groupByBox": "按 Box",
+        "openLinksIn": "链接打开方式",
+        "linksBrowser": "浏览器",
+        "linksRerun": "Rerun",
+        "language": "语言",
+        "notifications": "通知",
+        "pushOff": "推送已关闭",
+        "support": "支持",
+        "contactSupport": "联系支持",
+        "privacy": "隐私政策",
+        "terms": "服务条款",
+        "about": "关于",
+        "version": "版本",
+        "environment": "环境",
+        "signOut": "退出登录",
+        "deleteAccount": "删除账号",
+        "server": "服务器"
+    },
+    "notifications": {
+        "title": "通知",
+        "saveFailed": "无法保存",
+        "tryAgainShortly": "请稍后重试。",
+        "loadFailed": "无法加载您的设置，请稍后重试。",
+        "push": {
+            "label": "推送通知",
+            "off": "已关闭",
+            "turnOn": "开启",
+            "openSettings": "{platform, select, android {打开 Android 设置} other {打开 iOS 设置}}",
+            "footnote": "{platform, select, android {开启推送前，以下通知都不会发送到此手机。} other {开启推送前，以下通知都不会发送到此 iPhone。}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "同事消息",
+                "description": "当同事需要您或有话要说时。"
+            },
+            "silent": {
+                "name": "已完成的任务",
+                "description": "当同事完成任务时，静音通知。"
+            },
+            "crew": {
+                "name": "团队工作中",
+                "description": "谁在工作、谁需要您，持续显示在顶部。"
+            }
+        },
+        "scopeTitle": "通知我以下内容",
+        "recommended": "推荐",
+        "scopes": {
+            "everything": {
+                "label": "全部",
+                "detail": "工作区中的每次运行，无论由谁发起。"
+            },
+            "mine": {
+                "label": "我的运行和我关注的内容",
+                "detail": "我发起的运行、我参与的对话、我关注的同事。"
+            },
+            "needed": {
+                "label": "仅在需要我时",
+                "detail": "我的运行中的问题、审批和错误。运行完成时不打扰。"
+            },
+            "nothing": {
+                "label": "不通知",
+                "detail": "我自己查看收件箱。"
+            }
+        },
+        "email": {
+            "label": "电子邮件",
+            "footnote": "当您不在时需要您处理。每个事件一封邮件，绝不会每次运行发一封。"
+        },
+        "perCoworker": {
+            "title": "按同事",
+            "add": "添加同事",
+            "pickTitle": "此同事的每次运行都会通知您",
+            "cancel": "取消",
+            "empty": "所有同事都遵循上述规则。",
+            "detail": "也可在每位同事的详情中设置。",
+            "rowLabel": "{name}，{value}",
+            "followsTasks": "关注任务",
+            "yourSetting": "您的设置"
+        },
+        "accountEmails": {
+            "title": "账号邮件",
+            "billing": "试用与计费",
+            "product": "产品更新"
+        },
+        "modes": {
+            "default": {
+                "label": "默认",
+                "hint": "遵循您的设置。"
+            },
+            "everything": {
+                "label": "所有活动",
+                "hint": "每次运行，无论由谁发起。"
+            },
+            "muted": {
+                "label": "已静音",
+                "hint": "不通知。看板上仍会显示。"
+            }
+        },
+        "coworker": {
+            "title": "{name} 的通知",
+            "yourSetting": "您的设置",
+            "quotedScope": "“{scope}”",
+            "follow": "关注其定时任务",
+            "nothingScheduled": "暂无定时任务。",
+            "scheduled": "{count} 个定时任务，会像您自己的运行一样通知您。",
+            "reachYou": "它们会像您自己的运行一样通知您。",
+            "tasksTitle": "定时任务",
+            "tasksFailed": "无法加载其任务，请稍后重试。",
+            "taskSwitch": "{name} 的通知",
+            "muted": "{name} 已静音。"
+        },
+        "actions": {
+            "approve": "批准",
+            "deny": "拒绝",
+            "answer": "回答",
+            "reply": "回复",
+            "open": "打开",
+            "replyPlaceholder": "您的回答",
+            "send": "发送"
+        },
+        "receipts": {
+            "approve": "已批准。{agent} 正在处理。",
+            "deny": "已拒绝。{agent} 不会执行。",
+            "reply": "已发送。{agent} 正在处理。",
+            "failed": "未发送：{reason}",
+            "signedOut": "请打开 Rerun 重新登录。",
+            "fallbackAgent": "您的同事"
+        }
+    }
+}

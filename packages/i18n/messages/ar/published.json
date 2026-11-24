@@ -1,0 +1,116 @@
+{
+    "access": {
+        "short": {
+            "public": "عام",
+            "workspace": "مساحة العمل",
+            "password": "كلمة المرور",
+            "invited": "المدعوون"
+        },
+        "hint": {
+            "public": "دون تسجيل دخول",
+            "workspace": "للأعضاء المسجلين فقط",
+            "password": "يكتبها الزائر مرة واحدة",
+            "invited": "يؤكد الزائر بريده الإلكتروني"
+        },
+        "label": {
+            "public": "أي شخص لديه الرابط",
+            "workspace": "أعضاء {workspace}",
+            "password": "أي شخص لديه كلمة المرور",
+            "invited": "من تدعوهم فقط"
+        },
+        "anyoneAt": "أي شخص في {domain}",
+        "workspaceFallback": "مساحة العمل"
+    },
+    "gate": {
+        "madeWith": "صُنع بواسطة Rerun",
+        "locked": "صفحة {workspace}، مقفلة",
+        "code": "الرمز",
+        "switchAccount": "تبديل الحساب"
+    },
+    "viewer": {
+        "download": "تنزيل",
+        "report": "إبلاغ",
+        "updated": "حُدّث {when}",
+        "slides": "{count, plural, zero {# شريحة} one {شريحة واحدة} two {شريحتان} few {# شرائح} many {# شريحة} other {# شريحة}}",
+        "page": "الصفحة {page}",
+        "previousSlide": "الشريحة السابقة",
+        "nextSlide": "الشريحة التالية"
+    },
+    "csv": {
+        "meta": "{rows, plural, zero {# صف} one {صف واحد} two {صفان} few {# صفوف} many {# صفًا} other {# صف}}{truncated, select, true {+} other {}} · {columns, plural, zero {# عمود} one {عمود واحد} two {عمودان} few {# أعمدة} many {# عمودًا} other {# عمود}}",
+        "truncated": "يُعرض {rows, plural, zero {# صف} one {أول صف} two {أول صفين} few {أول # صفوف} many {أول # صفًا} other {أول # صف}}. نزّل الملف لرؤية الباقي."
+    },
+    "row": {
+        "more": "المزيد",
+        "open": "فتح",
+        "copyLink": "نسخ الرابط",
+        "shareSettings": "إعدادات المشاركة",
+        "unpublish": "إلغاء النشر",
+        "unpublishFailed": "تعذّر إلغاء النشر"
+    },
+    "unpublishConfirm": {
+        "title": "إلغاء نشر {title}؟",
+        "description": "يتوقف الرابط عن العمل فورًا، لكل من لديه.",
+        "confirm": "إلغاء النشر"
+    },
+    "panel": {
+        "emptyTitle": "لم يُنشر شيء بعد",
+        "emptyDescription": "تظهر هنا الصفحات والتقارير والملفات التي يشاركها {agent}.",
+        "updated": "حُدّث {when}",
+        "copyLink": "نسخ الرابط"
+    },
+    "list": {
+        "filterAll": "الكل {count}",
+        "emptyTitle": "لم يُنشر شيء بعد",
+        "emptyDescription": "تظهر هنا الصفحات والتقارير والملفات التي يشاركها زملاؤك.",
+        "fallbackCoworker": "زميل"
+    },
+    "chat": {
+        "unpublished": "أُلغي النشر",
+        "updateFailed": "تعذّر تحديث الرابط",
+        "copy": "نسخ",
+        "open": "فتح",
+        "fallbackCoworker": "زميلك",
+        "asksPublic": "يريد {coworker} أن يتمكن أي شخص لديه الرابط من فتحه",
+        "keepPrivate": "إبقاؤه خاصًا",
+        "makePublic": "جعله عامًا",
+        "madePublicByYou": "جعلته عامًا",
+        "madePublic": "أصبح عامًا",
+        "keptFor": "متاح لأعضاء {workspace} فقط"
+    },
+    "share": {
+        "title": "مشاركة",
+        "description": "اختر من يمكنه فتح هذا الرابط.",
+        "updateFailed": "تعذّر تحديث الرابط",
+        "unpublishFailed": "تعذّر إلغاء النشر",
+        "unpublish": "إلغاء النشر",
+        "publicOff": "معطّل في {workspace}",
+        "noEmail": "هذا الخادم لا يرسل رسائل بريد إلكتروني",
+        "passwordSet": "تم تعيين كلمة المرور",
+        "setPassword": "تعيين كلمة مرور",
+        "password": "كلمة المرور",
+        "invitePlaceholder": "عناوين بريد أو @company.com",
+        "invite": "دعوة عناوين بريد أو نطاقات",
+        "removeInvite": "إزالة {entry}",
+        "copyLink": "نسخ الرابط",
+        "copied": "تم النسخ"
+    },
+    "policy": {
+        "label": "الروابط العامة",
+        "people": {
+            "title": "الأشخاص فقط يمكنهم جعل رابط عامًا",
+            "hint": "ينشر الزملاء لـ {workspace} ويسألون قبل جعل أي رابط عامًا"
+        },
+        "anyone": {
+            "title": "يمكن للزملاء جعل رابط عامًا",
+            "hint": "يختارون مستوى الوصول بأنفسهم"
+        },
+        "never": {
+            "title": "لا شيء يصبح عامًا",
+            "hint": "روابط مساحة العمل وكلمة المرور والمدعوين فقط"
+        },
+        "turnOffTitle": "تعطيل الروابط العامة؟",
+        "turnOffDescription": "{count, plural, zero {لن يتغير أي رابط عام عند الحفظ.} one {سيصبح رابط عام واحد متاحًا لأعضاء {workspace} فقط عند الحفظ.} two {سيصبح رابطان عامان متاحين لأعضاء {workspace} فقط عند الحفظ.} few {ستصبح # روابط عامة متاحة لأعضاء {workspace} فقط عند الحفظ.} many {سيصبح # رابطًا عامًا متاحًا لأعضاء {workspace} فقط عند الحفظ.} other {سيصبح # رابط عام متاحًا لأعضاء {workspace} فقط عند الحفظ.}}",
+        "turnOff": "تعطيل"
+    }
+}

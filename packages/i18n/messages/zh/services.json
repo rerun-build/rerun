@@ -1,0 +1,152 @@
+{
+    "appAccount": {
+        "addAccount": "添加账号",
+        "connectTitle": "连接 {provider} 账号",
+        "connectHint": "为工作区连接一次，之后任何同事都可以使用它。",
+        "connect": "连接 {provider}",
+        "actsAs": "代表身份",
+        "accountName": "{provider} 账号",
+        "selected": "此同事以该账号身份操作",
+        "lastAccount": "卸载 {app} 以移除此同事的最后一个账号",
+        "appAccount": "{app} 账号",
+        "needsAttention": "需要在 {app} 中处理",
+        "wakeWhen": "在以下情况唤醒此同事",
+        "wakeWhenAccount": "在以下情况从 {account} 唤醒此同事",
+        "done": "完成",
+        "timing": {
+            "rightAway": "立即",
+            "everyFewHours": "每隔几小时检查一次"
+        },
+        "unavailable": "{app} 暂未在此工作区开放。",
+        "wakeEvents": {
+            "message_received": "收到消息",
+            "accepted_invitation": "邀请被接受",
+            "invitation_received": "收到邀请"
+        }
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "登录",
+            "key": "API 密钥",
+            "stdio": "本地",
+            "app": "工作区账号",
+            "other": "连接"
+        },
+        "description": {
+            "oauth": "通过安全弹窗登录。",
+            "key": "粘贴该服务的 API 密钥。",
+            "stdio": "在您的引擎上本地运行。",
+            "app": "选择已连接到工作区的账号。",
+            "other": "无需凭据。"
+        }
+    },
+    "connect": {
+        "authorizationFailed": "授权失败",
+        "startFailed": "无法开始连接",
+        "startOAuthFailed": "无法启动 OAuth",
+        "connectedAs": "已连接为 {account}",
+        "connected": "已连接",
+        "retry": "重试",
+        "secureTitle": "安全连接",
+        "secureBody": "此连接由我们信任的合作伙伴处理。",
+        "waiting": "正在等待授权…",
+        "connect": "连接"
+    },
+    "credentialGuide": {
+        "title": "如何获取您的 {label}"
+    },
+    "customMcp": {
+        "custom": "自定义",
+        "connect": "连接",
+        "edit": "编辑 {name}",
+        "remove": "移除 {name}",
+        "removeTitle": "移除 {name}？",
+        "removeDescription": "同事将失去此服务器提供的所有工具，其登录信息也会被清除。",
+        "removeConfirm": "移除",
+        "status": {
+            "connected": "已连接 · {count, plural, other {# 个工具}}",
+            "needsAuth": "需要登录",
+            "unreachable": "无法访问",
+            "noAnswer": "服务器没有响应。"
+        }
+    },
+    "requestApp": {
+        "required": "请描述您需要的应用",
+        "sent": "请求已发送。谢谢，我们会尽快查看。",
+        "title": "申请应用",
+        "description": "告诉我们您需要哪个应用以及您会如何使用它，剩下的交给我们。",
+        "placeholder": "描述您需要的应用…",
+        "cancel": "取消",
+        "send": "发送请求"
+    },
+    "alternatives": {
+        "label": "也可配合使用"
+    },
+    "configForm": {
+        "configured": "{name} 已配置",
+        "connectTitle": "连接 {name}",
+        "signInOAuth": "登录 {name}，以便您的代理可以使用它。",
+        "signInManaged": "使用 {name} 登录，以便您的代理可以使用它。Rerun 会为您处理连接。",
+        "setUp": "设置 {name}",
+        "authentication": "身份验证",
+        "backToMethods": "返回方式列表",
+        "connecting": "正在连接…",
+        "connect": "连接",
+        "installing": "正在安装…",
+        "chooseAccount": "选择账号",
+        "install": "安装",
+        "noTarget": "此服务需要登录，但未返回连接目标。",
+        "missingFields": "仍有必填字段未填写。"
+    },
+    "fields": {
+        "selectPlaceholder": "请选择…"
+    },
+    "installed": {
+        "title": "{name} 已安装",
+        "nextTurn": "下一轮可用：{tools}"
+    },
+    "list": {
+        "emptyTitle": "未找到应用",
+        "emptyDescription": "没有找到与您的搜索匹配的应用。",
+        "request": "申请应用",
+        "installed": "已安装",
+        "addAccount": "添加账号",
+        "needsSignIn": "需要登录",
+        "needsSetup": "需要设置",
+        "removeApp": "移除应用",
+        "finishSetup": "完成设置",
+        "install": "安装"
+    },
+    "suggestion": {
+        "loading": "正在加载推荐的应用…",
+        "loadFailed": "无法加载 {name}。",
+        "notFoundSkipped": "目录中未找到，已跳过。",
+        "notNow": "暂不",
+        "connect": "连接",
+        "cancel": "取消",
+        "connected": "{name} 已连接",
+        "reconnect": "重新连接",
+        "notFound": "目录中未找到。",
+        "skipped": "已跳过。",
+        "skip": "跳过",
+        "finish": "完成",
+        "nextApp": "下一个应用",
+        "fromVault": "已在 Vault 中",
+        "useAccount": "使用 {label}",
+        "connectNew": "新账号"
+    },
+    "signInPopup": {
+        "connecting": "正在连接 {name}…"
+    },
+    "categories": {
+        "payments": "支付",
+        "ecommerce": "电子商务",
+        "crm": "CRM",
+        "marketing": "营销",
+        "seo": "SEO",
+        "analytics": "分析",
+        "dev": "开发者",
+        "productivity": "效率",
+        "other": "其他"
+    }
+}

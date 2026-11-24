@@ -1,0 +1,159 @@
+{
+    "actions": {
+        "notNow": "לא עכשיו",
+        "explain": "להסביר",
+        "skip": "לדלג",
+        "connect": "לחבר",
+        "connectNew": "חשבון חדש",
+        "connecting": "מתחבר…",
+        "continue": "להמשיך",
+        "loading": "טוען…",
+        "openOnWeb": "לפתוח באתר",
+        "back": "חזרה",
+        "confirm": "לאשר",
+        "send": "לשלוח",
+        "next": "הבא",
+        "save": "לשמור",
+        "saving": "שומר…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {שאלה ממתינה} one {שאלה ממתינה} two {# שאלות ממתינות} other {# שאלות ממתינות}}",
+        "approval": "{count, plural, =0 {נדרש אישור} one {נדרש אישור} two {נדרשים # אישורים} other {נדרשים # אישורים}}",
+        "secret": "{count, plural, =0 {נדרשים פרטי גישה} one {נדרשים פרטי גישה} two {נדרשים # פרטי גישה} other {נדרשים # פרטי גישה}}",
+        "mcpNamed": "להתחבר אל {name}",
+        "mcp": "נדרשת התחברות",
+        "service": "{count, plural, =0 {אפליקציה לחיבור} one {אפליקציה לחיבור} two {# אפליקציות לחיבור} other {# אפליקציות לחיבור}}",
+        "takeover": "תורך על המסך",
+        "jumpTo": "{label}, לעבור אליו",
+        "spend": "הוצאה לאישור",
+        "computer": "לאשר פקודה ב-#{computer}",
+        "feature": "בקשה לשליחה לצוות Rerun"
+    },
+    "alert": {
+        "label": "התראה",
+        "failed": "לא ניתן היה לסמן כנקרא. יש לנסות שוב.",
+        "marking": "מסמן…",
+        "markAsRead": "לסמן כנקרא"
+    },
+    "approval": {
+        "label": "נדרש אישור",
+        "approved": "אושר",
+        "approve": "לאשר"
+    },
+    "decline": {
+        "placeholder": "למה לא? (לא חובה)",
+        "reason": "סיבה"
+    },
+    "fallback": {
+        "replyBelow": "אפשר לענות למטה, או",
+        "typeOnWeb": "יש להקליד את זה ב-Rerun באתר, אף פעם לא בצ'אט הזה.",
+        "needsYou": "{name} צריך אותך"
+    },
+    "steps": {
+        "previous": "השלב הקודם",
+        "next": "השלב הבא",
+        "goTo": "לעבור לשלב {step} מתוך {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "נדרשת התחברות",
+        "connected": "מחובר",
+        "signInNeeded": "נדרשת התחברות",
+        "unreachable": "לא נגיש",
+        "customServer": "שרת MCP מותאם אישית",
+        "customServerAt": "שרת MCP מותאם אישית · {host}",
+        "signInTo": "להתחבר אל {name}",
+        "loadFailed": "לא ניתן היה לטעון את השרת הזה. אפשר לחבר אותו באתר, או לדלג עליו."
+    },
+    "question": {
+        "dismiss": "לסגור את השאלות",
+        "selectAll": "יש לבחור את כל מה שמתאים",
+        "typeAnswer": "יש להקליד את התשובה שלך…",
+        "somethingElse": "משהו אחר",
+        "yourAnswer": "התשובה שלך",
+        "record": "לענות בקול",
+        "useRecording": "להשתמש בהקלטה הזו",
+        "discardRecording": "למחוק את ההקלטה",
+        "retryRecording": "לנסות לתמלל שוב",
+        "uploadFailed": "לא ניתן היה לצרף את הקבצים. יש לנסות שוב."
+    },
+    "secret": {
+        "labelOne": "נדרשים פרטי גישה",
+        "labelMany": "נדרשים פרטי גישה",
+        "dismiss": "לסגור את בקשת פרטי הגישה",
+        "storedAs": "נשמר בתור {key}",
+        "alreadySaved": "כבר נשמר. אפשר להקליד כדי להחליף",
+        "paste": "להדביק את הערך",
+        "whereToFind": "איפה למצוא את זה",
+        "storedNote": "נשמר ב-Box שלך כמשתנה של העמית. לעולם לא נשלח למודל.",
+        "saveFailed": "לא ניתן היה לשמור את פרטי הגישה"
+    },
+    "service": {
+        "label": "אפליקציה לחיבור",
+        "loadFailed": "לא ניתן היה לטעון את האפליקציות. אפשר לחבר אותן באתר, או לדלג עליהן.",
+        "loading": "טוען את האפליקציות…",
+        "webOnly": "האפליקציה הזו בוחרת את החשבון שלה באתר. אפשר לחבר אותה שם, או לדלג עליה.",
+        "connectFailed": "לא ניתן היה לחבר את האפליקציה",
+        "connected": "{name} חובר",
+        "notFound": "לא נמצא בקטלוג, דולג.",
+        "skipped": "דולג."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "דילגת על השאלות",
+            "service": "סגרת את הגדרת האפליקציה",
+            "secret": "סירבת לשתף את המפתחות",
+            "mcp": "דילגת על ההתחברות",
+            "takeover": "השארת את הדפדפן לעמית שלך",
+            "feature": "הבקשה לא נשלחה"
+        },
+        "answer": "תשובה",
+        "answers": "תשובות",
+        "answeredCount": "נענו {answered} מתוך {total}",
+        "skipped": "דולג",
+        "approval": "אישור",
+        "approvals": "אישורים",
+        "approvalCount": "{approved} אושרו, {declined} לא עכשיו",
+        "approved": "אושר",
+        "notNow": "לא עכשיו",
+        "quotedNote": "“{note}”",
+        "connected": "מחובר",
+        "notReconnected": "לא חובר מחדש",
+        "notFound": "לא נמצא",
+        "apps": "אפליקציות",
+        "appsConnected": "חוברו {connected} מתוך {total}",
+        "instead": "{name} (במקום {replaced})",
+        "keys": "מפתחות",
+        "keysStored": "נשמרו {stored} מתוך {total}",
+        "stored": "נשמר",
+        "storedOnBox": "נשמר ב-Box. העמית רואה רק את השמות.",
+        "mcpServer": "שרת MCP",
+        "handedBackOn": "החזרת את הדפדפן ב-{url}",
+        "handedBack": "החזרת את הדפדפן",
+        "spend": "נתונים בתשלום",
+        "approvedOnce": "אושר פעם אחת",
+        "alwaysAllowed": "מותר תמיד",
+        "featureSent": "נשלח לצוות Rerun: {title}"
+    },
+    "spend": {
+        "estimatedTotal": "סך הכול משוער",
+        "creditsUnit": "{count, plural, one {קרדיט} two {קרדיטים} other {קרדיטים}}",
+        "creditsShort": "נשארו רק {amount} {count, plural, one {קרדיט} two {קרדיטים} other {קרדיטים}}: אפשר להוסיף קרדיטים באתר, או לבחור לא עכשיו.",
+        "alwaysAllow": "לאפשר תמיד",
+        "approveOnce": "לאשר פעם אחת",
+        "addCredits": "להוסיף קרדיטים",
+        "alwaysAllowFailed": "לא ניתן היה להפעיל את \"הוצאה בלי לשאול\". האישור הזה עדיין בתוקף, עד לסכום המשוער."
+    },
+    "computer": {
+        "runOn": "להריץ ב-#{computer}",
+        "filesOn": "להשתמש בקבצים ב-#{computer}",
+        "deny": "לדחות",
+        "allow": "לאפשר",
+        "alwaysProgram": "לאפשר תמיד את {program}",
+        "alwaysFolder": "לאפשר תמיד את התיקייה הזו",
+        "interpreterWarning": "מתן הרשאה קבועה ל-{program} מאפשר כל קוד שהוא מריץ",
+        "alwaysFailed": "לא ניתן היה לשמור את הכלל במחשב: הותר הפעם בלבד.",
+        "inFolder": "בתיקייה {folder}",
+        "folderNote": "“תמיד” מאפשר כל קובץ בתיקייה {folder}"
+    }
+}

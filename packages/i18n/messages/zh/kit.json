@@ -1,0 +1,520 @@
+{
+    "close": "关闭",
+    "chat": {
+        "actionApproval": {
+            "title": "需要批准",
+            "previous": "上一项批准",
+            "next": "下一项批准",
+            "decline": "暂不",
+            "explain": "说明原因",
+            "approve": "批准",
+            "approved": "已批准"
+        },
+        "alert": {
+            "title": "通知",
+            "markAsRead": "标记为已读"
+        },
+        "approval": {
+            "title": "需要批准：{label}",
+            "responded": "已回复：<b>{choice}</b>",
+            "choices": {
+                "once": "允许一次",
+                "session": "本次会话",
+                "always": "始终",
+                "deny": "拒绝"
+            }
+        },
+        "decline": {
+            "placeholder": "为什么不？（可选）",
+            "back": "返回",
+            "confirm": "确认"
+        },
+        "question": {
+            "typeAnswer": "输入您的回答…",
+            "somethingElse": "其他",
+            "attachFiles": "附加文件",
+            "dropFiles": "拖放文件以附加",
+            "record": "用语音回答",
+            "useRecording": "使用此录音",
+            "discardRecording": "放弃录音",
+            "selectAll": "选择所有适用项",
+            "dismiss": "关闭问题",
+            "skip": "跳过",
+            "submit": "提交回答",
+            "next": "下一个问题"
+        },
+        "reasoning": {
+            "thinking": "思考中...",
+            "thoughtFor": "思考了 {duration}",
+            "thought": "已思考"
+        },
+        "secret": {
+            "saveFailed": "无法保存凭据",
+            "titleOne": "需要凭据",
+            "titleMany": "需要凭据",
+            "dismiss": "关闭凭据请求",
+            "storedAs": "保存为 {key}",
+            "replacePlaceholder": "已保存。输入新值可替换",
+            "placeholder": "粘贴值",
+            "whereToFind": "在哪里找到",
+            "storageNote": "作为同事变量保存在您的引擎上，绝不会发送给模型。",
+            "vaultNote": "保存在您工作区的 Vault 中，绝不会发送给模型。",
+            "skip": "跳过",
+            "saving": "正在保存…",
+            "save": "保存"
+        },
+        "skillProposal": {
+            "remembering": "正在记住",
+            "remembered": "已记住",
+            "failed": "无法记住此内容",
+            "retry": "重试",
+            "dismiss": "关闭",
+            "notRemembered": "未记住",
+            "remember": "记住",
+            "no": "不用",
+            "view": "查看",
+            "hideDetails": "隐藏详情",
+            "showDetails": "显示详情"
+        },
+        "steps": {
+            "previous": "上一步",
+            "next": "下一步",
+            "goTo": "前往第 {step} 步"
+        },
+        "table": {
+            "boxDatabase": "Box 数据库",
+            "coworkerDatabase": "同事数据库",
+            "rows": "{count, plural, other {# 行}}",
+            "columnsHidden": "部分列已隐藏",
+            "groupedBy": "按 {column} 分组",
+            "open": "打开数据库",
+            "empty": "暂无数据行。",
+            "more": "还有 {count} 项",
+            "rating": "{value} 分（满分 5 分）"
+        }
+    },
+    "canvas": {
+        "zoomIn": "放大",
+        "zoomOut": "缩小",
+        "recenter": "重新居中",
+        "recenterView": "重新居中视图"
+    },
+    "consent": {
+        "rejectAll": "全部拒绝",
+        "acceptAll": "全部接受",
+        "region": "Cookie 同意",
+        "title": "Cookie",
+        "short": "我们使用分析类 Cookie。<policy>Cookie 政策</policy>",
+        "long": "我们使用分析类 Cookie 来了解 Rerun 的使用情况。用于登录、运行客服聊天和记住您偏好的必要 Cookie 始终开启。<policy>Cookie 政策</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "您的身份",
+                    "description": "您的照片、横幅、名称和工作方式。"
+                },
+                "about": {
+                    "title": "关于您",
+                    "description": "您在哪里，做什么。"
+                },
+                "pricing": {
+                    "title": "费率与可用性",
+                    "description": "您的可用时间和大致费率。"
+                },
+                "expertise": {
+                    "title": "您的专长",
+                    "description": "您掌握的技能和使用的语言。可选。"
+                },
+                "links": {
+                    "title": "链接与发布",
+                    "description": "添加您的链接，然后发布您的资料。"
+                }
+            },
+            "name": "名称",
+            "namePlaceholder": "例如：Mira Labs",
+            "email": "邮箱",
+            "emailHelper": "保密。仅 Rerun 团队可见。",
+            "type": "类型",
+            "location": "所在地",
+            "locationPlaceholder": "例如：上海",
+            "bio": "简介",
+            "bioPlaceholder": "您构建什么，帮助哪些人。",
+            "availability": "可用性",
+            "budget": "预算",
+            "budgetPlaceholder": "选择范围",
+            "skills": "技能",
+            "skillsPlaceholder": "选择技能",
+            "languages": "语言",
+            "languagesPlaceholder": "选择语言",
+            "website": "网站",
+            "back": "返回",
+            "continue": "继续"
+        },
+        "types": {
+            "studio": {
+                "title": "工作室",
+                "description": "为客户构建方案的机构或团队"
+            },
+            "freelancer": {
+                "title": "自由职业者",
+                "description": "独立工作的个人开发者"
+            },
+            "expert": {
+                "title": "专家",
+                "description": "提供建议和指导的专业人士"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}：{hint}",
+            "available": {
+                "label": "可接单",
+                "hint": "目前正在接新项目"
+            },
+            "soon": {
+                "label": "即将可接单",
+                "hint": "很快会有空档"
+            },
+            "unavailable": {
+                "label": "暂不接单",
+                "hint": "目前已排满"
+            }
+        },
+        "validation": {
+            "nameRequired": "请填写名称",
+            "nameTooLong": "名称过长",
+            "nameInvalid": "名称不能包含 < 或 >",
+            "emailRequired": "请填写邮箱",
+            "emailInvalid": "邮箱无效",
+            "bioTooLong": "简介过长",
+            "budgetInvalid": "预算无效",
+            "skillInvalid": "技能无效",
+            "languageInvalid": "语言无效"
+        },
+        "images": {
+            "title": "照片与横幅",
+            "drop": "放下",
+            "dropBanner": "拖放您的横幅",
+            "dropPhoto": "拖放您的照片",
+            "upload": "上传",
+            "uploading": "正在上传…",
+            "changeBanner": "更换横幅",
+            "uploadPhoto": "上传照片",
+            "remove": "移除",
+            "notAnImage": "请选择图片文件。"
+        },
+        "card": {
+            "location": "所在地",
+            "status": "状态",
+            "links": "链接",
+            "namePlaceholder": "您的名称",
+            "rolePlaceholder": "Rerun 专家"
+        },
+        "preview": {
+            "hire": "雇用"
+        },
+        "skills": {
+            "agentDesign": "智能体设计",
+            "workflowAutomation": "工作流自动化",
+            "ragKnowledgeBases": "RAG 与知识库",
+            "integrationsApis": "集成与 API",
+            "mcpServers": "MCP 服务器",
+            "promptEngineering": "提示词工程",
+            "dataPipelines": "数据管道",
+            "chatbotsSupport": "聊天机器人与客服",
+            "voiceAgents": "语音智能体",
+            "leadGenOutreach": "获客与外联",
+            "crmAutomation": "CRM 自动化",
+            "webScraping": "网页抓取",
+            "ecommerceAutomation": "电商自动化",
+            "analyticsReporting": "分析与报告",
+            "fineTuning": "模型微调",
+            "noCodeAutomation": "无代码自动化"
+        }
+    },
+    "foreman": {
+        "orbLabel": "询问您的 Chief of Staff",
+        "tabsLabel": "Chief of Staff 标签页",
+        "empty": {
+            "title": "关于您的工作区，尽管问",
+            "description": "您的 Chief of Staff 与您一起创建和管理同事"
+        },
+        "header": {
+            "closeChat": "关闭聊天",
+            "resize": "调整聊天大小"
+        },
+        "tabs": {
+            "assistant": "提问",
+            "tasks": "任务",
+            "routines": "例行任务",
+            "card": "卡片"
+        },
+        "periods": {
+            "running": "运行中",
+            "morning": "今天上午",
+            "afternoon": "今天下午",
+            "tonight": "今晚",
+            "tomorrow": "明天",
+            "week": "本周",
+            "later": "以后",
+            "paused": "已暂停"
+        },
+        "routines": {
+            "setupFirst": "请先完成设置",
+            "pause": "暂停 {name}",
+            "resume": "恢复 {name}",
+            "nameLabel": "例行任务名称",
+            "runningJustNow": "运行中 · <1 分钟",
+            "runningMinutes": "运行中 · {minutes} 分钟",
+            "runningHours": "运行中 · {hours} 小时",
+            "startsNow": "即将开始",
+            "startsInMinutes": "{minutes} 分钟后开始",
+            "startsInHours": "{hours} 小时后开始"
+        },
+        "agentPicker": {
+            "openTab": "打开 {name} 的{tab}"
+        }
+    },
+    "forms": {
+        "optional": "可选",
+        "hidePassword": "隐藏密码",
+        "showPassword": "显示密码",
+        "select": "请选择…",
+        "search": "输入以搜索…",
+        "noResults": "无结果",
+        "dropFile": "将文件拖放到此处",
+        "remove": "移除 {item}"
+    },
+    "primitives": {
+        "loading": "加载中",
+        "scrollLeft": "向左滚动",
+        "scrollRight": "向右滚动",
+        "carousel": {
+            "previous": "上一个{label}",
+            "next": "下一个{label}",
+            "goTo": "前往{label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "数量",
+            "totalTokens": "总 Token 数",
+            "inputTokens": "输入 Token",
+            "outputTokens": "输出 Token",
+            "cachedInputTokens": "缓存 Token",
+            "reasoningTokens": "推理 Token",
+            "cost": "费用",
+            "avgDurationMs": "平均时长",
+            "errorCount": "错误",
+            "errorRate": "错误率"
+        },
+        "live": "实时",
+        "runStatus": {
+            "running": "运行中",
+            "done": "已完成",
+            "error": "错误",
+            "cancelled": "已取消"
+        },
+        "runs": {
+            "emptyTitle": "暂无运行",
+            "emptyDescription": "同事的每次运行都会记录在这里",
+            "steps": "{count, plural, other {# 步}}",
+            "tokens": "{tokens} 个 Token"
+        },
+        "agentStatus": {
+            "idle": "空闲",
+            "working": "工作中",
+            "error": "错误",
+            "waiting_human": "等待人工",
+            "offline": "离线",
+            "empty": "没有可显示的同事。"
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} 次运行",
+                "runSteps": "{count} 个运行步骤",
+                "toolCalls": "{count} 次工具调用",
+                "sessions": "{count} 个会话"
+            },
+            "other": "其他",
+            "loading": "加载中...",
+            "noData": "此期间无数据。"
+        },
+        "usage": {
+            "input": "输入",
+            "output": "输出",
+            "cached": "缓存",
+            "cost": "费用",
+            "tokens": "Token",
+            "totalCost": "总费用",
+            "totalTokens": "总 Token 数",
+            "runs": "{count, plural, other {# 次运行}}",
+            "noUsage": "此期间无用量。"
+        }
+    },
+    "inbox": {
+        "title": "通知",
+        "resize": "调整通知面板大小",
+        "close": "关闭通知",
+        "preferences": "偏好设置",
+        "preferencesUnavailable": "此处无法使用偏好设置",
+        "markAllRead": "全部标记为已读",
+        "nothingToMark": "没有可标记为已读的内容",
+        "markRead": "标记为已读",
+        "noUpdates": "没有更新",
+        "pillLabel": "通知：{summary}",
+        "pillLabelEmpty": "通知：没有更新",
+        "needsYouRow": "需要您处理",
+        "needsYouCount": "{count, plural, other {# 项需要您处理}}",
+        "doneCount": "{count, plural, other {# 项已完成}}",
+        "needsYouRich": "{count, plural, other {<b>#</b> 项需要您处理}}",
+        "doneRich": "{count, plural, other {<b>#</b> 项已完成}}",
+        "newUpdates": "{count, plural, other {<b>#</b> 条新动态}}",
+        "running": "{count, plural, other {<n>#</n> 项任务运行中}}",
+        "empty": {
+            "title": "没有待处理事项",
+            "description": "当同事需要您或完成任务时，会显示在这里。"
+        },
+        "sections": {
+            "needsYou": "需要您处理",
+            "headsUps": "提醒",
+            "errors": "错误",
+            "done": "已完成"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} 向您提了一个问题",
+            "awaiting_approval": "{agent} 需要您的批准",
+            "awaiting_connector": "{agent} 需要连接一个应用",
+            "waiting_human": "{agent} 正在等您",
+            "awaiting_ack": "{agent} 为您标记了一项内容",
+            "error": "{agent} 遇到了错误",
+            "done": "{agent} 已完成运行"
+        }
+    },
+    "richText": {
+        "bold": "粗体",
+        "italic": "斜体",
+        "heading": "标题",
+        "subheading": "副标题",
+        "bulletList": "项目符号列表",
+        "numberedList": "编号列表",
+        "quote": "引用",
+        "inlineCode": "行内代码",
+        "codeBlock": "代码块",
+        "link": "链接",
+        "linkPrompt": "链接地址"
+    },
+    "theme": {
+        "label": "主题",
+        "options": {
+            "system": "跟随系统",
+            "light": "浅色",
+            "dark": "深色"
+        }
+    },
+    "newAgent": {
+        "create": "创建 {name}",
+        "createCoworker": "创建同事",
+        "apps": "应用",
+        "pickedApps": "应用：{apps}",
+        "or": "或",
+        "browseTemplates": "浏览模板",
+        "job": {
+            "placeholder": "描述这项工作，就像向队友交代任务一样。",
+            "label": "您的新同事应该做什么？"
+        },
+        "name": {
+            "placeholder": "为您的同事命名",
+            "label": "同事名称"
+        },
+        "forYou": {
+            "heading": "或从为您挑选的同事开始",
+            "closeToIdea": "接近您的想法",
+            "otherIdeas": "其他想法"
+        },
+        "appsPicker": {
+            "search": "搜索应用",
+            "all": "全部",
+            "empty": "没有这个名称的应用。",
+            "limit": "开始时最多 {max} 个应用，之后您的同事可以连接更多。",
+            "categories": {
+                "payments": "支付",
+                "ecommerce": "电商",
+                "crm": "CRM",
+                "marketing": "营销",
+                "seo": "SEO",
+                "analytics": "分析",
+                "dev": "开发",
+                "productivity": "效率",
+                "other": "其他"
+            }
+        },
+        "schedule": {
+            "button": "计划",
+            "readFromDescription": "根据您的描述识别",
+            "onASchedule": "按计划",
+            "custom": "自定义",
+            "noSchedule": "无计划",
+            "onDemand": "仅在我要求时",
+            "timeOfDay": "时间",
+            "presets": {
+                "weekday": {
+                    "label": "每个工作日 9:00",
+                    "detail": "周一至周五"
+                },
+                "monday": {
+                    "label": "每周一 9:00",
+                    "detail": "每周一次"
+                }
+            },
+            "everyDay": "每天 {time}",
+            "everyWeekday": "每个工作日 {time}",
+            "everyDays": "每{days} {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "同事看板",
+        "addBlock": "在这一侧添加区块",
+        "status": {
+            "idle": "空闲",
+            "working": "工作中",
+            "error": "错误",
+            "offline": "离线",
+            "waiting_human": "等待您处理",
+            "disabled": "未启用",
+            "paused": "已暂停",
+            "restoring": "正在恢复"
+        },
+        "countdown": {
+            "seconds": "{count}秒",
+            "minutes": "{count}分",
+            "hours": "{count}时",
+            "days": "{count}天"
+        },
+        "untitledBox": "未命名 Box",
+        "boxAria": "Box：{name}",
+        "tileAria": "{name}，{state}{toHandle, plural, =0 {} other {，# 项待处理}}{results, plural, =0 {} other {，# 个新结果}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "运行中",
+            "approval": "需要您处理",
+            "success": "已完成",
+            "done": "已完成"
+        },
+        "approve": "批准",
+        "edit": "编辑"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "市场营销",
+            "sales": "销售",
+            "ops": "运营"
+        },
+        "roles": {
+            "headOfGrowth": "增长负责人",
+            "accountExecutive": "客户主管",
+            "operationsSpecialist": "运营专员"
+        }
+    }
+}

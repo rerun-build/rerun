@@ -1,0 +1,111 @@
+{
+    "update": {
+        "ready": "Rerun {version} 已就绪",
+        "description": "重启应用以使用新版本。",
+        "restart": "重启"
+    },
+    "downloads": {
+        "done": "已下载 {filename}",
+        "failed": "无法下载 {filename}",
+        "show": "在文件夹中显示"
+    },
+    "handoff": {
+        "title": "登录 {app}",
+        "body": "以 {account} 的身份继续使用 {app}？",
+        "continue": "继续",
+        "switchAccount": "使用其他账号",
+        "doneTitle": "返回 {app}",
+        "doneBody": "{app} 会自动完成登录。您可以关闭此标签页。",
+        "codeHint": "如果 {app} 没有打开，请将此代码粘贴到其中：",
+        "copyCode": "复制代码",
+        "failed": "无法登录应用，请重试。",
+        "invalidTitle": "此链接已过期",
+        "invalidBody": "请从桌面应用重新开始登录。"
+    },
+    "signIn": {
+        "waitingTitle": "请在浏览器中继续",
+        "waitingBody": "在已打开的浏览器窗口中登录，然后回到这里。",
+        "reopen": "重新打开浏览器",
+        "pasteCode": "改为粘贴代码",
+        "codeLabel": "浏览器中的代码",
+        "submit": "登录",
+        "back": "返回",
+        "errors": {
+            "expired": "此代码已过期，请重新开始。",
+            "invalid": "此代码无效，请重新开始。",
+            "state-mismatch": "此次登录是从另一个窗口发起的，请重新开始。",
+            "network": "无法连接到 Rerun，请检查您的网络连接。",
+            "cancelled": "登录已取消。"
+        }
+    },
+    "settings": {
+        "openAtLogin": "登录时打开",
+        "openAtLoginMac": "Rerun 随 Mac 启动，显示在菜单栏中。",
+        "openAtLoginOther": "Rerun 随电脑启动，显示在通知区域中。",
+        "closeToTray": "关闭后保持运行",
+        "closeToTrayHint": "关闭窗口后 Rerun 仍保留在通知区域，通知照常送达。",
+        "updates": "更新",
+        "version": "Rerun {version}",
+        "checking": "正在检查更新…",
+        "downloading": "正在下载更新… {percent}%",
+        "updateFailed": "无法检查更新。",
+        "check": "检查更新",
+        "restart": "重启以更新到 {version}",
+        "quickAsk": "快速提问",
+        "quickAskHint": "在任何应用中按 {shortcut} 即可打开向 Chief of Staff 提问的输入框。",
+        "quickAskOn": "在任何应用中打开向 Chief of Staff 提问的输入框。",
+        "quickAskOff": "已关闭。录制一个快捷键即可开启。",
+        "shortcut": {
+            "record": "录制快捷键",
+            "typing": "请按下快捷键",
+            "tryAnother": "换一个",
+            "recordingHint": "Esc 取消，⌫ 关闭",
+            "change": "快捷键 {keys}，点击更改",
+            "needsModifier": "请添加修饰键，例如 {key}",
+            "reserved": "{keys} 已被{owner, select, spotlight { Spotlight } finder {访达搜索} inputSources {输入法} appSwitcher {应用切换器} screenshot {截屏} windowMenu {窗口菜单} system {系统} other {所有应用}}占用",
+            "taken": "{keys} 已被其他应用占用"
+        },
+        "quickAskVoice": "语音快速提问",
+        "quickAskVoiceOn": "在任何应用中与您的 Chief of Staff 对话。",
+        "coworkerDock": "同事栏",
+        "coworkerDockHint": "您的同事显示在屏幕边缘，位于所有应用之上。"
+    },
+    "openInApp": {
+        "title": "在 {app} 中打开此页面？",
+        "open": "打开"
+    },
+    "quickAsk": {
+        "placeholder": "向您的 Chief of Staff 提问…",
+        "hint": "Enter 发送，Esc 关闭",
+        "send": "发送",
+        "holdToTalk": "按住<key>空格键</key>说话",
+        "releaseToSend": "松开发送，Esc 取消",
+        "sent": "已发送给您的 Chief of Staff",
+        "nothingHeard": "没有听到声音。请按住空格键说话。",
+        "transcriptionFailed": "无法转换为文字。请重试，或改为输入。",
+        "micDeniedTitle": "Rerun 听不到您的声音",
+        "micDeniedBody": "请在系统设置中允许 Rerun 使用麦克风。",
+        "openSettings": "打开设置",
+        "typeInstead": "改为输入",
+        "toggleHint": "Enter 发送，Esc 取消",
+        "cancel": "取消"
+    },
+    "server": {
+        "otherServer": "使用其他 Rerun 服务器"
+    },
+    "coworkerDock": {
+        "newCoworker": "新同事",
+        "move": "移动",
+        "show": "显示同事",
+        "resize": "调整大小",
+        "allNotifications": "所有通知",
+        "allCoworkers": "所有同事",
+        "nothingWaiting": "没有待您处理的事项。",
+        "openInRerun": "在 Rerun 中打开",
+        "replyTo": "回复 {name}",
+        "send": "发送",
+        "markRead": "标记为已读",
+        "dismiss": "忽略",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {有个问题} awaiting_approval {需要您的批准} done {已完成} error {遇到了问题} other {需要您}}</verb>"
+    }
+}

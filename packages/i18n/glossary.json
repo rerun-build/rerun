@@ -2,19 +2,22 @@
     "_doc": "Terms the translation keeps fixed. `keep` stays as written in every language; `translations` imposes a word per language; `tone` is the register of each language.",
     "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Chief of Staff", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe", "Vault"],
     "translations": {
-        "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker", "tr": "coworker (suffixes after an apostrophe: coworker'ınız, coworker'lar)" },
-        "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker", "tr": "coworker'lar" },
-        "workspace": { "fr": "workspace", "es": "workspace", "pt": "workspace", "de": "Workspace", "tr": "çalışma alanı" },
-        "credit": { "fr": "crédit", "es": "crédito", "pt": "crédito", "de": "Guthaben (a balance), Credit / Credits (a count: \"500 Credits\")", "tr": "kredi" },
-        "skill": { "fr": "skill", "es": "skill", "pt": "skill", "de": "Skill", "tr": "skill (suffixes after an apostrophe: skill'ler)" },
-        "run": { "fr": "exécution", "es": "ejecución", "pt": "execução", "de": "Ausführung", "tr": "çalıştırma" }
+        "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker", "tr": "coworker (suffixes after an apostrophe: coworker'ınız, coworker'lar)", "ar": "زميل", "zh": "同事", "he": "עמית" },
+        "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker", "tr": "coworker'lar", "ar": "زملاء", "zh": "同事", "he": "עמיתים" },
+        "workspace": { "fr": "workspace", "es": "workspace", "pt": "workspace", "de": "Workspace", "tr": "çalışma alanı", "ar": "مساحة العمل", "zh": "工作区", "he": "סביבת העבודה" },
+        "credit": { "fr": "crédit", "es": "crédito", "pt": "crédito", "de": "Guthaben (a balance), Credit / Credits (a count: \"500 Credits\")", "tr": "kredi", "ar": "رصيد (a balance), رصيد / أرصدة (a count: \"500 رصيد\")", "zh": "积分", "he": "קרדיט / קרדיטים" },
+        "skill": { "fr": "skill", "es": "skill", "pt": "skill", "de": "Skill", "tr": "skill (suffixes after an apostrophe: skill'ler)", "ar": "مهارة", "zh": "技能", "he": "מיומנות" },
+        "run": { "fr": "exécution", "es": "ejecución", "pt": "execução", "de": "Ausführung", "tr": "çalıştırma", "ar": "تشغيل", "zh": "运行", "he": "הרצה" }
     },
     "tone": {
         "fr": "Vouvoiement. Short, plain product French as in a SaaS app. No anglicisms beyond the glossary.",
         "es": "Tuteo (tú), as Spanish-language SaaS products do. Neutral Spanish, no regionalisms.",
         "pt": "Brazilian Portuguese (pt-BR), você, as Brazilian SaaS products write. Never European Portuguese spelling or vocabulary.",
         "de": "Duzen (du), as recent German SaaS products do. Short, plain product German; nouns capitalized. No anglicisms beyond the glossary.",
-        "tr": "Siz, as Turkish SaaS products write. Short, plain product Turkish; a foreign product name takes its suffix after an apostrophe (Slack'e). Never glue a case suffix onto an ICU argument ({name}'e): rephrase so the argument stands alone. No anglicisms beyond the glossary."
+        "tr": "Siz, as Turkish SaaS products write. Short, plain product Turkish; a foreign product name takes its suffix after an apostrophe (Slack'e). Never glue a case suffix onto an ICU argument ({name}'e): rephrase so the argument stands alone. No anglicisms beyond the glossary.",
+        "ar": "Modern Standard Arabic, as Arabic SaaS products write: short, plain, polite. Address the reader in the masculine singular as apps do; buttons use the imperative (احفظ) or the verbal noun (حفظ) consistently. Arabic punctuation (، ؛ ؟). Product and app names stay in Latin script. Digits are Latin (0-9). Plurals: give zero, one, two, few, many and other.",
+        "zh": "Simplified Chinese as written in mainland China SaaS products: short and plain. Address the reader as 您. Full-width punctuation (，。：？！、). Never the Chinese dash ——, nor the em dash. Product and app names stay in Latin script. Plurals: only `other` is needed.",
+        "he": "Modern Hebrew as Israeli SaaS products write: short and plain. Buttons and actions in the infinitive (לשמור), sentences addressed in the masculine singular as apps do. Product and app names stay in Latin script. Plurals: give one, two and other."
     },
     "rules": [
         "Never use the em dash (—) nor the en dash as punctuation.",

@@ -1,0 +1,31 @@
+{
+    "settings": {
+        "coworkersLanguage": "لغة الزملاء",
+        "coworkersLanguageHint": "اللغة التي يكتب بها زملاؤك عندما يعملون بمفردهم، وفق جدول أو مشغّل.",
+        "fallbackName": "مساحة العمل",
+        "adminOnly": "لا يمكن إلا للمسؤول تغيير إعدادات مساحة العمل",
+        "nameRequired": "الاسم مطلوب",
+        "nameTooLong": "يجب ألا يتجاوز {max} حرفًا",
+        "title": "إعدادات مساحة العمل",
+        "description": "اسم مساحة العمل وشعارها كما يراهما فريقك وتظهر في دعواتك.",
+        "uploadLogo": "ارفع شعارًا",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: Acme Inc.",
+        "logoLink": "شعار من موقع ويب أو رابط",
+        "noLogoFound": "لم يُعثر على شعار في هذا العنوان",
+        "pickIllustration": "أو اختر رسمًا توضيحيًا",
+        "showLess": "عرض أقل",
+        "showAll": "عرض الكل ({count})",
+        "illustrationOption": "رسم توضيحي {number}"
+    },
+    "access": {
+        "paused": "اشترك أولًا لاستعادة مساحة العمل",
+        "restoring": "متاح بعد استعادة مساحة العمل",
+        "paymentFailed": "حدّث وسيلة الدفع أولًا لاستعادة مساحة العمل",
+        "sandboxArchived": "متاح بعد إعادة تفعيل بيئة الاختبار",
+        "sandboxNone": "بيئة اختبار الخبير لا تملك ذلك",
+        "adminsOnly": "للمسؤولين فقط",
+        "apiNotIncluded": "غير مشمول في فئة AppSumo الخاصة بك",
+        "sandboxSingleBox": "بيئة الاختبار لها Box واحد فقط"
+    }
+}

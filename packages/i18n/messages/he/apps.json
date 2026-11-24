@@ -1,0 +1,219 @@
+{
+    "menu": {
+        "label": "אפליקציות"
+    },
+    "linkedToRerun": "{provider} מקושר ל-Rerun",
+    "slotPrice": {
+        "monthly": "{price}/חודש",
+        "yearly": "{price}/שנה"
+    },
+    "blocked": {
+        "notSubscribed": "קודם צריך להירשם ל-Rerun",
+        "paused": "סביבת העבודה שלך מושהית",
+        "trialSlot": "תקופת ניסיון כוללת משבצת {provider} אחת. כדי להוסיף עוד, יש לשדרג את התוכנית.",
+        "lifetimeTrialSlot": "תקופת הניסיון החינמית שלך כוללת משבצת {provider} אחת. אפשר להוסיף עוד בסיומה.",
+        "adminOnly": "רק אדמין יכול לנהל אפליקציות בתשלום"
+    },
+    "slots": {
+        "footer": "<b>נוצלו {used} מתוך {total, plural, one {משבצת אחת} two {2 משבצות} other {# משבצות}}</b>, {description}",
+        "subscriberTrial": "הראשונה בחינם עד {date}, ואז {price}",
+        "workspaceTrial": "$0 בתקופת הניסיון, ולאחר מכן בחיוב עם התוכנית שלך",
+        "paid": "{price} לכל אחת, בחיוב עם התוכנית שלך",
+        "lifetime": "{price} לכל אחת, בחיוב חודשי",
+        "lifetimeTrial": "בחינם בתקופת הניסיון, ואז {price} לכל אחת",
+        "lifetimeEnding": "הן מסתיימות ב-{date}"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "בחינם למשך {days} ימים",
+            "detail": "לאחר מכן {price} לחשבון, בחיוב עם התוכנית שלך"
+        },
+        "workspaceTrial": {
+            "headline": "$0 בתקופת הניסיון",
+            "detail": "לאחר מכן {price} לחשבון, בחיוב עם התוכנית שלך"
+        },
+        "lifetimeTrial": {
+            "detail": "לאחר מכן {price} לחשבון, בחיוב חודשי"
+        },
+        "freeSlot": {
+            "headline": "משבצת מחכה לך",
+            "detail": "היא כבר כלולה בתוכנית שלך",
+            "detailLifetime": "כבר כלולה במשבצות החודשיות שלך",
+            "detailLifetimeEnding": "המשבצות שלך מסתיימות ב-{date}"
+        },
+        "buySlot": {
+            "headline": "{price} לחשבון",
+            "detail": "נוסף לתוכנית שלך, בחיוב היום על יתרת התקופה"
+        },
+        "lifetimeSlot": {
+            "detail": "בחיוב חודשי, בנפרד מתוכנית ה-lifetime שלך"
+        }
+    },
+    "connectHint": {
+        "reconnect": "להתחבר שוב בתור {label}",
+        "subscriberTrial": "בחינם למשך {days} ימים, ואז {price}",
+        "workspaceTrial": "$0 בתקופת הניסיון, ואז {price} עם התוכנית שלך",
+        "default": "החשבון שבו העמיתים שלך פועלים"
+    },
+    "addSlot": {
+        "title": "להוסיף משבצת {provider}?",
+        "description": "{price} יתווסף לתוכנית שלך. החיוב היום הוא על מה שנותר מהתקופה הנוכחית.",
+        "descriptionLifetime": "{price} יתווסף למשבצות החודשיות שלך. החיוב היום הוא על מה שנותר מהחודש.",
+        "confirm": "להוסיף משבצת",
+        "button": "להוסיף משבצת",
+        "startTrial": "להתחיל תקופת ניסיון"
+    },
+    "intro": {
+        "connect": "לחבר את {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "העמיתים שלך מאתרים לקוחות פוטנציאליים מחשבון ה-LinkedIn שלך. הם כותבים, מתחברים ועוקבים בשבילך.",
+            "whatsapp": "העמיתים שלך עונים ממספר ה-WhatsApp שלך. הם קוראים את השיחה, משיבים ועוקבים בשבילך."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "הודעות והזמנות",
+                "text": "כותב ללקוחות פוטנציאליים ועוקב אחריהם, בתוך המגבלות היומיות של LinkedIn."
+            },
+            "linkedinSearch": {
+                "title": "חיפוש וקריאת פרופילים",
+                "text": "מוצא את האנשים הנכונים וקורא את הפרופיל שלהם לפני שהוא כותב."
+            },
+            "linkedinReplies": {
+                "title": "מתעורר עם כל תשובה",
+                "text": "תשובה או הזמנה שאושרה מפעילות את העמית מיד."
+            },
+            "whatsappReplies": {
+                "title": "תשובות ומעקבים",
+                "text": "עונה לאנשים שכותבים לך, בטקסט, בקבצים ובהודעות קוליות."
+            },
+            "whatsappMessages": {
+                "title": "מתעורר עם כל הודעה",
+                "text": "הודעה חדשה מפעילה את העמית מיד."
+            },
+            "whatsappCareful": {
+                "title": "זהיר עם המספר שלך",
+                "text": "נשאר בתוך המגבלות היומיות של WhatsApp ולעולם לא כותב לזרים."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "סביבת העבודה שלך מושהית, ולכן חשבונות ה-{provider} שלה נותקו. יש להחזיר את סביבת העבודה לפעילות ואז לחבר אותם מחדש.",
+        "freeSlot": "משבצת פנויה",
+        "freeSlotHint": {
+            "subscriberTrial": "לחבר חשבון, בחינם למשך {days} ימים",
+            "workspaceTrial": "לחבר חשבון, $0 בתקופת הניסיון",
+            "default": "לחבר חשבון {provider} כדי למלא אותה"
+        },
+        "addAnother": "להוסיף חשבון נוסף",
+        "addAnotherHint": "מוסיף לתוכנית שלך משבצת ב-{price}",
+        "addAnotherHintLifetime": "מוסיף משבצת ב-{price}",
+        "status": {
+            "connected": "מוכן",
+            "needsReconnect": "להתחבר שוב",
+            "paused": "מושהה",
+            "connecting": "מתחבר",
+            "disconnected": "מנותק"
+        },
+        "summary": {
+            "signedOutWhilePaused": "נותק בזמן שסביבת העבודה הייתה מושהית",
+            "signedOut": "{provider} ניתק את החשבון הזה",
+            "rateLimited": "בהפסקה ליום אחד, {provider} ביקש להאט",
+            "unpaid": "המשבצת שלו לא שולמה",
+            "unused": "עדיין אף עמית לא משתמש בו. אפשר לבחור אותו בשירותים של עמית.",
+            "usedBy": "בשימוש של {names}"
+        },
+        "defaultName": "חשבון {provider}",
+        "reconnect": "לחבר מחדש",
+        "resume": "לחדש",
+        "disconnectLabel": "לנתק את {name}",
+        "disconnectTitle": "לנתק את {name}?",
+        "disconnectDescription": "העמיתים שלו מאבדים מיד את כלי ה-{provider} שלהם. המשבצת נשארת בתוכנית שלך עד שמסירים אותה בחיוב.",
+        "disconnectDescriptionLifetime": "העמיתים שלו מאבדים מיד את כלי ה-{provider} שלהם. המשבצת נשארת שלך עד שמחזירים אותה כאן.",
+        "disconnect": "לנתק",
+        "disconnectTooltip": "לנתק את החשבון הזה",
+        "giveBack": "להחזיר",
+        "giveBackTitle": "להחזיר את משבצת ה-{provider} הזו?",
+        "giveBackDescription": "היא לא תחויב עוד החל מהחידוש הבא, ונשארת זמינה עד אז."
+    },
+    "success": {
+        "connectedIcon": "{provider} מחובר",
+        "title": "{app} פעיל",
+        "body": "<b>{label}</b> מחובר. אפשר לבחור אותו בשירותים של עמית כדי להפעיל אותו.",
+        "yourAccount": "החשבון שלך",
+        "done": "סיום"
+    },
+    "linkedin": {
+        "method": {
+            "password": "מייל וסיסמה",
+            "cookie": "קובץ Cookie של הסשן"
+        },
+        "cookieLabel": "קובץ Cookie של הסשן (li_at)",
+        "cookieHelp": "לחשבון שנפתח עם Google או Apple. יש להעתיק מהדפדפן את קובץ ה-Cookie li_at של linkedin.com.",
+        "emailLabel": "מייל של LinkedIn",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "סיסמת LinkedIn",
+        "passwordPlaceholder": "סיסמת ה-LinkedIn שלך",
+        "signInFrom": "התחברות מ",
+        "signInFromHelp": "LinkedIn סומך על התחברות מהמדינה שממנה אתה עובד בדרך כלל.",
+        "searchCountry": "לחפש מדינה",
+        "noCountry": "לא נמצאה מדינה",
+        "neverStored": "Rerun לעולם לא שומר את הסיסמה או את קובץ ה-Cookie שלך.",
+        "connect": "לחבר",
+        "approval": {
+            "figureLabel": "טלפון שמציג את בקשת ההתחברות, עם כפתור האישור מואר",
+            "title": "לאשר בטלפון",
+            "body": "LinkedIn שלח בקשת התחברות לטלפון שלך. יש לפתוח את אפליקציית LinkedIn ולהקיש על <b>כן</b>.",
+            "approved": "אישרתי",
+            "polling": "מחכה לאישור שלך",
+            "slow": "עדיין כלום? כדאי לבדוק את אפליקציית LinkedIn ואז להקיש למטה."
+        },
+        "code": {
+            "title": "להזין את הקוד",
+            "description": "הקוד בן {length} הספרות {where}.",
+            "where": {
+                "authenticator": "מאפליקציית האימות שלך",
+                "sentTo": "ש-LinkedIn שלח אל ה-{sentTo} שלך",
+                "sms": "ש-LinkedIn שלח בהודעת SMS",
+                "email": "ש-LinkedIn שלח במייל"
+            },
+            "resend": "לשלוח קוד חדש",
+            "verify": "לאמת"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "מספר WhatsApp",
+            "invalidPhone": "זה לא נראה כמו מספר טלפון מלא.",
+            "linkBy": "לקשר באמצעות",
+            "linkByQr": "סורקים עם הטלפון קוד שמוצג כאן.",
+            "linkByCode": "כשהדף הזה פתוח באותו טלפון: מקלידים קוד ב-WhatsApp במקום זאת.",
+            "method": {
+                "qr": "לסרוק קוד QR",
+                "code": "להקליד קוד"
+            },
+            "linkedDevice": "Rerun מצטרף כמכשיר מקושר, כמו WhatsApp Web. הטלפון שלך ממשיך לעבוד כרגיל.",
+            "submit": "לקבל את הקוד"
+        },
+        "link": {
+            "steps": {
+                "open": "לפתוח את WhatsApp בטלפון",
+                "settings": "הגדרות, אחר כך מכשירים מקושרים, ואז קישור מכשיר",
+                "pointQr": "לכוון את הטלפון לקוד הזה",
+                "typeCode": "להקיש על קישור באמצעות מספר טלפון ואז להקליד את הקוד הזה"
+            },
+            "expiredTitle": "תוקף הקוד הזה פג",
+            "scanTitle": "לסרוק עם WhatsApp",
+            "typeTitle": "להקליד את הקוד הזה ב-WhatsApp",
+            "expiredBody": "קוד תקף לשלוש דקות. יש לבקש קוד חדש ולקשר את הטלפון מיד.",
+            "onPhone": "בטלפון של <b>{phone}</b>",
+            "waiting": "מחכה לטלפון",
+            "switchToCode": "להקליד קוד במקום",
+            "switchToQr": "לסרוק קוד QR במקום",
+            "newCode": "קוד חדש",
+            "codeLabel": "קוד {code}",
+            "qrAlt": "קוד QR לקישור WhatsApp"
+        }
+    }
+}

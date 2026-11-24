@@ -1,0 +1,219 @@
+{
+    "menu": {
+        "label": "التطبيقات"
+    },
+    "linkedToRerun": "{provider} مربوط بـ Rerun",
+    "slotPrice": {
+        "monthly": "{price}/شهريًا",
+        "yearly": "{price}/سنويًا"
+    },
+    "blocked": {
+        "notSubscribed": "اشترك في Rerun أولًا",
+        "paused": "مساحة العمل متوقفة مؤقتًا",
+        "trialSlot": "تتضمن الفترة التجريبية خانة {provider} واحدة. رقِّ خطتك لإضافة المزيد.",
+        "lifetimeTrialSlot": "تتضمن فترتك التجريبية المجانية خانة {provider} واحدة. أضف المزيد عند انتهائها.",
+        "adminOnly": "لا يمكن إدارة التطبيقات المدفوعة إلا لمسؤول"
+    },
+    "slots": {
+        "footer": "<b>{used} من {total, plural, zero {# خانة} one {خانة واحدة} two {خانتين} few {# خانات} many {# خانة} other {# خانة}} مستخدمة</b>، {description}",
+        "subscriberTrial": "الأولى مجانية حتى {date}، ثم {price}",
+        "workspaceTrial": "$0 خلال فترتك التجريبية، ثم تُفوتر مع خطتك",
+        "paid": "{price} لكل خانة، تُفوتر مع خطتك",
+        "lifetime": "{price} لكل خانة، تُفوتر شهريًا",
+        "lifetimeTrial": "مجانية خلال فترتك التجريبية، ثم {price} لكل خانة",
+        "lifetimeEnding": "تنتهي في {date}"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "مجانًا لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+            "detail": "ثم {price} لكل حساب، تُفوتر مع خطتك"
+        },
+        "workspaceTrial": {
+            "headline": "$0 خلال فترتك التجريبية",
+            "detail": "ثم {price} لكل حساب، تُفوتر مع خطتك"
+        },
+        "lifetimeTrial": {
+            "detail": "ثم {price} لكل حساب، تُفوتر شهريًا"
+        },
+        "freeSlot": {
+            "headline": "خانة بانتظارك",
+            "detail": "إنها مدرجة في خطتك بالفعل",
+            "detailLifetime": "مدرجة بالفعل في خاناتك الشهرية",
+            "detailLifetimeEnding": "تنتهي خاناتك في {date}"
+        },
+        "buySlot": {
+            "headline": "{price} لكل حساب",
+            "detail": "تُضاف إلى خطتك، وتُفوتر اليوم عن بقية الفترة"
+        },
+        "lifetimeSlot": {
+            "detail": "تُفوتر شهريًا، بمعزل عن خطتك مدى الحياة"
+        }
+    },
+    "connectHint": {
+        "reconnect": "سجّل الدخول مجددًا باسم {label}",
+        "subscriberTrial": "مجانًا لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}، ثم {price}",
+        "workspaceTrial": "$0 خلال فترتك التجريبية، ثم {price} مع خطتك",
+        "default": "الحساب الذي يعمل به زملاؤك"
+    },
+    "addSlot": {
+        "title": "إضافة خانة {provider}؟",
+        "description": "يُضاف {price} إلى خطتك. تُحاسب اليوم عمّا تبقى من الفترة الحالية.",
+        "descriptionLifetime": "يُضاف {price} إلى خاناتك الشهرية. تُحاسب اليوم عمّا تبقى من الشهر.",
+        "confirm": "إضافة خانة",
+        "button": "إضافة خانة",
+        "startTrial": "بدء الفترة التجريبية المجانية"
+    },
+    "intro": {
+        "connect": "ربط {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "يبحث زملاؤك عن عملاء محتملين من حسابك على LinkedIn. يكتبون ويتواصلون ويتابعون نيابةً عنك.",
+            "whatsapp": "يرد زملاؤك من رقمك على WhatsApp. يقرؤون المحادثة ويردون ويتابعون نيابةً عنك."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "الرسائل والدعوات",
+                "text": "يراسل العملاء المحتملين ويتابعهم، ضمن الحدود اليومية لـ LinkedIn."
+            },
+            "linkedinSearch": {
+                "title": "البحث في الملفات الشخصية وقراءتها",
+                "text": "يجد الأشخاص المناسبين ويقرأ ملفاتهم الشخصية قبل الكتابة."
+            },
+            "linkedinReplies": {
+                "title": "يستيقظ عند الردود",
+                "text": "يبدأ الزميل العمل فورًا عند وصول رد أو قبول دعوة."
+            },
+            "whatsappReplies": {
+                "title": "الردود والمتابعات",
+                "text": "يرد على من يراسلونك، بالنصوص والملفات والرسائل الصوتية."
+            },
+            "whatsappMessages": {
+                "title": "يستيقظ عند الرسائل",
+                "text": "تبدأ رسالة جديدة عمل الزميل فورًا."
+            },
+            "whatsappCareful": {
+                "title": "حريص على رقمك",
+                "text": "يلتزم بالحدود اليومية لـ WhatsApp ولا يراسل الغرباء أبدًا."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "مساحة العمل متوقفة مؤقتًا، لذا سُجّل خروج حسابات {provider} الخاصة بها. أعد تشغيل مساحة العمل، ثم أعد ربطها.",
+        "freeSlot": "خانة متاحة",
+        "freeSlotHint": {
+            "subscriberTrial": "اربط حسابًا، مجانًا لمدة {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+            "workspaceTrial": "اربط حسابًا، $0 خلال فترتك التجريبية",
+            "default": "اربط حساب {provider} لملئها"
+        },
+        "addAnother": "إضافة حساب آخر",
+        "addAnotherHint": "يضيف خانة بسعر {price} إلى خطتك",
+        "addAnotherHintLifetime": "يضيف خانة بسعر {price}",
+        "status": {
+            "connected": "جاهز",
+            "needsReconnect": "سجّل الدخول مجددًا",
+            "paused": "متوقف مؤقتًا",
+            "connecting": "جارٍ الربط",
+            "disconnected": "غير مربوط"
+        },
+        "summary": {
+            "signedOutWhilePaused": "سُجّل الخروج أثناء توقف مساحة العمل",
+            "signedOut": "سجّل {provider} خروج هذا الحساب",
+            "rateLimited": "في استراحة ليوم واحد، طلب {provider} إبطاء النشاط",
+            "unpaid": "خانته غير مدفوعة",
+            "unused": "لا يستخدمه أي زميل بعد. اختره من خدمات أحد الزملاء.",
+            "usedBy": "يستخدمه {names}"
+        },
+        "defaultName": "حساب {provider}",
+        "reconnect": "إعادة الربط",
+        "resume": "استئناف",
+        "disconnectLabel": "فصل {name}",
+        "disconnectTitle": "فصل {name}؟",
+        "disconnectDescription": "يفقد زملاؤه أدوات {provider} فورًا. تبقى الخانة في خطتك حتى تزيلها من الفوترة.",
+        "disconnectDescriptionLifetime": "يفقد زملاؤه أدوات {provider} فورًا. تبقى الخانة لك حتى تعيدها من هنا.",
+        "disconnect": "فصل",
+        "disconnectTooltip": "فصل هذا الحساب",
+        "giveBack": "إعادة",
+        "giveBackTitle": "إعادة خانة {provider} هذه؟",
+        "giveBackDescription": "لن تُفوتر اعتبارًا من التجديد القادم، وتبقى قابلة للاستخدام حتى ذلك الحين."
+    },
+    "success": {
+        "connectedIcon": "{provider} مربوط",
+        "title": "{app} مفعّل",
+        "body": "<b>{label}</b> مربوط. اختره من خدمات أحد الزملاء ليبدأ العمل.",
+        "yourAccount": "حسابك",
+        "done": "تم"
+    },
+    "linkedin": {
+        "method": {
+            "password": "البريد الإلكتروني وكلمة المرور",
+            "cookie": "ملف تعريف ارتباط الجلسة"
+        },
+        "cookieLabel": "ملف تعريف ارتباط الجلسة (li_at)",
+        "cookieHelp": "لحساب تفتحه عبر Google أو Apple. انسخ ملف تعريف الارتباط li_at الخاص بـ linkedin.com من متصفحك.",
+        "emailLabel": "بريد LinkedIn الإلكتروني",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "كلمة مرور LinkedIn",
+        "passwordPlaceholder": "كلمة مرورك على LinkedIn",
+        "signInFrom": "تسجيل الدخول من",
+        "signInFromHelp": "يثق LinkedIn بتسجيل الدخول من البلد الذي تعمل منه عادةً.",
+        "searchCountry": "ابحث عن بلد",
+        "noCountry": "لم يُعثر على أي بلد",
+        "neverStored": "لا يخزّن Rerun كلمة مرورك ولا ملف تعريف الارتباط أبدًا.",
+        "connect": "ربط",
+        "approval": {
+            "figureLabel": "هاتف يعرض طلب تسجيل الدخول، وزر الموافقة مضاء",
+            "title": "وافق من هاتفك",
+            "body": "أرسل LinkedIn طلب تسجيل دخول إلى هاتفك. افتح تطبيق LinkedIn واضغط <b>نعم</b>.",
+            "approved": "وافقت",
+            "polling": "بانتظار موافقتك",
+            "slow": "لا شيء بعد؟ تحقق من تطبيق LinkedIn، ثم اضغط أدناه."
+        },
+        "code": {
+            "title": "أدخل الرمز",
+            "description": "الرمز المكوّن من {length} أرقام {where}.",
+            "where": {
+                "authenticator": "من تطبيق المصادقة",
+                "sentTo": "الذي أرسله LinkedIn إلى {sentTo}",
+                "sms": "الذي أرسله LinkedIn برسالة نصية",
+                "email": "الذي أرسله LinkedIn بالبريد الإلكتروني"
+            },
+            "resend": "إرسال رمز جديد",
+            "verify": "تحقق"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "رقم WhatsApp",
+            "invalidPhone": "لا يبدو هذا رقم هاتف كاملًا.",
+            "linkBy": "اربطه عبر",
+            "linkByQr": "تمسح بالهاتف رمزًا معروضًا هنا.",
+            "linkByCode": "عندما تكون هذه الصفحة مفتوحة على ذلك الهاتف: تكتب رمزًا في WhatsApp بدلًا من ذلك.",
+            "method": {
+                "qr": "مسح رمز QR",
+                "code": "كتابة رمز"
+            },
+            "linkedDevice": "ينضم Rerun كجهاز مرتبط، كما يفعل WhatsApp Web. يواصل هاتفك العمل كالمعتاد.",
+            "submit": "الحصول على الرمز"
+        },
+        "link": {
+            "steps": {
+                "open": "افتح WhatsApp على الهاتف",
+                "settings": "الإعدادات، ثم الأجهزة المرتبطة، ثم ربط جهاز",
+                "pointQr": "وجّه الهاتف نحو هذا الرمز",
+                "typeCode": "اضغط الربط برقم الهاتف بدلًا من ذلك، ثم اكتب هذا الرمز"
+            },
+            "expiredTitle": "انتهت صلاحية هذا الرمز",
+            "scanTitle": "امسح باستخدام WhatsApp",
+            "typeTitle": "اكتب هذا الرمز في WhatsApp",
+            "expiredBody": "تصلح الرموز لثلاث دقائق. اطلب رمزًا جديدًا، ثم اربط الهاتف فورًا.",
+            "onPhone": "على هاتف <b>{phone}</b>",
+            "waiting": "بانتظار الهاتف",
+            "switchToCode": "كتابة رمز بدلًا من ذلك",
+            "switchToQr": "مسح رمز QR بدلًا من ذلك",
+            "newCode": "رمز جديد",
+            "codeLabel": "الرمز {code}",
+            "qrAlt": "رمز QR لربط WhatsApp"
+        }
+    }
+}

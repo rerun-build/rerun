@@ -1,0 +1,30 @@
+{
+    "untitledTask": "עמית משנה {index}",
+    "untitledAgent": "עמית",
+    "trouble": {
+        "stalled": "{count} תקועים",
+        "failing": "{count} נכשלים"
+    },
+    "progress": {
+        "step": "שלב {steps}",
+        "calls": "{count, plural, =0 {# קריאות} one {קריאה אחת} two {# קריאות} other {# קריאות}}"
+    },
+    "headline": {
+        "messageSent": "הודעה נשלחה אל {name}",
+        "calling": "פונה אל {name}",
+        "callFailed": "{name} נכשל",
+        "callStopped": "{name} נעצר",
+        "callAnswered": "{name} ענה",
+        "building": "בונה את {name}",
+        "buildFailed": "לא ניתן היה לבנות את {name}",
+        "built": "{name} נבנה",
+        "buildingTeam": "בונה את הצוות שלך · {count, plural, =0 {# עמיתים} one {עמית אחד} two {# עמיתים} other {# עמיתים}}",
+        "delegating": "מאציל · {count, plural, =0 {# משימות} one {משימה אחת} two {# משימות} other {# משימות}}",
+        "doneOfTotal": "{done}/{total} הושלמו",
+        "coworkersBuilt": "{count, plural, =0 {# עמיתים נבנו} one {עמית אחד נבנה} two {# עמיתים נבנו} other {# עמיתים נבנו}}",
+        "openFromBoard": "לפתוח אחד מהלוח",
+        "tasksDone": "{count, plural, =0 {# משימות הושלמו} one {משימה אחת הושלמה} two {# משימות הושלמו} other {# משימות הושלמו}}",
+        "doneAndFailed": "{done} הושלמו · {failed} נכשלו",
+        "doneAndStopped": "{done} הושלמו · {stopped} נעצרו"
+    }
+}

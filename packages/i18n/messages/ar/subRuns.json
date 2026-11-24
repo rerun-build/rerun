@@ -1,0 +1,30 @@
+{
+    "untitledTask": "زميل فرعي {index}",
+    "untitledAgent": "زميل",
+    "trouble": {
+        "stalled": "{count} متوقف",
+        "failing": "{count} يفشل"
+    },
+    "progress": {
+        "step": "الخطوة {steps}",
+        "calls": "{count, plural, =0 {لا استدعاءات} zero {لا استدعاءات} one {استدعاء واحد} two {استدعاءان} few {# استدعاءات} many {# استدعاءً} other {# استدعاء}}"
+    },
+    "headline": {
+        "messageSent": "أُرسلت رسالة إلى {name}",
+        "calling": "جارٍ استدعاء {name}",
+        "callFailed": "فشل {name}",
+        "callStopped": "توقف {name}",
+        "callAnswered": "أجاب {name}",
+        "building": "جارٍ بناء {name}",
+        "buildFailed": "تعذّر بناء {name}",
+        "built": "تم بناء {name}",
+        "buildingTeam": "جارٍ بناء فريقك · {count, plural, =0 {لا زملاء} zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
+        "delegating": "جارٍ التفويض · {count, plural, =0 {لا مهام} zero {لا مهام} one {مهمة واحدة} two {مهمتان} few {# مهام} many {# مهمة} other {# مهمة}}",
+        "doneOfTotal": "اكتمل {done}/{total}",
+        "coworkersBuilt": "تم بناء {count, plural, =0 {لا زملاء} zero {لا زملاء} one {زميل واحد} two {زميلين} few {# زملاء} many {# زميلًا} other {# زميل}}",
+        "openFromBoard": "افتح أحدهم من اللوحة",
+        "tasksDone": "اكتمل {count, plural, =0 {لا مهام} zero {لا مهام} one {مهمة واحدة} two {مهمتان} few {# مهام} many {# مهمة} other {# مهمة}}",
+        "doneAndFailed": "اكتمل {done} · فشل {failed}",
+        "doneAndStopped": "اكتمل {done} · توقف {stopped}"
+    }
+}

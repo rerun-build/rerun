@@ -1,0 +1,13 @@
+{
+    "states": {
+        "done": "تم",
+        "error": "فشل",
+        "question": "سؤال",
+        "approval": "بحاجة إلى موافقة",
+        "connector": "بحاجة إلى تطبيق",
+        "info": "تحديث"
+    },
+    "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
+    "fallbackAgent": "زميلك"
+}

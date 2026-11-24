@@ -1,0 +1,25 @@
+{
+    "price": {
+        "free": "חינם",
+        "monthly": "{amount}/חודש",
+        "useForFree": "להשתמש בחינם",
+        "hire": "{count, plural, one {לגייס את העמית הזה · {price}} two {לגייס את שני העמיתים האלה · {price}} other {לגייס את # העמיתים האלה · {price}}}",
+        "hireCard": "לגייס · {price}"
+    },
+    "categories": {
+        "agencies": "סוכנויות",
+        "ecommerce": "מסחר מקוון",
+        "saas": "SaaS",
+        "sales": "מכירות",
+        "recruiting": "גיוס",
+        "real-estate": "נדל\"ן",
+        "legal": "משפט ורגולציה",
+        "creators": "יוצרים",
+        "productivity": "פרודוקטיביות",
+        "other": "אחר"
+    },
+    "connectors": {
+        "none": "לא נדרשות אפליקציות",
+        "label": "אפליקציות: {apps}"
+    }
+}

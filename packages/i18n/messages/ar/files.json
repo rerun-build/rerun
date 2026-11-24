@@ -1,0 +1,97 @@
+{
+    "detail": {
+        "readOnly": "هذا الملف للقراءة فقط",
+        "stillLoading": "لا يزال هذا الملف قيد التحميل",
+        "previousFile": "الملف السابق",
+        "nextFile": "الملف التالي",
+        "editNotText": "لا يمكن هنا تعديل سوى الملفات النصية.",
+        "editTruncated": "يتجاوز هذا الملف {limit} حرف ولا يمكن تعديله هنا. نزّله، أو اطلب من الزميل تعديله.",
+        "editBinary": "هذا الملف ليس نصيًا، وتعديله هنا قد يُتلفه."
+    },
+    "actions": {
+        "truncated": "مقتطع",
+        "edit": "تعديل",
+        "download": "تنزيل",
+        "deleteFile": "حذف الملف"
+    },
+    "delete": {
+        "title": "حذف {name}؟",
+        "file": "سيُحذف الملف من الـ Box. لا يمكن التراجع عن ذلك.",
+        "folder": "سيُحذف المجلد وكل ما بداخله من الـ Box. لا يمكن التراجع عن ذلك."
+    },
+    "editor": {
+        "unsaved": "غير محفوظ",
+        "cancel": "إلغاء",
+        "noChanges": "لا تغييرات لحفظها",
+        "save": "حفظ التغييرات",
+        "conflictTitle": "تغيّر {name} على الـ Box",
+        "conflictDescription": "كتب شخص ما، أو زميل، في هذا الملف بعد أن فتحته. الحفظ الآن سيستبدل نسختهم بنسختك.",
+        "overwrite": "استبدال",
+        "keepTheirs": "الاحتفاظ بنسختهم",
+        "discardTitle": "تجاهل تغييراتك؟",
+        "discardDescription": "تعديلاتك على {name} لم تُحفظ بعد. إغلاق المحرر سيتخلّص منها.",
+        "discard": "تجاهل التغييرات",
+        "keepEditing": "متابعة التعديل"
+    },
+    "preview": {
+        "noPreview": "لا تتوفر معاينة لهذا النوع من الملفات",
+        "download": "تنزيل",
+        "readFailed": "تعذّرت قراءة هذا الملف",
+        "showSource": "عرض المصدر",
+        "showRendered": "عرض كصفحة"
+    },
+    "publish": {
+        "publish": "نشر",
+        "publishPublicly": "نشر للعامة",
+        "publishedLink": "الرابط المنشور",
+        "publicLink": "رابط عام",
+        "open": "فتح",
+        "openPublicLink": "فتح الرابط العام",
+        "copyLink": "نسخ الرابط",
+        "copyPublicLink": "نسخ الرابط العام",
+        "shareSettings": "إعدادات المشاركة",
+        "unpublish": "إلغاء النشر",
+        "unshare": "إيقاف المشاركة",
+        "unpublishTitle": "إلغاء نشر {name}؟",
+        "unshareTitle": "إيقاف مشاركة {name}؟",
+        "unpublishDescription": "سيتوقف الرابط عن العمل فورًا لكل من يملكه.",
+        "unshareDescription": "سيتوقف الرابط العام عن العمل فورًا. كل من يفتحه سيرى خطأ 404."
+    },
+    "empty": {
+        "title": "مجلد فارغ",
+        "goUp": "مستوى واحد للأعلى"
+    },
+    "grid": {
+        "parentDirectory": "المجلد الأصل",
+        "openFolder": "فتح المجلد",
+        "open": "فتح",
+        "download": "تنزيل",
+        "rename": "إعادة تسمية",
+        "delete": "حذف",
+        "published": "منشور"
+    },
+    "list": {
+        "newName": "اسم جديد",
+        "dropHere": "أفلت الملفات أو المجلدات هنا لرفعها",
+        "name": "الاسم",
+        "size": "الحجم",
+        "type": "النوع",
+        "empty": "لا شيء هنا بعد. كل ما ينزّله زميل أو ينشئه أو يعدّله لمساحة العمل كلها يصل إلى هذا المجلد، وكذلك ما تفلته في هذه الصفحة.",
+        "actionsFor": "إجراءات {name}",
+        "folder": "مجلد",
+        "file": "ملف"
+    },
+    "uploadOutcome": {
+        "allFailed": "فشل الرفع",
+        "someFailed": "فشل رفع {failed} من {total, plural, zero {# ملف} one {ملف واحد} two {ملفين} few {# ملفات} many {# ملفًا} other {# ملف}}",
+        "uploaded": "{count, plural, zero {لم يُرفع أي ملف} one {تم رفع ملف واحد} two {تم رفع ملفين} few {تم رفع # ملفات} many {تم رفع # ملفًا} other {تم رفع # ملف}}",
+        "sessionExpired": "انتهت جلستك. أعد تحميل الصفحة وحاول مجددًا.",
+        "tooLarge": "هذا الملف أكبر من أن يُرفع.",
+        "retryLater": "فشل الرفع. أعد المحاولة بعد قليل.",
+        "networkFailed": "فشل الرفع. تحقّق من اتصالك وأعد المحاولة.",
+        "oversized": "{names}{more, plural, =0 {} zero {} one { وملف آخر} two { وملفان آخران} few { و# ملفات أخرى} many { و# ملفًا آخر} other { و# ملف آخر}} {count, plural, zero {تتجاوز} one {يتجاوز} two {يتجاوزان} few {تتجاوز} many {تتجاوز} other {تتجاوز}} الحد البالغ {limit} ميغابايت.",
+        "machineUpdating": "كان جهاز مساحة العمل هذه قيد التحديث. أعد محاولة الرفع.",
+        "engineUpdateNeeded": "تعمل مساحة العمل هذه على جهاز يحتاج إلى تحديث المحرّك لقبول ملفات أكبر من {limit} ميغابايت. يتحدّث تلقائيًا، فحاول مجددًا بعد بضع دقائق.",
+        "machineUnreachable": "تعذّر رفع {name}. قد يتعذّر الوصول إلى جهازك."
+    }
+}

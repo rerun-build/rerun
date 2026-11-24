@@ -1,0 +1,388 @@
+{
+    "labels": {
+        "shell_exec": "טרמינל",
+        "fs_read": "קריאת קובץ",
+        "fs_write": "כתיבת קובץ",
+        "fs_edit": "עריכת קובץ",
+        "fs_list": "רשימת קבצים",
+        "fs_search": "חיפוש קבצים",
+        "shared_read": "קריאת קובץ משותף",
+        "shared_write": "כתיבת קובץ משותף",
+        "shared_edit": "עריכת קובץ משותף",
+        "shared_list": "רשימת קבצים משותפים",
+        "shared_search": "חיפוש קבצים משותפים",
+        "browser_navigate": "גלישה באינטרנט",
+        "computer": "השתמש במחשב שלו",
+        "computer_open_app": "פתח אפליקציה",
+        "web_fetch": "טעינת דף",
+        "web_search": "חיפוש באינטרנט",
+        "WebSearch": "חיפוש באינטרנט",
+        "leads_people_search": "חיפוש אנשים",
+        "leads_email_find": "חיפוש אימייל",
+        "leads_email_verify": "אימות אימייל",
+        "leads_phone_find": "חיפוש טלפון",
+        "google_serp": "תוצאות Google",
+        "google_maps_search": "Google Maps",
+        "paid_data": "נתונים בתשלום",
+        "paid_data_catalog": "קטלוג נתונים בתשלום",
+        "paid_data_read": "קריאת נתונים בתשלום",
+        "tool_result_read": "קריאת התוצאה המלאה",
+        "download": "הורדה",
+        "memory_write": "שמירה בזיכרון",
+        "memory_recall": "שליפה מהזיכרון",
+        "brain_search": "חיפוש ב-Brain",
+        "brain_read": "קריאה מה-Brain",
+        "brain_propose": "הצעה ל-Brain",
+        "brain_write": "כתיבה ב-Brain",
+        "brain_delete": "הסרה מה-Brain",
+        "brain_proposals": "בדיקת שינויים ב-Brain",
+        "brain_decide": "החלטה על שינוי ב-Brain",
+        "vision_analyze": "ניתוח תמונה",
+        "delegate_tasks": "האצלת משימות",
+        "call_agent": "פנייה לעמית",
+        "team_status": "מצב הצוות",
+        "team_list_schedules": "רשימת התזמונים של עמית",
+        "team_list_triggers": "רשימת הטריגרים של עמית",
+        "team_list_runs": "רשימת ההרצות של עמית",
+        "team_get_run": "קריאת הרצה של עמית",
+        "ai_status": "בדיקת ספקי AI",
+        "schedule_list": "רשימת תזמונים",
+        "schedule_create": "יצירת תזמון",
+        "schedule_update": "עדכון תזמון",
+        "schedule_delete": "מחיקת תזמון",
+        "trigger_list": "רשימת טריגרים",
+        "trigger_create": "יצירת טריגר",
+        "trigger_get": "קריאת טריגר",
+        "trigger_update": "עדכון טריגר",
+        "trigger_rotate_token": "החלפת הסוד של הטריגר",
+        "trigger_delete": "מחיקת טריגר",
+        "skill_list": "רשימת מיומנויות",
+        "skill_read": "קריאת מיומנות",
+        "skill_read_file": "קריאת קובץ מיומנות",
+        "skill_write_file": "כתיבת קובץ מיומנות",
+        "skill_delete_file": "מחיקת קובץ מיומנות",
+        "skill_create": "יצירת מיומנות",
+        "skill_import": "ייבוא מיומנות",
+        "skill_edit": "עריכת מיומנות",
+        "skill_update": "עדכון מיומנות",
+        "skill_delete": "מחיקת מיומנות",
+        "skill_propose": "הצעת מיומנות",
+        "soul_update": "עדכון האישיות",
+        "verbosity_set": "התאמת אורך התשובה",
+        "tool_install": "התקנת כלי",
+        "mcp_register": "חיבור אינטגרציה",
+        "mcp_login": "התחברות לאינטגרציה",
+        "mcp_login_complete": "סיום ההתחברות",
+        "mcp_status": "מצב האינטגרציה",
+        "mcp_search": "חיפוש כלים",
+        "card_table": "הצגת טבלה",
+        "card_file": "הצגת קובץ",
+        "image_generation": "יצירת תמונה",
+        "table_view_save": "שמירת תצוגת טבלה",
+        "table_view_delete": "מחיקת תצוגת טבלה",
+        "rerun_hub_service_search": "חיפוש אפליקציות",
+        "rerun_hub_service_details": "פרטי האפליקציה",
+        "rerun_hub_service_install": "התקנת אפליקציה",
+        "rerun_hub_service_list_installed": "רשימת אפליקציות",
+        "rerun_hub_service_uninstall": "הסרת אפליקציה",
+        "rerun_hub_publish_file": "פרסום קובץ",
+        "rerun_hub_unpublish_file": "ביטול פרסום קובץ",
+        "rerun_hub_list_published": "רשימת קבצים שפורסמו",
+        "task_complete": "המשימה הושלמה",
+        "list_spaces": "רשימת Boxes",
+        "list_agents": "רשימת עמיתים",
+        "get_agent": "קריאת עמית",
+        "create_agent": "יצירת עמית",
+        "update_agent": "עדכון עמית",
+        "delete_agent": "מחיקת עמית",
+        "list_ai_connections": "רשימת ספקי AI",
+        "set_default_model": "הגדרת מודל ברירת מחדל",
+        "list_skills": "רשימת מיומנויות",
+        "get_skill": "קריאת מיומנות",
+        "upsert_skill": "כתיבת מיומנות",
+        "delete_skill": "מחיקת מיומנות",
+        "list_schedules": "רשימת משימות מתוזמנות",
+        "upsert_schedule": "תזמון משימה",
+        "run_schedule_now": "הרצת המשימה עכשיו",
+        "delete_schedule": "מחיקת משימה מתוזמנת",
+        "list_runs": "רשימת הרצות",
+        "get_run": "קריאת הרצה",
+        "search_connectors": "חיפוש אפליקציות",
+        "list_agent_connectors": "רשימת אפליקציות",
+        "attach_connector": "הוספת אפליקציה",
+        "detach_connector": "הסרת אפליקציה",
+        "list_vault": "קריאת ה-Vault",
+        "attach_vault_entry": "השאלה מה-Vault",
+        "detach_vault_entry": "החזרה ל-Vault",
+        "share_vault_entry": "שיתוף פריט מה-Vault",
+        "rename_vault_entry": "שינוי שם של פריט ב-Vault",
+        "delete_vault_entry": "מחיקת פריט מה-Vault",
+        "add_vault_entry": "הוספה ל-Vault",
+        "open_vault": "פתיחת ה-Vault",
+        "send_message": "הודעה לעמית",
+        "list_pending_cards": "קריאת תיבת הדואר שלך",
+        "answer_card": "מענה לכרטיס",
+        "create_boxes": "יצירת Boxes",
+        "build_team": "בניית צוות",
+        "write_agent": "כותב את ה-SOUL וההתקנה",
+        "rename_box": "שינוי שם של Box",
+        "delete_box": "מחיקת Box",
+        "focus_agent": "פתיחת עמית",
+        "show_agents": "הצגת עמיתים",
+        "open_connector_setup": "פתיחת הגדרת האפליקציה",
+        "open_settings": "פתיחת ההגדרות",
+        "recenter_board": "מירכוז הלוח",
+        "open_brain_page": "פתיחת ה-Brain",
+        "read_attachment": "קריאת קובץ מצורף",
+        "search_docs": "חיפוש בתיעוד",
+        "rerun_hub_search_docs": "חיפוש בתיעוד",
+        "analyze_website": "קריאת אתר",
+        "save_profile": "שמירת פרופיל",
+        "save_needs": "שמירת צרכים",
+        "list_templates": "עיון בתבניות",
+        "propose_plan": "כתיבת תוכנית",
+        "install_template": "התקנת תבנית",
+        "install_shared_agent": "התקנת עמית משותף",
+        "open_template_card": "פתיחת תבנית",
+        "start_agent_setup": "העברת ההגדרה",
+        "open_checkout": "התחלת תקופת ניסיון",
+        "open_template_purchase": "רכישת תבנית",
+        "ask_choice": "שאל את המשתמש",
+        "ask_either": "שאל את המשתמש",
+        "ask_input": "שאל את המשתמש",
+        "show_templates": "הציג תבניות",
+        "show_plan": "הציג את התוכנית",
+        "show_starter_pack": "הציג את חבילת הפתיחה",
+        "contact_team": "הציע את הצוות",
+        "ask_user": "שאל את המשתמש",
+        "request_approval": "ביקש אישור",
+        "suggest_service": "הציע אפליקציה",
+        "request_secret": "ביקש פרטי גישה",
+        "request_mcp_sign_in": "ביקש ממך להתחבר לשרת MCP",
+        "request_takeover": "ביקש ממך להשתלט על הדפדפן",
+        "request_spend": "ביקש להוציא קרדיטים",
+        "notify_user": "שלח לך התראה",
+        "install_complete": "סיים את ההגדרה",
+        "remote_computers": "בדק את המחשבים המקושרים",
+        "remote_exec": "{program, select, none {הריץ פקודה} other {הריץ את {program}}} ב-#{computer}",
+        "request_computer_access": "ביקש להשתמש ב-#{computer}",
+        "remote_job": "בדק משימה ב-#{computer}",
+        "remote_file_list": "הציג את הקבצים ב-#{computer}",
+        "remote_file_read": "קרא קובץ ב-#{computer}",
+        "remote_file_write": "כתב קובץ ב-#{computer}",
+        "remote_transfer": "העתיק קובץ עם #{computer}",
+        "request_feature": "ניסח בקשה לצוות של Rerun"
+    },
+    "activities": {
+        "shell_exec": "מריץ פקודה",
+        "fs_read": "קורא קובץ",
+        "fs_write": "כותב קובץ",
+        "fs_edit": "עורך קובץ",
+        "fs_list": "מציג קבצים",
+        "fs_search": "מחפש קבצים",
+        "shared_read": "קורא קובץ משותף",
+        "shared_write": "כותב קובץ משותף",
+        "shared_edit": "עורך קובץ משותף",
+        "shared_list": "מציג קבצים משותפים",
+        "shared_search": "מחפש קבצים משותפים",
+        "browser_navigate": "גולש באינטרנט",
+        "computer": "משתמש במחשב שלו",
+        "computer_open_app": "פותח אפליקציה",
+        "web_fetch": "קורא דף",
+        "web_search": "מחפש באינטרנט",
+        "WebSearch": "מחפש באינטרנט",
+        "leads_people_search": "מחפש אנשים",
+        "leads_email_find": "מחפש אימייל",
+        "leads_email_verify": "מאמת אימייל",
+        "leads_phone_find": "מחפש מספר טלפון",
+        "google_serp": "מחפש ב-Google",
+        "google_maps_search": "מחפש ב-Google Maps",
+        "download": "מוריד",
+        "memory_write": "שומר בזיכרון",
+        "memory_recall": "שולף מהזיכרון",
+        "brain_search": "מחפש ב-Brain",
+        "brain_read": "קורא את ה-Brain",
+        "brain_propose": "מציע שינוי ב-Brain",
+        "brain_write": "כותב ב-Brain",
+        "vision_analyze": "מסתכל על תמונה",
+        "image_generation": "יוצר תמונה",
+        "delegate_tasks": "מאציל משימות",
+        "call_agent": "פונה לעמית",
+        "team_status": "בודק את הצוות",
+        "team_list_runs": "קורא את ההרצות של עמית",
+        "team_get_run": "קורא הרצה של עמית",
+        "ai_status": "בודק ספקי AI",
+        "skill_read": "קורא מיומנות",
+        "skill_read_file": "קורא מיומנות",
+        "skill_create": "יוצר מיומנות",
+        "skill_edit": "עורך מיומנות",
+        "skill_update": "מעדכן מיומנות",
+        "mcp_search": "מחפש כלים",
+        "rerun_hub_service_search": "מחפש אפליקציות",
+        "rerun_hub_service_install": "מתקין אפליקציה",
+        "list_agents": "מסתכל על הצוות",
+        "create_agent": "יוצר עמית",
+        "update_agent": "מעדכן עמית",
+        "send_message": "שולח הודעה לעמית",
+        "list_pending_cards": "קורא את תיבת הדואר שלך",
+        "answer_card": "עונה לכרטיס",
+        "build_team": "בונה את הצוות",
+        "search_docs": "מחפש בתיעוד",
+        "rerun_hub_search_docs": "מחפש בתיעוד",
+        "analyze_website": "קורא את האתר",
+        "list_templates": "מעיין בתבניות",
+        "propose_plan": "כותב את התוכנית",
+        "install_template": "מתקין תבנית",
+        "remote_computers": "בודק את המחשבים המקושרים",
+        "remote_exec": "{program, select, none {מריץ פקודה} other {מריץ את {program}}} ב-#{computer}"
+    },
+    "paidData": {
+        "people": {
+            "search": "מחפש אנשים",
+            "email": {
+                "find": "מחפש כתובות אימייל",
+                "verify": "מאמת כתובות אימייל"
+            },
+            "phone": {
+                "find": "מחפש מספרי טלפון"
+            },
+            "enrich": "מעשיר נתוני אנשים",
+            "identity": {
+                "resolve": "מחפש פרופילי LinkedIn"
+            }
+        },
+        "companies": {
+            "search": "מחפש חברות",
+            "enrich": "מעשיר נתוני חברות",
+            "similar": "מחפש חברות דומות",
+            "jobs": {
+                "search": "קורא מודעות דרושים"
+            },
+            "news": "קורא חדשות על החברה"
+        },
+        "google": {
+            "serp": {
+                "organic": "קורא תוצאות Google",
+                "maps": "מחפש ב-Google Maps",
+                "local": "קורא דירוגים מקומיים",
+                "news": "קורא את Google News"
+            },
+            "keywords": {
+                "volume": "בודק נפחי חיפוש",
+                "ideas": "מחפש רעיונות למילות מפתח",
+                "trends": "קורא את Google Trends"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "שואל את Perplexity"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "קורא קישורים נכנסים",
+                "list": "מציג קישורים נכנסים"
+            },
+            "anchors": {
+                "list": "קורא טקסטים של עוגנים"
+            },
+            "url": {
+                "metrics": "בודק את סמכות הדומיין"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "קורא את LinkedIn",
+                "posts": "קורא פוסטים ב-LinkedIn"
+            },
+            "company": {
+                "profile": "קורא את LinkedIn"
+            },
+            "post": {
+                "detail": "קורא פוסטים ב-LinkedIn",
+                "comments": "קורא תגובות ב-LinkedIn",
+                "reactions": "קורא תגובות רגשיות ב-LinkedIn"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "קורא את TikTok",
+                "videos": "צופה בסרטוני TikTok"
+            },
+            "search": {
+                "users": "מחפש ב-TikTok",
+                "videos": "מחפש ב-TikTok"
+            },
+            "video": {
+                "detail": "צופה בסרטוני TikTok",
+                "comments": "קורא תגובות ב-TikTok"
+            },
+            "comment": {
+                "replies": "קורא תגובות ב-TikTok"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "קורא את Instagram",
+                "posts": "קורא פוסטים ב-Instagram",
+                "reels": "צופה ב-Reels של Instagram"
+            },
+            "search": {
+                "users": "מחפש ב-Instagram",
+                "reels": "מחפש ב-Instagram"
+            },
+            "hashtag": {
+                "posts": "קורא האשטגים ב-Instagram"
+            },
+            "post": {
+                "detail": "קורא פוסטים ב-Instagram",
+                "comments": "קורא תגובות ב-Instagram"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "קורא את X",
+                "posts": "קורא פוסטים ב-X"
+            },
+            "search": {
+                "posts": "מחפש ב-X"
+            },
+            "post": {
+                "comments": "קורא תשובות ב-X"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "קורא את YouTube",
+                "videos": "צופה בסרטוני YouTube"
+            },
+            "search": {
+                "videos": "מחפש ב-YouTube"
+            },
+            "video": {
+                "detail": "צופה בסרטוני YouTube",
+                "comments": "קורא תגובות ב-YouTube"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "קורא את Facebook",
+                "posts": "קורא פוסטים ב-Facebook"
+            },
+            "post": {
+                "comments": "קורא תגובות ב-Facebook"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "קורא את Reddit"
+            },
+            "post": {
+                "detail": "קורא את Reddit"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "הכלי לא נמצא"
+    }
+}

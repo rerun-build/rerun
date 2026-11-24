@@ -1,0 +1,88 @@
+{
+    "access": {
+        "boxManage": "רק אדמין או מנהל של ה-Box הזה יכולים לשנות את זה.",
+        "aiProvidersAdminOnly": "רק אדמין יכול לשנות את ספקי ה-AI.",
+        "noManagedBox": "כדי להוסיף עמית צריך Box שבניהולך. אפשר ליצור אחד ב-{host} או לפנות לאדמין.",
+        "boxesFailed": "לא הצלחנו לטעון את ה-Boxes שלך. כדאי לנסות שוב בעוד רגע.",
+        "noBoxYet": "בסביבת העבודה הזו עדיין אין Box. אפשר ליצור אחד ב-{host}.",
+        "foremanAdminOnly": "רק אדמין יכול לשנות את ה-Chief of Staff."
+    },
+    "page": {
+        "loadFailed": "לא ניתן לטעון את זה. כדאי לנסות שוב בעוד רגע."
+    },
+    "details": {
+        "back": "חזרה",
+        "more": "עוד",
+        "delete": "למחוק את העמית",
+        "edit": "לערוך",
+        "files": "קבצים",
+        "apps": "אפליקציות",
+        "routines": "שגרות",
+        "computer": "מחשב",
+        "notifications": "התראות",
+        "working": "עובד",
+        "idle": "פנוי",
+        "off": "כבוי",
+        "none": "אין",
+        "appsToConnect": "{count} לחיבור",
+        "appsConnected": "{count} מחוברות",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} פעילות",
+        "renameTitle": "שינוי שם",
+        "save": "לשמור",
+        "renameFailed": "לא ניתן לשנות את השם",
+        "deleteTitle": "למחוק את {name}?",
+        "deleteMessage": "פעולה זו מוחקת לצמיתות את העמית ואת הנתונים שלו. אי אפשר לבטל אותה.",
+        "deleteConfirm": "למחוק",
+        "deleteFailed": "לא ניתן למחוק"
+    },
+    "apps": {
+        "title": "אפליקציות",
+        "status": {
+            "needsSignIn": "נדרשת התחברות",
+            "needsSetup": "נדרשת הגדרה",
+            "error": "שגיאה"
+        },
+        "connect": "לחבר",
+        "connectNew": "חשבון חדש",
+        "empty": "עדיין אין אפליקציות.",
+        "askInChat": "אפשר לבקש מ-{name} בצ'אט להוסיף אפליקציה.",
+        "connectFailed": "לא ניתן לחבר את {name}"
+    },
+    "files": {
+        "title": "קבצים",
+        "media": "מדיה",
+        "docs": "מסמכים",
+        "earlier": "קודם לכן",
+        "thisMonth": "החודש",
+        "open": "לפתוח את {name}",
+        "fileFallback": "קובץ",
+        "noMedia": "אין מדיה",
+        "noDocs": "אין מסמכים",
+        "emptyHint": "מה ש-{name} יוצר יופיע כאן.",
+        "truncated": "רק הקבצים החדשים ביותר. כולם זמינים באתר."
+    },
+    "routines": {
+        "title": "שגרות",
+        "once": "פעם אחת, {date}",
+        "webhook": "Webhook",
+        "empty": "עדיין אין שגרות.",
+        "askInChat": "אפשר לבקש מ-{name} בצ'אט להגדיר אחת.",
+        "turnOnFailed": "לא ניתן להפעיל את {name}",
+        "turnOffFailed": "לא ניתן לכבות את {name}"
+    },
+    "create": {
+        "title": "עמית חדש",
+        "nameLabel": "שם",
+        "namePlaceholder": "סקאוט",
+        "descriptionLabel": "מה הוא צריך לעשות?",
+        "descriptionPlaceholder": "למצוא סוכנויות שיווק בליון ולנסח מייל ראשון לכל אחת",
+        "descriptionHelp": "המשימה הראשונה שלו. הוא מתחיל בה מיד.",
+        "boxLabel": "Box",
+        "submit": "ליצור",
+        "pausedTitle": "{name} מושהה",
+        "pausedMessage": "בתוכנית שלך אין מקום פנוי לעמית. אפשר להתחיל Pro ב-rerun.build לעמיתים ללא הגבלה.",
+        "failed": "לא ניתן ליצור את העמית"
+    }
+}

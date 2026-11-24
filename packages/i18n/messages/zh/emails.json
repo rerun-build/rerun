@@ -1,0 +1,315 @@
+{
+    "common": {
+        "footer": {
+            "tagline": "让同事替您完成工作。创建他们，看他们工作，一切尽在掌握。",
+            "copyright": "© 2026 Rerun 版权所有",
+            "unsubscribe": "退订"
+        },
+        "openConversation": "打开对话",
+        "openRerun": "打开 Rerun",
+        "useThisCoworker": "使用此同事",
+        "yourWorkspace": "您的工作区",
+        "dateAtTime": "{date} {time}（UTC）",
+        "meta": {
+            "accessEnds": "访问截止",
+            "amount": "金额",
+            "amountDue": "应付金额",
+            "archivedOn": "归档日期",
+            "archivedSince": "归档起始",
+            "coworker": "同事",
+            "coworkers": "同事",
+            "coworkersSaved": "已保存的同事",
+            "created": "创建时间",
+            "declinedOn": "拒付日期",
+            "deletedOn": "删除日期",
+            "included": "包含",
+            "lastOpened": "上次打开",
+            "pausedSince": "暂停起始",
+            "renewsOn": "续订日期",
+            "run": "运行",
+            "runs": "运行次数",
+            "savedUntil": "保存至",
+            "source": "来源",
+            "then": "之后",
+            "trialEnded": "试用已结束",
+            "trialEnds": "试用结束",
+            "workspace": "工作区",
+            "workspacePaused": "工作区已暂停"
+        }
+    },
+    "subjects": {
+        "signInCode": "您的 Rerun 验证码：{code}",
+        "publishedAccessCode": "打开 {pageTitle} 的验证码：{code}",
+        "lifetimeCode": "您的 Rerun 终身兑换码：{code}",
+        "workspaceInvite": "您受邀加入 Rerun 上的 {workspaceName}",
+        "runFailed": "{agentName} 遇到了错误",
+        "agentDone": "{agentName} 完成了一项任务",
+        "agentInfo": "{agentName} 需要您的关注",
+        "agentInput": "{agentName} 需要您的回复",
+        "appNotice": "{appName}：需要操作",
+        "incidentResolved": "{agentName} 已恢复正常",
+        "budgetExhausted": "您的 Rerun 积分已用完",
+        "onboardingResume": "您的 Rerun 设置尚未完成",
+        "agentRecommendations": "{count, plural, other {# 位适合 {company} 的 Rerun 同事}}",
+        "agentIdle": "{agentName} 已就绪，但还没有运行过",
+        "teamInvite": "邀请您的团队加入 {workspaceName}",
+        "automateAgent": "您已手动运行 {agentName}{manualRuns, plural, other { # 次}}，为下一次设置计划吧",
+        "trialStarted": "您的 {trialDays} 天 Rerun 试用已开始",
+        "trialEnding": "{daysLeft, plural, =1 {您的 Rerun 试用将于明天结束} other {您的 Rerun 试用将于 # 天后结束}}",
+        "trialFinalNoticeCard": "您的 Rerun 套餐将于 2 小时后开始",
+        "trialFinalNoticeNoCard": "您的 Rerun 试用将于 2 小时后结束，请添加银行卡以让同事继续运行",
+        "trialEndedPaymentFailed": "您的首次 Rerun 付款失败，工作区将于 24 小时后暂停",
+        "trialEndedNoCard": "您的 Rerun 试用已结束，工作区将于 2 小时后暂停",
+        "paymentFailed": "您的 Rerun 付款被拒，工作区将于 24 小时后暂停",
+        "subscriptionEnding": "{daysLeft, plural, =1 {您的 Rerun 订阅将于明天结束} other {您的 Rerun 订阅将于 # 天后结束}}",
+        "archiveExpiring": "{kind, select, sandbox {您已归档的 Rerun 沙盒将于 {date} 删除} other {您已暂停的 Rerun 工作区将于 {date} 删除}}",
+        "sandboxIdle": "除非您打开，否则您的 Rerun 沙盒将于 {date} 归档",
+        "renewalReminder": "{daysLeft, plural, =1 {您的 Rerun 套餐将于明天续订} other {您的 Rerun 套餐将于 # 天后续订}}",
+        "creatorPitch": "出售您在 Rerun 上创建的同事"
+    },
+    "reasons": {
+        "mine": "这次运行由您发起。",
+        "participant": "您在此对话中。",
+        "followed": "您关注了 {agentName} 的定时任务。",
+        "allActivity": "您会收到 {agentName} 的所有活动。",
+        "everything": "您会收到工作区中的每次运行。",
+        "workspace": "这与您的工作区有关。"
+    },
+    "signInCode": {
+        "preview": "您的 Rerun 验证码是 {code}",
+        "headingSignIn": "登录 Rerun",
+        "headingConfirm": "确认您的新邮箱",
+        "bodySignIn": "在您请求验证码的标签页中输入此验证码，或点击下方按钮立即登录。",
+        "bodyConfirm": "在您的 Rerun 账号设置中输入此验证码，即可将此邮箱设为账号邮箱。",
+        "button": "登录 Rerun",
+        "footnoteSignIn": "验证码和按钮将在{minutes, plural, other { # 分钟}}后失效，且仅能使用一次。如果这不是您的请求，请忽略此邮件。",
+        "footnoteConfirm": "验证码将在{minutes, plural, other { # 分钟}}后失效，且仅能使用一次。如果这不是您的请求，请忽略此邮件。"
+    },
+    "publishedAccessCode": {
+        "preview": "打开 {pageTitle} 的验证码：{code}",
+        "heading": "打开 {pageTitle}",
+        "body": "{workspaceName} 与您分享了此页面。在页面上输入此验证码即可打开。",
+        "footnote": "验证码将在{minutes, plural, other { # 分钟}}后失效，且仅能使用一次。如果这不是您的请求，请忽略此邮件。",
+        "untitledPage": "一个页面"
+    },
+    "lifetimeCode": {
+        "preview": "您的 Rerun 终身兑换码是 {code}",
+        "heading": "您的终身访问权限已就绪",
+        "body": "感谢您的购买。这是您的兑换码：在您的 Rerun 工作区中兑换，即可将其切换为终身套餐。",
+        "button": "兑换我的兑换码",
+        "footnote": "兑换码仅能在一个工作区使用一次。请保留此邮件，它是您的购买凭证。有疑问？直接回复此邮件即可。"
+    },
+    "workspaceInvite": {
+        "preview": "您受邀加入 Rerun 上的 {workspaceName}",
+        "heading": "您收到了邀请",
+        "bodyWithInviter": "<strong>{inviter}</strong> 邀请您加入 Rerun 上的 <strong>{workspaceName}</strong>。",
+        "bodyAnonymous": "您受邀加入 Rerun 上的 <strong>{workspaceName}</strong>。",
+        "pitch": "Rerun 用自主的 AI 同事运营您的业务。接受邀请，开始在此工作区中协作。",
+        "button": "加入 {workspaceName}",
+        "footnote": "此邀请将在 7 天后失效。如果这不在您的预期之中，请忽略此邮件。"
+    },
+    "teamInvite": {
+        "preview": "邀请您的团队加入 {workspaceName}",
+        "heading": "邀请您的团队加入 {workspaceName}",
+        "firstRun": "<strong>{agentName}</strong> 完成了首次成功运行，而您仍是此工作区中唯一的成员。",
+        "access": "如果需要其他人查看它的结果、批准它即将执行的操作，或在您不在时保持其工作流运行，他们需要拥有自己的访问权限。",
+        "button": "邀请您的团队",
+        "footnote": "由您决定谁加入。在您发送邀请之前，不会共享任何内容。",
+        "fallbackAgent": "您的同事"
+    },
+    "runFailed": {
+        "preview": "{agentName} 遇到了错误",
+        "heading": "运行失败",
+        "body": "您的同事 <strong>{agentName}</strong> 因错误而停止。"
+    },
+    "budgetExhausted": {
+        "preview": "您的 Rerun 积分已用完",
+        "heading": "Rerun 积分已用完",
+        "bodyNamed": "<strong>{workspaceName}</strong> 本月的 Rerun 积分已用完。使用 Rerun 模型的定时运行和触发运行将暂停，直到积分重置或您添加积分。",
+        "bodyUnnamed": "您工作区本月的 Rerun 积分已用完。使用 Rerun 模型的定时运行和触发运行将暂停，直到积分重置或您添加积分。",
+        "ownKeys": "使用自己 API 密钥的同事会继续运行。",
+        "button": "添加积分"
+    },
+    "agentNotification": {
+        "done": {
+            "preview": "{agentName}：任务已完成",
+            "heading": "任务已完成",
+            "body": "您的同事 <strong>{agentName}</strong> 完成了一项任务。"
+        },
+        "info": {
+            "preview": "{agentName}：需要您的关注",
+            "heading": "需要您的关注",
+            "body": "您的同事 <strong>{agentName}</strong> 希望您查看一些内容。"
+        },
+        "question": {
+            "preview": "{agentName}：同事有一个问题",
+            "heading": "同事有一个问题",
+            "body": "您的同事 <strong>{agentName}</strong> 需要您的回答才能继续。"
+        },
+        "approval": {
+            "preview": "{agentName}：需要批准",
+            "heading": "需要批准",
+            "body": "您的同事 <strong>{agentName}</strong> 正在等待您的批准。"
+        },
+        "connector": {
+            "preview": "{agentName}：应用设置",
+            "heading": "应用设置",
+            "body": "您的同事 <strong>{agentName}</strong> 需要您连接一项服务。"
+        }
+    },
+    "incidentResolved": {
+        "preview": "{agentName} 的{source}已恢复正常",
+        "heading": "已恢复正常",
+        "body": "<strong>{agentName}</strong> 的{source}已再次正常运行。除非它再次出错，否则您不会再收到相关邮件。",
+        "sources": {
+            "schedule": "计划“{slug}”",
+            "anySchedule": "一个定时任务",
+            "trigger": "触发器“{slug}”",
+            "anyTrigger": "一个触发器",
+            "conversation": "一个对话"
+        }
+    },
+    "agentIdle": {
+        "preview": "{agentName} 已就绪，但还没有运行过",
+        "heading": "{agentName} 还没有运行过",
+        "body": "您创建了 <strong>{agentName}</strong>，但它从未开始过运行。先给它一个小任务：一分钟就能读完的结果，能在您设置计划之前告诉您配置是否正确。",
+        "button": "打开 {agentName}",
+        "footnote": "打开此页面不会启动运行。",
+        "createdHoursAgo": "{count, plural, other {# 小时前}}",
+        "createdYesterday": "昨天",
+        "createdDaysAgo": "{count, plural, other {# 天前}}"
+    },
+    "agentRecommendations": {
+        "preview": "{count, plural, other {# 位适合 {company} 的 Rerun 同事}}",
+        "yourCompany": "您的公司",
+        "heading": "{company} 从哪里开始",
+        "bodyWithSite": "您在设置时分享了 <strong>{domain}</strong>。根据其中描述的重复性工作和您告诉我们的常用工具，以下是最适合起步的配置。",
+        "bodyWithoutSite": "根据您告诉我们的常用工具，以下是最适合起步的配置。",
+        "button": "浏览应用库",
+        "footnote": "在您选择一个并检查其配置之前，不会运行任何内容。"
+    },
+    "automateAgent": {
+        "preview": "您已手动启动 {agentName}{manualRuns, plural, other { # 次}}",
+        "heading": "让 {agentName} 自动启动",
+        "body": "您在{period}亲自启动了 <strong>{agentName}</strong> <strong>{manualRuns, plural, other {# 次}}</strong>，每次都顺利完成。",
+        "workflowWorks": "这个工作流行之有效。设置计划后，它会完成同样的工作，无需您打开应用来启动。",
+        "button": "为下次运行设置计划",
+        "footnote": "保存前您会先检查计划，并且可以随时暂停。",
+        "periods": {
+            "lastWeek": "过去一周",
+            "lastTwoWeeks": "过去两周"
+        }
+    },
+    "onboardingResume": {
+        "preview": "您的 Rerun 设置尚未完成",
+        "headingNamed": "{firstName}，您的设置尚未完成",
+        "heading": "您的设置尚未完成",
+        "leftEarly": "您的工作区已创建，但您在设置完成前离开了。只需大约一分钟：您的网站，以及您已经在用的工具。",
+        "whyItMatters": "Rerun 会根据这两个答案为您推荐同事。没有它们，您只会看到通用列表。",
+        "button": "完成设置",
+        "footnote": "当您进入工作区时，这些问题会自动重新打开。"
+    },
+    "archiveExpiring": {
+        "preview": "{kind, select, sandbox {您已归档的 Rerun 沙盒将于 {date} 删除} other {您已暂停的 Rerun 工作区将于 {date} 删除}}",
+        "heading": "{kind, select, sandbox {您已归档的沙盒将于 {date} 删除} other {您已暂停的工作区将于 {date} 删除}}",
+        "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong> 自 <strong>{pausedOn}</strong> 起已归档。其同事及他们知道的一切仍然保存着，但这是保存的最后一周。} other {<strong>{workspaceName}</strong> 自 <strong>{pausedOn}</strong> 起已暂停。其同事及他们知道的一切仍然保存着，但这是保存的最后一周。}}",
+        "statusUnnamed": "{kind, select, sandbox {您的工作区自 <strong>{pausedOn}</strong> 起已归档。其同事及他们知道的一切仍然保存着，但这是保存的最后一周。} other {您的工作区自 <strong>{pausedOn}</strong> 起已暂停。其同事及他们知道的一切仍然保存着，但这是保存的最后一周。}}",
+        "deletion": "{kind, select, sandbox {<strong>{date}</strong>，保存的副本将被永久删除，且无法恢复。请在此之前打开沙盒并申请重新激活，即可原样找回。} other {<strong>{date}</strong>，保存的副本将被永久删除，且无法恢复。在此之前订阅，您的工作区将原样恢复。}}",
+        "button": "{kind, select, sandbox {打开我的沙盒} other {恢复我的工作区}}",
+        "footnote": "{kind, select, sandbox {这是关于此沙盒的最后一封邮件。} other {这是关于此工作区的最后一封邮件。}}"
+    },
+    "creatorInvite": {
+        "previewOutreach": "根据您公开的作品创建。领取您的个人资料和沙盒。",
+        "previewApplication": "您已通过。领取您的沙盒，开始创建模板。",
+        "headingOutreach": "恭喜您，{firstName}",
+        "headingApplication": "您已通过，{firstName}",
+        "introOutreach": "您的个人资料刚刚被加入我们的专业人士目录，这些专业人士负责设计和部署 AI 同事。我们根据您公开的作品预先填写了您的资料。",
+        "introApplication": "我们审核了您加入 Rerun 创作者计划的申请，非常欢迎您的加入。",
+        "cardAlt": "{firstName} 的 Rerun 专家卡片",
+        "sandbox": "点击下方链接即可创建您的创作者账号并获得一个沙盒：一个不限量的工作区，您可以在其中创建同事、将其保存为模板并发布到市场。创作者可以获得其发布的每个付费模板的收入。",
+        "button": "领取我的 Box",
+        "conditions": "沙盒开放前，您需要接受计划条款，只需一分钟。您的公开资料随时可以在应用中自行编辑。",
+        "fallbackLink": "如果按钮无法使用，请将以下链接粘贴到浏览器中：<link>{url}</link>",
+        "signoff": "Rerun 团队",
+        "unsubscribe": "删除我的个人资料"
+    },
+    "creatorPitch": {
+        "preview": "出售您在 Rerun 上创建的同事",
+        "headingNamed": "{firstName}，出售您的作品",
+        "heading": "出售您的作品",
+        "bodyWithAgent": "您在 Rerun 中创建了 <strong>{agentName}</strong>。如果它也能解决其他人的问题，您可以将其打包成模板，让他们一键安装。",
+        "bodyWithoutAgent": "您在 Rerun 中创建了可用的同事。如果其中某位也能解决其他人的问题，您可以将其打包成模板，让他们一键安装。",
+        "creator": "作为 Rerun 创作者，您来定价，我们负责结账和付款，买家拿到的是已经能运行的配置。",
+        "button": "成为创作者",
+        "footnoteWithAgent": "从 {agentName} 开始，或从零为市场创建新作品。",
+        "footnoteWithoutAgent": "从您已有的同事开始，或从零为市场创建新作品。"
+    },
+    "paymentFailed": {
+        "preview": "您的 Rerun 付款被拒，工作区将于 {pausedAt} 暂停",
+        "heading": "您的付款被拒",
+        "declined": "<strong>{workspace}</strong> 的续订付款于 <strong>{date}</strong> 未能完成。可能只是您的银行需要您确认一下。",
+        "declinedWithAmount": "<strong>{workspace}</strong> 的续订付款 <strong>{amount}</strong> 于 <strong>{date}</strong> 未能完成。可能只是您的银行需要您确认一下。",
+        "consequences": "您的工作区会继续运行至 <strong>{pausedAt}</strong>。之后它将被<strong>暂停</strong>，您的同事也会停止工作。不会删除任何内容：您的同事及他们知道的一切会保存至 <strong>{keptUntil}</strong>。支付账单后一切照旧，套餐不变。",
+        "button": "支付账单",
+        "footnote": "我们会在接下来几天再次尝试扣款。只要其中一次成功，您的工作区就会继续运行；如果已经暂停，也会自动恢复。"
+    },
+    "renewalReminder": {
+        "preview": "您的 Rerun 套餐将于 {date} 续订",
+        "heading": "您的套餐将于{daysLeft, plural, =1 {一天} other { # 天}}后续订",
+        "body": "您要求我们在 <strong>{workspace}</strong> 的套餐续订前提醒您。套餐将于 <strong>{date}</strong> 续订，届时将从您绑定的银行卡扣款。在此之前，您的同事会照常运行。",
+        "button": "查看我的套餐",
+        "footnote": "想取消？请在 {date} 之前通过工作区菜单中的“账单”取消，您的银行卡将不会再被扣款。"
+    },
+    "sandboxIdle": {
+        "preview": "除非您打开，否则您的 Rerun 沙盒将于 {date} 归档",
+        "heading": "您的沙盒将于 {date} 归档",
+        "unused": "您的 Rerun 沙盒自 <strong>{lastActive}</strong> 起未被打开。沙盒会为您保持一台机器运行，因此闲置 30 天的沙盒会被归档以释放资源。",
+        "openBefore": "在 <strong>{date}</strong> 之前打开沙盒，一切照旧。在此之后，其同事和数据会被保存，但要找回需要请我们重新激活。",
+        "button": "打开我的沙盒"
+    },
+    "subscriptionEnding": {
+        "preview": "您的 Rerun 订阅将于 {date} 结束",
+        "heading": "{daysLeft, plural, =1 {您的订阅将于明天结束} other {您的订阅将于 # 天后结束}}",
+        "cancelled": "<strong>{workspace}</strong> 的订阅已取消，将于 <strong>{date}</strong> 结束。届时您的同事将停止工作，工作区将被暂停。",
+        "nothingDeleted": "不会删除任何内容。您的同事及其记忆、文件和历史记录会保存至 <strong>{keptUntil}</strong>，重新订阅即可原样恢复。",
+        "button": "保留我的订阅",
+        "footnote": "改变主意了？在 {date} 之前重新激活，一切都会继续运行，无需恢复。"
+    },
+    "trialEnded": {
+        "preview": "{reason, select, payment_failed {您的首次 Rerun 付款失败，工作区将于 {pausedAt} 暂停} other {您的 Rerun 试用已结束，工作区将于 {pausedAt} 暂停}}",
+        "heading": "{reason, select, payment_failed {您的首次付款失败} other {您的试用已结束}}",
+        "ended": "{reason, select, payment_failed {<strong>{workspace}</strong> 的试用已于 <strong>{date}</strong> 结束，首次扣款未能完成。可能只是您的银行需要您确认一下。} other {<strong>{workspace}</strong> 的试用已于 <strong>{date}</strong> 结束，您的同事已停止工作。}}",
+        "paused": "{reason, select, payment_failed {您的工作区将于 <strong>{pausedAt} 暂停</strong>。不会删除任何内容：您的同事及他们知道的一切会保存至 <strong>{keptUntil}</strong>。在暂停前支付账单即可继续运行，或在此之前随时订阅，一切都会原样恢复。} other {您的工作区将于 <strong>{pausedAt} 暂停</strong>。不会删除任何内容：您的同事及他们知道的一切会保存至 <strong>{keptUntil}</strong>。在此之前随时订阅，一切都会原样恢复。}}",
+        "button": "{reason, select, payment_failed {支付账单} other {开始我的套餐}}",
+        "footnote": "现在不是时候？您可以先放着，不会再产生任何费用。您的工作区会保存至 {keptUntil}。"
+    },
+    "trialEnding": {
+        "preview": "您的 Rerun 试用将于 {date} 结束",
+        "heading": "您的试用将于{daysLeft, plural, =1 {一天} other { # 天}}后结束",
+        "endsOn": "<strong>{workspace}</strong> 的试用将于 <strong>{date}</strong> 结束。此后您的套餐每月从绑定的银行卡扣款。如果没有绑定银行卡，您的同事将停止运行，工作区将在试用结束 2 小时后暂停。",
+        "nothingDeleted": "不会删除任何内容：您的同事及他们知道的一切会保存至 {keptUntil}，订阅后即可原样恢复。",
+        "button": "开始我的套餐",
+        "footnote": "不打算继续？请在 {date} 之前通过工作区菜单中的“账单”取消，不会产生任何费用。"
+    },
+    "trialFinalNotice": {
+        "previewCard": "您的 Rerun 套餐将于 {date} 开始",
+        "previewNoCard": "请在 {date} 之前添加银行卡，让您的 Rerun 同事继续运行",
+        "heading": "您的试用将于 2 小时后结束",
+        "bodyCard": "<strong>{workspace}</strong> 的试用将于 <strong>{date}</strong> 结束。届时您的套餐开始生效，并从绑定的银行卡扣除首月费用。您的同事会继续运行，您无需任何操作。",
+        "noCard": "<strong>{workspace}</strong> 的试用将于 <strong>{date}</strong> 结束，且尚未绑定银行卡。",
+        "noCardPause": "没有套餐，您的同事将在试用结束时停止工作，工作区将于 <strong>{pausedAt} 暂停</strong>。不会删除任何内容：您的同事及他们知道的一切会保存至 {keptUntil}，订阅后即可原样恢复。",
+        "buttonCard": "查看我的套餐",
+        "buttonNoCard": "开始我的套餐",
+        "footnoteCard": "不打算继续？请在 {date} 之前通过工作区菜单中的“账单”取消，您的银行卡将不会被扣款。"
+    },
+    "trialStarted": {
+        "preview": "您的 {trialDays} 天 Rerun 试用已开始",
+        "heading": "您的试用已开始",
+        "body": "<strong>{workspace}</strong> 正在进行 {trialDays} 天免费试用。您的同事正常运行，计划照常触发，今天不会产生任何费用。",
+        "included": "{coworkers, plural, other {# 位同事}}和{credits, plural, other { # 积分}}",
+        "perMonth": "{price}/月",
+        "button": "打开工作区",
+        "footnoteCard": "您的套餐将于 {date} 自动开始：届时从您添加的银行卡扣除 {price}，之后每月扣款。不打算继续？请在 {date} 之前通过工作区菜单中的“账单”取消，不会产生任何费用。",
+        "footnoteNoCard": "试用无需银行卡。若要在 {date} 之后继续使用，请通过工作区菜单中的“账单”添加银行卡，您的套餐将以 {price}/月开始。如果不添加，您的同事将停止工作，且不会产生任何费用。"
+    }
+}

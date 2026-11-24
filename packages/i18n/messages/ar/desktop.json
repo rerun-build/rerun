@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "سطح مكتب {name}",
+        "titleFallback": "سطح المكتب",
+        "description": "الشاشة التي يعمل عليها هذا الزميل. ما تفعله هنا يجده لاحقًا.",
+        "takeoverDescription": "أنت الآن في متصفح زميلك. اضغط «تم» عندما يمكنه المتابعة.",
+        "takeoverHoldsBrowser": "متصفح زميلك مفتوح بالفعل لهذا الطلب.",
+        "clipboardDenied": "لم يسمح متصفحك لـ Rerun بقراءة الحافظة.",
+        "disconnectedDescription": "انقطع الاتصال بالجهاز. لم يُفقد أي شيء عليه.",
+        "reconnect": "إعادة الاتصال",
+        "tryAgain": "إعادة المحاولة"
+    },
+    "screen": {
+        "connecting": "جارٍ الاتصال بالشاشة...",
+        "unavailable": "الشاشة غير متاحة",
+        "wentAway": "انقطعت الشاشة",
+        "resize": "تغيير حجم الشاشة"
+    },
+    "notch": {
+        "browser": "المتصفح",
+        "closeBrowser": "إغلاق المتصفح",
+        "files": "الملفات",
+        "terminal": "الطرفية",
+        "paste": "لصق",
+        "done": "تم",
+        "close": "إغلاق"
+    },
+    "screenCard": {
+        "openBrowser": "فتح المتصفح",
+        "takeControl": "تولّي التحكم"
+    }
+}

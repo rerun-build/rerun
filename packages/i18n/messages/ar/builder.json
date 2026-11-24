@@ -1,0 +1,134 @@
+{
+    "contextMenu": {
+        "newCoworker": "زميل جديد",
+        "openChat": "فتح المحادثة",
+        "rename": "إعادة تسمية",
+        "settings": "الإعدادات",
+        "share": "مشاركة",
+        "duplicate": "تكرار",
+        "moveToBox": "نقل إلى Box",
+        "noOtherBox": "لا يوجد Box آخر تديره",
+        "delete": "حذف",
+        "manageAccess": "إدارة الوصول",
+        "boxAccessAdminOnly": "يمكن للمسؤول فقط تغيير من يصل إلى Box",
+        "manageReason": "يمكن للمسؤول أو مدير هذا Box فقط القيام بذلك",
+        "untitledBox": "Box بلا عنوان",
+        "thisCoworker": "هذا الزميل"
+    },
+    "toolbar": {
+        "placementPrompt": "انقر على مربع لوضع {name}",
+        "placementPromptDefault": "انقر على مربع لوضع زميلك",
+        "placementProgress": "الزميل {current} من {total}",
+        "newCoworker": "زميل جديد",
+        "template": "قالب",
+        "create": "إنشاء",
+        "search": "بحث",
+        "unplaced": "{count} غير موضوع"
+    },
+    "isoBoard": {
+        "boxCta": "استكشف قوالب {name}",
+        "boxCtaFallback": "استكشف القوالب",
+        "recruitFirst": "انقر لتوظيف زميلك الأول",
+        "createBox": "انقر لإنشاء Box",
+        "preparingSandbox": "جارٍ تجهيز بيئتك التجريبية…",
+        "settingUpTemplate": "جارٍ إعداد {title}…",
+        "settingUpCoworker": "جارٍ إعداد زميلك…",
+        "installTemplate": "انقر لتثبيت {title}",
+        "addBoxOnSide": "أضف Box على هذا الجانب"
+    },
+    "discoveries": {
+        "statusDigging": "نتعرّف على {name}",
+        "statusDone": "{name} في لمحة",
+        "found": "تم العثور على {count}",
+        "sources": {
+            "website": "موقعك",
+            "domain": "نطاقك",
+            "registry": "السجل العام",
+            "web": "الويب"
+        },
+        "teasers": {
+            "profile": "جارٍ قراءة {domain}…",
+            "stack": "نلقي نظرة على ما وراء {domain}…",
+            "dns": "نتحقق من طريقة إدارتك للبريد…",
+            "registry": "نبحث عنك في السجل العام…",
+            "site": "جارٍ قراءة كل صفحات {domain}…",
+            "search": "نبحث في الويب عن {name}…",
+            "linkedinPerson": "نبحث عنك على LinkedIn…",
+            "linkedinCompany": "نبحث عن {name} على LinkedIn…",
+            "googleBusiness": "جارٍ قراءة تقييماتك على Google…",
+            "catalog": "نتصفح متجر {domain}…",
+            "synthesis": "نجمع كل شيء معًا…"
+        },
+        "cards": {
+            "identity": {
+                "title": "وجدناك"
+            },
+            "audience": {
+                "title": "لمن تبيع"
+            },
+            "tools": {
+                "title": "أدوات رصدناها"
+            },
+            "mail": {
+                "title": "بريدك الوارد",
+                "runsOn": "يعمل البريد على <b>{provider}</b>"
+            },
+            "social": {
+                "title": "أين تظهر"
+            },
+            "brand": {
+                "title": "علامتك التجارية"
+            },
+            "registry": {
+                "title": "في السجلات",
+                "since": "منذ <b>{year}</b>",
+                "people": "<b>{headcount}</b> موظف"
+            },
+            "person": {
+                "title": "هل هذا أنت يا {firstName}؟"
+            },
+            "linkedin": {
+                "title": "صفحتك على LinkedIn",
+                "followers": "متابع",
+                "team": "في الفريق"
+            },
+            "reviews": {
+                "title": "ماذا يقول العملاء",
+                "count": "<n>{count}</n> تقييم على Google"
+            },
+            "products": {
+                "title": "ما تبيعه"
+            },
+            "competitors": {
+                "title": "من تنافس"
+            },
+            "customers": {
+                "title": "من يشتري بالفعل"
+            },
+            "brain": {
+                "title": "Company Brain",
+                "pages": "{count, plural, zero {لا صفحات} one {صفحة واحدة} two {صفحتان} few {# صفحات} many {# صفحة} other {# صفحة}} يقرؤها زملاؤك قبل أن يبدؤوا",
+                "productsAndCompetitors": "+ {products, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}}، {competitors, plural, zero {لا منافسين} one {منافس واحد} two {منافسان} few {# منافسين} many {# منافسًا} other {# منافس}}",
+                "productsOnly": "+ {products, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}}",
+                "competitorsOnly": "+ {competitors, plural, zero {لا منافسين} one {منافس واحد} two {منافسان} few {# منافسين} many {# منافسًا} other {# منافس}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "تم إنشاء \"{name}\" لكنه غير نشط",
+        "createdInactiveHint": "لا تتضمن خطتك مكانًا شاغرًا لزميل. فعّله من لوحة الزميل.",
+        "addFailed": "تعذّرت إضافة هذا الزميل",
+        "lookFailed": "تعذّر تغيير مظهر هذا الزميل",
+        "duplicateFailed": "تعذّر تكرار هذا الزميل",
+        "importFailed": "تعذّر استيراد هذا القالب",
+        "importInterrupted": "تمت مقاطعة الاستيراد",
+        "importInterruptedHint": "تحقق من جهازك قبل الاستيراد مجددًا.",
+        "moveAgentFailed": "تعذّر نقل هذا الزميل",
+        "moveBoxFailed": "تعذّر نقل هذا Box",
+        "deleteBoxFailed": "تعذّر حذف هذا Box",
+        "checkConnection": "تحقق من اتصالك وحاول مجددًا.",
+        "shareLinkGone": "رابط المشاركة هذا لم يعد متاحًا",
+        "prepareBoxFailed": "تعذّر تجهيز Box الخاص بك",
+        "startCoworkerFailed": "تعذّر تشغيل زميلك"
+    }
+}

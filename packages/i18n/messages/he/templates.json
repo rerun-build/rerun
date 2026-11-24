@@ -1,0 +1,558 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" כבר לא זמינה",
+        "buyFailed": "לא ניתן היה לרכוש את \"{title}\"",
+        "alreadyOnBoard": "\"{title}\" כבר נמצאת בלוח שלך",
+        "alreadyOnBoardHint": "העמיתים שלה נפתחים במקום שבו השארת אותם.",
+        "notImported": "לא ניתן היה לייבא את {name}.",
+        "inactiveCount": "{count, plural, one {אחד מהם לא פעיל: בתוכנית שלך אין מקום פנוי לעמית.} two {שניים מהם לא פעילים: בתוכנית שלך אין מקום פנוי לעמית.} other {# מהם לא פעילים: בתוכנית שלך אין מקום פנוי לעמית.}}",
+        "landed": "{count, plural, one {עמית אחד מ-\"{title}\" נחת בלוח שלך} two {שני עמיתים מ-\"{title}\" נחתו בלוח שלך} other {# עמיתים מ-\"{title}\" נחתו בלוח שלך}}",
+        "openOne": "פתח אחד מהם והתחל את ההתקנה שלו: הוא יחבר איתך את מה שהוא צריך.",
+        "landedInactive": "הוא נחת לא פעיל: בתוכנית שלך אין מקום פנוי לעמית.",
+        "agentLanded": "\"{name}\" נחת בלוח שלך",
+        "openIt": "פתח אותו והתחל את ההתקנה שלו: הוא יחבר איתך את מה שהוא צריך.",
+        "webhooksMoved": "{count, plural, one {Webhook אחד קיבל כתובת URL חדשה: כוון את השירותים שלך לכתובת של העותק.} two {שני Webhooks קיבלו כתובת URL חדשה: כוון את השירותים שלך לכתובת של העותק.} other {# Webhooks קיבלו כתובת URL חדשה: כוון את השירותים שלך לכתובת של העותק.}}",
+        "schedulesDoubled": "{count, plural, one {תזמון אחד רץ גם בעותק. כבה אותו אם העבודה לא אמורה לקרות פעמיים.} two {שני תזמונים רצים גם בעותק. כבה אותם אם העבודה לא אמורה לקרות פעמיים.} other {# תזמונים רצים גם בעותק. כבה אותם אם העבודה לא אמורה לקרות פעמיים.}}",
+        "copyReady": "הוא כולל את כל מה שהיה במקור ומוכן לרוץ.",
+        "prepareBoxFailed": "לא ניתן היה להכין את ה-Box שלך",
+        "settingUp": "מגדירים את \"{title}\"",
+        "settingUpHint": "העמיתים שלך יופיעו בלוח בעוד רגע.",
+        "setUpFailed": "לא ניתן היה להגדיר את \"{title}\""
+    },
+    "price": {
+        "free": "חינם",
+        "monthly": "{amount} לחודש",
+        "useForFree": "להשתמש בחינם",
+        "hire": "{count, plural, one {לגייס את העמית הזה · {price}} two {לגייס את שני העמיתים האלה · {price}} other {לגייס את # העמיתים האלה · {price}}}",
+        "hireCard": "לגייס · {price}",
+        "purchased": "נרכשה",
+        "expired": "פג תוקף",
+        "install": "להתקין",
+        "renew": "לחדש"
+    },
+    "connectors": {
+        "none": "לא נדרשות אפליקציות",
+        "label": "אפליקציות: {names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, one {תבנית אחת} two {שתי תבניות} other {# תבניות}}",
+        "rerunTeam": "צוות Rerun",
+        "verified": "יוצר מאומת"
+    },
+    "spotlight": {
+        "viewProfile": "לצפות בפרופיל של {name}",
+        "workWith": "לעבוד עם {name}",
+        "badge": "יוצר השבוע",
+        "website": "אתר",
+        "socialLabel": "{name} ב-{network}",
+        "openTemplate": "לפתוח תבנית",
+        "recognizedFor": "ידוע בזכות"
+    },
+    "about": {
+        "showMore": "להציג עוד",
+        "showLess": "להציג פחות"
+    },
+    "agentCard": {
+        "comesWith": "כולל",
+        "apps": "אפליקציות",
+        "skills": "מיומנויות",
+        "schedules": "משימות מתוזמנות",
+        "webhooks": "Webhooks",
+        "more": "+{count} נוספים"
+    },
+    "detail": {
+        "price": "מחיר",
+        "coworkers": "עמיתים",
+        "useCases": "שימושים",
+        "alsoDoes": "{coworker} עושה גם",
+        "apps": "אפליקציות",
+        "setupTime": "זמן הגדרה",
+        "minutes": "{minutes} דק׳",
+        "category": "קטגוריה",
+        "about": "אודות",
+        "whatYouNeed": "מה תצטרך",
+        "carousel": "עמיתים בתבנית הזו",
+        "securityTitle": "אבטחה",
+        "securityBody": "פרטי הגישה והמידע הפרטי הוסרו מהתבנית הזו. האפליקציות מגיעות מנותקות, ואתה מאשר אותן אחרי הייבוא.",
+        "cancelAnytime": "אפשר לבטל בכל עת מהגדרות החיוב."
+    },
+    "library": {
+        "title": "ספריית תבניות",
+        "templates": "תבניות",
+        "hideDetails": "להסתיר פרטים",
+        "newCoworker": "עמית חדש",
+        "createCoworker": "ליצור עמית חדש",
+        "viewProfile": "לצפות בפרופיל",
+        "filters": {
+            "app": "אפליקציה",
+            "status": "סטטוס"
+        },
+        "search": {
+            "placeholder": "לחפש תבניות",
+            "clear": "לנקות חיפוש"
+        },
+        "mode": {
+            "coworkers": "עמיתים",
+            "use-cases": "שימושים"
+        },
+        "nav": {
+            "discover": "גילוי",
+            "all": "הכול"
+        },
+        "heading": {
+            "coworkers": "{count, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}}",
+            "useCases": "{count, plural, one {שימוש אחד} two {שני שימושים} other {# שימושים}}",
+            "results": "תוצאות עבור “{query}”",
+            "discoverEmpty": "התבניות שאתה יוצר מופיעות כאן.",
+            "discover": "עמיתים מוכנים, שנבנו על ידי אנשים שמפעילים אותם.",
+            "creator": "יוצר"
+        },
+        "discover": {
+            "seeAll": "לראות הכול",
+            "creators": "יוצרים",
+            "creatorsSubtitle": "האנשים שמאחורי התבניות.",
+            "allCreators": "כל היוצרים",
+            "forYou": "בשבילך",
+            "forYouSubtitle": "מותאמות לתחום שלך ולאפליקציות שבהן אתה משתמש.",
+            "featured": "מומלצות",
+            "featuredSubtitle": "הגדרות שנבחרו בקפידה ושווה להציץ בהן קודם.",
+            "justAdded": "נוספו עכשיו",
+            "justAddedSubtitle": "התבניות האחרונות שפורסמו ב-Rerun."
+        },
+        "empty": {
+            "filtered": "אין תבנית שמתאימה למסננים האלה",
+            "none": "עדיין אין כאן תבנית",
+            "selfHosted": "גייס עמית, ואז שמור אותו כתבנית.",
+            "cloud": "בנה אותה בעצמך ומכור אותה ב-Rerun.",
+            "become": "להפוך למומחה Rerun"
+        }
+    },
+    "scratch": {
+        "title": "להתחיל מאפס",
+        "description": "בלי תבנית. תן שם לעמית שלך והנח אותו על הרשת."
+    },
+    "section": {
+        "back": "חזרה לכל התבניות",
+        "filterBy": "לסנן לפי {title}"
+    },
+    "authoring": {
+        "prefill": "מילוי קסם",
+        "altText": "לכתוב טקסט חלופי",
+        "content": {
+            "title": "תוכן",
+            "tagline": "שורת תיאור",
+            "taglineHelp": "{count}/{limit}, משפט אחד.",
+            "taglinePlaceholder": "מאתר לקוחות פוטנציאליים, כותב את הפנייה הראשונה וממשיך לעקוב עד שהם עונים.",
+            "longDescription": "תיאור מלא",
+            "longDescriptionPlaceholder": "מה התבנית הזו עושה, למי היא מיועדת ומה היא צריכה כדי לרוץ."
+        },
+        "faq": {
+            "title": "שאלות נפוצות",
+            "hint": "מוצג בדף הציבורי ונשלח למנועי חיפוש כנתונים מובנים של שאלות נפוצות.",
+            "empty": "עדיין אין שאלות. מלא אותן אוטומטית, או הוסף אחת ידנית.",
+            "question": "שאלה",
+            "questionPlaceholder": "אילו חשבונות אני צריך לחבר?",
+            "answer": "תשובה",
+            "answerPlaceholder": "שניים או שלושה משפטים שעונים עליה בפני עצמם.",
+            "remove": "להסיר את השאלה הזו",
+            "add": "להוסיף שאלה"
+        },
+        "media": {
+            "title": "מדיה",
+            "videoUrl": "כתובת URL של סרטון",
+            "videoPlaceholder": "https://youtube.com/watch?v=… או קישור Loom",
+            "ogImage": "תמונת OG חלופית",
+            "ogImagePlaceholder": "להשאיר ריק כדי ליצור אחת",
+            "ogImageHelp": "להגדיר רק עבור כרטיס שיתוף מותאם אישית.",
+            "gallery": "גלריה",
+            "galleryHelp": "אופציונלי: הכרטיסים מציגים במקום זאת את לוח העמיתים. התמונות האלה ממחישות את דף הפרטים, הראשונה מובילה ותמונה שנוצרה אוטומטית נוספת אחריה. יש לשמור כדי שיישמרו. מומלץ להוסיף טקסט חלופי: התמונות מופיעות בדף שעובר אינדוקס.",
+            "altCover": "טקסט חלופי (תמונת שער)",
+            "alt": "טקסט חלופי",
+            "cover": "תמונת שער",
+            "remove": "להסיר",
+            "dropOverlay": "שחרר תמונות",
+            "uploading": "מעלה…",
+            "drop": "שחרר תמונות כאן או לחץ כדי לבחור"
+        },
+        "meta": {
+            "title": "מטא-נתונים",
+            "titleLabel": "כותרת",
+            "titlePlaceholder": "SDR לפניות יוצאות",
+            "slug": "Slug",
+            "category": "קטגוריה",
+            "setupTime": "זמן הגדרה (בדקות)",
+            "setupTimeHelp": "מוצג בדף הציבורי. היה כן לגבי הגדרת האפליקציות.",
+            "tags": "תגיות",
+            "tagsPlaceholder": "פניות, מכירות, אוטומציה",
+            "tagsHelp": "מופרדות בפסיקים. משמשות לסינון בדף הציבורי.",
+            "metaTitle": "כותרת מטא",
+            "metaTitlePlaceholder": "{title}, תבנית עמית AI",
+            "metaTitleDefault": "ברירת המחדל היא הכותרת",
+            "metaDescription": "תיאור מטא",
+            "metaDescriptionHelp": "{count}/{limit}, בין {min} ל-{limit} תווים כדי לפרסם.",
+            "metaDescriptionPlaceholder": "משפט או שניים לתוצאות החיפוש."
+        }
+    },
+    "capture": {
+        "failedRequest": "הבקשה לא עברה. בדוק את החיבור ונסה שוב.",
+        "steps": {
+            "select": {
+                "title": "ללכוד עמיתים",
+                "description": "בחר את העמיתים שהתיקייה שלהם תהפוך לתבנית הזו."
+            },
+            "review": {
+                "title": "בדיקת אבטחה",
+                "description": "בדוק מה כל עמית נושא איתו, ואז אשר לפני הלכידה."
+            },
+            "done": {
+                "title": "נלכדו",
+                "description": "הארכיונים נשמרו והתבנית מתארת עכשיו את העמיתים האלה."
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "תן שם לתבנית שלך",
+                "description": "הטיוטה נשמרת מיד כשאתה מאשר.",
+                "points": {
+                    "private": "פרטית עד לפרסום",
+                    "signed": "חתומה בשמך"
+                }
+            },
+            "select": {
+                "title": "בחר את העמיתים שלך",
+                "description": "תיקיית העמית נשמרת כתמונת מצב כפי שהיא.",
+                "points": {
+                    "snapshot": "תמונת מצב, לא קישור",
+                    "edits": "שינויים מאוחרים יותר נשארים אצלך"
+                }
+            },
+            "review": {
+                "title": "בדיקת אבטחה",
+                "description": "הסודות מוסרים לפני שמשהו יוצא מה-Box.",
+                "points": {
+                    "env": "ערכי הסביבה נמחקים",
+                    "apps": "האפליקציות מאופסות",
+                    "scan": "סריקת סודות בקבצים ובנתיבים",
+                    "memories": "הזיכרונות נשארים מאחור"
+                }
+            },
+            "done": {
+                "title": "לכידה",
+                "description": "הארכיון נשמר באופן פרטי ומתאר את התבנית.",
+                "points": {
+                    "stored": "שמור הרחק מהישג יד",
+                    "warnings": "אזהרות, לא הפתעות"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "אין עמית ללכידה",
+            "emptyDescription": "צור קודם עמית ב-Box, ואז חזור לכאן.",
+            "box": "Box",
+            "boxPlaceholder": "בחר את ה-Box שמכיל את העמיתים",
+            "boxFallback": "Box",
+            "coworkers": "עמיתים",
+            "coworkersIn": "עמיתים ב-{box}",
+            "search": "לחפש לפי שם או handle",
+            "selected": "{selected} מתוך {total} נבחרו",
+            "clear": "לנקות",
+            "selectAll": "לבחור הכול",
+            "noMatch": "אין עמית שמתאים לחיפוש הזה."
+        },
+        "review": {
+            "reviewed": "{approved} מתוך {total, plural, one {עמית אחד} two {שני עמיתים} other {# עמיתים}} נבדקו",
+            "files": "{kept} מתוך {total} קבצים, {size}",
+            "tools": "כלים",
+            "apps": "אפליקציות",
+            "skills": "מיומנויות",
+            "schedules": "תזמונים",
+            "oneShot": "חד-פעמי",
+            "webhooks": "Webhooks",
+            "memories": "זיכרונות",
+            "memoriesNote": "{count} נשמרו, לא נכללים בארכיון כברירת מחדל",
+            "removed": "הוסר ביציאה",
+            "toProvide": "יש לספק שוב בעותק",
+            "envKeys": "מפתחות סביבה",
+            "flagged": "קבצים מסומנים",
+            "flaggedKept": "{kept} מתוך {total} קבצים שנראה שהם מכילים פרטי גישה עדיין כלולים. הם יעברו בתוך הארכיון.",
+            "flaggedOut": "{count, plural, one {קובץ אחד נראה כאילו הוא מכיל פרטי גישה. הוא נשאר מחוץ לארכיון.} two {שני קבצים נראים כאילו הם מכילים פרטי גישה. הם נשארים מחוץ לארכיון.} other {# קבצים נראים כאילו הם מכילים פרטי גישה. הם נשארים מחוץ לארכיון.}}",
+            "install": "התקנה",
+            "filesGroup": "קבצים",
+            "hideFolder": "להסתיר את התיקייה",
+            "showFolder": "להציג את התיקייה",
+            "kept": "{kept} מתוך {total} נשמרו",
+            "confirm": "בדקתי מה העמית הזה נושא איתו",
+            "answerFirst": "ענה קודם על שאלת ההתקנה למעלה.",
+            "writeFirst": "כתוב קודם את הוראות ההתקנה למעלה.",
+            "flaggedTravel": "{count} קבצים מסומנים יעברו בתוך הארכיון.",
+            "nothingSecret": "שום דבר ברשימה הזו אינו סוד שאסור לשלוח.",
+            "more": "+{count} נוספים"
+        },
+        "tree": {
+            "collapse": "לכווץ",
+            "expand": "להרחיב",
+            "flagged": "{count} מסומנים"
+        },
+        "done": "{count, plural, one {עמית אחד נלכד. המיומנויות, התזמונים והאפליקציות שלו מתארים עכשיו את התבנית הזו.} two {שני עמיתים נלכדו. המיומנויות, התזמונים והאפליקציות שלהם מתארים עכשיו את התבנית הזו.} other {# עמיתים נלכדו. המיומנויות, התזמונים והאפליקציות שלהם מתארים עכשיו את התבנית הזו.}}",
+        "panel": {
+            "inspect": "לבדוק {count, plural, =0 {עמיתים} one {עמית אחד} two {שני עמיתים} other {# עמיתים}}",
+            "reviewEach": "בדוק כל סוכן כדי לאפשר את הלכידה ({approved}/{total})",
+            "back": "חזרה",
+            "capture": "ללכוד"
+        },
+        "dialog": {
+            "cancel": "ביטול",
+            "done": "סיום"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "עמיתים ({count})",
+            "empty": "עדיין לא נלכד עמית. לכוד אחד מארגז החול שלך כדי שאנשים יוכלו להתקין את ההגדרה הזו.",
+            "noRole": "עדיין אין תפקיד",
+            "connectors": "{count, plural, one {מחבר אחד} two {שני מחברים} other {# מחברים}}",
+            "setup": {
+                "guided": "התקנה מודרכת",
+                "none": "ללא התקנה",
+                "missing": "חסרה תשובת התקנה"
+            },
+            "removeTitle": "להסיר את {name}?",
+            "removeDescription": "גם הארכיון שנלכד מהתיקייה שלו נמחק. כדי להוסיף את העמית שוב צריך ללכוד אותו מחדש.",
+            "removeConfirm": "להסיר",
+            "removeLabel": "להסיר את {name}",
+            "capture": "ללכוד מארגז החול שלך",
+            "removeNote": "הסרת עמית מוחקת גם את הארכיון שנלכד מהתיקייה שלו. כדי להוסיף אותו שוב צריך ללכוד אותו מחדש."
+        },
+        "list": {
+            "newTemplate": "תבנית חדשה",
+            "emptyTitle": "עדיין אין תבניות",
+            "emptyDescription": "תאר הגדרת עמיתים פעם אחת, ואנחנו נבדוק אותה לפני שהיא מגיעה למרקטפלייס."
+        },
+        "row": {
+            "agents": "{count, plural, one {סוכן אחד} two {שני סוכנים} other {# סוכנים}}"
+        },
+        "tabs": {
+            "details": "פרטים",
+            "pricing": "תמחור",
+            "media": "מדיה",
+            "faq": "שאלות נפוצות",
+            "agents": "עמיתים"
+        },
+        "dialog": {
+            "title": "התבניות שלי",
+            "description": "צור טיוטת תבנית מארגז החול שלך, ואז העבר אותה אלינו. אנחנו בודקים אותה לפני שהיא עולה לאוויר.",
+            "pickTitle": "בחר תבנית",
+            "pickDescription": "או התחל תבנית חדשה כדי ללכוד לתוכה עמית מארגז החול שלך."
+        },
+        "toasts": {
+            "saved": "התבנית נשמרה.",
+            "submitted": "נשלח. נחזור אליך."
+        },
+        "footer": {
+            "requirements": {
+                "title": "כותרת",
+                "tagline": "שורת תיאור",
+                "description": "תיאור",
+                "metaDescription": "תיאור מטא של {min} עד {max} תווים",
+                "agent": "לפחות עמית אחד שנלכד",
+                "installAnswers": "תשובת התקנה לכל עמית",
+                "payouts": "חשבון Stripe שיכול לקבל תשלומים"
+            },
+            "live": "התבנית הזו פעילה במרקטפלייס. פנה לצוות Rerun כדי לשנות אותה.",
+            "inReview": "אנחנו בודקים את התבנית הזו. משוך אותה כדי להמשיך לערוך.",
+            "withdraw": "למשוך",
+            "completeChecklist": "השלם קודם את רשימת הבדיקה",
+            "saveFirst": "שמור קודם את השינויים",
+            "sentBack": "החזרנו את התבנית הזו",
+            "deleteTitle": "למחוק את התבנית הזו לצמיתות?",
+            "deleteDescription": "התבנית, המדיה שלה וכל העמיתים שנלכדו עבורה יוסרו. אי אפשר לבטל את הפעולה.",
+            "deleteTooltip": "למחוק את התבנית הזו לצמיתות",
+            "deleteLabel": "למחוק תבנית",
+            "checklistLabel": "רשימת בדיקה להגשה: {met} מתוך {total} הושלמו",
+            "ready": "מוכנה להגשה",
+            "checklistHint": "מה תבנית צריכה לפני שאנחנו בודקים אותה.",
+            "setUpPayouts": "להגדיר תשלומים",
+            "save": "לשמור",
+            "submit": "להגיש לבדיקה"
+        }
+    },
+    "pricing": {
+        "title": "תמחור",
+        "models": {
+            "free": "חינם",
+            "one_time": "רכישה חד-פעמית",
+            "recurring": "מנוי חודשי"
+        },
+        "helpers": {
+            "free": "כל מי שיש לו תוכנית Rerun יכול להתקין אותה.",
+            "one_time": "חיוב חד-פעמי. הקונה שומר אותה לתמיד.",
+            "recurring": "חיוב כל חודש. הגישה מסתיימת כשהקונה מבטל."
+        },
+        "modelHelp": "{helper} הקונים עדיין צריכים תוכנית Rerun פעילה כדי להתקין תבנית.",
+        "priceLabel": "מחיר (USD)",
+        "priceHelp": "מינימום {min}. שינוי מאוחר יותר חל רק על קונים חדשים.",
+        "payoutsTitle": "התשלומים לא מופעלים",
+        "payoutsBody": "אפשר לשמור את המחיר הזה עכשיו, אבל אי אפשר להגיש תבנית בתשלום לבדיקה עד שתשלומי Stripe יופעלו.",
+        "setUpPayouts": "להגדיר תשלומים",
+        "payout": {
+            "yourPrice": "המחיר שלך{recurring, select, true { לחודש} other {}}",
+            "fee": "עמלת Rerun ({fee})",
+            "earn": "אתה מרוויח{recurring, select, true { לחודש} other {}}",
+            "vat": "מע״מ מתווסף למחיר שלך בקופה ומשולם על ידי הקונה, כך שהוא אף פעם לא יורד מהחלק שלך. מה שאתה מרוויח זהה בכל מקום שבו הם נמצאים."
+        }
+    },
+    "payouts": {
+        "expired": "קישור ההגדרה שלך פג, פותחים את Stripe מחדש.",
+        "title": "תשלומים",
+        "subtitle": "לאן מגיע הכסף מהתבניות בתשלום שלך.",
+        "yourPrice": "המחיר שלך",
+        "yourPriceValue": "אתה קובע אותו לכל תבנית, לא כולל מע״מ",
+        "commission": "עמלת Rerun",
+        "schedule": "לוח זמנים לתשלומים",
+        "scheduleValue": "סטנדרט של Stripe",
+        "planNote": "הקונים עדיין צריכים תוכנית Rerun פעילה כדי להתקין תבנית, כך שרכישה פותחת את התבנית ותו לא.",
+        "states": {
+            "not_started": {
+                "headline": "לקבל תשלום על התבניות שלך",
+                "body": "Rerun שומרת {fee} מכל מכירה. הכסף מגיע לחשבון הבנק שלך דרך Stripe.",
+                "cta": "להגדיר תשלומים"
+            },
+            "incomplete": {
+                "headline": "השלם את הגדרת Stripe",
+                "body": "Stripe עדיין צריכה כמה פרטים לפני שהיא יכולה לשלם לך.",
+                "cta": "להשלים הגדרה"
+            },
+            "pending_verification": {
+                "headline": "Stripe מאמתת את הפרטים שלך",
+                "body": "זה בדרך כלל לוקח כמה דקות. בינתיים אפשר להמשיך לכתוב טיוטות של תבניות.",
+                "cta": "לבדוק סטטוס"
+            },
+            "restricted": {
+                "headline": "התשלומים מושהים",
+                "body": "Stripe הגבילה את החשבון הזה. התבניות שפרסמת נשארות באוויר, אבל אף אחד לא יכול לרכוש אותן עד שזה ייפתר.",
+                "cta": "לתקן ב-Stripe"
+            },
+            "ready": {
+                "headline": "אתה מוכן לקבל תשלומים",
+                "body": "תמחר תבנית והיא תעלה למכירה ברגע שנבדוק אותה. Rerun שומרת {fee} מכל מכירה.",
+                "cta": "לפתוח את לוח הבקרה של Stripe"
+            }
+        },
+        "stripeReported": "Stripe דיווחה: {reason}",
+        "terms": "המשך פירושו שאתה מקבל את <link>תנאי היוצרים במרקטפלייס</link>, כולל האופן שבו מוסדרים החזרים וביטולי עסקה.",
+        "sidebar": {
+            "payouts": "תשלומים",
+            "revenue": "הכנסות"
+        },
+        "stateLabels": {
+            "not_started": "לא הוגדר",
+            "incomplete": "נדרשת פעולה",
+            "pending_verification": "בבדיקה",
+            "restricted": "מוגבל",
+            "ready": "מוכן"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "אתר של העסק",
+                "mcc": "תחום העיסוק שלך"
+            },
+            "external_account": "חשבון בנק",
+            "individual": {
+                "verification": {
+                    "document": "מסמך מזהה",
+                    "additional_document": "אישור כתובת"
+                },
+                "id_number": "מספר תעודת הזהות שלך",
+                "address": {
+                    "line1": "הכתובת שלך"
+                },
+                "dob": {
+                    "day": "תאריך הלידה שלך"
+                }
+            },
+            "tos_acceptance": {
+                "date": "אישור התנאים של Stripe"
+            }
+        },
+        "saleKinds": {
+            "one_time": "חד-פעמי",
+            "recurring": "חודשי",
+            "refund": "החזר"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 ימים",
+            "12m": "12 חודשים",
+            "all": "כל הזמן"
+        },
+        "noAccountTitle": "עדיין אין חשבון תשלומים",
+        "noAccountDescription": "הגדר תשלומים כדי להתחיל למכור את התבניות שלך.",
+        "setUpPayouts": "להגדיר תשלומים",
+        "title": "הכנסות",
+        "openDashboard": "לפתוח את לוח הבקרה של Stripe",
+        "youEarned": "הרווחת",
+        "noSales": "אין מכירות בתקופה הזו.",
+        "recentSales": "מכירות אחרונות",
+        "date": "תאריך",
+        "template": "תבנית",
+        "type": "סוג",
+        "sales": "מכירות",
+        "gross": "ברוטו",
+        "fee": "עמלת Rerun",
+        "pending": "תשלום ממתין",
+        "available": "זמין עכשיו",
+        "subscriptions": "{count, plural, one {מנוי פעיל אחד} two {שני מנויים פעילים} other {# מנויים פעילים}}",
+        "perMonth": "{amount} לחודש"
+    },
+    "categories": {
+        "agencies": "סוכנויות",
+        "ecommerce": "מסחר אלקטרוני",
+        "saas": "SaaS",
+        "sales": "מכירות",
+        "recruiting": "גיוס",
+        "real-estate": "נדל״ן",
+        "legal": "משפטים וציות",
+        "creators": "יוצרים",
+        "productivity": "פרודוקטיביות",
+        "other": "אחר"
+    },
+    "status": {
+        "draft": "טיוטה",
+        "in_review": "בבדיקה",
+        "published": "פורסמה",
+        "unlisted": "לא רשומה",
+        "archived": "בארכיון"
+    },
+    "creatorKind": {
+        "studio": "סטודיו",
+        "freelancer": "פרילנסר",
+        "expert": "מומחה"
+    },
+    "cta": {
+        "place": "{count, plural, one {להציב עמית אחד} two {להציב שני עמיתים} other {להציב # עמיתים}}",
+        "placeCaption": "{count, plural, one {גרור אותו ללוח שלך, מוכן לרוץ.} two {גרור אותם ללוח שלך, מוכנים לרוץ.} other {גרור אותם ללוח שלך, מוכנים לרוץ.}}",
+        "trialInstall": "להתחיל ניסיון חינם ולהתקין",
+        "trialThenSubscribe": "להתחיל ניסיון חינם, ואז מנוי ב-{price} לחודש",
+        "trialThenPay": "להתחיל ניסיון חינם, ואז לשלם {price}",
+        "planInstall": "מנוי ב-{plan} לחודש והתקנה",
+        "planThenSubscribe": "מנוי ב-{plan} לחודש, ואז מנוי ב-{price} לחודש",
+        "planThenPay": "מנוי ב-{plan} לחודש, ואז לשלם {price}",
+        "subscribe": "מנוי ב-{price} לחודש",
+        "pay": "לשלם {price}",
+        "payCaption": "התבנית הזו, בחיוב נפרד.",
+        "useTemplate": "להשתמש בתבנית הזו",
+        "nothingCaptured": "עדיין לא נלכד עמית לתוך התבנית הזו.",
+        "open": "לפתוח את {name}",
+        "alreadyOnBoard": "כבר נמצאת בלוח שלך.",
+        "installAgain": "להתקין שוב",
+        "sandboxCannotBuy": "עבור לסביבת עבודה כדי לרכוש תבניות.",
+        "trialBilledSeparately": "{terms} התבנית הזו מחויבת בנפרד.",
+        "trialUsedBilledSeparately": "כבר השתמשת בניסיון החינם. החיוב היום; התבנית הזו מחויבת בנפרד.",
+        "resubscribe": "לחדש מנוי ב-{price} לחודש",
+        "lapsed": "המנוי שלך הסתיים. העמיתים שהתבנית הזו התקינה מושבתים.",
+        "billedTo": "החיוב על {workspace}. תוכנית Rerun שלך כבר פעילה.",
+        "yours": "התבנית שלך, ללא חיוב."
+    },
+    "boardAlt": "לוח העמיתים של {title}"
+}

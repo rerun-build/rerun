@@ -1,0 +1,43 @@
+{
+    "group": {
+        "steps": "{count, plural, zero {لا خطوات} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}",
+        "stepsWithFailures": "{count, plural, zero {لا خطوات} one {خطوة واحدة} two {خطوتان} few {# خطوات} many {# خطوة} other {# خطوة}}، فشل منها {failed}",
+        "failed": "فشل {failed}"
+    },
+    "tool": {
+        "input": "المدخلات",
+        "error": "خطأ",
+        "output": "المخرجات",
+        "completedInMs": "اكتمل في {ms} ملّي ثانية",
+        "completedInSeconds": "اكتمل في {seconds} ث"
+    },
+    "reasoning": {
+        "thinking": "يفكّر...",
+        "thought": "تفكير"
+    },
+    "compaction": {
+        "running": "جارٍ ضغط السياق…",
+        "failed": "فشل ضغط السياق",
+        "done": "تم ضغط السياق",
+        "summarized": "تم تلخيص {count} من الرسائل السابقة",
+        "recovered": "تم استرداد ~{count} رمز"
+    },
+    "subRun": {
+        "failures": "{count, plural, zero {لا إخفاقات} one {إخفاق واحد} two {إخفاقان} few {# إخفاقات} many {# إخفاقًا} other {# إخفاق}}",
+        "idle": "خامل منذ {minutes} د",
+        "stop": "أوقف هذه المهمة",
+        "failed": "فشل",
+        "stopped": "توقّف، مع الاحتفاظ بالعمل الجزئي",
+        "stoppedWithRun": "توقّف مع التشغيل",
+        "earlier": "+{count} سابقة",
+        "verbs": {
+            "web_search": "يبحث عن {summary}",
+            "web_fetch": "يقرأ {summary}",
+            "browser_navigate": "يتصفّح {summary}",
+            "shell_exec": "ينفّذ {summary}",
+            "fs_read": "يقرأ {summary}",
+            "fs_write": "يكتب {summary}",
+            "fs_edit": "يعدّل {summary}"
+        }
+    }
+}

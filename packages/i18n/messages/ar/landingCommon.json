@@ -1,0 +1,313 @@
+{
+    "site": {
+        "title": "Rerun: موظفو ذكاء اصطناعي على اشتراك ChatGPT أو Claude",
+        "description": "وظّف موظفي ذكاء اصطناعي للمبيعات والدعم والتسويق والإدارة. يعملون على اشتراك ChatGPT أو Claude أو أرصدة مضمّنة أو مفتاح API. تجربة مجانية {trialDays} يومًا."
+    },
+    "nav": {
+        "items": {
+            "features": "الميزات",
+            "useCases": "حالات الاستخدام",
+            "industries": "القطاعات",
+            "templates": "القوالب",
+            "pricing": "الأسعار",
+            "community": "المجتمع",
+            "resources": "الموارد"
+        },
+        "features": {
+            "coworkers": {
+                "label": "الزملاء",
+                "description": "أسند إليه مهمة، فيعيدها إليك منجزة."
+            },
+            "coworker-manager": {
+                "label": "مدير الزملاء",
+                "description": "قل ما تحتاجه، فيبلّغ الزميل المناسب."
+            },
+            "computer-use": {
+                "label": "استخدام الكمبيوتر",
+                "description": "يعمل في تطبيقاتك كما يفعل الإنسان."
+            },
+            "tools": {
+                "label": "أكثر من {count} أداة مضمّنة",
+                "description": "Gmail وStripe وHubSpot وأي خادم MCP."
+            },
+            "human-in-the-loop": {
+                "label": "الإنسان في الحلقة",
+                "description": "يستأذنون قبل أي خطوة مؤثّرة."
+            },
+            "runs-24-7": {
+                "label": "يعمل 24/7، في أوروبا",
+                "description": "ليلًا وفي العطلات والكمبيوتر مغلق: يواصل العمل."
+            },
+            "second-brain": {
+                "label": "عقل ثانٍ",
+                "description": "يعرف عرضك وسوقك وأسلوبك."
+            },
+            "workspaces": {
+                "label": "مساحات العمل",
+                "description": "حساب واحد، ومساحة عمل لكل نشاط تجاري."
+            },
+            "invite-your-team": {
+                "label": "ادعُ فريقك كله",
+                "description": "الجميع، دون تكلفة إضافية، على اللوحة نفسها."
+            },
+            "coworkers-work-together": {
+                "label": "الزملاء يعملون معًا",
+                "description": "أحدهم يجد العملاء المحتملين، والتالي يراسلهم."
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "الوكالات",
+                "description": "الأعمال الجديدة والتنفيذ وتقارير العملاء."
+            },
+            "freelancers": {
+                "label": "العمل الحر",
+                "description": "المهام الإدارية التي لم يكن لديك وقت لها."
+            },
+            "ecommerce": {
+                "label": "التجارة الإلكترونية",
+                "description": "الطلبات والمخزون والمراجعات والمنافسون."
+            },
+            "real-estate": {
+                "label": "العقارات",
+                "description": "البائعون والاستفسارات والإعلانات والإيجارات."
+            },
+            "startups": {
+                "label": "الشركات الناشئة",
+                "description": "خط المبيعات والإطلاقات والمؤشرات والدعم."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "فقدان العملاء والملاحظات والإصدارات والطلبات الواردة."
+            },
+            "legal": {
+                "label": "القانون والامتثال",
+                "description": "العقود والالتزامات والمواعيد النهائية والتدقيق."
+            },
+            "recruiting": {
+                "label": "التوظيف والموارد البشرية",
+                "description": "الفرز والمقابلات ومتابعة المرشحين."
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "إيجاد العملاء المحتملين",
+                "description": "إعلانات الوظائف وعدد الموظفين وCRM الخاص بك، مجتمعة."
+            },
+            "trackSales": {
+                "label": "متابعة المبيعات",
+                "description": "الإيرادات وخط المبيعات والجدول، كل صباح."
+            },
+            "runAds": {
+                "label": "إدارة إعلاناتك",
+                "description": "الإنفاق يُراجع يوميًا، والإعلانات الخاسرة تُوقف."
+            },
+            "watchCompetitors": {
+                "label": "مراقبة المنافسين",
+                "description": "أسعارهم وإطلاقاتهم وفجوات كلماتك المفتاحية."
+            },
+            "createContent": {
+                "label": "إنشاء المحتوى",
+                "description": "من الاستعلام المتراجع إلى المقال المعاد نشره."
+            },
+            "postSocial": {
+                "label": "النشر على وسائل التواصل",
+                "description": "منشور كل صباح، والردّ على التعليقات."
+            },
+            "replyCustomers": {
+                "label": "الردّ على العملاء",
+                "description": "المحادثات غير المقروءة مرتّبة ومُجاب عنها بأسلوبك."
+            },
+            "triageInbox": {
+                "label": "فرز بريدك الوارد",
+                "description": "مصنّف، والردود مسودّة، واثنان متروكان لك."
+            },
+            "prepareMeetings": {
+                "label": "التحضير لاجتماعاتك",
+                "description": "ملخص قصير عمّن ستقابله، قبل كل مكالمة."
+            },
+            "trackOrders": {
+                "label": "متابعة طلباتك",
+                "description": "رصد المتأخر منها، وإبلاغ عملائك أولًا."
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "الخبراء",
+                "description": "تصفّح بناة زملاء موثوقين ووظّفهم."
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "انضم إلى المجتمع واحصل على المساعدة فورًا."
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "التوثيق",
+                "description": "ابنِ زملاءك ووصّلهم وأطلقهم."
+            },
+            "blog": {
+                "label": "المدونة",
+                "description": "أخبار المنتج والأدلة وخطط عمل الزملاء."
+            }
+        },
+        "faq": "الأسئلة الشائعة",
+        "solution": "الحل",
+        "trialCta": "ابدأ التجربة بـ $0",
+        "openMenu": "افتح القائمة",
+        "closeMenu": "أغلق القائمة",
+        "menu": "القائمة",
+        "main": "الرئيسية",
+        "starOnGithub": "أضف نجمة على GitHub",
+        "login": "تسجيل الدخول",
+        "download": "تنزيل",
+        "openWebApp": "افتح تطبيق الويب",
+        "browseAll": {
+            "label": "تصفّح كل القوالب",
+            "description": "المكتبة كاملة، وكل الفئات في صفحة واحدة."
+        },
+        "becomeExpert": "كن خبيرًا",
+        "startFree": "ابدأ مجانًا",
+        "goToApp": "اذهب إلى التطبيق",
+        "logo": {
+            "brandKit": "عرض هوية العلامة",
+            "copy": "نسخ الشعار (SVG)",
+            "download": "تنزيل الشعار"
+        }
+    },
+    "github": {
+        "star": "نجمة",
+        "ariaStar": "أضف نجمة لـ Rerun على GitHub",
+        "ariaCount": "Rerun على GitHub، {count} نجمة"
+    },
+    "heroCta": "ابدأ الآن مجانًا",
+    "finalCta": {
+        "proof": "أكثر من {count} نشاط تجاري يعمل على Rerun",
+        "titleLead": "وظّف زملاء على اشتراك <switch></switch>",
+        "titleTail": "<mark>الذي تدفع ثمنه أصلًا.</mark>",
+        "steps": {
+            "plug": "وصّل اشتراكك",
+            "hire": "جهّز زملاءك",
+            "run": "أدِر عملك مع الزملاء"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "أصبح Rerun مفتوح المصدر<wide> بترخيص AGPL-3.0</wide>",
+        "cta": "أضف نجمة على GitHub"
+    },
+    "footer": {
+        "ctaTitle": "زميلك الأول على بُعد<br></br>ثلاث دقائق",
+        "ctaButton": "ابدأ مجانًا",
+        "tagline": "أدِر عملك بالزملاء. ابنِهم، وشاهدهم يعملون، وابقَ مطّلعًا على كل شيء.",
+        "productHuntAlt": "Rerun: زملاء ذكاء اصطناعي مفتوحو المصدر ينجزون العمل فعلًا | Product Hunt",
+        "columns": {
+            "features": "الميزات",
+            "industries": "القطاعات",
+            "solutions": "الحلول",
+            "compare": "مقارنة",
+            "guides": "الأدلة",
+            "resources": "الموارد",
+            "legal": "قانوني"
+        },
+        "resources": {
+            "about": "من نحن",
+            "docs": "التوثيق",
+            "github": "GitHub",
+            "pricing": "الأسعار",
+            "support": "الدعم",
+            "templates": "القوالب",
+            "compare": "مقارنة",
+            "blog": "المدونة",
+            "findExpert": "ابحث عن خبير",
+            "becomeExpert": "كن خبيرًا",
+            "whatsNew": "ما الجديد",
+            "brandKit": "هوية العلامة",
+            "community": "المجتمع",
+            "affiliate": "برنامج الشركاء بالعمولة",
+            "partnerBadge": "شارة الشريك"
+        },
+        "compareLink": "Rerun مقابل {name}",
+        "guides": {
+            "aiEmployees": "موظفو الذكاء الاصطناعي",
+            "smallBusiness": "وكلاء ذكاء اصطناعي للشركات الصغيرة",
+            "cost": "تكلفة موظف الذكاء الاصطناعي",
+            "noCode": "منشئو وكلاء ذكاء اصطناعي بلا برمجة",
+            "n8n": "بدائل n8n",
+            "personal": "وكلاء ذكاء اصطناعي شخصيون",
+            "hermes": "بدائل Hermes"
+        },
+        "legal": {
+            "terms": "شروط الخدمة",
+            "refunds": "سياسة الاسترداد",
+            "acceptableUse": "الاستخدام المقبول",
+            "creatorTerms": "شروط المنشئين",
+            "privacy": "سياسة الخصوصية",
+            "cookies": "سياسة ملفات تعريف الارتباط",
+            "dpa": "اتفاقية معالجة البيانات"
+        },
+        "copyright": "© {year} Rerun من {legalName}. جميع الحقوق محفوظة.",
+        "language": "اللغة",
+        "categories": {
+            "agencies": "الوكالات",
+            "ecommerce": "التجارة الإلكترونية",
+            "saas": "SaaS",
+            "sales": "المبيعات",
+            "recruiting": "التوظيف",
+            "real-estate": "العقارات",
+            "legal": "القانون والامتثال",
+            "creators": "صنّاع المحتوى",
+            "productivity": "الإنتاجية",
+            "other": "أخرى"
+        },
+        "cookieSettings": "إعدادات ملفات تعريف الارتباط"
+    },
+    "discord": "انضم إلى Discord",
+    "tabNudge": {
+        "firstCoworker": "3 دقائق تفصلك عن زميلك الأول",
+        "allDay": "زملاء يعملون لك 24/7",
+        "welcomeGuest": "مرحبًا بعودتك. زميلك الأول على بُعد 3 دقائق.",
+        "welcomeMember": "مرحبًا بعودتك. زملاؤك يعملون في التطبيق.",
+        "start": "ابدأ مجانًا",
+        "goToApp": "اذهب إلى التطبيق",
+        "dismiss": "تجاهل"
+    },
+    "notFound": {
+        "homeAria": "الصفحة الرئيسية لـ Rerun",
+        "title": "خرجت هذه الصفحة عن النص.",
+        "body": "الصفحة التي تبحث عنها غير موجودة أو نُقلت. دعنا نعيدك إلى المسار الصحيح.",
+        "back": "العودة إلى الرئيسية"
+    },
+    "crash": {
+        "title": "حدث خطأ ما.",
+        "body": "واجهت هذه الصفحة خطأً غير متوقع. أعد تحميلها لتتابع من حيث توقفت.",
+        "reload": "إعادة التحميل",
+        "back": "العودة إلى الرئيسية"
+    },
+    "og": {
+        "default": {
+            "line1": "أنجز مهامك",
+            "line2": "بالذكاء الاصطناعي",
+            "accent": "حتى وأنت نائم."
+        },
+        "experts": {
+            "line1": "وظّف أفضل",
+            "accent": "خبراء الذكاء الاصطناعي",
+            "cta": "وظّف خبيرًا",
+            "hire": "وظّف",
+            "badges": {
+                "Studio": "استوديو",
+                "Freelancer": "مستقل",
+                "Expert": "خبير"
+            }
+        },
+        "compare": {
+            "vs": "Rerun مقابل",
+            "cta": "شاهد المقارنة"
+        }
+    },
+    "composerPlaceholder": "أرسل رسالة...",
+    "dialog": {
+        "close": "إغلاق"
+    }
+}

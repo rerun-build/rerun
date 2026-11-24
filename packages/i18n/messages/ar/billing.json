@@ -1,0 +1,958 @@
+{
+    "credits": "{count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}",
+    "plan": {
+        "billed": {
+            "monthly": "{price}/شهريًا",
+            "yearly": "{price}/سنويًا"
+        },
+        "yourRenewal": "موعد التجديد",
+        "status": {
+            "paymentFailed": "فشل الدفع",
+            "ends": "ينتهي في {date}",
+            "ending": "قيد الانتهاء",
+            "monthlyFrom": "شهري بدءًا من {date}",
+            "active": "نشط"
+        },
+        "summary": {
+            "monthlyRenews": "زملاء بلا حدود · فوترة شهرية · يتجدد في {renewal}",
+            "monthlyEnds": "زملاء بلا حدود · فوترة شهرية · ينتهي في {renewal}",
+            "yearlyRenews": "زملاء بلا حدود · فوترة سنوية · يتجدد في {renewal}",
+            "yearlyEnds": "زملاء بلا حدود · فوترة سنوية · ينتهي في {renewal}"
+        },
+        "success": {
+            "done": "تم",
+            "paymentReceivedTitle": "تم استلام الدفعة",
+            "paymentReceivedBody": "تم تحديث بطاقتك وعادت خطة Pro إلى العمل.",
+            "backOnTitle": "عادت خطة Pro",
+            "backOnBody": "تتجدد خطتك في {date}."
+        },
+        "cardUpdated": "تم تحديث البطاقة",
+        "acceptTerms": "وافق على الشروط أولًا",
+        "pleaseWait": "يرجى الانتظار",
+        "nextInvoice": "الفاتورة التالية",
+        "overview": {
+            "keepYearlyFailed": "تعذّر الإبقاء على خطتك السنوية",
+            "billed": "الفوترة",
+            "billedYearly": "سنويًا، شاملة الضريبة",
+            "billedMonthly": "شهريًا، شاملة الضريبة",
+            "from": "بدءًا من {date}",
+            "monthlyPrice": "شهريًا · {price}",
+            "title": "الفوترة",
+            "update": "تحديث",
+            "invoices": "الفواتير",
+            "viewAll": "عرض الكل",
+            "creditUsage": "استخدام الرصيد",
+            "creditsLeft": "متبقٍ {credits}",
+            "keepYearly": "الإبقاء على خطتي السنوية",
+            "switchHint": "غيّر طريقة الفوترة لرؤية السعر الجديد.",
+            "cancelPlan": "إلغاء الخطة",
+            "referFriend": "ادعُ صديقًا",
+            "freeMonths": "{count, plural, zero {لا أشهر مجانية} one {شهر مجاني واحد} two {شهران مجانيان} few {# أشهر مجانية} many {# شهرًا مجانيًا} other {# شهر مجاني}}",
+            "getFreeMonth": "احصل على شهر مجاني"
+        },
+        "referrals": {
+            "title": "ادعُ صديقًا",
+            "pitch": "عندما يشترك صديق عبر رابطك، تحصلان كلاكما على شهر مجاني.",
+            "linkLabel": "رابط الإحالة الخاص بك",
+            "copy": "نسخ",
+            "copied": "تم النسخ",
+            "capped": "حصلت على كل الأشهر الـ {cap}. لا يزال رابطك يمنح الأصدقاء شهرًا.",
+            "freeMonths": "الأشهر المجانية",
+            "monthsOf": "{earned} من {cap}",
+            "progressLabel": "حصلت على {earned} من {cap} أشهر مجانية",
+            "firstPayment": "يُطبَّق على دفعتك الأولى",
+            "friends": "الأصدقاء",
+            "empty": "يظهر هنا الأصدقاء الذين يسجّلون عبر رابطك.",
+            "more": "+{count} آخرين",
+            "loadFailed": "تعذّر تحميل إحالاتك.",
+            "status": {
+                "subscribed": "+1 شهر",
+                "trial": "تجربة",
+                "signed_up": "مسجّل",
+                "canceled": "ملغى"
+            }
+        },
+        "change": {
+            "planLabel": "زملاء بلا حدود{slots}",
+            "switchScheduledTitle": "تمت جدولة التحويل",
+            "switchScheduledBody": "تستمر خطتك السنوية حتى نهايتها. تبدأ الفوترة الشهرية في {date}.",
+            "changeScheduledTitle": "تمت جدولة التغيير",
+            "changeScheduledBody": "تحتفظ بـ {current} حتى {renewal}، ثم {next} بسعر {price}.",
+            "planUpdatedTitle": "تم تحديث الخطة",
+            "planUpdatedBodyMonthly": "{plan}، بفوترة شهرية. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
+            "planUpdatedBodyYearly": "{plan}، بفوترة سنوية. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
+            "switchToMonthly": "التحويل إلى الشهري",
+            "changeToSlots": "التغيير إلى {count, plural, zero {<n></n> خانة {provider}} one {<n></n> خانة {provider}} two {<n></n> خانتين {provider}} few {<n></n> خانات {provider}} many {<n></n> خانة {provider}} other {<n></n> خانة {provider}}}",
+            "changeAppSlots": "تغيير خانات تطبيقاتك",
+            "switchToYearly": "التحويل إلى السنوي",
+            "proLineMonthly": "Pro · {plan}، شهريًا",
+            "proLineYearly": "Pro · {plan}، سنويًا",
+            "unusedTimeMonthly": "الوقت غير المستخدم من خطتك الشهرية",
+            "unusedTimeYearly": "الوقت غير المستخدم من خطتك السنوية",
+            "dueTodayTaxIncluded": "المستحق اليوم، شامل الضريبة",
+            "from": "بدءًا من {date}",
+            "until": "حتى {date}",
+            "monthlyFrom": "شهريًا · <price></price>",
+            "keepMyPlan": "الإبقاء على خطتي",
+            "confirmAndPay": "التأكيد والدفع",
+            "switchOn": "التحويل في {date}",
+            "scheduleFor": "الجدولة في {date}",
+            "billedNowSlots": "تُفوتر الخانات الجديدة الآن. تبدأ الفوترة الشهرية في {date}.",
+            "slotsReady": "تصبح الخانات الجديدة جاهزة فور إتمام الدفع.",
+            "yearlyStarts": "تبدأ خطتك السنوية فور إتمام الدفع.",
+            "nothingToday": "لن يُخصم أي مبلغ اليوم."
+        },
+        "cancelPending": {
+            "endOfPeriod": "نهاية فترتك",
+            "resumeFailed": "تعذّر استئناف خطتك",
+            "title": "تنتهي خطة Pro في {date}",
+            "body": "يواصل زملاؤك العمل حتى ذلك الحين. بعدها تتوقف مساحة العمل مؤقتًا وتُحفظ بياناتها لمدة 90 يومًا.",
+            "none": "لا شيء",
+            "resume": "استئناف Pro",
+            "footnote": "الاستئناف يُبقي على خطتك ويُفوتر {price} في {date}."
+        },
+        "card": {
+            "notSaved": "تعذّر حفظ بطاقتك",
+            "title": "تحديث بطاقتك",
+            "save": "حفظ البطاقة",
+            "footnote": "تُخصم فواتيرك القادمة من هذه البطاقة."
+        },
+        "pastDue": {
+            "declinedOn": "رُفضت دفعتك البالغة {amount} في {date}.",
+            "declined": "رُفضت دفعتك البالغة {amount}.",
+            "lastDeclined": "رُفضت دفعتك الأخيرة.",
+            "paused": "مساحة عملك متوقفة مؤقتًا وستعود فور إتمام الدفع.",
+            "keepRunning": "ادفعها الآن لتستمر مساحة عملك في العمل.",
+            "ctaAmount": "تحديث البطاقة ودفع {amount}",
+            "cta": "تحديث البطاقة والدفع"
+        },
+        "invoices": {
+            "loadFailed": "تعذّر تحميل فواتيرك",
+            "title": "الفواتير",
+            "empty": "لا توجد فواتير بعد.",
+            "status": {
+                "draft": "مسودة",
+                "open": "مستحقة",
+                "uncollectible": "غير قابلة للتحصيل",
+                "void": "ملغاة"
+            }
+        },
+        "credit": {
+            "addedTitle": "تمت إضافة الأرصدة",
+            "addedBody": "{count, plural, zero {لا أرصدة في مساحة عملك} one {رصيد واحد في مساحة عملك} two {رصيدان في مساحة عملك} few {# أرصدة في مساحة عملك} many {# رصيدًا في مساحة عملك} other {# رصيد في مساحة عملك}}. لا تنتهي صلاحيتها أبدًا، ويستأنف زملاؤك من حيث توقفوا.",
+            "title": "شراء أرصدة Rerun",
+            "eachPack": "تضيف كل حزمة {count, plural, zero {لا أرصدة} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} مقابل {price}، تُدفع مرة واحدة. لا تنتهي صلاحيتها أبدًا.",
+            "packs": "{count, plural, zero {لا حزم} one {حزمة واحدة} two {حزمتان} few {# حزم} many {# حزمة} other {# حزمة}}",
+            "packCredits": "{count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}، لا تنتهي صلاحيتها",
+            "lessAria": "حزمة أقل",
+            "moreAria": "حزمة أخرى",
+            "dueBeforeTax": "المستحق اليوم، قبل الضريبة",
+            "buy": "شراء أرصدة",
+            "payOnStripe": "الدفع عبر Stripe",
+            "chargedOnce": "يُخصم مرة واحدة من هذه البطاقة.",
+            "checkoutFootnote": "تدفع على صفحة Stripe آمنة، ثم تعود إلى هنا."
+        }
+    },
+    "lifetime": {
+        "badge": "مدى الحياة",
+        "title": "Rerun مدى الحياة",
+        "subtitle": "زملاء بلا حدود · دفعة واحدة، ملكك إلى الأبد",
+        "appsDescription": "قدرات إضافية لزملائك، تُفوتر شهريًا بشكل منفصل عن صفقتك مدى الحياة.",
+        "overview": {
+            "deal": "صفقة مدى الحياة",
+            "paidOnce": "دفعة واحدة",
+            "apps": "التطبيقات",
+            "aiProviders": "مزوّدو الذكاء الاصطناعي"
+        },
+        "slots": {
+            "oneOnCheckout": "خانة واحدة في الدفعة الأولى، وأضف المزيد بعدها مباشرةً",
+            "oneDuringTrial": "خانة واحدة لكل تطبيق خلال التجربة المجانية",
+            "slotLine": "{count, plural, zero {لا خانات {provider}} one {خانة {provider} واحدة} two {خانتا {provider}} few {# خانات {provider}} many {# خانة {provider}} other {# خانة {provider}}}",
+            "freeThen": "مجانًا لمدة {days} يومًا، ثم {price}",
+            "monthlyBill": "التطبيقات، شهريًا",
+            "billedToday": "يُفوتر اليوم مقابل ما تبقى من الشهر، ثم شهريًا مع خاناتك الأخرى.",
+            "freeDuringTrial": "مجاني حتى نهاية تجربتك، ثم يُفوتر شهريًا.",
+            "continueToPayment": "المتابعة إلى الدفع",
+            "confirm": "تأكيد",
+            "addedTitle": "تمت إضافة الخانات",
+            "addedBody": "اربط حسابًا في التطبيق لتشغيلها.",
+            "scheduledBody": "تبقى الخانات التي تخليت عنها قابلة للاستخدام حتى {date}، ثم تُزال من فاتورتك."
+        }
+    },
+    "apps": {
+        "title": "التطبيقات",
+        "description": "قدرات إضافية لزملائك، على الفاتورة نفسها مع خطتك.",
+        "slotsSuffix": "{count, plural, zero { + لا خانات {provider}} one { + خانة {provider} واحدة} two { + خانتا {provider}} few { + # خانات {provider}} many { + # خانة {provider}} other { + # خانة {provider}}}",
+        "unit": {
+            "monthly": "/شهريًا",
+            "yearly": "/سنويًا"
+        },
+        "lessReason": {
+            "freeUntil": "مجاني حتى {date}",
+            "loading": "جارٍ تحميل حساباتك",
+            "disconnectFirst": "افصل حسابًا في {app} أولًا"
+        },
+        "free": "مجاني",
+        "slots": {
+            "none": "لا خانات بعد",
+            "used": "{total, plural, zero {<used></used> مستخدمة من <n></n> خانة} one {<used></used> مستخدمة من <n></n> خانة} two {<used></used> مستخدمة من <n></n> خانتين} few {<used></used> مستخدمة من <n></n> خانات} many {<used></used> مستخدمة من <n></n> خانة} other {<used></used> مستخدمة من <n></n> خانة}}",
+            "count": "{total, plural, zero {<n></n> خانة} one {<n></n> خانة} two {<n></n> خانتان} few {<n></n> خانات} many {<n></n> خانة} other {<n></n> خانة}}",
+            "lineMonthly": "<slots></slots>، {price}/شهريًا لكل خانة",
+            "lineYearly": "<slots></slots>، {price}/سنويًا لكل خانة"
+        },
+        "trial": {
+            "free": "<b>خانة واحدة مجانًا حتى {date}</b>، ثم {price}",
+            "withPaid": "{count, plural, zero {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة} one {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة} two {<trial></trial>، إضافةً إلى <n></n> خانتين مدفوعتين} few {<trial></trial>، إضافةً إلى <n></n> خانات مدفوعة} many {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة} other {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة}}",
+            "withPaidInUse": "{count, plural, zero {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة (<inUse></inUse> قيد الاستخدام)} one {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة (<inUse></inUse> قيد الاستخدام)} two {<trial></trial>، إضافةً إلى <n></n> خانتين مدفوعتين (<inUse></inUse> قيد الاستخدام)} few {<trial></trial>، إضافةً إلى <n></n> خانات مدفوعة (<inUse></inUse> قيد الاستخدام)} many {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة (<inUse></inUse> قيد الاستخدام)} other {<trial></trial>، إضافةً إلى <n></n> خانة مدفوعة (<inUse></inUse> قيد الاستخدام)}}"
+        },
+        "lessAria": "خانة {provider} أقل",
+        "moreAria": "خانة {provider} أخرى",
+        "leaving": "{count, plural, zero {لا خانات تُزال في {date}} one {خانة واحدة تُزال في {date}} two {خانتان تُزالان في {date}} few {# خانات تُزال في {date}} many {# خانة تُزال في {date}} other {# خانة تُزال في {date}}}"
+    },
+    "business": {
+        "noAddress": "أضف بطاقة أولًا",
+        "title": "بيانات النشاط التجاري",
+        "add": "إضافة",
+        "saved": "تم حفظ بيانات النشاط التجاري",
+        "removeFailed": "تعذّرت إزالة الرقم",
+        "removed": "تمت إزالة الرقم",
+        "noTaxId": "لا يقبل Stripe رقمًا ضريبيًا لـ {country}.",
+        "nameLabel": "اسم النشاط التجاري",
+        "typeLabel": "النوع",
+        "euVat": "ضريبة القيمة المضافة الأوروبية",
+        "field": {
+            "vat": "رقم ضريبة القيمة المضافة",
+            "taxId": "الرقم الضريبي"
+        },
+        "confirm": {
+            "title": "إزالة هذا الرقم؟",
+            "description": "لن يظهر في فواتيرك القادمة.",
+            "confirm": "إزالة"
+        },
+        "removeNumber": "إزالة الرقم",
+        "save": "حفظ",
+        "footnote": "يظهر في فواتيرك القادمة.",
+        "status": {
+            "verified": "تم التحقق",
+            "pending": "قيد التحقق",
+            "unverified": "لم يتم التحقق"
+        }
+    },
+    "dialog": {
+        "title": "الفوترة",
+        "adminOnly": {
+            "title": "يدير المسؤول الفوترة",
+            "description": "اطلب من مسؤول مساحة العمل هذه تغيير الخطة أو إضافة أرصدة.",
+            "gotIt": "حسنًا"
+        },
+        "error": {
+            "title": "تعذّر تحميل خطتك",
+            "description": "لم يستجب Stripe. اشتراكك لم يتأثر، حاول مرة أخرى بعد قليل.",
+            "retry": "إعادة المحاولة"
+        }
+    },
+    "postPayment": {
+        "title": "كل شيء جاهز",
+        "ready": {
+            "place": "خطتك نشطة. ضع \"{title}\" على لوحتك.",
+            "setUp": "خطتك نشطة. هل أنت مستعد لإعداد \"{title}\"؟",
+            "first": "خطتك نشطة. هل أنت مستعد لتشغيل أول زميل لك؟"
+        },
+        "finalizing": "جارٍ إتمام اشتراكك، لن يستغرق ذلك سوى لحظة.",
+        "button": {
+            "placeOne": "ضع زميلك",
+            "placeMany": "ضع زملاءك الـ {count}",
+            "placingOne": "جارٍ وضع زميلك",
+            "placingMany": "جارٍ وضع زملائك الـ {count}",
+            "startOne": "شغّل زميلك",
+            "startMany": "شغّل زملاءك الـ {count}",
+            "startingOne": "جارٍ تشغيل زميلك",
+            "startingMany": "جارٍ تشغيل زملائك الـ {count}",
+            "finalizing": "جارٍ إتمام الاشتراك"
+        }
+    },
+    "templatePurchase": {
+        "title": "شكرًا على شرائك",
+        "waiting": "جارٍ إتمام عملية الشراء، لن يستغرق ذلك سوى لحظة.",
+        "timeout": "تمت عملية الدفع. يستغرق ظهورها وقتًا أطول من المعتاد، حدّث الصفحة بعد قليل.",
+        "fallbackTitle": "قالبك",
+        "readyOne": "أصبحت تملك \"{title}\". هل أنت مستعد لوضع زميله؟",
+        "readyMany": "أصبحت تملك \"{title}\". هل أنت مستعد لوضع زملائه الـ {count}؟",
+        "needsPlan": "أصبحت تملك \"{title}\". يلزم وجود خطة Rerun نشطة لتثبيته.",
+        "finalizing": "جارٍ إتمام الشراء",
+        "close": "إغلاق",
+        "placeOne": "ضع زميله",
+        "placeMany": "ضع {count} زملاء",
+        "subscribe": "اشترك"
+    },
+    "checkout": {
+        "trialEndFallback": "نهاية تجربتك",
+        "badge": {
+            "freeTrial": "تجربة مجانية",
+            "freeTrialEndsToday": "تجربة مجانية · تنتهي اليوم",
+            "freeTrialDaysLeft": "تجربة مجانية · {count, plural, zero {لم يتبقَّ أي يوم} one {يتبقى يوم واحد} two {يتبقى يومان} few {تتبقى # أيام} many {يتبقى # يومًا} other {يتبقى # يوم}}",
+            "trialDays": "تجربة مجانية لمدة {days} يومًا",
+            "complimentary": "وصول مجاني",
+            "paused": "متوقف مؤقتًا",
+            "pausedUntil": "متوقف مؤقتًا · محفوظ حتى {date}",
+            "yourCoworker": "زميلك",
+            "parkedMany": "{title} · {count} زملاء"
+        },
+        "timeline": {
+            "today": "اليوم",
+            "anytime": "في أي وقت",
+            "cancelTitle": "ألغِ بنقرة واحدة",
+            "noNotice": "بلا فترة إشعار",
+            "reminderDayBefore": "تذكير في اليوم السابق",
+            "proStarts": "تبدأ خطة Pro",
+            "unlimitedCoworkers": "زملاء بلا حدود",
+            "nextInvoice": "الفاتورة التالية",
+            "billedExclVat": "<billed></billed>، دون ضريبة القيمة المضافة",
+            "trialEndsProStarts": "تنتهي التجربة، وتبدأ خطة Pro",
+            "chargedToday": "<billed></billed> تُخصم اليوم، زملاء بلا حدود",
+            "trialRunning": "التجربة جارية",
+            "zeroToday": "$0 اليوم",
+            "trialEnds": "تنتهي التجربة",
+            "nothingCharged": "لا يُخصم شيء",
+            "reminder": "تذكير عبر البريد الإلكتروني",
+            "reminderDetail": "في اليوم السابق، لتقرر بهدوء",
+            "firstCharge": "{charge}، ألغِ قبلها ولن تدفع شيئًا",
+            "trialStarts": "تبدأ التجربة",
+            "trialStartsDetail": "$0 اليوم، {agents} زملاء و{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} لاستخدام الذكاء الاصطناعي",
+            "proStartsDetail": "يُخصم {charge}، زملاء بلا حدود و{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} شهريًا",
+            "restoreStarts": "تبدأ الاستعادة",
+            "restoreDetail": "يعود الزملاء خلال دقيقة",
+            "installs": "يتم التثبيت",
+            "placedCount": "{count, plural, zero {لم يُوضع أي زميل} one {وُضع زميل واحد} two {وُضع زميلان} few {وُضع # زملاء} many {وُضع # زميلًا} other {وُضع # زميل}}",
+            "placedOnBoard": "وُضع على لوحتك"
+        },
+        "variants": {
+            "startTrial": {
+                "title": "ابدأ تجربتك المجانية",
+                "subtitle": "البطاقة مطلوبة، $0 اليوم. يُخصم {price} في {date} ما لم تُلغِ قبل ذلك.",
+                "cta": "بدء التجربة المجانية",
+                "footnote": "$0 اليوم. ألغِ قبل {date} ولن يُخصم منك شيء."
+            },
+            "trialCardless": {
+                "title": "الترقية إلى Pro",
+                "subtitle": "كل ما بنيته خلال التجربة يبقى ويستمر في العمل.",
+                "cta": "إنهاء التجربة والاشتراك"
+            },
+            "trialCard": {
+                "title": "تجربتك المجانية",
+                "subtitle": "لا شيء للدفع اليوم. تبدأ خطة Pro في {date} تلقائيًا.",
+                "subtitleWithReminder": "لا شيء للدفع اليوم. تبدأ خطة Pro في {date} تلقائيًا، وسنراسلك في اليوم السابق.",
+                "subtitleCancelled": "ألغيت تجربتك. يواصل زملاؤك العمل حتى {date}، ولن يُخصم شيء.",
+                "cta": "الترقية إلى Pro الآن"
+            },
+            "trialCardPayNow": {
+                "title": "الترقية إلى Pro",
+                "subtitle": "تشغّل التجربة {agents} زملاء. ابدأ Pro الآن لزملاء بلا حدود، أو دع التجربة تنتقل إلى Pro في {date}.",
+                "cta": "إنهاء التجربة وبدء Pro الآن",
+                "footnote": "ينهي هذا تجربتك المجانية اليوم. لكي لا تدفع شيئًا اليوم، احتفظ بتجربتك: تبدأ خطة Pro في {date} تلقائيًا."
+            },
+            "creditLocked": {
+                "title": "أرصدة Rerun تأتي مع Pro",
+                "titleCoworker": "تابع مع Pro",
+                "subtitle": "استُنفدت أرصدة التجربة البالغة {trialCredits, number}. تتضمن خطة Pro {credits, plural, zero {لا أرصدة} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر، ويمكنك إضافة المزيد في أي وقت.",
+                "subtitleCoworker": "سيستأنف {coworker} من حيث توقف.",
+                "cta": "إنهاء التجربة والاشتراك",
+                "ctaCoworker": "الدفع والاستئناف",
+                "payCta": "دفع {amount} والاستئناف",
+                "footnote": "أغلق هذا ولن يُخصم شيء. تبقى تجربتك كما هي."
+            },
+            "noPlan": {
+                "title": "اشترك في Pro",
+                "subtitle": "زملاء بلا حدود، بسعر واحد. ألغِ في أي وقت.",
+                "cta": "اشترك"
+            },
+            "complimentary": {
+                "title": "اشترك في Pro",
+                "subtitle": "لمساحة عملك وصول مجاني. اشترك لإضافة أرصدة فوقه.",
+                "cta": "اشترك"
+            },
+            "paused": {
+                "title": "إعادة تشغيل Pro",
+                "subtitle": "زملاؤك وذكرياتهم وملفاتك مؤرشفة. وستعود تمامًا كما تركتها.",
+                "cta": "إعادة تشغيل Pro"
+            },
+            "template": {
+                "title": "احصل على Pro لتثبيته",
+                "subtitle": "إنه جاهز. سيظهر على لوحتك لحظة اشتراكك.",
+                "cta": "اشترك"
+            }
+        },
+        "refusal": {
+            "unchanged": "{message} لم تتغير تجربتك.",
+            "nothingCharged": "{message} لم يُخصم شيء ولم تتغير تجربتك."
+        },
+        "usageBack": {
+            "trial": "التجربة",
+            "back": "رجوع"
+        },
+        "success": {
+            "plan": "الخطة",
+            "planValue": "Pro · زملاء بلا حدود",
+            "nextInvoice": "الفاتورة التالية",
+            "backToBoard": "العودة إلى لوحتي",
+            "lastDayFallback": "آخر يوم من تجربتك",
+            "placeCoworkers": "ضع {count} زملاء",
+            "placeOnBoard": "ضعه على لوحتي",
+            "startCoworker": "شغّل زميلي",
+            "paid": {
+                "title": "أنت الآن على Pro",
+                "body": "إيصالك في طريقه إليك عبر البريد الإلكتروني."
+            },
+            "cardSaved": {
+                "title": "تم حفظ البطاقة",
+                "body": "تستمر تجربتك. تبدأ خطة Pro في {date}، ويُخصم {charge} من هذه البطاقة."
+            },
+            "trialStarted": {
+                "title": "بدأت تجربتك",
+                "body": "لا يُخصم شيء اليوم. {charge} في {date} ما لم تُلغِ قبل ذلك.",
+                "cta": "ابنِ زملائي"
+            },
+            "restoring": {
+                "title": "مرحبًا بعودتك",
+                "body": "جارٍ استعادة مساحة عملك. سيستيقظ زملاؤك خلال دقيقة تقريبًا."
+            },
+            "creditUnlocked": {
+                "body": "{coworker} مستعد لاستئناف المهمة. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
+                "bodyNoCoworker": "زميلك مستعد لاستئناف المهمة. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
+                "credits": "الأرصدة",
+                "creditsValue": "{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} شهريًا",
+                "coworkers": "الزملاء",
+                "coworkersValue": "بلا حدود",
+                "resume": "استئناف المهمة"
+            }
+        },
+        "pay": {
+            "tryAgain": "حاول مرة أخرى",
+            "trialRefused": "استُخدمت هذه البطاقة بالفعل في تجربة مجانية",
+            "trialRefusedDescription": "لا يزال بإمكانك الاشتراك، مع فوترة اليوم.",
+            "genericError": "حدث خطأ ما",
+            "acceptTerms": "وافق على الشروط أولًا",
+            "updateFailed": "تعذّر تحديث خطتك",
+            "stillUpdating": "لا يزال تحديث خطتك جاريًا",
+            "pleaseWait": "يرجى الانتظار",
+            "freeFor": "Rerun Pro، مجانًا لمدة {days} يومًا",
+            "subscribe": "اشترك في Rerun Pro",
+            "dueToday": "المستحق اليوم",
+            "perYear": "سنويًا",
+            "perMonth": "شهريًا",
+            "thenPerMonth": "ثم <amount></amount> شهريًا، دون ضريبة القيمة المضافة.",
+            "authorize": "باشتراكك، تفوّض Rerun بالخصم منك حتى تُلغي."
+        },
+        "card": {
+            "exclVat": "دون ضريبة القيمة المضافة، تُحسب من عنوانك.",
+            "payLaterFootnote": "الدفع الآن ينهي تجربتك المجانية اليوم، وتفوّض Rerun بالخصم منك حتى تُلغي. تفضّل إكمال تجربتك؟ <later></later>",
+            "saving": "جارٍ الحفظ…",
+            "payOn": "الدفع في {date}",
+            "payOnLastDay": "الدفع في اليوم الأخير"
+        },
+        "cardOnFile": {
+            "back": "تجربتك",
+            "title": "ابدأ Pro اليوم",
+            "header": "إنهاء التجربة وبدء Rerun Pro",
+            "tax": "الضريبة",
+            "taxFromAddress": "الضريبة، حسب عنوانك",
+            "dueToday": "المستحق اليوم",
+            "change": "تغيير"
+        },
+        "cancelTrial": "إلغاء التجربة",
+        "referral": {
+            "trial": "التجربة",
+            "trialValue": "{days, plural, zero {لا أيام مجانية} one {يوم واحد مجانًا} two {يومان مجانًا} few {# أيام مجانًا} many {# يومًا مجانًا} other {# يوم مجانًا}}",
+            "invitedBy": "بدعوة من {name}",
+            "invitedByFriend": "بدعوة من صديق",
+            "secondMonthFree": "الشهر الثاني مجانًا"
+        },
+        "trial": {
+            "title": "تجربتك المجانية",
+            "included": "المضمّن",
+            "includedValue": "{agents} زملاء و{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}",
+            "slots": "{count, plural, zero {خانة {provider} × #} one {خانة {provider} × #} two {خانات {provider} × #} few {خانات {provider} × #} many {خانات {provider} × #} other {خانات {provider} × #}}",
+            "slotPriceMonthly": "$0 الآن، {amount}/شهريًا بدءًا من {date}",
+            "slotPriceYearly": "$0 الآن، {amount}/سنويًا بدءًا من {date}",
+            "ends": "تنتهي التجربة",
+            "reminder": "تذكير عبر البريد الإلكتروني",
+            "firstCharge": "أول خصم",
+            "firstChargeValue": "<charge></charge> في {date}",
+            "cancelBefore": "ألغِ قبل {date} ولن يُخصم شيء. يواصل زملاؤك العمل حتى ذلك الحين.",
+            "continue": "متابعة تجربتي"
+        },
+        "trialCancelled": {
+            "resumeFailed": "تعذّر استئناف تجربتك",
+            "title": "تنتهي تجربتك",
+            "unit": "لا يُخصم شيء",
+            "body": "ألغيت تجربتك. يواصل زملاؤك العمل حتى ذلك الحين، ولن يُخصم شيء.",
+            "resume": "استئناف تجربتي"
+        },
+        "paneError": "تعذّر فتح نموذج الدفع"
+    },
+    "parts": {
+        "interval": {
+            "monthly": "شهري",
+            "yearly": "سنوي",
+            "perYear": "<amount></amount>/سنويًا",
+            "perMonth": "<amount></amount>/شهريًا"
+        },
+        "features": {
+            "runs": "<b>عمليات تشغيل بلا حدود</b>، على مدار الساعة",
+            "models": "<b>نماذج ذكية</b> مضمّنة",
+            "autopilot": "<b>طيار آلي</b> لأعمالك",
+            "trial": {
+                "agents": "<b>{count} زملاء</b> خلال التجربة، وبلا حدود مع Pro",
+                "teammates": "ادعُ <b>فريقك</b> من اليوم الأول",
+                "credit": "<b>{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} لاستخدام الذكاء الاصطناعي</b>، ثم {monthly, number} شهريًا"
+            },
+            "pro": {
+                "agents": "<b>زملاء بلا حدود</b> في العمل",
+                "teammates": "ادعُ <b>كل أعضاء فريقك</b>",
+                "credit": "<b>{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} لاستخدام الذكاء الاصطناعي</b> شهريًا"
+            },
+            "lifetime": {
+                "ownAi": "يعمل على <b>ذكائك الاصطناعي الخاص</b>",
+                "credit": "<b>أرصدة Rerun</b> عندما تحتاجها"
+            }
+        },
+        "plan": {
+            "title": "خطة Pro",
+            "freeTrialLine": "تجربة مجانية، ثم زملاء بلا حدود",
+            "unlimited": "زملاء بلا حدود",
+            "billedYearly": "<amount></amount> تُفوتر سنويًا",
+            "billedMonthly": "فوترة شهرية",
+            "forDays": "لمدة {days} يومًا",
+            "perMonth": "شهريًا"
+        },
+        "showTestimonial": "عرض {company}",
+        "quoted": "«{quote}»",
+        "cardOnFile": "البطاقة المحفوظة",
+        "promo": {
+            "add": "إضافة رمز ترويجي",
+            "label": "الرمز الترويجي",
+            "apply": "تطبيق",
+            "remove": "إزالة الرمز الترويجي"
+        },
+        "backToPlan": "الخطة",
+        "terms": "أوافق على <terms>الشروط</terms> وأطلب من Rerun البدء فورًا. إذا كنت مستهلكًا، ينتهي حقي في الانسحاب بمجرد بدء الخدمة.",
+        "lifetime": {
+            "title": "صفقة مدى الحياة",
+            "line": "زملاء بلا حدود · دفعة واحدة",
+            "paidOnce": "دفعة واحدة",
+            "forGood": "ملكك إلى الأبد"
+        }
+    },
+    "stripe": {
+        "orPayWithCard": "أو ادفع بالبطاقة",
+        "percentOff": "خصم {percent}%",
+        "amountOff": "خصم {amount}"
+    },
+    "perks": {
+        "feature": "الميزة",
+        "trial": "التجربة",
+        "pro": "Pro",
+        "rows": {
+            "credits": {
+                "title": "استخدام الذكاء الاصطناعي",
+                "trial": "{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}، مرة واحدة",
+                "pro": "{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر"
+            },
+            "coworkers": {
+                "title": "الزملاء",
+                "trial": "{count} نشطين",
+                "pro": "بلا حدود"
+            },
+            "team": {
+                "title": "أعضاء الفريق",
+                "trial": "أنت فقط",
+                "pro": "ادعُ فريقك بالكامل"
+            }
+        },
+        "headlines": {
+            "credits": "{credits, plural, zero {لا أرصدة/شهريًا} one {رصيد واحد/شهريًا} two {رصيدان/شهريًا} few {# أرصدة/شهريًا} many {# رصيدًا/شهريًا} other {# رصيد/شهريًا}}",
+            "coworkers": "زملاء بلا حدود",
+            "team": "ادعُ فريقك"
+        }
+    },
+    "cancel": {
+        "toasts": {
+            "openFailed": "تعذّر فتح الإلغاء",
+            "remindFailed": "تعذّر ضبط التذكير",
+            "claimFailed": "تعذّر تطبيق العرض",
+            "cancelFailed": "تعذّر إلغاء اشتراكك",
+            "resumeFailed": "تعذّر استئناف اشتراكك",
+            "trialResumed": "عادت تجربتك",
+            "subscriptionResumed": "عاد اشتراكك"
+        },
+        "header": {
+            "goodbyeTitle": "لم تحسم أمرك بعد؟ قرّر في {date}",
+            "goodbyeTrialDescription": "أبقِ تجربتك جارية. سنراسلك في اليوم السابق لأول خصم.",
+            "goodbyePaidDescription": "أبقِ زملاءك يعملون. سنراسلك قبل أسبوع من الخصم، فيمكنك الإلغاء حينها.",
+            "sunkTrialTitle": "زملاؤك جاهزون بالفعل",
+            "sunkTrialDescription": "الجزء الصعب انتهى. إذا غادرت الآن، سيتوقفون عن العمل.",
+            "sunkPaidTitle": "لقد دفعت مقابل هذا بالفعل",
+            "sunkPaidDescription": "إنه لك حتى {date} في كل الأحوال. والأرصدة التي لا تستخدمها تذهب معه.",
+            "reasonTitle": "لماذا تغادر؟",
+            "reasonDescription": "بكلماتك. يخبرنا ذلك بما نصلحه أولًا.",
+            "offerDescription": "تبقى خطتك وزملاؤك تمامًا كما هم.",
+            "farewellTitle": "سيتوقف زملاؤك عن العمل في {date}",
+            "farewellDescription": "تتوقف الجداول عن العمل وتتوقف مساحة عملك مؤقتًا.",
+            "claimedTitle": "شكرًا على بقائك",
+            "claimedDescription": "لم يتوقف زملاؤك عن العمل أبدًا.",
+            "remindedTitle": "سنذكّرك في {date}",
+            "remindedDescription": "لن يتغير شيء حتى ذلك الحين. يواصل زملاؤك العمل.",
+            "cancelledTitle": "تم تأكيد الإلغاء",
+            "cancelledDescription": "لن تُفوتر مجددًا. يعمل زملاؤك حتى {date}."
+        },
+        "offerTitle": {
+            "too_expensive": "نفضّل خفض السعر على أن نخسرك",
+            "unused": "امنحه شهرًا آخر",
+            "too_complex": "خذ شهرًا آخر لإعداده",
+            "low_quality": "نأسف لأنه خيّب ظنك",
+            "missing_features": "نطلق تحديثات كل أسبوع",
+            "switched_service": "قبل أن تنتقل",
+            "other": "قبل أن تغادر"
+        },
+        "comeback": {
+            "coming_back": "سأعود!",
+            "maybe": "ربما أعود.",
+            "not_coming_back": "على الأرجح لا."
+        },
+        "reason": {
+            "field": "ما الذي جعلك تقرر المغادرة؟",
+            "placeholder": "جملة واحدة تكفي",
+            "comebackField": "هل ستستخدم Rerun مجددًا؟",
+            "missingComment": "أخبرنا ببضع كلمات لماذا تغادر",
+            "missingComeback": "أخبرنا إن كنت ستعود",
+            "required": "أخبرنا ببضع كلمات لماذا تغادر.",
+            "tooLong": "اجعله أقل من {max, number} حرف.",
+            "notAReason": "لا يبدو هذا سببًا. ما الذي جعلك تقرر المغادرة؟"
+        },
+        "milestones": {
+            "youStay": "تبقى",
+            "email": "البريد",
+            "reminder": "التذكير",
+            "firstCharge": "أول خصم",
+            "renewal": "التجديد"
+        },
+        "daysLeft": {
+            "trial": "لا يزال في تجربتك <days>{count, plural, zero {0 أيام} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}</days>",
+            "paid": "لا يزال متبقيًا في خطتك <days>{count, plural, zero {0 أيام} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}</days>",
+            "runsSoFar": "{count, plural, zero {<figure>#</figure> تشغيل حتى الآن} one {<figure>#</figure> تشغيل حتى الآن} two {<figure>#</figure> تشغيلان حتى الآن} few {<figure>#</figure> عمليات تشغيل حتى الآن} many {<figure>#</figure> تشغيلًا حتى الآن} other {<figure>#</figure> تشغيل حتى الآن}}",
+            "runsThisWeek": "{count, plural, zero {<figure>#</figure> تشغيل هذا الأسبوع} one {<figure>#</figure> تشغيل هذا الأسبوع} two {<figure>#</figure> تشغيلان هذا الأسبوع} few {<figure>#</figure> عمليات تشغيل هذا الأسبوع} many {<figure>#</figure> تشغيلًا هذا الأسبوع} other {<figure>#</figure> تشغيل هذا الأسبوع}}"
+        },
+        "offerCard": {
+            "billedOn": "في {date}"
+        },
+        "offer": {
+            "trialHalf": {
+                "headline": "خصم 50% على شهرك الأول",
+                "terms": "ثم {full}/شهريًا بدءًا من {fullFrom}. سنراسلك قبل {endsOn}، ولا يزال بإمكانك الإلغاء مجانًا حتى ذلك الحين.",
+                "claim": "احصل على خصم 50%",
+                "claimed": "فاتورتك الأولى {price} في {endsOn}، ثم {full}/شهريًا."
+            },
+            "nextMonth": {
+                "headline": "الشهر القادم مقابل $1",
+                "terms": "ثم {full}/شهريًا بدءًا من {fullFrom}.",
+                "termsWithAddons": "تبقى إضافاتك بسعر {addons}/شهريًا. ثم {full}/شهريًا بدءًا من {fullFrom}.",
+                "claim": "احصل على الشهر القادم مقابل $1",
+                "claimed": "فاتورتك القادمة {price}. تعود الفوترة إلى {full}/شهريًا في {fullFrom}."
+            }
+        },
+        "sunk": {
+            "paidCaption": "من هذا الشهر، مدفوعة بالفعل",
+            "creditsLeft": "الأرصدة المتبقية",
+            "runsThisMonth": "عمليات التشغيل هذا الشهر",
+            "agents": "{count, plural, zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
+            "agentsCaption": "جاهزون ومتصلون ويعملون",
+            "creditsCaption": "أرصدة Rerun متبقية",
+            "runsSoFar": "عمليات التشغيل حتى الآن",
+            "schedules": "الجداول"
+        },
+        "remindMe": "ذكّرني في {date}",
+        "keepRunning": "أبقِ زملائي يعملون",
+        "keepCoworkers": "الإبقاء على زملائي",
+        "saved": {
+            "title": "محفوظ حتى {date}",
+            "description": "تُحفظ الذكريات والملفات والمهارات. اشترك مجددًا قبل ذلك وسيعود كل شيء."
+        },
+        "done": {
+            "emailTitle": "رسالة في {date}",
+            "emailTrialDescription": "في اليوم السابق لأول خصم. ألغِ من تلك الرسالة إن أردت.",
+            "emailPaidDescription": "قبل أسبوع من تجديد خطتك في {date}.",
+            "activeTitle": "نشط حتى {date}",
+            "activeTrialDescription": "تستمر تجربتك حتى نهايتها. لن يُخصم شيء.",
+            "activePaidDescription": "يستمر كل شيء في العمل حتى ذلك الحين.",
+            "changedMindTitle": "غيّرت رأيك؟",
+            "changedMindDescription": "استأنف قبل {endsOn} ولن يتوقف شيء. بعد ذلك، تُحفظ مساحة عملك حتى {keptUntil}."
+        },
+        "buttons": {
+            "resumeTrial": "استئناف التجربة",
+            "resumeSubscription": "استئناف الاشتراك",
+            "done": "تم",
+            "goBack": "رجوع",
+            "continueToCancel": "المتابعة إلى الإلغاء",
+            "continue": "متابعة",
+            "noThanks": "لا، شكرًا",
+            "cancelTrial": "إلغاء التجربة",
+            "cancelSubscription": "إلغاء الاشتراك"
+        }
+    },
+    "usage": {
+        "card": {
+            "title": "أرصدة Rerun",
+            "subtitle": "ينفقها زملاؤك على نماذج Rerun والبيانات المدفوعة",
+            "addCredits": "إضافة أرصدة",
+            "startProNow": "ابدأ Pro الآن",
+            "usedTrial": "المستخدم · أرصدة التجربة",
+            "used": "المستخدم",
+            "usedResets": "المستخدم · يُعاد ضبطه في {date}",
+            "usedOf": "{used} من {whole} رصيد",
+            "seeUsage": "عرض الاستخدام"
+        },
+        "outOfCredits": {
+            "trialTitle": "نفدت أرصدة تجربتك",
+            "title": "نفدت أرصدتك",
+            "trialDescription": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة. تأتي خطة Pro مع {count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر.",
+            "description": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة.",
+            "descriptionUntil": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة حتى {date}."
+        },
+        "switch": {
+            "label": "السماح بالإنفاق",
+            "on": "يمكن للزملاء استخدام نماذج Rerun والبيانات المدفوعة.",
+            "off": "متوقف مؤقتًا. لا يمكن للزملاء استخدام نماذج Rerun أو البيانات المدفوعة."
+        },
+        "kind": {
+            "ai": "نماذج الذكاء الاصطناعي",
+            "data": "البيانات المدفوعة"
+        },
+        "tier": {
+            "fast": "نموذج سريع",
+            "balanced": "نموذج متوازن",
+            "smart": "نموذج ذكي"
+        },
+        "bar": {
+            "aiSpent": "نماذج الذكاء الاصطناعي · {figure} رصيد",
+            "dataSpent": "البيانات المدفوعة · {figure} رصيد",
+            "leftThisMonth": "المتبقي هذا الشهر · {figure} رصيد",
+            "left": "المتبقي · {figure} رصيد",
+            "topup": "رصيد إضافي، لا تنتهي صلاحيته · {figure} رصيد"
+        },
+        "legendLeft": "المتبقي",
+        "calls": "{count, plural, zero {لا استدعاءات} one {استدعاء واحد} two {استدعاءان} few {# استدعاءات} many {# استدعاءً} other {# استدعاء}}",
+        "otherCoworker": "أخرى",
+        "pace": {
+            "onTopup": "أُنفقت أرصدة هذا الشهر. يستخدم الزملاء الآن رصيدك الإضافي، والمتبقي {figure}.",
+            "runsOutBeforeTrialEnds": "بهذه الوتيرة، سينفد رصيدك نحو {date}، قبل {days, plural, zero {0 أيام} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}} من نهاية تجربتك.",
+            "runsOutBeforeReset": "بهذه الوتيرة، سينفد رصيدك نحو {date}، قبل {days, plural, zero {0 أيام} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}} من إعادة الضبط."
+        },
+        "pane": {
+            "title": "استخدام الرصيد",
+            "loadFailed": "تعذّر تحميل استخدام رصيدك. حاول مرة أخرى بعد قليل.",
+            "creditsUsed": "{figure} <muted>رصيد مستخدم</muted>",
+            "periodLeft": "من {start} إلى {end} · المتبقي {left}",
+            "perDay": "يوميًا",
+            "pace": "الوتيرة",
+            "nothingSpentTrial": "لم يُنفق شيء بعد في هذه التجربة.",
+            "nothingSpentPeriod": "لم يُنفق شيء بعد في هذه الفترة.",
+            "bySource": "حسب المصدر",
+            "byCoworker": "حسب الزميل",
+            "latestCharges": "أحدث الخصومات"
+        },
+        "chart": {
+            "spentSoFar": "<value>{figure}</value> أُنفق حتى الآن",
+            "ai": "الذكاء الاصطناعي <value>{figure}</value>",
+            "data": "البيانات <value>{figure}</value>",
+            "perDay": "الأرصدة يوميًا",
+            "paceCaption": "ما أُنفق حتى الآن، وأين تصل هذه الوتيرة",
+            "monthly": "شهريًا {figure}",
+            "trialCredits": "أرصدة التجربة {figure}",
+            "topup": "+ رصيد إضافي {figure}",
+            "credits": "الأرصدة {figure}",
+            "today": "اليوم",
+            "trialEnds": "تنتهي التجربة في {date}",
+            "resets": "يُعاد الضبط في {date}"
+        },
+        "paidData": {
+            "people": {
+                "search": "الملفات الشخصية",
+                "email": {
+                    "find": "عناوين البريد المهنية",
+                    "verify": "عمليات التحقق من البريد"
+                },
+                "phone": {
+                    "find": "أرقام الهواتف"
+                },
+                "enrich": "ملفات الأشخاص",
+                "identity": {
+                    "resolve": "عمليات بحث LinkedIn"
+                }
+            },
+            "companies": {
+                "search": "الشركات",
+                "enrich": "ملفات الشركات",
+                "similar": "عمليات البحث عن شركات مشابهة",
+                "jobs": {
+                    "search": "عمليات البحث في إعلانات الوظائف"
+                },
+                "news": "عمليات البحث في أخبار الشركات"
+            },
+            "google": {
+                "serp": {
+                    "organic": "ترتيب Google",
+                    "maps": "عمليات البحث في خرائط Google",
+                    "local": "الترتيب المحلي",
+                    "news": "عمليات البحث في أخبار Google"
+                },
+                "keywords": {
+                    "volume": "عمليات التحقق من حجم الكلمات المفتاحية",
+                    "ideas": "قوائم أفكار الكلمات المفتاحية",
+                    "trends": "مخططات المؤشرات"
+                }
+            },
+            "ai-search": {
+                "perplexity": {
+                    "answer": "إجابات Perplexity"
+                }
+            },
+            "web": {
+                "backlinks": {
+                    "summary": "تقارير الروابط الخلفية",
+                    "list": "قوائم الروابط الخلفية"
+                },
+                "anchors": {
+                    "list": "قوائم نصوص الروابط"
+                },
+                "url": {
+                    "metrics": "عمليات التحقق من القوة"
+                }
+            },
+            "linkedin": {
+                "user": {
+                    "profile": "ملفات LinkedIn",
+                    "posts": "قوائم منشورات LinkedIn"
+                },
+                "company": {
+                    "profile": "صفحات الشركات على LinkedIn"
+                },
+                "post": {
+                    "detail": "منشورات LinkedIn",
+                    "comments": "قوائم تعليقات LinkedIn",
+                    "reactions": "قوائم تفاعلات LinkedIn"
+                }
+            },
+            "tiktok": {
+                "user": {
+                    "profile": "ملفات TikTok",
+                    "videos": "قوائم فيديوهات TikTok"
+                },
+                "search": {
+                    "users": "عمليات البحث عن حسابات TikTok",
+                    "videos": "عمليات البحث عن فيديوهات TikTok"
+                },
+                "video": {
+                    "detail": "فيديوهات TikTok",
+                    "comments": "قوائم تعليقات TikTok"
+                },
+                "comment": {
+                    "replies": "قوائم ردود TikTok"
+                }
+            },
+            "instagram": {
+                "user": {
+                    "profile": "ملفات Instagram",
+                    "posts": "قوائم منشورات Instagram",
+                    "reels": "قوائم مقاطع Reels على Instagram"
+                },
+                "search": {
+                    "users": "عمليات البحث عن حسابات Instagram",
+                    "reels": "عمليات البحث عن مقاطع Reels على Instagram"
+                },
+                "hashtag": {
+                    "posts": "عمليات البحث في وسوم Instagram"
+                },
+                "post": {
+                    "detail": "منشورات Instagram",
+                    "comments": "قوائم تعليقات Instagram"
+                }
+            },
+            "x": {
+                "user": {
+                    "profile": "ملفات X",
+                    "posts": "قوائم منشورات X"
+                },
+                "search": {
+                    "posts": "عمليات البحث في X"
+                },
+                "post": {
+                    "comments": "قوائم الردود على X"
+                }
+            },
+            "youtube": {
+                "channel": {
+                    "profile": "قنوات YouTube",
+                    "videos": "قوائم فيديوهات YouTube"
+                },
+                "search": {
+                    "videos": "عمليات البحث في YouTube"
+                },
+                "video": {
+                    "detail": "فيديوهات YouTube",
+                    "comments": "قوائم تعليقات YouTube"
+                }
+            },
+            "facebook": {
+                "user": {
+                    "profile": "صفحات Facebook",
+                    "posts": "قوائم منشورات Facebook"
+                },
+                "post": {
+                    "comments": "قوائم تعليقات Facebook"
+                }
+            },
+            "reddit": {
+                "subreddit": {
+                    "posts": "خلاصات Subreddit"
+                },
+                "post": {
+                    "detail": "منشورات Reddit"
+                }
+            }
+        }
+    },
+    "layout": {
+        "pill": {
+            "updatePayment": "تحديث الدفع",
+            "freeTrial": "تجربة مجانية",
+            "upgrade": "ترقية",
+            "daysLeft": "{count, plural, zero {0 يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+            "underADayLeft": "أقل من يوم"
+        },
+        "meter": {
+            "trialCredits": "أرصدة التجربة",
+            "credits": "الأرصدة",
+            "noTrialCreditsLeft": "لم تتبقَّ أرصدة تجربة",
+            "outOfCredits": "نفدت الأرصدة",
+            "left": "متبقٍ {figure}",
+            "ariaUsed": "أرصدة Rerun المستخدمة"
+        }
+    },
+    "creditsBar": {
+        "used": "الأرصدة المستخدمة",
+        "resetsOn": "يُعاد الضبط في {date}"
+    },
+    "trialOffer": {
+        "limitsDuringTrial": "{agents} زملاء و{credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} خلال التجربة.",
+        "chargeLine": "البطاقة مطلوبة، $0 اليوم. يُخصم {price} في {date} ما لم تُلغِ قبل ذلك.",
+        "cardlessLine": "لا حاجة إلى بطاقة، $0 اليوم. أضف بطاقة قبل {date} لتواصل بسعر {price}/شهريًا.",
+        "startTrial": "ابدأ تجربتك المجانية لمدة {days} يومًا",
+        "subscribe": "اشترك بـ {price}/شهريًا",
+        "billedToday": "تُفوتر اليوم. ألغِ في أي وقت.",
+        "trialUsed": "استُخدمت تجربتك المجانية. تُفوتر اليوم، ويمكنك الإلغاء في أي وقت."
+    },
+    "startPlan": {
+        "trialFailed": "تعذّر بدء تجربتك",
+        "trialStarted": "بدأت التجربة"
+    }
+}

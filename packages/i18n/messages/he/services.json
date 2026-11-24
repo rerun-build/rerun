@@ -1,0 +1,152 @@
+{
+    "appAccount": {
+        "addAccount": "להוסיף חשבון",
+        "connectTitle": "לחבר חשבון {provider}",
+        "connectHint": "מתחבר פעם אחת לסביבת העבודה, ואז כל עמית יכול לפעול איתו.",
+        "connect": "לחבר את {provider}",
+        "actsAs": "פועל בתור",
+        "accountName": "חשבון {provider}",
+        "selected": "העמית הזה פועל בתור החשבון הזה",
+        "lastAccount": "יש להסיר את {app} כדי להסיר את החשבון האחרון של העמית הזה",
+        "appAccount": "חשבון {app}",
+        "needsAttention": "דורש טיפול ב-{app}",
+        "wakeWhen": "להעיר את העמית הזה כאשר",
+        "wakeWhenAccount": "להעיר את העמית הזה מ-{account} כאשר",
+        "done": "סיום",
+        "timing": {
+            "rightAway": "מיד",
+            "everyFewHours": "נבדק כל כמה שעות"
+        },
+        "unavailable": "{app} עדיין לא זמין בסביבת העבודה הזו.",
+        "wakeEvents": {
+            "message_received": "מגיעה הודעה",
+            "accepted_invitation": "הזמנה מתקבלת על ידי הנמען",
+            "invitation_received": "מתקבלת הזמנה"
+        }
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "התחברות",
+            "key": "מפתח API",
+            "stdio": "מקומי",
+            "app": "חשבון סביבת העבודה",
+            "other": "חיבור"
+        },
+        "description": {
+            "oauth": "התחברות דרך חלון קופץ מאובטח.",
+            "key": "להדביק מפתח API מהשירות.",
+            "stdio": "רץ מקומית במנוע שלך.",
+            "app": "לבחור חשבון שמחובר לסביבת העבודה.",
+            "other": "לא נדרשים פרטי גישה."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "ההרשאה נכשלה",
+        "startFailed": "לא ניתן להתחיל את החיבור",
+        "startOAuthFailed": "לא ניתן להתחיל את OAuth",
+        "connectedAs": "מחובר בתור {account}",
+        "connected": "מחובר",
+        "retry": "לנסות שוב",
+        "secureTitle": "חיבור מאובטח",
+        "secureBody": "החיבור הזה מנוהל על ידי אחד השותפים המהימנים שלנו.",
+        "waiting": "ממתין להרשאה…",
+        "connect": "לחבר"
+    },
+    "credentialGuide": {
+        "title": "איך להשיג את ה-{label} שלך"
+    },
+    "customMcp": {
+        "custom": "מותאם אישית",
+        "connect": "לחבר",
+        "edit": "לערוך את {name}",
+        "remove": "להסיר את {name}",
+        "removeTitle": "להסיר את {name}?",
+        "removeDescription": "העמית יאבד את כל הכלים שהשרת הזה חושף, וההתחברות שלו תימחק.",
+        "removeConfirm": "להסיר",
+        "status": {
+            "connected": "מחובר · {count, plural, one {כלי אחד} two {# כלים} other {# כלים}}",
+            "needsAuth": "נדרשת התחברות",
+            "unreachable": "לא זמין",
+            "noAnswer": "השרת לא ענה."
+        }
+    },
+    "requestApp": {
+        "required": "יש לתאר את האפליקציה שדרושה לך",
+        "sent": "הבקשה נשלחה. תודה, נבדוק אותה.",
+        "title": "לבקש אפליקציה",
+        "description": "ספר לנו איזו אפליקציה דרושה לך ואיך היית משתמש בה. משם אנחנו ממשיכים.",
+        "placeholder": "תאר את האפליקציה שדרושה לך…",
+        "cancel": "ביטול",
+        "send": "לשלוח בקשה"
+    },
+    "alternatives": {
+        "label": "עובד גם עם"
+    },
+    "configForm": {
+        "configured": "{name} הוגדר",
+        "connectTitle": "לחבר את {name}",
+        "signInOAuth": "יש להתחבר ל-{name} כדי שהסוכן שלך יוכל להשתמש בו.",
+        "signInManaged": "יש להתחבר עם {name} כדי שהסוכן שלך יוכל להשתמש בו. Rerun מטפל בחיבור בשבילך.",
+        "setUp": "להגדיר את {name}",
+        "authentication": "אימות",
+        "backToMethods": "חזרה לשיטות",
+        "connecting": "מתחבר…",
+        "connect": "לחבר",
+        "installing": "מתקין…",
+        "chooseAccount": "לבחור חשבון",
+        "install": "להתקין",
+        "noTarget": "השירות הזה דורש התחברות אבל לא החזיר יעד חיבור.",
+        "missingFields": "חלק מהשדות הנדרשים עדיין חסרים."
+    },
+    "fields": {
+        "selectPlaceholder": "לבחור…"
+    },
+    "installed": {
+        "title": "{name} הותקן",
+        "nextTurn": "זמין בתור הבא: {tools}"
+    },
+    "list": {
+        "emptyTitle": "לא נמצאו אפליקציות",
+        "emptyDescription": "לא מצאנו אפליקציה שמתאימה לחיפוש שלך.",
+        "request": "לבקש אפליקציה",
+        "installed": "מותקן",
+        "addAccount": "להוסיף חשבון",
+        "needsSignIn": "נדרשת התחברות",
+        "needsSetup": "נדרשת הגדרה",
+        "removeApp": "להסיר אפליקציה",
+        "finishSetup": "לסיים הגדרה",
+        "install": "להתקין"
+    },
+    "suggestion": {
+        "loading": "טוען אפליקציות מומלצות…",
+        "loadFailed": "לא ניתן לטעון את {name}.",
+        "notFoundSkipped": "לא נמצא בקטלוג, דולג.",
+        "notNow": "לא עכשיו",
+        "connect": "לחבר",
+        "cancel": "ביטול",
+        "connected": "{name} חובר",
+        "reconnect": "לחבר מחדש",
+        "notFound": "לא נמצא בקטלוג.",
+        "skipped": "דולג.",
+        "skip": "לדלג",
+        "finish": "לסיים",
+        "nextApp": "האפליקציה הבאה",
+        "fromVault": "כבר ב-Vault",
+        "useAccount": "להשתמש ב-{label}",
+        "connectNew": "חשבון חדש"
+    },
+    "signInPopup": {
+        "connecting": "מתחבר ל-{name}…"
+    },
+    "categories": {
+        "payments": "תשלומים",
+        "ecommerce": "מסחר מקוון",
+        "crm": "CRM",
+        "marketing": "שיווק",
+        "seo": "SEO",
+        "analytics": "אנליטיקה",
+        "dev": "פיתוח",
+        "productivity": "פרודוקטיביות",
+        "other": "אחר"
+    }
+}

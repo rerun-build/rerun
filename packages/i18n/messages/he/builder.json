@@ -1,0 +1,134 @@
+{
+    "contextMenu": {
+        "newCoworker": "עמית חדש",
+        "openChat": "לפתוח צ'אט",
+        "rename": "לשנות שם",
+        "settings": "הגדרות",
+        "share": "לשתף",
+        "duplicate": "לשכפל",
+        "moveToBox": "להעביר ל-Box",
+        "noOtherBox": "אין Box אחר שאתה מנהל",
+        "delete": "למחוק",
+        "manageAccess": "לנהל גישה",
+        "boxAccessAdminOnly": "רק מנהל מערכת יכול לשנות למי יש גישה ל-Box",
+        "manageReason": "רק מנהל מערכת או מנהל של ה-Box הזה יכול לעשות את זה",
+        "untitledBox": "Box ללא שם",
+        "thisCoworker": "העמית הזה"
+    },
+    "toolbar": {
+        "placementPrompt": "להקיש על משבצת כדי למקם את {name}",
+        "placementPromptDefault": "להקיש על משבצת כדי למקם את העמית שלך",
+        "placementProgress": "עמית {current} מתוך {total}",
+        "newCoworker": "עמית חדש",
+        "template": "תבנית",
+        "create": "ליצור",
+        "search": "חיפוש",
+        "unplaced": "{count} לא ממוקמים"
+    },
+    "isoBoard": {
+        "boxCta": "לגלות תבניות של {name}",
+        "boxCtaFallback": "לגלות תבניות",
+        "recruitFirst": "ללחוץ כדי לגייס את העמית הראשון שלך",
+        "createBox": "ללחוץ כדי ליצור Box",
+        "preparingSandbox": "מכין את סביבת הניסוי שלך…",
+        "settingUpTemplate": "מגדיר את {title}…",
+        "settingUpCoworker": "מגדיר את העמית שלך…",
+        "installTemplate": "ללחוץ כדי להתקין את {title}",
+        "addBoxOnSide": "להוסיף Box בצד הזה"
+    },
+    "discoveries": {
+        "statusDigging": "מכירים את {name}",
+        "statusDone": "{name}, במבט אחד",
+        "found": "נמצאו {count}",
+        "sources": {
+            "website": "האתר שלך",
+            "domain": "הדומיין שלך",
+            "registry": "מרשם ציבורי",
+            "web": "הרשת"
+        },
+        "teasers": {
+            "profile": "קורא את {domain}…",
+            "stack": "מציץ מתחת למכסה המנוע של {domain}…",
+            "dns": "בודק איך מנוהל אצלך האימייל…",
+            "registry": "מחפש אותך במרשם הציבורי…",
+            "site": "קורא כל עמוד ב-{domain}…",
+            "search": "מחפש ברשת את {name}…",
+            "linkedinPerson": "מחפש אותך ב-LinkedIn…",
+            "linkedinCompany": "מאתר את {name} ב-LinkedIn…",
+            "googleBusiness": "קורא את הביקורות שלך ב-Google…",
+            "catalog": "מעיין בחנות של {domain}…",
+            "synthesis": "מחבר את כל החלקים…"
+        },
+        "cards": {
+            "identity": {
+                "title": "מצאנו אותך"
+            },
+            "audience": {
+                "title": "למי אתה מוכר"
+            },
+            "tools": {
+                "title": "כלים שזיהינו"
+            },
+            "mail": {
+                "title": "תיבת הדואר שלך",
+                "runsOn": "האימייל פועל על <b>{provider}</b>"
+            },
+            "social": {
+                "title": "איפה אתה מופיע"
+            },
+            "brand": {
+                "title": "המותג שלך"
+            },
+            "registry": {
+                "title": "על הנייר",
+                "since": "מאז <b>{year}</b>",
+                "people": "<b>{headcount}</b> אנשים"
+            },
+            "person": {
+                "title": "זה אתה, {firstName}?"
+            },
+            "linkedin": {
+                "title": "עמוד ה-LinkedIn שלך",
+                "followers": "עוקבים",
+                "team": "בצוות"
+            },
+            "reviews": {
+                "title": "מה הלקוחות אומרים",
+                "count": "<n>{count}</n> ביקורות ב-Google"
+            },
+            "products": {
+                "title": "מה אתה מוכר"
+            },
+            "competitors": {
+                "title": "מול מי אתה מתחרה"
+            },
+            "customers": {
+                "title": "מי כבר קונה"
+            },
+            "brain": {
+                "title": "Company Brain",
+                "pages": "{count, plural, one {עמוד אחד} two {שני עמודים} other {# עמודים}} שהסוכנים שלך קוראים לפני שהם מתחילים",
+                "productsAndCompetitors": "+ {products, plural, one {מוצר אחד} two {שני מוצרים} other {# מוצרים}}, {competitors, plural, one {מתחרה אחד} two {שני מתחרים} other {# מתחרים}}",
+                "productsOnly": "+ {products, plural, one {מוצר אחד} two {שני מוצרים} other {# מוצרים}}",
+                "competitorsOnly": "+ {competitors, plural, one {מתחרה אחד} two {שני מתחרים} other {# מתחרים}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" נוצר אבל אינו פעיל",
+        "createdInactiveHint": "בתוכנית שלך אין מקום פנוי לעמית. אפשר להפעיל אותו מחלונית העמית.",
+        "addFailed": "לא הצלחנו להוסיף את העמית הזה",
+        "lookFailed": "לא הצלחנו לשנות את המראה של העמית הזה",
+        "duplicateFailed": "לא הצלחנו לשכפל את העמית הזה",
+        "importFailed": "לא הצלחנו לייבא את התבנית הזו",
+        "importInterrupted": "הייבוא נקטע",
+        "importInterruptedHint": "כדאי לבדוק את המכונה שלך לפני ייבוא חוזר.",
+        "moveAgentFailed": "לא הצלחנו להעביר את העמית הזה",
+        "moveBoxFailed": "לא הצלחנו להעביר את ה-Box הזה",
+        "deleteBoxFailed": "לא הצלחנו למחוק את ה-Box הזה",
+        "checkConnection": "יש לבדוק את החיבור ולנסות שוב.",
+        "shareLinkGone": "קישור השיתוף הזה כבר לא זמין",
+        "prepareBoxFailed": "לא הצלחנו להכין את ה-Box שלך",
+        "startCoworkerFailed": "לא הצלחנו להפעיל את העמית שלך"
+    }
+}

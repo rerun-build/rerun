@@ -1,0 +1,379 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "כלול",
+            "plan": "מנוי",
+            "key": "מפתח API"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro או Max",
+                "hint": "התחברות עם חשבון Claude שלך"
+            },
+            "codex": {
+                "title": "ChatGPT Plus או Pro",
+                "hint": "התחברות עם חשבון ChatGPT שלך"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "מודלים של Claude, חיוב לפי טוקן"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "מודלים של GPT, חיוב לפי טוקן"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "מודלים של Gemini, חיוב לפי טוקן"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "כל המודלים במפתח אחד"
+            },
+            "opencode": {
+                "title": "OpenCode Go או Console",
+                "hint": "להדביק את מפתח OpenCode שלך"
+            },
+            "custom": {
+                "title": "נקודת קצה מותאמת",
+                "hint": "Ollama, LM Studio, vLLM או כל שרת תואם OpenAI"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# מודל} two {# מודלים} other {# מודלים}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "הקרדיטים של Rerun מושהים",
+        "creditUsed": "נוצלו {percent}% מהקרדיטים של החודש",
+        "creditUsedUpOn": "הקרדיטים החודשיים נוצלו, יחזרו ב-{date}",
+        "creditUsedUpNextMonth": "הקרדיטים החודשיים נוצלו, יחזרו בחודש הבא",
+        "creditBackOn": "ב-{date}",
+        "creditBackNextMonth": "בחודש הבא",
+        "windows": {
+            "session": "סשן",
+            "fiveHour": "5 שעות",
+            "weekly": "שבועי",
+            "monthly": "חודשי",
+            "modelWeekly": "{label} שבועי",
+            "modelWeeklyUnnamed": "מודל שבועי"
+        },
+        "windowResets": "מתאפס {when}",
+        "tiers": {
+            "fast": "מהיר וזול",
+            "smart": "החכם ביותר"
+        },
+        "opencodePlan": {
+            "go": "כלול ב-Go",
+            "console": "קרדיטים של Console",
+            "free": "חינם"
+        },
+        "unavailable": {
+            "opencodeRetired": "OpenCode כבר לא מציעים אותו",
+            "codexOutdated": "גרסת Codex CLI ישנה ב-Box הזה",
+            "notInChatgptPlan": "לא כלול במנוי ChatGPT שלך"
+        },
+        "pricePerMillion": "{input} קלט · {output} פלט /M",
+        "guide": {
+            "anthropic": {
+                "title": "איך משיגים מפתח Anthropic",
+                "step1": "לפתוח את [Anthropic Console](https://console.anthropic.com/settings/keys) ולהתחבר.",
+                "step2": "ללחוץ על **Create Key** ולתת לו שם, למשל \"Rerun\".",
+                "step3": "להעתיק את המפתח (הוא מתחיל ב-`sk-ant-`) ולהדביק אותו למעלה. הוא מוצג פעם אחת בלבד."
+            },
+            "openai": {
+                "title": "איך משיגים מפתח OpenAI",
+                "step1": "לפתוח את [OpenAI API keys](https://platform.openai.com/api-keys) ולהתחבר.",
+                "step2": "ללחוץ על **Create new secret key** ולתת לו שם, למשל \"Rerun\".",
+                "step3": "להעתיק את המפתח (הוא מתחיל ב-`sk-`) ולהדביק אותו למעלה. הוא מוצג פעם אחת בלבד."
+            },
+            "google": {
+                "title": "איך משיגים מפתח Google",
+                "step1": "לפתוח את [Google AI Studio](https://aistudio.google.com/apikey) ולהתחבר עם חשבון Google שלך.",
+                "step2": "ללחוץ על **Create API key** ולבחור פרויקט Google Cloud.",
+                "step3": "להעתיק את המפתח ולהדביק אותו למעלה."
+            },
+            "openrouter": {
+                "title": "איך משיגים מפתח OpenRouter",
+                "step1": "לפתוח את [OpenRouter keys](https://openrouter.ai/keys) ולהתחבר.",
+                "step2": "ללחוץ על **Create API Key**, ולהוסיף קרדיטים אם היתרה ריקה.",
+                "step3": "להעתיק את המפתח (הוא מתחיל ב-`sk-or-`) ולהדביק אותו למעלה. הוא מוצג פעם אחת בלבד."
+            },
+            "opencode": {
+                "title": "איך משיגים מפתח OpenCode",
+                "step1": "לפתוח את [OpenCode](https://opencode.ai/auth) ולהתחבר.",
+                "step2": "להירשם ל-**OpenCode Go**, או להוסיף קרדיטים כדי להשתמש במודלים של Console.",
+                "step3": "ליצור מפתח API, להעתיק אותו (הוא מתחיל ב-`oc_sk_`) ולהדביק אותו למעלה."
+            }
+        }
+    },
+    "noPlan": {
+        "trialText": "אפשר להתחיל תקופת ניסיון בחינם כדי לחבר מנוי Claude, מנוי ChatGPT או מפתח API משלך.",
+        "subscribeText": "צריך מנוי כדי לחבר מנוי Claude, מנוי ChatGPT או מפתח API משלך.",
+        "startTrial": "להתחיל ניסיון בחינם",
+        "subscribe": "להירשם למנוי"
+    },
+    "baseUrl": {
+        "label": "כתובת בסיס מותאמת",
+        "helper": "לשלוח בקשות לנתב משלך שתואם OpenRouter",
+        "inputLabel": "כתובת בסיס של OpenRouter"
+    },
+    "planLimits": {
+        "title": "שימוש במנוי",
+        "empty": "השימוש יופיע כאן אחרי ההרצה הבאה על המנוי הזה.",
+        "updatedJustNow": "עודכן הרגע",
+        "updatedAgo": "עודכן לפני {age}",
+        "used": "נוצלו {percent}",
+        "usedWithReset": "נוצלו {percent}, {reset}"
+    },
+    "meter": {
+        "planLimit": "ניצול מגבלת {name}",
+        "monthlyCredits": "ניצול הקרדיטים החודשיים"
+    },
+    "providerPicker": {
+        "added": "נוסף"
+    },
+    "status": {
+        "paused": "מושהה",
+        "creditsUsedUp": "הקרדיטים נוצלו",
+        "signInAgain": "להתחבר מחדש",
+        "keyRejected": "המפתח נדחה",
+        "keyMissing": "חסר מפתח",
+        "ready": "מוכן"
+    },
+    "backToProviders": "חזרה לספקי AI",
+    "subtitle": {
+        "included": "כלול במנוי שלך",
+        "apiKey": "מפתח API של {provider}"
+    },
+    "key": {
+        "label": "מפתח API",
+        "placeholder": "להדביק את המפתח שלך"
+    },
+    "name": {
+        "label": "שם",
+        "helper": "מוצג בבורר המודלים של כל עמית"
+    },
+    "becomesDefault": "זה יהפוך לברירת המחדל של סביבת העבודה: כל עמית שאין לו מודל משלו ירוץ עליו.",
+    "connecting": "מתחבר…",
+    "errors": {
+        "nameRequired": "צריך לתת שם לחיבור הזה",
+        "createFailed": "יצירת החיבור נכשלה",
+        "renameFailed": "שינוי שם החיבור נכשל",
+        "saveFailed": "השמירה נכשלה",
+        "startFailed": "לא ניתן להתחיל את החיבור",
+        "saveTokenFailed": "שמירת הטוקן נכשלה",
+        "saveConnectionFailed": "שמירת החיבור נכשלה",
+        "codeExpired": "הקוד פג, צריך להתחיל מחדש",
+        "deleteFailed": "מחיקת החיבור נכשלה",
+        "defaultFailed": "שינוי מודל ברירת המחדל נכשל",
+        "backupsFailed": "שמירת מודלי הגיבוי נכשלה"
+    },
+    "addProvider": {
+        "addKey": "להוסיף מפתח"
+    },
+    "remove": {
+        "button": "להסיר את {name}",
+        "confirmTitle": "להסיר את {name}?",
+        "confirm": "להסיר",
+        "removed": "{name} הוסר",
+        "checking": "בודק מה עדיין רץ עליו…",
+        "fallBack": {
+            "agents": "{agents} יעברו למודל ברירת המחדל של סביבת העבודה.",
+            "automations": "{count, plural, one {# אוטומציה תעבור} two {# אוטומציות יעברו} other {# אוטומציות יעברו}} למודל ברירת המחדל של סביבת העבודה.",
+            "both": "{agents} ו-{count, plural, one {# אוטומציה} two {# אוטומציות} other {# אוטומציות}} יעברו למודל ברירת המחדל של סביבת העבודה."
+        },
+        "holdsDefault": "הוא מחזיק את מודל ברירת המחדל של סביבת העבודה, שיימחק: כל עמית שלא בחר מודל יעבור ל-Rerun.",
+        "nothingRuns": "פרטי הגישה יוסרו מה-Box. שום דבר לא רץ עליו.",
+        "released": {
+            "agents": "{agents} רצים עכשיו על מודל ברירת המחדל של סביבת העבודה.",
+            "automations": "{count, plural, one {# אוטומציה רצה} two {# אוטומציות רצות} other {# אוטומציות רצות}} עכשיו על מודל ברירת המחדל של סביבת העבודה.",
+            "both": "{agents} ו-{count, plural, one {# אוטומציה} two {# אוטומציות} other {# אוטומציות}} רצים עכשיו על מודל ברירת המחדל של סביבת העבודה."
+        },
+        "defaultCleared": "ברירת המחדל של סביבת העבודה נמחקה."
+    },
+    "customModels": {
+        "remove": "להסיר",
+        "add": "להוסיף",
+        "addCustom": "להוסיף מודל מותאם",
+        "openrouterHint": "אפשר להוסיף כל מזהה מודל של OpenRouter (למשל <mono>x-ai/grok-4</mono>).",
+        "serverHint": "אפשר להוסיף מודל שהשרת מגיש אבל לא מציג ברשימה (למשל <mono>llama3.3:70b</mono>).",
+        "idPlaceholder": "מזהה מודל"
+    },
+    "models": {
+        "title": "מודלים",
+        "defaultModel": "מודל ברירת מחדל",
+        "turnOff": "לכבות את {model}",
+        "turnOn": "להפעיל את {model}",
+        "lockDefault": "זה מודל ברירת המחדל. צריך לבחור ברירת מחדל אחרת קודם.",
+        "lockLast": "העמיתים צריכים לפחות מודל אחד מהמקור הזה.",
+        "lockCustom": "מודל מותאם. אפשר להסיר אותו למטה.",
+        "available": "העמיתים שלך יכולים להשתמש",
+        "count": "{on} מתוך {total}",
+        "availableEmpty": "לגרור לכאן מודל כדי שהעמיתים יוכלו להשתמש בו.",
+        "hidden": "כבויים",
+        "hiddenEmpty": "לגרור לכאן מודל כדי למנוע מהעמיתים להשתמש בו."
+    },
+    "opencode": {
+        "goTitle": "כלול ב-OpenCode Go",
+        "goHint": "משולם דרך מנוי Go שלך. המודלים החינמיים כבויים עד שתפעיל אותם.",
+        "consoleTitle": "Console, משולם מהקרדיטים שלך",
+        "consoleHint": "חיוב לפי טוקן, כבוי עד שתפעיל אחד.",
+        "included": "כלול",
+        "credits": "קרדיטים",
+        "free": "חינם",
+        "new": "חדש",
+        "noVision": "ללא ראייה",
+        "search": "חיפוש מודלים",
+        "emptySection": "OpenCode לא מציגים כאן אף מודל כרגע.",
+        "noMatch": "אף מודל לא תואם ל-“{query}”."
+    },
+    "detail": {
+        "readOnly": "{reason}.",
+        "keyReplaced": "המפתח הוחלף",
+        "signedInAgain": "התחברת מחדש",
+        "creditsTitle": "הקרדיטים של החודש",
+        "topUp": "לטעון",
+        "creditsUsedUpOn": "עמיתים שרצים על Rerun מושהים עד שהקרדיטים יחזרו ב-{date}. אפשר לטעון או לבחור מודל ברירת מחדל אחר כדי שימשיכו.",
+        "creditsUsedUpNextMonth": "עמיתים שרצים על Rerun מושהים עד שהקרדיטים יחזרו בחודש הבא. אפשר לטעון או לבחור מודל ברירת מחדל אחר כדי שימשיכו.",
+        "creditsIncluded": "כלול במנוי Rerun שלך. בלי מפתח, בלי הגדרות.",
+        "signInRejected": "ההתחברות הזו נדחתה. עמיתים שמשתמשים בה עצרו עד שתתחבר מחדש.",
+        "signInExpired": "ההתחברות הזו פגה. עמיתים שמשתמשים בה עצרו עד שתתחבר מחדש.",
+        "reconnected": "העמיתים שלך חוזרים לעבוד",
+        "keyRejected": "המפתח הזה נדחה. עמיתים שמשתמשים בו עצרו עד שתדביק מפתח חדש.",
+        "keyMissing": "אין מפתח שמור. עמיתים שמשתמשים בו עצרו עד שתדביק מפתח."
+    },
+    "panel": {
+        "adminOnly": "רק מנהל יכול לשנות את ספקי ה-AI",
+        "groups": {
+            "default": "מודל ברירת מחדל",
+            "backups": "גיבויים",
+            "included": "כלול",
+            "plans": "המנויים שלך",
+            "keys": "מפתחות ה-API שלך",
+            "noPlan": "המנויים ומפתחות ה-API שלך"
+        },
+        "pitch": {
+            "plansWithOpencode": "כבר משתמש ב-Claude Code, Codex או OpenCode? העמיתים שלך יכולים לרוץ על המנוי שלך.",
+            "plans": "כבר משתמש ב-Claude Code או Codex? העמיתים שלך יכולים לרוץ על המנוי שלך.",
+            "plansWithoutClaudeWithOpencode": "כבר משתמש ב-Codex או OpenCode? העמיתים שלך יכולים לרוץ על המנוי שלך.",
+            "plansWithoutClaude": "כבר משתמש ב-Codex? העמיתים שלך יכולים לרוץ על מנוי ChatGPT שלך.",
+            "keysWithCustom": "לשלם ישירות לספק, לפי טוקן, או להריץ מודל משלך.",
+            "keys": "לשלם ישירות לספק, לפי טוקן."
+        },
+        "default": {
+            "via": "דרך {source}. עמיתים שאין להם מודל משלהם רצים עליו.",
+            "pausedPick": "הקרדיטים של Rerun מושהים, ולכן גם עמיתים שאין להם מודל משלהם מושהים. אפשר לבחור מודל אחר כדי שימשיכו.",
+            "pausedAdd": "הקרדיטים של Rerun מושהים, ולכן גם עמיתים שאין להם מודל משלהם מושהים. אפשר להוסיף מנוי או מפתח API כדי שימשיכו.",
+            "usedUpOnPick": "הקרדיטים של Rerun נוצלו עד שיחזרו ב-{date}, ולכן עמיתים שאין להם מודל משלהם מושהים. אפשר לבחור מודל אחר כדי שימשיכו.",
+            "usedUpOnAdd": "הקרדיטים של Rerun נוצלו עד שיחזרו ב-{date}, ולכן עמיתים שאין להם מודל משלהם מושהים. אפשר להוסיף מנוי או מפתח API כדי שימשיכו.",
+            "usedUpNextMonthPick": "הקרדיטים של Rerun נוצלו עד שיחזרו בחודש הבא, ולכן עמיתים שאין להם מודל משלהם מושהים. אפשר לבחור מודל אחר כדי שימשיכו.",
+            "usedUpNextMonthAdd": "הקרדיטים של Rerun נוצלו עד שיחזרו בחודש הבא, ולכן עמיתים שאין להם מודל משלהם מושהים. אפשר להוסיף מנוי או מפתח API כדי שימשיכו.",
+            "stopped": "עמיתים שאין להם מודל משלהם עצרו. צריך לתקן את {source} או לבחור מודל אחר.",
+            "noOtherModel": "אין מודל אחר מוכן. צריך להוסיף מנוי או מפתח API קודם.",
+            "change": "לשנות"
+        },
+        "backups": {
+            "add": "להוסיף גיבוי",
+            "rank": "{rank, selectordinal, other {מס׳ #}} · דרך {source}",
+            "rankNotReady": "{rank, selectordinal, other {מס׳ #}} · {source} לא מוכן, מדלגים",
+            "moveUp": "להזיז את {model} למעלה",
+            "moveDown": "להזיז את {model} למטה",
+            "remove": "להסיר את {model}",
+            "full": "עד {max} גיבויים",
+            "noneLeft": "אין מודל אחר מוכן. צריך להוסיף מנוי או מפתח API קודם.",
+            "credit": {
+                "title": "קרדיט Rerun כמוצא אחרון",
+                "description": "רק כשכל המנויים נגמרו"
+            }
+        },
+        "addSubscription": "להוסיף מנוי",
+        "addApiKey": "להוסיף מפתח API"
+    },
+    "chatgpt": {
+        "allowStep": "לאפשר התחברות עם קוד ב-ChatGPT",
+        "openSettings": "לפתוח את הגדרות ChatGPT",
+        "alreadyOn": "זה כבר מופעל",
+        "codeStep": "להזין את הקוד ב-OpenAI",
+        "remarks": {
+            "connected": "הכול מוכן!",
+            "starting": "מקבל קוד",
+            "expired": "הקוד הזה פג.",
+            "stuck": "עדיין אין תשובה מ-OpenAI.",
+            "waiting": "ממתין ל-OpenAI",
+            "grabCode": "עכשיו צריך לקבל קוד.",
+            "turnOn": "צריך להפעיל את זה פעם אחת."
+        },
+        "setting": {
+            "path": "איפה ההגדרה נמצאת ב-ChatGPT",
+            "settings": "הגדרות",
+            "security": "אבטחה",
+            "deviceCode": "הפעלת הרשאה באמצעות קוד מכשיר עבור Codex"
+        },
+        "adminSwitches": "מנהל ChatGPT שלך מפעיל את זה לכל סביבת העבודה. <copy></copy>",
+        "plusOrPro": "יש לי Plus או Pro",
+        "businessQuestion": "ב-ChatGPT Business או Enterprise?",
+        "copyCode": "להעתיק קוד",
+        "enterCode": "להזין אותו ב<link>דף של OpenAI</link> ולאשר. החלון הזה יקלוט אותו לבד.",
+        "opening": "OpenAI נפתח בכרטיסייה חדשה",
+        "gettingCode": "מקבל קוד…",
+        "newCode": "לקבל קוד חדש",
+        "getCode": "לקבל קוד",
+        "stuck": {
+            "expiredAdmin": "הקוד פג. כנראה שהמנהל שלך עדיין לא אפשר התחברות עם קוד. <copy></copy>",
+            "errorAdmin": "שגיאה בדף של OpenAI? כנראה שהמנהל שלך עדיין לא אפשר התחברות עם קוד. <copy></copy>",
+            "expiredSelf": "הקוד פג. כנראה שהתחברות עם קוד עדיין כבויה: צריך להפעיל אותה ב<link>הגדרות ← אבטחה</link>, ואז לקבל קוד חדש.",
+            "errorSelf": "שגיאה בדף של OpenAI? כנראה שהתחברות עם קוד עדיין כבויה: צריך להפעיל אותה ב<link>הגדרות ← אבטחה</link>, ואז להזין את הקוד שוב."
+        },
+        "copied": "הועתק",
+        "copyMessage": "להעתיק הודעה בשבילו",
+        "adminMessage": "היי! אפשר להפעיל את \"הרשאה באמצעות קוד מכשיר עבור Codex\" בהגדרות סביבת העבודה שלנו ב-ChatGPT? אני צריך את זה כדי לחבר את מנוי ChatGPT שלי ל-Rerun."
+    },
+    "claude": {
+        "remarks": {
+            "idle": "אני מחכה כאן.",
+            "waiting": "להדביק את מה ש-Claude נתן לך.",
+            "checking": "בודק",
+            "connected": "הכול מוכן!"
+        },
+        "approveStep": "לאשר את Rerun ב-Claude",
+        "opening": "Claude נפתח בכרטיסייה חדשה",
+        "openAgain": "לפתוח את Claude שוב",
+        "open": "לפתוח את Claude",
+        "pasteStep": "להדביק את הקוד",
+        "checkingCode": "בודק את הקוד…",
+        "codeAccepted": "הקוד התקבל",
+        "codePlaceholder": "קוד מ-Claude",
+        "paste": "להדביק",
+        "pasteHint": "להדביק אותו בשדה עם ⌘V או Ctrl+V."
+    },
+    "nameStep": {
+        "title": "לתת שם",
+        "remark": "דבר אחרון: שם.",
+        "fieldLabel": "שם החיבור",
+        "saving": "שומר…",
+        "done": "סיום",
+        "helper": "מוצג בבורר המודלים של כל עמית."
+    },
+    "letsGo": "יאללה",
+    "custom": {
+        "server": "שרת",
+        "other": "אחר",
+        "baseUrl": "כתובת בסיס",
+        "keyOptionalPlaceholder": "לא צריך לשרת מקומי",
+        "modelId": "מזהה מודל",
+        "connect": "להתחבר",
+        "endpoint": "נקודת קצה",
+        "contextWindow": "חלון הקשר",
+        "contextWindowHelper": "בטוקנים, למודלים שהשרת לא מגדיר להם גודל בעצמו",
+        "vision": "המודלים רואים תמונות",
+        "visionHelper": "צילומי מסך והמחשב צריכים את זה",
+        "probe": {
+            "unreachableCloud": "לא ניתן להגיע אל {host}. זו צריכה להיות כתובת ציבורית שעונה.",
+            "unreachableLocal": "לא ניתן להגיע אל {host}. צריך לבדוק שהשרת פועל ונגיש מהמנוע.",
+            "unauthorized": "השרת דחה את המפתח הזה. צריך לבדוק שהוא הועתק במלואו.",
+            "notListed": "השרת הזה לא מציג את המודלים שלו. צריך להקליד את המזהה של המודל להרצה.",
+            "refused": "השרת דחה את {model}: {detail}",
+            "refusedPlain": "השרת דחה את {model}.",
+            "refusedUnnamedDetail": "השרת דחה את המודל הזה: {detail}",
+            "refusedUnnamed": "השרת דחה את המודל הזה."
+        }
+    }
+}

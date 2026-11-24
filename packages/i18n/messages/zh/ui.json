@@ -1,0 +1,57 @@
+{
+    "close": "关闭",
+    "back": "返回",
+    "moreOptions": "更多选项",
+    "deleteConfirmTitle": "{label}？",
+    "command": {
+        "title": "命令面板",
+        "description": "搜索要运行的命令..."
+    },
+    "combobox": {
+        "placeholder": "选择一个选项",
+        "placeholderMultiple": "选择选项",
+        "search": "搜索…",
+        "empty": "未找到结果",
+        "selected": "已选择",
+        "remove": "移除 {option}",
+        "reorder": "调整 {option} 的顺序"
+    },
+    "filter": {
+        "search": "搜索{label}…",
+        "empty": "没有匹配项",
+        "clear": "清除"
+    },
+    "phone": {
+        "code": "国际区号，输入区号或国家/地区",
+        "noCountry": "未找到国家/地区"
+    },
+    "powerBars": "能力 {filled}/{max}",
+    "markdown": {
+        "openEditor": "打开完整编辑器",
+        "done": "完成"
+    },
+    "upload": {
+        "menu": "上传",
+        "files": "上传文件",
+        "folder": "上传文件夹",
+        "failed": "上传失败",
+        "finishing": "即将完成",
+        "waiting": "等待中 · {size}",
+        "progress": "上传进度",
+        "uploadingFile": "正在上传 {name}",
+        "totalProgress": "总上传进度",
+        "retry": "重试",
+        "cancel": "取消",
+        "cancelAll": "全部取消",
+        "dismiss": "关闭",
+        "headingFailed": "{total} 个文件中有 {failed} 个上传失败",
+        "headingDone": "{count, plural, other {已上传 # 个文件}}",
+        "headingUploading": "正在上传第 {current} 个，共 {total} 个",
+        "more": "+ 另外 {count} 个"
+    },
+    "waveform": {
+        "live": "实时音频波形",
+        "processing": "正在处理音频",
+        "idle": "音频波形空闲"
+    }
+}
