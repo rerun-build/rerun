@@ -83,7 +83,8 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     const recenterSignal = useBoardStore(s => s.recenterSignal)
     const cameraFocus = useBoardStore(s => s.cameraFocus)
     const selectedSpaceId = useBoardStore(s => s.selectedSpaceId)
-    // Under md the side panel and the foreman are bottom sheets, the board stays live above them.
+    // Under md the side panel and the foreman are bottom sheets, the board stays live above them
+    // until the side panel's fills the screen (SidePanel).
     const foremanFunnel = useForemanStore(s => s.funnel)
     const belowMd = useIsMobile(PANEL_SHEET_QUERY)
     const dialogCoversBoard = useBoardCoverStore(s => s.covers > 0)

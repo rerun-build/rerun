@@ -22,7 +22,7 @@ const DISMISS_FRACTION = 0.25
 const RUBBER_BAND = 0.55
 const VELOCITY_WINDOW_MS = 100
 /** La durée de la transition de la sheet, `duration-500` sur le panneau. */
-const DISMISS_HANDOFF_MS = 500
+export const SHEET_TRANSITION_MS = 500
 
 type Candidate = { detent: SheetDetent | null; height: number }
 type Sample = { t: number; y: number }
@@ -59,6 +59,7 @@ export function useSheetResize({ panelRef, dragVar, detentVar, loadDetent, remem
     // Le cran n'est jamais rendu, seulement écrit sur le nœud : le lire au premier rendu ne peut pas
     // désaccorder l'hydratation, et côté serveur le `try` de la lecture rend `null`.
     const [detent, setDetent] = useState(loadDetent)
+    const [dragging, setDragging] = useState(false)
     const teardownRef = useRef<(() => void) | null>(null)
 
     useEffect(() => {
@@ -116,6 +117,7 @@ export function useSheetResize({ panelRef, dragVar, detentVar, loadDetent, remem
                     if (Math.abs(moveEvent.clientY - startY) < LIFT_DISTANCE) return
                     lifted = true
                     panel.setAttribute('data-sheet-dragging', '')
+                    setDragging(true)
                 }
                 samples.push({ t: moveEvent.timeStamp, y: moveEvent.clientY })
                 while (samples.length > 2 && moveEvent.timeStamp - samples[0].t > VELOCITY_WINDOW_MS) samples.shift()
@@ -141,12 +143,13 @@ export function useSheetResize({ panelRef, dragVar, detentVar, loadDetent, remem
 
                 // Tout part dans le même frame que la transition qui revient : elle anime du doigt au cran.
                 panel.removeAttribute('data-sheet-dragging')
+                setDragging(false)
                 panel.style.removeProperty(dragVar)
                 if (dismissed) {
                     // Le `translate-y-full` de la fermeture n'arrive qu'au rendu suivant : sans ce relais
                     // la sheet remonterait d'abord vers sa place avant de redescendre.
                     panel.style.translate = '0 100%'
-                    setTimeout(() => (panel.style.translate = ''), DISMISS_HANDOFF_MS)
+                    setTimeout(() => (panel.style.translate = ''), SHEET_TRANSITION_MS)
                     onDismiss()
                     return
                 }
@@ -176,5 +179,5 @@ export function useSheetResize({ panelRef, dragVar, detentVar, loadDetent, remem
         [panelRef, detent, settle, dragVar, onDismiss, canDismiss]
     )
 
-    return { onPointerDown, toggleDetent }
+    return { detent, dragging, onPointerDown, toggleDetent }
 }

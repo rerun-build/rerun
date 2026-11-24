@@ -21,6 +21,7 @@ import { foremanNudge } from '@/lib/foreman/dock-feed'
 import { type ForemanCorner, loadForemanOrbCorner, rememberForemanOrbCorner, resolveCorner } from '@/lib/foreman-layout'
 import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
 import { cn } from '@/lib/utils'
+import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useControlCenterStore } from '@/stores/control-center.store'
 import { foremanOrbState, selectForemanOpen, selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -74,6 +75,7 @@ export function ForemanDock() {
     // faire à notre place. La variante `resolved` rend `null` tant que la media query n'a pas été
     // lue côté client : sans elle, un téléphone afficherait l'orbe à 56px le temps d'une frame.
     const isMobile = useResolvedIsMobile(FOREMAN_COLUMN_QUERY)
+    const boardCovered = useBoardCoverStore(s => s.covers > 0)
     const tooNarrow = useResolvedIsMobile(PILL_TOO_NARROW_QUERY)
     // Fenêtre flottante et orbe ne font qu'un : fermée, la fenêtre se replie en orbe dans son coin.
     // Sous `md` la fenêtre ne flotte jamais, l'orbe y garde son coin à elle.
@@ -259,7 +261,7 @@ export function ForemanDock() {
                             size={size}
                             state={orbState}
                             gaze={gaze}
-                            paused={open}
+                            paused={open || (isMobile && boardCovered)}
                             facing={corner.endsWith('left') ? 'right' : 'left'}
                             onClick={
                                 open

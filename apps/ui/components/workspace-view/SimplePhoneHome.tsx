@@ -22,6 +22,7 @@ import type { IsoAgent } from '@/lib/board/types'
 import { ChevronDownIcon, CirclePlusIcon, GridIcon, PlusIcon, SearchIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { loadGrouping, loadPins, saveGrouping, savePins, togglePin, type ListGrouping } from '@/lib/workspace-view'
+import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
 import { useControlCenterStore } from '@/stores/control-center.store'
@@ -48,6 +49,7 @@ export function SimplePhoneHome() {
     const previews = useCoworkerPreviewsStore(s => s.byAgent)
     const unseenRuns = useUnseenRunsStore(s => s.runs)
     const openControlCenter = useControlCenterStore(s => s.openControlCenter)
+    const covered = useBoardCoverStore(s => s.covers > 0)
     const viewer = useBoxViewer()
     const { needsMachineReason } = useWorkspaceAccess()
     const [pins, setPins] = useState<string[]>([])
@@ -97,7 +99,7 @@ export function SimplePhoneHome() {
     )
 
     return (
-        <div className="absolute inset-0 flex flex-col bg-background">
+        <div data-iso-paused={covered ? '' : undefined} className="absolute inset-0 flex flex-col bg-background">
             <header className="flex shrink-0 items-center gap-2 px-4 pt-3 pb-2">
                 <WorkspaceSwitcher placement="column" />
                 <span className="flex-1" />
@@ -136,7 +138,7 @@ export function SimplePhoneHome() {
                 )}
 
                 <div className="px-2">
-                    <ForemanTile />
+                    <ForemanTile paused={covered} />
                 </div>
 
                 <div className="flex items-center justify-between gap-3 px-5 pt-3 pb-1">

@@ -1,17 +1,21 @@
 'use client'
 
+import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+
 import { SidePanelResizeHandle } from '@/components/layout/SidePanelResizeHandle'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
-import { useSheetResize } from '@/components/layout/useSheetResize'
+import { SHEET_TRANSITION_MS, useSheetResize } from '@/components/layout/useSheetResize'
+import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
 import { SIDE_PANEL_DEFAULT_WIDTH, loadSidePanelSheetDetent, rememberSidePanelSheetDetent } from '@/lib/side-panel-width'
 import { cn } from '@/lib/utils'
+import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useTranslations } from 'next-intl'
-import { type ComponentProps, type CSSProperties, type ReactNode, useRef } from 'react'
+import { type ComponentProps, type CSSProperties, type ReactNode, useEffect, useRef } from 'react'
 
 /**
  * À partir de `md`, un panneau qui glisse depuis la droite du board. En dessous, une sheet qui monte
  * du bas comme celle du Foreman : tirée par sa poignée ou son en-tête d'un cran à l'autre ou jusqu'à
- * la fermeture (voir `useSheetResize`), le board reste vivant au-dessus. Le rail n'y existe pas :
+ * la fermeture (voir `useSheetResize`), le board reste vivant au-dessus du cran moyen. Le rail n'y existe pas :
  * `mobileBar` s'ancre tout en haut, sous la poignée, et `mobileHeader` remplace `header` juste dessous.
  * Sans en-tête, seule la poignée tire la sheet.
  */
@@ -34,7 +38,7 @@ export function SidePanel({
 }) {
     const panelRef = useRef<HTMLDivElement>(null)
     const t = useTranslations('layout.sidePanel')
-    const { onPointerDown, toggleDetent } = useSheetResize({
+    const { detent, dragging, onPointerDown, toggleDetent } = useSheetResize({
         panelRef,
         dragVar: '--side-sheet-drag-h',
         detentVar: '--side-sheet-detent-h',
@@ -42,6 +46,19 @@ export function SidePanel({
         rememberDetent: rememberSidePanelSheetDetent,
         onDismiss,
     })
+
+    const isSheet = useIsMobile(FOREMAN_COLUMN_QUERY)
+    const coversTheScreen = isOpen && isSheet && detent === 'large' && !dragging
+    useEffect(() => {
+        if (!coversTheScreen) return
+        let release: (() => void) | undefined
+        // Once it has slid up: frozen any sooner, what it covers would stop in plain sight.
+        const timer = setTimeout(() => (release = useBoardCoverStore.getState().cover()), SHEET_TRANSITION_MS)
+        return () => {
+            clearTimeout(timer)
+            release?.()
+        }
+    }, [coversTheScreen])
 
     return (
         <div

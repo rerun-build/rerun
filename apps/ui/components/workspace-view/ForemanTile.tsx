@@ -44,7 +44,7 @@ const ACTIONS: CoworkerTileActions = {
 }
 
 /** The Chief of Staff at the top of the list, in place of the orb that floats over the board: a coworker's tile, with its orb. */
-export function ForemanTile() {
+export function ForemanTile({ paused = false }: { paused?: boolean }) {
     const tView = useTranslations('workspaceView.foreman')
     const base = useForemanAsAgent()
     const visible = useForemanStore(selectForemanVisible)
@@ -66,7 +66,7 @@ export function ForemanTile() {
             unseen={false}
             onOpen={() => useForemanStore.getState().openInCenter()}
             actions={ACTIONS}
-            avatar={size => <Orb size={size - 6} state={foremanOrbState({ open, activity })} facing="right" />}
+            avatar={size => <Orb size={size - 6} state={foremanOrbState({ open, activity })} paused={paused} facing="right" />}
         />
     )
 }
