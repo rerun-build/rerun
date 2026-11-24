@@ -28,6 +28,8 @@
     "spaceNotFound": "Space nicht gefunden",
     "sessionNotFound": "Sitzung nicht gefunden",
     "conversationNotFound": "Unterhaltung nicht gefunden",
+    "invalidFeatureRequest": "Dieser Anfrage fehlt ein Titel oder sie ist zu lang.",
+    "featureRequestsUnavailable": "Anfragen an das Rerun-Team sind in dieser Installation nicht verfügbar.",
     "requestAlreadyAnswered": "Diese Anfrage wurde bereits beantwortet.",
     "coworkerStillWorking": "Der Coworker arbeitet noch. Versuche es gleich noch einmal.",
     "accountNotFound": "Konto nicht gefunden",

@@ -8,6 +8,7 @@ import { Children, useEffect, useState, type ComponentType, type ReactNode } fro
 import { getServiceAlternativesAction } from '@/app/api/_actions/services.actions'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
 import { MessageAttachments } from '@/components/chat/MessageAttachments'
+import { FeatureRequestSentRow, FeatureRequestSkippedRow } from '@/components/chat/feature-request/FeatureRequestReceipt'
 import { SpendReceipt } from '@/components/chat/spend/SpendReceipt'
 import { Icon } from '@/components/ui/icon'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
@@ -33,10 +34,12 @@ type HitlReceiptProps = {
     agentId?: string
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
+    // What a receipt that offers to go back on the choice sends (a skipped request reviewed).
+    onSendMessage?: (opts: { text: string }) => unknown
 }
 
 // What the user decided in a setup block, drawn in place of the reply written for the agent.
-export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false, agentId, rawUrlFor, readFile }: HitlReceiptProps) {
+export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false, agentId, rawUrlFor, readFile, onSendMessage }: HitlReceiptProps) {
     const input = hitlCallInput(call)
     switch (reply.kind) {
         case 'service':
@@ -55,8 +58,10 @@ export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false
             return <SpendReceipt decision={reply} totalMicros={readSpendQuote(call?.output)?.totalMicros ?? null} progress={{ spentMicros, running: spendRunning }} />
         case 'computer':
             return <ComputerAccessReceipt reply={reply} request={call ? pendingComputerAccess(input) : null} />
+        case 'feature':
+            return <FeatureRequestSentRow request={reply.request} />
         case 'cancelled':
-            return <DismissedLine of={reply.of} />
+            return reply.of === 'feature' ? <FeatureRequestSkippedRow call={call} onSendMessage={onSendMessage} /> : <DismissedLine of={reply.of} />
     }
 }
 

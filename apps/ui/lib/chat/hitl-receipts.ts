@@ -2,7 +2,7 @@ import { billedMicrosOf, isPaidDataTool, toolNameOf } from '@rerun/contracts'
 
 import { hitlKindOf, type HitlKind } from '@/lib/chat-hitl'
 
-export type HitlCallPart = { type: string; toolName?: string; input?: unknown; output?: unknown }
+export type HitlCallPart = { type: string; toolName?: string; toolCallId?: string; input?: unknown; output?: unknown }
 
 type MessageLike = { role: string; parts: readonly { type: string }[] }
 

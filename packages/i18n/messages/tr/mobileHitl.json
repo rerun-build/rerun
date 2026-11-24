@@ -26,7 +26,8 @@
         "takeover": "Ekranda sıra sizde",
         "jumpTo": "{label}, oraya git",
         "spend": "Onay bekleyen harcama",
-        "computer": "#{computer} üzerinde bir komutu onaylayın"
+        "computer": "#{computer} üzerinde bir komutu onaylayın",
+        "feature": "Rerun ekibine gönderilecek talep"
     },
     "alert": {
         "label": "Bildirim",
@@ -103,7 +104,8 @@
             "service": "Uygulama kurulumunu kapattınız",
             "secret": "Anahtarları paylaşmayı reddettiniz",
             "mcp": "Girişi atladınız",
-            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız"
+            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız",
+            "feature": "Talep gönderilmedi"
         },
         "answer": "Yanıt",
         "answers": "Yanıtlar",
@@ -130,7 +132,8 @@
         "handedBack": "Tarayıcıyı geri verdiniz",
         "spend": "Ücretli veri",
         "approvedOnce": "Bir kez onaylandı",
-        "alwaysAllowed": "Her zaman izinli"
+        "alwaysAllowed": "Her zaman izinli",
+        "featureSent": "Rerun ekibine gönderildi: {title}"
     },
     "spend": {
         "estimatedTotal": "Tahmini toplam",

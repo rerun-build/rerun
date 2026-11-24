@@ -26,7 +26,8 @@
         "takeover": "Du bist am Bildschirm dran",
         "jumpTo": "{label}, hingehen",
         "spend": "Ausgabe freizugeben",
-        "computer": "Befehl auf #{computer} freigeben"
+        "computer": "Befehl auf #{computer} freigeben",
+        "feature": "Anfrage an das Rerun-Team zu senden"
     },
     "alert": {
         "label": "Benachrichtigung",
@@ -103,7 +104,8 @@
             "service": "Du hast die App-Einrichtung geschlossen",
             "secret": "Du hast die Schlüssel nicht geteilt",
             "mcp": "Du hast die Anmeldung übersprungen",
-            "takeover": "Du hast den Browser deinem Coworker überlassen"
+            "takeover": "Du hast den Browser deinem Coworker überlassen",
+            "feature": "Anfrage nicht gesendet"
         },
         "answer": "Antwort",
         "answers": "Antworten",
@@ -130,7 +132,8 @@
         "handedBack": "Du hast den Browser zurückgegeben",
         "spend": "Kostenpflichtige Daten",
         "approvedOnce": "Einmal freigegeben",
-        "alwaysAllowed": "Immer erlaubt"
+        "alwaysAllowed": "Immer erlaubt",
+        "featureSent": "An das Rerun-Team gesendet: {title}"
     },
     "spend": {
         "estimatedTotal": "Geschätzte Summe",

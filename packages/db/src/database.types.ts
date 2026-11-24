@@ -1228,6 +1228,90 @@ export type Database = {
           },
         ]
       }
+      feature_requests: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          description: string
+          foreman_conversation_id: string | null
+          id: string
+          kind: string
+          session_id: string | null
+          title: string
+          tool_call_id: string
+          transcript: Json
+          user_id: string | null
+          workaround: string | null
+          workspace_id: number
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          description: string
+          foreman_conversation_id?: string | null
+          id?: string
+          kind: string
+          session_id?: string | null
+          title: string
+          tool_call_id: string
+          transcript?: Json
+          user_id?: string | null
+          workaround?: string | null
+          workspace_id: number
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          description?: string
+          foreman_conversation_id?: string | null
+          id?: string
+          kind?: string
+          session_id?: string | null
+          title?: string
+          tool_call_id?: string
+          transcript?: Json
+          user_id?: string | null
+          workaround?: string | null
+          workspace_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feature_requests_foreman_conversation_id_fkey"
+            columns: ["foreman_conversation_id"]
+            isOneToOne: false
+            referencedRelation: "foreman_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feature_requests_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feature_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feature_requests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       foreman_conversations: {
         Row: {
           backend: string

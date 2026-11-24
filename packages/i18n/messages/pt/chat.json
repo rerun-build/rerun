@@ -155,7 +155,8 @@
         "service": "{count, plural, =0 {App para conectar} one {App para conectar} other {# apps para conectar}}",
         "takeover": "Sua vez na tela",
         "spend": "Gasto para aprovar",
-        "computer": "Comando para aprovar em #{computer}"
+        "computer": "Comando para aprovar em #{computer}",
+        "feature": "Solicitação para enviar ao time do Rerun"
     },
     "pendingHitl": {
         "goTo": "{label}, ir até lá"
@@ -509,7 +510,8 @@
             "question": "Você pulou as perguntas",
             "secret": "Você recusou compartilhar as chaves",
             "mcp": "Você pulou o login",
-            "takeover": "Você deixou o navegador com seu coworker"
+            "takeover": "Você deixou o navegador com seu coworker",
+            "feature": "Solicitação não enviada"
         },
         "computer": {
             "status": {
@@ -590,5 +592,22 @@
         "label": "Tarefa concluída em <computer>#{handle}</computer>",
         "viewReport": "Ver relatório",
         "reportTitle": "O que #{computer} informou"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "Recurso",
+            "bug": "Bug",
+            "improvement": "Melhoria"
+        },
+        "today": "<strong>Hoje:</strong> {workaround}",
+        "notNow": "Agora não",
+        "edit": "Editar",
+        "done": "Pronto",
+        "send": "Enviar ao time",
+        "titleLabel": "Título",
+        "descriptionLabel": "Descrição",
+        "sent": "Enviado ao time do Rerun: <muted>{title}</muted>",
+        "reviewIt": "Revisar",
+        "sendFailed": "Não foi possível enviar a solicitação. Tente de novo."
     }
 }

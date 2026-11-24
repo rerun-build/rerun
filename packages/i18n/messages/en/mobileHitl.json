@@ -26,7 +26,8 @@
         "takeover": "Your turn on the screen",
         "jumpTo": "{label}, go to it",
         "spend": "Spend to approve",
-        "computer": "Approve a command on #{computer}"
+        "computer": "Approve a command on #{computer}",
+        "feature": "Request to send to the Rerun team"
     },
     "alert": {
         "label": "Notification",
@@ -103,7 +104,8 @@
             "service": "You closed the app setup",
             "secret": "You declined to share the keys",
             "mcp": "You skipped signing in",
-            "takeover": "You left the browser to your coworker"
+            "takeover": "You left the browser to your coworker",
+            "feature": "Request not sent"
         },
         "answer": "Answer",
         "answers": "Answers",
@@ -130,7 +132,8 @@
         "handedBack": "You handed the browser back",
         "spend": "Paid data",
         "approvedOnce": "Approved once",
-        "alwaysAllowed": "Always allowed"
+        "alwaysAllowed": "Always allowed",
+        "featureSent": "Sent to the Rerun team: {title}"
     },
     "_context": {
         "actions.notNow": "Declines an ask of a coworker for now (an approval, a sign-in, an app to connect).",

@@ -170,7 +170,8 @@
         "remote_file_list": "Listou arquivos em #{computer}",
         "remote_file_read": "Leu um arquivo em #{computer}",
         "remote_file_write": "Escreveu um arquivo em #{computer}",
-        "remote_transfer": "Copiou um arquivo com #{computer}"
+        "remote_transfer": "Copiou um arquivo com #{computer}",
+        "request_feature": "Escreveu uma solicitação para o time do Rerun"
     },
     "activities": {
         "shell_exec": "Executando um comando",

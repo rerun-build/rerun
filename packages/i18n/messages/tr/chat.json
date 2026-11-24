@@ -155,7 +155,8 @@
         "service": "{count, plural, =0 {Bağlanacak uygulama} one {Bağlanacak uygulama} other {Bağlanacak # uygulama}}",
         "takeover": "Ekranda sıra sizde",
         "spend": "Onaylanacak harcama",
-        "computer": "#{computer} üzerinde bir komutu onaylayın"
+        "computer": "#{computer} üzerinde bir komutu onaylayın",
+        "feature": "Rerun ekibine gönderilecek talep"
     },
     "pendingHitl": {
         "goTo": "{label}, oraya git"
@@ -509,7 +510,8 @@
             "question": "Soruları atladınız",
             "secret": "Anahtarları paylaşmayı reddettiniz",
             "mcp": "Girişi atladınız",
-            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız"
+            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız",
+            "feature": "Talep gönderilmedi"
         },
         "computer": {
             "status": {
@@ -590,5 +592,22 @@
         "label": "İş <computer>#{handle}</computer> üzerinde bitti",
         "viewReport": "Raporu görüntüle",
         "reportTitle": "#{computer} raporu"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "Özellik",
+            "bug": "Hata",
+            "improvement": "İyileştirme"
+        },
+        "today": "<strong>Bugün:</strong> {workaround}",
+        "notNow": "Şimdi değil",
+        "edit": "Düzenle",
+        "done": "Tamam",
+        "send": "Ekibe gönder",
+        "titleLabel": "Başlık",
+        "descriptionLabel": "Açıklama",
+        "sent": "Rerun ekibine gönderildi: <muted>{title}</muted>",
+        "reviewIt": "Gözden geçir",
+        "sendFailed": "Talep gönderilemedi. Tekrar deneyin."
     }
 }

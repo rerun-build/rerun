@@ -28,6 +28,8 @@
     "spaceNotFound": "Alan bulunamadı",
     "sessionNotFound": "Oturum bulunamadı",
     "conversationNotFound": "Sohbet bulunamadı",
+    "invalidFeatureRequest": "Bu talebin başlığı yok ya da çok uzun.",
+    "featureRequestsUnavailable": "Rerun ekibine talepler bu kurulumda kullanılamıyor.",
     "requestAlreadyAnswered": "Bu isteğe zaten yanıt verildi.",
     "coworkerStillWorking": "Coworker hâlâ çalışıyor. Birazdan tekrar deneyin.",
     "accountNotFound": "Hesap bulunamadı",

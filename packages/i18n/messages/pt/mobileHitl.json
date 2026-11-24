@@ -26,7 +26,8 @@
         "takeover": "Sua vez na tela",
         "jumpTo": "{label}, ir até lá",
         "spend": "Gasto para aprovar",
-        "computer": "Comando para aprovar em #{computer}"
+        "computer": "Comando para aprovar em #{computer}",
+        "feature": "Solicitação para enviar ao time do Rerun"
     },
     "alert": {
         "label": "Notificação",
@@ -103,7 +104,8 @@
             "service": "Você fechou a configuração do app",
             "secret": "Você recusou compartilhar as chaves",
             "mcp": "Você pulou o login",
-            "takeover": "Você deixou o navegador para o seu coworker"
+            "takeover": "Você deixou o navegador para o seu coworker",
+            "feature": "Solicitação não enviada"
         },
         "answer": "Resposta",
         "answers": "Respostas",
@@ -130,7 +132,8 @@
         "handedBack": "Você devolveu o navegador",
         "spend": "Dados pagos",
         "approvedOnce": "Aprovado desta vez",
-        "alwaysAllowed": "Sempre permitido"
+        "alwaysAllowed": "Sempre permitido",
+        "featureSent": "Enviado ao time do Rerun: {title}"
     },
     "spend": {
         "estimatedTotal": "Total estimado",

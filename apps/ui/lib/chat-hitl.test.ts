@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@rerun/contracts'
-import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingSecretVault, pendingServices, pendingSpend, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeSpendDecision, serializeTakeoverResult } from './chat-hitl'
+import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingFeatureRequest, serializeFeatureRequestSent, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingSecretVault, pendingServices, pendingSpend, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeSpendDecision, serializeTakeoverResult } from './chat-hitl'
 import { parseAttachments } from './chat/attachments-marker'
 
 describe('pendingQuestions', () => {
@@ -532,5 +532,31 @@ describe('findUnknownPendingCall', () => {
 
     it('finds nothing once the human has spoken', () => {
         expect(findUnknownPendingCall([assistant(unknown), { role: 'user', parts: [{ type: 'text', text: 'Done' }] }])).toBeNull()
+    })
+})
+
+describe('request_feature', () => {
+    it('reads the draft, the workaround only when written', () => {
+        expect(pendingFeatureRequest({ kind: 'bug', title: 'Export CSV\ndoes nothing', description: ' It answers 500. ', workaround: null })).toEqual({ kind: 'bug', title: 'Export CSV does nothing', description: 'It answers 500.' })
+        expect(pendingFeatureRequest({ kind: 'nonsense', title: 'Videos in the chat', description: 'Generate them.', workaround: 'Connect HeyGen.' })).toEqual({ kind: 'feature', title: 'Videos in the chat', description: 'Generate them.', workaround: 'Connect HeyGen.' })
+    })
+
+    it('needs a title to draw the card', () => {
+        expect(hitlKindOf('request_feature')).toBe('feature')
+        expect(hitlInputIsUsable('feature', { title: 'Videos in the chat' })).toBe(true)
+        expect(hitlInputIsUsable('feature', { description: 'Generate them.' })).toBe(false)
+    })
+
+    it('reads back the request as it was sent, edited text included', () => {
+        const request = { kind: 'improvement' as const, title: 'Guest access', description: 'Share a coworker by link.\n\nThe guest sees only their chat.' }
+        const text = serializeFeatureRequestSent(request)
+        expect(text).toContain('do not offer this request again')
+        expect(parseHitlReply(text)).toEqual({ kind: 'feature', request })
+        expect(parseHitlReply(serializeFeatureRequestSent({ ...request, description: '' }))).toEqual({ kind: 'feature', request: { ...request, description: '' } })
+    })
+
+    it('reads a skipped card as cancelled, and a typed lookalike as a plain message', () => {
+        expect(parseHitlReply(HITL_CANCELLED.feature)).toEqual({ kind: 'cancelled', of: 'feature' })
+        expect(parseHitlReply('Sent to the Rerun team (feature): **Videos**')).toBeNull()
     })
 })

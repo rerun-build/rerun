@@ -26,7 +26,8 @@
         "takeover": "Tu turno en la pantalla",
         "jumpTo": "{label}, ir",
         "spend": "Gasto por aprobar",
-        "computer": "Comando por aprobar en #{computer}"
+        "computer": "Comando por aprobar en #{computer}",
+        "feature": "Solicitud para enviar al equipo de Rerun"
     },
     "alert": {
         "label": "Notificación",
@@ -103,7 +104,8 @@
             "service": "Cerraste la configuración de apps",
             "secret": "Decidiste no compartir las claves",
             "mcp": "Omitiste el inicio de sesión",
-            "takeover": "Dejaste el navegador a tu coworker"
+            "takeover": "Dejaste el navegador a tu coworker",
+            "feature": "Solicitud no enviada"
         },
         "answer": "Respuesta",
         "answers": "Respuestas",
@@ -130,7 +132,8 @@
         "handedBack": "Devolviste el navegador",
         "spend": "Datos de pago",
         "approvedOnce": "Aprobado esta vez",
-        "alwaysAllowed": "Permitido siempre"
+        "alwaysAllowed": "Permitido siempre",
+        "featureSent": "Enviado al equipo de Rerun: {title}"
     },
     "spend": {
         "estimatedTotal": "Total estimado",

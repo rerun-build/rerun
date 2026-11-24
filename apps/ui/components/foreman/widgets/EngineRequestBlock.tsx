@@ -7,11 +7,12 @@ import { toast } from 'sonner'
 import { allowForemanPaidDataAction } from '@/app/api/_actions/agent.actions'
 import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
 import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBlock'
+import { FeatureRequestBlock } from '@/components/chat/feature-request/FeatureRequestBlock'
 import { McpSignInBlock } from '@/components/chat/McpSignInBlock'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
-import { HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingSecrets, pendingSecretVault, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
+import { HITL_CANCELLED, pendingApprovals, pendingFeatureRequest, pendingMcpSignIn, pendingSecrets, pendingSecretVault, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
 import type { UploadTarget } from '@/lib/files/upload-url'
 import type { PendingWidget } from '@/lib/foreman/pending-widget'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -74,6 +75,8 @@ export function EngineRequestBlock({ request, answerAttachments, onAnswer, onDis
             return <McpSignInBlock inline agentId={FOREMAN_AGENT_ID} {...pendingMcpSignIn(input)} onDone={onAnswer} onSkip={() => onAnswer(HITL_CANCELLED.mcp)} />
         case 'request_spend':
             return <SpendRequestBlock input={input} output={request.output} onSubmit={decision => void submitSpend(decision)} />
+        case 'request_feature':
+            return <FeatureRequestBlock request={pendingFeatureRequest(input)} toolCallId={request.toolCallId} onSent={onAnswer} onSkip={() => onAnswer(HITL_CANCELLED.feature)} />
         case 'request_takeover':
             return null
         default:

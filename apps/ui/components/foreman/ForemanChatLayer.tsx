@@ -45,6 +45,8 @@ import { ForemanActivityIndicator } from './ForemanActivityIndicator'
 import { useForemanMentionAgents } from './useForemanMentionAgents'
 import { ForemanWelcome } from './ForemanWelcome'
 import { EngineRequestBlock } from './widgets/EngineRequestBlock'
+import { FeatureRequestConversationProvider } from '@/components/chat/feature-request/FeatureRequestConversation'
+import { useForemanStore } from '@/stores/foreman.store'
 import { planAgentShortcuts } from './widgets/agent-picks'
 import { renderForemanWidget, type AnswerWidget, type DismissWidget } from './widgets/renderForemanWidget'
 import { skillProposalRow, type ForemanSkillProposals } from './widgets/skill-proposal-row'
@@ -132,6 +134,8 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
     const scrollMask = useScrollFade(scroller, { fadeSize: SCROLL_FADE })
     const mentionAgents = useForemanMentionAgents()
     const mentions = useMemo(() => mentionTokensOf(mentionAgents, []), [mentionAgents])
+    const foremanConversationId = useForemanStore(state => state.sessionId)
+    const featureRequestConversation = useMemo(() => ({ sessionId: foremanConversationId, scope: 'foreman' as const }), [foremanConversationId])
     const pendingRef = useArriveByTop(conversationRef, onWidgetAnswer && pending ? pending.toolCallId : null)
     const engineHitl = onWidgetAnswer && pending && isEngineHitl(pending.toolName) ? pending : null
     const engineHitlKind = engineHitl && hitlKindOf(engineHitl.toolName)
@@ -202,99 +206,101 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
     }
 
     return (
-        <div ref={setRoot} className={cn('pointer-events-auto relative w-full', className)} style={{ contain: 'paint' }}>
-            {/* Posé par-dessus la pile plutôt que dedans : il la trouve vide, et en sortant il se
-                fond sur le premier message qui arrive au lieu de lui disputer la hauteur. */}
-            <AnimatePresence>
-                {greeting && <ForemanWelcome key="welcome" thinking={streaming} orbPaused={orbPaused} />}
-            </AnimatePresence>
+        <FeatureRequestConversationProvider value={featureRequestConversation}>
+            <div ref={setRoot} className={cn('pointer-events-auto relative w-full', className)} style={{ contain: 'paint' }}>
+                {/* Posé par-dessus la pile plutôt que dedans : il la trouve vide, et en sortant il se
+                    fond sur le premier message qui arrive au lieu de lui disputer la hauteur. */}
+                <AnimatePresence>
+                    {greeting && <ForemanWelcome key="welcome" thinking={streaming} orbPaused={orbPaused} />}
+                </AnimatePresence>
 
-            <Conversation className="relative z-10 h-full" contextRef={conversationRef}>
-                {/* Le fondu porte sur ce calque et pas sur la `Conversation` : le bouton de retour
-                    en bas est son frère, ancré au ras du bord où le fondu est le plus fort, et il
-                    doit rester net. Le calque ne défile pas, il couvre exactement la fenêtre du
-                    conteneur qui défile, donc le fondu reste collé aux bords du panneau. */}
-                <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
-                    {/* `justify-end` et `min-h-full` : une conversation de deux messages reste collée
-                        au composer au lieu de flotter en haut du panneau. Sous `md` la sheet mesure
-                        cette pile pour prendre sa hauteur, un `min-h-full` l'empêcherait de jamais
-                        redescendre : c'est `mt-auto` qui la colle au composer, et il cède au
-                        défilement quand la pile déborde. L'accueil et l'en-tête de la carte sont
-                        posés en overlay, sans hauteur à eux : le plancher leur garde la place. Ce
-                        plancher explicite rend la pile compressible par le scroller, et la sheet
-                        qui la mesure rétrécirait d'un pixel à chaque tour : `shrink-0` l'en garde. */}
-                    <ConversationContent
-                        scrollClassName="max-md:flex max-md:flex-col md:[container-type:size]"
-                        className={cn(
-                            framed ? 'mx-auto w-full max-w-[var(--chat-column,none)]' : cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : underCrumb ? 'pt-[8.5rem]' : 'pt-24'),
-                            greeting ? 'max-md:min-h-72' : 'max-md:min-h-36'
-                        )}
-                    >
-                        {restoring && <ForemanChatSkeleton />}
-                        {threadBranches(threadRows.leading)}
-                        {empty && !greeting && !restoring ? (
-                            <ForemanTeamEmptyStateSlot onSend={onSuggestion} onPrefill={onPrefill} orbPaused={orbPaused} />
-                        ) : (
-                            visible.flatMap((message, index) => [
-                                <FloatingMessage
-                                    key={message.id}
-                                    message={message}
-                                    index={index}
-                                    isActive={streaming && index === visible.length - 1}
-                                    settled={index < visible.length - 1 || !(streaming || runHeld)}
-                                    rawUrlFor={rawUrlFor}
-                                    readFile={readFile}
-                                    sharedFiles={sharedFiles}
-                                    renderToolPart={renderToolPart}
-                                    mentions={mentions}
-                                    onStopTask={onStopTask}
-                                    onRegenerate={engineHitl && index === visible.length - 1 ? undefined : actions?.onRegenerate}
-                                    onRateMessage={actions?.onRate}
-                                    feedbackRating={actions ? actions.ratingOf(message.id) : undefined}
-                                    hitlCall={hitlCallBefore(visible, index)}
-                                    showQuickReplies={index === visible.length - 1 && !streaming && !engineHitl && !nextSteps?.length}
-                                    onSendMessage={sendQuickReply}
-                                    onDraftReply={onPrefill}
-                                    onOpenTable={onOpenTable}
-                                />,
-                                ...(threadBranches(threadRows.after.get(index)) ?? []),
-                            ])
-                        )}
-                        {engineHitl && onWidgetAnswer && !takeoverAsk && (
-                            <motion.div key={engineHitl.toolCallId} ref={pendingRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
-                                <EngineRequestBlock request={engineHitl} answerAttachments={answerAttachments} onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))} />
-                            </motion.div>
-                        )}
-                        {nextSteps && nextSteps.length > 0 && !streaming && (
-                            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
-                                <ForemanNextSteps steps={nextSteps} />
-                            </motion.div>
-                        )}
-                        {/* Pendant l'accueil, le premier tour n'est souvent pas encore parti (le
-                            workspace se prépare) : le loader se montre quand même, sinon l'écran a
-                            l'air figé jusqu'au premier token. */}
-                        {screenShown && onWidgetAnswer ? (
-                            <ChatScreen
-                                agentId={FOREMAN_AGENT_ID}
-                                active={!orbPaused}
-                                site={screenSite(messages, takeoverAsk?.request.url ?? null)}
-                                takeoverAsk={takeoverAsk}
-                                onTakeoverDone={summary => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, summary)}
-                                onTakeoverSkip={() => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, HITL_CANCELLED.takeover)}
-                                scroller={scroller}
-                                floatingHost={root}
-                                arriveRef={takeoverAsk ? pendingRef : undefined}
-                                fallback={activityLoader}
-                            />
-                        ) : (
-                            activityLoader
-                        )}
-                        {notice}
-                    </ConversationContent>
-                </div>
-                <ConversationScrollButton pending={pendingCue} />
-            </Conversation>
-        </div>
+                <Conversation className="relative z-10 h-full" contextRef={conversationRef}>
+                    {/* Le fondu porte sur ce calque et pas sur la `Conversation` : le bouton de retour
+                        en bas est son frère, ancré au ras du bord où le fondu est le plus fort, et il
+                        doit rester net. Le calque ne défile pas, il couvre exactement la fenêtre du
+                        conteneur qui défile, donc le fondu reste collé aux bords du panneau. */}
+                    <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
+                        {/* `justify-end` et `min-h-full` : une conversation de deux messages reste collée
+                            au composer au lieu de flotter en haut du panneau. Sous `md` la sheet mesure
+                            cette pile pour prendre sa hauteur, un `min-h-full` l'empêcherait de jamais
+                            redescendre : c'est `mt-auto` qui la colle au composer, et il cède au
+                            défilement quand la pile déborde. L'accueil et l'en-tête de la carte sont
+                            posés en overlay, sans hauteur à eux : le plancher leur garde la place. Ce
+                            plancher explicite rend la pile compressible par le scroller, et la sheet
+                            qui la mesure rétrécirait d'un pixel à chaque tour : `shrink-0` l'en garde. */}
+                        <ConversationContent
+                            scrollClassName="max-md:flex max-md:flex-col md:[container-type:size]"
+                            className={cn(
+                                framed ? 'mx-auto w-full max-w-[var(--chat-column,none)]' : cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : underCrumb ? 'pt-[8.5rem]' : 'pt-24'),
+                                greeting ? 'max-md:min-h-72' : 'max-md:min-h-36'
+                            )}
+                        >
+                            {restoring && <ForemanChatSkeleton />}
+                            {threadBranches(threadRows.leading)}
+                            {empty && !greeting && !restoring ? (
+                                <ForemanTeamEmptyStateSlot onSend={onSuggestion} onPrefill={onPrefill} orbPaused={orbPaused} />
+                            ) : (
+                                visible.flatMap((message, index) => [
+                                    <FloatingMessage
+                                        key={message.id}
+                                        message={message}
+                                        index={index}
+                                        isActive={streaming && index === visible.length - 1}
+                                        settled={index < visible.length - 1 || !(streaming || runHeld)}
+                                        rawUrlFor={rawUrlFor}
+                                        readFile={readFile}
+                                        sharedFiles={sharedFiles}
+                                        renderToolPart={renderToolPart}
+                                        mentions={mentions}
+                                        onStopTask={onStopTask}
+                                        onRegenerate={engineHitl && index === visible.length - 1 ? undefined : actions?.onRegenerate}
+                                        onRateMessage={actions?.onRate}
+                                        feedbackRating={actions ? actions.ratingOf(message.id) : undefined}
+                                        hitlCall={hitlCallBefore(visible, index)}
+                                        showQuickReplies={index === visible.length - 1 && !streaming && !engineHitl && !nextSteps?.length}
+                                        onSendMessage={sendQuickReply}
+                                        onDraftReply={onPrefill}
+                                        onOpenTable={onOpenTable}
+                                    />,
+                                    ...(threadBranches(threadRows.after.get(index)) ?? []),
+                                ])
+                            )}
+                            {engineHitl && onWidgetAnswer && !takeoverAsk && (
+                                <motion.div key={engineHitl.toolCallId} ref={pendingRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
+                                    <EngineRequestBlock request={engineHitl} answerAttachments={answerAttachments} onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))} />
+                                </motion.div>
+                            )}
+                            {nextSteps && nextSteps.length > 0 && !streaming && (
+                                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
+                                    <ForemanNextSteps steps={nextSteps} />
+                                </motion.div>
+                            )}
+                            {/* Pendant l'accueil, le premier tour n'est souvent pas encore parti (le
+                                workspace se prépare) : le loader se montre quand même, sinon l'écran a
+                                l'air figé jusqu'au premier token. */}
+                            {screenShown && onWidgetAnswer ? (
+                                <ChatScreen
+                                    agentId={FOREMAN_AGENT_ID}
+                                    active={!orbPaused}
+                                    site={screenSite(messages, takeoverAsk?.request.url ?? null)}
+                                    takeoverAsk={takeoverAsk}
+                                    onTakeoverDone={summary => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, summary)}
+                                    onTakeoverSkip={() => takeoverAsk && onWidgetAnswer(engineHitl?.toolName ?? 'request_takeover', takeoverAsk.callId, HITL_CANCELLED.takeover)}
+                                    scroller={scroller}
+                                    floatingHost={root}
+                                    arriveRef={takeoverAsk ? pendingRef : undefined}
+                                    fallback={activityLoader}
+                                />
+                            ) : (
+                                activityLoader
+                            )}
+                            {notice}
+                        </ConversationContent>
+                    </div>
+                    <ConversationScrollButton pending={pendingCue} />
+                </Conversation>
+            </div>
+        </FeatureRequestConversationProvider>
     )
 }
 

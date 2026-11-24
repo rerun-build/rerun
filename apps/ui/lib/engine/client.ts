@@ -1,3 +1,4 @@
+import { FEATURE_REQUESTS_ENABLED } from '@rerun/cloud/feature-requests'
 import {
     ENGINE_CAPABILITY_DESKTOP,
     ENGINE_CAPABILITY_OPENCODE,
@@ -533,7 +534,7 @@ export async function chat(conn: EngineConnection, agentId: string, params: { se
     return fetchEngine(`${conn.baseUrl}/agents/${encodeURIComponent(agentId)}/chat`, {
         method: 'POST',
         headers: buildHeaders(conn),
-        body: JSON.stringify(params),
+        body: JSON.stringify({ ...params, teamRequests: FEATURE_REQUESTS_ENABLED }),
         signal: AbortSignal.timeout(CHAT_TIMEOUT_MS),
     })
 }

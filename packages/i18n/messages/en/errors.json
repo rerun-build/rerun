@@ -73,6 +73,8 @@
     "spaceNotFound": "Space not found",
     "sessionNotFound": "Session not found",
     "conversationNotFound": "Conversation not found",
+    "invalidFeatureRequest": "This request is missing a title or is too long.",
+    "featureRequestsUnavailable": "Requests to the Rerun team are not available on this install.",
     "requestAlreadyAnswered": "This request was already answered.",
     "coworkerStillWorking": "The coworker is still working. Try again in a moment.",
     "accountNotFound": "Account not found",

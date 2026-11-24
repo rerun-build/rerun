@@ -155,7 +155,8 @@
         "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
         "takeover": "Du bist am Bildschirm dran",
         "spend": "Ausgabe freizugeben",
-        "computer": "Befehl auf #{computer} freigeben"
+        "computer": "Befehl auf #{computer} freigeben",
+        "feature": "Anfrage an das Rerun-Team zu senden"
     },
     "pendingHitl": {
         "goTo": "{label}, dorthin springen"
@@ -509,7 +510,8 @@
             "question": "Du hast die Fragen übersprungen",
             "secret": "Du hast die Schlüssel nicht geteilt",
             "mcp": "Du hast die Anmeldung übersprungen",
-            "takeover": "Du hast den Browser deinem Coworker überlassen"
+            "takeover": "Du hast den Browser deinem Coworker überlassen",
+            "feature": "Anfrage nicht gesendet"
         },
         "computer": {
             "status": {
@@ -590,5 +592,22 @@
         "label": "Job auf <computer>#{handle}</computer> beendet",
         "viewReport": "Bericht ansehen",
         "reportTitle": "Was #{computer} gemeldet hat"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "Funktion",
+            "bug": "Bug",
+            "improvement": "Verbesserung"
+        },
+        "today": "<strong>Heute:</strong> {workaround}",
+        "notNow": "Nicht jetzt",
+        "edit": "Bearbeiten",
+        "done": "Fertig",
+        "send": "An das Team senden",
+        "titleLabel": "Titel",
+        "descriptionLabel": "Beschreibung",
+        "sent": "An das Rerun-Team gesendet: <muted>{title}</muted>",
+        "reviewIt": "Ansehen",
+        "sendFailed": "Die Anfrage konnte nicht gesendet werden. Versuch es noch einmal."
     }
 }

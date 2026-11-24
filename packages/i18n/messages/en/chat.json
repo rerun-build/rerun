@@ -109,7 +109,12 @@
         "computerAccess.titleCommand": "Card where a coworker asks the person's approval before running a command on one of their own computers linked to Rerun. <computer> renders as #handle (e.g. #studio-pc); keep the tag.",
         "receipt.computer.status.always": "Badge on the receipt of a computer access: the person allowed it and kept a rule (a program or a folder) so it is never asked again.",
         "receipt.computer.screen": "On the receipt of a computer access: the coworker was allowed to use the screen, mouse and keyboard of the person's computer.",
-        "computerJob.state.lost": "A long job on the person's computer ended because the Rerun app quit or restarted while it ran."
+        "computerJob.state.lost": "A long job on the person's computer ended because the Rerun app quit or restarted while it ran.",
+        "featureRequest.today": "On a card where a coworker drafted a request for the Rerun team: what the user can already do today to get close. {workaround} is that sentence, written by the coworker.",
+        "featureRequest.sent": "One row in the chat once the user sent the request to the Rerun team. {title} is the title of the request.",
+        "featureRequest.kinds.feature": "Type of a request for the Rerun team: something Rerun cannot do yet.",
+        "featureRequest.kinds.improvement": "Type of a request for the Rerun team: something Rerun does, to be done better.",
+        "featureRequest.send": "Button that sends the drafted request to the Rerun team."
     },
     "actions": {
         "copy": "Copy",
@@ -267,7 +272,8 @@
         "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
         "takeover": "Your turn on the screen",
         "spend": "Spend to approve",
-        "computer": "Approve a command on #{computer}"
+        "computer": "Approve a command on #{computer}",
+        "feature": "Request to send to the Rerun team"
     },
     "pendingHitl": {
         "goTo": "{label}, go to it"
@@ -621,7 +627,8 @@
             "question": "You skipped the questions",
             "secret": "You declined to share the keys",
             "mcp": "You skipped signing in",
-            "takeover": "You left the browser to your coworker"
+            "takeover": "You left the browser to your coworker",
+            "feature": "Request not sent"
         },
         "computer": {
             "status": {
@@ -702,5 +709,22 @@
         "label": "Job ended on <computer>#{handle}</computer>",
         "viewReport": "View report",
         "reportTitle": "What #{computer} reported"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "Feature",
+            "bug": "Bug",
+            "improvement": "Improvement"
+        },
+        "today": "<strong>Today:</strong> {workaround}",
+        "notNow": "Not now",
+        "edit": "Edit",
+        "done": "Done",
+        "send": "Send to the team",
+        "titleLabel": "Title",
+        "descriptionLabel": "Description",
+        "sent": "Sent to the Rerun team: <muted>{title}</muted>",
+        "reviewIt": "Review it",
+        "sendFailed": "The request could not be sent. Try again."
     }
 }

@@ -17,6 +17,7 @@ const LEFT_TO_THE_USER: Partial<Record<HitlKind, string>> = {
     mcp: 'Signing in to a server is the user\'s own login: tell them which one and to sign in from the card.',
     takeover: 'The coworker hands its browser to the user: only they can take it, from the card.',
     computer: 'Access to a linked computer is the user\'s own yes, given on the card.',
+    feature: 'What goes to the Rerun team in their name is the user\'s to send: tell them what the coworker drafted and to send, edit or skip it from the card.',
 }
 
 const CONTEXT_MAX = 600

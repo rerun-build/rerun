@@ -116,7 +116,7 @@ export type MessageViewProps = {
     pendingAlertToolCallId?: string
     activeRunId?: string | null
     onStopTask?: (taskId: string) => void
-    onSendMessage?: (opts: { text: string }) => void
+    onSendMessage?: (opts: { text: string }) => unknown
     // Where a quick reply that still needs a value from the user goes to be finished. Without it,
     // such a reply is not offered at all: sent as is, it would reach the coworker empty-handed.
     onDraftReply?: (text: string) => void
@@ -398,7 +398,7 @@ function MessageViewInner({ message, isActive = false, settled = false, isLastAs
     if (jobEnd) return <JobEndBlock agentId={agentId} end={jobEnd} />
 
     // A setup block answered: what the user decided, not the reply written for the agent.
-    if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} spentMicros={spentMicros} spendRunning={spendRunning} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />
+    if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} spentMicros={spentMicros} spendRunning={spendRunning} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} onSendMessage={onSendMessage} />
 
     return (
         <Message from={message.role}>

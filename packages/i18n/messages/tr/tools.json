@@ -170,7 +170,8 @@
         "remote_file_list": "#{computer} dosyalarını listeledi",
         "remote_file_read": "#{computer} üzerinde bir dosya okudu",
         "remote_file_write": "#{computer} üzerine bir dosya yazdı",
-        "remote_transfer": "#{computer} ile bir dosya kopyaladı"
+        "remote_transfer": "#{computer} ile bir dosya kopyaladı",
+        "request_feature": "Rerun ekibi için bir talep hazırladı"
     },
     "activities": {
         "shell_exec": "Komut çalıştırılıyor",

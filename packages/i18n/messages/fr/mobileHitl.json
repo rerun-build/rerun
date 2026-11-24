@@ -26,7 +26,8 @@
         "takeover": "À vous de prendre l'écran",
         "jumpTo": "{label}, y aller",
         "spend": "Dépense à valider",
-        "computer": "Commande à approuver sur #{computer}"
+        "computer": "Commande à approuver sur #{computer}",
+        "feature": "Demande à envoyer à l'équipe Rerun"
     },
     "alert": {
         "label": "Notification",
@@ -103,7 +104,8 @@
             "service": "Vous avez fermé la configuration des apps",
             "secret": "Vous avez refusé de partager les clés",
             "mcp": "Vous avez passé la connexion",
-            "takeover": "Vous avez laissé le navigateur à votre coworker"
+            "takeover": "Vous avez laissé le navigateur à votre coworker",
+            "feature": "Demande non envoyée"
         },
         "answer": "Réponse",
         "answers": "Réponses",
@@ -130,7 +132,8 @@
         "handedBack": "Vous avez rendu le navigateur",
         "spend": "Données payantes",
         "approvedOnce": "Validé cette fois",
-        "alwaysAllowed": "Toujours autorisé"
+        "alwaysAllowed": "Toujours autorisé",
+        "featureSent": "Envoyé à l'équipe Rerun : {title}"
     },
     "spend": {
         "estimatedTotal": "Total estimé",

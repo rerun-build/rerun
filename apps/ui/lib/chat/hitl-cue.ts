@@ -1,5 +1,5 @@
 import { pendingHitlLabel, type HitlCueCopy, type HitlKind } from '@rerun/contracts'
-import { CoinsIcon, LockIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, PlugSparkleIcon, ShieldAlertIcon, type LucideIcon } from '@/lib/icons'
+import { CoinsIcon, LockIcon, MegaphoneIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, PlugSparkleIcon, ShieldAlertIcon, type LucideIcon } from '@/lib/icons'
 
 export type PendingHitlSummary = {
     icon: LucideIcon
@@ -20,6 +20,7 @@ const ICONS: Record<HitlKind, { icon: LucideIcon; tone: string }> = {
     takeover: { icon: MonitorIcon, tone: NEUTRAL_TONE },
     spend: { icon: CoinsIcon, tone: DECISION_TONE },
     computer: { icon: ShieldAlertIcon, tone: DECISION_TONE },
+    feature: { icon: MegaphoneIcon, tone: NEUTRAL_TONE },
 }
 
 // What the scroll cue says is waiting at the end of the thread, once the block is out of sight.

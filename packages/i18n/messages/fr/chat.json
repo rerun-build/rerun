@@ -155,7 +155,8 @@
         "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
         "takeover": "À vous de prendre l'écran",
         "spend": "Dépense à valider",
-        "computer": "Commande à approuver sur #{computer}"
+        "computer": "Commande à approuver sur #{computer}",
+        "feature": "Demande à envoyer à l'équipe Rerun"
     },
     "pendingHitl": {
         "goTo": "{label}, y aller"
@@ -509,7 +510,8 @@
             "question": "Vous avez passé les questions",
             "secret": "Vous avez refusé de partager les clés",
             "mcp": "Vous avez passé la connexion",
-            "takeover": "Vous avez laissé le navigateur à votre coworker"
+            "takeover": "Vous avez laissé le navigateur à votre coworker",
+            "feature": "Demande non envoyée"
         },
         "computer": {
             "status": {
@@ -590,5 +592,22 @@
         "label": "Tâche terminée sur <computer>#{handle}</computer>",
         "viewReport": "Voir le rapport",
         "reportTitle": "Ce que #{computer} a renvoyé"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "Fonctionnalité",
+            "bug": "Bug",
+            "improvement": "Amélioration"
+        },
+        "today": "<strong>Aujourd'hui :</strong> {workaround}",
+        "notNow": "Pas maintenant",
+        "edit": "Modifier",
+        "done": "Terminé",
+        "send": "Envoyer à l'équipe",
+        "titleLabel": "Titre",
+        "descriptionLabel": "Description",
+        "sent": "Envoyé à l'équipe Rerun : <muted>{title}</muted>",
+        "reviewIt": "La revoir",
+        "sendFailed": "La demande n'a pas pu être envoyée. Réessayez."
     }
 }

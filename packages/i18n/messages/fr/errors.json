@@ -28,6 +28,8 @@
     "spaceNotFound": "Box introuvable",
     "sessionNotFound": "Conversation introuvable",
     "conversationNotFound": "Conversation introuvable",
+    "invalidFeatureRequest": "Cette demande n'a pas de titre ou elle est trop longue.",
+    "featureRequestsUnavailable": "Les demandes à l'équipe Rerun ne sont pas disponibles sur cette installation.",
     "requestAlreadyAnswered": "Cette demande a déjà reçu une réponse.",
     "coworkerStillWorking": "Le coworker travaille encore. Réessayez dans un instant.",
     "accountNotFound": "Compte introuvable",
