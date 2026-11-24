@@ -29,7 +29,7 @@ vi.doMock('../../runtime/headless-run.js', () => ({
 }))
 
 vi.doMock('../../agents/registry.js', () => ({
-    getAgent: async (id: string) => ({ id, config: { name: 'Bob', enabled: true, tools: { callAgent: true }, selfImprovement: { enabled: true } } }),
+    getAgent: async (id: string) => ({ id, config: id === 'foreman' ? { name: 'foreman', kind: 'foreman', enabled: true, tools: { callAgent: true }, selfImprovement: { enabled: false } } : { name: 'Bob', enabled: true, tools: { callAgent: true }, selfImprovement: { enabled: true } } }),
 }))
 
 const { resolveTargetAgent, callAgentTools, callTargetsOf, withForeman } = await import('./call-agent.js')
@@ -175,6 +175,17 @@ describe('call_agent tells the coworker it calls who is calling', () => {
         const ctx = { agent: { id: 'agent-a', config: { name: 'Alice' } }, sessionId: 'session-1', callTargets: await agents() } as unknown as RunContext
         await (callAgentTools(ctx).call_agent as any).execute({ agent: 'agent-c', message: 'delete row 1', wait }, {} as any)
         expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', calledBy: { id: 'agent-a', name: 'Alice', waiting: wait } })
+    })
+})
+
+describe('call_agent to the Chief of Staff', () => {
+    it('names it as the roster does, not by its fixed id', async () => {
+        traced.length = 0
+        const written: { data: { agentName: string } }[] = []
+        const ctx = { agent: { id: 'agent-a', config: { name: 'Alice' } }, sessionId: 'session-1', callTargets: callTargetsOf(withForeman(await agents()), 'agent-a'), writer: { write: (part: { data: { agentName: string } }) => written.push(part) } } as unknown as RunContext
+        const answer = (await (callAgentTools(ctx).call_agent as any).execute({ agent: 'foreman', message: 'who handles billing?', wait: false }, { toolCallId: 'call-1' } as any)) as string
+        expect(answer).toContain('dispatched to Chief of Staff')
+        expect(written.map(part => part.data.agentName)).toEqual(expect.not.arrayContaining(['foreman']))
     })
 })
 

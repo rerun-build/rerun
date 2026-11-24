@@ -68,6 +68,8 @@ export function callAgentTools(ctx: RunContext): ToolSet {
 
                 const target = await getAgent(resolved.agent.id)
                 if (!target.config.enabled) return refuse(`Coworker "${target.config.name}" is switched off and cannot be called.`)
+                // The Chief of Staff's handle is its fixed id: it is named as the roster names it.
+                const calledAs = target.config.kind === 'foreman' ? resolved.agent.name : target.config.name
                 const config = structuredClone(target.config)
                 config.selfImprovement.enabled = false
                 const callee = { ...target, config }
@@ -99,7 +101,7 @@ export function callAgentTools(ctx: RunContext): ToolSet {
 
                 const prompt = context ? `${context}\n\n---\n\n${message}` : message
 
-                progress.agentName = target.config.name
+                progress.agentName = calledAs
                 progress.sessionId = session.id
                 emit()
 
@@ -124,14 +126,14 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                         source: 'agent',
                         metadata: { source: 'agent', status: 'error', error: reason },
                     })
-                    return `(error calling ${target.config.name}: ${reason})`
+                    return `(error calling ${calledAs}: ${reason})`
                 }
 
                 if (!wait) {
                     // The run drains itself, so a dispatched call needs nothing here to keep going.
                     progress.status = 'dispatched'
                     emit()
-                    return `Message dispatched to ${target.config.name}. It is handling it in its own session; you will not receive the answer here.`
+                    return `Message dispatched to ${calledAs}. It is handling it in its own session; you will not receive the answer here.`
                 }
 
                 const stopHeartbeat = startHeartbeat(emit)
@@ -139,12 +141,12 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                     const outcome = await followSubRun(run, progress, { onChange: emit, parentSignal: ctx.abortSignal ?? abortSignal })
                     endSubRun(progress, outcome.stopReason)
                     emit()
-                    return outcome.stopReason === undefined ? outcome.text || '(the coworker returned no text)' : `(error calling ${target.config.name}: ${renderSubRunOutcome(outcome, progress)})`
+                    return outcome.stopReason === undefined ? outcome.text || '(the coworker returned no text)' : `(error calling ${calledAs}: ${renderSubRunOutcome(outcome, progress)})`
                 } catch (err) {
                     const reason = err instanceof Error ? err.message : String(err)
                     endSubRun(progress, reason)
                     emit()
-                    return `(error calling ${target.config.name}: ${reason})`
+                    return `(error calling ${calledAs}: ${reason})`
                 } finally {
                     stopHeartbeat()
                 }

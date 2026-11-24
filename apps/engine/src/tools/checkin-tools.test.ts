@@ -90,6 +90,9 @@ const REFUSED_IN_A_CHECKIN = new Set([
     'rerun_hub_service_install',
     'rerun_hub_service_list_installed',
     'rerun_hub_service_uninstall',
+    'rerun_hub_publish_file',
+    'rerun_hub_unpublish_file',
+    'rerun_hub_list_published',
 ])
 
 async function toolNames(readOnly: boolean, provider = 'rerun'): Promise<string[]> {

@@ -116,6 +116,15 @@ describe('foreman', () => {
         for (const name of ['brain_delete', 'brain_proposals', 'brain_decide']) expect(names).not.toContain(name)
     })
 
+    it('reaches no other coworker\'s files when a coworker called it', async () => {
+        const agent = await getAgent(FOREMAN_AGENT_ID)
+        const { tools, close } = await buildTools({ agent, sessionId: 's1', logger, provider: 'rerun', model: 'rerun-max', called: true })
+        const names = Object.keys(tools)
+        await close()
+        expect(names.filter(name => name.startsWith('agent_files_'))).toEqual([])
+        expect(names).toContain('fs_read')
+    })
+
     it('keeps a memory, skills and routines of its own, like a coworker', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
@@ -250,6 +259,15 @@ describe('foreman', () => {
         expect(prompt).toContain('<verbosity>')
         expect(prompt).not.toContain('request_mcp_sign_in')
         expect(prompt).not.toContain('<unattended_run>')
+    })
+
+    it('is told of the tools it holds when a coworker called it', async () => {
+        const prompt = systemPromptText(await buildSystemPrompt(await getAgent(FOREMAN_AGENT_ID), { source: 'chat', calledBy: { id: 'agent-a', name: 'Alice', waiting: true } }))
+        expect(prompt).toContain('<environment>')
+        expect(prompt).not.toContain('agent_files_')
+        expect(prompt).toContain('brain_propose')
+        expect(prompt).not.toContain('brain_delete')
+        expect(prompt).not.toContain('brain_decide')
     })
 
     // A routine reaches it with no brief: nobody is talking to it, so the hub signed nothing.

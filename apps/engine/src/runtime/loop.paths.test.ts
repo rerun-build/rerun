@@ -455,7 +455,7 @@ describe('run loop paths', () => {
         expect(recalls).toHaveLength(1)
     })
 
-    it('offers every other agent as a call target except delegates', async () => {
+    it('offers every other agent as a call target except delegates, and the Chief of Staff', async () => {
         await insertAgentIndex(id, 'paths')
         await insertAgentIndex('peer', 'Peer')
         await insertAgentIndex('helper', 'paths delegate')
@@ -463,7 +463,7 @@ describe('run loop paths', () => {
 
         await run('who can help?')
 
-        expect(prep.callTargets).toEqual(['peer'])
+        expect(prep.callTargets).toEqual(['peer', 'foreman'])
     })
 
     it('still settles when the model teardown fails', async () => {

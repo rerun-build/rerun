@@ -808,8 +808,8 @@ Only `message` is required.
   zone already on file), and when they first and last wrote. `author.via: "foreman"` says the Chief
   of Staff sent the message in that person's name, answering a card of the coworker: it is kept on the
   message (`authorVia`) and the coworker reads it in a `<relayed>` block of its turn.
-- `callableAgentIds` narrows the coworkers `call_agent` offers to the ones the author reaches; absent,
-  every coworker can be called.
+- `callableAgentIds` narrows the coworkers `call_agent` offers to the ones the author reaches, the
+  Chief of Staff (`foreman`) among them when it is listed; absent, every coworker can be called.
 - `install: true` on a new conversation starts the agent's guided setup there, and `userLanguage`
   tells it the language the user reads the app in.
 - `teamRequests: true` says the app has a team at the other end (Rerun Cloud): for this turn the agent

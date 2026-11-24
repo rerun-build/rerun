@@ -111,7 +111,8 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
     const accountTools = ctx.agent.config.kind === 'foreman' ? foremanTools(ctx) : {}
-    Object.assign(tools, accountTools, ctx.agent.config.kind === 'foreman' ? agentFilesTools() : {})
+    // Called by a coworker it reaches no other coworker's files: only its own, like a coworker.
+    Object.assign(tools, accountTools, ctx.agent.config.kind === 'foreman' && !ctx.called ? agentFilesTools() : {})
     if (cfg.filesystem) Object.assign(tools, filesystemTools(ctx))
     if (cfg.shared) Object.assign(tools, sharedTools(ctx))
     if (cfg.shell) Object.assign(tools, shellTools(ctx))

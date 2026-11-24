@@ -286,8 +286,15 @@ function turnOrderSection(order: TurnOrder, closers: TurnClosers): string {
     return any ? section('turn_order', turnOrderNote(order, closers)) : ''
 }
 
-const foremanEnvironmentNote = (foremanId: string) =>
-    `You run on the workspace's own server, the one every coworker of this workspace lives on. Your own workspace is ${workspaceDir(foremanId)}: it is the working directory of shell_exec and your fs_ tools are rooted there, so it is where your scratch work and your own deliverables go. Your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker reads and writes. Each coworker's own files are reached with the agent_files_ tools, passing its handle: agent_files_list and agent_files_search to find a file, agent_files_read before you change anything, agent_files_edit for a surgical change and agent_files_write only for a new file or a full rewrite the user asked for. A coworker may be working in those files while you edit them, so change only what you were asked to. Never treat /opt/rerun or the engine source tree as anyone's workspace.`
+// Called by a coworker it holds what a coworker holds: the other coworkers' files are not in reach.
+const foremanEnvironmentNote = (foremanId: string, called: boolean) =>
+    [
+        `You run on the workspace's own server, the one every coworker of this workspace lives on. Your own workspace is ${workspaceDir(foremanId)}: it is the working directory of shell_exec and your fs_ tools are rooted there, so it is where your scratch work and your own deliverables go. Your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker reads and writes.`,
+        called ? '' : `Each coworker's own files are reached with the agent_files_ tools, passing its handle: agent_files_list and agent_files_search to find a file, agent_files_read before you change anything, agent_files_edit for a surgical change and agent_files_write only for a new file or a full rewrite the user asked for. A coworker may be working in those files while you edit them, so change only what you were asked to.`,
+        `Never treat /opt/rerun or the engine source tree as anyone's workspace.`,
+    ]
+        .filter(Boolean)
+        .join(' ')
 
 const FOREMAN_OPERATING_NOTES =
     'Use tools to act. Discover sources with web_search, read static pages with web_fetch, and use browser_navigate for JavaScript-heavy pages (optionally saving a screenshot to inspect with vision_analyze). delegate_tasks hands self-contained subtasks to fresh sub-coworkers, several in one call to run them in parallel: they work in your workspace, on your files, with your shell and web, but none of the account tools, so creating, changing or installing anything on the account stays with you. To put a question to one of the coworkers and wait for its answer inside this turn, use call_agent with wait set to true. Nothing keeps running once your turn ends, except what you schedule. When you tell the user you will come back to something (a result to check, a follow-up a few days on), create in the same turn a routine of your own with schedule_create and checkIn set to true, whose body says what you will look at and for whom: when it fires you wake in a check-in, read, and write to them only if there is something to say. Never say you will come back without that routine.'
@@ -363,11 +370,12 @@ async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promi
 async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provider: Provider, order: TurnOrder, heldBackMcp: Promise<McpCatalogEntry[] | undefined>): Promise<SystemPrompt> {
     const cfg = agent.config.tools
     const learns = agent.config.selfImprovement.enabled
+    const called = trigger.source === 'chat' && trigger.calledBy !== undefined
     const [own, dbSchema, sharedDbSchema, brain] = await Promise.all([
         ownStateSections(agent, provider, heldBackMcp),
         cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
-        cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
+        cfg.brain ? (called ? buildBrainSection(true) : buildForemanBrainSection()).catch(() => '') : Promise.resolve(''),
     ])
     const computer = runOffersComputer(agent.config, provider, agent.resolved.model, agent.resolved.connection)
     const takeover = offersTakeover(agent.config)
@@ -376,7 +384,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
         section('vocabulary', FOREMAN_VOCABULARY_NOTE),
-        section('environment', foremanEnvironmentNote(agent.id)),
+        section('environment', foremanEnvironmentNote(agent.id, called)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', operating),
         cfg.hub ? section('service_catalog', serviceCatalogNote(computer, takeover, cfg.paidData)) : '',
