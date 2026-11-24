@@ -72,11 +72,25 @@ function usePillHover() {
   return { over, bind: { "data-over": over ? "" : undefined, onPointerEnter: () => setOver(true), onPointerLeave: () => setOver(false) } };
 }
 
+// Arabic letters join and both scripts run right to left: cut letter by letter in the left-to-right
+// board, the word comes out detached and reversed. The text decides, not the language of the page: an
+// untranslated label stays left to right.
+const RIGHT_TO_LEFT_SCRIPT = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
+
+// Arabic, Hebrew and Chinese glyphs go past the one-em line a Latin letter is cut to.
+const TALL_SCRIPT = /[\u0590-\u08ff\u3000-\u9fff\ufb1d-\ufdff\ufe70-\uffef]/;
+
+function textDirection(text: string) {
+  return RIGHT_TO_LEFT_SCRIPT.test(text) ? "rtl" : undefined;
+}
+
 // La pastille posée au centre du losange, dont chaque lettre bascule au survol de son hôte : le
 // fantôme d'onboarding, ou une vraie Box qui porte un `cta`.
 function CenterPill({ center, label, hot: hostHot, disabled = false }: { center: Point; label: string; hot?: boolean; disabled?: boolean }) {
   const { over, bind } = usePillHover();
   const hot = hostHot || over;
+  const direction = textDirection(label);
+  const pieces = direction === "rtl" ? [label] : label.split("");
   return (
     <div
       className="iso-placeholder-label absolute"
@@ -90,9 +104,9 @@ function CenterPill({ center, label, hot: hostHot, disabled = false }: { center:
       }}
     >
       <div className="iso-placeholder-label-inner flex items-center justify-center whitespace-nowrap px-3 py-[6px]">
-        <span className="iso-pill-text text-[8px] leading-none">
-          {label.split("").map((ch, i) => (
-            <span key={i} className="iso-swap-letter">
+        <span dir={direction} className="iso-pill-text text-[8px] leading-none">
+          {pieces.map((ch, i) => (
+            <span key={i} className={TALL_SCRIPT.test(label) ? "iso-swap-letter iso-swap-tall" : "iso-swap-letter"}>
               <span
                 className="iso-swap-letter-inner"
                 style={{ transitionDelay: `${i * 12}ms` }}
@@ -162,11 +176,11 @@ function CtaTicker({ center, label, examples, hot: hostHot, still, disabled = fa
       <div className="iso-placeholder-label-inner flex items-center justify-center whitespace-nowrap px-3 py-[5px] text-[8px]">
         <span className="iso-cta-window" style={{ width }}>
           {line.previous !== null && (
-            <span key={`out-${line.previous}`} className="iso-cta-line iso-cta-line-out iso-pill-text" aria-hidden>
+            <span key={`out-${line.previous}`} dir={textDirection(line.previous)} className="iso-cta-line iso-cta-line-out iso-pill-text" aria-hidden>
               {line.previous}
             </span>
           )}
-          <span key={line.current} ref={lineRef} className={`iso-cta-line iso-cta-line-in ${hot ? "iso-pill-text-strong" : "iso-pill-text"}`}>
+          <span key={line.current} ref={lineRef} dir={textDirection(line.current)} className={`iso-cta-line iso-cta-line-in ${hot ? "iso-pill-text-strong" : "iso-pill-text"}`}>
             {line.current}
             {hot && !disabled && (
               <svg className="iso-cta-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -318,7 +332,7 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
         >
           <div className="iso-placeholder-label-inner flex items-center gap-1.5 whitespace-nowrap px-3 py-[6px]">
             <Spinner className="iso-pill-text size-2.5" />
-            <span className="iso-pill-text text-[8px] leading-none">{loadingLabel}</span>
+            <span dir={textDirection(loadingLabel)} className="iso-pill-text text-[8px] leading-none">{loadingLabel}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Noto_Sans_Arabic, Noto_Sans_Hebrew } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
@@ -22,8 +22,14 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { TimeZoneCookie } from "@/components/layout/TimeZoneCookie";
 import { UiLocaleProvider } from "@rerun/ui/locale";
+import { localeDirection } from "@rerun/i18n";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({subsets:['latin'],variable:'--font-inter'});
+
+// Inter has no Arabic nor Hebrew glyphs: these come next in `--font-sans`, and their unicode-range keeps
+// them off the wire for a page that has none of those letters. Chinese uses the system's fonts.
+const notoArabic = Noto_Sans_Arabic({ subsets: ["arabic"], variable: "--font-noto-arabic", preload: false });
+const notoHebrew = Noto_Sans_Hebrew({ subsets: ["hebrew"], variable: "--font-noto-hebrew", preload: false });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -97,9 +103,10 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
+      dir={localeDirection(locale)}
       suppressHydrationWarning
       {...(desktopShell ? { [DESKTOP_SHELL_ATTRIBUTE]: desktopShell.platform } : {})}
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable, notoArabic.variable, notoHebrew.variable)}
     >
       <body className="min-h-full flex flex-col">
         {desktopShell && <ShellTitleBar />}

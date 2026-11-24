@@ -159,7 +159,7 @@ export function TemplateLibraryDialog({
                         // whose two variants only sort by source order.
                         reduceMotion ? 'sm:transition-none' : 'sm:transition-[grid-template-columns]',
                         showDetail ? 'sm:grid-cols-[minmax(0,1fr)_420px]' : 'sm:grid-cols-[minmax(0,1fr)_0px]',
-                        view === 'detail' && 'max-sm:-translate-x-full',
+                        view === 'detail' && 'max-sm:-translate-x-full max-sm:rtl:translate-x-full',
                     )}
                 >
                     {/* inert rather than hidden: the panel off screen keeps its scroll position and

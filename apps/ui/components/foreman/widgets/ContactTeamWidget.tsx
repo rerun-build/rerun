@@ -73,7 +73,7 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                 <p className="text-sm font-medium">{t('title')}</p>
                 <p className="text-xs text-muted-foreground">{t('description')}</p>
             </div>
-            <blockquote className="border-s-2 border-border ps-3 text-sm text-muted-foreground">{summary}</blockquote>
+            <blockquote dir="auto" className="border-s-2 border-border ps-3 text-sm text-muted-foreground">{summary}</blockquote>
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => onAnswer({ answered: false })}>
                     {t('notNow')}

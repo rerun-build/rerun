@@ -20,7 +20,7 @@ export function WorkspacePill({ name, iconUrl, fallbackIconUrl, stripes = false,
         <ChromePill start="avatar" end="icon" className={className} {...props}>
             {stripes && <Stripes className="rounded-full" color="color-mix(in oklab, var(--foreground) 6%, transparent)" />}
             <WorkspaceLogoImage src={iconUrl} fallbackSrc={fallbackIconUrl} className="relative size-6 rounded-full shrink-0 object-cover" />
-            <span className="relative max-w-48 truncate">{name}</span>
+            <span dir="auto" className="relative max-w-48 truncate">{name}</span>
             <ChevronsUpDownIcon className="relative size-4 text-muted-foreground shrink-0" />
         </ChromePill>
     )

@@ -1213,7 +1213,9 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
 
     return (
         <div className="absolute inset-0">
+        {/* The board is a drawing: its geometry, camera and tiles keep one orientation in every language. */}
         <div
+            dir="ltr"
             ref={containerRef}
             role={interactive ? 'group' : undefined}
             aria-label={interactive ? t('isoGrid.board') : undefined}

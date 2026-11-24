@@ -50,7 +50,7 @@ export function AgentComputerThumbnail({ agentId, working, disabledReason, onOpe
                     <span className={cn('size-1.5 rounded-full', live && working ? 'bg-emerald-500' : 'bg-muted-foreground/40')} />
                     {live ? (working ? t('working') : t('live')) : t('computer')}
                 </span>
-                {!disabledReason && <ChevronRightIcon className="size-3.5 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5" />}
+                {!disabledReason && <ChevronRightIcon className="size-3.5 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />}
             </span>
             <span className="relative flex aspect-[16/7] overflow-hidden rounded-lg border border-border bg-muted/40">
                 {screen.status === 'loading' && <DesktopScreenLoader compact className="bg-muted/40" />}

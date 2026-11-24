@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { SIDE_PANEL_WIDTH, clampSidePanelWidth, getSidePanelMaxWidth, loadSidePanelWidth, saveSidePanelWidth, type PanelWidthConfig } from '@/lib/side-panel-width'
 import { GripVerticalIcon } from '@/lib/icons'
+import { useUiDirection } from '@rerun/ui/locale'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
@@ -26,7 +27,8 @@ type SidePanelResizeHandleProps = {
     panelRef: RefObject<HTMLElement | null>
     config?: PanelWidthConfig
     widthVar?: string
-    // The panel's edge the handle sits on: dragging away from the panel widens it.
+    // The panel's edge the handle sits on, as laid out in a left-to-right language (a right-to-left one
+    // mirrors it): dragging away from the panel widens it.
     edge?: 'left' | 'right'
     // `grip`: a pill always drawn. `line`: nothing at rest, a line on hover, focus and while dragging.
     look?: 'grip' | 'line'
@@ -37,7 +39,8 @@ type SidePanelResizeHandleProps = {
 
 // The grip on a panel's edge. `config` and `widthVar` say which panel: the board's side panel by
 // default, whose width the agent panel and every other side panel share.
-export function SidePanelResizeHandle({ panelRef, config = SIDE_PANEL_WIDTH, widthVar = '--side-panel-width', edge = 'left', look = 'grip', varTarget, className }: SidePanelResizeHandleProps) {
+export function SidePanelResizeHandle({ panelRef, config = SIDE_PANEL_WIDTH, widthVar = '--side-panel-width', edge: readingEdge = 'left', look = 'grip', varTarget, className }: SidePanelResizeHandleProps) {
+    const edge = useUiDirection() === 'rtl' ? (readingEdge === 'left' ? 'right' : 'left') : readingEdge
     const t = useTranslations('layout.sidePanel')
     const handleRef = useRef<HTMLDivElement>(null)
     const dragRef = useRef<DragState | null>(null)
@@ -184,7 +187,7 @@ export function SidePanelResizeHandle({ panelRef, config = SIDE_PANEL_WIDTH, wid
             data-dragging="false"
             tabIndex={0}
             // On a right edge it stays inside the panel: what sits beside it may clip it, and the panel keeps its scrollbar clear of it.
-            className={cn('group absolute inset-y-0 z-10 hidden cursor-col-resize touch-none focus-visible:outline-none md:block', edge === 'right' ? 'right-0 w-2' : '-left-[9px] w-4', className)}
+            className={cn('group absolute inset-y-0 z-10 hidden cursor-col-resize touch-none focus-visible:outline-none md:block', readingEdge === 'right' ? 'end-0 w-2' : '-start-[9px] w-4', className)}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={event => finishResize(event.pointerId)}

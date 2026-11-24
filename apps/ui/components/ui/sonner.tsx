@@ -3,11 +3,13 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { useIsMobile } from "@rerun/ui/primitives/use-is-mobile"
+import { useUiDirection } from "@rerun/ui/locale"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon, XIcon } from '@/lib/icons'
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme } = useTheme()
   const isMobile = useIsMobile()
+  const direction = useUiDirection()
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
@@ -15,7 +17,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       // so a toast landing there covers exactly what the user is about to tap. It comes down from
       // the top instead, where nothing is anchored. Sonner derives the swipe direction from the
       // position, so this also turns the dismiss gesture into a swipe up.
-      position={isMobile ? "top-center" : "bottom-left"}
+      position={isMobile ? "top-center" : direction === "rtl" ? "bottom-right" : "bottom-left"}
+      dir={direction}
       mobileOffset={{ top: "calc(env(safe-area-inset-top) + 12px)" }}
       gap={isMobile ? 8 : 14}
       className="toaster group"

@@ -59,7 +59,7 @@ function ServerPage() {
                 <h1 className="text-lg font-semibold text-balance">{t('title')}</h1>
                 <p className="text-sm text-muted-foreground text-balance">{t('description')}</p>
             </div>
-            <form onSubmit={onSubmit} className="flex w-full flex-col gap-4 text-left">
+            <form onSubmit={onSubmit} className="flex w-full flex-col gap-4 text-start">
                 <Field label={t('label')} htmlFor="server-address" error={error ? message : undefined} helperText={!error ? message : undefined}>
                     <Input
                         id="server-address"

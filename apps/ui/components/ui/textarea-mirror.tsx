@@ -15,7 +15,7 @@ type TextareaMirrorProps = {
  */
 export function TextareaMirror({ className, children, ref }: TextareaMirrorProps) {
     return (
-        <div ref={ref} className={cn('pointer-events-none absolute inset-0 overflow-hidden break-words whitespace-pre-wrap', className)}>
+        <div ref={ref} dir="auto" className={cn('pointer-events-none absolute inset-0 overflow-hidden break-words whitespace-pre-wrap', className)}>
             {children}
             {/* A trailing newline only gets a line of its own when something follows it, as it does in the textarea. */}
             {'\u200b'}

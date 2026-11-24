@@ -40,7 +40,7 @@ export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog,
                 <ContextMenuTrigger asChild>
                     <div {...drag?.handle} className="group relative flex h-9 items-center rounded-md transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50">
                         <button type="button" aria-expanded={!collapsed} onClick={onToggle} className="flex h-full min-w-0 flex-1 items-center gap-1.5 pe-8 ps-2 text-start text-xs font-medium text-muted-foreground">
-                            <ChevronDownIcon className={cn('size-3 shrink-0 transition-transform', collapsed && '-rotate-90')} />
+                            <ChevronDownIcon className={cn('size-3 shrink-0 transition-transform', collapsed && '-rotate-90 rtl:rotate-90')} />
                             <span className="truncate">{label}</span>
                             <span className="shrink-0 text-muted-foreground/60 tabular-nums">{members.length}</span>
                             {collapsed && waiting && <span className="size-1.5 shrink-0 rounded-full bg-orange-400" />}

@@ -19,7 +19,7 @@
    accent/destructive/border/input/ring + radius-sm..xl) : source partagée dans
    @rerun/ui/theme.css. Ici uniquement les tokens spécifiques à apps/ui. */
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-inter, Inter), var(--font-noto-arabic, "Noto Sans Arabic"), var(--font-noto-hebrew, "Noto Sans Hebrew"), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -265,6 +265,23 @@ html:not(.dark) .progress-fill {
   opacity: 0.8;
 }
 
+/* Code, logs and the editor read left to right in every language. */
+[data-streamdown="code-block"],
+[data-streamdown="mermaid-block"],
+[data-streamdown="inline-code"],
+.cm-editor,
+pre {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* An empty `dir="auto"` field resolves to left to right: its placeholder and caret follow the page instead. */
+[dir="rtl"] textarea[dir="auto"]:placeholder-shown,
+[dir="rtl"] .ProseMirror[dir="auto"]:has(> p:only-child > .ProseMirror-trailingBreak:only-child) {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
 [data-streamdown="inline-code"] {
   font-family: var(--font-mono);
   font-size: 0.85em;
@@ -275,8 +292,8 @@ html:not(.dark) .progress-fill {
 }
 
 [data-streamdown="blockquote"] {
-  border-left: 3px solid var(--border);
-  padding-left: 1rem;
+  border-inline-start: 3px solid var(--border);
+  padding-inline-start: 1rem;
   color: var(--muted-foreground);
   margin-block: 0.75rem;
 }
@@ -306,7 +323,7 @@ html:not(.dark) .progress-fill {
 [data-streamdown="unordered-list"] [data-streamdown="unordered-list"],
 [data-streamdown="ordered-list"] [data-streamdown="unordered-list"],
 [data-streamdown="unordered-list"] [data-streamdown="ordered-list"] {
-  padding-left: 1.5rem;
+  padding-inline-start: 1.5rem;
 }
 
 [data-streamdown="list-item"] {
@@ -325,7 +342,7 @@ html:not(.dark) .progress-fill {
 }
 
 [data-streamdown="table-header-cell"] {
-  text-align: left;
+  text-align: start;
   font-weight: 600;
   padding: 0.5rem 0.75rem;
   border-bottom: 2px solid var(--border);
@@ -368,7 +385,7 @@ html:not(.dark) .progress-fill {
 }
 
 [data-bubble-frame="bubble"] [data-streamdown="blockquote"] {
-  border-left-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+  border-inline-start-color: color-mix(in oklab, var(--foreground) 20%, transparent);
 }
 
 [data-bubble-frame="bubble"] [data-streamdown="blockquote"]:first-child {
@@ -481,8 +498,8 @@ html:not(.dark) .beam-soft.border-beam--arcs.border-beam--white {
    selectors above, and its runtime stylesheet is appended last, so it wins every tie. The `html`
    prefix is what puts these ahead of it. */
 html [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button] {
-  left: auto;
-  right: 8px;
+  inset-inline-start: auto;
+  inset-inline-end: 8px;
   top: 8px;
   transform: none;
   height: 24px;
@@ -506,7 +523,7 @@ html [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-b
 
 /* A loading toast never gets a close button, and would otherwise carry an orphan gutter. */
 html [data-sonner-toaster] [data-sonner-toast][data-styled='true']:has([data-close-button]) [data-content] {
-  padding-right: 24px;
+  padding-inline-end: 24px;
 }
 
 /* Only pointer devices hide the button: a touch screen has no hover to reveal it with. Keeping

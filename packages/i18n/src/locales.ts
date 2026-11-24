@@ -32,6 +32,14 @@ export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 // What a `users.locale` or `workspaces.locale` column accepts, mirrored by their check constraint.
 export const LOCALE_TAG_PATTERN = /^[a-z]{2}(-[A-Z]{2})?$/
 
+export type TextDirection = 'ltr' | 'rtl'
+
+const RIGHT_TO_LEFT_LOCALES: readonly string[] = ['ar', 'he']
+
+export function localeDirection(locale: string): TextDirection {
+    return RIGHT_TO_LEFT_LOCALES.includes(locale) ? 'rtl' : 'ltr'
+}
+
 export function isLocale(value: unknown): value is Locale {
     return typeof value === 'string' && Object.hasOwn(SUPPORTED_LOCALES, value)
 }

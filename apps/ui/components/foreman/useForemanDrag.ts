@@ -5,6 +5,7 @@ import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback, us
 
 import { type ForemanPlacement, clampForemanFloatSize, resolveDropTarget, sameForemanPlacement, serializeForemanPlacement } from '@/lib/foreman-layout'
 import { coversTheBoard } from '@/lib/foreman-open'
+import { useUiDirection } from '@rerun/ui/locale'
 import { useForemanStore } from '@/stores/foreman.store'
 
 type Point = { x: number; y: number }
@@ -21,6 +22,7 @@ const LANDING_DURATION_S = 0.22
  * l'y pose. La position ne passe jamais par React : un `transform` écrit sur le nœud à chaque move.
  */
 export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement }) {
+    const direction = useUiDirection()
     const reduceMotion = useReducedMotion()
     const [dragOrigin, setDragOrigin] = useState<Point | null>(null)
     const [landing, setLanding] = useState(0)
@@ -71,6 +73,7 @@ export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HT
                     panelCenter: { x: position.x + size.width / 2, y: position.y + size.height / 2 },
                     viewport: { width: window.innerWidth, height: window.innerHeight },
                     size: { width: origin.width, height: origin.height, dockWidth: origin.dockWidth },
+                    direction,
                 })
                 if (useForemanStore.getState().dropTarget && sameForemanPlacement(next, target)) return
                 target = next
@@ -122,7 +125,7 @@ export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HT
             window.addEventListener('keydown', keydown, true)
             teardownRef.current = teardown
         },
-        [panelRef]
+        [panelRef, direction]
     )
 
     const placementKey = serializeForemanPlacement(placement)

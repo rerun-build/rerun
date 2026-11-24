@@ -80,7 +80,7 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
                             >
                                 {t('openConversation')}
                             </TextShimmer>
-                            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
                         </button>
                     </div>
                 )}

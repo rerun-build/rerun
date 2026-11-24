@@ -120,7 +120,7 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
                             </Badge>
                         )}
                         {seconds !== undefined && <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{formatElapsed(seconds)}</span>}
-                        <ChevronRightIcon className={cn('size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90', !expandable && 'invisible')} />
+                        <ChevronRightIcon className={cn('size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90', !expandable && 'invisible')} />
                     </CollapsibleTrigger>
                     {canStop && (
                         <Button

@@ -5,6 +5,7 @@ import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Languages } from '@/lib/icons'
 import { localeNativeName, PSEUDO_LOCALE, stableLocales } from '@rerun/i18n'
+import { useUiDirection } from '@rerun/ui/locale'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
@@ -19,6 +20,7 @@ export function LanguageMenuRow() {
     const [pending, setPending] = useState<LanguageChoice | undefined>(undefined)
     const triggerRef = useRef<HTMLDivElement>(null)
     const [sideOffset, setSideOffset] = useState(0)
+    const direction = useUiDirection()
     const shown = pending === undefined ? value : pending
     const shownName = shown === null ? tLanguage('automatic') : shown === PSEUDO_LOCALE ? 'Pseudo' : localeNativeName(shown)
 
@@ -33,11 +35,12 @@ export function LanguageMenuRow() {
         }
     }
 
-    // On a phone the menu leaves no room on its right: the list slides back over it instead of off screen.
+    // On a phone the menu leaves no room on its reading end: the list slides back over it instead of off screen.
     const placeSubmenu = (open: boolean) => {
-        const right = triggerRef.current?.getBoundingClientRect().right
-        if (!open || right === undefined) return
-        setSideOffset(Math.min(0, window.innerWidth - right - SUBMENU_WIDTH - VIEWPORT_MARGIN))
+        const trigger = triggerRef.current?.getBoundingClientRect()
+        if (!open || !trigger) return
+        const room = direction === 'rtl' ? trigger.left : window.innerWidth - trigger.right
+        setSideOffset(Math.min(0, room - SUBMENU_WIDTH - VIEWPORT_MARGIN))
     }
 
     return (

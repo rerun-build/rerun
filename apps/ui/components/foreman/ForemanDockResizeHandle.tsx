@@ -1,5 +1,6 @@
 'use client'
 
+import { useUiDirection } from '@rerun/ui/locale'
 import type { PointerEvent, RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
@@ -20,7 +21,7 @@ type ResizeState = { pointerId: number; startX: number; startWidth: number; widt
 export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'dock' } }) {
     const t = useTranslations('foreman')
     const resizeRef = useRef<ResizeState | null>(null)
-    const growsLeft = placement.side === 'right'
+    const growsLeft = (placement.side === 'right') === (useUiDirection() === 'ltr')
 
     const splitOf = () => panelRef.current?.closest<HTMLElement>('[data-foreman-split]') ?? null
     const gridOf = () => panelRef.current?.closest<HTMLElement>('[data-foreman-grid]') ?? null
@@ -77,7 +78,7 @@ export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: Ref
             data-resizing="false"
             className={cn(
                 'group absolute inset-y-0 z-30 hidden w-2 cursor-col-resize touch-none md:block',
-                placement.side === 'right' ? 'left-0' : 'right-0'
+                placement.side === 'right' ? 'start-0' : 'end-0'
             )}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}

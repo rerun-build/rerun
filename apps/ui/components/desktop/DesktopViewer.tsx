@@ -105,7 +105,7 @@ export function DesktopViewer({ socketUrl, onDisconnect, viewOnly = false, ref, 
     }))
 
     return (
-        <div className={cn('relative min-h-0 flex-1 bg-muted/40', className)}>
+        <div dir="ltr" className={cn('relative min-h-0 flex-1 bg-muted/40', className)}>
             <DesktopScreenLoader fading={connected} compact={viewOnly} label={viewOnly ? undefined : t('connecting')} />
             <div ref={screenRef} className={cn('absolute inset-0 transition-opacity duration-300', connected ? 'opacity-100' : 'opacity-0', viewOnly && 'pointer-events-none')} />
         </div>

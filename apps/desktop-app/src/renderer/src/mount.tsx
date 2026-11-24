@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, type MessageTree } from '@rerun/i18n'
+import { DEFAULT_LOCALE, localeDirection, type MessageTree } from '@rerun/i18n'
 import englishKit from '@rerun/i18n/messages/en/kit.json'
 import { UiLocaleProvider } from '@rerun/ui/locale'
 import { StrictMode, type ReactNode } from 'react'
@@ -24,6 +24,7 @@ export function mount(page: ReactNode): void {
     applyTheme()
     const locale = resolveShellLocale(shellLocal()?.locale, navigator.language)
     document.documentElement.lang = locale
+    document.documentElement.dir = localeDirection(locale)
     document.documentElement.dataset.platform = shellLocal()?.platform ?? 'mac'
     const kit = (Object.entries(kitPacks).find(([path]) => path.endsWith(`/${locale}/kit.json`))?.[1].default ?? englishKit) as typeof englishKit
     createRoot(document.getElementById('root')!).render(

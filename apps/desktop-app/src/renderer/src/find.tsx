@@ -41,7 +41,7 @@ function FindBar() {
 
     return (
         <div className="flex h-full items-center p-1">
-            <div className="flex h-11 w-full items-center gap-1 rounded-xl border bg-popover pl-3 pr-1 text-popover-foreground shadow-lg">
+            <div className="flex h-11 w-full items-center gap-1 rounded-xl border bg-popover ps-3 pe-1 text-popover-foreground shadow-lg">
                 <input
                     ref={input}
                     value={text}

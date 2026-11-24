@@ -26,6 +26,7 @@
         "./markdown": "./src/markdown/index.ts",
         "./primitives": "./src/primitives/index.ts",
         "./primitives/spinner": "./src/primitives/spinner.tsx",
+        "./primitives/mirrored-icon": "./src/primitives/mirrored-icon.tsx",
         "./primitives/use-is-mobile": "./src/primitives/use-is-mobile.ts",
         "./forms": "./src/forms/index.ts",
         "./foreman": "./src/foreman/index.ts",

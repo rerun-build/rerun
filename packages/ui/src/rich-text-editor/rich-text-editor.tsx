@@ -61,6 +61,7 @@ export function RichTextEditor({ value, onChange, placeholder, id, contentClassN
         content: value,
         editorProps: {
             attributes: {
+                dir: 'auto',
                 class: cn(
                     richTextClassName,
                     'min-h-28 w-full rounded-b-lg bg-background px-3 py-2 text-sm text-foreground/70 outline-none',

@@ -1,6 +1,7 @@
 'use client'
 
 import { TextShimmer } from '@rerun/ui'
+import { useUiDirection } from '@rerun/ui/locale'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
@@ -30,6 +31,7 @@ function usedTools(items: StepGroupItem[]): ToolIconProps[] {
 
 function ToolStack({ items }: { items: StepGroupItem[] }) {
     const tools = usedTools(items)
+    const enterFrom = useUiDirection() === 'rtl' ? -6 : 6
     const shown = tools.slice(-MAX_STACKED)
     const hidden = tools.length - shown.length
     return (
@@ -39,7 +41,7 @@ function ToolStack({ items }: { items: StepGroupItem[] }) {
                     <motion.span
                         key={hidden + i}
                         layout
-                        initial={{ opacity: 0, x: 6 }}
+                        initial={{ opacity: 0, x: enterFrom }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25, ease: EASE }}
@@ -93,7 +95,7 @@ export function StepGroup({ items, agentId }: { items: StepGroupItem[]; agentId?
                     <ToolStack items={items} />
                     <span className="tabular-nums">{live ? items.length : count}</span>
                     {failed > 0 && <span className="text-red-500">{t('failed', { failed })}</span>}
-                    <ChevronRightIcon className={cn('size-3 shrink-0 transition-transform', open && 'rotate-90')} />
+                    <ChevronRightIcon className={cn('size-3 shrink-0 transition-transform', open && 'rotate-90 rtl:-rotate-90')} />
                 </button>
             </div>
             <AnimatePresence initial={false}>

@@ -1,8 +1,9 @@
 'use client'
 
-import type { AppLocale } from '@rerun/i18n'
+import { localeDirection, type AppLocale, type TextDirection } from '@rerun/i18n'
 import type { Messages } from '@rerun/i18n/messages'
 import englishKit from '@rerun/i18n/messages/en/kit.json'
+import { Direction } from 'radix-ui'
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { createTranslator } from 'use-intl'
 
@@ -17,7 +18,17 @@ const UiLocaleContext = createContext<{ locale: AppLocale; messages: KitMessages
 
 export function UiLocaleProvider({ locale, messages, children }: { locale: AppLocale; messages?: KitMessages; children: ReactNode }) {
     const value = useMemo(() => ({ locale, messages: messages ?? { kit: englishKit } }), [locale, messages])
-    return <UiLocaleContext.Provider value={value}>{children}</UiLocaleContext.Provider>
+    return (
+        <UiLocaleContext.Provider value={value}>
+            <Direction.Provider dir={localeDirection(locale)}>{children}</Direction.Provider>
+        </UiLocaleContext.Provider>
+    )
+}
+
+// The reading direction of the interface, for what CSS cannot flip on its own: a slide, a drag, a
+// scroll offset.
+export function useUiDirection(): TextDirection {
+    return localeDirection(useContext(UiLocaleContext).locale)
 }
 
 export function useUiLocale(): AppLocale {

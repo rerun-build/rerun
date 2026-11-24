@@ -1,5 +1,7 @@
 'use client'
 
+import { useUiDirection } from '../locale'
+import type { TextDirection } from '@rerun/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type ScrollFadeOptions = {
@@ -39,7 +41,7 @@ export function useScrollEdges(element: HTMLElement | null, { fadeSize = 24, axi
 
     const update = useCallback(() => {
         if (!element) return
-        const scrolled = axis === 'x' ? element.scrollLeft : element.scrollTop
+        const scrolled = axis === 'x' ? Math.abs(element.scrollLeft) : element.scrollTop
         const remaining = axis === 'x' ? element.scrollWidth - element.clientWidth - scrolled : element.scrollHeight - element.clientHeight - scrolled
         const [padStart, padEnd] = contentPadding(element.firstElementChild, axis)
         const top = clampEdge(scrolled - padStart, fadeSize)
@@ -70,12 +72,13 @@ export function useScrollEdges(element: HTMLElement | null, { fadeSize = 24, axi
     return fade
 }
 
-export function scrollFadeMask(fade: { top: number; bottom: number }, axis: 'x' | 'y' = 'y') {
+export function scrollFadeMask(fade: { top: number; bottom: number }, axis: 'x' | 'y' = 'y', direction: TextDirection = 'ltr') {
     const stops = [fade.top ? `transparent, black ${fade.top}px` : 'black', fade.bottom ? `black calc(100% - ${fade.bottom}px), transparent` : 'black'].join(', ')
 
-    return fade.top || fade.bottom ? `linear-gradient(${axis === 'x' ? 'to right' : 'to bottom'}, ${stops})` : undefined
+    return fade.top || fade.bottom ? `linear-gradient(${axis === 'y' ? 'to bottom' : direction === 'rtl' ? 'to left' : 'to right'}, ${stops})` : undefined
 }
 
 export function useScrollFade(element: HTMLElement | null, options: ScrollFadeOptions = {}) {
-    return scrollFadeMask(useScrollEdges(element, options), options.axis)
+    const direction = useUiDirection()
+    return scrollFadeMask(useScrollEdges(element, options), options.axis, direction)
 }

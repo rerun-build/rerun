@@ -39,7 +39,7 @@ export function AgentPickerList<Row extends AgentPickerRow>({ rows, selectedId, 
                     <span className="truncate">{row.tab ? t('foreman.agentPicker.openTab', { tab: row.tab, name: row.name }) : row.name}</span>
                     <span className="grid grid-cols-[0fr] opacity-0 transition-[grid-template-columns,opacity] duration-200 ease-out group-hover/button:grid-cols-[1fr] group-hover/button:opacity-100 group-focus-visible/button:grid-cols-[1fr] group-focus-visible/button:opacity-100 motion-reduce:transition-none">
                         <span className="overflow-hidden">
-                            <LayerUpIcon className="ms-1.5 size-3.5 -translate-x-1 transition-[translate] duration-200 ease-out group-hover/button:translate-x-0 group-focus-visible/button:translate-x-0" />
+                            <LayerUpIcon className="ms-1.5 size-3.5 -translate-x-1 rtl:translate-x-1 transition-[translate] duration-200 ease-out group-hover/button:translate-x-0 group-focus-visible/button:translate-x-0" />
                         </span>
                     </span>
                 </Suggestion>

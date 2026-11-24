@@ -1,7 +1,8 @@
 'use client'
 
 import { IsoGrid } from '@rerun/ui/iso-grid'
-import { Badge } from '@rerun/ui/primitives'
+import { useUiDirection } from '@rerun/ui/locale'
+import { Badge, readingSign } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -60,8 +61,9 @@ function useCarouselEdges(cards: number) {
     useEffect(() => {
         if (!scroller) return
         const update = () => {
-            const start = scroller.scrollLeft <= 1
-            const end = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1
+            const fromStart = Math.abs(scroller.scrollLeft)
+            const start = fromStart <= 1
+            const end = fromStart + scroller.clientWidth >= scroller.scrollWidth - 1
             setEdges(previous => (previous.start === start && previous.end === end ? previous : { start, end }))
         }
         update()
@@ -78,10 +80,11 @@ function useCarouselEdges(cards: number) {
 
     const scrollByCard = (direction: 1 | -1) => {
         const card = scroller?.firstElementChild as HTMLElement | null
-        if (card) scroller?.scrollBy({ left: direction * (card.offsetWidth + CARD_GAP), behavior: 'smooth' })
+        if (card && scroller) scroller.scrollBy({ left: readingSign(scroller) * direction * (card.offsetWidth + CARD_GAP), behavior: 'smooth' })
     }
 
-    const mask = edges.start && edges.end ? undefined : `linear-gradient(to right, ${edges.start ? '#000' : 'transparent'} 0, #000 ${EDGE_FADE}px, #000 calc(100% - ${EDGE_FADE}px), ${edges.end ? '#000' : 'transparent'} 100%)`
+    const readingEnd = useUiDirection() === 'rtl' ? 'left' : 'right'
+    const mask = edges.start && edges.end ? undefined : `linear-gradient(to ${readingEnd}, ${edges.start ? '#000' : 'transparent'} 0, #000 ${EDGE_FADE}px, #000 calc(100% - ${EDGE_FADE}px), ${edges.end ? '#000' : 'transparent'} 100%)`
 
     return { setScroller, edges, scrollByCard, mask }
 }

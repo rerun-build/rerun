@@ -154,7 +154,7 @@ function AppName({ name, onOpen }: { name: string; onOpen?: () => void }) {
     return (
         <button type="button" onClick={onOpen} className="group flex items-center gap-1 truncate text-sm font-medium">
             {name}
-            <ChevronRightIcon className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            <ChevronRightIcon className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
         </button>
     )
 }

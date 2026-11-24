@@ -45,7 +45,7 @@ export function TemplateSectionHeading({ title, subtitle, icon, onSelect, onBack
                             {/* `translate`, not `transform`: Tailwind v4 compiles `-translate-x-1` to the
                                 `translate` property, so a transition listed on `transform` never fires and
                                 the chevron pops in instead of sliding. */}
-                            <ChevronRightIcon className="size-4 -translate-x-1 text-muted-foreground opacity-0 transition-[opacity,translate] duration-200 ease-out group-focus-within:translate-x-0 group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100" />
+                            <ChevronRightIcon className="size-4 -translate-x-1 rtl:translate-x-1 text-muted-foreground opacity-0 transition-[opacity,translate] duration-200 ease-out group-focus-within:translate-x-0 group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100" />
                         </span>
                     </span>
                 </h2>

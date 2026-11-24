@@ -57,7 +57,7 @@ function Backlinks({ links, onOpenPage }: { links: BrainPageData['backlinks']; o
     return (
         <div className="mt-12 border-t border-border pt-4">
             <button type="button" onClick={() => setOpen(value => !value)} className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground" aria-expanded={open}>
-                <ChevronRightIcon className={cn('size-3.5 transition-transform duration-150', open && 'rotate-90')} />
+                <ChevronRightIcon className={cn('size-3.5 transition-transform duration-150', open && 'rotate-90 rtl:-rotate-90')} />
                 {t('backlinks', { count: links.length })}
             </button>
             {open && (

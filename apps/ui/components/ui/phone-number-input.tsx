@@ -107,6 +107,7 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                 <PopoverAnchor asChild>
                     <div
                         ref={boxRef}
+                        dir="ltr"
                         className="flex h-10 w-full items-center rounded-lg border border-input bg-background text-base transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary has-[input[aria-invalid=true]]:border-red-500 has-[input[aria-invalid=true]]:focus-within:ring-red-500 md:text-sm"
                     >
                         <label className="group flex h-full shrink-0 cursor-text items-center gap-1.5 pe-1.5 ps-3 has-disabled:cursor-not-allowed has-disabled:opacity-50">

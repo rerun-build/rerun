@@ -5,6 +5,7 @@ import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '../cn'
 import { ChevronLeft, ChevronRight } from '../icons'
 import { useKitTranslations } from '../locale'
+import { readingSign } from './reading-direction'
 
 const FADE_CLASS = 'pointer-events-none absolute -top-2 -bottom-10 z-20 w-24 transition-opacity duration-200'
 const ARROW_CLASS =
@@ -48,9 +49,10 @@ export function CardCarousel({
     function updatePosition() {
         const el = scrollerRef.current
         if (!el) return
-        setCanLeft(el.scrollLeft > 8)
-        setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 8)
-        setActive(Math.round(el.scrollLeft / step(el)))
+        const fromStart = Math.abs(el.scrollLeft)
+        setCanLeft(fromStart > 8)
+        setCanRight(fromStart < el.scrollWidth - el.clientWidth - 8)
+        setActive(Math.round(fromStart / step(el)))
     }
 
     useEffect(() => {
@@ -62,7 +64,7 @@ export function CardCarousel({
     function scrollByCard(direction: 1 | -1) {
         const el = scrollerRef.current
         if (!el) return
-        el.scrollBy({ left: direction * step(el), behavior: 'smooth' })
+        el.scrollBy({ left: readingSign(el) * direction * step(el), behavior: 'smooth' })
     }
 
     // Dots land on the snap point itself rather than on `index * step`: with centred items the two
@@ -74,7 +76,7 @@ export function CardCarousel({
         const card = el.firstElementChild as HTMLElement | null
         const centered = card ? getComputedStyle(card).scrollSnapAlign.startsWith('center') : false
         const inset = card && centered ? (el.clientWidth - card.clientWidth) / 2 : 0
-        el.scrollTo({ left: index * step(el) - inset, behavior: 'smooth' })
+        el.scrollTo({ left: readingSign(el) * (index * step(el) - inset), behavior: 'smooth' })
     }
 
     return (
@@ -90,14 +92,14 @@ export function CardCarousel({
                     ))}
                 </div>
 
-                <div aria-hidden className={cn(FADE_CLASS, '-start-4 bg-gradient-to-r to-transparent', fadeClassName, canLeft ? 'opacity-100' : 'opacity-0')} />
-                <div aria-hidden className={cn(FADE_CLASS, '-end-4 bg-gradient-to-l to-transparent', fadeClassName, canRight ? 'opacity-100' : 'opacity-0')} />
+                <div aria-hidden className={cn(FADE_CLASS, '-start-4 bg-gradient-to-r rtl:bg-gradient-to-l to-transparent', fadeClassName, canLeft ? 'opacity-100' : 'opacity-0')} />
+                <div aria-hidden className={cn(FADE_CLASS, '-end-4 bg-gradient-to-l rtl:bg-gradient-to-r to-transparent', fadeClassName, canRight ? 'opacity-100' : 'opacity-0')} />
 
                 <button
                     type="button"
                     aria-label={t('primitives.carousel.previous', { label })}
                     onClick={() => scrollByCard(-1)}
-                    className={cn(ARROW_CLASS, 'start-1 sm:start-0 sm:-translate-x-1/2', canLeft ? 'opacity-100' : 'pointer-events-none opacity-0')}
+                    className={cn(ARROW_CLASS, 'start-1 sm:start-0 sm:-translate-x-1/2 sm:rtl:translate-x-1/2', canLeft ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
                     <ChevronLeft className="size-4" />
                 </button>
@@ -105,7 +107,7 @@ export function CardCarousel({
                     type="button"
                     aria-label={t('primitives.carousel.next', { label })}
                     onClick={() => scrollByCard(1)}
-                    className={cn(ARROW_CLASS, 'end-1 sm:end-0 sm:translate-x-1/2', canRight ? 'opacity-100' : 'pointer-events-none opacity-0')}
+                    className={cn(ARROW_CLASS, 'end-1 sm:end-0 sm:translate-x-1/2 sm:rtl:-translate-x-1/2', canRight ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
                     <ChevronRight className="size-4" />
                 </button>

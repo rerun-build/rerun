@@ -24,7 +24,7 @@ const spentOn = (day: Day) => day.aiMicros + day.dataMicros
 function Daily({ days, slots, hover, onHover }: { days: Day[]; slots: number; hover: number | null; onHover: (index: number | null) => void }) {
     const max = Math.max(...days.map(spentOn), 1)
     return (
-        <div className="flex items-end gap-[2px]" style={{ height: HEIGHT }} onMouseLeave={() => onHover(null)}>
+        <div dir="ltr" className="flex items-end gap-[2px]" style={{ height: HEIGHT }} onMouseLeave={() => onHover(null)}>
             {Array.from({ length: slots }, (_, index) => {
                 const day = days[index]
                 return (
@@ -61,7 +61,7 @@ function Cumulative({ days, slots, balance, trial, hover, onHover, locale }: { d
     const figure = formatCredits(whole, locale)
 
     return (
-        <div className="relative" style={{ height: HEIGHT }} onMouseLeave={() => onHover(null)}>
+        <div dir="ltr" className="relative" style={{ height: HEIGHT }} onMouseLeave={() => onHover(null)}>
             <svg viewBox={`0 0 100 ${HEIGHT}`} preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
                 {showMonth && <line x1="0" x2="100" y1={y(month)} y2={y(month)} className="stroke-muted-foreground/50" strokeDasharray="2 2" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
                 <line x1="0" x2="100" y1={y(whole)} y2={y(whole)} className={showMonth ? 'stroke-muted-foreground/25' : 'stroke-muted-foreground/50'} strokeDasharray="2 2" strokeWidth="1" vectorEffect="non-scaling-stroke" />
@@ -72,11 +72,11 @@ function Cumulative({ days, slots, balance, trial, hover, onHover, locale }: { d
             </svg>
             {showMonth && (
                 <span className="absolute start-0 -translate-y-full pb-0.5 text-[10px] text-muted-foreground" style={{ top: y(month) }}>
-                    {t('usage.chart.monthly', { figure: formatCredits(month, locale) })}
+                    <bdi>{t('usage.chart.monthly', { figure: formatCredits(month, locale) })}</bdi>
                 </span>
             )}
             <span className={cn('absolute -translate-y-full pb-0.5 text-[10px]', showMonth ? 'end-0 text-muted-foreground/70' : 'start-0 text-muted-foreground')} style={{ top: y(whole) }}>
-                {trial ? t('usage.chart.trialCredits', { figure }) : showMonth ? t('usage.chart.topup', { figure }) : t('usage.chart.credits', { figure })}
+                <bdi>{trial ? t('usage.chart.trialCredits', { figure }) : showMonth ? t('usage.chart.topup', { figure }) : t('usage.chart.credits', { figure })}</bdi>
             </span>
             <div className="absolute inset-0 flex">
                 {Array.from({ length: slots }, (_, index) => (
@@ -127,14 +127,14 @@ export function UsageChart({ usage, balance, trial, mode }: { usage: CreditUsage
                 )}
             </div>
             {mode === 'daily' ? <Daily days={usage.days} slots={slots} hover={hover} onHover={setHover} /> : <Cumulative days={usage.days} slots={slots} balance={balance} trial={trial} hover={hover} onHover={setHover} locale={locale} />}
-            <div className="relative flex justify-between text-[10px] text-muted-foreground tabular-nums">
-                <span>{shortDate(usage.period.start, locale)}</span>
+            <div dir="ltr" className="relative flex justify-between text-[10px] text-muted-foreground tabular-nums">
+                <span dir="auto">{shortDate(usage.period.start, locale)}</span>
                 {usage.days.length < slots && (
                     <span className="absolute -translate-x-1/2 text-foreground" style={{ left: `${((usage.days.length - 0.5) / slots) * 100}%` }}>
                         {t('usage.chart.today')}
                     </span>
                 )}
-                <span>{trial ? t('usage.chart.trialEnds', { date: shortDate(usage.period.end, locale) }) : t('usage.chart.resets', { date: shortDate(usage.period.end, locale) })}</span>
+                <span dir="auto">{trial ? t('usage.chart.trialEnds', { date: shortDate(usage.period.end, locale) }) : t('usage.chart.resets', { date: shortDate(usage.period.end, locale) })}</span>
             </div>
         </figure>
     )

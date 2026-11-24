@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { type CSSProperties, type ReactNode, useRef, useState } from 'react'
 
 import { SidePanelResizeHandle } from '@/components/layout/SidePanelResizeHandle'
+import { useUiDirection } from '@rerun/ui/locale'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useDetailsBesideChat } from '@/components/workspace-view/useDetailsOpen'
 import { isTypingTarget } from '@/lib/typing-target'
@@ -36,6 +37,7 @@ export function DetailsColumn({ label, open, slideIn, onClose, children }: Detai
     // Holds the column's room until it has slid out.
     const [inFlow, setInFlow] = useState(open)
     if (open && !inFlow) setInFlow(true)
+    const offScreen = useUiDirection() === 'rtl' ? '-100%' : '100%'
 
     if (!besideChat) {
         // The page's colour, as beside the chat: the sticky headings of the lists inside are painted with it.
@@ -61,8 +63,8 @@ export function DetailsColumn({ label, open, slideIn, onClose, children }: Detai
             aria-hidden={!open || undefined}
             inert={!open}
             ref={columnRef}
-            initial={slideIn ? { x: '100%' } : false}
-            animate={{ x: open ? 0 : '100%' }}
+            initial={slideIn ? { x: offScreen } : false}
+            animate={{ x: open ? 0 : offScreen }}
             transition={reducedMotion ? { duration: 0 } : SLIDE}
             onAnimationComplete={() => !open && setInFlow(false)}
             style={{ '--details-width': `${DETAILS_COLUMN_WIDTH.defaultWidth}px` } as CSSProperties}

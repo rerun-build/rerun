@@ -54,7 +54,7 @@ export function ToolCallRow({ label, icon, iconSrc, status, elapsed, summary, op
                 </div>
                 {elapsed}
                 <StatusIndicator status={status} />
-                {hasContent && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />}
+                {hasContent && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />}
             </CollapsibleTrigger>
 
             {hasContent && (

@@ -273,7 +273,7 @@ function TestimonialRotation() {
             </div>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={testimonial.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
-                    <blockquote className="line-clamp-2 min-h-12 text-[15px] leading-6">{t('quoted', { quote: copy.quote })}</blockquote>
+                    <blockquote dir="auto" className="line-clamp-2 min-h-12 text-[15px] leading-6">{t('quoted', { quote: copy.quote })}</blockquote>
                     <figcaption className="flex items-center gap-2.5 text-sm">
                         <ExpertAvatar initials={initialsFromName(testimonial.author)} src={testimonial.avatar} alt={testimonial.author} rounded="rounded-full" className="size-7 shrink-0 text-[10px]" />
                         <span className="font-medium">{testimonial.author}</span>

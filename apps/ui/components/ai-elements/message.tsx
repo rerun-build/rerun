@@ -204,14 +204,16 @@ const linkSafetyOff = { enabled: false }
 // exist for the answer being written and nowhere else: a read-only transcript stays plain DOM.
 export const MessageResponse = memo(
     ({ className, isAnimating, animated, ...props }: MessageResponseProps) => (
-        <Streamdown
-            className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
-            plugins={streamdownPlugins}
-            linkSafety={linkSafetyOff}
-            isAnimating={isAnimating}
-            animated={animated ?? (isAnimating ? MESSAGE_STREAM_ANIMATION : undefined)}
-            {...props}
-        />
+        <div dir="auto" className="contents">
+            <Streamdown
+                className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
+                plugins={streamdownPlugins}
+                linkSafety={linkSafetyOff}
+                isAnimating={isAnimating}
+                animated={animated ?? (isAnimating ? MESSAGE_STREAM_ANIMATION : undefined)}
+                {...props}
+            />
+        </div>
     ),
     // remarkPlugins counts: the skills a message mentions can arrive after it has rendered.
     (prevProps, nextProps) => prevProps.children === nextProps.children && nextProps.isAnimating === prevProps.isAnimating && prevProps.animated === nextProps.animated && prevProps.remarkPlugins === nextProps.remarkPlugins

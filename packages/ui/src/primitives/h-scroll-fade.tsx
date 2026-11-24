@@ -2,6 +2,7 @@
 
 import { cn } from '../cn'
 import { useKitTranslations } from '../locale'
+import { readingSign } from './reading-direction'
 import { ChevronLeft, ChevronRight } from '../icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -15,8 +16,9 @@ export function HScrollFade({ children, className, fadeClassName = 'from-popover
     const update = useCallback(() => {
         const el = ref.current
         if (!el) return
-        setCanLeft(el.scrollLeft > 1)
-        setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+        const fromStart = Math.abs(el.scrollLeft)
+        setCanLeft(fromStart > 1)
+        setCanRight(fromStart + el.clientWidth < el.scrollWidth - 1)
     }, [])
 
     useEffect(() => {
@@ -39,7 +41,7 @@ export function HScrollFade({ children, className, fadeClassName = 'from-popover
         if (!el) return
         const child = el.firstElementChild as HTMLElement | null
         const gap = parseFloat(getComputedStyle(el).columnGap) || 0
-        el.scrollBy({ left: dir * Math.max(160, child ? child.clientWidth + gap : 0), behavior: 'smooth' })
+        el.scrollBy({ left: readingSign(el) * dir * Math.max(160, child ? child.clientWidth + gap : 0), behavior: 'smooth' })
     }
 
     return (
@@ -57,7 +59,7 @@ function Edge({ side, fadeClassName, onClick }: { side: 'left' | 'right'; fadeCl
     const t = useKitTranslations()
     const isLeft = side === 'left'
     return (
-        <div className={cn('pointer-events-none absolute inset-y-0 z-10 flex w-12 items-center to-transparent', fadeClassName, isLeft ? 'start-0 justify-start bg-gradient-to-r' : 'end-0 justify-end bg-gradient-to-l')}>
+        <div className={cn('pointer-events-none absolute inset-y-0 z-10 flex w-12 items-center to-transparent', fadeClassName, isLeft ? 'start-0 justify-start bg-gradient-to-r rtl:bg-gradient-to-l' : 'end-0 justify-end bg-gradient-to-l rtl:bg-gradient-to-r')}>
             <button
                 type="button"
                 onClick={onClick}

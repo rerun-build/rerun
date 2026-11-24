@@ -62,6 +62,12 @@ describe('resolveDropTarget', () => {
         expect(resolveDropTarget({ pointer: { x: 500, y: 40 }, panelCenter: { x: 700, y: 400 }, viewport, size })).toEqual({ mode: 'float', corner: 'top-left', ...size })
         expect(resolveDropTarget({ pointer: { x: 900, y: 40 }, panelCenter: { x: 1000, y: 500 }, viewport, size })).toEqual({ mode: 'float', corner: 'bottom-right', ...size })
     })
+
+    it('reads the screen from its right edge in a right-to-left page', () => {
+        expect(resolveDropTarget({ pointer: { x: 1420, y: 450 }, panelCenter: { x: 1180, y: 450 }, viewport, size, direction: 'rtl' })).toEqual({ mode: 'dock', side: 'left', ...size })
+        expect(resolveDropTarget({ pointer: { x: 900, y: 40 }, panelCenter: { x: 1000, y: 500 }, viewport, size, direction: 'rtl' })).toEqual({ mode: 'float', corner: 'bottom-left', ...size })
+        expect(resolveCorner({ x: 100, y: 100 }, viewport, 'rtl')).toBe('top-right')
+    })
 })
 
 describe('clampForemanFloatSize', () => {

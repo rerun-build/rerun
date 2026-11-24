@@ -81,7 +81,7 @@ function AppCoins({ apps, className }: { apps: (CatalogEntry | null)[]; classNam
         <span className={cn('flex items-center justify-end', className)}>
             {apps.map((app, index) => {
                 const coin = (
-                    <span key={app?.slug ?? index} data-app={app?.slug} style={{ marginLeft: index === 0 ? 0 : -6, zIndex: apps.length - index }} className="transition-transform duration-150 hover:-translate-y-0.5">
+                    <span key={app?.slug ?? index} data-app={app?.slug} style={{ marginInlineStart: index === 0 ? 0 : -6, zIndex: apps.length - index }} className="transition-transform duration-150 hover:-translate-y-0.5">
                         <AppCoin app={app} size={26} titled={false} className="ring-2 ring-(--cut)" />
                     </span>
                 )

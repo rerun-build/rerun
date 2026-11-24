@@ -55,7 +55,7 @@ export function GateScreen({ brand, lock, mark, title, subtitle, children }: { b
                 </div>
                 {children && <div className="flex w-full flex-col gap-2.5">{children}</div>}
             </div>
-            <MadeWithRerun className="absolute end-4 bottom-4 max-md:right-1/2 max-md:translate-x-1/2" />
+            <MadeWithRerun className="absolute bottom-4 md:end-4 max-md:left-1/2 max-md:-translate-x-1/2" />
         </main>
     )
 }

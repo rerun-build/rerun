@@ -39,7 +39,7 @@ export function StepRow({ iconProps, label, detail, status, elapsed, children }:
                 <span className={cn('max-w-[60%] shrink-0 truncate font-medium', status === 'error' && 'text-red-500')}>{status === 'running' ? <TextShimmer className="text-xs">{label}</TextShimmer> : label}</span>
                 <span className="min-w-0 flex-1 truncate text-muted-foreground">{detail}</span>
                 {elapsed}
-                {expandable && <ChevronRightIcon className={cn('size-3 shrink-0 text-muted-foreground opacity-0 transition group-hover/step:opacity-100', open && 'rotate-90 opacity-100')} />}
+                {expandable && <ChevronRightIcon className={cn('size-3 shrink-0 text-muted-foreground opacity-0 transition group-hover/step:opacity-100', open && 'rotate-90 rtl:-rotate-90 opacity-100')} />}
             </button>
             {open && expandable && <div className="mx-1.5 mb-1 space-y-1.5">{children}</div>}
         </div>

@@ -13,7 +13,7 @@ export function ThemeMenuRow() {
         <div className="flex items-center gap-2 px-1.5 py-1 text-sm text-muted-foreground">
             <SunMoonIcon className="size-4" />
             {t('theme')}
-            <ThemeToggle className="ms-auto origin-right scale-90 shadow-none" />
+            <ThemeToggle className="ms-auto origin-right rtl:origin-left scale-90 shadow-none" />
         </div>
     )
 }

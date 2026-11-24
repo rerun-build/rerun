@@ -19,6 +19,7 @@ export { scrollFadeMask, useScrollEdges, useScrollFade } from './use-scroll-fade
 export type { ScrollFadeOptions } from './use-scroll-fade'
 export { useIsMobile, useResolvedIsMobile } from './use-is-mobile'
 export { HScrollFade } from './h-scroll-fade'
+export { readingSign } from './reading-direction'
 export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './collapsible'
 export { useElapsed, formatElapsed } from './use-elapsed'
 export { PAGE_UNATTENDED_ATTRIBUTE } from './use-page-unattended'

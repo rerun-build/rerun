@@ -22,12 +22,12 @@ export function CancelTimeline({ milestones }: { milestones: readonly CancelMile
     return (
         <div className="relative mx-1 h-[4.75rem]">
             <div className="absolute inset-x-5 top-[21px] h-1 rounded-full bg-muted" />
-            <div className="absolute top-[21px] start-5 h-1 w-[10%] rounded-full bg-gradient-to-r from-foreground/70 to-transparent" />
+            <div className="absolute top-[21px] start-5 h-1 w-[10%] rounded-full bg-gradient-to-r rtl:bg-gradient-to-l from-foreground/70 to-transparent" />
             {milestones.map(milestone => (
                 <div
                     key={milestone.label}
-                    className={cn('absolute top-0 flex flex-col gap-2', milestone.at === 0 ? 'items-start' : milestone.at === 1 ? '-translate-x-full items-end' : '-translate-x-1/2 items-center')}
-                    style={{ left: `${milestonePosition(milestone.at) * 100}%` }}
+                    className={cn('absolute top-0 flex flex-col gap-2', milestone.at === 0 ? 'items-start' : milestone.at === 1 ? '-translate-x-full rtl:translate-x-full items-end' : '-translate-x-1/2 rtl:translate-x-1/2 items-center')}
+                    style={{ insetInlineStart: `${milestonePosition(milestone.at) * 100}%` }}
                 >
                     <CalendarTile date={milestone.date} highlighted={milestone.highlighted} />
                     <span className={cn('text-xs whitespace-nowrap', milestone.highlighted ? 'font-medium text-foreground' : 'text-muted-foreground')}>{milestone.label}</span>

@@ -97,7 +97,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                 <Stripes />
                 <div className="relative flex items-center gap-2 px-3 py-2">
                     <button type="button" onClick={() => setOpen(!isOpen)} aria-expanded={isOpen} aria-controls={listId} className="flex min-w-0 flex-1 items-center gap-1.5 text-start">
-                        <ChevronDownIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out', !isOpen && '-rotate-90')} />
+                        <ChevronDownIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out', !isOpen && '-rotate-90 rtl:rotate-90')} />
                         <span className="min-w-0 flex-1 truncate text-xs font-medium">{heading}</span>
                     </button>
                     {!settled && (

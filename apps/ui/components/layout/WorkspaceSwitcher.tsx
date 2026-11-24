@@ -446,7 +446,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                                 <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-6 rounded-md object-cover" />
                                 {brainProposals > 0 && <span className="pointer-events-none absolute -top-0.5 -end-0.5 size-2 rounded-full bg-red-500 ring-2 ring-sidebar" />}
                             </span>
-                            <span className="relative truncate">{workspace.name || t('defaultName')}</span>
+                            <span dir="auto" className="relative truncate">{workspace.name || t('defaultName')}</span>
                             <ChevronDownIcon className="relative size-3.5 shrink-0 text-muted-foreground" />
                         </button>
                     </DropdownMenuTrigger>

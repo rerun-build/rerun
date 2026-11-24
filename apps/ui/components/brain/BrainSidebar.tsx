@@ -90,7 +90,7 @@ function SidebarRow({
                     : undefined
             }
             title={tooltip}
-            style={{ paddingLeft: `${0.5 + depth * 0.875}rem` }}
+            style={{ paddingInlineStart: `${0.5 + depth * 0.875}rem` }}
             className={cn(
                 'group/row flex h-7 w-full cursor-pointer items-center gap-1.5 rounded-md pe-1.5 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
                 active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
@@ -124,11 +124,11 @@ function FolderRows({ dir, depth, files, selection, onSelect }: { dir: string; d
     const entries = files.entriesOf(dir)
     const indent = `${(dir ? 1.5 : 0.5) + depth * 0.875}rem`
     if (!entries) return (
-            <div style={{ paddingLeft: indent }} className="flex h-7 items-center">
+            <div style={{ paddingInlineStart: indent }} className="flex h-7 items-center">
                 <Skeleton className="h-3 w-24" />
             </div>
         )
-    if (entries.length === 0) return <p style={{ paddingLeft: indent }} className="py-1 text-xs text-muted-foreground/70">{dir ? t('emptyFolder') : t('noFiles')}</p>
+    if (entries.length === 0) return <p style={{ paddingInlineStart: indent }} className="py-1 text-xs text-muted-foreground/70">{dir ? t('emptyFolder') : t('noFiles')}</p>
 
     return entries.map(entry => <FileTreeRow key={entry.name} dir={dir} entry={entry} depth={depth} files={files} selection={selection} onSelect={onSelect} />)
 }
@@ -159,7 +159,7 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
                         }}
                         className="-ms-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
                     >
-                        <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90')} />
+                        <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90 rtl:-rotate-90')} />
                     </button>
                 }
                 onClick={() => {
@@ -240,7 +240,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                             }}
                             className="-ms-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
                         >
-                            <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90')} />
+                            <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90 rtl:-rotate-90')} />
                         </button>
                     }
                     trailing={<span className="text-[11px] tabular-nums text-muted-foreground/70">{boxPages.length + boxFiles.length}</span>}
@@ -366,7 +366,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                                             label={t('products')}
                                             active={false}
                                             expanded={productsOpen}
-                                            leading={<ChevronRightIcon className={cn('-ms-0.5 size-3 shrink-0 transition-transform duration-150', productsOpen && 'rotate-90')} />}
+                                            leading={<ChevronRightIcon className={cn('-ms-0.5 size-3 shrink-0 transition-transform duration-150', productsOpen && 'rotate-90 rtl:-rotate-90')} />}
                                             trailing={<span className="text-[11px] tabular-nums text-muted-foreground/70">{products.length}</span>}
                                             onClick={() => setProductsExpanded(!productsOpen)}
                                         />

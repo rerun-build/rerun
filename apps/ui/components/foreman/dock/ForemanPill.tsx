@@ -35,7 +35,7 @@ export function ForemanPill({ side, width, tone, hidden = false, ref, children }
             inert={hidden}
             className={cn(
                 'pointer-events-auto absolute top-1/2 -translate-y-1/2 gap-0 font-normal transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none',
-                side === 'left' ? 'left-0 pl-[66px]' : 'right-0 pr-[60px]',
+                side === 'left' ? 'start-0 ps-[66px]' : 'end-0 pe-[60px]',
                 width,
                 hidden && 'pointer-events-none opacity-0'
             )}

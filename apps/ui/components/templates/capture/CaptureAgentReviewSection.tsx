@@ -161,7 +161,7 @@ export function CaptureAgentReviewSection({
             <Collapsible open={filesOpen} onOpenChange={setFilesOpen}>
                 <CaptureReviewGroup icon={FolderIcon} title={t('filesGroup')}>
                     <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
-                        <ChevronRight className="size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90" />
+                        <ChevronRight className="size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />
                         {filesOpen ? t('hideFolder') : t('showFolder')}
                         <span className="ms-auto">{t('kept', { kept: stats.kept, total: stats.total })}</span>
                     </CollapsibleTrigger>

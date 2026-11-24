@@ -57,7 +57,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                         </div>
                         <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</p>
                         {creator.bio && (
-                            <blockquote className="mt-3 border-s-2 border-primary/50 ps-3 text-sm leading-relaxed text-foreground/80">
+                            <blockquote dir="auto" className="mt-3 border-s-2 border-primary/50 ps-3 text-sm leading-relaxed text-foreground/80">
                                 <p className="line-clamp-2">{creator.bio}</p>
                             </blockquote>
                         )}
@@ -119,7 +119,7 @@ function OpenTemplateButton({ onSelect, className }: { onSelect: () => void; cla
     return (
         <Button type="button" size="sm" onClick={onSelect} className={cn('group/open', className)}>
             {t('openTemplate')}
-            <ArrowRightIcon className="size-3.5 transition-transform group-hover/open:translate-x-0.5" />
+            <ArrowRightIcon className="size-3.5 transition-transform group-hover/open:translate-x-0.5 rtl:group-hover/open:-translate-x-0.5" />
         </Button>
     )
 }

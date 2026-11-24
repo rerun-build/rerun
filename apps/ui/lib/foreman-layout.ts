@@ -1,3 +1,5 @@
+import type { TextDirection } from '@rerun/i18n'
+
 import { coversTheBoard } from '@/lib/foreman-open'
 
 export type ForemanCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
@@ -96,9 +98,15 @@ export function rememberForemanOrbCorner(corner: ForemanCorner): void {
 type Point = { x: number; y: number }
 type Size = { width: number; height: number }
 
-export function resolveCorner(point: Point, viewport: Size): ForemanCorner {
+// A placement's "left" and "right" are those of a left-to-right page: a right-to-left one mirrors
+// them, so a pointer is read from the reading start.
+function fromReadingStart(x: number, viewport: Size, direction: TextDirection): number {
+    return direction === 'rtl' ? viewport.width - x : x
+}
+
+export function resolveCorner(point: Point, viewport: Size, direction: TextDirection = 'ltr'): ForemanCorner {
     const vertical = point.y < viewport.height / 2 ? 'top' : 'bottom'
-    const horizontal = point.x < viewport.width / 2 ? 'left' : 'right'
+    const horizontal = fromReadingStart(point.x, viewport, direction) < viewport.width / 2 ? 'left' : 'right'
     return `${vertical}-${horizontal}`
 }
 
@@ -106,10 +114,11 @@ export function resolveCorner(point: Point, viewport: Size): ForemanCorner {
  * La place où la colonne atterrira si on la lâche maintenant. Le dock se décide sur le pointeur, qui
  * doit toucher le bord ; le coin sur le centre de la fenêtre, qui est ce que l'œil voit bouger.
  */
-export function resolveDropTarget({ pointer, panelCenter, viewport, size }: { pointer: Point; panelCenter: Point; viewport: Size; size: ForemanSizes }): ForemanPlacement {
-    if (pointer.x <= DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'left', ...size }
-    if (pointer.x >= viewport.width - DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'right', ...size }
-    return { mode: 'float', corner: resolveCorner(panelCenter, viewport), ...size }
+export function resolveDropTarget({ pointer, panelCenter, viewport, size, direction = 'ltr' }: { pointer: Point; panelCenter: Point; viewport: Size; size: ForemanSizes; direction?: TextDirection }): ForemanPlacement {
+    const x = fromReadingStart(pointer.x, viewport, direction)
+    if (x <= DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'left', ...size }
+    if (x >= viewport.width - DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'right', ...size }
+    return { mode: 'float', corner: resolveCorner(panelCenter, viewport, direction), ...size }
 }
 
 export function clampForemanFloatSize(size: Size, viewport: Size): Size {

@@ -169,7 +169,7 @@ export function SimplePhoneHome() {
                                     className="flex items-center gap-2 px-5 pt-[18px] pb-2 text-[15px] text-muted-foreground active:opacity-60"
                                 >
                                     {section.label}
-                                    <ChevronDownIcon className={cn('size-3.5 transition-transform', isCollapsed && '-rotate-90')} />
+                                    <ChevronDownIcon className={cn('size-3.5 transition-transform', isCollapsed && '-rotate-90 rtl:rotate-90')} />
                                 </button>
                                 {!isCollapsed && <ul>{section.members.map(tile)}</ul>}
                             </section>

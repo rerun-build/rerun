@@ -19,6 +19,7 @@ import { hitlKindOf } from '@/lib/chat-hitl'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { foremanNudge } from '@/lib/foreman/dock-feed'
 import { type ForemanCorner, loadForemanOrbCorner, rememberForemanOrbCorner, resolveCorner } from '@/lib/foreman-layout'
+import { useUiDirection } from '@rerun/ui/locale'
 import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
 import { cn } from '@/lib/utils'
 import { useBoardCoverStore } from '@/stores/board-cover.store'
@@ -39,11 +40,11 @@ import { useForemanName } from '@/hooks/useForemanName'
 // elle partage leur axe : posée dans une rangée, elle déborde d'autant au-dessus qu'en dessous
 // (--orb-overhang), au lieu de s'aligner par le bord.
 const CORNER_CLASSES: Record<ForemanCorner, string> = {
-    'top-left': 'top-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))] left-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
-    'top-right': 'top-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px))] right-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))]',
+    'top-left': 'top-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))] start-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
+    'top-right': 'top-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px))] end-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))]',
     'bottom-left':
-        'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] left-[calc(var(--chrome-edge)+var(--board-corner-width,var(--chrome-size))+var(--chrome-gap)+var(--board-inset,0px))]',
-    'bottom-right': 'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] right-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
+        'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] start-[calc(var(--chrome-edge)+var(--board-corner-width,var(--chrome-size))+var(--chrome-gap)+var(--board-inset,0px))]',
+    'bottom-right': 'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] end-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
 }
 
 // Under it the pill would run into the bar at the bottom of the board, which moves right of the
@@ -81,6 +82,9 @@ export function ForemanDock() {
     // Sous `md` la fenêtre ne flotte jamais, l'orbe y garde son coin à elle.
     const floatCorner = isMobile === false && placement?.mode === 'float' ? placement.corner : null
     const corner = floatCorner ?? orbCorner
+    const direction = useUiDirection()
+    // The corner reads like the page: its "left" is the right of the screen in Arabic or Hebrew.
+    const onScreenLeft = corner.endsWith('left') === (direction === 'ltr')
 
     // Le coin propre de l'orbe suit la fenêtre, sinon redocker puis fermer la renverrait dans un
     // vieux coin.
@@ -163,8 +167,8 @@ export function ForemanDock() {
     // The ball looks at the card it holds up, towards the screen and away from its own edge.
     const gaze = useRef<OrbGaze | null>(null)
     useEffect(() => {
-        gaze.current = bubbleShown ? { x: corner.endsWith('left') ? 0.5 : -0.5, y: corner.startsWith('bottom') ? -1 : 1 } : null
-    }, [bubbleShown, corner])
+        gaze.current = bubbleShown ? { x: onScreenLeft ? 0.5 : -0.5, y: corner.startsWith('bottom') ? -1 : 1 } : null
+    }, [bubbleShown, corner, onScreenLeft])
 
     const size = isMobile ? PARKED_ORB_SIZE_MOBILE : PARKED_ORB_SIZE
 
@@ -200,7 +204,7 @@ export function ForemanDock() {
 
     const handleDragEnd = (_event: PointerEvent | MouseEvent | TouchEvent, info: { point: { x: number; y: number } }) => {
         setDragging(false)
-        const next = resolveCorner({ x: info.point.x - window.scrollX, y: info.point.y - window.scrollY }, { width: window.innerWidth, height: window.innerHeight })
+        const next = resolveCorner({ x: info.point.x - window.scrollX, y: info.point.y - window.scrollY }, { width: window.innerWidth, height: window.innerHeight }, direction)
         landingFromRef.current = orbRef.current?.getBoundingClientRect() ?? null
         rememberForemanOrbCorner(next)
         if (next === corner) {
@@ -262,7 +266,7 @@ export function ForemanDock() {
                             state={orbState}
                             gaze={gaze}
                             paused={open || (isMobile && boardCovered)}
-                            facing={corner.endsWith('left') ? 'right' : 'left'}
+                            facing={onScreenLeft ? 'right' : 'left'}
                             onClick={
                                 open
                                     ? undefined

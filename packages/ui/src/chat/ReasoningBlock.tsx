@@ -36,7 +36,7 @@ export function ReasoningBlock({ text, streaming = false, seconds, renderText = 
             <CollapsibleTrigger className="group flex w-full items-center gap-2 text-start text-sm text-muted-foreground">
                 <BrainIcon className="size-3.5 shrink-0" />
                 <ReasoningHeader streaming={streaming} seconds={seconds} />
-                {hasText && <ChevronRightIcon className="ms-auto size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90" />}
+                {hasText && <ChevronRightIcon className="ms-auto size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />}
             </CollapsibleTrigger>
 
             {hasText && (

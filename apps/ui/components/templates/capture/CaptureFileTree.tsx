@@ -121,13 +121,13 @@ function TreeRow({
 
     return (
         <>
-            <div className="flex items-center gap-2 rounded py-1 pe-1 hover:bg-muted/40" style={{ paddingLeft: `${depth * 0.875 + 0.25}rem` }}>
+            <div className="flex items-center gap-2 rounded py-1 pe-1 hover:bg-muted/40" style={{ paddingInlineStart: `${depth * 0.875 + 0.25}rem` }}>
                 <Checkbox size="sm" checked={checked} onCheckedChange={toggleSelf} />
                 {node.file ? (
                     <span className="w-3.5 shrink-0" />
                 ) : (
                     <button type="button" onClick={toggleOpen} className="shrink-0 text-muted-foreground" aria-label={isOpen ? t('collapse') : t('expand')}>
-                        <ChevronRight className={cn('size-3.5 transition-transform', isOpen && 'rotate-90')} />
+                        <ChevronRight className={cn('size-3.5 transition-transform', isOpen && 'rotate-90 rtl:-rotate-90')} />
                     </button>
                 )}
                 <span className={cn('min-w-0 flex-1 truncate font-mono text-xs', node.file ? '' : 'text-muted-foreground')}>

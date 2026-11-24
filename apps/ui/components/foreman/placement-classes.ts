@@ -3,15 +3,15 @@ import type { CSSProperties } from 'react'
 import type { ForemanCorner, ForemanPlacement } from '@/lib/foreman-layout'
 
 /**
- * Les coins de la fenêtre flottante, à la même distance du bord visible que le mobilier du board
+ * Les coins de la fenêtre flottante, lus dans le sens de la page (en arabe, « left » est à droite), à la même distance du bord visible que le mobilier du board
  * (1rem dans la carte, elle-même rentrée de --board-inset). En toutes lettres pour Tailwind, et en
  * classes plutôt qu'en pixels mesurés : le serveur rend la fenêtre déjà dans son coin.
  */
 export const FLOAT_CORNER_CLASSES: Record<ForemanCorner, string> = {
-    'top-left': 'md:top-[calc(1rem+var(--board-inset,0px))] md:left-[calc(1rem+var(--board-inset,0px))] md:origin-top-left',
-    'top-right': 'md:top-[calc(1rem+var(--board-inset,0px))] md:right-[calc(1rem+var(--board-inset,0px))] md:origin-top-right',
-    'bottom-left': 'md:bottom-[calc(1rem+var(--board-inset,0px)+var(--consent-inset))] md:left-[calc(1rem+var(--board-inset,0px))] md:origin-bottom-left',
-    'bottom-right': 'md:bottom-[calc(1rem+var(--board-inset,0px)+var(--consent-inset))] md:right-[calc(1rem+var(--board-inset,0px))] md:origin-bottom-right',
+    'top-left': 'md:top-[calc(1rem+var(--board-inset,0px))] md:start-[calc(1rem+var(--board-inset,0px))] md:origin-top-left md:rtl:origin-top-right',
+    'top-right': 'md:top-[calc(1rem+var(--board-inset,0px))] md:end-[calc(1rem+var(--board-inset,0px))] md:origin-top-right md:rtl:origin-top-left',
+    'bottom-left': 'md:bottom-[calc(1rem+var(--board-inset,0px)+var(--consent-inset))] md:start-[calc(1rem+var(--board-inset,0px))] md:origin-bottom-left md:rtl:origin-bottom-right',
+    'bottom-right': 'md:bottom-[calc(1rem+var(--board-inset,0px)+var(--consent-inset))] md:end-[calc(1rem+var(--board-inset,0px))] md:origin-bottom-right md:rtl:origin-bottom-left',
 }
 
 /** La taille tirée, bornée par l'écran en CSS : une fenêtre rapetissée n'a rien à recalculer. */

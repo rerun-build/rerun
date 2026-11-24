@@ -24,7 +24,7 @@ export function TemplateLibrarySectionLink({ children, onClick, href }: { childr
     const content = (
         <>
             {children}
-            <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-0.5" />
+            <ArrowRightIcon className="size-3.5 transition-transform group-hover/link:translate-x-0.5 rtl:group-hover/link:-translate-x-0.5" />
         </>
     )
     if (href) {

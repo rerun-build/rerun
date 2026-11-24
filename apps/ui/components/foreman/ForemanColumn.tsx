@@ -450,7 +450,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                           'md:fixed md:inset-auto md:z-50 md:overflow-visible',
                           FLOAT_SIZE_CLASSES,
                           dragging || placement.mode !== 'float'
-                              ? 'md:top-0 md:start-0 md:transition-none'
+                              ? 'md:top-0 md:left-0 md:transition-none'
                               : cn(FLOAT_CORNER_CLASSES[placement.corner], 'md:transition-[opacity,scale] md:duration-200 md:ease-out motion-reduce:md:transition-none'),
                           open === false && 'md:pointer-events-none md:scale-95 md:opacity-0'
                       )
@@ -460,7 +460,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                           // Ouverte, la piste ne découpe que du côté du board, là où elle révèle le panneau :
                           // partout ailleurs elle couperait l'ombre de la carte qu'il devient.
                           // Fermée elle découpe tout, sinon cette ombre dépasserait dans la gouttière.
-                          open !== false && (dockSide === 'left' ? 'md:overflow-visible md:[clip-path:inset(-1rem_0_-1rem_-1rem)]' : 'md:overflow-visible md:[clip-path:inset(-1rem_-1rem_-1rem_0)]')
+                          open !== false && (dockSide === 'left' ? 'md:overflow-visible md:[clip-path:inset(-1rem_0_-1rem_-1rem)] md:rtl:[clip-path:inset(-1rem_-1rem_-1rem_0)]' : 'md:overflow-visible md:[clip-path:inset(-1rem_-1rem_-1rem_0)] md:rtl:[clip-path:inset(-1rem_0_-1rem_-1rem)]')
                       )
             )}
         >
@@ -484,7 +484,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             'end-0 [--chat-column:48rem] md:w-(--foreman-dock-track) md:overflow-hidden md:rounded-e-3xl md:border md:border-s-0 md:border-border md:shadow'
                           : cn(
                                 'md:w-[calc(var(--foreman-dock-track)-8px)] md:overflow-hidden md:rounded-3xl md:border md:border-border md:shadow',
-                                dockSide === 'left' ? 'left-0' : 'right-0'
+                                dockSide === 'left' ? 'start-0' : 'end-0'
                             )
                 )}
             >

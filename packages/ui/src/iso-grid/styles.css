@@ -620,6 +620,12 @@
     overflow: hidden;
     vertical-align: top;
 }
+/* Arabic, Hebrew and Chinese: their marks and strokes go past the one-em line of a Latin letter. */
+.iso-swap-tall {
+    height: 1.6em;
+    line-height: 1.6;
+    margin-block: -0.3em;
+}
 .iso-swap-letter-inner {
     display: flex;
     flex-direction: column;
@@ -648,8 +654,11 @@
     display: inline-block;
     width: 1em;
     height: 1em;
-    margin-left: 0.5em;
+    margin-inline-start: 0.5em;
     vertical-align: -0.1em;
+}
+.iso-cta-line[dir="rtl"] .iso-cta-arrow {
+    scale: -1 1;
 }
 .iso-cta-line-in {
     animation: iso-cta-roll-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;

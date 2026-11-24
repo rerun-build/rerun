@@ -281,10 +281,26 @@ import {
     ZapIcon as LucideZapIcon,
     ZapOffIcon as LucideZapOffIcon,
 } from 'lucide-react'
+import { mirroredInRtl } from '@rerun/ui/primitives/mirrored-icon'
 import { SpinnerIcon } from '@rerun/ui/primitives/spinner'
 
 export type LucideIcon = FC<SVGProps<SVGSVGElement> & { size?: number | string; title?: string }>
 
+export const ArrowLeft: LucideIcon = mirroredInRtl(LucideArrowLeft)
+export const ArrowLeftIcon: LucideIcon = mirroredInRtl(LucideArrowLeftIcon)
+export const ArrowRight: LucideIcon = mirroredInRtl(LucideArrowRight)
+export const ArrowRightIcon: LucideIcon = mirroredInRtl(LucideArrowRightIcon)
+export const ChevronLeft: LucideIcon = mirroredInRtl(LucideChevronLeft)
+export const ChevronLeftIcon: LucideIcon = mirroredInRtl(LucideChevronLeftIcon)
+export const ChevronRight: LucideIcon = mirroredInRtl(LucideChevronRight)
+export const ChevronRightIcon: LucideIcon = mirroredInRtl(LucideChevronRightIcon)
+export const CornerDownLeftIcon: LucideIcon = LucideCornerDownLeftIcon
+export const SendIcon: LucideIcon = mirroredInRtl(LucideSendIcon)
+export const LogIn: LucideIcon = mirroredInRtl(LucideLogIn)
+export const LogInIcon: LucideIcon = mirroredInRtl(LucideLogInIcon)
+export const LogOutIcon: LucideIcon = mirroredInRtl(LucideLogOutIcon)
+export const PanelLeftCloseIcon: LucideIcon = mirroredInRtl(LucidePanelLeftCloseIcon)
+export const PanelRightCloseIcon: LucideIcon = mirroredInRtl(LucidePanelRightCloseIcon)
 export const ActivityIcon: LucideIcon = LucideActivityIcon
 export const AlertCircle: LucideIcon = LucideAlertCircle
 export const AlertCircleIcon: LucideIcon = LucideAlertCircleIcon
@@ -295,10 +311,6 @@ export const AlignLeftIcon: LucideIcon = LucideAlignLeftIcon
 export const AlignRightIcon: LucideIcon = LucideAlignRightIcon
 export const ArrowDownIcon: LucideIcon = LucideArrowDownIcon
 export const ArrowDownToLine: LucideIcon = LucideArrowDownToLine
-export const ArrowLeft: LucideIcon = LucideArrowLeft
-export const ArrowLeftIcon: LucideIcon = LucideArrowLeftIcon
-export const ArrowRight: LucideIcon = LucideArrowRight
-export const ArrowRightIcon: LucideIcon = LucideArrowRightIcon
 export const AtSign: LucideIcon = LucideAtSign
 export const BadgeCheck: LucideIcon = LucideBadgeCheck
 export const BadgePercent: LucideIcon = LucideBadgePercent
@@ -334,10 +346,6 @@ export const CheckIcon: LucideIcon = LucideCheckIcon
 export const ChefHat: LucideIcon = LucideChefHat
 export const ChevronDown: LucideIcon = LucideChevronDown
 export const ChevronDownIcon: LucideIcon = LucideChevronDownIcon
-export const ChevronLeft: LucideIcon = LucideChevronLeft
-export const ChevronLeftIcon: LucideIcon = LucideChevronLeftIcon
-export const ChevronRight: LucideIcon = LucideChevronRight
-export const ChevronRightIcon: LucideIcon = LucideChevronRightIcon
 export const ChevronUp: LucideIcon = LucideChevronUp
 export const ChevronUpIcon: LucideIcon = LucideChevronUpIcon
 export const ChevronsUpDownIcon: LucideIcon = LucideChevronsUpDownIcon
@@ -360,7 +368,6 @@ export const Cookie: LucideIcon = LucideCookie
 export const CookingPot: LucideIcon = LucideCookingPot
 export const Copy: LucideIcon = LucideCopy
 export const CopyIcon: LucideIcon = LucideCopyIcon
-export const CornerDownLeftIcon: LucideIcon = LucideCornerDownLeftIcon
 export const Cpu: LucideIcon = LucideCpu
 export const CpuIcon: LucideIcon = LucideCpuIcon
 export const CreditCard: LucideIcon = LucideCreditCard
@@ -420,8 +427,6 @@ export const Languages: LucideIcon = LucideLanguages
 export const Layers: LucideIcon = LucideLayers
 export const LayersIcon: LucideIcon = LucideLayersIcon
 export const LayerUpIcon: LucideIcon = LucideLayers2
-export const PanelLeftCloseIcon: LucideIcon = LucidePanelLeftCloseIcon
-export const PanelRightCloseIcon: LucideIcon = LucidePanelRightCloseIcon
 export const LayoutDashboard: LucideIcon = LucideLayoutDashboard
 export const LayoutDashboardIcon: LucideIcon = LucideLayoutDashboardIcon
 export const LayoutGridIcon: LucideIcon = LucideLayoutGridIcon
@@ -438,9 +443,6 @@ export const ListOrdered: LucideIcon = LucideListOrdered
 export const ListTodo: LucideIcon = LucideListTodo
 export const LoaderIcon: LucideIcon = LucideLoaderIcon
 export const LockIcon: LucideIcon = LucideLockIcon
-export const LogIn: LucideIcon = LucideLogIn
-export const LogInIcon: LucideIcon = LucideLogInIcon
-export const LogOutIcon: LucideIcon = LucideLogOutIcon
 export const Luggage: LucideIcon = LucideLuggage
 export const Magnet: LucideIcon = LucideMagnet
 export const Mail: LucideIcon = LucideMail
@@ -499,7 +501,6 @@ export const Scale: LucideIcon = LucideScale
 export const ScanSearch: LucideIcon = LucideScanSearch
 export const ScrollTextIcon: LucideIcon = LucideScrollTextIcon
 export const SearchIcon: LucideIcon = LucideSearchIcon
-export const SendIcon: LucideIcon = LucideSendIcon
 export const Server: LucideIcon = LucideServer
 export const ServerIcon: LucideIcon = LucideServerIcon
 export const Settings2Icon: LucideIcon = LucideSettings2Icon

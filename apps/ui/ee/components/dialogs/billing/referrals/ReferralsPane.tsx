@@ -45,7 +45,7 @@ function MonthsMilestones({ earned, cap }: { earned: number; cap: number }) {
             {REFERRAL_MILESTONES.map(step => {
                 const reached = earned >= step
                 return (
-                    <span key={step} className="absolute top-0 flex -translate-x-1/2 flex-col items-center gap-1.5 last:translate-x-[-100%] last:items-end" style={{ left: `${(step / cap) * 100}%` }}>
+                    <span key={step} className="absolute top-0 flex -translate-x-1/2 flex-col items-center gap-1.5 last:translate-x-[-100%] last:items-end rtl:translate-x-1/2 last:rtl:translate-x-full" style={{ insetInlineStart: `${(step / cap) * 100}%` }}>
                         <span className={cn('flex size-3.5 items-center justify-center rounded-full ring-2 ring-background', reached ? EARNED_FILL : 'bg-muted')}>{reached && <CheckIcon className="size-2.5 text-white" />}</span>
                         <span className={cn('text-[10px] tabular-nums', reached ? 'text-foreground' : 'text-muted-foreground')}>{step}</span>
                     </span>

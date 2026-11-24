@@ -31,7 +31,7 @@ export function TriggerPayloadBlock({ payload }: { payload: TriggerPayload }) {
                 <Icon icon={WebhookIcon} size="sm" />
                 <span className="min-w-0 flex-1 truncate font-medium">{payload.slug}</span>
                 <TriggerPayloadSummary payload={payload} />
-                {hasBody && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />}
+                {hasBody && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />}
             </CollapsibleTrigger>
 
             {hasBody && (

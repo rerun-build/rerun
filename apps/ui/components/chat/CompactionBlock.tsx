@@ -49,7 +49,7 @@ export function CompactionBlock({ data }: { data: CompactionData }) {
                 {data.status === 'running' && <Spinner className="size-3.5 shrink-0 text-amber-400" />}
                 {data.status === 'done' && <CheckCircle2Icon className="size-3.5 shrink-0 text-emerald-400" />}
                 {data.status === 'error' && <XCircleIcon className="size-3.5 shrink-0 text-red-400" />}
-                {hasContent && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />}
+                {hasContent && <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />}
             </CollapsibleTrigger>
 
             {hasContent && (

@@ -106,7 +106,7 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
         <Collapsible onOpenChange={open => open && onOpen()} className={cn(PANEL_CARD, 'overflow-hidden')}>
             <CollapsibleTrigger className={cn('group flex w-full flex-col gap-0.5 p-3 text-start', PANEL_CARD_INTERACTIVE)}>
                 <div className="flex items-center gap-2">
-                    <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
+                    <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />
                     <span className="flex-1 truncate text-sm">{run.startedAt ? formatDate(run.startedAt, locale) : run.id}</span>
                     <RunStatusBadge status={run.status} />
                 </div>
@@ -189,7 +189,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
     return (
         <Collapsible className="border-t border-border/40 first:border-t-0">
             <CollapsibleTrigger className="group flex w-full items-center gap-2 py-1.5 text-start text-xs transition-colors hover:bg-accent/30">
-                <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
+                <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90 rtl:group-data-[state=open]:-rotate-90" />
                 {createElement(toolIconOf(tool.toolName), { className: 'size-3.5 shrink-0 text-muted-foreground' })}
                 <span className="truncate font-mono">{tool.toolName}</span>
                 {isError ? <XIcon className="size-3 shrink-0 text-destructive" /> : <CheckIcon className="size-3 shrink-0 text-emerald-500" />}

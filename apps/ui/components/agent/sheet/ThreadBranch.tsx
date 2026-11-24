@@ -259,7 +259,7 @@ function ThreadRowContent({ thread, state, badged, open, stretch = false }: { th
                 </Badge>
             )}
             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{shortRelativeTime(thread.createdAt, locale)}</span>
-            <ChevronRightIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform duration-300', open ? 'rotate-90' : 'group-hover:translate-x-0.5')} />
+            <ChevronRightIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform duration-300', open ? 'rotate-90 rtl:-rotate-90' : 'group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5')} />
         </>
     )
 }

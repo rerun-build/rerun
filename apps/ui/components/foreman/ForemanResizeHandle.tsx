@@ -1,5 +1,6 @@
 'use client'
 
+import { useUiDirection } from '@rerun/ui/locale'
 import type { PointerEvent, RefObject } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
@@ -21,7 +22,7 @@ const HANDLE_CLASSES: Record<ForemanCorner, string> = {
 export function ForemanResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'float' } }) {
     const t = useTranslations('foreman')
     const resizeRef = useRef<ResizeState | null>(null)
-    const growsLeft = placement.corner.endsWith('right')
+    const growsLeft = placement.corner.endsWith('right') === (useUiDirection() === 'ltr')
     const growsUp = placement.corner.startsWith('bottom')
 
     const applySize = (width: number, height: number) => {

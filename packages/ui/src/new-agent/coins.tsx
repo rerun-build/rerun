@@ -30,7 +30,7 @@ export function CoinStack({ apps, size = 24, overlap = 6, className }: { apps: (
     return (
         <span className={cn('flex items-center', className)}>
             {apps.map((app, index) => (
-                <AppCoin key={app?.slug ?? index} app={app} size={size} className="ring-2 ring-(--cut)" style={{ marginLeft: index === 0 ? 0 : -overlap, zIndex: apps.length - index }} />
+                <AppCoin key={app?.slug ?? index} app={app} size={size} className="ring-2 ring-(--cut)" style={{ marginInlineStart: index === 0 ? 0 : -overlap, zIndex: apps.length - index }} />
             ))}
         </span>
     )
