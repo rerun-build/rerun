@@ -5,11 +5,10 @@ import { Alert } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { fetchInstalledServices } from '@/api/coworker'
-import { manageLock } from '@/auth/access'
 import { useAuth } from '@/auth/AuthProvider'
 import { CoworkerApps } from '@/components/coworker/CoworkerApps'
 import { loadCoworkerDetail, readCoworkerDetails } from '@/data/local-cache'
-import { useCoworkerAccess } from '@/data/useCoworkerAccess'
+import { useCoworkerManageLock } from '@/data/useCoworkerAccess'
 import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect } from '@/lib/oauth-connect'
 
@@ -22,7 +21,7 @@ export default function CoworkerAppsScreen() {
     const [apps, setApps] = useState<InstalledServiceView[] | null>(() => (me ? (readCoworkerDetails(me.workspace.id, agentId).apps ?? null) : null))
     const [failed, setFailed] = useState(false)
     const [connectingKey, setConnectingKey] = useState<string | null>(null)
-    const lock = manageLock(useCoworkerAccess(agentId))
+    const lock = useCoworkerManageLock(agentId)
     const vault = useVaultAccounts(agentId)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id

@@ -2,8 +2,8 @@ import { FOREMAN_AGENT_ID, type BoxAccessLevel } from '@rerun/contracts'
 import { useEffect, useMemo, useState } from 'react'
 
 import { fetchAgentView } from '@/api/chat'
-import { knownCoworkerAccess, UNKNOWN_ACCESS, type CoworkerAccess } from '@/auth/access'
-import { useAuth } from '@/auth/AuthProvider'
+import { foremanManageLock, knownCoworkerAccess, manageLock, UNKNOWN_ACCESS, type CoworkerAccess, type ManageLock } from '@/auth/access'
+import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { cachedBoard, loadCoworkerDetail, readCoworkerDetails, readCoworkerScreen } from '@/data/local-cache'
 
 // The caller's level on a coworker, for a screen opened with only its id (the chat's model sheet, a
@@ -36,4 +36,12 @@ export function useCoworkerAccess(agentId: string): CoworkerAccess {
 
     if (fetched?.askedFor === askedFor) return { access: fetched.access, known: true }
     return kept
+}
+
+// The lock on what changes a coworker itself (its routines, its apps): its Box's managers, or for
+// the Chief of Staff the workspace's admins.
+export function useCoworkerManageLock(agentId: string): ManageLock {
+    const access = useCoworkerAccess(agentId)
+    const admin = useIsWorkspaceAdmin()
+    return agentId === FOREMAN_AGENT_ID ? foremanManageLock(admin) : manageLock(access)
 }

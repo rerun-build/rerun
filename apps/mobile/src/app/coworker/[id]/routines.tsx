@@ -5,11 +5,10 @@ import { Alert } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { fetchRoutines, setRoutineEnabled } from '@/api/coworker'
-import { manageLock } from '@/auth/access'
 import { useAuth } from '@/auth/AuthProvider'
 import { CoworkerRoutines, routineKey } from '@/components/coworker/CoworkerRoutines'
 import { loadCoworkerDetail, readCoworkerDetails } from '@/data/local-cache'
-import { useCoworkerAccess } from '@/data/useCoworkerAccess'
+import { useCoworkerManageLock } from '@/data/useCoworkerAccess'
 
 export default function CoworkerRoutinesScreen() {
     const { id: agentId, name = '' } = useLocalSearchParams<{ id: string; name?: string }>()
@@ -21,7 +20,7 @@ export default function CoworkerRoutinesScreen() {
     const [fresh, setFresh] = useState(false)
     const [failed, setFailed] = useState(false)
     const [savingKeys, setSavingKeys] = useState<string[]>([])
-    const lock = manageLock(useCoworkerAccess(agentId))
+    const lock = useCoworkerManageLock(agentId)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
 

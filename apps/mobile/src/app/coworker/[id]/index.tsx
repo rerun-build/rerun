@@ -7,7 +7,7 @@ import { useTranslations } from 'use-intl'
 import { fetchBoxes } from '@/api/board'
 import { fetchAgentView } from '@/api/chat'
 import { deleteCoworker, fetchCoworkerFiles, fetchInstalledServices, fetchRoutines, renameCoworker } from '@/api/coworker'
-import { FOREMAN_ADMIN_ONLY, knownCoworkerAccess, manageLock } from '@/auth/access'
+import { foremanManageLock, knownCoworkerAccess, manageLock } from '@/auth/access'
 import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { CoworkerDetails } from '@/components/coworker/CoworkerDetails'
 import { ruleValue } from '@/components/notifications/NotificationCenter'
@@ -75,7 +75,7 @@ export default function CoworkerDetailsScreen() {
     const switchedOff = !!agent?.disabledAt
     const boxName = boxes.find(box => box.id === agent?.spaceId)?.name ?? null
     // The level comes with the coworker's copy: until one is read, the board the chat came from answers.
-    const lock = isForeman ? { locked: !admin, reason: admin ? null : FOREMAN_ADMIN_ONLY } : manageLock(agent ? { access: agent.access, known: true } : knownCoworkerAccess(agentId, { agents: workspaceId ? cachedBoard(workspaceId).read()?.agents : null }))
+    const lock = isForeman ? foremanManageLock(admin) : manageLock(agent ? { access: agent.access, known: true } : knownCoworkerAccess(agentId, { agents: workspaceId ? cachedBoard(workspaceId).read()?.agents : null }))
     const shownName = isForeman ? foremanLabel(foremanName) : name
 
     const openScreen = () => {

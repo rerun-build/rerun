@@ -1,6 +1,6 @@
 import { FOREMAN_AGENT_ID, type Box } from '@rerun/contracts'
 
-import { AI_PROVIDERS_ADMIN_ONLY, BOX_MANAGE_REASON, boxForNewCoworker, canManage, isAdminRole, knownCoworkerAccess, manageableBoxes, manageLock, manageReason, NO_MANAGED_BOX, newCoworkerBlocker, OPEN_LOCK, UNKNOWN_ACCESS } from '@/auth/access'
+import { AI_PROVIDERS_ADMIN_ONLY, BOX_MANAGE_REASON, boxForNewCoworker, canManage, FOREMAN_ADMIN_ONLY, foremanManageLock, isAdminRole, knownCoworkerAccess, manageableBoxes, manageLock, manageReason, NO_MANAGED_BOX, newCoworkerBlocker, OPEN_LOCK, UNKNOWN_ACCESS } from '@/auth/access'
 
 const box = (id: string, patch: Partial<Box> = {}): Box => ({ id, name: id, createdAt: null, managed: true, ...patch })
 
@@ -61,6 +61,11 @@ describe('access', () => {
         expect(manageLock({ known: true, access: 'use' })).toEqual({ locked: true, reason: BOX_MANAGE_REASON })
         expect(manageLock({ known: true, access: 'manage' })).toEqual(OPEN_LOCK)
         expect(manageLock({ known: true, access: undefined })).toEqual(OPEN_LOCK)
+    })
+
+    it("opens what changes the Chief of Staff to a workspace admin, and says why to a member", () => {
+        expect(foremanManageLock(true)).toEqual(OPEN_LOCK)
+        expect(foremanManageLock(false)).toEqual({ locked: true, reason: FOREMAN_ADMIN_ONLY })
     })
 
     it('keeps every visible copy short, English and free of em dashes and of the word agent', () => {

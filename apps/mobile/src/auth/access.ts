@@ -66,3 +66,7 @@ export function manageLock({ access, known }: CoworkerAccess): ManageLock {
     if (!known) return { locked: true, reason: null }
     return { locked: !canManage(access), reason: manageReason(access) }
 }
+
+// What a workspace admin alone changes on the Chief of Staff: its name, its routines, its apps. Its
+// model stays every member's to pick.
+export const foremanManageLock = (admin: boolean): ManageLock => ({ locked: !admin, reason: admin ? null : FOREMAN_ADMIN_ONLY })
