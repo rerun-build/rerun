@@ -1,6 +1,7 @@
 'use client'
 
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PowerBars } from '@/components/ui/power-bars'
@@ -33,10 +34,11 @@ export const pickKey = (pick: BoxDefault): string => `${pick.connectionId} ${pic
 // for it.
 export function DefaultModelPicker({ connections, current, exclude, withoutRerun = false, credit, onPick, children }: DefaultModelPickerProps) {
     const t = useTranslations('connections')
+    const { name: brandName } = useBrand()
     const [open, setOpen] = useState(false)
     const sources = connections
         .filter(c => isUsable(c, credit) && !(withoutRerun && c.id === RERUN_CONNECTION_ID))
-        .map(source => ({ source, models: enabledModels(source).filter(model => !exclude?.has(pickKey({ connectionId: source.id, model: model.id }))) }))
+        .map(source => ({ source, models: enabledModels(source, brandName).filter(model => !exclude?.has(pickKey({ connectionId: source.id, model: model.id }))) }))
         .filter(({ models }) => models.length > 0)
     const [triggerRef, portalContainer] = useDialogPortalContainer<HTMLButtonElement>()
 
@@ -68,7 +70,7 @@ export function DefaultModelPicker({ connections, current, exclude, withoutRerun
                                     return (
                                         <CommandItem key={model.id} value={`${source.id} ${model.id}`} onSelect={pick} className="gap-2 [&>svg:last-child]:hidden">
                                             <ProviderIcon provider={source.provider} className="size-3.5" />
-                                            <span className="min-w-0 flex-1 truncate">{modelName(source.id, model.id)}</span>
+                                            <span className="min-w-0 flex-1 truncate">{modelName(source.id, model.id, brandName)}</span>
                                             <PowerBars power={model.power} />
                                             <CheckIcon className={cn('size-3.5', !selected && 'invisible')} />
                                         </CommandItem>

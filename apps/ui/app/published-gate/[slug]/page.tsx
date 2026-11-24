@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { GateInput } from '@/components/published/GateInput'
 import { APP_URL } from '@/lib/app-url'
+import { getBrand } from '@/lib/brand/server'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { GATE_EMAIL_PARAM, GATE_ERROR_PARAM, loadPublished, loadWorkspaceBrand, safeNextPath, type GateError, type PublishedEntry } from '@/lib/published/gate'
 import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
 import { openPublishedHref } from '@/lib/published/links'
@@ -18,8 +20,6 @@ export const dynamic = 'force-dynamic'
 
 type Params = { slug: string }
 type Search = Record<string, string | string[] | undefined>
-
-const RERUN_BRAND: GateBrand = { name: 'Rerun', iconUrl: null }
 
 function param(search: Search, key: string): string | undefined {
     const value = search[key]
@@ -32,7 +32,7 @@ async function onOwnHost(slug: string): Promise<boolean> {
 
 async function gateContext(slug: string): Promise<{ entry: PublishedEntry | null; brand: GateBrand }> {
     const entry = await loadPublished(slug)
-    return { entry, brand: entry ? await loadWorkspaceBrand(entry.workspace_id) : RERUN_BRAND }
+    return { entry, brand: entry ? await loadWorkspaceBrand(entry.workspace_id) : await getBrand() }
 }
 
 // A crawler unfurling the link is no one in particular: whatever it reads, anyone the link is
@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const { slug } = await params
     const origin = publishedSiteOrigin(slug)
     const { entry, brand } = await gateContext(slug)
+    const product = entry ? await workspaceBrand(entry.workspace_id) : await getBrand()
     const t = await getTranslations('publicPages')
     const title = entry ? t('publishedView.protectedTitle') : t('linkOff.title')
     const description = entry ? t('publishedView.protectedDescription', { workspace: brand.name }) : t('linkOff.subtitle')
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         description,
         robots: { index: false, follow: false },
         ...(origin ? { metadataBase: new URL(origin) } : {}),
-        openGraph: { title, description, images, siteName: 'Rerun' },
+        openGraph: { title, description, images, siteName: product.name },
         twitter: { card: 'summary_large_image', title, description, images },
     }
 }

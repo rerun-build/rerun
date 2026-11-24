@@ -1,6 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { AddProviderPage } from '@/components/connections/AddProviderPage'
 import { AddCustomProviderPage } from '@/components/connections/custom/AddCustomProviderPage'
 import { BackupsGroup } from '@/components/connections/BackupsGroup'
@@ -226,6 +227,7 @@ type DefaultRowProps = {
 
 function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReason }: DefaultRowProps) {
     const t = useTranslations('connections')
+    const { name: brandName } = useBrand()
     const locale = useLocale()
     const source = connections.find(c => c.id === current.connectionId)
     const broken = source && !isUsable(source, credit)
@@ -234,7 +236,7 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
     const canChange = connections.some(c => isUsable(c, credit))
 
     const description = !broken
-        ? t('panel.default.via', { source: source?.name ?? 'Rerun' })
+        ? t('panel.default.via', { source: source?.name ?? brandName })
         : creditPaused
           ? canChange
               ? t('panel.default.pausedPick')
@@ -251,7 +253,7 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
             <PanelRow
                 className={cn('relative', broken && 'border-orange-500/30 bg-orange-500/5')}
                 leading={<SourceAvatar provider={source?.provider ?? 'rerun'} />}
-                title={modelName(current.connectionId, current.model)}
+                title={modelName(current.connectionId, current.model, brandName)}
                 description={description}
                 actions={
                     <>

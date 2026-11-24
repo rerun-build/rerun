@@ -105,7 +105,7 @@
         "region": "Consentimiento de cookies",
         "title": "Cookies",
         "short": "Usamos cookies de analítica. <policy>Política de cookies</policy>",
-        "long": "Usamos cookies de analítica para entender cómo se usa Rerun. Las cookies necesarias para iniciar sesión, hacer funcionar el chat de soporte y recordar tus preferencias siempre están activas. <policy>Política de cookies</policy>"
+        "long": "Usamos cookies de analítica para entender cómo se usa {brand}. Las cookies necesarias para iniciar sesión, hacer funcionar el chat de soporte y recordar tus preferencias siempre están activas. <policy>Política de cookies</policy>"
     },
     "experts": {
         "wizard": {

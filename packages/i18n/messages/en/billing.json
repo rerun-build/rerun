@@ -240,7 +240,7 @@
         "credit": {
             "addedTitle": "Credits added",
             "addedBody": "{count, plural, one {# credit is} other {# credits are}} in your workspace. They never expire, and your coworkers pick up where they stopped.",
-            "title": "Buy Rerun credits",
+            "title": "Buy {brand} credits",
             "eachPack": "Each pack adds {count, plural, one {# credit} other {# credits}} for {price}, paid once. They never expire.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
             "packCredits": "{count, plural, one {# credit} other {# credits}}, never expire",
@@ -378,7 +378,7 @@
         "fallbackTitle": "your template",
         "readyOne": "You own \"{title}\". Ready to place its coworker?",
         "readyMany": "You own \"{title}\". Ready to place its {count} coworkers?",
-        "needsPlan": "You own \"{title}\". An active Rerun plan is required to install it.",
+        "needsPlan": "You own \"{title}\". An active {brand} plan is required to install it.",
         "finalizing": "Finalizing purchase",
         "close": "Close",
         "placeOne": "Place its coworker",
@@ -452,7 +452,7 @@
                 "footnote": "This ends your free trial today. To pay nothing today, keep your trial: Pro starts on {date} on its own."
             },
             "creditLocked": {
-                "title": "Rerun credits come with Pro",
+                "title": "{brand} credits come with Pro",
                 "titleCoworker": "Keep going with Pro",
                 "subtitle": "Your {trialCredits, number} trial credits are used up. Pro includes {credits, plural, one {# credit} other {# credits}} every month, and you can add more anytime.",
                 "subtitleCoworker": "{coworker} picks up where it stopped.",
@@ -535,8 +535,8 @@
             "updateFailed": "Your plan could not be updated",
             "stillUpdating": "Your plan is still updating",
             "pleaseWait": "Please wait",
-            "freeFor": "Rerun Pro, free for {days} days",
-            "subscribe": "Subscribe to Rerun Pro",
+            "freeFor": "{brand} Pro, free for {days} days",
+            "subscribe": "Subscribe to {brand} Pro",
             "dueToday": "due today",
             "perYear": "per year",
             "perMonth": "per month",
@@ -553,7 +553,7 @@
         "cardOnFile": {
             "back": "Your trial",
             "title": "Start Pro today",
-            "header": "End trial, start Rerun Pro",
+            "header": "End trial, start {brand} Pro",
             "tax": "Tax",
             "taxFromAddress": "Tax, from your address",
             "dueToday": "Due today",
@@ -613,7 +613,7 @@
             },
             "lifetime": {
                 "ownAi": "Runs on <b>your own AI</b>",
-                "credit": "<b>Rerun credits</b> when you need them"
+                "credit": "<b>{brand} credits</b> when you need them"
             }
         },
         "plan": {
@@ -722,7 +722,7 @@
         "reason": {
             "field": "What made you decide to leave?",
             "placeholder": "A sentence is plenty",
-            "comebackField": "Will you use Rerun again?",
+            "comebackField": "Will you use {brand} again?",
             "missingComment": "Tell us in a few words why you are leaving",
             "missingComeback": "Tell us if you'll be back",
             "required": "Tell us in a few words why you are leaving.",
@@ -766,7 +766,7 @@
             "runsThisMonth": "Runs this month",
             "agents": "{count, plural, one {# agent} other {# agents}}",
             "agentsCaption": "set up, connected and working",
-            "creditsCaption": "Rerun credits left",
+            "creditsCaption": "{brand} credits left",
             "runsSoFar": "Runs so far",
             "schedules": "Schedules"
         },
@@ -801,8 +801,8 @@
     },
     "usage": {
         "card": {
-            "title": "Rerun credits",
-            "subtitle": "Spent by your coworkers on Rerun models and paid data",
+            "title": "{brand} credits",
+            "subtitle": "Spent by your coworkers on {brand} models and paid data",
             "addCredits": "Add credits",
             "startProNow": "Start Pro now",
             "usedTrial": "Used · trial credits",
@@ -814,14 +814,14 @@
         "outOfCredits": {
             "trialTitle": "You're out of trial credits",
             "title": "You're out of credits",
-            "trialDescription": "Your coworkers can't use Rerun models or paid data. Pro comes with {count, plural, one {# credit} other {# credits}} every month.",
-            "description": "Your coworkers can't use Rerun models or paid data.",
-            "descriptionUntil": "Your coworkers can't use Rerun models or paid data until {date}."
+            "trialDescription": "Your coworkers can't use {brand} models or paid data. Pro comes with {count, plural, one {# credit} other {# credits}} every month.",
+            "description": "Your coworkers can't use {brand} models or paid data.",
+            "descriptionUntil": "Your coworkers can't use {brand} models or paid data until {date}."
         },
         "switch": {
             "label": "Allow spending",
-            "on": "Coworkers can use Rerun models and paid data.",
-            "off": "Paused. Coworkers can't use Rerun models or paid data."
+            "on": "Coworkers can use {brand} models and paid data.",
+            "off": "Paused. Coworkers can't use {brand} models or paid data."
         },
         "kind": {
             "ai": "AI models",
@@ -1035,7 +1035,7 @@
             "noTrialCreditsLeft": "No trial credits left",
             "outOfCredits": "Out of credits",
             "left": "{figure} left",
-            "ariaUsed": "Rerun credits used"
+            "ariaUsed": "{brand} credits used"
         }
     },
     "creditsBar": {

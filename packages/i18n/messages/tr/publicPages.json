@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "E-posta tercihleri",
-        "subtitle": "Rerun'ın size gönderdiği e-postaları güncelleyin. Hesaba giriş gerekmez.",
+        "subtitle": "{brand}'ın size gönderdiği e-postaları güncelleyin. Hesaba giriş gerekmez.",
         "subtitleRuns": "Coworker'larınızın size e-posta gönderip gönderemeyeceğini seçin. Hesaba giriş gerekmez.",
         "invalid": "Bu abonelikten çıkma bağlantısı geçersiz veya süresi dolmuş.",
         "logIn": "Tercihlerinizi yönetmek için giriş yapın"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "{workspace} üyeleri için",
-            "continue": "Rerun ile devam et"
+            "continue": "{brand} ile devam et"
         }
     },
     "publishedSite": {

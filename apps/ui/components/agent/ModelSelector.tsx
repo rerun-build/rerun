@@ -3,6 +3,7 @@
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
 import { DotSpinner } from '@/components/ui/dot-spinner'
 import { AddProviderItem, SUBSCRIPTION_PROVIDERS, SubscriptionNudge, SubscriptionPitch, type AddableProvider, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
 import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, usePlanWindowsSummary, useRerunCreditDetail } from '@/components/agent/PlanLimitHint'
@@ -132,6 +133,7 @@ type ModelSelectorProps = {
 export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey, onPicked, conversationId }: ModelSelectorProps) {
     const t = useTranslations('agent.modelSelector')
     const tShared = useTranslations('agent.modelsShared')
+    const { name: brandName } = useBrand()
     const creditDetail = useRerunCreditDetail()
     const windowsSummary = usePlanWindowsSummary()
     const [open, setOpen] = useState(false)
@@ -176,7 +178,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     // A pick the subscription refuses is kept, not swapped behind the user's back: the message is
     // held and the picker offers the models the plan does serve.
     const refusedReason = refusedModelReason(active, model)
-    const modelText = model ? modelLabel(model) : t('select')
+    const modelText = model ? modelLabel(model, brandName) : t('select')
     const refusedMessage = refusedReason ? t('refused', { model: modelText, reason: refusedReason }) : null
 
     // A pin or an override that no longer resolves (a template just imported, a connection removed)
@@ -350,7 +352,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                     <CommandItem className="flex-1" value="workspace default model" data-checked={showingBoxDefault} disabled={!canSetDefault && !followsBoxDefault} onSelect={useBoxDefault}>
                                         <span className="flex min-w-0 flex-1 flex-col">
                                             <span className="truncate">{t('workspaceDefault')}</span>
-                                            <span className="truncate text-[11px] text-muted-foreground">{modelLabel(boxDefaultPick.model)}</span>
+                                            <span className="truncate text-[11px] text-muted-foreground">{modelLabel(boxDefaultPick.model, brandName)}</span>
                                         </span>
                                         {/* The star says what the agent runs by default, not what this conversation picked, so
                                             it stays filled while an override is in force. */}

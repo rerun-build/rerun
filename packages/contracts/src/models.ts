@@ -1,4 +1,5 @@
 import { RERUN_MODEL, type Provider } from './agent.js'
+import { RERUN_BRAND } from './brand.js'
 import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
 // What each model accepts when reached through its own API.
@@ -201,9 +202,10 @@ export const MODEL_LABEL: Record<string, string> = {
     ...Object.fromEntries(OPENCODE_SNAPSHOT.map(model => [model.id, model.label])),
 }
 
-// Friendly label for a model id; falls back to the raw id for custom/unknown models.
-export function modelLabel(id: string): string {
-    return MODEL_LABEL[id] ?? id
+// Friendly label for a model id; falls back to the raw id for custom/unknown models. Rerun's own
+// model carries the name of the brand the app is shown under.
+export function modelLabel(id: string, brandName: string = RERUN_BRAND.name): string {
+    return canonicalModelId(id) === RERUN_MODEL ? brandName : (MODEL_LABEL[id] ?? id)
 }
 
 // The id a model was curated under before it was renamed. A box whose connection was written by an

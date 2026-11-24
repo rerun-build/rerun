@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# plantilla} other {# plantillas}}",
-        "rerunTeam": "Equipo de Rerun",
+        "rerunTeam": "Equipo de {brand}",
         "verified": "Creador verificado"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "Destacadas",
             "featuredSubtitle": "Configuraciones elegidas para ver primero.",
             "justAdded": "Recién añadidas",
-            "justAddedSubtitle": "Las últimas plantillas publicadas en Rerun."
+            "justAddedSubtitle": "Las últimas plantillas publicadas en {brand}."
         },
         "empty": {
             "filtered": "Ninguna plantilla coincide con estos filtros",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "Ya usaste tu prueba gratis. Se factura hoy y esta plantilla se factura aparte.",
         "resubscribe": "Volver a suscribirte por {price}/mes",
         "lapsed": "Tu suscripción terminó. Los coworkers que instaló esta plantilla están desactivados.",
-        "billedTo": "Se factura a {workspace}. Tu plan de Rerun ya está activo.",
+        "billedTo": "Se factura a {workspace}. Tu plan de {brand} ya está activo.",
         "yours": "Tu plantilla, sin coste."
     },
     "boardAlt": "Tablero de coworkers de {title}"

@@ -22,7 +22,7 @@
         "workspaceFallback": "工作区"
     },
     "gate": {
-        "madeWith": "使用 Rerun 制作",
+        "madeWith": "使用 {brand} 制作",
         "locked": "{workspace} 的页面，已锁定",
         "code": "验证码",
         "switchAccount": "切换账号"

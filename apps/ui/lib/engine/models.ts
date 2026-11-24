@@ -6,7 +6,7 @@
 // per-agent API key that must be set for its models to be "available". Edit freely to
 // add/remove models.
 
-import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, modelLabel } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, RERUN_BRAND, isFreeOpencodeModel, modelLabel } from '@rerun/contracts'
 
 import { RERUN_DEMO_MODEL_IDS } from './constants'
 
@@ -39,7 +39,7 @@ const RERUN_DEMO_MODEL_POWER: Record<(typeof RERUN_DEMO_MODEL_IDS)[number], numb
 export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
     {
         provider: 'rerun',
-        label: 'Rerun',
+        label: RERUN_BRAND.name,
         keyName: '',
         section: 'free',
         models: RERUN_DEMO_MODEL_IDS.map(id => model(id, RERUN_DEMO_MODEL_POWER[id])),
@@ -198,14 +198,16 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
 // Flat lookup of model id -> provider display label (e.g. `rerun-max` -> `Rerun`), built once.
 const MODEL_PROVIDER_LABEL: Record<string, string> = Object.fromEntries(ENGINE_MODEL_CATALOG.flatMap(p => p.models.map(m => [m.id, p.label])))
 
+const isRerunDemoModel = (id: string) => (RERUN_DEMO_MODEL_IDS as readonly string[]).includes(id)
+
 // Fully-qualified label for logs: provider + model (e.g. `OpenAI GPT-5.5`). Falls back to the
 // bare label, then the raw id, for custom/unknown models. A label that already is the provider's
 // name (`Rerun`) is not doubled.
-export function modelLogLabel(id: string | null | undefined): string {
+export function modelLogLabel(id: string | null | undefined, brandName: string = RERUN_BRAND.name): string {
     if (!id) return ''
-    const label = MODEL_LABEL[id]
-    if (!label) return id
-    const provider = MODEL_PROVIDER_LABEL[id]
+    if (!MODEL_LABEL[id]) return id
+    const label = modelLabel(id, brandName)
+    const provider = isRerunDemoModel(id) ? brandName : MODEL_PROVIDER_LABEL[id]
     return provider && provider !== label ? `${provider} ${label}` : label
 }
 
@@ -225,6 +227,8 @@ const CATALOG_BY_PROVIDER: Record<string, CatalogProvider> = Object.fromEntries(
 // The display side of a provider: labels, power ratings, where to get a key. A provider the
 // catalog has never heard of still answers, with an empty model list, so a connection created
 // against a newer engine renders instead of crashing.
-export function catalogFor(provider: string): CatalogProvider {
-    return CATALOG_BY_PROVIDER[provider] ?? { provider, label: provider, keyName: '', section: 'api', models: [] }
+export function catalogFor(provider: string, brandName: string = RERUN_BRAND.name): CatalogProvider {
+    const catalog = CATALOG_BY_PROVIDER[provider] ?? { provider, label: provider, keyName: '', section: 'api', models: [] }
+    if (provider !== 'rerun') return catalog
+    return { ...catalog, label: brandName, models: catalog.models.map(entry => ({ ...entry, label: modelLabel(entry.id, brandName) })) }
 }

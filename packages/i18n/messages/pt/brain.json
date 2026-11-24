@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "O Brain ainda não está nesta Box",
-        "description": "Sua Box roda uma versão do Rerun anterior ao Brain. Ele aparece aqui quando a Box for atualizada."
+        "description": "Sua Box roda uma versão do {brand} anterior ao Brain. Ele aparece aqui quando a Box for atualizada."
     },
     "crumbs": {
         "brain": "Brain",
@@ -198,14 +198,14 @@
         "unreachableFallback": "Não foi possível acessar a máquina deste workspace.",
         "deleteFailed": "Não foi possível excluir a página",
         "noMachineTitle": "Seu Brain chega com seu primeiro coworker",
-        "noMachineDescription": "Ele fica na máquina do seu workspace, configurada quando o Rerun cria seu primeiro coworker. A partir daí, o que cada coworker sabe sobre sua empresa, e os arquivos e tabelas que eles compartilham, aparecem aqui.",
+        "noMachineDescription": "Ele fica na máquina do seu workspace, configurada quando o {brand} cria seu primeiro coworker. A partir daí, o que cada coworker sabe sobre sua empresa, e os arquivos e tabelas que eles compartilham, aparecem aqui.",
         "unreachableTitle": "Não foi possível acessar seu workspace",
         "unreachableDescription": "A máquina deste workspace não respondeu. Ela pode estar iniciando ainda.",
         "retry": "Tentar de novo",
-        "seedingTitle": "O Rerun está lendo seu site",
+        "seedingTitle": "O {brand} está lendo seu site",
         "emptyTitle": "O Brain da sua empresa está vazio",
         "seedingDescription": "O cartão de identidade da sua empresa aparece aqui em alguns minutos: o que você vende, para quem, sua equipe, seu tom de voz e suas ferramentas.",
-        "emptyDescription": "É o que cada coworker lê sobre sua empresa antes de trabalhar: o que você vende, para quem, sua equipe, seu tom de voz e suas ferramentas. O Rerun pode preenchê-lo a partir do seu site.",
+        "emptyDescription": "É o que cada coworker lê sobre sua empresa antes de trabalhar: o que você vende, para quem, sua equipe, seu tom de voz e suas ferramentas. O {brand} pode preenchê-lo a partir do seu site.",
         "refresh": "Atualizar",
         "writeYourself": "Escrever uma página você mesmo",
         "missingPageTitle": "Nenhuma página \"{slug}\" ainda",
@@ -240,7 +240,7 @@
         "googleBusiness": "Perfil da Empresa no Google"
     },
     "authors": {
-        "seed": "Rerun, a partir do seu site",
+        "seed": "{brand}, a partir do seu site",
         "foreman": "Chief of Staff"
     },
     "filing": {

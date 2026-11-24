@@ -2,13 +2,13 @@
     "menu": {
         "label": "אפליקציות"
     },
-    "linkedToRerun": "{provider} מקושר ל-Rerun",
+    "linkedToRerun": "{provider} מקושר ל-{brand}",
     "slotPrice": {
         "monthly": "{price}/חודש",
         "yearly": "{price}/שנה"
     },
     "blocked": {
-        "notSubscribed": "קודם צריך להירשם ל-Rerun",
+        "notSubscribed": "קודם צריך להירשם ל-{brand}",
         "paused": "סביבת העבודה שלך מושהית",
         "trialSlot": "תקופת ניסיון כוללת משבצת {provider} אחת. כדי להוסיף עוד, יש לשדרג את התוכנית.",
         "lifetimeTrialSlot": "תקופת הניסיון החינמית שלך כוללת משבצת {provider} אחת. אפשר להוסיף עוד בסיומה.",
@@ -159,7 +159,7 @@
         "signInFromHelp": "LinkedIn סומך על התחברות מהמדינה שממנה אתה עובד בדרך כלל.",
         "searchCountry": "לחפש מדינה",
         "noCountry": "לא נמצאה מדינה",
-        "neverStored": "Rerun לעולם לא שומר את הסיסמה או את קובץ ה-Cookie שלך.",
+        "neverStored": "{brand} לעולם לא שומר את הסיסמה או את קובץ ה-Cookie שלך.",
         "connect": "לחבר",
         "approval": {
             "figureLabel": "טלפון שמציג את בקשת ההתחברות, עם כפתור האישור מואר",
@@ -193,7 +193,7 @@
                 "qr": "לסרוק קוד QR",
                 "code": "להקליד קוד"
             },
-            "linkedDevice": "Rerun מצטרף כמכשיר מקושר, כמו WhatsApp Web. הטלפון שלך ממשיך לעבוד כרגיל.",
+            "linkedDevice": "{brand} מצטרף כמכשיר מקושר, כמו WhatsApp Web. הטלפון שלך ממשיך לעבוד כרגיל.",
             "submit": "לקבל את הקוד"
         },
         "link": {

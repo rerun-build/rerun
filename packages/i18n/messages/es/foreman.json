@@ -27,7 +27,7 @@
     },
     "resize": "Cambiar tamaño del chat",
     "modelPill": {
-        "hubReason": "Este chat siempre funciona con Rerun Balanced"
+        "hubReason": "Este chat siempre funciona con {brand} Balanced"
     },
     "nextSteps": {
         "turnOn": "Activar mi coworker",
@@ -141,12 +141,12 @@
     },
     "contact": {
         "defaultSummary": "Estoy atascado configurando mi primer coworker y necesito ayuda.",
-        "sentWithEmail": "Enviado al equipo de Rerun. Responden en el chat y en {email}.",
-        "sent": "Enviado al equipo de Rerun. Responden en el chat.",
+        "sentWithEmail": "Enviado al equipo de {brand}. Responden en el chat y en {email}.",
+        "sent": "Enviado al equipo de {brand}. Responden en el chat.",
         "openChat": "Abrir el chat",
         "stillStuck": "¿Sigues atascado? Alguien del equipo puede ayudarte.",
         "send": "Enviar al equipo",
-        "title": "Habla con alguien de Rerun",
+        "title": "Habla con alguien de {brand}",
         "description": "Esto llega al equipo con tu cuenta, y te responden en el chat.",
         "notNow": "Ahora no"
     },
@@ -304,8 +304,8 @@
         "owned": "{title} es tuyo",
         "recurring": "Facturación mensual",
         "oneTime": "Pago único",
-        "billedTo": "Se factura a {name}, aparte de tu plan de Rerun. Se instala en cuanto se procesa el pago.",
-        "billedToWorkspace": "Se factura a tu workspace, aparte de tu plan de Rerun. Se instala en cuanto se procesa el pago.",
+        "billedTo": "Se factura a {name}, aparte de tu plan de {brand}. Se instala en cuanto se procesa el pago.",
+        "billedToWorkspace": "Se factura a tu workspace, aparte de tu plan de {brand}. Se instala en cuanto se procesa el pago.",
         "dueToday": "A pagar hoy",
         "perMonth": "/mes",
         "opening": "Abriendo…",
@@ -330,7 +330,7 @@
         "guide": {
             "title": "¿Cómo funciona?",
             "description": "Coworkers, Boxes y rutinas en dos minutos",
-            "send": "¿Cómo funciona Rerun?"
+            "send": "¿Cómo funciona {brand}?"
         },
         "checkWorking": {
             "title": "¿Qué está haciendo {name}?",

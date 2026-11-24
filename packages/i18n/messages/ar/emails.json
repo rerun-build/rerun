@@ -2,11 +2,11 @@
     "common": {
         "footer": {
             "tagline": "أدِر عملك عبر الزملاء. ابنِهم، وراقبهم وهم يعملون، وابقَ مطّلعًا على كل شيء.",
-            "copyright": "حقوق النشر © 2026 Rerun",
+            "copyright": "حقوق النشر © 2026 {brand}",
             "unsubscribe": "إلغاء الاشتراك"
         },
         "openConversation": "افتح المحادثة",
-        "openRerun": "افتح Rerun",
+        "openRerun": "افتح {brand}",
         "useThisCoworker": "استخدم هذا الزميل",
         "yourWorkspace": "مساحة العمل الخاصة بك",
         "dateAtTime": "{date}، {time} UTC",
@@ -34,28 +34,28 @@
         }
     },
     "subjects": {
-        "signInCode": "رمزك في Rerun: {code}",
+        "signInCode": "رمزك في {brand}: {code}",
         "publishedAccessCode": "رمزك لفتح {pageTitle}: {code}",
         "lifetimeCode": "رمز Rerun مدى الحياة الخاص بك: {code}",
-        "workspaceInvite": "أنت مدعو إلى {workspaceName} على Rerun",
+        "workspaceInvite": "أنت مدعو إلى {workspaceName} على {brand}",
         "appNotice": "{appName}: مطلوب إجراء",
-        "budgetExhausted": "نفد رصيد Rerun في {workspace}",
-        "onboardingResume": "إعداد Rerun الخاص بك لم يكتمل",
-        "agentRecommendations": "{count, plural, zero {لا زملاء من Rerun يناسبون {company}} one {زميل واحد من Rerun يناسب {company}} two {زميلان من Rerun يناسبان {company}} few {# زملاء من Rerun يناسبون {company}} many {# زميلًا من Rerun يناسبون {company}} other {# زميل من Rerun يناسبون {company}}}",
+        "budgetExhausted": "نفد رصيد {brand} في {workspace}",
+        "onboardingResume": "إعداد {brand} الخاص بك لم يكتمل",
+        "agentRecommendations": "{count, plural, zero {لا زملاء من {brand} يناسبون {company}} one {زميل واحد من {brand} يناسب {company}} two {زميلان من {brand} يناسبان {company}} few {# زملاء من {brand} يناسبون {company}} many {# زميلًا من {brand} يناسبون {company}} other {# زميل من {brand} يناسبون {company}}}",
         "agentIdle": "{agentName} جاهز، لكنه لم يعمل بعد",
         "teamInvite": "أحضر فريقك إلى {workspaceName}",
         "automateAgent": "شغّلت {agentName} يدويًا {manualRuns, plural, zero {# مرة} one {مرة واحدة} two {مرتين} few {# مرات} many {# مرة} other {# مرة}}، جدول التشغيل التالي",
-        "trialStarted": "تجربة Rerun لمدة {trialDays} أيام مفعّلة",
-        "trialEnding": "{daysLeft, plural, =1 {تنتهي تجربة Rerun غدًا} zero {تنتهي تجربة Rerun اليوم} one {تنتهي تجربة Rerun غدًا} two {تنتهي تجربة Rerun خلال يومين} few {تنتهي تجربة Rerun خلال # أيام} many {تنتهي تجربة Rerun خلال # يومًا} other {تنتهي تجربة Rerun خلال # يوم}}",
-        "trialFinalNoticeCard": "تبدأ خطة Rerun الخاصة بك خلال ساعتين",
-        "trialFinalNoticeNoCard": "تنتهي تجربة Rerun خلال ساعتين، أضف بطاقة ليواصل زملاؤك العمل",
-        "trialEndedPaymentFailed": "فشلت دفعتك الأولى في Rerun، وستتوقف مساحة العمل خلال 24 ساعة",
-        "trialEndedNoCard": "انتهت تجربة Rerun، وستتوقف مساحة العمل خلال ساعتين",
+        "trialStarted": "تجربة {brand} لمدة {trialDays} أيام مفعّلة",
+        "trialEnding": "{daysLeft, plural, =1 {تنتهي تجربة {brand} غدًا} zero {تنتهي تجربة {brand} اليوم} one {تنتهي تجربة {brand} غدًا} two {تنتهي تجربة {brand} خلال يومين} few {تنتهي تجربة {brand} خلال # أيام} many {تنتهي تجربة {brand} خلال # يومًا} other {تنتهي تجربة {brand} خلال # يوم}}",
+        "trialFinalNoticeCard": "تبدأ خطة {brand} الخاصة بك خلال ساعتين",
+        "trialFinalNoticeNoCard": "تنتهي تجربة {brand} خلال ساعتين، أضف بطاقة ليواصل زملاؤك العمل",
+        "trialEndedPaymentFailed": "فشلت دفعتك الأولى في {brand}، وستتوقف مساحة العمل خلال 24 ساعة",
+        "trialEndedNoCard": "انتهت تجربة {brand}، وستتوقف مساحة العمل خلال ساعتين",
         "paymentFailed": "رُفضت الدفعة: ستتوقف مساحة العمل خلال 24 ساعة",
-        "subscriptionEnding": "{daysLeft, plural, =1 {ينتهي اشتراكك في Rerun غدًا} zero {ينتهي اشتراكك في Rerun اليوم} one {ينتهي اشتراكك في Rerun غدًا} two {ينتهي اشتراكك في Rerun خلال يومين} few {ينتهي اشتراكك في Rerun خلال # أيام} many {ينتهي اشتراكك في Rerun خلال # يومًا} other {ينتهي اشتراكك في Rerun خلال # يوم}}",
-        "archiveExpiring": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في Rerun في {date}} other {تُحذف مساحة العمل المتوقفة في Rerun في {date}}}",
-        "sandboxIdle": "تُؤرشف بيئتك التجريبية في Rerun في {date} ما لم تفتحها",
-        "renewalReminder": "{daysLeft, plural, =1 {تتجدد خطة Rerun غدًا} zero {تتجدد خطة Rerun اليوم} one {تتجدد خطة Rerun غدًا} two {تتجدد خطة Rerun خلال يومين} few {تتجدد خطة Rerun خلال # أيام} many {تتجدد خطة Rerun خلال # يومًا} other {تتجدد خطة Rerun خلال # يوم}}",
+        "subscriptionEnding": "{daysLeft, plural, =1 {ينتهي اشتراكك في {brand} غدًا} zero {ينتهي اشتراكك في {brand} اليوم} one {ينتهي اشتراكك في {brand} غدًا} two {ينتهي اشتراكك في {brand} خلال يومين} few {ينتهي اشتراكك في {brand} خلال # أيام} many {ينتهي اشتراكك في {brand} خلال # يومًا} other {ينتهي اشتراكك في {brand} خلال # يوم}}",
+        "archiveExpiring": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في {brand} في {date}} other {تُحذف مساحة العمل المتوقفة في {brand} في {date}}}",
+        "sandboxIdle": "تُؤرشف بيئتك التجريبية في {brand} في {date} ما لم تفتحها",
+        "renewalReminder": "{daysLeft, plural, =1 {تتجدد خطة {brand} غدًا} zero {تتجدد خطة {brand} اليوم} one {تتجدد خطة {brand} غدًا} two {تتجدد خطة {brand} خلال يومين} few {تتجدد خطة {brand} خلال # أيام} many {تتجدد خطة {brand} خلال # يومًا} other {تتجدد خطة {brand} خلال # يوم}}",
         "creatorPitch": "بِع الزملاء الذين تبنيهم على Rerun"
     },
     "reasons": {
@@ -67,12 +67,12 @@
         "workspace": "يتعلق هذا بمساحة العمل الخاصة بك."
     },
     "signInCode": {
-        "preview": "رمزك في Rerun هو {code}",
-        "headingSignIn": "سجّل الدخول إلى Rerun",
+        "preview": "رمزك في {brand} هو {code}",
+        "headingSignIn": "سجّل الدخول إلى {brand}",
         "headingConfirm": "أكّد بريدك الإلكتروني الجديد",
         "bodySignIn": "أدخل هذا الرمز في علامة التبويب التي طلبته منها، أو استخدم الزر أدناه لتسجيل الدخول فورًا.",
-        "bodyConfirm": "أدخل هذا الرمز في إعدادات حسابك في Rerun ليصبح هذا البريد بريد حسابك.",
-        "button": "سجّل الدخول إلى Rerun",
+        "bodyConfirm": "أدخل هذا الرمز في إعدادات حسابك في {brand} ليصبح هذا البريد بريد حسابك.",
+        "button": "سجّل الدخول إلى {brand}",
         "footnoteSignIn": "تنتهي صلاحية الرمز والزر خلال {minutes, plural, zero {# دقيقة} one {دقيقة واحدة} two {دقيقتين} few {# دقائق} many {# دقيقة} other {# دقيقة}} ويعملان مرة واحدة. إذا لم تطلبهما، فيمكنك تجاهل هذه الرسالة بأمان.",
         "footnoteConfirm": "تنتهي صلاحية الرمز خلال {minutes, plural, zero {# دقيقة} one {دقيقة واحدة} two {دقيقتين} few {# دقائق} many {# دقيقة} other {# دقيقة}} ويعمل مرة واحدة. إذا لم تطلبه، فيمكنك تجاهل هذه الرسالة بأمان."
     },
@@ -91,11 +91,11 @@
         "footnote": "يعمل الرمز مرة واحدة، على مساحة عمل واحدة. احتفظ بهذه الرسالة: إنها إثبات الشراء. لديك أسئلة؟ رد على هذه الرسالة."
     },
     "workspaceInvite": {
-        "preview": "أنت مدعو إلى {workspaceName} على Rerun",
+        "preview": "أنت مدعو إلى {workspaceName} على {brand}",
         "heading": "أنت مدعو",
-        "bodyWithInviter": "دعاك <strong>{inviter}</strong> للانضمام إلى <strong>{workspaceName}</strong> على Rerun.",
-        "bodyAnonymous": "تمت دعوتك للانضمام إلى <strong>{workspaceName}</strong> على Rerun.",
-        "pitch": "يدير Rerun عملك بزملاء مستقلين يعملون بالذكاء الاصطناعي. اقبل الدعوة لتبدأ التعاون في مساحة العمل هذه.",
+        "bodyWithInviter": "دعاك <strong>{inviter}</strong> للانضمام إلى <strong>{workspaceName}</strong> على {brand}.",
+        "bodyAnonymous": "تمت دعوتك للانضمام إلى <strong>{workspaceName}</strong> على {brand}.",
+        "pitch": "يدير {brand} عملك بزملاء مستقلين يعملون بالذكاء الاصطناعي. اقبل الدعوة لتبدأ التعاون في مساحة العمل هذه.",
         "button": "انضم إلى {workspaceName}",
         "footnote": "تنتهي صلاحية هذه الدعوة خلال 7 أيام. إذا لم تكن تتوقعها، فيمكنك تجاهل هذه الرسالة بأمان."
     },
@@ -113,9 +113,9 @@
         "button": "اعرف ما الذي تعطل"
     },
     "budgetExhausted": {
-        "heading": "نفد رصيد Rerun لديك",
-        "body": "عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى {date}، أو حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
-        "bodyNoReset": "عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
+        "heading": "نفد رصيد {brand} لديك",
+        "body": "عمليات التشغيل المجدولة والمُطلقة على نماذج {brand} متوقفة حتى {date}، أو حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
+        "bodyNoReset": "عمليات التشغيل المجدولة والمُطلقة على نماذج {brand} متوقفة حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
         "button": "أضف رصيدًا"
     },
     "agentNotification": {
@@ -161,7 +161,7 @@
         "createdDaysAgo": "{count, plural, zero {منذ # يوم} one {منذ يوم} two {منذ يومين} few {منذ # أيام} many {منذ # يومًا} other {منذ # يوم}}"
     },
     "agentRecommendations": {
-        "preview": "{count, plural, zero {لا زملاء من Rerun يناسبون {company}} one {زميل واحد من Rerun يناسب {company}} two {زميلان من Rerun يناسبان {company}} few {# زملاء من Rerun يناسبون {company}} many {# زميلًا من Rerun يناسبون {company}} other {# زميل من Rerun يناسبون {company}}}",
+        "preview": "{count, plural, zero {لا زملاء من {brand} يناسبون {company}} one {زميل واحد من {brand} يناسب {company}} two {زميلان من {brand} يناسبان {company}} few {# زملاء من {brand} يناسبون {company}} many {# زميلًا من {brand} يناسبون {company}} other {# زميل من {brand} يناسبون {company}}}",
         "yourCompany": "شركتك",
         "heading": "من أين تبدأ في {company}",
         "bodyWithSite": "شاركت <strong>{domain}</strong> أثناء الإعداد. بناءً على الأعمال المتكررة الموصوفة هناك والأدوات التي أخبرتنا أنك تستخدمها، هذه أوضح الإعدادات للبدء بها.",
@@ -182,16 +182,16 @@
         }
     },
     "onboardingResume": {
-        "preview": "إعداد Rerun الخاص بك لم يكتمل",
+        "preview": "إعداد {brand} الخاص بك لم يكتمل",
         "headingNamed": "{firstName}، إعدادك لم يكتمل",
         "heading": "إعدادك لم يكتمل",
         "leftEarly": "تم إنشاء مساحة العمل، لكنك غادرت قبل نهاية الإعداد. يستغرق الأمر دقيقة تقريبًا: موقعك، والأدوات التي تعمل بها بالفعل.",
-        "whyItMatters": "هاتان الإجابتان تحددان الزملاء الذين يعرضهم عليك Rerun. بدونهما تحصل على القائمة العامة.",
+        "whyItMatters": "هاتان الإجابتان تحددان الزملاء الذين يعرضهم عليك {brand}. بدونهما تحصل على القائمة العامة.",
         "button": "أكمل الإعداد",
         "footnote": "تظهر الأسئلة مجددًا تلقائيًا عند وصولك إلى مساحة العمل."
     },
     "archiveExpiring": {
-        "preview": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في Rerun في {date}} other {تُحذف مساحة العمل المتوقفة في Rerun في {date}}}",
+        "preview": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في {brand} في {date}} other {تُحذف مساحة العمل المتوقفة في {brand} في {date}}}",
         "heading": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في {date}} other {تُحذف مساحة العمل المتوقفة في {date}}}",
         "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong> مؤرشفة منذ <strong>{pausedOn}</strong>. لا يزال زملاؤها وكل ما يعرفونه محفوظين، وهذا آخر أسبوع سيبقون فيه كذلك.} other {<strong>{workspaceName}</strong> متوقفة منذ <strong>{pausedOn}</strong>. لا يزال زملاؤها وكل ما يعرفونه محفوظين، وهذا آخر أسبوع سيبقون فيه كذلك.}}",
         "statusUnnamed": "{kind, select, sandbox {مساحة العمل الخاصة بك مؤرشفة منذ <strong>{pausedOn}</strong>. لا يزال زملاؤها وكل ما يعرفونه محفوظين، وهذا آخر أسبوع سيبقون فيه كذلك.} other {مساحة العمل الخاصة بك متوقفة منذ <strong>{pausedOn}</strong>. لا يزال زملاؤها وكل ما يعرفونه محفوظين، وهذا آخر أسبوع سيبقون فيه كذلك.}}",
@@ -238,21 +238,21 @@
         "button": "ادفع الفاتورة"
     },
     "renewalReminder": {
-        "preview": "تتجدد خطة Rerun في {date}",
+        "preview": "تتجدد خطة {brand} في {date}",
         "heading": "تتجدد خطتك خلال {daysLeft, plural, =1 {يوم} zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
         "body": "طلبت منا تذكيرك قبل تجديد خطة <strong>{workspace}</strong>. تتجدد في <strong>{date}</strong>، وتُخصم البطاقة المسجلة حينها. حتى ذلك التاريخ يواصل زملاؤك العمل كما هم.",
         "button": "راجع خطتي",
         "footnote": "تريد الإلغاء؟ ألغِ قبل {date} من Billing في قائمة مساحة العمل، ولن تُخصم بطاقتك مجددًا."
     },
     "sandboxIdle": {
-        "preview": "تُؤرشف بيئتك التجريبية في Rerun في {date} ما لم تفتحها",
+        "preview": "تُؤرشف بيئتك التجريبية في {brand} في {date} ما لم تفتحها",
         "heading": "تُؤرشف بيئتك التجريبية في {date}",
-        "unused": "لم تُفتح بيئتك التجريبية في Rerun منذ <strong>{lastActive}</strong>. تُبقي البيئة التجريبية جهازًا يعمل لأجلك، لذا تُؤرشف البيئة غير المستخدمة لمدة 30 يومًا لتحرير الجهاز.",
+        "unused": "لم تُفتح بيئتك التجريبية في {brand} منذ <strong>{lastActive}</strong>. تُبقي البيئة التجريبية جهازًا يعمل لأجلك، لذا تُؤرشف البيئة غير المستخدمة لمدة 30 يومًا لتحرير الجهاز.",
         "openBefore": "افتح بيئتك التجريبية قبل <strong>{date}</strong> ولن يتغير شيء. بعد ذلك التاريخ يُحفظ زملاؤها وبياناتهم، لكن استعادتها تتطلب أن تطلب منا إعادة تفعيلها.",
         "button": "افتح بيئتي التجريبية"
     },
     "subscriptionEnding": {
-        "preview": "ينتهي اشتراكك في Rerun في {date}",
+        "preview": "ينتهي اشتراكك في {brand} في {date}",
         "heading": "{daysLeft, plural, =1 {ينتهي اشتراكك غدًا} zero {ينتهي اشتراكك اليوم} one {ينتهي اشتراكك غدًا} two {ينتهي اشتراكك خلال يومين} few {ينتهي اشتراكك خلال # أيام} many {ينتهي اشتراكك خلال # يومًا} other {ينتهي اشتراكك خلال # يوم}}",
         "cancelled": "أُلغي اشتراك <strong>{workspace}</strong> وينتهي في <strong>{date}</strong>. في ذلك التاريخ يتوقف زملاؤك وتتوقف مساحة العمل.",
         "nothingDeleted": "لا يُحذف أي شيء. زملاؤك وذكرياتهم وملفاتهم وسجلهم محفوظة حتى <strong>{keptUntil}</strong>، والاشتراك مجددًا يعيد كل شيء كما تركته تمامًا.",
@@ -260,7 +260,7 @@
         "footnote": "غيّرت رأيك؟ إعادة التفعيل قبل {date} تُبقي كل شيء يعمل، دون حاجة إلى استعادة أي شيء."
     },
     "trialEnded": {
-        "preview": "{reason, select, payment_failed {فشلت دفعتك الأولى في Rerun، وستتوقف مساحة العمل في {pausedAt}} other {انتهت تجربة Rerun، وستتوقف مساحة العمل في {pausedAt}}}",
+        "preview": "{reason, select, payment_failed {فشلت دفعتك الأولى في {brand}، وستتوقف مساحة العمل في {pausedAt}} other {انتهت تجربة {brand}، وستتوقف مساحة العمل في {pausedAt}}}",
         "heading": "{reason, select, payment_failed {فشلت دفعتك الأولى} other {انتهت تجربتك}}",
         "ended": "{reason, select, payment_failed {انتهت تجربة <strong>{workspace}</strong> في <strong>{date}</strong>، ولم ينجح الخصم الأول من بطاقتك. ربما يطلب منك البنك تأكيد العملية فقط.} other {انتهت تجربة <strong>{workspace}</strong> في <strong>{date}</strong>، وتوقف زملاؤك.}}",
         "paused": "{reason, select, payment_failed {<strong>تتوقف مساحة العمل في {pausedAt}</strong>. لا يُحذف أي شيء: زملاؤك وكل ما يعرفونه محفوظون حتى <strong>{keptUntil}</strong>. ادفع الفاتورة قبل التوقف لتواصل العمل، أو اشترك في أي وقت قبل ذلك وسيعود كل شيء كما تركته تمامًا.} other {<strong>تتوقف مساحة العمل في {pausedAt}</strong>. لا يُحذف أي شيء: زملاؤك وكل ما يعرفونه محفوظون حتى <strong>{keptUntil}</strong>. اشترك في أي وقت قبل ذلك وسيعود كل شيء كما تركته تمامًا.}}",
@@ -268,7 +268,7 @@
         "footnote": "ليس الوقت المناسب؟ يمكنك تركها، ولن يُخصم أي شيء آخر. تبقى مساحة العمل محفوظة حتى {keptUntil}."
     },
     "trialEnding": {
-        "preview": "تنتهي تجربة Rerun في {date}",
+        "preview": "تنتهي تجربة {brand} في {date}",
         "heading": "تنتهي تجربتك خلال {daysLeft, plural, =1 {يوم} zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
         "endsOn": "تنتهي تجربة <strong>{workspace}</strong> في <strong>{date}</strong>. من ذلك الحين تُحتسب خطتك على البطاقة المسجلة كل شهر. بدون بطاقة مسجلة، يتوقف زملاؤك عن العمل وتتوقف مساحة العمل بعد ساعتين من انتهاء التجربة.",
         "nothingDeleted": "لا يُحذف أي شيء: زملاؤك وكل ما يعرفونه محفوظون حتى {keptUntil}، والاشتراك يعيد كل شيء كما تركته تمامًا.",
@@ -276,8 +276,8 @@
         "footnote": "لا تنوي المتابعة؟ ألغِ قبل {date} من Billing في قائمة مساحة العمل، ولن يُخصم أي شيء."
     },
     "trialFinalNotice": {
-        "previewCard": "تبدأ خطة Rerun الخاصة بك في {date}",
-        "previewNoCard": "أضف بطاقة قبل {date} ليواصل زملاؤك في Rerun العمل",
+        "previewCard": "تبدأ خطة {brand} الخاصة بك في {date}",
+        "previewNoCard": "أضف بطاقة قبل {date} ليواصل زملاؤك في {brand} العمل",
         "heading": "تنتهي تجربتك خلال ساعتين",
         "bodyCard": "تنتهي تجربة <strong>{workspace}</strong> في <strong>{date}</strong>. تبدأ خطتك حينها، وتُخصم البطاقة المسجلة لشهرك الأول. يواصل زملاؤك العمل، ولا شيء عليك فعله.",
         "noCard": "تنتهي تجربة <strong>{workspace}</strong> في <strong>{date}</strong>، ولا توجد بطاقة مسجلة.",
@@ -287,7 +287,7 @@
         "footnoteCard": "لا تنوي المتابعة؟ ألغِ قبل {date} من Billing في قائمة مساحة العمل، ولن تُخصم بطاقتك."
     },
     "trialStarted": {
-        "preview": "تجربة Rerun لمدة {trialDays} أيام مفعّلة",
+        "preview": "تجربة {brand} لمدة {trialDays} أيام مفعّلة",
         "heading": "تجربتك مفعّلة",
         "body": "<strong>{workspace}</strong> في تجربة مجانية لمدة {trialDays} أيام. يعمل زملاؤك، وتنطلق جداولك، ولا يُخصم أي شيء اليوم.",
         "included": "{coworkers, plural, zero {# زميل} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}} و{credits, plural, zero {# رصيد} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}",

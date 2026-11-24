@@ -189,7 +189,7 @@
         "region": "Cookie consent",
         "title": "Cookies",
         "short": "We use analytics cookies. <policy>Cookie policy</policy>",
-        "long": "We use analytics cookies to understand how Rerun is used. Cookies needed to sign you in, run the support chat and remember your preferences are always on. <policy>Cookie policy</policy>"
+        "long": "We use analytics cookies to understand how {brand} is used. Cookies needed to sign you in, run the support chat and remember your preferences are always on. <policy>Cookie policy</policy>"
     },
     "experts": {
         "wizard": {

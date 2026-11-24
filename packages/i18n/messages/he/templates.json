@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {תבנית אחת} two {שתי תבניות} other {# תבניות}}",
-        "rerunTeam": "צוות Rerun",
+        "rerunTeam": "צוות {brand}",
         "verified": "יוצר מאומת"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "מומלצות",
             "featuredSubtitle": "הגדרות שנבחרו בקפידה ושווה להציץ בהן קודם.",
             "justAdded": "נוספו עכשיו",
-            "justAddedSubtitle": "התבניות האחרונות שפורסמו ב-Rerun."
+            "justAddedSubtitle": "התבניות האחרונות שפורסמו ב-{brand}."
         },
         "empty": {
             "filtered": "אין תבנית שמתאימה למסננים האלה",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "כבר השתמשת בניסיון החינם. החיוב היום; התבנית הזו מחויבת בנפרד.",
         "resubscribe": "לחדש מנוי ב-{price} לחודש",
         "lapsed": "המנוי שלך הסתיים. העמיתים שהתבנית הזו התקינה מושבתים.",
-        "billedTo": "החיוב על {workspace}. תוכנית Rerun שלך כבר פעילה.",
+        "billedTo": "החיוב על {workspace}. תוכנית {brand} שלך כבר פעילה.",
         "yours": "התבנית שלך, ללא חיוב."
     },
     "boardAlt": "לוח העמיתים של {title}"

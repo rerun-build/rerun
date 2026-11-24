@@ -11,7 +11,7 @@
         "addEmail": "إضافة بريد إلكتروني",
         "changePhone": "تغيير رقم الهاتف",
         "addPhone": "إضافة رقم هاتف",
-        "googleNeedsBrowser": "افتح Rerun في متصفحك لربط Google."
+        "googleNeedsBrowser": "افتح {brand} في متصفحك لربط Google."
     },
     "members": {
         "title": "الأعضاء",
@@ -464,7 +464,7 @@
     },
     "shortcuts": {
         "title": "اختصارات لوحة المفاتيح",
-        "description": "تنقّل في Rerun بسرعة أكبر مع هذه الاختصارات.",
+        "description": "تنقّل في {brand} بسرعة أكبر مع هذه الاختصارات.",
         "groups": {
             "general": "عام",
             "chat": "الدردشة",
@@ -599,7 +599,7 @@
         },
         "link": {
             "title": "ربط الهاتف",
-            "hint": "يضيف WhatsApp تطبيق Rerun كجهاز مرتبط",
+            "hint": "يضيف WhatsApp تطبيق {brand} كجهاز مرتبط",
             "cancel": "إلغاء الربط"
         }
     },
@@ -615,11 +615,11 @@
             "codex": "ChatGPT Plus أو Pro"
         },
         "decline": {
-            "cloud": "أفضّل البقاء على أرصدة Rerun",
+            "cloud": "أفضّل البقاء على أرصدة {brand}",
             "selfHosted": "أفضّل البقاء على OpenRouter"
         },
         "offer": {
-            "title": "يعمل Rerun بشكل أفضل مع اشتراك Claude أو ChatGPT",
+            "title": "يعمل {brand} بشكل أفضل مع اشتراك Claude أو ChatGPT",
             "description": "اربطه وسيعمل زملاؤك على الخطة التي تدفع ثمنها أصلًا.",
             "titleWithoutClaude": "يعمل زملاؤك على ذكائك الاصطناعي الخاص",
             "descriptionWithoutClaude": "اربط خطة ChatGPT أو مفتاح API، وسيعمل زملاؤك عليه."
@@ -630,12 +630,12 @@
                 "description": "يربط كل زميل فريق الخطة التي يدفع ثمنها. لا حساب يُتداول بينكم."
             },
             "password": {
-                "label": "لا يرى Rerun كلمة مرورك أبدًا",
+                "label": "لا يرى {brand} كلمة مرورك أبدًا",
                 "description": "توافق على ذلك في صفحة Claude أو OpenAI نفسها، ولا مكان آخر."
             },
             "unplug": {
                 "label": "افصله متى شئت",
-                "descriptionCloud": "افصله بنقرة واحدة وسيعود زملاؤك إلى أرصدة Rerun.",
+                "descriptionCloud": "افصله بنقرة واحدة وسيعود زملاؤك إلى أرصدة {brand}.",
                 "descriptionSelfHosted": "افصله بنقرة واحدة وسيعود زملاؤك إلى مفتاح OpenRouter الخاص بك."
             }
         },

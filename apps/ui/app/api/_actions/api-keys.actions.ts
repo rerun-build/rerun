@@ -5,6 +5,7 @@ import { actorFromContext, keepVisible, manageableSpaceIds } from '@/app/api/_au
 import { requireAdminContext, requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { getAppOrigin } from '@/lib/app-origin'
+import { getBrand } from '@/lib/brand/server'
 import { isApiLocked, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { apiKeyPrefix, generateApiKey, hashApiKey } from '@/lib/mcp/api-keys'
 import { mcpAccountUrl } from '@/lib/mcp/connect'
@@ -138,7 +139,7 @@ export async function createImportKeyAction(sourceId: ImportSourceId, requestedS
         if (error) return { ok: false, error: error.message }
 
         const connectorUrl = `${mcpAccountUrl(await getAppOrigin())}/${key}`
-        return { ok: true, connectorUrl, prompt: buildImportPrompt(sourceId, connectorUrl, spaceId), expiresAt }
+        return { ok: true, connectorUrl, prompt: buildImportPrompt(sourceId, connectorUrl, spaceId, (await getBrand()).name), expiresAt }
     } catch (err) {
         return failureOf(err, 'prepareImportFailed')
     }

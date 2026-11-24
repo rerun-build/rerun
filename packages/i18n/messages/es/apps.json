@@ -2,13 +2,13 @@
     "menu": {
         "label": "Apps"
     },
-    "linkedToRerun": "{provider} vinculado a Rerun",
+    "linkedToRerun": "{provider} vinculado a {brand}",
     "slotPrice": {
         "monthly": "{price}/mes",
         "yearly": "{price}/año"
     },
     "blocked": {
-        "notSubscribed": "Suscríbete primero a Rerun",
+        "notSubscribed": "Suscríbete primero a {brand}",
         "paused": "Tu workspace está en pausa",
         "trialSlot": "Una prueba incluye un solo espacio de {provider}. Mejora tu plan para añadir más.",
         "lifetimeTrialSlot": "Tu prueba gratuita incluye un solo espacio de {provider}. Añade más cuando termine.",
@@ -159,7 +159,7 @@
         "signInFromHelp": "LinkedIn confía en un inicio de sesión desde el país donde sueles trabajar.",
         "searchCountry": "Buscar un país",
         "noCountry": "No se encontró ningún país",
-        "neverStored": "Rerun nunca guarda tu contraseña ni tu cookie.",
+        "neverStored": "{brand} nunca guarda tu contraseña ni tu cookie.",
         "connect": "Conectar",
         "approval": {
             "figureLabel": "Un teléfono que muestra la solicitud de inicio de sesión, con la tecla de aprobar iluminada",
@@ -193,7 +193,7 @@
                 "qr": "Escanear un código QR",
                 "code": "Escribir un código"
             },
-            "linkedDevice": "Rerun se une como dispositivo vinculado, igual que WhatsApp Web. Tu teléfono sigue funcionando como siempre.",
+            "linkedDevice": "{brand} se une como dispositivo vinculado, igual que WhatsApp Web. Tu teléfono sigue funcionando como siempre.",
             "submit": "Obtener el código"
         },
         "link": {

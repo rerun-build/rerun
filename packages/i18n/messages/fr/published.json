@@ -22,7 +22,7 @@
         "workspaceFallback": "Workspace"
     },
     "gate": {
-        "madeWith": "Fait avec Rerun",
+        "madeWith": "Fait avec {brand}",
         "locked": "Page de {workspace}, verrouillée",
         "code": "Code",
         "switchAccount": "Changer de compte"

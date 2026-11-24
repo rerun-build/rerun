@@ -1,5 +1,6 @@
 import { assertAgentAccess } from '@/app/api/_auth/access'
 import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
+import { getBrand } from '@/lib/brand/server'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, resolveClient } from '@/lib/mcp-oauth'
 import { signInRefusal } from '@/lib/net/network-error'
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
         }
 
         const metadata = await discoverAuthServer(mcpUrl)
-        const clientInfo = await resolveClient(metadata, mcpUrl, req)
+        const clientInfo = await resolveClient(metadata, mcpUrl, req, (await getBrand()).name)
 
         if (!clientInfo?.clientId) return NextResponse.json(refusal('noOAuthClient'), { status: 400 })
 

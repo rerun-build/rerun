@@ -86,7 +86,7 @@
         "configured": "تم إعداد {name}",
         "connectTitle": "ربط {name}",
         "signInOAuth": "سجّل الدخول إلى {name} ليتمكن زميلك من استخدامه.",
-        "signInManaged": "سجّل الدخول باستخدام {name} ليتمكن زميلك من استخدامه. يتولى Rerun الاتصال نيابةً عنك.",
+        "signInManaged": "سجّل الدخول باستخدام {name} ليتمكن زميلك من استخدامه. يتولى {brand} الاتصال نيابةً عنك.",
         "setUp": "إعداد {name}",
         "authentication": "المصادقة",
         "backToMethods": "العودة إلى الطرق",

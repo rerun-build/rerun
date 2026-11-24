@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "Préférences e-mail",
-        "subtitle": "Choisissez les e-mails que Rerun vous envoie. Aucune connexion nécessaire.",
+        "subtitle": "Choisissez les e-mails que {brand} vous envoie. Aucune connexion nécessaire.",
         "subtitleRuns": "Choisissez si vos coworkers peuvent vous écrire par e-mail. Aucune connexion nécessaire.",
         "invalid": "Ce lien de désinscription est invalide ou a expiré.",
         "logIn": "Connectez-vous pour gérer vos préférences"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "Réservée aux membres de {workspace}",
-            "continue": "Continuer avec Rerun"
+            "continue": "Continuer avec {brand}"
         }
     },
     "publishedSite": {

@@ -11,7 +11,7 @@
         "addEmail": "添加邮箱",
         "changePhone": "更改手机号",
         "addPhone": "添加手机号",
-        "googleNeedsBrowser": "请在浏览器中打开 Rerun 以连接 Google。"
+        "googleNeedsBrowser": "请在浏览器中打开 {brand} 以连接 Google。"
     },
     "members": {
         "title": "成员",
@@ -464,7 +464,7 @@
     },
     "shortcuts": {
         "title": "键盘快捷键",
-        "description": "使用这些快捷键在 Rerun 中更快地操作。",
+        "description": "使用这些快捷键在 {brand} 中更快地操作。",
         "groups": {
             "general": "通用",
             "chat": "聊天",
@@ -599,7 +599,7 @@
         },
         "link": {
             "title": "关联手机",
-            "hint": "WhatsApp 会将 Rerun 添加为已关联设备",
+            "hint": "WhatsApp 会将 {brand} 添加为已关联设备",
             "cancel": "取消关联"
         }
     },
@@ -615,11 +615,11 @@
             "codex": "ChatGPT Plus 或 Pro"
         },
         "decline": {
-            "cloud": "我还是继续使用 Rerun 积分",
+            "cloud": "我还是继续使用 {brand} 积分",
             "selfHosted": "我还是继续使用 OpenRouter"
         },
         "offer": {
-            "title": "搭配您的 Claude 或 ChatGPT 订阅，Rerun 效果更好",
+            "title": "搭配您的 Claude 或 ChatGPT 订阅，{brand} 效果更好",
             "description": "连接后，您的同事将使用您已付费的套餐运行。",
             "titleWithoutClaude": "您的同事使用您自己的 AI 运行",
             "descriptionWithoutClaude": "连接您的 ChatGPT 套餐或 API 密钥，您的同事就会用它运行。"
@@ -630,12 +630,12 @@
                 "description": "每位队友连接自己付费的套餐。无需共用账号。"
             },
             "password": {
-                "label": "Rerun 永远看不到您的密码",
+                "label": "{brand} 永远看不到您的密码",
                 "description": "您只在 Claude 或 OpenAI 自己的页面上授权，别无他处。"
             },
             "unplug": {
                 "label": "随时断开",
-                "descriptionCloud": "一键断开，您的同事将改用 Rerun 积分。",
+                "descriptionCloud": "一键断开，您的同事将改用 {brand} 积分。",
                 "descriptionSelfHosted": "一键断开，您的同事将改用您的 OpenRouter 密钥。"
             }
         },

@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, other {# 个模型}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Rerun 积分已暂停",
+        "creditPaused": "{brand} 积分已暂停",
         "creditUsed": "本月积分已使用 {percent}%",
         "creditUsedUpOn": "本月积分已用完，将于 {date} 恢复",
         "creditUsedUpNextMonth": "本月积分已用完，将于下月恢复",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "如何获取您的 Anthropic 密钥",
                 "step1": "打开 [Anthropic Console](https://console.anthropic.com/settings/keys) 并登录。",
-                "step2": "点击 **Create Key** 并为其命名，例如“Rerun”。",
+                "step2": "点击 **Create Key** 并为其命名，例如“{brand}”。",
                 "step3": "复制密钥（以 `sk-ant-` 开头）并粘贴到上方。它只显示一次。"
             },
             "openai": {
                 "title": "如何获取您的 OpenAI 密钥",
                 "step1": "打开 [OpenAI API keys](https://platform.openai.com/api-keys) 并登录。",
-                "step2": "点击 **Create new secret key** 并为其命名，例如“Rerun”。",
+                "step2": "点击 **Create new secret key** 并为其命名，例如“{brand}”。",
                 "step3": "复制密钥（以 `sk-` 开头）并粘贴到上方。它只显示一次。"
             },
             "google": {
@@ -180,7 +180,7 @@
             "automations": "{count, plural, other {# 个自动化}}将回退到工作区默认模型。",
             "both": "{agents} 和 {count, plural, other {# 个自动化}}将回退到工作区默认模型。"
         },
-        "holdsDefault": "它承载着工作区默认模型，该默认模型将被清除：所有未选择模型的同事都将回退到 Rerun。",
+        "holdsDefault": "它承载着工作区默认模型，该默认模型将被清除：所有未选择模型的同事都将回退到 {brand}。",
         "nothingRuns": "凭据已从 Box 中移除。没有任何内容在使用它。",
         "released": {
             "agents": "{agents} 现在使用工作区默认模型运行。",
@@ -231,9 +231,9 @@
         "signedInAgain": "已重新登录",
         "creditsTitle": "本月积分",
         "topUp": "充值",
-        "creditsUsedUpOn": "使用 Rerun 运行的同事已暂停，直到积分于 {date} 恢复。充值或选择另一个默认模型，让它们继续工作。",
-        "creditsUsedUpNextMonth": "使用 Rerun 运行的同事已暂停，直到积分于下月恢复。充值或选择另一个默认模型，让它们继续工作。",
-        "creditsIncluded": "随您的 Rerun 方案附带。无需密钥，无需设置。",
+        "creditsUsedUpOn": "使用 {brand} 运行的同事已暂停，直到积分于 {date} 恢复。充值或选择另一个默认模型，让它们继续工作。",
+        "creditsUsedUpNextMonth": "使用 {brand} 运行的同事已暂停，直到积分于下月恢复。充值或选择另一个默认模型，让它们继续工作。",
+        "creditsIncluded": "随您的 {brand} 方案附带。无需密钥，无需设置。",
         "signInRejected": "此次登录被拒绝。使用它的同事将停止工作，直到您重新登录。",
         "signInExpired": "此次登录已过期。使用它的同事将停止工作，直到您重新登录。",
         "reconnected": "您的同事已重新开始工作",
@@ -260,12 +260,12 @@
         },
         "default": {
             "via": "通过 {source}。未单独设置模型的同事使用它运行。",
-            "pausedPick": "Rerun 积分已暂停，因此未单独设置模型的同事也已暂停。选择另一个模型，让它们继续工作。",
-            "pausedAdd": "Rerun 积分已暂停，因此未单独设置模型的同事也已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
-            "usedUpOnPick": "Rerun 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
-            "usedUpOnAdd": "Rerun 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
-            "usedUpNextMonthPick": "Rerun 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
-            "usedUpNextMonthAdd": "Rerun 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "pausedPick": "{brand} 积分已暂停，因此未单独设置模型的同事也已暂停。选择另一个模型，让它们继续工作。",
+            "pausedAdd": "{brand} 积分已暂停，因此未单独设置模型的同事也已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "usedUpOnPick": "{brand} 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
+            "usedUpOnAdd": "{brand} 积分已用完，将于 {date} 恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
+            "usedUpNextMonthPick": "{brand} 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。选择另一个模型，让它们继续工作。",
+            "usedUpNextMonthAdd": "{brand} 积分已用完，将于下月恢复，因此未单独设置模型的同事已暂停。添加订阅方案或 API 密钥，让它们继续工作。",
             "stopped": "未单独设置模型的同事已停止工作。请修复 {source} 或选择另一个模型。",
             "noOtherModel": "没有其他就绪的模型。请先添加订阅方案或 API 密钥。",
             "change": "更改"
@@ -280,7 +280,7 @@
             "full": "最多 {max} 个备用模型",
             "noneLeft": "没有其他就绪的模型。请先添加订阅方案或 API 密钥。",
             "credit": {
-                "title": "以 Rerun 积分作为最后备选",
+                "title": "以 {brand} 积分作为最后备选",
                 "description": "仅在所有方案都用完时"
             }
         },
@@ -324,7 +324,7 @@
         },
         "copied": "已复制",
         "copyMessage": "复制一条消息发给他们",
-        "adminMessage": "您好！能否在我们的 ChatGPT 工作区设置中开启“为 Codex 启用设备代码授权”？我需要用它把我的 ChatGPT 方案连接到 Rerun。"
+        "adminMessage": "您好！能否在我们的 ChatGPT 工作区设置中开启“为 Codex 启用设备代码授权”？我需要用它把我的 ChatGPT 方案连接到 {brand}。"
     },
     "claude": {
         "remarks": {
@@ -333,7 +333,7 @@
             "checking": "正在检查",
             "connected": "全部就绪！"
         },
-        "approveStep": "在 Claude 上批准 Rerun",
+        "approveStep": "在 Claude 上批准 {brand}",
         "opening": "Claude 正在新标签页中打开",
         "openAgain": "再次打开 Claude",
         "open": "打开 Claude",

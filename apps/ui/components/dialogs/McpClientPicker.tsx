@@ -1,5 +1,6 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { PlugIcon } from '@/lib/icons'
 import { MCP_CLIENTS, type McpClientId } from '@/lib/mcp/connect'
@@ -20,6 +21,7 @@ const CLIENT_PROVIDERS: Record<McpClientId, string | null> = {
 // five columns of the same width in the mobile bottom sheet.
 export function McpClientPicker({ value, onChange, className }: { value: McpClientId; onChange: (client: McpClientId) => void; className?: string }) {
     const t = useTranslations('dialogs.mcpConnect')
+    const { name: brandName } = useBrand()
     return (
         <div className={cn('flex flex-wrap gap-1.5', className)}>
             {MCP_CLIENTS.map(client => {
@@ -38,7 +40,7 @@ export function McpClientPicker({ value, onChange, className }: { value: McpClie
                         )}
                     >
                         {provider ? <ProviderIcon provider={provider} className="size-3.5 shrink-0" /> : <PlugIcon className="size-3.5 shrink-0" />}
-                        {client.brand ?? t('otherClient')}
+                        {client.id === 'rerun' ? brandName : (client.brand ?? t('otherClient'))}
                     </button>
                 )
             })}

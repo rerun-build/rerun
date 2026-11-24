@@ -118,7 +118,7 @@
         "credit": {
             "addedTitle": "Kredi eklendi",
             "addedBody": "{count, plural, one {# kredi çalışma alanınızda.} other {# kredi çalışma alanınızda.}} Süreleri asla dolmaz ve coworker'larınız kaldıkları yerden devam eder.",
-            "title": "Rerun kredisi satın alın",
+            "title": "{brand} kredisi satın alın",
             "eachPack": "Her paket, tek seferlik {price} karşılığında {count, plural, one {# kredi} other {# kredi}} ekler. Süreleri asla dolmaz.",
             "packs": "{count, plural, one {# paket} other {# paket}}",
             "packCredits": "{count, plural, one {# kredi} other {# kredi}}, süresi dolmaz",
@@ -278,7 +278,7 @@
         "fallbackTitle": "şablonunuz",
         "readyOne": "\"{title}\" artık sizin. Coworker'ını yerleştirmeye hazır mısınız?",
         "readyMany": "\"{title}\" artık sizin. {count} coworker'ını yerleştirmeye hazır mısınız?",
-        "needsPlan": "\"{title}\" artık sizin. Kurmak için aktif bir Rerun planı gerekir.",
+        "needsPlan": "\"{title}\" artık sizin. Kurmak için aktif bir {brand} planı gerekir.",
         "finalizing": "Satın alma tamamlanıyor",
         "close": "Kapat",
         "placeOne": "Coworker'ını yerleştir",
@@ -352,7 +352,7 @@
                 "footnote": "Bu, ücretsiz denemenizi bugün bitirir. Bugün hiçbir şey ödememek için denemenizi koruyun: Pro {date} tarihinde kendiliğinden başlar."
             },
             "creditLocked": {
-                "title": "Rerun kredisi Pro ile gelir",
+                "title": "{brand} kredisi Pro ile gelir",
                 "titleCoworker": "Pro ile devam edin",
                 "subtitle": "{trialCredits, number} deneme krediniz tükendi. Pro her ay {credits, plural, one {# kredi} other {# kredi}} içerir ve istediğiniz zaman daha fazlasını ekleyebilirsiniz.",
                 "subtitleCoworker": "{coworker} kaldığı yerden devam eder.",
@@ -435,8 +435,8 @@
             "updateFailed": "Planınız güncellenemedi",
             "stillUpdating": "Planınız hâlâ güncelleniyor",
             "pleaseWait": "Lütfen bekleyin",
-            "freeFor": "Rerun Pro, {days} gün ücretsiz",
-            "subscribe": "Rerun Pro'ya abone olun",
+            "freeFor": "{brand} Pro, {days} gün ücretsiz",
+            "subscribe": "{brand} Pro'ya abone olun",
             "dueToday": "bugün ödenecek",
             "perYear": "yıllık",
             "perMonth": "aylık",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "Denemeniz",
             "title": "Pro'yu bugün başlatın",
-            "header": "Denemeyi bitir, Rerun Pro'yu başlat",
+            "header": "Denemeyi bitir, {brand} Pro'yu başlat",
             "tax": "Vergi",
             "taxFromAddress": "Vergi, adresinize göre",
             "dueToday": "Bugün ödenecek",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "<b>Kendi yapay zekanızla</b> çalışır",
-                "credit": "İhtiyaç duyduğunuzda <b>Rerun kredisi</b>"
+                "credit": "İhtiyaç duyduğunuzda <b>{brand} kredisi</b>"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "Ayrılmaya neden karar verdiniz?",
             "placeholder": "Bir cümle yeterli",
-            "comebackField": "Rerun'ı yeniden kullanacak mısınız?",
+            "comebackField": "{brand}'ı yeniden kullanacak mısınız?",
             "missingComment": "Neden ayrıldığınızı birkaç kelimeyle anlatın",
             "missingComeback": "Geri dönüp dönmeyeceğinizi söyleyin",
             "required": "Neden ayrıldığınızı birkaç kelimeyle anlatın.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "Bu ayki çalıştırmalar",
             "agents": "{count, plural, one {# ajan} other {# ajan}}",
             "agentsCaption": "kuruldu, bağlandı ve çalışıyor",
-            "creditsCaption": "kalan Rerun kredisi",
+            "creditsCaption": "kalan {brand} kredisi",
             "runsSoFar": "Toplam çalıştırma",
             "schedules": "Zamanlamalar"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "Rerun kredisi",
-            "subtitle": "Coworker'larınızın Rerun modellerine ve ücretli verilere harcadığı",
+            "title": "{brand} kredisi",
+            "subtitle": "Coworker'larınızın {brand} modellerine ve ücretli verilere harcadığı",
             "addCredits": "Kredi ekle",
             "startProNow": "Pro'yu şimdi başlat",
             "usedTrial": "Kullanılan · deneme kredisi",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "Deneme krediniz tükendi",
             "title": "Krediniz tükendi",
-            "trialDescription": "Coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz. Pro her ay {count, plural, one {# kredi} other {# kredi}} ile gelir.",
-            "description": "Coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz.",
-            "descriptionUntil": "Coworker'larınız {date} tarihine kadar Rerun modellerini veya ücretli verileri kullanamaz."
+            "trialDescription": "Coworker'larınız {brand} modellerini veya ücretli verileri kullanamaz. Pro her ay {count, plural, one {# kredi} other {# kredi}} ile gelir.",
+            "description": "Coworker'larınız {brand} modellerini veya ücretli verileri kullanamaz.",
+            "descriptionUntil": "Coworker'larınız {date} tarihine kadar {brand} modellerini veya ücretli verileri kullanamaz."
         },
         "switch": {
             "label": "Harcamaya izin ver",
-            "on": "Coworker'lar Rerun modellerini ve ücretli verileri kullanabilir.",
-            "off": "Duraklatıldı. Coworker'lar Rerun modellerini veya ücretli verileri kullanamaz."
+            "on": "Coworker'lar {brand} modellerini ve ücretli verileri kullanabilir.",
+            "off": "Duraklatıldı. Coworker'lar {brand} modellerini veya ücretli verileri kullanamaz."
         },
         "kind": {
             "ai": "Yapay zeka modelleri",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "Deneme kredisi kalmadı",
             "outOfCredits": "Kredi tükendi",
             "left": "{figure} kaldı",
-            "ariaUsed": "Kullanılan Rerun kredisi"
+            "ariaUsed": "Kullanılan {brand} kredisi"
         }
     },
     "creditsBar": {

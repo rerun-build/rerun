@@ -44,12 +44,13 @@ export type McpSnippetHint = 'codexCliOnly' | 'coworkerReach'
 // multi-line instead of on a single scrollable row.
 export type McpSnippet = { label: McpSnippetLabel | { file: string }; value: string; block?: boolean; hint?: McpSnippetHint }
 
-// `brand` is null for the catch-all entry, whose name the picker translates.
+// `brand` is null where the picker names the client: the catch-all entry, which it translates, and the
+// coworker, which goes by the name of the brand.
 export const MCP_CLIENTS: { id: McpClientId; brand: string | null; docs: string }[] = [
     { id: 'claude-code', brand: 'Claude Code', docs: '/api/connect#claude-code' },
     { id: 'chatgpt', brand: 'ChatGPT', docs: '/api/connect#codex' },
     { id: 'cursor', brand: 'Cursor', docs: '/api/connect#cursor' },
-    { id: 'rerun', brand: 'Rerun', docs: '/api/connect#a-rerun-coworker' },
+    { id: 'rerun', brand: null, docs: '/api/connect#a-rerun-coworker' },
     { id: 'other', brand: null, docs: '/api/connect#any-other-client' },
 ]
 

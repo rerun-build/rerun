@@ -1,9 +1,9 @@
 import { rerunCreditTotalMicros, type RerunCreditColumns } from '@rerun/cloud/billing'
 import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/engine/models'
-import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
+import type { BoxConnection, BoxConnectionsList, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
 import { formatNumber, shortDate } from '@rerun/i18n/format'
-import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
+import { PROVIDER_LABELS, RERUN_BRAND, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isWhiteLabel, opencodePlanOf, opencodeServesModel, toProviderModel, type Brand, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
 
 // The AI providers dialog sorts every connection by who pays for it: the credit included with
 // Rerun, the user's own subscription, or the user's own API key.
@@ -90,12 +90,24 @@ export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: '
 const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT', opencode: 'OpenCode' }
 
 // What a person calls the plan behind a connection: "Claude", "ChatGPT", or the connection's own name.
-export function planName(source: { provider: Provider; name: string }): string {
+// Rerun's own connection is named by the machine, which knows no other brand.
+export function planName(source: { provider: Provider; name: string }, brand: Brand = RERUN_BRAND): string {
+    if (source.provider === 'rerun' && isWhiteLabel(brand)) return brand.name
     return PLAN_NAMES[source.provider] ?? source.name
 }
 
 // Opens the app on the account to sign in to again: where the email about it leads.
 export const RECONNECT_PARAM = 'reconnect'
+
+// The machine names Rerun's keyless connection itself and refuses to rename it, so the name of the
+// brand is put on what the hub reads off it and never sent back.
+export function brandConnection(connection: BoxConnection, brand: Brand): BoxConnection {
+    return connection.id === RERUN_CONNECTION_ID && isWhiteLabel(brand) ? { ...connection, name: brand.name } : connection
+}
+
+export function brandConnections(list: BoxConnectionsList, brand: Brand): BoxConnectionsList {
+    return { ...list, connections: list.connections.map(connection => brandConnection(connection, brand)) }
+}
 
 export const RERUN_FALLBACK: BoxDefault = { connectionId: RERUN_CONNECTION_ID, model: RERUN_MODEL }
 
@@ -134,20 +146,20 @@ export function isHiddenModel(connectionId: string, model: string): boolean {
 // Extra ids are served on top of `models` by the engine, so they are always on.
 // OpenCode's list is the box's live reading of its catalog when there is one, the snapshot this build
 // was cut with otherwise. A custom endpoint's is what it last listed at `/models`, ids as labels.
-function catalogOf(source: BoxConnection): CatalogModel[] {
+function catalogOf(source: BoxConnection, brandName?: string): CatalogModel[] {
     if (source.providerModels) return source.providerModels.map(m => ({ id: m.id, label: m.label }))
     if (source.discoveredModels) return source.discoveredModels.map(m => ({ id: m.id, label: m.id }))
-    return catalogFor(source.provider).models
+    return catalogFor(source.provider, brandName).models
 }
 
-export function offeredModels(source: BoxConnection): CatalogModel[] {
-    const catalog = catalogOf(source)
+export function offeredModels(source: BoxConnection, brandName?: string): CatalogModel[] {
+    const catalog = catalogOf(source, brandName)
     const catalogIds = new Set(catalog.map(m => m.id))
     // A model the connection still offers that the catalog no longer lists (retired between two
     // deploys) has to stay switchable off.
     const orphans = source.models.filter(id => !catalogIds.has(id))
     const extras = source.extraModels.filter(id => !catalogIds.has(id) && !orphans.includes(id))
-    const offered = [...catalog, ...[...orphans, ...extras].map(id => ({ id, label: modelLabel(id), power: modelPower(id) }))]
+    const offered = [...catalog, ...[...orphans, ...extras].map(id => ({ id, label: modelLabel(id, brandName), power: modelPower(id) }))]
     return inTierOrder(source.id, offered.filter(m => !isHiddenModel(source.id, m.id)))
 }
 
@@ -155,13 +167,14 @@ export function isModelEnabled(source: BoxConnection, modelId: string) {
     return source.models.includes(modelId) || source.extraModels.includes(modelId)
 }
 
-export function enabledModels(source: BoxConnection): CatalogModel[] {
-    return offeredModels(source).filter(m => isModelEnabled(source, m.id))
+export function enabledModels(source: BoxConnection, brandName?: string): CatalogModel[] {
+    return offeredModels(source, brandName).filter(m => isModelEnabled(source, m.id))
 }
 
-// Balanced is labelled "Rerun" already; only a tier pinned before the others were hidden needs the prefix.
-export function modelName(connectionId: string, model: string) {
-    return connectionId === RERUN_CONNECTION_ID && canonicalModelId(model) !== RERUN_MODEL ? `Rerun ${modelLabel(model)}` : modelLabel(model)
+// Balanced is labelled with the brand's name already; only a tier pinned before the others were hidden needs the prefix.
+export function modelName(connectionId: string, model: string, brandName: string = RERUN_BRAND.name) {
+    const label = modelLabel(model, brandName)
+    return connectionId === RERUN_CONNECTION_ID && canonicalModelId(model) !== RERUN_MODEL ? `${brandName} ${label}` : label
 }
 
 // A model the subscription's own CLI does not list on this box, so the row is disabled. Undefined when the CLI serves it,

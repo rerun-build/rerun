@@ -14,7 +14,7 @@
         "message": "Dieser Schlüssel gilt für alle Workspaces seiner Anthropic-Organisation. Erstelle in der Anthropic Console einen Schlüssel in einem einzelnen Workspace und verbinde ihn neu."
     },
     "titles": {
-        "budget": "Rerun-Guthaben aufgebraucht",
+        "budget": "{brand}-Guthaben aufgebraucht",
         "unauthorized": "Verbindung abgemeldet",
         "overloaded": "Anbieter überlastet",
         "context_window": "Unterhaltung zu lang",
@@ -25,7 +25,7 @@
         "session_gone": "Unterhaltung nicht verfügbar"
     },
     "messages": {
-        "budget": "Rerun-Guthaben für diesen Zeitraum aufgebraucht. Lade Guthaben auf oder warte auf die monatliche Erneuerung.",
+        "budget": "{brand}-Guthaben für diesen Zeitraum aufgebraucht. Lade Guthaben auf oder warte auf die monatliche Erneuerung.",
         "unauthorized": "Diese Verbindung muss neu angemeldet werden, bevor der Coworker arbeiten kann.",
         "overloaded": "Der Anbieter ist gerade überlastet. Versuch es gleich noch einmal.",
         "context_window": "Diese Unterhaltung passt nicht mehr ins Modell, und ein erneutes Senden stößt an dieselbe Grenze. Wechsle zu einem Modell mit größerem Kontextfenster oder starte eine neue Unterhaltung.",

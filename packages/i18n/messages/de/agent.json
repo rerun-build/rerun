@@ -303,7 +303,7 @@
             "aiProviders": {
                 "label": "Eigene KI-Anbieter sehen",
                 "blurb": "Aktives Modell, Guthaben und Kontingente",
-                "help": "Erlaubt dem Coworker zu sehen, mit welchem KI-Anbieter und welchem Modell er läuft, welche anderen Anbieter mit dem Workspace verbunden sind und was bei jedem übrig ist: das Rerun-Guthaben und die Limits eines Claude-, Codex- oder OpenCode-Abos. Er kann nichts ändern."
+                "help": "Erlaubt dem Coworker zu sehen, mit welchem KI-Anbieter und welchem Modell er läuft, welche anderen Anbieter mit dem Workspace verbunden sind und was bei jedem übrig ist: das {brand}-Guthaben und die Limits eines Claude-, Codex- oder OpenCode-Abos. Er kann nichts ändern."
             },
             "askUser": {
                 "label": "Dir Fragen stellen",
@@ -333,12 +333,12 @@
             "remoteComputers": {
                 "label": "Verknüpfte Computer nutzen",
                 "blurb": "Auf verknüpften PCs arbeiten",
-                "help": "Erlaubt dem Coworker, Befehle auszuführen, Dateien zu lesen und zu schreiben und lange Aufgaben auf den Computern zu starten, die Personen über die Rerun-Desktop-App mit dem Workspace verknüpft haben, benannt mit #. Jeder Befehl und jeder Ordner außerhalb der erlaubten wartet auf das Ja der Person im Chat, es sei denn, der Besitzer des Computers hat es anders festgelegt."
+                "help": "Erlaubt dem Coworker, Befehle auszuführen, Dateien zu lesen und zu schreiben und lange Aufgaben auf den Computern zu starten, die Personen über die {brand}-Desktop-App mit dem Workspace verknüpft haben, benannt mit #. Jeder Befehl und jeder Ordner außerhalb der erlaubten wartet auf das Ja der Person im Chat, es sei denn, der Besitzer des Computers hat es anders festgelegt."
             },
             "paidData": {
                 "label": "Leads-, SEO- & Social-Daten",
-                "blurb": "Bezahlt aus deinem Rerun-Guthaben",
-                "help": "Erlaubt dem Coworker, Interessenten samt geschäftlicher E-Mail-Adressen, Telefonnummern und Firmendaten zu finden, Suchvolumen, Keyword-Ideen und Backlinks zu prüfen, Google-Ergebnisse und lokale Unternehmen zu lesen sowie öffentliche Profile und Beiträge auf LinkedIn, TikTok, Instagram, X, YouTube, Facebook und Reddit zu lesen, ohne Apollo-, Semrush- oder Scraping-Abo. Jeder Aufruf wird aus deinem Rerun-Guthaben bezahlt, und der Coworker bittet dich vorher, geschätzte Kosten freizugeben."
+                "blurb": "Bezahlt aus deinem {brand}-Guthaben",
+                "help": "Erlaubt dem Coworker, Interessenten samt geschäftlicher E-Mail-Adressen, Telefonnummern und Firmendaten zu finden, Suchvolumen, Keyword-Ideen und Backlinks zu prüfen, Google-Ergebnisse und lokale Unternehmen zu lesen sowie öffentliche Profile und Beiträge auf LinkedIn, TikTok, Instagram, X, YouTube, Facebook und Reddit zu lesen, ohne Apollo-, Semrush- oder Scraping-Abo. Jeder Aufruf wird aus deinem {brand}-Guthaben bezahlt, und der Coworker bittet dich vorher, geschätzte Kosten freizugeben."
             },
             "requestSecret": {
                 "label": "Nach Zugangsdaten fragen",
@@ -459,7 +459,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Nur ein Admin oder Manager dieser Box kann das ändern",
-        "creditPaused": "Rerun-Guthaben ist pausiert"
+        "creditPaused": "{brand}-Guthaben ist pausiert"
     },
     "modelSelector": {
         "setUp": "Modell einrichten",

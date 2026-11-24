@@ -1,6 +1,7 @@
 'use client'
 
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { DetailBlock } from '@/components/connections/DetailBlock'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipLabeled } from '@/components/ui/tooltip'
@@ -122,9 +123,10 @@ type ModelBucketsProps = {
 export function ModelBuckets({ connection, defaultModel, onModelsChange }: ModelBucketsProps) {
     const t = useTranslations('connections.models')
     const tConnections = useTranslations('connections')
+    const { name: brandName } = useBrand()
     const [dragging, setDragging] = useState<CatalogModel | null>(null)
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }), useSensor(KeyboardSensor))
-    const offered = offeredModels(connection)
+    const offered = offeredModels(connection, brandName)
     const available = offered.filter(m => isModelEnabled(connection, m.id))
     const hidden = offered.filter(m => !isModelEnabled(connection, m.id))
 

@@ -156,7 +156,7 @@
         "takeover": "Du bist am Bildschirm dran",
         "spend": "Ausgabe freizugeben",
         "computer": "Befehl auf #{computer} freigeben",
-        "feature": "Anfrage an das Rerun-Team zu senden"
+        "feature": "Anfrage an das {brand}-Team zu senden"
     },
     "pendingHitl": {
         "goTo": "{label}, dorthin springen"
@@ -343,7 +343,7 @@
         "detailsLabel": "Bitte beschreibe die Details",
         "negativePlaceholder": "Was war an dieser Antwort unbefriedigend?",
         "positivePlaceholder": "Was war an dieser Antwort gut?",
-        "disclaimer": "Mit dieser Meldung teilst du diese Unterhaltung mit dem Rerun-Team, damit wir deine Coworker verbessern können.",
+        "disclaimer": "Mit dieser Meldung teilst du diese Unterhaltung mit dem {brand}-Team, damit wir deine Coworker verbessern können.",
         "cancel": "Abbrechen",
         "submit": "Senden",
         "categories": {
@@ -398,11 +398,11 @@
         }
     },
     "budget": {
-        "title": "Rerun-Guthaben",
+        "title": "{brand}-Guthaben",
         "paused": {
-            "title": "Rerun-Guthaben pausiert",
-            "body": "Deine Coworker können keine Rerun-Modelle oder kostenpflichtigen Daten nutzen, bis jemand sie wieder aktiviert.",
-            "actionTitle": "Rerun-Guthaben wieder aktivieren",
+            "title": "{brand}-Guthaben pausiert",
+            "body": "Deine Coworker können keine {brand}-Modelle oder kostenpflichtigen Daten nutzen, bis jemand sie wieder aktiviert.",
+            "actionTitle": "{brand}-Guthaben wieder aktivieren",
             "actionDescription": "Die Ausgaben laufen sofort wieder.",
             "cta": "Fortsetzen"
         },
@@ -417,17 +417,17 @@
             "description": "{credits} jeden Monat inklusive."
         },
         "topUp": {
-            "title": "Rerun-Guthaben aufladen",
+            "title": "{brand}-Guthaben aufladen",
             "cta": "Aufladen",
             "description": "Oder warte, es wird nächsten Monat zurückgesetzt."
         },
         "usedUp": {
-            "noCredit": "Dieser Workspace hat noch kein Rerun-Guthaben.",
+            "noCredit": "Dieser Workspace hat noch kein {brand}-Guthaben.",
             "trial": "Du hast die {credits} deiner kostenlosen Testphase aufgebraucht.",
-            "period": "Du hast dein Rerun-Guthaben für diesen Zeitraum aufgebraucht."
+            "period": "Du hast dein {brand}-Guthaben für diesen Zeitraum aufgebraucht."
         },
         "ownConnection": {
-            "body": "Diese Unterhaltung lief über Rerun, und dein {plan}-Abo ist verbunden."
+            "body": "Diese Unterhaltung lief über {brand}, und dein {plan}-Abo ist verbunden."
         },
         "runOn": "Über {plan} ausführen",
         "or": "Oder",
@@ -585,7 +585,7 @@
         },
         "stop": "Stoppen",
         "offlineNote": "Er läuft dort weiter. Der Coworker erfährt mehr, sobald der Computer zurück ist.",
-        "lostNote": "Rerun wurde auf dem Computer geschlossen, während er lief.",
+        "lostNote": "{brand} wurde auf dem Computer geschlossen, während er lief.",
         "goneNote": "Dieser Job kann nicht mehr gelesen werden: Der Computer wurde entfernt oder kennt ihn nicht mehr."
     },
     "jobEnd": {
@@ -606,7 +606,7 @@
         "send": "An das Team senden",
         "titleLabel": "Titel",
         "descriptionLabel": "Beschreibung",
-        "sent": "An das Rerun-Team gesendet: <muted>{title}</muted>",
+        "sent": "An das {brand}-Team gesendet: <muted>{title}</muted>",
         "reviewIt": "Ansehen",
         "sendFailed": "Die Anfrage konnte nicht gesendet werden. Versuch es noch einmal."
     }

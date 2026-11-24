@@ -3,8 +3,10 @@ import { actorFromContext, type AccessLevel } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveRunTarget } from '@/app/api/_services/chat.service'
 import { ApiError } from '@/lib/api-error'
+import { getBrand } from '@/lib/brand/server'
 import { refusal } from '@/lib/i18n/action-error'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
+import { brandConnections } from '@/lib/engine/ai-sources'
 import { connectionGroups } from '@/lib/engine/model-groups'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
@@ -20,12 +22,13 @@ const choiceOf = (connectionId: string | null | undefined, model: string | null 
 // pinned and what it runs today.
 export async function readAgentModels(ctx: WorkspaceContext, agentId: string): Promise<AgentModels> {
     const { conn, engineAgentId } = await targetOf(ctx, agentId, 'use')
+    const brand = await getBrand()
     const [detail, list, t] = await Promise.all([
         engineGetAgent(conn, engineAgentId),
         listConnections(conn),
-        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'connections')),
+        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'connections', brand.name)),
     ])
-    const groups = connectionGroups(list.connections, t)
+    const groups = connectionGroups(brandConnections(list, brand).connections, t, brand.name)
     return {
         groups: groups.map(group => ({
             connectionId: group.connectionId,

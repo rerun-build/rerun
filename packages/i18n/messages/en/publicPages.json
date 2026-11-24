@@ -17,7 +17,7 @@
     },
     "unsubscribe": {
         "title": "Email preferences",
-        "subtitle": "Update which emails Rerun sends you. No account login needed.",
+        "subtitle": "Update which emails {brand} sends you. No account login needed.",
         "subtitleRuns": "Choose whether your coworkers can email you. No account login needed.",
         "invalid": "This unsubscribe link is invalid or has expired.",
         "logIn": "Log in to manage your preferences"
@@ -58,7 +58,7 @@
         },
         "members": {
             "subtitle": "For {workspace} members",
-            "continue": "Continue with Rerun"
+            "continue": "Continue with {brand}"
         }
     },
     "publishedSite": {

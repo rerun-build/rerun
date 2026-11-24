@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, mergeMessages, type Locale } from '@rerun/i18n'
+import { DEFAULT_LOCALE, fillBrand, mergeMessages, type Locale } from '@rerun/i18n'
 
 import enChatErrors from '@rerun/i18n/messages/en/chatErrors.json'
 import enErrors from '@rerun/i18n/messages/en/errors.json'
@@ -137,7 +137,7 @@ import heSubRuns from '@rerun/i18n/messages/he/subRuns.json'
 import heTools from '@rerun/i18n/messages/he/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
-const english = { chatErrors: enChatErrors, errors: enErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
+const english = fillBrand({ chatErrors: enChatErrors, errors: enErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools })
 const french = { chatErrors: frChatErrors, errors: frErrors, mobileAuth: frMobileAuth, mobileCards: frMobileCards, mobileChat: frMobileChat, mobileCommon: frMobileCommon, mobileCoworker: frMobileCoworker, mobileHitl: frMobileHitl, mobileHome: frMobileHome, mobileOnboarding: frMobileOnboarding, mobileProviders: frMobileProviders, mobileSettings: frMobileSettings, mobileSteps: frMobileSteps, subRuns: frSubRuns, tools: frTools }
 const spanish = { chatErrors: esChatErrors, errors: esErrors, mobileAuth: esMobileAuth, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
 const portuguese = { chatErrors: ptChatErrors, errors: ptErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
@@ -158,7 +158,7 @@ export function messagesFor(locale: Locale): MobileMessages {
     if (locale === DEFAULT_LOCALE) return english
     let messages = merged.get(locale)
     if (!messages) {
-        messages = mergeMessages(english, PACKS[locale] as Record<string, never>)
+        messages = fillBrand(mergeMessages(english, PACKS[locale] as Record<string, never>))
         merged.set(locale, messages)
     }
     return messages

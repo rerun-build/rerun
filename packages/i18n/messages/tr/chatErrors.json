@@ -14,7 +14,7 @@
         "message": "Bu anahtar, Anthropic kuruluşunun tüm çalışma alanlarında geçerli. Anthropic Console'da tek bir çalışma alanı içinde anahtar oluşturun, ardından yeniden bağlanın."
     },
     "titles": {
-        "budget": "Rerun kredileri tükendi",
+        "budget": "{brand} kredileri tükendi",
         "unauthorized": "Bağlantının oturumu kapandı",
         "overloaded": "Sağlayıcı aşırı yüklü",
         "context_window": "Konuşma çok uzun",
@@ -25,7 +25,7 @@
         "session_gone": "Konuşma kullanılamıyor"
     },
     "messages": {
-        "budget": "Bu dönemin Rerun kredileri tükendi. Kredi ekleyin veya aylık yenilenmeyi bekleyin.",
+        "budget": "Bu dönemin {brand} kredileri tükendi. Kredi ekleyin veya aylık yenilenmeyi bekleyin.",
         "unauthorized": "Coworker'ın çalışabilmesi için bu bağlantıda yeniden oturum açılması gerekiyor.",
         "overloaded": "Sağlayıcı şu anda aşırı yüklü. Birazdan tekrar deneyin.",
         "context_window": "Bu konuşma artık modele sığmıyor ve yeniden göndermek aynı engele takılacak. Daha geniş bağlam penceresine sahip bir modele geçin veya yeni bir konuşma başlatın.",

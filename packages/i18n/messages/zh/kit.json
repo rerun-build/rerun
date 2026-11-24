@@ -105,7 +105,7 @@
         "region": "Cookie 同意",
         "title": "Cookie",
         "short": "我们使用分析类 Cookie。<policy>Cookie 政策</policy>",
-        "long": "我们使用分析类 Cookie 来了解 Rerun 的使用情况。用于登录、运行客服聊天和记住您偏好的必要 Cookie 始终开启。<policy>Cookie 政策</policy>"
+        "long": "我们使用分析类 Cookie 来了解 {brand} 的使用情况。用于登录、运行客服聊天和记住您偏好的必要 Cookie 始终开启。<policy>Cookie 政策</policy>"
     },
     "experts": {
         "wizard": {

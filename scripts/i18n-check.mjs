@@ -5,6 +5,7 @@
 // the source dropped. No network: the CI runs it, `pnpm i18n:translate` is what fixes what it reports.
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { rerunProblem } from './i18n/brand.mjs'
 import {
     flatten,
     hashOf,
@@ -39,6 +40,8 @@ for (const ns of namespaces(SOURCE_LOCALE)) {
         for (const problem of problemsOf({ key: `${ns}.${key}`, source, translation: source, locale: SOURCE_LOCALE, glossary }).filter(problem => problem.includes('dash'))) warnings.push(`${SOURCE_LOCALE}: ${problem} (kept: English copy is not rewritten by the check)`)
         const lowercased = isPageTitleKey(`${ns}.${key}`) ? headlineCaseProblems(source) : []
         if (lowercased.length) errors.push(`${SOURCE_LOCALE}: ${ns}.${key} is a page title, write it in headline case (${lowercased.join(', ')})`)
+        const namesRerun = rerunProblem(`${ns}.${key}`, source)
+        if (namesRerun) errors.push(`${SOURCE_LOCALE}: ${namesRerun}`)
         const tooLongForSearch = metaLengthProblem(`${ns}.${key}`, source)
         if (tooLongForSearch) errors.push(`${SOURCE_LOCALE}: ${tooLongForSearch}`)
     }
@@ -56,6 +59,8 @@ for (const locale of targetLocales()) {
                 continue
             }
             if (locked[id] !== hashOf(text)) errors.push(`${locale}: ${id} was translated from an older source`)
+            const namesRerun = rerunProblem(id, translated[key])
+            if (namesRerun) errors.push(`${locale}: ${namesRerun}`)
             for (const problem of problemsOf({ key: id, source: text, translation: translated[key], locale, glossary })) errors.push(`${locale}: ${problem}`)
         }
         for (const key of Object.keys(translated)) if (source[key] === undefined) errors.push(`${locale}: ${ns}.${key} is not in the English source anymore`)

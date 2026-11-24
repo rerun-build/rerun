@@ -8,6 +8,7 @@
 import { DEFAULT_PROTOCOL_VERSION } from '@/lib/mcp/hub-rpc'
 import { assertPublicUrl, fetchPublic } from '@/lib/net/public-fetch'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
+import { RERUN_BRAND } from '@rerun/contracts'
 import { createHash, randomBytes } from 'node:crypto'
 
 const trimSlash = (s: string) => s.replace(/\/+$/, '')
@@ -208,10 +209,10 @@ export function clientMetadataDocumentUrl(req: Request): string {
     return `${appOrigin(req)}${OAUTH_COOKIE_PATH}/client-metadata`
 }
 
-export function clientMetadataDocument(req: Request): Record<string, unknown> {
+export function clientMetadataDocument(req: Request, clientName: string = RERUN_BRAND.name): Record<string, unknown> {
     return {
         client_id: clientMetadataDocumentUrl(req),
-        client_name: 'Rerun',
+        client_name: clientName,
         client_uri: appOrigin(req),
         redirect_uris: [callbackUrl(req)],
         grant_types: ['authorization_code', 'refresh_token'],
@@ -221,12 +222,12 @@ export function clientMetadataDocument(req: Request): Record<string, unknown> {
 }
 
 // Dynamic Client Registration (RFC 7591) as a public PKCE client.
-export async function registerClient(registrationEndpoint: string, redirectUri: string): Promise<ClientInfo> {
+export async function registerClient(registrationEndpoint: string, redirectUri: string, clientName: string = RERUN_BRAND.name): Promise<ClientInfo> {
     const res = await fetchPublic(registrationEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
-            client_name: 'Rerun',
+            client_name: clientName,
             redirect_uris: [redirectUri],
             grant_types: ['authorization_code', 'refresh_token'],
             response_types: ['code'],
@@ -265,7 +266,7 @@ function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: 
     return clientId && clientSecret ? { clientId, clientSecret, engineRefreshes: entry.engineRefreshes === true } : null
 }
 
-export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string, req: Request): Promise<ClientInfo | null> {
+export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string, req: Request, clientName?: string): Promise<ClientInfo | null> {
     const preRegistered = preRegisteredClient(mcpUrl)
     if (preRegistered) return { clientId: preRegistered.clientId }
 
@@ -275,7 +276,7 @@ export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string
 
     if (metadata.registrationEndpoint) {
         try {
-            return await registerClient(metadata.registrationEndpoint, callbackUrl(req))
+            return await registerClient(metadata.registrationEndpoint, callbackUrl(req), clientName)
         } catch (err) {
             // Some servers (e.g. Indeed) restrict DCR to loopback redirect URIs and reject our
             // hosted https callback. Fall back to a Client ID Metadata Document when advertised.

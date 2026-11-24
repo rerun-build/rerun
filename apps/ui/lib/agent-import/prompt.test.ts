@@ -26,6 +26,13 @@ describe('buildImportPrompt', () => {
         expect(prompt).toContain(`anything over ${MAX_UPLOAD_MB} MB`)
     })
 
+    it('sends the agent to Rerun, or to the brand the app is shown under', () => {
+        expect(buildImportPrompt('other', URL, null)).toContain('Move yourself to Rerun, a platform')
+        const branded = buildImportPrompt('other', 'https://app.acme.com/api/mcp/account/rk_abc', null, 'Acme')
+        expect(branded).toContain('Move yourself to Acme, a platform')
+        expect(branded).not.toMatch(/rerun/i)
+    })
+
     it('names no Box when there is none to pin', () => {
         expect(buildImportPrompt('openclaw', URL, null)).not.toContain('spaceId')
     })

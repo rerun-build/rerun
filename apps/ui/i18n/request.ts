@@ -1,4 +1,5 @@
 import { requestLocale, requestTimeZone } from '@/lib/i18n/request-locale'
+import { getBrand } from '@/lib/brand/server'
 import { cloudMessages } from '@rerun/cloud/messages'
 import { loadMessages } from '@rerun/i18n/messages'
 import { getRequestConfig } from 'next-intl/server'
@@ -10,7 +11,8 @@ const OTHER_SURFACES = /^(landing|mobile|desktopApp$|emails$|push$)/
 
 export default getRequestConfig(async () => {
     const locale = await requestLocale()
-    const [all, timeZone] = await Promise.all([cloudMessages(locale).then(extra => loadMessages(locale, [extra])), requestTimeZone()])
+    const [extra, brand, timeZone] = await Promise.all([cloudMessages(locale), getBrand(), requestTimeZone()])
+    const all = await loadMessages(locale, [extra], brand.name)
     const messages = Object.fromEntries(Object.entries(all).filter(([namespace]) => !OTHER_SURFACES.test(namespace))) as typeof all
     return { locale, messages, timeZone }
 })

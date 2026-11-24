@@ -1,4 +1,5 @@
 import type englishMessages from '../messages/en/index'
+import { DEFAULT_BRAND_NAME, fillBrand } from './brand'
 import { DEFAULT_LOCALE, PSEUDO_LOCALE, type AppLocale, type Locale } from './locales'
 import { mergeMessages, withoutContext, type MessageTree } from './merge'
 import { pseudoMessages } from './pseudo'
@@ -18,11 +19,12 @@ const PACKS: Record<Locale, () => Promise<{ default: MessageTree }>> = {
 }
 
 // Every key of the English source, with the pack's strings over it and then the extra namespaces
-// (Rerun Cloud's own strings), so a key missing anywhere still reads in English.
-export async function loadMessages(locale: AppLocale, extra: MessageTree[] = []): Promise<Messages> {
+// (Rerun Cloud's own strings), so a key missing anywhere still reads in English. `brandName` is what
+// the product calls itself in them.
+export async function loadMessages(locale: AppLocale, extra: MessageTree[] = [], brandName: string = DEFAULT_BRAND_NAME): Promise<Messages> {
     const english = withoutContext((await PACKS[DEFAULT_LOCALE]()).default) as Messages
-    if (locale === PSEUDO_LOCALE) return pseudoMessages(mergeMessages(english, ...extra))
-    if (locale === DEFAULT_LOCALE) return mergeMessages(english, ...extra)
+    if (locale === PSEUDO_LOCALE) return pseudoMessages(fillBrand(mergeMessages(english, ...extra), brandName))
+    if (locale === DEFAULT_LOCALE) return fillBrand(mergeMessages(english, ...extra), brandName)
     const pack = (await PACKS[locale]()).default
-    return mergeMessages(english, pack, ...extra)
+    return fillBrand(mergeMessages(english, pack, ...extra), brandName)
 }

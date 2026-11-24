@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "Preferências de e-mail",
-        "subtitle": "Escolha quais e-mails o Rerun envia para você. Sem precisar entrar na conta.",
+        "subtitle": "Escolha quais e-mails o {brand} envia para você. Sem precisar entrar na conta.",
         "subtitleRuns": "Escolha se seus coworkers podem enviar e-mails para você. Sem precisar entrar na conta.",
         "invalid": "Este link de cancelamento é inválido ou expirou.",
         "logIn": "Entre para gerenciar suas preferências"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "Para membros de {workspace}",
-            "continue": "Continuar com o Rerun"
+            "continue": "Continuar com o {brand}"
         }
     },
     "publishedSite": {

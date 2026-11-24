@@ -6,6 +6,7 @@ import { animate, motion } from 'motion/react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Icon } from '@/components/ui/icon'
 import type { CompanyFinding, DiscoverySource } from '@/lib/company/explore/findings'
 import {
@@ -36,7 +37,7 @@ export const DISCOVERY_CARD_CLASS = 'relative w-full rounded-xl border border-bo
 
 type DescribedSourceKey = 'website' | 'domain' | 'registry' | 'web'
 
-const SOURCE_LABEL: Record<DiscoverySource, { brand: string } | { key: DescribedSourceKey }> = {
+const SOURCE_LABEL: Record<Exclude<DiscoverySource, 'synthesis'>, { brand: string } | { key: DescribedSourceKey }> = {
     profile: { key: 'website' },
     stack: { key: 'website' },
     site: { key: 'website' },
@@ -47,12 +48,13 @@ const SOURCE_LABEL: Record<DiscoverySource, { brand: string } | { key: Described
     linkedinPerson: { brand: 'LinkedIn' },
     linkedinCompany: { brand: 'LinkedIn' },
     googleBusiness: { brand: 'Google' },
-    synthesis: { brand: 'Rerun' },
 }
 
 export function useDiscoverySourceLabel() {
     const t = useTranslations('builder.discoveries.sources')
+    const brand = useBrand()
     return (source: DiscoverySource) => {
+        if (source === 'synthesis') return brand.name
         const label = SOURCE_LABEL[source]
         return 'brand' in label ? label.brand : t(label.key)
     }

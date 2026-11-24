@@ -14,7 +14,7 @@
         "message": "Cette clé vaut pour tous les workspaces de son organisation Anthropic. Créez une clé dans un seul workspace depuis la console Anthropic, puis connectez cette nouvelle clé."
     },
     "titles": {
-        "budget": "Crédits Rerun épuisés",
+        "budget": "Crédits {brand} épuisés",
         "unauthorized": "Reconnexion nécessaire",
         "overloaded": "Fournisseur surchargé",
         "context_window": "Conversation trop longue",
@@ -25,7 +25,7 @@
         "session_gone": "Conversation indisponible"
     },
     "messages": {
-        "budget": "Crédits Rerun épuisés pour cette période. Ajoutez des crédits ou attendez la remise à zéro mensuelle.",
+        "budget": "Crédits {brand} épuisés pour cette période. Ajoutez des crédits ou attendez la remise à zéro mensuelle.",
         "unauthorized": "Cette connexion doit être reconnectée avant que le coworker puisse travailler.",
         "overloaded": "Le fournisseur est surchargé pour le moment. Réessayez dans un instant.",
         "context_window": "Cette conversation ne tient plus dans le modèle, et la renvoyer se heurtera à la même limite. Passez à un modèle avec une fenêtre de contexte plus grande, ou démarrez une nouvelle conversation.",

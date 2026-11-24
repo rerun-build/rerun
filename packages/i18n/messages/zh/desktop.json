@@ -5,7 +5,7 @@
         "description": "这位同事工作所用的屏幕。您在这里做的操作，它之后都能看到。",
         "takeoverDescription": "您正在同事的浏览器中。它可以继续时，请按“完成”。",
         "takeoverHoldsBrowser": "您同事的浏览器已为此请求打开。",
-        "clipboardDenied": "您的浏览器不允许 Rerun 读取剪贴板。",
+        "clipboardDenied": "您的浏览器不允许 {brand} 读取剪贴板。",
         "disconnectedDescription": "与机器的连接已关闭，上面的内容没有丢失。",
         "reconnect": "重新连接",
         "tryAgain": "重试"

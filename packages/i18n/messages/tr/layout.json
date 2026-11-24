@@ -128,10 +128,10 @@
         "reload": "Yeniden yükle",
         "available": {
             "title": "Yeni sürüm mevcut",
-            "description": "Son Rerun sürümü için yeniden yükleyin."
+            "description": "Son {brand} sürümü için yeniden yükleyin."
         },
         "required": {
-            "title": "Rerun güncellendi",
+            "title": "{brand} güncellendi",
             "description": "Yeni bir sürüm yayında. Devam etmek için yeniden yükleyin."
         }
     },
@@ -213,10 +213,10 @@
     "boxNameSuggestions": "Veya bir ad seçin",
     "dashboard": {
         "metaTitle": "Pano",
-        "metaDescription": "Rerun'da Boxes ve coworker'larınız."
+        "metaDescription": "{brand}'da Boxes ve coworker'larınız."
     },
     "site": {
-        "title": "Rerun | Görevlerinizi yapay zekaya yaptırın, siz uyurken bile",
+        "title": "{brand} | Görevlerinizi yapay zekaya yaptırın, siz uyurken bile",
         "description": "Kütüphaneden çalışmaya hazır bir yapay zeka ajanı seçin veya kendinizinkini oluşturun, araçlarınızı bağlayın; buluttaki size özel makinenizde 7/24 çalışsın. {trialDays} gün ücretsiz deneme."
     }
 }

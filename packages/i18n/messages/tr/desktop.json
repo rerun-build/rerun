@@ -5,7 +5,7 @@
         "description": "Bu coworker'ın çalıştığı ekran. Burada yaptıklarınızı sonradan o da görür.",
         "takeoverDescription": "Coworker'ınızın tarayıcısındasınız. Devam edebileceği zaman Bitti'ye basın.",
         "takeoverHoldsBrowser": "Coworker'ınızın tarayıcısı bu istek için zaten açık.",
-        "clipboardDenied": "Tarayıcınız Rerun'ın panoyu okumasına izin vermedi.",
+        "clipboardDenied": "Tarayıcınız {brand}'ın panoyu okumasına izin vermedi.",
         "disconnectedDescription": "Makineyle bağlantı kapandı. Üzerindeki hiçbir şey kaybolmadı.",
         "reconnect": "Yeniden bağlan",
         "tryAgain": "Tekrar dene"

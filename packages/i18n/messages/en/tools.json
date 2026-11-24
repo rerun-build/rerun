@@ -178,7 +178,7 @@
         "remote_file_read": "Read a file on #{computer}",
         "remote_file_write": "Wrote a file on #{computer}",
         "remote_transfer": "Copied a file with #{computer}",
-        "request_feature": "Drafted a request for the Rerun team"
+        "request_feature": "Drafted a request for the {brand} team"
     },
     "activities": {
         "shell_exec": "Running a command",

@@ -32,7 +32,7 @@ export type AppDefinition = AppInfo & {
     wakePayload(event: string, envelope: LinkupEnvelope, account: WakeAccount, attachments: AttachmentSummary[]): Record<string, unknown>
     // The ids a file of this envelope is downloaded with, besides its own.
     attachmentBase(envelope: LinkupEnvelope): AttachmentRef
-    wakeTrigger: { name: string; description: string; prompt(events: string[]): string }
+    wakeTrigger: { name: string; description(brandName: string): string; prompt(events: string[]): string }
     // What the account is called in the app, and the id that tells one person from another across
     // reconnects: the free trial is claimed on it.
     profile(accountId: string): Promise<{ label: string; memberId: string }>
@@ -59,7 +59,7 @@ const APPS: Record<AppSlug, AppDefinition> = {
         envelopeKind: linkedinEvents.envelopeKind,
         wakePayload: linkedinEvents.wakePayload,
         attachmentBase: linkedinEvents.attachmentBase,
-        wakeTrigger: { name: 'LinkedIn events', description: 'Created by LinkedIn Pro. Fired by Rerun when one of the chosen LinkedIn events happens.', prompt: linkedinEvents.wakeTriggerPrompt },
+        wakeTrigger: { name: 'LinkedIn events', description: brandName => `Created by LinkedIn Pro. Fired by ${brandName} when one of the chosen LinkedIn events happens.`, prompt: linkedinEvents.wakeTriggerPrompt },
         profile: linkedinProfile,
         signInRefusal: linkedinSignInRefusal,
         deleteProviderAccount: deleteAccount,
@@ -78,7 +78,7 @@ const APPS: Record<AppSlug, AppDefinition> = {
         envelopeKind: whatsappEvents.envelopeKind,
         wakePayload: whatsappEvents.wakePayload,
         attachmentBase: whatsappEvents.attachmentBase,
-        wakeTrigger: { name: 'WhatsApp messages', description: 'Created by WhatsApp Pro. Fired by Rerun when a message reaches the WhatsApp number.', prompt: whatsappEvents.wakeTriggerPrompt },
+        wakeTrigger: { name: 'WhatsApp messages', description: brandName => `Created by WhatsApp Pro. Fired by ${brandName} when a message reaches the WhatsApp number.`, prompt: whatsappEvents.wakeTriggerPrompt },
         profile: whatsappProfile,
         signInRefusal: whatsappSignInRefusal,
         sessionClosed: whatsappSessionClosed,

@@ -399,7 +399,7 @@
             "aiProviders": {
                 "label": "See its AI providers",
                 "blurb": "Model in use, credit and quotas",
-                "help": "Lets the coworker check which AI provider and model it runs on, the other providers connected to the workspace, and what is left on each: the Rerun credit and the limits of a Claude, Codex or OpenCode subscription. It cannot change anything."
+                "help": "Lets the coworker check which AI provider and model it runs on, the other providers connected to the workspace, and what is left on each: the {brand} credit and the limits of a Claude, Codex or OpenCode subscription. It cannot change anything."
             },
             "askUser": {
                 "label": "Ask you questions",
@@ -429,12 +429,12 @@
             "remoteComputers": {
                 "label": "Use linked computers",
                 "blurb": "Work on the PCs people linked",
-                "help": "Lets the coworker run commands, read and write files and start long jobs on the computers people linked to the workspace from the Rerun desktop app, named with #. Every command and every folder outside the allowed ones waits for the yes of the person in the chat, unless the computer's owner said otherwise."
+                "help": "Lets the coworker run commands, read and write files and start long jobs on the computers people linked to the workspace from the {brand} desktop app, named with #. Every command and every folder outside the allowed ones waits for the yes of the person in the chat, unless the computer's owner said otherwise."
             },
             "paidData": {
                 "label": "Leads, SEO & social data",
-                "blurb": "Paid from your Rerun credits",
-                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your Rerun credits, and the coworker asks you to approve an estimated cost first."
+                "blurb": "Paid from your {brand} credits",
+                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your {brand} credits, and the coworker asks you to approve an estimated cost first."
             },
             "requestSecret": {
                 "label": "Ask for a credential",
@@ -555,7 +555,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Only an admin or a manager of this Box can change this",
-        "creditPaused": "Rerun credits are paused"
+        "creditPaused": "{brand} credits are paused"
     },
     "modelSelector": {
         "setUp": "Set up a model",

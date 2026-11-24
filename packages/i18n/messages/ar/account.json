@@ -11,7 +11,7 @@
         },
         "language": {
             "label": "اللغة",
-            "description": "اللغة التي يستخدمها Rerun معك."
+            "description": "اللغة التي يستخدمها {brand} معك."
         },
         "desktop": {
             "label": "تطبيق سطح المكتب",
@@ -19,7 +19,7 @@
         },
         "delete": {
             "label": "حذف الحساب",
-            "description": "أغلق حسابك على Rerun نهائيًا."
+            "description": "أغلق حسابك على {brand} نهائيًا."
         }
     },
     "language": {
@@ -50,7 +50,7 @@
         "phone": {
             "title": "الهاتف",
             "empty": "غير مرتبط. أضف رقمًا لتسجيل الدخول برمز عبر WhatsApp أو SMS.",
-            "otherAccount": "هذا الرقم يسجّل الدخول إلى حساب Rerun آخر. غيّره لتسجيل الدخول هنا عبر الهاتف."
+            "otherAccount": "هذا الرقم يسجّل الدخول إلى حساب {brand} آخر. غيّره لتسجيل الدخول هنا عبر الهاتف."
         },
         "change": "تغيير",
         "add": "إضافة",
@@ -62,7 +62,7 @@
         "disconnectTitle": "فصل {provider}؟",
         "disconnectDescription": "لن تتمكن بعد الآن من تسجيل الدخول إلى هذا الحساب عبر {provider}. تبقى طرق تسجيل الدخول الأخرى تعمل.",
         "linkError": {
-            "identityTaken": "حساب {provider} هذا يسجّل الدخول بالفعل إلى حساب Rerun آخر.",
+            "identityTaken": "حساب {provider} هذا يسجّل الدخول بالفعل إلى حساب {brand} آخر.",
             "denied": "لم يتم ربط {provider}.",
             "failed": "تعذّر ربط {provider}. حاول مرة أخرى."
         }

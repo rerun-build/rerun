@@ -128,10 +128,10 @@
         "reload": "לרענן",
         "available": {
             "title": "גרסה חדשה זמינה",
-            "description": "יש לרענן כדי לקבל את הגרסה האחרונה של Rerun."
+            "description": "יש לרענן כדי לקבל את הגרסה האחרונה של {brand}."
         },
         "required": {
-            "title": "Rerun עודכן",
+            "title": "{brand} עודכן",
             "description": "גרסה חדשה עלתה לאוויר. יש לרענן כדי להמשיך."
         }
     },
@@ -213,10 +213,10 @@
     "boxNameSuggestions": "או לבחור שם",
     "dashboard": {
         "metaTitle": "לוח בקרה",
-        "metaDescription": "ה-Boxes והעמיתים שלך ב-Rerun."
+        "metaDescription": "ה-Boxes והעמיתים שלך ב-{brand}."
     },
     "site": {
-        "title": "Rerun | משימות שה-AI מבצע בשבילך, גם כשאתה ישן",
+        "title": "{brand} | משימות שה-AI מבצע בשבילך, גם כשאתה ישן",
         "description": "לבחור סוכן AI מוכן מהספרייה או לבנות אחד משלך, לחבר את הכלים שלך, והוא פועל 24/7 על מכונה פרטית משלך בענן. ניסיון חינם ל-{trialDays} ימים."
     }
 }

@@ -254,6 +254,12 @@ describe('clientMetadataDocument', () => {
         expect(doc.redirect_uris).toEqual(['https://app.rerun.build/api/mcp/oauth/callback'])
         expect(doc.token_endpoint_auth_method).toBe('none')
     })
+
+    it('names the product Rerun, or the brand the app is shown under', () => {
+        const request = new Request('http://x/', { headers: { host: 'app.rerun.build' } })
+        expect(clientMetadataDocument(request).client_name).toBe('Rerun')
+        expect(clientMetadataDocument(request, 'Acme').client_name).toBe('Acme')
+    })
 })
 
 const CTX: OAuthContext = {

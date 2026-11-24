@@ -1,6 +1,7 @@
 import { internalPath } from '@/lib/auth/internal-path'
 import 'server-only'
 import type { Database } from '@/app/api/database.types'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { isPublishedAccess, type PublishedAccess } from '@/lib/published/access'
 import { mintAccessCookie, openAccessCookie, type AccessClaims, type AccessGrant } from '@/lib/published/access-ticket'
 import { publishedSiteOrigin } from '@/lib/published/host'
@@ -40,7 +41,7 @@ export type WorkspaceBrand = { name: string; iconUrl: string | null }
 
 export async function loadWorkspaceBrand(workspaceId: number): Promise<WorkspaceBrand> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['name', 'icon_url'] as const, { id: workspaceId })
-    return { name: data?.name ?? 'Rerun', iconUrl: data?.icon_url ?? null }
+    return { name: data?.name ?? (await workspaceBrand(workspaceId)).name, iconUrl: data?.icon_url ?? null }
 }
 
 export function isHtmlContentType(contentType: string): boolean {

@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
-        "rerunTeam": "Rerun-Team",
+        "rerunTeam": "{brand}-Team",
         "verified": "Verifizierter Creator"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "Empfohlen",
             "featuredSubtitle": "Handverlesene Setups, die einen ersten Blick wert sind.",
             "justAdded": "Neu hinzugefügt",
-            "justAddedSubtitle": "Die neuesten auf Rerun veröffentlichten Vorlagen."
+            "justAddedSubtitle": "Die neuesten auf {brand} veröffentlichten Vorlagen."
         },
         "empty": {
             "filtered": "Keine Vorlage passt zu diesen Filtern",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "Dein kostenloser Test ist schon genutzt. Heute abgerechnet; diese Vorlage wird separat abgerechnet.",
         "resubscribe": "Für {price}/Monat erneut abonnieren",
         "lapsed": "Dein Abo ist beendet. Die Coworker, die diese Vorlage installiert hat, sind deaktiviert.",
-        "billedTo": "Abgerechnet an {workspace}. Dein Rerun-Tarif ist bereits aktiv.",
+        "billedTo": "Abgerechnet an {workspace}. Dein {brand}-Tarif ist bereits aktiv.",
         "yours": "Deine Vorlage, kostenlos."
     },
     "boardAlt": "Coworker-Board von {title}"

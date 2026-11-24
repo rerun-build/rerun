@@ -3,7 +3,10 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { isClaudePlanOffered } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { getBrand } from '@/lib/brand/server'
 import {
+    brandConnection,
+    brandConnections,
     KEY_PROVIDERS,
     keyProviders,
     planProviders,
@@ -102,7 +105,8 @@ async function renameAliasedModels(conn: EngineConnection, list: BoxConnectionsL
 
 export async function listAiConnections(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<BoxConnectionsList> {
     const conn = await getWorkspaceConnection(workspaceId)
-    return renameAliasedModels(conn, await engineListConnections(conn, {}, { fresh }))
+    const [brand, list] = await Promise.all([getBrand(), engineListConnections(conn, {}, { fresh })])
+    return brandConnections(await renameAliasedModels(conn, list), brand)
 }
 
 export async function setWorkspaceDefaultModel(workspaceId: number, pick: BoxDefault | null): Promise<void> {
@@ -198,7 +202,7 @@ export async function probeCustomEndpoint(workspaceId: number, input: CustomProb
 
 export async function updateAiConnection(workspaceId: number, id: string, patch: UpdateBoxConnectionInput): Promise<BoxConnection> {
     await assertPublicBaseUrl(patch.baseUrl)
-    return enginePatchConnection(await getWorkspaceConnection(workspaceId), id, patch)
+    return brandConnection(await enginePatchConnection(await getWorkspaceConnection(workspaceId), id, patch), await getBrand())
 }
 
 export async function updateAiConnectionKeys(workspaceId: number, id: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<void> {
@@ -280,7 +284,7 @@ async function takenNames(workspaceId: number): Promise<string[]> {
     return (await engineListConnections(engine.conn)).connections.map(connection => connection.name)
 }
 
-function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, t: SourceCopy, locale: string): AiConnectionView {
+function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, t: SourceCopy, locale: string, brandName: string): AiConnectionView {
     const status = !source.connected || source.credentialRejected ? 'reconnect' : isCreditExhausted(source, credit) ? 'credit_used_up' : 'connected'
     return {
         id: source.id,
@@ -291,7 +295,7 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
         credentialOnFile: source.connected,
         summary: sourceSummary(source, credit, t, locale),
         isDefault: effectiveDefault(list.default).connectionId === source.id,
-        models: offeredModels(source).map(model => ({
+        models: offeredModels(source, brandName).map(model => ({
             id: model.id,
             label: model.label,
             description: modelDescription(source, model.id, t),
@@ -309,15 +313,16 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
 // windows, credit) applied here, since the app has none of them.
 export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiConnectionsView> {
     const engine = await findWorkspaceEngine(ctx.workspace.id)
-    const list = engine ? await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)) : { connections: [], default: null, backups: NO_BOX_BACKUPS }
+    const brand = await getBrand()
+    const list = engine ? brandConnections(await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)), brand) : { connections: [], default: null, backups: NO_BOX_BACKUPS }
     const credit = rerunCreditOf(ctx.workspace)
     const pick = effectiveDefault(list.default)
     const taken = list.connections.map(connection => connection.name)
     const locale = await recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id)
-    const t = await translatorFor(locale, 'connections')
+    const t = await translatorFor(locale, 'connections', brand.name)
     return {
-        connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, t, locale)),
-        default: { ...pick, label: modelName(pick.connectionId, pick.model) },
+        connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, t, locale, brand.name)),
+        default: { ...pick, label: modelName(pick.connectionId, pick.model, brand.name) },
         credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit, t, locale) },
         addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: isClaudePlanOffered(ctx.workspace) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
             provider,

@@ -171,7 +171,7 @@
         "remote_file_read": "قرأ ملفًا على #{computer}",
         "remote_file_write": "كتب ملفًا على #{computer}",
         "remote_transfer": "نسخ ملفًا مع #{computer}",
-        "request_feature": "صاغ طلبًا لفريق Rerun"
+        "request_feature": "صاغ طلبًا لفريق {brand}"
     },
     "activities": {
         "shell_exec": "ينفّذ أمرًا",

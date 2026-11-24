@@ -35,7 +35,7 @@
         "message": "This key works across every workspace of its Anthropic organization. Create a key inside one workspace in the Anthropic Console, then reconnect."
     },
     "titles": {
-        "budget": "Rerun credits used up",
+        "budget": "{brand} credits used up",
         "unauthorized": "Connection signed out",
         "overloaded": "Provider overloaded",
         "context_window": "Conversation too long",
@@ -46,7 +46,7 @@
         "session_gone": "Conversation unavailable"
     },
     "messages": {
-        "budget": "Rerun credits used up for this period. Add credits or wait for the monthly reset.",
+        "budget": "{brand} credits used up for this period. Add credits or wait for the monthly reset.",
         "unauthorized": "This connection needs to be signed in again before the coworker can run.",
         "overloaded": "The provider is overloaded right now. Try again in a moment.",
         "context_window": "This conversation no longer fits the model, and sending it again will hit the same wall. Switch to a model with a larger context window, or start a new conversation.",

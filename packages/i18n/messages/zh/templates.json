@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, other {# 个模板}}",
-        "rerunTeam": "Rerun 团队",
+        "rerunTeam": "{brand} 团队",
         "verified": "认证创作者"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "精选",
             "featuredSubtitle": "精心挑选、值得优先一看的配置。",
             "justAdded": "最新上架",
-            "justAddedSubtitle": "Rerun 上最新发布的模板。"
+            "justAddedSubtitle": "{brand} 上最新发布的模板。"
         },
         "empty": {
             "filtered": "没有符合这些筛选条件的模板",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "您的免费试用已用完。今天开始计费；此模板单独计费。",
         "resubscribe": "以 {price}/月重新订阅",
         "lapsed": "您的订阅已结束。此模板安装的同事已被停用。",
-        "billedTo": "由 {workspace} 支付。您的 Rerun 套餐已生效。",
+        "billedTo": "由 {workspace} 支付。您的 {brand} 套餐已生效。",
         "yours": "您自己的模板，免费。"
     },
     "boardAlt": "{title} 的同事看板"

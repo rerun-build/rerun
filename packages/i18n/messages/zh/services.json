@@ -86,7 +86,7 @@
         "configured": "{name} 已配置",
         "connectTitle": "连接 {name}",
         "signInOAuth": "登录 {name}，以便您的代理可以使用它。",
-        "signInManaged": "使用 {name} 登录，以便您的代理可以使用它。Rerun 会为您处理连接。",
+        "signInManaged": "使用 {name} 登录，以便您的代理可以使用它。{brand} 会为您处理连接。",
         "setUp": "设置 {name}",
         "authentication": "身份验证",
         "backToMethods": "返回方式列表",

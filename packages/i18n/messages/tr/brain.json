@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "Brain henüz bu Box'ta yok",
-        "description": "Box'ınız, Brain'den önceki bir Rerun sürümünü çalıştırıyor. Box güncellendiğinde burada görünür."
+        "description": "Box'ınız, Brain'den önceki bir {brand} sürümünü çalıştırıyor. Box güncellendiğinde burada görünür."
     },
     "crumbs": {
         "brain": "Brain",
@@ -198,14 +198,14 @@
         "unreachableFallback": "Bu çalışma alanının makinesine ulaşılamadı.",
         "deleteFailed": "Sayfa silinemedi",
         "noMachineTitle": "Brain'iniz ilk coworker'ınızla gelir",
-        "noMachineDescription": "Çalışma alanınızın makinesinde yaşar; bu makine, Rerun ilk coworker'ınızı oluşturduğunda kurulur. O andan itibaren her coworker'ın şirketiniz hakkında bildikleri ve paylaştıkları dosyalar ile tablolar burada görünür.",
+        "noMachineDescription": "Çalışma alanınızın makinesinde yaşar; bu makine, {brand} ilk coworker'ınızı oluşturduğunda kurulur. O andan itibaren her coworker'ın şirketiniz hakkında bildikleri ve paylaştıkları dosyalar ile tablolar burada görünür.",
         "unreachableTitle": "Çalışma alanınıza ulaşılamadı",
         "unreachableDescription": "Bu çalışma alanının makinesi yanıt vermedi. Hâlâ uyanıyor olabilir.",
         "retry": "Tekrar dene",
-        "seedingTitle": "Rerun web sitenizi okuyor",
+        "seedingTitle": "{brand} web sitenizi okuyor",
         "emptyTitle": "Şirketinizin Brain'i boş",
         "seedingDescription": "Şirketinizin kimlik kartı birkaç dakika içinde burada görünür: ne sattığınız, kime sattığınız, ekibiniz, ses tonunuz ve araçlarınız.",
-        "emptyDescription": "Her coworker'ın çalışmaya başlamadan önce şirketiniz hakkında okuduğu şey budur: ne sattığınız, kime sattığınız, ekibiniz, ses tonunuz ve araçlarınız. Rerun bunu web sitenizden doldurabilir.",
+        "emptyDescription": "Her coworker'ın çalışmaya başlamadan önce şirketiniz hakkında okuduğu şey budur: ne sattığınız, kime sattığınız, ekibiniz, ses tonunuz ve araçlarınız. {brand} bunu web sitenizden doldurabilir.",
         "refresh": "Yenile",
         "writeYourself": "Bir sayfayı kendiniz yazın",
         "missingPageTitle": "Henüz \"{slug}\" adlı bir sayfa yok",
@@ -240,7 +240,7 @@
         "googleBusiness": "Google İşletme Profili"
     },
     "authors": {
-        "seed": "Rerun, web sitenizden",
+        "seed": "{brand}, web sitenizden",
         "foreman": "Chief of Staff"
     },
     "filing": {

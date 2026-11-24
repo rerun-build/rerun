@@ -14,7 +14,7 @@
         "message": "Esta clave vale para todos los workspaces de su organización de Anthropic. Crea una clave dentro de un solo workspace en la consola de Anthropic y vuelve a conectarla."
     },
     "titles": {
-        "budget": "Créditos de Rerun agotados",
+        "budget": "Créditos de {brand} agotados",
         "unauthorized": "Hay que volver a conectar",
         "overloaded": "Proveedor saturado",
         "context_window": "Conversación demasiado larga",
@@ -25,7 +25,7 @@
         "session_gone": "Conversación no disponible"
     },
     "messages": {
-        "budget": "Créditos de Rerun agotados en este periodo. Añade créditos o espera al reinicio mensual.",
+        "budget": "Créditos de {brand} agotados en este periodo. Añade créditos o espera al reinicio mensual.",
         "unauthorized": "Vuelve a conectar esta conexión antes de que el coworker pueda trabajar.",
         "overloaded": "El proveedor está saturado ahora mismo. Inténtalo de nuevo en un momento.",
         "context_window": "Esta conversación ya no cabe en el modelo, y volver a enviarla chocará con el mismo límite. Cambia a un modelo con una ventana de contexto más grande, o empieza una conversación nueva.",

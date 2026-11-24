@@ -156,7 +156,7 @@
         "takeover": "轮到您操作屏幕",
         "spend": "有支出待审批",
         "computer": "审批在 #{computer} 上运行的命令",
-        "feature": "有请求待发送给 Rerun 团队"
+        "feature": "有请求待发送给 {brand} 团队"
     },
     "pendingHitl": {
         "goTo": "{label}，前往查看"
@@ -343,7 +343,7 @@
         "detailsLabel": "请提供详细信息",
         "negativePlaceholder": "这个回答有哪些不满意的地方？",
         "positivePlaceholder": "这个回答有哪些满意的地方？",
-        "disclaimer": "提交此报告会将此对话分享给 Rerun 团队，以便我们改进您的同事。",
+        "disclaimer": "提交此报告会将此对话分享给 {brand} 团队，以便我们改进您的同事。",
         "cancel": "取消",
         "submit": "提交",
         "categories": {
@@ -398,11 +398,11 @@
         }
     },
     "budget": {
-        "title": "Rerun 积分",
+        "title": "{brand} 积分",
         "paused": {
-            "title": "Rerun 积分已暂停",
-            "body": "在有人恢复之前，您的同事无法使用 Rerun 模型或付费数据。",
-            "actionTitle": "恢复 Rerun 积分",
+            "title": "{brand} 积分已暂停",
+            "body": "在有人恢复之前，您的同事无法使用 {brand} 模型或付费数据。",
+            "actionTitle": "恢复 {brand} 积分",
             "actionDescription": "支出将立即恢复。",
             "cta": "恢复"
         },
@@ -417,17 +417,17 @@
             "description": "每月包含 {credits}。"
         },
         "topUp": {
-            "title": "充值 Rerun 积分",
+            "title": "充值 {brand} 积分",
             "cta": "充值",
             "description": "或者等待，下月会重置。"
         },
         "usedUp": {
-            "noCredit": "此工作区还没有 Rerun 积分。",
+            "noCredit": "此工作区还没有 {brand} 积分。",
             "trial": "您已用完免费试用的 {credits}。",
-            "period": "您已用完本周期的 Rerun 积分。"
+            "period": "您已用完本周期的 {brand} 积分。"
         },
         "ownConnection": {
-            "body": "此对话在 Rerun 上运行，而您的 {plan} 方案已连接。"
+            "body": "此对话在 {brand} 上运行，而您的 {plan} 方案已连接。"
         },
         "runOn": "在 {plan} 上运行",
         "or": "或",
@@ -585,7 +585,7 @@
         },
         "stop": "停止",
         "offlineNote": "它会在那台电脑上继续运行。电脑恢复在线后，同事会收到结果。",
-        "lostNote": "运行期间电脑上的 Rerun 被关闭了。",
+        "lostNote": "运行期间电脑上的 {brand} 被关闭了。",
         "goneNote": "无法再读取此任务：电脑已被移除，或它已不再记得此任务。"
     },
     "jobEnd": {
@@ -606,7 +606,7 @@
         "send": "发送给团队",
         "titleLabel": "标题",
         "descriptionLabel": "描述",
-        "sent": "已发送给 Rerun 团队：<muted>{title}</muted>",
+        "sent": "已发送给 {brand} 团队：<muted>{title}</muted>",
         "reviewIt": "审核一下",
         "sendFailed": "请求无法发送，请重试。"
     }

@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# şablon} other {# şablon}}",
-        "rerunTeam": "Rerun ekibi",
+        "rerunTeam": "{brand} ekibi",
         "verified": "Doğrulanmış creator"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "Öne çıkanlar",
             "featuredSubtitle": "Önce göz atmaya değer, özenle seçilmiş kurulumlar.",
             "justAdded": "Yeni eklenenler",
-            "justAddedSubtitle": "Rerun'da yayınlanan en yeni şablonlar."
+            "justAddedSubtitle": "{brand}'da yayınlanan en yeni şablonlar."
         },
         "empty": {
             "filtered": "Bu filtrelerle eşleşen şablon yok",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "Ücretsiz denemenizi kullandınız. Bugün faturalandırılır; bu şablon ayrı faturalandırılır.",
         "resubscribe": "{price}/ay yeniden abone ol",
         "lapsed": "Aboneliğiniz sona erdi. Bu şablonun kurduğu coworker'lar devre dışı.",
-        "billedTo": "Fatura: {workspace}. Rerun planınız zaten etkin.",
+        "billedTo": "Fatura: {workspace}. {brand} planınız zaten etkin.",
         "yours": "Sizin şablonunuz, ücret yok."
     },
     "boardAlt": "{title} coworker panosu"

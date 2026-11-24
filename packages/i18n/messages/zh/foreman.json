@@ -27,7 +27,7 @@
     },
     "resize": "调整聊天大小",
     "modelPill": {
-        "hubReason": "此聊天始终使用 Rerun Balanced 运行"
+        "hubReason": "此聊天始终使用 {brand} Balanced 运行"
     },
     "nextSteps": {
         "turnOn": "启动我的同事",
@@ -141,12 +141,12 @@
     },
     "contact": {
         "defaultSummary": "我在设置第一个同事时卡住了，需要帮助。",
-        "sentWithEmail": "已发送给 Rerun 团队。他们会在聊天中以及通过 {email} 回复您。",
-        "sent": "已发送给 Rerun 团队。他们会在聊天中回复您。",
+        "sentWithEmail": "已发送给 {brand} 团队。他们会在聊天中以及通过 {email} 回复您。",
+        "sent": "已发送给 {brand} 团队。他们会在聊天中回复您。",
         "openChat": "打开聊天",
         "stillStuck": "还是卡住了？团队成员可以帮您。",
         "send": "发送给团队",
-        "title": "联系 Rerun 的工作人员",
+        "title": "联系 {brand} 的工作人员",
         "description": "此消息会连同您的账号信息发送给团队，他们会在聊天中回复您。",
         "notNow": "暂不"
     },
@@ -304,8 +304,8 @@
         "owned": "{title} 已归您所有",
         "recurring": "按月计费",
         "oneTime": "一次性购买",
-        "billedTo": "向 {name} 计费，独立于您的 Rerun 套餐。付款成功后立即安装。",
-        "billedToWorkspace": "向您的工作区计费，独立于您的 Rerun 套餐。付款成功后立即安装。",
+        "billedTo": "向 {name} 计费，独立于您的 {brand} 套餐。付款成功后立即安装。",
+        "billedToWorkspace": "向您的工作区计费，独立于您的 {brand} 套餐。付款成功后立即安装。",
         "dueToday": "今日应付",
         "perMonth": "/月",
         "opening": "正在打开…",
@@ -330,7 +330,7 @@
         "guide": {
             "title": "这是怎么运作的？",
             "description": "两分钟了解同事、Boxes 和例行任务",
-            "send": "Rerun 是怎么运作的？"
+            "send": "{brand} 是怎么运作的？"
         },
         "checkWorking": {
             "title": "{name} 在做什么？",

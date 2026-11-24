@@ -27,7 +27,7 @@
     },
     "resize": "Sohbeti boyutlandır",
     "modelPill": {
-        "hubReason": "Bu sohbet her zaman Rerun Balanced ile çalışır"
+        "hubReason": "Bu sohbet her zaman {brand} Balanced ile çalışır"
     },
     "nextSteps": {
         "turnOn": "Coworker'ımı aç",
@@ -141,12 +141,12 @@
     },
     "contact": {
         "defaultSummary": "İlk coworker'ımı kurarken takıldım ve yardıma ihtiyacım var.",
-        "sentWithEmail": "Rerun ekibine gönderildi. Sohbette ve şu adreste yanıt verirler: {email}.",
-        "sent": "Rerun ekibine gönderildi. Sohbette yanıt verirler.",
+        "sentWithEmail": "{brand} ekibine gönderildi. Sohbette ve şu adreste yanıt verirler: {email}.",
+        "sent": "{brand} ekibine gönderildi. Sohbette yanıt verirler.",
         "openChat": "Sohbeti aç",
         "stillStuck": "Hâlâ takıldınız mı? Ekipten biri yardımcı olabilir.",
         "send": "Ekibe gönder",
-        "title": "Rerun'dan biriyle konuşun",
+        "title": "{brand}'dan biriyle konuşun",
         "description": "Bu mesaj hesap bilgilerinizle birlikte ekibe gider ve size sohbette yanıt verirler.",
         "notNow": "Şimdi değil"
     },
@@ -304,8 +304,8 @@
         "owned": "{title} artık sizin",
         "recurring": "Aylık faturalandırılır",
         "oneTime": "Tek seferlik satın alma",
-        "billedTo": "Rerun planınızdan ayrı olarak faturalandırılır: {name}. Ödeme geçtiği anda kurulur.",
-        "billedToWorkspace": "Rerun planınızdan ayrı olarak çalışma alanınıza faturalandırılır. Ödeme geçtiği anda kurulur.",
+        "billedTo": "{brand} planınızdan ayrı olarak faturalandırılır: {name}. Ödeme geçtiği anda kurulur.",
+        "billedToWorkspace": "{brand} planınızdan ayrı olarak çalışma alanınıza faturalandırılır. Ödeme geçtiği anda kurulur.",
         "dueToday": "Bugün ödenecek",
         "perMonth": "/ay",
         "opening": "Açılıyor…",
@@ -330,7 +330,7 @@
         "guide": {
             "title": "Bu nasıl çalışıyor?",
             "description": "İki dakikada coworker'lar, Boxes, rutinler",
-            "send": "Rerun nasıl çalışıyor?"
+            "send": "{brand} nasıl çalışıyor?"
         },
         "checkWorking": {
             "title": "{name} ne yapıyor?",

@@ -11,7 +11,7 @@
         },
         "language": {
             "label": "语言",
-            "description": "Rerun 与您交流时使用的语言。"
+            "description": "{brand} 与您交流时使用的语言。"
         },
         "desktop": {
             "label": "桌面应用",
@@ -19,7 +19,7 @@
         },
         "delete": {
             "label": "删除账号",
-            "description": "永久关闭您的 Rerun 账号。"
+            "description": "永久关闭您的 {brand} 账号。"
         }
     },
     "language": {
@@ -50,7 +50,7 @@
         "phone": {
             "title": "手机",
             "empty": "未连接。添加号码后，可通过 WhatsApp 或短信验证码登录。",
-            "otherAccount": "此号码已用于登录另一个 Rerun 账号。更换号码后即可在此通过手机登录。"
+            "otherAccount": "此号码已用于登录另一个 {brand} 账号。更换号码后即可在此通过手机登录。"
         },
         "change": "更改",
         "add": "添加",
@@ -62,7 +62,7 @@
         "disconnectTitle": "断开 {provider}？",
         "disconnectDescription": "您将无法再使用 {provider} 登录此账号。您的其他登录方式仍可正常使用。",
         "linkError": {
-            "identityTaken": "此 {provider} 账号已用于登录另一个 Rerun 账号。",
+            "identityTaken": "此 {provider} 账号已用于登录另一个 {brand} 账号。",
             "denied": "未连接 {provider}。",
             "failed": "无法连接 {provider}，请重试。"
         }

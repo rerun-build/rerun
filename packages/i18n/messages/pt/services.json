@@ -86,7 +86,7 @@
         "configured": "{name} configurado",
         "connectTitle": "Conectar {name}",
         "signInOAuth": "Entre em {name} para que seu agente possa usá-lo.",
-        "signInManaged": "Entre com {name} para que seu agente possa usá-lo. O Rerun cuida da conexão para você.",
+        "signInManaged": "Entre com {name} para que seu agente possa usá-lo. O {brand} cuida da conexão para você.",
         "setUp": "Configurar {name}",
         "authentication": "Autenticação",
         "backToMethods": "Voltar aos métodos",

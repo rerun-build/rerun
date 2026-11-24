@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# modèle} other {# modèles}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Les crédits Rerun sont en pause",
+        "creditPaused": "Les crédits {brand} sont en pause",
         "creditUsed": "{percent} % des crédits du mois utilisés",
         "creditUsedUpOn": "Crédits du mois épuisés, de retour le {date}",
         "creditUsedUpNextMonth": "Crédits du mois épuisés, de retour le mois prochain",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "Obtenir votre clé Anthropic",
                 "step1": "Ouvrez la [console Anthropic](https://console.anthropic.com/settings/keys) et connectez-vous.",
-                "step2": "Cliquez sur **Create Key** et nommez-la, par exemple « Rerun ».",
+                "step2": "Cliquez sur **Create Key** et nommez-la, par exemple « {brand} ».",
                 "step3": "Copiez la clé (elle commence par `sk-ant-`) et collez-la ci-dessus. Elle n'est affichée qu'une fois."
             },
             "openai": {
                 "title": "Obtenir votre clé OpenAI",
                 "step1": "Ouvrez [OpenAI API keys](https://platform.openai.com/api-keys) et connectez-vous.",
-                "step2": "Cliquez sur **Create new secret key** et nommez-la, par exemple « Rerun ».",
+                "step2": "Cliquez sur **Create new secret key** et nommez-la, par exemple « {brand} ».",
                 "step3": "Copiez la clé (elle commence par `sk-`) et collez-la ci-dessus. Elle n'est affichée qu'une fois."
             },
             "google": {
@@ -180,7 +180,7 @@
             "automations": "{count, plural, one {# automatisation passera} other {# automatisations passeront}} sur le modèle par défaut du workspace.",
             "both": "{agents} et {count, plural, one {# automatisation} other {# automatisations}} passeront sur le modèle par défaut du workspace."
         },
-        "holdsDefault": "Elle porte le modèle par défaut du workspace, qui est retiré : chaque coworker sans modèle choisi revient sur Rerun.",
+        "holdsDefault": "Elle porte le modèle par défaut du workspace, qui est retiré : chaque coworker sans modèle choisi revient sur {brand}.",
         "nothingRuns": "L’identifiant est retiré de la Box. Rien ne l’utilise.",
         "released": {
             "agents": "{agents} utilisent désormais le modèle par défaut du workspace.",
@@ -231,9 +231,9 @@
         "signedInAgain": "Reconnecté",
         "creditsTitle": "Crédits du mois",
         "topUp": "Recharger",
-        "creditsUsedUpOn": "Les coworkers qui tournent sur Rerun sont en pause jusqu’au retour des crédits le {date}. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
-        "creditsUsedUpNextMonth": "Les coworkers qui tournent sur Rerun sont en pause jusqu’au retour des crédits le mois prochain. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
-        "creditsIncluded": "Inclus dans votre forfait Rerun. Pas de clé, rien à configurer.",
+        "creditsUsedUpOn": "Les coworkers qui tournent sur {brand} sont en pause jusqu’au retour des crédits le {date}. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
+        "creditsUsedUpNextMonth": "Les coworkers qui tournent sur {brand} sont en pause jusqu’au retour des crédits le mois prochain. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
+        "creditsIncluded": "Inclus dans votre forfait {brand}. Pas de clé, rien à configurer.",
         "signInRejected": "Cette connexion a été refusée. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous vous reconnectiez.",
         "signInExpired": "Cette connexion a expiré. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous vous reconnectiez.",
         "reconnected": "Vos coworkers redémarrent",
@@ -260,12 +260,12 @@
         },
         "default": {
             "via": "Via {source}. Les coworkers sans modèle propre l’utilisent.",
-            "pausedPick": "Les crédits Rerun sont en pause, donc les coworkers sans modèle propre le sont aussi. Choisissez un autre modèle pour les relancer.",
-            "pausedAdd": "Les crédits Rerun sont en pause, donc les coworkers sans modèle propre le sont aussi. Ajoutez un forfait ou une clé API pour les relancer.",
-            "usedUpOnPick": "Les crédits Rerun sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
-            "usedUpOnAdd": "Les crédits Rerun sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
-            "usedUpNextMonthPick": "Les crédits Rerun sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
-            "usedUpNextMonthAdd": "Les crédits Rerun sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
+            "pausedPick": "Les crédits {brand} sont en pause, donc les coworkers sans modèle propre le sont aussi. Choisissez un autre modèle pour les relancer.",
+            "pausedAdd": "Les crédits {brand} sont en pause, donc les coworkers sans modèle propre le sont aussi. Ajoutez un forfait ou une clé API pour les relancer.",
+            "usedUpOnPick": "Les crédits {brand} sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
+            "usedUpOnAdd": "Les crédits {brand} sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
+            "usedUpNextMonthPick": "Les crédits {brand} sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
+            "usedUpNextMonthAdd": "Les crédits {brand} sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
             "stopped": "Les coworkers sans modèle propre sont arrêtés. Réparez {source} ou choisissez un autre modèle.",
             "noOtherModel": "Aucun autre modèle n’est prêt. Ajoutez d’abord un forfait ou une clé API.",
             "change": "Changer"
@@ -280,7 +280,7 @@
             "full": "Jusqu’à {max} secours",
             "noneLeft": "Aucun autre modèle n’est prêt. Ajoutez d’abord un forfait ou une clé API.",
             "credit": {
-                "title": "Crédit Rerun en dernier recours",
+                "title": "Crédit {brand} en dernier recours",
                 "description": "Seulement quand tous les forfaits sont épuisés"
             }
         },
@@ -324,7 +324,7 @@
         },
         "copied": "Copié",
         "copyMessage": "Copier un message pour l’admin",
-        "adminMessage": "Bonjour ! Pourriez-vous activer « Autorisation par code d’appareil pour Codex » dans les paramètres de notre workspace ChatGPT ? J’en ai besoin pour connecter mon forfait ChatGPT à Rerun."
+        "adminMessage": "Bonjour ! Pourriez-vous activer « Autorisation par code d’appareil pour Codex » dans les paramètres de notre workspace ChatGPT ? J’en ai besoin pour connecter mon forfait ChatGPT à {brand}."
     },
     "claude": {
         "remarks": {
@@ -333,7 +333,7 @@
             "checking": "Vérification",
             "connected": "Tout est prêt !"
         },
-        "approveStep": "Approuver Rerun sur Claude",
+        "approveStep": "Approuver {brand} sur Claude",
         "opening": "Claude s’ouvre dans un nouvel onglet",
         "openAgain": "Rouvrir Claude",
         "open": "Ouvrir Claude",

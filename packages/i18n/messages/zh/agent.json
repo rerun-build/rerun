@@ -303,7 +303,7 @@
             "aiProviders": {
                 "label": "查看其 AI 提供商",
                 "blurb": "使用中的模型、积分和配额",
-                "help": "允许同事查看自己运行所用的 AI 提供商和模型、工作区连接的其他提供商，以及各自的剩余额度：Rerun 积分，以及 Claude、Codex 或 OpenCode 订阅的限额。它无法更改任何内容。"
+                "help": "允许同事查看自己运行所用的 AI 提供商和模型、工作区连接的其他提供商，以及各自的剩余额度：{brand} 积分，以及 Claude、Codex 或 OpenCode 订阅的限额。它无法更改任何内容。"
             },
             "askUser": {
                 "label": "向您提问",
@@ -333,12 +333,12 @@
             "remoteComputers": {
                 "label": "使用已关联的电脑",
                 "blurb": "在成员关联的电脑上工作",
-                "help": "允许同事在成员通过 Rerun 桌面应用关联到工作区的电脑上运行命令、读写文件和启动长时间任务，这些电脑以 # 命名。每条命令以及允许范围之外的每个文件夹，都需要聊天中的相关人员同意，除非电脑的所有者另有设置。"
+                "help": "允许同事在成员通过 {brand} 桌面应用关联到工作区的电脑上运行命令、读写文件和启动长时间任务，这些电脑以 # 命名。每条命令以及允许范围之外的每个文件夹，都需要聊天中的相关人员同意，除非电脑的所有者另有设置。"
             },
             "paidData": {
                 "label": "潜在客户、SEO 和社交数据",
-                "blurb": "从您的 Rerun 积分中扣费",
-                "help": "允许同事查找潜在客户及其工作邮箱、电话号码和公司数据，查看搜索量、关键词建议和外链，读取 Google 搜索结果和本地商家，并读取 LinkedIn、TikTok、Instagram、X、YouTube、Facebook 和 Reddit 上的公开资料和帖子，无需订阅 Apollo、Semrush 或爬虫服务。每次调用都从您的 Rerun 积分中扣费，同事会先请您批准预估费用。"
+                "blurb": "从您的 {brand} 积分中扣费",
+                "help": "允许同事查找潜在客户及其工作邮箱、电话号码和公司数据，查看搜索量、关键词建议和外链，读取 Google 搜索结果和本地商家，并读取 LinkedIn、TikTok、Instagram、X、YouTube、Facebook 和 Reddit 上的公开资料和帖子，无需订阅 Apollo、Semrush 或爬虫服务。每次调用都从您的 {brand} 积分中扣费，同事会先请您批准预估费用。"
             },
             "requestSecret": {
                 "label": "索取凭据",
@@ -459,7 +459,7 @@
     },
     "modelsShared": {
         "boxManageReason": "只有此 Box 的管理员或经理可以更改",
-        "creditPaused": "Rerun 积分已暂停"
+        "creditPaused": "{brand} 积分已暂停"
     },
     "modelSelector": {
         "setUp": "设置模型",

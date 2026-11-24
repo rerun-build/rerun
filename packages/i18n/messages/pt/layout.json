@@ -128,10 +128,10 @@
         "reload": "Recarregar",
         "available": {
             "title": "Nova versão disponível",
-            "description": "Recarregue para ter o Rerun mais recente."
+            "description": "Recarregue para ter o {brand} mais recente."
         },
         "required": {
-            "title": "O Rerun foi atualizado",
+            "title": "O {brand} foi atualizado",
             "description": "Uma nova versão está no ar. Recarregue para continuar."
         }
     },
@@ -213,10 +213,10 @@
     "boxNameSuggestions": "Ou escolha um nome",
     "dashboard": {
         "metaTitle": "Painel",
-        "metaDescription": "Suas Boxes e coworkers no Rerun."
+        "metaDescription": "Suas Boxes e coworkers no {brand}."
     },
     "site": {
-        "title": "Rerun | Suas tarefas feitas pela IA, até enquanto você dorme",
+        "title": "{brand} | Suas tarefas feitas pela IA, até enquanto você dorme",
         "description": "Escolha um agente de IA pronto na biblioteca ou crie o seu, conecte suas ferramentas, e ele roda 24/7 na sua própria máquina privada na nuvem. Teste grátis de {trialDays} dias."
     }
 }

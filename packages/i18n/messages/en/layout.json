@@ -26,7 +26,7 @@
         "providerStatus.headlineLong.many": "Same as headline.many, with a second sentence, on wide screens.",
         "workspaceMenu.summary.limits": "Under the workspace name. {agents} is a number. {seats} is already translated (\"3 seats\").",
         "workspaceMenu.summary.limitsUnlimited": "Under the workspace name, when the plan has no coworker limit. {seats} is already translated (\"3 seats\").",
-        "site.title": "Browser tab title and link preview title of the app's pages that have none of their own. Keep \"Rerun | \" at the start.",
+        "site.title": "Browser tab title and link preview title of the app's pages that have none of their own. Keep \"{brand} | \" at the start.",
         "site.description": "Meta description of the app's pages, shown under the title in search results and link previews. {trialDays} is a number of days.",
         "controlCenter.description": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "controlCenter.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
@@ -163,10 +163,10 @@
         "reload": "Reload",
         "available": {
             "title": "New version available",
-            "description": "Reload to get the latest Rerun."
+            "description": "Reload to get the latest {brand}."
         },
         "required": {
-            "title": "Rerun was updated",
+            "title": "{brand} was updated",
             "description": "A new version is live. Reload to continue."
         }
     },
@@ -248,10 +248,10 @@
     "boxNameSuggestions": "Or pick a name",
     "dashboard": {
         "metaTitle": "Dashboard",
-        "metaDescription": "Your Boxes and coworkers on Rerun."
+        "metaDescription": "Your Boxes and coworkers on {brand}."
     },
     "site": {
-        "title": "Rerun | Get your tasks done by AI, even while you sleep",
+        "title": "{brand} | Get your tasks done by AI, even while you sleep",
         "description": "Pick a ready-to-run AI agent from the library or build your own, connect your tools, and it runs 24/7 on your own private machine in the cloud. Free {trialDays}-day trial."
     }
 }

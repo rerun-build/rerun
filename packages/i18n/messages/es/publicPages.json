@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "Preferencias de email",
-        "subtitle": "Elige qué emails te envía Rerun. No necesitas iniciar sesión.",
+        "subtitle": "Elige qué emails te envía {brand}. No necesitas iniciar sesión.",
         "subtitleRuns": "Elige si tus coworkers pueden enviarte emails. No necesitas iniciar sesión.",
         "invalid": "Este enlace para darte de baja no es válido o caducó.",
         "logIn": "Inicia sesión para gestionar tus preferencias"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "Para los miembros de {workspace}",
-            "continue": "Continuar con Rerun"
+            "continue": "Continuar con {brand}"
         }
     },
     "publishedSite": {

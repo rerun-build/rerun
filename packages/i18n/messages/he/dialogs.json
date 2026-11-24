@@ -11,7 +11,7 @@
         "addEmail": "להוסיף אימייל",
         "changePhone": "לשנות מספר טלפון",
         "addPhone": "להוסיף מספר טלפון",
-        "googleNeedsBrowser": "יש לפתוח את Rerun בדפדפן כדי לחבר את Google."
+        "googleNeedsBrowser": "יש לפתוח את {brand} בדפדפן כדי לחבר את Google."
     },
     "members": {
         "title": "חברים",
@@ -464,7 +464,7 @@
     },
     "shortcuts": {
         "title": "קיצורי מקלדת",
-        "description": "לנוע מהר יותר ב-Rerun עם הקיצורים האלה.",
+        "description": "לנוע מהר יותר ב-{brand} עם הקיצורים האלה.",
         "groups": {
             "general": "כללי",
             "chat": "צ׳אט",
@@ -599,7 +599,7 @@
         },
         "link": {
             "title": "לקשר את הטלפון",
-            "hint": "WhatsApp מוסיפה את Rerun כמכשיר מקושר",
+            "hint": "WhatsApp מוסיפה את {brand} כמכשיר מקושר",
             "cancel": "לבטל את הקישור"
         }
     },
@@ -615,11 +615,11 @@
             "codex": "ChatGPT Plus או Pro"
         },
         "decline": {
-            "cloud": "אני מעדיף להישאר עם הקרדיטים של Rerun",
+            "cloud": "אני מעדיף להישאר עם הקרדיטים של {brand}",
             "selfHosted": "אני מעדיף להישאר עם OpenRouter"
         },
         "offer": {
-            "title": "Rerun עובדת טוב יותר עם מינוי Claude או ChatGPT שלך",
+            "title": "{brand} עובדת טוב יותר עם מינוי Claude או ChatGPT שלך",
             "description": "מחברים אותו, והעמיתים שלך פועלים על המינוי שאתה כבר משלם עליו.",
             "titleWithoutClaude": "העמיתים שלך פועלים על ה-AI שלך",
             "descriptionWithoutClaude": "מחברים את מינוי ה-ChatGPT שלך או מפתח API, והעמיתים שלך פועלים עליו."
@@ -630,12 +630,12 @@
                 "description": "כל חבר צוות מחבר את המינוי שהוא משלם עליו. בלי להעביר חשבון מיד ליד."
             },
             "password": {
-                "label": "Rerun אף פעם לא רואה את הסיסמה שלך",
+                "label": "{brand} אף פעם לא רואה את הסיסמה שלך",
                 "description": "מאשרים בדף של Claude או של OpenAI עצמם, ובשום מקום אחר."
             },
             "unplug": {
                 "label": "לנתק מתי שרוצים",
-                "descriptionCloud": "מנתקים בלחיצה אחת, והעמיתים שלך חוזרים לקרדיטים של Rerun.",
+                "descriptionCloud": "מנתקים בלחיצה אחת, והעמיתים שלך חוזרים לקרדיטים של {brand}.",
                 "descriptionSelfHosted": "מנתקים בלחיצה אחת, והעמיתים שלך חוזרים למפתח ה-OpenRouter שלך."
             }
         },

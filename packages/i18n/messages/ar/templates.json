@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, zero {لا قوالب} one {قالب واحد} two {قالبان} few {# قوالب} many {# قالبًا} other {# قالب}}",
-        "rerunTeam": "فريق Rerun",
+        "rerunTeam": "فريق {brand}",
         "verified": "منشئ موثّق"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "مميّزة",
             "featuredSubtitle": "إعدادات منتقاة يدويًا تستحق النظر أولًا.",
             "justAdded": "أُضيفت حديثًا",
-            "justAddedSubtitle": "أحدث القوالب المنشورة على Rerun."
+            "justAddedSubtitle": "أحدث القوالب المنشورة على {brand}."
         },
         "empty": {
             "filtered": "لا يوجد قالب يطابق عوامل التصفية هذه",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "استُخدمت تجربتك المجانية. تُفوتر اليوم؛ ويُفوتر هذا القالب بشكل منفصل.",
         "resubscribe": "أعد الاشتراك بـ {price}/شهريًا",
         "lapsed": "انتهى اشتراكك. الزملاء الذين ثبّتهم هذا القالب معطّلون.",
-        "billedTo": "يُفوتر على {workspace}. اشتراكك في Rerun نشط بالفعل.",
+        "billedTo": "يُفوتر على {workspace}. اشتراكك في {brand} نشط بالفعل.",
         "yours": "قالبك، بلا رسوم."
     },
     "boardAlt": "لوحة زملاء {title}"

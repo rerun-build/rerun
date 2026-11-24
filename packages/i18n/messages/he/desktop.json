@@ -5,7 +5,7 @@
         "description": "המסך שעליו העמית הזה עובד. מה שתעשה כאן, הוא ימצא אחר כך.",
         "takeoverDescription": "אתה בדפדפן של העמית שלך. יש ללחוץ על סיום כשהוא יכול להמשיך.",
         "takeoverHoldsBrowser": "הדפדפן של העמית שלך כבר פתוח לבקשה הזו.",
-        "clipboardDenied": "הדפדפן שלך לא אפשר ל-Rerun לקרוא את הלוח.",
+        "clipboardDenied": "הדפדפן שלך לא אפשר ל-{brand} לקרוא את הלוח.",
         "disconnectedDescription": "החיבור למכונה נסגר. שום דבר עליה לא אבד.",
         "reconnect": "להתחבר מחדש",
         "tryAgain": "לנסות שוב"

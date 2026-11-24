@@ -118,7 +118,7 @@
         "credit": {
             "addedTitle": "Créditos adicionados",
             "addedBody": "{count, plural, one {# crédito está} other {# créditos estão}} no seu workspace. Eles nunca expiram, e seus coworkers continuam de onde pararam.",
-            "title": "Comprar créditos Rerun",
+            "title": "Comprar créditos {brand}",
             "eachPack": "Cada pacote adiciona {count, plural, one {# crédito} other {# créditos}} por {price}, pago uma vez. Eles nunca expiram.",
             "packs": "{count, plural, one {# pacote} other {# pacotes}}",
             "packCredits": "{count, plural, one {# crédito} other {# créditos}}, sem expiração",
@@ -278,7 +278,7 @@
         "fallbackTitle": "seu template",
         "readyOne": "\"{title}\" é seu. Pronto para colocar o coworker dele?",
         "readyMany": "\"{title}\" é seu. Pronto para colocar os {count} coworkers dele?",
-        "needsPlan": "\"{title}\" é seu. É preciso um plano Rerun ativo para instalá-lo.",
+        "needsPlan": "\"{title}\" é seu. É preciso um plano {brand} ativo para instalá-lo.",
         "finalizing": "Finalizando compra",
         "close": "Fechar",
         "placeOne": "Colocar o coworker",
@@ -352,7 +352,7 @@
                 "footnote": "Isso encerra seu teste grátis hoje. Para não pagar nada hoje, mantenha seu teste: o Pro começa sozinho em {date}."
             },
             "creditLocked": {
-                "title": "Os créditos Rerun vêm com o Pro",
+                "title": "Os créditos {brand} vêm com o Pro",
                 "titleCoworker": "Continue com o Pro",
                 "subtitle": "Seus {trialCredits, number} créditos de teste acabaram. O Pro inclui {credits, plural, one {# crédito} other {# créditos}} todo mês, e você pode adicionar mais quando quiser.",
                 "subtitleCoworker": "{coworker} continua de onde parou.",
@@ -435,8 +435,8 @@
             "updateFailed": "Não foi possível atualizar seu plano",
             "stillUpdating": "Seu plano ainda está sendo atualizado",
             "pleaseWait": "Aguarde",
-            "freeFor": "Rerun Pro, grátis por {days} dias",
-            "subscribe": "Assinar o Rerun Pro",
+            "freeFor": "{brand} Pro, grátis por {days} dias",
+            "subscribe": "Assinar o {brand} Pro",
             "dueToday": "a pagar hoje",
             "perYear": "por ano",
             "perMonth": "por mês",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "Seu teste",
             "title": "Comece o Pro hoje",
-            "header": "Encerrar teste, começar o Rerun Pro",
+            "header": "Encerrar teste, começar o {brand} Pro",
             "tax": "Impostos",
             "taxFromAddress": "Impostos, pelo seu endereço",
             "dueToday": "A pagar hoje",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "Roda na <b>sua própria IA</b>",
-                "credit": "<b>Créditos Rerun</b> quando precisar"
+                "credit": "<b>Créditos {brand}</b> quando precisar"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "O que fez você decidir sair?",
             "placeholder": "Uma frase já basta",
-            "comebackField": "Você vai usar o Rerun de novo?",
+            "comebackField": "Você vai usar o {brand} de novo?",
             "missingComment": "Conte em poucas palavras por que está saindo",
             "missingComeback": "Diga se você vai voltar",
             "required": "Conte em poucas palavras por que está saindo.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "Execuções este mês",
             "agents": "{count, plural, one {# agente} other {# agentes}}",
             "agentsCaption": "configurados, conectados e trabalhando",
-            "creditsCaption": "créditos Rerun restantes",
+            "creditsCaption": "créditos {brand} restantes",
             "runsSoFar": "Execuções até agora",
             "schedules": "Agendamentos"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "Créditos Rerun",
-            "subtitle": "Gastos pelos seus coworkers em modelos Rerun e dados pagos",
+            "title": "Créditos {brand}",
+            "subtitle": "Gastos pelos seus coworkers em modelos {brand} e dados pagos",
             "addCredits": "Adicionar créditos",
             "startProNow": "Começar o Pro agora",
             "usedTrial": "Usados · créditos de teste",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "Seus créditos de teste acabaram",
             "title": "Seus créditos acabaram",
-            "trialDescription": "Seus coworkers não podem usar modelos Rerun nem dados pagos. O Pro vem com {count, plural, one {# crédito} other {# créditos}} todo mês.",
-            "description": "Seus coworkers não podem usar modelos Rerun nem dados pagos.",
-            "descriptionUntil": "Seus coworkers não podem usar modelos Rerun nem dados pagos até {date}."
+            "trialDescription": "Seus coworkers não podem usar modelos {brand} nem dados pagos. O Pro vem com {count, plural, one {# crédito} other {# créditos}} todo mês.",
+            "description": "Seus coworkers não podem usar modelos {brand} nem dados pagos.",
+            "descriptionUntil": "Seus coworkers não podem usar modelos {brand} nem dados pagos até {date}."
         },
         "switch": {
             "label": "Permitir gastos",
-            "on": "Os coworkers podem usar modelos Rerun e dados pagos.",
-            "off": "Pausado. Os coworkers não podem usar modelos Rerun nem dados pagos."
+            "on": "Os coworkers podem usar modelos {brand} e dados pagos.",
+            "off": "Pausado. Os coworkers não podem usar modelos {brand} nem dados pagos."
         },
         "kind": {
             "ai": "Modelos de IA",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "Sem créditos de teste",
             "outOfCredits": "Sem créditos",
             "left": "{figure} restantes",
-            "ariaUsed": "Créditos Rerun usados"
+            "ariaUsed": "Créditos {brand} usados"
         }
     },
     "creditsBar": {

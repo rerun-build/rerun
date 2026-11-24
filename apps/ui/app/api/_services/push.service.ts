@@ -1,5 +1,6 @@
 import type { Database } from '@/app/api/database.types'
 import type { StoredNotification } from '@/lib/notifications/inbound'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { coworkerPortraitUrl } from '@/lib/og/coworker-portrait'
@@ -81,8 +82,8 @@ async function pushToUser(supabase: SupabaseClient<Database>, userId: string, no
     if (!devices?.length) return
 
     const { notification } = context
-    const locale = await recipientLocale(supabase, userId, context.workspaceId)
-    const [t, tErrors] = await Promise.all([translatorFor(locale, 'push'), translatorFor(locale, 'chatErrors')])
+    const [locale, brand] = await Promise.all([recipientLocale(supabase, userId, context.workspaceId), workspaceBrand(context.workspaceId)])
+    const [t, tErrors] = await Promise.all([translatorFor(locale, 'push', brand.name), translatorFor(locale, 'chatErrors', brand.name)])
     const { title, subtitle, androidTitle, body, silent } = pushCopyOf({ agentName: context.agentName, notification, t, tErrors })
     const buttons = pushButtonsOf(notification, context.conversationId)
     const sender: PushSender | null = portrait ? { name: context.agentName, image: portrait, state: subtitle } : null

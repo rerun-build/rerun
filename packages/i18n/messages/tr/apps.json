@@ -2,13 +2,13 @@
     "menu": {
         "label": "Uygulamalar"
     },
-    "linkedToRerun": "{provider}, Rerun'a bağlı",
+    "linkedToRerun": "{provider}, {brand}'a bağlı",
     "slotPrice": {
         "monthly": "{price}/ay",
         "yearly": "{price}/yıl"
     },
     "blocked": {
-        "notSubscribed": "Önce Rerun'a abone olun",
+        "notSubscribed": "Önce {brand}'a abone olun",
         "paused": "Çalışma alanınız duraklatıldı",
         "trialSlot": "Deneme süresi bir {provider} yeri içerir. Daha fazlası için planınızı yükseltin.",
         "lifetimeTrialSlot": "Ücretsiz denemeniz bir {provider} yeri içerir. Deneme bitince daha fazla ekleyin.",
@@ -159,7 +159,7 @@
         "signInFromHelp": "LinkedIn, genellikle çalıştığınız ülkeden yapılan girişlere güvenir.",
         "searchCountry": "Ülke ara",
         "noCountry": "Ülke bulunamadı",
-        "neverStored": "Rerun şifrenizi veya çerezinizi asla saklamaz.",
+        "neverStored": "{brand} şifrenizi veya çerezinizi asla saklamaz.",
         "connect": "Bağlan",
         "approval": {
             "figureLabel": "Giriş isteğini gösteren, onay tuşu yanan bir telefon",
@@ -193,7 +193,7 @@
                 "qr": "QR kodu tara",
                 "code": "Kod yaz"
             },
-            "linkedDevice": "Rerun, WhatsApp Web gibi bağlı cihaz olarak katılır. Telefonunuz her zamanki gibi çalışmaya devam eder.",
+            "linkedDevice": "{brand}, WhatsApp Web gibi bağlı cihaz olarak katılır. Telefonunuz her zamanki gibi çalışmaya devam eder.",
             "submit": "Kodu al"
         },
         "link": {

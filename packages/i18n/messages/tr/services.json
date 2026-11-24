@@ -86,7 +86,7 @@
         "configured": "{name} yapılandırıldı",
         "connectTitle": "{name} bağla",
         "signInOAuth": "Ajanınızın kullanabilmesi için oturum açın: {name}.",
-        "signInManaged": "Ajanınızın kullanabilmesi için {name} ile oturum açın. Bağlantıyı Rerun sizin için yönetir.",
+        "signInManaged": "Ajanınızın kullanabilmesi için {name} ile oturum açın. Bağlantıyı {brand} sizin için yönetir.",
         "setUp": "{name} kurulumu",
         "authentication": "Kimlik doğrulama",
         "backToMethods": "Yöntemlere dön",

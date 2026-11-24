@@ -1,5 +1,6 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Field } from '@/components/ui/field'
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -64,6 +65,7 @@ type RunModelFieldProps = {
 
 export function RunModelField({ id, value, onChange, availableGroups, helperText, agentModel, disabled }: RunModelFieldProps) {
     const t = useTranslations('agent.runModelField')
+    const { name: brandName } = useBrand()
     // Keep a pair that is no longer available (connection deleted, model switched off) selectable,
     // so the routine stays editable instead of silently losing it.
     const orphan = useMemo(
@@ -71,9 +73,9 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
         [availableGroups, value]
     )
 
-    const agentDefaultLabel = agentModel ? t('coworkerDefaultWithModel', { model: modelLabel(agentModel) }) : t('coworkerDefault')
+    const agentDefaultLabel = agentModel ? t('coworkerDefaultWithModel', { model: modelLabel(agentModel, brandName) }) : t('coworkerDefault')
     // Spelled out rather than mirrored from the picked item: a tier's item is a two-line row.
-    const triggerLabel = value.model ? modelName(value.connectionId ?? '', value.model) : agentDefaultLabel
+    const triggerLabel = value.model ? modelName(value.connectionId ?? '', value.model, brandName) : agentDefaultLabel
 
     const pick = (encoded: string) => onChange(decode(encoded))
 
@@ -109,7 +111,7 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
                     {orphan && (
                         <SelectGroup>
                             <SelectLabel>{t('current')}</SelectLabel>
-                            <SelectItem value={encode(orphan)}>{modelLabel(orphan.model)}</SelectItem>
+                            <SelectItem value={encode(orphan)}>{modelLabel(orphan.model, brandName)}</SelectItem>
                         </SelectGroup>
                     )}
                 </SelectContent>

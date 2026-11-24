@@ -11,7 +11,7 @@
         "addEmail": "Añadir correo",
         "changePhone": "Cambiar número de teléfono",
         "addPhone": "Añadir número de teléfono",
-        "googleNeedsBrowser": "Abre Rerun en tu navegador para conectar Google."
+        "googleNeedsBrowser": "Abre {brand} en tu navegador para conectar Google."
     },
     "members": {
         "title": "Miembros",
@@ -464,7 +464,7 @@
     },
     "shortcuts": {
         "title": "Atajos de teclado",
-        "description": "Muévete más rápido por Rerun con estos atajos.",
+        "description": "Muévete más rápido por {brand} con estos atajos.",
         "groups": {
             "general": "General",
             "chat": "Chat",
@@ -599,7 +599,7 @@
         },
         "link": {
             "title": "Vincular el teléfono",
-            "hint": "WhatsApp añade Rerun como dispositivo vinculado",
+            "hint": "WhatsApp añade {brand} como dispositivo vinculado",
             "cancel": "Cancelar la vinculación"
         }
     },
@@ -615,11 +615,11 @@
             "codex": "ChatGPT Plus o Pro"
         },
         "decline": {
-            "cloud": "Prefiero seguir con los créditos de Rerun",
+            "cloud": "Prefiero seguir con los créditos de {brand}",
             "selfHosted": "Prefiero seguir con OpenRouter"
         },
         "offer": {
-            "title": "Rerun funciona mejor con tu suscripción de Claude o ChatGPT",
+            "title": "{brand} funciona mejor con tu suscripción de Claude o ChatGPT",
             "description": "Conéctala y tus coworkers funcionan con el plan que ya pagas.",
             "titleWithoutClaude": "Tus coworkers funcionan con tu propia IA",
             "descriptionWithoutClaude": "Conecta tu plan de ChatGPT o una clave de API, y tus coworkers funcionan con ella."
@@ -630,12 +630,12 @@
                 "description": "Cada compañero conecta el plan que paga. Sin cuentas compartidas."
             },
             "password": {
-                "label": "Rerun nunca ve tu contraseña",
+                "label": "{brand} nunca ve tu contraseña",
                 "description": "Lo apruebas en la página de Claude o de OpenAI, y en ningún otro sitio."
             },
             "unplug": {
                 "label": "Desconéctalo cuando quieras",
-                "descriptionCloud": "Desconecta con un clic y tus coworkers vuelven a los créditos de Rerun.",
+                "descriptionCloud": "Desconecta con un clic y tus coworkers vuelven a los créditos de {brand}.",
                 "descriptionSelfHosted": "Desconecta con un clic y tus coworkers vuelven a tu clave de OpenRouter."
             }
         },

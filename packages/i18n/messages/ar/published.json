@@ -22,7 +22,7 @@
         "workspaceFallback": "مساحة العمل"
     },
     "gate": {
-        "madeWith": "صُنع بواسطة Rerun",
+        "madeWith": "صُنع بواسطة {brand}",
         "locked": "صفحة {workspace}، مقفلة",
         "code": "الرمز",
         "switchAccount": "تبديل الحساب"

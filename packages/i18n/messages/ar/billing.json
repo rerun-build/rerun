@@ -140,7 +140,7 @@
         "credit": {
             "addedTitle": "تمت إضافة الأرصدة",
             "addedBody": "{count, plural, zero {لا أرصدة في مساحة عملك} one {رصيد واحد في مساحة عملك} two {رصيدان في مساحة عملك} few {# أرصدة في مساحة عملك} many {# رصيدًا في مساحة عملك} other {# رصيد في مساحة عملك}}. لا تنتهي صلاحيتها أبدًا، ويستأنف زملاؤك من حيث توقفوا.",
-            "title": "شراء أرصدة Rerun",
+            "title": "شراء أرصدة {brand}",
             "eachPack": "تضيف كل حزمة {count, plural, zero {لا أرصدة} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} مقابل {price}، تُدفع مرة واحدة. لا تنتهي صلاحيتها أبدًا.",
             "packs": "{count, plural, zero {لا حزم} one {حزمة واحدة} two {حزمتان} few {# حزم} many {# حزمة} other {# حزمة}}",
             "packCredits": "{count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}، لا تنتهي صلاحيتها",
@@ -278,7 +278,7 @@
         "fallbackTitle": "قالبك",
         "readyOne": "أصبحت تملك \"{title}\". هل أنت مستعد لوضع زميله؟",
         "readyMany": "أصبحت تملك \"{title}\". هل أنت مستعد لوضع زملائه الـ {count}؟",
-        "needsPlan": "أصبحت تملك \"{title}\". يلزم وجود خطة Rerun نشطة لتثبيته.",
+        "needsPlan": "أصبحت تملك \"{title}\". يلزم وجود خطة {brand} نشطة لتثبيته.",
         "finalizing": "جارٍ إتمام الشراء",
         "close": "إغلاق",
         "placeOne": "ضع زميله",
@@ -352,7 +352,7 @@
                 "footnote": "ينهي هذا تجربتك المجانية اليوم. لكي لا تدفع شيئًا اليوم، احتفظ بتجربتك: تبدأ خطة Pro في {date} تلقائيًا."
             },
             "creditLocked": {
-                "title": "أرصدة Rerun تأتي مع Pro",
+                "title": "أرصدة {brand} تأتي مع Pro",
                 "titleCoworker": "تابع مع Pro",
                 "subtitle": "استُنفدت أرصدة التجربة البالغة {trialCredits, number}. تتضمن خطة Pro {credits, plural, zero {لا أرصدة} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر، ويمكنك إضافة المزيد في أي وقت.",
                 "subtitleCoworker": "سيستأنف {coworker} من حيث توقف.",
@@ -435,8 +435,8 @@
             "updateFailed": "تعذّر تحديث خطتك",
             "stillUpdating": "لا يزال تحديث خطتك جاريًا",
             "pleaseWait": "يرجى الانتظار",
-            "freeFor": "Rerun Pro، مجانًا لمدة {days} يومًا",
-            "subscribe": "اشترك في Rerun Pro",
+            "freeFor": "{brand} Pro، مجانًا لمدة {days} يومًا",
+            "subscribe": "اشترك في {brand} Pro",
             "dueToday": "المستحق اليوم",
             "perYear": "سنويًا",
             "perMonth": "شهريًا",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "تجربتك",
             "title": "ابدأ Pro اليوم",
-            "header": "إنهاء التجربة وبدء Rerun Pro",
+            "header": "إنهاء التجربة وبدء {brand} Pro",
             "tax": "الضريبة",
             "taxFromAddress": "الضريبة، حسب عنوانك",
             "dueToday": "المستحق اليوم",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "يعمل على <b>ذكائك الاصطناعي الخاص</b>",
-                "credit": "<b>أرصدة Rerun</b> عندما تحتاجها"
+                "credit": "<b>أرصدة {brand}</b> عندما تحتاجها"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "ما الذي جعلك تقرر المغادرة؟",
             "placeholder": "جملة واحدة تكفي",
-            "comebackField": "هل ستستخدم Rerun مجددًا؟",
+            "comebackField": "هل ستستخدم {brand} مجددًا؟",
             "missingComment": "أخبرنا ببضع كلمات لماذا تغادر",
             "missingComeback": "أخبرنا إن كنت ستعود",
             "required": "أخبرنا ببضع كلمات لماذا تغادر.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "عمليات التشغيل هذا الشهر",
             "agents": "{count, plural, zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}}",
             "agentsCaption": "جاهزون ومتصلون ويعملون",
-            "creditsCaption": "أرصدة Rerun متبقية",
+            "creditsCaption": "أرصدة {brand} متبقية",
             "runsSoFar": "عمليات التشغيل حتى الآن",
             "schedules": "الجداول"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "أرصدة Rerun",
-            "subtitle": "ينفقها زملاؤك على نماذج Rerun والبيانات المدفوعة",
+            "title": "أرصدة {brand}",
+            "subtitle": "ينفقها زملاؤك على نماذج {brand} والبيانات المدفوعة",
             "addCredits": "إضافة أرصدة",
             "startProNow": "ابدأ Pro الآن",
             "usedTrial": "المستخدم · أرصدة التجربة",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "نفدت أرصدة تجربتك",
             "title": "نفدت أرصدتك",
-            "trialDescription": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة. تأتي خطة Pro مع {count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر.",
-            "description": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة.",
-            "descriptionUntil": "لا يمكن لزملائك استخدام نماذج Rerun أو البيانات المدفوعة حتى {date}."
+            "trialDescription": "لا يمكن لزملائك استخدام نماذج {brand} أو البيانات المدفوعة. تأتي خطة Pro مع {count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}} كل شهر.",
+            "description": "لا يمكن لزملائك استخدام نماذج {brand} أو البيانات المدفوعة.",
+            "descriptionUntil": "لا يمكن لزملائك استخدام نماذج {brand} أو البيانات المدفوعة حتى {date}."
         },
         "switch": {
             "label": "السماح بالإنفاق",
-            "on": "يمكن للزملاء استخدام نماذج Rerun والبيانات المدفوعة.",
-            "off": "متوقف مؤقتًا. لا يمكن للزملاء استخدام نماذج Rerun أو البيانات المدفوعة."
+            "on": "يمكن للزملاء استخدام نماذج {brand} والبيانات المدفوعة.",
+            "off": "متوقف مؤقتًا. لا يمكن للزملاء استخدام نماذج {brand} أو البيانات المدفوعة."
         },
         "kind": {
             "ai": "نماذج الذكاء الاصطناعي",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "لم تتبقَّ أرصدة تجربة",
             "outOfCredits": "نفدت الأرصدة",
             "left": "متبقٍ {figure}",
-            "ariaUsed": "أرصدة Rerun المستخدمة"
+            "ariaUsed": "أرصدة {brand} المستخدمة"
         }
     },
     "creditsBar": {

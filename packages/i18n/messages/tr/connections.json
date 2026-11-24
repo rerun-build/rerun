@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# model} other {# model}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Rerun kredileri duraklatıldı",
+        "creditPaused": "{brand} kredileri duraklatıldı",
         "creditUsed": "Bu ayın kredilerinin %{percent} kadarı kullanıldı",
         "creditUsedUpOn": "Aylık krediler tükendi, yenilenme: {date}",
         "creditUsedUpNextMonth": "Aylık krediler tükendi, gelecek ay yenilenir",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "Anthropic anahtarınızı nasıl alırsınız",
                 "step1": "[Anthropic Console](https://console.anthropic.com/settings/keys) sayfasını açın ve giriş yapın.",
-                "step2": "**Create Key** düğmesine tıklayın ve bir ad verin, örneğin \"Rerun\".",
+                "step2": "**Create Key** düğmesine tıklayın ve bir ad verin, örneğin \"{brand}\".",
                 "step3": "Anahtarı kopyalayın (`sk-ant-` ile başlar) ve yukarıya yapıştırın. Yalnızca bir kez gösterilir."
             },
             "openai": {
                 "title": "OpenAI anahtarınızı nasıl alırsınız",
                 "step1": "[OpenAI API keys](https://platform.openai.com/api-keys) sayfasını açın ve giriş yapın.",
-                "step2": "**Create new secret key** düğmesine tıklayın ve bir ad verin, örneğin \"Rerun\".",
+                "step2": "**Create new secret key** düğmesine tıklayın ve bir ad verin, örneğin \"{brand}\".",
                 "step3": "Anahtarı kopyalayın (`sk-` ile başlar) ve yukarıya yapıştırın. Yalnızca bir kez gösterilir."
             },
             "google": {
@@ -180,7 +180,7 @@
             "automations": "{count, plural, one {# otomasyon} other {# otomasyon}} çalışma alanının varsayılan modeline geri döner.",
             "both": "{agents} ve {count, plural, one {# otomasyon} other {# otomasyon}} çalışma alanının varsayılan modeline geri döner."
         },
-        "holdsDefault": "Çalışma alanının varsayılan modeli bunda, o da temizlenir: model seçmemiş her coworker Rerun'a geri döner.",
+        "holdsDefault": "Çalışma alanının varsayılan modeli bunda, o da temizlenir: model seçmemiş her coworker {brand}'a geri döner.",
         "nothingRuns": "Kimlik bilgisi Box'tan kaldırıldı. Üzerinde hiçbir şey çalışmıyor.",
         "released": {
             "agents": "{agents} artık çalışma alanının varsayılan modeliyle çalışıyor.",
@@ -231,9 +231,9 @@
         "signedInAgain": "Yeniden giriş yapıldı",
         "creditsTitle": "Bu ayın kredileri",
         "topUp": "Yükle",
-        "creditsUsedUpOn": "Rerun ile çalışan coworker'lar, krediler {date} tarihinde yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
-        "creditsUsedUpNextMonth": "Rerun ile çalışan coworker'lar, krediler gelecek ay yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
-        "creditsIncluded": "Rerun planınızla birlikte gelir. Anahtar yok, kurulacak bir şey yok.",
+        "creditsUsedUpOn": "{brand} ile çalışan coworker'lar, krediler {date} tarihinde yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
+        "creditsUsedUpNextMonth": "{brand} ile çalışan coworker'lar, krediler gelecek ay yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
+        "creditsIncluded": "{brand} planınızla birlikte gelir. Anahtar yok, kurulacak bir şey yok.",
         "signInRejected": "Bu giriş reddedildi. Bunu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
         "signInExpired": "Bu girişin süresi doldu. Bunu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
         "reconnected": "Coworker'larınız yeniden başlıyor",
@@ -260,12 +260,12 @@
         },
         "default": {
             "via": "{source} üzerinden. Kendi modeli olmayan coworker'lar bununla çalışır.",
-            "pausedPick": "Rerun kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için başka bir model seçin.",
-            "pausedAdd": "Rerun kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
-            "usedUpOnPick": "Rerun kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
-            "usedUpOnAdd": "Rerun kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
-            "usedUpNextMonthPick": "Rerun kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
-            "usedUpNextMonthAdd": "Rerun kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "pausedPick": "{brand} kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "pausedAdd": "{brand} kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "usedUpOnPick": "{brand} kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "usedUpOnAdd": "{brand} kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "usedUpNextMonthPick": "{brand} kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "usedUpNextMonthAdd": "{brand} kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
             "stopped": "Kendi modeli olmayan coworker'lar durduruldu. {source} bağlantısını düzeltin veya başka bir model seçin.",
             "noOtherModel": "Hazır başka model yok. Önce bir plan veya API anahtarı ekleyin.",
             "change": "Değiştir"
@@ -280,7 +280,7 @@
             "full": "En fazla {max} yedek",
             "noneLeft": "Hazır başka model yok. Önce bir plan veya API anahtarı ekleyin.",
             "credit": {
-                "title": "Son çare olarak Rerun kredisi",
+                "title": "Son çare olarak {brand} kredisi",
                 "description": "Yalnızca tüm planlar tükendiğinde"
             }
         },
@@ -324,7 +324,7 @@
         },
         "copied": "Kopyalandı",
         "copyMessage": "Onlar için bir mesaj kopyalayın",
-        "adminMessage": "Merhaba! ChatGPT çalışma alanı ayarlarımızda \"Codex için cihaz kodu yetkilendirmesi\" seçeneğini açabilir misiniz? ChatGPT planımı Rerun'a bağlamak için buna ihtiyacım var."
+        "adminMessage": "Merhaba! ChatGPT çalışma alanı ayarlarımızda \"Codex için cihaz kodu yetkilendirmesi\" seçeneğini açabilir misiniz? ChatGPT planımı {brand}'a bağlamak için buna ihtiyacım var."
     },
     "claude": {
         "remarks": {
@@ -333,7 +333,7 @@
             "checking": "Kontrol ediliyor",
             "connected": "Her şey hazır!"
         },
-        "approveStep": "Claude'da Rerun'u onaylayın",
+        "approveStep": "Claude'da {brand}'u onaylayın",
         "opening": "Claude yeni bir sekmede açılıyor",
         "openAgain": "Claude'u yeniden aç",
         "open": "Claude'u aç",

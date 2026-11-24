@@ -1,6 +1,7 @@
 'use client'
 
 import { getRunStepsAction, getRunToolsAction, listRunsAction } from '@/app/api/_actions/agent.actions'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PanelList, PanelScroller } from '@/components/ui/panel-list'
@@ -98,6 +99,7 @@ export function AgentPanelLogs({ agentId }: { agentId: string }) {
 
 function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; onOpen: () => void }) {
     const t = useTranslations('agent.agentPanelLogs')
+    const { name: brandName } = useBrand()
     const locale = useLocale()
     const tokens = runTokens(run)
     const usage = tokens ? t('tokens', { total: formatNumber(tokens, locale) }) : ''
@@ -123,7 +125,7 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
                     {run.model && (
                         <>
                             <span>·</span>
-                            <span className="font-mono">{modelLogLabel(run.model)}</span>
+                            <span className="font-mono">{modelLogLabel(run.model, brandName)}</span>
                         </>
                     )}
                     {trigger && (

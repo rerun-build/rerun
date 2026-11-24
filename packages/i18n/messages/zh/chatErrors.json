@@ -14,7 +14,7 @@
         "message": "此密钥适用于其 Anthropic 组织下的所有工作区。请在 Anthropic Console 中某个工作区内创建密钥，然后重新连接。"
     },
     "titles": {
-        "budget": "Rerun 积分已用完",
+        "budget": "{brand} 积分已用完",
         "unauthorized": "连接已退出登录",
         "overloaded": "提供商过载",
         "context_window": "对话过长",
@@ -25,7 +25,7 @@
         "session_gone": "对话不可用"
     },
     "messages": {
-        "budget": "本周期的 Rerun 积分已用完。请添加积分，或等待每月重置。",
+        "budget": "本周期的 {brand} 积分已用完。请添加积分，或等待每月重置。",
         "unauthorized": "此连接需要重新登录，同事才能运行。",
         "overloaded": "提供商目前过载。请稍后重试。",
         "context_window": "此对话已超出模型的容量，再次发送也会遇到同样的问题。请切换到上下文窗口更大的模型，或开始新对话。",

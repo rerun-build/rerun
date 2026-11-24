@@ -2,6 +2,7 @@ import { actorFromContext, keepVisible, visibleSpaceIds } from '@/app/api/_auth/
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { markSessionsHandled } from '@/app/api/_services/conversation.service'
 import type { Database } from '@/app/api/database.types'
+import { getBrand } from '@/lib/brand/server'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
@@ -48,7 +49,7 @@ export async function listWorkspaceInbox(ctx: WorkspaceContext, { foremanRuns }:
         asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
         agentIds.length ? selectCount(ctx.supabase, 'sessions', { agent_id: agentIds, status: 'working' }) : Promise.resolve({ data: 0, error: null }),
         chief ? selectCount(ctx.supabase, 'sessions', { agent_id: chief.id, owner_user_id: ctx.userId, status: 'working' }) : Promise.resolve({ data: 0, error: null }),
-        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'chatErrors')),
+        Promise.all([recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id), getBrand()]).then(([locale, brand]) => translatorFor(locale, 'chatErrors', brand.name)),
     ])
     if (attention.error) throw attention.error
     if (chiefAttention.error) throw chiefAttention.error

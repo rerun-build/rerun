@@ -171,7 +171,7 @@
         "remote_file_read": "Datei auf #{computer} gelesen",
         "remote_file_write": "Datei auf #{computer} geschrieben",
         "remote_transfer": "Datei mit #{computer} kopiert",
-        "request_feature": "Hat eine Anfrage für das Rerun-Team verfasst"
+        "request_feature": "Hat eine Anfrage für das {brand}-Team verfasst"
     },
     "activities": {
         "shell_exec": "Führt einen Befehl aus",

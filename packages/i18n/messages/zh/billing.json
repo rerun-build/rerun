@@ -140,7 +140,7 @@
         "credit": {
             "addedTitle": "积分已添加",
             "addedBody": "{count, plural, other {# 积分已存入您的工作区。}}积分永不过期，您的同事会从停下的地方继续。",
-            "title": "购买 Rerun 积分",
+            "title": "购买 {brand} 积分",
             "eachPack": "每个积分包以 {price} 一次性付款，增加 {count, plural, other {# 积分}}，永不过期。",
             "packs": "{count, plural, other {# 个积分包}}",
             "packCredits": "{count, plural, other {# 积分}}，永不过期",
@@ -278,7 +278,7 @@
         "fallbackTitle": "您的模板",
         "readyOne": "您已拥有“{title}”。准备好放置它的同事了吗？",
         "readyMany": "您已拥有“{title}”。准备好放置它的 {count} 位同事了吗？",
-        "needsPlan": "您已拥有“{title}”。需要有效的 Rerun 套餐才能安装。",
+        "needsPlan": "您已拥有“{title}”。需要有效的 {brand} 套餐才能安装。",
         "finalizing": "正在完成购买",
         "close": "关闭",
         "placeOne": "放置它的同事",
@@ -352,7 +352,7 @@
                 "footnote": "这将在今天结束您的免费试用。如果今天不想付费，请保留试用：Pro 将于 {date} 自动开始。"
             },
             "creditLocked": {
-                "title": "Rerun 积分随 Pro 提供",
+                "title": "{brand} 积分随 Pro 提供",
                 "titleCoworker": "升级 Pro 继续工作",
                 "subtitle": "您的 {trialCredits, number} 试用积分已用完。Pro 每月包含 {credits, plural, other {# 积分}}，您还可以随时添加。",
                 "subtitleCoworker": "{coworker} 会从停下的地方继续。",
@@ -435,8 +435,8 @@
             "updateFailed": "无法更新您的套餐",
             "stillUpdating": "您的套餐仍在更新中",
             "pleaseWait": "请稍候",
-            "freeFor": "Rerun Pro，免费 {days} 天",
-            "subscribe": "订阅 Rerun Pro",
+            "freeFor": "{brand} Pro，免费 {days} 天",
+            "subscribe": "订阅 {brand} Pro",
             "dueToday": "今日应付",
             "perYear": "每年",
             "perMonth": "每月",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "您的试用",
             "title": "今天开始 Pro",
-            "header": "结束试用，开始 Rerun Pro",
+            "header": "结束试用，开始 {brand} Pro",
             "tax": "税费",
             "taxFromAddress": "税费，根据您的地址",
             "dueToday": "今日应付",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "使用<b>您自己的 AI</b> 运行",
-                "credit": "需要时使用 <b>Rerun 积分</b>"
+                "credit": "需要时使用 <b>{brand} 积分</b>"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "是什么让您决定离开？",
             "placeholder": "一句话就够了",
-            "comebackField": "您还会再使用 Rerun 吗？",
+            "comebackField": "您还会再使用 {brand} 吗？",
             "missingComment": "请简单告诉我们您离开的原因",
             "missingComeback": "请告诉我们您是否还会回来",
             "required": "请简单告诉我们您离开的原因。",
@@ -666,7 +666,7 @@
             "runsThisMonth": "本月运行次数",
             "agents": "{count, plural, other {# 位同事}}",
             "agentsCaption": "已设置、已连接、正在工作",
-            "creditsCaption": "剩余 Rerun 积分",
+            "creditsCaption": "剩余 {brand} 积分",
             "runsSoFar": "迄今运行次数",
             "schedules": "计划任务"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "Rerun 积分",
-            "subtitle": "您的同事在 Rerun 模型和付费数据上的花费",
+            "title": "{brand} 积分",
+            "subtitle": "您的同事在 {brand} 模型和付费数据上的花费",
             "addCredits": "添加积分",
             "startProNow": "立即开始 Pro",
             "usedTrial": "已用 · 试用积分",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "您的试用积分已用完",
             "title": "您的积分已用完",
-            "trialDescription": "您的同事无法使用 Rerun 模型或付费数据。Pro 每月提供 {count, plural, other {# 积分}}。",
-            "description": "您的同事无法使用 Rerun 模型或付费数据。",
-            "descriptionUntil": "在 {date} 之前，您的同事无法使用 Rerun 模型或付费数据。"
+            "trialDescription": "您的同事无法使用 {brand} 模型或付费数据。Pro 每月提供 {count, plural, other {# 积分}}。",
+            "description": "您的同事无法使用 {brand} 模型或付费数据。",
+            "descriptionUntil": "在 {date} 之前，您的同事无法使用 {brand} 模型或付费数据。"
         },
         "switch": {
             "label": "允许消费",
-            "on": "同事可以使用 Rerun 模型和付费数据。",
-            "off": "已暂停。同事无法使用 Rerun 模型或付费数据。"
+            "on": "同事可以使用 {brand} 模型和付费数据。",
+            "off": "已暂停。同事无法使用 {brand} 模型或付费数据。"
         },
         "kind": {
             "ai": "AI 模型",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "试用积分已用完",
             "outOfCredits": "积分已用完",
             "left": "剩余 {figure}",
-            "ariaUsed": "已用 Rerun 积分"
+            "ariaUsed": "已用 {brand} 积分"
         }
     },
     "creditsBar": {

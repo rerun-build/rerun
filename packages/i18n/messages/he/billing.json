@@ -140,7 +140,7 @@
         "credit": {
             "addedTitle": "הקרדיטים נוספו",
             "addedBody": "{count, plural, one {קרדיט אחד נמצא} two {# קרדיטים נמצאים} other {# קרדיטים נמצאים}} בסביבת העבודה שלך. הם לא פגים, והעמיתים שלך ממשיכים מהמקום שבו עצרו.",
-            "title": "לקנות קרדיטים של Rerun",
+            "title": "לקנות קרדיטים של {brand}",
             "eachPack": "כל חבילה מוסיפה {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}} ב-{price}, בתשלום חד-פעמי. הם לא פגים.",
             "packs": "{count, plural, one {חבילה אחת} two {# חבילות} other {# חבילות}}",
             "packCredits": "{count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}, ללא תפוגה",
@@ -278,7 +278,7 @@
         "fallbackTitle": "התבנית שלך",
         "readyOne": "\"{title}\" שייכת לך. מוכן למקם את העמית שלה?",
         "readyMany": "\"{title}\" שייכת לך. מוכן למקם את {count} העמיתים שלה?",
-        "needsPlan": "\"{title}\" שייכת לך. כדי להתקין אותה נדרשת תוכנית Rerun פעילה.",
+        "needsPlan": "\"{title}\" שייכת לך. כדי להתקין אותה נדרשת תוכנית {brand} פעילה.",
         "finalizing": "משלים את הרכישה",
         "close": "לסגור",
         "placeOne": "למקם את העמית שלה",
@@ -352,7 +352,7 @@
                 "footnote": "זה מסיים היום את תקופת הניסיון החינמית. כדי לא לשלם כלום היום, אפשר להמשיך בניסיון: Pro מתחיל ב-{date} מעצמו."
             },
             "creditLocked": {
-                "title": "קרדיטים של Rerun מגיעים עם Pro",
+                "title": "קרדיטים של {brand} מגיעים עם Pro",
                 "titleCoworker": "להמשיך עם Pro",
                 "subtitle": "{trialCredits, number} קרדיטי הניסיון שלך נוצלו. Pro כולל {credits, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}} כל חודש, ואפשר להוסיף עוד בכל עת.",
                 "subtitleCoworker": "{coworker} ממשיך מהמקום שבו עצר.",
@@ -435,8 +435,8 @@
             "updateFailed": "לא ניתן לעדכן את התוכנית שלך",
             "stillUpdating": "התוכנית שלך עדיין מתעדכנת",
             "pleaseWait": "רק רגע",
-            "freeFor": "Rerun Pro, חינם ל-{days} ימים",
-            "subscribe": "להירשם ל-Rerun Pro",
+            "freeFor": "{brand} Pro, חינם ל-{days} ימים",
+            "subscribe": "להירשם ל-{brand} Pro",
             "dueToday": "לתשלום היום",
             "perYear": "לשנה",
             "perMonth": "לחודש",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "תקופת הניסיון שלך",
             "title": "להתחיל Pro היום",
-            "header": "לסיים את הניסיון, להתחיל את Rerun Pro",
+            "header": "לסיים את הניסיון, להתחיל את {brand} Pro",
             "tax": "מס",
             "taxFromAddress": "מס, לפי הכתובת שלך",
             "dueToday": "לתשלום היום",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "רץ על <b>ה-AI שלך</b>",
-                "credit": "<b>קרדיטים של Rerun</b> כשצריך"
+                "credit": "<b>קרדיטים של {brand}</b> כשצריך"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "מה גרם לך להחליט לעזוב?",
             "placeholder": "משפט אחד מספיק",
-            "comebackField": "תשתמש שוב ב-Rerun?",
+            "comebackField": "תשתמש שוב ב-{brand}?",
             "missingComment": "ספר לנו בכמה מילים למה אתה עוזב",
             "missingComeback": "ספר לנו אם תחזור",
             "required": "ספר לנו בכמה מילים למה אתה עוזב.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "הרצות החודש",
             "agents": "{count, plural, one {סוכן אחד} two {# סוכנים} other {# סוכנים}}",
             "agentsCaption": "מוגדרים, מחוברים ועובדים",
-            "creditsCaption": "קרדיטים של Rerun שנותרו",
+            "creditsCaption": "קרדיטים של {brand} שנותרו",
             "runsSoFar": "הרצות עד כה",
             "schedules": "תזמונים"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "קרדיטים של Rerun",
-            "subtitle": "הוצאו על ידי העמיתים שלך על מודלים של Rerun ונתונים בתשלום",
+            "title": "קרדיטים של {brand}",
+            "subtitle": "הוצאו על ידי העמיתים שלך על מודלים של {brand} ונתונים בתשלום",
             "addCredits": "להוסיף קרדיטים",
             "startProNow": "להתחיל Pro עכשיו",
             "usedTrial": "נוצלו · קרדיטי ניסיון",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "נגמרו לך קרדיטי הניסיון",
             "title": "נגמרו לך הקרדיטים",
-            "trialDescription": "העמיתים שלך לא יכולים להשתמש במודלים של Rerun או בנתונים בתשלום. Pro מגיע עם {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}} כל חודש.",
-            "description": "העמיתים שלך לא יכולים להשתמש במודלים של Rerun או בנתונים בתשלום.",
-            "descriptionUntil": "העמיתים שלך לא יכולים להשתמש במודלים של Rerun או בנתונים בתשלום עד {date}."
+            "trialDescription": "העמיתים שלך לא יכולים להשתמש במודלים של {brand} או בנתונים בתשלום. Pro מגיע עם {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}} כל חודש.",
+            "description": "העמיתים שלך לא יכולים להשתמש במודלים של {brand} או בנתונים בתשלום.",
+            "descriptionUntil": "העמיתים שלך לא יכולים להשתמש במודלים של {brand} או בנתונים בתשלום עד {date}."
         },
         "switch": {
             "label": "לאפשר הוצאות",
-            "on": "העמיתים יכולים להשתמש במודלים של Rerun ובנתונים בתשלום.",
-            "off": "מושהה. העמיתים לא יכולים להשתמש במודלים של Rerun או בנתונים בתשלום."
+            "on": "העמיתים יכולים להשתמש במודלים של {brand} ובנתונים בתשלום.",
+            "off": "מושהה. העמיתים לא יכולים להשתמש במודלים של {brand} או בנתונים בתשלום."
         },
         "kind": {
             "ai": "מודלי AI",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "לא נותרו קרדיטי ניסיון",
             "outOfCredits": "נגמרו הקרדיטים",
             "left": "נותרו {figure}",
-            "ariaUsed": "קרדיטים של Rerun שנוצלו"
+            "ariaUsed": "קרדיטים של {brand} שנוצלו"
         }
     },
     "creditsBar": {

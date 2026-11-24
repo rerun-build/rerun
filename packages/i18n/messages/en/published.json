@@ -56,7 +56,7 @@
         "workspaceFallback": "Workspace"
     },
     "gate": {
-        "madeWith": "Made with Rerun",
+        "madeWith": "Made with {brand}",
         "locked": "{workspace} page, locked",
         "code": "Code",
         "switchAccount": "Switch account"

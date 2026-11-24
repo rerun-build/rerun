@@ -52,7 +52,7 @@
     },
     "unavailable": {
         "title": "The Brain is not on this box yet",
-        "description": "Your box runs a version of Rerun from before the Brain. It shows up here once the box is updated."
+        "description": "Your box runs a version of {brand} from before the Brain. It shows up here once the box is updated."
     },
     "crumbs": {
         "brain": "Brain",
@@ -249,14 +249,14 @@
         "unreachableFallback": "Could not reach the machine of this workspace.",
         "deleteFailed": "Could not delete the page",
         "noMachineTitle": "Your Brain comes with your first coworker",
-        "noMachineDescription": "It lives on your workspace's machine, which is set up when Rerun builds your first coworker. From then on, what every coworker knows about your company, and the files and tables they share, show up here.",
+        "noMachineDescription": "It lives on your workspace's machine, which is set up when {brand} builds your first coworker. From then on, what every coworker knows about your company, and the files and tables they share, show up here.",
         "unreachableTitle": "Could not reach your workspace",
         "unreachableDescription": "The machine of this workspace did not answer. It may still be waking up.",
         "retry": "Retry",
-        "seedingTitle": "Rerun is reading your website",
+        "seedingTitle": "{brand} is reading your website",
         "emptyTitle": "Your company brain is empty",
         "seedingDescription": "The identity card of your company shows up here in a few minutes: what you sell, to whom, your team, your voice and your tools.",
-        "emptyDescription": "It is what every coworker reads about your company before it works: what you sell, to whom, your team, your voice and your tools. Rerun can fill it from your website.",
+        "emptyDescription": "It is what every coworker reads about your company before it works: what you sell, to whom, your team, your voice and your tools. {brand} can fill it from your website.",
         "refresh": "Refresh",
         "writeYourself": "Write a page yourself",
         "missingPageTitle": "No page \"{slug}\" yet",
@@ -291,7 +291,7 @@
         "googleBusiness": "Google Business Profile"
     },
     "authors": {
-        "seed": "Rerun, from your website",
+        "seed": "{brand}, from your website",
         "foreman": "Chief of Staff"
     },
     "filing": {

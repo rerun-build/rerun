@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "邮件偏好",
-        "subtitle": "更新 Rerun 向您发送的邮件。无需登录账号。",
+        "subtitle": "更新 {brand} 向您发送的邮件。无需登录账号。",
         "subtitleRuns": "选择您的同事是否可以给您发邮件。无需登录账号。",
         "invalid": "此退订链接无效或已过期。",
         "logIn": "登录以管理您的偏好"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "仅供 {workspace} 的成员访问",
-            "continue": "使用 Rerun 继续"
+            "continue": "使用 {brand} 继续"
         }
     },
     "publishedSite": {

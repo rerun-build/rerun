@@ -20,6 +20,9 @@ Every string a person sees goes through `t()` (`useTranslations` in a client com
 `getTranslations` on the server). The source is English, in `messages/en/<namespace>.json`.
 
 - A key says what the string is, not what it reads: `chat.composer.placeholder`.
+- The product is named `{brand}`, never "Rerun": the pack fills it when it loads, with the name of the
+  organization an app is shown under, so nobody passes it to `t()`. `i18n:check` refuses a literal
+  "Rerun" outside the surfaces only Rerun has (`scripts/i18n/brand.mjs`).
 - One sentence is one key. Never glue translated pieces together: variables and plurals go inside
   the message, in ICU (`{count, plural, one {# file} other {# files}}`).
 - A string whose meaning is not obvious from its key gets a note under `_context` at the root of its

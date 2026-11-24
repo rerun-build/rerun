@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# template} other {# templates}}",
-        "rerunTeam": "Equipe Rerun",
+        "rerunTeam": "Equipe {brand}",
         "verified": "Criador verificado"
     },
     "spotlight": {
@@ -117,7 +117,7 @@
             "featured": "Destaques",
             "featuredSubtitle": "Configurações escolhidas a dedo para ver primeiro.",
             "justAdded": "Recém-adicionados",
-            "justAddedSubtitle": "Os templates publicados mais recentemente no Rerun."
+            "justAddedSubtitle": "Os templates publicados mais recentemente no {brand}."
         },
         "empty": {
             "filtered": "Nenhum template corresponde a estes filtros",
@@ -551,7 +551,7 @@
         "trialUsedBilledSeparately": "Seu teste grátis já foi usado. Cobrado hoje; este template é cobrado à parte.",
         "resubscribe": "Assinar de novo por {price}/mês",
         "lapsed": "Sua assinatura terminou. Os coworkers que este template instalou estão desativados.",
-        "billedTo": "Cobrado de {workspace}. Seu plano Rerun já está ativo.",
+        "billedTo": "Cobrado de {workspace}. Seu plano {brand} já está ativo.",
         "yours": "Seu template, sem custo."
     },
     "boardAlt": "Quadro de coworkers {title}"

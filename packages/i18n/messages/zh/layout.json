@@ -128,10 +128,10 @@
         "reload": "重新加载",
         "available": {
             "title": "有新版本可用",
-            "description": "重新加载以获取最新的 Rerun。"
+            "description": "重新加载以获取最新的 {brand}。"
         },
         "required": {
-            "title": "Rerun 已更新",
+            "title": "{brand} 已更新",
             "description": "新版本已上线。请重新加载以继续。"
         }
     },
@@ -213,10 +213,10 @@
     "boxNameSuggestions": "或选择一个名称",
     "dashboard": {
         "metaTitle": "仪表板",
-        "metaDescription": "您在 Rerun 上的 Boxes 和同事。"
+        "metaDescription": "您在 {brand} 上的 Boxes 和同事。"
     },
     "site": {
-        "title": "Rerun | 让 AI 完成您的任务，即使在您睡觉时",
+        "title": "{brand} | 让 AI 完成您的任务，即使在您睡觉时",
         "description": "从库中挑选一个开箱即用的 AI 智能体或自行构建，连接您的工具，它会在您云端的专属私有机器上全天候运行。免费试用 {trialDays} 天。"
     }
 }

@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# model} other {# models}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Rerun credits are paused",
+        "creditPaused": "{brand} credits are paused",
         "creditUsed": "{percent}% of this month's credits used",
         "creditUsedUpOn": "Monthly credits used up, back on {date}",
         "creditUsedUpNextMonth": "Monthly credits used up, back next month",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "How to get your Anthropic key",
                 "step1": "Open the [Anthropic Console](https://console.anthropic.com/settings/keys) and sign in.",
-                "step2": "Click **Create Key** and name it, for example \"Rerun\".",
+                "step2": "Click **Create Key** and name it, for example \"{brand}\".",
                 "step3": "Copy the key (it starts with `sk-ant-`) and paste it above. It is shown only once."
             },
             "openai": {
                 "title": "How to get your OpenAI key",
                 "step1": "Open [OpenAI API keys](https://platform.openai.com/api-keys) and sign in.",
-                "step2": "Click **Create new secret key** and name it, for example \"Rerun\".",
+                "step2": "Click **Create new secret key** and name it, for example \"{brand}\".",
                 "step3": "Copy the key (it starts with `sk-`) and paste it above. It is shown only once."
             },
             "google": {
@@ -252,7 +252,7 @@
             "automations": "{count, plural, one {# automation} other {# automations}} will fall back to the workspace default model.",
             "both": "{agents} and {count, plural, one {# automation} other {# automations}} will fall back to the workspace default model."
         },
-        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Rerun.",
+        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to {brand}.",
         "nothingRuns": "The credential is removed from the Box. Nothing runs on it.",
         "released": {
             "agents": "{agents} now run on the workspace default model.",
@@ -303,9 +303,9 @@
         "signedInAgain": "Signed in again",
         "creditsTitle": "This month's credits",
         "topUp": "Top up",
-        "creditsUsedUpOn": "Coworkers running on Rerun are paused until the credits are back on {date}. Top up or pick another default model to keep them going.",
-        "creditsUsedUpNextMonth": "Coworkers running on Rerun are paused until the credits are back next month. Top up or pick another default model to keep them going.",
-        "creditsIncluded": "Comes with your Rerun plan. No key, nothing to set up.",
+        "creditsUsedUpOn": "Coworkers running on {brand} are paused until the credits are back on {date}. Top up or pick another default model to keep them going.",
+        "creditsUsedUpNextMonth": "Coworkers running on {brand} are paused until the credits are back next month. Top up or pick another default model to keep them going.",
+        "creditsIncluded": "Comes with your {brand} plan. No key, nothing to set up.",
         "signInRejected": "This sign-in was rejected. Coworkers using it are stopped until you sign in again.",
         "signInExpired": "This sign-in expired. Coworkers using it are stopped until you sign in again.",
         "reconnected": "Your coworkers start again",
@@ -332,12 +332,12 @@
         },
         "default": {
             "via": "Via {source}. Coworkers with no model of their own run on it.",
-            "pausedPick": "Rerun credits are paused, so coworkers with no model of their own are paused too. Pick another model to keep them going.",
-            "pausedAdd": "Rerun credits are paused, so coworkers with no model of their own are paused too. Add a plan or an API key to keep them going.",
-            "usedUpOnPick": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
-            "usedUpOnAdd": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
-            "usedUpNextMonthPick": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Pick another model to keep them going.",
-            "usedUpNextMonthAdd": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "pausedPick": "{brand} credits are paused, so coworkers with no model of their own are paused too. Pick another model to keep them going.",
+            "pausedAdd": "{brand} credits are paused, so coworkers with no model of their own are paused too. Add a plan or an API key to keep them going.",
+            "usedUpOnPick": "{brand} credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpOnAdd": "{brand} credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "usedUpNextMonthPick": "{brand} credits are used up until they are back next month, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpNextMonthAdd": "{brand} credits are used up until they are back next month, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
             "stopped": "Coworkers with no model of their own are stopped. Fix {source} or pick another model.",
             "noOtherModel": "No other model is ready. Add a plan or an API key first.",
             "change": "Change"
@@ -352,7 +352,7 @@
             "full": "Up to {max} backups",
             "noneLeft": "No other model is ready. Add a plan or an API key first.",
             "credit": {
-                "title": "Rerun credit as last resort",
+                "title": "{brand} credit as last resort",
                 "description": "Only when every plan is out"
             }
         },
@@ -396,7 +396,7 @@
         },
         "copied": "Copied",
         "copyMessage": "Copy a message for them",
-        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun."
+        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to {brand}."
     },
     "claude": {
         "remarks": {
@@ -405,7 +405,7 @@
             "checking": "Checking",
             "connected": "All set!"
         },
-        "approveStep": "Approve Rerun on Claude",
+        "approveStep": "Approve {brand} on Claude",
         "opening": "Claude is opening in a new tab",
         "openAgain": "Open Claude again",
         "open": "Open Claude",

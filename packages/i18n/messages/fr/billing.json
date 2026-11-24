@@ -118,7 +118,7 @@
         "credit": {
             "addedTitle": "Crédits ajoutés",
             "addedBody": "{count, plural, one {# crédit est} other {# crédits sont}} dans votre workspace. Ils n'expirent jamais, et vos coworkers reprennent là où ils s'étaient arrêtés.",
-            "title": "Acheter des crédits Rerun",
+            "title": "Acheter des crédits {brand}",
             "eachPack": "Chaque pack ajoute {count, plural, one {# crédit} other {# crédits}} pour {price}, payé une fois. Ils n'expirent jamais.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
             "packCredits": "{count, plural, one {# crédit} other {# crédits}}, sans expiration",
@@ -278,7 +278,7 @@
         "fallbackTitle": "votre modèle",
         "readyOne": "« {title} » est à vous. Prêt à placer son coworker ?",
         "readyMany": "« {title} » est à vous. Prêt à placer ses {count} coworkers ?",
-        "needsPlan": "« {title} » est à vous. Un abonnement Rerun actif est nécessaire pour l'installer.",
+        "needsPlan": "« {title} » est à vous. Un abonnement {brand} actif est nécessaire pour l'installer.",
         "finalizing": "Finalisation de l'achat",
         "close": "Fermer",
         "placeOne": "Placer son coworker",
@@ -352,7 +352,7 @@
                 "footnote": "Votre essai gratuit se termine aujourd'hui. Pour ne rien payer aujourd'hui, gardez votre essai : Pro démarre tout seul le {date}."
             },
             "creditLocked": {
-                "title": "Les crédits Rerun viennent avec Pro",
+                "title": "Les crédits {brand} viennent avec Pro",
                 "titleCoworker": "Continuez avec Pro",
                 "subtitle": "Vos {trialCredits, number} crédits d'essai sont épuisés. Pro inclut {credits, plural, one {# crédit} other {# crédits}} chaque mois, et vous pouvez en ajouter à tout moment.",
                 "subtitleCoworker": "{coworker} reprend là où il s'est arrêté.",
@@ -435,8 +435,8 @@
             "updateFailed": "Votre formule n'a pas pu être mise à jour",
             "stillUpdating": "Votre formule est en cours de mise à jour",
             "pleaseWait": "Patientez",
-            "freeFor": "Rerun Pro, gratuit pendant {days} jours",
-            "subscribe": "S'abonner à Rerun Pro",
+            "freeFor": "{brand} Pro, gratuit pendant {days} jours",
+            "subscribe": "S'abonner à {brand} Pro",
             "dueToday": "à payer aujourd'hui",
             "perYear": "par an",
             "perMonth": "par mois",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "Votre essai",
             "title": "Passer à Pro aujourd'hui",
-            "header": "Finir l'essai, passer à Rerun Pro",
+            "header": "Finir l'essai, passer à {brand} Pro",
             "tax": "Taxes",
             "taxFromAddress": "Taxes, selon votre adresse",
             "dueToday": "À payer aujourd'hui",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "Tourne sur <b>votre propre IA</b>",
-                "credit": "<b>Crédits Rerun</b> quand vous en avez besoin"
+                "credit": "<b>Crédits {brand}</b> quand vous en avez besoin"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "Qu'est-ce qui vous a décidé à partir ?",
             "placeholder": "Une phrase suffit",
-            "comebackField": "Utiliserez-vous Rerun à nouveau ?",
+            "comebackField": "Utiliserez-vous {brand} à nouveau ?",
             "missingComment": "Dites-nous en quelques mots pourquoi vous partez",
             "missingComeback": "Dites-nous si vous reviendrez",
             "required": "Dites-nous en quelques mots pourquoi vous partez.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "Exécutions ce mois-ci",
             "agents": "{count, plural, one {# agent} other {# agents}}",
             "agentsCaption": "configurés, connectés et au travail",
-            "creditsCaption": "crédits Rerun restants",
+            "creditsCaption": "crédits {brand} restants",
             "runsSoFar": "Exécutions jusqu'ici",
             "schedules": "Planifications"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "Crédits Rerun",
-            "subtitle": "Dépensés par vos coworkers en modèles Rerun et données payantes",
+            "title": "Crédits {brand}",
+            "subtitle": "Dépensés par vos coworkers en modèles {brand} et données payantes",
             "addCredits": "Ajouter des crédits",
             "startProNow": "Passer à Pro maintenant",
             "usedTrial": "Utilisés · crédits d'essai",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "Vous n'avez plus de crédits d'essai",
             "title": "Vous n'avez plus de crédits",
-            "trialDescription": "Vos coworkers ne peuvent plus utiliser les modèles Rerun ni les données payantes. Pro inclut {count, plural, one {# crédit} other {# crédits}} chaque mois.",
-            "description": "Vos coworkers ne peuvent plus utiliser les modèles Rerun ni les données payantes.",
-            "descriptionUntil": "Vos coworkers ne peuvent plus utiliser les modèles Rerun ni les données payantes jusqu'au {date}."
+            "trialDescription": "Vos coworkers ne peuvent plus utiliser les modèles {brand} ni les données payantes. Pro inclut {count, plural, one {# crédit} other {# crédits}} chaque mois.",
+            "description": "Vos coworkers ne peuvent plus utiliser les modèles {brand} ni les données payantes.",
+            "descriptionUntil": "Vos coworkers ne peuvent plus utiliser les modèles {brand} ni les données payantes jusqu'au {date}."
         },
         "switch": {
             "label": "Autoriser les dépenses",
-            "on": "Les coworkers peuvent utiliser les modèles Rerun et les données payantes.",
-            "off": "En pause. Les coworkers ne peuvent pas utiliser les modèles Rerun ni les données payantes."
+            "on": "Les coworkers peuvent utiliser les modèles {brand} et les données payantes.",
+            "off": "En pause. Les coworkers ne peuvent pas utiliser les modèles {brand} ni les données payantes."
         },
         "kind": {
             "ai": "Modèles d'IA",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "Plus de crédits d'essai",
             "outOfCredits": "Plus de crédits",
             "left": "{figure} restants",
-            "ariaUsed": "Crédits Rerun utilisés"
+            "ariaUsed": "Crédits {brand} utilisés"
         }
     },
     "creditsBar": {

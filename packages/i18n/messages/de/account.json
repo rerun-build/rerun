@@ -11,7 +11,7 @@
         },
         "language": {
             "label": "Sprache",
-            "description": "Die Sprache, in der Rerun mit dir spricht."
+            "description": "Die Sprache, in der {brand} mit dir spricht."
         },
         "desktop": {
             "label": "Desktop-App",
@@ -19,7 +19,7 @@
         },
         "delete": {
             "label": "Konto löschen",
-            "description": "Schließe dein Rerun-Konto endgültig."
+            "description": "Schließe dein {brand}-Konto endgültig."
         }
     },
     "language": {
@@ -50,7 +50,7 @@
         "phone": {
             "title": "Telefon",
             "empty": "Nicht verbunden. Füge eine Nummer hinzu, um dich mit einem Code per WhatsApp oder SMS anzumelden.",
-            "otherAccount": "Mit dieser Nummer meldest du dich bei einem anderen Rerun-Konto an. Ändere sie, um dich hier per Telefon anzumelden."
+            "otherAccount": "Mit dieser Nummer meldest du dich bei einem anderen {brand}-Konto an. Ändere sie, um dich hier per Telefon anzumelden."
         },
         "change": "Ändern",
         "add": "Hinzufügen",
@@ -62,7 +62,7 @@
         "disconnectTitle": "{provider} trennen?",
         "disconnectDescription": "Du kannst dich dann nicht mehr mit {provider} bei diesem Konto anmelden. Deine anderen Anmeldemethoden funktionieren weiter.",
         "linkError": {
-            "identityTaken": "Dieses {provider}-Konto ist bereits mit einem anderen Rerun-Konto verbunden.",
+            "identityTaken": "Dieses {provider}-Konto ist bereits mit einem anderen {brand}-Konto verbunden.",
             "denied": "{provider} wurde nicht verbunden.",
             "failed": "{provider} konnte nicht verbunden werden. Versuch es erneut."
         }

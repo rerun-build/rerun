@@ -27,7 +27,7 @@
     },
     "resize": "Chatgröße ändern",
     "modelPill": {
-        "hubReason": "Dieser Chat läuft immer mit Rerun Balanced"
+        "hubReason": "Dieser Chat läuft immer mit {brand} Balanced"
     },
     "nextSteps": {
         "turnOn": "Meinen Coworker einschalten",
@@ -141,12 +141,12 @@
     },
     "contact": {
         "defaultSummary": "Ich komme bei der Einrichtung meines ersten Coworkers nicht weiter und brauche Hilfe.",
-        "sentWithEmail": "An das Rerun-Team gesendet. Es antwortet im Chat und an {email}.",
-        "sent": "An das Rerun-Team gesendet. Es antwortet im Chat.",
+        "sentWithEmail": "An das {brand}-Team gesendet. Es antwortet im Chat und an {email}.",
+        "sent": "An das {brand}-Team gesendet. Es antwortet im Chat.",
         "openChat": "Chat öffnen",
         "stillStuck": "Kommst du nicht weiter? Jemand aus dem Team hilft dir.",
         "send": "An das Team senden",
-        "title": "Sprich mit jemandem bei Rerun",
+        "title": "Sprich mit jemandem bei {brand}",
         "description": "Das geht mit deinem Konto an das Team, und es antwortet dir im Chat.",
         "notNow": "Nicht jetzt"
     },
@@ -304,8 +304,8 @@
         "owned": "{title} gehört dir",
         "recurring": "Monatliche Abrechnung",
         "oneTime": "Einmalkauf",
-        "billedTo": "Abgerechnet an {name}, getrennt von deinem Rerun-Tarif. Die Installation startet, sobald die Zahlung durch ist.",
-        "billedToWorkspace": "Abgerechnet an deinen Workspace, getrennt von deinem Rerun-Tarif. Die Installation startet, sobald die Zahlung durch ist.",
+        "billedTo": "Abgerechnet an {name}, getrennt von deinem {brand}-Tarif. Die Installation startet, sobald die Zahlung durch ist.",
+        "billedToWorkspace": "Abgerechnet an deinen Workspace, getrennt von deinem {brand}-Tarif. Die Installation startet, sobald die Zahlung durch ist.",
         "dueToday": "Heute fällig",
         "perMonth": "/Monat",
         "opening": "Wird geöffnet…",
@@ -330,7 +330,7 @@
         "guide": {
             "title": "Wie funktioniert das?",
             "description": "Coworker, Boxes, Routinen, in zwei Minuten",
-            "send": "Wie funktioniert Rerun?"
+            "send": "Wie funktioniert {brand}?"
         },
         "checkWorking": {
             "title": "Was macht {name}?",

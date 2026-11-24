@@ -171,7 +171,7 @@
         "remote_file_read": "קרא קובץ ב-#{computer}",
         "remote_file_write": "כתב קובץ ב-#{computer}",
         "remote_transfer": "העתיק קובץ עם #{computer}",
-        "request_feature": "ניסח בקשה לצוות של Rerun"
+        "request_feature": "ניסח בקשה לצוות של {brand}"
     },
     "activities": {
         "shell_exec": "מריץ פקודה",

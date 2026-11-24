@@ -171,7 +171,7 @@
         "remote_file_read": "读取了 #{computer} 上的文件",
         "remote_file_write": "在 #{computer} 上写入了文件",
         "remote_transfer": "与 #{computer} 复制了文件",
-        "request_feature": "为 Rerun 团队起草了一份请求"
+        "request_feature": "为 {brand} 团队起草了一份请求"
     },
     "activities": {
         "shell_exec": "正在运行命令",

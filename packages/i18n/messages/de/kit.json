@@ -105,7 +105,7 @@
         "region": "Cookie-Einwilligung",
         "title": "Cookies",
         "short": "Wir nutzen Analyse-Cookies. <policy>Cookie-Richtlinie</policy>",
-        "long": "Wir nutzen Analyse-Cookies, um zu verstehen, wie Rerun genutzt wird. Cookies, die für deine Anmeldung, den Support-Chat und deine Einstellungen nötig sind, sind immer aktiv. <policy>Cookie-Richtlinie</policy>"
+        "long": "Wir nutzen Analyse-Cookies, um zu verstehen, wie {brand} genutzt wird. Cookies, die für deine Anmeldung, den Support-Chat und deine Einstellungen nötig sind, sind immer aktiv. <policy>Cookie-Richtlinie</policy>"
     },
     "experts": {
         "wizard": {

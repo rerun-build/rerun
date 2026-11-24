@@ -67,3 +67,9 @@ Read the generated `fr/*.json` and `es/*.json` in the diff. Fix a wrong word by 
 `pnpm verify:ui --locale fr` (then `es`, then `en-XA`, the pseudo-locale that stretches every string
 by a third and accents it: an English string left in the code shows up unaccented). Look at every
 width: French and Spanish run longer than English.
+
+## Naming the product
+
+Write `{brand}`, never "Rerun": the pack fills it when it loads (`fillBrand`), so it is never passed to
+`t()`. `pnpm i18n:check` refuses a literal "Rerun" outside the list of `scripts/i18n/brand.mjs`. Outside a
+request, `translatorFor(locale, namespace, brandName)` and `emailTranslator(locale, brandName)` take the name.

@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "Le Brain n'est pas encore sur cette Box",
-        "description": "Votre Box exécute une version de Rerun antérieure au Brain. Il apparaîtra ici une fois la Box mise à jour."
+        "description": "Votre Box exécute une version de {brand} antérieure au Brain. Il apparaîtra ici une fois la Box mise à jour."
     },
     "crumbs": {
         "brain": "Brain",
@@ -198,14 +198,14 @@
         "unreachableFallback": "Impossible de joindre la machine de ce workspace.",
         "deleteFailed": "Impossible de supprimer la page",
         "noMachineTitle": "Votre Brain arrive avec votre premier coworker",
-        "noMachineDescription": "Il vit sur la machine de votre workspace, mise en place quand Rerun crée votre premier coworker. Ensuite, ce que chaque coworker sait de votre entreprise, ainsi que les fichiers et les tables qu'ils partagent, apparaissent ici.",
+        "noMachineDescription": "Il vit sur la machine de votre workspace, mise en place quand {brand} crée votre premier coworker. Ensuite, ce que chaque coworker sait de votre entreprise, ainsi que les fichiers et les tables qu'ils partagent, apparaissent ici.",
         "unreachableTitle": "Impossible de joindre votre workspace",
         "unreachableDescription": "La machine de ce workspace n'a pas répondu. Elle est peut-être encore en train de démarrer.",
         "retry": "Réessayer",
-        "seedingTitle": "Rerun lit votre site web",
+        "seedingTitle": "{brand} lit votre site web",
         "emptyTitle": "Le Brain de votre entreprise est vide",
         "seedingDescription": "La carte d'identité de votre entreprise apparaît ici dans quelques minutes : ce que vous vendez, à qui, votre équipe, votre ton et vos outils.",
-        "emptyDescription": "C'est ce que chaque coworker lit sur votre entreprise avant de travailler : ce que vous vendez, à qui, votre équipe, votre ton et vos outils. Rerun peut le remplir depuis votre site web.",
+        "emptyDescription": "C'est ce que chaque coworker lit sur votre entreprise avant de travailler : ce que vous vendez, à qui, votre équipe, votre ton et vos outils. {brand} peut le remplir depuis votre site web.",
         "refresh": "Actualiser",
         "writeYourself": "Écrire une page vous-même",
         "missingPageTitle": "Pas encore de page « {slug} »",
@@ -240,7 +240,7 @@
         "googleBusiness": "Fiche d'établissement Google"
     },
     "authors": {
-        "seed": "Rerun, d'après votre site web",
+        "seed": "{brand}, d'après votre site web",
         "foreman": "Chief of Staff"
     },
     "filing": {

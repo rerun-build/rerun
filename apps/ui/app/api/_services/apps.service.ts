@@ -10,6 +10,7 @@ import { reportWorkspaceEvent } from '@/lib/apps/analytics'
 import { dropWakeTrigger, syncAppConnector, unbindAccount, unbindConnection } from '@/lib/apps/bindings'
 import { claimQuota, updateConnection, workspaceScope } from '@/lib/apps/connections'
 import { isWakeEventOf } from '@/lib/apps/catalog'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { loginLinkedin, type LinkedinCredentials } from '@/lib/apps/linkedin/connect'
 import { loginWhatsapp } from '@/lib/apps/whatsapp/connect'
 import { LinkupError, createWebhook, deleteAccount, resendCheckpointCode, submitCheckpoint, type LinkupLinkCode, type LinkupLoginResult } from '@/lib/apps/linkup/client'
@@ -545,7 +546,7 @@ export async function setAgentWakeEvents(slug: AppSlug, agentId: string, connect
         if (!owned.engine_agent_id) throw new AppActionError('unknown', 'coworkerNotRunning')
         const conn = await getWorkspaceConnection(workspace.id)
         const name = bindings?.some(other => other.trigger_slug) ? await accountTriggerName(supabase, app.wakeTrigger.name, connectionId) : app.wakeTrigger.name
-        const created = await engineCreateTrigger(conn, owned.engine_agent_id, { name, description: app.wakeTrigger.description, body: app.wakeTrigger.prompt(wanted), methods: ['POST'] })
+        const created = await engineCreateTrigger(conn, owned.engine_agent_id, { name, description: app.wakeTrigger.description((await workspaceBrand(workspace.id)).name), body: app.wakeTrigger.prompt(wanted), methods: ['POST'] })
         trigger = { slug: created.slug }
         token = created.token
     }

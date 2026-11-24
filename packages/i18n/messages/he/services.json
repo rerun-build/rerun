@@ -86,7 +86,7 @@
         "configured": "{name} הוגדר",
         "connectTitle": "לחבר את {name}",
         "signInOAuth": "יש להתחבר ל-{name} כדי שהסוכן שלך יוכל להשתמש בו.",
-        "signInManaged": "יש להתחבר עם {name} כדי שהסוכן שלך יוכל להשתמש בו. Rerun מטפל בחיבור בשבילך.",
+        "signInManaged": "יש להתחבר עם {name} כדי שהסוכן שלך יוכל להשתמש בו. {brand} מטפל בחיבור בשבילך.",
         "setUp": "להגדיר את {name}",
         "authentication": "אימות",
         "backToMethods": "חזרה לשיטות",

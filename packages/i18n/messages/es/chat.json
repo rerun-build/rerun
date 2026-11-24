@@ -156,7 +156,7 @@
         "takeover": "Tu turno en la pantalla",
         "spend": "Gasto por aprobar",
         "computer": "Comando por aprobar en #{computer}",
-        "feature": "Solicitud para enviar al equipo de Rerun"
+        "feature": "Solicitud para enviar al equipo de {brand}"
     },
     "pendingHitl": {
         "goTo": "{label}, ir allí"
@@ -343,7 +343,7 @@
         "detailsLabel": "Danos más detalles",
         "negativePlaceholder": "¿Qué no te convenció de esta respuesta?",
         "positivePlaceholder": "¿Qué te gustó de esta respuesta?",
-        "disclaimer": "Enviar este reporte comparte esta conversación con el equipo de Rerun para que podamos mejorar tus coworkers.",
+        "disclaimer": "Enviar este reporte comparte esta conversación con el equipo de {brand} para que podamos mejorar tus coworkers.",
         "cancel": "Cancelar",
         "submit": "Enviar",
         "categories": {
@@ -398,11 +398,11 @@
         }
     },
     "budget": {
-        "title": "Créditos de Rerun",
+        "title": "Créditos de {brand}",
         "paused": {
-            "title": "Créditos de Rerun en pausa",
-            "body": "Tus coworkers no pueden usar los modelos de Rerun ni los datos de pago hasta que alguien los reactive.",
-            "actionTitle": "Reactivar los créditos de Rerun",
+            "title": "Créditos de {brand} en pausa",
+            "body": "Tus coworkers no pueden usar los modelos de {brand} ni los datos de pago hasta que alguien los reactive.",
+            "actionTitle": "Reactivar los créditos de {brand}",
             "actionDescription": "El gasto se reanuda de inmediato.",
             "cta": "Reactivar"
         },
@@ -417,17 +417,17 @@
             "description": "{credits} incluidos cada mes."
         },
         "topUp": {
-            "title": "Recarga tus créditos de Rerun",
+            "title": "Recarga tus créditos de {brand}",
             "cta": "Recargar",
             "description": "O espera, se renuevan el mes que viene."
         },
         "usedUp": {
-            "noCredit": "Este workspace aún no tiene créditos de Rerun.",
+            "noCredit": "Este workspace aún no tiene créditos de {brand}.",
             "trial": "Has agotado los {credits} de tu prueba gratuita.",
-            "period": "Has agotado tus créditos de Rerun de este periodo."
+            "period": "Has agotado tus créditos de {brand} de este periodo."
         },
         "ownConnection": {
-            "body": "Esta conversación se ejecutó con Rerun, y tu plan de {plan} está conectado."
+            "body": "Esta conversación se ejecutó con {brand}, y tu plan de {plan} está conectado."
         },
         "runOn": "Ejecutar con {plan}",
         "or": "O",
@@ -585,7 +585,7 @@
         },
         "stop": "Detener",
         "offlineNote": "Sigue ejecutándose allí. El coworker recibirá noticias cuando la computadora vuelva.",
-        "lostNote": "Rerun se cerró en la computadora mientras se ejecutaba.",
+        "lostNote": "{brand} se cerró en la computadora mientras se ejecutaba.",
         "goneNote": "Este trabajo ya no se puede leer: la computadora se quitó o ya no lo conoce."
     },
     "jobEnd": {
@@ -606,7 +606,7 @@
         "send": "Enviar al equipo",
         "titleLabel": "Título",
         "descriptionLabel": "Descripción",
-        "sent": "Enviado al equipo de Rerun: <muted>{title}</muted>",
+        "sent": "Enviado al equipo de {brand}: <muted>{title}</muted>",
         "reviewIt": "Revisarla",
         "sendFailed": "No se pudo enviar la solicitud. Inténtalo de nuevo."
     }

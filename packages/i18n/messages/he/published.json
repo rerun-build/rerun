@@ -22,7 +22,7 @@
         "workspaceFallback": "סביבת העבודה"
     },
     "gate": {
-        "madeWith": "נוצר עם Rerun",
+        "madeWith": "נוצר עם {brand}",
         "locked": "דף של {workspace}, נעול",
         "code": "קוד",
         "switchAccount": "להחליף חשבון"

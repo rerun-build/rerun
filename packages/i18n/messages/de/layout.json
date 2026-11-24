@@ -128,10 +128,10 @@
         "reload": "Neu laden",
         "available": {
             "title": "Neue Version verfügbar",
-            "description": "Lade neu, um das neueste Rerun zu bekommen."
+            "description": "Lade neu, um das neueste {brand} zu bekommen."
         },
         "required": {
-            "title": "Rerun wurde aktualisiert",
+            "title": "{brand} wurde aktualisiert",
             "description": "Eine neue Version ist live. Lade neu, um weiterzumachen."
         }
     },
@@ -213,10 +213,10 @@
     "boxNameSuggestions": "Oder wähle einen Namen",
     "dashboard": {
         "metaTitle": "Dashboard",
-        "metaDescription": "Deine Boxes und Coworker auf Rerun."
+        "metaDescription": "Deine Boxes und Coworker auf {brand}."
     },
     "site": {
-        "title": "Rerun | Lass KI deine Aufgaben erledigen, sogar im Schlaf",
+        "title": "{brand} | Lass KI deine Aufgaben erledigen, sogar im Schlaf",
         "description": "Wähle einen startklaren KI-Agenten aus der Bibliothek oder bau deinen eigenen, verbinde deine Tools, und er läuft rund um die Uhr auf deiner eigenen privaten Maschine in der Cloud. {trialDays} Tage gratis testen."
     }
 }

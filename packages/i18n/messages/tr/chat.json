@@ -156,7 +156,7 @@
         "takeover": "Ekranda sıra sizde",
         "spend": "Onaylanacak harcama",
         "computer": "#{computer} üzerinde bir komutu onaylayın",
-        "feature": "Rerun ekibine gönderilecek talep"
+        "feature": "{brand} ekibine gönderilecek talep"
     },
     "pendingHitl": {
         "goTo": "{label}, oraya git"
@@ -343,7 +343,7 @@
         "detailsLabel": "Lütfen ayrıntı verin",
         "negativePlaceholder": "Bu yanıtta sizi tatmin etmeyen neydi?",
         "positivePlaceholder": "Bu yanıtta sizi tatmin eden neydi?",
-        "disclaimer": "Bu raporu göndermek, coworker'larınızı geliştirebilmemiz için bu konuşmayı Rerun ekibiyle paylaşır.",
+        "disclaimer": "Bu raporu göndermek, coworker'larınızı geliştirebilmemiz için bu konuşmayı {brand} ekibiyle paylaşır.",
         "cancel": "İptal",
         "submit": "Gönder",
         "categories": {
@@ -398,11 +398,11 @@
         }
     },
     "budget": {
-        "title": "Rerun kredileri",
+        "title": "{brand} kredileri",
         "paused": {
-            "title": "Rerun kredileri duraklatıldı",
-            "body": "Biri devam ettirene kadar coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz.",
-            "actionTitle": "Rerun kredilerini devam ettirin",
+            "title": "{brand} kredileri duraklatıldı",
+            "body": "Biri devam ettirene kadar coworker'larınız {brand} modellerini veya ücretli verileri kullanamaz.",
+            "actionTitle": "{brand} kredilerini devam ettirin",
             "actionDescription": "Harcama hemen yeniden başlar.",
             "cta": "Devam ettir"
         },
@@ -417,17 +417,17 @@
             "description": "Her ay dahil: {credits}."
         },
         "topUp": {
-            "title": "Rerun kredilerinizi yükleyin",
+            "title": "{brand} kredilerinizi yükleyin",
             "cta": "Kredi yükle",
             "description": "Ya da bekleyin, gelecek ay sıfırlanır."
         },
         "usedUp": {
-            "noCredit": "Bu çalışma alanının henüz Rerun kredisi yok.",
+            "noCredit": "Bu çalışma alanının henüz {brand} kredisi yok.",
             "trial": "Ücretsiz denemenizin kredisini tamamen kullandınız: {credits}.",
-            "period": "Bu dönemin Rerun kredilerini tamamen kullandınız."
+            "period": "Bu dönemin {brand} kredilerini tamamen kullandınız."
         },
         "ownConnection": {
-            "body": "Bu konuşma Rerun üzerinde çalıştı ve {plan} planınız bağlı."
+            "body": "Bu konuşma {brand} üzerinde çalıştı ve {plan} planınız bağlı."
         },
         "runOn": "{plan} ile çalıştır",
         "or": "Veya",
@@ -585,7 +585,7 @@
         },
         "stop": "Durdur",
         "offlineNote": "Orada çalışmaya devam ediyor. Bilgisayar geri gelince coworker'a haber gelir.",
-        "lostNote": "Çalışırken bilgisayarda Rerun kapatıldı.",
+        "lostNote": "Çalışırken bilgisayarda {brand} kapatıldı.",
         "goneNote": "Bu iş artık okunamıyor: bilgisayar kaldırıldı ya da artık bu işi tanımıyor."
     },
     "jobEnd": {
@@ -606,7 +606,7 @@
         "send": "Ekibe gönder",
         "titleLabel": "Başlık",
         "descriptionLabel": "Açıklama",
-        "sent": "Rerun ekibine gönderildi: <muted>{title}</muted>",
+        "sent": "{brand} ekibine gönderildi: <muted>{title}</muted>",
         "reviewIt": "Gözden geçir",
         "sendFailed": "Talep gönderilemedi. Tekrar deneyin."
     }

@@ -118,7 +118,7 @@
         "credit": {
             "addedTitle": "Guthaben hinzugefügt",
             "addedBody": "{count, plural, one {# Credit ist} other {# Credits sind}} in deinem Workspace. Sie verfallen nie, und deine Coworker machen dort weiter, wo sie aufgehört haben.",
-            "title": "Rerun-Guthaben kaufen",
+            "title": "{brand}-Guthaben kaufen",
             "eachPack": "Jedes Paket fügt {count, plural, one {# Credit} other {# Credits}} für {price} hinzu, einmal bezahlt. Sie verfallen nie.",
             "packs": "{count, plural, one {# Paket} other {# Pakete}}",
             "packCredits": "{count, plural, one {# Credit} other {# Credits}}, verfallen nie",
@@ -278,7 +278,7 @@
         "fallbackTitle": "dein Template",
         "readyOne": "\"{title}\" gehört dir. Bereit, seinen Coworker zu platzieren?",
         "readyMany": "\"{title}\" gehört dir. Bereit, seine {count} Coworker zu platzieren?",
-        "needsPlan": "\"{title}\" gehört dir. Zum Installieren brauchst du einen aktiven Rerun-Tarif.",
+        "needsPlan": "\"{title}\" gehört dir. Zum Installieren brauchst du einen aktiven {brand}-Tarif.",
         "finalizing": "Kauf wird abgeschlossen",
         "close": "Schließen",
         "placeOne": "Seinen Coworker platzieren",
@@ -352,7 +352,7 @@
                 "footnote": "Damit endet deine kostenlose Testphase heute. Um heute nichts zu zahlen, behalte deine Testphase: Pro beginnt am {date} von selbst."
             },
             "creditLocked": {
-                "title": "Rerun-Guthaben gibt es mit Pro",
+                "title": "{brand}-Guthaben gibt es mit Pro",
                 "titleCoworker": "Mit Pro weitermachen",
                 "subtitle": "Deine {trialCredits, number} Test-Credits sind aufgebraucht. Pro enthält jeden Monat {credits, plural, one {# Credit} other {# Credits}}, und du kannst jederzeit mehr hinzufügen.",
                 "subtitleCoworker": "{coworker} macht dort weiter, wo er aufgehört hat.",
@@ -435,8 +435,8 @@
             "updateFailed": "Dein Tarif konnte nicht aktualisiert werden",
             "stillUpdating": "Dein Tarif wird noch aktualisiert",
             "pleaseWait": "Bitte warten",
-            "freeFor": "Rerun Pro, {days} Tage kostenlos",
-            "subscribe": "Rerun Pro abonnieren",
+            "freeFor": "{brand} Pro, {days} Tage kostenlos",
+            "subscribe": "{brand} Pro abonnieren",
             "dueToday": "heute fällig",
             "perYear": "pro Jahr",
             "perMonth": "pro Monat",
@@ -453,7 +453,7 @@
         "cardOnFile": {
             "back": "Deine Testphase",
             "title": "Pro heute starten",
-            "header": "Testphase beenden, Rerun Pro starten",
+            "header": "Testphase beenden, {brand} Pro starten",
             "tax": "Steuer",
             "taxFromAddress": "Steuer, nach deiner Adresse",
             "dueToday": "Heute fällig",
@@ -513,7 +513,7 @@
             },
             "lifetime": {
                 "ownAi": "Läuft mit <b>deiner eigenen KI</b>",
-                "credit": "<b>Rerun-Guthaben</b>, wann immer du es brauchst"
+                "credit": "<b>{brand}-Guthaben</b>, wann immer du es brauchst"
             }
         },
         "plan": {
@@ -622,7 +622,7 @@
         "reason": {
             "field": "Warum hast du dich entschieden zu gehen?",
             "placeholder": "Ein Satz reicht",
-            "comebackField": "Wirst du Rerun wieder nutzen?",
+            "comebackField": "Wirst du {brand} wieder nutzen?",
             "missingComment": "Sag uns in ein paar Worten, warum du gehst",
             "missingComeback": "Sag uns, ob du wiederkommst",
             "required": "Sag uns in ein paar Worten, warum du gehst.",
@@ -666,7 +666,7 @@
             "runsThisMonth": "Ausführungen diesen Monat",
             "agents": "{count, plural, one {# Coworker} other {# Coworker}}",
             "agentsCaption": "eingerichtet, verbunden und aktiv",
-            "creditsCaption": "Rerun-Guthaben übrig",
+            "creditsCaption": "{brand}-Guthaben übrig",
             "runsSoFar": "Ausführungen bisher",
             "schedules": "Zeitpläne"
         },
@@ -701,8 +701,8 @@
     },
     "usage": {
         "card": {
-            "title": "Rerun-Guthaben",
-            "subtitle": "Von deinen Coworkern für Rerun-Modelle und kostenpflichtige Daten ausgegeben",
+            "title": "{brand}-Guthaben",
+            "subtitle": "Von deinen Coworkern für {brand}-Modelle und kostenpflichtige Daten ausgegeben",
             "addCredits": "Guthaben hinzufügen",
             "startProNow": "Pro jetzt starten",
             "usedTrial": "Genutzt · Testguthaben",
@@ -714,14 +714,14 @@
         "outOfCredits": {
             "trialTitle": "Dein Testguthaben ist aufgebraucht",
             "title": "Dein Guthaben ist aufgebraucht",
-            "trialDescription": "Deine Coworker können keine Rerun-Modelle oder kostenpflichtigen Daten nutzen. Pro enthält jeden Monat {count, plural, one {# Credit} other {# Credits}}.",
-            "description": "Deine Coworker können keine Rerun-Modelle oder kostenpflichtigen Daten nutzen.",
-            "descriptionUntil": "Deine Coworker können bis {date} keine Rerun-Modelle oder kostenpflichtigen Daten nutzen."
+            "trialDescription": "Deine Coworker können keine {brand}-Modelle oder kostenpflichtigen Daten nutzen. Pro enthält jeden Monat {count, plural, one {# Credit} other {# Credits}}.",
+            "description": "Deine Coworker können keine {brand}-Modelle oder kostenpflichtigen Daten nutzen.",
+            "descriptionUntil": "Deine Coworker können bis {date} keine {brand}-Modelle oder kostenpflichtigen Daten nutzen."
         },
         "switch": {
             "label": "Ausgaben erlauben",
-            "on": "Coworker können Rerun-Modelle und kostenpflichtige Daten nutzen.",
-            "off": "Pausiert. Coworker können keine Rerun-Modelle oder kostenpflichtigen Daten nutzen."
+            "on": "Coworker können {brand}-Modelle und kostenpflichtige Daten nutzen.",
+            "off": "Pausiert. Coworker können keine {brand}-Modelle oder kostenpflichtigen Daten nutzen."
         },
         "kind": {
             "ai": "KI-Modelle",
@@ -935,7 +935,7 @@
             "noTrialCreditsLeft": "Kein Testguthaben mehr",
             "outOfCredits": "Kein Guthaben mehr",
             "left": "{figure} übrig",
-            "ariaUsed": "Genutztes Rerun-Guthaben"
+            "ariaUsed": "Genutztes {brand}-Guthaben"
         }
     },
     "creditsBar": {

@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "Der Brain ist noch nicht auf dieser Box",
-        "description": "Deine Box läuft mit einer Rerun-Version von vor dem Brain. Er erscheint hier, sobald die Box aktualisiert ist."
+        "description": "Deine Box läuft mit einer {brand}-Version von vor dem Brain. Er erscheint hier, sobald die Box aktualisiert ist."
     },
     "crumbs": {
         "brain": "Brain",
@@ -198,14 +198,14 @@
         "unreachableFallback": "Die Maschine dieses Workspace ist nicht erreichbar.",
         "deleteFailed": "Die Seite konnte nicht gelöscht werden",
         "noMachineTitle": "Dein Brain kommt mit deinem ersten Coworker",
-        "noMachineDescription": "Er liegt auf der Maschine deines Workspace, die eingerichtet wird, wenn Rerun deinen ersten Coworker baut. Ab dann erscheint hier, was jeder Coworker über dein Unternehmen weiß, sowie die Dateien und Tabellen, die sie teilen.",
+        "noMachineDescription": "Er liegt auf der Maschine deines Workspace, die eingerichtet wird, wenn {brand} deinen ersten Coworker baut. Ab dann erscheint hier, was jeder Coworker über dein Unternehmen weiß, sowie die Dateien und Tabellen, die sie teilen.",
         "unreachableTitle": "Dein Workspace ist nicht erreichbar",
         "unreachableDescription": "Die Maschine dieses Workspace hat nicht geantwortet. Vielleicht startet sie noch.",
         "retry": "Erneut versuchen",
-        "seedingTitle": "Rerun liest deine Website",
+        "seedingTitle": "{brand} liest deine Website",
         "emptyTitle": "Der Brain deines Unternehmens ist leer",
         "seedingDescription": "Der Steckbrief deines Unternehmens erscheint hier in ein paar Minuten: was du verkaufst, an wen, dein Team, deine Tonalität und deine Tools.",
-        "emptyDescription": "Das liest jeder Coworker über dein Unternehmen, bevor er loslegt: was du verkaufst, an wen, dein Team, deine Tonalität und deine Tools. Rerun kann ihn aus deiner Website füllen.",
+        "emptyDescription": "Das liest jeder Coworker über dein Unternehmen, bevor er loslegt: was du verkaufst, an wen, dein Team, deine Tonalität und deine Tools. {brand} kann ihn aus deiner Website füllen.",
         "refresh": "Aktualisieren",
         "writeYourself": "Selbst eine Seite schreiben",
         "missingPageTitle": "Noch keine Seite \"{slug}\"",
@@ -240,7 +240,7 @@
         "googleBusiness": "Google-Unternehmensprofil"
     },
     "authors": {
-        "seed": "Rerun, aus deiner Website",
+        "seed": "{brand}, aus deiner Website",
         "foreman": "Chief of Staff"
     },
     "filing": {

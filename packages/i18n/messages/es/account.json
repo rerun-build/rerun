@@ -11,7 +11,7 @@
         },
         "language": {
             "label": "Idioma",
-            "description": "El idioma que Rerun usa contigo."
+            "description": "El idioma que {brand} usa contigo."
         },
         "desktop": {
             "label": "App de escritorio",
@@ -19,7 +19,7 @@
         },
         "delete": {
             "label": "Eliminar cuenta",
-            "description": "Cierra tu cuenta de Rerun para siempre."
+            "description": "Cierra tu cuenta de {brand} para siempre."
         }
     },
     "language": {
@@ -50,7 +50,7 @@
         "phone": {
             "title": "Teléfono",
             "empty": "Sin conectar. Añade un número para iniciar sesión con un código por WhatsApp o SMS.",
-            "otherAccount": "Este número inicia sesión en otra cuenta de Rerun. Cámbialo para iniciar sesión aquí por teléfono."
+            "otherAccount": "Este número inicia sesión en otra cuenta de {brand}. Cámbialo para iniciar sesión aquí por teléfono."
         },
         "change": "Cambiar",
         "add": "Añadir",
@@ -62,7 +62,7 @@
         "disconnectTitle": "¿Desconectar {provider}?",
         "disconnectDescription": "Ya no podrás iniciar sesión en esta cuenta con {provider}. Tus otros métodos de inicio de sesión siguen funcionando.",
         "linkError": {
-            "identityTaken": "Esta cuenta de {provider} ya se usa para iniciar sesión en otra cuenta de Rerun.",
+            "identityTaken": "Esta cuenta de {provider} ya se usa para iniciar sesión en otra cuenta de {brand}.",
             "denied": "{provider} no se conectó.",
             "failed": "No se pudo conectar {provider}. Inténtalo de nuevo."
         }

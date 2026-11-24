@@ -303,7 +303,7 @@
             "aiProviders": {
                 "label": "AI sağlayıcılarını görme",
                 "blurb": "Kullanılan model, kredi ve kotalar",
-                "help": "Coworker'ın hangi AI sağlayıcısı ve modelle çalıştığını, çalışma alanına bağlı diğer sağlayıcıları ve her birinde ne kaldığını kontrol etmesine izin verir: Rerun kredisi ve Claude, Codex veya OpenCode aboneliğinin limitleri. Hiçbir şeyi değiştiremez."
+                "help": "Coworker'ın hangi AI sağlayıcısı ve modelle çalıştığını, çalışma alanına bağlı diğer sağlayıcıları ve her birinde ne kaldığını kontrol etmesine izin verir: {brand} kredisi ve Claude, Codex veya OpenCode aboneliğinin limitleri. Hiçbir şeyi değiştiremez."
             },
             "askUser": {
                 "label": "Size soru sorma",
@@ -333,12 +333,12 @@
             "remoteComputers": {
                 "label": "Bağlı bilgisayarları kullanma",
                 "blurb": "Bağlı bilgisayarlarda çalışır",
-                "help": "Coworker'ın, kişilerin Rerun masaüstü uygulamasından çalışma alanına bağladığı ve # ile adlandırılan bilgisayarlarda komut çalıştırmasına, dosya okuyup yazmasına ve uzun işler başlatmasına izin verir. Bilgisayarın sahibi aksini belirtmedikçe her komut ve izin verilenlerin dışındaki her klasör, sohbetteki kişinin onayını bekler."
+                "help": "Coworker'ın, kişilerin {brand} masaüstü uygulamasından çalışma alanına bağladığı ve # ile adlandırılan bilgisayarlarda komut çalıştırmasına, dosya okuyup yazmasına ve uzun işler başlatmasına izin verir. Bilgisayarın sahibi aksini belirtmedikçe her komut ve izin verilenlerin dışındaki her klasör, sohbetteki kişinin onayını bekler."
             },
             "paidData": {
                 "label": "Müşteri adayı, SEO, sosyal veri",
-                "blurb": "Rerun kredilerinizden ödenir",
-                "help": "Coworker'ın Apollo, Semrush veya scraping aboneliği olmadan potansiyel müşteriler, iş e-postaları, telefon numaraları ve şirket verileri bulmasına; arama hacimlerini, anahtar kelime fikirlerini ve backlink'leri kontrol etmesine; Google sonuçlarını ve yerel işletmeleri okumasına; LinkedIn, TikTok, Instagram, X, YouTube, Facebook ve Reddit'teki herkese açık profilleri ve gönderileri okumasına izin verir. Her çağrı Rerun kredilerinizden ödenir ve coworker önce tahmini bir maliyeti onaylamanızı ister."
+                "blurb": "{brand} kredilerinizden ödenir",
+                "help": "Coworker'ın Apollo, Semrush veya scraping aboneliği olmadan potansiyel müşteriler, iş e-postaları, telefon numaraları ve şirket verileri bulmasına; arama hacimlerini, anahtar kelime fikirlerini ve backlink'leri kontrol etmesine; Google sonuçlarını ve yerel işletmeleri okumasına; LinkedIn, TikTok, Instagram, X, YouTube, Facebook ve Reddit'teki herkese açık profilleri ve gönderileri okumasına izin verir. Her çağrı {brand} kredilerinizden ödenir ve coworker önce tahmini bir maliyeti onaylamanızı ister."
             },
             "requestSecret": {
                 "label": "Kimlik bilgisi isteme",
@@ -459,7 +459,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Bunu yalnızca bu Box'ın yöneticisi veya sorumlusu değiştirebilir",
-        "creditPaused": "Rerun kredileri duraklatıldı"
+        "creditPaused": "{brand} kredileri duraklatıldı"
     },
     "modelSelector": {
         "setUp": "Model kur",

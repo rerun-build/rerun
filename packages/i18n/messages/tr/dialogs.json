@@ -11,7 +11,7 @@
         "addEmail": "E-posta ekle",
         "changePhone": "Telefon numarasını değiştir",
         "addPhone": "Telefon numarası ekle",
-        "googleNeedsBrowser": "Google'ı bağlamak için Rerun'ı tarayıcınızda açın."
+        "googleNeedsBrowser": "Google'ı bağlamak için {brand}'ı tarayıcınızda açın."
     },
     "members": {
         "title": "Üyeler",
@@ -464,7 +464,7 @@
     },
     "shortcuts": {
         "title": "Klavye kısayolları",
-        "description": "Bu kısayollarla Rerun'da daha hızlı gezinin.",
+        "description": "Bu kısayollarla {brand}'da daha hızlı gezinin.",
         "groups": {
             "general": "Genel",
             "chat": "Sohbet",
@@ -599,7 +599,7 @@
         },
         "link": {
             "title": "Telefonu bağla",
-            "hint": "WhatsApp, Rerun'ı bağlı cihaz olarak ekler",
+            "hint": "WhatsApp, {brand}'ı bağlı cihaz olarak ekler",
             "cancel": "Bağlamayı iptal et"
         }
     },
@@ -615,11 +615,11 @@
             "codex": "ChatGPT Plus veya Pro"
         },
         "decline": {
-            "cloud": "Rerun kredileriyle devam edeyim",
+            "cloud": "{brand} kredileriyle devam edeyim",
             "selfHosted": "OpenRouter ile devam edeyim"
         },
         "offer": {
-            "title": "Rerun, Claude veya ChatGPT aboneliğinizle daha iyi çalışır",
+            "title": "{brand}, Claude veya ChatGPT aboneliğinizle daha iyi çalışır",
             "description": "Bağlayın, coworker'larınız zaten ödediğiniz planla çalışsın.",
             "titleWithoutClaude": "Coworker'larınız kendi yapay zekanızla çalışır",
             "descriptionWithoutClaude": "ChatGPT planınızı veya bir API anahtarını bağlayın, coworker'larınız onunla çalışsın."
@@ -630,12 +630,12 @@
                 "description": "Her ekip arkadaşı ödediği planı bağlar. Elden ele dolaşan hesap yok."
             },
             "password": {
-                "label": "Rerun parolanızı asla görmez",
+                "label": "{brand} parolanızı asla görmez",
                 "description": "Onayı Claude'un veya OpenAI'ın kendi sayfasında verirsiniz, başka hiçbir yerde değil."
             },
             "unplug": {
                 "label": "İstediğiniz zaman ayırın",
-                "descriptionCloud": "Tek tıkla bağlantıyı kesin, coworker'larınız Rerun kredilerine geri döner.",
+                "descriptionCloud": "Tek tıkla bağlantıyı kesin, coworker'larınız {brand} kredilerine geri döner.",
                 "descriptionSelfHosted": "Tek tıkla bağlantıyı kesin, coworker'larınız OpenRouter anahtarınıza geri döner."
             }
         },

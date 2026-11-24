@@ -1,6 +1,7 @@
 'use client'
 
 import { updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { patchAgentModel, useAgentContext } from '@/hooks/useAgentContext'
 import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import type { BoxDefault } from '@/lib/engine/types'
@@ -16,6 +17,7 @@ export function useAvailableModels(agentId: string) {
     const { context, loaded } = useAgentContext(agentId)
     const { connections, boxDefault, loading: connectionsLoading, refresh: refreshConnections } = useWorkspaceConnections()
     const tConnections = useTranslations('connections')
+    const { name: brandName } = useBrand()
 
     const agentModel = context?.model
     const pin = { connectionId: agentModel?.connectionId ?? null, model: agentModel?.model ?? null, effort: agentModel?.effort ?? null }
@@ -28,7 +30,7 @@ export function useAvailableModels(agentId: string) {
     // following the Box: the picker would repair a state it does not know. It waits for a read.
     const loading = !loaded || connectionsLoading || !agentModel?.loaded
 
-    const availableGroups = useMemo(() => connectionGroups(connections, tConnections), [connections, tConnections])
+    const availableGroups = useMemo(() => connectionGroups(connections, tConnections, brandName), [connections, tConnections, brandName])
     // The connection owning a model id. Ambiguous by construction — two Claude subscriptions both
     // serve `opus` — so the agent's own connection wins when it is one of the candidates.
     const connectionOf = useCallback(

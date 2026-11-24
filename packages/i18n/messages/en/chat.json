@@ -273,7 +273,7 @@
         "takeover": "Your turn on the screen",
         "spend": "Spend to approve",
         "computer": "Approve a command on #{computer}",
-        "feature": "Request to send to the Rerun team"
+        "feature": "Request to send to the {brand} team"
     },
     "pendingHitl": {
         "goTo": "{label}, go to it"
@@ -460,7 +460,7 @@
         "detailsLabel": "Please provide details",
         "negativePlaceholder": "What was unsatisfying about this response?",
         "positivePlaceholder": "What was satisfying about this response?",
-        "disclaimer": "Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.",
+        "disclaimer": "Submitting this report shares this conversation with the {brand} team so we can improve your coworkers.",
         "cancel": "Cancel",
         "submit": "Submit",
         "categories": {
@@ -515,11 +515,11 @@
         }
     },
     "budget": {
-        "title": "Rerun credits",
+        "title": "{brand} credits",
         "paused": {
-            "title": "Rerun credits paused",
-            "body": "Your coworkers can't use Rerun models or paid data until someone resumes them.",
-            "actionTitle": "Resume Rerun credits",
+            "title": "{brand} credits paused",
+            "body": "Your coworkers can't use {brand} models or paid data until someone resumes them.",
+            "actionTitle": "Resume {brand} credits",
             "actionDescription": "Spending starts again right away.",
             "cta": "Resume"
         },
@@ -534,17 +534,17 @@
             "description": "{credits} included every month."
         },
         "topUp": {
-            "title": "Top up your Rerun credits",
+            "title": "Top up your {brand} credits",
             "cta": "Top up",
             "description": "Or wait, it resets next month."
         },
         "usedUp": {
-            "noCredit": "This workspace has no Rerun credits yet.",
+            "noCredit": "This workspace has no {brand} credits yet.",
             "trial": "You've used up the {credits} of your free trial.",
-            "period": "You've used up your Rerun credits for this period."
+            "period": "You've used up your {brand} credits for this period."
         },
         "ownConnection": {
-            "body": "This conversation ran on Rerun, and your {plan} plan is connected."
+            "body": "This conversation ran on {brand}, and your {plan} plan is connected."
         },
         "runOn": "Run on {plan}",
         "or": "Or",
@@ -702,7 +702,7 @@
         },
         "stop": "Stop",
         "offlineNote": "It keeps running there. The coworker hears back when the computer is back.",
-        "lostNote": "Rerun was closed on the computer while it ran.",
+        "lostNote": "{brand} was closed on the computer while it ran.",
         "goneNote": "This job can no longer be read: the computer was removed, or it no longer knows the job."
     },
     "jobEnd": {
@@ -723,7 +723,7 @@
         "send": "Send to the team",
         "titleLabel": "Title",
         "descriptionLabel": "Description",
-        "sent": "Sent to the Rerun team: <muted>{title}</muted>",
+        "sent": "Sent to the {brand} team: <muted>{title}</muted>",
         "reviewIt": "Review it",
         "sendFailed": "The request could not be sent. Try again."
     }

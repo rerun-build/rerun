@@ -2,13 +2,13 @@
     "menu": {
         "label": "应用"
     },
-    "linkedToRerun": "{provider} 已关联 Rerun",
+    "linkedToRerun": "{provider} 已关联 {brand}",
     "slotPrice": {
         "monthly": "{price}/月",
         "yearly": "{price}/年"
     },
     "blocked": {
-        "notSubscribed": "请先订阅 Rerun",
+        "notSubscribed": "请先订阅 {brand}",
         "paused": "您的工作区已暂停",
         "trialSlot": "试用期包含一个 {provider} 名额。升级套餐即可添加更多。",
         "lifetimeTrialSlot": "您的免费试用包含一个 {provider} 名额。试用结束后可添加更多。",
@@ -159,7 +159,7 @@
         "signInFromHelp": "LinkedIn 信任来自您常用工作国家的登录。",
         "searchCountry": "搜索国家",
         "noCountry": "未找到国家",
-        "neverStored": "Rerun 从不存储您的密码或 Cookie。",
+        "neverStored": "{brand} 从不存储您的密码或 Cookie。",
         "connect": "连接",
         "approval": {
             "figureLabel": "一部手机显示登录请求，其批准按钮已亮起",
@@ -193,7 +193,7 @@
                 "qr": "扫描二维码",
                 "code": "输入验证码"
             },
-            "linkedDevice": "Rerun 将作为关联设备加入，就像 WhatsApp Web 一样。您的手机照常使用。",
+            "linkedDevice": "{brand} 将作为关联设备加入，就像 WhatsApp Web 一样。您的手机照常使用。",
             "submit": "获取验证码"
         },
         "link": {

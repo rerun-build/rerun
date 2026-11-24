@@ -144,7 +144,7 @@
             "title": "How",
             "toast": {
                 "label": "Toast in the app",
-                "description": "Pops up above your inbox while Rerun is open."
+                "description": "Pops up above your inbox while {brand} is open."
             },
             "sound": {
                 "label": "Sound",
@@ -188,6 +188,6 @@
         "trialEndedDeclined": "Your free {provider} slot ended and the card was declined, so {account, select, none {the account} other {{account}}} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.",
         "rateLimited": "{provider} asked {account, select, none {one of your accounts} other {{account}}} to slow down. Your coworkers will not use it for 24 hours, so the account stays safe.",
         "signedOut": "{provider} signed {account, select, none {one of your accounts} other {{account}}} out. Reconnect it from Settings → Apps so your coworkers can use it again.",
-        "budgetExhausted": "Your Rerun credits for this month are used up. Scheduled and triggered runs on Rerun models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits."
+        "budgetExhausted": "Your {brand} credits for this month are used up. Scheduled and triggered runs on {brand} models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits."
     }
 }

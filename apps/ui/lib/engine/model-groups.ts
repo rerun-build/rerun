@@ -33,11 +33,11 @@ export function pinFirst<T>(items: T[], match: (item: T) => boolean): T[] {
 //
 // A connection with no credential is dropped rather than shown greyed out: the connections tab is
 // where you fix that, and a picker offering a model that cannot run is a trap.
-export function toGroup(connection: BoxConnection, t: SourceCopy): ConnectionGroup {
+export function toGroup(connection: BoxConnection, t: SourceCopy, brandName?: string): ConnectionGroup {
     const offered = connection.models.filter(id => !isHiddenModel(connection.id, id))
     const catalog = offered.map(id => ({
         id,
-        label: modelLabel(id),
+        label: modelLabel(id, brandName),
         power: modelPower(id),
         description: modelDescription(connection, id, t),
         unavailable: cliUnavailableReason(connection, id, t),
@@ -60,11 +60,11 @@ export function refusedModelReason(group: Pick<ConnectionGroup, 'models'> | unde
 }
 
 // The groups every picker offers, Rerun first: shared by the web hook and the app's /api/v1 route.
-export function connectionGroups(connections: BoxConnection[], t: SourceCopy): ConnectionGroup[] {
+export function connectionGroups(connections: BoxConnection[], t: SourceCopy, brandName?: string): ConnectionGroup[] {
     return pinFirst(
         connections
             .filter(connection => connection.connected)
-            .map(connection => toGroup(connection, t))
+            .map(connection => toGroup(connection, t, brandName))
             .filter(group => group.models.length > 0),
         group => group.connectionId === RERUN_CONNECTION_ID
     )

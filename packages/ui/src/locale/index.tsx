@@ -1,6 +1,6 @@
 'use client'
 
-import { localeDirection, type AppLocale, type TextDirection } from '@rerun/i18n'
+import { fillBrand, localeDirection, type AppLocale, type TextDirection } from '@rerun/i18n'
 import type { Messages } from '@rerun/i18n/messages'
 import englishKit from '@rerun/i18n/messages/en/kit.json'
 import { Direction } from 'radix-ui'
@@ -11,13 +11,18 @@ export { englishKitTranslator, type KitTranslator } from '../kit-translator'
 
 type KitMessages = Pick<Messages, 'kit'>
 
+// The app hands its pack already filled; the landing and the desktop shell hand theirs as written.
+const filled = (messages: KitMessages): KitMessages => ({ kit: fillBrand(messages.kit) })
+
+const ENGLISH_KIT = filled({ kit: englishKit })
+
 // The language the shared components speak and format in, and their strings (the `kit` namespace).
 // The landing renders them without a provider and gets English; the app hands down its request locale
 // and its pack from the root layout. packages/ui never imports next-intl.
-const UiLocaleContext = createContext<{ locale: AppLocale; messages: KitMessages }>({ locale: 'en', messages: { kit: englishKit } })
+const UiLocaleContext = createContext<{ locale: AppLocale; messages: KitMessages }>({ locale: 'en', messages: ENGLISH_KIT })
 
 export function UiLocaleProvider({ locale, messages, children }: { locale: AppLocale; messages?: KitMessages; children: ReactNode }) {
-    const value = useMemo(() => ({ locale, messages: messages ?? { kit: englishKit } }), [locale, messages])
+    const value = useMemo(() => ({ locale, messages: messages ? filled(messages) : ENGLISH_KIT }), [locale, messages])
     return (
         <UiLocaleContext.Provider value={value}>
             <Direction.Provider dir={localeDirection(locale)}>{children}</Direction.Provider>

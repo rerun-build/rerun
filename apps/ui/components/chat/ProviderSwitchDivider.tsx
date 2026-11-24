@@ -1,5 +1,6 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { modelName, planName } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ArrowRightIcon } from '@/lib/icons'
@@ -12,13 +13,14 @@ import { useState } from 'react'
 // back: a quiet line across the thread, not a notice, since nothing is asked of the user.
 export function ProviderSwitchDivider({ change }: { change: ProviderSwitch }) {
     const t = useTranslations('chat.providerSwitch')
+    const brand = useBrand()
     const locale = useLocale()
     const [now] = useState(() => Date.now())
-    const model = modelName(change.to.connectionId, change.to.model)
+    const model = modelName(change.to.connectionId, change.to.model, brand.name)
 
     const text = (() => {
-        if (change.kind === 'back') return t('back', { plan: planName(change.to), model })
-        const plan = planName(change.from)
+        if (change.kind === 'back') return t('back', { plan: planName(change.to, brand), model })
+        const plan = planName(change.from, brand)
         if (!change.resetsAt || Date.parse(change.resetsAt) <= now) return t('limit', { plan, model })
         const time = messageTime(change.resetsAt, locale)
         return calendarDaysBetween(new Date(now), new Date(change.resetsAt)) === 0 ? t('limitUntil', { plan, model, time }) : t('limitUntilDate', { plan, model, time, date: shortDate(change.resetsAt, locale) })

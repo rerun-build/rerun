@@ -123,7 +123,7 @@
             "title": "Nasıl",
             "toast": {
                 "label": "Uygulama içi bildirim",
-                "description": "Rerun açıkken gelen kutunuzun üstünde belirir."
+                "description": "{brand} açıkken gelen kutunuzun üstünde belirir."
             },
             "sound": {
                 "label": "Ses",
@@ -167,6 +167,6 @@
         "trialEndedDeclined": "Ücretsiz {provider} yeriniz sona erdi ve kart reddedildi, bu yüzden {account, select, none {hesap} other {{account}}} duraklatıldı. Saklamak için bir hafta içinde Faturalandırma bölümünden bir yer ekleyin, aksi takdirde bağlantı kesilecek.",
         "rateLimited": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} yavaşlamasını istedi. Hesabınız güvende kalsın diye coworker'larınız onu 24 saat kullanmayacak.",
         "signedOut": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} oturumunu kapattı. Coworker'larınızın yeniden kullanabilmesi için Ayarlar → Uygulamalar bölümünden yeniden bağlayın.",
-        "budgetExhausted": "Bu ayki Rerun kredileriniz tükendi. Rerun modelleriyle zamanlanmış ve tetiklenmiş çalıştırmalar duraklatıldı; krediler sıfırlanana veya siz kredi ekleyene kadar coworker'lar potansiyel müşteri, SEO veya sosyal medya verisi satın alamaz."
+        "budgetExhausted": "Bu ayki {brand} kredileriniz tükendi. {brand} modelleriyle zamanlanmış ve tetiklenmiş çalıştırmalar duraklatıldı; krediler sıfırlanana veya siz kredi ekleyene kadar coworker'lar potansiyel müşteri, SEO veya sosyal medya verisi satın alamaz."
     }
 }

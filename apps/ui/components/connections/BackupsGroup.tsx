@@ -1,5 +1,6 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { AddButton, Group } from '@/components/connections/AiProvidersPanel'
 import { DefaultModelPicker, pickKey } from '@/components/connections/DefaultModelPicker'
 import { SourceAvatar } from '@/components/connections/SourceBits'
@@ -28,6 +29,7 @@ type BackupsGroupProps = {
 // credit closes the list behind its own switch, off until someone turns it on.
 export function BackupsGroup({ connections, backups, current, credit, onChange, readOnlyReason }: BackupsGroupProps) {
     const t = useTranslations('connections')
+    const { name: brandName } = useBrand()
     const list = backups.backups
     const taken = new Set([pickKey(current), ...list.map(pickKey)])
     const anyLeft = connections.some(c => c.id !== RERUN_CONNECTION_ID && isUsable(c, credit) && enabledModels(c).some(model => !taken.has(pickKey({ connectionId: c.id, model: model.id }))))
@@ -56,7 +58,7 @@ export function BackupsGroup({ connections, backups, current, credit, onChange, 
             {list.map((backup, index) => {
                 const source = connections.find(c => c.id === backup.connectionId)
                 const ready = !!source && isUsable(source, credit) && isModelEnabled(source, backup.model)
-                const name = modelName(backup.connectionId, backup.model)
+                const name = modelName(backup.connectionId, backup.model, brandName)
                 return (
                     <PanelRow
                         key={pickKey(backup)}

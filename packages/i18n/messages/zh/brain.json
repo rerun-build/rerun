@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "此 Box 上还没有 Brain",
-        "description": "您的 Box 运行的 Rerun 版本早于 Brain。Box 更新后，它会显示在这里。"
+        "description": "您的 Box 运行的 {brand} 版本早于 Brain。Box 更新后，它会显示在这里。"
     },
     "crumbs": {
         "brain": "Brain",
@@ -198,14 +198,14 @@
         "unreachableFallback": "无法连接到此工作区的机器。",
         "deleteFailed": "无法删除页面",
         "noMachineTitle": "您的 Brain 会随第一位同事一起到来",
-        "noMachineDescription": "它位于您工作区的机器上，该机器会在 Rerun 构建您的第一位同事时设置好。从那时起，每位同事对您公司的了解，以及他们共享的文件和数据表，都会显示在这里。",
+        "noMachineDescription": "它位于您工作区的机器上，该机器会在 {brand} 构建您的第一位同事时设置好。从那时起，每位同事对您公司的了解，以及他们共享的文件和数据表，都会显示在这里。",
         "unreachableTitle": "无法连接到您的工作区",
         "unreachableDescription": "此工作区的机器没有响应，可能仍在启动中。",
         "retry": "重试",
-        "seedingTitle": "Rerun 正在读取您的网站",
+        "seedingTitle": "{brand} 正在读取您的网站",
         "emptyTitle": "您的公司 Brain 是空的",
         "seedingDescription": "您公司的身份卡片将在几分钟内显示在这里：您卖什么、卖给谁、您的团队、品牌语调和工具。",
-        "emptyDescription": "这是每位同事在工作前阅读的公司资料：您卖什么、卖给谁、您的团队、品牌语调和工具。Rerun 可以根据您的网站填充。",
+        "emptyDescription": "这是每位同事在工作前阅读的公司资料：您卖什么、卖给谁、您的团队、品牌语调和工具。{brand} 可以根据您的网站填充。",
         "refresh": "刷新",
         "writeYourself": "自己撰写页面",
         "missingPageTitle": "还没有页面“{slug}”",
@@ -240,7 +240,7 @@
         "googleBusiness": "Google 商家资料"
     },
     "authors": {
-        "seed": "Rerun，来自您的网站",
+        "seed": "{brand}，来自您的网站",
         "foreman": "您的 Chief of Staff"
     },
     "filing": {

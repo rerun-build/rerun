@@ -5,7 +5,7 @@
         "description": "L’écran sur lequel ce coworker travaille. Ce que vous faites ici, il le retrouve ensuite.",
         "takeoverDescription": "Vous êtes dans le navigateur de votre coworker. Appuyez sur Terminé quand il peut reprendre.",
         "takeoverHoldsBrowser": "Le navigateur de votre coworker est déjà ouvert pour cette demande.",
-        "clipboardDenied": "Votre navigateur n’a pas autorisé Rerun à lire le presse-papiers.",
+        "clipboardDenied": "Votre navigateur n’a pas autorisé {brand} à lire le presse-papiers.",
         "disconnectedDescription": "La connexion à la machine s’est fermée. Rien n’y a été perdu.",
         "reconnect": "Se reconnecter",
         "tryAgain": "Réessayer"

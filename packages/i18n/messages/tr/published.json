@@ -22,7 +22,7 @@
         "workspaceFallback": "Çalışma alanı"
     },
     "gate": {
-        "madeWith": "Rerun ile yapıldı",
+        "madeWith": "{brand} ile yapıldı",
         "locked": "{workspace} sayfası, kilitli",
         "code": "Kod",
         "switchAccount": "Hesap değiştir"

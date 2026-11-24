@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
 import { ModelSelector } from '@/components/agent/ModelSelector'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import type { ForemanBackend } from '@/lib/foreman/phase'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -16,11 +17,12 @@ import { useForemanStore } from '@/stores/foreman.store'
 // machine's connections on mount: nothing to read for a pill nobody can see.
 export function ForemanModelPill({ backend }: { backend: ForemanBackend }) {
     const t = useTranslations('foreman.modelPill')
+    const { name: brandName } = useBrand()
     const open = useForemanStore(state => state.open)
     if (backend === 'engine') return open === true ? <ModelSelector agentId={FOREMAN_AGENT_ID} /> : null
     return (
         <TooltipDisabledReason reason={t('hubReason')}>
-            <ModelPillTrigger provider="rerun" label="Rerun Balanced" disabled />
+            <ModelPillTrigger provider="rerun" label={`${brandName} Balanced`} disabled />
         </TooltipDisabledReason>
     )
 }

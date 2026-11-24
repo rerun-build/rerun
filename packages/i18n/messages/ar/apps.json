@@ -2,13 +2,13 @@
     "menu": {
         "label": "التطبيقات"
     },
-    "linkedToRerun": "{provider} مربوط بـ Rerun",
+    "linkedToRerun": "{provider} مربوط بـ {brand}",
     "slotPrice": {
         "monthly": "{price}/شهريًا",
         "yearly": "{price}/سنويًا"
     },
     "blocked": {
-        "notSubscribed": "اشترك في Rerun أولًا",
+        "notSubscribed": "اشترك في {brand} أولًا",
         "paused": "مساحة العمل متوقفة مؤقتًا",
         "trialSlot": "تتضمن الفترة التجريبية خانة {provider} واحدة. رقِّ خطتك لإضافة المزيد.",
         "lifetimeTrialSlot": "تتضمن فترتك التجريبية المجانية خانة {provider} واحدة. أضف المزيد عند انتهائها.",
@@ -159,7 +159,7 @@
         "signInFromHelp": "يثق LinkedIn بتسجيل الدخول من البلد الذي تعمل منه عادةً.",
         "searchCountry": "ابحث عن بلد",
         "noCountry": "لم يُعثر على أي بلد",
-        "neverStored": "لا يخزّن Rerun كلمة مرورك ولا ملف تعريف الارتباط أبدًا.",
+        "neverStored": "لا يخزّن {brand} كلمة مرورك ولا ملف تعريف الارتباط أبدًا.",
         "connect": "ربط",
         "approval": {
             "figureLabel": "هاتف يعرض طلب تسجيل الدخول، وزر الموافقة مضاء",
@@ -193,7 +193,7 @@
                 "qr": "مسح رمز QR",
                 "code": "كتابة رمز"
             },
-            "linkedDevice": "ينضم Rerun كجهاز مرتبط، كما يفعل WhatsApp Web. يواصل هاتفك العمل كالمعتاد.",
+            "linkedDevice": "ينضم {brand} كجهاز مرتبط، كما يفعل WhatsApp Web. يواصل هاتفك العمل كالمعتاد.",
             "submit": "الحصول على الرمز"
         },
         "link": {

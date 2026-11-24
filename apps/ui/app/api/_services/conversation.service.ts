@@ -4,6 +4,7 @@ import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRun
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
 import { EMPTY_SESSION_SNAPSHOT, type SessionSnapshot } from '@/lib/chat/session-snapshot'
 import { openSkillProposal, pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { getBrand } from '@/lib/brand/server'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
@@ -225,7 +226,7 @@ export async function listAgentConversations(ctx: WorkspaceContext, agentId: str
     const [unseen, notifications, tErrors] = await Promise.all([
         asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
         filter ? selectMany(ctx.supabase, 'notifications', ATTENTION_NOTIFICATION_COLUMNS, filter, { column: 'created_at', ascending: false }) : { data: [], error: null },
-        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'chatErrors')),
+        Promise.all([recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id), getBrand()]).then(([locale, brand]) => translatorFor(locale, 'chatErrors', brand.name)),
     ])
     const unseenIds = unseen.error ? null : new Set((unseen.data ?? []).filter(run => run.agent_id === agentId).map(run => run.session_id))
     const details = notifications.error ? {} : attentionDetailsOf(waiting, notifications.data ?? [], ctx.userId, tErrors)

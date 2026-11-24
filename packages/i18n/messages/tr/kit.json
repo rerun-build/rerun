@@ -105,7 +105,7 @@
         "region": "Çerez onayı",
         "title": "Çerezler",
         "short": "Analiz çerezleri kullanıyoruz. <policy>Çerez politikası</policy>",
-        "long": "Rerun'ın nasıl kullanıldığını anlamak için analiz çerezleri kullanıyoruz. Giriş yapmanız, destek sohbetinin çalışması ve tercihlerinizin hatırlanması için gereken çerezler her zaman açıktır. <policy>Çerez politikası</policy>"
+        "long": "{brand}'ın nasıl kullanıldığını anlamak için analiz çerezleri kullanıyoruz. Giriş yapmanız, destek sohbetinin çalışması ve tercihlerinizin hatırlanması için gereken çerezler her zaman açıktır. <policy>Çerez politikası</policy>"
     },
     "experts": {
         "wizard": {

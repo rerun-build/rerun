@@ -2,11 +2,11 @@
     "common": {
         "footer": {
             "tagline": "Coloque seu trabalho nas mãos de coworkers. Crie, veja trabalhar e acompanhe tudo de perto.",
-            "copyright": "© 2026 Rerun",
+            "copyright": "© 2026 {brand}",
             "unsubscribe": "Cancelar inscrição"
         },
         "openConversation": "Abrir a conversa",
-        "openRerun": "Abrir o Rerun",
+        "openRerun": "Abrir o {brand}",
         "useThisCoworker": "Usar este coworker",
         "yourWorkspace": "seu workspace",
         "dateAtTime": "{date}, {time} UTC",
@@ -34,28 +34,28 @@
         }
     },
     "subjects": {
-        "signInCode": "Seu código do Rerun: {code}",
+        "signInCode": "Seu código do {brand}: {code}",
         "publishedAccessCode": "Seu código para abrir {pageTitle}: {code}",
         "lifetimeCode": "Seu código vitalício do Rerun: {code}",
-        "workspaceInvite": "Você foi convidado para {workspaceName} no Rerun",
+        "workspaceInvite": "Você foi convidado para {workspaceName} no {brand}",
         "appNotice": "{appName}: ação necessária",
-        "budgetExhausted": "{workspace} está sem créditos Rerun",
-        "onboardingResume": "Sua configuração do Rerun não terminou",
-        "agentRecommendations": "{count, plural, one {# coworker Rerun para {company}} other {# coworkers Rerun para {company}}}",
+        "budgetExhausted": "{workspace} está sem créditos {brand}",
+        "onboardingResume": "Sua configuração do {brand} não terminou",
+        "agentRecommendations": "{count, plural, one {# coworker {brand} para {company}} other {# coworkers {brand} para {company}}}",
         "agentIdle": "{agentName} está pronto, mas ainda não rodou",
         "teamInvite": "Traga sua equipe para {workspaceName}",
         "automateAgent": "Você rodou {agentName} manualmente {manualRuns, plural, one {# vez} other {# vezes}}, agende a próxima",
-        "trialStarted": "Seu teste de {trialDays} dias do Rerun está ativo",
-        "trialEnding": "{daysLeft, plural, =1 {Seu teste do Rerun termina amanhã} one {Seu teste do Rerun termina em # dia} other {Seu teste do Rerun termina em # dias}}",
-        "trialFinalNoticeCard": "Seu plano Rerun começa em 2 horas",
-        "trialFinalNoticeNoCard": "Seu teste do Rerun termina em 2 horas, adicione um cartão para manter seus coworkers rodando",
-        "trialEndedPaymentFailed": "Seu primeiro pagamento do Rerun falhou, seu workspace será pausado em 24 horas",
-        "trialEndedNoCard": "Seu teste do Rerun terminou, seu workspace será pausado em 2 horas",
+        "trialStarted": "Seu teste de {trialDays} dias do {brand} está ativo",
+        "trialEnding": "{daysLeft, plural, =1 {Seu teste do {brand} termina amanhã} one {Seu teste do {brand} termina em # dia} other {Seu teste do {brand} termina em # dias}}",
+        "trialFinalNoticeCard": "Seu plano {brand} começa em 2 horas",
+        "trialFinalNoticeNoCard": "Seu teste do {brand} termina em 2 horas, adicione um cartão para manter seus coworkers rodando",
+        "trialEndedPaymentFailed": "Seu primeiro pagamento do {brand} falhou, seu workspace será pausado em 24 horas",
+        "trialEndedNoCard": "Seu teste do {brand} terminou, seu workspace será pausado em 2 horas",
         "paymentFailed": "Pagamento recusado: seu workspace será pausado em 24 horas",
-        "subscriptionEnding": "{daysLeft, plural, =1 {Sua assinatura do Rerun termina amanhã} one {Sua assinatura do Rerun termina em # dia} other {Sua assinatura do Rerun termina em # dias}}",
-        "archiveExpiring": "{kind, select, sandbox {Sua sandbox arquivada do Rerun será excluída em {date}} other {Seu workspace pausado do Rerun será excluído em {date}}}",
-        "sandboxIdle": "Sua sandbox do Rerun será arquivada em {date} se você não abri-la",
-        "renewalReminder": "{daysLeft, plural, =1 {Seu plano Rerun renova amanhã} one {Seu plano Rerun renova em # dia} other {Seu plano Rerun renova em # dias}}",
+        "subscriptionEnding": "{daysLeft, plural, =1 {Sua assinatura do {brand} termina amanhã} one {Sua assinatura do {brand} termina em # dia} other {Sua assinatura do {brand} termina em # dias}}",
+        "archiveExpiring": "{kind, select, sandbox {Sua sandbox arquivada do {brand} será excluída em {date}} other {Seu workspace pausado do {brand} será excluído em {date}}}",
+        "sandboxIdle": "Sua sandbox do {brand} será arquivada em {date} se você não abri-la",
+        "renewalReminder": "{daysLeft, plural, =1 {Seu plano {brand} renova amanhã} one {Seu plano {brand} renova em # dia} other {Seu plano {brand} renova em # dias}}",
         "creatorPitch": "Venda os coworkers que você cria no Rerun"
     },
     "reasons": {
@@ -67,12 +67,12 @@
         "workspace": "Isto é sobre o seu workspace."
     },
     "signInCode": {
-        "preview": "Seu código do Rerun é {code}",
-        "headingSignIn": "Entrar no Rerun",
+        "preview": "Seu código do {brand} é {code}",
+        "headingSignIn": "Entrar no {brand}",
         "headingConfirm": "Confirme seu novo e-mail",
         "bodySignIn": "Digite este código na aba onde você o pediu, ou use o botão abaixo para entrar na hora.",
-        "bodyConfirm": "Digite este código nas configurações da sua conta Rerun para tornar este o e-mail da sua conta.",
-        "button": "Entrar no Rerun",
+        "bodyConfirm": "Digite este código nas configurações da sua conta {brand} para tornar este o e-mail da sua conta.",
+        "button": "Entrar no {brand}",
         "footnoteSignIn": "O código e o botão expiram em {minutes, plural, one {# minuto} other {# minutos}} e funcionam uma vez. Se você não os pediu, pode ignorar este e-mail.",
         "footnoteConfirm": "O código expira em {minutes, plural, one {# minuto} other {# minutos}} e funciona uma vez. Se você não o pediu, pode ignorar este e-mail."
     },
@@ -91,11 +91,11 @@
         "footnote": "O código funciona uma vez, em um único workspace. Guarde este e-mail: ele é seu comprovante de compra. Dúvidas? Responda a este e-mail."
     },
     "workspaceInvite": {
-        "preview": "Você foi convidado para {workspaceName} no Rerun",
+        "preview": "Você foi convidado para {workspaceName} no {brand}",
         "heading": "Você foi convidado",
-        "bodyWithInviter": "<strong>{inviter}</strong> convidou você para entrar em <strong>{workspaceName}</strong> no Rerun.",
-        "bodyAnonymous": "Você foi convidado para entrar em <strong>{workspaceName}</strong> no Rerun.",
-        "pitch": "O Rerun toca seu negócio com coworkers de IA autônomos. Aceite o convite para começar a colaborar neste workspace.",
+        "bodyWithInviter": "<strong>{inviter}</strong> convidou você para entrar em <strong>{workspaceName}</strong> no {brand}.",
+        "bodyAnonymous": "Você foi convidado para entrar em <strong>{workspaceName}</strong> no {brand}.",
+        "pitch": "O {brand} toca seu negócio com coworkers de IA autônomos. Aceite o convite para começar a colaborar neste workspace.",
         "button": "Entrar em {workspaceName}",
         "footnote": "Este convite expira em 7 dias. Se você não esperava por ele, pode ignorar este e-mail."
     },
@@ -113,9 +113,9 @@
         "button": "Ver o que quebrou"
     },
     "budgetExhausted": {
-        "heading": "Você está sem créditos Rerun",
-        "body": "As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até {date}, ou até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
-        "bodyNoReset": "As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
+        "heading": "Você está sem créditos {brand}",
+        "body": "As execuções agendadas e por gatilho nos modelos {brand} ficam pausadas até {date}, ou até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
+        "bodyNoReset": "As execuções agendadas e por gatilho nos modelos {brand} ficam pausadas até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
         "button": "Adicionar créditos"
     },
     "agentNotification": {
@@ -161,7 +161,7 @@
         "createdDaysAgo": "{count, plural, one {há # dia} other {há # dias}}"
     },
     "agentRecommendations": {
-        "preview": "{count, plural, one {# coworker Rerun para {company}} other {# coworkers Rerun para {company}}}",
+        "preview": "{count, plural, one {# coworker {brand} para {company}} other {# coworkers {brand} para {company}}}",
         "yourCompany": "sua empresa",
         "heading": "Por onde começar na {company}",
         "bodyWithSite": "Você compartilhou <strong>{domain}</strong> durante a configuração. Pelo trabalho recorrente descrito lá e pelas ferramentas que você disse usar, estas são as configurações mais claras para começar.",
@@ -182,16 +182,16 @@
         }
     },
     "onboardingResume": {
-        "preview": "Sua configuração do Rerun não terminou",
+        "preview": "Sua configuração do {brand} não terminou",
         "headingNamed": "{firstName}, sua configuração não terminou",
         "heading": "Sua configuração não terminou",
         "leftEarly": "Seu workspace foi criado, mas você saiu antes do fim da configuração. Leva cerca de um minuto: seu site e as ferramentas que você já usa.",
-        "whyItMatters": "Essas duas respostas decidem quais coworkers o Rerun mostra para você. Sem elas, você recebe a lista genérica.",
+        "whyItMatters": "Essas duas respostas decidem quais coworkers o {brand} mostra para você. Sem elas, você recebe a lista genérica.",
         "button": "Terminar a configuração",
         "footnote": "As perguntas reabrem sozinhas quando você entra no seu workspace."
     },
     "archiveExpiring": {
-        "preview": "{kind, select, sandbox {Sua sandbox arquivada do Rerun será excluída em {date}} other {Seu workspace pausado do Rerun será excluído em {date}}}",
+        "preview": "{kind, select, sandbox {Sua sandbox arquivada do {brand} será excluída em {date}} other {Seu workspace pausado do {brand} será excluído em {date}}}",
         "heading": "{kind, select, sandbox {Sua sandbox arquivada será excluída em {date}} other {Seu workspace pausado será excluído em {date}}}",
         "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong> está arquivada desde <strong>{pausedOn}</strong>. Os coworkers e tudo o que eles sabem ainda estão salvos, e esta é a última semana em que estarão.} other {<strong>{workspaceName}</strong> está pausado desde <strong>{pausedOn}</strong>. Os coworkers e tudo o que eles sabem ainda estão salvos, e esta é a última semana em que estarão.}}",
         "statusUnnamed": "{kind, select, sandbox {Seu workspace está arquivado desde <strong>{pausedOn}</strong>. Os coworkers e tudo o que eles sabem ainda estão salvos, e esta é a última semana em que estarão.} other {Seu workspace está pausado desde <strong>{pausedOn}</strong>. Os coworkers e tudo o que eles sabem ainda estão salvos, e esta é a última semana em que estarão.}}",
@@ -238,21 +238,21 @@
         "button": "Pagar a fatura"
     },
     "renewalReminder": {
-        "preview": "Seu plano Rerun renova em {date}",
+        "preview": "Seu plano {brand} renova em {date}",
         "heading": "Seu plano renova em {daysLeft, plural, =1 {um dia} one {# dia} other {# dias}}",
         "body": "Você pediu para ser lembrado antes de o plano de <strong>{workspace}</strong> renovar. Ele renova em <strong>{date}</strong>, e o cartão cadastrado é cobrado nesse dia. Até lá, seus coworkers continuam rodando normalmente.",
         "button": "Revisar meu plano",
         "footnote": "Quer cancelar? Faça isso antes de {date} em Cobrança, no menu do seu workspace, e seu cartão não será cobrado de novo."
     },
     "sandboxIdle": {
-        "preview": "Sua sandbox do Rerun será arquivada em {date} se você não abri-la",
+        "preview": "Sua sandbox do {brand} será arquivada em {date} se você não abri-la",
         "heading": "Sua sandbox será arquivada em {date}",
-        "unused": "Sua sandbox do Rerun não é aberta desde <strong>{lastActive}</strong>. Uma sandbox mantém uma máquina ligada para você, então uma que fica 30 dias sem uso é arquivada para liberá-la.",
+        "unused": "Sua sandbox do {brand} não é aberta desde <strong>{lastActive}</strong>. Uma sandbox mantém uma máquina ligada para você, então uma que fica 30 dias sem uso é arquivada para liberá-la.",
         "openBefore": "Abra sua sandbox antes de <strong>{date}</strong> e nada muda. Depois dessa data, os coworkers e os dados deles ficam salvos, mas para recuperá-la você precisa nos pedir a reativação.",
         "button": "Abrir minha sandbox"
     },
     "subscriptionEnding": {
-        "preview": "Sua assinatura do Rerun termina em {date}",
+        "preview": "Sua assinatura do {brand} termina em {date}",
         "heading": "{daysLeft, plural, =1 {Sua assinatura termina amanhã} one {Sua assinatura termina em # dia} other {Sua assinatura termina em # dias}}",
         "cancelled": "A assinatura de <strong>{workspace}</strong> foi cancelada e termina em <strong>{date}</strong>. Nessa data, seus coworkers param e seu workspace é pausado.",
         "nothingDeleted": "Nada é excluído. Seus coworkers, as memórias, os arquivos e o histórico deles ficam salvos até <strong>{keptUntil}</strong>, e assinar de novo traz tudo de volta exatamente como você deixou.",
@@ -260,7 +260,7 @@
         "footnote": "Mudou de ideia? Reativar antes de {date} mantém tudo rodando, sem nada para restaurar."
     },
     "trialEnded": {
-        "preview": "{reason, select, payment_failed {Seu primeiro pagamento do Rerun falhou, seu workspace será pausado em {pausedAt}} other {Seu teste do Rerun terminou, seu workspace será pausado em {pausedAt}}}",
+        "preview": "{reason, select, payment_failed {Seu primeiro pagamento do {brand} falhou, seu workspace será pausado em {pausedAt}} other {Seu teste do {brand} terminou, seu workspace será pausado em {pausedAt}}}",
         "heading": "{reason, select, payment_failed {Seu primeiro pagamento falhou} other {Seu teste terminou}}",
         "ended": "{reason, select, payment_failed {O teste de <strong>{workspace}</strong> terminou em <strong>{date}</strong>, e a primeira cobrança no seu cartão não foi aprovada. Talvez seu banco só esteja pedindo uma confirmação.} other {O teste de <strong>{workspace}</strong> terminou em <strong>{date}</strong>, e seus coworkers pararam.}}",
         "paused": "{reason, select, payment_failed {Seu workspace será <strong>pausado em {pausedAt}</strong>. Nada é excluído: seus coworkers e tudo o que eles sabem ficam salvos até <strong>{keptUntil}</strong>. Pague a fatura antes da pausa para mantê-lo rodando, ou assine a qualquer momento antes disso e tudo volta exatamente como você deixou.} other {Seu workspace será <strong>pausado em {pausedAt}</strong>. Nada é excluído: seus coworkers e tudo o que eles sabem ficam salvos até <strong>{keptUntil}</strong>. Assine a qualquer momento antes disso e tudo volta exatamente como você deixou.}}",
@@ -268,7 +268,7 @@
         "footnote": "Não é o momento? Pode deixar assim, nada mais será cobrado. Seu workspace fica salvo até {keptUntil}."
     },
     "trialEnding": {
-        "preview": "Seu teste do Rerun termina em {date}",
+        "preview": "Seu teste do {brand} termina em {date}",
         "heading": "Seu teste termina em {daysLeft, plural, =1 {um dia} one {# dia} other {# dias}}",
         "endsOn": "O teste de <strong>{workspace}</strong> termina em <strong>{date}</strong>. A partir daí, seu plano é cobrado todo mês no cartão cadastrado. Sem cartão cadastrado, seus coworkers param de rodar e seu workspace é pausado 2 horas depois do fim do teste.",
         "nothingDeleted": "Nada é excluído: seus coworkers e tudo o que eles sabem ficam salvos até {keptUntil}, e assinar traz tudo de volta exatamente como você deixou.",
@@ -276,8 +276,8 @@
         "footnote": "Não pretende continuar? Cancele antes de {date} em Cobrança, no menu do seu workspace, e nada é cobrado."
     },
     "trialFinalNotice": {
-        "previewCard": "Seu plano Rerun começa em {date}",
-        "previewNoCard": "Adicione um cartão antes de {date} para manter seus coworkers do Rerun rodando",
+        "previewCard": "Seu plano {brand} começa em {date}",
+        "previewNoCard": "Adicione um cartão antes de {date} para manter seus coworkers do {brand} rodando",
         "heading": "Seu teste termina em 2 horas",
         "bodyCard": "O teste de <strong>{workspace}</strong> termina em <strong>{date}</strong>. Seu plano começa nesse momento, e o cartão cadastrado é cobrado pelo primeiro mês. Seus coworkers continuam rodando, não há nada a fazer.",
         "noCard": "O teste de <strong>{workspace}</strong> termina em <strong>{date}</strong>, e não há cartão cadastrado.",
@@ -287,7 +287,7 @@
         "footnoteCard": "Não pretende continuar? Cancele antes de {date} em Cobrança, no menu do seu workspace, e seu cartão não é cobrado."
     },
     "trialStarted": {
-        "preview": "Seu teste de {trialDays} dias do Rerun está ativo",
+        "preview": "Seu teste de {trialDays} dias do {brand} está ativo",
         "heading": "Seu teste está ativo",
         "body": "<strong>{workspace}</strong> está em um teste grátis de {trialDays} dias. Seus coworkers rodam, seus agendamentos disparam e nada é cobrado hoje.",
         "included": "{coworkers, plural, one {# coworker} other {# coworkers}} e {credits, plural, one {# crédito} other {# créditos}}",

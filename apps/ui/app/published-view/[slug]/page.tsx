@@ -9,6 +9,7 @@ import { MarkdownSlides } from '@/components/published/viewers/MarkdownSlides'
 import { MarkdownViewer } from '@/components/published/viewers/MarkdownViewer'
 import { MediaViewer } from '@/components/published/viewers/MediaViewer'
 import { PdfViewer } from '@/components/published/viewers/PdfViewer'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { loadPublished, loadWorkspaceBrand, mayOpen, opensInViewer, previewImageUrl, readAccessCookie, type PublishedEntry } from '@/lib/published/gate'
 import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
 import { fileNameOf, isMarkdownDeck, viewerKindOf } from '@/lib/published/viewer-kind'
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const origin = publishedSiteOrigin(slug)
     if (!entry || !origin) return { robots: { index: false, follow: false } }
 
-    const [brand, { data: agent }, t] = await Promise.all([loadWorkspaceBrand(entry.workspace_id), selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }), getTranslations('publicPages.publishedView')])
+    const [brand, product, { data: agent }, t] = await Promise.all([loadWorkspaceBrand(entry.workspace_id), workspaceBrand(entry.workspace_id), selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }), getTranslations('publicPages.publishedView')])
     const isPublic = entry.access === 'public'
     const title = isPublic ? (entry.title ?? fileNameOf(entry.source_path)) : t('protectedTitle')
     const description = isPublic ? (agent?.name ? t('publishedBy', { agent: agent.name, workspace: brand.name }) : t('publishedByUnknown', { workspace: brand.name })) : t('protectedDescription', { workspace: brand.name })
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: { absolute: title },
         description,
         robots: { index: false, follow: false },
-        openGraph: { type: 'website', siteName: 'Rerun', title, description, url: origin, images: [{ url: image, width: 1200, height: 630 }] },
+        openGraph: { type: 'website', siteName: product.name, title, description, url: origin, images: [{ url: image, width: 1200, height: 630 }] },
         twitter: { card: 'summary_large_image', title, description, images: [image] },
     }
 }

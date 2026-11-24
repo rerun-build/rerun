@@ -4,6 +4,7 @@ import { GateScreen, BrandTile } from '@/components/published/GateScreen'
 import { SwitchAccountButton } from '@/components/published/SwitchAccountButton'
 import { Icon } from '@/components/ui/icon'
 import { realEmail } from '@/lib/auth/placeholder-email'
+import { getBrand } from '@/lib/brand/server'
 import { mintAccessTicket } from '@/lib/published/access-ticket'
 import { loadPublished, loadWorkspaceBrand, safeNextPath } from '@/lib/published/gate'
 import { publishedSiteOrigin } from '@/lib/published/host'
@@ -36,7 +37,7 @@ export default async function PublishedAuthPage({ searchParams }: { searchParams
     const next = safeNextPath(param(search, 'next'))
     const entry = slug ? await loadPublished(slug) : null
     const t = await getTranslations('publicPages')
-    if (!entry) return <GateScreen brand={{ name: 'Rerun', iconUrl: null }} lock={null} mark={<BrandTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
+    if (!entry) return <GateScreen brand={await getBrand()} lock={null} mark={<BrandTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
 
     const returnTo = openPublishedHref(slug, next)
     const { data } = await (await createClient()).auth.getUser()

@@ -11,7 +11,7 @@
         },
         "language": {
             "label": "שפה",
-            "description": "השפה שבה Rerun פונה אליך."
+            "description": "השפה שבה {brand} פונה אליך."
         },
         "desktop": {
             "label": "אפליקציית מחשב",
@@ -19,7 +19,7 @@
         },
         "delete": {
             "label": "מחיקת החשבון",
-            "description": "לסגור את חשבון ה-Rerun שלך לצמיתות."
+            "description": "לסגור את חשבון ה-{brand} שלך לצמיתות."
         }
     },
     "language": {
@@ -50,7 +50,7 @@
         "phone": {
             "title": "טלפון",
             "empty": "לא מחובר. אפשר להוסיף מספר כדי להתחבר עם קוד ב-WhatsApp או ב-SMS.",
-            "otherAccount": "המספר הזה מחבר לחשבון Rerun אחר. אפשר לשנות אותו כדי להתחבר כאן בטלפון."
+            "otherAccount": "המספר הזה מחבר לחשבון {brand} אחר. אפשר לשנות אותו כדי להתחבר כאן בטלפון."
         },
         "change": "לשנות",
         "add": "להוסיף",
@@ -62,7 +62,7 @@
         "disconnectTitle": "לנתק את {provider}?",
         "disconnectDescription": "לא תוכל עוד להתחבר לחשבון הזה עם {provider}. שאר שיטות ההתחברות שלך ימשיכו לעבוד.",
         "linkError": {
-            "identityTaken": "חשבון ה-{provider} הזה כבר מחבר לחשבון Rerun אחר.",
+            "identityTaken": "חשבון ה-{provider} הזה כבר מחבר לחשבון {brand} אחר.",
             "denied": "{provider} לא חובר.",
             "failed": "לא ניתן לחבר את {provider}. כדאי לנסות שוב."
         }

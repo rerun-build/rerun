@@ -5,7 +5,7 @@
     },
     "unsubscribe": {
         "title": "E-Mail-Einstellungen",
-        "subtitle": "Lege fest, welche E-Mails Rerun dir schickt. Ohne Anmeldung.",
+        "subtitle": "Lege fest, welche E-Mails {brand} dir schickt. Ohne Anmeldung.",
         "subtitleRuns": "Lege fest, ob deine Coworker dir E-Mails schicken dürfen. Ohne Anmeldung.",
         "invalid": "Dieser Abmeldelink ist ungültig oder abgelaufen.",
         "logIn": "Anmelden, um Einstellungen zu verwalten"
@@ -46,7 +46,7 @@
         },
         "members": {
             "subtitle": "Für Mitglieder von {workspace}",
-            "continue": "Weiter mit Rerun"
+            "continue": "Weiter mit {brand}"
         }
     },
     "publishedSite": {

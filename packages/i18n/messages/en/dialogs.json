@@ -97,7 +97,7 @@
         "addEmail": "Add email",
         "changePhone": "Change phone number",
         "addPhone": "Add phone number",
-        "googleNeedsBrowser": "Open Rerun in your browser to connect Google."
+        "googleNeedsBrowser": "Open {brand} in your browser to connect Google."
     },
     "members": {
         "title": "Members",
@@ -550,7 +550,7 @@
     },
     "shortcuts": {
         "title": "Keyboard shortcuts",
-        "description": "Move faster around Rerun with these shortcuts.",
+        "description": "Move faster around {brand} with these shortcuts.",
         "groups": {
             "general": "General",
             "chat": "Chat",
@@ -685,7 +685,7 @@
         },
         "link": {
             "title": "Link the phone",
-            "hint": "WhatsApp adds Rerun as a linked device",
+            "hint": "WhatsApp adds {brand} as a linked device",
             "cancel": "Cancel the link"
         }
     },
@@ -701,11 +701,11 @@
             "codex": "ChatGPT Plus or Pro"
         },
         "decline": {
-            "cloud": "I'd rather stay on Rerun credits",
+            "cloud": "I'd rather stay on {brand} credits",
             "selfHosted": "I'd rather stay on OpenRouter"
         },
         "offer": {
-            "title": "Rerun works better with your Claude or ChatGPT subscription",
+            "title": "{brand} works better with your Claude or ChatGPT subscription",
             "description": "Connect it and your coworkers run on the plan you already pay for.",
             "titleWithoutClaude": "Your coworkers run on your own AI",
             "descriptionWithoutClaude": "Connect your ChatGPT plan or an API key, and your coworkers run on it."
@@ -716,12 +716,12 @@
                 "description": "Each teammate connects the plan they pay for. No account passed around."
             },
             "password": {
-                "label": "Rerun never sees your password",
+                "label": "{brand} never sees your password",
                 "description": "You approve it on Claude's or OpenAI's own page, and nowhere else."
             },
             "unplug": {
                 "label": "Unplug it whenever",
-                "descriptionCloud": "Disconnect in one click and your coworkers fall back on Rerun credits.",
+                "descriptionCloud": "Disconnect in one click and your coworkers fall back on {brand} credits.",
                 "descriptionSelfHosted": "Disconnect in one click and your coworkers fall back on your OpenRouter key."
             }
         },
