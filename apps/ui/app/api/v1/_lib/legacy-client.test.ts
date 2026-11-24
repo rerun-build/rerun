@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { agentViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
 
 import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
-import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider, emailCodeForClient } from './legacy-client'
+import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
@@ -135,5 +135,23 @@ describe('emailCodeForClient', () => {
     it('leaves it out for the builds that never read it', () => {
         expect(emailCodeForClient(request('ios/1.0.2 (23)'), { mailed: false })).toEqual({ mailed: false })
         expect(emailCodeForClient(request('android/1.0.0 (3)'), { mailed: true })).toEqual({ mailed: true })
+    })
+})
+
+describe('clientReadsForemanRuns', () => {
+    it('holds for no build until the first one that reads on screen is named', () => {
+        expect(clientReadsForemanRuns(request('ios/1.0.4 (46)'))).toBe(false)
+        expect(clientReadsForemanRuns(request('android/1.0.4 (14)'))).toBe(false)
+        expect(clientReadsForemanRuns(request())).toBe(false)
+    })
+
+    it('holds from the build named for its platform', () => {
+        vi.stubEnv('MOBILE_IOS_FOREMAN_RUNS_BUILD', '46')
+        vi.stubEnv('MOBILE_ANDROID_FOREMAN_RUNS_BUILD', '14')
+        expect(clientReadsForemanRuns(request('ios/1.0.3 (45)'))).toBe(false)
+        expect(clientReadsForemanRuns(request('ios/1.0.4 (46)'))).toBe(true)
+        expect(clientReadsForemanRuns(request('android/1.0.3 (13)'))).toBe(false)
+        expect(clientReadsForemanRuns(request('android/1.0.4 (14)'))).toBe(true)
+        expect(clientReadsForemanRuns(request())).toBe(false)
     })
 })

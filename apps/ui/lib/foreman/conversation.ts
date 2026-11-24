@@ -19,6 +19,7 @@ import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 import { coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { stripVoiceMarker } from '@/lib/voice/marker'
+import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
 import { ensureForemanAgentRow } from './agent-row'
@@ -198,9 +199,17 @@ export function foremanConversationOf(row: ListedRow): Conversation {
 }
 
 // General and its threads, the latest first: the onboarding's conversation, on the hub, is not one.
+// `unseen`, as on a coworker's: a run finished in it since the caller last had it on screen.
 export async function listForemanConversations(ctx: WorkspaceContext): Promise<Conversation[]> {
-    const { data } = await selectMany(createServiceRoleClient(), 'sessions', LIST_COLUMNS, await ownedBy(ctx), { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT)
-    return (data ?? []).map(foremanConversationOf)
+    const owner = await ownedBy(ctx)
+    // `unseen_runs` answers for `auth.uid()`: it runs as the caller, not through the service role.
+    const asCaller = await createClient()
+    const [{ data }, unseen] = await Promise.all([
+        selectMany(createServiceRoleClient(), 'sessions', LIST_COLUMNS, owner, { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT),
+        asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
+    ])
+    const unseenIds = unseen.error ? null : new Set((unseen.data ?? []).filter(run => run.agent_id === owner.agent_id).map(run => run.session_id))
+    return (data ?? []).map(row => ({ ...foremanConversationOf(row), ...(unseenIds && { unseen: unseenIds.has(row.id) }) }))
 }
 
 async function readEngineTranscript(conn: EngineConnection, engineSessionId: string): Promise<UIMessage[]> {
@@ -329,14 +338,6 @@ export async function openForemanRoutineThread(workspaceId: number, engineSessio
         console.error('[foreman] failed to open the thread of a routine', err)
         return null
     }
-}
-
-// One of the caller's conversations with the foreman, as the engine knows it: what a coworker's
-// session hands the skill proposals of its chat.
-export async function foremanSessionEngineContext(ctx: WorkspaceContext, sessionId: string): Promise<{ conn: EngineConnection; engineSessionId: string | null } | null> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'sessions', ['engine_session_id'] as const, { ...(await ownedBy(ctx)), id: sessionId })
-    if (!data) return null
-    return { conn: await getWorkspaceConnection(ctx.workspace.id), engineSessionId: data.engine_session_id }
 }
 
 // The engine announces a skill proposal as an approval once its run is over, and nothing answers it

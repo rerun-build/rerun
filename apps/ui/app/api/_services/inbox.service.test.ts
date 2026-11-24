@@ -2,7 +2,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { visibleSpaceIds } from '@/app/api/_auth/access'
 import { markSessionsHandled } from '@/app/api/_services/conversation.service'
 import { createClient } from '@/supabase/server'
-import { selectCount, selectMany } from '@/supabase/supabase-helpers'
+import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -44,7 +44,7 @@ describe('listWorkspaceInbox', () => {
             .mockResolvedValueOnce({ data: [{ agent_id: 'a', engine_session_id: 'e-ask', kind: 'question', message: ' Which list? ', metadata: null, recipients: { me: 'mine' } }, { agent_id: 'a', engine_session_id: 'e-other', kind: 'approval', message: 'Send it?', metadata: null, recipients: { someone: 'mine' } }], error: null } as never)
         vi.mocked(selectCount).mockResolvedValueOnce({ data: 2, error: null } as never)
 
-        const inbox = await listWorkspaceInbox(ctx)
+        const inbox = await listWorkspaceInbox(ctx, { foremanRuns: false })
 
         expect(inbox.running).toBe(2)
         expect(inbox.items).toEqual([
@@ -62,16 +62,31 @@ describe('listWorkspaceInbox', () => {
             .mockResolvedValueOnce({ data: [], error: null } as never)
         vi.mocked(selectCount).mockResolvedValueOnce({ data: 0, error: null } as never)
 
-        const inbox = await listWorkspaceInbox({ ...ctx, role: 'member' } as WorkspaceContext)
+        const inbox = await listWorkspaceInbox({ ...ctx, role: 'member' } as WorkspaceContext, { foremanRuns: false })
 
         expect(inbox.items).toEqual([])
         expect(vi.mocked(selectMany).mock.calls[1][3]).toMatchObject({ agent_id: ['a'] })
     })
 
+    it("lists a finished run of the Chief of Staff only for a caller that reads its conversations on screen", async () => {
+        const read = async (foremanRuns: boolean) => {
+            callerReturning([{ ...unseenRun('s-chief', '2026-10-22T10:00:00Z'), agent_id: 'chief' }])
+            vi.mocked(selectMaybeSingle).mockResolvedValueOnce({ data: { id: 'chief', name: 'Ada', kind: 'foreman' }, error: null } as never)
+            vi.mocked(selectMany)
+                .mockResolvedValueOnce({ data: [], error: null } as never)
+                .mockResolvedValueOnce({ data: [], error: null } as never)
+            vi.mocked(selectCount).mockResolvedValueOnce({ data: 0, error: null } as never)
+            return (await listWorkspaceInbox(ctx, { foremanRuns })).items
+        }
+
+        expect(await read(false)).toEqual([])
+        expect(await read(true)).toEqual([{ id: 'done:s-chief', sessionId: 's-chief', sessionIds: ['s-chief'], agentId: 'foreman', agentName: 'Ada', status: 'done', title: 's-chief title', message: 's-chief done', updatedAt: '2026-10-22T10:00:00.000Z', count: 1 }])
+    })
+
     it('answers empty without reading further when the workspace has no coworker', async () => {
         vi.mocked(selectMany).mockResolvedValueOnce({ data: [], error: null } as never)
 
-        expect(await listWorkspaceInbox(ctx)).toEqual({ items: [], running: 0 })
+        expect(await listWorkspaceInbox(ctx, { foremanRuns: false })).toEqual({ items: [], running: 0 })
         expect(createClient).not.toHaveBeenCalled()
     })
 })

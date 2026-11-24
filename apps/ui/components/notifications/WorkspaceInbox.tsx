@@ -128,7 +128,10 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         board.setPendingOpenSession({ agentId, sessionId, runId: peek.engineRunId })
     }, [])
     const markAllRead = useCallback(() => {
-        markSessionsHandled(items.filter(i => !i.sessionIds).map(i => i.id))
+        const waiting = items.filter(i => !i.sessionIds)
+        markSessionsHandled(waiting.map(i => i.id))
+        // The Chief of Staff's conversations are not the board's: each is put aside as its own row is.
+        for (const item of waiting) if (item.agentId === FOREMAN_AGENT_ID) markInboxItemRead(item)
         void useUnseenRunsStore.getState().markAllSeen()
     }, [markSessionsHandled, items])
     const openSettings = useCallback(() => {

@@ -347,11 +347,12 @@ describe('the onboarding of the mobile app', () => {
                 { id: 'fc-grace', agent_id: 'agent-cos', owner_user_id: 'user-grace', kind: 'general', title: 'General', status: 'idle', first_message: null, engine_session_id: 'engine-grace', created_at: '2026-11-18T09:00:00.000Z', updated_at: '2026-11-18T12:00:00.000Z' },
             ]
             tables.foreman_conversations = [{ id: 'fc-hub', workspace_id: 7, user_id: 'user-ada', backend: 'hub', kind: 'thread', title: 'Onboarding', status: 'idle', first_message: null, engine_session_id: null, created_at: '2026-11-17T09:00:00.000Z', updated_at: '2026-11-18T11:00:00.000Z' }]
+            tables['rpc:unseen_runs'] = [{ session_id: 'fc-general', agent_id: 'agent-cos', source: 'dashboard', slug: null, title: 'General', message: 'Done.', run_count: 1, last_at: '2026-11-18T10:30:00.000Z', automation_name: null }]
             const { GET } = await import('@/app/api/v1/foreman/conversations/route')
-            const conversations = (await expectContract(mobileApi.listForemanConversations, await callRoute(GET, mobileApi.listForemanConversations, { client: oldBuild }))) as { id: string; title: string; status: string; kind?: string }[]
-            expect(conversations.map(({ id, title, status, kind }) => ({ id, title, status, kind }))).toEqual([
-                { id: 'fc-thread', title: 'Find me twenty agencies in Lille', status: 'awaiting_approval', kind: 'thread' },
-                { id: 'fc-general', title: 'General', status: 'idle', kind: 'general' },
+            const conversations = (await expectContract(mobileApi.listForemanConversations, await callRoute(GET, mobileApi.listForemanConversations, { client: oldBuild }))) as { id: string; title: string; status: string; kind?: string; unseen?: boolean }[]
+            expect(conversations.map(({ id, title, status, kind, unseen }) => ({ id, title, status, kind, unseen }))).toEqual([
+                { id: 'fc-thread', title: 'Find me twenty agencies in Lille', status: 'awaiting_approval', kind: 'thread', unseen: false },
+                { id: 'fc-general', title: 'General', status: 'idle', kind: 'general', unseen: true },
             ])
         })
     })

@@ -22,7 +22,7 @@ export function useInboxItems(): { items: InboxItem[]; sessions: AttentionSessio
     // The Chief of Staff's conversations are the reader's own, and wait on nobody else.
     const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
     const foremanOnEngine = useForemanStore(s => selectForemanVisible(s) && s.surface === 'engine')
-    const { entries: foremanEntries } = useForemanThreads(foremanOnEngine)
+    const { entries: foremanEntries, sessionIds: foremanSessionIds } = useForemanThreads(foremanOnEngine)
 
     const items = useMemo<InboxItem[]>(() => {
         const names = new Map(agents.map(a => [a.id, a.name]))
@@ -31,11 +31,13 @@ export function useInboxItems(): { items: InboxItem[]; sessions: AttentionSessio
             return agentName && s.reason ? [{ ...s, agentName }] : []
         })
         const done = unseen.flatMap(group => {
-            const agentName = names.get(group.agentId)
+            // A finished run of the Chief of Staff, which sits on no board, is known by its conversation.
+            const ofForeman = foremanSessionIds.has(group.latestSessionId)
+            const agentName = ofForeman ? foremanName : names.get(group.agentId)
             if (!agentName) return []
             return [{
                 id: `done:${group.key}`,
-                agentId: group.agentId,
+                agentId: ofForeman ? FOREMAN_AGENT_ID : group.agentId,
                 agentName,
                 engineSessionId: null,
                 status: 'done' as const,
@@ -51,7 +53,7 @@ export function useInboxItems(): { items: InboxItem[]; sessions: AttentionSessio
             entry.id && needsHuman(entry.status) ? [{ id: entry.id, agentId: FOREMAN_AGENT_ID, agentName: foremanName, engineSessionId: entry.engineSessionId, status: entry.status, title: entry.title, message: null, updatedAt: entry.updatedAt, reason: 'mine' as const }] : []
         )
         return [...foreman, ...attention, ...done]
-    }, [sessions, agents, unseen, foremanEntries, foremanName])
+    }, [sessions, agents, unseen, foremanEntries, foremanSessionIds, foremanName])
 
     return { items, sessions }
 }

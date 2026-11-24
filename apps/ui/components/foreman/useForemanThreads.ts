@@ -39,11 +39,11 @@ function historyEntryOf(conversation: Thread): SessionHistoryEntry {
 
 /**
  * General's threads, the newest first: as branches of General (`threads`) and as rows of the list of
- * every conversation (`entries`). Read when the column needs them, then again, debounced, on
+ * every conversation (`entries`), with the ids of all its conversations, General included (`sessionIds`). Read when the column needs them, then again, debounced, on
  * every change of this person's conversations: a thread that opens, starts working, waits on an
  * answer or gets its title. Only the engine's foreman has threads.
  */
-export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; entries: SessionHistoryEntry[] } {
+export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; entries: SessionHistoryEntry[]; sessionIds: ReadonlySet<string> } {
     const { user } = useSession()
     const [conversations, setConversations] = useState<Conversation[]>([])
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -83,6 +83,6 @@ export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; ent
 
     return useMemo(() => {
         const threads = conversations.filter(isThread)
-        return { threads: threads.map(threadRowOf), entries: threads.map(historyEntryOf) }
+        return { threads: threads.map(threadRowOf), entries: threads.map(historyEntryOf), sessionIds: new Set(conversations.flatMap(conversation => conversation.id ?? [])) }
     }, [conversations])
 }

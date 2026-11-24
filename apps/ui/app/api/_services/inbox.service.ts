@@ -20,8 +20,9 @@ const ATTENTION_PAGE = 100
 
 // The web's inbox in one read: the conversations waiting on the caller, then the finished runs they
 // have not looked at yet, folded by scheduled task. Built from the same sources and the same rules as
-// `WorkspaceInbox`, so the two cannot disagree on what is news.
-export async function listWorkspaceInbox(ctx: WorkspaceContext): Promise<Inbox> {
+// `WorkspaceInbox`, so the two cannot disagree on what is news. `foremanRuns`: the caller reads a
+// conversation of the Chief of Staff as it shows it, so its finished runs are news there too.
+export async function listWorkspaceInbox(ctx: WorkspaceContext, { foremanRuns }: { foremanRuns: boolean }): Promise<Inbox> {
     const [{ data: agentRows, error: agentsError }, spaces, foreman] = await Promise.all([
         selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id, kind: 'coworker' }),
         visibleSpaceIds(actorFromContext(ctx)),
@@ -72,7 +73,7 @@ export async function listWorkspaceInbox(ctx: WorkspaceContext): Promise<Inbox> 
     // for a label, so it falls back on the slug, as the web does when the name is missing.
     const done: InboxItem[] = groupUnseenRuns(unseen.data ?? []).flatMap(group => {
         const agentName = namesById.get(group.agentId)
-        if (!agentName) return []
+        if (!agentName || (group.agentId === chief?.id && !foremanRuns)) return []
         const scheduled = isScheduledSource(group.source) && !!group.slug
         return [{ id: `done:${group.key}`, sessionId: group.latestSessionId, sessionIds: group.sessionIds, agentId: addressOf(group.agentId), agentName, status: 'done' as const, title: scheduled ? group.slug! : group.title, message: scheduled ? null : group.message, updatedAt: new Date(group.at).toISOString(), count: group.count }]
     })

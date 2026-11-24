@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type EmailCodePrepared, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type ClientPlatform, type EmailCodePrepared, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
 // The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
@@ -69,4 +69,16 @@ export function emailCodeForClient(req: Request, answer: EmailCodePrepared): Ema
     const client = clientOf(req)
     if (client && (client.platform === 'android' || client.build >= FIRST_IOS_BUILD_WITHOUT_CREATED)) return answer
     return { ...answer, created: false }
+}
+
+// A build marks a conversation of the Chief of Staff read as it shows it only since the one each
+// variable names: an older one would keep every finished run of it unread in its inbox. Unset, no
+// build of that platform does.
+const FIRST_FOREMAN_RUNS_BUILD_ENV: Record<ClientPlatform, string> = { ios: 'MOBILE_IOS_FOREMAN_RUNS_BUILD', android: 'MOBILE_ANDROID_FOREMAN_RUNS_BUILD' }
+
+export function clientReadsForemanRuns(req: Request): boolean {
+    const client = clientOf(req)
+    if (!client) return false
+    const firstBuild = Number.parseInt(process.env[FIRST_FOREMAN_RUNS_BUILD_ENV[client.platform]] ?? '', 10)
+    return Number.isInteger(firstBuild) && firstBuild > 0 && client.build >= firstBuild
 }

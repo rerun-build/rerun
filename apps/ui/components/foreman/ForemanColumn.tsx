@@ -61,6 +61,7 @@ import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useBoardStore } from '@/stores/board.store'
 import { selectForemanInThread, useForemanStore } from '@/stores/foreman.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
+import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
@@ -85,6 +86,12 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const { workspace, phoneStep } = useSession()
     const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, restoredProposals, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
+    // As on a coworker's chat: a conversation on screen reads its results, a run that finishes there too.
+    const chatOnScreen = (open === true || pinned) && backend === 'engine' && !onRoutines
+    useEffect(() => {
+        if (!chatOnScreen || !sessionId) return
+        return useUnseenRunsStore.getState().view(sessionId)
+    }, [chatOnScreen, sessionId])
     // Its skill proposals, as a coworker's chat reads them, once its engine keeps skills of its own.
     const skillProposals = useSkillProposals(hasCard && backend === 'engine' ? sessionId : null, status)
     // Like a coworker's chat, the column is handed the waiting proposals with the conversation it opens.
