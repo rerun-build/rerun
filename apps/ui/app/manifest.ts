@@ -1,20 +1,19 @@
-import type { MetadataRoute } from "next";
+import { brandManifestIcons } from "@/lib/brand/icons";
+import { getBrand } from "@/lib/brand/server";
 import { site } from "@/lib/site";
+import type { MetadataRoute } from "next";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const brand = await getBrand();
   return {
     id: "/",
-    name: site.name,
-    short_name: site.name,
+    name: brand.name,
+    short_name: brand.name,
     description: site.description,
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",
     theme_color: "#0a0a0a",
-    icons: [
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-    ],
+    icons: brandManifestIcons(brand),
   };
 }

@@ -158,7 +158,7 @@ export const config = {
          *   included: it carries no session and must answer before anyone signs in)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!_next/static|_next/image|favicon.ico|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
         // The labs put back in, for the gate alone: proxy() returns before it ever reaches
         // updateSession(). The UI kit (/render/kit) and the OG renders, /render/brand and
         // /render/templates, stay out: the screenshot service captures those on every card.
