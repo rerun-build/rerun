@@ -465,7 +465,7 @@
     "vaultConflict": "{coworker} 已从另一个 Vault 条目获得 {name}",
     "vaultSharedItem": "此应用来自 Vault，其他同事也在使用。请在 Vault 中更改。",
     "vaultPaidAppEveryone": "付费应用需要逐个同事绑定",
-    "vaultMethodUnsupported": "此应用暂时无法添加到 Vault。请在同事的“应用”标签页中连接。",
+    "vaultMethodUnsupported": "此应用无法保存在 Vault 中。请在同事的“应用”标签页中连接。",
     "vaultRenameUnsupported": "您工作区的机器暂时无法重命名账户，下次更新后即可。",
     "vaultConflictEveryone": "每位同事都已从另一个与所有人共享的 Vault 条目获得 {name}",
     "vaultConflictSomeone": "已有同事从另一个 Vault 条目获得 {name}",

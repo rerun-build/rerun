@@ -31,7 +31,6 @@
         "noCoworkers": "此工作区还没有同事。",
         "hiddenCoworkers": "{count, plural, other {# 位同事}}位于您看不到的 Boxes 中",
         "variables": "变量",
-        "reconnectFromCoworker": "请在使用它的同事的“应用”标签页中重新连接。",
         "rename": "重命名账号",
         "accountName": "账号名称",
         "namePlaceholder": "为此账号命名"

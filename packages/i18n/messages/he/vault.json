@@ -31,7 +31,6 @@
         "noCoworkers": "עדיין אין עמיתים בסביבת העבודה הזו.",
         "hiddenCoworkers": "{count, plural, one {# עמית} two {# עמיתים} other {# עמיתים}} ב-Boxes שאינך יכול לראות",
         "variables": "משתנים",
-        "reconnectFromCoworker": "אפשר להתחבר מחדש מהלשונית אפליקציות של עמית שמשתמש בה.",
         "rename": "לשנות את שם החשבון",
         "accountName": "שם החשבון",
         "namePlaceholder": "שם לחשבון הזה"

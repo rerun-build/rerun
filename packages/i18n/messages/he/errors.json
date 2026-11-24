@@ -465,7 +465,7 @@
     "vaultConflict": "{coworker} כבר מקבל את {name} מפריט אחר ב-Vault",
     "vaultSharedItem": "האפליקציה הזו מגיעה מה-Vault ועמיתים אחרים משתמשים בה. אפשר לשנות אותה מה-Vault.",
     "vaultPaidAppEveryone": "אפליקציה בתשלום מצורפת לכל עמית בנפרד",
-    "vaultMethodUnsupported": "עדיין אי אפשר להוסיף את האפליקציה הזו ל-Vault. אפשר לחבר אותה מהלשונית אפליקציות של עמית.",
+    "vaultMethodUnsupported": "אי אפשר לשמור את האפליקציה הזו ב-Vault. אפשר לחבר אותה מהלשונית אפליקציות של עמית.",
     "vaultRenameUnsupported": "המכונה של סביבת העבודה שלך עדיין לא יכולה לשנות שם של חשבון. היא תוכל בעדכון הבא שלה.",
     "vaultConflictEveryone": "כל עמית כבר מקבל את {name} מפריט אחר ב-Vault שמשותף עם כולם",
     "vaultConflictSomeone": "עמית כבר מקבל את {name} מפריט אחר ב-Vault",

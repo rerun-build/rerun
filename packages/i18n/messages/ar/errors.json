@@ -465,7 +465,7 @@
     "vaultConflict": "يحصل {coworker} بالفعل على {name} من إدخال آخر في Vault",
     "vaultSharedItem": "هذا التطبيق من Vault ويستخدمه زملاء آخرون. غيّره من Vault.",
     "vaultPaidAppEveryone": "يُرفق التطبيق المدفوع زميلًا تلو الآخر",
-    "vaultMethodUnsupported": "لا يمكن إضافة هذا التطبيق إلى Vault بعد. اربطه من علامة التبويب «التطبيقات» لأحد الزملاء.",
+    "vaultMethodUnsupported": "لا يمكن حفظ هذا التطبيق في Vault. اربطه من علامة التبويب «التطبيقات» لأحد الزملاء.",
     "vaultRenameUnsupported": "لا يستطيع جهاز مساحة العمل إعادة تسمية حساب بعد. سيتمكن من ذلك مع تحديثه القادم.",
     "vaultConflictEveryone": "يحصل كل زميل بالفعل على {name} من إدخال آخر في Vault مشترك مع الجميع",
     "vaultConflictSomeone": "يحصل أحد الزملاء بالفعل على {name} من إدخال آخر في Vault",

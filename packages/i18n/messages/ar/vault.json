@@ -31,7 +31,6 @@
         "noCoworkers": "لا يوجد زميل في مساحة العمل هذه بعد.",
         "hiddenCoworkers": "{count, plural, zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}} في Boxes لا يمكنك رؤيتها",
         "variables": "المتغيرات",
-        "reconnectFromCoworker": "أعد ربطه من تبويب التطبيقات لدى زميل يستخدمه.",
         "rename": "إعادة تسمية الحساب",
         "accountName": "اسم الحساب",
         "namePlaceholder": "سمِّ هذا الحساب"
