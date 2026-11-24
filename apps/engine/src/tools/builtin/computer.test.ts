@@ -8,6 +8,8 @@ const state = vi.hoisted(() => ({
     calls: [] as Array<[string, ...unknown[]]>,
     captures: 0,
     failure: null as Error | null,
+    failAfterCalls: null as number | null,
+    onCall: null as ((name: string) => unknown) | null,
     screenHolds: 0,
     browserHolds: 0,
     openBrowser: false,
@@ -45,7 +47,9 @@ vi.mock('../../desktop/control.js', () => {
         (name: string) =>
         async (_control: unknown, ...args: unknown[]) => {
             if (state.failure) throw state.failure
+            if (state.failAfterCalls !== null && state.calls.length >= state.failAfterCalls) throw new Error('xdotool is gone')
             state.calls.push([name, ...args])
+            state.onCall?.(name)
         }
     return {
         ControlRefusal,
@@ -125,6 +129,8 @@ beforeEach(() => {
     state.calls.length = 0
     state.captures = 0
     state.failure = null
+    state.failAfterCalls = null
+    state.onCall = null
     state.browserUrls.length = 0
     state.apps.length = 0
     state.sleeps.length = 0
@@ -436,6 +442,93 @@ describe('computer', () => {
         expect(state.calls).toHaveLength(1)
     })
 
+    describe('followed_by', () => {
+        const editBlock = { action: 'double_click', coordinate: [10, 20], followed_by: [{ action: 'key', text: 'ctrl+a' }, { action: 'type', text: 'hello' }, { action: 'key', text: 'Escape' }] }
+
+        it('carries the actions out in order and looks at the screen once', async () => {
+            const built = build(ctxWith())
+            expect(await settled(act(built, editBlock))).toEqual({ status: 'done', screenshotId: expect.any(String), screen: [1280, 720] })
+            expect(state.calls).toEqual([
+                ['click', [10, 20], { double: true }],
+                ['key', 'ctrl+a'],
+                ['type', 'hello'],
+                ['key', 'Escape'],
+            ])
+            expect(state.captures).toBe(1)
+            expect(state.sleeps).toEqual([600, 600, 600, 600])
+        })
+
+        it('waits without settling on top of the wait', async () => {
+            await settled(act(build(ctxWith()), { action: 'left_click', coordinate: [1, 1], followed_by: [{ action: 'wait', duration: 2 }] }))
+            expect(state.sleeps).toEqual([600, 2000])
+        })
+
+        it('counts as one screenshot of the run', async () => {
+            const built = build(ctxWith('claude-series', {}, { provider: 'claude' }))
+            for (let i = 0; i < 60; i++) expect((await settled(act(built, editBlock))).status).toBe('done')
+            expect((await settled(act(built, editBlock))).status).toBe('refused')
+            expect(state.calls).toHaveLength(240)
+        })
+
+        it('stops at the first one that fails and says what went through', async () => {
+            const built = build(ctxWith())
+            const result = await settled(act(built, { action: 'left_click', coordinate: [1, 1], followed_by: [{ action: 'type', text: 'hello' }, { action: 'key' }, { action: 'type', text: 'never' }] }))
+            expect(result).toEqual({ status: 'refused', reason: expect.stringMatching(/^key needs text\. Stopped at key, step 3 of 4: the steps before it went through/) })
+            expect(state.calls).toEqual([['click', [1, 1]], ['type', 'hello']])
+            expect(state.captures).toBe(0)
+        })
+
+        it('does nothing more when the first action fails, with the answer it always had', async () => {
+            expect(await settled(act(build(ctxWith()), { ...editBlock, coordinate: undefined }))).toEqual({ status: 'refused', reason: 'double_click needs coordinate.' })
+            expect(state.calls).toEqual([])
+        })
+
+        it('tells what broke from what the screen refused', async () => {
+            const built = build(ctxWith())
+            state.failAfterCalls = 1
+            expect(await settled(act(built, editBlock))).toEqual({ status: 'failed', reason: expect.stringMatching(/^xdotool is gone Stopped at key, step 2 of 4/) })
+        })
+
+        it('types a variable without its value entering the call or its result', async () => {
+            const built = build(ctxWith('a1', {}, {}, { ATLANTIC_TOKEN: '839201' }))
+            const result = await settled(act(built, { action: 'left_click', coordinate: [1, 1], followed_by: [{ action: 'type', secret: 'ATLANTIC_TOKEN' }] }))
+            expect(state.calls.at(-1)).toEqual(['type', '839201'])
+            expect(JSON.stringify(result)).not.toContain('839201')
+        })
+
+        it('presses no key once a person has taken the screen', async () => {
+            state.drivingAfterTyped = 1
+            const result = await settled(act(build(ctxWith()), { action: 'left_click', coordinate: [1, 1], followed_by: [{ action: 'type', text: 'hello' }, { action: 'key', text: 'Tab' }] }))
+            expect(result).toMatchObject({ status: 'refused', reason: expect.stringMatching(/driving your screen.*Stopped at key, step 3 of 3/) })
+            expect(state.calls.map(([name]) => name)).toEqual(['click', 'type'])
+        })
+
+        it('presses no key once its run let go of the screen', async () => {
+            const built = build(ctxWith())
+            state.onCall = name => name === 'type' && built.release()
+            const result = await settled(act(built, editBlock))
+            expect(result).toMatchObject({ status: 'refused', reason: expect.stringContaining('over') })
+            expect(state.calls.map(([name]) => name)).toEqual(['click', 'key', 'type'])
+        })
+
+        it('stops with the run instead of answering', async () => {
+            const controller = new AbortController()
+            const built = build(ctxWith('a1', {}, { abortSignal: controller.signal }))
+            state.onCall = name => name === 'click' && controller.abort()
+            await expect(settled(act(built, editBlock))).rejects.toThrow('aborted')
+            expect(state.calls.map(([name]) => name)).toEqual(['click'])
+        })
+
+        it('takes nothing that needs a look at the screen first, and ten at most', () => {
+            const schema = (build(ctxWith()).tools.computer as any).inputSchema
+            const series = (followed_by: unknown[]) => schema.safeParse({ action: 'left_click', coordinate: [1, 1], followed_by }).success
+            expect(series([{ action: 'key', text: 'Tab' }])).toBe(true)
+            expect(series([{ action: 'left_click', coordinate: [2, 2] }])).toBe(false)
+            expect(series(Array(10).fill({ action: 'wait' }))).toBe(true)
+            expect(series(Array(11).fill({ action: 'wait' }))).toBe(false)
+        })
+    })
+
     it('names the agents whose run has the screen', async () => {
         const built = build(ctxWith('a7'))
         expect(agentsOnScreen()).not.toContain('a7')
@@ -475,13 +568,13 @@ describe('computer', () => {
     it('gives a run on a CLI fewer actions, since its pictures all stay in its context', async () => {
         const built = build(ctxWith('claude-agent', {}, { provider: 'claude' }))
         for (let i = 0; i < 60; i++) expect((await settled(act(built, { action: 'screenshot' }))).status).toBe('done')
-        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('60 screen actions') })
+        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('60 screenshots') })
     })
 
     it('ends a run that would click forever', async () => {
         const built = build(ctxWith())
         for (let i = 0; i < 200; i++) expect((await settled(act(built, { action: 'screenshot' }))).status).toBe('done')
-        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('200 screen actions') })
+        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('200 screenshots') })
     })
 })
 

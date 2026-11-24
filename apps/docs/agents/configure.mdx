@@ -172,6 +172,17 @@ A coworker has a computer of its own, with a browser, a file manager and a termi
 
 When a coworker needs you on its screen (a sign-in, a captcha), it asks for a browser takeover: see [Human in the loop](/agents/human-in-the-loop#the-pauses).
 
+### How long it works on its screen
+
+A coworker looks at its screen once per call: one screenshot, after the action it took. A click can carry up to 10 actions behind it (typing, keys, waits), so filling a field is one screenshot, not four.
+
+| The coworker runs on | Screenshots in one run |
+| --- | --- |
+| A Claude or ChatGPT subscription | 60 |
+| An API key, OpenRouter, OpenCode, the Rerun models or a custom endpoint | 200 |
+
+Once they are used up, it tells you where it got to and stops. You can also stop it yourself at any time.
+
 ### What is its own, what is shared
 
 Every coworker of a workspace runs on the [same machine](/concepts#workspace). Each one gets a screen of its own on it, but they all run as the same system user, side by side:
