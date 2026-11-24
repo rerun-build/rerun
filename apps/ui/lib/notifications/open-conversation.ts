@@ -15,7 +15,7 @@ type OpenConversationArgs = {
     engineRunId: string | null
 }
 
-// The Chief of Staff has no agent row: its notification names it by its engine id, and the
+// The Chief of Staff sits on no board: its notification names it by its engine id, and the
 // conversation it is about is one of the reader's threads in its column.
 async function openForemanThread(engineSessionId: string | null): Promise<void> {
     const store = useForemanStore.getState()

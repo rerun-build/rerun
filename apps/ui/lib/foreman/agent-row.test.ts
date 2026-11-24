@@ -15,6 +15,16 @@ describe('ensureForemanAgentRow', () => {
         expect(db.writes('agents').map(write => write.payload)).toEqual([{ workspace_id: 7, kind: 'foreman', space_id: null, name: 'Chief of Staff', engine_agent_id: 'foreman' }])
     })
 
+    it('writes it under the name the workspace gave its Chief of Staff', async () => {
+        const db = fakeSupabase((table, calls) => {
+            if (table === 'workspace_onboarding') return { data: { answers: { foreman: { name: ' Ada ' } } } }
+            if (table !== 'agents') return undefined
+            return writeMethodOf(calls) ? { data: { id: 'cos-new' } } : { data: null }
+        })
+        await ensureForemanAgentRow(db.client, 7)
+        expect(db.writes('agents').map(write => (write.payload as { name: string }).name)).toEqual(['Ada'])
+    })
+
     it('reads the row of the caller it raced with', async () => {
         let reads = 0
         const db = fakeSupabase((table, calls) => {

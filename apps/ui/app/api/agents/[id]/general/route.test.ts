@@ -12,7 +12,7 @@ const read = (id = 'agent-1') => GET(new Request(`https://app.rerun.build/api/ag
 
 describe('GET /api/agents/:id/general', () => {
     beforeEach(() => {
-        mocks.assertAgentAccess.mockReset().mockResolvedValue({})
+        mocks.assertAgentAccess.mockReset().mockResolvedValue({ agent: { kind: 'coworker' } })
         mocks.findGeneralSession.mockReset().mockResolvedValue({ id: 'row-g', engineSessionId: 'engine-g' })
     })
 
@@ -29,6 +29,13 @@ describe('GET /api/agents/:id/general', () => {
 
         mocks.findGeneralSession.mockRejectedValue(new Error('database away'))
         expect(await (await read()).json()).toEqual({ general: null })
+    })
+
+    it("answers null for the Chief of Staff, whose General is each member's own", async () => {
+        mocks.assertAgentAccess.mockResolvedValue({ agent: { kind: 'foreman' } })
+
+        expect(await (await read('cos-row')).json()).toEqual({ general: null })
+        expect(mocks.findGeneralSession).not.toHaveBeenCalled()
     })
 
     it('answers 401 to a caller who is not signed in, without reading anything', async () => {

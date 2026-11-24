@@ -202,7 +202,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 
         const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
         const supabase = createServiceRoleClient()
-        // The foreman has no row: it only ever acts as the account of a Vault entry it holds.
+        // The Chief of Staff's row is not read here: it only ever acts as the account of a Vault entry it holds.
         const foreman = engineAgentId === FOREMAN_AGENT_ID
         const { data: agent } = engineAgentId && !foreman ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
         if (!agent && !foreman) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')

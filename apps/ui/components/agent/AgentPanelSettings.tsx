@@ -40,7 +40,7 @@ type ConfigValues = { soul: string; verbosity: EngineVerbosity }
 const SETTINGS_FORM_ID = 'agent-settings-form'
 
 export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agent.id)
     const t = useTranslations('agent.agentPanelSettings')
     const errorText = useErrorText()
     const verbosityOptions = useMemo(() => VERBOSITY_LEVELS.map((value: EngineVerbosity) => ({ value, label: t(`verbosity.${value}`) })), [t])

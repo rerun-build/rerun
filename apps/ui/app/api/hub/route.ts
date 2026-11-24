@@ -48,7 +48,7 @@ export async function POST(req: Request): Promise<Response> {
     const args = (body.args ?? {}) as Record<string, unknown>
     if (!tool) return new Response('Missing tool', { status: 400 })
 
-    // The foreman has no agent row: it speaks for the whole workspace the engine key names.
+    // The Chief of Staff is known by its fixed id: it speaks for the whole workspace the engine key names.
     const isForeman = engineAgentId === FOREMAN_AGENT_ID
     const asCoworker = isForeman && FOREMAN_COWORKER_HUB_TOOLS.has(tool)
     // The person the foreman's turn speaks for, from its signed token: their access, not the

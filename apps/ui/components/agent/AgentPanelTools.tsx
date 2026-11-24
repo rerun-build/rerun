@@ -81,7 +81,7 @@ function metaFor(family: EngineToolFamily, capabilities: Record<string, Capabili
 }
 
 export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelTools')
     const errorText = useErrorText()
     const capabilities = useCapabilityMeta()
@@ -272,7 +272,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                             {pending.has(key) ? (
                                                 <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0" />
                                             ) : (
-                                                <TooltipDisabledReason reason={manageReason} className="shrink-0">
+                                                <TooltipDisabledReason reason={lockedBy('self') ? t('lockedByKind') : manageReason} className="shrink-0">
                                                     <Switch checked={!!selfImprovement[key]} disabled={!canManage || lockedBy('self')} onCheckedChange={value => handleSelfImprovement(key, value)} className="shrink-0" />
                                                 </TooltipDisabledReason>
                                             )}

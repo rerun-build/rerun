@@ -64,9 +64,9 @@ export async function followCoworker(userId: string | null | undefined, agentId:
 }
 
 // A schedule or a trigger the coworker wrote during a chat names the member who asked for it. Checked
-// against the workspace, so a box can never make someone outside it follow anything. The foreman has
-// no agent row: it is followed under its fixed id, which is where a run of its routine looks for
-// who reads it.
+// against the workspace, so a box can never make someone outside it follow anything. The Chief of
+// Staff is followed under its fixed id, the name its notification rules know it by, which is where
+// a run of its routine looks for who reads it.
 export async function followAuthorOfCreatedTask(workspaceId: number, event: EngineCreatedEvent): Promise<void> {
     const authorId = event.metadata?.authorId
     if (event.event === 'box.connection.connected' || typeof authorId !== 'string' || !event.agentId) return

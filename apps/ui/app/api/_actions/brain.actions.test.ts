@@ -11,7 +11,7 @@ import { listWorkspaceFilesAction } from './workspace-file.actions'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: (ctx: unknown) => ctx, visibleSpaceIds: vi.fn(), manageableSpaceIds: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/coworker-box.service', () => ({ syncCoworkerBoxes: vi.fn() }))
 const rows = vi.hoisted(() => ({ spaces: [] as unknown[], agents: [] as unknown[] }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: async (_client: unknown, table: string) => ({ data: table === 'spaces' ? rows.spaces : rows.agents }) }))

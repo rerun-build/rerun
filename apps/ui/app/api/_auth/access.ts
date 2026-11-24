@@ -242,8 +242,9 @@ export async function assertAgentInWorkspace(agentId: string, need: AccessLevel 
 
 // For an OAuth callback, which lands in a popup that names no workspace: the agent names its own,
 // held to the caller's membership like a workspace a tab names. Connecting an app to a coworker
-// changes what it is, so it takes `manage` on its Box. The foreman has no row to name a workspace:
-// its sign-in carries the one it started in (`startedIn`), never the one the session last picked.
+// changes what it is, so it takes `manage` on its Box. The Chief of Staff goes by `foreman` in every
+// workspace, which names none: its sign-in carries the one it started in (`startedIn`), never the
+// one the session last picked.
 export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel = 'manage', startedIn?: number): Promise<number> {
     const { user } = await getSessionWorkspace()
     if (!user?.id) throw new UnauthenticatedError()

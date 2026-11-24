@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { sanitizeForemanName } from './name'
 
 const UNIQUE_VIOLATION = '23505'
 
@@ -12,9 +13,12 @@ export async function ensureForemanAgentRow(supabase: SupabaseClient<Database>, 
     const existing = await selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'foreman' })
     if (existing.error) throw new Error(`Failed to read the Chief of Staff of workspace ${workspaceId}: ${existing.error.message}`)
     if (existing.data) return existing.data.id
+    // Under the name the workspace gave it, which its onboarding answers keep.
+    const { data: onboarding } = await selectMaybeSingle(supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: workspaceId })
+    const given = sanitizeForemanName((onboarding?.answers as { foreman?: { name?: unknown } } | null)?.foreman?.name)
     const { data, error } = await supabase
         .from('agents')
-        .insert<Database['public']['Tables']['agents']['Insert']>({ workspace_id: workspaceId, kind: 'foreman', space_id: null, name: FOREMAN_DISPLAY_NAME, engine_agent_id: FOREMAN_AGENT_ID })
+        .insert<Database['public']['Tables']['agents']['Insert']>({ workspace_id: workspaceId, kind: 'foreman', space_id: null, name: given ?? FOREMAN_DISPLAY_NAME, engine_agent_id: FOREMAN_AGENT_ID })
         .select('id')
         .single()
     if (data) return data.id
