@@ -80,7 +80,8 @@
         "boardAlt": "Alt text of a template's thumbnail: a picture of the board of coworkers it installs. {title} is the template's name.",
         "library.mode.use-cases": "One of the two lists of the library, next to Coworkers: the tasks a coworker knows how to do.",
         "library.heading.coworkers": "Subtitle of a list of coworkers.",
-        "library.heading.useCases": "Subtitle of a list of use cases."
+        "library.heading.useCases": "Subtitle of a list of use cases.",
+        "detail.alsoDoes": "Title above the other tasks of a coworker. {coworker} is its job, like \"UX Researcher\"."
     },
     "price": {
         "free": "Free",
@@ -126,6 +127,8 @@
     "detail": {
         "price": "Price",
         "coworkers": "Coworkers",
+        "useCases": "Use cases",
+        "alsoDoes": "{coworker} also does",
         "apps": "Apps",
         "setupTime": "Setup time",
         "minutes": "{minutes} min",

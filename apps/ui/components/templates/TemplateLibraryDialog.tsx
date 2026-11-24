@@ -3,6 +3,7 @@
 import { TemplateDetailPanel } from '@/components/templates/TemplateDetailPanel'
 import { TemplateDetailPanelSkeleton } from '@/components/templates/TemplateDetailPanelSkeleton'
 import { TemplateLibraryBrowser } from '@/components/templates/TemplateLibraryBrowser'
+import { TemplateUseCasePanel } from '@/components/templates/TemplateUseCasePanel'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
@@ -10,7 +11,7 @@ import { useLibraryCreators } from '@/hooks/useLibraryCreators'
 import { useLibraryTemplates } from '@/hooks/useLibraryTemplates'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { ChevronLeftIcon, PanelRightCloseIcon } from '@/lib/icons'
-import type { UseCase } from '@/lib/templates/use-cases'
+import { coworkerUseCases, type UseCase } from '@/lib/templates/use-cases'
 import { cn } from '@/lib/utils'
 import type { TemplateCategory } from '@rerun/contracts'
 import { useIsMobile } from '@rerun/ui/primitives'
@@ -65,7 +66,14 @@ export function TemplateLibraryDialog({
 
     // Resolved against the full list, not the filtered one, so a filter change does not drop
     // the panel out from under the selection.
-    const selected = useMemo(() => (selection ? ((templates ?? []).find(t => t.slug === selection.slug) ?? null) : null), [templates, selection])
+    const selected = useMemo(() => {
+        const template = selection && templates?.find(t => t.slug === selection.slug)
+        if (!template) return null
+        const useCase = coworkerUseCases(template)
+            .flatMap(coworker => coworker.useCases)
+            .find(candidate => candidate.id === selection.useCaseId)
+        return { template, useCase: useCase ?? null }
+    }, [templates, selection])
     // On the selection rather than on the resolved template: opening on an `initialSlug` while the
     // catalogue is still coming would otherwise land on the gallery and push the panel open a second
     // later, in front of a viewer who already picked.
@@ -208,9 +216,17 @@ export function TemplateLibraryDialog({
                                 </TooltipLabeled>
                             </span>
 
-                            <StepTransition stepKey={shown?.slug ?? 'empty'} direction={1} className="flex min-h-0 flex-1 flex-col">
-                                {shown ? (
-                                    <TemplateDetailPanel template={shown} showStatus={isAdmin || shown.isMine} onImported={() => onOpenChange(false)} />
+                            <StepTransition stepKey={shown ? `${shown.template.slug}:${shown.useCase?.id ?? ''}` : 'empty'} direction={1} className="flex min-h-0 flex-1 flex-col">
+                                {shown?.useCase ? (
+                                    <TemplateUseCasePanel
+                                        useCase={shown.useCase}
+                                        showStatus={isAdmin || shown.template.isMine}
+                                        onSelectUseCase={selectUseCase}
+                                        onSelectCoworker={() => selectTemplate(shown.template.slug)}
+                                        onImported={() => onOpenChange(false)}
+                                    />
+                                ) : shown ? (
+                                    <TemplateDetailPanel template={shown.template} showStatus={isAdmin || shown.template.isMine} onImported={() => onOpenChange(false)} onSelectUseCase={selectUseCase} />
                                 ) : (
                                     <TemplateDetailPanelSkeleton />
                                 )}

@@ -63,6 +63,8 @@
     "detail": {
         "price": "Precio",
         "coworkers": "Coworkers",
+        "useCases": "Casos de uso",
+        "alsoDoes": "{coworker} también hace",
         "apps": "Apps",
         "setupTime": "Tiempo de configuración",
         "minutes": "{minutes} min",

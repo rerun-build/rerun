@@ -63,6 +63,8 @@
     "detail": {
         "price": "Fiyat",
         "coworkers": "Coworker'lar",
+        "useCases": "Kullanım alanları",
+        "alsoDoes": "{coworker} bunları da yapar",
         "apps": "Uygulamalar",
         "setupTime": "Kurulum süresi",
         "minutes": "{minutes} dk",

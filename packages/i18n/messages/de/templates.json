@@ -63,6 +63,8 @@
     "detail": {
         "price": "Preis",
         "coworkers": "Coworker",
+        "useCases": "Anwendungsfälle",
+        "alsoDoes": "{coworker} kann auch",
         "apps": "Apps",
         "setupTime": "Einrichtungszeit",
         "minutes": "{minutes} Min.",
