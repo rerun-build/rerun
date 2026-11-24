@@ -10,6 +10,7 @@ import { useLibraryCreators } from '@/hooks/useLibraryCreators'
 import { useLibraryTemplates } from '@/hooks/useLibraryTemplates'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { ChevronLeftIcon, PanelRightCloseIcon } from '@/lib/icons'
+import type { UseCase } from '@/lib/templates/use-cases'
 import { cn } from '@/lib/utils'
 import type { TemplateCategory } from '@rerun/contracts'
 import { useIsMobile } from '@rerun/ui/primitives'
@@ -18,7 +19,8 @@ import { useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
-type LibrarySelection = { kind: 'template'; slug: string } | null
+// `useCaseId` is null on a coworker's own page.
+type LibrarySelection = { slug: string; useCaseId: string | null } | null
 
 // The app's recruiting surface: pick a template, then place its captured agents on the board one by
 // one. Confirming closes the library rather than reloading it — the rest happens on the grid, and
@@ -63,7 +65,7 @@ export function TemplateLibraryDialog({
 
     // Resolved against the full list, not the filtered one, so a filter change does not drop
     // the panel out from under the selection.
-    const selected = useMemo(() => (selection?.kind === 'template' ? ((templates ?? []).find(t => t.slug === selection.slug) ?? null) : null), [templates, selection])
+    const selected = useMemo(() => (selection ? ((templates ?? []).find(t => t.slug === selection.slug) ?? null) : null), [templates, selection])
     // On the selection rather than on the resolved template: opening on an `initialSlug` while the
     // catalogue is still coming would otherwise land on the gallery and push the panel open a second
     // later, in front of a viewer who already picked.
@@ -85,7 +87,7 @@ export function TemplateLibraryDialog({
     if (open !== wasOpen) {
         setWasOpen(open)
         if (open) {
-            setSelection(initialSlug ? { kind: 'template', slug: initialSlug } : null)
+            setSelection(initialSlug ? { slug: initialSlug, useCaseId: null } : null)
             setView(initialSlug ? 'detail' : 'list')
             setOpenCount(count => count + 1)
             setNow(new Date())
@@ -106,6 +108,9 @@ export function TemplateLibraryDialog({
         setSelection(next)
         setView('detail')
     }
+
+    const selectTemplate = (slug: string) => select({ slug, useCaseId: null })
+    const selectUseCase = (useCase: UseCase) => select({ slug: useCase.template.slug, useCaseId: useCase.id })
 
     function collapseDetail() {
         setSelection(null)
@@ -167,8 +172,10 @@ export function TemplateLibraryDialog({
                             isAdmin={isAdmin}
                             signals={signals}
                             now={now}
-                            selectedSlug={selection?.kind === 'template' ? selection.slug : null}
-                            onSelectTemplate={slug => select({ kind: 'template', slug })}
+                            selectedSlug={selection && !selection.useCaseId ? selection.slug : null}
+                            selectedUseCaseId={selection?.useCaseId ?? null}
+                            onSelectTemplate={selectTemplate}
+                            onSelectUseCase={selectUseCase}
                             onScratch={onCreateFromScratch}
                         />
                     </div>

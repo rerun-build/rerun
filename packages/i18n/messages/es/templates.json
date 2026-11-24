@@ -89,26 +89,20 @@
             "placeholder": "Buscar plantillas",
             "clear": "Borrar búsqueda"
         },
+        "mode": {
+            "coworkers": "Coworkers",
+            "use-cases": "Casos de uso"
+        },
         "nav": {
             "discover": "Descubrir",
-            "forYou": "Para ti",
-            "all": "Todas",
-            "allTemplates": "Todas las plantillas",
-            "mine": "Mi biblioteca",
-            "stack": "Tus herramientas",
-            "popularApps": "Apps populares",
-            "categories": "Categorías"
+            "all": "Todos"
         },
         "heading": {
-            "count": "{count, plural, one {# plantilla} other {# plantillas}}",
+            "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+            "useCases": "{count, plural, one {# caso de uso} other {# casos de uso}}",
             "results": "Resultados para “{query}”",
             "discoverEmpty": "Las plantillas que crees aparecerán aquí.",
             "discover": "Coworkers listos para usar, creados por quienes los usan.",
-            "forYou": "Pensadas para tu sector y, primero, para las apps que usas.",
-            "mine": "Las plantillas de este workspace.",
-            "app": "App",
-            "appSubtitle": "{total} con {app}",
-            "thisApp": "esta app",
             "creator": "Creador"
         },
         "discover": {

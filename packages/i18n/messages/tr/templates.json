@@ -89,26 +89,20 @@
             "placeholder": "Şablon ara",
             "clear": "Aramayı temizle"
         },
+        "mode": {
+            "coworkers": "Coworker'lar",
+            "use-cases": "Kullanım alanları"
+        },
         "nav": {
             "discover": "Keşfet",
-            "forYou": "Size özel",
-            "all": "Tümü",
-            "allTemplates": "Tüm şablonlar",
-            "mine": "Kütüphanem",
-            "stack": "Araçlarınız",
-            "popularApps": "Popüler uygulamalar",
-            "categories": "Kategoriler"
+            "all": "Tümü"
         },
         "heading": {
-            "count": "{count, plural, one {# şablon} other {# şablon}}",
+            "coworkers": "{count, plural, one {# coworker} other {# coworker}}",
+            "useCases": "{count, plural, one {# kullanım alanı} other {# kullanım alanı}}",
             "results": "“{query}” için sonuçlar",
             "discoverEmpty": "Oluşturduğunuz şablonlar buraya gelir.",
             "discover": "Onları kullanan kişilerin hazırladığı hazır coworker'lar.",
-            "forYou": "Önce sektörünüze ve kullandığınız uygulamalara göre eşleştirildi.",
-            "mine": "Bu çalışma alanının sahip olduğu şablonlar.",
-            "app": "Uygulama",
-            "appSubtitle": "{app} kullanan {total}",
-            "thisApp": "bu uygulamayı",
             "creator": "Creator"
         },
         "discover": {

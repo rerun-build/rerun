@@ -89,26 +89,20 @@
             "placeholder": "Buscar templates",
             "clear": "Limpar busca"
         },
+        "mode": {
+            "coworkers": "Coworkers",
+            "use-cases": "Casos de uso"
+        },
         "nav": {
             "discover": "Descobrir",
-            "forYou": "Para você",
-            "all": "Todos",
-            "allTemplates": "Todos os templates",
-            "mine": "Minha biblioteca",
-            "stack": "Suas ferramentas",
-            "popularApps": "Apps populares",
-            "categories": "Categorias"
+            "all": "Todos"
         },
         "heading": {
-            "count": "{count, plural, one {# template} other {# templates}}",
+            "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+            "useCases": "{count, plural, one {# caso de uso} other {# casos de uso}}",
             "results": "Resultados para “{query}”",
             "discoverEmpty": "Os templates que você cria aparecem aqui.",
             "discover": "Coworkers prontos, criados por quem os usa.",
-            "forYou": "Escolhidos pelo seu setor e pelos apps que você usa primeiro.",
-            "mine": "Os templates deste workspace.",
-            "app": "App",
-            "appSubtitle": "{total} usando {app}",
-            "thisApp": "este app",
             "creator": "Criador"
         },
         "discover": {

@@ -22,13 +22,13 @@ export function TemplateConnectorLogos({ connectors, className }: { connectors: 
     )
 }
 
-export function ConnectorLogo({ connector, className }: { connector: TemplateConnector; className?: string }) {
+function ConnectorLogo({ connector }: { connector: TemplateConnector }) {
     const props = serviceIconProps(connector.icon)
-    if ('src' in props) return <img src={props.src} alt="" title={connector.name} className={cn('size-3.5 shrink-0 object-contain', className)} style={{ filter: brandIconFilter(props.src) }} />
+    if ('src' in props) return <img src={props.src} alt="" title={connector.name} className="size-3.5 shrink-0 object-contain" style={{ filter: brandIconFilter(props.src) }} />
     const Glyph = props.icon
     return (
         <span title={connector.name} className="flex shrink-0">
-            <Glyph className={cn('size-3.5 text-muted-foreground', className)} />
+            <Glyph className="size-3.5 text-muted-foreground" />
         </span>
     )
 }

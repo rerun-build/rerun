@@ -89,26 +89,20 @@
             "placeholder": "Vorlagen suchen",
             "clear": "Suche löschen"
         },
+        "mode": {
+            "coworkers": "Coworker",
+            "use-cases": "Anwendungsfälle"
+        },
         "nav": {
             "discover": "Entdecken",
-            "forYou": "Für dich",
-            "all": "Alle",
-            "allTemplates": "Alle Vorlagen",
-            "mine": "Meine Bibliothek",
-            "stack": "Deine Tools",
-            "popularApps": "Beliebte Apps",
-            "categories": "Kategorien"
+            "all": "Alle"
         },
         "heading": {
-            "count": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
+            "coworkers": "{count, plural, one {# Coworker} other {# Coworker}}",
+            "useCases": "{count, plural, one {# Anwendungsfall} other {# Anwendungsfälle}}",
             "results": "Ergebnisse für „{query}“",
             "discoverEmpty": "Die Vorlagen, die du erstellst, landen hier.",
             "discover": "Fertige Coworker, gebaut von Leuten, die sie selbst nutzen.",
-            "forYou": "Passend zu deiner Branche und den Apps, die du zuerst nutzt.",
-            "mine": "Die Vorlagen, die diesem Workspace gehören.",
-            "app": "App",
-            "appSubtitle": "{total} mit {app}",
-            "thisApp": "dieser App",
             "creator": "Creator"
         },
         "discover": {

@@ -172,10 +172,6 @@ export type LibraryFilters = {
 
 export const EMPTY_LIBRARY_FILTERS: LibraryFilters = { connectorSlugs: [], statuses: [] }
 
-export function isInMyLibrary(template: LibraryTemplate): boolean {
-    return template.isMine || template.access !== 'none'
-}
-
 export function filterTemplates(templates: LibraryTemplate[], filters: LibraryFilters): LibraryTemplate[] {
     return templates.filter(t => {
         // With no status asked for, an admin sees what a visitor sees: what is published, plus

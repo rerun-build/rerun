@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { PurchaseAccess } from './entitlement'
-import { EMPTY_LIBRARY_FILTERS, type LibraryFilters, type LibraryRow, type LibraryTemplate, filterTemplates, isInMyLibrary, toLibraryTemplates } from './library'
+import { EMPTY_LIBRARY_FILTERS, type LibraryFilters, type LibraryRow, type LibraryTemplate, filterTemplates, toLibraryTemplates } from './library'
 
 function row(overrides: Partial<LibraryRow> = {}): LibraryRow {
     return {
@@ -94,12 +94,5 @@ describe('filterTemplates', () => {
         ]
         expect(filterTemplates(list, filters({ connectorSlugs: ['hubspot', 'stripe'] })).map(t => t.id)).toEqual(['hubspot', 'stripe'])
         expect(filterTemplates(list, filters({ connectorSlugs: ['hubspot'], statuses: ['draft'] })).map(t => t.id)).toEqual(['draft-hubspot'])
-    })
-})
-
-describe('isInMyLibrary', () => {
-    it('includes a refunded purchase, which still differs from never having bought', () => {
-        expect(isInMyLibrary(template({ access: 'refunded' }))).toBe(true)
-        expect(isInMyLibrary(template())).toBe(false)
     })
 })

@@ -9,7 +9,7 @@ import { TemplateLibrarySection, TemplateLibrarySectionLink } from '@/components
 import { TemplateTileSkeleton } from '@/components/templates/TemplateTileSkeleton'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LibraryCreator, LibraryTemplate } from '@/lib/templates/library'
-import { creatorOfTheWeek, creatorSummaries, creatorsToMeet, hasViewerSignals, type LibraryView, newestFirst, rankForViewer, type ViewerSignals } from '@/lib/templates/library-view'
+import { COWORKERS_VIEW, creatorOfTheWeek, creatorSummaries, creatorsToMeet, hasViewerSignals, type LibraryView, newestFirst, rankForViewer, type ViewerSignals } from '@/lib/templates/library-view'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -56,7 +56,7 @@ export function TemplateLibraryDiscover({
     const grid = (items: LibraryTemplate[], key: string) => (
         <TemplateLibraryGrid templates={items} selectedSlug={selectedSlug} showStatus={t => isAdmin || t.isMine} onSelectTemplate={onSelectTemplate} empty={false} filtered={false} revealKey={key} />
     )
-    const seeAll = <TemplateLibrarySectionLink onClick={() => onView({ kind: 'all' })}>{t('seeAll')}</TemplateLibrarySectionLink>
+    const seeAll = <TemplateLibrarySectionLink onClick={() => onView(COWORKERS_VIEW)}>{t('seeAll')}</TemplateLibrarySectionLink>
 
     return (
         <div className="flex flex-col gap-8">
@@ -80,7 +80,7 @@ export function TemplateLibraryDiscover({
             )}
 
             {picks.length > 0 && (
-                <TemplateLibrarySection title={personal ? t('forYou') : t('featured')} subtitle={personal ? t('forYouSubtitle') : t('featuredSubtitle')} action={<TemplateLibrarySectionLink onClick={() => onView({ kind: 'foryou' })}>{t('seeAll')}</TemplateLibrarySectionLink>}>
+                <TemplateLibrarySection title={personal ? t('forYou') : t('featured')} subtitle={personal ? t('forYouSubtitle') : t('featuredSubtitle')} action={seeAll}>
                     {grid(picks, 'picks')}
                 </TemplateLibrarySection>
             )}

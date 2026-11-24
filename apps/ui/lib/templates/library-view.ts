@@ -1,32 +1,23 @@
 import { TEMPLATE_CATEGORIES, type TemplateCategory, type TemplateConnector } from '@rerun/contracts'
-import { isInMyLibrary, type LibraryCreator, type LibraryTemplate } from './library'
+import type { LibraryCreator, LibraryTemplate } from './library'
+
+// What the library lists: whole coworkers, or the tasks their skills know how to do.
+export type LibraryMode = 'coworkers' | 'use-cases'
+
+export const LIBRARY_MODES: readonly LibraryMode[] = ['coworkers', 'use-cases']
 
 // Where the library's rail points. Discover is the editorial home; every other view is one list.
-export type LibraryView = { kind: 'discover' } | { kind: 'foryou' } | { kind: 'all' } | { kind: 'mine' } | { kind: 'category'; category: TemplateCategory } | { kind: 'app'; slug: string } | { kind: 'creator'; slug: string }
+export type LibraryView = { kind: 'discover' } | { kind: 'list'; mode: LibraryMode; category: TemplateCategory | null } | { kind: 'creator'; slug: string }
 
 export const DISCOVER_VIEW: LibraryView = { kind: 'discover' }
+export const COWORKERS_VIEW: LibraryView = { kind: 'list', mode: 'coworkers', category: null }
 
-export function isSameView(a: LibraryView, b: LibraryView): boolean {
-    if (a.kind !== b.kind) return false
-    if (a.kind === 'category' && b.kind === 'category') return a.category === b.category
-    if (a.kind === 'creator' && b.kind === 'creator') return a.slug === b.slug
-    if (a.kind === 'app' && b.kind === 'app') return a.slug === b.slug
-    return true
-}
-
-export function templatesInView(templates: LibraryTemplate[], view: LibraryView, signals: ViewerSignals = {}): LibraryTemplate[] {
+export function templatesInView(templates: LibraryTemplate[], view: LibraryView): LibraryTemplate[] {
     switch (view.kind) {
         case 'discover':
-        case 'all':
             return templates
-        case 'foryou':
-            return rankForViewer(templates, signals)
-        case 'mine':
-            return templates.filter(isInMyLibrary)
-        case 'category':
-            return templates.filter(t => t.category === view.category)
-        case 'app':
-            return templates.filter(t => t.connectors.some(c => c.slug === view.slug))
+        case 'list':
+            return view.category ? templates.filter(t => t.category === view.category) : templates
         case 'creator':
             return templates.filter(t => t.creator?.slug === view.slug)
     }
@@ -45,7 +36,7 @@ export function templateHeadline(template: { title: string; tagline: string; age
 export function matchesQuery(template: LibraryTemplate, query: string): boolean {
     const q = query.trim().toLowerCase()
     if (!q) return true
-    return [template.title, template.tagline, template.creator?.name ?? '', ...template.agents.map(agent => agent.name), ...template.tags].some(field => field.toLowerCase().includes(q))
+    return [template.title, template.tagline, template.creator?.name ?? '', ...template.agents.map(agent => agent.name), ...template.connectors.map(connector => connector.name), ...template.tags].some(field => field.toLowerCase().includes(q))
 }
 
 // "Other" goes last whatever its size: it is the drawer, not a shelf anyone came for.
@@ -55,7 +46,7 @@ export function categoryCounts(templates: LibraryTemplate[]): { category: Templa
         .sort((a, b) => Number(a.category === 'other') - Number(b.category === 'other') || b.count - a.count)
 }
 
-export type AppCount = { connector: TemplateConnector; count: number }
+type AppCount = { connector: TemplateConnector; count: number }
 
 export function appCounts(templates: LibraryTemplate[]): AppCount[] {
     const bySlug = new Map<string, AppCount>()
@@ -65,16 +56,6 @@ export function appCounts(templates: LibraryTemplate[]): AppCount[] {
         bySlug.set(connector.slug, entry)
     }
     return [...bySlug.values()].sort((a, b) => b.count - a.count || a.connector.name.localeCompare(b.connector.name))
-}
-
-const STACK_SIZE = 6
-
-// The apps the viewer said they use, when they told us and the catalogue has something for them;
-// the catalogue's most used otherwise, which is what a stack looks like for most people.
-export function stackApps(templates: LibraryTemplate[], connectorSlugs: string[] = []): { mine: boolean; apps: AppCount[] } {
-    const all = appCounts(templates)
-    const mine = all.filter(app => connectorSlugs.includes(app.connector.slug))
-    return mine.length > 0 ? { mine: true, apps: mine } : { mine: false, apps: all.slice(0, STACK_SIZE) }
 }
 
 export type LibraryCreatorSummary = LibraryCreator & { templates: LibraryTemplate[] }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { type LibraryCreator, type LibraryRow, type LibraryTemplate, toLibraryTemplates } from './library'
-import { appCounts, categoryCounts, creatorOfTheWeek, creatorSummaries, creatorsToMeet, matchesQuery, stackApps, rankForViewer, templateHeadline, templatesInView } from './library-view'
+import { appCounts, categoryCounts, COWORKERS_VIEW, creatorOfTheWeek, creatorSummaries, creatorsToMeet, matchesQuery, rankForViewer, templateHeadline, templatesInView } from './library-view'
 
 const BASE_ROW: LibraryRow = {
     id: 't',
@@ -84,12 +84,23 @@ describe('templatesInView', () => {
         const templates = [template({ slug: 'a', creator: creator('ada') }), template({ slug: 'b' })]
         expect(templatesInView(templates, { kind: 'creator', slug: 'ada' }).map(t => t.slug)).toEqual(['a'])
     })
+
+    it('narrows a list to its category, and keeps everything without one', () => {
+        const templates = [template({ slug: 'a', category: 'sales' }), template({ slug: 'b', category: 'legal' })]
+        expect(templatesInView(templates, { kind: 'list', mode: 'coworkers', category: 'legal' }).map(t => t.slug)).toEqual(['b'])
+        expect(templatesInView(templates, COWORKERS_VIEW)).toHaveLength(2)
+    })
 })
 
 describe('matchesQuery', () => {
     it('finds a template by the name of who made it', () => {
         expect(matchesQuery(template({ creator: creator('ada') }), 'ADA')).toBe(true)
         expect(matchesQuery(template(), 'ada')).toBe(false)
+    })
+
+    it('finds a template by the name of an app it uses', () => {
+        expect(matchesQuery(template({ connectors: [{ slug: 'gmail', name: 'Gmail', icon: null }] }), 'gmail')).toBe(true)
+        expect(matchesQuery(template(), 'gmail')).toBe(false)
     })
 })
 
@@ -119,7 +130,7 @@ describe('templateHeadline', () => {
     })
 })
 
-describe('appCounts and stackApps', () => {
+describe('appCounts', () => {
     const gmail = { slug: 'gmail', name: 'Gmail', icon: null }
     const slack = { slug: 'slack', name: 'Slack', icon: null }
     const templates = [template({ slug: 'a', connectors: [gmail, slack] }), template({ slug: 'b', connectors: [gmail] })]
@@ -129,15 +140,6 @@ describe('appCounts and stackApps', () => {
             ['gmail', 2],
             ['slack', 1],
         ])
-    })
-
-    it("shows the viewer's own apps when the catalogue has something for them", () => {
-        expect(stackApps(templates, ['slack', 'notion'])).toEqual({ mine: true, apps: [{ connector: slack, count: 1 }] })
-    })
-
-    it('falls back on the most used apps otherwise', () => {
-        expect(stackApps(templates, ['notion']).mine).toBe(false)
-        expect(stackApps(templates).apps.map(app => app.connector.slug)).toEqual(['gmail', 'slack'])
     })
 })
 

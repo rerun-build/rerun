@@ -47,10 +47,7 @@
         "detail.minutes": "Setup time of a template, in minutes.",
         "detail.carousel": "Accessible label of the carousel of coworker cards, read as \"carousel of ...\".",
         "library.heading.results": "Title of the library while searching. {query} is what the person typed.",
-        "library.heading.count": "Subtitle of a list of templates.",
-        "library.heading.appSubtitle": "Subtitle of the templates that use one app. {total} is a library.heading.count sentence, {app} the app's name or library.heading.thisApp.",
-        "library.nav.all": "Short tab of the compact navigation that lists every template.",
-        "library.nav.stack": "Group of apps the viewer said they use.",
+        "library.nav.all": "Short tab of the compact navigation: every coworker, or every use case, whatever its category.",
         "library.empty.become": "Link to the program for people who build and sell templates on Rerun.",
         "section.filterBy": "Accessible label of a section heading that narrows the library to that section. {title} is the section's title.",
         "authoring.prefill": "Button that fills the fields of a section from what the template already says, with AI.",
@@ -80,7 +77,10 @@
         "payouts.stateLabels.not_started": "Badge of a creator's Stripe payout account: payouts not configured yet.",
         "payouts.requirements": "What Stripe still needs from a template creator before paying them, one item of a list.",
         "payouts.saleKinds.recurring": "Badge of a sale in the creator's revenue table: a monthly subscription payment.",
-        "boardAlt": "Alt text of a template's thumbnail: a picture of the board of coworkers it installs. {title} is the template's name."
+        "boardAlt": "Alt text of a template's thumbnail: a picture of the board of coworkers it installs. {title} is the template's name.",
+        "library.mode.use-cases": "One of the two lists of the library, next to Coworkers: the tasks a coworker knows how to do.",
+        "library.heading.coworkers": "Subtitle of a list of coworkers.",
+        "library.heading.useCases": "Subtitle of a list of use cases."
     },
     "price": {
         "free": "Free",
@@ -152,26 +152,20 @@
             "placeholder": "Search templates",
             "clear": "Clear search"
         },
+        "mode": {
+            "coworkers": "Coworkers",
+            "use-cases": "Use cases"
+        },
         "nav": {
             "discover": "Discover",
-            "forYou": "For you",
-            "all": "All",
-            "allTemplates": "All templates",
-            "mine": "My library",
-            "stack": "Your stack",
-            "popularApps": "Popular apps",
-            "categories": "Categories"
+            "all": "All"
         },
         "heading": {
-            "count": "{count, plural, one {# template} other {# templates}}",
+            "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+            "useCases": "{count, plural, one {# use case} other {# use cases}}",
             "results": "Results for “{query}”",
             "discoverEmpty": "The templates you create land here.",
             "discover": "Ready-made coworkers, built by people who run them.",
-            "forYou": "Matched to your industry and the apps you use first.",
-            "mine": "The templates this workspace owns.",
-            "app": "App",
-            "appSubtitle": "{total} using {app}",
-            "thisApp": "this app",
             "creator": "Creator"
         },
         "discover": {
