@@ -37,6 +37,8 @@ const SYSTEM_SYMBOLS = {
     share: 'square.and.arrow.up',
     globe: 'globe',
     copy: 'doc.on.doc',
+    check: 'checkmark',
+    x: 'xmark',
 } as const satisfies Partial<Record<IconName, SystemSymbol>>
 
 export type SystemSymbolIcon = keyof typeof SYSTEM_SYMBOLS

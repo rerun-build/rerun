@@ -48,6 +48,18 @@ describe('InboxProvider', () => {
         expect(result.current.state === 'ready' && result.current.items.map(i => i.id)).toEqual(['two'])
     })
 
+    it('clears the whole inbox on the hub, not only the rows read', async () => {
+        mockFetchInbox.mockResolvedValue(inboxWith(item('one'), { ...item('ask'), status: 'awaiting_approval' }))
+        mockMarkInboxRead.mockResolvedValue()
+        const { result } = await renderHook(() => useInbox(), { wrapper })
+        await act(async () => {})
+
+        await act(async () => result.current.clearAll())
+
+        expect(mockMarkInboxRead).toHaveBeenCalledWith(expect.anything(), 'all')
+        expect(result.current.state === 'ready' && result.current.items).toEqual([])
+    })
+
     it('shows the rows again when the write fails', async () => {
         mockFetchInbox.mockResolvedValue(inboxWith(item('one'), item('two')))
         mockMarkInboxRead.mockRejectedValue(new Error('offline'))

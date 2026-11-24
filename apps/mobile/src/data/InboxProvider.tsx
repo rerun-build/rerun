@@ -13,7 +13,7 @@ type InboxState = { state: 'loading' } | { state: 'error' } | { state: 'ready'; 
 
 type Inbox = InboxState & {
     markRead: (items: InboxItem[]) => void
-    markAllRead: () => void
+    clearAll: () => void
     reload: () => void
 }
 
@@ -92,7 +92,7 @@ export function InboxProvider({ children }: { children: ReactNode }) {
     }, [read, workspaceId, hidden])
 
     const markRead = useCallback((items: InboxItem[]) => write(items.flatMap(item => item.sessionIds), items.map(item => item.id)), [write])
-    const markAllRead = useCallback(() => write('all', shown.state === 'ready' ? shown.items.map(item => item.id) : []), [write, shown])
+    const clearAll = useCallback(() => write('all', shown.state === 'ready' ? shown.items.map(item => item.id) : []), [write, shown])
 
     // The app icon shows the bell's count, never off the copy kept from the last visit, whatever screen
     // is up: the Home rests frozen under a conversation.
@@ -101,7 +101,7 @@ export function InboxProvider({ children }: { children: ReactNode }) {
         if (unread !== null) setBadge(unread).catch(() => {})
     }, [unread])
 
-    return <InboxContext value={{ ...shown, markRead, markAllRead, reload }}>{children}</InboxContext>
+    return <InboxContext value={{ ...shown, markRead, clearAll, reload }}>{children}</InboxContext>
 }
 
 export function useInbox(): Inbox {

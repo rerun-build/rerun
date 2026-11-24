@@ -6,11 +6,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
-import { inboxSections } from '@/components/inbox/inbox'
+import { inboxCount, inboxSections, splitInbox } from '@/components/inbox/inbox'
 import { InboxRow } from '@/components/inbox/InboxRow'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Icon } from '@/components/ui/Icon'
+import { CircleTrigger, MenuItem, MenuSection, NativeMenu } from '@/components/ui/NativeMenu'
 import { PillButton } from '@/components/ui/PillButton'
 import { useInbox } from '@/data/InboxProvider'
 import { useNotificationPrefs } from '@/data/useNotificationPrefs'
@@ -27,7 +28,8 @@ export function InboxSheet() {
     const t = useTranslations('mobileHome.inbox')
     const items = inbox.state === 'ready' ? inbox.items : []
     const running = inbox.state === 'ready' ? inbox.running : 0
-    // Everything is cleared on the hub, not only the rows shown: never off the copy kept from the last visit.
+    const { informative, requests } = splitInbox(items)
+    // Clearing all clears everything on the hub, not only the rows shown: never off the copy kept from the last visit.
     const fresh = inbox.state === 'ready' && inbox.fresh
 
     // Opening a finished run is reading it, as on the web; a request stays until it is answered.
@@ -45,10 +47,10 @@ export function InboxSheet() {
 
     const openSettings = (item: InboxItem) => router.push({ pathname: '/settings/coworker/[id]', params: { id: item.agentId, name: item.agentName } })
 
-    const confirmMarkAll = () =>
-        Alert.alert(t('markAllTitle'), t('markAllMessage', { count: items.length }), [
+    const confirmClearAll = () =>
+        Alert.alert(t('clearAllTitle'), t('clearAllMessage', { count: requests.length }), [
             { text: t('cancel'), style: 'cancel' },
-            { text: t('markAllRead'), onPress: inbox.markAllRead },
+            { text: t('clearAllConfirm'), style: 'destructive', onPress: inbox.clearAll },
         ])
 
     // A form sheet lays out its scroll view itself: the header lives inside it, or the list covers it.
@@ -61,7 +63,18 @@ export function InboxSheet() {
                     {t('notifications')}
                 </AppText>
                 <GlassButton symbol="settings" label={t('settings')} onPress={() => router.push('/settings/notifications')} />
-                <GlassButton symbol="check" label={t('markAllRead')} disabled={items.length === 0 || !fresh} onPress={confirmMarkAll} />
+                {items.length === 0 || !fresh ? (
+                    <GlassButton symbol="check" label={t('markLabel')} disabled onPress={() => {}} />
+                ) : (
+                    <NativeMenu glass="circle" label={t('markLabel')} trigger={<CircleTrigger symbol="check" />}>
+                        <MenuItem label={informative.length > 0 ? t('markRead', { count: inboxCount(informative) }) : t('nothingToMark')} icon="check" disabled={informative.length === 0} onPress={() => inbox.markRead(informative)} />
+                        {requests.length > 0 && (
+                            <MenuSection>
+                                <MenuItem label={t('clearAll', { count: requests.length })} icon="x" destructive onPress={confirmClearAll} />
+                            </MenuSection>
+                        )}
+                    </NativeMenu>
+                )}
             </View>
 
             {running > 0 && (

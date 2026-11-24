@@ -80,9 +80,13 @@
         "bellLabel": "Notifications, {count}",
         "close": "Close",
         "settings": "Notification settings",
-        "markAllRead": "Mark all as read",
-        "markAllTitle": "Mark everything as read?",
-        "markAllMessage": "{count, plural, one {# item} other {# items}} will leave this list. Requests still waiting on an answer are cleared too, without being answered.",
+        "markLabel": "Mark notifications as read",
+        "markRead": "{count, plural, one {Mark # notification as read} other {Mark # notifications as read}}",
+        "nothingToMark": "No notification to mark",
+        "clearAll": "{count, plural, one {Clear all, including # request} other {Clear all, including # requests}}",
+        "clearAllTitle": "Clear all notifications?",
+        "clearAllMessage": "{count, plural, one {# waiting request leaves the inbox without an answer, and your coworker keeps waiting on it.} other {# waiting requests leave the inbox without an answer, and your coworkers keep waiting on them.}}",
+        "clearAllConfirm": "Clear all",
         "cancel": "Cancel",
         "running": "{count, plural, one {# task running} other {# tasks running}}",
         "loadFailed": "We could not load your notifications.",
@@ -156,6 +160,10 @@
         "widgets.needsYou": "Small solid chip on a widget, in capitals: a coworker waits on the person. Two words at most.",
         "widgets.minutes": "How long a coworker has been working, very short, e.g. 12m.",
         "widgets.asks": "Lock screen widget title: {name} is a coworker that waits on the person.",
-        "search.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
+        "search.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "inbox.markLabel": "Label of the button that opens the menu below.",
+        "inbox.markRead": "Menu item: marks the notifications that only inform. {count} is how many of them there are.",
+        "inbox.clearAll": "Menu item: empties the inbox. {count} is how many requests still wait for an answer among what leaves.",
+        "inbox.clearAllMessage": "{count} is how many requests still wait for an answer."
     }
 }
