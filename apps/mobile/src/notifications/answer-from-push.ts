@@ -22,9 +22,11 @@ export function replyOf(action: InPlaceAction, data: PushData, text: string | un
 // The same tap can reach the app twice: by the listener, then as the last response read at launch.
 const answered = new Set<string>()
 
-// The push is replaced by one saying what happened, which a tap still opens on the conversation.
+// The push is replaced by one saying what happened, which a tap still opens on the conversation. It keeps
+// the coworker's portrait, without the state the first one announced.
 async function receipt(title: string, body: string, data: PushData): Promise<void> {
-    await Notifications.scheduleNotificationAsync({ content: { title, body, data: { ...data, toolCallId: undefined, kind: 'receipt' }, sound: false }, trigger: { channelId: ANDROID_PUSH_CHANNELS.silent } })
+    const sender = data.sender && { ...data.sender, state: '' }
+    await Notifications.scheduleNotificationAsync({ content: { title, body, data: { ...data, toolCallId: undefined, kind: 'receipt', sender }, sound: false }, trigger: { channelId: ANDROID_PUSH_CHANNELS.silent } })
 }
 
 export async function answerFromPush(response: Notifications.NotificationResponse): Promise<void> {
@@ -41,7 +43,7 @@ export async function answerFromPush(response: Notifications.NotificationRespons
     if (!data?.conversationId || !reply) return
 
     const t = translatorFor('mobileSettings')
-    const agent = content.title ?? t('notifications.receipts.fallbackAgent')
+    const agent = data.sender?.name ?? content.title ?? t('notifications.receipts.fallbackAgent')
     await Notifications.dismissNotificationAsync(identifier).catch(() => {})
     try {
         const caller = await backgroundCaller(data.workspaceId)

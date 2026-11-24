@@ -48,6 +48,12 @@ describe('answerFromPush', () => {
         expect(mockScheduled[0].content).toMatchObject({ title: 'Closer', body: 'Approved. Closer is on it.', data: { conversationId: 'conv-1', kind: 'receipt' } })
     })
 
+    it('names the coworker of the push in the receipt, keeps its portrait and drops the state it announced', async () => {
+        const sender = { name: 'Scout', image: 'https://app.rerun.build/og/coworker/a', state: 'Needs approval' }
+        await answerFromPush(response('approve', { ...approval, sender }, 'n7'))
+        expect(mockScheduled[0].content).toMatchObject({ title: 'Scout', body: 'Approved. Scout is on it.', data: { sender: { ...sender, state: '' } } })
+    })
+
     it('answers once, however many times the same tap reaches the app', async () => {
         await answerFromPush(response('deny', approval, 'n2'))
         await answerFromPush(response('deny', approval, 'n2'))

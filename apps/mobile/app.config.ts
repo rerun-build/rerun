@@ -85,7 +85,7 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
     }
 }
 
-const PERSONAL_TEAM_DROPS: ReadonlySet<string | undefined> = new Set(['expo-notifications', 'expo-widgets'])
+const PERSONAL_TEAM_DROPS: ReadonlySet<string | undefined> = new Set(['expo-notifications', 'expo-widgets', './plugins/with-notification-service'])
 
 export default ({ config: base }: ConfigContext): ExpoConfig => {
     assertStoreBuildHasHub()
@@ -96,7 +96,8 @@ export default ({ config: base }: ConfigContext): ExpoConfig => {
         ...config,
         name: config.name!,
         slug: config.slug!,
-        // A free Apple ID gets neither push nor an app group, which the widgets share their data through.
+        // A free Apple ID gets neither push, nor the communication notifications that carry a portrait, nor
+        // an app group, which the widgets share their data through.
         // A paid one (RERUN_PAID_TEAM=1) keeps both, to try them on a phone.
         plugins: paidTeam ? config.plugins : config.plugins?.filter(plugin => !PERSONAL_TEAM_DROPS.has(Array.isArray(plugin) ? plugin[0] : plugin)),
         ios: {
