@@ -1,6 +1,6 @@
 import { ICONS } from '@rerun/cloud-mobile/icons'
 import { useId } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import { I18nManager, type StyleProp, type ViewStyle } from 'react-native'
 import Svg, { Circle, Defs, Ellipse, G, Line, Mask, Path, Polygon, Polyline, Rect } from 'react-native-svg'
 
 import type { IconShape, IconShapeTag } from '@/components/ui/icon-glyph'
@@ -31,6 +31,9 @@ const SHAPES: Record<IconShapeTag, typeof Path> = {
 }
 
 const BOLD = 1.25
+
+// They point along the reading direction: drawn mirrored when the app reads right to left.
+const MIRRORED_IN_RTL: ReadonlySet<IconName> = new Set(['chevron-left', 'chevron-right'])
 
 function paintOf(shape: IconShape, color: string, secondaryColor: string, strokeWidth: number) {
     const paint = shape[2]
@@ -70,7 +73,7 @@ export function Icon({ name, size = 18, color, secondaryColor = color, bold = fa
                     </Mask>
                 </Defs>
             )}
-            <G mask={cutouts.length > 0 ? `url(#${maskId})` : undefined}>{drawn.map((shape, index) => shapeElement(shape, index, paintOf(shape, color, secondaryColor, strokeWidth)))}</G>
+            <G mask={cutouts.length > 0 ? `url(#${maskId})` : undefined} transform={I18nManager.isRTL && MIRRORED_IN_RTL.has(name) ? `translate(${glyph.box} 0) scale(-1 1)` : undefined}>{drawn.map((shape, index) => shapeElement(shape, index, paintOf(shape, color, secondaryColor, strokeWidth)))}</G>
         </Svg>
     )
 }

@@ -5,6 +5,7 @@ import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg'
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon, type IconName } from '@/components/ui/Icon'
+import { RIGHT_TO_LEFT } from '@/lib/reading-direction'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing } from '@/theme/tokens'
 
@@ -39,7 +40,7 @@ function WaveLine({ side, flowing }: { side: 'left' | 'right'; flowing: boolean 
     const flow = useAnimatedStyle(() => ({ transform: [{ translateX: shift.value - WAVELENGTH }] }))
     const drawn = width + WAVELENGTH * 2
     return (
-        <View onLayout={event => setWidth(event.nativeEvent.layout.width)} style={{ flex: 1, minWidth: spacing.lg, height: WAVE_HEIGHT, overflow: 'hidden' }}>
+        <View onLayout={event => setWidth(event.nativeEvent.layout.width)} style={{ direction: 'ltr', flex: 1, minWidth: spacing.lg, height: WAVE_HEIGHT, overflow: 'hidden' }}>
             {width > 0 && (
                 <Animated.View style={[{ width: drawn, height: WAVE_HEIGHT }, flow]}>
                     <Svg width={drawn} height={WAVE_HEIGHT}>
@@ -65,7 +66,7 @@ export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, acc
     const theme = useTheme()
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xs }}>
-            <WaveLine side="left" flowing={flowing} />
+            <WaveLine side={RIGHT_TO_LEFT ? 'right' : 'left'} flowing={flowing} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 }}>
                 {accessory ?? <Icon name={symbol} size={13} color={symbolTint ?? theme.mutedForeground} />}
                 {pieces.map((piece, i) => (
@@ -91,7 +92,7 @@ export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, acc
                     </View>
                 ))}
             </View>
-            <WaveLine side="right" flowing={flowing} />
+            <WaveLine side={RIGHT_TO_LEFT ? 'left' : 'right'} flowing={flowing} />
         </View>
     )
 }

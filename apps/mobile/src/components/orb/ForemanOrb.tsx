@@ -168,7 +168,7 @@ export function ForemanOrb({ size, state = 'idle', facing = 'left', animated = t
     const faceBox: ViewStyle = { position: 'absolute', left: (RADIUS - CENTER.x - FACE_HALF) * unit, top: (RADIUS - CENTER.y - FACE_HALF) * unit, width: FACE_HALF * 2 * unit, height: FACE_HALF * 2 * unit }
 
     return (
-        <View pointerEvents="none" style={[{ width: size, height: size }, style]}>
+        <View pointerEvents="none" style={[{ direction: 'ltr', width: size, height: size }, style]}>
             <Animated.View style={[fromFloor, shadow]}>
                 <Svg viewBox={viewBox} width={width} height={height}>
                     <Defs>

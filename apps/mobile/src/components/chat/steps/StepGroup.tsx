@@ -1,7 +1,7 @@
 import { agentIdOf, argsOf, readableToolError, toolHeadline, toolLabelOf } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from 'react-native'
+import { I18nManager, Pressable, ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from 'react-native'
 import Animated, { Easing, FadeIn, FadeInUp, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
 import { useLocale, useTranslations } from 'use-intl'
 
@@ -14,6 +14,9 @@ import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
 import { toolSymbolOf } from './toolSymbols'
 import { formatElapsed, useElapsed } from './useElapsed'
+
+// A mirrored chevron turns the other way to point down.
+const OPEN_ROTATION = I18nManager.isRTL ? '-90deg' : '90deg'
 
 export type StepStatus = 'done' | 'error' | 'running'
 
@@ -163,7 +166,7 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
                             {t('failed', { failed })}
                         </AppText>
                     )}
-                    <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />
+                    <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? OPEN_ROTATION : '0deg' }] }} />
                 </Pressable>
             </View>
             {open && (
@@ -201,7 +204,7 @@ export function StepRow({ symbol, label, detail, status, elapsed, defaultOpen = 
                     {detail}
                 </AppText>
                 {elapsed}
-                {expandable && <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />}
+                {expandable && <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? OPEN_ROTATION : '0deg' }] }} />}
             </Pressable>
             {open && expandable && <View style={{ gap: 6, marginHorizontal: 6, marginBottom: spacing.xs }}>{children}</View>}
         </View>

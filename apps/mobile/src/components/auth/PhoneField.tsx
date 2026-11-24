@@ -30,7 +30,8 @@ export function PhoneField({ country, value, onChangeText, onPickCountry, onSubm
     const locale = useLocale()
     const { flag, callingCode, name } = countryByCode(country, locale)
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', height: FIELD_HEIGHT, borderRadius: FIELD_RADIUS, borderCurve: 'continuous', ...fieldOutline(theme, { focused, invalid }), backgroundColor: theme.card }}>
+        // A phone number reads left to right in every language, its calling code first.
+        <View style={{ direction: 'ltr', flexDirection: 'row', alignItems: 'center', height: FIELD_HEIGHT, borderRadius: FIELD_RADIUS, borderCurve: 'continuous', ...fieldOutline(theme, { focused, invalid }), backgroundColor: theme.card }}>
             <Pressable onPress={onPickCountry} accessibilityRole="button" accessibilityLabel={t('phone.countryLabel', { name })} hitSlop={4} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, height: '100%', paddingLeft: spacing.lg, paddingRight: spacing.md, opacity: pressed ? 0.6 : 1 })}>
                 <AppText variant="body" maxFontSizeMultiplier={1.2}>
                     {flag}

@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun משתמש בספריית התמונות כדי לצרף תמונות להודעה.",
+        "NSCameraUsageDescription": "Rerun משתמש במצלמה כדי לצרף תמונה להודעה.",
+        "NSMicrophoneUsageDescription": "Rerun משתמש במיקרופון כדי להקליט הודעות קוליות."
+    }
+}

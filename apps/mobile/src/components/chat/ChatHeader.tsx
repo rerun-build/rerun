@@ -15,6 +15,7 @@ import { GlassSurface } from '@/components/ui/GlassSurface'
 import { Icon } from '@/components/ui/Icon'
 import { CircleTrigger, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { READING_SIGN } from '@/lib/reading-direction'
 import { useMessageTimes } from '@/lib/time'
 import type { Coworker } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
@@ -187,7 +188,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     // slot per page, less the half of the slot the pill leaves out.
     const track = useAnimatedStyle(() => {
         const at = hasConversations ? progress.value : lastPage
-        return { transform: [{ translateX: -at * titleWidth - (titleWidth - widthAt(at)) / 2 }] }
+        return { transform: [{ translateX: -READING_SIGN * (at * titleWidth + (titleWidth - widthAt(at)) / 2) }] }
     })
     const measure = (id: string) => (width: number) => setContentWidths(known => (known[id] === width ? known : { ...known, [id]: width }))
     const identityLabel = t('identityLabel', { name: coworker.name, title: hasConversations ? activeTitle : t('newChat') })

@@ -4,6 +4,7 @@ import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import { READING_SIGN } from '@/lib/reading-direction'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { HOME_GUTTER, ROW_LINE } from '@/components/home/CoworkerRow'
@@ -21,7 +22,7 @@ type SectionHeaderProps = {
 export function SectionHeader({ label, count, collapsed, onToggle, action }: SectionHeaderProps) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')
-    const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: withTiming(collapsed ? '-90deg' : '0deg', { duration: MOTION.fast, easing: EASE_OUT }) }] }))
+    const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: withTiming(collapsed ? `${-READING_SIGN * 90}deg` : '0deg', { duration: MOTION.fast, easing: EASE_OUT }) }] }))
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: HOME_GUTTER }}>
             {/* The action sits beside the toggle, not inside it, so VoiceOver reaches both. */}

@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "يستخدم Rerun مكتبة الصور لإرفاق صور برسالة.",
+        "NSCameraUsageDescription": "يستخدم Rerun الكاميرا لإرفاق صورة برسالة.",
+        "NSMicrophoneUsageDescription": "يستخدم Rerun الميكروفون لتسجيل الرسائل الصوتية."
+    }
+}

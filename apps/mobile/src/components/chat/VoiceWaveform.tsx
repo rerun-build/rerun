@@ -120,7 +120,7 @@ export function VoiceWaveform({ peaks, progress, color, width, height = 32 }: Vo
     const count = Math.max(1, Math.floor(width / STEP))
     const playedUntil = progress * count
     return (
-        <View style={{ width, height, flexDirection: 'row', alignItems: 'center', gap: BAR_GAP }}>
+        <View style={{ direction: 'ltr', width, height, flexDirection: 'row', alignItems: 'center', gap: BAR_GAP }}>
             {Array.from({ length: count }, (_, i) => {
                 const value = peaks.length > 0 ? (peaks[Math.floor((i / count) * peaks.length)] ?? 0) : 0
                 const alpha = alphaOf(value)

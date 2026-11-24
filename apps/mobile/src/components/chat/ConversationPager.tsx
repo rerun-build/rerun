@@ -4,6 +4,7 @@ import Animated, { useAnimatedReaction, useAnimatedRef, useAnimatedScrollHandler
 import { scheduleOnRN } from 'react-native-worklets'
 
 import * as Haptics from '@/lib/haptics'
+import { offsetFromStart, offsetOfPage, RIGHT_TO_LEFT, usePagePlacement } from '@/lib/reading-direction'
 
 import type { ConversationPage } from './conversation-pages'
 
@@ -64,8 +65,10 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
         restingIndex.current = activeIndex
         const slides = rowStable && !reduceMotion
         if (!slides) progress.set(activeIndex)
-        scroll.current?.scrollTo({ x: activeIndex * size.width, animated: slides })
+        scroll.current?.scrollTo({ x: offsetOfPage(activeIndex, size.width, pages.length), animated: slides })
     }, [activeIndex, pages, size.width, reduceMotion, progress, scroll])
+
+    const placePage = usePagePlacement(size.width, () => scroll.current?.scrollTo({ x: offsetOfPage(restingIndex.current, size.width, pages.length), animated: false }))
 
     const settle = (offset: number) => {
         const index = Math.round(offset / size.width)
@@ -76,7 +79,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
 
     const onScroll = useAnimatedScrollHandler({
         onScroll: event => {
-            if (pageWidth.value > 0) progress.set(event.contentOffset.x / pageWidth.value)
+            if (pageWidth.value > 0) progress.set(offsetFromStart(event) / pageWidth.value)
         },
         onBeginDrag: () => {
             dragging.value = true
@@ -84,7 +87,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
         },
         onMomentumEnd: event => {
             dragging.value = false
-            scheduleOnRN(settle, event.contentOffset.x)
+            scheduleOnRN(settle, offsetFromStart(event))
         },
     })
 
@@ -124,7 +127,8 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
                     keyboardShouldPersistTaps="handled"
                     scrollsToTop={false}
                     scrollEventThrottle={16}
-                    contentOffset={{ x: size.offset, y: 0 }}
+                    contentOffset={RIGHT_TO_LEFT ? undefined : { x: size.offset, y: 0 }}
+                    onContentSizeChange={placePage}
                     onScroll={onScroll}
                 >
                     {pages.map((page, index) => {

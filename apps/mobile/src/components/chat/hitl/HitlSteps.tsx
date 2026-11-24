@@ -6,6 +6,7 @@ import Animated, { interpolateColor, useAnimatedRef, useAnimatedScrollHandler, u
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
 import * as Haptics from '@/lib/haptics'
+import { offsetFromStart, offsetOfPage, READING_SIGN, RIGHT_TO_LEFT, usePagePlacement } from '@/lib/reading-direction'
 import { useTheme } from '@/theme/theme'
 import { spacing, withAlpha } from '@/theme/tokens'
 
@@ -55,7 +56,7 @@ function Dot({ at, count, answered, progress, onPick }: { at: number; count: num
 function StepDots({ count, current, progress, done, onPick }: { count: number; current: number; progress: SharedValue<number>; done: (index: number) => boolean; onPick: (index: number) => void }) {
     const t = useTranslations('mobileHitl.steps')
     const theme = useTheme()
-    const halo = useAnimatedStyle(() => ({ transform: [{ translateX: DOTS_INSET + (DOT - HALO) / 2 + progress.value * (DOT + DOT_GAP) }] }))
+    const halo = useAnimatedStyle(() => ({ transform: [{ translateX: READING_SIGN * (DOTS_INSET + (DOT - HALO) / 2 + progress.value * (DOT + DOT_GAP)) }] }))
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: -spacing.sm }}>
             <Chevron direction="left" disabled={current === 0} onPress={() => onPick(current - 1)} />
@@ -97,7 +98,7 @@ export function HitlSteps({ count, index, onIndexChange, done, renderStep, actio
     const [openedAt] = useState(index)
 
     const onScroll = useAnimatedScrollHandler(event => {
-        if (pageWidth.value > 0) progress.value = event.contentOffset.x / pageWidth.value
+        if (pageWidth.value > 0) progress.value = offsetFromStart(event) / pageWidth.value
     })
 
     const frame = useAnimatedStyle(() => {
@@ -111,8 +112,10 @@ export function HitlSteps({ count, index, onIndexChange, done, renderStep, actio
     })
 
     useEffect(() => {
-        if (width > 0) pager.current?.scrollTo({ x: index * width, animated: !reduceMotion })
-    }, [index, width, reduceMotion, pager])
+        if (width > 0) pager.current?.scrollTo({ x: offsetOfPage(index, width, count), animated: !reduceMotion })
+    }, [index, width, count, reduceMotion, pager])
+
+    const placePage = usePagePlacement(width, () => pager.current?.scrollTo({ x: offsetOfPage(index, width, count), animated: false }))
 
     const settle = (offset: number) => {
         if (width <= 0) return
@@ -158,7 +161,7 @@ export function HitlSteps({ count, index, onIndexChange, done, renderStep, actio
                 style={[{ marginHorizontal: -spacing.lg, overflow: 'hidden' }, frame]}
             >
                 {width > 0 ? (
-                    <Animated.ScrollView ref={pager} horizontal pagingEnabled showsHorizontalScrollIndicator={false} scrollEventThrottle={16} onScroll={onScroll} onMomentumScrollEnd={event => settle(event.nativeEvent.contentOffset.x)} contentOffset={{ x: openedAt * width, y: 0 }} contentContainerStyle={{ alignItems: 'flex-start' }}>
+                    <Animated.ScrollView ref={pager} horizontal pagingEnabled showsHorizontalScrollIndicator={false} scrollEventThrottle={16} onScroll={onScroll} onMomentumScrollEnd={event => settle(offsetFromStart(event.nativeEvent))} contentOffset={RIGHT_TO_LEFT ? undefined : { x: openedAt * width, y: 0 }} onContentSizeChange={placePage} contentContainerStyle={{ alignItems: 'flex-start' }}>
                         {Array.from({ length: count }, (_, at) => (
                             <View key={at} accessibilityElementsHidden={at !== index} importantForAccessibility={at === index ? 'auto' : 'no-hide-descendants'} onLayout={event => measure(at, event.nativeEvent.layout.height)} style={{ width, paddingHorizontal: spacing.lg, gap: spacing.md }}>
                                 {renderStep(at)}

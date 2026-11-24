@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun 需要访问您的照片图库，以便在消息中附加照片。",
+        "NSCameraUsageDescription": "Rerun 需要使用相机，以便在消息中附加照片。",
+        "NSMicrophoneUsageDescription": "Rerun 需要使用麦克风来录制语音消息。"
+    }
+}

@@ -127,7 +127,7 @@ export function FloatingScreen({ top, label, onTakeControl, children }: Floating
     const handleOnRight = side === 'left'
 
     return (
-        <View pointerEvents="box-none" onLayout={onTrackLayout} style={{ position: 'absolute', top, left: TRACK_INSET, right: TRACK_INSET, height: (MAX_WIDTH * 9) / 16, zIndex: 40 }}>
+        <View pointerEvents="box-none" onLayout={onTrackLayout} style={{ direction: 'ltr', position: 'absolute', top, left: TRACK_INSET, right: TRACK_INSET, height: (MAX_WIDTH * 9) / 16, zIndex: 40 }}>
             <GestureDetector gesture={Gesture.Exclusive(drag, tap)}>
                 <Animated.View accessible accessibilityRole="button" accessibilityLabel={label} style={[{ position: 'absolute', top: 0, left: 0, borderRadius: radius.md, boxShadow: '0 10px 24px rgba(0,0,0,0.22)' }, place]}>
                     <Animated.View entering={ENTER} exiting={EXIT} style={{ aspectRatio: 16 / 9, borderRadius: radius.md, borderCurve: 'continuous', overflow: 'hidden', borderWidth: 1, borderColor: theme.border, backgroundColor: theme.card, transformOrigin: side === 'left' ? 'top left' : 'top right' }}>

@@ -10,6 +10,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { offsetFromStart, offsetOfPage, RIGHT_TO_LEFT } from '@/lib/reading-direction'
 import { spacing } from '@/theme/tokens'
 
 import { FilePage } from './FilePage'
@@ -47,8 +48,10 @@ export function MediaViewerHost() {
     // A window that resizes (an iPad in Split View, an iPhone Duo folding) keeps the item on screen.
     useEffect(() => {
         if (!state) return
-        requestAnimationFrame(() => pager.current?.scrollTo({ x: index * width, animated: false }))
-    }, [state, index, width])
+        requestAnimationFrame(() => pager.current?.scrollTo({ x: offsetOfPage(index, width, items.length), animated: false }))
+    }, [state, index, width, items.length])
+
+    const showPage = () => pager.current?.scrollTo({ x: offsetOfPage(index, width, items.length), animated: false })
 
     const headersFor = (url: string) => fileHeadersFor(caller, url)
 
@@ -81,8 +84,9 @@ export function MediaViewerHost() {
                     pagingEnabled
                     scrollEnabled={!zoomed}
                     showsHorizontalScrollIndicator={false}
+                    onContentSizeChange={RIGHT_TO_LEFT ? showPage : undefined}
                     onMomentumScrollEnd={event => {
-                        setIndex(Math.round(event.nativeEvent.contentOffset.x / width))
+                        setIndex(Math.round(offsetFromStart(event.nativeEvent) / width))
                         setZoomed(false)
                     }}
                 >

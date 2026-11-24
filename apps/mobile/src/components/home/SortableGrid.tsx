@@ -6,6 +6,7 @@ import { useTranslations } from 'use-intl'
 
 import { hashUnit } from '@/components/buddy/look'
 import * as Haptics from '@/lib/haptics'
+import { READING_SIGN } from '@/lib/reading-direction'
 
 type Item = { id: string }
 type Size = { width: number; height: number }
@@ -43,7 +44,7 @@ function Cell({ id, count, columns, cell, order, onDrop, children }: { id: strin
         })
         .onUpdate(event => {
             const rows = Math.ceil(count / columns)
-            x.value = Math.max(0, Math.min((columns - 1) * cell.width, start.value.x + event.translationX))
+            x.value = Math.max(0, Math.min((columns - 1) * cell.width, start.value.x + READING_SIGN * event.translationX))
             y.value = Math.max(0, Math.min((rows - 1) * cell.height, start.value.y + event.translationY))
             const target = Math.min(count - 1, Math.round(y.value / cell.height) * columns + Math.round(x.value / cell.width))
             const current = order.value.indexOf(id)
@@ -63,7 +64,7 @@ function Cell({ id, count, columns, cell, order, onDrop, children }: { id: strin
     const style = useAnimatedStyle(() => {
         const place = placeOf(order.value.indexOf(id), columns, cell)
         return {
-            left: dragging.value ? x.value : withTiming(place.x, { duration: 160 }),
+            start: dragging.value ? x.value : withTiming(place.x, { duration: 160 }),
             top: dragging.value ? y.value : withTiming(place.y, { duration: 160 }),
             zIndex: dragging.value ? 2 : 1,
             transform: [{ scale: withTiming(dragging.value ? 1.08 : 1) }, { rotate: `${dragging.value ? 0 : wiggle.value}deg` }],

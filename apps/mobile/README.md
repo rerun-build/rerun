@@ -100,4 +100,5 @@ End-to-end flows (Maestro) live in `.maestro/`, with their own README.
 
 `AGENTS.md` in this folder: the app is on Expo SDK 58, read the versioned Expo docs before writing
 code. The strings go through `@rerun/i18n` (`src/i18n/`), and the languages the system settings offer
-are `APP_LANGUAGES` in `app.config.ts`.
+are `APP_LANGUAGES` in `app.config.ts`. Arabic and Hebrew lay the app out right to left: when the
+language changes direction, `I18nProvider` sets `I18nManager` and restarts the app once.
