@@ -277,7 +277,12 @@
         "deleteConfirmUnnamed": "Delete this server?",
         "deleteDescription": "The coworker loses every tool this server exposes. Its stored variables go with it.",
         "saveChanges": "Save changes",
-        "createServer": "Create server"
+        "createServer": "Create server",
+        "nameProposed": "{source, select, address {Proposed from the address, rename it if you like} other {Proposed from the package, rename it if you like}}",
+        "transportGuessed": "Guessed from the address",
+        "incomplete": "Give each server a name and a command or an address",
+        "duplicateName": "Two servers are named \"{name}\"",
+        "addServers": "Add {count} servers"
     },
     "mcpVariableToken": {
         "editVariable": "Edit variable {name}",
@@ -1135,5 +1140,34 @@
         "weekdays": "Weekdays at {time}",
         "everyWeekday": "Every {day} at {time}",
         "monthly": "Monthly on day {day} at {time}"
+    },
+    "mcpJsonPaste": {
+        "link": "Paste a JSON config",
+        "linkVault": "or paste a JSON config",
+        "linkAgain": "Paste another JSON",
+        "boxLabel": "MCP server JSON config",
+        "placeholder": "Paste the JSON from the server’s README\n{example}",
+        "close": "Close",
+        "unnamed": "unnamed",
+        "keysStored": "{count, plural, one {# value will be stored as a key, not in the config} other {# values will be stored as keys, not in the config}}",
+        "errors": {
+            "invalidJson": "Not valid JSON: {detail}",
+            "notAnObject": "Paste a JSON object: {example}",
+            "containerNotObject": "\"mcpServers\" must be an object of servers",
+            "noServer": "No server found: expected \"mcpServers\", a named server or a server with a \"command\" or a \"url\"",
+            "emptyContainer": "\"mcpServers\" is empty",
+            "serverNotObject": "{scope, select, named {\"{server}\" must be an object} other {A server must be an object}}",
+            "invalidName": "\"{server}\": a name takes letters, digits, - and _ only",
+            "unknownField": "{scope, select, named {\"{server}\": unknown field {fields}} other {Unknown field {fields}}}",
+            "notText": "{scope, select, named {\"{server}\": {field} must be text} other {{field} must be text}}",
+            "commandAndUrl": "{scope, select, named {\"{server}\" has both a command and a url} other {The server has both a command and a url}}",
+            "argsNotList": "{scope, select, named {\"{server}\": args must be a list of text} other {args must be a list of text}}",
+            "unknownTransport": "{scope, select, named {\"{server}\": unknown transport \"{transport}\"} other {Unknown transport \"{transport}\"}}",
+            "needsCommand": "{scope, select, named {\"{server}\": a stdio server needs a command} other {A stdio server needs a command}}",
+            "needsUrl": "{scope, select, named {\"{server}\": an {transport} server needs a url} other {An {transport} server needs a url}}",
+            "notMap": "{scope, select, named {\"{server}\": {field} must be an object of text values} other {{field} must be an object of text values}}",
+            "unresolvedRef": "{scope, select, named {\"{server}\": {field} uses {ref}, put the real value in its place} other {{field} uses {ref}, put the real value in its place}}",
+            "multiline": "{scope, select, named {\"{server}\": {field} must fit on one line} other {{field} must fit on one line}}"
+        }
     }
 }

@@ -184,7 +184,12 @@
         "deleteConfirmUnnamed": "Bu sunucu silinsin mi?",
         "deleteDescription": "Coworker bu sunucunun sunduğu tüm araçları kaybeder. Saklanan değişkenleri de silinir.",
         "saveChanges": "Değişiklikleri kaydet",
-        "createServer": "Sunucu oluştur"
+        "createServer": "Sunucu oluştur",
+        "nameProposed": "{source, select, address {Adresten önerildi, isterseniz yeniden adlandırın} other {Paketten önerildi, isterseniz yeniden adlandırın}}",
+        "transportGuessed": "Adresten çıkarıldı",
+        "incomplete": "Her sunucuya bir ad ve bir komut ya da adres verin",
+        "duplicateName": "İki sunucunun adı aynı: \"{name}\"",
+        "addServers": "{count} sunucu ekle"
     },
     "mcpVariableToken": {
         "editVariable": "Değişkeni düzenle: {name}",
@@ -1042,5 +1047,34 @@
         "weekdays": "Hafta içi saat {time}",
         "everyWeekday": "Her {day} saat {time}",
         "monthly": "Her ayın {day}. günü, saat {time}"
+    },
+    "mcpJsonPaste": {
+        "link": "JSON yapılandırması yapıştır",
+        "linkVault": "veya JSON yapılandırması yapıştırın",
+        "linkAgain": "Başka bir JSON yapıştır",
+        "boxLabel": "MCP sunucusunun JSON yapılandırması",
+        "placeholder": "Sunucunun README dosyasındaki JSON kodunu yapıştırın\n{example}",
+        "close": "Kapat",
+        "unnamed": "adsız",
+        "keysStored": "{count, plural, one {# değer yapılandırmada değil, anahtar olarak saklanacak} other {# değer yapılandırmada değil, anahtar olarak saklanacak}}",
+        "errors": {
+            "invalidJson": "Geçersiz JSON: {detail}",
+            "notAnObject": "Bir JSON nesnesi yapıştırın: {example}",
+            "containerNotObject": "\"mcpServers\" sunuculardan oluşan bir nesne olmalı",
+            "noServer": "Sunucu bulunamadı: \"mcpServers\", adlandırılmış bir sunucu ya da \"command\" veya \"url\" içeren bir sunucu bekleniyordu",
+            "emptyContainer": "\"mcpServers\" boş",
+            "serverNotObject": "{scope, select, named {Sunucu \"{server}\" bir nesne olmalı} other {Bir sunucu nesne olmalı}}",
+            "invalidName": "Sunucu \"{server}\": ad yalnızca harf, rakam, - ve _ içerebilir",
+            "unknownField": "{scope, select, named {Sunucu \"{server}\": bilinmeyen alan {fields}} other {Bilinmeyen alan {fields}}}",
+            "notText": "{scope, select, named {Sunucu \"{server}\": {field} alanı metin olmalı} other {{field} alanı metin olmalı}}",
+            "commandAndUrl": "{scope, select, named {Sunucu \"{server}\" hem komut hem url içeriyor} other {Sunucu hem komut hem url içeriyor}}",
+            "argsNotList": "{scope, select, named {Sunucu \"{server}\": args bir metin listesi olmalı} other {args bir metin listesi olmalı}}",
+            "unknownTransport": "{scope, select, named {Sunucu \"{server}\": bilinmeyen aktarım \"{transport}\"} other {Bilinmeyen aktarım \"{transport}\"}}",
+            "needsCommand": "{scope, select, named {Sunucu \"{server}\": bir stdio sunucusu komut gerektirir} other {Bir stdio sunucusu komut gerektirir}}",
+            "needsUrl": "{scope, select, named {Sunucu \"{server}\": aktarımı {transport} olan bir sunucu url gerektirir} other {Aktarımı {transport} olan bir sunucu url gerektirir}}",
+            "notMap": "{scope, select, named {Sunucu \"{server}\": {field} alanı metin değerlerinden oluşan bir nesne olmalı} other {{field} alanı metin değerlerinden oluşan bir nesne olmalı}}",
+            "unresolvedRef": "{scope, select, named {Sunucu \"{server}\": {field} alanı {ref} kullanıyor, yerine gerçek değeri yazın} other {{field} alanı {ref} kullanıyor, yerine gerçek değeri yazın}}",
+            "multiline": "{scope, select, named {Sunucu \"{server}\": {field} alanı tek satıra sığmalı} other {{field} alanı tek satıra sığmalı}}"
+        }
     }
 }

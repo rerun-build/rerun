@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { externalizeArgs, externalizePairs, externalizeUrl, isSecretLike } from './mcp-secrets'
+import { externalizeArgs, externalizePairs, externalizeUrl, isSecretLike, separateKeys } from './mcp-secrets'
 
 const DISCORD_TOKEN = 'MTAyNDkxODM3MjM4NDkxNzI4.GxKp9d.7fQm2LvXeR4tYuIoP1aSdF3gHjKlZxCvBnM'
 const JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U'
@@ -119,5 +119,35 @@ describe('externalizePairs', () => {
             value: { Authorization: 'Bearer ${MCP_X_AUTHORIZATION}', 'x-key': '${MCP_X_X_KEY}' },
             keys: { MCP_X_X_KEY: 'raw' },
         })
+    })
+})
+
+describe('separateKeys', () => {
+    const server = (name: string) => ({ name, args: ['--token', '${TOKEN}'], url: 'https://a.dev/${TOKEN}', env: { TOKEN: '${TOKEN}', OTHER: '${OTHER}' }, headers: { 'x-token': 'Bearer ${TOKEN}' } })
+
+    it('leaves a server alone when no key is taken', () => {
+        expect(separateKeys(server('dev'), { TOKEN: 'b' }, {})).toEqual({ server: server('dev'), keys: { TOKEN: 'b' } })
+    })
+
+    it('shares a key that holds the same value', () => {
+        expect(separateKeys(server('dev'), { TOKEN: 'a' }, { TOKEN: 'a' })).toEqual({ server: server('dev'), keys: { TOKEN: 'a' } })
+    })
+
+    it('gives its own key to a server that brings another value, references included', () => {
+        expect(separateKeys(server('supabase-dev'), { TOKEN: 'b' }, { TOKEN: 'a' })).toEqual({
+            server: {
+                name: 'supabase-dev',
+                args: ['--token', '${MCP_SUPABASE_DEV_TOKEN}'],
+                url: 'https://a.dev/${MCP_SUPABASE_DEV_TOKEN}',
+                env: { TOKEN: '${MCP_SUPABASE_DEV_TOKEN}', OTHER: '${OTHER}' },
+                headers: { 'x-token': 'Bearer ${MCP_SUPABASE_DEV_TOKEN}' },
+            },
+            keys: { MCP_SUPABASE_DEV_TOKEN: 'b' },
+        })
+    })
+
+    it('finds a free name when the prefixed one is taken too', () => {
+        expect(separateKeys(server('a_b'), { TOKEN: 'c' }, { TOKEN: 'a', MCP_A_B_TOKEN: 'b' }).keys).toEqual({ MCP_A_B_TOKEN_2: 'c' })
+        expect(separateKeys(server('a'), { TOKEN: 'c', MCP_A_TOKEN: 'd' }, { TOKEN: 'a' }).keys).toEqual({ MCP_A_TOKEN_2: 'c', MCP_A_TOKEN: 'd' })
     })
 })

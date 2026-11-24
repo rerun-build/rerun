@@ -386,7 +386,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                 <McpServerEditor
                     agentId={agentId}
                     server={current}
-                    onSave={server => patchAgentMcpServersAction(agentId, { remove: current.name !== server.name ? [current.name] : [], upsert: [server] })}
+                    onSave={([server]) => patchAgentMcpServersAction(agentId, { remove: current.name !== server.name ? [current.name] : [], upsert: [server] })}
                     onDelete={() => removeCustomMcpServerAction(agentId, current.name)}
                     onDone={afterCustomChange}
                     onBack={() => setCustomStep(null)}

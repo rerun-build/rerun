@@ -4,7 +4,8 @@ import { McpVariableToken } from '@/components/agent/McpVariableToken'
 import { Field } from '@/components/ui/field'
 import { TextareaMirror } from '@/components/ui/textarea-mirror'
 import type { AgentVariables } from '@/hooks/useAgentVariables'
-import { useId, useMemo } from 'react'
+import { cn } from '@/lib/utils'
+import { useId, useMemo, type ClipboardEvent } from 'react'
 
 // Same shape the engine's resolver substitutes at connect time (see engine mcp-resolve.ts).
 const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
@@ -38,17 +39,19 @@ type McpVarTextareaProps = {
     minHeightClassName?: string
     singleLine?: boolean
     disabled?: boolean
+    className?: string
+    onPaste?: (event: ClipboardEvent<HTMLTextAreaElement>) => void
 }
 
 // A URL field stays a textarea that wraps rather than an input that scrolls horizontally: the
 // mirror is pinned to the box, so a scrolled input would slide its highlights off the characters.
-export function McpVarTextarea({ label, helperText, warning, value, onChange, placeholder, vars, minHeightClassName = 'min-h-16', singleLine, disabled }: McpVarTextareaProps) {
+export function McpVarTextarea({ label, helperText, warning, value, onChange, placeholder, vars, minHeightClassName = 'min-h-16', singleLine, disabled, className, onPaste }: McpVarTextareaProps) {
     const id = useId()
     const segments = useMemo(() => tokenize(value), [value])
 
     return (
         <Field label={label} helperText={helperText} htmlFor={id}>
-            <div className="relative rounded-lg border border-input transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30">
+            <div className={cn('relative rounded-lg border border-input transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30', className)}>
                 <textarea
                     id={id}
                     value={value}
@@ -56,6 +59,7 @@ export function McpVarTextarea({ label, helperText, warning, value, onChange, pl
                     onKeyDown={e => {
                         if (singleLine && e.key === 'Enter') e.preventDefault()
                     }}
+                    onPaste={onPaste}
                     placeholder={placeholder}
                     spellCheck={false}
                     disabled={disabled}

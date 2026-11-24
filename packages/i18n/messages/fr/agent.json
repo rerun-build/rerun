@@ -184,7 +184,12 @@
         "deleteConfirmUnnamed": "Supprimer ce serveur ?",
         "deleteDescription": "Le coworker perd tous les outils de ce serveur. Ses variables enregistrées partent avec lui.",
         "saveChanges": "Enregistrer",
-        "createServer": "Créer le serveur"
+        "createServer": "Créer le serveur",
+        "nameProposed": "{source, select, address {Proposé d’après l’adresse, vous pouvez le renommer} other {Proposé d’après le paquet, vous pouvez le renommer}}",
+        "transportGuessed": "Déduit de l’adresse",
+        "incomplete": "Donnez à chaque serveur un nom et une commande ou une adresse",
+        "duplicateName": "Deux serveurs s’appellent \"{name}\"",
+        "addServers": "Ajouter {count} serveurs"
     },
     "mcpVariableToken": {
         "editVariable": "Modifier la variable {name}",
@@ -1042,5 +1047,34 @@
         "weekdays": "En semaine à {time}",
         "everyWeekday": "Chaque {day} à {time}",
         "monthly": "Tous les mois le {day} à {time}"
+    },
+    "mcpJsonPaste": {
+        "link": "Coller une config JSON",
+        "linkVault": "ou coller une config JSON",
+        "linkAgain": "Coller un autre JSON",
+        "boxLabel": "Config JSON du serveur MCP",
+        "placeholder": "Collez le JSON du README du serveur\n{example}",
+        "close": "Fermer",
+        "unnamed": "sans nom",
+        "keysStored": "{count, plural, one {# valeur sera stockée comme clé, pas dans la config} other {# valeurs seront stockées comme clés, pas dans la config}}",
+        "errors": {
+            "invalidJson": "JSON invalide : {detail}",
+            "notAnObject": "Collez un objet JSON : {example}",
+            "containerNotObject": "\"mcpServers\" doit être un objet de serveurs",
+            "noServer": "Aucun serveur trouvé : attendu \"mcpServers\", un serveur nommé ou un serveur avec \"command\" ou \"url\"",
+            "emptyContainer": "\"mcpServers\" est vide",
+            "serverNotObject": "{scope, select, named {\"{server}\" doit être un objet} other {Un serveur doit être un objet}}",
+            "invalidName": "\"{server}\" : un nom ne prend que des lettres, des chiffres, - et _",
+            "unknownField": "{scope, select, named {\"{server}\" : champ inconnu {fields}} other {Champ inconnu {fields}}}",
+            "notText": "{scope, select, named {\"{server}\" : {field} doit être du texte} other {{field} doit être du texte}}",
+            "commandAndUrl": "{scope, select, named {\"{server}\" a à la fois une commande et une url} other {Le serveur a à la fois une commande et une url}}",
+            "argsNotList": "{scope, select, named {\"{server}\" : args doit être une liste de textes} other {args doit être une liste de textes}}",
+            "unknownTransport": "{scope, select, named {\"{server}\" : transport inconnu \"{transport}\"} other {Transport inconnu \"{transport}\"}}",
+            "needsCommand": "{scope, select, named {\"{server}\" : un serveur stdio a besoin d’une commande} other {Un serveur stdio a besoin d’une commande}}",
+            "needsUrl": "{scope, select, named {\"{server}\" : un serveur {transport} a besoin d’une url} other {Un serveur {transport} a besoin d’une url}}",
+            "notMap": "{scope, select, named {\"{server}\" : {field} doit être un objet de valeurs texte} other {{field} doit être un objet de valeurs texte}}",
+            "unresolvedRef": "{scope, select, named {\"{server}\" : {field} utilise {ref}, mettez la vraie valeur à la place} other {{field} utilise {ref}, mettez la vraie valeur à la place}}",
+            "multiline": "{scope, select, named {\"{server}\" : {field} doit tenir sur une ligne} other {{field} doit tenir sur une ligne}}"
+        }
     }
 }

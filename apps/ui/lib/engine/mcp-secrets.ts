@@ -200,6 +200,29 @@ export function externalizeArgs(args: string[], serverName: string): Externalize
     return { value, keys }
 }
 
+type ServerRefs = { name: string; args: string[]; url?: string; env: Record<string, string>; headers: Record<string, string> }
+
+// Two servers saved together may each carry their own value under one variable: the second one gets
+// a key of its own, otherwise both would run with the last value stored.
+export function separateKeys<T extends ServerRefs>(server: T, keys: Record<string, string>, taken: Record<string, string>): { server: T; keys: Record<string, string> } {
+    const free = (name: string, value: string) => !(name in taken) || taken[name] === value
+    const renamed: Record<string, string> = {}
+    const separated: Record<string, string> = {}
+    for (const [name, value] of Object.entries(keys)) {
+        const base = `MCP_${sanitize(server.name)}_${name}`
+        let next = name
+        for (let suffix = 1; !free(next, value) || (next !== name && next in keys) || next in separated; suffix++) next = suffix === 1 ? base : `${base}_${suffix}`
+        if (next !== name) renamed[name] = next
+        separated[next] = value
+    }
+    const swap = (text: string) => text.replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (whole, name: string) => (renamed[name] ? ref(renamed[name]) : whole))
+    const swapAll = (pairs: Record<string, string>) => Object.fromEntries(Object.entries(pairs).map(([key, value]) => [key, swap(value)]))
+    return {
+        server: { ...server, args: server.args.map(swap), ...(server.url ? { url: swap(server.url) } : {}), env: swapAll(server.env), headers: swapAll(server.headers) },
+        keys: separated,
+    }
+}
+
 // Both warnings run the real externalizer, so what the field announces is exactly what the save does.
 export const argsHaveSecret = (args: string[]) => Object.keys(externalizeArgs(args, 'x').keys).length > 0
 export const urlHasSecret = (url: string) => Object.keys(externalizeUrl(url, 'x').keys).length > 0

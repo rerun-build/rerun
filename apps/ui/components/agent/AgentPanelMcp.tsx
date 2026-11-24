@@ -96,7 +96,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     if (view.mode === 'create') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <McpServerEditor agentId={agentId} onSave={async server => mutate({ upsert: [server] })} onDone={() => setView({ mode: 'list' })} onBack={() => setView({ mode: 'list' })} />
+                <McpServerEditor agentId={agentId} onSave={async servers => mutate({ upsert: servers })} onDone={() => setView({ mode: 'list' })} onBack={() => setView({ mode: 'list' })} />
             </PanelSteps>
         )
     }
@@ -133,7 +133,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                     agentId={agentId}
                     server={current}
                     readOnly={view.readOnly}
-                    onSave={async server => mutate({ remove: current.name !== server.name ? [current.name] : [], upsert: [server] })}
+                    onSave={async ([server]) => mutate({ remove: current.name !== server.name ? [current.name] : [], upsert: [server] })}
                     onDelete={async () => mutate({ remove: [current.name] })}
                     onDone={() => setView({ mode: 'list' })}
                     onBack={() => setView({ mode: 'list' })}
