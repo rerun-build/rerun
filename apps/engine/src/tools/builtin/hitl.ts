@@ -4,6 +4,7 @@ import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming, type TurnOrder } from '../../agents/turn-order.js'
 import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
+import { vaultServerNote } from '../../vault/runtime.js'
 import { publicHttpUrl } from '../url.js'
 
 export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'request_computer_access', 'request_feature'] as const
@@ -33,13 +34,16 @@ export function isHitlToolName(name: string | undefined): boolean {
 
 export type PendingHitl = { toolCallId: string; toolName: string; input: unknown }
 
+// A CLI provider runs the tool itself, and the AI SDK stores what it threw as `error-json`.
+const REFUSED_OUTPUTS = new Set(['error-text', 'error-json'])
+
 function rejectedToolCallIds(messages: ModelMessage[]): Set<string> {
     const ids = new Set<string>()
     for (const m of messages) {
         if (!Array.isArray(m.content)) continue
         for (const part of m.content) {
             const p = part as { type?: string; toolCallId?: string; output?: { type?: string } }
-            if (p?.type === 'tool-result' && p.toolCallId && p.output?.type === 'error-text') ids.add(p.toolCallId)
+            if (p?.type === 'tool-result' && p.toolCallId && REFUSED_OUTPUTS.has(p.output?.type ?? '')) ids.add(p.toolCallId)
         }
     }
     return ids
@@ -109,8 +113,17 @@ export function hitlAck(order: TurnOrder): typeof HITL_ACK | typeof HITL_ACK_CAL
     return order === 'call-first' ? HITL_ACK_CALL_FIRST : HITL_ACK
 }
 
-function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
-    return tool({ description: `${description} ${cardCallTiming(order)}`, inputSchema, execute: async () => hitlAck(order) })
+// `refusal` names why the card would be of no use: thrown, so no card shows and the turn goes on.
+function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S, refusal?: (input: z.output<S>) => string | null) {
+    return tool({
+        description: `${description} ${cardCallTiming(order)}`,
+        inputSchema,
+        execute: async (input: z.output<S>) => {
+            const refused = refusal?.(input)
+            if (refused) throw new Error(refused)
+            return hitlAck(order)
+        },
+    })
 }
 
 export function jsonTolerantArray<S extends z.ZodTypeAny>(schema: S) {
@@ -338,15 +351,16 @@ function secretInputSchema(foreman: boolean) {
 
 // Registered alongside mcp_register rather than through the tool catalog: it only makes sense to an
 // agent that can add MCP servers to itself.
-export function mcpSignInTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
+export function mcpSignInTool(ctx: Pick<RunContext, 'turnOrder' | 'agent'>): ToolSet {
     return {
         request_mcp_sign_in: hitlTool(
             ctx.turnOrder,
-            'Ask the user to sign in to an MCP server of yours that requires sign-in, then END YOUR TURN. The user gets a card with a Connect button that runs the OAuth sign-in in a popup; you never see a token. Do not explain the sign-in steps yourself, the card does. The server\'s tools load once they are connected.',
+            "Ask the user to sign in to an MCP server of your own (not the Vault's) that requires sign-in, then END YOUR TURN. The user gets a card with a Connect button that runs the OAuth sign-in in a popup; you never see a token. Do not explain the sign-in steps, the card does. Its tools load once connected.",
             z.object({
                 name: z.string().min(1).describe('The exact name of the server.'),
                 reason: nullTolerantOptional(z.string().max(300)).describe('One short line shown on the card telling the user what signing in unlocks.'),
             }),
+            ({ name }) => vaultServerNote(name, ctx.agent),
         ),
     }
 }

@@ -350,7 +350,7 @@ export function serializeMcpSignInResult(name: string): string {
     return `MCP sign-in result:\n- ${name}: connected\n\nIts tools are available now. Please continue.`
 }
 
-type HitlPart = { type: string; toolCallId?: string; toolName?: string; input?: unknown; rawInput?: unknown; output?: unknown }
+type HitlPart = { type: string; state?: string; toolCallId?: string; toolName?: string; input?: unknown; rawInput?: unknown; output?: unknown }
 
 export type PendingHitl = { kind: HitlKind; toolCallId: string; input: Record<string, unknown>; output: unknown }
 
@@ -373,6 +373,8 @@ export function findPendingHitl(messages: readonly { role: string; parts: readon
         if (part.toolCallId === dismissedCallId) return null
         // A spend the hub could not price never reached the user: the coworker read the error instead.
         if (kind === 'spend' && !readSpendQuote(part.output)) return null
+        // Nor did a sign-in the engine refused, for a server of the Vault: it happens in the Vault.
+        if (kind === 'mcp' && part.state === 'output-error') return null
         return { kind, toolCallId: part.toolCallId, input, output: part.output }
     }
     return null

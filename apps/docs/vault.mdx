@@ -78,7 +78,7 @@ Click **Add secret**.
 | **Address or command** | An `https` address, or the command the machine starts |
 | **Header** and **Value** | Optional: a header the server needs, like `Authorization`, and its value. The value is kept as a variable of the entry |
 
-Click **Add server**. A remote server with no key offers to sign in from its entry.
+Click **Add server**. A remote server with no key offers to sign in from its entry: open it, click **Reconnect**, then **Connect**. A coworker that needs the sign-in sends you there, it cannot start it from the chat. See [what a server of your own needs](/agents/apps#missing-an-app) to sign in by OAuth.
 
 To copy a server's JSON config instead, click **or paste a JSON config** under **Address or command** and paste it, or paste it straight into **Name** or **Address or command**. The fields fill in, with one line per header and per environment variable: check each value and change it before adding, they are kept as variables of the entry. Change the address or the command to another server's and those lines go away. A config with several servers adds one entry per server with **Add N servers**. If one fails, the ones before it are already in the Vault and the form keeps the rest. The formats accepted are the same as [for a coworker](/agents/apps#missing-an-app).
 

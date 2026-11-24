@@ -497,6 +497,12 @@ describe('findPendingHitl', () => {
         expect(findPendingHitl([assistant(question), { role: 'user', parts: [{ type: 'text', text: 'Q4' }] }])).toBeNull()
     })
 
+    it('skips a sign-in the coworker was refused, whose card could not sign in', () => {
+        const signIn = { type: 'tool-request_mcp_sign_in', toolCallId: 'call-2', input: { name: 'docs' } }
+        expect(findPendingHitl([assistant({ ...signIn, state: 'output-available', output: { status: 'delivered' } })])).toMatchObject({ kind: 'mcp', toolCallId: 'call-2' })
+        expect(findPendingHitl([assistant({ ...signIn, state: 'output-error', errorText: 'from the Vault' }, { type: 'text', text: 'Sign in from the Vault.' })])).toBeNull()
+    })
+
     it('recovers the payload of a call the SDK rejected, and skips one with nothing usable left', () => {
         expect(findPendingHitl([assistant({ ...question, input: undefined, rawInput: question.input })])).toMatchObject({ input: question.input })
         expect(findPendingHitl([assistant({ ...question, input: {} })])).toBeNull()

@@ -42,6 +42,7 @@ const { agentConfigSchema } = await import('../../agents/types.js')
 const { writeAgentConfig } = await import('../../agents/config-write.js')
 const { getAgent } = await import('../../agents/registry.js')
 const { agentDir, configPath, soulPath, workspaceDir } = await import('../../config/paths.js')
+const { createVaultItem, deleteVaultItem } = await import('../../vault/store.js')
 
 const id = 'self-mcp-agent'
 const agentEnv = { LINEAR_KEY: 'k' }
@@ -250,6 +251,26 @@ describe('mcp_login_complete', () => {
     })
 })
 
+const VAULT_NOTE = (name: string) => `"${name}" comes from the workspace's Vault and is shared with other coworkers. Ask the user to sign in to it from the Vault (workspace menu, Vault); you cannot sign it in yourself.`
+
+describe('request_mcp_sign_in', () => {
+    it('shows its card for a server of the coworker', async () => {
+        await seedServers([{ name: 'getmcp', url: 'https://g.example/mcp' }])
+        expect(await call('request_mcp_sign_in', { name: 'getmcp' })).toMatchObject({ status: 'delivered' })
+    })
+
+    it('refuses a server of the Vault, which its card could not sign in', async () => {
+        const item = await createVaultItem({ kind: 'mcp', name: 'Docs', agentIds: [id], mcpServers: [{ name: 'docs', url: 'https://d.example/mcp' }] })
+        try {
+            await expect(call('request_mcp_sign_in', { name: 'docs' })).rejects.toThrow(VAULT_NOTE('docs'))
+            expect(await call('mcp_login', { name: 'docs' })).toBe(VAULT_NOTE('docs'))
+        } finally {
+            await deleteVaultItem(item.id)
+        }
+        expect(await call('request_mcp_sign_in', { name: 'docs' })).toMatchObject({ status: 'delivered' })
+    })
+})
+
 describe('mcp_status', () => {
     it('says when no server is registered', async () => {
         expect(await call('mcp_status', {})).toBe('No MCP servers registered.')
@@ -271,6 +292,18 @@ describe('mcp_status', () => {
             'needs sign-in getmcp (http): call request_mcp_sign_in with name "getmcp" and end your turn',
             'failed keyed (http): Unauthorized (HTTP 401)',
         ])
+    })
+
+    it('sends a server of the Vault that asks for sign-in to the Vault, unless a key of its own is turned down', async () => {
+        const open = await createVaultItem({ kind: 'mcp', name: 'Docs', agentIds: [id], mcpServers: [{ name: 'docs', url: 'https://d.example/mcp' }] })
+        const keyed = await createVaultItem({ kind: 'mcp', name: 'Keyed', agentIds: [id], env: { VAULT_KEY: 'k' }, mcpServers: [{ name: 'keyed', url: 'https://k.example/mcp', headers: { Authorization: 'Bearer ${VAULT_KEY}' } }] })
+        try {
+            for (const name of ['docs', 'keyed']) mocks.probes.set(name, { ok: false, transport: 'http', toolNames: [], error: 'Unauthorized (HTTP 401)' })
+            expect((await call('mcp_status', {})).split('\n')).toEqual([`needs sign-in docs (http): ${VAULT_NOTE('docs')}`, 'failed keyed (http): Unauthorized (HTTP 401)'])
+        } finally {
+            await deleteVaultItem(open.id)
+            await deleteVaultItem(keyed.id)
+        }
     })
 
     it('names the tools the way the CLI of the run shows them', async () => {

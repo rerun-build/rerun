@@ -31,6 +31,14 @@ export function agentMcpServers(agent: VaultHolder): AgentMcpServer[] {
     return [...fromVault, ...agent.config.mcpServers.filter(server => !taken.has(server.name))]
 }
 
+// A server of the workspace's Vault is signed in from the Vault, once for every coworker using it: a
+// device sign-in would land in this coworker's folder, where nothing reads it, and the Connect card
+// of the chat only knows the coworker's own servers.
+export function vaultServerNote(name: string, agent: VaultHolder): string | null {
+    const server = agentMcpServers(agent).find(candidate => candidate.name === name && candidate.vaultItemId)
+    return server ? `"${name}" comes from the workspace's Vault and is shared with other coworkers. Ask the user to sign in to it from the Vault (workspace menu, Vault); you cannot sign it in yourself.` : null
+}
+
 // Where the setup of each Vault server stands, in the shape a coworker's own connectors report it.
 // A catalog app always says; a custom server only once it waits on something, otherwise its
 // headers or its token tell the model how it signs in.

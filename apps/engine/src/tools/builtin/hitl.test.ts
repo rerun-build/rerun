@@ -223,7 +223,7 @@ describe('request_approval input schema', () => {
 })
 
 describe('request_mcp_sign_in', () => {
-    const schema = () => (mcpSignInTool({ turnOrder: 'message-first' }).request_mcp_sign_in as any).inputSchema as z.ZodTypeAny
+    const schema = () => (mcpSignInTool({ turnOrder: 'message-first' } as any).request_mcp_sign_in as any).inputSchema as z.ZodTypeAny
 
     it('accepts a server name with an optional reason', () => {
         expect(schema().safeParse({ name: 'mobbin', reason: 'Search real app screens' }).success).toBe(true)
@@ -232,6 +232,12 @@ describe('request_mcp_sign_in', () => {
 
     it('rejects a call without a server name', () => {
         expect(schema().safeParse({ name: '' }).success).toBe(false)
+    })
+
+    it.each(['error-text', 'error-json'])('does not wait on a card the tool refused, stored as %s by the run or by a CLI', type => {
+        const call = { type: 'tool-call', toolCallId: 's1', toolName: 'mcp__rerun__request_mcp_sign_in', input: { name: 'docs' } }
+        const refusal = { type: 'tool-result', toolCallId: 's1', toolName: 'mcp__rerun__request_mcp_sign_in', output: { type, value: 'from the Vault' } }
+        expect(findPendingHitl([{ role: 'assistant', content: [call, refusal, { type: 'text', text: 'Sign in from the Vault.' }] }] as unknown as ModelMessage[])).toBeNull()
     })
 
     it('pauses the run like every other card', () => {

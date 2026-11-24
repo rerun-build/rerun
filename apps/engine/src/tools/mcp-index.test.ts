@@ -9,7 +9,9 @@ process.env.RERUN_API_KEY = ''
 const { describe, expect, it } = await import('vitest')
 const { buildMcpIndex, describeConnectorState } = await import('./mcp-index.js')
 const { saveToken } = await import('./mcp-auth.js')
-const { mcpDir, mcpTokenPath, workspaceDir } = await import('../config/paths.js')
+const { createVaultItem } = await import('../vault/store.js')
+const { saveVaultToken } = await import('../vault/tokens.js')
+const { agentDir, configPath, mcpDir, mcpTokenPath, workspaceDir } = await import('../config/paths.js')
 
 type Server = { name: string; transport?: 'stdio' | 'sse' | 'http'; command?: string; url?: string; args: string[]; env: Record<string, string>; headers: Record<string, string> }
 
@@ -52,6 +54,22 @@ describe('buildMcpIndex', () => {
         const servers = [{ name: 'getmcp', url: 'https://g.example/mcp' }]
         expect(await buildMcpIndex(agentWith('idx-signin', servers))).toContain('- getmcp (http): not signed in — if its tools answer that sign-in is required, call request_mcp_sign_in with its name and end your turn')
         expect(await buildMcpIndex(agentWith('idx-signin-off', servers, true, false))).toContain('- getmcp (http): not signed in — if its tools answer that sign-in is required, ask the user to connect it from the Apps panel of this coworker')
+    })
+
+    it('sends a Vault server without a sign-in to the Vault, whose sign-in the Connect card cannot run', async () => {
+        const url = 'https://v.example/mcp'
+        await mkdir(agentDir('idx-vault'), { recursive: true })
+        await writeFile(configPath('idx-vault'), JSON.stringify({ name: 'idx-vault' }), 'utf8')
+        const item = await createVaultItem({ kind: 'mcp', name: 'Docs', agentIds: ['idx-vault'], mcpServers: [{ name: 'docs', url }], oauth: { serverName: 'docs', url } })
+        const agent = agentWith('idx-vault', [{ name: 'own', url: 'https://o.example/mcp' }])
+        const lines = (await buildMcpIndex(agent)).split('\n\n')[1].split('\n')
+        expect(lines).toEqual([
+            "- docs (http): not signed in — if its tools answer that sign-in is required, ask the user to sign in to it from the workspace's Vault (workspace menu, Vault)",
+            '- own (http): not signed in — if its tools answer that sign-in is required, call request_mcp_sign_in with its name and end your turn',
+        ])
+
+        await saveVaultToken(item.id, 'docs', { accessToken: 'at', obtainedAt: Date.now() })
+        expect(await buildMcpIndex(agent)).toContain('- docs (http): authenticated (OAuth)')
     })
 
     it('does not send a server dialed with a key in its url to the Connect card', async () => {

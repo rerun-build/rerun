@@ -11,7 +11,7 @@ import { writeAgentConfig, mergeMcpServers, ReservedMcpServerNameError, InvalidM
 import { mcpToolNameFor, probeMcp } from '../mcp.js'
 import { agentMcpSpawn } from '../mcp-pool.js'
 import { agentConnectorStates, describeConnectorState } from '../mcp-index.js'
-import { agentMcpServers } from '../../vault/runtime.js'
+import { agentMcpServers, vaultServerNote } from '../../vault/runtime.js'
 import {
     clearPending,
     discoverDeviceAuth,
@@ -27,13 +27,6 @@ import type { RunContext } from '../../runtime/context.js'
 import { mcpSignInTool } from './hitl.js'
 
 const run = promisify(execFile)
-
-// A server of the workspace's Vault is signed in from the Vault, once for every coworker using it:
-// a device sign-in here would land in this coworker's folder, where nothing reads it.
-function vaultServerNote(name: string, agent: RunContext['agent']): string | null {
-    const server = agentMcpServers(agent).find(candidate => candidate.name === name && candidate.vaultItemId)
-    return server ? `"${name}" comes from the workspace's Vault and is shared with other coworkers. Ask the user to reconnect it from the Vault (workspace menu, Vault); you cannot sign it in yourself.` : null
-}
 
 export function selfTools(ctx: RunContext): ToolSet {
     const id = ctx.agent.id
@@ -189,8 +182,9 @@ export function selfTools(ctx: RunContext): ToolSet {
                         }
                         const probe = await probeMcp(id, server, ctx.agent.env, { spawn: agentMcpSpawn(ctx.agent) })
                         if (probe.ok) return `connected ${server.name} (${probe.transport}): ${probe.toolNames.length} tools — ${modelToolNames(server.name, probe.toolNames)}`
-                        if (server.url && !server.vaultItemId && isAuthError(probe.error) && !serverCarriesCredential(server)) {
-                            return `needs sign-in ${server.name} (${probe.transport}): call request_mcp_sign_in with name "${server.name}" and end your turn`
+                        if (server.url && isAuthError(probe.error) && !serverCarriesCredential(server)) {
+                            const step = vaultServerNote(server.name, ctx.agent) ?? `call request_mcp_sign_in with name "${server.name}" and end your turn`
+                            return `needs sign-in ${server.name} (${probe.transport}): ${step}`
                         }
                         return `failed ${server.name} (${probe.transport}): ${probe.error}`
                     }),
