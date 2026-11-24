@@ -112,6 +112,8 @@ type ForemanState = {
     pillAvailable: boolean
     /** Bumped to send the caret to whichever composer is on screen, the pill's or the column's. */
     composerFocusRequest: number
+    /** Moves on each time a thread is asked for, the one on screen included. */
+    threadOpenRequest: number
     /** La checklist du board existe pour cet utilisateur, même masquée : le menu profil la rouvre. */
     gettingStartedAvailable: boolean
     // Incrémenté par le menu profil : la pastille s'ouvre (et se ré-affiche) à chaque changement.
@@ -210,6 +212,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     dock: IDLE_DOCK_FEED,
     pillAvailable: false,
     composerFocusRequest: 0,
+    threadOpenRequest: 0,
     gettingStartedAvailable: false,
     gettingStartedOpenRequest: 0,
     accountSwitches: 0,
@@ -274,6 +277,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         if (get().sessionId !== get().generalId) set({ ...CONVERSATION_SWITCH, sessionId: get().generalId, draftId: null })
     },
     openThread: sessionId => {
+        set(state => ({ threadOpenRequest: state.threadOpenRequest + 1 }))
         if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine', draftId: null })
     },
     setGeneral: (sessionId, backend) => set({ generalId: sessionId, sessionId, backend: backend ?? null }),

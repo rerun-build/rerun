@@ -81,6 +81,11 @@
         "newThread": "שרשור חדש",
         "general": "כללי"
     },
+    "resumeChat": {
+        "continue": "<verb>להמשיך</verb> <name>{title}</name>",
+        "dismiss": "לסגור",
+        "untitled": "שיחה חדשה"
+    },
     "sessionRename": {
         "rename": "לשנות שם",
         "label": "שם השיחה",

@@ -81,6 +81,11 @@
         "newThread": "Nouveau fil",
         "general": "Général"
     },
+    "resumeChat": {
+        "continue": "<verb>Continuer</verb> <name>{title}</name>",
+        "dismiss": "Ignorer",
+        "untitled": "Nouvelle conversation"
+    },
     "sessionRename": {
         "rename": "Renommer",
         "label": "Nom de la conversation",

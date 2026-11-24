@@ -81,6 +81,11 @@
         "newThread": "Neuer Thread",
         "general": "Allgemein"
     },
+    "resumeChat": {
+        "continue": "<verb>Fortsetzen</verb> <name>{title}</name>",
+        "dismiss": "Verwerfen",
+        "untitled": "Neue Unterhaltung"
+    },
     "sessionRename": {
         "rename": "Umbenennen",
         "label": "Name der Unterhaltung",

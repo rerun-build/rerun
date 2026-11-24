@@ -137,9 +137,11 @@ type AgentChatProps = {
     threads?: ThreadRow[]
     onOpenThread?: (sessionId: string, title: string) => void
     composerPlaceholder?: string
+    // Floats between the transcript and the composer.
+    aboveComposer?: ReactNode
 }
 
-export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder }: AgentChatProps) {
+export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder, aboveComposer }: AgentChatProps) {
     const t = useTranslations('chat.agentChat')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace, user } = useSession()
@@ -1142,6 +1144,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                 <MessageFeedbackDialog open={messageFeedback.dialogOpen} rating={messageFeedback.dialogRating} onOpenChange={messageFeedback.onDialogOpenChange} onSubmit={messageFeedback.submitDetails} />
 
                 {mentionMenu && mentionMenuPlace && <div className="absolute" style={mentionMenuPlace}>{mentionMenu}</div>}
+                {aboveComposer}
                 {footerVisible && (
                     <div className="border-t border-border p-3 *:mx-auto *:max-w-[var(--chat-column,none)]">
                         <AnimatePresence initial={false}>

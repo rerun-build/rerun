@@ -1,27 +1,18 @@
 'use client'
 
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { renameSessionAction } from '@/app/api/_actions/session.actions'
-import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { OpenChatsTabs } from '@/components/agent/sheet/OpenChatsTabs'
 import { useSessionRename } from '@/components/agent/sheet/SessionRename'
 import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialog'
-import { isGeneralTab, useSessionTabs } from '@/hooks/useSessionTabs'
+import type { ForemanTabs } from '@/components/foreman/useForemanTabs'
+import { isGeneralTab } from '@/hooks/useSessionTabs'
 import { isTypingTarget } from '@/lib/typing-target'
-import { useSession } from '@/supabase/session/SessionProvider'
 
 type ForemanTopBarProps = {
-    /** The conversation on screen: General's id, or one of its threads. */
-    sessionId: string
-    inThread: boolean
-    /** The thread on screen is a "New conversation" nobody has written in yet. */
-    blankDraft: boolean
-    threads: ThreadRow[]
-    onShowGeneral: () => void
-    onOpenThread: (id: string) => void
+    conversations: ForemanTabs
     onNewTask: () => void
     /** What opens the bar: the button to the Chief of Staff's card. */
     start?: ReactNode
@@ -33,56 +24,15 @@ type ForemanTopBarProps = {
 
 /**
  * The Chief of Staff's bar in the Simple view's middle, the one a coworker's chat has: General pinned
- * first, then the threads opened here, kept across reloads, between its card button and its history. The store says
- * which conversation is on screen; the tabs follow it, whoever opened it (+, the history, a notification).
+ * first, then the threads opened here, between its card button and its history.
  */
-export function ForemanTopBar({ sessionId, inThread, blankDraft, threads, onShowGeneral, onOpenThread, onNewTask, start, history, active = true }: ForemanTopBarProps) {
+export function ForemanTopBar({ conversations, onNewTask, start, history, active = true }: ForemanTopBarProps) {
     const t = useTranslations('foreman.threads')
     const generalTitle = t('general')
-    const untitled = t('untitled')
-    // The foreman's id is the same in every workspace: its tabs are kept per workspace.
-    const workspaceId = useSession().workspace?.id ?? 'none'
-    const { tabs, activeIndex, selectTab, closeTab, openTab, updateTabTitle } = useSessionTabs(`${FOREMAN_AGENT_ID}:${workspaceId}`)
+    const { tabs, activeIndex, rowById, show, close, updateTabTitle } = conversations
     const [pendingCloseIndex, setPendingCloseIndex] = useState<number | null>(null)
 
-    // The store keeps a single draft: a "New conversation" left before anything was written in it has nothing
-    // to reopen, so its tab goes with it.
-    const blankDraftOnScreen = useRef<string | null>(null)
-    useEffect(() => {
-        const leftDraft = blankDraftOnScreen.current
-        if (leftDraft && leftDraft !== sessionId) {
-            const index = tabs.findIndex(tab => !isGeneralTab(tab) && tab.id === leftDraft)
-            if (index !== -1) closeTab(index)
-        }
-        if (inThread) openTab(sessionId, untitled)
-        else selectTab(0)
-    }, [inThread, sessionId, untitled, tabs, openTab, selectTab, closeTab])
-    useEffect(() => {
-        blankDraftOnScreen.current = inThread && blankDraft ? sessionId : null
-    }, [inThread, blankDraft, sessionId])
-
-    const rowById = useMemo(() => new Map(threads.map(row => [row.id, row])), [threads])
     const shownTabs = useMemo(() => tabs.map(tab => (isGeneralTab(tab) ? { ...tab, title: generalTitle } : { ...tab, title: (tab.id && rowById.get(tab.id)?.title) || tab.title })), [tabs, rowById, generalTitle])
-
-    const show = (index: number) => {
-        const id = tabs[index]?.id
-        if (index === 0 || !id) onShowGeneral()
-        else onOpenThread(id)
-    }
-
-    const close = useCallback(
-        (index: number) => {
-            if (isGeneralTab(tabs[index])) return
-            if (index === activeIndex) {
-                const rest = tabs.filter((_, i) => i !== index)
-                const next = rest[Math.min(index, rest.length - 1)]
-                if (!next?.id || isGeneralTab(next)) onShowGeneral()
-                else onOpenThread(next.id)
-            }
-            closeTab(index)
-        },
-        [tabs, activeIndex, onShowGeneral, onOpenThread, closeTab]
-    )
 
     // A thread still working asks first, as a coworker's does: closing its tab is not stopping it.
     const requestClose = useCallback(

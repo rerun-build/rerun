@@ -18,6 +18,8 @@ import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
 import { Orb } from '@/components/foreman/Orb'
 import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
+import { useForemanTabs } from '@/components/foreman/useForemanTabs'
+import { ResumeChatPill } from '@/components/agent/sheet/ResumeChatPill'
 import { ForemanCard } from '@/components/foreman/ForemanCard'
 import { ForemanDetails } from '@/components/foreman/ForemanDetails'
 import { DetailsColumn } from '@/components/workspace-view/DetailsColumn'
@@ -142,7 +144,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
 
     const { queued, restoredId: restoredQueuedId, enqueue: enqueueMessage, clear: clearQueued } = useQueuedMessage('foreman')
     const composerRef = useRef<ChatComposerHandle | null>(null)
-    const blankDraft = useForemanStore(state => state.draftId === state.sessionId) && messages.length === 0
+    const draftId = useForemanStore(state => state.draftId)
+    const threadOpenRequest = useForemanStore(state => state.threadOpenRequest)
+    const blankDraft = draftId === sessionId && messages.length === 0
     // A "New conversation" nobody has written in yet is the new one: asking again lands on it.
     const startNewChat = useCallback(() => {
         if (!blankDraft) useForemanStore.getState().newChat()
@@ -158,7 +162,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const threadWaiting = useMemo(() => threads.some(thread => threadStateOf(thread.status) === 'needs'), [threads])
     const [historyOpen, setHistoryOpen] = useState(false)
     const openThread = useCallback((id: string) => useForemanStore.getState().openThread(id), [])
-    const backToGeneral = useCallback(() => useForemanStore.getState().showGeneral(), [])
+    const leaveThread = useCallback(() => useForemanStore.getState().showGeneral(), [])
+    const conversations = useForemanTabs({ sessionId, inThread, draftId, blankDraft, threadOpenRequest, threads, untitled: tThreads('untitled'), onScreen: open === true && hasThreads && !onRoutines, onShowGeneral: leaveThread, onOpenThread: openThread })
+    const { showGeneral: backToGeneral, resume, dismissResume } = conversations
     const threadOnScreen = useMemo(() => {
         if (!inThread) return null
         const row = threads.find(thread => thread.id === sessionId)
@@ -492,12 +498,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col">
                     {pinned ? (
                         <ForemanTopBar
-                            sessionId={sessionId}
-                            inThread={inThread}
-                            blankDraft={blankDraft}
-                            threads={threads}
-                            onShowGeneral={backToGeneral}
-                            onOpenThread={openThread}
+                            conversations={conversations}
                             onNewTask={startNewChat}
                             active={open === true}
                             start={<DetailsToggle label={tView('card', foremanName)} avatar={<Orb size={24} facing="right" />} />}
@@ -557,6 +558,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                                 className="min-h-0 flex-1"
                             />
                         </PanelSteps>
+                        <ResumeChatPill resume={resume} onContinue={openThread} onDismiss={dismissResume} />
                         <ForemanComposerSlot
                             ref={setSlotEl}
                             framed={pinned}

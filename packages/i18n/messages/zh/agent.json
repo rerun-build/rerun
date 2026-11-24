@@ -81,6 +81,11 @@
         "newThread": "新对话",
         "general": "常规"
     },
+    "resumeChat": {
+        "continue": "<verb>继续</verb> <name>{title}</name>",
+        "dismiss": "忽略",
+        "untitled": "新对话"
+    },
     "sessionRename": {
         "rename": "重命名",
         "label": "对话名称",

@@ -81,6 +81,11 @@
         "newThread": "Nuevo hilo",
         "general": "General"
     },
+    "resumeChat": {
+        "continue": "<verb>Continuar</verb> <name>{title}</name>",
+        "dismiss": "Descartar",
+        "untitled": "Nueva conversación"
+    },
     "sessionRename": {
         "rename": "Renombrar",
         "label": "Nombre de la conversación",

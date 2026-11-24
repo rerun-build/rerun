@@ -1,6 +1,7 @@
+import { MAX_OPEN_CHATS } from '@rerun/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptGeneralId, loadFromStorage, MAX_REMEMBERED_TABS, remember, saveToStorage, type SessionTab } from '@/hooks/useSessionTabs'
+import { adoptGeneralId, loadFromStorage, remember, saveToStorage, type SessionTab } from '@/hooks/useSessionTabs'
 
 function tab(n: number): SessionTab {
     return { uid: `uid-${n}`, id: `session-${n}`, title: `Conversation ${n}` }
@@ -13,17 +14,17 @@ describe('remember', () => {
     })
 
     it('forgets the oldest tabs and follows the active one, appended last', () => {
-        const tabs = Array.from({ length: MAX_REMEMBERED_TABS + 3 }, (_, i) => tab(i))
+        const tabs = Array.from({ length: MAX_OPEN_CHATS + 3 }, (_, i) => tab(i))
         const kept = remember({ tabs, activeIndex: tabs.length - 1 })
-        expect(kept.tabs).toHaveLength(MAX_REMEMBERED_TABS)
+        expect(kept.tabs).toHaveLength(MAX_OPEN_CHATS)
         expect(kept.tabs[0]).toBe(tabs[3])
         expect(kept.tabs[kept.activeIndex]).toBe(tabs[tabs.length - 1])
     })
 
     it('keeps an old active tab ahead of the newest ones', () => {
-        const tabs = Array.from({ length: MAX_REMEMBERED_TABS + 3 }, (_, i) => tab(i))
+        const tabs = Array.from({ length: MAX_OPEN_CHATS + 3 }, (_, i) => tab(i))
         const kept = remember({ tabs, activeIndex: 1 })
-        expect(kept.tabs).toHaveLength(MAX_REMEMBERED_TABS)
+        expect(kept.tabs).toHaveLength(MAX_OPEN_CHATS)
         expect(kept.tabs[kept.activeIndex]).toBe(tabs[1])
         expect(kept.tabs.at(-1)).toBe(tabs[tabs.length - 1])
     })
@@ -39,14 +40,14 @@ describe('General', () => {
     const general: SessionTab = { uid: 'general:a1', id: null, title: 'General', kind: 'general' }
 
     it('keeps General in front of the threads the ceiling trims, and never counts it', () => {
-        const threads = Array.from({ length: MAX_REMEMBERED_TABS + 2 }, (_, i) => tab(i))
+        const threads = Array.from({ length: MAX_OPEN_CHATS + 2 }, (_, i) => tab(i))
         const kept = remember({ tabs: [general, ...threads], activeIndex: 0 })
         expect(kept.tabs[0]).toBe(general)
-        expect(kept.tabs).toHaveLength(MAX_REMEMBERED_TABS + 1)
+        expect(kept.tabs).toHaveLength(MAX_OPEN_CHATS + 1)
         expect(kept.tabs.at(-1)).toBe(threads.at(-1))
         expect(kept.activeIndex).toBe(0)
 
-        const full = { tabs: [general, ...threads.slice(0, MAX_REMEMBERED_TABS)], activeIndex: 3 }
+        const full = { tabs: [general, ...threads.slice(0, MAX_OPEN_CHATS)], activeIndex: 3 }
         expect(remember(full)).toBe(full)
     })
 

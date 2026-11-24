@@ -11,7 +11,7 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 type AgentSheetChatProps = {
     uid: string
@@ -32,9 +32,10 @@ type AgentSheetChatProps = {
     title?: string
     threads?: ThreadRow[]
     onOpenThread?: (sessionId: string, title: string) => void
+    aboveComposer?: ReactNode
 }
 
-export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread }: AgentSheetChatProps) {
+export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread, aboveComposer }: AgentSheetChatProps) {
     const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
@@ -112,6 +113,7 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending
             threads={threads}
             onOpenThread={onOpenThread}
             composerPlaceholder={composerPlaceholder}
+            aboveComposer={aboveComposer}
         />
     )
 }

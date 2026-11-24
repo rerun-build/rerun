@@ -81,6 +81,11 @@
         "newThread": "Yeni konu",
         "general": "Genel"
     },
+    "resumeChat": {
+        "continue": "<verb>Devam et</verb> <name>{title}</name>",
+        "dismiss": "Kapat",
+        "untitled": "Yeni sohbet"
+    },
     "sessionRename": {
         "rename": "Yeniden adlandır",
         "label": "Sohbet adı",

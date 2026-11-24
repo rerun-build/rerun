@@ -1,5 +1,6 @@
 'use client'
 
+import { MAX_OPEN_CHATS, type Arrival, type OpenChat } from '@rerun/contracts'
 import { nanoid } from 'nanoid'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { adoptDraftModel, draftConversationId, forgetDraftModel } from '@/hooks/useAgentModel'
@@ -15,14 +16,12 @@ export type SessionTab = {
 export type SessionTabsState = {
     tabs: SessionTab[]
     activeIndex: number
+    // Moves on each time the hub's list is applied: what the tabs became then is not the person's doing.
+    hubRevision?: number
 }
 
 export const GENERAL_TAB_TITLE = 'General'
 export const NEW_THREAD_TITLE = 'New conversation'
-
-// The threads opened in this panel, most recent last, each one a tab after General. Past this many
-// the oldest are forgotten, and reopened from the coworker's threads list.
-export const MAX_REMEMBERED_TABS = 8
 
 export const isGeneralTab = (tab: SessionTab | undefined): boolean => tab?.kind === 'general'
 
@@ -44,7 +43,7 @@ export function adoptGeneralId(state: SessionTabsState, sessionId: string): Sess
     if (general.id === sessionId && duplicates.length === 0) return state
     const tabs = [{ ...general, id: sessionId }, ...state.tabs.filter((_, index) => index > 0 && !duplicates.includes(index))]
     const activeIndex = duplicates.includes(state.activeIndex) ? 0 : state.activeIndex - duplicates.filter(index => index < state.activeIndex).length
-    return { tabs, activeIndex }
+    return { ...state, tabs, activeIndex }
 }
 
 // Keeps the newest threads, and always the active one: a list saved under the old, higher ceiling
@@ -52,12 +51,30 @@ export function adoptGeneralId(state: SessionTabsState, sessionId: string): Sess
 export function remember(state: SessionTabsState): SessionTabsState {
     const pinned = isGeneralTab(state.tabs[0]) ? state.tabs.slice(0, 1) : []
     const threads = state.tabs.slice(pinned.length)
-    if (threads.length <= MAX_REMEMBERED_TABS) return state
+    if (threads.length <= MAX_OPEN_CHATS) return state
     const active = state.tabs[state.activeIndex]
-    const newest = threads.slice(-MAX_REMEMBERED_TABS)
+    const newest = threads.slice(-MAX_OPEN_CHATS)
     const kept = !active || isGeneralTab(active) || newest.includes(active) ? newest : [active, ...newest.slice(1)]
     const tabs = [...pinned, ...kept]
-    return { tabs, activeIndex: Math.max(0, tabs.indexOf(active)) }
+    return { ...state, tabs, activeIndex: Math.max(0, tabs.indexOf(active)) }
+}
+
+// The threads the hub holds, in its order, then what only this device knows: a draft, and a thread
+// `keep` says the hub has not heard of yet.
+export function arriveTabs(state: SessionTabsState, arrival: Arrival, chats: OpenChat[], keep: (sessionId: string) => boolean): SessionTabsState {
+    const pinned = isGeneralTab(state.tabs[0]) ? state.tabs.slice(0, 1) : []
+    const threads = state.tabs.slice(pinned.length)
+    const titles = new Map(chats.map(chat => [chat.id, chat.title]))
+    const open = arrival.openIds.map((id): SessionTab => {
+        const tab = threads.find(thread => thread.id === id) ?? { uid: nanoid(), id, title: NEW_THREAD_TITLE }
+        const title = titles.get(id) ?? tab.title
+        return title === tab.title ? tab : { ...tab, title }
+    })
+    const local = threads.filter(thread => thread.id === null || (!arrival.openIds.includes(thread.id) && keep(thread.id)))
+    const tabs = [...pinned, ...open, ...local]
+    const stays = state.tabs[state.activeIndex]
+    const active = arrival.activeId === undefined ? tabs.findIndex(tab => tab.uid === stays?.uid) : arrival.activeId === null ? 0 : tabs.findIndex(tab => tab.id === arrival.activeId)
+    return { tabs, activeIndex: Math.max(0, active), hubRevision: (state.hubRevision ?? 0) + 1 }
 }
 
 function getStorageKey(agentId: string) {
@@ -97,16 +114,25 @@ export function saveToStorage(agentId: string, state: SessionTabsState) {
 
 const freshState = (agentId: string): SessionTabsState => ({ tabs: [generalTab(agentId)], activeIndex: 0 })
 
-export function useSessionTabs(agentId: string) {
-    const [state, setState] = useState<SessionTabsState>(() => loadFromStorage(agentId) ?? freshState(agentId))
+// `opensOnGeneral`: the chat always opens on General, whatever tab was on screen last.
+function initialState(agentId: string, opensOnGeneral: boolean): SessionTabsState {
+    const state = loadFromStorage(agentId) ?? freshState(agentId)
+    return opensOnGeneral ? { ...state, activeIndex: 0 } : state
+}
+
+export function useSessionTabs(agentId: string, { opensOnGeneral = false }: { opensOnGeneral?: boolean } = {}) {
+    const [state, setState] = useState<SessionTabsState>(() => initialState(agentId, opensOnGeneral))
 
     const stateRef = useRef(state)
     stateRef.current = state
 
+    const loadedFor = useRef(agentId)
     useEffect(() => {
+        if (loadedFor.current === agentId) return
+        loadedFor.current = agentId
         // The General id resolved so far belongs to the previous coworker: the new one resolves its own.
-        setState(loadFromStorage(agentId) ?? freshState(agentId))
-    }, [agentId])
+        setState(prev => ({ ...initialState(agentId, opensOnGeneral), hubRevision: (prev.hubRevision ?? 0) + 1 }))
+    }, [agentId, opensOnGeneral])
 
     useEffect(() => {
         saveToStorage(agentId, state)
@@ -123,7 +149,7 @@ export function useSessionTabs(agentId: string) {
         setState(prev => {
             const blank = prev.tabs.findIndex(isBlankThread)
             if (blank !== -1) return { ...prev, activeIndex: blank }
-            return remember({ tabs: [...prev.tabs, newTab()], activeIndex: prev.tabs.length })
+            return { ...prev, tabs: [...prev.tabs, newTab()], activeIndex: prev.tabs.length }
         })
     }, [agentId])
 
@@ -142,20 +168,19 @@ export function useSessionTabs(agentId: string) {
             } else if (index < prev.activeIndex) {
                 newActive = prev.activeIndex - 1
             }
-            return { tabs: newTabs, activeIndex: Math.max(0, newActive) }
+            return { ...prev, tabs: newTabs, activeIndex: Math.max(0, newActive) }
         })
     }, [])
 
-    const openTab = useCallback((sessionId: string, title: string) => {
+    // A draft takes no thread's place: what the ceiling closes here is closed on every device.
+    const openTab = useCallback((sessionId: string, title: string, { draft = false }: { draft?: boolean } = {}) => {
         setState(prev => {
             const existing = prev.tabs.findIndex(t => t.id === sessionId)
             if (existing !== -1) {
                 return { ...prev, activeIndex: existing }
             }
-            return remember({
-                tabs: [...prev.tabs, { uid: nanoid(), id: sessionId, title }],
-                activeIndex: prev.tabs.length,
-            })
+            const opened = { ...prev, tabs: [...prev.tabs, { uid: nanoid(), id: sessionId, title }], activeIndex: prev.tabs.length }
+            return draft ? opened : remember(opened)
         })
     }, [])
 
@@ -188,9 +213,14 @@ export function useSessionTabs(agentId: string) {
         [agentId]
     )
 
+    const applyArrival = useCallback((arrival: Arrival, chats: OpenChat[], keep: (sessionId: string) => boolean) => {
+        setState(prev => arriveTabs(prev, arrival, chats, keep))
+    }, [])
+
     return {
         tabs: state.tabs,
         activeIndex: state.activeIndex,
+        hubRevision: state.hubRevision ?? 0,
         activeSessionId,
         createNew,
         selectTab,
@@ -199,5 +229,8 @@ export function useSessionTabs(agentId: string) {
         updateTabByUid,
         updateTabTitle,
         setGeneralSessionId,
+        applyArrival,
     }
 }
+
+export type SessionTabs = ReturnType<typeof useSessionTabs>

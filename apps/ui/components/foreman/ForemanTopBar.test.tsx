@@ -24,6 +24,7 @@ vi.mock('next-intl',() => ({ useTranslations: () => (key: string) => key }))
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: { id: bar.workspaceId } }) }))
 
 const { ForemanTopBar } = await import('./ForemanTopBar')
+const { useForemanTabs } = await import('./useForemanTabs')
 const { selectForemanInThread, useForemanStore } = await import('@/stores/foreman.store')
 
 const written = new Set<string>()
@@ -31,17 +32,11 @@ const written = new Set<string>()
 function Harness() {
     const sessionId = useForemanStore(state => state.sessionId)
     const inThread = useForemanStore(selectForemanInThread)
-    const blankDraft = useForemanStore(state => state.draftId === state.sessionId) && !written.has(sessionId)
+    const draftId = useForemanStore(state => state.draftId)
+    const blankDraft = draftId === sessionId && !written.has(sessionId)
     const store = useForemanStore.getState()
-    return createElement(ForemanTopBar, {
-        sessionId,
-        inThread,
-        blankDraft,
-        threads: [],
-        onShowGeneral: store.showGeneral,
-        onOpenThread: store.openThread,
-        onNewTask: () => !blankDraft && store.newChat(),
-    })
+    const conversations = useForemanTabs({ sessionId, inThread, draftId, blankDraft, threadOpenRequest: 0, threads: [], untitled: 'untitled', onScreen: false, onShowGeneral: store.showGeneral, onOpenThread: store.openThread })
+    return createElement(ForemanTopBar, { conversations, onNewTask: () => !blankDraft && store.newChat() })
 }
 
 let container: HTMLDivElement

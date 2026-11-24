@@ -2,6 +2,7 @@
 
 import { renameSessionAction } from '@/app/api/_actions/session.actions'
 import { fetchGeneralSession } from '@/lib/chat/session-snapshot'
+import { useOpenChatsSync } from '@/hooks/useOpenChatsSync'
 import { useAgentSetup } from '@/hooks/useAgentSetup'
 import { useAgentThreads } from '@/hooks/useAgentThreads'
 import { invalidateAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
@@ -16,6 +17,7 @@ import { AgentSheetChat } from '@/components/agent/AgentSheetChat'
 import { AgentChatsList, type ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
 import { FloatingSurface } from '@/components/agent/sheet/floating'
 import { OpenChatsTabs } from '@/components/agent/sheet/OpenChatsTabs'
+import { ResumeChatPill } from '@/components/agent/sheet/ResumeChatPill'
 import { useSessionRename } from '@/components/agent/sheet/SessionRename'
 import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialog'
 import { Button } from '@/components/ui/button'
@@ -66,7 +68,9 @@ type AgentPanelChatProps = {
 export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, onOpenChats, chatsAttention = 0, presentation = 'floating', headerStart, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
     const t = useTranslations('agent.agentPanelChat')
     const tView = useTranslations('workspaceView.chat')
-    const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
+    const sessionTabs = useSessionTabs(agentId)
+    const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = sessionTabs
+    const { resume, dismiss: dismissResume, stay } = useOpenChatsSync({ agentId, storageKey: agentId, tabs: sessionTabs, onScreen: selected })
     const { threads, refresh: refreshThreads } = useAgentThreads(agentId)
 
     // General's row exists once someone has spoken in it; until then its tab opens on nothing, and
@@ -130,7 +134,13 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     // even when its tab was already open and scrolled up. Counted per conversation so a tab's count
     // never moves unless it is the one being opened.
     const [arrivals, setArrivals] = useState<Record<string, number>>({})
-    const arriveAt = useCallback((sessionId: string) => setArrivals(prev => ({ ...prev, [sessionId]: (prev[sessionId] ?? 0) + 1 })), [])
+    const arriveAt = useCallback(
+        (sessionId: string) => {
+            stay()
+            setArrivals(prev => ({ ...prev, [sessionId]: (prev[sessionId] ?? 0) + 1 }))
+        },
+        [stay]
+    )
 
     useEffect(() => {
         if (!pendingOpenSession || pendingOpenSession.agentId !== agentId) return
@@ -195,9 +205,10 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
 
     useEffect(() => {
         if (!newThreadRequest) return
+        stay()
         createNew()
         onNewThreadConsumed?.()
-    }, [newThreadRequest, createNew, onNewThreadConsumed])
+    }, [newThreadRequest, createNew, onNewThreadConsumed, stay])
 
     // Cmd/Ctrl+K : nouvelle conversation. Cmd/Ctrl+Backspace : fermer l'onglet actif, hors d'un champ
     // où le raccourci efface le mot précédent.
@@ -342,6 +353,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             title={tab.title}
                             threads={isGeneralTab(tab) ? threads : undefined}
                             onOpenThread={openTab}
+                            aboveComposer={active && <ResumeChatPill resume={resume} onContinue={openTab} onDismiss={dismissResume} />}
                         />
                     </div>
                 )

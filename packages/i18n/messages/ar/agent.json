@@ -81,6 +81,11 @@
         "newThread": "محادثة جديدة",
         "general": "عام"
     },
+    "resumeChat": {
+        "continue": "<verb>متابعة</verb> <name>{title}</name>",
+        "dismiss": "تجاهل",
+        "untitled": "محادثة جديدة"
+    },
     "sessionRename": {
         "rename": "إعادة تسمية",
         "label": "اسم المحادثة",

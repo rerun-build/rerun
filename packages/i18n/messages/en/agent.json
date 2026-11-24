@@ -63,6 +63,9 @@
         "modelSelector.refused": "Shown in the chat composer when the AI subscription refuses the picked model. {model} is a model name, {reason} an English reason from the provider.",
         "modelsShared.boxManageReason": "Tooltip on a disabled control: the person lacks the rights on the Box (group of coworkers) holding this coworker.",
         "openChatsTabs.general": "Tab of the coworker's main conversation, always open.",
+        "resumeChat.continue": "Button opening the conversation {title} picked last on another device. <verb> wraps the action, <name> the title.",
+        "resumeChat.dismiss": "Accessible name of the cross that hides the offer to open the conversation left on another device.",
+        "resumeChat.untitled": "Stands in for the title of a conversation that has none yet.",
         "planLimitHint.credit.usedUpOn": "Monthly Rerun credits are exhausted. {date} is a short date like \"Nov 12\".",
         "planLimitHint.paused": "Badge: the Rerun credits are paused.",
         "planLimitHint.windowResets": "{name} is a usage window (Session, Weekly...), {percent} like 42%, {when} a relative time like \"in 5m\" or a short date.",
@@ -173,6 +176,11 @@
         "closeTabMenu": "Close tab",
         "newThread": "New thread",
         "general": "General"
+    },
+    "resumeChat": {
+        "continue": "<verb>Continue</verb> <name>{title}</name>",
+        "dismiss": "Dismiss",
+        "untitled": "New conversation"
     },
     "sessionRename": {
         "rename": "Rename",
