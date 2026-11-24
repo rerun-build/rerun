@@ -38,9 +38,13 @@
             "failed": "Tu respuesta no se envió. Vuelve a intentarlo."
         },
         "markAll": {
-            "title": "¿Marcar todo como leído?",
-            "description": "{count, plural, one {# elemento saldrá} other {# elementos saldrán}} de esta lista. Las solicitudes que siguen esperando respuesta también se borran, sin responderse.",
-            "confirm": "Marcar todo como leído"
+            "label": "Marcar las notificaciones como leídas",
+            "markRead": "{count, plural, one {Marcar # notificación como leída} other {Marcar # notificaciones como leídas}}",
+            "nothingToMark": "No hay notificaciones que marcar",
+            "clearAll": "{count, plural, one {Borrar todo, incluida # solicitud} other {Borrar todo, incluidas # solicitudes}}",
+            "confirmTitle": "¿Borrar todas las notificaciones?",
+            "confirmDescription": "{count, plural, one {# solicitud pendiente sale de la bandeja de entrada sin respuesta, y tu coworker sigue esperando.} other {# solicitudes pendientes salen de la bandeja de entrada sin respuesta, y tus coworkers siguen esperando.}}",
+            "confirm": "Borrar todo"
         },
         "rowMenu": {
             "options": "Opciones de notificación",

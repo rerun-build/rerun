@@ -16,7 +16,6 @@ type UnseenRunsState = {
     hydrate: (workspaceId: number, userId: string) => void
     refresh: () => Promise<void>
     markSeen: (sessionIds: string[]) => Promise<void>
-    markAllSeen: () => Promise<void>
     view: (sessionId: string) => () => void
 }
 
@@ -80,7 +79,6 @@ export const useUnseenRunsStore = create<UnseenRunsState>()((set, get) => ({
         }
         set(state => ({ seenLocally: { ...state.seenLocally, ...Object.fromEntries(data.map(row => [row.session_id, new Date(row.seen_at).getTime()])) } }))
     },
-    markAllSeen: () => get().markSeen(get().runs.map(run => run.session_id)),
     view: sessionId => {
         set(state => ({ viewing: { ...state.viewing, [sessionId]: (state.viewing[sessionId] ?? 0) + 1 } }))
         void get().markSeen([sessionId])

@@ -38,9 +38,13 @@
             "failed": "Votre réponse n'est pas partie. Réessayez."
         },
         "markAll": {
-            "title": "Tout marquer comme lu ?",
-            "description": "{count, plural, one {# élément quittera} other {# éléments quitteront}} cette liste. Les demandes encore en attente de réponse sont aussi effacées, sans réponse.",
-            "confirm": "Tout marquer comme lu"
+            "label": "Marquer les notifications comme lues",
+            "markRead": "{count, plural, one {Marquer # notification comme lue} other {Marquer # notifications comme lues}}",
+            "nothingToMark": "Aucune notification à marquer",
+            "clearAll": "{count, plural, one {Tout effacer, y compris # demande} other {Tout effacer, y compris # demandes}}",
+            "confirmTitle": "Effacer toutes les notifications ?",
+            "confirmDescription": "{count, plural, one {# demande en attente quitte la boîte de réception sans réponse, et votre coworker attend toujours.} other {# demandes en attente quittent la boîte de réception sans réponse, et vos coworkers attendent toujours.}}",
+            "confirm": "Tout effacer"
         },
         "rowMenu": {
             "options": "Options de notification",

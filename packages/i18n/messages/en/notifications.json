@@ -9,7 +9,10 @@
         "settings.channels.toast.label": "A toast is the small popup notification in the app.",
         "inbox.rowMenu.unfollow": "Menu item on a coworker's inbox row.",
         "inbox.detail.seeAllCount": "Button that opens the whole inbox. {count} is how many items it holds.",
-        "inbox.markAll.description": "{count} is how many items the inbox holds.",
+        "inbox.markAll.label": "Label of the button that opens the menu below.",
+        "inbox.markAll.markRead": "Menu item: marks the notifications that only inform. {count} is how many of them there are.",
+        "inbox.markAll.clearAll": "Menu item: empties the inbox. {count} is how many requests still wait for an answer among what leaves.",
+        "inbox.markAll.confirmDescription": "{count} is how many requests still wait for an answer.",
         "inbox.detail.status.awaiting_ack": "Kind of a notification: something a coworker flagged that the user has not read yet.",
         "notices": "Notices the app sends the whole workspace (in-app and by email) about a paid app (LinkedIn Pro, WhatsApp Pro) or the credits. {provider} is LinkedIn or WhatsApp, {account} the name of the connected account. Settings → Apps names a screen of the app.",
         "notices.trialEndsSoon": "{endsAt} is the day the free slot ends.",
@@ -56,9 +59,13 @@
             "failed": "Your answer did not go through. Try again."
         },
         "markAll": {
-            "title": "Mark everything as read?",
-            "description": "{count, plural, one {# item} other {# items}} will leave this list. Requests still waiting on an answer are cleared too, without being answered.",
-            "confirm": "Mark all as read"
+            "label": "Mark notifications as read",
+            "markRead": "{count, plural, one {Mark # notification as read} other {Mark # notifications as read}}",
+            "nothingToMark": "No notification to mark",
+            "clearAll": "{count, plural, one {Clear all, including # request} other {Clear all, including # requests}}",
+            "confirmTitle": "Clear all notifications?",
+            "confirmDescription": "{count, plural, one {# waiting request leaves the inbox without an answer, and your coworker keeps waiting on it.} other {# waiting requests leave the inbox without an answer, and your coworkers keep waiting on them.}}",
+            "confirm": "Clear all"
         },
         "rowMenu": {
             "options": "Notification options",

@@ -38,9 +38,13 @@
             "failed": "Yanıtınız iletilemedi. Tekrar deneyin."
         },
         "markAll": {
-            "title": "Tümü okundu olarak işaretlensin mi?",
-            "description": "{count, plural, one {# öğe} other {# öğe}} bu listeden çıkacak. Yanıt bekleyen istekler de yanıtlanmadan temizlenir.",
-            "confirm": "Tümünü okundu işaretle"
+            "label": "Bildirimleri okundu işaretle",
+            "markRead": "{count, plural, one {# bildirimi okundu işaretle} other {# bildirimi okundu işaretle}}",
+            "nothingToMark": "İşaretlenecek bildirim yok",
+            "clearAll": "{count, plural, one {# istek dahil tümünü temizle} other {# istek dahil tümünü temizle}}",
+            "confirmTitle": "Tüm bildirimler temizlensin mi?",
+            "confirmDescription": "{count, plural, one {Bekleyen # istek yanıtlanmadan gelen kutusundan kalkar ve coworker'ınız yanıtı beklemeye devam eder.} other {Bekleyen # istek yanıtlanmadan gelen kutusundan kalkar ve coworker'larınız yanıtı beklemeye devam eder.}}",
+            "confirm": "Tümünü temizle"
         },
         "rowMenu": {
             "options": "Bildirim seçenekleri",

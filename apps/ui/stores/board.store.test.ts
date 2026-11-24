@@ -537,3 +537,35 @@ describe('requestCreation', () => {
         })
     })
 })
+
+describe('markSessionsHandled', () => {
+    const sessions = [
+        { id: 'error', agentId: 'a1', status: 'error' },
+        { id: 'approval', agentId: 'a1', status: 'awaiting_approval' },
+        { id: 'working', agentId: 'a1', status: 'working' },
+    ] as ReturnType<typeof useBoardStore.getState>['sessions']
+    const statusOf = (id: string) => useBoardStore.getState().sessions.find(s => s.id === id)?.status
+
+    beforeEach(() => useBoardStore.setState({ sessions }))
+
+    it('puts aside every session that waits, never one back at work', () => {
+        useBoardStore.getState().markSessionsHandled(['error', 'approval', 'working'])
+        expect([statusOf('error'), statusOf('approval'), statusOf('working')]).toEqual(['idle', 'idle', 'working'])
+    })
+
+    it('leaves a session whose status is not among the ones asked', () => {
+        useBoardStore.getState().markSessionsHandled(['error', 'approval'], new Set(['error', 'awaiting_ack']))
+        expect([statusOf('error'), statusOf('approval')]).toEqual(['idle', 'awaiting_approval'])
+        expect(JSON.stringify(db.fake.chains)).toContain('awaiting_ack')
+        expect(JSON.stringify(db.fake.chains)).not.toContain('awaiting_approval')
+    })
+
+    it('puts aside a conversation of the Chief of Staff, which is not on the board, under the same guard', () => {
+        useBoardStore.getState().markSessionsHandled(['approval', 'chief'], new Set(['error', 'awaiting_ack']))
+        const write = JSON.stringify(db.fake.chains)
+        expect(write).toContain('chief')
+        expect(write).toContain('awaiting_ack')
+        expect(write).not.toContain('"approval"')
+        expect(statusOf('approval')).toBe('awaiting_approval')
+    })
+})

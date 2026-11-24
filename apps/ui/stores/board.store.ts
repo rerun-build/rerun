@@ -161,7 +161,7 @@ type BoardState = {
     setAgentLook: (id: string, look: CoworkerLook | null) => void
     removeAgent: (id: string) => void
     setSessionStatus: (sessionId: string, status: SessionStatus) => void
-    markSessionsHandled: (sessionIds: string[]) => void
+    markSessionsHandled: (sessionIds: string[], statuses?: ReadonlySet<SessionStatus>) => void
     setLiveLinks: (links: AgentLink[]) => void
     setAgentOnline: (agentId: string, online: boolean) => void
     setAgentEngineBusy: (agentId: string, busy: boolean) => void
@@ -718,18 +718,20 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     // Le garde sur le statut reprend celui de clearSessionAlert : une session repartie en `working`
     // entre le rendu de la liste et la confirmation appartient à son run, pas à l'accusé de lecture.
-    markSessionsHandled: sessionIds => {
+    markSessionsHandled: (sessionIds, statuses = ATTENTION_STATUSES) => {
         const requested = new Set(sessionIds)
-        const targets = get().sessions.filter(s => requested.has(s.id) && ATTENTION_STATUSES.has(s.status))
-        if (targets.length === 0) return
-
-        const ids = targets.map(s => s.id)
+        const onBoard = get().sessions.filter(s => requested.has(s.id))
+        const targets = onBoard.filter(s => statuses.has(s.status))
+        const kept = new Set(onBoard.filter(s => !statuses.has(s.status)).map(s => s.id))
+        // The Chief of Staff's conversations are not among the board's: the guard in the query is the one that reads their status.
+        const ids = sessionIds.filter(id => !kept.has(id))
+        if (ids.length === 0) return
 
         supabase
             .from('sessions')
             .update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' })
             .in('id', ids)
-            .in('status', [...ATTENTION_STATUSES])
+            .in('status', [...statuses])
             .then()
 
         const cleared = new Set(ids)

@@ -4,8 +4,8 @@ import { InboxSurface as SharedInboxSurface, type InboxAnnouncement, type InboxE
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
-import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { InboxDetailCard } from '@/components/notifications/InboxDetailCard'
+import { InboxClearAllDialog, InboxMarkAllMenu } from '@/components/notifications/InboxMarkAllMenu'
 import { InboxPeekCard } from '@/components/notifications/InboxPeekCard'
 import { InboxRowMenu } from '@/components/notifications/InboxRowMenu'
 import { useInboxAnnouncer } from '@/hooks/useInboxAnnouncer'
@@ -20,7 +20,6 @@ import { reasonSentence } from '@/lib/notifications/reason-copy'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
-import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 
 // Declared once, outside the inbox: a component reference the memoised rows can compare, where a render function would hand them a new element on every pass.
@@ -39,7 +38,6 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
     const hydrated = useBoardStore(s => s.hydrated)
-    const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
     const { items, sessions } = useInboxItems()
     // Until its notification is read, a row may well be someone else's: it waits rather than flashes.
     const reasonsLoaded = sessions.every(s => s.reason !== undefined)
@@ -127,13 +125,6 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         board.focusAgentOnBoard(agentId, 'chat')
         board.setPendingOpenSession({ agentId, sessionId, runId: peek.engineRunId })
     }, [])
-    const markAllRead = useCallback(() => {
-        const waiting = items.filter(i => !i.sessionIds)
-        markSessionsHandled(waiting.map(i => i.id))
-        // The Chief of Staff's conversations are not the board's: each is put aside as its own row is.
-        for (const item of waiting) if (item.agentId === FOREMAN_AGENT_ID) markInboxItemRead(item)
-        void useUnseenRunsStore.getState().markAllSeen()
-    }, [markSessionsHandled, items])
     const openSettings = useCallback(() => {
         setView(null)
         useNotificationsStore.getState().openNotifications()
@@ -205,7 +196,6 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
             pulse={pulse}
             onOpenItem={openItem}
             onMarkRead={markInboxItemRead}
-            onMarkAllRead={markAllRead}
             onOpenSettings={openSettings}
             announcement={announcement}
             onAnnouncementClick={openAnnouncement}
@@ -225,23 +215,20 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     )
 }
 
-/** The shared surface, with « Mark all as read » asking first: the app's confirm dialog cannot live in `@rerun/ui`. */
-export function InboxSurface({ items, onMarkAllRead, keepOpen = false, ...props }: InboxSurfaceProps<InboxItem>) {
-    const t = useTranslations('notifications.inbox.markAll')
-    const [confirmOpen, setConfirmOpen] = useState(false)
+/** The shared surface, with the app's menu behind the double check: menus and confirm dialogs cannot live in `@rerun/ui`. */
+export function InboxSurface({ items, keepOpen = false, ...props }: Omit<InboxSurfaceProps<InboxItem>, 'onMarkAllRead' | 'markAllControl'>) {
+    const [markAllMenuOpen, setMarkAllMenuOpen] = useState(false)
+    const [clearing, setClearing] = useState<InboxItem[] | null>(null)
 
     return (
         <>
-            <SharedInboxSurface {...props} items={items} keepOpen={keepOpen || confirmOpen} onMarkAllRead={() => setConfirmOpen(true)} />
-            <ConfirmDialog
-                open={confirmOpen}
-                onOpenChange={setConfirmOpen}
-                title={t('title')}
-                description={t('description', { count: items.length })}
-                confirmLabel={t('confirm')}
-                confirmVariant="default"
-                onConfirm={onMarkAllRead}
+            <SharedInboxSurface
+                {...props}
+                items={items}
+                keepOpen={keepOpen || markAllMenuOpen || clearing !== null}
+                markAllControl={<InboxMarkAllMenu items={items} onOpenChange={setMarkAllMenuOpen} onClearAll={setClearing} />}
             />
+            <InboxClearAllDialog items={clearing} onClose={() => setClearing(null)} />
         </>
     )
 }

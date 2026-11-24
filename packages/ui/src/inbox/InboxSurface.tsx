@@ -1,5 +1,6 @@
 'use client'
 
+import { NEEDS_YOU_STATUSES } from '@rerun/contracts'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { memo, startTransition, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ComponentProps, type ComponentType, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
@@ -41,10 +42,10 @@ export type InboxAnnouncement = {
     loud: boolean
 }
 
-type InboxSection = { key: 'needsYou' | 'headsUps' | 'errors' | 'done'; statuses: string[] }
+type InboxSection = { key: 'needsYou' | 'headsUps' | 'errors' | 'done'; statuses: readonly string[] }
 
 const SECTIONS: InboxSection[] = [
-    { key: 'needsYou', statuses: ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] },
+    { key: 'needsYou', statuses: NEEDS_YOU_STATUSES },
     { key: 'headsUps', statuses: ['awaiting_ack'] },
     { key: 'errors', statuses: ['error'] },
     { key: 'done', statuses: ['done'] },
@@ -83,7 +84,9 @@ export type InboxSurfaceProps<T extends InboxEntry> = {
     onOpenChange: (open: boolean) => void
     onOpenItem: (item: T) => void
     onMarkRead: (item: T) => void
-    onMarkAllRead: () => void
+    onMarkAllRead?: () => void
+    /** In place of the « Mark all as read » button while there is something to mark: a menu the app brings. */
+    markAllControl?: ReactNode
     /** False retire le bouton Préférences : une vitrine n'a pas de réglages à ouvrir, et le laisser
      *  désactivé ne fait qu'ajouter un libellé éteint. */
     showSettings?: boolean
@@ -130,6 +133,7 @@ export function InboxSurface<T extends InboxEntry>({
     onOpenItem,
     onMarkRead,
     onMarkAllRead,
+    markAllControl,
     onOpenSettings,
     showSettings = true,
     settingsDisabledReason,
@@ -226,7 +230,8 @@ export function InboxSurface<T extends InboxEntry>({
             onOpenChange(false)
         }
         const onKeyDown = (event: globalThis.KeyboardEvent) => {
-            if (event.key !== 'Escape') return
+            // Already spent on closing a menu, a dialog or a tooltip on top of the card.
+            if (event.key !== 'Escape' || event.defaultPrevented) return
             refocusPillRef.current = true
             onOpenChange(false)
         }
@@ -373,11 +378,13 @@ export function InboxSurface<T extends InboxEntry>({
                             </Button>
                         </TooltipDisabledReason>
                     ) : (
-                        <TooltipLabeled label={t('inbox.markAllRead')}>
-                            <Button size="icon-sm" variant="outline" aria-label={t('inbox.markAllRead')} onClick={onMarkAllRead}>
-                                <CheckCheckIcon className="size-3.5" />
-                            </Button>
-                        </TooltipLabeled>
+                        (markAllControl ?? (
+                            <TooltipLabeled label={t('inbox.markAllRead')}>
+                                <Button size="icon-sm" variant="outline" aria-label={t('inbox.markAllRead')} onClick={onMarkAllRead}>
+                                    <CheckCheckIcon className="size-3.5" />
+                                </Button>
+                            </TooltipLabeled>
+                        ))
                     )}
                 </div>
             </div>

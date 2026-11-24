@@ -16,6 +16,16 @@ export function needsHuman(status: SessionStatus): boolean {
     return attentionStatuses.has(status)
 }
 
+// The requests a coworker is stopped on, as opposed to the news it only leaves behind.
+export const NEEDS_YOU_STATUSES = ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] as const satisfies readonly SessionStatus[]
+
+const needsYouStatuses: ReadonlySet<string> = new Set(NEEDS_YOU_STATUSES)
+
+// Takes any status: an inbox row also carries `done`, which no session has.
+export function needsYou(status: string): boolean {
+    return needsYouStatuses.has(status)
+}
+
 export const sessionOutcomeSchema = z.enum(['done', 'nothing', 'failed'])
 export type SessionOutcome = z.infer<typeof sessionOutcomeSchema>
 

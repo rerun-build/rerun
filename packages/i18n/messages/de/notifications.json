@@ -38,9 +38,13 @@
             "failed": "Deine Antwort wurde nicht gesendet. Versuch es noch einmal."
         },
         "markAll": {
-            "title": "Alles als gelesen markieren?",
-            "description": "{count, plural, one {# Eintrag verlässt} other {# Einträge verlassen}} diese Liste. Anfragen, die noch auf eine Antwort warten, werden ebenfalls entfernt, ohne beantwortet zu werden.",
-            "confirm": "Alle als gelesen markieren"
+            "label": "Benachrichtigungen als gelesen markieren",
+            "markRead": "{count, plural, one {# Benachrichtigung als gelesen markieren} other {# Benachrichtigungen als gelesen markieren}}",
+            "nothingToMark": "Keine Benachrichtigung zu markieren",
+            "clearAll": "{count, plural, one {Alle entfernen, auch # Anfrage} other {Alle entfernen, auch # Anfragen}}",
+            "confirmTitle": "Alle Benachrichtigungen entfernen?",
+            "confirmDescription": "{count, plural, one {# wartende Anfrage verlässt den Posteingang ohne Antwort, und dein Coworker wartet weiter darauf.} other {# wartende Anfragen verlassen den Posteingang ohne Antwort, und deine Coworker warten weiter darauf.}}",
+            "confirm": "Alle entfernen"
         },
         "rowMenu": {
             "options": "Benachrichtigungsoptionen",

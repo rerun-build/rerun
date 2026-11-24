@@ -38,9 +38,13 @@
             "failed": "Sua resposta não foi enviada. Tente de novo."
         },
         "markAll": {
-            "title": "Marcar tudo como lido?",
-            "description": "{count, plural, one {# item vai sair} other {# itens vão sair}} desta lista. Pedidos ainda aguardando resposta também são removidos, sem resposta.",
-            "confirm": "Marcar tudo como lido"
+            "label": "Marcar notificações como lidas",
+            "markRead": "{count, plural, one {Marcar # notificação como lida} other {Marcar # notificações como lidas}}",
+            "nothingToMark": "Nenhuma notificação para marcar",
+            "clearAll": "{count, plural, one {Limpar tudo, incluindo # pedido} other {Limpar tudo, incluindo # pedidos}}",
+            "confirmTitle": "Limpar todas as notificações?",
+            "confirmDescription": "{count, plural, one {# pedido pendente sai da caixa de entrada sem resposta, e seu coworker continua esperando.} other {# pedidos pendentes saem da caixa de entrada sem resposta, e seus coworkers continuam esperando.}}",
+            "confirm": "Limpar tudo"
         },
         "rowMenu": {
             "options": "Opções de notificação",
