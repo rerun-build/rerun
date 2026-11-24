@@ -58,7 +58,7 @@ export function ExpertImageFields({
                             <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-card to-transparent" />
                             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-card to-transparent" />
                             {badge && (
-                                <div className="absolute top-3 right-3">
+                                <div className="absolute top-3 end-3">
                                     <Badge tone={badgeTone(badge)} size="sm">
                                         {labels.badge(badge)}
                                     </Badge>
@@ -112,7 +112,7 @@ export function ExpertImageFields({
                                                 onAvatarChange('')
                                                 setAvatarOpen(false)
                                             }}
-                                            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                         >
                                             <Trash2 className="size-4" />
                                             {t('experts.images.remove')}

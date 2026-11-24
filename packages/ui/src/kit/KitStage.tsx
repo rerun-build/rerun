@@ -83,7 +83,7 @@ export function KitStage({
                 className={cn('fixed inset-0 z-9999 flex items-center justify-center overflow-auto p-10', resolvedBackdrop === 'checker' ? 'bg-background' : backdropClass(resolvedBackdrop))}
             >
                 {body}
-                <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
+                <div className="fixed top-4 end-4 z-10 flex items-center gap-2">
                     {replay && <StageButton icon={<RefreshCw className="size-3" />} label="Replay" onClick={() => setRun(value => value + 1)} />}
                     <StageButton icon={<X className="size-3" />} label="Close" onClick={() => controls.setSolo(null)} />
                 </div>
@@ -99,7 +99,7 @@ export function KitStage({
                 className={cn('group/stage relative flex scroll-mt-24 items-center justify-center overflow-hidden rounded-xl border border-border', backdropClass(resolvedBackdrop), bare ? '' : 'p-6', className)}
             >
                 {body}
-                <div className="absolute top-2 right-2 z-10 flex items-center gap-1 opacity-0 transition-opacity group-hover/stage:opacity-100 focus-within:opacity-100">
+                <div className="absolute top-2 end-2 z-10 flex items-center gap-1 opacity-0 transition-opacity group-hover/stage:opacity-100 focus-within:opacity-100">
                     {replay && <StageButton icon={<RefreshCw className="size-3" />} label="Replay" onClick={() => setRun(value => value + 1)} />}
                     <StageButton icon={<Maximize2Icon className="size-3" />} label="Solo" onClick={() => controls.setSolo(id)} />
                 </div>

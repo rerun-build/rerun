@@ -74,7 +74,7 @@ function ReasoningEffortMenu({ modelName, effort, onPick }: { modelName: string;
                             setOpen(false)
                             onPick(level)
                         }}
-                        className="flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
+                        className="flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
                     >
                         <span className="flex-1">{t(EFFORT_KEY[level ?? 'default'])}</span>
                         <span className="text-xs text-muted-foreground">{t(EFFORT_HINT_KEY[level ?? 'default'])}</span>

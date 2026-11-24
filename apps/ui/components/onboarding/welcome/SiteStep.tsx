@@ -52,7 +52,7 @@ export function SiteStep({ firstName, value, onChange, onRead, onSubmit, onSkip,
                     submit()
                 }}
             >
-                <span className="pointer-events-none absolute top-1/2 left-3.5 z-10 flex -translate-y-1/2 items-center">
+                <span className="pointer-events-none absolute top-1/2 start-3.5 z-10 flex -translate-y-1/2 items-center">
                     <SiteMark domain={domain} />
                 </span>
                 <Input
@@ -66,9 +66,9 @@ export function SiteStep({ firstName, value, onChange, onRead, onSubmit, onSkip,
                     value={value}
                     placeholder={t('placeholder')}
                     onChange={event => onChange(event.target.value)}
-                    className={cn('h-12 pr-14 pl-11 text-base')}
+                    className={cn('h-12 pe-14 ps-11 text-base')}
                 />
-                <div className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center">
+                <div className="absolute top-1/2 end-1.5 flex -translate-y-1/2 items-center">
                     <Button type="submit" size="icon-lg" disabled={!readable || saving !== null} loading={saving === 'site'} aria-label={t('continue')}>
                         <ArrowRightIcon />
                     </Button>

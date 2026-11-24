@@ -46,7 +46,7 @@ export function FieldSourceDetails({ cell }: { cell: CellSource }) {
     )
 }
 
-const FIELD_ROW = 'flex min-h-11 w-full items-center gap-3 border-b border-border px-3 py-2 text-left last:border-b-0'
+const FIELD_ROW = 'flex min-h-11 w-full items-center gap-3 border-b border-border px-3 py-2 text-start last:border-b-0'
 
 function FieldRowContent({ field }: { field: LeadField }) {
     const t = useTranslations('data.sources')
@@ -122,7 +122,7 @@ export function LeadSourcesSheet({ row, onOpenChange, columns, sources, tones }:
             <SheetContent className="gap-0 p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-md">
                 {row && (
                     <>
-                        <SheetHeader className="shrink-0 pr-12">
+                        <SheetHeader className="shrink-0 pe-12">
                             <SheetTitle className="truncate">{rowTitle(row, columns, t('row'))}</SheetTitle>
                             <SheetDescription asChild>
                                 <div className="flex min-h-5 items-center">{sources && <SourceFacepile sources={sources.sources} size="sm" max={6} />}</div>

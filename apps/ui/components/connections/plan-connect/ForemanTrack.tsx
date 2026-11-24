@@ -34,7 +34,7 @@ export function ForemanTrack({ steps, at, done, orb, remark, thinking = false }:
         </motion.span>
     )
     const bubble = (
-        <motion.p key={typeof remark === 'string' ? remark : `step-${at}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex w-fit items-center gap-2 rounded-2xl rounded-tl-md bg-muted px-3 py-1.5 text-xs">
+        <motion.p key={typeof remark === 'string' ? remark : `step-${at}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex w-fit items-center gap-2 rounded-2xl rounded-ss-md bg-muted px-3 py-1.5 text-xs">
             {remark}
             {thinking && <TypingDots className="text-muted-foreground" />}
         </motion.p>
@@ -57,7 +57,7 @@ function Row({ index, status, here, cursor, bubble, step, last }: RowProps) {
     const muted = status === 'next'
     return (
         <li className="relative flex gap-3 pb-8 last:pb-0">
-            {!last && <span className={cn('absolute -bottom-2 left-4 w-0.5 -translate-x-1/2 rounded-full transition-colors duration-500', here ? 'top-8' : 'top-7', status === 'done' ? 'bg-brand dark:bg-[color-mix(in_oklab,var(--brand),white_25%)]' : 'bg-border')} />}
+            {!last && <span className={cn('absolute -bottom-2 start-4 w-0.5 -translate-x-1/2 rounded-full transition-colors duration-500', here ? 'top-8' : 'top-7', status === 'done' ? 'bg-brand dark:bg-[color-mix(in_oklab,var(--brand),white_25%)]' : 'bg-border')} />}
             <span className="flex w-8 shrink-0 justify-center">
                 {here ? (
                     cursor

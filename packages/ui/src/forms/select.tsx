@@ -60,7 +60,7 @@ export function Select({ options, value, onChange, label, optional, helperText, 
                                         type="button"
                                         onClick={() => handleSelect(option)}
                                         className={cn(
-                                            'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors',
+                                            'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-start text-sm transition-colors',
                                             selected ? 'text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                                         )}
                                     >

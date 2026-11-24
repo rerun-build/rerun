@@ -10,7 +10,7 @@ export const DOCUMENT_CLASS = [
     '[&_h1]:mb-4 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-balance max-md:[&_h1]:text-2xl',
     '[&_h2]:mt-8 [&_h2]:text-xl',
     '[&_table]:mt-4 [&_table]:w-full [&_table]:border-separate [&_table]:border-spacing-0 [&_table]:overflow-hidden [&_table]:rounded-lg [&_table]:border [&_table]:text-sm',
-    '[&_thead]:bg-muted/50 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-medium [&_td]:border-t [&_td]:px-3 [&_td]:py-2 [&_td]:break-words',
+    '[&_thead]:bg-muted/50 [&_th]:px-3 [&_th]:py-2 [&_th]:text-start [&_th]:font-medium [&_td]:border-t [&_td]:px-3 [&_td]:py-2 [&_td]:break-words',
     '[&_img]:mt-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-md',
     '[&_pre]:bg-muted/60',
 ].join(' ')

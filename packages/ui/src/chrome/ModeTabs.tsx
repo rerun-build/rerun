@@ -23,7 +23,7 @@ export function ModeTabs<M extends string>({ tabs, activeMode, onSelect, classNa
                         {active && <BorderBeam animated pattern="arcs" tone="white" glow duration={11} />}
                         <Icon className="size-4 shrink-0" />
                         <span className={cn('grid overflow-hidden transition-[grid-template-columns] duration-300 ease-out', active ? 'grid-cols-[1fr]' : 'grid-cols-[0fr] group-hover:grid-cols-[1fr]')}>
-                            <span className="min-w-0 overflow-hidden whitespace-nowrap pl-1.5">{label}</span>
+                            <span className="min-w-0 overflow-hidden whitespace-nowrap ps-1.5">{label}</span>
                         </span>
                     </button>
                 )

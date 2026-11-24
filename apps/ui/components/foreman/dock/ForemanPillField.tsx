@@ -86,7 +86,7 @@ export function ForemanPillField({ inputRef, mod, draft, focused, hidden = false
                     className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />
                 {!writing && (
-                    <span aria-hidden className="flex shrink-0 items-center gap-1 pr-1">
+                    <span aria-hidden className="flex shrink-0 items-center gap-1 pe-1">
                         <Kbd className={KEY}>{mod}K</Kbd>
                         <Kbd className={KEY}>
                             <MicIcon className="size-2.5" />

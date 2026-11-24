@@ -30,7 +30,7 @@ function WorkspaceFileLink({ children, className, path }: WorkspaceFileLinkProps
     return (
         <button
             type="button"
-            className={cn('wrap-anywhere appearance-none text-left font-medium text-primary underline', className)}
+            className={cn('wrap-anywhere appearance-none text-start font-medium text-primary underline', className)}
             data-streamdown="link"
             title={t('openFile', { path })}
             onClick={() => openAgentFile(agentId, path)}

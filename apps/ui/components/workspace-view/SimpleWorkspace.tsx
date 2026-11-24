@@ -163,7 +163,7 @@ export function SimpleWorkspace() {
             {workspace?.is_sandbox && <Stripes fade="edges" edgeWidth={104} color="rgb(245 158 11 / 0.16)" />}
             {/* Its widths are the list's track in BoardChatSplit, where the Chief of Staff takes the rest. */}
             {/* With the Chief of Staff in the middle the card is the list's width: its own edge is the line. */}
-            <div ref={listRef} className={cn('relative h-full w-[var(--simple-list-w,18rem)] shrink-0 bg-sidebar', !foremanInCenter && 'border-r border-border')}>
+            <div ref={listRef} className={cn('relative h-full w-[var(--simple-list-w,18rem)] shrink-0 bg-sidebar', !foremanInCenter && 'border-e border-border')}>
                 <SimpleSidebar onOpenCoworker={openCoworker} actionsFor={actionsFor} />
                 <SidePanelResizeHandle panelRef={listRef} config={SIMPLE_LIST_WIDTH} widthVar="--simple-list-w" edge="right" look="line" varTarget={splitOf} />
             </div>

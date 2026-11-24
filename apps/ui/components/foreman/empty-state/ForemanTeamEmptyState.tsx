@@ -48,7 +48,7 @@ export function ForemanTeamEmptyState({ model, now, onSend, onPrefill, orbPaused
                 {model.subtitle && <p className={cn('text-sm text-balance text-muted-foreground', SHORT_HIDDEN)}>{model.subtitle}</p>}
             </div>
             {model.pulse && <Pulse pulse={model.pulse} now={now} />}
-            <div className="flex w-full max-w-sm flex-col gap-2 text-left">
+            <div className="flex w-full max-w-sm flex-col gap-2 text-start">
                 {model.rows.map(row => (
                     <PanelRow key={row.id} onClick={() => run(row.action)} leading={<RowLeading row={row} />} title={row.title} description={<span className={SHORT_HIDDEN}>{row.description}</span>} className={cn('py-2.5', SHORT_ROW)} />
                 ))}

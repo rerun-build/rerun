@@ -48,7 +48,7 @@ function Row({
             type="button"
             onClick={onSelect}
             aria-current={selected ? 'true' : undefined}
-            className={cn('flex h-11 w-full items-center gap-3 px-4 text-left transition-colors hover:bg-accent', selected && 'bg-accent')}
+            className={cn('flex h-11 w-full items-center gap-3 px-4 text-start transition-colors hover:bg-accent', selected && 'bg-accent')}
         >
             <RowIcon className="size-4 text-muted-foreground" />
             <span className="min-w-0 flex-1 truncate text-xs font-medium">{label}</span>

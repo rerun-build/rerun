@@ -130,7 +130,7 @@ function ThreadTab({ tab, active, state, onSelect, onClose, onRename, renamable 
         <div
             data-active={active}
             className={cn(
-                'group relative flex h-7 shrink-0 items-center gap-1 rounded-md pl-2.5 pr-1 text-xs transition-colors',
+                'group relative flex h-7 shrink-0 items-center gap-1 rounded-md ps-2.5 pe-1 text-xs transition-colors',
                 active ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )}
         >

@@ -61,7 +61,7 @@ function ChangelogSteps() {
                     <a href={landingUrl('/changelog')} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
                         {t('seeAll')}
                     </a>
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="ms-auto flex items-center gap-2">
                         {!isFirst && (
                             <Button variant="ghost" onClick={back}>
                                 {t('back')}

@@ -17,7 +17,7 @@ export function TableLayout({ card, context, mobileColumns }: { card: TableCard;
                 <TableHeader>
                     <TableRow className="border-border hover:bg-transparent">
                         {card.columns.map((column, i) => (
-                            <TableHead key={column} className={cn('h-8 whitespace-nowrap text-[11px] text-muted-foreground', isNumericFormat(formats[column]) && 'text-right', hidden(i) && 'max-sm:hidden')}>
+                            <TableHead key={column} className={cn('h-8 whitespace-nowrap text-[11px] text-muted-foreground', isNumericFormat(formats[column]) && 'text-end', hidden(i) && 'max-sm:hidden')}>
                                 {column}
                             </TableHead>
                         ))}
@@ -29,7 +29,7 @@ export function TableLayout({ card, context, mobileColumns }: { card: TableCard;
                             {card.columns.map((column, j) => (
                                 <TableCell
                                     key={column}
-                                    className={cn('max-w-48 truncate py-1.5 text-[12px]', isNumericFormat(formats[column]) && 'text-right', formats[column] === 'progress' && 'w-28', hidden(j) && 'max-sm:hidden')}
+                                    className={cn('max-w-48 truncate py-1.5 text-[12px]', isNumericFormat(formats[column]) && 'text-end', formats[column] === 'progress' && 'w-28', hidden(j) && 'max-sm:hidden')}
                                 >
                                     {formats[column] ? formatCell(row[column], formats[column], context) : plainCell(row[column])}
                                 </TableCell>

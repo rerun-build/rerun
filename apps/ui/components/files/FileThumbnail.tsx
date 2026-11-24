@@ -18,7 +18,7 @@ type FileThumbnailProps = {
 }
 
 function SheetIcon({ icon: Glyph }: { icon: LucideIcon }) {
-    return <Glyph className="absolute left-[24.5px] top-[26px] size-4" style={{ color: GLYPH_INK_MUTED }} />
+    return <Glyph className="absolute start-[24.5px] top-[26px] size-4" style={{ color: GLYPH_INK_MUTED }} />
 }
 
 export function FileThumbnail({ entry, path, rawUrl, textHead, onRequestText }: FileThumbnailProps) {
@@ -65,7 +65,7 @@ export function FileThumbnail({ entry, path, rawUrl, textHead, onRequestText }: 
             <FileSheetGlyph badge={textHead ? undefined : badge}>
                 {textHead ? (
                     <pre
-                        className="absolute left-[19px] top-[22px] h-[29px] w-[27px] overflow-hidden text-[4px] leading-[5.5px] font-mono whitespace-pre"
+                        className="absolute start-[19px] top-[22px] h-[29px] w-[27px] overflow-hidden text-[4px] leading-[5.5px] font-mono whitespace-pre"
                         style={{ color: GLYPH_INK_MUTED }}
                     >
                         {textHead}

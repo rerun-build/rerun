@@ -44,7 +44,7 @@ export function ProposalCard({ proposal, busy, onAccept, onDismiss, onOpenPage }
                             {open ? t('hideDetails') : t('moreDetails')}
                             <ChevronDownIcon className={cn('transition-transform duration-200', open && 'rotate-180')} />
                         </Button>
-                        <div className="ml-auto flex items-center gap-1.5">
+                        <div className="ms-auto flex items-center gap-1.5">
                             <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={onDismiss} disabled={busy}>
                                 {t('dismiss')}
                             </Button>

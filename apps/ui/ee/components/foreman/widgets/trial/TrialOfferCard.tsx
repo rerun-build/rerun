@@ -95,7 +95,7 @@ export function TrialOfferCard({ offer, priceArm, submitting, error, onStart, su
                 </dl>
 
                 {trial ? (
-                    <ol className="relative before:absolute before:bottom-4 before:left-4 before:top-4 before:w-px before:bg-border">
+                    <ol className="relative before:absolute before:bottom-4 before:start-4 before:top-4 before:w-px before:bg-border">
                         <TimelineStep icon={CircleCheckIcon} title={t('today')} description={subject ? t('todayInstall', { subject }) : t('todayTeam')} />
                         <TimelineStep icon={CalendarClockIcon} title={reminderDate} description={t('reminder')} />
                         <TimelineStep

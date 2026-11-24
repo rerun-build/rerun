@@ -171,17 +171,17 @@ export function AgentPanel() {
                 <>
                     <TopVeil tall={!locked} />
                     {!locked && (
-                        <div className="absolute left-3 top-3 z-50">
+                        <div className="absolute start-3 top-3 z-50">
                             <FloatingPill label={t('agentPanel.threads')} onClick={() => toggleSurface({ kind: 'chats', filter: 'all' })} active={shownSurface?.kind === 'chats'} className="w-10 justify-center px-0">
                                 <span className="relative flex">
                                     <MessageCircle className="size-4 text-muted-foreground" />
-                                    {attentionCount > 0 && <span className="absolute -right-1 -top-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+                                    {attentionCount > 0 && <span className="absolute -end-1 -top-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
                                 </span>
                             </FloatingPill>
                         </div>
                     )}
                     <div className="pointer-events-none absolute inset-x-16 top-3 z-50 flex justify-center">
-                        <FloatingPill label={t('agentPanel.coworkerCard')} onClick={() => toggleSurface({ kind: 'card' })} active={shownSurface?.kind === 'card'} className="pointer-events-auto relative min-w-0 pl-1.5">
+                        <FloatingPill label={t('agentPanel.coworkerCard')} onClick={() => toggleSurface({ kind: 'card' })} active={shownSurface?.kind === 'card'} className="pointer-events-auto relative min-w-0 ps-1.5">
                             <BorderBeam pattern="arcs" tone="neutral" angle={243} outset={1} className="opacity-50" />
                             <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
                                 <AgentBuddy agentId={agent.id} mood={buddyMood} size={20} facing="right" />
@@ -190,7 +190,7 @@ export function AgentPanel() {
                             <ChevronDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
                         </FloatingPill>
                     </div>
-                    <div className="absolute right-3 top-3 z-50">
+                    <div className="absolute end-3 top-3 z-50">
                         <Button aria-label={t('panelsShared.closePanel')} variant="ghost" size="icon-sm" onClick={closePanel} className="bg-background/85 backdrop-blur-xl">
                             <XIcon className="size-4" />
                         </Button>

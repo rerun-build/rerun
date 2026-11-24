@@ -41,7 +41,7 @@ export function TemplateSectionHeading({ title, subtitle, icon, onSelect, onBack
                         animates through `grid-template-columns`, the one way to go from nothing to
                         content width in CSS, same as the mode tabs. */}
                     <span aria-hidden className="grid grid-cols-[0fr] overflow-hidden transition-[grid-template-columns] duration-200 ease-out group-focus-within:grid-cols-[1fr] group-hover:grid-cols-[1fr]">
-                        <span className="min-w-0 overflow-hidden pl-1">
+                        <span className="min-w-0 overflow-hidden ps-1">
                             {/* `translate`, not `transform`: Tailwind v4 compiles `-translate-x-1` to the
                                 `translate` property, so a transition listed on `transform` never fires and
                                 the chevron pops in instead of sliding. */}

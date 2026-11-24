@@ -427,7 +427,7 @@ export function ChatComposer({
                             <PromptInputTextarea
                                 ref={inputRef}
                                 placeholder={placeholder ?? (commands && !commands.triggers.includes('/') ? t('placeholderNoSkill') : t('placeholder'))}
-                                className={cn(expandable && 'pr-9', links.hasTokens && 'text-transparent caret-foreground [scrollbar-gutter:stable]')}
+                                className={cn(expandable && 'pe-9', links.hasTokens && 'text-transparent caret-foreground [scrollbar-gutter:stable]')}
                                 {...textareaProps}
                                 onChange={e => {
                                     textareaProps?.onChange?.(e)
@@ -451,7 +451,7 @@ export function ChatComposer({
                                 <ComposerLinkMirror
                                     ref={node => links.attachMirror(node, inputRef.current)}
                                     segments={links.segments}
-                                    className={cn('px-2.5 py-2 text-base text-foreground md:text-sm [scrollbar-gutter:stable]', expandable && 'pr-9')}
+                                    className={cn('px-2.5 py-2 text-base text-foreground md:text-sm [scrollbar-gutter:stable]', expandable && 'pe-9')}
                                     onPlaceCaret={offset => links.placeCaret(inputRef.current, offset)}
                                     onUnlink={(range, url) => links.unlink(inputRef.current, range, url)}
                                 />
@@ -473,7 +473,7 @@ export function ChatComposer({
                                     }}
                                     aria-label={t('openEditor')}
                                     title={t('openEditor')}
-                                    className="absolute top-1.5 right-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
+                                    className="absolute top-1.5 end-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                                 >
                                     <Maximize2Icon className="size-3.5" />
                                 </motion.button>

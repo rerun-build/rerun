@@ -178,9 +178,9 @@ export function McpOAuthAuthorize({ url, agentId, serverName, serviceKey, onAuth
                 className="w-full"
             >
                 {state === 'authorizing' ? (
-                    <Loader2Icon className="size-3.5 animate-spin mr-1.5" />
+                    <Loader2Icon className="size-3.5 animate-spin me-1.5" />
                 ) : (
-                    <ExternalLinkIcon className="size-3.5 mr-1.5" />
+                    <ExternalLinkIcon className="size-3.5 me-1.5" />
                 )}
                 {state === 'authorizing' ? t('waiting') : t('connect')}
             </Button>

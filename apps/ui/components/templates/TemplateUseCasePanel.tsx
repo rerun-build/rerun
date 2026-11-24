@@ -33,7 +33,7 @@ export function TemplateUseCasePanel({ useCase, showStatus, onSelectUseCase, onS
                     <button
                         type="button"
                         onClick={onSelectCoworker}
-                        className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3 text-left transition-colors outline-none hover:bg-accent/30 focus-visible:ring-3 focus-visible:ring-ring/50"
+                        className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3 text-start transition-colors outline-none hover:bg-accent/30 focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
                         <AgentBuddy agentId={agent.key} size={36} facing="right" className="shrink-0" />
                         <span className="min-w-0 flex-1">

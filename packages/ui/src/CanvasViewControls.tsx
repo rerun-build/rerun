@@ -19,8 +19,8 @@ type CanvasViewControlsProps = {
 // Assise sur l'inset de la bannière de consentement (0px sans bannière), comme les sheets : en
 // mobile elle est `fixed bottom-0` et recouvrirait la moitié de la pill. En haut, rien à éviter.
 const PLACEMENT: Record<CanvasViewControlsPlacement, string> = {
-    'bottom-right': 'bottom-[calc(1rem+var(--consent-inset))] right-4',
-    'top-right': 'top-4 right-4',
+    'bottom-right': 'bottom-[calc(1rem+var(--consent-inset))] end-4',
+    'top-right': 'top-4 end-4',
 }
 
 // Pill verticale (zoom in / zoom out / recentrer) partagée par l'iso board et le dashboard.

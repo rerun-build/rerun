@@ -99,7 +99,7 @@ export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; 
                         {access === 'invited' && live && <span className="text-muted-foreground">· {live.invited.length}</span>}
                         <ChevronDownIcon className="text-muted-foreground" />
                     </Button>
-                    <div className="ml-auto flex items-center gap-1">
+                    <div className="ms-auto flex items-center gap-1">
                         <CopyLinkButton url={live?.url ?? result.url} label={t('copy')} variant="ghost" size="sm" />
                         <Button variant="outline" size="sm" asChild>
                             <a href={openPublishedHref(slug)} target="_blank" rel="noopener noreferrer">

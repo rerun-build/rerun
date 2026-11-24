@@ -108,7 +108,7 @@ function CodeStep({ auth, primary, stuck, workspacePlan }: { auth: CodexDeviceAu
         <div className="flex flex-col gap-2">
             {pending ? (
                 <>
-                    <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1.5 pl-4">
+                    <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1.5 ps-4">
                         <code className="min-w-0 flex-1 truncate font-mono text-lg font-medium tracking-[0.2em]">{pending.userCode}</code>
                         <Button type="button" size="icon" variant="ghost" onClick={auth.copy} aria-label={t('copyCode')}>
                             {auth.copied ? <CheckIcon className="size-4" /> : <CopyIcon className="size-4" />}

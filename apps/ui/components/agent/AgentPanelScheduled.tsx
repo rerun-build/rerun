@@ -124,7 +124,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     const newButton = (
         <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                <PlusIcon className="size-3.5 mr-1" /> {t('new')}
+                <PlusIcon className="size-3.5 me-1" /> {t('new')}
             </Button>
         </TooltipDisabledReason>
     )
@@ -365,7 +365,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
             <PanelEditorHeader title={isEdit ? (canManage ? t('titleEdit') : t('titleReadOnly')) : t('titleNew')} onBack={onBack}>
                 {isEdit && onShowHistory && (
                     <Button size="sm" variant="ghost" onClick={onShowHistory}>
-                        <HistoryIcon className="size-3.5 mr-1" /> {t('history')}
+                        <HistoryIcon className="size-3.5 me-1" /> {t('history')}
                     </Button>
                 )}
             </PanelEditorHeader>

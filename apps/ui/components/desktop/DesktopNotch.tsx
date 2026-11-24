@@ -33,8 +33,8 @@ export function DesktopNotch({ launchers, browsing, browserLockedReason, disable
 
     return (
         <div className="absolute top-0 left-1/2 z-10 flex max-w-[calc(100%-3rem)] -translate-x-1/2 items-center gap-1 rounded-b-xl bg-popover px-1.5 pt-0.5 pb-1.5 text-popover-foreground">
-            <span aria-hidden className={`${SHOULDER} right-full bg-[radial-gradient(circle_at_0_100%,transparent_calc(0.75rem-0.5px),var(--popover)_0.75rem)]`} />
-            <span aria-hidden className={`${SHOULDER} left-full bg-[radial-gradient(circle_at_100%_100%,transparent_calc(0.75rem-0.5px),var(--popover)_0.75rem)]`} />
+            <span aria-hidden className={`${SHOULDER} end-full bg-[radial-gradient(circle_at_0_100%,transparent_calc(0.75rem-0.5px),var(--popover)_0.75rem)]`} />
+            <span aria-hidden className={`${SHOULDER} start-full bg-[radial-gradient(circle_at_100%_100%,transparent_calc(0.75rem-0.5px),var(--popover)_0.75rem)]`} />
             {takeoverReason && <p className="max-w-64 truncate px-1.5 text-xs font-medium">{takeoverReason}</p>}
             {launchers && (
                 <>

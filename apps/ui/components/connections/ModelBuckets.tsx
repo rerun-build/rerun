@@ -75,7 +75,7 @@ function ModelChip({
                                 aria-label={bucket === 'available' ? t('turnOff', { model: model.label }) : t('turnOn', { model: model.label })}
                                 onClick={onMove}
                                 onKeyDown={e => e.stopPropagation()}
-                                className="-mr-1 flex size-5 items-center justify-center self-start rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 group-hover/chip:opacity-100 hover:text-foreground focus-visible:opacity-100"
+                                className="-me-1 flex size-5 items-center justify-center self-start rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 group-hover/chip:opacity-100 hover:text-foreground focus-visible:opacity-100"
                             >
                                 <MoveIcon className="size-3" />
                             </button>

@@ -33,7 +33,7 @@ export function TagBadge({ tag, onRemove }: { tag: string; onRemove?: () => void
             fill="outline"
             trailing={
                 onRemove && (
-                    <button type="button" onClick={onRemove} aria-label={t('removeTag', { tag })} className="-mr-1 rounded-full p-0.5 hover:bg-foreground/10">
+                    <button type="button" onClick={onRemove} aria-label={t('removeTag', { tag })} className="-me-1 rounded-full p-0.5 hover:bg-foreground/10">
                         <XIcon className="size-2.5" />
                     </button>
                 )
@@ -170,7 +170,7 @@ export function BrainFilingProperties({ spaceId, tags, author, filing, suggestio
                     value={spaceId}
                     boxes={filing.boxes}
                     onChange={next => onChange({ spaceId: next })}
-                    className="-ml-2 max-w-full border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent"
+                    className="-ms-2 max-w-full border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent"
                 />
             </PageProperty>
             <PageProperty label={t('tags')}>

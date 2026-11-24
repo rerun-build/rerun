@@ -131,7 +131,7 @@ export function CookieBanner({ policyHref, onGrant, onRevoke, className }: Cooki
             role="region"
             aria-label={t('consent.region')}
             className={cn(
-                'pointer-events-auto fixed bottom-4 left-4 z-60 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-background/95 shadow-lg backdrop-blur-md',
+                'pointer-events-auto fixed bottom-4 start-4 z-60 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-background/95 shadow-lg backdrop-blur-md',
                 'mb-[env(safe-area-inset-bottom)] animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out',
                 className,
             )}

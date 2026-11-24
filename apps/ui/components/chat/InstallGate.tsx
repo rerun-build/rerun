@@ -78,7 +78,7 @@ export function InstallGate({
             )}
             <div className="flex flex-wrap items-center justify-between gap-1">
                 {modelSlot}
-                <Button size="sm" variant="ghost" disabled={starting} onClick={onSkip} className="ml-auto text-muted-foreground">
+                <Button size="sm" variant="ghost" disabled={starting} onClick={onSkip} className="ms-auto text-muted-foreground">
                     {t('skip')}
                 </Button>
             </div>

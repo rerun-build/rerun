@@ -384,7 +384,7 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
                 </form>
             </Form>
 
-            <div className="hidden min-h-0 border-l bg-muted/30 sm:block">
+            <div className="hidden min-h-0 border-s bg-muted/30 sm:block">
                 <ExpertProfilePreview expert={preview} action={previewAction} />
             </div>
         </div>
@@ -393,7 +393,7 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
 
 function AvailabilityOptionCard({ value, title, desc, selected, onClick }: { value: (typeof EXPERT_AVAILABILITIES)[number]; title: string; desc: string; selected: boolean; onClick: () => void }) {
     return (
-        <button type="button" onClick={onClick} className={cn('relative flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border hover:bg-muted/50')}>
+        <button type="button" onClick={onClick} className={cn('relative flex w-full items-center gap-2.5 rounded-lg border p-3 text-start transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border hover:bg-muted/50')}>
             {selected && <BorderBeam animated pattern="arcs" tone="white" glow />}
             <span className={cn('size-2 shrink-0 rounded-full', availabilityDot(value))} />
             <span className="min-w-0">
@@ -406,7 +406,7 @@ function AvailabilityOptionCard({ value, title, desc, selected, onClick }: { val
 
 function TypeOptionCard({ icon, title, desc, selected, onClick }: { icon: LucideIcon; title: string; desc: string; selected: boolean; onClick: () => void }) {
     return (
-        <button type="button" onClick={onClick} className={cn('relative flex w-full items-start gap-2.5 rounded-lg border p-3 text-left transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border hover:bg-muted/50')}>
+        <button type="button" onClick={onClick} className={cn('relative flex w-full items-start gap-2.5 rounded-lg border p-3 text-start transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border hover:bg-muted/50')}>
             {selected && <BorderBeam animated pattern="arcs" tone="white" glow />}
             <Icon icon={icon} size="sm" />
             <span className="min-w-0">

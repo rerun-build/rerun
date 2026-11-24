@@ -12,7 +12,7 @@ export function ViewList({ view, rows, context, onOpenRow }: ViewListProps) {
             {rows.map((row, i) => (
                 <li key={String(row.__rowid ?? i)}>
                     {onOpenRow ? (
-                        <button type="button" onClick={() => onOpenRow(row)} className="block w-full text-left transition-colors hover:bg-accent/40">
+                        <button type="button" onClick={() => onOpenRow(row)} className="block w-full text-start transition-colors hover:bg-accent/40">
                             <ListItem row={row} fields={view.fields ?? {}} formats={view.formats ?? {}} context={context} />
                         </button>
                     ) : (

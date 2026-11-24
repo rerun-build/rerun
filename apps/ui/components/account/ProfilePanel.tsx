@@ -114,7 +114,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
                                                 setPhotoMenuOpen(false)
                                                 void changePhoto(removeAvatar)
                                             }}
-                                            className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                            className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                         >
                                             <Trash2 className="size-4" />
                                             {t('removePhoto')}

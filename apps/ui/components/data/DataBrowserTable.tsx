@@ -58,8 +58,8 @@ export function DataBrowserTable({
     const t = useTranslations('data.table')
     const selecting = selectedRowIds.size > 0
     const columnOf = (id: string): FriendlyColumn => friendly.get(id) ?? { key: id, label: columnLabel(id), kind: 'text' }
-    const gutter = 'w-8 min-w-8 border-b border-border/70 pl-3 pr-1'
-    const firstColumnPadding = canSelectRows ? undefined : 'pl-4 @3xl:pl-2'
+    const gutter = 'w-8 min-w-8 border-b border-border/70 ps-3 pe-1'
+    const firstColumnPadding = canSelectRows ? undefined : 'ps-4 @3xl:ps-2'
 
     return (
         <table className="w-full min-w-max border-collapse text-[13px]">
@@ -82,8 +82,8 @@ export function DataBrowserTable({
                                     key={header.id}
                                     aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined}
                                     className={cn(
-                                        'h-9 border-b border-border px-2 text-left font-normal whitespace-nowrap text-muted-foreground',
-                                        index > 0 && 'border-l border-border/70',
+                                        'h-9 border-b border-border px-2 text-start font-normal whitespace-nowrap text-muted-foreground',
+                                        index > 0 && 'border-s border-border/70',
                                         index === 0 && firstColumnPadding,
                                     )}
                                 >
@@ -101,7 +101,7 @@ export function DataBrowserTable({
                             )
                         })}
                         {showSources && (
-                            <th className="h-9 w-0 border-b border-l border-border border-l-border/70 px-2 text-left font-normal whitespace-nowrap text-muted-foreground">
+                            <th className="h-9 w-0 border-b border-s border-border border-s-border/70 px-2 text-start font-normal whitespace-nowrap text-muted-foreground">
                                 <span className="inline-flex items-center gap-1.5">
                                     <DatabaseIcon className="size-3.5 shrink-0 opacity-70" />
                                     {t('sources')}
@@ -145,13 +145,13 @@ export function DataBrowserTable({
                                     adornment: verdict && <EmailVerdictBadge status={verdict} className="shrink-0" />,
                                 }
                                 return (
-                                    <td key={cell.id} className={index === 0 ? cn('h-9 max-w-64 border-b border-border/70 px-2', firstColumnPadding) : 'h-9 max-w-72 border-b border-l border-border/70 px-2'}>
+                                    <td key={cell.id} className={index === 0 ? cn('h-9 max-w-64 border-b border-border/70 px-2', firstColumnPadding) : 'h-9 max-w-72 border-b border-s border-border/70 px-2'}>
                                         <EditableCell {...shared} onCommit={key !== null ? text => onEditCell(row.original, column.key, text) : undefined} />
                                     </td>
                                 )
                             })}
                             {showSources && (
-                                <td className="h-9 border-b border-l border-border/70 px-2">
+                                <td className="h-9 border-b border-s border-border/70 px-2">
                                     {sources && onOpenSources && <RowSourcesCell sources={sources.sources} onOpen={() => onOpenSources(row.original)} />}
                                 </td>
                             )}

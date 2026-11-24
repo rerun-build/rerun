@@ -118,7 +118,7 @@ function CoworkerAvatars({ coworkers }: { coworkers: SpaceAccessCoworker[] }) {
                     <AgentBuddy agentId={coworker.id} size={20} animated={false} facing="right" />
                 </span>
             ))}
-            {hidden > 0 && <span className="pl-2 text-xs text-muted-foreground">+{hidden}</span>}
+            {hidden > 0 && <span className="ps-2 text-xs text-muted-foreground">+{hidden}</span>}
         </span>
     )
 }

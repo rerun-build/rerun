@@ -41,7 +41,7 @@ export function EditableName({ name, onRename, label, maxLength, allowEmpty = fa
     }
 
     return (
-        <button type="button" aria-label={label} onClick={() => setDraft(name)} className="group/name inline-flex min-w-0 max-w-full items-center gap-1.5 text-left">
+        <button type="button" aria-label={label} onClick={() => setDraft(name)} className="group/name inline-flex min-w-0 max-w-full items-center gap-1.5 text-start">
             <span className={cn('truncate text-sm font-medium', className)}>{name}</span>
             <PencilIcon className="size-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/name:opacity-100 group-focus-visible/name:opacity-100 [@media(hover:none)]:opacity-100" />
         </button>

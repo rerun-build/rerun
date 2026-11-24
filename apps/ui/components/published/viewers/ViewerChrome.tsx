@@ -17,7 +17,7 @@ export function ViewerPage({ slug, bar, children, className }: { slug: string; b
         <div {...{ [PUBLISHED_PAGE_MARKER]: '' }} className="relative flex h-dvh flex-col bg-background text-foreground">
             {bar}
             <main className={cn('min-h-0 flex-1 overflow-auto', className)}>{children}</main>
-            <MadeWithRerun slug={slug} className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:right-3" />
+            <MadeWithRerun slug={slug} className="fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:end-3" />
         </div>
     )
 }
@@ -41,7 +41,7 @@ export function ViewerTopBar({ icon: FormatIcon, name, meta, children }: { icon:
             <h1 className="min-w-0 truncate text-sm font-medium">{name}</h1>
             {meta && <span className="shrink-0 text-xs text-muted-foreground max-md:hidden">{meta}</span>}
             {children}
-            <DownloadButton className="ml-auto" />
+            <DownloadButton className="ms-auto" />
         </header>
     )
 }

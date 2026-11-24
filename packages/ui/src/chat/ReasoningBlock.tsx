@@ -33,15 +33,15 @@ export function ReasoningBlock({ text, streaming = false, seconds, renderText = 
 
     return (
         <Collapsible open={open && hasText} onOpenChange={setOpen} className={cn('space-y-1.5 px-1.5', className)}>
-            <CollapsibleTrigger className="group flex w-full items-center gap-2 text-left text-sm text-muted-foreground">
+            <CollapsibleTrigger className="group flex w-full items-center gap-2 text-start text-sm text-muted-foreground">
                 <BrainIcon className="size-3.5 shrink-0" />
                 <ReasoningHeader streaming={streaming} seconds={seconds} />
-                {hasText && <ChevronRightIcon className="ml-auto size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90" />}
+                {hasText && <ChevronRightIcon className="ms-auto size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90" />}
             </CollapsibleTrigger>
 
             {hasText && (
                 <CollapsibleContent>
-                    <ScrollFade pinBottom={streaming} className="max-h-40 border-l border-border pl-3 text-xs leading-relaxed text-muted-foreground/80">
+                    <ScrollFade pinBottom={streaming} className="max-h-40 border-s border-border ps-3 text-xs leading-relaxed text-muted-foreground/80">
                         {renderText(text)}
                     </ScrollFade>
                 </CollapsibleContent>

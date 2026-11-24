@@ -455,7 +455,7 @@ export const PromptInputActionAddAttachments = ({
 
   return (
     <DropdownMenuItem {...props} onSelect={handleSelect}>
-      <ImageIcon className="mr-2 size-4" /> {label ?? t("addFiles")}
+      <ImageIcon className="me-2 size-4" /> {label ?? t("addFiles")}
     </DropdownMenuItem>
   );
 };
@@ -501,7 +501,7 @@ export const PromptInputActionAddScreenshot = ({
 
   return (
     <DropdownMenuItem {...props} onSelect={handleSelect}>
-      <Monitor className="mr-2 size-4" />
+      <Monitor className="me-2 size-4" />
       {label ?? t("takeScreenshot")}
     </DropdownMenuItem>
   );
@@ -1275,7 +1275,7 @@ export const PromptInputButton = ({
       <TooltipContent side={side}>
         {tooltipContent}
         {shortcut && (
-          <span className="ml-2 text-muted-foreground">{shortcut}</span>
+          <span className="ms-2 text-muted-foreground">{shortcut}</span>
         )}
       </TooltipContent>
     </Tooltip>

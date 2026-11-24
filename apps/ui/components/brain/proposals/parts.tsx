@@ -83,7 +83,7 @@ export function ProposalCardSkeleton() {
                 </div>
                 <div className="mt-5 flex items-center gap-2">
                     <Skeleton className="h-8 w-28" />
-                    <Skeleton className="ml-auto h-8 w-16" />
+                    <Skeleton className="ms-auto h-8 w-16" />
                     <Skeleton className="h-8 w-20" />
                 </div>
             </div>

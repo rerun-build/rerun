@@ -228,7 +228,7 @@ function MentionMenu({ trigger, items, listRead, highlight, onHover, onPick }: M
     }, [highlight])
 
     return (
-        <div className="absolute bottom-full left-0 right-0 z-50 mb-1 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md">
+        <div className="absolute bottom-full start-0 end-0 z-50 mb-1 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md">
             <div className="flex items-center gap-2.5 border-b border-border px-3 py-2">
                 <CommandGlyph trigger={trigger} />
                 <div className="min-w-0">
@@ -246,7 +246,7 @@ function MentionMenu({ trigger, items, listRead, highlight, onHover, onPick }: M
                                 type="button"
                                 role="option"
                                 aria-selected={index === highlight}
-                                className={cn('flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm', index === highlight && 'bg-accent text-accent-foreground', item.kind === 'computer' && item.status === 'offline' && 'text-muted-foreground')}
+                                className={cn('flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-start text-sm', index === highlight && 'bg-accent text-accent-foreground', item.kind === 'computer' && item.status === 'offline' && 'text-muted-foreground')}
                                 onMouseEnter={() => onHover(index)}
                                 onMouseDown={e => {
                                     e.preventDefault()
@@ -258,7 +258,7 @@ function MentionMenu({ trigger, items, listRead, highlight, onHover, onPick }: M
                                 <span className="flex-1 min-w-0">
                                     <span className="block truncate">
                                         {item.name}
-                                        {item.kind === 'skill' && <span className="ml-1.5 text-muted-foreground">/{item.slug}</span>}
+                                        {item.kind === 'skill' && <span className="ms-1.5 text-muted-foreground">/{item.slug}</span>}
                                     </span>
                                     {item.kind === 'agent' && item.handle && <span className="block truncate text-xs text-muted-foreground">@{item.handle}</span>}
                                     {item.kind === 'skill' && item.description && <span className="block truncate text-xs text-muted-foreground">{item.description}</span>}

@@ -280,7 +280,7 @@ export function ForemanDock() {
                 </TooltipLabeled>
                 {/* A question put off with « Later » is still waiting: the ball keeps its mark. */}
                 {nudge && !shownNudge && !open && (
-                    <span aria-hidden className={cn('pointer-events-none absolute -top-1 flex size-5 items-center justify-center rounded-full bg-amber-500 text-[11px] leading-none font-bold text-black ring-2 ring-background', corner.endsWith('left') ? '-right-1' : '-left-1')}>
+                    <span aria-hidden className={cn('pointer-events-none absolute -top-1 flex size-5 items-center justify-center rounded-full bg-amber-500 text-[11px] leading-none font-bold text-black ring-2 ring-background', corner.endsWith('left') ? '-end-1' : '-start-1')}>
                         ?
                     </span>
                 )}

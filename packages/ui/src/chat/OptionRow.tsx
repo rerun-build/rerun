@@ -46,14 +46,14 @@ export function OptionRow({ index, label, description, selected, multi = false, 
         >
             <OptionMark index={index} selected={selected} multi={multi} />
             {description ? (
-                <div className="flex min-h-7 min-w-0 flex-1 flex-col justify-center text-left">
+                <div className="flex min-h-7 min-w-0 flex-1 flex-col justify-center text-start">
                     <div data-selected={selected} className="text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
                         {label}
                     </div>
                     <div className="line-clamp-2 text-xs text-muted-foreground/80">{description}</div>
                 </div>
             ) : (
-                <div data-selected={selected} className="flex min-h-7 min-w-0 flex-1 items-center text-left text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
+                <div data-selected={selected} className="flex min-h-7 min-w-0 flex-1 items-center text-start text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
                     {label}
                 </div>
             )}
@@ -77,7 +77,7 @@ export function CustomOptionRow({ open, onOpen, children, label, className }: Cu
             <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
                 <Pencil className="size-3.5" />
             </span>
-            {open ? children : <span className="flex min-h-7 flex-1 items-center text-left text-muted-foreground">{label ?? t('chat.question.somethingElse')}</span>}
+            {open ? children : <span className="flex min-h-7 flex-1 items-center text-start text-muted-foreground">{label ?? t('chat.question.somethingElse')}</span>}
         </div>
     )
 }

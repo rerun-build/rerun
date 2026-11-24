@@ -37,7 +37,7 @@ export function ScopeRadioList({ scope, onChange }: { scope: NotificationScope; 
                             aria-checked={selected}
                             tabIndex={selected ? 0 : -1}
                             onClick={() => onChange(option)}
-                            className={cn('flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors outline-none first:rounded-t-lg last:rounded-b-lg focus-visible:ring-3 focus-visible:ring-ring/50', selected ? 'bg-primary/5' : 'hover:bg-muted/40')}
+                            className={cn('flex w-full items-start gap-3 px-3 py-2.5 text-start transition-colors outline-none first:rounded-t-lg last:rounded-b-lg focus-visible:ring-3 focus-visible:ring-ring/50', selected ? 'bg-primary/5' : 'hover:bg-muted/40')}
                         >
                             <span className={cn('mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border', selected ? 'border-primary' : 'border-muted-foreground/40')}>{selected && <span className="size-2 rounded-full bg-primary" />}</span>
                             <span className="flex min-w-0 flex-col gap-0.5">

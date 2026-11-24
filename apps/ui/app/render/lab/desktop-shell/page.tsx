@@ -27,7 +27,7 @@ const SIZES = [
 
 function MacButtons() {
     return (
-        <div className="pointer-events-none absolute top-2 left-3 flex gap-2">
+        <div className="pointer-events-none absolute top-2 start-3 flex gap-2">
             {['#ff5f57', '#febc2e', '#28c840'].map((color) => (
                 <span key={color} className="size-3 rounded-full shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.2)]" style={{ background: color }} />
             ))}
@@ -37,7 +37,7 @@ function MacButtons() {
 
 function CaptionButtons() {
     return (
-        <div className="pointer-events-none absolute top-0 right-0 flex h-8 text-foreground">
+        <div className="pointer-events-none absolute top-0 end-0 flex h-8 text-foreground">
             {['M0 5h10', 'M.5.5h9v9h-9z', 'M0 0l10 10M10 0L0 10'].map((path) => (
                 <span key={path} className="grid h-8 w-[46px] place-items-center">
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">

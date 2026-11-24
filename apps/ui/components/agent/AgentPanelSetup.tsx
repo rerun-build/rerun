@@ -85,11 +85,11 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
                 <Button type="button" size="sm" onClick={save} disabled={saving || !canManage || !isSetupAnswered(draft)} className="w-full">
                     {saved ? (
                         <>
-                            <CheckIcon className="mr-1.5 size-3.5 text-emerald-500" /> {t('saved')}
+                            <CheckIcon className="me-1.5 size-3.5 text-emerald-500" /> {t('saved')}
                         </>
                     ) : saving ? (
                         <>
-                            <Loader2Icon className="mr-1.5 size-3.5 animate-spin" /> {t('saving')}
+                            <Loader2Icon className="me-1.5 size-3.5 animate-spin" /> {t('saving')}
                         </>
                     ) : (
                         t('save')

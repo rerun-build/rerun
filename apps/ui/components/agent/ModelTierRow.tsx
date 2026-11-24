@@ -13,8 +13,8 @@ type ModelTierRowProps = {
 export function ModelTierRow({ label, description, power, trailing }: ModelTierRowProps) {
     return (
         <span className="flex min-w-0 flex-1 items-center gap-2">
-            <span className={description ? 'shrink-0' : 'min-w-0 flex-1 truncate text-left'}>{label}</span>
-            {description && <span className="min-w-0 flex-1 truncate text-left text-xs text-muted-foreground">{description}</span>}
+            <span className={description ? 'shrink-0' : 'min-w-0 flex-1 truncate text-start'}>{label}</span>
+            {description && <span className="min-w-0 flex-1 truncate text-start text-xs text-muted-foreground">{description}</span>}
             {trailing}
             <PowerBars power={power} className="shrink-0" />
         </span>

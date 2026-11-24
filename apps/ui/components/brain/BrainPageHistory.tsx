@@ -123,7 +123,7 @@ export function BrainPageHistory({ page, revisions, titles, onBack, onOpenPage, 
                     </div>
                 </div>
 
-                <aside className="flex min-h-0 shrink-0 flex-col border-border sm:w-64 sm:border-l max-sm:max-h-48 max-sm:border-b">
+                <aside className="flex min-h-0 shrink-0 flex-col border-border sm:w-64 sm:border-s max-sm:max-h-48 max-sm:border-b">
                     <p className="px-4 pb-1 pt-3 text-[11px] font-medium text-muted-foreground/80">{t('history.versions')}</p>
                     <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
                         {revisions.map((revision, index) => (
@@ -131,7 +131,7 @@ export function BrainPageHistory({ page, revisions, titles, onBack, onOpenPage, 
                                 key={revision.id}
                                 type="button"
                                 onClick={() => setSelectedId(revision.id)}
-                                className={cn('block w-full rounded-md px-2 py-1.5 text-left transition-colors', revision.id === selectedId ? 'bg-accent' : 'hover:bg-accent/60')}
+                                className={cn('block w-full rounded-md px-2 py-1.5 text-start transition-colors', revision.id === selectedId ? 'bg-accent' : 'hover:bg-accent/60')}
                             >
                                 <span className="block text-sm font-medium" title={fullDateTime(revision.createdAt, locale)}>
                                     {index === 0 && revision.hash === page.hash ? t('history.currentShort') : shortRelativeTime(revision.createdAt, locale)}

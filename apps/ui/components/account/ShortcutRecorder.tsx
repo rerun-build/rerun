@@ -138,11 +138,11 @@ export function ShortcutRecorder({ id, value, platform, onRecordingChange, onCha
                 )}
             </button>
             {problemText ? (
-                <span id={id ? `${id}-problem` : undefined} role="alert" className="text-right text-xs text-destructive">
+                <span id={id ? `${id}-problem` : undefined} role="alert" className="text-end text-xs text-destructive">
                     {problemText}
                 </span>
             ) : (
-                recording && <span className="text-right text-xs text-muted-foreground">{t('recordingHint')}</span>
+                recording && <span className="text-end text-xs text-muted-foreground">{t('recordingHint')}</span>
             )}
         </span>
     )

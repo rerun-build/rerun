@@ -21,7 +21,7 @@ export function TemplateLibraryCompactNav({ view, mode, query, counts, onView, o
 
     return (
         <div className="flex shrink-0 flex-col gap-3 border-b px-5 pt-5 pb-3 lg:hidden">
-            <div className="flex items-center gap-2 pr-8">
+            <div className="flex items-center gap-2 pe-8">
                 <TemplateLibrarySearch value={query} onChange={onQuery} className="min-w-0 flex-1" />
                 <Button type="button" size="sm" onClick={onScratch} className="shrink-0">
                     <PlusIcon />

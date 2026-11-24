@@ -22,7 +22,7 @@ export function CreateWorkspacePreview({ name, iconFile, members }: { name: stri
     const roster: Member[] = [{ email: ownerEmail, owner: true }, ...members.map(email => ({ email }))]
 
     return (
-        <div className="hidden h-full flex-col items-center justify-center border-l bg-muted/30 p-8 sm:flex">
+        <div className="hidden h-full flex-col items-center justify-center border-s bg-muted/30 p-8 sm:flex">
             <div className="relative w-full max-w-xs rounded-2xl border bg-background p-6 shadow-sm">
                 <BorderBeam pattern="arcs" tone="white" animated={false} glow angle={53} className="opacity-20" />
 

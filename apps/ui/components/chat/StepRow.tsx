@@ -34,7 +34,7 @@ export function StepRow({ iconProps, label, detail, status, elapsed, children }:
     const expandable = !!children
     return (
         <div>
-            <button type="button" disabled={!expandable} onClick={() => setOpen(!open)} className="group/step flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left text-xs transition-colors enabled:hover:bg-muted/60">
+            <button type="button" disabled={!expandable} onClick={() => setOpen(!open)} className="group/step flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-start text-xs transition-colors enabled:hover:bg-muted/60">
                 <StepGlyph iconProps={iconProps} className="text-muted-foreground" />
                 <span className={cn('max-w-[60%] shrink-0 truncate font-medium', status === 'error' && 'text-red-500')}>{status === 'running' ? <TextShimmer className="text-xs">{label}</TextShimmer> : label}</span>
                 <span className="min-w-0 flex-1 truncate text-muted-foreground">{detail}</span>

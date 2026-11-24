@@ -42,7 +42,7 @@ export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAd
                     <ViewTab key={view.id} label={view.name} icon={LAYOUT_ICONS[view.layout]} active={activeId === view.id} onSelect={() => onSelect(view.id)}>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button type="button" aria-label={t('viewOptions', { name: view.name })} className="-mr-1 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground">
+                                <button type="button" aria-label={t('viewOptions', { name: view.name })} className="-me-1 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground">
                                     <EllipsisIcon className="size-3.5" />
                                 </button>
                             </DropdownMenuTrigger>

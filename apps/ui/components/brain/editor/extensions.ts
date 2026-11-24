@@ -41,7 +41,7 @@ export function brainExtensions({ titleOf, onOpenPage, onOpenFile, placeholder }
             underline: false,
             link: { openOnClick: false, autolink: true, protocols: ['http', 'https', 'mailto'] },
         }),
-        TaskList.configure({ HTMLAttributes: { class: '!list-none !pl-0' } }),
+        TaskList.configure({ HTMLAttributes: { class: '!list-none !ps-0' } }),
         TaskItem.configure({
             nested: true,
             HTMLAttributes: { class: 'flex items-start gap-2 [&>label]:mt-[0.4rem] [&>label]:shrink-0 [&>div]:min-w-0 [&>div]:flex-1 data-[checked=true]:[&>div]:text-muted-foreground data-[checked=true]:[&>div]:line-through' },

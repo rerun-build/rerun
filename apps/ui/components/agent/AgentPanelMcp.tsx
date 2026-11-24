@@ -159,7 +159,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     const newButton = (
         <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                <PlusIcon className="size-3.5 mr-1" /> {t('new')}
+                <PlusIcon className="size-3.5 me-1" /> {t('new')}
             </Button>
         </TooltipDisabledReason>
     )

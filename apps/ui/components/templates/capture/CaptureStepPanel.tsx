@@ -60,7 +60,7 @@ export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose,
                 {step === 'review' && (
                     <>
                         {!flow.allApproved && (
-                            <p className="text-xs text-amber-500 sm:mr-auto sm:self-center">
+                            <p className="text-xs text-amber-500 sm:me-auto sm:self-center">
                                 {t('reviewEach', { approved: flow.approvedCount, total: flow.plans.length })}
                             </p>
                         )}

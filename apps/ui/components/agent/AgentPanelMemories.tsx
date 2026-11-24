@@ -146,24 +146,24 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
             <PanelListHeader className="flex-col items-stretch gap-2">
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1">
-                        <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <SearchIcon className="absolute start-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                         <Input
                             hideRequired
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && handleSearch()}
                             placeholder={t('recallPlaceholder')}
-                            className="h-8 pl-7 text-xs"
+                            className="h-8 ps-7 text-xs"
                         />
                         {recall !== null && (
-                            <button onClick={() => { setQuery(''); setRecall(null) }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                            <button onClick={() => { setQuery(''); setRecall(null) }} className="absolute end-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                                 <XIcon className="size-3.5" />
                             </button>
                         )}
                     </div>
                     <TooltipDisabledReason reason={manageReason}>
                         <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setCreating(c => !c)}>
-                            <PlusIcon className="size-3.5 mr-1" /> {t('new')}
+                            <PlusIcon className="size-3.5 me-1" /> {t('new')}
                         </Button>
                     </TooltipDisabledReason>
                     {memories.length > 0 && (
@@ -201,7 +201,7 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
                         recall === null ? (
                             <TooltipDisabledReason reason={manageReason}>
                                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setCreating(true)}>
-                                    <PlusIcon className="size-3.5 mr-1" /> {t('empty.add')}
+                                    <PlusIcon className="size-3.5 me-1" /> {t('empty.add')}
                                 </Button>
                             </TooltipDisabledReason>
                         ) : undefined

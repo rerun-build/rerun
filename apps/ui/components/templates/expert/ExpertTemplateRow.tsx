@@ -15,7 +15,7 @@ export function ExpertTemplateRow({ template, selected, onSelect }: { template: 
             type="button"
             onClick={onSelect}
             aria-current={selected}
-            className={cn('flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors', selected ? 'bg-muted' : 'hover:bg-muted/50')}
+            className={cn('flex w-full items-center gap-3 border-b border-border px-4 py-3 text-start transition-colors', selected ? 'bg-muted' : 'hover:bg-muted/50')}
         >
             {template.coverUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element

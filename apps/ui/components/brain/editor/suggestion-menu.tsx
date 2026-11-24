@@ -98,7 +98,7 @@ export function SuggestionMenu({ state, index, position, emptyLabel, onHover }: 
                             data-index={itemIndex}
                             onMouseEnter={() => onHover(itemIndex)}
                             onClick={() => state.command(item)}
-                            className={cn('flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm', itemIndex === index ? 'bg-accent text-accent-foreground' : 'text-foreground')}
+                            className={cn('flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-start text-sm', itemIndex === index ? 'bg-accent text-accent-foreground' : 'text-foreground')}
                         >
                             <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background">
                                 <Glyph className="size-3.5" />

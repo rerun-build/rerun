@@ -41,7 +41,7 @@ export function CompactionBlock({ data }: { data: CompactionData }) {
     return (
         <Collapsible open={open && hasContent} onOpenChange={setOpen} className="relative rounded-xl transition-colors data-[state=open]:bg-muted/40">
             {isRunning && <BorderBeam animated pattern="arcs" tone="brand" glow width={1} duration={5} />}
-            <CollapsibleTrigger className="group flex w-full items-center gap-3 rounded-xl px-1.5 py-1.5 text-left text-sm transition-colors data-[state=closed]:hover:bg-muted/40">
+            <CollapsibleTrigger className="group flex w-full items-center gap-3 rounded-xl px-1.5 py-1.5 text-start text-sm transition-colors data-[state=closed]:hover:bg-muted/40">
                 <Icon icon={FoldVerticalIcon} size="sm" />
                 <div className="flex-1 min-w-0">
                     <span className="block truncate font-medium">{label}</span>

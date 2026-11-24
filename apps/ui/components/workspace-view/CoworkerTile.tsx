@@ -61,7 +61,7 @@ export function CoworkerTile({ agent, preview, viewerId, selected, unseen, onOpe
     return (
         <TileMenu agent={agent} actions={actions}>
             <div className={cn('group relative flex items-center rounded-lg transition-colors', selected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/60')}>
-                <button type="button" onClick={onOpen} aria-current={selected ? 'true' : undefined} className={cn('flex min-w-0 flex-1 items-center text-left', large ? 'gap-4 py-[17px] pr-12 pl-5' : 'gap-3 py-2.5 pr-1 pl-2')}>
+                <button type="button" onClick={onOpen} aria-current={selected ? 'true' : undefined} className={cn('flex min-w-0 flex-1 items-center text-start', large ? 'gap-4 py-[17px] pe-12 ps-5' : 'gap-3 py-2.5 pe-1 ps-2')}>
                     {avatar ? <span className="flex shrink-0 items-center justify-center">{avatar(large ? 48 : 36)}</span> : <AgentBuddy agentId={agent.id} mood={paused ? 'asleep' : 'idle'} size={large ? 48 : 36} facing="right" className="shrink-0" />}
                     <span className={cn('min-w-0 flex-1', large && 'space-y-1')}>
                         <span className="flex items-baseline gap-2">
@@ -227,7 +227,7 @@ function TileMoreMenu({ agent, actions, large }: { agent: IsoAgent; actions: Cow
                     variant="ghost"
                     size="icon-sm"
                     aria-label={t('more', { name: agent.name })}
-                    className={cn('absolute opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100', large ? 'top-1/2 right-3 size-8 -translate-y-1/2' : 'top-2 right-1.5 size-6')}
+                    className={cn('absolute opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100', large ? 'top-1/2 end-3 size-8 -translate-y-1/2' : 'top-2 end-1.5 size-6')}
                 >
                     <EllipsisIcon className="size-3.5" />
                 </Button>

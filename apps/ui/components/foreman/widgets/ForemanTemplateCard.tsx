@@ -40,7 +40,7 @@ export function ForemanTemplateCard({ loaded, answered }: ForemanTemplateCardPro
         <div className={cn('relative mb-2', verdict && 'mt-3')}>
             {verdict && (
                 <TooltipLabeled label={t(verdict.labelKey)}>
-                    <Icon icon={verdict.icon} size="sm" className={cn('absolute -top-3 left-2 z-10 bg-card shadow-lg shadow-black/40', verdict.className)} />
+                    <Icon icon={verdict.icon} size="sm" className={cn('absolute -top-3 start-2 z-10 bg-card shadow-lg shadow-black/40', verdict.className)} />
                 </TooltipLabeled>
             )}
             {template ? <TemplateTile template={template} /> : <TemplateTileSkeleton />}

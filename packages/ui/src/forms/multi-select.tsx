@@ -51,7 +51,7 @@ export function MultiSelect({ options, optionLabel = option => option, value, on
                         type="button"
                         disabled={disabled}
                         className={cn(
-                            'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border border-input bg-background px-2 py-1.5 text-left outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50',
+                            'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border border-input bg-background px-2 py-1.5 text-start outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50',
                         )}
                     >
                         {value.length === 0 ? (
@@ -75,7 +75,7 @@ export function MultiSelect({ options, optionLabel = option => option, value, on
                                 </span>
                             ))
                         )}
-                        <ChevronDown className={cn('ml-auto size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
+                        <ChevronDown className={cn('ms-auto size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
                     </button>
                 </PopoverPrimitive.Trigger>
 
@@ -108,7 +108,7 @@ export function MultiSelect({ options, optionLabel = option => option, value, on
                                             type="button"
                                             onClick={() => toggle(option)}
                                             className={cn(
-                                                'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors',
+                                                'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-start text-sm transition-colors',
                                                 selected ? 'text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                                             )}
                                         >

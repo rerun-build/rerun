@@ -51,7 +51,7 @@ function NoteHeader({ note, name, onBack, onClose }: DockNoteDetailProps) {
     const subtitle = [note.title, note.updatedAt && shortRelativeTime(note.updatedAt, locale)].filter(Boolean).join(' · ')
     return (
         <div className="flex shrink-0 items-center gap-2.5 p-3 pb-2">
-            <Button size="icon-sm" variant="ghost" aria-label={t('back')} onClick={onBack} className="-ml-1">
+            <Button size="icon-sm" variant="ghost" aria-label={t('back')} onClick={onBack} className="-ms-1">
                 <ArrowLeftIcon className="size-3.5" />
             </Button>
             <AttentionBuddy agentId={note.agentId} status={note.status} />

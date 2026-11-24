@@ -31,7 +31,7 @@ export function TemplateFeaturedCard({ template, selected, showStatus, onSelect 
             onClick={onSelect}
             {...handlers}
             className={cn(
-                'group relative flex w-full flex-col overflow-hidden rounded-xl border text-left transition-[background-color,border-color] sm:h-64 sm:flex-row',
+                'group relative flex w-full flex-col overflow-hidden rounded-xl border text-start transition-[background-color,border-color] sm:h-64 sm:flex-row',
                 selected ? 'border-primary/40 bg-primary/5' : 'border-border bg-card hover:border-foreground/20 hover:bg-muted/30',
             )}
         >
@@ -61,7 +61,7 @@ export function TemplateFeaturedCard({ template, selected, showStatus, onSelect 
                 <AnimatePresence>{live && <TemplateCardBoard agents={template.agents} connectors={template.connectors} />}</AnimatePresence>
                 {showStatus && template.status !== 'published' && (
                     // Le fond soft du Badge seul ne tient pas au-dessus d'une cover : le wrapper opacifie.
-                    <span className="absolute left-3 top-3 flex rounded-full bg-background/70 backdrop-blur">
+                    <span className="absolute start-3 top-3 flex rounded-full bg-background/70 backdrop-blur">
                         <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
                             {templateStatusLabel(template.status, tStatus)}
                         </Badge>

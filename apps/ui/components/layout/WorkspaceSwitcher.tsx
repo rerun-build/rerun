@@ -181,9 +181,9 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     {t('apiKeys')}
                     {apiLocked && isMobile && <span className="block text-xs whitespace-normal">{tAccess('apiNotIncluded')}</span>}
                 </span>
-                {apiLocked && <LockIcon className="ml-auto size-3.5" />}
+                {apiLocked && <LockIcon className="ms-auto size-3.5" />}
                 {!apiEntitled && !apiLocked && (
-                    <Badge size="xs" tone="brand" glow={false} className="ml-auto font-medium">
+                    <Badge size="xs" tone="brand" glow={false} className="ms-auto font-medium">
                         PRO
                     </Badge>
                 )}
@@ -202,7 +202,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     )
 
     const identity = (
-        <div className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 text-start">
             <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-8 shrink-0 rounded-full object-cover" />
             <div className="min-w-0">
                 <div className="truncate text-sm font-medium text-foreground">{workspace.name || t('defaultName')}</div>
@@ -272,7 +272,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     <BrainIcon className="size-4" />
                     {t('brain')}
                     {brainProposals > 0 && (
-                        <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={t('brainProposals', { count: brainProposals })}>
+                        <span className="ms-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={t('brainProposals', { count: brainProposals })}>
                             {brainProposals}
                         </span>
                     )}
@@ -288,7 +288,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
                     <LockIcon className="size-4" />
                     {t('vault')}
-                    {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+                    {vaultSignedOut > 0 && <span className="ms-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
                 </DropdownMenuItem>
             </DisabledWithReason>
             <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
@@ -319,7 +319,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling('referrals', 'invite_friends')} className="gap-2 text-muted-foreground">
                         <UserPlus className="size-4" />
                         {t('inviteFriends')}
-                        <Badge size="xs" tone="green" className="ml-auto">
+                        <Badge size="xs" tone="green" className="ms-auto">
                             {t('freeMonth')}
                         </Badge>
                     </DropdownMenuItem>
@@ -428,7 +428,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     return (
         // Leaves room for the view controls in the top-right corner: on a phone the workspace name
         // truncates rather than pushing the row under them.
-        <div className={cn('flex items-center gap-2', placement === 'column' ? 'min-w-0' : 'absolute top-4 left-4 z-40 max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))]')}>
+        <div className={cn('flex items-center gap-2', placement === 'column' ? 'min-w-0' : 'absolute top-4 start-4 z-40 max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))]')}>
             <DropdownMenu
                 modal={false}
                 onOpenChange={open => {
@@ -444,7 +444,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                             {workspace.is_sandbox && <Stripes className="rounded-md" color="color-mix(in oklab, var(--foreground) 6%, transparent)" />}
                             <span className="relative shrink-0">
                                 <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-6 rounded-md object-cover" />
-                                {brainProposals > 0 && <span className="pointer-events-none absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-sidebar" />}
+                                {brainProposals > 0 && <span className="pointer-events-none absolute -top-0.5 -end-0.5 size-2 rounded-full bg-red-500 ring-2 ring-sidebar" />}
                             </span>
                             <span className="relative truncate">{workspace.name || t('defaultName')}</span>
                             <ChevronDownIcon className="relative size-3.5 shrink-0 text-muted-foreground" />
@@ -455,7 +455,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                         <DropdownMenuTrigger asChild>
                             <WorkspacePill className="max-w-full shrink" name={workspace.name || t('defaultName')} iconUrl={workspace.icon_url || activeIcon} fallbackIconUrl={activeIcon} stripes={workspace.is_sandbox} />
                         </DropdownMenuTrigger>
-                        {brainProposals > 0 && <span className="pointer-events-none absolute top-0.5 right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
+                        {brainProposals > 0 && <span className="pointer-events-none absolute top-0.5 end-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
                     </div>
                 )}
                 <DropdownMenuContent

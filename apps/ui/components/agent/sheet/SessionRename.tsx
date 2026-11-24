@@ -50,7 +50,7 @@ function useSessionRenameField({ title, status, focus, onSubmit, onCancel }: Ren
 export function TabRenameField(props: RenameFieldProps) {
     const { busy, fieldProps } = useSessionRenameField(props)
     return (
-        <div className={cn('flex h-7 shrink-0 items-center gap-1 rounded-md bg-background pl-2 pr-1.5 text-xs ring-1 ring-inset', props.status === 'error' ? 'ring-destructive' : 'ring-primary')}>
+        <div className={cn('flex h-7 shrink-0 items-center gap-1 rounded-md bg-background ps-2 pe-1.5 text-xs ring-1 ring-inset', props.status === 'error' ? 'ring-destructive' : 'ring-primary')}>
             <input {...fieldProps} className="field-sizing-content min-w-16 max-w-[220px] bg-transparent outline-none selection:bg-foreground/20 read-only:opacity-60" />
             {busy && <Spinner className="size-3 text-muted-foreground" />}
         </div>
@@ -63,8 +63,8 @@ export function ChatRowRenameField(props: RenameFieldProps) {
     return (
         <div className="flex flex-col gap-1 px-1 py-1">
             <div className="relative">
-                <Input {...fieldProps} className="h-9 pr-8 read-only:opacity-50" />
-                {busy && <Spinner className="absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />}
+                <Input {...fieldProps} className="h-9 pe-8 read-only:opacity-50" />
+                {busy && <Spinner className="absolute end-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />}
             </div>
             {props.status === 'error' && (
                 <p role="alert" className="px-1 text-[11px] text-destructive">

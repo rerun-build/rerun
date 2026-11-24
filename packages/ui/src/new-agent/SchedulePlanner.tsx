@@ -35,7 +35,7 @@ export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSche
         <div className="text-[13px]">
             {read && (
                 <>
-                    <button type="button" aria-pressed={choice.kind === 'described'} onClick={() => onChoice(DESCRIBED)} className={cn('flex w-full items-start gap-2.5 rounded-lg p-2 text-left transition-colors', choice.kind === 'described' ? 'bg-muted/60' : 'hover:bg-muted/40')}>
+                    <button type="button" aria-pressed={choice.kind === 'described'} onClick={() => onChoice(DESCRIBED)} className={cn('flex w-full items-start gap-2.5 rounded-lg p-2 text-start transition-colors', choice.kind === 'described' ? 'bg-muted/60' : 'hover:bg-muted/40')}>
                         {app ? <AppLogo app={app} className="mt-px" /> : <span className="size-4 shrink-0" />}
                         <span className="min-w-0 flex-1">
                             <span className="block leading-[18px] text-foreground">{read.label}</span>
@@ -58,8 +58,8 @@ export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSche
                     </Option>
                 )
             })}
-            <div className={cn('flex h-8 items-center gap-2.5 rounded-md pr-2 transition-colors', choice.kind === 'custom' ? 'bg-muted/60' : 'hover:bg-muted/40')}>
-                <button type="button" aria-pressed={choice.kind === 'custom'} onClick={() => pick(custom, choice.kind === 'custom')} className="flex h-full flex-1 items-center gap-2.5 pl-2 text-left">
+            <div className={cn('flex h-8 items-center gap-2.5 rounded-md pe-2 transition-colors', choice.kind === 'custom' ? 'bg-muted/60' : 'hover:bg-muted/40')}>
+                <button type="button" aria-pressed={choice.kind === 'custom'} onClick={() => pick(custom, choice.kind === 'custom')} className="flex h-full flex-1 items-center gap-2.5 ps-2 text-start">
                     <Tick selected={choice.kind === 'custom'} />
                     <span className="text-foreground/90">{t('newAgent.schedule.custom')}</span>
                 </button>
@@ -90,10 +90,10 @@ function Tick({ selected, icon }: { selected: boolean; icon?: ReactNode }) {
 
 function Option({ icon, aim, selected, detail, onClick, children }: { icon?: ReactNode; aim?: string; selected: boolean; detail: ReactNode; onClick: () => void; children: ReactNode }) {
     return (
-        <button type="button" data-aim={aim} aria-pressed={selected} onClick={onClick} className={cn('flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-left transition-colors', selected ? 'bg-muted/60' : 'hover:bg-muted/40')}>
+        <button type="button" data-aim={aim} aria-pressed={selected} onClick={onClick} className={cn('flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-start transition-colors', selected ? 'bg-muted/60' : 'hover:bg-muted/40')}>
             <Tick selected={selected} icon={icon} />
             <span className="text-foreground/90">{children}</span>
-            <span className="ml-auto text-xs text-muted-foreground">{detail}</span>
+            <span className="ms-auto text-xs text-muted-foreground">{detail}</span>
         </button>
     )
 }

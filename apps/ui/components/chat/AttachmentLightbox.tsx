@@ -42,8 +42,8 @@ export function AttachmentLightbox({ agentId, paths, names, index, rawUrlFor, re
     return (
         <Dialog open onOpenChange={open => !open && onClose()}>
             <DialogContent aria-describedby={undefined} className="flex h-[80vh] flex-col gap-0 p-0 sm:max-w-4xl">
-                <div className="flex shrink-0 items-center gap-2 border-b border-border py-2 pl-4 pr-12">
-                    <DialogTitle className="min-w-0 flex-1 truncate text-left font-mono text-xs font-normal text-muted-foreground">{name}</DialogTitle>
+                <div className="flex shrink-0 items-center gap-2 border-b border-border py-2 ps-4 pe-12">
+                    <DialogTitle className="min-w-0 flex-1 truncate text-start font-mono text-xs font-normal text-muted-foreground">{name}</DialogTitle>
                     {paths.length > 1 && (
                         <>
                             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">

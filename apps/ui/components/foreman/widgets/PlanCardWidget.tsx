@@ -114,7 +114,7 @@ function PlanAgent({ item }: { item: PlanItem }) {
                 </Badge>
             )}
             {item.need && (
-                <p className="rounded-md border-l-2 border-amber-500/70 bg-amber-500/5 px-3 py-2 text-xs text-muted-foreground">
+                <p className="rounded-md border-s-2 border-amber-500/70 bg-amber-500/5 px-3 py-2 text-xs text-muted-foreground">
                     {t.rich('goesAfter', { need: item.need, label: chunks => <span className="font-medium text-foreground">{chunks}</span> })}
                 </p>
             )}
@@ -172,7 +172,7 @@ export function PlanCardWidget({ input, output, streaming = false, onAnswer }: P
         <div className={cn('relative mb-2 flex flex-col gap-3 py-4', verdict && 'mt-3 pt-6', PANEL_CARD)}>
             {verdict && (
                 <TooltipLabeled label={t(verdict.labelKey)}>
-                    <Icon icon={verdict.icon} size="sm" className={cn('absolute -top-3 right-2 z-10 bg-card shadow-lg shadow-black/40', verdict.className)} />
+                    <Icon icon={verdict.icon} size="sm" className={cn('absolute -top-3 end-2 z-10 bg-card shadow-lg shadow-black/40', verdict.className)} />
                 </TooltipLabeled>
             )}
             <div className="flex items-start justify-between gap-3 px-4">

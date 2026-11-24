@@ -44,7 +44,7 @@ function render(reply: ComputerReply, callPart?: ReturnType<typeof call>) {
 }
 
 const text = (element: Element | null | undefined) => element?.textContent?.replace(/\s+/g, ' ').trim()
-const badge = () => text(container.querySelector('span.ml-auto'))
+const badge = () => text(container.querySelector('span.ms-auto'))
 const lines = () => [...container.querySelectorAll('code')].map(code => code.textContent)
 const highlighted = () => [...container.querySelectorAll('mark')].map(mark => mark.textContent)
 

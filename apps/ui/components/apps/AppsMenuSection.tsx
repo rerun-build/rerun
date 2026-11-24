@@ -15,7 +15,7 @@ export function AppsMenuSection({ apps, onOpen }: { apps: AppSlug[]; onOpen: (sl
     return (
         <>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="pl-7.5 text-xs font-normal text-muted-foreground">{t('label')}</DropdownMenuLabel>
+            <DropdownMenuLabel className="ps-7.5 text-xs font-normal text-muted-foreground">{t('label')}</DropdownMenuLabel>
             {apps.map(slug => {
                 const Glyph = MENU_GLYPHS[slug]
                 return (

@@ -179,7 +179,7 @@ export function AgentPanelSkills({ agentId, agentName, focusSlug, onFocusConsume
                 <TooltipDisabledReason reason={manageReason}>
                     <DropdownMenuTrigger asChild>
                         <Button size="sm" variant="outline" disabled={importing || !canManage}>
-                            {importing ? <Loader2Icon className="size-3.5 mr-1 animate-spin" /> : <UploadIcon className="size-3.5 mr-1" />} {t('upload')}
+                            {importing ? <Loader2Icon className="size-3.5 me-1 animate-spin" /> : <UploadIcon className="size-3.5 me-1" />} {t('upload')}
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipDisabledReason>
@@ -196,7 +196,7 @@ export function AgentPanelSkills({ agentId, agentName, focusSlug, onFocusConsume
             </DropdownMenu>
             <TooltipDisabledReason reason={manageReason}>
                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                    <PlusIcon className="size-3.5 mr-1" /> {t('newSkill')}
+                    <PlusIcon className="size-3.5 me-1" /> {t('newSkill')}
                 </Button>
             </TooltipDisabledReason>
         </div>

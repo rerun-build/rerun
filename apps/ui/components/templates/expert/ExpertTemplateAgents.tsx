@@ -52,7 +52,7 @@ export function ExpertTemplateAgents({
                                 </span>
                             </div>
 
-                            <Badge size="xs" glow={false} tone={SETUP_BADGE[String(agent.setupRequired)].tone} className="ml-auto shrink-0">
+                            <Badge size="xs" glow={false} tone={SETUP_BADGE[String(agent.setupRequired)].tone} className="ms-auto shrink-0">
                                 {t(`setup.${SETUP_BADGE[String(agent.setupRequired)].label}`)}
                             </Badge>
 

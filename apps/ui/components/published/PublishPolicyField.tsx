@@ -56,7 +56,7 @@ export function PublishPolicyField({ value, onChange, publicLinks, workspaceName
                                   type="button"
                                   aria-pressed={selected}
                                   onClick={() => pick(policy)}
-                                  className={cn('flex w-full items-start gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors', selected ? 'border-primary/40 ring-1 ring-primary/40' : 'border-border hover:border-foreground/20')}
+                                  className={cn('flex w-full items-start gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors', selected ? 'border-primary/40 ring-1 ring-primary/40' : 'border-border hover:border-foreground/20')}
                               >
                                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                                       <span className="text-sm">{t(`${policy}.title`)}</span>

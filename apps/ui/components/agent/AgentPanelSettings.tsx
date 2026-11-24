@@ -217,7 +217,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canManage}>
                         {saved ? (
                             <>
-                                <CheckIcon className="size-3.5 mr-1.5 text-emerald-500" /> {t('saved')}
+                                <CheckIcon className="size-3.5 me-1.5 text-emerald-500" /> {t('saved')}
                             </>
                         ) : (
                             t('save')

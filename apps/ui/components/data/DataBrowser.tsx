@@ -444,7 +444,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
                     ) : (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="-ml-2 h-auto min-w-0 gap-1.5 px-2 py-0.5 text-xl font-semibold tracking-tight text-foreground @3xl:text-3xl">
+                                <Button variant="ghost" className="-ms-2 h-auto min-w-0 gap-1.5 px-2 py-0.5 text-xl font-semibold tracking-tight text-foreground @3xl:text-3xl">
                                     <span className="truncate">{humanizeTableName(selected ?? '')}</span>
                                     <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
                                 </Button>

@@ -9,7 +9,7 @@ export function ForemanOutcomeRow({ icon, tone, text, action, className }: { ico
         <div className={cn('flex items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2 text-sm', className)}>
             <Icon icon={icon} className={tone ?? 'text-muted-foreground'} />
             <span>{text}</span>
-            {action ? <div className="ml-auto shrink-0">{action}</div> : null}
+            {action ? <div className="ms-auto shrink-0">{action}</div> : null}
         </div>
     )
 }

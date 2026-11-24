@@ -40,7 +40,7 @@ export function StarterPackCard({ card, picked, locked, onToggle, className }: S
                 onToggle()
             }}
             className={cn(
-                'group relative flex min-w-0 flex-col overflow-hidden rounded-xl border text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                'group relative flex min-w-0 flex-col overflow-hidden rounded-xl border text-start outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                 picked ? 'border-primary/40 bg-primary/5' : 'border-border bg-card hover:border-foreground/20',
                 className,
             )}
@@ -48,7 +48,7 @@ export function StarterPackCard({ card, picked, locked, onToggle, className }: S
             {picked && <BorderBeam animated pattern="arcs" tone="white" glow className="z-10" />}
             <TemplateCardThumbnail image={card.image} className="aspect-[1200/630] w-full border-b">
                 {picked && (
-                    <span className="absolute top-2.5 right-2.5 z-10 inline-flex size-6 items-center justify-center rounded-full bg-background/80 backdrop-blur">
+                    <span className="absolute top-2.5 end-2.5 z-10 inline-flex size-6 items-center justify-center rounded-full bg-background/80 backdrop-blur">
                         <CheckIcon className="size-3.5 text-primary" />
                     </span>
                 )}
@@ -68,7 +68,7 @@ export function StarterPackCard({ card, picked, locked, onToggle, className }: S
                             event.stopPropagation()
                             onToggle()
                         }}
-                        className="ml-auto shrink-0"
+                        className="ms-auto shrink-0"
                     >
                         {picked ? <CheckIcon data-icon="inline-start" className="size-3.5" /> : locked ? <LockIcon data-icon="inline-start" className="size-3.5" /> : null}
                         {picked ? t('picked') : locked ? t('trialFull') : t('pick')}

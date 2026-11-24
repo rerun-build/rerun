@@ -123,7 +123,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
 
     return (
         <Button variant="outline" size="sm" onClick={startAuth} disabled={state === 'authorizing'} className="w-full">
-            {state === 'authorizing' ? <Loader2Icon className="size-3.5 animate-spin mr-1.5" /> : <ExternalLinkIcon className="size-3.5 mr-1.5" />}
+            {state === 'authorizing' ? <Loader2Icon className="size-3.5 animate-spin me-1.5" /> : <ExternalLinkIcon className="size-3.5 me-1.5" />}
             {state === 'authorizing' ? t('waiting') : t('connect')}
         </Button>
     )

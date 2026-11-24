@@ -55,11 +55,11 @@ export function GateScreen({ brand, lock, mark, title, subtitle, children }: { b
                 </div>
                 {children && <div className="flex w-full flex-col gap-2.5">{children}</div>}
             </div>
-            <MadeWithRerun className="absolute right-4 bottom-4 max-md:right-1/2 max-md:translate-x-1/2" />
+            <MadeWithRerun className="absolute end-4 bottom-4 max-md:right-1/2 max-md:translate-x-1/2" />
         </main>
     )
 }
 
 export function GateMessage({ children }: { children: ReactNode }) {
-    return <p className="-mt-1 text-left text-xs text-destructive">{children}</p>
+    return <p className="-mt-1 text-start text-xs text-destructive">{children}</p>
 }

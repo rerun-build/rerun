@@ -12,7 +12,7 @@ export function ReasoningStep({ text, isStreaming = false }: { text: string; isS
     const t = useTranslations('chat.reasoning')
     return (
         <StepRow iconProps={{ icon: BrainIcon }} label={isStreaming ? t('thinking') : t('thought')} detail={text.replace(/\s+/g, ' ')} status={isStreaming ? 'running' : 'done'}>
-            {text && <div className="border-l border-border pl-3 text-xs leading-relaxed text-muted-foreground/80">{renderMarkdown(text)}</div>}
+            {text && <div className="border-s border-border ps-3 text-xs leading-relaxed text-muted-foreground/80">{renderMarkdown(text)}</div>}
         </StepRow>
     )
 }

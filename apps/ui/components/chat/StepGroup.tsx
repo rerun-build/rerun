@@ -43,13 +43,13 @@ function ToolStack({ items }: { items: StepGroupItem[] }) {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25, ease: EASE }}
-                        className={cn('flex size-5 items-center justify-center rounded-full bg-muted text-muted-foreground ring-2 ring-background', i > 0 && '-ml-1')}
+                        className={cn('flex size-5 items-center justify-center rounded-full bg-muted text-muted-foreground ring-2 ring-background', i > 0 && '-ms-1')}
                     >
                         <StepGlyph iconProps={iconProps} className="size-3" />
                     </motion.span>
                 ))}
             </AnimatePresence>
-            {hidden > 0 && <span className="ml-1 font-mono text-[11px] tabular-nums text-muted-foreground">+{hidden}</span>}
+            {hidden > 0 && <span className="ms-1 font-mono text-[11px] tabular-nums text-muted-foreground">+{hidden}</span>}
         </span>
     )
 }
@@ -88,7 +88,7 @@ export function StepGroup({ items, agentId }: { items: StepGroupItem[]; agentId?
                     aria-expanded={open}
                     aria-label={failed > 0 ? t('countWithFailures', { count: items.length, failed }) : count}
                     onClick={() => setOpen(!open)}
-                    className="flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-border bg-muted/40 pr-2 pl-1 transition-colors hover:bg-muted/70"
+                    className="flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-border bg-muted/40 pe-2 ps-1 transition-colors hover:bg-muted/70"
                 >
                     <ToolStack items={items} />
                     <span className="tabular-nums">{live ? items.length : count}</span>

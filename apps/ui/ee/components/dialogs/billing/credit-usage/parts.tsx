@@ -38,7 +38,7 @@ export function SourceChip({ source }: { source: CreditSource }) {
     return (
         <span className="relative flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted ring-1 ring-border">
             {createElement(sourceIcon(source), { className: 'size-3.5 text-muted-foreground' })}
-            <Swatch kind={source.kind} className="absolute -right-0.5 -bottom-0.5 size-2 ring-2 ring-popover" />
+            <Swatch kind={source.kind} className="absolute -end-0.5 -bottom-0.5 size-2 ring-2 ring-popover" />
         </span>
     )
 }
@@ -79,7 +79,7 @@ export function SplitBar({ balance, trial = false }: { balance: CreditBalance; t
             {segments.map(segment => (
                 <Tooltip key={segment.key}>
                     <TooltipTrigger asChild>
-                        <span className={cn('relative h-full min-w-1 overflow-hidden first:rounded-l-full last:rounded-r-full', segment.className)} style={{ flexGrow: segment.micros, flexBasis: 0 }}>
+                        <span className={cn('relative h-full min-w-1 overflow-hidden first:rounded-s-full last:rounded-e-full', segment.className)} style={{ flexGrow: segment.micros, flexBasis: 0 }}>
                             {segment.hatched && <span aria-hidden className="absolute inset-0" style={HATCH} />}
                         </span>
                     </TooltipTrigger>

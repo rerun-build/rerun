@@ -27,7 +27,7 @@ export function ScreenCard({ live, site, screen, takeover, onTakeControl, ref }:
             <div className={cn('group relative flex aspect-video overflow-hidden', takeover && 'm-1.5 rounded-lg bg-background')}>
                 {screen}
                 {live && site && (
-                    <span className="pointer-events-none absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur">
+                    <span className="pointer-events-none absolute top-2 end-2 flex items-center gap-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur">
                         <GlobeIcon className="size-3" />
                         {site}
                     </span>

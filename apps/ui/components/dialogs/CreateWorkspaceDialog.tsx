@@ -156,7 +156,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                             >
                                                 <img src={blob.url} alt="" className="size-full object-cover" />
                                                 {iconFile === blob.file && (
-                                                    <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground">
+                                                    <span className="absolute end-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground">
                                                         <CheckIcon className="size-2.5 text-background" />
                                                     </span>
                                                 )}

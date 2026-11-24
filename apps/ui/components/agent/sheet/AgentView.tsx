@@ -36,14 +36,14 @@ export function AgentViewHeader({ name, avatar, title, onBack, onClose }: { name
     const t = useTranslations('agent.agentView')
     return (
         <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2">
-            <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink pl-1.5">
+            <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink ps-1.5">
                 <ChevronLeftIcon className="size-4" />
                 <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">{avatar}</span>
                 <span className="truncate text-muted-foreground">{name}</span>
             </Button>
             <span className="text-muted-foreground/50">/</span>
             <span className="shrink-0 px-1.5 text-sm font-semibold">{title}</span>
-            <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
+            <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ms-auto">
                 <XIcon className="size-4" />
             </Button>
         </div>

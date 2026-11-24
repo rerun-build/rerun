@@ -27,7 +27,7 @@ export function TriggerPayloadBlock({ payload }: { payload: TriggerPayload }) {
 
     return (
         <Collapsible open={open && hasBody} onOpenChange={setOpen} className="w-full rounded-xl bg-background/40 transition-colors data-[state=open]:bg-background/70">
-            <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm transition-colors data-[state=closed]:hover:bg-background/70">
+            <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-start text-sm transition-colors data-[state=closed]:hover:bg-background/70">
                 <Icon icon={WebhookIcon} size="sm" />
                 <span className="min-w-0 flex-1 truncate font-medium">{payload.slug}</span>
                 <TriggerPayloadSummary payload={payload} />

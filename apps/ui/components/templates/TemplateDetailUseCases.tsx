@@ -12,7 +12,7 @@ export function TemplateDetailUseCases({ title, useCases, onSelect }: { title: s
                         <button
                             type="button"
                             onClick={() => onSelect(useCase)}
-                            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] transition-colors outline-none hover:bg-foreground/[0.05] focus-visible:ring-3 focus-visible:ring-ring/50"
+                            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-start text-[13px] transition-colors outline-none hover:bg-foreground/[0.05] focus-visible:ring-3 focus-visible:ring-ring/50"
                         >
                             <span className="min-w-0 flex-1 truncate">{useCase.name}</span>
                             <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground/60" />

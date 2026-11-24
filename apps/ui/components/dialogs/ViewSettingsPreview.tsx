@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl'
 export function ViewSettingsPreview({ card, fileUrl }: { card: TableCardData; fileUrl?: FileUrl }) {
     const t = useTranslations('dialogs.viewSettings')
     return (
-        <div className="hidden h-full flex-col justify-center gap-3 overflow-y-auto border-l bg-muted/30 p-8 sm:flex">
+        <div className="hidden h-full flex-col justify-center gap-3 overflow-y-auto border-s bg-muted/30 p-8 sm:flex">
             <p className="text-xs font-medium text-muted-foreground">{t('preview')}</p>
             <TableCard card={card} fileUrl={fileUrl} />
         </div>

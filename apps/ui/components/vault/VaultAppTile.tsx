@@ -11,7 +11,7 @@ type Props = { icon: ReactNode; name: string; label?: string | null; badges?: Re
 // An app of the Vault, recognised by its logo first, then by the account it is signed in with.
 export function VaultAppTile({ icon, name, label, badges, usage, onClick }: Props) {
     return (
-        <button type="button" onClick={onClick} className={cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'flex min-w-0 flex-col items-start gap-3 p-3 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none')}>
+        <button type="button" onClick={onClick} className={cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'flex min-w-0 flex-col items-start gap-3 p-3 text-start focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none')}>
             <span className="flex w-full items-start justify-between gap-2">
                 {icon}
                 {badges && <span className="flex min-w-0 flex-wrap justify-end gap-1">{badges}</span>}

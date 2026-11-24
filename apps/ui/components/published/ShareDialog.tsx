@@ -189,7 +189,7 @@ function AccessTrigger({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="-ml-1.5 min-w-0" disabled={disabled}>
+                <Button variant="ghost" className="-ms-1.5 min-w-0" disabled={disabled}>
                     <AccessIcon access={access} />
                     <span className="truncate">{accessCopy.label(access, workspaceName)}</span>
                     <ChevronDownIcon className="text-muted-foreground" />
@@ -283,7 +283,7 @@ function InviteDetail({ invited, disabled, onSave }: { invited: string[]; disabl
             {invited.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                     {invited.map(entry => (
-                        <span key={entry} className="flex max-w-full items-center gap-1 rounded-full bg-muted py-0.5 pr-1 pl-2.5 text-xs">
+                        <span key={entry} className="flex max-w-full items-center gap-1 rounded-full bg-muted py-0.5 pe-1 ps-2.5 text-xs">
                             <span className="truncate">{accessCopy.invite(entry)}</span>
                             {removable && (
                                 <button

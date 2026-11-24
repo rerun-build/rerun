@@ -39,7 +39,7 @@ export function CopyChip({ value, pasteTarget }: { value: string; pasteTarget?: 
             {characters.join('')}
             <span className="whitespace-nowrap">
                 {lastCharacter}
-                <span className="ml-1.5 inline-block align-[-0.15em]">
+                <span className="ms-1.5 inline-block align-[-0.15em]">
                     {copied ? <CheckIcon className="size-3.5 shrink-0 text-emerald-500" /> : <CopyIcon className="size-3.5 shrink-0 text-muted-foreground" />}
                 </span>
             </span>

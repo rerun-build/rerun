@@ -10,7 +10,7 @@ function SkeletonList({ rows = 5, className, ...props }: React.ComponentProps<"d
         <div key={i} className="flex items-center gap-2.5 px-2 py-2">
           <Skeleton className="size-7 shrink-0 rounded-full" />
           <Skeleton className="h-3.5 w-1/2" />
-          <Skeleton className="ml-auto h-3 w-12 shrink-0" />
+          <Skeleton className="ms-auto h-3 w-12 shrink-0" />
         </div>
       ))}
     </div>
@@ -127,7 +127,7 @@ function SkeletonFileGrid({ tiles = 10, className, ...props }: React.ComponentPr
 function SkeletonChatMessage({ role }: { role: "user" | "assistant" }) {
   if (role === "user") {
     return (
-      <div className="ml-auto flex w-fit max-w-[95%] flex-col gap-2 rounded-lg bg-secondary px-4 py-3">
+      <div className="ms-auto flex w-fit max-w-[95%] flex-col gap-2 rounded-lg bg-secondary px-4 py-3">
         <Skeleton className="h-3.5 w-48" />
         <Skeleton className="h-3.5 w-32" />
       </div>

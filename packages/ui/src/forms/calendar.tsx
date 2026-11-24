@@ -43,8 +43,8 @@ function Calendar({
         today: "[&>button]:ring-1 [&>button]:ring-foreground/25",
         selected:
           "[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary",
-        range_start: cn(RANGE_EDGE, "rounded-l-md"),
-        range_end: cn(RANGE_EDGE, "rounded-r-md"),
+        range_start: cn(RANGE_EDGE, "rounded-s-md"),
+        range_end: cn(RANGE_EDGE, "rounded-e-md"),
         range_middle:
           "bg-primary/15 [&>button]:bg-transparent! [&>button]:text-foreground! [&>button]:hover:bg-primary/20!",
         outside: "text-muted-foreground/50",

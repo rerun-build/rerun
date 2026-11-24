@@ -75,7 +75,7 @@ export function DiscoveryTeaser({ source, subject }: { source: DiscoverySource; 
             <div className="mb-2 flex items-center gap-2">
                 <Skeleton className="size-5 rounded-md" />
                 <TextShimmer className="truncate text-[11px] font-medium">{t(source, subject)}</TextShimmer>
-                <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
+                <span className="ms-auto shrink-0 text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
             </div>
             <TeaserBody shape={TEASER_SHAPE[source]} />
         </div>

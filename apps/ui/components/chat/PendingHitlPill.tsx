@@ -17,7 +17,7 @@ export function PendingHitlPill({ summary, onJump }: { summary: PendingHitlSumma
     const t = useTranslations('chat.pendingHitl')
     const KindIcon = summary.icon
     return (
-        <button type="button" onClick={onJump} aria-label={t('goTo', { label: summary.label })} className="inline-flex h-9 max-w-full items-center gap-2 rounded-full border border-border bg-background pr-3 pl-1.5 text-sm font-medium text-foreground shadow-md transition-colors hover:bg-muted">
+        <button type="button" onClick={onJump} aria-label={t('goTo', { label: summary.label })} className="inline-flex h-9 max-w-full items-center gap-2 rounded-full border border-border bg-background pe-3 ps-1.5 text-sm font-medium text-foreground shadow-md transition-colors hover:bg-muted">
             <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full', summary.tone)}>
                 <KindIcon className="size-3.5" />
             </span>

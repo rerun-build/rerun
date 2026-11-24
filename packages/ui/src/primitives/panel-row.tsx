@@ -36,7 +36,7 @@ export function PanelRow({ title, description, footer, leading, meta, actions, o
         </>
     )
 
-    const rootClassName = cn('group flex w-full items-center gap-3 p-3 text-left', PANEL_CARD, onClick && PANEL_CARD_INTERACTIVE, className)
+    const rootClassName = cn('group flex w-full items-center gap-3 p-3 text-start', PANEL_CARD, onClick && PANEL_CARD_INTERACTIVE, className)
 
     if (!onClick) return <div className={rootClassName}>{content}</div>
 

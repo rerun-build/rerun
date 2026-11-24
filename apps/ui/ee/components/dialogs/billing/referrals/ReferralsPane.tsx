@@ -40,7 +40,7 @@ function MonthsMilestones({ earned, cap }: { earned: number; cap: number }) {
     return (
         <div className="relative pt-1 pb-6" role="img" aria-label={t('progressLabel', { earned, cap })}>
             <div className="relative h-1.5 w-full rounded-full bg-muted-foreground/20">
-                <span className={cn('absolute inset-y-0 left-0 rounded-full', EARNED_FILL)} style={{ width: `${(Math.min(earned, cap) / cap) * 100}%` }} />
+                <span className={cn('absolute inset-y-0 start-0 rounded-full', EARNED_FILL)} style={{ width: `${(Math.min(earned, cap) / cap) * 100}%` }} />
             </div>
             {REFERRAL_MILESTONES.map(step => {
                 const reached = earned >= step
@@ -126,7 +126,7 @@ export function ReferralsPane({ overview, failed, nextInvoice, onBack }: { overv
                         <MonthsMilestones earned={overview.monthsEarned} cap={overview.cap} />
                         <div className="-mx-4 flex items-baseline justify-between gap-4 border-t px-4 py-3 text-sm">
                             <span className="text-muted-foreground">{t('plan.nextInvoice')}</span>
-                            <span className={cn('text-right tabular-nums', !nextInvoice && 'text-muted-foreground')}>{nextInvoice ? `${shortDate(nextInvoice.at, locale)} · ${usd(nextInvoice.amountCents)}` : t('plan.referrals.firstPayment')}</span>
+                            <span className={cn('text-end tabular-nums', !nextInvoice && 'text-muted-foreground')}>{nextInvoice ? `${shortDate(nextInvoice.at, locale)} · ${usd(nextInvoice.amountCents)}` : t('plan.referrals.firstPayment')}</span>
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">

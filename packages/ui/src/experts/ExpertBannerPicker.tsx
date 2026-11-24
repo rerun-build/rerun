@@ -48,7 +48,7 @@ export function ExpertBannerPicker({ options, value, onChange, onDone, upload }:
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto pr-0.5">
+            <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto pe-0.5">
                 <FileDropzone accept="image/*" onFiles={handleFiles} disabled={uploading} overlayLabel={t('experts.images.drop')} className="rounded-md">
                     {({ inputId, dragOver }) => (
                         <label

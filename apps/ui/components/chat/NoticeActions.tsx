@@ -32,7 +32,7 @@ export function NoticeActions({ actions }: { actions: NoticeAction[] }) {
                         <span className="block text-sm font-medium">{action.title}</span>
                         <span className="text-xs text-muted-foreground">{action.description}</span>
                     </span>
-                    <Button size="sm" variant={action.variant ?? (index === 0 ? 'default' : 'outline')} onClick={action.onClick} className={cn('shrink-0', stacked ? 'mt-auto w-full' : 'ml-auto')}>
+                    <Button size="sm" variant={action.variant ?? (index === 0 ? 'default' : 'outline')} onClick={action.onClick} className={cn('shrink-0', stacked ? 'mt-auto w-full' : 'ms-auto')}>
                         {action.cta}
                         <ArrowRightIcon className="size-3.5" />
                     </Button>

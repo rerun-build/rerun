@@ -18,8 +18,8 @@ type IconGlyph = ComponentType<{ className?: string }>
 // The title row stops short of the close button in the top right corner.
 export function DialogHeaderBar({ icon, title, description, actions, children }: { icon: IconGlyph | ReactNode; title: ReactNode; description?: ReactNode; actions?: ReactNode; children?: ReactNode }) {
     return (
-        <DialogHeader className="shrink-0 gap-4 border-b p-4 text-left [[data-slot=dialog-content]:not(.p-0)_&]:-mx-4 [[data-slot=dialog-content]:not(.p-0)_&]:-mt-4">
-            <div className="flex items-center gap-3 pr-8">
+        <DialogHeader className="shrink-0 gap-4 border-b p-4 text-start [[data-slot=dialog-content]:not(.p-0)_&]:-mx-4 [[data-slot=dialog-content]:not(.p-0)_&]:-mt-4">
+            <div className="flex items-center gap-3 pe-8">
                 {isValidElement(icon) ? icon : <Icon size="md" icon={icon as IconGlyph} />}
                 <div className="min-w-0 flex-1 space-y-1">
                     <DialogTitle className="leading-snug break-words">{title}</DialogTitle>

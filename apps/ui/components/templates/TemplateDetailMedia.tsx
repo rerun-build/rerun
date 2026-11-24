@@ -21,13 +21,13 @@ export function TemplateDetailMedia({ template, showStatus }: { template: Librar
                 <Icon icon={LayersIcon} size="lg" className="opacity-40" />
             )}
             {showStatus && template.status !== 'published' && (
-                <span className="absolute left-3 top-3 z-10 flex rounded-full sm:left-12 bg-background/70 backdrop-blur">
+                <span className="absolute start-3 top-3 z-10 flex rounded-full sm:start-12 bg-background/70 backdrop-blur">
                     <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
                         {templateStatusLabel(template.status, tStatus)}
                     </Badge>
                 </span>
             )}
-            <span className="absolute right-3 top-3 z-10 flex rounded-full bg-background/70 backdrop-blur empty:hidden">
+            <span className="absolute end-3 top-3 z-10 flex rounded-full bg-background/70 backdrop-blur empty:hidden">
                 <TemplatePriceBadge pricing={template.pricing} access={template.access} />
             </span>
         </div>

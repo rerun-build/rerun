@@ -49,7 +49,7 @@ export function WorkspaceSwitchItems() {
 
     return (
         <>
-            {email && <DropdownMenuLabel className="truncate pl-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
+            {email && <DropdownMenuLabel className="truncate ps-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
             {switchableWorkspaces(workspaces).map((w, index) => {
                 const active = w.id === workspace?.id
                 const fallbackIcon = PRICING_ICONS[index % PRICING_ICONS.length]

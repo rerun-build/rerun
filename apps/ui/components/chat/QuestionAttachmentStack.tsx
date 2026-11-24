@@ -40,7 +40,7 @@ export function QuestionAttachmentStack({ items, onRemove, onRetry }: QuestionAt
             {hidden.length > 0 && (
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <span className="ml-1.5 text-xs font-medium text-muted-foreground tabular-nums">+{hidden.length}</span>
+                        <span className="ms-1.5 text-xs font-medium text-muted-foreground tabular-nums">+{hidden.length}</span>
                     </TooltipTrigger>
                     <TooltipContent>{hidden.map(item => item.file.filename).join(', ')}</TooltipContent>
                 </Tooltip>
@@ -61,7 +61,7 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <div className={cn('group/thumb relative -ml-2 size-8 shrink-0 transition-[rotate] duration-200 first:ml-0 hover:z-10 hover:rotate-0', tilt)}>
+                <div className={cn('group/thumb relative -ms-2 size-8 shrink-0 transition-[rotate] duration-200 first:ms-0 hover:z-10 hover:rotate-0', tilt)}>
                     <div className={cn('relative size-full overflow-hidden rounded-md border border-foreground/15 bg-muted shadow-md shadow-black/30', failed && 'border-destructive/70')}>
                         {isImage ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -94,7 +94,7 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
                         type="button"
                         onClick={() => onRemove(file.id)}
                         aria-label={t('removeNamed', { name: fileName })}
-                        className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-foreground text-background opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-visible:opacity-100"
+                        className="absolute -top-1.5 -end-1.5 flex size-4 items-center justify-center rounded-full bg-foreground text-background opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-visible:opacity-100"
                     >
                         <XIcon className="size-2.5" />
                     </button>
@@ -102,7 +102,7 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
             </TooltipTrigger>
             <TooltipContent>
                 <span className="font-medium">{fileName}</span>
-                <span className="ml-1.5 opacity-70">{statusLine(upload, locale, t)}</span>
+                <span className="ms-1.5 opacity-70">{statusLine(upload, locale, t)}</span>
             </TooltipContent>
         </Tooltip>
     )

@@ -205,7 +205,7 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
                         {t('hints.more')}
                     </span>
                 )}
-                <span className="ml-auto flex items-center gap-1.5 max-sm:hidden">
+                <span className="ms-auto flex items-center gap-1.5 max-sm:hidden">
                     {t.rich('hints.searchPage', {
                         keys: () => (
                             <>
@@ -244,20 +244,20 @@ export function ControlRowItem({ row }: { row: ControlRow }) {
                 </span>
                 {row.disabledReason && <span className="text-xs text-muted-foreground">{row.disabledReason}</span>}
             </span>
-            <span className="ml-auto flex shrink-0 items-center gap-2">
+            <span className="ms-auto flex shrink-0 items-center gap-2">
                 {row.badge && (
                     <Badge size="xs" tone={row.badge.tone} glow={false} className="font-medium">
                         {row.badge.label}
                     </Badge>
                 )}
                 {asking && (
-                    <CommandShortcut className="ml-0 flex items-center gap-1 tracking-normal max-sm:hidden!">
+                    <CommandShortcut className="ms-0 flex items-center gap-1 tracking-normal max-sm:hidden!">
                         <Kbd className={HINT_KEY}>{mod}</Kbd>
                         <Kbd className={HINT_KEY}>↵</Kbd>
                     </CommandShortcut>
                 )}
                 {row.onDrill && (
-                    <CommandShortcut className="ml-0 hidden tracking-normal group-data-[selected=true]/command-item:inline-flex max-sm:hidden!">
+                    <CommandShortcut className="ms-0 hidden tracking-normal group-data-[selected=true]/command-item:inline-flex max-sm:hidden!">
                         <Kbd className={HINT_KEY}>Tab</Kbd>
                     </CommandShortcut>
                 )}

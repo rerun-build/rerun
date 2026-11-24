@@ -55,14 +55,14 @@ export function MarkdownTextarea({
     return (
         <Field label={label} optional={optional} hideRequired={hideRequired} helperText={helperText} htmlFor={textareaId}>
             <div className="relative">
-                <Textarea id={textareaId} value={value} onChange={e => onChange(e.target.value)} disabled={disabled} className={cn('pr-9', className)} {...props} />
+                <Textarea id={textareaId} value={value} onChange={e => onChange(e.target.value)} disabled={disabled} className={cn('pe-9', className)} {...props} />
                 {!disabled && (
                     <button
                         type="button"
                         onClick={handleExpand}
                         aria-label={t('openEditor')}
                         title={t('openEditor')}
-                        className="absolute top-1.5 right-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
+                        className="absolute top-1.5 end-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                     >
                         <Maximize2Icon className="size-3.5" />
                     </button>

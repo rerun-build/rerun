@@ -14,19 +14,19 @@ export const CHROME_SIZE = 40
 export type ChromeInset = 'control' | 'avatar' | 'gauge' | 'icon' | 'text'
 
 const INSET_START: Record<ChromeInset, string> = {
-    control: 'pl-[3px]',
-    avatar: 'pl-[7px]',
-    gauge: 'pl-[9px]',
-    icon: 'pl-[11px]',
-    text: 'pl-[15px]',
+    control: 'ps-[3px]',
+    avatar: 'ps-[7px]',
+    gauge: 'ps-[9px]',
+    icon: 'ps-[11px]',
+    text: 'ps-[15px]',
 }
 
 const INSET_END: Record<ChromeInset, string> = {
-    control: 'pr-[3px]',
-    avatar: 'pr-[7px]',
-    gauge: 'pr-[9px]',
-    icon: 'pr-[11px]',
-    text: 'pr-[15px]',
+    control: 'pe-[3px]',
+    avatar: 'pe-[7px]',
+    gauge: 'pe-[9px]',
+    icon: 'pe-[11px]',
+    text: 'pe-[15px]',
 }
 
 const SURFACE = 'relative rounded-full border border-border bg-card/95 text-sm font-medium text-foreground shadow-2xl'

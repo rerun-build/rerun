@@ -7,7 +7,7 @@ import { creatorKindLabel, type LibraryCreatorSummary } from '@/lib/templates/li
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
-const CARD_CLASS = 'group flex min-w-0 items-center gap-2 rounded-xl border bg-card px-2.5 py-2.5 text-left transition-colors hover:border-foreground/20 hover:bg-muted/30'
+const CARD_CLASS = 'group flex min-w-0 items-center gap-2 rounded-xl border bg-card px-2.5 py-2.5 text-start transition-colors hover:border-foreground/20 hover:bg-muted/30'
 
 // A creator with templates opens their shelf inside the library, so browsing their work never
 // costs leaving the app. One without any yet has nothing to open but their public page.

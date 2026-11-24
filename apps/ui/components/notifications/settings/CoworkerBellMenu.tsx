@@ -51,7 +51,7 @@ export function CoworkerBellMenu({ name, rule, scope, scheduledCount, onChange, 
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon-sm" aria-label={t('notificationsFor', { name })} className={cn('relative', rule.mode === 'muted' ? 'text-muted-foreground' : 'text-foreground', className)}>
                     <ModeIcon className="size-4" />
-                    {following && rule.mode !== 'muted' && <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />}
+                    {following && rule.mode !== 'muted' && <span className="absolute top-1 end-1 size-1.5 rounded-full bg-primary" />}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent

@@ -245,5 +245,5 @@ function LiveDot({ tone }: { tone: RoutineStatus['tone'] }) {
 function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (name: string) => void; onCancel: () => void }) {
     const t = useKitTranslations()
     const { inputProps } = useRenameField({ name, onSubmit, onCancel })
-    return <Input {...inputProps} maxLength={120} aria-label={t('foreman.routines.nameLabel')} className="-ml-1.5 h-6 px-1.5 text-sm font-medium" />
+    return <Input {...inputProps} maxLength={120} aria-label={t('foreman.routines.nameLabel')} className="-ms-1.5 h-6 px-1.5 text-sm font-medium" />
 }

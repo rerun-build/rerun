@@ -46,7 +46,7 @@ export function UpgradePill() {
 export function UpgradePillButton({ pastDue, daysLeft, onClick }: { pastDue: boolean; daysLeft: string | null; onClick?: () => void }) {
     const t = useTranslations('billing')
     return (
-        <Button onClick={onClick} className="h-(--chrome-size) gap-2 rounded-full pr-[15px] pl-[11px]">
+        <Button onClick={onClick} className="h-(--chrome-size) gap-2 rounded-full pe-[15px] ps-[11px]">
             <RocketIcon className={cn('size-4', pastDue && 'text-destructive')} />
             {pastDue ? t('layout.pill.updatePayment') : daysLeft ? t('layout.pill.freeTrial') : t('layout.pill.upgrade')}
             {daysLeft && <span className="text-primary-foreground/60 tabular-nums max-sm:hidden">· {daysLeft}</span>}

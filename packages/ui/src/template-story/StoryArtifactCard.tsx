@@ -112,7 +112,7 @@ export function StoryDockedCard({
                 <motion.div
                     key={artifact.key}
                     aria-hidden
-                    className="pointer-events-none absolute left-1/2"
+                    className="pointer-events-none absolute start-1/2"
                     style={{ top, translate: '-50% 0', scale: artifact.scale, transformOrigin: '50% 0' }}
                     initial={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { ...ENTER, delay: 0.35 } }}
@@ -151,7 +151,7 @@ export function StoryActivityCard({
     const look = STATE[state]
 
     return (
-        <div className={cn('relative w-64 text-left', className)}>
+        <div className={cn('relative w-64 text-start', className)}>
             <div
                 className="relative overflow-hidden rounded-xl shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_16px_36px_-18px_rgb(0_0_0/0.3)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_18px_40px_-16px_rgb(0_0_0/0.8)]"
                 style={{ background: 'color-mix(in oklab, var(--foreground) 4%, var(--background))' }}

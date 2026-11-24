@@ -109,7 +109,7 @@ function PinnedDecision(props: SkillProposalBlockProps & Copy) {
             <Stripes fade="bottom" />
             <div className={cn('relative flex flex-wrap gap-3 text-sm sm:flex-nowrap', unfolded ? 'items-start' : 'items-center')}>
                 <Icon size="sm" icon={BrainIcon} />
-                <button type="button" aria-expanded={expanded} aria-label={expanded ? t('chat.skillProposal.hideDetails') : t('chat.skillProposal.showDetails')} onClick={toggle} className="group min-w-0 flex-1 cursor-pointer text-left">
+                <button type="button" aria-expanded={expanded} aria-label={expanded ? t('chat.skillProposal.hideDetails') : t('chat.skillProposal.showDetails')} onClick={toggle} className="group min-w-0 flex-1 cursor-pointer text-start">
                     <span className={cn('flex gap-1', unfolded ? 'items-start' : 'items-center')}>
                         <span className={cn('font-medium', unfolded ? 'break-words' : 'truncate')}>{headline}</span>
                         <ChevronDownIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition group-hover:text-foreground', unfolded && 'mt-1', expanded && 'rotate-180')} />
@@ -125,7 +125,7 @@ function PinnedDecision(props: SkillProposalBlockProps & Copy) {
                             <span className="block space-y-1.5 break-words">
                                 <span className={cn('block', failed && 'text-destructive')}>{detail}</span>
                                 {!failed && instructions.length > 0 && (
-                                    <ul className="list-disc space-y-1 pl-4">
+                                    <ul className="list-disc space-y-1 ps-4">
                                         {instructions.map((instruction, index) => (
                                             <li key={index} className="whitespace-pre-line">
                                                 {instruction}

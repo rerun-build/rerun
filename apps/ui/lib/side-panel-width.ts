@@ -5,7 +5,7 @@ export const SIDE_PANEL_MIN_WIDTH = 480
 export const SIDE_PANEL_MAX_WIDTH = 800
 /** Doit rester d'accord avec le `60vw` de la classe `max-w` de `SidePanel`. */
 export const SIDE_PANEL_MAX_VIEWPORT_RATIO = 0.6
-/** Le panneau flotte sur le board ; doit rester d'accord avec les `md:top-2 md:right-2 md:bottom-2` de `SidePanel`. */
+/** Le panneau flotte sur le board ; doit rester d'accord avec les `md:top-2 md:end-2 md:bottom-2` de `SidePanel`. */
 export const SIDE_PANEL_GAP = 8
 
 // Une seule largeur pour tous les panneaux latéraux ; la clé garde son ancien nom pour

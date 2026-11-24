@@ -35,7 +35,7 @@ export function SourceFacepile({ sources, size = 'sm', max = 3, className }: Sou
                     <SourceLogo key={source.id} source={source} size={size} className="ring-2 ring-background" />
                 ))}
             </span>
-            {hidden > 0 && <span className="ml-1 text-[11px] text-muted-foreground tabular-nums">+{hidden}</span>}
+            {hidden > 0 && <span className="ms-1 text-[11px] text-muted-foreground tabular-nums">+{hidden}</span>}
         </span>
     )
 }

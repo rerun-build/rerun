@@ -121,7 +121,7 @@ function TreeRow({
 
     return (
         <>
-            <div className="flex items-center gap-2 rounded py-1 pr-1 hover:bg-muted/40" style={{ paddingLeft: `${depth * 0.875 + 0.25}rem` }}>
+            <div className="flex items-center gap-2 rounded py-1 pe-1 hover:bg-muted/40" style={{ paddingLeft: `${depth * 0.875 + 0.25}rem` }}>
                 <Checkbox size="sm" checked={checked} onCheckedChange={toggleSelf} />
                 {node.file ? (
                     <span className="w-3.5 shrink-0" />
@@ -140,7 +140,7 @@ function TreeRow({
                         {node.file ? node.file.flagged.join(', ') : t('flagged', { count: flaggedCount })}
                     </span>
                 )}
-                <span className="w-14 shrink-0 text-right text-[0.65rem] text-muted-foreground">{formatBytes(node.bytes, locale)}</span>
+                <span className="w-14 shrink-0 text-end text-[0.65rem] text-muted-foreground">{formatBytes(node.bytes, locale)}</span>
             </div>
 
             {!node.file &&

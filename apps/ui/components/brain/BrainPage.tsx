@@ -63,7 +63,7 @@ function Backlinks({ links, onOpenPage }: { links: BrainPageData['backlinks']; o
             {open && (
                 <div className="mt-2 space-y-0.5">
                     {links.map(link => (
-                        <button key={link.slug} type="button" onClick={() => onOpenPage(link.slug)} className="block w-full rounded-md px-2 py-1 text-left text-sm underline decoration-foreground/30 underline-offset-2 transition-colors hover:bg-accent hover:decoration-foreground">
+                        <button key={link.slug} type="button" onClick={() => onOpenPage(link.slug)} className="block w-full rounded-md px-2 py-1 text-start text-sm underline decoration-foreground/30 underline-offset-2 transition-colors hover:bg-accent hover:decoration-foreground">
                             {link.title}
                         </button>
                     ))}

@@ -71,11 +71,11 @@ function Cumulative({ days, slots, balance, trial, hover, onHover, locale }: { d
                 {hover != null && <line x1={x(hover)} x2={x(hover)} y1="0" y2={HEIGHT} className="stroke-foreground/30" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
             </svg>
             {showMonth && (
-                <span className="absolute left-0 -translate-y-full pb-0.5 text-[10px] text-muted-foreground" style={{ top: y(month) }}>
+                <span className="absolute start-0 -translate-y-full pb-0.5 text-[10px] text-muted-foreground" style={{ top: y(month) }}>
                     {t('usage.chart.monthly', { figure: formatCredits(month, locale) })}
                 </span>
             )}
-            <span className={cn('absolute -translate-y-full pb-0.5 text-[10px]', showMonth ? 'right-0 text-muted-foreground/70' : 'left-0 text-muted-foreground')} style={{ top: y(whole) }}>
+            <span className={cn('absolute -translate-y-full pb-0.5 text-[10px]', showMonth ? 'end-0 text-muted-foreground/70' : 'start-0 text-muted-foreground')} style={{ top: y(whole) }}>
                 {trial ? t('usage.chart.trialCredits', { figure }) : showMonth ? t('usage.chart.topup', { figure }) : t('usage.chart.credits', { figure })}
             </span>
             <div className="absolute inset-0 flex">

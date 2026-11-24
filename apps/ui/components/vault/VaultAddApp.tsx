@@ -99,8 +99,8 @@ function VaultCatalog({ onPick }: { onPick: (app: VaultCatalogApp) => void }) {
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="border-b p-3">
                 <div className="relative">
-                    <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <Input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder={t('addPage.search')} className="pl-8" aria-label={t('addPage.search')} />
+                    <SearchIcon className="pointer-events-none absolute top-1/2 start-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <Input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder={t('addPage.search')} className="ps-8" aria-label={t('addPage.search')} />
                 </div>
             </div>
             <ScrollFade className="min-h-0 flex-1 p-3">

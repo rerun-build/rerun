@@ -161,7 +161,7 @@ export function ForemanCheckinsView({ checkins, running, onEnabledChange, onRunN
                 <div className="flex items-center justify-between gap-2">
                     <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{t('recent')}</h3>
                     <TooltipDisabledReason reason={on ? undefined : t('switchedOff')}>
-                        <Button variant="ghost" size="sm" className="-mr-2 h-7 gap-1.5 px-2 text-xs text-muted-foreground" disabled={!on || running} onClick={onRunNow}>
+                        <Button variant="ghost" size="sm" className="-me-2 h-7 gap-1.5 px-2 text-xs text-muted-foreground" disabled={!on || running} onClick={onRunNow}>
                             <Play className="size-3" />
                             {t('runNow')}
                         </Button>
@@ -185,7 +185,7 @@ function CheckinTimeline({ checkins, now }: { checkins: CheckinEntry[]; now?: Da
                 const quiet = underWay ? t('running') : failed ? t('failed') : checkin.status === 'cancelled' ? t('stopped') : t(`reasons.${checkin.reason}`)
                 return (
                     <li key={checkin.runId} className="relative flex gap-3 pb-4 last:pb-0">
-                        {index < checkins.length - 1 && <span aria-hidden className="absolute top-4 bottom-0 left-[4.5px] w-px bg-border" />}
+                        {index < checkins.length - 1 && <span aria-hidden className="absolute top-4 bottom-0 start-[4.5px] w-px bg-border" />}
                         <span aria-hidden className="flex h-5 w-2.5 shrink-0 items-center justify-center">
                             <span className={cn('rounded-full', spoke ? 'size-2.5 bg-brand ring-4 ring-brand/15' : underWay ? 'size-2 bg-brand motion-safe:animate-pulse' : failed ? 'size-2 bg-destructive' : 'size-2 border border-muted-foreground/50 bg-background')} />
                         </span>

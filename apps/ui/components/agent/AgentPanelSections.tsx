@@ -57,8 +57,8 @@ export function SectionBar<T extends string>({
                     >
                         <span className="relative">
                             <section.icon className="size-4" />
-                            {!active && typeof count === 'number' && <CountPastille count={count} className="absolute -right-3 -top-1.5 ring-2 ring-background" />}
-                            {!active && count === undefined && sectionBadges.includes('dot') && <DotPastille className="absolute -right-1 -top-1 ring-2 ring-background" />}
+                            {!active && typeof count === 'number' && <CountPastille count={count} className="absolute -end-3 -top-1.5 ring-2 ring-background" />}
+                            {!active && count === undefined && sectionBadges.includes('dot') && <DotPastille className="absolute -end-1 -top-1 ring-2 ring-background" />}
                         </span>
                         <span className="max-w-full truncate">{section.label}</span>
                     </button>
@@ -86,7 +86,7 @@ export function SectionTabsHeader<T extends string>({
 }) {
     const t = useTranslations('agent.panelsShared')
     return (
-        <div className="flex shrink-0 items-center gap-1 border-b border-border pl-3 pr-2">
+        <div className="flex shrink-0 items-center gap-1 border-b border-border ps-3 pe-2">
             <div role="tablist" className="no-scrollbar flex min-w-0 flex-1 touch-pan-x items-stretch gap-4 overflow-x-auto">
                 {current.tabs.map(tab => {
                     const active = tab.id === tabId

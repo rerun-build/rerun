@@ -46,7 +46,7 @@ export function GalleryItem({ row, fields, formats, context, shape = 'square', c
             <div className="relative">
                 <CardThumb src={fields.image ? row[fields.image] : undefined} fileUrl={context.fileUrl} className={cn('w-full', GALLERY_ASPECT[shape])} />
                 {fields.badge && row[fields.badge] != null && (
-                    <Badge size="xs" fill="media" tone={toneOf(cellText(row[fields.badge]), context.tones)} glow={false} className="absolute top-1.5 left-1.5">
+                    <Badge size="xs" fill="media" tone={toneOf(cellText(row[fields.badge]), context.tones)} glow={false} className="absolute top-1.5 start-1.5">
                         {cellText(row[fields.badge])}
                     </Badge>
                 )}
@@ -91,7 +91,7 @@ export function BoardColumnHeader({ value, total, sum, valueFormat, context, cla
                 {value || '—'}
             </Badge>
             <span className="text-[11px] tabular-nums text-muted-foreground">{total}</span>
-            {sum !== undefined && <span className="ml-auto text-[11px] tabular-nums text-muted-foreground">{formatText(sum, valueFormat)}</span>}
+            {sum !== undefined && <span className="ms-auto text-[11px] tabular-nums text-muted-foreground">{formatText(sum, valueFormat)}</span>}
         </div>
     )
 }

@@ -20,9 +20,9 @@ export function CsvViewer({ slug, name, text, textTruncated }: { slug: string; n
             <table className="min-w-full border-separate border-spacing-0 text-sm">
                 <thead>
                     <tr>
-                        <th className="sticky top-0 left-0 z-20 w-10 border-r border-b bg-muted px-2 py-2 text-right font-mono text-[11px] font-normal text-muted-foreground">#</th>
+                        <th className="sticky top-0 start-0 z-20 w-10 border-e border-b bg-muted px-2 py-2 text-end font-mono text-[11px] font-normal text-muted-foreground">#</th>
                         {Array.from({ length: width }, (_, c) => (
-                            <th key={c} className={cn('sticky top-0 z-10 border-b bg-muted px-3 py-2 text-left font-medium whitespace-nowrap', numeric[c] && 'text-right')}>
+                            <th key={c} className={cn('sticky top-0 z-10 border-b bg-muted px-3 py-2 text-start font-medium whitespace-nowrap', numeric[c] && 'text-end')}>
                                 {header[c] ?? ''}
                             </th>
                         ))}
@@ -31,9 +31,9 @@ export function CsvViewer({ slug, name, text, textTruncated }: { slug: string; n
                 <tbody>
                     {body.map((row, r) => (
                         <tr key={r} className="hover:bg-muted/40">
-                            <td className="sticky left-0 border-r border-b bg-background px-2 py-2 text-right font-mono text-[11px] text-muted-foreground">{r + 1}</td>
+                            <td className="sticky start-0 border-e border-b bg-background px-2 py-2 text-end font-mono text-[11px] text-muted-foreground">{r + 1}</td>
                             {Array.from({ length: width }, (_, c) => (
-                                <td key={c} className={cn('max-w-[28rem] truncate border-b px-3 py-2 whitespace-nowrap', numeric[c] && 'text-right tabular-nums')} title={row[c]}>
+                                <td key={c} className={cn('max-w-[28rem] truncate border-b px-3 py-2 whitespace-nowrap', numeric[c] && 'text-end tabular-nums')} title={row[c]}>
                                     {row[c] ?? ''}
                                 </td>
                             ))}

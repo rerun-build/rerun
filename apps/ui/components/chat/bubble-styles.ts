@@ -2,7 +2,7 @@
 // user sent takes the second, whose classes only bite inside a `Message from="user"`.
 export const AGENT_BUBBLE_SURFACE = 'rounded-[20px] bg-muted'
 
-export const USER_BUBBLE_SHAPE = 'group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:px-3.5 group-[.is-user]:py-2'
+export const USER_BUBBLE_SHAPE = 'group-[.is-user]:rounded-2xl group-[.is-user]:rounded-ee-md group-[.is-user]:px-3.5 group-[.is-user]:py-2'
 
 // The brand violet against the agent's grey bubbles, so who said what reads at a glance. Links and
 // inline code take the bubble's white, their own colours would vanish on it; the voice player too,

@@ -15,7 +15,7 @@ const OPTIONS = [
     { value: 'simple', icon: PanelLeftIcon },
 ] as const satisfies readonly { value: WorkspaceView; icon: typeof BoxIcon }[]
 
-const TILE = cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'group relative flex flex-col gap-2 p-2 text-left focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-default data-[selected=true]:border-foreground/40 data-[selected=true]:bg-accent')
+const TILE = cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'group relative flex flex-col gap-2 p-2 text-start focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-default data-[selected=true]:border-foreground/40 data-[selected=true]:bg-accent')
 
 // The ids only pick each buddy's colours.
 const BOARD_BUDDIES = [
@@ -51,7 +51,7 @@ function BoardDrawing() {
 function ClassicDrawing() {
     return (
         <div className="flex aspect-[16/10] overflow-hidden rounded-lg border bg-background">
-            <div className="flex w-[38%] flex-col gap-1.5 border-r bg-muted/50 p-1.5">
+            <div className="flex w-[38%] flex-col gap-1.5 border-e bg-muted/50 p-1.5">
                 {LIST_BUDDIES.map((id, index) => (
                     <div key={id} className={cn('flex items-center gap-1 rounded-md p-1', index === 0 && 'bg-background')}>
                         <AgentBuddy agentId={id} size={16} animated={false} />
@@ -65,7 +65,7 @@ function ClassicDrawing() {
             <div className="flex flex-1 flex-col justify-end gap-1.5 p-2">
                 <div className="h-3 w-4/5 rounded-md bg-muted" />
                 <div className="h-3 w-3/5 rounded-md bg-muted" />
-                <div className="ml-auto h-3 w-1/2 rounded-md bg-brand" />
+                <div className="ms-auto h-3 w-1/2 rounded-md bg-brand" />
                 <div className="mt-1 h-4 rounded-md border" />
             </div>
         </div>
@@ -74,7 +74,7 @@ function ClassicDrawing() {
 
 function PickedMark({ selected }: { selected: boolean }) {
     return (
-        <span className={cn('absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-foreground text-background transition-opacity', selected ? 'opacity-100' : 'opacity-0')}>
+        <span className={cn('absolute top-3 end-3 flex size-5 items-center justify-center rounded-full bg-foreground text-background transition-opacity', selected ? 'opacity-100' : 'opacity-0')}>
             <CheckIcon className="size-3" />
         </span>
     )

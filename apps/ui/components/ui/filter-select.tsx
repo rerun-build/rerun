@@ -101,7 +101,7 @@ export function FilterSelect<T extends string>({ label, options, values, onChang
                     </CommandList>
                 </Command>
                 {selected.length > 0 && (
-                    <button type="button" onClick={() => onChange([])} className="w-full border-t border-border/50 px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <button type="button" onClick={() => onChange([])} className="w-full border-t border-border/50 px-3 py-2 text-start text-sm text-muted-foreground transition-colors hover:text-foreground">
                         {t('clear')}
                     </button>
                 )}

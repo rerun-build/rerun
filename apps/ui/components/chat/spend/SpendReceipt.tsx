@@ -28,7 +28,7 @@ export function SpendReceipt({ decision, totalMicros, progress = { spentMicros: 
     const { spentMicros, running } = progress
 
     return (
-        <div className={cn(PANEL_CARD, 'ml-auto w-full max-w-[85%] space-y-2 px-3 py-2.5')}>
+        <div className={cn(PANEL_CARD, 'ms-auto w-full max-w-[85%] space-y-2 px-3 py-2.5')}>
             <div className="flex items-start gap-2">
                 <CoinsIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
                 <p className={cn('min-w-0 flex-1 text-sm', !approved && 'text-muted-foreground line-through decoration-muted-foreground/40')}>{decision.purpose}</p>
@@ -37,7 +37,7 @@ export function SpendReceipt({ decision, totalMicros, progress = { spentMicros: 
                 </Badge>
             </div>
             {approved && totalMicros !== null && totalMicros > 0 && (
-                <div className="flex items-center gap-2.5 pl-5.5">
+                <div className="flex items-center gap-2.5 ps-5.5">
                     <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
                         <div className={cn('h-full rounded-full transition-[width] duration-500', running ? 'bg-orange-500' : 'bg-emerald-500')} style={{ width: `${Math.min(100, (spentMicros / totalMicros) * 100)}%` }} />
                     </div>

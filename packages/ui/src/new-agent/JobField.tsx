@@ -50,7 +50,7 @@ function Mirror({ text, mark, caret, placeholder }: { text: string; mark?: strin
     if (!text) {
         return (
             <span className="text-muted-foreground/70">
-                {caret && <Caret className="mr-px" />}
+                {caret && <Caret className="me-px" />}
                 {placeholder}
             </span>
         )
@@ -70,7 +70,7 @@ function Mirror({ text, mark, caret, placeholder }: { text: string; mark?: strin
             {/* A line break typed last has no height of its own in the mirror, which would leave the
                 caret one line below the text it belongs to. */}
             {text.endsWith('\n') && '\u200b'}
-            {caret && <Caret className="ml-px" />}
+            {caret && <Caret className="ms-px" />}
         </>
     )
 }

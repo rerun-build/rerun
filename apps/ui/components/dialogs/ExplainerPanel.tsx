@@ -12,7 +12,7 @@ export type ExplainerPoint = {
 // live preview.
 export function ExplainerPanel({ title, points }: { title: string; points: readonly ExplainerPoint[] }) {
     return (
-        <div className="hidden flex-col justify-center border-l bg-muted/30 p-8 sm:flex">
+        <div className="hidden flex-col justify-center border-s bg-muted/30 p-8 sm:flex">
             <h3 className="mb-6 text-lg font-medium">{title}</h3>
             <ul className="flex flex-col gap-4">
                 {points.map(point => (

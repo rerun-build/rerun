@@ -138,7 +138,7 @@ export function TemplateLibraryBrowser({
 
                 <ScrollFade scrollRef={scrollerRef} className="@container min-h-0 flex-1 overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <div className="flex flex-col gap-6 px-5 pt-5 pb-10 lg:px-8 lg:pt-7">
-                        <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 pr-8">
+                        <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 pe-8">
                             <div className="flex min-w-0 items-center gap-3.5">
                                 {creator && <TemplateCreatorAvatar creator={creator} size={44} />}
                                 <div className="min-w-0">

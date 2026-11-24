@@ -19,7 +19,7 @@ function ModelMarks() {
     return (
         <span className="flex items-center">
             {MODELS.map((model, index) => (
-                <Icon key={model.logo} icon={MODEL_ICONS[model.logo]} size="sm" glyphClassName={`size-4 ${model.tone ?? ''}`} className={`relative bg-[#0a0a0a] ${TILTS[index]} ${index > 0 ? '-ml-1.5' : ''}`} style={{ zIndex: MODELS.length - index }} />
+                <Icon key={model.logo} icon={MODEL_ICONS[model.logo]} size="sm" glyphClassName={`size-4 ${model.tone ?? ''}`} className={`relative bg-[#0a0a0a] ${TILTS[index]} ${index > 0 ? '-ms-1.5' : ''}`} style={{ zIndex: MODELS.length - index }} />
             ))}
         </span>
     )
@@ -39,7 +39,7 @@ const COLUMN_OFFSETS = [-44, 44]
 
 function Benefits() {
     return (
-        <div className="pointer-events-none absolute inset-y-0 right-14 z-10 flex items-center gap-5">
+        <div className="pointer-events-none absolute inset-y-0 end-14 z-10 flex items-center gap-5">
             {COLUMNS.map((column, i) => (
                 <div key={i} className="flex flex-col gap-5" style={{ transform: `translateY(${COLUMN_OFFSETS[i]}px)` }}>
                     {column.map(benefit => (
@@ -70,11 +70,11 @@ export function PricingOgStage({ innerRef, rounded = true }: { innerRef?: RefObj
         >
             <Benefits />
 
-            <div className="absolute left-16 top-14 z-20">
+            <div className="absolute start-16 top-14 z-20">
                 <RerunWordmark />
             </div>
 
-            <div className="absolute inset-y-0 left-16 z-20 flex flex-col items-start justify-center gap-8">
+            <div className="absolute inset-y-0 start-16 z-20 flex flex-col items-start justify-center gap-8">
                 <h2 className="-mb-[0.14em] bg-radial-[at_35%_30%] from-white from-15% via-[#b4b4be] via-55% to-[#6f6f7d] to-95% bg-clip-text pb-[0.14em] text-[4.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-transparent">
                     One plan.
                     <br />

@@ -95,7 +95,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 <WorkspaceInbox trigger="row" />
             </div>
 
-            <div className="flex items-center gap-1 pt-2 pr-3 pb-1 pl-5">
+            <div className="flex items-center gap-1 pt-2 pe-3 pb-1 ps-5">
                 <h2 className="text-xs font-medium text-muted-foreground">{t('label')}</h2>
                 <span className="flex-1" />
                 <TooltipDisabledReason reason={singleBoxReason}>
@@ -114,7 +114,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 </TooltipDisabledReason>
             </div>
 
-            <nav ref={setListElement} aria-label={t('label')} className="mr-2 min-h-0 flex-1 overflow-y-auto pl-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
+            <nav ref={setListElement} aria-label={t('label')} className="me-2 min-h-0 flex-1 overflow-y-auto ps-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
                 <div className="space-y-1 pb-2">
                     <ForemanTile />
                     {!previewsLoaded ? (
@@ -207,7 +207,7 @@ function SidebarFoot() {
                 <UpgradePill />
             </div>
             <div className="flex items-center gap-1">
-                <button type="button" onClick={() => openAccount()} className="-ml-1 flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md px-1 text-left text-sm transition-colors hover:bg-accent">
+                <button type="button" onClick={() => openAccount()} className="-ms-1 flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md px-1 text-start text-sm transition-colors hover:bg-accent">
                     <CardAvatar src={profile?.avatarUrl} name={label} className="size-6 text-[10px]" />
                     <span className="truncate">{label}</span>
                 </button>

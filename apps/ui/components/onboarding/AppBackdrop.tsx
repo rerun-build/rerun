@@ -17,7 +17,7 @@ export function AppBackdrop() {
         <div aria-hidden className="fixed inset-0 flex gap-2 bg-muted/40 p-2">
             <div className="relative min-w-0 flex-1 overflow-hidden rounded-xl border bg-background">
                 <IsoGrid tiles={[]} containers={[]} liveLinks={[]} canDraw={false} scrollGestures={false} />
-                <div className="absolute top-3 left-3 z-40">
+                <div className="absolute top-3 start-3 z-40">
                     <SignInPillButton />
                 </div>
                 <CanvasViewControls placement="top-right" onZoomIn={noop} onZoomOut={noop} onRecenter={noop} />

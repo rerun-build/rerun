@@ -26,7 +26,7 @@ export function SubscriptionOfferDialog() {
         <Dialog open={open} onOpenChange={next => !next && answer()}>
             {/* A stray click outside would spend the only time this is offered, and cut the wait
                 on the ChatGPT code short. */}
-            <SplitDialogContent aside={<OfferBoardPanel className="border-l" />} onInteractOutside={event => event.preventDefault()}>
+            <SplitDialogContent aside={<OfferBoardPanel className="border-s" />} onInteractOutside={event => event.preventDefault()}>
                 <DialogTitle className="sr-only">{t(claudePlanOffered ? 'title' : 'titleWithoutClaude')}</DialogTitle>
                 <ConnectedOffer claudePlanOffered={claudePlanOffered} onClose={answer} />
             </SplitDialogContent>

@@ -112,9 +112,9 @@ export function FileGrid({
                 </ContextMenuTrigger>
                 {menuEntry && (
                     <ContextMenuContent>
-                        <ContextMenuLabel className="max-w-56 truncate pl-7">{menuEntry.name}</ContextMenuLabel>
+                        <ContextMenuLabel className="max-w-56 truncate ps-7">{menuEntry.name}</ContextMenuLabel>
                         <ContextMenuSeparator />
-                        <ContextMenuItem className="pl-7" onSelect={() => (menuEntry.type === 'dir' ? onNavigate(menuEntry.name) : onSelectFile(menuEntry.name))}>
+                        <ContextMenuItem className="ps-7" onSelect={() => (menuEntry.type === 'dir' ? onNavigate(menuEntry.name) : onSelectFile(menuEntry.name))}>
                             {menuEntry.type === 'dir' ? t('grid.openFolder') : t('grid.open')}
                         </ContextMenuItem>
                         {menuEntry.type !== 'dir' && (
@@ -130,7 +130,7 @@ export function FileGrid({
                         {(onPublish || menuUrl) && <ContextMenuSeparator />}
                         {menuUrl ? (
                             <>
-                                <ContextMenuLabel className="pl-7">{t('publish.publicLink')}</ContextMenuLabel>
+                                <ContextMenuLabel className="ps-7">{t('publish.publicLink')}</ContextMenuLabel>
                                 <ContextMenuItem onSelect={() => window.open(menuUrl, '_blank', 'noopener,noreferrer')}>
                                     <ExternalLinkIcon className="size-4" />
                                     {t('publish.openPublicLink')}
@@ -139,7 +139,7 @@ export function FileGrid({
                                     <CopyIcon className="size-4" />
                                     {t('publish.copyPublicLink')}
                                 </ContextMenuItem>
-                                <ContextMenuItem variant="destructive" className="pl-7" onSelect={() => setConfirming({ name: menuEntry.name, action: 'unshare' })}>
+                                <ContextMenuItem variant="destructive" className="ps-7" onSelect={() => setConfirming({ name: menuEntry.name, action: 'unshare' })}>
                                     {t('publish.unshare')}
                                 </ContextMenuItem>
                             </>

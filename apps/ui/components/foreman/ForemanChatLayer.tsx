@@ -314,7 +314,7 @@ function ForemanChatSkeleton({ still }: { still?: boolean }) {
     return (
         <div aria-hidden className={cn('flex flex-col gap-4', still && '[&_[data-slot=skeleton]]:animate-none')}>
             <SkeletonAssistantLines widths={['w-1/2', 'w-5/6', 'w-3/4']} />
-            <div className="ml-auto flex w-fit max-w-[95%] flex-col gap-2 rounded-lg bg-secondary px-4 py-3">
+            <div className="ms-auto flex w-fit max-w-[95%] flex-col gap-2 rounded-lg bg-secondary px-4 py-3">
                 <Skeleton className="h-3.5 w-40" />
                 <Skeleton className="h-3.5 w-24" />
             </div>

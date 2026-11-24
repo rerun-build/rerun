@@ -100,7 +100,7 @@ function DockBubble({ note, name, top, layer, dock, onSettled }: { note: Coworke
             style={{ top, ...inwardStyle(layer.edge, layer.anchors) }}
         >
             <div className={cn('relative rounded-2xl', CARD)}>
-                <button type="button" onClick={() => dock.openPanel(dockEntryIdOf(note.agentId), note)} className="flex w-full flex-col gap-1 rounded-[inherit] py-2.5 pr-8 pl-3 text-left transition-colors hover:bg-accent/60">
+                <button type="button" onClick={() => dock.openPanel(dockEntryIdOf(note.agentId), note)} className="flex w-full flex-col gap-1 rounded-[inherit] py-2.5 pe-8 ps-3 text-start transition-colors hover:bg-accent/60">
                     <span className="text-xs">
                         {t.rich('said', {
                             name,
@@ -111,7 +111,7 @@ function DockBubble({ note, name, top, layer, dock, onSettled }: { note: Coworke
                     </span>
                     <span className="line-clamp-2 text-sm text-foreground/90">{messagePreview(note.text ?? note.title) || note.title}</span>
                 </button>
-                <button type="button" aria-label={t('dismiss')} onClick={() => dock.dismissBubble(note.id)} className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground">
+                <button type="button" aria-label={t('dismiss')} onClick={() => dock.dismissBubble(note.id)} className="absolute top-2 end-2 flex size-5 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground">
                     <XIcon className="size-3" />
                 </button>
             </div>
@@ -174,7 +174,7 @@ function DockCard({ panel, layer, dock, nameOf, onOpenNote, onOpenFilter, onMark
                     />
                 ) : (
                     <>
-                        <div className="flex shrink-0 items-center gap-2 py-2 pr-2 pl-3.5">
+                        <div className="flex shrink-0 items-center gap-2 py-2 pe-2 ps-3.5">
                             <span className="flex-1 truncate text-sm font-medium">{panel.filter === 'all' ? t('allCoworkers') : nameOf(panel.filter)}</span>
                             <Button size="icon-sm" variant="ghost" aria-label={tPeek('close')} onClick={dock.closePanel}>
                                 <XIcon className="size-3.5" />

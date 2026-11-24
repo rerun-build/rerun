@@ -139,7 +139,7 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
                             <PlayDisc />
                         </span>
                     )}
-                    <DurationPill className="pointer-events-none absolute right-2 bottom-2">{formatVoiceDuration((started ? duration - currentTime : duration) * 1000)}</DurationPill>
+                    <DurationPill className="pointer-events-none absolute end-2 bottom-2">{formatVoiceDuration((started ? duration - currentTime : duration) * 1000)}</DurationPill>
                     {started && duration > 0 && (
                         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-white/25">
                             <span className="block h-full bg-white" style={{ width: `${(currentTime / duration) * 100}%` }} />
@@ -153,7 +153,7 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
                         }}
                         aria-label={t('openFullScreen', { name })}
                         className={cn(
-                            'absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-opacity',
+                            'absolute top-2 end-2 grid size-7 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-opacity',
                             !started && 'pointer-fine:opacity-0 pointer-fine:group-hover/video:opacity-100 pointer-fine:focus-visible:opacity-100'
                         )}
                     >

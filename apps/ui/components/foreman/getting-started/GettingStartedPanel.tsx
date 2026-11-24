@@ -39,7 +39,7 @@ export function GettingStartedHeader({ progress, onHide, className }: { progress
             </span>
             {onHide && (
                 <TooltipLabeled label={t('hide')}>
-                    <Button variant="ghost" size="icon-sm" onClick={onHide} aria-label={t('hide')} className="-my-1 ml-auto text-muted-foreground">
+                    <Button variant="ghost" size="icon-sm" onClick={onHide} aria-label={t('hide')} className="-my-1 ms-auto text-muted-foreground">
                         <EyeOffIcon />
                     </Button>
                 </TooltipLabeled>
@@ -57,7 +57,7 @@ function StepRow({ step, done, highlighted, onStep }: { step: GettingStartedStep
                 disabled={done}
                 onClick={() => onStep(step)}
                 className={cn(
-                    'group flex w-full items-start gap-3 rounded-lg px-2.5 py-2 text-left transition-colors',
+                    'group flex w-full items-start gap-3 rounded-lg px-2.5 py-2 text-start transition-colors',
                     done ? 'cursor-default' : 'hover:bg-accent',
                     highlighted && 'bg-muted/60'
                 )}

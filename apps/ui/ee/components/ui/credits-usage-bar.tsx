@@ -58,7 +58,7 @@ export function CreditsUsageBar({ usedMicros, budgetMicros, resetAt, className }
                 that are themselves `bg-muted` and the track would vanish into them. */}
             <div className="absolute inset-0 bg-muted-foreground/25" style={mask} />
             {/* The glow lives on the wrapper: a filter on the masked box itself would be clipped away by the mask. */}
-            <div className="credits-bar-glow absolute inset-y-0 left-0" style={{ width: `${percent}%`, '--credits-accent': accent } as CSSProperties}>
+            <div className="credits-bar-glow absolute inset-y-0 start-0" style={{ width: `${percent}%`, '--credits-accent': accent } as CSSProperties}>
                 <div className="size-full" style={{ ...mask, backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${accent}, white var(--credits-highlight)), ${accent})` }} />
             </div>
         </div>

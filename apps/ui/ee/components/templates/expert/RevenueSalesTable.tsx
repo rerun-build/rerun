@@ -26,7 +26,7 @@ export function RevenueSalesTable({ revenue }: { revenue: CreatorRevenue }) {
                         <TableHead>{t('date')}</TableHead>
                         <TableHead>{t('template')}</TableHead>
                         <TableHead>{t('type')}</TableHead>
-                        <TableHead className="text-right">{t('youEarned')}</TableHead>
+                        <TableHead className="text-end">{t('youEarned')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -39,7 +39,7 @@ export function RevenueSalesTable({ revenue }: { revenue: CreatorRevenue }) {
                                     {saleKindLabel(sale.kind, tPayouts)}
                                 </Badge>
                             </TableCell>
-                            <TableCell className="text-right tabular-nums">{formatAmount(sale.netCents, revenue.currency)}</TableCell>
+                            <TableCell className="text-end tabular-nums">{formatAmount(sale.netCents, revenue.currency)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

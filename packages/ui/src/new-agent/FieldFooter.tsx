@@ -60,7 +60,7 @@ export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, sched
                 and the title already spell it out, rather than pushing the button to a line of its own.
                 Where the row is too narrow for the sentence at all, on a phone, the button is its arrow
                 and the pill and the timing are the ones that give way. */}
-            <Button type="submit" data-aim="create" disabled={!canCreate || creating} className="ml-auto max-w-full min-w-0 shrink @max-[24rem]:w-8 @max-[24rem]:shrink-0 @max-[24rem]:px-0">
+            <Button type="submit" data-aim="create" disabled={!canCreate || creating} className="ms-auto max-w-full min-w-0 shrink @max-[24rem]:w-8 @max-[24rem]:shrink-0 @max-[24rem]:px-0">
                 <span className="truncate @max-[24rem]:sr-only">{name ? t('newAgent.create', { name }) : t('newAgent.createCoworker')}</span>
                 <ArrowRightIcon className="size-3.5" />
             </Button>

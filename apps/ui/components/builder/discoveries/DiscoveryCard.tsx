@@ -66,7 +66,7 @@ export function DiscoveryCardShell({ icon, label, source, beam, children }: { ic
             <div className="mb-2 flex items-center gap-2">
                 <Icon icon={icon} size="xs" />
                 <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
+                <span className="ms-auto text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
             </div>
             {children}
         </div>
@@ -122,7 +122,7 @@ function Stars({ rating, still }: { rating: number; still?: boolean }) {
     return (
         <div className="relative w-fit">
             <StarRow className="text-muted-foreground/25" />
-            <motion.div className="absolute inset-y-0 left-0 overflow-hidden" initial={{ width: still ? filled : 0 }} animate={{ width: filled }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}>
+            <motion.div className="absolute inset-y-0 start-0 overflow-hidden" initial={{ width: still ? filled : 0 }} animate={{ width: filled }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}>
                 <StarRow className="text-yellow-400" />
             </motion.div>
         </div>
@@ -237,7 +237,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
                                 transition={{ type: 'spring', stiffness: 400, damping: 18, delay: 0.15 + index * 0.08 }}
                             />
                         ))}
-                        {finding.fonts.length > 0 && <span className="ml-1.5 truncate text-xs text-muted-foreground">{finding.fonts.join(', ')}</span>}
+                        {finding.fonts.length > 0 && <span className="ms-1.5 truncate text-xs text-muted-foreground">{finding.fonts.join(', ')}</span>}
                     </div>
                 </DiscoveryCardShell>
             )

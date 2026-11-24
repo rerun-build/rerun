@@ -55,7 +55,7 @@ export function BuilderToolbar() {
                 <div className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {placing ? (
                         // En placement : la barre change entièrement de contenu (message shimmer + Cancel).
-                        <div className="relative flex shrink-0 items-center gap-2 pl-3">
+                        <div className="relative flex shrink-0 items-center gap-2 ps-3">
                             {placementQueue && (
                                 <TooltipLabeled label={placementProgressLabel}>
                                     <span className="flex items-center text-foreground" aria-label={placementProgressLabel}>
@@ -104,7 +104,7 @@ export function BuilderToolbar() {
                             {unplacedAgents.length > 0 && (
                                 <>
                                     {!recruitingFirstAgent && <ChromeDivider />}
-                                    <div className="relative flex h-(--chrome-control) shrink-0 items-center gap-1.5 px-1 md:pl-3">
+                                    <div className="relative flex h-(--chrome-control) shrink-0 items-center gap-1.5 px-1 md:ps-3">
                                         <span className="hidden text-xs text-muted-foreground md:inline">{t('unplaced', { count: unplacedAgents.length })}</span>
                                         {unplacedAgents.map(agent => (
                                             <button key={agent.id} className="flex h-6 items-center rounded-full bg-secondary px-2.5 text-xs whitespace-nowrap text-secondary-foreground transition-colors hover:bg-secondary/80" onClick={() => useBoardStore.setState({ placingAgentId: agent.id })}>

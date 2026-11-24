@@ -33,7 +33,7 @@ export function TemplateLibraryRail({ view, query, counts, onView, onQuery, onSc
     const category = view.kind === 'list' ? view.category : null
 
     return (
-        <aside className="flex w-60 shrink-0 flex-col border-r bg-muted/20">
+        <aside className="flex w-60 shrink-0 flex-col border-e bg-muted/20">
             <div className="flex flex-col gap-3 px-3 pt-6 pb-3">
                 <h2 className="px-2 font-heading text-lg leading-none font-semibold tracking-tight">{t('templates')}</h2>
                 <TemplateLibrarySearch value={query} onChange={onQuery} />
@@ -58,7 +58,7 @@ export function TemplateLibraryRail({ view, query, counts, onView, onQuery, onSc
                                 {/* Rows rather than height: a list has no height to animate to. */}
                                 <div inert={!open} className={cn('grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
                                     <div className="min-h-0 overflow-hidden">
-                                        <div className="my-1 ml-[1.05rem] border-l pl-2">
+                                        <div className="my-1 ms-[1.05rem] border-s ps-2">
                                             {counts?.categories.map(row => (
                                                 <RailItem
                                                     key={row.category}
@@ -95,7 +95,7 @@ function RailItem({ icon: Glyph, label, count, active, strong = false, expanded,
             aria-current={active ? 'page' : undefined}
             aria-expanded={expanded}
             className={cn(
-                'flex h-8 w-full shrink-0 items-center gap-2.5 rounded-lg px-2.5 text-left text-[13px] transition-colors',
+                'flex h-8 w-full shrink-0 items-center gap-2.5 rounded-lg px-2.5 text-start text-[13px] transition-colors',
                 active ? 'bg-foreground/[0.07] font-medium text-foreground' : 'text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground',
                 strong && 'font-medium text-foreground',
             )}

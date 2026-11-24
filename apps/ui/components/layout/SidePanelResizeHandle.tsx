@@ -194,7 +194,7 @@ export function SidePanelResizeHandle({ panelRef, config = SIDE_PANEL_WIDTH, wid
             onDoubleClick={resetWidth}
         >
             {look === 'line' ? (
-                <span className="absolute inset-y-0 right-0 w-0.5 bg-transparent transition-colors group-hover:bg-brand/60 group-focus-visible:bg-brand group-data-[dragging=true]:bg-brand" />
+                <span className="absolute inset-y-0 end-0 w-0.5 bg-transparent transition-colors group-hover:bg-brand/60 group-focus-visible:bg-brand group-data-[dragging=true]:bg-brand" />
             ) : (
                 <span className="absolute top-1/2 left-1/2 flex h-9 w-4 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border/50 bg-background/85 text-muted-foreground shadow-sm backdrop-blur-xl transition-colors duration-200 group-hover:bg-accent group-hover:text-foreground group-focus-visible:bg-accent group-focus-visible:text-foreground group-focus-visible:ring-2 group-focus-visible:ring-ring/40 group-data-[dragging=true]:bg-accent group-data-[dragging=true]:text-foreground">
                     <GripVerticalIcon className="size-3" />

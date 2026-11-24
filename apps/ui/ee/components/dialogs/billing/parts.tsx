@@ -185,7 +185,7 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                         </p>
                     </div>
                 </div>
-                <div className="ml-auto min-w-0 text-right">
+                <div className="ms-auto min-w-0 text-end">
                     <p className="flex items-baseline justify-end gap-2">
                         <span className="text-2xl font-semibold sm:text-3xl tracking-tight tabular-nums">
                             <UsdFlow cents={freeTrial ? 0 : monthCents} />
@@ -219,7 +219,7 @@ export function LifetimeDealCard() {
                         <p className="text-sm text-muted-foreground">{t('line')}</p>
                     </div>
                 </div>
-                <div className="ml-auto min-w-0 text-right">
+                <div className="ms-auto min-w-0 text-end">
                     <p className="text-2xl font-semibold tracking-tight sm:text-3xl">{t('paidOnce')}</p>
                     <p className="text-sm text-muted-foreground">{t('forGood')}</p>
                 </div>
@@ -280,9 +280,9 @@ function TestimonialRotation() {
                         <span className="truncate text-muted-foreground">· {copy.role}</span>
                         {testimonial.companyLogo ? (
                             // eslint-disable-next-line @next/next/no-img-element -- a company mark bundled with the testimonial, sized by CSS
-                            <img src={testimonial.companyLogo} alt={testimonial.company} className="ml-auto size-5 object-contain" />
+                            <img src={testimonial.companyLogo} alt={testimonial.company} className="ms-auto size-5 object-contain" />
                         ) : (
-                            <span className="ml-auto shrink-0 text-xs font-medium text-muted-foreground">{testimonial.company}</span>
+                            <span className="ms-auto shrink-0 text-xs font-medium text-muted-foreground">{testimonial.company}</span>
                         )}
                     </figcaption>
                 </motion.div>
@@ -313,7 +313,7 @@ export function SummaryRows({ rows }: { rows: SummaryRow[] }) {
             {rows.map(row => (
                 <div key={row.label} className="flex items-baseline justify-between gap-4 px-4 py-3 text-sm">
                     <dt className={cn(row.strong ? 'font-medium' : 'text-muted-foreground')}>{row.label}</dt>
-                    <dd className={cn('text-right tabular-nums', row.strong && 'font-medium', row.muted && 'text-muted-foreground')}>{row.value}</dd>
+                    <dd className={cn('text-end tabular-nums', row.strong && 'font-medium', row.muted && 'text-muted-foreground')}>{row.value}</dd>
                 </div>
             ))}
         </dl>
@@ -483,7 +483,7 @@ export function SuccessPanel({ title, body, rows, cta, onDone, loading }: { titl
                 <h3 className="text-2xl font-semibold tracking-tight">{title}</h3>
                 <p className="max-w-xs text-sm text-muted-foreground">{body}</p>
                 {rows && (
-                    <div className="mt-2 w-full text-left">
+                    <div className="mt-2 w-full text-start">
                         <SummaryRows rows={rows} />
                     </div>
                 )}

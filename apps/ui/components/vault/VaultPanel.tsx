@@ -129,8 +129,8 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
                             <div className="space-y-4">
                                 {listing.entries.length >= SEARCH_FROM && (
                                     <div className="relative">
-                                        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                                        <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
+                                        <SearchIcon className="pointer-events-none absolute top-1/2 start-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                                        <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="ps-8" aria-label={t('search')} />
                                     </div>
                                 )}
                                 <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} />

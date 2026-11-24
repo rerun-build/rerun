@@ -66,9 +66,9 @@ export function DetailsColumn({ label, open, slideIn, onClose, children }: Detai
             transition={reducedMotion ? { duration: 0 } : SLIDE}
             onAnimationComplete={() => !open && setInFlow(false)}
             style={{ '--details-width': `${DETAILS_COLUMN_WIDTH.defaultWidth}px` } as CSSProperties}
-            className={cn('relative flex w-(--details-width) max-w-[45vw] shrink-0 flex-col border-l border-border bg-background will-change-transform', !inFlow && 'hidden')}
+            className={cn('relative flex w-(--details-width) max-w-[45vw] shrink-0 flex-col border-s border-border bg-background will-change-transform', !inFlow && 'hidden')}
         >
-            <SidePanelResizeHandle panelRef={columnRef} config={DETAILS_COLUMN_WIDTH} widthVar="--details-width" className="-left-2" />
+            <SidePanelResizeHandle panelRef={columnRef} config={DETAILS_COLUMN_WIDTH} widthVar="--details-width" className="-start-2" />
             {children}
         </motion.aside>
     )

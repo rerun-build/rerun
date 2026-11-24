@@ -109,7 +109,7 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                         ref={boxRef}
                         className="flex h-10 w-full items-center rounded-lg border border-input bg-background text-base transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary has-[input[aria-invalid=true]]:border-red-500 has-[input[aria-invalid=true]]:focus-within:ring-red-500 md:text-sm"
                     >
-                        <label className="group flex h-full shrink-0 cursor-text items-center gap-1.5 pr-1.5 pl-3 has-disabled:cursor-not-allowed has-disabled:opacity-50">
+                        <label className="group flex h-full shrink-0 cursor-text items-center gap-1.5 pe-1.5 ps-3 has-disabled:cursor-not-allowed has-disabled:opacity-50">
                             <span ref={dialogProbeRef} key={country} aria-hidden className="animate-in text-base leading-none duration-200 fade-in-0 slide-in-from-bottom-1">
                                 {countryFlag(country)}
                             </span>
@@ -149,7 +149,7 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                             onChange={onType}
                             onKeyDown={onNumberKeyDown}
                             disabled={disabled}
-                            className="h-full min-w-0 flex-1 rounded-r-lg bg-transparent pr-3 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                            className="h-full min-w-0 flex-1 rounded-e-lg bg-transparent pe-3 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                             {...props}
                         />
                     </div>

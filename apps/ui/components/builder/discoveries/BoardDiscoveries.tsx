@@ -81,7 +81,7 @@ export function BoardDiscoveries({
                 {compact && <Ticker entries={flowing} subject={subject} still={still} />}
             </div>
 
-            {!compact && <DiscoveryStack entries={cards} still={still} className="absolute -bottom-2 -right-2 w-72" />}
+            {!compact && <DiscoveryStack entries={cards} still={still} className="absolute -bottom-2 -end-2 w-72" />}
 
             <AnimatePresence>
                 {compact && brain && (

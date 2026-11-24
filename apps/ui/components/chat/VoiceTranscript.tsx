@@ -26,7 +26,7 @@ export function VoiceTranscript({ transcript, open, heardUpTo }: VoiceTranscript
             <div className="min-h-0 overflow-hidden">
                 <p
                     className={cn(
-                        'mt-1 mb-1.5 ml-auto max-w-sm border-r-2 border-brand/35 pr-3 text-right text-[13px] italic leading-relaxed break-words dark:border-brand/70',
+                        'mt-1 mb-1.5 ms-auto max-w-sm border-e-2 border-brand/35 pe-3 text-end text-[13px] italic leading-relaxed break-words dark:border-brand/70',
                         'transition-[opacity,translate,filter] duration-500 motion-reduce:transition-none',
                         EASE_OUT,
                         open ? 'translate-y-0 opacity-100 blur-none delay-75' : '-translate-y-1 opacity-0 blur-[2px]'

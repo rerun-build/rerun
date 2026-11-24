@@ -71,7 +71,7 @@ export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[
 
     return (
         <TooltipLabeled label={<PlanLimitDetail windows={windows} provider={provider} />} side="right">
-            <span className={cn('ml-auto shrink-0 pl-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(tightest.usedPercent)])}>
+            <span className={cn('ms-auto shrink-0 ps-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(tightest.usedPercent)])}>
                 {planWindowPercent(tightest)}
                 {tightest.resetsAt ? ` · ${compactUntil(tightest.resetsAt, locale)}` : ''}
             </span>
@@ -90,7 +90,7 @@ export function RerunCreditHint({ credit }: { credit: RerunCredit }) {
     if (credit.paused) {
         return (
             <TooltipLabeled label={tShared('creditPaused')} side="right">
-                <span className="ml-auto shrink-0 pl-2 font-normal text-muted-foreground">{t('paused')}</span>
+                <span className="ms-auto shrink-0 ps-2 font-normal text-muted-foreground">{t('paused')}</span>
             </TooltipLabeled>
         )
     }
@@ -98,7 +98,7 @@ export function RerunCreditHint({ credit }: { credit: RerunCredit }) {
 
     return (
         <TooltipLabeled label={creditDetail(credit)} side="right">
-            <span className={cn('ml-auto shrink-0 pl-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(credit.percent)])}>
+            <span className={cn('ms-auto shrink-0 ps-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(credit.percent)])}>
                 {credit.percent}%{credit.resetAt ? ` · ${compactUntil(credit.resetAt, locale)}` : ''}
             </span>
         </TooltipLabeled>

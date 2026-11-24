@@ -30,7 +30,7 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
 
     return (
         <main className="mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-4 py-16">
-            <div className="absolute top-4 right-4 z-40">
+            <div className="absolute top-4 end-4 z-40">
                 <SignInPillButton />
             </div>
 

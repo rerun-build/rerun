@@ -68,7 +68,7 @@ export function Progress({ value, className }: { value: number; className?: stri
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                 <span className="block h-full rounded-full bg-brand" style={{ width: `${percent}%` }} />
             </span>
-            <span className="w-8 text-right text-[11px] tabular-nums text-muted-foreground">{Math.round(percent)}%</span>
+            <span className="w-8 text-end text-[11px] tabular-nums text-muted-foreground">{Math.round(percent)}%</span>
         </span>
     )
 }

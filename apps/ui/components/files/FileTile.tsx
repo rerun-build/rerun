@@ -78,7 +78,7 @@ export function FileTile({ name, glyph, title, published, renaming, onOpen, onCo
                 {glyph}
                 {published && (
                     <TooltipLabeled label={t('publish.publicLink')}>
-                        <span className="absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-background">
+                        <span className="absolute -end-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-background">
                             <GlobeIcon className="size-3 text-emerald-400" aria-label={t('grid.published')} />
                         </span>
                     </TooltipLabeled>

@@ -17,7 +17,7 @@ type Row = { key: string; icon: LucideIcon; title: string; tags: string[]; open:
 function ItemRow({ row, onSelect }: { row: Row; onSelect: (selection: BrainSelection) => void }) {
     const Glyph = row.icon
     return (
-        <button type="button" onClick={() => onSelect(row.open)} className="flex w-full items-center gap-3 py-2.5 text-left text-sm transition-colors hover:bg-accent/40">
+        <button type="button" onClick={() => onSelect(row.open)} className="flex w-full items-center gap-3 py-2.5 text-start text-sm transition-colors hover:bg-accent/40">
             <Glyph className="size-4 shrink-0 text-muted-foreground" />
             <span className="min-w-0 flex-1 truncate">{row.title}</span>
             <span className="flex shrink-0 gap-1 max-sm:hidden">

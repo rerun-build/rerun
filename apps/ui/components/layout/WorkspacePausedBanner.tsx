@@ -133,7 +133,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
 
     if (stage === 'waiting') {
         return (
-            <div className="relative flex min-w-0 items-center gap-2 pr-3">
+            <div className="relative flex min-w-0 items-center gap-2 pe-3">
                 <ClockIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
                     <span className="font-medium">{approved ? t('waitingApproved') : t('waitingPaid')}</span> <span className="text-muted-foreground max-sm:hidden">{t('waitingHint')}</span>
@@ -145,7 +145,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
     // The teardown refuses this one every tick and never retries it: no "within minutes" here.
     if (stage === 'failed') {
         return (
-            <div className="relative flex min-w-0 items-center gap-2 pr-3">
+            <div className="relative flex min-w-0 items-center gap-2 pe-3">
                 <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
                     <span className="font-medium">{t('failed')}</span> <span className="text-muted-foreground max-sm:hidden">{approved ? t('failedApproved') : t('failedPaid')}</span>
@@ -156,7 +156,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
 
     const current = RESTORE_STEPS.indexOf(stage)
     return (
-        <div className="relative flex min-w-0 items-center gap-4 pr-3 pl-1">
+        <div className="relative flex min-w-0 items-center gap-4 pe-3 ps-1">
             <Shimmer as="span" duration={1.6} className="text-sm font-medium whitespace-nowrap">
                 {t('title')}
             </Shimmer>

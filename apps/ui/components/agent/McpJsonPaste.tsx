@@ -129,9 +129,9 @@ export function McpJsonPasteSlot<Form>({ paste, idleLabel }: { paste: McpJsonPas
                     value={paste.text}
                     onChange={e => paste.apply(e.target.value)}
                     placeholder={t('placeholder', { example: JSON_EXAMPLE })}
-                    className="field-sizing-content max-h-40 min-h-20 w-full resize-none rounded-lg border border-dashed border-input bg-transparent py-2 pr-8 pl-2.5 font-mono text-xs leading-relaxed outline-none placeholder:text-muted-foreground focus-visible:border-solid focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-solid aria-invalid:border-destructive dark:bg-input/30"
+                    className="field-sizing-content max-h-40 min-h-20 w-full resize-none rounded-lg border border-dashed border-input bg-transparent py-2 pe-8 ps-2.5 font-mono text-xs leading-relaxed outline-none placeholder:text-muted-foreground focus-visible:border-solid focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-solid aria-invalid:border-destructive dark:bg-input/30"
                 />
-                <Button size="icon-xs" variant="ghost" aria-label={t('close')} className="absolute top-1.5 right-1.5" onClick={paste.closeBox}>
+                <Button size="icon-xs" variant="ghost" aria-label={t('close')} className="absolute top-1.5 end-1.5" onClick={paste.closeBox}>
                     <XIcon />
                 </Button>
             </div>

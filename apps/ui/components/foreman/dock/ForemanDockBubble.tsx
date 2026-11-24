@@ -10,17 +10,17 @@ import { cn } from '@/lib/utils'
 // The card sits on the screen side of the ball and its tail points back at the ball's centre,
 // 28px in from the edge the two share.
 const PLACEMENT: Record<ForemanCorner, string> = {
-    'top-left': 'top-full left-0 mt-4',
-    'top-right': 'top-full right-0 mt-4',
-    'bottom-left': 'bottom-full left-0 mb-4',
-    'bottom-right': 'right-0 bottom-full mb-4',
+    'top-left': 'top-full start-0 mt-4',
+    'top-right': 'top-full end-0 mt-4',
+    'bottom-left': 'bottom-full start-0 mb-4',
+    'bottom-right': 'end-0 bottom-full mb-4',
 }
 
 const TAIL: Record<ForemanCorner, string> = {
-    'top-left': '-top-[7px] left-[22px] border-t border-l',
-    'top-right': '-top-[7px] right-[22px] border-t border-l',
-    'bottom-left': '-bottom-[7px] left-[22px] border-r border-b',
-    'bottom-right': '-bottom-[7px] right-[22px] border-r border-b',
+    'top-left': '-top-[7px] start-[22px] border-t border-s',
+    'top-right': '-top-[7px] end-[22px] border-t border-s',
+    'bottom-left': '-bottom-[7px] start-[22px] border-e border-b',
+    'bottom-right': '-bottom-[7px] end-[22px] border-e border-b',
 }
 
 type ForemanDockBubbleProps = { corner: ForemanCorner; tone?: BorderBeamProps['tone']; children: ReactNode }

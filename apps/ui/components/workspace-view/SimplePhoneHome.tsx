@@ -180,7 +180,7 @@ export function SimplePhoneHome() {
 
             <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background via-background/80 to-transparent" />
             <BoardCornerActions />
-            <Button variant="outline" size="icon" aria-label={t('list.search')} onClick={openControlCenter} className="absolute right-4 bottom-[calc(1rem+var(--consent-inset))] z-40 size-11 rounded-full bg-background/80 backdrop-blur-xl">
+            <Button variant="outline" size="icon" aria-label={t('list.search')} onClick={openControlCenter} className="absolute end-4 bottom-[calc(1rem+var(--consent-inset))] z-40 size-11 rounded-full bg-background/80 backdrop-blur-xl">
                 <SearchIcon className="size-5" />
             </Button>
             {deleteAgentId && (
@@ -203,7 +203,7 @@ function PinnedDisc({ agent, unseen, onOpen }: { agent: IsoAgent; unseen: boolea
         <button type="button" onClick={onOpen} className="flex w-full flex-col items-center gap-1.5 py-2 active:opacity-60">
             <span className="relative flex size-20 items-center justify-center rounded-full bg-muted">
                 <AgentBuddy agentId={agent.id} mood={buddyMoodOfStatus(agent.status, !!agent.disabledAt)} size={56} />
-                {unseen && <span className="absolute top-1.5 left-1.5 size-3.5 rounded-full border-2 border-background bg-brand" />}
+                {unseen && <span className="absolute top-1.5 start-1.5 size-3.5 rounded-full border-2 border-background bg-brand" />}
             </span>
             <span className={cn('max-w-full truncate text-[13px]', unseen ? 'font-medium text-foreground' : 'text-muted-foreground')}>{agent.name}</span>
         </button>

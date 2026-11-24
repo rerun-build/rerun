@@ -115,7 +115,7 @@ export function Combobox(props: SingleProps | MultiProps) {
                             {selected.map(option => (
                                 <span
                                     key={option.value}
-                                    className="flex max-w-full items-center gap-1 rounded-sm border border-border/60 bg-background/50 py-0.5 pr-1 pl-1.5 text-xs"
+                                    className="flex max-w-full items-center gap-1 rounded-sm border border-border/60 bg-background/50 py-0.5 pe-1 ps-1.5 text-xs"
                                 >
                                     <span className="truncate">{option.label}</span>
                                     <span

@@ -26,7 +26,7 @@ export function AgentSetupFields({ value, onChange, disabled }: { value: AgentSe
 
     const resetButton = (
         <Button type="button" size="sm" variant="ghost" disabled={disabled} onClick={prompt ? undefined : useDefaultTemplate} className="self-start">
-            <Wand2 className="mr-1.5 size-3.5" />
+            <Wand2 className="me-1.5 size-3.5" />
             {prompt ? t('resetToDefault') : t('useDefault')}
         </Button>
     )

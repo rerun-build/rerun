@@ -22,11 +22,11 @@ export function ForemanReplyBubble({ corner, text, failed = false, onOpen, onDis
     const t = useTranslations('foreman.reply')
     return (
         <ForemanDockBubble corner={corner} tone={failed ? 'red' : undefined}>
-            <button type="button" data-bubble-surface onClick={onOpen} className="flex w-full flex-col gap-1.5 rounded-[inherit] py-3 pr-9 pl-3 text-left transition-colors hover:bg-accent">
+            <button type="button" data-bubble-surface onClick={onOpen} className="flex w-full flex-col gap-1.5 rounded-[inherit] py-3 pe-9 ps-3 text-start transition-colors hover:bg-accent">
                 <span className={cn('line-clamp-4 whitespace-pre-line', failed && 'text-destructive')}>{text}</span>
                 <span className="text-xs text-muted-foreground">{t('open')}</span>
             </button>
-            <button type="button" aria-label={t('dismiss')} onClick={onDismiss} className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+            <button type="button" aria-label={t('dismiss')} onClick={onDismiss} className="absolute top-2 end-2 flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                 <XIcon className="size-3.5" />
             </button>
         </ForemanDockBubble>

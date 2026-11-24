@@ -83,7 +83,7 @@ export function MarkdownEditorDialog({
                     onSubmitShortcut={onSubmit ? handleSubmit : undefined}
                 />
                 <DialogFooter className="sm:items-center">
-                    {hint && <span className="hidden text-xs text-muted-foreground sm:mr-auto sm:inline">{hint}</span>}
+                    {hint && <span className="hidden text-xs text-muted-foreground sm:me-auto sm:inline">{hint}</span>}
                     <Button type="button" variant={submitLabel ? 'outline' : 'default'} onClick={() => handleOpenChange(false)}>
                         {closeLabel ?? t('done')}
                     </Button>

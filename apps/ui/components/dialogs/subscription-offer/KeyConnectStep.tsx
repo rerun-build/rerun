@@ -77,7 +77,7 @@ export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConn
                     {!only && (
                         <div className="flex flex-col gap-2">
                             {KEY_PROVIDERS.map(id => (
-                                <button key={id} type="button" onClick={() => pick(id)} className={cn('flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-accent/30', provider === id ? 'border-foreground ring-1 ring-foreground' : 'bg-muted/20')}>
+                                <button key={id} type="button" onClick={() => pick(id)} className={cn('flex items-center gap-2.5 rounded-lg border px-3 py-2 text-start transition-colors hover:bg-accent/30', provider === id ? 'border-foreground ring-1 ring-foreground' : 'bg-muted/20')}>
                                     <ProviderIcon provider={id} className="size-4" />
                                     <span className="flex min-w-0 flex-1 flex-col">
                                         <span className="truncate text-sm">{providerPitch(id, tConnections).title}</span>

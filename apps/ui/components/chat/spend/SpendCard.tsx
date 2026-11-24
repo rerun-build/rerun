@@ -54,7 +54,7 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
                             <LineIcon className="size-3.5 shrink-0 text-muted-foreground" />
                             <span className="min-w-0 flex-1 truncate">{tTools(`paidData.${line.capability}`)}</span>
                             <span className="shrink-0 text-xs text-muted-foreground tabular-nums">×{line.units}</span>
-                            <span className="w-12 shrink-0 text-right tabular-nums text-muted-foreground">{formatCredits(line.micros, locale)}</span>
+                            <span className="w-12 shrink-0 text-end tabular-nums text-muted-foreground">{formatCredits(line.micros, locale)}</span>
                         </li>
                     )
                 })}
@@ -70,7 +70,7 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
 
             {/* Narrow, the main answer takes a row of its own so three buttons never squeeze into one. */}
             <div className="grid grid-cols-2 gap-2 @sm:flex @sm:items-center">
-                <Button size="sm" variant="destructive" disabled={submitted} onClick={() => decide({ decision: 'declined' })} data-hitl="decline" className={cn('@sm:mr-auto', short && 'col-span-2')}>
+                <Button size="sm" variant="destructive" disabled={submitted} onClick={() => decide({ decision: 'declined' })} data-hitl="decline" className={cn('@sm:me-auto', short && 'col-span-2')}>
                     {t('notNow')}
                 </Button>
                 {short ? (

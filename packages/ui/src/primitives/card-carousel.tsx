@@ -90,14 +90,14 @@ export function CardCarousel({
                     ))}
                 </div>
 
-                <div aria-hidden className={cn(FADE_CLASS, '-left-4 bg-gradient-to-r to-transparent', fadeClassName, canLeft ? 'opacity-100' : 'opacity-0')} />
-                <div aria-hidden className={cn(FADE_CLASS, '-right-4 bg-gradient-to-l to-transparent', fadeClassName, canRight ? 'opacity-100' : 'opacity-0')} />
+                <div aria-hidden className={cn(FADE_CLASS, '-start-4 bg-gradient-to-r to-transparent', fadeClassName, canLeft ? 'opacity-100' : 'opacity-0')} />
+                <div aria-hidden className={cn(FADE_CLASS, '-end-4 bg-gradient-to-l to-transparent', fadeClassName, canRight ? 'opacity-100' : 'opacity-0')} />
 
                 <button
                     type="button"
                     aria-label={t('primitives.carousel.previous', { label })}
                     onClick={() => scrollByCard(-1)}
-                    className={cn(ARROW_CLASS, 'left-1 sm:left-0 sm:-translate-x-1/2', canLeft ? 'opacity-100' : 'pointer-events-none opacity-0')}
+                    className={cn(ARROW_CLASS, 'start-1 sm:start-0 sm:-translate-x-1/2', canLeft ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
                     <ChevronLeft className="size-4" />
                 </button>
@@ -105,7 +105,7 @@ export function CardCarousel({
                     type="button"
                     aria-label={t('primitives.carousel.next', { label })}
                     onClick={() => scrollByCard(1)}
-                    className={cn(ARROW_CLASS, 'right-1 sm:right-0 sm:translate-x-1/2', canRight ? 'opacity-100' : 'pointer-events-none opacity-0')}
+                    className={cn(ARROW_CLASS, 'end-1 sm:end-0 sm:translate-x-1/2', canRight ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
                     <ChevronRight className="size-4" />
                 </button>

@@ -92,7 +92,7 @@ function SidebarRow({
             title={tooltip}
             style={{ paddingLeft: `${0.5 + depth * 0.875}rem` }}
             className={cn(
-                'group/row flex h-7 w-full cursor-pointer items-center gap-1.5 rounded-md pr-1.5 text-left text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
+                'group/row flex h-7 w-full cursor-pointer items-center gap-1.5 rounded-md pe-1.5 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
                 active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
             )}
         >
@@ -106,9 +106,9 @@ function SidebarRow({
 
 function SectionHeader({ label, action, active, onClick }: { label: string; action?: ReactNode; active?: boolean; onClick?: () => void }) {
     return (
-        <div className="group/section flex h-7 items-center justify-between pl-2 pr-1 pt-3">
+        <div className="group/section flex h-7 items-center justify-between ps-2 pe-1 pt-3">
             {onClick ? (
-                <button type="button" onClick={onClick} className={cn('-ml-1 rounded px-1 text-[11px] font-medium transition-colors hover:bg-accent hover:text-foreground', active ? 'text-foreground' : 'text-muted-foreground/80')}>
+                <button type="button" onClick={onClick} className={cn('-ms-1 rounded px-1 text-[11px] font-medium transition-colors hover:bg-accent hover:text-foreground', active ? 'text-foreground' : 'text-muted-foreground/80')}>
                     {label}
                 </button>
             ) : (
@@ -157,7 +157,7 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
                             event.stopPropagation()
                             files.toggle(path)
                         }}
-                        className="-ml-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
+                        className="-ms-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
                     >
                         <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90')} />
                     </button>
@@ -238,7 +238,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                                 event.stopPropagation()
                                 setBoxesExpanded(current => ({ ...current, [boxId]: !open }))
                             }}
-                            className="-ml-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
+                            className="-ms-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
                         >
                             <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90')} />
                         </button>
@@ -287,7 +287,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
     return (
         <div className="flex h-full min-h-0 flex-col">
             <div className="space-y-2 px-2 pb-1 pt-3">
-                <div className="flex items-center gap-2 pl-2">
+                <div className="flex items-center gap-2 ps-2">
                     <BrainIcon className="size-4 shrink-0" />
                     <span className="flex-1 text-sm font-semibold">{t('title')}</span>
                     <Button size="icon-xs" variant="ghost" onClick={() => onImport(null)} aria-label={t('import')} title={t('importHint')}>
@@ -295,7 +295,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                     </Button>
                 </div>
                 <div className="relative">
-                    <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         ref={searchRef}
                         value={query}
@@ -303,9 +303,9 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                         onKeyDown={event => event.key === 'Escape' && query && (event.stopPropagation(), setQuery(''))}
                         placeholder={t('search')}
                         aria-label={t('searchLabel')}
-                        className="h-7 pl-8 text-sm"
+                        className="h-7 ps-8 text-sm"
                     />
-                    <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground/70 max-sm:hidden">⌘K</kbd>
+                    <kbd className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground/70 max-sm:hidden">⌘K</kbd>
                 </div>
             </div>
 
@@ -366,7 +366,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                                             label={t('products')}
                                             active={false}
                                             expanded={productsOpen}
-                                            leading={<ChevronRightIcon className={cn('-ml-0.5 size-3 shrink-0 transition-transform duration-150', productsOpen && 'rotate-90')} />}
+                                            leading={<ChevronRightIcon className={cn('-ms-0.5 size-3 shrink-0 transition-transform duration-150', productsOpen && 'rotate-90')} />}
                                             trailing={<span className="text-[11px] tabular-nums text-muted-foreground/70">{products.length}</span>}
                                             onClick={() => setProductsExpanded(!productsOpen)}
                                         />

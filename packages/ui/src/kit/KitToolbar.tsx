@@ -9,7 +9,7 @@ export function KitToolbar({ className }: { className?: string }) {
     const { backdrop, setBackdrop, scale, setScale } = useKitControls()
 
     return (
-        <div className={cn('sticky top-4 z-30 flex flex-wrap items-center gap-3 rounded-full border border-border bg-background/70 p-1 pr-3 backdrop-blur-md', className)}>
+        <div className={cn('sticky top-4 z-30 flex flex-wrap items-center gap-3 rounded-full border border-border bg-background/70 p-1 pe-3 backdrop-blur-md', className)}>
             <ThemeToggle />
             <SegmentedControl value={backdrop} onValueChange={value => setBackdrop(value as KitBackdrop)} className="gap-0.5 p-0.5" role="radiogroup" aria-label="Backdrop">
                 {KIT_BACKDROPS.map(option => (

@@ -13,7 +13,7 @@ export function TemplateScratchCard({ selected, onSelect, className }: { selecte
         <button
             type="button"
             onClick={onSelect}
-            className={cn('group relative flex flex-col overflow-hidden rounded-lg border text-left transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border bg-card hover:bg-muted/50', className)}
+            className={cn('group relative flex flex-col overflow-hidden rounded-lg border text-start transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border bg-card hover:bg-muted/50', className)}
         >
             {selected && <BorderBeam animated pattern="arcs" tone="white" glow />}
             {/* Faded like its neighbours in the grid: one card meeting its body on a hard edge while

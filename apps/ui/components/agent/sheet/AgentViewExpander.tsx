@@ -54,7 +54,7 @@ export function AgentViewExpander({ origin, ghost, onGrown, children }: { origin
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: transition(0.3, 0.12) }}
                 exit={{ opacity: 0, transition: transition(0.15) }}
-                className="absolute left-0 top-0 flex flex-col"
+                className="absolute start-0 top-0 flex flex-col"
                 style={size}
             >
                 {children}

@@ -63,7 +63,7 @@ function BySource({ usage }: { usage: CreditUsage }) {
                                     <div className="h-1 flex-1 rounded-full bg-muted-foreground/15">
                                         <div className={cn('h-full rounded-full', KIND_FILL[total.source.kind])} style={{ width: `${(total.micros / max) * 100}%` }} />
                                     </div>
-                                    <span className="w-20 text-right text-[11px] text-muted-foreground">{t('usage.calls', { count: total.calls })}</span>
+                                    <span className="w-20 text-end text-[11px] text-muted-foreground">{t('usage.calls', { count: total.calls })}</span>
                                 </div>
                             </div>
                         </div>
@@ -91,8 +91,8 @@ function ByCoworker({ usage }: { usage: CreditUsage }) {
                                 <span className="tabular-nums">{formatCredits(sum, locale)}</span>
                             </div>
                             <div className="mt-1 flex h-1 gap-px" style={{ width: `${(sum / max) * 100}%` }}>
-                                {total.aiMicros > 0 && <div className={cn('h-full rounded-l-full', KIND_FILL.ai, total.dataMicros === 0 && 'rounded-r-full')} style={{ flexGrow: total.aiMicros }} />}
-                                {total.dataMicros > 0 && <div className={cn('h-full rounded-r-full', KIND_FILL.data, total.aiMicros === 0 && 'rounded-l-full')} style={{ flexGrow: total.dataMicros }} />}
+                                {total.aiMicros > 0 && <div className={cn('h-full rounded-s-full', KIND_FILL.ai, total.dataMicros === 0 && 'rounded-e-full')} style={{ flexGrow: total.aiMicros }} />}
+                                {total.dataMicros > 0 && <div className={cn('h-full rounded-e-full', KIND_FILL.data, total.aiMicros === 0 && 'rounded-s-full')} style={{ flexGrow: total.dataMicros }} />}
                             </div>
                         </div>
                     </div>

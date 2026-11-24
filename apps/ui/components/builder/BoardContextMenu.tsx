@@ -82,7 +82,7 @@ export function BoardContextMenu({ children, target, onTargetClear, onNewCoworke
                 </ContextMenuTrigger>
                 {targetAgent && (
                     <ContextMenuContent>
-                        <ContextMenuLabel className="max-w-56 truncate pl-7">{targetAgent.name}</ContextMenuLabel>
+                        <ContextMenuLabel className="max-w-56 truncate ps-7">{targetAgent.name}</ContextMenuLabel>
                         <ContextMenuSeparator />
                         <ContextMenuItem onSelect={() => openAgentChat(targetAgent.id)}>
                             <MessageCircle className="size-4" />
@@ -112,7 +112,7 @@ export function BoardContextMenu({ children, target, onTargetClear, onNewCoworke
                         </Forbidden>
                         <ContextMenuSub>
                             <Forbidden reason={agentReason}>
-                                <ContextMenuSubTrigger disabled={!canManageAgent} className="w-full pl-7">
+                                <ContextMenuSubTrigger disabled={!canManageAgent} className="w-full ps-7">
                                     {t('moveToBox')}
                                 </ContextMenuSubTrigger>
                             </Forbidden>
@@ -139,7 +139,7 @@ export function BoardContextMenu({ children, target, onTargetClear, onNewCoworke
                 )}
                 {targetSpace && (
                     <ContextMenuContent>
-                        <ContextMenuLabel className="max-w-56 truncate pl-7">{targetSpace.name || t('untitledBox')}</ContextMenuLabel>
+                        <ContextMenuLabel className="max-w-56 truncate ps-7">{targetSpace.name || t('untitledBox')}</ContextMenuLabel>
                         <ContextMenuSeparator />
                         <Forbidden reason={spaceReason ?? needsMachineReason ?? undefined}>
                             <ContextMenuItem disabled={!canManageSpace || !!needsMachineReason} className="w-full" onSelect={() => onNewCoworker(targetSpace.id)}>

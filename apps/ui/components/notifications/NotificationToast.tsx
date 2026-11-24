@@ -41,7 +41,7 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
                 type="button"
                 onClick={onDismiss}
                 aria-label={t('close')}
-                className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100"
+                className="absolute end-2 top-2 flex size-6 items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100"
             >
                 <XIcon className="size-3.5" />
             </button>
@@ -53,7 +53,7 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
                 </span>
             )}
             <div className="min-w-0 flex-1">
-                <p className="pr-6 text-sm font-medium text-foreground">{title}</p>
+                <p className="pe-6 text-sm font-medium text-foreground">{title}</p>
                 <div className="relative">
                     <div
                         ref={messageRef}

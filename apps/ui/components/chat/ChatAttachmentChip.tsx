@@ -31,7 +31,7 @@ export function ChatAttachmentChip({ file, upload, onRemove, onRetry }: ChatAtta
     const pending = upload != null && upload.status !== 'done' && upload.status !== 'error'
 
     return (
-        <div className={`group relative flex items-center gap-2 rounded-lg border bg-background py-1.5 pl-1.5 pr-1 text-xs ${failed ? 'border-destructive/50' : 'border-border'}`}>
+        <div className={`group relative flex items-center gap-2 rounded-lg border bg-background py-1.5 ps-1.5 pe-1 text-xs ${failed ? 'border-destructive/50' : 'border-border'}`}>
             {/* La pastille de succès se pose sur le coin de la vignette : dans une chip aussi basse,
                 une colonne de plus pousse le nom du fichier et la ligne d'état se lit moins bien. */}
             <span className="relative shrink-0">
@@ -43,7 +43,7 @@ export function ChatAttachmentChip({ file, upload, onRemove, onRetry }: ChatAtta
                         <FileIcon className="size-4" />
                     </span>
                 )}
-                {upload?.status === 'done' && <IconBadge tone="green" icon={CheckIcon} className="absolute -right-1 -top-1 size-4 bg-background [&>svg]:size-2.5" />}
+                {upload?.status === 'done' && <IconBadge tone="green" icon={CheckIcon} className="absolute -end-1 -top-1 size-4 bg-background [&>svg]:size-2.5" />}
             </span>
 
             <div className="flex min-w-0 flex-col gap-0.5">

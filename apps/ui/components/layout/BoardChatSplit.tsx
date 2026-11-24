@@ -117,7 +117,7 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
                 )}
             >
                 {/* In the Simple view the Chief of Staff in the middle is the rest of this card: its right side is theirs. */}
-                <div className={cn('min-w-0 bg-background md:rounded-3xl md:border md:border-border md:shadow overflow-hidden md:overflow-auto h-full', visible && 'md:col-start-2 md:row-start-1', simple && open && 'md:rounded-r-none')}>{children}</div>
+                <div className={cn('min-w-0 bg-background md:rounded-3xl md:border md:border-border md:shadow overflow-hidden md:overflow-auto h-full', visible && 'md:col-start-2 md:row-start-1', simple && open && 'md:rounded-e-none')}>{children}</div>
                 {/* Se connecter à un autre compte sans recharger repart d'une colonne neuve, qui relit
                     la phase et la conversation de ce compte-là. */}
                 <div className={visible ? 'contents' : 'hidden'}>

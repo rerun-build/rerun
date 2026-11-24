@@ -138,7 +138,7 @@ export function FloatingScreen({ takeControlLabel, children, onTakeControl, clas
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
                 transition={{ duration: 0.28, ease: ENTER_EASE }}
-                className="group pointer-events-auto absolute top-0 left-0 flex aspect-video cursor-grab touch-none overflow-hidden rounded-lg shadow-xl ring-1 ring-border active:cursor-grabbing"
+                className="group pointer-events-auto absolute top-0 start-0 flex aspect-video cursor-grab touch-none overflow-hidden rounded-lg shadow-xl ring-1 ring-border active:cursor-grabbing"
             >
                 {children}
                 <TakeControlOverlay label={takeControlLabel} onClick={takeControlUnlessDragged} />

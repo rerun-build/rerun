@@ -47,7 +47,7 @@ export function NewAgentForm({ suggestions, suggestionsHeading, catalog, read, o
                     <OrbLight focused={described} top={ORB_SIZE / 2} className="z-10" />
                 </div>
                 <div className="relative z-20">
-                    <span ref={anchorRef} aria-hidden className="absolute top-1/2 left-1/2" />
+                    <span ref={anchorRef} aria-hidden className="absolute top-1/2 start-1/2" />
                     <div style={{ transform: 'translate(var(--orb-x, 0px), var(--orb-y, 0px))' }}>
                         <Orb state={pending ? 'thinking' : 'listening'} size={ORB_SIZE} gaze={gaze} />
                     </div>

@@ -22,7 +22,7 @@ export function ForemanThreadCrumb({ title, status, onBack }: { title: string; s
             <span aria-hidden className="text-muted-foreground/50">
                 /
             </span>
-            <StateDot state={state === 'live' || state === 'needs' ? state : 'quiet'} className="ml-1" />
+            <StateDot state={state === 'live' || state === 'needs' ? state : 'quiet'} className="ms-1" />
             <span className={cn('min-w-0 truncate text-sm font-medium', state === 'error' && 'text-destructive')}>{title}</span>
         </div>
     )

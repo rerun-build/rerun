@@ -31,13 +31,13 @@ const TRIGGER_SIZE: Record<ButtonSize, ButtonSize> = {
     'icon-lg': 'icon-lg',
 }
 
-// `outline` et `destructive` ont déjà une bordure visible, que le `-ml-px` fond en un seul
+// `outline` et `destructive` ont déjà une bordure visible, que le `-ms-px` fond en un seul
 // trait. Les autres variantes n'ont qu'une bordure transparente : il faut la teinter pour
 // que la couture existe.
 const SEAM_BY_VARIANT: Partial<Record<ButtonVariant, string>> = {
-    default: 'border-l-primary-foreground/25',
-    secondary: 'border-l-foreground/15',
-    ghost: 'border-l-border',
+    default: 'border-s-primary-foreground/25',
+    secondary: 'border-s-foreground/15',
+    ghost: 'border-s-border',
 }
 
 export function SplitButton({
@@ -65,10 +65,10 @@ export function SplitButton({
             {/* Les `!` sont indispensables : les petites tailles rétablissent un rayon complet dans
                 un groupe (`in-data-[slot=button-group]:rounded-lg`), ce qui redonnerait deux pilules
                 séparées au lieu d'un bouton coupé en deux. */}
-            <Button variant={variant} size={size} disabled={disabled} className={cn('rounded-r-none!', className)} {...props} />
+            <Button variant={variant} size={size} disabled={disabled} className={cn('rounded-e-none!', className)} {...props} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant={variant} size={TRIGGER_SIZE[size]} disabled={disabled} aria-label={menuLabel ?? t('moreOptions')} className={cn('-ml-px rounded-l-none! border-l', SEAM_BY_VARIANT[variant])}>
+                    <Button variant={variant} size={TRIGGER_SIZE[size]} disabled={disabled} aria-label={menuLabel ?? t('moreOptions')} className={cn('-ms-px rounded-s-none! border-s', SEAM_BY_VARIANT[variant])}>
                         <ChevronDownIcon className="size-3.5 opacity-60" />
                     </Button>
                 </DropdownMenuTrigger>

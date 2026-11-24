@@ -4,7 +4,7 @@ export function KitSpec({ rows }: { rows: KitSpecRow[] }) {
     const hasNotes = rows.some(row => row.note)
     return (
         <div className="overflow-hidden rounded-xl border border-border">
-            <table className="w-full text-left">
+            <table className="w-full text-start">
                 <tbody>
                     {rows.map(row => (
                         <tr key={row.key} className="border-b border-border last:border-b-0">

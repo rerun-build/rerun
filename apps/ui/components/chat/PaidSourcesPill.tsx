@@ -22,7 +22,7 @@ function SourceLineRow({ line }: { line: PaidSourceLine }) {
                     {t(`paidData.${line.capability}`)}
                 </p>
             </div>
-            <div className="w-24 shrink-0 text-right">
+            <div className="w-24 shrink-0 text-end">
                 <p className="text-sm text-foreground tabular-nums">
                     {line.found}
                     <span className="text-muted-foreground">/{line.asked}</span>
@@ -42,7 +42,7 @@ export function PaidSourcesPill({ sources }: { sources: PaidTurnSources }) {
             <PopoverTrigger asChild>
                 <button
                     type="button"
-                    className="mb-4 flex min-h-8 w-fit items-center gap-2 rounded-full border border-border bg-background py-1 pr-3 pl-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[state=open]:bg-muted data-[state=open]:text-foreground"
+                    className="mb-4 flex min-h-8 w-fit items-center gap-2 rounded-full border border-border bg-background py-1 pe-3 ps-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[state=open]:bg-muted data-[state=open]:text-foreground"
                 >
                     <SourceFacepile sources={sources.sources} max={4} />
                     {t('count', { count: sources.sources.length })}

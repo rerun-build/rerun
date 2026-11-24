@@ -174,7 +174,7 @@ function AccountNameField({ name, placeholder, busy, onSubmit, onCancel }: { nam
     const t = useTranslations('vault')
     const { inputProps } = useRenameField({ name, onSubmit, onCancel, busy, allowEmpty: true })
     return (
-        <div className="mt-0.5 flex h-6 items-center gap-1 rounded-md bg-background pr-1.5 pl-1.5 text-[11px] ring-1 ring-primary ring-inset">
+        <div className="mt-0.5 flex h-6 items-center gap-1 rounded-md bg-background pe-1.5 ps-1.5 text-[11px] ring-1 ring-primary ring-inset">
             <input {...inputProps} data-vault-account-name aria-label={t('detail.accountName')} placeholder={placeholder} maxLength={VAULT_ACCOUNT_LABEL_MAX} readOnly={busy} className="min-w-0 flex-1 bg-transparent outline-none selection:bg-foreground/20 read-only:opacity-60" />
             {busy && <Spinner className="size-3 text-muted-foreground" />}
         </div>

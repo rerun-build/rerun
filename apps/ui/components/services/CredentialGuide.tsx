@@ -12,9 +12,9 @@ const HINT_CLASS_NAME = 'text-xs text-muted-foreground/80 [&_p]:leading-snug [&_
 
 // Ordered list items become numbered pips through a CSS counter, so the author writes plain `1.`.
 const STEPS_CLASS_NAME = cn(
-    '[&_ol]:mt-0 [&_ol]:list-none [&_ol]:space-y-3 [&_ol]:pl-0 [&_ol]:[counter-reset:step]',
-    '[&_li]:relative [&_li]:mt-0 [&_li]:pl-8 [&_li]:text-sm [&_li]:leading-6 [&_li]:[counter-increment:step]',
-    '[&_li]:before:absolute [&_li]:before:top-0.5 [&_li]:before:left-0 [&_li]:before:flex [&_li]:before:size-5 [&_li]:before:items-center [&_li]:before:justify-center',
+    '[&_ol]:mt-0 [&_ol]:list-none [&_ol]:space-y-3 [&_ol]:ps-0 [&_ol]:[counter-reset:step]',
+    '[&_li]:relative [&_li]:mt-0 [&_li]:ps-8 [&_li]:text-sm [&_li]:leading-6 [&_li]:[counter-increment:step]',
+    '[&_li]:before:absolute [&_li]:before:top-0.5 [&_li]:before:start-0 [&_li]:before:flex [&_li]:before:size-5 [&_li]:before:items-center [&_li]:before:justify-center',
     '[&_li]:before:rounded-full [&_li]:before:bg-foreground/10 [&_li]:before:text-[11px] [&_li]:before:font-medium [&_li]:before:text-foreground',
     '[&_li]:before:content-[counter(step)]',
 )

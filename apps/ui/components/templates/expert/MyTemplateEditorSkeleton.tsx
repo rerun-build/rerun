@@ -41,7 +41,7 @@ export function MyTemplateEditorSkeleton() {
 
             <footer className="flex items-center gap-2 border-t border-border px-5 py-4">
                 <Skeleton className="size-8" />
-                <Skeleton className="ml-auto h-3 w-16" />
+                <Skeleton className="ms-auto h-3 w-16" />
                 <Skeleton className="h-8 w-16" />
                 <Skeleton className="h-8 w-36" />
             </footer>

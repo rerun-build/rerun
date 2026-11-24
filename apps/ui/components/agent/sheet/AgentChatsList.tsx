@@ -150,7 +150,7 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     return (
         <div className="flex min-h-0 flex-col">
             <div className="flex shrink-0 items-center justify-between gap-2 px-3 pb-1 pt-3">
-                <span className="flex items-center gap-2 pl-1 text-sm font-semibold">
+                <span className="flex items-center gap-2 ps-1 text-sm font-semibold">
                     <MessageCircle className="size-4 text-muted-foreground" />
                     {t('title')}
                 </span>
@@ -175,7 +175,7 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                     {t('filters.automations')}
                 </Chip>
                 <Chip selected={filter === 'needs'} onClick={() => chooseFilter('needs')}>
-                    {t('filters.needs')} <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{attention.length}</span>
+                    {t('filters.needs')} <span className={cn('ms-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{attention.length}</span>
                 </Chip>
                 {filter === 'needs' && attention.length > 0 && (
                     <ConfirmDialog
@@ -185,7 +185,7 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                         confirmVariant="default"
                         onConfirm={() => markSessionsHandled(attention.map(item => item.id))}
                     >
-                        <Button size="xs" variant="ghost" className="ml-auto text-muted-foreground">
+                        <Button size="xs" variant="ghost" className="ms-auto text-muted-foreground">
                             <CheckCheckIcon className="size-3.5" />
                             {t('markAllRead.confirm')}
                         </Button>
@@ -265,7 +265,7 @@ export function ChatListRow({ rename, ...row }: ChatRowProps & { rename: Session
         return <ChatRowRenameField title={entry.title} status={renaming.status} focus={renaming.focus} onSubmit={title => void rename.submit(entry.engineSessionId, title)} onCancel={rename.cancel} />
     }
     return (
-        <div className="group/row relative [@media(hover:none)]:pr-8">
+        <div className="group/row relative [@media(hover:none)]:pe-8">
             <ChatRow {...row} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -273,7 +273,7 @@ export function ChatListRow({ rename, ...row }: ChatRowProps & { rename: Session
                         aria-label={t('moreFor', { title: entry.title })}
                         variant="ghost"
                         size="icon-sm"
-                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-background opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:right-0 [@media(hover:none)]:bg-transparent [@media(hover:none)]:opacity-100"
+                        className="absolute end-1.5 top-1/2 -translate-y-1/2 bg-background opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:end-0 [@media(hover:none)]:bg-transparent [@media(hover:none)]:opacity-100"
                     >
                         <EllipsisIcon className="size-4" />
                     </Button>
@@ -301,7 +301,7 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: ChatRowPro
             type="button"
             disabled={adopting}
             onClick={onOpen}
-            className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors disabled:opacity-50', active ? 'bg-muted/60' : 'hover:bg-muted/40')}
+            className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-start transition-colors disabled:opacity-50', active ? 'bg-muted/60' : 'hover:bg-muted/40')}
         >
             <span className="flex min-w-0 flex-1 flex-col">
                 <span className="flex min-w-0 items-center gap-1.5">
@@ -334,7 +334,7 @@ export function ChatsSkeleton({ rows = SKELETON_WIDTHS.length }: { rows?: number
             {SKELETON_WIDTHS.slice(0, rows).map((width, i) => (
                 <div key={i} className="flex items-center gap-2.5 px-2.5 py-2.5">
                     <Skeleton className={cn('h-3.5', width)} />
-                    <Skeleton className="ml-auto h-3 w-6 shrink-0" />
+                    <Skeleton className="ms-auto h-3 w-6 shrink-0" />
                 </div>
             ))}
         </>

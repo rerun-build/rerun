@@ -281,7 +281,7 @@ function freeSlotHint(t: AppsTranslator, overview: AppsOverview): string {
     return t('accounts.freeSlotHint.default', { provider: appInfo(overview.slug).providerLabel })
 }
 
-const OPEN_SLOT = 'flex w-full items-center gap-3 rounded-md border border-dashed p-3 text-left transition-colors hover:border-foreground/30 hover:bg-accent/20 disabled:pointer-events-none disabled:opacity-60'
+const OPEN_SLOT = 'flex w-full items-center gap-3 rounded-md border border-dashed p-3 text-start transition-colors hover:border-foreground/30 hover:bg-accent/20 disabled:pointer-events-none disabled:opacity-60'
 
 // A slot with nothing in it yet: what gets the dashed border instead of an account.
 function OpenSlotButton({ title, description, className, ...props }: ComponentProps<'button'> & { title: string; description: string }) {
@@ -549,7 +549,7 @@ function ConnectedAppIcon({ slug }: { slug: AppSlug }) {
         <div role="img" aria-label={t('success.connectedIcon', { provider: appInfo(slug).providerLabel })} className="relative mb-5">
             <AppIcon slug={slug} size="xl" tone="green" />
             <span
-                className="absolute -right-2 -bottom-2 flex size-6 items-center justify-center rounded-full ring-4 ring-popover"
+                className="absolute -end-2 -bottom-2 flex size-6 items-center justify-center rounded-full ring-4 ring-popover"
                 style={{ background: 'color-mix(in oklab, var(--color-emerald-500) 18%, var(--popover))' }}
             >
                 <BorderBeam pattern="ring" tone="green" glow animated={false} />

@@ -351,7 +351,7 @@ function SourceRow({ source, credit, onClick, children }: { source: BoxConnectio
             actions={
                 <>
                     <SourceStatus source={source} credit={credit} />
-                    <ChevronRightIcon className="ml-1 size-4 text-muted-foreground" />
+                    <ChevronRightIcon className="ms-1 size-4 text-muted-foreground" />
                 </>
             }
         >

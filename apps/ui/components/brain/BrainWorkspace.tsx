@@ -650,7 +650,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                             </SheetContent>
                         </Sheet>
                     ) : (
-                        <aside className="flex w-[248px] shrink-0 flex-col border-r border-border bg-muted/30">{sidebar}</aside>
+                        <aside className="flex w-[248px] shrink-0 flex-col border-e border-border bg-muted/30">{sidebar}</aside>
                     ))}
 
                 <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">

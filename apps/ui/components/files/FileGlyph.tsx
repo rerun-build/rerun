@@ -61,7 +61,7 @@ export function FileSheetGlyph({ children, badge, className }: { children?: Reac
             {children}
             {badge && (
                 <span
-                    className="absolute bottom-[11px] left-[19px] w-[27px] truncate text-center text-[6px] font-semibold uppercase tracking-wider"
+                    className="absolute bottom-[11px] start-[19px] w-[27px] truncate text-center text-[6px] font-semibold uppercase tracking-wider"
                     style={{ color: GLYPH_INK_MUTED }}
                 >
                     {badge}

@@ -89,7 +89,7 @@ export function TeamStep({ invites, onInvited, onDone, onBack, saving, error }: 
                         void invite()
                     }}
                 >
-                    <span className="pointer-events-none absolute top-1/2 left-3.5 z-10 flex -translate-y-1/2 items-center">
+                    <span className="pointer-events-none absolute top-1/2 start-3.5 z-10 flex -translate-y-1/2 items-center">
                         <MailIcon className="size-5 text-muted-foreground" />
                     </span>
                     <Input
@@ -103,9 +103,9 @@ export function TeamStep({ invites, onInvited, onDone, onBack, saving, error }: 
                             setRefused(null)
                             setTyped(event.target.value)
                         }}
-                        className="h-12 pr-24 pl-11 text-base"
+                        className="h-12 pe-24 ps-11 text-base"
                     />
-                    <div className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center">
+                    <div className="absolute top-1/2 end-1.5 flex -translate-y-1/2 items-center">
                         <Button type="submit" size="lg" disabled={!valid} loading={sending}>
                             {t('team.invite')}
                         </Button>

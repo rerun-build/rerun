@@ -104,13 +104,13 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
     const trigger = run.triggerSlug ?? run.triggerSource
     return (
         <Collapsible onOpenChange={open => open && onOpen()} className={cn(PANEL_CARD, 'overflow-hidden')}>
-            <CollapsibleTrigger className={cn('group flex w-full flex-col gap-0.5 p-3 text-left', PANEL_CARD_INTERACTIVE)}>
+            <CollapsibleTrigger className={cn('group flex w-full flex-col gap-0.5 p-3 text-start', PANEL_CARD_INTERACTIVE)}>
                 <div className="flex items-center gap-2">
                     <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
                     <span className="flex-1 truncate text-sm">{run.startedAt ? formatDate(run.startedAt, locale) : run.id}</span>
                     <RunStatusBadge status={run.status} />
                 </div>
-                <div className="flex flex-wrap items-center gap-1.5 pl-6 text-[10px] text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-1.5 ps-6 text-[10px] text-muted-foreground">
                     {typeof run.stepCount === 'number' && (
                         <span>{t('stepCount', { count: run.stepCount })}</span>
                     )}
@@ -135,7 +135,7 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
                 </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
-                <div className="px-3 pb-3 pl-9">
+                <div className="px-3 pb-3 ps-9">
                     {run.error && <div className="mb-2 whitespace-pre-wrap break-all rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">{run.error}</div>}
                     {!detail ? (
                         <div className="py-2">
@@ -188,7 +188,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
     const isError = tool.isError !== 0
     return (
         <Collapsible className="border-t border-border/40 first:border-t-0">
-            <CollapsibleTrigger className="group flex w-full items-center gap-2 py-1.5 text-left text-xs transition-colors hover:bg-accent/30">
+            <CollapsibleTrigger className="group flex w-full items-center gap-2 py-1.5 text-start text-xs transition-colors hover:bg-accent/30">
                 <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
                 {createElement(toolIconOf(tool.toolName), { className: 'size-3.5 shrink-0 text-muted-foreground' })}
                 <span className="truncate font-mono">{tool.toolName}</span>
@@ -197,7 +197,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
                 {tool.durationMs != null && <span className="shrink-0 text-muted-foreground">{formatDuration(tool.durationMs)}</span>}
             </CollapsibleTrigger>
             <CollapsibleContent>
-                <div className="flex flex-col gap-2 pb-2 pl-5">
+                <div className="flex flex-col gap-2 pb-2 ps-5">
                     {input && <JsonBlock label={t('input')} json={input} />}
                     {output && <JsonBlock label={t('output')} json={output} error={isError} />}
                 </div>

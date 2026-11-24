@@ -16,7 +16,7 @@ export function ViewMenuRow() {
         <div className="flex items-center gap-2 px-1.5 py-1 text-sm text-muted-foreground">
             <LayoutGridIcon className="size-4" />
             {t('label')}
-            <ViewModeSwitch value={view} onChange={next => useWorkspaceViewStore.getState().choose(next)} className="ml-auto origin-right scale-90" />
+            <ViewModeSwitch value={view} onChange={next => useWorkspaceViewStore.getState().choose(next)} className="ms-auto origin-right scale-90" />
         </div>
     )
 }

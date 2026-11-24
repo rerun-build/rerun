@@ -83,7 +83,7 @@ export function FeatureRequestBlock({ request, toolCallId, onSent, onSkip, class
                     <Textarea value={description} onChange={event => setDescription(event.target.value)} aria-label={t('descriptionLabel')} maxLength={FEATURE_REQUEST_LIMITS.description} rows={4} className="max-h-60 text-sm" />
                 </div>
             ) : (
-                description.trim() && <blockquote className="border-l-2 border-border pl-3 text-sm break-words whitespace-pre-line text-muted-foreground">{description}</blockquote>
+                description.trim() && <blockquote className="border-s-2 border-border ps-3 text-sm break-words whitespace-pre-line text-muted-foreground">{description}</blockquote>
             )}
             {request.workaround && (
                 <div className="flex items-start gap-2 rounded-md bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground">

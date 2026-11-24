@@ -276,7 +276,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                                 <Button variant="ghost" size="icon-sm" aria-label={tView('allConversations')} className={cn(chats && 'bg-accent')}>
                                     <span className="relative flex">
                                         <MessageCircle className="size-4" />
-                                        {chatsAttention > 0 && <span className="absolute -top-1 -right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+                                        {chatsAttention > 0 && <span className="absolute -top-1 -end-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
                                     </span>
                                 </Button>
                             </PopoverTrigger>
@@ -301,7 +301,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
             )}
             {/* Skipping hides the gate, not the fact that the agent still has nothing connected. */}
             {setup.pending && setup.skipped && (
-                <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/40 py-1 pr-1.5 pl-3 text-xs text-muted-foreground">
+                <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/40 py-1 pe-1.5 ps-3 text-xs text-muted-foreground">
                     <WrenchIcon className="size-3.5 shrink-0" />
                     <span className="min-w-0 flex-1 truncate">{t('notSetUp')}</span>
                     <Button
@@ -348,7 +348,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
             })}
             <AnimatePresence>
                 {!docked && chats && (
-                    <FloatingSurface key="chats" className="top-16 left-3 w-[min(340px,calc(100%-1.5rem))]">
+                    <FloatingSurface key="chats" className="top-16 start-3 w-[min(340px,calc(100%-1.5rem))]">
                         {chatsList}
                     </FloatingSurface>
                 )}

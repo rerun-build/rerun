@@ -53,7 +53,7 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                 actions={
                     <>
                         {member.role === 'admin' && (
-                            <Badge size="xs" tone="brand" glow={false} className="mr-1">
+                            <Badge size="xs" tone="brand" glow={false} className="me-1">
                                 {t('adminBadge')}
                             </Badge>
                         )}

@@ -22,7 +22,7 @@ export function CancelTimeline({ milestones }: { milestones: readonly CancelMile
     return (
         <div className="relative mx-1 h-[4.75rem]">
             <div className="absolute inset-x-5 top-[21px] h-1 rounded-full bg-muted" />
-            <div className="absolute top-[21px] left-5 h-1 w-[10%] rounded-full bg-gradient-to-r from-foreground/70 to-transparent" />
+            <div className="absolute top-[21px] start-5 h-1 w-[10%] rounded-full bg-gradient-to-r from-foreground/70 to-transparent" />
             {milestones.map(milestone => (
                 <div
                     key={milestone.label}

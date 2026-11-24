@@ -64,7 +64,7 @@ function KitIndexGroup({
                         <span className="shrink-0 font-mono text-xs text-foreground/25">{String(offset + index + 1).padStart(2, '0')}</span>
                         <span className="w-56 shrink-0 text-sm font-medium text-foreground">{category.label}</span>
                         <span className="text-sm text-foreground/50">{category.blurb}</span>
-                        {external && <span className="shrink-0 font-mono text-[11px] text-foreground/25 sm:ml-auto">{category.host === 'app' ? 'app' : 'rerun.build'}</span>}
+                        {external && <span className="shrink-0 font-mono text-[11px] text-foreground/25 sm:ms-auto">{category.host === 'app' ? 'app' : 'rerun.build'}</span>}
                     </a>
                 ))}
             </div>

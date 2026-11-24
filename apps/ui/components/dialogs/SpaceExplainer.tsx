@@ -33,7 +33,7 @@ export function SpaceExplainer() {
     const { ref, frame } = useRenderedFrame()
 
     return (
-        <div className="relative hidden overflow-hidden border-l sm:flex sm:flex-col" style={PANEL_STYLE}>
+        <div className="relative hidden overflow-hidden border-s sm:flex sm:flex-col" style={PANEL_STYLE}>
             {frame && <BoxExplainerScene band={frame.height} className="absolute inset-0" />}
 
             <div ref={ref} className="relative mt-auto px-8 pt-16 pb-8" style={{ backgroundImage: COPY_SCRIM }}>

@@ -31,7 +31,7 @@ export function AlertBlock({ message, onAcknowledge, at, pending, renderText = t
                     <p className="text-sm leading-snug font-medium">{t('chat.alert.title')}</p>
                     {raisedAt && (
                         <TooltipLabeled label={fullDateTime(raisedAt, locale)}>
-                            <span className="ml-auto shrink-0 text-[10px] tabular-nums text-muted-foreground">{shortRelativeTime(raisedAt, locale)}</span>
+                            <span className="ms-auto shrink-0 text-[10px] tabular-nums text-muted-foreground">{shortRelativeTime(raisedAt, locale)}</span>
                         </TooltipLabeled>
                     )}
                 </div>

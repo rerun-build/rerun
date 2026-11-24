@@ -135,5 +135,5 @@ function AgentListRow({ icon: Glyph, title, subtitle }: { icon: LucideIcon; titl
 
 function MoreRow({ count }: { count: number }) {
     const t = useTranslations('templates.agentCard')
-    return <p className="pl-6 text-[11px] text-muted-foreground">{t('more', { count })}</p>
+    return <p className="ps-6 text-[11px] text-muted-foreground">{t('more', { count })}</p>
 }

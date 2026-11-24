@@ -72,7 +72,7 @@ export function TemplateSubmitFooter({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="ml-auto"
+                    className="ms-auto"
                     loading={running === 'withdraw'}
                     disabled={pending}
                     onClick={() => run('withdraw', onWithdraw)}
@@ -124,7 +124,7 @@ export function TemplateSubmitFooter({
                     <PopoverTrigger asChild>
                         <button
                             type="button"
-                            className="ml-auto flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                            className="ms-auto flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                             aria-label={t('checklistLabel', { met: metCount, total: checklist.length })}
                         >
                             <Gauge ratio={metCount / checklist.length} complete={ready} className={cn(readyTone, ready && 'hover:text-emerald-500')} />
@@ -147,7 +147,7 @@ export function TemplateSubmitFooter({
                                         {requirement.label}
                                     </span>
                                     {!requirement.met && requirement.id === 'payouts' && (
-                                        <button type="button" className="ml-5 w-fit text-left underline" onClick={() => setPane({ kind: 'payouts' })}>
+                                        <button type="button" className="ms-5 w-fit text-start underline" onClick={() => setPane({ kind: 'payouts' })}>
                                             {t('setUpPayouts')}
                                         </button>
                                     )}

@@ -15,7 +15,7 @@ export function ViewGallery({ view, rows, context, onOpenRow }: ViewGalleryProps
                 const item = <GalleryItem row={row} fields={view.fields ?? {}} formats={view.formats ?? {}} context={context} shape={shape} className="h-full" />
                 if (!onOpenRow) return <div key={String(row.__rowid ?? i)}>{item}</div>
                 return (
-                    <button key={String(row.__rowid ?? i)} type="button" onClick={() => onOpenRow(row)} className="rounded-md text-left outline-none transition-shadow hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50">
+                    <button key={String(row.__rowid ?? i)} type="button" onClick={() => onOpenRow(row)} className="rounded-md text-start outline-none transition-shadow hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50">
                         {item}
                     </button>
                 )

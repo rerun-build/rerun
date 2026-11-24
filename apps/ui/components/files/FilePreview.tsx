@@ -81,17 +81,17 @@ function RenderedText({ fileName, format, content }: { fileName: string; format:
     return (
         <div className="relative h-full">
             {showSource ? (
-                <SourceText content={content} className="pr-12" />
+                <SourceText content={content} className="pe-12" />
             ) : format === 'html' ? (
                 // No scripts and an opaque origin: whatever a coworker wrote in the page can neither run
                 // nor reach the app's session. Popups only, so its links open in a tab of their own.
                 <iframe sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={framedHtmlDocument(content)} title={fileName} className="h-full w-full bg-white" />
             ) : (
-                <div className="h-full overflow-auto py-4 pr-12 pl-4 sm:pl-6">
+                <div className="h-full overflow-auto py-4 pe-12 ps-4 sm:ps-6">
                     <Markdown content={withoutFrontmatter(content)} className={DOCUMENT_CLASS} />
                 </div>
             )}
-            <div className="absolute top-2 right-2 rounded-md bg-background shadow-sm">
+            <div className="absolute top-2 end-2 rounded-md bg-background shadow-sm">
                 <Button size="icon-sm" variant="outline" onClick={() => setShowSource(current => !current)} title={toggleLabel} aria-label={toggleLabel}>
                     {showSource ? <EyeIcon className="size-4" /> : <Code2 className="size-4" />}
                 </Button>

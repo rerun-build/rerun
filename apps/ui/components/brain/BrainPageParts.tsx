@@ -102,7 +102,7 @@ export function PageTypeSelect({ value, disabled, onChange }: { value: BrainPage
     const t = useTranslations('brain')
     return (
         <Select value={value} onValueChange={next => onChange(next as BrainPageType)} disabled={disabled}>
-            <SelectTrigger size="sm" className="-ml-2 border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent" aria-label={t('parts.pageType')}>
+            <SelectTrigger size="sm" className="-ms-2 border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent" aria-label={t('parts.pageType')}>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>

@@ -54,7 +54,7 @@ function ForemanBuddy({ coworker, edge }: { coworker: CoworkerDockCoworker; edge
     return (
         <span data-dock-foreman className="relative flex size-[34px] items-center justify-center">
             <Orb size={BUDDY_SIZE - 6} state={foremanDockOrbState(coworker.mood)} facing={edge === 'right' ? 'left' : 'right'} />
-            <CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} className="absolute -top-1 -right-1" />
+            <CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} className="absolute -top-1 -end-1" />
         </span>
     )
 }
@@ -121,7 +121,7 @@ export function DockInbox({ edge, total, active, onOpen }: { edge: CoworkerDockE
                 )}
             >
                 <InboxIcon className="size-4" />
-                <CountPip count={total} className="absolute -top-0.5 -right-0.5 h-3.5 min-w-3.5 text-[9px]" />
+                <CountPip count={total} className="absolute -top-0.5 -end-0.5 h-3.5 min-w-3.5 text-[9px]" />
             </button>
         </TooltipLabeled>
     )

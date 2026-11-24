@@ -57,7 +57,7 @@ function Edge({ side, fadeClassName, onClick }: { side: 'left' | 'right'; fadeCl
     const t = useKitTranslations()
     const isLeft = side === 'left'
     return (
-        <div className={cn('pointer-events-none absolute inset-y-0 z-10 flex w-12 items-center to-transparent', fadeClassName, isLeft ? 'left-0 justify-start bg-gradient-to-r' : 'right-0 justify-end bg-gradient-to-l')}>
+        <div className={cn('pointer-events-none absolute inset-y-0 z-10 flex w-12 items-center to-transparent', fadeClassName, isLeft ? 'start-0 justify-start bg-gradient-to-r' : 'end-0 justify-end bg-gradient-to-l')}>
             <button
                 type="button"
                 onClick={onClick}

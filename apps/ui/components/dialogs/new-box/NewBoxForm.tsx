@@ -69,7 +69,7 @@ export function NewBoxForm({
                     onFloor={
                         <div className="flex flex-col items-center pb-1">
                             <div className="relative">
-                                <span ref={anchorRef} aria-hidden className="absolute top-1/2 left-1/2" />
+                                <span ref={anchorRef} aria-hidden className="absolute top-1/2 start-1/2" />
                                 <div style={{ transform: 'translate(var(--orb-x, 0px), var(--orb-y, 0px))' }}>
                                     <Orb state={draft.named ? 'thinking' : 'listening'} size={44} gaze={gaze} />
                                 </div>

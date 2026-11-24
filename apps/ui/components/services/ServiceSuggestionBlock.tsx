@@ -420,7 +420,7 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
                                 disabled={locked}
                             />
                         )}
-                        <div className="ml-auto flex items-center gap-2">
+                        <div className="ms-auto flex items-center gap-2">
                             {multiple && (
                                 <Button size="sm" variant="outline" disabled={locked} onClick={skip}>
                                     {t('suggestion.skip')}

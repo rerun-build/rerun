@@ -130,7 +130,7 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 pl-11 @md:justify-end @md:pl-0">
+                <div className="flex items-center justify-between gap-3 ps-11 @md:justify-end @md:ps-0">
                     <span className="text-sm tabular-nums">
                         {onlyTrialSlot ? (
                             t('free')

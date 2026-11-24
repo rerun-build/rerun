@@ -19,7 +19,7 @@ const CATEGORY_ICONS: Record<EmailCategory, LucideIcon> = {
 
 function SwitchRow({ icon, label, description, checked, onChange }: { icon: LucideIcon; label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) {
     return (
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted">
+        <label className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-start transition-colors hover:bg-muted">
             <Icon icon={icon} size="sm" />
             <Field orientation="row" label={label} helperText={description} className="flex-1">
                 <Switch checked={checked} onCheckedChange={onChange} />

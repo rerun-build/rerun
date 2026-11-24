@@ -60,7 +60,7 @@ export function MediaAlbum({ items, captions, align = 'start', onOpen }: MediaAl
     const hidden = items.length - shown.length
 
     return (
-        <div className={cn('grid w-full max-w-md grid-cols-2 gap-1.5', align === 'end' && 'ml-auto')}>
+        <div className={cn('grid w-full max-w-md grid-cols-2 gap-1.5', align === 'end' && 'ms-auto')}>
             {shown.map((item, index) => {
                 const wide = shown.length === 3 && index === 0
                 return (

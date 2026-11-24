@@ -66,8 +66,8 @@ export function SkillFilesSection({ agentId, slug, files, readOnly, addLockedRea
             <div className="rounded-md border border-border divide-y divide-border">
                 {files.length === 0 && !adding && <p className="px-2.5 py-2 text-xs text-muted-foreground">{t('empty')}</p>}
                 {files.map(path => (
-                    <div key={path} className="flex items-center gap-1 pr-1">
-                        <button type="button" onClick={() => onOpen(path)} className="flex flex-1 min-w-0 items-center gap-2 px-2.5 py-2 text-left hover:bg-accent/30 transition-colors">
+                    <div key={path} className="flex items-center gap-1 pe-1">
+                        <button type="button" onClick={() => onOpen(path)} className="flex flex-1 min-w-0 items-center gap-2 px-2.5 py-2 text-start hover:bg-accent/30 transition-colors">
                             <FileTextIcon className="size-3.5 shrink-0 text-muted-foreground" />
                             <span className="truncate text-xs font-mono">{path}</span>
                         </button>
@@ -103,7 +103,7 @@ export function SkillFilesSection({ agentId, slug, files, readOnly, addLockedRea
             {!readOnly && !adding && (
                 <TooltipDisabledReason reason={addLockedReason} className="w-full">
                     <Button size="sm" variant="outline" className="w-full" disabled={!!addLockedReason} onClick={() => setAdding(true)}>
-                        <PlusIcon className="size-3.5 mr-1" /> {t('addFile')}
+                        <PlusIcon className="size-3.5 me-1" /> {t('addFile')}
                     </Button>
                 </TooltipDisabledReason>
             )}

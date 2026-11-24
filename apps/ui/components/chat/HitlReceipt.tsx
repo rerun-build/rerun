@@ -22,7 +22,7 @@ import { ComputerHandle } from '@/components/computers/ComputerBits'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
 
-const USER_SIDE = 'ml-auto w-full max-w-[85%]'
+const USER_SIDE = 'ms-auto w-full max-w-[85%]'
 
 type HitlReceiptProps = {
     reply: HitlReply
@@ -116,7 +116,7 @@ function ReceiptCard({ icon: Glyph, title, meta, children }: { icon: ComponentTy
             <div className={cn('flex items-center gap-2 px-3 py-2 text-xs', hasBody && 'border-b border-border')}>
                 <Glyph className="size-3.5 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 font-medium text-foreground">{title}</span>
-                {meta && <span className="ml-auto shrink-0 text-muted-foreground">{meta}</span>}
+                {meta && <span className="ms-auto shrink-0 text-muted-foreground">{meta}</span>}
             </div>
             {hasBody && <div className="divide-y divide-border">{children}</div>}
         </div>
@@ -295,7 +295,7 @@ function McpSignInReceipt({ agentId, name }: { agentId?: string; name: string })
 function TakeoverReceipt({ url }: { url: string | null }) {
     const t = useTranslations('chat.receipt')
     return (
-        <p className="ml-auto flex max-w-[85%] items-center gap-1.5 text-xs text-muted-foreground">
+        <p className="ms-auto flex max-w-[85%] items-center gap-1.5 text-xs text-muted-foreground">
             <MonitorIcon className="size-3 shrink-0" />
             <span className="truncate">{url ? t('takeover.handedBackOn', { url }) : t('takeover.handedBack')}</span>
         </p>
@@ -305,7 +305,7 @@ function TakeoverReceipt({ url }: { url: string | null }) {
 function DismissedLine({ of }: { of: Extract<HitlReply, { kind: 'cancelled' }>['of'] }) {
     const t = useTranslations('chat.receipt.dismissed')
     return (
-        <p className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+        <p className="ms-auto flex items-center gap-1.5 text-xs text-muted-foreground">
             <XIcon className="size-3" />
             {t(of)}
         </p>

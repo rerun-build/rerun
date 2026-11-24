@@ -6,8 +6,8 @@ const formatDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { 
 
 function TimelineEntry({ entry, latest }: { entry: ChangelogOgEntry; latest: boolean }) {
     return (
-        <article className="relative flex h-[118px] items-center gap-5 pl-9">
-            <span className="absolute top-1/2 left-0 flex size-[11px] -translate-y-1/2 items-center justify-center rounded-full border border-neutral-700 bg-[#0a0a0a]">
+        <article className="relative flex h-[118px] items-center gap-5 ps-9">
+            <span className="absolute top-1/2 start-0 flex size-[11px] -translate-y-1/2 items-center justify-center rounded-full border border-neutral-700 bg-[#0a0a0a]">
                 {latest ? <span className="size-full rounded-full bg-white" /> : null}
             </span>
             {entry.imageUrl ? (
@@ -28,19 +28,19 @@ function TimelineEntry({ entry, latest }: { entry: ChangelogOgEntry; latest: boo
 export function ChangelogOgStage({ entries }: { entries: ChangelogOgEntry[] }) {
     return (
         <div className="dark relative overflow-hidden bg-[#0a0a0a] text-white" style={{ width: OG_WIDTH, height: OG_HEIGHT }}>
-            <div className="absolute left-16 top-14 z-20">
+            <div className="absolute start-16 top-14 z-20">
                 <RerunWordmark />
             </div>
 
-            <div className="absolute inset-y-0 left-16 z-20 flex max-w-[440px] flex-col justify-center gap-5">
+            <div className="absolute inset-y-0 start-16 z-20 flex max-w-[440px] flex-col justify-center gap-5">
                 <h2 className="bg-radial-[at_35%_30%] from-white from-15% via-[#b4b4be] via-55% to-[#6f6f7d] to-95% bg-clip-text text-[4.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-transparent">
                     What&apos;s new
                 </h2>
                 <p className="text-2xl leading-snug text-muted-foreground">Every change we ship to Rerun, newest first.</p>
             </div>
 
-            <div className="absolute top-14 right-16 flex w-[556px] flex-col gap-9">
-                <div className="absolute top-[59px] left-[5px] h-[640px] w-px bg-neutral-800" />
+            <div className="absolute top-14 end-16 flex w-[556px] flex-col gap-9">
+                <div className="absolute top-[59px] start-[5px] h-[640px] w-px bg-neutral-800" />
                 {entries.map((entry, index) => (
                     <TimelineEntry key={entry.slug} entry={entry} latest={index === 0} />
                 ))}

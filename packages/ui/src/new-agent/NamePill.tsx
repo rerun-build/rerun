@@ -15,12 +15,12 @@ import { AGENT_NAME_MAX } from './reading'
 // the edit, and an emptied name gives the naming back to the description.
 export function NamePill({ name, editing, onEdit, onRename, onCancel }: { name: string | null; editing: boolean; onEdit: () => void; onRename: (name: string) => void; onCancel: () => void }) {
     const t = useKitTranslations()
-    const pill = 'mr-1 inline-flex h-7 max-w-56 min-w-0 shrink-0 items-center @max-[24rem]:min-w-0 @max-[24rem]:shrink gap-1.5 rounded-full border pl-1.5 text-[0.8rem] font-medium whitespace-nowrap'
+    const pill = 'me-1 inline-flex h-7 max-w-56 min-w-0 shrink-0 items-center @max-[24rem]:min-w-0 @max-[24rem]:shrink gap-1.5 rounded-full border ps-1.5 text-[0.8rem] font-medium whitespace-nowrap'
 
     if (editing) return <EditingPill className={pill} name={name ?? ''} onRename={onRename} onCancel={onCancel} />
 
     return (
-        <button type="button" data-aim="name" onClick={onEdit} className={cn(pill, 'group/name pr-2 transition-colors', name ? 'border-foreground/15 bg-muted/50 text-foreground hover:bg-muted' : 'border-border pr-2.5 text-muted-foreground hover:text-foreground')}>
+        <button type="button" data-aim="name" onClick={onEdit} className={cn(pill, 'group/name pe-2 transition-colors', name ? 'border-foreground/15 bg-muted/50 text-foreground hover:bg-muted' : 'border-border pe-2.5 text-muted-foreground hover:text-foreground')}>
             <AgentTile lit={Boolean(name)} className="size-[18px] shrink-0" />
             {/* Keyed on the name, so a name that changes while one writes arrives rather than swaps. */}
             <span key={name ?? ''} className={cn('truncate', name && 'animate-in fade-in-0 slide-in-from-bottom-1 duration-300')}>
@@ -47,7 +47,7 @@ function EditingPill({ className, name, onRename, onCancel }: { className: strin
     }
 
     return (
-        <span data-aim="name" className={cn(className, 'border-foreground/30 bg-background pr-2.5 text-foreground ring-3 ring-ring/25')}>
+        <span data-aim="name" className={cn(className, 'border-foreground/30 bg-background pe-2.5 text-foreground ring-3 ring-ring/25')}>
             <AgentTile lit className="size-[18px] shrink-0" />
             <input ref={inputRef} value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={onKeyDown} onBlur={() => onRename(draft.trim())} aria-label={t('newAgent.name.label')} placeholder={t('newAgent.name.placeholder')} maxLength={AGENT_NAME_MAX} className="field-sizing-content max-w-full min-w-16 bg-transparent outline-none selection:bg-foreground/20 placeholder:text-muted-foreground" />
         </span>

@@ -288,7 +288,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                 <div className="space-y-3">
                     {hasChoice ? (
                         <div className="flex items-center gap-1">
-                            <Button size="icon-sm" variant="ghost" onClick={() => setChoosing(true)} aria-label={t('configForm.backToMethods')} className="-my-1 -ml-1.5 text-muted-foreground">
+                            <Button size="icon-sm" variant="ghost" onClick={() => setChoosing(true)} aria-label={t('configForm.backToMethods')} className="-my-1 -ms-1.5 text-muted-foreground">
                                 <ArrowLeftIcon className="size-4" />
                             </Button>
                             <p className="min-w-0 truncate text-sm font-medium">{method.label || t(`authMethod.label.${methodKindKey(method.kind)}`)}</p>
@@ -303,7 +303,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
 
                     {isConnect ? (
                         <Button variant="outline" size="sm" disabled={loading || missingRequired} onClick={() => connect(openPendingSignInPopup(name, t('signInPopup.connecting', { name })))} className="w-full">
-                            {loading ? <Loader2Icon className="size-3.5 animate-spin mr-1.5" /> : <ExternalLinkIcon className="size-3.5 mr-1.5" />}
+                            {loading ? <Loader2Icon className="size-3.5 animate-spin me-1.5" /> : <ExternalLinkIcon className="size-3.5 me-1.5" />}
                             {loading ? t('configForm.connecting') : t('configForm.connect')}
                         </Button>
                     ) : (

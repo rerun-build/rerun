@@ -144,7 +144,7 @@ function AccountCard({ slug, account, binding, isLast, disabled, onToggle, onWak
     return (
         <div className={cn(PANEL_CARD, binding ? 'border-foreground/40 bg-accent/40' : PANEL_CARD_INTERACTIVE)}>
             <TooltipDisabledReason reason={lastReason} className="flex w-full">
-                <label className={cn('flex w-full items-center gap-3 p-3 text-left', lastReason ? 'cursor-not-allowed' : 'cursor-pointer', disabled && !binding && 'opacity-60')}>
+                <label className={cn('flex w-full items-center gap-3 p-3 text-start', lastReason ? 'cursor-not-allowed' : 'cursor-pointer', disabled && !binding && 'opacity-60')}>
                     <AccountAvatar name={name} />
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                         <span className="truncate text-sm font-medium">{name}</span>

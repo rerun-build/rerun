@@ -6,7 +6,7 @@ import { Logo } from '@rerun/ui/logo'
 // board clair que sombre.
 export function SceneWatermark() {
     return (
-        <div className="absolute top-6 left-6 z-10 inline-flex items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-foreground">
+        <div className="absolute top-6 start-6 z-10 inline-flex items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-foreground">
             <Logo aria-hidden className="size-5" />
             <span className="text-sm font-medium tracking-tight">rerun.build</span>
             <BorderBeam tone="brand" animated={false} glow width={1.5} radius="9999px" />

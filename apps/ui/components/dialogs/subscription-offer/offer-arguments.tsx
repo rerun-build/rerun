@@ -41,9 +41,9 @@ export function OfferArguments() {
 
 function ConnectionPile() {
     return (
-        <span className="ml-2 inline-flex translate-y-0.5 items-center">
+        <span className="ms-2 inline-flex translate-y-0.5 items-center">
             {TEAM_CONNECTIONS.map(provider => (
-                <span key={provider} className="flex size-5 items-center justify-center rounded-full bg-muted ring-2 ring-popover not-first:-ml-1.5">
+                <span key={provider} className="flex size-5 items-center justify-center rounded-full bg-muted ring-2 ring-popover not-first:-ms-1.5">
                     <ProviderIcon provider={provider} className="size-3" />
                 </span>
             ))}

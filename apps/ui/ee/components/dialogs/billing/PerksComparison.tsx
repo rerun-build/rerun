@@ -27,25 +27,25 @@ export function PerksComparison() {
             <BorderBeam />
             <table className="w-full text-sm">
                 <thead>
-                    <tr className="text-left text-xs text-muted-foreground">
+                    <tr className="text-start text-xs text-muted-foreground">
                         <th className="pb-2 font-normal">
                             <span className="sr-only">{t('feature')}</span>
                         </th>
-                        <th className="pb-2 pl-4 font-normal">{t('trial')}</th>
-                        <th className="pb-2 pl-4 font-medium text-foreground">{t('pro')}</th>
+                        <th className="pb-2 ps-4 font-normal">{t('trial')}</th>
+                        <th className="pb-2 ps-4 font-medium text-foreground">{t('pro')}</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                     {PRO_PERKS.map(perk => ({ perk, text: perkCopy(t, perk) })).map(({ perk, text }) => (
                         <tr key={perk.id}>
-                            <th scope="row" className="py-2.5 text-left font-normal whitespace-nowrap text-muted-foreground">
+                            <th scope="row" className="py-2.5 text-start font-normal whitespace-nowrap text-muted-foreground">
                                 <span className="flex items-center gap-2.5">
                                     <Icon size="sm" icon={perk.icon} className="@max-md:hidden" />
                                     {text.title}
                                 </span>
                             </th>
-                            <td className="py-2.5 pl-4 text-muted-foreground">{text.trial}</td>
-                            <td className="py-2.5 pl-4 font-medium">{text.pro}</td>
+                            <td className="py-2.5 ps-4 text-muted-foreground">{text.trial}</td>
+                            <td className="py-2.5 ps-4 font-medium">{text.pro}</td>
                         </tr>
                     ))}
                 </tbody>

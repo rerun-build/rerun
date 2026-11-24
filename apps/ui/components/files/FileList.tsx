@@ -74,7 +74,7 @@ function ListSkeleton() {
                 <div key={index} className="flex h-9 items-center gap-3 px-2">
                     <Skeleton className="size-4 rounded" />
                     <Skeleton className="h-3 w-1/3" />
-                    <Skeleton className="ml-auto h-3 w-12" />
+                    <Skeleton className="ms-auto h-3 w-12" />
                 </div>
             ))}
         </div>
@@ -127,7 +127,7 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
 
                 <div className="grid grid-cols-[minmax(0,1fr)_5rem_4rem_2rem] items-center gap-x-3 border-b border-border px-2 pb-1.5 text-xs text-muted-foreground max-sm:grid-cols-[minmax(0,1fr)_2rem]">
                     <span>{t('list.name')}</span>
-                    <span className="text-right max-sm:hidden">{t('list.size')}</span>
+                    <span className="text-end max-sm:hidden">{t('list.size')}</span>
                     <span className="max-sm:hidden">{t('list.type')}</span>
                     <span />
                 </div>
@@ -164,7 +164,7 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
                                             <span className="truncate">{entry.name}</span>
                                         )}
                                     </span>
-                                    <span className="text-right text-xs tabular-nums text-muted-foreground max-sm:hidden">{entry.type === 'dir' ? '' : formatBytes(entry.size, locale)}</span>
+                                    <span className="text-end text-xs tabular-nums text-muted-foreground max-sm:hidden">{entry.type === 'dir' ? '' : formatBytes(entry.size, locale)}</span>
                                     <span className="truncate text-xs text-muted-foreground max-sm:hidden">{kindLabel(entry, kindLabels)}</span>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

@@ -31,7 +31,7 @@ export function AuthMethodPicker({ methods, onSelect }: { methods: AuthMethodSum
     return (
         <div className="flex flex-col gap-1.5">
             {methods.map(m => (
-                <button key={m.id} type="button" onClick={() => onSelect(m.id)} className="group flex items-center gap-2.5 rounded-lg border border-border bg-card px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted">
+                <button key={m.id} type="button" onClick={() => onSelect(m.id)} className="group flex items-center gap-2.5 rounded-lg border border-border bg-card px-2.5 py-2 text-start text-sm transition-colors hover:bg-muted">
                     <Icon icon={methodKindIcon(m.kind)} size="sm" />
                     <span className="min-w-0 flex-1">
                         <span className="block font-medium">{m.label || t(`label.${methodKindKey(m.kind)}`)}</span>

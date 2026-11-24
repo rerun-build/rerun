@@ -195,12 +195,12 @@ export function TemplateLibraryDialog({
                     <div ref={detailRef} tabIndex={-1} inert={isMobile ? view === 'list' : !showDetail} className="flex w-full min-h-0 min-w-0 shrink-0 flex-col outline-none sm:w-auto sm:overflow-hidden">
                         {/* The border sits here and not on the clipper, which would keep a hairline
                             of it lit against the catalogue while the column is closed. */}
-                        <div className="relative flex w-full min-h-0 flex-1 flex-col border-l max-sm:border-l-0 sm:w-[420px] sm:bg-muted/20 sm:shadow-[inset_2px_0_4px_0_rgb(0_0_0/0.05)]">
+                        <div className="relative flex w-full min-h-0 flex-1 flex-col border-s max-sm:border-s-0 sm:w-[420px] sm:bg-muted/20 sm:shadow-[inset_2px_0_4px_0_rgb(0_0_0/0.05)]">
                             {/* Above the StepTransition, not inside the panels: it would have to be
                                 repeated in all three of them, and it would slide away with the step
                                 animation every time another template is picked. */}
                             <div className="flex shrink-0 items-center border-b px-2 py-1.5 sm:hidden">
-                                <Button type="button" variant="ghost" size="sm" className="gap-1.5 pl-1.5" onClick={() => setView('list')}>
+                                <Button type="button" variant="ghost" size="sm" className="gap-1.5 ps-1.5" onClick={() => setView('list')}>
                                     <ChevronLeftIcon className="size-4" />
                                     {t('templates')}
                                 </Button>
@@ -208,7 +208,7 @@ export function TemplateLibraryDialog({
 
                             {/* Folds the column away and leaves the library open, which the dialog's
                                 own close button does not. A phone has the bar above for that. */}
-                            <span className="absolute top-2 left-2 z-20 flex rounded-md bg-background/70 backdrop-blur max-sm:hidden">
+                            <span className="absolute top-2 start-2 z-20 flex rounded-md bg-background/70 backdrop-blur max-sm:hidden">
                                 <TooltipLabeled label={t('hideDetails')} side="bottom">
                                     <Button type="button" variant="ghost" size="icon-sm" aria-label={t('hideDetails')} onClick={collapseDetail}>
                                         <PanelRightCloseIcon />

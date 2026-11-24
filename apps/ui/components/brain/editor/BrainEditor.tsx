@@ -139,7 +139,7 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
         content,
         editorProps: {
             attributes: {
-                class: cn(richTextClassName, 'min-h-48 text-[15px] leading-7 text-foreground/85 outline-none [&_p.is-editor-empty:first-child::before]:pointer-events-none [&_p.is-editor-empty:first-child::before]:float-left [&_p.is-editor-empty:first-child::before]:h-0 [&_p.is-editor-empty:first-child::before]:text-muted-foreground/60 [&_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_h1]:mt-6 [&_h1]:mb-2 [&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-foreground'),
+                class: cn(richTextClassName, 'min-h-48 text-[15px] leading-7 text-foreground/85 outline-none [&_p.is-editor-empty:first-child::before]:pointer-events-none [&_p.is-editor-empty:first-child::before]:float-start [&_p.is-editor-empty:first-child::before]:h-0 [&_p.is-editor-empty:first-child::before]:text-muted-foreground/60 [&_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_h1]:mt-6 [&_h1]:mb-2 [&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-foreground'),
             },
             handleDrop: (view, event) => {
                 const raw = event.dataTransfer?.getData(SHARED_FILE_DRAG_TYPE)

@@ -94,7 +94,7 @@ function RunRow({ run, onOpen }: { run: Run; onOpen: () => void }) {
         <button
             type="button"
             onClick={onOpen}
-            className="group/row flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-accent"
+            className="group/row flex w-full items-center gap-3 rounded-xl px-2 py-2 text-start transition-colors hover:bg-accent"
         >
             <Icon size="sm" icon={meta.icon} className={meta.tint} />
             <div className="flex min-w-0 flex-1 flex-col">

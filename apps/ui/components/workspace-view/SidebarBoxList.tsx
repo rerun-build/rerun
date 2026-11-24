@@ -195,7 +195,7 @@ function SortableTile({ agent, draggable, landingBefore, children }: { agent: Is
 // What follows the pointer: the coworker as it reads in the list, without its line and menus.
 function TileGhost({ agent }: { agent: IsoAgent }) {
     return (
-        <div className="flex w-[calc(var(--simple-list-w,18rem)-1rem)] cursor-grabbing items-center gap-3 rounded-lg border border-border bg-background py-2.5 pr-3 pl-2 shadow-lg">
+        <div className="flex w-[calc(var(--simple-list-w,18rem)-1rem)] cursor-grabbing items-center gap-3 rounded-lg border border-border bg-background py-2.5 pe-3 ps-2 shadow-lg">
             <AgentBuddy agentId={agent.id} mood={agent.disabledAt ? 'asleep' : 'idle'} size={36} facing="right" className="shrink-0" />
             <span className="min-w-0 flex-1 truncate text-[15px] leading-5 font-medium">{agent.name}</span>
         </div>

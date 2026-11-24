@@ -44,7 +44,7 @@ export function AgentComputerThumbnail({ agentId, working, disabledReason, onOpe
     const live = screen.status === 'live'
 
     return (
-        <button type="button" disabled={!!disabledReason} onClick={onOpen} className="group w-full space-y-1.5 text-left disabled:cursor-not-allowed">
+        <button type="button" disabled={!!disabledReason} onClick={onOpen} className="group w-full space-y-1.5 text-start disabled:cursor-not-allowed">
             <span className="flex items-center justify-between px-1">
                 <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                     <span className={cn('size-1.5 rounded-full', live && working ? 'bg-emerald-500' : 'bg-muted-foreground/40')} />

@@ -138,7 +138,7 @@ function RowStatus({ computer }: { computer: ComputerItem }) {
     return (
         <>
             <ComputerStatusBadge status={computer.status} jobs={computer.runningJobs} />
-            <ChevronRightIcon className="ml-1 size-4 text-muted-foreground" />
+            <ChevronRightIcon className="ms-1 size-4 text-muted-foreground" />
         </>
     )
 }
@@ -378,7 +378,7 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
 function AllowedChip({ icon: Glyph, label, reason, warn, onRemove }: { icon: typeof TerminalIcon; label: string; reason: string | undefined; warn?: boolean; onRemove: () => void }) {
     const t = useTranslations('computers.detail')
     return (
-        <span className={cn('inline-flex max-w-full items-center gap-1.5 rounded-md border py-0.5 pr-1 pl-2 text-xs', warn ? 'border-orange-500/30 bg-orange-500/5' : 'bg-muted/30')} title={warn ? t('interpreterWarning') : undefined}>
+        <span className={cn('inline-flex max-w-full items-center gap-1.5 rounded-md border py-0.5 pe-1 ps-2 text-xs', warn ? 'border-orange-500/30 bg-orange-500/5' : 'bg-muted/30')} title={warn ? t('interpreterWarning') : undefined}>
             <Glyph className="size-3 shrink-0 text-muted-foreground" />
             <span className="truncate font-mono">{label}</span>
             <TooltipDisabledReason reason={reason}>

@@ -23,7 +23,7 @@ export function ComposerSubscriptionCta({ open, claudePlanOffered, onClick }: Co
     return (
         <div className={cn('-mt-px grid transition-[grid-template-rows] duration-300 ease-out', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
             <div className="overflow-hidden px-2">
-                <div className="relative flex w-full items-center gap-2 rounded-b-lg border-x border-b border-input bg-input/30 py-1 pr-1.5 pl-3">
+                <div className="relative flex w-full items-center gap-2 rounded-b-lg border-x border-b border-input bg-input/30 py-1 pe-1.5 ps-3">
                     {/* Mirror of the notification nudge above the composer: stripes densest on the outer edge. */}
                     <Stripes className="rounded-b-lg" fade="top" />
                     <ProviderIcon provider="openai" className="relative size-3.5 shrink-0" />

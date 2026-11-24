@@ -53,13 +53,13 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                         <Button variant="ghost" size="icon-sm" aria-label={tHeader('conversations')} className={cn(open && 'bg-accent')}>
                             <span className="relative flex">
                                 <MessageCircle className="size-4" />
-                                {waiting && <span aria-hidden className="absolute -top-1 -right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+                                {waiting && <span aria-hidden className="absolute -top-1 -end-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
                             </span>
                         </Button>
                     ) : (
                         <Button variant="ghost" size="icon-sm" aria-label={tHeader('conversations')} className="relative">
                             <HistoryIcon className="size-3.5" />
-                            {waiting && <span aria-hidden className="absolute top-1 right-1 size-1.5 rounded-full bg-amber-400" />}
+                            {waiting && <span aria-hidden className="absolute top-1 end-1 size-1.5 rounded-full bg-amber-400" />}
                         </Button>
                     )}
                 </PopoverTrigger>
@@ -68,7 +68,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
             <PopoverContent align="end" onPointerDown={event => event.stopPropagation()} className="max-h-[min(32rem,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0">
                 <div className="flex min-h-0 flex-col">
                     <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 pt-3 pb-1">
-                        <span className="flex items-center gap-2 pl-1 text-sm font-semibold">
+                        <span className="flex items-center gap-2 ps-1 text-sm font-semibold">
                             <MessageCircle className="size-4 text-muted-foreground" />
                             {t('title')}
                         </span>
@@ -87,7 +87,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                             {tList('filters.all')}
                         </Chip>
                         <Chip selected={filter === 'needs'} onClick={() => setFilter('needs')}>
-                            {tList('filters.needs')} <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{waitingEntries.length}</span>
+                            {tList('filters.needs')} <span className={cn('ms-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{waitingEntries.length}</span>
                         </Chip>
                     </div>
                     <div className="min-h-0 space-y-0.5 overflow-y-auto px-2 pb-2">
@@ -95,7 +95,7 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
                             <button
                                 type="button"
                                 onClick={pick(onOpenGeneral)}
-                                className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium transition-colors', activeThreadId === null ? 'bg-muted/60' : 'hover:bg-muted/40')}
+                                className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-start text-sm font-medium transition-colors', activeThreadId === null ? 'bg-muted/60' : 'hover:bg-muted/40')}
                             >
                                 <MessagesSquare className="size-3.5 text-brand-text" />
                                 {tThreads('general')}

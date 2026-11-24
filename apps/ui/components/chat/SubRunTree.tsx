@@ -71,9 +71,9 @@ export function SubRunTree({ tasks, toolDisplay, onStopTask }: SubRunTreeProps) 
 
 function Branch({ tone, last, children, className }: { tone: Tone; last: boolean; children: ReactNode; className?: string }) {
     return (
-        <div className={cn('relative pl-6', className)}>
-            {!last && <span aria-hidden className={cn('absolute top-0 -bottom-1 left-2.5 border-l transition-colors duration-500', BRANCH_TONE[tone])} />}
-            <span aria-hidden className={cn('absolute top-0 left-2.5 h-3.5 w-3 rounded-bl-md border-b border-l transition-colors duration-500', BRANCH_TONE[tone])} />
+        <div className={cn('relative ps-6', className)}>
+            {!last && <span aria-hidden className={cn('absolute top-0 -bottom-1 start-2.5 border-s transition-colors duration-500', BRANCH_TONE[tone])} />}
+            <span aria-hidden className={cn('absolute top-0 start-2.5 h-3.5 w-3 rounded-es-md border-b border-s transition-colors duration-500', BRANCH_TONE[tone])} />
             {children}
         </div>
     )
@@ -105,7 +105,7 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
                 <div className="flex items-center gap-1">
                     <CollapsibleTrigger
                         disabled={!expandable}
-                        className="group flex h-7 min-w-0 flex-1 items-center gap-2.5 rounded-md pr-1 text-left text-sm transition-colors enabled:hover:bg-muted/50"
+                        className="group flex h-7 min-w-0 flex-1 items-center gap-2.5 rounded-md pe-1 text-start text-sm transition-colors enabled:hover:bg-muted/50"
                     >
                         <TaskStatus task={task} />
                         <span className={cn('min-w-0 flex-1 truncate font-medium', task.status === 'queued' && 'text-muted-foreground')}>{task.title}</span>
@@ -155,7 +155,7 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
                             )}
                             <Outcome task={task} />
                             {task.preview && (
-                                <div className="ml-6 rounded-md bg-muted/40">
+                                <div className="ms-6 rounded-md bg-muted/40">
                                     <ScrollFade className="max-h-40" fadeSize={32}>
                                         <p className="px-2.5 py-2 text-xs whitespace-pre-wrap break-words text-foreground/80">{task.preview}</p>
                                     </ScrollFade>
@@ -175,7 +175,7 @@ function Outcome({ task }: { task: SubRunTask }) {
         const result = subRunOutcome(task.preview)
         if (!result) return null
         return (
-            <p className="flex h-6 items-center gap-2.5 pl-0.5 text-xs text-emerald-600 dark:text-emerald-400">
+            <p className="flex h-6 items-center gap-2.5 ps-0.5 text-xs text-emerald-600 dark:text-emerald-400">
                 <CheckIcon className="size-3.5 shrink-0" />
                 <span className="truncate">{result}</span>
             </p>
@@ -184,7 +184,7 @@ function Outcome({ task }: { task: SubRunTask }) {
     if (task.status === 'error' || task.status === 'stopped') {
         const stoppedLabel = task.error === SUB_RUN_STOPPED_BY_USER ? t('stopped') : t('stoppedWithRun')
         return (
-            <p className={cn('flex h-6 items-center gap-2.5 pl-0.5 text-xs', task.status === 'error' ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground')}>
+            <p className={cn('flex h-6 items-center gap-2.5 ps-0.5 text-xs', task.status === 'error' ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground')}>
                 {task.status === 'error' ? <XIcon className="size-3.5 shrink-0" /> : <SquareIcon className="size-3 shrink-0" />}
                 <span className="truncate">{task.status === 'stopped' ? stoppedLabel : task.error || t('failed')}</span>
             </p>
@@ -204,7 +204,7 @@ function LiveSteps({ task, tone, toolDisplay }: { task: SubRunTask; tone: Tone; 
 
     return (
         <div className="flex flex-col">
-            {hidden > 0 && <div className="flex h-6 items-center pl-6 text-[11px] text-muted-foreground/70">{t('earlier', { count: hidden })}</div>}
+            {hidden > 0 && <div className="flex h-6 items-center ps-6 text-[11px] text-muted-foreground/70">{t('earlier', { count: hidden })}</div>}
             <AnimatePresence initial={false}>
                 {visible.map((call, i) => (
                     <motion.div

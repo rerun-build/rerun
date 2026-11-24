@@ -61,7 +61,7 @@ export function CaptureProgressPanel({ step }: { step: ProgressStep }) {
     const activeIndex = CAPTURE_STAGES.findIndex(stage => stage.step === step)
 
     return (
-        <div className="hidden min-h-0 flex-col border-l bg-muted/30 sm:flex">
+        <div className="hidden min-h-0 flex-col border-s bg-muted/30 sm:flex">
             <div ref={scrollRef} className="min-h-0 flex-1 overflow-hidden px-8" style={{ maskImage: EDGE_FADE, WebkitMaskImage: EDGE_FADE }}>
                 <ol className="relative flex flex-col" style={{ paddingBlock: pad }}>
                     {CAPTURE_STAGES.map((stage, index) => {

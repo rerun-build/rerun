@@ -23,7 +23,7 @@ export function BoardCornerActions() {
     }, [])
 
     return (
-        <div ref={rowRef} className="absolute bottom-[calc(1rem+var(--consent-inset))] left-4 z-40 flex items-center gap-2">
+        <div ref={rowRef} className="absolute bottom-[calc(1rem+var(--consent-inset))] start-4 z-40 flex items-center gap-2">
             <WorkspaceInbox />
             <GettingStartedPill />
         </div>

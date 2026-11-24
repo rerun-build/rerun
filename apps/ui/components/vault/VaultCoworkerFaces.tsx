@@ -40,9 +40,9 @@ export function VaultCoworkerFaces({ usage, size = 24, className }: { usage: Vau
             ) : (
                 <>
                     {faces.ids.map((id, index) => (
-                        <AgentBuddy key={id} agentId={id} size={size} animated={false} facing="right" className={cn(index > 0 && '-ml-2')} />
+                        <AgentBuddy key={id} agentId={id} size={size} animated={false} facing="right" className={cn(index > 0 && '-ms-2')} />
                     ))}
-                    {faces.more > 0 && <span className="ml-1 text-xs text-muted-foreground tabular-nums">+{faces.more}</span>}
+                    {faces.more > 0 && <span className="ms-1 text-xs text-muted-foreground tabular-nums">+{faces.more}</span>}
                 </>
             )}
         </span>

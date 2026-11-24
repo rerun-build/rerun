@@ -32,7 +32,7 @@ export function WhatsNewMenuItem() {
             <MegaphoneIcon className="size-4" />
             {t('whatsNew')}
             {changelogUnread > 0 && (
-                <Badge size="xs" tone="brand" glow={false} className="ml-auto">
+                <Badge size="xs" tone="brand" glow={false} className="ms-auto">
                     {changelogUnread}
                 </Badge>
             )}

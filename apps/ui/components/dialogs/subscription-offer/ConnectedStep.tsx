@@ -30,7 +30,7 @@ export function ConnectedStep({ provider, onDone }: { provider: AddableProvider;
             <div className="flex flex-1 flex-col items-center justify-center gap-4 py-6 text-center">
                 <span className="relative">
                     <Icon size="lg" icon={PROVIDER_GLYPH[provider]} />
-                    <span className="absolute -right-2 -bottom-2 z-20">
+                    <span className="absolute -end-2 -bottom-2 z-20">
                         <ExplainerCheck />
                     </span>
                 </span>

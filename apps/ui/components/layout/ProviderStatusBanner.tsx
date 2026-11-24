@@ -59,7 +59,7 @@ function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
 
     return (
         <div role="status" className="shrink-0 border-b border-border px-2 pb-1 md:border-b-0 md:px-0">
-            <div className="relative flex flex-nowrap items-center justify-center gap-x-2 gap-y-1 py-1 pl-1 pr-8 text-center text-sm text-foreground md:flex-wrap md:gap-x-3 md:px-8">
+            <div className="relative flex flex-nowrap items-center justify-center gap-x-2 gap-y-1 py-1 ps-1 pe-8 text-center text-sm text-foreground md:flex-wrap md:gap-x-3 md:px-8">
                 <Icon icon={TriangleAlertIcon} size="xs" glyphClassName={cn(outage ? 'text-destructive' : 'text-amber-500')} />
                 <TextShimmer as="span" duration={5} className="min-w-0 truncate font-medium md:hidden">
                     {headline}
@@ -76,7 +76,7 @@ function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
                     type="button"
                     onClick={dismiss}
                     aria-label={t('dismiss')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute end-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <XIcon className="size-3.5" />
                 </button>

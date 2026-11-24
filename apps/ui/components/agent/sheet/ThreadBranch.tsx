@@ -43,10 +43,10 @@ const STATE_BADGE_TONE: Record<Exclude<ThreadState, 'done' | 'live'>, 'orange' |
 
 const THREAD_STRIPES_INK = 'color-mix(in oklab, var(--foreground) 6%, transparent)'
 
-const ROW = 'group relative flex h-8 items-center gap-2 overflow-hidden px-2.5 text-left text-sm [&>:not(:first-child)]:relative'
+const ROW = 'group relative flex h-8 items-center gap-2 overflow-hidden px-2.5 text-start text-sm [&>:not(:first-child)]:relative'
 
 const EXPANDED_MAX_WIDTH = 560
-// The row's indent under the bubble, `pl-7`.
+// The row's indent under the bubble, `ps-7`.
 const BRANCH_INDENT = 28
 // Stands for the request of a row that waits, until it is read.
 const REQUEST_UNREAD = ''
@@ -96,13 +96,13 @@ export function ThreadBranch({ thread, onOpen, owner }: { thread: ThreadRow; onO
     return (
         <div className="flex w-full flex-col gap-2" data-thread-row={thread.id}>
             {/* The clamp sits on an inner span: on the padded box itself, a third line would show through the bottom padding. Its right padding keeps the overhang of a last italic glyph. */}
-            <div className={cn('w-fit max-w-full rounded-2xl rounded-bl-md bg-muted px-3 py-1.5 text-xs text-foreground/80', !thread.firstMessage && 'text-muted-foreground italic')}>
-                <span className="line-clamp-2 pr-0.5 break-words">{opener}</span>
+            <div className={cn('w-fit max-w-full rounded-2xl rounded-es-md bg-muted px-3 py-1.5 text-xs text-foreground/80', !thread.firstMessage && 'text-muted-foreground italic')}>
+                <span className="line-clamp-2 pe-0.5 break-words">{opener}</span>
             </div>
             {owner && peeked ? (
                 <ThreadPeek thread={thread} state={state} peekable={peekable} owner={owner} title={title} onOpen={onOpen} />
             ) : (
-                <div className="relative w-full pl-7">
+                <div className="relative w-full ps-7">
                     <BranchCurve state={state} />
                     <button type="button" onClick={onOpen} title={title} className={cn(ROW, 'max-w-full rounded-lg border border-border transition-colors hover:border-foreground/20')}>
                         <RowStripes />
@@ -172,11 +172,11 @@ function ThreadPeek({ thread, state, peekable, owner, title, onOpen }: { thread:
     }
 
     return (
-        <div ref={measureColumn} className="relative w-full pl-7">
+        <div ref={measureColumn} className="relative w-full ps-7">
             <BranchCurve state={sent ? 'done' : state} />
             <motion.div initial={false} animate={width === null ? undefined : { width }} transition={reducedMotion ? INSTANT : open ? GROW : SHRINK_WIDTH} className={cn('relative w-fit max-w-full overflow-hidden rounded-lg border transition-[background-color,border-color,box-shadow] duration-300', open ? 'border-foreground/15 bg-card shadow-sm' : 'border-border hover:border-foreground/20')}>
                 {/* The row as it sits collapsed, on one line and never seen: its width is the one the element folds back to. */}
-                <div ref={measureRow} aria-hidden className={cn(ROW, 'invisible absolute top-0 left-0 w-max whitespace-nowrap')}>
+                <div ref={measureRow} aria-hidden className={cn(ROW, 'invisible absolute top-0 start-0 w-max whitespace-nowrap')}>
                     <ThreadRowContent thread={thread} state={state} badged={!sent} open={false} stretch />
                 </div>
                 <button type="button" aria-expanded={peekable ? open : undefined} onClick={toggle} title={title} className={cn(ROW, 'w-full')}>
@@ -234,7 +234,7 @@ function useMeasuredWidth(): [(element: HTMLDivElement | null) => void, number |
 }
 
 function BranchCurve({ state }: { state: ThreadState }) {
-    return <span aria-hidden className={cn('absolute -top-2 left-3.5 h-6 w-3 rounded-bl-md border-b border-l transition-colors duration-500', BRANCH_TONE[state])} />
+    return <span aria-hidden className={cn('absolute -top-2 start-3.5 h-6 w-3 rounded-es-md border-b border-s transition-colors duration-500', BRANCH_TONE[state])} />
 }
 
 // Turned half a turn, the hatch keeps its slant and fades toward the title instead of the chevron.

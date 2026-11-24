@@ -15,7 +15,7 @@ export function StepFrame({ title, description, onBack, primary, secondary, erro
     return (
         <div className="flex flex-col gap-6">
             {onBack && (
-                <Button variant="ghost" size="icon-sm" className="absolute top-3 left-3" onClick={onBack} aria-label={t('back')}>
+                <Button variant="ghost" size="icon-sm" className="absolute top-3 start-3" onClick={onBack} aria-label={t('back')}>
                     <ArrowLeftIcon />
                 </Button>
             )}

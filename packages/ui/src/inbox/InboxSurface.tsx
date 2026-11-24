@@ -393,7 +393,7 @@ export function InboxSurface<T extends InboxEntry>({
                 <div className="flex flex-wrap gap-1.5 px-4 pb-2">
                     {sections.map(section => (
                         <Chip key={section.key} selected={section.key === shownSection} onClick={() => jumpToSection(section.key)}>
-                            {t(`inbox.sections.${section.key}`)} <span className="ml-0.5 tabular-nums opacity-60">{section.items.reduce((sum, item) => sum + (item.count ?? 1), 0)}</span>
+                            {t(`inbox.sections.${section.key}`)} <span className="ms-0.5 tabular-nums opacity-60">{section.items.reduce((sum, item) => sum + (item.count ?? 1), 0)}</span>
                         </Chip>
                     ))}
                 </div>
@@ -440,7 +440,7 @@ export function InboxSurface<T extends InboxEntry>({
                             className={cn('flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground', cardOpen && 'bg-accent text-foreground')}
                         >
                             <InboxIcon className="size-4 shrink-0" />
-                            <span className="min-w-0 flex-1 truncate text-left">{t('inbox.needsYouRow')}</span>
+                            <span className="min-w-0 flex-1 truncate text-start">{t('inbox.needsYouRow')}</span>
                             {needs > 0 && (
                                 <span className="relative flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white tabular-nums">
                                     {pulse > 0 && !reducedMotion && (
@@ -462,7 +462,7 @@ export function InboxSurface<T extends InboxEntry>({
                         {dropAnchor &&
                             createPortal(
                                 <div ref={dropLayerRef} style={{ top: dropAnchor.top, left: dropAnchor.left }} className="fixed z-40">
-                                    <div aria-live="polite" className="absolute top-0 left-0 pt-1">
+                                    <div aria-live="polite" className="absolute top-0 start-0 pt-1">
                                         <AnimatePresence>
                                             {announcement && !cardOpen && (
                                                 <motion.button
@@ -478,7 +478,7 @@ export function InboxSurface<T extends InboxEntry>({
                                                     exit={dropped}
                                                     transition={morph}
                                                     style={{ transformOrigin: 'top left' }}
-                                                    className={cn('relative block overflow-hidden rounded-xl border border-border bg-card text-left shadow-2xl transition-colors hover:bg-accent', cardClassName)}
+                                                    className={cn('relative block overflow-hidden rounded-xl border border-border bg-card text-start shadow-2xl transition-colors hover:bg-accent', cardClassName)}
                                                 >
                                                     <AnnouncementLine announcement={announcement} animated={!reducedMotion} />
                                                 </motion.button>
@@ -515,7 +515,7 @@ export function InboxSurface<T extends InboxEntry>({
 
     return (
         <div ref={rootRef} className="relative">
-            <div aria-live="polite" className="absolute bottom-full left-0 pb-2">
+            <div aria-live="polite" className="absolute bottom-full start-0 pb-2">
                 <AnimatePresence>
                     {announcement && !cardOpen && !cardMounted && (
                         <motion.button
@@ -531,7 +531,7 @@ export function InboxSurface<T extends InboxEntry>({
                             exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.7 }}
                             transition={morph}
                             style={{ transformOrigin: 'bottom left' }}
-                            className="relative block w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card text-left shadow-2xl transition-colors hover:bg-accent sm:w-80"
+                            className="relative block w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card text-start shadow-2xl transition-colors hover:bg-accent sm:w-80"
                         >
                             <AnnouncementLine announcement={announcement} animated={!reducedMotion} />
                         </motion.button>
@@ -572,7 +572,7 @@ export function InboxSurface<T extends InboxEntry>({
                         animate={{ width: 'auto', height: 'auto', borderRadius: 14 }}
                         exit={folded}
                         transition={morph}
-                        className="absolute bottom-0 left-0 z-10 flex flex-col justify-end overflow-hidden border border-border bg-card shadow-2xl"
+                        className="absolute bottom-0 start-0 z-10 flex flex-col justify-end overflow-hidden border border-border bg-card shadow-2xl"
                     >
                         <motion.span aria-hidden initial={{ opacity: 1 }} animate={{ opacity: 0 }} exit={{ opacity: 1 }} transition={fade} className="pointer-events-none absolute inset-0 rounded-[inherit]">
                             <BorderBeam pattern="arcs" tone="white" animated={false} glow angle={53} outset={1} className="opacity-30" />
@@ -585,7 +585,7 @@ export function InboxSurface<T extends InboxEntry>({
                                     <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>
                                         {listBody}
 
-                                        <button type="button" aria-label={t('inbox.close')} onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pr-[15px] pl-[11px] transition-colors hover:bg-accent">
+                                        <button type="button" aria-label={t('inbox.close')} onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pe-[15px] ps-[11px] transition-colors hover:bg-accent">
                                             <InboxPillContent items={items} />
                                         </button>
                                     </div>
@@ -638,7 +638,7 @@ function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnou
             <span className="flex h-[38px] items-center gap-2.5 px-3 text-sm text-foreground">
                 <span className="relative flex">
                     <BellIcon className="size-4" />
-                    <span aria-hidden className="absolute -top-0.5 -right-0.5 flex size-2">
+                    <span aria-hidden className="absolute -top-0.5 -end-0.5 flex size-2">
                         <span className="absolute inset-0 animate-ping rounded-full bg-red-500 motion-reduce:hidden" />
                         <span className="relative size-2 rounded-full bg-red-500 ring-2 ring-card" />
                     </span>
@@ -700,9 +700,9 @@ function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; com
         <span className="relative flex items-center gap-2 text-sm font-medium text-foreground">
             <span className="relative flex">
                 <BellIcon className="size-4" />
-                {items.length > 0 && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
+                {items.length > 0 && <span aria-hidden className="absolute -top-0.5 -end-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
             </span>
-            <span className={cn('flex items-center gap-2', compact && 'pr-1 max-sm:hidden @max-4xl/board:hidden')}>
+            <span className={cn('flex items-center gap-2', compact && 'pe-1 max-sm:hidden @max-4xl/board:hidden')}>
                 {stack.length > 0 && (
                     <span aria-hidden className="flex -space-x-1.5">
                         {stack.map(agentId => (

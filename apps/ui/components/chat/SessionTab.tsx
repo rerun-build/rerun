@@ -25,7 +25,7 @@ export function SessionTab({ uid, title, active, onClick, onClose }: SessionTabP
             {...listeners}
             className={cn(
                 'group relative flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap transition-colors',
-                'border-r border-border',
+                'border-e border-border',
                 active
                     ? 'bg-background text-foreground'
                     : 'bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted',
@@ -38,7 +38,7 @@ export function SessionTab({ uid, title, active, onClick, onClose }: SessionTabP
             <span className="max-w-[120px] truncate">{title}</span>
             <span
                 className={cn(
-                    'ml-1 rounded-sm p-0.5 transition-opacity hover:bg-accent',
+                    'ms-1 rounded-sm p-0.5 transition-opacity hover:bg-accent',
                     active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                 )}
                 onPointerDown={e => e.stopPropagation()}

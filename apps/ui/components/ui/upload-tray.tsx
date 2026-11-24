@@ -96,7 +96,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
             <div className="relative overflow-hidden">
                 <Stripes />
                 <div className="relative flex items-center gap-2 px-3 py-2">
-                    <button type="button" onClick={() => setOpen(!isOpen)} aria-expanded={isOpen} aria-controls={listId} className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
+                    <button type="button" onClick={() => setOpen(!isOpen)} aria-expanded={isOpen} aria-controls={listId} className="flex min-w-0 flex-1 items-center gap-1.5 text-start">
                         <ChevronDownIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out', !isOpen && '-rotate-90')} />
                         <span className="min-w-0 flex-1 truncate text-xs font-medium">{heading}</span>
                     </button>
@@ -136,7 +136,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                                 <UploadRow key={item.id} item={item} onCancel={onCancel} onRetry={onRetry} />
                             ))}
                             {hidden > 0 && (
-                                <button type="button" onClick={() => setExpanded(true)} className="w-full px-3 py-1.5 text-left text-[10px] text-muted-foreground transition-colors hover:text-foreground">
+                                <button type="button" onClick={() => setExpanded(true)} className="w-full px-3 py-1.5 text-start text-[10px] text-muted-foreground transition-colors hover:text-foreground">
                                     {t('more', { count: hidden })}
                                 </button>
                             )}

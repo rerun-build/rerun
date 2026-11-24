@@ -86,7 +86,7 @@ export function CoworkerRules({ coworkers, rules, onChange, pinnedId, renderPick
                                     </span>
                                 )}
                             </span>
-                            <div className="ml-auto flex items-center gap-1">
+                            <div className="ms-auto flex items-center gap-1">
                                 <Select value={rule.mode} onValueChange={mode => onChange(c.id, { ...rule, mode: mode as CoworkerMode })}>
                                     <SelectTrigger size="sm" className="w-32" aria-label={t('notificationsFor', { name: c.name })}>
                                         <SelectValue />

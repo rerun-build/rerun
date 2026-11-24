@@ -33,7 +33,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                     are links of their own, and an anchor cannot hold another. Everything above it lets
                     the click through except those buttons. */}
                 <div className="group/creator relative grid transition-colors hover:bg-muted/20 @min-[40rem]/spotlight:grid-cols-[10rem_minmax(0,1fr)] @min-[56rem]/spotlight:grid-cols-[11rem_minmax(0,1fr)]">
-                    <a href={profileUrl} target="_blank" rel="noreferrer" aria-label={t('viewProfile', { name: creator.name })} className="absolute inset-0 rounded-l-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" />
+                    <a href={profileUrl} target="_blank" rel="noreferrer" aria-label={t('viewProfile', { name: creator.name })} className="absolute inset-0 rounded-s-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" />
                     <div className="pointer-events-none relative hidden min-h-48 bg-muted @min-[40rem]/spotlight:block">
                         {creator.avatarUrl ? (
                             <img src={creator.avatarUrl} alt="" className="absolute inset-0 size-full object-cover object-[50%_30%]" />
@@ -44,7 +44,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                         )}
                         <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-transparent from-55% to-card" />
                     </div>
-                    <div className="pointer-events-none relative flex min-w-0 flex-col p-5 @min-[40rem]/spotlight:pl-3">
+                    <div className="pointer-events-none relative flex min-w-0 flex-col p-5 @min-[40rem]/spotlight:ps-3">
                         <CrownBadge />
                         <div className="mt-3 flex min-w-0 items-center gap-3">
                             {/* The photo column folds away when the detail panel narrows the page; the
@@ -57,7 +57,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                         </div>
                         <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</p>
                         {creator.bio && (
-                            <blockquote className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed text-foreground/80">
+                            <blockquote className="mt-3 border-s-2 border-primary/50 ps-3 text-sm leading-relaxed text-foreground/80">
                                 <p className="line-clamp-2">{creator.bio}</p>
                             </blockquote>
                         )}
@@ -74,7 +74,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                 </div>
                 {/* Same padding as the creator half and both actions pinned to the bottom, so "Work
                     with" and "Open template" share one baseline whatever each column holds. */}
-                <div className="hidden border-l p-5 @min-[56rem]/spotlight:flex">
+                <div className="hidden border-s p-5 @min-[56rem]/spotlight:flex">
                     <RecognizedCard template={template} selected={selected} onSelect={onSelectTemplate} className="w-full" />
                 </div>
             </div>

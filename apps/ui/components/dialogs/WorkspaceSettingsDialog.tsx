@@ -159,7 +159,7 @@ export function WorkspaceSettingsForm({
                                 {({ inputId }) => (
                                     <label htmlFor={inputId} aria-label={t('uploadLogo')} className="group relative block size-16 cursor-pointer">
                                         {shownPreviewSrc ? <img src={shownPreviewSrc} alt="" onError={() => setBrokenPreviewSrc(previewSrc)} className="size-full rounded-2xl bg-muted object-cover" /> : <span className="block size-full rounded-2xl bg-muted" />}
-                                        <span className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border bg-background shadow-sm transition-colors group-hover:bg-muted">
+                                        <span className="absolute -end-1 -bottom-1 flex size-6 items-center justify-center rounded-full border bg-background shadow-sm transition-colors group-hover:bg-muted">
                                             <UploadIcon className="size-3.5" />
                                         </span>
                                     </label>
@@ -181,10 +181,10 @@ export function WorkspaceSettingsForm({
 
                         <Field label={t('logoLink')} error={linkBroken ? t('noLogoFound') : undefined}>
                             <div className="relative">
-                                <span className="pointer-events-none absolute top-1/2 left-2.5 flex size-5 -translate-y-1/2 items-center justify-center overflow-hidden rounded">
+                                <span className="pointer-events-none absolute top-1/2 start-2.5 flex size-5 -translate-y-1/2 items-center justify-center overflow-hidden rounded">
                                     {logo.kind === 'link' && !linkBroken ? <img src={logoSrc} alt="" className="size-full object-contain" onError={() => setBrokenSrc(logoSrc)} /> : <GlobeIcon className="size-4 text-muted-foreground" />}
                                 </span>
-                                <Input className="pl-10" placeholder="acme.com" inputMode="url" autoComplete="url" value={linkInput} onChange={e => changeLink(e.target.value)} />
+                                <Input className="ps-10" placeholder="acme.com" inputMode="url" autoComplete="url" value={linkInput} onChange={e => changeLink(e.target.value)} />
                             </div>
                         </Field>
 
@@ -265,7 +265,7 @@ function IllustrationGrid({ selectedUrl, onPick }: { selectedUrl: string | undef
                         <button key={blob.file} type="button" onClick={() => onPick(blob.file)} aria-pressed={selected} aria-label={t('illustrationOption', { number: index + 1 })} className={cn('relative aspect-square overflow-hidden rounded-lg border transition-colors', selected ? 'border-foreground ring-1 ring-foreground' : 'border-border hover:border-foreground/40')}>
                             <img src={blob.url} alt="" className="size-full object-cover" />
                             {selected && (
-                                <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-foreground">
+                                <span className="absolute top-1 end-1 flex size-4 items-center justify-center rounded-full bg-foreground">
                                     <CheckIcon className="size-2.5 text-background" />
                                 </span>
                             )}
@@ -273,7 +273,7 @@ function IllustrationGrid({ selectedUrl, onPick }: { selectedUrl: string | undef
                     )
                 })}
             </div>
-            <Button type="button" variant="ghost" size="sm" className="-ml-2 text-muted-foreground" onClick={() => setExpanded(value => !value)}>
+            <Button type="button" variant="ghost" size="sm" className="-ms-2 text-muted-foreground" onClick={() => setExpanded(value => !value)}>
                 {expanded ? t('showLess') : t('showAll', { count: BLOB_ILLUSTRATIONS.length })}
             </Button>
         </div>

@@ -25,7 +25,7 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
     const { live, handlers } = useBoardOnHover(template.agents.length > 0)
     const { headline, subline } = templateHeadline(template)
 
-    const tileClassName = cn('group flex min-w-0 flex-col rounded-xl text-left outline-none', className)
+    const tileClassName = cn('group flex min-w-0 flex-col rounded-xl text-start outline-none', className)
 
     const content = (
         <>
@@ -40,13 +40,13 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
                 {!selected && <BorderBeam pattern="ring" tone="neutral" angle={hashUnit(template.slug, 0) * 360} className="z-10 opacity-60 transition-opacity duration-200 group-hover:opacity-100" />}
                 <AnimatePresence>{live && <TemplateCardBoard agents={template.agents} connectors={template.connectors} />}</AnimatePresence>
                 {showStatus && template.status !== 'published' && (
-                    <span className="absolute top-2 left-2 flex rounded-full bg-background/70 backdrop-blur">
+                    <span className="absolute top-2 start-2 flex rounded-full bg-background/70 backdrop-blur">
                         <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
                             {templateStatusLabel(template.status, tStatus)}
                         </Badge>
                     </span>
                 )}
-                <span className="absolute top-2 right-2 flex rounded-full bg-background/70 backdrop-blur empty:hidden">
+                <span className="absolute top-2 end-2 flex rounded-full bg-background/70 backdrop-blur empty:hidden">
                     <TemplatePriceBadge pricing={template.pricing} access={template.access} />
                 </span>
             </TemplateCardThumbnail>

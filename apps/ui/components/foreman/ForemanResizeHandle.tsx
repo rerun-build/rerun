@@ -12,10 +12,10 @@ type ResizeState = { pointerId: number; startX: number; startY: number; startWid
 
 /** La poignée vit sur le coin opposé à celui où la fenêtre est aimantée : ce coin-là ne bouge jamais. */
 const HANDLE_CLASSES: Record<ForemanCorner, string> = {
-    'bottom-right': 'top-0 left-0 cursor-nwse-resize rounded-tl-xl border-t-2 border-l-2',
-    'bottom-left': 'top-0 right-0 cursor-nesw-resize rounded-tr-xl border-t-2 border-r-2',
-    'top-right': 'bottom-0 left-0 cursor-nesw-resize rounded-bl-xl border-b-2 border-l-2',
-    'top-left': 'bottom-0 right-0 cursor-nwse-resize rounded-br-xl border-b-2 border-r-2',
+    'bottom-right': 'top-0 start-0 cursor-nwse-resize rounded-ss-xl border-t-2 border-s-2',
+    'bottom-left': 'top-0 end-0 cursor-nesw-resize rounded-se-xl border-t-2 border-e-2',
+    'top-right': 'bottom-0 start-0 cursor-nesw-resize rounded-es-xl border-b-2 border-s-2',
+    'top-left': 'bottom-0 end-0 cursor-nwse-resize rounded-ee-xl border-b-2 border-e-2',
 }
 
 export function ForemanResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'float' } }) {

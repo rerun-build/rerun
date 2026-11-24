@@ -173,7 +173,7 @@ function DialogContent({
           {/* A plain button and not DrawerPrimitive.Close: vaul drops every close request of a
               drawer that is not dismissible, so its Close would do nothing here. */}
           {showCloseButton && !dismissible && (
-            <Button data-slot="dialog-close" variant="ghost" className="absolute top-2 right-2" size="icon-sm" onClick={close}>
+            <Button data-slot="dialog-close" variant="ghost" className="absolute top-2 end-2" size="icon-sm" onClick={close}>
               <XIcon />
               <span className="sr-only">{t("close")}</span>
             </Button>
@@ -199,7 +199,7 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               variant="ghost"
-              className="absolute top-2 right-2"
+              className="absolute top-2 end-2"
               size="icon-sm"
             >
               <XIcon

@@ -13,7 +13,7 @@ export function CoworkerFace({ agentId, size, badge }: { agentId: string; size: 
     return (
         <span className="relative flex shrink-0" style={{ width: size, height: size }}>
             <Orb size={size} paused facing="right" />
-            {badge && <span className="absolute -bottom-1 -left-1 flex">{badge}</span>}
+            {badge && <span className="absolute -bottom-1 -start-1 flex">{badge}</span>}
         </span>
     )
 }
