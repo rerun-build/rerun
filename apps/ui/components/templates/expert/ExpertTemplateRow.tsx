@@ -24,7 +24,7 @@ export function ExpertTemplateRow({ template, selected, onSelect }: { template: 
                 <div className="h-9 w-14 shrink-0 rounded border border-dashed border-border" />
             )}
             <div className="flex min-w-0 flex-col gap-1">
-                <span className="truncate text-sm font-medium">{template.title}</span>
+                <span dir="auto" className="truncate text-sm font-medium rtl:text-right">{template.title}</span>
                 <div className="flex items-center gap-1.5">
                     <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
                         {templateStatusLabel(template.status, tStatus)}

@@ -45,7 +45,7 @@ export function ExpertTemplateAgents({
                     agents.map(agent => (
                         <div key={agent.key} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                             <div className="flex min-w-0 flex-col">
-                                <span className="truncate text-sm">{agent.name}</span>
+                                <span dir="auto" className="truncate text-sm rtl:text-right">{agent.name}</span>
                                 <span className="truncate text-xs text-muted-foreground">
                                     {agent.role || t('noRole')}
                                     {agent.connectorSlugs.length > 0 && ` · ${t('connectors', { count: agent.connectorSlugs.length })}`}

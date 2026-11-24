@@ -47,8 +47,8 @@ export function TemplateDetailPanel({
 
                 <div className="flex flex-col gap-5 p-5">
                     <div className="space-y-1.5">
-                        <h3 className="text-base font-medium">{headline}</h3>
-                        {subline && <p className="text-xs leading-relaxed text-muted-foreground">{subline}</p>}
+                        <h3 dir="auto" className="text-base font-medium rtl:text-right">{headline}</h3>
+                        {subline && <p dir="auto" className="text-xs leading-relaxed text-muted-foreground rtl:text-right">{subline}</p>}
                     </div>
 
                     {onSelectUseCase &&

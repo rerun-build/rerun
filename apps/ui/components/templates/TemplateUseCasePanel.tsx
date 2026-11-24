@@ -26,8 +26,8 @@ export function TemplateUseCasePanel({ useCase, showStatus, onSelectUseCase, onS
 
                 <div className="flex flex-col gap-5 p-5">
                     <div className="space-y-1.5">
-                        <h3 className="text-base font-medium break-words">{useCase.name}</h3>
-                        {useCase.summary && <p className="text-xs leading-relaxed text-muted-foreground">{useCase.summary}</p>}
+                        <h3 dir="auto" className="text-base font-medium break-words rtl:text-right">{useCase.name}</h3>
+                        {useCase.summary && <p dir="auto" className="text-xs leading-relaxed text-muted-foreground rtl:text-right">{useCase.summary}</p>}
                     </div>
 
                     <button
@@ -37,8 +37,8 @@ export function TemplateUseCasePanel({ useCase, showStatus, onSelectUseCase, onS
                     >
                         <AgentBuddy agentId={agent.key} size={36} facing="right" className="shrink-0" />
                         <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-medium">{agent.name}</span>
-                            <span className="block truncate text-xs text-muted-foreground">{template.title}</span>
+                            <span dir="auto" className="block truncate text-sm font-medium rtl:text-right">{agent.name}</span>
+                            <span dir="auto" className="block truncate text-xs text-muted-foreground rtl:text-right">{template.title}</span>
                         </span>
                         <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />
                     </button>

@@ -15,7 +15,7 @@ export function TemplateDetailApps({ connectors }: { connectors: TemplateConnect
                 {connectors.map(connector => (
                     <li key={connector.slug} className="flex items-center gap-2.5 rounded-lg border border-border/60 bg-muted/20 px-2.5 py-2">
                         <Icon {...serviceIconProps(connector.icon)} size="xs" />
-                        <p className="min-w-0 flex-1 truncate text-xs font-medium">{connector.name}</p>
+                        <p dir="auto" className="min-w-0 flex-1 truncate text-xs font-medium rtl:text-right">{connector.name}</p>
                     </li>
                 ))}
             </ul>

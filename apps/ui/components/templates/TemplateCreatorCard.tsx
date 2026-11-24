@@ -2,8 +2,9 @@
 
 import { useTranslations } from 'next-intl'
 import { TemplateCreatorAvatar } from '@/components/templates/TemplateCreatorAvatar'
+import { TemplateCreatorMeta } from '@/components/templates/TemplateCreatorMeta'
 import { TemplateVerifiedBadge } from '@/components/templates/TemplateVerifiedBadge'
-import { creatorKindLabel, type LibraryCreatorSummary } from '@/lib/templates/library-view'
+import { type LibraryCreatorSummary } from '@/lib/templates/library-view'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -13,17 +14,16 @@ const CARD_CLASS = 'group flex min-w-0 items-center gap-2 rounded-xl border bg-c
 // costs leaving the app. One without any yet has nothing to open but their public page.
 export function TemplateCreatorCard({ creator, onOpen, className }: { creator: LibraryCreatorSummary; onOpen: () => void; className?: string }) {
     const t = useTranslations('templates.creator')
-    const tKind = useTranslations('templates.creatorKind')
     const count = creator.templates.length
     const content = (
         <>
             <TemplateCreatorAvatar creator={creator} size={32} />
             <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1">
-                    <span className="truncate text-[13px] font-medium">{creator.name}</span>
+                    <span dir="auto" className="truncate text-[13px] font-medium">{creator.name}</span>
                     {creator.verified && <TemplateVerifiedBadge className="size-3" />}
                 </span>
-                <span className="block truncate text-xs text-muted-foreground">{count > 0 ? t('templateCount', { count }) : [creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</span>
+                {count > 0 ? <span className="block truncate text-xs text-muted-foreground">{t('templateCount', { count })}</span> : <TemplateCreatorMeta creator={creator} className="text-xs text-muted-foreground" />}
             </span>
         </>
     )

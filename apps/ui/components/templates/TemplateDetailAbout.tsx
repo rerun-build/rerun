@@ -38,7 +38,7 @@ export function TemplateDetailAbout({ content }: { content: string }) {
                 className={cn('overflow-hidden transition-[max-height] duration-300 ease-out', collapsed && '[mask-image:linear-gradient(to_bottom,black_calc(100%-3rem),transparent)]')}
                 style={{ maxHeight: overflows ? (collapsed ? COLLAPSED_HEIGHT : contentHeight) : COLLAPSED_HEIGHT }}
             >
-                <div ref={contentRef}>
+                <div ref={contentRef} dir="auto">
                     <Markdown content={content} className={COMPACT_PROSE} />
                 </div>
             </div>

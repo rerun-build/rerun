@@ -37,10 +37,10 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
             <header className="relative -mx-3 -mt-3 flex flex-col gap-1.5 px-3 pt-3">
                 <Stripes />
                 <div className="relative flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-medium">{agent.name}</p>
+                    <p dir="auto" className="truncate text-sm font-medium rtl:text-right">{agent.name}</p>
                     {agent.role && <span className="shrink-0 text-[10px] text-muted-foreground">{agent.role}</span>}
                 </div>
-                {agent.description && <p className="relative line-clamp-2 text-xs text-muted-foreground">{agent.description}</p>}
+                {agent.description && <p dir="auto" className="relative line-clamp-2 text-xs text-muted-foreground rtl:text-right">{agent.description}</p>}
             </header>
 
             {/* First, and above what the agent is made of: someone opening a shared copy is deciding
@@ -126,8 +126,8 @@ function AgentListRow({ icon: Glyph, title, subtitle }: { icon: LucideIcon; titl
         <div className="flex items-center gap-2.5">
             <Glyph className="size-3.5 shrink-0 text-muted-foreground" />
             <div className="min-w-0">
-                <p className="truncate text-xs">{title}</p>
-                {subtitle && <p className="truncate text-[11px] text-muted-foreground">{subtitle}</p>}
+                <p dir="auto" className="truncate text-xs rtl:text-right">{title}</p>
+                {subtitle && <p dir="auto" className="truncate text-[11px] text-muted-foreground rtl:text-right">{subtitle}</p>}
             </div>
         </div>
     )

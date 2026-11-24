@@ -5,12 +5,13 @@ import type { ComponentType } from 'react'
 import { useTranslations } from 'next-intl'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
 import { TemplateCreatorAvatar } from '@/components/templates/TemplateCreatorAvatar'
+import { TemplateCreatorMeta } from '@/components/templates/TemplateCreatorMeta'
 import { TemplateVerifiedBadge } from '@/components/templates/TemplateVerifiedBadge'
 import { Button } from '@/components/ui/button'
 import { ArrowRightIcon, CrownIcon, GlobeIcon, HandshakeIcon } from '@/lib/icons'
 import { templateCardImage } from '@/lib/templates/card-image'
 import type { LibraryCreator, LibraryTemplate } from '@/lib/templates/library'
-import { creatorKindLabel, type LibraryCreatorSummary, templateHeadline } from '@/lib/templates/library-view'
+import { type LibraryCreatorSummary, templateHeadline } from '@/lib/templates/library-view'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -23,7 +24,6 @@ const WORK_WITH_HASH = '#work-with'
 // its own column and its own action.
 export function TemplateCreatorSpotlight({ creator, template, selected, onSelectTemplate }: { creator: LibraryCreatorSummary; template: LibraryTemplate; selected: boolean; onSelectTemplate: () => void }) {
     const t = useTranslations('templates.spotlight')
-    const tKind = useTranslations('templates.creatorKind')
     const profileUrl = landingUrl(`/community/experts/${creator.slug}`)
 
     return (
@@ -51,11 +51,11 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                                 face stays, as an avatar beside the name. */}
                             <TemplateCreatorAvatar creator={creator} size={44} className="@min-[40rem]/spotlight:hidden" />
                             <h3 className="font-heading flex min-w-0 items-center gap-2 text-[1.75rem] leading-tight font-semibold tracking-tight">
-                                <span className="truncate">{creator.name}</span>
+                                <span dir="auto" className="truncate">{creator.name}</span>
                                 {creator.verified && <TemplateVerifiedBadge className="size-[1.1rem]" />}
                             </h3>
                         </div>
-                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</p>
+                        <TemplateCreatorMeta creator={creator} className="mt-0.5 text-sm text-muted-foreground" />
                         {creator.bio && (
                             <blockquote dir="auto" className="mt-3 border-s-2 border-primary/50 ps-3 text-sm leading-relaxed text-foreground/80">
                                 <p className="line-clamp-2">{creator.bio}</p>
@@ -137,7 +137,7 @@ function RecognizedText({ template }: { template: LibraryTemplate }) {
     return (
         <>
             <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{t('recognizedFor')}</p>
-            <p className="mt-1 line-clamp-2 text-sm leading-snug font-semibold tracking-tight">{templateHeadline(template).headline}</p>
+            <p dir="auto" className="mt-1 line-clamp-2 text-sm leading-snug font-semibold tracking-tight rtl:text-right">{templateHeadline(template).headline}</p>
         </>
     )
 }

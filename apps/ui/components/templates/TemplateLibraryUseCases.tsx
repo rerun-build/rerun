@@ -36,12 +36,12 @@ export function TemplateLibraryUseCases({ useCases, selectedId, scrollRef, onSel
 function UseCaseCard({ useCase, selected, onSelect }: { useCase: UseCase; selected: boolean; onSelect: () => void }) {
     return (
         <button type="button" aria-pressed={selected} onClick={onSelect} className={cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, CARD, 'text-start outline-none focus-visible:ring-3 focus-visible:ring-ring/50', selected && 'ring-2 ring-primary')}>
-            <span className="text-[15px] leading-tight font-semibold tracking-tight break-words">{useCase.name}</span>
-            <span className="mt-1.5 line-clamp-2 min-h-[2lh] text-[13px] leading-snug text-muted-foreground">{useCase.summary}</span>
+            <span dir="auto" className="text-[15px] leading-tight font-semibold tracking-tight break-words rtl:text-right">{useCase.name}</span>
+            <span dir="auto" className="mt-1.5 line-clamp-2 min-h-[2lh] text-[13px] leading-snug text-muted-foreground rtl:text-right">{useCase.summary}</span>
             <span className="mt-auto flex items-center justify-between gap-3 pt-4">
                 <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
                     <AgentBuddy agentId={useCase.agent.key} size={22} animated={false} facing="right" className="shrink-0" />
-                    <span className="truncate">{useCase.agent.name}</span>
+                    <span dir="auto" className="truncate">{useCase.agent.name}</span>
                 </span>
                 {useCase.connectors.length > 0 && <TemplateConnectorLogos connectors={useCase.connectors} />}
             </span>

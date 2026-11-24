@@ -70,8 +70,8 @@ export function TemplateFeaturedCard({ template, selected, showStatus, onSelect 
             </TemplateCardThumbnail>
 
             <span className="relative flex min-w-0 flex-1 flex-col gap-1.5 p-5">
-                <span className="line-clamp-2 text-lg leading-snug font-medium">{template.title}</span>
-                <span className="line-clamp-3 text-sm text-muted-foreground">{template.tagline}</span>
+                <span dir="auto" className="line-clamp-2 text-lg leading-snug font-medium rtl:text-right">{template.title}</span>
+                <span dir="auto" className="line-clamp-3 text-sm text-muted-foreground rtl:text-right">{template.tagline}</span>
 
                 {/* Pinned to the bottom rather than centred with the rest: the card has a fixed
                     height, and a floating block leaves a void above and below it. Same line as the

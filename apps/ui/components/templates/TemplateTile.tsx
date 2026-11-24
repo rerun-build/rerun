@@ -53,13 +53,13 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
 
             {/* One line each, so every card is the same height and none leaves a hole: the
                 agent's name says the job in a few words, the title spells it out under it. */}
-            <span className="mt-3 truncate px-0.5 text-base leading-tight font-semibold tracking-tight text-foreground">{headline}</span>
-            <span className="mt-1 truncate px-0.5 text-[13px] text-muted-foreground">{subline}</span>
+            <span dir="auto" className="mt-3 truncate px-0.5 text-base leading-tight font-semibold tracking-tight text-foreground rtl:text-right">{headline}</span>
+            <span dir="auto" className="mt-1 truncate px-0.5 text-[13px] text-muted-foreground rtl:text-right">{subline}</span>
 
             <span className="mt-2.5 flex items-center justify-between gap-3 px-0.5">
                 <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
                     <TemplateCreatorAvatar creator={template.creator} size={16} />
-                    <span className="truncate">{template.creator?.name ?? t('rerunTeam')}</span>
+                    <span dir="auto" className="truncate">{template.creator?.name ?? t('rerunTeam')}</span>
                 </span>
                 <TemplateConnectorLogos connectors={template.connectors} />
             </span>
