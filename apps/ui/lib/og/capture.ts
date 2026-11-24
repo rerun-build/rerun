@@ -23,7 +23,7 @@ const ogCache = createOgCache({ ttlMs: 60 * 60 * 1000, maxEntries: 200 })
 // content-addressed disk cache. A template card also carries its row's `updated_at`, but that only
 // covers an edit of the content: without this constant a change of the layout itself would keep
 // serving the old image. The public URL never carries it, so crawlers keep the one they know.
-export const OG_VERSION = '15'
+export const OG_VERSION = '16'
 
 export function readOgRequest(req: Request): { format: CaptureFormat; fresh: boolean } {
     const search = new URL(req.url).searchParams

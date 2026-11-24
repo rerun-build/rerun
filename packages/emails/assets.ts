@@ -10,10 +10,10 @@ export const ASSET_ORIGIN =
   "https://app.rerun.build";
 
 /** Bumped whenever the artwork changes: both art routes are cached immutably. */
-export const ART_VERSION = "6";
+export const ART_VERSION = "7";
 
-// The framed mark, rendered by /email/logo the same way the banner is. The flat `logo.png` it
-// replaces stays in `public/` because mail already in inboxes still points at it.
+// The Buddy of the app icon, served by /email/logo. `public/email/logo.png` is that same image:
+// mail sent before the route existed points straight at it.
 export const LOGO_URL = `${ASSET_ORIGIN}/email/logo?v=${ART_VERSION}`;
 export const LOGO_SIZE = 32;
 

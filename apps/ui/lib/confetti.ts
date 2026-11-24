@@ -1,4 +1,4 @@
-import { R_PATH } from '@rerun/ui/logo'
+import { MARK_PATH } from '@rerun/ui/logo'
 import type { Options, Shape } from 'canvas-confetti'
 
 const DURATION_MS = 2500
@@ -7,7 +7,7 @@ const EMITTERS_PER_TICK = 3
 const PARTICLES_PER_EMITTER = 2
 const COLORS = ['#ffffff', '#e5e5e5', '#a3a3a3', '#4d34f7', '#b7a8ff']
 
-let rShape: Shape | null = null
+let buddyShape: Shape | null = null
 let firing = false
 
 // canvas-confetti assigne la couleur par index de particule (`colors[i % colors.length]`),
@@ -26,10 +26,10 @@ export async function fireRerunConfetti() {
     // canvas-confetti ne l'expose que sur le default export : le déstructurer casse au runtime.
     const { default: confetti } = await import('canvas-confetti')
 
-    rShape ??= confetti.shapeFromPath({ path: R_PATH })
+    buddyShape ??= confetti.shapeFromPath({ path: MARK_PATH })
 
     const baseOptions: Options = {
-        shapes: [rShape],
+        shapes: [buddyShape],
         particleCount: PARTICLES_PER_EMITTER,
         angle: 270,
         spread: 55,

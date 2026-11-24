@@ -3,7 +3,8 @@ import { ImageResponse } from 'next/og'
 import type { ReactNode } from 'react'
 
 import { badgeFromType, markdownToPlainText } from '@rerun/ui/experts/options'
-import { R_PATH } from '@/components/layout/Logo'
+import { MARK_PATH } from '@rerun/ui/logo'
+import { brandIconDataUrl } from '@/lib/og/brand-icon'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
@@ -89,9 +90,6 @@ const GLOBE_PATH =
 
 const DIAMOND = 'M6 0 L12 6 L6 12 L0 6 Z'
 
-const HOLO_LOGO_PATH =
-    'M69.39,399.06Q55.56,391.02 55.51,375.02L54.84,134.50Q54.80,118.50 68.63,126.54L248.94,231.34Q262.78,239.38 262.82,255.38L263.51,495.88Q263.56,511.88 249.72,503.84Z M224.25,8.00Q238.11,0.00 251.94,8.04L432.37,112.89Q446.21,120.92 432.35,128.92L287.50,212.55Q273.64,220.55 259.81,212.51L79.39,107.67Q65.56,99.63 79.41,91.63Z M442.44,147.35Q456.52,139.75 456.56,155.75L456.61,173.16Q456.65,189.16 442.80,197.16L378.85,234.08Q365.00,242.08 365.04,258.08L365.55,443.00Q365.60,459.00 351.74,467.00L304.03,494.56Q290.18,502.56 290.13,486.56L289.45,245.93Q289.40,229.93 303.48,222.33Z'
-
 function buildHoloTileUrl(): string {
     const cell = 22
     const viewBox = 812
@@ -100,7 +98,7 @@ function buildHoloTileUrl(): string {
     const svg =
         `<svg xmlns="http://www.w3.org/2000/svg" width="${cell}" height="${cell}" viewBox="0 0 ${cell} ${cell}">` +
         `<g transform="scale(${tileScale}) translate(${offset} ${offset})">` +
-        `<path fill="none" stroke="${BRAND}" stroke-width="26" stroke-linejoin="round" fill-rule="evenodd" d="${HOLO_LOGO_PATH}"/>` +
+        `<path fill="none" stroke="${BRAND}" stroke-width="26" stroke-linejoin="round" fill-rule="evenodd" d="${MARK_PATH}"/>` +
         `</g>` +
         `</svg>`
     return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
@@ -176,7 +174,7 @@ function DataRow({ label, s, children }: { label: string; s: number; children: R
     )
 }
 
-function CardImage({ data, photoDataUrl, s }: { data: ExpertCard; photoDataUrl: string | null; s: number }) {
+function CardImage({ data, photoDataUrl, brandIcon, s }: { data: ExpertCard; photoDataUrl: string | null; brandIcon: string; s: number }) {
     const socials = [data.xUrl && X_PATH, data.linkedinUrl && LINKEDIN_PATH, data.githubUrl && GITHUB_PATH].filter(Boolean) as string[]
     const hasWebsite = Boolean(data.websiteUrl)
 
@@ -406,9 +404,7 @@ function CardImage({ data, photoDataUrl, s }: { data: ExpertCard; photoDataUrl: 
                             backgroundImage: 'radial-gradient(circle, rgba(183,168,255,0.85), transparent 70%)',
                         }}
                     />
-                    <svg width={16 * s} height={16 * s} viewBox="0 0 512 512" fill="rgba(255,255,255,0.7)" style={{ position: 'relative' }}>
-                        <path fillRule="evenodd" d={R_PATH} />
-                    </svg>
+                    <img src={brandIcon} width={16 * s} height={16 * s} style={{ position: 'relative', borderRadius: 3.6 * s }} alt="" />
                 </div>
             </div>
             </div>
@@ -450,7 +446,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
         }
     }
 
-    const { inter, interSemibold, mono, monoMedium } = await loadFonts()
+    const [{ inter, interSemibold, mono, monoMedium }, brandIcon] = await Promise.all([loadFonts(), brandIconDataUrl()])
     const width = BASE_W * s
     const height = BASE_H * s
 
@@ -465,7 +461,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
                 backgroundColor: 'transparent',
             }}
         >
-            <CardImage data={data} photoDataUrl={photoDataUrl} s={s} />
+            <CardImage data={data} photoDataUrl={photoDataUrl} brandIcon={brandIcon} s={s} />
         </div>
     )
 

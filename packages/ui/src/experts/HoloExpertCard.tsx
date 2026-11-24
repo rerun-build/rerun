@@ -8,7 +8,7 @@ import { cn } from '../cn'
 import { BorderBeam } from '../BorderBeam'
 import { TextShimmer } from '../TextShimmer'
 import { Badge } from '../primitives/badge'
-import { R_PATH } from '../logo'
+import { Logo } from '../logo'
 import { SOCIAL_LINK_REL } from './expert-profile-parts'
 import { useKitTranslations } from '../locale'
 
@@ -371,11 +371,7 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
 
                 <motion.div className="flex items-center justify-between px-6 py-5 font-mono text-[10px] tracking-widest text-white/30 uppercase" {...item}>
                     <span>Rerun.build</span>
-                    <span className="relative inline-flex size-4 items-center justify-center text-white/70">
-                        <svg viewBox="0 0 512 512" fill="currentColor" aria-hidden className="size-full drop-shadow-[0_0_6px_rgba(183,168,255,0.85)]">
-                            <path fillRule="evenodd" d={R_PATH} />
-                        </svg>
-                    </span>
+                    <Logo compact aria-hidden className="size-4 drop-shadow-[0_0_6px_rgba(183,168,255,0.85)]" />
                 </motion.div>
             </motion.div>
 

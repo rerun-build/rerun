@@ -1,7 +1,7 @@
 import 'server-only'
 import { readFile } from 'node:fs/promises'
 import { ImageResponse } from 'next/og'
-import { R_PATH } from '@rerun/ui/logo'
+import { brandIconDataUrl } from '@/lib/og/brand-icon'
 
 const WIDTH = 1200
 const HEIGHT = 630
@@ -53,7 +53,7 @@ export type PublishedOgInput = {
 // that is not public only ever gets the locked card: no title, no capture, nothing a forwarded link
 // would leak.
 export async function publishedOgImage(input: PublishedOgInput): Promise<ImageResponse> {
-    const fonts = await loadFonts()
+    const [fonts, brandIcon] = await Promise.all([loadFonts(), brandIconDataUrl()])
     const title = input.locked ? 'Protected page' : truncate(input.title, MAX_TITLE_LENGTH)
 
     return new ImageResponse(
@@ -75,9 +75,7 @@ export async function publishedOgImage(input: PublishedOgInput): Promise<ImageRe
                         <div style={{ display: 'flex', fontSize: 62, lineHeight: 1.05, fontWeight: 600, letterSpacing: -1.5 }}>{title}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, color: 'rgba(250,250,250,0.6)' }}>
-                        <svg width={26} height={26} viewBox="0 0 512 512">
-                            <path d={R_PATH} fill="#fafafa" />
-                        </svg>
+                        <img src={brandIcon} width={30} height={30} style={{ borderRadius: 7 }} alt="" />
                         rerun.site
                     </div>
                 </div>
@@ -87,9 +85,7 @@ export async function publishedOgImage(input: PublishedOgInput): Promise<ImageRe
                             {input.locked ? (
                                 <Lock size={84} color="rgba(250,250,250,0.4)" />
                             ) : (
-                                <svg width={84} height={84} viewBox="0 0 512 512">
-                                    <path d={R_PATH} fill="rgba(250,250,250,0.3)" />
-                                </svg>
+                                <img src={brandIcon} width={96} height={96} style={{ borderRadius: 21, opacity: 0.5 }} alt="" />
                             )}
                         </div>
                     ) : (

@@ -1,18 +1,16 @@
-import { buildMarkSvg, MARK_SIZE } from './mark-art'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 
 export const runtime = 'nodejs'
 
-export async function GET() {
-    const { default: sharp } = await import('sharp')
-    const png = await sharp(Buffer.from(buildMarkSvg()), { density: 96 })
-        .resize(MARK_SIZE, MARK_SIZE)
-        .png()
-        .toBuffer()
+// Mail already in inboxes asks for /email/logo?v=<n>: whatever version it names gets today's mark.
+const LOGO_PATH = path.join(process.cwd(), 'public', 'email', 'logo.png')
 
+export async function GET() {
+    const png = await readFile(LOGO_PATH)
     return new Response(new Uint8Array(png), {
         headers: {
             'Content-Type': 'image/png',
-            // Versioned by the caller, like the banner: a rendered mark never has to be revalidated.
             'Cache-Control': 'public, max-age=31536000, immutable',
         },
     })

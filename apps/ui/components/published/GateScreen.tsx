@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { R_PATH } from '@/components/layout/Logo'
+import { Logo } from '@/components/layout/Logo'
 import { Icon } from '@/components/ui/icon'
 import { LinkedPair } from '@/components/ui/linked-pair'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
@@ -21,11 +21,7 @@ export function WorkspaceTile({ brand }: { brand: GateBrand }) {
 // The tile a link that no longer exists shows: no workspace is left to name it, so Rerun does.
 export function RerunTile() {
     return (
-        <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/5 text-foreground">
-            <svg viewBox="0 0 512 512" className="size-6">
-                <path d={R_PATH} fill="currentColor" />
-            </svg>
-        </span>
+        <Logo size="lg" aria-hidden />
     )
 }
 
@@ -38,9 +34,7 @@ function MadeWithRerun({ className }: { className?: string }) {
             rel="noopener"
             className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/12 bg-[#0b0b0c] px-3.5 py-2.5 text-xs font-medium text-[#fafafa] shadow-[0_8px_24px_rgba(0,0,0,.24)] ${className ?? ''}`}
         >
-            <svg viewBox="0 0 512 512" aria-hidden className="size-3.5">
-                <path d={R_PATH} fill="currentColor" />
-            </svg>
+            <Logo compact aria-hidden className="size-4" />
             {t('madeWith')}
         </a>
     )
