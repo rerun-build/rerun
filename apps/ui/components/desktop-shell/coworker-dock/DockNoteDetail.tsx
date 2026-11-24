@@ -91,7 +91,7 @@ function RequestBody({ note, name, onBack, onOpenApp, onDone }: DockNoteDetailPr
 function MessageBody({ note, name, onOpenApp, onMarkRead, onDone }: DockNoteDetailProps) {
     const t = useTranslations('notifications.inbox.peek')
     const { sessionId } = note
-    const reply = async (text: string) => (sessionId ? sendSessionMessage({ agentId: note.agentId, sessionId, text, model: readAgentModel(note.agentId) }) : 'failed')
+    const reply = async (text: string) => (sessionId ? sendSessionMessage({ agentId: note.agentId, sessionId, text, model: readAgentModel(note.agentId, sessionId) }) : 'failed')
     const { phase, notice, submit } = usePeekAnswer({ answer: reply, decide: noDecision }, () => {
         onMarkRead()
         onDone()

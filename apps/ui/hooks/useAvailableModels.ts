@@ -54,7 +54,7 @@ export function useAvailableModels(agentId: string) {
     const setDefault = useCallback(
         (connectionId: string, model: string, provider: EngineProvider, effort: ReasoningEffort | null) => {
             patchAgentModel(agentId, { connectionId, model, effort, resolvedConnectionId: connectionId, resolvedModel: model })
-            void updateAgentConfigAction(agentId, { connectionId, model, provider, ...(effort || savedEffort ? { effort } : {}) })
+            return updateAgentConfigAction(agentId, { connectionId, model, provider, ...(effort || savedEffort ? { effort } : {}) })
         },
         [agentId, savedEffort]
     )

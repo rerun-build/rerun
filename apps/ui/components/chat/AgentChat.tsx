@@ -42,7 +42,7 @@ import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionAct
 import { fetchSessionSnapshot, fetchSessionTranscript } from '@/lib/chat/session-snapshot'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
-import { useAgentModel } from '@/hooks/useAgentModel'
+import { draftConversationId, useAgentModel } from '@/hooks/useAgentModel'
 import { refreshWorkspaceConnections, useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { useArriveByTop } from '@/hooks/useArriveByTop'
 import { useMemberProfiles } from '@/hooks/useMemberProfiles'
@@ -197,7 +197,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
 
     // Per-conversation model override (see useAgentModel). Read via a ref so the
     // transport body picks up the latest pick without recreating the transport.
-    const { selection: modelSelection, select: selectModel } = useAgentModel(agentId)
+    const conversationId = sessionId ?? draftConversationId(uid)
+    const { selection: modelSelection, select: selectModel } = useAgentModel(agentId, conversationId)
     const modelSelectionRef = useRef(modelSelection)
     modelSelectionRef.current = modelSelection
 
@@ -1162,7 +1163,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                         onContinue={() => setup?.sessionId && onOpenInstall?.(setup.sessionId)}
                                         disabled={status === 'streaming' || status === 'submitted'}
                                         hint={modelHint}
-                                        modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />}
+                                        modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />}
                                         onStart={() => {
                                             if (!modelReady) {
                                                 blockSend()
@@ -1179,7 +1180,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                 </motion.div>
                             ) : (
                                 <motion.div key="composer" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden pb-px">
-                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
+                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
                                     <ComposerSubscriptionCta open={!hasOwnConnection} claudePlanOffered={isClaudePlanOffered(workspace)} onClick={connectSubscription} />
                                 </motion.div>
                             )}

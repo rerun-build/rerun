@@ -10,7 +10,7 @@ import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { useClaudePlanOffered } from '@/components/connections/NoPlanNotice'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
-import { useAgentModel } from '@/hooks/useAgentModel'
+import { readAgentModel, useAgentModel, type ModelSelection } from '@/hooks/useAgentModel'
 import { useAvailableModels, type ConnectionGroup } from '@/hooks/useAvailableModels'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { refusedModelReason } from '@/lib/engine/model-groups'
@@ -117,6 +117,8 @@ type ModelSelectorProps = {
     pickerKey?: string
     // A model picked in a picker that notice opened: the chat carries the turn the notice was about on.
     onPicked?: () => void
+    // The conversation a pick belongs to (see useAgentModel). Without one the pick covers the agent.
+    conversationId?: string
 }
 
 // In-chat model picker shown in the prompt footer. One group per Box connection, so two Claude
@@ -124,9 +126,10 @@ type ModelSelectorProps = {
 // sets a per-conversation override (see useAgentModel) that the chat transport sends with every
 // message — it does NOT mutate the agent's persisted default config; the star does that.
 //
-// The "Box default" entry is the one exception: it is not a per-conversation choice but a statement
-// about the agent, so it clears both the override and the pin in one click.
-export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey, onPicked }: ModelSelectorProps) {
+// The star and the "Box default" entry are statements about the agent, not choices for this
+// conversation: each clears the conversation's override too, or the chat would go on sending the
+// model the user just walked away from.
+export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey, onPicked, conversationId }: ModelSelectorProps) {
     const t = useTranslations('agent.modelSelector')
     const tShared = useTranslations('agent.modelsShared')
     const creditDetail = useRerunCreditDetail()
@@ -135,7 +138,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const openedOnRequestRef = useRef(false)
     const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, pinnedEffort, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
         useAvailableModels(agentId)
-    const { selection, select } = useAgentModel(agentId)
+    const { selection, select } = useAgentModel(agentId, conversationId)
     // Picking a model for this conversation stays open: only what the coworker runs by default is
     // managed through its Box. The foreman has no Box, so its default is left as it was.
     const canManageCoworker = useCanManageAgent(agentId)
@@ -248,6 +251,18 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
             return pinnedConnectionId === group.connectionId && pinnedModel === rowModel ? pinnedEffort : null
         },
         [active, model, effort, pinnedConnectionId, pinnedModel, pinnedEffort]
+    )
+
+    // The conversation carries the starred model until the engine has it as the default: a message sent
+    // meanwhile, or after a save that failed, runs on what the pill says. A pick made meanwhile stays.
+    const makeDefault = useCallback(
+        async (group: ConnectionGroup, nextModel: string, nextEffort: ReasoningEffort | null) => {
+            const starred: ModelSelection = { connectionId: group.connectionId, model: nextModel, effort: nextEffort }
+            select(starred)
+            const result = await setDefault(group.connectionId, nextModel, group.provider, nextEffort).catch(() => null)
+            if (result?.success && readAgentModel(agentId, conversationId) === starred) select({})
+        },
+        [setDefault, select, agentId, conversationId]
     )
 
     const selectModel = useCallback(
@@ -400,7 +415,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                 onClick={e => {
                                                     e.preventDefault()
                                                     e.stopPropagation()
-                                                    setDefault(group.connectionId, m.id, group.provider, levelOfRow)
+                                                    void makeDefault(group, m.id, levelOfRow)
                                                 }}
                                             >
                                                 <StarIcon className="size-3.5" />

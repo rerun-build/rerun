@@ -59,7 +59,7 @@ async function settle() {
     for (let i = 0; i < 5; i++) await act(async () => new Promise(resolve => setTimeout(resolve, 0)))
 }
 
-async function mount(agentId: string, onReadyChange?: (ready: boolean) => void, props: { pickerKey?: string; onPicked?: () => void } = {}) {
+async function mount(agentId: string, onReadyChange?: (ready: boolean) => void, props: { pickerKey?: string; onPicked?: () => void; conversationId?: string } = {}) {
     const { ModelSelector } = await import('@/components/agent/ModelSelector')
     container = document.createElement('div')
     document.body.appendChild(container)
@@ -144,6 +144,7 @@ describe('ModelSelector coworker default', REIMPORT_TIMEOUT, () => {
         mocks.getAgentContextAction.mockResolvedValue(FOLLOWS_CLAUDE)
         mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
         mocks.updateAgentConfigAction.mockReset()
+        mocks.updateAgentConfigAction.mockResolvedValue({ success: true })
     })
     afterEach(() => {
         act(() => root?.unmount())
@@ -169,6 +170,220 @@ describe('ModelSelector coworker default', REIMPORT_TIMEOUT, () => {
         await openPicker()
         const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Sonnet 5.5 this coworker\'s default"]')
         expect(star?.disabled).toBe(false)
+    })
+})
+
+// A model picked in a chat is that chat's: the next new chat of the coworker opens on its default,
+// and the star moves the chat it was clicked in onto the new default (RER-284).
+describe('ModelSelector per conversation', REIMPORT_TIMEOUT, () => {
+    const PINNED_SONNET = modelContext({ connectionId: 'claude-1', model: 'claude-sonnet-5-5', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-sonnet-5-5' })
+    const pill = () => container!.querySelector('button')!.textContent
+
+    beforeEach(() => {
+        vi.resetModules()
+        localStorage.clear()
+        mocks.getAgentContextAction.mockResolvedValue(PINNED_SONNET)
+        mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
+        mocks.updateAgentConfigAction.mockReset()
+        mocks.updateAgentConfigAction.mockResolvedValue({ success: true })
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    function closeChat() {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    }
+
+    it('opens a new chat on the coworker default, not on the model picked in another chat', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await pickModel('Opus 5.5')
+        expect(pill()).toContain('Opus 5.5')
+        closeChat()
+
+        await mount('coworker', undefined, { conversationId: 'session-b' })
+        expect(pill()).toContain('Sonnet 5.5')
+        expect(readAgentModel('coworker', 'session-b')).toEqual({})
+        closeChat()
+
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        expect(pill()).toContain('Opus 5.5')
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-opus-5-5')
+    })
+
+    it('moves the chat the star was clicked in onto the new default', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await pickModel('Opus 5.5')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Opus 5.5 this coworker\'s default"]')
+        await act(async () => star!.click())
+        await settle()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('coworker', { connectionId: 'claude-1', model: 'claude-opus-5-5', provider: 'claude' })
+        expect(readAgentModel('coworker', 'session-a')).toEqual({})
+        expect(pill()).toContain('Opus 5.5')
+    })
+
+    it('runs the chat on the starred model when another one was picked in it', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        mocks.getAgentContextAction.mockResolvedValue(FOLLOWS_CLAUDE)
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await pickModel('Opus 5.5')
+        await openPicker()
+        const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Sonnet 5.5 this coworker\'s default"]')
+        await act(async () => star!.click())
+        await settle()
+        expect(readAgentModel('coworker', 'session-a')).toEqual({})
+        expect(pill()).toContain('Sonnet 5.5')
+    })
+
+    const starOf = (model: string) => document.querySelector<HTMLButtonElement>(`button[aria-label="Make ${model} this coworker's default"]`)!
+
+    it('keeps the chat on the starred model while the default is being saved, and when the save is refused', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        let answer!: (result: { success: boolean }) => void
+        mocks.updateAgentConfigAction.mockReturnValue(new Promise(resolve => (answer = resolve)))
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await act(async () => starOf('Opus 5.5').click())
+        await settle()
+        expect(pill()).toContain('Opus 5.5')
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-opus-5-5')
+
+        await act(async () => answer({ success: false }))
+        await settle()
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-opus-5-5')
+    })
+
+    it('keeps the chat on the starred model when the save never reaches the server', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        mocks.updateAgentConfigAction.mockRejectedValue(new Error('network'))
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await act(async () => starOf('Opus 5.5').click())
+        await settle()
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-opus-5-5')
+    })
+
+    it('keeps a model picked while the default is being saved', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        let answer!: (result: { success: boolean }) => void
+        mocks.updateAgentConfigAction.mockReturnValue(new Promise(resolve => (answer = resolve)))
+        await mount('coworker', undefined, { conversationId: 'session-a' })
+        await openPicker()
+        await act(async () => starOf('Opus 5.5').click())
+        // "Workspace default" names the same model above it.
+        const sonnet = [...document.querySelectorAll<HTMLElement>('[role="option"]')].filter(item => item.textContent?.includes('Sonnet 5.5')).at(-1)!
+        await act(async () => sonnet.click())
+        await settle()
+        await act(async () => answer({ success: true }))
+        await settle()
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-sonnet-5-5')
+    })
+})
+
+// The session of a new chat comes with the answer to its first message, or for General through the
+// hub's realtime channel first. The pick made before it has to be there on the first render that reads
+// the session: the picker repairs a pin that no longer resolves, and would write over it.
+describe('ModelSelector when a new chat opens its session', REIMPORT_TIMEOUT, () => {
+    const DEAD_PIN = modelContext({ connectionId: 'gone', model: 'gpt-6-astra', resolvedConnectionId: 'gone', resolvedModel: 'gpt-6-astra' })
+    const pill = () => container!.querySelector('button')!.textContent
+
+    beforeEach(() => {
+        vi.resetModules()
+        localStorage.clear()
+        mocks.getAgentContextAction.mockReset()
+        mocks.getAgentContextAction.mockResolvedValue(DEAD_PIN)
+        mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    async function mountTabs() {
+        const { ModelSelector } = await import('@/components/agent/ModelSelector')
+        const { draftConversationId } = await import('@/hooks/useAgentModel')
+        const { useSessionTabs } = await import('@/hooks/useSessionTabs')
+        let tabs!: ReturnType<typeof useSessionTabs>
+        function Panel() {
+            tabs = useSessionTabs('coworker')
+            const tab = tabs.tabs[tabs.activeIndex]
+            return createElement(ModelSelector, { key: tab.uid, agentId: 'coworker', conversationId: tab.id ?? draftConversationId(tab.uid) })
+        }
+        container = document.createElement('div')
+        document.body.appendChild(container)
+        root = createRoot(container)
+        await act(async () => root!.render(createElement(Panel)))
+        await settle()
+        return () => tabs
+    }
+
+    it('keeps the pick of a thread', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        const tabs = await mountTabs()
+        await act(async () => tabs().createNew())
+        await settle()
+        await openPicker()
+        await pickModel('Opus 5.5')
+        await act(async () => tabs().updateTabByUid(tabs().tabs[1].uid, 'session-a'))
+        await settle()
+        expect(readAgentModel('coworker', 'session-a').model).toBe('claude-opus-5-5')
+        expect(pill()).toContain('Opus 5.5')
+    })
+
+    it('keeps the pick of General', async () => {
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        const tabs = await mountTabs()
+        await openPicker()
+        await pickModel('Opus 5.5')
+        await act(async () => tabs().setGeneralSessionId('general-row'))
+        await act(async () => tabs().updateTabByUid(tabs().tabs[0].uid, 'general-row'))
+        await settle()
+        expect(readAgentModel('coworker', 'general-row').model).toBe('claude-opus-5-5')
+        expect(pill()).toContain('Opus 5.5')
+    })
+
+    it('keeps the pick General had before a reload over the one the picker repaired meanwhile', async () => {
+        localStorage.setItem('rerun-agent-model-coworker:general-row', JSON.stringify({ connectionId: 'claude-1', model: 'claude-opus-5-5', effort: null }))
+        const { readAgentModel } = await import('@/hooks/useAgentModel')
+        const tabs = await mountTabs()
+        await act(async () => tabs().setGeneralSessionId('general-row'))
+        await settle()
+        expect(readAgentModel('coworker', 'general-row').model).toBe('claude-opus-5-5')
+        expect(pill()).toContain('Opus 5.5')
+    })
+
+    it('opens a new chat on the default again when the last one picked a model and was never sent', async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'claude-1', model: 'claude-sonnet-5-5', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-sonnet-5-5' }))
+        const tabs = await mountTabs()
+        await act(async () => tabs().createNew())
+        await settle()
+        await openPicker()
+        await pickModel('Opus 5.5')
+        await act(async () => tabs().createNew())
+        await settle()
+        expect(pill()).toContain('Opus 5.5')
+
+        await act(async () => tabs().selectTab(0))
+        await act(async () => tabs().selectTab(1))
+        await settle()
+        expect(pill()).toContain('Opus 5.5')
+
+        await act(async () => tabs().selectTab(0))
+        await act(async () => tabs().createNew())
+        await settle()
+        expect(tabs().tabs).toHaveLength(2)
+        expect(pill()).toContain('Sonnet 5.5')
     })
 })
 
@@ -255,6 +470,7 @@ describe('ModelSelector reasoning effort', REIMPORT_TIMEOUT, () => {
         mocks.getAgentContextAction.mockResolvedValue(FOLLOWS_CLAUDE)
         mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
         mocks.updateAgentConfigAction.mockReset()
+        mocks.updateAgentConfigAction.mockResolvedValue({ success: true })
     })
     afterEach(() => {
         act(() => root?.unmount())

@@ -8,7 +8,7 @@ vi.mock('@/app/api/_actions/session.actions', () => ({ peekPendingRequestAction:
 vi.mock('@/app/api/_actions/foreman-conversation.actions', () => ({ peekForemanPendingRequestAction: mocks.peekForemanPendingRequestAction }))
 vi.mock('@/lib/chat/send-session-message', () => ({ sendSessionMessage: mocks.sendSessionMessage, sendForemanThreadMessage: mocks.sendForemanThreadMessage }))
 vi.mock('@/lib/notifications/open-conversation', () => ({ resolveSessionId: async () => null }))
-vi.mock('@/hooks/useAgentModel', () => ({ useAgentModel: () => ({ selection: {} }) }))
+vi.mock('@/hooks/useAgentModel', () => ({ readAgentModel: () => ({}) }))
 vi.mock('@/app/api/_actions/skill-proposal.actions', () => ({ decideSkillProposalAction: mocks.decideSkillProposalAction }))
 
 const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')

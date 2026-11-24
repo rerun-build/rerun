@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { peekForemanPendingRequestAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { peekPendingRequestAction } from '@/app/api/_actions/session.actions'
 import { decideSkillProposalAction } from '@/app/api/_actions/skill-proposal.actions'
-import { useAgentModel } from '@/hooks/useAgentModel'
+import { readAgentModel } from '@/hooks/useAgentModel'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { sendForemanThreadMessage, sendSessionMessage } from '@/lib/chat/send-session-message'
 import { resolveSessionId } from '@/lib/notifications/open-conversation'
@@ -31,7 +31,6 @@ function readPendingRequest(agentId: string, sessionId: string): Promise<Pending
 // General asks again, and its status alone may have gone there and back between two reads of the list.
 export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget, enabled = true, revision?: string) {
     const [peek, setPeek] = useState<InboxPeek>({ state: 'loading' })
-    const { selection: model } = useAgentModel(agentId)
 
     useEffect(() => {
         if (!enabled) return
@@ -59,10 +58,11 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
             if (peek.state !== 'ready' || !peek.peek.pending) return 'stale'
             const fresh = await readPendingRequest(agentId, peek.sessionId)
             if (fresh?.pending?.toolCallId !== peek.peek.pending.toolCallId) return 'stale'
-            if (agentId === FOREMAN_AGENT_ID) return sendForemanThreadMessage({ sessionId: peek.sessionId, text, model })
-            return sendSessionMessage({ agentId, sessionId: peek.sessionId, text, model })
+            // The Chief of Staff's picker knows no conversation: its pick covers the agent (see useAgentModel).
+            if (agentId === FOREMAN_AGENT_ID) return sendForemanThreadMessage({ sessionId: peek.sessionId, text, model: readAgentModel(agentId) })
+            return sendSessionMessage({ agentId, sessionId: peek.sessionId, text, model: readAgentModel(agentId, peek.sessionId) })
         },
-        [agentId, model, peek]
+        [agentId, peek]
     )
 
     // No read first: the engine only moves a proposal still waiting, and answers with where it stands.

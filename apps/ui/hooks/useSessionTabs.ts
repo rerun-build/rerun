@@ -2,6 +2,7 @@
 
 import { nanoid } from 'nanoid'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { adoptDraftModel, draftConversationId, forgetDraftModel } from '@/hooks/useAgentModel'
 
 export type SessionTab = {
     uid: string
@@ -24,6 +25,8 @@ export const NEW_THREAD_TITLE = 'New conversation'
 export const MAX_REMEMBERED_TABS = 8
 
 export const isGeneralTab = (tab: SessionTab | undefined): boolean => tab?.kind === 'general'
+
+const isBlankThread = (tab: SessionTab): boolean => tab.id === null && !isGeneralTab(tab)
 
 export const generalTabUid = (agentId: string) => `general:${agentId}`
 
@@ -111,14 +114,18 @@ export function useSessionTabs(agentId: string) {
 
     const activeSessionId = state.tabs[state.activeIndex]?.id ?? null
 
-    // A conversation nobody has spoken in yet is the new one: asking again lands on it.
+    // A conversation nobody has spoken in yet is the new one: asking again lands on it, back on the
+    // coworker's default model unless it is already on screen.
     const createNew = useCallback(() => {
+        const { tabs, activeIndex } = stateRef.current
+        const waiting = tabs.findIndex(isBlankThread)
+        if (waiting !== -1 && waiting !== activeIndex) forgetDraftModel(agentId, draftConversationId(tabs[waiting].uid))
         setState(prev => {
-            const blank = prev.tabs.findIndex(t => t.id === null && !isGeneralTab(t))
+            const blank = prev.tabs.findIndex(isBlankThread)
             if (blank !== -1) return { ...prev, activeIndex: blank }
             return remember({ tabs: [...prev.tabs, newTab()], activeIndex: prev.tabs.length })
         })
-    }, [])
+    }, [agentId])
 
     const selectTab = useCallback((index: number) => {
         setState(prev => (index === prev.activeIndex ? prev : { ...prev, activeIndex: index }))
@@ -152,12 +159,18 @@ export function useSessionTabs(agentId: string) {
         })
     }, [])
 
-    const updateTabByUid = useCallback((uid: string, sessionId: string, title?: string) => {
-        setState(prev => ({
-            ...prev,
-            tabs: prev.tabs.map(t => (t.uid === uid ? { ...t, id: sessionId, title: isGeneralTab(t) ? t.title : (title ?? t.title) } : t)),
-        }))
-    }, [])
+    // The pick moves before the tab learns its session: the first render that reads the session already
+    // finds it, and the picker has nothing to repair.
+    const updateTabByUid = useCallback(
+        (uid: string, sessionId: string, title?: string) => {
+            adoptDraftModel(agentId, draftConversationId(uid), sessionId)
+            setState(prev => ({
+                ...prev,
+                tabs: prev.tabs.map(t => (t.uid === uid ? { ...t, id: sessionId, title: isGeneralTab(t) ? t.title : (title ?? t.title) } : t)),
+            }))
+        },
+        [agentId]
+    )
 
     // General keeps its name whatever the hub writes on its row.
     const updateTabTitle = useCallback((sessionId: string, title: string) => {
@@ -167,9 +180,13 @@ export function useSessionTabs(agentId: string) {
         }))
     }, [])
 
-    const setGeneralSessionId = useCallback((sessionId: string) => {
-        setState(prev => adoptGeneralId(prev, sessionId))
-    }, [])
+    const setGeneralSessionId = useCallback(
+        (sessionId: string) => {
+            adoptDraftModel(agentId, draftConversationId(generalTabUid(agentId)), sessionId)
+            setState(prev => adoptGeneralId(prev, sessionId))
+        },
+        [agentId]
+    )
 
     return {
         tabs: state.tabs,
