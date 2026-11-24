@@ -97,6 +97,7 @@ let tables: {
     space_members: Rows<'space_members'>
     sessions: Rows<'sessions'>
     foreman_conversations: Rows<'foreman_conversations'>
+    'rpc:unseen_runs': Database['public']['Functions']['unseen_runs']['Returns']
 }
 
 // The rows of `tables`, where an upsert of a session lands as PostgREST would keep it, and a write
@@ -135,6 +136,7 @@ describe('the onboarding of the mobile app', () => {
             space_members: [],
             sessions: [],
             foreman_conversations: [],
+            'rpc:unseen_runs': [],
         }
         state.failingWrite = null
         const db = fakeSupabase(database())
