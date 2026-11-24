@@ -98,7 +98,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end sm:rounded-b-xl",
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:flex-wrap-reverse group-data-[size=sm]/alert-dialog-content:*:grow group-data-[size=sm]/alert-dialog-content:*:basis-[calc(50%-0.25rem)] sm:flex-row sm:justify-end sm:rounded-b-xl",
         // -mb-4 only cancels the 1rem of p-4, so the safe area padding the sheet adds would survive
         // and float this bar above the sheet's bottom edge.
         "max-sm:pb-[max(1rem,env(safe-area-inset-bottom))]",
