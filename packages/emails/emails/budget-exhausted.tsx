@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { readingSides } from "../components/direction";
 import { strong } from "../components/rich";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
@@ -37,7 +38,7 @@ export default function BudgetExhausted({
           ? t.rich("budgetExhausted.bodyNamed", { workspaceName, strong })
           : t("budgetExhausted.bodyUnnamed")}
       </Text>
-      <Text style={hint}>{t("budgetExhausted.ownKeys")}</Text>
+      <Text style={readingSides(locale).start === "left" ? { ...hint, borderLeft: hintRule, paddingLeft: "12px" } : { ...hint, borderRight: hintRule, paddingRight: "12px" }}>{t("budgetExhausted.ownKeys")}</Text>
       <Section style={cta}>
         <Button href={appUrl}>{t("budgetExhausted.button")}</Button>
       </Section>
@@ -50,11 +51,11 @@ BudgetExhausted.PreviewProps = {
   appUrl: "https://app.rerun.build",
 } satisfies BudgetExhaustedProps;
 
+const hintRule = `2px solid ${theme.surface.border}`;
+
 const hint: React.CSSProperties = {
   ...text.footnote,
-  borderLeft: `2px solid ${theme.surface.border}`,
   margin: "0 0 4px",
-  paddingLeft: "12px",
 };
 
 const cta: React.CSSProperties = {

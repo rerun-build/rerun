@@ -90,6 +90,51 @@ import trMobileSettings from '@rerun/i18n/messages/tr/mobileSettings.json'
 import trMobileSteps from '@rerun/i18n/messages/tr/mobileSteps.json'
 import trSubRuns from '@rerun/i18n/messages/tr/subRuns.json'
 import trTools from '@rerun/i18n/messages/tr/tools.json'
+import arChatErrors from '@rerun/i18n/messages/ar/chatErrors.json'
+import arErrors from '@rerun/i18n/messages/ar/errors.json'
+import arMobileAuth from '@rerun/i18n/messages/ar/mobileAuth.json'
+import arMobileCards from '@rerun/i18n/messages/ar/mobileCards.json'
+import arMobileChat from '@rerun/i18n/messages/ar/mobileChat.json'
+import arMobileCommon from '@rerun/i18n/messages/ar/mobileCommon.json'
+import arMobileCoworker from '@rerun/i18n/messages/ar/mobileCoworker.json'
+import arMobileHitl from '@rerun/i18n/messages/ar/mobileHitl.json'
+import arMobileHome from '@rerun/i18n/messages/ar/mobileHome.json'
+import arMobileOnboarding from '@rerun/i18n/messages/ar/mobileOnboarding.json'
+import arMobileProviders from '@rerun/i18n/messages/ar/mobileProviders.json'
+import arMobileSettings from '@rerun/i18n/messages/ar/mobileSettings.json'
+import arMobileSteps from '@rerun/i18n/messages/ar/mobileSteps.json'
+import arSubRuns from '@rerun/i18n/messages/ar/subRuns.json'
+import arTools from '@rerun/i18n/messages/ar/tools.json'
+import zhChatErrors from '@rerun/i18n/messages/zh/chatErrors.json'
+import zhErrors from '@rerun/i18n/messages/zh/errors.json'
+import zhMobileAuth from '@rerun/i18n/messages/zh/mobileAuth.json'
+import zhMobileCards from '@rerun/i18n/messages/zh/mobileCards.json'
+import zhMobileChat from '@rerun/i18n/messages/zh/mobileChat.json'
+import zhMobileCommon from '@rerun/i18n/messages/zh/mobileCommon.json'
+import zhMobileCoworker from '@rerun/i18n/messages/zh/mobileCoworker.json'
+import zhMobileHitl from '@rerun/i18n/messages/zh/mobileHitl.json'
+import zhMobileHome from '@rerun/i18n/messages/zh/mobileHome.json'
+import zhMobileOnboarding from '@rerun/i18n/messages/zh/mobileOnboarding.json'
+import zhMobileProviders from '@rerun/i18n/messages/zh/mobileProviders.json'
+import zhMobileSettings from '@rerun/i18n/messages/zh/mobileSettings.json'
+import zhMobileSteps from '@rerun/i18n/messages/zh/mobileSteps.json'
+import zhSubRuns from '@rerun/i18n/messages/zh/subRuns.json'
+import zhTools from '@rerun/i18n/messages/zh/tools.json'
+import heChatErrors from '@rerun/i18n/messages/he/chatErrors.json'
+import heErrors from '@rerun/i18n/messages/he/errors.json'
+import heMobileAuth from '@rerun/i18n/messages/he/mobileAuth.json'
+import heMobileCards from '@rerun/i18n/messages/he/mobileCards.json'
+import heMobileChat from '@rerun/i18n/messages/he/mobileChat.json'
+import heMobileCommon from '@rerun/i18n/messages/he/mobileCommon.json'
+import heMobileCoworker from '@rerun/i18n/messages/he/mobileCoworker.json'
+import heMobileHitl from '@rerun/i18n/messages/he/mobileHitl.json'
+import heMobileHome from '@rerun/i18n/messages/he/mobileHome.json'
+import heMobileOnboarding from '@rerun/i18n/messages/he/mobileOnboarding.json'
+import heMobileProviders from '@rerun/i18n/messages/he/mobileProviders.json'
+import heMobileSettings from '@rerun/i18n/messages/he/mobileSettings.json'
+import heMobileSteps from '@rerun/i18n/messages/he/mobileSteps.json'
+import heSubRuns from '@rerun/i18n/messages/he/subRuns.json'
+import heTools from '@rerun/i18n/messages/he/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
 const english = { chatErrors: enChatErrors, errors: enErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
@@ -98,10 +143,13 @@ const spanish = { chatErrors: esChatErrors, errors: esErrors, mobileAuth: esMobi
 const portuguese = { chatErrors: ptChatErrors, errors: ptErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
 const german = { chatErrors: deChatErrors, errors: deErrors, mobileAuth: deMobileAuth, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
 const turkish = { chatErrors: trChatErrors, errors: trErrors, mobileAuth: trMobileAuth, mobileCards: trMobileCards, mobileChat: trMobileChat, mobileCommon: trMobileCommon, mobileCoworker: trMobileCoworker, mobileHitl: trMobileHitl, mobileHome: trMobileHome, mobileOnboarding: trMobileOnboarding, mobileProviders: trMobileProviders, mobileSettings: trMobileSettings, mobileSteps: trMobileSteps, subRuns: trSubRuns, tools: trTools }
+const arabic = { chatErrors: arChatErrors, errors: arErrors, mobileAuth: arMobileAuth, mobileCards: arMobileCards, mobileChat: arMobileChat, mobileCommon: arMobileCommon, mobileCoworker: arMobileCoworker, mobileHitl: arMobileHitl, mobileHome: arMobileHome, mobileOnboarding: arMobileOnboarding, mobileProviders: arMobileProviders, mobileSettings: arMobileSettings, mobileSteps: arMobileSteps, subRuns: arSubRuns, tools: arTools }
+const chinese = { chatErrors: zhChatErrors, errors: zhErrors, mobileAuth: zhMobileAuth, mobileCards: zhMobileCards, mobileChat: zhMobileChat, mobileCommon: zhMobileCommon, mobileCoworker: zhMobileCoworker, mobileHitl: zhMobileHitl, mobileHome: zhMobileHome, mobileOnboarding: zhMobileOnboarding, mobileProviders: zhMobileProviders, mobileSettings: zhMobileSettings, mobileSteps: zhMobileSteps, subRuns: zhSubRuns, tools: zhTools }
+const hebrew = { chatErrors: heChatErrors, errors: heErrors, mobileAuth: heMobileAuth, mobileCards: heMobileCards, mobileChat: heMobileChat, mobileCommon: heMobileCommon, mobileCoworker: heMobileCoworker, mobileHitl: heMobileHitl, mobileHome: heMobileHome, mobileOnboarding: heMobileOnboarding, mobileProviders: heMobileProviders, mobileSettings: heMobileSettings, mobileSteps: heMobileSteps, subRuns: heSubRuns, tools: heTools }
 
 export type MobileMessages = typeof english
 
-const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish }
+const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish, ar: arabic, zh: chinese, he: hebrew }
 
 const merged = new Map<Locale, MobileMessages>()
 

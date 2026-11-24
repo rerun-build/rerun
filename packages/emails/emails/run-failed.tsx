@@ -51,6 +51,7 @@ export default function RunFailed({
       </Panel>
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.coworker"), value: agentName },
             ...(runId ? [{ label: t("common.meta.run"), value: runId }] : []),

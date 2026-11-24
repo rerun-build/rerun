@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, PSEUDO_LOCALE } from './locales'
+import { DEFAULT_LOCALE, localeDirection, PSEUDO_LOCALE } from './locales'
 
 const SECOND = 1000
 const MINUTE = 60 * SECOND
@@ -9,7 +9,13 @@ const WEEK = 7 * DAY
 // The English output predates the packs: short dates read day first (en-GB) and long ones the US
 // way. Kept as they were, so turning the packs on changes nothing for an English reader.
 function tag(locale: string, english: 'en-GB' | 'en-US'): string {
-    return locale === DEFAULT_LOCALE || locale === PSEUDO_LOCALE ? english : locale
+    return locale === DEFAULT_LOCALE || locale === PSEUDO_LOCALE ? english : intlLocale(locale)
+}
+
+// Arabic is written with Latin digits (0-9), the way the prices, counts and dates of the rest of the
+// app read, whatever numbering the reader's browser would default to.
+function intlLocale(locale: string): string {
+    return locale === 'ar' ? 'ar-u-nu-latn' : locale
 }
 
 function isEnglish(locale: string): boolean {
@@ -22,7 +28,7 @@ function capitalize(text: string, locale: string): string {
 
 function narrowUnit(value: number, unit: 'minute' | 'hour' | 'day', locale: string): string {
     if (isEnglish(locale)) return `${value}${unit.charAt(0)}`
-    return new Intl.NumberFormat(locale, { style: 'unit', unit, unitDisplay: 'narrow' }).format(value)
+    return new Intl.NumberFormat(intlLocale(locale), { style: 'unit', unit, unitDisplay: 'narrow' }).format(value)
 }
 
 function rightNow(locale: string): string {
@@ -55,7 +61,7 @@ export function shortUntil(iso: string, locale: string = DEFAULT_LOCALE, now: Da
     if (diff >= WEEK) return dayMonth(date, locale, now)
     const [value, unit] = diff < HOUR ? [Math.floor(diff / MINUTE), 'minute' as const] : diff < DAY ? [Math.floor(diff / HOUR), 'hour' as const] : [Math.floor(diff / DAY), 'day' as const]
     if (isEnglish(locale)) return `in ${narrowUnit(value, unit, locale)}`
-    return new Intl.RelativeTimeFormat(locale, { style: 'short' }).format(value, unit)
+    return new Intl.RelativeTimeFormat(intlLocale(locale), { style: 'short' }).format(value, unit)
 }
 
 export function fullDateTime(iso: string, locale: string = DEFAULT_LOCALE): string {
@@ -114,8 +120,11 @@ export function longDate(date: Date | string, locale: string = DEFAULT_LOCALE): 
     return new Date(date).toLocaleDateString(tag(locale, 'en-US'), { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// Inside an Arabic or Hebrew sentence, an amount ("0 US$") would be reordered by the bidi algorithm
+// into "$US 0": it is isolated as a left-to-right run.
 export function formatNumber(value: number, locale: string = DEFAULT_LOCALE, options?: Intl.NumberFormatOptions): string {
-    return value.toLocaleString(tag(locale, 'en-US'), options)
+    const text = value.toLocaleString(tag(locale, 'en-US'), options)
+    return options?.style === 'currency' && localeDirection(locale) === 'rtl' ? `\u2066${text}\u2069` : text
 }
 
 const BYTE_UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte'] as const
@@ -129,7 +138,7 @@ export function formatBytes(bytes: number, locale: string = DEFAULT_LOCALE): str
     }
     const power = Math.min(BYTE_UNITS.length - 1, bytes < 1024 ? 0 : Math.floor(Math.log(bytes) / Math.log(1024)))
     const value = bytes / 1024 ** power
-    return new Intl.NumberFormat(locale, { style: 'unit', unit: BYTE_UNITS[power], unitDisplay: 'short', minimumFractionDigits: power ? 1 : 0, maximumFractionDigits: power ? 1 : 0 }).format(value)
+    return new Intl.NumberFormat(intlLocale(locale), { style: 'unit', unit: BYTE_UNITS[power], unitDisplay: 'short', minimumFractionDigits: power ? 1 : 0, maximumFractionDigits: power ? 1 : 0 }).format(value)
 }
 
 /** "45s", "12 min", "2h 5m": how long something took. */
@@ -142,7 +151,7 @@ export function formatDuration(ms: number, locale: string = DEFAULT_LOCALE): str
         const rest = minutes % 60
         return rest ? `${hours}h ${rest}m` : `${hours}h`
     }
-    const unit = (value: number, name: 'second' | 'minute' | 'hour', display: 'narrow' | 'short') => new Intl.NumberFormat(locale, { style: 'unit', unit: name, unitDisplay: display }).format(value)
+    const unit = (value: number, name: 'second' | 'minute' | 'hour', display: 'narrow' | 'short') => new Intl.NumberFormat(intlLocale(locale), { style: 'unit', unit: name, unitDisplay: display }).format(value)
     if (minutes < 1) return unit(Math.max(1, Math.round(ms / SECOND)), 'second', 'narrow')
     if (minutes < 60) return unit(minutes, 'minute', 'short')
     const hours = Math.floor(minutes / 60)

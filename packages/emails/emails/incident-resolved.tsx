@@ -48,6 +48,7 @@ export default function IncidentResolved({
       {reason ? <Text style={reasonLine}>{reason}</Text> : null}
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.coworker"), value: agentName },
             { label: t("common.meta.source"), value: sourceLabel },

@@ -57,6 +57,7 @@ export default function TrialStarted({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.workspace"), value: workspace },
             { label: t("common.meta.included"), value: includedLabel },

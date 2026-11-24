@@ -9,9 +9,11 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
+import { readingSides } from "./direction";
 import { Footer } from "./Footer";
 import { Hero, type HeroProps } from "./Hero";
 import { LOGO_SIZE, LOGO_URL } from "../assets";
+import { localeDirection } from "@rerun/i18n";
 import type { EmailLocale } from "../i18n";
 import { theme } from "../theme";
 
@@ -33,8 +35,9 @@ export function Layout({
   unsubscribeLabel,
   locale = "en",
 }: LayoutProps) {
+  const sides = readingSides(locale);
   return (
-    <Html lang={locale}>
+    <Html lang={locale} dir={localeDirection(locale)}>
       <Head>
         <meta name="color-scheme" content="dark" />
         <meta name="supported-color-schemes" content="dark" />
@@ -44,11 +47,11 @@ export function Layout({
       </Head>
       <Preview>{preview}</Preview>
       <Body className="rr-frame" style={body}>
-        <Section style={header}>
-          <table align="left" role="presentation" style={lockup}>
+        <Section style={{ ...header, textAlign: sides.start }}>
+          <table align={sides.start} role="presentation" style={lockup}>
             <tbody>
               <tr>
-                <td style={logoCell}>
+                <td style={{ ...logoCell, padding: sides.start === "left" ? "0 10px 0 0" : "0 0 0 10px" }}>
                   <Link href={SITE_URL} style={logoLink}>
                     <Img
                       src={LOGO_URL}
@@ -102,7 +105,6 @@ const body: React.CSSProperties = {
 const header: React.CSSProperties = {
   margin: "0 auto 18px",
   maxWidth: `${theme.width.card}px`,
-  textAlign: "left",
 };
 
 const lockup: React.CSSProperties = {
@@ -110,7 +112,6 @@ const lockup: React.CSSProperties = {
 };
 
 const logoCell: React.CSSProperties = {
-  paddingRight: "10px",
   verticalAlign: "middle",
 };
 

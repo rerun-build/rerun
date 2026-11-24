@@ -39,6 +39,7 @@ export function TemplateCard({
   if (!imageUrl) {
     return (
       <ItemCard
+        locale={locale}
         title={title}
         href={href}
         meta={meta}

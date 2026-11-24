@@ -15,6 +15,7 @@ export interface ItemCardProps {
   href?: string;
   /** A text link under the body, for a list where each card has its own destination. */
   action?: { href: string; label: string };
+  locale?: string;
 }
 
 /**
@@ -22,7 +23,7 @@ export interface ItemCardProps {
  * this, it drops its children into a single `<Text>` and a title plus two lines would come out as
  * paragraphs nested inside a paragraph.
  */
-export function ItemCard({ title, meta, label, body, href, action }: ItemCardProps) {
+export function ItemCard({ title, meta, label, body, href, action, locale }: ItemCardProps) {
   return (
     <Section style={card}>
       <SplitTable>
@@ -37,6 +38,7 @@ export function ItemCard({ title, meta, label, body, href, action }: ItemCardPro
             )
           }
           right={meta ? <span style={cardMeta}>{meta}</span> : null}
+          locale={locale}
         />
       </SplitTable>
       {label ? <Text style={cardLabel}>{label}</Text> : null}

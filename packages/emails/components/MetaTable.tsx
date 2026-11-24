@@ -1,15 +1,17 @@
 import * as React from "react";
+import { readingSides } from "./direction";
 import { theme } from "../theme";
 
 export interface MetaTableProps {
   rows: { label: string; value: React.ReactNode }[];
+  locale?: string;
 }
 
 /**
  * Label/value rows. A two-column table rather than `justify-content: space-between`, which
  * the Word engine behind Outlook and Gmail's sanitiser both ignore.
  */
-export function MetaTable({ rows }: MetaTableProps) {
+export function MetaTable({ rows, locale }: MetaTableProps) {
   return (
     <SplitTable>
       {rows.map((row) => (
@@ -17,6 +19,7 @@ export function MetaTable({ rows }: MetaTableProps) {
           key={row.label}
           left={<span style={label}>{row.label}</span>}
           right={<span style={value}>{row.value}</span>}
+          locale={locale}
         />
       ))}
     </SplitTable>
@@ -34,16 +37,19 @@ export function SplitTable({ children }: { children: React.ReactNode }) {
 export function SplitRow({
   left,
   right,
+  locale,
 }: {
   left: React.ReactNode;
   right: React.ReactNode;
+  locale?: string;
 }) {
+  const sides = readingSides(locale);
   return (
     <tr>
-      <td align="left" style={leftCell}>
+      <td align={sides.start} style={{ ...leftCell, padding: sides.start === "left" ? "3px 8px 3px 0" : "3px 0 3px 8px", textAlign: sides.start }}>
         {left}
       </td>
-      <td align="right" style={rightCell}>
+      <td align={sides.end} style={{ ...rightCell, textAlign: sides.end }}>
         {right}
       </td>
     </tr>
@@ -55,14 +61,11 @@ const table: React.CSSProperties = {
 };
 
 const leftCell: React.CSSProperties = {
-  padding: "3px 8px 3px 0",
-  textAlign: "left",
   verticalAlign: "top",
 };
 
 const rightCell: React.CSSProperties = {
   padding: "3px 0",
-  textAlign: "right",
   verticalAlign: "top",
 };
 

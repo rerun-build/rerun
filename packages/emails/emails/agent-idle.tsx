@@ -43,6 +43,7 @@ export default function AgentIdle({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.coworker"), value: agentName },
             { label: t("common.meta.created"), value: createdLabel },

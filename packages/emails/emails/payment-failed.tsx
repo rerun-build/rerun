@@ -66,6 +66,7 @@ export default function PaymentFailed({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.workspace"), value: workspace },
             ...(amountLabel ? [{ label: t("common.meta.amountDue"), value: amountLabel }] : []),

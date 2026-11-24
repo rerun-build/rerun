@@ -2,6 +2,7 @@ import * as React from "react";
 import { Link, Section, Text } from "@react-email/components";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
+import { readingSides } from "./direction";
 
 export interface FooterProps {
   unsubscribeUrl?: string;
@@ -15,8 +16,9 @@ export function Footer({
   locale,
 }: FooterProps) {
   const t = emailTranslator(locale);
+  const sides = readingSides(locale);
   return (
-    <Section style={footer}>
+    <Section style={{ ...footer, textAlign: sides.start }}>
       <table role="presentation" width="100%" cellPadding={0} cellSpacing={0} border={0} style={ruleTable}>
         <tbody>
           <tr>
@@ -45,7 +47,6 @@ export function Footer({
 const footer: React.CSSProperties = {
   margin: "0 auto",
   maxWidth: `${theme.width.card}px`,
-  textAlign: "left",
 };
 
 const ruleTable: React.CSSProperties = {

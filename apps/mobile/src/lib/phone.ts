@@ -1,11 +1,14 @@
 import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import countries from 'i18n-iso-countries'
+import arabic from 'i18n-iso-countries/langs/ar.json'
 import german from 'i18n-iso-countries/langs/de.json'
 import english from 'i18n-iso-countries/langs/en.json'
 import spanish from 'i18n-iso-countries/langs/es.json'
 import french from 'i18n-iso-countries/langs/fr.json'
+import hebrew from 'i18n-iso-countries/langs/he.json'
 import portuguese from 'i18n-iso-countries/langs/pt.json'
 import turkish from 'i18n-iso-countries/langs/tr.json'
+import chinese from 'i18n-iso-countries/langs/zh.json'
 import { getLocales } from 'expo-localization'
 import { AsYouType, getCountries, getCountryCallingCode, getExampleNumber, parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js/min'
 import mobileExamples from 'libphonenumber-js/mobile/examples'
@@ -16,6 +19,9 @@ countries.registerLocale(spanish)
 countries.registerLocale(portuguese)
 countries.registerLocale(german)
 countries.registerLocale(turkish)
+countries.registerLocale(arabic)
+countries.registerLocale(chinese)
+countries.registerLocale(hebrew)
 
 export type PhoneCountry = { code: CountryCode; name: string; callingCode: string; flag: string }
 
@@ -32,6 +38,9 @@ const MISSING_NAMES: Record<Locale, Partial<Record<CountryCode, string>>> = {
     pt: { AC: 'Ilha de Ascensão', TA: 'Tristão da Cunha' },
     de: { AC: 'Ascension', TA: 'Tristan da Cunha' },
     tr: { AC: 'Ascension Adası', TA: 'Tristan da Cunha' },
+    ar: { AC: 'جزيرة أسنشين', TA: 'تريستان دا كونا' },
+    zh: { AC: '阿森松岛', TA: '特里斯坦-达库尼亚' },
+    he: { AC: 'האי אסנשן', TA: 'טריסטן דה קונה' },
 }
 
 // i18n-iso-countries only has European Portuguese: these are the names Brazil writes differently.

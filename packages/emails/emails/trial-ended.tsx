@@ -82,6 +82,7 @@ export default function TrialEnded({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.trialEnded"), value: trialEndedLabel },
             { label: t("common.meta.workspacePaused"), value: pausedLabel },

@@ -9,6 +9,9 @@ export const SUPPORTED_LOCALES = {
     pt: 'stable',
     de: 'stable',
     tr: 'stable',
+    ar: 'beta',
+    zh: 'beta',
+    he: 'beta',
 } as const satisfies Record<string, LocaleStatus>
 
 export type Locale = keyof typeof SUPPORTED_LOCALES
@@ -52,11 +55,17 @@ export function stableLocales(): Locale[] {
     return LOCALES.filter(locale => SUPPORTED_LOCALES[locale] === 'stable')
 }
 
-// "fr-CA" and "FR" both land on "fr": the packs are per language, never per region.
+// Older Android and Java systems still report Hebrew under its withdrawn code.
+const LEGACY_LANGUAGE_CODES: Record<string, Locale> = { iw: 'he' }
+
+// "fr-CA" and "FR" both land on "fr": the packs are per language, never per region. "zh-TW" lands on
+// "zh", the Simplified pack: there is no Traditional one.
 export function matchLocale(tag: string | null | undefined): Locale | null {
     if (!tag) return null
     const language = tag.trim().split(/[-_]/)[0]?.toLowerCase()
-    return isLocale(language) ? language : null
+    if (!language) return null
+    const current = LEGACY_LANGUAGE_CODES[language] ?? language
+    return isLocale(current) ? current : null
 }
 
 export function parseAcceptLanguage(header: string | null | undefined): Locale | null {
@@ -94,9 +103,10 @@ export function localeNativeName(locale: Locale): string {
 }
 
 // The language as the prompts of a model name it ("French"), whatever the language of the reader.
+// Chinese is named with its script, so a model answers in the Simplified characters of the pack.
 export function languageName(locale: string): string {
     try {
-        return new Intl.DisplayNames(['en'], { type: 'language' }).of(locale) ?? locale
+        return new Intl.DisplayNames(['en'], { type: 'language' }).of(locale === 'zh' ? 'zh-Hans' : locale) ?? locale
     } catch {
         return locale
     }

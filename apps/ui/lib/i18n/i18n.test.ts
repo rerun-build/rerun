@@ -1,6 +1,6 @@
 import { loadMessages } from '@rerun/i18n/messages'
-import { localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@rerun/i18n'
-import { formatBytes, formatDuration, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil } from '@rerun/i18n/format'
+import { languageName, localeDirection, localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@rerun/i18n'
+import { formatBytes, formatDuration, formatNumber, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil } from '@rerun/i18n/format'
 import { pseudoLocalize } from '@rerun/i18n/pseudo'
 import { mergeMessages } from '@rerun/i18n'
 import { describe, expect, it } from 'vitest'
@@ -29,6 +29,10 @@ describe('resolveLocale', () => {
         expect(matchLocale('pt-PT')).toBe('pt')
         expect(matchLocale('de-CH')).toBe('de')
         expect(matchLocale('tr-TR')).toBe('tr')
+        expect(matchLocale('ar-SA')).toBe('ar')
+        expect(matchLocale('zh-TW')).toBe('zh')
+        expect(matchLocale('zh-Hant-HK')).toBe('zh')
+        expect(matchLocale('iw-IL')).toBe('he')
         expect(parseAcceptLanguage('*, fr;q=0')).toBeNull()
     })
 
@@ -39,6 +43,20 @@ describe('resolveLocale', () => {
         expect(localeNativeName('de')).toBe('Deutsch')
         expect(localeNativeName('tr')).toBe('Türkçe')
         expect(localeNativeName('en')).toBe('English')
+        expect(localeNativeName('ar')).toBe('العربية')
+        expect(localeNativeName('zh')).toBe('中文')
+        expect(localeNativeName('he')).toBe('עברית')
+    })
+
+    it('reads Arabic and Hebrew right to left, and only them', () => {
+        expect(localeDirection('ar')).toBe('rtl')
+        expect(localeDirection('he')).toBe('rtl')
+        expect(['en', 'fr', 'es', 'pt', 'de', 'tr', 'zh', 'en-XA'].map(localeDirection)).toEqual(Array(8).fill('ltr'))
+    })
+
+    it('names Chinese with its script for a model', () => {
+        expect(languageName('zh')).toBe('Simplified Chinese')
+        expect(languageName('ar')).toBe('Arabic')
     })
 })
 
@@ -53,6 +71,15 @@ describe('format', () => {
         expect(longDate('2026-03-05T12:00:00Z', 'en')).toBe('Mar 5, 2026')
         expect(formatBytes(1536, 'en')).toBe('1.5 KB')
         expect(formatDuration(125 * MINUTE, 'en')).toBe('2h 5m')
+    })
+
+    it('writes Arabic with Latin digits', () => {
+        expect(formatNumber(1234, 'ar')).toMatch(/^1[,٬]234$/)
+        expect(formatNumber(29, 'ar', { style: 'currency', currency: 'USD' })).toMatch(/^\u2066.*29.*US\$\u2069$/)
+        expect(formatNumber(29, 'he', { style: 'currency', currency: 'USD' }).startsWith('\u2066')).toBe(true)
+        expect(formatNumber(29, 'fr', { style: 'currency', currency: 'USD' }).startsWith('\u2066')).toBe(false)
+        expect(plain(formatBytes(1536, 'ar'))).toMatch(/1[.,٫]5/)
+        expect(longDate('2026-03-05T12:00:00Z', 'ar')).toMatch(/2026/)
     })
 
     it('speaks French and Spanish', () => {

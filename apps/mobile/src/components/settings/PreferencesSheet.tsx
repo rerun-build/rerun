@@ -40,7 +40,7 @@ const LINK_TARGETS: { value: LinkTarget; label: 'linksBrowser' | 'linksRerun' }[
 ]
 
 // Each language in its own words, whatever the current one: Hermes has no Intl.DisplayNames.
-const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch', tr: 'Türkçe' }
+const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch', tr: 'Türkçe', ar: 'العربية', zh: '中文', he: 'עברית' }
 
 const AVATAR_SIZE = 44
 

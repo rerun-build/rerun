@@ -56,6 +56,7 @@ export default function SandboxIdle({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.lastOpened"), value: lastActiveLabel },
             ...(agentCount > 0

@@ -68,6 +68,7 @@ export default function ArchiveExpiring({
 
       <Section style={meta}>
         <MetaTable
+          locale={locale}
           rows={[
             { label: t("common.meta.workspace"), value: workspace },
             { label: sandbox ? t("common.meta.archivedSince") : t("common.meta.pausedSince"), value: pausedLabel },

@@ -19,8 +19,35 @@ function cardinal(locale: Locale, value: number): PluralCategory {
         if (absolute === 1) return 'one'
         return largeRound ? 'many' : 'other'
     }
+    if (locale === 'zh') return 'other'
+    if (locale === 'ar') {
+        if (!integer) return 'other'
+        const hundreds = absolute % 100
+        if (absolute === 0) return 'zero'
+        if (absolute === 1) return 'one'
+        if (absolute === 2) return 'two'
+        if (hundreds >= 3 && hundreds <= 10) return 'few'
+        if (hundreds >= 11) return 'many'
+        return 'other'
+    }
+    if (locale === 'he') {
+        if (absolute === 1 && integer) return 'one'
+        if (Math.floor(absolute) === 0 && !integer) return 'one'
+        return absolute === 2 && integer ? 'two' : 'other'
+    }
     return absolute === 1 && integer ? 'one' : 'other'
 }
+
+const CARDINAL_CATEGORIES: Partial<Record<Locale, PluralCategory[]>> = {
+    fr: ['one', 'many', 'other'],
+    pt: ['one', 'many', 'other'],
+    es: ['one', 'many', 'other'],
+    ar: ['zero', 'one', 'two', 'few', 'many', 'other'],
+    he: ['one', 'two', 'other'],
+    zh: ['other'],
+}
+
+const ORDINAL_CATEGORIES: Partial<Record<Locale, PluralCategory[]>> = { en: ['one', 'two', 'few', 'other'], fr: ['one', 'other'] }
 
 function ordinal(locale: Locale, value: number): PluralCategory {
     if (locale === 'fr') return value === 1 ? 'one' : 'other'
@@ -59,7 +86,8 @@ class PackPluralRules {
     }
 
     resolvedOptions() {
-        return { locale: this.locale, type: this.type, pluralCategories: ['one', 'many', 'other'] as PluralCategory[], minimumIntegerDigits: 1, minimumFractionDigits: 0, maximumFractionDigits: 3 }
+        const categories = this.type === 'ordinal' ? ORDINAL_CATEGORIES : CARDINAL_CATEGORIES
+        return { locale: this.locale, type: this.type, pluralCategories: categories[this.locale] ?? (['one', 'other'] as PluralCategory[]), minimumIntegerDigits: 1, minimumFractionDigits: 0, maximumFractionDigits: 3 }
     }
 }
 
