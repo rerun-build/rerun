@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry, type SpendDecision } from '@rerun/contracts'
+import { HITL_CANCELLED, type ApprovalDecision, type SentFeatureRequest, type QuestionAnswer, type ServiceSetupEntry, type SpendDecision } from '@rerun/contracts'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
@@ -176,6 +176,20 @@ export function McpReceipt({ name }: { name: string }) {
         <ReceiptCard title={t('mcpServer')}>
             <StatusRow text={name} approved label={t('connected')} />
         </ReceiptCard>
+    )
+}
+
+// The request the user sent to the Rerun team from the web: the app has no card for it, only this line.
+export function FeatureRequestReceipt({ request }: { request: SentFeatureRequest }) {
+    const t = useTranslations('mobileHitl.receipts')
+    const theme = useTheme()
+    return (
+        <View style={{ alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: spacing.xs, maxWidth: '86%' }}>
+            <Icon name="circle-check" size={11} bold color={theme.mutedForeground} />
+            <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 1 }}>
+                {t('featureSent', { title: request.title })}
+            </AppText>
+        </View>
     )
 }
 

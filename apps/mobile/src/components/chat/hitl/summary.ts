@@ -1,4 +1,4 @@
-import { pendingApprovals, pendingComputerAccess, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingSpend, pendingTakeover, type HitlKind } from '@rerun/contracts'
+import { pendingApprovals, pendingComputerAccess, pendingFeatureRequest, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingSpend, pendingTakeover, type HitlKind } from '@rerun/contracts'
 import type { useTranslations } from 'use-intl'
 
 import type { IconName } from '@/components/ui/Icon'
@@ -6,7 +6,7 @@ import type { IconName } from '@/components/ui/Icon'
 
 type HitlTranslator = ReturnType<typeof useTranslations<'mobileHitl'>>
 
-const SYMBOLS: Record<HitlKind, IconName> = { question: 'message-circle-question', approval: 'shield-check', secret: 'lock', mcp: 'link', service: 'link', takeover: 'monitor', spend: 'circle-dollar-sign', computer: 'shield-check' }
+const SYMBOLS: Record<HitlKind, IconName> = { question: 'message-circle-question', approval: 'shield-check', secret: 'lock', mcp: 'link', service: 'link', takeover: 'monitor', spend: 'circle-dollar-sign', computer: 'shield-check', feature: 'send' }
 
 // What is waiting at the end of the thread, the web's words (`pendingHitlLabel`) in the app's language.
 function pendingLabel(kind: HitlKind, input: Record<string, unknown>, t: HitlTranslator): string {
@@ -29,6 +29,8 @@ function pendingLabel(kind: HitlKind, input: Record<string, unknown>, t: HitlTra
             return t('pending.spend')
         case 'computer':
             return t('pending.computer', { computer: pendingComputerAccess(input).computer })
+        case 'feature':
+            return t('pending.feature')
     }
 }
 
@@ -60,6 +62,8 @@ export function firstAsk(kind: HitlKind, input: Record<string, unknown>): string
             const request = pendingComputerAccess(input)
             return request.commands[0] ? `#${request.computer}: ${request.commands[0]}` : textOf(request.reason)
         }
+        case 'feature':
+            return textOf(pendingFeatureRequest(input).title)
     }
 }
 

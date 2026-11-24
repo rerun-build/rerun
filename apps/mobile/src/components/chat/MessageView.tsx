@@ -18,7 +18,7 @@ import { SkillProposalRow } from './cards/SkillProposalRow'
 import { Sources, type Source } from './cards/Sources'
 import { FileCardView } from './cards/FileCardView'
 import { TableCardView } from './cards/TableCardView'
-import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, SpendReceipt, TakeoverReceipt } from './hitl/Receipts'
+import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, SpendReceipt, TakeoverReceipt, FeatureRequestReceipt } from './hitl/Receipts'
 import { attachmentsOf, userTextOf, voiceOf } from './message-text'
 import { InstallDivider, JobEndDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
 import { AssistantMessage, UserBubble } from './Messages'
@@ -123,6 +123,7 @@ function MessageViewBody({ message, isLastAssistant, running, settled = false, a
         if (reply?.kind === 'mcp') return <McpReceipt name={reply.name} />
         if (reply?.kind === 'takeover') return <TakeoverReceipt url={reply.url} />
         if (reply?.kind === 'spend') return <SpendReceipt decision={reply} />
+        if (reply?.kind === 'feature') return <FeatureRequestReceipt request={reply.request} />
         if (reply?.kind === 'cancelled') return <CancelledReceipt of={reply.of} />
         // The files of a message just sent are still on the phone; once read back, the ones it
         // carried are on the Box, behind the hub.

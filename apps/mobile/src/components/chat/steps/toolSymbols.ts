@@ -173,6 +173,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     request_takeover: 'monitor',
     request_spend: 'circle-dollar-sign',
     request_computer_access: 'shield-alert',
+    request_feature: 'send',
     remote_computers: 'monitor',
     remote_exec: 'terminal',
     remote_job: 'terminal',
