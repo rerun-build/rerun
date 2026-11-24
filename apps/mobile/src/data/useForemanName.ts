@@ -26,6 +26,11 @@ export function rememberForemanName(workspaceId: number, name: string | null, su
     listeners.forEach(listener => listener())
 }
 
+// A name given from the phone, shown everywhere at once before the next read confirms it.
+export function setForemanName(workspaceId: number, name: string | null) {
+    rememberForemanName(workspaceId, name, cachedForeman(workspaceId).read()?.surface ?? 'engine')
+}
+
 // What the workspace calls its Chief of Staff, null until someone gave it a name.
 export function useForemanName(): string | null {
     const { session, me } = useAuth()

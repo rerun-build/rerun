@@ -4,7 +4,8 @@
         "aiProvidersAdminOnly": "Yapay zeka sağlayıcılarını yalnızca bir yönetici değiştirebilir.",
         "noManagedBox": "Coworker eklemek için yönettiğiniz bir Box gerekir. Şu adreste oluşturun: {host}. Ya da bir yöneticiye sorun.",
         "boxesFailed": "Boxes listeniz yüklenemedi. Birazdan tekrar deneyin.",
-        "noBoxYet": "Bu çalışma alanında henüz Box yok. Şu adreste oluşturun: {host}."
+        "noBoxYet": "Bu çalışma alanında henüz Box yok. Şu adreste oluşturun: {host}.",
+        "foremanAdminOnly": "Chief of Staff'u yalnızca bir yönetici değiştirebilir."
     },
     "page": {
         "loadFailed": "Bu yüklenemedi. Birazdan tekrar deneyin."

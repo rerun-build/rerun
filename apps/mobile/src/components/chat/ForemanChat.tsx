@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
 import { fetchForemanEngineFiles, fetchForemanState } from '@/api/foreman'
+import { markInboxRead } from '@/api/inbox'
 import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
 import { takePendingAsk } from '@/chat/pending-ask'
@@ -24,6 +25,7 @@ import { spacing } from '@/theme/tokens'
 
 import { CHAT_HEADER_HEIGHT, ChatHeader, type ChatTab } from './ChatHeader'
 import { CONTROL } from './ComposerControls'
+import { stateOf } from './conversation-sections'
 import { activePageIndex, conversationPages, GENERAL_DRAFT_KEY, GENERAL_PAGE_ID, type ConversationPage } from './conversation-pages'
 import { ConversationPager } from './ConversationPager'
 import { BLUR_ABOVE_FOOTER, ConversationPane, type ChatCoworker } from './ConversationPane'
@@ -113,6 +115,18 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     useEffect(() => {
         latestToken.current = accessToken
     }, [accessToken])
+
+    // On screen is read, as on a coworker's page: only an Unread one, the inbox's read also sends a
+    // waiting conversation back to idle.
+    const readId = activeId === GENERAL_PAGE_ID ? generalId : activeId
+    const activeUnseen = !!readId && conversations.some(conversation => conversation.id === readId && stateOf(conversation) === 'new')
+    useEffect(() => {
+        const token = latestToken.current
+        if (!activeUnseen || !readId || !token || !workspaceId) return
+        markInboxRead({ accessToken: token, workspaceId }, [readId])
+            .then(loadConversations)
+            .catch(() => {})
+    }, [activeUnseen, readId, workspaceId, loadConversations])
 
     const open = (id: string) => {
         if (id !== GENERAL_PAGE_ID && id !== generalId) openChat(id)
@@ -274,7 +288,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                     }}
                 />
             )}
-            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={shownId ?? undefined} progress={progress} allSessions={surface === 'engine' ? allTabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
+            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={shownId ?? undefined} progress={progress} allSessions={surface === 'engine' ? allTabs : []} onBack={back} onSelect={select} onNewSession={startNew} onOpenDetails={surface === 'engine' ? () => router.push({ pathname: '/coworker/[id]', params: { id: FOREMAN_AGENT_ID, name: foreman.name } }) : undefined} />
         </View>
     )
 }

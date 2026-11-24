@@ -1,4 +1,4 @@
-import type { AgentView, Box, CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentView, type Box, type CoworkerFiles, type InstalledServiceView, type RoutineView } from '@rerun/contracts'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
@@ -7,12 +7,13 @@ import { useTranslations } from 'use-intl'
 import { fetchBoxes } from '@/api/board'
 import { fetchAgentView } from '@/api/chat'
 import { deleteCoworker, fetchCoworkerFiles, fetchInstalledServices, fetchRoutines, renameCoworker } from '@/api/coworker'
-import { knownCoworkerAccess, manageLock } from '@/auth/access'
-import { useAuth } from '@/auth/AuthProvider'
+import { FOREMAN_ADMIN_ONLY, knownCoworkerAccess, manageLock } from '@/auth/access'
+import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { CoworkerDetails } from '@/components/coworker/CoworkerDetails'
 import { ruleValue } from '@/components/notifications/NotificationCenter'
 import { promptText } from '@/components/ui/system-dialogs'
 import { cachedBoard, loadCoworkerDetail, readCoworkerDetails, type CoworkerDetailsRead } from '@/data/local-cache'
+import { foremanLabel, setForemanName, useForemanName } from '@/data/useForemanName'
 import { useNotificationPrefs } from '@/data/useNotificationPrefs'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
 
@@ -39,6 +40,10 @@ export default function CoworkerDetailsScreen() {
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
     const caller = accessToken && workspaceId ? { accessToken, workspaceId } : null
+    // The Chief of Staff sits in no Box and is named by the workspace: its card reads both from there.
+    const isForeman = agentId === FOREMAN_AGENT_ID
+    const foremanName = useForemanName()
+    const admin = useIsWorkspaceAdmin()
 
     useFocusEffect(
         useCallback(() => {
@@ -51,27 +56,30 @@ export default function CoworkerDetailsScreen() {
                     setUnavailable(current => ({ ...current, [key]: false }))
                 }, failed(key))
             const detail = <K extends keyof CoworkerDetailsRead>(part: K, fetch: () => Promise<NonNullable<CoworkerDetailsRead[K]>>) => loadCoworkerDetail(workspaceId, agentId, part, fetch)
-            detail('view', () => fetchAgentView(who, agentId))
-                .then(next => {
-                    setView(next)
-                    setName(next.agent.name)
-                })
-                .catch(() => {})
-            detail('boxes', () => fetchBoxes(who)).then(setBoxes, () => {})
+            if (!isForeman) {
+                detail('view', () => fetchAgentView(who, agentId))
+                    .then(next => {
+                        setView(next)
+                        setName(next.agent.name)
+                    })
+                    .catch(() => {})
+                detail('boxes', () => fetchBoxes(who)).then(setBoxes, () => {})
+            }
             read('files', detail('files', () => fetchCoworkerFiles(who, agentId)), setFiles)
             read('apps', detail('apps', () => fetchInstalledServices(who, agentId)), setApps)
             read('routines', detail('routines', () => fetchRoutines(who, agentId)), setRoutines)
-        }, [accessToken, workspaceId, agentId])
+        }, [accessToken, workspaceId, agentId, isForeman])
     )
 
     const agent = view?.agent
     const switchedOff = !!agent?.disabledAt
     const boxName = boxes.find(box => box.id === agent?.spaceId)?.name ?? null
     // The level comes with the coworker's copy: until one is read, the board the chat came from answers.
-    const lock = manageLock(agent ? { access: agent.access, known: true } : knownCoworkerAccess(agentId, { agents: workspaceId ? cachedBoard(workspaceId).read()?.agents : null }))
+    const lock = isForeman ? { locked: !admin, reason: admin ? null : FOREMAN_ADMIN_ONLY } : manageLock(agent ? { access: agent.access, known: true } : knownCoworkerAccess(agentId, { agents: workspaceId ? cachedBoard(workspaceId).read()?.agents : null }))
+    const shownName = isForeman ? foremanLabel(foremanName) : name
 
     const openScreen = () => {
-        setPendingDesktopOpen({ agentId, name })
+        setPendingDesktopOpen({ agentId, name: shownName })
         router.push({ pathname: '/desktop', params: { agent: agentId } })
     }
 
@@ -79,12 +87,21 @@ export default function CoworkerDetailsScreen() {
         if (!caller || lock.locked) return
         promptText({
             title: t('renameTitle'),
-            defaultValue: name,
+            defaultValue: shownName,
             cancelLabel: tCommon('actions.cancel'),
             submitLabel: t('save'),
             onSubmit: value => {
                 const next = value.trim()
-                if (!next || next === name) return
+                if (!next || next === shownName) return
+                if (isForeman) {
+                    const previous = foremanName
+                    setForemanName(caller.workspaceId, next)
+                    renameCoworker(caller, agentId, next).catch(err => {
+                        setForemanName(caller.workspaceId, previous)
+                        Alert.alert(t('renameFailed'), errorText(err))
+                    })
+                    return
+                }
                 const previous = name
                 setName(next)
                 renameCoworker(caller, agentId, next).catch(err => {
@@ -110,18 +127,18 @@ export default function CoworkerDetailsScreen() {
         ])
     }
 
-    const page = (screen: 'files' | 'apps' | 'routines' | 'notifications') => router.push({ pathname: `/coworker/[id]/${screen}`, params: { id: agentId, name } })
+    const page = (screen: 'files' | 'apps' | 'routines' | 'notifications') => router.push({ pathname: `/coworker/[id]/${screen}`, params: { id: agentId, name: shownName } })
 
     return (
         <CoworkerDetails
-            coworker={{ id: agentId, name, status: switchedOff ? 'offline' : (agent?.status ?? 'idle'), boxName }}
+            coworker={{ id: agentId, kind: isForeman ? 'foreman' : 'coworker', name: shownName, status: switchedOff ? 'offline' : (agent?.status ?? 'idle'), boxName }}
             files={files}
             apps={apps}
             routines={routines}
             notifications={rule ? ruleValue(rule) : null}
             unavailable={unavailable}
             computerUnavailable={switchedOff ? t('off') : null}
-            canDelete={!!caller}
+            canDelete={!!caller && !isForeman}
             lock={lock}
             onBack={() => router.back()}
             onEdit={rename}

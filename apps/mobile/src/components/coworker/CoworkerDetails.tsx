@@ -5,6 +5,7 @@ import { useTranslations } from 'use-intl'
 
 import type { ManageLock } from '@/auth/access'
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
+import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { moodOf } from '@/components/ui/CoworkerAvatar'
@@ -19,7 +20,7 @@ import { webHost } from '@/config/environment'
 
 const BUDDY_SIZE = 96
 
-export type CoworkerSummary = { id: string; name: string; status: CoworkerStatus; boxName: string | null }
+export type CoworkerSummary = { id: string; kind?: 'coworker' | 'foreman'; name: string; status: CoworkerStatus; boxName: string | null }
 
 type CoworkerDetailsProps = {
     coworker: CoworkerSummary
@@ -79,13 +80,16 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: topBar.left - pane.left, marginRight: topBar.right - pane.right }}>
                 <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} />
-                <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
-                    <MenuItem label={t('delete')} icon="trash" destructive onPress={onDelete} disabled={!canDelete || lock.locked} />
-                </NativeMenu>
+                {/* The Chief of Staff comes with the workspace: there is nothing to delete. */}
+                {coworker.kind !== 'foreman' && (
+                    <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
+                        <MenuItem label={t('delete')} icon="trash" destructive onPress={onDelete} disabled={!canDelete || lock.locked} />
+                    </NativeMenu>
+                )}
             </View>
 
             <View style={{ alignItems: 'center', gap: spacing.sm }}>
-                <AgentBuddy agentId={coworker.id} size={BUDDY_SIZE} mood={moodOf(coworker.status)} />
+                {coworker.kind === 'foreman' ? <ForemanOrb size={BUDDY_SIZE} state={coworker.status === 'working' ? 'thinking' : 'idle'} /> : <AgentBuddy agentId={coworker.id} size={BUDDY_SIZE} mood={moodOf(coworker.status)} />}
                 <View style={{ alignItems: 'center', gap: 2, alignSelf: 'stretch' }}>
                     <AppText variant="title" numberOfLines={2} style={{ textAlign: 'center' }}>
                         {coworker.name}

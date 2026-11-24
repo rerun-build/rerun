@@ -4,7 +4,8 @@
         "aiProvidersAdminOnly": "Só um admin pode alterar os provedores de IA.",
         "noManagedBox": "Você precisa de uma Box que você gerencia para adicionar um coworker. Crie uma em {host} ou peça a um admin.",
         "boxesFailed": "Não conseguimos carregar suas Boxes. Tente novamente em instantes.",
-        "noBoxYet": "Este workspace ainda não tem Box. Crie uma em {host}."
+        "noBoxYet": "Este workspace ainda não tem Box. Crie uma em {host}.",
+        "foremanAdminOnly": "Só um admin pode alterar o Chief of Staff."
     },
     "page": {
         "loadFailed": "Não foi possível carregar. Tente novamente em instantes."

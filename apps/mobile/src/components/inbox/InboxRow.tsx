@@ -1,4 +1,5 @@
 import type { CoworkerRule, InboxItem } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useRef } from 'react'
 import { Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
@@ -80,7 +81,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
             >
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg, paddingVertical: spacing.md, paddingHorizontal: spacing.xl }}>
                     <View style={{ paddingTop: 2 }}>
-                        <CoworkerAvatar coworker={{ id: item.agentId, kind: 'coworker', status: moodOfInbox(item.status) }} size={AVATAR} facing="right" animated={false} />
+                        <CoworkerAvatar coworker={{ id: item.agentId, kind: item.agentId === FOREMAN_AGENT_ID ? 'foreman' : 'coworker', status: moodOfInbox(item.status) }} size={AVATAR} facing="right" animated={false} />
                     </View>
                     <View style={{ flex: 1, gap: 2 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>

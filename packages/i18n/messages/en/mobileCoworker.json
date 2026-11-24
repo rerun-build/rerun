@@ -4,7 +4,8 @@
         "aiProvidersAdminOnly": "Only an admin can change the AI providers.",
         "noManagedBox": "You need a Box you manage to add a coworker. Create one at {host}, or ask an admin.",
         "boxesFailed": "We could not load your Boxes. Try again in a moment.",
-        "noBoxYet": "This workspace has no Box yet. Create one at {host}."
+        "noBoxYet": "This workspace has no Box yet. Create one at {host}.",
+        "foremanAdminOnly": "Only an admin can change the Chief of Staff."
     },
     "page": {
         "loadFailed": "Could not load this. Try again in a moment."

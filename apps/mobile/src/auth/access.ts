@@ -5,11 +5,12 @@ import { FOREMAN_AGENT_ID, type BoardAgent, type Box, type BoxAccessLevel, type 
 
 // Why a control is closed, as a key of `mobileCoworker.access`: the screen that shows it says it in
 // the reader's language.
-export type AccessReason = 'boxManage' | 'aiProvidersAdminOnly' | 'noManagedBox' | 'boxesFailed' | 'noBoxYet'
+export type AccessReason = 'boxManage' | 'aiProvidersAdminOnly' | 'foremanAdminOnly' | 'noManagedBox' | 'boxesFailed' | 'noBoxYet'
 
 export const BOX_MANAGE_REASON: AccessReason = 'boxManage'
 export const AI_PROVIDERS_ADMIN_ONLY: AccessReason = 'aiProvidersAdminOnly'
 export const NO_MANAGED_BOX: AccessReason = 'noManagedBox'
+export const FOREMAN_ADMIN_ONLY: AccessReason = 'foremanAdminOnly'
 
 // A hub older than roles sends none, and a copy of the account cached before them has none: both
 // meant every member ran the workspace.
