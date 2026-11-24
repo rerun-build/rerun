@@ -77,7 +77,11 @@
         "targetHint": "Una dirección https, o el comando que lanza la máquina.",
         "header": "Cabecera",
         "headerValue": "Valor",
-        "add": "Añadir servidor"
+        "variable": "Variable",
+        "add": "Añadir servidor",
+        "addServers": "Añadir {count} servidores",
+        "incomplete": "Dale a cada servidor un nombre y una dirección o un comando",
+        "partlyAdded": "{count, plural, one {# servidor añadido, el siguiente falló: {reason}} other {# servidores añadidos, el siguiente falló: {reason}}}"
     },
     "paid": {
         "badge": "De pago",

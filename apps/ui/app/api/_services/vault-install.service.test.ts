@@ -216,6 +216,21 @@ describe('addVaultMcp', () => {
         expect(local.mcpServers).toEqual([{ name: 'local-files', command: 'npx', args: ['-y', 'files-mcp'], headers: {} }])
     })
 
+    it("keeps a command's environment secrets in the entry's variables too", async () => {
+        await addVaultMcp({ name: 'github', command: 'npx', args: ['-y', '@modelcontextprotocol/server-github'], env: [{ name: 'GITHUB_PERSONAL_ACCESS_TOKEN', value: 'ghp_secret' }] })
+        const input = vi.mocked(createVaultItem).mock.calls[0][1]
+        expect(input.env).toEqual({ VAULT_GITHUB_GITHUB_PERSONAL_ACCESS_TOKEN: 'ghp_secret' })
+        expect(input.mcpServers).toEqual([
+            { name: 'github', command: 'npx', args: ['-y', '@modelcontextprotocol/server-github'], headers: {}, env: { GITHUB_PERSONAL_ACCESS_TOKEN: '${VAULT_GITHUB_GITHUB_PERSONAL_ACCESS_TOKEN}' } },
+        ])
+        expect(JSON.stringify(input.mcpServers)).not.toContain('ghp_secret')
+    })
+
+    it('keeps a transport the pasted config declared', async () => {
+        await addVaultMcp({ name: 'sentry', url: 'https://mcp.sentry.dev/events', transport: 'sse' })
+        expect(vi.mocked(createVaultItem).mock.calls[0][1].mcpServers).toEqual([{ name: 'sentry', url: 'https://mcp.sentry.dev/events', transport: 'sse', headers: {} }])
+    })
+
     it('needs exactly one of an address and a command', async () => {
         await expect(addVaultMcp({ name: 'x' })).rejects.toMatchObject({ code: 'vaultMcpTarget' })
         await expect(addVaultMcp({ name: 'x', url: 'https://a.test', command: 'npx' })).rejects.toMatchObject({ code: 'vaultMcpTarget' })

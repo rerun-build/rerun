@@ -77,7 +77,11 @@
         "targetHint": "Bir https adresi veya makinenin başlattığı komut.",
         "header": "Başlık",
         "headerValue": "Değer",
-        "add": "Sunucu ekle"
+        "variable": "Değişken",
+        "add": "Sunucu ekle",
+        "addServers": "{count} sunucu ekle",
+        "incomplete": "Her sunucuya bir ad ve bir adres ya da komut verin",
+        "partlyAdded": "{count, plural, one {# sunucu eklendi, sonraki başarısız oldu: {reason}} other {# sunucu eklendi, sonraki başarısız oldu: {reason}}}"
     },
     "paid": {
         "badge": "Ücretli",

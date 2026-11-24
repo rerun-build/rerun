@@ -88,7 +88,11 @@
         "targetHint": "An https address, or the command the machine starts.",
         "header": "Header",
         "headerValue": "Value",
-        "add": "Add server"
+        "variable": "Variable",
+        "add": "Add server",
+        "addServers": "Add {count} servers",
+        "incomplete": "Give each server a name and an address or a command",
+        "partlyAdded": "{count, plural, one {# server added, the next one failed: {reason}} other {# servers added, the next one failed: {reason}}}"
     },
     "paid": {
         "badge": "Paid",

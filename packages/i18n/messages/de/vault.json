@@ -77,7 +77,11 @@
         "targetHint": "Eine https-Adresse oder der Befehl, den die Maschine startet.",
         "header": "Header",
         "headerValue": "Wert",
-        "add": "Server hinzufügen"
+        "variable": "Variable",
+        "add": "Server hinzufügen",
+        "addServers": "{count} Server hinzufügen",
+        "incomplete": "Gib jedem Server einen Namen und eine Adresse oder einen Befehl",
+        "partlyAdded": "{count, plural, one {# Server hinzugefügt, der nächste ist fehlgeschlagen: {reason}} other {# Server hinzugefügt, der nächste ist fehlgeschlagen: {reason}}}"
     },
     "paid": {
         "badge": "Kostenpflichtig",

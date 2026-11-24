@@ -32,9 +32,9 @@ const SEARCH_DELAY_MS = 250
 // picked next, on the entry itself.
 // The empty Vault opens it on an app already picked, or on the MCP or secret form.
 // A paid app's sign-in, slots and billing stay in its own window: `onPaidApp` opens it.
-type Props = { listing: VaultListing; initialApp?: VaultCatalogApp; initialKind?: VaultAddKind; onBack: () => void; onAdded: (itemId: string) => Promise<void>; onPaidApp: (slug: AppSlug) => void }
+type Props = { listing: VaultListing; initialApp?: VaultCatalogApp; initialKind?: VaultAddKind; onBack: () => void; onAdded: (itemId: string) => Promise<void>; onChanged: () => Promise<void>; onPaidApp: (slug: AppSlug) => void }
 
-export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, onAdded, onPaidApp }: Props) {
+export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, onAdded, onChanged, onPaidApp }: Props) {
     const t = useTranslations('vault')
     const [picked, setPicked] = useState<VaultCatalogApp | null>(initialApp ?? null)
     const [kind, setKind] = useState<VaultAddKind>(initialKind)
@@ -61,7 +61,7 @@ export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, 
                     {kind === 'app' ? (
                         <VaultCatalog onPick={app => (app.paidApp ? onPaidApp(app.paidApp) : setPicked(app))} />
                     ) : (
-                        <PanelScroller className="p-4">{kind === 'mcp' ? <VaultAddMcp onAdded={onAdded} /> : <VaultAddSecret onAdded={onAdded} />}</PanelScroller>
+                        <PanelScroller className="p-4">{kind === 'mcp' ? <VaultAddMcp onAdded={onAdded} onChanged={onChanged} /> : <VaultAddSecret onAdded={onAdded} />}</PanelScroller>
                     )}
                 </div>
             )}

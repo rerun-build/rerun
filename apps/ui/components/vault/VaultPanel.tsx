@@ -103,6 +103,7 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
                             initialApp={page.app}
                             initialKind={page.addKind}
                             onBack={back}
+                            onChanged={onChanged}
                             onPaidApp={slug => {
                                 setAwaitingPaid({ slug, known: paid.map(account => account.connectionId) })
                                 back()

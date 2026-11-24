@@ -77,7 +77,11 @@
         "targetHint": "Um endereço https, ou o comando que a máquina executa.",
         "header": "Cabeçalho",
         "headerValue": "Valor",
-        "add": "Adicionar servidor"
+        "variable": "Variável",
+        "add": "Adicionar servidor",
+        "addServers": "Adicionar {count} servidores",
+        "incomplete": "Dê a cada servidor um nome e um endereço ou um comando",
+        "partlyAdded": "{count, plural, one {# servidor adicionado, o próximo falhou: {reason}} other {# servidores adicionados, o próximo falhou: {reason}}}"
     },
     "paid": {
         "badge": "Pago",
