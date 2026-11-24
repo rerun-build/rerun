@@ -166,6 +166,20 @@ and `apps/mobile/api-contract` holds what each shipped build reads. Follow the `
 - A build is retired only once nobody runs it (`app_build_days`): raise `MOBILE_IOS_MIN_BUILD` or
   `MOBILE_ANDROID_MIN_BUILD` first, then delete its snapshot and the adaptations no build left needs.
 
+# A Box is not a machine
+
+One workspace = one engine = one machine (a VPS on Rerun Cloud). A Box (`spaces`, `space` in the code and
+the API) is only a logical and visual grouping of coworkers: a rectangle on the board, who may reach its
+coworkers, where the Brain files what they add. It has no process, disk, key or data of its own.
+
+- The engine is resolved from the workspace (`findWorkspaceEngine`), never from a `space_id`. Health,
+  updates, backups, archives, capacity and billing are per workspace.
+- A Box isolates no data: every coworker of the workspace shares the machine, the shared folder and the
+  shared database. Never propose a Box as an isolation boundary.
+- In new code and copy, say "Box" for the group and "engine" or "machine" for what runs it. Older names
+  keep the former meaning (`box_index`, `engine_box_metrics`, `boxes_archived_at`, `boxDefaultModel`,
+  `box-0NN`): there, a lowercase box is the machine of one workspace.
+
 # Engine data-dir migrations
 
 An engine data-dir can be archived and restored weeks later onto a newer engine. Anything that changes what the engine keeps on disk (a file, a folder, a SQLite schema) is a new numbered step at the end of its ladder: `DATA_DIR_MIGRATIONS` in `apps/engine/src/datadir/migrations.ts`, `SYSTEM_DB_MIGRATIONS`, `SHARED_DB_MIGRATIONS` or `BRAIN_DB_MIGRATIONS` (`apps/engine/src/db/`).
