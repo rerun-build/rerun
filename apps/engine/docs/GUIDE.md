@@ -325,6 +325,8 @@ Tools are built per run and gated by `config.tools` (`src/tools/registry.ts`, th
 | `suggestService` | `suggest_service` | Suggests catalog apps to set up and pauses the run |
 | `requestSecret` | `request_secret` | Asks for a key through a masked form that stores it as an agent variable |
 
+`request_feature` sits outside the families too: it is there only on a turn whose chat request carries `teamRequests: true` (an app with a team at the other end, Rerun Cloud), for a person in the chat. It shows a card with a draft feature request, improvement or bug report for the Rerun team, which the person sends, edits or skips, and pauses the run like the other cards.
+
 `install_complete` sits outside the families because it answers to a state rather than a setting: it only exists while the agent still has a guided setup to run (`config.setup.required` true, `completedAt` null, `INSTALL.md` present). Calling it also switches on the schedules and triggers the agent carries, because a captured template usually arrives with its crons off and this is the moment its folder is finally configured (see `POST /agents/:id/automations/activate` in API.md).
 
 ### MCP

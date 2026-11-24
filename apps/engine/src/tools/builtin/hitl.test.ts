@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import type { ModelMessage } from 'ai'
-import { HITL_ACK, HITL_ACK_CALL_FIRST, approvalSummary, askUserTool, findPendingHitl, hitlAck, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, takeoverSummary } from './hitl.js'
+import { HITL_ACK, HITL_ACK_CALL_FIRST, approvalSummary, askUserTool, findPendingHitl, hitlAck, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestFeatureTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, takeoverSummary } from './hitl.js'
 
 function askUserCall(toolCallId: string, toolName = 'ask_user'): ModelMessage {
     return { role: 'assistant', content: [{ type: 'tool-call', toolCallId, toolName, input: { questions: [{ question: 'Which domain?' }] } }] } as unknown as ModelMessage
@@ -453,5 +453,28 @@ describe('request_takeover', () => {
     it('summarises the request for the notification', () => {
         expect(takeoverSummary({ reason: 'Sign in to LinkedIn' })).toBe('Needs you in the browser: Sign in to LinkedIn')
         expect(takeoverSummary(undefined)).toBe('The coworker needs you in the browser')
+    })
+})
+
+describe('request_feature', () => {
+    const schema = (): z.ZodTypeAny => (requestFeatureTool({ turnOrder: 'message-first' }).request_feature as any).inputSchema
+
+    it('takes a typed draft, its workaround optional even when sent as null', () => {
+        expect(schema().safeParse({ kind: 'bug', title: 'Export CSV does nothing', description: 'Clicking Export CSV on Leads downloads nothing.', workaround: null }).success).toBe(true)
+        expect(schema().safeParse({ kind: 'feature', title: 'Videos in the chat', description: 'Generate a short video from a prompt.', workaround: 'Connect HeyGen in Apps.' }).success).toBe(true)
+        expect(schema().safeParse({ kind: 'question', title: 'Videos', description: 'Generate them.' }).success).toBe(false)
+        expect(schema().safeParse({ kind: 'feature', title: '', description: 'Generate them.' }).success).toBe(false)
+    })
+
+    it('ends the turn like the other human-in-the-loop tools, under its bridged names too', () => {
+        expect(isHitlToolName('request_feature')).toBe(true)
+        expect(lastStepHasHitlCall([{ toolCalls: [{ toolName: 'mcp__rerun__request_feature' }] }])).toBe(true)
+    })
+
+    it('tells the model to check first, never to offer it twice, and that nothing leaves before the click', () => {
+        const description = (requestFeatureTool({ turnOrder: 'message-first' }).request_feature as any).description as string
+        expect(description).toContain('rerun_hub_search_docs')
+        expect(description).toContain('nothing leaves before they click')
+        expect(description).toContain('do not offer the same request again')
     })
 })

@@ -24,7 +24,7 @@ import { foremanHubTools, hubTools } from './builtin/hub.js'
 import { paidDataTools } from './builtin/paid-data.js'
 import { paidDataOffered } from '../paid-data/price.js'
 import { cardTools } from './builtin/cards.js'
-import { askUserTool, offersTakeover, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
+import { askUserTool, offersTakeover, requestApprovalTool, requestFeatureTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { installTools } from './builtin/install.js'
 import { foremanTools } from './builtin/foreman.js'
 import { reportToMemberTool } from './builtin/checkin.js'
@@ -146,6 +146,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
     if (cfg.requestSecret) Object.assign(tools, requestSecretTool(ctx))
+    if (ctx.teamRequests) Object.assign(tools, requestFeatureTool(ctx))
     // Only exists while there is an installation to close, so no other agent carries a tool it
     // could never legitimately call.
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))

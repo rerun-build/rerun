@@ -789,7 +789,8 @@ the assistant and tool messages, and runs the curator when `selfImprovement.enab
   "author": { "id": "user-uuid", "name": "Ana", "timezone": "Europe/Paris" },
   "callableAgentIds": ["abc...", "def..."],
   "install": false,
-  "userLanguage": "fr"
+  "userLanguage": "fr",
+  "teamRequests": true
 }
 ```
 
@@ -813,6 +814,10 @@ Only `message` is required.
   every coworker can be called.
 - `install: true` on a new conversation starts the agent's guided setup there, and `userLanguage`
   tells it the language the user reads the app in.
+- `teamRequests: true` says the app has a team at the other end (Rerun Cloud): for this turn the agent
+  gets `request_feature`, the card that drafts a feature request, an improvement or a bug report for
+  that team, which the person sends, edits or skips. Absent (a self-hosted app), the tool and its
+  prompt section are not there, nor for a coworker another one called.
 - `foreman` is read only on `/agents/foreman/chat`: the instructions and the tools the app hands the
   Chief of Staff for this turn.
 
@@ -1652,7 +1657,7 @@ An agent can notify its user out-of-band by calling the `notify_user` tool (the 
 conversation as needing an acknowledgement, and it stays flagged after the run completes until the
 user marks it as read or sends the next message. The human-in-the-loop tools send `question`
 (`ask_user`), `connector` (`suggest_service`, `request_secret`, `request_mcp_sign_in`) or `approval`
-(`request_approval`, `request_takeover`, `request_spend`, and a skill proposal), with the tool's
+(`request_approval`, `request_takeover`, `request_spend`, `request_computer_access`, `request_feature`, and a skill proposal), with the tool's
 `toolCallId`, `toolName` and `input` in `metadata`. When the tool is called with nothing configured,
 it tells the agent the notification was not delivered.
 

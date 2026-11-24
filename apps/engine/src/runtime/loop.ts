@@ -43,7 +43,7 @@ import { mcpWireMiddleware } from '../tools/mcp-wire.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
-import { runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
+import { offersTeamRequests, runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
 import { stoppedTurn } from './stopped-turn.js'
 import { streamedTurn } from './streamed-turn.js'
@@ -168,6 +168,7 @@ function hitlMessage(toolName: string, input: Record<string, unknown> | undefine
     if (toolName === 'request_takeover') return takeoverSummary(input)
     if (toolName === 'request_spend') return typeof input?.purpose === 'string' && input.purpose.trim() ? input.purpose : 'Approve a paid data spend'
     if (toolName === 'request_computer_access') return computerAccessSummary(input)
+    if (toolName === 'request_feature') return typeof input?.title === 'string' && input.title.trim() ? `Send to the Rerun team: ${input.title.trim()}` : 'Send a request to the Rerun team'
     return approvalSummary(input)
 }
 
@@ -544,7 +545,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
         const effort = runEffort(baseAgent, runOverride, provider, model)
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, teamRequests: offersTeamRequests(trigger) }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null

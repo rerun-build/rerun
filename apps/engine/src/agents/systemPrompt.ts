@@ -20,7 +20,7 @@ import { runOffersComputer } from '../tools/builtin/computer.js'
 import { CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
 import { SKILL_STYLE } from '../skills/style.js'
-import type { RunTrigger } from '../runtime/context.js'
+import { offersTeamRequests, type RunTrigger } from '../runtime/context.js'
 
 function environmentNote(agentId: string, sharedDb: boolean): string {
     const sharedDbSentence = sharedDb ? ` The shared database of this space is at ${sharedDbPath()}, reachable from a script through the RERUN_SHARED_DB environment variable.` : ''
@@ -75,6 +75,9 @@ const QUICK_REPLIES_NOTE =
 
 const rerunDocsNote = (web: boolean) =>
     `A question about Rerun itself (how something works, what it costs, what a plan or the API allows, where something is in the app) is answered out of the documentation: call rerun_hub_search_docs and give the user the link of the passage you used. Never answer one of those from memory, and never invent a feature, a limit or a price. When you are stuck on Rerun's side, a Rerun tool failing in a way you do not understand or a step in the app the user cannot find or cannot get through, look it up with rerun_hub_search_docs before answering or retrying blindly.${web ? ' When a passage is cut short, read the whole page with web_fetch on its docs.rerun.build link.' : ''}`
+
+const TEAM_REQUESTS_NOTE =
+    'When the user asks for something Rerun cannot do yet, or runs into a bug of Rerun itself, do not stop at "not possible". Check the Rerun documentation and the app catalog first. Once the gap stands (no built-in way, no app, no setting does it), call request_feature in that same turn, whatever else you still need from the user: your message says what is possible today and asks in plain words for what a workaround would need, and the request is the one card of that turn. When the user asked for Rerun to do it itself (built in, right in the chat) and only an app of the catalog gets close, that app is the workaround the card names, and the request still goes. A Rerun screen, button or tool that misbehaves and that the documentation does not explain is reported the same way, as a bug, in the turn the user tells you about it, even when you cannot reproduce it yourself: the quick checks worth trying go in your message beside the card, never instead of it. Never for a plain question, and never twice for the same request in a conversation.'
 
 const FAILURE_NOTE =
     'When an action you were asked to perform fails or cannot be done, your final message opens with that, in plain words: what failed, why, and what has to happen next, with the exact steps when the user must do it themselves. Saying what you are about to do is fine, but never write that something is done before the tool call that does it has returned: call the tool, then report what actually happened. If a sentence you already wrote announced an action that then failed, correct it explicitly in your final message. A failure you already knew about from memory or from an earlier conversation is still news to the reader: state it again. When only part of the work could be done, the final message says plainly what is delivered, what is partial and what is blocked, and for each blocked part the one thing that would unblock it: a precise access, a file, or another try later. Before you say you have no access to something (the code of a site, a document, a dataset), look for the public copy: the links on the site itself (a GitHub repository, docs, an export) and a public repository you can clone. Ask only for the access that is still missing once you have done all you can without it, and never change a live site or a repository before the user says yes. A tool error you worked around and that changes nothing for the result needs no mention.'
@@ -259,7 +262,7 @@ function turnOrderNote(order: TurnOrder, { cards, skillPropose }: TurnClosers): 
     return `A turn ends in this order, your message first: ${numbered([message, ...calls])}. When the turn ends on one of these calls, make it in the same reply as your message, right after it: a reply that stops at the message never sends the card you meant to send. Nothing comes after the last of them: your message has already reached the user, and writing it again shows it twice.`
 }
 
-function turnClosers(agent: LoadedAgent, takeover: boolean, computersLinked: boolean): TurnClosers {
+function turnClosers(agent: LoadedAgent, takeover: boolean, computersLinked: boolean, teamRequests: boolean): TurnClosers {
     const { tools, selfImprovement, paidDataAlwaysAllow } = agent.config
     const offered: Record<HitlToolName, boolean> = {
         ask_user: tools.askUser,
@@ -270,6 +273,7 @@ function turnClosers(agent: LoadedAgent, takeover: boolean, computersLinked: boo
         request_takeover: takeover,
         request_spend: tools.paidData && tools.requestApproval && !paidDataAlwaysAllow,
         request_computer_access: computersLinked,
+        request_feature: teamRequests,
     }
     return {
         cards: HITL_TOOL_NAMES.filter(name => offered[name]),
@@ -382,7 +386,8 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
         section('asking_the_user', `${askingNote(cfg, computer)} ${showBeforeAskingNote(cfg.cards)}`),
         offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
-        turnOrderSection(order, turnClosers(agent, takeover, foremanComputers !== null)),
+        offersTeamRequests(trigger) ? section('rerun_team_requests', TEAM_REQUESTS_NOTE) : '',
+        turnOrderSection(order, turnClosers(agent, takeover, foremanComputers !== null, offersTeamRequests(trigger))),
         section('verbosity', verbosityNote(agent.config.verbosity, learns)),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),
         unattendedSection(trigger, cfg),
@@ -443,8 +448,9 @@ export async function buildSystemPrompt(
         conversational && trigger.source === 'chat' ? section('keeping_the_user_posted', KEEPING_THE_USER_POSTED_NOTE) : '',
         cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
         asks ? section('asking_the_user', askingNote(cfg, computer)) : '',
+        conversational && offersTeamRequests(trigger) ? section('rerun_team_requests', TEAM_REQUESTS_NOTE) : '',
         offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
-        conversational ? turnOrderSection(order, turnClosers(agent, takeover, computers !== null)) : '',
+        conversational ? turnOrderSection(order, turnClosers(agent, takeover, computers !== null, conversational && offersTeamRequests(trigger))) : '',
         conversational ? section('language', languageNote(agent.config.language)) : '',
         section('verbosity', verbosityNote(agent.config.verbosity, agent.config.selfImprovement.enabled)),
         conversational ? section('shared_conversation', SHARED_CONVERSATION_NOTE) : section('sub_agent_rules', SUB_AGENT_RULES),

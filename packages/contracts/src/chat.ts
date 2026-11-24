@@ -54,6 +54,10 @@ export const chatRequestSchema = z.object({
     // The language the user reads the app in, sent with an install: its guide is the publisher's
     // words, so the coworker has nothing the user wrote to tell it from.
     userLanguage: z.string().optional(),
+    // Set by a hub with a team at the other end (Rerun Cloud): only then may the coworker draft a
+    // feature request or a bug report for it. An engine that predates it drops it; a hub that predates
+    // it never offers the card.
+    teamRequests: z.boolean().optional(),
 })
 
 export const contextOccupancySchema = z.object({

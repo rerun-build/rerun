@@ -59,7 +59,7 @@ function agentFor(provider: Provider, config: (typeof CONFIGS)[keyof typeof CONF
 }
 
 async function promptFor(provider: Provider, config: keyof typeof CONFIGS, model = 'm') {
-    return systemPromptText(await buildSystemPrompt(agentFor(provider, CONFIGS[config], model), { source: 'chat' }, provider))
+    return systemPromptText(await buildSystemPrompt(agentFor(provider, CONFIGS[config], model), { source: 'chat', teamRequests: config === 'full' }, provider))
 }
 
 const sectionOf = (prompt: string, tag: string) => prompt.match(new RegExp(`<${tag}>\\n([\\s\\S]*?)\\n</${tag}>`))?.[1] ?? null
@@ -145,6 +145,18 @@ describe('the cards that close a turn', () => {
         expect(note).toContain('ask_user')
         expect(note).not.toContain('request_approval')
         expect(note).not.toContain('suggest_replies')
+        expect(note).not.toContain('request_feature')
+    })
+
+    it('offer a request to the Rerun team only when the hub has a team behind it', async () => {
+        const agent = agentFor('rerun', CONFIGS.full)
+        const withTeam = systemPromptText(await buildSystemPrompt(agent, { source: 'chat', teamRequests: true }, 'rerun'))
+        const selfHosted = systemPromptText(await buildSystemPrompt(agent, { source: 'chat' }, 'rerun'))
+        const calledByAnother = systemPromptText(await buildSystemPrompt(agent, { source: 'chat', teamRequests: true, calledBy: 'other-agent' }, 'rerun'))
+        expect(sectionOf(withTeam, 'rerun_team_requests')).toContain('request_feature')
+        expect(sectionOf(selfHosted, 'rerun_team_requests')).toBeNull()
+        expect(sectionOf(selfHosted, 'turn_order')).not.toContain('request_feature')
+        expect(sectionOf(calledByAnother, 'rerun_team_requests')).toBeNull()
     })
 })
 

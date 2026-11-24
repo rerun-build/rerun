@@ -6,7 +6,7 @@ import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
 import { publicHttpUrl } from '../url.js'
 
-export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'request_computer_access'] as const
+export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'request_computer_access', 'request_feature'] as const
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
 export const HITL_TOOL_SET = new Set<string>(HITL_TOOL_NAMES)
 
@@ -346,6 +346,24 @@ export function mcpSignInTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
             z.object({
                 name: z.string().min(1).describe('The exact name of the server.'),
                 reason: nullTolerantOptional(z.string().max(300)).describe('One short line shown on the card telling the user what signing in unlocks.'),
+            }),
+        ),
+    }
+}
+
+export const REQUEST_FEATURE_DESCRIPTION =
+    "Draft a request for the Rerun team, then END YOUR TURN: a feature Rerun lacks, an improvement to something it already does, or a bug of Rerun itself (a Rerun screen, button or tool that misbehaves, not the user's data, a third-party app or a mistake of yours). The user gets a card with your draft and sends it, edits it first, or skips it: nothing leaves before they click, and the team receives it with their account and a copy of this conversation. Until their reply says it was sent, the team has nothing: never tell the user it was sent or reported before that. Only once you are sure Rerun cannot do it today: look it up in the Rerun documentation (rerun_hub_search_docs or search_docs, whichever you have), then say in your message what is possible today, if anything, and that you drafted a request they can send. Never for a plain question, for something you can do yourself, or for what a catalog app or a setting already covers as the user asked for it; when they asked for Rerun to do it itself and only an app gets close, name that app as the workaround. Offer it once per request: when the user sent it, skipped it, or wrote about something else instead, do not offer the same request again in this conversation unless they ask for it. When they sent it, say so in one line and go on with what can be done meanwhile."
+
+export function requestFeatureTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
+    return {
+        request_feature: hitlTool(
+            ctx.turnOrder,
+            REQUEST_FEATURE_DESCRIPTION,
+            z.object({
+                kind: z.enum(['feature', 'bug', 'improvement']).describe('feature: something Rerun cannot do at all. improvement: something it does, done better. bug: something of Rerun that does not work as it should.'),
+                title: z.string().min(1).max(120).describe('The request in a few words, as the team would title it: "Generate videos directly in the chat", "Export CSV does nothing on the Leads table". In the language the user writes in.'),
+                description: z.string().min(1).max(2000).describe('Two to four sentences the team can act on, in the language the user writes in: what the user wanted to do and why, or for a bug what they did, what happened and what they expected. No greeting, no mention of yourself.'),
+                workaround: nullTolerantOptional(z.string().max(300)).describe('What the user can already do today to get close, in one sentence, when there is a way. Leave the field out when there is none, never write that there is none.'),
             }),
         ),
     }

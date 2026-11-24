@@ -14,7 +14,7 @@ export type CalledBy = { id: string; name: string; waiting: boolean }
 // source, which the published apps know; only the run's `trigger_source` says `checkin`. `slug` and
 // `name` are those of the routine that asked for it, or the check-in's own.
 export type RunTrigger =
-    | { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: CalledBy }
+    | { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: CalledBy; teamRequests?: boolean }
     | { source: 'schedule'; slug: string; name: string }
     | { source: 'trigger'; slug: string; name: string }
     | { source: 'job'; computer: string; jobId: string }
@@ -23,6 +23,10 @@ export type RunTrigger =
 // No one is in the chat: a schedule, a trigger, a check-in, the end of a job on a linked computer, or
 // another coworker started the run.
 export const runsUnattended = (trigger: RunTrigger): boolean => trigger.source === 'schedule' || trigger.source === 'trigger' || trigger.source === 'checkin' || trigger.source === 'job' || (trigger.source === 'chat' && trigger.calledBy !== undefined)
+
+// Someone is in the chat and the hub has a team at the other end (Rerun Cloud): the coworker may draft
+// a request for that team. A coworker another one called has nobody to send it.
+export const offersTeamRequests = (trigger: RunTrigger): boolean => trigger.source === 'chat' && trigger.teamRequests === true && trigger.calledBy === undefined
 
 // A check-in only reads and suggests: its tools, its CLI sandbox and its end all follow from this.
 export const runsReadOnly = (trigger: RunTrigger): boolean => trigger.source === 'checkin'
@@ -60,4 +64,6 @@ export type RunContext = {
     unattended?: boolean
     // See `runsReadOnly`.
     readOnly?: boolean
+    // See `offersTeamRequests`.
+    teamRequests?: boolean
 }

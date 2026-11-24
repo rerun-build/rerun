@@ -57,7 +57,19 @@ export type ComputerAccessRequest = { computer: string; reason: string; commands
 // `always` is the rule the person kept with their yes, already written to the computer's settings.
 export type ComputerAccessDecision = { computer: string; decision: 'approved' | 'declined'; always?: string }
 
-export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover' | 'spend' | 'computer'
+// Something Rerun cannot do yet, or a bug of Rerun itself, drafted by the coworker for the Rerun
+// team. Nothing leaves before the person sends it, after editing it if they want.
+export type FeatureRequestKind = 'feature' | 'bug' | 'improvement'
+
+export const FEATURE_REQUEST_KINDS = ['feature', 'bug', 'improvement'] as const satisfies readonly FeatureRequestKind[]
+
+// What the hub accepts once the person has edited the draft: the card's fields stop there too.
+export const FEATURE_REQUEST_LIMITS = { title: 200, description: 5_000, workaround: 1_000 } as const
+
+// `workaround`: what the person can already do today, when there is a way around the gap.
+export type FeatureRequestDraft = { kind: FeatureRequestKind; title: string; description: string; workaround?: string }
+
+export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover' | 'spend' | 'computer' | 'feature'
 
 export const HITL_TOOL_NAMES = {
     ask_user: 'question',
@@ -68,6 +80,7 @@ export const HITL_TOOL_NAMES = {
     request_takeover: 'takeover',
     request_spend: 'spend',
     request_computer_access: 'computer',
+    request_feature: 'feature',
 } as const satisfies Record<string, HitlKind>
 
 export function hitlKindOf(toolName: string): HitlKind | null {
@@ -82,6 +95,7 @@ export const HITL_CANCELLED = {
     service: '[User dismissed the app setup without configuring]',
     mcp: '[User skipped signing in to the MCP server]',
     takeover: '[User declined to take over the browser]',
+    feature: '[User chose not to send the request to the Rerun team]',
 } as const
 
 function coerceJsonArray(value: unknown): unknown {
@@ -103,6 +117,7 @@ const HITL_INPUT_KEYS: Record<HitlKind, string[]> = {
     takeover: ['url'],
     spend: ['purpose', 'calls'],
     computer: ['computer'],
+    feature: ['title'],
 }
 
 // A rejected tool call reaches the UI with its input stripped, and the forms below would then render
@@ -549,6 +564,39 @@ export function parseComputerAccessDecision(text: string): ComputerAccessDecisio
     return always ? { computer, decision: 'approved', always } : { computer, decision: 'approved' }
 }
 
+const isFeatureRequestKind = (value: unknown): value is FeatureRequestKind => FEATURE_REQUEST_KINDS.includes(value as FeatureRequestKind)
+
+const oneLine = (value: string): string => value.replace(/\s*\n\s*/g, ' ').trim()
+
+export function pendingFeatureRequest(input: Record<string, unknown>): FeatureRequestDraft {
+    const workaround = typeof input.workaround === 'string' ? input.workaround.trim() : ''
+    return {
+        kind: isFeatureRequestKind(input.kind) ? input.kind : 'feature',
+        title: typeof input.title === 'string' ? oneLine(input.title) : '',
+        description: typeof input.description === 'string' ? input.description.trim() : '',
+        ...(workaround ? { workaround } : {}),
+    }
+}
+
+export type SentFeatureRequest = Pick<FeatureRequestDraft, 'kind' | 'title' | 'description'>
+
+const FEATURE_REQUEST_SENT_NEXT = 'The Rerun team has it now. Say so in one line, offer what can be done meanwhile if anything, and do not offer this request again in this conversation.'
+
+// The text as it left, edited or not, so the coworker knows what the team received.
+export function serializeFeatureRequestSent({ kind, title, description }: SentFeatureRequest): string {
+    const body = description.trim()
+    return `Sent to the Rerun team (${kind}): **${oneLine(title)}**${body ? `\n\n${body}` : ''}\n\n${FEATURE_REQUEST_SENT_NEXT}`
+}
+
+const FEATURE_REQUEST_RESULT = /^Sent to the Rerun team \((feature|bug|improvement)\): \*\*([^\n]+)\*\*(?:\n\n([\s\S]*?))?\n\nThe Rerun team has it now\./
+
+export function parseFeatureRequestSent(text: string): SentFeatureRequest | null {
+    const match = FEATURE_REQUEST_RESULT.exec(text.trim())
+    if (!match) return null
+    const [, kind, title, description] = match
+    return { kind: kind as FeatureRequestKind, title, description: description ?? '' }
+}
+
 const SPEND_ALWAYS_LINE = 'Always allowed: paid data tools no longer ask for this coworker.'
 const SPEND_APPROVED_NEXT = 'Go on with the paid calls you planned, and stay close to the estimate.'
 const SPEND_DECLINED_NEXT = 'Do not call any paid data tool for this. Go on with the free tools if they can do part of it, or ask me what to change.'
@@ -614,6 +662,7 @@ export type HitlReply =
     | { kind: 'takeover'; url: string | null }
     | ({ kind: 'spend' } & SpendDecision)
     | ({ kind: 'computer' } & ComputerAccessDecision)
+    | { kind: 'feature'; request: SentFeatureRequest }
     | { kind: 'cancelled'; of: keyof typeof HITL_CANCELLED }
 
 export function parseHitlReply(text: string): HitlReply | null {
@@ -636,5 +685,7 @@ export function parseHitlReply(text: string): HitlReply | null {
     if (spend) return { kind: 'spend', ...spend }
     const computer = parseComputerAccessDecision(trimmed)
     if (computer) return { kind: 'computer', ...computer }
+    const request = parseFeatureRequestSent(trimmed)
+    if (request) return { kind: 'feature', request }
     return null
 }

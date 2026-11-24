@@ -113,6 +113,12 @@ describe('buildTools', () => {
         }
     })
 
+    it('offers request_feature only when the hub has a team behind it', async () => {
+        expect(await namesOf(ctxWith())).not.toContain('request_feature')
+        expect(await namesOf(ctxWith({}, { teamRequests: true }))).toContain('request_feature')
+        expect(await namesOf(ctxWith({ kind: 'foreman' }, { teamRequests: true }))).toContain('request_feature')
+    })
+
     it('offers request_takeover only where a person can be shown the screen', async () => {
         expect(await namesOf(ctxWith())).toContain('request_takeover')
         expect(await namesOf(ctxWith({ ephemeral: true }))).not.toContain('request_takeover')
