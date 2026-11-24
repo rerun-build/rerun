@@ -5,6 +5,7 @@
 //
 // Server-only (uses node:crypto). Import from route handlers.
 
+import { DEFAULT_PROTOCOL_VERSION } from '@/lib/mcp/hub-rpc'
 import { assertPublicUrl, fetchPublic } from '@/lib/net/public-fetch'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
 import { createHash, randomBytes } from 'node:crypto'
@@ -127,6 +128,33 @@ async function endpointOnSite(value: unknown, label: string, sites: URL[]): Prom
     return value
 }
 
+const RESOURCE_METADATA = /\bresource_metadata\s*=\s*(?:"([^"]+)"|([^\s,]+))/i
+
+// RFC 9728 §5.1: a server that owns nothing at the root of its domain (a Supabase edge function)
+// names its protected-resource document in the challenge of its 401. Only a document of its own
+// origin is read. The call is a client's first one: some servers let a bare GET through.
+async function challengedResourceMetadata(mcpUrl: URL): Promise<Record<string, unknown> | null> {
+    try {
+        const res = await fetchPublic(mcpUrl.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 1,
+                method: 'initialize',
+                params: { protocolVersion: DEFAULT_PROTOCOL_VERSION, capabilities: {}, clientInfo: { name: 'Rerun', version: '1.0.0' } },
+            }),
+        })
+        await res.body?.cancel()
+        if (res.status !== 401) return null
+        const challenge = RESOURCE_METADATA.exec(res.headers.get('www-authenticate') ?? '')
+        const named = challenge?.[1] ?? challenge?.[2]
+        return named && new URL(named).origin === mcpUrl.origin ? await fetchJson(named) : null
+    } catch {
+        return null
+    }
+}
+
 // Protected-resource metadata → authorization-server metadata. Falls back to treating the
 // MCP origin as the authorization server when no protected-resource document is published.
 export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMetadata> {
@@ -137,7 +165,8 @@ export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMeta
     const path = trimSlash(url.pathname)
     const prm =
         (path ? await fetchJson(`${origin}/.well-known/oauth-protected-resource${path}`) : null) ??
-        (await fetchJson(`${origin}/.well-known/oauth-protected-resource`))
+        (await fetchJson(`${origin}/.well-known/oauth-protected-resource`)) ??
+        (await challengedResourceMetadata(url))
     const servers = prm?.authorization_servers as string[] | undefined
     const bases = servers?.length ? [servers[0]] : [origin, ...parentOrigins(origin)]
     // RFC 9728: the protected resource lists the scopes it actually accepts. Prefer these over

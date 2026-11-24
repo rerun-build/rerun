@@ -137,6 +137,16 @@ Two ways forward.
 
 **Add the MCP server yourself.** Open the coworker card, then **Apps**, then the **MCP** tab, and click **New**. Register any Model Context Protocol server: HTTP, SSE or a local command, with its own arguments, headers or environment variables. A server that signs in by OAuth shows **Connect** next to its name once saved: click it to sign in. Its tools are merged as `<name>_<tool>`. To share a server between coworkers, add it to the [Vault](/vault#add-an-mcp-server) instead. Anything with an MCP server works with Rerun today, app or not.
 
+**Sign in to a server of your own.** For an OAuth sign-in, the server has to be reachable on the public internet, and its authorization server has to support PKCE and register clients on its own: Dynamic Client Registration, or Client ID Metadata Documents. In Supabase Auth, that is **Allow Dynamic OAuth Apps**.
+
+Rerun finds the authorization server in one of three ways, in this order:
+
+- the server publishes its protected-resource document under `/.well-known/oauth-protected-resource`;
+- it names that document, on its own origin, in the `WWW-Authenticate: Bearer resource_metadata="…"` header of its `401`. A server hosted as a Supabase Edge Function does this;
+- with neither, its domain or a parent domain publishes the authorization server's metadata, under `/.well-known/oauth-authorization-server` or `/.well-known/openid-configuration`.
+
+The authorization and token endpoints stay on the domain of the server or of the authorization server it names.
+
 **Paste its JSON config.** Most servers give their setup as a JSON block for Claude Desktop, Cursor, Claude Code or VS Code. Under **Command** (or **URL**), click **Paste a JSON config** and paste it, or paste it straight into **Name**, **Command** or **URL**. The form fills in at once for you to check:
 
 - the full `{ "mcpServers": { … } }` block, VS Code's `servers`, a single named server or a server on its own (Rerun proposes a name for it);

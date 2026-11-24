@@ -133,6 +133,106 @@ describe('discoverAuthServer', () => {
         vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNRESET')))
         await expect(discoverAuthServer('https://acme.com')).rejects.toThrow('does not advertise')
     })
+
+    describe('when the server only names its protected-resource document in its 401', () => {
+        // A Supabase edge function owns nothing at the root of its domain, gateway included.
+        const MCP_URL = 'https://ref.supabase.co/functions/v1/mcp'
+        const NAMED = `${MCP_URL}/.well-known/oauth-protected-resource`
+        const ISSUER = 'https://ref.supabase.co/auth/v1'
+        const SUPABASE_META = {
+            issuer: ISSUER,
+            authorization_endpoint: `${ISSUER}/oauth/authorize`,
+            token_endpoint: `${ISSUER}/oauth/token`,
+            registration_endpoint: `${ISSUER}/oauth/clients/register`,
+            scopes_supported: ['openid', 'email'],
+        }
+        const DOCUMENTS = {
+            [NAMED]: { resource: MCP_URL, authorization_servers: [ISSUER] },
+            'https://ref.supabase.co/.well-known/oauth-authorization-server/auth/v1': SUPABASE_META,
+        }
+
+        function stubServer(answer: () => Response, documents: Record<string, unknown> = DOCUMENTS) {
+            const calls: { url: string; method: string; body: unknown }[] = []
+            vi.stubGlobal(
+                'fetch',
+                vi.fn(async (input: string | URL, init?: RequestInit) => {
+                    const url = String(input)
+                    const method = init?.method ?? 'GET'
+                    calls.push({ url, method, body: init?.body })
+                    if (method === 'POST') return answer()
+                    const doc = documents[url]
+                    return doc ? new Response(JSON.stringify(doc), { status: 200 }) : new Response('not found', { status: url.endsWith('/functions/v1/mcp') ? 401 : 404 })
+                }),
+            )
+            return calls
+        }
+
+        const unauthorized = (challenge: string | null, status = 401) => () => new Response('{"error":"unauthorized"}', { status, headers: challenge ? { 'WWW-Authenticate': challenge } : {} })
+
+        it('reads the document the 401 names', async () => {
+            const calls = stubServer(unauthorized(`Bearer realm="mcp", resource_metadata="${NAMED}"`))
+            expect(await discoverAuthServer(MCP_URL)).toEqual({
+                authorizationEndpoint: SUPABASE_META.authorization_endpoint,
+                tokenEndpoint: SUPABASE_META.token_endpoint,
+                registrationEndpoint: SUPABASE_META.registration_endpoint,
+                scopesSupported: ['openid', 'email'],
+                clientIdMetadataDocumentSupported: false,
+            })
+            const posts = calls.filter(call => call.method === 'POST')
+            expect(posts.map(call => call.url)).toEqual([MCP_URL])
+            expect(JSON.parse(String(posts[0].body))).toMatchObject({ jsonrpc: '2.0', method: 'initialize' })
+        })
+
+        it.each([
+            ['unquoted', `Bearer resource_metadata=${NAMED}`],
+            ['unquoted and followed by another parameter', `Bearer resource_metadata=${NAMED}, error="invalid_token"`],
+            ['spaced and capitalised', `Bearer error="invalid_token", Resource_Metadata = "${NAMED}", scope="read"`],
+            ['beside another scheme', `Basic realm="x", Bearer resource_metadata="${NAMED}"`],
+        ])('reads it %s', async (_label, challenge) => {
+            stubServer(unauthorized(challenge))
+            await expect(discoverAuthServer(MCP_URL)).resolves.toMatchObject({ tokenEndpoint: SUPABASE_META.token_endpoint })
+        })
+
+        it('prefers the scopes of the document it names', async () => {
+            stubServer(unauthorized(`Bearer resource_metadata="${NAMED}"`), { ...DOCUMENTS, [NAMED]: { authorization_servers: [ISSUER], scopes_supported: ['email'] } })
+            await expect(discoverAuthServer(MCP_URL)).resolves.toMatchObject({ scopesSupported: ['email'] })
+        })
+
+        it.each([
+            ['another origin', unauthorized('Bearer resource_metadata="https://evil.supabase.co/prm"')],
+            ['a private address', unauthorized('Bearer resource_metadata="http://169.254.169.254/prm"')],
+            ['something that is not a URL', unauthorized('Bearer resource_metadata="nope"')],
+            ['nothing', unauthorized('Bearer realm="mcp"')],
+            ['no challenge at all', unauthorized(null)],
+            ['a document on an answer that is not a 401', unauthorized(`Bearer resource_metadata="${NAMED}"`, 200)],
+            ['a missing document', unauthorized(`Bearer resource_metadata="${NAMED}/missing"`)],
+        ])('ignores a server that names %s', async (_label, answer) => {
+            const calls = stubServer(answer)
+            await expect(discoverAuthServer(MCP_URL)).rejects.toThrow('does not advertise')
+            expect(calls.every(call => call.url.startsWith('https://ref.supabase.co/') || call.url.startsWith('https://supabase.co/'))).toBe(true)
+        })
+
+        it('releases the stream of a server that answers without asking for a sign-in', async () => {
+            const cancelled = vi.fn()
+            stubServer(() => new Response(new ReadableStream({ cancel: cancelled }), { status: 200, headers: { 'Content-Type': 'text/event-stream' } }))
+            await expect(discoverAuthServer(MCP_URL)).rejects.toThrow('does not advertise')
+            expect(cancelled).toHaveBeenCalledOnce()
+        })
+
+        it('still falls back to the metadata of the origin', async () => {
+            stubServer(unauthorized(null), { 'https://mcp.example/.well-known/oauth-authorization-server': SELF_META })
+            await expect(discoverAuthServer('https://mcp.example/mcp')).resolves.toMatchObject({ tokenEndpoint: SELF_META.token_endpoint })
+        })
+
+        it('never calls the server when a well-known document is published', async () => {
+            const calls = stubServer(unauthorized(`Bearer resource_metadata="${NAMED}"`), {
+                'https://mcp.example/.well-known/oauth-protected-resource/mcp': { authorization_servers: ['https://auth.example'] },
+                'https://auth.example/.well-known/oauth-authorization-server': AUTH_META,
+            })
+            await expect(discoverAuthServer('https://mcp.example/mcp')).resolves.toMatchObject({ tokenEndpoint: AUTH_META.token_endpoint })
+            expect(calls.filter(call => call.method === 'POST')).toEqual([])
+        })
+    })
 })
 
 describe('callbackUrl', () => {
