@@ -137,4 +137,13 @@ Two ways forward.
 
 **Add the MCP server yourself.** Open the coworker card, then **Apps**, then the **MCP** tab, and click **New**. Register any Model Context Protocol server: HTTP, SSE or a local command, with its own arguments, headers or environment variables. A server that signs in by OAuth shows **Connect** next to its name once saved: click it to sign in. Its tools are merged as `<name>_<tool>`. To share a server between coworkers, add it to the [Vault](/vault#add-an-mcp-server) instead. Anything with an MCP server works with Rerun today, app or not.
 
+**Paste its JSON config.** Most servers give their setup as a JSON block for Claude Desktop, Cursor, Claude Code or VS Code. Under **Command** (or **URL**), click **Paste a JSON config** and paste it, or paste it straight into **Name**, **Command** or **URL**. The form fills in at once for you to check:
+
+- the full `{ "mcpServers": { … } }` block, VS Code's `servers`, a single named server or a server on its own (Rerun proposes a name for it);
+- `command` gives a local command, `url` an SSE address when it ends in `/sse` and HTTP otherwise, unless `type` or `transport` says which;
+- `args`, `env` and `headers` are kept as they are, and their secrets become keys of the coworker, never text in its config;
+- a block with several servers adds them all with **Add N servers**: click a server's name above the form to check it. Two servers that give the same variable different values each get a key of their own.
+
+Invalid JSON, a field Rerun does not know, a value on several lines or a reference only another client resolves (`${input:token}`, `${env:TOKEN}`) shows an error under the box, and nothing is saved. Put the real value in its place, in the box.
+
 Reference a stored secret in an MCP config with `${VARIABLE_NAME}`. It resolves on your workspace's machine at run time. A secret typed straight into a field is detected, moved to the machine and replaced by a `${VARIABLE_NAME}` when you save.
