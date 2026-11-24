@@ -290,9 +290,9 @@ const TEMPLATES = [
         setup_minutes: 10,
         featured: true,
         agents: [
-            { key: 'lead-scout', name: 'Lead Scout', role: 'Prospecting', description: 'Finds funded companies that need a new site.', connectorSlugs: ['hubspot'], setupRequired: true },
-            { key: 'qualifier', name: 'Qualifier', role: 'Qualification', description: 'Checks each lead against your ideal customer.', connectorSlugs: ['hubspot'], setupRequired: false },
-            { key: 'booker', name: 'Booker', role: 'Outreach', description: 'Writes the intro email and books the call.', connectorSlugs: ['gmail', 'google-calendar'], setupRequired: true },
+            { key: 'lead_scout', name: 'Lead Scout', role: 'Prospecting', description: 'Finds funded companies that need a new site.', connectorSlugs: ['hubspot'], setupRequired: true, skills: [{ name: 'Find funded companies', description: 'Use when asked to find companies that just raised.' }, { name: 'Enrich a lead', description: 'Use when asked to complete what is known about a lead.' }] },
+            { key: 'qualifier', name: 'Qualifier', role: 'Qualification', description: 'Checks each lead against your ideal customer.', connectorSlugs: ['hubspot'], setupRequired: false, skills: [{ name: 'Score a lead', description: 'Use when asked to check a lead against the ideal customer.' }] },
+            { key: 'booker', name: 'Booker', role: 'Outreach', description: 'Writes the intro email and books the call.', connectorSlugs: ['gmail', 'google-calendar'], setupRequired: true, skills: [{ name: 'Write the intro email', description: 'Use when asked to write to a qualified lead.' }, { name: 'Book the intro call', description: 'Use when asked to find a time and book the call.' }] },
         ],
         connectors: [
             { slug: 'hubspot', name: 'HubSpot', icon: '/services/hubspot.svg' },
@@ -310,8 +310,8 @@ const TEMPLATES = [
         setup_minutes: 5,
         featured: false,
         agents: [
-            { key: 'invoice-chaser', name: 'Invoice Chaser', role: 'Collections', description: 'Follows up on unpaid invoices.', connectorSlugs: ['stripe', 'gmail'], setupRequired: true },
-            { key: 'bookkeeper', name: 'Bookkeeper', role: 'Accounting', description: 'Matches payments to invoices.', connectorSlugs: ['stripe'], setupRequired: false },
+            { key: 'invoice_chaser', name: 'Invoice Chaser', role: 'Collections', description: 'Follows up on unpaid invoices.', connectorSlugs: ['stripe', 'gmail'], setupRequired: true, skills: [{ name: 'Chase unpaid invoices', description: 'Use when asked to follow up on an invoice past its due date.' }] },
+            { key: 'bookkeeper', name: 'Bookkeeper', role: 'Accounting', description: 'Matches payments to invoices.', connectorSlugs: ['stripe'], setupRequired: false, skills: [{ name: 'Match payments to invoices', description: 'Use when asked to match a payment to its invoice.' }] },
         ],
         connectors: [
             { slug: 'stripe', name: 'Stripe', icon: '/services/stripe.svg' },
@@ -327,7 +327,7 @@ const TEMPLATES = [
         tags: ['support'],
         setup_minutes: 5,
         featured: false,
-        agents: [{ key: 'inbox-triage', name: 'Inbox Triage', role: 'Support', description: 'Sorts the support inbox.', connectorSlugs: ['gmail', 'slack'], setupRequired: true }],
+        agents: [{ key: 'inbox_triage', name: 'Inbox Triage', role: 'Support', description: 'Sorts the support inbox.', connectorSlugs: ['gmail', 'slack'], setupRequired: true, skills: [{ name: 'Sort the support inbox', description: 'Use when asked to sort the support inbox.' }] }],
         connectors: [
             { slug: 'gmail', name: 'Gmail', icon: '/services/gmail.svg' },
             { slug: 'slack', name: 'Slack', icon: '/services/slack.png' },
