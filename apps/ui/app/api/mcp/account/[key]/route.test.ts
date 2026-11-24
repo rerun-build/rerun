@@ -37,7 +37,7 @@ function resolveRow(table: string, calls: readonly SupabaseCall[]) {
         const hash = calls.find(call => call.method === 'eq' && call.args[0] === 'key_hash')?.args[1] as string
         return { data: API_KEYS[hash]?.() ?? null }
     }
-    if (table === 'workspaces') return { data: { subscription_status: 'active', is_sandbox: false } }
+    if (table === 'workspaces') return { data: { subscription_status: 'active', is_sandbox: false, api_access: true } }
     return undefined
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canEndTrialNow, isApiEntitled, isMachineEntitled, isPaidSubscription, isSubscriptionEntitled, isTrialLapsed, isWorkspaceApiEntitled } from './entitlement'
+import { canEndTrialNow, isApiEntitled, isApiLocked, isMachineEntitled, isPaidSubscription, isSubscriptionEntitled, isTrialLapsed, isWorkspaceApiEntitled } from './entitlement'
 
 describe('isSubscriptionEntitled', () => {
     it('keeps a trial and a late payment entitled', () => {
@@ -47,17 +47,30 @@ describe('isApiEntitled', () => {
     })
 })
 
+describe('isApiLocked', () => {
+    it('closes the API of a workspace whose tier leaves it out, whatever its subscription', () => {
+        expect(isApiLocked({ is_sandbox: false, api_access: false })).toBe(true)
+        expect(isApiLocked({ is_sandbox: false, api_access: true })).toBe(false)
+        expect(isWorkspaceApiEntitled({ subscription_status: 'active', is_sandbox: false, api_access: false })).toBe(false)
+    })
+
+    it('never closes a sandbox', () => {
+        expect(isApiLocked({ is_sandbox: true, api_access: false })).toBe(false)
+        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true, api_access: false })).toBe(true)
+    })
+})
+
 describe('isWorkspaceApiEntitled', () => {
     it('opens the API to a sandbox whatever its status', () => {
-        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true })).toBe(true)
-        expect(isWorkspaceApiEntitled({ subscription_status: 'trialing', is_sandbox: true })).toBe(true)
+        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true, api_access: true })).toBe(true)
+        expect(isWorkspaceApiEntitled({ subscription_status: 'trialing', is_sandbox: true, api_access: true })).toBe(true)
     })
 
     it('follows the subscription status for a regular workspace', () => {
-        expect(isWorkspaceApiEntitled({ subscription_status: 'past_due', is_sandbox: false })).toBe(true)
-        expect(isWorkspaceApiEntitled({ subscription_status: 'trialing', is_sandbox: false })).toBe(true)
-        expect(isWorkspaceApiEntitled({ subscription_status: 'canceled', is_sandbox: false })).toBe(false)
-        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: false })).toBe(false)
+        expect(isWorkspaceApiEntitled({ subscription_status: 'past_due', is_sandbox: false, api_access: true })).toBe(true)
+        expect(isWorkspaceApiEntitled({ subscription_status: 'trialing', is_sandbox: false, api_access: true })).toBe(true)
+        expect(isWorkspaceApiEntitled({ subscription_status: 'canceled', is_sandbox: false, api_access: true })).toBe(false)
+        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: false, api_access: true })).toBe(false)
     })
 })
 

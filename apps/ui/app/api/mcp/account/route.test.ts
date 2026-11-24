@@ -64,7 +64,7 @@ function resolveRow(table: string, calls: readonly SupabaseCall[]) {
     }
     if (table === 'spaces') return { data: SPACES[eqValue(calls, 'id') as string] ?? null }
     if (table === 'workspace_members') return { data: MEMBERS[`${eqValue(calls, 'user_id')}:${eqValue(calls, 'workspace_id')}`] ?? null }
-    if (table === 'workspaces') return { data: { subscription_status: 'active', is_sandbox: false } }
+    if (table === 'workspaces') return { data: { subscription_status: 'active', is_sandbox: false, api_access: true } }
     return undefined
 }
 

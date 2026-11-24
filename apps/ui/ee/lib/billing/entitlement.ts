@@ -41,8 +41,14 @@ export function isApiEntitled(status: string | null | undefined): boolean {
 // A sandbox carries no subscription of its own: it is an expert perk sitting on a fictitious
 // `active` plan. Authoring templates goes through the MCP server, so a key is the tool the sandbox
 // exists for, not a paid extra.
-export function isWorkspaceApiEntitled(workspace: { subscription_status: string | null; is_sandbox: boolean }): boolean {
-    return workspace.is_sandbox || isApiEntitled(workspace.subscription_status)
+export function isWorkspaceApiEntitled(workspace: { subscription_status: string | null; is_sandbox: boolean; api_access: boolean }): boolean {
+    return !isApiLocked(workspace) && (workspace.is_sandbox || isApiEntitled(workspace.subscription_status))
+}
+
+// The API and the MCP server are not part of what this workspace bought (the first lifetime tier).
+// Subscribing does not open them, so no upgrade is offered: the doors are just locked.
+export function isApiLocked(workspace: { is_sandbox: boolean; api_access: boolean }): boolean {
+    return !workspace.is_sandbox && !workspace.api_access
 }
 
 // Converting a trial into a paid subscription on the spot, at unchanged quantities. Shared by the

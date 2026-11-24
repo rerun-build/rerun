@@ -7,12 +7,13 @@ export { PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, basePriceCents, parsePriceArm, type
 
 export const BILLING_ENABLED = false
 
-type WorkspacePlan = { subscription_status: string | null; is_sandbox: boolean }
+type WorkspacePlan = { subscription_status: string | null; is_sandbox: boolean; api_access: boolean }
 
 export const isSubscriptionEntitled = (_status: string | null | undefined): boolean => true
 export const isMachineEntitled = (_status: string | null | undefined): boolean => true
 export const isPaidSubscription = (_status: string | null | undefined): boolean => true
 export const isWorkspaceApiEntitled = (_workspace: WorkspacePlan): boolean => true
+export const isApiLocked = (_workspace: Pick<WorkspacePlan, 'is_sandbox' | 'api_access'>): boolean => false
 
 // A lifetime plan is sold through an AppSumo code, which only Rerun Cloud redeems.
 export const isLifetimePlan = (_workspace: { plan: string | null } | null | undefined): boolean => false
@@ -32,11 +33,12 @@ export type WorkspaceLimitColumns = {
     max_seats: number | null
     model_access: ModelAccess
     custom_integrations: boolean
+    api_access: boolean
     rerun_budget_micros: number
 }
 
 export function baseLimitsToColumns(): WorkspaceLimitColumns {
-    return { max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 0 }
+    return { max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, api_access: true, rerun_budget_micros: 0 }
 }
 
 export type RerunCreditColumns = { rerun_budget_micros?: number | null; rerun_used_micros?: number | null; rerun_topup_micros?: number | null }

@@ -1415,6 +1415,7 @@ export type Database = {
           max_uses: number | null
           note: string | null
           plan: string
+          stackable: boolean
           uses: number
         }
         Insert: {
@@ -1427,6 +1428,7 @@ export type Database = {
           max_uses?: number | null
           note?: string | null
           plan: string
+          stackable?: boolean
           uses?: number
         }
         Update: {
@@ -1439,6 +1441,7 @@ export type Database = {
           max_uses?: number | null
           note?: string | null
           plan?: string
+          stackable?: boolean
           uses?: number
         }
         Relationships: []
@@ -4003,6 +4006,7 @@ export type Database = {
       workspaces: {
         Row: {
           addons_current_period_end: string | null
+          api_access: boolean
           boxes_archived_at: string | null
           boxes_deleted_at: string | null
           boxes_disabled_at: string | null
@@ -4014,6 +4018,8 @@ export type Database = {
           id: number
           is_sandbox: boolean
           last_active_at: string | null
+          lifetime_purchase_id: string | null
+          lifetime_tier: number | null
           locale: string
           max_agents: number | null
           max_seats: number | null
@@ -4043,6 +4049,7 @@ export type Database = {
         }
         Insert: {
           addons_current_period_end?: string | null
+          api_access?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -4054,6 +4061,8 @@ export type Database = {
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
+          lifetime_purchase_id?: string | null
+          lifetime_tier?: number | null
           locale?: string
           max_agents?: number | null
           max_seats?: number | null
@@ -4083,6 +4092,7 @@ export type Database = {
         }
         Update: {
           addons_current_period_end?: string | null
+          api_access?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -4094,6 +4104,8 @@ export type Database = {
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
+          lifetime_purchase_id?: string | null
+          lifetime_tier?: number | null
           locale?: string
           max_agents?: number | null
           max_seats?: number | null

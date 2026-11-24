@@ -12,7 +12,7 @@ import { LIFETIME_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
 import { LIFETIME_PLAN_SLUG } from '@/ee/lib/billing/plans'
 import { idOf, lifetimePriceId, stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectMany } from '@/supabase/supabase-helpers'
 
 type CodeInsert = Database['public']['Tables']['invitation_codes']['Insert']
 type CodeUpdate = Database['public']['Tables']['invitation_codes']['Update']
@@ -125,6 +125,6 @@ export async function refundLifetimePurchase(charge: Stripe.Charge): Promise<voi
 
     const code = revoked?.[0]
     if (!code?.uses) return
-    const { data: redemption } = await selectMaybeSingle(supabase, 'invitation_redemptions', ['workspace_id'] as const, { code_id: code.id })
-    console.error('[lifetime deal] refunded after its code was redeemed, the workspace keeps the lifetime plan', { session: session.id, workspaceId: redemption?.workspace_id ?? null })
+    const { data: redemptions } = await selectMany(supabase, 'invitation_redemptions', ['workspace_id'] as const, { code_id: code.id })
+    console.error('[lifetime deal] refunded after its code was redeemed, the workspace keeps the lifetime plan', { session: session.id, workspaceIds: (redemptions ?? []).map(redemption => redemption.workspace_id) })
 }
