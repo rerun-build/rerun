@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Brand } from "@rerun/contracts";
 import { Heading, Section, Text } from "@react-email/components";
 import { Bubble } from "./Bubble";
 import { Button } from "./Button";
@@ -20,6 +21,7 @@ export interface CoworkerMessageProps {
   conversationUrl?: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /** One coworker, what it says, and the one thing to do about it. */
@@ -35,10 +37,11 @@ export function CoworkerMessage({
   conversationUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: CoworkerMessageProps & { variant: HeroVariant; heading: string; action: string }) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
-    <Layout preview={message} hero={{ variant, closeUp: boardUrl }} appUrl={appUrl} unsubscribeUrl={unsubscribeUrl} locale={locale}>
+    <Layout preview={message} hero={{ variant, closeUp: boardUrl }} appUrl={appUrl} unsubscribeUrl={unsubscribeUrl} locale={locale} brand={brand}>
       <Heading style={{ ...text.heading, margin: "0 0 20px" }}>{heading}</Heading>
       <Bubble portraitUrl={portraitUrl} locale={locale}>
         {message}

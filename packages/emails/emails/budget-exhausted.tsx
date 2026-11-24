@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Brand } from "@rerun/contracts";
 import { AlertMessage } from "../components/AlertMessage";
 import { emailTranslator, type EmailLocale } from "../i18n";
 
@@ -11,10 +12,11 @@ export interface BudgetExhaustedProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
-export default function BudgetExhausted({ resetLabel, creditsUrl, boardUrl, appUrl, unsubscribeUrl, locale }: BudgetExhaustedProps) {
-  const t = emailTranslator(locale);
+export default function BudgetExhausted({ resetLabel, creditsUrl, boardUrl, appUrl, unsubscribeUrl, locale, brand }: BudgetExhaustedProps) {
+  const t = emailTranslator(locale, brand?.name);
   return (
     <AlertMessage
       hero={{ scene: "budget-exhausted", closeUp: boardUrl }}
@@ -24,6 +26,7 @@ export default function BudgetExhausted({ resetLabel, creditsUrl, boardUrl, appU
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     />
   );
 }

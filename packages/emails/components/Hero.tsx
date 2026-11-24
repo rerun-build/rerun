@@ -28,22 +28,22 @@ export type HeroProps =
 
 const STRIPE_HEIGHT = 88;
 
-function heroSrc(props: HeroProps): string {
+function heroSrc(props: HeroProps, origin?: string): string {
   if ("closeUp" in props && props.closeUp) return props.closeUp;
   if ("board" in props && props.board) return props.board;
-  if ("variant" in props) return heroUrl(props.variant);
-  if ("scene" in props) return sceneUrl(props.scene);
+  if ("variant" in props) return heroUrl(props.variant, origin);
+  if ("scene" in props) return sceneUrl(props.scene, origin);
   return newsletterArtUrl(props.newsletter);
 }
 
-export function Hero(props: HeroProps) {
+export function Hero(props: HeroProps & { origin?: string }) {
   const closeUp = "closeUp" in props && Boolean(props.closeUp);
   const stripe = "variant" in props && !props.board && !closeUp;
 
   return (
     <Section style={wrap}>
       <Img
-        src={heroSrc(props)}
+        src={heroSrc(props, props.origin)}
         width={stripe ? theme.width.card : SCENE_WIDTH}
         height={stripe ? STRIPE_HEIGHT : closeUp ? CLOSE_UP_HEIGHT : SCENE_HEIGHT}
         alt=""

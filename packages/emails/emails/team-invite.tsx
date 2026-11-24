@@ -3,6 +3,7 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -15,6 +16,7 @@ export interface TeamInviteProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function TeamInvite({
@@ -25,8 +27,9 @@ export default function TeamInvite({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: TeamInviteProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("teamInvite.preview", { workspaceName })}
@@ -34,6 +37,7 @@ export default function TeamInvite({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("teamInvite.heading", { workspaceName })}</Heading>
       <Text style={text.paragraph}>{t.rich("teamInvite.firstRun", { agentName, strong })}</Text>

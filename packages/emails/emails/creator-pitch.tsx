@@ -3,6 +3,7 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -14,6 +15,7 @@ export interface CreatorPitchProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 // No hero: this one is a proposition, not a report, and the band would dress it up.
@@ -24,8 +26,9 @@ export default function CreatorPitch({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: CreatorPitchProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("creatorPitch.preview")}
@@ -33,6 +36,7 @@ export default function CreatorPitch({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>
         {firstName ? t("creatorPitch.headingNamed", { firstName }) : t("creatorPitch.heading")}

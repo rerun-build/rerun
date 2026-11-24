@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { RERUN_BRAND } from '@rerun/contracts'
 import { sendTrialStartedEmail } from '@/ee/lib/email/lifecycle-emails'
 import { fakeSupabase, type SupabaseResult } from '@/test/supabase-fake'
 import { loadRecipient } from './recipient'
@@ -48,7 +49,7 @@ describe('sendTrialStartedReceipt', () => {
         expect(claimedBeforeSend).toBe(true)
         expect(db.writes('lifecycle_emails')[0].payload).toMatchObject({ user_id: 'owner', workspace_id: 1, sequence_key: 'trial_started', status: 'sent' })
         expect(sendTrialStartedEmail).toHaveBeenCalledWith(
-            { to: 'owner@example.com', unsubscribeUrl: expect.stringMatching(/&category=billing$/), locale: 'en' },
+            { to: 'owner@example.com', unsubscribeUrl: expect.stringMatching(/&category=billing$/), locale: 'en', brand: RERUN_BRAND },
             expect.objectContaining({ workspaceName: 'Acme', trialDays: 3, trialEndsLabel: '23 September', includedLabel: '3 coworkers and 350 credits' }),
         )
     })

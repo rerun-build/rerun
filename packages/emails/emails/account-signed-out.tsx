@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Brand } from "@rerun/contracts";
 import { AlertMessage } from "../components/AlertMessage";
 import { emailTranslator, type EmailLocale, type EmailTranslator } from "../i18n";
 
@@ -20,6 +21,7 @@ export interface AccountSignedOutProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export function accountSignedOutSubject({ kind, account, coworkers }: Pick<AccountSignedOutProps, "kind" | "account" | "coworkers">, t: EmailTranslator): string {
@@ -34,8 +36,8 @@ function namesOf(coworkers: string[], t: EmailTranslator, locale: EmailLocale = 
   return new Intl.ListFormat(locale === "en" ? "en-GB" : locale, { type: "conjunction" }).format(names);
 }
 
-export default function AccountSignedOut({ kind, account, coworkers, workspaceName, reconnectUrl, boardUrl, appUrl, unsubscribeUrl, locale }: AccountSignedOutProps) {
-  const t = emailTranslator(locale);
+export default function AccountSignedOut({ kind, account, coworkers, workspaceName, reconnectUrl, boardUrl, appUrl, unsubscribeUrl, locale, brand }: AccountSignedOutProps) {
+  const t = emailTranslator(locale, brand?.name);
   const workspace = workspaceName ?? t("common.yourWorkspace");
   const body = coworkers.length
     ? t(`accountSignedOut.${kind}.body`, { coworkers: namesOf(coworkers, t, locale), count: coworkers.length, workspace })
@@ -49,6 +51,7 @@ export default function AccountSignedOut({ kind, account, coworkers, workspaceNa
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     />
   );
 }

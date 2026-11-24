@@ -3,7 +3,8 @@ import { RERUN_CONNECTION_ID, type Provider } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/app/api/database.types'
-import { APP_URL } from '@/lib/app-url'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { alertBanner, BANNER_WARM_BACKGROUND_MS } from '@/lib/email/board-banner'
 import { PLAN_PROVIDERS, planName, RECONNECT_PARAM } from '@/lib/engine/ai-sources'
 import { getAgent, getConnectionUsage, listConnections } from '@/lib/engine/client'
@@ -48,13 +49,14 @@ export async function alertSignedOutAccounts(workspaceId: number, provider: stri
 }
 
 async function alertSignedOut(supabase: Client, workspaceId: number, conn: EngineConnection, connection: BoxConnection): Promise<void> {
-    const alert = { workspaceId, key: `${alertKeyPrefix(workspaceId)}${connection.id}`, awayOnly: true, reopenAfterMs: FORGOTTEN_AFTER_MS }
+    const brand = await workspaceBrand(workspaceId)
+    const alert = { workspaceId, key: `${alertKeyPrefix(workspaceId)}${connection.id}`, awayOnly: true, reopenAfterMs: FORGOTTEN_AFTER_MS, brand }
     const adminIds = await adminsToAlert(supabase, alert)
     if (!adminIds.length) return
 
     const [{ data: workspace }, stopped] = await Promise.all([selectMaybeSingle(supabase, 'workspaces', ['name'] as const, { id: workspaceId }), stoppedCoworkers(supabase, workspaceId, conn, connection.id)])
     const board = stopped.length ? causeAlertBoard(supabase, workspaceId, connection.provider, stopped.map(agent => agent.id)) : null
-    const boardUrl = await alertBanner(board, BANNER_WARM_BACKGROUND_MS)
+    const boardUrl = await alertBanner(board, BANNER_WARM_BACKGROUND_MS, brand)
     await sendAlert(supabase, alert, adminIds, ({ to, locale, unsubscribeUrl }) =>
         sendAccountSignedOutEmail({
             to,
@@ -62,10 +64,11 @@ async function alertSignedOut(supabase: Client, workspaceId: number, conn: Engin
             account: planName(connection),
             coworkers: stopped.map(agent => agent.name),
             workspaceName: workspace?.name ?? null,
-            reconnectUrl: `${APP_URL}/?${WORKSPACE_PARAM}=${workspaceId}&${RECONNECT_PARAM}=${encodeURIComponent(connection.id)}`,
+            reconnectUrl: `${brandAppUrl(brand)}/?${WORKSPACE_PARAM}=${workspaceId}&${RECONNECT_PARAM}=${encodeURIComponent(connection.id)}`,
             boardUrl,
             unsubscribeUrl,
             locale,
+            brand,
         }),
     )
 }

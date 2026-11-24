@@ -1,11 +1,13 @@
 import { after } from 'next/server'
-import { agentAddress, agentKindOfEngineId, agentKindPolicy, FOREMAN_AGENT_ID, parseCoworkerLook, RERUN_CONNECTION_ID, type AgentKind, type CoworkerLook } from '@rerun/contracts'
+import { agentAddress, agentKindOfEngineId, agentKindPolicy, FOREMAN_AGENT_ID, parseCoworkerLook, RERUN_CONNECTION_ID, type AgentKind, type Brand, type CoworkerLook } from '@rerun/contracts'
 
 import { boxAccessOf, memberActor, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
 import type { Database } from '@/app/api/database.types'
 import { BANNER_WARM_INLINE_MS, alertBanner, buildUnsubscribeUrl, emailPortrait, pushNotification, sendNotificationEmail } from '@rerun/cloud/email'
 import { notificationUrl } from '@/lib/app-url'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import type { NotificationPayload } from '@/lib/engine/types'
 import { ACCOUNT_REFUSED_ERROR_CODE, RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
@@ -361,17 +363,18 @@ async function emailIncidents(supabase: ServiceRoleClient, context: IncidentCont
         if (!away.length) return
 
         const key = incidentKeyFor(keyInput)
-        const content = lazyContent(supabase, context, kind)
-        const results = await Promise.allSettled(away.map(({ userId, reason }) => emailIncident(supabase, context, { kind, key, userId, reason, now, content })))
+        const brand = await workspaceBrand(context.workspaceId)
+        const content = lazyContent(supabase, context, kind, brand)
+        const results = await Promise.allSettled(away.map(({ userId, reason }) => emailIncident(supabase, context, { kind, key, userId, reason, now, content, brand })))
         for (const result of results) if (result.status === 'rejected') console.error('[notification] failed to email a recipient of the incident', result.reason)
     } catch (err) {
         console.error('[notification] failed to email the incident', err)
     }
 }
 
-type IncidentEmail = { kind: IncidentKind; key: string; userId: string; reason: NotificationReason; now: Date; content: () => Promise<IncidentContent> }
+type IncidentEmail = { kind: IncidentKind; key: string; userId: string; reason: NotificationReason; now: Date; content: () => Promise<IncidentContent>; brand: Brand }
 
-async function emailIncident(supabase: ServiceRoleClient, context: IncidentContext, { kind, key, userId, reason, now, content }: IncidentEmail): Promise<void> {
+async function emailIncident(supabase: ServiceRoleClient, context: IncidentContext, { kind, key, userId, reason, now, content, brand }: IncidentEmail): Promise<void> {
     const recipient = await loadEmailRecipient(supabase, userId)
     if (!recipient) return
     const { data: opened, error } = await supabase.rpc('open_notification_incident', { p_user_id: userId, p_source_key: key })
@@ -382,21 +385,23 @@ async function emailIncident(supabase: ServiceRoleClient, context: IncidentConte
     // would find it taken and the recipient would never hear of it.
     const send = async () => {
         const { app, look, board } = await content()
+        const appUrl = brandAppUrl(brand)
         const locale = await recipientLocale(supabase, userId, context.workspaceId)
         const [boardUrl, portraitUrl] = await Promise.all([board, context.agentId ? emailPortrait(context.agentId, look, locale, BANNER_WARM_INLINE_MS) : undefined])
         const { ok } = await sendNotificationEmail({
             to: recipient.email,
             kind,
             agentName: context.agentName,
-            message: incidentMessage(context.notification, await translatorFor(locale, 'chatErrors')),
+            message: incidentMessage(context.notification, await translatorFor(locale, 'chatErrors', brand.name)),
             app,
             opensConversation: opensConversation(context.notification),
-            reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale)),
+            reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale, brand.name)),
             portraitUrl,
             boardUrl,
-            conversationUrl: notificationUrl(context.notificationId),
-            unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
+            conversationUrl: notificationUrl(context.notificationId, appUrl),
+            unsubscribeUrl: buildUnsubscribeUrl(userId, appUrl, 'runs'),
             locale,
+            brand,
         })
         return ok
     }
@@ -437,12 +442,12 @@ type IncidentContent = { app: string | undefined; look: CoworkerLook | null; boa
 
 // The same picture and the same words of the catalog whoever the notification goes to, read by the
 // first email that leaves.
-function lazyContent(supabase: ServiceRoleClient, context: IncidentContext, kind: IncidentKind): () => Promise<IncidentContent> {
+function lazyContent(supabase: ServiceRoleClient, context: IncidentContext, kind: IncidentKind, brand: Brand): () => Promise<IncidentContent> {
     let content: Promise<IncidentContent> | undefined
-    return () => (content ??= loadContent(supabase, context, kind))
+    return () => (content ??= loadContent(supabase, context, kind, brand))
 }
 
-async function loadContent(supabase: ServiceRoleClient, { workspaceId, boardAgentId, agentId, notification }: IncidentContext, kind: IncidentKind): Promise<IncidentContent> {
+async function loadContent(supabase: ServiceRoleClient, { workspaceId, boardAgentId, agentId, notification }: IncidentContext, kind: IncidentKind, brand: Brand): Promise<IncidentContent> {
     const awaited = kind === 'connector' ? awaitedApp(notification) : {}
     const [catalog, { data: agent }] = await Promise.all([
         awaited.slug ? loadServiceCatalog(supabase, [awaited.slug]) : null,
@@ -450,7 +455,7 @@ async function loadContent(supabase: ServiceRoleClient, { workspaceId, boardAgen
     ])
     // The Chief of Staff stands on no board: its email opens on the usual banner.
     const scene = boardAgentId ? coworkerAlertBoard(supabase, workspaceId, boardAgentId, ALERT_STATE_OF_KIND[kind], awaited.slug) : null
-    return { app: awaited.name ?? (awaited.slug ? catalog?.get(awaited.slug)?.name : undefined), look: parseCoworkerLook(agent?.look), board: alertBanner(scene, BANNER_WARM_INLINE_MS) }
+    return { app: awaited.name ?? (awaited.slug ? catalog?.get(awaited.slug)?.name : undefined), look: parseCoworkerLook(agent?.look), board: alertBanner(scene, BANNER_WARM_INLINE_MS, brand) }
 }
 
 async function dropIncident(supabase: ServiceRoleClient, userId: string, key: string): Promise<void> {

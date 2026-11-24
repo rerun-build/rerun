@@ -7,7 +7,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import type { Database } from '@/app/api/database.types'
-import { APP_URL, type SendEmailResult } from '@/lib/email/client'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
+import type { SendEmailResult } from '@/lib/email/client'
 import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
 import {
     sendAgentIdleEmail,
@@ -25,7 +27,7 @@ import {
 } from '@/ee/lib/email/lifecycle-emails'
 import { PLAN_CURRENCY } from '@/ee/lib/billing/plans'
 import { stripe } from '@/ee/lib/billing/stripe'
-import { formatAmount } from '@rerun/contracts'
+import { formatAmount, type Brand } from '@rerun/contracts'
 import { isRetriableFailure } from '@/lib/email/throttle'
 import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
 import { BANNER_WARM_BACKGROUND_MS, emailBoardBanner } from '@/lib/email/board-banner'
@@ -117,14 +119,14 @@ function periodLabel(from: Date, now: Date, t: EmailTranslator): string {
     return t('automateAgent.periods.lastTwoWeeks')
 }
 
-function unsubscribeFor(candidate: LifecycleCandidate): string | null {
+function unsubscribeFor(candidate: LifecycleCandidate, appUrl: string): string | null {
     // An end-of-access notice carries no unsubscribe link. It is sent whatever the category
     // preference says, and offering a one-click opt-out that the ladder then ignores is a worse
     // answer than offering none: the footer then shows no link at all.
     if (LIFECYCLE_SEQUENCES[candidate.sequenceKey].mandatory) return null
     // The POST route reads `category`, so a one-click unsubscribe on an activation email leaves the
     // billing ones alone.
-    return `${buildUnsubscribeUrl(candidate.userId)}&category=${candidate.category}`
+    return `${buildUnsubscribeUrl(candidate.userId, appUrl)}&category=${candidate.category}`
 }
 
 // Whole days, rounded up: an email that says "3 days" the moment 2.6 remain is not wrong, and one
@@ -133,25 +135,26 @@ function daysUntil(deadline: Date, now: Date): number {
     return Math.max(1, Math.ceil((deadline.getTime() - now.getTime()) / (24 * 60 * 60_000)))
 }
 
-async function build(supabase: Client, input: DeliverInput, recipient: LifecycleRecipient, locale: Locale): Promise<{ send: () => Promise<SendEmailResult> } | { skip: string }> {
+async function build(supabase: Client, input: DeliverInput, recipient: LifecycleRecipient, locale: Locale, brand: Brand): Promise<{ send: () => Promise<SendEmailResult> } | { skip: string }> {
     const { candidate, snapshot, workspace, agentName, now } = input
-    const to = { to: recipient.email, unsubscribeUrl: unsubscribeFor(candidate), locale }
-    const t = emailTranslator(locale)
+    const appUrl = brandAppUrl(brand)
+    const to = { to: recipient.email, unsubscribeUrl: unsubscribeFor(candidate, appUrl), locale, brand }
+    const t = emailTranslator(locale, brand.name)
     const dateLabel = (value: Date) => emailDateLabel(value, locale)
     const timeLabel = (value: Date) => emailTimeLabel(value, locale)
-    const agentUrl = candidate.agentId ? `${APP_URL}/?agent=${candidate.agentId}` : APP_URL
-    const billingUrl = `${APP_URL}/?billing=1`
+    const agentUrl = candidate.agentId ? `${appUrl}/?agent=${candidate.agentId}` : appUrl
+    const billingUrl = `${appUrl}/?billing=1`
     // Asked for only once a case knows it sends, so a skipped candidate never costs a capture.
-    const banner = (status: TeamStatus) => emailBoardBanner(supabase, candidate.workspaceId, status, BANNER_WARM_BACKGROUND_MS)
+    const banner = (status: TeamStatus) => emailBoardBanner(supabase, candidate.workspaceId, status, BANNER_WARM_BACKGROUND_MS, brand)
 
     switch (candidate.sequenceKey) {
         case 'onboarding_resume':
-            return { send: () => sendOnboardingResumeEmail(to, { firstName: recipient.firstName, resumeUrl: APP_URL }) }
+            return { send: () => sendOnboardingResumeEmail(to, { firstName: recipient.firstName, resumeUrl: appUrl }) }
 
         case 'agent_recommendations': {
             const answers = (workspace?.onboarding_answers ?? null) as Parameters<typeof recommendTemplates>[1]
             const candidates = await loadRecommendCandidates(supabase)
-            const result = await recommendTemplates(candidates, answers, { appUrl: APP_URL, now })
+            const result = await recommendTemplates(candidates, answers, { appUrl, now })
             if (!result.ok) return { skip: 'no solid recommendation' }
             const company = answers as { company_name?: string; company_url?: string } | null
 
@@ -168,7 +171,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         companyName: company?.company_name ?? null,
                         websiteDomain: hostnameOf(company?.company_url),
                         templates,
-                        browseUrl: APP_URL,
+                        browseUrl: appUrl,
                     }),
             }
         }
@@ -182,7 +185,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
 
         case 'team_invite': {
             const boardUrl = await banner('working')
-            return { send: () => sendTeamInviteEmail(to, { workspaceName: workspace?.name ?? t('common.yourWorkspace'), agentName: agentName ?? t('teamInvite.fallbackAgent'), inviteUrl: `${APP_URL}/?members=1`, boardUrl }) }
+            return { send: () => sendTeamInviteEmail(to, { workspaceName: workspace?.name ?? t('common.yourWorkspace'), agentName: agentName ?? t('teamInvite.fallbackAgent'), inviteUrl: `${appUrl}/?members=1`, boardUrl }) }
         }
 
         case 'automate_agent': {
@@ -335,7 +338,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
         }
 
         case 'creator_pitch':
-            return { send: () => sendCreatorPitchEmail(to, { firstName: recipient.firstName, agentName, creatorUrl: `${APP_URL}/creator` }) }
+            return { send: () => sendCreatorPitchEmail(to, { firstName: recipient.firstName, agentName, creatorUrl: `${appUrl}/creator` }) }
 
         case 'trial_started':
         case 'payment_failed':
@@ -364,7 +367,8 @@ export async function deliverLifecycleEmail(supabase: Client, input: DeliverInpu
     if (!recipient) return { sent: false, reason: 'no address' }
 
     const locale = await recipientLocale(supabase, input.candidate.userId, input.candidate.workspaceId)
-    const built = await build(supabase, input, recipient, locale)
+    const brand = await workspaceBrand(input.candidate.workspaceId)
+    const built = await build(supabase, input, recipient, locale, brand)
     if ('skip' in built) return { sent: false, reason: built.skip }
 
     const result = await built.send()

@@ -26,7 +26,7 @@ function actionLabel({ kind, app, opensConversation }: AgentNotificationProps, t
 }
 
 export default function AgentNotification(props: AgentNotificationProps) {
-  const t = emailTranslator(props.locale);
+  const t = emailTranslator(props.locale, props.brand?.name);
   return <CoworkerMessage {...props} variant={props.kind} heading={agentNotificationTitle(props, t)} action={actionLabel(props, t)} />;
 }
 

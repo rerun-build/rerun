@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { RERUN_BRAND } from '@rerun/contracts'
 import { sendPaymentFailedEmail } from '@/ee/lib/email/lifecycle-emails'
 import { deliverWhatsApp } from '@/lib/whatsapp/send'
 import { fakeSupabase, type SupabaseResult } from '@/test/supabase-fake'
@@ -42,7 +43,7 @@ describe('sendPaymentFailedNotice', () => {
         await sendPaymentFailedNotice(db.client, 1, INVOICE, NOW)
 
         expect(sendPaymentFailedEmail).toHaveBeenCalledWith(
-            { to: 'owner@example.com', unsubscribeUrl: null, locale: 'en' },
+            { to: 'owner@example.com', unsubscribeUrl: null, locale: 'en', brand: RERUN_BRAND },
             { workspaceName: 'Acme', amountLabel: '$17.62', pausedLabel: '6 October, 06:10 UTC', firstCharge: false, billingUrl: 'https://pay.stripe.test/in_1', boardUrl: 'https://app.rerun.build/og/board?sig=banner' },
         )
         expect(db.writes('lifecycle_emails')[0].payload).toMatchObject({ user_id: 'owner', workspace_id: 1, sequence_key: 'payment_failed', status: 'sent', metadata: { invoice_id: 'in_1' } })

@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
 import { formatNumber } from "@rerun/i18n/format";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -23,6 +24,7 @@ export interface ArchiveExpiringProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /**
@@ -41,8 +43,9 @@ export default function ArchiveExpiring({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: ArchiveExpiringProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   const kind = sandbox ? "sandbox" : "workspace";
   const workspace = workspaceName ?? t("common.yourWorkspace");
 
@@ -53,6 +56,7 @@ export default function ArchiveExpiring({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>
         {t("archiveExpiring.heading", { kind, date: deletionLabel })}

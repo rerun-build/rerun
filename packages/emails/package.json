@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@react-email/components": "^1.0.12",
+        "@rerun/contracts": "workspace:*",
         "@rerun/i18n": "workspace:*",
         "use-intl": "^4.14.9"
     },

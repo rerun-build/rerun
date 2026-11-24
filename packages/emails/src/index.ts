@@ -103,7 +103,7 @@ export type {
 export { theme, text, TONES } from "../theme";
 export type { Tone, ToneName } from "../theme";
 
-export { ASSET_ORIGIN, SCENE_HEIGHT, SCENE_WIDTH } from "../assets";
+export { ASSET_ORIGIN, LOGO_URL, SCENE_HEIGHT, SCENE_WIDTH } from "../assets";
 export type { HeroVariant } from "../assets";
 
 export { NOTE_ICONS } from "../assets";

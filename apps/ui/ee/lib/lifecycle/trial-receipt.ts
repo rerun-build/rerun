@@ -7,7 +7,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { PLAN_CURRENCY, basePriceCents, parsePriceArm } from '@/ee/lib/billing/plans'
 import { BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
-import { APP_URL } from '@/lib/email/client'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { emailDateLabel } from '@/lib/email/date-labels'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { sendTrialStartedEmail } from '@/ee/lib/email/lifecycle-emails'
@@ -47,9 +48,11 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
         if (!recipient) return
 
         const locale = await recipientLocale(supabase, owner.user_id, workspaceId)
-        const boardUrl = await emailBoardBanner(supabase, workspaceId, 'working', BANNER_WARM_INLINE_MS)
+        const brand = await workspaceBrand(workspaceId)
+        const appUrl = brandAppUrl(brand)
+        const boardUrl = await emailBoardBanner(supabase, workspaceId, 'working', BANNER_WARM_INLINE_MS, brand)
         await sendTrialStartedEmail(
-            { to: recipient.email, unsubscribeUrl: `${buildUnsubscribeUrl(owner.user_id)}&category=billing`, locale },
+            { to: recipient.email, unsubscribeUrl: `${buildUnsubscribeUrl(owner.user_id, appUrl)}&category=billing`, locale, brand },
             {
                 workspaceName: workspace.name,
                 trialDays,
@@ -57,9 +60,9 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
                 // The price this workspace is sold the plan at, before any promotion code entered at
                 // Checkout: it lowers the first charge, and overstating is the safe direction for a receipt.
                 monthlyPriceLabel: formatAmount(basePriceCents(parsePriceArm(workspace.price_arm)), PLAN_CURRENCY),
-                includedLabel: emailTranslator(locale)('trialStarted.included', { coworkers: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }),
+                includedLabel: emailTranslator(locale, brand.name)('trialStarted.included', { coworkers: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }),
                 hasCard,
-                workspaceUrl: APP_URL,
+                workspaceUrl: appUrl,
                 boardUrl,
             },
         )

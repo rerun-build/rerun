@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text, theme } from "../theme";
 
@@ -13,6 +14,7 @@ export interface SignInCodeProps {
   expiresInMinutes: number;
   appUrl: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function SignInCode({
@@ -21,10 +23,11 @@ export default function SignInCode({
   expiresInMinutes,
   appUrl,
   locale,
+  brand,
 }: SignInCodeProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
-    <Layout preview={t("signInCode.preview", { code })} appUrl={appUrl} locale={locale}>
+    <Layout preview={t("signInCode.preview", { code })} appUrl={appUrl} locale={locale} brand={brand}>
       <Heading style={text.heading}>
         {signInUrl ? t("signInCode.headingSignIn") : t("signInCode.headingConfirm")}
       </Heading>

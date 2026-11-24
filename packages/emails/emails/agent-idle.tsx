@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
 import { formatNumber } from "@rerun/i18n/format";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -18,6 +19,7 @@ export interface AgentIdleProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function AgentIdle({
@@ -28,8 +30,9 @@ export default function AgentIdle({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: AgentIdleProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("agentIdle.preview", { agentName })}
@@ -37,6 +40,7 @@ export default function AgentIdle({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("agentIdle.heading", { agentName })}</Heading>
       <Text style={text.paragraph}>{t.rich("agentIdle.body", { agentName, strong })}</Text>

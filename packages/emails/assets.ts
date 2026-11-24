@@ -1,3 +1,5 @@
+import { isWhiteLabel, type Brand } from "@rerun/contracts";
+
 // Gmail drops data: URI images, and a localhost appUrl would break every asset in mails sent
 // from a dev environment, so a sent email always resolves its assets against the production host.
 // Previews are the exception and override it: the react-email server sets EMAIL_ASSET_ORIGIN in
@@ -8,6 +10,13 @@ type MaybeNode = { process?: { env?: Record<string, string | undefined> } };
 export const ASSET_ORIGIN =
   (globalThis as MaybeNode).process?.env?.EMAIL_ASSET_ORIGIN ??
   "https://app.rerun.build";
+
+// An organization's email loads its artwork from where its links lead, so nothing in it names Rerun.
+// A localhost app keeps the production host, which the mail client can reach.
+export function assetOrigin(brand: Brand, appUrl: string | undefined): string {
+  if (!isWhiteLabel(brand) || !appUrl?.startsWith("https://")) return ASSET_ORIGIN;
+  return new URL(appUrl).origin;
+}
 
 /** Bumped whenever the artwork changes: both art routes are cached immutably. */
 export const ART_VERSION = "7";
@@ -34,8 +43,8 @@ export type HeroVariant =
   | "library"
   | "schedule";
 
-export function heroUrl(variant: HeroVariant): string {
-  return `${ASSET_ORIGIN}/email/art?variant=${variant}&v=${ART_VERSION}`;
+export function heroUrl(variant: HeroVariant, origin = ASSET_ORIGIN): string {
+  return `${origin}/email/art?variant=${variant}&v=${ART_VERSION}`;
 }
 
 // Every email an account gets about itself opens on a rendered 3D glass scene instead of the icon
@@ -61,8 +70,8 @@ export const SCENE_HEIGHT = 240;
 /** A close-up of the board, as wide as a scene. */
 export const CLOSE_UP_HEIGHT = 260;
 
-export function sceneUrl(scene: HeroScene): string {
-  return `${ASSET_ORIGIN}/email/scene/${scene}.jpg?v=${ART_VERSION}`;
+export function sceneUrl(scene: HeroScene, origin = ASSET_ORIGIN): string {
+  return `${origin}/email/scene/${scene}.jpg?v=${ART_VERSION}`;
 }
 
 // The previews cannot capture a close-up or a portrait either: flat files, captured once from /og/board

@@ -7,7 +7,7 @@ export interface RunFailedProps extends CoworkerMessageProps {
 }
 
 export default function RunFailed(props: RunFailedProps) {
-  const t = emailTranslator(props.locale);
+  const t = emailTranslator(props.locale, props.brand?.name);
   return <CoworkerMessage {...props} variant="failed" heading={t("runFailed.heading", { agentName: props.agentName })} action={t("runFailed.button")} />;
 }
 

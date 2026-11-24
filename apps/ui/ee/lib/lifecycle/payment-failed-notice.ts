@@ -5,7 +5,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { alertBanner, BANNER_WARM_INLINE_MS } from '@/lib/email/board-banner'
-import { APP_URL } from '@/lib/email/client'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { emailTimeLabel } from '@/lib/email/date-labels'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { sendPaymentFailedEmail } from '@/ee/lib/email/lifecycle-emails'
@@ -17,7 +18,7 @@ import { teamBoardUrl } from '@/lib/whatsapp/team'
 import { paymentFailedMessage, teamLabel } from '@/lib/whatsapp/templates'
 import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
-import { formatAmount } from '@rerun/contracts'
+import { formatAmount, type Brand } from '@rerun/contracts'
 import { loadRecipient } from './recipient'
 import { recordLifecycleEmail } from './store'
 
@@ -33,19 +34,19 @@ export type DeclinedInvoice = {
     firstCharge: boolean
 }
 
-async function emailAdmin(supabase: SupabaseClient<Database>, workspace: { id: number; name: string | null }, boardUrl: string | undefined, userId: string, invoice: DeclinedInvoice, now: Date): Promise<void> {
+async function emailAdmin(supabase: SupabaseClient<Database>, workspace: { id: number; name: string | null }, brand: Brand, boardUrl: string | undefined, userId: string, invoice: DeclinedInvoice, now: Date): Promise<void> {
     const recipient = await loadRecipient(supabase, userId)
     if (!recipient) return
 
     const locale = await recipientLocale(supabase, userId, workspace.id)
     const result = await sendPaymentFailedEmail(
-        { to: recipient.email, unsubscribeUrl: null, locale },
+        { to: recipient.email, unsubscribeUrl: null, locale, brand },
         {
             workspaceName: workspace.name,
             amountLabel: invoice.amountDueCents > 0 ? formatAmount(invoice.amountDueCents, invoice.currency) : undefined,
             pausedLabel: emailTimeLabel(new Date(now.getTime() + PAYMENT_FAILED_GRACE_MS), locale),
             firstCharge: invoice.firstCharge,
-            billingUrl: invoice.hostedUrl ?? `${APP_URL}/?${WORKSPACE_PARAM}=${workspace.id}&billing=1`,
+            billingUrl: invoice.hostedUrl ?? `${brandAppUrl(brand)}/?${WORKSPACE_PARAM}=${workspace.id}&billing=1`,
             boardUrl,
         },
     )
@@ -55,8 +56,9 @@ async function emailAdmin(supabase: SupabaseClient<Database>, workspace: { id: n
 async function emailAdmins(supabase: SupabaseClient<Database>, workspace: { id: number; name: string | null }, invoice: DeclinedInvoice, now: Date): Promise<void> {
     const { data: admins } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id, role: 'admin' }, { column: 'created_at' })
     if (!admins?.length) return
-    const boardUrl = await alertBanner(causeAlertBoard(supabase, workspace.id, 'payment'), BANNER_WARM_INLINE_MS)
-    const results = await Promise.allSettled(admins.map(admin => emailAdmin(supabase, workspace, boardUrl, admin.user_id, invoice, now)))
+    const brand = await workspaceBrand(workspace.id)
+    const boardUrl = await alertBanner(causeAlertBoard(supabase, workspace.id, 'payment'), BANNER_WARM_INLINE_MS, brand)
+    const results = await Promise.allSettled(admins.map(admin => emailAdmin(supabase, workspace, brand, boardUrl, admin.user_id, invoice, now)))
     for (const result of results) if (result.status === 'rejected') console.error('[lifecycle] payment failed email failed', result.reason)
 }
 

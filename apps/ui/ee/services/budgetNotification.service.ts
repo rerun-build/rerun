@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Database } from '@/app/api/database.types'
-import { APP_URL } from '@/lib/app-url'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { alertBanner, BANNER_WARM_BACKGROUND_MS } from '@/lib/email/board-banner'
 import { emailDateLabel } from '@/lib/email/date-labels'
 import { BUDGET_EXHAUSTED_EVENT, BUDGET_NOTICE_WINDOW_MS, RERUN_BUDGET_ERROR_CODE, decideBudgetNotice } from '@/lib/notifications/budget-notice'
@@ -75,14 +76,15 @@ async function emailAdmins(supabase: ReturnType<typeof createServiceRoleClient>,
     if (!budget || !(await everHadCredit(supabase, workspaceId, budget.budgetMicros))) return
 
     const resetsAt = creditResetsAt(budget)
-    const alert = { workspaceId, key: `workspace:${workspaceId}:credits:${resetsAt?.toISOString().slice(0, 10) ?? 'once'}:${budget.budgetMicros}` }
+    const brand = await workspaceBrand(workspaceId)
+    const alert = { workspaceId, brand, key: `workspace:${workspaceId}:credits:${resetsAt?.toISOString().slice(0, 10) ?? 'once'}:${budget.budgetMicros}` }
     const adminIds = await adminsToAlert(supabase, alert)
     if (!adminIds.length) return
 
     // Run after the 402 response is flushed, so nobody waits on the capture.
-    const boardUrl = await alertBanner(causeAlertBoard(supabase, workspaceId, 'credits'), BANNER_WARM_BACKGROUND_MS)
+    const boardUrl = await alertBanner(causeAlertBoard(supabase, workspaceId, 'credits'), BANNER_WARM_BACKGROUND_MS, brand)
     await sendAlert(supabase, alert, adminIds, ({ to, locale, unsubscribeUrl }) =>
-        sendBudgetExhaustedEmail({ to, workspaceName, resetLabel: resetsAt ? emailDateLabel(resetsAt, locale) : undefined, creditsUrl: `${APP_URL}/?${WORKSPACE_PARAM}=${workspaceId}&billing=1`, boardUrl, unsubscribeUrl, locale }),
+        sendBudgetExhaustedEmail({ to, workspaceName, resetLabel: resetsAt ? emailDateLabel(resetsAt, locale) : undefined, creditsUrl: `${brandAppUrl(brand)}/?${WORKSPACE_PARAM}=${workspaceId}&billing=1`, boardUrl, unsubscribeUrl, locale, brand }),
     )
 }
 

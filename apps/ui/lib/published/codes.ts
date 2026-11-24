@@ -2,6 +2,7 @@ import 'server-only'
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import type { Database } from '@/app/api/database.types'
 import { sendPublishedAccessCodeEmail } from '@rerun/cloud/email'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { callerRateKey } from '@/lib/auth/caller-ip'
 import { inviteAllows } from '@/lib/published/access'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
@@ -109,10 +110,10 @@ export async function sendAccessCode(entry: PublishedEntry, email: string, ip: s
     })
     if (error) throw new Error(`Failed to store the access code: ${error.message}`)
 
-    const brand = await loadWorkspaceBrand(entry.workspace_id)
+    const [publisher, brand] = await Promise.all([loadWorkspaceBrand(entry.workspace_id), workspaceBrand(entry.workspace_id)])
     const locale = await workspaceLocale(supabase, entry.workspace_id)
-    const pageTitle = entry.title ?? emailTranslator(locale)('publishedAccessCode.untitledPage')
-    await sendPublishedAccessCodeEmail({ to: email, code, workspaceName: brand.name, pageTitle, expiresInMinutes: CODE_TTL_MINUTES, locale })
+    const pageTitle = entry.title ?? emailTranslator(locale, brand.name)('publishedAccessCode.untitledPage')
+    await sendPublishedAccessCodeEmail({ to: email, code, workspaceName: publisher.name, pageTitle, expiresInMinutes: CODE_TTL_MINUTES, locale, brand })
     return 'sent'
 }
 

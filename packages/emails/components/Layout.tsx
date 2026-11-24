@@ -1,18 +1,18 @@
 import * as React from "react";
+import { RERUN_BRAND, type Brand } from "@rerun/contracts";
 import {
   Body,
   Container,
   Head,
   Html,
-  Img,
-  Link,
   Preview,
   Section,
 } from "@react-email/components";
 import { readingSides } from "./direction";
 import { Footer } from "./Footer";
 import { Hero, type HeroProps } from "./Hero";
-import { LOGO_SIZE, LOGO_URL } from "../assets";
+import { Lockup } from "./Lockup";
+import { assetOrigin } from "../assets";
 import { localeDirection } from "@rerun/i18n";
 import type { EmailLocale } from "../i18n";
 import { theme } from "../theme";
@@ -25,15 +25,18 @@ export interface LayoutProps {
   unsubscribeUrl?: string;
   unsubscribeLabel?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export function Layout({
   preview,
   children,
   hero,
+  appUrl,
   unsubscribeUrl,
   unsubscribeLabel,
   locale = "en",
+  brand = RERUN_BRAND,
 }: LayoutProps) {
   const sides = readingSides(locale);
   return (
@@ -48,43 +51,19 @@ export function Layout({
       <Preview>{preview}</Preview>
       <Body className="rr-frame" style={body}>
         <Section style={{ ...header, textAlign: sides.start }}>
-          <table align={sides.start} role="presentation" style={lockup}>
-            <tbody>
-              <tr>
-                <td style={{ ...logoCell, padding: sides.start === "left" ? "0 10px 0 0" : "0 0 0 10px" }}>
-                  <Link href={SITE_URL} style={logoLink}>
-                    <Img
-                      src={LOGO_URL}
-                      width={LOGO_SIZE}
-                      height={LOGO_SIZE}
-                      alt="Rerun"
-                      style={logo}
-                    />
-                  </Link>
-                </td>
-                <td style={brandCell}>
-                  <Link href={SITE_URL} style={brand}>
-                    Rerun
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <Lockup brand={brand} start={sides.start} />
         </Section>
         <Container style={container}>
-          {hero ? <Hero {...hero} /> : null}
+          {hero ? <Hero {...hero} origin={assetOrigin(brand, appUrl)} /> : null}
           <Section className="rr-content" style={hero ? content : { ...content, paddingTop: "34px" }}>
             {children}
           </Section>
         </Container>
-        <Footer unsubscribeUrl={unsubscribeUrl} unsubscribeLabel={unsubscribeLabel} locale={locale} />
+        <Footer unsubscribeUrl={unsubscribeUrl} unsubscribeLabel={unsubscribeLabel} locale={locale} brand={brand} />
       </Body>
     </Html>
   );
 }
-
-// The lockup points at the site, not at the app: the CTAs already carry `appUrl`.
-const SITE_URL = "https://rerun.build";
 
 const HEAD_STYLE = `
   :root { color-scheme: dark; supported-color-schemes: dark; }
@@ -105,40 +84,6 @@ const body: React.CSSProperties = {
 const header: React.CSSProperties = {
   margin: "0 auto 18px",
   maxWidth: `${theme.width.card}px`,
-};
-
-const lockup: React.CSSProperties = {
-  borderCollapse: "collapse",
-};
-
-const logoCell: React.CSSProperties = {
-  verticalAlign: "middle",
-};
-
-// Colour stated rather than left to react-email, whose `Link` defaults to its own blue. It is
-// only ever seen when images are blocked: what is painted then is the `alt`, and the alt reads
-// "Rerun" right next to the wordmark.
-const logoLink: React.CSSProperties = {
-  color: theme.text.strong,
-  display: "block",
-  textDecoration: "none",
-};
-
-const logo: React.CSSProperties = {
-  display: "block",
-};
-
-const brandCell: React.CSSProperties = {
-  verticalAlign: "middle",
-};
-
-// Weight 500, per the design system rule that headings are medium and never bold.
-const brand: React.CSSProperties = {
-  color: theme.text.strong,
-  fontSize: "17px",
-  fontWeight: 500,
-  letterSpacing: "-0.02em",
-  textDecoration: "none",
 };
 
 const container: React.CSSProperties = {

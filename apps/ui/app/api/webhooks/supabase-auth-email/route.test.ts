@@ -1,3 +1,4 @@
+import { RERUN_BRAND } from '@rerun/contracts'
 import { randomUUID } from 'node:crypto'
 import { Webhook } from 'standardwebhooks'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +9,9 @@ vi.mock('@/app/api/_services/email.service', () => ({ sendSignInCodeEmail: (inpu
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
 const recipientLocale = vi.fn()
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: (...args: unknown[]) => recipientLocale(...args) }))
+
+const authEmailBrand = vi.fn()
+vi.mock('@/lib/brand/workspace', () => ({ authEmailBrand: (request: unknown) => authEmailBrand(request) }))
 
 const claimAuthEmailSend = vi.fn()
 vi.mock('@/app/api/_services/email-sign-up.service', () => ({ claimAuthEmailSend: (email: string) => claimAuthEmailSend(email) }))
@@ -42,6 +46,7 @@ describe('supabase send email hook', () => {
         vi.stubEnv('SEND_EMAIL_HOOK_SECRET', SECRET)
         sendSignInCodeEmail.mockReset().mockResolvedValue({ ok: true, id: 'email_1' })
         recipientLocale.mockReset().mockResolvedValue('en')
+        authEmailBrand.mockReset().mockResolvedValue(RERUN_BRAND)
         rememberSignInCode.mockReset()
         claimAuthEmailSend.mockReset().mockResolvedValue(true)
     })
@@ -54,6 +59,16 @@ describe('supabase send email hook', () => {
         const input = sendSignInCodeEmail.mock.calls[0][0]
         expect(input).toMatchObject({ to: 'a@b.co', code: '123456' })
         expect(input.signInUrl).toContain('/auth/confirm?token_hash=hash1&type=magiclink')
+    })
+
+    it('mails it under the brand of the address and of the host it was asked from', async () => {
+        const agency = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys' }
+        authEmailBrand.mockResolvedValue(agency)
+
+        await post({ user: { id: 'user-1', email: 'a@b.co' }, email_data: emailData({ token: '123456', token_hash: 'hash1', redirect_to: 'https://agents.nordlys.no/auth/callback' }) })
+
+        expect(authEmailBrand).toHaveBeenCalledWith({ email: 'a@b.co', redirectTo: 'https://agents.nordlys.no/auth/callback' })
+        expect(sendSignInCodeEmail.mock.calls[0][0].brand).toEqual(agency)
     })
 
     it('remembers the code it mailed, so asking again can send the same one', async () => {

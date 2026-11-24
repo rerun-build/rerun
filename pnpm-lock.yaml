@@ -788,6 +788,9 @@ importers:
       '@react-email/components':
         specifier: ^1.0.12
         version: 1.0.12(react-dom@19.2.4)(react@19.2.4)
+      '@rerun/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@rerun/i18n':
         specifier: workspace:*
         version: link:../i18n

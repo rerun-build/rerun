@@ -4,7 +4,10 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { AppNotice as AppNoticeEmail, renderEmail } from '@rerun/emails'
 import { emailTranslator } from '@rerun/emails/i18n'
 import type { Database } from '@/app/api/database.types'
-import { APP_URL, REPLY_TO, TRANSACTIONAL_FROM, getResendClient, redirectDelivery } from '@/lib/email/client'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
+import { getResendClient, redirectDelivery } from '@/lib/email/client'
+import { emailSender } from '@/lib/email/sender'
 import { sendThrottled } from '@/lib/email/throttle'
 import { buildUnsubscribeUrl, listUnsubscribeHeaders } from '@/lib/email/unsubscribeToken'
 import { loadRecipient } from '@/ee/lib/lifecycle/recipient'
@@ -60,17 +63,20 @@ async function emailMembers(supabase: Client, workspaceId: number, notice: AppNo
     const { data: users } = await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: userIds })
     const recipients = (users ?? []).filter(user => wantsCategoryEmail(user.email_notification_prefs, 'billing'))
 
+    const brand = await workspaceBrand(workspaceId)
+    const appUrl = brandAppUrl(brand)
+
     await Promise.allSettled(
         recipients.map(async user => {
             const recipient = await loadRecipient(supabase, user.id)
             if (!recipient) return
             const locale = await recipientLocale(supabase, user.id, workspaceId)
-            const unsubscribeUrl = `${buildUnsubscribeUrl(user.id)}&category=billing`
-            const subject = emailTranslator(locale)('subjects.appNotice', { appName: notice.appName })
-            const message = noticeText({ message: notice.message, metadata: { notice: notice.copy } }, await translatorFor(locale, 'notifications.notices'))
-            const { html, text } = await renderEmail(React.createElement(AppNoticeEmail, { appName: notice.appName, message, appUrl: APP_URL, unsubscribeUrl, locale }))
+            const unsubscribeUrl = `${buildUnsubscribeUrl(user.id, appUrl)}&category=billing`
+            const subject = emailTranslator(locale, brand.name)('subjects.appNotice', { appName: notice.appName })
+            const message = noticeText({ message: notice.message, metadata: { notice: notice.copy } }, await translatorFor(locale, 'notifications.notices', brand.name))
+            const { html, text } = await renderEmail(React.createElement(AppNoticeEmail, { appName: notice.appName, message, appUrl, unsubscribeUrl, locale, brand }))
             const delivery = redirectDelivery(recipient.email, subject)
-            await sendThrottled(() => resend.emails.send({ from: TRANSACTIONAL_FROM, replyTo: REPLY_TO, to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(unsubscribeUrl) }))
+            await sendThrottled(() => resend.emails.send({ ...emailSender(brand), to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(unsubscribeUrl) }))
         }),
     )
 }

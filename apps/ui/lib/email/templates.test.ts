@@ -1,8 +1,9 @@
+import { RERUN_BRAND, type Brand } from '@rerun/contracts'
 import { readdirSync } from 'node:fs'
 import path from 'node:path'
 import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@rerun/emails'
+import { ASSET_ORIGIN, EMAIL_PREVIEWS, LOGO_URL, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@rerun/emails'
 
 // The email design system only holds if the templates keep going through it. These three checks
 // are what stop the old habits from creeping back: per-file colour constants, flexbox that no
@@ -129,5 +130,68 @@ describe('email templates in the reader\'s language', () => {
         }
         expect(errors).not.toHaveBeenCalled()
         errors.mockRestore()
+    })
+})
+
+const AGENCY: Brand = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys & Co', iconUrl: 'https://cdn.example/nordlys.png', supportEmail: 'help@nordlys.no' }
+const AGENCY_APP = 'https://agents.nordlys.no'
+
+// Rerun's own programs, which no organization ever sends.
+const RERUN_ONLY = /^(creator-invite|creator-pitch|lifetime-code)\//
+
+type BrandedElement = React.ReactElement<{ brand?: Brand; locale?: string }>
+
+// The previews link to Rerun's app; a sender links to the app of the brand.
+function onAgencyApp<T>(value: T): T {
+    if (typeof value === 'string') return value.replaceAll(ASSET_ORIGIN, AGENCY_APP) as T
+    if (Array.isArray(value)) return value.map(onAgencyApp) as T
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, onAgencyApp(entry)])) as T
+    return value
+}
+
+const links = (html: string) => [...html.matchAll(/<a\b[^>]* href="([^"]*)"/g)].map(match => match[1])
+const images = (html: string) => [...html.matchAll(/<img\b[^>]* src="([^"]*)"/g)].map(match => match[1])
+
+describe('the brand of an email', () => {
+    it('is Rerun by default: its logo, its site and its line at the foot of every preview', async () => {
+        for (const preview of EMAIL_PREVIEWS) {
+            const element = preview.element as BrandedElement
+            const { html, text } = await renderEmail(element)
+            expect(html, preview.id).toBe((await renderEmail(React.cloneElement(element, { brand: RERUN_BRAND }))).html)
+            expect(links(html).slice(0, 2), preview.id).toEqual(['https://rerun.build', 'https://rerun.build'])
+            expect(images(html)[0], preview.id).toBe(LOGO_URL)
+            expect(html, preview.id).toMatch(/<img[^>]*alt="Rerun"/)
+            expect(text, preview.id).toContain('Run your work on coworkers. Build them, watch them work, and keep your eyes on everything.\n\n© 2026 Rerun')
+            expect(html, preview.id).not.toContain('mailto:')
+        }
+    })
+
+    it.each(['en', 'fr', 'es', 'pt', 'de', 'tr'] as const)('names the organization and nothing of Rerun, in %s', async locale => {
+        const branded = EMAIL_PREVIEWS.filter(preview => !RERUN_ONLY.test(preview.id))
+        expect(branded.length).toBeGreaterThan(30)
+        for (const preview of branded) {
+            const element = preview.element as BrandedElement
+            const { html, text } = await renderEmail(React.cloneElement(element, { ...onAgencyApp(element.props), brand: AGENCY, locale }))
+            expect(html, preview.id).not.toMatch(/rerun/i)
+            expect(text, preview.id).not.toMatch(/rerun/i)
+            expect(text, preview.id).toContain('© 2026 Nordlys & Co')
+            expect(images(html)[0], preview.id).toBe(AGENCY.iconUrl)
+            expect(links(html), preview.id).toContain('mailto:help@nordlys.no')
+        }
+    })
+
+    it('shows a name alone when the organization has no icon, and no contact when it gave none', async () => {
+        const { html, text } = await renderEmail(React.cloneElement(EMAIL_PREVIEWS[0].element as BrandedElement, { brand: { ...AGENCY, iconUrl: null, supportEmail: null } }))
+        expect(text).toContain('Nordlys & Co')
+        expect(html).not.toContain(LOGO_URL)
+        expect(html).not.toContain('mailto:')
+    })
+
+    it('loads the artwork of an organization from its own app, and from production when the app is not reachable', async () => {
+        // Without its close-up, which the sender captures on the app of the brand, the email opens on its own art.
+        const element = EMAIL_PREVIEWS[0].element as React.ReactElement<{ brand?: Brand; appUrl?: string; boardUrl?: string }>
+        const art = async (appUrl: string) => images((await renderEmail(React.cloneElement(element, { brand: AGENCY, appUrl, boardUrl: undefined }))).html)[1]
+        expect(await art(AGENCY_APP)).toMatch(/^https:\/\/agents\.nordlys\.no\/email\//)
+        expect(await art('http://localhost:3000')).toContain(`${ASSET_ORIGIN}/email/`)
     })
 })

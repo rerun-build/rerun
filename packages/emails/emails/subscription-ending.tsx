@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -20,6 +21,7 @@ export interface SubscriptionEndingProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /**
@@ -40,8 +42,9 @@ export default function SubscriptionEnding({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: SubscriptionEndingProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
@@ -51,6 +54,7 @@ export default function SubscriptionEnding({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>
         {t("subscriptionEnding.heading", { daysLeft: Math.max(daysLeft, 1) })}

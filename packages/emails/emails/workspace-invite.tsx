@@ -3,6 +3,7 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -14,6 +15,7 @@ export interface WorkspaceInviteProps {
   boardUrl?: string;
   appUrl: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function WorkspaceInvite({
@@ -23,14 +25,16 @@ export default function WorkspaceInvite({
   boardUrl,
   appUrl,
   locale,
+  brand,
 }: WorkspaceInviteProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("workspaceInvite.preview", { workspaceName })}
       hero={{ scene: "workspace-invite", board: boardUrl }}
       appUrl={appUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("workspaceInvite.heading")}</Heading>
       <Text style={text.paragraph}>

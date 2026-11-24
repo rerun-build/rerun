@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Brand } from "@rerun/contracts";
 import { Heading, Section, Text } from "@react-email/components";
 import { Button } from "./Button";
 import type { HeroProps } from "./Hero";
@@ -14,12 +15,13 @@ export interface AlertMessageProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /** What stopped coworkers, in one paragraph, and the one thing that starts them again. */
-export function AlertMessage({ hero, heading, body, action, appUrl, unsubscribeUrl, locale }: AlertMessageProps) {
+export function AlertMessage({ hero, heading, body, action, appUrl, unsubscribeUrl, locale, brand }: AlertMessageProps) {
   return (
-    <Layout preview={body} hero={hero} appUrl={appUrl} unsubscribeUrl={unsubscribeUrl} locale={locale}>
+    <Layout preview={body} hero={hero} appUrl={appUrl} unsubscribeUrl={unsubscribeUrl} locale={locale} brand={brand}>
       <Heading style={text.heading}>{heading}</Heading>
       <Text style={{ ...text.paragraph, margin: 0 }}>{body}</Text>
       <Section style={{ margin: "24px 0 0" }}>

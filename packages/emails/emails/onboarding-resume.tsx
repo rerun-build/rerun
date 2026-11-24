@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -11,6 +12,7 @@ export interface OnboardingResumeProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 // Nothing is stored while the survey is open, so this email never claims a saved position. What it
@@ -21,8 +23,9 @@ export default function OnboardingResume({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: OnboardingResumeProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("onboardingResume.preview")}
@@ -30,6 +33,7 @@ export default function OnboardingResume({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>
         {firstName ? t("onboardingResume.headingNamed", { firstName }) : t("onboardingResume.heading")}

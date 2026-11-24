@@ -1,4 +1,5 @@
 import * as React from "react";
+import { isWhiteLabel, RERUN_BRAND, type Brand } from "@rerun/contracts";
 import { Link, Section, Text } from "@react-email/components";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
@@ -8,14 +9,16 @@ export interface FooterProps {
   unsubscribeUrl?: string;
   unsubscribeLabel?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export function Footer({
   unsubscribeUrl,
   unsubscribeLabel,
   locale,
+  brand = RERUN_BRAND,
 }: FooterProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand.name);
   const sides = readingSides(locale);
   return (
     <Section style={{ ...footer, textAlign: sides.start }}>
@@ -28,9 +31,17 @@ export function Footer({
           </tr>
         </tbody>
       </table>
-      <Text style={tagline}>{t("common.footer.tagline")}</Text>
+      {isWhiteLabel(brand) ? null : <Text style={tagline}>{t("common.footer.tagline")}</Text>}
       <Text style={legal}>
         {t("common.footer.copyright")}
+        {brand.supportEmail ? (
+          <>
+            <span style={dot}>·</span>
+            <Link href={`mailto:${brand.supportEmail}`} style={link}>
+              {brand.supportEmail}
+            </Link>
+          </>
+        ) : null}
         {unsubscribeUrl ? (
           <>
             <span style={dot}>·</span>

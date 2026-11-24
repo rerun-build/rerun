@@ -90,8 +90,8 @@ export function boardImageUrl(scene: BoardScene | AlertBoard, options: BoardImag
     return `${appUrl}/og/board?${signedBoardImageQuery(scene, options)}`
 }
 
-export function alertBoardUrl(board: AlertBoard): string {
-    return boardImageUrl(board, ALERT_BOARD_SIZE)
+export function alertBoardUrl(board: AlertBoard, appUrl?: string): string {
+    return boardImageUrl(board, ALERT_BOARD_SIZE, appUrl)
 }
 
 function readScene(raw: string | null) {

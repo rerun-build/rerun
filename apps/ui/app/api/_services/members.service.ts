@@ -6,6 +6,8 @@ import { toBoxScope, type BoxScope, type WorkspaceContext, type WorkspaceRole } 
 import type { Database } from '@/app/api/database.types'
 import { displayNameOf, readProfile } from '@/app/api/_services/me.service'
 import { BANNER_WARM_BACKGROUND_MS, EMAIL_DELIVERY, emailBoardBanner, sendWorkspaceInviteEmail } from '@rerun/cloud/email'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import { randomUuid } from '@/lib/random-uuid'
@@ -14,7 +16,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll, selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { emailTranslator } from '@rerun/emails/i18n'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.rerun.build'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -116,13 +117,14 @@ export async function inviteMember({ supabase, workspace, invitedBy }: InviteSco
 
     // After the response: the invitation is saved, and the board the email opens on can take a cold
     // capture without holding the caller.
-    const inviteUrl = `${APP_URL}/invite/${token}`
+    const brand = await workspaceBrand(workspace.id)
+    const inviteUrl = `${brandAppUrl(brand)}/invite/${token}`
     after(async () => {
         const serviceRole = createServiceRoleClient()
-        const boardUrl = await emailBoardBanner(serviceRole, workspace.id, 'working', BANNER_WARM_BACKGROUND_MS)
+        const boardUrl = await emailBoardBanner(serviceRole, workspace.id, 'working', BANNER_WARM_BACKGROUND_MS, brand)
         const locale = await workspaceLocale(serviceRole, workspace.id)
-        const workspaceName = workspace.name ?? emailTranslator(locale)('common.yourWorkspace')
-        await sendWorkspaceInviteEmail({ to: email, workspaceName, inviteUrl, invitedByEmail: invitedBy.email ?? undefined, boardUrl, locale })
+        const workspaceName = workspace.name ?? emailTranslator(locale, brand.name)('common.yourWorkspace')
+        await sendWorkspaceInviteEmail({ to: email, workspaceName, inviteUrl, invitedByEmail: invitedBy.email ?? undefined, boardUrl, locale, brand })
     })
 
     return EMAIL_DELIVERY ? { ok: true } : { ok: true, inviteUrl }

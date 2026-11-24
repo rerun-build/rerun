@@ -2,6 +2,7 @@ import { claimAuthEmailSend } from '@/app/api/_services/email-sign-up.service'
 import { sendSignInCodeEmail } from '@/app/api/_services/email.service'
 import { SIGN_IN_CODE_TTL_MINUTES, mailedSignInUrl, rememberSignInCode } from '@/app/api/_services/sign-in-code.service'
 import type { EmailOtpType } from '@supabase/supabase-js'
+import { authEmailBrand } from '@/lib/brand/workspace'
 import { normalizeEmail } from '@/lib/email'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -15,6 +16,7 @@ type SendEmailHookPayload = {
         token_new: string
         token_hash_new: string
         email_action_type: string
+        redirect_to?: string
     }
 }
 
@@ -65,8 +67,9 @@ export async function POST(req: Request) {
     const locale = await recipientLocale(createServiceRoleClient(), payload.user.id, null)
     for (const email of emails) {
         if (!(await claimAuthEmailSend(normalizeEmail(email.to)))) return hookError(429, 'Too many codes were sent to this address. Try again later.')
-        const signInUrl = mailedSignInUrl(email.tokenHash, email.type, payload.user)
-        const sent = await sendSignInCodeEmail({ to: email.to, code: email.code, signInUrl, expiresInMinutes: SIGN_IN_CODE_TTL_MINUTES, locale })
+        const brand = await authEmailBrand({ email: email.to, redirectTo: payload.email_data.redirect_to || null })
+        const signInUrl = mailedSignInUrl(email.tokenHash, email.type, payload.user, brand)
+        const sent = await sendSignInCodeEmail({ to: email.to, code: email.code, signInUrl, expiresInMinutes: SIGN_IN_CODE_TTL_MINUTES, locale, brand })
         if (!sent.ok) return hookError(502, 'We could not send the email. Please try again.')
         await rememberSignInCode({ email: email.to, userId: payload.user.id, type: email.type, code: email.code, tokenHash: email.tokenHash })
     }

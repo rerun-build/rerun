@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Img, Link, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
@@ -18,6 +19,7 @@ export interface CreatorInviteProps {
   cardImageUrl?: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 // This one keeps the expert card as its visual: a portrait of the recipient's own listing beats
@@ -30,8 +32,9 @@ export default function CreatorInvite({
   cardImageUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: CreatorInviteProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   const outreach = context === "outreach";
 
   return (
@@ -41,6 +44,7 @@ export default function CreatorInvite({
       unsubscribeUrl={unsubscribeUrl}
       unsubscribeLabel={unsubscribeUrl ? t("creatorInvite.unsubscribe") : undefined}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>
         {outreach

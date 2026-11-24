@@ -1,8 +1,10 @@
 import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { RERUN_BRAND, type Brand } from '@rerun/contracts'
 import type { Locale } from '@rerun/i18n'
 
 import type { Database } from '@/app/api/database.types'
+import { brandAppUrl } from '@/lib/brand/urls'
 import type { SendEmailResult } from '@/lib/email/client'
 import { loadEmailRecipient } from '@/lib/email/recipient'
 import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
@@ -24,6 +26,8 @@ export type AdminAlert = {
     awayOnly?: boolean
     /** Reopens an alert nobody closed for that long, in case what should have closed it was lost. */
     reopenAfterMs?: number
+    /** The brand of the workspace, which its emails wear. */
+    brand?: Brand
 }
 
 /** The admins this alert still has to reach. An alert is about the account, not about one run: the Email switch does not decide. */
@@ -48,12 +52,12 @@ export async function adminsToAlert(supabase: Client, { workspaceId, key, awayOn
 
 export type AlertAddress = { to: string; locale: Locale; unsubscribeUrl: string }
 
-export async function sendAlert(supabase: Client, { workspaceId, key }: AdminAlert, adminIds: string[], send: (address: AlertAddress) => Promise<SendEmailResult>): Promise<void> {
+export async function sendAlert(supabase: Client, { workspaceId, key, brand = RERUN_BRAND }: AdminAlert, adminIds: string[], send: (address: AlertAddress) => Promise<SendEmailResult>): Promise<void> {
     const results = await Promise.allSettled(
         adminIds.map(async userId => {
             const recipient = await loadEmailRecipient(supabase, userId)
             if (!recipient) return
-            const address = { to: recipient.email, locale: await recipientLocale(supabase, userId, workspaceId), unsubscribeUrl: `${buildUnsubscribeUrl(userId)}&category=billing` }
+            const address = { to: recipient.email, locale: await recipientLocale(supabase, userId, workspaceId), unsubscribeUrl: `${buildUnsubscribeUrl(userId, brandAppUrl(brand))}&category=billing` }
             const { data: opened, error } = await supabase.rpc('open_notification_incident', { p_user_id: userId, p_source_key: key })
             if (error) throw new Error(error.message)
             if (!opened) return

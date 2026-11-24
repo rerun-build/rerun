@@ -2,10 +2,12 @@ import 'server-only'
 import type { Database } from '@/app/api/database.types'
 import { sendSignInCodeEmail } from '@rerun/cloud/email'
 import { normalizeEmail } from '@/lib/email'
-import { APP_URL } from '@/lib/app-url'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { authEmailBrand } from '@/lib/brand/workspace'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import type { Brand } from '@rerun/contracts'
 import type { User } from '@supabase/supabase-js'
 
 // Mirrors auth.email.otp_expiry (900 s) in supabase/config.toml and on the hosted projects.
@@ -22,7 +24,7 @@ const SIGN_IN_CODE_COLUMNS = ['email', 'user_id', 'type', 'code', 'token_hash', 
 
 type SignInCodeRow = Pick<Database['public']['Tables']['sign_in_codes']['Row'], (typeof SIGN_IN_CODE_COLUMNS)[number]>
 
-export const signInUrlFor = (tokenHash: string, type: string) => `${APP_URL}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${type}`
+const signInUrlFor = (tokenHash: string, type: string, brand: Brand) => `${brandAppUrl(brand)}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${type}`
 
 // Best effort: the email is already out, and a code that is not remembered only means the next
 // request mints a new one, as it did before this table existed.
@@ -55,8 +57,8 @@ export async function rememberSignInCode(input: { email: string; userId: string;
 // for it: the link of the email only signs in, which it has no use for. An anonymous visitor
 // claiming an address is signing up, and keeps the link. What tells them apart is the address the
 // account already has, the visitor having none.
-export function mailedSignInUrl(tokenHash: string, type: string, user: { email?: string }): string | undefined {
-    return type === 'email_change' && user.email ? undefined : signInUrlFor(tokenHash, type)
+export function mailedSignInUrl(tokenHash: string, type: string, user: { email?: string }, brand: Brand): string | undefined {
+    return type === 'email_change' && user.email ? undefined : signInUrlFor(tokenHash, type, brand)
 }
 
 const isAfter = (date: string | undefined, time: number) => !!date && Date.parse(date) > time
@@ -96,7 +98,8 @@ export async function resendSignInCodeIfLive(email: string, sessionUserId: strin
     if (now - Date.parse(row.last_sent_at) < MIN_RESEND_INTERVAL_MS) return 'held'
 
     const locale = await recipientLocale(supabase, row.user_id, null)
-    const sent = await sendSignInCodeEmail({ to: row.email, code: row.code, signInUrl: mailedSignInUrl(row.token_hash, row.type, data.user), expiresInMinutes: minutesLeft, locale })
+    const brand = await authEmailBrand({ email: row.email, redirectTo: null })
+    const sent = await sendSignInCodeEmail({ to: row.email, code: row.code, signInUrl: mailedSignInUrl(row.token_hash, row.type, data.user, brand), expiresInMinutes: minutesLeft, locale, brand })
     if (!sent.ok) return null
 
     await supabase

@@ -3,7 +3,10 @@ import * as React from 'react'
 import { AccountSignedOut, AgentNotification, BudgetExhausted, LifetimeCode, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, accountSignedOutSubject, agentNotificationTitle, renderEmail, type AccountSignedOutProps } from '@rerun/emails'
 import { emailTranslator } from '@rerun/emails/i18n'
 import type { Locale } from '@rerun/i18n'
-import { APP_URL, IS_PRODUCTION_MAILER, REPLY_TO, TRANSACTIONAL_FROM as FROM, getResendClient as getClient, redirectDelivery, type SendEmailResult } from '@/lib/email/client'
+import { RERUN_BRAND, type Brand } from '@rerun/contracts'
+import { brandAppUrl } from '@/lib/brand/urls'
+import { APP_URL, IS_PRODUCTION_MAILER, getResendClient as getClient, redirectDelivery, type SendEmailResult } from '@/lib/email/client'
+import { emailSender } from '@/lib/email/sender'
 import { sendThrottled } from '@/lib/email/throttle'
 import { listUnsubscribeHeaders } from '@/lib/email/unsubscribeToken'
 import type { IncidentKind } from '@/lib/notifications/routing'
@@ -23,9 +26,11 @@ type NotificationEmailInput = {
     conversationUrl?: string
     unsubscribeUrl?: string
     locale?: Locale
+    brand?: Brand
 }
 
 export async function sendNotificationEmail(input: NotificationEmailInput): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         // No API key in this environment (e.g. local dev): skip sending, do not crash.
@@ -39,8 +44,7 @@ export async function sendNotificationEmail(input: NotificationEmailInput): Prom
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -63,31 +67,33 @@ type BudgetExhaustedEmailInput = {
     boardUrl?: string
     unsubscribeUrl?: string
     locale?: Locale
+    brand?: Brand
 }
 
 export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         console.warn('[email] RESEND_API_KEY missing, skipping budget exhausted email')
         return { ok: true, id: null }
     }
 
-    const t = emailTranslator(input.locale)
+    const t = emailTranslator(input.locale, brand.name)
     const element = React.createElement(BudgetExhausted, {
         resetLabel: input.resetLabel,
         creditsUrl: input.creditsUrl,
         boardUrl: input.boardUrl,
-        appUrl: APP_URL,
+        appUrl: brandAppUrl(brand),
         unsubscribeUrl: input.unsubscribeUrl,
         locale: input.locale,
+        brand,
     })
     const { html, text } = await renderEmail(element)
     const delivery = redirectDelivery(input.to, input.workspaceName ? t('subjects.budgetExhausted', { workspace: input.workspaceName }) : t('budgetExhausted.heading'))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -103,19 +109,19 @@ export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput)
 }
 
 export async function sendAccountSignedOutEmail({ to, ...input }: Omit<AccountSignedOutProps, 'appUrl'> & { to: string }): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         console.warn('[email] RESEND_API_KEY missing, skipping account signed out email')
         return { ok: true, id: null }
     }
 
-    const { html, text } = await renderEmail(React.createElement(AccountSignedOut, { ...input, appUrl: APP_URL }))
-    const delivery = redirectDelivery(to, accountSignedOutSubject(input, emailTranslator(input.locale)))
+    const { html, text } = await renderEmail(React.createElement(AccountSignedOut, { ...input, brand, appUrl: brandAppUrl(brand) }))
+    const delivery = redirectDelivery(to, accountSignedOutSubject(input, emailTranslator(input.locale, brand.name)))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -137,9 +143,11 @@ type WorkspaceInviteEmailInput = {
     invitedByEmail?: string
     boardUrl?: string
     locale?: Locale
+    brand?: Brand
 }
 
 export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         console.warn('[email] RESEND_API_KEY missing, skipping workspace invite email')
@@ -151,16 +159,16 @@ export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput)
         inviteUrl: input.inviteUrl,
         invitedByEmail: input.invitedByEmail,
         boardUrl: input.boardUrl,
-        appUrl: APP_URL,
+        appUrl: brandAppUrl(brand),
         locale: input.locale,
+        brand,
     })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.workspaceInvite', { workspaceName: input.workspaceName }))
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale, brand.name)('subjects.workspaceInvite', { workspaceName: input.workspaceName }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -174,7 +182,8 @@ export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput)
     return { ok: true, id: data?.id ?? null }
 }
 
-export async function sendPublishedAccessCodeEmail(input: { to: string; code: string; workspaceName: string; pageTitle: string; expiresInMinutes: number; locale?: Locale }): Promise<SendEmailResult> {
+export async function sendPublishedAccessCodeEmail(input: { to: string; code: string; workspaceName: string; pageTitle: string; expiresInMinutes: number; locale?: Locale; brand?: Brand }): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         if (IS_PRODUCTION_MAILER) console.error('[email] RESEND_API_KEY missing, skipping published access code email')
@@ -182,14 +191,13 @@ export async function sendPublishedAccessCodeEmail(input: { to: string; code: st
         return { ok: true, id: null }
     }
 
-    const element = React.createElement(PublishedAccessCode, { ...input, appUrl: APP_URL })
+    const element = React.createElement(PublishedAccessCode, { ...input, brand, appUrl: brandAppUrl(brand) })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.publishedAccessCode', { pageTitle: input.pageTitle, code: input.code }))
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale, brand.name)('subjects.publishedAccessCode', { pageTitle: input.pageTitle, code: input.code }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -218,8 +226,7 @@ export async function sendLifetimeCodeEmail(input: { to: string; code: string; l
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(RERUN_BRAND),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -233,7 +240,8 @@ export async function sendLifetimeCodeEmail(input: { to: string; code: string; l
     return { ok: true, id: data?.id ?? null }
 }
 
-export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number; locale?: Locale }): Promise<SendEmailResult> {
+export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number; locale?: Locale; brand?: Brand }): Promise<SendEmailResult> {
+    const brand = input.brand ?? RERUN_BRAND
     const resend = getClient()
     if (!resend) {
         // Local dev and staging send no email at all, so the log is the only way to sign in there.
@@ -243,14 +251,13 @@ export async function sendSignInCodeEmail(input: { to: string; code: string; sig
         return { ok: true, id: null }
     }
 
-    const element = React.createElement(SignInCode, { code: input.code, signInUrl: input.signInUrl, expiresInMinutes: input.expiresInMinutes, appUrl: APP_URL, locale: input.locale })
+    const element = React.createElement(SignInCode, { code: input.code, signInUrl: input.signInUrl, expiresInMinutes: input.expiresInMinutes, appUrl: brandAppUrl(brand), locale: input.locale, brand })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.signInCode', { code: input.code }))
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale, brand.name)('subjects.signInCode', { code: input.code }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
-            from: FROM,
-            replyTo: REPLY_TO,
+            ...emailSender(brand),
             to: delivery.to,
             subject: delivery.subject,
             html,
@@ -264,11 +271,12 @@ export async function sendSignInCodeEmail(input: { to: string; code: string; sig
     return { ok: true, id: data?.id ?? null }
 }
 
-function buildNotificationEmail({ kind, app, opensConversation, ...input }: NotificationEmailInput): { element: React.ReactElement; subject: string } {
-    const t = emailTranslator(input.locale)
-    if (kind === 'error') return { subject: t('runFailed.heading', { agentName: input.agentName }), element: React.createElement(RunFailed, { ...input, appUrl: APP_URL }) }
+function buildNotificationEmail({ kind, app, opensConversation, brand = RERUN_BRAND, ...input }: NotificationEmailInput): { element: React.ReactElement; subject: string } {
+    const t = emailTranslator(input.locale, brand.name)
+    const appUrl = brandAppUrl(brand)
+    if (kind === 'error') return { subject: t('runFailed.heading', { agentName: input.agentName }), element: React.createElement(RunFailed, { ...input, brand, appUrl }) }
     return {
         subject: agentNotificationTitle({ kind, agentName: input.agentName, app }, t),
-        element: React.createElement(AgentNotification, { ...input, kind, app, opensConversation, appUrl: APP_URL }),
+        element: React.createElement(AgentNotification, { ...input, kind, app, opensConversation, brand, appUrl }),
     }
 }

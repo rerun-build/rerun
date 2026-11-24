@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -24,6 +25,7 @@ export interface TrialStartedProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function TrialStarted({
@@ -38,8 +40,9 @@ export default function TrialStarted({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: TrialStartedProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
@@ -49,6 +52,7 @@ export default function TrialStarted({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("trialStarted.heading")}</Heading>
       <Text style={text.paragraph}>

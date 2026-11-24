@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text, theme } from "../theme";
 
@@ -11,6 +12,7 @@ export interface PublishedAccessCodeProps {
   expiresInMinutes: number;
   appUrl: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function PublishedAccessCode({
@@ -20,10 +22,11 @@ export default function PublishedAccessCode({
   expiresInMinutes,
   appUrl,
   locale,
+  brand,
 }: PublishedAccessCodeProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
-    <Layout preview={t("publishedAccessCode.preview", { pageTitle, code })} appUrl={appUrl} locale={locale}>
+    <Layout preview={t("publishedAccessCode.preview", { pageTitle, code })} appUrl={appUrl} locale={locale} brand={brand}>
       <Heading style={text.heading}>{t("publishedAccessCode.heading", { pageTitle })}</Heading>
       <Text style={text.paragraph}>
         {t("publishedAccessCode.body", { workspaceName })}

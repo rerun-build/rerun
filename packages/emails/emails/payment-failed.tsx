@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Brand } from "@rerun/contracts";
 import { AlertMessage } from "../components/AlertMessage";
 import { emailTranslator, type EmailLocale } from "../i18n";
 
@@ -17,6 +18,7 @@ export interface PaymentFailedProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /**
@@ -24,8 +26,8 @@ export interface PaymentFailedProps {
  * that says when the coworkers stop. The subscription is still there: paying the invoice keeps
  * everything on the same plan, which is why the button goes to the invoice and not to a new checkout.
  */
-export default function PaymentFailed({ workspaceName, amountLabel, pausedLabel, firstCharge = false, billingUrl, boardUrl, appUrl, unsubscribeUrl, locale }: PaymentFailedProps) {
-  const t = emailTranslator(locale);
+export default function PaymentFailed({ workspaceName, amountLabel, pausedLabel, firstCharge = false, billingUrl, boardUrl, appUrl, unsubscribeUrl, locale, brand }: PaymentFailedProps) {
+  const t = emailTranslator(locale, brand?.name);
   const workspace = workspaceName ?? t("common.yourWorkspace");
   const charge = firstCharge ? "first" : "renewal";
   return (
@@ -37,6 +39,7 @@ export default function PaymentFailed({ workspaceName, amountLabel, pausedLabel,
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     />
   );
 }

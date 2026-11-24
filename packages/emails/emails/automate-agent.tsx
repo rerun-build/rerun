@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { Panel } from "../components/Panel";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -20,6 +21,7 @@ export interface AutomateAgentProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 export default function AutomateAgent({
@@ -32,8 +34,9 @@ export default function AutomateAgent({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: AutomateAgentProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   return (
     <Layout
       preview={t("automateAgent.preview", { agentName, manualRuns })}
@@ -41,6 +44,7 @@ export default function AutomateAgent({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("automateAgent.heading", { agentName })}</Heading>
       <Text style={text.paragraph}>

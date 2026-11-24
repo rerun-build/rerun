@@ -4,6 +4,7 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { strong } from "../components/rich";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
@@ -20,6 +21,7 @@ export interface TrialEndingProps {
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
 /**
@@ -37,8 +39,9 @@ export default function TrialEnding({
   appUrl,
   unsubscribeUrl,
   locale,
+  brand,
 }: TrialEndingProps) {
-  const t = emailTranslator(locale);
+  const t = emailTranslator(locale, brand?.name);
   const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
@@ -48,6 +51,7 @@ export default function TrialEnding({
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
+      brand={brand}
     >
       <Heading style={text.heading}>{t("trialEnding.heading", { daysLeft })}</Heading>
       <Text style={text.paragraph}>

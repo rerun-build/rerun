@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import type { Brand } from "@rerun/contracts";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { text, theme } from "../theme";
 
@@ -10,12 +11,13 @@ export interface LifetimeCodeProps {
   redeemUrl: string;
   appUrl: string;
   locale?: EmailLocale;
+  brand?: Brand;
 }
 
-export default function LifetimeCode({ code, redeemUrl, appUrl, locale }: LifetimeCodeProps) {
-  const t = emailTranslator(locale);
+export default function LifetimeCode({ code, redeemUrl, appUrl, locale, brand }: LifetimeCodeProps) {
+  const t = emailTranslator(locale, brand?.name);
   return (
-    <Layout preview={t("lifetimeCode.preview", { code })} appUrl={appUrl} locale={locale}>
+    <Layout preview={t("lifetimeCode.preview", { code })} appUrl={appUrl} locale={locale} brand={brand}>
       <Heading style={text.heading}>{t("lifetimeCode.heading")}</Heading>
       <Text style={text.paragraph}>{t("lifetimeCode.body")}</Text>
       <Section style={codeBox}>
