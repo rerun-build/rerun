@@ -25,13 +25,31 @@ export const SIGN_IN_EXPIRED = 'Sign-in expired, please retry'
 // The Composio account of a Vault entry whose sign-in nobody can finish any more.
 export type AbandonedVaultAccount = { workspaceId: number; itemId: string; connectedAccountId: string }
 
-export class SignInClaimError extends Error {}
+export class SignInClaimError extends Error {
+    constructor(
+        message: string,
+        readonly abandoned: AbandonedVaultAccount | null = null,
+    ) {
+        super(message)
+    }
+}
+
+// A row parked for a Vault entry names no coworker, and its `key` is the entry's id.
+function vaultAccountOf(row: { agent_id: string; workspace_id: number; payload: Json | null }): AbandonedVaultAccount | null {
+    const parked = row.payload as unknown as ParkedSignIn | null
+    if (row.agent_id !== '' || parked?.kind !== 'composio') return null
+    return { workspaceId: row.workspace_id, itemId: parked.key, connectedAccountId: parked.connectedAccountId }
+}
+
+export async function purgeExpiredGrants(): Promise<AbandonedVaultAccount[]> {
+    const { data, error } = await createServiceRoleClient().from('oauth_pending_grants').delete().lt('expires_at', new Date().toISOString()).select('agent_id, workspace_id, payload')
+    if (error) throw new Error(error.message)
+    return data.flatMap(row => vaultAccountOf(row) ?? [])
+}
 
 // The ticket is spent as the sign-in starts: a second start on the same ticket finds its row.
 export async function openPendingGrant(ticket: ConnectTicket): Promise<void> {
-    const supabase = createServiceRoleClient()
-    await supabase.from('oauth_pending_grants').delete().lt('expires_at', new Date().toISOString())
-    const { error } = await supabase
+    const { error } = await createServiceRoleClient()
         .from('oauth_pending_grants')
         .insert<PendingInsert>({ jti: ticket.jti, agent_id: ticket.agentId, workspace_id: ticket.workspaceId, user_id: ticket.userId, expires_at: new Date(Date.now() + GRANT_TTL_MS).toISOString() })
     if (error?.code === '23505') throw new Error(SIGN_IN_ALREADY_USED)
@@ -66,6 +84,6 @@ export async function claimSignIn(jti: string, claimant: { agentId: string; work
     if (!row) throw new SignInClaimError(SIGN_IN_EXPIRED)
     await supabase.from('oauth_pending_grants').delete().eq('jti', jti)
     const theirs = row.agent_id === claimant.agentId && row.workspace_id === claimant.workspaceId && row.user_id === claimant.userId
-    if (!theirs || row.payload === null || new Date(row.expires_at).getTime() < Date.now()) throw new SignInClaimError(SIGN_IN_EXPIRED)
+    if (!theirs || row.payload === null || new Date(row.expires_at).getTime() < Date.now()) throw new SignInClaimError(SIGN_IN_EXPIRED, vaultAccountOf(row))
     return row.payload as unknown as ParkedSignIn
 }

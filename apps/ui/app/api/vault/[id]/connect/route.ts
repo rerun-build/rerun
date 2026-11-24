@@ -15,7 +15,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const { actor, conn } = await vaultContext()
         await assertCanAdd(actor)
         const item = await getVaultItem(conn, id)
-        if (!item.oauth) throw new AppError('vaultEntryOtherServer')
+        if (!item.oauth && !item.managed && !item.composio) throw new AppError('vaultEntryOtherServer')
         if (actor.kind !== 'user') throw new AppError('authorizationFailed')
         const target: ConnectTarget = { url: vaultConnectUrl(req, actor, item.id), returnUrl: appReturnBase(requestingDesktop(req)) }
         return NextResponse.json(target)

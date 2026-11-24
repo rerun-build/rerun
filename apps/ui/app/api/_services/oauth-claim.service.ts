@@ -4,10 +4,12 @@ import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { markComposioAuthorized, markManagedAuthorized, markServiceAuthorized } from '@/app/api/_services/services.service'
 import { ApiError } from '@/lib/api-error'
 import { putConnectorToken } from '@/lib/vault/tokens'
+import { managedTokenBundle } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { engineClientSecret } from '@/lib/mcp-oauth'
 import { claimSignIn, SIGN_IN_EXPIRED, SignInClaimError, type ParkedSignIn } from '@/lib/oauth/pending-grant'
 import { refusal } from '@/lib/i18n/action-error'
+import { discardVaultComposioAccount } from './vault-sign-in.service'
 
 type Claimant = { agentId: string; workspaceId: number; userId: string }
 
@@ -15,8 +17,9 @@ export async function claimParkedSignIn(claim: string, claimant: Claimant): Prom
     try {
         return await claimSignIn(claim, claimant)
     } catch (err) {
-        if (err instanceof SignInClaimError) throw new ApiError(409, err.message === SIGN_IN_EXPIRED ? refusal('signInExpired') : err.message)
-        throw err
+        if (!(err instanceof SignInClaimError)) throw err
+        if (err.abandoned) await discardVaultComposioAccount(err.abandoned)
+        throw new ApiError(409, err.message === SIGN_IN_EXPIRED ? refusal('signInExpired') : err.message)
     }
 }
 
@@ -35,10 +38,8 @@ export async function finishParkedSignIn(agentId: string, actor: Actor, parked: 
         return
     }
     const provider = getManagedProvider(parked.provider)
-    const clientId = provider && process.env[provider.oauth.clientIdEnv]
-    const clientSecret = provider && process.env[provider.oauth.clientSecretEnv]
-    if (!provider || !clientId || !clientSecret) throw new Error(`${parked.provider} is not configured on this server.`)
-    await putConnectorToken(conn, engineAgentId, parked.serverName, { ...parked.token, tokenEndpoint: provider.oauth.tokenEndpoint, clientId, clientSecret, obtainedAt: Date.now() })
+    if (!provider) throw new Error(`${parked.provider} is not configured on this server.`)
+    await putConnectorToken(conn, engineAgentId, parked.serverName, managedTokenBundle(provider, parked.token))
     await markManagedAuthorized(agentId, parked.key, parked.email, actor)
 }
 

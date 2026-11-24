@@ -1,17 +1,21 @@
 import { getServiceDetails, loadManifest } from '@/app/api/_services/services.service'
-import { composioUserId, composioVaultOwnUserId, initiateConnectedAccount } from '@/lib/composio/client'
+import { composioUserId, composioVaultOwnUserId, deleteConnectedAccount, initiateConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { readRegistry } from '@/lib/services/registry'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { decodeComposioContext } from '@/lib/composio/oauth'
+import { decodeManagedContext } from '@/lib/managed/oauth'
 import { decodeContext } from '@/lib/mcp-oauth'
 import { callbackGrant, mintConnectTicket } from '@/lib/oauth/mobile-ticket'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const getCustomMcpServer = vi.fn()
 const openPendingGrant = vi.fn()
-vi.mock('@/lib/oauth/pending-grant', () => ({ openPendingGrant: (...args: unknown[]) => openPendingGrant(...args) }))
+const purgeExpiredGrants = vi.fn()
+let afterTasks: Promise<unknown>[] = []
+vi.mock('next/server', async importOriginal => ({ ...(await importOriginal<typeof import('next/server')>()), after: (task: () => Promise<unknown>) => void afterTasks.push(task()) }))
+vi.mock('@/lib/oauth/pending-grant', () => ({ openPendingGrant: (...args: unknown[]) => openPendingGrant(...args), purgeExpiredGrants: () => purgeExpiredGrants() }))
 vi.mock('@/app/api/_services/custom-mcp.service', () => ({ getCustomMcpServer: (...args: unknown[]) => getCustomMcpServer(...args) }))
 vi.mock('@/app/api/_services/services.service', () => ({ getServiceDetails: vi.fn(), loadManifest: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
@@ -22,7 +26,8 @@ vi.mock('@/app/api/_services/vault.service', async importOriginal => ({
     ...(await importOriginal<typeof import('@/app/api/_services/vault.service')>()),
     vaultContext: vi.fn(async (actor: unknown) => ({ actor, conn: { baseUrl: 'https://engine.test', apiKey: null }, coworkers: [], byEngineId: new Map() })),
 }))
-vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), composioConfigured: () => true, initiateConnectedAccount: vi.fn() }))
+vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), composioConfigured: () => true, deleteConnectedAccount: vi.fn(), initiateConnectedAccount: vi.fn() }))
+vi.mock('@/app/api/_services/workspace-engine.service', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_services/workspace-engine.service')>()), findWorkspaceEngine: vi.fn(async () => null) }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
     discoverAuthServer: async () => ({ authorizationEndpoint: 'https://linear.app/oauth/authorize', tokenEndpoint: 'https://linear.app/oauth/token', scopesSupported: ['read'] }),
@@ -36,7 +41,9 @@ const serverTicket = () => mintConnectTicket({ agentId: 'agent-1', server: 'line
 
 beforeEach(() => {
     vi.stubEnv('MOBILE_OAUTH_TICKET_SECRET', 'test-secret')
+    afterTasks = []
     openPendingGrant.mockReset().mockResolvedValue(undefined)
+    purgeExpiredGrants.mockReset().mockResolvedValue([])
     getCustomMcpServer.mockReset().mockResolvedValue({ server: { name: 'linear', displayName: 'Linear', transport: 'http', host: 'mcp.linear.app', icon: null, signInUrl: 'https://mcp.linear.app/mcp' }, status: 'needs_auth' })
 })
 
@@ -75,6 +82,28 @@ describe('GET /api/oauth/mobile/start, for a server registered outside the catal
     })
 })
 
+describe('GET /api/oauth/mobile/start, and the sign-ins nobody claimed', () => {
+    it('drops the accounts they left, and starts this one whatever becomes of them', async () => {
+        purgeExpiredGrants.mockResolvedValueOnce([
+            { workspaceId: 7, itemId: 'item-1', connectedAccountId: 'ca_1' },
+            { workspaceId: 8, itemId: 'item-2', connectedAccountId: 'ca_2' },
+        ])
+        expect((await open(serverTicket())).status).toBe(302)
+        await Promise.all(afterTasks)
+        expect(vi.mocked(deleteConnectedAccount).mock.calls).toEqual([['ca_1'], ['ca_2']])
+
+        vi.spyOn(console, 'warn').mockImplementation(() => {})
+        purgeExpiredGrants.mockRejectedValueOnce(new Error('db down'))
+        expect(new URL((await open(serverTicket())).headers.get('location')!).origin).toBe('https://linear.app')
+        await Promise.all(afterTasks)
+    })
+
+    it('purges nothing for a ticket that does not verify', async () => {
+        await open('forged')
+        expect(purgeExpiredGrants).not.toHaveBeenCalled()
+    })
+})
+
 describe('GET /api/oauth/mobile/start, for an entry of the Vault', () => {
     const vaultTicket = () => mintConnectTicket({ agentId: '', vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
 
@@ -91,6 +120,33 @@ describe('GET /api/oauth/mobile/start, for an entry of the Vault', () => {
         const ctx = decodeContext(cookie.value)
         expect(ctx).toMatchObject({ agentId: '', serverName: 'notion', mcpUrl: 'https://mcp.notion.com/mcp', vault: { itemId: 'item-1', workspaceId: 7 } })
         expect(callbackGrant(ctx)).toMatchObject({ vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
+    })
+
+    it("starts a Composio entry as the entry's own user, bound to the entry and to the app", async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase().client)
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', slug: 'gmail', name: 'Gmail', composio: { toolkit: 'gmail', serverName: 'gmail' } } as never)
+        vi.mocked(loadManifest).mockResolvedValue({ name: 'Gmail', authMethods: [{ kind: 'composio', composio: { toolkit: 'gmail', authConfigId: 'ac_1' } }] } as unknown as Awaited<ReturnType<typeof loadManifest>>)
+        vi.mocked(initiateConnectedAccount).mockResolvedValue({ connectedAccountId: 'ca_2', redirectUrl: 'https://connect.composio.dev/link/x' })
+
+        const res = await open(vaultTicket())
+
+        expect(res.headers.get('location')).toBe('https://connect.composio.dev/link/x')
+        expect(initiateConnectedAccount).toHaveBeenLastCalledWith(composioVaultOwnUserId(7, 'item-1'), 'ac_1', expect.any(String))
+        const ctx = decodeComposioContext(res.cookies.getAll()[0].value)
+        expect(ctx).toMatchObject({ agentId: '', key: 'item-1', vault: { itemId: 'item-1', workspaceId: 7 } })
+        expect(callbackGrant(ctx)).toMatchObject({ vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
+    })
+
+    it('starts a managed entry with its provider', async () => {
+        vi.stubEnv('RERUN_TYPEFORM_CLIENT_ID', 'tf-id')
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', slug: 'typeform', name: 'Typeform', managed: { provider: 'typeform', serverName: 'typeform' } } as never)
+
+        const res = await open(vaultTicket())
+
+        expect(new URL(res.headers.get('location')!).searchParams.get('client_id')).toBe('tf-id')
+        const ctx = decodeManagedContext(res.cookies.getAll()[0].value)
+        expect(ctx).toMatchObject({ agentId: '', key: 'item-1', provider: 'typeform', vault: { itemId: 'item-1', workspaceId: 7 } })
+        expect(callbackGrant(ctx)).toMatchObject({ vaultItem: 'item-1', desktop: 'stable' })
     })
 
     it('ends in the desktop app with the reason when the entry has no sign-in', async () => {

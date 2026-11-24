@@ -36,6 +36,15 @@ describe('POST /api/vault/[id]/connect', () => {
         expect(returnUrl).toBe('rerun-desktop://oauth/callback')
     })
 
+    it('hands one out for a Composio and a managed entry too', async () => {
+        for (const target of [{ composio: { toolkit: 'gmail', serverName: 'gmail' } }, { managed: { provider: 'typeform', serverName: 'typeform' } }]) {
+            vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', ...target } as never)
+            const res = await call()
+            expect(res.status).toBe(200)
+            expect(verifyConnectTicket(new URL((await res.json()).url).searchParams.get('t'))).toMatchObject({ vaultItem: 'item-1' })
+        }
+    })
+
     it('refuses an entry with no sign-in', async () => {
         vi.mocked(getVaultItem).mockResolvedValue({ id: 'item-1' } as never)
 

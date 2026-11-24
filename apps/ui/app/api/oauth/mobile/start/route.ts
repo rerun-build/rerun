@@ -10,20 +10,28 @@ import { getManagedProvider } from '@/lib/managed/registry'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, resolveClient } from '@/lib/mcp-oauth'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { mintCallbackGrant, verifyConnectTicket, type ConnectTicket } from '@/lib/oauth/mobile-ticket'
-import { openPendingGrant } from '@/lib/oauth/pending-grant'
+import { openPendingGrant, purgeExpiredGrants } from '@/lib/oauth/pending-grant'
+import { beginVaultComposio, beginVaultManaged, discardVaultComposioAccount } from '@/app/api/_services/vault-sign-in.service'
 import { vaultContext } from '@/app/api/_services/vault.service'
+import { type ContextCookie, setContextCookie } from '@/lib/oauth/context-cookie'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { AppError } from '@/lib/i18n/action-error'
-import { NextResponse } from 'next/server'
+import { after, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-type Cookie = { name: string; value: string; path: string }
-
-function redirect(url: string, cookie?: Cookie): NextResponse {
+function redirect(url: string, cookie?: ContextCookie): NextResponse {
     const res = new NextResponse(null, { status: 302, headers: { Location: url } })
-    if (cookie) res.cookies.set(cookie.name, cookie.value, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: cookie.path, maxAge: 600 })
-    return res
+    return cookie ? setContextCookie(res, cookie) : res
+}
+
+// A sign-in nobody came back to claim leaves with its row.
+async function dropUnclaimedSignIns(): Promise<void> {
+    try {
+        await Promise.all((await purgeExpiredGrants()).map(discardVaultComposioAccount))
+    } catch (err) {
+        console.warn('[oauth] expired sign-ins left in place:', err instanceof Error ? err.message : err)
+    }
 }
 
 async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverName: string; url: string; mobileGrant: string; vault?: OAuthContext['vault'] }): Promise<NextResponse> {
@@ -59,6 +67,8 @@ export async function GET(req: Request) {
         return redirect(appReturnUrl({ ok: false, error: err instanceof Error ? err.message : 'Invalid sign-in ticket' }))
     }
 
+    after(dropUnclaimedSignIns)
+
     const { agentId, workspaceId, userId, jti } = ticket
     // The ticket is only minted for someone who manages the coworker's Box, or who may add to the Vault
     // for an entry, and its claim checks that again.
@@ -72,6 +82,8 @@ export async function GET(req: Request) {
         if (ticket.vaultItem !== undefined) {
             const { conn } = await vaultContext(actor)
             const item = await getVaultItem(conn, ticket.vaultItem)
+            const brokered = item.composio ? await beginVaultComposio(req, workspaceId, item, mobileGrant) : item.managed ? await beginVaultManaged(req, workspaceId, item, mobileGrant) : null
+            if (brokered) return redirect(brokered.url, brokered.cookie)
             if (!item.oauth) throw new AppError('vaultEntryOtherServer')
             return await mcpOAuthRedirect(req, { agentId, serverName: item.oauth.serverName, url: item.oauth.url, mobileGrant, vault: { itemId: item.id, workspaceId } })
         }
