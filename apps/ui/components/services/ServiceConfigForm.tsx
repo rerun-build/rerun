@@ -237,6 +237,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                     pendingPopup={signInStart?.popup}
                     agentId={agentId}
                     instanceKey={connectKey}
+                    vaultItemId={vault ? connectKey : undefined}
                     name={name}
                     onAuthorized={() => {
                         setInstalled(true)
@@ -259,6 +260,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                     pendingPopup={signInStart?.popup}
                     agentId={agentId}
                     instanceKey={connectKey}
+                    vaultItemId={vault ? connectKey : undefined}
                     provider={managedStep.provider}
                     serverName={managedStep.serverName}
                     name={name}

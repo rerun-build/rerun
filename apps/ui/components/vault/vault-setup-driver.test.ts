@@ -26,6 +26,13 @@ describe('vaultSetupDriver', () => {
         expect(second).toMatchObject({ ok: true, result: { status: 'installed', key: 'item-1', toolNames: ['linear'] } })
     })
 
+    it('hands the sign-in of a Composio or managed app to the form', async () => {
+        for (const target of [{ composio: { toolkit: 'gmail', serverName: 'gmail' } }, { managed: { provider: 'typeform', serverName: 'typeform' } }]) {
+            vi.mocked(addVaultServiceAction).mockResolvedValueOnce({ ok: true, result: { status: 'needs_auth', item, ...target } } as never)
+            expect(await vaultSetupDriver({ itemId: null, agentIds: [], onItem: vi.fn() }, 'App').install('', 'app', {}, undefined)).toMatchObject({ ok: true, result: { status: 'needs_auth', key: 'item-1', ...target } })
+        }
+    })
+
     it('hands a refusal back as it came', async () => {
         vi.mocked(addVaultServiceAction).mockResolvedValue({ ok: false, error: 'Only an admin can do this', code: 'vaultAdminOnly' })
         expect(await vaultSetupDriver({ itemId: null, agentIds: [], onItem: vi.fn() }, 'Linear').install('', 'linear', {}, undefined)).toEqual({ ok: false, error: 'Only an admin can do this', code: 'vaultAdminOnly' })

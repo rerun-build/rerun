@@ -16,10 +16,6 @@ export const VAULT_AGENT_REF = '${RERUN_AGENT_ID}'
 // accounts are the workspace's already, in Supabase.
 export const VAULT_METHOD_KINDS: ReadonlySet<string> = new Set(['oauth', 'key', 'stdio', 'none', 'managed', 'composio'])
 
-// What the Vault's own add page offers: a managed or Composio sign-in needs a coworker to start
-// from for now, so those apps are added from a coworker's Apps tab and attached from the Vault.
-export const VAULT_DIALOG_METHOD_KINDS: ReadonlySet<string> = new Set(['oauth', 'key', 'stdio', 'none'])
-
 // The slug the engine would give the skill, so an item's skill lands where an install of the same
 // app on the coworker itself would have put it.
 export function vaultSkills(skills: ServiceSkill[]): VaultSkill[] {

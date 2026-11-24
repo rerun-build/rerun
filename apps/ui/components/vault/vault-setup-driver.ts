@@ -14,7 +14,7 @@ function asInstallResult(result: VaultAddResult, name: string): InstallResult {
     const { item } = result
     const base = { key: item.id, slug: item.slug ?? '', name }
     if (result.status === 'needs_config') return { status: 'needs_config', ...base, authMethods: result.authMethods, authMethodId: result.authMethodId, message: '' }
-    if (result.status === 'needs_auth') return { status: 'needs_auth', ...base, oauth: result.oauth, message: '' }
+    if (result.status === 'needs_auth') return { status: 'needs_auth', ...base, oauth: result.oauth, managed: result.managed, composio: result.composio, message: '' }
     return { status: 'installed', ...base, toolNames: item.mcpServers.map(server => server.name), message: '' }
 }
 

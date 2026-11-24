@@ -11,8 +11,11 @@ import type { VaultEntryView, VaultListing } from '@/app/api/_services/vault.ser
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
 import { Group } from '@/components/connections/AiProvidersPanel'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
+import { ComposioConnect } from '@/components/services/ComposioConnect'
+import { ManagedConnect } from '@/components/services/ManagedConnect'
 import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceSetupDriverProvider } from '@/components/services/service-setup-driver'
+import { openPendingSignInPopup } from '@/components/services/sign-in-popup'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PanelScroller } from '@/components/ui/panel-list'
@@ -65,7 +68,7 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
             </div>
 
             <PanelScroller className="space-y-6 p-4">
-                <SignInSection entry={entry} signingIn={signingIn} onSigningIn={setSigningIn} onChanged={onChanged} />
+                <SignInSection entry={entry} canAdd={listing.canAdd} signingIn={signingIn} onSigningIn={setSigningIn} onChanged={onChanged} />
 
                 <Group title={t('detail.coworkers')}>
                     <TooltipDisabledReason reason={everyoneReason} className="flex w-full">
@@ -181,7 +184,7 @@ function AccountNameField({ name, placeholder, busy, onSubmit, onCancel }: { nam
     )
 }
 
-function SignInSection({ entry, signingIn, onSigningIn, onChanged }: { entry: VaultEntryView; signingIn: boolean; onSigningIn: (on: boolean) => void; onChanged: () => Promise<void> }) {
+function SignInSection({ entry, canAdd, signingIn, onSigningIn, onChanged }: { entry: VaultEntryView; canAdd: boolean; signingIn: boolean; onSigningIn: (on: boolean) => void; onChanged: () => Promise<void> }) {
     const t = useTranslations('vault')
 
     if (entry.status === 'needs_config' && entry.slug) {
@@ -196,16 +199,7 @@ function SignInSection({ entry, signingIn, onSigningIn, onChanged }: { entry: Va
     }
 
     const signedOut = entry.status === 'needs_auth'
-    // A managed or Composio sign-in starts from a coworker for now: say where to go.
-    if (!entry.oauth && signedOut && (entry.managed || entry.composio)) {
-        return (
-            <Alert variant="warning">
-                <AlertDescription>
-                    {t('detail.signedOut', { name: entry.name })} {t('detail.reconnectFromCoworker')}
-                </AlertDescription>
-            </Alert>
-        )
-    }
+    if (!entry.oauth && (entry.managed || entry.composio)) return <BrokeredSignIn entry={entry} canAdd={canAdd} signedOut={signedOut} onChanged={onChanged} />
     if (!entry.oauth) return null
     if (!signedOut && !signingIn) {
         return (
@@ -231,6 +225,45 @@ function SignInSection({ entry, signingIn, onSigningIn, onChanged }: { entry: Va
                         await onChanged()
                     }}
                 />
+            </AlertDescription>
+        </Alert>
+    )
+}
+
+// A managed or Composio account signed in again, once for every coworker using it. The click opens the
+// window and starts the sign-in, whose callback turns the entry active.
+function BrokeredSignIn({ entry, canAdd, signedOut, onChanged }: { entry: VaultEntryView; canAdd: boolean; signedOut: boolean; onChanged: () => Promise<void> }) {
+    const t = useTranslations('vault')
+    const tServices = useTranslations('services')
+    const [attempt, setAttempt] = useState<{ popup: Window | null } | null>(null)
+
+    const reconnect = (
+        <TooltipDisabledReason reason={canAdd ? undefined : t('reasons.manageAny')}>
+            <Button size="xs" variant="outline" disabled={!canAdd} onClick={() => setAttempt({ popup: openPendingSignInPopup(entry.name, tServices('signInPopup.connecting', { name: entry.name })) })}>
+                {t('detail.reconnect')}
+            </Button>
+        </TooltipDisabledReason>
+    )
+    const connect = {
+        agentId: '',
+        vaultItemId: entry.id,
+        instanceKey: entry.id,
+        name: entry.name,
+        autoStart: true,
+        pendingPopup: attempt?.popup,
+        onAuthorized: async () => {
+            await onChanged()
+            setAttempt(null)
+        },
+    }
+
+    if (attempt) return entry.managed ? <ManagedConnect {...connect} provider={entry.managed.provider} serverName={entry.managed.serverName} /> : <ComposioConnect {...connect} />
+    if (!signedOut) return <div className="flex justify-end">{reconnect}</div>
+    return (
+        <Alert variant="warning">
+            <AlertDescription className="space-y-3">
+                <p>{t('detail.signedOut', { name: entry.name })}</p>
+                {reconnect}
             </AlertDescription>
         </Alert>
     )

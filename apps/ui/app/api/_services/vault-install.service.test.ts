@@ -1,5 +1,5 @@
 import { paidAppFlags } from '@rerun/cloud/apps.server'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EngineRequestError } from '@/lib/engine/client'
 import { createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
@@ -111,19 +111,23 @@ describe('vaultCatalog', () => {
 
     it('offers a paid app the plan sells, to be connected in its own window', async () => {
         vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
+        catalogRows([WHATSAPP_PRO])
         const apps = await vaultCatalog('whatsapp')
         expect(apps).toEqual([expect.objectContaining({ slug: 'whatsapp-pro', paidApp: 'whatsapp', authMethods: [] })])
     })
 
     it('leaves a paid app out where the plan does not sell it', async () => {
+        catalogRows([WHATSAPP_PRO])
         vi.mocked(paidAppFlags).mockResolvedValue({})
         expect(await vaultCatalog('whatsapp')).toEqual([])
         expect(await vaultCatalog()).toEqual([])
     })
 
-    it('still leaves out an app whose sign-in needs a coworker to start from', async () => {
+    it('offers an app that signs in through Composio, browsed or searched', async () => {
         vi.mocked(paidAppFlags).mockResolvedValue({ linkedin: true, whatsapp: true })
-        expect((await vaultCatalog()).map(app => app.slug)).not.toContain('gmail')
+        const gmail = expect.objectContaining({ slug: 'gmail', authMethods: [expect.objectContaining({ kind: 'composio' })] })
+        expect(await vaultCatalog()).toContainEqual(gmail)
+        expect(await vaultCatalog('gmail')).toContainEqual(gmail)
     })
 
     it('puts the paid apps first when nothing is searched, even past the first page by name', async () => {
@@ -185,6 +189,36 @@ describe('addVaultService', () => {
         expect(input).not.toHaveProperty('instanceId')
         expect(input.mcpServers?.map(server => server.name)).toEqual(['getxapi'])
         expect(input.env).toEqual({ RERUN_SVC_GETXAPI_GETXAPI_KEY: 'key-1' })
+    })
+})
+
+describe('addVaultService, for an app that signs in through Composio', () => {
+    const gmail = serviceManifestSchema.parse(GMAIL.manifest)
+
+    beforeEach(() => {
+        vi.stubEnv('COMPOSIO_API_KEY', 'key')
+        vi.mocked(loadManifest).mockResolvedValue(gmail)
+        vi.mocked(toAuthMethodSummaries).mockReturnValue([])
+        vi.mocked(listVaultItems).mockResolvedValue([])
+    })
+
+    afterEach(() => vi.unstubAllEnvs())
+
+    it('waits on its sign-in, with no coworker, the first account and the next ones', async () => {
+        expect(await addVaultService({ slug: 'gmail' })).toMatchObject({ status: 'needs_auth', composio: { toolkit: 'gmail', serverName: 'gmail' } })
+        expect(vi.mocked(createVaultItem).mock.calls[0][1]).toMatchObject({ status: 'needs_auth', agentIds: [] })
+
+        vi.mocked(listVaultItems).mockResolvedValue([{ id: 'first', slug: 'gmail' }] as never)
+        const second = await addVaultService({ slug: 'gmail' })
+        const { instanceId, label } = vi.mocked(createVaultItem).mock.calls[1][1]
+        expect(label).toBe('Gmail 2')
+        expect(second).toMatchObject({ status: 'needs_auth', composio: { toolkit: 'gmail', serverName: `gmail-${instanceId}` } })
+    })
+
+    it('makes no entry on an install that cannot sign in to it', async () => {
+        vi.stubEnv('COMPOSIO_API_KEY', '')
+        await expect(addVaultService({ slug: 'gmail' })).rejects.toMatchObject({ code: 'composioNotConfigured' })
+        expect(createVaultItem).not.toHaveBeenCalled()
     })
 })
 

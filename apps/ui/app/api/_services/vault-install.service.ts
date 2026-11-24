@@ -13,15 +13,16 @@ import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { nextServiceInstance } from '@/lib/services/instances'
-import type { AuthMethodSummary } from '@/lib/services/types'
-import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
+import type { AuthMethodSummary, ComposioTarget, ManagedTarget, OAuthTarget } from '@/lib/services/types'
+import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, requireAdmin, rethrowConflict, vaultContext } from './vault.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
+import { assertSignInConfigured } from './vault-sign-in.service'
 
 export type VaultAddResult =
     | { status: 'installed'; item: VaultItemSummary }
     | { status: 'needs_config'; item: VaultItemSummary; authMethods: AuthMethodSummary[]; authMethodId: string }
-    | { status: 'needs_auth'; item: VaultItemSummary; oauth: { serverName: string; url: string } }
+    | { status: 'needs_auth'; item: VaultItemSummary; oauth?: OAuthTarget; managed?: ManagedTarget; composio?: ComposioTarget }
 
 export type AddVaultServiceInput = {
     slug: string
@@ -34,6 +35,8 @@ export type AddVaultServiceInput = {
 function resultOf(item: VaultItemSummary, manifestMethods: AuthMethodSummary[]): VaultAddResult {
     if (item.status === 'needs_config') return { status: 'needs_config', item, authMethods: manifestMethods, authMethodId: item.authMethodId ?? '' }
     if (item.status === 'needs_auth' && item.oauth) return { status: 'needs_auth', item, oauth: item.oauth }
+    if (item.status === 'needs_auth' && item.managed) return { status: 'needs_auth', item, managed: { provider: item.managed.provider, serverName: item.managed.serverName } }
+    if (item.status === 'needs_auth' && item.composio) return { status: 'needs_auth', item, composio: { toolkit: item.composio.toolkit, serverName: item.composio.serverName } }
     return { status: 'installed', item }
 }
 
@@ -47,7 +50,8 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
     const manifest = await loadManifest(input.slug)
     if (!manifest) throw new Error(`Service not found: ${input.slug}`)
     const method = getMethod(manifest, input.authMethodId)
-    if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    if (!VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    assertSignInConfigured(manifest, method)
 
     const sameApp = (await listVaultItems(ctx.conn)).filter(item => item.slug === manifest.slug)
     const instance = sameApp.length > 0 ? nextServiceInstance(manifest, sameApp) : null
@@ -82,7 +86,7 @@ export async function reconfigureVaultService(itemId: string, values: Record<str
     const manifest = await loadManifest(current.slug)
     if (!manifest) throw new Error(`Service not found: ${current.slug}`)
     const method = getMethod(manifest, authMethodId ?? current.authMethodId)
-    if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    if (!VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
     if (missingRequiredInputs(method, values).length > 0) return { status: 'needs_config', item: current, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id }
     const instance = current.instanceId ? { key: `${current.slug}@${current.instanceId}`, instanceId: current.instanceId, label: current.label } : undefined
     const { item } = await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance, itemId }))
@@ -97,7 +101,7 @@ const CATALOG_COLUMNS = ['slug', 'name', 'icon', 'category', 'summary', 'manifes
 type CatalogRow = { slug: string; name: string; icon: string | null; category: string; summary: string; manifest: unknown }
 
 // The catalog as the Vault offers it: no coworker to read installs from, and only the sign-in methods
-// the Vault holds, plus the paid apps the plan sells. Any other app is left out until the Vault holds its sign-in.
+// the Vault holds, plus the paid apps the plan sells.
 function toVaultCatalogApps(rows: CatalogRow[], paidApps: Set<AppSlug>): VaultCatalogApp[] {
     return rows.flatMap(row => {
         const parsed = serviceManifestSchema.safeParse(row.manifest)
@@ -105,7 +109,7 @@ function toVaultCatalogApps(rows: CatalogRow[], paidApps: Set<AppSlug>): VaultCa
         const app = { slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: takesSeveralAccounts(parsed.data) }
         const paidApp = parsed.data.authMethods.map(method => appTarget(method)?.appSlug).find(isAppSlug)
         if (paidApp) return paidApps.has(paidApp) ? [{ ...app, authMethods: [], paidApp }] : []
-        const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_DIALOG_METHOD_KINDS.has(method.kind))
+        const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_METHOD_KINDS.has(method.kind))
         if (authMethods.length === 0) return []
         return [{ ...app, authMethods }]
     })

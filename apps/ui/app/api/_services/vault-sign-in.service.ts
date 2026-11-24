@@ -13,6 +13,7 @@ import { getManagedProvider } from '@/lib/managed/registry'
 import type { ContextCookie } from '@/lib/oauth/context-cookie'
 import type { AbandonedVaultAccount } from '@/lib/oauth/pending-grant'
 import type { ManagedOAuthConfig } from '@/lib/managed/types'
+import type { AuthMethod, ServiceManifest } from '@/lib/services/manifest'
 import { composioVaultUserId, revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { loadManifest } from './services.service'
 import { assertCanAdd, readItem, vaultContext, type VaultContext } from './vault.service'
@@ -43,6 +44,12 @@ function configuredProvider(providerId: string): { oauth: ManagedOAuthConfig; cl
     const clientId = process.env[provider.oauth.clientIdEnv]
     if (!clientId) throw new AppError('providerNotConfigured', { provider: provider.label })
     return { oauth: provider.oauth, clientId }
+}
+
+// Refused before an entry is made for an app this install cannot sign in to.
+export function assertSignInConfigured(manifest: Pick<ServiceManifest, 'name'>, method: AuthMethod): void {
+    if (method.composio) assertComposioConfigured({ name: manifest.name, ...method.composio })
+    if (method.managed) configuredProvider(method.managed.provider)
 }
 
 export async function beginVaultComposio(req: Request, workspaceId: number, item: VaultItemSummary, mobileGrant?: string): Promise<VaultSignInStart> {

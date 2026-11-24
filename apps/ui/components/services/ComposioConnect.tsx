@@ -23,6 +23,9 @@ type ComposioConnectProps = {
     // Starts the sign-in at mount, in the window the caller opened inside its click handler.
     autoStart?: boolean
     pendingPopup?: Window | null
+    // Signs in a Vault entry rather than a coworker's own account: `instanceKey` is then its id too,
+    // and `agentId` is ignored.
+    vaultItemId?: string
 }
 
 type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
@@ -30,7 +33,7 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // Connect a Composio service: the popup runs Composio's hosted sign-in, the callback verifies
 // the connected account server-side, and here we only drive the popup and react to its result
 // over a same-origin BroadcastChannel (survives COOP-severed openers).
-export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, autoStart, pendingPopup }: ComposioConnectProps) {
+export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, autoStart, pendingPopup, vaultItemId }: ComposioConnectProps) {
     const t = useTranslations('services.connect')
     const errorText = useErrorText()
     const thrownText = useThrownText()
@@ -57,7 +60,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
         setState('authorizing')
         setError(null)
         if (desktopServiceSignInAvailable()) {
-            const result = await signInThroughBrowser({ agentId, key: instanceKey }, t('authorizationFailed'))
+            const result = await signInThroughBrowser(vaultItemId ? { vaultItemId } : { agentId, key: instanceKey }, t('authorizationFailed'))
             if (result.ok) {
                 setState('authorized')
                 onAuthorized()
@@ -72,7 +75,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
             const res = await fetch('/api/oauth/composio/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ agentId, key: instanceKey }),
+                body: JSON.stringify(vaultItemId ? { vaultItemId } : { agentId, key: instanceKey }),
             })
             const data = await res.json()
             if (!res.ok) throw new RefusalError(data)

@@ -31,7 +31,6 @@
         "noCoworkers": "Bu çalışma alanında henüz coworker yok.",
         "hiddenCoworkers": "Göremediğiniz Boxes içinde {count, plural, one {# coworker} other {# coworker}}",
         "variables": "Değişkenler",
-        "reconnectFromCoworker": "Onu kullanan bir coworker'ın Uygulamalar sekmesinden yeniden bağlayın.",
         "rename": "Hesabı yeniden adlandır",
         "accountName": "Hesap adı",
         "namePlaceholder": "Bu hesaba bir ad verin"

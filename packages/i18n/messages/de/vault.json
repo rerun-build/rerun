@@ -31,7 +31,6 @@
         "noCoworkers": "Noch keine Coworker in diesem Workspace.",
         "hiddenCoworkers": "{count, plural, one {# Coworker} other {# Coworker}} in Boxes, die du nicht siehst",
         "variables": "Variablen",
-        "reconnectFromCoworker": "Verbinde sie neu im Tab Apps eines Coworkers, der sie nutzt.",
         "rename": "Konto umbenennen",
         "accountName": "Kontoname",
         "namePlaceholder": "Benenne dieses Konto"

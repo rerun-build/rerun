@@ -23,6 +23,9 @@ type ManagedConnectProps = {
     // Starts the sign-in at mount, in the window the caller opened inside its click handler.
     autoStart?: boolean
     pendingPopup?: Window | null
+    // Signs in a Vault entry rather than a coworker's own account: `instanceKey` is then its id too,
+    // and `agentId` is ignored.
+    vaultItemId?: string
 }
 
 type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
@@ -30,7 +33,7 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // Connect a managed service: Rerun brokers the OAuth (one app) in a popup, then runs the
 // provider's API calls itself. The token lands on the engine; here we only drive the popup and
 // react to its result over a same-origin BroadcastChannel (survives COOP-severed openers).
-export function ManagedConnect({ agentId, instanceKey, provider, serverName, name, onAuthorized, autoStart, pendingPopup }: ManagedConnectProps) {
+export function ManagedConnect({ agentId, instanceKey, provider, serverName, name, onAuthorized, autoStart, pendingPopup, vaultItemId }: ManagedConnectProps) {
     const t = useTranslations('services.connect')
     const errorText = useErrorText()
     const thrownText = useThrownText()
@@ -57,7 +60,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
         setState('authorizing')
         setError(null)
         if (desktopServiceSignInAvailable()) {
-            const result = await signInThroughBrowser({ agentId, key: instanceKey }, t('authorizationFailed'))
+            const result = await signInThroughBrowser(vaultItemId ? { vaultItemId } : { agentId, key: instanceKey }, t('authorizationFailed'))
             if (result.ok) {
                 setState('authorized')
                 onAuthorized()
@@ -72,7 +75,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
             const res = await fetch(`/api/oauth/managed/${provider}/start`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ agentId, key: instanceKey, serverName }),
+                body: JSON.stringify(vaultItemId ? { vaultItemId } : { agentId, key: instanceKey, serverName }),
             })
             const data = await res.json()
             if (!res.ok) throw new RefusalError(data)

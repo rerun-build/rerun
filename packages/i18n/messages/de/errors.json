@@ -464,7 +464,7 @@
     "vaultConflict": "{coworker} bekommt {name} schon aus einem anderen Vault-Eintrag",
     "vaultSharedItem": "Diese App kommt aus dem Vault und andere Coworker nutzen sie. Ändere sie im Vault.",
     "vaultPaidAppEveryone": "Eine kostenpflichtige App wird Coworker für Coworker verbunden",
-    "vaultMethodUnsupported": "Diese App kann noch nicht zum Vault hinzugefügt werden. Verbinde sie über den Tab Apps eines Coworkers.",
+    "vaultMethodUnsupported": "Diese App kann nicht im Vault aufbewahrt werden. Verbinde sie über den Tab Apps eines Coworkers.",
     "vaultRenameUnsupported": "Die Maschine deines Workspace kann noch kein Konto umbenennen. Mit dem nächsten Update geht es.",
     "vaultConflictEveryone": "Jeder Coworker bekommt {name} schon aus einem anderen Vault-Eintrag, der mit allen geteilt ist",
     "vaultConflictSomeone": "Ein Coworker bekommt {name} schon aus einem anderen Vault-Eintrag",
