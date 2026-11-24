@@ -47,6 +47,7 @@ export function ForemanDockPill({ side, mode, tone, hidden, ref, mod, inputRef, 
                     mod={mod}
                     draft={draft}
                     focused={focused}
+                    hidden={hidden}
                     onDraftChange={setDraft}
                     onFocusChange={setFocused}
                     onEngage={onEngage}

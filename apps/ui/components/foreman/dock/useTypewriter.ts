@@ -7,7 +7,8 @@ type Typing = { index: number; length: number; erasing: boolean }
 /**
  * Types each phrase, holds it, erases it, moves to the next: the placeholder suggests what to ask.
  * The first phrase is already written on mount, so the field never opens empty. Paused, it stays on
- * that first phrase. Frozen (nobody in front of the page), it stops where it is and resumes from there.
+ * that first phrase. Frozen (nobody in front of the page, or the field hidden), it stops where it is
+ * and resumes from there.
  */
 export function useTypewriter(phrases: readonly string[], { paused = false, frozen = false, typeMs = 42, holdMs = 2600, eraseMs = 16 } = {}) {
     const [typing, setTyping] = useState<Typing>({ index: 0, length: phrases[0].length, erasing: false })

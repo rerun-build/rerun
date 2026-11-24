@@ -28,6 +28,7 @@ type ForemanPillFieldProps = {
     mod: string
     draft: string
     focused: boolean
+    hidden?: boolean
     onDraftChange: (draft: string) => void
     /** Has to be stable: it is also called when the field goes away. */
     onFocusChange: (focused: boolean) => void
@@ -36,13 +37,13 @@ type ForemanPillFieldProps = {
 }
 
 /** What is typed here is sent from here and answered above the ball. Only the ball opens the column. */
-export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
+export function ForemanPillField({ inputRef, mod, draft, focused, hidden = false, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
     const t = useTranslations('foreman.pill')
     const foremanName = useForemanName()
     const reducedMotion = useReducedMotion()
     const prompts = useMemo(() => [t('prompts.lastNight'), t('prompts.failedRun'), t('prompts.newCoworker')], [t])
     const unattended = usePageAttention() !== 'focused'
-    const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused, frozen: unattended })
+    const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused, frozen: unattended || hidden })
     const writing = focused || draft.length > 0
 
     useEffect(() => {
