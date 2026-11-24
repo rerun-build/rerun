@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 
+import { dockEntryIdOf } from '@/lib/desktop-shell/coworker-dock'
 import { stackBubbleTops } from '@/lib/desktop-shell/coworker-dock-notes'
 import { ArrowRight, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -55,7 +56,7 @@ type DockLayerProps = {
 /** What opens beside the rail, towards the middle of the screen: the bubbles, then the card of notes. */
 export function DockLayer({ layer, dock, nameOf, onOpenNote, onOpenFilter, onMarkRead, onSettled }: DockLayerProps) {
     const tops = stackBubbleTops(
-        dock.bubbleNotes.map(note => ({ id: note.id, anchor: layer.anchors.byId[note.agentId] ?? layer.height / 2 })),
+        dock.bubbleNotes.map(note => ({ id: note.id, anchor: layer.anchors.byId[dockEntryIdOf(note.agentId)] ?? layer.height / 2 })),
         BUBBLE_PITCH,
         BUBBLE_MARGIN,
         layer.height - BUBBLE_MARGIN
@@ -99,7 +100,7 @@ function DockBubble({ note, name, top, layer, dock, onSettled }: { note: Coworke
             style={{ top, ...inwardStyle(layer.edge, layer.anchors) }}
         >
             <div className={cn('relative rounded-2xl', CARD)}>
-                <button type="button" onClick={() => dock.openPanel(note.agentId, note)} className="flex w-full flex-col gap-1 rounded-[inherit] py-2.5 pr-8 pl-3 text-left transition-colors hover:bg-accent/60">
+                <button type="button" onClick={() => dock.openPanel(dockEntryIdOf(note.agentId), note)} className="flex w-full flex-col gap-1 rounded-[inherit] py-2.5 pr-8 pl-3 text-left transition-colors hover:bg-accent/60">
                     <span className="text-xs">
                         {t.rich('said', {
                             name,

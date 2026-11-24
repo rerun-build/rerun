@@ -8,7 +8,7 @@ import { DOCK_RESIZE_HANDLE_OUTSET, DockResizeEdge } from '@/components/desktop-
 import { RailDock } from '@/components/desktop-shell/coworker-dock/RailDock'
 import { useDockNotes, type DockFilter } from '@/components/desktop-shell/coworker-dock/useDockNotes'
 import { desktopShell } from '@/lib/desktop-shell/client'
-import { isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
+import { dockEntryIdOf, isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
 import { cn } from '@/lib/utils'
 import { installWorkspaceHeader, pinTabWorkspace } from '@/lib/workspace/tab-workspace'
 
@@ -199,14 +199,14 @@ export function CoworkerDock() {
     const openNote = useCallback(
         (note: CoworkerDockNote) => {
             if (dock.notes.some(item => item.id === note.id)) dockApi()?.openNote?.(note.id)
-            else dockApi()?.open(note.agentId)
+            else dockApi()?.open(dockEntryIdOf(note.agentId))
             closePanel()
         },
         [closePanel, dock.notes]
     )
     const openFilter = useCallback(
         (filter: DockFilter) => {
-            const agentId = filter === 'all' ? (dock.notes[0]?.agentId ?? view?.state?.coworkers.find(coworker => !isForemanDockEntry(coworker))?.id) : filter
+            const agentId = filter === 'all' ? ((dock.notes[0] && dockEntryIdOf(dock.notes[0].agentId)) ?? view?.state?.coworkers.find(coworker => !isForemanDockEntry(coworker))?.id) : filter
             if (agentId) dockApi()?.open(agentId)
             closePanel()
         },
@@ -307,7 +307,7 @@ export function CoworkerDock() {
 
     const { edge, collapsed } = view
     const coworkers = view.state.coworkers
-    const nameOf = (agentId: string) => coworkers.find(coworker => coworker.id === agentId)?.name ?? ''
+    const nameOf = (agentId: string) => coworkers.find(coworker => coworker.id === dockEntryIdOf(agentId))?.name ?? ''
     const y = dragY ?? dragSize?.y ?? view.y
     const maxHeight = edgeDrag?.maxHeight ?? (dragSize ? dragSize.maxHeight : view.maxHeight)
     const position = edgeDrag ? { [edgeDrag.side === 'top' ? 'bottom' : 'top']: `${edgeDrag.anchor}px` } : { top: `${y * 100}%`, transform: `translateY(-${y * 100}%)` }

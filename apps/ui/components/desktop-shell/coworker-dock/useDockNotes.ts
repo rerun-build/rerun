@@ -3,6 +3,7 @@
 import type { CoworkerDockNote } from '@rerun/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { dockEntryIdOf } from '@/lib/desktop-shell/coworker-dock'
 import { freshNotes } from '@/lib/desktop-shell/coworker-dock-notes'
 
 export type DockFilter = string | 'all'
@@ -16,6 +17,8 @@ const EMPTY: CoworkerDockNote[] = []
 // The inbox of the main window fills in over its first seconds: only what a coworker said since the
 // dock opened pops up, never what already waited.
 const CLOCK_SKEW_MS = 5_000
+
+const entryOf = (note: CoworkerDockNote | undefined) => (note ? dockEntryIdOf(note.agentId) : undefined)
 
 /** What opens from the rail: a bubble when a coworker says something new, the card on a coworker's notes or everyone's, a note opened in it. */
 export function useDockNotes(published: CoworkerDockNote[] | undefined) {
@@ -47,7 +50,7 @@ export function useDockNotes(published: CoworkerDockNote[] | undefined) {
             setBubbles(current => {
                 if (note) return current.filter(id => id !== note.id)
                 if (filter === 'all') return []
-                return current.filter(id => notes.find(item => item.id === id)?.agentId !== filter)
+                return current.filter(id => entryOf(notes.find(item => item.id === id)) !== filter)
             })
             setPanel({ filter, note })
         },
@@ -60,7 +63,7 @@ export function useDockNotes(published: CoworkerDockNote[] | undefined) {
 
     const showNote = useCallback((note: CoworkerDockNote | null) => setPanel(current => (current ? { ...current, note } : current)), [])
 
-    const panelNotes = useMemo(() => (panel ? notes.filter(note => panel.filter === 'all' || note.agentId === panel.filter) : EMPTY), [notes, panel])
+    const panelNotes = useMemo(() => (panel ? notes.filter(note => panel.filter === 'all' || entryOf(note) === panel.filter) : EMPTY), [notes, panel])
     const openNote = panel?.note ? (notes.find(note => note.id === panel.note?.id) ?? panel.note) : null
     const bubbleNotes = useMemo(() => bubbles.flatMap(id => notes.filter(note => note.id === id)), [bubbles, notes])
 

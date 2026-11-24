@@ -1,7 +1,7 @@
 import { COWORKER_DOCK_FOREMAN_ID } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { foremanDockEntry, foremanDockOrbState, isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
+import { dockEntryIdOf, foremanDockEntry, foremanDockOrbState, isForemanDockEntry } from '@/lib/desktop-shell/coworker-dock'
 import { IDLE_DOCK_FEED } from '@/lib/foreman/dock-feed'
 import type { PendingWidget } from '@/lib/foreman/pending-widget'
 
@@ -36,5 +36,13 @@ describe('the dock entry of the Chief of Staff', () => {
     it('thinks while it works', () => {
         expect(foremanDockOrbState('working')).toBe('thinking')
         expect(foremanDockOrbState('waiting')).toBe('idle')
+    })
+})
+
+describe('dockEntryIdOf', () => {
+    it("finds the Chief of Staff's entry of the rail from the name its notes carry", () => {
+        expect(dockEntryIdOf('foreman')).toBe(COWORKER_DOCK_FOREMAN_ID)
+        expect(isForemanDockEntry({ id: dockEntryIdOf('foreman') })).toBe(true)
+        expect(dockEntryIdOf('agent-1')).toBe('agent-1')
     })
 })
