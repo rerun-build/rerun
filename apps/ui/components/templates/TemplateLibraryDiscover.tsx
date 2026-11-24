@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { isWhiteLabel } from '@rerun/contracts'
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { TemplateCreatorCard } from '@/components/templates/TemplateCreatorCard'
@@ -40,6 +42,7 @@ export function TemplateLibraryDiscover({
     onView: (view: LibraryView) => void
 }) {
     const t = useTranslations('templates.library.discover')
+    const whiteLabel = isWhiteLabel(useBrand())
     const creators = useMemo(() => creatorSummaries(templates, directory), [templates, directory])
     const spotlight = useMemo(() => creatorOfTheWeek(creators, now), [creators, now])
     const otherCreators = useMemo(() => creatorsToMeet(creators, { exclude: spotlight?.creator.slug, seed: now.getTime(), count: CREATORS_SHOWN }), [creators, spotlight, now])
@@ -60,7 +63,7 @@ export function TemplateLibraryDiscover({
 
     return (
         <div className="flex flex-col gap-8">
-            {spotlight && (
+            {!whiteLabel && spotlight && (
                 <TemplateCreatorSpotlight
                     creator={spotlight.creator}
                     template={spotlight.template}
@@ -69,7 +72,7 @@ export function TemplateLibraryDiscover({
                 />
             )}
 
-            {otherCreators.length > 0 && (
+            {!whiteLabel && otherCreators.length > 0 && (
                 <TemplateLibrarySection title={t('creators')} subtitle={t('creatorsSubtitle')} action={<TemplateLibrarySectionLink href={landingUrl('/community/experts')}>{t('allCreators')}</TemplateLibrarySectionLink>}>
                     <div className="grid grid-cols-2 gap-3 @min-[40rem]:grid-cols-3 @min-[52rem]:grid-cols-4 @min-[60rem]:grid-cols-5">
                         {otherCreators.map((creator, index) => (

@@ -9,7 +9,7 @@ import { isApiLocked, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { AgentStatus, IsoAgent } from '@/lib/board/types'
 import { buildControlCommands, type ControlCommand, type ControlCommandId } from '@/lib/control-center/commands'
-import { openCrisp } from '@/lib/crisp'
+import { useSupport } from '@/components/brand/useSupport'
 import { parseQuery, searchItems } from '@/lib/control-center/search'
 import { BellIcon, BoxIcon, BrainIcon, CirclePlusIcon, CreditCardIcon, FocusCenterIcon, FolderIcon, GridIcon, HeadsetIcon, KeyboardIcon, KeyIcon, LockKeyholeIcon, MegaphoneIcon, MessageCircle, MessageCircleQuestionIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { useAccountStore } from '@/stores/account.store'
@@ -98,7 +98,8 @@ export function ControlCenter() {
     const hydrated = useBoardStore(s => s.hydrated)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const sessions = useBoardStore(s => s.sessions)
-    const { workspace, session } = useSession()
+    const { workspace } = useSession()
+    const support = useSupport()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const { needsMachineReason } = useWorkspaceAccess()
     const isTemplateAuthor = useIsTemplateAuthor()
@@ -227,7 +228,7 @@ export function ControlCenter() {
         browse_templates: () => useBuilderDialogsStore.getState().openLibrary(),
         new_box: () => useBuilderDialogsStore.getState().setNewBoxOpen(true),
         ask_assistant: () => (text ? useForemanStore.getState().askForeman(query.trim()) : useForemanStore.getState().toggle()),
-        contact_support: () => openCrisp(session?.user?.email),
+        contact_support: () => support.open(),
         recenter_board: () => useBoardStore.getState().recenterBoard(),
         toggle_theme: () => setTheme(darkTheme ? 'light' : 'dark'),
         workspace: () => useWorkspaceSettingsStore.getState().openWorkspacePanel('workspace'),
@@ -253,7 +254,7 @@ export function ControlCenter() {
     })
 
     function rootSections(): ControlSection[] {
-        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
+        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme, supportAvailable: support.available }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
             ...command,
             label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`, foremanName),
         }))

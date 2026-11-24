@@ -1,12 +1,15 @@
+import { WHITE_LABEL_ATTRIBUTE } from '@rerun/contracts'
 import { startAnalytics, startSessionReplay, stopAnalytics } from '@rerun/analytics/client'
 
 // Les routes `/render/` et `/og/` sont capturées par un navigateur headless : ni bannière dans les
 // screenshots, ni faux pageviews. `/desktop-view` est l'écran d'un coworker dans l'app iOS, qui a
-// son propre consentement.
+// son propre consentement. Un hôte en marque blanche n'est pas mesuré non plus : ses visiteurs sont
+// ceux de l'organisation, et le bandeau leur citerait la politique de Rerun.
 const NON_ANALYTICS_PREFIXES = ['/render/', '/og/', '/desktop-view']
 
 export function isAnalyticsSurface(): boolean {
     if (typeof window === 'undefined') return false
+    if (document.documentElement.hasAttribute(WHITE_LABEL_ATTRIBUTE)) return false
     return !NON_ANALYTICS_PREFIXES.some(prefix => window.location.pathname.startsWith(prefix))
 }
 

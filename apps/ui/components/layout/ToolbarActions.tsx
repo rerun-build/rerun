@@ -16,7 +16,10 @@ import { isDesktopShell } from '@/lib/desktop-shell/client'
 import { detectMobileOs } from '@/lib/in-app-browser'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { useSyncExternalStore } from 'react'
-import { docsUrl, landingUrl } from '@/lib/site'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { brandDocsUrl } from '@/lib/brand/links'
+import { landingUrl } from '@/lib/site'
+import { isWhiteLabel } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 
 export function WhatsNewMenuItem() {
@@ -44,11 +47,13 @@ const noSubscription = () => () => {}
 
 export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: () => void }) {
     const t = useTranslations('layout.menu')
+    const brand = useBrand()
+    const docs = brandDocsUrl(brand)
     const openShortcuts = useShortcutsStore(s => s.openShortcuts)
     const { canInstall, promptInstall } = useInstallPrompt()
     const gettingStartedAvailable = useForemanStore(s => s.gettingStartedAvailable)
     // Rerun Cloud publishes the desktop app; it is offered on a computer's browser, never inside it.
-    const offerDesktopApp = useSyncExternalStore(noSubscription, () => RERUN_CLOUD && !isDesktopShell() && detectMobileOs(navigator.userAgent) === null, () => false)
+    const offerDesktopApp = useSyncExternalStore(noSubscription, () => RERUN_CLOUD && !isWhiteLabel(brand) && !isDesktopShell() && detectMobileOs(navigator.userAgent) === null, () => false)
 
     return (
         <>
@@ -64,18 +69,22 @@ export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: 
                     {t('gettingStarted')}
                 </DropdownMenuItem>
             )}
-            <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
-                <a href={docsUrl()} target="_blank" rel="noopener noreferrer">
-                    <BookOpenIcon className="size-4" />
-                    {t('docs')}
-                </a>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
-                <a href="https://discord.gg/cJUUgdTg5p" target="_blank" rel="noopener noreferrer">
-                    <UsersIcon className="size-4" />
-                    {t('community')}
-                </a>
-            </DropdownMenuItem>
+            {docs && (
+                <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
+                    <a href={docs} target="_blank" rel="noopener noreferrer">
+                        <BookOpenIcon className="size-4" />
+                        {t('docs')}
+                    </a>
+                </DropdownMenuItem>
+            )}
+            {!isWhiteLabel(brand) && (
+                <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
+                    <a href="https://discord.gg/cJUUgdTg5p" target="_blank" rel="noopener noreferrer">
+                        <UsersIcon className="size-4" />
+                        {t('community')}
+                    </a>
+                </DropdownMenuItem>
+            )}
             <DropdownMenuItem onSelect={() => openShortcuts()} className="gap-2 text-muted-foreground">
                 <KeyboardIcon className="size-4" />
                 {t('shortcuts')}

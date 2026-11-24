@@ -2,10 +2,10 @@
 
 import { useTranslations } from 'next-intl'
 
+import { useSupport } from '@/components/brand/useSupport'
 import { Button } from '@/components/ui/button'
 import { PANEL_CARD } from '@/components/ui/panel-row'
 import { realEmail } from '@/lib/auth/placeholder-email'
-import { openCrisp, sendToCrisp } from '@/lib/crisp'
 import { CircleCheckIcon, LifeBuoyIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -29,11 +29,12 @@ function readSummary(input: unknown): string | null {
 
 export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidgetProps) {
     const t = useTranslations('foreman.contact')
-    const { session, workspace } = useSession()
+    const { session } = useSession()
+    const support = useSupport()
     const email = session?.user?.email
     const replyAddress = realEmail(email)
     const summary = readSummary(input) ?? t('defaultSummary')
-    const send = () => sendToCrisp({ email, workspaceId: workspace?.id, text: summary })
+    const send = () => support.send(summary)
 
     if ((output as { sent?: unknown } | undefined)?.sent === true) {
         return (
@@ -43,7 +44,7 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                 tone="text-emerald-500"
                 text={replyAddress ? t('sentWithEmail', { email: replyAddress }) : t('sent')}
                 action={
-                    <Button variant="ghost" size="sm" onClick={() => openCrisp(email)}>
+                    <Button variant="ghost" size="sm" onClick={() => support.open()}>
                         {t('openChat')}
                     </Button>
                 }

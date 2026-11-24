@@ -14,6 +14,8 @@ import { FOREMAN_OPEN_COOKIE, parseForemanOpen } from '@/lib/foreman-open'
 import { parseWorkspaceView, WORKSPACE_VIEW_COOKIE } from '@/lib/workspace-view'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { SessionProvider, type InitialSession } from '@/supabase/session/SessionProvider'
+import { getBrand } from '@/lib/brand/server'
+import { isWhiteLabel } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Once per server process, on the first board anyone opens: the crons a self-hosted app runs itself.
     startBackgroundSchedules()
-    const [apps, session] = await Promise.all([paidAppFlags(), getServerSession()])
+    const [apps, session, brand] = await Promise.all([paidAppFlags(), getServerSession(), getBrand()])
     // The session this request already verified, so the browser does not read it again before the board.
     const initialSession: InitialSession | null = session.user && session.workspace && session.membership ? { user: session.user, workspace: session.workspace, role: session.membership.role, boxScope: session.membership.box_scope } : null
     // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
@@ -40,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     <CoworkerLooks>
                         <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
                     </CoworkerLooks>
-                    <CrispChat hideLauncher position="left" />
+                    {!isWhiteLabel(brand) && <CrispChat hideLauncher position="left" />}
                     <WorkspaceSwitchLoader />
                     <QuickAskReceiver />
                 </WorkspaceViewProvider>

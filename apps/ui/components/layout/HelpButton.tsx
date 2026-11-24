@@ -1,21 +1,19 @@
 'use client'
 
-import { SUPPORT_CHAT_ENABLED } from '@rerun/cloud/support'
+import { useSupport } from '@/components/brand/useSupport'
 import { ChromePill } from '@rerun/ui/chrome'
 import { HelpMenuItems } from '@/components/layout/ToolbarActions'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { HeadsetIcon, HelpCircleIcon } from '@/lib/icons'
-import { openCrisp } from '@/lib/crisp'
-import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
 // `icon`: a plain icon button, for a row of icon buttons such as the foot of the Simple view's list.
 export function HelpButton({ trigger = 'chrome' }: { trigger?: 'chrome' | 'icon' }) {
     const t = useTranslations('layout.help')
-    const { session } = useSession()
+    const support = useSupport()
     // The menu hands focus back to its trigger as it closes, which the checklist popover would read
     // as a click outside and close on the spot.
     const openingGettingStarted = useRef(false)
@@ -45,9 +43,9 @@ export function HelpButton({ trigger = 'chrome' }: { trigger?: 'chrome' | 'icon'
                     event.preventDefault()
                 }}
             >
-                {SUPPORT_CHAT_ENABLED && (
+                {support.available && (
                     <>
-                        <DropdownMenuItem onSelect={() => openCrisp(session?.user?.email)} className="gap-2 text-muted-foreground">
+                        <DropdownMenuItem onSelect={() => support.open()} className="gap-2 text-muted-foreground">
                             <HeadsetIcon className="size-4" />
                             {t('contactSupport')}
                         </DropdownMenuItem>

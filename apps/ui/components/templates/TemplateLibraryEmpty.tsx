@@ -1,6 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { isWhiteLabel } from '@rerun/contracts'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -11,10 +13,11 @@ import { landingUrl } from '@/lib/site'
 
 // A search that lands on nothing is the moment someone knows exactly what they wanted and the
 // catalogue does not have it, which is the best moment to offer them the other side of it.
-// A self-hosted install has no marketplace and starts with no template: it creates its own.
+// A self-hosted install or an organization has no marketplace to send people to: they create their own.
 export function TemplateLibraryEmpty({ filtered, onScratch }: { filtered: boolean; onScratch?: () => void }) {
     const t = useTranslations('templates.library')
-    if (!RERUN_CLOUD) {
+    const whiteLabel = isWhiteLabel(useBrand())
+    if (!RERUN_CLOUD || whiteLabel) {
         return (
             <EmptyState
                 icon={HammerIcon}

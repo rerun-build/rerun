@@ -1,6 +1,7 @@
 'use client'
 
-import { landingUrl } from '@/lib/site'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { brandTerms } from '@/lib/brand/links'
 import { cn } from '@/lib/utils'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import type { ElementType, ReactNode } from 'react'
@@ -71,16 +72,17 @@ export function AuthShell({
 
 export function AuthTerms() {
     const t = useTranslations('auth')
+    const links = brandTerms(useBrand())
     // A self-hosted install has its own terms, if any: Rerun's do not bind its users.
-    if (!RERUN_CLOUD) return null
+    if (!RERUN_CLOUD || !links) return null
     return t.rich('terms', {
         terms: chunks => (
-            <a href={landingUrl('/terms')} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
+            <a href={links.terms} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
                 {chunks}
             </a>
         ),
         privacy: chunks => (
-            <a href={landingUrl('/privacy')} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
+            <a href={links.privacy} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
                 {chunks}
             </a>
         ),

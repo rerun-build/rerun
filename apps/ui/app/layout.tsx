@@ -17,7 +17,7 @@ import { OpenInDesktopPrompt } from "@/components/desktop-shell/OpenInDesktopPro
 import { PageAttentionWatcher } from "@/components/layout/PageAttentionWatcher";
 import { ShellTitleBar } from "@/components/desktop-shell/ShellTitleBar";
 import { requestDesktopShell } from "@/lib/desktop-shell/server";
-import { DESKTOP_SHELL_ATTRIBUTE, isWhiteLabel, TRIAL_DAYS } from "@rerun/contracts";
+import { DESKTOP_SHELL_ATTRIBUTE, isWhiteLabel, TRIAL_DAYS, WHITE_LABEL_ATTRIBUTE } from "@rerun/contracts";
 import { DomMutationGuard } from "@rerun/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
@@ -109,6 +109,7 @@ export default async function RootLayout({
       lang={locale}
       dir={localeDirection(locale)}
       suppressHydrationWarning
+      {...(isWhiteLabel(brand) ? { [WHITE_LABEL_ATTRIBUTE]: '' } : {})}
       {...(desktopShell ? { [DESKTOP_SHELL_ATTRIBUTE]: desktopShell.platform } : {})}
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable, notoArabic.variable, notoHebrew.variable)}
     >
@@ -131,11 +132,11 @@ export default async function RootLayout({
                   <Toaster />
                   <AppChrome>
                     <CookieConsent />
-                    <AffiliateTracking />
+                    {!isWhiteLabel(brand) && <AffiliateTracking />}
                     <DeployUpdateWatcher />
                     <DesktopShellBridge />
                     <PageAttentionWatcher />
-                    <OpenInDesktopPrompt />
+                    {!isWhiteLabel(brand) && <OpenInDesktopPrompt />}
                     <RegisterSW />
                   </AppChrome>
                 </TooltipProvider>

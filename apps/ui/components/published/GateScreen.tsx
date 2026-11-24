@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { BrandLogo } from '@/components/brand/BrandLogo'
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { Icon } from '@/components/ui/icon'
 import { LinkedPair } from '@/components/ui/linked-pair'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
@@ -55,7 +56,9 @@ export function GateScreen({ brand, lock, mark, title, subtitle, children }: { b
                 </div>
                 {children && <div className="flex w-full flex-col gap-2.5">{children}</div>}
             </div>
-            <MadeWithRerun className="absolute bottom-4 md:end-4 max-md:left-1/2 max-md:-translate-x-1/2" />
+            <RerunOnly>
+                <MadeWithRerun className="absolute bottom-4 md:end-4 max-md:left-1/2 max-md:-translate-x-1/2" />
+            </RerunOnly>
         </main>
     )
 }

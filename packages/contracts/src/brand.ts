@@ -25,6 +25,9 @@ export function isWhiteLabel(brand: Brand): boolean {
     return brand.organizationId !== null
 }
 
+// On <html>, for what runs before React: the page belongs to an organization, not to Rerun.
+export const WHITE_LABEL_ATTRIBUTE = 'data-white-label'
+
 // The domain of the example addresses shown in an empty email field.
 export function exampleEmailDomain(brand: Brand): string {
     return isWhiteLabel(brand) ? 'company.com' : 'rerun.build'

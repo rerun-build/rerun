@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { isWhiteLabel } from '@rerun/contracts'
 import { confirmTemplatePurchaseAction } from '@rerun/cloud/marketplace.client'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { BuilderView } from '@/components/builder/BuilderView'
@@ -353,8 +355,9 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     }, [selectedAgentWorking])
 
     // Le changelog ne s'ouvre jamais par-dessus un parcours qui tient déjà l'écran (mur du téléphone,
-    // onboarding, deep link de template ou de partage).
-    const changelogReady = hydrated && !phoneWallOpen && Boolean(workspace?.onboarded_at) && !templateLinkSlug && !shareLinkToken && !purchase
+    // onboarding, deep link de template ou de partage). Il raconte Rerun : une organisation n'en a pas.
+    const whiteLabel = isWhiteLabel(useBrand())
+    const changelogReady = !whiteLabel && hydrated && !phoneWallOpen && Boolean(workspace?.onboarded_at) && !templateLinkSlug && !shareLinkToken && !purchase
     useChangelogLauncher(user?.id, changelogReady)
 
     useEnsureSandboxSpace()

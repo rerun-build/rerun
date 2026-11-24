@@ -1,3 +1,5 @@
+import { isWhiteLabel } from '@rerun/contracts'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { callerIp } from '@/lib/auth/caller-ip'
 import { isInlineSafeContentType, siteContentType, withUtf8Charset } from '@/lib/files/content-type'
 import { cookieTtlMs, openAccessTicket } from '@/lib/published/access-ticket'
@@ -137,7 +139,8 @@ async function serveObject(entry: PublishedEntry, request: Request, key: string,
     const headers = { ...BASE_HEADERS, 'Content-Type': contentType, 'Cache-Control': cacheControl }
     if (!html) return new Response(blob.stream(), { headers })
 
-    let page = injectBadge(await blob.text(), entry.slug)
+    const source = await blob.text()
+    let page = isWhiteLabel(await workspaceBrand(entry.workspace_id)) ? source : injectBadge(source, entry.slug)
     if (parseDataGrants(entry.data_tables).length > 0) page = injectDataClient(page)
     if (entry.access === 'public') page = injectPreviewMeta(page, await previewMetaFor(entry, request))
     return new Response(page, { headers })

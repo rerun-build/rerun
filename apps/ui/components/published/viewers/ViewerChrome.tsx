@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { Button } from '@/components/ui/button'
 import { DownloadIcon, type LucideIcon } from '@/lib/icons'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
@@ -17,7 +18,9 @@ export function ViewerPage({ slug, bar, children, className }: { slug: string; b
         <div {...{ [PUBLISHED_PAGE_MARKER]: '' }} className="relative flex h-dvh flex-col bg-background text-foreground">
             {bar}
             <main className={cn('min-h-0 flex-1 overflow-auto', className)}>{children}</main>
-            <MadeWithRerun slug={slug} className="fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:end-3" />
+            <RerunOnly>
+                <MadeWithRerun slug={slug} className="fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:end-3" />
+            </RerunOnly>
         </div>
     )
 }

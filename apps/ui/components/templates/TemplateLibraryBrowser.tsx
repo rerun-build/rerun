@@ -1,6 +1,7 @@
 'use client'
 
-import { templateCategoryLabel, type TemplateCategoryCopy, type TemplateStatus } from '@rerun/contracts'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { isWhiteLabel, templateCategoryLabel, type TemplateCategoryCopy, type TemplateStatus } from '@rerun/contracts'
 import { brandIconFilter } from '@rerun/ui/brand-icon'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { useMemo, useRef, useState } from 'react'
@@ -54,6 +55,7 @@ export function TemplateLibraryBrowser({
     onScratch: () => void
 }) {
     const t = useTranslations('templates.library')
+    const whiteLabel = isWhiteLabel(useBrand())
     const tCategory = useTranslations('templates.categories')
     const tStatus = useTranslations('templates.status')
     const statusOptions: FilterOption<TemplateStatus>[] = LIBRARY_STATUSES.map(status => ({ value: status, label: templateStatusLabel(status, tStatus) }))
@@ -154,7 +156,7 @@ export function TemplateLibraryBrowser({
                             </div>
                             {!onDiscover && (
                                 <div className="flex items-center gap-2">
-                                    {creator && (
+                                    {creator && !whiteLabel && (
                                         <Button asChild variant="outline" size="lg">
                                             <a href={landingUrl(`/community/experts/${creator.slug}`)} target="_blank" rel="noreferrer">
                                                 <UserIcon className="size-4" />

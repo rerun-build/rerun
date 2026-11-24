@@ -1,5 +1,7 @@
 'use client'
 
+import { isWhiteLabel } from '@rerun/contracts'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { useErrorText } from '@/hooks/useErrorText'
 import { enterSandboxAction } from '@/app/api/_actions/workspace.actions'
 import { AccountDialog } from '@/components/dialogs/AccountDialog'
@@ -79,6 +81,7 @@ function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslato
 
 // `column`: at the top of the Simple view's list, in the flow, alone: help and the offer sit at its foot.
 export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corner' | 'column' }) {
+    const whiteLabel = isWhiteLabel(useBrand())
     const t = useTranslations('layout.workspaceMenu')
     const tAccess = useTranslations('workspace.access')
     const errorText = useErrorText()
@@ -166,7 +169,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const listInPlace = isMobile && switching
     const trialing = workspace.subscription_status === 'trialing'
     // Refer a friend lives in the plan dialog, which only a paying Stripe subscriber gets.
-    const canRefer = BILLING_ENABLED && !workspace.is_sandbox && workspace.subscription_status === 'active' && !!workspace.stripe_customer_id && !isLifetimePlan(workspace)
+    const canRefer = !whiteLabel && BILLING_ENABLED && !workspace.is_sandbox && workspace.subscription_status === 'active' && !!workspace.stripe_customer_id && !isLifetimePlan(workspace)
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
@@ -291,12 +294,14 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     {vaultSignedOut > 0 && <span className="ms-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
                 </DropdownMenuItem>
             </DisabledWithReason>
-            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
-                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
-                    <MonitorIcon className="size-4" />
-                    {t('computers')}
-                </DropdownMenuItem>
-            </DisabledWithReason>
+            {!whiteLabel && (
+                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                    <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
+                        <MonitorIcon className="size-4" />
+                        {t('computers')}
+                    </DropdownMenuItem>
+                </DisabledWithReason>
+            )}
             {apiKeysItem}
             {SERVERS_ENABLED && (
                 <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
