@@ -1,0 +1,35 @@
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
+import { hashedBuddyLook } from '@rerun/ui/iso-grid/buddy-look'
+
+import { APP_URL } from '@/lib/app-url'
+
+// Bump on any change to the drawing: phones and proxies keep a portrait for good.
+export const PORTRAIT_VERSION = '1'
+
+// Captured at 2x. A phone crops it to a circle of 64 points at most.
+export const PORTRAIT_SIZE = 128
+
+export type CoworkerPortrait = { kind: 'foreman' } | { kind: 'buddy'; look: Required<CoworkerLook> }
+
+// The address names a look and nothing else: a phone downloads it signed out, so it can carry neither
+// the coworker's id nor its name, and every word of it comes from a closed list.
+function portraitSlug(agentId: string, look: CoworkerLook | null): string {
+    if (agentId === FOREMAN_AGENT_ID) return FOREMAN_AGENT_ID
+    const { eyes, mouth, color, material = 'classic' } = look ?? hashedBuddyLook(agentId)
+    return [eyes, mouth, color.slice(1), material].join('-')
+}
+
+export function coworkerPortraitUrl(agentId: string, look: CoworkerLook | null): string {
+    return `${APP_URL}/og/coworker/${portraitSlug(agentId, look)}?v=${PORTRAIT_VERSION}`
+}
+
+export function portraitOfSlug(slug: string): CoworkerPortrait | null {
+    if (slug === FOREMAN_AGENT_ID) return { kind: 'foreman' }
+    const [eyesPart, mouthPart, colorPart, materialPart, ...rest] = slug.split('-')
+    const eyes = COWORKER_EYES.find(value => value === eyesPart)
+    const mouth = COWORKER_MOUTHS.find(value => value === mouthPart)
+    const color = COWORKER_COLORS.find(value => value === `#${colorPart}`)
+    const material = COWORKER_MATERIALS.find(value => value === materialPart)
+    if (!eyes || !mouth || !color || !material || rest.length) return null
+    return { kind: 'buddy', look: { eyes, mouth, color, material } }
+}

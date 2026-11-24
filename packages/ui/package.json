@@ -17,6 +17,7 @@
         "./dom-guard": "./src/dom-guard/index.ts",
         "./inbox": "./src/inbox/index.ts",
         "./iso-grid": "./src/iso-grid/index.ts",
+        "./iso-grid/buddy-look": "./src/iso-grid/components/buddy/buddy-look.ts",
         "./iso-grid/card-capture": "./src/iso-grid/card-capture.ts",
         "./iso-grid/iso": "./src/iso-grid/iso.ts",
         "./kit": "./src/kit/index.ts",
