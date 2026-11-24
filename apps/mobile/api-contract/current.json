@@ -3256,6 +3256,281 @@
                 "x-mobile-api": "getAgentModels"
             }
         },
+        "/api/v1/agents/{id}/open-chats": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "chats": {
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "nullable": true,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "last": {
+                                            "nullable": true,
+                                            "properties": {
+                                                "activeId": {
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "changedAt": {
+                                                    "type": "string"
+                                                },
+                                                "deviceId": {
+                                                    "type": "string"
+                                                },
+                                                "deviceKind": {
+                                                    "enum": [
+                                                        "computer",
+                                                        "phone"
+                                                    ],
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "activeId",
+                                                "deviceId",
+                                                "deviceKind",
+                                                "changedAt"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "chats",
+                                        "last"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "getOpenChats"
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "changes": {
+                                        "default": [],
+                                        "items": {
+                                            "oneOf": [
+                                                {
+                                                    "properties": {
+                                                        "sessionId": {
+                                                            "format": "uuid",
+                                                            "nullable": true,
+                                                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$",
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "enum": [
+                                                                "select"
+                                                            ],
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "sessionId"
+                                                    ],
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "properties": {
+                                                        "sessionId": {
+                                                            "format": "uuid",
+                                                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$",
+                                                            "type": "string"
+                                                        },
+                                                        "type": {
+                                                            "enum": [
+                                                                "close"
+                                                            ],
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "sessionId"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            ]
+                                        },
+                                        "maxItems": 100,
+                                        "type": "array"
+                                    },
+                                    "device": {
+                                        "properties": {
+                                            "id": {
+                                                "format": "uuid",
+                                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$",
+                                                "type": "string"
+                                            },
+                                            "kind": {
+                                                "enum": [
+                                                    "computer",
+                                                    "phone"
+                                                ],
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "kind"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "merge": {
+                                        "items": {
+                                            "format": "uuid",
+                                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$",
+                                            "type": "string"
+                                        },
+                                        "maxItems": 100,
+                                        "type": "array"
+                                    }
+                                },
+                                "required": [
+                                    "device"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "chats": {
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "nullable": true,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "last": {
+                                            "nullable": true,
+                                            "properties": {
+                                                "activeId": {
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "changedAt": {
+                                                    "type": "string"
+                                                },
+                                                "deviceId": {
+                                                    "type": "string"
+                                                },
+                                                "deviceKind": {
+                                                    "enum": [
+                                                        "computer",
+                                                        "phone"
+                                                    ],
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "activeId",
+                                                "deviceId",
+                                                "deviceKind",
+                                                "changedAt"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "chats",
+                                        "last"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "changeOpenChats"
+            }
+        },
         "/api/v1/agents/{id}/paid-data": {
             "put": {
                 "parameters": [

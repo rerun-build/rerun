@@ -94,6 +94,8 @@ async function erasePersonalData(admin: Client, userId: string) {
         admin.from('user_phones').delete().eq('user_id', userId),
         admin.from('sign_in_codes').delete().eq('user_id', userId),
         admin.from('user_presence').delete().eq('user_id', userId),
+        admin.from('open_chats').delete().eq('user_id', userId),
+        admin.from('open_chat_states').delete().eq('user_id', userId),
         admin
             .from('newsletter_recipients')
             .update<NewsletterRecipientUpdate>({ email: deletedAccountEmailFor(userId) })

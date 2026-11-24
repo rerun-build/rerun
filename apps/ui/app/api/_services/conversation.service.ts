@@ -49,7 +49,7 @@ export type SessionHistoryPage = { entries: SessionHistoryEntry[]; before: strin
 
 // The conversations of a coworker a caller reads: all of them, or for a coworker whose
 // conversations are each member's own, the caller's alone (none for a caller who is no member).
-function ownerFilterOf(agent: { kind: AgentKind }, caller: Actor): { filter: { owner_user_id?: string } } | null {
+export function ownerFilterOf(agent: { kind: AgentKind }, caller: Actor): { filter: { owner_user_id?: string } } | null {
     if (agentKindPolicy(agent.kind).conversations === 'shared') return { filter: {} }
     return caller.kind === 'user' ? { filter: { owner_user_id: caller.userId } } : null
 }

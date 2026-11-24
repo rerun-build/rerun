@@ -1992,6 +1992,98 @@ export type Database = {
         }
         Relationships: []
       }
+      open_chat_states: {
+        Row: {
+          active_session_id: string | null
+          agent_id: string
+          changed_at: string
+          device_id: string
+          device_kind: string
+          user_id: string
+        }
+        Insert: {
+          active_session_id?: string | null
+          agent_id: string
+          changed_at?: string
+          device_id: string
+          device_kind: string
+          user_id: string
+        }
+        Update: {
+          active_session_id?: string | null
+          agent_id?: string
+          changed_at?: string
+          device_id?: string
+          device_kind?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "open_chat_states_active_session_id_fkey"
+            columns: ["active_session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "open_chat_states_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "open_chat_states_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      open_chats: {
+        Row: {
+          agent_id: string
+          opened_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          agent_id: string
+          opened_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string
+          opened_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "open_chats_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "open_chats_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "open_chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paid_data_events: {
         Row: {
           billed_micros: number

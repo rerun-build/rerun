@@ -41,6 +41,7 @@ import { deviceTokenSchema, meSchema, memberProfileSchema } from './me.js'
 import { messageFeedbackDetailsRequestSchema, messageFeedbackEntrySchema, messageFeedbackRateRequestSchema, messageFeedbackScopeSchema } from './message-feedback.js'
 import { notificationPrefsPatchSchema, notificationPrefsSchema } from './notifications.js'
 import { onboardingEngineSchema, onboardingStateSchema } from './onboarding.js'
+import { changeOpenChatsSchema, openChatsSchema } from './open-chats.js'
 import { paidDataAlwaysAllowSchema } from './paid-data.js'
 import { remoteComputerRuleSchema } from './remote-computer.js'
 import { routinesViewSchema, updateRoutineSchema } from './routine.js'
@@ -179,6 +180,8 @@ export const mobileApi = {
     updateAgentKeys: hubEndpoint({ method: 'PUT', path: '/api/v1/agents/{id}/keys', body: updateAgentKeysSchema, response: agentKeysListSchema }),
     setPaidDataAlwaysAllow: hubEndpoint({ method: 'PUT', path: '/api/v1/agents/{id}/paid-data', body: paidDataAlwaysAllowSchema, response: 'none' }),
     listAgentConversations: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}/conversations', response: z.array(conversationSchema) }),
+    getOpenChats: hubEndpoint({ method: 'GET', path: '/api/v1/agents/{id}/open-chats', response: openChatsSchema }),
+    changeOpenChats: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/open-chats', body: changeOpenChatsSchema, response: openChatsSchema }),
     cancelSubRun: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/runs/{runId}/tasks/{taskId}/cancel', response: 'none' }),
     openDesktop: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/desktop', body: desktopSocketRequestSchema, response: desktopSocketSchema }),
     startTakeover: hubEndpoint({ method: 'POST', path: '/api/v1/agents/{id}/desktop/takeover', body: takeoverRequestSchema, response: 'none' }),
