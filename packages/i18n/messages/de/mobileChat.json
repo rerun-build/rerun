@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "Zurück",
+        "closeConversation": "Unterhaltung schließen",
         "conversationCount": "{count, plural, one {# Unterhaltung} other {# Unterhaltungen}}",
         "conversations": "Unterhaltungen",
         "coworkerDetails": "Coworker-Details",
@@ -256,6 +257,11 @@
         "thinking": "Denkt nach",
         "waking": "Wacht auf",
         "working": "Arbeitet"
+    },
+    "resume": {
+        "continue": "<verb>Fortsetzen</verb> <name>{title}</name>",
+        "dismiss": "Verwerfen",
+        "untitled": "Neue Unterhaltung"
     },
     "screen": {
         "disconnected": "Der Bildschirm ist weg",

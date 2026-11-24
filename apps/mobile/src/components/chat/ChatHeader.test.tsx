@@ -10,8 +10,14 @@ jest.mock('react-native-svg', () => {
     return { __esModule: true, default: Shape, Svg: Shape, Path: Shape, G: Shape, Circle: Shape, Rect: Shape, Defs: Shape, LinearGradient: Shape, RadialGradient: Shape, Stop: Shape, Polygon: Shape, Ellipse: Shape, Line: Shape, ClipPath: Shape, Mask: Shape }
 })
 jest.mock('@/components/ui/NativeMenu', () => {
+    const { Pressable, Text } = jest.requireActual('react-native')
     const Pass = ({ children }: { children?: ReactNode }) => children ?? null
-    return { NativeMenu: Pass, MenuItem: () => null, MenuToggle: () => null, MenuSection: Pass, SubMenu: Pass, CircleTrigger: () => null }
+    const Item = ({ label, onPress }: { label: string; onPress: () => void }) => (
+        <Pressable onPress={onPress}>
+            <Text>{label}</Text>
+        </Pressable>
+    )
+    return { NativeMenu: Pass, MenuItem: Item, MenuToggle: () => null, MenuSection: Pass, SubMenu: Pass, CircleTrigger: () => null }
 })
 
 const coworker = { id: 'pulse', kind: 'coworker' as const, name: 'Support', status: 'idle' as const }
@@ -46,5 +52,21 @@ describeOnIos('the chat header pill', () => {
         await renderHeader('t')
         await measure('Weekly quota failure on the support inbox', 900)
         expect(widthOf(titleArea())).toBeLessThan(240)
+    })
+})
+
+describe('the conversations menu', () => {
+    const renderMenu = (onCloseSession?: () => void) => render(<ChatHeader coworker={coworker} tabs={tabs} activeId="t" progress={{ value: 1 } as never} allSessions={tabs} onBack={() => {}} onSelect={() => {}} onNewSession={() => {}} onCloseSession={onCloseSession} />)
+
+    it('closes the thread on screen', async () => {
+        const close = jest.fn()
+        await renderMenu(close)
+        await fireEvent.press(screen.getByText('Close conversation'))
+        expect(close).toHaveBeenCalledTimes(1)
+    })
+
+    it('closes nothing on General nor on the draft', async () => {
+        await renderMenu()
+        expect(screen.queryByText('Close conversation')).toBeNull()
     })
 })

@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "Voltar",
+        "closeConversation": "Fechar conversa",
         "conversationCount": "{count, plural, one {# conversa} other {# conversas}}",
         "conversations": "Conversas",
         "coworkerDetails": "Detalhes do coworker",
@@ -256,6 +257,11 @@
         "thinking": "Pensando",
         "waking": "Acordando",
         "working": "Trabalhando"
+    },
+    "resume": {
+        "continue": "<verb>Continuar</verb> <name>{title}</name>",
+        "dismiss": "Dispensar",
+        "untitled": "Nova conversa"
     },
     "screen": {
         "disconnected": "A tela sumiu",

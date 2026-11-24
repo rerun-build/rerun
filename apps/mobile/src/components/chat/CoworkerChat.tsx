@@ -25,6 +25,7 @@ import { ConversationPane, type ChatCoworker } from './ConversationPane'
 import { generalThreadsOf } from './threads/general-threads'
 import type { StartedBy } from './origins/StartedByBanner'
 import { useCoworkerConversations } from './useCoworkerConversations'
+import { ResumeChatPill } from './ResumeChatPill'
 import { useOpenChats } from './useOpenChats'
 
 function coworkerOf(agentId: string, view: AgentView | null): ChatCoworker {
@@ -59,9 +60,9 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
     const [bornKeys, setBornKeys] = useState<Record<string, string>>({})
     const [activeId, setActiveId] = useState(sessionId)
-    const [openIds, openChat] = useOpenChats(agentId, sessionId === GENERAL_PAGE_ID ? null : sessionId)
     const coworker = coworkerOf(agentId, view)
     const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? knownGeneralId
+    const { openIds, resume, select: pickChat, close: closeChat, dismiss: dismissResume, settle: settleResume } = useOpenChats(agentId, { openedOn: sessionId === GENERAL_PAGE_ID || sessionId === knownGeneralId ? null : sessionId, activeId: activeId === GENERAL_PAGE_ID || (activeId && activeId === generalId) ? null : (activeId ?? undefined) })
     const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
     // Read again when the model sheet closes on a new pick, or the details come back on a new name.
     // The first focus is the opening, which the reads above already cover.
@@ -91,12 +92,13 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     }, [activeUnseen, readId, accessToken, workspaceId, loadConversations])
 
     const open = (id: string) => {
-        if (id !== GENERAL_PAGE_ID && id !== generalId) openChat(id)
+        pickChat(id === GENERAL_PAGE_ID || id === generalId ? null : id)
         setActiveId(id)
         router.setParams({ id })
     }
 
     const showDraft = () => {
+        settleResume()
         setActiveId(null)
         router.setParams({ id: 'new' })
     }
@@ -105,6 +107,11 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const select = (id: string) => {
         Haptics.selectionAsync()
         open(id)
+    }
+
+    const closeActive = (id: string) => {
+        Haptics.selectionAsync()
+        open(closeChat(id) ?? generalId ?? GENERAL_PAGE_ID)
     }
 
     const startNew = () => {
@@ -117,12 +124,12 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))
             setDraftKey(`new-${Date.now()}`)
-            openChat(id)
+            pickChat(id)
             setActiveId(id)
             router.setParams({ id })
             loadConversations()
         },
-        [draftKey, openChat, loadConversations]
+        [draftKey, pickChat, loadConversations]
     )
 
     // General born on its own page: it keeps that page, and stays the active one under its own id
@@ -140,6 +147,9 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const activeIndex = activePageIndex(pages, activeId)
     const shownId = activeId === GENERAL_PAGE_ID && generalId ? generalId : activeId
 
+    const activePage = pages[activeIndex]
+    const closableId = activePage && !activePage.general ? activePage.sessionId : null
+    const resumePill = resume && <ResumeChatPill resume={resume} onContinue={select} onDismiss={dismissResume} />
     const progress = useSharedValue(activeIndex)
 
     const settleOn = (index: number) => {
@@ -162,8 +172,8 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => (page.general && !page.sessionId && !conversationsLoaded ? <ConversationPagePlaceholder /> : <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} updatedAt={conversationsFresh && page.sessionId ? (byId.get(page.sessionId)?.updatedAt ?? null) : null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} />)} />
-            <ChatHeader coworker={coworker} tabs={tabs} activeId={shownId ?? undefined} progress={progress} allSessions={allTabs} onBack={back} onSelect={select} onNewSession={startNew} onOpenDetails={() => router.push({ pathname: '/coworker/[id]', params: { id: agentId, name: coworker.name } })} />
+            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => (page.general && !page.sessionId && !conversationsLoaded ? <ConversationPagePlaceholder /> : <ConversationPane coworker={coworker} makeEndpoints={() => coworkerEndpoints(agentId, { general: page.general })} initialSessionId={page.sessionId} onSessionCreated={page.general ? onGeneralCreated : onSessionCreated} models={models} status={(page.sessionId && byId.get(page.sessionId)?.status) || null} updatedAt={conversationsFresh && page.sessionId ? (byId.get(page.sessionId)?.updatedAt ?? null) : null} onStatusChange={loadConversations} webUrl={`${environment.apiUrl}/?agent=${encodeURIComponent(agentId)}`} onScreen={onScreen} startedBy={startedByOf(page.sessionId ? byId.get(page.sessionId) : undefined)} threads={page.general ? generalThreads : undefined} onOpenThread={select} aboveComposer={onScreen ? resumePill : undefined} />)} />
+            <ChatHeader coworker={coworker} tabs={tabs} activeId={shownId ?? undefined} progress={progress} allSessions={allTabs} onBack={back} onSelect={select} onNewSession={startNew} onCloseSession={closableId ? () => closeActive(closableId) : undefined} onOpenDetails={() => router.push({ pathname: '/coworker/[id]', params: { id: agentId, name: coworker.name } })} />
         </View>
     )
 }

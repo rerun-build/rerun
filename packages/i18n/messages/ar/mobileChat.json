@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "رجوع",
+        "closeConversation": "إغلاق المحادثة",
         "conversationCount": "{count, plural, zero {لا محادثات} one {محادثة واحدة} two {محادثتان} few {# محادثات} many {# محادثة} other {# محادثة}}",
         "conversations": "المحادثات",
         "coworkerDetails": "تفاصيل الزميل",
@@ -256,6 +257,11 @@
         "thinking": "يفكّر",
         "waking": "يستيقظ",
         "working": "يعمل"
+    },
+    "resume": {
+        "continue": "<verb>متابعة</verb> <name>{title}</name>",
+        "dismiss": "تجاهل",
+        "untitled": "محادثة جديدة"
     },
     "screen": {
         "disconnected": "انقطعت الشاشة",

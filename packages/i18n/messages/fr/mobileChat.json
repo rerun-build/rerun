@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "Retour",
+        "closeConversation": "Fermer la conversation",
         "conversationCount": "{count, plural, one {# conversation} other {# conversations}}",
         "conversations": "Conversations",
         "coworkerDetails": "Détails du coworker",
@@ -256,6 +257,11 @@
         "thinking": "Réflexion",
         "waking": "Réveil",
         "working": "Au travail"
+    },
+    "resume": {
+        "continue": "<verb>Continuer</verb> <name>{title}</name>",
+        "dismiss": "Ignorer",
+        "untitled": "Nouvelle conversation"
     },
     "screen": {
         "disconnected": "L'écran a disparu",

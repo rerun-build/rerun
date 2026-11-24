@@ -150,10 +150,12 @@ type ChatHeaderProps = {
     onBack?: () => void
     onSelect: (sessionId: string) => void
     onNewSession: () => void
+    // Closes the thread on screen: its page leaves the row. General and the draft have none.
+    onCloseSession?: () => void
     onOpenDetails?: () => void
 }
 
-export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, onBack, onSelect, onNewSession, onOpenDetails }: ChatHeaderProps) {
+export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, onBack, onSelect, onNewSession, onCloseSession, onOpenDetails }: ChatHeaderProps) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const insets = useSafeAreaInsets()
@@ -233,6 +235,11 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                         <MenuItem label={untitled} icon="plus" onPress={onNewSession} disabled={!activeId} />
                         {general && <MenuToggle label={t('general')} icon="messages-square" isOn={activeId === general.id} onChange={() => onSelect(general.id)} />}
                         {listed.length > 0 && <ConversationsMenu sessions={listed} activeId={activeId} threaded={Boolean(general)} onSelect={onSelect} />}
+                        {onCloseSession && (
+                            <MenuSection>
+                                <MenuItem label={t('closeConversation')} icon="x" onPress={onCloseSession} />
+                            </MenuSection>
+                        )}
                     </NativeMenu>
                 ) : (
                     <View style={{ width: GLASS_BUTTON_SIZE }} />

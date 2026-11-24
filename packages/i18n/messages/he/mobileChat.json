@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "חזרה",
+        "closeConversation": "לסגור את השיחה",
         "conversationCount": "{count, plural, one {שיחה אחת} two {# שיחות} other {# שיחות}}",
         "conversations": "שיחות",
         "coworkerDetails": "פרטי העמית",
@@ -256,6 +257,11 @@
         "thinking": "חושב",
         "waking": "מתעורר",
         "working": "עובד"
+    },
+    "resume": {
+        "continue": "<verb>להמשיך</verb> <name>{title}</name>",
+        "dismiss": "לסגור",
+        "untitled": "שיחה חדשה"
     },
     "screen": {
         "disconnected": "החיבור למסך נותק",

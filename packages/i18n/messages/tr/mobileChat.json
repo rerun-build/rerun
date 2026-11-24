@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "Geri",
+        "closeConversation": "Sohbeti kapat",
         "conversationCount": "{count, plural, one {# sohbet} other {# sohbet}}",
         "conversations": "Sohbetler",
         "coworkerDetails": "Coworker ayrıntıları",
@@ -256,6 +257,11 @@
         "thinking": "Düşünüyor",
         "waking": "Uyanıyor",
         "working": "Çalışıyor"
+    },
+    "resume": {
+        "continue": "<verb>Devam et</verb> <name>{title}</name>",
+        "dismiss": "Kapat",
+        "untitled": "Yeni sohbet"
     },
     "screen": {
         "disconnected": "Ekran bağlantısı kesildi",

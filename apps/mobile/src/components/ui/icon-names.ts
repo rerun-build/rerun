@@ -102,6 +102,7 @@ export const ICON_NAMES = [
     'shield-alert',
     'shield-check',
     'shield-check-fill',
+    'smartphone',
     'square',
     'square-check-fill',
     'square-dashed',

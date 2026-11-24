@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "返回",
+        "closeConversation": "关闭对话",
         "conversationCount": "{count, plural, other {# 个对话}}",
         "conversations": "对话",
         "coworkerDetails": "同事详情",
@@ -256,6 +257,11 @@
         "thinking": "思考中",
         "waking": "正在唤醒",
         "working": "工作中"
+    },
+    "resume": {
+        "continue": "<verb>继续</verb> <name>{title}</name>",
+        "dismiss": "忽略",
+        "untitled": "新对话"
     },
     "screen": {
         "disconnected": "屏幕已断开",

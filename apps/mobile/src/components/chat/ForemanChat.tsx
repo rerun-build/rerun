@@ -32,6 +32,7 @@ import { BLUR_ABOVE_FOOTER, ConversationPane, type ChatCoworker } from './Conver
 import { ConversationSkeleton } from './ConversationSkeleton'
 import { generalThreadsOf } from './threads/general-threads'
 import { useForemanConversations } from './useCoworkerConversations'
+import { ResumeChatPill } from './ResumeChatPill'
 import { useOpenChats } from './useOpenChats'
 
 // Opens the Foreman's General, the conversation the web column opens on. Older links and pushes say `last`.
@@ -102,8 +103,8 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const [filesOnEngine, setFilesOnEngine] = useState(false)
     // Read by the pages' endpoints at upload time, long after the render that built them.
     const filesOnEngineRef = useRef(false)
-    const [openIds, openChat] = useOpenChats(FOREMAN_AGENT_ID, opensGeneral ? null : sessionId)
     const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? null
+    const { openIds, resume, select: pickChat, close: closeChat, dismiss: dismissResume, settle: settleResume } = useOpenChats(FOREMAN_AGENT_ID, { openedOn: opensGeneral ? null : sessionId, activeId: activeId === GENERAL_PAGE_ID || (activeId && activeId === generalId) ? null : (activeId ?? undefined) })
     const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
@@ -129,12 +130,13 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     }, [activeUnseen, readId, workspaceId, loadConversations])
 
     const open = (id: string) => {
-        if (id !== GENERAL_PAGE_ID && id !== generalId) openChat(id)
+        pickChat(id === GENERAL_PAGE_ID || id === generalId ? null : id)
         setActiveId(id)
         router.setParams({ id })
     }
 
     const showDraft = () => {
+        settleResume()
         setActiveId(null)
         router.setParams({ id: 'new' })
     }
@@ -194,6 +196,11 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         open(id)
     }
 
+    const closeActive = (id: string) => {
+        Haptics.selectionAsync()
+        open(closeChat(id) ?? generalId ?? GENERAL_PAGE_ID)
+    }
+
     const startNew = () => {
         Haptics.selectionAsync()
         showDraft()
@@ -204,12 +211,12 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))
             setDraftKey(`new-${Date.now()}`)
-            openChat(id)
+            pickChat(id)
             setActiveId(id)
             router.setParams({ id })
             loadConversations()
         },
-        [draftKey, openChat, loadConversations]
+        [draftKey, pickChat, loadConversations]
     )
 
     // General born on its own page: it keeps that page, and stays the active one under its own id
@@ -229,6 +236,9 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const pages = conversationPages(openIds, bornKeys, draftKey, { sessionId: generalId })
     const activeIndex = activePageIndex(pages, activeId)
     const shownId = activeId === GENERAL_PAGE_ID && generalId ? generalId : activeId
+    const activePage = pages[activeIndex]
+    const closableId = activePage && !activePage.general ? activePage.sessionId : null
+    const resumePill = resume && <ResumeChatPill resume={resume} onContinue={select} onDismiss={dismissResume} />
     const progress = useSharedValue(activeIndex)
 
     const settleOn = (index: number) => {
@@ -273,6 +283,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                             canAttach={filesOnEngine}
                             threads={page.general ? generalThreads : undefined}
                             onOpenThread={select}
+                            aboveComposer={onScreen ? resumePill : undefined}
                         />
                     )}
                 />
@@ -288,7 +299,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                     }}
                 />
             )}
-            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={shownId ?? undefined} progress={progress} allSessions={surface === 'engine' ? allTabs : []} onBack={back} onSelect={select} onNewSession={startNew} onOpenDetails={surface === 'engine' ? () => router.push({ pathname: '/coworker/[id]', params: { id: FOREMAN_AGENT_ID, name: foreman.name } }) : undefined} />
+            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={shownId ?? undefined} progress={progress} allSessions={surface === 'engine' ? allTabs : []} onBack={back} onSelect={select} onNewSession={startNew} onCloseSession={closableId ? () => closeActive(closableId) : undefined} onOpenDetails={surface === 'engine' ? () => router.push({ pathname: '/coworker/[id]', params: { id: FOREMAN_AGENT_ID, name: foreman.name } }) : undefined} />
         </View>
     )
 }

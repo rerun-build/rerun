@@ -1,6 +1,6 @@
 import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideOutDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -110,6 +110,8 @@ type ConversationPaneProps = {
     // General only: the coworker's threads, each hung under the message it was opened after.
     threads?: ThreadItem[]
     onOpenThread?: (sessionId: string) => void
+    // Floats over the composer.
+    aboveComposer?: ReactNode
 }
 
 // One conversation on screen: the transcript, what waits on an answer, and the composer.
@@ -122,7 +124,7 @@ export function ConversationPane(props: ConversationPaneProps) {
     )
 }
 
-function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, updatedAt = null, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
+function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, updatedAt = null, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread, aboveComposer }: ConversationPaneProps) {
     noteRender('ConversationPane')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
@@ -561,6 +563,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                             <PinnedSkillProposal proposal={proposal} pending={skillProposals.pendingId === proposal.id} onDecide={skillProposals.decide} />
                         </Animated.View>
                     ))}
+                    {aboveComposer}
                     {replies.length > 0 && !draft && !queue.queued && <Suggestions items={replies} onPick={pickReply} />}
                     {queue.queued && (
                         <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)} style={{ paddingHorizontal: spacing.md }}>

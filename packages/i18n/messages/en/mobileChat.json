@@ -162,6 +162,7 @@
     },
     "header": {
         "back": "Back",
+        "closeConversation": "Close conversation",
         "conversationCount": "{count, plural, one {# conversation} other {# conversations}}",
         "conversations": "Conversations",
         "coworkerDetails": "Coworker details",
@@ -257,6 +258,11 @@
         "waking": "Waking up",
         "working": "Working"
     },
+    "resume": {
+        "continue": "<verb>Continue</verb> <name>{title}</name>",
+        "dismiss": "Dismiss",
+        "untitled": "New conversation"
+    },
     "screen": {
         "disconnected": "The screen went away",
         "error": "The screen is not available",
@@ -325,6 +331,10 @@
         "messages.compacting": "Status shown while the conversation history is being summarized to save context.",
         "markdown.code": "Fallback label over a code block whose language is unknown.",
         "origins.payload": "The body of an HTTP request a webhook received.",
+        "header.closeConversation": "Menu item: takes the conversation on screen out of the row of open ones. It is not deleted.",
+        "resume.continue": "Button opening the conversation {title} picked last on another device. <verb> wraps the action, <name> the title.",
+        "resume.dismiss": "Accessibility label of the cross that hides the offer to open the conversation left on another device.",
+        "resume.untitled": "Stands in for the title of a conversation that has none yet.",
         "takeover.done": "Button: the person has finished using the coworker's browser and hands it back.",
         "empty.starters.capabilities": "One of four chips on an empty conversation with a coworker: tapped, it is sent as the user's own message to the coworker. Same for the other empty.starters keys.",
         "empty.team.greetingWithTeam": "Title of the Chief of Staff's empty conversation. {greeting} is the greeting sentence, for example \"Hi Alex, I'm your Chief of Staff\".",
