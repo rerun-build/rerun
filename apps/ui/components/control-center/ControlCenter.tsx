@@ -5,7 +5,7 @@ import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isApiLocked, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { AgentStatus, IsoAgent } from '@/lib/board/types'
 import { buildControlCommands, type ControlCommand, type ControlCommandId } from '@/lib/control-center/commands'
@@ -253,7 +253,7 @@ export function ControlCenter() {
     })
 
     function rootSections(): ControlSection[] {
-        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox') }).map(command => ({
+        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
             ...command,
             label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`, foremanName),
         }))

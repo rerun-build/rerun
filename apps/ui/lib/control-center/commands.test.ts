@@ -5,7 +5,7 @@ vi.mock('@rerun/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
 
 import { buildControlCommands, pushRecentAgent, type ControlGates } from './commands'
 
-const OPEN: ControlGates = { isSandbox: false, workspaceAdmin: true, apiEntitled: true, needsMachineReason: null, assistantReady: true, hasChangelog: true, darkTheme: false }
+const OPEN: ControlGates = { isSandbox: false, workspaceAdmin: true, apiEntitled: true, apiLocked: false, needsMachineReason: null, assistantReady: true, hasChangelog: true, darkTheme: false }
 
 function find(gates: Partial<ControlGates>, id: string) {
     return buildControlCommands({ ...OPEN, ...gates }).find(command => command.id === id)
@@ -35,6 +35,10 @@ describe('buildControlCommands', () => {
 
     it('marks API keys as paid rather than disabling it', () => {
         expect(find({ apiEntitled: false }, 'api_keys')).toMatchObject({ paid: true, disabledReason: null })
+    })
+
+    it('locks API keys out of the tier, without sending anyone to billing', () => {
+        for (const workspaceAdmin of [true, false]) expect(find({ workspaceAdmin, apiEntitled: false, apiLocked: true }, 'api_keys')).toMatchObject({ paid: false, disabledReason: 'Not included in your AppSumo tier' })
     })
 
     it('drops the assistant and the changelog when there is nothing behind them', () => {

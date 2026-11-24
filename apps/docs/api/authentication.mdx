@@ -25,7 +25,7 @@ Only an admin of the workspace creates or revokes a key. For any other member th
     In [the Rerun app](https://app.rerun.build), click the workspace pill in the top left corner.
   </Step>
   <Step title="Choose API keys & MCP">
-    The **API keys** dialog lists your active keys and the connection snippets for every supported client. On Rerun Cloud, a workspace whose subscription is over sees a **PRO** badge on the entry, and clicking it opens the plan dialog instead.
+    The **API keys** dialog lists your active keys and the connection snippets for every supported client. On Rerun Cloud, a workspace whose subscription is over sees a **PRO** badge on the entry, and clicking it opens the plan dialog instead. On [AppSumo Tier 1](/billing#appsumo-tiers) the entry is locked, with the reason "Not included in your AppSumo tier".
   </Step>
   <Step title="Name the key and create it">
     Name it after what will hold it, for example `claude-code-laptop` or `ci`, then click **Create key**. Names are limited to 60 characters.
@@ -81,6 +81,7 @@ There is no read-only key and no per-coworker key. If you need a narrower blast 
 | --- | --- |
 | No `Authorization: Bearer` header, a token that does not start with `rk_`, an unknown key, a revoked key | `401 Unauthorized`, plain text body |
 | A workspace whose subscription is over (Rerun Cloud) | `401 Unauthorized`, plain text body |
+| A workspace on [AppSumo Tier 1](/billing#appsumo-tiers) | `401 Unauthorized`, plain text body |
 | The member who created the key has left the workspace | `200 OK` with a JSON-RPC error, code `-32001`, on every `tools/call` |
 | Valid key, failing tool call | `200 OK` with a JSON-RPC result carrying `isError: true`. See [Protocol](/api/protocol) |
 

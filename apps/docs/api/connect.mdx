@@ -99,4 +99,4 @@ curl -s https://app.rerun.build/api/mcp/account \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-A `401 Unauthorized` in plain text means the key is missing, malformed or revoked, or that the workspace has no active subscription. See [Authentication](/api/authentication#errors) for the full list. Anything else comes back as JSON-RPC. See [Protocol](/api/protocol) for the full handshake.
+A `401 Unauthorized` in plain text means the key is missing, malformed or revoked, that the workspace has no active subscription, or that its [AppSumo tier](/billing#appsumo-tiers) leaves the API out. See [Authentication](/api/authentication#errors) for the full list. Anything else comes back as JSON-RPC. See [Protocol](/api/protocol) for the full handshake.

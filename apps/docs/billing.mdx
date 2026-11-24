@@ -81,7 +81,7 @@ Starting Pro during the trial (**End trial & start Pro now**) ends the trial on 
 If the trial credits run out before day 5, the coworker that stopped offers to start Pro now. The amount and the next billing date are shown before you confirm, nothing is charged until you do, and a refused card leaves the trial as it was. Once paid, the coworker picks the task back up where it stopped.
 
 <Note>
-  The [Rerun API](/api/authentication) follows the subscription: it works during the trial and on Pro, and every key stops answering once the subscription is over.
+  The [Rerun API](/api/authentication) follows the subscription: it works during the trial and on Pro, and every key stops answering once the subscription is over. On the Lifetime plan it is included, except on [AppSumo Tier 1](#appsumo-tiers).
 </Note>
 
 ## When you hit a limit
@@ -128,7 +128,7 @@ To leave Rerun altogether, cancel the subscription first, then [delete your acco
 
 ## Lifetime plan
 
-A workspace on the **Lifetime plan** paid once and keeps it for good: unlimited coworkers and seats, running on your own AI. It comes with no Rerun credits, so connect your API key or your ChatGPT subscription from **AI providers**, in **Billing**. To run it on your Claude subscription instead, write to [help@rerun.build](mailto:help@rerun.build) and we open it on your workspace.
+A workspace on the **Lifetime plan** paid once and keeps it for good: unlimited coworkers and seats, running on your own AI. A workspace on an [AppSumo tier](#appsumo-tiers) has the seats and the API access of its tier. It comes with no Rerun credits, so connect your API key or your ChatGPT subscription from **AI providers**, in **Billing**. To run it on your Claude subscription instead, write to [help@rerun.build](mailto:help@rerun.build) and we open it on your workspace.
 
 **Billing** shows the **Lifetime deal** where Pro shows its plan, with the same **Rerun credits** card and, on the full Lifetime plan, the same **Apps**. You can buy [credit packs](#credit-packs) from **Add credits** whenever you want to run your coworkers on the Rerun models, and find your invoices and business details on the right.
 
@@ -136,8 +136,26 @@ The lifetime deal is not on sale on the website: it is sold through a private li
 
 Then open [app.rerun.build/redeem](https://app.rerun.build/redeem), sign in or create your account, paste the code and click **Redeem**. Your workspace switches to the Lifetime plan.
 
-- One code switches one workspace, and works once. Buy one code for each workspace.
+- One code switches one workspace, and works once. Buy one code for each workspace, unless your [AppSumo tier](#appsumo-tiers) covers several.
 - A workspace with a running Pro subscription cannot redeem a code. Write to [help@rerun.build](mailto:help@rerun.build) and we switch it for you.
+
+### AppSumo tiers
+
+The Lifetime plan sold on AppSumo comes in three tiers. Coworkers are unlimited on all of them.
+
+| | Tier 1 | Tier 2 | Tier 3 |
+| --- | --- | --- | --- |
+| Codes to redeem | 1 | 2 | 3 |
+| Seats | 3 | Unlimited | Unlimited |
+| [API and MCP](/api/introduction) | No | Yes | Yes |
+| Workspaces | 1 | 1 | 3 |
+| Support | Standard | Standard | Priority |
+
+- **Raising your tier.** Each AppSumo code you add to the same workspace raises it by one tier. Click **Add another code** on [app.rerun.build/redeem](https://app.rerun.build/redeem) to paste several at once, or come back later with the next one.
+- **Opening the other workspaces of Tier 3.** Create a workspace, switch to it, then redeem one of the codes you already used: it opens on the same tier. Only an admin of a workspace the purchase already covers can do it, for anyone else the code is already used. A fourth workspace is refused.
+- **What Tier 1 leaves out.** **API keys & MCP** is locked in the workspace menu, and keys created before stop answering. Importing a coworker goes through the same key, so it is closed too. Past 3 members nobody is removed, but **Invite** is disabled.
+
+Lifetime workspaces bought before the tiers keep everything: unlimited seats, the API and the MCP server.
 
 ### Paid apps on the Lifetime plan
 

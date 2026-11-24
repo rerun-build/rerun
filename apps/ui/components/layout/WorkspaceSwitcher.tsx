@@ -32,7 +32,7 @@ import { Badge, Stripes, useIsMobile } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { activeAgentLimitFor, BILLING_ENABLED, isApiLocked, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
@@ -80,6 +80,7 @@ function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslato
 // `column`: at the top of the Simple view's list, in the flow, alone: help and the offer sit at its foot.
 export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corner' | 'column' }) {
     const t = useTranslations('layout.workspaceMenu')
+    const tAccess = useTranslations('workspace.access')
     const errorText = useErrorText()
     const { user, workspace, workspaces, signOut } = useSession()
     const openBilling = useBillingStore(s => s.openBilling)
@@ -143,6 +144,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
 
     const isExpert = user?.account_role === 'expert'
     const apiEntitled = isWorkspaceApiEntitled(workspace)
+    const apiLocked = isApiLocked(workspace)
     const sorted = switchableWorkspaces(workspaces)
     const activeIndex = Math.max(0, sorted.findIndex(w => w.id === workspace.id))
     const activeIcon = PRICING_ICONS[activeIndex % PRICING_ICONS.length]
@@ -168,11 +170,19 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
-        <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.apiKeys')}>
-            <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => (apiEntitled ? openWorkspacePanel('api_keys') : openBilling(undefined, 'api_keys'))} className="gap-2 text-muted-foreground">
+        <DisabledWithReason allowed={workspaceAdmin && !apiLocked} reason={apiLocked ? tAccess('apiNotIncluded') : t('adminOnly.apiKeys')}>
+            <DropdownMenuItem
+                disabled={!workspaceAdmin || apiLocked}
+                onSelect={() => (apiEntitled ? openWorkspacePanel('api_keys') : openBilling(undefined, 'api_keys'))}
+                className="w-full gap-2 text-muted-foreground"
+            >
                 <KeyIcon className="size-4" />
-                {t('apiKeys')}
-                {!apiEntitled && (
+                <span className="min-w-0">
+                    {t('apiKeys')}
+                    {apiLocked && isMobile && <span className="block text-xs whitespace-normal">{tAccess('apiNotIncluded')}</span>}
+                </span>
+                {apiLocked && <LockIcon className="ml-auto size-3.5" />}
+                {!apiEntitled && !apiLocked && (
                     <Badge size="xs" tone="brand" glow={false} className="ml-auto font-medium">
                         PRO
                     </Badge>

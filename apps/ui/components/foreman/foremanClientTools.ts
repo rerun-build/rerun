@@ -22,7 +22,7 @@ type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 // What the workspace menu knows and a tool call does not: which of its sections exist here. The
 // session lives in a React context, so the caller reads it and hands it over.
 // `vaultOpen`: the workspace menu opens the Vault only on an active plan or trial.
-export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean }
+export type ForemanClientGates = { apiEntitled: boolean; apiLocked: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {
     const choices = Object.entries(labels).map(([id, label]) => `${id} ("${label}")`)
@@ -68,6 +68,9 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
             if (!panel) return { ok: false, error: unknownTab(requested, SETTINGS_PANEL_LABELS, 'panel') }
             if ((panel === 'workspace' || panel === 'api_keys') && !gates.isAdmin) {
                 return { ok: false, error: `Only an admin of the workspace can open the ${SETTINGS_PANEL_LABELS[panel]} panel, and this user is a member. Say so, and suggest they ask an admin.` }
+            }
+            if (panel === 'api_keys' && gates.apiLocked) {
+                return { ok: false, error: 'API keys and the MCP client are not included in the AppSumo tier of this workspace. Say so, without offering the billing panel: no subscription opens them.' }
             }
             if (panel === 'api_keys' && !gates.apiEntitled) {
                 return { ok: false, error: 'API keys and the MCP client need an active subscription, and this workspace has none. Say so, and offer to open the billing panel instead.' }
