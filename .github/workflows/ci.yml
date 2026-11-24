@@ -114,7 +114,7 @@ jobs:
         env:
           EXPO_NO_GIT_STATUS: '1'
       - working-directory: apps/mobile/android
-        run: ./gradlew :composer-paste:testDebugUnitTest :background-grace:testDebugUnitTest --console=plain
+        run: ./gradlew :composer-paste:testDebugUnitTest :background-grace:testDebugUnitTest :push-portrait:testDebugUnitTest --console=plain
 
   migrations:
     # Runs in the open source repository only, not in a private clone of it.

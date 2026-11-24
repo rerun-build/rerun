@@ -28,7 +28,7 @@ import { useAiConsent } from '@/lib/ai-consent'
 import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
 import '@/notifications/background-pushes'
-import { OpenPushTarget, usePushTarget } from '@/notifications/PushRouting'
+import { OpenPushTarget, usePushTarget, useShortcutTarget } from '@/notifications/PushRouting'
 import { FrameMonitor } from '@/perf/FrameMonitor'
 import { PERF_LOG } from '@/perf/timing'
 import { OpenStartRoute } from '@/lib/start-route'
@@ -63,6 +63,7 @@ function App() {
     const [handedOver, setHandedOver] = useState(false)
     const split = useIsSplit()
     const pushTarget = usePushTarget()
+    const shortcutTarget = useShortcutTarget()
 
     useEffect(() => {
         if (!handedOver || route.kind !== 'app') return
@@ -121,6 +122,7 @@ function App() {
                         <CoworkerLooks>
                             <InboxProvider>
                                 {signedIn && <OpenPushTarget href={pushTarget.href} onOpened={pushTarget.opened} />}
+                                {signedIn && <OpenPushTarget href={shortcutTarget.href} onOpened={shortcutTarget.opened} />}
                                 <SplitShell enabled={signedIn}>
                                     <Stack screenOptions={{ headerShown: false }}>
                                         <Stack.Protected guard={signedIn} redirectTo="/sign-in">

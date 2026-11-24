@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Both stand in for the ones of expo-notifications, which declares them at priority -1 for an app to do so. -->
+    <service
+      android:name=".PortraitMessagingService"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+    </service>
+
+    <!-- Nothing but the event: expo-notifications's own receiver keeps the boot of the phone. -->
+    <receiver
+      android:name=".PortraitNotificationsService"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="expo.modules.notifications.NOTIFICATION_EVENT" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

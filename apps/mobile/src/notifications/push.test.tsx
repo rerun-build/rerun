@@ -8,7 +8,8 @@ import appJson from '../../app.json'
 import { brand } from '@/theme/tokens'
 
 import { askForPushOnce, pushAvailable, registerDevice, setConversationOnScreen, turnOnPush, unregisterDevice } from './push'
-import { OpenPushTarget, usePushTarget } from './PushRouting'
+import { OpenPushTarget, usePushTarget, useShortcutTarget } from './PushRouting'
+import { holdShortcut } from './shortcut-link'
 
 const mockApi = jest.fn().mockResolvedValue(undefined)
 jest.mock('@/api/client', () => ({ hub: jest.requireActual('@/api/client').createHubClient((...args: unknown[]) => mockApi(...args)), appBuild: 7 }))
@@ -59,8 +60,15 @@ const mockSwitchWorkspace = jest.fn(async (workspaceId: number) => void mockCall
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ me: { workspace: { id: mockAuth.workspaceId } }, switchWorkspace: mockSwitchWorkspace }) }))
 
 function Routing({ shellShown = true }: { shellShown?: boolean }) {
-    const { href, opened } = usePushTarget()
-    return shellShown ? <OpenPushTarget href={href} onOpened={opened} /> : null
+    const push = usePushTarget()
+    const shortcut = useShortcutTarget()
+    if (!shellShown) return null
+    return (
+        <>
+            <OpenPushTarget href={push.href} onOpened={push.opened} />
+            <OpenPushTarget href={shortcut.href} onOpened={shortcut.opened} />
+        </>
+    )
 }
 
 const settle = () => act(async () => await new Promise(resolve => setTimeout(resolve, 0)))
@@ -265,6 +273,69 @@ describe('a tapped push from another workspace', () => {
         await renderRouting({ shellShown: false })
         await moveTo(7)
         expect(mockPush).not.toHaveBeenCalled()
+    })
+})
+
+describe('a tapped shortcut of a coworker', () => {
+    const GENERAL = { pathname: '/chat/[id]', params: { id: 'general', to: 'a1' } }
+    const tap = (workspaceId: number) => act(async () => void holdShortcut(`rerun://chat/general?to=a1&workspace=${workspaceId}`))
+
+    beforeEach(() => {
+        mockLastResponse = null
+    })
+
+    it('opens in the workspace the phone is on, without switching, each time it is tapped', async () => {
+        await renderRouting()
+        await tap(18259)
+        await settle()
+        await tap(18259)
+        await settle()
+        expect(mockCalls).toEqual(['navigate', 'navigate'])
+        expect(mockPush).toHaveBeenLastCalledWith(GENERAL)
+    })
+
+    it('switches to its workspace first, whether it launched the app or found it open', async () => {
+        await tap(1)
+        await renderRouting()
+        expect(mockCalls).toEqual(['switch:1'])
+        await moveTo(1)
+        expect(mockCalls).toEqual(['switch:1', 'navigate'])
+        expect(mockPush).toHaveBeenCalledWith(GENERAL)
+        await tap(7)
+        await settle()
+        expect(mockCalls).toEqual(['switch:1', 'navigate', 'switch:7'])
+        await moveTo(7)
+        expect(mockCalls).toEqual(['switch:1', 'navigate', 'switch:7', 'navigate'])
+    })
+
+    it('does not take the phone back once it has opened, when the person moves on', async () => {
+        await renderRouting()
+        await tap(1)
+        await moveTo(1)
+        await moveTo(7)
+        expect(mockCalls).toEqual(['switch:1', 'navigate'])
+    })
+
+    it('stays where it is when the switch is refused, and gives the shortcut up for good', async () => {
+        mockSwitchWorkspace.mockRejectedValueOnce(new Error('HTTP 403'))
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        await renderRouting()
+        await tap(1)
+        await settle()
+        await moveTo(1)
+        expect(mockPush).not.toHaveBeenCalled()
+        warn.mockRestore()
+    })
+
+    it('holds back no push while it waits behind a workspace with no plan, nor opens under another one', async () => {
+        await renderRouting({ shellShown: false })
+        await tap(1)
+        mockLastResponse = { notification: notification({ workspaceId: 18259, agentId: 'a2', conversationId: 'conv-12', kind: 'question' }, 'n19') }
+        await moveTo(18259)
+        expect(mockPush.mock.calls).toEqual([[{ pathname: '/chat/[id]', params: { id: 'conv-12', to: 'a2' } }]])
+        await moveTo(1)
+        expect(mockPush).toHaveBeenLastCalledWith(GENERAL)
+        expect(mockPush).toHaveBeenCalledTimes(2)
     })
 })
 

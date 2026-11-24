@@ -1,0 +1,37 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'build.rerun'
+version = '1.0.0'
+
+// Expo links expo-notifications as a published library, or as a project when it is built from source.
+def notificationsPackage = providers.exec {
+  workingDir(rootDir)
+  commandLine('node', '--print', "require.resolve('expo-notifications/package.json')")
+}.standardOutput.asText.get().trim()
+def notificationsVersion = new groovy.json.JsonSlurper().parse(new File(notificationsPackage)).version
+
+android {
+  namespace "expo.modules.pushportrait"
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+  }
+  testOptions {
+    unitTests.includeAndroidResources = true
+  }
+}
+
+dependencies {
+  implementation findProject(':expo-notifications') ?: "host.exp.exponent:expo.modules.notifications:$notificationsVersion"
+  implementation 'com.google.firebase:firebase-messaging:25.0.1'
+  implementation 'androidx.core:core-ktx:1.17.0'
+  implementation 'androidx.lifecycle:lifecycle-process:2.9.3'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'androidx.test:core:1.7.0'
+  testImplementation 'org.robolectric:robolectric:4.16.1'
+}
