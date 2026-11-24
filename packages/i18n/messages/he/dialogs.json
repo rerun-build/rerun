@@ -47,7 +47,7 @@
             "linkHint": "יש לשלוח את הקישור הזה אל {email}. הוא עובד רק עבורו, פעם אחת.",
             "copyLink": "להעתיק את קישור ההזמנה",
             "emailLabel": "להזמין באימייל",
-            "emailPlaceholder": "teammate@rerun.build",
+            "emailPlaceholder": "teammate@{domain}",
             "boxes": "Boxes",
             "submit": "להזמין",
             "sent": "ההזמנה נשלחה אל {email}"
@@ -114,7 +114,7 @@
         "name": "שם",
         "namePlaceholder": "לדוגמה: Acme בע״מ",
         "email": "אימייל",
-        "emailPlaceholder": "teammate@rerun.build",
+        "emailPlaceholder": "teammate@{domain}",
         "emailHint": "חברי הצוות יקבלו הזמנה באימייל כשתיצור את סביבת העבודה. כדי להזמין צריך מינוי Team או Scale.",
         "add": "להוסיף",
         "removeMember": "להסיר את {email}",

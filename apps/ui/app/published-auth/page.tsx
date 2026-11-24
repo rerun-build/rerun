@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { GateScreen, RerunTile } from '@/components/published/GateScreen'
+import { GateScreen, BrandTile } from '@/components/published/GateScreen'
 import { SwitchAccountButton } from '@/components/published/SwitchAccountButton'
 import { Icon } from '@/components/ui/icon'
 import { realEmail } from '@/lib/auth/placeholder-email'
@@ -36,7 +36,7 @@ export default async function PublishedAuthPage({ searchParams }: { searchParams
     const next = safeNextPath(param(search, 'next'))
     const entry = slug ? await loadPublished(slug) : null
     const t = await getTranslations('publicPages')
-    if (!entry) return <GateScreen brand={{ name: 'Rerun', iconUrl: null }} lock={null} mark={<RerunTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
+    if (!entry) return <GateScreen brand={{ name: 'Rerun', iconUrl: null }} lock={null} mark={<BrandTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
 
     const returnTo = openPublishedHref(slug, next)
     const { data } = await (await createClient()).auth.getUser()

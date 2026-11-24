@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { Logo } from '@/components/layout/Logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { GateCodeField } from '@/components/published/GateCodeField'
-import { GateMessage, GateScreen, RerunTile, type GateBrand } from '@/components/published/GateScreen'
+import { GateMessage, GateScreen, BrandTile, type GateBrand } from '@/components/published/GateScreen'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { GateInput } from '@/components/published/GateInput'
@@ -90,7 +90,7 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     const t = await getTranslations('publicPages.gate')
 
     if (!entry || param(search, 'gate') === 'gone') {
-        return <GateScreen brand={brand} lock={null} mark={<RerunTile />} title={tPages('linkOff.title')} subtitle={tPages('linkOff.subtitle')} />
+        return <GateScreen brand={brand} lock={null} mark={<BrandTile />} title={tPages('linkOff.title')} subtitle={tPages('linkOff.subtitle')} />
     }
 
     const title = entry.title ?? tPages('publishedView.protectedTitle')
@@ -148,7 +148,7 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     }
 
     return (
-        <GateScreen brand={brand} lock={<Logo size="lg" />} title={title} subtitle={t('members.subtitle', { workspace: brand.name })}>
+        <GateScreen brand={brand} lock={<BrandLogo size="lg" />} title={title} subtitle={t('members.subtitle', { workspace: brand.name })}>
             <Button size="lg" asChild>
                 <a href={`${APP_URL}${openPublishedHref(slug, next)}`}>
                     <LogInIcon />

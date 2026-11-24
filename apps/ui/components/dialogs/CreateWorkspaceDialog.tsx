@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { exampleEmailDomain } from '@rerun/contracts'
 import { useErrorText } from '@/hooks/useErrorText'
 import { inviteToWorkspaceAction } from '@/app/api/_actions/members.actions'
 import { createWorkspaceAction } from '@/app/api/_actions/workspace.actions'
@@ -34,6 +36,7 @@ const defaultValues: FormValues = { name: '', iconFile: '', members: [], memberD
 
 export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('dialogs.createWorkspace')
+    const exampleDomain = exampleEmailDomain(useBrand())
     const tCommon = useTranslations('common')
     const tSettings = useTranslations('workspace.settings')
     const errorText = useErrorText()
@@ -172,7 +175,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                                 <Input
                                                     label={t('email')}
                                                     type="email"
-                                                    placeholder={t('emailPlaceholder')}
+                                                    placeholder={t('emailPlaceholder', { domain: exampleDomain })}
                                                     helperText={t('emailHint')}
                                                     {...form.register('memberDraft')}
                                                     onKeyDown={e => {

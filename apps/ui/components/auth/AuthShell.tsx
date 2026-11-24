@@ -2,7 +2,7 @@
 
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
-import { Logo } from '@rerun/ui/logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import type { ElementType, ReactNode } from 'react'
 import { AuthScene } from './AuthScene'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
@@ -47,7 +47,7 @@ export function AuthShell({
             <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 py-6 sm:py-10">
                 <div className="mx-auto w-full max-w-sm space-y-6">
                     <div className="flex flex-col items-center space-y-4 text-center">
-                        <Logo size="md" />
+                        <BrandLogo size="md" />
                         <div className="space-y-2">
                             <Title className="text-3xl font-medium tracking-tight text-balance sm:text-4xl">{title}</Title>
                             <p className="text-base text-muted-foreground text-balance">{subtitle}</p>

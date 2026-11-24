@@ -47,7 +47,7 @@
             "linkHint": "أرسل هذا الرابط إلى {email}. يعمل له وحده، ولمرة واحدة.",
             "copyLink": "نسخ رابط الدعوة",
             "emailLabel": "الدعوة عبر البريد الإلكتروني",
-            "emailPlaceholder": "teammate@rerun.build",
+            "emailPlaceholder": "teammate@{domain}",
             "boxes": "Boxes",
             "submit": "دعوة",
             "sent": "تم إرسال الدعوة إلى {email}"
@@ -114,7 +114,7 @@
         "name": "الاسم",
         "namePlaceholder": "مثال: Acme Inc.",
         "email": "البريد الإلكتروني",
-        "emailPlaceholder": "teammate@rerun.build",
+        "emailPlaceholder": "teammate@{domain}",
         "emailHint": "يتلقى زملاء الفريق دعوة بالبريد عند إنشاء مساحة العمل. تتطلب الدعوة خطة Team أو Scale.",
         "add": "إضافة",
         "removeMember": "إزالة {email}",

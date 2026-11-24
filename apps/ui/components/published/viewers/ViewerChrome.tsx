@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DownloadIcon, type LucideIcon } from '@/lib/icons'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
 import { cn } from '@/lib/utils'
-import { Logo } from '@rerun/ui/logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 
 export const RAW_URL = '/__rerun/raw'
 export const DOWNLOAD_URL = '/__rerun/raw?download=1'
@@ -54,7 +54,7 @@ export function MadeWithRerun({ slug, className }: { slug: string; className?: s
     return (
         <div className={cn('z-40 flex items-center gap-0.5 rounded-full border border-white/12 bg-[#0b0b0c] p-1 text-[12px] font-medium whitespace-nowrap text-[#fafafa] shadow-[0_8px_24px_rgba(0,0,0,.24)] print:hidden', className)}>
             <a href={landing} target="_blank" rel="noopener" className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 hover:bg-white/8">
-                <Logo compact aria-hidden className="size-4" />
+                <BrandLogo compact aria-hidden className="size-4" />
                 {t('gate.madeWith')}
             </a>
             <a href={report} className="rounded-full px-2.5 py-1.5 text-[#fafafa]/56 hover:bg-white/8">

@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { Logo } from '@/components/layout/Logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { Icon } from '@/components/ui/icon'
 import { LinkedPair } from '@/components/ui/linked-pair'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
@@ -18,10 +18,10 @@ export function WorkspaceTile({ brand }: { brand: GateBrand }) {
     )
 }
 
-// The tile a link that no longer exists shows: no workspace is left to name it, so Rerun does.
-export function RerunTile() {
+// The tile a link that no longer exists shows: no workspace is left to name it, so the brand does.
+export function BrandTile() {
     return (
-        <Logo size="lg" aria-hidden />
+        <BrandLogo size="lg" aria-hidden />
     )
 }
 
@@ -34,7 +34,7 @@ function MadeWithRerun({ className }: { className?: string }) {
             rel="noopener"
             className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/12 bg-[#0b0b0c] px-3.5 py-2.5 text-xs font-medium text-[#fafafa] shadow-[0_8px_24px_rgba(0,0,0,.24)] ${className ?? ''}`}
         >
-            <Logo compact aria-hidden className="size-4" />
+            <BrandLogo compact aria-hidden className="size-4" />
             {t('madeWith')}
         </a>
     )

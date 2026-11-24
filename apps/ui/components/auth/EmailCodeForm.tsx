@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { exampleEmailDomain } from '@rerun/contracts'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -72,6 +74,7 @@ export function EmailCodeForm({
     initialSentTo?: string
 }) {
     const t = useTranslations('auth.email')
+    const exampleDomain = exampleEmailDomain(useBrand())
     const tCaptcha = useTranslations('auth.captcha')
     const emailSchema = useMemo(() => emailSchemaFor(t), [t])
     const codeSchema = useMemo(() => codeSchemaFor(t), [t])
@@ -162,7 +165,7 @@ export function EmailCodeForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Input type="email" label={t('label')} placeholder="you@rerun.build" autoComplete="email" {...field} />
+                                            <Input type="email" label={t('label')} placeholder={`you@${exampleDomain}`} autoComplete="email" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

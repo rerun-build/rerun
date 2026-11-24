@@ -47,7 +47,7 @@
             "linkHint": "将此链接发送给 {email}。仅对方可用，且只能使用一次。",
             "copyLink": "复制邀请链接",
             "emailLabel": "通过邮箱邀请",
-            "emailPlaceholder": "teammate@rerun.build",
+            "emailPlaceholder": "teammate@{domain}",
             "boxes": "Boxes",
             "submit": "邀请",
             "sent": "已向 {email} 发送邀请"
@@ -114,7 +114,7 @@
         "name": "名称",
         "namePlaceholder": "例如 Acme Inc.",
         "email": "邮箱",
-        "emailPlaceholder": "teammate@rerun.build",
+        "emailPlaceholder": "teammate@{domain}",
         "emailHint": "创建工作区时，队友会收到邀请邮件。邀请需要 Team 或 Scale 套餐。",
         "add": "添加",
         "removeMember": "移除 {email}",

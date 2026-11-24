@@ -24,3 +24,8 @@ export const RERUN_BRAND: Brand = {
 export function isWhiteLabel(brand: Brand): boolean {
     return brand.organizationId !== null
 }
+
+// The domain of the example addresses shown in an empty email field.
+export function exampleEmailDomain(brand: Brand): string {
+    return isWhiteLabel(brand) ? 'company.com' : 'rerun.build'
+}

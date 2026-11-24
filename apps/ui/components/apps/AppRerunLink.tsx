@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl'
-import { Logo } from '@/components/layout/Logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { LinkedPair } from '@/components/ui/linked-pair'
 import { appInfo } from '@/lib/apps/catalog'
 import type { AppSlug } from '@/lib/apps/types'
@@ -9,5 +9,5 @@ import { AppIcon } from './PaidAppViews'
 // send out.
 export function AppRerunLink({ slug, className }: { slug: AppSlug; className?: string }) {
     const t = useTranslations('apps')
-    return <LinkedPair left={<AppIcon slug={slug} size="lg" />} right={<Logo size="lg" />} label={t('linkedToRerun', { provider: appInfo(slug).providerLabel })} className={className} />
+    return <LinkedPair left={<AppIcon slug={slug} size="lg" />} right={<BrandLogo size="lg" />} label={t('linkedToRerun', { provider: appInfo(slug).providerLabel })} className={className} />
 }

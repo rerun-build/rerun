@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { exampleEmailDomain } from '@rerun/contracts'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { WorkspaceInviteRow, WorkspaceMember } from '@/app/api/_actions/members.actions'
 import type { MemberAccessView, MemberBoxAccess } from '@/app/api/_actions/space-access.actions'
@@ -83,6 +85,7 @@ export function WorkspaceMembersView(props: WorkspaceMembersViewProps) {
 
 function MembersList({ loading, members, invites, currentUserId, currentRole, maxSeats, inviteLink, busy, profileOf, onInvite, onRoleChange, onRemove, onRevoke, onOpenMember }: WorkspaceMembersViewProps) {
     const t = useTranslations('dialogs.members')
+    const exampleDomain = exampleEmailDomain(useBrand())
     const [draft, setDraft] = useState('')
     const [boxScope, setBoxScope] = useState<BoxScope>('all')
     const [inviting, setInviting] = useState(false)
@@ -141,7 +144,7 @@ function MembersList({ loading, members, invites, currentUserId, currentRole, ma
                         <Input
                             label={t('invite.emailLabel')}
                             type="email"
-                            placeholder={t('invite.emailPlaceholder')}
+                            placeholder={t('invite.emailPlaceholder', { domain: exampleDomain })}
                             value={draft}
                             disabled={!loading && !isAdmin}
                             onChange={e => setDraft(e.target.value)}

@@ -47,7 +47,7 @@
             "linkHint": "Bu bağlantıyı şu adrese gönderin: {email}. Yalnızca o kişi için, bir kez çalışır.",
             "copyLink": "Davet bağlantısını kopyala",
             "emailLabel": "E-postayla davet et",
-            "emailPlaceholder": "teammate@rerun.build",
+            "emailPlaceholder": "teammate@{domain}",
             "boxes": "Boxes",
             "submit": "Davet et",
             "sent": "Davet gönderildi: {email}"
@@ -114,7 +114,7 @@
         "name": "Ad",
         "namePlaceholder": "ör. Acme A.Ş.",
         "email": "E-posta",
-        "emailPlaceholder": "teammate@rerun.build",
+        "emailPlaceholder": "teammate@{domain}",
         "emailHint": "Çalışma alanını oluşturduğunuzda ekip arkadaşlarınıza e-posta daveti gider. Davet için Team veya Scale planı gerekir.",
         "add": "Ekle",
         "removeMember": "Çıkar: {email}",

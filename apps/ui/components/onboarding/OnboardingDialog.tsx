@@ -4,7 +4,7 @@ import { AuthScene } from '@/components/auth/AuthScene'
 import { StepSwap } from '@/components/onboarding/StepSwap'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { Logo } from '@rerun/ui/logo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import type { ReactNode } from 'react'
 
 const keepOpen = (event: Event) => event.preventDefault()
@@ -46,7 +46,7 @@ export function OnboardingDialog({ open = true, stepKey, corner, children }: { o
 export function OnboardingHeading({ title, subtitle, mark }: { title: ReactNode; subtitle?: ReactNode; mark?: ReactNode }) {
     return (
         <div className="flex flex-col items-center gap-4 text-center">
-            {mark ?? <Logo size="md" />}
+            {mark ?? <BrandLogo size="md" />}
             <div className="space-y-2">
                 <DialogTitle className="text-3xl font-medium tracking-tight text-balance sm:text-4xl">{title}</DialogTitle>
                 {subtitle && <DialogDescription className="text-base text-balance">{subtitle}</DialogDescription>}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { exampleEmailDomain } from '@rerun/contracts'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -21,6 +23,7 @@ const passwordSignInSchemaFor = (t: ReturnType<typeof useTranslations<'auth.pass
 // the accounts an admin gave one in /admin/users, so this form never signs anyone up.
 export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
     const t = useTranslations('auth.password')
+    const exampleDomain = exampleEmailDomain(useBrand())
     const passwordSignInSchema = useMemo(() => passwordSignInSchemaFor(t), [t])
     const form = useForm<z.infer<typeof passwordSignInSchema>>({
         resolver: zodResolver(passwordSignInSchema),
@@ -45,7 +48,7 @@ export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <Input type="email" label={t('email')} placeholder="you@rerun.build" autoComplete="email" {...field} />
+                                <Input type="email" label={t('email')} placeholder={`you@${exampleDomain}`} autoComplete="email" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
