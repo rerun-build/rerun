@@ -22,6 +22,9 @@ const PENDING_COLUMNS = ['jti', 'agent_id', 'workspace_id', 'user_id', 'payload'
 export const SIGN_IN_ALREADY_USED = 'This sign-in link was already used, please retry'
 export const SIGN_IN_EXPIRED = 'Sign-in expired, please retry'
 
+// The Composio account of a Vault entry whose sign-in nobody can finish any more.
+export type AbandonedVaultAccount = { workspaceId: number; itemId: string; connectedAccountId: string }
+
 export class SignInClaimError extends Error {}
 
 // The ticket is spent as the sign-in starts: a second start on the same ticket finds its row.
@@ -47,6 +50,11 @@ export async function parkSignIn(grant: CallbackGrant, parked: ParkedSignIn): Pr
         .select('jti')
     if (error) throw new Error(error.message)
     if (!data?.length) throw new Error(SIGN_IN_EXPIRED)
+}
+
+export async function holdsParkedSignIn(jti: string): Promise<boolean> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'oauth_pending_grants', ['payload'] as const, { jti })
+    return Boolean(data?.payload)
 }
 
 // The app claims with the bearer of the person who started the sign-in, in the workspace the ticket

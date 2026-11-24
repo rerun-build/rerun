@@ -73,7 +73,10 @@ export async function compileIntoVault(install: VaultInstall): Promise<CompileRe
         mcpServers: compiled.servers,
         skills: vaultSkills(compiled.skills),
     }
-    const targets = { oauth: compiled.oauth, managed: compiled.managed, composio: compiled.composio, app: compiled.app }
+    // The account an entry is connected to survives a recompile, so that signing in again can replace it.
+    const held = current?.composio?.toolkit === compiled.composio?.toolkit ? current?.composio : undefined
+    const composio = compiled.composio && { ...held, ...compiled.composio }
+    const targets = { oauth: compiled.oauth, managed: compiled.managed, composio, app: compiled.app }
 
     let item: VaultItemSummary
     if (itemId && current) {
@@ -97,5 +100,5 @@ export async function compileIntoVault(install: VaultInstall): Promise<CompileRe
             env: compiled.env,
         })
     }
-    return { toolNames: compiled.toolNames, ...targets, item }
+    return { toolNames: compiled.toolNames, ...targets, composio: compiled.composio, item }
 }

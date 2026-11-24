@@ -1,3 +1,4 @@
+import type { NextResponse } from 'next/server'
 import { open, seal } from './mobile-ticket'
 
 const CONTEXT_KIND = 'oauth-context'
@@ -24,4 +25,11 @@ export function openContext<T>(raw: string): T {
     const sealed = tryOpen<T>(raw)
     if (sealed?.kind !== CONTEXT_KIND) throw new Error(SESSION_EXPIRED)
     return sealed.ctx
+}
+
+export type ContextCookie = { name: string; value: string; path: string }
+
+export function setContextCookie(res: NextResponse, { name, value, path }: ContextCookie): NextResponse {
+    res.cookies.set(name, value, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path, maxAge: 600 })
+    return res
 }

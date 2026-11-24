@@ -529,6 +529,14 @@ describe('sign-in', () => {
         expect(patchVaultItem).not.toHaveBeenCalled()
     })
 
+    it('never turns a Composio or managed entry active on a say-so', async () => {
+        for (const target of [{ composio: { toolkit: 'gmail', serverName: 'gmail' } }, { managed: { provider: 'typeform', serverName: 'typeform' } }]) {
+            vi.mocked(getVaultItem).mockResolvedValueOnce(item({ status: 'needs_auth', tokens: [], ...target }) as never)
+            await markVaultEntryAuthorized('item-1', admin)
+        }
+        expect(patchVaultItem).not.toHaveBeenCalled()
+    })
+
     it('answers an unknown entry as gone when asked who uses it', async () => {
         vi.mocked(getVaultItem).mockRejectedValue(new EngineRequestError('404', 404))
         await expect(vaultEntryUsage('gone', admin)).rejects.toMatchObject({ code: 'vaultItemNotFound' })

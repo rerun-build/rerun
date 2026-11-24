@@ -1,12 +1,14 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { markManagedAuthorized } from '@/app/api/_services/services.service'
+import { connectVaultManaged, vaultSignInContext } from '@/app/api/_services/vault-sign-in.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
-import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, decodeManagedContext, exchangeManagedCode } from '@/lib/managed/oauth'
+import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, decodeManagedContext, exchangeManagedCode, managedTokenBundle } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
+import type { ManagedProvider } from '@/lib/managed/types'
 import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
-import { callbackGrant } from '@/lib/oauth/mobile-ticket'
+import { callbackGrant, type CallbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
@@ -28,6 +30,10 @@ async function htmlResult(result: CallbackResult, key?: string): Promise<NextRes
     }
     const { ok: _ok, ...failure } = result
     return oauthPopupResponse({ channel: 'managed-oauth', message: { type: 'managed-oauth-error', ...target, ...failure }, label: await popupFailureLabel(failure) })
+}
+
+async function accountEmailOf(provider: ManagedProvider, accessToken: string): Promise<string | undefined> {
+    return provider.oauth.accountEmail?.(accessToken).catch(() => undefined)
 }
 
 // Managed OAuth redirect target on our own domain. Exchanges the code for tokens using Rerun's
@@ -77,29 +83,32 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         if (ctx.provider !== providerId) return finish({ ok: false, ...refusal('providerMismatch') })
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
+        const exchange = async () => {
+            const token = await exchangeManagedCode(provider.oauth, clientId, clientSecret, ctx, code)
+            return { token, email: await accountEmailOf(provider, token.accessToken) }
+        }
+        // The app has no session here: the token waits for its claim, the client secret stays in the env.
+        const park = async (pending: CallbackGrant) => {
+            const { token, email } = await exchange()
+            await parkSignIn(pending, { kind: 'managed', key: ctx.key, provider: ctx.provider, serverName: ctx.serverName, token, email })
+            return finish({ ok: true, email, claim: pending.jti })
+        }
+
+        if (ctx.vault) {
+            if (grant) return await park(grant)
+            const vault = await vaultSignInContext(ctx.vault.workspaceId)
+            const { token, email } = await exchange()
+            await connectVaultManaged(vault, ctx.vault.itemId, providerId, token, email)
+            return finish({ ok: true, email })
+        }
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId, 'manage', ctx.workspaceId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, 'manage', actor)
-        const token = await exchangeManagedCode(provider.oauth, clientId, clientSecret, ctx, code)
-        const email = provider.oauth.accountEmail ? await provider.oauth.accountEmail(token.accessToken).catch(() => undefined) : undefined
+        if (grant) return await park(grant)
 
-        // The app has no session here: the token waits for its claim, the client secret stays in the env.
-        if (grant) {
-            await parkSignIn(grant, { kind: 'managed', key: ctx.key, provider: ctx.provider, serverName: ctx.serverName, token: { accessToken: token.accessToken, refreshToken: token.refreshToken, expiresAt: token.expiresAt, scope: token.scope }, email })
-            return finish({ ok: true, email, claim: grant.jti })
-        }
-
-        await putConnectorToken(conn, engineAgentId, ctx.serverName, {
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken,
-            expiresAt: token.expiresAt,
-            scope: token.scope,
-            tokenEndpoint: provider.oauth.tokenEndpoint,
-            clientId,
-            clientSecret,
-            obtainedAt: Date.now(),
-        })
+        const { token, email } = await exchange()
+        await putConnectorToken(conn, engineAgentId, ctx.serverName, managedTokenBundle(provider, token))
         await markManagedAuthorized(ctx.agentId, ctx.key, email, actor)
         return finish({ ok: true, email })
     } catch (err) {

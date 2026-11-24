@@ -139,7 +139,7 @@ export async function rethrowConflict<T>(ctx: Pick<VaultContext, 'byEngineId'>, 
     }
 }
 
-async function readItem(ctx: VaultContext, id: string): Promise<VaultItemSummary> {
+export async function readItem(ctx: VaultContext, id: string): Promise<VaultItemSummary> {
     try {
         return await getVaultItem(ctx.conn, id)
     } catch (err) {
@@ -357,6 +357,8 @@ export async function markVaultEntryAuthorized(itemId: string, actor?: Actor, ac
     const item = await readItem(ctx, itemId)
     // A sign-in that never wrote its token has nothing to flip: the entry stays signed out.
     if (item.oauth && !item.tokens.includes(item.oauth.serverName)) return item
+    // A managed or Composio sign-in is recorded by what checked it, the callback or the claim.
+    if (item.managed || item.composio) return item
     return patchVaultItem(ctx.conn, itemId, { status: 'active', ...(account?.label ? { label: account.label } : {}) })
 }
 

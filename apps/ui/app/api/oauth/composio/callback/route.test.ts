@@ -1,11 +1,13 @@
 import { requireAgentWorkspaceId } from '@/app/api/_auth/access'
+import { assertVaultComposioAccount, connectVaultComposio, discardVaultComposioAccount, vaultSignInContext } from '@/app/api/_services/vault-sign-in.service'
+import { AppError } from '@/lib/i18n/action-error'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { type ComposioConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { readRegistry } from '@/lib/services/registry'
 import { type ComposioOAuthContext, encodeComposioContext } from '@/lib/composio/oauth'
 import { mintCallbackGrant } from '@/lib/oauth/mobile-ticket'
-import { parkSignIn } from '@/lib/oauth/pending-grant'
+import { holdsParkedSignIn, parkSignIn } from '@/lib/oauth/pending-grant'
 import { serviceManifestSchema } from '@/lib/services/manifest'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -17,7 +19,9 @@ vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ requireAgentWorkspaceId: vi.fn(async () => 7), workspaceActor: (workspaceId: number) => ({ kind: 'workspace', workspaceId }) }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), loadManifest: vi.fn() }))
-vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
+vi.mock('@/app/api/_services/vault.service', () => ({ vaultContext: vi.fn(async (actor: unknown) => ({ actor })) }))
+vi.mock('@/app/api/_services/vault-sign-in.service', () => ({ assertVaultComposioAccount: vi.fn(), connectVaultComposio: vi.fn(), discardVaultComposioAccount: vi.fn(), vaultSignInContext: vi.fn() }))
+vi.mock('@/lib/oauth/pending-grant', () => ({ holdsParkedSignIn: vi.fn(async () => false), parkSignIn: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
@@ -289,6 +293,93 @@ describe('GET /api/oauth/composio/callback', () => {
 
             expect(await res.text()).toContain('Connection mismatch, please retry')
             expect(markComposioAuthorized).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('for an entry connected from the Vault', () => {
+        const VAULT_CONTEXT: ComposioOAuthContext = { ...CONTEXT, agentId: '', key: 'item-1', vault: { itemId: 'item-1', workspaceId: 7 } }
+        const grant = (over = {}) => mintCallbackGrant({ agentId: '', vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', jti: 'row-1', desktop: 'stable', ...over })
+
+        it('connects the entry in the workspace it started in, with no coworker, and answers its own button', async () => {
+            vi.mocked(vaultSignInContext).mockResolvedValue({ conn: 'of-7' } as never)
+            withContext(VAULT_CONTEXT)
+
+            const html = await (await callback({ state: STATE, status: 'success' })).text()
+
+            expect(html).toContain('composio-oauth-success')
+            expect(html).toContain('"key":"item-1"')
+            expect(vaultSignInContext).toHaveBeenCalledWith(7)
+            expect(connectVaultComposio).toHaveBeenCalledWith({ conn: 'of-7' }, 'item-1', 'ca_1')
+            expect(discardVaultComposioAccount).not.toHaveBeenCalled()
+            expect(requireAgentWorkspaceId).not.toHaveBeenCalled()
+            expect(markComposioAuthorized).not.toHaveBeenCalled()
+        })
+
+        it('connects nothing for who may not, and says why', async () => {
+            vi.mocked(vaultSignInContext).mockRejectedValue(new AppError('notMember'))
+            withContext(VAULT_CONTEXT)
+
+            const res = await callback({ state: STATE, status: 'success' })
+
+            expect(await res.text()).toContain('You are not a member of this workspace')
+            expect(connectVaultComposio).not.toHaveBeenCalled()
+            expect(deletesStateCookie(res)).toBe(true)
+        })
+
+        it('parks the checked account for the desktop app, and connects nothing yet', async () => {
+            withContext({ ...VAULT_CONTEXT, mobileGrant: grant() })
+
+            const location = new URL((await callback({ state: STATE, status: 'success' })).headers.get('location') ?? '')
+
+            expect(location.protocol).toBe('rerun-desktop:')
+            expect(location.searchParams.get('claim')).toBe('row-1')
+            expect(assertVaultComposioAccount).toHaveBeenCalledWith({ actor: { kind: 'workspace', workspaceId: 7 } }, 'item-1', 'ca_1')
+            expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1', vaultItem: 'item-1' }), { kind: 'composio', key: 'item-1', connectedAccountId: 'ca_1' })
+            expect(connectVaultComposio).not.toHaveBeenCalled()
+            expect(discardVaultComposioAccount).not.toHaveBeenCalled()
+        })
+
+        it('leaves no account behind a sign-in that could not be recorded, on the web and from the desktop app', async () => {
+            const abandoned = { workspaceId: 7, itemId: 'item-1', connectedAccountId: 'ca_1' }
+            const failures: [ComposioOAuthContext, () => void][] = [
+                [VAULT_CONTEXT, () => vi.mocked(vaultSignInContext).mockRejectedValueOnce(new AppError('notMember'))],
+                [VAULT_CONTEXT, () => vi.mocked(connectVaultComposio).mockRejectedValueOnce(new AppError('connectionNotActiveYet', { status: 'INITIALIZING' }))],
+                [{ ...VAULT_CONTEXT, mobileGrant: grant() }, () => vi.mocked(assertVaultComposioAccount).mockRejectedValueOnce(new AppError('connectionMismatch'))],
+                [{ ...VAULT_CONTEXT, mobileGrant: grant() }, () => vi.mocked(parkSignIn).mockRejectedValueOnce(new Error('Sign-in expired, please retry'))],
+                [{ ...VAULT_CONTEXT, mobileGrant: grant({ vaultItem: 'item-2' }) }, () => {}],
+            ]
+            for (const [ctx, fail] of failures) {
+                vi.mocked(discardVaultComposioAccount).mockClear()
+                fail()
+                withContext(ctx)
+                await callback({ state: STATE, status: 'success' })
+                expect(discardVaultComposioAccount).toHaveBeenCalledExactlyOnceWith(expect.objectContaining(abandoned))
+            }
+        })
+
+        it('keeps the account a first callback parked when the browser sends it twice', async () => {
+            vi.mocked(parkSignIn).mockRejectedValueOnce(new Error('Sign-in expired, please retry'))
+            vi.mocked(holdsParkedSignIn).mockResolvedValueOnce(true)
+            withContext({ ...VAULT_CONTEXT, mobileGrant: grant() })
+            await callback({ state: STATE, status: 'success' })
+            expect(holdsParkedSignIn).toHaveBeenCalledWith('row-1')
+            expect(discardVaultComposioAccount).not.toHaveBeenCalled()
+        })
+
+        it("discards nothing of a coworker's own sign-in", async () => {
+            vi.mocked(requireAgentWorkspaceId).mockRejectedValueOnce(new AppError('notMember'))
+            withContext(CONTEXT)
+            await callback({ state: STATE, status: 'success' })
+            expect(discardVaultComposioAccount).not.toHaveBeenCalled()
+        })
+
+        it('parks nothing for an account Composio does not vouch for, or a grant of another entry', async () => {
+            vi.mocked(assertVaultComposioAccount).mockRejectedValueOnce(new AppError('connectionMismatch'))
+            withContext({ ...VAULT_CONTEXT, mobileGrant: grant() })
+            await callback({ state: STATE, status: 'success' })
+            withContext({ ...VAULT_CONTEXT, mobileGrant: grant({ vaultItem: 'item-2' }) })
+            await callback({ state: STATE, status: 'success' })
+            expect(parkSignIn).not.toHaveBeenCalled()
         })
     })
 

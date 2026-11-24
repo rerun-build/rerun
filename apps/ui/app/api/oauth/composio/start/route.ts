@@ -1,8 +1,11 @@
 import { parseServiceRegistryKey } from '@rerun/contracts'
 import { assertAgentAccess } from '@/app/api/_auth/access'
+import { assertCanAdd, readItem, vaultContext } from '@/app/api/_services/vault.service'
+import { beginVaultComposio } from '@/app/api/_services/vault-sign-in.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { composioConfigured, initiateConnectedAccount } from '@/lib/composio/client'
+import { setContextCookie } from '@/lib/oauth/context-cookie'
 import { composioUserForKey } from '@/lib/vault/composio'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, composioCallbackUrl, createComposioState, encodeComposioContext } from '@/lib/composio/oauth'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
@@ -15,8 +18,14 @@ import { NextResponse } from 'next/server'
 // by state so /callback can finish it. The COMPOSIO_API_KEY never leaves this server.
 export async function POST(req: Request) {
     try {
-        const body = (await req.json()) as { agentId: string; key?: string; slug?: string }
-        const { agentId } = body
+        const body = (await req.json()) as { agentId?: string; key?: string; slug?: string; vaultItemId?: string }
+        if (body.vaultItemId) {
+            const vault = await vaultContext()
+            await assertCanAdd(vault.actor)
+            const { url, cookie } = await beginVaultComposio(req, vault.actor.workspaceId, await readItem(vault, body.vaultItemId))
+            return setContextCookie(NextResponse.json({ authorizationUrl: url }), cookie)
+        }
+        const agentId = body.agentId ?? ''
         const key = body.key ?? body.slug ?? ''
         const { actor } = await assertAgentAccess(agentId, 'manage')
 
@@ -51,15 +60,7 @@ export async function POST(req: Request) {
             workspaceId: actor.workspaceId,
         }
 
-        const res = NextResponse.json({ authorizationUrl: redirectUrl })
-        res.cookies.set(COMPOSIO_COOKIE_PREFIX + state, encodeComposioContext(ctx), {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: COMPOSIO_COOKIE_PATH,
-            maxAge: 600,
-        })
-        return res
+        return setContextCookie(NextResponse.json({ authorizationUrl: redirectUrl }), { name: COMPOSIO_COOKIE_PREFIX + state, value: encodeComposioContext(ctx), path: COMPOSIO_COOKIE_PATH })
     } catch (err) {
         return NextResponse.json(signInRefusal(err, 'startConnectionFailed'), { status: 400 })
     }

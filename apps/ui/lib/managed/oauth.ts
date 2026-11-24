@@ -6,7 +6,9 @@
 //
 // Server-only. Import from route handlers.
 
-import type { ManagedOAuthConfig } from '@/lib/managed/types'
+import type { McpTokenBundle } from '@/lib/engine/client'
+import { AppError } from '@/lib/i18n/action-error'
+import type { ManagedOAuthConfig, ManagedProvider } from '@/lib/managed/types'
 import { base64url } from '@/lib/mcp-oauth'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
 import { createHash, randomBytes } from 'node:crypto'
@@ -30,6 +32,8 @@ export type ManagedOAuthContext = {
     // Started from the iOS app: the callback redirects back into it instead of answering with the
     // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
+    // The Vault entry being connected, with an empty `agentId` and its id as the `key`.
+    vault?: { itemId: string; workspaceId: number }
 }
 
 export function createPkceState(): { verifier: string; challenge: string; state: string } {
@@ -95,6 +99,15 @@ export async function exchangeManagedCode(cfg: ManagedOAuthConfig, clientId: str
         expiresAt: typeof data.expires_in === 'number' ? Date.now() + data.expires_in * 1000 : undefined,
         scope: typeof data.scope === 'string' ? data.scope : undefined,
     }
+}
+
+// What the engine keeps to refresh the token by itself. The client secret is read here, at the last
+// moment, and never travels with the token before that.
+export function managedTokenBundle(provider: ManagedProvider, token: ManagedToken): McpTokenBundle {
+    const clientId = process.env[provider.oauth.clientIdEnv]
+    const clientSecret = process.env[provider.oauth.clientSecretEnv]
+    if (!clientId || !clientSecret) throw new AppError('providerNotConfigured', { provider: provider.label })
+    return { ...token, tokenEndpoint: provider.oauth.tokenEndpoint, clientId, clientSecret, obtainedAt: Date.now() }
 }
 
 export function encodeManagedContext(ctx: ManagedOAuthContext): string {

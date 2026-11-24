@@ -131,6 +131,15 @@ describe('compileIntoVault', () => {
         expect(createVaultItem).not.toHaveBeenCalled()
     })
 
+    it('keeps the Composio account an entry is connected to', async () => {
+        const gmail = serviceManifestSchema.parse({ slug: 'gmail', name: 'Gmail', authMethods: [{ id: 'composio', kind: 'composio', composio: { toolkit: 'gmail', authConfigId: 'ac_1' }, mcpServers: [{ name: 'gmail', transport: 'http', url: 'https://rerun.test/api/mcp/composio/gmail' }] }] })
+        const held = { toolkit: 'gmail', serverName: 'gmail', connectedAccountId: 'ca_1', userId: 'local_agent_x' }
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', agentIds: [], authMethodId: 'composio', envKeys: [], composio: held } as never)
+        const { composio } = await compileIntoVault({ conn, manifest: gmail, values: {}, itemId: 'item-1' })
+        expect(patchVaultItem).toHaveBeenCalledWith(conn, 'item-1', expect.objectContaining({ status: 'needs_auth', composio: held }))
+        expect(composio).toEqual({ toolkit: 'gmail', serverName: 'gmail' })
+    })
+
     it('drops the variables of the method it was compiled with before', async () => {
         vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', agentIds: [], authMethodId: 'oauth', envKeys: ['OLD_TOKEN', 'RERUN_SVC_ATLASSIAN_ATLASSIAN_API_TOKEN'] } as never)
         await compileIntoVault({ conn, manifest, values, authMethodId: 'api-token', itemId: 'item-1' })

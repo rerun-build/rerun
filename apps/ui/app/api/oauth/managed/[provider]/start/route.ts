@@ -1,6 +1,9 @@
 import { assertAgentAccess } from '@/app/api/_auth/access'
+import { assertCanAdd, readItem, vaultContext } from '@/app/api/_services/vault.service'
+import { beginVaultManaged } from '@/app/api/_services/vault-sign-in.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, type ManagedOAuthContext, buildManagedAuthorizeUrl, createPkceState, encodeManagedContext, managedCallbackUrl } from '@/lib/managed/oauth'
+import { setContextCookie } from '@/lib/oauth/context-cookie'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
 import { signInRefusal } from '@/lib/net/network-error'
@@ -15,8 +18,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
         const provider = getManagedProvider(providerId)
         if (!provider) return NextResponse.json(refusal('unknownOAuthProvider', { provider: providerId }), { status: 404 })
 
-        const body = (await req.json()) as { agentId: string; key?: string; slug?: string; serverName?: string }
-        const { agentId } = body
+        const body = (await req.json()) as { agentId?: string; key?: string; slug?: string; serverName?: string; vaultItemId?: string }
+        if (body.vaultItemId) {
+            const vault = await vaultContext()
+            await assertCanAdd(vault.actor)
+            const item = await readItem(vault, body.vaultItemId)
+            if (item.managed?.provider !== providerId) return NextResponse.json(refusal('vaultEntryOtherServer'), { status: 400 })
+            const { url, cookie } = await beginVaultManaged(req, vault.actor.workspaceId, item)
+            return setContextCookie(NextResponse.json({ authorizationUrl: url }), cookie)
+        }
+        const agentId = body.agentId ?? ''
         const key = body.key ?? body.slug ?? ''
         const { actor } = await assertAgentAccess(agentId, 'manage')
 
@@ -41,15 +52,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
             workspaceId: actor.workspaceId,
         }
 
-        const res = NextResponse.json({ authorizationUrl: buildManagedAuthorizeUrl(provider.oauth, clientId, ctx, challenge, state) })
-        res.cookies.set(MANAGED_COOKIE_PREFIX + state, encodeManagedContext(ctx), {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: MANAGED_COOKIE_PATH,
-            maxAge: 600,
-        })
-        return res
+        return setContextCookie(NextResponse.json({ authorizationUrl: buildManagedAuthorizeUrl(provider.oauth, clientId, ctx, challenge, state) }), { name: MANAGED_COOKIE_PREFIX + state, value: encodeManagedContext(ctx), path: MANAGED_COOKIE_PATH })
     } catch (err) {
         return NextResponse.json(signInRefusal(err, 'startOAuthFailed'), { status: 400 })
     }

@@ -14,7 +14,7 @@ vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: async () => '
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectMany: mocks.selectMany, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
-const { AccessDeniedError, assertAgentAccess, assertRunInReach, assertSessionInWorkspace, runSessionsInReach, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
+const { AccessDeniedError, assertAgentAccess, assertRunInReach, assertSessionInWorkspace, runSessionsInReach, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, requireWorkspaceActor, visibleSpaceIds, workspaceActor } = await import('./access')
 type Actor = import('./access').Actor
 
 const admin: Actor = { kind: 'user', userId: 'u-admin', workspaceId: 1, role: 'admin', boxScope: 'all' }
@@ -231,6 +231,27 @@ describe('requireAgentWorkspaceId', () => {
     it("answers a coworker's own workspace, whatever the sign-in names", async () => {
         readsAnswering({ agents: { id: 'a1', workspace_id: 3, kind: 'coworker', space_id: 'box-1', engine_agent_id: 'e1' }, workspace_members: { role: 'admin', box_scope: 'all' }, spaces: { id: 'box-1', workspace_id: 3, visibility: 'workspace' } })
         await expect(requireAgentWorkspaceId('a1', 'manage', 2)).resolves.toBe(3)
+    })
+})
+
+describe('requireWorkspaceActor', () => {
+    beforeEach(() => {
+        mocks.getSessionWorkspace.mockReset()
+        mocks.selectMaybeSingle.mockReset()
+        mocks.getSessionWorkspace.mockResolvedValue({ user: { id: 'u-1', workspace_id: 1 }, workspaceRefused: false, membership: { role: 'admin', box_scope: 'all' } })
+    })
+
+    it('answers the caller as a member of the workspace named, not of the one the session last picked', async () => {
+        readsAnswering({ workspace_members: { role: 'member', box_scope: 'assigned' } })
+        await expect(requireWorkspaceActor(2)).resolves.toEqual({ kind: 'user', userId: 'u-1', workspaceId: 2, role: 'member', boxScope: 'assigned' })
+        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ user_id: 'u-1', workspace_id: 2 })
+    })
+
+    it('refuses who is not a member of it, and who is not signed in', async () => {
+        readsAnswering({})
+        await expect(requireWorkspaceActor(2)).rejects.toMatchObject({ code: 'notMember' })
+        mocks.getSessionWorkspace.mockResolvedValue({ user: null })
+        await expect(requireWorkspaceActor(2)).rejects.toThrow()
     })
 })
 

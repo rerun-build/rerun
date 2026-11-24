@@ -1,21 +1,19 @@
-import { sleep } from '@rerun/contracts'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
-import { getConnectedAccount } from '@/lib/composio/client'
+import { assertVaultComposioAccount, connectVaultComposio, discardVaultComposioAccount, vaultSignInContext } from '@/app/api/_services/vault-sign-in.service'
+import { vaultContext } from '@/app/api/_services/vault.service'
+import { assertConnectedAccount } from '@/lib/composio/connected-account'
 import { composioUserForKey } from '@/lib/vault/composio'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
 import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
-import { callbackGrant } from '@/lib/oauth/mobile-ticket'
-import { parkSignIn } from '@/lib/oauth/pending-grant'
+import { callbackGrant, type CallbackGrant } from '@/lib/oauth/mobile-ticket'
+import { holdsParkedSignIn, parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { DesktopShellChannel } from '@rerun/contracts'
-
-const ACTIVE_POLL_ATTEMPTS = 5
-const ACTIVE_POLL_DELAY_MS = 1000
 
 type CallbackResult = { ok: true; accountLabel?: string; claim?: string } | ({ ok: false } & ActionRefusal)
 
@@ -77,9 +75,21 @@ export async function GET(req: Request) {
         return finish({ ok: false, error: detail ?? `Connection ${status}` })
     }
 
+    let grant: CallbackGrant | undefined
     try {
-        const grant = callbackGrant(ctx)
+        grant = callbackGrant(ctx)
         desktop = grant?.desktop
+        if (ctx.vault) {
+            // From the desktop app, the sign-in ends in the system browser, which has no session: the
+            // checked account waits under the grant for the app to claim it with its own.
+            if (grant) {
+                await assertVaultComposioAccount(await vaultContext(workspaceActor(grant.workspaceId)), ctx.vault.itemId, ctx.connectedAccountId)
+                await parkSignIn(grant, { kind: 'composio', key: ctx.key, connectedAccountId: ctx.connectedAccountId })
+                return finish({ ok: true, claim: grant.jti })
+            }
+            await connectVaultComposio(await vaultSignInContext(ctx.vault.workspaceId), ctx.vault.itemId, ctx.connectedAccountId)
+            return finish({ ok: true })
+        }
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId, 'manage', ctx.workspaceId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
@@ -87,19 +97,7 @@ export async function GET(req: Request) {
         const userId = await composioUserForKey(conn, workspaceId, engineAgentId, ctx.agentId, ctx.key)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
         if (!method?.composio) return finish({ ok: false, ...refusal('noProviderConnectionToSetUp', { key: ctx.key, provider: 'Composio' }) })
-        const authConfigId = method.composio.authConfigId
-        let account = await getConnectedAccount(ctx.connectedAccountId)
-        for (let attempt = 1; account.status !== 'ACTIVE' && account.status !== 'FAILED' && attempt < ACTIVE_POLL_ATTEMPTS; attempt++) {
-            await sleep(ACTIVE_POLL_DELAY_MS)
-            account = await getConnectedAccount(ctx.connectedAccountId)
-        }
-        if (account.userId !== userId || account.authConfigId !== authConfigId) {
-            console.warn(`[composio] connected account ${ctx.connectedAccountId} does not match the pending context`)
-            return finish({ ok: false, ...refusal('connectionMismatch') })
-        }
-        if (account.status !== 'ACTIVE') {
-            return finish({ ok: false, ...refusal('connectionNotActiveYet', { status: account.status }) })
-        }
+        await assertConnectedAccount(ctx.connectedAccountId, { userId, authConfigId: method.composio.authConfigId })
 
         if (grant) {
             await parkSignIn(grant, { kind: 'composio', key: ctx.key, connectedAccountId: ctx.connectedAccountId })
@@ -108,6 +106,8 @@ export async function GET(req: Request) {
         await markComposioAuthorized(ctx.agentId, ctx.key, ctx.connectedAccountId, undefined, actor)
         return finish({ ok: true })
     } catch (err) {
+        // A callback the browser sent twice: the first one parked the account, which its claim comes for.
+        if (ctx.vault && !(grant && (await holdsParkedSignIn(grant.jti)))) await discardVaultComposioAccount({ ...ctx.vault, connectedAccountId: ctx.connectedAccountId })
         return finish({ ok: false, ...refusalOf(err, 'authorizationFailed') })
     }
 }

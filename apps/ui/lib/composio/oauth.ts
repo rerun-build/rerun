@@ -27,6 +27,8 @@ export type ComposioOAuthContext = {
     // Started from the iOS app: the callback redirects back into it instead of answering with the
     // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
+    // The Vault entry being connected, with an empty `agentId` and its id as the `key`.
+    vault?: { itemId: string; workspaceId: number }
 }
 
 export function createComposioState(): string {

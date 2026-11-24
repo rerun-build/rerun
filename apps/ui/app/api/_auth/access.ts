@@ -240,6 +240,21 @@ export async function assertAgentInWorkspace(agentId: string, need: AccessLevel 
     return (await assertAgentAccess(agentId, need, actor)).agent
 }
 
+async function sessionMemberOf(workspaceId: number): Promise<Actor | null> {
+    const { user } = await getSessionWorkspace()
+    if (!user?.id) throw new UnauthenticatedError()
+    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: workspaceId })
+    return membership && { kind: 'user', userId: user.id, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
+}
+
+// For an OAuth callback, which lands in a popup that names no workspace: the caller as a member of
+// the one the sign-in started in, never of the one the session last picked.
+export async function requireWorkspaceActor(workspaceId: number): Promise<Actor> {
+    const actor = await sessionMemberOf(workspaceId)
+    if (!actor) throw new AuthorizationError('notMember')
+    return actor
+}
+
 // For an OAuth callback, which lands in a popup that names no workspace: the agent names its own,
 // held to the caller's membership like a workspace a tab names. Connecting an app to a coworker
 // changes what it is, so it takes `manage` on its Box. The Chief of Staff goes by `foreman` in every
@@ -251,9 +266,9 @@ export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel
     const supabase = createServiceRoleClient()
     const workspaceId = agentId === FOREMAN_AGENT_ID ? startedIn : (await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })).data?.workspace_id
     if (workspaceId === undefined) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: workspaceId })
-    if (!membership) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    await assertAgentAccess(agentId, need, { kind: 'user', userId: user.id, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope) })
+    const actor = await sessionMemberOf(workspaceId)
+    if (!actor) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    await assertAgentAccess(agentId, need, actor)
     return workspaceId
 }
 

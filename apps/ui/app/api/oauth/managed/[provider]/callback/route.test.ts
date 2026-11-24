@@ -1,4 +1,6 @@
 import { markManagedAuthorized } from '@/app/api/_services/services.service'
+import { connectVaultManaged, vaultSignInContext } from '@/app/api/_services/vault-sign-in.service'
+import { AppError } from '@/lib/i18n/action-error'
 import { findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { putMcpToken } from '@/lib/engine/client'
 import { type ManagedOAuthContext, encodeManagedContext, exchangeManagedCode } from '@/lib/managed/oauth'
@@ -22,6 +24,7 @@ vi.mock('@/supabase/session/getServerSession', () => {
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/app/api/_services/services.service', () => ({ markManagedAuthorized: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), deleteMcpToken: vi.fn(), supportsVault: vi.fn(async () => false), listRuns: vi.fn() }))
+vi.mock('@/app/api/_services/vault-sign-in.service', () => ({ connectVaultManaged: vi.fn(), vaultSignInContext: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
 vi.mock('@/lib/managed/oauth', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/managed/oauth')>()), exchangeManagedCode: vi.fn() }))
@@ -296,6 +299,45 @@ describe('GET /api/oauth/managed/[provider]/callback', () => {
         expect(markManagedAuthorized).not.toHaveBeenCalled()
         expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1' }), { kind: 'managed', key: 'acme', provider: 'acme', serverName: 'acme', token: expect.objectContaining({ accessToken: expect.any(String) }), email: 'me@acme.test' })
         expect(JSON.stringify(vi.mocked(parkSignIn).mock.calls[0][1])).not.toContain('secret')
+    })
+
+    describe('for an entry connected from the Vault', () => {
+        const VAULT_CONTEXT: ManagedOAuthContext = { ...CONTEXT, agentId: '', key: 'item-1', vault: { itemId: 'item-1', workspaceId: OTHER_WORKSPACE } }
+
+        it('connects the entry in the workspace it started in, whatever the session last picked, with no coworker', async () => {
+            vi.mocked(vaultSignInContext).mockResolvedValue({ conn: 'of-2' } as never)
+            withContext(VAULT_CONTEXT)
+
+            const html = await (await callback({ code: 'code-1', state: STATE })).text()
+
+            expect(html).toContain('Connected as me@acme.test')
+            expect(html).toContain('"key":"item-1"')
+            expect(vaultSignInContext).toHaveBeenCalledWith(OTHER_WORKSPACE)
+            expect(connectVaultManaged).toHaveBeenCalledWith({ conn: 'of-2' }, 'item-1', 'acme', { accessToken: 'access', refreshToken: 'refresh' }, 'me@acme.test')
+            expect(putMcpToken).not.toHaveBeenCalled()
+            expect(markManagedAuthorized).not.toHaveBeenCalled()
+        })
+
+        it('spends no code for who may not', async () => {
+            vi.mocked(vaultSignInContext).mockRejectedValue(new AppError('vaultManageOnly'))
+            withContext(VAULT_CONTEXT)
+
+            expect(await (await callback({ code: 'code-1', state: STATE })).text()).toContain('You need to manage at least one Box')
+            expect(exchangeManagedCode).not.toHaveBeenCalled()
+            expect(connectVaultManaged).not.toHaveBeenCalled()
+        })
+
+        it('parks the token for the desktop app without its client secret, and connects nothing yet', async () => {
+            withContext({ ...VAULT_CONTEXT, mobileGrant: mintCallbackGrant({ agentId: '', vaultItem: 'item-1', workspaceId: OTHER_WORKSPACE, userId: 'user-1', jti: 'row-1', desktop: 'stable' }) })
+
+            const location = new URL((await callback({ code: 'code-1', state: STATE })).headers.get('location') ?? '')
+
+            expect(location.protocol).toBe('rerun-desktop:')
+            expect(location.searchParams.get('claim')).toBe('row-1')
+            expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1', vaultItem: 'item-1' }), expect.objectContaining({ kind: 'managed', key: 'item-1', provider: 'acme' }))
+            expect(JSON.stringify(vi.mocked(parkSignIn).mock.calls[0][1])).not.toContain('secret')
+            expect(connectVaultManaged).not.toHaveBeenCalled()
+        })
     })
 
     it('refuses a context started for another provider than the one in the callback path', async () => {
