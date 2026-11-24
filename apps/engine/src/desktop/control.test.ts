@@ -93,6 +93,19 @@ describe('captureScreen', () => {
         expect(shot).toMatchObject({ mediaType: 'image/jpeg', width: 1280, height: 720 })
         expect(await sharp(shot.image).metadata()).toMatchObject({ format: 'jpeg', width: 1280, height: 720 })
     })
+
+    it('also reads the screen small and grey, without the bar its clock lives in', async () => {
+        const plain = state.png
+        const control = await controlScreen('a1')
+        const { view } = await captureScreen(control)
+        expect(view).toHaveLength(320 * 180)
+        const bar = await sharp({ create: { width: 1920, height: 32, channels: 3, background: '#ffffff' } }).png().toBuffer()
+        state.png = await sharp(plain).composite([{ input: bar, left: 0, top: 0 }]).png().toBuffer()
+        expect((await captureScreen(control)).view.equals(view)).toBe(true)
+        state.png = await sharp(plain).composite([{ input: bar, left: 0, top: 500 }]).png().toBuffer()
+        expect((await captureScreen(control)).view.equals(view)).toBe(false)
+        state.png = plain
+    })
 })
 
 describe('pointer', () => {

@@ -22,7 +22,7 @@ vi.mock('../desktop/takeover.js', async importOriginal => ({ ...(await importOri
 vi.mock('../desktop/control.js', async importOriginal => ({
     ...(await importOriginal<typeof import('../desktop/control.js')>()),
     controlScreen: async (agentId: string) => ({ agentId }),
-    captureScreen: async () => ({ image: Buffer.from('shot'), mediaType: 'image/jpeg', width: 1280, height: 720 }),
+    captureScreen: async () => ({ image: Buffer.from('shot'), mediaType: 'image/jpeg', width: 1280, height: 720, view: Buffer.alloc(400) }),
     click: async (_control: unknown, at: unknown) => void clicks.push(at),
 }))
 

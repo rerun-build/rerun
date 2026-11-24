@@ -2,8 +2,10 @@ import { streamText, wrapLanguageModel, type LanguageModelUsage, type ModelMessa
 import { RERUN_CONNECTION_ID, contextTextPart, pendingComputerAccess, providerSwitchEntry, type ContextOccupancy, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { effortProviderOptions, mergeProviderOptions, reasoningProviderOptions, runEffort } from '../agents/reasoning.js'
-import { prepareRunHistory } from './compaction/compact.js'
+import { compactionThreshold, prepareRunHistory, runContextWindow } from './compaction/compact.js'
+import { estimateTokens } from './compaction/estimate.js'
 import { createInRunCompactor } from './compaction/in-run.js'
+import { pruneToolOutputs } from './compaction/prune.js'
 import { repairToolPairs, withToolResultsInToolMessages } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { CLI_PROVIDERS, resolveModel, type ModelOverride } from '../agents/providers.js'
@@ -33,6 +35,7 @@ import { isSharedConversation, signText } from './message-authors.js'
 import { bumpRunStep, cancelRun, failRun, finishRun, setRunContext, startRun } from '../db/repos/runs.js'
 import { insertRunStep, insertToolCall } from '../db/repos/telemetry.js'
 import { touchSession } from '../db/repos/sessions.js'
+import { settledWithin } from '../lib/abort.js'
 import { logger } from '../lib/logger.js'
 import { newId, nowIso } from '../lib/ids.js'
 import { buildTools } from '../tools/registry.js'
@@ -50,6 +53,8 @@ import { streamedTurn } from './streamed-turn.js'
 import { registerRunAbort, setRunCancel, unregisterRunAbort } from './run-control.js'
 import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
+import { createScreenBudget } from './screen-budget.js'
+import { acrossScreenStretches } from './screen-stretches.js'
 import { stepWithScreenshots } from './screenshots.js'
 import { costMicrosFrom } from './step-cost.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
@@ -304,18 +309,12 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         if (provider === 'claude') refreshClaudePlanLimitsAfterRun(connection, startedAt)
     }
 
-    const closeSafely = async (): Promise<boolean> => {
-        let timer: ReturnType<typeof setTimeout> | undefined
-        const guard = new Promise<false>(resolve => {
-            timer = setTimeout(() => {
-                logger.warn({ agent: agent.id, run: run.id, provider }, 'run teardown timed out')
-                resolve(false)
-            }, CLOSE_TIMEOUT_MS)
-        })
-        const closedInTime = await Promise.race([close().then(() => true, () => true), guard])
-        if (timer) clearTimeout(timer)
+    const teardown = async (closing: () => Promise<void>): Promise<boolean> => {
+        const closedInTime = await settledWithin(closing(), CLOSE_TIMEOUT_MS)
+        if (!closedInTime) logger.warn({ agent: agent.id, run: run.id, provider }, 'run teardown timed out')
         return closedInTime
     }
+    const closeSafely = (): Promise<boolean> => teardown(close)
 
     let settled = false
     let resolveSettled!: (outcome: AttemptOutcome) => void
@@ -545,7 +544,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
         const effort = runEffort(baseAgent, runOverride, provider, model)
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, called: trigger.source === 'chat' && trigger.calledBy !== undefined, teamRequests: offersTeamRequests(trigger) }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, called: trigger.source === 'chat' && trigger.calledBy !== undefined, teamRequests: offersTeamRequests(trigger), screenBudget: createScreenBudget(provider) }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null
@@ -623,7 +622,30 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             writer?.write({ type: 'data-compaction', id: cliCompactionId, data: compaction })
             if (compaction.status === 'done') logger.info({ agent: agent.id, session: sessionId, run: run.id, tokensRecovered: compaction.tokensRecovered }, 'context compacted by the CLI')
         }
-        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, readOnly, effort, onClaudeCompaction })
+        const openModel = () => resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, readOnly, effort, onClaudeCompaction })
+        const resolvedModel =
+            CLI_PROVIDERS.has(provider) && ctx.screenBudget
+                ? acrossScreenStretches(openModel, {
+                      budget: ctx.screenBudget,
+                      signal: attemptSignal,
+                      teardown,
+                      betweenStretches: async () => {
+                          logger.info({ agent: agent.id, run: run.id, provider }, 'screenshots of the stretch used up, carrying on in a new session')
+                          if (provider === 'codex') await syncCodexAuth(connection).catch(() => {})
+                          await cliAuthP?.then(release => release())
+                          if (settled) return
+                          cliAuthP = ensureCliAuth(provider, connection)
+                          await cliAuthP
+                          spawnToken = claudeTokenOf(connection)
+                      },
+                      fit: work => {
+                          const contextWindow = runContextWindow(model, provider, connection)
+                          const whole = [...cached.messages, ...work]
+                          if (!contextWindow || estimateTokens(whole, systemText, toolChars) < compactionThreshold(contextWindow, provider)) return work
+                          return pruneToolOutputs(work, work.length).messages
+                      },
+                  })
+                : openModel()
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.

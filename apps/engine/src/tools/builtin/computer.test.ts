@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
     available: true,
     calls: [] as Array<[string, ...unknown[]]>,
     captures: 0,
+    view: () => Buffer.alloc(400),
     failure: null as Error | null,
     failAfterCalls: null as number | null,
     onCall: null as ((name: string) => unknown) | null,
@@ -57,7 +58,7 @@ vi.mock('../../desktop/control.js', () => {
         captureScreen: async () => {
             const image = Buffer.from(`shot-${++state.captures}`)
             await state.captureGate
-            return { image, mediaType: 'image/jpeg', width: 1280, height: 720 }
+            return { image, mediaType: 'image/jpeg', width: 1280, height: 720, view: state.view() }
         },
         click: record('click'),
         drag: record('drag'),
@@ -128,6 +129,7 @@ beforeEach(() => {
     state.available = true
     state.calls.length = 0
     state.captures = 0
+    state.view = () => Buffer.alloc(400)
     state.failure = null
     state.failAfterCalls = null
     state.onCall = null
@@ -565,10 +567,32 @@ describe('computer', () => {
         await vi.waitFor(() => expect(existsSync(first.screenshotPath)).toBe(false))
     })
 
-    it('gives a run on a CLI fewer actions, since its pictures all stay in its context', async () => {
-        const built = build(ctxWith('claude-agent', {}, { provider: 'claude' }))
+    it('drops the files of a stretch codex is done with at the first screenshot of the next one', async () => {
+        const ctx = ctxWith(`codex-stretch-${process.pid}`, {}, { provider: 'codex' })
+        const built = build(ctx)
+        const before = await settled(act(built, { action: 'screenshot' }))
+        const alsoBefore = await settled(act(built, { action: 'screenshot' }))
+        ctx.screenBudget.nextStretch()
+        const after = await settled(act(built, { action: 'screenshot' }))
+        const alsoAfter = await settled(act(built, { action: 'screenshot' }))
+        expect([before, alsoBefore, after, alsoAfter].map(shot => existsSync(shot.screenshotPath))).toEqual([false, false, true, true])
+    })
+
+    it('tells a run on a CLI to note where it got to once a stretch is used up, since it carries on by itself', async () => {
+        state.view = () => Buffer.alloc(400, state.captures * 30)
+        const ctx = ctxWith('claude-agent', {}, { provider: 'claude' })
+        const built = build(ctx)
         for (let i = 0; i < 60; i++) expect((await settled(act(built, { action: 'screenshot' }))).status).toBe('done')
-        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('60 screenshots') })
+        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringMatching(/60 screenshots of this stretch.*you carry on by yourself/) })
+        expect(ctx.screenBudget.carriesOn()).toBe(true)
+    })
+
+    it('tells a run on a CLI whose screen stopped moving to stop there', async () => {
+        const ctx = ctxWith('claude-agent', {}, { provider: 'claude' })
+        const built = build(ctx)
+        for (let i = 0; i < 60; i++) expect((await settled(act(built, { action: 'screenshot' }))).status).toBe('done')
+        expect(await settled(act(built, { action: 'screenshot' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('going in circles') })
+        expect(ctx.screenBudget.carriesOn()).toBe(false)
     })
 
     it('ends a run that would click forever', async () => {

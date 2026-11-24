@@ -2,7 +2,7 @@ import { parseHitlReply } from './chat-hitl.js'
 import { toolNameOf } from './chat-tool-name.js'
 import { messageText } from './message-text.js'
 
-const SCREEN_TOOLS = new Set(['computer', 'computer_open_app'])
+export const SCREEN_TOOLS: ReadonlySet<string> = new Set(['computer', 'computer_open_app'])
 const NAVIGATE_TOOL = 'browser_navigate'
 
 type ToolPart = { type: string; toolName?: string; input?: unknown; text?: string }

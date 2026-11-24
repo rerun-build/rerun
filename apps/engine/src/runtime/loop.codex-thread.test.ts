@@ -52,6 +52,7 @@ vi.mock('../agents/providers.js', async importOriginal => {
                 },
             }),
             close: () => (turn.closeHangs ? new Promise<void>(() => {}) : Promise.resolve()),
+            quickReplies: () => undefined,
         }),
     }
 })

@@ -34,7 +34,7 @@ function heldCallOf(input: unknown, held: Record<string, McpCatalogEntry>): Held
     return toolName && Object.hasOwn(held, toolName) ? { toolName, args: argumentsOf(input) } : null
 }
 
-function parsedInput(input: string | undefined): unknown {
+export function parsedInput(input: string | undefined): unknown {
     try {
         return JSON.parse(input ?? '')
     } catch {

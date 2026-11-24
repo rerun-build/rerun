@@ -3,6 +3,7 @@ import type { LanguageModelUsage, UIMessageChunk, UIMessageStreamWriter } from '
 import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, withHitlVersion } from '@rerun/contracts'
 import { canonicalHitlName, isHitlToolName } from '../tools/builtin/hitl.js'
 import type { QuickRepliesCapture } from '../agents/quick-replies-stream.js'
+import { sum } from '../lib/sum.js'
 import type { AgentRun, AttemptOutcome } from './loop.js'
 
 // A settled run whose provider stream never closes would otherwise keep the SSE response and the
@@ -10,9 +11,6 @@ import type { AgentRun, AttemptOutcome } from './loop.js'
 // message the user types next is dropped as a duplicate. The grace period lets the last chunks of a
 // normal turn land before the cut.
 const CUT_GRACE_MS = 2_000
-
-const sum = (a: number | undefined, b: number | undefined): number | undefined =>
-    a === undefined && b === undefined ? undefined : (a ?? 0) + (b ?? 0)
 
 const addUsage = (a: Usage | undefined, b: LanguageModelUsage): Usage => ({
     inputTokens: sum(a?.inputTokens, b.inputTokens),

@@ -7,7 +7,7 @@ import { tool, type ToolSet } from 'ai'
 import { desktopAppSchema, type DesktopApp } from '@rerun/contracts'
 import { z } from 'zod'
 import type { LoadedConnection } from '../../connections/types.js'
-import { CLI_PROVIDERS, type AgentConfig } from '../../agents/types.js'
+import type { AgentConfig } from '../../agents/types.js'
 import type { Provider } from '@rerun/contracts'
 import { openDesktopApp } from '../../desktop/apps.js'
 import { ControlRefusal, captureScreen, click, controlScreen, drag, movePointer, pressKeys, scroll, typeText, type ScreenControl, type Screenshot } from '../../desktop/control.js'
@@ -16,6 +16,7 @@ import { holdBrowser, holdOpenBrowser } from '../../desktop/takeover.js'
 import { withKeyedLock } from '../../lib/lock.js'
 import type { RunContext } from '../../runtime/context.js'
 import { newId } from '../../lib/ids.js'
+import { createScreenBudget, type ScreenBudget, type ScreenRefusal } from '../../runtime/screen-budget.js'
 import { createScreenshotStore } from '../../runtime/screenshots.js'
 import { publicHttpUrl } from '../url.js'
 import { agentVariables } from '../../agents/process-env.js'
@@ -31,10 +32,6 @@ const SETTLE_MS = 600
 const APP_OPEN_SETTLE_MS = 2_000
 const DEFAULT_SCROLL_AMOUNT = 3
 const DEFAULT_WAIT_SECONDS = 1
-// Nothing else ends a model that keeps clicking: the loop only stops on its own final answer. A CLI
-// keeps every picture of the run in its context, where the engine cannot drop the old ones.
-const MAX_CAPTURES_PER_RUN = 200
-const MAX_CAPTURES_PER_CLI_RUN = 60
 const VIEW_IMAGE_NOTE = 'Open screenshotPath with view_image to see your screen before the next action.'
 
 const coordinate = z.array(z.number()).length(2)
@@ -86,6 +83,17 @@ const screenWaiters = new Map<string, Set<() => void>>()
 const SCREEN_WAIT_MS = 5 * 60_000
 const SCREEN_TAKEN = 'Another run of this coworker is using the screen right now. Carry on without it, or tell the user to retry once that run is over.'
 const RUN_OVER = 'This run is over: its hands are off the screen.'
+
+function noScreenshotLeft(refusal: ScreenRefusal, { perRun, perStretch }: ScreenBudget): string {
+    switch (refusal) {
+        case 'spent':
+            return `This run has used its ${perRun} screenshots. Tell the user where you got to and end your turn.`
+        case 'stuck':
+            return `The screen showed almost nothing new over the last ${perStretch} screenshots: you are going in circles. Tell the user where you got to and what blocks you, and end your turn.`
+        case 'carry-on':
+            return `You have used the ${perStretch} screenshots of this stretch. End your turn now, with no other tool call: you carry on by yourself right after, on a fresh view of the same screen, without these screenshots. First write the note you will carry on from: what is done, what is left, where the screen is, and what you learned about working this page. It is for you, not the user: ask them nothing and do not tell them to relaunch you.`
+    }
+}
 
 function freeScreen(agentId: string): void {
     screenOwners.delete(agentId)
@@ -216,8 +224,9 @@ const OPEN_APP_DESCRIPTION =
 export function computerTools(ctx: RunContext): { tools: ToolSet; release: () => void } {
     const id = ctx.agent.id
     const releases: Array<() => void> = []
-    const maxCaptures = CLI_PROVIDERS.has(ctx.provider) ? MAX_CAPTURES_PER_CLI_RUN : MAX_CAPTURES_PER_RUN
-    let captures = 0
+    const budget = (ctx.screenBudget ??= createScreenBudget(ctx.provider))
+    const screensDir = resolve(tmpdir(), 'rerun-desktop', 'screens', id)
+    let keptStretch = 0
     let released = false
 
     // Nothing calls `release` a second time: what a call still in flight takes after it goes back at once.
@@ -233,14 +242,18 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
             ctx.screenshots ??= createScreenshotStore()
             return { screenshotId: ctx.screenshots.add(screenshot) }
         }
-        const dir = resolve(tmpdir(), 'rerun-desktop', 'screens', id)
         if (!releases.includes(dropScreens)) releases.push(dropScreens)
-        await mkdir(dir, { recursive: true })
-        const screenshotPath = resolve(dir, `${newId()}.jpg`)
+        if (budget.stretch() !== keptStretch) {
+            keptStretch = budget.stretch()
+            await removeScreens()
+        }
+        await mkdir(screensDir, { recursive: true })
+        const screenshotPath = resolve(screensDir, `${newId()}.jpg`)
         await writeFile(screenshotPath, screenshot.image)
         return { screenshotPath, next: VIEW_IMAGE_NOTE }
     }
-    const dropScreens = () => void rm(resolve(tmpdir(), 'rerun-desktop', 'screens', id), { recursive: true, force: true }).catch(() => {})
+    const removeScreens = () => rm(screensDir, { recursive: true, force: true }).catch(() => {})
+    const dropScreens = () => void removeScreens()
 
     // The check and the claim run with no await between them, so two runs woken by the same release
     // cannot both take the screen.
@@ -266,9 +279,8 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     const claimScreen = async (signal: AbortSignal | undefined): Promise<Refused | null> => {
         if (!(await takeScreen(signal))) return refused(released ? RUN_OVER : SCREEN_TAKEN)
         if (humanDriving(id)) return refused(HUMAN_DRIVING)
-        if (captures >= maxCaptures) return refused(`This run has used its ${maxCaptures} screenshots. Tell the user where you got to and end your turn.`)
-        captures++
-        return null
+        const noneLeft = budget.take()
+        return noneLeft && refused(noScreenshotLeft(noneLeft, budget))
     }
 
     const onScreen = async (toolSignal: AbortSignal | undefined, settleMs: number, act: (control: ScreenControl, signal: AbortSignal | undefined) => Promise<void>): Promise<Done | Refused | Failed> => {
@@ -284,6 +296,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
                 if (settleMs > 0) await sleep(settleMs, undefined, { signal })
                 const screenshot = await captureScreen(control)
                 if (released) return refused(RUN_OVER)
+                budget.saw(screenshot.view)
                 return { status: 'done' as const, screen: [screenshot.width, screenshot.height] as [number, number], ...(await keep(screenshot)) }
             } catch (err) {
                 if (signal?.aborted) throw err

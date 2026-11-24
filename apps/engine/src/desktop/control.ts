@@ -1,11 +1,13 @@
 import { execFile } from 'node:child_process'
-import { BAR_WINDOW_NAME, DOCK_WINDOW_NAME } from './panels.js'
+import { BAR_HEIGHT, BAR_WINDOW_NAME, DOCK_WINDOW_NAME } from './panels.js'
 import { SCREEN_CAPTURE_BINARY, desktopEnv, ensureDesktop } from './session.js'
 
 // Past this size a model scales the picture down itself and its coordinates stop matching ours.
 const VIEW_MAX_WIDTH = 1280
 const VIEW_MAX_HEIGHT = 720
 const JPEG_QUALITY = 75
+const COMPARED_WIDTH = 320
+const COMPARED_HEIGHT = 180
 const CAPTURE_MAX_BYTES = 64 * 1024 * 1024
 const TYPE_DELAY_MS = '12'
 const DOUBLE_CLICK_DELAY_MS = '80'
@@ -54,7 +56,8 @@ const KEY_ALIASES: Record<string, string> = {
 export type ViewPoint = readonly [number, number]
 export type MouseButton = keyof typeof BUTTONS
 export type ScrollDirection = keyof typeof SCROLL_BUTTONS
-export type Screenshot = { image: Buffer; mediaType: 'image/jpeg'; width: number; height: number }
+// `view` is what tells one screen from another: small, grey, without the bar whose clock always moves.
+export type Screenshot = { image: Buffer; mediaType: 'image/jpeg'; width: number; height: number; view: Buffer }
 
 // The agent points at what it saw, which is the capture, not the screen: `scale` is the way back.
 export type ScreenControl = { env: NodeJS.ProcessEnv; width: number; height: number; scale: number; signal?: AbortSignal }
@@ -87,7 +90,13 @@ export async function captureScreen(control: ScreenControl): Promise<Screenshot>
     const width = Math.round(control.width / control.scale)
     const height = Math.round(control.height / control.scale)
     const image = await sharp(png).resize(width, height, { fit: 'fill' }).jpeg({ quality: JPEG_QUALITY }).toBuffer()
-    return { image, mediaType: 'image/jpeg', width, height }
+    const view = await sharp(png)
+        .extract({ left: 0, top: BAR_HEIGHT, width: control.width, height: control.height - BAR_HEIGHT })
+        .resize(COMPARED_WIDTH, COMPARED_HEIGHT, { fit: 'fill' })
+        .greyscale()
+        .raw()
+        .toBuffer()
+    return { image, mediaType: 'image/jpeg', width, height, view }
 }
 
 function onScreen(control: ScreenControl, [x, y]: ViewPoint): [string, string] {

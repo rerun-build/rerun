@@ -8,6 +8,7 @@ export const DOCK_APPS: Array<{ app: DesktopApp; label: string; windowClass: str
 
 export const DOCK_WINDOW_NAME = 'rerun-dock'
 export const BAR_WINDOW_NAME = 'rerun-bar'
+export const BAR_HEIGHT = 32
 
 export const windowClassOf = (app: DesktopApp): string => DOCK_APPS.find(entry => entry.app === app)!.windowClass
 
@@ -113,7 +114,7 @@ export function barConfig(): string {
         ]),
         lines([
             ['panel_items', 'EFC'],
-            ['panel_size', '100% 32'],
+            ['panel_size', `100% ${BAR_HEIGHT}`],
             ['panel_margin', '0 0'],
             ['panel_padding', '14 0 0'],
             ['panel_background_id', 1],

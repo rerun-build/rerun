@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { deadlineSignal, raceAbort } from './abort.js'
+import { deadlineSignal, raceAbort, settledWithin } from './abort.js'
 
 describe('raceAbort', () => {
     it('resolves with the work when it settles first', async () => {
@@ -38,5 +38,15 @@ describe('deadlineSignal', () => {
         const signal = deadlineSignal(60_000, parent.signal)
         parent.abort()
         expect(signal.aborted).toBe(true)
+    })
+})
+
+describe('settledWithin', () => {
+    it.each([
+        ['ended', () => Promise.resolve(), true],
+        ['failed', () => Promise.reject(new Error('refused')), true],
+        ['hangs', () => new Promise(() => {}), false],
+    ])('tells of work that %s', async (_name, work, expected) => {
+        expect(await settledWithin(work(), 20)).toBe(expected)
     })
 })

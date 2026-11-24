@@ -18,3 +18,13 @@ export function raceAbort<T>(work: Promise<T>, signal: AbortSignal): Promise<T> 
     })
     return Promise.race([work, aborted]).finally(() => signal.removeEventListener('abort', onAbort))
 }
+
+/** Whether the work ended, well or not, within `ms`. Past that nobody waits for it any more. */
+export async function settledWithin(work: Promise<unknown>, ms: number): Promise<boolean> {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const late = new Promise<false>(resolve => {
+        timer = setTimeout(() => resolve(false), ms)
+    })
+    const settled = work.then(() => true, () => true)
+    return Promise.race([settled, late]).finally(() => clearTimeout(timer))
+}

@@ -5,6 +5,7 @@ import type { LoadedAgent } from '../agents/types.js'
 import type { AgentRow } from '../db/schema.js'
 import type { Logger } from '../lib/logger.js'
 import type { HostBreaker } from '../tools/host-breaker.js'
+import type { ScreenBudget } from './screen-budget.js'
 import type { ScreenshotStore } from './screenshots.js'
 
 // The coworker that started the run with call_agent. `waiting`: it blocks on the answer.
@@ -55,6 +56,7 @@ export type RunContext = {
     partialResults?: PartialResult[]
     skillProposals?: SkillProposalNotice[]
     screenshots?: ScreenshotStore
+    screenBudget?: ScreenBudget
     // What the run's compaction summaries cost, added to the cost of its steps when it settles.
     compactionCostMicros?: number
     // The user's turn goes to the database without holding the run up: a tool that reads the
