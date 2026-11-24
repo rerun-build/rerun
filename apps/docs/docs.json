@@ -26,7 +26,7 @@
   "icons": {
     "library": "lucide"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
       {
@@ -152,8 +152,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/buddy.png",
+    "dark": "/logo/buddy.png"
   },
   "navbar": {
     "links": [
