@@ -10,6 +10,7 @@ import { isForemanClientTool, runForemanClientTool, type ForemanClientGates, typ
 import { refreshForemanSurface } from '@/components/foreman/useForemanKickoff'
 import { getRunAction } from '@/app/api/_actions/agent.actions'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
+import { reReadAgentsChangedBy } from '@/hooks/useAgentContext'
 import { readAgentModel, useAgentModel } from '@/hooks/useAgentModel'
 import { useRunReconnect } from '@/hooks/useRunReconnect'
 import { useTranscriptCatchUp } from '@/hooks/useTranscriptCatchUp'
@@ -149,6 +150,7 @@ export function useForemanChat() {
         onFinish: ({ message, isAbort, isDisconnect, isError }) => {
             // Only the engine foreman has a model pill reading the store; the hub's is fixed.
             if (selectForemanBackend(useForemanStore.getState()) === 'engine' && !isDisconnect && !isError) void refreshWorkspaceConnections()
+            reReadAgentsChangedBy(message.parts)
             if (isAbort || isDisconnect || isError) return
             // It just took the name they gave it: every label that names it follows.
             if (message.parts.some(part => isToolPart(part) && toolNameOf(part) === 'set_name' && part.state === 'output-available')) void refreshForemanSurface()
@@ -189,7 +191,14 @@ export function useForemanChat() {
             return {
                 runId,
                 getRun: () => getRunAction(FOREMAN_AGENT_ID, runId),
-                fetchMessages: () => fetchEngineTranscript(sessionId),
+                // The stream is gone for good: what the run changed after it dropped is in the transcript,
+                // where one turn can take several messages.
+                fetchMessages: async () => {
+                    const transcript = await fetchEngineTranscript(sessionId)
+                    const turn = transcript.slice(transcript.findLastIndex(message => message.role === 'user') + 1)
+                    reReadAgentsChangedBy(turn.flatMap(message => message.parts))
+                    return transcript
+                },
                 onSettled: ({ errorText }) => {
                     holdRun(null)
                     if (errorText) setRunError(errorText)

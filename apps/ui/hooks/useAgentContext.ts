@@ -1,5 +1,6 @@
 'use client'
 
+import { isRecord, isToolPart, toolNameOf } from '@rerun/contracts'
 import { useCallback, useSyncExternalStore } from 'react'
 import { getAgentContextAction, type AgentContext, type ModelSelectorContext } from '@/app/api/_actions/agent.actions'
 
@@ -66,6 +67,17 @@ export function invalidateAgentContext(agentId: string) {
 // one out or moving the box default changes what each of them runs, pin or not.
 export function invalidateLoadedAgentContexts() {
     for (const agentId of snapshots.keys()) void load(agentId)
+}
+
+// A turn of the Chief of Staff that changed what a coworker runs on: every picker showing it reads it
+// again, or the app keeps the model it loaded with until a reload (RER-284).
+export function reReadAgentsChangedBy(parts: readonly { type: string }[]) {
+    for (const part of parts) {
+        if (!isToolPart(part) || part.state !== 'output-available') continue
+        const tool = toolNameOf(part)
+        if (tool === 'set_default_model') invalidateLoadedAgentContexts()
+        else if (tool === 'update_agent' && isRecord(part.input) && typeof part.input.agentId === 'string' && snapshots.has(part.input.agentId)) invalidateAgentContext(part.input.agentId)
+    }
 }
 
 // The pick the user just made, shown everywhere the agent is open before the engine confirms it.
