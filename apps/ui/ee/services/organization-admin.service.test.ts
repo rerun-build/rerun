@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => mocks.client }))
 vi.mock('@/supabase/session/getServerSession', () => ({ getSessionIdentity: vi.fn() }))
 vi.mock('@rerun/cloud/organizations', () => ({ ORGANIZATIONS_ENABLED: true }))
-vi.mock('@rerun/cloud/organizations.server', () => ({ organizationBrandOfWorkspace: async () => null, archiveOrganizationMachine: mocks.archive, restoreOrganizationMachine: mocks.restore, restartOrganizationMachine: vi.fn(), destroyOrganizationMachine: vi.fn(), readOrganizationMachine: vi.fn() }))
+vi.mock('@rerun/cloud/organizations.server', () => ({ organizationBrandOfWorkspace: async () => null, archiveOrganizationMachine: mocks.archive, restoreOrganizationMachine: mocks.restore, restartOrganizationMachine: vi.fn(), destroyOrganizationMachine: vi.fn(), readOrganizationMachine: vi.fn(), readOrganizationMachines: async () => new Map() }))
 vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 vi.mock('@rerun/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.delivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn() }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))

@@ -97,7 +97,7 @@ export async function demoteKeepingAnAdmin(supabase: SupabaseClient<Database>, w
     return { error: restoreError ?? LAST_ADMIN }
 }
 
-export type MemberEntry = { userId: string; email: string | null; role: WorkspaceRole; boxScope: BoxScope }
+export type MemberEntry = { userId: string; email: string | null; name: string | null; role: WorkspaceRole; boxScope: BoxScope }
 export type InviteEntry = { id: string; email: string; status: string; createdAt: string; boxScope: BoxScope; role: WorkspaceRole }
 
 export async function listMembersAndInvites(supabase: SupabaseClient<Database>, workspaceId: number): Promise<{ members: MemberEntry[]; invites: InviteEntry[] }> {
@@ -108,7 +108,7 @@ export async function listMembersAndInvites(supabase: SupabaseClient<Database>, 
     const rows = memberRows ?? []
     const identities = await resolveMemberIdentities(supabase, rows.map(m => m.user_id))
     return {
-        members: rows.map(m => ({ userId: m.user_id, email: identities.get(m.user_id)?.email ?? null, role: m.role, boxScope: toBoxScope(m.box_scope) })),
+        members: rows.map(m => ({ userId: m.user_id, email: identities.get(m.user_id)?.email ?? null, name: identities.get(m.user_id)?.name ?? null, role: m.role, boxScope: toBoxScope(m.box_scope) })),
         invites: (inviteRows ?? []).map(i => ({ id: i.id, email: i.email, status: i.status, createdAt: i.created_at, boxScope: toBoxScope(i.box_scope), role: i.role })),
     }
 }

@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
     restart: vi.fn(async () => {}),
     destroy: vi.fn(async () => {}),
     read: vi.fn(async () => null as unknown),
+    readMany: vi.fn(async () => new Map<number, unknown>()),
     readLogo: vi.fn(async () => ({ ok: true }) as unknown),
     sendWorkspaceInviteEmail: vi.fn(async () => ({ ok: true, id: null })),
     stopBilling: vi.fn(async () => null as string | null),
@@ -26,6 +27,7 @@ vi.mock('@rerun/cloud/organizations.server', () => ({
     restartOrganizationMachine: mocks.restart,
     destroyOrganizationMachine: mocks.destroy,
     readOrganizationMachine: mocks.read,
+    readOrganizationMachines: mocks.readMany,
 }))
 vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 vi.mock('@rerun/cloud/email', () => ({ EMAIL_DELIVERY: true, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.test/og') }))
@@ -78,6 +80,7 @@ beforeEach(() => {
     mocks.readLogo.mockResolvedValue({ ok: true })
     mocks.stopBilling.mockResolvedValue(null)
     mocks.read.mockResolvedValue(null)
+    mocks.readMany.mockResolvedValue(new Map())
     open()
 })
 
@@ -93,6 +96,21 @@ describe('creating a workspace', () => {
         expect(world.rows('workspace_invitations')).toEqual([expect.objectContaining({ workspace_id: workspaceId, email: 'hank@globex.test', role: 'admin', status: 'pending' })])
         await vi.waitFor(() => expect(mocks.sendWorkspaceInviteEmail).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ to: 'hank@globex.test', workspaceName: 'Globex', invitedByEmail: undefined })))
         expect(world.rows('workspace_members').some(row => row.workspace_id === workspaceId)).toBe(false)
+    })
+
+    it('starts with credit out of the reserve, and hands over the link of its invitation', async () => {
+        world.rows('organization_credit_movements').push({ id: 'm1', organization_id: NORDLYS, seq: 1, kind: 'purchase', micros: 10_000_000, balance_after: 10_000_000, request_id: 'bought' })
+        const { workspaceId, inviteUrl, creditFailed } = await createOrganizationWorkspace(ctx(), form(), { credits: 250, requestId: 'r1' })
+        expect(workspace(workspaceId)).toMatchObject({ rerun_topup_micros: 2_500_000 })
+        expect(creditFailed).toBeUndefined()
+        expect(inviteUrl).toContain(`/invite/${world.rows('workspace_invitations')[0].token}`)
+    })
+
+    it('stays when the reserve does not hold that credit, and says so', async () => {
+        const { workspaceId, creditFailed } = await createOrganizationWorkspace(ctx(), form(), { credits: 250, requestId: 'r1' })
+        expect(creditFailed).toBe(true)
+        expect(workspace(workspaceId)).toMatchObject({ rerun_topup_micros: 0 })
+        expect(world.rows('workspace_invitations')).toHaveLength(1)
     })
 
     it.each([
@@ -148,13 +166,41 @@ describe('creating a workspace', () => {
 describe('the list', () => {
     it('counts the client’s people and coworkers, without staff, without the Chief of Staff', async () => {
         world.rows('workspace_members').push(memberRow(OWNER, CLIENT, { organization_staff: true }), memberRow('someone', CLIENT, { role: 'member' }))
-        world.rows('agents').push({ id: 'a1', workspace_id: CLIENT, kind: 'coworker' }, { id: 'a2', workspace_id: CLIENT, kind: 'foreman' }, { id: 'a3', workspace_id: RIVAL_WORKSPACE, kind: 'coworker' })
+        world.rows('agents').push({ id: 'a1', name: 'Nova', look: null, disabled_at: null, workspace_id: CLIENT, kind: 'coworker', created_at: '1' }, { id: 'a2', workspace_id: CLIENT, kind: 'foreman' }, { id: 'a3', workspace_id: RIVAL_WORKSPACE, kind: 'coworker' })
         world.rows('engine_pool').push({ id: 'e1', claimed_by_workspace_id: CLIENT, status: 'claimed' })
         Object.assign(workspace(CLIENT)!, { rerun_topup_micros: 3_000_000, rerun_used_micros: 1_000_000, rerun_period_anchor: new Date().toISOString(), last_active_at: '2026-11-23T10:00:00Z' })
 
         expect(await listOrganizationWorkspaces(ctx())).toEqual([
-            { id: CLIENT, name: 'Acme', iconUrl: null, status: 'active', createdAt: expect.any(String), lastActiveAt: '2026-11-23T10:00:00Z', memberCount: 2, coworkerCount: 1, usedMicros: 1_000_000, leftMicros: 3_000_000, machine: 'running' },
+            { id: CLIENT, name: 'Acme', iconUrl: null, status: 'active', createdAt: expect.any(String), lastActiveAt: '2026-11-23T10:00:00Z', memberCount: 2, coworkerCount: 1, coworkers: [{ id: 'a1', name: 'Nova', look: null, status: 'idle' }], pendingAdmin: null, usedMicros: 1_000_000, leftMicros: 3_000_000, spentPerDayMicros: 1_000_000, machine: 'running', diskPercent: null },
         ])
+    })
+
+    it('draws the first coworkers of each board, as they stand', async () => {
+        const look = { eyes: 'round', mouth: 'smile', color: '#0f52ff' }
+        const coworker = (index: number, overrides = {}) => ({ id: `a${index}`, name: `N${index}`, look: null, disabled_at: null, workspace_id: CLIENT, kind: 'coworker', created_at: String(index).padStart(2, '0'), ...overrides })
+        world.rows('agents').push(...Array.from({ length: 10 }, (_, index) => coworker(index)).reverse(), coworker(99, { workspace_id: RIVAL_WORKSPACE }))
+        Object.assign(world.rows('agents').find(row => row.id === 'a0')!, { look })
+        Object.assign(world.rows('agents').find(row => row.id === 'a2')!, { disabled_at: '2026-11-20T00:00:00Z' })
+        world.rows('sessions').push({ agent_id: 'a1', status: 'working' }, { agent_id: 'a2', status: 'working' }, { agent_id: 'a3', status: 'idle' })
+        const [row] = await listOrganizationWorkspaces(ctx())
+        expect(row.coworkerCount).toBe(10)
+        expect(row.coworkers.map(({ id, status }) => [id, status])).toEqual([['a0', 'idle'], ['a1', 'working'], ['a2', 'offline'], ['a3', 'idle'], ['a4', 'idle'], ['a5', 'idle'], ['a6', 'idle'], ['a7', 'idle']])
+        expect(row.coworkers[0].look).toEqual(look)
+    })
+
+    it('names the admin who has not come, until someone joins', async () => {
+        const invitation = { id: 'i1', workspace_id: CLIENT, email: 'lea@acme.test', role: 'admin', status: 'pending', expires_at: '2026-01-01T00:00:00Z', created_at: '1' }
+        world.rows('workspace_invitations').push(invitation, { ...invitation, id: 'i2', role: 'member' }, { ...invitation, id: 'i3', status: 'revoked' })
+        expect((await listOrganizationWorkspaces(ctx()))[0].pendingAdmin).toBeNull()
+        world.tables.workspace_members = world.rows('workspace_members').filter(row => row.workspace_id !== CLIENT)
+        expect((await listOrganizationWorkspaces(ctx()))[0].pendingAdmin).toEqual({ invitationId: 'i1', email: 'lea@acme.test', expired: true })
+    })
+
+    it('tells how full each disk is, and stands without it', async () => {
+        mocks.readMany.mockResolvedValue(new Map([[CLIENT, { managed: true, running: true, disk: { usedMb: 940, totalMb: 1000 } }]]))
+        expect((await listOrganizationWorkspaces(ctx()))[0].diskPercent).toBe(94)
+        mocks.readMany.mockRejectedValue(new Error('down'))
+        expect((await listOrganizationWorkspaces(ctx()))[0].diskPercent).toBeNull()
     })
 
     it('does not carry the spending of an older month', async () => {
@@ -168,7 +214,7 @@ describe('the list', () => {
         open({ workspaces: many })
         const rows = await listOrganizationWorkspaces(ctx())
         expect(rows).toHaveLength(1000)
-        expect(world.chains.length).toBeLessThanOrEqual(1 + 5 * 4)
+        expect(world.chains.length).toBeLessThanOrEqual(1 + 5 * 5)
     })
 
     it('follows the latest archive', async () => {

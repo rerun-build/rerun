@@ -6,13 +6,15 @@ import { moveToOtherWorkspace } from '@/app/api/_services/default-workspace.serv
 import { inviteMember, isEmailAddress } from '@/app/api/_services/members.service'
 import type { Database } from '@/app/api/database.types'
 import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
+import { spentPerDay } from '@/ee/lib/billing/credit-usage'
 import { addOneMonth } from '@/ee/lib/billing/cancel-flow'
 import { ORGANIZATION_PLAN_SLUG, organizationLimitsToColumns } from '@/ee/lib/billing/plans'
 import { stopBilling } from '@/ee/lib/billing/stop-billing'
 import { organizationMachineState, organizationWorkspaceStatus, type OrganizationMachineState, type OrganizationWorkspaceStatus } from '@/ee/lib/organizations/workspace-state'
 import { readOrganization, readOrganizationWorkspaces, requireOrganizationWorkspace, type OrganizationContext, type OrganizationWorkspaceRow } from '@/ee/services/organization-context.service'
 import { batchesOf } from '@/ee/lib/organizations/batches'
-import { returnAllocatedCredit } from '@/ee/services/organization-credit.service'
+import { allocateOrganizationCredit, returnAllocatedCredit } from '@/ee/services/organization-credit.service'
+import { pendingInvitationUrl } from '@/ee/services/organization-members.service'
 import { remainingMicros } from '@/ee/services/rerunBudget.service'
 import { syncWorkspaceAppsSafely } from '@/lib/apps/lifecycle'
 import { randomBlob } from '@/lib/blobs/catalog'
@@ -22,7 +24,8 @@ import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { readWorkspaceLogo } from '@/lib/workspace/read-logo'
 import { selectAll, selectCount, selectMany } from '@/supabase/supabase-helpers'
 import { requestAgentActivationSync } from '@/trigger/sync-agent-activation'
-import { archiveOrganizationMachine, destroyOrganizationMachine, readOrganizationMachine, restartOrganizationMachine, restoreOrganizationMachine, type OrganizationMachine } from '@rerun/cloud/organizations.server'
+import { archiveOrganizationMachine, destroyOrganizationMachine, readOrganizationMachine, readOrganizationMachines, restartOrganizationMachine, restoreOrganizationMachine, type OrganizationMachine } from '@rerun/cloud/organizations.server'
+import { parseCoworkerLook, type CoworkerLook } from '@rerun/contracts'
 import { isStableLocale } from '@rerun/i18n'
 
 type Client = SupabaseClient<Database>
@@ -40,11 +43,22 @@ export type OrganizationWorkspaceSummary = {
     lastActiveAt: string | null
     memberCount: number
     coworkerCount: number
+    // The first ones, enough to draw its board.
+    coworkers: OrganizationCoworker[]
+    // The invitation of its admin, until someone joins.
+    pendingAdmin: { invitationId: string; email: string; expired: boolean } | null
     // Spent since its month began, and what it can still spend.
     usedMicros: number
     leftMicros: number
+    spentPerDayMicros: number
     machine: OrganizationMachineState
+    diskPercent: number | null
 }
+
+export type OrganizationCoworker = { id: string; name: string; look: CoworkerLook | null; status: 'idle' | 'working' | 'offline' }
+
+const BOARD_COWORKERS = 8
+const AGENTS_PER_READ = 100
 
 function countBy(rows: { workspace_id: number }[]): Map<number, number> {
     const counts = new Map<number, number>()
@@ -59,19 +73,33 @@ function usedThisMonth(workspace: OrganizationWorkspaceRow, now: Date): number {
     return workspace.rerun_used_micros
 }
 
+async function workingAmong(supabase: Client, agentIds: string[]): Promise<Set<string>> {
+    const reads = await Promise.all(Array.from({ length: Math.ceil(agentIds.length / AGENTS_PER_READ) }, (_, index) => selectAll(supabase, 'sessions', ['agent_id'] as const, { agent_id: agentIds.slice(index * AGENTS_PER_READ, (index + 1) * AGENTS_PER_READ), status: 'working' })))
+    return new Set(reads.flatMap(({ data }) => (data ?? []).map(session => session.agent_id)))
+}
+
 async function summarize(supabase: Client, workspaces: OrganizationWorkspaceRow[]): Promise<OrganizationWorkspaceSummary[]> {
+    const machinesRead = readOrganizationMachines(workspaces.map(workspace => workspace.id)).catch(err => {
+        console.error('[organizations] could not read the machines', err)
+        return new Map<number, OrganizationMachine>()
+    })
     const batches = await Promise.all(
         batchesOf(workspaces.map(workspace => workspace.id)).map(ids =>
             Promise.all([
                 selectWorkspaceMembers(supabase, ['workspace_id'] as const, { workspace_id: ids }),
-                selectAll(supabase, 'agents', ['workspace_id'] as const, { workspace_id: ids, kind: 'coworker' }),
+                selectAll(supabase, 'agents', ['id', 'workspace_id', 'name', 'look', 'disabled_at'] as const, { workspace_id: ids, kind: 'coworker' }, { column: 'created_at', ascending: true }),
                 selectAll(supabase, 'engine_pool', ['claimed_by_workspace_id', 'status', 'provider_server_id'] as const, { claimed_by_workspace_id: ids }),
                 selectAll(supabase, 'workspace_archives', ['workspace_id', 'status'] as const, { workspace_id: ids }, { column: 'created_at', ascending: true }),
+                selectAll(supabase, 'workspace_invitations', ['id', 'workspace_id', 'email', 'expires_at'] as const, { workspace_id: ids, status: 'pending', role: 'admin' }, { column: 'created_at', ascending: true }),
             ]),
         ),
     )
     const members = countBy(batches.flatMap(([rows]) => rows.data ?? []))
-    const coworkers = countBy(batches.flatMap(([, rows]) => rows.data ?? []))
+    const agents = Map.groupBy(batches.flatMap(([, rows]) => rows.data ?? []), agent => agent.workspace_id)
+    const invitations = Map.groupBy(batches.flatMap(([, , , , rows]) => rows.data ?? []), invitation => invitation.workspace_id)
+    const shown = new Map([...agents].map(([id, rows]) => [id, rows.slice(0, BOARD_COWORKERS)]))
+    const working = await workingAmong(supabase, [...shown.values()].flat().flatMap(agent => (agent.disabled_at ? [] : agent.id)))
+    const machines = await machinesRead
     const instances = new Map(batches.flatMap(([, , rows]) => rows.data ?? []).map(row => [row.claimed_by_workspace_id, row]))
     const archives = new Map(batches.flatMap(([, , , rows]) => rows.data ?? []).map(row => [row.workspace_id, row.status]))
 
@@ -79,6 +107,8 @@ async function summarize(supabase: Client, workspaces: OrganizationWorkspaceRow[
     return workspaces.map(workspace => {
         const status = organizationWorkspaceStatus(workspace)
         const usedMicros = usedThisMonth(workspace, now)
+        const invitation = invitations.get(workspace.id)?.at(-1)
+        const disk = machines.get(workspace.id)?.disk
         return {
             id: workspace.id,
             name: workspace.name,
@@ -87,9 +117,13 @@ async function summarize(supabase: Client, workspaces: OrganizationWorkspaceRow[
             createdAt: workspace.created_at,
             lastActiveAt: workspace.last_active_at,
             memberCount: members.get(workspace.id) ?? 0,
-            coworkerCount: coworkers.get(workspace.id) ?? 0,
+            coworkerCount: agents.get(workspace.id)?.length ?? 0,
+            coworkers: (shown.get(workspace.id) ?? []).map(({ id, name, look, disabled_at }) => ({ id, name, look: parseCoworkerLook(look), status: disabled_at ? 'offline' : working.has(id) ? 'working' : 'idle' })),
+            pendingAdmin: members.has(workspace.id) || !invitation ? null : { invitationId: invitation.id, email: invitation.email, expired: new Date(invitation.expires_at) < now },
             usedMicros,
             leftMicros: remainingMicros({ budgetMicros: workspace.rerun_budget_micros, usedMicros, topupMicros: workspace.rerun_topup_micros }),
+            spentPerDayMicros: workspace.rerun_period_anchor ? spentPerDay(usedMicros, new Date(workspace.rerun_period_anchor), now) : 0,
+            diskPercent: disk ? Math.round((disk.usedMb / disk.totalMb) * 100) : null,
             machine: organizationMachineState({ status, boxesArchivedAt: workspace.boxes_archived_at, instance: instances.get(workspace.id) ?? null, archiveStatus: archives.get(workspace.id) ?? null }),
         }
     })
@@ -129,8 +163,12 @@ export async function countWorkspaces(supabase: Client, organizationId: string):
 
 export const limitReached = (max: number) => new AppError('organizationWorkspaceLimit', { max })
 
-// The workspace, and the invitation of its first admin. `inviteUrl` comes back where no email leaves.
-export async function createOrganizationWorkspace(ctx: OrganizationContext, formData: FormData): Promise<{ workspaceId: number; inviteUrl?: string }> {
+export type StartingCredit = { credits: number; requestId: string }
+export type CreatedWorkspace = { workspaceId: number; inviteUrl?: string; creditFailed?: true }
+
+// The workspace, the invitation of its first admin with the link to it, and the credit it starts with.
+// Credit that could not be moved leaves the workspace where it is: it is given from its page.
+export async function createOrganizationWorkspace(ctx: OrganizationContext, formData: FormData, starting: StartingCredit | null = null): Promise<CreatedWorkspace> {
     const { supabase, organization } = ctx
     const name = workspaceName(formData)
     const locale = workspaceLocaleOf(formData)
@@ -165,10 +203,23 @@ export async function createOrganizationWorkspace(ctx: OrganizationContext, form
 
         // Never blocks the workspace: a row missing here is written the first time it is needed.
         await ensureForemanAgentRow(supabase, workspaceId).catch(err => console.error('[organizations] failed to write the Chief of Staff', err))
-        return { workspaceId, ...(invite.inviteUrl ? { inviteUrl: invite.inviteUrl } : {}) }
     } catch (err) {
         await supabase.from('workspaces').delete().eq('id', workspaceId).eq('organization_id', organization.id)
         throw err
+    }
+
+    const creditFailed = starting !== null && !(await startsWith(ctx, workspaceId, starting))
+    const inviteUrl = await pendingInvitationUrl(ctx, workspaceId, adminEmail).catch(() => null)
+    return { workspaceId, ...(inviteUrl ? { inviteUrl } : {}), ...(creditFailed ? { creditFailed: true as const } : {}) }
+}
+
+async function startsWith(ctx: OrganizationContext, workspaceId: number, starting: StartingCredit): Promise<boolean> {
+    try {
+        await allocateOrganizationCredit(ctx, { workspaceId, ...starting })
+        return true
+    } catch (err) {
+        console.error('[organizations] a new workspace did not get the credit it starts with', workspaceId, err)
+        return false
     }
 }
 

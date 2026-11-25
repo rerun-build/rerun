@@ -11,8 +11,8 @@ import type { ClientRole } from './WorkspaceDetailView'
 // What the services answer, as the views draw it.
 
 export function consoleWorkspaceOf(summary: OrganizationWorkspaceSummary, unnamed: string): ConsoleWorkspace {
-    const { id, name, iconUrl, memberCount, coworkerCount, leftMicros, lastActiveAt } = summary
-    return { id, name: name || unnamed, iconUrl, status: consoleStatusOf(summary), memberCount, coworkerCount, creditMicros: leftMicros, lastActivityAt: lastActiveAt }
+    const { id, name, iconUrl, memberCount, coworkerCount, coworkers, pendingAdmin, leftMicros, spentPerDayMicros, machine, diskPercent, lastActiveAt } = summary
+    return { id, name: name || unnamed, iconUrl, status: consoleStatusOf(summary), memberCount, coworkerCount, coworkers, pendingAdmin, creditMicros: leftMicros, spentPerDayMicros, machine, diskPercent, lastActivityAt: lastActiveAt }
 }
 
 export function consoleMachineOf({ machine, hardware }: OrganizationWorkspaceDetail): ConsoleMachine {
@@ -23,7 +23,7 @@ export type WorkspacePeople = { members: MemberEntry[]; invites: InviteEntry[] }
 
 export function consoleMembersOf({ members, invites }: WorkspacePeople, selfId: string): { members: ConsolePerson<ClientRole>[]; invitations: ConsoleInvitation[] } {
     return {
-        members: members.map(({ userId, email, role }) => ({ userId, name: null, email, photo: null, role, isSelf: userId === selfId })),
+        members: members.map(({ userId, name, email, role }) => ({ userId, name, email, photo: null, role, isSelf: userId === selfId })),
         invitations: invites.map(({ id, email, role }) => ({ id, email, role })),
     }
 }

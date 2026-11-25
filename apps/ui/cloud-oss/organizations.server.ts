@@ -58,6 +58,10 @@ export async function readOrganizationMachine(_workspaceId: number): Promise<Org
     return null
 }
 
+export async function readOrganizationMachines(_workspaceIds: number[]): Promise<Map<number, OrganizationMachine>> {
+    return new Map()
+}
+
 export async function archiveOrganizationMachine(_workspaceId: number): Promise<void> {
     throw new Error(NO_ORGANIZATIONS)
 }

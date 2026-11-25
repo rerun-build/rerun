@@ -120,12 +120,16 @@ export function creditBalance({ budgetMicros, usedMicros, topupMicros }: CreditC
     }
 }
 
+export function spentPerDay(usedMicros: number, since: Date, now: Date): number {
+    return usedMicros / Math.max((now.getTime() - since.getTime()) / DAY_MS, 1)
+}
+
 // The day the credit runs out if the coworkers keep spending at the pace they have so far, or null
 // when it lasts until the period ends.
 export function runsOutOn(balance: CreditBalance, period: { start: string; end: string }, now: Date): Date | null {
     const used = balance.usedAiMicros + balance.usedDataMicros
     if (used <= 0) return null
-    const perDay = used / Math.max((now.getTime() - new Date(period.start).getTime()) / DAY_MS, 1)
+    const perDay = spentPerDay(used, new Date(period.start), now)
     const out = new Date(now.getTime() + (balance.leftMicros / perDay) * DAY_MS)
     return out < new Date(period.end) ? out : null
 }

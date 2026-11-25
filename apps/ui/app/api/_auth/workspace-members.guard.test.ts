@@ -102,6 +102,7 @@ const NAMES_ALLOWED: Record<string, string> = {
     'ee/lib/lifecycle/recipient.ts': 'the address of a recipient the callers took from the helper',
     'ee/services/referral.service.ts': "the people someone referred, shown to them alone and to nobody's client",
     'ee/services/referral-attach.service.ts': 'the first name of who referred, on their own link',
+    'ee/lib/organizations/console.server.ts': 'the caller reading their own name, in the console',
     'ee/services/organization-admin.service.ts': 'the console, read by the team alone',
     'ee/services/organization-credit.service.ts': 'the console, read by the team alone',
     'ee/services/organization-team.service.ts': 'the console, read by the team alone',

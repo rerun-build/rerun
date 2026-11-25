@@ -16,6 +16,7 @@ vi.mock('@rerun/cloud/organizations.server', () => ({
     restartOrganizationMachine: mocks.machine,
     destroyOrganizationMachine: mocks.machine,
     readOrganizationMachine: async () => null,
+    readOrganizationMachines: async () => new Map(),
 }))
 vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 vi.mock('@rerun/cloud/email', () => ({ EMAIL_DELIVERY: false, sendWorkspaceInviteEmail: vi.fn(async () => ({ ok: true, id: null })), BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.test/og') }))
@@ -46,7 +47,7 @@ function form(): FormData {
 // Every action of the console, what it takes and what it asks of the caller. An action missing here
 // fails the first test: it must say where it stands before it ships.
 const CONSOLE: Record<string, { args: Call; reads?: true; min: 'admin' | 'owner'; workspace: boolean }> = {
-    listOrganizationWorkspacesAction: { args: () => [], reads: true, min: 'admin', workspace: false },
+    loadOrganizationOverviewAction: { args: () => [], reads: true, min: 'admin', workspace: false },
     loadOrganizationWorkspaceAction: { args: id => [id], reads: true, min: 'admin', workspace: true },
     createOrganizationWorkspaceAction: { args: () => [form()], min: 'admin', workspace: false },
     archiveOrganizationWorkspaceAction: { args: id => [id], min: 'admin', workspace: true },
@@ -56,6 +57,8 @@ const CONSOLE: Record<string, { args: Call; reads?: true; min: 'admin' | 'owner'
     openOrganizationWorkspaceAction: { args: id => [id], min: 'admin', workspace: true },
     listOrganizationWorkspaceMembersAction: { args: id => [id], reads: true, min: 'admin', workspace: true },
     inviteOrganizationWorkspaceMemberAction: { args: id => [id, 'new@acme.test', 'member'], min: 'admin', workspace: true },
+    resendOrganizationWorkspaceInvitationAction: { args: (id, _person, invitation) => [id, invitation], min: 'admin', workspace: true },
+    readOrganizationWorkspaceInvitationUrlAction: { args: (id, _person, invitation) => [id, invitation], min: 'admin', workspace: true },
     revokeOrganizationWorkspaceInvitationAction: { args: (id, _person, invitation) => [id, invitation], min: 'admin', workspace: true },
     removeOrganizationWorkspaceMemberAction: { args: (id, person) => [id, person], min: 'admin', workspace: true },
     setOrganizationWorkspaceMemberRoleAction: { args: (id, person) => [id, person, 'member'], min: 'admin', workspace: true },
@@ -141,7 +144,7 @@ describe('another organization', () => {
     })
 
     it('shows nothing of itself in a list', async () => {
-        for (const name of ['listOrganizationWorkspacesAction', 'loadOrganizationCreditAction', 'listOrganizationTeamAction', 'loadOrganizationBrandAction', 'listOrganizationDomainsAction']) expect(JSON.stringify(await run(name, []))).not.toMatch(/Rival|havre|Havre/)
+        for (const name of ['loadOrganizationOverviewAction', 'loadOrganizationCreditAction', 'listOrganizationTeamAction', 'loadOrganizationBrandAction', 'listOrganizationDomainsAction']) expect(JSON.stringify(await run(name, []))).not.toMatch(/Rival|havre|Havre/)
     })
 })
 

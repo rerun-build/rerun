@@ -8,7 +8,8 @@ import { brandOfOrganization } from '@/ee/services/organization-brand.service'
 import { requireActiveOrganization, requireOrganizationContext } from '@/ee/services/organization-context.service'
 import { allocateOrganizationCredit, loadOrganizationCredit, MAX_CREDITS_PER_MOVEMENT, takeBackOrganizationCredit, type OrganizationCredit } from '@/ee/services/organization-credit.service'
 import { addOrganizationDomain, checkOrganizationDomain, listOrganizationDomains, removeOrganizationDomain, type OrganizationDomains } from '@/ee/services/organization-domains.service'
-import { inviteOrganizationWorkspaceMember, listOrganizationWorkspaceMembers, removeOrganizationWorkspaceMember, revokeOrganizationWorkspaceInvitation, setOrganizationWorkspaceMemberRole } from '@/ee/services/organization-members.service'
+import { inviteOrganizationWorkspaceMember, listOrganizationWorkspaceMembers, readOrganizationWorkspaceInvitationUrl, removeOrganizationWorkspaceMember, resendOrganizationWorkspaceInvitation, revokeOrganizationWorkspaceInvitation, setOrganizationWorkspaceMemberRole } from '@/ee/services/organization-members.service'
+import { loadOrganizationOverview, type OrganizationOverview } from '@/ee/services/organization-overview.service'
 import { loadOrganizationBrandSettings, updateOrganizationBrand, type OrganizationBrandSettings } from '@/ee/services/organization-settings.service'
 import { brandReachedBy } from '@/ee/services/organization-reach.service'
 import { openOrganizationWorkspace } from '@/ee/services/organization-staff.service'
@@ -17,12 +18,11 @@ import {
     archiveOrganizationWorkspace,
     createOrganizationWorkspace,
     deleteOrganizationWorkspace,
-    listOrganizationWorkspaces,
     loadOrganizationWorkspace,
     restartOrganizationWorkspace,
     restoreOrganizationWorkspace,
+    type CreatedWorkspace,
     type OrganizationWorkspaceDetail,
-    type OrganizationWorkspaceSummary,
 } from '@/ee/services/organization-workspaces.service'
 import { hostOrganizationId } from '@/lib/brand/request-site'
 import { AppError, failure, type ActionFailure, type ErrorCode } from '@/lib/i18n/action-error'
@@ -39,6 +39,7 @@ const boxScopeSchema = z.enum(['all', 'assigned'])
 const teamRoleSchema = z.enum(['owner', 'admin'])
 const tokenSchema = z.string().min(1).max(100)
 const creditChangeSchema = z.object({ workspaceId: workspaceIdSchema, credits: z.number().int().min(1).max(MAX_CREDITS_PER_MOVEMENT), requestId: uuidSchema })
+const startingCreditSchema = creditChangeSchema.omit({ workspaceId: true }).optional()
 const hostnameSchema = z.string().max(300)
 const seqSchema = z.number().int().positive().optional()
 
@@ -57,10 +58,9 @@ function answered(result: { ok: true; inviteUrl?: string } | ActionFailure | { o
     return failure('generic')
 }
 
-export async function listOrganizationWorkspacesAction(): Promise<Result<{ workspaces: OrganizationWorkspaceSummary[]; maxWorkspaces: number }>> {
+export async function loadOrganizationOverviewAction(): Promise<Result<OrganizationOverview>> {
     try {
-        const ctx = await requireOrganizationContext()
-        return { ok: true, workspaces: await listOrganizationWorkspaces(ctx), maxWorkspaces: ctx.organization.max_workspaces }
+        return { ok: true, ...(await loadOrganizationOverview(await requireOrganizationContext())) }
     } catch (err) {
         return refused(err)
     }
@@ -76,10 +76,10 @@ export async function loadOrganizationWorkspaceAction(workspaceId: number): Prom
 }
 
 // name, adminEmail, locale and the logo of a workspace form (iconFile, logoFile or logoLink).
-export async function createOrganizationWorkspaceAction(formData: FormData): Promise<Result<{ workspaceId: number; inviteUrl?: string }>> {
+export async function createOrganizationWorkspaceAction(formData: FormData, starting?: { credits: number; requestId: string }): Promise<Result<CreatedWorkspace>> {
     try {
         const ctx = await requireActiveOrganization()
-        return { ok: true, ...(await createOrganizationWorkspace(ctx, z.instanceof(FormData).parse(formData))) }
+        return { ok: true, ...(await createOrganizationWorkspace(ctx, z.instanceof(FormData).parse(formData), startingCreditSchema.parse(starting) ?? null)) }
     } catch (err) {
         return refused(err, 'createWorkspaceFailed')
     }
@@ -155,6 +155,24 @@ export async function inviteOrganizationWorkspaceMemberAction(workspaceId: numbe
         return answered(await inviteOrganizationWorkspaceMember(ctx, workspaceIdSchema.parse(workspaceId), emailSchema.parse(email), workspaceRoleSchema.parse(role), boxScopeSchema.parse(boxScope)))
     } catch (err) {
         return refused(err, 'sendInvitationFailed')
+    }
+}
+
+export async function resendOrganizationWorkspaceInvitationAction(workspaceId: number, invitationId: string): Promise<Result<{ inviteUrl?: string }>> {
+    try {
+        const ctx = await requireActiveOrganization()
+        return answered(await resendOrganizationWorkspaceInvitation(ctx, workspaceIdSchema.parse(workspaceId), uuidSchema.parse(invitationId)))
+    } catch (err) {
+        return refused(err, 'sendInvitationFailed')
+    }
+}
+
+export async function readOrganizationWorkspaceInvitationUrlAction(workspaceId: number, invitationId: string): Promise<Result<{ inviteUrl: string }>> {
+    try {
+        const ctx = await requireActiveOrganization()
+        return { ok: true, inviteUrl: await readOrganizationWorkspaceInvitationUrl(ctx, workspaceIdSchema.parse(workspaceId), uuidSchema.parse(invitationId)) }
+    } catch (err) {
+        return refused(err)
     }
 }
 
