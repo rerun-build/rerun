@@ -9,7 +9,6 @@
         "productHuntAlt": "Rerun for Agencies - Coworkers de IA prontos para usar para os seus clientes, com a sua marca. | Product Hunt"
     },
     "partner": "Seja um parceiro",
-    "mailSubject": "White label para a minha agência",
     "perks": {
         "title": "Plug and play. <fade>De bandeja.</fade>",
         "lead": "Entregue aos seus clientes um app de IA simples que funciona desde o primeiro dia e gerencie todos em um só lugar, com a sua marca.",
@@ -140,7 +139,7 @@
             },
             "start": {
                 "question": "Como eu começo?",
-                "answer": "Escreva para os fundadores. Vemos quem são seus clientes e quais Coworkers você quer vender, depois configuramos a sua marca com você."
+                "answer": "Agende uma chamada com os fundadores. Vemos quem são seus clientes e quais Coworkers você quer vender, depois configuramos a sua marca com você."
             },
             "brand": {
                 "question": "Posso usar meu próprio domínio, cores e logo?",
@@ -168,7 +167,7 @@
             },
             "cost": {
                 "question": "Quanto custa o white label?",
-                "answer": "Depende de quantos clientes você tem nele. Escreva para os fundadores e enviamos um preço."
+                "answer": "Depende de quantos clientes você tem nele. Agende uma chamada com os fundadores e passamos um preço."
             },
             "ai": {
                 "question": "Quem paga pela IA?",

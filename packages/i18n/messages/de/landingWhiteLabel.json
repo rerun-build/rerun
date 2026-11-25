@@ -9,7 +9,6 @@
         "productHuntAlt": "Rerun for Agencies - Sofort startklare KI-Coworker für deine Kunden, unter deiner Marke. | Product Hunt"
     },
     "partner": "Partner werden",
-    "mailSubject": "White Label für meine Agentur",
     "perks": {
         "title": "Plug-and-play. <fade>Auf dem Silbertablett.</fade>",
         "lead": "Gib deinen Kunden eine einfache KI-App, die vom ersten Tag an läuft, und verwalte alle an einem Ort, unter deiner Marke.",
@@ -140,7 +139,7 @@
             },
             "start": {
                 "question": "Wie fange ich an?",
-                "answer": "Schreib den Gründern. Wir schauen uns deine Kunden und die Coworker an, die du verkaufen willst, und richten dann deine Marke mit dir ein."
+                "answer": "Buch einen Anruf mit den Gründern. Wir schauen uns deine Kunden und die Coworker an, die du verkaufen willst, und richten dann deine Marke mit dir ein."
             },
             "brand": {
                 "question": "Kann ich meine eigene Domain, Farben und Logo nutzen?",
@@ -168,7 +167,7 @@
             },
             "cost": {
                 "question": "Was kostet White Label?",
-                "answer": "Das hängt davon ab, wie viele Kunden du damit betreust. Schreib den Gründern, und wir schicken dir einen Preis."
+                "answer": "Das hängt davon ab, wie viele Kunden du damit betreust. Buch einen Anruf mit den Gründern, und wir nennen dir einen Preis."
             },
             "ai": {
                 "question": "Wer bezahlt die KI?",

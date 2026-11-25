@@ -9,7 +9,6 @@
         "productHuntAlt": "Rerun for Agencies - Müşterileriniz için kendi markanızla tak çalıştır AI coworker'lar. | Product Hunt"
     },
     "partner": "İş ortağı olun",
-    "mailSubject": "Ajansım için beyaz etiket",
     "perks": {
         "title": "Tak çalıştır. <fade>Her şey hazır önünüzde.</fade>",
         "lead": "Müşterilerinize ilk günden çalışan basit bir AI uygulaması sunun, hepsini kendi markanızla tek yerden yönetin.",
@@ -140,7 +139,7 @@
             },
             "start": {
                 "question": "Nasıl başlarım?",
-                "answer": "Kuruculara yazın. Müşterilerinize ve satmak istediğiniz Coworker'lara bakar, ardından markanızı sizinle birlikte kurarız."
+                "answer": "Kurucularla bir görüşme ayarlayın. Müşterilerinize ve satmak istediğiniz Coworker'lara bakar, ardından markanızı sizinle birlikte kurarız."
             },
             "brand": {
                 "question": "Kendi alan adım, renklerim ve logom olur mu?",
@@ -168,7 +167,7 @@
             },
             "cost": {
                 "question": "Beyaz etiketin fiyatı ne kadar?",
-                "answer": "Kaç müşteriyle kullandığınıza bağlı. Kuruculara yazın, size bir fiyat gönderelim."
+                "answer": "Kaç müşteriyle kullandığınıza bağlı. Kurucularla bir görüşme ayarlayın, size bir fiyat verelim."
             },
             "ai": {
                 "question": "AI'ın ücretini kim öder?",

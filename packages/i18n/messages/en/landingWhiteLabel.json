@@ -3,8 +3,7 @@
         "metaTitle": "Title of the page in search results and the browser tab.",
         "hero.lead": "First line of the H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep the line about as long as in English.",
         "hero.productHuntAlt": "Alt text of the Product Hunt badge. \"Rerun for Agencies\" is the name of the launch and \"Product Hunt\" the site: keep both as they are.",
-        "partner": "Button that writes an email to the founders.",
-        "mailSubject": "Subject of the email the button opens.",
+        "partner": "Button that books a call with the founders.",
         "perks.title": "<fade> is greyed.",
         "jobs.title": "<chip> wraps the word drawn as a rotating avatar pill. <end> goes to a second line on a wide screen.",
         "clients.title": "<chip> wraps the word drawn as a rotating avatar pill.",
@@ -24,7 +23,6 @@
         "productHuntAlt": "Rerun for Agencies - Plug-and-play AI coworkers for your clients, on your brand. | Product Hunt"
     },
     "partner": "Become a partner",
-    "mailSubject": "White label for my agency",
     "perks": {
         "title": "Plug and play. <fade>Served on a plate.</fade>",
         "lead": "Hand your clients a simple AI app that works on day one, and run them all from one place, under your brand.",
@@ -155,7 +153,7 @@
             },
             "start": {
                 "question": "How do I get started?",
-                "answer": "Write to the founders. We look at your clients and the Coworkers you want to sell, then set up your brand with you."
+                "answer": "Book a call with the founders. We look at your clients and the Coworkers you want to sell, then set up your brand with you."
             },
             "brand": {
                 "question": "Can I use my own domain, colors and logo?",
@@ -183,7 +181,7 @@
             },
             "cost": {
                 "question": "How much does the white label cost?",
-                "answer": "It depends on how many clients you run on it. Write to the founders and we will send you a price."
+                "answer": "It depends on how many clients you run on it. Book a call with the founders and we will give you a price."
             },
             "ai": {
                 "question": "Who pays for the AI?",

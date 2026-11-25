@@ -9,7 +9,6 @@
         "productHuntAlt": "Rerun for Agencies : des coworkers IA clé en main pour vos clients, sous votre marque. | Product Hunt"
     },
     "partner": "Devenir partenaire",
-    "mailSubject": "Marque blanche pour mon agence",
     "perks": {
         "title": "Clé en main. <fade>Servi sur un plateau.</fade>",
         "lead": "Offrez à vos clients une app IA simple, prête dès le premier jour, et gérez-les tous au même endroit, sous votre marque.",
@@ -140,7 +139,7 @@
             },
             "start": {
                 "question": "Comment démarrer ?",
-                "answer": "Écrivez aux fondateurs. Nous regardons vos clients et les Coworkers que vous voulez vendre, puis nous mettons en place votre marque avec vous."
+                "answer": "Réservez un appel avec les fondateurs. Nous regardons vos clients et les Coworkers que vous voulez vendre, puis nous mettons en place votre marque avec vous."
             },
             "brand": {
                 "question": "Puis-je utiliser mon domaine, mes couleurs et mon logo ?",
@@ -168,7 +167,7 @@
             },
             "cost": {
                 "question": "Combien coûte la marque blanche ?",
-                "answer": "Cela dépend du nombre de clients que vous y gérez. Écrivez aux fondateurs et nous vous enverrons un prix."
+                "answer": "Cela dépend du nombre de clients que vous y gérez. Réservez un appel avec les fondateurs et nous vous donnerons un prix."
             },
             "ai": {
                 "question": "Qui paie l’IA ?",

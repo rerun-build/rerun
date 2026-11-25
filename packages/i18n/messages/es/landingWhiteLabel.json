@@ -9,7 +9,6 @@
         "productHuntAlt": "Rerun for Agencies: coworkers de IA listos para usar para tus clientes, con tu marca. | Product Hunt"
     },
     "partner": "Hazte partner",
-    "mailSubject": "Marca blanca para mi agencia",
     "perks": {
         "title": "Listo para usar. <fade>Servido en bandeja.</fade>",
         "lead": "Dales a tus clientes una app de IA sencilla que funciona desde el primer día, y gestiónalos a todos desde un solo lugar, con tu marca.",
@@ -140,7 +139,7 @@
             },
             "start": {
                 "question": "¿Cómo empiezo?",
-                "answer": "Escribe a los fundadores. Vemos tus clientes y los Coworkers que quieres vender, y configuramos tu marca contigo."
+                "answer": "Reserva una llamada con los fundadores. Vemos tus clientes y los Coworkers que quieres vender, y configuramos tu marca contigo."
             },
             "brand": {
                 "question": "¿Puedo usar mi propio dominio, colores y logo?",
@@ -168,7 +167,7 @@
             },
             "cost": {
                 "question": "¿Cuánto cuesta la marca blanca?",
-                "answer": "Depende de cuántos clientes gestiones con ella. Escribe a los fundadores y te enviaremos un precio."
+                "answer": "Depende de cuántos clientes gestiones con ella. Reserva una llamada con los fundadores y te daremos un precio."
             },
             "ai": {
                 "question": "¿Quién paga la IA?",
