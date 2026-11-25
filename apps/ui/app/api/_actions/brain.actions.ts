@@ -113,10 +113,19 @@ export type BrainPageInput = { title: string; type: BrainPageType; content: stri
 
 export type BrainWriteResult = { ok: true; detail: engine.BrainPageDetail } | (ActionFailure & { conflict: boolean })
 
-export async function saveBrainPageAction(slug: string, input: BrainPageInput): Promise<BrainWriteResult> {
+// A new page written from a Box is filed under it right after: the engine's write takes no Box, and
+// filing it through its own route works on every engine already out there. A filing that fails
+// leaves the page written, under Everyone, where its Box property moves it in one click.
+export async function saveBrainPageAction(slug: string, input: BrainPageInput, filing?: { spaceId: string }): Promise<BrainWriteResult> {
     try {
         const { conn, author } = await authorContext()
-        return { ok: true, detail: await engine.writeBrainPage(conn, slug, { ...input, author }) }
+        const detail = await engine.writeBrainPage(conn, slug, { ...input, author })
+        if (!filing) return { ok: true, detail }
+        try {
+            return { ok: true, detail: await engine.setBrainPageMeta(conn, slug, brainItemMetaPatchSchema.parse(filing)) }
+        } catch {
+            return { ok: true, detail }
+        }
     } catch (err) {
         const conflict = err instanceof engine.EngineRequestError && err.status === 409
         return { ok: false, conflict, ...(conflict ? refusal('brainPageConflict') : refusalOf(err, 'saveBrainPageFailed')) }

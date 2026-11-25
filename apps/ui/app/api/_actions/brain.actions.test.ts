@@ -5,7 +5,7 @@ import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createBrainSkillAction, listBrainProposalsAction, listBrainSkillsAction, loadBrainAction, setBrainFilesMetaAction } from './brain.actions'
+import { createBrainSkillAction, listBrainProposalsAction, listBrainSkillsAction, loadBrainAction, saveBrainPageAction, setBrainFilesMetaAction } from './brain.actions'
 import { listWorkspaceTablesAction } from './workspace-db.actions'
 import { listWorkspaceFilesAction } from './workspace-file.actions'
 
@@ -34,6 +34,8 @@ vi.mock('@/lib/engine/client', () => ({
     listBrainSkills: vi.fn(async () => []),
     createBrainSkill: vi.fn(),
     setBrainFileMeta: vi.fn(),
+    writeBrainPage: vi.fn(),
+    setBrainPageMeta: vi.fn(),
     listBrainProposals: vi.fn(),
     listDbTables: vi.fn(),
     listFiles: vi.fn(),
@@ -165,5 +167,35 @@ describe('the Boxes the Brain files under', () => {
         vi.mocked(engine.setBrainFileMeta).mockResolvedValue([])
         await expect(setBrainFilesMetaAction({ paths: ['brand-kit', 'brand-kit/logo.svg'], tags: ['brand'], spaceId: 'b2' })).resolves.toEqual({ ok: true, value: [] })
         expect(engine.setBrainFileMeta).toHaveBeenCalledWith(undefined, { paths: ['brand-kit', 'brand-kit/logo.svg'], tags: ['brand'], spaceId: 'b2', author: 'user:theo@example.com' })
+    })
+})
+
+describe('a page written from the Brain', () => {
+    const input = { title: 'Launch post ideas', type: 'note' as const, content: '', sources: [], baseHash: null }
+    const written = { page: { slug: 'launch-post-ideas', spaceId: null }, revisions: [] } as never
+    const filed = { page: { slug: 'launch-post-ideas', spaceId: 'b2' }, revisions: [] } as never
+
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(requireWorkspaceContext).mockResolvedValue({ workspace: { id: 7 }, userId: 'u1', userEmail: 'theo@example.com', supabase: {} } as never)
+        vi.mocked(getWorkspaceConnection).mockResolvedValue(conn)
+        vi.mocked(engine.writeBrainPage).mockResolvedValue(written)
+        vi.mocked(engine.setBrainPageMeta).mockResolvedValue(filed)
+    })
+
+    it('is filed under the Box it was started in', async () => {
+        await expect(saveBrainPageAction('launch-post-ideas', input, { spaceId: 'b2' })).resolves.toEqual({ ok: true, detail: filed })
+        expect(engine.writeBrainPage).toHaveBeenCalledWith(conn, 'launch-post-ideas', { ...input, author: 'user:theo@example.com' })
+        expect(engine.setBrainPageMeta).toHaveBeenCalledWith(conn, 'launch-post-ideas', { spaceId: 'b2' })
+    })
+
+    it('files nothing when it was started for everyone', async () => {
+        await expect(saveBrainPageAction('launch-post-ideas', input)).resolves.toEqual({ ok: true, detail: written })
+        expect(engine.setBrainPageMeta).not.toHaveBeenCalled()
+    })
+
+    it('stays written, under Everyone, when its filing fails', async () => {
+        vi.mocked(engine.setBrainPageMeta).mockRejectedValue(new engine.EngineRequestError('rerun-engine PATCH failed: 500', 500))
+        await expect(saveBrainPageAction('launch-post-ideas', input, { spaceId: 'b2' })).resolves.toEqual({ ok: true, detail: written })
     })
 })
