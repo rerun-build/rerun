@@ -1,7 +1,7 @@
 import { AuthTerms } from '@/components/auth/AuthShell'
 import { RerunOnly } from '@/components/brand/RerunOnly'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { TrustStrip } from '@/components/onboarding/TrustStrip'
 import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
 import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'

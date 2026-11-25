@@ -3,6 +3,7 @@ import type { BrainPage } from '@rerun/contracts'
 import type { CompanyFinding, CompanyFindingsRow } from '@/lib/company/explore/findings'
 import { describeNeed } from '@/lib/foreman/needs'
 import { foremanUseCases, type ForemanAnswers } from '@/lib/foreman/phase'
+import { sectorById } from '@/lib/onboarding/sectors'
 import type { Evidence, EvidenceDraft } from './types'
 
 const TEXT_MAX = 420
@@ -122,6 +123,7 @@ export function answersEvidence(answers: ForemanAnswers, { withProfile }: { with
         add('answers:profile', 'Audience', answers.company_audience)
     }
     add('answers:industry', 'Industry', answers.industry)
+    add('answers:sector', 'Line of work', answers.onboarding?.industryLabel ?? sectorById(answers.onboarding?.sector)?.about)
     if (answers.tools?.length) add('answers:tools', 'Apps they picked', `Picked these apps at onboarding, in this order: ${answers.tools.join(', ')}`)
 
     const foreman = answers.foreman ?? {}

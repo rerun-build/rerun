@@ -24,7 +24,7 @@ const MAX_ROLE = 90
  * designs their coworker instead.
  */
 export async function loadStarterPack(ctx: WorkspaceContext, state: ForemanState): Promise<StarterPackInput | null> {
-    const cards = starterPack(state.answers.industry)
+    const cards = starterPack(state.answers.industry, state.answers.onboarding?.sector)
     const { data } = await selectMany(ctx.supabase, 'templates', LIBRARY_COLUMNS, { slug: cards.map(card => card.template), status: 'published' })
     const bySlug = new Map(
         toLibraryTemplates((data ?? []) as LibraryRow[])

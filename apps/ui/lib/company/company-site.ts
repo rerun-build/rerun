@@ -29,8 +29,7 @@ export async function readCompanySite(input: string): Promise<CompanySite | null
     return { url: analysis.analysis.url, profile, industry: profile.industry && isTemplateCategory(profile.industry) ? profile.industry : null }
 }
 
-/** The answers with the company's site in them. */
-export function withCompanySite(answers: ForemanAnswers, site: CompanySite): ForemanAnswers {
+function withCompanySite(answers: ForemanAnswers, site: CompanySite): ForemanAnswers {
     return {
         ...answers,
         company_url: site.url,

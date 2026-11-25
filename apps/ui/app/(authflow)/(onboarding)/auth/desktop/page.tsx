@@ -1,6 +1,6 @@
 import { isPkceChallenge } from '@/app/api/_services/desktop-auth.service'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { createClient } from '@/supabase/server'
 import { isDesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'

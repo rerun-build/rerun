@@ -5,13 +5,14 @@ export default {
     watches: ['apps/ui/components/onboarding/', 'apps/ui/app/(authflow)/(onboarding)/welcome/', 'apps/ui/components/chat/', 'packages/i18n/messages/en/onboarding.json'],
     shots: [
         {
-            name: 'website-question',
+            name: 'line-of-work',
             account: 'onboarding',
             open: async ({ page, base, demo }) => {
                 await demo.onboarding.setAnswers({})
                 await visit(page, base, '/')
+                await page.getByRole('button', { name: 'Agency', exact: true }).click()
             },
-            ready: ({ page }) => page.getByText("What's your website?"),
+            ready: ({ page }) => page.getByText('Find your next clients'),
             frame: body,
         },
         {

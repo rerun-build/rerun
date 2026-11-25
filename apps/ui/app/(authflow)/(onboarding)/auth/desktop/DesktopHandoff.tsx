@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { CopyLine } from '@/components/dialogs/CopyLine'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'

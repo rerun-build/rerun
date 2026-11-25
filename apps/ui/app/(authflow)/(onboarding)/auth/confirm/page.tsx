@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { TEAM_SIGN_IN_PARAM } from '@/lib/auth/team-session'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'

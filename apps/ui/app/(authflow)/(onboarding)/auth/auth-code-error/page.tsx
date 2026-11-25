@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'

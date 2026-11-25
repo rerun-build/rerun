@@ -73,7 +73,7 @@ async function saveCompanyWebsite(actor: Actor, args: Record<string, unknown>) {
     const { workspaceId } = actor
     if (args.none === true) {
         const answers = await skipCompanySite({ supabase, workspaceId })
-        return { saved: false, next: firstCoworkersOffer(answers.industry) }
+        return { saved: false, next: firstCoworkersOffer(answers) }
     }
     const input = requireString(args.url, 'url')
     const platform = platformHost(input)
@@ -82,7 +82,7 @@ async function saveCompanyWebsite(actor: Actor, args: Record<string, unknown>) {
     if (!site) throw new Error('That does not look like a website address. Ask them for it again.')
     const userId = actor.kind === 'user' ? actor.userId : await founderOf(workspaceId)
     const answers = await saveCompanySite({ supabase, workspaceId, userId }, site)
-    return { saved: true, url: site.url, company: site.profile, next: `${site.profile ? 'Say in one sentence what you understood of their company.' : 'The site could not be read: say so in one short line, and never invent what they do.'} ${firstCoworkersOffer(answers.industry)}` }
+    return { saved: true, url: site.url, company: site.profile, next: `${site.profile ? 'Say in one sentence what you understood of their company.' : 'The site could not be read: say so in one short line, and never invent what they do.'} ${firstCoworkersOffer(answers)}` }
 }
 
 // Added with the checks of the Vault's own Add page, then left for the user to sign in to: no value

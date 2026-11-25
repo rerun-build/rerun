@@ -2,61 +2,126 @@
     "metaTitle": "مرحبًا بك",
     "back": "رجوع",
     "continue": "متابعة",
-    "site": {
-        "title": "ما موقعك الإلكتروني؟",
-        "titleNamed": "مرحبًا {name}، ما موقعك الإلكتروني؟",
-        "description": "نقرؤه ونجهّز لوحتك بالفريق المناسب.",
-        "label": "موقع الشركة",
-        "placeholder": "acme.com",
-        "continue": "متابعة",
-        "skip": "ليس لدي موقع"
+    "sector": {
+        "title": "أخبرنا بما تعمل فيه",
+        "description": "اختر الأقرب، أو ابحث عن مجالك.",
+        "search": "ابحث عن مجال عملك",
+        "placeholder": "ابحث، مثل: طالب، مخبز…",
+        "more": "عرض المزيد",
+        "use": "استخدم «{words}»",
+        "notListed": "لا يوجد شيء بهذا الاسم، ولا بأس: سنعتمد كلماتك.",
+        "panel": {
+            "heading": "فريقك الأول",
+            "anyone": "أي نشاط",
+            "title": "يتغيّر فريقك بحسبه.",
+            "line": "تبدأ الوكالة بمن يبحث عن العملاء، والمتجر بمن يقرأ مبيعاته، ومكتب المحاماة بمن يراجع العقود. ويمكنك تغيير كل واحد منهم لاحقًا."
+        }
     },
-    "industry": {
-        "title": "ما مجال عملك؟",
-        "description": "يتغيّر فريقك بحسبه.",
-        "other": "آخر",
-        "otherLabel": "مجال عملك",
-        "otherPlaceholder": "مخبز، عيادة أسنان، نادٍ رياضي…"
+    "sectors": {
+        "freelance": {
+            "label": "عمل حر",
+            "keywords": "فريلانسر مستقل حر عمل حر مقاول مستقلة شخص واحد عمل فردي"
+        },
+        "agency": {
+            "label": "وكالة",
+            "keywords": "وكالة استوديو تسويق تصميم هوية بصرية مواقع برمجة علاقات عامة اتصال إعلان دعاية مصمم"
+        },
+        "consulting": {
+            "label": "استشارات وتدريب",
+            "keywords": "استشاري مستشار استشارات مدرب كوتش مدربة مرشد تدريب إرشاد تطوير ذاتي"
+        },
+        "creators": {
+            "label": "صناعة المحتوى والإعلام",
+            "keywords": "يوتيوب بودكاست نشرة بريدية مؤثر صانع محتوى كاتب كاتبة فنان موسيقي مصور"
+        },
+        "ecommerce": {
+            "label": "متجر إلكتروني",
+            "keywords": "متجر محل شوبيفاي أمازون إتسي تجزئة تجارة إلكترونية علامة تجارية دروبشيبينغ بيع أونلاين"
+        },
+        "saas": {
+            "label": "برمجيات وتقنية",
+            "keywords": "شركة ناشئة برمجيات تطبيق ساس مطور مطورة مبرمج تقنية منصة تكنولوجيا"
+        },
+        "sales": {
+            "label": "مبيعات وشركات",
+            "keywords": "مبيعات مندوب مندوبة بيع تطوير أعمال عملاء محتملون فريق المبيعات تسويق مباشر شركات"
+        },
+        "real-estate": {
+            "label": "عقارات",
+            "keywords": "عقار عقارات سمسار وسيط عقاري إيجار مؤجر مالك شقق بيوت أيربنب"
+        },
+        "legal": {
+            "label": "قانون وامتثال",
+            "keywords": "محامي محامية محاماة مكتب محاماة قانون موثق كاتب عدل استشارات قانونية امتثال"
+        },
+        "finance": {
+            "label": "محاسبة ومالية",
+            "keywords": "محاسب محاسبة مدقق ضرائب مدير مالي استثمار بنك مصرف تأمين مالية"
+        },
+        "recruiting": {
+            "label": "توظيف وموارد بشرية",
+            "keywords": "توظيف موارد بشرية استقطاب مسؤول توظيف موظفين كفاءات مواهب شؤون الموظفين"
+        },
+        "health": {
+            "label": "صحة وعافية",
+            "keywords": "طبيب طبيبة طبيب أسنان عيادة معالج علاج طبيعي نادي رياضي يوغا تجميل صالون"
+        },
+        "education": {
+            "label": "تعليم وتدريب",
+            "keywords": "مدرسة معلم معلمة مدرس مدرسة خصوصية دروس خصوصية دورة أكاديمية معهد تعليم"
+        },
+        "hospitality": {
+            "label": "مطاعم وضيافة",
+            "keywords": "مقهى كافيه مطعم مخبز مخبوزات فندق تموين ولائم مناسبات فعاليات أعراس حلويات"
+        },
+        "trades": {
+            "label": "حِرف وخدمات منزلية",
+            "keywords": "سباك كهربائي بنّاء مقاول بناء تنظيف إصلاح صيانة بستاني نجار دهان"
+        },
+        "nonprofit": {
+            "label": "منظمة غير ربحية",
+            "keywords": "جمعية منظمة غير ربحية خيرية مؤسسة وقف مسجد كنيسة نادٍ تطوع"
+        },
+        "personal": {
+            "label": "استخدام شخصي",
+            "keywords": "شخصي لنفسي حياتي هواية مشروع جانبي مشروع شخصي عائلة منزل أسرة"
+        },
+        "student": {
+            "label": "طالب",
+            "keywords": "طالب طالبة دراسة جامعة كلية مدرسة ماجستير دكتوراه رسالة بحث تعلم"
+        }
     },
-    "role": {
-        "title": "ما دورك هناك؟",
-        "description": "زميلك الأول يعمل من أجلك.",
-        "other": "دور آخر",
-        "otherLabel": "دورك",
-        "otherPlaceholder": "رئيس النمو"
-    },
-    "roles": {
-        "founderAgencyOwner": "مؤسس / مالك وكالة",
-        "accountOrClientLead": "مسؤول حسابات أو عملاء",
-        "marketingCreative": "تسويق / إبداع",
-        "operations": "العمليات",
-        "founderStoreOwner": "مؤسس / مالك متجر",
-        "marketingGrowth": "تسويق / نمو",
-        "customerCare": "خدمة العملاء",
-        "operationsLogistics": "العمليات / الخدمات اللوجستية",
-        "founderCeo": "مؤسس / رئيس تنفيذي",
-        "productOrEngineering": "المنتج أو الهندسة",
-        "salesOrSupport": "المبيعات أو الدعم",
-        "salesRepOrAe": "مندوب مبيعات أو مدير حسابات",
-        "salesLeadership": "قيادة المبيعات",
-        "marketingDemandGen": "تسويق / توليد الطلب",
-        "recruiter": "مسؤول توظيف",
-        "talentOrHrLead": "مسؤول مواهب أو موارد بشرية",
-        "founderBroker": "مؤسس / وسيط",
-        "agent": "وكيل",
-        "propertyOrPortfolioManager": "مدير عقارات أو محافظ",
-        "marketing": "التسويق",
-        "founderPartner": "مؤسس / شريك",
-        "lawyerOrCounsel": "محامٍ أو مستشار قانوني",
-        "paralegalOrLegalOps": "مساعد قانوني أو عمليات قانونية",
-        "businessDevelopment": "تطوير الأعمال",
-        "creatorFounder": "صانع محتوى / مؤسس",
-        "editorOrWriter": "محرر أو كاتب",
-        "communityOrSocial": "المجتمع أو التواصل الاجتماعي",
-        "sponsorshipsBusiness": "الرعايات / الأعمال",
-        "financeOrAdmin": "المالية أو الإدارة",
-        "projectOrTeamLead": "قائد مشروع أو فريق",
-        "sales": "المبيعات"
+    "promises": {
+        "briefMeEveryMorning": "أطلعني على المستجدات كل صباح",
+        "chaseMyUnpaidInvoices": "تابع فواتيري غير المدفوعة",
+        "keepMyProjectsOnTrack": "أبقِ مشاريعي على المسار",
+        "closeMyBooksEveryMonth": "أقفل حساباتي كل شهر",
+        "findMyNextHire": "ابحث عن موظفي القادم",
+        "findOwnersAboutToSell": "اعثر على ملّاك يوشكون على البيع",
+        "runYourRentalsWithoutTheChasing": "أدر إيجاراتك دون ملاحقة",
+        "knowIfADealIsWorthIt": "اعرف إن كانت الصفقة تستحق",
+        "findYourNextClients": "اعثر على عملائك القادمين",
+        "getFoundOnGoogle": "ظهر في نتائج Google",
+        "deliverClientProjectsOnTime": "سلّم مشاريع العملاء في موعدها",
+        "bookMoreDemos": "احجز المزيد من العروض التجريبية",
+        "saveAccountsBeforeTheyChurn": "أنقذ الحسابات قبل أن تغادر",
+        "makeTheNextLaunchLand": "انجح في إطلاقك القادم",
+        "bookMoreMeetings": "احجز المزيد من الاجتماعات",
+        "seeThePipelineBeforeYourMondayCall": "شاهد مسار المبيعات قبل مكالمة الاثنين",
+        "walkIntoEveryMeetingPrepared": "ادخل كل اجتماع وأنت مستعد",
+        "knowWhatYourStoreDidThisWeek": "اعرف ما حققه متجرك هذا الأسبوع",
+        "winBackTheAbandonedCarts": "استرجع السلال المتروكة",
+        "getTheOrdersOutTheDoor": "أنجز شحن الطلبات",
+        "postEverywhereWithoutDoingItTwice": "انشر في كل مكان دون تكرار العمل",
+        "neverRunOutOfContentIdeas": "لا تنفد أفكار المحتوى أبدًا",
+        "turnOneIdeaIntoAFinishedArticle": "حوّل فكرة واحدة إلى مقال مكتمل",
+        "reviewContractsBeforeYouSign": "راجع العقود قبل أن توقّع",
+        "stayAuditReady": "كن جاهزًا دائمًا للتدقيق",
+        "buildACaseFileFromAClientMatter": "كوّن ملف قضية من ملف العميل",
+        "findAndScreenYourNextHires": "اعثر على موظفيك القادمين وافرزهم",
+        "onboardEveryNewHireProperly": "استقبل كل موظف جديد كما ينبغي",
+        "runPayrollWithoutTheErrors": "أعدّ الرواتب دون أخطاء",
+        "keepMyCourseworkOnTrack": "أبقِ واجباتي الدراسية على المسار"
     },
     "team": {
         "title": "ادعُ فريقك",
@@ -94,18 +159,6 @@
         "enterAnyway": "الدخول على أي حال",
         "enter": "هيا بنا",
         "wait": "لحظة واحدة"
-    },
-    "industries": {
-        "agencies": "الوكالات",
-        "ecommerce": "التجارة الإلكترونية",
-        "saas": "SaaS",
-        "sales": "المبيعات",
-        "recruiting": "التوظيف",
-        "real-estate": "العقارات",
-        "legal": "القانون والامتثال",
-        "creators": "صنّاع المحتوى",
-        "productivity": "الإنتاجية",
-        "other": "أخرى"
     },
     "showcase": {
         "connect": {

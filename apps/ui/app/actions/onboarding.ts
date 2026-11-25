@@ -1,3 +1,4 @@
+import type { SectorId } from '@/lib/onboarding/sectors'
 import type { WorkType } from '@/lib/onboarding/work-types'
 import type { WorkspaceView } from '@/lib/workspace-view'
 import type { TemplateCategory } from '@rerun/contracts'
@@ -35,9 +36,11 @@ export type OnboardingAnswers = {
 
 export type WelcomeProgress = {
     siteSkipped?: boolean
-    // What the read of the site filed it under: the industry question opens on it.
+    // What the read of the site filed it under.
     siteIndustry?: TemplateCategory
-    // What they typed under "Other", kept verbatim beside the bucket it was filed into.
+    // The line of work they picked, finer than the industry it was filed into.
+    sector?: SectorId
+    // What they typed instead of picking one, kept verbatim beside the bucket it was filed into.
     industryLabel?: string
     teamDone?: boolean
     // The way they chose to see the workspace. The device keeps the preference itself: this only says the question was answered.

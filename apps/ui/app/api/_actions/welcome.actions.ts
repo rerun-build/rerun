@@ -1,18 +1,19 @@
 'use server'
 
-import { isTemplateCategory, platformHost, type TemplateCategory } from '@rerun/contracts'
+import type { TemplateCategory } from '@rerun/contracts'
 
 import type { WelcomeProgress } from '@/app/actions/onboarding'
 import { requireAdminContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { ensureWorkspaceNamed } from '@/app/api/_services/naming.service'
 import { requestCompanyExplore } from '@/lib/brain/request-seed'
 import { decideIndustry } from '@/lib/company/decide-industry'
-import { readCompanySite, withCompanySite } from '@/lib/company/company-site'
+import { readCompanySite } from '@/lib/company/company-site'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import { readAnswers, saveFirstName, writeAnswers } from '@/lib/foreman/profile'
 import { failure, failureOf } from '@/lib/i18n/action-error'
 import { takeIntakeCall } from '@/lib/onboarding/anonymous-intake-quota'
 import type { ForemanIntake } from '@/lib/onboarding/intake'
+import { sectorById } from '@/lib/onboarding/sectors'
 import { parseWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import type { ActionResult } from './space.actions'
 
@@ -35,37 +36,6 @@ async function saveAnswers(ctx: WorkspaceContext, change: (answers: ForemanAnswe
 }
 
 const withProgress = (answers: ForemanAnswers, progress: WelcomeProgress): ForemanAnswers => ({ ...answers, onboarding: { ...answers.onboarding, ...progress } })
-
-/**
- * The company website, read for what it sells, or `null` for someone who has none. What comes back
- * is the industry the read files it under, which the next question opens already picked.
- */
-export async function saveWelcomeSiteAction(site: string | null): Promise<ActionResult<{ industry: TemplateCategory | null }>> {
-    try {
-        const ctx = await welcomeContext()
-        if (site === null) {
-            await saveAnswers(ctx, answers => {
-                const { company_url: _url, company_name: _name, company_description: _description, company_offering: _offering, company_audience: _audience, ...rest } = answers
-                return withProgress(rest, { siteSkipped: true, siteIndustry: undefined })
-            })
-            return { ok: true, industry: null }
-        }
-
-        const platform = platformHost(site)
-        if (platform) return failure('notYourCompanySite', { domain: platform })
-        const company = await readCompanySite(site)
-        if (!company) return failure('notAWebsiteAddress')
-
-        await saveAnswers(ctx, answers => withCompanySite(answers, company))
-
-        // The paid sources and the workspace name both read the address just written.
-        await requestCompanyExplore(ctx.supabase, ctx.workspace.id, company.url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
-        await ensureWorkspaceNamed({ workspaceId: ctx.workspace.id, userId: ctx.userId })
-        return { ok: true, industry: company.industry }
-    } catch (err) {
-        return failureOf(err, 'saveAnswerFailed')
-    }
-}
 
 /**
  * The app's welcome card: the site, the line of work and the role handed over at once, where the page
@@ -104,31 +74,25 @@ export async function saveWelcomeIntakeAction(intake: ForemanIntake): Promise<{ 
 }
 
 /**
- * A tile, or what they typed under "Other": kept verbatim beside the bucket it is filed into, the
- * catch-all when nothing fits.
+ * The line of work they picked, or what they typed instead: kept verbatim beside the bucket it is
+ * filed into, the catch-all when nothing fits.
  */
-export async function saveWelcomeIndustryAction(choice: { industry: TemplateCategory } | { label: string }): Promise<ActionResult<{ industry: TemplateCategory }>> {
+export async function saveWelcomeSectorAction(choice: { sector: string } | { label: string }): Promise<ActionResult<{ industry: TemplateCategory }>> {
     try {
         const ctx = await welcomeContext()
+        const sector = 'sector' in choice ? sectorById(choice.sector) : null
         const label = 'label' in choice ? choice.label.trim().slice(0, 120) : ''
-        if ('label' in choice && !label) return failure('saveAnswerFailed')
+        if (!sector && !label) return failure('saveAnswerFailed')
         const decided = label && takeIntakeCall(ctx.workspace.id, 'decide') ? ((await decideIndustry(label))?.industry ?? null) : null
-        const industry: TemplateCategory = 'industry' in choice && isTemplateCategory(choice.industry) ? choice.industry : (decided ?? 'other')
+        const industry: TemplateCategory = sector?.category ?? decided ?? 'other'
 
-        await saveAnswers(ctx, answers => withProgress({ ...answers, industry, company_offering: answers.company_offering ?? (label || undefined) }, { industryLabel: label || undefined }))
+        await saveAnswers(ctx, answers => {
+            // What they sell is only ever their own words until the site says better: a new answer
+            // replaces the words of the one before.
+            const said = answers.company_offering === answers.onboarding?.industryLabel ? undefined : answers.company_offering
+            return withProgress({ ...answers, industry, company_offering: said ?? (label || undefined) }, { sector: sector?.id, industryLabel: label || undefined })
+        })
         return { ok: true, industry }
-    } catch (err) {
-        return failureOf(err, 'saveAnswerFailed')
-    }
-}
-
-export async function saveWelcomeRoleAction(position: string): Promise<ActionResult> {
-    try {
-        const ctx = await welcomeContext()
-        const role = position.trim().slice(0, 120)
-        if (!role) return failure('saveAnswerFailed')
-        await saveAnswers(ctx, answers => ({ ...answers, position: role }))
-        return { ok: true }
     } catch (err) {
         return failureOf(err, 'saveAnswerFailed')
     }

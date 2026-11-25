@@ -3,30 +3,24 @@ import { describe, expect, it } from 'vitest'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import { needsOnboarding, onboardingStep, type NeedsOnboardingInput } from './step'
 
-const ANSWERED: ForemanAnswers = { company_url: 'https://acme.com', industry: 'saas', position: 'Founder / CEO', onboarding: { teamDone: true, view: 'board' } }
+const ANSWERED: ForemanAnswers = { industry: 'saas', onboarding: { sector: 'saas', teamDone: true, view: 'simple' } }
 
 describe('onboardingStep', () => {
     const step = (answers: ForemanAnswers, entitled = false, billing = true) => onboardingStep({ answers, entitled, billing })
 
-    it('starts on the website of a workspace that answered nothing', () => {
-        expect(step({})).toBe('site')
+    it('starts on the line of work of a workspace that answered nothing', () => {
+        expect(step({})).toBe('industry')
     })
 
-    it('moves past the website once it is given or skipped', () => {
-        expect(step({ company_url: 'https://acme.com' })).toBe('industry')
-        expect(step({ onboarding: { siteSkipped: true } })).toBe('industry')
-    })
-
-    it('asks the industry, then the role, then the team, in that order', () => {
-        expect(step({ company_url: 'https://acme.com', position: 'Founder / CEO' })).toBe('industry')
-        expect(step({ company_url: 'https://acme.com', industry: 'other', onboarding: { industryLabel: 'Bakery' } })).toBe('role')
-        expect(step({ company_url: 'https://acme.com', industry: 'saas', position: '  ' })).toBe('role')
-        expect(step({ company_url: 'https://acme.com', industry: 'saas', position: 'Sales' })).toBe('team')
-    })
-
-    it('asks how to see the workspace once the team is done', () => {
+    it('asks the team, then how to see the workspace', () => {
+        expect(step({ industry: 'other', onboarding: { industryLabel: 'Bakery' } })).toBe('team')
         expect(step({ ...ANSWERED, onboarding: { teamDone: true } })).toBe('view')
         expect(step({ ...ANSWERED, onboarding: { teamDone: true, view: 'simple' } })).toBe('trial')
+    })
+
+    it('never asks for the website nor the role, which earlier versions waited on', () => {
+        expect(step({ onboarding: { siteSkipped: true } })).toBe('industry')
+        expect(step({ company_url: 'https://acme.com', industry: 'saas' })).toBe('team')
     })
 
     it('asks for the trial once the questions are answered, unless the workspace is already entitled', () => {
@@ -39,9 +33,9 @@ describe('onboardingStep', () => {
     })
 
     it('resumes where a reload leaves it: answers written earlier are never asked again', () => {
-        const halfway: ForemanAnswers = { company_url: 'https://acme.com', industry: 'ecommerce' }
-        expect(step(halfway)).toBe('role')
-        expect(step({ ...halfway, position: 'Operations' })).toBe('team')
+        const halfway: ForemanAnswers = { industry: 'ecommerce', onboarding: { sector: 'ecommerce' } }
+        expect(step(halfway)).toBe('team')
+        expect(step({ ...halfway, onboarding: { ...halfway.onboarding, teamDone: true } })).toBe('view')
     })
 })
 

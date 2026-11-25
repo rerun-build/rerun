@@ -2,61 +2,126 @@
     "metaTitle": "Hoş geldiniz",
     "back": "Geri",
     "continue": "Devam et",
-    "site": {
-        "title": "Web siteniz nedir?",
-        "titleNamed": "Merhaba {name}, web siteniz nedir?",
-        "description": "Sitenizi okuyup panonuzu kadroyla doldururuz.",
-        "label": "Şirket web sitesi",
-        "placeholder": "acme.com",
-        "continue": "Devam et",
-        "skip": "Web sitem yok"
+    "sector": {
+        "title": "Ne iş yaptığınızı söyleyin",
+        "description": "En yakın olanı seçin ya da kendi alanınızı arayın.",
+        "search": "Çalışma alanınızı arayın",
+        "placeholder": "Arayın, örn. öğrenci, fırın…",
+        "more": "Daha fazla göster",
+        "use": "“{words}” ile devam edin",
+        "notListed": "Bu adla bir şey çıkmadı, sorun değil: sizin kelimelerinizle ilerleyeceğiz.",
+        "panel": {
+            "heading": "Başlangıç ekibiniz",
+            "anyone": "Her işletme",
+            "title": "Ekibiniz buna göre değişir.",
+            "line": "Bir ajans müşteri bulan biriyle, bir mağaza satışlarını okuyan biriyle, bir hukuk bürosu sözleşmeleri inceleyen biriyle başlar. Hepsini sonradan değiştirebilirsiniz."
+        }
     },
-    "industry": {
-        "title": "Hangi sektörde çalışıyorsunuz?",
-        "description": "Ekibiniz buna göre değişir.",
-        "other": "Diğer",
-        "otherLabel": "Sektörünüz",
-        "otherPlaceholder": "Fırın, diş kliniği, spor salonu…"
+    "sectors": {
+        "freelance": {
+            "label": "Serbest çalışan",
+            "keywords": "freelance serbest bağımsız tek kişi girişimci danışman yüklenici esnaf kendi işim"
+        },
+        "agency": {
+            "label": "Ajans",
+            "keywords": "ajans stüdyo reklam pazarlama tasarım marka web yazılım halkla ilişkiler iletişim medya dijital"
+        },
+        "consulting": {
+            "label": "Danışmanlık ve koçluk",
+            "keywords": "danışman danışmanlık koç koçluk eğitmen mentor uzman yönetim eğitimci"
+        },
+        "creators": {
+            "label": "İçerik ve medya",
+            "keywords": "youtuber podcast bülten influencer içerik üreticisi yazar sanatçı müzisyen fotoğrafçı blog gazeteci"
+        },
+        "ecommerce": {
+            "label": "Online mağaza",
+            "keywords": "e-ticaret mağaza online satış shopify trendyol hepsiburada etsy amazon perakende marka dropshipping butik"
+        },
+        "saas": {
+            "label": "Yazılım ve teknoloji",
+            "keywords": "startup girişim yazılım uygulama saas yazılımcı geliştirici bilişim teknoloji platform mühendis"
+        },
+        "sales": {
+            "label": "Satış ve B2B",
+            "keywords": "satış satışçı pazarlamacı iş geliştirme müşteri adayı b2b bayi temsilci toptan"
+        },
+        "real-estate": {
+            "label": "Gayrimenkul",
+            "keywords": "emlak emlakçı gayrimenkul danışmanı konut kiralama kiracı ev sahibi airbnb müteahhit arsa"
+        },
+        "legal": {
+            "label": "Hukuk ve uyumluluk",
+            "keywords": "avukat hukuk büro noter hukukçu danışman uyumluluk dava arabulucu"
+        },
+        "finance": {
+            "label": "Muhasebe ve finans",
+            "keywords": "muhasebeci mali müşavir vergi finans yatırım banka sigorta bütçe denetçi"
+        },
+        "recruiting": {
+            "label": "İşe alım ve İK",
+            "keywords": "işe alım ik insan kaynakları headhunter yetenek personel istihdam kariyer uzmanı"
+        },
+        "health": {
+            "label": "Sağlık ve zindelik",
+            "keywords": "doktor diş hekimi dişçi klinik terapist fizyoterapist spor salonu yoga pilates güzellik kuaför berber spa psikolog diyetisyen"
+        },
+        "education": {
+            "label": "Eğitim ve öğretim",
+            "keywords": "okul öğretmen özel ders kurs akademi eğitmen dershane üniversite anaokulu"
+        },
+        "hospitality": {
+            "label": "Restoran ve konaklama",
+            "keywords": "restoran kafe bar fırın pastane otel pansiyon catering etkinlik düğün lokanta aşçı garson"
+        },
+        "trades": {
+            "label": "Zanaat ve ev hizmetleri",
+            "keywords": "tesisatçı elektrikçi usta inşaat müteahhit temizlik tamir bahçıvan boyacı marangoz nakliyat tadilat"
+        },
+        "nonprofit": {
+            "label": "Kâr amacı gütmeyen",
+            "keywords": "dernek vakıf sivil toplum stk hayır kurumu bağış gönüllü kulüp cami kooperatif"
+        },
+        "personal": {
+            "label": "Kişisel kullanım",
+            "keywords": "kendim kişisel hobi yan proje aile ev günlük hayat bireysel özel"
+        },
+        "student": {
+            "label": "Öğrenci",
+            "keywords": "öğrenci üniversite lise okul ders tez doktora yüksek lisans araştırma ödev sınav akademik"
+        }
     },
-    "role": {
-        "title": "Orada ne iş yapıyorsunuz?",
-        "description": "İlk coworker'ınız sizin için çalışır.",
-        "other": "Başka bir şey",
-        "otherLabel": "Rolünüz",
-        "otherPlaceholder": "Büyüme Direktörü"
-    },
-    "roles": {
-        "founderAgencyOwner": "Kurucu / Ajans sahibi",
-        "accountOrClientLead": "Müşteri temsilcisi",
-        "marketingCreative": "Pazarlama / Kreatif",
-        "operations": "Operasyon",
-        "founderStoreOwner": "Kurucu / Mağaza sahibi",
-        "marketingGrowth": "Pazarlama / Büyüme",
-        "customerCare": "Müşteri hizmetleri",
-        "operationsLogistics": "Operasyon / Lojistik",
-        "founderCeo": "Kurucu / CEO",
-        "productOrEngineering": "Ürün veya Mühendislik",
-        "salesOrSupport": "Satış veya Destek",
-        "salesRepOrAe": "Satış temsilcisi veya AE",
-        "salesLeadership": "Satış yönetimi",
-        "marketingDemandGen": "Pazarlama / Talep yaratma",
-        "recruiter": "İşe alım uzmanı",
-        "talentOrHrLead": "Yetenek veya İK yöneticisi",
-        "founderBroker": "Kurucu / Broker",
-        "agent": "Emlak danışmanı",
-        "propertyOrPortfolioManager": "Mülk veya portföy yöneticisi",
-        "marketing": "Pazarlama",
-        "founderPartner": "Kurucu / Ortak",
-        "lawyerOrCounsel": "Avukat veya hukuk müşaviri",
-        "paralegalOrLegalOps": "Hukuk asistanı veya hukuk operasyonları",
-        "businessDevelopment": "İş geliştirme",
-        "creatorFounder": "İçerik üreticisi / Kurucu",
-        "editorOrWriter": "Editör veya yazar",
-        "communityOrSocial": "Topluluk veya sosyal medya",
-        "sponsorshipsBusiness": "Sponsorluk / İş",
-        "financeOrAdmin": "Finans veya İdari işler",
-        "projectOrTeamLead": "Proje veya ekip lideri",
-        "sales": "Satış"
+    "promises": {
+        "briefMeEveryMorning": "Her sabah bana özet geçsin",
+        "chaseMyUnpaidInvoices": "Ödenmemiş faturalarımı takip etsin",
+        "keepMyProjectsOnTrack": "Projelerimi yolunda tutsun",
+        "closeMyBooksEveryMonth": "Her ay hesaplarımı kapatsın",
+        "findMyNextHire": "Sıradaki çalışanımı bulsun",
+        "findOwnersAboutToSell": "Satmak üzere olan sahipleri bulsun",
+        "runYourRentalsWithoutTheChasing": "Kiralarınızı peşine düşmeden yönetin",
+        "knowIfADealIsWorthIt": "Bir anlaşmanın değip değmediğini bilin",
+        "findYourNextClients": "Sıradaki müşterilerinizi bulun",
+        "getFoundOnGoogle": "Google'da bulunun",
+        "deliverClientProjectsOnTime": "Müşteri projelerini zamanında teslim edin",
+        "bookMoreDemos": "Daha çok demo planlayın",
+        "saveAccountsBeforeTheyChurn": "Hesapları kaybetmeden önce kurtarın",
+        "makeTheNextLaunchLand": "Bir sonraki lansmanı başarıya ulaştırın",
+        "bookMoreMeetings": "Daha çok toplantı planlayın",
+        "seeThePipelineBeforeYourMondayCall": "Pazartesi görüşmenizden önce satış hattını görün",
+        "walkIntoEveryMeetingPrepared": "Her toplantıya hazırlıklı girin",
+        "knowWhatYourStoreDidThisWeek": "Mağazanızın bu hafta ne yaptığını öğrenin",
+        "winBackTheAbandonedCarts": "Terk edilen sepetleri geri kazanın",
+        "getTheOrdersOutTheDoor": "Siparişleri kapıdan çıkarın",
+        "postEverywhereWithoutDoingItTwice": "Her yerde paylaşın, iki kez uğraşmayın",
+        "neverRunOutOfContentIdeas": "İçerik fikirleriniz hiç bitmesin",
+        "turnOneIdeaIntoAFinishedArticle": "Tek bir fikri bitmiş bir yazıya dönüştürün",
+        "reviewContractsBeforeYouSign": "Sözleşmeleri imzalamadan önce inceleyin",
+        "stayAuditReady": "Denetime hep hazır olun",
+        "buildACaseFileFromAClientMatter": "Müvekkil dosyasından dava dosyası çıkarın",
+        "findAndScreenYourNextHires": "Yeni çalışanlarınızı bulun ve eleyin",
+        "onboardEveryNewHireProperly": "Her yeni çalışana düzgün bir başlangıç yaptırın",
+        "runPayrollWithoutTheErrors": "Bordroyu hatasız yürütün",
+        "keepMyCourseworkOnTrack": "Ödevlerimi yolunda tutsun"
     },
     "team": {
         "title": "Ekibinizi davet edin",
@@ -94,18 +159,6 @@
         "enterAnyway": "Yine de gir",
         "enter": "Başlayalım",
         "wait": "Bir saniye"
-    },
-    "industries": {
-        "agencies": "Ajanslar",
-        "ecommerce": "E-ticaret",
-        "saas": "SaaS",
-        "sales": "Satış",
-        "recruiting": "İşe alım",
-        "real-estate": "Gayrimenkul",
-        "legal": "Hukuk ve uyum",
-        "creators": "İçerik üreticileri",
-        "productivity": "Verimlilik",
-        "other": "Diğer"
     },
     "showcase": {
         "connect": {

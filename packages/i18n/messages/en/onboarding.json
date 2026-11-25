@@ -1,11 +1,6 @@
 {
     "_context": {
-        "industries": "Lines of business shown as a badge on the onboarding board and as tiles of the industry question.",
-        "roles": "Job titles offered as tiles on the role question of the onboarding. Short, like a job title on a business card.",
-        "site.titleNamed": "{name} is the first name of the person signing up.",
-        "site.skip": "Button: the person has no company website.",
         "team.description": "The AI coworkers of the workspace work for every person invited to it.",
-        "role.description": "The first AI coworker built for them will work for the person in that role.",
         "engine.greetingNamed": "{name} is the first name of the person. Said by the Chief of Staff, the AI assistant of the workspace, when it wakes up at the end of the onboarding.",
         "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up.",
         "view.title": "Title of the onboarding step that asks how the person wants to see their workspace: as the isometric board (Boxes and coworkers drawn in 3D) or as the classic view (a list of coworkers beside the chat). 'Your team' means their AI coworkers.",
@@ -14,66 +9,136 @@
         "showcase.create.job": "Typed by a user in the box that creates a coworker. {when} is showcase.create.when and has to read naturally in the middle of the sentence.",
         "showcase.task.title": "'Them' are the AI coworkers.",
         "showcase.done.routine": "Name of a routine that runs every morning on the user's emails.",
-        "trust.users": "{count} is already formatted, such as 4,500. The sentence of the landing page's hero."
+        "trust.users": "{count} is already formatted, such as 4,500. The sentence of the landing page's hero.",
+        "sectors": "Lines of work offered on the question 'Tell us what you do'. `label` is drawn on a small tile: two or three words. `keywords` are never shown: the other words people of this language type to look for that line of work, separated by spaces. Do not translate them word for word, write the words people really use, jobs included.",
+        "promises": "What an AI coworker does for the person, in their voice ('my') or as a short imperative, on one line.",
+        "sector.use": "Tile that keeps what the person typed as their answer. {words} is what they typed.",
+        "sector.panel.heading": "Title bar of a small window that lists the first AI coworkers offered for the line of work picked.",
+        "sector.panel.anyone": "Shown in that title bar while no line of work is picked."
     },
     "metaTitle": "Welcome",
     "back": "Back",
     "continue": "Continue",
-    "site": {
-        "title": "What's your website?",
-        "titleNamed": "Hi {name}, what's your website?",
-        "description": "We read it and staff your board.",
-        "label": "Company website",
-        "placeholder": "acme.com",
-        "continue": "Continue",
-        "skip": "I don't have one"
+    "sector": {
+        "title": "Tell us what you do",
+        "description": "Pick the closest, or search for yours.",
+        "search": "Search your line of work",
+        "placeholder": "Search, e.g. student, bakery…",
+        "more": "See more",
+        "use": "Use “{words}”",
+        "notListed": "Nothing listed by that name, and that is fine: we will go with your words.",
+        "panel": {
+            "heading": "Your starter team",
+            "anyone": "Any business",
+            "title": "Your team changes with it.",
+            "line": "An agency starts with someone finding clients, a shop with someone reading its sales, a law firm with someone reviewing contracts. You can change every one of them later."
+        }
     },
-    "industry": {
-        "title": "What's your line of work?",
-        "description": "Your team changes with it.",
-        "other": "Other",
-        "otherLabel": "Your line of work",
-        "otherPlaceholder": "Bakery, dental practice, gym…"
+    "sectors": {
+        "freelance": {
+            "label": "Freelance",
+            "keywords": "solo independent self-employed contractor freelancer one person"
+        },
+        "agency": {
+            "label": "Agency",
+            "keywords": "studio marketing design branding web dev pr communication advertising"
+        },
+        "consulting": {
+            "label": "Consulting & coaching",
+            "keywords": "consultant coach advisor trainer mentor"
+        },
+        "creators": {
+            "label": "Creator & media",
+            "keywords": "youtube podcast newsletter influencer content writer author artist musician photographer"
+        },
+        "ecommerce": {
+            "label": "Online shop",
+            "keywords": "store shop shopify amazon etsy retail d2c brand dropshipping"
+        },
+        "saas": {
+            "label": "Software & tech",
+            "keywords": "startup software app saas developer it platform"
+        },
+        "sales": {
+            "label": "Sales & B2B",
+            "keywords": "sales team business development lead generation outbound"
+        },
+        "real-estate": {
+            "label": "Real estate",
+            "keywords": "realtor broker property rental landlord airbnb"
+        },
+        "legal": {
+            "label": "Legal & compliance",
+            "keywords": "lawyer attorney law firm notary"
+        },
+        "finance": {
+            "label": "Accounting & finance",
+            "keywords": "accountant bookkeeper tax cfo investment bank insurance"
+        },
+        "recruiting": {
+            "label": "Recruiting & HR",
+            "keywords": "recruiter hiring staffing talent people"
+        },
+        "health": {
+            "label": "Health & wellness",
+            "keywords": "doctor dentist clinic therapist physio gym yoga fitness beauty salon spa"
+        },
+        "education": {
+            "label": "Education & training",
+            "keywords": "school teacher tutor course academy"
+        },
+        "hospitality": {
+            "label": "Restaurant & hospitality",
+            "keywords": "cafe bar bakery hotel catering events wedding"
+        },
+        "trades": {
+            "label": "Trades & home services",
+            "keywords": "plumber electrician builder construction cleaning repair gardener painter"
+        },
+        "nonprofit": {
+            "label": "Nonprofit",
+            "keywords": "association ngo charity foundation church club"
+        },
+        "personal": {
+            "label": "Personal use",
+            "keywords": "myself me life hobby side project family home"
+        },
+        "student": {
+            "label": "Student",
+            "keywords": "study studies school university college phd thesis research learning"
+        }
     },
-    "role": {
-        "title": "What do you do there?",
-        "description": "Your first coworker works for you.",
-        "other": "Something else",
-        "otherLabel": "Your role",
-        "otherPlaceholder": "Head of Growth"
-    },
-    "roles": {
-        "founderAgencyOwner": "Founder / Agency owner",
-        "accountOrClientLead": "Account or client lead",
-        "marketingCreative": "Marketing / Creative",
-        "operations": "Operations",
-        "founderStoreOwner": "Founder / Store owner",
-        "marketingGrowth": "Marketing / Growth",
-        "customerCare": "Customer care",
-        "operationsLogistics": "Operations / Logistics",
-        "founderCeo": "Founder / CEO",
-        "productOrEngineering": "Product or Engineering",
-        "salesOrSupport": "Sales or Support",
-        "salesRepOrAe": "Sales rep or AE",
-        "salesLeadership": "Sales leadership",
-        "marketingDemandGen": "Marketing / Demand gen",
-        "recruiter": "Recruiter",
-        "talentOrHrLead": "Talent or HR lead",
-        "founderBroker": "Founder / Broker",
-        "agent": "Agent",
-        "propertyOrPortfolioManager": "Property or portfolio manager",
-        "marketing": "Marketing",
-        "founderPartner": "Founder / Partner",
-        "lawyerOrCounsel": "Lawyer or counsel",
-        "paralegalOrLegalOps": "Paralegal or legal ops",
-        "businessDevelopment": "Business development",
-        "creatorFounder": "Creator / Founder",
-        "editorOrWriter": "Editor or writer",
-        "communityOrSocial": "Community or social",
-        "sponsorshipsBusiness": "Sponsorships / Business",
-        "financeOrAdmin": "Finance or Admin",
-        "projectOrTeamLead": "Project or team lead",
-        "sales": "Sales"
+    "promises": {
+        "briefMeEveryMorning": "Brief me every morning",
+        "chaseMyUnpaidInvoices": "Chase my unpaid invoices",
+        "keepMyProjectsOnTrack": "Keep my projects on track",
+        "closeMyBooksEveryMonth": "Close my books every month",
+        "findMyNextHire": "Find my next hire",
+        "findOwnersAboutToSell": "Find owners about to sell",
+        "runYourRentalsWithoutTheChasing": "Run your rentals without the chasing",
+        "knowIfADealIsWorthIt": "Know if a deal is worth it",
+        "findYourNextClients": "Find your next clients",
+        "getFoundOnGoogle": "Get found on Google",
+        "deliverClientProjectsOnTime": "Deliver client projects on time",
+        "bookMoreDemos": "Book more demos",
+        "saveAccountsBeforeTheyChurn": "Save accounts before they churn",
+        "makeTheNextLaunchLand": "Make the next launch land",
+        "bookMoreMeetings": "Book more meetings",
+        "seeThePipelineBeforeYourMondayCall": "See the pipeline before your Monday call",
+        "walkIntoEveryMeetingPrepared": "Walk into every meeting prepared",
+        "knowWhatYourStoreDidThisWeek": "Know what your store did this week",
+        "winBackTheAbandonedCarts": "Win back the abandoned carts",
+        "getTheOrdersOutTheDoor": "Get the orders out the door",
+        "postEverywhereWithoutDoingItTwice": "Post everywhere without doing it twice",
+        "neverRunOutOfContentIdeas": "Never run out of content ideas",
+        "turnOneIdeaIntoAFinishedArticle": "Turn one idea into a finished article",
+        "reviewContractsBeforeYouSign": "Review contracts before you sign",
+        "stayAuditReady": "Stay audit-ready",
+        "buildACaseFileFromAClientMatter": "Build a case file from a client matter",
+        "findAndScreenYourNextHires": "Find and screen your next hires",
+        "onboardEveryNewHireProperly": "Onboard every new hire properly",
+        "runPayrollWithoutTheErrors": "Run payroll without the errors",
+        "keepMyCourseworkOnTrack": "Keep my coursework on track"
     },
     "team": {
         "title": "Invite your team",
@@ -111,18 +176,6 @@
         "enterAnyway": "Go in anyway",
         "enter": "Let's go",
         "wait": "One moment"
-    },
-    "industries": {
-        "agencies": "Agencies",
-        "ecommerce": "E-commerce",
-        "saas": "SaaS",
-        "sales": "Sales",
-        "recruiting": "Recruiting",
-        "real-estate": "Real estate",
-        "legal": "Legal & compliance",
-        "creators": "Creators",
-        "productivity": "Productivity",
-        "other": "Other"
     },
     "showcase": {
         "connect": {

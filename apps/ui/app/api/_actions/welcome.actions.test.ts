@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import type { ForemanIntake } from '@/lib/onboarding/intake'
 
+const decideIndustry = vi.fn()
 const readAnswers = vi.fn()
 const writeAnswers = vi.fn()
 const saveFirstName = vi.fn()
@@ -13,8 +14,8 @@ const ctx = { userId: 'user-1', authUser: { id: 'user-1', is_anonymous: false },
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireAdminContext: async () => ctx }))
 vi.mock('@/app/api/_services/naming.service', () => ({ ensureWorkspaceNamed: (...args: unknown[]) => ensureWorkspaceNamed(...args) }))
-vi.mock('@/lib/brain/request-seed', () => ({ requestCompanyExplore: (...args: unknown[]) => requestCompanyExplore(...args) }))
-vi.mock('@/lib/company/decide-industry', () => ({ decideIndustry: vi.fn() }))
+vi.mock('@/lib/brain/request-seed', () => ({ requestCompanyBrainSeed: vi.fn(), requestCompanyExplore: (...args: unknown[]) => requestCompanyExplore(...args) }))
+vi.mock('@/lib/company/decide-industry', () => ({ decideIndustry: (...args: unknown[]) => decideIndustry(...args) }))
 vi.mock('@/lib/company/firecrawl', () => ({ companySiteUrl: (input: string) => `https://${input.replace(/^https?:\/\//, '')}` }))
 vi.mock('@/lib/company/profile', () => ({ analyzeCompanyProfile: (...args: unknown[]) => analyzeCompanyProfile(...args) }))
 vi.mock('@/lib/foreman/profile', () => ({
@@ -23,7 +24,7 @@ vi.mock('@/lib/foreman/profile', () => ({
     saveFirstName: (...args: unknown[]) => saveFirstName(...args),
 }))
 
-const { saveWelcomeIntakeAction } = await import('./welcome.actions')
+const { saveWelcomeIntakeAction, saveWelcomeSectorAction } = await import('./welcome.actions')
 
 const INTAKE: ForemanIntake = { companyUrl: 'acme.com', industry: null, decidedIndustry: null, industryLabel: null, position: 'Founder / CEO', firstName: 'Ada' }
 
@@ -69,5 +70,39 @@ describe('saveWelcomeIntakeAction', () => {
         await saveWelcomeIntakeAction({ ...INTAKE, companyUrl: 'linkedin.com/company/acme' })
         expect(analyzeCompanyProfile).not.toHaveBeenCalled()
         expect(written().company_url).toBeUndefined()
+    })
+})
+
+describe('saveWelcomeSectorAction', () => {
+    beforeEach(() => {
+        readAnswers.mockReset().mockResolvedValue({})
+        writeAnswers.mockReset().mockResolvedValue(undefined)
+        decideIndustry.mockReset().mockResolvedValue(null)
+    })
+
+    it('files the line of work they picked under its category, and keeps which one it was', async () => {
+        expect(await saveWelcomeSectorAction({ sector: 'consulting' })).toEqual({ ok: true, industry: 'agencies' })
+        expect(written()).toMatchObject({ industry: 'agencies', onboarding: { sector: 'consulting' } })
+        expect(decideIndustry).not.toHaveBeenCalled()
+    })
+
+    it('keeps their own words, filed where the fast decision puts them', async () => {
+        decideIndustry.mockResolvedValue({ industry: 'legal' })
+        expect(await saveWelcomeSectorAction({ label: ' Patent attorney ' })).toEqual({ ok: true, industry: 'legal' })
+        expect(written()).toMatchObject({ industry: 'legal', company_offering: 'Patent attorney', onboarding: { industryLabel: 'Patent attorney' } })
+    })
+
+    it('forgets the words of the answer before when they change their mind', async () => {
+        readAnswers.mockResolvedValue({ industry: 'other', company_offering: 'Bakery', onboarding: { industryLabel: 'Bakery' } })
+        await saveWelcomeSectorAction({ sector: 'student' })
+        expect(written()).toMatchObject({ industry: 'productivity', onboarding: { sector: 'student' } })
+        expect(written().company_offering).toBeUndefined()
+        expect(written().onboarding?.industryLabel).toBeUndefined()
+    })
+
+    it('refuses a line of work that does not exist, and an empty one', async () => {
+        expect(await saveWelcomeSectorAction({ sector: 'falconry' })).toMatchObject({ ok: false })
+        expect(await saveWelcomeSectorAction({ label: '  ' })).toMatchObject({ ok: false })
+        expect(writeAnswers).not.toHaveBeenCalled()
     })
 })

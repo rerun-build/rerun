@@ -2,61 +2,126 @@
     "metaTitle": "ברוכים הבאים",
     "back": "חזרה",
     "continue": "להמשיך",
-    "site": {
-        "title": "מה האתר שלך?",
-        "titleNamed": "היי {name}, מה האתר שלך?",
-        "description": "נקרא אותו ונאייש את הלוח שלך.",
-        "label": "אתר החברה",
-        "placeholder": "acme.com",
-        "continue": "להמשיך",
-        "skip": "אין לי אתר"
+    "sector": {
+        "title": "ספר לנו במה אתה עוסק",
+        "description": "בחר את הקרוב ביותר, או חפש את שלך.",
+        "search": "חיפוש תחום עיסוק",
+        "placeholder": "חפש, למשל סטודנט, מאפייה…",
+        "more": "עוד",
+        "use": "להשתמש ב-“{words}”",
+        "notListed": "לא מצאנו תחום בשם הזה, וזה בסדר: נעבוד לפי המילים שלך.",
+        "panel": {
+            "heading": "צוות הפתיחה שלך",
+            "anyone": "כל עסק",
+            "title": "הצוות שלך משתנה בהתאם.",
+            "line": "סוכנות מתחילה עם מי שמחפש לקוחות, חנות עם מי שקורא את המכירות, משרד עורכי דין עם מי שבודק חוזים. אפשר לשנות כל אחד מהם בהמשך."
+        }
     },
-    "industry": {
-        "title": "באיזה תחום אתה עובד?",
-        "description": "הצוות שלך משתנה בהתאם.",
-        "other": "אחר",
-        "otherLabel": "תחום העיסוק שלך",
-        "otherPlaceholder": "מאפייה, מרפאת שיניים, חדר כושר…"
+    "sectors": {
+        "freelance": {
+            "label": "פרילנס",
+            "keywords": "פרילנסר פרילנס עצמאי עצמאית עוסק פטור עוסק מורשה קבלן עצמאי עבודה עצמאית יחיד"
+        },
+        "agency": {
+            "label": "סוכנות",
+            "keywords": "סוכנות סטודיו שיווק פרסום עיצוב מיתוג בניית אתרים יחסי ציבור תקשורת דיגיטל קריאייטיב"
+        },
+        "consulting": {
+            "label": "ייעוץ וקואצ'ינג",
+            "keywords": "יועץ יועצת קואצ'ר מאמן מאמנת מנטור מנחה הדרכה ליווי אימון ייעוץ"
+        },
+        "creators": {
+            "label": "יוצרים ומדיה",
+            "keywords": "יוצר יוצרת יוטיוב פודקאסט ניוזלטר משפיען משפיענית תוכן כותב כותבת סופר אמן אמנית מוזיקאי צלם צלמת"
+        },
+        "ecommerce": {
+            "label": "חנות אונליין",
+            "keywords": "חנות אונליין חנות וירטואלית איקומרס שופיפיי אמזון איטסי מסחר מכירות אונליין מותג דרופשיפינג"
+        },
+        "saas": {
+            "label": "תוכנה והייטק",
+            "keywords": "הייטק סטארטאפ תוכנה אפליקציה מפתח מפתחת מתכנת מתכנתת פלטפורמה סאאס"
+        },
+        "sales": {
+            "label": "מכירות ו-B2B",
+            "keywords": "מכירות איש מכירות אשת מכירות סוכן מכירות פיתוח עסקי לידים גיוס לקוחות מכירות עסקיות נציג מכירות"
+        },
+        "real-estate": {
+            "label": "נדל\"ן",
+            "keywords": "נדלן נדל\"ן מתווך מתווכת תיווך השכרה משכיר דירות להשכרה בעל דירה אירבנב"
+        },
+        "legal": {
+            "label": "משפט ורגולציה",
+            "keywords": "עורך דין עורכת דין משרד עורכי דין משפטן יועץ משפטי נוטריון רגולציה ציות חוזים"
+        },
+        "finance": {
+            "label": "הנהלת חשבונות ופיננסים",
+            "keywords": "רואה חשבון רואת חשבון הנהלת חשבונות מנהל חשבונות יועץ מס מיסים כספים בנק ביטוח השקעות"
+        },
+        "recruiting": {
+            "label": "גיוס ומשאבי אנוש",
+            "keywords": "גיוס מגייס מגייסת משאבי אנוש משא\"ן כוח אדם השמה גיוס עובדים טאלנט"
+        },
+        "health": {
+            "label": "בריאות ורווחה",
+            "keywords": "רופא רופאה רופא שיניים מרפאה מטפל מטפלת פיזיותרפיסט חדר כושר יוגה כושר קוסמטיקה מכון יופי ספא"
+        },
+        "education": {
+            "label": "חינוך והדרכה",
+            "keywords": "בית ספר מורה מורה פרטי שיעורים פרטיים קורס אקדמיה הדרכה מדריך מדריכה חינוך"
+        },
+        "hospitality": {
+            "label": "מסעדנות ואירוח",
+            "keywords": "מסעדה בית קפה קפה בר מאפייה קונדיטוריה מלון אירוח קייטרינג אירועים חתונות צימר"
+        },
+        "trades": {
+            "label": "בעלי מקצוע ושירותי בית",
+            "keywords": "אינסטלטור חשמלאי קבלן בנייה שיפוצים ניקיון תיקונים גנן צבעי נגר טכנאי בעל מקצוע"
+        },
+        "nonprofit": {
+            "label": "עמותה",
+            "keywords": "עמותה מלכ\"ר ארגון ללא כוונת רווח תרומות קרן בית כנסת קהילה מתנדבים התנדבות מועדון"
+        },
+        "personal": {
+            "label": "שימוש אישי",
+            "keywords": "אישי לעצמי בשבילי חיים תחביב פרויקט צד פרויקט אישי משפחה בית"
+        },
+        "student": {
+            "label": "סטודנט",
+            "keywords": "סטודנט סטודנטית לימודים אוניברסיטה מכללה תלמיד תלמידה תואר דוקטורט תזה מחקר"
+        }
     },
-    "role": {
-        "title": "מה התפקיד שלך שם?",
-        "description": "העמית הראשון שלך עובד בשבילך.",
-        "other": "משהו אחר",
-        "otherLabel": "התפקיד שלך",
-        "otherPlaceholder": "ראש תחום צמיחה"
-    },
-    "roles": {
-        "founderAgencyOwner": "מייסד / בעל סוכנות",
-        "accountOrClientLead": "מנהל לקוחות",
-        "marketingCreative": "שיווק / קריאייטיב",
-        "operations": "תפעול",
-        "founderStoreOwner": "מייסד / בעל חנות",
-        "marketingGrowth": "שיווק / צמיחה",
-        "customerCare": "שירות לקוחות",
-        "operationsLogistics": "תפעול / לוגיסטיקה",
-        "founderCeo": "מייסד / מנכ\"ל",
-        "productOrEngineering": "מוצר או פיתוח",
-        "salesOrSupport": "מכירות או תמיכה",
-        "salesRepOrAe": "נציג מכירות או AE",
-        "salesLeadership": "הנהלת מכירות",
-        "marketingDemandGen": "שיווק / יצירת ביקוש",
-        "recruiter": "מגייס",
-        "talentOrHrLead": "מנהל גיוס או משאבי אנוש",
-        "founderBroker": "מייסד / מתווך",
-        "agent": "סוכן",
-        "propertyOrPortfolioManager": "מנהל נכסים או תיק נכסים",
-        "marketing": "שיווק",
-        "founderPartner": "מייסד / שותף",
-        "lawyerOrCounsel": "עורך דין או יועץ משפטי",
-        "paralegalOrLegalOps": "משפטן או תפעול משפטי",
-        "businessDevelopment": "פיתוח עסקי",
-        "creatorFounder": "יוצר / מייסד",
-        "editorOrWriter": "עורך או כותב",
-        "communityOrSocial": "קהילה או רשתות חברתיות",
-        "sponsorshipsBusiness": "חסויות / עסקים",
-        "financeOrAdmin": "כספים או אדמיניסטרציה",
-        "projectOrTeamLead": "ראש פרויקט או צוות",
-        "sales": "מכירות"
+    "promises": {
+        "briefMeEveryMorning": "תדרכו אותי כל בוקר",
+        "chaseMyUnpaidInvoices": "רדפו אחרי החשבוניות שלא שולמו",
+        "keepMyProjectsOnTrack": "שמרו על הפרויקטים שלי בלוח הזמנים",
+        "closeMyBooksEveryMonth": "סגרו לי את הספרים כל חודש",
+        "findMyNextHire": "מצאו את העובד הבא שלי",
+        "findOwnersAboutToSell": "מצאו בעלים שעומדים למכור",
+        "runYourRentalsWithoutTheChasing": "נהלו את ההשכרות בלי לרדוף אחרי אף אחד",
+        "knowIfADealIsWorthIt": "דעו אם עסקה משתלמת",
+        "findYourNextClients": "מצאו את הלקוחות הבאים שלכם",
+        "getFoundOnGoogle": "שימצאו אותך ב-Google",
+        "deliverClientProjectsOnTime": "מסרו פרויקטים ללקוחות בזמן",
+        "bookMoreDemos": "קבעו עוד הדגמות",
+        "saveAccountsBeforeTheyChurn": "הצילו לקוחות לפני שהם עוזבים",
+        "makeTheNextLaunchLand": "הצליחו את ההשקה הבאה",
+        "bookMoreMeetings": "קבעו עוד פגישות",
+        "seeThePipelineBeforeYourMondayCall": "ראו את הצנרת לפני שיחת יום שני",
+        "walkIntoEveryMeetingPrepared": "הגיעו מוכנים לכל פגישה",
+        "knowWhatYourStoreDidThisWeek": "דעו מה עשתה החנות שלכם השבוע",
+        "winBackTheAbandonedCarts": "החזירו את העגלות הנטושות",
+        "getTheOrdersOutTheDoor": "שלחו את ההזמנות בזמן",
+        "postEverywhereWithoutDoingItTwice": "פרסמו בכל מקום בלי לעשות את זה פעמיים",
+        "neverRunOutOfContentIdeas": "לעולם לא יגמרו לכם רעיונות לתוכן",
+        "turnOneIdeaIntoAFinishedArticle": "הפכו רעיון אחד למאמר גמור",
+        "reviewContractsBeforeYouSign": "בדקו חוזים לפני שחותמים",
+        "stayAuditReady": "תהיו תמיד מוכנים לביקורת",
+        "buildACaseFileFromAClientMatter": "בנו תיק מתיק לקוח",
+        "findAndScreenYourNextHires": "מצאו ומיינו את המועמדים הבאים",
+        "onboardEveryNewHireProperly": "קלטו כל עובד חדש כמו שצריך",
+        "runPayrollWithoutTheErrors": "הפיקו שכר בלי טעויות",
+        "keepMyCourseworkOnTrack": "שמרו על העבודות שלי בלוח הזמנים"
     },
     "team": {
         "title": "להזמין את הצוות שלך",
@@ -94,18 +159,6 @@
         "enterAnyway": "להיכנס בכל זאת",
         "enter": "יאללה",
         "wait": "רגע אחד"
-    },
-    "industries": {
-        "agencies": "סוכנויות",
-        "ecommerce": "מסחר אלקטרוני",
-        "saas": "SaaS",
-        "sales": "מכירות",
-        "recruiting": "גיוס",
-        "real-estate": "נדל\"ן",
-        "legal": "משפט ורגולציה",
-        "creators": "יוצרים",
-        "productivity": "פרודוקטיביות",
-        "other": "אחר"
     },
     "showcase": {
         "connect": {

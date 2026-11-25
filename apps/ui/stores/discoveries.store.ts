@@ -15,7 +15,6 @@ type DiscoveriesStore = {
     domain: string | null
     apply: (events: DiscoveryEvent[]) => void
     applyRow: (row: CompanyFindingsRow) => void
-    reset: (domain: string | null) => void
 }
 
 let queued: DiscoveryEvent[] = []
@@ -56,12 +55,6 @@ export const useDiscoveriesStore = create<DiscoveriesStore>()((set, get) => {
             const domain = new URL(row.url).hostname.replace(/^www\./i, '')
             if (get().domain !== domain) set({ domain })
             if (events.length) get().apply(events)
-        },
-        reset: domain => {
-            queued = []
-            if (timer) clearTimeout(timer)
-            timer = null
-            set({ state: EMPTY_DISCOVERIES, domain })
         },
     }
 })

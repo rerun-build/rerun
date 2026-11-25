@@ -1,4 +1,5 @@
 import { MAX_STARTER_PICKS, type TemplateCategory } from '@rerun/contracts'
+import type { SectorId } from './sectors'
 
 // What a new account is offered right after the welcome card, instead of an interview and a
 // coworker designed on the spot: the starter pack of the industry the card already settled.
@@ -8,6 +9,9 @@ import { MAX_STARTER_PICKS, type TemplateCategory } from '@rerun/contracts'
 // "Find your next clients" to an agency and "Book more meetings" to a sales team. `focus` is the
 // skill of that template the install starts on, the one thing the person picked the card for.
 // `line` only overrides the template's tagline when the promise moves it far enough.
+//
+// The panel of the sign-up draws the promises in the reader's language, from `onboarding.promises`:
+// one added or reworded here is added or reworded there.
 //
 // A template that is not published yet simply drops off the rail (scripted.ts), so a card can be
 // written here before its template exists.
@@ -85,6 +89,17 @@ export const STARTER_PACKS: Record<TemplateCategory, StarterCard[]> = {
     other: EVERYONE,
 }
 
-export function starterPack(industry: TemplateCategory | null | undefined): StarterCard[] {
+const WRITING: StarterCard = { template: 'editorial-writer', promise: 'Turn one idea into a finished article', focus: 'Write the blog article' }
+const POSTING: StarterCard = { template: 'social-media-manager', promise: 'Post everywhere without doing it twice', focus: "Plan the week's posts" }
+
+// The sectors with no company behind them: nobody chases invoices for a thesis.
+export const SECTOR_PACKS: Partial<Record<SectorId, StarterCard[]>> = {
+    personal: [ASSISTANT, PROJECTS, WRITING, POSTING],
+    student: [{ template: 'project-manager', promise: 'Keep my coursework on track', focus: 'Plan a project' }, ASSISTANT, WRITING, POSTING],
+}
+
+export function starterPack(industry: TemplateCategory | null | undefined, sector?: string | null): StarterCard[] {
+    const own = SECTOR_PACKS[sector as SectorId]
+    if (own) return own
     return STARTER_PACKS[industry ?? 'other'] ?? STARTER_PACKS.other
 }

@@ -102,6 +102,15 @@ describe('foremanEngineInstructions on the turn the welcome page leaves owed', (
             expect(foremanEngineInstructions({ ...asked({}), agents: [{ id: 'a' }] as unknown as ForemanState['agents'] })).not.toContain('the first thing you asked them')
         })
 
+        it('never asks someone here for themselves, and offers what suits them', () => {
+            const instructions = foremanEngineInstructions(stateWith({ foreman: {}, answers: { industry: 'productivity', onboarding: { sector: 'student' } } }), { greeting: true })
+            expect(instructions).not.toContain('company website')
+            expect(instructions).toContain('Keep my coursework on track')
+            expect(instructions).toContain('Line of work: Student, no company')
+            expect(instructions).not.toContain('Industry: productivity')
+            expect(instructions).not.toContain('what you understood of their company')
+        })
+
         it('never asks whoever was asked by the app, nor a member', () => {
             expect(foremanEngineInstructions(stateWith({ foreman: {}, answers: { industry: 'saas', onboarding: { siteSkipped: true } } }), { greeting: true })).toContain('template sales-development-rep')
             expect(foremanEngineInstructions({ ...asked({}), isMember: true })).not.toContain('save_company_website')

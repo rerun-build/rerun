@@ -2,61 +2,126 @@
     "metaTitle": "Boas-vindas",
     "back": "Voltar",
     "continue": "Continuar",
-    "site": {
-        "title": "Qual é o seu site?",
-        "titleNamed": "Olá {name}, qual é o seu site?",
-        "description": "Nós o lemos e montamos sua equipe.",
-        "label": "Site da empresa",
-        "placeholder": "acme.com",
-        "continue": "Continuar",
-        "skip": "Não tenho"
+    "sector": {
+        "title": "Conte o que você faz",
+        "description": "Escolha o mais próximo ou busque o seu.",
+        "search": "Busque sua área de atuação",
+        "placeholder": "Busque, por ex. estudante, padaria…",
+        "more": "Ver mais",
+        "use": "Usar “{words}”",
+        "notListed": "Não achamos nada com esse nome, e tudo bem: vamos usar as suas palavras.",
+        "panel": {
+            "heading": "Seu time inicial",
+            "anyone": "Qualquer negócio",
+            "title": "Seu time muda com ela.",
+            "line": "Uma agência começa com alguém que busca clientes, uma loja com alguém que analisa as vendas, um escritório de advocacia com alguém que revisa contratos. Você pode mudar cada um deles depois."
+        }
     },
-    "industry": {
-        "title": "Qual é a sua área de atuação?",
-        "description": "Sua equipe muda com ela.",
-        "other": "Outra",
-        "otherLabel": "Sua área",
-        "otherPlaceholder": "Padaria, clínica odontológica, academia…"
+    "sectors": {
+        "freelance": {
+            "label": "Freelancer",
+            "keywords": "freelancer freela autônomo autônoma independente profissional liberal pessoa física MEI prestador prestadora solo"
+        },
+        "agency": {
+            "label": "Agência",
+            "keywords": "agência estúdio marketing design branding publicidade propaganda comunicação assessoria social media web criação"
+        },
+        "consulting": {
+            "label": "Consultoria e coaching",
+            "keywords": "consultor consultora coach mentor mentora instrutor instrutora treinador treinadora palestrante assessor assessora"
+        },
+        "creators": {
+            "label": "Criador e mídia",
+            "keywords": "youtuber youtube podcast newsletter influenciador influenciadora criador conteúdo escritor escritora autor autora artista músico música fotógrafo fotógrafa"
+        },
+        "ecommerce": {
+            "label": "Loja online",
+            "keywords": "loja virtual e-commerce shopify mercado livre amazon varejo dropshipping lojista marca revenda marketplace"
+        },
+        "saas": {
+            "label": "Software e tecnologia",
+            "keywords": "startup software aplicativo app saas desenvolvedor desenvolvedora programador programadora TI tecnologia plataforma"
+        },
+        "sales": {
+            "label": "Vendas e B2B",
+            "keywords": "vendas vendedor vendedora comercial equipe comercial SDR prospecção geração de leads representante negócios"
+        },
+        "real-estate": {
+            "label": "Imobiliário",
+            "keywords": "corretor corretora imóveis imobiliária imobiliário aluguel locação proprietário airbnb temporada incorporadora"
+        },
+        "legal": {
+            "label": "Jurídico e compliance",
+            "keywords": "advogado advogada escritório de advocacia direito jurídico cartório tabelião compliance procurador"
+        },
+        "finance": {
+            "label": "Contabilidade e finanças",
+            "keywords": "contador contadora contabilidade escritório contábil impostos CFO investimentos banco seguros corretora financeiro"
+        },
+        "recruiting": {
+            "label": "Recrutamento e RH",
+            "keywords": "recrutador recrutadora recrutamento seleção RH recursos humanos headhunter contratação talentos pessoas"
+        },
+        "health": {
+            "label": "Saúde e bem-estar",
+            "keywords": "médico médica dentista odontologia clínica terapeuta psicólogo psicóloga fisioterapeuta academia pilates yoga fitness estética salão spa"
+        },
+        "education": {
+            "label": "Educação e ensino",
+            "keywords": "escola professor professora aula particular curso cursinho faculdade ensino treinamento educação"
+        },
+        "hospitality": {
+            "label": "Restaurante e hotelaria",
+            "keywords": "restaurante café bar padaria lanchonete pizzaria hotel pousada buffet eventos casamento confeitaria"
+        },
+        "trades": {
+            "label": "Obras e serviços",
+            "keywords": "encanador eletricista pedreiro obra construção reforma limpeza diarista jardineiro pintor marceneiro conserto manutenção"
+        },
+        "nonprofit": {
+            "label": "Sem fins lucrativos",
+            "keywords": "ONG associação fundação instituto igreja voluntariado projeto social terceiro setor caridade clube"
+        },
+        "personal": {
+            "label": "Uso pessoal",
+            "keywords": "eu pessoal vida hobby projeto paralelo projeto pessoal família casa rotina"
+        },
+        "student": {
+            "label": "Estudante",
+            "keywords": "estudante aluno aluna universidade faculdade escola graduação mestrado doutorado TCC tese pesquisa estudos vestibular"
+        }
     },
-    "role": {
-        "title": "E o que você faz lá?",
-        "description": "Seu primeiro coworker trabalha para você.",
-        "other": "Outra coisa",
-        "otherLabel": "Sua função",
-        "otherPlaceholder": "Head de Growth"
-    },
-    "roles": {
-        "founderAgencyOwner": "Fundador / Dono de agência",
-        "accountOrClientLead": "Responsável por contas",
-        "marketingCreative": "Marketing / Criação",
-        "operations": "Operações",
-        "founderStoreOwner": "Fundador / Dono de loja",
-        "marketingGrowth": "Marketing / Growth",
-        "customerCare": "Atendimento ao cliente",
-        "operationsLogistics": "Operações / Logística",
-        "founderCeo": "Fundador / CEO",
-        "productOrEngineering": "Produto ou Engenharia",
-        "salesOrSupport": "Vendas ou Suporte",
-        "salesRepOrAe": "Vendedor ou AE",
-        "salesLeadership": "Liderança de vendas",
-        "marketingDemandGen": "Marketing / Geração de demanda",
-        "recruiter": "Recrutador",
-        "talentOrHrLead": "Líder de talentos ou RH",
-        "founderBroker": "Fundador / Corretor",
-        "agent": "Corretor",
-        "propertyOrPortfolioManager": "Gestor de imóveis ou de carteira",
-        "marketing": "Marketing",
-        "founderPartner": "Fundador / Sócio",
-        "lawyerOrCounsel": "Advogado ou consultor jurídico",
-        "paralegalOrLegalOps": "Paralegal ou legal ops",
-        "businessDevelopment": "Desenvolvimento de negócios",
-        "creatorFounder": "Criador / Fundador",
-        "editorOrWriter": "Editor ou redator",
-        "communityOrSocial": "Comunidade ou redes sociais",
-        "sponsorshipsBusiness": "Patrocínios / Negócios",
-        "financeOrAdmin": "Finanças ou Administração",
-        "projectOrTeamLead": "Líder de projeto ou de equipe",
-        "sales": "Vendas"
+    "promises": {
+        "briefMeEveryMorning": "Me atualize toda manhã",
+        "chaseMyUnpaidInvoices": "Cobre minhas faturas em aberto",
+        "keepMyProjectsOnTrack": "Mantenha meus projetos no prazo",
+        "closeMyBooksEveryMonth": "Feche minha contabilidade todo mês",
+        "findMyNextHire": "Encontre minha próxima contratação",
+        "findOwnersAboutToSell": "Encontre proprietários prestes a vender",
+        "runYourRentalsWithoutTheChasing": "Gerencie seus aluguéis sem correr atrás",
+        "knowIfADealIsWorthIt": "Saiba se um negócio vale a pena",
+        "findYourNextClients": "Encontre seus próximos clientes",
+        "getFoundOnGoogle": "Seja encontrado no Google",
+        "deliverClientProjectsOnTime": "Entregue os projetos dos clientes no prazo",
+        "bookMoreDemos": "Agende mais demonstrações",
+        "saveAccountsBeforeTheyChurn": "Salve contas antes que cancelem",
+        "makeTheNextLaunchLand": "Faça o próximo lançamento dar certo",
+        "bookMoreMeetings": "Agende mais reuniões",
+        "seeThePipelineBeforeYourMondayCall": "Veja o funil antes da reunião de segunda",
+        "walkIntoEveryMeetingPrepared": "Chegue preparado a toda reunião",
+        "knowWhatYourStoreDidThisWeek": "Saiba como sua loja foi esta semana",
+        "winBackTheAbandonedCarts": "Recupere os carrinhos abandonados",
+        "getTheOrdersOutTheDoor": "Despache os pedidos",
+        "postEverywhereWithoutDoingItTwice": "Publique em todo lugar sem fazer duas vezes",
+        "neverRunOutOfContentIdeas": "Nunca fique sem ideias de conteúdo",
+        "turnOneIdeaIntoAFinishedArticle": "Transforme uma ideia em um artigo pronto",
+        "reviewContractsBeforeYouSign": "Revise contratos antes de assinar",
+        "stayAuditReady": "Esteja sempre pronto para auditorias",
+        "buildACaseFileFromAClientMatter": "Monte um dossiê a partir de um caso do cliente",
+        "findAndScreenYourNextHires": "Encontre e selecione suas próximas contratações",
+        "onboardEveryNewHireProperly": "Integre bem cada nova pessoa contratada",
+        "runPayrollWithoutTheErrors": "Rode a folha de pagamento sem erros",
+        "keepMyCourseworkOnTrack": "Mantenha meus trabalhos da faculdade em dia"
     },
     "team": {
         "title": "Convide sua equipe",
@@ -94,18 +159,6 @@
         "enterAnyway": "Entrar mesmo assim",
         "enter": "Vamos lá",
         "wait": "Um momento"
-    },
-    "industries": {
-        "agencies": "Agências",
-        "ecommerce": "E-commerce",
-        "saas": "SaaS",
-        "sales": "Vendas",
-        "recruiting": "Recrutamento",
-        "real-estate": "Imobiliário",
-        "legal": "Jurídico e compliance",
-        "creators": "Criadores",
-        "productivity": "Produtividade",
-        "other": "Outro"
     },
     "showcase": {
         "connect": {

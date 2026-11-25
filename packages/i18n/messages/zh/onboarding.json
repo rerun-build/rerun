@@ -2,61 +2,126 @@
     "metaTitle": "欢迎",
     "back": "返回",
     "continue": "继续",
-    "site": {
-        "title": "您的网站是什么？",
-        "titleNamed": "{name}，您好！您的网站是什么？",
-        "description": "我们会阅读它，并为您的看板配备人员。",
-        "label": "公司网站",
-        "placeholder": "acme.com",
-        "continue": "继续",
-        "skip": "我没有网站"
+    "sector": {
+        "title": "告诉我们您从事什么",
+        "description": "选择最接近的一项，或搜索您的行业。",
+        "search": "搜索您的行业",
+        "placeholder": "搜索，例如 学生、面包店…",
+        "more": "查看更多",
+        "use": "使用“{words}”",
+        "notListed": "没有找到同名的行业，没关系，我们会按您的说法来。",
+        "panel": {
+            "heading": "您的初始团队",
+            "anyone": "任何企业",
+            "title": "您的团队随之而变。",
+            "line": "广告代理公司从寻找客户的同事开始，商店从分析销售的同事开始，律所从审阅合同的同事开始。之后每一位都可以更换。"
+        }
     },
-    "industry": {
-        "title": "您从事哪个行业？",
-        "description": "您的团队会随之调整。",
-        "other": "其他",
-        "otherLabel": "您的行业",
-        "otherPlaceholder": "面包店、牙科诊所、健身房…"
+    "sectors": {
+        "freelance": {
+            "label": "自由职业",
+            "keywords": "自由职业者 个人 独立 单干 个体 接单 自雇 兼职 一个人 外包"
+        },
+        "agency": {
+            "label": "代理公司",
+            "keywords": "工作室 营销 设计 品牌 网站 开发 公关 传播 广告 策划 创意 代理商"
+        },
+        "consulting": {
+            "label": "咨询与教练",
+            "keywords": "咨询 顾问 教练 培训师 导师 讲师 辅导 管理咨询 职业规划"
+        },
+        "creators": {
+            "label": "创作者与媒体",
+            "keywords": "博主 自媒体 视频 播客 公众号 网红 内容 作家 作者 艺术家 音乐人 摄影师 主播 UP主"
+        },
+        "ecommerce": {
+            "label": "网店",
+            "keywords": "电商 网店 淘宝 京东 拼多多 店铺 零售 跨境 独立站 品牌 卖家 微商"
+        },
+        "saas": {
+            "label": "软件与科技",
+            "keywords": "创业公司 软件 应用 程序员 开发者 互联网 IT 平台 科技 研发 工程师 SaaS"
+        },
+        "sales": {
+            "label": "销售与企业服务",
+            "keywords": "销售 业务 商务拓展 获客 客户开发 渠道 大客户 市场拓展 B2B 电销"
+        },
+        "real-estate": {
+            "label": "房地产",
+            "keywords": "房产 中介 经纪人 租赁 房东 出租 物业 民宿 楼盘 买房 卖房"
+        },
+        "legal": {
+            "label": "法律与合规",
+            "keywords": "律师 律所 法务 法律 公证 合规 诉讼 知识产权 顾问"
+        },
+        "finance": {
+            "label": "会计与财务",
+            "keywords": "会计 记账 财务 税务 审计 投资 银行 保险 理财 出纳 财税 代账"
+        },
+        "recruiting": {
+            "label": "招聘与人力资源",
+            "keywords": "招聘 猎头 人力资源 HR 人事 用人 人才 面试 劳务 薪酬"
+        },
+        "health": {
+            "label": "健康与养生",
+            "keywords": "医生 牙医 牙科 诊所 医院 理疗 康复 健身 瑜伽 美容 美发 美甲 水疗 护士 心理咨询"
+        },
+        "education": {
+            "label": "教育与培训",
+            "keywords": "学校 老师 教师 家教 课程 培训班 培训机构 辅导 补习 教育 讲师"
+        },
+        "hospitality": {
+            "label": "餐饮与酒店",
+            "keywords": "餐厅 饭店 咖啡馆 酒吧 面包店 烘焙 酒店 民宿 餐饮 婚礼 活动 宴会 外卖 奶茶店"
+        },
+        "trades": {
+            "label": "技工与家政服务",
+            "keywords": "水电工 电工 管道工 装修 施工 建筑 保洁 家政 维修 园丁 油漆工 木工 师傅"
+        },
+        "nonprofit": {
+            "label": "非营利组织",
+            "keywords": "公益 协会 非营利 基金会 慈善 志愿者 社团 俱乐部 教会 社会组织"
+        },
+        "personal": {
+            "label": "个人使用",
+            "keywords": "个人 自己 生活 爱好 副业 兴趣 家庭 家用 业余项目 个人项目"
+        },
+        "student": {
+            "label": "学生",
+            "keywords": "学生 大学 大学生 研究生 博士 论文 研究 学习 高中 留学 课业 学校"
+        }
     },
-    "role": {
-        "title": "您在那里做什么？",
-        "description": "您的第一位同事为您工作。",
-        "other": "其他职位",
-        "otherLabel": "您的职位",
-        "otherPlaceholder": "增长负责人"
-    },
-    "roles": {
-        "founderAgencyOwner": "创始人 / 代理机构负责人",
-        "accountOrClientLead": "客户经理或客户负责人",
-        "marketingCreative": "市场 / 创意",
-        "operations": "运营",
-        "founderStoreOwner": "创始人 / 店主",
-        "marketingGrowth": "市场 / 增长",
-        "customerCare": "客户服务",
-        "operationsLogistics": "运营 / 物流",
-        "founderCeo": "创始人 / CEO",
-        "productOrEngineering": "产品或工程",
-        "salesOrSupport": "销售或支持",
-        "salesRepOrAe": "销售代表或客户主管",
-        "salesLeadership": "销售管理层",
-        "marketingDemandGen": "市场 / 需求挖掘",
-        "recruiter": "招聘专员",
-        "talentOrHrLead": "人才或 HR 负责人",
-        "founderBroker": "创始人 / 经纪人",
-        "agent": "经纪人",
-        "propertyOrPortfolioManager": "物业或资产组合经理",
-        "marketing": "市场营销",
-        "founderPartner": "创始人 / 合伙人",
-        "lawyerOrCounsel": "律师或法律顾问",
-        "paralegalOrLegalOps": "律师助理或法务运营",
-        "businessDevelopment": "商务拓展",
-        "creatorFounder": "创作者 / 创始人",
-        "editorOrWriter": "编辑或作者",
-        "communityOrSocial": "社区或社交媒体",
-        "sponsorshipsBusiness": "赞助 / 商务",
-        "financeOrAdmin": "财务或行政",
-        "projectOrTeamLead": "项目或团队负责人",
-        "sales": "销售"
+    "promises": {
+        "briefMeEveryMorning": "每天早上向我汇报",
+        "chaseMyUnpaidInvoices": "帮我催收未付发票",
+        "keepMyProjectsOnTrack": "让我的项目保持进度",
+        "closeMyBooksEveryMonth": "每月帮我完成结账",
+        "findMyNextHire": "帮我找到下一位员工",
+        "findOwnersAboutToSell": "找到即将出售的房东",
+        "runYourRentalsWithoutTheChasing": "轻松打理出租房，不用四处催促",
+        "knowIfADealIsWorthIt": "判断一笔交易值不值得做",
+        "findYourNextClients": "找到您的下一批客户",
+        "getFoundOnGoogle": "让客户在 Google 上找到您",
+        "deliverClientProjectsOnTime": "按时交付客户项目",
+        "bookMoreDemos": "预约更多演示",
+        "saveAccountsBeforeTheyChurn": "在客户流失前挽留他们",
+        "makeTheNextLaunchLand": "让下一次发布大获成功",
+        "bookMoreMeetings": "预约更多会议",
+        "seeThePipelineBeforeYourMondayCall": "周一例会前看清销售漏斗",
+        "walkIntoEveryMeetingPrepared": "每场会议都有备而来",
+        "knowWhatYourStoreDidThisWeek": "了解您的店铺本周表现",
+        "winBackTheAbandonedCarts": "挽回被遗弃的购物车",
+        "getTheOrdersOutTheDoor": "让订单按时发出",
+        "postEverywhereWithoutDoingItTwice": "一次创作，全平台发布",
+        "neverRunOutOfContentIdeas": "内容灵感永不枯竭",
+        "turnOneIdeaIntoAFinishedArticle": "把一个想法变成一篇成稿",
+        "reviewContractsBeforeYouSign": "签约前先审阅合同",
+        "stayAuditReady": "随时准备好接受审计",
+        "buildACaseFileFromAClientMatter": "根据客户案件整理案卷",
+        "findAndScreenYourNextHires": "寻找并筛选下一批候选人",
+        "onboardEveryNewHireProperly": "妥善安排每位新员工入职",
+        "runPayrollWithoutTheErrors": "准确无误地发放工资",
+        "keepMyCourseworkOnTrack": "让我的课业保持进度"
     },
     "team": {
         "title": "邀请您的团队",
@@ -94,18 +159,6 @@
         "enterAnyway": "仍然进入",
         "enter": "开始吧",
         "wait": "请稍候"
-    },
-    "industries": {
-        "agencies": "代理机构",
-        "ecommerce": "电子商务",
-        "saas": "SaaS",
-        "sales": "销售",
-        "recruiting": "招聘",
-        "real-estate": "房地产",
-        "legal": "法律与合规",
-        "creators": "创作者",
-        "productivity": "效率",
-        "other": "其他"
     },
     "showcase": {
         "connect": {

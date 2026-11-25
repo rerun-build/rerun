@@ -15,8 +15,7 @@ import type { ForemanIntake } from '@/lib/onboarding/intake'
 //
 // An anonymous visitor answers the card too, so the industry decision is open to them, and the
 // write is not: their answers wait in the browser until they have an account. Every workspace, with
-// an account or not, decides within a quota (the read of the site goes through
-// /api/onboarding/discoveries, under its own): each call is a paid model decision.
+// an account or not, decides within a quota: each call is a paid model decision.
 
 /**
  * Which industry, fast enough for the board to draw the Boxes while the card is still being filled.

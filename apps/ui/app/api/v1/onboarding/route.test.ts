@@ -21,7 +21,7 @@ describe('GET /api/v1/onboarding', () => {
         resolveEngineWaitlist.mockReset().mockResolvedValue(false)
     })
 
-    it.each(['site', 'industry', 'role'])('stays on the questions while "%s" is unanswered', async step => {
+    it.each(['industry'])('stays on the questions while "%s" is unanswered', async step => {
         readWelcomeState.mockResolvedValue({ needed: true, step, answers: {}, firstName: 'Ada' })
         expect(await read()).toEqual({ needed: true, stage: 'questions', waitlisted: false, firstName: 'Ada' })
     })

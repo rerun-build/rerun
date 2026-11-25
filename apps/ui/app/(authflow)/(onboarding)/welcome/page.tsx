@@ -7,7 +7,8 @@ import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { internalPath } from '@/lib/auth/internal-path'
 import { requestHostScope } from '@/lib/brand/host-scope'
 import { opensOnHost } from '@/lib/workspace/host-workspace'
-import { siteDomain } from '@/lib/onboarding/site-favicon'
+import { sectorById } from '@/lib/onboarding/sectors'
+import { readStarterRoles } from '@/lib/onboarding/starter-roles.server'
 import { readWelcomeState } from '@/lib/onboarding/welcome.server'
 import { routes } from '@/lib/routes'
 import { getServerSession } from '@/supabase/session/getServerSession'
@@ -36,7 +37,7 @@ async function hasAnotherWorkspace(ctx: WorkspaceContext): Promise<boolean> {
     return (workspaces ?? []).filter(workspace => opensOnHost(scope, workspace.organization_id)).length > 1
 }
 
-// The onboarding of a new workspace, in the dialog the sign-in opened over the app. Only its admin, and only
+// The onboarding of a new workspace, on the page the sign-in opened. Only its admin, and only
 // once: anyone else, or a workspace past it, is sent on to where they were going.
 export default async function WelcomePage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
     const next = internalPath((await searchParams).next, routes.home)
@@ -56,14 +57,14 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     const state = await readWelcomeState(ctx)
     if (!state.needed) redirect(next)
 
-    const [{ data: pending }, phonePending, waitlisted, canSwitchWorkspace] = await Promise.all([
+    const [{ data: pending }, phonePending, waitlisted, canSwitchWorkspace, starterRoles] = await Promise.all([
         selectMany(ctx.supabase, 'workspace_invitations', ['email'] as const, { workspace_id: ctx.workspace.id, status: 'pending' }),
         isPhoneStepPending(ctx.supabase, ctx.userId),
         resolveEngineWaitlist(ctx.workspace.id),
         hasAnotherWorkspace(ctx),
+        readStarterRoles(ctx.supabase),
     ])
     const { answers } = state
-    const siteIndustry = answers.onboarding?.siteIndustry
     const industry = answers.industry && isTemplateCategory(answers.industry) ? answers.industry : null
 
     return (
@@ -72,13 +73,12 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                 initialStep={state.step}
                 afterQuestions={BILLING_ENABLED && !isSubscriptionEntitled(ctx.workspace.subscription_status) ? 'trial' : 'engine'}
                 initial={{
-                    site: answers.company_url ? (siteDomain(answers.company_url) ?? answers.company_url) : '',
-                    siteIndustry: siteIndustry && isTemplateCategory(siteIndustry) ? siteIndustry : null,
+                    sector: sectorById(answers.onboarding?.sector)?.id ?? null,
+                    sectorLabel: answers.onboarding?.industryLabel ?? '',
                     industry,
-                    industryLabel: answers.onboarding?.industryLabel ?? '',
-                    role: answers.position ?? '',
                     invites: (pending ?? []).map(invite => ({ email: invite.email })),
                 }}
+                starterRoles={starterRoles}
                 firstName={state.firstName}
                 next={next}
                 phonePending={phonePending}

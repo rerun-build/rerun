@@ -2,6 +2,7 @@ import 'server-only'
 
 import { brandContact, brandDiscretion, brandText } from '@/lib/brand/text'
 import { isWhiteLabel, type Brand } from '@rerun/contracts'
+import { isOwnUse, sectorById } from '@/lib/onboarding/sectors'
 import { starterPack } from '@/lib/onboarding/starter-packs'
 import { MEMBER_REACH_NOTE, renderBoardMap } from './board-map'
 import { KICKOFF_MARKER } from './kickoff-marker'
@@ -122,11 +123,13 @@ function intentBlock(state: ForemanState): string {
     return `What they arrived with:\n${arrival}\n${weight}`
 }
 
+const lineOfWork = ({ onboarding }: ForemanState['answers']): string | undefined => onboarding?.industryLabel ?? sectorById(onboarding?.sector)?.about
+
 // Exported for the build: an agent drafted for this company needs to know what it sells and to whom,
 // or it gets a SOUL that could belong to anybody.
 export function foremanProfileBlock(state: ForemanState): string {
     const { answers, foreman } = state
-    const lines = [state.firstName ? `First name: ${state.firstName}` : null, answers.company_name || answers.company_url ? `Company: ${[answers.company_name, answers.company_url].filter(Boolean).join(' - ')}` : null, answers.company_offering ? `What they sell: ${answers.company_offering}` : null, answers.company_audience ? `Who they sell to: ${answers.company_audience}` : null, answers.industry ? `Industry: ${answers.industry}` : null, answers.position ? `Their role: ${answers.position}` : null, foremanUseCases(foreman).length ? `What they want off their plate: ${foremanUseCases(foreman).join(' · ')}` : null, foreman.needs?.length ? `What goes wrong for them: ${foreman.needs.map(describeNeed).join(' · ')}` : null, !foreman.needs?.length && foreman.pains?.length ? `What slows them down: ${foreman.pains.join(' · ')}` : null, !foreman.needs?.length && foreman.challenge ? `Their challenge right now: ${foreman.challenge}` : null, answers.tools?.length ? `Apps they named: ${answers.tools.join(', ')}` : null].filter(Boolean)
+    const lines = [state.firstName ? `First name: ${state.firstName}` : null, answers.company_name || answers.company_url ? `Company: ${[answers.company_name, answers.company_url].filter(Boolean).join(' - ')}` : null, answers.company_offering ? `What they sell: ${answers.company_offering}` : null, answers.company_audience ? `Who they sell to: ${answers.company_audience}` : null, answers.industry && !isOwnUse(answers.onboarding?.sector) ? `Industry: ${answers.industry}` : null, lineOfWork(answers) ? `Line of work: ${lineOfWork(answers)}` : null, answers.position ? `Their role: ${answers.position}` : null, foremanUseCases(foreman).length ? `What they want off their plate: ${foremanUseCases(foreman).join(' · ')}` : null, foreman.needs?.length ? `What goes wrong for them: ${foreman.needs.map(describeNeed).join(' · ')}` : null, !foreman.needs?.length && foreman.pains?.length ? `What slows them down: ${foreman.pains.join(' · ')}` : null, !foreman.needs?.length && foreman.challenge ? `Their challenge right now: ${foreman.challenge}` : null, answers.tools?.length ? `Apps they named: ${answers.tools.join(', ')}` : null].filter(Boolean)
 
     return lines.length ? `What you already know about them, so you never ask twice:\n${lines.join('\n')}` : ''
 }
@@ -186,22 +189,29 @@ function greetingBlock(state: ForemanState): string {
         `- greet them${state.firstName ? ` as ${state.firstName}` : ''};`,
         ...(asked
             ? ['- say in one sentence that you would like to read the website of their company, to know what it does before you hire anyone;', ASK_FOR_THE_WEBSITE]
-            : ['- say in one sentence what you understood of their company, from what you already know about them above. If you know nothing about it, leave this line out. Never invent a fact about their company;', `- ${firstCoworkersOffer(state.answers.industry)}`]),
+            : [
+                  isOwnUse(state.answers.onboarding?.sector)
+                      ? '- they are here for themselves: say nothing of a company;'
+                      : '- say in one sentence what you understood of their company, from what you already know about them above. If you know nothing about it, leave this line out. Never invent a fact about their company;',
+                  `- ${firstCoworkersOffer(state.answers)}`,
+              ]),
     ].join('\n')
 }
 
-export function firstCoworkersOffer(industry: ForemanState['answers']['industry']): string {
-    const pack = starterPack(industry)
+export function firstCoworkersOffer(answers: ForemanState['answers']): string {
+    const pack = starterPack(answers.industry, answers.onboarding?.sector)
         .map(card => `- ${card.promise} (template ${card.template})`)
         .join('\n')
     return `Offer the first coworkers you would hire for them, out of the starter templates of their line of work:\n${pack}\nCall ask_user with the first three of those coworkers as options, so they pick one in a tap. Install nothing before they answer.`
 }
 
 // Nothing before this conversation asks for the website: the sign-up only asks what they do, and the
-// Brain, the name of the workspace and every coworker are the better for it. The app that asked, or
-// whoever said they have none, is not asked twice.
+// Brain, the name of the workspace and every coworker are the better for it. Whoever was
+// asked by the app, or said they have none, is not asked twice, and someone here for themselves has no
+// company.
 function owesWebsite(state: ForemanState): boolean {
-    return !state.isMember && !state.answers.company_url && !state.answers.onboarding?.siteSkipped
+    const { company_url, onboarding } = state.answers
+    return !state.isMember && !company_url && !onboarding?.siteSkipped && !isOwnUse(onboarding?.sector)
 }
 
 const ASK_FOR_THE_WEBSITE = `Then call ask_user with one question, the address of their company website, and no options: they type it in the form, and skip the question when they have none. Only when the email they signed up with is on a domain of their company's own, give two options: that domain, and "I don't have one". Offer no coworker before they answer.`

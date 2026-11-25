@@ -6,10 +6,10 @@ import { mobileApi, type OnboardingState } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-const QUESTION_STEPS: readonly OnboardingStep[] = ['site', 'industry', 'role']
+const QUESTION_STEPS: readonly OnboardingStep[] = ['industry']
 
-// Where the workspace stands in the onboarding of the welcome page, for the app, which walks the same
-// one: its questions first, then the trial and the machine. Inviting the team stays on the web.
+// Where the workspace stands in the onboarding of the welcome page, for the app, which asks its own
+// questions first, then the trial and the machine. Inviting the team stays on the web.
 export const GET = apiRoute(mobileApi.getOnboarding, { auth: 'member' }, async ({ ctx }): Promise<OnboardingState> => {
     const state = await readWelcomeState(ctx)
     return {

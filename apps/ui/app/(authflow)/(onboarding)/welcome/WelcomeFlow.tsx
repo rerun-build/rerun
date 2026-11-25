@@ -1,22 +1,20 @@
 'use client'
 
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
-import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
-import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
+import { finishWelcomeTeamAction, saveWelcomeSectorAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { LazyShowcase, LazyTeamPanel } from '@/components/onboarding/panels/LazyPanels'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
-import { IndustryStep, type IndustryAnswer } from '@/components/onboarding/welcome/IndustryStep'
-import { RoleStep, type RoleAnswer } from '@/components/onboarding/welcome/RoleStep'
-import { SiteStep } from '@/components/onboarding/welcome/SiteStep'
+import { SectorStep, type SectorAnswer } from '@/components/onboarding/welcome/SectorStep'
 import { TeamStep, type SentInvite } from '@/components/onboarding/welcome/TeamStep'
 import { TrialStep } from '@/components/onboarding/welcome/TrialStep'
 import { ViewStep } from '@/components/onboarding/welcome/ViewStep'
 import { useErrorText } from '@/hooks/useErrorText'
 import type { ActionFailure } from '@/lib/i18n/action-error'
-import { rolesForIndustry } from '@/lib/onboarding/intake'
+import { sectorById, type SectorId } from '@/lib/onboarding/sectors'
+import type { StarterRole } from '@/lib/onboarding/starter-roles.server'
 import { ONBOARDING_STEPS, type OnboardingStep } from '@/lib/onboarding/step'
 import { rememberWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import { useBillingStore } from '@/stores/billing.store'
@@ -25,21 +23,20 @@ import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import type { TemplateCategory } from '@rerun/contracts'
 import { PhoneStep } from '@/components/onboarding/welcome/PhoneStep'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type WelcomeAnswers = {
-    site: string
-    siteIndustry: TemplateCategory | null
+    sector: SectorId | null
+    sectorLabel: string
     industry: TemplateCategory | null
-    industryLabel: string
-    role: string
     invites: SentInvite[]
 }
 
-type QuestionStep = 'site' | 'industry' | 'role' | 'team' | 'view'
+type QuestionStep = 'industry' | 'team' | 'view'
 
-const QUESTIONS: QuestionStep[] = ['site', 'industry', 'role', 'team', 'view']
+const QUESTIONS: QuestionStep[] = ['industry', 'team', 'view']
 
 // How long a picked tile shows its check before the next step takes its place.
 const PICKED_BEAT_MS = 250
@@ -48,14 +45,14 @@ const PICKED_BEAT_MS = 250
 const ENGINE_PATIENCE_MS = 90_000
 const ENGINE_POLL_MS = 2_000
 
-// The five questions, one at a time in the onboarding page: each answer is saved as it is given and
+// The three questions, one at a time in the onboarding page: each answer is saved as it is given and
 // moves to the next. A number still owed after a Google sign-up is asked first. Then the trial,
 // through today's checkout, and the machine, whose milestones the Chief of Staff's orb reads out
 // before it hands them over to the app. `afterQuestions` is the step the server resolved for the end
 // of the questions: the trial, or the machine where the workspace is already entitled or nothing is
 // sold. With no machine left in the pool, the waitlist wall stands before the trial. The billing
 // dialog and the waitlist wall open over the page.
-export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
+export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; starterRoles: Record<string, StarterRole>; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
     const { phoneStep, workspace } = useSession()
@@ -63,12 +60,10 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     const [step, setStep] = useState<OnboardingStep>(initialStep)
     const [direction, setDirection] = useState(1)
-    const [site, setSite] = useState(initial.site)
-    const [guess, setGuess] = useState<TemplateCategory | null>(initial.siteIndustry)
-    const [industry, setIndustry] = useState<IndustryAnswer>({ industry: initial.industry ?? initial.siteIndustry, label: initial.industryLabel, other: !!initial.industryLabel })
-    const [role, setRole] = useState<RoleAnswer>({ role: initial.role, other: !!initial.role && !rolesForIndustry(initial.industry).includes(initial.role) })
+    const [sector, setSector] = useState<SectorAnswer>({ sector: initial.sector, label: initial.sectorLabel })
+    const [industry, setIndustry] = useState<TemplateCategory | null>(initial.industry)
     const [invites, setInvites] = useState<SentInvite[]>(initial.invites)
-    const [saving, setSaving] = useState<'site' | 'skip' | 'answer' | null>(null)
+    const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     const viewed = useRef<OnboardingStep | null>(null)
@@ -78,9 +73,6 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         track('onboarding_step_viewed', { step })
     }, [step])
 
-    // Started while the site is still being typed: it fills the profile cache the answer reads when sent.
-    const read = useCallback((typed: string) => void streamLiveDiscoveries(typed), [])
-
     const go = (target: OnboardingStep) => {
         setError(null)
         setDirection(ONBOARDING_STEPS.indexOf(target) < ONBOARDING_STEPS.indexOf(step) ? -1 : 1)
@@ -88,7 +80,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     }
 
     const saved = (result: { ok: true } | ActionFailure, completed: QuestionStep, target: OnboardingStep, skipped = false, view?: WorkspaceView) => {
-        setSaving(null)
+        setSaving(false)
         if (!result.ok) {
             setError(errorText(result))
             return false
@@ -98,38 +90,16 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         return true
     }
 
-    const submitSite = async (value: string | null) => {
-        setSaving(value === null ? 'skip' : 'site')
+    const submitSector = async () => {
+        setSaving(true)
         setError(null)
-        const result = await saveWelcomeSiteAction(value)
-        if (result.ok && result.industry) {
-            setGuess(result.industry)
-            if (!industry.industry && !industry.other) setIndustry({ industry: result.industry, label: '', other: false })
-        }
-        if (value === null) {
-            setSite('')
-            setGuess(null)
-        }
-        saved(result, 'site', 'industry', value === null)
-    }
-
-    const submitIndustry = async () => {
-        setSaving('answer')
-        setError(null)
-        const result = await saveWelcomeIndustryAction(industry.other ? { label: industry.label } : { industry: industry.industry ?? 'other' })
-        if (result.ok) setIndustry(current => (current.other ? current : { ...current, industry: result.industry }))
-        if (result.ok && industry.other) setGuess(result.industry)
-        saved(result, 'industry', 'role')
-    }
-
-    const submitRole = async () => {
-        setSaving('answer')
-        setError(null)
-        saved(await saveWelcomeRoleAction(role.role), 'role', 'team')
+        const result = await saveWelcomeSectorAction(sector.sector ? { sector: sector.sector } : { label: sector.label })
+        if (result.ok) setIndustry(result.industry)
+        saved(result, 'industry', 'team')
     }
 
     const finishTeam = async () => {
-        setSaving('answer')
+        setSaving(true)
         setError(null)
         saved(await finishWelcomeTeamAction(), 'team', 'view', invites.length === 0)
     }
@@ -217,18 +187,12 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     }
 
     const back = () => go(QUESTIONS[Math.max(0, QUESTIONS.indexOf(step as QuestionStep) - 1)])
-    const answering = saving === 'answer'
-
     const content = askPhone ? (
         <PhoneStep />
-    ) : step === 'site' ? (
-        <SiteStep firstName={firstName} value={site} onChange={setSite} onRead={read} onSubmit={() => void submitSite(site.trim())} onSkip={() => void submitSite(null)} saving={saving === 'site' || saving === 'skip' ? saving : null} error={error} />
     ) : step === 'industry' ? (
-        <IndustryStep answer={industry} onChange={setIndustry} onSubmit={() => void submitIndustry()} onBack={back} saving={answering} error={error} />
-    ) : step === 'role' ? (
-        <RoleStep industry={industry.other ? guess : industry.industry} answer={role} onChange={setRole} onSubmit={() => void submitRole()} onBack={back} saving={answering} error={error} />
+        <SectorStep answer={sector} onChange={setSector} onSubmit={() => void submitSector()} saving={saving} error={error} />
     ) : step === 'team' ? (
-        <TeamStep invites={invites} onInvited={sent => setInvites(current => [...current, sent])} onDone={() => void finishTeam()} onBack={back} saving={answering} error={error} />
+        <TeamStep invites={invites} onInvited={sent => setInvites(current => [...current, sent])} onDone={() => void finishTeam()} onBack={back} saving={saving} error={error} />
     ) : step === 'view' ? (
         <ViewStep onPick={pickView} onBack={back} error={error} />
     ) : step === 'trial' ? (
@@ -237,6 +201,10 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         <EngineStep firstName={firstName} progress={engine} error={error} onRetry={() => void startEngine()} onEnter={() => void enter()} entering={entering} />
     )
 
+    const t = useTranslations('onboarding.sectors')
+    const picked = sectorById(sector.sector)
+    const panel = !askPhone && step === 'industry' ? <LazyTeamPanel industry={picked?.category ?? (sector.label ? null : industry)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} /> : <LazyShowcase />
+
     const question = QUESTIONS.indexOf(step as QuestionStep)
     const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')
     // Someone who created this workspace by mistake goes back to the one they were in, from any step.
@@ -244,7 +212,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
 
     return (
         <>
-            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={<LazyShowcase />}>
+            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={panel}>
                 {content}
             </OnboardingPage>
             <EngineWaitlistDialog open={waitlistUp} corner={switcher} />
