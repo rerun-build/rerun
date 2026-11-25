@@ -1,9 +1,10 @@
 'use client'
 
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { useResolvedIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { MotionConfig } from 'motion/react'
 import dynamic from 'next/dynamic'
 import type { CSSProperties, ReactNode } from 'react'
-import { RerunOnly } from '@/components/brand/RerunOnly'
 
 // Tailwind's `lg`: under it the panel is not only hidden, nothing of it is loaded.
 const BESIDE_QUERY = '(min-width: 1024px)'
@@ -22,11 +23,11 @@ export function OnboardingPanel({ children }: { children?: ReactNode }) {
                     style={{ '--panel-ground': '#0c0a1f' } as CSSProperties}
                 >
                     {beside && (
-                        <>
+                        <MotionConfig reducedMotion="user">
                             <PanelGround />
                             <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-linear-to-t from-(--panel-ground) from-20% to-transparent" />
                             {children}
-                        </>
+                        </MotionConfig>
                     )}
                 </section>
             </div>

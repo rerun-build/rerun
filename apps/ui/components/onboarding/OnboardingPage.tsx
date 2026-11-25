@@ -2,9 +2,10 @@
 
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
+import { useScrollFade } from '@rerun/ui/primitives'
 import { StepTransition } from '@rerun/ui/steps'
-import type { ReactNode } from 'react'
-import { OnboardingPanel } from './OnboardingPanel'
+import { useState, type ReactNode } from 'react'
+import { OnboardingPanel } from './panels/OnboardingPanel'
 
 // The page of the sign-in and of the questions after it: the form on the left half, a panel that
 // shows what it leads to on the right, gone under `lg` and where the caller has none. The whole left
@@ -12,9 +13,11 @@ import { OnboardingPanel } from './OnboardingPanel'
 // not. `corner` and the logo stay still while the steps swap; a step that brings its own mark hides
 // the logo.
 export function OnboardingPage({ stepKey, direction = 1, corner, hideLogo = false, progress, panel, footer, children }: { stepKey: string; direction?: number; corner?: ReactNode; hideLogo?: boolean; progress?: { index: number; count: number }; panel?: ReactNode; footer?: ReactNode; children: ReactNode }) {
+    const [column, setColumn] = useState<HTMLElement | null>(null)
+    const mask = useScrollFade(column)
     return (
         <div className="flex h-full min-h-0">
-            <main className="relative flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            <main ref={setColumn} style={{ maskImage: mask, WebkitMaskImage: mask }} className="relative flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
                 {corner && <div className="flex min-w-0 shrink-0 px-4 pt-4">{corner}</div>}
                 <div className="flex flex-1 flex-col items-center px-4 pt-8 pb-[calc(var(--consent-inset)+max(2rem,env(safe-area-inset-bottom)))] sm:px-6">
                     <div className="my-auto flex w-full flex-col items-center gap-4">

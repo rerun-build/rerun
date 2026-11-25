@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
 import { TEAM_SIGN_IN_PARAM } from '@/lib/auth/team-session'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'
@@ -14,7 +15,7 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
 
     if (!token_hash || !type) {
         return (
-            <OnboardingPage stepKey="invalid" panel={null}>
+            <OnboardingPage stepKey="invalid" panel={<LazyShowcase />}>
                 <OnboardingStepLayout heading={<OnboardingHeading title={t('invalidTitle')} subtitle={t('invalidMessage')} />}>
                     <Button asChild size="lg" className="w-full">
                         <Link href={routes.auth}>{t('newCode')}</Link>
@@ -25,7 +26,7 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
     }
 
     return (
-        <OnboardingPage stepKey="confirm" panel={null}>
+        <OnboardingPage stepKey="confirm" panel={<LazyShowcase />}>
             <OnboardingStepLayout heading={<OnboardingHeading title={t('title')} subtitle={t('message')} />}>
                 <form action={confirmLogin}>
                     <input type="hidden" name="token_hash" value={token_hash} />

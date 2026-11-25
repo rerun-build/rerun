@@ -4,6 +4,7 @@ import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersActi
 import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
@@ -243,7 +244,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
 
     return (
         <>
-            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={null}>
+            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={<LazyShowcase />}>
                 {content}
             </OnboardingPage>
             <EngineWaitlistDialog open={waitlistUp} corner={switcher} />

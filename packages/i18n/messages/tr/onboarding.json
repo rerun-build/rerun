@@ -106,5 +106,60 @@
         "creators": "İçerik üreticileri",
         "productivity": "Verimlilik",
         "other": "Diğer"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Yapay zeka planınız",
+            "title": "Yapay zeka aboneliğinizi bağlayın.",
+            "line": "Coworker'larınız zaten ödediğiniz Claude, ChatGPT veya OpenCode planıyla çalışır. Token başına ödemeyi mi tercih edersiniz? Anthropic, OpenAI, Google veya OpenRouter anahtarınızı ya da kendi barındırdığınız bir modeli kullanın."
+        },
+        "create": {
+            "tab": "Coworker'lar",
+            "title": "Coworker'lar oluşturun.",
+            "line": "Kullandığınız her uygulamaya bağlayın: Gmail, Slack, Notion, HubSpot ve katalogdaki 200 uygulama daha, ayrıca API'si veya MCP sunucusu olan her araç, kimsenin listelemediği bir araç bile.",
+            "job": "Müşteri e-postalarımı Gmail'de {when} yanıtla ve Slack'e bir özet gönder",
+            "when": "hafta içi her gün saat 8'de",
+            "schedule": "Hafta içi her gün 8:00"
+        },
+        "task": {
+            "tab": "Her görev",
+            "title": "Onlara her görevi verin.",
+            "line": "Tek cümleyle söyleyin. Bir kez ya da her Pazartesi dokuzda.",
+            "conversation": "Dubai finans direktörleri",
+            "placeholder": "{name} adlı coworker'a istediğinizi sorun…",
+            "ask": "Dubai'deki lojistik firmalarından 30 finans direktörü bul ve HubSpot'a ekle.",
+            "answer": "30 finans direktörü bulundu ve HubSpot'a eklendi. Her biri için Gmail'de bir tanışma e-postası taslağı hazırladım.",
+            "added": "HubSpot'ta",
+            "columns": {
+                "name": "Ad",
+                "company": "Şirket",
+                "title": "Unvan",
+                "status": "Durum"
+            }
+        },
+        "done": {
+            "tab": "Tamam",
+            "title": "İşi bitirin.",
+            "line": "Geceleri, hafta sonları ve dizüstü bilgisayarınız kapalıyken de çalışırlar.",
+            "routine": "Sabah gelen kutusu",
+            "instructions": "Okunmamış e-postaları oku, yanıtları hazırla, bana düşenleri işaretle ve Slack'e bir özet gönder.",
+            "answer": "Siz uyanmadan bitti: 34 e-posta okundu, 9 yanıt hazırlandı, 1 tanesi size ait. Özet Slack'te.",
+            "draftReady": "Taslak hazır",
+            "needsYou": "Sizi bekliyor",
+            "columns": {
+                "from": "Gönderen",
+                "subject": "Konu",
+                "status": "Durum"
+            },
+            "subjects": {
+                "invoice": "2214 numaralı fatura",
+                "renewal": "Yenileme fiyatı",
+                "delivery": "Lyon'a teslimat",
+                "call": "Tanışma görüşmesi"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ kullanıcı</b> işi için {brand}'a güveniyor"
     }
 }

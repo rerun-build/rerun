@@ -106,5 +106,60 @@
         "creators": "Créateurs",
         "productivity": "Productivité",
         "other": "Autre"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Votre abonnement IA",
+            "title": "Connectez votre abonnement IA.",
+            "line": "Vos coworkers tournent avec l'abonnement Claude, ChatGPT ou OpenCode que vous payez déjà. Vous préférez payer au token ? Apportez une clé Anthropic, OpenAI, Google ou OpenRouter, ou un modèle que vous hébergez."
+        },
+        "create": {
+            "tab": "Coworkers",
+            "title": "Créez des coworkers.",
+            "line": "Connectez-les à toutes vos applications : Gmail, Slack, Notion, HubSpot et 200 autres au catalogue, et tout outil doté d'une API ou d'un serveur MCP, même non listé.",
+            "job": "Réponds à mes e-mails clients dans Gmail {when} et publie un récap dans Slack",
+            "when": "chaque jour ouvré à 8 h",
+            "schedule": "Chaque jour ouvré à 8 h 00"
+        },
+        "task": {
+            "tab": "Toute tâche",
+            "title": "Confiez-leur n'importe quelle tâche.",
+            "line": "Dites-le en une phrase. Une fois, ou chaque lundi à neuf heures.",
+            "conversation": "DAF à Dubaï",
+            "placeholder": "Demandez ce que vous voulez à {name}…",
+            "ask": "Trouve 30 DAF d'entreprises de logistique à Dubaï et ajoute-les à HubSpot.",
+            "answer": "30 DAF trouvés et ajoutés à HubSpot. J'ai rédigé un e-mail de présentation pour chacun dans Gmail.",
+            "added": "Dans HubSpot",
+            "columns": {
+                "name": "Nom",
+                "company": "Entreprise",
+                "title": "Poste",
+                "status": "Statut"
+            }
+        },
+        "done": {
+            "tab": "Fait",
+            "title": "Le travail est fait.",
+            "line": "Ils travaillent la nuit, le week-end et même ordinateur fermé.",
+            "routine": "Boîte mail du matin",
+            "instructions": "Lis les e-mails non lus, rédige les réponses, signale ce qui demande mon attention et publie un récap dans Slack.",
+            "answer": "Fait avant votre réveil : 34 e-mails lus, 9 réponses rédigées, 1 pour vous. Le récap est dans Slack.",
+            "draftReady": "Brouillon prêt",
+            "needsYou": "Besoin de vous",
+            "columns": {
+                "from": "De",
+                "subject": "Objet",
+                "status": "Statut"
+            },
+            "subjects": {
+                "invoice": "Facture n° 2214",
+                "renewal": "Tarifs de renouvellement",
+                "delivery": "Livraison à Lyon",
+                "call": "Appel d'intégration"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ utilisateurs</b> font confiance à {brand} pour leur activité"
     }
 }

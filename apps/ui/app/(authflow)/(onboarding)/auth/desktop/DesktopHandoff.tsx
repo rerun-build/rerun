@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { CopyLine } from '@/components/dialogs/CopyLine'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
 import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'
@@ -42,7 +43,7 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (account === null) {
         return (
-            <OnboardingPage stepKey="signed-out" panel={null}>
+            <OnboardingPage stepKey="signed-out" panel={<LazyShowcase />}>
                 <OnboardingStepLayout
                     heading={
                         <div className="flex w-full max-w-sm flex-col items-center gap-3">
@@ -84,7 +85,7 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (status === 'done' && code) {
         return (
-            <OnboardingPage stepKey="done" panel={null}>
+            <OnboardingPage stepKey="done" panel={<LazyShowcase />}>
                 <OnboardingStepLayout heading={<OnboardingHeading title={t('doneTitle', { app })} subtitle={t('doneBody', { app })} />}>
                     <div className="space-y-1.5">
                         <p className="text-xs font-medium text-muted-foreground">{t('codeHint', { app })}</p>
@@ -96,7 +97,7 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
     }
 
     return (
-        <OnboardingPage stepKey="confirm" panel={null}>
+        <OnboardingPage stepKey="confirm" panel={<LazyShowcase />}>
             <OnboardingStepLayout heading={<OnboardingHeading title={t('title', { app })} subtitle={<span className="break-words">{t('body', { app, account })}</span>} />}>
                 {status === 'failed' && <p className="mb-4 text-center text-sm text-destructive">{t('failed')}</p>}
                 <div className="flex flex-col gap-1">

@@ -106,5 +106,60 @@
         "creators": "Creator",
         "productivity": "Produktivität",
         "other": "Sonstiges"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Dein KI-Abo",
+            "title": "Verbinde dein KI-Abo.",
+            "line": "Deine Coworker laufen mit dem Claude-, ChatGPT- oder OpenCode-Abo, das du schon bezahlst. Lieber Abrechnung pro Token? Nutze einen Schlüssel von Anthropic, OpenAI, Google oder OpenRouter oder ein selbst gehostetes Modell."
+        },
+        "create": {
+            "tab": "Coworker",
+            "title": "Erstelle Coworker.",
+            "line": "Verbinde sie mit jeder App, die du nutzt: Gmail, Slack, Notion, HubSpot und über 200 weitere im Katalog, dazu jedes andere Tool mit API oder MCP-Server, auch eins, das nirgends aufgeführt ist.",
+            "job": "Beantworte meine Kunden-E-Mails in Gmail {when} und poste eine Zusammenfassung in Slack",
+            "when": "jeden Werktag um 8 Uhr",
+            "schedule": "Jeden Werktag um 8:00"
+        },
+        "task": {
+            "tab": "Jede Aufgabe",
+            "title": "Gib ihnen jede Aufgabe.",
+            "line": "Sag es in einem Satz. Einmalig oder jeden Montag um neun.",
+            "conversation": "CFOs in Dubai",
+            "placeholder": "Frag {name} alles…",
+            "ask": "Finde 30 CFOs bei Logistikfirmen in Dubai und füge sie zu HubSpot hinzu.",
+            "answer": "30 CFOs gefunden und zu HubSpot hinzugefügt. Für jeden habe ich in Gmail eine Vorstellungs-Mail entworfen.",
+            "added": "In HubSpot",
+            "columns": {
+                "name": "Name",
+                "company": "Firma",
+                "title": "Position",
+                "status": "Status"
+            }
+        },
+        "done": {
+            "tab": "Erledigt",
+            "title": "Lass es erledigen.",
+            "line": "Sie arbeiten nachts, am Wochenende und bei geschlossenem Laptop.",
+            "routine": "Morgendlicher Posteingang",
+            "instructions": "Lies die ungelesenen E-Mails, entwirf die Antworten, markiere, was ich selbst machen muss, und poste eine Zusammenfassung in Slack.",
+            "answer": "Erledigt, bevor du aufgewacht bist: 34 E-Mails gelesen, 9 Antworten entworfen, 1 für dich. Die Zusammenfassung steht in Slack.",
+            "draftReady": "Entwurf fertig",
+            "needsYou": "Braucht dich",
+            "columns": {
+                "from": "Von",
+                "subject": "Betreff",
+                "status": "Status"
+            },
+            "subjects": {
+                "invoice": "Rechnung #2214",
+                "renewal": "Preise zur Verlängerung",
+                "delivery": "Lieferung nach Lyon",
+                "call": "Onboarding-Call"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ Nutzer</b> vertrauen {brand} für ihr Business"
     }
 }

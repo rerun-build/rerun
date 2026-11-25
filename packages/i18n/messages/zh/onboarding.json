@@ -106,5 +106,60 @@
         "creators": "创作者",
         "productivity": "效率",
         "other": "其他"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "您的 AI 套餐",
+            "title": "连接您的 AI 订阅。",
+            "line": "您的同事使用您已经在付费的 Claude、ChatGPT 或 OpenCode 套餐运行。想按 token 计费？也可以使用 Anthropic、OpenAI、Google 或 OpenRouter 的密钥，或自己部署的模型。"
+        },
+        "create": {
+            "tab": "同事",
+            "title": "创建同事。",
+            "line": "把他们连接到您使用的任何应用：Gmail、Slack、Notion、HubSpot，目录中还有 200 多个，以及任何带 API 或 MCP 服务器的工具，哪怕没人收录过。",
+            "job": "{when}回复我在 Gmail 里的客户邮件，并在 Slack 发一份总结",
+            "when": "每个工作日早上 8 点",
+            "schedule": "每个工作日 8:00"
+        },
+        "task": {
+            "tab": "任何任务",
+            "title": "交给他们任何任务。",
+            "line": "一句话说清楚。只做一次，或每周一早上九点。",
+            "conversation": "迪拜的 CFO",
+            "placeholder": "问问{name}，什么都行…",
+            "ask": "找出 30 位迪拜物流公司的 CFO，并添加到 HubSpot。",
+            "answer": "已找到 30 位 CFO 并添加到 HubSpot。我在 Gmail 里为每个人起草了一封介绍邮件。",
+            "added": "已加入 HubSpot",
+            "columns": {
+                "name": "姓名",
+                "company": "公司",
+                "title": "职位",
+                "status": "状态"
+            }
+        },
+        "done": {
+            "tab": "完成",
+            "title": "把事情办妥。",
+            "line": "夜里、周末，甚至您合上电脑时，他们照样工作。",
+            "routine": "早晨收件箱",
+            "instructions": "阅读未读邮件，起草回复，标出需要我处理的，并在 Slack 发一份总结。",
+            "answer": "在您醒来前已完成：读了 34 封邮件，起草了 9 封回复，其中 1 封需要您处理。总结已发到 Slack。",
+            "draftReady": "草稿已就绪",
+            "needsYou": "需要您处理",
+            "columns": {
+                "from": "发件人",
+                "subject": "主题",
+                "status": "状态"
+            },
+            "subjects": {
+                "invoice": "发票 #2214",
+                "renewal": "续订价格",
+                "delivery": "送货到里昂",
+                "call": "入职沟通电话"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ 位用户</b>信赖 {brand} 来经营他们的业务"
     }
 }

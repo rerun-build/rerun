@@ -106,5 +106,60 @@
         "creators": "Criadores",
         "productivity": "Produtividade",
         "other": "Outro"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Seu plano de IA",
+            "title": "Conecte sua assinatura de IA.",
+            "line": "Seus coworkers funcionam com o plano Claude, ChatGPT ou OpenCode que você já paga. Prefere cobrança por token? Use uma chave da Anthropic, OpenAI, Google ou OpenRouter, ou um modelo hospedado por você."
+        },
+        "create": {
+            "tab": "Coworkers",
+            "title": "Crie coworkers.",
+            "line": "Conecte-os a qualquer app que você usa: Gmail, Slack, Notion, HubSpot e mais 200 no catálogo, além de qualquer outra ferramenta com API ou servidor MCP, mesmo que ninguém a tenha listado.",
+            "job": "Responder aos e-mails dos meus clientes no Gmail {when} e postar um resumo no Slack",
+            "when": "todo dia útil às 8h",
+            "schedule": "Todo dia útil às 8h00"
+        },
+        "task": {
+            "tab": "Qualquer tarefa",
+            "title": "Dê qualquer tarefa a eles.",
+            "line": "Diga em uma frase. Uma vez, ou toda segunda às nove.",
+            "conversation": "CFOs de Dubai",
+            "placeholder": "Pergunte qualquer coisa a {name}…",
+            "ask": "Encontre 30 CFOs de empresas de logística em Dubai e adicione ao HubSpot.",
+            "answer": "30 CFOs encontrados e adicionados ao HubSpot. Redigi um e-mail de apresentação para cada um no Gmail.",
+            "added": "No HubSpot",
+            "columns": {
+                "name": "Nome",
+                "company": "Empresa",
+                "title": "Cargo",
+                "status": "Status"
+            }
+        },
+        "done": {
+            "tab": "Feito",
+            "title": "Resolva o trabalho.",
+            "line": "Eles trabalham de noite, no fim de semana e com o seu notebook fechado.",
+            "routine": "Caixa de entrada da manhã",
+            "instructions": "Leia os e-mails não lidos, redija as respostas, sinalize o que precisa de mim e poste um resumo no Slack.",
+            "answer": "Pronto antes de você acordar: 34 e-mails lidos, 9 respostas redigidas, 1 para você. O resumo está no Slack.",
+            "draftReady": "Rascunho pronto",
+            "needsYou": "Precisa de você",
+            "columns": {
+                "from": "De",
+                "subject": "Assunto",
+                "status": "Status"
+            },
+            "subjects": {
+                "invoice": "Fatura #2214",
+                "renewal": "Preço da renovação",
+                "delivery": "Entrega em Lyon",
+                "call": "Reunião de onboarding"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ usuários</b> confiam na {brand} para o seu negócio"
     }
 }

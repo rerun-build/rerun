@@ -9,7 +9,12 @@
         "engine.greetingNamed": "{name} is the first name of the person. Said by the Chief of Staff, the AI assistant of the workspace, when it wakes up at the end of the onboarding.",
         "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up.",
         "view.title": "Title of the onboarding step that asks how the person wants to see their workspace: as the isometric board (Boxes and coworkers drawn in 3D) or as the classic view (a list of coworkers beside the chat). 'Your team' means their AI coworkers.",
-        "view.hint": "Line under the two tiles of the step, followed by a picture of the small switch that changes the view later, found in the menu of the workspace."
+        "view.hint": "Line under the two tiles of the step, followed by a picture of the small switch that changes the view later, found in the menu of the workspace.",
+        "showcase": "The panel beside the sign-in form: four chapters, each a short tab label, a headline, one line, and the text of an example drawn in the real interface (a job typed by a user, a coworker's answer, a small table).",
+        "showcase.create.job": "Typed by a user in the box that creates a coworker. {when} is showcase.create.when and has to read naturally in the middle of the sentence.",
+        "showcase.task.title": "'Them' are the AI coworkers.",
+        "showcase.done.routine": "Name of a routine that runs every morning on the user's emails.",
+        "trust.users": "{count} is already formatted, such as 4,500. The sentence of the landing page's hero."
     },
     "metaTitle": "Welcome",
     "back": "Back",
@@ -118,5 +123,60 @@
         "creators": "Creators",
         "productivity": "Productivity",
         "other": "Other"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Your AI plan",
+            "title": "Connect your AI subscription.",
+            "line": "Your coworkers run on the Claude, ChatGPT or OpenCode plan you already pay for. Prefer per-token billing? Bring an Anthropic, OpenAI, Google or OpenRouter key, or a model you host yourself."
+        },
+        "create": {
+            "tab": "Coworkers",
+            "title": "Create coworkers.",
+            "line": "Connect them to any app you use: Gmail, Slack, Notion, HubSpot and 200 more in the catalogue, and any other tool with an API or an MCP server, even one nobody listed.",
+            "job": "Answer my customer emails in Gmail {when} and post a recap in Slack",
+            "when": "every weekday at 8",
+            "schedule": "Every weekday at 8:00"
+        },
+        "task": {
+            "tab": "Any task",
+            "title": "Give them any task.",
+            "line": "Say it in a sentence. Once, or every Monday at nine.",
+            "conversation": "Dubai CFOs",
+            "placeholder": "Ask {name} anything…",
+            "ask": "Find 30 CFOs at logistics firms in Dubai and add them to HubSpot.",
+            "answer": "30 CFOs found and added to HubSpot. I drafted an intro email for each one in Gmail.",
+            "added": "In HubSpot",
+            "columns": {
+                "name": "Name",
+                "company": "Company",
+                "title": "Title",
+                "status": "Status"
+            }
+        },
+        "done": {
+            "tab": "Done",
+            "title": "Get the job done.",
+            "line": "They work nights, weekends and while your laptop is shut.",
+            "routine": "Morning inbox",
+            "instructions": "Read the unread emails, draft the replies, flag what needs me and post a recap in Slack.",
+            "answer": "Done before you woke up: 34 emails read, 9 replies drafted, 1 for you. The recap is in Slack.",
+            "draftReady": "Draft ready",
+            "needsYou": "Needs you",
+            "columns": {
+                "from": "From",
+                "subject": "Subject",
+                "status": "Status"
+            },
+            "subjects": {
+                "invoice": "Invoice #2214",
+                "renewal": "Renewal pricing",
+                "delivery": "Delivery to Lyon",
+                "call": "Onboarding call"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ users</b> trust {brand} for their business"
     }
 }

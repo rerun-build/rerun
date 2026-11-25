@@ -1,6 +1,8 @@
 import { AuthTerms } from '@/components/auth/AuthShell'
 import { RerunOnly } from '@/components/brand/RerunOnly'
 import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
+import { LazyShowcase } from '@/components/onboarding/panels/LazyShowcase'
+import { TrustStrip } from '@/components/onboarding/TrustStrip'
 import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
 import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'
 import { referrerOfCode } from '@/ee/services/referral-attach.service'
@@ -28,14 +30,14 @@ export default async function AuthPage({ searchParams }: { searchParams: Promise
     return (
         <OnboardingPage
             stepKey="signin"
-            panel={null}
+            panel={<LazyShowcase />}
             footer={
                 <p className="max-w-sm pt-10 text-center text-xs text-muted-foreground text-balance">
                     <AuthTerms />
                 </p>
             }
         >
-            <OnboardingStepLayout heading={<OnboardingHeading title={invitedOnly ? t('invited.title') : t('title')} subtitle={moved ? t('invited.moved') : invitedOnly ? t('invited.subtitle') : t('subtitle')} />}>
+            <OnboardingStepLayout below={<TrustStrip />} heading={<OnboardingHeading title={invitedOnly ? t('invited.title') : t('title')} subtitle={moved ? t('invited.moved') : invitedOnly ? t('invited.subtitle') : t('subtitle')} />}>
                 <div className="flex flex-col gap-6">
                     {referrer && (
                         <RerunOnly>

@@ -106,5 +106,60 @@
         "creators": "Creadores",
         "productivity": "Productividad",
         "other": "Otro"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "Tu plan de IA",
+            "title": "Conecta tu suscripción de IA.",
+            "line": "Tus coworkers funcionan con el plan de Claude, ChatGPT u OpenCode que ya pagas. ¿Prefieres pagar por token? Usa una clave de Anthropic, OpenAI, Google u OpenRouter, o un modelo alojado por ti."
+        },
+        "create": {
+            "tab": "Coworkers",
+            "title": "Crea coworkers.",
+            "line": "Conéctalos a cualquier app que uses: Gmail, Slack, Notion, HubSpot y 200 más en el catálogo, y cualquier otra herramienta con una API o un servidor MCP, incluso una que nadie haya listado.",
+            "job": "Responde a mis correos de clientes en Gmail {when} y publica un resumen en Slack",
+            "when": "cada día laborable a las 8",
+            "schedule": "Cada día laborable a las 8:00"
+        },
+        "task": {
+            "tab": "Cualquier tarea",
+            "title": "Encárgales cualquier tarea.",
+            "line": "Dilo en una frase. Una vez, o cada lunes a las nueve.",
+            "conversation": "CFOs de Dubái",
+            "placeholder": "Pregúntale lo que quieras a {name}…",
+            "ask": "Encuentra 30 CFOs de empresas de logística en Dubái y añádelos a HubSpot.",
+            "answer": "Encontré 30 CFOs y los añadí a HubSpot. Redacté un correo de presentación para cada uno en Gmail.",
+            "added": "En HubSpot",
+            "columns": {
+                "name": "Nombre",
+                "company": "Empresa",
+                "title": "Cargo",
+                "status": "Estado"
+            }
+        },
+        "done": {
+            "tab": "Hecho",
+            "title": "Haz que el trabajo se haga.",
+            "line": "Trabajan de noche, en fines de semana y con tu portátil cerrado.",
+            "routine": "Correo de la mañana",
+            "instructions": "Lee los correos sin leer, redacta las respuestas, señala lo que necesita mi atención y publica un resumen en Slack.",
+            "answer": "Listo antes de que despertaras: 34 correos leídos, 9 respuestas redactadas, 1 para ti. El resumen está en Slack.",
+            "draftReady": "Borrador listo",
+            "needsYou": "Te necesita",
+            "columns": {
+                "from": "De",
+                "subject": "Asunto",
+                "status": "Estado"
+            },
+            "subjects": {
+                "invoice": "Factura #2214",
+                "renewal": "Precios de renovación",
+                "delivery": "Entrega en Lyon",
+                "call": "Llamada de bienvenida"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>Más de {count} usuarios</b> confían en {brand} para su negocio"
     }
 }
