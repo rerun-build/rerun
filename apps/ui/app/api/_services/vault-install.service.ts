@@ -13,6 +13,7 @@ import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { nextServiceInstance } from '@/lib/services/instances'
+import { checkShopifyCredentials } from '@/lib/services/shopify-credentials'
 import type { AuthMethodSummary, ComposioTarget, ManagedTarget, OAuthTarget } from '@/lib/services/types'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, requireAdmin, rethrowConflict, vaultContext } from './vault.service'
@@ -70,7 +71,8 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
             createdBy,
         })
     } else {
-        item = (await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance: instance ?? undefined, createdBy }))).item
+        const checked = await checkShopifyCredentials(manifest.slug, method.id, values)
+        item = (await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values: checked, authMethodId: method.id, instance: instance ?? undefined, createdBy }))).item
     }
     for (const coworker of coworkers) item = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, item.id, coworker.engineAgentId))
     return resultOf(item, toAuthMethodSummaries(manifest))
@@ -88,8 +90,9 @@ export async function reconfigureVaultService(itemId: string, values: Record<str
     const method = getMethod(manifest, authMethodId ?? current.authMethodId)
     if (!VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
     if (missingRequiredInputs(method, values).length > 0) return { status: 'needs_config', item: current, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id }
+    const checked = await checkShopifyCredentials(manifest.slug, method.id, values)
     const instance = current.instanceId ? { key: `${current.slug}@${current.instanceId}`, instanceId: current.instanceId, label: current.label } : undefined
-    const { item } = await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance, itemId }))
+    const { item } = await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values: checked, authMethodId: method.id, instance, itemId }))
     return resultOf(item, toAuthMethodSummaries(manifest))
 }
 

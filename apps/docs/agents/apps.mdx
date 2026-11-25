@@ -74,6 +74,8 @@ A service can offer several ways to connect, and you pick one at install time.
 | **Workspace account** | **Workspace account** | Pick an account already connected to the workspace. This is how a [paid app](#paid-apps) is attached |
 | **None** | **Connect** | No credentials required. It works right away |
 
+Shopify connected with a **Client ID and secret** is checked before it is saved, from a coworker's Apps tab as from the [Vault](/vault): Rerun asks your store for a token with them. When your Dev Dashboard app is not installed on that store, when the store is not in the same Shopify organization as the app, when Shopify does not recognize or refuses the Client ID and secret, or when no store answers at that `.myshopify.com` domain, the form says so and nothing is saved. Install the app on the store (**Install app** in the Dev Dashboard), then save again.
+
 ## Statuses
 
 Every app on a coworker shows one of three states:

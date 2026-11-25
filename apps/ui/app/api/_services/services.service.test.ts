@@ -11,6 +11,7 @@ import { syncAppConnector } from '@rerun/cloud/apps.server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { searchDocs } from '@/lib/foreman/search-docs'
+import { fetchPublic } from '@/lib/net/public-fetch'
 import { dispatchHubTool, getServiceDetails, installService, installedFromRegistry, listInstalledServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -48,6 +49,7 @@ vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/lib/foreman/agent-row', () => ({ ensureForemanAgentRow: vi.fn(async () => 'foreman-row') }))
 vi.mock('@rerun/cloud/apps.server', () => ({ syncAppConnector: vi.fn(async () => 0), unbindAgent: vi.fn() }))
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
+vi.mock('@/lib/net/public-fetch', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/net/public-fetch')>()), fetchPublic: vi.fn() }))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
 const appMethod = { id: 'app', label: 'Connect', kind: 'app', recommended: true, app: { appSlug: 'whatsapp' } }
@@ -62,6 +64,34 @@ const MANIFESTS: Record<string, unknown> = {
     gmail: { slug: 'gmail', name: 'Gmail', authMethods: [composioMethod] },
     'linkedin-pro': { slug: 'linkedin-pro', name: 'LinkedIn Pro', authMethods: [composioMethod] },
     'whatsapp-pro': { slug: 'whatsapp-pro', name: 'WhatsApp Pro', authMethods: [appMethod] },
+    shopify: {
+        slug: 'shopify',
+        name: 'Shopify',
+        authMethods: [
+            {
+                id: 'client_credentials',
+                label: 'Client ID and secret',
+                kind: 'stdio',
+                recommended: true,
+                inputs: [
+                    { key: 'SHOPIFY_CLIENT_ID', type: 'text', label: 'Client ID', required: true },
+                    { key: 'SHOPIFY_CLIENT_SECRET', type: 'password', label: 'Client secret', secret: true, required: true },
+                    { key: 'MYSHOPIFY_DOMAIN', type: 'text', label: 'Store domain', required: true },
+                ],
+                mcpServers: [{ name: 'shopify', command: 'npx', args: ['-y', 'cob-shopify-mcp', 'start'], env: { SHOPIFY_CLIENT_ID: '${input.SHOPIFY_CLIENT_ID}', SHOPIFY_CLIENT_SECRET: '${input.SHOPIFY_CLIENT_SECRET}', SHOPIFY_STORE_DOMAIN: '${input.MYSHOPIFY_DOMAIN}' } }],
+            },
+            {
+                id: 'default',
+                label: 'Access token',
+                kind: 'stdio',
+                inputs: [
+                    { key: 'SHOPIFY_ACCESS_TOKEN', type: 'password', label: 'Admin API access token', secret: true, required: true },
+                    { key: 'MYSHOPIFY_DOMAIN', type: 'text', label: 'Store domain', required: true },
+                ],
+                mcpServers: [{ name: 'shopify', command: 'npx', args: ['-y', 'cob-shopify-mcp', 'start'], env: { SHOPIFY_ACCESS_TOKEN: '${input.SHOPIFY_ACCESS_TOKEN}', SHOPIFY_STORE_DOMAIN: '${input.MYSHOPIFY_DOMAIN}' } }],
+            },
+        ],
+    },
 }
 
 function eqSlug(calls: readonly { method: string; args: unknown[] }[]): unknown {
@@ -246,6 +276,55 @@ describe('installService with a key the app refuses', () => {
         expect(deleteVaultItem).toHaveBeenCalledWith({}, 'item-1')
         expect(patchVaultItem).not.toHaveBeenCalled()
         expect(updateVaultItemEnv).not.toHaveBeenCalled()
+    })
+})
+
+// RER-317: a Client ID and secret of a Dev Dashboard app not installed on the store were saved as connected,
+// and Shopify only said app_not_installed at the coworker's first call.
+describe('installService of Shopify with a Client ID and secret', () => {
+    const CREDENTIALS = { SHOPIFY_CLIENT_ID: 'client-id', SHOPIFY_CLIENT_SECRET: 'shpss_secret', MYSHOPIFY_DOMAIN: 'walking-store.myshopify.com' }
+
+    beforeEach(() => {
+        useRegistry({ services: {} })
+        vi.mocked(compileService).mockResolvedValue({ toolNames: ['shopify'], oauth: null, managed: null, composio: null, app: null })
+    })
+
+    afterEach(() => {
+        vi.mocked(compileService).mockResolvedValue({ toolNames: [], oauth: null, managed: null, composio: { toolkit: 'gmail', serverName: 'gmail' }, app: null })
+        vi.mocked(supportsVault).mockResolvedValue(false)
+    })
+
+    it.each([
+        ['on the coworker', false],
+        ['in the Vault', true],
+    ])('refuses an app not installed on the store and saves nothing %s', async (_, vault) => {
+        vi.mocked(supportsVault).mockResolvedValue(vault)
+        vi.mocked(fetchPublic).mockResolvedValue(new Response('Oauth error app_not_installed: The application is not installed on this shop.', { status: 400 }))
+
+        await expect(installService('agent', 'shopify', CREDENTIALS, 'client_credentials')).rejects.toMatchObject({ code: 'shopifyAppNotInstalled', params: { domain: 'walking-store.myshopify.com' } })
+        expect(vi.mocked(fetchPublic).mock.calls[0][0]).toBe('https://walking-store.myshopify.com/admin/oauth/access_token')
+        expect(compileService).not.toHaveBeenCalled()
+        expect(compileIntoVault).not.toHaveBeenCalled()
+        expect(upsertRegistryEntry).not.toHaveBeenCalled()
+    })
+
+    it('installs credentials Shopify exchanges for a token', async () => {
+        vi.mocked(fetchPublic).mockResolvedValue(new Response(JSON.stringify({ access_token: 'shpat_x' }), { status: 200 }))
+
+        await expect(installService('agent', 'shopify', CREDENTIALS, 'client_credentials')).resolves.toMatchObject({ status: 'installed', key: 'shopify' })
+    })
+
+    it('saves the store domain the way it was checked', async () => {
+        vi.mocked(fetchPublic).mockResolvedValue(new Response(JSON.stringify({ access_token: 'shpat_x' }), { status: 200 }))
+
+        await installService('agent', 'shopify', { ...CREDENTIALS, MYSHOPIFY_DOMAIN: ' https://Walking-Store.myshopify.com/ ' }, 'client_credentials')
+
+        expect(vi.mocked(compileService).mock.calls[0][2]).toEqual(CREDENTIALS)
+    })
+
+    it('asks Shopify nothing for an access token', async () => {
+        await expect(installService('agent', 'shopify', { SHOPIFY_ACCESS_TOKEN: 'shpat_x', MYSHOPIFY_DOMAIN: 'walking-store.myshopify.com' }, 'default')).resolves.toMatchObject({ status: 'installed' })
+        expect(fetchPublic).not.toHaveBeenCalled()
     })
 })
 

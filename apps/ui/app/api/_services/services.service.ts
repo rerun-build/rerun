@@ -36,6 +36,7 @@ import {
     upsertRegistryEntry,
 } from '@/lib/services/registry'
 import { rerankRelevant } from '@/lib/services/rerank'
+import { checkShopifyCredentials } from '@/lib/services/shopify-credentials'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { ALTERNATIVE_THRESHOLD, MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
 import type { AgentServiceStatus, AuthMethodSummary, InstallResult, InstalledService, ResetConnectionResult, ServiceAlternative, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
@@ -457,12 +458,13 @@ export async function installService(
         else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
         return { status: 'needs_config', key, slug: manifest.slug, name: manifest.name, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id, message: `${manifest.name} needs configuration. A form has been shown to the user — ask them to fill it in.` }
     }
+    const checked = await checkShopifyCredentials(manifest.slug, method.id, values)
 
     const intoVault = vault
-        ? await rethrowConflict(vault.ctx, () => compileIntoVault({ conn: vault.conn, manifest, values, authMethodId: method.id, instance: instance ?? undefined, itemId: vault.itemId, engineAgentId: vault.engineAgentId, createdBy: vault.createdBy }))
+        ? await rethrowConflict(vault.ctx, () => compileIntoVault({ conn: vault.conn, manifest, values: checked, authMethodId: method.id, instance: instance ?? undefined, itemId: vault.itemId, engineAgentId: vault.engineAgentId, createdBy: vault.createdBy }))
         : null
-    const { toolNames, oauth, managed, composio, app } = intoVault ?? (await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined))
-    const keyTyped = method.kind === 'key' && method.inputs.some(input => input.secret && values[input.key]?.trim())
+    const { toolNames, oauth, managed, composio, app } = intoVault ?? (await compileService(agentId, manifest, checked, method.id, actor, instance ?? undefined))
+    const keyTyped = method.kind === 'key' && method.inputs.some(input => input.secret && checked[input.key]?.trim())
     if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && usesInstances(manifest)), actor, vaultItem: intoVault?.item ?? null })
     if (oauth) {
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, oauth, message: `${manifest.name} needs the user to sign in. A Connect button has been shown to them.` }

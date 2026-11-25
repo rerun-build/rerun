@@ -5,7 +5,8 @@ import { EngineRequestError } from '@/lib/engine/client'
 import { createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { serviceManifestSchema } from '@/lib/services/manifest'
-import { addVaultMcp, addVaultSecret, addVaultService, saveSecretsToVault, vaultCatalog, vaultServerName } from './vault-install.service'
+import { fetchPublic } from '@/lib/net/public-fetch'
+import { addVaultMcp, addVaultSecret, addVaultService, reconfigureVaultService, saveSecretsToVault, vaultCatalog, vaultServerName } from './vault-install.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
 import { assertManagesCoworker, shareVaultEntry } from './vault.service'
 
@@ -15,6 +16,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectAll: vi.fn(), selectMany: 
 vi.mock('@rerun/cloud/apps.server', () => ({ paidAppFlags: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ createVaultItem: vi.fn(async (_c: unknown, input: Record<string, unknown>) => ({ id: 'new', ...input })), attachVaultItem: vi.fn(), getVaultItem: vi.fn(), listVaultItems: vi.fn(), updateVaultItemEnv: vi.fn() }))
 vi.mock('./services.service', () => ({ loadManifest: vi.fn(), toAuthMethodSummaries: vi.fn() }))
+vi.mock('@/lib/net/public-fetch', () => ({ fetchPublic: vi.fn() }))
 vi.mock('./vault.service', async () => ({
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     requireAdmin: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).requireAdmin,
@@ -275,6 +277,58 @@ describe('addVaultMcp', () => {
         expect(vaultServerName('Company Docs (prod)')).toBe('company-docs-prod')
         expect(vaultServerName('!!!')).toBe('mcp')
         expect(vaultServerName('x'.repeat(100))).toHaveLength(64)
+    })
+})
+
+// RER-317: the Vault's own form saved Shopify without asking the store, so an app not installed on it showed as connected.
+describe('Shopify with a Client ID and secret, from the Vault', () => {
+    const SHOPIFY = serviceManifestSchema.parse({
+        slug: 'shopify',
+        name: 'Shopify',
+        authMethods: [
+            {
+                id: 'client_credentials',
+                label: 'Client ID and secret',
+                kind: 'stdio',
+                inputs: [
+                    { key: 'SHOPIFY_CLIENT_ID', type: 'text', label: 'Client ID', required: true },
+                    { key: 'SHOPIFY_CLIENT_SECRET', type: 'password', label: 'Client secret', secret: true, required: true },
+                    { key: 'MYSHOPIFY_DOMAIN', type: 'text', label: 'Store domain', required: true },
+                ],
+                mcpServers: [{ name: 'shopify', command: 'npx', args: ['-y', 'cob-shopify-mcp', 'start'], env: { SHOPIFY_CLIENT_ID: '${input.SHOPIFY_CLIENT_ID}', SHOPIFY_CLIENT_SECRET: '${input.SHOPIFY_CLIENT_SECRET}', SHOPIFY_STORE_DOMAIN: '${input.MYSHOPIFY_DOMAIN}' } }],
+            },
+        ],
+    })
+    const CREDENTIALS = { SHOPIFY_CLIENT_ID: 'client-id', SHOPIFY_CLIENT_SECRET: 'shpss_secret', MYSHOPIFY_DOMAIN: 'https://Walking-Store.myshopify.com/' }
+    const notInstalled = () => vi.mocked(fetchPublic).mockResolvedValue(new Response('Oauth error app_not_installed: The application is not installed on this shop.', { status: 400 }))
+
+    beforeEach(() => {
+        vi.mocked(loadManifest).mockResolvedValue(SHOPIFY)
+        vi.mocked(toAuthMethodSummaries).mockReturnValue([])
+        vi.mocked(listVaultItems).mockResolvedValue([])
+    })
+
+    it('refuses an app not installed on the store and adds nothing', async () => {
+        notInstalled()
+
+        await expect(addVaultService({ slug: 'shopify', values: CREDENTIALS, authMethodId: 'client_credentials', agentIds: ['alice'] })).rejects.toMatchObject({ code: 'shopifyAppNotInstalled', params: { domain: 'walking-store.myshopify.com' } })
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('refuses it when the entry is configured again, and leaves the entry as it was', async () => {
+        vi.mocked(getVaultItem).mockResolvedValue({ id: 'shop', kind: 'service', slug: 'shopify', authMethodId: 'client_credentials' } as never)
+        notInstalled()
+
+        await expect(reconfigureVaultService('shop', CREDENTIALS, 'client_credentials')).rejects.toMatchObject({ code: 'shopifyAppNotInstalled' })
+        expect(updateVaultItemEnv).not.toHaveBeenCalled()
+    })
+
+    it('saves the store domain the way it was checked', async () => {
+        vi.mocked(fetchPublic).mockResolvedValue(new Response(JSON.stringify({ access_token: 'shpat_x' }), { status: 200 }))
+
+        await addVaultService({ slug: 'shopify', values: CREDENTIALS, authMethodId: 'client_credentials' })
+
+        expect(vi.mocked(createVaultItem).mock.calls[0][1].config).toMatchObject({ MYSHOPIFY_DOMAIN: 'walking-store.myshopify.com' })
     })
 })
 
