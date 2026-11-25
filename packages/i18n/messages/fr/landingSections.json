@@ -143,6 +143,10 @@
             "hook": "URL du webhook",
             "next": "Prochaine exécution aujourd’hui à 07:00",
             "save": "Enregistrer"
+        },
+        "bring": {
+            "title": "Utilisez l’IA que vous payez déjà",
+            "body": "Branchez votre abonnement <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> ou <opencode>OpenCode</opencode>, vos clés d’API, ou les crédits Rerun inclus."
         }
     },
     "steps": {
@@ -401,9 +405,17 @@
                 "question": "Pourquoi un Coworker fait-il mieux que Claude ou ChatGPT sur la même tâche ?",
                 "answer": "Parce qu’un chatbot s’arrête à la réponse. Il rédige l’e-mail, et c’est encore vous qui ouvrez l’onglet, copiez le texte, vous connectez au vieux portail et l’envoyez. Un Coworker a son propre ordinateur et vos apps : il fait ces étapes lui-même, et il démarre seul à 7 h, sans que vous ouvriez quoi que ce soit."
             },
+            "flows": {
+                "question": "Quelle différence avec Zapier, Make ou n8n ?",
+                "answer": "Ces outils suivent un scénario figé, étape par étape, et cassent dès qu’une page ou un e-mail change. Un Coworker part d’un objectif : il s’adapte à ce qu’il trouve et vous montre chaque étape de son travail."
+            },
             "start": {
                 "question": "Je ne sais pas quoi lui confier en premier. Par où commencer ?",
                 "answer": "Prenez ce que vous refaites chaque semaine à contrecœur : les relances de factures, le tri de la boîte mail, le rapport du lundi. Les exemples de cette page sont ceux que les gens confient en premier."
+            },
+            "code": {
+                "question": "Faut-il savoir coder ?",
+                "answer": "Non. Décrivez le poste avec vos mots, ou installez un Coworker tout prêt. Il écrit lui-même ses skills et connecte les apps dont il a besoin."
             },
             "readyMade": {
                 "question": "Puis-je partir d’un Coworker tout prêt ?",
@@ -413,6 +425,10 @@
                 "question": "Quelqu’un peut-il configurer mes Coworkers pour moi ?",
                 "answer": "Oui. Les experts Rerun conçoivent et installent des Coworkers, c’est leur métier : vous pouvez les parcourir et en engager un. Nous deux, qui construisons Rerun, répondons aussi sur Discord, gratuitement.",
                 "link": "experts"
+            },
+            "whiteLabel": {
+                "question": "J’ai une agence. Puis-je vendre Rerun sous ma propre marque ?",
+                "answer": "Oui. Avec la marque blanche, Rerun porte votre nom, votre logo et votre domaine, avec un workspace pour chacun de vos clients. Écrivez aux fondateurs pour la mettre en place."
             },
             "safe": {
                 "question": "Mes données sont-elles en sécurité ?",
@@ -429,6 +445,10 @@
             "where": {
                 "question": "Où tournent mes Coworkers, concrètement ?",
                 "answer": "Sur leur propre machine dans le cloud, en Europe, une par workspace et isolée de tous les autres. Elle est toujours allumée, et ses fichiers, sa mémoire et ses bases de données restent à l’intérieur."
+            },
+            "selfHost": {
+                "question": "Puis-je héberger Rerun moi-même ?",
+                "answer": "Oui. Rerun est open source sous AGPL-3.0, et tourne sur votre propre ordinateur ou serveur avec Docker."
             },
             "laptop": {
                 "question": "Est-ce que ça tourne quand mon ordinateur est fermé ?",
@@ -450,6 +470,10 @@
                 "question": "Les Coworkers peuvent-ils travailler ensemble ?",
                 "answer": "Oui. Ils se passent le travail : l’un trouve les leads, le suivant leur écrit, un troisième classe le résultat. Vous le demandez une fois, et la chaîne tourne sans vous au milieu."
             },
+            "team": {
+                "question": "Toute mon équipe peut l’utiliser ?",
+                "answer": "Oui, avec autant de collègues que vous voulez, sans frais en plus. Tout le monde partage le même board, chacun peut répondre à un Coworker qui attend, et sa mémoire et ses skills restent dans le workspace quand quelqu’un s’en va."
+            },
             "watch": {
                 "question": "Puis-je les regarder travailler, en direct ?",
                 "answer": "Oui, c’est tout l’intérêt. Chaque Coworker est sur un seul board, mis à jour en temps réel pendant qu’il travaille, avec l’historique complet de chaque exécution quand vous voulez le détail."
@@ -468,7 +492,7 @@
             },
             "phone": {
                 "question": "Puis-je utiliser Rerun depuis mon téléphone ?",
-                "answer": "Oui. Rerun tourne dans le navigateur de votre téléphone et s’installe sur l’écran d’accueil comme une app. Le board, la conversation et les validations sont pensés pour un petit écran : vous débloquez un Coworker depuis une file d’attente."
+                "answer": "Oui. Rerun a sa propre app sur l’App Store et Google Play : le board, les conversations et les validations, pensés pour un petit écran."
             },
             "billing": {
                 "question": "Comment fonctionne la facturation ? Je paie par personne ?",
@@ -485,6 +509,10 @@
             "data": {
                 "question": "Combien coûtent les e-mails, numéros de téléphone et autres données ?",
                 "answer": "Ils sont pris sur votre crédit Rerun, et un e-mail ou un numéro n’est facturé que s’il est trouvé. Avant une recherche, votre Coworker vous dit ce qu’elle coûtera et attend votre accord. Aucun fournisseur de données à qui s’abonner."
+            },
+            "social": {
+                "question": "LinkedIn et WhatsApp sont-ils inclus ?",
+                "answer": "Ce sont des options payantes, vendues à part. L’enrichissement de leads peut aussi passer par votre propre compte Apollo, Clay ou Prospeo."
             }
         }
     },

@@ -9,6 +9,7 @@
             "useCases": "תרחישי שימוש",
             "industries": "תעשיות",
             "templates": "תבניות",
+            "whiteLabel": "White Label",
             "pricing": "תמחור",
             "community": "קהילה",
             "resources": "משאבים"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "לשלוח הודעה...",
     "dialog": {
         "close": "לסגור"
+    },
+    "app": {
+        "download": "להוריד אפליקציה",
+        "appStore": "להורדה ב-App Store",
+        "playStore": "כעת ב-Google Play",
+        "menu": "macOS, Windows ו-Linux",
+        "desktop": "אפליקציה למחשב",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

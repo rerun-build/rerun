@@ -90,6 +90,11 @@ export type HeroCta =
     | 'video'
     | 'composer'
 
+export type AppDownloadPlatform = 'mac' | 'windows' | 'linux' | 'ios' | 'android'
+// Where the link sits: the top bar, a hero, a section's own button, the tiles of the download section
+// or of the /download page, the devices named under the workspace picture.
+export type AppDownloadPlacement = 'nav' | 'hero' | 'section' | 'tiles' | 'devices' | 'download_page'
+
 // A paying customer, or a trial whose end charges a card.
 export type CancelFlowPhase = 'paid' | 'trial'
 
@@ -293,6 +298,9 @@ export interface AnalyticsEventMap {
     // des agents que les gens veulent, pas pour sa longueur exacte. Le reste est ce que le composer a
     // lu dans ce prompt, ou la suggestion dont il est parti.
     hero_cta_clicked: { cta: HeroCta; prompt?: string; prompt_length?: number; agent_name?: string; apps_count?: number; scheduled?: boolean; suggestion?: string }
+    // A link of the landing that downloads the desktop app or opens the mobile app's store. `arch` is the
+    // desktop build's; a phone has none.
+    app_download_clicked: { platform: AppDownloadPlatform; arch?: 'arm64' | 'x64'; placement: AppDownloadPlacement }
     // Émis une fois par visite. Sans lui on ne sait pas distinguer « le champ n'attire personne » de
     // « le champ attire mais ne convertit pas », deux verdicts opposés sur la même variante.
     hero_composer_engaged: { via: 'typing' | 'suggestion' }

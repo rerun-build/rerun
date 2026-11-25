@@ -143,6 +143,10 @@
             "hook": "Webhook URL",
             "next": "Next run today at 07:00",
             "save": "Save"
+        },
+        "bring": {
+            "title": "Bring the AI you already pay for",
+            "body": "Plug in the <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> or <opencode>OpenCode</opencode> plan you already have, your own API keys, or the Rerun credits included."
         }
     },
     "steps": {
@@ -401,9 +405,17 @@
                 "question": "Why is a Coworker better than Claude or ChatGPT at the same task?",
                 "answer": "Because a chatbot stops at the answer. It writes the email, and you still open the tab, copy the text, log into the old portal and send it. A Coworker has its own computer and your apps, so it does those steps itself, and it starts on its own at 7am, without you opening anything."
             },
+            "flows": {
+                "question": "How is it different from Zapier, Make or n8n?",
+                "answer": "Those run a fixed flow, step by step, and break when a page or an email changes. A Coworker works from a goal: it adapts to what it finds and shows you every step it took."
+            },
             "start": {
                 "question": "I do not know what to hand one first. Where do I start?",
                 "answer": "Take the thing you redo every week and dread doing: the invoice chase, the inbox triage, the Monday report. The examples on this page are the ones people hand over first."
+            },
+            "code": {
+                "question": "Do I need to know how to code?",
+                "answer": "No. Describe the job in plain words, or install a ready-made Coworker. It writes its own skills and connects the apps it needs."
             },
             "readyMade": {
                 "question": "Can I start from something ready-made?",
@@ -413,6 +425,10 @@
                 "question": "Can someone set my Coworkers up for me?",
                 "answer": "Yes. Rerun experts build and install Coworkers for a living, and you can browse them and hire one. The two of us who build Rerun also answer in the Discord, for free.",
                 "link": "experts"
+            },
+            "whiteLabel": {
+                "question": "I run an agency. Can I sell Rerun under my own brand?",
+                "answer": "Yes. With the white label, Rerun runs under your name, your logo and your domain, with a workspace for each of your clients. Write to the founders to set it up."
             },
             "safe": {
                 "question": "Is my data safe?",
@@ -429,6 +445,10 @@
             "where": {
                 "question": "Where do my Coworkers actually run?",
                 "answer": "On their own machine in the cloud, in Europe, one per workspace and isolated from everyone else. It is always on, and its files, its memory and its databases stay inside it."
+            },
+            "selfHost": {
+                "question": "Can I host Rerun myself?",
+                "answer": "Yes. Rerun is open source under AGPL-3.0, and it runs on your own computer or server with Docker."
             },
             "laptop": {
                 "question": "Does it keep running when my laptop is closed?",
@@ -450,6 +470,10 @@
                 "question": "Can Coworkers work together?",
                 "answer": "Yes. They hand work to each other: one finds the leads, the next writes to them, a third files the result. You ask for it once, and the chain runs without you in the middle."
             },
+            "team": {
+                "question": "Can my whole team use it?",
+                "answer": "Yes, with as many teammates as you want at no extra cost. Everyone shares one board, anyone can answer a Coworker that is waiting, and its memory and skills stay with the workspace when someone leaves."
+            },
             "watch": {
                 "question": "Can I watch them work, live?",
                 "answer": "Yes, that is the whole idea. Every Coworker is on one board, updated in real time while it works, with the full history of every run when you want the detail."
@@ -468,7 +492,7 @@
             },
             "phone": {
                 "question": "Can I use Rerun from my phone?",
-                "answer": "Yes. Rerun runs in your phone browser and installs to your home screen like an app. The board, the conversation and the approvals are all built for a small screen, so you can unblock a Coworker from a queue."
+                "answer": "Yes. Rerun has its own app on the App Store and Google Play: the board, the conversations and the approvals, built for a small screen."
             },
             "billing": {
                 "question": "How does billing work? Do I pay per person?",
@@ -485,6 +509,10 @@
             "data": {
                 "question": "What do the emails, phone numbers and other data cost?",
                 "answer": "They come out of your Rerun credit, and an email or a phone number is only billed when it is found. Before a search, your Coworker tells you what it will cost and waits for your yes. There is no data provider to subscribe to."
+            },
+            "social": {
+                "question": "Are LinkedIn and WhatsApp included?",
+                "answer": "They are paid add-ons, sold separately. Lead enrichment can also run on your own Apollo, Clay or Prospeo account."
             }
         }
     },
@@ -573,6 +601,7 @@
         "foreman.powers.voice.detail": "<kbd> draws the key as a keycap.",
         "foreman.voice.running": "A status line while the assistant runs its 'Message Coworker' tool.",
         "foreman.partner.running": "A status line while the assistant runs its 'Create Coworker' tool.",
-        "foreman.autopilot.name": "The name of the feature, on a switch."
+        "foreman.autopilot.name": "The name of the feature, on a switch.",
+        "plan.bring.body": "<chatgpt>, <claude> and <opencode> draw the logo of the product they name. Keep the three names as they are."
     }
 }

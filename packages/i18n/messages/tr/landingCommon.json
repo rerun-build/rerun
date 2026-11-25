@@ -9,6 +9,7 @@
             "useCases": "Kullanım alanları",
             "industries": "Sektörler",
             "templates": "Şablonlar",
+            "whiteLabel": "Beyaz etiket",
             "pricing": "Fiyatlandırma",
             "community": "Topluluk",
             "resources": "Kaynaklar"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "Bir mesaj gönderin...",
     "dialog": {
         "close": "Kapat"
+    },
+    "app": {
+        "download": "Uygulamayı indir",
+        "appStore": "App Store'dan indirin",
+        "playStore": "Google Play'den alın",
+        "menu": "macOS, Windows ve Linux",
+        "desktop": "Masaüstü uygulaması",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

@@ -54,5 +54,15 @@
             "title": "Toujours là",
             "body": "Fermer la fenêtre garde Rerun dans la barre des menus ou la zone de notification, avec sur son icône le nombre de ce qui vous attend."
         }
+    },
+    "section": {
+        "title": "Télécharger Rerun",
+        "lead": "Vos Coworkers sur votre ordinateur et dans votre poche. Branchez ChatGPT, Claude ou OpenCode une fois, suivez-les de partout.",
+        "macMeta": "macOS 13+ · Apple Silicon et Intel",
+        "windowsMeta": "Windows 10+ · x64 et Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Vos Coworkers dans votre poche"
     }
 }

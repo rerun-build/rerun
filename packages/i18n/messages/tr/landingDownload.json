@@ -54,5 +54,15 @@
             "title": "Her zaman çalışır",
             "body": "Pencereyi kapatmak Rerun'ı menü çubuğunda veya sistem tepsisinde tutar, simgesinde sizi bekleyenlerin sayısı görünür."
         }
+    },
+    "section": {
+        "title": "Rerun'ı indirin",
+        "lead": "Coworker'larınız bilgisayarınızda ve cebinizde. ChatGPT, Claude veya OpenCode'u bir kez bağlayın, onları her yerden takip edin.",
+        "macMeta": "macOS 13+ · Apple Silicon ve Intel",
+        "windowsMeta": "Windows 10+ · x64 ve Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Coworker'larınız cebinizde"
     }
 }

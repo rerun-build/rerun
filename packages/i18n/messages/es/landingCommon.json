@@ -9,6 +9,7 @@
             "useCases": "Casos de uso",
             "industries": "Sectores",
             "templates": "Plantillas",
+            "whiteLabel": "Marca blanca",
             "pricing": "Precios",
             "community": "Comunidad",
             "resources": "Recursos"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "Enviar un mensaje...",
     "dialog": {
         "close": "Cerrar"
+    },
+    "app": {
+        "download": "Descargar la app",
+        "appStore": "Descárgalo en el App Store",
+        "playStore": "Disponible en Google Play",
+        "menu": "macOS, Windows y Linux",
+        "desktop": "App de escritorio",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

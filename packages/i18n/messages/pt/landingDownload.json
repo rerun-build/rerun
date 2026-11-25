@@ -54,5 +54,15 @@
             "title": "Sempre rodando",
             "body": "Fechar a janela mantém o Rerun na barra de menus ou na bandeja do sistema, com o número do que espera por você no ícone."
         }
+    },
+    "section": {
+        "title": "Baixe o Rerun",
+        "lead": "Seus Coworkers no computador e no bolso. Conecte o ChatGPT, o Claude ou o OpenCode uma vez e acompanhe de qualquer lugar.",
+        "macMeta": "macOS 13+ · Apple Silicon e Intel",
+        "windowsMeta": "Windows 10+ · x64 e Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Seus Coworkers no bolso"
     }
 }

@@ -54,5 +54,15 @@
             "title": "يعمل دائمًا",
             "body": "إغلاق النافذة يُبقي Rerun في شريط القوائم أو علبة النظام، مع عدد ما ينتظرك على أيقونته."
         }
+    },
+    "section": {
+        "title": "نزّل Rerun",
+        "lead": "زملاؤك على حاسوبك وفي جيبك. اربط ChatGPT أو Claude أو OpenCode مرة واحدة، وتابعهم من أي مكان.",
+        "macMeta": "macOS 13 أو أحدث · Apple Silicon وIntel",
+        "windowsMeta": "Windows 10 أو أحدث · x64 وArm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "زملاؤك في جيبك"
     }
 }

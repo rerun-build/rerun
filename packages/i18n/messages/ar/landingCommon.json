@@ -9,6 +9,7 @@
             "useCases": "حالات الاستخدام",
             "industries": "القطاعات",
             "templates": "القوالب",
+            "whiteLabel": "العلامة البيضاء",
             "pricing": "الأسعار",
             "community": "المجتمع",
             "resources": "الموارد"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "أرسل رسالة...",
     "dialog": {
         "close": "إغلاق"
+    },
+    "app": {
+        "download": "نزّل التطبيق",
+        "appStore": "تنزيل من App Store",
+        "playStore": "احصل عليه من Google Play",
+        "menu": "macOS وWindows وLinux",
+        "desktop": "تطبيق سطح المكتب",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

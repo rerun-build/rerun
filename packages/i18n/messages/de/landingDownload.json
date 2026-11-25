@@ -54,5 +54,15 @@
             "title": "Immer da",
             "body": "Beim Schließen des Fensters bleibt Rerun in der Menüleiste oder im Infobereich, mit der Zahl dessen, was auf dich wartet, auf dem Symbol."
         }
+    },
+    "section": {
+        "title": "Rerun herunterladen",
+        "lead": "Deine Coworker auf dem Computer und in der Hosentasche. Verbinde ChatGPT, Claude oder OpenCode einmal und behalte sie von überall im Blick.",
+        "macMeta": "macOS 13+ · Apple Silicon und Intel",
+        "windowsMeta": "Windows 10+ · x64 und Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Deine Coworker in der Hosentasche"
     }
 }

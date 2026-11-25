@@ -1,8 +1,8 @@
 {
     "hero": {
         "title": {
-            "lead": "雇佣 <keep>AI <chip>同事</chip></keep>",
-            "tail": "他们像您一样工作。"
+            "lead": "遇见 <keep>AI <chip>同事</chip></keep>",
+            "tail": "比真人更出色。"
         },
         "subtitle": "聊天机器人告诉您该做什么，AI 同事直接把事情做完。把您已付费的大模型接入 Rerun，然后给他们分配工作。",
         "cta": "以 {price} 开始 5 天试用",
@@ -407,7 +407,21 @@
                         "frequency": "每月 1 日上午 9:00"
                     }
                 }
+            },
+            "classic": {
+                "search": "搜索",
+                "inbox": "收件箱",
+                "coworkers": "同事",
+                "chiefOfStaff": "Chief of Staff",
+                "chiefOfStaffLine": "关于团队的一切，尽管问",
+                "recent": "最近",
+                "byBox": "按 Box",
+                "back": "返回"
             }
+        },
+        "lines": {
+            "plans": "连接 <chatgpt>ChatGPT</chatgpt>、<claude>Claude</claude> 或 <opencode>OpenCode</opencode>，让同事完成每一项任务。",
+            "team": "免费邀请您的团队，马上开始协作。"
         }
     },
     "cases": {
@@ -651,5 +665,70 @@
             "name": "您的副业项目",
             "crew": "1 位同事 · 内容"
         }
+    },
+    "jobs": {
+        "title": "给每位<chip>同事</chip><end>一份工作。</end>",
+        "lead": "同事是适合任何业务的 AI 智能体。先交给它一份您会交给新员工的工作。"
+    },
+    "abilities": {
+        "title": "每位<chip>同事</chip>都独立工作。",
+        "items": {
+            "memory": {
+                "title": "自己的记忆",
+                "line": "您说过一次，它就记住：您的客户、您的语气、哪些事不能再做。"
+            },
+            "skills": {
+                "title": "自己的技能",
+                "line": "工作的每个步骤都写下来。教它一项新技能，它每次都照样做好。"
+            },
+            "apps": {
+                "title": "自己的应用",
+                "line": "您的工具只需连接一次：它自己登录，自己在里面干活。"
+            },
+            "computer": {
+                "title": "自己的电脑",
+                "line": "云端有它专属的屏幕，像真人一样打开您的应用，点击操作。"
+            }
+        },
+        "card": {
+            "share": "分享",
+            "apps": "应用",
+            "skills": "技能",
+            "knowledge": "知识",
+            "routines": "例行任务",
+            "files": "文件",
+            "database": "数据库",
+            "working": "正在自己的电脑上工作",
+            "activity": "活动",
+            "settings": "设置",
+            "delete": "删除此同事"
+        },
+        "hubspot": {
+            "contacts": "联系人",
+            "search": "搜索",
+            "create": "创建联系人",
+            "name": "姓名",
+            "company": "公司",
+            "jobTitle": "职务",
+            "stage": "阶段",
+            "lead": "线索"
+        }
+    },
+    "everywhere": {
+        "title": "您的工作区，在云端，也在您身边。",
+        "lead": "您的同事在自己的机器上 24/7 工作，合上电脑也不停。在任何屏幕上都能跟进。",
+        "local": "想自己运行？Rerun 是开源的。<link>自行托管</link>",
+        "web": "网页版",
+        "scene": {
+            "ask": "找出法国刚开始招聘销售人员的 SaaS 公司。",
+            "found": "找到 26 家公司。前 3 名已放进 HubSpot。",
+            "routine": "每周一 9:00",
+            "composer": "发送消息…",
+            "online": "24/7 在线 · {time}"
+        }
+    },
+    "tools": {
+        "title": "<chip>同事</chip>使用您的工具工作，<even>内部工具也不例外。</even>",
+        "count": "{count, number}+ 项集成，<own>还可通过 MCP 或 API 接入您自己的工具。</own>"
     }
 }

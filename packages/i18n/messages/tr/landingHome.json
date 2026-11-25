@@ -1,8 +1,8 @@
 {
     "hero": {
         "title": {
-            "lead": "<keep>AI <chip>Coworker'lar</chip></keep> işe alın",
-            "tail": "Sizin gibi çalışırlar."
+            "lead": "İşte <keep>AI <chip>Coworker'lar</chip></keep>",
+            "tail": "İnsanlardan daha iyi."
         },
         "subtitle": "Sohbet botları ne yapacağınızı söyler. AI Coworker'lar işi bitirir. Zaten ödediğiniz LLM'i Rerun'a bağlayın ve onlara iş verin.",
         "cta": "{price} ile 5 günlük denemeyi başlatın",
@@ -407,7 +407,21 @@
                         "frequency": "Her ayın 1'i 09:00"
                     }
                 }
+            },
+            "classic": {
+                "search": "Ara",
+                "inbox": "Gelen kutusu",
+                "coworkers": "Coworker'lar",
+                "chiefOfStaff": "Chief of Staff",
+                "chiefOfStaffLine": "Ekibiniz hakkında her şeyi sorun",
+                "recent": "Son kullanılanlar",
+                "byBox": "Box'a göre",
+                "back": "Geri"
             }
+        },
+        "lines": {
+            "plans": "<chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> veya <opencode>OpenCode</opencode> bağlayın, Coworker'lar her işi bitirsin.",
+            "team": "Ekibinizi ücretsiz davet edin ve birlikte çalışmaya başlayın."
         }
     },
     "cases": {
@@ -651,5 +665,70 @@
             "name": "Yan Projeniz",
             "crew": "1 Coworker · İçerik"
         }
+    },
+    "jobs": {
+        "title": "Her <chip>Coworker'a</chip> <end>bir iş verin.</end>",
+        "lead": "Coworker'lar her işletmeye uyum sağlayan AI ajanlarıdır. Yeni bir çalışana vereceğiniz işle başlayın."
+    },
+    "abilities": {
+        "title": "Her <chip>Coworker</chip> bağımsızdır.",
+        "items": {
+            "memory": {
+                "title": "Kendi belleği",
+                "line": "Bir kez söylediğinizi unutmaz: müşterileriniz, üslubunuz, bir daha yapılmaması gerekenler."
+            },
+            "skills": {
+                "title": "Kendi skill'leri",
+                "line": "İşinin adımları, yazılı olarak. Yenisini öğretin, her seferinde aynı şekilde yapsın."
+            },
+            "apps": {
+                "title": "Kendi uygulamaları",
+                "line": "Araçlarınızı bir kez bağlayın: oturumu kendisi açar, işini kendi başına yapar."
+            },
+            "computer": {
+                "title": "Kendi bilgisayarı",
+                "line": "Bulutta kendine ait bir ekran: uygulamalarınızı açar, bir insan gibi tıklayarak kullanır."
+            }
+        },
+        "card": {
+            "share": "Paylaş",
+            "apps": "Uygulamalar",
+            "skills": "Skill'ler",
+            "knowledge": "Bilgi",
+            "routines": "Rutinler",
+            "files": "Dosyalar",
+            "database": "Veritabanı",
+            "working": "Bilgisayarında çalışıyor",
+            "activity": "Etkinlik",
+            "settings": "Ayarlar",
+            "delete": "Bu coworker'ı sil"
+        },
+        "hubspot": {
+            "contacts": "Kişiler",
+            "search": "Ara",
+            "create": "Kişi oluştur",
+            "name": "Ad",
+            "company": "Şirket",
+            "jobTitle": "Unvan",
+            "stage": "Aşama",
+            "lead": "Lead"
+        }
+    },
+    "everywhere": {
+        "title": "Çalışma alanınız bulutta ve her yerde.",
+        "lead": "Coworker'larınız kendi makinelerinde 7/24 çalışır, dizüstünüz kapalıyken bile. Onları her ekrandan takip edin.",
+        "local": "Kendiniz mi çalıştırmak istiyorsunuz? Rerun açık kaynaktır. <link>Kendiniz barındırın</link>",
+        "web": "Web",
+        "scene": {
+            "ask": "Fransa'da satış ekibi işe almaya yeni başlamış SaaS şirketlerini bul.",
+            "found": "26 şirket bulundu. İlk 3'ü HubSpot'ta.",
+            "routine": "Her pazartesi 09:00",
+            "composer": "Bir mesaj gönderin…",
+            "online": "7/24 çevrimiçi · {time}"
+        }
+    },
+    "tools": {
+        "title": "<chip>Coworker'lar</chip> araçlarınızla çalışır, <even>şirket içi olanlarla bile.</even>",
+        "count": "{count, number}+ entegrasyon, <own>MCP veya API ile kendi araçlarınız da dahil.</own>"
     }
 }

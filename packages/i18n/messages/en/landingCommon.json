@@ -9,6 +9,7 @@
             "useCases": "Use cases",
             "industries": "Industries",
             "templates": "Templates",
+            "whiteLabel": "White label",
             "pricing": "Pricing",
             "community": "Community",
             "resources": "Resources"
@@ -314,9 +315,37 @@
         "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",
         "openSource.announce": "<wide> wraps the part hidden on small screens.",
         "og.default.line1": "The social card of the site (1200x630 image): three short lines, the last one highlighted. Keep each line short.",
-        "dialog.close": "Screen reader label of the X button that closes a dialog."
+        "dialog.close": "Screen reader label of the X button that closes a dialog.",
+        "nav.items.whiteLabel": "Top bar link to the page for agencies that resell the product under their own brand. \"White label\" is the commercial term.",
+        "app.download": "Button of the top bar and the home page: downloads the desktop app, or opens the store on a phone. Keep it short.",
+        "app.appStore": "Use Apple's own wording of its badge in this language.",
+        "app.playStore": "Use Google's own wording of its badge in this language.",
+        "app.menu": "Screen reader label of the button that opens the list of systems.",
+        "app.mac": "Name of the operating system, keep it as is.",
+        "app.windows": "Name of the operating system, keep it as is.",
+        "app.linux": "Name of the operating system, keep it as is.",
+        "app.appleSilicon": "Apple's name for its own Mac chips, keep it as is.",
+        "app.intel": "Keep it as is.",
+        "app.x64": "Keep it as is.",
+        "app.arm64": "PCs with an Arm chip, keep the word Arm.",
+        "app.appImage": "A Linux file format, keep the name."
     },
     "dialog": {
         "close": "Close"
+    },
+    "app": {
+        "download": "Download app",
+        "appStore": "Download on the App Store",
+        "playStore": "Get it on Google Play",
+        "menu": "macOS, Windows and Linux",
+        "desktop": "Desktop app",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

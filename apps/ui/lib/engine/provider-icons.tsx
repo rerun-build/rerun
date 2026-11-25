@@ -1,12 +1,13 @@
 // Inline brand SVG logos for the model-selector providers and the MCP clients we tell people how
 // to connect.
 //
-// Kept dependency-free (no icon library): one small component per provider, plus a
+// No icon library: one small component per provider, plus a
 // <ProviderIcon> dispatcher keyed by the catalog `provider` id (see models.ts).
 // Anthropic and Google keep their brand colors; OpenAI and OpenRouter use
 // `currentColor` so their near-black marks stay visible in both light and dark themes.
 
 import type { JSX } from 'react'
+import { OpenCodeMark } from '@rerun/ui/beams'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { ServerIcon } from '@/lib/icons'
 
@@ -73,20 +74,6 @@ function OpenRouterIcon({ className = 'size-3.5' }: IconProps) {
     )
 }
 
-// Shared with the offer board, which inlines the same mark as a data URL for its tile.
-export const OPENCODE_FRAME_PATH = 'M384 416H128V96H384V416ZM320 160H192V352H320V160Z'
-export const OPENCODE_CORE_PATH = 'M320 224V352H192V224H320Z'
-
-// OpenCode's own mark is white on near-black; `currentColor` keeps it readable in both themes.
-function OpenCodeIcon({ className = 'size-3.5' }: IconProps) {
-    return (
-        <svg className={className} viewBox="80 80 352 352" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d={OPENCODE_CORE_PATH} opacity={0.4} />
-            <path fillRule="evenodd" clipRule="evenodd" d={OPENCODE_FRAME_PATH} />
-        </svg>
-    )
-}
-
 function CursorIcon({ className = 'size-3.5' }: IconProps) {
     return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -105,7 +92,7 @@ const PROVIDER_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     google: GoogleIcon,
     apple: AppleIcon,
     openrouter: OpenRouterIcon,
-    opencode: OpenCodeIcon,
+    opencode: OpenCodeMark,
 }
 
 // Brand logo for a catalog provider id. A provider with no logo of its own — a user's own

@@ -9,6 +9,7 @@
             "useCases": "Anwendungsfälle",
             "industries": "Branchen",
             "templates": "Vorlagen",
+            "whiteLabel": "White Label",
             "pricing": "Preise",
             "community": "Community",
             "resources": "Ressourcen"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "Nachricht senden...",
     "dialog": {
         "close": "Schließen"
+    },
+    "app": {
+        "download": "App laden",
+        "appStore": "Laden im App Store",
+        "playStore": "Jetzt bei Google Play",
+        "menu": "macOS, Windows und Linux",
+        "desktop": "Desktop-App",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

@@ -1,7 +1,7 @@
 {
     "_context": {
         "cases.quoted": "A customer quote wrapped in this language's quotation marks (French: « {quote} »).",
-        "hero.title.lead": "First line of the home H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep both tags around the same words.",
+        "hero.title.lead": "First line of the home H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep both tags around the same words, and the line about as long as in English.",
         "hero.pillLeads.jobs": "Read glued to a job title on a pill: \"Hire a | Sales\". The job pills (hero.tiles.*.pill) must read naturally after it.",
         "hero.pillLeads.tasks": "Read glued to a task on a pill: \"Hire a Coworker to | Find new clients\".",
         "hero.tiles": "Job titles written on small isometric tiles of a demo board: 20 characters at most.",
@@ -12,12 +12,23 @@
         "coworker.tools.gmail.typed2": "Typed letter by letter in a fixed-width window: 33 characters at most.",
         "coworker.always.place": "Where the Coworker's machine runs: a box id, then a city and its country.",
         "hero.screen": "A demo of the product playing inside a screen on the home page: Coworkers on a board, their chat threads, an inbox, the Chief of Staff. Names of companies and people are fictional and stay as they are.",
-        "hero.screen.foreman": "{writer}, {social}, {research}, {invoices} are Coworker job titles (hero.tiles.*.job) used as names: \"the Content Marketer\"."
+        "hero.screen.foreman": "{writer}, {social}, {research}, {invoices} are Coworker job titles (hero.tiles.*.job) used as names: \"the Content Marketer\".",
+        "hero.title.tail": "Second line of the home H1, about the AI Coworkers of the first line.",
+        "hero.lines.plans": "<chatgpt>, <claude> and <opencode> draw the logo of the product they name. Keep the three names as they are.",
+        "hero.screen.classic": "Labels of the app's sidebar and phone home, in a demo. A Box is a group of coworkers.",
+        "jobs.title": "<chip> wraps the word drawn as a rotating avatar pill. <end> goes to a second line on a wide screen.",
+        "abilities.title": "<chip> wraps the word drawn as a rotating avatar pill.",
+        "abilities.card": "Labels of a Coworker's card in a picture of the app. Use the words the app uses. Keep them short.",
+        "abilities.hubspot": "HubSpot's contacts page in a picture. Use the labels HubSpot shows in this language.",
+        "abilities.hubspot.lead": "A stage of a contact in a CRM: a prospect. Very short.",
+        "everywhere.scene.online": "A pill over the picture: the machine answers at any hour. {time} is an hour such as 03:40.",
+        "tools.title": "<chip> wraps the word drawn as a rotating avatar pill. <even> is greyed, at the end of the title.",
+        "tools.count": "One line under a wall of app logos. <own> is greyed."
     },
     "hero": {
         "title": {
-            "lead": "Hire <keep>AI <chip>Coworkers</chip></keep>",
-            "tail": "They work like you."
+            "lead": "Meet <keep>AI <chip>Coworkers</chip></keep>",
+            "tail": "Better than humans."
         },
         "subtitle": "Chatbots tell you what to do. AI Coworkers get the job done. Plug the LLM you already pay for into Rerun and give them work.",
         "cta": "Start a 5-day trial for {price}",
@@ -422,7 +433,21 @@
                         "frequency": "Monthly on day 1 at 9:00 AM"
                     }
                 }
+            },
+            "classic": {
+                "search": "Search",
+                "inbox": "Inbox",
+                "coworkers": "Coworkers",
+                "chiefOfStaff": "Chief of Staff",
+                "chiefOfStaffLine": "Ask anything about your team",
+                "recent": "Recent",
+                "byBox": "By Box",
+                "back": "Back"
             }
+        },
+        "lines": {
+            "plans": "Connect <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> or <opencode>OpenCode</opencode> and let Coworkers get every task done.",
+            "team": "Invite your team for free and start working together."
         }
     },
     "cases": {
@@ -666,5 +691,70 @@
             "name": "Your Side Project",
             "crew": "1 Coworker · Content"
         }
+    },
+    "jobs": {
+        "title": "Give each <chip>Coworker</chip> <end>a job.</end>",
+        "lead": "Coworkers are AI agents shaped for any business. Start with the job you would hand a new hire."
+    },
+    "abilities": {
+        "title": "Each <chip>Coworker</chip> is independent.",
+        "items": {
+            "memory": {
+                "title": "Its own memory",
+                "line": "It keeps what you told it once: your customers, your tone, what not to do again."
+            },
+            "skills": {
+                "title": "Its own skills",
+                "line": "The steps of its job, written down. Teach it a new one and it does it the same way every time."
+            },
+            "apps": {
+                "title": "Its own apps",
+                "line": "Your tools, connected once: it signs in and works in them on its own."
+            },
+            "computer": {
+                "title": "Its own computer",
+                "line": "A screen of its own in the cloud, to open your apps and click through them like a person."
+            }
+        },
+        "card": {
+            "share": "Share",
+            "apps": "Apps",
+            "skills": "Skills",
+            "knowledge": "Knowledge",
+            "routines": "Routines",
+            "files": "Files",
+            "database": "Database",
+            "working": "Working on its computer",
+            "activity": "Activity",
+            "settings": "Settings",
+            "delete": "Delete this coworker"
+        },
+        "hubspot": {
+            "contacts": "Contacts",
+            "search": "Search",
+            "create": "Create contact",
+            "name": "Name",
+            "company": "Company",
+            "jobTitle": "Job title",
+            "stage": "Stage",
+            "lead": "Lead"
+        }
+    },
+    "everywhere": {
+        "title": "Your workspace, in the cloud and everywhere.",
+        "lead": "Your Coworkers work 24/7 on their own machine, even with your laptop shut. Follow them from any screen.",
+        "local": "Rather run it yourself? Rerun is open source. <link>Host it yourself</link>",
+        "web": "Web",
+        "scene": {
+            "ask": "Find SaaS companies in France that just started hiring sales people.",
+            "found": "26 companies found. The top 3 are in HubSpot.",
+            "routine": "Every Monday at 9:00",
+            "composer": "Send a message…",
+            "online": "Online 24/7 · {time}"
+        }
+    },
+    "tools": {
+        "title": "<chip>Coworkers</chip> work with your tools, <even>even your internal ones.</even>",
+        "count": "{count, number}+ integrations, <own>and your own tools through MCP or API.</own>"
     }
 }

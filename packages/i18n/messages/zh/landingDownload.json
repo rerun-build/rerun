@@ -54,5 +54,15 @@
             "title": "始终运行",
             "body": "关闭窗口后，Rerun 仍保留在菜单栏或系统托盘中，图标上会显示等待您处理的事项数量。"
         }
+    },
+    "section": {
+        "title": "下载 Rerun",
+        "lead": "您的同事，在电脑上，也在口袋里。ChatGPT、Claude 或 OpenCode 只需接入一次，随时随地跟进同事。",
+        "macMeta": "macOS 13+ · Apple Silicon 和 Intel",
+        "windowsMeta": "Windows 10+ · x64 和 Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "把同事装进口袋"
     }
 }

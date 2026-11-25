@@ -9,6 +9,7 @@
             "useCases": "使用场景",
             "industries": "行业",
             "templates": "模板",
+            "whiteLabel": "白标",
             "pricing": "价格",
             "community": "社区",
             "resources": "资源"
@@ -309,5 +310,20 @@
     "composerPlaceholder": "发送消息...",
     "dialog": {
         "close": "关闭"
+    },
+    "app": {
+        "download": "下载应用",
+        "appStore": "在 App Store 下载",
+        "playStore": "在 Google Play 下载",
+        "menu": "macOS、Windows 和 Linux",
+        "desktop": "桌面应用",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
     }
 }

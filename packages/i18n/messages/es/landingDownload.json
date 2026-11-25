@@ -54,5 +54,15 @@
             "title": "Siempre en marcha",
             "body": "Al cerrar la ventana, Rerun queda en la barra de menús o en la bandeja del sistema, con lo que te espera contado en su icono."
         }
+    },
+    "section": {
+        "title": "Descarga Rerun",
+        "lead": "Tus Coworkers en tu computadora y en tu bolsillo. Conecta ChatGPT, Claude u OpenCode una vez y síguelos desde cualquier lugar.",
+        "macMeta": "macOS 13+ · Apple Silicon e Intel",
+        "windowsMeta": "Windows 10+ · x64 y Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Tus Coworkers en tu bolsillo"
     }
 }

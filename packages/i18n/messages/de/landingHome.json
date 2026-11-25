@@ -1,8 +1,8 @@
 {
     "hero": {
         "title": {
-            "lead": "Hol dir <keep>KI-<chip>Coworker</chip></keep>",
-            "tail": "Sie arbeiten wie du."
+            "lead": "Das sind <keep>KI-<chip>Coworker</chip></keep>",
+            "tail": "Besser als Menschen."
         },
         "subtitle": "Chatbots sagen dir, was zu tun ist. KI-Coworker erledigen die Arbeit. Verbinde das LLM, für das du schon zahlst, mit Rerun und gib ihnen Aufgaben.",
         "cta": "5 Tage testen für {price}",
@@ -407,7 +407,21 @@
                         "frequency": "Monatlich am 1. um 9:00"
                     }
                 }
+            },
+            "classic": {
+                "search": "Suche",
+                "inbox": "Posteingang",
+                "coworkers": "Coworker",
+                "chiefOfStaff": "Chief of Staff",
+                "chiefOfStaffLine": "Frag alles über dein Team",
+                "recent": "Zuletzt",
+                "byBox": "Nach Box",
+                "back": "Zurück"
             }
+        },
+        "lines": {
+            "plans": "Verbinde <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> oder <opencode>OpenCode</opencode> und lass Coworker jede Aufgabe erledigen.",
+            "team": "Lade dein Team kostenlos ein und legt gemeinsam los."
         }
     },
     "cases": {
@@ -651,5 +665,70 @@
             "name": "Dein Nebenprojekt",
             "crew": "1 Coworker · Content"
         }
+    },
+    "jobs": {
+        "title": "Gib jedem <chip>Coworker</chip> <end>einen Job.</end>",
+        "lead": "Coworker sind KI-Agenten für jedes Business. Fang mit dem Job an, den du einem neuen Mitarbeiter geben würdest."
+    },
+    "abilities": {
+        "title": "Jeder <chip>Coworker</chip> ist eigenständig.",
+        "items": {
+            "memory": {
+                "title": "Eigenes Gedächtnis",
+                "line": "Er behält, was du ihm einmal gesagt hast: deine Kunden, deinen Ton, was er nicht noch mal tun soll."
+            },
+            "skills": {
+                "title": "Eigene Skills",
+                "line": "Die Schritte seines Jobs, aufgeschrieben. Bring ihm etwas Neues bei, und er macht es jedes Mal genauso."
+            },
+            "apps": {
+                "title": "Eigene Apps",
+                "line": "Deine Tools, einmal verbunden: Er meldet sich an und arbeitet selbstständig darin."
+            },
+            "computer": {
+                "title": "Eigener Computer",
+                "line": "Ein eigener Bildschirm in der Cloud, auf dem er deine Apps öffnet und sich durchklickt wie ein Mensch."
+            }
+        },
+        "card": {
+            "share": "Teilen",
+            "apps": "Apps",
+            "skills": "Skills",
+            "knowledge": "Wissen",
+            "routines": "Routinen",
+            "files": "Dateien",
+            "database": "Datenbank",
+            "working": "Arbeitet an seinem Computer",
+            "activity": "Aktivität",
+            "settings": "Einstellungen",
+            "delete": "Diesen Coworker löschen"
+        },
+        "hubspot": {
+            "contacts": "Kontakte",
+            "search": "Suchen",
+            "create": "Kontakt erstellen",
+            "name": "Name",
+            "company": "Unternehmen",
+            "jobTitle": "Jobtitel",
+            "stage": "Phase",
+            "lead": "Lead"
+        }
+    },
+    "everywhere": {
+        "title": "Dein Workspace, in der Cloud und überall.",
+        "lead": "Deine Coworker arbeiten rund um die Uhr auf ihrer eigenen Maschine, auch bei zugeklapptem Laptop. Sieh ihnen von jedem Bildschirm aus zu.",
+        "local": "Lieber selbst betreiben? Rerun ist Open Source. <link>Selbst hosten</link>",
+        "web": "Web",
+        "scene": {
+            "ask": "Finde SaaS-Firmen in Frankreich, die gerade Vertriebler einstellen.",
+            "found": "26 Firmen gefunden. Die Top 3 sind in HubSpot.",
+            "routine": "Jeden Montag um 9:00",
+            "composer": "Nachricht senden…",
+            "online": "24/7 online · {time}"
+        }
+    },
+    "tools": {
+        "title": "<chip>Coworker</chip> arbeiten mit deinen Tools, <even>sogar mit den internen.</even>",
+        "count": "{count, number}+ Integrationen, <own>und deine eigenen Tools über MCP oder API.</own>"
     }
 }

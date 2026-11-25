@@ -54,5 +54,15 @@
             "title": "תמיד פועל",
             "body": "סגירת החלון משאירה את Rerun בשורת התפריטים או במגש המערכת, עם מספר הדברים שמחכים לך על הסמל."
         }
+    },
+    "section": {
+        "title": "להוריד את Rerun",
+        "lead": "העמיתים שלך במחשב ובכיס. מחברים פעם אחת ChatGPT, Claude או OpenCode, ועוקבים אחריהם מכל מקום.",
+        "macMeta": "macOS 13 ואילך · Apple Silicon ו-Intel",
+        "windowsMeta": "Windows 10 ואילך · x64 ו-Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "העמיתים שלך בכיס"
     }
 }

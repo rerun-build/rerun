@@ -143,6 +143,10 @@
             "hook": "URL do webhook",
             "next": "Próxima execução hoje às 07:00",
             "save": "Salvar"
+        },
+        "bring": {
+            "title": "Traga a IA que você já paga",
+            "body": "Conecte o plano do <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> ou <opencode>OpenCode</opencode> que você já tem, suas chaves de API ou os créditos Rerun incluídos."
         }
     },
     "steps": {
@@ -401,9 +405,17 @@
                 "question": "Por que um Coworker é melhor que o Claude ou o ChatGPT na mesma tarefa?",
                 "answer": "Porque um chatbot para na resposta. Ele escreve o e-mail, e você ainda abre a aba, copia o texto, entra no portal antigo e envia. Um Coworker tem seu próprio computador e seus apps, então faz esses passos sozinho, e começa por conta própria às 7h, sem você abrir nada."
             },
+            "flows": {
+                "question": "Qual é a diferença para o Zapier, o Make ou o n8n?",
+                "answer": "Eles seguem um fluxo fixo, passo a passo, e quebram quando uma página ou um e-mail muda. Um Coworker parte de um objetivo: ele se adapta ao que encontra e mostra cada passo que deu."
+            },
             "start": {
                 "question": "Não sei o que passar primeiro. Por onde começo?",
                 "answer": "Pegue aquilo que você refaz toda semana e detesta fazer: a cobrança de faturas, a triagem da caixa de entrada, o relatório de segunda. Os exemplos desta página são os que as pessoas passam primeiro."
+            },
+            "code": {
+                "question": "Preciso saber programar?",
+                "answer": "Não. Descreva o trabalho com suas palavras ou instale um Coworker pronto. Ele escreve as próprias skills e conecta os apps de que precisa."
             },
             "readyMade": {
                 "question": "Posso começar por algo pronto?",
@@ -413,6 +425,10 @@
                 "question": "Alguém pode configurar meus Coworkers para mim?",
                 "answer": "Sim. Os especialistas Rerun criam e instalam Coworkers profissionalmente, e você pode conhecê-los e contratar um. Nós dois que construímos o Rerun também respondemos no Discord, de graça.",
                 "link": "especialistas"
+            },
+            "whiteLabel": {
+                "question": "Tenho uma agência. Posso vender o Rerun com a minha marca?",
+                "answer": "Sim. Com o white label, o Rerun roda com o seu nome, o seu logo e o seu domínio, com um workspace para cada cliente. Escreva para os fundadores para configurar tudo."
             },
             "safe": {
                 "question": "Meus dados estão seguros?",
@@ -429,6 +445,10 @@
             "where": {
                 "question": "Onde meus Coworkers rodam de fato?",
                 "answer": "Na própria máquina deles na nuvem, na Europa, uma por workspace e isolada de todos os outros. Ela está sempre ligada, e os arquivos, a memória e os bancos de dados ficam dentro dela."
+            },
+            "selfHost": {
+                "question": "Posso auto-hospedar o Rerun?",
+                "answer": "Sim. O Rerun é open source sob a licença AGPL-3.0 e roda no seu próprio computador ou servidor com Docker."
             },
             "laptop": {
                 "question": "Continua rodando com o notebook fechado?",
@@ -450,6 +470,10 @@
                 "question": "Os Coworkers podem trabalhar juntos?",
                 "answer": "Sim. Eles passam trabalho um para o outro: um encontra os leads, o próximo escreve para eles, um terceiro arquiva o resultado. Você pede uma vez, e a cadeia roda sem você no meio."
             },
+            "team": {
+                "question": "Toda a minha equipe pode usar?",
+                "answer": "Sim, com quantos colegas você quiser, sem custo extra. Todos compartilham um quadro, qualquer um pode responder a um Coworker que está esperando, e a memória e as skills dele ficam no workspace quando alguém sai."
+            },
             "watch": {
                 "question": "Posso vê-los trabalhando ao vivo?",
                 "answer": "Sim, essa é a ideia. Todos os Coworkers ficam num quadro, atualizado em tempo real enquanto trabalham, com o histórico completo de cada execução quando você quiser os detalhes."
@@ -468,7 +492,7 @@
             },
             "phone": {
                 "question": "Posso usar o Rerun pelo celular?",
-                "answer": "Sim. O Rerun roda no navegador do celular e se instala na tela inicial como um app. O quadro, a conversa e as aprovações são feitos para tela pequena, então você destrava um Coworker até na fila do mercado."
+                "answer": "Sim. O Rerun tem app próprio na App Store e no Google Play: o quadro, as conversas e as aprovações, feitos para tela pequena."
             },
             "billing": {
                 "question": "Como funciona a cobrança? Pago por pessoa?",
@@ -485,6 +509,10 @@
             "data": {
                 "question": "Quanto custam os e-mails, telefones e outros dados?",
                 "answer": "Saem do seu crédito Rerun, e um e-mail ou telefone só é cobrado quando é encontrado. Antes de uma busca, seu Coworker diz quanto vai custar e espera o seu sim. Não há provedor de dados para assinar."
+            },
+            "social": {
+                "question": "LinkedIn e WhatsApp estão incluídos?",
+                "answer": "São add-ons pagos, vendidos à parte. O enriquecimento de leads também pode rodar na sua própria conta do Apollo, Clay ou Prospeo."
             }
         }
     },

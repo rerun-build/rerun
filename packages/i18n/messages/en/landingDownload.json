@@ -18,7 +18,10 @@
         "alternatives.macIntel": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
         "alternatives.macAppleSilicon": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
         "alternatives.windowsArm64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
-        "alternatives.windowsX64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads."
+        "alternatives.windowsX64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
+        "section": "The download section of the home page, one tile per system.",
+        "section.iphone": "Keep it as is.",
+        "section.android": "Keep it as is."
     },
     "title": "Download the Rerun Desktop App",
     "eyebrow": "Desktop app",
@@ -75,5 +78,15 @@
             "title": "Always running",
             "body": "Closing the window keeps Rerun in the menu bar or the system tray, with the count of what waits for you on its icon."
         }
+    },
+    "section": {
+        "title": "Download Rerun",
+        "lead": "Your Coworkers on your computer and in your pocket. Plug in ChatGPT, Claude or OpenCode once, follow them from anywhere.",
+        "macMeta": "macOS 13+ · Apple Silicon and Intel",
+        "windowsMeta": "Windows 10+ · x64 and Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "Your Coworkers in your pocket"
     }
 }

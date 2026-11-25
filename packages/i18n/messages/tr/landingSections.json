@@ -143,6 +143,10 @@
             "hook": "Webhook URL'si",
             "next": "Sonraki çalıştırma bugün 07:00",
             "save": "Kaydet"
+        },
+        "bring": {
+            "title": "Zaten ödediğiniz AI'ı getirin",
+            "body": "Mevcut <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> veya <opencode>OpenCode</opencode> planınızı, kendi API anahtarlarınızı ya da dahil olan Rerun kredilerini kullanın."
         }
     },
     "steps": {
@@ -401,9 +405,17 @@
                 "question": "Aynı görevde bir Coworker neden Claude veya ChatGPT'den daha iyi?",
                 "answer": "Çünkü bir sohbet botu yanıtta durur. E-postayı yazar, ama sekmeyi açmak, metni kopyalamak, eski portala giriş yapıp göndermek yine size kalır. Bir Coworker'ın kendi bilgisayarı ve sizin uygulamalarınız vardır, bu yüzden bu adımları kendisi yapar ve siz hiçbir şey açmadan sabah 7'de kendiliğinden başlar."
             },
+            "flows": {
+                "question": "Zapier, Make veya n8n'den farkı ne?",
+                "answer": "Onlar sabit bir akışı adım adım yürütür, bir sayfa ya da e-posta değişince bozulur. Coworker ise bir hedefle çalışır: karşılaştığına uyum sağlar ve attığı her adımı size gösterir."
+            },
             "start": {
                 "question": "İlk olarak ne vereceğimi bilmiyorum. Nereden başlamalıyım?",
                 "answer": "Her hafta yeniden yaptığınız ve yapmaktan çekindiğiniz işi seçin: fatura takibi, gelen kutusunu ayıklama, pazartesi raporu. Bu sayfadaki örnekler insanların ilk devrettiği işlerdir."
+            },
+            "code": {
+                "question": "Kod yazmayı bilmem gerekiyor mu?",
+                "answer": "Hayır. İşi sade sözcüklerle anlatın ya da hazır bir Coworker yükleyin. Skill'lerini kendisi yazar, ihtiyaç duyduğu uygulamaları kendisi bağlar."
             },
             "readyMade": {
                 "question": "Hazır bir şeyle başlayabilir miyim?",
@@ -413,6 +425,10 @@
                 "question": "Coworker'larımı benim yerime biri kurabilir mi?",
                 "answer": "Evet. Rerun uzmanları işi Coworker kurmak ve yüklemek olan kişilerdir; onlara göz atıp birini işe alabilirsiniz. Rerun'ı geliştiren ikimiz de Discord'da ücretsiz yanıt veriyoruz.",
                 "link": "uzmanları"
+            },
+            "whiteLabel": {
+                "question": "Bir ajansım var. Rerun'ı kendi markamla satabilir miyim?",
+                "answer": "Evet. Beyaz etiketle Rerun sizin adınız, logonuz ve alan adınızla çalışır, her müşterinizin kendi çalışma alanı olur. Kurulum için kuruculara yazın."
             },
             "safe": {
                 "question": "Verilerim güvende mi?",
@@ -429,6 +445,10 @@
             "where": {
                 "question": "Coworker'larım gerçekte nerede çalışır?",
                 "answer": "Bulutta, Avrupa'da, kendi makinelerinde: her çalışma alanı için bir tane, herkesten yalıtılmış. Her zaman açıktır ve dosyaları, belleği ve veritabanları onun içinde kalır."
+            },
+            "selfHost": {
+                "question": "Rerun'ı kendim barındırabilir miyim?",
+                "answer": "Evet. Rerun, AGPL-3.0 lisansı altında açık kaynaktır ve Docker ile kendi bilgisayarınızda ya da sunucunuzda çalışır."
             },
             "laptop": {
                 "question": "Dizüstü bilgisayarım kapalıyken çalışmaya devam eder mi?",
@@ -450,6 +470,10 @@
                 "question": "Coworker'lar birlikte çalışabilir mi?",
                 "answer": "Evet. İşi birbirlerine devrederler: biri potansiyel müşterileri bulur, sonraki onlara yazar, üçüncüsü sonucu dosyalar. Bir kez istersiniz, zincir siz araya girmeden işler."
             },
+            "team": {
+                "question": "Bütün ekibim kullanabilir mi?",
+                "answer": "Evet, ek ücret olmadan istediğiniz kadar ekip arkadaşıyla. Herkes aynı panoyu paylaşır, bekleyen bir Coworker'a herkes yanıt verebilir ve biri ayrıldığında Coworker'ın belleği ile skill'leri çalışma alanında kalır."
+            },
             "watch": {
                 "question": "Çalışmalarını canlı izleyebilir miyim?",
                 "answer": "Evet, bütün fikir bu. Her Coworker tek bir panodadır, çalışırken gerçek zamanlı güncellenir ve ayrıntı istediğinizde her çalıştırmanın tam geçmişi oradadır."
@@ -468,7 +492,7 @@
             },
             "phone": {
                 "question": "Rerun'ı telefonumdan kullanabilir miyim?",
-                "answer": "Evet. Rerun telefonunuzun tarayıcısında çalışır ve bir uygulama gibi ana ekranınıza yüklenir. Pano, konuşma ve onaylar küçük ekran için tasarlandı, böylece bir kuyrukta beklerken bile bir Coworker'ın önünü açabilirsiniz."
+                "answer": "Evet. Rerun'ın App Store ve Google Play'de kendi uygulaması var: pano, konuşmalar ve onaylar, küçük ekran için tasarlandı."
             },
             "billing": {
                 "question": "Faturalandırma nasıl işliyor? Kişi başına mı ödüyorum?",
@@ -485,6 +509,10 @@
             "data": {
                 "question": "E-postalar, telefon numaraları ve diğer veriler ne kadar tutar?",
                 "answer": "Rerun kredinizden düşülür ve bir e-posta ya da telefon numarası yalnızca bulunduğunda ücretlendirilir. Bir aramadan önce Coworker'ınız size ne kadar tutacağını söyler ve onayınızı bekler. Abone olmanız gereken bir veri sağlayıcısı yoktur."
+            },
+            "social": {
+                "question": "LinkedIn ve WhatsApp dahil mi?",
+                "answer": "Bunlar ayrı satılan ücretli eklentilerdir. Lead zenginleştirme kendi Apollo, Clay veya Prospeo hesabınızla da çalışabilir."
             }
         }
     },
