@@ -1,0 +1,178 @@
+{
+    "metaTitle": "Coworkers IA en marque blanche pour les agences",
+    "metaDescription": "Vendez des Coworkers IA sous votre marque : votre URL, vos couleurs, votre logo. Créez-les une fois, gérez tous vos clients au même endroit.",
+    "hero": {
+        "lead": "Vendez des <keep><chip>Coworkers</chip> IA</keep>",
+        "tail": "Sous votre propre marque.",
+        "first": "Une app IA clé en main pour vos clients, avec votre URL, vos couleurs et votre logo.",
+        "second": "Gérez tous vos clients au même endroit, sur le web et sur mobile."
+    },
+    "partner": "Devenir partenaire",
+    "mailSubject": "Marque blanche pour mon agence",
+    "perks": {
+        "title": "Clé en main. <fade>Servi sur un plateau.</fade>",
+        "lead": "Offrez à vos clients une app IA simple, prête dès le premier jour, et gérez-les tous au même endroit, sous votre marque.",
+        "items": {
+            "plug": {
+                "title": "Clé en main",
+                "line": "Vos clients se connectent, leurs Coworkers sont déjà là. Rien à installer, rien à configurer."
+            },
+            "onePlace": {
+                "title": "Tous vos clients au même endroit",
+                "line": "Passez d’un client à l’autre et voyez qui attend qui, depuis un seul compte."
+            },
+            "brand": {
+                "title": "Votre marque, pas la nôtre",
+                "line": "Votre URL, vos couleurs et votre logo. Vos clients ne voient jamais Rerun."
+            },
+            "mobile": {
+                "title": "Une app mobile à votre nom",
+                "line": "Vos clients suivent leurs Coworkers et leur répondent depuis leur téléphone, dans votre app."
+            },
+            "library": {
+                "title": "Votre bibliothèque en glisser-déposer",
+                "line": "Créez un Coworker une fois, puis déposez-le chez chaque client qui demande le même travail."
+            },
+            "simple": {
+                "title": "Simple pour vos clients",
+                "line": "Un chat et un board. Ils demandent, leurs Coworkers font le travail, sans formation."
+            }
+        }
+    },
+    "compare": {
+        "before": {
+            "title": "Avant",
+            "agents": "Des agents sur mesure sur Hermes, refaits de zéro pour chaque client",
+            "servers": "Des scripts, des serveurs et des clés à surveiller",
+            "unused": "Un outil que vos clients n’ouvrent jamais"
+        },
+        "after": {
+            "title": "Avec Rerun en marque blanche",
+            "library": "Une bibliothèque de Coworkers, à déposer chez chaque client",
+            "cloud": "Rien à héberger : tout tourne dans le cloud, 24 h/24",
+            "app": "Une app simple que vos clients utilisent, sur le web et sur leur téléphone"
+        }
+    },
+    "jobs": {
+        "title": "Créez chaque <chip>Coworker</chip> <end>une seule fois.</end>",
+        "lead": "Vos clients demandent toujours les mêmes choses. Créez chaque Coworker une fois, puis glissez-déposez-le chez n’importe quel client."
+    },
+    "clients": {
+        "title": "Chaque <chip>Coworker</chip> travaille pour un seul client.",
+        "items": {
+            "workspace": {
+                "title": "Son propre workspace",
+                "line": "Son board, ses fichiers et ses données, séparés de ceux des autres clients."
+            },
+            "memory": {
+                "title": "Sa propre mémoire",
+                "line": "Chaque Coworker connaît ce client : sa clientèle, son ton, ce qu’il ne faut plus faire."
+            },
+            "skills": {
+                "title": "Votre méthode",
+                "line": "Écrivez-la une fois sous forme de skill, puis installez-la chez chaque client."
+            },
+            "apps": {
+                "title": "Ses propres apps",
+                "line": "Les outils du client, connectés avec ses comptes, jamais les vôtres."
+            }
+        }
+    },
+    "everywhere": {
+        "title": "Votre marque, sur chaque écran.",
+        "lead": "Votre URL, vos couleurs et votre logo, sur le web et dans une app mobile à votre nom. Leurs Coworkers travaillent 24 h/24 dans le cloud, sans serveur à gérer pour vous.",
+        "local": "Plutôt sur vos propres serveurs ? Rerun est open source. <link>Hébergez-le vous-même</link>"
+    },
+    "plan": {
+        "model": {
+            "title": "Avec l’IA de vos clients, ou la vôtre",
+            "body": "Branchez l’abonnement <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> ou <opencode>OpenCode</opencode> du client, vos clés d’API, ou les crédits Rerun inclus."
+        },
+        "team": {
+            "title": "Votre équipe et la leur",
+            "body": "Invitez chaque client et toute son équipe dans son workspace, gratuitement."
+        },
+        "runs": {
+            "title": "Travail récurrent, revenus récurrents",
+            "body": "Chaque matin, chaque lundi, ou quand une app l’appelle."
+        }
+    },
+    "tools": {
+        "title": "Les <chip>Coworkers</chip> travaillent avec les outils de vos clients, <even>même leurs outils internes.</even>",
+        "count": "Plus de {count, number} intégrations, <own>et leurs propres outils via MCP ou API.</own>"
+    },
+    "steps": {
+        "title": "Clé en main, <br></br>en trois étapes.",
+        "items": {
+            "connect": {
+                "title": "Connectez l’IA du client",
+                "body": "Son compte Claude ou ChatGPT, en une connexion. Ou votre clé, ou le crédit inclus dans l’offre."
+            },
+            "hire": {
+                "title": "Déposez vos Coworkers",
+                "body": "Choisissez-les dans votre bibliothèque ou parmi les Coworkers tout prêts, puis répondez à leurs questions pour ce client."
+            },
+            "run": {
+                "title": "Facturez chaque mois",
+                "body": "Planifié, déclenché ou à la demande : le travail pour lequel votre client vous paie."
+            }
+        }
+    },
+    "download": {
+        "title": "Essayez avant de vendre",
+        "lead": "Téléchargez Rerun et mettez vos premiers Coworkers au travail pour votre propre agence. Quand ils ont fait leurs preuves, mettez-les à votre marque."
+    },
+    "faq": {
+        "sub": "Tout ce que les agences demandent avant de vendre leur premier Coworker. Si votre question n’y est pas, les fondateurs sont juste en dessous.",
+        "items": {
+            "what": {
+                "question": "Qu’est-ce que Rerun en marque blanche ?",
+                "answer": "Une version clé en main de Rerun sous votre marque : votre URL, vos couleurs, votre logo, et une app mobile à votre nom. Vous la confiez à vos clients et les gérez tous au même endroit."
+            },
+            "who": {
+                "question": "À qui s’adresse-t-elle ?",
+                "answer": "Aux agences, consultants et freelances qui veulent vendre des Coworkers IA à leurs clients comme un service : prospection, support, réseaux sociaux, facturation ou recrutement."
+            },
+            "custom": {
+                "question": "Quelle différence avec des agents sur mesure ?",
+                "answer": "Avec Hermes ou du code sur mesure, chaque nouveau client vous fait repartir de zéro, puis il faut héberger et réparer. Ici, vous créez un Coworker une fois, vous le déposez chez n’importe quel client, et Rerun le fait tourner pour vous."
+            },
+            "start": {
+                "question": "Comment démarrer ?",
+                "answer": "Écrivez aux fondateurs. Nous regardons vos clients et les Coworkers que vous voulez vendre, puis nous mettons en place votre marque avec vous."
+            },
+            "brand": {
+                "question": "Puis-je utiliser mon domaine, mes couleurs et mon logo ?",
+                "answer": "Oui. Vos clients ouvrent l’app à votre adresse, par exemple app.votreagence.com, à vos couleurs et avec votre logo. Ils ne voient jamais Rerun."
+            },
+            "reuse": {
+                "question": "Un Coworker peut-il servir à plusieurs clients ?",
+                "answer": "Oui. Créez-le une fois avec ses skills et ses apps, gardez-le dans votre bibliothèque, puis glissez-déposez-le dans le workspace de n’importe quel client."
+            },
+            "mobile": {
+                "question": "Mes clients ont-ils une app mobile ?",
+                "answer": "Oui. Ils suivent leurs Coworkers et leur répondent depuis une app mobile à votre nom et avec votre logo."
+            },
+            "manage": {
+                "question": "Puis-je gérer tous mes clients au même endroit ?",
+                "answer": "Oui. Chaque client a son propre workspace, avec ses Coworkers, sa mémoire, ses fichiers et ses apps, et vous passez de l’un à l’autre depuis un seul compte."
+            },
+            "team": {
+                "question": "Mes clients peuvent-ils inviter leur équipe ?",
+                "answer": "Oui, autant de collègues qu’ils veulent, sans frais en plus. N’importe qui dans leur équipe peut répondre à un Coworker qui attend."
+            },
+            "bill": {
+                "question": "Comment facturer mes clients ?",
+                "answer": "Vous fixez votre prix et facturez vous-même vos clients. Rerun vous facture, vous, jamais eux."
+            },
+            "cost": {
+                "question": "Combien coûte la marque blanche ?",
+                "answer": "Cela dépend du nombre de clients que vous y gérez. Écrivez aux fondateurs et nous vous enverrons un prix."
+            },
+            "ai": {
+                "question": "Qui paie l’IA ?",
+                "answer": "Chaque workspace tourne sur l’IA que vous choisissez pour lui : l’abonnement ChatGPT ou Claude du client, vos clés d’API, ou les crédits Rerun inclus."
+            }
+        }
+    }
+}

@@ -1,0 +1,178 @@
+{
+    "metaTitle": "Ajanslar için beyaz etiketli AI Coworker'lar",
+    "metaDescription": "AI Coworker'ları kendi markanızla satın: URL'niz, renkleriniz, logonuz. Bir kez kurun, tüm müşterilerinizi tek yerden yönetin.",
+    "hero": {
+        "lead": "<keep>AI <chip>Coworker'lar</chip></keep> satın",
+        "tail": "Kendi markanızla.",
+        "first": "Müşterileriniz için tak çalıştır bir AI uygulaması: sizin URL'niz, renkleriniz ve logonuzla.",
+        "second": "Tüm müşterilerinizi web'de ve mobilde tek yerden yönetin."
+    },
+    "partner": "İş ortağı olun",
+    "mailSubject": "Ajansım için beyaz etiket",
+    "perks": {
+        "title": "Tak çalıştır. <fade>Her şey hazır önünüzde.</fade>",
+        "lead": "Müşterilerinize ilk günden çalışan basit bir AI uygulaması sunun, hepsini kendi markanızla tek yerden yönetin.",
+        "items": {
+            "plug": {
+                "title": "Tak çalıştır",
+                "line": "Müşterileriniz giriş yapar, Coworker'ları onları bekliyordur. Yükleme yok, kurulum yok."
+            },
+            "onePlace": {
+                "title": "Tüm müşteriler tek yerde",
+                "line": "Tek bir hesapla müşteriden müşteriye geçin, kimin kimi beklediğini görün."
+            },
+            "brand": {
+                "title": "Bizim değil, sizin markanız",
+                "line": "Sizin URL'niz, renkleriniz ve logonuz. Müşterileriniz Rerun'ı hiç görmez."
+            },
+            "mobile": {
+                "title": "Sizin adınızla mobil uygulama",
+                "line": "Müşterileriniz Coworker'larını sizin uygulamanızda, telefonlarından takip eder ve yanıtlar."
+            },
+            "library": {
+                "title": "Sürükle bırak kitaplığınız",
+                "line": "Bir Coworker'ı bir kez kurun, aynı işi isteyen her müşteriye sürükleyip bırakın."
+            },
+            "simple": {
+                "title": "Müşterileriniz için basit",
+                "line": "Bir sohbet ve bir pano. Onlar ister, Coworker'ları yapar. Eğitim gerekmez."
+            }
+        }
+    },
+    "compare": {
+        "before": {
+            "title": "Önce",
+            "agents": "Hermes üzerinde her müşteri için sıfırdan kurulan özel ajanlar",
+            "servers": "Bakım isteyen script'ler, sunucular, anahtarlar",
+            "unused": "Müşterilerinizin hiç açmadığı bir araç"
+        },
+        "after": {
+            "title": "Rerun beyaz etiketiyle",
+            "library": "Her müşteriye bırakılabilen tek bir Coworker kitaplığı",
+            "cloud": "Barındırma derdi yok: bulutta 7/24 çalışır",
+            "app": "Müşterilerinizin web'de ve telefonda gerçekten kullandığı basit bir uygulama"
+        }
+    },
+    "jobs": {
+        "title": "<chip>Coworker</chip> kitaplığınızı <end>bir kez kurun.</end>",
+        "lead": "Müşterileriniz hep aynı işleri ister. Her Coworker'ı bir kez kurun, sonra istediğiniz müşteriye sürükleyip bırakın."
+    },
+    "clients": {
+        "title": "Her <chip>Coworker</chip> tek bir müşteri için çalışır.",
+        "items": {
+            "workspace": {
+                "title": "Kendi çalışma alanı",
+                "line": "Panosu, dosyaları ve verileri diğer tüm müşterilerden ayrı tutulur."
+            },
+            "memory": {
+                "title": "Kendi belleği",
+                "line": "Her Coworker bu müşteriyi hatırlar: kime sattığını, üslubunu, bir daha yapılmaması gerekenleri."
+            },
+            "skills": {
+                "title": "Sizin yönteminiz",
+                "line": "Yönteminizi bir kez skill olarak yazın, her müşteriye yükleyin."
+            },
+            "apps": {
+                "title": "Kendi uygulamaları",
+                "line": "Müşterinin araçları, sizin değil, kendi hesaplarıyla bağlanır."
+            }
+        }
+    },
+    "everywhere": {
+        "title": "Markanız her ekranda.",
+        "lead": "URL'niz, renkleriniz ve logonuz, web'de ve sizin adınızı taşıyan bir mobil uygulamada. Coworker'lar bulutta 7/24 çalışır, sizin yöneteceğiniz bir sunucu olmaz.",
+        "local": "Kendi sunucularınızda mı kalsın? Rerun açık kaynaktır. <link>Kendiniz barındırın</link>"
+    },
+    "plan": {
+        "model": {
+            "title": "Müşterinizin AI'ıyla veya sizinkiyle",
+            "body": "Müşterinin <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> veya <opencode>OpenCode</opencode> planını, kendi API anahtarlarınızı ya da dahil olan Rerun kredilerini kullanın."
+        },
+        "team": {
+            "title": "Sizin ekibiniz ve onlarınki",
+            "body": "Her müşteriyi tüm ekibiyle birlikte kendi çalışma alanına ücretsiz davet edin."
+        },
+        "runs": {
+            "title": "Düzenli iş, düzenli gelir",
+            "body": "Her sabah, her pazartesi ya da bir uygulama çağırdığında."
+        }
+    },
+    "tools": {
+        "title": "<chip>Coworker'lar</chip> müşterilerinizin araçlarıyla çalışır, <even>şirket içi olanlarla bile.</even>",
+        "count": "{count, number}+ entegrasyon, <own>MCP veya API ile kendi araçları da dahil.</own>"
+    },
+    "steps": {
+        "title": "Tak çalıştır, <br></br>üç adımda.",
+        "items": {
+            "connect": {
+                "title": "Müşterinin AI'ını bağlayın",
+                "body": "Claude veya ChatGPT hesabı, tek bir oturum açma. Ya da sizin anahtarınız veya plana dahil kredi."
+            },
+            "hire": {
+                "title": "Coworker'larınızı yerleştirin",
+                "body": "Kitaplığınızdan ya da hazır olanlardan seçin, sonra bu müşteri için sorularını yanıtlayın."
+            },
+            "run": {
+                "title": "İşi her ay faturalayın",
+                "body": "Bir zamanlamayla, bir tetikleyiciyle ya da istek üzerine: müşterinizin size para ödediği iş."
+            }
+        }
+    },
+    "download": {
+        "title": "Satmadan önce deneyin",
+        "lead": "Rerun'ı indirin ve ilk Coworker'larınızı kendi ajansınızda çalıştırın. Sonuç verdiklerinde markanızı ekleyin."
+    },
+    "faq": {
+        "sub": "Ajansların ilk Coworker'larını satmadan önce sorduğu her şey. Sorunuz burada yoksa kurucular hemen aşağıda.",
+        "items": {
+            "what": {
+                "question": "Rerun beyaz etiketi (white label) nedir?",
+                "answer": "Rerun'ın sizin markanızı taşıyan tak çalıştır sürümü: URL'niz, renkleriniz, logonuz ve sizin adınızla bir mobil uygulama. Müşterilerinize sunar, hepsini tek yerden yönetirsiniz."
+            },
+            "who": {
+                "question": "Kimler için?",
+                "answer": "Müşterilerine AI Coworker'ları hizmet olarak satmak isteyen ajanslar, danışmanlar ve serbest çalışanlar için: müşteri arama, destek, sosyal medya, faturalama veya işe alım."
+            },
+            "custom": {
+                "question": "Özel ajanlar geliştirmekten farkı ne?",
+                "answer": "Hermes ya da özel kodla her yeni müşteride baştan başlar, sonra kurduğunuzu barındırıp onarırsınız. Burada bir Coworker'ı bir kez kurar, istediğiniz müşteriye bırakırsınız, Rerun da onu sizin yerinize çalıştırır."
+            },
+            "start": {
+                "question": "Nasıl başlarım?",
+                "answer": "Kuruculara yazın. Müşterilerinize ve satmak istediğiniz Coworker'lara bakar, ardından markanızı sizinle birlikte kurarız."
+            },
+            "brand": {
+                "question": "Kendi alan adım, renklerim ve logom olur mu?",
+                "answer": "Evet. Müşterileriniz uygulamayı app.ajansiniz.com gibi size ait bir adreste, sizin renkleriniz ve logonuzla açar. Rerun'ı hiç görmezler."
+            },
+            "reuse": {
+                "question": "Aynı Coworker birçok müşteride kullanılır mı?",
+                "answer": "Evet. Skill'leri ve uygulamalarıyla bir kez kurun, kitaplığınızda saklayın, sonra istediğiniz müşterinin çalışma alanına sürükleyip bırakın."
+            },
+            "mobile": {
+                "question": "Müşterilerimin mobil uygulaması olacak mı?",
+                "answer": "Evet. Coworker'larını sizin adınızı ve logonuzu taşıyan bir mobil uygulamadan takip eder ve yanıtlarlar."
+            },
+            "manage": {
+                "question": "Tüm müşterilerimi tek yerden yönetebilir miyim?",
+                "answer": "Evet. Her müşterinin kendi Coworker'ları, belleği, dosyaları ve uygulamalarıyla ayrı bir çalışma alanı vardır, siz tek bir hesapla birinden diğerine geçersiniz."
+            },
+            "team": {
+                "question": "Müşterilerim ekiplerini davet edebilir mi?",
+                "answer": "Evet, ek ücret olmadan istedikleri kadar ekip arkadaşını. Bekleyen bir Coworker'a ekiplerinden herkes yanıt verebilir."
+            },
+            "bill": {
+                "question": "Müşterilerime nasıl fatura keserim?",
+                "answer": "Fiyatınızı siz belirler, müşterilerinize faturayı siz kesersiniz. Rerun yalnızca size fatura keser, onlara asla."
+            },
+            "cost": {
+                "question": "Beyaz etiketin fiyatı ne kadar?",
+                "answer": "Kaç müşteriyle kullandığınıza bağlı. Kuruculara yazın, size bir fiyat gönderelim."
+            },
+            "ai": {
+                "question": "AI'ın ücretini kim öder?",
+                "answer": "Her çalışma alanı seçtiğiniz AI ile çalışır: müşterinin ChatGPT veya Claude planı, kendi API anahtarlarınız ya da dahil olan Rerun kredileri."
+            }
+        }
+    }
+}

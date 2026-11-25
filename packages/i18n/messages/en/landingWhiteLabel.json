@@ -1,0 +1,192 @@
+{
+    "_context": {
+        "metaTitle": "Title of the page in search results and the browser tab.",
+        "hero.lead": "First line of the H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep the line about as long as in English.",
+        "partner": "Button that writes an email to the founders.",
+        "mailSubject": "Subject of the email the button opens.",
+        "perks.title": "<fade> is greyed.",
+        "jobs.title": "<chip> wraps the word drawn as a rotating avatar pill. <end> goes to a second line on a wide screen.",
+        "clients.title": "<chip> wraps the word drawn as a rotating avatar pill.",
+        "plan.model.body": "<chatgpt>, <claude> and <opencode> draw the logo of the product they name. Keep the three names as they are.",
+        "tools.title": "<chip> wraps the word drawn as a rotating avatar pill. <even> is greyed, at the end of the title.",
+        "tools.count": "One line under a wall of app logos. <own> is greyed.",
+        "steps.title": "<br></br> is a forced line break between the two halves of the title.",
+        "compare.before": "\"Hermes\" is an AI agent framework: keep the name."
+    },
+    "metaTitle": "White Label AI Coworkers for Agencies",
+    "metaDescription": "Sell AI Coworkers under your own brand: your URL, your colors and your logo. Build them once, run every client from one place.",
+    "hero": {
+        "lead": "Sell <keep>AI <chip>Coworkers</chip></keep>",
+        "tail": "Under your own brand.",
+        "first": "A plug-and-play AI app for your clients, with your URL, colors and logo.",
+        "second": "Manage every client from one place, on the web and on mobile."
+    },
+    "partner": "Become a partner",
+    "mailSubject": "White label for my agency",
+    "perks": {
+        "title": "Plug and play. <fade>Served on a plate.</fade>",
+        "lead": "Hand your clients a simple AI app that works on day one, and run them all from one place, under your brand.",
+        "items": {
+            "plug": {
+                "title": "Plug and play",
+                "line": "Your clients sign in and their Coworkers are already there. Nothing to install, nothing to set up."
+            },
+            "onePlace": {
+                "title": "Every client in one place",
+                "line": "Move from one client to the next and see who is waiting on whom, from a single account."
+            },
+            "brand": {
+                "title": "Your brand, not ours",
+                "line": "Your URL, your colors and your logo. Your clients never see Rerun."
+            },
+            "mobile": {
+                "title": "A mobile app in your name",
+                "line": "Your clients follow their Coworkers and answer them from their phone, in your app."
+            },
+            "library": {
+                "title": "Your library, drag and drop",
+                "line": "Build a Coworker once, then drop it into any client that asks for the same job."
+            },
+            "simple": {
+                "title": "Simple for your clients",
+                "line": "A chat and a board. They ask, their Coworkers do the work, no training needed."
+            }
+        }
+    },
+    "compare": {
+        "before": {
+            "title": "Before",
+            "agents": "Custom agents on Hermes, rebuilt from scratch for every client",
+            "servers": "Scripts, servers and keys to look after",
+            "unused": "A tool your clients never open"
+        },
+        "after": {
+            "title": "With Rerun white label",
+            "library": "One library of Coworkers, dropped into any client",
+            "cloud": "Nothing to host: it runs in the cloud, 24/7",
+            "app": "A simple app your clients use, on the web and on their phone"
+        }
+    },
+    "jobs": {
+        "title": "Build a <chip>Coworker</chip> <end>library once.</end>",
+        "lead": "Your clients keep asking for the same jobs. Build each Coworker once, then drag and drop it into any client."
+    },
+    "clients": {
+        "title": "Each <chip>Coworker</chip> works for one client.",
+        "items": {
+            "workspace": {
+                "title": "Its own workspace",
+                "line": "Its board, files and data, kept apart from every other client."
+            },
+            "memory": {
+                "title": "Its own memory",
+                "line": "Each Coworker remembers this client: its customers, its tone, what not to do again."
+            },
+            "skills": {
+                "title": "Your playbook",
+                "line": "Write your method once as a skill, then install it for every client."
+            },
+            "apps": {
+                "title": "Its own apps",
+                "line": "The client's tools, connected with its own accounts, never yours."
+            }
+        }
+    },
+    "everywhere": {
+        "title": "Your brand, on every screen.",
+        "lead": "Your URL, your colors and your logo, on the web and in a mobile app in your name. Their Coworkers work 24/7 in the cloud, with no server for you to run.",
+        "local": "Rather keep it on your own servers? Rerun is open source. <link>Host it yourself</link>"
+    },
+    "plan": {
+        "model": {
+            "title": "Runs on your clients' AI, or yours",
+            "body": "Plug in the client's <chatgpt>ChatGPT</chatgpt>, <claude>Claude</claude> or <opencode>OpenCode</opencode> plan, your own API keys, or the Rerun credits included."
+        },
+        "team": {
+            "title": "Your team and theirs",
+            "body": "Invite each client and its whole team to its workspace, for free."
+        },
+        "runs": {
+            "title": "Recurring work, recurring revenue",
+            "body": "Every morning, every Monday, or when an app calls."
+        }
+    },
+    "tools": {
+        "title": "<chip>Coworkers</chip> work with your clients' tools, <even>even their internal ones.</even>",
+        "count": "{count, number}+ integrations, <own>and their own tools through MCP or API.</own>"
+    },
+    "steps": {
+        "title": "Plug and play, <br></br>in three steps.",
+        "items": {
+            "connect": {
+                "title": "Connect the client's AI",
+                "body": "Its Claude or ChatGPT account, one sign-in. Or your key, or the credit that comes with the plan."
+            },
+            "hire": {
+                "title": "Drop in your Coworkers",
+                "body": "Pick them from your library or the ready-made ones, then answer their questions for this client."
+            },
+            "run": {
+                "title": "Bill the work every month",
+                "body": "On a schedule, on a trigger or on demand: the job your client pays you for."
+            }
+        }
+    },
+    "download": {
+        "title": "Try it before you sell it",
+        "lead": "Download Rerun and put your first Coworkers to work for your own agency. Once they deliver, put your brand on them."
+    },
+    "faq": {
+        "sub": "Everything agencies ask before they sell their first Coworker. If yours is not in there, the founders are right below.",
+        "items": {
+            "what": {
+                "question": "What is the Rerun white label?",
+                "answer": "A plug-and-play version of Rerun under your brand: your URL, your colors, your logo, and a mobile app in your name. You hand it to your clients and manage them all from one place."
+            },
+            "who": {
+                "question": "Who is it for?",
+                "answer": "Agencies, consultants and freelancers who want to sell AI Coworkers to their clients as a service: prospecting, support, social media, invoicing or recruiting."
+            },
+            "custom": {
+                "question": "How is it different from building custom agents?",
+                "answer": "With Hermes or custom code, every new client means starting over, then hosting and fixing what you built. Here you build a Coworker once, drop it into any client, and Rerun runs it for you."
+            },
+            "start": {
+                "question": "How do I get started?",
+                "answer": "Write to the founders. We look at your clients and the Coworkers you want to sell, then set up your brand with you."
+            },
+            "brand": {
+                "question": "Can I use my own domain, colors and logo?",
+                "answer": "Yes. Your clients open the app on an address of yours, such as app.youragency.com, in your colors and with your logo. They never see Rerun."
+            },
+            "reuse": {
+                "question": "Can I reuse a Coworker across clients?",
+                "answer": "Yes. Build it once with its skills and its apps, keep it in your library, then drag and drop it into the workspace of any client."
+            },
+            "mobile": {
+                "question": "Do my clients get a mobile app?",
+                "answer": "Yes. They follow their Coworkers and answer them from a mobile app in your name and with your logo."
+            },
+            "manage": {
+                "question": "Can I manage all my clients from one place?",
+                "answer": "Yes. Each client has its own workspace, with its own Coworkers, memory, files and apps, and you move from one to the next from a single account."
+            },
+            "team": {
+                "question": "Can my clients invite their team?",
+                "answer": "Yes, as many teammates as they want, at no extra cost. Anyone on their team can answer a Coworker that is waiting."
+            },
+            "bill": {
+                "question": "How do I bill my clients?",
+                "answer": "You set your own price and bill your clients yourself. Rerun bills you, never them."
+            },
+            "cost": {
+                "question": "How much does the white label cost?",
+                "answer": "It depends on how many clients you run on it. Write to the founders and we will send you a price."
+            },
+            "ai": {
+                "question": "Who pays for the AI?",
+                "answer": "Each workspace runs on the AI you choose for it: the client's ChatGPT or Claude plan, your own API keys, or the Rerun credits included."
+            }
+        }
+    }
+}

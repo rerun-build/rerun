@@ -35,6 +35,7 @@ import landingPricing from './landingPricing.json'
 import landingResources from './landingResources.json'
 import landingSections from './landingSections.json'
 import landingTemplates from './landingTemplates.json'
+import landingWhiteLabel from './landingWhiteLabel.json'
 import layout from './layout.json'
 import managed from './managed.json'
 import mobileAuth from './mobileAuth.json'
@@ -63,4 +64,4 @@ import vault from './vault.json'
 import workspace from './workspace.json'
 import workspaceView from './workspaceView.json'
 
-export default { account, agent, agentSuggestions, apps, auth, billing, brain, builder, changelog, chat, chatErrors, common, computers, connections, data, desktop, desktopApp, desktopShell, dialogs, emails, errors, files, foreman, kit, landingAbout, landingCommon, landingCommunity, landingCompare, landingDownload, landingFeatures, landingHome, landingIndustries, landingPricing, landingResources, landingSections, landingTemplates, layout, managed, mobileAuth, mobileCards, mobileChat, mobileCommon, mobileCoworker, mobileHitl, mobileHome, mobileOnboarding, mobileProviders, mobileSettings, mobileSteps, notifications, onboarding, organization, publicPages, published, push, services, subRuns, templates, tools, ui, vault, workspace, workspaceView }
+export default { account, agent, agentSuggestions, apps, auth, billing, brain, builder, changelog, chat, chatErrors, common, computers, connections, data, desktop, desktopApp, desktopShell, dialogs, emails, errors, files, foreman, kit, landingAbout, landingCommon, landingCommunity, landingCompare, landingDownload, landingFeatures, landingHome, landingIndustries, landingPricing, landingResources, landingSections, landingTemplates, landingWhiteLabel, layout, managed, mobileAuth, mobileCards, mobileChat, mobileCommon, mobileCoworker, mobileHitl, mobileHome, mobileOnboarding, mobileProviders, mobileSettings, mobileSteps, notifications, onboarding, organization, publicPages, published, push, services, subRuns, templates, tools, ui, vault, workspace, workspaceView }
