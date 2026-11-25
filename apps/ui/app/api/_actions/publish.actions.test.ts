@@ -47,6 +47,7 @@ describe('publishFileAction', () => {
             title: 'report.pdf',
             access: 'workspace',
             requestedAccess: null,
+            dataTables: [],
             message: 'Only the members of this workspace can open it, once signed in.',
         })
 

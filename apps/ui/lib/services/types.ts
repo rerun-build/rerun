@@ -138,6 +138,8 @@ export type PublishResult = {
     access: PublishedAccessMode
     // 'public' when the coworker asked for it and the workspace policy holds it for a person.
     requestedAccess: 'public' | null
+    // The tables the page reads live, and whether it may also add and edit rows.
+    dataTables: { table: string; database: 'shared' | 'own' | 'another coworker'; access: 'read' | 'write' }[]
     message: string
 }
 

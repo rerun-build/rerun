@@ -16,6 +16,8 @@ import {
     type PublishPolicy,
 } from '@/lib/published/access'
 import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedRawFileUrl, publishedSiteOrigin, rendersAsPage, slugPrefix, suffixedSlug } from '@/lib/published/host'
+import { SHARED_DATABASE, parseDataGrants } from '@/lib/published/data-grants'
+import { grantsForPage, publishedTables, type PageTableRequest } from '@/lib/published/page-tables'
 import { normalizeInvites } from '@/lib/published/invites'
 import { hashPassword } from '@/lib/published/password'
 import { AppError } from '@/lib/i18n/action-error'
@@ -254,7 +256,7 @@ async function accessFields(next: AccessResolution, input: AccessInput, existing
     return { access: next.access, requested_access: next.requestedAccess, invited, password_hash: passwordHash, access_version: version }
 }
 
-export type PublishOptions = AccessInput & { access?: PublishedAccess }
+export type PublishOptions = AccessInput & { access?: PublishedAccess; tables?: readonly PageTableRequest[] }
 
 // Publish a workspace file, or a folder with an index.html served as a site. Re-publishing the same
 // path upserts in place and keeps the existing slug/URL (unless a new slug is given), and the access
@@ -271,9 +273,11 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'published_files',
-        ['slug', 'kind', 'storage_key', 'files', 'thumbnail_key', ...ACCESS_COLUMNS] as const,
+        ['slug', 'kind', 'storage_key', 'files', 'thumbnail_key', 'data_tables', ...ACCESS_COLUMNS] as const,
         { agent_id: agentId, source_path: cleanPath },
     )
+    // Checked before the upload, so a machine that cannot list its tables fails the publish early.
+    const requestedTables = options.tables ? await grantsForPage(conn, agentId, engineAgentId, options.tables) : null
 
     const policy = await workspacePublishPolicy(workspaceId)
     const resolution = resolveCoworkerAccess({ policy, requested: options.access, current: currentAccess(existing) })
@@ -288,6 +292,7 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     const uploaded = (await isDirectory(conn, base, cleanPath))
         ? await uploadSite(supabase, conn, base, cleanPath, `${workspaceId}/${slug}/site-${Date.now()}`)
         : await uploadFile(supabase, conn, base, cleanPath, storageKeyFor(workspaceId, slug, cleanPath))
+    const pageTables = publishedTables(rendersAsPage(uploaded.kind, uploaded.contentType), requestedTables, parseDataGrants(existing?.data_tables))
 
     const row: Database['public']['Tables']['published_files']['Insert'] = {
         workspace_id: workspaceId,
@@ -305,6 +310,7 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
         thumbnail_key: null,
         updated_at: new Date().toISOString(),
         ...access,
+        ...(pageTables.changed ? { data_tables: pageTables.grants } : {}),
     }
     const { error: rowErr } = await supabase
         .from('published_files')
@@ -331,7 +337,8 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
         title: uploaded.title,
         access: resolution.access,
         requestedAccess: resolution.requestedAccess,
-        message: coworkerAccessMessage(options.access, resolution, access.invited ?? []),
+        dataTables: pageTables.grants.map(grant => ({ table: grant.table, database: grant.database === SHARED_DATABASE ? 'shared' : grant.database === agentId ? 'own' : 'another coworker', access: grant.grant })),
+        message: [coworkerAccessMessage(options.access, resolution, access.invited ?? []), pageTables.message].filter(Boolean).join(' '),
     }
 }
 

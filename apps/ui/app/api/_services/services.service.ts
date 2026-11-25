@@ -24,6 +24,8 @@ import { type ServiceInstanceSeed, heldAccounts, instanceServerName, nextService
 import { isPublishedAccess } from '@/lib/published/access'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
+import type { PageTableRequest } from '@/lib/published/page-tables'
+import { isDataGrantLevel } from '@/lib/published/data-grants'
 import {
     type ServiceRegistry,
     entriesOfSlug,
@@ -724,6 +726,16 @@ function asStringArray(v: unknown): string[] | undefined {
     return Array.isArray(v) ? v.filter((entry): entry is string => typeof entry === 'string') : undefined
 }
 
+function pageTableRequests(v: unknown): PageTableRequest[] | undefined {
+    if (!Array.isArray(v)) return undefined
+    return v.flatMap(entry => {
+        if (!entry || typeof entry !== 'object') return []
+        const { name, database, access } = entry as Record<string, unknown>
+        if (typeof name !== 'string' || !name.trim() || !isDataGrantLevel(access)) return []
+        return [{ name: name.trim(), database: database === 'own' ? 'own' : 'shared', access }]
+    })
+}
+
 function asStringRecord(v: unknown): Record<string, string> {
     if (!v || typeof v !== 'object') return {}
     const out: Record<string, string> = {}
@@ -756,6 +768,7 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
                 access: isPublishedAccess(args.access) ? args.access : undefined,
                 invite: asStringArray(args.invite),
                 password: asString(args.password),
+                tables: pageTableRequests(args.tables),
             })
         case 'unpublish_file':
             return unpublishFile(await agentRowIdOf(agentId, workspaceId), { path: asString(args.path), slug: asString(args.slug) })
