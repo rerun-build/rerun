@@ -22,7 +22,7 @@ import { SquareLogo } from './SquareLogo'
 import { isOpenable, type ConsoleResult, type ConsoleWorkspace, type CreditTransfer } from './types'
 import { useHeldDialog, type Hold } from './useHeldDialog'
 
-export type TransferDirection = 'allocate' | 'takeBack'
+type TransferDirection = 'allocate' | 'takeBack'
 
 type TransferFormProps = {
     direction: TransferDirection
