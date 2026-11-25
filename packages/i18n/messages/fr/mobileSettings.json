@@ -77,7 +77,7 @@
         },
         "email": {
             "label": "E-mail",
-            "footnote": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais un par exécution."
+            "footnote": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais plus de 3 par jour."
         },
         "perCoworker": {
             "title": "Par coworker",

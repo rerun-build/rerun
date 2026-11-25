@@ -1,14 +1,17 @@
 import 'server-only'
-import { realEmail } from '@/lib/auth/placeholder-email'
 import type { Database } from '@/app/api/database.types'
-import { BANNER_WARM_BACKGROUND_MS, emailBoardBanner } from '@/lib/email/board-banner'
-import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
-import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { APP_URL } from '@/lib/app-url'
+import { alertBanner, BANNER_WARM_BACKGROUND_MS } from '@/lib/email/board-banner'
+import { emailDateLabel } from '@/lib/email/date-labels'
 import { BUDGET_EXHAUSTED_EVENT, BUDGET_NOTICE_WINDOW_MS, RERUN_BUDGET_ERROR_CODE, decideBudgetNotice } from '@/lib/notifications/budget-notice'
-import { NOTIFICATION_EMAILS_PAUSED, wantsCategoryEmail } from '@/lib/notifications/prefs'
 import type { NotificationReason } from '@/lib/notifications/routing'
+import { causeAlertBoard } from '@/lib/og/alert-crew'
+import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { adminsToAlert, sendAlert } from '@/app/api/_services/admin-alert.service'
+import { creditResetsAt, getWorkspaceBudget } from '@/ee/services/rerunBudget.service'
+import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { sendBudgetExhaustedEmail } from '@/app/api/_services/email.service'
 import type { NoticeCopy } from '@/lib/notifications/notice-copy'
 
@@ -36,7 +39,7 @@ export async function notifyBudgetExhausted(workspaceId: number): Promise<void> 
         )
         if (recentError) throw new Error(recentError.message)
 
-        const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox'] as const, { id: workspaceId })
+        const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'subscription_status'] as const, { id: workspaceId })
         if (!workspace) return
 
         const { insert, email } = decideBudgetNotice({ recentNoticeExists: (recent?.length ?? 0) > 0, isSandbox: workspace.is_sandbox })
@@ -59,32 +62,33 @@ export async function notifyBudgetExhausted(workspaceId: number): Promise<void> 
         })
         if (insertError) throw new Error(insertError.message)
 
-        if (!email || NOTIFICATION_EMAILS_PAUSED) return
-        await emailWorkspaceMembers(supabase, workspaceId, workspace.name)
+        if (email && isSubscriptionEntitled(workspace.subscription_status)) await emailAdmins(supabase, workspaceId, workspace.name)
     } catch (err) {
         console.error('[notification] budget exhausted notice failed', err)
     }
 }
 
 // Credits are an admin's to top up, so the mail goes to them alone; everyone sees the notice in the app.
-async function emailWorkspaceMembers(supabase: ReturnType<typeof createServiceRoleClient>, workspaceId: number, workspaceName: string | null): Promise<void> {
-    const { data: admins } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, role: 'admin' })
-    const adminIds = (admins ?? []).map(admin => admin.user_id)
+// One per month of credit, however many days go by without any: the notice of the day is the app's.
+async function emailAdmins(supabase: ReturnType<typeof createServiceRoleClient>, workspaceId: number, workspaceName: string | null): Promise<void> {
+    const budget = await getWorkspaceBudget(workspaceId)
+    if (!budget || !(await everHadCredit(supabase, workspaceId, budget.budgetMicros))) return
+
+    const resetsAt = creditResetsAt(budget)
+    const alert = { workspaceId, key: `workspace:${workspaceId}:credits:${resetsAt?.toISOString().slice(0, 10) ?? 'once'}:${budget.budgetMicros}` }
+    const adminIds = await adminsToAlert(supabase, alert)
     if (!adminIds.length) return
-    const { data: members } = await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: adminIds })
-    const recipients = (members ?? []).filter(member => wantsCategoryEmail(member.email_notification_prefs, 'billing'))
-    if (!recipients.length) return
 
     // Run after the 402 response is flushed, so nobody waits on the capture.
-    const boardUrl = await emailBoardBanner(supabase, workspaceId, 'offline', BANNER_WARM_BACKGROUND_MS)
-    await Promise.allSettled(
-        recipients.map(async member => {
-            const { data } = await supabase.auth.admin.getUserById(member.id)
-            const to = realEmail(data.user?.email)
-            if (!to) return
-            // Scope-less token: this is an account-category email, not a run notification.
-            const locale = await recipientLocale(supabase, member.id, workspaceId)
-            await sendBudgetExhaustedEmail({ to, workspaceName, boardUrl, unsubscribeUrl: buildUnsubscribeUrl(member.id), locale })
-        }),
+    const boardUrl = await alertBanner(causeAlertBoard(supabase, workspaceId, 'credits'), BANNER_WARM_BACKGROUND_MS)
+    await sendAlert(supabase, alert, adminIds, ({ to, locale, unsubscribeUrl }) =>
+        sendBudgetExhaustedEmail({ to, workspaceName, resetLabel: resetsAt ? emailDateLabel(resetsAt, locale) : undefined, creditsUrl: `${APP_URL}/?${WORKSPACE_PARAM}=${workspaceId}&billing=1`, boardUrl, unsubscribeUrl, locale }),
     )
+}
+
+// A lifetime workspace runs on its own keys and never had a credit to run out of.
+async function everHadCredit(supabase: ReturnType<typeof createServiceRoleClient>, workspaceId: number, budgetMicros: number): Promise<boolean> {
+    if (budgetMicros > 0) return true
+    const { data: spent } = await selectCount(supabase, 'rerun_usage_events', { workspace_id: workspaceId, billed: true })
+    return (spent ?? 0) > 0
 }

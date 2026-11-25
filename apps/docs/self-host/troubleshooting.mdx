@@ -198,7 +198,7 @@ The browser opens a coworker's screen directly on the server's address, over `ws
 
 - **No Resend key.** Without `RESEND_API_KEY`, nothing is emailed: the app logs `[email] RESEND_API_KEY missing` and the members dialog hands you the invitation link instead.
 - **The sender.** Until `RESEND_FROM` names an address on a domain you verified in Resend, emails leave from Resend's test sender, which only delivers to the address of your Resend account.
-- **Notification emails are paused.** In this version no coworker notification is emailed, on any install: they show in the app only.
+- **Notification emails are off by default.** Each person turns **Email** on in their notification settings, and `UNSUBSCRIBE_SECRET` must be set.
 
 See [Email](/self-host/configuration#email). After changing `.env`, run `docker compose up -d`.
 

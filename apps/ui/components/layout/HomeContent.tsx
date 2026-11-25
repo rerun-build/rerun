@@ -40,12 +40,14 @@ import { useSession } from '@/supabase/session/SessionProvider'
 import { useAgentsRealtime } from '@/supabase/useAgentsRealtime'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useAgentShareStore } from '@/stores/agent-share.store'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { clearSearchParams } from '@/lib/clear-search-params'
 import { settleSlotsCheckoutAction } from '@/app/api/_actions/apps.actions'
 import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, isAppSlug } from '@/lib/apps/types'
 import { usePaidAppsStore } from '@rerun/cloud/apps.client'
+import { RECONNECT_PARAM } from '@/lib/engine/ai-sources'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -140,6 +142,14 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         if (searchParams.get('billing') !== '1' || loading) return
         useBillingStore.getState().openBilling(undefined, 'email_link')
         clearSearchParams('billing')
+    }, [searchParams, loading])
+
+    // The email about an AI account that stopped links here: its sign-in opens straight away.
+    useEffect(() => {
+        const connectionId = searchParams.get(RECONNECT_PARAM)
+        if (!connectionId || loading) return
+        useWorkspaceSettingsStore.getState().reconnectAiProvider(connectionId)
+        clearSearchParams(RECONNECT_PARAM)
     }, [searchParams, loading])
 
     // Connecting a provider from the account settings leaves the app and comes back here: the

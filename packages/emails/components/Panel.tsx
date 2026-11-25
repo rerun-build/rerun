@@ -6,13 +6,11 @@ export interface PanelProps {
   children: React.ReactNode;
   /** Tints the frame. Left neutral when omitted. */
   tone?: ToneName;
-  /** Machine output (an error, a log line) rather than prose. */
-  mono?: boolean;
   style?: React.CSSProperties;
 }
 
-/** The framed block that sits inside a card: an agent's message, an error, a log line. */
-export function Panel({ children, tone, mono = false, style }: PanelProps) {
+/** The framed block that sits inside a card: a quote, a message. */
+export function Panel({ children, tone, style }: PanelProps) {
   const t = tone ? TONES[tone] : null;
   return (
     <Section
@@ -23,9 +21,7 @@ export function Panel({ children, tone, mono = false, style }: PanelProps) {
         ...style,
       }}
     >
-      <Text style={mono ? { ...body, ...monoBody, color: t ? t.text : theme.text.body } : body}>
-        {children}
-      </Text>
+      <Text style={body}>{children}</Text>
     </Section>
   );
 }
@@ -41,10 +37,4 @@ const body: React.CSSProperties = {
   lineHeight: "22px",
   margin: 0,
   whiteSpace: "pre-wrap",
-};
-
-const monoBody: React.CSSProperties = {
-  fontFamily: theme.font.mono,
-  fontSize: "13px",
-  lineHeight: "20px",
 };

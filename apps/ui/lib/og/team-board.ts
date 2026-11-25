@@ -19,21 +19,6 @@ export type BoardStatus = NonNullable<BoardScene['agents'][number]['status']>
 // others stand on the board without one.
 export type TeamStatus = BoardStatus | Record<string, BoardStatus>
 
-type NotificationKind = Database['public']['Enums']['notification_kind']
-
-const BOARD_STATUS_OF_KIND: Record<NotificationKind, BoardStatus> = {
-    question: 'waiting_human',
-    approval: 'waiting_human',
-    connector: 'waiting_human',
-    info: 'working',
-    done: 'idle',
-    error: 'error',
-}
-
-export function boardStatusOfKind(kind: NotificationKind): BoardStatus {
-    return BOARD_STATUS_OF_KIND[kind]
-}
-
 /**
  * The coworkers a workspace would lose, oldest first: the first one hired is the one its owner
  * knows by name. One switched off by a plan limit is not part of it. `mustInclude` is read even

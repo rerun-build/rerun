@@ -5,8 +5,8 @@ import type { Database } from '@/app/api/database.types'
 import type { RoutedMember, NotificationRecipients } from '@/lib/notifications/routing'
 import type { StoredNotification } from '@/lib/notifications/inbound'
 
-export { sendIncidentResolvedEmail, sendNotificationEmail, sendPublishedAccessCodeEmail, sendSignInCodeEmail, sendWorkspaceInviteEmail } from '@/app/api/_services/email.service'
-export { BANNER_WARM_BACKGROUND_MS, BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
+export { sendNotificationEmail, sendPublishedAccessCodeEmail, sendSignInCodeEmail, sendWorkspaceInviteEmail } from '@/app/api/_services/email.service'
+export { BANNER_WARM_BACKGROUND_MS, BANNER_WARM_INLINE_MS, alertBanner, emailBoardBanner, emailPortrait } from '@/lib/email/board-banner'
 export { buildUnsubscribeUrl, verifyUnsubscribeToken } from '@/lib/email/unsubscribeToken'
 
 // A self-hosted install sends its emails through its own Resend account (RESEND_API_KEY, RESEND_FROM).

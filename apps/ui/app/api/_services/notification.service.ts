@@ -1,28 +1,32 @@
-import { realEmail } from '@/lib/auth/placeholder-email'
 import { after } from 'next/server'
-import { agentAddress, agentKindOfEngineId, agentKindPolicy, type AgentKind } from '@rerun/contracts'
+import { agentAddress, agentKindOfEngineId, agentKindPolicy, FOREMAN_AGENT_ID, parseCoworkerLook, RERUN_CONNECTION_ID, type AgentKind, type CoworkerLook } from '@rerun/contracts'
 
 import { boxAccessOf, memberActor, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
 import type { Database } from '@/app/api/database.types'
-import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
+import { BANNER_WARM_INLINE_MS, alertBanner, buildUnsubscribeUrl, emailPortrait, pushNotification, sendNotificationEmail } from '@rerun/cloud/email'
 import { notificationUrl } from '@/lib/app-url'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import type { NotificationPayload } from '@/lib/engine/types'
-import { RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
+import { ACCOUNT_REFUSED_ERROR_CODE, RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
-import { announcesRecovery, emailSourceLabel, incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
+import { ALERT_STATE_OF_KIND, awaitedApp, DAILY_EMAIL_CAP, DAILY_EMAIL_WINDOW_MS, holdsARun, incidentMessage, opensConversation } from '@/lib/notifications/incident-email'
+import { incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
 import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
-import { NOTIFICATION_EMAILS_PAUSED, coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
+import { coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
-import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
-import { boardStatusOfKind } from '@/lib/og/team-board'
+import { computeRecipients, isUrgentKind, needsOwnerFollow, wantsIncidentEmail, type IncidentKind, type NotificationReason, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
+import { loadEmailRecipient } from '@/lib/email/recipient'
+import { translatorFor } from '@/lib/i18n/server-translator'
+import { coworkerAlertBoard } from '@/lib/og/alert-crew'
+import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { copyToShippedForemanRow, openForemanRoutineThread } from '@/lib/foreman/conversation'
 import { isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { alertSignedOutAccounts, closeReconnectedAccounts } from './ai-account-alert.service'
 import { ensureSessionRow } from './chat.service'
 import { recordAgentReply } from './session-preview.service'
 import { writeNotificationPrefs } from './notification-audience.service'
@@ -34,6 +38,7 @@ import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import { emailTranslator } from '@rerun/emails/i18n'
 
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
+type DispatchInsert = Database['public']['Tables']['notification_email_dispatches']['Insert']
 type SessionUpdate = Database['public']['Tables']['sessions']['Update']
 type SessionSource = Database['public']['Enums']['session_source']
 type ServiceRoleClient = ReturnType<typeof createServiceRoleClient>
@@ -110,7 +115,11 @@ export async function recordNotification(token: string, payload: NotificationPay
 
     // Best-effort: a delivery failure must never fail the webhook, the notification is already
     // stored. A sandbox workspace keeps its in-app notifications but never emails anyone.
-    if (!engine.isSandbox && !NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: address, boardAgentId: agent?.space_id ? agent.id : null, agentName: agent?.name ?? 'your coworker', notification, recipients, members: audience.members })
+    if (!engine.isSandbox) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: address, boardAgentId: agent?.space_id ? agent.id : null, agentName: agent?.name ?? 'your coworker', notification, recipients, members: audience.members })
+    const provider = typeof notification.metadata?.provider === 'string' ? notification.metadata.provider : null
+    // Both after the response: they ask the machine that is waiting for it.
+    if (!engine.isSandbox && notification.kind === 'error' && notification.metadata?.errorCode === ACCOUNT_REFUSED_ERROR_CODE) after(() => alertSignedOutAccounts(engine.workspaceId, provider))
+    if (!engine.isSandbox && notification.kind === 'done' && isRunCompletion(notification.event) && provider && provider !== RERUN_CONNECTION_ID) after(() => closeReconnectedAccounts(engine.workspaceId, provider))
     if (!engine.isSandbox) {
         const sourceKey = incidentKeyFor({ event: notification.event, kind: notification.kind, agentId: notification.agentId, source: notification.source, metadata: notification.metadata, sessionId: notification.sessionId })
         await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: address, agentName: agent?.name ?? 'your coworker', conversationId: audience.conversationId, sourceKey, notification, recipients, members: audience.members })
@@ -327,21 +336,22 @@ type IncidentContext = {
 }
 
 // One email when something needs a recipient who is away, then nothing on that source until it
-// works again, and one more when it does. Someone with the app open already got the toast.
+// works again. Someone with the app open already got the toast.
 async function emailIncidents(supabase: ServiceRoleClient, context: IncidentContext): Promise<void> {
     const { notification } = context
     try {
         const keyInput = { event: notification.event, kind: notification.kind, agentId: notification.agentId, source: notification.source, metadata: notification.metadata, sessionId: notification.sessionId }
         if (notification.kind === 'done' && isRunCompletion(notification.event)) {
-            await resolveIncidents(supabase, context, resolvedIncidentKeysFor(keyInput))
+            await resolveIncidents(supabase, resolvedIncidentKeysFor(keyInput))
             return
         }
-        // A budget-exhausted failure keeps its in-app row but never emails per occurrence: the
-        // workspace-level notice from the LLM proxy replaces it.
-        if (suppressesErrorEmail(notification.kind, notification.metadata)) return
+        const { kind } = notification
+        if (!isUrgentKind(kind) || !holdsARun(notification)) return
+        // A failure that has an alert of its own keeps its in-app row but never emails per occurrence.
+        if (suppressesErrorEmail(kind, notification.metadata)) return
 
         const prefsOf = new Map(context.members.map(m => [m.id, m.prefs]))
-        const wanting = Object.entries(context.recipients).flatMap(([userId, reason]) => (wantsIncidentEmail(prefsOf.get(userId), reason, notification.kind, context.agentId) ? [{ userId, reason }] : []))
+        const wanting = Object.entries(context.recipients).flatMap(([userId, reason]) => (wantsIncidentEmail(prefsOf.get(userId), reason, kind, context.agentId) ? [{ userId, reason }] : []))
         if (!wanting.length) return
 
         const now = new Date()
@@ -351,91 +361,99 @@ async function emailIncidents(supabase: ServiceRoleClient, context: IncidentCont
         if (!away.length) return
 
         const key = incidentKeyFor(keyInput)
-        const banner = lazyBanner(supabase, context)
-        await Promise.allSettled(
-            away.map(async ({ userId, reason }) => {
-                const { data: opened, error } = await supabase.rpc('open_notification_incident', { p_user_id: userId, p_source_key: key })
-                if (error) throw new Error(error.message)
-                if (!opened) return
-                const to = await emailOf(supabase, userId)
-                const locale = await recipientLocale(supabase, userId, context.workspaceId)
-                const sent = to
-                    ? await sendNotificationEmail({
-                          to,
-                          kind: notification.kind,
-                          agentName: context.agentName,
-                          message: notification.message,
-                          runId: notification.runId ?? null,
-                          reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale)),
-                          boardUrl: await banner(),
-                          conversationUrl: notificationUrl(context.notificationId),
-                          unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
-                          locale,
-                      })
-                    : null
-                // An incident stays open only once its email has left: otherwise the next failure
-                // on the source would find it taken and the recipient would hear nothing until recovery.
-                if (!sent?.ok) await dropIncident(supabase, userId, key)
-            }),
-        )
+        const content = lazyContent(supabase, context, kind)
+        const results = await Promise.allSettled(away.map(({ userId, reason }) => emailIncident(supabase, context, { kind, key, userId, reason, now, content })))
+        for (const result of results) if (result.status === 'rejected') console.error('[notification] failed to email a recipient of the incident', result.reason)
     } catch (err) {
         console.error('[notification] failed to email the incident', err)
     }
 }
 
-// Every incident on these sources closes, and whoever was told a scheduled task broke and is still
-// away hears that it works again.
-async function resolveIncidents(supabase: ServiceRoleClient, context: IncidentContext, keys: string[]): Promise<void> {
-    const now = new Date()
-    const banner = lazyBanner(supabase, context)
-    const prefsOf = new Map(context.members.map(m => [m.id, m.prefs]))
-    await Promise.allSettled(
-        keys.map(async key => {
-            const { data: userIds, error } = await supabase.rpc('resolve_notification_incidents', { p_source_key: key })
-            if (error) throw new Error(error.message)
-            if (!userIds?.length || !announcesRecovery(key)) return
-            // The incident table outlives a membership: someone removed since the source broke is not told it works again.
-            const wanting = userIds.filter(userId => prefsOf.has(userId) && wantsRecoveryEmail(prefsOf.get(userId), context.agentId))
-            if (!wanting.length) return
-            const presence = await loadPresence(supabase, wanting)
-            const online = new Set(presence.filter(row => isPresent(row.last_seen_at, now)).map(row => row.user_id))
-            await Promise.allSettled(
-                wanting
-                    .filter(userId => !online.has(userId))
-                    .map(async userId => {
-                        const to = await emailOf(supabase, userId)
-                        if (!to) return
-                        const reason = context.recipients[userId]
-                        const locale = await recipientLocale(supabase, userId, context.workspaceId)
-                        const t = emailTranslator(locale)
-                        await sendIncidentResolvedEmail({
-                            to,
-                            agentName: context.agentName,
-                            sourceLabel: emailSourceLabel(key, t),
-                            reason: reason ? emailReasonSentence(reason, context.agentName, t) : undefined,
-                            boardUrl: await banner(),
-                            conversationUrl: notificationUrl(context.notificationId),
-                            unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
-                            locale,
-                        })
-                    }),
-            )
-        }),
-    )
+type IncidentEmail = { kind: IncidentKind; key: string; userId: string; reason: NotificationReason; now: Date; content: () => Promise<IncidentContent> }
+
+async function emailIncident(supabase: ServiceRoleClient, context: IncidentContext, { kind, key, userId, reason, now, content }: IncidentEmail): Promise<void> {
+    const recipient = await loadEmailRecipient(supabase, userId)
+    if (!recipient) return
+    const { data: opened, error } = await supabase.rpc('open_notification_incident', { p_user_id: userId, p_source_key: key })
+    if (error) throw new Error(error.message)
+    if (!opened) return
+
+    // An incident stays open only once its email has left: otherwise the next failure on the source
+    // would find it taken and the recipient would never hear of it.
+    const send = async () => {
+        const { app, look, board } = await content()
+        const locale = await recipientLocale(supabase, userId, context.workspaceId)
+        const [boardUrl, portraitUrl] = await Promise.all([board, context.agentId ? emailPortrait(context.agentId, look, locale, BANNER_WARM_INLINE_MS) : undefined])
+        const { ok } = await sendNotificationEmail({
+            to: recipient.email,
+            kind,
+            agentName: context.agentName,
+            message: incidentMessage(context.notification, await translatorFor(locale, 'chatErrors')),
+            app,
+            opensConversation: opensConversation(context.notification),
+            reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale)),
+            portraitUrl,
+            boardUrl,
+            conversationUrl: notificationUrl(context.notificationId),
+            unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
+            locale,
+        })
+        return ok
+    }
+    if (!(await attempted(() => sendWithinCap(supabase, context, { kind, key, userId, now }, send)))) await dropIncident(supabase, userId, key)
 }
 
-// One board capture per notification whoever it goes to, asked for by the first email that leaves.
-function lazyBanner(supabase: ServiceRoleClient, { workspaceId, boardAgentId, notification }: IncidentContext): () => Promise<string | undefined> {
-    let banner: Promise<string | undefined> | undefined
-    return () => (banner ??= boardAgentId ? emailBoardBanner(supabase, workspaceId, { [boardAgentId]: boardStatusOfKind(notification.kind) }, BANNER_WARM_INLINE_MS) : Promise.resolve(undefined))
+function attempted(send: () => Promise<boolean>): Promise<boolean> {
+    return send().catch((err: unknown) => {
+        console.error('[notification] failed to send the incident', err)
+        return false
+    })
+}
+
+// Recorded before it is counted, so two coworkers stopping at once cannot both take the last email of
+// the day, and struck off again when it did not leave.
+async function sendWithinCap(supabase: ServiceRoleClient, context: IncidentContext, { kind, key, userId, now }: Pick<IncidentEmail, 'kind' | 'key' | 'userId' | 'now'>, send: () => Promise<boolean>): Promise<boolean> {
+    const { data: dispatch, error } = await supabase
+        .from('notification_email_dispatches')
+        .insert<DispatchInsert>({ notification_id: context.notificationId, user_id: userId, workspace_id: context.workspaceId, source_key: key, kind, status: 'sent' })
+        .select('id')
+        .single()
+    if (error) throw new Error(error.message)
+
+    const { data: count } = await selectCount(supabase, 'notification_email_dispatches', { user_id: userId, status: 'sent', created_at: { gte: new Date(now.getTime() - DAILY_EMAIL_WINDOW_MS).toISOString() } })
+    const sent = (count ?? 0) <= DAILY_EMAIL_CAP && (await attempted(send))
+    if (!sent) await supabase.from('notification_email_dispatches').delete().eq('id', dispatch.id)
+    return sent
+}
+
+async function resolveIncidents(supabase: ServiceRoleClient, keys: string[]): Promise<void> {
+    for (const key of keys) {
+        const { error } = await supabase.rpc('resolve_notification_incidents', { p_source_key: key })
+        if (error) console.error('[notification] failed to close an incident', error)
+    }
+}
+
+type IncidentContent = { app: string | undefined; look: CoworkerLook | null; board: Promise<string | undefined> }
+
+// The same picture and the same words of the catalog whoever the notification goes to, read by the
+// first email that leaves.
+function lazyContent(supabase: ServiceRoleClient, context: IncidentContext, kind: IncidentKind): () => Promise<IncidentContent> {
+    let content: Promise<IncidentContent> | undefined
+    return () => (content ??= loadContent(supabase, context, kind))
+}
+
+async function loadContent(supabase: ServiceRoleClient, { workspaceId, boardAgentId, agentId, notification }: IncidentContext, kind: IncidentKind): Promise<IncidentContent> {
+    const awaited = kind === 'connector' ? awaitedApp(notification) : {}
+    const [catalog, { data: agent }] = await Promise.all([
+        awaited.slug ? loadServiceCatalog(supabase, [awaited.slug]) : null,
+        agentId && agentId !== FOREMAN_AGENT_ID ? selectMaybeSingle(supabase, 'agents', ['look'] as const, { id: agentId }) : { data: null },
+    ])
+    // The Chief of Staff stands on no board: its email opens on the usual banner.
+    const scene = boardAgentId ? coworkerAlertBoard(supabase, workspaceId, boardAgentId, ALERT_STATE_OF_KIND[kind], awaited.slug) : null
+    return { app: awaited.name ?? (awaited.slug ? catalog?.get(awaited.slug)?.name : undefined), look: parseCoworkerLook(agent?.look), board: alertBanner(scene, BANNER_WARM_INLINE_MS) }
 }
 
 async function dropIncident(supabase: ServiceRoleClient, userId: string, key: string): Promise<void> {
     const { error } = await supabase.from('notification_incidents').delete().eq('user_id', userId).eq('source_key', key)
     if (error) console.error('[notification] failed to drop an incident nobody was emailed about', error)
-}
-
-async function emailOf(supabase: ServiceRoleClient, userId: string): Promise<string | null> {
-    const { data } = await supabase.auth.admin.getUserById(userId)
-    return realEmail(data.user?.email) ?? null
 }

@@ -6,11 +6,14 @@ export type { RunFailedProps } from "../emails/run-failed";
 export { default as BudgetExhausted } from "../emails/budget-exhausted";
 export type { BudgetExhaustedProps } from "../emails/budget-exhausted";
 
-export { default as AgentNotification } from "../emails/agent-notification";
-export type { AgentNotificationProps } from "../emails/agent-notification";
+export { default as AgentNotification, agentNotificationTitle } from "../emails/agent-notification";
+export type { AgentNotificationKind, AgentNotificationProps } from "../emails/agent-notification";
 
-export { default as IncidentResolved } from "../emails/incident-resolved";
-export type { IncidentResolvedProps } from "../emails/incident-resolved";
+export { default as AccountSignedOut, accountSignedOutSubject } from "../emails/account-signed-out";
+export type { AccountKind, AccountSignedOutProps } from "../emails/account-signed-out";
+
+export { default as AppNotice } from "../emails/app-notice";
+export type { AppNoticeProps } from "../emails/app-notice";
 
 export { default as WorkspaceInvite } from "../emails/workspace-invite";
 export type { WorkspaceInviteProps } from "../emails/workspace-invite";

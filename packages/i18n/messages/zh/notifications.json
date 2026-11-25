@@ -132,14 +132,14 @@
             },
             "email": {
                 "label": "电子邮件",
-                "description": "当您不在时需要您处理。每个事件一封邮件，绝不会每次运行发一封。"
+                "description": "当您不在时需要您处理。每个事件一封邮件，每天不超过 3 封。"
             }
         },
         "accountEmails": {
             "title": "账号邮件",
             "billing": {
                 "label": "试用与计费",
-                "description": "关于您订阅的试用提醒和计费通知。"
+                "description": "试用提醒、计费通知，以及 AI 账户或积分导致同事停止时的提醒。"
             },
             "product": {
                 "label": "产品更新",
@@ -153,7 +153,7 @@
         "coworkerTitle": "同事通知",
         "email": {
             "label": "电子邮件",
-            "description": "当您不在时，同事需要您或出现故障。每个事件一封邮件，绝不会每次运行发一封。"
+            "description": "当您不在时，同事需要您或出现故障。每个事件一封邮件，每天不超过 3 封。"
         },
         "saveFailed": "无法保存偏好设置",
         "saving": "正在保存…",

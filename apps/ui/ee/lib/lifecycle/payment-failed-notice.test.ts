@@ -8,7 +8,7 @@ import { loadRecipient } from './recipient'
 vi.mock('@/ee/lib/email/lifecycle-emails', () => ({ sendPaymentFailedEmail: vi.fn() }))
 vi.mock('./recipient', () => ({ loadRecipient: vi.fn() }))
 vi.mock('@/lib/whatsapp/send', () => ({ deliverWhatsApp: vi.fn() }))
-vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_INLINE_MS: 0, teamBoardBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=banner') }))
+vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_INLINE_MS: 0, alertBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=banner') }))
 vi.mock('@/lib/og/board-image', () => ({ boardImageUrl: vi.fn((scene: unknown) => `https://app.rerun.build/og/board?scene=${JSON.stringify(scene)}`) }))
 
 type Tables = { workspaces?: SupabaseResult; workspace_members?: SupabaseResult; lifecycle_emails?: SupabaseResult; agents?: SupabaseResult }
@@ -18,10 +18,10 @@ const INVOICE: DeclinedInvoice = { id: 'in_1', amountDueCents: 1762, currency: '
 
 function database(overrides: Tables = {}) {
     const tables: Tables = {
-        workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false } },
+        workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false, trial_ends_at: '2026-09-01T00:00:00Z' } },
         workspace_members: { data: [{ user_id: 'owner' }] },
         lifecycle_emails: {},
-        agents: { data: [{ name: 'Lead Scout' }, { name: 'Inbox Assistant' }] },
+        agents: { data: [{ id: 'a1', name: 'Lead Scout' }, { id: 'a2', name: 'Inbox Assistant' }] },
         ...overrides,
     }
     return fakeSupabase(table => tables[table as keyof Tables])
@@ -36,14 +36,14 @@ describe('sendPaymentFailedNotice', () => {
         vi.mocked(deliverWhatsApp).mockResolvedValue({ sent: true, id: 'row-1' })
     })
 
-    it('sends the owner the amount, the invoice link and the date the archive is kept until, with no opt-out', async () => {
+    it('sends the amount, the invoice link and when the coworkers stop, with no opt-out', async () => {
         const db = database()
 
         await sendPaymentFailedNotice(db.client, 1, INVOICE, NOW)
 
         expect(sendPaymentFailedEmail).toHaveBeenCalledWith(
             { to: 'owner@example.com', unsubscribeUrl: null, locale: 'en' },
-            { workspaceName: 'Acme', amountLabel: '$17.62', declinedLabel: '5 October', pausedLabel: '6 October, 06:10 UTC', keptUntilLabel: '4 January', billingUrl: 'https://pay.stripe.test/in_1', boardUrl: 'https://app.rerun.build/og/board?sig=banner' },
+            { workspaceName: 'Acme', amountLabel: '$17.62', pausedLabel: '6 October, 06:10 UTC', firstCharge: false, billingUrl: 'https://pay.stripe.test/in_1', boardUrl: 'https://app.rerun.build/og/board?sig=banner' },
         )
         expect(db.writes('lifecycle_emails')[0].payload).toMatchObject({ user_id: 'owner', workspace_id: 1, sequence_key: 'payment_failed', status: 'sent', metadata: { invoice_id: 'in_1' } })
     })
@@ -88,10 +88,28 @@ describe('sendPaymentFailedNotice', () => {
         expect(deliverWhatsApp).toHaveBeenCalled()
     })
 
+    it('writes to every admin, and messages the owner alone', async () => {
+        const db = database({ workspace_members: { data: [{ user_id: 'owner' }, { user_id: 'second' }] } })
+
+        await sendPaymentFailedNotice(db.client, 1, INVOICE, NOW)
+
+        expect(sendPaymentFailedEmail).toHaveBeenCalledTimes(2)
+        expect(db.writes('lifecycle_emails').map(write => (write.payload as { user_id: string }).user_id)).toEqual(['owner', 'second'])
+        expect(deliverWhatsApp).toHaveBeenCalledTimes(1)
+    })
+
+    it('emails a first charge no trial_ended email would ever follow', async () => {
+        const db = database({ workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false, trial_ends_at: null } } })
+
+        await sendPaymentFailedNotice(db.client, 1, { ...INVOICE, firstCharge: true }, NOW)
+
+        expect(sendPaymentFailedEmail).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ firstCharge: true }))
+    })
+
     it('falls back to the billing dialog when Stripe gave no hosted page', async () => {
         await sendPaymentFailedNotice(database().client, 1, { ...INVOICE, hostedUrl: null }, NOW)
 
-        expect(sendPaymentFailedEmail).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ billingUrl: expect.stringMatching(/\/\?billing=1$/) }))
+        expect(sendPaymentFailedEmail).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ billingUrl: expect.stringMatching(/\/\?workspace=1&billing=1$/) }))
     })
 
     it('records a failed delivery as failed', async () => {

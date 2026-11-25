@@ -4,11 +4,11 @@ import type { Database } from '@/app/api/database.types'
 import { loadRecipient } from './recipient'
 
 function client(result: { data: { user: Record<string, unknown> | null }; error: unknown }) {
-    return { auth: { admin: { getUserById: async () => result } } } as unknown as SupabaseClient<Database>
+    return { auth: { admin: { getUserById: async () => result } }, rpc: async () => ({ data: false, error: null }) } as unknown as SupabaseClient<Database>
 }
 
 function withUser(user: Record<string, unknown>) {
-    return client({ data: { user: { is_anonymous: false, email: 'ada@example.com', user_metadata: {}, ...user } }, error: null })
+    return client({ data: { user: { is_anonymous: false, email: 'ada@acme.io', user_metadata: {}, ...user } }, error: null })
 }
 
 describe('loadRecipient', () => {
@@ -25,7 +25,7 @@ describe('loadRecipient', () => {
     })
 
     it('trims the address', async () => {
-        await expect(loadRecipient(withUser({ email: ' ada@example.com ' }), 'u')).resolves.toEqual({ email: 'ada@example.com', firstName: null })
+        await expect(loadRecipient(withUser({ email: ' ada@acme.io ' }), 'u')).resolves.toEqual({ email: 'ada@acme.io', firstName: null })
     })
 
     it.each([

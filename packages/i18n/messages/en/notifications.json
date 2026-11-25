@@ -153,14 +153,14 @@
             },
             "email": {
                 "label": "Email",
-                "description": "When it needs you while you are away. One email per incident, never one per run."
+                "description": "When it needs you while you are away. One email per incident, never more than 3 a day."
             }
         },
         "accountEmails": {
             "title": "Account emails",
             "billing": {
                 "label": "Trial & billing",
-                "description": "Trial reminders and billing notices about your subscription."
+                "description": "Trial reminders, billing notices, and alerts when an AI account or your credits stop your coworkers."
             },
             "product": {
                 "label": "Product updates",
@@ -174,7 +174,7 @@
         "coworkerTitle": "Coworker notifications",
         "email": {
             "label": "Email",
-            "description": "When a coworker needs you or breaks while you are away. One email per incident, never one per run."
+            "description": "When a coworker needs you or breaks while you are away. One email per incident, never more than 3 a day."
         },
         "saveFailed": "Could not save preferences",
         "saving": "Saving…",

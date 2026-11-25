@@ -77,7 +77,7 @@
         },
         "email": {
             "label": "E-Mail",
-            "footnote": "Wenn du gebraucht wirst, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+            "footnote": "Wenn er dich braucht, während du weg bist. Eine E-Mail pro Vorfall, nie mehr als 3 am Tag."
         },
         "perCoworker": {
             "title": "Pro Coworker",

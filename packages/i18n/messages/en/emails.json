@@ -3,9 +3,8 @@
         "common.dateAtTime": "A deadline to the minute, always in UTC. {date} is a day and month already formatted (\"12 March\"), {time} a 24-hour time (\"16:00\").",
         "common.meta": "Short uppercase labels of a two-column table of facts in an email (label on the left, value on the right).",
         "common.footer.tagline": "Last line of every email, under a rule, in small grey text.",
-        "reasons": "A small grey line under the first paragraph of a notification email: why this person receives it. {agentName} is a coworker's name.",
-        "incidentResolved.sources": "The thing that works again, used as {source} in the incident emails. {slug} is the technical name of a schedule or a trigger, shown as is.",
-        "agentNotification": "Notification emails a coworker sends. The heading is the email's title, the body names the coworker in bold.",
+        "reasons": "A small grey line under the button of a notification email: why this person receives it. {agentName} is a coworker's name.",
+        "agentNotification": "Emails a coworker sends. The heading is both the subject and the title; what the coworker says follows in a bubble. {app} is the name of an app (\"Gmail\").",
         "agentIdle.createdHoursAgo": "Value of the \"Created\" row of a table: how long ago a coworker was created.",
         "agentIdle.createdYesterday": "Value of the \"Created\" row of a table: how long ago a coworker was created.",
         "agentIdle.createdDaysAgo": "Value of the \"Created\" row of a table: how long ago a coworker was created. Never 1, which reads createdYesterday.",
@@ -13,7 +12,11 @@
         "archiveExpiring": "{kind} is \"sandbox\" for a creator's free sandbox, anything else for a paid workspace that was paused.",
         "creatorInvite.button": "\"Box\" is the coworkers' machine, a product name kept as is.",
         "creatorInvite.signoff": "Signature at the bottom of the email.",
-        "trialStarted.perMonth": "{price} is an amount with its currency (\"$49\")."
+        "trialStarted.perMonth": "{price} is an amount with its currency (\"$49\").",
+        "runFailed": "Email sent when a coworker's run broke. The heading is both the subject and the title; the error follows in a bubble.",
+        "accountSignedOut": "Email to the admins of a workspace when the AI account its coworkers run on stopped working. {account} is a provider (\"Claude\", \"ChatGPT\", \"OpenAI\"), {coworkers} an already formatted list of names, {workspace} the workspace's name.",
+        "accountSignedOut.more": "Last item of the list of coworkers: \"Lead Scout, Blog Writer and 2 more\".",
+        "paymentFailed": "{pausedAt} is a day and an hour in UTC (\"25 November, 16:00 UTC\"), {amount} an amount with its currency."
     },
     "common": {
         "footer": {
@@ -29,23 +32,19 @@
         "meta": {
             "accessEnds": "Access ends",
             "amount": "Amount",
-            "amountDue": "Amount due",
             "archivedOn": "Archived on",
             "archivedSince": "Archived since",
             "coworker": "Coworker",
             "coworkers": "Coworkers",
             "coworkersSaved": "Coworkers saved",
             "created": "Created",
-            "declinedOn": "Declined on",
             "deletedOn": "Deleted on",
             "included": "Included",
             "lastOpened": "Last opened",
             "pausedSince": "Paused since",
             "renewsOn": "Renews on",
-            "run": "Run",
             "runs": "Runs",
             "savedUntil": "Saved until",
-            "source": "Source",
             "then": "Then",
             "trialEnded": "Trial ended",
             "trialEnds": "Trial ends",
@@ -58,13 +57,8 @@
         "publishedAccessCode": "Your code to open {pageTitle}: {code}",
         "lifetimeCode": "Your Rerun lifetime code: {code}",
         "workspaceInvite": "You're invited to {workspaceName} on Rerun",
-        "runFailed": "{agentName} ran into an error",
-        "agentDone": "{agentName} finished a task",
-        "agentInfo": "{agentName} needs your attention",
-        "agentInput": "{agentName} needs your input",
         "appNotice": "{appName}: action needed",
-        "incidentResolved": "{agentName} is back to normal",
-        "budgetExhausted": "Your Rerun credits are used up",
+        "budgetExhausted": "{workspace} is out of Rerun credits",
         "onboardingResume": "Your Rerun setup isn't finished",
         "agentRecommendations": "{count, plural, one {# Rerun coworker that fits {company}} other {# Rerun coworkers that fit {company}}}",
         "agentIdle": "{agentName} is ready, but hasn't run yet",
@@ -76,7 +70,7 @@
         "trialFinalNoticeNoCard": "Your Rerun trial ends in 2 hours, add a card to keep your coworkers running",
         "trialEndedPaymentFailed": "Your first Rerun payment failed, your workspace is paused in 24 hours",
         "trialEndedNoCard": "Your Rerun trial has ended, your workspace is paused in 2 hours",
-        "paymentFailed": "Your Rerun payment was declined, your workspace is paused in 24 hours",
+        "paymentFailed": "Payment declined: your workspace is paused in 24 hours",
         "subscriptionEnding": "{daysLeft, plural, =1 {Your Rerun subscription ends tomorrow} other {Your Rerun subscription ends in # days}}",
         "archiveExpiring": "{kind, select, sandbox {Your archived Rerun sandbox is deleted on {date}} other {Your paused Rerun workspace is deleted on {date}}}",
         "sandboxIdle": "Your Rerun sandbox is archived on {date} unless you open it",
@@ -134,55 +128,45 @@
         "fallbackAgent": "Your coworker"
     },
     "runFailed": {
-        "preview": "{agentName} ran into an error",
-        "heading": "Run failed",
-        "body": "Your coworker <strong>{agentName}</strong> stopped with an error."
+        "heading": "{agentName} stopped on an error",
+        "button": "See what broke"
     },
     "budgetExhausted": {
-        "preview": "Your Rerun credits are used up",
-        "heading": "Rerun credits used up",
-        "bodyNamed": "The Rerun credits of <strong>{workspaceName}</strong> are used up for this month. Scheduled and triggered runs on Rerun models are paused until they reset or you add credits.",
-        "bodyUnnamed": "Your workspace's Rerun credits are used up for this month. Scheduled and triggered runs on Rerun models are paused until they reset or you add credits.",
-        "ownKeys": "Coworkers using their own API keys keep running.",
+        "heading": "You are out of Rerun credits",
+        "body": "Scheduled and triggered runs on Rerun models are paused until {date}, or until you add credits. Coworkers using their own API keys keep running.",
+        "bodyNoReset": "Scheduled and triggered runs on Rerun models are paused until you add credits. Coworkers using their own API keys keep running.",
         "button": "Add credits"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}: Task done",
-            "heading": "Task done",
-            "body": "Your agent <strong>{agentName}</strong> finished a task."
-        },
-        "info": {
-            "preview": "{agentName}: Needs your attention",
-            "heading": "Needs your attention",
-            "body": "Your agent <strong>{agentName}</strong> wants you to look at something."
-        },
         "question": {
-            "preview": "{agentName}: Coworker has a question",
-            "heading": "Coworker has a question",
-            "body": "Your agent <strong>{agentName}</strong> needs an answer to continue."
+            "heading": "{agentName} has a question",
+            "button": "Answer"
         },
         "approval": {
-            "preview": "{agentName}: Approval needed",
-            "heading": "Approval needed",
-            "body": "Your agent <strong>{agentName}</strong> is waiting for your approval."
+            "heading": "{agentName} needs your approval",
+            "button": "Approve or deny"
         },
         "connector": {
-            "preview": "{agentName}: App setup",
-            "heading": "App setup",
-            "body": "Your agent <strong>{agentName}</strong> needs you to connect a service."
+            "heading": "{agentName} needs {app}",
+            "headingUnnamed": "{agentName} needs an app",
+            "button": "Connect {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{source} of {agentName} works again",
-        "heading": "Back to normal",
-        "body": "{source} of <strong>{agentName}</strong> ran fine again. You won't get another email about it unless it breaks again.",
-        "sources": {
-            "schedule": "Schedule \"{slug}\"",
-            "anySchedule": "A scheduled task",
-            "trigger": "Trigger \"{slug}\"",
-            "anyTrigger": "A trigger",
-            "conversation": "A conversation"
+    "accountSignedOut": {
+        "more": "{count, plural, one {# more} other {# more}}",
+        "subscription": {
+            "subject": "{account} is signed out: {count, plural, one {# coworker stopped} other {# coworkers stopped}}",
+            "heading": "{account} is signed out",
+            "body": "{count, plural, one {{coworkers} of {workspace} starts again as soon as you sign in.} other {{coworkers} of {workspace} start again as soon as you sign in.}}",
+            "bodyUnnamed": "The coworkers of {workspace} that run on {account} start again as soon as you sign in.",
+            "button": "Sign in to {account}"
+        },
+        "key": {
+            "subject": "{account} refused your key: {count, plural, one {# coworker stopped} other {# coworkers stopped}}",
+            "heading": "{account} refused your key",
+            "body": "{count, plural, one {{coworkers} of {workspace} starts again as soon as you update it.} other {{coworkers} of {workspace} start again as soon as you update it.}}",
+            "bodyUnnamed": "The coworkers of {workspace} that run on {account} start again as soon as you update it.",
+            "button": "Update the key"
         }
     },
     "agentIdle": {
@@ -261,13 +245,16 @@
         "footnoteWithoutAgent": "Start from a coworker you already have, or build something for the marketplace from scratch."
     },
     "paymentFailed": {
-        "preview": "Your Rerun payment was declined, your workspace is paused on {pausedAt}",
         "heading": "Your payment was declined",
-        "declined": "The renewal for <strong>{workspace}</strong> did not go through on <strong>{date}</strong>. Your bank may simply be asking you to confirm it.",
-        "declinedWithAmount": "The renewal for <strong>{workspace}</strong>, <strong>{amount}</strong>, did not go through on <strong>{date}</strong>. Your bank may simply be asking you to confirm it.",
-        "consequences": "Your workspace keeps running until <strong>{pausedAt}</strong>. After that it is <strong>paused</strong> and your coworkers stop. Nothing is deleted: your coworkers and everything they know are saved until <strong>{keptUntil}</strong>. Pay the invoice and nothing changes, on the same plan.",
-        "button": "Pay the invoice",
-        "footnote": "We will try the card again over the next few days. If one of those attempts goes through, your workspace carries on, or is restored on its own if it was already paused."
+        "renewal": {
+            "bodyWithAmount": "The renewal of {workspace}, {amount}, did not go through. Your coworkers stop on {pausedAt}. Nothing is deleted.",
+            "body": "The renewal of {workspace} did not go through. Your coworkers stop on {pausedAt}. Nothing is deleted."
+        },
+        "first": {
+            "bodyWithAmount": "The first payment of {workspace}, {amount}, did not go through. Your coworkers stop on {pausedAt}. Nothing is deleted.",
+            "body": "The first payment of {workspace} did not go through. Your coworkers stop on {pausedAt}. Nothing is deleted."
+        },
+        "button": "Pay the invoice"
     },
     "renewalReminder": {
         "preview": "Your Rerun plan renews on {date}",

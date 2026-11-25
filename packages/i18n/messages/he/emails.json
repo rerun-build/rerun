@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "הגישה מסתיימת",
             "amount": "סכום",
-            "amountDue": "סכום לתשלום",
             "archivedOn": "הועבר לארכיון ב",
             "archivedSince": "בארכיון מאז",
             "coworker": "עמית",
             "coworkers": "עמיתים",
             "coworkersSaved": "עמיתים שנשמרו",
             "created": "נוצר",
-            "declinedOn": "נדחה ב",
             "deletedOn": "נמחק ב",
             "included": "כלול",
             "lastOpened": "נפתח לאחרונה",
             "pausedSince": "מושהה מאז",
             "renewsOn": "מתחדש ב",
-            "run": "הרצה",
             "runs": "הרצות",
             "savedUntil": "נשמר עד",
-            "source": "מקור",
             "then": "לאחר מכן",
             "trialEnded": "הניסיון הסתיים",
             "trialEnds": "הניסיון מסתיים",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "הקוד שלך לפתיחת {pageTitle}: {code}",
         "lifetimeCode": "קוד Rerun לכל החיים שלך: {code}",
         "workspaceInvite": "הוזמנת ל-{workspaceName} ב-Rerun",
-        "runFailed": "{agentName} נתקל בשגיאה",
-        "agentDone": "{agentName} סיים משימה",
-        "agentInfo": "{agentName} צריך את תשומת לבך",
-        "agentInput": "{agentName} צריך תשובה ממך",
         "appNotice": "{appName}: נדרשת פעולה",
-        "incidentResolved": "{agentName} חזר לפעול כרגיל",
-        "budgetExhausted": "קרדיטי Rerun שלך נגמרו",
+        "budgetExhausted": "קרדיטי Rerun של {workspace} נגמרו",
         "onboardingResume": "ההגדרה של Rerun עדיין לא הסתיימה",
         "agentRecommendations": "{count, plural, one {עמית Rerun אחד שמתאים ל-{company}} two {שני עמיתי Rerun שמתאימים ל-{company}} other {# עמיתי Rerun שמתאימים ל-{company}}}",
         "agentIdle": "{agentName} מוכן, אבל עוד לא רץ",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "ניסיון Rerun שלך מסתיים בעוד שעתיים, כדאי להוסיף כרטיס כדי שהעמיתים ימשיכו לפעול",
         "trialEndedPaymentFailed": "התשלום הראשון שלך ל-Rerun נכשל, סביבת העבודה תושהה בעוד 24 שעות",
         "trialEndedNoCard": "ניסיון Rerun שלך הסתיים, סביבת העבודה תושהה בעוד שעתיים",
-        "paymentFailed": "התשלום שלך ל-Rerun נדחה, סביבת העבודה תושהה בעוד 24 שעות",
+        "paymentFailed": "התשלום נדחה: סביבת העבודה שלך תושהה בעוד 24 שעות",
         "subscriptionEnding": "{daysLeft, plural, =1 {מינוי Rerun שלך מסתיים מחר} one {מינוי Rerun שלך מסתיים מחר} two {מינוי Rerun שלך מסתיים בעוד יומיים} other {מינוי Rerun שלך מסתיים בעוד # ימים}}",
         "archiveExpiring": "{kind, select, sandbox {סביבת הניסוי של Rerun שבארכיון תימחק ב-{date}} other {סביבת העבודה המושהית של Rerun תימחק ב-{date}}}",
         "sandboxIdle": "סביבת הניסוי של Rerun תועבר לארכיון ב-{date} אם לא תפתח אותה",
@@ -118,55 +109,45 @@
         "fallbackAgent": "העמית שלך"
     },
     "runFailed": {
-        "preview": "{agentName} נתקל בשגיאה",
-        "heading": "ההרצה נכשלה",
-        "body": "העמית שלך <strong>{agentName}</strong> נעצר עם שגיאה."
+        "heading": "{agentName} נעצר בגלל שגיאה",
+        "button": "לראות מה נשבר"
     },
     "budgetExhausted": {
-        "preview": "קרדיטי Rerun שלך נגמרו",
-        "heading": "קרדיטי Rerun נגמרו",
-        "bodyNamed": "קרדיטי Rerun של <strong>{workspaceName}</strong> נגמרו לחודש הזה. הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד שהקרדיטים יתאפסו או עד שתוסיף קרדיטים.",
-        "bodyUnnamed": "קרדיטי Rerun של סביבת העבודה שלך נגמרו לחודש הזה. הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד שהקרדיטים יתאפסו או עד שתוסיף קרדיטים.",
-        "ownKeys": "עמיתים שמשתמשים במפתחות API משלהם ממשיכים לפעול.",
+        "heading": "קרדיטי Rerun שלך נגמרו",
+        "body": "הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד {date}, או עד שתוסיף קרדיטים. עמיתים שמשתמשים במפתחות API משלהם ממשיכים לפעול.",
+        "bodyNoReset": "הרצות מתוזמנות והרצות שמופעלות על ידי טריגר במודלים של Rerun מושהות עד שתוסיף קרדיטים. עמיתים שמשתמשים במפתחות API משלהם ממשיכים לפעול.",
         "button": "להוסיף קרדיטים"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}: המשימה הושלמה",
-            "heading": "המשימה הושלמה",
-            "body": "הסוכן שלך <strong>{agentName}</strong> סיים משימה."
-        },
-        "info": {
-            "preview": "{agentName}: צריך את תשומת לבך",
-            "heading": "צריך את תשומת לבך",
-            "body": "הסוכן שלך <strong>{agentName}</strong> רוצה שתסתכל על משהו."
-        },
         "question": {
-            "preview": "{agentName}: לעמית יש שאלה",
-            "heading": "לעמית יש שאלה",
-            "body": "הסוכן שלך <strong>{agentName}</strong> צריך תשובה כדי להמשיך."
+            "heading": "ל-{agentName} יש שאלה",
+            "button": "לענות"
         },
         "approval": {
-            "preview": "{agentName}: נדרש אישור",
-            "heading": "נדרש אישור",
-            "body": "הסוכן שלך <strong>{agentName}</strong> ממתין לאישור שלך."
+            "heading": "{agentName} צריך את האישור שלך",
+            "button": "לאשר או לדחות"
         },
         "connector": {
-            "preview": "{agentName}: הגדרת אפליקציה",
-            "heading": "הגדרת אפליקציה",
-            "body": "הסוכן שלך <strong>{agentName}</strong> צריך שתחבר שירות."
+            "heading": "{agentName} צריך את {app}",
+            "headingUnnamed": "{agentName} צריך אפליקציה",
+            "button": "לחבר את {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{source} של {agentName} עובד שוב",
-        "heading": "חזרה לשגרה",
-        "body": "{source} של <strong>{agentName}</strong> רץ שוב בלי בעיות. לא תקבל אימייל נוסף על זה, אלא אם זה יישבר שוב.",
-        "sources": {
-            "schedule": "התזמון \"{slug}\"",
-            "anySchedule": "משימה מתוזמנת",
-            "trigger": "הטריגר \"{slug}\"",
-            "anyTrigger": "טריגר",
-            "conversation": "שיחה"
+    "accountSignedOut": {
+        "more": "{count, plural, one {עוד אחד} other {עוד #}}",
+        "subscription": {
+            "subject": "{account} מנותק: {count, plural, one {עמית אחד נעצר} two {שני עמיתים נעצרו} other {# עמיתים נעצרו}}",
+            "heading": "{account} מנותק",
+            "body": "{count, plural, one {{coworkers} מ-{workspace} יחזור לפעול ברגע שתתחבר.} other {{coworkers} מ-{workspace} יחזרו לפעול ברגע שתתחבר.}}",
+            "bodyUnnamed": "העמיתים של {workspace} שפועלים על {account} יחזרו לפעול ברגע שתתחבר.",
+            "button": "להתחבר ל-{account}"
+        },
+        "key": {
+            "subject": "{account} דחה את המפתח שלך: {count, plural, one {עמית אחד נעצר} two {שני עמיתים נעצרו} other {# עמיתים נעצרו}}",
+            "heading": "{account} דחה את המפתח שלך",
+            "body": "{count, plural, one {{coworkers} מ-{workspace} יחזור לפעול ברגע שתעדכן אותו.} other {{coworkers} מ-{workspace} יחזרו לפעול ברגע שתעדכן אותו.}}",
+            "bodyUnnamed": "העמיתים של {workspace} שפועלים על {account} יחזרו לפעול ברגע שתעדכן אותו.",
+            "button": "לעדכן את המפתח"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "אפשר להתחיל מעמית שכבר יש לך, או לבנות משהו לחנות מאפס."
     },
     "paymentFailed": {
-        "preview": "התשלום שלך ל-Rerun נדחה, סביבת העבודה תושהה ב-{pausedAt}",
         "heading": "התשלום שלך נדחה",
-        "declined": "החידוש של <strong>{workspace}</strong> לא עבר ב-<strong>{date}</strong>. ייתכן שהבנק שלך פשוט מבקש ממך לאשר אותו.",
-        "declinedWithAmount": "החידוש של <strong>{workspace}</strong>, <strong>{amount}</strong>, לא עבר ב-<strong>{date}</strong>. ייתכן שהבנק שלך פשוט מבקש ממך לאשר אותו.",
-        "consequences": "סביבת העבודה שלך ממשיכה לפעול עד <strong>{pausedAt}</strong>. אחרי זה היא <strong>מושהית</strong> והעמיתים שלך נעצרים. שום דבר לא נמחק: העמיתים שלך וכל מה שהם יודעים שמורים עד <strong>{keptUntil}</strong>. אם תשלם את החשבונית, שום דבר לא משתנה, באותה תוכנית.",
-        "button": "לשלם את החשבונית",
-        "footnote": "ננסה לחייב את הכרטיס שוב בימים הקרובים. אם אחד הניסיונות יעבור, סביבת העבודה שלך תמשיך לפעול, או תשוחזר מעצמה אם כבר הושהתה."
+        "renewal": {
+            "bodyWithAmount": "החידוש של {workspace}, {amount}, לא עבר. העמיתים שלך נעצרים ב-{pausedAt}. שום דבר לא נמחק.",
+            "body": "החידוש של {workspace} לא עבר. העמיתים שלך נעצרים ב-{pausedAt}. שום דבר לא נמחק."
+        },
+        "first": {
+            "bodyWithAmount": "התשלום הראשון של {workspace}, {amount}, לא עבר. העמיתים שלך נעצרים ב-{pausedAt}. שום דבר לא נמחק.",
+            "body": "התשלום הראשון של {workspace} לא עבר. העמיתים שלך נעצרים ב-{pausedAt}. שום דבר לא נמחק."
+        },
+        "button": "לשלם את החשבונית"
     },
     "renewalReminder": {
         "preview": "תוכנית Rerun שלך מתחדשת ב-{date}",

@@ -94,6 +94,9 @@ export function planName(source: { provider: Provider; name: string }): string {
     return PLAN_NAMES[source.provider] ?? source.name
 }
 
+// Opens the app on the account to sign in to again: where the email about it leads.
+export const RECONNECT_PARAM = 'reconnect'
+
 export const RERUN_FALLBACK: BoxDefault = { connectionId: RERUN_CONNECTION_ID, model: RERUN_MODEL }
 
 // What agents with no model of their own run on: a fresh workspace has no default, and runs on Rerun.

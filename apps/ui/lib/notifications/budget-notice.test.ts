@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ENGINE_RESTARTED_ERROR_CODE, RERUN_BUDGET_ERROR_CODE, decideBudgetNotice, suppressesErrorEmail } from './budget-notice'
+import { ACCOUNT_REFUSED_ERROR_CODE, ENGINE_RESTARTED_ERROR_CODE, RERUN_BUDGET_ERROR_CODE, decideBudgetNotice, suppressesErrorEmail } from './budget-notice'
 
 describe('decideBudgetNotice', () => {
     it('inserts and emails a normal workspace on the first notice', () => {
@@ -21,6 +21,8 @@ describe('suppressesErrorEmail', () => {
         expect(suppressesErrorEmail('error', { errorCode: RERUN_BUDGET_ERROR_CODE })).toBe(true)
         // A restart reports every conversation it interrupted at once.
         expect(suppressesErrorEmail('error', { errorCode: ENGINE_RESTARTED_ERROR_CODE })).toBe(true)
+        // An account turned away has one alert of its own.
+        expect(suppressesErrorEmail('error', { errorCode: ACCOUNT_REFUSED_ERROR_CODE })).toBe(true)
     })
 
     it('leaves other errors alone', () => {

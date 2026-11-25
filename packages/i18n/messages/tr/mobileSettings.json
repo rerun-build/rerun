@@ -77,7 +77,7 @@
         },
         "email": {
             "label": "E-posta",
-            "footnote": "Siz yokken size ihtiyaç olduğunda. Her olay için bir e-posta, asla her çalıştırma için değil."
+            "footnote": "Siz uzaktayken size ihtiyaç olduğunda. Her olay için bir e-posta, günde en fazla 3."
         },
         "perCoworker": {
             "title": "Coworker bazında",

@@ -132,7 +132,7 @@ export function sendTrialEndedEmail(
 
 export function sendPaymentFailedEmail(
     recipient: Recipient,
-    input: { workspaceName: string | null; amountLabel?: string; declinedLabel: string; pausedLabel: string; keptUntilLabel: string; billingUrl: string; boardUrl?: string },
+    input: { workspaceName: string | null; amountLabel?: string; pausedLabel: string; firstCharge?: boolean; billingUrl: string; boardUrl?: string },
 ): Promise<SendEmailResult> {
     return deliver(recipient, 'payment_failed', emailTranslator(recipient.locale)('subjects.paymentFailed'), React.createElement(PaymentFailed, { ...input, appUrl: APP_URL, unsubscribeUrl: recipient.unsubscribeUrl ?? undefined, locale: recipient.locale }))
 }

@@ -132,14 +132,14 @@
             },
             "email": {
                 "label": "E-posta",
-                "description": "Siz uzaktayken size ihtiyaç olduğunda. Her olay için bir e-posta, asla her çalıştırma için değil."
+                "description": "Siz uzaktayken size ihtiyaç olduğunda. Her olay için bir e-posta, günde en fazla 3."
             }
         },
         "accountEmails": {
             "title": "Hesap e-postaları",
             "billing": {
                 "label": "Deneme ve faturalandırma",
-                "description": "Aboneliğinizle ilgili deneme hatırlatmaları ve fatura bildirimleri."
+                "description": "Deneme hatırlatmaları, fatura bildirimleri ve bir yapay zeka hesabı ya da kredileriniz coworker'larınızı durdurduğunda uyarılar."
             },
             "product": {
                 "label": "Ürün güncellemeleri",
@@ -153,7 +153,7 @@
         "coworkerTitle": "Coworker bildirimleri",
         "email": {
             "label": "E-posta",
-            "description": "Siz uzaktayken bir coworker'ın size ihtiyacı olduğunda veya bir sorun çıktığında. Her olay için bir e-posta, asla her çalıştırma için değil."
+            "description": "Siz uzaktayken bir coworker'ın size ihtiyacı olduğunda veya bir sorun çıktığında. Her olay için bir e-posta, günde en fazla 3."
         },
         "saveFailed": "Tercihler kaydedilemedi",
         "saving": "Kaydediliyor…",

@@ -77,7 +77,7 @@
         },
         "email": {
             "label": "Email",
-            "footnote": "When it needs you while you are away. One email per incident, never one per run."
+            "footnote": "When it needs you while you are away. One email per incident, never more than 3 a day."
         },
         "perCoworker": {
             "title": "Per coworker",

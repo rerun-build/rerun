@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { NotificationKind } from '@/lib/engine/types'
 
 import { DEFAULT_NOTIFICATION_PREFS, taskKey, type NotificationPrefs } from './prefs'
-import { computeRecipients, deliveryFor, needsOwnerFollow, reasonFor, recipientReason, wantsIncidentEmail, wantsPush, wantsRecoveryEmail, type RoutedEvent } from './routing'
+import { computeRecipients, deliveryFor, needsOwnerFollow, reasonFor, recipientReason, wantsIncidentEmail, wantsPush, type RoutedEvent } from './routing'
 
 type Member = 'you' | 'maya' | 'tom' | 'sarah'
 type Seen = 'sound' | 'toast' | 'inbox' | 'email' | 'none'
@@ -153,15 +153,6 @@ describe('needsOwnerFollow', () => {
 
     it('never applies to a run someone started', () => {
         expect(needsOwnerFollow(routed(DAY[3][0]), nobodyDecided)).toBe(false)
-    })
-})
-
-describe('wantsRecoveryEmail', () => {
-    it('tells whoever was emailed that it works again, unless they have since opted out', () => {
-        expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, email: true }, 'weekly-report')).toBe(true)
-        expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, email: false }, 'weekly-report')).toBe(false)
-        expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, scope: 'nothing' }, 'weekly-report')).toBe(false)
-        expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, coworkers: { 'weekly-report': { mode: 'muted' } } }, 'weekly-report')).toBe(false)
     })
 })
 

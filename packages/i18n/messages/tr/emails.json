@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "Erişim bitişi",
             "amount": "Tutar",
-            "amountDue": "Ödenecek tutar",
             "archivedOn": "Arşivlenme tarihi",
             "archivedSince": "Arşivlenme tarihi",
             "coworker": "Coworker",
             "coworkers": "Coworker'lar",
             "coworkersSaved": "Kayıtlı coworker'lar",
             "created": "Oluşturulma",
-            "declinedOn": "Reddedilme tarihi",
             "deletedOn": "Silinme tarihi",
             "included": "Dahil",
             "lastOpened": "Son açılma",
             "pausedSince": "Duraklatılma tarihi",
             "renewsOn": "Yenilenme tarihi",
-            "run": "Çalıştırma",
             "runs": "Çalıştırmalar",
             "savedUntil": "Saklanma süresi",
-            "source": "Kaynak",
             "then": "Sonra",
             "trialEnded": "Deneme bitti",
             "trialEnds": "Deneme bitişi",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "{pageTitle} için açma kodunuz: {code}",
         "lifetimeCode": "Rerun ömür boyu kodunuz: {code}",
         "workspaceInvite": "Rerun'da {workspaceName} çalışma alanına davet edildiniz",
-        "runFailed": "{agentName} bir hatayla karşılaştı",
-        "agentDone": "{agentName} bir görevi tamamladı",
-        "agentInfo": "{agentName} ilginizi bekliyor",
-        "agentInput": "{agentName} yanıtınızı bekliyor",
         "appNotice": "{appName}: işlem gerekiyor",
-        "incidentResolved": "{agentName} yeniden normal çalışıyor",
-        "budgetExhausted": "Rerun kredileriniz tükendi",
+        "budgetExhausted": "{workspace} çalışma alanının Rerun kredisi bitti",
         "onboardingResume": "Rerun kurulumunuz tamamlanmadı",
         "agentRecommendations": "{count, plural, one {{company} için uygun # Rerun coworker} other {{company} için uygun # Rerun coworker}}",
         "agentIdle": "{agentName} hazır ama henüz çalışmadı",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "Rerun denemeniz 2 saat içinde bitiyor, coworker'larınızın çalışmaya devam etmesi için bir kart ekleyin",
         "trialEndedPaymentFailed": "İlk Rerun ödemeniz başarısız oldu, çalışma alanınız 24 saat içinde duraklatılacak",
         "trialEndedNoCard": "Rerun denemeniz sona erdi, çalışma alanınız 2 saat içinde duraklatılacak",
-        "paymentFailed": "Rerun ödemeniz reddedildi, çalışma alanınız 24 saat içinde duraklatılacak",
+        "paymentFailed": "Ödeme reddedildi: çalışma alanınız 24 saat içinde duraklatılacak",
         "subscriptionEnding": "{daysLeft, plural, =1 {Rerun aboneliğiniz yarın bitiyor} other {Rerun aboneliğiniz # gün içinde bitiyor}}",
         "archiveExpiring": "{kind, select, sandbox {Arşivlenen Rerun sandbox'ınız {date} tarihinde silinecek} other {Duraklatılan Rerun çalışma alanınız {date} tarihinde silinecek}}",
         "sandboxIdle": "Rerun sandbox'ınızı açmazsanız {date} tarihinde arşivlenecek",
@@ -118,55 +109,45 @@
         "fallbackAgent": "Coworker'ınız"
     },
     "runFailed": {
-        "preview": "{agentName} bir hatayla karşılaştı",
-        "heading": "Çalıştırma başarısız",
-        "body": "Coworker'ınız <strong>{agentName}</strong> bir hatayla durdu."
+        "heading": "{agentName} bir hatada durdu",
+        "button": "Neyin bozulduğunu gör"
     },
     "budgetExhausted": {
-        "preview": "Rerun kredileriniz tükendi",
-        "heading": "Rerun kredileri tükendi",
-        "bodyNamed": "<strong>{workspaceName}</strong> çalışma alanının bu ayki Rerun kredileri tükendi. Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar, krediler sıfırlanana veya siz kredi ekleyene kadar duraklatıldı.",
-        "bodyUnnamed": "Çalışma alanınızın bu ayki Rerun kredileri tükendi. Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar, krediler sıfırlanana veya siz kredi ekleyene kadar duraklatıldı.",
-        "ownKeys": "Kendi API anahtarlarını kullanan coworker'lar çalışmaya devam eder.",
+        "heading": "Rerun krediniz bitti",
+        "body": "Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar {date} tarihine kadar veya siz kredi ekleyene kadar duraklatıldı. Kendi API anahtarlarını kullanan coworker'lar çalışmaya devam eder.",
+        "bodyNoReset": "Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar, siz kredi ekleyene kadar duraklatıldı. Kendi API anahtarlarını kullanan coworker'lar çalışmaya devam eder.",
         "button": "Kredi ekle"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}: Görev tamamlandı",
-            "heading": "Görev tamamlandı",
-            "body": "Coworker'ınız <strong>{agentName}</strong> bir görevi tamamladı."
-        },
-        "info": {
-            "preview": "{agentName}: İlginizi bekliyor",
-            "heading": "İlginizi bekliyor",
-            "body": "Coworker'ınız <strong>{agentName}</strong> bir şeye bakmanızı istiyor."
-        },
         "question": {
-            "preview": "{agentName}: Coworker'ın bir sorusu var",
-            "heading": "Coworker'ın bir sorusu var",
-            "body": "Coworker'ınız <strong>{agentName}</strong> devam etmek için bir yanıt bekliyor."
+            "heading": "{agentName} bir soru soruyor",
+            "button": "Yanıtla"
         },
         "approval": {
-            "preview": "{agentName}: Onay gerekiyor",
-            "heading": "Onay gerekiyor",
-            "body": "Coworker'ınız <strong>{agentName}</strong> onayınızı bekliyor."
+            "heading": "{agentName} onayınızı bekliyor",
+            "button": "Onayla veya reddet"
         },
         "connector": {
-            "preview": "{agentName}: Uygulama kurulumu",
-            "heading": "Uygulama kurulumu",
-            "body": "Coworker'ınız <strong>{agentName}</strong> bir hizmeti bağlamanızı bekliyor."
+            "heading": "{agentName} için {app} gerekiyor",
+            "headingUnnamed": "{agentName} için bir uygulama gerekiyor",
+            "button": "{app} bağla"
         }
     },
-    "incidentResolved": {
-        "preview": "{source}, {agentName} için yeniden çalışıyor",
-        "heading": "Her şey normale döndü",
-        "body": "{source}, <strong>{agentName}</strong> için yeniden sorunsuz çalıştı. Tekrar bozulmadıkça bu konuda başka e-posta almayacaksınız.",
-        "sources": {
-            "schedule": "\"{slug}\" zamanlaması",
-            "anySchedule": "Zamanlanmış bir görev",
-            "trigger": "\"{slug}\" tetikleyicisi",
-            "anyTrigger": "Bir tetikleyici",
-            "conversation": "Bir sohbet"
+    "accountSignedOut": {
+        "more": "{count, plural, one {# kişi daha} other {# kişi daha}}",
+        "subscription": {
+            "subject": "{account} oturumu kapandı: {count, plural, one {# coworker durdu} other {# coworker durdu}}",
+            "heading": "{account} oturumu kapandı",
+            "body": "{count, plural, one {{workspace} çalışma alanından {coworkers}, oturum açtığınız anda yeniden çalışır.} other {{workspace} çalışma alanından {coworkers}, oturum açtığınız anda yeniden çalışır.}}",
+            "bodyUnnamed": "{workspace} çalışma alanında {account} ile çalışan coworker'lar, oturum açtığınız anda yeniden çalışır.",
+            "button": "{account} oturumu aç"
+        },
+        "key": {
+            "subject": "{account} anahtarınızı reddetti: {count, plural, one {# coworker durdu} other {# coworker durdu}}",
+            "heading": "{account} anahtarınızı reddetti",
+            "body": "{count, plural, one {{workspace} çalışma alanından {coworkers}, anahtarı güncellediğiniz anda yeniden çalışır.} other {{workspace} çalışma alanından {coworkers}, anahtarı güncellediğiniz anda yeniden çalışır.}}",
+            "bodyUnnamed": "{workspace} çalışma alanında {account} ile çalışan coworker'lar, anahtarı güncellediğiniz anda yeniden çalışır.",
+            "button": "Anahtarı güncelle"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "Zaten sahip olduğunuz bir coworker ile başlayın veya pazar yeri için sıfırdan bir şey oluşturun."
     },
     "paymentFailed": {
-        "preview": "Rerun ödemeniz reddedildi, çalışma alanınız {pausedAt} tarihinde duraklatılacak",
         "heading": "Ödemeniz reddedildi",
-        "declined": "<strong>{workspace}</strong> için yenileme ödemesi <strong>{date}</strong> tarihinde gerçekleşmedi. Bankanız yalnızca onaylamanızı istiyor olabilir.",
-        "declinedWithAmount": "<strong>{workspace}</strong> için <strong>{amount}</strong> tutarındaki yenileme ödemesi <strong>{date}</strong> tarihinde gerçekleşmedi. Bankanız yalnızca onaylamanızı istiyor olabilir.",
-        "consequences": "Çalışma alanınız <strong>{pausedAt}</strong> tarihine kadar çalışmaya devam eder. Ardından <strong>duraklatılır</strong> ve coworker'larınız durur. Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey <strong>{keptUntil}</strong> tarihine kadar saklanır. Faturayı ödeyin, aynı planla hiçbir şey değişmez.",
-        "button": "Faturayı öde",
-        "footnote": "Önümüzdeki birkaç gün içinde kartı yeniden deneyeceğiz. Denemelerden biri başarılı olursa çalışma alanınız devam eder veya zaten duraklatılmışsa kendiliğinden geri yüklenir."
+        "renewal": {
+            "bodyWithAmount": "{workspace} yenilemesi ({amount}) gerçekleşmedi. Coworker'larınız {pausedAt} itibarıyla durur. Hiçbir şey silinmez.",
+            "body": "{workspace} yenilemesi gerçekleşmedi. Coworker'larınız {pausedAt} itibarıyla durur. Hiçbir şey silinmez."
+        },
+        "first": {
+            "bodyWithAmount": "{workspace} çalışma alanının ilk ödemesi ({amount}) gerçekleşmedi. Coworker'larınız {pausedAt} itibarıyla durur. Hiçbir şey silinmez.",
+            "body": "{workspace} çalışma alanının ilk ödemesi gerçekleşmedi. Coworker'larınız {pausedAt} itibarıyla durur. Hiçbir şey silinmez."
+        },
+        "button": "Faturayı öde"
     },
     "renewalReminder": {
         "preview": "Rerun planınız {date} tarihinde yenileniyor",

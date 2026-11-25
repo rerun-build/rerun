@@ -58,10 +58,20 @@ export type HeroScene =
 
 export const SCENE_WIDTH = 520;
 export const SCENE_HEIGHT = 240;
+/** A close-up of the board, as wide as a scene. */
+export const CLOSE_UP_HEIGHT = 260;
 
 export function sceneUrl(scene: HeroScene): string {
   return `${ASSET_ORIGIN}/email/scene/${scene}.jpg?v=${ART_VERSION}`;
 }
+
+// The previews cannot capture a close-up or a portrait either: flat files, captured once from /og/board
+// and /og/coworker.
+export function alertSampleUrl(name: AlertSample): string {
+  return `${ASSET_ORIGIN}/email/alert/${name}.png?v=${ART_VERSION}`;
+}
+
+export type AlertSample = "question" | "approval" | "connector" | "failed" | "claude" | "key" | "credits" | "payment" | "portrait";
 
 // The previews cannot sign a board of their own (the secret lives with the app), so they show one
 // captured once from /og/board at the frame of a scene and kept as a flat file.

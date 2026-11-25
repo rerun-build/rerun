@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "ينتهي الوصول",
             "amount": "المبلغ",
-            "amountDue": "المبلغ المستحق",
             "archivedOn": "تاريخ الأرشفة",
             "archivedSince": "مؤرشف منذ",
             "coworker": "الزميل",
             "coworkers": "الزملاء",
             "coworkersSaved": "الزملاء المحفوظون",
             "created": "تاريخ الإنشاء",
-            "declinedOn": "تاريخ الرفض",
             "deletedOn": "تاريخ الحذف",
             "included": "المشمول",
             "lastOpened": "آخر فتح",
             "pausedSince": "متوقف منذ",
             "renewsOn": "يتجدد في",
-            "run": "التشغيل",
             "runs": "عمليات التشغيل",
             "savedUntil": "محفوظ حتى",
-            "source": "المصدر",
             "then": "بعد ذلك",
             "trialEnded": "انتهت التجربة",
             "trialEnds": "تنتهي التجربة",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "رمزك لفتح {pageTitle}: {code}",
         "lifetimeCode": "رمز Rerun مدى الحياة الخاص بك: {code}",
         "workspaceInvite": "أنت مدعو إلى {workspaceName} على Rerun",
-        "runFailed": "واجه {agentName} خطأ",
-        "agentDone": "أنهى {agentName} مهمة",
-        "agentInfo": "{agentName} يحتاج إلى انتباهك",
-        "agentInput": "{agentName} يحتاج إلى ردك",
         "appNotice": "{appName}: مطلوب إجراء",
-        "incidentResolved": "عاد {agentName} إلى وضعه الطبيعي",
-        "budgetExhausted": "نفد رصيد Rerun الخاص بك",
+        "budgetExhausted": "نفد رصيد Rerun في {workspace}",
         "onboardingResume": "إعداد Rerun الخاص بك لم يكتمل",
         "agentRecommendations": "{count, plural, zero {لا زملاء من Rerun يناسبون {company}} one {زميل واحد من Rerun يناسب {company}} two {زميلان من Rerun يناسبان {company}} few {# زملاء من Rerun يناسبون {company}} many {# زميلًا من Rerun يناسبون {company}} other {# زميل من Rerun يناسبون {company}}}",
         "agentIdle": "{agentName} جاهز، لكنه لم يعمل بعد",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "تنتهي تجربة Rerun خلال ساعتين، أضف بطاقة ليواصل زملاؤك العمل",
         "trialEndedPaymentFailed": "فشلت دفعتك الأولى في Rerun، وستتوقف مساحة العمل خلال 24 ساعة",
         "trialEndedNoCard": "انتهت تجربة Rerun، وستتوقف مساحة العمل خلال ساعتين",
-        "paymentFailed": "رُفضت دفعتك في Rerun، وستتوقف مساحة العمل خلال 24 ساعة",
+        "paymentFailed": "رُفضت الدفعة: ستتوقف مساحة العمل خلال 24 ساعة",
         "subscriptionEnding": "{daysLeft, plural, =1 {ينتهي اشتراكك في Rerun غدًا} zero {ينتهي اشتراكك في Rerun اليوم} one {ينتهي اشتراكك في Rerun غدًا} two {ينتهي اشتراكك في Rerun خلال يومين} few {ينتهي اشتراكك في Rerun خلال # أيام} many {ينتهي اشتراكك في Rerun خلال # يومًا} other {ينتهي اشتراكك في Rerun خلال # يوم}}",
         "archiveExpiring": "{kind, select, sandbox {تُحذف بيئتك التجريبية المؤرشفة في Rerun في {date}} other {تُحذف مساحة العمل المتوقفة في Rerun في {date}}}",
         "sandboxIdle": "تُؤرشف بيئتك التجريبية في Rerun في {date} ما لم تفتحها",
@@ -118,55 +109,45 @@
         "fallbackAgent": "زميلك"
     },
     "runFailed": {
-        "preview": "واجه {agentName} خطأ",
-        "heading": "فشل التشغيل",
-        "body": "توقّف زميلك <strong>{agentName}</strong> بسبب خطأ."
+        "heading": "توقف {agentName} بسبب خطأ",
+        "button": "اعرف ما الذي تعطل"
     },
     "budgetExhausted": {
-        "preview": "نفد رصيد Rerun الخاص بك",
-        "heading": "نفد رصيد Rerun",
-        "bodyNamed": "نفد رصيد Rerun في <strong>{workspaceName}</strong> لهذا الشهر. عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى يتجدد الرصيد أو تضيف رصيدًا.",
-        "bodyUnnamed": "نفد رصيد Rerun في مساحة العمل الخاصة بك لهذا الشهر. عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى يتجدد الرصيد أو تضيف رصيدًا.",
-        "ownKeys": "يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
+        "heading": "نفد رصيد Rerun لديك",
+        "body": "عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى {date}، أو حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
+        "bodyNoReset": "عمليات التشغيل المجدولة والمُطلقة على نماذج Rerun متوقفة حتى تضيف رصيدًا. يواصل الزملاء الذين يستخدمون مفاتيح API الخاصة بهم العمل.",
         "button": "أضف رصيدًا"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}: اكتملت المهمة",
-            "heading": "اكتملت المهمة",
-            "body": "أنهى زميلك <strong>{agentName}</strong> مهمة."
-        },
-        "info": {
-            "preview": "{agentName}: يحتاج إلى انتباهك",
-            "heading": "يحتاج إلى انتباهك",
-            "body": "يريد زميلك <strong>{agentName}</strong> أن تلقي نظرة على شيء ما."
-        },
         "question": {
-            "preview": "{agentName}: لدى الزميل سؤال",
-            "heading": "لدى الزميل سؤال",
-            "body": "يحتاج زميلك <strong>{agentName}</strong> إلى إجابة ليواصل."
+            "heading": "لدى {agentName} سؤال",
+            "button": "أجب"
         },
         "approval": {
-            "preview": "{agentName}: مطلوب موافقة",
-            "heading": "مطلوب موافقة",
-            "body": "ينتظر زميلك <strong>{agentName}</strong> موافقتك."
+            "heading": "يحتاج {agentName} إلى موافقتك",
+            "button": "وافق أو ارفض"
         },
         "connector": {
-            "preview": "{agentName}: إعداد تطبيق",
-            "heading": "إعداد تطبيق",
-            "body": "يحتاج زميلك <strong>{agentName}</strong> إلى أن تربط خدمة."
+            "heading": "يحتاج {agentName} إلى {app}",
+            "headingUnnamed": "يحتاج {agentName} إلى تطبيق",
+            "button": "اربط {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{source} الخاص بـ {agentName} يعمل مجددًا",
-        "heading": "عاد كل شيء إلى طبيعته",
-        "body": "عمل {source} الخاص بـ <strong>{agentName}</strong> بشكل سليم مجددًا. لن تصلك رسالة أخرى بشأنه إلا إذا تعطّل مجددًا.",
-        "sources": {
-            "schedule": "الجدول \"{slug}\"",
-            "anySchedule": "مهمة مجدولة",
-            "trigger": "المشغّل \"{slug}\"",
-            "anyTrigger": "مشغّل",
-            "conversation": "محادثة"
+    "accountSignedOut": {
+        "more": "{count, plural, one {واحد آخر} two {اثنان آخران} few {# آخرون} many {# آخر} other {# آخر}}",
+        "subscription": {
+            "subject": "تم تسجيل الخروج من {account}: {count, plural, one {توقف زميل واحد} two {توقف زميلان} few {توقف # زملاء} many {توقف # زميلًا} other {توقف # زميلًا}}",
+            "heading": "تم تسجيل الخروج من {account}",
+            "body": "{count, plural, one {يعود {coworkers} في {workspace} إلى العمل فور تسجيل دخولك.} other {يعود {coworkers} في {workspace} إلى العمل فور تسجيل دخولك.}}",
+            "bodyUnnamed": "يعود الزملاء الذين يعملون على {account} في {workspace} إلى العمل فور تسجيل دخولك.",
+            "button": "سجّل الدخول إلى {account}"
+        },
+        "key": {
+            "subject": "رفض {account} مفتاحك: {count, plural, one {توقف زميل واحد} two {توقف زميلان} few {توقف # زملاء} many {توقف # زميلًا} other {توقف # زميلًا}}",
+            "heading": "رفض {account} مفتاحك",
+            "body": "{count, plural, one {يعود {coworkers} في {workspace} إلى العمل فور تحديثه.} other {يعود {coworkers} في {workspace} إلى العمل فور تحديثه.}}",
+            "bodyUnnamed": "يعود الزملاء الذين يعملون على {account} في {workspace} إلى العمل فور تحديثه.",
+            "button": "حدّث المفتاح"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "ابدأ من زميل لديك بالفعل، أو ابنِ شيئًا للسوق من الصفر."
     },
     "paymentFailed": {
-        "preview": "رُفضت دفعتك في Rerun، وستتوقف مساحة العمل في {pausedAt}",
         "heading": "رُفضت دفعتك",
-        "declined": "لم يتم تجديد <strong>{workspace}</strong> في <strong>{date}</strong>. ربما يطلب منك البنك تأكيد العملية فقط.",
-        "declinedWithAmount": "لم يتم تجديد <strong>{workspace}</strong> بمبلغ <strong>{amount}</strong> في <strong>{date}</strong>. ربما يطلب منك البنك تأكيد العملية فقط.",
-        "consequences": "تواصل مساحة العمل العمل حتى <strong>{pausedAt}</strong>. بعد ذلك <strong>تتوقف</strong> ويتوقف زملاؤك. لا يُحذف أي شيء: زملاؤك وكل ما يعرفونه محفوظون حتى <strong>{keptUntil}</strong>. ادفع الفاتورة ولن يتغير شيء، على الخطة نفسها.",
-        "button": "ادفع الفاتورة",
-        "footnote": "سنحاول خصم البطاقة مجددًا خلال الأيام القليلة القادمة. إذا نجحت إحدى المحاولات، تواصل مساحة العمل عملها، أو تُستعاد تلقائيًا إن كانت قد توقفت بالفعل."
+        "renewal": {
+            "bodyWithAmount": "لم ينجح تجديد {workspace} بقيمة {amount}. يتوقف زملاؤك في {pausedAt}. لن يُحذف شيء.",
+            "body": "لم ينجح تجديد {workspace}. يتوقف زملاؤك في {pausedAt}. لن يُحذف شيء."
+        },
+        "first": {
+            "bodyWithAmount": "لم تنجح الدفعة الأولى لمساحة {workspace} بقيمة {amount}. يتوقف زملاؤك في {pausedAt}. لن يُحذف شيء.",
+            "body": "لم تنجح الدفعة الأولى لمساحة {workspace}. يتوقف زملاؤك في {pausedAt}. لن يُحذف شيء."
+        },
+        "button": "ادفع الفاتورة"
     },
     "renewalReminder": {
         "preview": "تتجدد خطة Rerun في {date}",

@@ -69,6 +69,11 @@ export async function ensureCurrentPeriod(budget: WorkspaceBudget): Promise<Work
     return stampPeriod(budget, true)
 }
 
+// When the month's credit comes back, null for a workspace that has none to come back.
+export function creditResetsAt({ budgetMicros, periodAnchor }: WorkspaceBudget): Date | null {
+    return budgetMicros > 0 && periodAnchor ? new Date(addOneMonth(periodAnchor)) : null
+}
+
 // The counter is only written when it is being reset: rewriting the value we read would clobber the
 // increment of a call that settled in between.
 async function stampPeriod(budget: WorkspaceBudget, reset: boolean): Promise<WorkspaceBudget> {

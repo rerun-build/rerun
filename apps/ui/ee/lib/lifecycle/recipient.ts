@@ -1,4 +1,4 @@
-import { realEmail } from '@/lib/auth/placeholder-email'
+import { loadEmailRecipient } from '@/lib/email/recipient'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 
@@ -18,16 +18,10 @@ function firstNameOf(metadata: Record<string, unknown> | undefined): string | nu
     return full.split(/\s+/)[0] || null
 }
 
-// An anonymous visitor has a users row and a workspace but no address, and is purged within the day.
-// Returning null here is the last gate before an email is built.
+// Null when there is nobody to write to: see `loadEmailRecipient`.
 export async function loadRecipient(supabase: SupabaseClient<Database>, userId: string): Promise<LifecycleRecipient | null> {
-    const { data, error } = await supabase.auth.admin.getUserById(userId)
-    if (error || !data.user || data.user.is_anonymous) return null
-
-    const email = realEmail(data.user.email)?.trim()
-    if (!email) return null
-
-    return { email, firstName: firstNameOf(data.user.user_metadata) }
+    const recipient = await loadEmailRecipient(supabase, userId)
+    return recipient && { email: recipient.email, firstName: firstNameOf(recipient.user.user_metadata) }
 }
 
 // A WhatsApp message needs a first name and no address: someone who signed in by phone has none.

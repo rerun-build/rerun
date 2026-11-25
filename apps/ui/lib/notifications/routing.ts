@@ -10,9 +10,12 @@ export type NotificationReason = (typeof NOTIFICATION_REASONS)[number]
 
 export type NotificationRecipients = Record<string, NotificationReason>
 
-const URGENT_KINDS = new Set<NotificationKind>(['question', 'approval', 'connector', 'error'])
+// What waits for someone, or broke: the only kinds worth an email.
+export const INCIDENT_KINDS = ['question', 'approval', 'connector', 'error'] as const satisfies readonly NotificationKind[]
 
-export const isUrgentKind = (kind: NotificationKind) => URGENT_KINDS.has(kind)
+export type IncidentKind = (typeof INCIDENT_KINDS)[number]
+
+export const isUrgentKind = (kind: NotificationKind): kind is IncidentKind => (INCIDENT_KINDS as readonly NotificationKind[]).includes(kind)
 
 // The reasons that make it your run rather than news about someone else's.
 const CONCERNED = new Set<NotificationReason>(['mine', 'participant', 'followed', 'workspace'])
@@ -116,13 +119,6 @@ export function wantsIncidentEmail(rawPrefs: unknown, reason: NotificationReason
 // someone away from a computer is the point of a push.
 export function wantsPush(rawPrefs: unknown, reason: NotificationReason, kind: NotificationKind, agentId: string | null | undefined): boolean {
     return scopeAllows(normalizeNotificationPrefs(rawPrefs), reason, kind, agentId)
-}
-
-// Whoever was told a source broke hears it works again, unless they have since stopped the emails,
-// muted the coworker or asked for nothing at all.
-export function wantsRecoveryEmail(rawPrefs: unknown, agentId: string | null): boolean {
-    const prefs = normalizeNotificationPrefs(rawPrefs)
-    return prefs.email && prefs.scope !== 'nothing' && coworkerRuleOf(prefs, agentId).mode !== 'muted'
 }
 
 // A row stored before recipients existed (null) reaches everyone, as it did then.

@@ -1,3 +1,6 @@
+import { after } from 'next/server'
+
+import { closeReconnectedAccounts } from '@/app/api/_services/ai-account-alert.service'
 import { recordGettingStartedEvent } from '@/app/api/_services/getting-started.service'
 import { followAuthorOfCreatedTask } from '@/app/api/_services/notification-audience.service'
 import { recordNotification } from '@/app/api/_services/notification.service'
@@ -21,6 +24,8 @@ export async function POST(req: Request) {
     const created = engineCreatedEventSchema.safeParse(body)
     if (created.success) {
         await Promise.all([recordGettingStartedEvent(engine.workspaceId, created.data.event), followAuthorOfCreatedTask(engine.workspaceId, created.data)])
+        // After the response: it asks the machine that is waiting for it.
+        if (created.data.event === 'box.connection.connected') after(() => closeReconnectedAccounts(engine.workspaceId))
         return Response.json({ ok: true }, { status: 202 })
     }
 

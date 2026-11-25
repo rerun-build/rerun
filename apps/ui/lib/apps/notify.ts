@@ -1,7 +1,7 @@
 // No 'server-only': the archive, restore and trial sweeps that call this run as Trigger.dev tasks.
 import * as React from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { AgentNotification, renderEmail } from '@rerun/emails'
+import { AppNotice as AppNoticeEmail, renderEmail } from '@rerun/emails'
 import { emailTranslator } from '@rerun/emails/i18n'
 import type { Database } from '@/app/api/database.types'
 import { APP_URL, REPLY_TO, TRANSACTIONAL_FROM, getResendClient, redirectDelivery } from '@/lib/email/client'
@@ -65,10 +65,10 @@ async function emailMembers(supabase: Client, workspaceId: number, notice: AppNo
             const recipient = await loadRecipient(supabase, user.id)
             if (!recipient) return
             const locale = await recipientLocale(supabase, user.id, workspaceId)
-            const unsubscribeUrl = buildUnsubscribeUrl(user.id)
+            const unsubscribeUrl = `${buildUnsubscribeUrl(user.id)}&category=billing`
             const subject = emailTranslator(locale)('subjects.appNotice', { appName: notice.appName })
             const message = noticeText({ message: notice.message, metadata: { notice: notice.copy } }, await translatorFor(locale, 'notifications.notices'))
-            const { html, text } = await renderEmail(React.createElement(AgentNotification, { agentName: notice.appName, kind: 'connector', message, appUrl: APP_URL, unsubscribeUrl, locale }))
+            const { html, text } = await renderEmail(React.createElement(AppNoticeEmail, { appName: notice.appName, message, appUrl: APP_URL, unsubscribeUrl, locale }))
             const delivery = redirectDelivery(recipient.email, subject)
             await sendThrottled(() => resend.emails.send({ from: TRANSACTIONAL_FROM, replyTo: REPLY_TO, to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(unsubscribeUrl) }))
         }),

@@ -1,7 +1,7 @@
 import * as React from "react";
-import AgentNotification, {
-  type AgentNotificationKind,
-} from "../emails/agent-notification";
+import AccountSignedOut from "../emails/account-signed-out";
+import AgentNotification from "../emails/agent-notification";
+import AppNotice from "../emails/app-notice";
 import AgentIdle from "../emails/agent-idle";
 import ArchiveExpiring from "../emails/archive-expiring";
 import AgentRecommendations from "../emails/agent-recommendations";
@@ -9,7 +9,6 @@ import AutomateAgent from "../emails/automate-agent";
 import BudgetExhausted from "../emails/budget-exhausted";
 import CreatorInvite from "../emails/creator-invite";
 import CreatorPitch from "../emails/creator-pitch";
-import IncidentResolved from "../emails/incident-resolved";
 import LifetimeCode from "../emails/lifetime-code";
 import OnboardingResume from "../emails/onboarding-resume";
 import PaymentFailed from "../emails/payment-failed";
@@ -25,7 +24,7 @@ import TrialEnding from "../emails/trial-ending";
 import TrialFinalNotice from "../emails/trial-final-notice";
 import TrialStarted from "../emails/trial-started";
 import WorkspaceInvite from "../emails/workspace-invite";
-import { boardSampleUrl } from "../assets";
+import { alertSampleUrl, boardSampleUrl } from "../assets";
 
 export interface EmailPreview {
   id: string;
@@ -37,25 +36,6 @@ export interface EmailPreview {
 const APP_URL = "https://app.rerun.build";
 // The end-of-access notices are mandatory, so they carry no unsubscribe link at all.
 const BILLING_URL = `${APP_URL}/?billing=1`;
-
-const KIND_LABELS: Record<AgentNotificationKind, string> = {
-  done: "Done",
-  info: "Heads up",
-  question: "Question",
-  approval: "Approval",
-  connector: "App",
-};
-
-const KIND_MESSAGES: Record<AgentNotificationKind, string> = {
-  done: "Published the weekly report to Notion and emailed the summary to the team.",
-  info: "The Stripe webhook signature changed. I kept going, but you may want to look.",
-  question:
-    "I found two candidate database schemas. Which one should I use for the migration?",
-  approval:
-    "Ready to send the outreach sequence to 240 contacts. Approve before I start?",
-  connector:
-    "I need access to Google Drive to read the spreadsheet you mentioned.",
-};
 
 // Real published slugs, so the gallery shows the cards the endpoint actually captures rather
 // than the generic fallback a slug nobody published resolves to.
@@ -88,136 +68,206 @@ const RECOMMENDED = [
 // turned off comes closest to seeing.
 const RECOMMENDED_NO_IMAGE = RECOMMENDED.map(({ imageUrl, ...rest }) => rest);
 
-const notificationPreviews: EmailPreview[] = (
-  Object.keys(KIND_LABELS) as AgentNotificationKind[]
-).map((kind) => ({
-  id: `agent-notification/${kind}`,
-  group: "Coworker notification",
-  label: KIND_LABELS[kind],
-  element: (
-    <AgentNotification
-      agentName="Atlas"
-      kind={kind}
-      message={KIND_MESSAGES[kind]}
-      appUrl={APP_URL}
-      unsubscribeUrl={`${APP_URL}/unsubscribe`}
-    />
-  ),
-}));
+const NOTIFICATION = {
+  portraitUrl: alertSampleUrl("portrait"),
+  appUrl: APP_URL,
+  conversationUrl: `${APP_URL}/?notification=preview`,
+  unsubscribeUrl: `${APP_URL}/unsubscribe`,
+};
+
+const CREW = ["Lead Scout", "Blog Writer", "Inbox Triage", "Weekly Report"];
 
 /**
  * Every template and every variant of it, in one list. The admin gallery renders this, so a
  * new variant is visible the moment it is added here.
  */
 export const EMAIL_PREVIEWS: EmailPreview[] = [
-  ...notificationPreviews,
   {
-    id: "agent-notification/question-board",
+    id: "agent-notification/question",
     group: "Coworker notification",
-    label: "Question, on the workspace board",
+    label: "Question",
     element: (
       <AgentNotification
-        agentName="Atlas"
+        {...NOTIFICATION}
+        agentName="Lead Scout"
         kind="question"
-        message={KIND_MESSAGES.question}
-        reason="You started this conversation."
-        boardUrl={boardSampleUrl()}
-        appUrl={APP_URL}
-        unsubscribeUrl={`${APP_URL}/unsubscribe`}
-      />
-    ),
-  },
-  {
-    id: "run-failed/with-run",
-    group: "Run failed",
-    label: "With run id",
-    element: (
-      <RunFailed
-        agentName="Atlas"
-        runId="run_4f2a9c"
-        errorMessage="Tool call timed out after 900s while waiting for the engine."
+        message="I found two companies with the same name in Lyon. Which one is your client?"
         reason="You started this run."
-        appUrl={APP_URL}
-        unsubscribeUrl={`${APP_URL}/unsubscribe`}
+        boardUrl={alertSampleUrl("question")}
       />
     ),
   },
   {
-    id: "run-failed/no-run",
-    group: "Run failed",
-    label: "Without run id",
+    id: "agent-notification/question-long",
+    group: "Coworker notification",
+    label: "Question, long",
     element: (
-      <RunFailed
-        agentName="Scout"
-        runId=""
-        errorMessage={
-          "Error: connect ECONNREFUSED 127.0.0.1:3000\n    at TCPConnectWrap.afterConnect"
+      <AgentNotification
+        {...NOTIFICATION}
+        agentName="Lead Scout"
+        kind="question"
+        message={
+          "I went through the 40 companies of the list and two of them share the same name in Lyon: one sells kitchen equipment to restaurants, the other is a recruitment agency that opened in March.\n\nBoth have a founder active on LinkedIn and both match your filters, so I stopped before writing to either of them.\n\nWhich one is your client, and should I leave the other one out of the next searches too?"
         }
-        appUrl={APP_URL}
+        reason="You started this run."
+        boardUrl={alertSampleUrl("question")}
       />
     ),
   },
   {
-    id: "run-failed/board",
+    id: "agent-notification/approval",
+    group: "Coworker notification",
+    label: "Approval",
+    element: (
+      <AgentNotification
+        {...NOTIFICATION}
+        agentName="Blog Writer"
+        kind="approval"
+        message="Publish the post of the day on LinkedIn"
+        reason="You started this run."
+        boardUrl={alertSampleUrl("approval")}
+      />
+    ),
+  },
+  {
+    id: "agent-notification/connector",
+    group: "Coworker notification",
+    label: "App to connect",
+    element: (
+      <AgentNotification
+        {...NOTIFICATION}
+        agentName="Inbox Triage"
+        kind="connector"
+        app="Gmail"
+        message="I need Gmail to sort the support inbox."
+        reason="You follow Inbox Triage's scheduled tasks."
+        boardUrl={alertSampleUrl("connector")}
+      />
+    ),
+  },
+  {
+    id: "agent-notification/connector-unnamed",
+    group: "Coworker notification",
+    label: "App to connect, without its name or a capture",
+    element: (
+      <AgentNotification
+        {...NOTIFICATION}
+        portraitUrl={undefined}
+        agentName="Inbox Triage"
+        kind="connector"
+        message="Set up an app"
+      />
+    ),
+  },
+  {
+    id: "run-failed",
     group: "Run failed",
-    label: "On the workspace board",
+    label: "Stopped on an error",
     element: (
       <RunFailed
-        agentName="Atlas"
-        runId="run_4f2a9c"
-        errorMessage="Tool call timed out after 900s while waiting for the engine."
-        boardUrl={boardSampleUrl()}
-        appUrl={APP_URL}
-        unsubscribeUrl={`${APP_URL}/unsubscribe`}
+        {...NOTIFICATION}
+        agentName="Weekly Report"
+        message="The Google Sheets token expired."
+        reason="You follow Weekly Report's scheduled tasks."
+        boardUrl={alertSampleUrl("failed")}
       />
     ),
   },
   {
-    id: "incident-resolved/schedule",
-    group: "Back to normal",
-    label: "Schedule recovered",
+    id: "run-failed/no-capture",
+    group: "Run failed",
+    label: "Without a capture",
     element: (
-      <IncidentResolved
-        agentName="Atlas"
-        sourceLabel='Schedule "weekly-export"'
-        reason="You follow Atlas's scheduled tasks."
+      <RunFailed
+        agentName="Weekly Report"
+        message="The Google Sheets token expired."
         appUrl={APP_URL}
-        unsubscribeUrl={`${APP_URL}/unsubscribe`}
       />
     ),
   },
   {
-    id: "incident-resolved/trigger-board",
-    group: "Back to normal",
-    label: "Trigger recovered, on the workspace board",
+    id: "account-signed-out/claude",
+    group: "AI account stopped",
+    label: "Claude signed out",
     element: (
-      <IncidentResolved
-        agentName="Scout"
-        sourceLabel='Trigger "on-push"'
-        reason="You created this trigger."
-        boardUrl={boardSampleUrl()}
+      <AccountSignedOut
+        kind="subscription"
+        account="Claude"
+        coworkers={CREW}
+        workspaceName="Acme"
+        reconnectUrl={`${APP_URL}/?reconnect=preview`}
+        boardUrl={alertSampleUrl("claude")}
         appUrl={APP_URL}
         unsubscribeUrl={`${APP_URL}/unsubscribe`}
       />
     ),
   },
   {
-    id: "budget-exhausted/named",
-    group: "Budget",
-    label: "Named workspace",
+    id: "account-signed-out/key",
+    group: "AI account stopped",
+    label: "Key refused, more coworkers than names",
+    element: (
+      <AccountSignedOut
+        kind="key"
+        account="Anthropic"
+        coworkers={[...CREW, "Data Keeper", "Support Desk"]}
+        workspaceName="Acme"
+        reconnectUrl={`${APP_URL}/?reconnect=preview`}
+        boardUrl={alertSampleUrl("key")}
+        appUrl={APP_URL}
+        unsubscribeUrl={`${APP_URL}/unsubscribe`}
+      />
+    ),
+  },
+  {
+    id: "account-signed-out/unnamed",
+    group: "AI account stopped",
+    label: "Coworkers unknown, without a capture",
+    element: (
+      <AccountSignedOut
+        kind="subscription"
+        account="ChatGPT"
+        coworkers={[]}
+        workspaceName={null}
+        reconnectUrl={`${APP_URL}/?reconnect=preview`}
+        appUrl={APP_URL}
+      />
+    ),
+  },
+  {
+    id: "budget-exhausted",
+    group: "Credits",
+    label: "Monthly credit used up",
     element: (
       <BudgetExhausted
-        workspaceName="Acme"
+        resetLabel="1 December"
+        creditsUrl={BILLING_URL}
+        boardUrl={alertSampleUrl("credits")}
         appUrl={APP_URL}
         unsubscribeUrl={`${APP_URL}/unsubscribe`}
       />
     ),
   },
   {
-    id: "budget-exhausted/unnamed",
-    group: "Budget",
-    label: "No workspace name",
-    element: <BudgetExhausted workspaceName={null} appUrl={APP_URL} />,
+    id: "budget-exhausted/no-reset",
+    group: "Credits",
+    label: "Top-up used up, without a capture",
+    element: (
+      <BudgetExhausted creditsUrl={BILLING_URL} appUrl={APP_URL} />
+    ),
+  },
+  {
+    id: "app-notice",
+    group: "Paid app",
+    label: "News of a paid app",
+    element: (
+      <AppNotice
+        appName="LinkedIn"
+        message="The trial of LinkedIn ends tomorrow. Add a card to keep it connected."
+        appUrl={APP_URL}
+        unsubscribeUrl={`${APP_URL}/unsubscribe`}
+      />
+    ),
   },
   {
     id: "workspace-invite/with-inviter",
@@ -547,27 +597,23 @@ export const EMAIL_PREVIEWS: EmailPreview[] = [
     element: (
       <PaymentFailed
         workspaceName="Acme"
-        amountLabel="$49.00"
-        declinedLabel="12 March"
-        pausedLabel="13 March, 16:00 UTC"
-        keptUntilLabel="10 June"
+        amountLabel="$29.00"
+        pausedLabel="25 November, 16:00 UTC"
+        boardUrl={alertSampleUrl("payment")}
         billingUrl={BILLING_URL}
         appUrl={APP_URL}
       />
     ),
   },
   {
-    id: "payment-failed/board",
+    id: "payment-failed/first",
     group: "Payment failed",
-    label: "On the workspace board",
+    label: "First charge declined, without a capture",
     element: (
       <PaymentFailed
         workspaceName="Acme"
-        amountLabel="$49.00"
-        declinedLabel="12 March"
-        pausedLabel="13 March, 16:00 UTC"
-        keptUntilLabel="10 June"
-        boardUrl={boardSampleUrl()}
+        pausedLabel="25 November, 16:00 UTC"
+        firstCharge
         billingUrl={BILLING_URL}
         appUrl={APP_URL}
       />

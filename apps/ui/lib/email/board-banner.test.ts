@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { emailBoardBanner } from './board-banner'
+import { emailBoardBanner, emailPortrait } from './board-banner'
 
 function database() {
     return fakeSupabase(table => (table === 'agents' ? { data: [{ id: 'a', name: 'Scout' }] } : undefined))
 }
 
 function respond(init: ResponseInit) {
-    return vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('png', init))
+    return vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response('png', init))
 }
 
 describe('emailBoardBanner', () => {
@@ -50,5 +50,20 @@ describe('emailBoardBanner', () => {
 
         await expect(emailBoardBanner(database().client, 7, 'working', 1_000)).resolves.toBeUndefined()
         expect(fetch).not.toHaveBeenCalled()
+    })
+})
+
+describe('emailPortrait', () => {
+    afterEach(() => vi.restoreAllMocks())
+
+    it('links the portrait turned towards its bubble, on the side the language reads from', async () => {
+        respond({ status: 200 })
+        expect(new URL((await emailPortrait('agent-1', null, 'en', 1_000)) as string).searchParams.get('bare')).toBe('right')
+        expect(new URL((await emailPortrait('agent-1', null, 'ar', 1_000)) as string).searchParams.get('bare')).toBe('left')
+    })
+
+    it('does without it when the capture fails', async () => {
+        respond({ status: 502 })
+        await expect(emailPortrait('agent-1', null, 'en', 1_000)).resolves.toBeUndefined()
     })
 })

@@ -94,14 +94,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 A self-hosted Rerun sends its own emails through your [Resend](https://resend.com) account. Without `RESEND_API_KEY`, nothing is sent: an invitation gives you its link to send yourself, and a published page cannot be shared by invitation.
 
-With it, the app emails invitations to a workspace and the access codes of pages shared by invitation. Coworker notification emails (a coworker needs you, a run broke, it works again) are paused in this version for every install: notifications show in the app only.
+With it, the app emails invitations to a workspace and the access codes of pages shared by invitation. It also emails each person who turned **Email** on when a coworker needs them or breaks while they are away, and the admins when an AI account is signed out or a key is refused. Those emails open on the usual banner: the picture of your board in them needs Rerun Cloud's capture service.
 
 | Variable | Required | Default | What it does |
 | --- | --- | --- | --- |
 | `RESEND_API_KEY` | Optional | empty | Turns email on. |
 | `RESEND_FROM` | With email | `Rerun <onboarding@resend.dev>` | The sender, on a domain you verified in Resend. The default is Resend's test sender, which only delivers to the address of your Resend account. |
 | `RESEND_REPLY_TO` | Optional | none | Where replies to those emails go. |
-| `UNSUBSCRIBE_SECRET` | Generated | empty | Signs the unsubscribe link of notification emails, so they work once they are switched back on. Invitations go out without it. |
+| `UNSUBSCRIBE_SECRET` | Generated | empty | Signs the unsubscribe link of notification emails, and is required for them to leave. Invitations go out without it. |
 | `EMAIL_REDIRECT_TO` | Optional | empty | Sends every email to this one inbox instead, with the real recipient in the subject. For a test install on a copy of real accounts. |
 | `SEND_EMAIL_HOOK_SECRET` | Optional | empty | The secret of a Supabase **Send Email Hook** pointed at `NEXT_PUBLIC_APP_URL/api/webhooks/supabase-auth-email`. With both, sign-in codes go out through Resend, in the account's language, instead of through Supabase's mailer. |
 

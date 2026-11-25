@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "Fin de l'accès",
             "amount": "Montant",
-            "amountDue": "Montant dû",
             "archivedOn": "Archivage le",
             "archivedSince": "Archivée depuis",
             "coworker": "Coworker",
             "coworkers": "Coworkers",
             "coworkersSaved": "Coworkers conservés",
             "created": "Créé",
-            "declinedOn": "Refusé le",
             "deletedOn": "Suppression le",
             "included": "Inclus",
             "lastOpened": "Dernière ouverture",
             "pausedSince": "En pause depuis",
             "renewsOn": "Renouvellement le",
-            "run": "Exécution",
             "runs": "Exécutions",
             "savedUntil": "Conservé jusqu'au",
-            "source": "Source",
             "then": "Ensuite",
             "trialEnded": "Fin de l'essai",
             "trialEnds": "Fin de l'essai",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "Votre code pour ouvrir {pageTitle} : {code}",
         "lifetimeCode": "Votre code Rerun à vie : {code}",
         "workspaceInvite": "Vous êtes invité à rejoindre {workspaceName} sur Rerun",
-        "runFailed": "{agentName} a rencontré une erreur",
-        "agentDone": "{agentName} a terminé une tâche",
-        "agentInfo": "{agentName} demande votre attention",
-        "agentInput": "{agentName} a besoin de vous",
         "appNotice": "{appName} : action requise",
-        "incidentResolved": "{agentName} fonctionne de nouveau",
-        "budgetExhausted": "Vos crédits Rerun sont épuisés",
+        "budgetExhausted": "{workspace} n'a plus de crédits Rerun",
         "onboardingResume": "Votre configuration Rerun n'est pas terminée",
         "agentRecommendations": "{count, plural, one {# coworker Rerun adapté à {company}} other {# coworkers Rerun adaptés à {company}}}",
         "agentIdle": "{agentName} est prêt, mais ne s'est pas encore lancé",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "Votre essai Rerun se termine dans 2 heures, ajoutez une carte pour que vos coworkers continuent",
         "trialEndedPaymentFailed": "Votre premier paiement Rerun a échoué, votre workspace est mis en pause dans 24 heures",
         "trialEndedNoCard": "Votre essai Rerun est terminé, votre workspace est mis en pause dans 2 heures",
-        "paymentFailed": "Votre paiement Rerun a été refusé, votre workspace est mis en pause dans 24 heures",
+        "paymentFailed": "Paiement refusé : votre workspace est mis en pause dans 24 heures",
         "subscriptionEnding": "{daysLeft, plural, =1 {Votre abonnement Rerun se termine demain} other {Votre abonnement Rerun se termine dans # jours}}",
         "archiveExpiring": "{kind, select, sandbox {Votre sandbox Rerun archivée sera supprimée le {date}} other {Votre workspace Rerun en pause sera supprimé le {date}}}",
         "sandboxIdle": "Votre sandbox Rerun sera archivée le {date} si vous ne l'ouvrez pas",
@@ -118,55 +109,45 @@
         "fallbackAgent": "Votre coworker"
     },
     "runFailed": {
-        "preview": "{agentName} a rencontré une erreur",
-        "heading": "Échec de l'exécution",
-        "body": "Votre coworker <strong>{agentName}</strong> s'est arrêté sur une erreur."
+        "heading": "{agentName} s'est arrêté sur une erreur",
+        "button": "Voir ce qui a cassé"
     },
     "budgetExhausted": {
-        "preview": "Vos crédits Rerun sont épuisés",
-        "heading": "Crédits Rerun épuisés",
-        "bodyNamed": "Les crédits Rerun de <strong>{workspaceName}</strong> sont épuisés pour ce mois-ci. Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause jusqu'à leur renouvellement ou jusqu'à ce que vous ajoutiez des crédits.",
-        "bodyUnnamed": "Les crédits Rerun de votre workspace sont épuisés pour ce mois-ci. Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause jusqu'à leur renouvellement ou jusqu'à ce que vous ajoutiez des crédits.",
-        "ownKeys": "Les coworkers qui utilisent leurs propres clés API continuent de tourner.",
+        "heading": "Vous n'avez plus de crédits Rerun",
+        "body": "Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause jusqu'au {date}, ou jusqu'à ce que vous ajoutiez des crédits. Les coworkers qui utilisent leurs propres clés API continuent de tourner.",
+        "bodyNoReset": "Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause jusqu'à ce que vous ajoutiez des crédits. Les coworkers qui utilisent leurs propres clés API continuent de tourner.",
         "button": "Ajouter des crédits"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName} : tâche terminée",
-            "heading": "Tâche terminée",
-            "body": "Votre agent <strong>{agentName}</strong> a terminé une tâche."
-        },
-        "info": {
-            "preview": "{agentName} : demande votre attention",
-            "heading": "Demande votre attention",
-            "body": "Votre agent <strong>{agentName}</strong> souhaite que vous regardiez quelque chose."
-        },
         "question": {
-            "preview": "{agentName} : le coworker a une question",
-            "heading": "Le coworker a une question",
-            "body": "Votre agent <strong>{agentName}</strong> a besoin d'une réponse pour continuer."
+            "heading": "{agentName} a une question",
+            "button": "Répondre"
         },
         "approval": {
-            "preview": "{agentName} : validation requise",
-            "heading": "Validation requise",
-            "body": "Votre agent <strong>{agentName}</strong> attend votre validation."
+            "heading": "{agentName} a besoin de votre accord",
+            "button": "Approuver ou refuser"
         },
         "connector": {
-            "preview": "{agentName} : app à connecter",
-            "heading": "App à connecter",
-            "body": "Votre agent <strong>{agentName}</strong> a besoin que vous connectiez un service."
+            "heading": "{agentName} a besoin de {app}",
+            "headingUnnamed": "{agentName} a besoin d'une app",
+            "button": "Connecter {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{source} de {agentName} fonctionne de nouveau",
-        "heading": "Tout est rentré dans l'ordre",
-        "body": "{source} de <strong>{agentName}</strong> fonctionne de nouveau. Vous ne recevrez plus d'e-mail à ce sujet, sauf en cas de nouvelle panne.",
-        "sources": {
-            "schedule": "La planification « {slug} »",
-            "anySchedule": "Une tâche planifiée",
-            "trigger": "Le déclencheur « {slug} »",
-            "anyTrigger": "Un déclencheur",
-            "conversation": "Une conversation"
+    "accountSignedOut": {
+        "more": "{count, plural, one {# autre} other {# autres}}",
+        "subscription": {
+            "subject": "{account} est déconnecté : {count, plural, one {# coworker arrêté} other {# coworkers arrêtés}}",
+            "heading": "{account} est déconnecté",
+            "body": "{count, plural, one {{coworkers} de {workspace} reprend dès que vous vous reconnectez.} other {{coworkers} de {workspace} reprennent dès que vous vous reconnectez.}}",
+            "bodyUnnamed": "Les coworkers de {workspace} qui tournent sur {account} reprennent dès que vous vous reconnectez.",
+            "button": "Se connecter à {account}"
+        },
+        "key": {
+            "subject": "{account} a refusé votre clé : {count, plural, one {# coworker arrêté} other {# coworkers arrêtés}}",
+            "heading": "{account} a refusé votre clé",
+            "body": "{count, plural, one {{coworkers} de {workspace} reprend dès que vous la mettez à jour.} other {{coworkers} de {workspace} reprennent dès que vous la mettez à jour.}}",
+            "bodyUnnamed": "Les coworkers de {workspace} qui tournent sur {account} reprennent dès que vous la mettez à jour.",
+            "button": "Mettre à jour la clé"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "Partez d'un coworker que vous avez déjà, ou créez quelque chose pour la marketplace à partir de zéro."
     },
     "paymentFailed": {
-        "preview": "Votre paiement Rerun a été refusé, votre workspace est mis en pause le {pausedAt}",
         "heading": "Votre paiement a été refusé",
-        "declined": "Le renouvellement de <strong>{workspace}</strong> n'est pas passé le <strong>{date}</strong>. Votre banque vous demande peut-être simplement de le confirmer.",
-        "declinedWithAmount": "Le renouvellement de <strong>{workspace}</strong>, <strong>{amount}</strong>, n'est pas passé le <strong>{date}</strong>. Votre banque vous demande peut-être simplement de le confirmer.",
-        "consequences": "Votre workspace continue de tourner jusqu'au <strong>{pausedAt}</strong>. Ensuite, il est <strong>mis en pause</strong> et vos coworkers s'arrêtent. Rien n'est supprimé : vos coworkers et tout ce qu'ils savent sont conservés jusqu'au <strong>{keptUntil}</strong>. Réglez la facture et rien ne change, avec le même abonnement.",
-        "button": "Régler la facture",
-        "footnote": "Nous réessaierons la carte dans les prochains jours. Si l'une de ces tentatives passe, votre workspace continue, ou est restauré de lui-même s'il était déjà en pause."
+        "renewal": {
+            "bodyWithAmount": "Le renouvellement de {workspace}, {amount}, n'est pas passé. Vos coworkers s'arrêtent le {pausedAt}. Rien n'est supprimé.",
+            "body": "Le renouvellement de {workspace} n'est pas passé. Vos coworkers s'arrêtent le {pausedAt}. Rien n'est supprimé."
+        },
+        "first": {
+            "bodyWithAmount": "Le premier paiement de {workspace}, {amount}, n'est pas passé. Vos coworkers s'arrêtent le {pausedAt}. Rien n'est supprimé.",
+            "body": "Le premier paiement de {workspace} n'est pas passé. Vos coworkers s'arrêtent le {pausedAt}. Rien n'est supprimé."
+        },
+        "button": "Régler la facture"
     },
     "renewalReminder": {
         "preview": "Votre abonnement Rerun se renouvelle le {date}",

@@ -132,14 +132,14 @@
             },
             "email": {
                 "label": "E-Mail",
-                "description": "Wenn er dich braucht, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+                "description": "Wenn er dich braucht, während du weg bist. Eine E-Mail pro Vorfall, nie mehr als 3 am Tag."
             }
         },
         "accountEmails": {
             "title": "Konto-E-Mails",
             "billing": {
                 "label": "Testphase & Abrechnung",
-                "description": "Erinnerungen zur Testphase und Abrechnungshinweise zu deinem Abo."
+                "description": "Erinnerungen zur Testphase, Abrechnungshinweise und Warnungen, wenn ein KI-Konto oder dein Guthaben deine Coworker stoppt."
             },
             "product": {
                 "label": "Produkt-Updates",
@@ -153,7 +153,7 @@
         "coworkerTitle": "Coworker-Benachrichtigungen",
         "email": {
             "label": "E-Mail",
-            "description": "Wenn ein Coworker dich braucht oder ausfällt, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+            "description": "Wenn ein Coworker dich braucht oder ausfällt, während du weg bist. Eine E-Mail pro Vorfall, nie mehr als 3 am Tag."
         },
         "saveFailed": "Einstellungen konnten nicht gespeichert werden",
         "saving": "Wird gespeichert…",

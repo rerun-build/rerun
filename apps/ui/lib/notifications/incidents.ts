@@ -1,4 +1,3 @@
-import type { EmailTranslator } from '@rerun/emails/i18n'
 import type { NotificationKind } from '@/lib/engine/types'
 
 export type SourceKeyInput = {
@@ -41,25 +40,4 @@ export function resolvedIncidentKeysFor(input: SourceKeyInput): string[] {
     const keys = isScheduledCompletion(input.event) ? [sourceKeyFor(input)] : []
     if (input.sessionId) keys.push(sessionKey(input.agentId, input.sessionId))
     return keys
-}
-
-// Split from the right because an engine agent id is opaque and could itself hold a colon.
-function segmentsOf(key: string): { segment: string; slug: string } {
-    const parts = key.split(':')
-    return { segment: parts.at(-2) ?? '', slug: parts.at(-1) ?? '' }
-}
-
-// Only a scheduled task or a trigger working again is worth an email. A conversation moving on says
-// so in the conversation, to someone who is usually the one who moved it on.
-export function announcesRecovery(key: string): boolean {
-    const { segment } = segmentsOf(key)
-    return segment === 'schedule' || segment === 'trigger'
-}
-
-// What recovered, named for the email that says so.
-export function emailSourceLabel(key: string, t: EmailTranslator): string {
-    const { segment, slug } = segmentsOf(key)
-    if (segment === 'schedule') return slug === 'run' ? t('incidentResolved.sources.anySchedule') : t('incidentResolved.sources.schedule', { slug })
-    if (segment === 'trigger') return slug === 'run' ? t('incidentResolved.sources.anyTrigger') : t('incidentResolved.sources.trigger', { slug })
-    return t('incidentResolved.sources.conversation')
 }

@@ -1,22 +1,24 @@
 import 'server-only'
 import * as React from 'react'
-import { AgentNotification, BudgetExhausted, IncidentResolved, LifetimeCode, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, renderEmail } from '@rerun/emails'
-import { emailTranslator, type EmailTranslator } from '@rerun/emails/i18n'
+import { AccountSignedOut, AgentNotification, BudgetExhausted, LifetimeCode, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, accountSignedOutSubject, agentNotificationTitle, renderEmail, type AccountSignedOutProps } from '@rerun/emails'
+import { emailTranslator } from '@rerun/emails/i18n'
 import type { Locale } from '@rerun/i18n'
 import { APP_URL, IS_PRODUCTION_MAILER, REPLY_TO, TRANSACTIONAL_FROM as FROM, getResendClient as getClient, redirectDelivery, type SendEmailResult } from '@/lib/email/client'
 import { sendThrottled } from '@/lib/email/throttle'
 import { listUnsubscribeHeaders } from '@/lib/email/unsubscribeToken'
-import type { NotificationKind } from '@/lib/engine/types'
+import type { IncidentKind } from '@/lib/notifications/routing'
 
 export type { SendEmailResult }
 
 type NotificationEmailInput = {
     to: string
-    kind: NotificationKind
+    kind: IncidentKind
     agentName: string
     message: string
-    runId?: string | null
+    app?: string
+    opensConversation?: boolean
     reason?: string
+    portraitUrl?: string
     boardUrl?: string
     conversationUrl?: string
     unsubscribeUrl?: string
@@ -56,6 +58,8 @@ export async function sendNotificationEmail(input: NotificationEmailInput): Prom
 type BudgetExhaustedEmailInput = {
     to: string
     workspaceName: string | null
+    resetLabel?: string
+    creditsUrl: string
     boardUrl?: string
     unsubscribeUrl?: string
     locale?: Locale
@@ -68,15 +72,17 @@ export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput)
         return { ok: true, id: null }
     }
 
+    const t = emailTranslator(input.locale)
     const element = React.createElement(BudgetExhausted, {
-        workspaceName: input.workspaceName,
+        resetLabel: input.resetLabel,
+        creditsUrl: input.creditsUrl,
         boardUrl: input.boardUrl,
         appUrl: APP_URL,
         unsubscribeUrl: input.unsubscribeUrl,
         locale: input.locale,
     })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.budgetExhausted'))
+    const delivery = redirectDelivery(input.to, input.workspaceName ? t('subjects.budgetExhausted', { workspace: input.workspaceName }) : t('budgetExhausted.heading'))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -96,36 +102,15 @@ export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput)
     return { ok: true, id: data?.id ?? null }
 }
 
-type IncidentResolvedEmailInput = {
-    to: string
-    agentName: string
-    sourceLabel: string
-    reason?: string
-    boardUrl?: string
-    conversationUrl?: string
-    unsubscribeUrl?: string
-    locale?: Locale
-}
-
-export async function sendIncidentResolvedEmail(input: IncidentResolvedEmailInput): Promise<SendEmailResult> {
+export async function sendAccountSignedOutEmail({ to, ...input }: Omit<AccountSignedOutProps, 'appUrl'> & { to: string }): Promise<SendEmailResult> {
     const resend = getClient()
     if (!resend) {
-        console.warn('[email] RESEND_API_KEY missing, skipping incident resolved email')
+        console.warn('[email] RESEND_API_KEY missing, skipping account signed out email')
         return { ok: true, id: null }
     }
 
-    const element = React.createElement(IncidentResolved, {
-        agentName: input.agentName,
-        sourceLabel: input.sourceLabel,
-        reason: input.reason,
-        boardUrl: input.boardUrl,
-        appUrl: APP_URL,
-        conversationUrl: input.conversationUrl,
-        unsubscribeUrl: input.unsubscribeUrl,
-        locale: input.locale,
-    })
-    const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.incidentResolved', { agentName: input.agentName }))
+    const { html, text } = await renderEmail(React.createElement(AccountSignedOut, { ...input, appUrl: APP_URL }))
+    const delivery = redirectDelivery(to, accountSignedOutSubject(input, emailTranslator(input.locale)))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -139,7 +124,7 @@ export async function sendIncidentResolvedEmail(input: IncidentResolvedEmailInpu
         }),
     )
     if (error) {
-        console.error('[email] failed to send incident resolved email', error)
+        console.error('[email] failed to send account signed out email', error)
         return { ok: false, error: error.message }
     }
     return { ok: true, id: data?.id ?? null }
@@ -279,52 +264,11 @@ export async function sendSignInCodeEmail(input: { to: string; code: string; sig
     return { ok: true, id: data?.id ?? null }
 }
 
-function buildNotificationEmail(input: NotificationEmailInput): { element: React.ReactElement; subject: string } {
-    const { agentName, message, kind, reason, boardUrl, conversationUrl, unsubscribeUrl, locale } = input
-    const t = emailTranslator(locale)
-
-    if (kind === 'error') {
-        return {
-            subject: t('subjects.runFailed', { agentName }),
-            element: React.createElement(RunFailed, {
-                agentName,
-                runId: input.runId ?? '',
-                errorMessage: message,
-                reason,
-                boardUrl,
-                appUrl: APP_URL,
-                conversationUrl,
-                unsubscribeUrl,
-                locale,
-            }),
-        }
-    }
-
+function buildNotificationEmail({ kind, app, opensConversation, ...input }: NotificationEmailInput): { element: React.ReactElement; subject: string } {
+    const t = emailTranslator(input.locale)
+    if (kind === 'error') return { subject: t('runFailed.heading', { agentName: input.agentName }), element: React.createElement(RunFailed, { ...input, appUrl: APP_URL }) }
     return {
-        subject: subjectForKind(kind, agentName, t),
-        element: React.createElement(AgentNotification, {
-            agentName,
-            kind,
-            message,
-            reason,
-            boardUrl,
-            appUrl: APP_URL,
-            conversationUrl,
-            unsubscribeUrl,
-            locale,
-        }),
-    }
-}
-
-function subjectForKind(kind: Exclude<NotificationKind, 'error'>, agentName: string, t: EmailTranslator): string {
-    switch (kind) {
-        case 'done':
-            return t('subjects.agentDone', { agentName })
-        case 'info':
-            return t('subjects.agentInfo', { agentName })
-        case 'question':
-        case 'approval':
-        case 'connector':
-            return t('subjects.agentInput', { agentName })
+        subject: agentNotificationTitle({ kind, agentName: input.agentName, app }, t),
+        element: React.createElement(AgentNotification, { ...input, kind, app, opensConversation, appUrl: APP_URL }),
     }
 }

@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "Acesso termina",
             "amount": "Valor",
-            "amountDue": "Valor devido",
             "archivedOn": "Arquivado em",
             "archivedSince": "Arquivado desde",
             "coworker": "Coworker",
             "coworkers": "Coworkers",
             "coworkersSaved": "Coworkers salvos",
             "created": "Criado",
-            "declinedOn": "Recusado em",
             "deletedOn": "Excluído em",
             "included": "Incluído",
             "lastOpened": "Último acesso",
             "pausedSince": "Pausado desde",
             "renewsOn": "Renova em",
-            "run": "Execução",
             "runs": "Execuções",
             "savedUntil": "Salvo até",
-            "source": "Origem",
             "then": "Depois",
             "trialEnded": "Teste encerrado",
             "trialEnds": "Teste termina",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "Seu código para abrir {pageTitle}: {code}",
         "lifetimeCode": "Seu código vitalício do Rerun: {code}",
         "workspaceInvite": "Você foi convidado para {workspaceName} no Rerun",
-        "runFailed": "{agentName} encontrou um erro",
-        "agentDone": "{agentName} terminou uma tarefa",
-        "agentInfo": "{agentName} precisa da sua atenção",
-        "agentInput": "{agentName} precisa da sua resposta",
         "appNotice": "{appName}: ação necessária",
-        "incidentResolved": "{agentName} voltou ao normal",
-        "budgetExhausted": "Seus créditos Rerun acabaram",
+        "budgetExhausted": "{workspace} está sem créditos Rerun",
         "onboardingResume": "Sua configuração do Rerun não terminou",
         "agentRecommendations": "{count, plural, one {# coworker Rerun para {company}} other {# coworkers Rerun para {company}}}",
         "agentIdle": "{agentName} está pronto, mas ainda não rodou",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "Seu teste do Rerun termina em 2 horas, adicione um cartão para manter seus coworkers rodando",
         "trialEndedPaymentFailed": "Seu primeiro pagamento do Rerun falhou, seu workspace será pausado em 24 horas",
         "trialEndedNoCard": "Seu teste do Rerun terminou, seu workspace será pausado em 2 horas",
-        "paymentFailed": "Seu pagamento do Rerun foi recusado, seu workspace será pausado em 24 horas",
+        "paymentFailed": "Pagamento recusado: seu workspace será pausado em 24 horas",
         "subscriptionEnding": "{daysLeft, plural, =1 {Sua assinatura do Rerun termina amanhã} one {Sua assinatura do Rerun termina em # dia} other {Sua assinatura do Rerun termina em # dias}}",
         "archiveExpiring": "{kind, select, sandbox {Sua sandbox arquivada do Rerun será excluída em {date}} other {Seu workspace pausado do Rerun será excluído em {date}}}",
         "sandboxIdle": "Sua sandbox do Rerun será arquivada em {date} se você não abri-la",
@@ -118,55 +109,45 @@
         "fallbackAgent": "Seu coworker"
     },
     "runFailed": {
-        "preview": "{agentName} encontrou um erro",
-        "heading": "Execução com falha",
-        "body": "Seu coworker <strong>{agentName}</strong> parou com um erro."
+        "heading": "{agentName} parou em um erro",
+        "button": "Ver o que quebrou"
     },
     "budgetExhausted": {
-        "preview": "Seus créditos Rerun acabaram",
-        "heading": "Créditos Rerun esgotados",
-        "bodyNamed": "Os créditos Rerun de <strong>{workspaceName}</strong> acabaram neste mês. As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até a renovação ou até você adicionar créditos.",
-        "bodyUnnamed": "Os créditos Rerun do seu workspace acabaram neste mês. As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até a renovação ou até você adicionar créditos.",
-        "ownKeys": "Coworkers que usam suas próprias chaves de API continuam rodando.",
+        "heading": "Você está sem créditos Rerun",
+        "body": "As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até {date}, ou até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
+        "bodyNoReset": "As execuções agendadas e por gatilho nos modelos Rerun ficam pausadas até você adicionar créditos. Coworkers que usam suas próprias chaves de API continuam rodando.",
         "button": "Adicionar créditos"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}: tarefa concluída",
-            "heading": "Tarefa concluída",
-            "body": "Seu agente <strong>{agentName}</strong> terminou uma tarefa."
-        },
-        "info": {
-            "preview": "{agentName}: precisa da sua atenção",
-            "heading": "Precisa da sua atenção",
-            "body": "Seu agente <strong>{agentName}</strong> quer que você veja algo."
-        },
         "question": {
-            "preview": "{agentName}: o coworker tem uma pergunta",
-            "heading": "O coworker tem uma pergunta",
-            "body": "Seu agente <strong>{agentName}</strong> precisa de uma resposta para continuar."
+            "heading": "{agentName} tem uma pergunta",
+            "button": "Responder"
         },
         "approval": {
-            "preview": "{agentName}: aprovação necessária",
-            "heading": "Aprovação necessária",
-            "body": "Seu agente <strong>{agentName}</strong> está esperando sua aprovação."
+            "heading": "{agentName} precisa da sua aprovação",
+            "button": "Aprovar ou recusar"
         },
         "connector": {
-            "preview": "{agentName}: configuração de app",
-            "heading": "Configuração de app",
-            "body": "Seu agente <strong>{agentName}</strong> precisa que você conecte um serviço."
+            "heading": "{agentName} precisa do {app}",
+            "headingUnnamed": "{agentName} precisa de um app",
+            "button": "Conectar {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{source} de {agentName} voltou a funcionar",
-        "heading": "De volta ao normal",
-        "body": "{source} de <strong>{agentName}</strong> voltou a rodar bem. Você não receberá outro e-mail sobre isso, a menos que quebre de novo.",
-        "sources": {
-            "schedule": "Agendamento \"{slug}\"",
-            "anySchedule": "Uma tarefa agendada",
-            "trigger": "Gatilho \"{slug}\"",
-            "anyTrigger": "Um gatilho",
-            "conversation": "Uma conversa"
+    "accountSignedOut": {
+        "more": "{count, plural, one {mais #} other {mais #}}",
+        "subscription": {
+            "subject": "{account} está desconectado: {count, plural, one {# coworker parado} other {# coworkers parados}}",
+            "heading": "{account} está desconectado",
+            "body": "{count, plural, one {{coworkers} de {workspace} volta a rodar assim que você entrar.} other {{coworkers} de {workspace} voltam a rodar assim que você entrar.}}",
+            "bodyUnnamed": "Os coworkers de {workspace} que rodam no {account} voltam a rodar assim que você entrar.",
+            "button": "Entrar no {account}"
+        },
+        "key": {
+            "subject": "{account} recusou sua chave: {count, plural, one {# coworker parado} other {# coworkers parados}}",
+            "heading": "{account} recusou sua chave",
+            "body": "{count, plural, one {{coworkers} de {workspace} volta a rodar assim que você a atualizar.} other {{coworkers} de {workspace} voltam a rodar assim que você a atualizar.}}",
+            "bodyUnnamed": "Os coworkers de {workspace} que rodam no {account} voltam a rodar assim que você a atualizar.",
+            "button": "Atualizar a chave"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "Comece com um coworker que você já tem, ou crie algo para o marketplace do zero."
     },
     "paymentFailed": {
-        "preview": "Seu pagamento do Rerun foi recusado, seu workspace será pausado em {pausedAt}",
         "heading": "Seu pagamento foi recusado",
-        "declined": "A renovação de <strong>{workspace}</strong> não foi aprovada em <strong>{date}</strong>. Talvez seu banco só esteja pedindo uma confirmação.",
-        "declinedWithAmount": "A renovação de <strong>{workspace}</strong>, <strong>{amount}</strong>, não foi aprovada em <strong>{date}</strong>. Talvez seu banco só esteja pedindo uma confirmação.",
-        "consequences": "Seu workspace continua rodando até <strong>{pausedAt}</strong>. Depois disso, ele é <strong>pausado</strong> e seus coworkers param. Nada é excluído: seus coworkers e tudo o que eles sabem ficam salvos até <strong>{keptUntil}</strong>. Pague a fatura e nada muda, no mesmo plano.",
-        "button": "Pagar a fatura",
-        "footnote": "Vamos tentar o cartão de novo nos próximos dias. Se uma dessas tentativas passar, seu workspace continua, ou é restaurado sozinho se já estiver pausado."
+        "renewal": {
+            "bodyWithAmount": "A renovação de {workspace}, {amount}, não foi concluída. Seus coworkers param em {pausedAt}. Nada é excluído.",
+            "body": "A renovação de {workspace} não foi concluída. Seus coworkers param em {pausedAt}. Nada é excluído."
+        },
+        "first": {
+            "bodyWithAmount": "O primeiro pagamento de {workspace}, {amount}, não foi concluído. Seus coworkers param em {pausedAt}. Nada é excluído.",
+            "body": "O primeiro pagamento de {workspace} não foi concluído. Seus coworkers param em {pausedAt}. Nada é excluído."
+        },
+        "button": "Pagar a fatura"
     },
     "renewalReminder": {
         "preview": "Seu plano Rerun renova em {date}",

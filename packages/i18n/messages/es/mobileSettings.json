@@ -77,7 +77,7 @@
         },
         "email": {
             "label": "Email",
-            "footnote": "Cuando te necesita mientras no estás. Un email por incidente, nunca uno por ejecución."
+            "footnote": "Cuando te necesita mientras no estás. Un email por incidente, nunca más de 3 al día."
         },
         "perCoworker": {
             "title": "Por coworker",

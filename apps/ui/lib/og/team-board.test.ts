@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { fakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
-import { boardStatusOfKind, loadTeam, teamBoardScene } from './team-board'
+import { loadTeam, teamBoardScene } from './team-board'
 
 const agent = (id: string, name = id) => ({ id, name })
 
@@ -30,17 +30,6 @@ describe('teamBoardScene', () => {
 
     it('cuts a name to what a tile label holds', () => {
         expect(teamBoardScene([agent('a', 'x'.repeat(60))], 'idle').agents[0].name).toHaveLength(40)
-    })
-})
-
-describe('boardStatusOfKind', () => {
-    it('reads a notification as the state its coworker is left in', () => {
-        expect(boardStatusOfKind('question')).toBe('waiting_human')
-        expect(boardStatusOfKind('approval')).toBe('waiting_human')
-        expect(boardStatusOfKind('connector')).toBe('waiting_human')
-        expect(boardStatusOfKind('error')).toBe('error')
-        expect(boardStatusOfKind('done')).toBe('idle')
-        expect(boardStatusOfKind('info')).toBe('working')
     })
 })
 

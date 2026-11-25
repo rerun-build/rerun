@@ -132,14 +132,14 @@
             },
             "email": {
                 "label": "E-mail",
-                "description": "Quando precisarem de você enquanto estiver fora. Um e-mail por incidente, nunca um por execução."
+                "description": "Quando precisarem de você enquanto estiver fora. Um e-mail por incidente, nunca mais de 3 por dia."
             }
         },
         "accountEmails": {
             "title": "E-mails da conta",
             "billing": {
                 "label": "Teste e cobrança",
-                "description": "Lembretes do teste e avisos de cobrança sobre a sua assinatura."
+                "description": "Lembretes do teste, avisos de cobrança e alertas quando uma conta de IA ou seus créditos param seus coworkers."
             },
             "product": {
                 "label": "Novidades do produto",
@@ -153,7 +153,7 @@
         "coworkerTitle": "Notificações de coworkers",
         "email": {
             "label": "E-mail",
-            "description": "Quando um coworker precisa de você ou quebra enquanto você está fora. Um e-mail por incidente, nunca um por execução."
+            "description": "Quando um coworker precisa de você ou quebra enquanto você está fora. Um e-mail por incidente, nunca mais de 3 por dia."
         },
         "saveFailed": "Falha ao salvar as preferências",
         "saving": "Salvando…",

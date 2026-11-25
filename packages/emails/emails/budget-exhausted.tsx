@@ -1,63 +1,35 @@
 import * as React from "react";
-import { Heading, Section, Text } from "@react-email/components";
-import { Layout } from "../components/Layout";
-import { Button } from "../components/Button";
-import { readingSides } from "../components/direction";
-import { strong } from "../components/rich";
+import { AlertMessage } from "../components/AlertMessage";
 import { emailTranslator, type EmailLocale } from "../i18n";
-import { theme, text } from "../theme";
 
 export interface BudgetExhaustedProps {
-  workspaceName: string | null;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
+  /** When the credit of the month comes back, "1 December", preformatted. Left out when none does. */
+  resetLabel?: string;
+  creditsUrl: string;
+  /** The close-up of the team asleep around its credit, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-export default function BudgetExhausted({
-  workspaceName,
-  boardUrl,
-  appUrl,
-  unsubscribeUrl,
-  locale,
-}: BudgetExhaustedProps) {
+export default function BudgetExhausted({ resetLabel, creditsUrl, boardUrl, appUrl, unsubscribeUrl, locale }: BudgetExhaustedProps) {
   const t = emailTranslator(locale);
   return (
-    <Layout
-      preview={t("budgetExhausted.preview")}
-      hero={{ scene: "budget-exhausted", board: boardUrl }}
+    <AlertMessage
+      hero={{ scene: "budget-exhausted", closeUp: boardUrl }}
+      heading={t("budgetExhausted.heading")}
+      body={resetLabel ? t("budgetExhausted.body", { date: resetLabel }) : t("budgetExhausted.bodyNoReset")}
+      action={{ label: t("budgetExhausted.button"), href: creditsUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
       locale={locale}
-    >
-      <Heading style={text.heading}>{t("budgetExhausted.heading")}</Heading>
-      <Text style={text.paragraph}>
-        {workspaceName
-          ? t.rich("budgetExhausted.bodyNamed", { workspaceName, strong })
-          : t("budgetExhausted.bodyUnnamed")}
-      </Text>
-      <Text style={readingSides(locale).start === "left" ? { ...hint, borderLeft: hintRule, paddingLeft: "12px" } : { ...hint, borderRight: hintRule, paddingRight: "12px" }}>{t("budgetExhausted.ownKeys")}</Text>
-      <Section style={cta}>
-        <Button href={appUrl}>{t("budgetExhausted.button")}</Button>
-      </Section>
-    </Layout>
+    />
   );
 }
 
 BudgetExhausted.PreviewProps = {
-  workspaceName: "Acme",
+  resetLabel: "1 December",
+  creditsUrl: "https://app.rerun.build/?billing=1",
   appUrl: "https://app.rerun.build",
 } satisfies BudgetExhaustedProps;
-
-const hintRule = `2px solid ${theme.surface.border}`;
-
-const hint: React.CSSProperties = {
-  ...text.footnote,
-  margin: "0 0 4px",
-};
-
-const cta: React.CSSProperties = {
-  margin: "24px 0 0",
-};

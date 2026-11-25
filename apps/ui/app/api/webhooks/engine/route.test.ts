@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from '@/app/api/_services/workspace-owner.service'
 import { ensureSessionRow } from '@/app/api/_services/chat.service'
-import { pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
+import { alertSignedOutAccounts, closeReconnectedAccounts } from '@/app/api/_services/ai-account-alert.service'
+import { pushNotification, sendNotificationEmail } from '@rerun/cloud/email'
 import { loadPresence } from '@/app/api/_services/presence.service'
 import { captureServer } from '@rerun/analytics/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -19,7 +20,9 @@ vi.mock('@/app/api/_services/workspace-owner.service', () => ({ resolveWorkspace
 vi.mock('@rerun/cloud/billing.server', () => ({ extendTrial: vi.fn(), subscriptionHasCard: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({ ensureSessionRow: vi.fn() }))
 vi.mock('@/app/api/_services/presence.service', () => ({ loadPresence: vi.fn().mockResolvedValue([]) }))
-vi.mock('@rerun/cloud/email', () => ({ sendNotificationEmail: vi.fn(), sendIncidentResolvedEmail: vi.fn(), BANNER_WARM_INLINE_MS: 0, emailBoardBanner: vi.fn().mockResolvedValue(undefined), buildUnsubscribeUrl: (userId: string) => `https://app.rerun.build/unsubscribe?u=${userId}`, pushNotification: vi.fn() }))
+vi.mock('@rerun/cloud/email', () => ({ sendNotificationEmail: vi.fn(), BANNER_WARM_INLINE_MS: 0, alertBanner: vi.fn(async () => undefined), emailPortrait: vi.fn(async () => undefined), buildUnsubscribeUrl: (userId: string) => `https://app.rerun.build/unsubscribe?u=${userId}`, pushNotification: vi.fn() }))
+vi.mock('@/lib/og/alert-crew', () => ({ coworkerAlertBoard: vi.fn(async () => null) }))
+vi.mock('@/app/api/_services/ai-account-alert.service', () => ({ alertSignedOutAccounts: vi.fn(), closeReconnectedAccounts: vi.fn() }))
 vi.mock('@rerun/cloud/engines', () => ({ claimPoolEngine: vi.fn() }))
 const afterTasks = vi.hoisted(() => [] as Promise<unknown>[])
 vi.mock('next/server', async importOriginal => ({ ...(await importOriginal<typeof import('next/server')>()), after: (task: () => Promise<unknown>) => void afterTasks.push(task()) }))
@@ -28,15 +31,6 @@ vi.mock('@/lib/ai/generate-run-title', () => ({ generateRunTitle: vi.fn() }))
 const afterResponse = () => Promise.all(afterTasks.splice(0))
 vi.mock('@/app/api/_services/capacity.service', () => ({ assertEngineEntitlement: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ listConnections: vi.fn(), listSchedules: vi.fn() }))
-// Notification emails are paused in production; the incident tests describe what leaves once they resume.
-const emailFlags = vi.hoisted(() => ({ paused: false }))
-vi.mock('@/lib/notifications/prefs', async importOriginal => ({
-    ...(await importOriginal<typeof import('@/lib/notifications/prefs')>()),
-    get NOTIFICATION_EMAILS_PAUSED() {
-        return emailFlags.paused
-    },
-}))
-
 const BOX_KEY = 'box-key-of-workspace-7'
 const WORKSPACE_ID = 7
 const OTHER_WORKSPACE_ID = 99
@@ -60,6 +54,10 @@ let participants: string[] = []
 let prefsOf: Record<string, unknown> = {}
 let incidentOpens = true
 let resolvedUsers: string[] = []
+// The emails of the day, the one about to leave included.
+let sentToday = 1
+let authUser: Record<string, unknown> = {}
+let blockedDomain = false
 
 function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table === 'engine_pool') {
@@ -92,6 +90,9 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
     }
     if (table === 'rpc:open_notification_incident') return { data: incidentOpens }
     if (table === 'rpc:resolve_notification_incidents') return { data: resolvedUsers }
+    if (table === 'rpc:email_domain_is_blocked') return { data: blockedDomain }
+    if (table === 'notification_email_dispatches') return writeMethodOf(calls) ? { data: { id: 'dispatch-1' } } : { count: sentToday }
+    if (table === 'services') return { data: [{ slug: 'gmail', name: 'Gmail', icon: null, category: 'communication' }] }
     if (table === 'workspace_getting_started') return { data: [] }
     if (table === 'workspace_onboarding') return { data: null }
     return undefined
@@ -120,9 +121,11 @@ describe('POST /api/webhooks/engine', () => {
         prefsOf = Object.fromEntries(MEMBERS.map(id => [id, { version: 2, email: true }]))
         incidentOpens = true
         resolvedUsers = []
-        emailFlags.paused = false
+        sentToday = 1
+        authUser = {}
+        blockedDomain = false
         db = fakeSupabase(resolve)
-        Object.assign(db.client, { auth: { admin: { getUserById: async (id: string) => ({ data: { user: { email: `${id}@rerun.test` } } }) } } })
+        Object.assign(db.client, { auth: { admin: { getUserById: async (id: string) => ({ data: { user: { email: `${id}@acme.io`, ...authUser } } }) } } })
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
         vi.mocked(sendNotificationEmail).mockResolvedValue({ ok: true, id: 'email-1' })
     })
@@ -287,21 +290,8 @@ describe('POST /api/webhooks/engine', () => {
             await POST(request(notification({ kind: 'question' })))
 
             expect(sendNotificationEmail).toHaveBeenCalledTimes(1)
-            expect(sendNotificationEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'user-2@rerun.test', kind: 'question', reason: 'You started this run.' }))
+            expect(sendNotificationEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'user-2@acme.io', kind: 'question', reason: 'You started this run.' }))
             expect(db.chainsOn('rpc:open_notification_incident')[0][0].args[1]).toEqual({ p_user_id: 'user-2', p_source_key: 'engine-own:session:engine-session' })
-        })
-
-        it('emails nobody while notification emails are paused, and still writes the notification', async () => {
-            sandbox = false
-            emailFlags.paused = true
-            session = { id: 'session-1', source: 'dashboard' }
-            participants = ['user-2']
-
-            await POST(request(notification({ kind: 'question' })))
-
-            expect(db.writes('notifications')).toHaveLength(1)
-            expect(sendNotificationEmail).not.toHaveBeenCalled()
-            expect(db.chainsOn('rpc:open_notification_incident')).toHaveLength(0)
         })
 
         it('drops the incident when its email never left, so the next failure can try again', async () => {
@@ -389,7 +379,7 @@ describe('POST /api/webhooks/engine', () => {
             expect(db.writes('sessions').map(write => write.payload)).toContainEqual({ automation_name: 'Daily missions apply', outcome: 'done' })
         })
 
-        it('tells whoever was emailed about a broken schedule that it works again', async () => {
+        it('closes the incidents of a schedule that works again, and emails nobody about it', async () => {
             sandbox = false
             session = { id: 'session-1', source: 'schedule' }
             resolvedUsers = ['user-1']
@@ -397,30 +387,160 @@ describe('POST /api/webhooks/engine', () => {
             await POST(request(notification({ event: 'agent.schedule.completed', kind: 'done', source: 'schedule', metadata: { scheduleSlug: 'weekly' } })))
 
             expect(db.chainsOn('rpc:resolve_notification_incidents').map(chain => chain[0].args[1])).toEqual([{ p_source_key: 'engine-own:schedule:weekly' }, { p_source_key: 'engine-own:session:engine-session' }])
-            expect(sendIncidentResolvedEmail).toHaveBeenCalledTimes(1)
-            expect(sendIncidentResolvedEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'user-1@rerun.test', sourceLabel: 'Schedule "weekly"' }))
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
         })
 
-        it('tells nobody who has left the workspace that it works again', async () => {
+        it('emails nobody who did not turn Email on', async () => {
             sandbox = false
-            session = { id: 'session-1', source: 'schedule' }
-            resolvedUsers = ['user-1', 'user-9']
+            prefsOf = { 'user-1': null, 'user-2': { version: 2, scope: 'mine' } }
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
 
-            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'done', source: 'schedule', metadata: { scheduleSlug: 'weekly' } })))
+            await POST(request(notification({ kind: 'question' })))
 
-            expect(sendIncidentResolvedEmail).toHaveBeenCalledTimes(1)
-            expect(sendIncidentResolvedEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'user-1@rerun.test' }))
+            expect(db.writes('notifications')).toHaveLength(1)
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+            expect(db.chainsOn('rpc:open_notification_incident')).toHaveLength(0)
         })
 
-        it('tells nobody who unsubscribed that it works again', async () => {
+        it('stops at three emails a day for one person, and leaves the incident open to another day', async () => {
+            sandbox = false
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+            sentToday = 4
+
+            await POST(request(notification({ kind: 'question' })))
+
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+            expect(db.writes('notification_email_dispatches').map(write => write.method)).toEqual(['insert', 'delete'])
+            expect(db.chainsOn('notification_incidents').filter(chain => writeMethodOf(chain) === 'delete')).toHaveLength(1)
+        })
+
+        it('sends the third email of the day', async () => {
+            sandbox = false
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+            sentToday = 3
+
+            await POST(request(notification({ kind: 'question' })))
+
+            expect(sendNotificationEmail).toHaveBeenCalledTimes(1)
+            expect(db.writes('notification_email_dispatches')).toEqual([expect.objectContaining({ method: 'insert', payload: expect.objectContaining({ user_id: 'user-2', status: 'sent', kind: 'question' }) })])
+        })
+
+        it.each([
+            ['an anonymous visitor', { is_anonymous: true }],
+            ['a banned account', { banned_until: '2999-01-01T00:00:00Z' }],
+            ['an address that can receive nothing', { email: 'someone@example.com' }],
+        ])('never writes to %s', async (_who, user) => {
+            sandbox = false
+            authUser = user
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+
+            await POST(request(notification({ kind: 'question' })))
+
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+        })
+
+        it('never writes to an address on a domain blocked for abuse', async () => {
+            sandbox = false
+            blockedDomain = true
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+
+            await POST(request(notification({ kind: 'question' })))
+
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+        })
+
+        it('keeps a proposed skill out of the mailbox: it holds no run', async () => {
+            sandbox = false
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+
+            await POST(request(notification({ kind: 'approval', metadata: { toolName: 'skill_propose' } })))
+
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+        })
+
+        it('names the app a coworker waits for, and says why in its own words', async () => {
+            sandbox = false
+            session = { id: 'session-1', source: 'dashboard' }
+            participants = ['user-2']
+
+            await POST(request(notification({ kind: 'connector', message: 'Set up gmail', metadata: { toolName: 'suggest_service', input: { services: [{ slug: 'gmail', reason: 'I need Gmail to sort the support inbox.' }] } } })))
+
+            expect(sendNotificationEmail).toHaveBeenCalledWith(expect.objectContaining({ app: 'Gmail', message: 'I need Gmail to sort the support inbox.' }))
+        })
+
+        it('tells a broken run in the words of the inbox', async () => {
             sandbox = false
             session = { id: 'session-1', source: 'schedule' }
-            resolvedUsers = ['user-1']
-            prefsOf = { 'user-1': { version: 2, email: false } }
+            prefsOf['user-2'] = { version: 2, email: true, coworkers: { 'agent-own': { mode: 'default', follow: true } } }
 
-            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'done', source: 'schedule', metadata: { scheduleSlug: 'weekly' } })))
+            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'error', source: 'schedule', message: 'Schedule "weekly" failed: boom', metadata: { scheduleSlug: 'weekly', error: 'The Google Sheets token expired.' } })))
 
-            expect(sendIncidentResolvedEmail).not.toHaveBeenCalled()
+            expect(sendNotificationEmail).toHaveBeenCalledTimes(1)
+            expect(sendNotificationEmail).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error', message: 'The Google Sheets token expired.' }))
+        })
+
+        it('leaves a run its account turned away to the alert of the account', async () => {
+            sandbox = false
+            session = { id: 'session-1', source: 'schedule' }
+            prefsOf['user-2'] = { version: 2, email: true, coworkers: { 'agent-own': { mode: 'default', follow: true } } }
+
+            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'error', source: 'schedule', metadata: { scheduleSlug: 'weekly', errorCode: 'provider_unauthorized', provider: 'claude', error: '401' } })))
+            await afterResponse()
+
+            expect(sendNotificationEmail).not.toHaveBeenCalled()
+            expect(alertSignedOutAccounts).toHaveBeenCalledWith(WORKSPACE_ID, 'claude')
+        })
+
+        it('alerts about no account for a run that broke on something else, nor in a sandbox', async () => {
+            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'error', source: 'schedule', metadata: { scheduleSlug: 'weekly', errorCode: 'provider_unauthorized' } })))
+            sandbox = false
+            forgetMachine(WORKSPACE_ID)
+            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'error', source: 'schedule', metadata: { scheduleSlug: 'weekly', errorCode: 'provider_overloaded' } })))
+            await afterResponse()
+
+            expect(alertSignedOutAccounts).not.toHaveBeenCalled()
+        })
+
+        it('closes the alert of the account a run went through on', async () => {
+            sandbox = false
+            await POST(request(notification({ event: 'agent.message.completed', kind: 'done', metadata: { provider: 'claude' } })))
+            await afterResponse()
+
+            expect(closeReconnectedAccounts).toHaveBeenCalledWith(WORKSPACE_ID, 'claude')
+        })
+
+        it.each([
+            ['on the Rerun credit', { event: 'agent.message.completed', kind: 'done', metadata: { provider: 'rerun' } }],
+            ['that names no provider', { event: 'agent.message.completed', kind: 'done' }],
+            ['that was stopped', { event: 'agent.message.completed', kind: 'done', metadata: { provider: 'claude', status: 'cancelled' } }],
+            ['that broke', { event: 'agent.message.completed', kind: 'error', metadata: { provider: 'claude' } }],
+            ['that asks a question', { kind: 'question', metadata: { provider: 'claude' } }],
+        ])('closes no alert for a run %s', async (_, overrides) => {
+            sandbox = false
+            await POST(request(notification(overrides)))
+            await afterResponse()
+
+            expect(closeReconnectedAccounts).not.toHaveBeenCalled()
+        })
+
+        it('closes no alert in a sandbox', async () => {
+            await POST(request(notification({ event: 'agent.message.completed', kind: 'done', metadata: { provider: 'claude' } })))
+            await afterResponse()
+
+            expect(closeReconnectedAccounts).not.toHaveBeenCalled()
+        })
+
+        it('closes the alerts of the accounts that work again once one is connected', async () => {
+            await POST(request({ event: 'box.connection.connected', kind: 'info', agentId: null, message: 'claude', timestamp: '2026-11-24T10:00:00.000Z' }))
+            await afterResponse()
+
+            expect(closeReconnectedAccounts).toHaveBeenCalledWith(WORKSPACE_ID)
         })
 
         it('stores a heads-up of the Chief of Staff for the member whose thread it ran in, and pushes it under its name', async () => {

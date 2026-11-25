@@ -13,23 +13,19 @@
         "meta": {
             "accessEnds": "访问截止",
             "amount": "金额",
-            "amountDue": "应付金额",
             "archivedOn": "归档日期",
             "archivedSince": "归档起始",
             "coworker": "同事",
             "coworkers": "同事",
             "coworkersSaved": "已保存的同事",
             "created": "创建时间",
-            "declinedOn": "拒付日期",
             "deletedOn": "删除日期",
             "included": "包含",
             "lastOpened": "上次打开",
             "pausedSince": "暂停起始",
             "renewsOn": "续订日期",
-            "run": "运行",
             "runs": "运行次数",
             "savedUntil": "保存至",
-            "source": "来源",
             "then": "之后",
             "trialEnded": "试用已结束",
             "trialEnds": "试用结束",
@@ -42,13 +38,8 @@
         "publishedAccessCode": "打开 {pageTitle} 的验证码：{code}",
         "lifetimeCode": "您的 Rerun 终身兑换码：{code}",
         "workspaceInvite": "您受邀加入 Rerun 上的 {workspaceName}",
-        "runFailed": "{agentName} 遇到了错误",
-        "agentDone": "{agentName} 完成了一项任务",
-        "agentInfo": "{agentName} 需要您的关注",
-        "agentInput": "{agentName} 需要您的回复",
         "appNotice": "{appName}：需要操作",
-        "incidentResolved": "{agentName} 已恢复正常",
-        "budgetExhausted": "您的 Rerun 积分已用完",
+        "budgetExhausted": "{workspace} 的 Rerun 积分已用完",
         "onboardingResume": "您的 Rerun 设置尚未完成",
         "agentRecommendations": "{count, plural, other {# 位适合 {company} 的 Rerun 同事}}",
         "agentIdle": "{agentName} 已就绪，但还没有运行过",
@@ -60,7 +51,7 @@
         "trialFinalNoticeNoCard": "您的 Rerun 试用将于 2 小时后结束，请添加银行卡以让同事继续运行",
         "trialEndedPaymentFailed": "您的首次 Rerun 付款失败，工作区将于 24 小时后暂停",
         "trialEndedNoCard": "您的 Rerun 试用已结束，工作区将于 2 小时后暂停",
-        "paymentFailed": "您的 Rerun 付款被拒，工作区将于 24 小时后暂停",
+        "paymentFailed": "付款被拒：您的工作区将于 24 小时后暂停",
         "subscriptionEnding": "{daysLeft, plural, =1 {您的 Rerun 订阅将于明天结束} other {您的 Rerun 订阅将于 # 天后结束}}",
         "archiveExpiring": "{kind, select, sandbox {您已归档的 Rerun 沙盒将于 {date} 删除} other {您已暂停的 Rerun 工作区将于 {date} 删除}}",
         "sandboxIdle": "除非您打开，否则您的 Rerun 沙盒将于 {date} 归档",
@@ -118,55 +109,45 @@
         "fallbackAgent": "您的同事"
     },
     "runFailed": {
-        "preview": "{agentName} 遇到了错误",
-        "heading": "运行失败",
-        "body": "您的同事 <strong>{agentName}</strong> 因错误而停止。"
+        "heading": "{agentName} 因错误而停止",
+        "button": "查看出错原因"
     },
     "budgetExhausted": {
-        "preview": "您的 Rerun 积分已用完",
-        "heading": "Rerun 积分已用完",
-        "bodyNamed": "<strong>{workspaceName}</strong> 本月的 Rerun 积分已用完。使用 Rerun 模型的定时运行和触发运行将暂停，直到积分重置或您添加积分。",
-        "bodyUnnamed": "您工作区本月的 Rerun 积分已用完。使用 Rerun 模型的定时运行和触发运行将暂停，直到积分重置或您添加积分。",
-        "ownKeys": "使用自己 API 密钥的同事会继续运行。",
+        "heading": "您的 Rerun 积分已用完",
+        "body": "使用 Rerun 模型的定时运行和触发运行将暂停至 {date}，或直到您添加积分。使用自己 API 密钥的同事会继续运行。",
+        "bodyNoReset": "使用 Rerun 模型的定时运行和触发运行将暂停，直到您添加积分。使用自己 API 密钥的同事会继续运行。",
         "button": "添加积分"
     },
     "agentNotification": {
-        "done": {
-            "preview": "{agentName}：任务已完成",
-            "heading": "任务已完成",
-            "body": "您的同事 <strong>{agentName}</strong> 完成了一项任务。"
-        },
-        "info": {
-            "preview": "{agentName}：需要您的关注",
-            "heading": "需要您的关注",
-            "body": "您的同事 <strong>{agentName}</strong> 希望您查看一些内容。"
-        },
         "question": {
-            "preview": "{agentName}：同事有一个问题",
-            "heading": "同事有一个问题",
-            "body": "您的同事 <strong>{agentName}</strong> 需要您的回答才能继续。"
+            "heading": "{agentName} 有一个问题",
+            "button": "回答"
         },
         "approval": {
-            "preview": "{agentName}：需要批准",
-            "heading": "需要批准",
-            "body": "您的同事 <strong>{agentName}</strong> 正在等待您的批准。"
+            "heading": "{agentName} 需要您的批准",
+            "button": "批准或拒绝"
         },
         "connector": {
-            "preview": "{agentName}：应用设置",
-            "heading": "应用设置",
-            "body": "您的同事 <strong>{agentName}</strong> 需要您连接一项服务。"
+            "heading": "{agentName} 需要 {app}",
+            "headingUnnamed": "{agentName} 需要一个应用",
+            "button": "连接 {app}"
         }
     },
-    "incidentResolved": {
-        "preview": "{agentName} 的{source}已恢复正常",
-        "heading": "已恢复正常",
-        "body": "<strong>{agentName}</strong> 的{source}已再次正常运行。除非它再次出错，否则您不会再收到相关邮件。",
-        "sources": {
-            "schedule": "计划“{slug}”",
-            "anySchedule": "一个定时任务",
-            "trigger": "触发器“{slug}”",
-            "anyTrigger": "一个触发器",
-            "conversation": "一个对话"
+    "accountSignedOut": {
+        "more": "{count, plural, other {另外 # 位}}",
+        "subscription": {
+            "subject": "{account} 已退出登录：{count, plural, other {# 位同事已停止}}",
+            "heading": "{account} 已退出登录",
+            "body": "{count, plural, other {您登录后，{workspace} 的 {coworkers} 会立即恢复运行。}}",
+            "bodyUnnamed": "您登录后，{workspace} 中使用 {account} 的同事会立即恢复运行。",
+            "button": "登录 {account}"
+        },
+        "key": {
+            "subject": "{account} 拒绝了您的密钥：{count, plural, other {# 位同事已停止}}",
+            "heading": "{account} 拒绝了您的密钥",
+            "body": "{count, plural, other {您更新密钥后，{workspace} 的 {coworkers} 会立即恢复运行。}}",
+            "bodyUnnamed": "您更新密钥后，{workspace} 中使用 {account} 的同事会立即恢复运行。",
+            "button": "更新密钥"
         }
     },
     "agentIdle": {
@@ -245,13 +226,16 @@
         "footnoteWithoutAgent": "从您已有的同事开始，或从零为市场创建新作品。"
     },
     "paymentFailed": {
-        "preview": "您的 Rerun 付款被拒，工作区将于 {pausedAt} 暂停",
         "heading": "您的付款被拒",
-        "declined": "<strong>{workspace}</strong> 的续订付款于 <strong>{date}</strong> 未能完成。可能只是您的银行需要您确认一下。",
-        "declinedWithAmount": "<strong>{workspace}</strong> 的续订付款 <strong>{amount}</strong> 于 <strong>{date}</strong> 未能完成。可能只是您的银行需要您确认一下。",
-        "consequences": "您的工作区会继续运行至 <strong>{pausedAt}</strong>。之后它将被<strong>暂停</strong>，您的同事也会停止工作。不会删除任何内容：您的同事及他们知道的一切会保存至 <strong>{keptUntil}</strong>。支付账单后一切照旧，套餐不变。",
-        "button": "支付账单",
-        "footnote": "我们会在接下来几天再次尝试扣款。只要其中一次成功，您的工作区就会继续运行；如果已经暂停，也会自动恢复。"
+        "renewal": {
+            "bodyWithAmount": "{workspace} 的续订（{amount}）未成功。您的同事将于 {pausedAt} 停止。不会删除任何内容。",
+            "body": "{workspace} 的续订未成功。您的同事将于 {pausedAt} 停止。不会删除任何内容。"
+        },
+        "first": {
+            "bodyWithAmount": "{workspace} 的首次付款（{amount}）未成功。您的同事将于 {pausedAt} 停止。不会删除任何内容。",
+            "body": "{workspace} 的首次付款未成功。您的同事将于 {pausedAt} 停止。不会删除任何内容。"
+        },
+        "button": "支付账单"
     },
     "renewalReminder": {
         "preview": "您的 Rerun 套餐将于 {date} 续订",

@@ -132,14 +132,14 @@
             },
             "email": {
                 "label": "E-mail",
-                "description": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais un par exécution."
+                "description": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais plus de 3 par jour."
             }
         },
         "accountEmails": {
             "title": "E-mails du compte",
             "billing": {
                 "label": "Essai et facturation",
-                "description": "Rappels d'essai et avis de facturation concernant votre abonnement."
+                "description": "Rappels d'essai, avis de facturation, et alertes quand un compte IA ou vos crédits arrêtent vos coworkers."
             },
             "product": {
                 "label": "Nouveautés produit",
@@ -153,7 +153,7 @@
         "coworkerTitle": "Notifications des coworkers",
         "email": {
             "label": "E-mail",
-            "description": "Quand un coworker a besoin de vous ou tombe en panne pendant votre absence. Un e-mail par incident, jamais un par exécution."
+            "description": "Quand un coworker a besoin de vous ou tombe en panne pendant votre absence. Un e-mail par incident, jamais plus de 3 par jour."
         },
         "saveFailed": "Impossible d'enregistrer les préférences",
         "saving": "Enregistrement…",
