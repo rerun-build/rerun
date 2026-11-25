@@ -6,7 +6,7 @@ import { deleteBrainPageAction, listBrainFileMetaAction, listBrainProposalsActio
 import { BrainBoxView } from '@/components/brain/BrainBoxView'
 import { BrainFileView, BrainFolderView } from '@/components/brain/BrainFiles'
 import { BrainImportDialog } from '@/components/brain/BrainImportDialog'
-import { BrainNewPage } from '@/components/brain/BrainNewPage'
+import { BrainNewPage, type BrainNewPageDraft } from '@/components/brain/BrainNewPage'
 import { BrainPage } from '@/components/brain/BrainPage'
 import { BrainPageHistory } from '@/components/brain/BrainPageHistory'
 import { PageColumn } from '@/components/brain/BrainPageParts'
@@ -95,6 +95,8 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
     const [tablesError, setTablesError] = useState<string | null>(null)
     const [seeding, setSeeding] = useState(false)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    // Set while a new page is being written; null once it is created or left.
+    const [newPageDraft, setNewPageDraft] = useState<BrainNewPageDraft | null>(null)
     const [uploadDir, setUploadDir] = useState('')
     // The Box the import files what comes in under; undefined while the import is closed.
     const [importSpaceId, setImportSpaceId] = useState<string | null | undefined>(undefined)
@@ -158,11 +160,12 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
 
     const select = useCallback(
         (next: BrainSelection) => {
-            if (next.kind === 'page' && selectionRef.current?.kind === 'page' && selectionRef.current.slug === next.slug) {
+            if ((next.kind === 'page' || next.kind === 'new-page') && selectionKey(selectionRef.current) === selectionKey(next)) {
                 setSidebarOpen(false)
                 return
             }
             setSelection(next)
+            setNewPageDraft(next.kind === 'new-page' ? { title: '', type: 'note', spaceId: next.spaceId ?? null } : null)
             setSidebarOpen(false)
             if (next.kind === 'page') void loadPage(next.slug)
         },
@@ -336,6 +339,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             savedPage(detail)
             setPageState({ slug: detail.page.slug, detail, missing: false, version: 1 })
             setSelection({ kind: 'page', slug: detail.page.slug })
+            setNewPageDraft(null)
             void reloadOverview()
         },
         [savedPage, reloadOverview],
@@ -536,7 +540,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                 )
             }
             case 'new-page':
-                return <BrainNewPage pages={pages} titles={titles} files={files.knownFiles} onOpenPage={openPage} onOpenFile={openFile} onCreated={createdPage} />
+                return newPageDraft && <BrainNewPage draft={newPageDraft} boxes={filing.boxes} onDraftChange={setNewPageDraft} pages={pages} titles={titles} files={files.knownFiles} onOpenPage={openPage} onOpenFile={openFile} onCreated={createdPage} />
             case 'proposals':
                 return <BrainProposalsPanel proposals={available ? proposals : []} onDecided={proposalDecided} onOpenPage={openPage} />
             case 'published':
@@ -614,6 +618,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             files={files}
             tables={tables}
             filing={filing}
+            newPageDraft={selection?.kind === 'new-page' ? newPageDraft : null}
             searchRef={searchRef}
             onSelect={select}
             onImport={openImport}

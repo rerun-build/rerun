@@ -3,7 +3,8 @@ import type { KnowledgeBaseTab } from '@/lib/settings/panels'
 export type BrainSelection =
     | { kind: 'page'; slug: string }
     | { kind: 'history'; slug: string }
-    | { kind: 'new-page' }
+    // A page not written yet, filed under this Box once it has a title (Everyone without one).
+    | { kind: 'new-page'; spaceId?: string | null }
     | { kind: 'proposals' }
     | { kind: 'published' }
     | { kind: 'folder'; path: string }
@@ -34,6 +35,8 @@ export function selectionKey(selection: BrainSelection | null): string {
             return `box:${selection.spaceId}`
         case 'skill':
             return `skill:${selection.slug}`
+        case 'new-page':
+            return `new-page:${selection.spaceId ?? ''}`
         default:
             return selection.kind
     }

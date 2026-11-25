@@ -2,6 +2,7 @@
 
 import type { FileEntry } from '@/app/api/_actions/workspace-file.actions'
 import { SHARED_FILE_DRAG_TYPE } from '@/components/brain/editor/file-link'
+import type { BrainNewPageDraft } from '@/components/brain/BrainNewPage'
 import type { BrainSelection } from '@/components/brain/selection'
 import { joinPath, type SharedFileRef, type SharedFilesTree } from '@/components/brain/useSharedFilesTree'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,8 @@ type BrainSidebarProps = {
     // Null while the shared database is being listed.
     tables: EngineDbTable[] | null
     filing: BrainFiling
+    // The page being written, shown in its Box until it is created.
+    newPageDraft: BrainNewPageDraft | null
     searchRef: Ref<HTMLInputElement>
     onSelect: (selection: BrainSelection) => void
     // Opens the import, set to file what comes in under this Box (null for everyone).
@@ -40,6 +43,9 @@ type BrainSidebarProps = {
 }
 
 const NO_SKILLS: BrainSkill[] = []
+
+// What only shows on hover stays there on a phone, on a touch screen, and while the row has the keyboard focus.
+const SHOWN_WITHOUT_HOVER = 'max-sm:flex [@media(pointer:coarse)]:flex group-focus-within/row:flex'
 
 function fileIcon(file: BrainFileMeta): LucideIcon {
     if (file.kind === 'dir') return FolderIcon
@@ -56,10 +62,16 @@ function SidebarRow({
     draggableFile,
     tooltip,
     expanded,
+    placeholder,
+    fresh,
     onClick,
 }: {
     icon: LucideIcon
     label: string
+    // The label is a stand-in (an untitled page), drawn fainter.
+    placeholder?: boolean
+    // Lights up once as it appears.
+    fresh?: boolean
     tooltip?: string
     active: boolean
     depth?: number
@@ -92,13 +104,14 @@ function SidebarRow({
             title={tooltip}
             style={{ paddingInlineStart: `${0.5 + depth * 0.875}rem` }}
             className={cn(
-                'group/row flex h-7 w-full cursor-pointer items-center gap-1.5 rounded-md pe-1.5 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50',
+                'group/row flex h-7 w-full cursor-pointer items-center gap-1.5 rounded-md pe-1.5 text-start text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 max-sm:h-9',
                 active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+                fresh && 'animate-[brain-row-fresh_1.2s_ease-out]',
             )}
         >
             {leading}
             <Glyph className="size-3.5 shrink-0" />
-            <span className="min-w-0 flex-1 truncate">{label}</span>
+            <span className={cn('min-w-0 flex-1 truncate', placeholder && 'text-muted-foreground/60')}>{label}</span>
             {trailing}
         </div>
     )
@@ -174,8 +187,9 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
 
 // One tree for everything the workspace shares, as Notion keeps its pages and databases side by
 // side: what agents proposed, the company pages, the shared folder and the shared database.
-export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = false, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onImport }: BrainSidebarProps) {
+export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = false, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, newPageDraft, searchRef, onSelect, onImport }: BrainSidebarProps) {
     const t = useTranslations('brain.sidebar')
+    const tCrumbs = useTranslations('brain.crumbs')
     const boxLabel = useBoxLabel()
     const [query, setQuery] = useState('')
     const everyone = pagesOfBox(null, pages, filing.boxes)
@@ -219,10 +233,15 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
     const boxRows = (boxId: string) => {
         const boxPages = pagesOfBox(boxId, pages, filing.boxes)
         const boxFiles = filesOfBox(boxId, filing.files)
-        const holdsSelection = boxPages.some(isSelected) || boxFiles.some(file => isFileSelected(file.path)) || (selection?.kind === 'box' && selection.spaceId === boxId)
+        const draft = newPageDraft?.spaceId === boxId ? newPageDraft : null
+        const holdsSelection = Boolean(draft) || boxPages.some(isSelected) || boxFiles.some(file => isFileSelected(file.path)) || (selection?.kind === 'box' && selection.spaceId === boxId)
         const open = boxesExpanded[boxId] ?? holdsSelection
         const box = filing.boxes.find(entry => entry.id === boxId) ?? null
         const name = boxLabel(box)
+        const newPageHere = () => {
+            setBoxesExpanded(current => ({ ...current, [boxId]: true }))
+            onSelect({ kind: 'new-page', spaceId: boxId })
+        }
         return (
             <div key={boxId}>
                 <SidebarRow
@@ -243,13 +262,42 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                             <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90 rtl:-rotate-90')} />
                         </button>
                     }
-                    trailing={<span className="text-[11px] tabular-nums text-muted-foreground/70">{boxPages.length + boxFiles.length}</span>}
+                    trailing={
+                        <>
+                            <span className="min-w-4 text-center text-[11px] tabular-nums text-muted-foreground/70 group-hover/row:hidden">{boxPages.length + boxFiles.length + (draft ? 1 : 0)}</span>
+                            <Button
+                                size="icon-xs"
+                                variant="ghost"
+                                aria-label={t('newPageIn', { name })}
+                                title={t('newPageIn', { name })}
+                                className={cn('hidden size-5 shrink-0 text-muted-foreground hover:bg-foreground/10 hover:text-foreground group-hover/row:flex max-sm:size-7', SHOWN_WITHOUT_HOVER)}
+                                onClick={event => {
+                                    event.stopPropagation()
+                                    newPageHere()
+                                }}
+                            >
+                                <PlusIcon />
+                            </Button>
+                        </>
+                    }
                     onClick={() => {
                         setBoxesExpanded(current => ({ ...current, [boxId]: true }))
                         onSelect({ kind: 'box', spaceId: boxId })
                     }}
                 />
                 {open && boxPages.map(page => pageRow(page, 1))}
+                {open && draft && (
+                    <SidebarRow
+                        icon={BRAIN_PAGE_ICONS[draft.type]}
+                        label={draft.title.trim() || tCrumbs('untitled')}
+                        placeholder={!draft.title.trim()}
+                        fresh
+                        depth={1}
+                        leading={<span className="w-3.5 shrink-0" />}
+                        active
+                        onClick={() => selection && onSelect(selection)}
+                    />
+                )}
                 {open &&
                     boxFiles.map(file => {
                         const folder = file.kind === 'dir'
@@ -267,6 +315,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                             />
                         )
                     })}
+                {open && <SidebarRow icon={PlusIcon} label={t('newPage')} depth={1} leading={<span className="w-3.5 shrink-0" />} active={false} onClick={newPageHere} />}
             </div>
         )
     }
@@ -374,7 +423,7 @@ export function BrainSidebar({ pages, skills = NO_SKILLS, skillsAvailable = fals
                                     </>
                                 )}
                                 {others.map(page => pageRow(page))}
-                                <SidebarRow icon={PlusIcon} label={t('newPage')} active={selection?.kind === 'new-page'} onClick={() => onSelect({ kind: 'new-page' })} />
+                                <SidebarRow icon={PlusIcon} label={t('newPage')} active={selection?.kind === 'new-page' && !newPageDraft?.spaceId} onClick={() => onSelect({ kind: 'new-page' })} />
                             </>
                         )}
 

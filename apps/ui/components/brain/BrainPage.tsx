@@ -2,7 +2,7 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { BrainEditor, type BrainEditorHandle } from '@/components/brain/editor/BrainEditor'
-import { BrainFilingProperties, useBoxLabel } from '@/components/brain/BrainItemProperties'
+import { BrainFilingProperties, useFilingCrumbs } from '@/components/brain/BrainItemProperties'
 import { PageColumn, PageProperty, PageTitle, PageTypeIcon, PageTypeSelect, UnconfirmedSections } from '@/components/brain/BrainPageParts'
 import { BrainTopBar } from '@/components/brain/BrainTopBar'
 import type { SharedFileRef } from '@/components/brain/useSharedFilesTree'
@@ -11,11 +11,11 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { confirmBrainSectionsAction, setBrainPageMetaAction } from '@/app/api/_actions/brain.actions'
 import { useBrainAutosave, type AutosaveStatus } from '@/hooks/useBrainAutosave'
-import { addedByOf, boxOfItem, type BrainFiling } from '@/lib/brain/items'
+import { addedByOf, type BrainFiling } from '@/lib/brain/items'
 import { brainAuthorLabel, brainSourceLabels } from '@/lib/brain/labels'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import type { BrainPageDetail } from '@/lib/engine/client'
-import { BoxIcon, ChevronRightIcon, CopyIcon, EllipsisIcon, HistoryIcon, Trash2Icon } from '@/lib/icons'
+import { ChevronRightIcon, CopyIcon, EllipsisIcon, HistoryIcon, Trash2Icon } from '@/lib/icons'
 import { shortRelativeTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import type { BrainItemMetaPatch, BrainPage as BrainPageData, BrainPageSummary, BrainPageType, BrainProposal } from '@rerun/contracts'
@@ -90,7 +90,7 @@ export function BrainPage({ detail, pages, titles, files, proposal, filing, tagS
     const [deleting, setDeleting] = useState(false)
     const [confirming, setConfirming] = useState(false)
     const editorHandle = useRef<BrainEditorHandle>(null)
-    const boxLabel = useBoxLabel()
+    const filingCrumbs = useFilingCrumbs()
     // Shown at once, then replaced by what the engine kept; put back if it refused.
     const [filed, setFiled] = useState({ tags: page.tags, spaceId: page.spaceId })
 
@@ -131,12 +131,11 @@ export function BrainPage({ detail, pages, titles, files, proposal, filing, tagS
         else toast.error(errorText(result))
     }
 
-    const section = boxLabel(boxOfItem(filed.spaceId, filing.boxes))
     const status = saveLabel(autosave.status, page, locale, tPage)
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={[{ label: section, icon: BoxIcon }, { label: title.trim() || t('crumbs.untitled'), icon: BRAIN_PAGE_ICONS[type] }]} status={status && <span className={cn(autosave.status === 'error' && 'text-destructive')} title={autosave.error ?? undefined}>{status}</span>}>
+            <BrainTopBar crumbs={[...filingCrumbs(filed.spaceId, filing.boxes), { label: title.trim() || t('crumbs.untitled'), icon: BRAIN_PAGE_ICONS[type] }]} status={status && <span className={cn(autosave.status === 'error' && 'text-destructive')} title={autosave.error ?? undefined}>{status}</span>}>
                 <Button size="icon-sm" variant="ghost" onClick={onHistory} aria-label={tPage('versionHistory')} title={tPage('versionHistory')}>
                     <HistoryIcon />
                 </Button>

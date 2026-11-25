@@ -1,6 +1,7 @@
 'use client'
 
 import { PageProperty } from '@/components/brain/BrainPageParts'
+import type { BrainCrumb } from '@/components/brain/BrainTopBar'
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -137,6 +138,26 @@ export function BrainBoxSelect({ value, boxes, onChange, className }: { value: s
     )
 }
 
+// The Box property of a page or a file, set inline like the other properties under its title.
+export function BrainBoxProperty({ spaceId, boxes, onChange }: { spaceId: string | null; boxes: BrainBox[]; onChange: (spaceId: string | null) => void }) {
+    const t = useTranslations('brain.filing')
+    return (
+        <PageProperty label={t('box')}>
+            <BrainBoxSelect value={spaceId} boxes={boxes} onChange={onChange} className="-ms-2 max-w-full border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent" />
+        </PageProperty>
+    )
+}
+
+// Where a page sits, as the top bar shows it: Boxes, then its Box, or Everyone.
+export function useFilingCrumbs() {
+    const t = useTranslations('brain.crumbs')
+    const boxLabel = useBoxLabel()
+    return (spaceId: string | null, boxes: BrainBox[]): BrainCrumb[] => {
+        const box = boxOfItem(spaceId, boxes)
+        return box ? [{ label: t('boxes') }, { label: boxLabel(box), icon: BoxIcon }] : [{ label: boxLabel(null), icon: BoxIcon }]
+    }
+}
+
 // Who put the item in the Brain: a coworker drawn as itself, a person, or the import from the website.
 export function BrainAddedBy({ author, filing }: { author: string | null; filing: BrainFiling }) {
     const t = useTranslations('brain')
@@ -165,14 +186,7 @@ export function BrainFilingProperties({ spaceId, tags, author, filing, suggestio
     const t = useTranslations('brain.filing')
     return (
         <>
-            <PageProperty label={t('box')}>
-                <BrainBoxSelect
-                    value={spaceId}
-                    boxes={filing.boxes}
-                    onChange={next => onChange({ spaceId: next })}
-                    className="-ms-2 max-w-full border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent"
-                />
-            </PageProperty>
+            <BrainBoxProperty spaceId={spaceId} boxes={filing.boxes} onChange={next => onChange({ spaceId: next })} />
             <PageProperty label={t('tags')}>
                 <BrainTagEditor tags={tags} suggestions={suggestions} onChange={next => onChange({ tags: next })} />
             </PageProperty>

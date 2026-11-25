@@ -177,6 +177,7 @@
         "company": "Empresa",
         "notOnBox": "Ainda não está nesta Box",
         "newPage": "Nova página",
+        "newPageIn": "Nova página em {name}",
         "products": "Produtos",
         "database": "Banco de dados",
         "noTables": "Nenhuma tabela ainda",

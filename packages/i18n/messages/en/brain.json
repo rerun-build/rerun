@@ -228,6 +228,7 @@
         "company": "Company",
         "notOnBox": "Not on this box yet",
         "newPage": "New page",
+        "newPageIn": "New page in {name}",
         "products": "Products",
         "database": "Database",
         "noTables": "No tables yet",

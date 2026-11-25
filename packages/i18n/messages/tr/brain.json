@@ -177,6 +177,7 @@
         "company": "Şirket",
         "notOnBox": "Henüz bu Box'ta yok",
         "newPage": "Yeni sayfa",
+        "newPageIn": "{name} içinde yeni sayfa",
         "products": "Ürünler",
         "database": "Veritabanı",
         "noTables": "Henüz tablo yok",

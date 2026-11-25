@@ -177,6 +177,7 @@
         "company": "החברה",
         "notOnBox": "עדיין לא ב-Box הזה",
         "newPage": "דף חדש",
+        "newPageIn": "דף חדש ב{name}",
         "products": "מוצרים",
         "database": "מסד נתונים",
         "noTables": "עדיין אין טבלאות",

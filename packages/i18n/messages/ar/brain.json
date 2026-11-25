@@ -177,6 +177,7 @@
         "company": "الشركة",
         "notOnBox": "غير متوفر على هذا الـ Box بعد",
         "newPage": "صفحة جديدة",
+        "newPageIn": "صفحة جديدة في {name}",
         "products": "المنتجات",
         "database": "قاعدة البيانات",
         "noTables": "لا توجد جداول بعد",

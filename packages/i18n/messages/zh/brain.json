@@ -177,6 +177,7 @@
         "company": "公司",
         "notOnBox": "此 Box 上尚未提供",
         "newPage": "新建页面",
+        "newPageIn": "在 {name} 中新建页面",
         "products": "产品",
         "database": "数据库",
         "noTables": "暂无数据表",

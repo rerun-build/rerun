@@ -177,6 +177,11 @@ html:not(.dark) .progress-fill {
   50% { opacity: 0.9; }
 }
 
+/* Only a start: the row then fades into its own background, the accent of the selected row included. */
+@keyframes brain-row-fresh {
+  from { background-color: color-mix(in oklab, var(--brand) 22%, transparent); }
+}
+
 @keyframes agent-shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-1.5px); }
