@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { TEAM_SIGN_IN_PARAM } from '@/lib/auth/team-session'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'
 import { confirmLogin } from './actions'
@@ -7,8 +8,8 @@ import { getTranslations } from 'next-intl/server'
 
 // Opening the link does not sign in: the emailed token works once and the browser's prefetch would
 // spend it. The click, a POST through a server action, consumes it and opens the session.
-export default async function ConfirmPage({ searchParams }: { searchParams: Promise<{ token_hash?: string; type?: string }> }) {
-    const { token_hash, type } = await searchParams
+export default async function ConfirmPage({ searchParams }: { searchParams: Promise<{ token_hash?: string; type?: string; [TEAM_SIGN_IN_PARAM]?: string }> }) {
+    const { token_hash, type, [TEAM_SIGN_IN_PARAM]: team } = await searchParams
     const t = await getTranslations('auth.confirm')
 
     if (!token_hash || !type) {
@@ -31,6 +32,7 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
                 <form action={confirmLogin}>
                     <input type="hidden" name="token_hash" value={token_hash} />
                     <input type="hidden" name="type" value={type} />
+                    {team && <input type="hidden" name={TEAM_SIGN_IN_PARAM} value={team} />}
                     <Button type="submit" size="lg" className="w-full">
                         {t('submit')}
                     </Button>

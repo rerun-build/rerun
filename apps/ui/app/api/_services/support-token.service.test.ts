@@ -1,28 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fakeSupabase, writeMethodOf, type SupabaseCall } from '@/test/supabase-fake'
+import { fakeSupabase } from '@/test/supabase-fake'
 
 const support = vi.hoisted(() => ({ SUPPORT_CHAT_ENABLED: true }))
 vi.mock('@rerun/cloud/support', () => support)
 
 const { supportChatTokenOf } = await import('./support-token.service')
 
-const USER = 'user-ada'
+const KEYS: Record<string, string | null> = { 'user-ada': 'key-ada', 'user-grace': 'key-grace', 'user-deleted': null }
 
-// The table as Postgres keeps it: one row per person, the key drawn by the database on insert, an
-// insert that finds the row already there leaves it as it is.
-function tokenTable(rows: { user_id: string; token: string }[] = [], fail = false) {
-    let drawn = 0
-    return fakeSupabase((table, calls: readonly SupabaseCall[]) => {
-        if (table !== 'user_support_tokens') return undefined
-        if (fail) return { error: { message: 'relation does not exist' } }
-        const userId = calls.find(call => call.method === 'eq' && call.args[0] === 'user_id')?.args[1]
-        if (writeMethodOf(calls) === 'upsert') {
-            const { user_id } = calls.find(call => call.method === 'upsert')!.args[0] as { user_id: string }
-            if (!rows.some(row => row.user_id === user_id)) rows.push({ user_id, token: `token-${++drawn}` })
-            return { data: null }
-        }
-        return { data: rows.find(row => row.user_id === userId) ?? null }
+function usersTable() {
+    return fakeSupabase((table, calls) => {
+        if (table !== 'users') return undefined
+        const id = calls.find(call => call.method === 'eq' && call.args[0] === 'id')?.args[1] as string
+        return { data: id in KEYS ? { support_token: KEYS[id] } : null }
     })
 }
 
@@ -31,45 +22,33 @@ beforeEach(() => {
 })
 
 describe('supportChatTokenOf', () => {
-    it('makes the key the first time, then hands back the same one on every device', async () => {
-        const db = tokenTable()
+    it('reads the key of that person, and writes nothing', async () => {
+        const db = usersTable()
 
-        const first = await supportChatTokenOf(db.client, USER)
-        const second = await supportChatTokenOf(db.client, USER)
-
-        expect(first).toBe('token-1')
-        expect(second).toBe(first)
-        expect(db.writes('user_support_tokens').map(write => write.method)).toEqual(['upsert'])
+        await expect(supportChatTokenOf(db.client, 'user-ada')).resolves.toBe('key-ada')
+        await expect(supportChatTokenOf(db.client, 'user-grace')).resolves.toBe('key-grace')
+        expect(db.writes('users')).toEqual([])
     })
 
-    it('never replaces a key already made', async () => {
-        const db = tokenTable([{ user_id: USER, token: 'kept' }])
+    it('has no key for a deleted account, nor for one without a row yet', async () => {
+        const db = usersTable()
 
-        await expect(supportChatTokenOf(db.client, USER)).resolves.toBe('kept')
-        expect(db.writes('user_support_tokens')).toEqual([])
+        await expect(supportChatTokenOf(db.client, 'user-deleted')).resolves.toBeNull()
+        await expect(supportChatTokenOf(db.client, 'user-unknown')).resolves.toBeNull()
     })
 
-    it('gives each person a key of their own', async () => {
-        const db = tokenTable()
-
-        const ada = await supportChatTokenOf(db.client, USER)
-        const grace = await supportChatTokenOf(db.client, 'user-grace')
-
-        expect(grace).not.toBe(ada)
-    })
-
-    it('makes no key where there is no support chat', async () => {
+    it('reads nothing where there is no support chat', async () => {
         support.SUPPORT_CHAT_ENABLED = false
-        const db = tokenTable()
+        const db = usersTable()
 
-        await expect(supportChatTokenOf(db.client, USER)).resolves.toBeNull()
+        await expect(supportChatTokenOf(db.client, 'user-ada')).resolves.toBeNull()
         expect(db.calls).toEqual([])
     })
 
     it('leaves the chat without a key rather than failing the page', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {})
-        const db = tokenTable([], true)
+        const db = fakeSupabase(() => ({ error: { message: 'column does not exist' } }))
 
-        await expect(supportChatTokenOf(db.client, USER)).resolves.toBeNull()
+        await expect(supportChatTokenOf(db.client, 'user-ada')).resolves.toBeNull()
     })
 })

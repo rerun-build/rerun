@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
+import { fakeSupabase } from '@/test/supabase-fake'
 
 import { loadMe, messageAuthorOf, readMe } from './me.service'
 const getAuthUser = vi.fn()
@@ -34,7 +35,7 @@ describe('readMe', () => {
 })
 
 describe('loadMe', () => {
-    const context = (authUser: object) => ({ ...contextWith({ subscription_status: 'trialing', is_sandbox: false }), userLocale: 'fr', authUser }) as unknown as WorkspaceContext
+    const context = (authUser: object) => ({ ...contextWith({ subscription_status: 'trialing', is_sandbox: false }), userLocale: 'fr', authUser, supabase: fakeSupabase().client }) as unknown as WorkspaceContext
 
     it('answers the language and the name the session already holds, with no read of its own', async () => {
         getAuthUser.mockReset()

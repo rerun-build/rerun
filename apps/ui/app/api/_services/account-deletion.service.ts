@@ -99,7 +99,6 @@ async function erasePersonalData(admin: Client, userId: string) {
         admin.from('user_presence').delete().eq('user_id', userId),
         admin.from('open_chats').delete().eq('user_id', userId),
         admin.from('open_chat_states').delete().eq('user_id', userId),
-        admin.from('user_support_tokens').delete().eq('user_id', userId),
         admin
             .from('newsletter_recipients')
             .update<NewsletterRecipientUpdate>({ email: deletedAccountEmailFor(userId) })
@@ -115,7 +114,7 @@ async function erasePersonalData(admin: Client, userId: string) {
         if (error) throw new Error(error.message)
     }
 
-    const { error } = await admin.from('users').update<UserUpdate>({ deleted_at: new Date().toISOString(), onboarding_answers: null }).eq('id', userId)
+    const { error } = await admin.from('users').update<UserUpdate>({ deleted_at: new Date().toISOString(), onboarding_answers: null, support_token: null }).eq('id', userId)
     if (error) throw new Error(error.message)
 }
 

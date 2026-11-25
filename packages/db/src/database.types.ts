@@ -3677,32 +3677,6 @@ export type Database = {
           },
         ]
       }
-      user_support_tokens: {
-        Row: {
-          created_at: string
-          token: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          token?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          token?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_support_tokens_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           account_role: Database["public"]["Enums"]["account_role"]
@@ -3716,6 +3690,7 @@ export type Database = {
           onboarding_answers: Json | null
           onboarding_completed_at: string | null
           signed_up_at: string | null
+          support_token: string | null
           verified: boolean
           workspace_id: number
         }
@@ -3731,6 +3706,7 @@ export type Database = {
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
+          support_token?: string | null
           verified?: boolean
           workspace_id: number
         }
@@ -3746,6 +3722,7 @@ export type Database = {
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
+          support_token?: string | null
           verified?: boolean
           workspace_id?: number
         }

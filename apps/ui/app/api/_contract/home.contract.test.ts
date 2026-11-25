@@ -43,7 +43,7 @@ const tables = {
         { user_id: 'user-grace', workspace_id: 7, role: 'member', box_scope: 'assigned', organization_staff: false },
     ],
     workspaces: [{ id: 7, name: 'Atelier Nord', icon_url: null, plan: 'pro', is_sandbox: false, subscription_status: 'active' }],
-    user_support_tokens: [{ user_id: 'user-ada', token: '0b6c1f3e-5a2d-4c8e-9f17-3d2a6b8e4c51' }],
+    users: [{ id: 'user-ada', support_token: '0b6c1f3e-5a2d-4c8e-9f17-3d2a6b8e4c51' }],
 }
 
 const users: Record<string, { id: string; email: string; user_metadata: Record<string, string> }> = {

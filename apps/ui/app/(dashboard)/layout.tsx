@@ -12,6 +12,7 @@ import { WorkspaceViewProvider } from '@/components/workspace-view/WorkspaceView
 import { FOREMAN_PLACEMENT_COOKIE, parseForemanPlacement } from '@/lib/foreman-layout'
 import { FOREMAN_OPEN_COOKIE, parseForemanOpen } from '@/lib/foreman-open'
 import { parseWorkspaceView, WORKSPACE_VIEW_COOKIE } from '@/lib/workspace-view'
+import { isTeamSession, TEAM_SESSION_COOKIE } from '@/lib/auth/team-session'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { supportChatTokenOf } from '@/app/api/_services/support-token.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -36,14 +37,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
     startBackgroundSchedules()
     const [apps, session, hostBrand, hostScope] = await Promise.all([paidAppFlags(), getServerSession(), getBrand(), requestHostScope()])
     if (hostScope?.organizationId && session.session && !session.user) return <NoHostAccess organizationId={hostScope.organizationId} userId={session.session.id} />
+    const cookieStore = await cookies()
+    // The team on a customer's account must not open that customer's conversation. On Rerun's address the
+    // key is there whatever the workspace: going from a managed one to another reloads nothing.
+    const opensAccountChat = !isWhiteLabel(hostBrand) && !isTeamSession(cookieStore.get(TEAM_SESSION_COOKIE)?.value, session.user?.id)
     const [brand, supportChatToken] = await Promise.all([
         !isWhiteLabel(hostBrand) && session.workspace && isManagedWorkspace(session.workspace) ? workspaceBrand(session.workspace.id) : hostBrand,
-        session.user ? supportChatTokenOf(createServiceRoleClient(), session.user.id) : null,
+        session.user && opensAccountChat ? supportChatTokenOf(createServiceRoleClient(), session.user.id) : null,
     ])
     // The session this request already verified, so the browser does not read it again before the board.
     const initialSession: InitialSession | null = session.user && session.workspace && session.membership ? { user: session.user, workspace: session.workspace, role: session.membership.role, boxScope: session.membership.box_scope, organizationStaff: session.membership.organization_staff } : null
     // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
-    const cookieStore = await cookies()
     const foremanOpen = parseForemanOpen(cookieStore.get(FOREMAN_OPEN_COOKIE)?.value)
     const foremanPlacement = parseForemanPlacement(cookieStore.get(FOREMAN_PLACEMENT_COOKIE)?.value)
     const workspaceView = parseWorkspaceView(cookieStore.get(WORKSPACE_VIEW_COOKIE)?.value)

@@ -3,6 +3,7 @@
 import { LAST_SIGN_IN_COOKIE, LAST_SIGN_IN_MAX_AGE_SECONDS } from '@/lib/auth/last-sign-in-cookie'
 import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
+import { TEAM_SESSION_COOKIE, TEAM_SESSION_MAX_AGE_SECONDS, TEAM_SIGN_IN_PARAM, TEAM_SIGN_IN_VALUE } from '@/lib/auth/team-session'
 import { routes } from '@/lib/routes'
 import { createClient } from '@/supabase/server'
 import { captureServer } from '@rerun/analytics/server'
@@ -18,10 +19,12 @@ export async function confirmLogin(formData: FormData) {
     const cookieStore = await cookies()
 
     let ok = false
+    let userId: string | undefined
     if (tokenHash && type) {
         const supabase = await createClient()
         const { data, error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
         ok = !error
+        userId = data.user?.id
         const email = data.user?.email
         if (ok && email) {
             const sentAt = cookieStore.get('rr_verif_sent_at')?.value
@@ -31,6 +34,11 @@ export async function confirmLogin(formData: FormData) {
     }
     if (!ok) redirect(routes.authCodeError)
     cookieStore.set(LAST_SIGN_IN_COOKIE, 'email', { path: '/', maxAge: LAST_SIGN_IN_MAX_AGE_SECONDS, sameSite: 'lax' })
+    if (userId && formData.get(TEAM_SIGN_IN_PARAM) === TEAM_SIGN_IN_VALUE) {
+        cookieStore.set(TEAM_SESSION_COOKIE, userId, { path: '/', maxAge: TEAM_SESSION_MAX_AGE_SECONDS, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', httpOnly: true })
+    } else {
+        cookieStore.delete(TEAM_SESSION_COOKIE)
+    }
 
     const pendingInvite = cookieStore.get(PENDING_INVITE_COOKIE)?.value
     if (pendingInvite) cookieStore.delete(PENDING_INVITE_COOKIE)
