@@ -5,7 +5,7 @@ vi.mock('@/lib/og/shot', () => ({ capturePage }))
 
 const { GET } = await import('./route')
 
-const get = (look: string) => GET(new Request(`https://app.rerun.build/og/coworker/${look}`), { params: Promise.resolve({ look }) })
+const get = (look: string) => GET(new Request(`https://app.rerun.build/og/coworker/${look}`), { params: Promise.resolve({ look: look.split('?')[0] }) })
 
 describe('GET /og/coworker/[look]', () => {
     beforeEach(() => capturePage.mockReset())
@@ -25,6 +25,16 @@ describe('GET /og/coworker/[look]', () => {
         const answers = await Promise.all([get('wink-flat-e935c1-felt'), get('wink-flat-e935c1-felt'), get('wink-flat-e935c1-felt')])
         expect(answers.map(answer => answer.status)).toEqual([200, 200, 200])
         expect(capturePage).toHaveBeenCalledTimes(1)
+    })
+
+    it('captures the bare portrait apart, on no background', async () => {
+        capturePage.mockResolvedValue({ body: Buffer.from('png'), contentType: 'image/png' })
+        await get('pill-smile-0f52ff-felt')
+        await get('pill-smile-0f52ff-felt?bare=right')
+        expect(capturePage.mock.calls.map(([path, options]) => [path.includes('bare=right'), options.transparent])).toEqual([
+            [false, false],
+            [true, true],
+        ])
     })
 
     it('refuses a look nobody can wear without starting a browser', async () => {

@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { AgentStatus, BoardAgent } from '@rerun/ui/iso-grid'
 import { z } from 'zod'
 
+import { alertBoardSchema, ALERT_BOARD_SIZE, type AlertBoard } from './alert-board'
 import { CARD_HEIGHT, CARD_THEME, CARD_THEMES, CARD_WIDTH } from './size'
 
 // No 'server-only': the URL of a board image is also built from the Trigger.dev lifecycle tasks,
@@ -42,8 +43,14 @@ const boardImageOptionsSchema = z.object({
 })
 export type BoardImageOptions = z.input<typeof boardImageOptionsSchema>
 
+// A whole board, or the close-up an alert email opens on.
+const boardImageSceneSchema = z.union([alertBoardSchema, boardSceneSchema])
+export type BoardImageScene = z.output<typeof boardImageSceneSchema>
+
+export const isAlertBoard = (scene: BoardImageScene): scene is AlertBoard => 'kind' in scene
+
 export type BoardImageRequest = z.output<typeof boardImageOptionsSchema> & {
-    scene: z.output<typeof boardSceneSchema>
+    scene: BoardImageScene
     // The signed query as it was verified, signature included: the capture route hands it on to the
     // render page, which checks it a second time.
     query: string
@@ -65,11 +72,11 @@ function sign(query: string): string {
 // Every capture starts a browser, and the render page draws whatever text it is given on our own
 // domain: only a URL our server built is honoured. Sorted so the signature does not depend on the
 // order a mail client or a proxy puts the parameters back in.
-export function signedBoardImageQuery(scene: BoardScene, options: BoardImageOptions = {}): string {
+export function signedBoardImageQuery(scene: BoardScene | AlertBoard, options: BoardImageOptions = {}): string {
     boardImageOptionsSchema.parse(options)
 
     const params = new URLSearchParams()
-    params.set('scene', Buffer.from(JSON.stringify(boardSceneSchema.parse(scene)), 'utf8').toString('base64url'))
+    params.set('scene', Buffer.from(JSON.stringify(boardImageSceneSchema.parse(scene)), 'utf8').toString('base64url'))
     for (const [option, param] of Object.entries(PARAM_OF_OPTION)) {
         const value = options[option as keyof BoardImageOptions]
         if (value !== undefined) params.set(param, String(value))
@@ -79,14 +86,18 @@ export function signedBoardImageQuery(scene: BoardScene, options: BoardImageOpti
     return params.toString()
 }
 
-export function boardImageUrl(scene: BoardScene, options: BoardImageOptions = {}, appUrl: string = APP_URL): string {
+export function boardImageUrl(scene: BoardScene | AlertBoard, options: BoardImageOptions = {}, appUrl: string = APP_URL): string {
     return `${appUrl}/og/board?${signedBoardImageQuery(scene, options)}`
+}
+
+export function alertBoardUrl(board: AlertBoard): string {
+    return boardImageUrl(board, ALERT_BOARD_SIZE)
 }
 
 function readScene(raw: string | null) {
     if (!raw) return null
     try {
-        const parsed = boardSceneSchema.safeParse(JSON.parse(Buffer.from(raw, 'base64url').toString('utf8')))
+        const parsed = boardImageSceneSchema.safeParse(JSON.parse(Buffer.from(raw, 'base64url').toString('utf8')))
         return parsed.success ? parsed.data : null
     } catch {
         return null
@@ -118,7 +129,7 @@ export function readBoardImageRequest(search: URLSearchParams): BoardImageReques
 
 // A buddy takes its face and its colour from its tile id, so the id is the name: the same coworker
 // keeps the same look from one picture to the next, wherever it stands on the board.
-export function boardAgentsOfScene(scene: BoardImageRequest['scene'], knownConnectorSlugs: ReadonlySet<string>): BoardAgent[] {
+export function boardAgentsOfScene(scene: z.output<typeof boardSceneSchema>, knownConnectorSlugs: ReadonlySet<string>): BoardAgent[] {
     const seen = new Map<string, number>()
     return scene.agents.map(agent => {
         const count = seen.get(agent.name) ?? 0

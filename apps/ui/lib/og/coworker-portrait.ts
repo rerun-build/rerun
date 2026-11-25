@@ -23,6 +23,18 @@ export function coworkerPortraitUrl(agentId: string, look: CoworkerLook | null):
     return `${APP_URL}/og/coworker/${portraitSlug(agentId, look)}?v=${PORTRAIT_VERSION}`
 }
 
+// The same buddy alone, turned towards the words it says: beside its message in an email, on a dark card.
+export const BARE_PARAM = 'bare'
+
+const BARE_SIDES = ['left', 'right'] as const
+export type BareSide = (typeof BARE_SIDES)[number]
+
+export const bareSideOf = (value: string | null | undefined): BareSide | null => BARE_SIDES.find(side => side === value) ?? null
+
+export function bareCoworkerPortraitUrl(agentId: string, look: CoworkerLook | null, facing: BareSide): string {
+    return `${coworkerPortraitUrl(agentId, look)}&${BARE_PARAM}=${facing}`
+}
+
 export function portraitOfSlug(slug: string): CoworkerPortrait | null {
     if (slug === FOREMAN_AGENT_ID) return { kind: 'foreman' }
     const [eyesPart, mouthPart, colorPart, materialPart, ...rest] = slug.split('-')

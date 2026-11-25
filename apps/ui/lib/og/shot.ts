@@ -29,7 +29,7 @@ function renderOrigin(requestUrl: string): string {
 // shoots once the page has loaded.
 export async function capturePage(
     path: string,
-    { requestUrl, width, height, scale = 1, format, fresh, waitFor = OG_READY_SELECTOR, dark }: { requestUrl: string; width: number; height: number; scale?: number; format: CaptureFormat; fresh?: boolean; waitFor?: string | null; dark?: boolean },
+    { requestUrl, width, height, scale = 1, format, fresh, waitFor = OG_READY_SELECTOR, dark, transparent }: { requestUrl: string; width: number; height: number; scale?: number; format: CaptureFormat; fresh?: boolean; waitFor?: string | null; dark?: boolean; transparent?: boolean },
 ): Promise<Capture> {
     const endpoint = new URL('/screenshot', SHOT_URL)
     endpoint.searchParams.set('url', new URL(path, renderOrigin(requestUrl)).toString())
@@ -41,6 +41,7 @@ export async function capturePage(
     endpoint.searchParams.set('timeout', String(CAPTURE_TIMEOUT_MS))
     if (fresh) endpoint.searchParams.set('cache', '0')
     if (dark !== undefined) endpoint.searchParams.set('dark', dark ? '1' : '0')
+    if (transparent) endpoint.searchParams.set('transparent', '1')
 
     const res = await fetch(endpoint, {
         headers: SHOT_API_KEY ? { Authorization: `Bearer ${SHOT_API_KEY}` } : undefined,
