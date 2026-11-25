@@ -3,6 +3,7 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
 import { Database } from '@/app/api/database.types'
 import { routes } from '@/lib/routes'
+import { resetCrisp } from '@/lib/crisp'
 import { parsePriceArm, PRICE_EXPERIMENT_KEY, PRICE_PROPERTY, isSubscriptionEntitled, TRIAL_CARD_PROPERTY, trialArm } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { useBoardStore } from '@/stores/board.store'
@@ -139,9 +140,11 @@ export function SessionProvider({ children, initial = null, hostScope = null }: 
             // replaces them is asynchronous. Dropping them here, loading flags included, is what
             // keeps everything reading the session from deciding on that stale identity in between.
             const nextUserId = session?.user?.id ?? null
-            const switchedAccount = event !== 'INITIAL_SESSION' && event !== 'SIGNED_OUT' && nextUserId !== sessionUserId.current
+            const previousUserId = sessionUserId.current
+            const switchedAccount = event !== 'INITIAL_SESSION' && event !== 'SIGNED_OUT' && nextUserId !== previousUserId
             sessionUserId.current = nextUserId
             if (switchedAccount) {
+                if (previousUserId) resetCrisp()
                 setUser(null)
                 setUserLoading(true)
                 setWorkspace(null)
@@ -157,6 +160,7 @@ export function SessionProvider({ children, initial = null, hostScope = null }: 
                 useBoardStore.getState().reset()
                 clearTabWorkspace()
                 posthog.reset()
+                resetCrisp()
                 // The middleware clears it too, but the navigation that follows a sign-out can be
                 // served from the router cache without ever reaching it, and the landing would keep
                 // offering a dashboard to someone who just left.

@@ -2,8 +2,10 @@ import { placeholderPhone, realEmail } from '@/lib/auth/placeholder-email'
 
 type CrispCommand = [string, string, unknown[]?]
 
+type CrispWindow = Window & { $crisp?: CrispCommand[]; CRISP_TOKEN_ID?: string | null }
+
 function crisp(): CrispCommand[] | undefined {
-    return (window as Window & { $crisp?: CrispCommand[] }).$crisp
+    return (window as CrispWindow).$crisp
 }
 
 // Crisp only knows the visitor by what it is told: without the email, the team reads an anonymous
@@ -31,4 +33,13 @@ export function sendToCrisp({ email, workspaceId, text }: { email: string | null
     identify(email, workspaceId != null ? { workspace_id: String(workspaceId), source: 'foreman' } : { source: 'foreman' })
     crisp()?.push(['do', 'message:send', ['text', text]])
     openCrisp()
+}
+
+// At a sign-out or a switch of account. The widget stays loaded in the tab, and without this the next
+// account to sign in on this browser would read the conversation of the one that left.
+export function resetCrisp() {
+    const target = window as CrispWindow
+    if (!target.$crisp) return
+    target.CRISP_TOKEN_ID = null
+    target.$crisp.push(['do', 'session:reset'])
 }

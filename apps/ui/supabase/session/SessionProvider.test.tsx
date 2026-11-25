@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
     urlWorkspace: null as number | null,
     tabWorkspace: null as number | null,
     signOut: vi.fn<(options?: { scope: string }) => Promise<void>>(async () => {}),
+    resetCrisp: vi.fn(),
 }))
 
 // Every read waits until the test lets it through: what the provider shows before that came from
@@ -61,6 +62,7 @@ vi.mock('posthog-js', () => ({ default: { register: () => {}, unregister: () => 
 vi.mock('@rerun/analytics/client', () => ({ track: () => {}, readAttribution: () => ({}), getCookie: () => undefined, identifyPerson: () => {}, setSharedCookie: () => {}, deleteSharedCookie: () => {} }))
 vi.mock('@rerun/analytics/experiments', () => ({ experimentProperties: () => ({}), readExperimentCookie: () => ({}), STALE_EXPERIMENT_PROPERTIES: [], writeExperimentVariants: () => {} }))
 vi.mock('@rerun/cloud/billing', () => ({ parsePriceArm: () => null, PRICE_EXPERIMENT_KEY: 'price', PRICE_PROPERTY: 'price', isSubscriptionEntitled: () => false, TRIAL_CARD_PROPERTY: 'trial', trialArm: () => null }))
+vi.mock('@/lib/crisp', () => ({ resetCrisp: mocks.resetCrisp }))
 vi.mock('@rerun/cloud/phone', () => ({ PHONE_STATUS_COLUMNS: ['user_id'], phoneStatusOf: () => 'verified' }))
 
 const { SessionProvider, useSession } = await import('./SessionProvider')
@@ -104,6 +106,7 @@ beforeEach(() => {
     mocks.rows = { users: USER, workspaces: WORKSPACE, workspace_members: { role: 'member', box_scope: 'assigned', workspace_id: 7 } }
     mocks.urlWorkspace = null
     mocks.tabWorkspace = null
+    mocks.resetCrisp.mockClear()
     root = createRoot(document.createElement('div'))
 })
 
@@ -198,5 +201,32 @@ describe('SessionProvider signing out', () => {
         await authEvent('INITIAL_SESSION', 'u1')
         await act(async () => seen.signOut())
         expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({ scope: 'local' })
+    })
+})
+
+// The support chat stays loaded in the tab: whoever signs in next on this browser must not read the
+// conversation of the account that left.
+describe('SessionProvider and the support chat', () => {
+    it('empties it when the account signs out', async () => {
+        await mount(INITIAL)
+        await authEvent('INITIAL_SESSION', 'u1')
+        await authEvent('SIGNED_OUT', null)
+        expect(mocks.resetCrisp).toHaveBeenCalledOnce()
+    })
+
+    it('empties it when another account signs in in its place', async () => {
+        await mount(INITIAL)
+        await authEvent('INITIAL_SESSION', 'u1')
+        await authEvent('SIGNED_IN', 'u2')
+        expect(mocks.resetCrisp).toHaveBeenCalledOnce()
+    })
+
+    it('keeps it for the same account, and on a first sign-in', async () => {
+        await mount(null)
+        await authEvent('INITIAL_SESSION', null)
+        await authEvent('SIGNED_IN', 'u1')
+        await authEvent('TOKEN_REFRESHED', 'u1')
+        await authEvent('SIGNED_IN', 'u1')
+        expect(mocks.resetCrisp).not.toHaveBeenCalled()
     })
 })
