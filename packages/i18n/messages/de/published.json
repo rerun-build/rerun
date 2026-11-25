@@ -80,7 +80,7 @@
     },
     "share": {
         "title": "Teilen",
-        "description": "Wähle, wer diesen Link öffnen kann.",
+        "description": "Wer diese Seite öffnen kann und was sie mit deinen Daten tun darf.",
         "updateFailed": "Link konnte nicht aktualisiert werden",
         "unpublishFailed": "Veröffentlichung konnte nicht aufgehoben werden",
         "unpublish": "Veröffentlichung aufheben",
@@ -93,7 +93,32 @@
         "invite": "E-Mails oder Domains einladen",
         "removeInvite": "{entry} entfernen",
         "copyLink": "Link kopieren",
-        "copied": "Kopiert"
+        "copied": "Kopiert",
+        "data": {
+            "title": "Live-Daten",
+            "empty": "Diese Seite zeigt, was sie bei der Veröffentlichung enthielt.",
+            "addTable": "Tabelle hinzufügen",
+            "rows": "{count, plural, one {# Zeile} other {# Zeilen}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "Workspace",
+            "grant": {
+                "read": {
+                    "label": "Kann ansehen",
+                    "hint": "Besucher sehen ihre Zeilen, live"
+                },
+                "write": {
+                    "label": "Kann ansehen und hinzufügen",
+                    "hint": "Besucher können auch Zeilen hinzufügen und bearbeiten"
+                },
+                "off": {
+                    "label": "Kein Zugriff",
+                    "hint": "Die Seite sieht diese Tabelle nicht"
+                }
+            },
+            "publicWrite": "Jeder mit dem Link kann den Tabellen dieser Seite Zeilen hinzufügen.",
+            "updateFailed": "Ändern, was diese Seite mit deinen Daten tun darf, hat nicht geklappt",
+            "loadFailed": "Die Tabellen dieses Workspace konnten nicht gelesen werden"
+        }
     },
     "policy": {
         "label": "Öffentliche Links",

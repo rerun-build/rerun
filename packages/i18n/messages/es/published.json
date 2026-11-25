@@ -80,7 +80,7 @@
     },
     "share": {
         "title": "Compartir",
-        "description": "Elige quién puede abrir este enlace.",
+        "description": "Quién puede abrir esta página y qué puede hacer con tus datos.",
         "updateFailed": "No se pudo actualizar el enlace",
         "unpublishFailed": "No se pudo despublicar",
         "unpublish": "Despublicar",
@@ -93,7 +93,32 @@
         "invite": "Invitar emails o dominios",
         "removeInvite": "Quitar {entry}",
         "copyLink": "Copiar enlace",
-        "copied": "Copiado"
+        "copied": "Copiado",
+        "data": {
+            "title": "Datos en vivo",
+            "empty": "Esta página muestra lo que tenía cuando se publicó.",
+            "addTable": "Añadir una tabla",
+            "rows": "{count, plural, one {# fila} other {# filas}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "Workspace",
+            "grant": {
+                "read": {
+                    "label": "Puede ver",
+                    "hint": "Los visitantes ven sus filas, en vivo"
+                },
+                "write": {
+                    "label": "Puede ver y añadir",
+                    "hint": "Los visitantes también pueden añadir y editar filas"
+                },
+                "off": {
+                    "label": "Sin acceso",
+                    "hint": "La página no puede ver esta tabla"
+                }
+            },
+            "publicWrite": "Cualquiera con el enlace puede añadir filas a las tablas de esta página.",
+            "updateFailed": "No se pudo cambiar lo que esta página puede hacer con tus datos",
+            "loadFailed": "No se pudieron leer las tablas de este workspace"
+        }
     },
     "policy": {
         "label": "Enlaces públicos",

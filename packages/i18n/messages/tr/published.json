@@ -80,7 +80,7 @@
     },
     "share": {
         "title": "Paylaş",
-        "description": "Bu bağlantıyı kimlerin açabileceğini seçin.",
+        "description": "Bu sayfayı kimlerin açabileceği ve verilerinizle neler yapabileceği.",
         "updateFailed": "Bağlantı güncellenemedi",
         "unpublishFailed": "Yayından kaldırılamadı",
         "unpublish": "Yayından kaldır",
@@ -93,7 +93,32 @@
         "invite": "E-posta veya alan adı davet et",
         "removeInvite": "{entry} kaldır",
         "copyLink": "Bağlantıyı kopyala",
-        "copied": "Kopyalandı"
+        "copied": "Kopyalandı",
+        "data": {
+            "title": "Canlı veriler",
+            "empty": "Bu sayfa, yayınlandığı andaki içeriği gösterir.",
+            "addTable": "Tablo ekle",
+            "rows": "{count, plural, other {# satır}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "Çalışma alanı",
+            "grant": {
+                "read": {
+                    "label": "Görüntüleyebilir",
+                    "hint": "Ziyaretçiler satırlarını canlı olarak görür"
+                },
+                "write": {
+                    "label": "Görüntüleyebilir ve ekleyebilir",
+                    "hint": "Ziyaretçiler satır da ekleyip düzenleyebilir"
+                },
+                "off": {
+                    "label": "Erişim yok",
+                    "hint": "Sayfa bu tabloyu göremez"
+                }
+            },
+            "publicWrite": "Bağlantıya sahip herkes bu sayfanın tablolarına satır ekleyebilir.",
+            "updateFailed": "Bu sayfanın verilerinizle neler yapabileceği değiştirilemedi",
+            "loadFailed": "Bu çalışma alanının tabloları okunamadı"
+        }
     },
     "policy": {
         "label": "Herkese açık bağlantılar",

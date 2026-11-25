@@ -88,7 +88,7 @@ On Rerun Cloud, a published page is served from its own address under `rerun.sit
 
 ### Who can open a link
 
-Every link has an access, set in **Share settings** (**Share**: **Choose who can open this link.**):
+Every link has an access, set in **Share settings** (**Share**: **Who can open this page, and what it can do with your data.**):
 
 | Access | Who opens it |
 | --- | --- |
@@ -114,6 +114,28 @@ An admin sets **Public links** in the workspace **Settings**:
 | **Nothing goes public** | Workspace, password and invited links only |
 
 Turning public links off switches every public link of the workspace to its members once you save.
+
+### Pages that use your data
+
+A published page or site can read the workspace's database live, and add rows to it: a client directory, a lead tracker, a catalogue, a form that fills a table. Ask the coworker for the page ("make me a page that lists my clients from the `clients` table, with a form to add one"). It names the tables the page uses when it publishes, and the page then shows the rows as they are now, not as they were when it was published. A row a coworker adds shows up on the open page within a few seconds, without publishing again.
+
+**Share settings** lists those tables under **Live data**, with what the page may do with each:
+
+| Grant | What the page can do |
+| --- | --- |
+| **Can view** | Visitors see its rows, live |
+| **Can view and add** | Visitors can also add rows and edit them. They can never delete a row or change the table |
+| **No access** | Takes the table off the page |
+
+**Add a table** opens one more table to the page, from the workspace's database or from a coworker's own, and starts it at **Can view**. Nothing else of the database is reachable from the page, and the page's data opens to the same people as the page itself: a visitor who may not open the link reads nothing. When the link is open to anyone and a table takes rows, the dialog says so: **Anyone with the link can add rows to this page's tables.**
+
+Limits worth knowing:
+
+- A page reads at most 200 rows per request, and a visitor makes at most 120 reads a minute.
+- A visitor adds or edits at most 30 rows a minute and 120 an hour, and a page at most 600 an hour.
+- A value holds at most 10,000 characters, a row at most 50 columns and 64 KB.
+
+Only a page or a site reads tables: a PDF, an image or any other file published with tables gets none. A page built this way only reads its data once published: opened from the coworker's folder, it shows no rows.
 
 ## Getting data out
 

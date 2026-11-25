@@ -21,7 +21,17 @@
         "share.publicOff": "Why the Public option is greyed out. {workspace} is the name of the workspace.",
         "share.noEmail": "Why the Invited option is greyed out: this self-hosted server is not set up to send emails.",
         "share.passwordSet": "Placeholder of the password field when the link already has a password.",
-        "policy.label": "Workspace setting: who may make a published link public."
+        "policy.label": "Workspace setting: who may make a published link public.",
+        "share.description": "Under the title of the share dialog of a published page: it sets who can open the page and which tables of the workspace's database the page reads or writes.",
+        "share.data.title": "Heading of the list of database tables a published page reads live.",
+        "share.data.empty": "Shown in place of the list when the page reads no table: its content is frozen as it was published.",
+        "share.data.rows": "Number of rows in a database table.",
+        "share.data.tableMeta": "Under a table name: {owner} is whose database holds it (the workspace, or a coworker's name), {rows} the number of rows, already formatted.",
+        "share.data.workspace": "Names the workspace's shared database, as opposed to a coworker's own.",
+        "share.data.grant.read.label": "What a published page may do with a table: show its rows to visitors.",
+        "share.data.grant.write.label": "What a published page may do with a table: show its rows, and let visitors add and edit rows.",
+        "share.data.grant.off.label": "What a published page may do with a table: nothing, the table is taken off the page.",
+        "share.data.publicWrite": "Warning shown when the link is open to anyone and at least one table lets visitors add rows."
     },
     "access": {
         "short": {
@@ -104,7 +114,7 @@
     },
     "share": {
         "title": "Share",
-        "description": "Choose who can open this link.",
+        "description": "Who can open this page, and what it can do with your data.",
         "updateFailed": "Could not update the link",
         "unpublishFailed": "Could not unpublish",
         "unpublish": "Unpublish",
@@ -117,7 +127,32 @@
         "invite": "Invite emails or domains",
         "removeInvite": "Remove {entry}",
         "copyLink": "Copy link",
-        "copied": "Copied"
+        "copied": "Copied",
+        "data": {
+            "title": "Live data",
+            "empty": "This page shows what it held when it was published.",
+            "addTable": "Add a table",
+            "rows": "{count, plural, one {# row} other {# rows}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "Workspace",
+            "grant": {
+                "read": {
+                    "label": "Can view",
+                    "hint": "Visitors see its rows, live"
+                },
+                "write": {
+                    "label": "Can view and add",
+                    "hint": "Visitors can also add and edit rows"
+                },
+                "off": {
+                    "label": "No access",
+                    "hint": "The page cannot see this table"
+                }
+            },
+            "publicWrite": "Anyone with the link can add rows to this page's tables.",
+            "updateFailed": "Could not change what this page can do with your data",
+            "loadFailed": "Could not read the tables of this workspace"
+        }
     },
     "policy": {
         "label": "Public links",

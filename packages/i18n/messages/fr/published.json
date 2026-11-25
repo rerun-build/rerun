@@ -80,7 +80,7 @@
     },
     "share": {
         "title": "Partager",
-        "description": "Choisissez qui peut ouvrir ce lien.",
+        "description": "Qui peut ouvrir cette page, et ce qu'elle peut faire de vos données.",
         "updateFailed": "Impossible de modifier le lien",
         "unpublishFailed": "Impossible de dépublier",
         "unpublish": "Dépublier",
@@ -93,7 +93,32 @@
         "invite": "Inviter des e-mails ou des domaines",
         "removeInvite": "Retirer {entry}",
         "copyLink": "Copier le lien",
-        "copied": "Copié"
+        "copied": "Copié",
+        "data": {
+            "title": "Données en direct",
+            "empty": "Cette page montre ce qu'elle contenait au moment de sa publication.",
+            "addTable": "Ajouter une table",
+            "rows": "{count, plural, one {# ligne} other {# lignes}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "Workspace",
+            "grant": {
+                "read": {
+                    "label": "Peut voir",
+                    "hint": "Les visiteurs voient ses lignes, en direct"
+                },
+                "write": {
+                    "label": "Peut voir et ajouter",
+                    "hint": "Les visiteurs peuvent aussi ajouter et modifier des lignes"
+                },
+                "off": {
+                    "label": "Aucun accès",
+                    "hint": "La page ne voit pas cette table"
+                }
+            },
+            "publicWrite": "Toute personne qui a le lien peut ajouter des lignes aux tables de cette page.",
+            "updateFailed": "Impossible de changer ce que cette page peut faire de vos données",
+            "loadFailed": "Impossible de lire les tables de ce workspace"
+        }
     },
     "policy": {
         "label": "Liens publics",

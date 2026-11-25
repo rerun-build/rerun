@@ -80,7 +80,7 @@
     },
     "share": {
         "title": "分享",
-        "description": "选择谁可以打开此链接。",
+        "description": "谁可以打开此页面，以及它可以如何使用你的数据。",
         "updateFailed": "无法更新链接",
         "unpublishFailed": "无法取消发布",
         "unpublish": "取消发布",
@@ -93,7 +93,32 @@
         "invite": "邀请邮箱或域名",
         "removeInvite": "移除 {entry}",
         "copyLink": "复制链接",
-        "copied": "已复制"
+        "copied": "已复制",
+        "data": {
+            "title": "实时数据",
+            "empty": "此页面显示的是发布时的内容。",
+            "addTable": "添加表",
+            "rows": "{count, plural, other {# 行}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "工作区",
+            "grant": {
+                "read": {
+                    "label": "可查看",
+                    "hint": "访客可实时查看其中的行"
+                },
+                "write": {
+                    "label": "可查看和添加",
+                    "hint": "访客还可以添加和编辑行"
+                },
+                "off": {
+                    "label": "无权访问",
+                    "hint": "页面无法看到此表"
+                }
+            },
+            "publicWrite": "任何拥有链接的人都可以向此页面的表中添加行。",
+            "updateFailed": "无法更改此页面使用你数据的方式",
+            "loadFailed": "无法读取此工作区的表"
+        }
     },
     "policy": {
         "label": "公开链接",

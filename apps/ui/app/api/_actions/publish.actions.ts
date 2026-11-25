@@ -1,6 +1,6 @@
 'use server'
 
-import { assertAgentInWorkspace, isAdminActor, requireLightSessionActor, visibleAgentIds } from '@/app/api/_auth/access'
+import { assertAgentInWorkspace, isAdminActor, requireLightSessionActor, visibleAgentIds, type Actor } from '@/app/api/_auth/access'
 import { requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { EMAIL_DELIVERY } from '@rerun/cloud/email'
@@ -18,6 +18,8 @@ import {
     type AccessChange,
 } from '@/lib/services/publish'
 import { publishWithThumbnail } from '@/lib/services/publish-thumbnail'
+import { getPageData, updatePageData, type PageData } from '@/lib/services/published-data'
+import type { DataGrant } from '@/lib/published/data-grants'
 import type { PublishedFile } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -26,12 +28,16 @@ import type { ActionResult } from './space.actions'
 
 // A link is the coworker's that published it: reaching the link by its slug takes reaching that
 // coworker's Box, the way the coworker's Published tab does. An admin reaches them all.
-async function reachablePublishedWorkspaceId(slug: string): Promise<number> {
+async function reachablePublishedLink(slug: string): Promise<{ workspaceId: number; actor: Actor }> {
     const actor = await requireLightSessionActor()
-    if (isAdminActor(actor)) return actor.workspaceId
+    if (isAdminActor(actor)) return { workspaceId: actor.workspaceId, actor }
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'published_files', ['agent_id'] as const, { workspace_id: actor.workspaceId, slug })
     if (data) await assertAgentInWorkspace(data.agent_id, 'use', actor)
-    return actor.workspaceId
+    return { workspaceId: actor.workspaceId, actor }
+}
+
+async function reachablePublishedWorkspaceId(slug: string): Promise<number> {
+    return (await reachablePublishedLink(slug)).workspaceId
 }
 
 // Files an agent has published (see lib/services/publish.ts). Read by the Files tab
@@ -102,6 +108,25 @@ export async function updatePublishedAccessAction(slug: string, change: AccessCh
         if (change.access === 'invited' && !EMAIL_DELIVERY) return failure('noEmailForInvites')
         const file = await updatePublishedAccess(await reachablePublishedWorkspaceId(slug), slug, change)
         return { ok: true, file }
+    } catch (err) {
+        return failureOf(err, 'updateLinkFailed')
+    }
+}
+
+// The tables a page reads live, and the others of the machine the person may open to it.
+export async function getPublishedDataAction(slug: string): Promise<ActionResult<{ data: PageData }>> {
+    try {
+        const { workspaceId, actor } = await reachablePublishedLink(slug)
+        return { ok: true, data: await getPageData(workspaceId, slug, await visibleAgentIds(actor)) }
+    } catch (err) {
+        return failureOf(err, 'workspaceMachineUnreachable')
+    }
+}
+
+export async function updatePublishedDataAction(slug: string, grants: DataGrant[]): Promise<ActionResult<{ data: PageData }>> {
+    try {
+        const { workspaceId, actor } = await reachablePublishedLink(slug)
+        return { ok: true, data: await updatePageData(workspaceId, slug, grants, await visibleAgentIds(actor)) }
     } catch (err) {
         return failureOf(err, 'updateLinkFailed')
     }

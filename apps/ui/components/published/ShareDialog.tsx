@@ -17,12 +17,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useAwaitedThumbnail } from '@/hooks/useAwaitedThumbnail'
 import type { AccessChange } from '@/lib/services/publish'
 import type { PublishedAccess } from '@/lib/published/access'
+import { rendersAsPage } from '@/lib/published/host'
 import { publishedHostOf } from '@/lib/published/links'
 import type { PublishedFile } from '@/lib/services/types'
 import { CheckIcon, ChevronDownIcon, LinkIcon, Share2Icon, Trash2Icon, XIcon } from '@/lib/icons'
 
 import { ACCESS_ORDER, AccessIcon, useAccessCopy, useWorkspaceName } from './access'
 import { PublishedThumb } from './PublishedThumb'
+import { ShareLiveData } from './ShareLiveData'
 
 type ShareDialogProps = {
     open: boolean
@@ -107,9 +109,9 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
         <>
             <DialogHeaderBar icon={Share2Icon} title={t('share.title')} description={t('share.description')} />
 
-            <div className="@container relative h-44 shrink-0 overflow-hidden border-b bg-muted/30">
+            <div className="@container relative h-36 shrink-0 overflow-hidden border-b bg-muted/30 max-sm:h-28">
                 <Stripes fade="bottom" />
-                <div className="absolute inset-x-12 top-6 -bottom-px overflow-hidden rounded-t-lg shadow-[0_12px_32px_rgba(0,0,0,.18)] ring-1 ring-foreground/10 @max-sm:inset-x-8">
+                <div className="absolute inset-x-12 top-5 -bottom-px overflow-hidden rounded-t-lg shadow-[0_12px_32px_rgba(0,0,0,.18)] ring-1 ring-foreground/10 @max-sm:inset-x-8">
                     {file ? <PublishedThumb file={file} className="aspect-auto h-full rounded-none ring-0" /> : <Skeleton className="size-full rounded-none" />}
                 </div>
             </div>
@@ -128,10 +130,12 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
                 )}
             </div>
 
+            {file && rendersAsPage(file.kind, file.contentType) && <ShareLiveData slug={slug} access={shownAccess} />}
+
             {file && shownAccess === 'password' && <PasswordField hasPassword={file.hasPassword && file.access === 'password'} disabled={saving} onSave={password => save({ access: 'password', password })} />}
             {file && shownAccess === 'invited' && <InviteDetail invited={file.access === 'invited' ? file.invited : []} disabled={saving} onSave={invite => save({ access: 'invited', invite })} />}
 
-            <div className="flex items-center justify-between gap-2 px-4 py-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between gap-2 border-t px-4 py-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 {file ? (
                     <AccessTrigger
                         access={shownAccess}
