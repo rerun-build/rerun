@@ -23,14 +23,8 @@ async function resolve(scope: DataScope): Promise<{ conn: EngineConnection; base
 function describe(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
     if (/failed: 404\b/.test(message)) return refusal('dataNeedsEngineUpdate')
-    const body = /failed: \d+ (\{[\s\S]*\})$/.exec(message)?.[1]
-    if (body) {
-        try {
-            const parsed = JSON.parse(body) as { error?: unknown }
-            if (typeof parsed.error === 'string' && parsed.error) return { error: parsed.error }
-        } catch {}
-    }
-    return refusal(fallback)
+    const explained = engine.engineRefusal(err)
+    return explained ? { error: explained } : refusal(fallback)
 }
 
 export async function listTableViewsAction(scope: DataScope, table: string): Promise<ActionResult<{ views: TableView[] }>> {

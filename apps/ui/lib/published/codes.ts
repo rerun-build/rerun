@@ -59,6 +59,34 @@ export async function claimPasswordTry(slug: string, ip: string): Promise<boolea
     return perCaller && perLink
 }
 
+// A page whose tables take rows is a form anyone it opens for can post to: enough for a busy sign-up
+// sheet, not for a script filling the workspace's database.
+// A visitor's hourly share stays well under the link's, so one script cannot close the form to
+// everyone else.
+const MINUTE_SECONDS = 60
+const HOUR_SECONDS = 60 * 60
+const DATA_WRITES_PER_CALLER_MINUTE = 30
+const DATA_WRITES_PER_CALLER_HOUR = 120
+const DATA_WRITES_PER_LINK_HOUR = 600
+
+export async function claimDataWrite(slug: string, ip: string): Promise<boolean> {
+    const caller = callerRateKey(ip)
+    const claims = await Promise.all([
+        claim([`data-write:${slug}:${caller}`], DATA_WRITES_PER_CALLER_MINUTE, MINUTE_SECONDS),
+        claim([`data-write-hour:${slug}:${caller}`], DATA_WRITES_PER_CALLER_HOUR, HOUR_SECONDS),
+        claim([`data-write:${slug}`], DATA_WRITES_PER_LINK_HOUR, HOUR_SECONDS),
+    ])
+    return claims.every(Boolean)
+}
+
+// Every read reaches the workspace's machine: enough for about ten open tabs refreshing every five
+// seconds, not for a script hammering it.
+const DATA_READS_PER_CALLER_MINUTE = 120
+
+export async function claimDataRead(slug: string, ip: string): Promise<boolean> {
+    return claim([`data-read:${slug}:${callerRateKey(ip)}`], DATA_READS_PER_CALLER_MINUTE, MINUTE_SECONDS)
+}
+
 export type SendOutcome = 'sent' | 'silent' | 'limited'
 
 export async function sendAccessCode(entry: PublishedEntry, email: string, ip: string): Promise<SendOutcome> {

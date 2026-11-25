@@ -2226,6 +2226,7 @@ export type Database = {
           access_version: number
           agent_id: string
           content_type: string
+          data_tables: Json
           created_at: string
           files: string[] | null
           id: string
@@ -2249,6 +2250,7 @@ export type Database = {
           access_version?: number
           agent_id: string
           content_type?: string
+          data_tables?: Json
           created_at?: string
           files?: string[] | null
           id?: string
@@ -2272,6 +2274,7 @@ export type Database = {
           access_version?: number
           agent_id?: string
           content_type?: string
+          data_tables?: Json
           created_at?: string
           files?: string[] | null
           id?: string

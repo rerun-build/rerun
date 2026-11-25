@@ -2,6 +2,9 @@ import { callerIp } from '@/lib/auth/caller-ip'
 import { isInlineSafeContentType, siteContentType, withUtf8Charset } from '@/lib/files/content-type'
 import { cookieTtlMs, openAccessTicket } from '@/lib/published/access-ticket'
 import { injectBadge } from '@/lib/published/badge'
+import { answerDataRequest } from '@/lib/published/data-api'
+import { injectDataClient } from '@/lib/published/data-client'
+import { parseDataGrants } from '@/lib/published/data-grants'
 import { claimPasswordTry, normalizedEmail, sendAccessCode, verifyAccessCode } from '@/lib/published/codes'
 import {
     accessCookieHeader,
@@ -19,7 +22,7 @@ import {
     type GateError,
     type PublishedEntry,
 } from '@/lib/published/gate'
-import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
+import { extractPublishedSlug, publishedSiteOrigin, rendersAsPage } from '@/lib/published/host'
 import { injectPreviewMeta } from '@/lib/published/meta'
 import { publishedOgImage } from '@/lib/published/og-image'
 import { verifyPassword } from '@/lib/published/password'
@@ -135,6 +138,7 @@ async function serveObject(entry: PublishedEntry, request: Request, key: string,
     if (!html) return new Response(blob.stream(), { headers })
 
     let page = injectBadge(await blob.text(), entry.slug)
+    if (parseDataGrants(entry.data_tables).length > 0) page = injectDataClient(page)
     if (entry.access === 'public') page = injectPreviewMeta(page, await previewMetaFor(entry, request))
     return new Response(page, { headers })
 }
@@ -285,6 +289,20 @@ function reserved(path: string[]): string | null {
     return path[0] === '__rerun' ? path.slice(1).join('/') : null
 }
 
+function isDataPath(path: string[]): boolean {
+    return path[0] === '__rerun' && path[1] === 'data'
+}
+
+function mayOpenRequest(entry: PublishedEntry, request: Request): boolean {
+    return mayOpen(entry, readAccessCookie(request.headers.get('cookie'), isSecureRequest(request)))
+}
+
+// Only a page or a site runs the script that reads its tables: any other file has no data to serve.
+async function answerData(entry: PublishedEntry, request: Request, path: string[]): Promise<Response> {
+    if (!rendersAsPage(entry.kind, entry.content_type) || !mayOpenRequest(entry, request)) return notFound()
+    return answerDataRequest(entry, request, path.slice(2), originOf(entry.slug, request))
+}
+
 export async function GET(request: Request, context: Params): Promise<Response> {
     const target = await resolve(request, context)
     if (!target) return notFound()
@@ -296,8 +314,8 @@ export async function GET(request: Request, context: Params): Promise<Response> 
     if (action === 'og.png') return serveOgImage(entry)
     if (action === 'auth') return redeemTicket(entry, request)
 
-    const allowed = mayOpen(entry, readAccessCookie(request.headers.get('cookie'), isSecureRequest(request)))
-    if (!allowed) return notFound()
+    if (isDataPath(path)) return answerData(entry, request, path)
+    if (!mayOpenRequest(entry, request)) return notFound()
     if (action === 'raw') return serveRaw(entry, request)
     if (action !== null) return notFound()
     return serveContent(entry, request, path)
@@ -306,6 +324,7 @@ export async function GET(request: Request, context: Params): Promise<Response> 
 export async function POST(request: Request, context: Params): Promise<Response> {
     const target = await resolve(request, context)
     if (!target?.entry) return notFound()
+    if (isDataPath(target.path)) return answerData(target.entry, request, target.path)
     switch (reserved(target.path)) {
         case 'password':
             return checkPassword(target.entry, request)
@@ -316,4 +335,10 @@ export async function POST(request: Request, context: Params): Promise<Response>
         default:
             return notFound()
     }
+}
+
+export async function PATCH(request: Request, context: Params): Promise<Response> {
+    const target = await resolve(request, context)
+    if (!target?.entry || !isDataPath(target.path)) return notFound()
+    return answerData(target.entry, request, target.path)
 }

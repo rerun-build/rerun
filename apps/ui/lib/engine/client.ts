@@ -208,6 +208,19 @@ async function fetchEngine(url: string, init: RequestInit): Promise<Response> {
     }
 }
 
+// The `{ error }` an engine answers a refusal it can explain with, out of the message `request` throws.
+export function engineRefusal(err: unknown): string | null {
+    const message = err instanceof Error ? err.message : ''
+    const body = /failed: \d+ (\{[\s\S]*\})$/.exec(message)?.[1]
+    if (!body) return null
+    try {
+        const parsed = JSON.parse(body) as { error?: unknown }
+        return typeof parsed.error === 'string' && parsed.error ? parsed.error : null
+    } catch {
+        return null
+    }
+}
+
 export async function request<T>(conn: EngineConnection, path: string, init: RequestInit, parse: (data: unknown) => T): Promise<T> {
     const signal = init.signal ?? AbortSignal.timeout(DEFAULT_TIMEOUT_MS)
     const res = await fetchEngine(`${conn.baseUrl}${path}`, { ...init, signal, headers: { ...buildHeaders(conn), ...(init.headers ?? {}) } })
@@ -371,8 +384,10 @@ export const agentDataBase = (agentId: string) => `/agents/${encodeURIComponent(
 export const agentFilesBase = (agentId: string) => `/agents/${encodeURIComponent(agentId)}/files`
 export const SPACE_DATA_BASE = '/shared/data'
 
-export async function listDbTables(conn: EngineConnection, base: string): Promise<EngineDbTable[]> {
-    return request(conn, `${base}/tables`, { method: 'GET' }, d => engineDbTablesListSchema.parse(d).tables)
+// `counts` asks for the rows of every table, which the engine counts one by one: only for a screen
+// that shows them. An engine that predates it answers without.
+export async function listDbTables(conn: EngineConnection, base: string, { counts = false }: { counts?: boolean } = {}): Promise<EngineDbTable[]> {
+    return request(conn, `${base}/tables${counts ? '?counts=1' : ''}`, { method: 'GET' }, d => engineDbTablesListSchema.parse(d).tables)
 }
 
 export async function queryDb(conn: EngineConnection, base: string, params: DbQueryInput): Promise<DbQueryResult> {
@@ -408,6 +423,10 @@ export async function readDbTableGroups(conn: EngineConnection, base: string, ta
 export async function updateDbTableRow(conn: EngineConnection, base: string, table: string, rowid: number | string, values: Record<string, string | number | boolean | null>): Promise<Record<string, unknown>> {
     const path = `${base}/tables/${encodeURIComponent(table)}/rows/${encodeURIComponent(String(rowid))}`
     return request(conn, path, { method: 'PATCH', body: JSON.stringify({ values }) }, d => engineRowUpdateResultSchema.parse(d).row)
+}
+
+export async function insertDbTableRow(conn: EngineConnection, base: string, table: string, values: Record<string, string | number | boolean | null>): Promise<Record<string, unknown>> {
+    return request(conn, `${base}/tables/${encodeURIComponent(table)}/rows`, { method: 'POST', body: JSON.stringify({ values }) }, d => engineRowUpdateResultSchema.parse(d).row)
 }
 
 // Where each row's paid data came from. The engine matches the values themselves, so the table the

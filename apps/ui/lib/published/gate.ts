@@ -24,7 +24,7 @@ export const GATE_ERROR_PARAM = 'rr_error'
 export const GATE_EMAIL_PARAM = 'rr_email'
 export type GateError = 'password' | 'code' | 'limited' | 'email'
 
-const PUBLISHED_ENTRY_COLUMNS = ['id', 'slug', 'workspace_id', 'agent_id', 'source_path', 'kind', 'content_type', 'size', 'storage_key', 'files', 'title', 'access', 'invited', 'password_hash', 'access_version', 'thumbnail_key', 'updated_at'] as const
+const PUBLISHED_ENTRY_COLUMNS = ['id', 'slug', 'workspace_id', 'agent_id', 'source_path', 'kind', 'content_type', 'size', 'storage_key', 'files', 'title', 'access', 'invited', 'password_hash', 'access_version', 'thumbnail_key', 'updated_at', 'data_tables'] as const
 
 type Row = Pick<Database['public']['Tables']['published_files']['Row'], (typeof PUBLISHED_ENTRY_COLUMNS)[number]>
 export type PublishedEntry = Omit<Row, 'access'> & { access: PublishedAccess }
