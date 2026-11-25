@@ -26,7 +26,7 @@ export function InviteMismatch({ inviteEmail, currentEmail, workspaceName }: { i
                 </p>
             </div>
             <Button className="w-full" onClick={switchAccount} loading={loading}>
-                {t('mismatch.switch', { email: inviteEmail })}
+                <span className="min-w-0 truncate">{t('mismatch.switch', { email: inviteEmail })}</span>
             </Button>
         </Card>
     )

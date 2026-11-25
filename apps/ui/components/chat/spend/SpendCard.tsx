@@ -6,6 +6,8 @@ import { Button, Icon } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
+import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
+import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { CoinsIcon } from '@/lib/icons'
 import { paidDataIcon } from '@/lib/paid-data/spend'
 import { cn } from '@/lib/utils'
@@ -15,13 +17,16 @@ type SpendCardProps = {
     quote: SpendQuote
     onSubmit: (decision: Omit<SpendDecision, 'purpose'>) => void
     onAddCredits?: () => void
+    // Hands the workspace its credit, in place of buying some.
+    manager?: WorkspaceManager | null
 }
 
 const isShort = (quote: SpendQuote) => quote.totalMicros > quote.creditLeftMicros
 
-export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardProps) {
+export function SpendCard({ request, quote, onSubmit, onAddCredits, manager }: SpendCardProps) {
     const t = useTranslations('chat.spend')
     const tTools = useTranslations('tools')
+    const tManaged = useTranslations('managed.credit')
     const locale = useLocale()
     const [submitted, setSubmitted] = useState(false)
     // Answering twice starts two runs on the same conversation: the latch has to be a ref.
@@ -67,13 +72,16 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
             </ul>
 
             {short && <MissingCredits quote={quote} />}
+            {short && manager && <p className="text-xs text-muted-foreground">{tManaged('out', { manager: manager.name })}</p>}
 
             {/* Narrow, the main answer takes a row of its own so three buttons never squeeze into one. */}
             <div className="grid grid-cols-2 gap-2 @sm:flex @sm:items-center">
                 <Button size="sm" variant="destructive" disabled={submitted} onClick={() => decide({ decision: 'declined' })} data-hitl="decline" className={cn('@sm:me-auto', short && 'col-span-2')}>
                     {t('notNow')}
                 </Button>
-                {short ? (
+                {short && manager ? (
+                    <ContactManagerButton manager={manager} size="sm" className="order-first col-span-2 @sm:order-none" />
+                ) : short ? (
                     <Button size="sm" variant="default" disabled={submitted} onClick={onAddCredits} className="order-first col-span-2 @sm:order-none">
                         {t('addCredits')}
                     </Button>

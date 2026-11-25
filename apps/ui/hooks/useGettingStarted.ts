@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { dismissGettingStartedAction, restoreGettingStartedAction } from '@/app/api/_actions/getting-started.actions'
 import { GETTING_STARTED_STEPS, isComplete, progressOf, rewardOf, type GettingStartedState, type GettingStartedStepId } from '@/lib/onboarding/getting-started'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { isPhoneStepDone } from '@rerun/cloud/phone'
 import { useForemanStore } from '@/stores/foreman.store'
 import { createClient } from '@/supabase/client'
@@ -36,6 +37,7 @@ async function syncGettingStarted(): Promise<SyncResult> {
 export function useGettingStarted({ enabled, onLiveStep }: { enabled: boolean; onLiveStep?: (live: LiveStep) => void }) {
     const { workspace, phoneStatus } = useSession()
     const workspaceId = workspace?.id
+    const sold = !isManagedWorkspace(workspace)
     const [items, setItems] = useState<ReadonlySet<string> | null>(null)
     const [visible, setVisible] = useState(false)
     const [dismissed, setDismissed] = useState(false)
@@ -87,7 +89,7 @@ export function useGettingStarted({ enabled, onLiveStep }: { enabled: boolean; o
                 setDismissed(true)
             }
             if (!STEP_IDS.has(row.item)) return
-            const complete = isComplete(progressOf(next, phoneRef.current))
+            const complete = isComplete(progressOf(next, phoneRef.current, { sold }))
             onLiveStep?.({ step: row.item as GettingStartedStepId, complete })
             if (complete && !next.has('reward')) void syncGettingStarted()
         },
@@ -109,10 +111,10 @@ export function useGettingStarted({ enabled, onLiveStep }: { enabled: boolean; o
         const previous = phoneRef.current
         phoneRef.current = phoneStatus
         if (!phoneStatus || !isPhoneStepDone(phoneStatus) || (previous !== 'skipped' && previous !== 'pending')) return
-        const complete = isComplete(progressOf(items, phoneStatus))
+        const complete = isComplete(progressOf(items, phoneStatus, { sold }))
         onLiveStep?.({ step: 'phone', complete })
         if (complete && !items.has('reward')) void syncGettingStarted()
-    }, [phoneStatus, enabled, items, onLiveStep])
+    }, [phoneStatus, enabled, items, onLiveStep, sold])
 
     const dismiss = useCallback(() => {
         setVisible(false)
@@ -130,8 +132,8 @@ export function useGettingStarted({ enabled, onLiveStep }: { enabled: boolean; o
 
     const state = useMemo<GettingStartedState | null>(() => {
         if (!items || !workspace) return null
-        return { progress: progressOf(items, phoneStatus), reward: rewardOf(items, workspace) }
-    }, [items, workspace, phoneStatus])
+        return { progress: progressOf(items, phoneStatus, { sold }), reward: sold ? rewardOf(items, workspace) : null }
+    }, [items, workspace, phoneStatus, sold])
 
     return { state: visible ? state : null, dismiss, restore }
 }

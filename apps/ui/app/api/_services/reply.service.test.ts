@@ -56,7 +56,7 @@ describe('replyToConversation', () => {
         expect(agentId).toBe('engine-agent')
         expect(params).toMatchObject({ sessionId: 'engine-session', author: { id: 'me' } })
         expect(params.message).toContain('1. **APPROVED** — Send 12 emails')
-        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', 'me', params.message)
+        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', expect.objectContaining({ userId: 'me' }), params.message)
     })
 
     it('refuses a card that is no longer the one waiting, on a second tap or once answered in the app', async () => {
@@ -104,6 +104,6 @@ describe('replyToConversation', () => {
         expect(getExistingSession).toHaveBeenCalledWith('conv-1', member)
         expect(readSessionTranscript).toHaveBeenCalledWith('conv-1', member)
         expect(engineChat.mock.calls[0][2]).toMatchObject({ author: { id: 'u-2', name: 'Ada', via: 'foreman' } })
-        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', 'u-2', expect.stringContaining('**APPROVED**'))
+        expect(recordMessageSent).toHaveBeenCalledWith('conv-1', member, expect.stringContaining('**APPROVED**'))
     })
 })

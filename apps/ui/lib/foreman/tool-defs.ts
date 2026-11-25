@@ -237,6 +237,9 @@ function describeTabs<T extends string>(tabs: readonly T[], labels: Record<T, st
     return tabs.map(tab => `\`${tab}\` ("${labels[tab]}": ${hints[tab]})`).join(', ')
 }
 
+const openSettingsDescription = (panels: readonly SettingsPanel[]): string =>
+    `Open one of the account panels in front of the user, over the board. Call it rather than describing where to click, whenever the answer lives in one of them: ${panels.includes('billing') ? 'a question about the plan or the invoice, ' : ''}a teammate to invite, notifications to turn down, a key to issue. The panels: ${describeTabs(panels, SETTINGS_PANEL_LABELS, SETTINGS_PANEL_HINTS)}. You only open them, you cannot change anything inside: the user sets it themselves, so say one line and wait rather than narrating the steps. The one exception is what coworkers run on, which you set yourself with update_agent and set_default_model; ai_providers is only where a subscription or a key is added, reconnected or removed.`
+
 export type PlanItemKind = ForemanPlanItem['kind']
 
 export const ALL_PLAN_KINDS: readonly PlanItemKind[] = ['agent', 'template', 'share']
@@ -594,7 +597,7 @@ export const FOREMAN_CLIENT_TOOL_DEFS = [
     },
     {
         name: 'open_settings',
-        description: `Open one of the account panels in front of the user, over the board. Call it rather than describing where to click, whenever the answer lives in one of them: a question about the plan or the invoice, a teammate to invite, notifications to turn down, a key to issue. The panels: ${describeTabs(SETTINGS_PANELS, SETTINGS_PANEL_LABELS, SETTINGS_PANEL_HINTS)}. You only open them, you cannot change anything inside: the user sets it themselves, so say one line and wait rather than narrating the steps. The one exception is what coworkers run on, which you set yourself with update_agent and set_default_model; ai_providers is only where a subscription or a key is added, reconnected or removed.`,
+        description: openSettingsDescription(SETTINGS_PANELS),
         inputSchema: {
             type: 'object',
             properties: {
@@ -654,6 +657,13 @@ export const FOREMAN_CLIENT_TOOL_DEFS = [
         },
     },
 ] as const
+
+// The clients of an organization have no bill of their own to open.
+export function withoutBillingPanel(def: ForemanToolDef): ForemanToolDef {
+    if (def.name !== 'open_settings') return def
+    const panels = SETTINGS_PANELS.filter(panel => panel !== 'billing')
+    return { ...def, description: openSettingsDescription(panels), inputSchema: { type: 'object', properties: { panel: { type: 'string', enum: panels } }, required: ['panel'] } }
+}
 
 export type ForemanClientToolName = (typeof FOREMAN_CLIENT_TOOL_DEFS)[number]['name']
 

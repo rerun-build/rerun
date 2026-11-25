@@ -3,13 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
     getServerSession: vi.fn(),
     selectMaybeSingle: vi.fn(),
-    selectMany: vi.fn(),
+    selectAll: vi.fn(),
     rows: {} as Record<string, unknown>,
 }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMany: mocks.selectMany }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
 const { assertTemplateOwnedBy, hasPendingCreatorTerms, isExpertAccount, requireExpertUserId, requireSandboxAuthorKey, requireSandboxAuthorSession } = await import('./expert')
@@ -23,7 +23,7 @@ beforeEach(() => {
     }
     mocks.getServerSession.mockReset().mockResolvedValue({ user: { id: 'u1', workspace_id: 1 }, workspaceRefused: false })
     mocks.selectMaybeSingle.mockReset().mockImplementation(async (_client, table: string) => ({ data: mocks.rows[table] ?? null, error: null }))
-    mocks.selectMany.mockReset().mockResolvedValue({ data: [{ user_id: 'founder' }], error: null })
+    mocks.selectAll.mockReset().mockResolvedValue({ data: [{ user_id: 'founder' }], error: null })
 })
 
 describe('isExpertAccount', () => {
@@ -113,11 +113,11 @@ describe('requireSandboxAuthorKey', () => {
     it('refuses a key issued on a workspace that is not a sandbox', async () => {
         mocks.rows.workspaces = { is_sandbox: false }
         await expect(requireSandboxAuthorKey(1)).rejects.toThrow(/sandbox workspace/)
-        expect(mocks.selectMany).not.toHaveBeenCalled()
+        expect(mocks.selectAll).not.toHaveBeenCalled()
     })
 
     it('refuses a sandbox with no member', async () => {
-        mocks.selectMany.mockResolvedValue({ data: [], error: null })
+        mocks.selectAll.mockResolvedValue({ data: [], error: null })
         await expect(requireSandboxAuthorKey(1)).rejects.toThrow(/no member/)
     })
 

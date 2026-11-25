@@ -9,7 +9,8 @@ const mocks = vi.hoisted(() => ({ getServerSession: vi.fn() }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/lib/app-origin', () => ({ getAppOrigin: async () => 'https://app.rerun.build' }))
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => ({ ...(await import('@rerun/contracts')).RERUN_BRAND, name: 'Nordlys' }) }))
+vi.mock('@/lib/app-origin', () => ({ appOriginOf: async () => 'https://app.rerun.build' }))
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<object>()), manageableSpaceIds: vi.fn(async () => 'all') }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
@@ -79,6 +80,16 @@ describe('createApiKeyAction', () => {
         database(() => ({ count: 0 }))
 
         await expect(createApiKeyAction('CI')).resolves.toMatchObject({ ok: true })
+    })
+
+    it('names the brand on a key the team of the organization creates', async () => {
+        const db = fakeSupabase((table, calls) => (table === 'workspace_members' ? { data: { user_id: 'user-1', role: 'admin', organization_staff: true } } : writeMethodOf(calls) ? undefined : { data: [{ id: 'box-1' }], count: 0 }))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+
+        await createApiKeyAction('CI')
+        await createImportKeyAction('openclaw')
+
+        expect(db.writes('api_keys').map(write => (write.payload as { created_by: string }).created_by)).toEqual(['Nordlys', 'Nordlys'])
     })
 
     it('refuses a twenty-first active key', async () => {

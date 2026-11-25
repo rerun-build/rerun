@@ -102,7 +102,10 @@
                 "step2": "Abonniere **OpenCode Go** oder lade Guthaben auf, um die Console-Modelle zu nutzen.",
                 "step3": "Erstelle einen API-Schlüssel, kopiere ihn (er beginnt mit `oc_sk_`) und füge ihn oben ein."
             }
-        }
+        },
+        "creditManagedUsed": "{percent} % des Guthabens verbraucht",
+        "creditManagedUsedUp": "Guthaben aufgebraucht",
+        "creditBackManaged": "sobald neues hinzukommt"
     },
     "noPlan": {
         "trialText": "Starte deinen kostenlosen Test, um deinen eigenen Claude-Tarif, ChatGPT-Tarif oder API-Schlüssel zu verbinden.",

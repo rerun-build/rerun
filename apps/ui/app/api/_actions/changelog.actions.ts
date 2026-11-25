@@ -3,6 +3,7 @@
 import type { Database } from '@/app/api/database.types'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 
 // Le menu rouvre les dernières annonces, pas l'historique : le reste se lit sur la page publique.
 const MAX_ENTRIES = 10
@@ -28,6 +29,7 @@ const EMPTY: ChangelogFeed = { entries: [], seenAt: null }
 // serves both.
 export async function listChangelogAction(): Promise<ChangelogFeed> {
     const { supabase, userId, workspace } = await requireWorkspaceContext()
+    if (isManagedWorkspace(workspace)) return EMPTY
 
     // La vraie porte est ici. `requireWorkspaceContext` rend un client service role, donc la RLS ne
     // filtre rien : un compte pas encore inscrit ou pas encore sorti de l'onboarding n'a rien à

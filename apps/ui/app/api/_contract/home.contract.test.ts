@@ -38,8 +38,8 @@ const tables = {
     space_members: [],
     engine_pool: [{ id: 'pool-1', engine_host: 'box-001.rerun.internal', engine_api_key: 'key', provider_server_id: 'srv-1', claimed_by_workspace_id: 7 }],
     workspace_members: [
-        { user_id: 'user-ada', workspace_id: 7, role: 'admin', box_scope: 'all' },
-        { user_id: 'user-grace', workspace_id: 7, role: 'member', box_scope: 'assigned' },
+        { user_id: 'user-ada', workspace_id: 7, role: 'admin', box_scope: 'all', organization_staff: false },
+        { user_id: 'user-grace', workspace_id: 7, role: 'member', box_scope: 'assigned', organization_staff: false },
     ],
     workspaces: [{ id: 7, name: 'Atelier Nord', icon_url: null, plan: 'pro', is_sandbox: false, subscription_status: 'active' }],
 }

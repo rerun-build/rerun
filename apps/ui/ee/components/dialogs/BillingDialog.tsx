@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getLifetimeBillingStateAction, getSubscriptionStateAction } from '@/ee/actions/billing.actions'
 import type { SubscriptionState } from '@/ee/services/billing.service'
 import type { LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -26,6 +27,7 @@ import { BillingDialogShell } from './billing/BillingDialogShell'
 import { CheckoutDialog } from './billing/CheckoutDialog'
 import { CreditPane, type CreditPurchased } from './billing/CreditPane'
 import { LifetimeDialog } from './billing/LifetimeDialog'
+import { ManagedCreditDialog } from './billing/ManagedCreditDialog'
 import { SuccessPanel } from './billing/parts'
 import { PlanDialog } from './billing/PlanDialog'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
@@ -40,6 +42,8 @@ type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute }
 // with no paid plan to manage buys it from a dialog of its own.
 export function BillingDialog() {
     const { workspace, role } = useSession()
+    const manager = useWorkspaceManager()
+    const managed = manager !== null
     const { open, highlightAddon, trigger, setOpen } = useBillingStore()
     const { access } = useWorkspaceAccess()
     const parked = useOnboardingStore(s => hasPendingStart(s))
@@ -114,10 +118,10 @@ export function BillingDialog() {
             opened.current = false
             return
         }
-        if (opened.current || !workspace || role !== 'admin') return
+        if (opened.current || managed || !workspace || role !== 'admin') return
         opened.current = true
         void decide()
-    }, [open, workspace, role, decide])
+    }, [open, managed, workspace, role, decide])
 
     const reload = useCallback(async () => {
         await loadState()
@@ -127,7 +131,9 @@ export function BillingDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            {role === 'member' ? (
+            {manager ? (
+                <ManagedCreditDialog manager={manager} canPause={role === 'admin'} />
+            ) : role === 'member' ? (
                 <AdminOnlyShell onClose={close} />
             ) : resolved.kind === 'loading' ? (
                 <LoadingShell />

@@ -2,6 +2,7 @@
 
 import { actorFromContext, manageableSpaceIds, visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
+import { brandSignature } from '@/app/api/_auth/signature'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
@@ -22,7 +23,8 @@ const isMissingRoute = (err: unknown) => err instanceof engine.EngineRequestErro
 // Every write names a person in the page history; the engine has no users of its own.
 async function authorContext() {
     const ctx = await requireWorkspaceContext()
-    return { conn: await getWorkspaceConnection(ctx.workspace.id), author: `user:${ctx.userEmail ?? ctx.userId}` }
+    const [conn, brand] = await Promise.all([getWorkspaceConnection(ctx.workspace.id), brandSignature(ctx)])
+    return { conn, author: `user:${brand?.name ?? ctx.userEmail ?? ctx.userId}` }
 }
 
 // A workspace gets its machine when its first coworker is built: until then, an onboarding user who

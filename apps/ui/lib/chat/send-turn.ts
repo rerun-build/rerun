@@ -2,6 +2,7 @@ import 'server-only'
 
 import { ENGINE_SESSION_NOT_FOUND, type MessageAuthor } from '@rerun/contracts'
 
+import type { UserActor } from '@/app/api/_auth/access'
 import { GeneralAlreadyOpenError, recordMessageSent, type AgentChatTarget } from '@/app/api/_services/chat.service'
 import type { Database } from '@/app/api/database.types'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
@@ -15,6 +16,9 @@ export type EngineBusy = { code?: string; sessionId?: string; runId?: string; st
 export type Turn = {
     target: AgentChatTarget
     text: string
+    // Who sends it, and who the coworker is told sends it: not the same for the team of the
+    // organization that runs the workspace.
+    sender: Pick<UserActor, 'userId' | 'organizationStaff'>
     author: MessageAuthor
     queued: boolean
     // Read as the turn starts: a part that cannot be read (what the author reaches) fails the send
@@ -136,7 +140,7 @@ export async function sendTurn(turn: Turn): Promise<Response> {
         break
     }
 
-    await recordMessageSent(rowId, author.id, turn.preview)
+    await recordMessageSent(rowId, turn.sender, turn.preview)
     await turn.recorded?.(rowId)
     return stream(engineRes, rowId, engineRes.headers.get('x-run-id'))
 }

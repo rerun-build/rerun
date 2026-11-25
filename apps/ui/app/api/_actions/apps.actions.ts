@@ -3,6 +3,7 @@
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { z } from 'zod'
 import { paidAppFlag } from '@rerun/cloud/apps.server'
+import { refuseManagedSession } from '@/app/api/_auth/managed-workspace'
 import { requireAdminContext } from '@/app/api/_auth/ownership'
 import {
     AppActionError,
@@ -37,6 +38,7 @@ type Result<T> = { ok: true; value: T } | (ActionFailure & { reason?: AppActionE
 async function run<T>(slug: AppSlug, fallback: ErrorCode, body: () => Promise<T>): Promise<Result<T>> {
     try {
         const app = appSlug.parse(slug)
+        await refuseManagedSession()
         if (!(await paidAppFlag(app))) throw new AppActionError('not_entitled', 'appNotAvailableYet', { app: appInfo(app).name })
         return { ok: true, value: await body() }
     } catch (err) {

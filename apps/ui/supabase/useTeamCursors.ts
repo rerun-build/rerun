@@ -13,8 +13,12 @@ const STALE_MS = 5000
 const THROTTLE_MS = 50
 
 export function useTeamCursors(workspaceId: number | undefined) {
-    const { session } = useSession()
+    const { session, organizationStaff } = useSession()
     const userId = session?.user?.id
+    // Until this tab knows its user is a member, it watches and shows nobody: the team of the
+    // organization that runs the workspace is never seen on it. The policies of the channel refuse
+    // what they would send anyway.
+    const visible = organizationStaff === false
     const channelKey = workspaceId === undefined ? undefined : `cursors:${workspaceId}`
 
     const memberOf = useMemberDirectory(workspaceId)
@@ -27,6 +31,12 @@ export function useTeamCursors(workspaceId: number | undefined) {
     const cursorsRef = useRef<Map<string, TimedCursor>>(new Map())
     const channelRef = useRef<RealtimeChannel | null>(null)
     const lastSentRef = useRef(0)
+    const visibleRef = useRef(visible)
+    useEffect(() => {
+        visibleRef.current = visible
+        const channel = channelRef.current
+        if (visible && userId && channel?.state === REALTIME_CHANNEL_STATES.joined) void channel.track({ userId })
+    }, [visible, userId])
 
     const flush = useCallback(() => setCursors(Array.from(cursorsRef.current.values())), [])
 
@@ -76,7 +86,7 @@ export function useTeamCursors(workspaceId: number | undefined) {
                 if (!alive || disposed) return
                 if (status === 'SUBSCRIBED') {
                     attempt = 0
-                    created.track({ userId })
+                    if (visibleRef.current) created.track({ userId })
                 } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
                     alive = false
                     const delay = Math.min(1000 * 2 ** attempt, 15000)
@@ -119,7 +129,7 @@ export function useTeamCursors(workspaceId: number | undefined) {
             const channel = channelRef.current
             // Hors d'un canal joint, realtime-js retombe sur un POST HTTP à chaque appel, soit jusqu'à
             // 20 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
-            if (!channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
+            if (!visible || !channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
 
             if (!world) {
                 channel.send({ type: 'broadcast', event: 'cursor-leave', payload: { userId } })
@@ -131,7 +141,7 @@ export function useTeamCursors(workspaceId: number | undefined) {
             lastSentRef.current = now
             channel.send({ type: 'broadcast', event: 'cursor', payload: { userId, x: world.x, y: world.y } satisfies CursorPayload })
         },
-        [userId]
+        [userId, visible]
     )
 
     return { cursors, onPointerWorldMove }

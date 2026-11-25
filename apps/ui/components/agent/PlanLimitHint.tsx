@@ -1,5 +1,6 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { isCreditUsedUp, planLimitTone, planWindowPercent, tightestPlanWindow, type PlanLimitTone, type RerunCredit } from '@/lib/engine/ai-sources'
 import { shortRelativeTime, shortUntil } from '@/lib/time'
@@ -54,8 +55,11 @@ export function usePlanWindowsSummary() {
 
 export function useRerunCreditDetail() {
     const t = useTranslations('agent.planLimitHint')
+    const tManaged = useTranslations('managed.credit')
+    const { name: manager } = useBrand()
     const locale = useLocale()
     return (credit: RerunCredit) => {
+        if (credit.managed) return isCreditUsedUp(credit) ? tManaged('usedUp', { manager }) : tManaged('usage', { percent: credit.percent })
         const date = credit.resetAt ? shortDate(credit.resetAt, locale) : null
         if (isCreditUsedUp(credit)) return date ? t('credit.usedUpOn', { date }) : t('credit.usedUpNextMonth')
         return date ? t('credit.usageOn', { percent: credit.percent, date }) : t('credit.usageNextMonth', { percent: credit.percent })
@@ -94,7 +98,7 @@ export function RerunCreditHint({ credit }: { credit: RerunCredit }) {
             </TooltipLabeled>
         )
     }
-    if (credit.budgetMicros <= 0) return null
+    if (credit.budgetMicros <= 0 && !credit.managed) return null
 
     return (
         <TooltipLabeled label={creditDetail(credit)} side="right">

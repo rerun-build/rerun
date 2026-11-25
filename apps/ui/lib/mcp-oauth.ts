@@ -8,6 +8,8 @@
 import { DEFAULT_PROTOCOL_VERSION } from '@/lib/mcp/hub-rpc'
 import { assertPublicUrl, fetchPublic } from '@/lib/net/public-fetch'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
+import type { HostReturn } from '@/lib/oauth/host-sign-in'
+import { requestOrigin } from '@/lib/request-host'
 import { RERUN_BRAND } from '@rerun/contracts'
 import { createHash, randomBytes } from 'node:crypto'
 
@@ -41,6 +43,8 @@ export type OAuthContext = {
     // Started from the workspace's Vault, for an entry no coworker may hold yet: the token goes to the
     // entry, in the workspace named here, and `agentId` is empty.
     vault?: { itemId: string; workspaceId: number }
+    // Started on an organization's address, where the sign-in is finished.
+    host?: HostReturn
 }
 
 export type DiscoveredMetadata = {
@@ -53,13 +57,7 @@ export type DiscoveredMetadata = {
 
 export type ClientInfo = { clientId: string; clientSecret?: string }
 
-function appOrigin(req: Request): string {
-    const h = req.headers
-    const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000'
-    const local = host.startsWith('localhost') || host.startsWith('127.')
-    const proto = h.get('x-forwarded-proto') ?? (local ? 'http' : 'https')
-    return `${proto}://${host}`
-}
+const appOrigin = (req: Request): string => requestOrigin(req.headers)
 
 // The redirect_uri, derived identically in /discover (DCR), /start (authorize) and
 // /callback (exchange) so the three always agree.
@@ -264,6 +262,11 @@ function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: 
     const clientId = entry && process.env[entry.clientIdEnv]
     const clientSecret = entry && process.env[entry.clientSecretEnv]
     return clientId && clientSecret ? { clientId, clientSecret, engineRefreshes: entry.engineRefreshes === true } : null
+}
+
+// A client registered by Rerun itself, whose only redirect URI is on Rerun's own address.
+export function isPreRegistered(mcpUrl: string): boolean {
+    return preRegisteredClient(mcpUrl) !== null
 }
 
 export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string, req: Request, clientName?: string): Promise<ClientInfo | null> {

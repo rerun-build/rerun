@@ -1,4 +1,4 @@
-import { FORMER_MEMBER, type AuthorProfile } from '@rerun/contracts'
+import { authorShortName, type AuthorProfile } from '@rerun/contracts'
 import { Image } from 'expo-image'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
@@ -17,8 +17,6 @@ const NAMED_FOR_MS = 1800
 
 // The web's `CardAvatar` tints: the initials sit on one of five, hashed from the name.
 const TINTS = [brand.base, '#0891b2', '#16a34a', '#ea580c', '#db2777']
-
-const firstNameOf = (author: AuthorProfile) => (author.id === FORMER_MEMBER.id ? author.name : author.name.split(' ')[0])
 
 function initialsOf(name: string): string {
     return name
@@ -67,7 +65,7 @@ function RelayedGroup({ author, children }: { author: AuthorProfile | null; chil
                 {children}
                 {author ? (
                     <AppText variant="caption" numberOfLines={1} style={{ alignSelf: 'flex-end', color: theme.mutedForeground }}>
-                        {t('relayedFor', { ...foremanNameValues(foremanName), person: firstNameOf(author) })}
+                        {t('relayedFor', { ...foremanNameValues(foremanName), person: authorShortName(author) })}
                     </AppText>
                 ) : (
                     <Skeleton style={{ alignSelf: 'flex-end', width: 112, height: 12, borderRadius: radius.sm }} />
@@ -99,7 +97,7 @@ function MemberGroup({ author, children }: { author: AuthorProfile | null; child
                         <Animated.View entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} pointerEvents="none" style={{ position: 'absolute', bottom: SIZE + 6, right: 0, width: 200, alignItems: 'flex-end' }}>
                             <View style={{ paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.sm, backgroundColor: theme.foreground }}>
                                 <AppText variant="caption" numberOfLines={1} style={{ color: theme.background }}>
-                                    {firstNameOf(author)}
+                                    {authorShortName(author)}
                                 </AppText>
                             </View>
                         </Animated.View>

@@ -40,7 +40,7 @@ function database(rows: Record<string, Row[]>, emails: Record<string, string> = 
 }
 
 function member(userId: string, role: 'admin' | 'member' = 'member', boxScope: 'all' | 'assigned' = 'all', workspaceId = WORKSPACE_ID): Row {
-    return { user_id: userId, workspace_id: workspaceId, role, box_scope: boxScope }
+    return { user_id: userId, workspace_id: workspaceId, role, box_scope: boxScope, organization_staff: false }
 }
 
 function space(id: string, visibility: 'workspace' | 'restricted' = 'workspace', workspaceId = WORKSPACE_ID): Row {

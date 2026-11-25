@@ -2,6 +2,7 @@
 // the voice of a coworker, to bring its owner back to what their coworkers are doing. No
 // 'server-only', like the rest of this folder: a Trigger.dev task runs it.
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
@@ -59,7 +60,7 @@ type Context = {
 }
 
 async function ownerOf(supabase: Client, workspaceId: number): Promise<string | null> {
-    const { data } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at', ascending: true }, 1)
+    const { data } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
     return data?.[0]?.user_id ?? null
 }
 

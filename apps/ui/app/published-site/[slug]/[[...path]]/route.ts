@@ -25,6 +25,7 @@ import {
     type PublishedEntry,
 } from '@/lib/published/gate'
 import { extractPublishedSlug, publishedSiteOrigin, rendersAsPage } from '@/lib/published/host'
+import { requestHost } from '@/lib/request-host'
 import { injectPreviewMeta } from '@/lib/published/meta'
 import { publishedOgImage } from '@/lib/published/og-image'
 import { verifyPassword } from '@/lib/published/password'
@@ -284,7 +285,7 @@ async function checkCode(entry: PublishedEntry, request: Request): Promise<Respo
 // Reachable on the app host by its internal path too, where agent HTML must never run.
 async function resolve(request: Request, { params }: Params): Promise<{ entry: PublishedEntry | null; slug: string; path: string[] } | null> {
     const { slug, path = [] } = await params
-    if (extractPublishedSlug(request.headers.get('host')) !== slug) return null
+    if (extractPublishedSlug(requestHost(request.headers)) !== slug) return null
     return { entry: await loadPublished(slug), slug, path }
 }
 

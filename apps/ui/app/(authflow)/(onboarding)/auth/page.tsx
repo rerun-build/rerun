@@ -5,7 +5,9 @@ import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
 import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'
 import { referrerOfCode } from '@/ee/services/referral-attach.service'
 import { isTellaAutoCapture } from '@/lib/auth/tella-auto-capture'
+import { getBrand } from '@/lib/brand/server'
 import { detectInAppBrowser, detectMobileOs } from '@/lib/in-app-browser'
+import { isWhiteLabel } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'
 import { cookies, headers } from 'next/headers'
 import { Suspense } from 'react'
@@ -19,7 +21,8 @@ export default async function AuthPage() {
     const phoneLeadsAlone = detectMobileOs(userAgent) !== null
     const showGoogle = !detectInAppBrowser(userAgent)
     const t = await getTranslations('auth.page')
-    const referrer = await referrerOfCode((await cookies()).get(REFERRAL_COOKIE)?.value)
+    const invitedOnly = isWhiteLabel(await getBrand())
+    const referrer = invitedOnly ? null : await referrerOfCode((await cookies()).get(REFERRAL_COOKIE)?.value)
     return (
         <OnboardingDialog stepKey="signin">
             <div className="flex flex-col gap-6">
@@ -28,9 +31,9 @@ export default async function AuthPage() {
                         <ReferralInvite referrer={referrer} />
                     </RerunOnly>
                 )}
-                <OnboardingHeading title={t('title')} subtitle={t('subtitle')} />
+                <OnboardingHeading title={invitedOnly ? t('invited.title') : t('title')} subtitle={invitedOnly ? t('invited.subtitle') : t('subtitle')} />
                 <Suspense fallback={null}>
-                    <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} skipCaptcha={isTellaAutoCapture(requestHeaders)} />
+                    <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} skipCaptcha={isTellaAutoCapture(requestHeaders)} invitedOnly={invitedOnly} />
                 </Suspense>
                 <p className="text-center text-xs text-muted-foreground">
                     <AuthTerms />

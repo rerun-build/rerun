@@ -102,7 +102,10 @@
                 "step2": "להירשם ל-**OpenCode Go**, או להוסיף קרדיטים כדי להשתמש במודלים של Console.",
                 "step3": "ליצור מפתח API, להעתיק אותו (הוא מתחיל ב-`oc_sk_`) ולהדביק אותו למעלה."
             }
-        }
+        },
+        "creditManagedUsed": "נעשה שימוש ב-{percent}% מהקרדיטים",
+        "creditManagedUsedUp": "הקרדיטים נגמרו",
+        "creditBackManaged": "ברגע שיתווספו עוד"
     },
     "noPlan": {
         "trialText": "אפשר להתחיל תקופת ניסיון בחינם כדי לחבר מנוי Claude, מנוי ChatGPT או מפתח API משלך.",

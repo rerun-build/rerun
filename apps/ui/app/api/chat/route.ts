@@ -1,4 +1,4 @@
-import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
+import { actorFromContext, callableEngineAgentIds, type UserActor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/errors'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, ensureSessionRow, findGeneralSession, getExistingSession, resolveAgentTarget } from '@/app/api/_services/chat.service'
@@ -41,13 +41,13 @@ export async function POST(request: Request) {
     let author: MessageAuthor
     // Read once here and handed to every check below: nothing shares a read between the calls of a
     // route handler, so each one left to find the caller again would ask the database for it.
-    let actor: Actor
+    let actor: UserActor
     let callablePromise: Promise<string[] | undefined>
     let workspaceId: number
     try {
         const ctx = await requireWorkspaceContext()
         // The zone only helps the Chief of Staff: a request it cannot be read from still sends.
-        author = messageAuthorOf(ctx, await requestTimeZone().catch(() => undefined))
+        author = await messageAuthorOf(ctx, await requestTimeZone().catch(() => undefined))
         actor = actorFromContext(ctx)
         workspaceId = ctx.workspace.id
         // Read alongside the body and awaited inside the engine call's try: a failure fails the send
@@ -148,6 +148,7 @@ export async function POST(request: Request) {
     return sendTurn({
         target,
         text,
+        sender: actor,
         author,
         queued: queued === true,
         engine: async () => ({ connectionId, model, effort, source, callableAgentIds: await callablePromise, install: !!install && isNew, userLanguage: install && isNew ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }),

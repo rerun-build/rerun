@@ -24,7 +24,7 @@ import { useDesktopSignInWaiting } from '@/components/desktop-shell/desktop-sign
 
 const PATH_BASE = 'http://next.invalid'
 
-export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha }: { phoneLeadsAlone: boolean; showGoogle: boolean; skipCaptcha: boolean }) {
+export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha, invitedOnly }: { phoneLeadsAlone: boolean; showGoogle: boolean; skipCaptcha: boolean; invitedOnly: boolean }) {
     const searchParams = useSearchParams()
     const tRetry = useTranslations('auth.oauthRetry')
     // A Google or Apple sign-in that failed upstream comes back to `/`, which sends it here with the
@@ -44,9 +44,10 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha }: { 
         setProvider(left)
     }, [failure])
     const router = useRouter()
+    const phoneOffered = PHONE_ENABLED && !invitedOnly
     // A link that carries an address was written for the email form.
-    const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'
-    const passwordOnly = searchParams.get('method') === 'password'
+    const initialMethod = searchParams.get('email') || !phoneOffered ? 'email' : 'phone'
+    const passwordOnly = !invitedOnly && searchParams.get('method') === 'password'
     const funnel = useSignupFunnel({ surface: 'auth_page', active: !passwordOnly, initialStep: initialMethod })
     const waitingForBrowser = useDesktopSignInWaiting()
 
@@ -78,6 +79,7 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha }: { 
                 phoneLeadsAlone={phoneLeadsAlone}
                 onMethodChange={method => funnel.setStep(signupStep(method))}
                 oauth={
+                    !invitedOnly &&
                     ENABLED_OAUTH_PROVIDERS.length > 0 && (
                         <>
                             {showGoogle && ENABLED_OAUTH_PROVIDERS.includes('google') && <OAuthSignInButton provider="google" verb="Sign in with" onLeave={leaveForProvider} />}
@@ -85,10 +87,10 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle, skipCaptcha }: { 
                         </>
                     )
                 }
-                phone={PHONE_ENABLED ? surroundings => <PhoneSignIn onSignedIn={enter} onStepChange={step => funnel.setStep(signupStep('phone', step === 'code'))} skipCaptcha={skipCaptcha} {...surroundings} /> : undefined}
-                email={beforeEmail => <EmailAuth beforeEmail={beforeEmail} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} onSignedIn={enter} skipCaptcha={skipCaptcha} />}
+                phone={phoneOffered ? surroundings => <PhoneSignIn onSignedIn={enter} onStepChange={step => funnel.setStep(signupStep('phone', step === 'code'))} skipCaptcha={skipCaptcha} {...surroundings} /> : undefined}
+                email={beforeEmail => <EmailAuth beforeEmail={beforeEmail} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} onSignedIn={enter} skipCaptcha={skipCaptcha} invitedOnly={invitedOnly} />}
             />
-            <DesktopServerLink />
+            {!invitedOnly && <DesktopServerLink />}
         </>
     )
 }

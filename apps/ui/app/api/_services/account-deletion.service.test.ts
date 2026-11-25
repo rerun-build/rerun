@@ -9,9 +9,11 @@ const mocks = vi.hoisted(() => ({
     listAvatars: vi.fn(),
     removeAvatars: vi.fn(),
     revokeMemberComputers: vi.fn(async () => {}),
+    leaveOrganizations: vi.fn(async () => {}),
 }))
 
 vi.mock('@/app/api/_services/remote-computers.service', () => ({ revokeMemberComputers: mocks.revokeMemberComputers }))
+vi.mock('@rerun/cloud/organizations.server', () => ({ leaveOrganizations: mocks.leaveOrganizations }))
 vi.mock('@rerun/cloud/account', () => ({ subscriptionStillCharges: mocks.subscriptionStillCharges, stopWorkspaceCharges: mocks.stopWorkspaceCharges, uninstallWorkspaceApps: mocks.uninstallWorkspaceApps }))
 
 const { accountDeletionBlockers, anonymizeAccount, ACCOUNT_DELETED_REASON } = await import('./account-deletion.service')
@@ -19,17 +21,17 @@ const { accountDeletionBlockers, anonymizeAccount, ACCOUNT_DELETED_REASON } = aw
 const USER = 'user-leaving'
 const TEAMMATE = 'user-staying'
 
-type WorkspaceRow = { id: number; name: string; is_sandbox: boolean; stripe_customer_id: string | null; stripe_subscription_id: string | null; subscription_status: string | null }
+type WorkspaceRow = { id: number; name: string; is_sandbox: boolean; stripe_customer_id: string | null; stripe_subscription_id: string | null; subscription_status: string | null; organization_id?: string | null }
 
 const SHARED: WorkspaceRow = { id: 1, name: 'Acme', is_sandbox: false, stripe_customer_id: 'cus_acme', stripe_subscription_id: 'sub_acme', subscription_status: 'active' }
 const OWN: WorkspaceRow = { id: 2, name: 'Side project', is_sandbox: false, stripe_customer_id: 'cus_side', stripe_subscription_id: 'sub_side', subscription_status: 'trialing' }
 
 const filtersOn = (calls: readonly SupabaseCall[], column: string) => calls.some(call => (call.method === 'eq' || call.method === 'in') && call.args[0] === column)
 
-type MemberRow = { workspace_id: number; user_id: string; role?: 'admin' | 'member' }
+type MemberRow = { workspace_id: number; user_id: string; role?: 'admin' | 'member'; organization_staff?: boolean }
 
 function membersMatching(members: MemberRow[], calls: readonly SupabaseCall[]) {
-    const rows = members.map(member => ({ role: 'admin', ...member }) as Record<string, unknown>)
+    const rows = members.map(member => ({ role: 'admin', organization_staff: false, ...member }) as Record<string, unknown>)
     const matching = rows.filter(row =>
         calls.every(call => {
             if (call.method === 'eq') return row[call.args[0] as string] === call.args[1]
@@ -127,6 +129,27 @@ describe('anonymizeAccount', () => {
         expect(agents.payload).toMatchObject({ disabled_reason: ACCOUNT_DELETED_REASON })
         expect(agents.filters.map(call => call.args)).toContainEqual(['workspace_id', OWN.id])
         expect(db.writes('workspaces').map(write => write.filters[0].args)).toEqual([['id', OWN.id]])
+    })
+
+    it('leaves the team of an organization first, and never touches a workspace it only ran for a client', async () => {
+        const CLIENT: WorkspaceRow = { ...OWN, id: 9, name: 'Client', stripe_customer_id: null, organization_id: 'org-1' }
+        const db = world([CLIENT], [{ workspace_id: CLIENT.id, user_id: USER, organization_staff: true }])
+
+        await expect(anonymizeAccount(db.client, USER)).resolves.toEqual({ ok: true })
+
+        expect(mocks.leaveOrganizations).toHaveBeenCalledExactlyOnceWith(USER)
+        expect(mocks.stopWorkspaceCharges).not.toHaveBeenCalled()
+        expect(db.writes('workspaces')).toEqual([])
+    })
+
+    it('leaves the workspace of an organization standing when its last person goes', async () => {
+        const CLIENT: WorkspaceRow = { ...OWN, id: 9, name: 'Client', stripe_customer_id: null, organization_id: 'org-1' }
+        const db = world([CLIENT], [{ workspace_id: CLIENT.id, user_id: USER }, { workspace_id: CLIENT.id, user_id: 'user-staff', organization_staff: true }])
+
+        await expect(anonymizeAccount(db.client, USER)).resolves.toEqual({ ok: true })
+
+        expect(mocks.stopWorkspaceCharges).not.toHaveBeenCalled()
+        expect(db.writes('workspace_members').map(write => write.method)).toEqual(['delete'])
     })
 
     it('hands a shared workspace to the earliest teammate when its last admin leaves', async () => {

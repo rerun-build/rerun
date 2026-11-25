@@ -9,6 +9,7 @@ import { skipPhoneVerification } from '@/app/api/_services/phone-verification.se
 import { callerIp } from '@/lib/auth/caller-ip'
 import { verifyCaptcha } from '@/lib/auth/captcha'
 import { captchaProofSchema } from '@/lib/auth/captcha-proof'
+import { isRerunHost } from '@/lib/brand/request-site'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 import { PHONE_FAILURE_CODES, type PhoneFailure } from '@/lib/phone/failure-messages'
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
@@ -81,6 +82,7 @@ export async function sendPhoneSignInCodeAction(input: z.input<typeof signInSend
     const phone = parsed.success ? signInPhone(parsed.data) : null
     if (!parsed.success || !phone) return invalidNumber()
 
+    if (!(await isRerunHost())) return refused('unavailable')
     const requestHeaders = await headers()
     const ip = callerIp(requestHeaders)
     if (!(await verifyCaptcha(parsed.data.captcha, requestHeaders))) return refused('captcha_failed')
@@ -94,12 +96,15 @@ export async function verifyPhoneSignInCodeAction(input: z.input<typeof signInSc
     const parsed = signInSchema.safeParse(input)
     const phone = parsed.success ? signInPhone(parsed.data) : null
     if (!parsed.success || !phone) return refused('wrong_code')
+    if (!(await isRerunHost())) return refused('unavailable')
 
     const result = await completePhoneSignIn(await createClient(), phone, parsed.data.code, parsed.data.channel)
     return result.ok ? result : refused(result.error)
 }
 
+// Nobody on an organization's address: an account keeps no number there.
 async function signedInAccount(): Promise<PhoneAccount | null> {
+    if (!(await isRerunHost())) return null
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser()
     return data.user && !data.user.is_anonymous ? { id: data.user.id, email: data.user.email ?? null } : null

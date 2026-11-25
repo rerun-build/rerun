@@ -3,6 +3,7 @@ import * as React from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AppNotice as AppNoticeEmail, renderEmail } from '@rerun/emails'
 import { emailTranslator } from '@rerun/emails/i18n'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { brandAppUrl } from '@/lib/brand/urls'
 import { workspaceBrand } from '@/lib/brand/workspace'
@@ -15,7 +16,8 @@ import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { noticeText, type NoticeCopy } from '@/lib/notifications/notice-copy'
 import { wantsCategoryEmail } from '@/lib/notifications/prefs'
-import { selectMany } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
+import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 type Client = SupabaseClient<Database>
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
@@ -35,6 +37,11 @@ export type AppNotice = {
 // throws: a notice that fails must not undo the change it reports.
 export async function notifyWorkspace(supabase: Client, workspaceId: number, notice: AppNotice): Promise<void> {
     try {
+        // Slots, trials and what they cost: an organization's workspaces are sold none of it.
+        const { data: workspace, error: workspaceError } = await selectMaybeSingle(supabase, 'workspaces', ['organization_id'] as const, { id: workspaceId })
+        if (workspaceError) throw new Error(workspaceError.message)
+        if (isManagedWorkspace(workspace)) return
+
         const { error } = await supabase.from('notifications').insert<NotificationInsert>({
             workspace_id: workspaceId,
             space_id: null,
@@ -57,7 +64,7 @@ async function emailMembers(supabase: Client, workspaceId: number, notice: AppNo
     const resend = getResendClient()
     if (!resend) return
 
-    const { data: admins } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, role: 'admin' })
+    const { data: admins } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId, role: 'admin' })
     const userIds = (admins ?? []).map(admin => admin.user_id)
     if (userIds.length === 0) return
     const { data: users } = await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: userIds })

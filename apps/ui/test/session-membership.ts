@@ -6,7 +6,7 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 // getServerSession answers, completed with the membership row that database holds.
 export function sessionWithMembership<S extends { user: { id: string; workspace_id: number } }>(session: S) {
     return async () => {
-        const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope'] as const, { user_id: session.user.id, workspace_id: session.user.workspace_id })
+        const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope', 'organization_staff'] as const, { user_id: session.user.id, workspace_id: session.user.workspace_id })
         return { ...session, membership: data ?? null }
     }
 }

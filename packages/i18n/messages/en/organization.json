@@ -1,0 +1,350 @@
+{
+    "_context": {
+        "nav.label": "Accessibility name of the navigation of the console an agency manages its clients' workspaces from.",
+        "workspaces.count": "How many workspaces the agency has out of its limit, next to the page title.",
+        "workspaces.noActivity": "In the Last activity column, a workspace nobody has used yet.",
+        "credit.reserve": "The credit the agency bought and has not given to a workspace yet.",
+        "credit.takeBack": "Verb: move credit from a workspace back to the agency's reserve.",
+        "credit.kinds.allocation": "A line of the credit history: credit was given to this workspace.",
+        "credit.kinds.adjustment": "A line of the credit history: the balance was corrected by hand.",
+        "credit.change": "Before and after a transfer, as two figures.",
+        "brand.guarded": "{status} is error, waiting or running: what this color already means in the app.",
+        "brand.preview.assistant": "Sample message of an AI coworker in a preview. The <link> part is a link.",
+        "domains.record.name": "The Name column of a DNS record.",
+        "machine.states.none": "The workspace has no server at the moment."
+    },
+    "nav": {
+        "label": "Organization",
+        "workspaces": "Workspaces",
+        "credit": "Credit",
+        "team": "Team",
+        "brand": "Brand",
+        "domains": "Domains",
+        "back": "Back to the app"
+    },
+    "suspended": {
+        "title": "This organization is suspended",
+        "description": "Its workspaces are stopped and nothing can be changed."
+    },
+    "blocked": {
+        "suspended": "This organization is suspended",
+        "ownerOnly": "Only an owner can do this"
+    },
+    "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member"
+    },
+    "status": {
+        "active": "Active",
+        "archived": "Archived",
+        "archiving": "Archiving",
+        "restoring": "Restoring",
+        "provisioning": "Setting up",
+        "outOfCredit": "Out of credit",
+        "suspended": "Suspended"
+    },
+    "workspaces": {
+        "title": "Workspaces",
+        "count": "{count} of {max}",
+        "new": "New workspace",
+        "limitReached": "{max, plural, one {Your organization is limited to # workspace} other {Your organization is limited to # workspaces}}",
+        "search": "Search workspaces",
+        "noMatch": "No workspace matches “{query}”",
+        "summary": "{members, plural, one {# member} other {# members}} · {coworkers, plural, one {# coworker} other {# coworkers}} · {credits, plural, one {# credit} other {# credits}}",
+        "columns": {
+            "name": "Name",
+            "members": "Members",
+            "coworkers": "Coworkers",
+            "credit": "Credit left",
+            "lastActivity": "Last activity"
+        },
+        "noActivity": "None yet",
+        "empty": {
+            "title": "No workspace yet",
+            "description": "Create one for each client and invite its first admin."
+        },
+        "unnamed": "Untitled workspace"
+    },
+    "create": {
+        "title": "New workspace",
+        "description": "Its first admin gets an invitation by email.",
+        "logo": "Upload a logo",
+        "name": "Name",
+        "namePlaceholder": "Acme",
+        "nameTooLong": "{max} characters at most",
+        "email": "First admin’s email",
+        "emailPlaceholder": "you@company.com",
+        "emailInvalid": "Enter a valid email address",
+        "logoTooLarge": "This image is larger than 8 MB",
+        "submit": "Create",
+        "done": {
+            "title": "{name} is ready",
+            "description": "We invited {email}.",
+            "linkHint": "Send this link to {email}.",
+            "copyLink": "Copy the invitation link",
+            "close": "Done",
+            "open": "View workspace"
+        }
+    },
+    "detail": {
+        "back": "Workspaces",
+        "open": "Open workspace",
+        "notReady": "This workspace is not ready yet",
+        "archived": "Restore this workspace first",
+        "members": "Members",
+        "credit": "Credit",
+        "usage": "Usage",
+        "machine": "Machine",
+        "danger": "Manage"
+    },
+    "people": {
+        "you": "(you)",
+        "unknown": "Unknown user",
+        "invite": "Invite",
+        "role": "Role of {name}",
+        "remove": "Remove {name}",
+        "pending": "Invited",
+        "revoke": "Cancel the invitation of {email}",
+        "lastAdmin": "A workspace keeps at least one admin",
+        "lastOwner": "An organization keeps at least one owner",
+        "self": "Another owner can change your role",
+        "empty": "No one has joined yet",
+        "removeConfirm": {
+            "title": "Remove {name}?",
+            "workspace": "They lose access to this workspace.",
+            "team": "They lose access to this console and to every workspace.",
+            "confirm": "Remove"
+        },
+        "revokeConfirm": {
+            "title": "Cancel the invitation?",
+            "description": "The link sent to {email} stops working.",
+            "confirm": "Cancel invitation",
+            "keep": "Keep"
+        }
+    },
+    "invite": {
+        "workspaceTitle": "Invite to {name}",
+        "teamTitle": "Invite to the team",
+        "description": "They get an invitation by email.",
+        "email": "Email",
+        "emailPlaceholder": "you@company.com",
+        "role": "Role",
+        "submit": "Send invitation",
+        "linkHint": "Send this link to {email}.",
+        "copyLink": "Copy the invitation link",
+        "done": "Done",
+        "roles": {
+            "owner": "Everything, team, brand and domains included",
+            "admin": "Workspaces, members and credit",
+            "workspaceAdmin": "Manages the workspace and its members",
+            "workspaceMember": "Works with the coworkers"
+        }
+    },
+    "usage": {
+        "empty": "Nothing spent yet"
+    },
+    "machine": {
+        "states": {
+            "running": "Running",
+            "stopped": "Stopped",
+            "error": "Error",
+            "archiving": "Archiving",
+            "archived": "Archived",
+            "restoring": "Restoring",
+            "none": "No machine"
+        },
+        "disk": "Disk",
+        "diskUsed": "{used} of {total}",
+        "diskUnknown": "Not measured yet",
+        "notStarted": "Starts with its first coworker",
+        "restart": "Restart",
+        "restartConfirm": {
+            "title": "Restart the machine?",
+            "description": "Coworkers stop what they are doing for about a minute.",
+            "confirm": "Restart"
+        },
+        "restarting": "The machine is restarting"
+    },
+    "danger": {
+        "archive": "Archive",
+        "archiveHint": "Stops its coworkers and keeps its data. It still counts in your limit.",
+        "archiveConfirm": {
+            "title": "Archive {name}?",
+            "description": "Its members lose access and its coworkers stop until you restore it.",
+            "confirm": "Archive"
+        },
+        "restore": "Restore",
+        "restoreHint": "Back as it was, in a few minutes.",
+        "delete": "Delete",
+        "deleteHint": "Erases its coworkers, files and conversations for good.",
+        "deleteConfirm": {
+            "title": "Delete this workspace?",
+            "description": "Its coworkers, files and conversations are erased for good. Credit left in it goes back to your reserve.",
+            "type": "Type <strong></strong> to confirm.",
+            "confirm": "Delete"
+        },
+        "busy": "Wait until it is done",
+        "deleted": "{name} was deleted"
+    },
+    "credit": {
+        "title": "Credit",
+        "reserve": "Reserve",
+        "reserveHint": "Not given to a workspace yet",
+        "left": "Left in this workspace",
+        "add": "Add credit",
+        "takeBack": "Take back",
+        "reserveEmpty": "The reserve is empty",
+        "workspaceEmpty": "This workspace has no credit left",
+        "nothingToTakeBack": "No workspace has credit left",
+        "noWorkspace": "Create a workspace first",
+        "history": "History",
+        "loadMore": "Show more",
+        "kinds": {
+            "purchase": "Credit bought",
+            "adjustment": "Adjustment",
+            "allocation": "Added to {workspace}",
+            "take_back": "Taken back from {workspace}"
+        },
+        "deletedWorkspace": "a deleted workspace",
+        "reversed": "Did not go through",
+        "reversal": "Back in the reserve",
+        "empty": {
+            "title": "No movement yet",
+            "description": "Credit you buy, give and take back shows here."
+        },
+        "dialog": {
+            "allocateTitle": "Add credit",
+            "allocateDescription": "From your reserve to a workspace.",
+            "takeBackTitle": "Take credit back",
+            "takeBackDescription": "From a workspace to your reserve.",
+            "workspace": "Workspace",
+            "workspacePlaceholder": "Pick a workspace",
+            "workspaceSearch": "Search workspaces",
+            "amount": "Credits",
+            "reserve": "Reserve",
+            "change": "{before} → {after}",
+            "tooMuchReserve": "Your reserve holds {count, plural, one {# credit} other {# credits}}",
+            "tooMuchWorkspace": "{count, plural, one {# credit} other {# credits}} left to take back",
+            "allocate": "Add {count, plural, =0 {credit} one {# credit} other {# credits}}",
+            "takeBack": "Take back {count, plural, =0 {credit} one {# credit} other {# credits}}"
+        },
+        "tookLess": "{count, plural, =0 {No credit was left to take back} one {Only # credit was left to take back} other {Only # credits were left to take back}}"
+    },
+    "team": {
+        "title": "Team",
+        "description": "They open any workspace without its members seeing them."
+    },
+    "brand": {
+        "title": "Brand",
+        "description": "What your clients see.",
+        "name": "Name",
+        "nameInvalid": "1 to 40 characters, without {list}",
+        "icon": "Icon",
+        "iconHint": "Square, 512 px or more, with its own background.",
+        "iconUpload": "Upload an icon",
+        "iconReplace": "Replace",
+        "iconProblems": {
+            "type": "Use a PNG, JPEG or WebP image",
+            "notSquare": "This image is {width} × {height} px: it has to be square",
+            "tooSmall": "This image is {width} px wide: it takes 512 px or more",
+            "tooLarge": "This image is larger than 8 MB",
+            "unreadable": "This image could not be read"
+        },
+        "color": "Color",
+        "colorPicker": "Pick a color",
+        "colorClear": "No color",
+        "colorHint": "Adjusted so it stays readable. Without one, the app is black and white.",
+        "colorInvalid": "Use a hex color, like #1668E3",
+        "guarded": "This color already means {status, select, error {an error} waiting {a coworker waiting for an answer} other {a coworker at work}}, so only the chat bubble wears it.",
+        "support": "Support email",
+        "supportPlaceholder": "support@company.com",
+        "supportHint": "Where your clients write for help.",
+        "emailInvalid": "Enter a valid email address",
+        "docs": "Documentation",
+        "terms": "Terms",
+        "privacy": "Privacy policy",
+        "urlInvalid": "Use a full address, starting with https://",
+        "preview": {
+            "light": "Light",
+            "dark": "Dark",
+            "user": "Draft the weekly report",
+            "assistant": "Done. <link>Open the report</link>",
+            "unread": "Unread",
+            "progress": "Progress"
+        },
+        "unsaved": "Unsaved changes",
+        "discard": "Discard",
+        "leave": {
+            "title": "Leave without saving?",
+            "description": "Your changes to the brand are lost.",
+            "confirm": "Leave",
+            "stay": "Stay"
+        }
+    },
+    "domains": {
+        "title": "Domains",
+        "description": "Where your clients sign in.",
+        "default": "Default address",
+        "custom": "Your domain",
+        "copyAddress": "Copy the address",
+        "add": "Add domain",
+        "empty": {
+            "title": "No domain yet",
+            "description": "Serve the app from your own address."
+        },
+        "status": {
+            "pending": "Waiting for DNS",
+            "verifying": "Verifying",
+            "active": "Active",
+            "error": "Error"
+        },
+        "record": {
+            "hint": "Add these records where your domain is managed. They can take an hour to show.",
+            "type": "Type",
+            "name": "Name",
+            "value": "Value",
+            "copyName": "Copy the name",
+            "copyValue": "Copy the value"
+        },
+        "checkedAt": "Last check: {time}",
+        "check": "Check again",
+        "remove": "Remove",
+        "removeConfirm": {
+            "title": "Remove {hostname}?",
+            "description": "Your clients can no longer sign in there. The default address keeps working.",
+            "confirm": "Remove"
+        },
+        "dialog": {
+            "title": "Add a domain",
+            "description": "A subdomain of a domain you own.",
+            "hostname": "Domain",
+            "invalid": "Enter a domain, like app.acme.com",
+            "apex": "Use a subdomain, like app.{hostname}",
+            "submit": "Add domain"
+        },
+        "problems": {
+            "noRecord": "No record points here yet.",
+            "elsewhere": "This domain points somewhere else.",
+            "noToken": "The TXT record is missing.",
+            "taken": "Someone else proved this domain first.",
+            "lookupFailed": "The DNS of this domain did not answer. We will try again."
+        }
+    },
+    "failed": {
+        "title": "This page could not be loaded",
+        "retry": "Try again"
+    },
+    "missing": {
+        "title": "Workspace not found",
+        "description": "It was deleted, or it belongs to someone else.",
+        "back": "All workspaces"
+    },
+    "join": {
+        "metaTitle": "Team Invitation",
+        "title": "You are invited to the team of {organization}",
+        "signIn": "Sign in or create your account with {email} to join it.",
+        "expired": "This invitation has expired. Ask an owner of the team to send a new one.",
+        "failed": "Could not join the team"
+    }
+}

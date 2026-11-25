@@ -102,7 +102,10 @@
                 "step2": "Abonnez-vous à **OpenCode Go**, ou ajoutez des crédits pour utiliser les modèles Console.",
                 "step3": "Créez une clé API, copiez-la (elle commence par `oc_sk_`) et collez-la ci-dessus."
             }
-        }
+        },
+        "creditManagedUsed": "{percent} % des crédits utilisés",
+        "creditManagedUsedUp": "Crédits épuisés",
+        "creditBackManaged": "dès que d'autres sont ajoutés"
     },
     "noPlan": {
         "trialText": "Démarrez votre essai gratuit pour connecter votre forfait Claude, votre forfait ChatGPT ou une clé API.",

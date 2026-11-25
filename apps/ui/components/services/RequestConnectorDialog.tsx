@@ -1,6 +1,7 @@
 'use client'
 
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { useErrorText } from '@/hooks/useErrorText'
 import { requestConnectorAction } from '@/app/api/_actions/connector-requests.actions'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,7 @@ type FormValues = z.infer<ReturnType<typeof requestSchema>>
 
 // Lets a user ask us to add a connector that the library does not have yet. The ask is
 // persisted server-side via requestConnectorAction. Generic by design: no search term.
+// Rerun's own team reads it, so an organization's clients are not offered it.
 export function RequestConnectorDialog({ children, agentId }: RequestConnectorDialogProps) {
     const t = useTranslations('services.requestApp')
     const errorText = useErrorText()
@@ -57,36 +59,38 @@ export function RequestConnectorDialog({ children, agentId }: RequestConnectorDi
     })
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-                <Form {...form}>
-                    <form onSubmit={onSubmit}>
-                        <DialogHeaderBar icon={ServerIcon} title={t('title')} description={t('description')} />
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem className="py-4">
-                                    <FormControl>
-                                        <Textarea autoFocus placeholder={t('placeholder')} className="min-h-28" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
-                                {t('cancel')}
-                            </Button>
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting && <Loader2Icon className="size-4 animate-spin" />}
-                                {t('send')}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+        <RerunOnly>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
+                <DialogTrigger asChild>{children}</DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                    <Form {...form}>
+                        <form onSubmit={onSubmit}>
+                            <DialogHeaderBar icon={ServerIcon} title={t('title')} description={t('description')} />
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem className="py-4">
+                                        <FormControl>
+                                            <Textarea autoFocus placeholder={t('placeholder')} className="min-h-28" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>
+                                    {t('cancel')}
+                                </Button>
+                                <Button type="submit" disabled={isSubmitting}>
+                                    {isSubmitting && <Loader2Icon className="size-4 animate-spin" />}
+                                    {t('send')}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+        </RerunOnly>
     )
 }

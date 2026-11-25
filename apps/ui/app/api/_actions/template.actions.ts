@@ -15,6 +15,7 @@ import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 
 // The library is the app's recruiting surface, so everyone reads it: a visitor gets what is
 // published and flagged for the library, an author also gets their own work whatever its status,
@@ -27,7 +28,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 // until they ask for a status, which is the client-side Status filter's job.
 export async function listLibraryTemplatesAction(): Promise<LibraryTemplate[]> {
     const isAdmin = (await getAdminEmail()) !== null
-    const { user } = await getServerSession()
+    const { user, workspace } = await getServerSession()
     const supabase = createServiceRoleClient()
     const order = { column: 'published_at', ascending: false } as const
 
@@ -49,7 +50,8 @@ export async function listLibraryTemplatesAction(): Promise<LibraryTemplate[]> {
     for (const row of [...((listed.data ?? []) as LibraryRow[]), ...((mine.data ?? []) as LibraryRow[])]) byId.set(row.id, row)
     const rows = [...byId.values()]
     const creators = await loadLibraryCreators(supabase, rows.flatMap(row => (row.creator_id ? [row.creator_id] : [])))
-    return toLibraryTemplates(rows, user?.id, access, creators)
+    const templates = toLibraryTemplates(rows, user?.id, access, creators)
+    return isManagedWorkspace(workspace) ? templates.filter(template => template.owned) : templates
 }
 
 // The creators the library introduces on Discover. Published fiches are public, but the read goes
@@ -76,7 +78,7 @@ export async function getSharedTemplateAction(slug: string): Promise<LibraryTemp
     const parsed = z.string().trim().min(1).max(200).safeParse(slug)
     if (!parsed.success) return null
     const isAdmin = (await getAdminEmail()) !== null
-    const { user } = await getServerSession()
+    const { user, workspace } = await getServerSession()
     const supabase = createServiceRoleClient()
     const { data } = await selectMaybeSingle(supabase, 'templates', LIBRARY_COLUMNS, { slug: parsed.data })
     if (!data) return null
@@ -85,7 +87,8 @@ export async function getSharedTemplateAction(slug: string): Promise<LibraryTemp
     if (!isAdmin && !isMine && !isPublicStatus(row.status as TemplateStatus)) return null
 
     const [access, creators] = await Promise.all([user?.workspace_id ? templateAccessByWorkspace(supabase, user.workspace_id) : new Map(), loadLibraryCreators(supabase, row.creator_id ? [row.creator_id] : [])])
-    return toLibraryTemplates([row], user?.id, access, creators)[0] ?? null
+    const template = toLibraryTemplates([row], user?.id, access, creators)[0] ?? null
+    return isManagedWorkspace(workspace) && !template?.owned ? null : template
 }
 
 // The anchors are where the user dropped each agent, in the template's own install order. They are
@@ -122,9 +125,9 @@ export async function installTemplateAction(input: { slug: string; spaceId: stri
             const { user } = await getServerSession()
             if (!user?.id || template.creator_id !== user.id) await assertAdminUser()
         } else if ((await getAdminEmail()) === null) {
-            const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status'] as const, { id: workspace_id })
+            const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'organization_id'] as const, { id: workspace_id })
             const status = workspace?.subscription_status
-            if (status !== 'active' && status !== 'trialing') throw new AppError('noActivePlan')
+            if (status !== 'active' && status !== 'trialing') throw new AppError(isManagedWorkspace(workspace) ? 'managedWorkspacePaused' : 'noActivePlan')
 
             // The plan gate stays first: buying a template unlocks the template, not the compute
             // it needs to run.

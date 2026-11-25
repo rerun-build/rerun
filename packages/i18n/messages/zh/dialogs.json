@@ -92,7 +92,8 @@
                 "title": "移除对 {box} 的访问权限？",
                 "confirm": "移除"
             }
-        }
+        },
+        "descriptionManaged": "管理员管理成员和设置。成员使用同事。"
     },
     "createWorkspace": {
         "nameRequired": "名称为必填项",

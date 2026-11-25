@@ -2,6 +2,8 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { activateAgentAction } from '@/app/api/_actions/agent.actions'
+import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
+import { useWorkspaceManager, type WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
@@ -23,8 +25,9 @@ import { toast } from 'sonner'
 // says how many agents run, the user says which ones, and freeing a slot means deleting an agent
 // (Settings stays reachable behind this, which is where that lives).
 export function AgentLockedOverlay({ agent }: { agent: IsoAgent }) {
-    const { access, keptUntil, paymentFailed, sandboxArchived } = useWorkspaceAccess()
+    const { access, keptUntil, paymentFailed, sandboxArchived, manager } = useWorkspaceAccess()
     if (sandboxArchived) return <SandboxArchivedOverlay name={agent.name} keptUntil={keptUntil} />
+    if (access === 'paused' && manager) return <ManagedPausedOverlay name={agent.name} manager={manager} />
     if (access === 'paused') return <WorkspacePausedOverlay name={agent.name} keptUntil={keptUntil} paymentFailed={paymentFailed} />
     if (access === 'restoring') return <WorkspaceRestoringOverlay name={agent.name} />
     return <AgentSlotOverlay agent={agent} />
@@ -46,6 +49,23 @@ export function WorkspacePausedOverlay({ name, keptUntil, paymentFailed = false 
             <Button variant="outline" highlight onClick={() => useBillingStore.getState().openBilling(undefined, 'paused_agent_panel')}>
                 {paymentFailed ? t('paused.updatePayment') : t('paused.subscribe')}
             </Button>
+        </div>
+    )
+}
+
+export function ManagedPausedOverlay({ name, manager }: { name: string; manager: WorkspaceManager }) {
+    const t = useTranslations('agent.agentLockedOverlay')
+    const tManaged = useTranslations('managed.paused')
+    return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
+            <Icon size="lg" icon={LockIcon} className="text-muted-foreground" />
+            <div className="space-y-1.5">
+                <p className="text-sm font-medium">{t('paused.title', { name })}</p>
+                <p className="text-sm text-muted-foreground">
+                    {t('saved')} {tManaged('coworker', { name, manager: manager.name })}
+                </p>
+            </div>
+            <ContactManagerButton manager={manager} variant="outline" />
         </div>
     )
 }
@@ -83,6 +103,7 @@ export function WorkspaceRestoringOverlay({ name }: { name: string }) {
 function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentLockedOverlay')
+    const tManaged = useTranslations('managed')
     const errorText = useErrorText()
     const { noFreeAgentSlot, activeAgentsCount, maxAgents, gate } = useEntitlements()
     const { workspace } = useSession()
@@ -91,6 +112,7 @@ function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
     const [activating, setActivating] = useState(false)
 
     const fromTemplate = !isPlanLimited(agent)
+    const manager = useWorkspaceManager()
     const capFixedByHand = noFreeAgentSlot && workspace?.subscription_status !== 'trialing'
 
     const handleActivate = async () => {
@@ -120,9 +142,9 @@ function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
                     <div className="space-y-2">
                         {/* Only a trial's cap is lifted by paying: a paid plan runs unlimited coworkers, so a number left on
                             a subscribed workspace was set by hand from the admin and no checkout raises it. */}
-                        <TooltipDisabledReason reason={capFixedByHand ? t('slot.fixedLimit') : undefined}>
-                            <Button variant="outline" highlight disabled={capFixedByHand} onClick={gate}>
-                                {t('slot.upgradeToActivate')}
+                        <TooltipDisabledReason reason={manager ? tManaged('contact', { manager: manager.name }) : capFixedByHand ? t('slot.fixedLimit') : undefined}>
+                            <Button variant="outline" highlight disabled={capFixedByHand || manager !== null} onClick={gate}>
+                                {manager ? t('slot.activate') : t('slot.upgradeToActivate')}
                             </Button>
                         </TooltipDisabledReason>
                         {maxAgents !== null && (

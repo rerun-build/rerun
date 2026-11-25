@@ -17,6 +17,7 @@ import { useTranscriptCatchUp } from '@/hooks/useTranscriptCatchUp'
 import { refreshWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { contextStatsOf } from '@/lib/chat/context-stats'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { isApiLocked, isSubscriptionEntitled, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { lastUserText } from '@/lib/chat-payload'
 import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
@@ -67,7 +68,7 @@ export function useForemanChat() {
     // it was given, and a workspace read there would be the one of the first render forever.
     const gates = useRef<ForemanClientGates>({ apiEntitled: false, apiLocked: false, isSandbox: false, isAdmin: false, vaultOpen: false })
     useEffect(() => {
-        gates.current = { apiEntitled: !!workspace && isWorkspaceApiEntitled(workspace), apiLocked: !!workspace && isApiLocked(workspace), isSandbox: !!workspace?.is_sandbox, isAdmin, vaultOpen: !!workspace && isSubscriptionEntitled(workspace.subscription_status) }
+        gates.current = { apiEntitled: !!workspace && isWorkspaceApiEntitled(workspace), apiLocked: !!workspace && isApiLocked(workspace), isSandbox: !!workspace?.is_sandbox, isAdmin, vaultOpen: !!workspace && isSubscriptionEntitled(workspace.subscription_status), managed: isManagedWorkspace(workspace) }
     }, [workspace, isAdmin])
 
     const transport = useMemo(

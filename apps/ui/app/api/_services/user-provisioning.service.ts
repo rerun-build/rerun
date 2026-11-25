@@ -1,14 +1,16 @@
 import type { Database, Json } from '@/app/api/database.types'
 import { grantRerunTopup } from '@rerun/cloud/billing.server'
-import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
-import { randomBlob } from '@/lib/blobs/catalog'
+import { insertDefaultWorkspace } from '@/app/api/_services/default-workspace.service'
+import { SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
 import { attachReferral } from '@/ee/services/referral-attach.service'
-import { DEFAULT_NOTIFICATION_PREFS } from '@/lib/notifications/prefs'
+import { DEFAULT_NOTIFICATION_PREFS, mergeNotificationPrefs } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
+
+const NO_RERUN_EMAIL = { categories: { product: false, billing: false } }
 
 // Just-in-time provisioning: the first time an authenticated user is seen, seed
 // their workspace, user row and owner membership. The request client only reads the users row;
@@ -27,12 +29,15 @@ import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 // `locale` is the language of the request (the visitor's cookie, else the browser): a workspace born
 // on it has its coworkers write in that language when they work on their own.
 //
+// `ownWorkspace: 'bare'` is an account of an organization's team, born on the organization's address:
+// the workspace it has to have comes with no signup credit, and Rerun writes it no email about it.
+//
 // `referralCode` is the code of the referral link the visitor came through, if any: only an account
 // born on this request becomes that member's friend.
 export async function provisionUser(
     supabase: SupabaseClient<Database>,
     user: User,
-    { phoneStep, priceArm, locale = DEFAULT_LOCALE, referralCode }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale; referralCode?: string | null },
+    { phoneStep, priceArm, locale = DEFAULT_LOCALE, ownWorkspace = 'full', referralCode }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale; ownWorkspace?: 'full' | 'bare'; referralCode?: string | null },
 ): Promise<{ signedUp: boolean } | null> {
     const existingUser = await selectMaybeSingle(supabase, 'users', ['id', 'workspace_id', 'signed_up_at'] as const, { id: user.id })
 
@@ -51,22 +56,7 @@ export async function provisionUser(
 
     const serviceSupabase = createServiceRoleClient()
 
-    const { data: workspace, error: workspaceError } = await serviceSupabase
-        .from('workspaces')
-        .insert<Database['public']['Tables']['workspaces']['Insert']>({
-            name: 'My workspace',
-            icon_url: randomBlob()?.url ?? null,
-            plan: BASE_PLAN_SLUG,
-            ...baseLimitsToColumns(),
-            // The plan's credit belongs to the plan: an account with no subscription gets the
-            // signup allowance below and nothing else, or a visitor who never pays walks off with
-            // five dollars of Rerun credit.
-            rerun_budget_micros: 0,
-            price_arm: priceArm,
-            locale,
-        })
-        .select()
-        .single()
+    const { data: workspace, error: workspaceError } = await insertDefaultWorkspace(serviceSupabase, { priceArm, locale })
 
     // Without a workspace the users row cannot satisfy its NOT NULL workspace_id, so bail out
     // and let the next request retry the whole provisioning rather than leave a half-seeded user.
@@ -78,7 +68,7 @@ export async function provisionUser(
     const { error: userError } = await serviceSupabase.from('users').insert<Database['public']['Tables']['users']['Insert']>({
         id: user.id,
         workspace_id: workspace.id,
-        email_notification_prefs: DEFAULT_NOTIFICATION_PREFS as unknown as Json,
+        email_notification_prefs: (ownWorkspace === 'bare' ? mergeNotificationPrefs(DEFAULT_NOTIFICATION_PREFS, NO_RERUN_EMAIL) : DEFAULT_NOTIFICATION_PREFS) as unknown as Json,
         signed_up_at: new Date().toISOString(),
     })
 
@@ -101,7 +91,7 @@ export async function provisionUser(
     await ensureForemanAgentRow(serviceSupabase, workspace.id).catch(err => console.error('[workspace] failed to write the Chief of Staff', err))
 
     // An account is born signed up: its allowance and its phone step come with it.
-    await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
+    if (ownWorkspace === 'full') await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
     if (phoneStep) await requirePhone(user.id)
     if (referralCode) await attachReferral(user.id, workspace.id, referralCode)
     return { signedUp: true }

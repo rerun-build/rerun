@@ -89,6 +89,8 @@ import type {
 export type EngineConnection = {
     baseUrl: string
     apiKey: string | null
+    // Whose machine it is, on a connection read for a workspace.
+    workspaceId?: number
 }
 
 export const engineToolsSchema = toolsSchema

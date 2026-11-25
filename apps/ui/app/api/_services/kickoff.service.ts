@@ -1,9 +1,10 @@
 import { callableEngineAgentIds, requireLightSessionActor, type Actor } from '@/app/api/_auth/access'
 import { createSessionRow, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
-import { recordSessionParticipant } from '@/app/api/_services/notification-audience.service'
+import { participantIdOf, recordSessionParticipant } from '@/app/api/_services/notification-audience.service'
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { reformulateKickoff } from '@/lib/ai/reformulate-kickoff'
+import { offersTeamRequests } from '@/lib/brand/connection'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { chat } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -30,8 +31,9 @@ export async function startKickoff(agentId: string, input: { kickoff?: string; d
         const message = kickoff || (description ? await reformulateKickoff(description).catch(() => description) : '')
         if (!message) return { ok: false, error: 'Nothing to send', agentGone: true }
 
-        const callableAgentIds = await callableEngineAgentIds(actor ?? (await requireLightSessionActor()))
-        const engineRes = await chat(target.conn, target.engineAgentId, { message, source: 'dashboard', author, callableAgentIds })
+        const caller = actor ?? (await requireLightSessionActor())
+        const callableAgentIds = await callableEngineAgentIds(caller)
+        const engineRes = await chat(target.conn, target.engineAgentId, { message, source: 'dashboard', author, callableAgentIds, teamRequests: await offersTeamRequests(target.conn) })
         if (!engineRes.ok) {
             const errBody = await engineRes.text().catch(() => '')
             return { ok: false, error: `Engine error: ${engineRes.status} ${errBody}`, agentGone: false }
@@ -44,7 +46,7 @@ export async function startKickoff(agentId: string, input: { kickoff?: string; d
 
         const sessionId = await createSessionRow(agentId, engineSessionId, message, null, undefined, 'thread', message)
         await updateSessionStatus(sessionId, 'working')
-        await recordSessionParticipant(sessionId, author.id)
+        if (caller.kind === 'user') await recordSessionParticipant(sessionId, participantIdOf(caller))
 
         generateSessionTitle(message)
             .then(async title => {

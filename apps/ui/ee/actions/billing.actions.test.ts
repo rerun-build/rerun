@@ -23,6 +23,7 @@ import {
 
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({ ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()), stripe: (await import('@/ee/test/stripe-fake')).fakeStripe() }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireAdminContext: vi.fn(), requireWorkspaceId: vi.fn() }))
+vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: async () => ({ workspace: { id: 42, organization_id: null } }) }))
 vi.mock('@/app/api/_services/getting-started.service', () => ({ markPaymentMethodAdded: vi.fn() }))
 vi.mock('@/ee/services/billing.service', () => ({
     PLAN_CARD_SETUP_KIND: 'plan_card_setup',

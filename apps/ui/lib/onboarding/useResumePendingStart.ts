@@ -5,6 +5,7 @@ import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { useCallback } from 'react'
 
 // Replays whatever is parked (a first-agent draft or a shared template). Where it lands depends on
@@ -23,6 +24,6 @@ export function useResumePendingStart() {
             await startPending()
             return
         }
-        openBilling(undefined, 'resume_first_agent')
+        if (!isManagedWorkspace(workspace)) openBilling(undefined, 'resume_first_agent')
     }, [workspace, startPending, openBilling])
 }

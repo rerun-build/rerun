@@ -45,7 +45,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => ({
         supabase: state.db!.client,
         user: contractSessionUser('user-ada', 7),
         workspaceRefused: false,
-        membership: { role: 'admin', box_scope: 'all' },
+        membership: { role: 'admin', box_scope: 'all', organization_staff: false },
     }),
 }))
 

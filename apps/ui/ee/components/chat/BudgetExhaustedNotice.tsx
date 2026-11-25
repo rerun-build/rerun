@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 import { setRerunCreditPausedAction } from '@/ee/actions/billing.actions'
+import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
+import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { NoticeActions, type NoticeAction } from '@/components/chat/NoticeActions'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -45,6 +47,9 @@ type SubscriptionProvider = 'claude' | 'codex'
 // offered only when `claudePlanOffered`: the restricted lifetime plan leaves it out, AppSumo refuses
 // to list it.
 //
+// `manager` is the organization that runs the workspace: it hands the credit out, so it is the one to
+// ask for more, and the workspace's own AI is the other way out.
+//
 // On a trial, `coworker` names who stopped, `onPaid` hands the checkout a way to pick the task back
 // up, and `resuming` is the moment between paying and the plan landing, when the notice turns into
 // the receipt. `onResumeNow` is the hand-held way back if that moment drags on.
@@ -61,8 +66,9 @@ export function BudgetExhaustedNotice({
     noCredit,
     lifetime,
     claudePlanOffered,
+    manager,
     ...upgrade
-}: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection; preTrial?: boolean; trialing?: boolean; paused?: boolean; noCredit?: boolean; lifetime?: boolean; claudePlanOffered?: boolean } & TrialUpgrade) {
+}: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection; preTrial?: boolean; trialing?: boolean; paused?: boolean; noCredit?: boolean; lifetime?: boolean; claudePlanOffered?: boolean; manager?: WorkspaceManager | null } & TrialUpgrade) {
     const t = useTranslations('chat.budget')
     const openBilling = useBillingStore(s => s.openBilling)
     const errorText = useErrorText()
@@ -84,6 +90,8 @@ export function BudgetExhaustedNotice({
             </div>
         )
     }
+
+    if (manager) return <ManagedNotice manager={manager} onConnectProvider={onConnectProvider} ownConnection={ownConnection} />
 
     if (preTrial) {
         return (
@@ -170,6 +178,49 @@ export function BudgetExhaustedNotice({
                 <>
                     <p className="text-sm">{usedUp} {trialing || noCredit ? t('subscribeToKeepWorking') : t('resetsNextMonth')}</p>
                     <NoticeActions actions={[paidWayOut]} />
+                </>
+            )}
+        </div>
+    )
+}
+
+function ManagedNotice({ manager, onConnectProvider, ownConnection }: { manager: WorkspaceManager; onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection }) {
+    const t = useTranslations('chat.budget')
+    const tManaged = useTranslations('managed.credit')
+    const openAiProviders = useWorkspaceSettingsStore(s => s.openAiProviders)
+
+    return (
+        <div className="relative mb-2 space-y-2.5 overflow-hidden rounded-lg px-4 pt-3 pb-4">
+            <BorderBeam animated pattern="arcs" tone="red" glow width={1} duration={7} />
+            <div className="flex items-center gap-2.5 text-sm">
+                <Icon size="sm" tone="red" icon={ZapOffIcon} className="bg-red-500/10 text-foreground" />
+                <span className="font-medium">{tManaged('outTitle')}</span>
+            </div>
+            <p className="text-sm">{ownConnection ? tManaged('outOwnPlan', { manager: manager.name, plan: ownConnection.label }) : tManaged('outOwnAi', { manager: manager.name })}</p>
+            <ContactManagerButton manager={manager} size="sm" className="w-full" />
+            {ownConnection ? (
+                <Button size="sm" variant="outline" className="w-full" onClick={ownConnection.onUse}>
+                    <ProviderIcon provider={ownConnection.provider} className="size-3.5" />
+                    <span className="truncate">{t('runOn', { plan: ownConnection.label })}</span>
+                </Button>
+            ) : (
+                <>
+                    {onConnectProvider && (
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button size="sm" variant="outline" onClick={() => onConnectProvider('claude')}>
+                                <ProviderIcon provider="claude" className="size-3.5" />
+                                {t('connectProvider.claude')}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => onConnectProvider('codex')}>
+                                <ProviderIcon provider="openai" className="size-3.5" />
+                                {t('connectProvider.chatgpt')}
+                            </Button>
+                        </div>
+                    )}
+                    <Button size="sm" variant="outline" className="w-full" onClick={() => openAiProviders()}>
+                        <KeyIcon className="size-3.5" />
+                        {t('lifetime.apiKeyTitle')}
+                    </Button>
                 </>
             )}
         </div>

@@ -2,6 +2,8 @@ import 'server-only'
 
 import { memberActor, workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
+import { brandText, brandTools } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { deleteAgent } from '@/app/api/_services/agent.service'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 import { authenticateApiKey, bindImportKey, type AuthenticatedApiKey } from '@/lib/mcp/api-keys'
@@ -79,7 +81,7 @@ export async function handleAccountMcp(req: Request, token: string, { importOnly
     }
 
     if (method === 'tools/list') {
-        return rpcResult(id, { tools: isImportKey(key) ? importToolDefs(ACCOUNT_TOOL_DEFS) : ACCOUNT_TOOL_DEFS })
+        return rpcResult(id, { tools: brandTools(isImportKey(key) ? importToolDefs(ACCOUNT_TOOL_DEFS) : ACCOUNT_TOOL_DEFS, await workspaceBrand(key.workspaceId)) })
     }
 
     if (method === 'tools/call') {
@@ -102,7 +104,7 @@ export async function handleAccountMcp(req: Request, token: string, { importOnly
             }
             return rpcResult(id, { content: [{ type: 'text', text }], structuredContent: out })
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'Tool failed'
+            const message = brandText(err instanceof Error ? err.message : 'Tool failed', await workspaceBrand(key.workspaceId))
             console.error(`[mcp-account] tools/call ${name} failed:`, message)
             // Surface as a tool execution error (isError) rather than a protocol error, so the
             // client model reads the reason and can correct its arguments.

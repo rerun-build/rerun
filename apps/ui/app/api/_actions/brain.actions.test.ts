@@ -10,6 +10,7 @@ import { listWorkspaceTablesAction } from './workspace-db.actions'
 import { listWorkspaceFilesAction } from './workspace-file.actions'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
+vi.mock('@/lib/brand/workspace', () => ({ workspaceBrand: async () => ({ name: 'Nordlys' }) }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: (ctx: unknown) => ctx, visibleSpaceIds: vi.fn(), manageableSpaceIds: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/coworker-box.service', () => ({ syncCoworkerBoxes: vi.fn() }))
@@ -153,6 +154,14 @@ describe('the Boxes the Brain files under', () => {
         vi.mocked(engine.createBrainSkill).mockRejectedValue(new engine.EngineRequestError('rerun-engine POST /brain/skills failed: 409', 409))
         await expect(createBrainSkillAction({ name: 'Weekly report', description: '', body: 'Steps.' })).resolves.toMatchObject({ ok: false, code: 'brainSkillExists', params: { name: 'Weekly report' } })
         expect(engine.createBrainSkill).toHaveBeenCalledWith(conn, { name: 'Weekly report', description: '', body: 'Steps.', author: 'user:theo@example.com' })
+    })
+
+    it('signs what the team of the organization writes with its brand', async () => {
+        vi.mocked(requireWorkspaceContext).mockResolvedValueOnce({ userId: 'staff', userEmail: 'solveig@nordlys.test', organizationStaff: true, workspace: { id: 7 } } as never)
+        vi.mocked(getWorkspaceConnection).mockResolvedValueOnce(conn)
+        vi.mocked(engine.createBrainSkill).mockResolvedValue({} as never)
+        await createBrainSkillAction({ name: 'Weekly report', description: '', body: 'Steps.' })
+        expect(vi.mocked(engine.createBrainSkill).mock.lastCall?.[1]).toMatchObject({ author: 'user:Nordlys' })
     })
 
     it('reads the files of an engine from before filing as unfiled', async () => {

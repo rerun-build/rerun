@@ -4,6 +4,7 @@ import { boxAccessOf, toAccessLevel, toVisibility, type AccessLevel, type BoxAcc
 import { requireAdminContext, requireWorkspaceContext, toBoxScope, type BoxScope, type WorkspaceRole } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { resolveMemberIdentities } from '@/app/api/_services/members.service'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import { selectAll, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -40,14 +41,15 @@ export async function getSpaceAccessAction(spaceId: string): Promise<ActionResul
         const [{ data: agentRows }, { data: grantRows }, { data: memberRows }] = await Promise.all([
             selectAll(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspace.id, space_id: spaceId }, { column: 'created_at', ascending: true }),
             selectAll(supabase, 'space_members', ['user_id', 'access', 'granted_by'] as const, { space_id: spaceId, workspace_id: workspace.id }, { column: 'created_at', ascending: true }),
-            selectAll(supabase, 'workspace_members', ['user_id', 'role'] as const, { workspace_id: workspace.id }, { column: 'created_at', ascending: true }),
+            selectWorkspaceMembers(supabase, ['user_id', 'role'] as const, { workspace_id: workspace.id }),
         ])
         const members = memberRows ?? []
         const identities = await resolveMemberIdentities(supabase, members.map(m => m.user_id))
 
+        const memberIds = new Set(members.map(m => m.user_id))
         const people: SpaceAccessPerson[] = (grantRows ?? []).flatMap(row => {
             const access = toAccessLevel(row.access)
-            return access ? [{ userId: row.user_id, access, grantedBy: row.granted_by, createdBox: row.granted_by === row.user_id }] : []
+            return access && memberIds.has(row.user_id) ? [{ userId: row.user_id, access, grantedBy: row.granted_by, createdBox: row.granted_by === row.user_id }] : []
         })
 
         return {
@@ -87,7 +89,7 @@ export async function grantSpaceAccessAction(spaceId: string, userIds: string[],
         if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return failure('boxNotFound')
 
         const [{ data: memberRows }, { data: existingRows }] = await Promise.all([
-            selectMany(supabase, 'workspace_members', ['user_id', 'role'] as const, { workspace_id: workspace.id, user_id: targets }),
+            selectWorkspaceMembers(supabase, ['user_id', 'role'] as const, { workspace_id: workspace.id, user_id: targets }),
             selectMany(supabase, 'space_members', ['user_id', 'granted_by'] as const, { space_id: spaceId, user_id: targets }),
         ])
         const roleOf = new Map((memberRows ?? []).map(m => [m.user_id, m.role]))
@@ -139,7 +141,7 @@ export async function listMemberAccessAction(targetUserId: string): Promise<Acti
         if (!viewerIsAdmin && targetUserId !== ctx.userId) return failure('adminOnlyMemberBoxes')
         const { workspace, supabase } = ctx
 
-        const { data: target } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: targetUserId, workspace_id: workspace.id })
+        const { data: target } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: targetUserId, workspace_id: workspace.id, ...(targetUserId === ctx.userId ? {} : { organization_staff: false }) })
         if (!target) return failure('userNotMember')
 
         const [{ data: spaceRows }, { data: agentRows }, { data: grantRows }] = await Promise.all([

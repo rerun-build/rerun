@@ -9,6 +9,7 @@ import type { BoxConnection } from '@/lib/engine/types'
 import { ChevronLeftIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID, addableProviderSchema } from '@rerun/contracts'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 
@@ -69,10 +70,12 @@ function BackButton({ onBack }: { onBack: () => void }) {
     )
 }
 
-function SourceSubtitle({ source }: { source: BoxConnection }) {
+function SourceSubtitle({ source, credit }: { source: BoxConnection; credit: RerunCredit }) {
     const t = useTranslations('connections.subtitle')
+    const tManaged = useTranslations('managed.credit')
+    const { name: brandName } = useBrand()
     const tConnections = useTranslations('connections')
-    if (source.id === RERUN_CONNECTION_ID) return t('included')
+    if (source.id === RERUN_CONNECTION_ID) return credit.managed ? tManaged('providedBy', { manager: brandName }) : t('included')
     const provider = addableProviderSchema.safeParse(source.provider)
     if (!provider.success) return source.provider
     const pitch = providerPitch(provider.data, tConnections)
@@ -86,7 +89,7 @@ export function DetailHeader({ source, credit, onBack, onRename }: { source: Box
             <SourceAvatar provider={source.provider} size="sm" />
             <div className="flex min-w-0 flex-1 flex-col">
                 {source.id === RERUN_CONNECTION_ID || !onRename ? <span className="truncate text-sm font-medium">{source.name}</span> : <EditableName name={source.name} onRename={onRename} />}
-                <span className="truncate text-[11px] text-muted-foreground"><SourceSubtitle source={source} /></span>
+                <span className="truncate text-[11px] text-muted-foreground"><SourceSubtitle source={source} credit={credit} /></span>
             </div>
             <SourceStatus source={source} credit={credit} />
         </div>

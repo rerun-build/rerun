@@ -19,8 +19,9 @@ export type GettingStartedStep = {
 
 export type GettingStartedStepId = GettingStartedStep['id']
 
-// `phone` is null for an account that was never asked for a number: the step is not in its list.
-export type GettingStartedProgress = Record<Exclude<GettingStartedStepId, 'phone'>, boolean> & { phone: boolean | null }
+// `phone` is null for an account that was never asked for a number, `payment_method` where an
+// organization pays for the workspace: the step is not in its list.
+export type GettingStartedProgress = Record<Exclude<GettingStartedStepId, 'phone' | 'payment_method'>, boolean> & { phone: boolean | null; payment_method: boolean | null }
 
 // `null` when there is nothing to win: only a trial can be extended.
 export type GettingStartedReward = 'available' | 'granted' | null
@@ -76,14 +77,14 @@ export const GETTING_STARTED_ITEMS = ['first_agent', 'ai_provider', 'invite', 's
 export type GettingStartedItem = (typeof GETTING_STARTED_ITEMS)[number]
 
 // `phone` is the status of the account looking at the list, null while it is not known yet.
-export function progressOf(items: ReadonlySet<string>, phone: PhoneStatus | null): GettingStartedProgress {
+export function progressOf(items: ReadonlySet<string>, phone: PhoneStatus | null, { sold = true }: { sold?: boolean } = {}): GettingStartedProgress {
     return {
         phone: phone === null || phone === 'none' ? null : isPhoneStepDone(phone),
         first_agent: items.has('first_agent'),
         ai_provider: items.has('ai_provider'),
         invite: items.has('invite'),
         schedule: items.has('schedule'),
-        payment_method: items.has('payment_method'),
+        payment_method: sold ? items.has('payment_method') : null,
     }
 }
 

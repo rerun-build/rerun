@@ -2,6 +2,7 @@ import { rerunCreditTotalMicros, type RerunCreditColumns } from '@rerun/cloud/bi
 import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/engine/models'
 import type { BoxConnection, BoxConnectionsList, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { formatNumber, shortDate } from '@rerun/i18n/format'
 import { PROVIDER_LABELS, RERUN_BRAND, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isWhiteLabel, opencodePlanOf, opencodeServesModel, toProviderModel, type Brand, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
 
@@ -54,6 +55,9 @@ export type SourceCopy = (
         | 'sources.creditUsedUpNextMonth'
         | 'sources.creditBackOn'
         | 'sources.creditBackNextMonth'
+        | 'sources.creditManagedUsed'
+        | 'sources.creditManagedUsedUp'
+        | 'sources.creditBackManaged'
         | 'sources.windowResets'
         | 'sources.pricePerMillion',
     values?: Record<string, string | number>
@@ -117,21 +121,24 @@ export function effectiveDefault(boxDefault: BoxDefault | null): BoxDefault {
 }
 
 // `paused`: a member turned the credit off, and the hub refuses every Rerun call until it is resumed.
-export type RerunCredit = { usedMicros: number; budgetMicros: number; resetAt: string | null; percent: number; paused?: boolean }
+// `managed`: the organization that runs the workspace hands it out, so no month brings it back.
+export type RerunCredit = { usedMicros: number; budgetMicros: number; resetAt: string | null; percent: number; paused?: boolean; managed?: boolean }
 
-export function rerunCreditOf(workspace: (RerunCreditColumns & { current_period_end?: string | null; rerun_credit_paused_at?: string | null }) | null | undefined): RerunCredit {
+export function rerunCreditOf(workspace: (RerunCreditColumns & { current_period_end?: string | null; rerun_credit_paused_at?: string | null; organization_id?: string | null }) | null | undefined): RerunCredit {
     const usedMicros = workspace?.rerun_used_micros ?? 0
     const budgetMicros = rerunCreditTotalMicros(workspace)
-    const percent = budgetMicros > 0 ? Math.min(100, Math.round((usedMicros / budgetMicros) * 100)) : 0
-    return { usedMicros, budgetMicros, resetAt: workspace?.current_period_end ?? null, percent, paused: !!workspace?.rerun_credit_paused_at }
+    const managed = isManagedWorkspace(workspace)
+    const percent = budgetMicros > 0 ? Math.min(100, Math.round((usedMicros / budgetMicros) * 100)) : managed ? 100 : 0
+    return { usedMicros, budgetMicros, resetAt: managed ? null : (workspace?.current_period_end ?? null), percent, paused: !!workspace?.rerun_credit_paused_at, ...(managed ? { managed } : {}) }
 }
 
 export function isCreditUsedUp(credit: RerunCredit) {
-    return credit.budgetMicros > 0 && credit.usedMicros >= credit.budgetMicros
+    return (credit.budgetMicros > 0 || !!credit.managed) && credit.usedMicros >= credit.budgetMicros
 }
 
 // Set inside a sentence of the iOS app ("back {backOn}"), which is why it carries its own preposition.
 export function creditResetPhrase(credit: RerunCredit, t: SourceCopy, locale: string) {
+    if (credit.managed) return t('sources.creditBackManaged')
     return credit.resetAt ? t('sources.creditBackOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditBackNextMonth')
 }
 
@@ -328,6 +335,7 @@ export function planWindowReset(window: PlanLimitWindow, t: SourceCopy, locale: 
 
 function creditSummary(credit: RerunCredit, t: SourceCopy, locale: string): string {
     if (credit.paused) return t('sources.creditPaused')
+    if (credit.managed) return isCreditUsedUp(credit) ? t('sources.creditManagedUsedUp') : t('sources.creditManagedUsed', { percent: credit.percent })
     if (!isCreditUsedUp(credit)) return t('sources.creditUsed', { percent: credit.percent })
     return credit.resetAt ? t('sources.creditUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditUsedUpNextMonth')
 }

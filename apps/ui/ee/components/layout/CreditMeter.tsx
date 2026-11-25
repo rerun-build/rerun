@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 
+import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { formatCredits } from '@/ee/lib/billing/plans'
 import { PlusIcon } from '@/lib/icons'
@@ -20,13 +21,15 @@ function toneOf(leftMicros: number, wholeMicros: number): CreditTone {
 }
 
 // The Rerun credit at a glance in the workspace menu: coworkers spend it without asking, so what is
-// left has to be one click away. The split by AI and paid data stays in the billing dialog.
-export function CreditMeter({ usedMicros, wholeMicros, trial, onOpen, onAdd }: { usedMicros: number; wholeMicros: number; trial: boolean; onOpen: () => void; onAdd?: () => void }) {
+// left has to be one click away. The split by AI and paid data stays in the billing dialog. `manager`
+// is the organization that hands it out, where one does: there is nothing to buy, only someone to ask.
+export function CreditMeter({ usedMicros, wholeMicros, trial, onOpen, onAdd, manager }: { usedMicros: number; wholeMicros: number; trial: boolean; onOpen: () => void; onAdd?: () => void; manager?: WorkspaceManager | null }) {
     const locale = useLocale()
     const t = useTranslations('billing')
+    const tManaged = useTranslations('managed')
     const leftMicros = Math.max(wholeMicros - usedMicros, 0)
     const tone = toneOf(leftMicros, wholeMicros)
-    const ratio = Math.min(usedMicros / wholeMicros, 1)
+    const ratio = wholeMicros > 0 ? Math.min(usedMicros / wholeMicros, 1) : 1
     const left = tone === 'out' ? (trial ? t('layout.meter.noTrialCreditsLeft') : t('layout.meter.outOfCredits')) : t('layout.meter.left', { figure: formatCredits(leftMicros, locale) })
 
     return (
@@ -42,6 +45,11 @@ export function CreditMeter({ usedMicros, wholeMicros, trial, onOpen, onAdd }: {
                     <span className={cn('block h-full rounded-full transition-[width] duration-500', tone === 'ok' ? 'bg-brand' : 'bg-destructive')} style={{ width: `${Math.max(ratio * 100, usedMicros > 0 ? 2 : 0)}%` }} />
                 </span>
             </DropdownMenuItem>
+            {tone === 'out' && manager?.supportEmail && (
+                <DropdownMenuItem asChild className="h-7 justify-center gap-1.5 rounded-md bg-primary text-xs text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground">
+                    <a href={`mailto:${manager.supportEmail}`}>{tManaged('contact', { manager: manager.name })}</a>
+                </DropdownMenuItem>
+            )}
             {tone === 'out' && onAdd && (
                 <DropdownMenuItem onSelect={onAdd} className="h-7 justify-center gap-1.5 rounded-md bg-primary text-xs text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground">
                     {trial ? (

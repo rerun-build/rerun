@@ -7,11 +7,12 @@ import { GateMessage, GateScreen, BrandTile, type GateBrand } from '@/components
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { GateInput } from '@/components/published/GateInput'
-import { APP_URL } from '@/lib/app-url'
+import { workspaceAppUrl } from '@/lib/brand/workspace'
 import { getBrand } from '@/lib/brand/server'
 import { workspaceBrand } from '@/lib/brand/workspace'
 import { GATE_EMAIL_PARAM, GATE_ERROR_PARAM, loadPublished, loadWorkspaceBrand, safeNextPath, type GateError, type PublishedEntry } from '@/lib/published/gate'
 import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
+import { requestHost } from '@/lib/request-host'
 import { openPublishedHref } from '@/lib/published/links'
 import { KeyIcon, LogInIcon, MailIcon } from '@/lib/icons'
 import { getTranslations } from 'next-intl/server'
@@ -27,7 +28,7 @@ function param(search: Search, key: string): string | undefined {
 }
 
 async function onOwnHost(slug: string): Promise<boolean> {
-    return extractPublishedSlug((await headers()).get('host')) === slug
+    return extractPublishedSlug(requestHost(await headers())) === slug
 }
 
 async function gateContext(slug: string): Promise<{ entry: PublishedEntry | null; brand: GateBrand }> {
@@ -151,7 +152,7 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     return (
         <GateScreen brand={brand} lock={<BrandLogo size="lg" />} title={title} subtitle={t('members.subtitle', { workspace: brand.name })}>
             <Button size="lg" asChild>
-                <a href={`${APP_URL}${openPublishedHref(slug, next)}`}>
+                <a href={`${await workspaceAppUrl(entry.workspace_id)}${openPublishedHref(slug, next)}`}>
                     <LogInIcon />
                     {t('members.continue')}
                 </a>

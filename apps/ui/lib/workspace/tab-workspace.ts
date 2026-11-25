@@ -1,3 +1,4 @@
+import { LAST_WORKSPACE_COOKIE, readWorkspaceId } from './host-workspace'
 import { WORKSPACE_HEADER, WORKSPACE_PARAM } from './workspace-header'
 
 // Each tab stays on the workspace it opened, whatever another tab switches to. `users.workspace_id`
@@ -35,6 +36,21 @@ export function clearTabWorkspace() {
     try {
         sessionStorage.removeItem(TAB_WORKSPACE_KEY)
     } catch {}
+}
+
+const LAST_WORKSPACE_MAX_AGE = 365 * 24 * 60 * 60
+
+// On an organization's address: the server reads it on the next page, which names no workspace. Kept to
+// this very host, the cookie names one of its workspaces.
+export function rememberHostWorkspace(workspaceId: number) {
+    const secure = window.location.protocol === 'https:' ? '; secure' : ''
+    document.cookie = `${LAST_WORKSPACE_COOKIE}=${workspaceId}; path=/; max-age=${LAST_WORKSPACE_MAX_AGE}; samesite=lax${secure}`
+}
+
+export function readLastHostWorkspace(): number | null {
+    const prefix = `${LAST_WORKSPACE_COOKIE}=`
+    const entry = document.cookie.split('; ').find(cookie => cookie.startsWith(prefix))
+    return readWorkspaceId(entry?.slice(prefix.length))
 }
 
 export function withTabWorkspace(url: string): string {

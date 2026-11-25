@@ -5,10 +5,14 @@ import { resendSignInCodeIfLive } from '@/app/api/_services/sign-in-code.service
 import { callerIp } from '@/lib/auth/caller-ip'
 import { EMAIL_PREPARATION_CODES, type EmailPreparationFailure } from '@/lib/auth/email-sign-in-messages'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
+import { isRerunHost, requestSite } from '@/lib/brand/request-site'
 import { verifyCaptcha } from '@/lib/auth/captcha'
 import { captchaProofSchema, type CaptchaProof } from '@/lib/auth/captcha-proof'
 import { normalizeEmail } from '@/lib/email'
 import { createClient } from '@/supabase/server'
+import { askInvitedSignInCode } from '@rerun/cloud/organizations.server'
+import { DEFAULT_LOCALE, isStableLocale } from '@rerun/i18n'
+import { getLocale } from 'next-intl/server'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 
@@ -16,6 +20,7 @@ import { z } from 'zod'
 // the last one is still good it is mailed again instead. `resent: false` means ask Supabase, `held`
 // that the last one left less than a minute ago and nothing new was mailed.
 export async function resendLiveSignInCode(email: string): Promise<{ resent: boolean; held: boolean }> {
+    if (!(await isRerunHost())) return { resent: false, held: false }
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser()
     const outcome = await resendSignInCodeIfLive(normalizeEmail(email), data.user?.id ?? null)
@@ -42,10 +47,25 @@ async function refuseCodeAsk(captcha: CaptchaProof | undefined): Promise<{ ip: s
 export async function prepareEmailSignIn(input: z.input<typeof prepareSchema>): Promise<EmailSignInPreparation> {
     const parsed = prepareSchema.safeParse(input)
     if (!parsed.success) return preparationRefused('invalid_email')
+    if (!(await isRerunHost())) return preparationRefused('unavailable')
 
     const { ip, refusal } = await refuseCodeAsk(parsed.data.captcha)
     if (refusal) return preparationRefused(refusal)
 
     const result = await ensureEmailAccount(normalizeEmail(parsed.data.email), ip)
     return result.ok ? result : preparationRefused(result.error)
+}
+
+// The only way in on an organization's address. Whoever the address belongs to, the answer is the
+// same: a code is on its way if somebody here invited them.
+export async function askInvitedCode(rawEmail: string): Promise<{ ok: true } | (ActionFailure & { reason: EmailPreparationFailure })> {
+    const site = await requestSite()
+    if (site.kind !== 'organization' || site.suspended) return preparationRefused('unavailable')
+    const parsed = prepareSchema.shape.email.safeParse(rawEmail)
+    if (!parsed.success) return preparationRefused('invalid_email')
+
+    const spoken = await getLocale()
+    const locale = isStableLocale(spoken) ? spoken : DEFAULT_LOCALE
+    const outcome = await askInvitedSignInCode({ organizationId: site.organizationId, brand: site.brand, email: normalizeEmail(parsed.data), ip: callerIp(await headers()), locale })
+    return outcome === 'asked' ? { ok: true } : preparationRefused('too_many_codes')
 }

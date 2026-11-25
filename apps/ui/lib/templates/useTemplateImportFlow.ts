@@ -5,6 +5,7 @@ import { useBillingStore } from '@/stores/billing.store'
 import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { track } from '@rerun/analytics/client'
 import type { LibraryTemplate } from '@/lib/templates/library'
 
@@ -36,6 +37,7 @@ export function useTemplateImportFlow({ onDone }: { onDone: () => void }) {
         const hasSpace = spaces.length > 0
         if (hasSpace) {
             if (!isSubscriptionEntitled(workspace.subscription_status)) {
+                if (isManagedWorkspace(workspace)) return
                 openBilling(undefined, 'template_link')
                 return
             }

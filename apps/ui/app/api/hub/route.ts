@@ -6,6 +6,8 @@ import { dispatchForemanHubTool } from '@/app/api/_services/foreman-hub.service'
 import { dispatchHubTool } from '@/app/api/_services/services.service'
 import { dispatchTeamHubTool, isTeamHubTool } from '@/app/api/_services/team-hub.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { brandText } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { FOREMAN_READ_TOOL_NAMES } from '@/lib/foreman/engine-brief'
 import { foremanHubTokenRequired, verifyForemanHubToken } from '@/lib/foreman/hub-token'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -94,6 +96,6 @@ export async function POST(req: Request): Promise<Response> {
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Hub tool failed'
         console.error(`[hub] ${tool} failed:`, message)
-        return Response.json({ error: message })
+        return Response.json({ error: brandText(message, await workspaceBrand(engine.workspaceId)) })
     }
 }

@@ -114,7 +114,7 @@ export async function saveForemanProfile(ctx: WorkspaceContext, args: Record<str
     await writeAnswers(ctx, next, true)
 
     const firstName = asString(args.first_name)
-    if (firstName) await saveFirstName(ctx, firstName)
+    if (firstName && !ctx.organizationStaff) await saveFirstName(ctx, firstName)
 
     // After the first name: the exploration looks for the person on LinkedIn by it. Never for an
     // anonymous visitor, whose answers are not written anyway: the paid sources wait for an account.

@@ -5,10 +5,12 @@ import type { Database } from '@/app/api/database.types'
 import { revokeMemberComputers } from '@/app/api/_services/remote-computers.service'
 import { stopWorkspaceCharges, subscriptionStillCharges, uninstallWorkspaceApps } from '@rerun/cloud/account'
 import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
+import { leaveOrganizations } from '@rerun/cloud/organizations.server'
 import { deletedAccountEmailFor } from '@/lib/auth/placeholder-email'
 import { DEFAULT_WORKSPACE_NAME } from '@/lib/naming/workspace-name'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import { isLastAdmin, setMemberRole } from '@/app/api/_services/members.service'
-import { selectAll, selectMany } from '@/supabase/supabase-helpers'
+import { selectAll } from '@/supabase/supabase-helpers'
 
 type Client = SupabaseClient<Database>
 type AgentUpdate = Database['public']['Tables']['agents']['Update']
@@ -19,18 +21,18 @@ type NewsletterRecipientUpdate = Database['public']['Tables']['newsletter_recipi
 export const ACCOUNT_DELETED_REASON = 'account_deleted'
 
 const USER_AVATARS_BUCKET = 'user-avatars'
-const WORKSPACE_COLUMNS = ['id', 'name', 'is_sandbox', 'stripe_customer_id', 'stripe_subscription_id', 'subscription_status'] as const
+const WORKSPACE_COLUMNS = ['id', 'name', 'is_sandbox', 'stripe_customer_id', 'stripe_subscription_id', 'subscription_status', 'organization_id'] as const
 const LIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing'])
 
 type OwnWorkspace = { id: number; name: string; isSandbox: boolean; stripeCustomerId: string | null; stripeSubscriptionId: string | null; subscriptionStatus: string | null; shared: boolean }
 
 async function workspacesOf(admin: Client, userId: string): Promise<OwnWorkspace[]> {
-    const { data: memberships, error } = await selectAll(admin, 'workspace_members', ['workspace_id'] as const, { user_id: userId })
+    const { data: memberships, error } = await selectAll(admin, 'workspace_members', ['workspace_id'] as const, { user_id: userId, organization_staff: false })
     if (error) throw new Error(error.message)
     const ids = memberships.map(membership => membership.workspace_id)
     if (ids.length === 0) return []
 
-    const [{ data: workspaces, error: workspacesError }, { data: members, error: membersError }] = await Promise.all([selectAll(admin, 'workspaces', WORKSPACE_COLUMNS, { id: ids }), selectAll(admin, 'workspace_members', ['workspace_id', 'user_id'] as const, { workspace_id: ids })])
+    const [{ data: workspaces, error: workspacesError }, { data: members, error: membersError }] = await Promise.all([selectAll(admin, 'workspaces', WORKSPACE_COLUMNS, { id: ids }), selectWorkspaceMembers(admin, ['workspace_id', 'user_id'] as const, { workspace_id: ids })])
     if (workspacesError) throw new Error(workspacesError.message)
     if (membersError) throw new Error(membersError.message)
 
@@ -41,7 +43,8 @@ async function workspacesOf(admin: Client, userId: string): Promise<OwnWorkspace
         stripeCustomerId: workspace.stripe_customer_id,
         stripeSubscriptionId: workspace.stripe_subscription_id,
         subscriptionStatus: workspace.subscription_status,
-        shared: members.some(member => member.workspace_id === workspace.id && member.user_id !== userId),
+        // An organization's workspace is the organization's: its last person leaves it as it stands.
+        shared: workspace.organization_id != null || members.some(member => member.workspace_id === workspace.id && member.user_id !== userId),
     }))
 }
 
@@ -61,7 +64,7 @@ export async function accountDeletionBlockers(admin: Client, userId: string): Pr
 // who can pay for it or let anyone in.
 async function leaveSharedWorkspace(admin: Client, userId: string, workspace: OwnWorkspace) {
     if (await isLastAdmin(admin, workspace.id, userId)) {
-        const { data: members } = await selectMany(admin, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id, user_id: { neq: userId } }, { column: 'created_at' }, 1)
+        const { data: members } = await selectWorkspaceMembers(admin, ['user_id'] as const, { workspace_id: workspace.id, user_id: { neq: userId } })
         const heir = members?.[0]
         if (heir) {
             const { error } = await setMemberRole(admin, workspace.id, heir.user_id, 'admin')
@@ -125,6 +128,7 @@ export async function anonymizeAccount(admin: Client, userId: string): Promise<{
     const blockers = await blockersAmong(workspaces)
     if (blockers.length > 0) return { ok: false, blockers }
 
+    await leaveOrganizations(userId)
     for (const workspace of workspaces) {
         if (workspace.shared) await leaveSharedWorkspace(admin, userId, workspace)
         else await shutDownOwnWorkspace(admin, workspace)

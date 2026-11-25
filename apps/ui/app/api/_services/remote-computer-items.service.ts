@@ -2,7 +2,7 @@ import 'server-only'
 import { remoteOsSchema } from '@rerun/contracts'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { resolveMemberIdentities } from '@/app/api/_services/members.service'
+import { resolveWorkspaceIdentities } from '@/app/api/_services/members.service'
 import { hasLinkedComputers, listWorkspaceComputers, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
 import type { ComputerItem, ComputersList, ComputerStatus } from '@/lib/computers/types'
 import { AppError } from '@/lib/i18n/action-error'
@@ -27,7 +27,12 @@ function statusOf(computer: WorkspaceComputer): ComputerStatus {
 }
 
 async function toItems(ctx: WorkspaceContext, computers: WorkspaceComputer[]): Promise<ComputerItem[]> {
-    const people = await resolveMemberIdentities(ctx.supabase, [...new Set(computers.flatMap(computer => (computer.linked_by ? [computer.linked_by] : [])))])
+    const people = await resolveWorkspaceIdentities(ctx.supabase, ctx.workspace.id, [...new Set(computers.flatMap(computer => (computer.linked_by ? [computer.linked_by] : [])))])
+    const linkerOf = (userId: string | null) => {
+        if (!userId) return null
+        const person = people.get(userId)
+        return { id: person?.id ?? userId, name: person?.name ?? person?.email ?? '' }
+    }
     return computers.map(computer => ({
         id: computer.id,
         name: computer.name,
@@ -36,7 +41,7 @@ async function toItems(ctx: WorkspaceContext, computers: WorkspaceComputer[]): P
         arch: computer.arch,
         hostname: computer.hostname,
         appVersion: computer.view?.appVersion ?? computer.app_version,
-        linkedBy: computer.linked_by ? { id: computer.linked_by, name: people.get(computer.linked_by)?.name ?? people.get(computer.linked_by)?.email ?? '' } : null,
+        linkedBy: linkerOf(computer.linked_by),
         linkedAt: computer.created_at,
         lastSeenAt: computer.view?.lastSeenAt ?? computer.last_seen_at,
         status: statusOf(computer),

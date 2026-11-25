@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
-import { authorIdOf, authorTurnsOf } from '@/lib/chat/message-author'
+import { authorIdOf, authorShortName, authorTurnsOf, FORMER_MEMBER } from '@/lib/chat/message-author'
 
 const user = (id: string, authorId?: string, text = 'hello') => ({ id, role: 'user', parts: [{ type: 'text', text }], ...(authorId && { metadata: { authorId } }) })
 const agent = (id: string) => ({ id, role: 'assistant', parts: [{ type: 'text', text: 'done' }], metadata: { model: 'sonnet' } })
@@ -47,5 +47,13 @@ describe('install guide', () => {
     it('stays unsigned even though a person clicked it off', () => {
         const install = buildInstallMessage('Connect your CRM.', 'Closer')
         expect(authorIdOf(user('m1', 'u1', install))).toBeUndefined()
+    })
+})
+
+describe('authorShortName', () => {
+    it('calls a person by their first name, and a brand by the whole of its name', () => {
+        expect(authorShortName({ id: 'u1', name: 'Ada Lovelace' })).toBe('Ada')
+        expect(authorShortName({ id: 'organization', name: 'Nordlys Studio' })).toBe('Nordlys Studio')
+        expect(authorShortName(FORMER_MEMBER)).toBe('Former member')
     })
 })

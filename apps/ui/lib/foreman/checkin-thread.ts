@@ -26,7 +26,7 @@ export async function checkinReaderOf(workspaceId: number, metadata: Notificatio
     const memberId = typeof metadata?.memberId === 'string' ? metadata.memberId : null
     if (!memberId) return null
     const actor = await memberActor(workspaceId, memberId)
-    if (!actor) return null
+    if (!actor || actor.organizationStaff) return null
     return (await visibleAgentIds(actor)) === 'all' ? memberId : null
 }
 

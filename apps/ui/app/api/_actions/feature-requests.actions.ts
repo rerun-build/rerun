@@ -3,10 +3,11 @@
 import type { Database, Json } from '@/app/api/database.types'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { conversationCopy } from '@/app/api/_services/conversation-copy.service'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { FEATURE_REQUESTS_ENABLED } from '@rerun/cloud/feature-requests'
-import { FEATURE_REQUEST_KINDS, FEATURE_REQUEST_LIMITS } from '@rerun/contracts'
+import { FEATURE_REQUEST_KINDS, FEATURE_REQUEST_LIMITS, isWhiteLabel } from '@rerun/contracts'
 import { z } from 'zod'
 
 type FeatureRequestInsert = Database['public']['Tables']['feature_requests']['Insert']
@@ -34,6 +35,7 @@ export async function sendFeatureRequestAction(input: z.input<typeof sendSchema>
     const { sessionId, scope, toolCallId, kind, title, description, workaround } = parsed.data
 
     const ctx = await requireWorkspaceContext()
+    if (isWhiteLabel(await workspaceBrand(ctx.workspace.id))) return failure('featureRequestsUnavailable')
     const copy = await conversationCopy(ctx, scope, sessionId).catch(() => null)
     if (!copy) return failure('conversationNotFound')
 

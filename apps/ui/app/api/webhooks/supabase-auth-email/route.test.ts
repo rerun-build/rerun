@@ -61,13 +61,13 @@ describe('supabase send email hook', () => {
         expect(input.signInUrl).toContain('/auth/confirm?token_hash=hash1&type=magiclink')
     })
 
-    it('mails it under the brand of the address and of the host it was asked from', async () => {
+    it('mails it under the brand of the account', async () => {
         const agency = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys' }
         authEmailBrand.mockResolvedValue(agency)
 
         await post({ user: { id: 'user-1', email: 'a@b.co' }, email_data: emailData({ token: '123456', token_hash: 'hash1', redirect_to: 'https://agents.nordlys.no/auth/callback' }) })
 
-        expect(authEmailBrand).toHaveBeenCalledWith({ email: 'a@b.co', redirectTo: 'https://agents.nordlys.no/auth/callback' })
+        expect(authEmailBrand).toHaveBeenCalledWith({ email: 'a@b.co', userId: 'user-1' })
         expect(sendSignInCodeEmail.mock.calls[0][0].brand).toEqual(agency)
     })
 

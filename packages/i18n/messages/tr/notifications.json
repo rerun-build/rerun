@@ -167,6 +167,7 @@
         "trialEndedDeclined": "Ücretsiz {provider} yeriniz sona erdi ve kart reddedildi, bu yüzden {account, select, none {hesap} other {{account}}} duraklatıldı. Saklamak için bir hafta içinde Faturalandırma bölümünden bir yer ekleyin, aksi takdirde bağlantı kesilecek.",
         "rateLimited": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} yavaşlamasını istedi. Hesabınız güvende kalsın diye coworker'larınız onu 24 saat kullanmayacak.",
         "signedOut": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} oturumunu kapattı. Coworker'larınızın yeniden kullanabilmesi için Ayarlar → Uygulamalar bölümünden yeniden bağlayın.",
-        "budgetExhausted": "Bu ayki {brand} kredileriniz tükendi. {brand} modelleriyle zamanlanmış ve tetiklenmiş çalıştırmalar duraklatıldı; krediler sıfırlanana veya siz kredi ekleyene kadar coworker'lar potansiyel müşteri, SEO veya sosyal medya verisi satın alamaz."
+        "budgetExhausted": "Bu ayki {brand} kredileriniz tükendi. {brand} modelleriyle zamanlanmış ve tetiklenmiş çalıştırmalar duraklatıldı; krediler sıfırlanana veya siz kredi ekleyene kadar coworker'lar potansiyel müşteri, SEO veya sosyal medya verisi satın alamaz.",
+        "managedCreditOut": "Bu çalışma alanının kredisi bitti. Daha fazlası için {manager} ile iletişime geçin: o zamana kadar zamanlanmış ve tetiklenmiş çalıştırmalar durdurulur, coworker'lar lead, SEO veya sosyal veri satın alamaz."
     }
 }

@@ -7,6 +7,7 @@ import { sendPaymentFailedNotice, type DeclinedInvoice } from './payment-failed-
 import { loadRecipient } from './recipient'
 
 vi.mock('@/ee/lib/email/lifecycle-emails', () => ({ sendPaymentFailedEmail: vi.fn() }))
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => (await import('@rerun/contracts')).RERUN_BRAND }))
 vi.mock('./recipient', () => ({ loadRecipient: vi.fn() }))
 vi.mock('@/lib/whatsapp/send', () => ({ deliverWhatsApp: vi.fn() }))
 vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_INLINE_MS: 0, alertBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=banner') }))
@@ -125,6 +126,13 @@ describe('sendPaymentFailedNotice', () => {
     it('skips a sandbox', async () => {
         await sendPaymentFailedNotice(database({ workspaces: { data: { id: 1, name: 'Sandbox', is_sandbox: true } } }).client, 1, INVOICE, NOW)
 
+        expect(sendPaymentFailedEmail).not.toHaveBeenCalled()
+        expect(deliverWhatsApp).not.toHaveBeenCalled()
+    })
+
+    it('skips a workspace an organization runs, whose card it is not', async () => {
+        const db = database({ workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false, organization_id: 'org-nordlys' } } })
+        await sendPaymentFailedNotice(db.client, 1, INVOICE, NOW)
         expect(sendPaymentFailedEmail).not.toHaveBeenCalled()
         expect(deliverWhatsApp).not.toHaveBeenCalled()
     })

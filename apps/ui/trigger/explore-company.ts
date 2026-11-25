@@ -3,6 +3,7 @@ import { queue, task } from '@trigger.dev/sdk/v3'
 import { taskLogger as logger } from '@rerun/cloud/tasks'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database, Json } from '@/app/api/database.types'
 import { buildSeedPages, seedPagesOutline } from '@/lib/brain/seed-pages'
 import { COLLECTOR_IDS } from '@/lib/company/explore/catalog'
@@ -13,7 +14,7 @@ import { applyToRow, type CompanyFindingsRow, type DiscoveryEvent } from '@/lib/
 import type { SynthesisFindings } from '@/lib/company/explore/synthesize'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 export type ExploreCompanyPayload = { workspaceId: number; url: string }
 
@@ -37,9 +38,10 @@ function metadataString(metadata: Record<string, unknown> | undefined, key: stri
     return typeof value === 'string' ? value.trim() : ''
 }
 
-// The earliest member is the one who signed up, the person the LinkedIn collectors look for.
+// The earliest member is the one who signed up, or the first the organization that runs the workspace
+// invited, the person the LinkedIn collectors look for.
 export async function readSignup(supabase: SupabaseClient<Database>, workspaceId: number): Promise<Signup> {
-    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' }, 1)
+    const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
     const owner = members?.[0]
     if (!owner) return { personName: null, email: null }
 

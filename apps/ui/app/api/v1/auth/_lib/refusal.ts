@@ -27,3 +27,8 @@ export function phoneRefused(reason: PhoneFailure, retryAfterSeconds?: number): 
 export function emailRefused(reason: EmailPreparationFailure): Response {
     return refusal(reason, EMAIL_PREPARATION_MESSAGES[reason])
 }
+
+// The apps sign in on Rerun's own address. An organization's has its own sign-in, by invitation.
+export function notOnThisHost(): Response {
+    return Response.json({ error: 'Not found' }, { status: 404 })
+}

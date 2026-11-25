@@ -92,7 +92,8 @@
                 "title": "Remover o acesso a {box}?",
                 "confirm": "Remover"
             }
-        }
+        },
+        "descriptionManaged": "Os admins gerenciam os membros e as configurações. Os membros usam os coworkers."
     },
     "createWorkspace": {
         "nameRequired": "O nome é obrigatório",

@@ -1,7 +1,7 @@
 'use client'
 
 import { useBrand } from '@/components/brand/BrandProvider'
-import { exampleEmailDomain } from '@rerun/contracts'
+import { exampleEmailDomain, isWhiteLabel } from '@rerun/contracts'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { WorkspaceInviteRow, WorkspaceMember } from '@/app/api/_actions/members.actions'
 import type { MemberAccessView, MemberBoxAccess } from '@/app/api/_actions/space-access.actions'
@@ -56,11 +56,12 @@ export type WorkspaceMembersViewProps = {
 
 export function WorkspaceMembersView(props: WorkspaceMembersViewProps) {
     const t = useTranslations('dialogs.members')
+    const managed = isWhiteLabel(useBrand())
     const { opened, currentRole, busy, profileOf, onCloseMember, onScopeChange, onBoxLevelChange, onRestrictBox } = props
 
     return (
         <>
-            <DialogHeaderBar icon={UsersIcon} title={t('title')} description={t('description')} />
+            <DialogHeaderBar icon={UsersIcon} title={t('title')} description={managed ? t('descriptionManaged') : t('description')} />
 
             <PanelSteps stepKey={opened ? opened.member.userId : 'list'} depth={opened ? 1 : 0}>
                 {opened ? (

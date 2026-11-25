@@ -8,13 +8,11 @@ import { Orb } from '@/components/foreman/Orb'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useForemanName } from '@/hooks/useForemanName'
-import { FORMER_MEMBER, type AuthorProfile } from '@/lib/chat/message-author'
+import { authorShortName, type AuthorProfile } from '@/lib/chat/message-author'
 
 const asIs = (path: string) => path
 
 const AVATAR_SIZE = 28
-
-const firstNameOf = (author: AuthorProfile) => (author.id === FORMER_MEMBER.id ? author.name : author.name.split(' ')[0])
 
 /**
  * Consecutive messages one person sent, signed once by their avatar at the foot of the group.
@@ -33,7 +31,7 @@ export function AuthoredGroup({ author, relayed = false, children }: { author: A
                             <CardAvatar src={author.photo} fileUrl={asIs} name={author.name} className="size-7" />
                         </span>
                     </TooltipTrigger>
-                    <TooltipContent side="top">{firstNameOf(author)}</TooltipContent>
+                    <TooltipContent side="top">{authorShortName(author)}</TooltipContent>
                 </Tooltip>
             ) : (
                 <Skeleton className="size-7 shrink-0 rounded-full" />
@@ -49,7 +47,7 @@ function RelayedGroup({ author, children }: { author: AuthorProfile | null; chil
         <div className="flex items-end gap-2">
             <div className="flex min-w-0 flex-1 flex-col gap-1">
                 {children}
-                {author ? <span className="max-w-full self-end truncate text-xs text-muted-foreground">{t('relayedFor', { ...foreman, person: firstNameOf(author) })}</span> : <Skeleton className="h-3 w-28 self-end" />}
+                {author ? <span className="max-w-full self-end truncate text-xs text-muted-foreground">{t('relayedFor', { ...foreman, person: authorShortName(author) })}</span> : <Skeleton className="h-3 w-28 self-end" />}
             </div>
             <span className="mb-5 shrink-0">
                 <Orb size={AVATAR_SIZE} paused />

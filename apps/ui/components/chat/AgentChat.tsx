@@ -12,6 +12,7 @@ import { McpSignInBlock } from '@/components/chat/McpSignInBlock'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import { ChatScreen } from '@/components/chat/ChatScreen'
 import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import { ComposerSubscriptionCta } from '@/components/chat/ComposerSubscriptionCta'
 import { InstallGate } from '@/components/chat/InstallGate'
@@ -80,7 +81,7 @@ import { isClaudePlanOffered, isLifetimePlan } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
-import { COWORKER_STARTER_SUGGESTIONS, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@rerun/contracts'
+import { COWORKER_STARTER_SUGGESTIONS, ORGANIZATION_AUTHOR_ID, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
@@ -144,8 +145,8 @@ type AgentChatProps = {
 export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder, aboveComposer }: AgentChatProps) {
     const t = useTranslations('chat.agentChat')
     const tHitlCue = useTranslations('chat.hitlCue')
-    const { workspace, user } = useSession()
-    const userId = user?.id
+    const { workspace, user, organizationStaff } = useSession()
+    const authorId = organizationStaff ? ORGANIZATION_AUTHOR_ID : user?.id
     const onSessionCreatedRef = useRef(onSessionCreated)
     onSessionCreatedRef.current = onSessionCreated
 
@@ -320,11 +321,11 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
             lastSendQueuedRef.current = options?.body?.queued === true
             if (browserPermission() === 'default') askNotificationPermission()
             // Signed here so the bubble carries its author before the transcript is read back.
-            sendChatMessage(userId ? { ...opts, metadata: { authorId: userId } } : opts, options)
+            sendChatMessage(authorId ? { ...opts, metadata: { authorId } } : opts, options)
             conversationRef.current?.scrollToBottom()
             return true
         },
-        [sendChatMessage, status, askNotificationPermission, userId]
+        [sendChatMessage, status, askNotificationPermission, authorId]
     )
 
     // What the user already typed stays, after the reply: they may have pasted the value first.
@@ -447,6 +448,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     // was reported when it happened, and a budget refusal is over once the credit has room again:
     // a payment made since must not meet the same notice on the way back.
     const rerunCredit = useMemo(() => rerunCreditOf(workspace), [workspace])
+    const manager = useWorkspaceManager()
     const creditHasRoom = !rerunCredit.paused && rerunCredit.budgetMicros > rerunCredit.usedMicros
     const creditHasRoomRef = useRef(creditHasRoom)
     useEffect(() => {
@@ -1128,13 +1130,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                 <Message from="assistant">
                                     {/* Paid data only runs on Rerun credit: connecting a Claude or ChatGPT plan would not buy it. */}
                                     <MessageContent>
-                                        <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} {...trialUpgrade} />
+                                        <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} />
                                     </MessageContent>
                                 </Message>
                             )}
                             {displayedError !== null && errorKind !== null && (
                                 <Message from="assistant">
-                                    <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={errorKind === 'usage_limit' ? switchModelAndContinue : switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
+                                    <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={errorKind === 'usage_limit' ? switchModelAndContinue : switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
                                 </Message>
                             )}
                         </ConversationContent>

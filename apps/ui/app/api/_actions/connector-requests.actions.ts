@@ -3,6 +3,8 @@
 import type { Database } from '@/app/api/database.types'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
+import { getServerSession } from '@/supabase/session/getServerSession'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 // A user searched the connector library, found nothing, and asked us to add the connector
@@ -16,6 +18,7 @@ export async function requestConnectorAction(input: { description: string; agent
 
     // Trust the session for the workspace, not the client.
     const workspaceId = await requireWorkspaceId()
+    if (isManagedWorkspace((await getServerSession()).workspace)) return failure('managedWorkspace')
 
     const supabase = createServiceRoleClient()
     const { error } = await supabase.from('connector_requests').insert<Database['public']['Tables']['connector_requests']['Insert']>({

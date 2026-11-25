@@ -102,7 +102,10 @@
                 "step2": "Subscribe to **OpenCode Go**, or add credits to use the Console models.",
                 "step3": "Create an API key, copy it (it starts with `oc_sk_`) and paste it above."
             }
-        }
+        },
+        "creditManagedUsed": "{percent}% of credits used",
+        "creditManagedUsedUp": "Credits used up",
+        "creditBackManaged": "once more are added"
     },
     "_context": {
         "panel.groups.included": "Heading of the group of AI sources that come with the Rerun plan (the Rerun credit).",
@@ -174,7 +177,8 @@
         "sources.guide.openrouter.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.guide.opencode.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.guide.opencode.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
-        "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English."
+        "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.creditBackManaged": "Completes the sentence \"Credits used up, back ...\" of the mobile app."
     },
     "noPlan": {
         "trialText": "Start your free trial to connect your own Claude plan, ChatGPT plan or API key.",

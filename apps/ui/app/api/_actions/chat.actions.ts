@@ -5,5 +5,5 @@ import { startKickoff, type KickoffResult } from '@/app/api/_services/kickoff.se
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 
 export async function startKickoffAction(agentId: string, input: { kickoff?: string; description?: string }): Promise<KickoffResult> {
-    return startKickoff(agentId, input, messageAuthorOf(await requireWorkspaceContext()))
+    return startKickoff(agentId, input, await messageAuthorOf(await requireWorkspaceContext()))
 }

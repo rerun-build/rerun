@@ -12,7 +12,9 @@ import { ADMIN_URL } from '@rerun/cloud/admin'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { SERVERS_ENABLED } from '@rerun/cloud/servers'
 import { CreateWorkspaceDialog } from '@/components/dialogs/CreateWorkspaceDialog'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
+import { OrganizationMenuItem } from '@rerun/cloud/organizations.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
 import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
@@ -82,6 +84,9 @@ function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslato
 // `column`: at the top of the Simple view's list, in the flow, alone: help and the offer sit at its foot.
 export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corner' | 'column' }) {
     const whiteLabel = isWhiteLabel(useBrand())
+    const manager = useWorkspaceManager()
+    const managed = manager !== null
+    const tManaged = useTranslations('managed.paused')
     const t = useTranslations('layout.workspaceMenu')
     const tAccess = useTranslations('workspace.access')
     const errorText = useErrorText()
@@ -148,6 +153,8 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const isExpert = user?.account_role === 'expert'
     const apiEntitled = isWorkspaceApiEntitled(workspace)
     const apiLocked = isApiLocked(workspace)
+    const apiPaused = managed && !apiEntitled
+    const needsPlanReason = manager ? tManaged('reason', { manager: manager.name }) : t('needsPlan')
     const sorted = switchableWorkspaces(workspaces)
     const activeIndex = Math.max(0, sorted.findIndex(w => w.id === workspace.id))
     const activeIcon = PRICING_ICONS[activeIndex % PRICING_ICONS.length]
@@ -169,13 +176,13 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const listInPlace = isMobile && switching
     const trialing = workspace.subscription_status === 'trialing'
     // Refer a friend lives in the plan dialog, which only a paying Stripe subscriber gets.
-    const canRefer = !whiteLabel && BILLING_ENABLED && !workspace.is_sandbox && workspace.subscription_status === 'active' && !!workspace.stripe_customer_id && !isLifetimePlan(workspace)
-    const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
+    const canRefer = !whiteLabel && !managed && BILLING_ENABLED && !workspace.is_sandbox && workspace.subscription_status === 'active' && !!workspace.stripe_customer_id && !isLifetimePlan(workspace)
+    const showCredit = !workspace.is_sandbox && (credit.budgetMicros > 0 || managed) && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
-        <DisabledWithReason allowed={workspaceAdmin && !apiLocked} reason={apiLocked ? tAccess('apiNotIncluded') : t('adminOnly.apiKeys')}>
+        <DisabledWithReason allowed={workspaceAdmin && !apiLocked && !apiPaused} reason={apiLocked ? tAccess('apiNotIncluded') : workspaceAdmin ? needsPlanReason : t('adminOnly.apiKeys')}>
             <DropdownMenuItem
-                disabled={!workspaceAdmin || apiLocked}
+                disabled={!workspaceAdmin || apiLocked || apiPaused}
                 onSelect={() => (apiEntitled ? openWorkspacePanel('api_keys') : openBilling(undefined, 'api_keys'))}
                 className="w-full gap-2 text-muted-foreground"
             >
@@ -185,7 +192,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     {apiLocked && isMobile && <span className="block text-xs whitespace-normal">{tAccess('apiNotIncluded')}</span>}
                 </span>
                 {apiLocked && <LockIcon className="ms-auto size-3.5" />}
-                {!apiEntitled && !apiLocked && (
+                {!apiEntitled && !apiLocked && !managed && (
                     <Badge size="xs" tone="brand" glow={false} className="ms-auto font-medium">
                         PRO
                     </Badge>
@@ -197,10 +204,12 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const workspacesSection = (
         <>
             <WorkspaceSwitchItems />
-            <DropdownMenuItem onSelect={() => setCreateOpen(true)} className="gap-2 text-muted-foreground">
-                <PlusIcon className="size-4" />
-                {t('newWorkspace')}
-            </DropdownMenuItem>
+            {!managed && (
+                <DropdownMenuItem onSelect={() => setCreateOpen(true)} className="gap-2 text-muted-foreground">
+                    <PlusIcon className="size-4" />
+                    {t('newWorkspace')}
+                </DropdownMenuItem>
+            )}
         </>
     )
 
@@ -246,7 +255,8 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                             wholeMicros={credit.budgetMicros}
                             trial={trialing}
                             onOpen={() => (workspaceAdmin ? openBilling(undefined, 'workspace_menu') : undefined)}
-                            onAdd={workspaceAdmin ? () => openBilling(trialing ? undefined : 'credit_pack', 'workspace_menu') : undefined}
+                            manager={manager}
+                            onAdd={workspaceAdmin && !managed ? () => openBilling(trialing ? undefined : 'credit_pack', 'workspace_menu') : undefined}
                         />
                     )}
                     {!workspace.is_sandbox && (
@@ -270,7 +280,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
 
     const workspaceItemsSection = (
         <>
-            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+            <DisabledWithReason allowed={!needsPlan} reason={needsPlanReason}>
                 <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('knowledge_base')} className="gap-2 text-muted-foreground">
                     <BrainIcon className="size-4" />
                     {t('brain')}
@@ -281,13 +291,13 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     )}
                 </DropdownMenuItem>
             </DisabledWithReason>
-            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+            <DisabledWithReason allowed={!needsPlan} reason={needsPlanReason}>
                 <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('ai_providers')} className="gap-2 text-muted-foreground">
                     <LockKeyholeIcon className="size-4" />
                     {t('aiProviders')}
                 </DropdownMenuItem>
             </DisabledWithReason>
-            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+            <DisabledWithReason allowed={!needsPlan} reason={needsPlanReason}>
                 <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
                     <LockIcon className="size-4" />
                     {t('vault')}
@@ -295,7 +305,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 </DropdownMenuItem>
             </DisabledWithReason>
             {!whiteLabel && (
-                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                <DisabledWithReason allowed={!needsPlan} reason={needsPlanReason}>
                     <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
                         <MonitorIcon className="size-4" />
                         {t('computers')}
@@ -311,7 +321,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     </DropdownMenuItem>
                 </DisabledWithReason>
             )}
-            {BILLING_ENABLED && !workspace.is_sandbox && (
+            {BILLING_ENABLED && !managed && !workspace.is_sandbox && (
                 <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.billing')}>
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling()} className="gap-2 text-muted-foreground">
                         <CreditCardIcon className="size-4" />
@@ -332,10 +342,11 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
             )}
             <WhatsNewMenuItem />
             {!workspace.is_sandbox && appsInMenu.length > 0 && <AppsMenuSection apps={appsInMenu} onOpen={slug => openApp(slug)} />}
+            <OrganizationMenuItem />
         </>
     )
 
-    const templatesMenu = isTemplateAuthor && (
+    const templatesMenu = isTemplateAuthor && !managed && (
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className="gap-2 text-muted-foreground">
                 <LayersIcon className="size-4" />
@@ -354,7 +365,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         </DropdownMenuSub>
     )
 
-    const expertMenu = isExpert && (
+    const expertMenu = isExpert && !managed && (
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className={cn('gap-2', workspace.is_sandbox ? 'text-primary' : 'text-muted-foreground')}>
                 <BadgeCheck className="size-4" />

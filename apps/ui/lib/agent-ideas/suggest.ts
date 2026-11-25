@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/app/api/database.types'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import type { CollectorCost } from '@/lib/company/explore/types'
 import { selectAll } from '@/supabase/supabase-helpers'
 import { design } from './design'
@@ -59,7 +60,7 @@ export async function suggestAgents(supabase: SupabaseClient<Database>, workspac
 
         const catalog = await loadCatalog(supabase)
         const candidates = await step('design', async () => {
-            const { candidates: data, cost } = await design(dossier, opportunities, catalog)
+            const { candidates: data, cost } = await design(dossier, opportunities, catalog, await workspaceBrand(workspaceId))
             return { data, cost, highlights: data.map(candidate => `${candidate.name} : ${candidate.role}`) }
         })
 

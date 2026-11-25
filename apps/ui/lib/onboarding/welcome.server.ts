@@ -11,6 +11,7 @@ import { accountFirstName } from '@/lib/naming/account-first-name'
 import { BILLING_ENABLED, isLifetimePlan, isPaidSubscription, isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { needsOnboarding, onboardingStep, type OnboardingStep } from './step'
 
 export type WelcomeState = { needed: boolean; step: OnboardingStep; answers: ForemanAnswers; firstName: string | null }
@@ -30,7 +31,7 @@ export async function readWelcomeState(ctx: WorkspaceContext): Promise<WelcomeSt
         isSandbox: ctx.workspace.is_sandbox,
         archived: !!workspace?.boxes_archived_at,
         agentCount: agentCount ?? 0,
-        paying: RERUN_CLOUD && (isPaidSubscription(status) || isLifetimePlan(ctx.workspace)),
+        paying: RERUN_CLOUD && (isPaidSubscription(status) || isLifetimePlan(ctx.workspace) || isManagedWorkspace(ctx.workspace)),
         inHubFunnel: !!answers.foreman?.profileAt || !!answers.foreman?.plan,
         arrivingByInvite: cookieStore.has(PENDING_INVITE_COOKIE),
         hubForeman: RERUN_CLOUD || !!foremanHubApiKey(),

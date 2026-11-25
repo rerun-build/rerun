@@ -6,20 +6,22 @@ const mocks = vi.hoisted(() => ({ inviteMember: vi.fn(), addVaultService: vi.fn(
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/foreman/profile', () => ({ saveForemanName: vi.fn() }))
-vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ service: true, auth: { admin: { getUserById: async (id: string) => ({ data: { user: { id, email: `${id}@acme.test` } } }) } } }) }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ service: true }) }))
 vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: vi.fn(async () => 'u-founder') }))
+vi.mock('@/app/api/_auth/workspace-members', () => ({ earliestOrganizationStaff: async () => 'u-staff' }))
 vi.mock('@/app/api/_services/mcp-account.service', () => ({ dispatchAccountTool: vi.fn() }))
 vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
 vi.mock('@/lib/foreman/inbox-tools', () => ({ dispatchInboxTool: vi.fn(async () => ({ cards: [] })) }))
 vi.mock('@/lib/foreman/onboarding-tools', () => ({ dispatchWorkspaceOnboardingTool: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
-vi.mock('@/app/api/_services/members.service', () => ({ inviteMember: mocks.inviteMember }))
+vi.mock('@/app/api/_services/members.service', () => ({ inviteMember: mocks.inviteMember, resolveWorkspaceIdentities: async (_db: unknown, _workspace: number, ids: string[]) => new Map(ids.map(id => [id, { id, name: id, email: id === 'u-staff' ? null : `${id}@acme.test`, avatarUrl: null }])) }))
 vi.mock('@/app/api/_services/vault-install.service', () => ({ addVaultService: mocks.addVaultService, addVaultMcp: mocks.addVaultMcp }))
 vi.mock('@/app/api/_services/vault.service', () => ({ shareVaultEntry: mocks.shareVaultEntry }))
 vi.mock('@/app/api/_services/mcp-vault.service', () => ({ entryAfter: mocks.entryAfter }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: async () => ({ data: { id: 7, name: 'Acme', max_seats: 5 } }) }))
 
 const { dispatchForemanHubTool } = await import('./foreman-hub.service')
+const { workspaceFounderUserId } = await import('@/app/api/_auth/ownership')
 const { dispatchInboxTool } = await import('@/lib/foreman/inbox-tools')
 
 const admin = { kind: 'user', userId: 'u-admin', workspaceId: 7, role: 'admin', boxScope: 'all' } as const
@@ -63,6 +65,16 @@ describe('invite_members', () => {
     it('invites in the name of the founder for a turn with nobody behind it', async () => {
         await dispatchForemanHubTool({ kind: 'workspace', workspaceId: 7 }, 'invite_members', { emails: ['bo@acme.test'] })
         expect(mocks.inviteMember).toHaveBeenCalledWith(expect.objectContaining({ invitedBy: { userId: 'u-founder', email: 'u-founder@acme.test' } }), 'bo@acme.test', 'all')
+    })
+
+    it('names nobody when the organization alone is in the workspace, or when one of its team asks', async () => {
+        vi.mocked(workspaceFounderUserId).mockResolvedValueOnce(null)
+        await dispatchForemanHubTool({ kind: 'workspace', workspaceId: 7 }, 'invite_members', { emails: ['bo@acme.test'] })
+        await dispatchForemanHubTool({ ...admin, userId: 'u-staff', organizationStaff: true }, 'invite_members', { emails: ['bo@acme.test'] })
+        expect(mocks.inviteMember.mock.calls.map(([scope]) => scope.invitedBy)).toEqual([
+            { userId: 'u-staff', email: null },
+            { userId: 'u-staff', email: null },
+        ])
     })
 
     it('refuses a member, an empty list and a batch too large', async () => {

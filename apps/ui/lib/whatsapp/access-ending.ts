@@ -1,6 +1,7 @@
 // The message that goes out a day before a cancelled subscription, paid or still in trial, reaches
 // its end. No 'server-only', like the rest of this folder: a Trigger.dev task runs it.
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
 import { loadFirstName } from '@/ee/lib/lifecycle/recipient'
@@ -55,7 +56,7 @@ export async function sweepAccessEnding(supabase: SupabaseClient<Database>, now:
 
     for (const workspace of workspaces) {
         try {
-            const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id }, { column: 'created_at', ascending: true }, 1)
+            const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspace.id })
             const owner = members?.[0]
             const message = owner ? await messageFor(supabase, workspace.id, owner.user_id, now) : null
             if (!owner || !message) {

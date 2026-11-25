@@ -12,6 +12,7 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { readHeroAgentApps, readHeroAgentName } from '@/lib/onboarding/hero-handoff'
 import { useResumePendingStart } from '@/lib/onboarding/useResumePendingStart'
 import { nameAgentFromPromptAction } from '@/app/api/_actions/onboarding.actions'
@@ -355,7 +356,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                     void resumePendingStart()
                     return
                 }
-                openBilling(undefined, 'iso_drop')
+                if (!isManagedWorkspace(workspace)) openBilling(undefined, 'iso_drop')
                 return
             }
             confirmPlacement(pos, viewer)

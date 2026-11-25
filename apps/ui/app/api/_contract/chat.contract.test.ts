@@ -49,7 +49,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => {
         getAuthUser: async () => state.ctx?.authUser,
         getSessionWorkspace: async (): ReturnType<typeof original.getSessionWorkspace> => {
             const ctx = state.ctx!
-            return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
+            return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope, organization_staff: false } }
         },
     }
 })
@@ -238,7 +238,7 @@ describe('a coworker chat', () => {
         const { GET } = await import('@/app/api/chat/resume/route')
         const res = await callRoute(GET, mobileApi.resumeChat, { query: { agentId: 'agent-scout', runId: 'run-8' } })
         expect(answerOf(await expectContract(mobileApi.resumeChat, res)).text).toBe('Three bakeries have not been called yet.')
-        expect(engine.reconnectRun).toHaveBeenCalledWith({ baseUrl: expect.any(String), apiKey: 'key' }, 'eng-scout', 'run-8')
+        expect(engine.reconnectRun).toHaveBeenCalledWith({ baseUrl: expect.any(String), apiKey: 'key', workspaceId: 7 }, 'eng-scout', 'run-8')
     })
 
     // The registry promises a stream with a 200; a run that is over answers 204, which the AI SDK's

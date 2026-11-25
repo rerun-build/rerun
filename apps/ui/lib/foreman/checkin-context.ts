@@ -15,10 +15,10 @@ export async function founderContext(workspaceId: number): Promise<WorkspaceCont
     if (!founder) return null
     const [{ data: workspace }, { data: membership }, { data: user }, { data: auth }] = await Promise.all([
         selectMaybeSingle(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id: workspaceId }),
-        selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { workspace_id: workspaceId, user_id: founder }),
+        selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope', 'organization_staff'] as const, { workspace_id: workspaceId, user_id: founder }),
         selectMaybeSingle(supabase, 'users', ['locale'] as const, { id: founder }),
         supabase.auth.admin.getUserById(founder),
     ])
     if (!workspace || !membership || !auth.user) return null
-    return { userId: founder, userEmail: realEmail(auth.user.email), userLocale: user?.locale ?? null, authUser: auth.user, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase }
+    return { userId: founder, userEmail: realEmail(auth.user.email), userLocale: user?.locale ?? null, authUser: auth.user, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), organizationStaff: membership.organization_staff, supabase }
 }

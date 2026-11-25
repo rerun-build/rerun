@@ -100,6 +100,7 @@ export const CONTRACT_WORKSPACE = {
     onboarded_at: '2026-11-02T09:00:00.000Z',
     price_arm: null,
     locale: 'en',
+    organization_id: null,
 } satisfies WorkspaceContext['workspace']
 
 type SessionUser = NonNullable<Awaited<ReturnType<typeof getSessionWorkspace>>['user']>

@@ -16,7 +16,8 @@
         "runFailed": "Email sent when a coworker's run broke. The heading is both the subject and the title; the error follows in a bubble.",
         "accountSignedOut": "Email to the admins of a workspace when the AI account its coworkers run on stopped working. {account} is a provider (\"Claude\", \"ChatGPT\", \"OpenAI\"), {coworkers} an already formatted list of names, {workspace} the workspace's name.",
         "accountSignedOut.more": "Last item of the list of coworkers: \"Lead Scout, Blog Writer and 2 more\".",
-        "paymentFailed": "{pausedAt} is a day and an hour in UTC (\"25 November, 16:00 UTC\"), {amount} an amount with its currency."
+        "paymentFailed": "{pausedAt} is a day and an hour in UTC (\"25 November, 16:00 UTC\"), {amount} an amount with its currency.",
+        "organizationCreditOut.bodyNamed": "To the team of an agency: one of the workspaces it runs for a client has no AI credits left."
     },
     "common": {
         "footer": {
@@ -75,7 +76,8 @@
         "archiveExpiring": "{kind, select, sandbox {Your archived {brand} sandbox is deleted on {date}} other {Your paused {brand} workspace is deleted on {date}}}",
         "sandboxIdle": "Your {brand} sandbox is archived on {date} unless you open it",
         "renewalReminder": "{daysLeft, plural, =1 {Your {brand} plan renews tomorrow} other {Your {brand} plan renews in # days}}",
-        "creatorPitch": "Sell the coworkers you build on Rerun"
+        "creatorPitch": "Sell the coworkers you build on Rerun",
+        "organizationCreditOut": "{workspaceName} is out of credits"
     },
     "reasons": {
         "mine": "You started this run.",
@@ -314,5 +316,13 @@
         "button": "Open workspace",
         "footnoteCard": "Your plan starts on its own on {date}: {price} is charged to the card you added, then every month. Not planning to continue? Cancel before {date} from Billing, in your workspace menu, and nothing is charged.",
         "footnoteNoCard": "No card needed for the trial. To keep going after {date}, add one from Billing, in your workspace menu, and your plan starts at {price}/month. Without one, your coworkers stop and nothing is charged."
+    },
+    "organizationCreditOut": {
+        "preview": "One of your workspaces is out of credits",
+        "heading": "A workspace is out of credits",
+        "bodyNamed": "<strong>{workspaceName}</strong> has used the credits you gave it. Its scheduled and triggered runs are paused until you add more.",
+        "bodyUnnamed": "One of your workspaces has used the credits you gave it. Its scheduled and triggered runs are paused until you add more.",
+        "members": "Its members see that it is out of credits, and are asked to contact you.",
+        "button": "Add credits"
     }
 }

@@ -5,6 +5,7 @@ import { OAUTH_PROVIDER_COOKIE, isOAuthProvider, type OAuthProvider } from '@/li
 import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { AUTH_RETURN_COOKIE, readAuthReturnCookie } from '@/lib/auth/auth-return'
+import { isRerunHost } from '@/lib/brand/request-site'
 import { routes } from '@/lib/routes'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { SIGNUP_INTENT_COOKIE, sharedCookieDomain } from '@rerun/analytics'
@@ -54,6 +55,7 @@ function backToAccount(request: Request, linkError?: { code: string; provider: O
 }
 
 export async function GET(request: Request) {
+    if (!(await isRerunHost())) return new NextResponse('Not found', { status: 404 })
     const { searchParams } = new URL(request.url)
     const code = searchParams.get('code')
     const cookieStore = await cookies()

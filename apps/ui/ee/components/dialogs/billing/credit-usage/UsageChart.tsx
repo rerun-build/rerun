@@ -91,11 +91,16 @@ function value(chunks: ReactNode) {
     return <span className="text-foreground tabular-nums">{chunks}</span>
 }
 
-export function UsageChart({ usage, balance, trial, mode }: { usage: CreditUsage; balance: CreditBalance; trial: boolean; mode: ChartMode }) {
+// Past this share of the width, "Today" takes the place of the date on that side.
+const EDGE = 25
+
+// `resets={false}` for a credit that outlives the period.
+export function UsageChart({ usage, balance, trial, mode, resets = true }: { usage: CreditUsage; balance: CreditBalance; trial: boolean; mode: ChartMode; resets?: boolean }) {
     const locale = useLocale()
     const t = useTranslations('billing')
     const [hover, setHover] = useState<number | null>(null)
     const slots = periodDayCount(usage)
+    const todayAt = ((usage.days.length - 0.5) / slots) * 100
     const day = hover != null ? usage.days[hover] : null
     const upTo = hover != null ? usage.days.slice(0, hover + 1).reduce((sum, entry) => sum + spentOn(entry), 0) : 0
 
@@ -128,13 +133,27 @@ export function UsageChart({ usage, balance, trial, mode }: { usage: CreditUsage
             </div>
             {mode === 'daily' ? <Daily days={usage.days} slots={slots} hover={hover} onHover={setHover} /> : <Cumulative days={usage.days} slots={slots} balance={balance} trial={trial} hover={hover} onHover={setHover} locale={locale} />}
             <div dir="ltr" className="relative flex justify-between text-[10px] text-muted-foreground tabular-nums">
-                <span dir="auto">{shortDate(usage.period.start, locale)}</span>
-                {usage.days.length < slots && (
-                    <span className="absolute -translate-x-1/2 text-foreground" style={{ left: `${((usage.days.length - 0.5) / slots) * 100}%` }}>
-                        {t('usage.chart.today')}
-                    </span>
+                {resets ? (
+                    <>
+                        <span dir="auto">{shortDate(usage.period.start, locale)}</span>
+                        {usage.days.length < slots && (
+                            <span className="absolute -translate-x-1/2 text-foreground" style={{ left: `${todayAt}%` }}>
+                                {t('usage.chart.today')}
+                            </span>
+                        )}
+                        <span dir="auto">{trial ? t('usage.chart.trialEnds', { date: shortDate(usage.period.end, locale) }) : t('usage.chart.resets', { date: shortDate(usage.period.end, locale) })}</span>
+                    </>
+                ) : (
+                    <>
+                        <span dir="auto" className={cn(todayAt < EDGE && 'text-foreground')}>{todayAt < EDGE ? t('usage.chart.today') : shortDate(usage.period.start, locale)}</span>
+                        {todayAt >= EDGE && todayAt <= 100 - EDGE && (
+                            <span className="absolute -translate-x-1/2 text-foreground" style={{ left: `${todayAt}%` }}>
+                                {t('usage.chart.today')}
+                            </span>
+                        )}
+                        <span dir="auto" className={cn(todayAt > 100 - EDGE && 'text-foreground')}>{todayAt > 100 - EDGE ? t('usage.chart.today') : shortDate(usage.period.end, locale)}</span>
+                    </>
                 )}
-                <span dir="auto">{trial ? t('usage.chart.trialEnds', { date: shortDate(usage.period.end, locale) }) : t('usage.chart.resets', { date: shortDate(usage.period.end, locale) })}</span>
             </div>
         </figure>
     )

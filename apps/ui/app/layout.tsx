@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: brand.name,
     keywords: [brand.name, "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
     authors: [{ name: brand.name }],
-    metadataBase: new URL(site.url),
+    metadataBase: new URL(brand.appUrl ?? site.url),
     icons: brandIcons(brand),
     // iOS Safari otherwise wraps what looks like a phone number or an address in a link before React
     // hydrates, and the markup no longer matches the server's (React error #418).

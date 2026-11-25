@@ -92,7 +92,8 @@
                 "title": "إزالة الوصول إلى {box}؟",
                 "confirm": "إزالة"
             }
-        }
+        },
+        "descriptionManaged": "يدير المشرفون الأعضاء والإعدادات. ويستخدم الأعضاء الزملاء."
     },
     "createWorkspace": {
         "nameRequired": "الاسم مطلوب",

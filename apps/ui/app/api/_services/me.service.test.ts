@@ -4,6 +4,8 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 
 import { loadMe, messageAuthorOf, readMe } from './me.service'
 const getAuthUser = vi.fn()
+const workspaceBrand = vi.hoisted(() => vi.fn(async () => ({ name: 'Nordlys' })))
+vi.mock('@/lib/brand/workspace', () => ({ workspaceBrand }))
 vi.mock('@/supabase/session/getServerSession', () => ({ getAuthUser: () => getAuthUser() }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
@@ -61,9 +63,16 @@ describe('loadMe', () => {
 })
 
 describe('messageAuthorOf', () => {
-    it('names the member and the zone of their device, and leaves out what is not known', () => {
+    it('names the member and the zone of their device, and leaves out what is not known', async () => {
         const ctx = { userId: 'user-1', authUser: { user_metadata: { full_name: 'Ada Lovelace' } } } as unknown as WorkspaceContext
-        expect(messageAuthorOf(ctx, 'Europe/Paris')).toEqual({ id: 'user-1', name: 'Ada Lovelace', timezone: 'Europe/Paris' })
-        expect(messageAuthorOf({ ...ctx, authUser: { user_metadata: {} } } as unknown as WorkspaceContext)).toEqual({ id: 'user-1' })
+        expect(await messageAuthorOf(ctx, 'Europe/Paris')).toEqual({ id: 'user-1', name: 'Ada Lovelace', timezone: 'Europe/Paris' })
+        expect(await messageAuthorOf({ ...ctx, authUser: { user_metadata: {} } } as unknown as WorkspaceContext)).toEqual({ id: 'user-1' })
+    })
+
+    it('signs the team of the organization with its brand, without a name of their own when it cannot be read', async () => {
+        const ctx = { userId: 'user-1', organizationStaff: true, workspace: { id: 7 }, authUser: { user_metadata: { full_name: 'Solveig Staff' } } } as unknown as WorkspaceContext
+        expect(await messageAuthorOf(ctx, 'Europe/Paris')).toEqual({ id: 'organization', name: 'Nordlys' })
+        workspaceBrand.mockRejectedValueOnce(new Error('down'))
+        expect(await messageAuthorOf(ctx)).toEqual({ id: 'organization' })
     })
 })

@@ -20,6 +20,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { Database } from '@/app/api/database.types'
 import { isStableLocale, LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, PSEUDO_LOCALE, type Locale } from '@rerun/i18n'
 import { failure, failureOf } from '@/lib/i18n/action-error'
+import { requestHost } from '@/lib/request-host'
 import type { ActionResult } from './space.actions'
 
 const USER_AVATARS_BUCKET = 'user-avatars'
@@ -76,7 +77,7 @@ export async function updateMyLocaleAction(params: { locale: Locale | typeof PSE
         }
 
         const cookieStore = await cookies()
-        const host = ((await headers()).get('host') ?? '').split(':')[0]
+        const host = (requestHost(await headers()) ?? '').split(':')[0]
         const domain = host.endsWith('rerun.build') ? '.rerun.build' : undefined
         if (locale === null) cookieStore.set(LOCALE_COOKIE, '', { path: '/', maxAge: 0, domain })
         else cookieStore.set(LOCALE_COOKIE, locale, { path: '/', maxAge: LOCALE_COOKIE_MAX_AGE, sameSite: 'lax', domain })

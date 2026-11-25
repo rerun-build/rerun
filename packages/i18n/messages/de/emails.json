@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {Deine archivierte {brand}-Sandbox wird am {date} gelöscht} other {Dein pausierter {brand}-Workspace wird am {date} gelöscht}}",
         "sandboxIdle": "Deine {brand}-Sandbox wird am {date} archiviert, wenn du sie nicht öffnest",
         "renewalReminder": "{daysLeft, plural, =1 {Dein {brand}-Tarif verlängert sich morgen} other {Dein {brand}-Tarif verlängert sich in # Tagen}}",
-        "creatorPitch": "Verkaufe die Coworker, die du auf Rerun baust"
+        "creatorPitch": "Verkaufe die Coworker, die du auf Rerun baust",
+        "organizationCreditOut": "Guthaben von {workspaceName} aufgebraucht"
     },
     "reasons": {
         "mine": "Du hast diese Ausführung gestartet.",
@@ -295,5 +296,13 @@
         "button": "Workspace öffnen",
         "footnoteCard": "Dein Tarif startet am {date} von selbst: {price} werden von der hinterlegten Karte abgebucht, danach jeden Monat. Du willst nicht weitermachen? Kündige vor dem {date} unter Abrechnung in deinem Workspace-Menü, dann wird nichts berechnet.",
         "footnoteNoCard": "Für die Testphase ist keine Karte nötig. Um nach dem {date} weiterzumachen, füge eine unter Abrechnung in deinem Workspace-Menü hinzu, und dein Tarif startet für {price}/Monat. Ohne Karte stoppen deine Coworker und es wird nichts berechnet."
+    },
+    "organizationCreditOut": {
+        "preview": "Das Guthaben eines deiner Workspaces ist aufgebraucht",
+        "heading": "Guthaben eines Workspace aufgebraucht",
+        "bodyNamed": "<strong>{workspaceName}</strong> hat das Guthaben verbraucht, das du zugeteilt hast. Geplante und ausgelöste Ausführungen sind pausiert, bis du mehr hinzufügst.",
+        "bodyUnnamed": "Einer deiner Workspaces hat das Guthaben verbraucht, das du zugeteilt hast. Geplante und ausgelöste Ausführungen sind pausiert, bis du mehr hinzufügst.",
+        "members": "Die Mitglieder sehen, dass das Guthaben aufgebraucht ist, und werden gebeten, sich an dich zu wenden.",
+        "button": "Guthaben hinzufügen"
     }
 }

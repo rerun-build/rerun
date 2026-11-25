@@ -1,23 +1,29 @@
 import type { Database } from '@/app/api/database.types'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
+import type { HostSite } from '@/lib/brand/site'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
 import { drawPriceArm } from '@rerun/cloud/billing'
+import { joinOrganization } from '@rerun/cloud/organizations.server'
 import { internalPath } from '@/lib/auth/internal-path'
+import { requestHost, requestProtocol } from '@/lib/request-host'
 import { routes } from '@/lib/routes'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
 import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
 import { createServerClient } from '@supabase/ssr'
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Every page of the app needs an account. These are the ones a visitor without a session may open:
-// the sign-in itself, and the doors that bring someone to it with something to join (a workspace
-// invitation, a creator invite, an AppSumo code, a friend's referral link) or to leave (an unsubscribe
-// link). Everything outside the matcher of proxy.ts (published pages, the OG renders, the public and
+// the sign-in itself, and the doors that bring someone to it with something to join (a workspace or a
+// team invitation, a creator invite, an AppSumo code, a friend's referral link) or to leave (an
+// unsubscribe link). Everything outside the matcher of proxy.ts (published pages, the OG renders, the public and
 // mobile APIs) never gets here.
-const PUBLIC_PATHS = [routes.auth, '/invite', '/redeem', '/creator/join', '/unsubscribe', REFERRAL_PATH]
+// The start and the callbacks of an app's sign-in check for themselves who they are for: the browser an
+// organization's address sends here has no session on this one.
+const SELF_CHECKED_PATHS = ['/api/oauth/host', '/api/oauth/claim', '/api/oauth/managed', '/api/mcp/oauth']
+const PUBLIC_PATHS = [...SELF_CHECKED_PATHS, routes.auth, '/invite', '/organization/invite', '/redeem', '/creator/join', '/unsubscribe', REFERRAL_PATH]
 
 export function isPublicPath(pathname: string): boolean {
     return PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(`${path}/`))
@@ -47,15 +53,14 @@ function redirectKeepingSession(request: NextRequest, target: string, sessionRes
 }
 
 function cookieDomain(request: NextRequest): string | undefined {
-    const host = (request.headers.get('host') ?? request.nextUrl.hostname).split(':')[0]
+    const host = (requestHost(request.headers) ?? request.nextUrl.hostname).split(':')[0]
     return host.endsWith('rerun.build') ? '.rerun.build' : undefined
 }
 
 // The reverse proxy (Traefik, under Dokploy) terminates the TLS and forwards the request in clear: without the forwarded header the
 // cookie would go out without `Secure` in production.
 function isSecure(request: NextRequest): boolean {
-    const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim()
-    return (forwarded ?? request.nextUrl.protocol.replace(':', '')) === 'https'
+    return requestProtocol(request.headers, request.nextUrl.protocol === 'https:' ? 'https' : 'http') === 'https'
 }
 
 // The landing reads this one with an inline script before its first paint, so it stays out of
@@ -92,7 +97,7 @@ function isPageLoad(request: NextRequest): boolean {
     return request.method === 'GET' && (request.headers.get('accept')?.includes('text/html') ?? false)
 }
 
-const INVITE_PATHS = ['/invite/', '/creator/join', '/redeem']
+const INVITE_PATHS = ['/invite/', '/organization/invite/', '/creator/join', '/redeem']
 
 // Whoever signs up through a workspace invite or a creator invite joins something that already
 // exists, and is not asked for a phone number, nor is whoever comes to redeem a code they paid
@@ -117,7 +122,24 @@ function applyProvisionedCookie(request: NextRequest, response: NextResponse, id
     response.cookies.set(PROVISIONED_COOKIE, `${identity.id}.${signedUp ? 1 : 0}`, { path: '/', maxAge: PROVISIONED_MAX_AGE, sameSite: 'lax', secure: isSecure(request), httpOnly: true })
 }
 
-export async function updateSession(request: NextRequest) {
+type Provisioned = { signedUp: boolean } | null
+
+async function provision(request: NextRequest, supabase: SupabaseClient<Database>, user: User, site: HostSite): Promise<Provisioned> {
+    const locale = resolveLocale({ cookie: request.cookies.get(LOCALE_COOKIE)?.value, acceptLanguage: request.headers.get('accept-language') })
+    if (site.kind === 'organization') return joinOrganization(user, site.organizationId, { locale })
+    return provisionUser(supabase, user, {
+        phoneStep: !arrivesByInvite(request),
+        priceArm: drawPriceArm({
+            experimentCookie: request.cookies.get(EXPERIMENT_COOKIE)?.value,
+            consentCookie: request.cookies.get(CONSENT_COOKIE)?.value,
+            userAgent: request.headers.get('user-agent'),
+        }),
+        locale,
+        referralCode: request.cookies.get(REFERRAL_COOKIE)?.value,
+    })
+}
+
+export async function updateSession(request: NextRequest, site: HostSite = { kind: 'rerun' }) {
     let supabaseResponse = NextResponse.next({
         request,
     })
@@ -164,20 +186,11 @@ export async function updateSession(request: NextRequest) {
 
     identity ??= user ? { id: user.id } : null
 
-    let provisioned: { signedUp: boolean } | null = null
+    let provisioned: Provisioned = null
     if (identity && provisioningNeeded(request.cookies.get(PROVISIONED_COOKIE)?.value, identity)) {
         user ??= (await supabase.auth.getUser()).data.user
         if (user) {
-            provisioned = await provisionUser(supabase, user, {
-                phoneStep: !arrivesByInvite(request),
-                priceArm: drawPriceArm({
-                    experimentCookie: request.cookies.get(EXPERIMENT_COOKIE)?.value,
-                    consentCookie: request.cookies.get(CONSENT_COOKIE)?.value,
-                    userAgent: request.headers.get('user-agent'),
-                }),
-                locale: resolveLocale({ cookie: request.cookies.get(LOCALE_COOKIE)?.value, acceptLanguage: request.headers.get('accept-language') }),
-                referralCode: request.cookies.get(REFERRAL_COOKIE)?.value,
-            })
+            provisioned = await provision(request, supabase, user, site)
         }
     }
 

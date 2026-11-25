@@ -2,6 +2,7 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { updateNotificationPrefsAction, updateNotificationPrefsByTokenAction } from '@/app/api/_actions/notifications.actions'
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { Field } from '@/components/ui/field'
 import { Icon } from '@/components/ui/icon'
 import { Switch } from '@/components/ui/switch'
@@ -69,12 +70,14 @@ export function EmailPreferencesForm({ initialPrefs, token }: { initialPrefs: Em
                 <SwitchRow icon={MailIcon} label={t('email.label')} description={t('email.description')} checked={prefs.email} onChange={toggleRunEmails} />
             </section>
 
-            <section className="flex flex-col gap-1">
-                <h2 className="px-3 text-sm font-semibold text-foreground">{tCategories('title')}</h2>
-                {EMAIL_CATEGORIES.map(category => (
-                    <SwitchRow key={category} icon={CATEGORY_ICONS[category]} label={tCategories(`${category}.label`)} description={tCategories(`${category}.description`)} checked={prefs.categories[category]} onChange={v => toggleCategory(category, v)} />
-                ))}
-            </section>
+            <RerunOnly>
+                <section className="flex flex-col gap-1">
+                    <h2 className="px-3 text-sm font-semibold text-foreground">{tCategories('title')}</h2>
+                    {EMAIL_CATEGORIES.map(category => (
+                        <SwitchRow key={category} icon={CATEGORY_ICONS[category]} label={tCategories(`${category}.label`)} description={tCategories(`${category}.description`)} checked={prefs.categories[category]} onChange={v => toggleCategory(category, v)} />
+                    ))}
+                </section>
+            </RerunOnly>
 
             <div className="flex h-5 items-center gap-1.5 px-3 text-xs text-muted-foreground">
                 {saveState === 'saving' && (

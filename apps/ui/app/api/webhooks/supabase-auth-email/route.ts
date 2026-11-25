@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     const locale = await recipientLocale(createServiceRoleClient(), payload.user.id, null)
     for (const email of emails) {
         if (!(await claimAuthEmailSend(normalizeEmail(email.to)))) return hookError(429, 'Too many codes were sent to this address. Try again later.')
-        const brand = await authEmailBrand({ email: email.to, redirectTo: payload.email_data.redirect_to || null })
+        const brand = await authEmailBrand({ email: email.to, userId: payload.user.id ?? null })
         const signInUrl = mailedSignInUrl(email.tokenHash, email.type, payload.user, brand)
         const sent = await sendSignInCodeEmail({ to: email.to, code: email.code, signInUrl, expiresInMinutes: SIGN_IN_CODE_TTL_MINUTES, locale, brand })
         if (!sent.ok) return hookError(502, 'We could not send the email. Please try again.')

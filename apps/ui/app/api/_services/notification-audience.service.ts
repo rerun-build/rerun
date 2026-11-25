@@ -2,6 +2,7 @@ import 'server-only'
 
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 
+import type { UserActor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import type { EngineCreatedEvent } from '@/lib/engine/types'
 import { coworkerRuleOf, normalizeNotificationPrefs, type NotificationPrefs } from '@/lib/notifications/prefs'
@@ -11,6 +12,14 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 type ParticipantInsert = Database['public']['Tables']['session_participants']['Insert']
 type UserUpdate = Database['public']['Tables']['users']['Update']
 type SessionReadInsert = Database['public']['Tables']['session_reads']['Insert']
+
+export type MessageSender = Pick<UserActor, 'userId' | 'organizationStaff'>
+
+// The team of the organization that runs the workspace takes part in no conversation of its members:
+// nothing of it reaches them, and nobody sees them in it.
+export function participantIdOf(sender: MessageSender): string | null {
+    return sender.organizationStaff ? null : sender.userId
+}
 
 // Who wrote in a conversation is who its notifications reach. Best-effort: a message that went out
 // must never fail because this bookkeeping did.
@@ -73,7 +82,7 @@ export async function followAuthorOfCreatedTask(workspaceId: number, event: Engi
     try {
         const supabase = createServiceRoleClient()
         const [{ data: member }, followedId] = await Promise.all([
-            selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, user_id: authorId }),
+            selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, user_id: authorId, organization_staff: false }),
             event.agentId === FOREMAN_AGENT_ID
                 ? FOREMAN_AGENT_ID
                 : selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, engine_agent_id: event.agentId }).then(({ data: agent }) => agent?.id ?? null),

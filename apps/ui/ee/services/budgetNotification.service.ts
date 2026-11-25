@@ -1,4 +1,5 @@
 import 'server-only'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { brandAppUrl } from '@/lib/brand/urls'
 import { workspaceBrand } from '@/lib/brand/workspace'
@@ -11,6 +12,7 @@ import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { adminsToAlert, sendAlert } from '@/app/api/_services/admin-alert.service'
+import { alertOrganizationOutOfCredit } from '@/ee/services/organization-credit-alert.service'
 import { creditResetsAt, getWorkspaceBudget } from '@/ee/services/rerunBudget.service'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { sendBudgetExhaustedEmail } from '@/app/api/_services/email.service'
@@ -18,10 +20,24 @@ import type { NoticeCopy } from '@/lib/notifications/notice-copy'
 
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
 
+type BudgetNotice = { message: string; copy: NoticeCopy }
+
+const OWN_NOTICE: BudgetNotice = {
+    message: 'Your Rerun credits for this month are used up. Scheduled and triggered runs on Rerun models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits.',
+    copy: { key: 'budgetExhausted' },
+}
+
+const managedNotice = (manager: string): BudgetNotice => ({
+    message: `This workspace is out of credits. Contact ${manager} to get more: until then, scheduled and triggered runs are paused, and coworkers cannot buy leads, SEO or social data.`,
+    copy: { key: 'managedCreditOut', values: { manager } },
+})
+
 /**
  * One workspace-level notice per 24h window instead of one error email per failing occurrence.
  * Called from the LLM proxy's 402 path after the response is flushed, so it must never throw and
- * its steady-state cost per 402 is the single dedup select.
+ * its steady-state cost per 402 is two selects, and one more write for a workspace an organization
+ * runs: its people are told who to ask, and its organization, which hands the credit out, is written
+ * to apart, once each time it runs out.
  */
 export async function notifyBudgetExhausted(workspaceId: number): Promise<void> {
     try {
@@ -40,15 +56,18 @@ export async function notifyBudgetExhausted(workspaceId: number): Promise<void> 
         )
         if (recentError) throw new Error(recentError.message)
 
-        const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'subscription_status'] as const, { id: workspaceId })
+        const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'subscription_status', 'organization_id'] as const, { id: workspaceId })
         if (!workspace) return
+        const { organization_id } = workspace
+        if (organization_id) await alertOrganizationOutOfCredit(supabase, { ...workspace, organization_id }).catch(err => console.error('[notification] organization credit alert failed', err))
 
         const { insert, email } = decideBudgetNotice({ recentNoticeExists: (recent?.length ?? 0) > 0, isSandbox: workspace.is_sandbox })
         if (!insert) return
 
-        const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId })
+        const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
         const recipients = Object.fromEntries((members ?? []).map(member => [member.user_id, 'workspace' satisfies NotificationReason]))
 
+        const notice = organization_id ? managedNotice((await workspaceBrand(workspaceId)).name) : OWN_NOTICE
         const { error: insertError } = await supabase.from('notifications').insert<NotificationInsert>({
             workspace_id: workspaceId,
             space_id: null,
@@ -56,14 +75,14 @@ export async function notifyBudgetExhausted(workspaceId: number): Promise<void> 
             engine_agent_id: null,
             event: BUDGET_EXHAUSTED_EVENT,
             kind: 'error',
-            message: 'Your Rerun credits for this month are used up. Scheduled and triggered runs on Rerun models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits.',
-            metadata: { errorCode: RERUN_BUDGET_ERROR_CODE, notice: { key: 'budgetExhausted' } satisfies NoticeCopy } as unknown as NotificationInsert['metadata'],
+            message: notice.message,
+            metadata: { errorCode: RERUN_BUDGET_ERROR_CODE, notice: notice.copy } as unknown as NotificationInsert['metadata'],
             recipients,
             notified_at: new Date().toISOString(),
         })
         if (insertError) throw new Error(insertError.message)
 
-        if (email && isSubscriptionEntitled(workspace.subscription_status)) await emailAdmins(supabase, workspaceId, workspace.name)
+        if (email && !organization_id && isSubscriptionEntitled(workspace.subscription_status)) await emailAdmins(supabase, workspaceId, workspace.name)
     } catch (err) {
         console.error('[notification] budget exhausted notice failed', err)
     }

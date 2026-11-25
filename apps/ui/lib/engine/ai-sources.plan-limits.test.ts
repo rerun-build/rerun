@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
-import { isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
+import { creditResetPhrase, isCreditUsedUp, isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, rerunCreditOf, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import type { BoxConnection } from './types'
+
+// A self-hosted install meters no credit: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
+vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), rerunCreditTotalMicros: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).rerunCreditTotalMicros }))
 
 const NOW = Date.parse('2026-10-05T12:00:00.000Z')
 const session: PlanLimitWindow = { kind: 'session', label: null, usedPercent: 42, resetsAt: '2026-10-05T14:00:00.000Z' }
@@ -31,6 +34,38 @@ describe('isUsable', () => {
         expect(isUsable(plan(null), credit)).toBe(true)
         expect(isUsable({ ...plan(null), credentialRejected: true }, credit)).toBe(false)
         expect(isUsable({ ...plan(null), connected: false }, credit)).toBe(false)
+    })
+})
+
+describe('the credit of a workspace an organization runs', () => {
+    const t = englishTranslator('connections')
+    const managed = (columns: object) => rerunCreditOf({ organization_id: 'org-nordlys', current_period_end: '2026-12-01T00:00:00.000Z', ...columns })
+    const rerun = { ...plan(null), id: RERUN_CONNECTION_ID, provider: 'rerun' } as BoxConnection
+
+    it('never comes back with a month', () => {
+        expect(managed({ rerun_topup_micros: 1_000_000 })).toMatchObject({ managed: true, resetAt: null })
+        expect(rerunCreditOf({ organization_id: null, current_period_end: '2026-12-01T00:00:00.000Z', rerun_topup_micros: 1_000_000 })).not.toHaveProperty('managed')
+    })
+
+    it('is used up with nothing left, whether some was ever given or the month started over', () => {
+        for (const columns of [{}, { rerun_used_micros: 5_000_000 }]) {
+            const credit = managed(columns)
+            expect(isCreditUsedUp(credit)).toBe(true)
+            expect(credit.percent).toBe(100)
+            expect(isUsable(rerun, credit)).toBe(false)
+            expect(sourceSummary(rerun, credit, t, 'en')).toBe('Credits used up')
+        }
+        expect(isCreditUsedUp(rerunCreditOf({ organization_id: null }))).toBe(false)
+    })
+
+    it('runs while some is left', () => {
+        const credit = managed({ rerun_used_micros: 1_000_000, rerun_topup_micros: 3_000_000 })
+        expect(isCreditUsedUp(credit)).toBe(false)
+        expect(sourceSummary(rerun, credit, t, 'en')).toBe('25% of credits used')
+    })
+
+    it('tells the mobile app nothing of a month either', () => {
+        expect(creditResetPhrase(managed({}), t, 'en')).toBe('once more are added')
     })
 })
 

@@ -9,7 +9,8 @@ import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant, type CallbackGrant } from '@/lib/oauth/mobile-ticket'
-import { parkSignIn } from '@/lib/oauth/pending-grant'
+import { returnToHost, type HostReturn } from '@/lib/oauth/host-sign-in'
+import { parkForHost, parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -36,6 +37,14 @@ async function accountEmailOf(provider: ManagedProvider, accessToken: string): P
     return provider.oauth.accountEmail?.(accessToken).catch(() => undefined)
 }
 
+function hostReturnOf(raw: string): HostReturn | undefined {
+    try {
+        return decodeManagedContext(raw).host
+    } catch {
+        return undefined
+    }
+}
+
 // Managed OAuth redirect target on our own domain. Exchanges the code for tokens using Rerun's
 // client, hands the bundle to the ENGINE token store (never Supabase), marks the service
 // active, then messages the opener popup and closes.
@@ -51,9 +60,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
     // The desktop app's channel, when it started the sign-in: where the browser goes back to.
     let desktop: DesktopShellChannel | undefined
     let key: string | undefined
+    const raw = state ? (await cookies()).get(MANAGED_COOKIE_PREFIX + state)?.value : undefined
+    const host = raw ? hostReturnOf(raw) : undefined
 
     const finish = async (result: CallbackResult): Promise<NextResponse> => {
-        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : await htmlResult(result, key)
+        const res = host
+            ? await returnToHost(host, result.ok ? { ok: true, claim: result.claim ?? '' } : result).catch(() => htmlResult({ ok: false, ...refusal('oauthSessionExpired') }, key))
+            : mobile
+              ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } })
+              : await htmlResult(result, key)
         if (state) res.cookies.delete({ name: MANAGED_COOKIE_PREFIX + state, path: MANAGED_COOKIE_PATH })
         return res
     }
@@ -64,8 +79,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         return finish({ ok: false, error: description ? `${providerError}: ${description}` : providerError })
     }
     if (!code || !state) return finish({ ok: false, ...refusal('missingCodeOrState') })
-
-    const raw = (await cookies()).get(MANAGED_COOKIE_PREFIX + state)?.value
 
     if (!raw) return finish({ ok: false, ...refusal('oauthSessionExpired') })
 
@@ -100,6 +113,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
             const { token, email } = await exchange()
             await connectVaultManaged(vault, ctx.vault.itemId, providerId, token, email)
             return finish({ ok: true, email })
+        }
+        if (host) {
+            const { token, email } = await exchange()
+            return finish({ ok: true, email, claim: await parkForHost(host, { kind: 'managed', key: ctx.key, provider: ctx.provider, serverName: ctx.serverName, token, email }) })
         }
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId, 'manage', ctx.workspaceId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.

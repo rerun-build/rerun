@@ -1,10 +1,11 @@
 import { toBoxScope, type BoxScope } from '@/app/api/_auth/box-scope'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
 import { realEmail } from '@/lib/auth/placeholder-email'
 import type { Database, Enums } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession, getSessionWorkspace, type SessionIdentity } from '@/supabase/session/getServerSession'
-import { selectMany, selectMaybeSingleWithJoins, selectSingle } from '@/supabase/supabase-helpers'
+import { selectSingle } from '@/supabase/supabase-helpers'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 
@@ -42,6 +43,8 @@ export type WorkspaceContext = {
     workspace: NonNullable<Awaited<ReturnType<typeof getServerSession>>['workspace']>
     role: WorkspaceRole
     boxScope: BoxScope
+    // Here for the organization that runs the workspace: what they do is signed by its brand.
+    organizationStaff?: boolean
     supabase: SupabaseClient<Database>
 }
 
@@ -54,7 +57,7 @@ export async function requireWorkspaceContext(): Promise<WorkspaceContext> {
     if (!user?.id || !user.workspace_id || !workspace || !session) throw new UnauthenticatedError()
     if (!membership) throw new AuthorizationError(NOT_A_MEMBER)
 
-    return { userId: user.id, userEmail: realEmail(session.email), userLocale: user.locale, authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase: createServiceRoleClient() }
+    return { userId: user.id, userEmail: realEmail(session.email), userLocale: user.locale, authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), organizationStaff: membership.organization_staff, supabase: createServiceRoleClient() }
 }
 
 export const ADMIN_ONLY = 'adminOnly' satisfies ErrorCode
@@ -85,7 +88,7 @@ export async function assertSpaceInWorkspace(spaceId: string): Promise<OwnedSpac
 // or the earliest member should no admin be left. Answers null so each caller writes its own refusal.
 export async function workspaceFounderUserId(workspaceId: number): Promise<string | null> {
     const supabase = createServiceRoleClient()
-    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id', 'role'] as const, { workspace_id: workspaceId }, { column: 'created_at' })
+    const { data: members } = await selectWorkspaceMembers(supabase, ['user_id', 'role'] as const, { workspace_id: workspaceId })
     return earliestAdminFirst(members ?? [])?.user_id ?? null
 }
 

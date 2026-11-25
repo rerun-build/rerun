@@ -108,7 +108,7 @@ describe('startAgentSetup', () => {
         const result = (await startAgentSetup(CTX, { agents: [{ agentId: 'agent-2', message: 'Triage the inbox' }] })) as { agents: { ranItsOwnInstall?: boolean }[] }
 
         expect(result.agents[0].ranItsOwnInstall).toBe(true)
-        expect(engineChat).toHaveBeenCalledWith({}, 'engine-1', { message: '<agent_install agent="Closer">\nRun your own setup\n</agent_install>', source: 'api', install: true })
+        expect(engineChat).toHaveBeenCalledWith({}, 'engine-1', { message: '<agent_install agent="Closer">\nRun your own setup\n</agent_install>', source: 'api', install: true, teamRequests: expect.any(Boolean) })
         expect(ensureSessionRow).toHaveBeenCalledWith('agent-2', 'engine-session-2', 'Install Closer', { source: 'api', status: 'working' })
     })
 

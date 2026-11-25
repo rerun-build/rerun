@@ -11,7 +11,12 @@ import {
     RESERVED_PREFIX,
     siteFileExists,
 } from '@/lib/published/gate'
-import { extractPublishedSlug, PUBLISHED_SITE_ROUTE } from '@/lib/published/host'
+import { HOST_UNAVAILABLE_ROUTE, isRerunOnlyPath } from '@/lib/brand/host-paths'
+import { organizationRootDomain } from '@/lib/brand/root-domain'
+import { hostSite } from '@/lib/brand/site'
+import { PUBLISHED_SITE_ROUTE } from '@/lib/published/host'
+import { requestHost, requestProtocol } from '@/lib/request-host'
+import { PAGE_HEADER } from '@/lib/workspace/workspace-header'
 import { STAGING_GATE_CHALLENGE, stagingGateVerdict } from '@/lib/staging-gate'
 import { updateSession } from '@/supabase/middleware'
 import { DESKTOP_SHELL_PREVIEW_HEADER, DESKTOP_SHELL_PREVIEW_PARAM } from '@/lib/desktop-shell/preview'
@@ -25,6 +30,8 @@ import {
     isGatedPath,
 } from '@rerun/contracts'
 import { NextRequest, NextResponse } from 'next/server'
+
+const notFoundResponse = () => new NextResponse('Not found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
 
 // The labs are work in progress, so they answer 404 unless the request carries the shared design
 // system token, as `?key=` or in the cookie that grants it. Same token and same cookie as the
@@ -40,18 +47,17 @@ function brandGate(request: NextRequest): NextResponse {
         production: process.env.NODE_ENV === 'production',
     })
 
-    if (verdict === 'deny') return new NextResponse('Not found', { status: 404, headers: { 'Cache-Control': 'no-store' } })
+    if (verdict === 'deny') return notFoundResponse()
 
     const response = NextResponse.next()
     if (verdict === 'grant' && secret) {
-        const host = (request.headers.get('host') ?? request.nextUrl.hostname).split(':')[0]
-        const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0].trim()
+        const host = (requestHost(request.headers) ?? request.nextUrl.hostname).split(':')[0]
         response.cookies.set(BRAND_GATE_COOKIE, secret, {
             path: '/',
             maxAge: BRAND_GATE_MAX_AGE,
             sameSite: 'lax',
             domain: host.endsWith('rerun.build') ? '.rerun.build' : undefined,
-            secure: (forwarded ?? request.nextUrl.protocol.replace(':', '')) === 'https',
+            secure: requestProtocol(request.headers, request.nextUrl.protocol === 'https:' ? 'https' : 'http') === 'https',
         })
     }
     return response
@@ -88,9 +94,16 @@ async function publishedHost(request: NextRequest, slug: string): Promise<NextRe
     return rewriteTo(request, `${PUBLISHED_SITE_ROUTE}/${slug}${pathname}`)
 }
 
+// Whose app the host is decides before anything else: a page published by a coworker, an
+// organization's app, or Rerun's. A name pointed here that is nobody's gets nothing, never a sign-in.
 export async function proxy(request: NextRequest) {
-    const publishedSlug = extractPublishedSlug(request.headers.get('host'))
-    if (publishedSlug) return publishedHost(request, publishedSlug)
+    const site = await hostSite(requestHost(request.headers) ?? request.nextUrl.host)
+    if (site.kind === 'published') return publishedHost(request, site.slug)
+    if (site.kind === 'unknown') return notFoundResponse()
+    if (site.kind === 'organization') {
+        if (isRerunOnlyPath(request.nextUrl.pathname)) return notFoundResponse()
+        if (site.suspended) return unavailableHost(request)
+    }
 
     if (isGatedPath(request.nextUrl.pathname, APP_GATED_PATHS)) return brandGate(request)
 
@@ -106,7 +119,24 @@ export async function proxy(request: NextRequest) {
         })
     }
 
-    return updateSession(withDesktopShellPreview(request))
+    const response = await updateSession(markPage(withDesktopShellPreview(request)), site)
+    // Nobody frames an organization's app but itself: its address is the only sign of whose it is.
+    if (site.kind === 'organization' && !request.nextUrl.pathname.startsWith('/api/')) response.headers.set('Content-Security-Policy', "frame-ancestors 'self'")
+    return response
+}
+
+// The organization exists, its name is said and nothing else opens.
+function unavailableHost(request: NextRequest): NextResponse {
+    if (request.method !== 'GET' || request.nextUrl.pathname.startsWith('/api/')) return NextResponse.json({ error: 'Unavailable' }, { status: 403, headers: { 'Cache-Control': 'no-store' } })
+    return rewriteTo(request, HOST_UNAVAILABLE_ROUTE, {}, 403)
+}
+
+// Only where organizations are served: there, what a page opens on depends on the host it opens on.
+function markPage(request: NextRequest): NextRequest {
+    if (!organizationRootDomain()) return request
+    if (request.method === 'GET' && !request.nextUrl.pathname.startsWith('/api/')) request.headers.set(PAGE_HEADER, '1')
+    else request.headers.delete(PAGE_HEADER)
+    return request
 }
 
 // The lab of the desktop chrome (/render/lab/desktop-shell) frames the app in iframes: the app there
@@ -154,11 +184,12 @@ export const config = {
          *   published host: a visitor without a session is sent to sign in, never handed one)
          * - desktop-view (the screen of a coworker in the iOS app's web view: the ticket in its
          *   fragment is the only key, there is no session to refresh nor one to provision)
+         * - api/edge (asked by the edge before it gets a certificate, with a key of its own)
          * - api/desktop/config (asked by the desktop app before it shows the server, staging
          *   included: it carries no session and must answer before anyone signs in)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!_next/static|_next/image|favicon.ico|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/edge/|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
         // The labs put back in, for the gate alone: proxy() returns before it ever reaches
         // updateSession(). The UI kit (/render/kit) and the OG renders, /render/brand and
         // /render/templates, stay out: the screenshot service captures those on every card.

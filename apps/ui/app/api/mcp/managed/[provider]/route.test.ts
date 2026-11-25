@@ -6,6 +6,7 @@ import type { ManagedProvider } from '@/lib/managed/types'
 import { POST } from './route'
 
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn() }))
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => (await import('@rerun/contracts')).RERUN_BRAND }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
 
 const BOX_KEY = 'box-key-of-workspace-7'

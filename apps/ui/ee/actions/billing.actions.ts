@@ -2,7 +2,8 @@
 
 import type { Database } from '@/app/api/database.types'
 import { actorFromContext } from '@/app/api/_auth/access'
-import { requireAdminContext, requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
+import { refuseManagedSession, refuseManagedWorkspace } from '@/app/api/_auth/managed-workspace'
+import { requireAdminContext, requireWorkspaceContext, requireWorkspaceId, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import {
     acceptPlanTerms,
     cancelPendingSwitch,
@@ -53,6 +54,14 @@ const stripeIdSchema = z.string().trim().min(1).max(200)
 
 const requireBillingAdmin = () => requireAdminContext('adminOnlyBilling')
 
+// Everything bought or billed. An organization pays for the workspaces it runs: nobody in them buys
+// anything, a direct call included.
+async function requireBuyer(): Promise<WorkspaceContext> {
+    const ctx = await requireBillingAdmin()
+    refuseManagedWorkspace(ctx.workspace)
+    return ctx
+}
+
 const creditPacksSchema = z.number().int().min(1).max(MAX_CREDIT_PACKS_PER_PURCHASE)
 
 const planSelectionSchema = z.object({
@@ -65,6 +74,7 @@ const planSelectionSchema = z.object({
 // "the trial was refused" rather than leaving the widget waiting forever.
 export async function readCheckoutOutcomeAction(sessionId: string): Promise<{ ok: true; outcome: CheckoutOutcome } | ActionFailure> {
     try {
+        await refuseManagedSession()
         const outcome = await readCheckoutOutcome(z.string().trim().min(1).max(200).parse(sessionId))
         return { ok: true, outcome }
     } catch (err) {
@@ -76,7 +86,7 @@ export async function readCheckoutOutcomeAction(sessionId: string): Promise<{ ok
 // false` is not an error: the workspace simply goes through the card checkout instead.
 export async function startTrialAction(): Promise<{ ok: true; entitled: boolean } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, entitled: await startCardlessTrial() }
     } catch (err) {
         return failureOf(err, 'startTrialFailed')
@@ -88,7 +98,7 @@ export async function startTrialAction(): Promise<{ ok: true; entitled: boolean 
 // session id comes from the client, so the session must prove it belongs to the caller.
 export async function confirmCardSetupAction(sessionId: string): Promise<{ ok: true } | ActionFailure> {
     try {
-        const { workspace } = await requireBillingAdmin()
+        const { workspace } = await requireBuyer()
         const workspaceId = workspace.id
         const session = await stripe.checkout.sessions.retrieve(z.string().trim().min(1).max(200).parse(sessionId))
         if (session.metadata?.kind !== PLAN_CARD_SETUP_KIND) throw new AppError('notCardSetupSession')
@@ -112,6 +122,7 @@ export async function confirmCardSetupAction(sessionId: string): Promise<{ ok: t
 // subscription yet.
 export async function getSubscriptionStateAction(): Promise<{ ok: true; state: SubscriptionState | null } | ActionFailure> {
     try {
+        await refuseManagedSession()
         return { ok: true, state: await getSubscriptionState() }
     } catch (err) {
         return failureOf(err, 'loadSubscriptionFailedShort')
@@ -120,7 +131,7 @@ export async function getSubscriptionStateAction(): Promise<{ ok: true; state: S
 
 export async function getLifetimeBillingStateAction(): Promise<{ ok: true; state: LifetimeBillingState } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, state: await getLifetimeBillingState() }
     } catch (err) {
         return failureOf(err, 'loadSubscriptionFailedShort')
@@ -131,6 +142,7 @@ export async function getLifetimeBillingStateAction(): Promise<{ ok: true; state
 // offer if this workspace can still have it.
 export async function getCancelFlowStateAction(): Promise<{ ok: true; state: CancelFlowState } | ActionFailure> {
     try {
+        await refuseManagedSession()
         return { ok: true, state: await getCancelFlowState() }
     } catch (err) {
         return failureOf(err, 'loadSubscriptionFailed')
@@ -141,6 +153,7 @@ export async function getCancelFlowStateAction(): Promise<{ ok: true; state: Can
 // does not answer, and the dialog simply leaves those figures out.
 export async function getCancelFlowActivityAction(): Promise<{ ok: true; activity: CancelFlowActivity | null } | ActionFailure> {
     try {
+        await refuseManagedSession()
         return { ok: true, activity: await loadCancelFlowActivity(await requireWorkspaceId()) }
     } catch (err) {
         return failureOf(err, 'loadCoworkersFailed')
@@ -151,7 +164,7 @@ export async function getCancelFlowActivityAction(): Promise<{ ok: true; activit
 // lets them through: the dialog counts the refusals and stops refusing, this never holds anyone.
 export async function checkCancelReasonAction(text: string): Promise<{ ok: true; genuine: boolean; reason: CancelReason } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         const reading = await readCancelReason(cancelReasonTextSchema.parse(text))
         return { ok: true, genuine: reading?.genuine ?? true, reason: reading?.reason ?? 'other' }
     } catch (err) {
@@ -168,7 +181,7 @@ const cancelInputSchema = z.object({
 // the reading says the cancellation goes through: it only decides how the answer is filed.
 export async function cancelSubscriptionAction(input: z.input<typeof cancelInputSchema>): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         const parsed = cancelInputSchema.parse(input)
         const reading = await readCancelReason(parsed.comment)
         await cancelSubscription({ ...parsed, reason: reading?.reason ?? 'other', check: reading ? (reading.genuine ? 'genuine' : 'rejected') : 'unchecked' })
@@ -180,7 +193,7 @@ export async function cancelSubscriptionAction(input: z.input<typeof cancelInput
 
 export async function resumeSubscriptionAction(): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await resumeSubscription()
         return { ok: true }
     } catch (err) {
@@ -190,7 +203,7 @@ export async function resumeSubscriptionAction(): Promise<{ ok: true } | ActionF
 
 export async function claimRetentionOfferAction(): Promise<{ ok: true; offer: RetentionOfferKind } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, offer: await claimRetentionOffer() }
     } catch (err) {
         return failureOf(err, 'applyOfferFailed')
@@ -199,7 +212,7 @@ export async function claimRetentionOfferAction(): Promise<{ ok: true; offer: Re
 
 export async function requestRenewalReminderAction(): Promise<{ ok: true; reminderAt: string } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, reminderAt: await requestRenewalReminder() }
     } catch (err) {
         return failureOf(err, 'setReminderFailed')
@@ -212,7 +225,7 @@ export async function requestRenewalReminderAction(): Promise<{ ok: true; remind
 // monthly whatever the selection says, and `trial` tells the dialog so.
 export async function createPlanCheckoutAction(selection: PlanSelection): Promise<({ ok: true } & PlanCheckoutSession) | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, ...(await createPlanCheckoutSession(planSelectionSchema.parse(selection))) }
     } catch (err) {
         return failureOf(err, 'startCheckoutFailed')
@@ -222,7 +235,7 @@ export async function createPlanCheckoutAction(selection: PlanSelection): Promis
 // Called through the Checkout client's `runServerUpdate`, which reloads the session afterwards.
 export async function updatePlanCheckoutAction(sessionId: string, selection: PlanSelection): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await updatePlanCheckoutSession(stripeIdSchema.parse(sessionId), planSelectionSchema.parse(selection))
         return { ok: true }
     } catch (err) {
@@ -232,7 +245,7 @@ export async function updatePlanCheckoutAction(sessionId: string, selection: Pla
 
 export async function acceptPlanTermsAction(sessionId: string): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await acceptPlanTerms(stripeIdSchema.parse(sessionId))
         return { ok: true }
     } catch (err) {
@@ -244,7 +257,7 @@ export async function acceptPlanTermsAction(sessionId: string): Promise<{ ok: tr
 // through confirmCardSetupAction; a trial paying today then runs the plan change from the dialog.
 export async function createPlanCardSetupAction(): Promise<{ ok: true; clientSecret: string; sessionId: string } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, ...(await createPlanCardSetupSession()) }
     } catch (err) {
         return failureOf(err, 'openCardFormFailed')
@@ -253,6 +266,7 @@ export async function createPlanCardSetupAction(): Promise<{ ok: true; clientSec
 
 export async function previewPlanChangeAction(selection: PlanSelection): Promise<{ ok: true; quote: PlanQuote | null } | ActionFailure> {
     try {
+        await refuseManagedSession()
         return { ok: true, quote: await previewPlanChange(planSelectionSchema.parse(selection)) }
     } catch (err) {
         return failureOf(err, 'previewPlanChangeFailed')
@@ -261,7 +275,7 @@ export async function previewPlanChangeAction(selection: PlanSelection): Promise
 
 export async function changePlanAction(selection: PlanSelection): Promise<({ ok: true } & PlanChangeResult) | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         // A page loaded before credit left the plan still sends its packs. The schema would drop them
         // and answer a success that bought nothing.
         if ((selection?.quantities as { credit_pack?: number } | undefined)?.credit_pack) throw new AppError('reloadToBuyCredit')
@@ -286,7 +300,7 @@ function planChargeFailure(err: unknown, fallback: ErrorCode = 'changePlanFailed
 
 export async function quoteCreditPurchaseAction(packs: number): Promise<({ ok: true } & CreditQuote) | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, ...(await quoteCreditPurchase(creditPacksSchema.parse(packs))) }
     } catch (err) {
         return failureOf(err, 'quoteCreditFailed')
@@ -295,7 +309,7 @@ export async function quoteCreditPurchaseAction(packs: number): Promise<({ ok: t
 
 export async function buyCreditAction(packs: number): Promise<({ ok: true } & CreditPurchaseResult) | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, ...(await buyCredit(creditPacksSchema.parse(packs))) }
     } catch (err) {
         return planChargeFailure(err, 'buyCreditFailed')
@@ -304,7 +318,7 @@ export async function buyCreditAction(packs: number): Promise<({ ok: true } & Cr
 
 export async function settleCreditInvoiceAction(invoiceId: string): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await settleCreditInvoice(stripeIdSchema.parse(invoiceId))
         return { ok: true }
     } catch (err) {
@@ -314,7 +328,7 @@ export async function settleCreditInvoiceAction(invoiceId: string): Promise<{ ok
 
 export async function abandonCreditInvoiceAction(invoiceId: string): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await abandonCreditInvoice(stripeIdSchema.parse(invoiceId))
         return { ok: true }
     } catch (err) {
@@ -324,7 +338,7 @@ export async function abandonCreditInvoiceAction(invoiceId: string): Promise<{ o
 
 export async function confirmCreditCheckoutAction(sessionId: string): Promise<{ ok: true; packs: number } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         return { ok: true, ...(await confirmCreditCheckout(stripeIdSchema.parse(sessionId))) }
     } catch (err) {
         if (err instanceof AppError) return failureOf(err)
@@ -336,7 +350,7 @@ export async function confirmCreditCheckoutAction(sessionId: string): Promise<{ 
 
 export async function cancelPendingSwitchAction(): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await cancelPendingSwitch()
         return { ok: true }
     } catch (err) {
@@ -372,6 +386,7 @@ export async function setRerunCreditPausedAction(paused: boolean): Promise<{ ok:
 
 export async function listInvoicesAction(): Promise<{ ok: true; invoices: InvoiceSummary[] } | ActionFailure> {
     try {
+        await refuseManagedSession()
         return { ok: true, invoices: await listInvoices() }
     } catch (err) {
         return failureOf(err, 'loadInvoicesFailed')
@@ -392,7 +407,7 @@ function businessDetailsRefusal(message: string | undefined): ActionFailure {
 
 export async function saveBusinessDetailsAction(input: z.input<typeof businessDetailsSchema>): Promise<{ ok: true; business: BusinessDetails } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         const parsed = businessDetailsSchema.safeParse(input)
         if (!parsed.success) return businessDetailsRefusal(parsed.error.issues[0]?.message)
         return { ok: true, business: await saveBusinessDetails({ ...parsed.data, type: parsed.data.type as TaxIdType }) }
@@ -403,7 +418,7 @@ export async function saveBusinessDetailsAction(input: z.input<typeof businessDe
 
 export async function removeTaxIdAction(): Promise<{ ok: true } | ActionFailure> {
     try {
-        await requireBillingAdmin()
+        await requireBuyer()
         await removeTaxId()
         return { ok: true }
     } catch (err) {

@@ -26,7 +26,7 @@ let db: FakeSupabase
 
 const connection = (id: string, provider: string, credentialRejected: boolean, name = provider) => ({ id, provider, name, credentialRejected })
 const connected = (...connections: ReturnType<typeof connection>[]) => vi.mocked(listConnections).mockResolvedValue({ connections } as never)
-const member = (user_id: string, role = 'admin') => ({ workspace_id: WORKSPACE_ID, user_id, role })
+const member = (user_id: string, role = 'admin', organization_staff = false) => ({ workspace_id: WORKSPACE_ID, user_id, role, organization_staff })
 
 // The two RPCs as the database runs them, over rows the reads see too.
 function database(): FakeSupabase {
@@ -133,6 +133,13 @@ describe('alertSignedOutAccounts', () => {
         expect(sentTo()).toEqual([])
 
         await alertSignedOutAccounts(WORKSPACE_ID, 'claude')
+        expect(sentTo()).toEqual(['ada@acme.io'])
+    })
+
+    it('leaves out the team of the organization that runs the workspace', async () => {
+        tables.workspace_members = [member('ada'), member('bob', 'admin', true)]
+        await alertSignedOutAccounts(WORKSPACE_ID, 'claude')
+
         expect(sentTo()).toEqual(['ada@acme.io'])
     })
 

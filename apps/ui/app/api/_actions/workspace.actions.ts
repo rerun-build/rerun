@@ -1,20 +1,24 @@
 'use server'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '@/app/api/database.types'
 import { AuthorizationError, requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { hasPendingCreatorTerms, isExpertAccount, requireSandboxWorkspaceId } from '@/app/api/_auth/expert'
 import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS } from '@rerun/cloud/billing'
 import { grantRerunTopup } from '@rerun/cloud/billing.server'
-import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catalog'
-import { uploadPublicImage } from '@/lib/images/upload'
+import { BLOB_ILLUSTRATIONS, randomBlob } from '@/lib/blobs/catalog'
+import { requestHostScope } from '@/lib/brand/host-scope'
+import { isRerunHost } from '@/lib/brand/request-site'
+import { opensOnHost } from '@/lib/workspace/host-workspace'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { enterSandbox, ensureSandboxSpace } from '@/app/api/_services/sandbox.service'
 import { accountFirstName } from '@/lib/naming/account-first-name'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { WORKSPACE_NAME_MAX, workspaceNameFrom } from '@/lib/naming/workspace-name'
-import { fetchLogoBytes, rasterizeVectorLogo } from '@/lib/workspace/fetch-logo'
-import { LOGO_MAX_BYTES, logoLinkImageUrl, readLogoLink } from '@/lib/workspace/logo-input'
+import { readWorkspaceLogo } from '@/lib/workspace/read-logo'
 import { getServerSession } from '@/supabase/session/getServerSession'
-import { selectSingle } from '@/supabase/supabase-helpers'
+import { selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 
 import { applyCoworkerLanguage } from '@/app/api/_services/coworker-language.service'
 import { isStableLocale } from '@rerun/i18n'
@@ -28,6 +32,14 @@ async function requireUserId(): Promise<string> {
     return user.id
 }
 
+// A workspace another host opens answers like one they are not in.
+async function opensHere(supabase: SupabaseClient<Database>, workspaceId: number): Promise<boolean> {
+    const scope = await requestHostScope()
+    if (!scope) return true
+    const { data } = await selectMaybeSingle(supabase, 'workspaces', ['organization_id'] as const, { id: workspaceId })
+    return opensOnHost(scope, data?.organization_id ?? null)
+}
+
 // Sets the caller's active workspace. The active workspace is `users.workspace_id`,
 // which scopes the UI and the service-role API layer. We only allow switching to a
 // workspace the caller is actually a member of.
@@ -37,6 +49,7 @@ export async function switchWorkspaceAction(workspaceId: number): Promise<Action
 
     const { data: membership } = await selectSingle(supabase, 'workspace_members', ['workspace_id'] as const, { user_id: userId, workspace_id: workspaceId })
     if (!membership) return failure('notMember')
+    if (!(await opensHere(supabase, workspaceId))) return failure('notMember')
 
     const { error } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: workspaceId }).eq('id', userId)
     if (error) return { ok: false, error: error.message }
@@ -64,7 +77,7 @@ export async function updateWorkspaceAction(formData: FormData): Promise<ActionR
     const locale = formData.get('locale')
     if (locale !== null && !isStableLocale(locale)) return failure('unknownLanguage')
 
-    const logo = await readLogo(formData, workspace.id)
+    const logo = await readWorkspaceLogo(formData, workspace.id)
     if (!logo.ok) return logo
 
     const { error } = await supabase
@@ -76,52 +89,15 @@ export async function updateWorkspaceAction(formData: FormData): Promise<ActionR
     return { ok: true }
 }
 
-const WORKSPACE_LOGOS_BUCKET = 'workspace-logos'
-const WORKSPACE_LOGO_MAX_SIZE = 256
-
-async function readLogo(formData: FormData, workspaceId: number): Promise<ActionResult<{ iconUrl?: string }>> {
-    const iconFile = formData.get('iconFile')
-    if (typeof iconFile === 'string' && iconFile) {
-        const icon = getBlobByFile(iconFile)
-        return icon ? { ok: true, iconUrl: icon.url } : failure('unknownIcon')
-    }
-
-    const logoFile = formData.get('logoFile')
-    if (logoFile instanceof File) {
-        if (!logoFile.type.startsWith('image/')) return failure('chooseImage')
-        if (logoFile.size > LOGO_MAX_BYTES) return failure('imageTooLarge', { max: LOGO_MAX_BYTES / (1024 * 1024) })
-        return rehostLogo(await logoFile.arrayBuffer(), workspaceId)
-    }
-
-    const logoLink = formData.get('logoLink')
-    if (typeof logoLink === 'string' && logoLink.trim()) {
-        const link = readLogoLink(logoLink)
-        if (!link) return failure('noLogoFound')
-        const fetched = await fetchLogoBytes(logoLinkImageUrl(link))
-        if (!fetched.ok) return fetched
-        return rehostLogo(fetched.bytes, workspaceId)
-    }
-
-    return { ok: true }
-}
-
-async function rehostLogo(bytes: ArrayBuffer | Uint8Array, workspaceId: number): Promise<ActionResult<{ iconUrl: string }>> {
-    try {
-        const raster = await rasterizeVectorLogo(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), WORKSPACE_LOGO_MAX_SIZE)
-        const iconUrl = await uploadPublicImage(createServiceRoleClient(), raster, WORKSPACE_LOGOS_BUCKET, String(workspaceId), { maxSize: WORKSPACE_LOGO_MAX_SIZE })
-        return { ok: true, iconUrl }
-    } catch {
-        return failure('imageUnreadable')
-    }
-}
-
 // Creates a new workspace owned by the caller, adds the owner membership, and
 // makes it the active workspace.
 export async function createWorkspaceAction(name: string, iconUrl?: string): Promise<ActionResult<{ workspaceId: number }>> {
     const userId = await requireUserId()
+    const { session, workspace: current } = await getServerSession()
+    // The organization opens the workspaces of its clients.
+    if (isManagedWorkspace(current) || !(await isRerunHost())) return failure('managedWorkspace')
     const icon = iconUrl ? BLOB_ILLUSTRATIONS.find(blob => blob.url === iconUrl) : undefined
     if (iconUrl && !icon) return failure('unknownIcon')
-    const { session, workspace: current } = await getServerSession()
     const supabase = createServiceRoleClient()
 
     const { data: workspace, error: workspaceError } = await supabase
@@ -169,6 +145,7 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
 export async function enterSandboxAction(): Promise<ActionResult<{ workspaceId: number }>> {
     const userId = await requireUserId()
 
+    if (!(await isRerunHost())) return failure('sandboxExpertOnly')
     if (!(await isExpertAccount(userId))) return failure('sandboxExpertOnly')
     // The creator flow claims the sandbox itself, before the conditions screen. Everywhere else the
     // wall holds: no switching into a sandbox whose program conditions are still unsigned.

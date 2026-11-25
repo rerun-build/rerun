@@ -1,9 +1,11 @@
 'use client'
 
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Button } from '@/components/ui/button'
 import { Bell, CreditCard, MailIcon, Package, Play, Volume2, type LucideIcon } from '@/lib/icons'
 import { playNotificationSound } from '@/lib/notifications/browser'
 import { EMAIL_CATEGORIES, type EmailCategory, type NotificationPrefs } from '@/lib/notifications/prefs'
+import { isWhiteLabel } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 
 import { SETTINGS_CARD, SettingsSection, SwitchRow } from './SettingsSection'
@@ -45,6 +47,8 @@ const CATEGORY_ICONS: Record<EmailCategory, LucideIcon> = {
 
 export function AccountEmails({ categories, onChange }: { categories: NotificationPrefs['categories']; onChange: (category: EmailCategory, value: boolean) => void }) {
     const t = useTranslations('notifications.settings.accountEmails')
+    // Rerun's news and its billing notices: neither is sent about a workspace an organization runs.
+    if (isWhiteLabel(useBrand())) return null
     return (
         <SettingsSection title={t('title')}>
             <div className={SETTINGS_CARD}>

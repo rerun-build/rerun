@@ -2,6 +2,7 @@ import 'server-only'
 
 import { isAdminActor, type Actor } from '@/app/api/_auth/access'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
+import { earliestOrganizationStaff } from '@/app/api/_auth/workspace-members'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
 import { entryAfter } from '@/app/api/_services/mcp-vault.service'
 import { addVaultMcp, addVaultService } from '@/app/api/_services/vault-install.service'
@@ -12,10 +13,11 @@ import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, ac
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { FOREMAN_NAME_MAX, sanitizeForemanName } from '@/lib/foreman/name'
 import { saveForemanName } from '@/lib/foreman/profile'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS } from '@/lib/foreman/tool-defs'
 import { asString, asStringArray, requireString } from '@/lib/mcp/args'
-import { inviteMember } from '@/app/api/_services/members.service'
+import { inviteMember, resolveWorkspaceIdentities } from '@/app/api/_services/members.service'
 import { failure } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectSingle } from '@/supabase/supabase-helpers'
@@ -29,7 +31,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     const workspaceId = actor.workspaceId
     if (!FOREMAN_ENGINE_HUB_TOOL_NAMES.has(tool)) throw new Error(`Unknown foreman tool: ${tool}`)
 
-    if (tool === 'search_docs') return searchDocs(requireString(args.query, 'query'))
+    if (tool === 'search_docs') return searchDocs(requireString(args.query, 'query'), await workspaceBrand(workspaceId))
     if (tool === 'set_name') return setName(actor, args)
     if (tool === 'invite_members') return inviteMembers(actor, args)
     if (INBOX_TOOL_NAMES.has(tool)) return dispatchInboxTool(actor, tool, args)
@@ -45,8 +47,10 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     return dispatchAccountTool(actor, accountToolNameOf(tool), args, { actorUserId: actor.kind === 'user' ? actor.userId : null })
 }
 
+// An organization sets a workspace up before anyone of its own is in it: until then, its team stands
+// for it.
 async function founderOf(workspaceId: number): Promise<string> {
-    const userId = await workspaceFounderUserId(workspaceId)
+    const userId = (await workspaceFounderUserId(workspaceId)) ?? (await earliestOrganizationStaff(createServiceRoleClient(), workspaceId))
     if (!userId) throw new Error('This workspace has no member to act for.')
     return userId
 }
@@ -89,12 +93,12 @@ async function inviteMembers(actor: Actor, args: Record<string, unknown>): Promi
     if (emails.length > MAX_INVITES) throw new Error(`Invite at most ${MAX_INVITES} people at once.`)
     const supabase = createServiceRoleClient()
     const userId = actor.kind === 'user' ? actor.userId : await founderOf(actor.workspaceId)
-    const [{ data: workspace }, { data: inviter }] = await Promise.all([selectSingle(supabase, 'workspaces', ['id', 'name', 'max_seats'] as const, { id: actor.workspaceId }), supabase.auth.admin.getUserById(userId)])
+    const [{ data: workspace }, inviters] = await Promise.all([selectSingle(supabase, 'workspaces', ['id', 'name', 'max_seats'] as const, { id: actor.workspaceId }), resolveWorkspaceIdentities(supabase, actor.workspaceId, [userId])])
     if (!workspace) throw new Error('This workspace no longer exists.')
     const scope = asString(args.scope) === 'assigned' ? 'assigned' : 'all'
     const invitations = []
     for (const email of emails) {
-        const result = await inviteMember({ supabase, workspace, invitedBy: { userId, email: inviter.user?.email ?? null } }, email, scope)
+        const result = await inviteMember({ supabase, workspace, invitedBy: { userId, email: inviters.get(userId)?.email ?? null } }, email, scope)
         invitations.push(result.ok ? { email, sent: true, ...(result.inviteUrl ? { inviteUrl: result.inviteUrl } : {}) } : { email, sent: false, error: 'code' in result ? failure(result.code).error : result.error })
     }
     return { invitations }

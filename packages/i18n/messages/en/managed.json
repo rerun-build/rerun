@@ -1,0 +1,46 @@
+{
+    "_context": {
+        "contact": "Button, opens an email to the organization (an agency) that runs the workspace for its people. {manager} is its name.",
+        "paused.reason": "Tooltip of a disabled button. {manager} is the organization that runs the workspace.",
+        "paused.coworker": "{name} is a coworker (an AI agent), {manager} the organization that runs the workspace.",
+        "credit.providedBy": "Under \"Credits\". {manager} is the organization that gives the workspace its AI credits.",
+        "credit.outOwnPlan": "{plan} is \"Claude\" or \"ChatGPT\". {manager} is the organization that gives the workspace its AI credits."
+    },
+    "contact": "Contact {manager}",
+    "templateUnavailable": "Not available in this workspace",
+    "paused": {
+        "title": "This workspace is paused.",
+        "body": "Contact {manager} to bring it back.",
+        "reason": "This workspace is paused. Contact {manager}.",
+        "coworker": "Contact {manager} and {name} picks up exactly where it stopped."
+    },
+    "restoring": {
+        "waiting": "This workspace is first in line.",
+        "failed": "We've been alerted and are bringing it back by hand."
+    },
+    "credit": {
+        "title": "Credits",
+        "providedBy": "Provided by {manager}",
+        "outTitle": "Out of credits",
+        "out": "Contact {manager} to get more.",
+        "outOwnPlan": "Contact {manager} to get more, or run on your {plan} plan, already connected.",
+        "outOwnAi": "Contact {manager} to get more, or run your coworkers on your own AI.",
+        "usedUp": "Credits used up. Contact {manager}.",
+        "usage": "{percent}% of credits used",
+        "detailUsedUp": "Coworkers running on these credits are paused. Contact {manager} to get more, or pick another default model to keep them going.",
+        "detailIncluded": "Provided by {manager}. No key, nothing to set up.",
+        "defaultPick": "Credits are used up, so coworkers with no model of their own are paused. Contact {manager}, or pick another model to keep them going.",
+        "defaultAdd": "Credits are used up, so coworkers with no model of their own are paused. Contact {manager}, or add a plan or an API key to keep them going."
+    },
+    "host": {
+        "noAccess": {
+            "title": "You don't have access",
+            "body": "{email} has no workspace here. Ask {brand} for an invitation.",
+            "bodyUnnamed": "This account has no workspace here. Ask {brand} for an invitation."
+        },
+        "unavailable": {
+            "title": "{brand} is unavailable",
+            "body": "Please come back later."
+        }
+    }
+}

@@ -7,6 +7,7 @@ import ArchiveExpiring from "../emails/archive-expiring";
 import AgentRecommendations from "../emails/agent-recommendations";
 import AutomateAgent from "../emails/automate-agent";
 import BudgetExhausted from "../emails/budget-exhausted";
+import OrganizationCreditOut from "../emails/organization-credit-out";
 import CreatorInvite from "../emails/creator-invite";
 import CreatorPitch from "../emails/creator-pitch";
 import LifetimeCode from "../emails/lifetime-code";
@@ -264,6 +265,19 @@ export const EMAIL_PREVIEWS: EmailPreview[] = [
       <AppNotice
         appName="LinkedIn"
         message="The trial of LinkedIn ends tomorrow. Add a card to keep it connected."
+        appUrl={APP_URL}
+        unsubscribeUrl={`${APP_URL}/unsubscribe`}
+      />
+    ),
+  },
+  {
+    id: "organization-credit-out",
+    group: "Organization credit",
+    label: "One of its workspaces",
+    element: (
+      <OrganizationCreditOut
+        workspaceName="Acme"
+        consoleUrl={`${APP_URL}/organization`}
         appUrl={APP_URL}
         unsubscribeUrl={`${APP_URL}/unsubscribe`}
       />

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), insert: vi.fn(), workspaceFounderUserId: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), selectAll: vi.fn(), insert: vi.fn(), workspaceFounderUserId: vi.fn() }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ insert: mocks.insert }) }) }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle, selectMany: mocks.selectMany, selectMaybeSingleWithJoins: async () => ({ data: null }) }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle, selectMany: mocks.selectMany, selectAll: mocks.selectAll, selectMaybeSingleWithJoins: async () => ({ data: null }) }))
 vi.mock('./agent-row', () => ({ ensureForemanAgentRow: async () => 'agent-cos' }))
 vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: mocks.workspaceFounderUserId }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn() }))
@@ -15,10 +15,8 @@ const { findForemanThreadId, openForemanRoutineThread } = await import('./conver
 const follows = (follow: boolean | undefined) => ({ version: 2, coworkers: follow === undefined ? {} : { foreman: { mode: 'default', follow } } })
 
 function members(users: Array<{ id: string; follow?: boolean }>) {
-    mocks.selectMany.mockImplementation(async (_client: unknown, table: string) => {
-        if (table === 'workspace_members') return { data: users.map(user => ({ user_id: user.id })) }
-        return { data: [...users].reverse().map(user => ({ id: user.id, email_notification_prefs: follows(user.follow) })) }
-    })
+    mocks.selectAll.mockResolvedValue({ data: users.map(user => ({ user_id: user.id })) })
+    mocks.selectMany.mockResolvedValue({ data: [...users].reverse().map(user => ({ id: user.id, email_notification_prefs: follows(user.follow) })) })
 }
 
 beforeEach(() => {
@@ -41,7 +39,7 @@ describe('openForemanRoutineThread', () => {
         members([{ id: 'founder' }, { id: 'first', follow: true }, { id: 'second', follow: true }])
         await openForemanRoutineThread(7, 'engine-2', 'Weekly review')
         expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ owner_user_id: 'first' }))
-        expect(mocks.selectMany.mock.calls[0][4]).toEqual({ column: 'created_at' })
+        expect(mocks.selectAll.mock.calls[0].slice(3)).toEqual([{ workspace_id: 7, organization_staff: false }, { column: 'created_at', ascending: true }])
     })
 
     it("falls back to the workspace's founder when nobody follows it", async () => {

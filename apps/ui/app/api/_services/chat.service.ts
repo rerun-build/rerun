@@ -10,7 +10,7 @@ import { FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind, type SessionKind, ty
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectManyWithJoins, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
 import { isPlanLimited } from './capacity.service'
-import { recordSessionParticipant, recordSessionRead } from './notification-audience.service'
+import { participantIdOf, recordSessionParticipant, recordSessionRead, type MessageSender } from './notification-audience.service'
 import { recordSentMessage } from './session-preview.service'
 import { findWorkspaceEngine, NoEngineError, type WorkspaceEngine } from './workspace-engine.service'
 
@@ -227,10 +227,10 @@ export async function claimWaitingSession(sessionId: string, waitingAs: SessionS
 // What a message sent to a running coworker leaves behind: the conversation working, its author a
 // participant who has read it, and, for anything but an install's guide, the line under the coworker.
 // The preview is not awaited: it would land after the reply it asked for.
-export async function recordMessageSent(sessionId: string, authorId: string, preview: string | null) {
+export async function recordMessageSent(sessionId: string, sender: MessageSender, preview: string | null) {
     await updateSessionStatus(sessionId, 'working')
-    await Promise.all([recordSessionParticipant(sessionId, authorId), recordSessionRead(sessionId, authorId)])
-    if (preview !== null) void recordSentMessage(sessionId, preview, authorId)
+    await Promise.all([recordSessionParticipant(sessionId, participantIdOf(sender)), recordSessionRead(sessionId, sender.userId)])
+    if (preview !== null) void recordSentMessage(sessionId, preview, sender.userId)
 }
 
 // Acknowledging an alert only clears that alert: a run started since then owns the status now.

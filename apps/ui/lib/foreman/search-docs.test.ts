@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { RERUN_BRAND } from '@rerun/contracts'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { parseDocsSections, rankDocsSections } from './search-docs'
+import { parseDocsSections, rankDocsSections, searchDocs } from './search-docs'
 
 // The shape docs.rerun.build serves at /llms-full.txt: every page behind a `# Title` / `Source:`
 // pair, one after the other in a single file.
@@ -67,5 +68,60 @@ describe('rankDocsSections', () => {
     it('never hands back more than two sections of the same page', () => {
         const hits = rankDocsSections(sections, 'agent run')
         expect(hits.filter(section => section.page === 'Automations')).toHaveLength(2)
+    })
+})
+
+describe('searchDocs', () => {
+    const NORDLYS = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys', supportEmail: 'help@nordlys.example', links: { docs: 'https://help.nordlys.example', terms: null, privacy: null } }
+    const PAGES = `${CORPUS}
+# Vault
+Source: https://docs.rerun.build/vault
+
+Rerun keeps every account once. See [Billing](/billing) or ask the Rerun team.
+
+## Paid apps
+
+Two apps are sold by the account.
+`
+
+    const serve = (body: string) => vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(body))
+
+    afterEach(() => {
+        vi.restoreAllMocks()
+        vi.useRealTimers()
+    })
+
+    it('answers Rerun as it always has', async () => {
+        serve(PAGES)
+        expect(await searchDocs('vault account')).toEqual({
+            documentation: 'https://docs.rerun.build',
+            passages: expect.arrayContaining([{ title: 'Vault', url: 'https://docs.rerun.build/vault', text: 'Rerun keeps every account once. See [Billing](/billing) or ask the Rerun team.' }]),
+        })
+    })
+
+    it('answers a brand in its name, without a link of Rerun', async () => {
+        serve(PAGES)
+        const answer = await searchDocs('Nordlys vault account', NORDLYS)
+        expect(answer.documentation).toBe('https://help.nordlys.example')
+        expect(answer.passages).toContainEqual({ title: 'Vault', text: 'Nordlys keeps every account once.' })
+        expect(answer.note).toContain('help@nordlys.example')
+        expect(JSON.stringify(answer)).not.toMatch(/rerun|discord/i)
+    })
+
+    it('holds no price, whatever is asked', async () => {
+        serve(PAGES)
+        for (const question of ['credit trial dollars', 'paid apps sold', 'Nordlys pricing']) {
+            const answer = await searchDocs(question, NORDLYS)
+            expect(JSON.stringify(answer.passages)).not.toMatch(/trial|dollars|sold|billing/i)
+            expect(answer.note).toContain('never state one')
+        }
+    })
+
+    it('names no address of Rerun when the documentation cannot be read, nor when the organization has none', async () => {
+        vi.useFakeTimers({ toFake: ['Date'], now: Date.now() + 2 * 60 * 60_000 })
+        vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('docs.rerun.build is down'))
+        const answer = await searchDocs('vault', { ...NORDLYS, links: { ...NORDLYS.links, docs: null } })
+        expect(answer).toEqual({ passages: [], note: expect.any(String) })
+        expect(JSON.stringify(answer)).not.toMatch(/rerun/i)
     })
 })

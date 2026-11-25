@@ -18,6 +18,6 @@ export const POST = apiRoute(mobileApi.createAgent, { auth: 'member' }, async ({
     await assertSpaceOwnedBy(ctx.workspace.id, body.spaceId)
     const { agentId, active } = await createAgentWithSetup({ name: body.name, description: body.description, look: body.look, workspaceId: ctx.workspace.id, spaceId: body.spaceId, actor: actorFromContext(ctx) })
     if (!active || !body.description) return { agentId, active, sessionId: null, runId: null }
-    const kickoff = await startKickoff(agentId, { description: body.description }, messageAuthorOf(ctx))
+    const kickoff = await startKickoff(agentId, { description: body.description }, await messageAuthorOf(ctx))
     return kickoff.ok ? { agentId, active, sessionId: kickoff.sessionId, runId: kickoff.runId } : { agentId, active, sessionId: null, runId: null }
 })

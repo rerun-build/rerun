@@ -24,7 +24,7 @@ const SIGN_IN_CODE_COLUMNS = ['email', 'user_id', 'type', 'code', 'token_hash', 
 
 type SignInCodeRow = Pick<Database['public']['Tables']['sign_in_codes']['Row'], (typeof SIGN_IN_CODE_COLUMNS)[number]>
 
-const signInUrlFor = (tokenHash: string, type: string, brand: Brand) => `${brandAppUrl(brand)}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${type}`
+export const signInUrlFor = (tokenHash: string, type: string, brand: Brand) => `${brandAppUrl(brand)}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${type}`
 
 // Best effort: the email is already out, and a code that is not remembered only means the next
 // request mints a new one, as it did before this table existed.
@@ -75,10 +75,19 @@ function isStillLive(row: SignInCodeRow, user: User) {
     return !isAfter(user.recovery_sent_at, replacedAfter) && !isAfter(user.confirmation_sent_at, replacedAfter) && !isAfter(user.email_change_sent_at, replacedAfter)
 }
 
+// The account a code was mailed to and not replaced since, whose next code would void it. Null for a
+// code that confirms a change of address: it signs nobody in.
+export async function accountOfLiveCode(email: string): Promise<string | null> {
+    const { data: row } = await selectMaybeSingle(createServiceRoleClient(), 'sign_in_codes', SIGN_IN_CODE_COLUMNS, { email: normalizeEmail(email) })
+    if (!row || row.type === 'email_change' || Date.parse(row.expires_at) <= Date.now()) return null
+    return row.user_id
+}
+
 // `sent` when the address already holds a code that is still good and it was mailed again, `held`
 // when that code left less than a minute ago and nothing was mailed. Null means the caller has to
-// ask Supabase for a new one.
-export async function resendSignInCodeIfLive(email: string, sessionUserId: string | null): Promise<'sent' | 'held' | null> {
+// ask Supabase for a new one. `hostBrand` is the brand of the address it is asked on, when that address
+// is an organization's.
+export async function resendSignInCodeIfLive(email: string, sessionUserId: string | null, hostBrand?: Brand): Promise<'sent' | 'held' | null> {
     const supabase = createServiceRoleClient()
     const { data: row } = await selectMaybeSingle(supabase, 'sign_in_codes', SIGN_IN_CODE_COLUMNS, { email: normalizeEmail(email) })
     if (!row) return null
@@ -98,7 +107,7 @@ export async function resendSignInCodeIfLive(email: string, sessionUserId: strin
     if (now - Date.parse(row.last_sent_at) < MIN_RESEND_INTERVAL_MS) return 'held'
 
     const locale = await recipientLocale(supabase, row.user_id, null)
-    const brand = await authEmailBrand({ email: row.email, redirectTo: null })
+    const brand = hostBrand ?? (await authEmailBrand({ email: row.email, userId: row.user_id }))
     const sent = await sendSignInCodeEmail({ to: row.email, code: row.code, signInUrl: mailedSignInUrl(row.token_hash, row.type, data.user, brand), expiresInMinutes: minutesLeft, locale, brand })
     if (!sent.ok) return null
 

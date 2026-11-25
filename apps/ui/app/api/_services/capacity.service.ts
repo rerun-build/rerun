@@ -1,7 +1,8 @@
 import { activeAgentLimitFor, isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectSingle } from '@/supabase/supabase-helpers'
-import { AppError } from '@/lib/i18n/action-error'
+import { AppError, type ErrorCode } from '@/lib/i18n/action-error'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 
 // The plan caps how many agents can be *active*, not how many exist: a workspace may hold as many
 // agents as it likes, and the ones beyond the limit sit disabled until a slot frees up. So the
@@ -47,8 +48,8 @@ export async function freeAgentSlots(workspaceId: number): Promise<number> {
 }
 
 export class NoPlanError extends AppError {
-    constructor() {
-        super('noActivePlan')
+    constructor(code: ErrorCode = 'noActivePlan') {
+        super(code)
         this.name = 'NoPlanError'
     }
 }
@@ -58,6 +59,6 @@ export class NoPlanError extends AppError {
 // takes one out of the pool.
 export async function assertEngineEntitlement(workspaceId: number): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['subscription_status'] as const, { id: workspaceId })
-    if (!isSubscriptionEntitled(workspace?.subscription_status)) throw new NoPlanError()
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['subscription_status', 'organization_id'] as const, { id: workspaceId })
+    if (!isSubscriptionEntitled(workspace?.subscription_status)) throw new NoPlanError(isManagedWorkspace(workspace) ? 'managedWorkspacePaused' : undefined)
 }

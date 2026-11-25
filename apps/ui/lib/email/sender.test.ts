@@ -1,9 +1,11 @@
 import { RERUN_BRAND, type Brand } from '@rerun/contracts'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MARKETING_FROM, REPLY_TO, TRANSACTIONAL_FROM } from './client'
 import { emailSender, senderName } from './sender'
 
 const AGENCY: Brand = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys', supportEmail: 'help@nordlys.no' }
+
+afterEach(() => vi.unstubAllEnvs())
 
 describe('emailSender', () => {
     it('leaves the senders of Rerun as they are', () => {
@@ -14,6 +16,15 @@ describe('emailSender', () => {
     it('signs with the name of the organization, from the same address', () => {
         expect(emailSender(AGENCY, 'Rerun <hey@mail.test>')).toEqual({ from: '"Nordlys" <hey@mail.test>', replyTo: 'help@nordlys.no' })
         expect(emailSender(AGENCY, 'hey@mail.test').from).toBe('"Nordlys" <hey@mail.test>')
+    })
+
+    it('sends an organization’s from the domain set for them, once it is, and Rerun’s from its own all the same', () => {
+        vi.stubEnv('ORGANIZATION_EMAIL_FROM_DOMAIN', ' Rerun.work ')
+        expect(emailSender(AGENCY, 'Rerun <hey@mail.test>').from).toBe('"Nordlys" <hey@rerun.work>')
+        expect(emailSender(AGENCY, 'hey@mail.test').from).toBe('"Nordlys" <hey@rerun.work>')
+        expect(emailSender(RERUN_BRAND)).toEqual({ from: TRANSACTIONAL_FROM, replyTo: REPLY_TO })
+        vi.stubEnv('ORGANIZATION_EMAIL_FROM_DOMAIN', '')
+        expect(emailSender(AGENCY, 'Rerun <hey@mail.test>').from).toBe('"Nordlys" <hey@mail.test>')
     })
 
     it('never sends the replies of an organization to Rerun', () => {

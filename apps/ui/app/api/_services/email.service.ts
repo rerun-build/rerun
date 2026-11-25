@@ -1,6 +1,6 @@
 import 'server-only'
 import * as React from 'react'
-import { AccountSignedOut, AgentNotification, BudgetExhausted, LifetimeCode, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, accountSignedOutSubject, agentNotificationTitle, renderEmail, type AccountSignedOutProps } from '@rerun/emails'
+import { AccountSignedOut, AgentNotification, BudgetExhausted, LifetimeCode, OrganizationCreditOut, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, accountSignedOutSubject, agentNotificationTitle, renderEmail, type AccountSignedOutProps } from '@rerun/emails'
 import { emailTranslator } from '@rerun/emails/i18n'
 import type { Locale } from '@rerun/i18n'
 import { RERUN_BRAND, type Brand } from '@rerun/contracts'
@@ -103,6 +103,39 @@ export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput)
     )
     if (error) {
         console.error('[email] failed to send budget exhausted email', error)
+        return { ok: false, error: error.message }
+    }
+    return { ok: true, id: data?.id ?? null }
+}
+
+type OrganizationCreditOutEmailInput = {
+    to: string
+    workspaceName: string | null
+    consoleUrl: string
+    boardUrl?: string
+    unsubscribeUrl: string
+    locale: Locale
+    brand: Brand
+}
+
+// To the team of an organization: one of the workspaces it runs has no credit left.
+export async function sendOrganizationCreditOutEmail(input: OrganizationCreditOutEmailInput): Promise<SendEmailResult> {
+    const resend = getClient()
+    if (!resend) {
+        console.warn('[email] RESEND_API_KEY missing, skipping organization credit email')
+        return { ok: true, id: null }
+    }
+
+    const { to, ...props } = input
+    const { html, text } = await renderEmail(React.createElement(OrganizationCreditOut, { ...props, appUrl: brandAppUrl(input.brand) }))
+    const t = emailTranslator(input.locale, input.brand.name)
+    const delivery = redirectDelivery(to, input.workspaceName ? t('subjects.organizationCreditOut', { workspaceName: input.workspaceName }) : t('organizationCreditOut.preview'))
+
+    const { data, error } = await sendThrottled(() =>
+        resend.emails.send({ ...emailSender(input.brand), to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(input.unsubscribeUrl) }),
+    )
+    if (error) {
+        console.error('[email] failed to send organization credit email', error)
         return { ok: false, error: error.message }
     }
     return { ok: true, id: data?.id ?? null }

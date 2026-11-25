@@ -227,6 +227,7 @@ type DefaultRowProps = {
 
 function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReason }: DefaultRowProps) {
     const t = useTranslations('connections')
+    const tManaged = useTranslations('managed.credit')
     const { name: brandName } = useBrand()
     const locale = useLocale()
     const source = connections.find(c => c.id === current.connectionId)
@@ -242,7 +243,9 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
               ? t('panel.default.pausedPick')
               : t('panel.default.pausedAdd')
           : creditGone
-            ? credit.resetAt
+            ? credit.managed
+              ? tManaged(canChange ? 'defaultPick' : 'defaultAdd', { manager: brandName })
+              : credit.resetAt
                 ? t(canChange ? 'panel.default.usedUpOnPick' : 'panel.default.usedUpOnAdd', { date: shortDate(credit.resetAt, locale) })
                 : t(canChange ? 'panel.default.usedUpNextMonthPick' : 'panel.default.usedUpNextMonthAdd')
             : t('panel.default.stopped', { source: source.name })

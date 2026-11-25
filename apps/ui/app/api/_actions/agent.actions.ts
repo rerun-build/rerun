@@ -7,7 +7,7 @@ import { requireWorkspaceContext, requireWorkspaceId } from '@/app/api/_auth/own
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
 import { resolveAgentTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
-import { followCoworker } from '@/app/api/_services/notification-audience.service'
+import { followCoworker, participantIdOf } from '@/app/api/_services/notification-audience.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { deleteAgent, duplicateAgent, moveAgentToBox, renameAgent, setAgentLook } from '@/app/api/_services/agent.service'
 import {
@@ -695,11 +695,16 @@ export async function getScheduleAction(agentId: string, slug: string): Promise<
     }
 }
 
+async function followAsCaller(agentId: string): Promise<void> {
+    const { user, membership } = await getServerSession()
+    if (user) await followCoworker(participantIdOf({ userId: user.id, organizationStaff: membership?.organization_staff }), agentId)
+}
+
 export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const schedule = await engineCreateSchedule(conn, engineAgentId, params)
-        await followCoworker((await getServerSession()).user?.id, agentId)
+        await followAsCaller(agentId)
         return { success: true, schedule }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'createScheduleFailed') }
@@ -785,7 +790,7 @@ export async function createTriggerAction(agentId: string, params: TriggerCreate
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
         const trigger = await engineCreateTrigger(conn, engineAgentId, params)
-        await followCoworker((await getServerSession()).user?.id, agentId)
+        await followAsCaller(agentId)
         return { success: true, trigger }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'createTriggerFailed') }

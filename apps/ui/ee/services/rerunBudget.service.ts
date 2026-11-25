@@ -88,7 +88,7 @@ async function stampPeriod(budget: WorkspaceBudget, reset: boolean): Promise<Wor
 // The month's budget first, then the top-up. `consume_rerun_credit` takes the top-up down as it
 // spends it, so what is left of the month cannot be counted against the whole of it: past the
 // budget, the top-up is the remainder on its own.
-export function remainingMicros(budget: WorkspaceBudget): number {
+export function remainingMicros(budget: Pick<WorkspaceBudget, 'budgetMicros' | 'usedMicros' | 'topupMicros'>): number {
     return Math.max(budget.budgetMicros - budget.usedMicros, 0) + budget.topupMicros
 }
 
@@ -96,9 +96,12 @@ export function hasRemainingBudget(budget: WorkspaceBudget): boolean {
     return remainingMicros(budget) > 0
 }
 
-// A one-off credit that survives the monthly reset. The signup allowance goes through here.
-export async function grantRerunTopup(workspaceId: number, micros: number): Promise<void> {
-    await createServiceRoleClient().rpc('grant_rerun_topup', { p_workspace_id: workspaceId, p_micros: micros })
+// A one-off credit that survives the monthly reset. The signup allowance goes through here. Answers
+// whether it landed.
+export async function grantRerunTopup(workspaceId: number, micros: number): Promise<boolean> {
+    const { error } = await createServiceRoleClient().rpc('grant_rerun_topup', { p_workspace_id: workspaceId, p_micros: micros })
+    if (error) console.error('[credit] failed to grant a top-up', workspaceId, error.message)
+    return !error
 }
 
 // engineAgentId is the coworker that made the call, null when the box did not say.

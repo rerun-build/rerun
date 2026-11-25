@@ -51,7 +51,7 @@ describe('authenticateEngineToken', () => {
 describe('getWorkspaceConnection', () => {
     it('builds the connection of the machine claimed by the workspace', async () => {
         enginePoolRow = { id: 'i1', engine_host: '10.0.0.1:3000', engine_api_key: 'k', provider_server_id: 'srv' }
-        await expect(getWorkspaceConnection(3)).resolves.toEqual({ baseUrl: 'http://10.0.0.1:3000', apiKey: 'k' })
+        await expect(getWorkspaceConnection(3)).resolves.toEqual({ baseUrl: 'http://10.0.0.1:3000', apiKey: 'k', workspaceId: 3 })
         expect(filtersOf('engine_pool')).toEqual([['claimed_by_workspace_id', 3]])
     })
 

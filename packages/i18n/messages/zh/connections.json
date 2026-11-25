@@ -102,7 +102,10 @@
                 "step2": "订阅 **OpenCode Go**，或充值以使用 Console 模型。",
                 "step3": "创建一个 API 密钥，复制它（以 `oc_sk_` 开头）并粘贴到上方。"
             }
-        }
+        },
+        "creditManagedUsed": "已使用 {percent}% 的积分",
+        "creditManagedUsedUp": "积分已用完",
+        "creditBackManaged": "补充后恢复"
     },
     "noPlan": {
         "trialText": "开始免费试用，即可连接您自己的 Claude 方案、ChatGPT 方案或 API 密钥。",

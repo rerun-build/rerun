@@ -1,7 +1,9 @@
 import { requestLocale } from '@/lib/i18n/request-locale'
 import { DEFAULT_LOCALE, PSEUDO_LOCALE } from '@rerun/i18n'
 import { realEmail } from '@/lib/auth/placeholder-email'
+import { refuseManagedWorkspace } from '@/app/api/_auth/managed-workspace'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import { Database } from '@/app/api/database.types'
 import { getAppOrigin } from '@/lib/app-origin'
 import {
@@ -72,6 +74,7 @@ import { APP_ADDON_KEYS, APP_SLUGS, SLOT_HOLDING_STATUSES } from '@/lib/apps/typ
 import { APP_INFO } from '@/lib/apps/catalog'
 import { isPhoneStepPending } from '@/app/api/_services/phone-gate.service'
 import { AppError } from '@/lib/i18n/action-error'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { requestAgentActivationSync } from '@/trigger/sync-agent-activation'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 import { sendPaymentFailedNotice } from '@/ee/lib/lifecycle/payment-failed-notice'
@@ -104,7 +107,9 @@ export async function ensureStripeCustomer(): Promise<{ workspaceId: number; cus
     const { session } = await getServerSession()
     const supabase = createServiceRoleClient()
 
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'stripe_customer_id'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'stripe_customer_id', 'organization_id'] as const, { id: workspaceId })
+    // The last word on every checkout: an organization pays for this workspace.
+    refuseManagedWorkspace(workspace)
     if (workspace?.stripe_customer_id) return { workspaceId, customerId: workspace.stripe_customer_id }
 
     // Outside a request (a job) there is no browser to ask: English.
@@ -128,7 +133,7 @@ export async function ensureStripeCustomer(): Promise<{ workspaceId: number; cus
 // already carries one is left alone: it may be a teammate's.
 export async function syncStripeCustomerEmail(userId: string, email: string): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: memberships } = await selectMany(supabase, 'workspace_members', ['workspace_id'] as const, { user_id: userId })
+    const { data: memberships } = await selectWorkspaceMembers(supabase, ['workspace_id'] as const, { user_id: userId })
     const workspaceIds = (memberships ?? []).map(membership => membership.workspace_id)
     if (!workspaceIds.length) return
 
@@ -233,8 +238,9 @@ export async function startCardlessTrial(client: ForemanClient = 'web'): Promise
 
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status', 'is_sandbox', 'price_arm'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status', 'is_sandbox', 'price_arm', 'organization_id'] as const, { id: workspaceId })
     if (!workspace || workspace.is_sandbox) return false
+    refuseManagedWorkspace(workspace)
     if (isSubscriptionEntitled(workspace.subscription_status)) return true
     if (workspace.trial_ends_at) return false
     if (client === 'web' && trialArm(workspaceId) === 'card') return false
@@ -1378,7 +1384,9 @@ export async function findWorkspaceId(subscription: Stripe.Subscription): Promis
 // agents off.
 async function ownsWorkspacePlan(workspaceId: number, subscription: Stripe.Subscription): Promise<boolean> {
     const supabase = createServiceRoleClient()
-    const { data } = await selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id'] as const, { id: workspaceId })
+    const { data } = await selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id', 'organization_id'] as const, { id: workspaceId })
+    // Left over from before its organization took it on: whatever becomes of it, the workspace stays.
+    if (isManagedWorkspace(data)) return false
     const owns = isSameSubscription(data?.stripe_subscription_id, subscription.id)
     if (!owns) console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, which is billed on ${data?.stripe_subscription_id}`)
     return owns
@@ -1465,9 +1473,11 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'workspaces',
-        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros'] as const,
+        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros', 'organization_id'] as const,
         { id: workspaceId },
     )
+    // Its organization pays for it: a subscription left over never writes a plan back over it.
+    if (isManagedWorkspace(existing)) return
 
     if (!adopt && !shouldAdoptSubscription({ id: existing?.stripe_subscription_id, status: existing?.subscription_status }, subscription.id)) {
         console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, which is billed on ${existing?.stripe_subscription_id}`)

@@ -55,6 +55,7 @@ import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AGENT_FOCUS_TABS, type AgentFocusTab, type SpacePublic } from '@/lib/board/types'
 import { useSearchParams } from 'next/navigation'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { useEffect, useRef, useState } from 'react'
 import { ACCOUNT_LINK_ERROR_PARAM, ACCOUNT_LINK_PROVIDER_PARAM, ACCOUNT_PARAM, linkErrorMessage } from '@/lib/auth/link-intent'
@@ -141,10 +142,10 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
 
     // Every end-of-access email links here: open billing straight away, once the account is known.
     useEffect(() => {
-        if (searchParams.get('billing') !== '1' || loading) return
-        useBillingStore.getState().openBilling(undefined, 'email_link')
+        if (searchParams.get('billing') !== '1' || loading || !workspace) return
+        if (!isManagedWorkspace(workspace)) useBillingStore.getState().openBilling(undefined, 'email_link')
         clearSearchParams('billing')
-    }, [searchParams, loading])
+    }, [searchParams, loading, workspace])
 
     // The email about an AI account that stopped links here: its sign-in opens straight away.
     useEffect(() => {

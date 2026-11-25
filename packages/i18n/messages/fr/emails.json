@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {Votre sandbox {brand} archivée sera supprimée le {date}} other {Votre workspace {brand} en pause sera supprimé le {date}}}",
         "sandboxIdle": "Votre sandbox {brand} sera archivée le {date} si vous ne l'ouvrez pas",
         "renewalReminder": "{daysLeft, plural, =1 {Votre abonnement {brand} se renouvelle demain} other {Votre abonnement {brand} se renouvelle dans # jours}}",
-        "creatorPitch": "Vendez les coworkers que vous créez sur Rerun"
+        "creatorPitch": "Vendez les coworkers que vous créez sur Rerun",
+        "organizationCreditOut": "{workspaceName} n'a plus de crédits"
     },
     "reasons": {
         "mine": "Vous avez lancé cette exécution.",
@@ -295,5 +296,13 @@
         "button": "Ouvrir le workspace",
         "footnoteCard": "Votre abonnement démarre de lui-même le {date} : {price} sont prélevés sur la carte que vous avez ajoutée, puis chaque mois. Vous ne comptez pas continuer ? Résiliez avant le {date} depuis Facturation, dans le menu de votre workspace, et rien ne sera prélevé.",
         "footnoteNoCard": "Aucune carte n'est nécessaire pour l'essai. Pour continuer après le {date}, ajoutez-en une depuis Facturation, dans le menu de votre workspace, et votre abonnement démarre à {price}/mois. Sans carte, vos coworkers s'arrêtent et rien n'est prélevé."
+    },
+    "organizationCreditOut": {
+        "preview": "Un de vos workspaces n'a plus de crédits",
+        "heading": "Un workspace n'a plus de crédits",
+        "bodyNamed": "<strong>{workspaceName}</strong> a utilisé les crédits que vous lui avez donnés. Ses exécutions planifiées et déclenchées sont en pause jusqu'à ce que vous en ajoutiez.",
+        "bodyUnnamed": "Un de vos workspaces a utilisé les crédits que vous lui avez donnés. Ses exécutions planifiées et déclenchées sont en pause jusqu'à ce que vous en ajoutiez.",
+        "members": "Ses membres voient qu'il n'a plus de crédits et sont invités à vous contacter.",
+        "button": "Ajouter des crédits"
     }
 }

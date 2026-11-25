@@ -1,5 +1,6 @@
 'use client'
 
+import { RerunOnly } from '@/components/brand/RerunOnly'
 import { Orb } from '@/components/foreman/Orb'
 import { SignInPillButton } from '@/components/layout/SignInPill'
 import { CanvasViewControls } from '@rerun/ui'
@@ -10,7 +11,8 @@ const noop = () => {}
 
 // The app the onboarding dialog opens over: the empty board with its pill and its view controls, the
 // Chief of Staff's column beside it. Only ever seen under the dialog's blurred overlay, so it is the
-// real chrome on an empty board with nothing wired.
+// real chrome on an empty board with nothing wired. Under an organization's brand there is no
+// Chief of Staff to sign up with: the board stands alone.
 export function AppBackdrop() {
     const t = useTranslations('onboarding.site')
     return (
@@ -22,20 +24,22 @@ export function AppBackdrop() {
                 </div>
                 <CanvasViewControls placement="top-right" onZoomIn={noop} onZoomOut={noop} onRecenter={noop} />
             </div>
-            <div className="hidden w-[30%] max-w-md shrink-0 flex-col rounded-xl border bg-background p-4 md:flex">
-                <Orb size={28} state="idle" />
-                <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-                    <Orb size={72} state="idle" />
-                    <p className="text-lg font-medium">{t('title')}</p>
-                    <p className="text-sm text-muted-foreground">{t('description')}</p>
-                </div>
-                <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
-                    <div className="h-9 rounded-md border bg-background" />
-                    <div className="flex justify-end">
-                        <div className="h-8 w-14 rounded-md bg-foreground" />
+            <RerunOnly>
+                <div className="hidden w-[30%] max-w-md shrink-0 flex-col rounded-xl border bg-background p-4 md:flex">
+                    <Orb size={28} state="idle" />
+                    <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+                        <Orb size={72} state="idle" />
+                        <p className="text-lg font-medium">{t('title')}</p>
+                        <p className="text-sm text-muted-foreground">{t('description')}</p>
+                    </div>
+                    <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
+                        <div className="h-9 rounded-md border bg-background" />
+                        <div className="flex justify-end">
+                            <div className="h-8 w-14 rounded-md bg-foreground" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </RerunOnly>
         </div>
     )
 }

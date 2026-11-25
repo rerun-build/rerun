@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 import { VOICE } from '@/lib/templates/voice'
+import { brandText } from '@/lib/brand/text'
+import { RERUN_BRAND, type Brand } from '@rerun/contracts'
 import { AGENT_CAPABILITIES } from './capabilities'
 import { evidenceForPrompt } from './evidence'
 import { generateIdeasObject } from './model'
@@ -56,7 +58,7 @@ function prompt(dossier: CompanyDossier, opportunities: Opportunity[], catalog: 
     return [`Company: ${dossier.companyName ?? 'unknown name'}`, dossier.existingAgents.length ? `Coworkers they already have:\n${dossier.existingAgents.map(agent => `- ${agent.name}: ${agent.description}`).join('\n')}` : 'They have no coworker yet.', `Recurring work found:\n${opportunities.map(describeOpportunity).join('\n')}`, `Facts:\n${evidenceForPrompt(dossier.evidence)}`, `Available apps (slug | name | category | what it is):\n${catalog.map(describeApp).join('\n')}`].join('\n\n')
 }
 
-export async function design(dossier: CompanyDossier, opportunities: Opportunity[], catalog: CatalogApp[]) {
-    const { object, cost } = await generateIdeasObject({ schema: designSchema, system: SYSTEM, prompt: prompt(dossier, opportunities, catalog) })
+export async function design(dossier: CompanyDossier, opportunities: Opportunity[], catalog: CatalogApp[], brand: Brand = RERUN_BRAND) {
+    const { object, cost } = await generateIdeasObject({ schema: designSchema, system: brandText(SYSTEM, brand), prompt: prompt(dossier, opportunities, catalog) })
     return { candidates: object.candidates satisfies AgentCandidate[], cost }
 }

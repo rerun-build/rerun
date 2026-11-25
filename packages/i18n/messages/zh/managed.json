@@ -1,0 +1,39 @@
+{
+    "contact": "联系 {manager}",
+    "templateUnavailable": "此工作区不可用",
+    "paused": {
+        "title": "此工作区已暂停。",
+        "body": "请联系 {manager} 恢复。",
+        "reason": "此工作区已暂停。请联系 {manager}。",
+        "coworker": "联系 {manager} 后，{name} 会从中断处继续。"
+    },
+    "restoring": {
+        "waiting": "此工作区排在第一位。",
+        "failed": "我们已收到警报，正在手动恢复。"
+    },
+    "credit": {
+        "title": "积分",
+        "providedBy": "由 {manager} 提供",
+        "outTitle": "积分已用完",
+        "out": "请联系 {manager} 获取更多。",
+        "outOwnPlan": "请联系 {manager} 获取更多，或改用您已连接的 {plan} 套餐。",
+        "outOwnAi": "请联系 {manager} 获取更多，或让您的同事使用您自己的 AI。",
+        "usedUp": "积分已用完。请联系 {manager}。",
+        "usage": "已使用 {percent}% 的积分",
+        "detailUsedUp": "使用这些积分的同事已暂停。请联系 {manager} 获取更多，或选择其他默认模型以继续运行。",
+        "detailIncluded": "由 {manager} 提供。无需密钥，无需设置。",
+        "defaultPick": "积分已用完，因此没有专属模型的同事已暂停。请联系 {manager}，或选择其他模型以继续运行。",
+        "defaultAdd": "积分已用完，因此没有专属模型的同事已暂停。请联系 {manager}，或添加套餐或 API 密钥以继续运行。"
+    },
+    "host": {
+        "noAccess": {
+            "title": "您没有访问权限",
+            "body": "{email} 在此没有工作区。请向 {brand} 申请邀请。",
+            "bodyUnnamed": "此账户在此没有工作区。请向 {brand} 申请邀请。"
+        },
+        "unavailable": {
+            "title": "{brand} 暂不可用",
+            "body": "请稍后再来。"
+        }
+    }
+}

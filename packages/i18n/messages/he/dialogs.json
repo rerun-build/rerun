@@ -92,7 +92,8 @@
                 "title": "להסיר את הגישה אל {box}?",
                 "confirm": "להסיר"
             }
-        }
+        },
+        "descriptionManaged": "מנהלים מנהלים את החברים וההגדרות. החברים עובדים עם העמיתים."
     },
     "createWorkspace": {
         "nameRequired": "חובה להזין שם",

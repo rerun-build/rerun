@@ -1,5 +1,6 @@
 import { isPublicStatus, type TemplateStatus } from '@rerun/contracts'
 import type Stripe from 'stripe'
+import { refuseManagedWorkspace } from '@/app/api/_auth/managed-workspace'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { getAppOrigin } from '@/lib/app-origin'
 import { TEMPLATE_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
@@ -26,7 +27,8 @@ const CHECKOUT_COLUMNS = ['id', 'slug', 'title', 'status', 'creator_id', 'pricin
 
 export async function createTemplateCheckoutSession(slug: string): Promise<TemplateCheckoutOutcome> {
     const workspaceId = await requireWorkspaceId()
-    const { user } = await getServerSession()
+    const { user, workspace: current } = await getServerSession()
+    refuseManagedWorkspace(current)
     const supabase = createServiceRoleClient()
 
     const { data: template } = await selectMaybeSingle(supabase, 'templates', CHECKOUT_COLUMNS, { slug })

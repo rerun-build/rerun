@@ -6,6 +6,7 @@ import { loadRecipient } from './recipient'
 import { sendTrialStartedReceipt } from './trial-receipt'
 
 vi.mock('@/ee/lib/email/lifecycle-emails', () => ({ sendTrialStartedEmail: vi.fn() }))
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => (await import('@rerun/contracts')).RERUN_BRAND }))
 vi.mock('./recipient', () => ({ loadRecipient: vi.fn() }))
 vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_INLINE_MS: 0, emailBoardBanner: vi.fn(async () => undefined) }))
 
@@ -75,6 +76,11 @@ describe('sendTrialStartedReceipt', () => {
         await receipt(db)
 
         expect(db.writes('lifecycle_emails')).toEqual([])
+        expect(sendTrialStartedEmail).not.toHaveBeenCalled()
+    })
+
+    it('skips a workspace an organization runs', async () => {
+        await receipt(database({ workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false, organization_id: 'org-nordlys' } } }))
         expect(sendTrialStartedEmail).not.toHaveBeenCalled()
     })
 

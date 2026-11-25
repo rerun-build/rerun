@@ -30,6 +30,13 @@ export async function claimAuthEmailSend(email: string): Promise<boolean> {
     return data === true
 }
 
+// Every ask made on an organization's address counts against the address typed, whether or not a code
+// leaves for it. A counter that cannot be read refuses: it stands in for the robot check.
+export async function claimInvitedCodeAsk(organizationId: string, email: string): Promise<boolean> {
+    const { data, error } = await createServiceRoleClient().rpc('claim_email_sign_up', { p_ip: `host:${organizationId}:${email}`, p_ip_max: MAX_AUTH_EMAILS_PER_ADDRESS, p_window_seconds: SIGN_UP_WINDOW_SECONDS })
+    return !error && data === true
+}
+
 export type EmailAccountFailure = 'blocked_domain' | 'too_many' | 'unavailable'
 // `created` is whether this call opened the account: the address is new, and the sign-in about to
 // follow is a signup.

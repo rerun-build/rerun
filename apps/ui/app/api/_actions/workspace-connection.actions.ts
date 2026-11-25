@@ -42,8 +42,9 @@ function refused(err: unknown, fallback: ErrorCode): Refusal {
     return { success: false, ...refusalOf(err, fallback) }
 }
 
-function refusedNoPlan(code: ErrorCode): Refusal & { reason: 'no_plan' } {
-    return { success: false, ...refusal(code), reason: 'no_plan' }
+// A workspace an organization runs is told it is paused: it has no trial to start.
+function refusedNoPlan(err: NoPlanError, offer: ErrorCode): Refusal & { reason: 'no_plan' } {
+    return { success: false, ...refusal(err.code === 'managedWorkspacePaused' ? err.code : offer), reason: 'no_plan' }
 }
 
 // `no_plan` lets the caller offer the trial instead of a dead end: without a plan there is no machine
@@ -74,7 +75,7 @@ export async function probeCustomEndpointAction(input: CustomProbeInput): Promis
     try {
         return { success: true, result: await probeCustomEndpoint(await requireWorkspaceId(), customProbeInputSchema.parse(input)) }
     } catch (err) {
-        if (err instanceof NoPlanError) return refusedNoPlan('trialToConnectModel')
+        if (err instanceof NoPlanError) return refusedNoPlan(err, 'trialToConnectModel')
         return refused(err, 'endpointUnreachable')
     }
 }
@@ -101,7 +102,7 @@ export async function createAiConnectionAction(params: CreateBoxConnectionInput)
     try {
         return { success: true, connection: await createAiConnection(await requireProvidersAdminWorkspaceId(), params) }
     } catch (err) {
-        if (err instanceof NoPlanError) return refusedNoPlan('trialToConnectClaude')
+        if (err instanceof NoPlanError) return refusedNoPlan(err, 'trialToConnectClaude')
         return refused(err, 'createConnectionFailed')
     }
 }

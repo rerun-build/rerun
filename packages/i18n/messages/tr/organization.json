@@ -1,0 +1,336 @@
+{
+    "nav": {
+        "label": "Kuruluş",
+        "workspaces": "Çalışma alanları",
+        "credit": "Kredi",
+        "team": "Ekip",
+        "brand": "Marka",
+        "domains": "Alan adları",
+        "back": "Uygulamaya dön"
+    },
+    "suspended": {
+        "title": "Bu kuruluş askıya alındı",
+        "description": "Çalışma alanları durduruldu ve hiçbir şey değiştirilemez."
+    },
+    "blocked": {
+        "suspended": "Bu kuruluş askıya alındı",
+        "ownerOnly": "Yalnızca sahipler yapabilir"
+    },
+    "roles": {
+        "owner": "Sahip",
+        "admin": "Yönetici",
+        "member": "Üye"
+    },
+    "status": {
+        "active": "Etkin",
+        "archived": "Arşivlendi",
+        "archiving": "Arşivleniyor",
+        "restoring": "Geri yükleniyor",
+        "provisioning": "Kuruluyor",
+        "outOfCredit": "Kredi bitti",
+        "suspended": "Askıda"
+    },
+    "workspaces": {
+        "title": "Çalışma alanları",
+        "count": "{count} / {max}",
+        "new": "Yeni çalışma alanı",
+        "limitReached": "{max, plural, one {Kuruluşunuz # çalışma alanıyla sınırlı} other {Kuruluşunuz # çalışma alanıyla sınırlı}}",
+        "search": "Çalışma alanı ara",
+        "noMatch": "“{query}” ile eşleşen çalışma alanı yok",
+        "summary": "{members, plural, one {# üye} other {# üye}} · {coworkers, plural, one {# coworker} other {# coworker}} · {credits, plural, one {# kredi} other {# kredi}}",
+        "columns": {
+            "name": "Ad",
+            "members": "Üyeler",
+            "coworkers": "Coworker'lar",
+            "credit": "Kalan kredi",
+            "lastActivity": "Son etkinlik"
+        },
+        "noActivity": "Henüz yok",
+        "empty": {
+            "title": "Henüz çalışma alanı yok",
+            "description": "Her müşteri için bir tane oluşturun ve ilk yöneticisini davet edin."
+        },
+        "unnamed": "Adsız çalışma alanı"
+    },
+    "create": {
+        "title": "Yeni çalışma alanı",
+        "description": "İlk yöneticisine e-postayla davet gönderilir.",
+        "logo": "Logo yükle",
+        "name": "Ad",
+        "namePlaceholder": "Acme",
+        "nameTooLong": "En fazla {max} karakter",
+        "email": "İlk yöneticinin e-postası",
+        "emailPlaceholder": "siz@sirket.com",
+        "emailInvalid": "Geçerli bir e-posta adresi girin",
+        "logoTooLarge": "Bu görsel 8 MB'tan büyük",
+        "submit": "Oluştur",
+        "done": {
+            "title": "{name} hazır",
+            "description": "{email} adresine davet gönderdik.",
+            "linkHint": "Bu bağlantıyı {email} adresine gönderin.",
+            "copyLink": "Davet bağlantısını kopyala",
+            "close": "Bitti",
+            "open": "Çalışma alanını gör"
+        }
+    },
+    "detail": {
+        "back": "Çalışma alanları",
+        "open": "Çalışma alanını aç",
+        "notReady": "Bu çalışma alanı henüz hazır değil",
+        "archived": "Önce bu çalışma alanını geri yükleyin",
+        "members": "Üyeler",
+        "credit": "Kredi",
+        "usage": "Kullanım",
+        "machine": "Makine",
+        "danger": "Yönet"
+    },
+    "people": {
+        "you": "(siz)",
+        "unknown": "Bilinmeyen kullanıcı",
+        "invite": "Davet et",
+        "role": "{name} rolü",
+        "remove": "{name} kişisini kaldır",
+        "pending": "Davet edildi",
+        "revoke": "{email} davetini iptal et",
+        "lastAdmin": "Bir çalışma alanında en az bir yönetici kalır",
+        "lastOwner": "Bir kuruluşta en az bir sahip kalır",
+        "self": "Rolünüzü başka bir sahip değiştirebilir",
+        "empty": "Henüz kimse katılmadı",
+        "removeConfirm": {
+            "title": "{name} kaldırılsın mı?",
+            "workspace": "Bu çalışma alanına erişimini kaybeder.",
+            "team": "Bu konsola ve tüm çalışma alanlarına erişimini kaybeder.",
+            "confirm": "Kaldır"
+        },
+        "revokeConfirm": {
+            "title": "Davet iptal edilsin mi?",
+            "description": "{email} adresine gönderilen bağlantı çalışmaz hale gelir.",
+            "confirm": "Daveti iptal et",
+            "keep": "Koru"
+        }
+    },
+    "invite": {
+        "workspaceTitle": "Davet et: {name}",
+        "teamTitle": "Ekibe davet et",
+        "description": "Kişiye e-postayla davet gönderilir.",
+        "email": "E-posta",
+        "emailPlaceholder": "siz@sirket.com",
+        "role": "Rol",
+        "submit": "Daveti gönder",
+        "linkHint": "Bu bağlantıyı {email} adresine gönderin.",
+        "copyLink": "Davet bağlantısını kopyala",
+        "done": "Bitti",
+        "roles": {
+            "owner": "Her şey, ekip, marka ve alan adları dahil",
+            "admin": "Çalışma alanları, üyeler ve kredi",
+            "workspaceAdmin": "Çalışma alanını ve üyelerini yönetir",
+            "workspaceMember": "Coworker'larla çalışır"
+        }
+    },
+    "usage": {
+        "empty": "Henüz harcama yok"
+    },
+    "machine": {
+        "states": {
+            "running": "Çalışıyor",
+            "stopped": "Durduruldu",
+            "error": "Hata",
+            "archiving": "Arşivleniyor",
+            "archived": "Arşivlendi",
+            "restoring": "Geri yükleniyor",
+            "none": "Makine yok"
+        },
+        "disk": "Disk",
+        "diskUsed": "{used} / {total}",
+        "diskUnknown": "Henüz ölçülmedi",
+        "notStarted": "İlk coworker'ı ile başlar",
+        "restart": "Yeniden başlat",
+        "restartConfirm": {
+            "title": "Makine yeniden başlatılsın mı?",
+            "description": "Coworker'lar yaklaşık bir dakika boyunca yaptıklarını durdurur.",
+            "confirm": "Yeniden başlat"
+        },
+        "restarting": "Makine yeniden başlıyor"
+    },
+    "danger": {
+        "archive": "Arşivle",
+        "archiveHint": "Coworker'larını durdurur, verilerini korur. Sınırınıza yine de sayılır.",
+        "archiveConfirm": {
+            "title": "{name} arşivlensin mi?",
+            "description": "Siz geri yükleyene kadar üyeleri erişimini kaybeder ve coworker'ları durur.",
+            "confirm": "Arşivle"
+        },
+        "restore": "Geri yükle",
+        "restoreHint": "Eskisi gibi, birkaç dakika içinde.",
+        "delete": "Sil",
+        "deleteHint": "Coworker'larını, dosyalarını ve konuşmalarını kalıcı olarak siler.",
+        "deleteConfirm": {
+            "title": "Bu çalışma alanı silinsin mi?",
+            "description": "Coworker'ları, dosyaları ve konuşmaları kalıcı olarak silinir. İçinde kalan kredi rezervinize döner.",
+            "type": "Onaylamak için <strong></strong> yazın.",
+            "confirm": "Sil"
+        },
+        "busy": "İşlem bitene kadar bekleyin",
+        "deleted": "{name} silindi"
+    },
+    "credit": {
+        "title": "Kredi",
+        "reserve": "Rezerv",
+        "reserveHint": "Henüz bir çalışma alanına aktarılmadı",
+        "left": "Bu çalışma alanında kalan",
+        "add": "Kredi ekle",
+        "takeBack": "Geri al",
+        "reserveEmpty": "Rezerv boş",
+        "workspaceEmpty": "Bu çalışma alanında kredi kalmadı",
+        "nothingToTakeBack": "Hiçbir çalışma alanında kredi kalmadı",
+        "noWorkspace": "Önce bir çalışma alanı oluşturun",
+        "history": "Geçmiş",
+        "loadMore": "Daha fazla göster",
+        "kinds": {
+            "purchase": "Satın alınan kredi",
+            "adjustment": "Düzeltme",
+            "allocation": "Eklendi: {workspace}",
+            "take_back": "Geri alındı: {workspace}"
+        },
+        "deletedWorkspace": "silinmiş bir çalışma alanı",
+        "reversed": "Gerçekleşmedi",
+        "reversal": "Rezerve döndü",
+        "empty": {
+            "title": "Henüz hareket yok",
+            "description": "Satın aldığınız, aktardığınız ve geri aldığınız kredi burada görünür."
+        },
+        "dialog": {
+            "allocateTitle": "Kredi ekle",
+            "allocateDescription": "Rezervinizden bir çalışma alanına.",
+            "takeBackTitle": "Kredi geri al",
+            "takeBackDescription": "Bir çalışma alanından rezervinize.",
+            "workspace": "Çalışma alanı",
+            "workspacePlaceholder": "Bir çalışma alanı seçin",
+            "workspaceSearch": "Çalışma alanı ara",
+            "amount": "Kredi",
+            "reserve": "Rezerv",
+            "change": "{before} → {after}",
+            "tooMuchReserve": "Rezervinizde {count, plural, one {# kredi} other {# kredi}} var",
+            "tooMuchWorkspace": "En fazla {count, plural, one {# kredi} other {# kredi}} geri alınabilir",
+            "allocate": "{count, plural, =0 {Kredi ekle} one {# kredi ekle} other {# kredi ekle}}",
+            "takeBack": "{count, plural, =0 {Kredi geri al} one {# kredi geri al} other {# kredi geri al}}"
+        },
+        "tookLess": "{count, plural, =0 {Geri alınacak kredi kalmamıştı} one {Geri alınacak yalnızca # kredi kalmıştı} other {Geri alınacak yalnızca # kredi kalmıştı}}"
+    },
+    "team": {
+        "title": "Ekip",
+        "description": "Üyeleri görmeden her çalışma alanını açabilirler."
+    },
+    "brand": {
+        "title": "Marka",
+        "description": "Müşterilerinizin gördüğü.",
+        "name": "Ad",
+        "nameInvalid": "1 ila 40 karakter, {list} olmadan",
+        "icon": "Simge",
+        "iconHint": "Kare, 512 px veya daha büyük, kendi arka planıyla.",
+        "iconUpload": "Simge yükle",
+        "iconReplace": "Değiştir",
+        "iconProblems": {
+            "type": "PNG, JPEG veya WebP görsel kullanın",
+            "notSquare": "Bu görsel {width} × {height} px: kare olmalı",
+            "tooSmall": "Bu görselin genişliği {width} px: en az 512 px gerekir",
+            "tooLarge": "Bu görsel 8 MB'tan büyük",
+            "unreadable": "Bu görsel okunamadı"
+        },
+        "color": "Renk",
+        "colorPicker": "Bir renk seçin",
+        "colorClear": "Renk yok",
+        "colorHint": "Okunaklı kalması için ayarlanır. Renk yoksa uygulama siyah beyaz olur.",
+        "colorInvalid": "Onaltılık bir renk kullanın, örneğin #1668E3",
+        "guarded": "Bu renk zaten {status, select, error {bir hatayı} waiting {yanıt bekleyen bir coworker'ı} other {çalışan bir coworker'ı}} ifade ediyor, bu yüzden yalnızca sohbet balonunda kullanılır.",
+        "support": "Destek e-postası",
+        "supportPlaceholder": "destek@sirket.com",
+        "supportHint": "Müşterilerinizin yardım için yazdığı adres.",
+        "emailInvalid": "Geçerli bir e-posta adresi girin",
+        "docs": "Dokümantasyon",
+        "terms": "Şartlar",
+        "privacy": "Gizlilik politikası",
+        "urlInvalid": "https:// ile başlayan tam bir adres kullanın",
+        "preview": {
+            "light": "Açık",
+            "dark": "Koyu",
+            "user": "Haftalık raporu hazırla",
+            "assistant": "Tamam. <link>Raporu aç</link>",
+            "unread": "Okunmadı",
+            "progress": "İlerleme"
+        },
+        "unsaved": "Kaydedilmemiş değişiklikler",
+        "discard": "Vazgeç",
+        "leave": {
+            "title": "Kaydetmeden çıkılsın mı?",
+            "description": "Markada yaptığınız değişiklikler kaybolur.",
+            "confirm": "Çık",
+            "stay": "Kal"
+        }
+    },
+    "domains": {
+        "title": "Alan adları",
+        "description": "Müşterilerinizin giriş yaptığı yer.",
+        "default": "Varsayılan adres",
+        "custom": "Alan adınız",
+        "copyAddress": "Adresi kopyala",
+        "add": "Alan adı ekle",
+        "empty": {
+            "title": "Henüz alan adı yok",
+            "description": "Uygulamayı kendi adresinizden sunun."
+        },
+        "status": {
+            "pending": "DNS bekleniyor",
+            "verifying": "Doğrulanıyor",
+            "active": "Etkin",
+            "error": "Hata"
+        },
+        "record": {
+            "hint": "Bu kayıtları alan adınızın yönetildiği yere ekleyin. Görünmeleri bir saati bulabilir.",
+            "type": "Tür",
+            "name": "Ad",
+            "value": "Değer",
+            "copyName": "Adı kopyala",
+            "copyValue": "Değeri kopyala"
+        },
+        "checkedAt": "Son kontrol: {time}",
+        "check": "Yeniden kontrol et",
+        "remove": "Kaldır",
+        "removeConfirm": {
+            "title": "{hostname} kaldırılsın mı?",
+            "description": "Müşterileriniz artık buradan giriş yapamaz. Varsayılan adres çalışmaya devam eder.",
+            "confirm": "Kaldır"
+        },
+        "dialog": {
+            "title": "Alan adı ekle",
+            "description": "Sahibi olduğunuz bir alan adının alt alan adı.",
+            "hostname": "Alan adı",
+            "invalid": "Bir alan adı girin, örneğin app.acme.com",
+            "apex": "Bir alt alan adı kullanın, örneğin app.{hostname}",
+            "submit": "Ekle"
+        },
+        "problems": {
+            "noRecord": "Henüz buraya işaret eden bir kayıt yok.",
+            "elsewhere": "Bu alan adı başka bir yere işaret ediyor.",
+            "noToken": "TXT kaydı eksik.",
+            "taken": "Bu alan adını başka biri daha önce doğruladı.",
+            "lookupFailed": "Bu alan adının DNS'i yanıt vermedi. Yeniden deneyeceğiz."
+        }
+    },
+    "failed": {
+        "title": "Bu sayfa yüklenemedi",
+        "retry": "Tekrar dene"
+    },
+    "missing": {
+        "title": "Çalışma alanı bulunamadı",
+        "description": "Silindi veya başkasına ait.",
+        "back": "Tüm çalışma alanları"
+    },
+    "join": {
+        "metaTitle": "Ekip daveti",
+        "title": "{organization} ekibine davet edildiniz",
+        "signIn": "Katılmak için {email} ile giriş yapın veya hesap oluşturun.",
+        "expired": "Bu davetin süresi doldu. Ekibin bir sahibinden yeni bir davet göndermesini isteyin.",
+        "failed": "Ekibe katılınamadı"
+    }
+}

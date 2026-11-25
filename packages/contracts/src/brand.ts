@@ -8,6 +8,8 @@ export type Brand = {
     // Null is the neutral palette for an organization, Rerun's indigo for Rerun.
     color: string | null
     supportEmail: string | null
+    // Where its people open the app, without a trailing slash. Null is Rerun's own address.
+    appUrl: string | null
     links: { docs: string | null; terms: string | null; privacy: string | null }
 }
 
@@ -17,6 +19,7 @@ export const RERUN_BRAND: Brand = {
     iconUrl: null,
     color: null,
     supportEmail: null,
+    appUrl: null,
     links: { docs: null, terms: null, privacy: null },
 }
 

@@ -5,11 +5,13 @@
 // fetching the positive side over the same bounded id list and subtracting with a Set: PostgREST has
 // no NOT EXISTS.
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import { isMachineEntitled, isPaidSubscription, isTrialLapsed } from '@/ee/lib/billing/entitlement'
 import { wantsCategoryEmail } from '@/lib/notifications/prefs'
 import { loadRecommendCandidates, recommendContext, shortlistTemplates, type TemplateCandidate } from '@/lib/templates/recommend'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { selectAll, selectCount, selectMany } from '@/supabase/supabase-helpers'
 import { latestCompletedArchives } from '@/lib/archive/latest'
 import type { LifecycleAgent, LifecycleArchive, LifecycleSnapshot } from './decide'
@@ -47,6 +49,7 @@ export type WorkspaceRow = {
     onboarded_at: string | null
     boxes_archived_at: string | null
     payment_failed_at: string | null
+    organization_id: string | null
     renewal_reminder_at: string | null
     renewal_reminder_user_id: string | null
     // What the workspace's onboarding learned, read from workspace_onboarding and kept beside the
@@ -70,6 +73,7 @@ const WORKSPACE_COLUMNS = [
     'renewal_reminder_user_id',
     'boxes_archived_at',
     'payment_failed_at',
+    'organization_id',
 ] as const
 export type UserRow = { id: string; workspace_id: number; signed_up_at: string | null; email_notification_prefs: unknown }
 type MemberRow = { workspace_id: number; user_id: string; created_at: string }
@@ -338,7 +342,7 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
 
     // Read once here to turn the candidate workspaces into recipients, and again below over the
     // wider set, once the users have brought their own workspaces in.
-    const { data: memberRows } = await selectAll(supabase, 'workspace_members', ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: [...workspaceIds] }, { column: 'created_at' })
+    const { data: memberRows } = await selectWorkspaceMembers(supabase, ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: [...workspaceIds] })
     for (const founder of foundersOf(memberRows ?? []).values()) userIds.add(founder)
 
     if (only) for (const id of [...userIds]) if (!only.includes(id)) userIds.delete(id)
@@ -352,7 +356,7 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
         selectAll(supabase, 'workspaces', WORKSPACE_COLUMNS, { id: allWorkspaceIds }, { column: 'id' }),
         selectAll(supabase, 'workspace_onboarding', ['workspace_id', 'answers'] as const, { workspace_id: allWorkspaceIds }, { column: 'workspace_id' }),
         // Rows rather than a count per workspace: one query beats one per workspace.
-        selectAll(supabase, 'workspace_members', ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: allWorkspaceIds }, { column: 'created_at' }),
+        selectWorkspaceMembers(supabase, ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: allWorkspaceIds }),
         selectAll(supabase, 'agents', ['workspace_id'] as const, { workspace_id: allWorkspaceIds, kind: 'coworker' }, { column: 'id' }),
     ])
 
@@ -371,7 +375,11 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
         loadSentIndex(supabase, [...userIds], allWorkspaceIds),
     ])
 
-    const snapshots = users.map(user => {
+    // Trials, prices, nudges, what Rerun keeps and for how long: none of it is for the people of a
+    // workspace an organization runs. What concerns its organization is sent apart.
+    const recipients = users.filter(user => !isManagedWorkspace(workspaces.get(user.workspace_id)))
+
+    const snapshots = recipients.map(user => {
         const workspace = workspaces.get(user.workspace_id)
         const answers = (workspace?.onboarding_answers ?? null) as OnboardingAnswers | null
 
@@ -404,5 +412,5 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
         } satisfies LifecycleSnapshot
     })
 
-    return { snapshots, users: new Map(users.map(user => [user.id, user])), workspaces, agentNames }
+    return { snapshots, users: new Map(recipients.map(user => [user.id, user])), workspaces, agentNames }
 }

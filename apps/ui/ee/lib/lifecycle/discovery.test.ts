@@ -75,7 +75,7 @@ function user(id: string, workspaceId: number, overrides: Row = {}): Row {
 }
 
 function member(workspaceId: number, userId: string, createdAt: string): Row {
-    return { workspace_id: workspaceId, user_id: userId, created_at: createdAt }
+    return { workspace_id: workspaceId, user_id: userId, created_at: createdAt, organization_staff: false }
 }
 
 describe('loadLifecycleContext', () => {
@@ -102,6 +102,30 @@ describe('loadLifecycleContext', () => {
 
         expect(snapshots).toHaveLength(1)
         expect(snapshots[0]).toMatchObject({ userId: 'founder', isFounder: true, memberCount: 2 })
+    })
+
+    it('writes to nobody of a workspace an organization runs, whatever it would have been about', async () => {
+        const tables = (organization_id: string | null) => ({
+            workspaces: [
+                workspace(1, { trial_ends_at: at(12 * HOUR), subscription_status: 'trialing', first_paid_at: null, organization_id }),
+                workspace(2, { trial_ends_at: at(-12 * HOUR), subscription_status: 'canceled', first_paid_at: null, organization_id }),
+                workspace(3, { subscription_cancel_at: at(3 * DAY), organization_id }),
+                workspace(4, { onboarded_at: at(-2 * DAY), organization_id }),
+                workspace(5, { subscription_status: 'canceled', boxes_archived_at: at(-86 * DAY), organization_id }),
+                workspace(6, { renewal_reminder_at: at(-HOUR), renewal_reminder_user_id: 'user-6', organization_id }),
+                workspace(7, { onboarded_at: null, organization_id }),
+            ],
+            workspace_archives: [{ workspace_id: 5, archived_at: at(-86 * DAY), expires_at: at(4 * DAY) }],
+            workspace_members: [1, 2, 3, 4, 5, 6, 7].map(id => member(id, `user-${id}`, '2026-02-01T00:00:00.000Z')),
+            users: [1, 2, 3, 4, 5, 6, 7].map(id => user(`user-${id}`, id, id === 7 ? { signed_up_at: at(-30 * HOUR) } : {})),
+        })
+
+        const own = await loadLifecycleContext(database(tables(null)).client, NOW)
+        expect(own.snapshots.map(snapshot => snapshot.workspaceId).sort()).toEqual([1, 2, 3, 4, 5, 6, 7])
+
+        const managed = await loadLifecycleContext(database(tables('org-nordlys')).client, NOW)
+        expect(managed.snapshots).toEqual([])
+        expect(managed.users.size).toBe(0)
     })
 
     it('counts one member when the membership rows are missing', async () => {

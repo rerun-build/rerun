@@ -101,7 +101,7 @@ export function ControlCenter() {
     const { workspace } = useSession()
     const support = useSupport()
     const workspaceAdmin = useIsWorkspaceAdmin()
-    const { needsMachineReason } = useWorkspaceAccess()
+    const { needsMachineReason, manager } = useWorkspaceAccess()
     const isTemplateAuthor = useIsTemplateAuthor()
     const assistantReady = useForemanStore(s => selectForemanVisible(s) && s.funnel === 'companion')
     const assistantOpen = useForemanStore(selectForemanOpen)
@@ -254,7 +254,7 @@ export function ControlCenter() {
     })
 
     function rootSections(): ControlSection[] {
-        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme, supportAvailable: support.available }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
+        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, managed: manager !== null, apiPausedReason: manager && workspace && !isWorkspaceApiEntitled(workspace) ? needsMachineReason : null, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme, supportAvailable: support.available }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
             ...command,
             label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`, foremanName),
         }))

@@ -92,7 +92,8 @@
                 "title": "Zugriff auf {box} entfernen?",
                 "confirm": "Entfernen"
             }
-        }
+        },
+        "descriptionManaged": "Admins verwalten Mitglieder und Einstellungen. Mitglieder nutzen die Coworker."
     },
     "createWorkspace": {
         "nameRequired": "Name ist erforderlich",

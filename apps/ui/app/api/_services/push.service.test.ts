@@ -11,6 +11,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({
 }))
 
 const warmImage = vi.fn()
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => (await import('@rerun/contracts')).RERUN_BRAND }))
 vi.mock('@/lib/og/warm', () => ({ warmImage }))
 
 const { pushNotification } = await import('./push.service')

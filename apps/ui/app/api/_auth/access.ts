@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, ORGANIZATION_AUTHOR_ID, agentKindPolicy, type AgentKind } from '@rerun/contracts'
 
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
 import type { ErrorCode } from '@/lib/i18n/action-error'
@@ -25,7 +25,8 @@ export type SpaceVisibility = 'workspace' | 'restricted'
 
 // Who is asking. A person signed in, or the workspace itself: an API key, the onboarding, a foreman
 // turn with no person behind it. The workspace stands for its admins, so it reaches every Box.
-export type Actor = { kind: 'user'; userId: string; workspaceId: number; role: WorkspaceRole; boxScope: BoxScope } | { kind: 'workspace'; workspaceId: number }
+export type UserActor = { kind: 'user'; userId: string; workspaceId: number; role: WorkspaceRole; boxScope: BoxScope; organizationStaff?: boolean }
+export type Actor = UserActor | { kind: 'workspace'; workspaceId: number }
 
 export const BOX_MANAGE_ONLY = 'boxManagerOnly' satisfies ErrorCode
 export const COWORKER_NOT_FOUND = 'coworkerNotFound' satisfies ErrorCode
@@ -62,8 +63,20 @@ export function workspaceActor(workspaceId: number): Actor {
     return { kind: 'workspace', workspaceId }
 }
 
-export function actorFromContext(ctx: Pick<WorkspaceContext, 'userId' | 'role' | 'boxScope'> & { workspace: { id: number } }): Actor {
-    return { kind: 'user', userId: ctx.userId, workspaceId: ctx.workspace.id, role: ctx.role, boxScope: ctx.boxScope }
+export function actorFromContext(ctx: Pick<WorkspaceContext, 'userId' | 'role' | 'boxScope' | 'organizationStaff'> & { workspace: { id: number } }): UserActor {
+    return { kind: 'user', userId: ctx.userId, workspaceId: ctx.workspace.id, role: ctx.role, boxScope: ctx.boxScope, organizationStaff: ctx.organizationStaff }
+}
+
+export function signedInUserId(actor: Actor): string {
+    if (actor.kind !== 'user') throw new UnauthenticatedError()
+    return actor.userId
+}
+
+// Who the machine of the workspace is told did something: what it stores is read by its coworkers and
+// by its members, who know no one in the team of their organization.
+export function signerIdOf(actor: Actor): string | null {
+    if (actor.kind !== 'user') return null
+    return actor.organizationStaff ? ORGANIZATION_AUTHOR_ID : actor.userId
 }
 
 export function isAdminActor(actor: Actor): boolean {
@@ -71,11 +84,11 @@ export function isAdminActor(actor: Actor): boolean {
 }
 
 // The signed-in caller as an actor, in a single read: the membership row the session already proves.
-export async function requireLightSessionActor(): Promise<Actor> {
+export async function requireLightSessionActor(): Promise<UserActor> {
     const { user, workspaceRefused, membership } = await getSessionWorkspace()
     if (workspaceRefused) throw new AuthorizationError('notMember')
     if (!user?.id || !user.workspace_id || !membership) throw new UnauthenticatedError()
-    return { kind: 'user', userId: user.id, workspaceId: user.workspace_id, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
+    return { kind: 'user', userId: user.id, workspaceId: user.workspace_id, role: membership.role, boxScope: toBoxScope(membership.box_scope), organizationStaff: membership.organization_staff }
 }
 
 // The rule itself, with every input already read. Pure, so the matrix is tested without a database.
@@ -243,8 +256,8 @@ export async function assertAgentInWorkspace(agentId: string, need: AccessLevel 
 async function sessionMemberOf(workspaceId: number): Promise<Actor | null> {
     const { user } = await getSessionWorkspace()
     if (!user?.id) throw new UnauthenticatedError()
-    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: workspaceId })
-    return membership && { kind: 'user', userId: user.id, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
+    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope', 'organization_staff'] as const, { user_id: user.id, workspace_id: workspaceId })
+    return membership && { kind: 'user', userId: user.id, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope), organizationStaff: membership.organization_staff }
 }
 
 // For an OAuth callback, which lands in a popup that names no workspace: the caller as a member of
@@ -306,8 +319,8 @@ async function readSessionWithAgent(sessionId: string) {
 
 // A member named by something the hub signed (a foreman turn's token), held to their membership
 // as it stands now: someone who left since the token was minted reaches nothing.
-export async function memberActor(workspaceId: number, userId: string): Promise<Actor | null> {
-    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope'] as const, { user_id: userId, workspace_id: workspaceId })
+export async function memberActor(workspaceId: number, userId: string): Promise<UserActor | null> {
+    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope', 'organization_staff'] as const, { user_id: userId, workspace_id: workspaceId })
     if (!membership) return null
-    return { kind: 'user', userId, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
+    return { kind: 'user', userId, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope), organizationStaff: membership.organization_staff }
 }

@@ -1,3 +1,5 @@
+import { ORGANIZATION_AUTHOR_ID } from '@rerun/contracts'
+
 export type TeamCursor = {
     userId: string
     name: string
@@ -22,11 +24,12 @@ export function colorFromId(id: string): string {
 }
 
 // A broadcast carries whatever its sender wrote: only the id and the position are read from it,
-// the name and photo shown are those the workspace's member list holds for that id.
+// the name and photo shown are those the workspace's member list holds for that id. The organization
+// that runs the workspace is on that list to sign its messages, and never on the board.
 export function cursorFromPayload(payload: unknown, memberOf: MemberLookup): TeamCursor | null {
     if (!payload || typeof payload !== 'object') return null
     const { userId, x, y } = payload as Record<string, unknown>
-    if (typeof userId !== 'string' || !userId) return null
+    if (typeof userId !== 'string' || !userId || userId === ORGANIZATION_AUTHOR_ID) return null
     if (typeof x !== 'number' || !Number.isFinite(x) || typeof y !== 'number' || !Number.isFinite(y)) return null
     const member = memberOf(userId)
     if (!member) return null

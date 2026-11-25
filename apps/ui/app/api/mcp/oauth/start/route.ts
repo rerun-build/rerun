@@ -1,8 +1,9 @@
-import { assertAgentAccess } from '@/app/api/_auth/access'
+import { assertAgentAccess, signedInUserId, type Actor } from '@/app/api/_auth/access'
 import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
 import { getBrand } from '@/lib/brand/server'
 import { getVaultItem } from '@/lib/engine/vault-client'
-import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, resolveClient } from '@/lib/mcp-oauth'
+import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, isPreRegistered, resolveClient } from '@/lib/mcp-oauth'
+import { requestHostReturn, startOnRerunHost } from '@/lib/oauth/host-sign-in'
 import { signInRefusal } from '@/lib/net/network-error'
 import { refusal } from '@/lib/i18n/action-error'
 import { NextResponse } from 'next/server'
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
         const agentId = body.agentId ?? ''
         let vault: OAuthContext['vault']
         let workspaceId: number | undefined
+        let starter: Actor
         if (body.vaultItemId) {
             // An entry signs in where it was compiled to: its own server and address, never the caller's.
             const ctx = await vaultContext()
@@ -27,9 +29,14 @@ export async function POST(req: Request) {
             if (!item.oauth || item.oauth.serverName !== serverName) return NextResponse.json(refusal('vaultEntryOtherServer'), { status: 400 })
             mcpUrl = item.oauth.url
             vault = { itemId: item.id, workspaceId: ctx.actor.workspaceId }
+            starter = ctx.actor
         } else {
-            workspaceId = (await assertAgentAccess(agentId, 'manage')).actor.workspaceId
+            starter = (await assertAgentAccess(agentId, 'manage')).actor
+            workspaceId = starter.workspaceId
         }
+
+        const from = isPreRegistered(mcpUrl) ? await requestHostReturn(req) : null
+        if (from) return startOnRerunHost(from, { agentId: vault ? '' : agentId, workspaceId: starter.workspaceId, userId: signedInUserId(starter) }, { flow: 'mcp', serverName, mcpUrl, ...(vault ? { vaultItem: vault.itemId } : {}) })
 
         const metadata = await discoverAuthServer(mcpUrl)
         const clientInfo = await resolveClient(metadata, mcpUrl, req, (await getBrand()).name)

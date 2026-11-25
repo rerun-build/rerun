@@ -12,7 +12,9 @@ export async function subscriptionHasCard(_subscriptionId: string, _timeoutMs: n
     return false
 }
 
-export async function grantRerunTopup(_workspaceId: number, _micros: number): Promise<void> {}
+export async function grantRerunTopup(_workspaceId: number, _micros: number): Promise<boolean> {
+    return false
+}
 
 export async function logRerunUsage(_params: { workspaceId: number; engineAgentId?: string | null; model: string; tier: string; inputTokens: number; outputTokens: number; costMicros: number }): Promise<void> {}
 

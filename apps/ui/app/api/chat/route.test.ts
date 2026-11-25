@@ -1,5 +1,6 @@
-import { callableEngineAgentIds } from '@/app/api/_auth/access'
+import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/errors'
+import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, recordMessageSent, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
@@ -12,6 +13,7 @@ import { POST } from './route'
 
 vi.mock('@/lib/i18n/request-locale', () => ({ requestTimeZone: vi.fn(async () => 'Europe/Paris') }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn().mockResolvedValue({ userId: 'me', workspace: { id: 7 }, authUser: { app_metadata: {}, user_metadata: {} } }) }))
+vi.mock('@/lib/brand/workspace', () => ({ workspaceBrand: async () => ({ name: 'Nordlys' }) }))
 vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedValue(null) }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
 vi.mock('@/app/api/_services/notification-audience.service', () => ({ recordSessionParticipant: vi.fn(), recordSessionRead: vi.fn() }))
@@ -285,7 +287,18 @@ describe('POST /api/chat', () => {
             const response = await settle(POST(request({})))
 
             expect(response.status).toBe(200)
-            expect(recordMessageSent).toHaveBeenCalledWith(SESSION, 'me', 'ship it')
+            expect(recordMessageSent).toHaveBeenCalledWith(SESSION, expect.objectContaining({ userId: 'me' }), 'ship it')
+        })
+
+        it('signs what the team of the organization sends with its brand, and keeps who sent it to the hub', async () => {
+            vi.mocked(engine.chat).mockResolvedValue(streaming('run-5'))
+            vi.mocked(requireWorkspaceContext).mockResolvedValueOnce({ userId: 'staff', organizationStaff: true, workspace: { id: 7 }, authUser: { app_metadata: {}, user_metadata: { full_name: 'Solveig Staff' } } } as never)
+            vi.mocked(actorFromContext).mockReturnValueOnce({ kind: 'user', userId: 'staff', workspaceId: 7, role: 'admin', boxScope: 'all', organizationStaff: true })
+
+            await settle(POST(request({})))
+
+            expect(vi.mocked(engine.chat).mock.calls[0][2].author).toEqual({ id: 'organization', name: 'Nordlys' })
+            expect(recordMessageSent).toHaveBeenCalledWith(SESSION, expect.objectContaining({ userId: 'staff', organizationStaff: true }), 'ship it')
         })
 
         it('keeps nothing of an install, which opens with its guide', async () => {
@@ -294,7 +307,7 @@ describe('POST /api/chat', () => {
 
             await settle(POST(request({ sessionId: undefined, text: buildInstallMessage('Set up the coworker', 'Scout') })))
 
-            expect(recordMessageSent).toHaveBeenCalledWith('new-session', 'me', null)
+            expect(recordMessageSent).toHaveBeenCalledWith('new-session', expect.objectContaining({ userId: 'me' }), null)
         })
 
         it('keeps nothing when the engine refuses the message', async () => {

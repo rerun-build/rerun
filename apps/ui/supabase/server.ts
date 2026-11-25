@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient as createTokenClient } from '@supabase/supabase-js'
 import { cookies, headers } from 'next/headers'
 import { readQueryWorkspace } from '@/lib/workspace/query-workspace'
-import { WORKSPACE_HEADER } from '@/lib/workspace/workspace-header'
+import { PAGE_HEADER, WORKSPACE_HEADER } from '@/lib/workspace/workspace-header'
 
 const BEARER_PREFIX = 'Bearer '
 
@@ -29,6 +29,15 @@ export async function getRequestWorkspaceId(): Promise<number | null> {
         return /^\d+$/.test(raw.trim()) ? Number(raw.trim()) : Number.NaN
     } catch {
         return null
+    }
+}
+
+// Whether a page is being rendered, as opposed to a call it makes or a provider coming back.
+export async function isPageRequest(): Promise<boolean> {
+    try {
+        return (await headers()).get(PAGE_HEADER) !== null
+    } catch {
+        return false
     }
 }
 

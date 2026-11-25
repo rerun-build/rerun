@@ -1,8 +1,9 @@
 import { after } from 'next/server'
-import { agentAddress, agentKindOfEngineId, agentKindPolicy, FOREMAN_AGENT_ID, parseCoworkerLook, RERUN_CONNECTION_ID, type AgentKind, type Brand, type CoworkerLook } from '@rerun/contracts'
+import { agentAddress, agentKindOfEngineId, agentKindPolicy, FOREMAN_AGENT_ID, isWhiteLabel, ORGANIZATION_AUTHOR_ID, parseCoworkerLook, RERUN_CONNECTION_ID, type AgentKind, type Brand, type CoworkerLook } from '@rerun/contracts'
 
 import { boxAccessOf, memberActor, toAccessLevel } from '@/app/api/_auth/access'
 import { toBoxScope } from '@/app/api/_auth/box-scope'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { BANNER_WARM_INLINE_MS, alertBanner, buildUnsubscribeUrl, emailPortrait, pushNotification, sendNotificationEmail } from '@rerun/cloud/email'
 import { notificationUrl } from '@/lib/app-url'
@@ -26,6 +27,7 @@ import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { copyToShippedForemanRow, openForemanRoutineThread } from '@/lib/foreman/conversation'
 import { isCheckinAnnouncement, openCheckinThread } from '@/lib/foreman/checkin-thread'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
+import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { alertSignedOutAccounts, closeReconnectedAccounts } from './ai-account-alert.service'
@@ -137,6 +139,8 @@ async function reportChatRun(workspaceId: number, agentId: string, notification:
     if (notification.event !== 'agent.message.completed' || (notification.kind !== 'done' && notification.kind !== 'error')) return
     try {
         const metadata = notification.metadata ?? {}
+        // The organization that runs the workspace at work is no use of it by its own people.
+        if (metadata.authorId === ORGANIZATION_AUTHOR_ID) return
         // Credited to the member who sent the message. An engine that predates `authorId`, or a run
         // rebuilt at boot, names nobody and falls back to the owner.
         const author = typeof metadata.authorId === 'string' ? await resolveWorkspaceMemberEmail(workspaceId, metadata.authorId) : null
@@ -279,7 +283,7 @@ async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number,
     const agentId = agent?.id ?? null
     const [{ data: session }, { data: memberships }] = await Promise.all([
         agentId && notification.sessionId ? selectMaybeSingle(supabase, 'sessions', ['id', 'source', 'owner_user_id'] as const, { agent_id: agentId, engine_session_id: notification.sessionId }) : Promise.resolve({ data: null }),
-        selectMany(supabase, 'workspace_members', ['user_id', 'role', 'box_scope'] as const, { workspace_id: workspaceId }),
+        selectWorkspaceMembers(supabase, ['user_id', 'role', 'box_scope'] as const, { workspace_id: workspaceId }),
     ])
     // A conversation held by one member is theirs alone, and a run of a coworker whose conversations
     // are private reaches nobody when the hub does not know whose it is.
@@ -298,7 +302,9 @@ async function resolveAudience(supabase: ServiceRoleClient, workspaceId: number,
     // A question or a heads-up names nobody on older engines: the last one to write is who is waiting,
     // and in a conversation one member holds, that member.
     const owner = session?.owner_user_id && memberIds.has(session.owner_user_id) ? session.owner_user_id : null
-    const authorId = typeof claimed === 'string' && memberIds.has(claimed) ? claimed : (participantIds[0] ?? owner)
+    // A run of the team of the organization that runs the workspace is nobody's here, and no run left
+    // unattended either: whoever follows the coworker did not ask for it.
+    const authorId = claimed === ORGANIZATION_AUTHOR_ID || (typeof claimed === 'string' && memberIds.has(claimed)) ? claimed : (participantIds[0] ?? owner)
     // An event without a source is a HITL stop or a notify_user: the session knows what started it.
     const source = (notification.source ?? session?.source ?? null) as SessionSource | null
 
@@ -398,7 +404,7 @@ async function emailIncident(supabase: ServiceRoleClient, context: IncidentConte
             reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale, brand.name)),
             portraitUrl,
             boardUrl,
-            conversationUrl: notificationUrl(context.notificationId, appUrl),
+            conversationUrl: notificationLink(context, brand),
             unsubscribeUrl: buildUnsubscribeUrl(userId, appUrl, 'runs'),
             locale,
             brand,
@@ -406,6 +412,13 @@ async function emailIncident(supabase: ServiceRoleClient, context: IncidentConte
         return ok
     }
     if (!(await attempted(() => sendWithinCap(supabase, context, { kind, key, userId, now }, send)))) await dropIncident(supabase, userId, key)
+}
+
+// A person of an organization may have several of its workspaces: the one the notification is in goes
+// with the link.
+function notificationLink({ notificationId, workspaceId }: Pick<IncidentContext, 'notificationId' | 'workspaceId'>, brand: Brand): string {
+    const url = notificationUrl(notificationId, brandAppUrl(brand))
+    return isWhiteLabel(brand) ? `${url}&${WORKSPACE_PARAM}=${workspaceId}` : url
 }
 
 function attempted(send: () => Promise<boolean>): Promise<boolean> {

@@ -89,7 +89,7 @@ function openedSession(user: User): Awaited<ReturnType<Auth['verifyOtp']>> {
 }
 
 const workspaces: Rows<'workspaces'> = [{ id: 7, name: 'Atelier Nord', is_sandbox: false, stripe_customer_id: 'cus_R8hJk2LmNpQ4', stripe_subscription_id: 'sub_1QxYz8LmNpQ4', subscription_status: 'active' }]
-const workspaceMembers: Rows<'workspace_members'> = [{ workspace_id: 7, user_id: 'user-ada', role: 'admin', box_scope: 'all' }]
+const workspaceMembers: Rows<'workspace_members'> = [{ workspace_id: 7, user_id: 'user-ada', role: 'admin', box_scope: 'all', organization_staff: false }]
 const users: Rows<'users'> = [
     {
         id: 'user-ada',

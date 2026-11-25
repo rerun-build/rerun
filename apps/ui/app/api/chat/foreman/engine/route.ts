@@ -104,7 +104,8 @@ export async function POST(req: Request): Promise<Response> {
     return sendTurn({
         target,
         text,
-        author: messageAuthorOf(ctx, timezone),
+        sender: ctx,
+        author: await messageAuthorOf(ctx, timezone),
         queued,
         // Its brief is written by the hub on every turn: the instructions and the tools of where the
         // workspace stands now, with a token that carries this member's rights.

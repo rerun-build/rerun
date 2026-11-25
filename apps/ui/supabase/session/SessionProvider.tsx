@@ -10,7 +10,8 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { usePresenceHeartbeat } from '@/hooks/usePresenceHeartbeat'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import { enterActiveWorkspace, isWorkspaceSwitchInFlight } from '@/lib/workspace/workspace-switch'
-import { clearTabWorkspace, installWorkspaceHeader, pinTabWorkspace, readTabWorkspace, readUrlWorkspace } from '@/lib/workspace/tab-workspace'
+import { opensOnHost, pickHostWorkspace, type HostMembership, type HostScope } from '@/lib/workspace/host-workspace'
+import { clearTabWorkspace, installWorkspaceHeader, pinTabWorkspace, readLastHostWorkspace, readTabWorkspace, readUrlWorkspace, rememberHostWorkspace } from '@/lib/workspace/tab-workspace'
 import { PHONE_STATUS_COLUMNS, phoneStatusOf, type PhoneStatus } from '@rerun/cloud/phone'
 import { awaitSignupStamp } from '@/supabase/session/signup-stamp'
 import { Session } from '@supabase/supabase-js'
@@ -50,6 +51,7 @@ type Workspace = Pick<
     | 'boxes_archived_at'
     | 'price_arm'
     | 'locale'
+    | 'organization_id'
 >
 type User = Pick<Database['public']['Tables']['users']['Row'], 'id' | 'created_at' | 'workspace_id' | 'email_notification_prefs' | 'account_role' | 'expert_profile_id' | 'signed_up_at' | 'locale'>
 type WorkspaceAnswers = Database['public']['Tables']['workspace_onboarding']['Row']['answers']
@@ -81,6 +83,9 @@ export type SessionContextValue = {
     // Whether the caller uses every Box open to the workspace or only the ones named to them,
     // `null` until it is read. Meaningless for an admin, who reaches every Box.
     boxScope: BoxScope | null
+    // Here for the organization that runs the workspace, and invisible to its members. `undefined`
+    // until it is read.
+    organizationStaff?: boolean
     workspaces: Workspace[]
     session: Session | null
     phoneStep: PhoneStep
@@ -100,13 +105,14 @@ const SessionContext = createContext<SessionContextValue | null>(null)
 
 // What the server already read for the page it renders, so the board does not wait for the browser
 // to read it again.
-export type InitialSession = { user: User; workspace: Workspace; role: WorkspaceRole; boxScope: string }
+export type InitialSession = { user: User; workspace: Workspace; role: WorkspaceRole; boxScope: string; organizationStaff: boolean }
 
-export function SessionProvider({ children, initial = null }: PropsWithChildren<{ initial?: InitialSession | null }>) {
+// `hostScope` is which workspaces the host opens, as the server said: the two pick by the same rule.
+export function SessionProvider({ children, initial = null, hostScope = null }: PropsWithChildren<{ initial?: InitialSession | null; hostScope?: HostScope | null }>) {
     const [user, setUser] = useState<User | null>(null)
     const [workspace, setWorkspace] = useState<Workspace | null>(null)
     const [loadedAnswers, setLoadedAnswers] = useState<{ workspaceId: number; answers: WorkspaceAnswers | null } | null>(null)
-    const [loadedRole, setLoadedRole] = useState<{ workspaceId: number; role: WorkspaceRole; boxScope: BoxScope } | null>(null)
+    const [loadedRole, setLoadedRole] = useState<{ workspaceId: number; role: WorkspaceRole; boxScope: BoxScope; organizationStaff: boolean } | null>(null)
     const [roleReads, setRoleReads] = useState(0)
     const [workspaces, setWorkspaces] = useState<Workspace[]>([])
     const [session, setSession] = useState<Session | null>(null)
@@ -184,6 +190,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
         }
         loadedWorkspaceRef.current = { userId: user.id, workspaceId: user.workspace_id }
         pinTabWorkspace(user.workspace_id)
+        if (hostScope?.organizationId) rememberHostWorkspace(user.workspace_id)
         fetchWorkspace()
     }, [user?.id, user?.workspace_id])
 
@@ -197,11 +204,12 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
     const memberId = user?.id ?? null
     const role = loadedRole && loadedRole.workspaceId === workspaceId ? loadedRole.role : null
     const boxScope = loadedRole && loadedRole.workspaceId === workspaceId ? loadedRole.boxScope : null
+    const organizationStaff = loadedRole && loadedRole.workspaceId === workspaceId ? loadedRole.organizationStaff : undefined
     useEffect(() => {
         if (!memberId || workspaceId === null) return
         let cancelled = false
-        void selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: memberId, workspace_id: workspaceId }).then(({ data }) => {
-            if (!cancelled && data) setLoadedRole({ workspaceId, role: data.role, boxScope: toBoxScope(data.box_scope) })
+        void selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope', 'organization_staff'] as const, { user_id: memberId, workspace_id: workspaceId }).then(({ data }) => {
+            if (!cancelled && data) setLoadedRole({ workspaceId, role: data.role, boxScope: toBoxScope(data.box_scope), organizationStaff: data.organization_staff })
         })
         return () => {
             cancelled = true
@@ -346,7 +354,8 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
         },
     })
     const phoneStatus = accountId && phoneRead?.userId === accountId ? phoneRead.status : null
-    const phoneStep: PhoneStep = !accountId ? 'clear' : !phoneStatus ? 'unknown' : phoneStatus === 'pending' ? 'pending' : 'clear'
+    // Nobody owes an organization's address a number.
+    const phoneStep: PhoneStep = !accountId || hostScope?.organizationId ? 'clear' : !phoneStatus ? 'unknown' : phoneStatus === 'pending' ? 'pending' : 'clear'
 
     useRealtimeSubscription('users', {
         channelId: 'user-provider',
@@ -379,7 +388,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
         enabled: !!user?.id,
         onInsert: () => fetchWorkspaces(),
         onUpdate: row => {
-            if (row.workspace_id === workspaceId) setLoadedRole({ workspaceId: row.workspace_id, role: row.role, boxScope: toBoxScope(row.box_scope) })
+            if (row.workspace_id === workspaceId) setLoadedRole({ workspaceId: row.workspace_id, role: row.role, boxScope: toBoxScope(row.box_scope), organizationStaff: row.organization_staff })
         },
         onDelete: () => fetchWorkspaces(),
         onResync: () => setRoleReads(reads => reads + 1),
@@ -401,7 +410,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
         setUserLoading(false)
         setWorkspace(given.workspace)
         setWorkspaceLoading(false)
-        setLoadedRole({ workspaceId: given.workspace.id, role: given.role, boxScope: toBoxScope(given.boxScope) })
+        setLoadedRole({ workspaceId: given.workspace.id, role: given.role, boxScope: toBoxScope(given.boxScope), organizationStaff: given.organizationStaff })
     }
 
     // Only the latest read lands: an older one still in flight, the one SIGNED_IN fired before the
@@ -430,10 +439,27 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
     // since every workspace row is readable. A workspace named in the URL comes first: it is the
     // landing of a flow that just moved the account (an accepted invitation, a creator's sandbox).
     async function resolveTabWorkspace(row: User): Promise<number> {
+        if (hostScope) {
+            const memberships = await readMemberships(row.id)
+            return pickHostWorkspace(hostScope, memberships, [readUrlWorkspace(), readTabWorkspace(), row.workspace_id, readLastHostWorkspace()]) ?? row.workspace_id
+        }
         const pinned = readUrlWorkspace() ?? readTabWorkspace()
         if (pinned === null || pinned === row.workspace_id) return row.workspace_id
         const { data } = await selectMaybeSingle(supabase, 'workspace_members', ['workspace_id'] as const, { user_id: row.id, workspace_id: pinned })
         return data ? pinned : row.workspace_id
+    }
+
+    async function readMemberships(userId: string): Promise<HostMembership[]> {
+        const rows = await readOwnRows(userId)
+        if (rows.length === 0) return []
+        const { data } = await selectMany(supabase, 'workspaces', ['id', 'organization_id'] as const, { id: rows.map(row => row.workspace_id) })
+        const organizations = new Map((data ?? []).map(workspace => [workspace.id, workspace.organization_id]))
+        return rows.flatMap(row => (organizations.has(row.workspace_id) ? [{ workspaceId: row.workspace_id, organizationId: organizations.get(row.workspace_id) ?? null, joinedAt: row.created_at }] : []))
+    }
+
+    async function readOwnRows(userId: string) {
+        const { data } = await selectMany(supabase, 'workspace_members', ['workspace_id', 'created_at'] as const, { user_id: userId })
+        return data ?? []
     }
 
     async function fetchWorkspace() {
@@ -444,8 +470,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
 
     async function fetchWorkspaces() {
         if (!user?.id) return
-        const { data: memberships } = await selectMany(supabase, 'workspace_members', ['workspace_id'], { user_id: user.id })
-        const ids = (memberships ?? []).map(m => m.workspace_id)
+        const ids = (await readOwnRows(user.id)).map(row => row.workspace_id)
         // Removed from the workspace this tab is on: it reloads onto the one the server moved the
         // account to. Not when that is the stored one, which would reload into the same place.
         const tabWorkspaceId = user.workspace_id
@@ -458,7 +483,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
             return
         }
         const { data } = await selectMany(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id: ids })
-        setWorkspaces(data ?? [])
+        setWorkspaces((data ?? []).filter(row => opensOnHost(hostScope, row.organization_id)))
     }
 
     usePresenceHeartbeat(!!user?.id)
@@ -468,7 +493,7 @@ export function SessionProvider({ children, initial = null }: PropsWithChildren<
         router.push(routes.auth)
     }
 
-    return <SessionContext.Provider value={{ user, workspace, workspaceAnswers, role, boxScope, workspaces, session, phoneStep, phoneStatus, refreshPhoneStep, loading: userLoading || workspaceLoading, signOut, refreshWorkspace: fetchWorkspace, refreshUser: fetchUser }}>{children}</SessionContext.Provider>
+    return <SessionContext.Provider value={{ user, workspace, workspaceAnswers, role, boxScope, organizationStaff, workspaces, session, phoneStep, phoneStatus, refreshPhoneStep, loading: userLoading || workspaceLoading, signOut, refreshWorkspace: fetchWorkspace, refreshUser: fetchUser }}>{children}</SessionContext.Provider>
 }
 
 // For the render labs, which draw session-bound components with no signed-in user behind them.

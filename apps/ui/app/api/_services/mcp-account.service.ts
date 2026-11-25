@@ -20,7 +20,7 @@ import {
     getSkill as engineGetSkill,
     getTrigger as engineGetTrigger,
     importSkill as engineImportSkill,
-    listConnections as engineListConnections,
+    listConnections,
     listDbTables as engineListDbTables,
     listRuns as engineListRuns,
     listSchedules as engineListSchedules,
@@ -36,6 +36,10 @@ import {
     uploadFile as engineUploadFile,
     writeFileText as engineWriteFileText,
 } from '@/lib/engine/client'
+import { connectionBrand, offersTeamRequests } from '@/lib/brand/connection'
+import { brandText } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
+import { brandConnections } from '@/lib/engine/ai-sources'
 import type { InstalledService } from '@/lib/services/types'
 import type { BoxConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineAgentSetup, EngineConnection, EngineRunDetail, EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
 import { MAX_MEMORIES_PER_CALL, MAX_MEMORY_CHARS, MAX_UPLOAD_MB } from '@/lib/mcp/account-tools'
@@ -135,6 +139,12 @@ function unverifiedModelPin(args: Record<string, unknown>): ModelPin {
     const parsed = provider === undefined ? null : providerSchema.safeParse(provider)
     if (parsed && !parsed.success) throw new Error(`Unknown provider "${provider}". Expected one of: ${providerSchema.options.join(', ')}`)
     return { connectionId: asString(args.connectionId) ?? null, provider: parsed?.data ?? null, model: asString(args.model) ?? null }
+}
+
+// The keyless connection goes by the name of the workspace's brand.
+async function engineListConnections(conn: EngineConnection) {
+    const [list, brand] = await Promise.all([listConnections(conn), connectionBrand(conn)])
+    return brandConnections(list, brand)
 }
 
 async function newAgentModelPin(workspaceId: number, args: Record<string, unknown>): Promise<ModelPin | undefined> {
@@ -314,6 +324,7 @@ function readMemoryEntries(value: unknown): MemoryEntry[] {
 // API key's creator, the foreman's member).
 export async function dispatchAccountTool(actor: Actor, name: string, args: Record<string, unknown>, { actorUserId = null }: { actorUserId?: string | null } = {}): Promise<unknown> {
     const workspaceId = actor.workspaceId
+    const followerId = actor.kind === 'user' && actor.organizationStaff ? null : actorUserId
     switch (name) {
         case 'list_spaces': {
             const supabase = createServiceRoleClient()
@@ -674,7 +685,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 timezone: shared.timezone,
                 enabled: shared.enabled,
             })
-            await followCoworker(actorUserId, agentId)
+            await followCoworker(followerId, agentId)
             return schedule
         }
 
@@ -724,7 +735,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 methods: shared.methods,
                 enabled: shared.enabled,
             })
-            await followCoworker(actorUserId, agentId)
+            await followCoworker(followerId, agentId)
 
             return await projectTrigger(agentId, workspaceId, trigger)
         }
@@ -784,7 +795,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             if (agentKindPolicy(recipient.kind).conversations === 'per-member') throw new Error('This coworker keeps each member\'s conversations private: talk to it in the Rerun app.')
             const waitSeconds = clamp(asNumber(args.waitSeconds), DEFAULT_WAIT_SECONDS, MAX_WAIT_SECONDS)
 
-            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds })
+            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, teamRequests: await offersTeamRequests(conn) })
             if (!res.ok) throw new Error(`The coworker could not be reached: ${res.status} ${await res.text().catch(() => '')}`.trim())
 
             const runId = res.headers.get('x-run-id')
@@ -796,7 +807,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             // Same reason as the foreman's setup hand-over: /chat announces no session, so without
             // this the conversation never shows up in the agent's chat.
             const conversationId = sessionId ? await ensureSessionRow(agentId, sessionId, requireString(args.message, 'message'), { source: 'api', status: 'working' }) : null
-            if (conversationId) await recordSessionParticipant(conversationId, actorUserId)
+            if (conversationId) await recordSessionParticipant(conversationId, followerId)
 
             const run = await waitForRun(conn, engineAgentId, runId, waitSeconds)
             return {
@@ -892,7 +903,8 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
         case 'search_connectors': {
             const results = await searchCatalogServices(asString(args.query), asString(args.category))
-            return { connectors: results.map(({ slug, name, category, summary, setup, setupReason }) => ({ slug, name, category, summary, setup, setupReason })) }
+            const brand = await workspaceBrand(workspaceId)
+            return { connectors: results.map(({ slug, name, category, summary, setup, setupReason }) => ({ slug, name, category, summary, setup, setupReason: brandText(setupReason, brand) })) }
         }
 
         case 'list_connectors': {
@@ -948,7 +960,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 message:
                     status === 'active'
                         ? `${name} is installed and its tools are available to ${holder}.`
-                        : `${name} is declared on ${holder} and waiting for the account owner to connect it from the Rerun app (${appsScreen}). Do not ask anyone for credentials here.`,
+                        : `${name} is declared on ${holder} and waiting for the account owner to connect it from the ${(await workspaceBrand(workspaceId)).name} app (${appsScreen}). Do not ask anyone for credentials here.`,
             }
         }
 

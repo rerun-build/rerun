@@ -1,0 +1,39 @@
+{
+    "contact": "Contacter {manager}",
+    "templateUnavailable": "Non disponible dans ce workspace",
+    "paused": {
+        "title": "Ce workspace est en pause.",
+        "body": "Contactez {manager} pour le remettre en marche.",
+        "reason": "Ce workspace est en pause. Contactez {manager}.",
+        "coworker": "Contactez {manager} et {name} reprend exactement où il s'est arrêté."
+    },
+    "restoring": {
+        "waiting": "Ce workspace est le premier de la file.",
+        "failed": "Nous sommes prévenus et le remettons en marche à la main."
+    },
+    "credit": {
+        "title": "Crédits",
+        "providedBy": "Fournis par {manager}",
+        "outTitle": "Plus de crédits",
+        "out": "Contactez {manager} pour en obtenir.",
+        "outOwnPlan": "Contactez {manager} pour en obtenir, ou utilisez votre plan {plan}, déjà connecté.",
+        "outOwnAi": "Contactez {manager} pour en obtenir, ou faites tourner vos coworkers sur votre propre IA.",
+        "usedUp": "Crédits épuisés. Contactez {manager}.",
+        "usage": "{percent} % des crédits utilisés",
+        "detailUsedUp": "Les coworkers qui tournent sur ces crédits sont en pause. Contactez {manager} pour en obtenir, ou choisissez un autre modèle par défaut pour qu'ils continuent.",
+        "detailIncluded": "Fourni par {manager}. Pas de clé, rien à configurer.",
+        "defaultPick": "Les crédits sont épuisés : les coworkers sans modèle à eux sont en pause. Contactez {manager}, ou choisissez un autre modèle pour qu'ils continuent.",
+        "defaultAdd": "Les crédits sont épuisés : les coworkers sans modèle à eux sont en pause. Contactez {manager}, ou ajoutez un plan ou une clé API pour qu'ils continuent."
+    },
+    "host": {
+        "noAccess": {
+            "title": "Vous n’avez pas accès",
+            "body": "{email} n’a aucun espace de travail ici. Demandez une invitation à {brand}.",
+            "bodyUnnamed": "Ce compte n’a aucun espace de travail ici. Demandez une invitation à {brand}."
+        },
+        "unavailable": {
+            "title": "{brand} est indisponible",
+            "body": "Revenez plus tard."
+        }
+    }
+}

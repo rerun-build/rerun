@@ -92,7 +92,8 @@
                 "title": "Retirer l'accès à {box} ?",
                 "confirm": "Retirer"
             }
-        }
+        },
+        "descriptionManaged": "Les admins gèrent les membres et les réglages. Les membres utilisent les coworkers."
     },
     "createWorkspace": {
         "nameRequired": "Le nom est obligatoire",

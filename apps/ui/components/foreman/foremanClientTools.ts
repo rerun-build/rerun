@@ -22,7 +22,8 @@ type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 // What the workspace menu knows and a tool call does not: which of its sections exist here. The
 // session lives in a React context, so the caller reads it and hands it over.
 // `vaultOpen`: the workspace menu opens the Vault only on an active plan or trial.
-export type ForemanClientGates = { apiEntitled: boolean; apiLocked: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean }
+// `managed`: an organization runs the workspace and handles its plan.
+export type ForemanClientGates = { apiEntitled: boolean; apiLocked: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean; managed?: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {
     const choices = Object.entries(labels).map(([id, label]) => `${id} ("${label}")`)
@@ -71,6 +72,12 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
             }
             if (panel === 'api_keys' && gates.apiLocked) {
                 return { ok: false, error: 'API keys and the MCP client are not included in the AppSumo tier of this workspace. Say so, without offering the billing panel: no subscription opens them.' }
+            }
+            if (gates.managed && panel === 'billing') {
+                return { ok: false, error: 'This workspace has no billing panel: its plan, its credits and its payments are handled by the team that runs it. Say so in one line.' }
+            }
+            if (gates.managed && panel === 'api_keys' && !gates.apiEntitled) {
+                return { ok: false, error: 'This workspace is paused, so its API keys and MCP client are closed. Say so, and that the team that runs it can bring it back.' }
             }
             if (panel === 'api_keys' && !gates.apiEntitled) {
                 return { ok: false, error: 'API keys and the MCP client need an active subscription, and this workspace has none. Say so, and offer to open the billing panel instead.' }

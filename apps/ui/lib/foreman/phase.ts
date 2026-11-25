@@ -1,4 +1,4 @@
-import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
+import { FOREMAN_PHASES, RERUN_BRAND, isMobileClient, type Brand, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import type { PriceArm } from '@rerun/cloud/billing'
@@ -215,7 +215,11 @@ export type ForemanState = {
     // person is a member rather than an admin.
     hiddenBoxes?: number
     isMember?: boolean
+    // Who the product is in front of this person. Absent is Rerun.
+    brand?: Brand
     // The getting-started checklist as it stands, read for an admin of a running workspace while the
     // list is still shown: what the Chief of Staff leads them through, one step at a time.
     gettingStarted?: GettingStartedProgress | null
 }
+
+export const brandOf = (state: Pick<ForemanState, 'brand'>): Brand => state.brand ?? RERUN_BRAND

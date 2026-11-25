@@ -167,6 +167,7 @@
         "trialEndedDeclined": "Sua vaga {provider} gratuita terminou e o cartão foi recusado, então {account, select, none {a conta} other {{account}}} está pausada. Adicione uma vaga em Faturamento em até uma semana para mantê-la, ou ela será desconectada.",
         "rateLimited": "{provider} pediu que {account, select, none {uma das suas contas} other {{account}}} diminuísse o ritmo. Seus coworkers não vão usá-la por 24 horas, para manter a conta segura.",
         "signedOut": "{provider} desconectou {account, select, none {uma das suas contas} other {{account}}}. Reconecte-a em Configurações → Apps para que seus coworkers possam usá-la de novo.",
-        "budgetExhausted": "Seus créditos {brand} deste mês acabaram. As execuções agendadas e acionadas nos modelos {brand} estão pausadas, e os coworkers não podem comprar leads nem dados de SEO ou redes sociais, até a renovação ou até você adicionar créditos."
+        "budgetExhausted": "Seus créditos {brand} deste mês acabaram. As execuções agendadas e acionadas nos modelos {brand} estão pausadas, e os coworkers não podem comprar leads nem dados de SEO ou redes sociais, até a renovação ou até você adicionar créditos.",
+        "managedCreditOut": "Este workspace ficou sem créditos. Fale com {manager} para obter mais: até lá, as execuções agendadas e acionadas ficam pausadas, e os coworkers não podem comprar leads, dados de SEO ou de redes sociais."
     }
 }

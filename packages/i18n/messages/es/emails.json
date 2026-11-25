@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {Tu sandbox de {brand} archivado se elimina el {date}} other {Tu workspace de {brand} en pausa se elimina el {date}}}",
         "sandboxIdle": "Tu sandbox de {brand} se archiva el {date} si no lo abres",
         "renewalReminder": "{daysLeft, plural, =1 {Tu plan de {brand} se renueva mañana} other {Tu plan de {brand} se renueva en # días}}",
-        "creatorPitch": "Vende los coworkers que creas en Rerun"
+        "creatorPitch": "Vende los coworkers que creas en Rerun",
+        "organizationCreditOut": "{workspaceName} se quedó sin créditos"
     },
     "reasons": {
         "mine": "Tú iniciaste esta ejecución.",
@@ -295,5 +296,13 @@
         "button": "Abrir el workspace",
         "footnoteCard": "Tu plan empieza solo el {date}: se cobran {price} a la tarjeta que añadiste, y después cada mes. ¿No piensas continuar? Cancela antes del {date} desde Facturación, en el menú de tu workspace, y no se cobrará nada.",
         "footnoteNoCard": "No necesitas tarjeta para la prueba. Para seguir después del {date}, añade una desde Facturación, en el menú de tu workspace, y tu plan empieza a {price}/mes. Sin ella, tus coworkers se detienen y no se cobra nada."
+    },
+    "organizationCreditOut": {
+        "preview": "Uno de tus workspaces se quedó sin créditos",
+        "heading": "Un workspace se quedó sin créditos",
+        "bodyNamed": "<strong>{workspaceName}</strong> ha usado los créditos que le diste. Sus ejecuciones programadas y activadas están en pausa hasta que añadas más.",
+        "bodyUnnamed": "Uno de tus workspaces ha usado los créditos que le diste. Sus ejecuciones programadas y activadas están en pausa hasta que añadas más.",
+        "members": "Sus miembros ven que no le quedan créditos y se les pide que te contacten.",
+        "button": "Añadir créditos"
     }
 }

@@ -458,6 +458,24 @@ describe('markSubscriptionPastDue', () => {
     })
 })
 
+describe('a workspace an organization runs, with a subscription left over', () => {
+    const row = { id: WORKSPACE_ID, plan: 'organization', organization_id: 'org-nordlys', stripe_subscription_id: 'sub_1', subscription_status: 'active', current_period_end: null, first_paid_at: null, max_agents: null, max_seats: null, rerun_budget_micros: 0 }
+
+    it.each([
+        ['a purchase', () => applySubscriptionToWorkspace(sub())],
+        ['a renewal', () => applySubscriptionToWorkspace(sub(), { adopt: false })],
+        ['its end', () => markSubscriptionCanceled(sub())],
+        ['a declined charge', () => markSubscriptionPastDue(sub(), { id: 'in_1', attempt_count: 1, amount_due: 2900, currency: 'usd' } as never)],
+    ])('is left as it is by %s', async (_event, play) => {
+        const db = useDb({ row })
+        await play()
+        expect(db.updates()).toEqual([])
+        expect(m.sendPaymentFailedNotice).not.toHaveBeenCalled()
+        expect(m.reportSubscriptionTransition).not.toHaveBeenCalled()
+        expect(m.reportSubscriptionCancelled).not.toHaveBeenCalled()
+    })
+})
+
 describe('stampFirstPlanPayment', () => {
     const paid = { id: 'in_1', amount_paid: 4900 } as Stripe.Invoice
 

@@ -3,7 +3,7 @@ import 'server-only'
 import { paidAppFlags } from '@rerun/cloud/apps.server'
 import type { SecretVaultTarget, VaultItemSummary } from '@rerun/contracts'
 
-import { AccessDeniedError, type Actor } from '@/app/api/_auth/access'
+import { AccessDeniedError, signerIdOf, type Actor } from '@/app/api/_auth/access'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_SLUGS, isAppSlug, type AppSlug } from '@/lib/apps/types'
 import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
@@ -56,7 +56,7 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
 
     const sameApp = (await listVaultItems(ctx.conn)).filter(item => item.slug === manifest.slug)
     const instance = sameApp.length > 0 ? nextServiceInstance(manifest, sameApp) : null
-    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    const createdBy = signerIdOf(ctx.actor)
     const values = input.values ?? {}
 
     let item: VaultItemSummary
@@ -158,7 +158,7 @@ async function addVaultSecrets(input: { name: string; env: Record<string, string
     await assertCanAdd(ctx.actor)
     if (input.sharedWithAll) requireAdmin(ctx.actor)
     const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
-    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    const createdBy = signerIdOf(ctx.actor)
     return rethrowConflict(ctx, () =>
         createVaultItem(ctx.conn, {
             kind: 'secret',
@@ -252,7 +252,7 @@ export async function addVaultMcp(input: AddVaultMcpInput, actor?: Actor): Promi
     const headers = toVariables(input.headers)
     const serverEnv = toVariables(input.env)
     const server = { name: serverName, ...(url ? { url, ...(input.transport ? { transport: input.transport } : {}) } : { command, args: input.args ?? [] }), headers, ...(Object.keys(serverEnv).length > 0 ? { env: serverEnv } : {}) }
-    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    const createdBy = signerIdOf(ctx.actor)
     return rethrowConflict(ctx, () =>
         createVaultItem(ctx.conn, {
             kind: 'mcp',

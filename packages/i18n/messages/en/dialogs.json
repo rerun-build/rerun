@@ -178,7 +178,8 @@
                 "title": "Remove access to {box}?",
                 "confirm": "Remove"
             }
-        }
+        },
+        "descriptionManaged": "Admins manage members and settings. Members use the coworkers."
     },
     "createWorkspace": {
         "nameRequired": "Name is required",

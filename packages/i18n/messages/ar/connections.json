@@ -102,7 +102,10 @@
                 "step2": "اشترك في **OpenCode Go**، أو أضف أرصدة لاستخدام نماذج Console.",
                 "step3": "أنشئ مفتاح API وانسخه (يبدأ بـ `oc_sk_`) والصقه أعلاه."
             }
-        }
+        },
+        "creditManagedUsed": "تم استخدام {percent}% من الأرصدة",
+        "creditManagedUsedUp": "نفدت الأرصدة",
+        "creditBackManaged": "بمجرد إضافة المزيد"
     },
     "noPlan": {
         "trialText": "ابدأ تجربتك المجانية لتوصيل اشتراك Claude أو ChatGPT أو مفتاح API خاص بك.",

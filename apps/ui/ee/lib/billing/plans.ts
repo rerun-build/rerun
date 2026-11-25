@@ -125,9 +125,22 @@ export function isClaudePlanOffered(workspace: { plan: string | null } | null | 
 }
 
 // LinkedIn Pro and WhatsApp Pro: sold as slots on the plan, and to the full lifetime plan on a
-// subscription of their own. An AppSumo workspace stays without them.
+// subscription of their own. An AppSumo workspace stays without them, and so does an organization's,
+// which has no subscription to bill them on.
 export function arePaidAppsOffered(workspace: { plan: string | null } | null | undefined): boolean {
-    return workspace?.plan !== LIFETIME_RESTRICTED_PLAN_SLUG
+    return workspace?.plan !== LIFETIME_RESTRICTED_PLAN_SLUG && !isOrganizationPlan(workspace)
+}
+
+// The workspaces of an organization, which pays Rerun for them itself: no Stripe subscription, and
+// their credit is what the organization hands out from its reserve.
+export const ORGANIZATION_PLAN_SLUG = 'organization'
+
+export function isOrganizationPlan(workspace: { plan: string | null } | null | undefined): boolean {
+    return workspace?.plan === ORGANIZATION_PLAN_SLUG
+}
+
+export function organizationLimitsToColumns(): WorkspaceLimitColumns {
+    return { ...baseLimitsToColumns(), rerun_budget_micros: 0 }
 }
 
 export type LifetimeTierId = 1 | 2 | 3

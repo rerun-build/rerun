@@ -1,10 +1,11 @@
-import { assertAgentAccess } from '@/app/api/_auth/access'
+import { assertAgentAccess, signedInUserId } from '@/app/api/_auth/access'
 import { assertCanAdd, readItem, vaultContext } from '@/app/api/_services/vault.service'
 import { beginVaultManaged } from '@/app/api/_services/vault-sign-in.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, type ManagedOAuthContext, buildManagedAuthorizeUrl, createPkceState, encodeManagedContext, managedCallbackUrl } from '@/lib/managed/oauth'
 import { setContextCookie } from '@/lib/oauth/context-cookie'
 import { getManagedProvider } from '@/lib/managed/registry'
+import { requestHostReturn, startOnRerunHost } from '@/lib/oauth/host-sign-in'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
 import { signInRefusal } from '@/lib/net/network-error'
 import { refusal } from '@/lib/i18n/action-error'
@@ -40,6 +41,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
 
         const clientId = process.env[provider.oauth.clientIdEnv]
         if (!clientId) return NextResponse.json(refusal('providerNotConfigured', { provider: provider.label }), { status: 400 })
+
+        const from = await requestHostReturn(req)
+        if (from) return startOnRerunHost(from, { agentId, workspaceId: actor.workspaceId, userId: signedInUserId(actor) }, { flow: 'managed', provider: providerId, key, serverName })
 
         const { verifier, challenge, state } = createPkceState()
         const ctx: ManagedOAuthContext = {

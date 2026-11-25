@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 
+import { ManagedPausedNotice } from '@/components/brand/ManagedPausedNotice'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { Button } from '@/components/ui/button'
 import { isClaudePlanOffered, isSubscriptionEntitled, trialOffer } from '@rerun/cloud/billing'
 import { startPlan } from '@rerun/cloud/billing.client'
@@ -24,8 +26,11 @@ export function useClaudePlanOffered(): boolean {
 export function NoPlanNotice({ className }: { className?: string }) {
     const t = useTranslations('connections.noPlan')
     const { workspace } = useSession()
+    const manager = useWorkspaceManager()
     const trialEligible = trialOffer(workspace) !== 'paid'
     const [pending, startTransition] = useTransition()
+
+    if (manager) return <ManagedPausedNotice manager={manager} className={className} />
 
     return (
         <div className={cn('flex flex-col gap-3 rounded-md border border-dashed px-3 py-4 sm:flex-row sm:items-center', className)}>

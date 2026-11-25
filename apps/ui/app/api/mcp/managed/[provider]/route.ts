@@ -1,4 +1,6 @@
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { brandTools } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { getTool, toolDefs } from '@/lib/managed/types'
 
@@ -59,7 +61,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
     }
 
     if (method === 'tools/list') {
-        return rpcResult(id, { tools: toolDefs(provider) })
+        return rpcResult(id, { tools: brandTools(toolDefs(provider), await workspaceBrand(engine.workspaceId)) })
     }
 
     if (method === 'tools/call') {

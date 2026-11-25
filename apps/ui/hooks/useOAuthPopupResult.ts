@@ -36,7 +36,11 @@ export function useOAuthPopupResult<T extends { type: string }>(channelName: str
             deliveredRef.current = true
             onResultRef.current(data)
         }
-        const handleMessage = (event: MessageEvent) => deliver(event.data)
+        // The callback page always comes back to the app's own origin before it speaks: any other window
+        // that holds this one could only fake a result.
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin === window.location.origin) deliver(event.data)
+        }
         window.addEventListener('message', handleMessage)
         let channel: BroadcastChannel | null = null
         try {

@@ -102,7 +102,10 @@
                 "step2": "**OpenCode Go** aboneliği alın ya da Console modellerini kullanmak için kredi ekleyin.",
                 "step3": "Bir API anahtarı oluşturun, kopyalayın (`oc_sk_` ile başlar) ve yukarıya yapıştırın."
             }
-        }
+        },
+        "creditManagedUsed": "Kredilerin %{percent} kadarı kullanıldı",
+        "creditManagedUsedUp": "Krediler tükendi",
+        "creditBackManaged": "yenileri eklendiğinde"
     },
     "noPlan": {
         "trialText": "Kendi Claude planınızı, ChatGPT planınızı veya API anahtarınızı bağlamak için ücretsiz denemenizi başlatın.",

@@ -63,7 +63,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => ({
     getAuthUser: async () => state.ctx?.authUser,
     getSessionWorkspace: async (): Promise<SessionWorkspace> => {
         const ctx = state.ctx as WorkspaceContext
-        return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope } }
+        return { supabase: ctx.supabase, user: contractSessionUser(ctx.userId, ctx.workspace.id), workspaceRefused: false, membership: { role: ctx.role, box_scope: ctx.boxScope, organization_staff: false } }
     },
 }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({

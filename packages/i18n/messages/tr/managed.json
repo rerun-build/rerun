@@ -1,0 +1,39 @@
+{
+    "contact": "{manager} ile iletişime geç",
+    "templateUnavailable": "Bu çalışma alanında kullanılamıyor",
+    "paused": {
+        "title": "Bu çalışma alanı duraklatıldı.",
+        "body": "Yeniden açmak için {manager} ile iletişime geçin.",
+        "reason": "Bu çalışma alanı duraklatıldı. {manager} ile iletişime geçin.",
+        "coworker": "{manager} ile iletişime geçin; {name} tam kaldığı yerden devam eder."
+    },
+    "restoring": {
+        "waiting": "Bu çalışma alanı sırada ilk.",
+        "failed": "Haberimiz var, elle geri getiriyoruz."
+    },
+    "credit": {
+        "title": "Krediler",
+        "providedBy": "{manager} tarafından sağlanır",
+        "outTitle": "Kredi kalmadı",
+        "out": "Daha fazlası için {manager} ile iletişime geçin.",
+        "outOwnPlan": "Daha fazlası için {manager} ile iletişime geçin ya da zaten bağlı olan {plan} planınızı kullanın.",
+        "outOwnAi": "Daha fazlası için {manager} ile iletişime geçin ya da coworker'larınızı kendi yapay zekânızla çalıştırın.",
+        "usedUp": "Krediler tükendi. {manager} ile iletişime geçin.",
+        "usage": "Kredilerin %{percent} kadarı kullanıldı",
+        "detailUsedUp": "Bu kredilerle çalışan coworker'lar duraklatıldı. Daha fazlası için {manager} ile iletişime geçin ya da devam etmeleri için başka bir varsayılan model seçin.",
+        "detailIncluded": "{manager} tarafından sağlanır. Anahtar yok, kurulacak bir şey yok.",
+        "defaultPick": "Krediler tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. {manager} ile iletişime geçin ya da devam etmeleri için başka bir model seçin.",
+        "defaultAdd": "Krediler tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. {manager} ile iletişime geçin ya da devam etmeleri için bir plan veya API anahtarı ekleyin."
+    },
+    "host": {
+        "noAccess": {
+            "title": "Erişiminiz yok",
+            "body": "{email} adresinin burada çalışma alanı yok. {brand} ekibinden davet isteyin.",
+            "bodyUnnamed": "Bu hesabın burada çalışma alanı yok. {brand} ekibinden davet isteyin."
+        },
+        "unavailable": {
+            "title": "{brand} kullanılamıyor",
+            "body": "Lütfen daha sonra tekrar gelin."
+        }
+    }
+}

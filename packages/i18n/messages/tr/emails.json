@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {Arşivlenen {brand} sandbox'ınız {date} tarihinde silinecek} other {Duraklatılan {brand} çalışma alanınız {date} tarihinde silinecek}}",
         "sandboxIdle": "{brand} sandbox'ınızı açmazsanız {date} tarihinde arşivlenecek",
         "renewalReminder": "{daysLeft, plural, =1 {{brand} planınız yarın yenileniyor} other {{brand} planınız # gün içinde yenileniyor}}",
-        "creatorPitch": "Rerun'da oluşturduğunuz coworker'ları satın"
+        "creatorPitch": "Rerun'da oluşturduğunuz coworker'ları satın",
+        "organizationCreditOut": "{workspaceName} çalışma alanının kredisi kalmadı"
     },
     "reasons": {
         "mine": "Bu çalıştırmayı siz başlattınız.",
@@ -295,5 +296,13 @@
         "button": "Çalışma alanını aç",
         "footnoteCard": "Planınız {date} tarihinde kendiliğinden başlar: eklediğiniz karttan {price} tahsil edilir, ardından her ay. Devam etmeyi düşünmüyor musunuz? {date} tarihinden önce çalışma alanı menünüzdeki Faturalandırma bölümünden iptal edin, hiçbir ücret alınmaz.",
         "footnoteNoCard": "Deneme için kart gerekmez. {date} sonrasında devam etmek için çalışma alanı menünüzdeki Faturalandırma bölümünden bir kart ekleyin, planınız ayda {price} ile başlar. Kart olmadan coworker'larınız durur ve hiçbir ücret alınmaz."
+    },
+    "organizationCreditOut": {
+        "preview": "Çalışma alanlarınızdan birinin kredisi kalmadı",
+        "heading": "Bir çalışma alanının kredisi kalmadı",
+        "bodyNamed": "<strong>{workspaceName}</strong> verdiğiniz kredileri kullandı. Zamanlanmış ve tetiklenmiş çalıştırmaları, siz yenilerini ekleyene kadar duraklatıldı.",
+        "bodyUnnamed": "Çalışma alanlarınızdan biri verdiğiniz kredileri kullandı. Zamanlanmış ve tetiklenmiş çalıştırmaları, siz yenilerini ekleyene kadar duraklatıldı.",
+        "members": "Üyeler kredinin kalmadığını görür ve sizinle iletişime geçmeleri istenir.",
+        "button": "Kredi ekle"
     }
 }

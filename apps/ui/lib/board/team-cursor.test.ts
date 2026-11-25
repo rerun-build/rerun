@@ -21,6 +21,10 @@ describe('cursorFromPayload', () => {
         expect(cursorFromPayload({ userId: 42, x: 1, y: 1 }, memberOf)).toBeNull()
     })
 
+    it('never draws the organization that runs the workspace, which is on the list to sign its messages', () => {
+        expect(cursorFromPayload({ userId: 'organization', x: 1, y: 1 }, id => ({ id, name: 'Nordlys' }))).toBeNull()
+    })
+
     it('ignores a position that is not a pair of finite numbers', () => {
         expect(cursorFromPayload({ userId: 'alice', x: Number.NaN, y: 1 }, memberOf)).toBeNull()
         expect(cursorFromPayload({ userId: 'alice', x: 1, y: Number.POSITIVE_INFINITY }, memberOf)).toBeNull()

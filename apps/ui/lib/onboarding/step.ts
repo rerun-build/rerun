@@ -32,7 +32,8 @@ export type NeedsOnboardingInput = {
     isSandbox: boolean
     archived: boolean
     agentCount: number
-    // Paying for a plan rather than trying it: a running workspace is never walked through a sign-up.
+    // Paying for a plan rather than trying it, or run by an organization: a running workspace is never
+    // walked through a sign-up.
     paying: boolean
     // Answered the welcome card of the onboarding chat before this page existed: it finishes there.
     inHubFunnel: boolean

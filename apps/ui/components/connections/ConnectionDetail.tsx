@@ -14,6 +14,8 @@ import { PlanLimitsBlock } from '@/components/connections/PlanLimitsBlock'
 import { DetailHeader } from '@/components/connections/SourceBits'
 import { Button } from '@/components/ui/button'
 import { CreditsUsageBar } from '@rerun/cloud/billing.client'
+import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
 import { connectMethod, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
@@ -133,6 +135,9 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
     const [value, setValue] = useState('')
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const tManaged = useTranslations('managed.credit')
+    const brand = useBrand()
+    const manager = credit.managed ? { name: brand.name, supportEmail: brand.supportEmail } : null
     const openBilling = useBillingStore(s => s.openBilling)
     const kind = sourceKind(connection.provider)
 
@@ -140,19 +145,23 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
         const usedUp = isCreditUsedUp(credit)
         return (
             <DetailBlock
-                title={t('detail.creditsTitle')}
+                title={manager ? tManaged('title') : t('detail.creditsTitle')}
                 aside={
-                    <Button size="xs" variant={usedUp ? 'default' : 'outline'} onClick={() => openBilling('credit_pack', 'ai_providers')}>
-                        <CoinsIcon />
-                        {t('detail.topUp')}
-                    </Button>
+                    manager ? (
+                        usedUp && <ContactManagerButton manager={manager} size="xs" />
+                    ) : (
+                        <Button size="xs" variant={usedUp ? 'default' : 'outline'} onClick={() => openBilling('credit_pack', 'ai_providers')}>
+                            <CoinsIcon />
+                            {t('detail.topUp')}
+                        </Button>
+                    )
                 }
             >
                 <div className={cn('rounded-md border bg-muted/20 p-3', usedUp && 'border-red-500/30 bg-red-500/5')}>
                     <CreditsUsageBar className="mt-0" usedMicros={credit.usedMicros} budgetMicros={credit.budgetMicros} resetAt={credit.resetAt} />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                    {usedUp ? (credit.resetAt ? t('detail.creditsUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('detail.creditsUsedUpNextMonth')) : t('detail.creditsIncluded')}
+                    {manager ? tManaged(usedUp ? 'detailUsedUp' : 'detailIncluded', { manager: manager.name }) : usedUp ? (credit.resetAt ? t('detail.creditsUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('detail.creditsUsedUpNextMonth')) : t('detail.creditsIncluded')}
                 </p>
             </DetailBlock>
         )

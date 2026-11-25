@@ -1,12 +1,14 @@
 'use server'
 
+import { brandSignature } from '@/app/api/_auth/signature'
 import { accountLabel } from '@/lib/auth/placeholder-email'
 import { actorFromContext, keepVisible, manageableSpaceIds } from '@/app/api/_auth/access'
 import { requireAdminContext, requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
-import { getAppOrigin } from '@/lib/app-origin'
+import { appOriginOf } from '@/lib/app-origin'
 import { getBrand } from '@/lib/brand/server'
 import { isApiLocked, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { apiKeyPrefix, generateApiKey, hashApiKey } from '@/lib/mcp/api-keys'
 import { mcpAccountUrl } from '@/lib/mcp/connect'
 import { IMPORT_KEY_TTL_MS } from '@/lib/mcp/import-scope'
@@ -71,7 +73,7 @@ export async function listApiKeysAction(): Promise<ActionResult<{ keys: ApiKeyVi
 
         // Resolved on the server: in dev each Conductor workspace runs on its own port, so a
         // constant would hand out a command pointing at another app, or at nothing.
-        return { ok: true, keys, mcpUrl: mcpAccountUrl(await getAppOrigin()), entitled: isWorkspaceApiEntitled(ctx.workspace) }
+        return { ok: true, keys, mcpUrl: mcpAccountUrl(await appOriginOf(ctx.workspace.id)), entitled: isWorkspaceApiEntitled(ctx.workspace) }
     } catch (err) {
         return failureOf(err, 'loadApiKeysFailed')
     }
@@ -83,7 +85,7 @@ export async function createApiKeyAction(rawName: string): Promise<ActionResult<
         const ctx = await requireAdminContext(API_KEYS_ADMIN_ONLY)
         if (isApiLocked(ctx.workspace)) return failure('apiNotIncluded')
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
-            return failure('apiNeedsSubscription')
+            return failure(isManagedWorkspace(ctx.workspace) ? 'managedWorkspacePaused' : 'apiNeedsSubscription')
         }
 
         const name = rawName.trim()
@@ -101,7 +103,7 @@ export async function createApiKeyAction(rawName: string): Promise<ActionResult<
             name,
             key_prefix: apiKeyPrefix(key),
             key_hash: hashApiKey(key),
-            created_by: accountLabel(ctx.authUser.email),
+            created_by: (await brandSignature(ctx))?.name ?? accountLabel(ctx.authUser.email),
             created_by_user_id: ctx.userId,
         })
         if (error) return { ok: false, error: error.message }
@@ -120,7 +122,7 @@ export async function createImportKeyAction(sourceId: ImportSourceId, requestedS
         const ctx = await requireWorkspaceContext()
         if (isApiLocked(ctx.workspace)) return failure('importNotIncluded')
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
-            return failure('importNeedsSubscription')
+            return failure(isManagedWorkspace(ctx.workspace) ? 'managedWorkspacePaused' : 'importNeedsSubscription')
         }
 
         const spaceId = await importDestination(ctx, requestedSpaceId)
@@ -131,14 +133,14 @@ export async function createImportKeyAction(sourceId: ImportSourceId, requestedS
             name: `Import · ${importSource(sourceId).label}`,
             key_prefix: apiKeyPrefix(key),
             key_hash: hashApiKey(key),
-            created_by: accountLabel(ctx.authUser.email),
+            created_by: (await brandSignature(ctx))?.name ?? accountLabel(ctx.authUser.email),
             created_by_user_id: ctx.userId,
             scope: 'agent_import',
             expires_at: expiresAt,
         })
         if (error) return { ok: false, error: error.message }
 
-        const connectorUrl = `${mcpAccountUrl(await getAppOrigin())}/${key}`
+        const connectorUrl = `${mcpAccountUrl(await appOriginOf(ctx.workspace.id))}/${key}`
         return { ok: true, connectorUrl, prompt: buildImportPrompt(sourceId, connectorUrl, spaceId, (await getBrand()).name), expiresAt }
     } catch (err) {
         return failureOf(err, 'prepareImportFailed')

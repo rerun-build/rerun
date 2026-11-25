@@ -4,6 +4,7 @@ import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionSour
 import type { UIMessage } from 'ai'
 
 import { workspaceFounderUserId, type WorkspaceContext } from '@/app/api/_auth/ownership'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import { FIRST_MESSAGE_MAX_CHARS, GENERAL_SESSION_TITLE, GeneralAlreadyOpenError, lastRunError, listSessionRuns, readUsageSeed, type GeneralSession, type SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'
@@ -298,7 +299,7 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
 // follows it.
 async function routineReaderOf(workspaceId: number): Promise<string | null> {
     const supabase = createServiceRoleClient()
-    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' })
+    const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
     const idsByAge = (members ?? []).map(member => member.user_id)
     const { data: users } = idsByAge.length ? await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: idsByAge }) : { data: [] }
     const followers = new Set((users ?? []).filter(user => coworkerRuleOf(normalizeNotificationPrefs(user.email_notification_prefs), FOREMAN_AGENT_ID).follow === true).map(user => user.id))

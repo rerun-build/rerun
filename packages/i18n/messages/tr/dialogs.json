@@ -92,7 +92,8 @@
                 "title": "{box} erişimi kaldırılsın mı?",
                 "confirm": "Kaldır"
             }
-        }
+        },
+        "descriptionManaged": "Yöneticiler üyeleri ve ayarları yönetir. Üyeler coworker'ları kullanır."
     },
     "createWorkspace": {
         "nameRequired": "Ad gerekli",

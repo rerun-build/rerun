@@ -4,13 +4,13 @@ const mocks = vi.hoisted(() => ({
     getServerSession: vi.fn(),
     selectSingle: vi.fn(),
     selectMaybeSingle: vi.fn(),
-    selectMany: vi.fn(),
+    selectAll: vi.fn(),
     client: {},
 }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => mocks.client }))
-vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: mocks.selectSingle, selectMaybeSingle: mocks.selectMaybeSingle, selectMany: mocks.selectMany }))
+vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: mocks.selectSingle, selectMaybeSingle: mocks.selectMaybeSingle, selectAll: mocks.selectAll }))
 
 const {
     AuthorizationError,
@@ -38,7 +38,7 @@ beforeEach(() => {
     mocks.getServerSession.mockReset().mockResolvedValue(sessionIn(1))
     mocks.selectSingle.mockReset()
     mocks.selectMaybeSingle.mockReset()
-    mocks.selectMany.mockReset()
+    mocks.selectAll.mockReset()
 })
 
 describe('requireWorkspaceId', () => {
@@ -131,26 +131,26 @@ describe('requireAdminContext', () => {
 
 describe('workspaceFounderUserId', () => {
     it('answers the earliest admin, ordered by created_at', async () => {
-        mocks.selectMany.mockResolvedValue({ data: [{ user_id: 'first', role: 'member' }, { user_id: 'second', role: 'admin' }, { user_id: 'third', role: 'admin' }], error: null })
+        mocks.selectAll.mockResolvedValue({ data: [{ user_id: 'first', role: 'member' }, { user_id: 'second', role: 'admin' }, { user_id: 'third', role: 'admin' }], error: null })
         await expect(workspaceFounderUserId(1)).resolves.toBe('second')
     })
 
     it('falls back on the earliest member when no admin is left', async () => {
-        mocks.selectMany.mockResolvedValue({ data: [{ user_id: 'first', role: 'member' }, { user_id: 'second', role: 'member' }], error: null })
+        mocks.selectAll.mockResolvedValue({ data: [{ user_id: 'first', role: 'member' }, { user_id: 'second', role: 'member' }], error: null })
         await expect(workspaceFounderUserId(1)).resolves.toBe('first')
-        const [, table, , filters, orderBy] = mocks.selectMany.mock.calls[0]
+        const [, table, , filters, orderBy] = mocks.selectAll.mock.calls[0]
         expect(table).toBe('workspace_members')
-        expect(filters).toEqual({ workspace_id: 1 })
-        expect(orderBy).toEqual({ column: 'created_at' })
+        expect(filters).toEqual({ workspace_id: 1, organization_staff: false })
+        expect(orderBy).toEqual({ column: 'created_at', ascending: true })
     })
 
     it('answers null when the workspace has no member', async () => {
-        mocks.selectMany.mockResolvedValue({ data: [], error: null })
+        mocks.selectAll.mockResolvedValue({ data: [], error: null })
         await expect(workspaceFounderUserId(1)).resolves.toBeNull()
     })
 
     it('answers null when the read fails', async () => {
-        mocks.selectMany.mockResolvedValue({ data: null, error: { message: 'boom' } })
+        mocks.selectAll.mockResolvedValue({ data: null, error: { message: 'boom' } })
         await expect(workspaceFounderUserId(1)).resolves.toBeNull()
     })
 })

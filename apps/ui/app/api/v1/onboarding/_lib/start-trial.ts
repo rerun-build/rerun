@@ -5,6 +5,7 @@ import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { ENGINE_WAITLIST_MESSAGE, startCardlessTrial } from '@/ee/services/billing.service'
 import { mergeForeman } from '@/lib/foreman/profile'
 import { PHONE_REQUIRED_MESSAGE } from '@/lib/phone/verification'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { BILLING_ENABLED } from '@rerun/cloud/billing'
 import type { ForemanTrialResult } from '@rerun/contracts'
 
@@ -16,6 +17,8 @@ export async function startAppTrial({ req, ctx }: { req: Request; ctx: Workspace
     if (!BILLING_ENABLED) return { entitled: true }
     const platform = appPlatformOf(req)
     const alreadyOn = isSubscriptionEntitled(ctx.workspace.subscription_status)
+    // Its organization decides whether it is on: there is no trial to start.
+    if (isManagedWorkspace(ctx.workspace)) return { entitled: alreadyOn }
     let entitled: boolean
     try {
         entitled = await startCardlessTrial(platform)

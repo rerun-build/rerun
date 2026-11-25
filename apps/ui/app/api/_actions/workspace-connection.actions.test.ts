@@ -17,7 +17,7 @@ vi.mock('@rerun/cloud/billing', async importOriginal => ({
 vi.mock('@/app/api/_auth/ownership', () => ({ requireAdminContext: vi.fn(), requireWorkspaceId: vi.fn() }))
 vi.mock('@/app/api/_services/capacity.service', () => ({
     NoPlanError: class NoPlanError extends Error {
-        constructor() {
+        constructor(readonly code = 'noActivePlan') {
             super('This workspace has no active plan.')
         }
     },
@@ -99,6 +99,12 @@ describe('createAiConnectionAction', () => {
         vi.mocked(findWorkspaceEngine).mockResolvedValue(null)
         vi.mocked(ensureWorkspaceEngine).mockRejectedValue(new NoPlanError())
         await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Start your free trial to connect your own Claude plan or API key.', code: 'trialToConnectClaude', reason: 'no_plan' })
+        expect(engine.createConnection).not.toHaveBeenCalled()
+    })
+
+    it('tells a workspace an organization put away that it is paused, with no trial to start', async () => {
+        vi.mocked(ensureWorkspaceEngine).mockRejectedValue(new NoPlanError('managedWorkspacePaused'))
+        await expect(createAiConnectionAction(params)).resolves.toMatchObject({ success: false, code: 'managedWorkspacePaused', reason: 'no_plan' })
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 

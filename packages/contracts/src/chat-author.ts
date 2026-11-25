@@ -5,6 +5,15 @@ export type AuthorProfile = { id: string; name: string; photo?: string }
 
 export const FORMER_MEMBER: AuthorProfile = { id: 'gone', name: 'Former member' }
 
+// What the team of the organization that runs a workspace signs with, whoever of them wrote: their
+// own ids never leave the hub, so no transcript, coworker or client can tell one person from another.
+export const ORGANIZATION_AUTHOR_ID = 'organization'
+
+/** How a bubble names its author: a person by their first name, a brand by the whole of it. */
+export function authorShortName(author: AuthorProfile): string {
+    return author.id === FORMER_MEMBER.id || author.id === ORGANIZATION_AUTHOR_ID ? author.name : author.name.split(' ')[0]
+}
+
 type PartLike = { type: string; text?: string }
 type AuthoredMessageLike = { id: string; role: string; parts: readonly PartLike[]; metadata?: unknown }
 

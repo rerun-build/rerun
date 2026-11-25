@@ -11,6 +11,7 @@ import { installAgentShare, type AgentShareInstallOutcome } from '@/lib/agents/s
 import { listWorkspaceShares, readAgentShare, revokeAgentShare, type WorkspaceShare } from '@/lib/agents/share-read'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
 // Unlike a template capture, none of this is gated on the sandbox: a share is a transfer to one
@@ -97,9 +98,9 @@ export async function installSharedAgentAction(input: unknown): Promise<InstallS
         const supabase = createServiceRoleClient()
 
         if ((await getAdminEmail()) === null) {
-            const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status'] as const, { id: workspace_id })
+            const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'organization_id'] as const, { id: workspace_id })
             const status = workspace?.subscription_status
-            if (status !== 'active' && status !== 'trialing') throw new AppError('noActivePlan')
+            if (status !== 'active' && status !== 'trialing') throw new AppError(isManagedWorkspace(workspace) ? 'managedWorkspacePaused' : 'noActivePlan')
         }
 
         return { ok: true, ...(await installAgentShare(supabase, token, { workspaceId: workspace_id, spaceId, actor, position })) }

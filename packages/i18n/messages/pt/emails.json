@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {Sua sandbox arquivada do {brand} será excluída em {date}} other {Seu workspace pausado do {brand} será excluído em {date}}}",
         "sandboxIdle": "Sua sandbox do {brand} será arquivada em {date} se você não abri-la",
         "renewalReminder": "{daysLeft, plural, =1 {Seu plano {brand} renova amanhã} one {Seu plano {brand} renova em # dia} other {Seu plano {brand} renova em # dias}}",
-        "creatorPitch": "Venda os coworkers que você cria no Rerun"
+        "creatorPitch": "Venda os coworkers que você cria no Rerun",
+        "organizationCreditOut": "{workspaceName} ficou sem créditos"
     },
     "reasons": {
         "mine": "Você iniciou esta execução.",
@@ -295,5 +296,13 @@
         "button": "Abrir o workspace",
         "footnoteCard": "Seu plano começa sozinho em {date}: {price} é cobrado no cartão que você adicionou, e depois todo mês. Não pretende continuar? Cancele antes de {date} em Cobrança, no menu do seu workspace, e nada é cobrado.",
         "footnoteNoCard": "Não precisa de cartão para o teste. Para continuar depois de {date}, adicione um em Cobrança, no menu do seu workspace, e seu plano começa por {price}/mês. Sem ele, seus coworkers param e nada é cobrado."
+    },
+    "organizationCreditOut": {
+        "preview": "Um dos seus workspaces ficou sem créditos",
+        "heading": "Um workspace ficou sem créditos",
+        "bodyNamed": "<strong>{workspaceName}</strong> usou os créditos que você deu. As execuções agendadas e acionadas ficam pausadas até você adicionar mais.",
+        "bodyUnnamed": "Um dos seus workspaces usou os créditos que você deu. As execuções agendadas e acionadas ficam pausadas até você adicionar mais.",
+        "members": "Os membros veem que ele está sem créditos e são orientados a falar com você.",
+        "button": "Adicionar créditos"
     }
 }

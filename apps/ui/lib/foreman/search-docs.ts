@@ -1,4 +1,8 @@
+import { isSharedDocsPage, rewriteDocs } from '@/lib/brand/docs'
+import { brandDocsUrl } from '@/lib/brand/links'
+import { brandContact } from '@/lib/brand/text'
 import { docsUrl } from '@/lib/site'
+import { isWhiteLabel, RERUN_BRAND, type Brand } from '@rerun/contracts'
 
 // The public documentation, read live from the Mintlify export rather than from apps/docs. The docs
 // ship on their own branch and are served from another host, so reading them over the wire is what
@@ -12,9 +16,9 @@ const PASSAGE_CHARS = 1600
 export type DocsSection = { page: string; heading: string | null; url: string; body: string }
 
 export type DocsSearchResult = {
-    documentation: string
-    passages: { title: string; url: string; text: string }[]
-    pages?: { title: string; url: string }[]
+    documentation?: string
+    passages: { title: string; url?: string; text: string }[]
+    pages?: { title: string; url?: string }[]
     note?: string
 }
 
@@ -135,7 +139,11 @@ function sectionTitle(section: DocsSection): string {
  * Answers a question about Rerun itself out of the public documentation. Never throws: a
  * documentation the app cannot reach right now still has a home page worth handing to the user.
  */
-export async function searchDocs(query: string): Promise<DocsSearchResult> {
+export async function searchDocs(query: string, brand: Brand = RERUN_BRAND): Promise<DocsSearchResult> {
+    return isWhiteLabel(brand) ? searchBrandedDocs(query, brand) : searchRerunDocs(query)
+}
+
+async function searchRerunDocs(query: string): Promise<DocsSearchResult> {
     const documentation = docsUrl()
 
     let sections: DocsSection[]
@@ -155,4 +163,40 @@ export async function searchDocs(query: string): Promise<DocsSearchResult> {
         documentation,
         passages: hits.map(section => ({ title: sectionTitle(section), url: section.url, text: section.body.slice(0, PASSAGE_CHARS) })),
     }
+}
+
+// The same documentation as the clients of an organization read it. Its own pages hold other words, so
+// a passage carries no link: only the organization's documentation, when it has one.
+async function searchBrandedDocs(query: string, brand: Brand): Promise<DocsSearchResult> {
+    const own = brandDocsUrl(brand)
+    const documentation = own ? { documentation: own } : {}
+    const help = `Prices, plans and bills are not in here: never state one, send the user to ${brandContact(brand)} for those and for anything left unanswered.`
+
+    let sections: DocsSection[]
+    try {
+        sections = brandedSections(await loadSections(), brand)
+    } catch {
+        return { ...documentation, passages: [], note: `The documentation could not be read. Say so rather than answering from memory. ${help}` }
+    }
+
+    const hits = rankDocsSections(sections, withoutName(query, brand.name))
+    if (!hits.length) {
+        const pages = [...new Set(sections.map(section => section.page))].map(title => ({ title }))
+        return { ...documentation, passages: [], pages, note: `Nothing in the documentation matched those words. Try another wording against the pages listed here, and never invent an answer. ${help}` }
+    }
+    return { ...documentation, passages: hits.map(section => ({ title: sectionTitle(section), text: section.body.slice(0, PASSAGE_CHARS) })), note: help }
+}
+
+function brandedSections(sections: DocsSection[], brand: Brand): DocsSection[] {
+    return sections
+        .filter(section => isSharedDocsPage(section.url))
+        .map(section => ({ ...section, page: rewriteDocs(section.page, brand), heading: section.heading === null ? null : rewriteDocs(section.heading, brand), body: rewriteDocs(section.body, brand) }))
+        .filter(section => section.page && section.heading !== '' && section.body.split('\n').some(line => line.trim() && !/^#+ /.test(line)))
+}
+
+// The name of the brand is in every page: searched for, it would rank them all the same.
+function withoutName(query: string, name: string): string {
+    const words = new Set(name.toLowerCase().match(/[a-z0-9]+/g) ?? [])
+    const kept = query.split(/\s+/).filter(word => !words.has(word.toLowerCase().replace(/[^a-z0-9]/g, '')))
+    return kept.length ? kept.join(' ') : query
 }

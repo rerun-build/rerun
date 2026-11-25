@@ -5,7 +5,8 @@ import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type ExchangedToken, type OAuth
 import type { McpTokenBundle } from '@/lib/engine/client'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
-import { parkSignIn } from '@/lib/oauth/pending-grant'
+import { returnToHost, type HostReturn } from '@/lib/oauth/host-sign-in'
+import { parkForHost, parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, requireLightSessionActor, workspaceActor } from '@/app/api/_auth/access'
 import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
 import { putVaultToken } from '@/lib/engine/vault-client'
@@ -40,6 +41,14 @@ function tokenBundle(ctx: OAuthContext, token: ExchangedToken): McpTokenBundle {
     }
 }
 
+function hostReturnOf(raw: string): HostReturn | undefined {
+    try {
+        return decodeContext(raw).host
+    } catch {
+        return undefined
+    }
+}
+
 // OAuth redirect target on our own domain. Exchanges the code for tokens, writes the bundle
 // to the engine token store (never Supabase), then messages the opener popup and closes. For the
 // app, which has no session here, the bundle is parked instead, for the app to claim with its bearer.
@@ -55,9 +64,15 @@ export async function GET(req: Request) {
     // The desktop app's channel, when it started the sign-in: where the browser goes back to.
     let desktop: DesktopShellChannel | undefined
     let serverName: string | undefined
+    const raw = state ? (await cookies()).get(OAUTH_COOKIE_PREFIX + state)?.value : undefined
+    const host = raw ? hostReturnOf(raw) : undefined
 
     const finish = async (result: CallbackResult): Promise<NextResponse> => {
-        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : await htmlResult(result, serverName)
+        const res = host
+            ? await returnToHost(host, result.ok ? { ok: true, claim: result.claim ?? '' } : result).catch(() => htmlResult({ ok: false, ...refusal('oauthSessionExpired') }, serverName))
+            : mobile
+              ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } })
+              : await htmlResult(result, serverName)
         if (state) res.cookies.delete({ name: OAUTH_COOKIE_PREFIX + state, path: OAUTH_COOKIE_PATH })
         return res
     }
@@ -65,14 +80,16 @@ export async function GET(req: Request) {
     if (providerError) return finish({ ok: false, error: providerError })
     if (!code || !state) return finish({ ok: false, ...refusal('missingCodeOrState') })
 
-    const raw = (await cookies()).get(OAUTH_COOKIE_PREFIX + state)?.value
-
     if (!raw) return finish({ ok: false, ...refusal('oauthSessionExpired') })
 
     try {
         const ctx = decodeContext(raw)
         mobile = ctx.mobileGrant !== undefined
         serverName = ctx.serverName
+        if (host) {
+            const token = tokenBundle(ctx, await exchangeCode(ctx, code))
+            return finish({ ok: true, claim: await parkForHost(host, { kind: 'mcp', serverName: ctx.serverName, mcpUrl: ctx.mcpUrl, token }) })
+        }
         if (ctx.vault) {
             // From the desktop app, the sign-in ends in the system browser, which has no session: the
             // token waits under the grant for the app to claim it with its own.

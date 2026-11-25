@@ -1,0 +1,336 @@
+{
+    "nav": {
+        "label": "Organisation",
+        "workspaces": "Workspaces",
+        "credit": "Guthaben",
+        "team": "Team",
+        "brand": "Marke",
+        "domains": "Domains",
+        "back": "Zurück zur App"
+    },
+    "suspended": {
+        "title": "Diese Organisation ist gesperrt",
+        "description": "Ihre Workspaces sind gestoppt und nichts lässt sich ändern."
+    },
+    "blocked": {
+        "suspended": "Diese Organisation ist gesperrt",
+        "ownerOnly": "Das können nur Inhaber"
+    },
+    "roles": {
+        "owner": "Inhaber",
+        "admin": "Admin",
+        "member": "Mitglied"
+    },
+    "status": {
+        "active": "Aktiv",
+        "archived": "Archiviert",
+        "archiving": "Wird archiviert",
+        "restoring": "Wird wiederhergestellt",
+        "provisioning": "Wird eingerichtet",
+        "outOfCredit": "Kein Guthaben",
+        "suspended": "Gesperrt"
+    },
+    "workspaces": {
+        "title": "Workspaces",
+        "count": "{count} von {max}",
+        "new": "Neuer Workspace",
+        "limitReached": "{max, plural, one {Deine Organisation ist auf # Workspace begrenzt} other {Deine Organisation ist auf # Workspaces begrenzt}}",
+        "search": "Workspaces suchen",
+        "noMatch": "Kein Workspace passt zu „{query}“",
+        "summary": "{members, plural, one {# Mitglied} other {# Mitglieder}} · {coworkers, plural, one {# Coworker} other {# Coworker}} · {credits, plural, one {# Credit} other {# Credits}}",
+        "columns": {
+            "name": "Name",
+            "members": "Mitglieder",
+            "coworkers": "Coworker",
+            "credit": "Guthaben",
+            "lastActivity": "Aktivität"
+        },
+        "noActivity": "Noch keine",
+        "empty": {
+            "title": "Noch kein Workspace",
+            "description": "Lege pro Kunde einen an und lade den ersten Admin ein."
+        },
+        "unnamed": "Unbenannter Workspace"
+    },
+    "create": {
+        "title": "Neuer Workspace",
+        "description": "Der erste Admin bekommt eine Einladung per E-Mail.",
+        "logo": "Logo hochladen",
+        "name": "Name",
+        "namePlaceholder": "Acme",
+        "nameTooLong": "Höchstens {max} Zeichen",
+        "email": "E-Mail des ersten Admins",
+        "emailPlaceholder": "du@firma.de",
+        "emailInvalid": "Gib eine gültige E-Mail-Adresse ein",
+        "logoTooLarge": "Dieses Bild ist größer als 8 MB",
+        "submit": "Anlegen",
+        "done": {
+            "title": "{name} ist bereit",
+            "description": "Wir haben {email} eingeladen.",
+            "linkHint": "Schick diesen Link an {email}.",
+            "copyLink": "Einladungslink kopieren",
+            "close": "Fertig",
+            "open": "Workspace ansehen"
+        }
+    },
+    "detail": {
+        "back": "Workspaces",
+        "open": "Workspace öffnen",
+        "notReady": "Dieser Workspace ist noch nicht bereit",
+        "archived": "Stelle diesen Workspace zuerst wieder her",
+        "members": "Mitglieder",
+        "credit": "Guthaben",
+        "usage": "Verbrauch",
+        "machine": "Maschine",
+        "danger": "Verwalten"
+    },
+    "people": {
+        "you": "(du)",
+        "unknown": "Unbekannter Nutzer",
+        "invite": "Einladen",
+        "role": "Rolle von {name}",
+        "remove": "{name} entfernen",
+        "pending": "Eingeladen",
+        "revoke": "Einladung von {email} zurückziehen",
+        "lastAdmin": "Ein Workspace behält mindestens einen Admin",
+        "lastOwner": "Eine Organisation behält mindestens einen Inhaber",
+        "self": "Ein anderer Inhaber kann deine Rolle ändern",
+        "empty": "Noch niemand ist beigetreten",
+        "removeConfirm": {
+            "title": "{name} entfernen?",
+            "workspace": "Die Person verliert den Zugang zu diesem Workspace.",
+            "team": "Die Person verliert den Zugang zu dieser Konsole und zu allen Workspaces.",
+            "confirm": "Entfernen"
+        },
+        "revokeConfirm": {
+            "title": "Einladung zurückziehen?",
+            "description": "Der Link an {email} funktioniert dann nicht mehr.",
+            "confirm": "Zurückziehen",
+            "keep": "Behalten"
+        }
+    },
+    "invite": {
+        "workspaceTitle": "Zu {name} einladen",
+        "teamTitle": "Ins Team einladen",
+        "description": "Die Person bekommt eine Einladung per E-Mail.",
+        "email": "E-Mail",
+        "emailPlaceholder": "du@firma.de",
+        "role": "Rolle",
+        "submit": "Einladung senden",
+        "linkHint": "Schick diesen Link an {email}.",
+        "copyLink": "Einladungslink kopieren",
+        "done": "Fertig",
+        "roles": {
+            "owner": "Alles, auch Team, Marke und Domains",
+            "admin": "Workspaces, Mitglieder und Guthaben",
+            "workspaceAdmin": "Verwaltet den Workspace und seine Mitglieder",
+            "workspaceMember": "Arbeitet mit den Coworkern"
+        }
+    },
+    "usage": {
+        "empty": "Noch nichts verbraucht"
+    },
+    "machine": {
+        "states": {
+            "running": "Läuft",
+            "stopped": "Gestoppt",
+            "error": "Fehler",
+            "archiving": "Wird archiviert",
+            "archived": "Archiviert",
+            "restoring": "Wird wiederhergestellt",
+            "none": "Keine Maschine"
+        },
+        "disk": "Speicher",
+        "diskUsed": "{used} von {total}",
+        "diskUnknown": "Noch nicht gemessen",
+        "notStarted": "Startet mit dem ersten Coworker",
+        "restart": "Neu starten",
+        "restartConfirm": {
+            "title": "Maschine neu starten?",
+            "description": "Die Coworker unterbrechen ihre Arbeit für etwa eine Minute.",
+            "confirm": "Neu starten"
+        },
+        "restarting": "Die Maschine startet neu"
+    },
+    "danger": {
+        "archive": "Archivieren",
+        "archiveHint": "Stoppt die Coworker und behält die Daten. Zählt weiter zu deinem Limit.",
+        "archiveConfirm": {
+            "title": "{name} archivieren?",
+            "description": "Die Mitglieder verlieren den Zugang und die Coworker stoppen, bis du ihn wiederherstellst.",
+            "confirm": "Archivieren"
+        },
+        "restore": "Wiederherstellen",
+        "restoreHint": "Wie vorher, in wenigen Minuten.",
+        "delete": "Löschen",
+        "deleteHint": "Löscht Coworker, Dateien und Unterhaltungen endgültig.",
+        "deleteConfirm": {
+            "title": "Diesen Workspace löschen?",
+            "description": "Coworker, Dateien und Unterhaltungen werden endgültig gelöscht. Das restliche Guthaben geht zurück in deine Reserve.",
+            "type": "Gib zur Bestätigung <strong></strong> ein.",
+            "confirm": "Löschen"
+        },
+        "busy": "Warte, bis es fertig ist",
+        "deleted": "{name} wurde gelöscht"
+    },
+    "credit": {
+        "title": "Guthaben",
+        "reserve": "Reserve",
+        "reserveHint": "Noch keinem Workspace zugeteilt",
+        "left": "Übrig in diesem Workspace",
+        "add": "Guthaben hinzufügen",
+        "takeBack": "Zurückholen",
+        "reserveEmpty": "Die Reserve ist leer",
+        "workspaceEmpty": "Dieser Workspace hat kein Guthaben mehr",
+        "nothingToTakeBack": "Kein Workspace hat noch Guthaben",
+        "noWorkspace": "Lege zuerst einen Workspace an",
+        "history": "Verlauf",
+        "loadMore": "Mehr anzeigen",
+        "kinds": {
+            "purchase": "Guthaben gekauft",
+            "adjustment": "Korrektur",
+            "allocation": "An {workspace} gegeben",
+            "take_back": "Von {workspace} zurückgeholt"
+        },
+        "deletedWorkspace": "einem gelöschten Workspace",
+        "reversed": "Nicht durchgeführt",
+        "reversal": "Zurück in der Reserve",
+        "empty": {
+            "title": "Noch keine Bewegung",
+            "description": "Guthaben, das du kaufst, vergibst und zurückholst, erscheint hier."
+        },
+        "dialog": {
+            "allocateTitle": "Guthaben hinzufügen",
+            "allocateDescription": "Aus deiner Reserve an einen Workspace.",
+            "takeBackTitle": "Guthaben zurückholen",
+            "takeBackDescription": "Von einem Workspace in deine Reserve.",
+            "workspace": "Workspace",
+            "workspacePlaceholder": "Workspace wählen",
+            "workspaceSearch": "Workspaces suchen",
+            "amount": "Credits",
+            "reserve": "Reserve",
+            "change": "{before} → {after}",
+            "tooMuchReserve": "Deine Reserve enthält {count, plural, one {# Credit} other {# Credits}}",
+            "tooMuchWorkspace": "Höchstens {count, plural, one {# Credit} other {# Credits}} zurückholbar",
+            "allocate": "{count, plural, =0 {Guthaben} one {# Credit} other {# Credits}} hinzufügen",
+            "takeBack": "{count, plural, =0 {Guthaben} one {# Credit} other {# Credits}} zurückholen"
+        },
+        "tookLess": "{count, plural, =0 {Es war kein Guthaben mehr übrig} one {Nur # Credit war noch übrig} other {Nur # Credits waren noch übrig}}"
+    },
+    "team": {
+        "title": "Team",
+        "description": "Sie öffnen jeden Workspace, ohne dass dessen Mitglieder sie sehen."
+    },
+    "brand": {
+        "title": "Marke",
+        "description": "Was deine Kunden sehen.",
+        "name": "Name",
+        "nameInvalid": "1 bis 40 Zeichen, ohne {list}",
+        "icon": "Icon",
+        "iconHint": "Quadratisch, ab 512 px, mit eigenem Hintergrund.",
+        "iconUpload": "Icon hochladen",
+        "iconReplace": "Ersetzen",
+        "iconProblems": {
+            "type": "Nimm ein PNG-, JPEG- oder WebP-Bild",
+            "notSquare": "Dieses Bild hat {width} × {height} px: es muss quadratisch sein",
+            "tooSmall": "Dieses Bild ist {width} px breit: nötig sind mindestens 512",
+            "tooLarge": "Dieses Bild ist größer als 8 MB",
+            "unreadable": "Dieses Bild ließ sich nicht lesen"
+        },
+        "color": "Farbe",
+        "colorPicker": "Farbe wählen",
+        "colorClear": "Keine Farbe",
+        "colorHint": "Wird angepasst, damit sie lesbar bleibt. Ohne Farbe ist die App schwarz-weiß.",
+        "colorInvalid": "Nimm eine Hex-Farbe, etwa #1668E3",
+        "guarded": "Diese Farbe bedeutet schon {status, select, error {einen Fehler} waiting {einen Coworker, der auf Antwort wartet} other {einen Coworker bei der Arbeit}}: nur die Chatblase trägt sie.",
+        "support": "Support-E-Mail",
+        "supportPlaceholder": "support@firma.de",
+        "supportHint": "Dorthin schreiben deine Kunden, wenn sie Hilfe brauchen.",
+        "emailInvalid": "Gib eine gültige E-Mail-Adresse ein",
+        "docs": "Dokumentation",
+        "terms": "Nutzungsbedingungen",
+        "privacy": "Datenschutzerklärung",
+        "urlInvalid": "Gib eine vollständige Adresse mit https:// ein",
+        "preview": {
+            "light": "Hell",
+            "dark": "Dunkel",
+            "user": "Schreib den Wochenbericht",
+            "assistant": "Fertig. <link>Bericht öffnen</link>",
+            "unread": "Ungelesen",
+            "progress": "Fortschritt"
+        },
+        "unsaved": "Nicht gespeicherte Änderungen",
+        "discard": "Verwerfen",
+        "leave": {
+            "title": "Ohne Speichern verlassen?",
+            "description": "Deine Änderungen an der Marke gehen verloren.",
+            "confirm": "Verlassen",
+            "stay": "Bleiben"
+        }
+    },
+    "domains": {
+        "title": "Domains",
+        "description": "Wo sich deine Kunden anmelden.",
+        "default": "Standardadresse",
+        "custom": "Deine Domain",
+        "copyAddress": "Adresse kopieren",
+        "add": "Domain hinzufügen",
+        "empty": {
+            "title": "Noch keine Domain",
+            "description": "Biete die App unter deiner eigenen Adresse an."
+        },
+        "status": {
+            "pending": "Wartet auf DNS",
+            "verifying": "Wird geprüft",
+            "active": "Aktiv",
+            "error": "Fehler"
+        },
+        "record": {
+            "hint": "Füge diese Einträge dort hinzu, wo deine Domain verwaltet wird. Es kann eine Stunde dauern, bis sie sichtbar sind.",
+            "type": "Typ",
+            "name": "Name",
+            "value": "Wert",
+            "copyName": "Namen kopieren",
+            "copyValue": "Wert kopieren"
+        },
+        "checkedAt": "Zuletzt geprüft: {time}",
+        "check": "Erneut prüfen",
+        "remove": "Entfernen",
+        "removeConfirm": {
+            "title": "{hostname} entfernen?",
+            "description": "Deine Kunden können sich dort nicht mehr anmelden. Die Standardadresse funktioniert weiter.",
+            "confirm": "Entfernen"
+        },
+        "dialog": {
+            "title": "Domain hinzufügen",
+            "description": "Eine Subdomain einer Domain, die dir gehört.",
+            "hostname": "Domain",
+            "invalid": "Gib eine Domain ein, etwa app.acme.com",
+            "apex": "Nimm eine Subdomain, etwa app.{hostname}",
+            "submit": "Hinzufügen"
+        },
+        "problems": {
+            "noRecord": "Noch kein Eintrag zeigt hierher.",
+            "elsewhere": "Diese Domain zeigt woandershin.",
+            "noToken": "Der TXT-Eintrag fehlt.",
+            "taken": "Jemand anderes hat diese Domain zuerst nachgewiesen.",
+            "lookupFailed": "Das DNS dieser Domain hat nicht geantwortet. Wir versuchen es erneut."
+        }
+    },
+    "failed": {
+        "title": "Diese Seite konnte nicht geladen werden",
+        "retry": "Erneut versuchen"
+    },
+    "missing": {
+        "title": "Workspace nicht gefunden",
+        "description": "Er wurde gelöscht oder gehört jemand anderem.",
+        "back": "Alle Workspaces"
+    },
+    "join": {
+        "metaTitle": "Einladung ins Team",
+        "title": "Du bist ins Team von {organization} eingeladen",
+        "signIn": "Melde dich mit {email} an oder erstelle damit dein Konto, um beizutreten.",
+        "expired": "Diese Einladung ist abgelaufen. Bitte einen Inhaber des Teams um eine neue.",
+        "failed": "Beitritt zum Team nicht möglich"
+    }
+}

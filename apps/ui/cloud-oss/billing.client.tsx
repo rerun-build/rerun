@@ -2,6 +2,7 @@
 
 import { DEFAULT_PRICE_ARM, type PriceArm } from '@rerun/contracts'
 
+import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import type { TrialStep } from '@/lib/foreman/next-steps'
 
@@ -23,7 +24,7 @@ export function UpgradePill() {
     return null
 }
 
-export function CreditMeter(_props: { usedMicros: number; wholeMicros: number; trial: boolean; onOpen: () => void; onAdd?: () => void }) {
+export function CreditMeter(_props: { usedMicros: number; wholeMicros: number; trial: boolean; onOpen: () => void; onAdd?: () => void; manager?: WorkspaceManager | null }) {
     return null
 }
 
@@ -40,6 +41,7 @@ export function BudgetExhaustedNotice(_props: {
     noCredit?: boolean
     lifetime?: boolean
     claudePlanOffered?: boolean
+    manager?: WorkspaceManager | null
     coworker?: string
     priceArm?: PriceArm
     onPaid?: () => void

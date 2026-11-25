@@ -11,6 +11,8 @@ import { AppError } from '@/lib/i18n/action-error'
 import type { ManagedOAuthConfig, ManagedProvider } from '@/lib/managed/types'
 import { base64url } from '@/lib/mcp-oauth'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
+import type { HostReturn } from '@/lib/oauth/host-sign-in'
+import { requestOrigin } from '@/lib/request-host'
 import { createHash, randomBytes } from 'node:crypto'
 
 export const MANAGED_COOKIE_PREFIX = 'managed_oauth_'
@@ -34,6 +36,8 @@ export type ManagedOAuthContext = {
     mobileGrant?: string
     // The Vault entry being connected, with an empty `agentId` and its id as the `key`.
     vault?: { itemId: string; workspaceId: number }
+    // Started on an organization's address, where the sign-in is finished.
+    host?: HostReturn
 }
 
 export function createPkceState(): { verifier: string; challenge: string; state: string } {
@@ -43,13 +47,7 @@ export function createPkceState(): { verifier: string; challenge: string; state:
     return { verifier, challenge, state }
 }
 
-export function appOrigin(req: Request): string {
-    const h = req.headers
-    const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000'
-    const local = host.startsWith('localhost') || host.startsWith('127.')
-    const proto = h.get('x-forwarded-proto') ?? (local ? 'http' : 'https')
-    return `${proto}://${host}`
-}
+export const appOrigin = (req: Request): string => requestOrigin(req.headers)
 
 // The redirect target, derived identically in /start and /callback so they always agree.
 // Must match a redirect URI registered on the provider's OAuth client.

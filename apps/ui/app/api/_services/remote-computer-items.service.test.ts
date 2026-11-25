@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
-vi.mock('@/app/api/_services/members.service', () => ({ resolveMemberIdentities: vi.fn(async () => new Map()) }))
+vi.mock('@/app/api/_services/members.service', () => ({ resolveWorkspaceIdentities: vi.fn(async () => new Map()) }))
 vi.mock('@/app/api/_services/remote-computers.service', () => ({ hasLinkedComputers: vi.fn(), listWorkspaceComputers: vi.fn() }))
 
 const { hasLinkedComputers, listWorkspaceComputers } = await import('@/app/api/_services/remote-computers.service')

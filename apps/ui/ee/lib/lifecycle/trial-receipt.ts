@@ -4,6 +4,7 @@
 // No 'server-only': billing.service.ts is a Next module, but this file also has to stay importable
 // from the sweeper's bundle so both paths share the same guards.
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { PLAN_CURRENCY, basePriceCents, parsePriceArm } from '@/ee/lib/billing/plans'
 import { BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
@@ -14,7 +15,8 @@ import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { sendTrialStartedEmail } from '@/ee/lib/email/lifecycle-emails'
 import { wantsCategoryEmail } from '@/lib/notifications/prefs'
 import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
-import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
+import { selectSingle } from '@/supabase/supabase-helpers'
 import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, formatAmount } from '@rerun/contracts'
 import { emailTranslator } from '@rerun/emails/i18n'
 import { loadRecipient } from './recipient'
@@ -30,10 +32,10 @@ const SEQUENCE_KEY = 'trial_started' as const
  */
 export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>, workspaceId: number, trialEndsAt: string, trialDays: number, hasCard: boolean): Promise<void> {
     try {
-        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'price_arm'] as const, { id: workspaceId })
-        if (!workspace || workspace.is_sandbox) return
+        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'price_arm', 'organization_id'] as const, { id: workspaceId })
+        if (!workspace || workspace.is_sandbox || isManagedWorkspace(workspace)) return
 
-        const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' }, 1)
+        const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
         const owner = members?.[0]
         if (!owner) return
 

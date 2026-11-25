@@ -3,6 +3,7 @@ import 'server-only'
 import { callableEngineAgentIds, workspaceActor, type Actor } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { ensureSessionRow, resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { offersTeamRequests } from '@/lib/brand/connection'
 import { chat as engineChat, getAgent as engineGetAgent } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { buildInstallMessage, installSessionTitle } from '@/lib/chat/install-marker'
@@ -74,7 +75,7 @@ async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean
         const written = fresh ? { message, title: message, ranItsOwnInstall: false } : await messageFor(conn, engineAgentId, message, agentName)
 
         const userLanguage = written.ranItsOwnInstall ? await browserLanguage() : undefined
-        const res = await engineChat(conn, engineAgentId, { message: written.message, source: 'api', install: written.ranItsOwnInstall, userLanguage, callableAgentIds })
+        const res = await engineChat(conn, engineAgentId, { message: written.message, source: 'api', install: written.ranItsOwnInstall, userLanguage, callableAgentIds, teamRequests: await offersTeamRequests(conn) })
         if (!res.ok) {
             const refusal = await res.text().catch(() => '')
             // Its install already runs elsewhere, started from its own chat or by an earlier

@@ -216,7 +216,7 @@ describe('/api/chat/foreman/engine', () => {
             const response = await POST(post({ kind: 'general' }))
 
             expect(vi.mocked(startChat).mock.calls[0][2]).toMatchObject({ sessionId: 'engine-general' })
-            expect(recordMessageSent).toHaveBeenCalledWith('general', 'user-1', 'ship it')
+            expect(recordMessageSent).toHaveBeenCalledWith('general', expect.objectContaining({ userId: 'user-1' }), 'ship it')
             expect(copyToShippedForemanRow).toHaveBeenCalledWith('general')
             expect(startEngineConversation).not.toHaveBeenCalled()
             expect(response.headers.get('X-Session-Id')).toBe('general')
@@ -231,7 +231,7 @@ describe('/api/chat/foreman/engine', () => {
 
             expect(cancelRun).toHaveBeenCalledWith(expect.anything(), expect.any(String), 'run-orphan')
             expect(vi.mocked(startChat).mock.calls[1][2]).toMatchObject({ sessionId: 'engine-winner' })
-            expect(recordMessageSent).toHaveBeenCalledWith('winner', 'user-1', 'ship it')
+            expect(recordMessageSent).toHaveBeenCalledWith('winner', expect.objectContaining({ userId: 'user-1' }), 'ship it')
             expect(response.headers.get('X-Session-Id')).toBe('winner')
             expect(response.headers.get('X-Run-Id')).toBe('run-winner')
         })

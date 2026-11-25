@@ -1,9 +1,10 @@
 import { startPhoneSignIn } from '@/app/api/_services/phone-sign-in.service'
-import { phoneRefused } from '@/app/api/v1/auth/_lib/refusal'
+import { notOnThisHost, phoneRefused } from '@/app/api/v1/auth/_lib/refusal'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
 import { isAppReviewNumber } from '@rerun/cloud/app-review'
 import { callerIp } from '@/lib/auth/caller-ip'
+import { isRerunHost } from '@/lib/brand/request-site'
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { verificationLanguage } from '@/lib/phone/verification'
 import { mobileApi } from '@rerun/contracts'
@@ -11,6 +12,8 @@ import { mobileApi } from '@rerun/contracts'
 export const dynamic = 'force-dynamic'
 
 export const POST = apiRoute(mobileApi.sendPhoneCode, { auth: 'public', invalidBody: () => phoneRefused('invalid_number') }, async ({ req, body }) => {
+    if (!(await isRerunHost())) return notOnThisHost()
+
     const phone = isPhoneCountry(body.country) ? toE164(body.phone, body.country) : null
     if (!phone) return phoneRefused('invalid_number')
     if (isAppReviewNumber(phone)) return { channel: body.channel }

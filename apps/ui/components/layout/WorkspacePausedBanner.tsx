@@ -1,6 +1,8 @@
 'use client'
 
 import { getSandboxArchiveStateAction, getWorkspaceRestoreStageAction, type SandboxArchiveState } from '@/app/api/_actions/workspace-restore.actions'
+import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
+import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { Shimmer } from '@/components/ai-elements/shimmer'
 import { RequestSandboxReactivationDialog } from '@/components/dialogs/RequestSandboxReactivationDialog'
 import { Button } from '@/components/ui/button'
@@ -31,7 +33,7 @@ export function formatKeptUntil(date: Date, locale: string): string {
 // The board of a workspace whose machine was archived when its plan ended, and of one coming back
 // after a payment. The agents stay drawn, locked: this is the one place that says why and how out.
 export function WorkspacePausedBanner() {
-    const { access, keptUntil, paymentFailed, sandboxArchived } = useWorkspaceAccess()
+    const { access, keptUntil, paymentFailed, sandboxArchived, manager } = useWorkspaceAccess()
     const { workspace } = useSession()
     const isSandbox = !!workspace?.is_sandbox
     if (access === 'live') return null
@@ -40,7 +42,7 @@ export function WorkspacePausedBanner() {
         <div className="pointer-events-none absolute inset-x-0 top-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap))] z-30 flex justify-center px-4 md:top-(--chrome-edge)">
             <ChromeBar start="icon" className="pointer-events-auto max-w-full font-normal md:max-w-[calc(100%-26rem)]">
                 {isSandbox && workspace && <SandboxArchiveSync workspaceId={workspace.id} />}
-                {sandboxArchived ? <SandboxArchivedBanner keptUntil={keptUntil} /> : access === 'paused' ? <PausedContent keptUntil={keptUntil} paymentFailed={paymentFailed} /> : <RestoringContent approved={isSandbox} />}
+                {sandboxArchived ? <SandboxArchivedBanner keptUntil={keptUntil} /> : access === 'paused' ? manager ? <ManagedPausedContent manager={manager} /> : <PausedContent keptUntil={keptUntil} paymentFailed={paymentFailed} /> : <RestoringContent approved={isSandbox} managed={manager !== null} />}
             </ChromeBar>
         </div>
     )
@@ -59,6 +61,19 @@ export function PausedContent({ keptUntil, paymentFailed = false }: { keptUntil:
             <Button className="shrink-0 rounded-full px-3" onClick={() => useBillingStore.getState().openBilling(undefined, 'paused_banner')}>
                 {paymentFailed ? t('updatePayment') : t('subscribe')}
             </Button>
+        </>
+    )
+}
+
+export function ManagedPausedContent({ manager }: { manager: WorkspaceManager }) {
+    const t = useTranslations('managed.paused')
+    return (
+        <>
+            <ArchiveIcon className="relative size-4 shrink-0 text-muted-foreground" />
+            <p className="relative min-w-0 truncate pe-3 text-sm">
+                <span className="font-medium">{t('title')}</span> <span className="text-muted-foreground max-sm:hidden">{t('body', { manager: manager.name })}</span>
+            </p>
+            <ContactManagerButton manager={manager} className="shrink-0 rounded-full px-3" />
         </>
     )
 }
@@ -121,8 +136,9 @@ export function SandboxArchivedContent({ keptUntil, status, onRequest }: { keptU
 
 // `approved`: a sandbox coming back on an approval rather than a payment, which changes what the
 // two stalled states have to say.
-function RestoringContent({ approved = false }: { approved?: boolean }) {
+function RestoringContent({ approved = false, managed = false }: { approved?: boolean; managed?: boolean }) {
     const t = useTranslations('layout.restoring')
+    const tManaged = useTranslations('managed.restoring')
     const [stage, setStage] = useState<RestoreStage>('machine')
     const poll = useCallback(() => {
         getWorkspaceRestoreStageAction()
@@ -136,7 +152,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
             <div className="relative flex min-w-0 items-center gap-2 pe-3">
                 <ClockIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
-                    <span className="font-medium">{approved ? t('waitingApproved') : t('waitingPaid')}</span> <span className="text-muted-foreground max-sm:hidden">{t('waitingHint')}</span>
+                    <span className="font-medium">{managed ? tManaged('waiting') : approved ? t('waitingApproved') : t('waitingPaid')}</span> <span className="text-muted-foreground max-sm:hidden">{t('waitingHint')}</span>
                 </p>
             </div>
         )
@@ -148,7 +164,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
             <div className="relative flex min-w-0 items-center gap-2 pe-3">
                 <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
-                    <span className="font-medium">{t('failed')}</span> <span className="text-muted-foreground max-sm:hidden">{approved ? t('failedApproved') : t('failedPaid')}</span>
+                    <span className="font-medium">{t('failed')}</span> <span className="text-muted-foreground max-sm:hidden">{managed ? tManaged('failed') : approved ? t('failedApproved') : t('failedPaid')}</span>
                 </p>
             </div>
         )

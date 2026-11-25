@@ -102,7 +102,10 @@
                 "step2": "Suscríbete a **OpenCode Go** o añade créditos para usar los modelos de Console.",
                 "step3": "Crea una clave API, cópiala (empieza por `oc_sk_`) y pégala arriba."
             }
-        }
+        },
+        "creditManagedUsed": "{percent} % de los créditos usados",
+        "creditManagedUsedUp": "Créditos agotados",
+        "creditBackManaged": "cuando se añadan más"
     },
     "noPlan": {
         "trialText": "Empieza tu prueba gratis para conectar tu plan de Claude, tu plan de ChatGPT o una clave API.",

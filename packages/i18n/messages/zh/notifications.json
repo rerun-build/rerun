@@ -167,6 +167,7 @@
         "trialEndedDeclined": "您的免费 {provider} 席位已结束且银行卡被拒，因此 {account, select, none {该账号} other {{account}}} 已暂停。请在一周内于“计费”中添加席位以保留它，否则它将被断开连接。",
         "rateLimited": "{provider} 要求 {account, select, none {您的一个账号} other {{account}}} 放慢速度。同事将在 24 小时内不使用它，以确保账号安全。",
         "signedOut": "{provider} 已将 {account, select, none {您的一个账号} other {{account}}} 退出登录。请在“设置 → 应用”中重新连接，以便同事再次使用。",
-        "budgetExhausted": "您本月的 {brand} 积分已用完。使用 {brand} 模型的定时运行和触发运行已暂停，同事也无法购买潜在客户、SEO 或社交数据，直到积分重置或您添加积分。"
+        "budgetExhausted": "您本月的 {brand} 积分已用完。使用 {brand} 模型的定时运行和触发运行已暂停，同事也无法购买潜在客户、SEO 或社交数据，直到积分重置或您添加积分。",
+        "managedCreditOut": "此工作区积分已用完。请联系 {manager} 获取更多：在此之前，定时和触发的运行已暂停，同事也无法购买潜在客户、SEO 或社交数据。"
     }
 }

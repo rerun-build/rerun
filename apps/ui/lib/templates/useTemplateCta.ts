@@ -7,6 +7,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, trialOfferLine } from '@rerun/cloud/billing'
 import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
@@ -45,12 +46,14 @@ export type TemplateCta = {
 // `steps` annonce d'avance celles qui restent derrière.
 export function useTemplateCta(template: LibraryTemplate, onDone: () => void): TemplateCta {
     const { workspace } = useSession()
+    const manager = useWorkspaceManager()
     const isAdmin = useIsAdmin()
     const { run: startImport } = useTemplateImportFlow({ onDone })
     const [pending, startTransition] = useTransition()
     const installed = useBoardStore(s => s.agents.find(agent => agent.templateId === template.id) ?? null)
     const t = useTranslations('templates.cta')
     const tPrice = useTranslations('templates.price')
+    const tManaged = useTranslations('managed')
     const tTrial = useTranslations('billing.trialOffer')
     const errorText = useErrorText()
     const locale = useLocale()
@@ -145,6 +148,12 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     }
 
     const ownedOrGranted = template.owned || isAdmin
+
+    // What an organization runs is neither sold a template nor a plan.
+    if (manager && (!entitled || !ownedOrGranted)) {
+        const reason = entitled ? tManaged('templateUnavailable') : tManaged('paused.reason', { manager: manager.name })
+        return { gate: 'blocked', label: t('useTemplate'), note: null, steps: [], disabled: true, disabledReason: reason, pending: false, run: () => {} }
+    }
 
     if (!entitled) {
         return {

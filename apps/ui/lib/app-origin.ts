@@ -1,3 +1,6 @@
+import { organizationRootDomain } from '@/lib/brand/root-domain'
+import { workspaceBrand } from '@/lib/brand/workspace'
+import { requestHost } from '@/lib/request-host'
 import { headers } from 'next/headers'
 import { site } from '@/lib/site'
 
@@ -10,6 +13,12 @@ const CONFIGURED_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL ?? site.url).replace(
 export async function getAppOrigin(): Promise<string> {
     if (process.env.NODE_ENV !== 'development') return CONFIGURED_ORIGIN
 
-    const host = (await headers()).get('host')
+    const host = requestHost(await headers())
     return host ? `http://${host}` : CONFIGURED_ORIGIN
+}
+
+// Where a link about a workspace, handed to someone else, opens it.
+export async function appOriginOf(workspaceId: number): Promise<string> {
+    if (!organizationRootDomain()) return getAppOrigin()
+    return (await workspaceBrand(workspaceId)).appUrl ?? (await getAppOrigin())
 }

@@ -1,9 +1,11 @@
-import type { CheckinReason, ForemanBrief, ForemanToolSpec } from '@rerun/contracts'
+import { isWhiteLabel, type Brand, type CheckinReason, type ForemanBrief, type ForemanToolSpec } from '@rerun/contracts'
 
-import { isMobileApp, type ForemanState } from './phase'
+import { brandTools } from '@/lib/brand/text'
+
+import { brandOf, isMobileApp, type ForemanState } from './phase'
 import { foremanCheckinInstructions } from './checkin-prompt'
 import { foremanEngineInstructions } from './prompt'
-import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
+import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS, FOREMAN_MCP_TOOL_NAMES, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_SELF_TOOL_DEFS, FOREMAN_VAULT_TOOL_DEFS, FOREMAN_VAULT_TOOL_NAMES, accountToolDef, withoutBillingPanel, type ForemanClientToolName, type ForemanToolDef } from './tool-defs'
 
 // The belt of the foreman that runs on the engine. Everything the hub executes goes through
 // POST /api/hub; the board gestures only reach the browser, as transient data parts, so nothing
@@ -92,7 +94,9 @@ export const FOREMAN_READ_TOOL_NAMES: ReadonlySet<string> = new Set([
     'list_vault',
 ])
 
-function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSpec {
+// Under the brand of the workspace, whose clients have no bill to open when it is an organization's.
+function spec(declared: ForemanToolDef, kind: ForemanToolSpec['kind'], brand: Brand): ForemanToolSpec {
+    const [def] = brandTools([isWhiteLabel(brand) ? withoutBillingPanel(declared) : declared], brand)
     return { name: def.name, description: def.description, inputSchema: def.inputSchema as Record<string, unknown>, kind, serial: SERIAL_TOOL_NAMES.has(def.name) }
 }
 
@@ -103,13 +107,14 @@ export function foremanCheckinBrief(state: ForemanState, reason: CheckinReason, 
         instructions: foremanCheckinInstructions(state, reason),
         tools: hubToolDefs(features)
             .filter(def => FOREMAN_READ_TOOL_NAMES.has(def.name))
-            .map(def => spec(def, 'hub')),
+            .map(def => spec(def, 'hub', brandOf(state))),
     }
 }
 
 export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } & ForemanBoxFeatures = {}): ForemanBrief {
+    const brand = brandOf(state)
     return {
         instructions: foremanEngineInstructions(state, options),
-        tools: [...hubToolDefs(options).map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name) || (options.vault && !isMobileApp(state) && VAULT_INTENT_TOOL_NAMES.has(def.name))).map(def => spec(def, 'intent'))],
+        tools: [...hubToolDefs(options).map(def => spec(def, 'hub', brand)), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name) || (options.vault && !isMobileApp(state) && VAULT_INTENT_TOOL_NAMES.has(def.name))).map(def => spec(def, 'intent', brand))],
     }
 }

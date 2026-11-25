@@ -1,0 +1,39 @@
+{
+    "contact": "{manager} kontaktieren",
+    "templateUnavailable": "In diesem Workspace nicht verfügbar",
+    "paused": {
+        "title": "Dieser Workspace ist pausiert.",
+        "body": "Wende dich an {manager}, um ihn wieder zu aktivieren.",
+        "reason": "Dieser Workspace ist pausiert. Wende dich an {manager}.",
+        "coworker": "Wende dich an {manager}, und {name} macht genau dort weiter, wo er aufgehört hat."
+    },
+    "restoring": {
+        "waiting": "Dieser Workspace ist als Nächster an der Reihe.",
+        "failed": "Wir wurden benachrichtigt und holen ihn von Hand zurück."
+    },
+    "credit": {
+        "title": "Guthaben",
+        "providedBy": "Bereitgestellt von {manager}",
+        "outTitle": "Guthaben aufgebraucht",
+        "out": "Wende dich an {manager}, um mehr zu erhalten.",
+        "outOwnPlan": "Wende dich an {manager}, um mehr zu erhalten, oder nutze deinen bereits verbundenen {plan}-Plan.",
+        "outOwnAi": "Wende dich an {manager}, um mehr zu erhalten, oder lass deine Coworker mit deiner eigenen KI laufen.",
+        "usedUp": "Guthaben aufgebraucht. Wende dich an {manager}.",
+        "usage": "{percent} % des Guthabens verbraucht",
+        "detailUsedUp": "Coworker, die mit diesem Guthaben laufen, sind pausiert. Wende dich an {manager}, um mehr zu erhalten, oder wähle ein anderes Standardmodell, damit sie weiterlaufen.",
+        "detailIncluded": "Bereitgestellt von {manager}. Kein Schlüssel, nichts einzurichten.",
+        "defaultPick": "Das Guthaben ist aufgebraucht, daher sind Coworker ohne eigenes Modell pausiert. Wende dich an {manager} oder wähle ein anderes Modell, damit sie weiterlaufen.",
+        "defaultAdd": "Das Guthaben ist aufgebraucht, daher sind Coworker ohne eigenes Modell pausiert. Wende dich an {manager} oder füge einen Plan oder einen API-Schlüssel hinzu, damit sie weiterlaufen."
+    },
+    "host": {
+        "noAccess": {
+            "title": "Du hast keinen Zugriff",
+            "body": "{email} hat hier keinen Workspace. Bitte {brand} um eine Einladung.",
+            "bodyUnnamed": "Dieses Konto hat hier keinen Workspace. Bitte {brand} um eine Einladung."
+        },
+        "unavailable": {
+            "title": "{brand} ist nicht verfügbar",
+            "body": "Bitte versuche es später erneut."
+        }
+    }
+}

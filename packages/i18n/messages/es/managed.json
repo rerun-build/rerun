@@ -1,0 +1,39 @@
+{
+    "contact": "Contactar con {manager}",
+    "templateUnavailable": "No disponible en este workspace",
+    "paused": {
+        "title": "Este workspace está en pausa.",
+        "body": "Contacta con {manager} para reactivarlo.",
+        "reason": "Este workspace está en pausa. Contacta con {manager}.",
+        "coworker": "Contacta con {manager} y {name} retoma justo donde lo dejó."
+    },
+    "restoring": {
+        "waiting": "Este workspace es el primero en la cola.",
+        "failed": "Nos ha llegado el aviso y lo estamos recuperando a mano."
+    },
+    "credit": {
+        "title": "Créditos",
+        "providedBy": "Los proporciona {manager}",
+        "outTitle": "Sin créditos",
+        "out": "Contacta con {manager} para conseguir más.",
+        "outOwnPlan": "Contacta con {manager} para conseguir más, o usa tu plan {plan}, ya conectado.",
+        "outOwnAi": "Contacta con {manager} para conseguir más, o usa tu propia IA para tus coworkers.",
+        "usedUp": "Créditos agotados. Contacta con {manager}.",
+        "usage": "{percent} % de los créditos usados",
+        "detailUsedUp": "Los coworkers que usan estos créditos están en pausa. Contacta con {manager} para conseguir más, o elige otro modelo predeterminado para que sigan.",
+        "detailIncluded": "Lo proporciona {manager}. Sin clave, nada que configurar.",
+        "defaultPick": "Los créditos se agotaron, así que los coworkers sin modelo propio están en pausa. Contacta con {manager}, o elige otro modelo para que sigan.",
+        "defaultAdd": "Los créditos se agotaron, así que los coworkers sin modelo propio están en pausa. Contacta con {manager}, o añade un plan o una clave de API para que sigan."
+    },
+    "host": {
+        "noAccess": {
+            "title": "No tienes acceso",
+            "body": "{email} no tiene ningún espacio de trabajo aquí. Pide una invitación a {brand}.",
+            "bodyUnnamed": "Esta cuenta no tiene ningún espacio de trabajo aquí. Pide una invitación a {brand}."
+        },
+        "unavailable": {
+            "title": "{brand} no está disponible",
+            "body": "Vuelve más tarde."
+        }
+    }
+}

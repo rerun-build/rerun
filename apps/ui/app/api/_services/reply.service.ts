@@ -1,4 +1,4 @@
-import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
+import { actorFromContext, callableEngineAgentIds, type UserActor } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { claimWaitingSession, getExistingSession, recordMessageSent, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { readSessionTranscript } from '@/app/api/_services/conversation.service'
@@ -15,13 +15,13 @@ const alreadyAnswered = () => new ApiError(409, refusal('requestAlreadyAnswered'
 
 // Answers a conversation without anyone watching the stream: the run goes on on the engine, which
 // keeps it apart from whoever reads it, and the person sees its end in a push or in the app.
-export function replyToConversation(ctx: WorkspaceContext, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
-    return replyAs(actorFromContext(ctx), messageAuthorOf(ctx), sessionId, reply)
+export async function replyToConversation(ctx: WorkspaceContext, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
+    return replyAs(actorFromContext(ctx), await messageAuthorOf(ctx), sessionId, reply)
 }
 
 // The same answer from a caller with no browser session: the Chief of Staff answering a card in the
 // name of the member it speaks for, whose author says so (`via`).
-export async function replyAs(actor: Actor, author: MessageAuthor, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
+export async function replyAs(actor: UserActor, author: MessageAuthor, sessionId: string, reply: ConversationReply): Promise<ConversationReplyResult> {
     const session = await getExistingSession(sessionId, actor)
     // Without an engine session the engine would open a new conversation instead of answering this one.
     if (!session.engineSessionId) throw new ApiError(404, refusal('conversationNotFound'))
@@ -61,6 +61,6 @@ export async function replyAs(actor: Actor, author: MessageAuthor, sessionId: st
     }
     void response.body?.cancel().catch(() => {})
 
-    await recordMessageSent(session.sessionId, author.id, text)
+    await recordMessageSent(session.sessionId, actor, text)
     return { runId: response.headers.get('x-run-id') }
 }

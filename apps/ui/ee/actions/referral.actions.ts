@@ -1,5 +1,6 @@
 'use server'
 
+import { refuseManagedWorkspace } from '@/app/api/_auth/managed-workspace'
 import { requireAdminContext } from '@/app/api/_auth/ownership'
 import type { ReferralOverview } from '@/ee/lib/billing/referral'
 import { pendingReferrer, type Referrer } from '@/ee/services/referral-attach.service'
@@ -10,6 +11,7 @@ import { failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 export async function getReferralOverviewAction(): Promise<{ ok: true; overview: ReferralOverview } | ActionFailure> {
     try {
         const { workspace, authUser } = await requireAdminContext('adminOnlyBilling')
+        refuseManagedWorkspace(workspace)
         return { ok: true, overview: await getReferralOverview(workspace.id, authUser) }
     } catch (err) {
         return failureOf(err, 'loadReferralsFailed')
@@ -20,6 +22,7 @@ export async function getReferralOverviewAction(): Promise<{ ok: true; overview:
 export async function getPendingReferrerAction(): Promise<{ ok: true; referrer: Referrer | null } | ActionFailure> {
     try {
         const { workspace } = await requireAdminContext('adminOnlyBilling')
+        refuseManagedWorkspace(workspace)
         return { ok: true, referrer: await pendingReferrer(workspace.id) }
     } catch (err) {
         return failureOf(err, 'loadReferralsFailed')

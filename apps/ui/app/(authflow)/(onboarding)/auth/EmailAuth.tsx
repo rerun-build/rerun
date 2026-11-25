@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { prepareEmailSignIn, resendLiveSignInCode } from '@/app/(authflow)/(onboarding)/auth/actions'
+import { askInvitedCode, prepareEmailSignIn, resendLiveSignInCode } from '@/app/(authflow)/(onboarding)/auth/actions'
 import { EmailCodeForm, type EmailCodeStep } from '@/components/auth/EmailCodeForm'
 import { useCaptcha } from '@/components/auth/captcha/useCaptcha'
 import { EmailSendError, trackEmailSend } from '@/components/auth/email-send'
@@ -22,19 +22,27 @@ export default function EmailAuth({
     onStepChange,
     onSignedIn,
     skipCaptcha = false,
+    invitedOnly = false,
 }: {
     beforeEmail?: ReactNode
     onStepChange: (step: EmailCodeStep) => void
     onSignedIn: () => void
     skipCaptcha?: boolean
+    // On an organization's address the server alone asks for the code, and only for whoever it invited.
+    invitedOnly?: boolean
 }) {
     const searchParams = useSearchParams()
     const errorText = useErrorText()
     const supabase = createClient()
-    const { containerRef, challenging, getToken } = useCaptcha({ skipped: skipCaptcha })
+    const { containerRef, challenging, getToken } = useCaptcha({ skipped: skipCaptcha || invitedOnly })
 
     const sendCode = (email: string) =>
         trackEmailSend(async () => {
+            if (invitedOnly) {
+                const asked = await askInvitedCode(email)
+                if (!asked.ok) throw new EmailSendError(errorText(asked), asked.reason)
+                return
+            }
             const live = await resendLiveSignInCode(email)
             if (live.resent) return live.held ? 'held' : undefined
             const prepared = await prepareEmailSignIn({ email, captcha: await getToken() })

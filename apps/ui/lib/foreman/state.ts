@@ -6,6 +6,7 @@ import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { accountFirstName } from '@/lib/naming/account-first-name'
 import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryRow } from '@/lib/templates/library'
@@ -21,6 +22,7 @@ import { stampWorkspaceOnboarded } from './profile'
 import { readGettingStartedItems } from '@/app/api/_services/getting-started.service'
 import { progressOf } from '@/lib/onboarding/getting-started'
 import { foremanPhase, isNamedReadyMade, type ArrivingIntent, type ForemanAnswers, type ForemanState } from './phase'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { sitsInABox } from '@/lib/agents/in-box'
 
 // The reads behind a phase: the profile the foreman keeps on the workspace, and the two tables the
@@ -60,12 +62,13 @@ async function describeIntent(ctx: WorkspaceContext, intent: KickoffIntent): Pro
 
 export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: string | null, intent: KickoffIntent | null = null, client: ForemanClient = 'web'): Promise<ForemanState> {
     const actor = actorFromContext(ctx)
-    const [onboarding, { data: spaces }, { data: agents }, reach, firstName] = await Promise.all([
+    const [onboarding, { data: spaces }, { data: agents }, reach, firstName, brand] = await Promise.all([
         selectMaybeSingle(ctx.supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: ctx.workspace.id }),
         selectMany(ctx.supabase, 'spaces', SPACE_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
         selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id, kind: 'coworker' }, { column: 'created_at' }),
         isAdminActor(actor) ? Promise.resolve(null) : spaceAccessMap(actor),
         accountFirstName(ctx.authUser),
+        workspaceBrand(ctx.workspace.id),
     ])
     // A member's foreman sees the board through their Boxes. The phase still reads the whole
     // workspace: a member with nothing open to them is not a workspace to onboard.
@@ -83,8 +86,10 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     const onboardingCompletedAt = ctx.workspace.onboarded_at ?? null
     const input = { foreman, onboardingCompletedAt, entitled, trialing, agentCount: agents?.length ?? 0, hubForeman: RERUN_CLOUD || !!foremanHubApiKey() }
     // A sandbox is an expert's workspace, handed its machine when it is created: it never goes
-    // through the onboarding, and talks to the foreman on that machine from the start.
-    const pastOnboarding = ctx.workspace.is_sandbox || foremanPhase(input) === 'companion'
+    // through the onboarding, and talks to the foreman on that machine from the start. Neither does a
+    // workspace an organization runs, which has no trial to start.
+    const managed = isManagedWorkspace(ctx.workspace)
+    const pastOnboarding = ctx.workspace.is_sandbox || managed || foremanPhase(input) === 'companion'
     // The pool is only asked for an account still in the funnel: a companion has its machine, and
     // an anonymous visitor is never stamped, or bot traffic would fill the list.
     const waitlisted = !pastOnboarding && !ctx.authUser.is_anonymous && (await resolveEngineWaitlist(ctx.workspace.id))
@@ -101,7 +106,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
 
     // The checklist an admin still sees on the board: hidden or finished, it is no longer theirs to walk.
     const items = phase === 'companion' && !reach ? await readGettingStartedItems(ctx.supabase, ctx.workspace.id).catch(() => null) : null
-    const gettingStarted = items && !items.has('dismissed') ? progressOf(items, null) : null
+    const gettingStarted = items && !items.has('dismissed') ? progressOf(items, null, { sold: !managed }) : null
 
     return {
         gettingStarted,
@@ -110,7 +115,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         answers,
         foreman,
         onboardingCompletedAt,
-        firstName,
+        firstName: ctx.organizationStaff ? brand.name : firstName,
         language: accountLanguage(ctx.userLocale) ?? foreman.language ?? preferredLanguage(acceptLanguage),
         entitled,
         trialing,
@@ -121,10 +126,11 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         client,
         workspaceName: ctx.workspace.name ?? 'this workspace',
         workspacePlan: ctx.workspace.plan ?? 'none',
-        userEmail: ctx.userEmail,
+        userEmail: ctx.organizationStaff ? brand.name : ctx.userEmail,
         spaces: visibleSpaces,
         agents: visibleAgents,
         hiddenBoxes: (spaces?.length ?? 0) - visibleSpaces.length,
         isMember: !!reach,
+        brand,
     }
 }

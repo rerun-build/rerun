@@ -23,6 +23,7 @@ import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { ProfilePanel } from '@/components/account/ProfilePanel'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
+import { useBrand } from '@/components/brand/BrandProvider'
 import { DIALOG_TABS_CONTENT } from '@/components/dialogs/DialogTabs'
 import { PHONE_ENABLED } from '@rerun/cloud/phone'
 import { PhoneChangeForm } from '@rerun/cloud/phone.client'
@@ -40,6 +41,7 @@ import { useAccountStore, type AccountTab } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { isWhiteLabel } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { DesktopAppPanel } from '@/components/account/DesktopAppPanel'
@@ -90,6 +92,7 @@ function SignInTab() {
     const t = useTranslations('dialogs.account')
     const errorText = useErrorText()
     const { refreshPhoneStep } = useSession()
+    const emailOnly = isWhiteLabel(useBrand())
     const [methods, setMethods] = useState<SignInMethods | null>(null)
     const [step, setStep] = useState<SignInStep>(() => useAccountStore.getState().signInStart)
     const [busyProvider, setBusyProvider] = useState<OAuthProvider | null>(null)
@@ -191,7 +194,7 @@ function SignInTab() {
         )
     }
 
-    if (step === 'phone') {
+    if (step === 'phone' && !emailOnly) {
         return (
             <PanelSteps stepKey="phone" depth={1}>
                 <PanelEditorShell>
@@ -213,7 +216,8 @@ function SignInTab() {
                 unavailableReasons={inAppBrowser ? { google: t('googleNeedsBrowser') } : undefined}
                 busyProvider={busyProvider}
                 onChangeEmail={() => setStep('email')}
-                onChangePhone={PHONE_ENABLED ? () => setStep('phone') : undefined}
+                onChangePhone={PHONE_ENABLED && !emailOnly ? () => setStep('phone') : undefined}
+                emailOnly={emailOnly}
                 onConnect={connectProvider}
                 onDisconnect={disconnectProvider}
             />

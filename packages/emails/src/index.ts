@@ -6,6 +6,9 @@ export type { RunFailedProps } from "../emails/run-failed";
 export { default as BudgetExhausted } from "../emails/budget-exhausted";
 export type { BudgetExhaustedProps } from "../emails/budget-exhausted";
 
+export { default as OrganizationCreditOut } from "../emails/organization-credit-out";
+export type { OrganizationCreditOutProps } from "../emails/organization-credit-out";
+
 export { default as AgentNotification, agentNotificationTitle } from "../emails/agent-notification";
 export type { AgentNotificationKind, AgentNotificationProps } from "../emails/agent-notification";
 

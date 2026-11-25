@@ -1,7 +1,8 @@
 import { displayNameOf, PROFILE_NAME_MAX, readProfile } from '@/lib/auth/user-profile'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import type { Me, MessageAuthor } from '@rerun/contracts'
+import { brandSignature, type Signer } from '@/app/api/_auth/signature'
+import { ORGANIZATION_AUTHOR_ID, type Me, type MessageAuthor } from '@rerun/contracts'
 import { getAuthUser } from '@/supabase/session/getServerSession'
 import type { User } from '@supabase/supabase-js'
 
@@ -9,7 +10,12 @@ export { displayNameOf, readProfile, type UserProfile } from '@/lib/auth/user-pr
 
 // `timezone`: the zone of the device the message was written from (requestTimeZone), so the Chief of
 // Staff knows the hour of this member's day.
-export function messageAuthorOf(ctx: Pick<WorkspaceContext, 'userId' | 'authUser'>, timezone?: string): MessageAuthor {
+export async function messageAuthorOf(ctx: Pick<WorkspaceContext, 'userId' | 'authUser'> & Signer, timezone?: string): Promise<MessageAuthor> {
+    if (ctx.organizationStaff) {
+        // A brand that cannot be read costs the name, never the message, and never shows the person's.
+        const brand = await brandSignature(ctx).catch(() => null)
+        return { id: ORGANIZATION_AUTHOR_ID, ...(brand ? { name: brand.name } : {}) }
+    }
     const name = displayNameOf(ctx.authUser)?.slice(0, PROFILE_NAME_MAX)
     return { id: ctx.userId, ...(name ? { name } : {}), ...(timezone ? { timezone } : {}) }
 }

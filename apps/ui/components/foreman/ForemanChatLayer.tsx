@@ -12,6 +12,7 @@ import { Conversation, ConversationContent, ConversationScrollButton, type Conve
 import { Message, MessageContent } from '@/components/ai-elements/message'
 import { mentionTokensOf } from '@/components/chat/MentionAutocomplete'
 import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ChatActivityLoader } from '@/components/chat/ChatActivityLoader'
 import { ChatScreen } from '@/components/chat/ChatScreen'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
@@ -123,6 +124,7 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
     const { workspace } = useSession()
     const priceArm = usePriceArm()
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
+    const manager = useWorkspaceManager()
     // `Conversation` possède son conteneur de défilement : on le récupère par son contexte, une
     // fois monté, pour que le fondu sache ce qu'il reste au-dessus et en dessous.
     const conversationRef = useRef<ConversationHandle | null>(null)
@@ -199,7 +201,7 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
                 <MessageContent>
                     {/* Pas de cellule « abonnement » : il n'y a pas de Box derrière le Foreman, donc
                         nulle part où brancher un plan Claude ou ChatGPT. */}
-                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} onRetry={onRetry} />}
+                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} onRetry={onRetry} />}
                 </MessageContent>
             </Message>
         )

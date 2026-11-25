@@ -3,6 +3,7 @@
 //
 // No 'server-only', for the same reason as trial-receipt.ts.
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { alertBanner, BANNER_WARM_INLINE_MS } from '@/lib/email/board-banner'
 import { brandAppUrl } from '@/lib/brand/urls'
@@ -16,8 +17,9 @@ import { causeAlertBoard } from '@/lib/og/alert-crew'
 import { loadTeam, type TeamMember } from '@/lib/og/team-board'
 import { teamBoardUrl } from '@/lib/whatsapp/team'
 import { paymentFailedMessage, teamLabel } from '@/lib/whatsapp/templates'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
-import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
+import { selectSingle } from '@/supabase/supabase-helpers'
 import { formatAmount, type Brand } from '@rerun/contracts'
 import { loadRecipient } from './recipient'
 import { recordLifecycleEmail } from './store'
@@ -54,7 +56,7 @@ async function emailAdmin(supabase: SupabaseClient<Database>, workspace: { id: n
 }
 
 async function emailAdmins(supabase: SupabaseClient<Database>, workspace: { id: number; name: string | null }, invoice: DeclinedInvoice, now: Date): Promise<void> {
-    const { data: admins } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id, role: 'admin' }, { column: 'created_at' })
+    const { data: admins } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspace.id, role: 'admin' })
     if (!admins?.length) return
     const brand = await workspaceBrand(workspace.id)
     const boardUrl = await alertBanner(causeAlertBoard(supabase, workspace.id, 'payment'), BANNER_WARM_INLINE_MS, brand)
@@ -85,10 +87,10 @@ async function messageOwner(supabase: SupabaseClient<Database>, workspaceId: num
  */
 export async function sendPaymentFailedNotice(supabase: SupabaseClient<Database>, workspaceId: number, invoice: DeclinedInvoice, now: Date = new Date()): Promise<void> {
     try {
-        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'trial_ends_at'] as const, { id: workspaceId })
-        if (!workspace || workspace.is_sandbox) return
+        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'trial_ends_at', 'organization_id'] as const, { id: workspaceId })
+        if (!workspace || workspace.is_sandbox || isManagedWorkspace(workspace)) return
 
-        const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' }, 1)
+        const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
         const owner = members?.[0]
         if (!owner) return
 

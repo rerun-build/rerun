@@ -1,4 +1,6 @@
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
+import { brandTools } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
 import { APP_LIST_TOOLS, APP_RUN_TOOL } from '@/lib/apps/catalog'
 import { agentConnections, connectionScope, countUsage, markNeedsReconnect, pauseForRateLimit, pickConnection, updateConnection } from '@/lib/apps/connections'
@@ -52,7 +54,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     if (method === 'tools/list') {
         const supabase = createServiceRoleClient()
         const agent = await callingAgent(supabase, engineAgentId, engine.workspaceId)
-        return rpcResult(id, { tools: listedTools(app, agent ? await agentConnections(supabase, agent.id, slug) : []) })
+        const [tools, brand] = await Promise.all([agent ? agentConnections(supabase, agent.id, slug).then(connections => listedTools(app, connections)) : listedTools(app, []), workspaceBrand(engine.workspaceId)])
+        return rpcResult(id, { tools: brandTools(tools, brand) })
     }
 
     if (method !== 'tools/call') return rpcError(id, -32601, `Method not found: ${method}`)

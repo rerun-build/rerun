@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { Actor } from '@/app/api/_auth/access'
+import type { Actor, UserActor } from '@/app/api/_auth/access'
 import { getSessionEngineContext, decideCoworkerSkillProposal } from '@/app/api/_services/chat.service'
 import { listPendingCards, readPendingRequest, type PendingCard } from '@/app/api/_services/conversation.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
@@ -55,10 +55,14 @@ function projectCard(card: PendingCard) {
     }
 }
 
-async function authorFor(actor: Actor): Promise<MessageAuthor> {
+function personBehind(actor: Actor): UserActor {
     if (actor.kind !== 'user') throw new Error('A card is answered in the name of the member you are talking to, and this turn has none behind it. Tell the user what waits on them instead.')
+    return actor
+}
+
+async function authorFor(actor: UserActor): Promise<MessageAuthor> {
     const { data } = await createServiceRoleClient().auth.admin.getUserById(actor.userId)
-    const author = data.user ? messageAuthorOf({ userId: actor.userId, authUser: data.user }) : { id: actor.userId }
+    const author = data.user ? await messageAuthorOf({ userId: actor.userId, authUser: data.user, organizationStaff: actor.organizationStaff, workspace: { id: actor.workspaceId } }) : { id: actor.userId }
     return { ...author, via: 'foreman' }
 }
 
@@ -99,9 +103,10 @@ function questionReplyText(input: Record<string, unknown>, args: Record<string, 
     return serializeAnswers(questions.map((item, index) => ({ question: item.question, answers: [answered[index]] })))
 }
 
-async function answerCard(actor: Actor, args: Record<string, unknown>) {
+async function answerCard(caller: Actor, args: Record<string, unknown>) {
     const sessionId = requireString(args.sessionId, 'sessionId')
     const action = answerActionOf(args.action)
+    const actor = personBehind(caller)
     const author = await authorFor(actor)
     const peek = await readPendingRequest(sessionId, actor)
 

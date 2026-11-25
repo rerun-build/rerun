@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
     getUser: vi.fn(),
     signOut: vi.fn(),
     selectMaybeSingle: vi.fn(),
+    joinOrganization: vi.fn(),
 }))
 
 // The JWT the request carries says what the auth server would: same refresh, same user.
@@ -30,6 +31,7 @@ vi.mock('@supabase/ssr', () => ({
 vi.mock('./serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ update: () => ({ eq: async () => ({}) }) }) }) }))
 
 vi.mock('./supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle }))
+vi.mock('@rerun/cloud/organizations.server', () => ({ joinOrganization: mocks.joinOrganization }))
 
 const { arrivesByInvite, isPublicPath, provisioningNeeded, updateSession } = await import('./middleware')
 
@@ -312,6 +314,9 @@ describe('isPublicPath', () => {
         expect(isPublicPath('/auth')).toBe(true)
         expect(isPublicPath('/auth/callback')).toBe(true)
         expect(isPublicPath('/invite/abc')).toBe(true)
+        expect(isPublicPath('/organization/invite/abc')).toBe(true)
+        expect(isPublicPath('/organization')).toBe(false)
+        expect(isPublicPath('/organization/team')).toBe(false)
         expect(isPublicPath('/')).toBe(false)
         expect(isPublicPath('/welcome')).toBe(false)
         expect(isPublicPath('/authors')).toBe(false)
@@ -342,10 +347,43 @@ describe('arrivesByInvite', () => {
 
     it('recognises the landing on an invite once the callback has cleared the cookie', () => {
         expect(arrivesByInvite(request('/invite/abc'))).toBe(true)
+        expect(arrivesByInvite(request('/organization/invite/abc'))).toBe(true)
         expect(arrivesByInvite(request('/creator/join/abc'))).toBe(true)
     })
 
     it('leaves a plain signup alone', () => {
         expect(arrivesByInvite(request('/'))).toBe(false)
+    })
+})
+
+describe('provisioning on an organization’s address', () => {
+    const site = { kind: 'organization', organizationId: 'org-n', suspended: false, brand: {} } as never
+
+    beforeEach(() => {
+        mocks.getUser.mockReset().mockResolvedValue({ data: { user: { id: 'user-1', is_anonymous: false } } })
+        mocks.selectMaybeSingle.mockReset()
+        mocks.joinOrganization.mockReset()
+    })
+
+    it('joins what the organization invited them to, and opens nothing of their own', async () => {
+        mocks.joinOrganization.mockResolvedValue({ signedUp: true })
+        const response = await updateSession(new NextRequest('https://nordlys.rerun.work/', { headers: { ...DOCUMENT, 'accept-language': 'fr' } }), site)
+        expect(mocks.joinOrganization).toHaveBeenCalledWith(expect.objectContaining({ id: 'user-1' }), 'org-n', { locale: 'fr' })
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+        expect(response.cookies.get('rerun-provisioned')?.value).toBe('user-1.1')
+    })
+
+    it('tries again on the next request when nobody invited them', async () => {
+        mocks.joinOrganization.mockResolvedValue(null)
+        const response = await updateSession(new NextRequest('https://nordlys.rerun.work/', { headers: DOCUMENT }), site)
+        expect(response.cookies.get('rerun-provisioned')).toBeUndefined()
+    })
+
+    it('lets the start and the end of an app’s sign-in through without a session', async () => {
+        mocks.getUser.mockResolvedValue({ data: { user: null } })
+        for (const path of ['/api/oauth/claim?r=x', '/api/oauth/host/start?t=x', '/api/oauth/managed/google/callback?code=x']) {
+            const response = await updateSession(new NextRequest(`https://app.rerun.build${path}`, { headers: DOCUMENT }))
+            expect(response.headers.get('location'), path).toBeNull()
+        }
     })
 })

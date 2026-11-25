@@ -2,6 +2,7 @@
 
 import { pendingSpend, readSpendQuote, type SpendDecision } from '@rerun/contracts'
 
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
 import { useBillingStore } from '@/stores/billing.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -18,6 +19,7 @@ type SpendRequestBlockProps = {
 // card turns from "Add credits" to the approve buttons as soon as the workspace is topped up.
 export function SpendRequestBlock({ input, output, onSubmit }: SpendRequestBlockProps) {
     const { workspace } = useSession()
+    const manager = useWorkspaceManager()
     const { usedMicros, budgetMicros } = useRerunCredit()
     const openBilling = useBillingStore(s => s.openBilling)
     const priced = readSpendQuote(output)
@@ -27,5 +29,5 @@ export function SpendRequestBlock({ input, output, onSubmit }: SpendRequestBlock
     const quote = { ...priced, creditLeftMicros: Math.max(budgetMicros - usedMicros, 0) }
     const addCredits = () => openBilling('credit_pack', workspace?.subscription_status === 'trialing' ? 'spend_short_trial' : 'spend_short')
 
-    return <SpendCard request={request} quote={quote} onSubmit={decision => onSubmit({ purpose: request.purpose, ...decision })} onAddCredits={addCredits} />
+    return <SpendCard request={request} quote={quote} onSubmit={decision => onSubmit({ purpose: request.purpose, ...decision })} onAddCredits={addCredits} manager={manager} />
 }

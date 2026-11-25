@@ -40,7 +40,7 @@ export async function findWorkspaceEngine(workspaceId: number): Promise<Workspac
     if (!data?.engine_host) return null
     const engine: WorkspaceEngine = {
         instanceId: data.id,
-        conn: { baseUrl: buildBaseUrl(data.engine_host), apiKey: data.engine_api_key },
+        conn: { baseUrl: buildBaseUrl(data.engine_host), apiKey: data.engine_api_key, workspaceId },
         managed: !!data.provider_server_id,
     }
     keepMachine(workspaceId, engine)

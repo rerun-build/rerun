@@ -3,6 +3,7 @@ import type { Database, Json } from '@/app/api/database.types'
 import type { McpTokenBundle } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { randomBytes } from 'node:crypto'
 import { GRANT_TTL_MS, type CallbackGrant, type ConnectTicket } from './mobile-ticket'
 
 type PendingInsert = Database['public']['Tables']['oauth_pending_grants']['Insert']
@@ -18,6 +19,8 @@ export type ParkedSignIn =
     | { kind: 'composio'; key: string; connectedAccountId: string }
 
 const PENDING_COLUMNS = ['jti', 'agent_id', 'workspace_id', 'user_id', 'payload', 'expires_at'] as const
+
+const HOST_CLAIM_TTL_MS = 120_000
 
 export const SIGN_IN_ALREADY_USED = 'This sign-in link was already used, please retry'
 export const SIGN_IN_EXPIRED = 'Sign-in expired, please retry'
@@ -73,6 +76,17 @@ export async function parkSignIn(grant: CallbackGrant, parked: ParkedSignIn): Pr
 export async function holdsParkedSignIn(jti: string): Promise<boolean> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'oauth_pending_grants', ['payload'] as const, { jti })
     return Boolean(data?.payload)
+}
+
+// For a sign-in that comes back to another host: the claim is drawn here, once the provider answered,
+// and names a row nobody could have known of before.
+export async function parkForHost(owner: { agentId: string; workspaceId: number; userId: string }, parked: ParkedSignIn): Promise<string> {
+    const claim = randomBytes(32).toString('base64url')
+    const { error } = await createServiceRoleClient()
+        .from('oauth_pending_grants')
+        .insert<PendingInsert>({ jti: claim, agent_id: owner.agentId, workspace_id: owner.workspaceId, user_id: owner.userId, kind: parked.kind, payload: parked as unknown as Json, expires_at: new Date(Date.now() + HOST_CLAIM_TTL_MS).toISOString() })
+    if (error) throw new Error(error.message)
+    return claim
 }
 
 // The app claims with the bearer of the person who started the sign-in, in the workspace the ticket

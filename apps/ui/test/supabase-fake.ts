@@ -76,7 +76,7 @@ function likePattern(pattern: string, flags: string): RegExp {
     return new RegExp(`^${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*').replace(/_/g, '.')}$`, flags)
 }
 
-function keeps(row: Row, { method, args }: SupabaseCall): boolean {
+export function keeps(row: Row, { method, args }: SupabaseCall): boolean {
     const [column, value] = args as [string, unknown]
     const cell = row[column]
     if (method === 'eq') return cell === value

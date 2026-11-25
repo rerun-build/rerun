@@ -1,4 +1,5 @@
 import { getAppOrigin } from '@/lib/app-origin'
+import { workspaceStableUrl } from '@/lib/brand/workspace'
 import { triggerPath } from './trigger-path'
 
 export const MAX_TRIGGER_BODY_BYTES = 1_048_576
@@ -31,7 +32,9 @@ export async function readBodyCapped(req: Request, maxBytes: number): Promise<st
 
 // The public URL of a trigger, built server-side. TriggerUrlField builds the same path in the
 // browser from window.location.origin instead: the origin the user is looking at is the one they
-// should paste into the other service.
+// should paste into the other service. An organization's is its default address, which a domain of
+// its own that comes and goes does not break.
 export async function triggerWebhookUrl(agentId: string, workspaceId: number, slug: string, token: string): Promise<string> {
-    return `${await getAppOrigin()}${triggerPath(agentId, workspaceId, slug, token)}`
+    const origin = (await workspaceStableUrl(workspaceId)) ?? (await getAppOrigin())
+    return `${origin}${triggerPath(agentId, workspaceId, slug, token)}`
 }

@@ -12,6 +12,7 @@ import { PdfViewer } from '@/components/published/viewers/PdfViewer'
 import { workspaceBrand } from '@/lib/brand/workspace'
 import { loadPublished, loadWorkspaceBrand, mayOpen, opensInViewer, previewImageUrl, readAccessCookie, type PublishedEntry } from '@/lib/published/gate'
 import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
+import { requestHost } from '@/lib/request-host'
 import { fileNameOf, isMarkdownDeck, viewerKindOf } from '@/lib/published/viewer-kind'
 import { PUBLISHED_BUCKET } from '@/lib/services/publish'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -29,7 +30,7 @@ type Props = { params: Promise<{ slug: string }> }
 
 const openableEntry = cache(async (slug: string): Promise<PublishedEntry | null> => {
     const requestHeaders = await headers()
-    if (extractPublishedSlug(requestHeaders.get('host')) !== slug) return null
+    if (extractPublishedSlug(requestHost(requestHeaders)) !== slug) return null
     const entry = await loadPublished(slug)
     if (!entry || !opensInViewer(entry)) return null
     const secure = requestHeaders.get('x-forwarded-proto')?.split(',')[0].trim() === 'https'

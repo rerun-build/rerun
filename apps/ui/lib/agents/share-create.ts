@@ -4,7 +4,7 @@ import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { planAgentArchive } from '@/lib/engine/client'
 import { connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
-import { getAppOrigin } from '@/lib/app-origin'
+import { appOriginOf } from '@/lib/app-origin'
 import { opaqueToken } from '@/lib/opaque-token'
 import { selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 import { uploadPrivateFile } from '@/lib/storage/private'
@@ -24,8 +24,8 @@ export const AGENT_SHARE_TOKEN_LENGTH = 32
 
 // The origin the app is actually served on, not the hub base URL: that one is where the engine
 // reaches the UI from its own host, and in dev each Conductor workspace answers on its own port.
-export async function shareUrl(token: string): Promise<string> {
-    return `${await getAppOrigin()}/?share=${token}`
+export async function shareUrl(token: string, workspaceId: number): Promise<string> {
+    return `${await appOriginOf(workspaceId)}/?share=${token}`
 }
 
 // What the form needs to let someone decide: the three buckets priced, and everything about the
@@ -117,7 +117,7 @@ export async function createAgentShare(
         },
         { column: 'created_at', ascending: false },
     )
-    if (existing) return { token: existing.token, url: await shareUrl(existing.token), warnings: [], reused: true }
+    if (existing) return { token: existing.token, url: await shareUrl(existing.token, workspaceId), warnings: [], reused: true }
 
     const { agent, conn, plan: fullPlan } = await planFor(supabase, agentRowId, workspaceId)
     const exclude = shareExcludePaths(fullPlan, include)
@@ -149,5 +149,5 @@ export async function createAgentShare(
     })
     if (error) throw new Error(error.message)
 
-    return { token, url: await shareUrl(token), warnings: [...archiveWarnings(plan, preview.agent.name), SPACE_DATA_WARNING], reused: false }
+    return { token, url: await shareUrl(token, workspaceId), warnings: [...archiveWarnings(plan, preview.agent.name), SPACE_DATA_WARNING], reused: false }
 }

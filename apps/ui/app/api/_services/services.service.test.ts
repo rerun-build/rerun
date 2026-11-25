@@ -12,6 +12,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { fetchPublic } from '@/lib/net/public-fetch'
+import { RERUN_BRAND } from '@rerun/contracts'
 import { dispatchHubTool, getServiceDetails, installService, installedFromRegistry, listInstalledServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -508,7 +509,7 @@ describe('search_docs', () => {
         vi.mocked(searchDocs).mockResolvedValue(answer)
 
         await expect(dispatchHubTool('agent', 'search_docs', { query: 'webhook trigger' }, 7)).resolves.toEqual(answer)
-        expect(searchDocs).toHaveBeenCalledWith('webhook trigger')
+        expect(searchDocs).toHaveBeenCalledWith('webhook trigger', RERUN_BRAND)
         expect(resolveAgentTarget).not.toHaveBeenCalled()
     })
 

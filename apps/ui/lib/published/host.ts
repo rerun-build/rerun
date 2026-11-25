@@ -22,6 +22,11 @@ function hostname(host: string): string {
     return host.split(':')[0].toLowerCase()
 }
 
+export function publishHostname(): string | null {
+    const host = publishHost()
+    return host && hostname(host)
+}
+
 export function isReservedSlug(slug: string): boolean {
     return RESERVED_SLUGS.has(slug) || slug.startsWith('xn--')
 }

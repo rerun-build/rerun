@@ -92,10 +92,10 @@ function InstallFooter({ token, preview, onDone }: { token: string; preview: Age
     return (
         <div className="flex flex-col gap-3 border-t bg-muted/50 px-5 py-4 max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]">
             {cta.steps.length > 1 && <TemplateInstallSteps steps={cta.steps} />}
-            <Button className="w-full" loading={cta.pending} onClick={cta.run}>
+            <Button className="w-full" loading={cta.pending} disabled={!!cta.disabledReason} onClick={cta.run}>
                 {cta.label}
             </Button>
-            {cta.note && <p className="text-center text-xs text-muted-foreground">{cta.note}</p>}
+            {(cta.disabledReason || cta.note) && <p className="text-center text-xs text-muted-foreground">{cta.disabledReason ?? cta.note}</p>}
         </div>
     )
 }

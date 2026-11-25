@@ -77,16 +77,18 @@ export type SignInMethodsPanelProps = {
     onChangeEmail: () => void
     // Absent where phone sign-in is not offered: the row is left out.
     onChangePhone?: () => void
+    // The code by email is the only way in, as on an organization's address.
+    emailOnly?: boolean
     onConnect: (provider: OAuthProvider) => void
     onDisconnect: (provider: OAuthProvider) => void
 }
 
-export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider = null, onChangeEmail, onChangePhone, onConnect, onDisconnect }: SignInMethodsPanelProps) {
+export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider = null, onChangeEmail, onChangePhone, emailOnly = false, onConnect, onDisconnect }: SignInMethodsPanelProps) {
     const t = useTranslations('account.signIn')
     if (!methods) {
         return (
             <div className="px-1 py-2">
-                <SkeletonPanelRows rows={4} lines={2} leading />
+                <SkeletonPanelRows rows={emailOnly ? 1 : 4} lines={2} leading />
             </div>
         )
     }
@@ -106,7 +108,7 @@ export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider =
                 }
             />
 
-            {ENABLED_OAUTH_PROVIDERS.map(provider => (
+            {(emailOnly ? [] : ENABLED_OAUTH_PROVIDERS).map(provider => (
                 <OAuthRow
                     key={provider}
                     provider={provider}

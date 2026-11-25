@@ -15,6 +15,12 @@ import { parseWorkspaceView, WORKSPACE_VIEW_COOKIE } from '@/lib/workspace-view'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { SessionProvider, type InitialSession } from '@/supabase/session/SessionProvider'
 import { getBrand } from '@/lib/brand/server'
+import { requestHostScope } from '@/lib/brand/host-scope'
+import { NoHostAccess } from '@/components/brand/NoHostAccess'
+import { workspaceBrand } from '@/lib/brand/workspace'
+import { RerunOnly } from '@/components/brand/RerunOnly'
+import { WorkspaceBrandProvider } from '@/components/brand/WorkspaceBrandProvider'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { isWhiteLabel } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'
 
@@ -26,9 +32,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Once per server process, on the first board anyone opens: the crons a self-hosted app runs itself.
     startBackgroundSchedules()
-    const [apps, session, brand] = await Promise.all([paidAppFlags(), getServerSession(), getBrand()])
+    const [apps, session, hostBrand, hostScope] = await Promise.all([paidAppFlags(), getServerSession(), getBrand(), requestHostScope()])
+    if (hostScope?.organizationId && session.session && !session.user) return <NoHostAccess organizationId={hostScope.organizationId} userId={session.session.id} />
+    const brand = !isWhiteLabel(hostBrand) && session.workspace && isManagedWorkspace(session.workspace) ? await workspaceBrand(session.workspace.id) : hostBrand
     // The session this request already verified, so the browser does not read it again before the board.
-    const initialSession: InitialSession | null = session.user && session.workspace && session.membership ? { user: session.user, workspace: session.workspace, role: session.membership.role, boxScope: session.membership.box_scope } : null
+    const initialSession: InitialSession | null = session.user && session.workspace && session.membership ? { user: session.user, workspace: session.workspace, role: session.membership.role, boxScope: session.membership.box_scope, organizationStaff: session.membership.organization_staff } : null
     // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
     const cookieStore = await cookies()
     const foremanOpen = parseForemanOpen(cookieStore.get(FOREMAN_OPEN_COOKIE)?.value)
@@ -36,17 +44,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const workspaceView = parseWorkspaceView(cookieStore.get(WORKSPACE_VIEW_COOKIE)?.value)
 
     return (
-        <SessionProvider initial={initialSession}>
-            <FeatureFlagsProvider apps={apps}>
-                <WorkspaceViewProvider initialView={workspaceView}>
-                    <CoworkerLooks>
-                        <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
-                    </CoworkerLooks>
-                    {!isWhiteLabel(brand) && <CrispChat hideLauncher position="left" />}
-                    <WorkspaceSwitchLoader />
-                    <QuickAskReceiver />
-                </WorkspaceViewProvider>
-            </FeatureFlagsProvider>
+        <SessionProvider initial={initialSession} hostScope={hostScope}>
+            <WorkspaceBrandProvider initial={brand}>
+                <FeatureFlagsProvider apps={apps}>
+                    <WorkspaceViewProvider initialView={workspaceView}>
+                        <CoworkerLooks>
+                            <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
+                        </CoworkerLooks>
+                        <RerunOnly>
+                            <CrispChat hideLauncher position="left" />
+                        </RerunOnly>
+                        <WorkspaceSwitchLoader />
+                        <QuickAskReceiver />
+                    </WorkspaceViewProvider>
+                </FeatureFlagsProvider>
+            </WorkspaceBrandProvider>
         </SessionProvider>
     )
 }

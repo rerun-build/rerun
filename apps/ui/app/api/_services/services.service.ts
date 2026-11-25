@@ -1,11 +1,11 @@
 import { FOREMAN_AGENT_ID, parseServiceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 
-import { requireLightSessionActor, workspaceActor, type Actor, agentRowIdOf } from '@/app/api/_auth/access'
+import { requireLightSessionActor, signerIdOf, workspaceActor, type Actor, agentRowIdOf } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug } from '@rerun/cloud/apps'
-import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
+import { arePaidAppsOffered, isOrganizationPlan } from '@/ee/lib/billing/plans'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
@@ -22,6 +22,8 @@ import { embedText, toVectorLiteral } from '@/lib/services/embed'
 import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, isPaidApp, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema, takesSeveralAccounts, usesInstances } from '@/lib/services/manifest'
 import { type ServiceInstanceSeed, heldAccounts, instanceServerName, nextServiceInstance, ordinalInstanceLabel } from '@/lib/services/instances'
 import { isPublishedAccess } from '@/lib/published/access'
+import { brandDescriptions, brandText } from '@/lib/brand/text'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
 import type { PageTableRequest } from '@/lib/published/page-tables'
@@ -184,10 +186,14 @@ async function appHolderOf(agentId: string, actor?: Actor): Promise<{ id: string
 }
 
 async function arePaidAppsOfferedTo(agentId: string, actor?: Actor): Promise<boolean> {
+    return arePaidAppsOffered(await planOfHolder(agentId, actor))
+}
+
+async function planOfHolder(agentId: string, actor?: Actor): Promise<{ plan: string | null } | null> {
     const agent = await appHolderOf(agentId, actor)
-    if (!agent) return true
+    if (!agent) return null
     const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan'] as const, { id: agent.workspace_id })
-    return arePaidAppsOffered(workspace)
+    return workspace
 }
 
 // Vector shortlist shared by search and use-case suggestion: embed the query, let pgvector
@@ -448,7 +454,10 @@ export async function installService(
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
-    if (isPaidApp(manifest) && !(await arePaidAppsOfferedTo(agentId, actor))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
+    if (isPaidApp(manifest)) {
+        const workspace = await planOfHolder(agentId, actor)
+        if (!arePaidAppsOffered(workspace)) throw new Error(isOrganizationPlan(workspace) ? `${manifest.name} is not available in this workspace.` : `${manifest.name} is not included in the lifetime plan.`)
+    }
 
     const instance = await installTarget(agentId, manifest, slugOrKey, Boolean(opts?.newInstance), actor)
     const key = instance?.key ?? manifest.slug
@@ -538,7 +547,7 @@ async function vaultInstallTarget(agentId: string, key: string, methodKind: stri
     // An entry of the Vault is never compiled into a sign-in the Vault does not hold yet.
     if (entry?.vaultItemId && !VAULT_METHOD_KINDS.has(methodKind)) throw new AccessDeniedError('vaultMethodUnsupported')
     const ctx = await vaultContext(actor)
-    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    const createdBy = signerIdOf(ctx.actor)
     if (!entry?.vaultItemId) return { conn, engineAgentId, itemId: null, createdBy, ctx }
     await assertCanChangeItem(ctx.actor, await getVaultItem(conn, entry.vaultItemId), ctx, engineAgentId)
     return { conn, engineAgentId, itemId: entry.vaultItemId, createdBy, ctx }
@@ -749,10 +758,12 @@ function asStringRecord(v: unknown): Record<string, string> {
 // `actor` is the workspace for a coworker of the box, and the member a foreman's turn speaks for.
 export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number, actor: Actor = workspaceActor(workspaceId)): Promise<unknown> {
     switch (name) {
-        case 'service_search':
-            return searchServices(agentId, asString(args.query), asString(args.category), actor)
+        case 'service_search': {
+            const [{ results }, brand] = await Promise.all([searchServices(agentId, asString(args.query), asString(args.category), actor), workspaceBrand(workspaceId)])
+            return { results: results.map(result => ({ ...result, setupReason: brandText(result.setupReason, brand) })) }
+        }
         case 'service_details':
-            return getServiceDetails(agentId, requireString(args.slug, 'slug'), actor)
+            return brandDescriptions(await getServiceDetails(agentId, requireString(args.slug, 'slug'), actor), await workspaceBrand(workspaceId))
         case 'service_install':
             return installService(agentId, requireString(args.slug, 'slug'), asStringRecord(args.values), asString(args.authMethodId), actor)
         case 'service_list_installed':
@@ -779,7 +790,7 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
         case 'trigger_url':
             return { url: await triggerWebhookUrl(agentId, workspaceId, requireString(args.slug, 'slug'), requireString(args.token, 'token')) }
         case 'search_docs':
-            return searchDocs(requireString(args.query, 'query'))
+            return searchDocs(requireString(args.query, 'query'), await workspaceBrand(workspaceId))
         default:
             throw new Error(`Unknown Hub tool: ${name}`)
     }

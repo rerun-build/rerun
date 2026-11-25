@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RocketIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { useBillingStore } from '@/stores/billing.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
@@ -35,7 +36,7 @@ export function UpgradePill() {
         return () => clearInterval(id)
     }, [trialEndsAt])
 
-    if (!workspace || workspace.is_sandbox || status === 'active') return null
+    if (!workspace || workspace.is_sandbox || isManagedWorkspace(workspace) || status === 'active') return null
 
     const pastDue = status === 'past_due'
     const daysLeft = trialEndsAt ? trialDaysLeftLabel(t, trialEndsAt, now) : null

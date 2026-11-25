@@ -34,6 +34,7 @@ vi.mock('@/ee/lib/email/lifecycle-emails', () => ({
 }))
 vi.mock('@/lib/templates/email-card', () => ({ warmTemplateEmailCards: vi.fn() }))
 vi.mock('@/lib/templates/recommend', () => ({ loadRecommendCandidates: vi.fn(), recommendTemplates: vi.fn() }))
+vi.mock('@/lib/brand/workspace', async () => ({ workspaceBrand: async () => (await import('@rerun/contracts')).RERUN_BRAND }))
 vi.mock('./recipient', () => ({ loadRecipient: vi.fn() }))
 vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => BANNER) }))
 vi.mock('./store', () => ({ recordLifecycleEmail: vi.fn() }))
@@ -87,6 +88,7 @@ const workspace: WorkspaceRow = {
     subscription_status: 'trialing',
     subscription_cancel_at: null,
     payment_failed_at: null,
+    organization_id: null,
     first_paid_at: null,
     stripe_customer_id: 'cus_1',
     stripe_subscription_id: 'sub_1',

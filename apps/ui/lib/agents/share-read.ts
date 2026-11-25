@@ -39,7 +39,7 @@ export async function listWorkspaceShares(supabase: SupabaseClient<Database>, wo
     return await Promise.all(
         (data ?? []).map(async row => ({
             id: row.id,
-            url: await shareUrl(row.token),
+            url: await shareUrl(row.token, workspaceId),
             sourceAgentId: row.source_agent_id,
             agentName: row.source_agent_name,
             createdAt: row.created_at,

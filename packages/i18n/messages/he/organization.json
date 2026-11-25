@@ -1,0 +1,336 @@
+{
+    "nav": {
+        "label": "ארגון",
+        "workspaces": "סביבות עבודה",
+        "credit": "קרדיט",
+        "team": "צוות",
+        "brand": "מותג",
+        "domains": "דומיינים",
+        "back": "חזרה לאפליקציה"
+    },
+    "suspended": {
+        "title": "הארגון הזה מושעה",
+        "description": "סביבות העבודה שלו עצורות ולא ניתן לשנות דבר."
+    },
+    "blocked": {
+        "suspended": "הארגון הזה מושעה",
+        "ownerOnly": "רק בעלים יכול לעשות זאת"
+    },
+    "roles": {
+        "owner": "בעלים",
+        "admin": "מנהל",
+        "member": "חבר"
+    },
+    "status": {
+        "active": "פעילה",
+        "archived": "בארכיון",
+        "archiving": "בארכוב",
+        "restoring": "בשחזור",
+        "provisioning": "בהקמה",
+        "outOfCredit": "הקרדיט נגמר",
+        "suspended": "מושעה"
+    },
+    "workspaces": {
+        "title": "סביבות עבודה",
+        "count": "{count} מתוך {max}",
+        "new": "סביבת עבודה חדשה",
+        "limitReached": "הארגון שלך מוגבל ל{max, plural, one {סביבת עבודה אחת} two {# סביבות עבודה} other {# סביבות עבודה}}",
+        "search": "חיפוש סביבות עבודה",
+        "noMatch": "אין סביבת עבודה שמתאימה ל“{query}”",
+        "summary": "{members, plural, one {חבר אחד} two {# חברים} other {# חברים}} · {coworkers, plural, one {עמית אחד} two {# עמיתים} other {# עמיתים}} · {credits, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
+        "columns": {
+            "name": "שם",
+            "members": "חברים",
+            "coworkers": "עמיתים",
+            "credit": "קרדיט שנשאר",
+            "lastActivity": "פעילות אחרונה"
+        },
+        "noActivity": "עדיין אין",
+        "empty": {
+            "title": "עדיין אין סביבת עבודה",
+            "description": "אפשר ליצור אחת לכל לקוח ולהזמין את המנהל הראשון שלה."
+        },
+        "unnamed": "סביבת עבודה ללא שם"
+    },
+    "create": {
+        "title": "סביבת עבודה חדשה",
+        "description": "המנהל הראשון שלה יקבל הזמנה באימייל.",
+        "logo": "להעלות לוגו",
+        "name": "שם",
+        "namePlaceholder": "Acme",
+        "nameTooLong": "{max} תווים לכל היותר",
+        "email": "האימייל של המנהל הראשון",
+        "emailPlaceholder": "you@company.com",
+        "emailInvalid": "יש להזין כתובת אימייל תקינה",
+        "logoTooLarge": "התמונה הזו גדולה מ-8MB",
+        "submit": "ליצור",
+        "done": {
+            "title": "{name} מוכנה",
+            "description": "הזמנו את {email}.",
+            "linkHint": "יש לשלוח את הקישור הזה אל {email}.",
+            "copyLink": "להעתיק את קישור ההזמנה",
+            "close": "סיום",
+            "open": "לצפות בסביבת העבודה"
+        }
+    },
+    "detail": {
+        "back": "סביבות עבודה",
+        "open": "לפתוח את סביבת העבודה",
+        "notReady": "סביבת העבודה הזו עדיין לא מוכנה",
+        "archived": "יש לשחזר קודם את סביבת העבודה הזו",
+        "members": "חברים",
+        "credit": "קרדיט",
+        "usage": "שימוש",
+        "machine": "מכונה",
+        "danger": "ניהול"
+    },
+    "people": {
+        "you": "(אתה)",
+        "unknown": "משתמש לא מוכר",
+        "invite": "להזמין",
+        "role": "התפקיד של {name}",
+        "remove": "להסיר את {name}",
+        "pending": "הוזמן",
+        "revoke": "לבטל את ההזמנה של {email}",
+        "lastAdmin": "בסביבת עבודה נשאר לפחות מנהל אחד",
+        "lastOwner": "בארגון נשאר לפחות בעלים אחד",
+        "self": "בעלים אחר יכול לשנות את התפקיד שלך",
+        "empty": "עדיין אף אחד לא הצטרף",
+        "removeConfirm": {
+            "title": "להסיר את {name}?",
+            "workspace": "הגישה שלו לסביבת העבודה הזו תוסר.",
+            "team": "הגישה שלו למסוף הזה ולכל סביבות העבודה תוסר.",
+            "confirm": "להסיר"
+        },
+        "revokeConfirm": {
+            "title": "לבטל את ההזמנה?",
+            "description": "הקישור שנשלח אל {email} יפסיק לעבוד.",
+            "confirm": "לבטל הזמנה",
+            "keep": "להשאיר"
+        }
+    },
+    "invite": {
+        "workspaceTitle": "הזמנה אל {name}",
+        "teamTitle": "הזמנה לצוות",
+        "description": "הם יקבלו הזמנה באימייל.",
+        "email": "אימייל",
+        "emailPlaceholder": "you@company.com",
+        "role": "תפקיד",
+        "submit": "לשלוח הזמנה",
+        "linkHint": "יש לשלוח את הקישור הזה אל {email}.",
+        "copyLink": "להעתיק את קישור ההזמנה",
+        "done": "סיום",
+        "roles": {
+            "owner": "הכול, כולל הצוות, המותג והדומיינים",
+            "admin": "סביבות עבודה, חברים וקרדיט",
+            "workspaceAdmin": "מנהל את סביבת העבודה ואת החברים בה",
+            "workspaceMember": "עובד עם העמיתים"
+        }
+    },
+    "usage": {
+        "empty": "עדיין לא הוצא דבר"
+    },
+    "machine": {
+        "states": {
+            "running": "פועלת",
+            "stopped": "עצורה",
+            "error": "שגיאה",
+            "archiving": "בארכוב",
+            "archived": "בארכיון",
+            "restoring": "בשחזור",
+            "none": "אין מכונה"
+        },
+        "disk": "דיסק",
+        "diskUsed": "{used} מתוך {total}",
+        "diskUnknown": "עדיין לא נמדד",
+        "notStarted": "מתחילה עם העמית הראשון",
+        "restart": "להפעיל מחדש",
+        "restartConfirm": {
+            "title": "להפעיל מחדש את המכונה?",
+            "description": "העמיתים יפסיקו את מה שהם עושים לכדקה.",
+            "confirm": "להפעיל מחדש"
+        },
+        "restarting": "המכונה מופעלת מחדש"
+    },
+    "danger": {
+        "archive": "לארכב",
+        "archiveHint": "עוצר את העמיתים שלה ושומר את הנתונים. עדיין נספרת במגבלה שלך.",
+        "archiveConfirm": {
+            "title": "לארכב את {name}?",
+            "description": "החברים בה יאבדו גישה והעמיתים שלה יעצרו עד שתשחזר אותה.",
+            "confirm": "לארכב"
+        },
+        "restore": "לשחזר",
+        "restoreHint": "חוזרת כמו שהייתה, תוך כמה דקות.",
+        "delete": "למחוק",
+        "deleteHint": "מוחק לצמיתות את העמיתים, הקבצים והשיחות שלה.",
+        "deleteConfirm": {
+            "title": "למחוק את סביבת העבודה הזו?",
+            "description": "העמיתים, הקבצים והשיחות שלה יימחקו לצמיתות. הקרדיט שנשאר בה יחזור למאגר שלך.",
+            "type": "יש להקליד <strong></strong> כדי לאשר.",
+            "confirm": "למחוק"
+        },
+        "busy": "יש להמתין עד שזה יסתיים",
+        "deleted": "{name} נמחקה"
+    },
+    "credit": {
+        "title": "קרדיט",
+        "reserve": "מאגר",
+        "reserveHint": "עדיין לא הוענק לסביבת עבודה",
+        "left": "נשאר בסביבת העבודה הזו",
+        "add": "להוסיף קרדיט",
+        "takeBack": "להחזיר",
+        "reserveEmpty": "המאגר ריק",
+        "workspaceEmpty": "לא נשאר קרדיט בסביבת העבודה הזו",
+        "nothingToTakeBack": "לא נשאר קרדיט באף סביבת עבודה",
+        "noWorkspace": "יש ליצור קודם סביבת עבודה",
+        "history": "היסטוריה",
+        "loadMore": "להציג עוד",
+        "kinds": {
+            "purchase": "קרדיט שנרכש",
+            "adjustment": "התאמה",
+            "allocation": "נוסף אל {workspace}",
+            "take_back": "הוחזר מ-{workspace}"
+        },
+        "deletedWorkspace": "סביבת עבודה שנמחקה",
+        "reversed": "לא עבר",
+        "reversal": "חזר למאגר",
+        "empty": {
+            "title": "עדיין אין תנועות",
+            "description": "כאן יופיע הקרדיט שאתה קונה, מעניק ומחזיר."
+        },
+        "dialog": {
+            "allocateTitle": "להוסיף קרדיט",
+            "allocateDescription": "מהמאגר שלך אל סביבת עבודה.",
+            "takeBackTitle": "להחזיר קרדיט",
+            "takeBackDescription": "מסביבת עבודה אל המאגר שלך.",
+            "workspace": "סביבת עבודה",
+            "workspacePlaceholder": "לבחור סביבת עבודה",
+            "workspaceSearch": "חיפוש סביבות עבודה",
+            "amount": "קרדיטים",
+            "reserve": "מאגר",
+            "change": "{before} → {after}",
+            "tooMuchReserve": "במאגר שלך יש {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
+            "tooMuchWorkspace": "נשארו להחזרה {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
+            "allocate": "להוסיף {count, plural, =0 {קרדיט} one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
+            "takeBack": "להחזיר {count, plural, =0 {קרדיט} one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}"
+        },
+        "tookLess": "{count, plural, =0 {לא נשאר קרדיט להחזרה} one {נשאר רק קרדיט אחד להחזרה} two {נשארו רק # קרדיטים להחזרה} other {נשארו רק # קרדיטים להחזרה}}"
+    },
+    "team": {
+        "title": "צוות",
+        "description": "הם פותחים כל סביבת עבודה בלי שהחברים בה רואים אותם."
+    },
+    "brand": {
+        "title": "מותג",
+        "description": "מה שהלקוחות שלך רואים.",
+        "name": "שם",
+        "nameInvalid": "1 עד 40 תווים, בלי {list}",
+        "icon": "אייקון",
+        "iconHint": "ריבועי, 512 פיקסלים או יותר, עם רקע משלו.",
+        "iconUpload": "להעלות אייקון",
+        "iconReplace": "להחליף",
+        "iconProblems": {
+            "type": "יש להשתמש בתמונת PNG, JPEG או WebP",
+            "notSquare": "התמונה הזו היא {width} × {height} פיקסלים: היא חייבת להיות ריבועית",
+            "tooSmall": "רוחב התמונה הזו הוא {width} פיקסלים: נדרשים 512 או יותר",
+            "tooLarge": "התמונה הזו גדולה מ-8MB",
+            "unreadable": "לא ניתן היה לקרוא את התמונה הזו"
+        },
+        "color": "צבע",
+        "colorPicker": "לבחור צבע",
+        "colorClear": "בלי צבע",
+        "colorHint": "מותאם כדי שיישאר קריא. בלעדיו האפליקציה בשחור לבן.",
+        "colorInvalid": "יש להשתמש בצבע hex, כמו #1668E3",
+        "guarded": "הצבע הזה כבר מציין {status, select, error {שגיאה} waiting {עמית שמחכה לתשובה} other {עמית בעבודה}}, ולכן רק בועת הצ׳אט לובשת אותו.",
+        "support": "אימייל תמיכה",
+        "supportPlaceholder": "support@company.com",
+        "supportHint": "לשם הלקוחות שלך כותבים כדי לקבל עזרה.",
+        "emailInvalid": "יש להזין כתובת אימייל תקינה",
+        "docs": "תיעוד",
+        "terms": "תנאים",
+        "privacy": "מדיניות פרטיות",
+        "urlInvalid": "יש להשתמש בכתובת מלאה שמתחילה ב-https://",
+        "preview": {
+            "light": "בהיר",
+            "dark": "כהה",
+            "user": "לנסח את הדוח השבועי",
+            "assistant": "בוצע. <link>לפתוח את הדוח</link>",
+            "unread": "לא נקרא",
+            "progress": "התקדמות"
+        },
+        "unsaved": "שינויים שלא נשמרו",
+        "discard": "לבטל",
+        "leave": {
+            "title": "לעזוב בלי לשמור?",
+            "description": "השינויים במותג יאבדו.",
+            "confirm": "לעזוב",
+            "stay": "להישאר"
+        }
+    },
+    "domains": {
+        "title": "דומיינים",
+        "description": "המקום שבו הלקוחות שלך נכנסים.",
+        "default": "כתובת ברירת מחדל",
+        "custom": "הדומיין שלך",
+        "copyAddress": "להעתיק את הכתובת",
+        "add": "להוסיף דומיין",
+        "empty": {
+            "title": "עדיין אין דומיין",
+            "description": "אפשר להגיש את האפליקציה מהכתובת שלך."
+        },
+        "status": {
+            "pending": "ממתין ל-DNS",
+            "verifying": "באימות",
+            "active": "פעיל",
+            "error": "שגיאה"
+        },
+        "record": {
+            "hint": "יש להוסיף את הרשומות האלה במקום שבו הדומיין מנוהל. הן יכולות להופיע תוך שעה.",
+            "type": "סוג",
+            "name": "שם",
+            "value": "ערך",
+            "copyName": "להעתיק את השם",
+            "copyValue": "להעתיק את הערך"
+        },
+        "checkedAt": "בדיקה אחרונה: {time}",
+        "check": "לבדוק שוב",
+        "remove": "להסיר",
+        "removeConfirm": {
+            "title": "להסיר את {hostname}?",
+            "description": "הלקוחות שלך לא יוכלו עוד להיכנס משם. כתובת ברירת המחדל ממשיכה לעבוד.",
+            "confirm": "להסיר"
+        },
+        "dialog": {
+            "title": "להוסיף דומיין",
+            "description": "תת-דומיין של דומיין שבבעלותך.",
+            "hostname": "דומיין",
+            "invalid": "יש להזין דומיין, כמו app.acme.com",
+            "apex": "יש להשתמש בתת-דומיין, כמו app.{hostname}",
+            "submit": "להוסיף דומיין"
+        },
+        "problems": {
+            "noRecord": "עדיין אין רשומה שמצביעה לכאן.",
+            "elsewhere": "הדומיין הזה מצביע למקום אחר.",
+            "noToken": "רשומת ה-TXT חסרה.",
+            "taken": "מישהו אחר הוכיח קודם את הבעלות על הדומיין הזה.",
+            "lookupFailed": "ה-DNS של הדומיין הזה לא ענה. ננסה שוב."
+        }
+    },
+    "failed": {
+        "title": "לא ניתן היה לטעון את הדף הזה",
+        "retry": "לנסות שוב"
+    },
+    "missing": {
+        "title": "סביבת העבודה לא נמצאה",
+        "description": "היא נמחקה, או שהיא שייכת למישהו אחר.",
+        "back": "כל סביבות העבודה"
+    },
+    "join": {
+        "metaTitle": "הזמנה לצוות",
+        "title": "הוזמנת לצוות של {organization}",
+        "signIn": "יש להיכנס או ליצור חשבון עם {email} כדי להצטרף.",
+        "expired": "תוקף ההזמנה פג. יש לבקש מבעלים בצוות לשלוח הזמנה חדשה.",
+        "failed": "לא ניתן היה להצטרף לצוות"
+    }
+}

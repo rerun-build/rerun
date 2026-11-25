@@ -56,7 +56,8 @@
         "archiveExpiring": "{kind, select, sandbox {您已归档的 {brand} 沙盒将于 {date} 删除} other {您已暂停的 {brand} 工作区将于 {date} 删除}}",
         "sandboxIdle": "除非您打开，否则您的 {brand} 沙盒将于 {date} 归档",
         "renewalReminder": "{daysLeft, plural, =1 {您的 {brand} 套餐将于明天续订} other {您的 {brand} 套餐将于 # 天后续订}}",
-        "creatorPitch": "出售您在 Rerun 上创建的同事"
+        "creatorPitch": "出售您在 Rerun 上创建的同事",
+        "organizationCreditOut": "{workspaceName} 的积分已用完"
     },
     "reasons": {
         "mine": "这次运行由您发起。",
@@ -295,5 +296,13 @@
         "button": "打开工作区",
         "footnoteCard": "您的套餐将于 {date} 自动开始：届时从您添加的银行卡扣除 {price}，之后每月扣款。不打算继续？请在 {date} 之前通过工作区菜单中的“账单”取消，不会产生任何费用。",
         "footnoteNoCard": "试用无需银行卡。若要在 {date} 之后继续使用，请通过工作区菜单中的“账单”添加银行卡，您的套餐将以 {price}/月开始。如果不添加，您的同事将停止工作，且不会产生任何费用。"
+    },
+    "organizationCreditOut": {
+        "preview": "您的某个工作区积分已用完",
+        "heading": "某个工作区积分已用完",
+        "bodyNamed": "<strong>{workspaceName}</strong> 已用完您分配的积分。在您补充之前，其定时和触发的运行将暂停。",
+        "bodyUnnamed": "您的某个工作区已用完您分配的积分。在您补充之前，其定时和触发的运行将暂停。",
+        "members": "其成员会看到积分已用完，并被提示联系您。",
+        "button": "添加积分"
     }
 }

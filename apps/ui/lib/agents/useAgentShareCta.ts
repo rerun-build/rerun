@@ -7,6 +7,7 @@ import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, tria
 import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
 import { CreditCard, LayoutGridIcon, type LucideIcon } from '@/lib/icons'
 import { TRIAL_DAYS, formatAmount, trialLimitsCaption } from '@rerun/contracts'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
@@ -25,6 +26,8 @@ export type AgentShareCta = {
     note: string | null
     steps: ShareStep[]
     pending: boolean
+    // The workspace cannot take it on, and why.
+    disabledReason?: string
     run: () => void
 }
 
@@ -36,6 +39,8 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
 
     const t = useTranslations('agent.shareCta')
     const tTrial = useTranslations('billing.trialOffer')
+    const tManaged = useTranslations('managed.paused')
+    const manager = useWorkspaceManager()
     const locale = useLocale()
 
     const priceArm = usePriceArm()
@@ -63,6 +68,9 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
     // A workspace with no Space at all is still in onboarding: the drop on the placeholder is what
     // triggers signup and the paywall, so gating here would only get in the way of that moment.
     const hasSpace = useBoardStore.getState().spaces.length > 0
+    if (manager && !isSubscriptionEntitled(workspace?.subscription_status)) {
+        return { gate: 'place', label: t('add'), note: null, steps: [], pending, disabledReason: tManaged('reason', { manager: manager.name }), run: () => {} }
+    }
     if (hasSpace && !isSubscriptionEntitled(workspace?.subscription_status)) {
         return {
             gate: 'plan',

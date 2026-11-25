@@ -4,8 +4,9 @@ import type { CheckinReason } from '@rerun/contracts'
 
 import { renderBoardMap } from './board-map'
 import { checklistBlock } from './checklist-block'
-import type { ForemanState } from './phase'
-import { RERUN_PRIMER, foremanProfileBlock, identityLine } from './prompt'
+import { brandOf, type ForemanState } from './phase'
+import { brandText } from '@/lib/brand/text'
+import { RERUN_PRIMER, foremanProfileBlock, identityLine, workspaceLine } from './prompt'
 
 const REASON_NOTES: Record<CheckinReason, string> = {
     pulse: 'The daily look the box takes at the workspace found something that may be worth a closer read. It is a lead, not a verdict: check it before you decide anything.',
@@ -30,11 +31,12 @@ How you decide:
 - Otherwise do not call it: end your run in one line, which only goes to your own log.`
 
 export function foremanCheckinInstructions(state: ForemanState, reason: CheckinReason): string {
+    const brand = brandOf(state)
     const blocks = [
-        `${identityLine(state.foreman.name)}\n\n${CHECKIN_CHARTER}`,
+        `${identityLine(state.foreman.name)}\n\n${brandText(CHECKIN_CHARTER, brand)}`,
         `Why you woke up: ${REASON_NOTES[reason]}`,
-        RERUN_PRIMER,
-        `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}).${state.language ? ` Its owner reads Rerun in ${state.language}.` : ''}`,
+        brandText(RERUN_PRIMER, brand),
+        `${workspaceLine(state)}${state.language ? ` Its owner reads ${brand.name} in ${state.language}.` : ''}`,
         foremanProfileBlock(state),
         checklistBlock(state.gettingStarted, { checkin: true }),
         `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`,

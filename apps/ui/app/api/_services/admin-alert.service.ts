@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { RERUN_BRAND, type Brand } from '@rerun/contracts'
 import type { Locale } from '@rerun/i18n'
 
+import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
 import { brandAppUrl } from '@/lib/brand/urls'
 import type { SendEmailResult } from '@/lib/email/client'
@@ -32,7 +33,7 @@ export type AdminAlert = {
 
 /** The admins this alert still has to reach. An alert is about the account, not about one run: the Email switch does not decide. */
 export async function adminsToAlert(supabase: Client, { workspaceId, key, awayOnly, reopenAfterMs }: AdminAlert, now: Date = new Date()): Promise<string[]> {
-    const { data: admins } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, role: 'admin' })
+    const { data: admins } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId, role: 'admin' })
     const adminIds = (admins ?? []).map(admin => admin.user_id)
     if (!adminIds.length) return []
 

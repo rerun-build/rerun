@@ -1,5 +1,7 @@
 import { checkoutTerms } from './checkout-terms'
-import { isMobileApp, type ForemanState } from '@/lib/foreman/phase'
+import { brandContact, brandText } from '@/lib/brand/text'
+import { brandOf, isMobileApp, type ForemanState } from '@/lib/foreman/phase'
+import { isWhiteLabel } from '@rerun/contracts'
 import type { PhaseSpec } from '@/lib/foreman/phases/spec'
 
 // The step between an agent the user has agreed to and the agent being built. The offer itself is the
@@ -21,13 +23,12 @@ export const TRIAL_PHASE: PhaseSpec = {
 
         return `Right now: their first coworker is agreed and nothing has been created. ${team}${divisions}
 
-Their workspace has no plan, which is why nothing can exist yet: coworkers run on the machine of the workspace, and that machine is only claimed for an account with a plan. The trial card went up in the chat when they agreed: ${checkoutTerms(state)}
+Their workspace has no plan, which is why nothing can exist yet: coworkers run on the machine of the workspace, and that machine is only claimed for an account with a plan. The trial card went up in the chat when they agreed: ${brandText(checkoutTerms(state), brandOf(state))}
 
 How to run this:
 - The trial is not on yet: the card they tried was already used for a trial, or Stripe has not confirmed it yet. Say what happened in one or two short lines. They cannot write back: the message field is gone until the plan is on, so ask nothing.
 - Right under your reply the app puts a button that reopens the card form: "Start free trial", or "Start my plan" when their card was already used for a trial. The coworker is built by itself the moment the plan is on. Point them to that button, never to a card further up the chat, and never tell them to refresh the page.
-- Under the chat they also have a "Talk to the team" button for anything about paying. If the card form itself failed, call contact_team.
-- Never invent a discount, a free plan or an exception, never answer anything beside the trial, and do not try to create a Box or a coworker: it will fail, and they will read the failure.`
+${isWhiteLabel(brandOf(state)) ? '' : '- Under the chat they also have a "Talk to the team" button for anything about paying. If the card form itself failed, call contact_team.\n'}- Never invent a discount, a free plan or an exception, never answer anything beside the trial, and do not try to create a Box or a coworker: it will fail, and they will read the failure.`
     },
     tools: ['search_docs', 'contact_team'],
 }
@@ -36,8 +37,9 @@ How to run this:
 // about paying is ever said there: what can stop it is a trial already spent, which only the web can
 // take further, or a hiccup the button simply retries.
 function mobileAppInstructions(state: ForemanState, agreed: string): string {
+    const brand = brandOf(state)
     const blocked = state.trialSpent
-        ? 'This workspace cannot be started from the app. Say so in one line, and that they can finish setting it up at rerun.build. Nothing else.'
+        ? `This workspace cannot be started from the app. Say so in one line, and that ${isWhiteLabel(brand) ? `${brandContact(brand)} can finish setting it up` : 'they can finish setting it up at rerun.build'}. Nothing else.`
         : 'The build did not start. Say in one line that it did not go through and that the "Build my team" button right under your reply tries again.'
     return `Right now: their first coworker is agreed and nothing has been created. ${agreed}
 
