@@ -1,7 +1,7 @@
-import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
+import { DEFAULT_ROLES, INTAKE_INDUSTRIES, rolesForIndustry, TEMPLATE_CATEGORIES } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_ROLES, INTAKE_INDUSTRIES, intakeBoxes, intakePreviewPlan, rolesForIndustry } from './intake'
+import { intakeBoxes, intakePreviewPlan } from './intake'
 
 describe('INTAKE_INDUSTRIES', () => {
     it('offers every bucket but the one nobody recognises themselves in', () => {

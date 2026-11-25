@@ -17,7 +17,7 @@ type DiscoveriesStore = {
     applyRow: (row: CompanyFindingsRow) => void
 }
 
-let queued: DiscoveryEvent[] = []
+const queued: DiscoveryEvent[] = []
 let timer: ReturnType<typeof setTimeout> | null = null
 let lastLanding = 0
 

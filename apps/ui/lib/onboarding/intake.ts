@@ -3,8 +3,6 @@ import type { TemplateCategory } from '@rerun/contracts'
 import type { ShownPlan } from '@/components/foreman/widgets/plan-card'
 import { DEFAULT_BOX_NAMES, divisionExamples } from '@/lib/onboarding/box-name-suggestions'
 
-export { DEFAULT_ROLES, INDUSTRY_ROLES, INTAKE_INDUSTRIES, rolesForIndustry } from '@rerun/contracts'
-
 // What the welcome card asks, and what it draws on the board while it asks it. Pure, so the lab can
 // replay every industry without a network and the server can read the same lists back.
 

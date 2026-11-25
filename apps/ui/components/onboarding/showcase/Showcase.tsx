@@ -59,10 +59,12 @@ function ChapterTabs({ index, onPick, onEnd }: { index: number; onPick: (index: 
 
     useEffect(() => {
         if (still) return
-        const startedAt = performance.now()
+        // Only the time spent in sight counts: a chapter left in a hidden tab picks up where it was.
+        let shownMs = 0
         const timer = setInterval(() => {
             if (document.hidden) return
-            const percent = ((performance.now() - startedAt) / HOLD_MS) * 100
+            shownMs += TICK_MS
+            const percent = (shownMs / HOLD_MS) * 100
             if (percent >= 100) return onEnd()
             setClock({ index, percent })
         }, TICK_MS)

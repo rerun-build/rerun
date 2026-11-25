@@ -60,7 +60,8 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     const [step, setStep] = useState<OnboardingStep>(initialStep)
     const [direction, setDirection] = useState(1)
     const [sector, setSector] = useState<SectorAnswer>({ sector: initial.sector, label: initial.sectorLabel })
-    const [industry, setIndustry] = useState<TemplateCategory | null>(initial.industry)
+    // The industry an answer was filed under, with the words it was decided for.
+    const [filed, setFiled] = useState<{ label: string; industry: TemplateCategory | null }>({ label: initial.sectorLabel, industry: initial.industry })
     const [view, setView] = useState<WorkspaceView>(initial.view)
     const [invites, setInvites] = useState<SentInvite[]>(initial.invites)
     const [saving, setSaving] = useState(false)
@@ -93,7 +94,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
         setSaving(true)
         setError(null)
         const result = await saveWelcomeSectorAction(sector.sector ? { sector: sector.sector } : { label: sector.label })
-        if (result.ok) setIndustry(result.industry)
+        if (result.ok) setFiled({ label: sector.sector ? '' : sector.label, industry: result.industry })
         saved(result, 'industry', 'team')
     }
 
@@ -205,7 +206,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     const email = accountLabel(session?.user?.email)
     const panel =
         !askPhone && step === 'industry' ? (
-            <LazyTeamPanel industry={picked?.category ?? (sector.label ? null : industry)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} />
+            <LazyTeamPanel industry={picked?.category ?? (sector.label === filed.label ? filed.industry : null)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} />
         ) : !askPhone && step === 'team' ? (
             <LazyMembersPanel name={firstName ?? email ?? ''} email={email} invites={invites.map(invite => invite.email)} />
         ) : !askPhone && step === 'view' ? (
