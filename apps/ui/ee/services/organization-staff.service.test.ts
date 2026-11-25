@@ -126,10 +126,22 @@ describe('leaving the team', () => {
     })
 
     it('does it for every team before an account goes', async () => {
+        world.rows('organization_members').push({ organization_id: HAVRE, user_id: ADMIN, role: 'admin', created_at: '2026-11-05T00:00:00Z' })
+        world.rows('workspace_members').push(memberRow(ADMIN, CLIENT, { organization_staff: true }), memberRow(ADMIN, RIVAL_WORKSPACE, { organization_staff: true }))
+        await leaveOrganizations(ADMIN)
+        expect(world.rows('organization_members').filter(row => row.user_id === ADMIN)).toEqual([])
+        expect(world.rows('workspace_members').filter(row => row.user_id === ADMIN && row.organization_staff)).toEqual([])
+    })
+
+    it('keeps the account of an organization’s last owner, and everything it has, until it hands over', async () => {
         world.rows('organization_members').push({ organization_id: HAVRE, user_id: OWNER, role: 'admin', created_at: '2026-11-05T00:00:00Z' })
         world.rows('workspace_members').push(memberRow(OWNER, CLIENT, { organization_staff: true }), memberRow(OWNER, RIVAL_WORKSPACE, { organization_staff: true }))
+        await expect(leaveOrganizations(OWNER)).rejects.toMatchObject({ code: 'organizationNeedsOwner' })
+        expect(world.rows('organization_members').filter(row => row.user_id === OWNER)).toHaveLength(2)
+        expect(world.rows('workspace_members').filter(row => row.user_id === OWNER && row.organization_staff)).toHaveLength(2)
+
+        world.rows('organization_members').find(row => row.user_id === ADMIN)!.role = 'owner'
         await leaveOrganizations(OWNER)
         expect(world.rows('organization_members').filter(row => row.user_id === OWNER)).toEqual([])
-        expect(world.rows('workspace_members').filter(row => row.user_id === OWNER && row.organization_staff)).toEqual([])
     })
 })

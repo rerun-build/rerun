@@ -12,8 +12,9 @@ export function isEmail(value: string): boolean {
     return emailSchema.safeParse(value).success
 }
 
+// As the database holds it: written `https://`, which a parser also reads out of `HTTPS://x` or `https:x`.
 export function isHttpsUrl(value: string): boolean {
-    return URL.canParse(value) && new URL(value).protocol === 'https:'
+    return value.startsWith('https://') && URL.canParse(value)
 }
 
 // Whole credits, whatever a person types between the digits. Null while nothing usable is there.
@@ -45,7 +46,7 @@ export type BrandProblem = 'nameInvalid' | 'colorInvalid' | 'emailInvalid' | 'ur
 export function brandProblems(fields: BrandFields): Partial<Record<keyof BrandFields, BrandProblem>> {
     const name = fields.name.trim()
     const problems: Partial<Record<keyof BrandFields, BrandProblem>> = {}
-    if (!name || name.length > BRAND_NAME_MAX || /[{}<>#|]/.test(name)) problems.name = 'nameInvalid'
+    if (!name || name.length > BRAND_NAME_MAX || /[{}<>#|\p{Cc}]/u.test(name)) problems.name = 'nameInvalid'
     if (fields.color && !normalizeHex(fields.color)) problems.color = 'colorInvalid'
     if (fields.supportEmail && !isEmail(fields.supportEmail.trim())) problems.supportEmail = 'emailInvalid'
     for (const key of ['docsUrl', 'termsUrl', 'privacyUrl'] as const) if (fields[key] && !isHttpsUrl(fields[key].trim())) problems[key] = 'urlInvalid'

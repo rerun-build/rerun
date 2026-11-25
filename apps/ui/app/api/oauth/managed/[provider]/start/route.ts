@@ -25,6 +25,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
             await assertCanAdd(vault.actor)
             const item = await readItem(vault, body.vaultItemId)
             if (item.managed?.provider !== providerId) return NextResponse.json(refusal('vaultEntryOtherServer'), { status: 400 })
+            const from = await requestHostReturn(req)
+            if (from) return startOnRerunHost(from, { agentId: '', workspaceId: vault.actor.workspaceId, userId: signedInUserId(vault.actor) }, { flow: 'managed', provider: providerId, key: item.id, serverName: item.managed.serverName, vaultItem: item.id })
             const { url, cookie } = await beginVaultManaged(req, vault.actor.workspaceId, item)
             return setContextCookie(NextResponse.json({ authorizationUrl: url }), cookie)
         }

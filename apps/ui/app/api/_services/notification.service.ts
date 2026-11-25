@@ -393,7 +393,7 @@ async function emailIncident(supabase: ServiceRoleClient, context: IncidentConte
         const { app, look, board } = await content()
         const appUrl = brandAppUrl(brand)
         const locale = await recipientLocale(supabase, userId, context.workspaceId)
-        const [boardUrl, portraitUrl] = await Promise.all([board, context.agentId ? emailPortrait(context.agentId, look, locale, BANNER_WARM_INLINE_MS) : undefined])
+        const [boardUrl, portraitUrl] = await Promise.all([board, context.agentId ? emailPortrait(context.agentId, look, locale, BANNER_WARM_INLINE_MS, brand) : undefined])
         const { ok } = await sendNotificationEmail({
             to: recipient.email,
             kind,

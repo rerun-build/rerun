@@ -65,7 +65,7 @@ describe('supabase send email hook', () => {
         const agency = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys' }
         authEmailBrand.mockResolvedValue(agency)
 
-        await post({ user: { id: 'user-1', email: 'a@b.co' }, email_data: emailData({ token: '123456', token_hash: 'hash1', redirect_to: 'https://agents.nordlys.no/auth/callback' }) })
+        await post({ user: { id: 'user-1', email: 'a@b.co' }, email_data: emailData({ token: '123456', token_hash: 'hash1' }) })
 
         expect(authEmailBrand).toHaveBeenCalledWith({ email: 'a@b.co', userId: 'user-1' })
         expect(sendSignInCodeEmail.mock.calls[0][0].brand).toEqual(agency)

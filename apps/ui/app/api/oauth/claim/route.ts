@@ -1,6 +1,7 @@
 import { memberActor, requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { UnauthenticatedError } from '@/app/api/_auth/errors'
 import { claimParkedSignIn, finishParkedSignIn } from '@/app/api/_services/oauth-claim.service'
+import { connectVaultManaged } from '@/app/api/_services/vault-sign-in.service'
 import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
 import { getVaultItem, putVaultToken } from '@/lib/engine/vault-client'
 import { AppError, refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
@@ -33,8 +34,10 @@ async function popup(result: Finished, target?: HostReturn['target']): Promise<N
 async function finishForVault(back: HostReturn, vaultItem: string, parked: ParkedSignIn): Promise<void> {
     const actor = await memberActor(back.workspaceId, back.userId)
     if (!actor) throw new AppError('signInOtherWorkspace')
-    const { conn } = await vaultContext(actor)
+    const vault = await vaultContext(actor)
+    const { conn } = vault
     await assertCanAdd(actor)
+    if (parked.kind === 'managed') return connectVaultManaged(vault, vaultItem, parked.provider, parked.token, parked.email)
     const item = await getVaultItem(conn, vaultItem)
     if (parked.kind !== 'mcp' || !item.oauth || parked.serverName !== item.oauth.serverName || parked.mcpUrl !== item.oauth.url) throw new AppError('signInForAnotherServer')
     await putVaultToken(conn, item.id, parked.serverName, { ...parked.token, clientSecret: engineClientSecret({ mcpUrl: item.oauth.url, clientId: parked.token.clientId, clientSecret: parked.token.clientSecret }) })
@@ -45,7 +48,7 @@ async function finish(back: HostReturn, claim: string): Promise<Finished> {
     const identity = await getSessionIdentity()
     if (identity?.id !== back.userId) throw new UnauthenticatedError()
     const { agentId, workspaceId, userId, target } = back
-    const vaultItem = target.flow === 'mcp' ? target.vaultItem : undefined
+    const { vaultItem } = target
     if (vaultItem === undefined) await requireAgentWorkspaceId(agentId, 'manage', workspaceId)
 
     const parked = await claimParkedSignIn(claim, { agentId, workspaceId, userId })

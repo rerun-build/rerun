@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { SupabaseCall } from '@/test/supabase-fake'
 import { writeMethodOf } from '@/test/supabase-fake'
-import { CLIENT, HAVRE, NORDLYS, organizationContext, organizationTables, organizationWorld, RIVAL, RIVAL_WORKSPACE, workspaceRow, type OrganizationWorld } from '@/ee/test/organization-world'
+import { CLIENT, HAVRE, NORDLYS, organizationContext, organizationTables, organizationWorld, RIVAL, RIVAL_WORKSPACE, STRANGER, workspaceRow, type OrganizationWorld } from '@/ee/test/organization-world'
 
 const mocks = vi.hoisted(() => ({ client: null as unknown }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => mocks.client }))
@@ -11,16 +11,24 @@ vi.mock('@/supabase/session/getServerSession', () => ({ getSessionIdentity: vi.f
 vi.mock('@rerun/cloud/organizations', () => ({ ORGANIZATIONS_ENABLED: true }))
 vi.mock('@/app/api/_services/remote-computers.service', () => ({ revokeMemberComputers: vi.fn() }))
 
-const { adjustOrganizationCredit, allocateOrganizationCredit, loadOrganizationCredit, MAX_CREDITS_PER_MOVEMENT, purchaseOrganizationCredit, reserveBalanceMicros, returnCreditToReserve, takeBackOrganizationCredit } = await import('./organization-credit.service')
+const { adjustOrganizationCredit, allocateOrganizationCredit, loadOrganizationCredit, MAX_CREDITS_PER_MOVEMENT, purchaseOrganizationCredit, reserveBalanceMicros, returnAllocatedCredit, takeBackOrganizationCredit } = await import('./organization-credit.service')
 
 const request = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 const credits = (n: number) => n * MICROS_PER_CREDIT
 
 let world: OrganizationWorld
 
-function open(before?: (table: string, calls: readonly SupabaseCall[]) => { error: unknown } | undefined | void, topup = 0): void {
+// `topup` is what the workspace holds, `handed` what of it the organization gave: the rest it bought itself.
+function open(before?: (table: string, calls: readonly SupabaseCall[]) => { error: unknown } | undefined | void, topup = 0, handed = topup): void {
     const tables = organizationTables()
-    world = organizationWorld({ ...tables, workspaces: [...tables.workspaces.filter(row => row.id !== CLIENT), workspaceRow(CLIENT, { name: 'Acme', rerun_topup_micros: topup })] }, before)
+    const given = { organization_id: NORDLYS, workspace_id: CLIENT, workspace_name: 'Acme', applied_at: '2026-11-01T00:00:00Z', reversal_of: null }
+    const movements = handed
+        ? [
+              { ...given, id: 'bought', seq: 1, kind: 'purchase', micros: handed, balance_after: handed, workspace_id: null, workspace_name: null, request_id: 'bought' },
+              { ...given, id: 'handed', seq: 2, kind: 'allocation', micros: -handed, balance_after: 0, request_id: 'handed' },
+          ]
+        : []
+    world = organizationWorld({ ...tables, organization_credit_movements: movements, workspaces: [...tables.workspaces.filter(row => row.id !== CLIENT), workspaceRow(CLIENT, { name: 'Acme', rerun_topup_micros: topup })] }, before)
     mocks.client = world.client
 }
 
@@ -218,7 +226,24 @@ describe('taking credit back', () => {
         expect(await balance()).toBe(credits(50))
         expect(await takeBack(50, 2)).toBe(credits(50))
         expect(topupOf(CLIENT)).toBe(credits(70))
-        expect(ledger()).toHaveLength(1)
+        expect(ledger().filter(row => row.kind === 'take_back')).toHaveLength(1)
+    })
+
+    it('never takes what the workspace bought itself', async () => {
+        open(undefined, credits(120), credits(50))
+        expect(await takeBack(100, 2)).toBe(credits(50))
+        expect(topupOf(CLIENT)).toBe(credits(70))
+        expect(await balance()).toBe(credits(50))
+        await expect(takeBack(10, 3)).rejects.toMatchObject({ code: 'organizationNothingToTakeBack' })
+        expect(topupOf(CLIENT)).toBe(credits(70))
+        expectLedgerToAddUp()
+    })
+
+    it('takes nothing from a workspace it handed nothing to', async () => {
+        open(undefined, credits(120), 0)
+        await expect(takeBack(10, 2)).rejects.toMatchObject({ code: 'organizationNothingToTakeBack' })
+        expect(topupOf(CLIENT)).toBe(credits(120))
+        expect(ledger()).toHaveLength(0)
     })
 
     it('gives it back to the workspace when the ledger could not be written', async () => {
@@ -235,14 +260,22 @@ describe('taking credit back', () => {
         expectLedgerToAddUp()
     })
 
-    it('returns everything before a workspace is deleted, and nothing from an empty one', async () => {
+    it('returns what it handed out before a workspace leaves, and nothing from an empty one', async () => {
         open(undefined, 777)
         const ctx = organizationContext(world)
         const workspace = world.rows('workspaces').find(row => row.id === CLIENT)!
-        await returnCreditToReserve(ctx, workspace as never)
-        await returnCreditToReserve(ctx, workspace as never)
+        await returnAllocatedCredit(ctx, workspace as never)
+        await returnAllocatedCredit(ctx, workspace as never)
         expect(await balance()).toBe(777)
-        expect(ledger()).toHaveLength(1)
+        expect(ledger().filter(row => row.kind === 'take_back')).toHaveLength(1)
+    })
+
+    it('leaves a workspace that goes what it bought itself', async () => {
+        open(undefined, credits(120), credits(50))
+        const workspace = world.rows('workspaces').find(row => row.id === CLIENT)!
+        await returnAllocatedCredit(organizationContext(world), workspace as never)
+        expect(topupOf(CLIENT)).toBe(credits(70))
+        expect(await balance()).toBe(credits(50))
     })
 })
 
@@ -258,6 +291,13 @@ describe('the history', () => {
         const second = await loadOrganizationCredit(organizationContext(world), first.nextBeforeSeq!)
         expect(second.movements.map(movement => movement.seq)).toEqual([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
         expect(second.nextBeforeSeq).toBeNull()
+    })
+
+    it('names its own team, and nobody of Rerun who sold or corrected the reserve', async () => {
+        await purchaseOrganizationCredit(world.client, { organizationId: NORDLYS, credits: 500, actorUserId: STRANGER, requestId: request(1) })
+        await allocate(10, 2)
+        const { movements } = await loadOrganizationCredit(organizationContext(world))
+        expect(movements.map(movement => movement.actorName)).toEqual(['owner', null])
     })
 
     it('shows the allocation that failed as undone', async () => {

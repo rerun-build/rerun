@@ -1,6 +1,6 @@
 import type { Database, Json } from '@/app/api/database.types'
 import { grantRerunTopup } from '@rerun/cloud/billing.server'
-import { insertDefaultWorkspace } from '@/app/api/_services/default-workspace.service'
+import { insertDefaultWorkspace, NO_RERUN_EMAIL } from '@/app/api/_services/default-workspace.service'
 import { SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
 import { attachReferral } from '@/ee/services/referral-attach.service'
 import { DEFAULT_NOTIFICATION_PREFS, mergeNotificationPrefs } from '@/lib/notifications/prefs'
@@ -9,8 +9,6 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
-
-const NO_RERUN_EMAIL = { categories: { product: false, billing: false } }
 
 // Just-in-time provisioning: the first time an authenticated user is seen, seed
 // their workspace, user row and owner membership. The request client only reads the users row;

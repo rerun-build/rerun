@@ -113,7 +113,6 @@ type OrganizationCreditOutEmailInput = {
     workspaceName: string | null
     consoleUrl: string
     boardUrl?: string
-    unsubscribeUrl: string
     locale: Locale
     brand: Brand
 }
@@ -132,7 +131,7 @@ export async function sendOrganizationCreditOutEmail(input: OrganizationCreditOu
     const delivery = redirectDelivery(to, input.workspaceName ? t('subjects.organizationCreditOut', { workspaceName: input.workspaceName }) : t('organizationCreditOut.preview'))
 
     const { data, error } = await sendThrottled(() =>
-        resend.emails.send({ ...emailSender(input.brand), to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(input.unsubscribeUrl) }),
+        resend.emails.send({ ...emailSender(input.brand), to: delivery.to, subject: delivery.subject, html, text }),
     )
     if (error) {
         console.error('[email] failed to send organization credit email', error)

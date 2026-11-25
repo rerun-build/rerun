@@ -152,7 +152,9 @@ export async function allocateOrganizationCredit(ctx: OrganizationContext, { wor
         await clearOrganizationCreditAlert(supabase, workspaceId).catch(err => console.error('[organizations] failed to clear the credit alert', workspaceId, err))
         return
     }
-    await appendMovement(supabase, { organizationId: organization.id, kind: 'take_back', micros: -movement.micros, workspace, actorUserId: userId, requestId: randomUuid(), appliedAt: new Date().toISOString(), reversalOf: movement.id })
+    await appendMovement(supabase, { organizationId: organization.id, kind: 'take_back', micros: -movement.micros, workspace, actorUserId: userId, requestId: randomUuid(), appliedAt: new Date().toISOString(), reversalOf: movement.id }).catch(err =>
+        console.error('[organizations] an allocation left the reserve, reached no workspace and could not be undone', { organizationId: organization.id, workspaceId, micros: -movement.micros, movementId: movement.id, err }),
+    )
     throw new AppError('organizationCreditFailed')
 }
 
@@ -166,29 +168,30 @@ async function isReversed(supabase: Client, movementId: string): Promise<boolean
 // coworkers may be spending it at the same time.
 export async function takeBackOrganizationCredit(ctx: OrganizationContext, { workspaceId, credits, requestId }: WorkspaceChange): Promise<number> {
     const workspace = await requireOrganizationWorkspace(ctx, workspaceId)
-    const wanted = microsOf(credits)
-    const movement: NewMovement = { organizationId: ctx.organization.id, kind: 'take_back', micros: wanted, workspace, actorUserId: ctx.userId, requestId, appliedAt: new Date().toISOString() }
+    const asked = microsOf(credits)
+    const movement: NewMovement = { organizationId: ctx.organization.id, kind: 'take_back', micros: asked, workspace, actorUserId: ctx.userId, requestId, appliedAt: new Date().toISOString() }
     const done = await movementOfRequest(ctx.supabase, requestId)
     if (done) {
         assertSameIntent(done, movement)
         return done.micros
     }
 
-    const taken = await takeFromWorkspace(ctx.supabase, workspaceId, wanted)
+    const taken = await takeFromWorkspace(ctx.supabase, workspaceId, Math.min(asked, await allocatedMicros(ctx, workspaceId)))
     if (taken === 0) throw new AppError('organizationNothingToTakeBack')
     return returnTaken(ctx.supabase, workspaceId, { ...movement, micros: taken })
 }
 
-// Before a workspace is deleted: the organization paid for what its client did not spend. `upTo` is
-// for a workspace that lives on, and keeps what it bought itself.
-export async function returnCreditToReserve(ctx: OrganizationContext, workspace: OrganizationWorkspaceRow, upTo = Number.MAX_SAFE_INTEGER): Promise<void> {
-    const taken = await takeFromWorkspace(ctx.supabase, workspace.id, upTo)
+// Before a workspace leaves the organization, deleted or detached: what the organization handed it and
+// its client did not spend. Never more: a workspace that joined with credit of its own bought it from
+// Rerun, and that is not the organization's to take.
+export async function returnAllocatedCredit(ctx: OrganizationContext, workspace: OrganizationWorkspaceRow): Promise<void> {
+    const taken = await takeFromWorkspace(ctx.supabase, workspace.id, await allocatedMicros(ctx, workspace.id))
     if (taken === 0) return
     await returnTaken(ctx.supabase, workspace.id, { organizationId: ctx.organization.id, kind: 'take_back', micros: taken, workspace, actorUserId: ctx.userId, requestId: randomUuid(), appliedAt: new Date().toISOString() })
 }
 
 // What the organization handed to a workspace and did not take back.
-export async function allocatedMicros({ supabase, organization }: OrganizationContext, workspaceId: number): Promise<number> {
+async function allocatedMicros({ supabase, organization }: OrganizationContext, workspaceId: number): Promise<number> {
     const { data, error } = await selectAll(supabase, 'organization_credit_movements', ['micros'] as const, { organization_id: organization.id, workspace_id: workspaceId })
     if (error) throw new Error(error.message)
     return Math.max(0, -data.reduce((sum, { micros }) => sum + micros, 0))
@@ -222,11 +225,17 @@ async function returnTaken(supabase: Client, workspaceId: number, movement: NewM
     try {
         appended = await appendMovement(supabase, movement)
     } catch (err) {
-        await grantRerunTopup(workspaceId, movement.micros)
+        await giveBack(workspaceId, movement)
         throw err
     }
-    if (appended.replayed) await grantRerunTopup(workspaceId, movement.micros)
+    if (appended.replayed) await giveBack(workspaceId, movement)
     return appended.movement.micros
+}
+
+// The credit left the workspace and reached nothing: said with what it takes to put it back by hand.
+async function giveBack(workspaceId: number, { organizationId, micros, requestId }: NewMovement): Promise<void> {
+    if (await grantRerunTopup(workspaceId, micros)) return
+    console.error('[organizations] credit taken from a workspace reached neither the reserve nor the workspace again', { organizationId, workspaceId, micros, requestId })
 }
 
 export type CreditMovement = {
@@ -259,7 +268,11 @@ export async function loadOrganizationCredit(ctx: OrganizationContext, beforeSeq
     if (error) throw new Error(error.message)
     const rows = (data ?? []).slice(0, HISTORY_PAGE)
 
-    const actorIds = [...new Set(rows.flatMap(row => row.actor_user_id ?? []))]
+    // Rerun's own people sell and correct the reserve: the history names the team and nobody else.
+    const { data: team, error: teamError } = await selectAll(supabase, 'organization_members', ['user_id'] as const, { organization_id: organization.id })
+    if (teamError) throw new Error(teamError.message)
+    const onTeam = new Set(team.map(member => member.user_id))
+    const actorIds = [...new Set(rows.flatMap(row => (row.actor_user_id && onTeam.has(row.actor_user_id) ? row.actor_user_id : [])))]
     const [identities, { data: reversals }] = await Promise.all([resolveMemberIdentities(supabase, actorIds), selectMany(supabase, 'organization_credit_movements', ['reversal_of'] as const, { reversal_of: rows.map(row => row.id) })])
     const reversed = new Set((reversals ?? []).map(row => row.reversal_of))
 

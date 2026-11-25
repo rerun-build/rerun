@@ -343,6 +343,14 @@ describe('removeMemberAction', () => {
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
+    it('leaves it to the organization that runs the workspace, whose console opens them a workspace of their own', async () => {
+        mocks.getServerSession.mockImplementation(sessionWithMembership({ user: { id: ME, workspace_id: WORKSPACE_ID }, workspace: { id: WORKSPACE_ID, name: 'Acme', max_seats: null, organization_id: 'org-1' }, session: { id: ME, email: 'me@acme.test' } }))
+        const db = database({ workspace_members: [member(ME), member('user-2'), member('user-2', 42)], users: [{ id: 'user-2', workspace_id: WORKSPACE_ID }] })
+
+        await expect(removeMemberAction('user-2')).resolves.toMatchObject({ ok: false, code: 'managedWorkspace' })
+        expect(db.writes('workspace_members')).toHaveLength(0)
+    })
+
     it('refuses a user who is not a member of the workspace', async () => {
         const db = database({ workspace_members: [member(ME), member('user-2', 99)] })
 

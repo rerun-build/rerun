@@ -18,7 +18,7 @@ const IMMUTABLE_CACHE_CONTROL = '31536000'
 
 export type OrganizationBrandSettings = { fields: BrandFields; iconUrl: string | null }
 
-export function brandSettingsOf(organization: OrganizationRow): OrganizationBrandSettings {
+function brandSettingsOf(organization: OrganizationRow): OrganizationBrandSettings {
     return {
         fields: {
             name: organization.name,

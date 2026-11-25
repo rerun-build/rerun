@@ -1,6 +1,7 @@
 import type { User } from '@supabase/supabase-js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { writeMethodOf } from '@/test/supabase-fake'
 import { ADMIN, CLIENT, EMAILS, HAVRE, memberRow, NORDLYS, organizationContext, organizationWorld, OWNER, RIVAL, STRANGER, type OrganizationWorld } from '@/ee/test/organization-world'
 
 const mocks = vi.hoisted(() => ({ client: null as unknown, delivery: true, sendWorkspaceInviteEmail: vi.fn(async () => ({ ok: true, id: null })) }))
@@ -164,6 +165,20 @@ describe('the last owner', () => {
 describe('taking someone off the team', () => {
     it('takes them out of the clients’ workspaces too', async () => {
         world.rows('workspace_members').push(memberRow(ADMIN, CLIENT, { organization_staff: true }))
+        await removeTeamMember(owner(), ADMIN)
+        expect(roleOf(ADMIN)).toBeUndefined()
+        expect(world.rows('workspace_members').some(row => row.user_id === ADMIN && row.organization_staff)).toBe(false)
+    })
+
+    it('leaves them on the team, to be removed again, when their way into a client’s workspace resists', async () => {
+        let broken = true
+        world = organizationWorld({}, (table, calls) => (broken && table === 'workspace_members' && writeMethodOf(calls) === 'delete' ? { data: null, error: { message: 'boom' } } : undefined))
+        mocks.client = world.client
+        world.rows('workspace_members').push(memberRow(ADMIN, CLIENT, { organization_staff: true }))
+        await expect(removeTeamMember(owner(), ADMIN)).rejects.toThrow('boom')
+        expect(roleOf(ADMIN)).toBe('admin')
+
+        broken = false
         await removeTeamMember(owner(), ADMIN)
         expect(roleOf(ADMIN)).toBeUndefined()
         expect(world.rows('workspace_members').some(row => row.user_id === ADMIN && row.organization_staff)).toBe(false)

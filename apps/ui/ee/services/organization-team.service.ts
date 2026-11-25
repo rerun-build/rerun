@@ -140,10 +140,12 @@ export async function setTeamMemberRole(ctx: OrganizationContext, userId: string
     else await writeRole(ctx, userId, role)
 }
 
-// An owner is demoted before being removed, which is what keeps one. Off the team first, out of the
-// clients' workspaces next: nothing can open one in between.
+// An owner is demoted before being removed, which is what keeps one. Out of the clients' workspaces
+// while still on the team: a failure there leaves someone the console still lists, to be removed again.
+// Then off the team, and out once more of what they opened in between.
 export async function removeTeamMember(ctx: OrganizationContext, userId: string): Promise<void> {
     if ((await roleInTeam(ctx, userId)) === 'owner') await demoteKeepingAnOwner(ctx, userId)
+    await removeStaff(ctx.supabase, ctx.organization.id, userId)
     const { error } = await ctx.supabase.from('organization_members').delete().eq('organization_id', ctx.organization.id).eq('user_id', userId)
     if (error) throw new Error(error.message)
     await removeStaff(ctx.supabase, ctx.organization.id, userId)

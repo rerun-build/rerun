@@ -41,11 +41,19 @@ describe('the ask of the edge', () => {
         expect((await ask('domain=nordlys.rerun.work&key=edge-key')).status).toBe(404)
     })
 
-    it('slows a caller down past its pace, the key notwithstanding', async () => {
+    it('stops answering made-up names past its pace, and still says yes to a name it serves', async () => {
         const { GET } = await import('./route')
+        const made = (n: number) => GET(new Request(`http://app/api/edge/ask?domain=x${n}.rerun.work&key=edge-key`))
         const statuses: number[] = []
-        for (let i = 0; i < 305; i++) statuses.push((await GET(new Request('http://app/api/edge/ask?domain=nordlys.rerun.work&key=edge-key'))).status)
-        expect(statuses.slice(0, 300).every(status => status === 200)).toBe(true)
+        for (let i = 0; i < 305; i++) statuses.push((await made(i)).status)
+        expect(statuses.slice(0, 300).every(status => status === 404)).toBe(true)
         expect(statuses.slice(300)).toEqual([429, 429, 429, 429, 429])
+        expect((await GET(new Request('http://app/api/edge/ask?domain=nordlys.rerun.work&key=edge-key'))).status).toBe(200)
+    })
+
+    it('never counts a name it serves against that pace', async () => {
+        const { GET } = await import('./route')
+        for (let i = 0; i < 305; i++) expect((await GET(new Request('http://app/api/edge/ask?domain=nordlys.rerun.work&key=edge-key'))).status).toBe(200)
+        expect((await GET(new Request('http://app/api/edge/ask?domain=nobody.rerun.work&key=edge-key'))).status).toBe(404)
     })
 })

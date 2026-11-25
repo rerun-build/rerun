@@ -279,7 +279,6 @@ export const EMAIL_PREVIEWS: EmailPreview[] = [
         workspaceName="Acme"
         consoleUrl={`${APP_URL}/organization`}
         appUrl={APP_URL}
-        unsubscribeUrl={`${APP_URL}/unsubscribe`}
       />
     ),
   },

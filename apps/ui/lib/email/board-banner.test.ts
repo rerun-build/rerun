@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeSupabase } from '@/test/supabase-fake'
+import { RERUN_BRAND } from '@rerun/contracts'
 import { emailBoardBanner, emailPortrait } from './board-banner'
 
 function database() {
@@ -60,6 +61,12 @@ describe('emailPortrait', () => {
         respond({ status: 200 })
         expect(new URL((await emailPortrait('agent-1', null, 'en', 1_000)) as string).searchParams.get('bare')).toBe('right')
         expect(new URL((await emailPortrait('agent-1', null, 'ar', 1_000)) as string).searchParams.get('bare')).toBe('left')
+    })
+
+    it('is served by the app of the brand the email wears, never by Rerun’s under an organization', async () => {
+        respond({ status: 200 })
+        const brand = { ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys', appUrl: 'https://agents.nordlys.no' }
+        expect(new URL((await emailPortrait('agent-1', null, 'en', 1_000, brand)) as string).origin).toBe('https://agents.nordlys.no')
     })
 
     it('does without it when the capture fails', async () => {

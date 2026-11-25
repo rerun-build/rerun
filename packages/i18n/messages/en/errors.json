@@ -179,6 +179,7 @@
     "messageNotFound": "Message not found",
     "saveFeedbackFailed": "Could not save your feedback",
     "feedbackNotFound": "Feedback not found",
+    "feedbackUnavailable": "Feedback is not available here.",
     "adminOnlySandboxReactivation": "Only an admin can ask to reactivate this sandbox",
     "reactivationNoteRequired": "Tell us what you plan to build with your sandbox.",
     "keepItUnderDot": "Keep it under {max} characters.",

@@ -4,9 +4,10 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { moveToOtherWorkspace } from '@/app/api/_services/default-workspace.service'
 import { revokeMemberComputers } from '@/app/api/_services/remote-computers.service'
+import { batchesOf } from '@/ee/lib/organizations/batches'
 import { requireOrganizationWorkspace, type OrganizationContext } from '@/ee/services/organization-context.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectAll, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectAll, selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AppError } from '@/lib/i18n/action-error'
 
 type Client = SupabaseClient<Database>
@@ -45,20 +46,26 @@ export async function openOrganizationWorkspace(ctx: OrganizationContext, worksp
     if (switchError) throw new Error(switchError.message)
 }
 
-// Called once the person is off the team, so that nothing can open a workspace behind it.
+// Out of every workspace of the organization's clients. Run again without harm: before the person is
+// off the team, so that a failure leaves them where they can be removed again, and once more after,
+// for a workspace opened in between.
 export async function removeStaff(supabase: Client, organizationId: string, userId: string): Promise<void> {
     const { data: rows, error } = await selectAll(supabase, 'workspace_members', ['workspace_id'] as const, { user_id: userId, organization_staff: true })
     if (error) throw new Error(error.message)
-    if (rows.length === 0) return
 
-    const { data: own, error: ownError } = await selectMany(supabase, 'workspaces', ['id'] as const, { organization_id: organizationId, id: rows.map(row => row.workspace_id) })
-    if (ownError) throw new Error(ownError.message)
-    const ids = (own ?? []).map(workspace => workspace.id)
+    const ids: number[] = []
+    for (const batch of batchesOf(rows.map(row => row.workspace_id))) {
+        const { data: own, error: ownError } = await selectMany(supabase, 'workspaces', ['id'] as const, { organization_id: organizationId, id: batch })
+        if (ownError) throw new Error(ownError.message)
+        ids.push(...(own ?? []).map(workspace => workspace.id))
+    }
     if (ids.length === 0) return
 
     // All the rows first: the workspace they are moved to must not be one they are leaving too.
-    const { error: deleteError } = await supabase.from('workspace_members').delete().eq('user_id', userId).eq('organization_staff', true).in('workspace_id', ids)
-    if (deleteError) throw new Error(deleteError.message)
+    for (const batch of batchesOf(ids)) {
+        const { error: deleteError } = await supabase.from('workspace_members').delete().eq('user_id', userId).eq('organization_staff', true).in('workspace_id', batch)
+        if (deleteError) throw new Error(deleteError.message)
+    }
 
     const { data: user } = await selectMaybeSingle(supabase, 'users', ['workspace_id'] as const, { id: userId })
     if (user && ids.includes(user.workspace_id)) await moveToOtherWorkspace(supabase, userId, user.workspace_id, { openOne: true })
@@ -79,12 +86,20 @@ export async function removeStaffFromWorkspace(supabase: Client, workspaceId: nu
     }
 }
 
-// Before an account is deleted.
+// Before an account is deleted. Refused to the last owner of an organization, which would be left with
+// nobody to run its team, its brand and its credit: they hand it over first.
 export async function leaveOrganizations(userId: string): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: memberships, error } = await selectAll(supabase, 'organization_members', ['organization_id'] as const, { user_id: userId })
+    const { data: memberships, error } = await selectAll(supabase, 'organization_members', ['organization_id', 'role'] as const, { user_id: userId })
     if (error) throw new Error(error.message)
+    for (const { organization_id, role } of memberships) {
+        if (role !== 'owner') continue
+        const { data: owners, error: ownersError } = await selectCount(supabase, 'organization_members', { organization_id, role: 'owner' })
+        if (ownersError || owners === null) throw new Error(ownersError?.message ?? 'Could not count the owners')
+        if (owners <= 1) throw new AppError('organizationNeedsOwner')
+    }
     for (const { organization_id } of memberships) {
+        await removeStaff(supabase, organization_id, userId)
         const { error: deleteError } = await supabase.from('organization_members').delete().eq('organization_id', organization_id).eq('user_id', userId)
         if (deleteError) throw new Error(deleteError.message)
         await removeStaff(supabase, organization_id, userId)

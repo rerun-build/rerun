@@ -16,6 +16,9 @@ const FETCH_TIMEOUT_MS = 10_000
 let held: EngineBrand | undefined
 let askedAt = -Infinity
 let asking: Promise<void> | null = null
+// Until the hub has answered once, what is held is only what the machine was born with: Rerun, which
+// the first run of an organization's machine must not say. That run waits for the answer itself.
+let answered = false
 
 function readStored(): EngineBrand {
     try {
@@ -54,10 +57,12 @@ async function askHub(): Promise<void> {
     const res = await fetch(`${hub.replace(/\/$/, '')}/api/engines/brand`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
     if (!res.ok) throw new Error(`hub answered ${res.status}`)
     await keep(engineBrandSchema.parse(await res.json()))
+    answered = true
 }
 
 // Called as a run starts, before anything is written for its model. A hub that fails, or predates the
-// route, is asked again once FRESH_MS has passed, and what was last known stands meanwhile.
+// route, is asked again once FRESH_MS has passed, and what was last known stands meanwhile. A machine
+// that was never answered waits for as long as the hub may take.
 export async function refreshBrand(): Promise<void> {
     if (Date.now() - askedAt >= FRESH_MS) {
         askedAt = Date.now()
@@ -67,5 +72,5 @@ export async function refreshBrand(): Promise<void> {
                 asking = null
             })
     }
-    if (asking) await Promise.race([asking, new Promise(resolve => setTimeout(resolve, WAIT_MS).unref())])
+    if (asking) await Promise.race([asking, new Promise(resolve => setTimeout(resolve, answered ? WAIT_MS : FETCH_TIMEOUT_MS).unref())])
 }

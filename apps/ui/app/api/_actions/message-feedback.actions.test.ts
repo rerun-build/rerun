@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
+import { RERUN_BRAND } from '@rerun/contracts'
 
 const mocks = vi.hoisted(() => ({
     requireWorkspaceContext: vi.fn(),
@@ -8,6 +9,7 @@ const mocks = vi.hoisted(() => ({
     assertSessionInWorkspace: vi.fn(),
     assertAgentInWorkspace: vi.fn(),
     readSessionMessages: vi.fn(),
+    workspaceBrand: vi.fn(),
 }))
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: mocks.requireWorkspaceContext }))
@@ -20,6 +22,7 @@ vi.mock('@/app/api/_auth/access', () => ({
 }))
 vi.mock('@/app/api/_services/conversation.service', () => ({ readSessionMessages: mocks.readSessionMessages }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/lib/brand/workspace', () => ({ workspaceBrand: mocks.workspaceBrand }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { clearMessageFeedbackAction, rateMessageAction, updateMessageFeedbackAction } = await import('./message-feedback.actions')
@@ -37,6 +40,7 @@ beforeEach(() => {
     vi.clearAllMocks()
     db = fakeSupabase(table => (table === 'message_feedback' ? { data: { id: FEEDBACK_ID } } : undefined))
     vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+    mocks.workspaceBrand.mockResolvedValue(RERUN_BRAND)
     mocks.requireWorkspaceContext.mockResolvedValue({ userId: 'user-me', workspace: { id: WORKSPACE_ID }, role: 'admin', boxScope: 'all', supabase: db.client })
     mocks.requireLightSessionActor.mockResolvedValue(ADMIN)
     mocks.assertSessionInWorkspace.mockResolvedValue({ id: SESSION_ID, agent_id: 'agent-1' })
@@ -61,6 +65,12 @@ describe('rateMessageAction', () => {
             details: null,
             transcript: TRANSCRIPT,
         })
+    })
+
+    it('copies no conversation of an organization’s client for Rerun’s team to read', async () => {
+        mocks.workspaceBrand.mockResolvedValue({ ...RERUN_BRAND, organizationId: 'org', name: 'Nordlys' })
+        expect(await rateMessageAction({ sessionId: SESSION_ID, messageId: 'engine-1', rating: 'down', messageText: 'Done.' })).toMatchObject({ ok: false, code: 'feedbackUnavailable' })
+        expect(db.writes('message_feedback')).toEqual([])
     })
 
     it('refuses a vote on a message the conversation does not hold, without writing', async () => {

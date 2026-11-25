@@ -96,6 +96,8 @@ export async function POST(req: Request): Promise<Response> {
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Hub tool failed'
         console.error(`[hub] ${tool} failed:`, message)
-        return Response.json({ error: brandText(message, await workspaceBrand(engine.workspaceId)) })
+        // A coworker reads this error: under a brand that cannot be read, it is told no more than that.
+        const brand = await workspaceBrand(engine.workspaceId).catch(() => null)
+        return Response.json({ error: brand ? brandText(message, brand) : 'Hub tool failed' })
     }
 }

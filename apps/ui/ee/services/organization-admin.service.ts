@@ -10,7 +10,7 @@ import { BASE_PLAN_SLUG, baseLimitsToColumns, isLifetimePlan, ORGANIZATION_PLAN_
 import { stripe } from '@/ee/lib/billing/stripe'
 import { slugProblem } from '@/ee/lib/organizations/slugs'
 import { readOrganization, requireOrganizationWorkspace, toOrganizationRole, type OrganizationContext, type OrganizationRow } from '@/ee/services/organization-context.service'
-import { allocatedMicros, reserveBalanceMicros, returnCreditToReserve } from '@/ee/services/organization-credit.service'
+import { reserveBalanceMicros, returnAllocatedCredit } from '@/ee/services/organization-credit.service'
 import { removeStaffFromWorkspace } from '@/ee/services/organization-staff.service'
 import { inviteTeamMember, revokeTeamInvitation, setTeamMemberRole } from '@/ee/services/organization-team.service'
 import { assertMachineIdle, assertStillAllowed, countWorkspaces, limitReached, startRunning } from '@/ee/services/organization-workspaces.service'
@@ -336,7 +336,7 @@ export async function detachWorkspace(ctx: OrganizationContext, workspaceId: num
 
     const { error: cutError } = await supabase.from('workspaces').update<WorkspaceUpdate>({ subscription_status: 'canceled' }).eq('id', workspaceId).eq('organization_id', organization.id)
     if (cutError) throw new Error(cutError.message)
-    await returnCreditToReserve(ctx, workspace, await allocatedMicros(ctx, workspaceId))
+    await returnAllocatedCredit(ctx, workspace)
     // While it can still be detached again should this fail, then once more for anyone who opened it in
     // between.
     await removeStaffFromWorkspace(supabase, workspaceId)

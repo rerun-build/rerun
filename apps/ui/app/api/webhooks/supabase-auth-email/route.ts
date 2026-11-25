@@ -16,7 +16,6 @@ type SendEmailHookPayload = {
         token_new: string
         token_hash_new: string
         email_action_type: string
-        redirect_to?: string
     }
 }
 

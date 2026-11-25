@@ -83,6 +83,13 @@ describe('who a code is mailed to', () => {
         expect(mocks.createUser).not.toHaveBeenCalled()
     })
 
+    it('with a link to the default address for someone who also works elsewhere, never to a domain of the organization’s own', async () => {
+        vi.stubEnv('ORGANIZATION_ROOT_DOMAIN', 'rerun.work')
+        await ask(EMAILS[OWNER])
+        expect(mocks.sent).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ signInUrl: 'https://nordlys.rerun.work/auth/confirm?token_hash=hash&type=magiclink', brand: { ...BRAND, appUrl: 'https://nordlys.rerun.work' } }))
+        vi.unstubAllEnvs()
+    })
+
     it('someone it invited to a workspace, whose account is opened', async () => {
         world({ workspace_invitations: [invitation('new@acme.test')] })
         await ask('new@acme.test')

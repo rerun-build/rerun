@@ -94,7 +94,9 @@ describe('a workspace of an organization that runs out of credit', () => {
     })
 
     it('is not rearmed by taking credit back', async () => {
-        open({ client: { rerun_topup_micros: 50 * MICROS_PER_CREDIT, organization_credit_alerted_at: '2026-11-20T00:00:00.000Z' } })
+        await purchaseOrganizationCredit(world.client, { organizationId: NORDLYS, credits: 50, actorUserId: null, requestId: request(1) })
+        await allocateOrganizationCredit(organizationContext(world), { workspaceId: CLIENT, credits: 50, requestId: request(2) })
+        Object.assign(clientRow(), { organization_credit_alerted_at: '2026-11-20T00:00:00.000Z' })
         await takeBackOrganizationCredit(organizationContext(world), { workspaceId: CLIENT, credits: 50, requestId: request(3) })
         await notifyBudgetExhausted(CLIENT)
         expect(mocks.send).not.toHaveBeenCalled()
@@ -117,10 +119,23 @@ describe('a workspace of an organization that runs out of credit', () => {
         expect(clientRow().organization_credit_alerted_at).toEqual(expect.any(String))
     })
 
-    it('leaves out whoever turned billing emails off', async () => {
-        Object.assign(world.rows('users').find(row => row.id === ADMIN)!, { email_notification_prefs: { categories: { billing: false } } })
+    it('reaches a team whose accounts were born on its address, with every email of Rerun switched off', async () => {
+        for (const id of [OWNER, ADMIN]) Object.assign(world.rows('users').find(row => row.id === id)!, { email_notification_prefs: { categories: { billing: false, product: false } } })
         await notifyBudgetExhausted(CLIENT)
-        expect(mocks.send).toHaveBeenCalledTimes(1)
+        expect(reached()).toEqual([INBOXES[ADMIN], INBOXES[OWNER]].sort())
+        expect(clientRow().organization_credit_alerted_at).toEqual(expect.any(String))
+    })
+
+    it('tries again on the next refused call when the alert could not even be written', async () => {
+        let broken = true
+        open({ before: table => (broken && table === 'organization_members' ? { error: { message: 'database down' } } : undefined) })
+        await notifyBudgetExhausted(CLIENT)
+        expect(mocks.send).not.toHaveBeenCalled()
+        expect(clientRow().organization_credit_alerted_at).toBeNull()
+
+        broken = false
+        await notifyBudgetExhausted(CLIENT)
+        expect(mocks.send).toHaveBeenCalledTimes(2)
     })
 
     it('still tells its members when the alert could not be taken', async () => {

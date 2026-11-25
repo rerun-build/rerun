@@ -19,8 +19,10 @@ function portraitSlug(agentId: string, look: CoworkerLook | null): string {
     return [eyes, mouth, color.slice(1), material].join('-')
 }
 
-export function coworkerPortraitUrl(agentId: string, look: CoworkerLook | null): string {
-    return `${APP_URL}/og/coworker/${portraitSlug(agentId, look)}?v=${PORTRAIT_VERSION}`
+// `origin` is the app of the brand the picture is shown under: an email of an organization loads it
+// from the organization's address.
+export function coworkerPortraitUrl(agentId: string, look: CoworkerLook | null, origin: string = APP_URL): string {
+    return `${origin}/og/coworker/${portraitSlug(agentId, look)}?v=${PORTRAIT_VERSION}`
 }
 
 // The same buddy alone, turned towards the words it says: beside its message in an email, on a dark card.
@@ -31,8 +33,8 @@ export type BareSide = (typeof BARE_SIDES)[number]
 
 export const bareSideOf = (value: string | null | undefined): BareSide | null => BARE_SIDES.find(side => side === value) ?? null
 
-export function bareCoworkerPortraitUrl(agentId: string, look: CoworkerLook | null, facing: BareSide): string {
-    return `${coworkerPortraitUrl(agentId, look)}&${BARE_PARAM}=${facing}`
+export function bareCoworkerPortraitUrl(agentId: string, look: CoworkerLook | null, facing: BareSide, origin?: string): string {
+    return `${coworkerPortraitUrl(agentId, look, origin)}&${BARE_PARAM}=${facing}`
 }
 
 export function portraitOfSlug(slug: string): CoworkerPortrait | null {

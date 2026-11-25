@@ -48,9 +48,7 @@ function form(): FormData {
 const CONSOLE: Record<string, { args: Call; reads?: true; min: 'admin' | 'owner'; workspace: boolean }> = {
     listOrganizationWorkspacesAction: { args: () => [], reads: true, min: 'admin', workspace: false },
     loadOrganizationWorkspaceAction: { args: id => [id], reads: true, min: 'admin', workspace: true },
-    loadOrganizationWorkspaceUsageAction: { args: id => [id], reads: true, min: 'admin', workspace: true },
     createOrganizationWorkspaceAction: { args: () => [form()], min: 'admin', workspace: false },
-    updateOrganizationWorkspaceAction: { args: id => [id, form()], min: 'admin', workspace: true },
     archiveOrganizationWorkspaceAction: { args: id => [id], min: 'admin', workspace: true },
     restoreOrganizationWorkspaceAction: { args: id => [id], min: 'admin', workspace: true },
     restartOrganizationWorkspaceAction: { args: id => [id], min: 'admin', workspace: true },
@@ -190,7 +188,7 @@ describe('a suspended organization', () => {
         expect(written()).toEqual([])
     })
 
-    it.each(names.filter(name => CONSOLE[name].reads && name !== 'loadOrganizationWorkspaceUsageAction'))('%s still answers', async name => {
+    it.each(names.filter(name => CONSOLE[name].reads))('%s still answers', async name => {
         expect(await run(name, CONSOLE[name].args(CLIENT, ADMIN, TEAM_INVITE))).toMatchObject({ ok: true })
     })
 })

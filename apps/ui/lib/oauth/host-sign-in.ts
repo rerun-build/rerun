@@ -22,7 +22,8 @@ const RESULT_TTL_MS = 120_000
 const NONCE_MAX_AGE_SECONDS = 600
 const NONCE_COOKIE_PREFIX = 'host_oauth_'
 
-export type HostSignInTarget = { flow: 'managed'; provider: string; key: string; serverName: string } | { flow: 'mcp'; serverName: string; mcpUrl: string; vaultItem?: string }
+// `vaultItem`: the sign-in is for an entry of the Vault, which no coworker holds yet.
+export type HostSignInTarget = { flow: 'managed'; provider: string; key: string; serverName: string; vaultItem?: string } | { flow: 'mcp'; serverName: string; mcpUrl: string; vaultItem?: string }
 export type HostSignInOwner = { agentId: string; workspaceId: number; userId: string }
 
 // Where the sign-in goes back to, and what only the browser it started in can answer for.

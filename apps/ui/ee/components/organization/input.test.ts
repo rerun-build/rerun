@@ -54,6 +54,11 @@ describe('brandProblems', () => {
         expect(isHttpsUrl('https://acme.com')).toBe(true)
         expect(isHttpsUrl('ftp://acme.com')).toBe(false)
     })
+
+    it('refuses what the database would: a link not written https://, a name with a control character', () => {
+        for (const link of ['HTTPS://acme.com', 'https:acme.com', 'http://acme.com']) expect(isHttpsUrl(link), link).toBe(false)
+        expect(brandProblems({ ...FIELDS, name: 'Nord\u0007lys' })).toEqual({ name: 'nameInvalid' })
+    })
 })
 
 describe('iconProblem', () => {

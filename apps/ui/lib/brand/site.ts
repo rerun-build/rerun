@@ -1,12 +1,11 @@
-import { organizationOfHost } from '@rerun/cloud/organizations.server'
-import type { Brand } from '@rerun/contracts'
+import { organizationOfHost, type HostedOrganization } from '@rerun/cloud/organizations.server'
 import { classifyHost } from './host'
 
 // Whose app answers on a host.
 export type HostSite =
     | { kind: 'rerun' }
     | { kind: 'published'; slug: string }
-    | { kind: 'organization'; brand: Brand; organizationId: string; suspended: boolean }
+    | ({ kind: 'organization' } & HostedOrganization)
     | { kind: 'unknown' }
 
 // A read that failed throws: an organization's clients are never shown Rerun instead, nor a stranger's

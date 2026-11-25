@@ -4,9 +4,10 @@ import type { HostSite } from '@/lib/brand/site'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
 import { drawPriceArm } from '@rerun/cloud/billing'
-import { joinOrganization } from '@rerun/cloud/organizations.server'
+import { joinOrganization, reachesBeyondOrganization } from '@rerun/cloud/organizations.server'
 import { internalPath } from '@/lib/auth/internal-path'
 import { requestHost, requestProtocol } from '@/lib/request-host'
+import { MOVED_PARAM } from '@/lib/brand/host-paths'
 import { routes } from '@/lib/routes'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
 import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
@@ -40,6 +41,15 @@ function redirectToSignIn(request: NextRequest, sessionResponse: NextResponse): 
     const response = NextResponse.redirect(url)
     sessionResponse.cookies.getAll().forEach(cookie => response.cookies.set(cookie))
     return response
+}
+
+// The sign-in of the address Rerun answers for, with where they were going and why they are sent there.
+function signInOnDefaultAddress(request: NextRequest, defaultOrigin: string): string {
+    const url = new URL(routes.auth, defaultOrigin)
+    url.searchParams.set(MOVED_PARAM, '1')
+    const back = `${request.nextUrl.pathname}${request.nextUrl.search}`
+    if (back !== routes.home) url.searchParams.set('next', back)
+    return url.toString()
 }
 
 // A redirect response is built from scratch, so it does not inherit the refreshed session cookies
@@ -97,6 +107,11 @@ function isPageLoad(request: NextRequest): boolean {
     return request.method === 'GET' && (request.headers.get('accept')?.includes('text/html') ?? false)
 }
 
+// A page, loaded by the browser or fetched by the router, as opposed to a call, an action or a form.
+function isPage(request: NextRequest): boolean {
+    return request.method === 'GET' && !request.nextUrl.pathname.startsWith('/api/')
+}
+
 const INVITE_PATHS = ['/invite/', '/organization/invite/', '/creator/join', '/redeem']
 
 // Whoever signs up through a workspace invite or a creator invite joins something that already
@@ -123,6 +138,14 @@ function applyProvisionedCookie(request: NextRequest, response: NextResponse, id
 }
 
 type Provisioned = { signedUp: boolean } | null
+
+// A read that failed lets the page through: it is asked again on the next one.
+async function worksElsewhere(userId: string, organizationId: string): Promise<boolean> {
+    return reachesBeyondOrganization(userId, organizationId).catch(err => {
+        console.error('[organizations] could not tell where else an account works', err)
+        return false
+    })
+}
 
 async function provision(request: NextRequest, supabase: SupabaseClient<Database>, user: User, site: HostSite): Promise<Provisioned> {
     const locale = resolveLocale({ cookie: request.cookies.get(LOCALE_COOKIE)?.value, acceptLanguage: request.headers.get('accept-language') })
@@ -185,6 +208,16 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
     }
 
     identity ??= user ? { id: user.id } : null
+
+    // A session is the same on every address, and a domain of an organization's own answers wherever
+    // its DNS says: an account that also works elsewhere never keeps one there. Closed on this address
+    // alone, and they sign in on the one Rerun answers for.
+    // The router's own fetch of a page cannot follow a redirect to another address: it falls back on
+    // loading that page, and that load is what closes the session and takes them there.
+    if (identity && site.kind === 'organization' && site.defaultOrigin && isPage(request) && (await worksElsewhere(identity.id, site.organizationId))) {
+        if (isPageLoad(request)) await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+        return redirectKeepingSession(request, signInOnDefaultAddress(request, site.defaultOrigin), supabaseResponse)
+    }
 
     let provisioned: Provisioned = null
     if (identity && provisioningNeeded(request.cookies.get(PROVISIONED_COOKIE)?.value, identity)) {

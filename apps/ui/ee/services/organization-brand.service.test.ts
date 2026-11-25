@@ -59,7 +59,7 @@ describe('the brand of an organization', () => {
     })
 })
 
-const domain = (overrides: object = {}) => ({ id: 'd1', organization_id: NORDLYS, hostname: 'app.nordlys.test', status: 'active', created_at: '2026-11-02', ...overrides })
+const domain = (overrides: object = {}) => ({ id: 'd1', organization_id: NORDLYS, hostname: 'app.nordlys.test', status: 'active', failing_since: null, created_at: '2026-11-02', ...overrides })
 
 describe('the address of an organization', () => {
     beforeEach(() => {
@@ -77,6 +77,12 @@ describe('the address of an organization', () => {
     it.each(['pending', 'error'])('is never a domain that is %s', async status => {
         mocks.client = organizationWorld({ organization_domains: [domain({ status })] }).client
         expect(await workspaceAppUrl(CLIENT)).toBe('https://nordlys.rerun.work')
+    })
+
+    it('falls back on its default one while its domain no longer points here, though it is still served', async () => {
+        mocks.client = organizationWorld({ organization_domains: [domain({ failing_since: '2026-11-20T10:00:00Z' })] }).client
+        expect(await workspaceAppUrl(CLIENT)).toBe('https://nordlys.rerun.work')
+        expect(await organizationOfHost({ kind: 'domain', hostname: 'app.nordlys.test' })).toMatchObject({ organizationId: NORDLYS })
     })
 
     it('is Rerun’s own for a workspace no organization runs', async () => {
@@ -166,8 +172,13 @@ describe('the brand of a sign-in email', () => {
     })
 
     it('is the organization’s for an address it alone invited', async () => {
-        mocks.client = organizationWorld({ workspace_invitations: [{ id: 'i', workspace_id: RIVAL_WORKSPACE, email: 'new@rival.test', status: 'pending' }] }).client
+        mocks.client = organizationWorld({ workspace_invitations: [{ id: 'i', workspace_id: RIVAL_WORKSPACE, email: 'new@rival.test', status: 'pending', expires_at: '2099-01-01T00:00:00Z' }] }).client
         expect(await organizationBrandOfAccount({ email: 'New@Rival.test', userId: null })).toMatchObject({ organizationId: HAVRE })
+    })
+
+    it('is Rerun’s for an address whose invitation ran out', async () => {
+        mocks.client = organizationWorld({ workspace_invitations: [{ id: 'i', workspace_id: RIVAL_WORKSPACE, email: 'new@rival.test', status: 'pending', expires_at: '2020-01-01T00:00:00Z' }] }).client
+        expect(await organizationBrandOfAccount({ email: 'new@rival.test', userId: null })).toBeNull()
     })
 
     it('never holds a sign-in back', async () => {

@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Brand } from '@rerun/contracts'
 
 import type { Database } from '@/app/api/database.types'
+import { keeper } from '@/ee/lib/organizations/keeper'
 import { organizationDefaultOrigin, organizationOrigin } from '@/lib/brand/host'
 import { organizationRootDomain } from '@/lib/brand/root-domain'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -31,35 +32,18 @@ export async function brandOfOrganization(supabase: Client, row: Omit<BrandRow, 
     return organizationBrand(row, organizationDefaultOrigin(row.slug) ? await readServedHostname(supabase, row.id) : null)
 }
 
-// The first domain they had served keeps being the one they are reached at.
+// The first domain they had served keeps being the one they are reached at, while it points here: one
+// that stopped is still answered for a day, and no link is written to it, a sign-in link least of all.
 async function readServedHostname(supabase: Client, organizationId: string): Promise<string | null> {
-    const { data, error } = await selectMany(supabase, 'organization_domains', ['hostname'] as const, { organization_id: organizationId, status: 'active' }, { column: 'created_at', ascending: true }, 1)
+    const { data, error } = await selectMany(supabase, 'organization_domains', ['hostname'] as const, { organization_id: organizationId, status: 'active', failing_since: { isNull: true } }, { column: 'created_at', ascending: true }, 1)
     if (error) throw new Error(`Could not read the domain of organization ${organizationId}: ${error.message}`)
     return data?.[0]?.hostname ?? null
 }
 
-// Asked for by every request, email, push, published page and coworker tool, and changed a few times
-// in an organization's life: kept for a moment, in this process only.
-const KEPT_MS = 30_000
-const MAX_KEPT = 5_000
-
-function keeper<Key, Value>(read: (key: Key) => Promise<Value>) {
-    const kept = new Map<Key, { value: Value; until: number }>()
-    return {
-        forget: () => kept.clear(),
-        get: async (key: Key): Promise<Value> => {
-            const known = kept.get(key)
-            if (known && known.until > Date.now()) return known.value
-            const value = await read(key)
-            if (kept.size >= MAX_KEPT) kept.clear()
-            kept.set(key, { value, until: Date.now() + KEPT_MS })
-            return value
-        },
-    }
-}
-
 type Address = { kind: 'organization'; slug: string } | { kind: 'domain'; hostname: string }
-export type HostedOrganization = { brand: Brand; organizationId: string; suspended: boolean }
+// `defaultOrigin` is set on a domain of their own: the address Rerun itself answers for, whatever
+// becomes of their DNS.
+export type HostedOrganization = { brand: Brand; organizationId: string; suspended: boolean; defaultOrigin: string | null }
 
 const brandsOfWorkspaces = keeper(readBrandOfWorkspace)
 const organizationsOfHosts = keeper(readOrganizationOfHost)
@@ -102,7 +86,7 @@ async function readOrganizationOfHost(key: string): Promise<HostedOrganization |
     if (!filter) return null
     const { data: organization, error } = await selectMaybeSingle(supabase, 'organizations', BRAND_COLUMNS, filter)
     if (error) throw new Error(`Could not read the organization of ${name}: ${error.message}`)
-    return organization && { brand: await brandOfOrganization(supabase, organization), organizationId: organization.id, suspended: organization.status !== 'active' }
+    return organization && { brand: await brandOfOrganization(supabase, organization), organizationId: organization.id, suspended: organization.status !== 'active', defaultOrigin: kind === 'slug' ? null : organizationDefaultOrigin(organization.slug) }
 }
 
 async function ownerOfDomain(supabase: Client, hostname: string): Promise<{ id: string } | null> {
@@ -116,8 +100,11 @@ async function ownerOfDomain(supabase: Client, hostname: string): Promise<{ id: 
 export async function organizationDefaultUrlOfWorkspace(workspaceId: number): Promise<string | null> {
     if (!organizationRootDomain()) return null
     const brand = await organizationBrandOfWorkspace(workspaceId)
-    if (!brand?.organizationId) return null
-    const { data, error } = await selectMaybeSingle(createServiceRoleClient(), 'organizations', ['slug'] as const, { id: brand.organizationId })
+    return brand?.organizationId ? organizationDefaultUrl(brand.organizationId) : null
+}
+
+export async function organizationDefaultUrl(organizationId: string): Promise<string | null> {
+    const { data, error } = await selectMaybeSingle(createServiceRoleClient(), 'organizations', ['slug'] as const, { id: organizationId })
     if (error) throw new Error(error.message)
     return data && organizationDefaultOrigin(data.slug)
 }
@@ -146,7 +133,7 @@ async function organizationsJoined(supabase: Client, userId: string): Promise<(s
 }
 
 async function organizationsInviting(supabase: Client, email: string): Promise<(string | null)[]> {
-    const { data, error } = await selectMany(supabase, 'workspace_invitations', ['workspace_id'] as const, { email: email.toLowerCase(), status: 'pending' })
+    const { data, error } = await selectMany(supabase, 'workspace_invitations', ['workspace_id'] as const, { email: email.toLowerCase(), status: 'pending', expires_at: { gt: new Date().toISOString() } })
     if (error) throw new Error(error.message)
     return organizationsOf(supabase, (data ?? []).map(row => row.workspace_id))
 }

@@ -11,7 +11,8 @@ import { ORGANIZATION_PLAN_SLUG, organizationLimitsToColumns } from '@/ee/lib/bi
 import { stopBilling } from '@/ee/lib/billing/stop-billing'
 import { organizationMachineState, organizationWorkspaceStatus, type OrganizationMachineState, type OrganizationWorkspaceStatus } from '@/ee/lib/organizations/workspace-state'
 import { readOrganization, readOrganizationWorkspaces, requireOrganizationWorkspace, type OrganizationContext, type OrganizationWorkspaceRow } from '@/ee/services/organization-context.service'
-import { returnCreditToReserve } from '@/ee/services/organization-credit.service'
+import { batchesOf } from '@/ee/lib/organizations/batches'
+import { returnAllocatedCredit } from '@/ee/services/organization-credit.service'
 import { remainingMicros } from '@/ee/services/rerunBudget.service'
 import { syncWorkspaceAppsSafely } from '@/lib/apps/lifecycle'
 import { randomBlob } from '@/lib/blobs/catalog'
@@ -28,9 +29,6 @@ type Client = SupabaseClient<Database>
 type WorkspaceInsert = Database['public']['Tables']['workspaces']['Insert']
 type WorkspaceUpdate = Database['public']['Tables']['workspaces']['Update']
 
-// Keeps each IN list under PostgREST's URL limit.
-const ID_BATCH_SIZE = 200
-
 const IN_FLIGHT_STATUSES = ['archiving', 'restoring'] as const
 
 export type OrganizationWorkspaceSummary = {
@@ -46,12 +44,6 @@ export type OrganizationWorkspaceSummary = {
     usedMicros: number
     leftMicros: number
     machine: OrganizationMachineState
-}
-
-function batchesOf(ids: number[]): number[][] {
-    const batches: number[][] = []
-    for (let start = 0; start < ids.length; start += ID_BATCH_SIZE) batches.push(ids.slice(start, start + ID_BATCH_SIZE))
-    return batches
 }
 
 function countBy(rows: { workspace_id: number }[]): Map<number, number> {
@@ -193,14 +185,6 @@ async function updateWorkspace(supabase: Client, workspaceId: number, update: Wo
     if (error) throw new Error(error.message)
 }
 
-export async function updateOrganizationWorkspace(ctx: OrganizationContext, workspaceId: number, formData: FormData): Promise<void> {
-    await requireOrganizationWorkspace(ctx, workspaceId)
-    const name = workspaceName(formData)
-    const logo = await readWorkspaceLogo(formData, workspaceId)
-    if (!logo.ok) throw new AppError(logo.code ?? 'imageUnreadable', logo.params)
-    await updateWorkspace(ctx.supabase, workspaceId, { name, ...(logo.iconUrl ? { icon_url: logo.iconUrl } : {}) })
-}
-
 // Nothing is lost: the machine is archived, the coworkers and the Boxes stay.
 export async function archiveOrganizationWorkspace(ctx: OrganizationContext, workspaceId: number): Promise<void> {
     await requireOrganizationWorkspace(ctx, workspaceId)
@@ -263,7 +247,7 @@ export async function deleteOrganizationWorkspace(ctx: OrganizationContext, work
     await syncWorkspaceAppsSafely(supabase, workspaceId, { uninstall: true })
     await destroyOrganizationMachine(workspaceId)
     // After the machine, which could still have spent some.
-    await returnCreditToReserve(ctx, workspace)
+    await returnAllocatedCredit(ctx, workspace)
 
     await removeEveryone(supabase, workspaceId)
     for (const table of ['agents', 'spaces'] as const) {

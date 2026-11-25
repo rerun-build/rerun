@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     signOut: vi.fn(),
     selectMaybeSingle: vi.fn(),
     joinOrganization: vi.fn(),
+    reachesBeyond: vi.fn(),
 }))
 
 // The JWT the request carries says what the auth server would: same refresh, same user.
@@ -31,7 +32,7 @@ vi.mock('@supabase/ssr', () => ({
 vi.mock('./serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ update: () => ({ eq: async () => ({}) }) }) }) }))
 
 vi.mock('./supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle }))
-vi.mock('@rerun/cloud/organizations.server', () => ({ joinOrganization: mocks.joinOrganization }))
+vi.mock('@rerun/cloud/organizations.server', () => ({ joinOrganization: mocks.joinOrganization, reachesBeyondOrganization: mocks.reachesBeyond }))
 
 const { arrivesByInvite, isPublicPath, provisioningNeeded, updateSession } = await import('./middleware')
 
@@ -385,5 +386,57 @@ describe('provisioning on an organization’s address', () => {
             const response = await updateSession(new NextRequest(`https://app.rerun.build${path}`, { headers: DOCUMENT }))
             expect(response.headers.get('location'), path).toBeNull()
         }
+    })
+})
+
+describe('a session on a domain of an organization’s own', () => {
+    const onItsDomain = { kind: 'organization', organizationId: 'org-n', suspended: false, brand: {}, defaultOrigin: 'https://nordlys.rerun.work' } as never
+    const onDefaultAddress = { kind: 'organization', organizationId: 'org-n', suspended: false, brand: {}, defaultOrigin: null } as never
+    const signedIn = 'rerun-provisioned=user-1.1'
+
+    beforeEach(() => {
+        mocks.getUser.mockReset().mockResolvedValue({ data: { user: { id: 'user-1', is_anonymous: false } } })
+        mocks.signOut.mockReset().mockResolvedValue({ error: null })
+        mocks.reachesBeyond.mockReset().mockResolvedValue(true)
+    })
+
+    it('is closed there for an account that also works elsewhere, which signs in on the default address', async () => {
+        const response = await updateSession(new NextRequest('https://app.nordlys.test/board?tab=runs', { headers: { ...DOCUMENT, cookie: signedIn } }), onItsDomain)
+        expect(mocks.reachesBeyond).toHaveBeenCalledWith('user-1', 'org-n')
+        expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' })
+        expect(response.headers.get('location')).toBe('https://nordlys.rerun.work/auth?moved=1&next=%2Fboard%3Ftab%3Druns')
+    })
+
+    it('is left to the page load that follows when the router fetched the page: its redirect only says to load it', async () => {
+        const response = await updateSession(new NextRequest('https://app.nordlys.test/board', { headers: { 'sec-fetch-dest': 'empty', rsc: '1', cookie: signedIn } }), onItsDomain)
+        expect(mocks.signOut).not.toHaveBeenCalled()
+        expect(response.headers.get('location')).toBe('https://nordlys.rerun.work/auth?moved=1&next=%2Fboard')
+    })
+
+    it('is not looked at for a call nor an action, which answer for themselves', async () => {
+        await updateSession(new NextRequest('https://app.nordlys.test/api/files', { headers: { cookie: signedIn } }), onItsDomain)
+        await updateSession(new NextRequest('https://app.nordlys.test/', { method: 'POST', headers: { 'next-action': 'abc', cookie: signedIn } }), onItsDomain)
+        expect(mocks.reachesBeyond).not.toHaveBeenCalled()
+    })
+
+    it('stays for an account this organization’s workspaces are all it has', async () => {
+        mocks.reachesBeyond.mockResolvedValue(false)
+        const response = await updateSession(new NextRequest('https://app.nordlys.test/', { headers: { ...DOCUMENT, cookie: signedIn } }), onItsDomain)
+        expect(mocks.signOut).not.toHaveBeenCalled()
+        expect(response.headers.get('location')).toBeNull()
+    })
+
+    it('is never looked at on the default address, nor on Rerun’s own', async () => {
+        await updateSession(new NextRequest('https://nordlys.rerun.work/', { headers: { ...DOCUMENT, cookie: signedIn } }), onDefaultAddress)
+        await updateSession(new NextRequest('https://app.rerun.build/', { headers: { ...DOCUMENT, cookie: signedIn } }))
+        expect(mocks.reachesBeyond).not.toHaveBeenCalled()
+    })
+
+    it('lets the page through when it could not be told, to be asked again on the next one', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        mocks.reachesBeyond.mockRejectedValue(new Error('down'))
+        const response = await updateSession(new NextRequest('https://app.nordlys.test/', { headers: { ...DOCUMENT, cookie: signedIn } }), onItsDomain)
+        expect(mocks.signOut).not.toHaveBeenCalled()
+        expect(response.headers.get('location')).toBeNull()
     })
 })

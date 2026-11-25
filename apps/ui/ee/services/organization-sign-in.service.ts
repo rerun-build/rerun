@@ -7,9 +7,10 @@ import { after } from 'next/server'
 import type { Database } from '@/app/api/database.types'
 import { claimEmailCodeAsk, claimInvitedCodeAsk } from '@/app/api/_services/email-sign-up.service'
 import { accountOfLiveCode, rememberSignInCode, resendSignInCodeIfLive, SIGN_IN_CODE_TTL_MINUTES, signInUrlFor } from '@/app/api/_services/sign-in-code.service'
+import { brandReachedBy } from '@/ee/services/organization-reach.service'
 import { accountEmails } from '@/lib/auth/account-emails'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectCount, selectMany } from '@/supabase/supabase-helpers'
+import { selectAll, selectCount, selectMany } from '@/supabase/supabase-helpers'
 import { sendSignInCodeEmail } from '@rerun/cloud/email'
 
 type Client = SupabaseClient<Database>
@@ -35,12 +36,16 @@ export async function mailCode({ organizationId, brand, email, locale }: Invited
     const invited = await isInvited(supabase, organizationId, email)
     if (!invited && !(await isOrganizationPerson(supabase, organizationId, email))) return
 
-    if ((await accountOfLiveCode(email)) && (await resendSignInCodeIfLive(email, null, brand))) return
+    const live = await accountOfLiveCode(email)
+    if (live && (await resendSignInCodeIfLive(email, null, await brandReachedBy(live, organizationId, brand)))) return
 
     const account = await accountFor(supabase, email, { mayOpen: invited })
     if (!account) return
     const { user, code, tokenHash, type } = account
-    const sent = await sendSignInCodeEmail({ to: email, code, signInUrl: signInUrlFor(tokenHash, type, brand), expiresInMinutes: SIGN_IN_CODE_TTL_MINUTES, locale, brand })
+    // The link of the email signs in where it leads: never on a domain of the organization's own for
+    // an account that also works elsewhere.
+    const signInBrand = await brandReachedBy(user.id, organizationId, brand)
+    const sent = await sendSignInCodeEmail({ to: email, code, signInUrl: signInUrlFor(tokenHash, type, signInBrand), expiresInMinutes: SIGN_IN_CODE_TTL_MINUTES, locale, brand: signInBrand })
     if (sent.ok) await rememberSignInCode({ email, userId: user.id, type, code, tokenHash })
 }
 
@@ -84,15 +89,16 @@ async function countWorkspacesOf(supabase: Client, organizationId: string, works
 // In its team, or in one of its workspaces, its team's rows included: whoever may open something here.
 async function isOrganizationPerson(supabase: Client, organizationId: string, email: string): Promise<boolean> {
     const [{ data: team, error: teamError }, { data: workspaces, error: workspacesError }] = await Promise.all([
-        selectMany(supabase, 'organization_members', ['user_id'] as const, { organization_id: organizationId }),
-        selectMany(supabase, 'workspaces', ['id'] as const, { organization_id: organizationId }),
+        selectAll(supabase, 'organization_members', ['user_id'] as const, { organization_id: organizationId }),
+        selectAll(supabase, 'workspaces', ['id'] as const, { organization_id: organizationId }),
     ])
-    if (teamError ?? workspacesError) throw new Error((teamError ?? workspacesError)?.message)
-    const workspaceIds = (workspaces ?? []).map(workspace => workspace.id)
-    const { data: members, error } = workspaceIds.length ? await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceIds }) : { data: [], error: null }
+    if (teamError) throw new Error(teamError.message)
+    if (workspacesError) throw new Error(workspacesError.message)
+    const workspaceIds = workspaces.map(workspace => workspace.id)
+    const { data: members, error } = workspaceIds.length ? await selectAll(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceIds }) : { data: [], error: null }
     if (error) throw new Error(error.message)
 
-    const people = new Set([...(team ?? []), ...(members ?? [])].map(row => row.user_id))
+    const people = new Set([...team, ...members].map(row => row.user_id))
     for (const id of people) {
         const { data } = await supabase.auth.admin.getUserById(id)
         if (data.user && accountEmails(data.user).includes(email)) return true

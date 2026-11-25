@@ -1,5 +1,6 @@
 import { AccessDeniedError, assertAgentAccess } from '@/app/api/_auth/access'
 import { assertCanAdd, readItem } from '@/app/api/_services/vault.service'
+import { requestSite } from '@/lib/brand/request-site'
 import { decodeManagedContext } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { readRegistry, type ServiceRegistry } from '@/lib/services/registry'
@@ -17,6 +18,7 @@ vi.mock('@/lib/services/registry', () => ({
     resolveRegistryEntry: (registry: ServiceRegistry, key: string) => (registry.services[key] ? { key, entry: registry.services[key] } : null),
 }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
+vi.mock('@/lib/brand/request-site', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/brand/request-site')>()), requestSite: vi.fn(async () => ({ kind: 'rerun' })) }))
 
 const start = (body: object, provider = 'typeform') => POST(new Request(`https://rerun.test/api/oauth/managed/${provider}/start`, { method: 'POST', body: JSON.stringify(body) }), { params: Promise.resolve({ provider }) })
 
@@ -44,6 +46,14 @@ describe('POST /api/oauth/managed/[provider]/start', () => {
         expect(new URL((await res.json()).authorizationUrl).origin).toBe('https://tf.test')
         expect(decodeManagedContext(res.cookies.getAll()[0].value)).toMatchObject({ agentId: '', key: 'item-2', vault: { itemId: 'item-2', workspaceId: 7 } })
         expect(assertAgentAccess).not.toHaveBeenCalled()
+    })
+
+    it('sends a Vault entry started on an organization’s address through Rerun’s own, which the provider knows', async () => {
+        vi.mocked(requestSite).mockResolvedValueOnce({ kind: 'organization', organizationId: 'org-1', suspended: false } as never)
+        const res = await start({ vaultItemId: 'item-2' })
+        expect(res.status).toBe(200)
+        expect(new URL((await res.json()).authorizationUrl).pathname).toBe('/api/oauth/host/start')
+        expect(res.cookies.getAll().map(cookie => cookie.name)).toEqual([expect.stringMatching(/^host_oauth_/)])
     })
 
     it('refuses an entry of another provider', async () => {

@@ -47,7 +47,6 @@ const {
     restoreOrganizationWorkspace,
     resumeOrganization,
     suspendOrganization,
-    updateOrganizationWorkspace,
 } = await import('./organization-workspaces.service')
 
 let world: OrganizationWorld
@@ -185,13 +184,6 @@ describe('the list', () => {
     })
 })
 
-describe('renaming', () => {
-    it('writes the name, and the logo only when there is one', async () => {
-        await updateOrganizationWorkspace(ctx(), CLIENT, form({ name: ' Acme Inc ' }))
-        expect(world.writes('workspaces')[0].payload).toEqual({ name: 'Acme Inc' })
-    })
-})
-
 describe('archiving and restoring', () => {
     beforeEach(() => {
         world.rows('agents').push({ id: 'a1', workspace_id: CLIENT, kind: 'coworker', disabled_at: null, disabled_reason: null, created_at: '1' })
@@ -291,10 +283,25 @@ describe('deleting', () => {
         expect(order).toEqual(['billing', 'apps', 'machine', 'workspace_invitations', 'workspace_members', 'agents', 'spaces', 'workspaces'])
     })
 
+    // 5 credits handed out, 0.8 spent since.
+    const handed = { organization_id: NORDLYS, workspace_id: CLIENT, workspace_name: 'Acme', applied_at: '2026-11-01T00:00:00Z', reversal_of: null }
+    const handOut = () =>
+        world.rows('organization_credit_movements').push(
+            { ...handed, id: 'bought', seq: 1, kind: 'purchase', micros: 5_000_000, balance_after: 5_000_000, workspace_id: null, workspace_name: null, request_id: 'bought' },
+            { ...handed, id: 'handed', seq: 2, kind: 'allocation', micros: -5_000_000, balance_after: 0, request_id: 'handed' },
+        )
+
     it('returns the credit its client did not spend', async () => {
+        handOut()
         workspace(CLIENT)!.rerun_topup_micros = 4_200_000
         await deleteOrganizationWorkspace(ctx(), CLIENT)
-        expect(world.rows('organization_credit_movements')).toEqual([expect.objectContaining({ kind: 'take_back', micros: 4_200_000, balance_after: 4_200_000, workspace_name: 'Acme' })])
+        expect(world.rows('organization_credit_movements').at(-1)).toMatchObject({ kind: 'take_back', micros: 4_200_000, balance_after: 4_200_000, workspace_name: 'Acme' })
+    })
+
+    it('never takes the credit a workspace bought itself before it joined', async () => {
+        workspace(CLIENT)!.rerun_topup_micros = 4_200_000
+        await deleteOrganizationWorkspace(ctx(), CLIENT)
+        expect(world.rows('organization_credit_movements')).toEqual([])
     })
 
     it('stops at a machine that resists: access cut, people and rows still there, to be deleted again', async () => {

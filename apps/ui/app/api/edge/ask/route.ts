@@ -3,21 +3,20 @@ import { createHash, timingSafeEqual } from 'node:crypto'
 
 export const dynamic = 'force-dynamic'
 
-// Questions a process answers in a minute. A certificate is asked for once and renewed every two
-// months, so anything past it is somebody knocking with made-up names.
-const MAX_ASKS_PER_MINUTE = 300
+// Names a process turns down in a minute before it stops looking them up: somebody knocking with
+// made-up ones. A name it serves never counts, so its certificate is never held back by them.
+const MAX_REFUSALS_PER_MINUTE = 300
 const WINDOW_MS = 60_000
 
 let windowStart = 0
-let asks = 0
+let refusals = 0
 
-function withinPace(now: number): boolean {
+function refusedTooMany(now: number): boolean {
     if (now - windowStart >= WINDOW_MS) {
         windowStart = now
-        asks = 0
+        refusals = 0
     }
-    asks += 1
-    return asks <= MAX_ASKS_PER_MINUTE
+    return refusals >= MAX_REFUSALS_PER_MINUTE
 }
 
 const digest = (value: string): Buffer => createHash('sha256').update(value).digest()
@@ -36,9 +35,11 @@ const answer = (status: 200 | 404 | 429) => new Response(null, { status, headers
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     if (!isEdge(searchParams.get('key'))) return answer(404)
-    if (!withinPace(Date.now())) return answer(429)
     try {
-        return answer((await isServedHostname((searchParams.get('domain') ?? '').toLowerCase())) ? 200 : 404)
+        if (await isServedHostname((searchParams.get('domain') ?? '').toLowerCase())) return answer(200)
+        if (refusedTooMany(Date.now())) return answer(429)
+        refusals += 1
+        return answer(404)
     } catch (err) {
         console.error('[edge] a name could not be looked up', err)
         return answer(404)

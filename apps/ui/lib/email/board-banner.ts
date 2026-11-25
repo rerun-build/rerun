@@ -48,7 +48,7 @@ export async function alertBanner(board: AlertBoard | null | Promise<AlertBoard 
 }
 
 /** A coworker's portrait, turned towards the bubble beside it, or undefined when it could not be captured. Never throws. */
-export async function emailPortrait(agentId: string, look: CoworkerLook | null, locale: Locale, timeoutMs: number): Promise<string | undefined> {
-    const url = bareCoworkerPortraitUrl(agentId, look, localeDirection(locale) === 'rtl' ? 'left' : 'right')
+export async function emailPortrait(agentId: string, look: CoworkerLook | null, locale: Locale, timeoutMs: number, brand: Brand = RERUN_BRAND): Promise<string | undefined> {
+    const url = bareCoworkerPortraitUrl(agentId, look, localeDirection(locale) === 'rtl' ? 'left' : 'right', brandAppUrl(brand))
     return (await warmImage(url, timeoutMs)) ? url : undefined
 }

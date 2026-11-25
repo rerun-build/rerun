@@ -12,3 +12,6 @@ export function isRerunOnlyPath(pathname: string): boolean {
 }
 
 export const HOST_UNAVAILABLE_ROUTE = '/host-unavailable'
+
+// On the sign-in of an organization's default address: they were sent there from a domain of its own.
+export const MOVED_PARAM = 'moved'

@@ -1,10 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-import type { Database } from '@/app/api/database.types'
+import type { Database, Json } from '@/app/api/database.types'
 import { BASE_PLAN_SLUG, baseLimitsToColumns, type PriceArm } from '@rerun/cloud/billing'
 import { randomBlob } from '@/lib/blobs/catalog'
 import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 import { DEFAULT_WORKSPACE_NAME } from '@/lib/naming/workspace-name'
+import { mergeNotificationPrefs, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { DEFAULT_LOCALE, isStableLocale, type Locale } from '@rerun/i18n'
 
@@ -28,8 +29,12 @@ export function insertDefaultWorkspace(supabase: Client, { priceArm, locale }: {
         .single()
 }
 
+// A workspace opened for someone who never came to Rerun for one, the team of an organization or a
+// client it let go: Rerun writes them no email about it.
+export const NO_RERUN_EMAIL = { categories: { product: false, billing: false } }
+
 async function openDefaultWorkspace(supabase: Client, userId: string): Promise<number> {
-    const { data: user } = await selectMaybeSingle(supabase, 'users', ['locale'] as const, { id: userId })
+    const { data: user } = await selectMaybeSingle(supabase, 'users', ['locale', 'email_notification_prefs'] as const, { id: userId })
     const { data: workspace, error } = await insertDefaultWorkspace(supabase, { priceArm: null, locale: isStableLocale(user?.locale) ? user.locale : DEFAULT_LOCALE })
     if (error || !workspace) throw new Error(`Could not open a workspace for ${userId}: ${error?.message}`)
 
@@ -39,6 +44,9 @@ async function openDefaultWorkspace(supabase: Client, userId: string): Promise<n
         throw new Error(memberError.message)
     }
     await ensureForemanAgentRow(supabase, workspace.id).catch(err => console.error('[workspace] failed to write the Chief of Staff', err))
+    const quiet = mergeNotificationPrefs(normalizeNotificationPrefs(user?.email_notification_prefs), NO_RERUN_EMAIL) as unknown as Json
+    const { error: prefsError } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ email_notification_prefs: quiet }).eq('id', userId)
+    if (prefsError) console.error('[workspace] the emails of an account given a workspace stayed on', userId, prefsError)
     return workspace.id
 }
 

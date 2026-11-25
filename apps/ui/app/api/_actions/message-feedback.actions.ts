@@ -4,8 +4,9 @@ import type { Database, Json } from '@/app/api/database.types'
 import { assertAgentInWorkspace, assertSessionInWorkspace, isAdminActor, requireLightSessionActor } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { conversationCopy } from '@/app/api/_services/conversation-copy.service'
+import { workspaceBrand } from '@/lib/brand/workspace'
 import { engineSessionOf } from '@/lib/foreman/conversation'
-import { MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackRating } from '@rerun/contracts'
+import { isWhiteLabel, MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackRating } from '@rerun/contracts'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { z } from 'zod'
@@ -46,6 +47,8 @@ export async function rateMessageAction(input: z.input<typeof rateSchema>): Prom
 
     const ctx = await requireWorkspaceContext()
     const { userId, workspace, supabase } = ctx
+    // A vote copies the conversation for Rerun's team to read: never the one of an organization's client.
+    if (isWhiteLabel(await workspaceBrand(workspace.id))) return failure('feedbackUnavailable')
     const owner = await conversationCopy(ctx, scope, sessionId)
     if (!owner) return failure('conversationNotFound')
     // A vote names a message of the conversation it is about, not any string: each one copies the

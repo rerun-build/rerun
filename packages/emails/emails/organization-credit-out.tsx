@@ -14,7 +14,6 @@ export interface OrganizationCreditOutProps {
   /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
-  unsubscribeUrl?: string;
   locale?: EmailLocale;
   brand?: Brand;
 }
@@ -25,7 +24,6 @@ export default function OrganizationCreditOut({
   consoleUrl,
   boardUrl,
   appUrl,
-  unsubscribeUrl,
   locale,
   brand,
 }: OrganizationCreditOutProps) {
@@ -35,7 +33,6 @@ export default function OrganizationCreditOut({
       preview={t("organizationCreditOut.preview")}
       hero={{ scene: "budget-exhausted", board: boardUrl }}
       appUrl={appUrl}
-      unsubscribeUrl={unsubscribeUrl}
       locale={locale}
       brand={brand}
     >

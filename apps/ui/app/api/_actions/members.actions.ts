@@ -1,5 +1,6 @@
 'use server'
 
+import { refuseManagedWorkspace } from '@/app/api/_auth/managed-workspace'
 import { requireAdminContext, requireWorkspaceContext, toBoxScope, type BoxScope, type WorkspaceRole } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { INVITATION_COLUMNS, takeInvitation } from '@/app/api/_services/invitation.service'
@@ -61,6 +62,9 @@ export async function revokeInvitationAction(invitationId: string): Promise<Acti
 export async function removeMemberAction(targetUserId: string): Promise<ActionResult> {
     try {
         const { userId, workspace, supabase } = await requireAdminContext(MEMBERS_ADMIN_ONLY)
+        // Someone an organization brought in often has no other workspace: it lets them go from its
+        // console, where one of their own is opened for them.
+        refuseManagedWorkspace(workspace)
         if (targetUserId === userId) return failure('cannotRemoveSelf')
         return await removeMember(supabase, workspace.id, targetUserId, { openOne: false })
     } catch (err) {

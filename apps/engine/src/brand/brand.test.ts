@@ -98,14 +98,38 @@ describe('the brand of the machine', () => {
         expect(boxBrand()).toEqual(RERUN)
     })
 
-    it('holds a run two seconds at most', async () => {
+    it('waits for the first answer of a slow hub, so that the machine of an organization never starts as Rerun', async () => {
         vi.useFakeTimers()
-        vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}))
+        vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(Response.json(NORDLYS)), 5_000)))
         const { boxBrand, refreshBrand } = await boot()
+        const waited = refreshBrand()
+        await vi.advanceTimersByTimeAsync(5_000)
+        await waited
+        expect(boxBrand()).toEqual(NORDLYS)
+    })
+
+    it('gives up on a first answer that never comes, and on the runs of the minute that follows', async () => {
+        vi.useFakeTimers()
+        const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}))
+        const { boxBrand, refreshBrand } = await boot()
+        const waited = refreshBrand()
+        await vi.advanceTimersByTimeAsync(10_000)
+        await waited
+        expect(boxBrand()).toEqual(RERUN)
+        expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('holds a run two seconds at most once the hub has answered', async () => {
+        vi.useFakeTimers()
+        answer(NORDLYS)
+        const { boxBrand, refreshBrand } = await boot()
+        await refreshBrand()
+        await vi.advanceTimersByTimeAsync(60_000)
+        vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}))
         const waited = refreshBrand()
         await vi.advanceTimersByTimeAsync(2_000)
         await waited
-        expect(boxBrand()).toEqual(RERUN)
+        expect(boxBrand()).toEqual(NORDLYS)
     })
 
     it('is one line, whatever the hub holds', async () => {

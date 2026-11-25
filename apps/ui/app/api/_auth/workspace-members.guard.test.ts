@@ -11,14 +11,16 @@ import { describe, expect, it } from 'vitest'
 
 const UI = process.cwd()
 const CLOUD = join(UI, '../../cloud/packages/cloud/src')
-const SKIPPED = new Set(['node_modules', '.next', 'public', 'test', '__tests__', 'database.types.ts'])
+const SKIPPED = new Set(['node_modules', '.next', 'test', '__tests__', 'database.types.ts'])
+// The static files of the app, at its root alone: `app/api/public` holds routes anyone may call.
+const STATIC_FILES = 'public'
 
-function sourcesIn(root: string): string[] {
+function sourcesIn(root: string, top = true): string[] {
     if (!existsSync(root)) return []
     return readdirSync(root, { withFileTypes: true }).flatMap(entry => {
-        if (SKIPPED.has(entry.name) || entry.name.startsWith('.')) return []
+        if (SKIPPED.has(entry.name) || entry.name.startsWith('.') || (top && entry.name === STATIC_FILES)) return []
         const path = join(root, entry.name)
-        if (entry.isDirectory()) return sourcesIn(path)
+        if (entry.isDirectory()) return sourcesIn(path, false)
         return /\.tsx?$/.test(entry.name) && !/\.(test|spec|d)\.tsx?$/.test(entry.name) ? [path] : []
     })
 }
@@ -78,6 +80,7 @@ const LISTS_ALLOWED: Record<string, { reads: number; why: string }> = {
     'ee/services/organization-brand.service.ts': { reads: 1, why: 'the workspaces one account works in, the ones it only runs left out, for the brand of its sign-in email' },
     'ee/services/organization-sign-in.service.ts': { reads: 1, why: "the people of one organization, to whom alone its sign-in mails a code; nothing is shown" },
     'ee/services/organization-join.service.ts': { reads: 1, why: "one account's own memberships" },
+    'ee/services/organization-reach.service.ts': { reads: 1, why: "one account's own memberships, to tell whether it works beyond an organization; nothing is shown" },
     'ee/services/organization-staff.service.ts': { reads: 2, why: 'the staff rows of one person or one workspace, taken away with their team' },
 }
 

@@ -17,7 +17,7 @@ export async function organizationBrandOfAccount(_account: { userId: string | nu
     return null
 }
 
-export type HostedOrganization = { brand: Brand; organizationId: string; suspended: boolean }
+export type HostedOrganization = { brand: Brand; organizationId: string; suspended: boolean; defaultOrigin: string | null }
 
 export async function organizationOfHost(_address: { kind: 'organization'; slug: string } | { kind: 'domain'; hostname: string }): Promise<HostedOrganization | null> {
     return null
@@ -44,6 +44,10 @@ export async function isInOrganizationTeam(_organizationId: string, _userId: str
 }
 
 export async function leaveOrganizations(_userId: string): Promise<void> {}
+
+export async function reachesBeyondOrganization(_userId: string, _organizationId: string): Promise<boolean> {
+    return false
+}
 
 // The machine of an organization's workspace, as its console drives it.
 export type OrganizationMachine = { managed: boolean; running: boolean | null; disk: { usedMb: number; totalMb: number } | null }

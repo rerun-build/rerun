@@ -4,14 +4,13 @@ import { z } from 'zod'
 
 import { AuthorizationError } from '@/app/api/_auth/errors'
 import type { InviteEntry, MemberEntry } from '@/app/api/_services/members.service'
-import type { CreditUsage } from '@/ee/lib/billing/credit-usage'
-import { getCreditUsage } from '@/ee/services/credit-usage.service'
 import { brandOfOrganization } from '@/ee/services/organization-brand.service'
-import { requireActiveOrganization, requireOrganizationContext, requireOrganizationWorkspace } from '@/ee/services/organization-context.service'
+import { requireActiveOrganization, requireOrganizationContext } from '@/ee/services/organization-context.service'
 import { allocateOrganizationCredit, loadOrganizationCredit, MAX_CREDITS_PER_MOVEMENT, takeBackOrganizationCredit, type OrganizationCredit } from '@/ee/services/organization-credit.service'
 import { addOrganizationDomain, checkOrganizationDomain, listOrganizationDomains, removeOrganizationDomain, type OrganizationDomains } from '@/ee/services/organization-domains.service'
 import { inviteOrganizationWorkspaceMember, listOrganizationWorkspaceMembers, removeOrganizationWorkspaceMember, revokeOrganizationWorkspaceInvitation, setOrganizationWorkspaceMemberRole } from '@/ee/services/organization-members.service'
 import { loadOrganizationBrandSettings, updateOrganizationBrand, type OrganizationBrandSettings } from '@/ee/services/organization-settings.service'
+import { brandReachedBy } from '@/ee/services/organization-reach.service'
 import { openOrganizationWorkspace } from '@/ee/services/organization-staff.service'
 import { acceptTeamInvitation, inviteTeamMember, listOrganizationTeam, removeTeamMember, revokeTeamInvitation, setTeamMemberRole, viewTeamInvitation, type OrganizationTeam, type TeamInvitationView } from '@/ee/services/organization-team.service'
 import {
@@ -22,7 +21,6 @@ import {
     loadOrganizationWorkspace,
     restartOrganizationWorkspace,
     restoreOrganizationWorkspace,
-    updateOrganizationWorkspace,
     type OrganizationWorkspaceDetail,
     type OrganizationWorkspaceSummary,
 } from '@/ee/services/organization-workspaces.service'
@@ -77,16 +75,6 @@ export async function loadOrganizationWorkspaceAction(workspaceId: number): Prom
     }
 }
 
-export async function loadOrganizationWorkspaceUsageAction(workspaceId: number): Promise<Result<{ usage: CreditUsage }>> {
-    try {
-        const ctx = await requireOrganizationContext()
-        const { id } = await requireOrganizationWorkspace(ctx, workspaceIdSchema.parse(workspaceId))
-        return { ok: true, usage: await getCreditUsage(ctx.supabase, { kind: 'workspace', workspaceId: id }) }
-    } catch (err) {
-        return refused(err, 'loadCreditUsageFailed')
-    }
-}
-
 // name, adminEmail, locale and the logo of a workspace form (iconFile, logoFile or logoLink).
 export async function createOrganizationWorkspaceAction(formData: FormData): Promise<Result<{ workspaceId: number; inviteUrl?: string }>> {
     try {
@@ -94,16 +82,6 @@ export async function createOrganizationWorkspaceAction(formData: FormData): Pro
         return { ok: true, ...(await createOrganizationWorkspace(ctx, z.instanceof(FormData).parse(formData))) }
     } catch (err) {
         return refused(err, 'createWorkspaceFailed')
-    }
-}
-
-export async function updateOrganizationWorkspaceAction(workspaceId: number, formData: FormData): Promise<Result> {
-    try {
-        const ctx = await requireActiveOrganization()
-        await updateOrganizationWorkspace(ctx, workspaceIdSchema.parse(workspaceId), z.instanceof(FormData).parse(formData))
-        return { ok: true }
-    } catch (err) {
-        return refused(err)
     }
 }
 
@@ -154,7 +132,7 @@ export async function openOrganizationWorkspaceAction(workspaceId: number): Prom
         const ctx = await requireActiveOrganization()
         const id = workspaceIdSchema.parse(workspaceId)
         await openOrganizationWorkspace(ctx, id)
-        const { appUrl } = await brandOfOrganization(ctx.supabase, ctx.organization)
+        const { appUrl } = await brandReachedBy(ctx.userId, ctx.organization.id, await brandOfOrganization(ctx.supabase, ctx.organization))
         const elsewhere = appUrl !== null && (await hostOrganizationId()) !== ctx.organization.id
         return { ok: true, ...(elsewhere ? { url: `${appUrl}/?${WORKSPACE_PARAM}=${id}` } : {}) }
     } catch (err) {
