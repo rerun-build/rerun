@@ -1339,6 +1339,34 @@ the Brain already holds that slug or when an app installed the skill.
 
 ---
 
+## Search
+
+### `GET /search?q=<word>&agents=<id>,<id>`
+
+Every mention of a word on the machine, for the global search of the app. The match is literal and
+ignores case; `q` takes 2 to 200 characters (`400` otherwise). What the workspace shares is always
+searched: the shared folder, the shared database, the Brain pages and the Brain skills. A
+coworker's soul, skills, files (`workspace/`) and database are searched only when its id is in
+`agents`: the app lists there the coworkers the person may reach.
+
+```json
+{
+  "hits": [
+    { "kind": "coworker", "agentId": "ada", "field": "soul", "line": 2, "snippet": "Every Monday, boost the best post." },
+    { "kind": "skill", "agentId": null, "slug": "weekly-report", "name": "weekly-report", "snippet": "List every boost still running." },
+    { "kind": "file", "agentId": null, "path": "marketing/q4-plan.md", "line": 42, "snippet": "Boost budget: $400 a month." },
+    { "kind": "brain", "slug": "ad-budget", "title": "Ad budget rules", "snippet": "Any boost over $50 needs an OK." },
+    { "kind": "table", "agentId": "ada", "table": "leads", "rowId": 14, "title": "Lena Hart", "snippet": "notes: came from the boost" }
+  ],
+  "truncated": false
+}
+```
+
+`agentId` is `null` for what the workspace shares. A file hit keeps the first matching line of the
+file (`line` is `null` when only its name matches); files over 1 MB, binary files, hidden files
+and folders, and `node_modules` are skipped. A table hit's `rowId` is `null` for a `WITHOUT ROWID`
+table. Each source stops at 20 hits, and the whole search at about 1.5 s, with `truncated: true`.
+
 ## Schedules
 
 Scheduled tasks are markdown files (`agents/<id>/schedules/<slug>.md`) scanned from disk by the in-process scheduler every 30 seconds. A task is either **recurring** (`cron`) or **one-shot** (`runAt`). When due, the engine starts a fresh session and runs the task `body` as the agent's instruction, no user message needed. Each fire is recorded in the `runs` table like any other run, and its completion is pushed to the app (see [Notifications](#notifications)).

@@ -161,14 +161,15 @@ export async function stat(root: string, rel: string): Promise<FileEntry> {
     }
 }
 
-async function walkFiles(dir: string, out: string[], limit: number): Promise<void> {
+export async function walkFiles(dir: string, out: string[], limit: number, { skipHidden = false }: { skipHidden?: boolean } = {}): Promise<void> {
     if (out.length >= limit) return
     const entries = await readdir(dir, { withFileTypes: true })
     for (const entry of entries) {
         if (out.length >= limit) return
+        if (skipHidden && entry.name.startsWith('.')) continue
         if (entry.isDirectory()) {
             if (IGNORED_DIRS.has(entry.name)) continue
-            await walkFiles(join(dir, entry.name), out, limit)
+            await walkFiles(join(dir, entry.name), out, limit, { skipHidden })
         } else if (entry.isFile()) {
             out.push(join(dir, entry.name))
         }

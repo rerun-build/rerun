@@ -27,6 +27,7 @@ import { brainSkillRoutes } from './routes/brain-skills.js'
 import { agentDesktopRoutes, desktopRoutes } from './routes/desktop.js'
 import { vaultRoutes } from './routes/vault.js'
 import { remoteRoutes } from './routes/remote.js'
+import { searchRoutes } from './routes/search.js'
 import { VaultConflictError } from '../vault/conflicts.js'
 import { HttpError, notFound } from '../lib/errors.js'
 import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
@@ -88,6 +89,7 @@ export function createServer(): Hono {
     )
     api.route('/shared/files', createFilesRouter(() => sharedDir(), sharedFileMetaHooks))
     api.route('/shared/data', createDataRouter(() => getSharedDb(), SHARED_HIDDEN_TABLES, () => listAgentIdsOnDisk()))
+    api.route('/search', searchRoutes)
     api.route('/brain/skills', brainSkillRoutes)
     api.route('/brain', brainRoutes)
     api.route('/desktop', desktopRoutes)

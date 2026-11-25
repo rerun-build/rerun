@@ -197,6 +197,22 @@ export async function readTableRows(
     return { columns: visibleColumns, rows, total }
 }
 
+export type TableSearchHit = { rowId: number | null; row: Record<string, unknown> }
+
+// Every column is searched, `%` and `_` standing for themselves, and the rowid comes back so a hit
+// can say which row it is.
+export async function searchTableRows(client: Client, table: string, q: string, limit: number): Promise<TableSearchHit[]> {
+    const columns = await columnsOf(client, table)
+    const term = q.trim()
+    if (!term || columns.length === 0) return []
+    const pattern = `%${term.replace(/[\\%_]/g, '\\$&')}%`
+    const matches = columns.map(c => `CAST(${quoteIdent(c.name)} AS TEXT) LIKE ? ESCAPE '\\'`).join(' OR ')
+    const hasRowid = await tableHasRowid(client, table)
+    const rs = await client.execute({ sql: `SELECT ${hasRowid ? 'rowid AS "__rowid", ' : ''}${buildSelect(columns)} FROM ${quoteIdent(table)} WHERE ${matches} LIMIT ?`, args: [...columns.map(() => pattern), limit] })
+    const visible = rs.columns.filter(c => c !== '__rowid')
+    return (rs.rows as unknown as Record<string, unknown>[]).map(r => ({ rowId: hasRowid ? Number(r.__rowid) : null, row: serializeRow(visible, r) }))
+}
+
 export type GroupRowsOptions = { groupBy: string; sumColumn?: string; where?: RowFilter[]; q?: string; limit: number; hidden?: string[] }
 export type RowGroup = { value: SqlParam; total: number; sum?: number }
 
