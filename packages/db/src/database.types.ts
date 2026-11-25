@@ -2084,6 +2084,271 @@ export type Database = {
           },
         ]
       }
+      organization_credit_movements: {
+        Row: {
+          actor_user_id: string | null
+          applied_at: string | null
+          balance_after: number
+          created_at: string
+          id: string
+          kind: string
+          micros: number
+          note: string | null
+          organization_id: string
+          request_id: string
+          reversal_of: string | null
+          seq: number
+          workspace_id: number | null
+          workspace_name: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          applied_at?: string | null
+          balance_after: number
+          created_at?: string
+          id?: string
+          kind: string
+          micros: number
+          note?: string | null
+          organization_id: string
+          request_id: string
+          reversal_of?: string | null
+          seq: number
+          workspace_id?: number | null
+          workspace_name?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          applied_at?: string | null
+          balance_after?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          micros?: number
+          note?: string | null
+          organization_id?: string
+          request_id?: string
+          reversal_of?: string | null
+          seq?: number
+          workspace_id?: number | null
+          workspace_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_credit_movements_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_credit_movements_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_credit_movements_reversal_of_fkey"
+            columns: ["reversal_of"]
+            isOneToOne: true
+            referencedRelation: "organization_credit_movements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_credit_movements_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_domains: {
+        Row: {
+          created_at: string
+          failing_since: string | null
+          hostname: string
+          id: string
+          last_checked_at: string | null
+          organization_id: string
+          problem: string | null
+          status: string
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          failing_since?: string | null
+          hostname: string
+          id?: string
+          last_checked_at?: string | null
+          organization_id: string
+          problem?: string | null
+          status?: string
+          verification_token: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          failing_since?: string | null
+          hostname?: string
+          id?: string
+          last_checked_at?: string | null
+          organization_id?: string
+          problem?: string | null
+          status?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_domains_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          role: string
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          role: string
+          status?: string
+          token: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          role?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          created_at: string
+          organization_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          organization_id: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          organization_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          color: string | null
+          created_at: string
+          docs_url: string | null
+          icon_url: string | null
+          id: string
+          max_workspaces: number
+          name: string
+          privacy_url: string | null
+          slug: string
+          status: string
+          support_email: string | null
+          terms_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          docs_url?: string | null
+          icon_url?: string | null
+          id?: string
+          max_workspaces?: number
+          name: string
+          privacy_url?: string | null
+          slug: string
+          status?: string
+          support_email?: string | null
+          terms_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          docs_url?: string | null
+          icon_url?: string | null
+          id?: string
+          max_workspaces?: number
+          name?: string
+          privacy_url?: string | null
+          slug?: string
+          status?: string
+          support_email?: string | null
+          terms_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       paid_data_events: {
         Row: {
           billed_micros: number
@@ -3935,6 +4200,7 @@ export type Database = {
           expires_at: string
           id: string
           invited_by: string | null
+          role: Database["public"]["Enums"]["workspace_role"]
           status: string
           token: string
           workspace_id: number
@@ -3947,6 +4213,7 @@ export type Database = {
           expires_at: string
           id?: string
           invited_by?: string | null
+          role?: Database["public"]["Enums"]["workspace_role"]
           status?: string
           token: string
           workspace_id: number
@@ -3959,6 +4226,7 @@ export type Database = {
           expires_at?: string
           id?: string
           invited_by?: string | null
+          role?: Database["public"]["Enums"]["workspace_role"]
           status?: string
           token?: string
           workspace_id?: number
@@ -3984,6 +4252,7 @@ export type Database = {
         Row: {
           box_scope: string
           created_at: string
+          organization_staff: boolean
           role: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: number
@@ -3991,6 +4260,7 @@ export type Database = {
         Insert: {
           box_scope?: string
           created_at?: string
+          organization_staff?: boolean
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: number
@@ -3998,6 +4268,7 @@ export type Database = {
         Update: {
           box_scope?: string
           created_at?: string
+          organization_staff?: boolean
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id?: string
           workspace_id?: number
@@ -4121,6 +4392,9 @@ export type Database = {
           model_access: string | null
           name: string | null
           onboarded_at: string | null
+          organization_archived_at: string | null
+          organization_credit_alerted_at: string | null
+          organization_id: string | null
           payment_failed_at: string | null
           plan: string
           price_arm: string | null
@@ -4164,6 +4438,9 @@ export type Database = {
           model_access?: string | null
           name?: string | null
           onboarded_at?: string | null
+          organization_archived_at?: string | null
+          organization_credit_alerted_at?: string | null
+          organization_id?: string | null
           payment_failed_at?: string | null
           plan?: string
           price_arm?: string | null
@@ -4207,6 +4484,9 @@ export type Database = {
           model_access?: string | null
           name?: string | null
           onboarded_at?: string | null
+          organization_archived_at?: string | null
+          organization_credit_alerted_at?: string | null
+          organization_id?: string | null
           payment_failed_at?: string | null
           plan?: string
           price_arm?: string | null
@@ -4229,6 +4509,13 @@ export type Database = {
           waitlisted_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "workspaces_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspaces_renewal_reminder_user_id_fkey"
             columns: ["renewal_reminder_user_id"]
