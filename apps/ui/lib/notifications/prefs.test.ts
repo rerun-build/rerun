@@ -27,9 +27,14 @@ describe('normalizeNotificationPrefs, from the v1 matrix', () => {
         expect(normalizeNotificationPrefs({ categories: { billing: false, product: true } }).categories).toEqual({ billing: false, product: true })
     })
 
-    it('keeps an unsubscribe from run emails', () => {
-        expect(normalizeNotificationPrefs({ channels: { email: ALL_OFF } }).email).toBe(false)
-        expect(normalizeNotificationPrefs({ channels: { email: LEGACY_DEFAULT_MATRIX } }).email).toBe(true)
+    it('reads Email off: nobody ever chose it there', () => {
+        expect(normalizeNotificationPrefs({ channels: { email: LEGACY_DEFAULT_MATRIX } }).email).toBe(false)
+        expect(normalizeNotificationPrefs({}).email).toBe(false)
+        expect(normalizeNotificationPrefs({ version: 2 }).email).toBe(false)
+    })
+
+    it('keeps Email on for who turned it on', () => {
+        expect(normalizeNotificationPrefs({ version: 2, email: true }).email).toBe(true)
     })
 
     it('reads nothing stored as the defaults', () => {

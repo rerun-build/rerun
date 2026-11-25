@@ -44,7 +44,8 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
   scope: "mine",
   toast: true,
   sound: true,
-  email: true,
+  // Email is for those who ask for it: an inbox that did not costs the domain its reputation.
+  email: false,
   coworkers: {},
   tasks: {},
   categories: { billing: true, product: true },
@@ -126,20 +127,6 @@ function normalizeCoworkerRule(value: unknown): CoworkerRule | null {
   return rule.mode === "default" && rule.follow === undefined ? null : rule;
 }
 
-function anyKindOn(value: unknown): boolean {
-  if (!isRecord(value)) return false;
-  return Object.values(value).some(
-    (entry) => entry === true || anyKindOn(entry),
-  );
-}
-
-// A v1 email matrix with every kind off is someone who unsubscribed from run emails: that choice
-// survives the reset, the rest of the matrix does not.
-function unsubscribedFromRunEmails(raw: Record<string, unknown>): boolean {
-  const channels = isRecord(raw.channels) ? raw.channels : null;
-  return !!channels && isRecord(channels.email) && !anyKindOn(channels.email);
-}
-
 function legacyPrefs(raw: Record<string, unknown>): NotificationPrefs {
   const coworkers: Record<string, CoworkerRule> = {};
   if (isRecord(raw.agents)) {
@@ -153,7 +140,6 @@ function legacyPrefs(raw: Record<string, unknown>): NotificationPrefs {
   }
   return {
     ...DEFAULT_NOTIFICATION_PREFS,
-    email: !unsubscribedFromRunEmails(raw),
     coworkers,
     tasks: {},
     categories: normalizeCategories(raw),

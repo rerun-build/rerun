@@ -14,7 +14,7 @@ const MEMBERS: Member[] = ['you', 'maya', 'tom', 'sarah']
 const PREFS: Record<Member, NotificationPrefs> = {
     you: DEFAULT_NOTIFICATION_PREFS,
     maya: { ...DEFAULT_NOTIFICATION_PREFS, coworkers: { 'blog-writer': { mode: 'default', follow: true } } },
-    tom: { ...DEFAULT_NOTIFICATION_PREFS, coworkers: { 'weekly-report': { mode: 'default', follow: true } } },
+    tom: { ...DEFAULT_NOTIFICATION_PREFS, email: true, coworkers: { 'weekly-report': { mode: 'default', follow: true } } },
     sarah: DEFAULT_NOTIFICATION_PREFS,
 }
 
@@ -158,7 +158,7 @@ describe('needsOwnerFollow', () => {
 
 describe('wantsRecoveryEmail', () => {
     it('tells whoever was emailed that it works again, unless they have since opted out', () => {
-        expect(wantsRecoveryEmail(DEFAULT_NOTIFICATION_PREFS, 'weekly-report')).toBe(true)
+        expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, email: true }, 'weekly-report')).toBe(true)
         expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, email: false }, 'weekly-report')).toBe(false)
         expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, scope: 'nothing' }, 'weekly-report')).toBe(false)
         expect(wantsRecoveryEmail({ ...DEFAULT_NOTIFICATION_PREFS, coworkers: { 'weekly-report': { mode: 'muted' } } }, 'weekly-report')).toBe(false)

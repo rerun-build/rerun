@@ -117,7 +117,7 @@ describe('POST /api/webhooks/engine', () => {
         sandbox = true
         session = null
         participants = []
-        prefsOf = {}
+        prefsOf = Object.fromEntries(MEMBERS.map(id => [id, { version: 2, email: true }]))
         incidentOpens = true
         resolvedUsers = []
         emailFlags.paused = false
