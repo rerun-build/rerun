@@ -57,7 +57,7 @@ When a coworker needs an API key, it never asks for it in the chat. It opens a m
 
 The [Chief of Staff](/chief-of-staff)'s form can send the value to the [Vault](/vault) instead, when you ask it to keep a key there: the value goes straight to the Vault entry, with your rights, and the Chief of Staff only learns which entry holds it.
 
-The coworker learns which variable name was filled and nothing else. It then references it as `${VARIABLE_NAME}` in an app config or a command, and the value resolves on the machine at run time.
+The coworker learns which variable name was filled and nothing else. It then references it as `${VARIABLE_NAME}` in an app config or a command, and the value resolves on the machine at run time. In every later conversation it still sees the names of its variables, its own and those of the [Vault](/vault) secrets lent to it, so it only opens the form for a key it does not hold yet.
 
 <Warning>
   Never paste a secret into the chat itself. The conversation is stored and sent to the model. A coworker that asks you to is doing it wrong: use the masked form.

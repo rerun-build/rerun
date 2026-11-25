@@ -26,6 +26,7 @@ const { forgetVaultCache, getVaultItem } = await import('./store.js')
 const { agentMcpServers, vaultEnvFor } = await import('./runtime.js')
 const { prepareMcpServer } = await import('../tools/mcp.js')
 const { agentProcessEnv } = await import('../agents/process-env.js')
+const { buildSystemPrompt, systemPromptText } = await import('../agents/systemPrompt.js')
 const { agentMcpSpawn } = await import('../tools/mcp-pool.js')
 const { getAgent, unloadAgent } = await import('../agents/registry.js')
 const { saveVaultToken } = await import('./tokens.js')
@@ -109,6 +110,25 @@ describe('what a coworker draws on', () => {
         expect(agentMcpServers(await loaded(c))).toEqual([])
         expect(vaultEnvFor(await loaded(c))).toEqual({})
         expect(agentProcessEnv(await loaded(c)).env.LINEAR_EXTRA).toBeUndefined()
+    })
+
+    // RER-331: the key was in the shell, but the coworker never knew it and asked for it again.
+    it('names a secret it gets from the Vault in its prompt, with the entry and never the value', async () => {
+        const a = await createAgent('Holds the secret')
+        const c = await createAgent('Holds nothing')
+        await createItem({ kind: 'secret', name: 'FastMoss', env: { FASTMOSS: 'fm-secret-value' }, agentIds: [a] })
+        await createItem({ kind: 'secret', name: 'OpenAI images', env: { OPENAI_API_KEY: 'lent-on-purpose' }, agentIds: [a] })
+
+        const prompt = systemPromptText(await buildSystemPrompt(await loaded(a)))
+        expect(prompt).toContain('<variables>')
+        expect(prompt).toContain("- FASTMOSS (from the workspace's Vault: FastMoss)")
+        expect(prompt).toContain("- OPENAI_API_KEY (from the workspace's Vault: OpenAI images)")
+        expect(prompt).not.toContain('fm-secret-value')
+        expect(prompt).toContain('Only those marked yours can also be referenced as ${NAME} in an MCP server you register')
+
+        const other = systemPromptText(await buildSystemPrompt(await loaded(c)))
+        expect(other).not.toContain('<variables>')
+        expect(other).not.toContain('FASTMOSS')
     })
 
     it('gives an item shared with everyone to every coworker, the foreman included', async () => {

@@ -18,6 +18,8 @@ import { offersQuickReplies } from './quick-replies-stream.js'
 import { HITL_TOOL_NAMES, offersTakeover, type HitlToolName } from '../tools/builtin/hitl.js'
 import { runOffersComputer } from '../tools/builtin/computer.js'
 import { CLI_PROVIDERS, type LoadedAgent } from './types.js'
+import { agentVariables } from './process-env.js'
+import { attachedVaultItems } from '../vault/runtime.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
 import { SKILL_STYLE } from '../skills/style.js'
 import { offersTeamRequests, type RunTrigger } from '../runtime/context.js'
@@ -25,6 +27,25 @@ import { offersTeamRequests, type RunTrigger } from '../runtime/context.js'
 function environmentNote(agentId: string, sharedDb: boolean): string {
     const sharedDbSentence = sharedDb ? ` The shared database of this space is at ${sharedDbPath()}, reachable from a script through the RERUN_SHARED_DB environment variable.` : ''
     return `Your workspace is ${workspaceDir(agentId)}. It is the working directory of shell_exec (its pwd) and its absolute path is in the RERUN_WORKSPACE environment variable. Your fs_ tools are rooted there; your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker in this space can read and write.${sharedDbSentence} This is where your files live and where the user drops files for you. Never treat install or system paths such as /opt/rerun or the engine source tree as your workspace — your files are never there. To find a file, prefer fs_list and fs_search over a raw shell find, and search the shared space with shared_list and shared_search.`
+}
+
+// A key the user put in the Vault reached the shell, but nothing named it, so the coworker asked for
+// it again with request_secret (RER-331). Names only: a value never enters the prompt. `RERUN_` is
+// the engine's own namespace, the one `GET /agents/:id/keys` reports apart.
+//
+// A server the coworker registers resolves its ${VAR}s from its own `.env` only (`agentMcpSpawn`,
+// `prepareMcpServer`), so a Vault variable is offered for the shell and never for such a server.
+function variablesNote(agent: LoadedAgent): string {
+    const vaultEntryOf = new Map(attachedVaultItems(agent).flatMap(item => Object.keys(item.env).map(name => [name, item.config.name] as const)))
+    const variables = Object.entries(agentVariables(agent))
+        .filter(([name]) => vaultEntryOf.has(name) || !name.startsWith('RERUN_'))
+        .sort(([a], [b]) => a.localeCompare(b))
+    if (variables.length === 0) return ''
+    const lines = variables.map(([name, value]) => {
+        const entry = vaultEntryOf.get(name)
+        return `- ${name} (${entry ? `from the workspace's Vault: ${entry}` : 'yours'}${value ? '' : ', still empty'})`
+    })
+    return `These environment variables are set in every process you start (shell_exec, your scripts). You see their names, never their values. Only those marked yours can also be referenced as \${NAME} in an MCP server you register: such a server never reads the Vault, so for one that needs a key from the Vault, ask the user to add that server to the Vault with its key. A key here is a way to reach its service even when an app or an MCP server of the same name is not connected: when the user asks whether you can use a service, answer from this list too. Before you ask the user for a key, look here: when one of them is for that service, use it. A variable marked still empty holds no value yet: it is a key you still have to ask for.\n${lines.join('\n')}`
 }
 
 const SERVICE_CATALOG_LEAD =
@@ -217,7 +238,7 @@ function askingNote(cfg: LoadedAgent['config']['tools'], computer = false): stri
     if (cfg.askUser) lines.push('When you cannot proceed without input from the user — a scoping question, a missing detail, a choice between a few options — call ask_user with all the questions you need at once. Give a question short answer options when a set of concrete choices helps, or leave its options out entirely to ask an open, free-text question the user answers by typing. Options come at least two at a time and each one is a possible answer: a question whose answer is a value only the user knows (a URL, a name, a number) takes none. Aim for six options or fewer, and only go beyond that when the set is genuinely enumerated, like every channel or every connected account. Options are exclusive by default; when the answers genuinely add up rather than compete, set multiple: true on that question so the user can tick every one that applies. Give each question a header of one or two words naming what it is about (Format, Audience, Schedule), and give an option a one-line description only when its label alone does not say what picking it implies, never one that repeats the label. Prefer it over notify_user or ending your turn silently whenever you actually need an answer. A question the user skipped is answered, and a skip is never a yes: state in one line the assumption you made in its place, deliver what they asked for, and never ask it again unless they bring it up. Before you act after a skip, reread what they asked. When it was a question (is this possible, did it work), answer it from what you know and what you can read, then end the turn. Until they ask for something to be built, every tool call after a skip only reads: creating, changing, running or deleting anything in their tools, even as a test you would clean up, is building what they did not ask for. Nothing is built, created, run or scheduled that they did not ask for, however ready it looks. The card never carries your explanation: what you found, why you ask, and in full what the question is about go in your message, and a card sent without one leaves the user with a bare card and a question about a summary they never saw.')
     if (cfg.requestApproval) lines.push('Before one or more consequential or irreversible actions, call request_approval and end your turn. Group every approval you genuinely need right now into its approvals array so the user can decide them together, but never add filler, split one action artificially, or include speculative actions that are not ready to run. Perform only actions the user approves. When the user has told you to go ahead without asking for a kind of action (join them all, send them, don\'t ask me), that standing go-ahead approves every action of that kind within what they described: do them without a card, and ask again only for an action outside it or riskier than what they allowed. If the user declines an action, you must NOT perform it and must NOT attempt any workaround to achieve the same result.')
     if (cfg.suggestService) lines.push('To connect a catalog service that needs credentials or a sign-in, call suggest_service with the service slug(s) when the next step needs it, after you have shown what you prepared, and end your turn — the user gets a setup card to enter their keys or sign in. Never ask the user to paste secrets into the chat, and never call rerun_hub_service_install for a service that still needs credentials.')
-    if (cfg.requestSecret) lines.push('When a setup needs an API key or token that no catalog app covers (an MCP server you register yourself, a script that needs an authenticated call), call request_secret with the variable names you need and end your turn. The user fills a masked form and the values are written into your coworker variables without ever entering the conversation; you get back only the names of the variables that were filled, and you then reference them as ${KEY} in the MCP server config or command' + (computer ? ", or type them into a page with the computer tool's secret" : '') + '. Never ask the user to type or paste a secret in the chat, and never repeat a secret value even if one reaches you anyway.')
+    if (cfg.requestSecret) lines.push('When a setup needs an API key or token that no catalog app covers (an MCP server you register yourself, a script that needs an authenticated call) and that you do not already hold as one of your variables, call request_secret with the variable names you need and end your turn. The user fills a masked form and the values are written into your coworker variables without ever entering the conversation; you get back only the names of the variables that were filled, and you then reference them as ${KEY} in the MCP server config or command' + (computer ? ", or type them into a page with the computer tool's secret" : '') + '. Never ask the user to type or paste a secret in the chat, and never repeat a secret value even if one reaches you anyway.')
     if (cfg.askUser || cfg.requestApproval || cfg.suggestService || cfg.requestSecret) lines.push('These blocks render in a narrow card, so keep the text inside them short: one short line per question, action or label, and options of a few words. Anything more to explain goes in your message, never inside the card. Wherever you make the call in your reply, the card shows at the bottom of the conversation, below your message, right above the box where the user types: when your message points to it, it is the card below, never the card above. Each of these cards exists only as a tool call: never write one as a tag in your message, since a tag like <ask_user> shows to the user as raw text and no card appears. Call at most one of these tools in a turn (a single ask_user may carry several questions, a single request_approval may carry several approvals, a single suggest_service may carry several apps, and a single request_secret may carry several credentials), and your turn ends on it, in the order set in turn_order. The user answers in the chat and you continue from their reply.')
     return lines.join(' ')
 }
@@ -411,6 +432,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         cfg.db ? section('database', `${databaseNote(cfg.sharedDb)} ${FOREMAN_COWORKER_DATABASES_NOTE}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
+        section('variables', variablesNote(agent)),
         section('current_time', currentTimeNote()),
     ]
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
@@ -474,6 +496,7 @@ export async function buildSystemPrompt(
         cfg.db ? section('database', `${databaseNote(cfg.sharedDb)}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `${SHARED_DATABASE_NOTE}${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
+        section('variables', variablesNote(agent)),
         computers ? section('linked_computers', computers) : '',
         section('current_time', currentTimeNote()),
     ]

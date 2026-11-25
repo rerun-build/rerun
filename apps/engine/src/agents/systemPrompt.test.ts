@@ -63,6 +63,41 @@ describe('company brain section', () => {
     })
 })
 
+describe('variables section', () => {
+    it('names the variables the coworker holds itself, never their values', async () => {
+        const prompt = await buildSystemPrompt({ ...agentWith({ requestSecret: true }), env: { FASTMOSS_API_KEY: 'own-value' } }, { source: 'chat' })
+        expect(prompt).toContain('<variables>')
+        expect(prompt).toContain('- FASTMOSS_API_KEY (yours)')
+        expect(prompt).not.toContain('own-value')
+        expect(prompt).toContain('and that you do not already hold as one of your variables, call request_secret')
+    })
+
+    it('leaves the section out when the coworker holds no variable', async () => {
+        const prompt = await buildSystemPrompt(agent, { source: 'chat' })
+        expect(prompt).not.toContain('<variables>')
+    })
+
+    it('says a variable an archive left blank is still empty, a key still to ask for', async () => {
+        const prompt = await buildSystemPrompt({ ...agent, env: { STRIPE_KEY: '' } }, { source: 'chat' })
+        expect(prompt).toContain('- STRIPE_KEY (yours, still empty)')
+        expect(prompt).toContain('A variable marked still empty holds no value yet')
+    })
+
+    it("keeps the engine's own keys out of it, never a provider-named key the user gave the coworker", async () => {
+        const prompt = await buildSystemPrompt({ ...agent, env: { RERUN_API_KEY: 'engine-key', OPENAI_API_KEY: 'images-key' } }, { source: 'chat' })
+        expect(prompt).not.toContain('RERUN_API_KEY')
+        expect(prompt).toContain('- OPENAI_API_KEY (yours)')
+        expect(prompt).not.toContain('images-key')
+    })
+
+    it('names the variables of the Chief of Staff too', async () => {
+        const foreman = { ...agent, config: agentConfigSchema.parse({ name: 'foreman', kind: 'foreman', provider: 'rerun' }), env: { NOTION_TOKEN: 'cos-value' } }
+        const prompt = await buildSystemPrompt(foreman, { source: 'chat' })
+        expect(prompt).toContain('- NOTION_TOKEN (yours)')
+        expect(prompt).not.toContain('cos-value')
+    })
+})
+
 describe('Rerun documentation section', () => {
     const docsOf = (prompt: string) => prompt.slice(prompt.indexOf('<rerun_docs>'), prompt.indexOf('</rerun_docs>'))
 
