@@ -64,9 +64,17 @@ Follow the `create-dialog` skill.
 
 Rerun has paying customers: a change that shows anywhere (a screen, a dialog, a button, a flow, an
 API route the UI calls, the mobile app) is not done until it has been seen working in the running
-app. Tests and the typecheck are not enough. Follow the `verify-in-app` skill without being asked:
+app. Tests and the typecheck are not enough. How much to run follows the size of the change:
 
-- run it on the local stack only (`pnpm db:start`, `pnpm cloud env:local`), never on production
+- **Nothing to run** (a question, docs, a comment, agent configuration): no test, no environment.
+- **Small** (a label, a style, a local fix): the test or the lint of the files it touches, and a single
+  capture of the screen if it shows. Never small: the database, an API, the contracts, the engine, auth,
+  billing, the mobile or desktop app, dependencies, a new screen, dialog or flow, a component several screens share.
+- **Real** (everything else, and any doubt): the whole `verify-in-app` skill, without being asked.
+
+Whatever the size, it runs on the local stack only, never on production. For a real change:
+
+- start the local stack (`pnpm db:start`, `pnpm cloud env:local`)
 - `pnpm verify:ui` signs in, captures every width in both themes and reports console errors,
   failed requests and load timings; a scenario in `.context/verify/` clicks the path that changed
 - look at every capture, fix what the change broke, run it again
