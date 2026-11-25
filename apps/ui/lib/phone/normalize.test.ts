@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { countryDialling, countryFlag, countryFromLocale, countryOfTyped, exampleNationalNumber, formatAsTyped, isPhoneCountry, PHONE_COUNTRIES, readTypedPhone, searchCountries, toE164 } from './normalize'
+import { countryDialling, countryFlag, countryFromLocale, countryOfTyped, exampleNationalNumber, formatAsTyped, formatE164, isPhoneCountry, PHONE_COUNTRIES, readTypedPhone, searchCountries, toE164 } from './normalize'
 
 describe('toE164', () => {
     it('reads a national number in the selected country', () => {
@@ -16,6 +16,13 @@ describe('toE164', () => {
         expect(toE164('12345', 'FR')).toBeNull()
         expect(toE164('', 'FR')).toBeNull()
         expect(toE164('not a number', 'US')).toBeNull()
+    })
+})
+
+describe('formatE164', () => {
+    it('spaces a number the way its country writes it, and keeps what is not one', () => {
+        expect(formatE164('+33612345678')).toBe('+33 6 12 34 56 78')
+        expect(formatE164('12')).toBe('12')
     })
 })
 

@@ -30,6 +30,8 @@ export function toE164(input: string, country: CountryCode): string | null {
     return parsed?.isValid() ? parsed.number : null
 }
 
+export const formatE164 = (phone: string): string => parsePhoneNumberFromString(phone)?.formatInternational() ?? phone
+
 export const countryOfE164 = (phone: string): CountryCode | undefined => parsePhoneNumberFromString(phone)?.country
 
 // The country the number itself names once it is complete, the selected one until then: a `+7`

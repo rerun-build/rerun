@@ -9,7 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { PhoneNumberInput } from '@/components/ui/phone-number-input'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { countryFromLocale, countryOfE164, countryOfTyped, toE164 } from '@/lib/phone/normalize'
+import { PencilIcon } from '@/lib/icons'
+import { countryFromLocale, countryOfE164, countryOfTyped, formatE164, toE164 } from '@/lib/phone/normalize'
 import { reachableChannels } from '@/lib/phone/reach'
 import { clearSentCode, readSentCode, writeSentCode } from '@/lib/phone/sent-code'
 import { VERIFICATION_CODE_LENGTH, type VerificationChannel } from '@/lib/phone/verification'
@@ -307,14 +308,14 @@ export function PhoneCodeForm({
             ) : (
                 <Form {...codeForm}>
                     <form onSubmit={submitCode} className="space-y-4">
-                        <p className="text-sm text-muted-foreground">
-                            {t.rich('code.sent', {
-                                length: VERIFICATION_CODE_LENGTH,
-                                phone: sentTo,
-                                channel: CHANNEL_NAMES[sentChannel],
-                                number: chunks => <span className="font-medium text-foreground">{chunks}</span>,
-                            })}
-                        </p>
+                        <div className="flex flex-col items-center gap-2 text-center">
+                            <p className="text-sm text-muted-foreground text-balance">{t('code.sentTo', { length: VERIFICATION_CODE_LENGTH, channel: CHANNEL_NAMES[sentChannel] })}</p>
+                            <Button type="button" variant="secondary" size="sm" className="rounded-full" onClick={changeNumber}>
+                                <bdi dir="ltr">{formatE164(sentTo)}</bdi>
+                                <span className="sr-only">{t('code.changeNumber')}</span>
+                                <PencilIcon className="text-muted-foreground" />
+                            </Button>
+                        </div>
                         <FormField
                             control={codeForm.control}
                             name="code"
@@ -349,10 +350,7 @@ export function PhoneCodeForm({
                                 {t('code.nudge', { channel: CHANNEL_NAMES[otherChannel] })}
                             </Button>
                         )}
-                        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                            <button type="button" onClick={changeNumber} className="transition-colors hover:text-foreground">
-                                {t('code.changeNumber')}
-                            </button>
+                        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
                             <TooltipDisabledReason reason={resendIn > 0 ? t('code.resendIn', { seconds: resendIn }) : undefined}>
                                 <button
                                     type="button"
@@ -363,9 +361,7 @@ export function PhoneCodeForm({
                                     {resendIn > 0 ? t('code.resendWait', { wait: formatWait(resendIn, t) }) : t('code.resend')}
                                 </button>
                             </TooltipDisabledReason>
-                        </div>
-                        {!nudged && canSwitch && (
-                            <div className="flex justify-center text-sm text-muted-foreground">
+                            {!nudged && canSwitch && (
                                 <TooltipDisabledReason reason={switchIn > 0 ? t('code.switchIn', { channel: CHANNEL_NAMES[otherChannel], seconds: switchIn }) : undefined}>
                                     <button
                                         type="button"
@@ -376,8 +372,8 @@ export function PhoneCodeForm({
                                         {switchIn > 0 ? t('code.switchWait', { channel: CHANNEL_NAMES[otherChannel], wait: formatWait(switchIn, t) }) : t('code.switch', { channel: CHANNEL_NAMES[otherChannel] })}
                                     </button>
                                 </TooltipDisabledReason>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </form>
                 </Form>
             )}
