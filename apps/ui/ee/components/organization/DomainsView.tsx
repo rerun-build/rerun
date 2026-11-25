@@ -1,35 +1,35 @@
 'use client'
 
+import type { Brand } from '@rerun/contracts'
 import { fullDateTime } from '@rerun/i18n/format'
-import { Badge } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
-import { CopyLine } from '@/components/dialogs/CopyLine'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
-import { EmptyState } from '@/components/ui/empty-state'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PANEL_CARD } from '@/components/ui/panel-row'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Spinner } from '@/components/ui/spinner'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useErrorText } from '@/hooks/useErrorText'
-import { GlobeIcon, PlusIcon, RotateCwIcon } from '@/lib/icons'
+import { EllipsisIcon, GlobeIcon, PlusIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-import { ConsoleGroup, ConsolePage } from './ConsolePage'
+import { BrandScreenPreview } from './BrandScreenPreview'
 import { readHostname } from './input'
-import { DOMAIN_STATUS_TONE, type ConsoleDomain, type ConsoleResult, type DnsRecord, type DomainStatus, type WriteBlock } from './types'
+import { CopyButton, Dot, Page, Section } from './parts'
+import type { ConsoleDomain, ConsoleResult, DnsRecord, WriteBlock } from './types'
 import { useBlockReason } from './useBlockReason'
 import { useHeldDialog, type Hold } from './useHeldDialog'
 
 type DomainsViewProps = {
-    // Null while it is read.
-    defaultHostname: string | null
-    domains: ConsoleDomain[] | null
+    brand: Brand
+    defaultHostname: string
+    domains: ConsoleDomain[]
     checkingId: string | null
     block: WriteBlock | null
     onAdd: (hostname: string) => Promise<ConsoleResult>
@@ -37,116 +37,157 @@ type DomainsViewProps = {
     onRemove: (domain: ConsoleDomain) => void
 }
 
-export function DomainsView({ defaultHostname, domains, checkingId, block, onAdd, onCheck, onRemove }: DomainsViewProps) {
+// Served and pointing here: nothing left to set up. One that is served and stopped pointing here shows
+// what to publish again.
+const isSettled = ({ status, error }: ConsoleDomain) => status === 'active' && !error
+
+export function DomainsView({ brand, defaultHostname, domains, checkingId, block, onAdd, onCheck, onRemove }: DomainsViewProps) {
     const t = useTranslations('organization.domains')
     const blockReason = useBlockReason(block)
     const [adding, setAdding] = useState(false)
+    const settled = domains.filter(isSettled)
+    const [main, ...others] = settled
+    const address = main?.hostname ?? defaultHostname
     return (
-        <ConsolePage
-            title={t('title')}
-            description={t('description')}
-            actions={
-                <TooltipDisabledReason reason={blockReason}>
-                    <Button disabled={!domains || !!blockReason} onClick={() => setAdding(true)}>
-                        <PlusIcon />
-                        {t('add')}
-                    </Button>
-                </TooltipDisabledReason>
-            }
-        >
-            <ConsoleGroup title={t('default')}>
-                <div className={cn('flex items-center gap-3 p-4', PANEL_CARD)}>
-                    {defaultHostname === null ? <Skeleton className="h-8 flex-1" /> : <CopyLine value={`https://${defaultHostname}`} label={t('copyAddress')} className="flex-1" />}
-                    <DomainStatusBadge status="active" />
-                </div>
-            </ConsoleGroup>
-            <ConsoleGroup title={t('custom')}>
-                {!domains ? (
-                    <DomainSkeleton />
-                ) : domains.length === 0 ? (
-                    <EmptyState icon={GlobeIcon} title={t('empty.title')} description={t('empty.description')} className="py-12" />
-                ) : (
-                    <div className="space-y-3">
-                        {domains.map(domain => (
-                            <DomainCard key={domain.id} domain={domain} checking={domain.id === checkingId} blockReason={blockReason} onCheck={() => onCheck(domain)} onRemove={() => onRemove(domain)} />
+        <Page>
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-16 gap-y-10 lg:grid-cols-2">
+                <div className="min-w-0 space-y-10">
+                    <header className="space-y-4">
+                        <p className="text-sm text-muted-foreground">{t('signInAt')}</p>
+                        <h1 className="text-3xl font-medium tracking-tight break-all sm:text-4xl">{address}</h1>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <TooltipDisabledReason reason={blockReason}>
+                                <Button disabled={!!blockReason} onClick={() => setAdding(true)}>
+                                    <PlusIcon />
+                                    {t('add')}
+                                </Button>
+                            </TooltipDisabledReason>
+                            {main && <DomainMenu domain={main} reason={blockReason} onRemove={() => onRemove(main)} />}
+                        </div>
+                    </header>
+                    {domains
+                        .filter(domain => !isSettled(domain))
+                        .map(domain => (
+                            <DomainSetup key={domain.id} domain={domain} checking={domain.id === checkingId} blockReason={blockReason} onCheck={() => onCheck(domain)} onRemove={() => onRemove(domain)} />
                         ))}
-                    </div>
-                )}
-            </ConsoleGroup>
+                    <Section title={t(main ? 'alsoAnswers' : 'included')}>
+                        {others.map(domain => (
+                            <AddressLine key={domain.id} hostname={domain.hostname}>
+                                <DomainMenu domain={domain} reason={blockReason} onRemove={() => onRemove(domain)} />
+                            </AddressLine>
+                        ))}
+                        <AddressLine hostname={defaultHostname} />
+                    </Section>
+                </div>
+                <BrandScreenPreview surface="auth" brand={brand} address={address} width={860} className="max-lg:hidden lg:sticky lg:top-10" frameClassName="aspect-[1.15]" />
+            </div>
             <AddDomainDialog open={adding} onOpenChange={setAdding} onAdd={onAdd} />
-        </ConsolePage>
+        </Page>
     )
 }
 
-function DomainStatusBadge({ status }: { status: DomainStatus }) {
-    const t = useTranslations('organization.domains.status')
+function AddressLine({ hostname, children }: { hostname: string; children?: ReactNode }) {
+    const t = useTranslations('organization.domains')
     return (
-        <Badge size="xs" tone={DOMAIN_STATUS_TONE[status]} glow={false} className="shrink-0 font-medium">
-            {t(status)}
-        </Badge>
+        <div className="flex items-center gap-3 border-b border-border py-2.5 last:border-b-0">
+            <span className="min-w-0 flex-1 truncate text-sm">{hostname}</span>
+            <span className="flex shrink-0 items-center gap-2 text-sm text-muted-foreground">
+                <Dot tone="green" />
+                {t('status.active')}
+            </span>
+            <CopyButton value={`https://${hostname}`} label={t('copyAddress')} />
+            {children}
+        </div>
     )
 }
 
-function DomainCard({ domain, checking, blockReason, onCheck, onRemove }: { domain: ConsoleDomain; checking: boolean; blockReason?: string; onCheck: () => void; onRemove: () => void }) {
+function DomainMenu({ domain: { hostname }, reason, onRemove }: { domain: ConsoleDomain; reason?: string; onRemove: () => void }) {
+    const t = useTranslations('organization.domains')
+    const [confirming, setConfirming] = useState(false)
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon-sm" aria-label={t('more', { hostname })} className="shrink-0 text-muted-foreground">
+                        <EllipsisIcon />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                    <TooltipDisabledReason reason={reason} side="left" className="flex w-full">
+                        <DropdownMenuItem variant="destructive" disabled={!!reason} onSelect={() => setConfirming(true)} className="w-full">
+                            <Trash2Icon />
+                            {t('remove')}
+                        </DropdownMenuItem>
+                    </TooltipDisabledReason>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <ConfirmDialog open={confirming} onOpenChange={setConfirming} title={t('removeConfirm.title', { hostname })} description={t('removeConfirm.description')} confirmLabel={t('removeConfirm.confirm')} onConfirm={onRemove} />
+        </>
+    )
+}
+
+function DomainSetup({ domain, checking, blockReason, onCheck, onRemove }: { domain: ConsoleDomain; checking: boolean; blockReason?: string; onCheck: () => void; onRemove: () => void }) {
     const t = useTranslations('organization.domains')
     const locale = useLocale()
-    const [confirming, setConfirming] = useState(false)
     const { hostname, status, error, records, lastCheckedAt } = domain
-    // Served and pointing here: nothing left to set up. One that is served and stopped pointing here
-    // shows what to publish again, and can be checked as soon as it is.
-    const settled = status === 'active' && !error
+    const steps = ['records', 'seen', 'https'] as const
     return (
-        <div className={cn('space-y-4 p-4', PANEL_CARD)}>
-            <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 space-y-0.5">
-                    <p className="text-sm font-medium break-all">{hostname}</p>
-                    {lastCheckedAt && !settled && <p className="text-xs text-muted-foreground">{t('checkedAt', { time: fullDateTime(lastCheckedAt, locale) })}</p>}
-                </div>
-                <DomainStatusBadge status={status} />
-            </div>
-            {error && <p className="text-sm break-words text-destructive">{error}</p>}
-            {!settled && records.length > 0 && (
-                <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground">{t('record.hint')}</p>
-                    {records.map(record => (
-                        <DnsRecordFields key={`${record.type} ${record.name}`} record={record} />
-                    ))}
-                </div>
-            )}
-            <div className="flex flex-wrap items-center justify-end gap-2">
-                <TooltipDisabledReason reason={blockReason}>
-                    <Button variant="ghost" disabled={!!blockReason} className="text-muted-foreground" onClick={() => setConfirming(true)}>
-                        {t('remove')}
-                    </Button>
-                </TooltipDisabledReason>
-                {!settled && (
+        <Section
+            title={t(status === 'pending' ? 'moving' : 'lost', { hostname })}
+            actions={
+                <>
                     <TooltipDisabledReason reason={blockReason}>
-                        <Button variant="outline" disabled={!!blockReason} loading={checking} onClick={onCheck}>
-                            <RotateCwIcon />
+                        <Button variant="outline" size="sm" disabled={!!blockReason} loading={checking} onClick={onCheck}>
                             {t('check')}
                         </Button>
                     </TooltipDisabledReason>
-                )}
-            </div>
-            <ConfirmDialog open={confirming} onOpenChange={setConfirming} title={t('removeConfirm.title', { hostname })} description={t('removeConfirm.description')} confirmLabel={t('removeConfirm.confirm')} onConfirm={onRemove} />
-        </div>
+                    <DomainMenu domain={domain} reason={blockReason} onRemove={onRemove} />
+                </>
+            }
+        >
+            {error && (
+                <p className="flex items-center gap-2 border-b border-border py-3 text-sm">
+                    <Dot tone={status === 'pending' ? 'amber' : 'red'} />
+                    <span className="min-w-0 break-words">{error}</span>
+                </p>
+            )}
+            <ol>
+                {steps.map((step, index) => (
+                    <li key={step} className="space-y-3 border-b border-border py-3">
+                        <p className={cn('flex items-center gap-3 text-sm', index === 0 ? 'font-medium' : 'text-muted-foreground')}>
+                            <span className="flex w-5 shrink-0 justify-center tabular-nums">{index === 0 ? <Spinner className="size-4" /> : index + 1}</span>
+                            {t(`steps.${step}`)}
+                        </p>
+                        {index === 0 && records.map(record => <DnsRecordFields key={`${record.type} ${record.name}`} record={record} />)}
+                    </li>
+                ))}
+            </ol>
+            {lastCheckedAt && <p className="pt-2 text-xs text-muted-foreground">{t('checkedAt', { time: fullDateTime(lastCheckedAt, locale) })}</p>}
+        </Section>
     )
 }
 
 function DnsRecordFields({ record }: { record: DnsRecord }) {
     const t = useTranslations('organization.domains.record')
+    const cells = [
+        { label: t('type'), value: record.type, copy: null },
+        { label: t('name'), value: record.name, copy: t('copyName') },
+        { label: t('value'), value: record.value, copy: t('copyValue') },
+    ]
     return (
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,1fr)]">
-            <Field label={t('type')}>
-                <span className="font-mono text-xs leading-8">{record.type}</span>
-            </Field>
-            <Field label={t('name')}>
-                <CopyLine value={record.name} label={t('copyName')} />
-            </Field>
-            <Field label={t('value')}>
-                <CopyLine value={record.value} label={t('copyValue')} />
-            </Field>
-        </div>
+        <dl className="grid grid-cols-[minmax(0,1fr)] rounded-lg bg-muted/60 max-sm:divide-y max-sm:divide-border sm:grid-cols-[5.5rem_minmax(0,0.8fr)_minmax(0,1fr)]">
+            {cells.map(({ label, value, copy }) => (
+                <div key={label} className="flex min-w-0 items-center gap-1 px-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                        <dt className="text-xs text-muted-foreground">{label}</dt>
+                        <dd className="truncate font-mono text-sm" title={value}>
+                            {value}
+                        </dd>
+                    </div>
+                    {copy && <CopyButton value={value} label={copy} />}
+                </div>
+            ))}
+        </dl>
     )
 }
 
@@ -200,18 +241,25 @@ function AddDomainForm({ onAdd, hold, onClose }: { onAdd: DomainsViewProps['onAd
     )
 }
 
-function DomainSkeleton() {
+export function DomainsSkeleton() {
+    const t = useTranslations('organization.domains')
     return (
-        <div className={cn('space-y-4 p-4', PANEL_CARD)}>
-            <div className="flex items-center justify-between gap-3">
-                <Skeleton className="h-4 w-40" />
-                <Skeleton className="h-5 w-20 rounded-full" />
+        <Page>
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-16 gap-y-10 lg:grid-cols-2">
+                <div className="min-w-0 space-y-10">
+                    <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground">{t('signInAt')}</p>
+                        <Skeleton className="h-10 w-72 max-w-full" />
+                        <Skeleton className="h-9 w-36 rounded-lg" />
+                    </div>
+                    <Section title={t('included')}>
+                        <div className="py-3">
+                            <Skeleton className="h-4 w-40" />
+                        </div>
+                    </Section>
+                </div>
+                <Skeleton className="aspect-[1.1] w-full rounded-xl max-lg:hidden" />
             </div>
-            <Skeleton className="h-8 w-full" />
-            <div className="flex justify-end gap-2">
-                <Skeleton className="h-8 w-20 rounded-lg" />
-                <Skeleton className="h-8 w-28 rounded-lg" />
-            </div>
-        </div>
+        </Page>
     )
 }

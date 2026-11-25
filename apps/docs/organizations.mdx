@@ -13,7 +13,9 @@ An organization sits above workspaces. It is for an agency that runs Rerun for i
 
 Your team runs everything from the console. Click the workspace pill in the top left corner, then **Organization**. Only the people of your team see that entry.
 
-The console has five sections: **Workspaces**, **Credit**, **Team**, **Brand** and **Domains**.
+The console has five sections: **Workspaces**, **Credit**, **Brand**, **Domains** and **Team**. The credit you can still give shows at the top, with **+** to create a workspace. Your picture opens a menu with **Back to the app**. In the page of a workspace, the name at the top changes it for another.
+
+Until you have a client, the console lists what is left to do: set your brand, connect your domain, create your first workspace and invite your team.
 
 ## Your team
 
@@ -24,7 +26,7 @@ Your team has two roles.
 | **Owner** | Everything, team, brand and domains included |
 | **Admin** | Workspaces, members and credit |
 
-In **Team**, click **Invite**, enter an email address and pick a role. The invitation is valid for 7 days. An organization keeps at least one owner: the last one cannot step down, be removed, or delete their account until another owner is named.
+In **Team**, enter an email address, pick a role and click **Invite**. The invitation is valid for 7 days. An organization keeps at least one owner: the last one cannot step down, be removed, or delete their account until another owner is named.
 
 Your team opens any workspace of your clients without its members seeing them. They do not appear in its list of members, nor on its board, and what they do there is signed by your brand.
 
@@ -32,31 +34,57 @@ Your team opens any workspace of your clients without its members seeing them. T
 
 One workspace per client. Each one is a hard boundary with its own machine, its own members and its own coworkers, like any [workspace](/teams#workspaces).
 
+### Find what needs you
+
+**Workspaces** shows the board of each client, with its credit and how long it lasts. The ones that need you come first, with what to do about it:
+
+| What you read | What it means | What to do |
+|---|---|---|
+| **Out of credit, coworkers are paused** | The workspace has no credit left | **Add credit** |
+| **Credit for 7 more days** | Less than 14 days left at the pace of this month | **Add credit** |
+| **Disk 94% full** | The disk of its machine is 90% full or more | **See machine** |
+| **The machine needs a look** | Its machine is in error | **See machine** |
+| **Waiting for lea@acme.com** | Its admin has not accepted the invitation | **Resend invite** |
+
+The number next to **Workspaces** is how many need you.
+
 ### Create a workspace
 
-In **Workspaces**, click **New workspace**. Give it a **Name**, the **First admin's email** and, if you like, a logo. Its first admin gets an invitation by email, valid for 7 days.
+Click **New workspace**. Give the name of the **Client**, the email of **Their admin**, the **Credit to start with** (**None**, 250, 500 or 1,000, out of your reserve) and, if you like, a logo. The invitation shows as your client receives it. Click **Create and invite**: their admin gets it by email, valid for 7 days, and you get the link to pass on another way. Only the person invited can use it.
+
+If the credit cannot be added, the workspace is created without it and the page says so.
 
 The count next to the title, such as **2 of 3**, is how many workspaces you hold out of the limit set for your organization. Archived workspaces count. Ask the Rerun team to raise it.
 
+Until its first coworker is hired, the page of the workspace lists its steps under **Going live**. **Copy link** copies the invitation of its admin. **Resend** sends it again, valid for 7 more days.
+
 ### Open, archive, restore, delete
 
-Open a workspace from the list to see its **Members**, its **Credit**, its **Usage** and its **Machine**.
+Open a workspace from the list to see its board, its credit, its **Status**, its **Machine**, its **Usage** and its **People**.
 
-- **Open workspace** takes you inside, as your team.
+- **Open** takes you inside, as your team.
+- **Restore** brings an archived workspace back, in a few minutes.
+
+The **...** menu holds the rest:
+
 - **Restart** restarts its machine. Coworkers stop what they are doing for about a minute.
-- **Archive** stops its coworkers and keeps its data. Its members lose access until you **Restore** it, which takes a few minutes.
+- **Take back** moves credit it has not spent to your reserve.
+- **Archive** stops its coworkers and keeps its data. Its members lose access until you restore it.
 - **Delete** erases its coworkers, files and conversations for good, archives included. You type the name of the workspace to confirm. Credit you gave it that it has not spent goes back to your reserve.
 
 ### Members of a workspace
 
-You invite and remove the members of a workspace from its page in the console. Its own admins can invite people and change their role from inside the workspace. Removing someone is yours: in the workspace, **Remove** is off and says to ask you.
+You invite and remove the members of a workspace under **People**, on its page in the console. Its own admins can invite people and change their role from inside the workspace. Removing someone is yours: in the workspace, **Remove** is off and says to ask you.
 
 ## Credit
 
-You buy Rerun credit from the Rerun team and hand it out yourself. What you bought and have not given yet is your **Reserve**.
+You buy Rerun credit from the Rerun team and hand it out yourself. What you bought and have not given yet is **In reserve**.
 
-- **Add credit** moves credit from your reserve to a workspace.
-- **Take back** moves it from a workspace to your reserve. You take back what you gave and the workspace has not spent, never more: a workspace that joined your organization with credit of its own keeps it.
+- In **Credit**, type what each workspace gets under **Give**, then click **Give** once for all of them. The ones whose credit ends first are at the top. One that does not go through keeps its amount and says why.
+- On the page of a workspace, type an amount under its balance and click **Add credit**.
+- **Take back**, in the **...** menu of either page, moves credit from a workspace to your reserve. You take back what you gave and the workspace has not spent, never more: a workspace that joined your organization with credit of its own keeps it.
+
+How long the credit of a workspace lasts is its balance divided by what it has spent a day since its month began. Just after a new month begins, it rests on little. **Unused** means nothing was spent this month.
 
 Credit moves in whole credits. **History** lists every movement: credit bought, added, taken back, and what did not go through.
 
@@ -64,7 +92,7 @@ When a workspace runs out, its members read that they should contact you, and yo
 
 ## Brand
 
-In **Brand**, an owner sets what your clients see.
+In **Brand**, an owner sets what your clients see. The app shows above the fields, half in light and half in dark, and follows what you type before you save.
 
 | Field | Rule |
 |---|---|
@@ -72,7 +100,7 @@ In **Brand**, an owner sets what your clients see.
 | **Icon** | A square PNG, JPEG or WebP image, 512 px or more, 8 MB at most, with its own background |
 | **Color** | A hex color. It is adjusted so it stays readable in light and dark. Without one, the app is black and white |
 | **Support email** | Where your clients write for help |
-| **Documentation**, **Terms**, **Privacy policy** | Full addresses, starting with `https://` |
+| **Help center**, **Terms**, **Privacy policy** | Full addresses, starting with `https://` |
 
 Until you upload an icon, the app draws the first letter of your name on a tile, in the browser tab and on a home screen too.
 
@@ -80,24 +108,24 @@ A color that already means something in the app (an error, a coworker waiting fo
 
 ## Domains
 
-Your clients sign in at your **Default address**, which Rerun gives you. In **Domains**, an owner can add up to 10 domains of your own.
+**Domains** shows the address your clients sign in at. Rerun gives you one, under **Included**. An owner can add up to 10 domains of your own.
 
 <Steps>
   <Step title="Add the domain">
-    Click **Add domain** and enter a subdomain of a domain you own, like `app.acme.com`. A bare domain like `acme.com` is refused.
+    Click **Add a domain**, then enter a subdomain of a domain you own, like `app.acme.com`. A bare domain like `acme.com` is refused.
   </Step>
   <Step title="Publish the records">
     The console shows two DNS records: one that points the domain to Rerun, and a TXT record that proves it is yours. Add both where your domain is managed. They can take an hour to show.
   </Step>
   <Step title="Check">
-    Click **Check again**. Once both records are read, the domain is **Active** and your clients can sign in there.
+    Click **Check now**. Once both records are read, the domain becomes the address your clients sign in at, and the one Rerun gave you moves under **Also answers**.
   </Step>
 </Steps>
 
-If an active domain stops pointing to Rerun, it is still answered for 24 hours, then shows **Error**. During that time the emails sent to your clients link to your default address, and the console shows the records to publish again. The default address always keeps working.
+If an active domain stops pointing to Rerun, it is still answered for 24 hours. During that time the emails sent to your clients link to the address Rerun gave you, and the console shows the records to publish again. That address always keeps working. **Remove** is in the **...** menu of a domain.
 
 <Note>
-  A person who also works somewhere else, in a workspace of their own or of another organization, always signs in at your default address. Opening your own domain sends them there.
+  A person who also works somewhere else, in a workspace of their own or of another organization, always signs in at the address Rerun gave you. Opening your own domain sends them there.
 </Note>
 
 ## What your clients see

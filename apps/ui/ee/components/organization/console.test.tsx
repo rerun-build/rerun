@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { MICROS_PER_CREDIT } from '@rerun/contracts'
+import { MICROS_PER_CREDIT, RERUN_BRAND, type Brand } from '@rerun/contracts'
 import { act, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -9,8 +9,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { BrandView } from './BrandView'
 import { CreditView } from './CreditView'
 import { DomainsView } from './DomainsView'
+import { NewWorkspaceView } from './NewWorkspaceView'
+import { INVITED_WORKSPACE } from '@/ee/lib/organizations/invitation-preview'
 import { TeamView } from './TeamView'
-import { consoleStatusOf, type BrandFields, type ConsolePerson, type ConsoleResult, type ConsoleWorkspace, type ConsoleWorkspaceStatus, type CreditTransfer, type OrganizationRole } from './types'
+import { consoleStatusOf, type BrandFields, type ConsolePerson, type ConsoleResult, type ConsoleWorkspace, type ConsoleWorkspaceStatus, type ConsoleRefusal, type CreditTransfer, type OrganizationRole } from './types'
 import { WorkspaceDetailView, type ClientRole } from './WorkspaceDetailView'
 import { WorkspacesView } from './WorkspacesView'
 
@@ -54,7 +56,7 @@ async function type(selector: string, value: string) {
     })
 }
 
-const submit = () => act(async () => void document.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
+const submit = () => act(async () => void [...document.querySelectorAll('form')].at(-1)!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })))
 
 // A disabled button sits in a focusable wrapper whose tooltip says why.
 async function reasonOf(control: HTMLElement): Promise<string> {
@@ -67,9 +69,24 @@ async function reasonOf(control: HTMLElement): Promise<string> {
 }
 
 const noop = () => {}
+const BRAND: Brand = { ...RERUN_BRAND, organizationId: 'o1', name: 'Nordlys', appUrl: 'https://nordlys.rerun.work' }
+
+// A menu opens from the keyboard here: happy-dom has no pointer capture.
+async function menu(trigger: string) {
+    await act(async () => void button(trigger).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })))
+}
+
+function item(name: string): HTMLElement {
+    const found = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(candidate => candidate.textContent?.trim() === name)
+    if (!found) throw new Error(`no menu item "${name}"`)
+    return found
+}
+
+const isOff = (element: HTMLElement) => element.getAttribute('aria-disabled') === 'true'
+
 const ok = async () => ({ ok: true as const })
 
-const workspace = (name: string, creditCount = 100, status: ConsoleWorkspaceStatus = 'active'): ConsoleWorkspace => ({ id: 7, name: `Client ${name}`, iconUrl: null, status, memberCount: 2, coworkerCount: 1, creditMicros: creditCount * MICROS_PER_CREDIT, lastActivityAt: null })
+const workspace = (name: string, creditCount = 100, status: ConsoleWorkspaceStatus = 'active', overrides: Partial<ConsoleWorkspace> = {}): ConsoleWorkspace => ({ id: 7, name: `Client ${name}`, iconUrl: null, status, memberCount: 2, coworkerCount: 1, coworkers: [{ id: 'c1', name: 'Nova', look: null, status: 'idle' }], pendingAdmin: null, creditMicros: creditCount * MICROS_PER_CREDIT, spentPerDayMicros: 0, machine: 'running', diskPercent: null, lastActivityAt: null, ...overrides })
 
 describe('consoleStatusOf', () => {
     it.each([
@@ -88,59 +105,245 @@ describe('consoleStatusOf', () => {
 })
 
 describe('WorkspacesView', () => {
-    const view = (count: number, maxWorkspaces: number, block: 'suspended' | null = null) => <WorkspacesView workspaces={Array.from({ length: count }, (_, index) => ({ ...workspace(String(index)), id: index }))} maxWorkspaces={maxWorkspaces} block={block} onOpen={noop} onNew={noop} />
+    type View = Parameters<typeof WorkspacesView>[0]
+    const view = (workspaces: ConsoleWorkspace[], maxWorkspaces: number, props: Partial<View> = {}) => <WorkspacesView workspaces={workspaces} maxWorkspaces={maxWorkspaces} reserveMicros={100 * MICROS_PER_CREDIT} block={null} resendingId={null} onAddCredit={noop} onResend={noop} {...props} />
+    const some = (count: number) => Array.from({ length: count }, (_, index) => ({ ...workspace(String(index)), id: index }))
+    const titles = () => [...container.querySelectorAll('h2')].map(title => title.textContent)
 
     it('creates under the limit', async () => {
-        await render(view(2, 3))
-        expect(button('New workspace').disabled).toBe(false)
+        await render(view(some(2), 3))
+        expect(container.querySelector('a[href="/organization/workspaces/new"]')?.textContent).toBe('New workspace')
         expect(container.textContent).toContain('2 of 3')
     })
 
     it('says why at the limit', async () => {
-        await render(view(3, 3))
-        expect(button('New workspace').disabled).toBe(true)
+        await render(view(some(3), 3))
         expect(await reasonOf(button('New workspace'))).toContain('limited to 3 workspaces')
     })
 
     it('says the organization is suspended before the limit', async () => {
-        await render(view(3, 3, 'suspended'))
+        await render(view(some(3), 3, { block: 'suspended' }))
         expect(await reasonOf(button('New workspace'))).toContain('suspended')
     })
 
-    it('waits for the list before anything can be created', async () => {
-        await render(<WorkspacesView workspaces={null} maxWorkspaces={3} block={null} onOpen={noop} onNew={noop} />)
-        expect(button('New workspace').disabled).toBe(true)
-        expect(container.querySelector('[data-slot="skeleton"]')).toBeTruthy()
-    })
-
-    it('gets a search past eight workspaces', async () => {
-        await render(view(8, 20))
-        expect(container.querySelector('input[type="search"]')).toBeNull()
-
-        await render(view(9, 20))
+    it('finds a workspace by its name', async () => {
+        await render(view(some(9), 20))
         await type('input[type="search"]', 'client 4')
-        expect(container.textContent).toContain('Client 4')
-        expect(container.textContent).not.toContain('Client 5')
-
+        expect(titles()).toEqual(['Client 4'])
         await type('input[type="search"]', 'zzz')
         expect(container.textContent).toContain('No workspace matches “zzz”')
+    })
+
+    it('asks for a first workspace when none is left, without naming a search', async () => {
+        await render(view([], 3))
+        expect(container.textContent).toContain('Create your first workspace')
+        expect(container.textContent).not.toContain('No workspace matches')
+    })
+
+    it('shows twelve at a time', async () => {
+        await render(view(some(30), 40))
+        expect(titles()).toHaveLength(12)
+        await click(button('Show more'))
+        expect(titles()).toHaveLength(24)
+        await click(button('Show more'))
+        expect(titles()).toHaveLength(30)
+        expect(buttons().some(candidate => candidate.textContent === 'Show more')).toBe(false)
+    })
+
+    it('puts what needs the agency first, the worst at the top, with what to do about it', async () => {
+        const onAddCredit = vi.fn()
+        const onResend = vi.fn()
+        await render(
+            view(
+                [
+                    workspace('quiet', 10, 'archived', { id: 1 }),
+                    workspace('fine', 500, 'active', { id: 2, spentPerDayMicros: 10 * MICROS_PER_CREDIT }),
+                    workspace('invited', 500, 'provisioning', { id: 3, memberCount: 0, coworkers: [], coworkerCount: 0, pendingAdmin: { invitationId: 'i', email: 'nadia@delta.test', expired: false } }),
+                    workspace('low', 70, 'active', { id: 4, spentPerDayMicros: 10 * MICROS_PER_CREDIT }),
+                    workspace('full', 500, 'active', { id: 5, diskPercent: 94 }),
+                    workspace('out', 0, 'outOfCredit', { id: 6 }),
+                ],
+                12,
+                { onAddCredit, onResend },
+            ),
+        )
+        expect(titles()).toEqual(['Client full', 'Client out', 'Client invited', 'Client low', 'Client fine', 'Client quiet'])
+        for (const text of ['Disk 94% full', 'Out of credit, coworkers are paused', 'Waiting for nadia@delta.test', 'Credit for 7 more days', '500 credits, 50 days', 'Archived']) expect(container.textContent).toContain(text)
+        expect([...container.querySelectorAll('a')].find(link => link.textContent === 'See machine')?.getAttribute('href')).toBe('/organization/workspaces/5')
+        await click(button('Add credit'))
+        expect(onAddCredit).toHaveBeenCalledWith(expect.objectContaining({ id: 6 }))
+        await click(button('Resend invite'))
+        expect(onResend).toHaveBeenCalledWith(expect.objectContaining({ id: 3 }))
+    })
+
+    it('offers no credit from an empty reserve, and nothing under a suspended organization', async () => {
+        const out = [workspace('out', 0, 'outOfCredit')]
+        await render(view(out, 12, { reserveMicros: 0 }))
+        expect(await reasonOf(button('Add credit'))).toBe('The reserve is empty')
+        await render(view(out, 12, { block: 'suspended' }))
+        expect(await reasonOf(button('Add credit'))).toContain('suspended')
+    })
+})
+
+describe('NewWorkspaceView', () => {
+    type View = Parameters<typeof NewWorkspaceView>[0]
+    const onCreate = vi.fn<View['onCreate']>()
+    beforeEach(() => void onCreate.mockReset().mockResolvedValue({ ok: true, workspaceId: 9, inviteUrl: 'https://x.test/invite/abc' }))
+    const view = (props: Partial<View> = {}) => <NewWorkspaceView brand={BRAND} email={`<p>Join ${INVITED_WORKSPACE}</p>`} reserveMicros={700 * MICROS_PER_CREDIT} limitReached={null} block={null} onCreate={onCreate} {...props} />
+    const fill = async () => {
+        await type('#new-workspace-name', ' Globex ')
+        await type('#new-workspace-email', 'Hank@Globex.test')
+    }
+
+    it('creates with the credit picked, then hands over the link of the invitation', async () => {
+        await render(view())
+        expect(button('Create and invite').disabled).toBe(true)
+        await fill()
+        expect(container.textContent).toContain('200 left in reserve')
+        await click(button('250'))
+        expect(container.textContent).toContain('450 left in reserve')
+        await submit()
+        expect(onCreate).toHaveBeenCalledExactlyOnceWith({ name: 'Globex', adminEmail: 'hank@globex.test', logo: null, starting: { credits: 250, requestId: expect.any(String) } })
+        expect(container.textContent).toContain('Globex is ready.')
+        expect(container.textContent).toContain('https://x.test/invite/abc')
+        expect(container.querySelector('a[href="/organization/workspaces/9"]')?.textContent).toBe('See workspace')
+    })
+
+    it('starts with no credit when the reserve is short, and refuses what it does not hold', async () => {
+        await render(view({ reserveMicros: 300 * MICROS_PER_CREDIT }))
+        expect(button('None').getAttribute('aria-pressed')).toBe('true')
+        expect(await reasonOf(button('500'))).toBe('Your reserve holds 300 credits')
+        expect(button('250').disabled).toBe(false)
+        await fill()
+        await submit()
+        expect(onCreate).toHaveBeenCalledWith(expect.objectContaining({ starting: null }))
+    })
+
+    it('says when the credit did not follow', async () => {
+        onCreate.mockResolvedValue({ ok: true, workspaceId: 9, creditFailed: true })
+        await render(view())
+        await fill()
+        await submit()
+        expect(container.textContent).toContain('The credit could not be added')
+    })
+
+    it('keeps the form with the reason of a refusal, and the same request', async () => {
+        onCreate.mockResolvedValue({ ok: false, code: 'createWorkspaceFailed' })
+        await render(view())
+        await fill()
+        await submit()
+        await submit()
+        expect(document.querySelector<HTMLInputElement>('#new-workspace-name')!.value).toBe(' Globex ')
+        const [first, second] = onCreate.mock.calls.map(([created]) => created.starting!.requestId)
+        expect(second).toBe(first)
+    })
+
+    it('creates once on a double submit', async () => {
+        let finish: () => void = noop
+        onCreate.mockReturnValue(new Promise(resolve => (finish = () => resolve({ ok: true, workspaceId: 9 }))))
+        await render(view())
+        await fill()
+        await submit()
+        await submit()
+        expect(onCreate).toHaveBeenCalledTimes(1)
+        await act(async () => finish())
+    })
+
+    it('creates nothing at the limit, nor under a suspended organization', async () => {
+        await render(view({ limitReached: 3 }))
+        await fill()
+        expect(await reasonOf(button('Create and invite'))).toContain('limited to 3 workspaces')
+        await submit()
+        await render(view({ block: 'suspended' }))
+        expect(await reasonOf(button('Create and invite'))).toContain('suspended')
+        expect(onCreate).not.toHaveBeenCalled()
     })
 })
 
 describe('CreditView', () => {
-    const view = (reserve: number, workspaces: ConsoleWorkspace[], onAllocate = vi.fn(ok), onTakeBack = vi.fn(ok)) => (
-        <CreditView reserveMicros={reserve * MICROS_PER_CREDIT} workspaces={workspaces} movements={[]} hasMore={false} loadingMore={false} block={null} onLoadMore={noop} onAllocate={onAllocate} onTakeBack={onTakeBack} />
-    )
+    type View = Parameters<typeof CreditView>[0]
+    const onGive = vi.fn<View['onGive']>()
+    beforeEach(() => void onGive.mockReset().mockResolvedValue(new Map()))
+    const view = (reserve: number, workspaces: ConsoleWorkspace[], props: Partial<View> = {}) => <CreditView reserveMicros={reserve * MICROS_PER_CREDIT} workspaces={workspaces} movements={[]} hasMore={false} loadingMore={false} block={null} onLoadMore={noop} onGive={onGive} onTakeBack={ok} {...props} />
+    const two = [workspace('a', 40, 'active', { id: 1 }), workspace('b', 0, 'outOfCredit', { id: 2 })]
+    const field = (name: string) => `input[aria-label="Credit for Client ${name}"]`
 
-    it('refuses to give from an empty reserve, and says it', async () => {
-        await render(view(0, [workspace('a')]))
-        expect(await reasonOf(button('Add credit'))).toBe('The reserve is empty')
+    it('lists whose credit ends first, without what is put away', async () => {
+        await render(view(10, [workspace('unused', 40, 'active', { id: 1 }), workspace('long', 40, 'active', { id: 2, spentPerDayMicros: MICROS_PER_CREDIT }), workspace('short', 40, 'active', { id: 3, spentPerDayMicros: 8 * MICROS_PER_CREDIT }), workspace('out', 0, 'outOfCredit', { id: 4 }), workspace('gone', 40, 'archived', { id: 5 })]))
+        expect([...container.querySelectorAll('form input')].map(input => input.getAttribute('aria-label'))).toEqual(['Credit for Client out', 'Credit for Client short', 'Credit for Client long', 'Credit for Client unused'])
     })
 
-    it('refuses to give with no workspace, and to take back when none has credit', async () => {
+    it('gives to several at once, one request each', async () => {
+        await render(view(500, two))
+        await type(field('a'), '120')
+        await type(field('b'), '1000')
+        expect(container.textContent).toContain('More than the reserve')
+        await submit()
+        expect(onGive).not.toHaveBeenCalled()
+        await type(field('b'), '30')
+        expect(container.textContent).toContain('350 left in reserve')
+        await submit()
+        const [[transfers]] = onGive.mock.calls
+        expect(transfers).toEqual([
+            { workspaceId: 2, credits: 30, requestId: expect.any(String) },
+            { workspaceId: 1, credits: 120, requestId: expect.any(String) },
+        ])
+        expect(transfers[0].requestId).not.toBe(transfers[1].requestId)
+        expect(document.querySelector<HTMLInputElement>(field('a'))!.value).toBe('')
+        expect(buttons().some(candidate => candidate.textContent?.startsWith('Give'))).toBe(false)
+    })
+
+    it('keeps the amount, the reason and the request of the one that did not go through', async () => {
+        const refusal: ConsoleRefusal = { ok: false, code: 'workspaceArchived' }
+        onGive.mockResolvedValueOnce(new Map([[1, refusal]]))
+        await render(view(500, two))
+        await type(field('a'), '120')
+        await type(field('b'), '30')
+        await submit()
+        expect(document.querySelector<HTMLInputElement>(field('a'))!.value).toBe('120')
+        expect(document.querySelector<HTMLInputElement>(field('b'))!.value).toBe('')
+        expect(container.querySelector('form')!.textContent).toMatch(/archived|restore/i)
+        await submit()
+        const [first, second] = onGive.mock.calls.map(([transfers]) => transfers.find(({ workspaceId }) => workspaceId === 1)!.requestId)
+        expect(second).toBe(first)
+        expect(onGive.mock.calls[1][0]).toHaveLength(1)
+    })
+
+    it('sends once on a double submit', async () => {
+        let finish: () => void = noop
+        onGive.mockReturnValue(new Promise(resolve => (finish = () => resolve(new Map()))))
+        await render(view(500, two))
+        await type(field('a'), '1')
+        await submit()
+        await submit()
+        expect(onGive).toHaveBeenCalledTimes(1)
+        await act(async () => finish())
+    })
+
+    it('clears what was typed', async () => {
+        await render(view(500, two))
+        await type(field('a'), '5')
+        await click(button('Clear'))
+        expect(document.querySelector<HTMLInputElement>(field('a'))!.value).toBe('')
+    })
+
+    it('gives nothing to a machine on its way back, nor under a suspended organization', async () => {
+        await render(view(10, [workspace('a', 5, 'restoring')]))
+        expect(await reasonOf(document.querySelector<HTMLElement>(field('a'))!)).toBe('Restoring')
+        await render(view(10, two, { block: 'suspended' }))
+        expect(await reasonOf(document.querySelector<HTMLElement>(field('a'))!)).toContain('suspended')
+    })
+
+    it('takes back from its menu, when one has credit', async () => {
         await render(view(10, []))
-        expect(await reasonOf(button('Add credit'))).toBe('Create a workspace first')
-        expect(await reasonOf(button('Take back'))).toBe('No workspace has credit left')
+        expect(container.textContent).toContain('Create a workspace first')
+        await menu('More')
+        expect(isOff(item('Take back'))).toBe(true)
+        await act(async () => root.render(null))
+        await render(view(10, two))
+        await menu('More')
+        await click(item('Take back'))
+        expect(document.body.textContent).toContain('Take credit back')
     })
 })
 
@@ -148,27 +351,23 @@ describe('credit of a workspace', () => {
     const onAllocate = vi.fn<(transfer: CreditTransfer) => Promise<ConsoleResult>>(async () => ({ ok: true }))
     beforeEach(() => onAllocate.mockClear())
 
-    const open = async (reserve: number) => {
-        await render(detail({ workspace: workspace('a', 40), reserveMicros: reserve * MICROS_PER_CREDIT, onAllocate }))
-        await click(button('Add credit'))
-    }
+    const open = (reserve: number) => render(detail({ workspace: workspace('a', 40), reserveMicros: reserve * MICROS_PER_CREDIT, onAllocate }))
 
-    it('shows both balances after the transfer, then sends whole credits', async () => {
+    it('shows the balance and the reserve after the transfer, then sends whole credits', async () => {
         await open(500)
-        await type('#credit-amount', '120')
-        expect(document.body.textContent).toContain('500 → 380')
+        await type('#workspace-credit-amount', '120')
         expect(document.body.textContent).toContain('40 → 160')
+        expect(document.body.textContent).toContain('380 in reserve')
 
         await submit()
         expect(onAllocate).toHaveBeenCalledWith({ workspaceId: 7, credits: 120, requestId: expect.any(String) })
-        expect(document.querySelector('#credit-amount')).toBeNull()
+        expect(document.querySelector<HTMLInputElement>('#workspace-credit-amount')!.value).toBe('')
     })
 
     it('refuses more than the reserve holds, and says it', async () => {
         await open(500)
-        await type('#credit-amount', '501')
-        expect(button('Add credit').disabled).toBe(false)
-        expect(lastButton('Add credit').disabled).toBe(true)
+        await type('#workspace-credit-amount', '501')
+        expect(button('Add credit').disabled).toBe(true)
         expect(document.body.textContent).toContain('Your reserve holds 500 credits')
         await submit()
         expect(onAllocate).not.toHaveBeenCalled()
@@ -176,7 +375,7 @@ describe('credit of a workspace', () => {
 
     it('refuses zero', async () => {
         await open(500)
-        await type('#credit-amount', '0')
+        await type('#workspace-credit-amount', '0')
         await submit()
         expect(onAllocate).not.toHaveBeenCalled()
     })
@@ -184,11 +383,11 @@ describe('credit of a workspace', () => {
     it('keeps the request of a failed send, and starts a new one once the amount changes', async () => {
         onAllocate.mockResolvedValue({ ok: false, error: 'Try again' })
         await open(500)
-        await type('#credit-amount', '10')
+        await type('#workspace-credit-amount', '10')
         await submit()
         expect(document.body.textContent).toContain('Try again')
         await submit()
-        await type('#credit-amount', '11')
+        await type('#workspace-credit-amount', '11')
         await submit()
         const [first, second, third] = onAllocate.mock.calls.map(([transfer]) => transfer.requestId)
         expect(second).toBe(first)
@@ -200,7 +399,7 @@ describe('credit of a workspace', () => {
         let finish: (result: ConsoleResult) => void = noop
         onAllocate.mockImplementationOnce(() => new Promise(resolve => (finish = resolve)))
         await open(500)
-        await type('#credit-amount', '10')
+        await type('#workspace-credit-amount', '10')
         await submit()
         await submit()
         expect(onAllocate).toHaveBeenCalledTimes(1)
@@ -219,12 +418,13 @@ function detail(props: Partial<Parameters<typeof WorkspaceDetailView>[0]> = {}) 
             usage={null}
             pending={null}
             block={null}
-            onBack={noop}
             onOpenWorkspace={noop}
             onInvite={ok}
             onRoleChange={noop}
             onRemove={noop}
             onRevoke={noop}
+            onResend={noop}
+            onCopyLink={noop}
             onAllocate={ok}
             onTakeBack={ok}
             onRestart={noop}
@@ -239,10 +439,15 @@ function detail(props: Partial<Parameters<typeof WorkspaceDetailView>[0]> = {}) 
 describe('WorkspaceDetailView', () => {
     const member = (userId: string, role: ClientRole): ConsolePerson<ClientRole> => ({ userId, name: userId, email: `${userId}@acme.com`, photo: null, role, isSelf: false })
 
+    const pick = async (name: string) => {
+        await menu('More')
+        await click(item(name))
+    }
+
     it('deletes only once the name is typed', async () => {
         const onDelete = vi.fn()
         await render(detail({ onDelete }))
-        await click(button('Delete'))
+        await pick('Delete')
         expect(lastButton('Delete').disabled).toBe(true)
 
         await type('input[aria-label="Client a"]', 'client a')
@@ -257,44 +462,89 @@ describe('WorkspaceDetailView', () => {
 
     it('asks for the name again when it reopens', async () => {
         await render(detail())
-        await click(button('Delete'))
+        await pick('Delete')
         await type('input[aria-label="Client a"]', 'Client a')
         await click(lastButton('Cancel'))
-        await click(button('Delete'))
+        await pick('Delete')
         expect(lastButton('Delete').disabled).toBe(true)
     })
 
-    it('archives only after a confirmation', async () => {
+    it('archives and restarts only after a confirmation', async () => {
         const onArchive = vi.fn()
-        await render(detail({ onArchive }))
-        await click(button('Archive'))
+        const onRestart = vi.fn()
+        await render(detail({ onArchive, onRestart }))
+        await pick('Archive')
         expect(onArchive).not.toHaveBeenCalled()
         await click(lastButton('Archive'))
         expect(onArchive).toHaveBeenCalledTimes(1)
+        await pick('Restart')
+        expect(onRestart).not.toHaveBeenCalled()
+        await click(lastButton('Restart'))
+        expect(onRestart).toHaveBeenCalledTimes(1)
     })
 
     it('restores an archived workspace, which cannot be opened, restarted nor given credit', async () => {
-        await render(detail({ workspace: workspace('a', 10, 'archived'), reserveMicros: 100 * MICROS_PER_CREDIT }))
-        expect(buttons().some(candidate => candidate.textContent === 'Archive')).toBe(false)
-        expect(button('Restore').disabled).toBe(false)
-        for (const name of ['Open workspace', 'Restart', 'Add credit']) expect(await reasonOf(button(name))).toBe('Restore this workspace first')
-        expect(button('Take back').disabled).toBe(false)
+        const onRestore = vi.fn()
+        await render(detail({ workspace: workspace('a', 10, 'archived'), reserveMicros: 100 * MICROS_PER_CREDIT, onRestore }))
+        expect(buttons().some(candidate => candidate.textContent === 'Open')).toBe(false)
+        expect(await reasonOf(button('Add credit'))).toBe('Restore this workspace first')
+        await click(button('Restore'))
+        expect(onRestore).toHaveBeenCalledTimes(1)
+        await menu('More')
+        expect(isOff(item('Restart'))).toBe(true)
+        expect(isOff(item('Take back'))).toBe(false)
+        expect(isOff(item('Delete'))).toBe(false)
+        expect(() => item('Archive')).toThrow()
     })
 
     it('opens, archives and gives credit to one nobody has used yet', async () => {
         await render(detail({ workspace: workspace('a', 0, 'provisioning'), reserveMicros: 100 * MICROS_PER_CREDIT }))
-        for (const name of ['Open workspace', 'Add credit', 'Archive', 'Delete']) expect(button(name).disabled, name).toBe(false)
+        expect(button('Open').disabled).toBe(false)
+        await menu('More')
+        for (const name of ['Archive', 'Delete']) expect(isOff(item(name)), name).toBe(false)
     })
 
     it.each(['archiving', 'restoring'] as const)('waits while it is %s', async status => {
         await render(detail({ workspace: workspace('a', 10, status) }))
-        expect(await reasonOf(button('Delete'))).toBe('Wait until it is done')
-        expect(await reasonOf(button('Open workspace'))).toBe('This workspace is not ready yet')
+        expect(await reasonOf(button('Open'))).toBe('This workspace is not ready yet')
+        await menu('More')
+        for (const name of ['Delete', 'Restart']) expect(isOff(item(name)), name).toBe(true)
     })
 
     it('has no machine to restart before its first coworker', async () => {
         await render(detail({ machine: { state: 'none', disk: null } }))
-        expect(await reasonOf(button('Restart'))).toBe('Starts with its first coworker')
+        expect(container.textContent).toContain('Not started')
+        await menu('More')
+        expect(isOff(item('Restart'))).toBe(true)
+    })
+
+    it('tells the machine, its disk and its admin', async () => {
+        await render(detail({ machine: { state: 'running', disk: { usedMb: 620, totalMb: 1000 } }, members: [member('lea', 'admin')] }))
+        expect(container.textContent).toContain('Running, disk 62%')
+        expect(container.querySelector('dl')!.textContent).toContain('lea')
+    })
+
+    it('walks a new one to its first coworker, with its invitation at hand', async () => {
+        const onResend = vi.fn()
+        const onCopyLink = vi.fn()
+        const fresh = workspace('a', 500, 'provisioning', { memberCount: 0, coworkerCount: 0, coworkers: [], pendingAdmin: { invitationId: 'i', email: 'nadia@delta.test', expired: false } })
+        await render(detail({ workspace: fresh, onResend, onCopyLink }))
+        for (const text of ['Going live', '2 of 4', '500 credits added', 'nadia@delta.test joins', 'Waiting for its admin']) expect(container.textContent).toContain(text)
+        expect(container.textContent).not.toContain('Usage')
+        await click(button('Resend'))
+        await click(button('Copy link'))
+        expect([onResend.mock.calls.length, onCopyLink.mock.calls.length]).toEqual([1, 1])
+    })
+
+    it('keeps the usage of one that spent and has no coworker', async () => {
+        await render(detail({ workspace: workspace('a', 40, 'active', { coworkerCount: 0, coworkers: [], spentPerDayMicros: MICROS_PER_CREDIT }) }))
+        for (const text of ['Going live', 'Usage']) expect(container.textContent).toContain(text)
+    })
+
+    it('invites an admin again when the invitation is gone', async () => {
+        await render(detail({ workspace: workspace('a', 0, 'provisioning', { memberCount: 0, coworkerCount: 0, coworkers: [] }) }))
+        await click(button('Invite'))
+        expect(document.querySelector('#invite-email')).not.toBeNull()
     })
 
     it('hands over the link of an invitation no email carries', async () => {
@@ -317,10 +567,12 @@ describe('WorkspaceDetailView', () => {
 
     it('is read only under a suspended organization', async () => {
         await render(detail({ block: 'suspended', members: [member('lea', 'admin'), member('jo', 'member')], reserveMicros: 100 * MICROS_PER_CREDIT }))
-        for (const name of ['Open workspace', 'Add credit', 'Take back', 'Restart', 'Invite', 'Remove jo', 'Archive', 'Delete']) {
+        for (const name of ['Open', 'Add credit', 'Invite', 'Remove jo']) {
             expect(button(name).disabled, name).toBe(true)
             expect(await reasonOf(button(name)), name).toContain('suspended')
         }
+        await menu('More')
+        for (const name of ['Take back', 'Restart', 'Archive', 'Delete']) expect(isOff(item(name)), name).toBe(true)
     })
 })
 
@@ -363,7 +615,7 @@ describe('BrandView', () => {
     const view = (onSave = vi.fn(ok), block: 'ownerOnly' | null = null) => (
         <>
             <a href="#elsewhere">Elsewhere</a>
-            <BrandView fields={FIELDS} iconUrl={null} block={block} onSave={onSave} />
+            <BrandView fields={FIELDS} brand={BRAND} iconUrl={null} block={block} onSave={onSave} />
         </>
     )
 
@@ -458,6 +710,7 @@ describe('BrandView', () => {
 describe('DomainsView', () => {
     const view = (onAdd = vi.fn(ok), block: 'ownerOnly' | null = null) => (
         <DomainsView
+            brand={BRAND}
             defaultHostname="nordlys.rerun.work"
             domains={[
                 { id: 'd1', hostname: 'app.nordlys.agency', status: 'error', error: 'It points elsewhere.', records: [{ type: 'CNAME', name: 'app', value: 'edge.rerun.work' }], lastCheckedAt: null },
@@ -475,17 +728,17 @@ describe('DomainsView', () => {
         await render(view())
         expect(container.textContent).toContain('It points elsewhere.')
         expect(container.textContent).toContain('edge.rerun.work')
-        expect(buttons().filter(candidate => candidate.textContent === 'Check again')).toHaveLength(1)
+        expect(buttons().filter(candidate => candidate.textContent === 'Check now')).toHaveLength(1)
     })
 
     it('shows what to publish again, and a check, for a domain still served whose DNS left', async () => {
         const failing = { id: 'd3', hostname: 'gone.nordlys.agency', status: 'active' as const, error: 'This domain points somewhere else.', records: [{ type: 'CNAME' as const, name: 'gone', value: 'edge.rerun.work' }], lastCheckedAt: null }
         const onCheck = vi.fn()
-        await render(<DomainsView defaultHostname="nordlys.rerun.work" domains={[failing]} checkingId={null} block={null} onAdd={vi.fn(ok)} onCheck={onCheck} onRemove={noop} />)
-        expect(container.textContent).toContain('Active')
+        await render(<DomainsView brand={BRAND} defaultHostname="nordlys.rerun.work" domains={[failing]} checkingId={null} block={null} onAdd={vi.fn(ok)} onCheck={onCheck} onRemove={noop} />)
+        expect(container.textContent).toContain('gone.nordlys.agency stopped pointing here')
         expect(container.textContent).toContain('This domain points somewhere else.')
         expect(container.textContent).toContain('edge.rerun.work')
-        await click(button('Check again'))
+        await click(button('Check now'))
         expect(onCheck).toHaveBeenCalledWith(failing)
     })
 
@@ -493,7 +746,7 @@ describe('DomainsView', () => {
         let answer: (result: { ok: true }) => void = noop
         const onAdd = vi.fn(() => new Promise<{ ok: true }>(resolve => (answer = resolve)))
         await render(view(onAdd))
-        await click(button('Add domain'))
+        await click(button('Add a domain'))
         await type('#organization-hostname', 'app.acme.com')
         await submit()
         expect(lastButton('Cancel').disabled).toBe(true)
@@ -507,7 +760,7 @@ describe('DomainsView', () => {
     it('adds the domain of a pasted address, and refuses a bare one', async () => {
         const onAdd = vi.fn(ok)
         await render(view(onAdd))
-        await click(button('Add domain'))
+        await click(button('Add a domain'))
         await type('#organization-hostname', 'acme.com')
         await submit()
         expect(onAdd).not.toHaveBeenCalled()
@@ -520,6 +773,20 @@ describe('DomainsView', () => {
 
     it('is read only for an admin', async () => {
         await render(view(vi.fn(ok), 'ownerOnly'))
-        for (const name of ['Add domain', 'Remove', 'Check again']) expect(await reasonOf(button(name)), name).toBe('Only an owner can do this')
+        for (const name of ['Add a domain', 'Check now']) expect(await reasonOf(button(name)), name).toBe('Only an owner can do this')
+        await menu('More about app.nordlys.agency')
+        expect(isOff(item('Remove'))).toBe(true)
+    })
+
+    it('leads with the domain being served, the included address under it', async () => {
+        const onRemove = vi.fn()
+        await render(<DomainsView brand={BRAND} defaultHostname="nordlys.rerun.work" domains={[{ id: 'd2', hostname: 'live.nordlys.agency', status: 'active', error: null, records: [], lastCheckedAt: null }]} checkingId={null} block={null} onAdd={vi.fn(ok)} onCheck={noop} onRemove={onRemove} />)
+        expect(container.querySelector('h1')!.textContent).toBe('live.nordlys.agency')
+        expect(container.textContent).toContain('Also answers')
+        await menu('More about live.nordlys.agency')
+        await click(item('Remove'))
+        expect(onRemove).not.toHaveBeenCalled()
+        await click(lastButton('Remove'))
+        expect(onRemove).toHaveBeenCalledTimes(1)
     })
 })
