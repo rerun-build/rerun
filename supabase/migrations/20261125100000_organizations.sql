@@ -27,7 +27,8 @@ create trigger organizations_updated_at before update on public.organizations fo
 create table public.organization_members (
     organization_id uuid not null references public.organizations(id) on delete cascade,
     user_id uuid not null references public.users(id) on delete cascade,
-    -- An owner also manages the team and the organization's credit; an admin runs its workspaces.
+    -- An owner also manages the team, the brand and the domains; an admin runs its workspaces, their
+    -- members and their credit.
     role text not null check (role in ('owner', 'admin')),
     created_at timestamptz not null default now(),
     primary key (organization_id, user_id)

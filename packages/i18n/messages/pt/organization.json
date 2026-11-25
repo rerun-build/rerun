@@ -166,7 +166,7 @@
         "deleteHint": "Apaga de vez os coworkers, arquivos e conversas.",
         "deleteConfirm": {
             "title": "Excluir este workspace?",
-            "description": "Os coworkers, arquivos e conversas são apagados de vez. O crédito que sobrar volta para a sua reserva.",
+            "description": "Os coworkers, arquivos e conversas são apagados de vez. O crédito que você deu e que não foi gasto volta para a sua reserva.",
             "type": "Digite <strong></strong> para confirmar.",
             "confirm": "Excluir"
         },

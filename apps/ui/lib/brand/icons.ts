@@ -13,6 +13,12 @@ export function organizationIconUrl(brand: Brand): string | null {
     return isWhiteLabel(brand) ? (brand.iconUrl ?? INITIAL_ICON) : null
 }
 
+// The square icon of the app under this brand, where one picture is all there is room for: a
+// notification, the tab's own icon, the avatar of the team that publishes the templates.
+export function appIconUrl(brand: Brand): string {
+    return organizationIconUrl(brand) ?? '/icon-192.png'
+}
+
 export function brandIcons(brand: Brand): NonNullable<Metadata['icons']> {
     const iconUrl = organizationIconUrl(brand)
     if (iconUrl) return { icon: iconUrl, apple: iconUrl }

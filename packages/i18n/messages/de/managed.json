@@ -1,5 +1,6 @@
 {
     "contact": "{manager} kontaktieren",
+    "removeAsk": "Bitte {manager}, jemanden zu entfernen",
     "templateUnavailable": "In diesem Workspace nicht verfügbar",
     "paused": {
         "title": "Dieser Workspace ist pausiert.",

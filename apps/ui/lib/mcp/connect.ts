@@ -2,13 +2,22 @@
 // purpose: lib/mcp/api-keys.ts carries one (it holds the hashing), and the dialog that shows
 // these commands is a client component.
 
+import { slugify } from '@/lib/slugify'
+import { isWhiteLabel, type Brand } from '@rerun/contracts'
+
 export const MCP_ACCOUNT_PATH = '/api/mcp/account'
 
 // The placeholder a command carries when no key is in hand: the connect panel is readable
 // before a key exists, and the user swaps this for their own.
 export const KEY_PLACEHOLDER = 'rk_your_key'
 
-const SERVER_NAME = 'rerun'
+const RERUN_SERVER_NAME = 'rerun'
+
+// What a client lists the server under, and what a person types to add it: the brand's own name
+// under an organization, never Rerun's.
+export function mcpServerName(brand: Brand): string {
+    return isWhiteLabel(brand) ? slugify(brand.name, { maxLength: 40 }) || 'workspace' : RERUN_SERVER_NAME
+}
 
 export function mcpAccountUrl(origin: string): string {
     return `${origin.replace(/\/$/, '')}${MCP_ACCOUNT_PATH}`
@@ -24,8 +33,8 @@ function authorizationHeader(key: string): string {
     return `Bearer ${key}`
 }
 
-export function claudeMcpAddCommand(url: string, key: string): string {
-    return `claude mcp add --transport http ${SERVER_NAME} ${url} --header "Authorization: ${authorizationHeader(key)}"`
+export function claudeMcpAddCommand(url: string, key: string, serverName: string = RERUN_SERVER_NAME): string {
+    return `claude mcp add --transport http ${serverName} ${url} --header "Authorization: ${authorizationHeader(key)}"`
 }
 
 // For a client that only speaks stdio.
@@ -60,36 +69,36 @@ export function mcpClientDocs(client: McpClientId): string {
 
 // Codex never takes the key inline: it reads it from the environment each time it starts the
 // server, so connecting takes an exported variable next to the `mcp add`.
-const CODEX_KEY_ENV = 'RERUN_MCP_KEY'
+const codexKeyEnv = (serverName: string) => `${serverName.toUpperCase().replace(/-/g, '_')}_MCP_KEY`.replace(/^(?=\d)/, '_')
 
-function cursorConfig(url: string, key: string): string {
-    return JSON.stringify({ mcpServers: { [SERVER_NAME]: { url, headers: { Authorization: authorizationHeader(key) } } } }, null, 2)
+function cursorConfig(url: string, key: string, serverName: string): string {
+    return JSON.stringify({ mcpServers: { [serverName]: { url, headers: { Authorization: authorizationHeader(key) } } } }, null, 2)
 }
 
-function rerunAgentConfig(url: string, key: string): string {
-    return JSON.stringify({ name: SERVER_NAME, transport: 'http', url, headers: { Authorization: authorizationHeader(key) } }, null, 2)
+function rerunAgentConfig(url: string, key: string, serverName: string): string {
+    return JSON.stringify({ name: serverName, transport: 'http', url, headers: { Authorization: authorizationHeader(key) } }, null, 2)
 }
 
-export function mcpClientSnippets(client: McpClientId, url: string, key: string): McpSnippet[] {
+export function mcpClientSnippets(client: McpClientId, url: string, key: string, serverName: string = RERUN_SERVER_NAME): McpSnippet[] {
     switch (client) {
         case 'claude-code':
-            return [{ label: 'terminal', value: claudeMcpAddCommand(url, key) }]
+            return [{ label: 'terminal', value: claudeMcpAddCommand(url, key, serverName) }]
         case 'chatgpt':
             return [
-                { label: 'shellProfile', value: `export ${CODEX_KEY_ENV}="${key}"` },
+                { label: 'shellProfile', value: `export ${codexKeyEnv(serverName)}="${key}"` },
                 {
                     label: 'terminal',
-                    value: `codex mcp add ${SERVER_NAME} --url ${url} --bearer-token-env-var ${CODEX_KEY_ENV}`,
+                    value: `codex mcp add ${serverName} --url ${url} --bearer-token-env-var ${codexKeyEnv(serverName)}`,
                     hint: 'codexCliOnly',
                 },
             ]
         case 'cursor':
-            return [{ label: { file: '~/.cursor/mcp.json' }, value: cursorConfig(url, key), block: true }]
+            return [{ label: { file: '~/.cursor/mcp.json' }, value: cursorConfig(url, key, serverName), block: true }]
         case 'rerun':
             return [
                 {
                     label: 'coworkerPanel',
-                    value: rerunAgentConfig(url, key),
+                    value: rerunAgentConfig(url, key, serverName),
                     block: true,
                     hint: 'coworkerReach',
                 },

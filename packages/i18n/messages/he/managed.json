@@ -1,5 +1,6 @@
 {
     "contact": "לפנות אל {manager}",
+    "removeAsk": "יש לבקש מ-{manager} להסיר מישהו",
     "templateUnavailable": "לא זמין בסביבת העבודה הזו",
     "paused": {
         "title": "סביבת העבודה הזו מושהית.",

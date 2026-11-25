@@ -166,7 +166,7 @@
         "deleteHint": "永久清除其同事、文件和对话。",
         "deleteConfirm": {
             "title": "删除此工作区？",
-            "description": "其同事、文件和对话将被永久清除。其中剩余的积分会回到您的储备。",
+            "description": "其同事、文件和对话将被永久清除。您给它且尚未用完的积分会回到您的储备。",
             "type": "输入 <strong></strong> 以确认。",
             "confirm": "删除"
         },

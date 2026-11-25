@@ -17,16 +17,21 @@ function linearChannels(hex: string): [number, number, number] {
     return [channel(1), channel(3), channel(5)]
 }
 
-function relativeLuminance(hex: string): number {
-    const [r, g, b] = linearChannels(hex)
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+const luminanceOf = (r: number, g: number, b: number) => 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+// WCAG relative luminance of a color given as its red, green and blue from 0 to 255.
+export function rgbLuminance(red: number, green: number, blue: number): number {
+    return luminanceOf(toLinear(red / 255), toLinear(green / 255), toLinear(blue / 255))
+}
+
+// WCAG contrast ratio of two relative luminances, from 1 to 21.
+export function luminanceContrast(first: number, second: number): number {
+    return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
 }
 
 // WCAG contrast ratio of two `#rrggbb` colors, from 1 to 21.
 export function hexContrast(a: string, b: string): number {
-    const first = relativeLuminance(a)
-    const second = relativeLuminance(b)
-    return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
+    return luminanceContrast(luminanceOf(...linearChannels(a)), luminanceOf(...linearChannels(b)))
 }
 
 export function hexToOklch(hex: string): Oklch {

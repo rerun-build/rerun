@@ -136,7 +136,9 @@
         "connectNew": "新账号"
     },
     "signInPopup": {
-        "connecting": "正在连接 {name}…"
+        "connecting": "正在连接 {name}…",
+        "connected": "已连接。您可以关闭此窗口。",
+        "connectedAs": "已以 {account} 连接。您可以关闭此窗口。"
     },
     "categories": {
         "payments": "支付",

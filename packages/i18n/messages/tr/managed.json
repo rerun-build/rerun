@@ -1,5 +1,6 @@
 {
     "contact": "{manager} ile iletişime geç",
+    "removeAsk": "Birini çıkarmak için {manager} ile iletişime geçin",
     "templateUnavailable": "Bu çalışma alanında kullanılamıyor",
     "paused": {
         "title": "Bu çalışma alanı duraklatıldı.",

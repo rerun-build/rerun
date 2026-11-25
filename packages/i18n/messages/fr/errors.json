@@ -123,6 +123,7 @@
     "messageNotFound": "Message introuvable",
     "saveFeedbackFailed": "Impossible d'enregistrer votre avis",
     "feedbackNotFound": "Avis introuvable",
+    "feedbackUnavailable": "Les avis ne sont pas disponibles ici.",
     "adminOnlySandboxReactivation": "Seul un admin peut demander la réactivation de ce sandbox",
     "reactivationNoteRequired": "Dites-nous ce que vous comptez construire avec votre sandbox.",
     "keepItUnderDot": "Restez sous {max} caractères.",

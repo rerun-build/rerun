@@ -123,6 +123,7 @@
     "messageNotFound": "Nachricht nicht gefunden",
     "saveFeedbackFailed": "Dein Feedback konnte nicht gespeichert werden",
     "feedbackNotFound": "Feedback nicht gefunden",
+    "feedbackUnavailable": "Feedback ist hier nicht verfügbar.",
     "adminOnlySandboxReactivation": "Nur ein Admin kann die Reaktivierung dieser Sandbox anfragen",
     "reactivationNoteRequired": "Sag uns, was du mit deiner Sandbox bauen willst.",
     "keepItUnderDot": "Höchstens {max} Zeichen.",

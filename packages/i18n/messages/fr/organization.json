@@ -166,7 +166,7 @@
         "deleteHint": "Efface définitivement ses coworkers, fichiers et conversations.",
         "deleteConfirm": {
             "title": "Supprimer ce workspace ?",
-            "description": "Ses coworkers, fichiers et conversations sont effacés définitivement. Son crédit restant revient dans votre réserve.",
+            "description": "Ses coworkers, fichiers et conversations sont effacés définitivement. Le crédit que vous lui avez donné et qu’il n’a pas dépensé revient dans votre réserve.",
             "type": "Tapez <strong></strong> pour confirmer.",
             "confirm": "Supprimer"
         },

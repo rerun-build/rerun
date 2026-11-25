@@ -47,19 +47,21 @@ export type PublishedOgInput = {
     workspaceIconUrl: string | null
     coworkerName: string | null
     thumbnailDataUrl: string | null
+    // Under the brand of an organization: the card carries neither Rerun's icon, its address nor its color.
+    unsigned?: boolean
 }
 
 // The 1200×630 card a crawler fetches for a published link. A crawler never passes a gate, so a link
 // that is not public only ever gets the locked card: no title, no capture, nothing a forwarded link
 // would leak.
 export async function publishedOgImage(input: PublishedOgInput): Promise<ImageResponse> {
-    const [fonts, brandIcon] = await Promise.all([loadFonts(), brandIconDataUrl()])
+    const [fonts, brandIcon] = await Promise.all([loadFonts(), input.unsigned ? null : brandIconDataUrl()])
     const title = input.locked ? 'Protected page' : truncate(input.title, MAX_TITLE_LENGTH)
 
     return new ImageResponse(
         (
             <div style={{ display: 'flex', width: '100%', height: '100%', backgroundColor: BACKGROUND, color: '#fafafa', fontFamily: 'Inter', position: 'relative' }}>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', backgroundImage: 'radial-gradient(60% 80% at 85% 20%, rgba(99,102,241,0.35), rgba(11,11,12,0) 70%)' }} />
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', backgroundImage: `radial-gradient(60% 80% at 85% 20%, ${brandIcon ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.12)'}, rgba(11,11,12,0) 70%)` }} />
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '58%', padding: 66 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 26, color: 'rgba(250,250,250,0.6)' }}>
                         <WorkspaceTile name={input.workspaceName} iconUrl={input.workspaceIconUrl} />
@@ -74,10 +76,14 @@ export async function publishedOgImage(input: PublishedOgInput): Promise<ImageRe
                         )}
                         <div style={{ display: 'flex', fontSize: 62, lineHeight: 1.05, fontWeight: 600, letterSpacing: -1.5 }}>{title}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, color: 'rgba(250,250,250,0.6)' }}>
-                        <img src={brandIcon} width={30} height={30} style={{ borderRadius: 7 }} alt="" />
-                        rerun.site
-                    </div>
+                    {brandIcon ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 24, color: 'rgba(250,250,250,0.6)' }}>
+                            <img src={brandIcon} width={30} height={30} style={{ borderRadius: 7 }} alt="" />
+                            rerun.site
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex' }} />
+                    )}
                 </div>
                 <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', paddingRight: 60, position: 'relative' }}>
                     {input.locked || !input.thumbnailDataUrl ? (
@@ -85,7 +91,7 @@ export async function publishedOgImage(input: PublishedOgInput): Promise<ImageRe
                             {input.locked ? (
                                 <Lock size={84} color="rgba(250,250,250,0.4)" />
                             ) : (
-                                <img src={brandIcon} width={96} height={96} style={{ borderRadius: 21, opacity: 0.5 }} alt="" />
+                                brandIcon && <img src={brandIcon} width={96} height={96} style={{ borderRadius: 21, opacity: 0.5 }} alt="" />
                             )}
                         </div>
                     ) : (

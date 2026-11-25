@@ -34,38 +34,6 @@ export type DiscoveryEvent =
     | { type: 'dropped'; source: DiscoverySource }
     | { type: 'end' }
 
-type Subject = { name: string; domain: string }
-
-// What a teaser says while its source is being read. Written to make someone want to see the card it
-// turns into, so it names what we are looking for rather than the tool doing it.
-export const DISCOVERY_TEASERS: Record<DiscoverySource, { line: (subject: Subject) => string }> = {
-    profile: { line: ({ domain }) => `Reading ${domain}…` },
-    stack: { line: ({ domain }) => `Peeking under the hood of ${domain}…` },
-    dns: { line: () => 'Checking how you run email…' },
-    registry: { line: () => 'Looking you up in the public registry…' },
-    site: { line: ({ domain }) => `Reading every page of ${domain}…` },
-    search: { line: ({ name }) => `Searching the web for ${name}…` },
-    linkedinPerson: { line: () => 'Looking for you on LinkedIn…' },
-    linkedinCompany: { line: ({ name }) => `Finding ${name} on LinkedIn…` },
-    googleBusiness: { line: () => 'Reading your Google reviews…' },
-    catalog: { line: ({ domain }) => `Browsing the ${domain} shop…` },
-    synthesis: { line: () => 'Piecing it all together…' },
-}
-
-export const DISCOVERY_SOURCE_LABELS: Record<DiscoverySource, string> = {
-    profile: 'Your website',
-    stack: 'Your website',
-    site: 'Your website',
-    dns: 'Your domain',
-    registry: 'Public registry',
-    search: 'The web',
-    linkedinPerson: 'LinkedIn',
-    linkedinCompany: 'LinkedIn',
-    googleBusiness: 'Google',
-    catalog: 'Your website',
-    synthesis: 'Rerun',
-}
-
 export type DiscoveryEntry =
     | { id: string; order: number; source: DiscoverySource; type: 'teaser' }
     // `arrival` counts every landing, an update included, so the latest news can be told apart from

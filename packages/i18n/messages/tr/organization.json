@@ -166,7 +166,7 @@
         "deleteHint": "Coworker'larını, dosyalarını ve konuşmalarını kalıcı olarak siler.",
         "deleteConfirm": {
             "title": "Bu çalışma alanı silinsin mi?",
-            "description": "Coworker'ları, dosyaları ve konuşmaları kalıcı olarak silinir. İçinde kalan kredi rezervinize döner.",
+            "description": "Coworker'ları, dosyaları ve konuşmaları kalıcı olarak silinir. Verdiğiniz ve harcanmamış kredi rezervinize döner.",
             "type": "Onaylamak için <strong></strong> yazın.",
             "confirm": "Sil"
         },

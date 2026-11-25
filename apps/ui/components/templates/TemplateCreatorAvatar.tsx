@@ -1,13 +1,19 @@
+'use client'
+
+import { useBrand } from '@/components/brand/BrandProvider'
+import { appIconUrl } from '@/lib/brand/icons'
 import type { LibraryCreator } from '@/lib/templates/library'
 import { cn } from '@/lib/utils'
 
-// A null creator is the Rerun team, drawn with the app's own mark rather than initials.
+// A null creator is the team behind the app, drawn with the app's own icon rather than initials: the
+// brand's under an organization, which the tile names beside it.
 export function TemplateCreatorAvatar({ creator, size, className }: { creator: LibraryCreator | null; size: number; className?: string }) {
+    const brand = useBrand()
     const style = { width: size, height: size }
     if (!creator) {
         return (
             <span className={cn('inline-flex shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-border', className)} style={style}>
-                <img src="/icon-192.png" alt="" className="size-full object-cover" />
+                <img src={appIconUrl(brand)} alt="" className="size-full object-cover" />
             </span>
         )
     }

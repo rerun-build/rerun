@@ -136,7 +136,9 @@
         "connectNew": "حساب جديد"
     },
     "signInPopup": {
-        "connecting": "جارٍ الاتصال بـ {name}…"
+        "connecting": "جارٍ الاتصال بـ {name}…",
+        "connected": "تم الاتصال. يمكنك إغلاق هذه النافذة.",
+        "connectedAs": "تم الاتصال باسم {account}. يمكنك إغلاق هذه النافذة."
     },
     "categories": {
         "payments": "المدفوعات",

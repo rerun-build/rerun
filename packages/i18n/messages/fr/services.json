@@ -136,7 +136,9 @@
         "connectNew": "Nouveau compte"
     },
     "signInPopup": {
-        "connecting": "Connexion à {name}…"
+        "connecting": "Connexion à {name}…",
+        "connected": "Connecté. Vous pouvez fermer cette fenêtre.",
+        "connectedAs": "Connecté en tant que {account}. Vous pouvez fermer cette fenêtre."
     },
     "categories": {
         "payments": "Paiements",

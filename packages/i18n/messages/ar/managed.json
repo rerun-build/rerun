@@ -1,5 +1,6 @@
 {
     "contact": "تواصل مع {manager}",
+    "removeAsk": "اطلب من {manager} إزالة شخص",
     "templateUnavailable": "غير متاح في مساحة العمل هذه",
     "paused": {
         "title": "مساحة العمل هذه متوقفة مؤقتًا.",

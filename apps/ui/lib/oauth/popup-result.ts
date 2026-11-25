@@ -44,6 +44,13 @@ export function oauthPopupResponse({ channel, message, label }: OAuthPopupResult
     })
 }
 
+// The line a finished sign-in popup shows while it closes, in the reader's language. `account` is the
+// address or the name the provider gave for who signed in.
+export async function popupSuccessLabel(account?: string | null): Promise<string> {
+    const t = await getTranslations('services.signInPopup')
+    return account ? t('connectedAs', { account }) : t('connected')
+}
+
 // The line a failed sign-in popup shows while it closes, in the reader's language.
 export async function popupFailureLabel(refusal: ActionRefusal): Promise<string> {
     const t = await getTranslations('errors')

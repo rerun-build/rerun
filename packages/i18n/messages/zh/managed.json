@@ -1,5 +1,6 @@
 {
     "contact": "联系 {manager}",
+    "removeAsk": "请让 {manager} 移除成员",
     "templateUnavailable": "此工作区不可用",
     "paused": {
         "title": "此工作区已暂停。",

@@ -1,6 +1,6 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
-import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
+import { oauthPopupResponse, popupFailureLabel, popupSuccessLabel } from '@/lib/oauth/popup-result'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type ExchangedToken, type OAuthContext, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
 import type { McpTokenBundle } from '@/lib/engine/client'
 import { appReturnUrl } from '@/lib/oauth/app-return'
@@ -22,7 +22,7 @@ type CallbackResult = { ok: true; claim?: string } | ({ ok: false } & ActionRefu
 // read, so every listener still hears that failure.
 async function htmlResult(result: CallbackResult, serverName?: string): Promise<NextResponse> {
     const target = serverName ? { serverName } : {}
-    if (result.ok) return oauthPopupResponse({ channel: 'mcp-oauth', message: { type: 'mcp-oauth-success', ...target }, label: 'Connected. You can close this window.' })
+    if (result.ok) return oauthPopupResponse({ channel: 'mcp-oauth', message: { type: 'mcp-oauth-success', ...target }, label: await popupSuccessLabel() })
     const { ok: _ok, ...failure } = result
     return oauthPopupResponse({ channel: 'mcp-oauth', message: { type: 'mcp-oauth-error', ...target, ...failure }, label: await popupFailureLabel(failure) })
 }

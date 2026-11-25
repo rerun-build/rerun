@@ -136,7 +136,9 @@
         "connectNew": "Yeni hesap"
     },
     "signInPopup": {
-        "connecting": "Bağlanılıyor: {name}…"
+        "connecting": "Bağlanılıyor: {name}…",
+        "connected": "Bağlandı. Bu pencereyi kapatabilirsiniz.",
+        "connectedAs": "Bağlanan hesap: {account}. Bu pencereyi kapatabilirsiniz."
     },
     "categories": {
         "payments": "Ödemeler",

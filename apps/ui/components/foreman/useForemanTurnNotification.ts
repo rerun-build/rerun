@@ -4,6 +4,8 @@ import type { ChatStatus, UIMessage } from 'ai'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
+import { useBrand } from '@/components/brand/BrandProvider'
+import { appIconUrl } from '@/lib/brand/icons'
 import { showBrowserNotification } from '@/lib/notifications/browser'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useForemanName } from '@/hooks/useForemanName'
@@ -32,9 +34,10 @@ export function useForemanTurnNotification({ messages, status, guided }: { messa
     // Read when the turn starts: the turn that builds the team leaves the funnel before it ends.
     const turnGuided = useRef(false)
     const wasBusy = useRef(false)
-    const latest = useRef({ messages, guided, waitingText, titleText })
+    const iconUrl = appIconUrl(useBrand())
+    const latest = useRef({ messages, guided, waitingText, titleText, iconUrl })
     useEffect(() => {
-        latest.current = { messages, guided, waitingText, titleText }
+        latest.current = { messages, guided, waitingText, titleText, iconUrl }
     })
 
     useEffect(() => {
@@ -52,6 +55,7 @@ export function useForemanTurnNotification({ messages, status, guided }: { messa
                 title: latest.current.titleText,
                 body: lastAssistantText(latest.current.messages) ?? latest.current.waitingText,
                 tag: 'foreman',
+                icon: latest.current.iconUrl,
                 onClick: () => useForemanStore.getState().openForFunnel(),
             })
         }, SETTLE_MS)

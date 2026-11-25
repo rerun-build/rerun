@@ -22,9 +22,11 @@ export function ForemanTrialGate({ step }: { step: TrialStep }) {
                 <Icon icon={LockIcon} size="sm" className="shrink-0 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">{step === 'trial_refused' ? t('plan') : t('trial')}</p>
             </div>
-            <Button variant="ghost" size="sm" className="ms-auto shrink-0" onClick={() => support.open()}>
-                {t('talk')}
-            </Button>
+            {support.available && (
+                <Button variant="ghost" size="sm" className="ms-auto shrink-0" onClick={() => support.open()}>
+                    {t('talk')}
+                </Button>
+            )}
         </div>
     )
 }

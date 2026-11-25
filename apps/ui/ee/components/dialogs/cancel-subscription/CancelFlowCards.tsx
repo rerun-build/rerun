@@ -16,7 +16,7 @@ export function DaysLeftCard({ trial, daysLeft, agents, loading }: { trial: bool
     const featured = agents.slice(0, FEATURED_AGENTS)
     const tiles = loading ? FEATURED_AGENTS : featured.length
     const t = useTranslations('billing')
-    const days = (chunks: ReactNode) => <span className={"font-semibold text-brand-text"}>{chunks}</span>
+    const days = (chunks: ReactNode) => <span className="font-semibold text-brand-text">{chunks}</span>
 
     return (
         <div className={cn('relative flex flex-col gap-3 overflow-hidden p-3', PANEL_CARD)}>
@@ -94,7 +94,7 @@ export function OfferCard({ headline, priceLabel, fullPriceLabel, billedOnLabel,
             <BorderBeam pattern="arcs" tone="brand" animated glow width={1} duration={7} outset={1} />
             <span className="text-sm font-medium text-foreground">{headline}</span>
             <div className="flex items-baseline gap-2">
-                <span className={"text-4xl font-semibold tracking-tight text-brand-text tabular-nums"}>{priceLabel}</span>
+                <span className="text-4xl font-semibold tracking-tight text-brand-text tabular-nums">{priceLabel}</span>
                 <span className="text-sm text-muted-foreground line-through">{fullPriceLabel}</span>
                 <span className="text-sm text-muted-foreground">{t('cancel.offerCard.billedOn', { date: billedOnLabel })}</span>
             </div>

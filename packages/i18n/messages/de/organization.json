@@ -166,7 +166,7 @@
         "deleteHint": "Löscht Coworker, Dateien und Unterhaltungen endgültig.",
         "deleteConfirm": {
             "title": "Diesen Workspace löschen?",
-            "description": "Coworker, Dateien und Unterhaltungen werden endgültig gelöscht. Das restliche Guthaben geht zurück in deine Reserve.",
+            "description": "Coworker, Dateien und Unterhaltungen werden endgültig gelöscht. Das Guthaben, das du vergeben hast und das nicht verbraucht wurde, geht zurück in deine Reserve.",
             "type": "Gib zur Bestätigung <strong></strong> ein.",
             "confirm": "Löschen"
         },

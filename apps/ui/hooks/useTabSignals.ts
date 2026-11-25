@@ -1,18 +1,25 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { appIconUrl } from '@/lib/brand/icons'
 import { desktopShell } from '@/lib/desktop-shell/client'
 
 const COUNT_PREFIX = /^\(\d+\+?\)\s/
 const FAVICON_SIZE = 64
 const ORIGINAL_HREF = 'data-original-href'
 
-let badgedIcon: Promise<string | null> | null = null
+const badgedIcons = new Map<string, Promise<string | null>>()
 
-// The app icon with a red dot in its corner, drawn once and reused.
-function drawBadgedIcon(): Promise<string | null> {
-    badgedIcon ??= new Promise(resolve => {
+// The app icon with a red dot in its corner, drawn once per icon and reused.
+function drawBadgedIcon(iconUrl: string): Promise<string | null> {
+    const drawn = badgedIcons.get(iconUrl)
+    if (drawn) return drawn
+    const badgedIcon = new Promise<string | null>(resolve => {
         const image = new Image()
+        // An organization's icon is served from another origin, and a canvas only hands back pixels it
+        // was allowed to read.
+        image.crossOrigin = 'anonymous'
         image.onload = () => {
             const canvas = document.createElement('canvas')
             canvas.width = FAVICON_SIZE
@@ -26,11 +33,16 @@ function drawBadgedIcon(): Promise<string | null> {
             context.arc(center, radius, radius, 0, Math.PI * 2)
             context.fillStyle = '#ef4444'
             context.fill()
-            resolve(canvas.toDataURL('image/png'))
+            try {
+                resolve(canvas.toDataURL('image/png'))
+            } catch {
+                resolve(null)
+            }
         }
         image.onerror = () => resolve(null)
-        image.src = '/icon-192.png'
+        image.src = iconUrl
     })
+    badgedIcons.set(iconUrl, badgedIcon)
     return badgedIcon
 }
 
@@ -46,13 +58,14 @@ type BadgingNavigator = Navigator & { setAppBadge?: (count?: number) => Promise<
 // What is waiting for you, seen from outside the tab: « (3) Rerun » in the title, a dot on the
 // favicon, and the count on the icon of the installed app.
 export function useTabSignals(count: number) {
+    const iconUrl = appIconUrl(useBrand())
     useEffect(() => {
         const label = count > 99 ? '99+' : String(count)
         const base = document.title.replace(COUNT_PREFIX, '')
         document.title = count > 0 ? `(${label}) ${base}` : base
 
         let cancelled = false
-        if (count > 0) void drawBadgedIcon().then(href => !cancelled && href && setFavicon(href))
+        if (count > 0) void drawBadgedIcon(iconUrl).then(href => !cancelled && href && setFavicon(href))
         else setFavicon(null)
 
         const badging = navigator as BadgingNavigator
@@ -64,7 +77,7 @@ export function useTabSignals(count: number) {
         return () => {
             cancelled = true
         }
-    }, [count])
+    }, [count, iconUrl])
 
     useEffect(
         () => () => {

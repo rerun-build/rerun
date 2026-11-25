@@ -123,6 +123,7 @@
     "messageNotFound": "未找到消息",
     "saveFeedbackFailed": "无法保存您的反馈",
     "feedbackNotFound": "未找到反馈",
+    "feedbackUnavailable": "此处不提供反馈功能。",
     "adminOnlySandboxReactivation": "只有管理员可以申请重新激活此沙盒",
     "reactivationNoteRequired": "请告诉我们您打算用沙盒构建什么。",
     "keepItUnderDot": "请少于 {max} 个字符。",

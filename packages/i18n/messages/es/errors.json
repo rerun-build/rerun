@@ -123,6 +123,7 @@
     "messageNotFound": "Mensaje no encontrado",
     "saveFeedbackFailed": "No se pudo guardar tu opinión",
     "feedbackNotFound": "Opinión no encontrada",
+    "feedbackUnavailable": "Las opiniones no están disponibles aquí.",
     "adminOnlySandboxReactivation": "Solo un admin puede pedir la reactivación de este sandbox",
     "reactivationNoteRequired": "Cuéntanos qué piensas construir con tu sandbox.",
     "keepItUnderDot": "Usa menos de {max} caracteres.",

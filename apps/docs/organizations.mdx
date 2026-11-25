@@ -1,0 +1,113 @@
+---
+title: "Organizations"
+description: "Run workspaces for your clients under your own brand: your name, your icon, your address, your credit to hand out."
+---
+
+An organization sits above workspaces. It is for an agency that runs Rerun for its clients: each client gets a workspace of its own, and everything they see carries your brand instead of Rerun's.
+
+<Note>
+  Organizations are part of Rerun Cloud and are opened by the Rerun team. Write to [help@rerun.build](mailto:help@rerun.build) to get one. A self-hosted install has none: see [Open source vs Rerun Cloud](/self-host/open-source-vs-cloud).
+</Note>
+
+## The console
+
+Your team runs everything from the console. Click the workspace pill in the top left corner, then **Organization**. Only the people of your team see that entry.
+
+The console has five sections: **Workspaces**, **Credit**, **Team**, **Brand** and **Domains**.
+
+## Your team
+
+Your team has two roles.
+
+| Role | What they do |
+|---|---|
+| **Owner** | Everything, team, brand and domains included |
+| **Admin** | Workspaces, members and credit |
+
+In **Team**, click **Invite**, enter an email address and pick a role. The invitation is valid for 7 days. An organization keeps at least one owner: the last one cannot step down, be removed, or delete their account until another owner is named.
+
+Your team opens any workspace of your clients without its members seeing them. They do not appear in its list of members, nor on its board, and what they do there is signed by your brand.
+
+## Workspaces
+
+One workspace per client. Each one is a hard boundary with its own machine, its own members and its own coworkers, like any [workspace](/teams#workspaces).
+
+### Create a workspace
+
+In **Workspaces**, click **New workspace**. Give it a **Name**, the **First admin's email** and, if you like, a logo. Its first admin gets an invitation by email, valid for 7 days.
+
+The count next to the title, such as **2 of 3**, is how many workspaces you hold out of the limit set for your organization. Archived workspaces count. Ask the Rerun team to raise it.
+
+### Open, archive, restore, delete
+
+Open a workspace from the list to see its **Members**, its **Credit**, its **Usage** and its **Machine**.
+
+- **Open workspace** takes you inside, as your team.
+- **Restart** restarts its machine. Coworkers stop what they are doing for about a minute.
+- **Archive** stops its coworkers and keeps its data. Its members lose access until you **Restore** it, which takes a few minutes.
+- **Delete** erases its coworkers, files and conversations for good, archives included. You type the name of the workspace to confirm. Credit you gave it that it has not spent goes back to your reserve.
+
+### Members of a workspace
+
+You invite and remove the members of a workspace from its page in the console. Its own admins can invite people and change their role from inside the workspace. Removing someone is yours: in the workspace, **Remove** is off and says to ask you.
+
+## Credit
+
+You buy Rerun credit from the Rerun team and hand it out yourself. What you bought and have not given yet is your **Reserve**.
+
+- **Add credit** moves credit from your reserve to a workspace.
+- **Take back** moves it from a workspace to your reserve. You take back what you gave and the workspace has not spent, never more: a workspace that joined your organization with credit of its own keeps it.
+
+Credit moves in whole credits. **History** lists every movement: credit bought, added, taken back, and what did not go through.
+
+When a workspace runs out, its members read that they should contact you, and your whole team gets an email, once, until you add credit again.
+
+## Brand
+
+In **Brand**, an owner sets what your clients see.
+
+| Field | Rule |
+|---|---|
+| **Name** | 1 to 40 characters, without `{ } < > # \|` |
+| **Icon** | A square PNG, JPEG or WebP image, 512 px or more, 8 MB at most, with its own background |
+| **Color** | A hex color. It is adjusted so it stays readable in light and dark. Without one, the app is black and white |
+| **Support email** | Where your clients write for help |
+| **Documentation**, **Terms**, **Privacy policy** | Full addresses, starting with `https://` |
+
+Until you upload an icon, the app draws the first letter of your name on a tile, in the browser tab and on a home screen too.
+
+A color that already means something in the app (an error, a coworker waiting for an answer, a coworker at work) only shows on the chat bubble, so a status is never mistaken for your brand.
+
+## Domains
+
+Your clients sign in at your **Default address**, which Rerun gives you. In **Domains**, an owner can add up to 10 domains of your own.
+
+<Steps>
+  <Step title="Add the domain">
+    Click **Add domain** and enter a subdomain of a domain you own, like `app.acme.com`. A bare domain like `acme.com` is refused.
+  </Step>
+  <Step title="Publish the records">
+    The console shows two DNS records: one that points the domain to Rerun, and a TXT record that proves it is yours. Add both where your domain is managed. They can take an hour to show.
+  </Step>
+  <Step title="Check">
+    Click **Check again**. Once both records are read, the domain is **Active** and your clients can sign in there.
+  </Step>
+</Steps>
+
+If an active domain stops pointing to Rerun, it is still answered for 24 hours, then shows **Error**. During that time the emails sent to your clients link to your default address, and the console shows the records to publish again. The default address always keeps working.
+
+<Note>
+  A person who also works somewhere else, in a workspace of their own or of another organization, always signs in at your default address. Opening your own domain sends them there.
+</Note>
+
+## What your clients see
+
+Your clients sign in at your address with a code sent to their email, and only once you or an admin of their workspace invited them.
+
+Inside, the app, its emails and its coworkers carry your name, your icon and your color. The [Chief of Staff](/chief-of-staff) and the coworkers name your brand, and send your clients to your support email.
+
+What belongs to Rerun's own customers does not show in a workspace you run: plans and billing, the referral program, paid templates and paid apps, Rerun's support chat and changelog, the thumbs under an answer, and requests to the Rerun team.
+
+## When an organization is suspended
+
+Its workspaces are stopped and nothing can be changed. Your address shows a page that says so until the Rerun team resumes it.

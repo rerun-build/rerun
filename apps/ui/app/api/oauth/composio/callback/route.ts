@@ -5,7 +5,7 @@ import { assertConnectedAccount } from '@/lib/composio/connected-account'
 import { composioUserForKey } from '@/lib/vault/composio'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
-import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
+import { oauthPopupResponse, popupFailureLabel, popupSuccessLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant, type CallbackGrant } from '@/lib/oauth/mobile-ticket'
@@ -25,7 +25,7 @@ async function htmlResult(result: CallbackResult, key?: string): Promise<NextRes
         return oauthPopupResponse({
             channel: 'composio-oauth',
             message: { type: 'composio-oauth-success', ...target, accountLabel: result.accountLabel },
-            label: `Connected${result.accountLabel ? ` as ${result.accountLabel}` : ''}. You can close this window.`,
+            label: await popupSuccessLabel(result.accountLabel),
         })
     }
     const { ok: _ok, ...failure } = result

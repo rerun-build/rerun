@@ -5,7 +5,7 @@ import { putConnectorToken } from '@/lib/vault/tokens'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, decodeManagedContext, exchangeManagedCode, managedTokenBundle } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import type { ManagedProvider } from '@/lib/managed/types'
-import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
+import { oauthPopupResponse, popupFailureLabel, popupSuccessLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant, type CallbackGrant } from '@/lib/oauth/mobile-ticket'
@@ -26,7 +26,7 @@ async function htmlResult(result: CallbackResult, key?: string): Promise<NextRes
         return oauthPopupResponse({
             channel: 'managed-oauth',
             message: { type: 'managed-oauth-success', ...target, email: result.email },
-            label: `Connected${result.email ? ` as ${result.email}` : ''}. You can close this window.`,
+            label: await popupSuccessLabel(result.email),
         })
     }
     const { ok: _ok, ...failure } = result

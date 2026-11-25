@@ -180,7 +180,7 @@
         "deleteHint": "Erases its coworkers, files and conversations for good.",
         "deleteConfirm": {
             "title": "Delete this workspace?",
-            "description": "Its coworkers, files and conversations are erased for good. Credit left in it goes back to your reserve.",
+            "description": "Its coworkers, files and conversations are erased for good. Credit you gave it and it has not spent goes back to your reserve.",
             "type": "Type <strong></strong> to confirm.",
             "confirm": "Delete"
         },

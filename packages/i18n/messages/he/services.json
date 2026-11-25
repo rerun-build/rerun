@@ -136,7 +136,9 @@
         "connectNew": "חשבון חדש"
     },
     "signInPopup": {
-        "connecting": "מתחבר ל-{name}…"
+        "connecting": "מתחבר ל-{name}…",
+        "connected": "החיבור הושלם. אפשר לסגור את החלון הזה.",
+        "connectedAs": "החיבור הושלם בתור {account}. אפשר לסגור את החלון הזה."
     },
     "categories": {
         "payments": "תשלומים",

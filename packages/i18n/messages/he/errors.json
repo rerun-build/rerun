@@ -123,6 +123,7 @@
     "messageNotFound": "ההודעה לא נמצאה",
     "saveFeedbackFailed": "לא ניתן היה לשמור את המשוב שלך",
     "feedbackNotFound": "המשוב לא נמצא",
+    "feedbackUnavailable": "משוב לא זמין כאן.",
     "adminOnlySandboxReactivation": "רק מנהל יכול לבקש להפעיל מחדש את סביבת הניסוי הזו",
     "reactivationNoteRequired": "ספר לנו מה אתה מתכנן לבנות בסביבת הניסוי שלך.",
     "keepItUnderDot": "עד {max} תווים.",

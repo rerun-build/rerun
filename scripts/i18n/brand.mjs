@@ -19,7 +19,7 @@ const RERUN_KEYS = [
     /^templates\.library\.empty\./,
 ]
 
-export function maySayRerun(id) {
+function maySayRerun(id) {
     return RERUN_NAMESPACES.test(id.split('.')[0]) || RERUN_KEYS.some(pattern => pattern.test(id))
 }
 

@@ -8,7 +8,7 @@ import { AppError, refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/act
 import { engineClientSecret } from '@/lib/mcp-oauth'
 import { forgetNonce, openHostResult, type HostReturn } from '@/lib/oauth/host-sign-in'
 import type { ParkedSignIn } from '@/lib/oauth/pending-grant'
-import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
+import { oauthPopupResponse, popupFailureLabel, popupSuccessLabel } from '@/lib/oauth/popup-result'
 import { requestOrigin } from '@/lib/request-host'
 import { getSessionIdentity } from '@/supabase/session/getServerSession'
 import { cookies } from 'next/headers'
@@ -24,7 +24,7 @@ async function popup(result: Finished, target?: HostReturn['target']): Promise<N
     const named = !target ? {} : target.flow === 'mcp' ? { serverName: target.serverName } : { key: target.key }
     if (result.ok) {
         const email = result.email ? { email: result.email } : {}
-        return oauthPopupResponse({ channel, message: { type: `${channel}-success`, ...named, ...email }, label: `Connected${result.email ? ` as ${result.email}` : ''}. You can close this window.` })
+        return oauthPopupResponse({ channel, message: { type: `${channel}-success`, ...named, ...email }, label: await popupSuccessLabel(result.email) })
     }
     const { ok: _ok, ...failure } = result
     return oauthPopupResponse({ channel, message: { type: `${channel}-error`, ...named, ...failure }, label: await popupFailureLabel(failure) })

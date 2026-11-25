@@ -1,5 +1,6 @@
 {
     "_context": {
+        "signInPopup.connectedAs": "Shown in the sign-in popup of a connected app as it closes. {account} is the address or the name of the account that signed in.",
         "appAccount.actsAs": "Field title: which account of the paid app the coworker acts as.",
         "appAccount.appAccount": "{app} is the paid app's name (LinkedIn Pro, WhatsApp Pro).",
         "appAccount.wakeWhen": "Field title, followed by a list of events (a message arrives, an invitation is accepted...).",
@@ -154,7 +155,9 @@
         "connectNew": "New account"
     },
     "signInPopup": {
-        "connecting": "Connecting to {name}…"
+        "connecting": "Connecting to {name}…",
+        "connected": "Connected. You can close this window.",
+        "connectedAs": "Connected as {account}. You can close this window."
     },
     "categories": {
         "payments": "Payments",

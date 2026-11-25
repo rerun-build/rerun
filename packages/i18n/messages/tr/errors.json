@@ -123,6 +123,7 @@
     "messageNotFound": "Mesaj bulunamadı",
     "saveFeedbackFailed": "Geri bildiriminiz kaydedilemedi",
     "feedbackNotFound": "Geri bildirim bulunamadı",
+    "feedbackUnavailable": "Geri bildirim burada kullanılamıyor.",
     "adminOnlySandboxReactivation": "Bu sandbox'ın yeniden etkinleştirilmesini yalnızca bir yönetici isteyebilir",
     "reactivationNoteRequired": "Sandbox'ınızla ne oluşturmayı planladığınızı bize anlatın.",
     "keepItUnderDot": "En fazla {max} karakter olmalı.",

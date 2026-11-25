@@ -5,7 +5,8 @@ import { CopyLine } from '@/components/dialogs/CopyLine'
 import { McpClientPicker } from '@/components/dialogs/McpClientPicker'
 import { DocsLink } from '@/components/ui/docs-link'
 import { Field } from '@/components/ui/field'
-import { KEY_PLACEHOLDER, mcpClientDocs, mcpClientSnippets, type McpClientId, type McpSnippet } from '@/lib/mcp/connect'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { KEY_PLACEHOLDER, mcpClientDocs, mcpClientSnippets, mcpServerName, type McpClientId, type McpSnippet } from '@/lib/mcp/connect'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -16,6 +17,7 @@ export function McpSnippets({ mcpUrl, apiKey = KEY_PLACEHOLDER }: { mcpUrl: stri
     const t = useTranslations('dialogs.copy')
     const tConnect = useTranslations('dialogs.mcpConnect')
     const [client, setClient] = useState<McpClientId>('claude-code')
+    const serverName = mcpServerName(useBrand())
     const labelOf = (snippet: McpSnippet) => (typeof snippet.label === 'string' ? tConnect(`labels.${snippet.label}`) : snippet.label.file)
 
     return (
@@ -26,7 +28,7 @@ export function McpSnippets({ mcpUrl, apiKey = KEY_PLACEHOLDER }: { mcpUrl: stri
             </div>
 
             <div className="space-y-2.5 p-3">
-                {mcpClientSnippets(client, mcpUrl, apiKey).map(snippet => {
+                {mcpClientSnippets(client, mcpUrl, apiKey, serverName).map(snippet => {
                     const label = labelOf(snippet)
                     return (
                         <Field key={label} label={label} helperText={snippet.hint && tConnect(`hints.${snippet.hint}`)}>

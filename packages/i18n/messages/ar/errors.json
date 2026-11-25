@@ -123,6 +123,7 @@
     "messageNotFound": "الرسالة غير موجودة",
     "saveFeedbackFailed": "تعذّر حفظ ملاحظاتك",
     "feedbackNotFound": "الملاحظات غير موجودة",
+    "feedbackUnavailable": "الملاحظات غير متاحة هنا.",
     "adminOnlySandboxReactivation": "لا يمكن طلب إعادة تفعيل هذه البيئة التجريبية إلا للمسؤول",
     "reactivationNoteRequired": "أخبرنا بما تخطط لبنائه في بيئتك التجريبية.",
     "keepItUnderDot": "اجعله أقل من {max} حرفًا.",

@@ -44,9 +44,11 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                 tone="text-emerald-500"
                 text={replyAddress ? t('sentWithEmail', { email: replyAddress }) : t('sent')}
                 action={
-                    <Button variant="ghost" size="sm" onClick={() => support.open()}>
-                        {t('openChat')}
-                    </Button>
+                    support.available && (
+                        <Button variant="ghost" size="sm" onClick={() => support.open()}>
+                            {t('openChat')}
+                        </Button>
+                    )
                 }
             />
         )
@@ -79,15 +81,17 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                 <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => onAnswer({ answered: false })}>
                     {t('notNow')}
                 </Button>
-                <Button
-                    size="sm"
-                    onClick={() => {
-                        send()
-                        onAnswer({ sent: true })
-                    }}
-                >
-                    {t('send')}
-                </Button>
+                {support.available && (
+                    <Button
+                        size="sm"
+                        onClick={() => {
+                            send()
+                            onAnswer({ sent: true })
+                        }}
+                    >
+                        {t('send')}
+                    </Button>
+                )}
             </div>
         </div>
     )

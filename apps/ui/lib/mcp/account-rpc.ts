@@ -7,6 +7,7 @@ import { workspaceBrand } from '@/lib/brand/workspace'
 import { deleteAgent } from '@/app/api/_services/agent.service'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 import { authenticateApiKey, bindImportKey, type AuthenticatedApiKey } from '@/lib/mcp/api-keys'
+import { mcpServerName } from '@/lib/mcp/connect'
 import { assertImportCall, importToolDefs, isImportKey } from '@/lib/mcp/import-scope'
 import { responseTooLarge, tooLargeMessage } from '@/lib/mcp/truncate'
 
@@ -76,7 +77,7 @@ export async function handleAccountMcp(req: Request, token: string, { importOnly
         return rpcResult(id, {
             protocolVersion,
             capabilities: { tools: {} },
-            serverInfo: { name: 'rerun', version: '1.0.0' },
+            serverInfo: { name: mcpServerName(await workspaceBrand(key.workspaceId)), version: '1.0.0' },
         })
     }
 

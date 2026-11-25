@@ -216,8 +216,9 @@ async function logoDataUrl(url: string | null): Promise<string | null> {
 
 async function serveOgImage(entry: PublishedEntry): Promise<Response> {
     const locked = entry.access !== 'public'
-    const [brand, { data: agent }, thumbnail, t] = await Promise.all([
+    const [brand, product, { data: agent }, thumbnail, t] = await Promise.all([
         loadWorkspaceBrand(entry.workspace_id),
+        workspaceBrand(entry.workspace_id),
         selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }),
         locked ? null : thumbnailDataUrl(entry.thumbnail_key),
         getTranslations('publicPages.publishedView'),
@@ -229,6 +230,7 @@ async function serveOgImage(entry: PublishedEntry): Promise<Response> {
         workspaceIconUrl: await logoDataUrl(brand.iconUrl),
         coworkerName: agent?.name ?? null,
         thumbnailDataUrl: thumbnail,
+        unsigned: isWhiteLabel(product),
     })
     const headers = new Headers(image.headers)
     headers.set('Cache-Control', OG_CACHE_CONTROL)

@@ -166,7 +166,7 @@
         "deleteHint": "Borra para siempre sus coworkers, archivos y conversaciones.",
         "deleteConfirm": {
             "title": "¿Eliminar este workspace?",
-            "description": "Sus coworkers, archivos y conversaciones se borran para siempre. El crédito que le quede vuelve a tu reserva.",
+            "description": "Sus coworkers, archivos y conversaciones se borran para siempre. El crédito que le diste y que no ha gastado vuelve a tu reserva.",
             "type": "Escribe <strong></strong> para confirmar.",
             "confirm": "Eliminar"
         },

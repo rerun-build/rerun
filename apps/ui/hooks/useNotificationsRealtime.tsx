@@ -7,6 +7,8 @@ import type { NotificationKind } from '@/lib/engine/types'
 import { errorHeadline } from '@/lib/notifications/attention-details'
 import { noticeText } from '@/lib/notifications/notice-copy'
 import { ANNOUNCED_STATUS, FINISHED_STATUS } from '@/lib/notifications/announcement'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { appIconUrl } from '@/lib/brand/icons'
 import { playNotificationSoundOnce, showBrowserNotification } from '@/lib/notifications/browser'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { isScheduledSource, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
@@ -23,6 +25,11 @@ import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 // how loud, from the user's channels.
 export function useNotificationsRealtime(workspaceId: number | undefined) {
     const { user } = useSession()
+    const iconUrl = appIconUrl(useBrand())
+    const iconUrlRef = useRef(iconUrl)
+    useEffect(() => {
+        iconUrlRef.current = iconUrl
+    }, [iconUrl])
     const prefsRef = useRef(user?.email_notification_prefs)
     useEffect(() => {
         prefsRef.current = user?.email_notification_prefs
@@ -88,7 +95,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             }
 
             if (delivery === 'sound') playNotificationSoundOnce(row.id)
-            if (shown || delivery === 'sound') showBrowserNotification({ title, body: message, tag: row.id, onClick: openConversation })
+            if (shown || delivery === 'sound') showBrowserNotification({ title, body: message, tag: row.id, icon: iconUrlRef.current, onClick: openConversation })
         },
     })
 }

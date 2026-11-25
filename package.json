@@ -29,7 +29,7 @@
         "i18n:translate": "node scripts/i18n-translate.mjs",
         "security:start": "node scripts/security-start.mjs",
         "dev:landing": "pnpm --dir cloud/apps/landing dev",
-        "dev:emails": "pnpm --filter @rerun/emails dev",
+        "dev:emails": "pnpm build:contracts && pnpm --filter @rerun/emails dev",
         "dev:docs": "cd apps/docs && npx --yes mint dev --port 3333",
         "check:docs": "node scripts/docs-media-check.mjs && cd apps/docs && npx --yes mint validate && npx --yes mint broken-links",
         "typecheck": "pnpm -r --if-present ts-check",
