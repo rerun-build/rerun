@@ -50,6 +50,13 @@ describe('the whole catalog', () => {
         expect(single.every(isPaidApp)).toBe(true)
     })
 
+    // Lovable only lets the clients of its own list sign in to its MCP server, and Rerun is not one.
+    it('connects Lovable with a key alone, and says what the key needs next to its field', () => {
+        const lovable = catalog.find(manifest => manifest.slug === 'lovable')
+        expect(lovable?.authMethods).toMatchObject([{ kind: 'key', mcpServers: [], inputs: [{ key: 'LOVABLE_API_KEY', secret: true, required: true }] }])
+        expect(lovable?.authMethods[0].inputs[0].help).toMatch(/Business or Enterprise.*owner or admin.*cannot create a project/)
+    })
+
     const compiled = catalog.filter(usesInstances).flatMap(manifest => manifest.authMethods.map(method => ({ slug: manifest.slug, methodId: method.id, manifest })))
 
     it.each(compiled)('keeps two accounts of $slug ($methodId) apart', ({ manifest, methodId }) => {
