@@ -34,9 +34,10 @@ async function startManaged(back: HostReturn, target: Extract<HostReturn['target
 
 async function startMcp(back: HostReturn, target: Extract<HostReturn['target'], { flow: 'mcp' }>): Promise<NextResponse> {
     if (!isPreRegistered(target.mcpUrl)) throw new AppError('noOAuthClient')
-    const metadata = await discoverAuthServer(target.mcpUrl)
-    const client = await resolveClient(metadata, target.mcpUrl, onRerunHost())
+    const discovered = await discoverAuthServer(target.mcpUrl)
+    const client = await resolveClient(discovered, target.mcpUrl, onRerunHost())
     if (!client) throw new AppError('noOAuthClient')
+    const metadata = { ...discovered, ...client.signIn }
 
     const { verifier, challenge, state } = createPkce()
     const ctx: OAuthContext = { verifier, agentId: back.agentId, serverName: target.serverName, mcpUrl: target.mcpUrl, tokenEndpoint: metadata.tokenEndpoint, clientId: client.clientId, redirectUri: callbackUrl(onRerunHost()), workspaceId: back.workspaceId, host: back }
