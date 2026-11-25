@@ -9,7 +9,7 @@ import { StepFrame } from './StepFrame'
 export function PhoneStep() {
     const t = useTranslations('dialogs.phoneVerification')
     return (
-        <StepFrame title={t('title')} description={t('subtitle')}>
+        <StepFrame size="form" title={t('title')} description={t('subtitle')}>
             <div className="space-y-4">
                 <PhoneVerificationStep active />
             </div>

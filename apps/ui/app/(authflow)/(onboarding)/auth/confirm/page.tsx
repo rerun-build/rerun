@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
 import { TEAM_SIGN_IN_PARAM } from '@/lib/auth/team-session'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'
@@ -14,21 +14,19 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
 
     if (!token_hash || !type) {
         return (
-            <OnboardingDialog stepKey="invalid">
-                <div className="flex flex-col gap-6">
-                    <OnboardingHeading title={t('invalidTitle')} subtitle={t('invalidMessage')} />
+            <OnboardingPage stepKey="invalid" panel={null}>
+                <OnboardingStepLayout heading={<OnboardingHeading title={t('invalidTitle')} subtitle={t('invalidMessage')} />}>
                     <Button asChild size="lg" className="w-full">
                         <Link href={routes.auth}>{t('newCode')}</Link>
                     </Button>
-                </div>
-            </OnboardingDialog>
+                </OnboardingStepLayout>
+            </OnboardingPage>
         )
     }
 
     return (
-        <OnboardingDialog stepKey="confirm">
-            <div className="flex flex-col gap-6">
-                <OnboardingHeading title={t('title')} subtitle={t('message')} />
+        <OnboardingPage stepKey="confirm" panel={null}>
+            <OnboardingStepLayout heading={<OnboardingHeading title={t('title')} subtitle={t('message')} />}>
                 <form action={confirmLogin}>
                     <input type="hidden" name="token_hash" value={token_hash} />
                     <input type="hidden" name="type" value={type} />
@@ -37,7 +35,7 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
                         {t('submit')}
                     </Button>
                 </form>
-            </div>
-        </OnboardingDialog>
+            </OnboardingStepLayout>
+        </OnboardingPage>
     )
 }

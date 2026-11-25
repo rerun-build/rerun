@@ -1,7 +1,7 @@
 'use client'
 
 import { Orb } from '@/components/foreman/Orb'
-import { OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { OnboardingHeading, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
 import { Button } from '@/components/ui/button'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
@@ -18,19 +18,22 @@ export function EngineStep({ firstName, progress, error, onRetry, onEnter, enter
     const line = progress.failed ? t('failed') : progress.ready ? t('ready') : t(`milestones.${pending}`)
 
     return (
-        <div className="flex flex-col gap-6">
-            <OnboardingHeading
-                mark={<Orb size={72} state={progress.ready ? 'speaking' : progress.failed ? 'idle' : 'thinking'} />}
-                title={progress.ready ? (firstName ? t('greetingNamed', { name: firstName }) : t('greeting')) : t('title')}
-                subtitle={
-                    <AnimatePresence mode="wait" initial={false}>
-                        <motion.span key={line} className="block" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }} aria-live="polite">
-                            {line}
-                        </motion.span>
-                    </AnimatePresence>
-                }
-            />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+        <OnboardingStepLayout
+            heading={
+                <OnboardingHeading
+                    mark={<Orb size={72} state={progress.ready ? 'speaking' : progress.failed ? 'idle' : 'thinking'} />}
+                    title={progress.ready ? (firstName ? t('greetingNamed', { name: firstName }) : t('greeting')) : t('title')}
+                    subtitle={
+                        <AnimatePresence mode="wait" initial={false}>
+                            <motion.span key={line} className="block" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }} aria-live="polite">
+                                {line}
+                            </motion.span>
+                        </AnimatePresence>
+                    }
+                />
+            }
+        >
+            {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
             <div className="flex w-full flex-col gap-1">
                 {progress.failed ? (
                     <>
@@ -47,6 +50,6 @@ export function EngineStep({ firstName, progress, error, onRetry, onEnter, enter
                     </Button>
                 )}
             </div>
-        </div>
+        </OnboardingStepLayout>
     )
 }

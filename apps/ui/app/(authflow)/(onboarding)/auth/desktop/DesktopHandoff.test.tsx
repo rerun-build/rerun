@@ -7,7 +7,7 @@ const signOut = vi.hoisted(() => vi.fn())
 
 vi.mock('@/supabase/client', () => ({ createClient: () => ({ auth: { signOut } }) }))
 vi.mock('./actions', () => ({ approveDesktopSignIn: vi.fn() }))
-vi.mock('@/components/onboarding/OnboardingDialog', () => ({ OnboardingDialog: ({ children }: { children: ReactNode }) => children, OnboardingHeading: () => null }))
+vi.mock('@/components/onboarding/OnboardingPage', () => ({ OnboardingPage: ({ children }: { children: ReactNode }) => children, OnboardingStepLayout: ({ children }: { children?: ReactNode }) => children, OnboardingHeading: () => null }))
 
 const { DesktopHandoff } = await import('./DesktopHandoff')
 

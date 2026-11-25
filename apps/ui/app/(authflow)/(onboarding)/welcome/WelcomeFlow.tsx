@@ -3,7 +3,7 @@
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
 import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
-import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog'
+import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
@@ -16,7 +16,7 @@ import { ViewStep } from '@/components/onboarding/welcome/ViewStep'
 import { useErrorText } from '@/hooks/useErrorText'
 import type { ActionFailure } from '@/lib/i18n/action-error'
 import { rolesForIndustry } from '@/lib/onboarding/intake'
-import type { OnboardingStep } from '@/lib/onboarding/step'
+import { ONBOARDING_STEPS, type OnboardingStep } from '@/lib/onboarding/step'
 import { rememberWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
 import { useBillingStore } from '@/stores/billing.store'
 import { track } from '@rerun/analytics/client'
@@ -47,13 +47,13 @@ const PICKED_BEAT_MS = 250
 const ENGINE_PATIENCE_MS = 90_000
 const ENGINE_POLL_MS = 2_000
 
-// The five questions, one at a time in the onboarding dialog: each answer is saved as it is given and
+// The five questions, one at a time in the onboarding page: each answer is saved as it is given and
 // moves to the next. A number still owed after a Google sign-up is asked first. Then the trial,
 // through today's checkout, and the machine, whose milestones the Chief of Staff's orb reads out
 // before it hands them over to the app. `afterQuestions` is the step the server resolved for the end
 // of the questions: the trial, or the machine where the workspace is already entitled or nothing is
 // sold. With no machine left in the pool, the waitlist wall stands before the trial. The billing
-// dialog and the waitlist wall each take the onboarding dialog's place, never open on top of it.
+// dialog and the waitlist wall open over the page.
 export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
@@ -61,6 +61,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     const askPhone = phonePending && phoneStep !== 'clear'
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     const [step, setStep] = useState<OnboardingStep>(initialStep)
+    const [direction, setDirection] = useState(1)
     const [site, setSite] = useState(initial.site)
     const [guess, setGuess] = useState<TemplateCategory | null>(initial.siteIndustry)
     const [industry, setIndustry] = useState<IndustryAnswer>({ industry: initial.industry ?? initial.siteIndustry, label: initial.industryLabel, other: !!initial.industryLabel })
@@ -81,6 +82,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
 
     const go = (target: OnboardingStep) => {
         setError(null)
+        setDirection(ONBOARDING_STEPS.indexOf(target) < ONBOARDING_STEPS.indexOf(step) ? -1 : 1)
         setStep(target)
     }
 
@@ -139,7 +141,6 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         return saved(result, 'view', afterQuestions, false, view)
     }
 
-    const billingOpen = useBillingStore(state => state.open)
     const startTrial = useCallback(() => {
         track('checkout_started', { plan: 'base', source: 'onboarding' })
         useBillingStore.getState().openBilling(undefined, 'onboarding')
@@ -157,6 +158,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         useBillingStore.getState().setOpen(false)
         track('onboarding_step_completed', { step: 'trial' })
         setError(null)
+        setDirection(1)
         setStep('engine')
     }, [step, entitled])
 
@@ -234,15 +236,16 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         <EngineStep firstName={firstName} progress={engine} error={error} onRetry={() => void startEngine()} onEnter={() => void enter()} entering={entering} />
     )
 
+    const question = QUESTIONS.indexOf(step as QuestionStep)
     const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')
     // Someone who created this workspace by mistake goes back to the one they were in, from any step.
     const switcher = canSwitchWorkspace ? <WelcomeWorkspaceSwitcher /> : undefined
 
     return (
         <>
-            <OnboardingDialog open={!waitlistUp && !(step === 'trial' && billingOpen)} stepKey={askPhone ? 'phone' : step} corner={switcher}>
+            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={null}>
                 {content}
-            </OnboardingDialog>
+            </OnboardingPage>
             <EngineWaitlistDialog open={waitlistUp} corner={switcher} />
         </>
     )

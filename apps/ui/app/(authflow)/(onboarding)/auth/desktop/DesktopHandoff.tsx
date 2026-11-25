@@ -2,8 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { CopyLine } from '@/components/dialogs/CopyLine'
-import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
-import { DialogTitle } from '@/components/ui/dialog'
+import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
 import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'
@@ -43,15 +42,19 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (account === null) {
         return (
-            <OnboardingDialog stepKey="signed-out">
-                <div className="flex flex-col items-center gap-4">
-                    <DialogTitle className="sr-only">{t('title', { app })}</DialogTitle>
-                    <Skeleton className="size-12 rounded-xl" />
-                    <Skeleton className="h-9 w-2/3" />
-                    <Skeleton className="h-5 w-full" />
+            <OnboardingPage stepKey="signed-out" panel={null}>
+                <OnboardingStepLayout
+                    heading={
+                        <div className="flex w-full max-w-sm flex-col items-center gap-3">
+                            <h1 className="sr-only">{t('title', { app })}</h1>
+                            <Skeleton className="h-9 w-2/3" />
+                            <Skeleton className="h-5 w-full" />
+                        </div>
+                    }
+                >
                     <Skeleton className="h-10 w-full" />
-                </div>
-            </OnboardingDialog>
+                </OnboardingStepLayout>
+            </OnboardingPage>
         )
     }
 
@@ -81,23 +84,21 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (status === 'done' && code) {
         return (
-            <OnboardingDialog stepKey="done">
-                <div className="flex flex-col gap-6">
-                    <OnboardingHeading title={t('doneTitle', { app })} subtitle={t('doneBody', { app })} />
+            <OnboardingPage stepKey="done" panel={null}>
+                <OnboardingStepLayout heading={<OnboardingHeading title={t('doneTitle', { app })} subtitle={t('doneBody', { app })} />}>
                     <div className="space-y-1.5">
                         <p className="text-xs font-medium text-muted-foreground">{t('codeHint', { app })}</p>
                         <CopyLine value={code} label={t('copyCode')} />
                     </div>
-                </div>
-            </OnboardingDialog>
+                </OnboardingStepLayout>
+            </OnboardingPage>
         )
     }
 
     return (
-        <OnboardingDialog stepKey="confirm">
-            <div className="flex flex-col gap-6">
-                <OnboardingHeading title={t('title', { app })} subtitle={<span className="break-words">{t('body', { app, account })}</span>} />
-                {status === 'failed' && <p className="text-center text-sm text-destructive">{t('failed')}</p>}
+        <OnboardingPage stepKey="confirm" panel={null}>
+            <OnboardingStepLayout heading={<OnboardingHeading title={t('title', { app })} subtitle={<span className="break-words">{t('body', { app, account })}</span>} />}>
+                {status === 'failed' && <p className="mb-4 text-center text-sm text-destructive">{t('failed')}</p>}
                 <div className="flex flex-col gap-1">
                     <Button size="lg" className="w-full" onClick={() => void approve()} loading={status === 'approving'}>
                         {t('continue')}
@@ -106,7 +107,7 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
                         {t('switchAccount')}
                     </Button>
                 </div>
-            </div>
-        </OnboardingDialog>
+            </OnboardingStepLayout>
+        </OnboardingPage>
     )
 }

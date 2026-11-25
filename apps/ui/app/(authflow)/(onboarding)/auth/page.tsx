@@ -1,6 +1,6 @@
 import { AuthTerms } from '@/components/auth/AuthShell'
 import { RerunOnly } from '@/components/brand/RerunOnly'
-import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { OnboardingHeading, OnboardingPage, OnboardingStepLayout } from '@/components/onboarding/OnboardingPage'
 import { ReferralInvite } from '@/ee/components/referrals/ReferralInvite'
 import { REFERRAL_COOKIE } from '@/ee/lib/billing/referral'
 import { referrerOfCode } from '@/ee/services/referral-attach.service'
@@ -26,21 +26,27 @@ export default async function AuthPage({ searchParams }: { searchParams: Promise
     const moved = invitedOnly && (await searchParams)[MOVED_PARAM] !== undefined
     const referrer = invitedOnly ? null : await referrerOfCode((await cookies()).get(REFERRAL_COOKIE)?.value)
     return (
-        <OnboardingDialog stepKey="signin">
-            <div className="flex flex-col gap-6">
-                {referrer && (
-                    <RerunOnly>
-                        <ReferralInvite referrer={referrer} />
-                    </RerunOnly>
-                )}
-                <OnboardingHeading title={invitedOnly ? t('invited.title') : t('title')} subtitle={moved ? t('invited.moved') : invitedOnly ? t('invited.subtitle') : t('subtitle')} />
-                <Suspense fallback={null}>
-                    <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} skipCaptcha={isTellaAutoCapture(requestHeaders)} invitedOnly={invitedOnly} />
-                </Suspense>
-                <p className="text-center text-xs text-muted-foreground">
+        <OnboardingPage
+            stepKey="signin"
+            panel={null}
+            footer={
+                <p className="max-w-sm pt-10 text-center text-xs text-muted-foreground text-balance">
                     <AuthTerms />
                 </p>
-            </div>
-        </OnboardingDialog>
+            }
+        >
+            <OnboardingStepLayout heading={<OnboardingHeading title={invitedOnly ? t('invited.title') : t('title')} subtitle={moved ? t('invited.moved') : invitedOnly ? t('invited.subtitle') : t('subtitle')} />}>
+                <div className="flex flex-col gap-6">
+                    {referrer && (
+                        <RerunOnly>
+                            <ReferralInvite referrer={referrer} />
+                        </RerunOnly>
+                    )}
+                    <Suspense fallback={null}>
+                        <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} skipCaptcha={isTellaAutoCapture(requestHeaders)} invitedOnly={invitedOnly} />
+                    </Suspense>
+                </div>
+            </OnboardingStepLayout>
+        </OnboardingPage>
     )
 }
