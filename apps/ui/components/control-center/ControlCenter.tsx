@@ -11,7 +11,8 @@ import type { AgentStatus, IsoAgent } from '@/lib/board/types'
 import { buildControlCommands, type ControlCommand, type ControlCommandId } from '@/lib/control-center/commands'
 import { useSupport } from '@/components/brand/useSupport'
 import { parseQuery, searchItems } from '@/lib/control-center/search'
-import { BellIcon, BoxIcon, BrainIcon, CirclePlusIcon, CreditCardIcon, FocusCenterIcon, FolderIcon, GridIcon, HeadsetIcon, KeyboardIcon, KeyIcon, LockKeyholeIcon, MegaphoneIcon, MessageCircle, MessageCircleQuestionIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { MACHINE_SOURCES, SEARCH_FILTERS, splitPath, stillSearching, type SearchFilter, type SearchSource } from '@/lib/control-center/global-search'
+import { BellIcon, BoxIcon, BrainIcon, CirclePlusIcon, CreditCardIcon, FileTextIcon, FocusCenterIcon, FolderIcon, GridIcon, HeadsetIcon, KeyboardIcon, KeyIcon, LayersIcon, LockKeyholeIcon, MegaphoneIcon, MessageCircle, MessageCircleQuestionIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, TableIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
@@ -26,14 +27,16 @@ import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import { useForemanName } from '@/hooks/useForemanName'
 import type { BadgeTone } from '@rerun/ui/primitives'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { useEffect, useState, type ComponentType } from 'react'
 
 import { ControlCenterView } from './ControlCenterView'
-import type { ControlRow, ControlSection } from './types'
+import type { ControlRow, ControlSection, SourceChip } from './types'
 import { useConversationSearch } from './useConversationSearch'
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { useWorkspaceSearch } from './useWorkspaceSearch'
+import { FOREMAN_AGENT_ID, type WorkspaceSearchHit } from '@rerun/contracts'
+import { shortRelativeTime } from '@rerun/ui/time'
 import { openForemanConversation } from '@/lib/notifications/open-inbox-item'
 
 type Page = { kind: 'root' } | { kind: 'agent'; agentId: string } | { kind: 'box'; spaceId: string } | { kind: 'move'; agentId: string }
@@ -43,6 +46,14 @@ const ROOT: Page = { kind: 'root' }
 const AGENT_RESULTS = 8
 const BOX_RESULTS = 5
 const MIN_CONVERSATION_QUERY = 2
+
+type HitRow = ControlRow & { source: SearchSource }
+
+// What a hit of the machine says, so an answer to an earlier query can stay on screen while it still fits.
+function hitMentions(hit: WorkspaceSearchHit, text: string): boolean {
+    const shown = [hit.snippet, 'title' in hit ? hit.title : '', 'name' in hit ? hit.name : '', 'path' in hit ? hit.path : '']
+    return shown.some(part => part.toLowerCase().includes(text))
+}
 
 const COMMAND_ICONS: Record<ControlCommandId, ComponentType<{ className?: string }>> = {
     new_agent: CirclePlusIcon,
@@ -84,6 +95,7 @@ function isMacPlatform(): boolean {
 
 export function ControlCenter() {
     const t = useTranslations('layout.controlCenter')
+    const locale = useLocale()
     const foremanName = useForemanName()
     const foremanLabel = useTranslations('workspaceView.foreman')('name', foremanName)
     const tReasons = useTranslations('workspace.access')
@@ -110,12 +122,14 @@ export function ControlCenter() {
     const mod = useModKeyLabel()
     const [pages, setPages] = useState<Page[]>([ROOT])
     const [query, setQuery] = useState('')
+    const [filter, setFilter] = useState<SearchFilter>('all')
     const [wasOpen, setWasOpen] = useState(open)
     if (wasOpen !== open) {
         setWasOpen(open)
         if (open) {
             setPages([ROOT])
             setQuery('')
+            setFilter('all')
         }
     }
 
@@ -126,8 +140,12 @@ export function ControlCenter() {
     const pageSpace = page.kind === 'box' ? spaces.find(space => space.id === page.spaceId) : undefined
     const darkTheme = resolvedTheme === 'dark'
 
-    const searchesConversations = open && (page.kind === 'agent' || (page.kind === 'root' && scope === 'all' && text.length >= MIN_CONVERSATION_QUERY))
+    // From two characters typed on the root, the search reaches into everything the workspace holds.
+    const searchingEverything = open && page.kind === 'root' && scope === 'all' && text.length >= MIN_CONVERSATION_QUERY
+    const searchesConversations = searchingEverything || (open && page.kind === 'agent')
     const conversations = useConversationSearch(text, page.kind === 'agent' ? page.agentId : null, searchesConversations)
+    const machine = useWorkspaceSearch(text, searchingEverything)
+    const shownFilter = searchingEverything ? filter : 'all'
 
     // ⌘F on a Mac, Ctrl+F elsewhere: Ctrl+F on a Mac moves the caret in a text field. Pressed while
     // the center is open it only closes it, and the browser goes on to open its own search.
@@ -253,6 +271,75 @@ export function ControlCenter() {
         onSelect: run(command.paid ? () => useBillingStore.getState().openBilling(undefined, command.id) : commandActions[command.id]),
     })
 
+    // Every hit of the global search, in the order of the chips, with `detail` saying where it sits.
+    function globalHits(): { rows: HitRow[]; counts: Map<SearchSource, number>; machineLoading: boolean } {
+        const agentById = new Map(agents.map(agent => [agent.id, agent]))
+        const ownerOf = (agentId: string | null) => (agentId ? agentById.get(agentId)?.name : t('hit.shared'))
+        const fresh = machine.hits.filter(hit => !machine.loading || hitMentions(hit, text))
+        const matched = searchItems(
+            agents.map(agent => ({ agent, label: agent.name, keywords: [agent.handle ?? '', agent.description ?? ''] })),
+            text,
+            AGENT_RESULTS
+        )
+        // A soul usually names its coworker: typing the name opens the coworker, never its soul.
+        const matchedIds = new Set(matched.map(({ agent }) => agent.id))
+        const soulHits = fresh.filter(hit => hit.kind === 'coworker').filter(hit => !matchedIds.has(hit.agentId))
+
+        const coworkers: HitRow[] = [
+            ...matched.map(({ agent }): HitRow => ({ ...agentRow(agent, 'hits'), badge: undefined, source: 'coworker', snippet: agent.description ?? undefined })),
+            ...soulHits.flatMap((hit): HitRow[] => {
+                const agent = agentById.get(hit.agentId)
+                if (!agent) return []
+                return [{ id: `hits-soul-${agent.id}`, label: agent.name, detail: t('hit.soul', { box: boxName(agent.spaceId) }), leading: { kind: 'agent', agentId: agent.id }, source: 'coworker', snippet: hit.snippet, onSelect: run(() => useBoardStore.getState().focusAgentOnBoard(agent.id, 'settings')) }]
+            }),
+        ]
+
+        const machineRows = fresh.flatMap((hit, index): HitRow[] => {
+            const id = `hits-${hit.kind}-${index}`
+            if (hit.kind === 'coworker') return []
+            if (hit.kind === 'brain') return [{ id, label: hit.title, leading: { kind: 'icon', icon: BrainIcon }, source: 'brain', snippet: hit.snippet, onSelect: run(() => useWorkspaceSettingsStore.getState().openBrainPage(hit.slug)) }]
+            const owner = ownerOf(hit.agentId)
+            if (owner === undefined) return []
+            const agentId = hit.agentId
+            if (hit.kind === 'skill') {
+                return [{ id, label: hit.name, detail: agentId ? t('hit.skill', { owner }) : t('hit.brainSkill'), leading: { kind: 'icon', icon: LayersIcon }, source: 'skill', snippet: hit.snippet, onSelect: run(() => (agentId ? useBoardStore.getState().openAgentSkill(agentId, hit.slug) : useWorkspaceSettingsStore.getState().openBrainSkill(hit.slug))) }]
+            }
+            if (hit.kind === 'file') {
+                const { name, folder } = splitPath(hit.path)
+                const detail = t('hit.file', { owner, hasFolder: folder ? 'yes' : 'no', folder, hasLine: hit.line === null ? 'no' : 'yes', line: hit.line ?? 0 })
+                return [{ id, label: name, detail, leading: { kind: 'icon', icon: FileTextIcon }, source: 'file', snippet: hit.line === null ? undefined : hit.snippet, onSelect: run(() => (agentId ? useBoardStore.getState().openAgentFile(agentId, hit.path) : useWorkspaceSettingsStore.getState().openBrainFile(hit.path))) }]
+            }
+            const detail = t('hit.table', { hasOwner: agentId ? 'yes' : 'no', owner, table: hit.table, hasRow: hit.rowId === null ? 'no' : 'yes', row: hit.rowId ?? 0 })
+            return [{ id, label: hit.title || hit.table, detail, leading: { kind: 'icon', icon: TableIcon }, source: 'table', snippet: hit.snippet, onSelect: run(() => (agentId ? useBoardStore.getState().openAgentData(agentId, hit.table) : useWorkspaceSettingsStore.getState().openKnowledgeBase('database', hit.table))) }]
+        })
+
+        const conversationHits = conversationRows('hits', false).map((row, index): HitRow => {
+            const hit = conversations.hits[index]
+            const agentName = hit.agentId === FOREMAN_AGENT_ID ? foremanLabel : (agentById.get(hit.agentId)?.name ?? '')
+            return { ...row, detail: t('hit.conversation', { agent: agentName, when: shortRelativeTime(hit.updatedAt, locale) }), source: 'conversation' }
+        })
+
+        const rows = [...coworkers, ...machineRows, ...conversationHits].sort((a, b) => SEARCH_FILTERS.indexOf(a.source) - SEARCH_FILTERS.indexOf(b.source))
+        const counts = new Map<SearchSource, number>()
+        for (const row of rows) counts.set(row.source, (counts.get(row.source) ?? 0) + 1)
+        return { rows, counts, machineLoading: machine.loading }
+    }
+
+    function sourceChips(): SourceChip[] {
+        const { counts, machineLoading } = globalHits()
+        // The coworkers' names are known at once, their souls come with the machine.
+        const pending = (source: SearchSource) => (machineLoading && (MACHINE_SOURCES.has(source) || (source === 'coworker' && !counts.get(source)))) || (source === 'conversation' && conversations.loading)
+        const sources = SEARCH_FILTERS.filter((value): value is SearchSource => value !== 'all')
+        const anyPending = sources.some(pending)
+        const found = [...counts.values()].reduce((sum, count) => sum + count, 0)
+        // Nothing found where nothing could be searched is not a zero.
+        const shownCount = (count: number, readsMachine: boolean): SourceChip['count'] => (count === 0 && readsMachine && machine.unavailable ? 'unknown' : count)
+        return [
+            { value: 'all', label: t('sources.all'), count: anyPending ? 'pending' : shownCount(found, true) },
+            ...sources.map(source => ({ value: source, label: t(`sources.${source}`), count: pending(source) ? ('pending' as const) : shownCount(counts.get(source) ?? 0, source !== 'conversation') })),
+        ]
+    }
+
     function rootSections(): ControlSection[] {
         const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, managed: manager !== null, apiPausedReason: manager && workspace && !isWorkspaceApiEntitled(workspace) ? needsMachineReason : null, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, apiLocked: workspace ? isApiLocked(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme, supportAvailable: support.available }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox'), apiLocked: tReasons('apiNotIncluded') }).map(command => ({
             ...command,
@@ -294,6 +381,22 @@ export function ControlCenter() {
         const askAssistant: ControlSection[] = assistantReady
             ? [{ id: 'assistant', heading: t('headings.assistant', foremanName), rows: [{ id: 'ask-assistant', label: t('askRerun', foremanName), detail: t('quotedQuery', { query: query.trim() }), leading: { kind: 'assistant' }, onSelect: run(commandActions.ask_assistant) }] }]
             : []
+
+        if (searchingEverything) {
+            const hits = globalHits()
+            const shown = shownFilter === 'all' ? hits.rows : hits.rows.filter(row => row.source === shownFilter)
+            const notice = machine.unavailable ? t('notice.unavailable') : machine.truncated ? t('notice.partial') : undefined
+            const hitSection: ControlSection = {
+                id: 'hits',
+                heading: shownFilter === 'all' ? t('headings.bestMatches') : t(`sources.${shownFilter}`),
+                rows: shownFilter === 'all' ? shown.map(row => ({ ...row, detail: row.detail ? t('hit.sourceWhere', { source: t(`sources.${row.source}`), where: row.detail }) : t(`sources.${row.source}`) })) : shown,
+                loading: stillSearching(shownFilter, new Set(shown.map(row => row.source)), { machine: hits.machineLoading, conversations: conversations.loading }),
+                notice: shownFilter === 'conversation' ? undefined : notice,
+                emptyMessage: t('empty.nothingMentions', { query: query.trim() }),
+            }
+            if (shownFilter !== 'all') return [hitSection]
+            return [...commandSections, { id: 'boxes', heading: t('headings.boxes'), rows: boxes }, hitSection, ...askAssistant]
+        }
 
         return [
             { id: 'agents', heading: t('headings.agents'), rows: searchItems(searchableAgents, text, AGENT_RESULTS).map(entry => agentRow(entry.agent, 'agents')) },
@@ -378,9 +481,13 @@ export function ControlCenter() {
             depth={pages.length - 1}
             crumbs={crumbs}
             onBack={back}
-            sections={sections().filter(section => section.rows.length > 0 || section.loading)}
+            sections={sections().filter(section => section.rows.length > 0 || section.loading || section.emptyMessage)}
             emptyLabel={emptyLabel}
             mod={mod}
+            chips={searchingEverything ? sourceChips() : undefined}
+            filter={shownFilter}
+            onFilterChange={setFilter}
+            onAsk={searchingEverything && assistantReady ? run(commandActions.ask_assistant) : undefined}
         />
     )
 }

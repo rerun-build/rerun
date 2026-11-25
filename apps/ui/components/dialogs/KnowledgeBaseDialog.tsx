@@ -29,7 +29,7 @@ export function KnowledgeBaseDialog({ open, onOpenChange }: { open: boolean; onO
         if (!focus?.tab) return
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setRequest({
-            selection: focus.skill ? { kind: 'skill', slug: focus.skill } : focus.page ? { kind: 'page', slug: focus.page } : selectionForTab(focus.tab),
+            selection: focus.file ? { kind: 'file', path: focus.file } : focus.skill ? { kind: 'skill', slug: focus.skill } : focus.page ? { kind: 'page', slug: focus.page } : selectionForTab(focus.tab),
             data: focus.table ? { table: focus.table, view: focus.view } : null,
         })
         clearFocus()

@@ -162,7 +162,8 @@
             "recentConversations": "Son konuşmalar",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Aç",
-            "moveTo": "Taşı"
+            "moveTo": "Taşı",
+            "bestMatches": "En iyi eşleşmeler"
         },
         "agent": {
             "desktop": "Masaüstü",
@@ -173,7 +174,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {Arayın veya {name} ile konuşun…} other {Arayın veya Chief of Staff'ınıza sorun…}}",
-            "root": "Ajan, ayar, konuşma arayın…",
+            "root": "Tüm çalışma alanında arayın…",
             "agent": "Ara: {name}…",
             "agentUnknown": "Bu ajanda ara…",
             "box": "Bu Box'taki ajanlarda ara…",
@@ -181,12 +182,18 @@
         },
         "empty": {
             "box": "Bu Box'ta henüz ajan yok.",
-            "noMatch": "Eşleşen bir şey yok."
+            "noMatch": "Eşleşen bir şey yok.",
+            "nothingMentions": "Bu çalışma alanında “{query}” geçen hiçbir şey yok."
+        },
+        "notice": {
+            "unavailable": "Soul'lar, skill'ler, dosyalar, Brain ve tablolar aranamadı.",
+            "partial": "Arama erken durdu, bazı sonuçlar eksik olabilir."
         },
         "hints": {
             "open": "Aç",
             "more": "Daha fazla",
-            "searchPage": "Sayfada aramak için tekrar <keys></keys>"
+            "searchPage": "Sayfada aramak için tekrar <keys></keys>",
+            "nextSource": "Sonraki kaynak"
         },
         "commands": {
             "new_agent": "Yeni ajan",
@@ -208,6 +215,25 @@
             "notifications": "Bildirimler",
             "shortcuts": "Klavye kısayolları",
             "whats_new": "Yenilikler"
+        },
+        "sources": {
+            "all": "Tümü",
+            "coworker": "Coworker'lar",
+            "skill": "Skill'ler",
+            "file": "Dosyalar",
+            "brain": "Brain",
+            "table": "Tablolar",
+            "conversation": "Konuşmalar"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "Paylaşılan",
+            "soul": "{box} · Soul",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · satır {line}} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · satır {row}} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "Veya bir ad seçin",

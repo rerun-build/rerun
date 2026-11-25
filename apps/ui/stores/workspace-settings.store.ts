@@ -5,7 +5,7 @@ import type { Provider } from '@rerun/contracts'
 // What a caller asks a dialog to land on, beyond opening it: a provider to sign back in, a table to
 // browse, a provider to add. Read then cleared by the dialog it names, because the content it asks for only mounts on
 // the next render — which is why it cannot be an argument.
-type PanelFocus = { entryId?: string; connectionId?: string; reconnect?: boolean; addProvider?: Exclude<Provider, 'rerun'>; tab?: KnowledgeBaseTab; table?: string; view?: string; page?: string; skill?: string }
+type PanelFocus = { entryId?: string; connectionId?: string; reconnect?: boolean; addProvider?: Exclude<Provider, 'rerun'>; tab?: KnowledgeBaseTab; table?: string; view?: string; page?: string; skill?: string; file?: string }
 
 type WorkspaceSettingsState = {
     // One panel at a time: they are all modal dialogs over the same board.
@@ -18,6 +18,7 @@ type WorkspaceSettingsState = {
     openKnowledgeBase: (tab: KnowledgeBaseTab, table?: string, view?: string) => void
     openBrainPage: (slug: string) => void
     openBrainSkill: (slug: string) => void
+    openBrainFile: (path: string) => void
     openVault: (entryId?: string) => void
     clearFocus: () => void
     setPanel: (panel: WorkspaceDialogPanel | null) => void
@@ -34,6 +35,7 @@ export const useWorkspaceSettingsStore = create<WorkspaceSettingsState>(set => (
     openKnowledgeBase: (tab, table, view) => set({ panel: 'knowledge_base', focus: { tab, table, view } }),
     openBrainPage: slug => set({ panel: 'knowledge_base', focus: { tab: 'company', page: slug } }),
     openBrainSkill: slug => set({ panel: 'knowledge_base', focus: { tab: 'company', skill: slug } }),
+    openBrainFile: path => set({ panel: 'knowledge_base', focus: { tab: 'files', file: path } }),
     openVault: entryId => set({ panel: 'vault', focus: entryId ? { entryId } : null }),
     clearFocus: () => set({ focus: null }),
     setPanel: panel => set({ panel, focus: null }),

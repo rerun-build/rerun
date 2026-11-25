@@ -32,7 +32,21 @@
         "controlCenter.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "controlCenter.headings.assistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "controlCenter.placeholder.rootAssistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
-        "controlCenter.commands.ask_assistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
+        "controlCenter.commands.ask_assistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "controlCenter.sources.all": "Chip of the global search: every source at once. Followed by a number of results.",
+        "controlCenter.sources.coworker": "Chip of the global search: results in the coworkers (AI agents), their name or their soul (system prompt).",
+        "controlCenter.headings.bestMatches": "Heading above the results of the global search mixed from every source.",
+        "controlCenter.notice.unavailable": "Under the results of the global search, when the workspace's machine did not answer: only names and conversation titles were searched. A soul is a coworker's system prompt.",
+        "controlCenter.notice.partial": "Under the results of the global search, when it ran out of time before reading everything.",
+        "controlCenter.hints.nextSource": "Footer hint next to the Tab key: shows the results of the next source (Coworkers, Skills, Files…).",
+        "controlCenter.hit.sourceWhere": "Beside a search result. {source} is a source name (\"Files\"), {where} where the result sits (\"Shared · marketing/ · line 42\").",
+        "controlCenter.hit.shared": "Owner of a file or a table the whole workspace shares, as opposed to one coworker's.",
+        "controlCenter.hit.soul": "Where a word was found: the soul (system prompt) of a coworker. {box} is the name of the Box (group) the coworker is in.",
+        "controlCenter.hit.skill": "Where a word was found: a skill file of a coworker. {owner} is the coworker's name. Keep SKILL.md as is.",
+        "controlCenter.hit.brainSkill": "Where a word was found: a skill of the Brain (the workspace's shared knowledge base). Keep SKILL.md as is.",
+        "controlCenter.hit.file": "Where a word was found in a file. {owner} is a coworker's name or the 'shared' text, {folder} a folder path (\"marketing/\"), {line} a line number.",
+        "controlCenter.hit.table": "Where a word was found in a database table. {owner} is a coworker's name, {table} the table name, {row} the row number.",
+        "controlCenter.hit.conversation": "Beside a conversation found by its title. {agent} is the coworker's name, {when} how long ago (\"2d ago\")."
     },
     "loading": "Loading...",
     "theme": "Theme",
@@ -197,7 +211,8 @@
             "recentConversations": "Recent conversations",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Open",
-            "moveTo": "Move to"
+            "moveTo": "Move to",
+            "bestMatches": "Best matches"
         },
         "agent": {
             "desktop": "Desktop",
@@ -208,7 +223,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {Search or ask {name}…} other {Search or ask your Chief of Staff…}}",
-            "root": "Search agents, settings, conversations…",
+            "root": "Search everything in the workspace…",
             "agent": "Search in {name}…",
             "agentUnknown": "Search in this agent…",
             "box": "Search agents in this Box…",
@@ -216,12 +231,18 @@
         },
         "empty": {
             "box": "No agents in this Box yet.",
-            "noMatch": "Nothing matches."
+            "noMatch": "Nothing matches.",
+            "nothingMentions": "Nothing in this workspace mentions “{query}”."
+        },
+        "notice": {
+            "unavailable": "Souls, skills, files, the Brain and tables could not be searched.",
+            "partial": "The search stopped early, some results may be missing."
         },
         "hints": {
             "open": "Open",
             "more": "More",
-            "searchPage": "<keys></keys> again to search in the page"
+            "searchPage": "<keys></keys> again to search in the page",
+            "nextSource": "Next source"
         },
         "commands": {
             "new_agent": "New agent",
@@ -243,6 +264,25 @@
             "notifications": "Notifications",
             "shortcuts": "Keyboard shortcuts",
             "whats_new": "What's new"
+        },
+        "sources": {
+            "all": "All",
+            "coworker": "Coworkers",
+            "skill": "Skills",
+            "file": "Files",
+            "brain": "Brain",
+            "table": "Tables",
+            "conversation": "Conversations"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "Shared",
+            "soul": "{box} · Soul",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · line {line}} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · row {row}} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "Or pick a name",

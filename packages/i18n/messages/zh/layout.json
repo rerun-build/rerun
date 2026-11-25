@@ -162,7 +162,8 @@
             "recentConversations": "最近的对话",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "打开",
-            "moveTo": "移动到"
+            "moveTo": "移动到",
+            "bestMatches": "最佳匹配"
         },
         "agent": {
             "desktop": "桌面",
@@ -173,7 +174,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {搜索或询问 {name}…} other {搜索或询问您的 Chief of Staff…}}",
-            "root": "搜索智能体、设置、对话…",
+            "root": "搜索整个工作区…",
             "agent": "在 {name} 中搜索…",
             "agentUnknown": "在此智能体中搜索…",
             "box": "在此 Box 中搜索智能体…",
@@ -181,12 +182,18 @@
         },
         "empty": {
             "box": "此 Box 中还没有智能体。",
-            "noMatch": "没有匹配的结果。"
+            "noMatch": "没有匹配的结果。",
+            "nothingMentions": "此工作区中没有任何内容提到“{query}”。"
+        },
+        "notice": {
+            "unavailable": "无法搜索灵魂、技能、文件、Brain 和数据表。",
+            "partial": "搜索提前停止，部分结果可能缺失。"
         },
         "hints": {
             "open": "打开",
             "more": "更多",
-            "searchPage": "再按 <keys></keys> 在页面中搜索"
+            "searchPage": "再按 <keys></keys> 在页面中搜索",
+            "nextSource": "下一个来源"
         },
         "commands": {
             "new_agent": "新建智能体",
@@ -208,6 +215,25 @@
             "notifications": "通知",
             "shortcuts": "键盘快捷键",
             "whats_new": "新功能"
+        },
+        "sources": {
+            "all": "全部",
+            "coworker": "同事",
+            "skill": "技能",
+            "file": "文件",
+            "brain": "Brain",
+            "table": "数据表",
+            "conversation": "对话"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "共享",
+            "soul": "{box} · 灵魂",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · 第 {line} 行} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · 第 {row} 行} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "或选择一个名称",
