@@ -6,7 +6,11 @@
         "team": "צוות",
         "brand": "מותג",
         "domains": "דומיינים",
-        "back": "חזרה לאפליקציה"
+        "back": "חזרה לאפליקציה",
+        "reserve": "{amount} <hint>במאגר</hint>",
+        "account": "החשבון שלך",
+        "switch": "{name}, להחליף סביבת עבודה",
+        "alerts": "{count, plural, one {דבר אחד מחכה לך} two {# דברים מחכים לך} other {# דברים מחכים לך}}"
     },
     "suspended": {
         "title": "הארגון הזה מושעה",
@@ -28,7 +32,8 @@
         "restoring": "בשחזור",
         "provisioning": "בהקמה",
         "outOfCredit": "הקרדיט נגמר",
-        "suspended": "מושעה"
+        "suspended": "מושעה",
+        "waitingAdmin": "ממתינה למנהל שלה"
     },
     "workspaces": {
         "title": "סביבות עבודה",
@@ -37,55 +42,55 @@
         "limitReached": "הארגון שלך מוגבל ל{max, plural, one {סביבת עבודה אחת} two {# סביבות עבודה} other {# סביבות עבודה}}",
         "search": "חיפוש סביבות עבודה",
         "noMatch": "אין סביבת עבודה שמתאימה ל“{query}”",
-        "summary": "{members, plural, one {חבר אחד} two {# חברים} other {# חברים}} · {coworkers, plural, one {עמית אחד} two {# עמיתים} other {# עמיתים}} · {credits, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
-        "columns": {
-            "name": "שם",
-            "members": "חברים",
-            "coworkers": "עמיתים",
-            "credit": "קרדיט שנשאר",
-            "lastActivity": "פעילות אחרונה"
-        },
-        "noActivity": "עדיין אין",
-        "empty": {
-            "title": "עדיין אין סביבת עבודה",
-            "description": "אפשר ליצור אחת לכל לקוח ולהזמין את המנהל הראשון שלה."
-        },
+        "showMore": "להציג עוד",
+        "board": "{count, plural, one {הלוח של {name}, עמית אחד} two {הלוח של {name}, # עמיתים} other {הלוח של {name}, # עמיתים}}",
+        "credit": "{count, plural, one {{amount} קרדיט, {runway}} two {{amount} קרדיטים, {runway}} other {{amount} קרדיטים, {runway}}}",
         "unnamed": "סביבת עבודה ללא שם"
     },
     "create": {
         "title": "סביבת עבודה חדשה",
-        "description": "המנהל הראשון שלה יקבל הזמנה באימייל.",
+        "question": "בשביל מי היא?",
+        "close": "לסגור",
         "logo": "להעלות לוגו",
-        "name": "שם",
+        "name": "לקוח",
         "namePlaceholder": "Acme",
         "nameTooLong": "{max} תווים לכל היותר",
-        "email": "האימייל של המנהל הראשון",
+        "email": "המנהל שלו",
         "emailPlaceholder": "you@company.com",
         "emailInvalid": "יש להזין כתובת אימייל תקינה",
         "logoTooLarge": "התמונה הזו גדולה מ-8MB",
-        "submit": "ליצור",
+        "credit": "קרדיט להתחלה",
+        "noCredit": "ללא",
+        "submit": "ליצור ולהזמין",
+        "mailTo": "אל {email}",
+        "mailTitle": "אימייל ההזמנה",
         "done": {
-            "title": "{name} מוכנה",
-            "description": "הזמנו את {email}.",
-            "linkHint": "יש לשלוח את הקישור הזה אל {email}.",
+            "title": "{name} מוכנה.",
+            "description": "ההזמנה נשלחה אל {email}. הקישור הזה עושה אותו דבר:",
+            "sent": "ההזמנה נשלחה אל {email}.",
             "copyLink": "להעתיק את קישור ההזמנה",
-            "close": "סיום",
+            "creditFailed": "לא ניתן היה להוסיף את הקרדיט. אפשר להוסיף אותו מסביבת העבודה.",
             "open": "לצפות בסביבת העבודה"
         }
     },
     "detail": {
-        "back": "סביבות עבודה",
-        "open": "לפתוח את סביבת העבודה",
+        "open": "לפתוח",
+        "more": "עוד",
         "notReady": "סביבת העבודה הזו עדיין לא מוכנה",
         "archived": "יש לשחזר קודם את סביבת העבודה הזו",
-        "members": "חברים",
-        "credit": "קרדיט",
+        "people": "אנשים",
         "usage": "שימוש",
+        "status": "סטטוס",
         "machine": "מכונה",
-        "danger": "ניהול"
+        "admin": "מנהל",
+        "noAdmin": "עדיין אין",
+        "paused": "העמיתים מושהים",
+        "noCredit": "עדיין אין קרדיט",
+        "unspent": "עדיין לא נוצל",
+        "daysLeft": "{days, plural, =0 {נשאר פחות מיום} one {נשאר בערך יום אחד} two {נשארו בערך יומיים} other {נשארו בערך # ימים}}"
     },
     "people": {
-        "you": "(אתה)",
+        "you": "אתה",
         "unknown": "משתמש לא מוכר",
         "invite": "להזמין",
         "role": "התפקיד של {name}",
@@ -107,11 +112,12 @@
             "description": "הקישור שנשלח אל {email} יפסיק לעבוד.",
             "confirm": "לבטל הזמנה",
             "keep": "להשאיר"
-        }
+        },
+        "resent": "ההזמנה נשלחה אל {email}",
+        "linkCopied": "הקישור הועתק"
     },
     "invite": {
         "workspaceTitle": "הזמנה אל {name}",
-        "teamTitle": "הזמנה לצוות",
         "description": "הם יקבלו הזמנה באימייל.",
         "email": "אימייל",
         "emailPlaceholder": "you@company.com",
@@ -121,11 +127,10 @@
         "copyLink": "להעתיק את קישור ההזמנה",
         "done": "סיום",
         "roles": {
-            "owner": "הכול, כולל הצוות, המותג והדומיינים",
-            "admin": "סביבות עבודה, חברים וקרדיט",
             "workspaceAdmin": "מנהל את סביבת העבודה ואת החברים בה",
             "workspaceMember": "עובד עם העמיתים"
-        }
+        },
+        "teamPlaceholder": "colleague@company.com"
     },
     "usage": {
         "empty": "עדיין לא הוצא דבר"
@@ -138,11 +143,8 @@
             "archiving": "בארכוב",
             "archived": "בארכיון",
             "restoring": "בשחזור",
-            "none": "אין מכונה"
+            "none": "לא הופעלה"
         },
-        "disk": "דיסק",
-        "diskUsed": "{used} מתוך {total}",
-        "diskUnknown": "עדיין לא נמדד",
         "notStarted": "מתחילה עם העמית הראשון",
         "restart": "להפעיל מחדש",
         "restartConfirm": {
@@ -150,20 +152,18 @@
             "description": "העמיתים יפסיקו את מה שהם עושים לכדקה.",
             "confirm": "להפעיל מחדש"
         },
-        "restarting": "המכונה מופעלת מחדש"
+        "restarting": "המכונה מופעלת מחדש",
+        "summary": "{state}, דיסק {percent}%"
     },
     "danger": {
         "archive": "לארכב",
-        "archiveHint": "עוצר את העמיתים שלה ושומר את הנתונים. עדיין נספרת במגבלה שלך.",
         "archiveConfirm": {
             "title": "לארכב את {name}?",
             "description": "החברים בה יאבדו גישה והעמיתים שלה יעצרו עד שתשחזר אותה.",
             "confirm": "לארכב"
         },
         "restore": "לשחזר",
-        "restoreHint": "חוזרת כמו שהייתה, תוך כמה דקות.",
         "delete": "למחוק",
-        "deleteHint": "מוחק לצמיתות את העמיתים, הקבצים והשיחות שלה.",
         "deleteConfirm": {
             "title": "למחוק את סביבת העבודה הזו?",
             "description": "העמיתים, הקבצים והשיחות שלה יימחקו לצמיתות. הקרדיט שנתת לה ולא נוצל יחזור למאגר שלך.",
@@ -175,9 +175,7 @@
     },
     "credit": {
         "title": "קרדיט",
-        "reserve": "מאגר",
-        "reserveHint": "עדיין לא הוענק לסביבת עבודה",
-        "left": "נשאר בסביבת העבודה הזו",
+        "reserve": "במאגר",
         "add": "להוסיף קרדיט",
         "takeBack": "להחזיר",
         "reserveEmpty": "המאגר ריק",
@@ -215,15 +213,35 @@
             "allocate": "להוסיף {count, plural, =0 {קרדיט} one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}",
             "takeBack": "להחזיר {count, plural, =0 {קרדיט} one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}"
         },
-        "tookLess": "{count, plural, =0 {לא נשאר קרדיט להחזרה} one {נשאר רק קרדיט אחד להחזרה} two {נשארו רק # קרדיטים להחזרה} other {נשארו רק # קרדיטים להחזרה}}"
+        "tookLess": "{count, plural, =0 {לא נשאר קרדיט להחזרה} one {נשאר רק קרדיט אחד להחזרה} two {נשארו רק # קרדיטים להחזרה} other {נשארו רק # קרדיטים להחזרה}}",
+        "withClients": "אצל לקוחות",
+        "inReserve": "{amount} במאגר",
+        "leftInReserve": "נשארו {amount} במאגר",
+        "becomes": "← {amount}",
+        "amountLabel": "קרדיט להוספה",
+        "more": "עוד",
+        "columns": {
+            "workspace": "סביבת עבודה",
+            "lasts": "יספיק ל",
+            "has": "יש לה",
+            "give": "להעניק",
+            "then": "אחר כך"
+        },
+        "hasAndLasts": "{amount}, {runway}",
+        "give": "קרדיט עבור {name}",
+        "giveAll": "{count, plural, one {להעניק קרדיט אחד} two {להעניק # קרדיטים} other {להעניק # קרדיטים}}",
+        "clear": "לנקות",
+        "tooMuch": "יותר ממה שיש במאגר",
+        "notGiven": "{count, plural, one {סביבת עבודה אחת לא קיבלה את הקרדיט שלה} two {# סביבות עבודה לא קיבלו את הקרדיט שלהן} other {# סביבות עבודה לא קיבלו את הקרדיט שלהן}}"
     },
     "team": {
         "title": "צוות",
-        "description": "הם פותחים כל סביבת עבודה בלי שהחברים בה רואים אותם."
+        "hint": "הלקוחות אף פעם לא רואים אותם",
+        "invited": "הוזמנו",
+        "members": "חברים"
     },
     "brand": {
         "title": "מותג",
-        "description": "מה שהלקוחות שלך רואים.",
         "name": "שם",
         "nameInvalid": "1 עד 40 תווים, בלי {list}",
         "icon": "אייקון",
@@ -247,18 +265,10 @@
         "supportPlaceholder": "support@company.com",
         "supportHint": "לשם הלקוחות שלך כותבים כדי לקבל עזרה.",
         "emailInvalid": "יש להזין כתובת אימייל תקינה",
-        "docs": "תיעוד",
+        "docs": "מרכז עזרה",
         "terms": "תנאים",
         "privacy": "מדיניות פרטיות",
         "urlInvalid": "יש להשתמש בכתובת מלאה שמתחילה ב-https://",
-        "preview": {
-            "light": "בהיר",
-            "dark": "כהה",
-            "user": "לנסח את הדוח השבועי",
-            "assistant": "בוצע. <link>לפתוח את הדוח</link>",
-            "unread": "לא נקרא",
-            "progress": "התקדמות"
-        },
         "unsaved": "שינויים שלא נשמרו",
         "discard": "לבטל",
         "leave": {
@@ -266,26 +276,19 @@
             "description": "השינויים במותג יאבדו.",
             "confirm": "לעזוב",
             "stay": "להישאר"
-        }
+        },
+        "identity": "זהות",
+        "contact": "יצירת קשר",
+        "legal": "מידע משפטי"
     },
     "domains": {
         "title": "דומיינים",
-        "description": "המקום שבו הלקוחות שלך נכנסים.",
-        "default": "כתובת ברירת מחדל",
-        "custom": "הדומיין שלך",
         "copyAddress": "להעתיק את הכתובת",
         "add": "להוסיף דומיין",
-        "empty": {
-            "title": "עדיין אין דומיין",
-            "description": "אפשר להגיש את האפליקציה מהכתובת שלך."
-        },
         "status": {
-            "pending": "ממתין ל-DNS",
-            "active": "פעיל",
-            "error": "שגיאה"
+            "active": "פעיל"
         },
         "record": {
-            "hint": "יש להוסיף את הרשומות האלה במקום שבו הדומיין מנוהל. הן יכולות להופיע תוך שעה.",
             "type": "סוג",
             "name": "שם",
             "value": "ערך",
@@ -293,7 +296,7 @@
             "copyValue": "להעתיק את הערך"
         },
         "checkedAt": "בדיקה אחרונה: {time}",
-        "check": "לבדוק שוב",
+        "check": "לבדוק עכשיו",
         "remove": "להסיר",
         "removeConfirm": {
             "title": "להסיר את {hostname}?",
@@ -314,6 +317,17 @@
             "noToken": "רשומת ה-TXT חסרה.",
             "taken": "מישהו אחר הוכיח קודם את הבעלות על הדומיין הזה.",
             "lookupFailed": "ה-DNS של הדומיין הזה לא ענה. ננסה שוב."
+        },
+        "signInAt": "הלקוחות שלך נכנסים דרך",
+        "moving": "בתהליך מעבר אל {hostname}",
+        "lost": "{hostname} כבר לא מצביע לכאן",
+        "included": "כלול",
+        "alsoAnswers": "עונה גם",
+        "more": "עוד על {hostname}",
+        "steps": {
+            "records": "יש להוסיף את הרשומות האלה במקום שבו קנית את הדומיין",
+            "seen": "אנחנו רואים שהוא מצביע לכאן",
+            "https": "הוא נפתח ב-HTTPS"
         }
     },
     "failed": {
@@ -331,5 +345,82 @@
         "signIn": "יש להיכנס או ליצור חשבון עם {email} כדי להצטרף.",
         "expired": "תוקף ההזמנה פג. יש לבקש מבעלים בצוות לשלוח הזמנה חדשה.",
         "failed": "לא ניתן היה להצטרף לצוות"
+    },
+    "runway": {
+        "empty": "נגמר",
+        "unused": "לא בשימוש",
+        "days": "{days, plural, one {יום אחד} two {יומיים} other {# ימים}}",
+        "long": "יותר מ-99 ימים"
+    },
+    "alerts": {
+        "outOfCredit": "הקרדיט נגמר, העמיתים מושהים",
+        "machine": "כדאי לבדוק את המכונה",
+        "disk": "הדיסק מלא ב-{percent}%",
+        "invite": "ממתינים ל-{email}",
+        "inviteExpired": "תוקף ההזמנה של {email} פג",
+        "lowCredit": "{days, plural, =0 {קרדיט לפחות מיום} one {קרדיט לעוד יום אחד} two {קרדיט לעוד יומיים} other {קרדיט לעוד # ימים}}",
+        "actions": {
+            "addCredit": "להוסיף קרדיט",
+            "seeMachine": "לצפות במכונה",
+            "resend": "לשלוח שוב הזמנה"
+        }
+    },
+    "firstVisit": {
+        "title": "{name} כמעט נפתח.",
+        "done": "בוצע",
+        "start": "להתחיל",
+        "steps": {
+            "brand": "להגדיר את המותג שלך",
+            "domain": "לחבר את הדומיין שלך",
+            "workspace": "ליצור את סביבת העבודה הראשונה שלך",
+            "team": "להזמין את הצוות שלך"
+        }
+    },
+    "setup": {
+        "title": "עלייה לאוויר",
+        "progress": "{done} מתוך {total}",
+        "done": "בוצע",
+        "created": "סביבת העבודה נוצרה",
+        "credit": "נוספו {amount} קרדיטים",
+        "creditMissing": "הוספת קרדיט",
+        "adminJoins": "הצטרפות של {email}",
+        "adminExpired": "תוקף ההזמנה של {email} פג",
+        "adminJoined": "המנהל שלה הצטרף",
+        "adminMissing": "הצטרפות המנהל שלה",
+        "coworker": "גיוס העמית הראשון",
+        "copyLink": "להעתיק קישור",
+        "resend": "לשלוח שוב",
+        "invite": "להזמין"
+    },
+    "preview": {
+        "titles": {
+            "app": "תצוגה מקדימה של האפליקציה",
+            "auth": "תצוגה מקדימה של דף הכניסה"
+        },
+        "admin": "מנהל",
+        "search": "חיפוש",
+        "inbox": "תיבת דואר",
+        "chief": "Chief of Staff",
+        "credits": "קרדיטים",
+        "creditsLeft": "נשארו {amount}",
+        "tier": "מאוזן",
+        "composer": "לשלוח הודעה...",
+        "attach": "לצרף קובץ",
+        "ask": "תמצא 100 סוכנויות אינטרנט בליון, תכניס אותן ל-`leads` ותגיד לי מה בולט. באותו פורמט כמו https://example.com/report",
+        "tool": "מחפש באינטרנט",
+        "toolSummary": "40 דפים נקראו",
+        "answer": "מצאתי **100 סוכנויות אינטרנט בליון**, לכולן אימייל ציבורי ליצירת קשר.\n\n- ב-38 מהן יש פחות מ-10 אנשים\n- 7 מהן מגייסות עכשיו",
+        "question": "למי לכתוב קודם?",
+        "optionSmall": "38 הצוותים הקטנים",
+        "optionHiring": "7 הסוכנויות שמגייסות",
+        "lines": {
+            "chief": "עדכון הבוקר הושלם.",
+            "nova": "הטיוטה מוכנה: 900 מילים, שלושה חלקים.",
+            "ledger": "חשבוניות אוקטובר",
+            "pulse": "לאשר את הלידים מליון",
+            "echo": "לסנכרן את ה-CRM",
+            "vega": "ארבעה לידים חדשים השבוע."
+        },
+        "signIn": "כניסה אל {name}"
     }
 }

@@ -6,7 +6,11 @@
         "team": "الفريق",
         "brand": "العلامة التجارية",
         "domains": "النطاقات",
-        "back": "العودة إلى التطبيق"
+        "back": "العودة إلى التطبيق",
+        "reserve": "{amount} <hint>في الاحتياطي</hint>",
+        "account": "حسابك",
+        "switch": "{name}، تغيير مساحة العمل",
+        "alerts": "{count, plural, zero {لا شيء يحتاج إليك} one {أمر واحد يحتاج إليك} two {أمران يحتاجان إليك} few {# أمور تحتاج إليك} many {# أمرًا يحتاج إليك} other {# أمر يحتاج إليك}}"
     },
     "suspended": {
         "title": "هذه المنظمة معلّقة",
@@ -28,7 +32,8 @@
         "restoring": "قيد الاستعادة",
         "provisioning": "قيد الإعداد",
         "outOfCredit": "نفد الرصيد",
-        "suspended": "معلّقة"
+        "suspended": "معلّقة",
+        "waitingAdmin": "بانتظار مشرفها"
     },
     "workspaces": {
         "title": "مساحات العمل",
@@ -37,55 +42,55 @@
         "limitReached": "منظمتك محدودة بـ{max, plural, zero {لا مساحات عمل} one {مساحة عمل واحدة} two {مساحتا عمل} few {# مساحات عمل} many {# مساحة عمل} other {# مساحة عمل}}",
         "search": "بحث في مساحات العمل",
         "noMatch": "لا توجد مساحة عمل تطابق «{query}»",
-        "summary": "{members, plural, zero {لا أعضاء} one {عضو واحد} two {عضوان} few {# أعضاء} many {# عضوًا} other {# عضو}} · {coworkers, plural, zero {لا زملاء} one {زميل واحد} two {زميلان} few {# زملاء} many {# زميلًا} other {# زميل}} · {credits, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}}",
-        "columns": {
-            "name": "الاسم",
-            "members": "الأعضاء",
-            "coworkers": "الزملاء",
-            "credit": "الرصيد المتبقي",
-            "lastActivity": "آخر نشاط"
-        },
-        "noActivity": "لا شيء بعد",
-        "empty": {
-            "title": "لا توجد مساحة عمل بعد",
-            "description": "أنشئ واحدة لكل عميل وادعُ أول مشرف فيها."
-        },
+        "showMore": "عرض المزيد",
+        "board": "{count, plural, zero {لوحة {name}، لا زملاء} one {لوحة {name}، زميل واحد} two {لوحة {name}، زميلان} few {لوحة {name}، # زملاء} many {لوحة {name}، # زميلًا} other {لوحة {name}، # زميل}}",
+        "credit": "{count, plural, zero {{amount} رصيد، {runway}} one {{amount} رصيد، {runway}} two {{amount} رصيد، {runway}} few {{amount} أرصدة، {runway}} many {{amount} رصيدًا، {runway}} other {{amount} رصيد، {runway}}}",
         "unnamed": "مساحة عمل بلا عنوان"
     },
     "create": {
         "title": "مساحة عمل جديدة",
-        "description": "سيتلقى أول مشرف فيها دعوة بالبريد الإلكتروني.",
+        "question": "لمن هي؟",
+        "close": "إغلاق",
         "logo": "رفع شعار",
-        "name": "الاسم",
+        "name": "العميل",
         "namePlaceholder": "Acme",
         "nameTooLong": "{max} حرفًا على الأكثر",
-        "email": "البريد الإلكتروني لأول مشرف",
+        "email": "مشرف العميل",
         "emailPlaceholder": "you@company.com",
         "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
         "logoTooLarge": "هذه الصورة أكبر من 8 ميغابايت",
-        "submit": "إنشاء",
+        "credit": "الرصيد الأولي",
+        "noCredit": "لا شيء",
+        "submit": "إنشاء ودعوة",
+        "mailTo": "إلى {email}",
+        "mailTitle": "رسالة الدعوة",
         "done": {
-            "title": "{name} جاهزة",
-            "description": "دعونا {email}.",
-            "linkHint": "أرسل هذا الرابط إلى {email}.",
+            "title": "{name} جاهزة.",
+            "description": "وصلت الدعوة إلى {email}. ويؤدي هذا الرابط الغرض نفسه:",
+            "sent": "وصلت الدعوة إلى {email}.",
             "copyLink": "نسخ رابط الدعوة",
-            "close": "تم",
+            "creditFailed": "تعذّرت إضافة الرصيد. أضفه من مساحة العمل.",
             "open": "عرض مساحة العمل"
         }
     },
     "detail": {
-        "back": "مساحات العمل",
-        "open": "فتح مساحة العمل",
+        "open": "فتح",
+        "more": "المزيد",
         "notReady": "مساحة العمل هذه ليست جاهزة بعد",
         "archived": "استعد مساحة العمل هذه أولًا",
-        "members": "الأعضاء",
-        "credit": "الرصيد",
+        "people": "الأشخاص",
         "usage": "الاستخدام",
+        "status": "الحالة",
         "machine": "الجهاز",
-        "danger": "إدارة"
+        "admin": "المشرف",
+        "noAdmin": "لا يوجد بعد",
+        "paused": "الزملاء متوقفون مؤقتًا",
+        "noCredit": "لا رصيد بعد",
+        "unspent": "لم يُنفق بعد",
+        "daysLeft": "{days, plural, =0 {يتبقى أقل من يوم} zero {يتبقى أقل من يوم} one {يتبقى يوم واحد تقريبًا} two {يتبقى يومان تقريبًا} few {يتبقى # أيام تقريبًا} many {يتبقى # يومًا تقريبًا} other {يتبقى # يوم تقريبًا}}"
     },
     "people": {
-        "you": "(أنت)",
+        "you": "أنت",
         "unknown": "مستخدم غير معروف",
         "invite": "دعوة",
         "role": "دور {name}",
@@ -107,11 +112,12 @@
             "description": "سيتوقف الرابط المرسل إلى {email} عن العمل.",
             "confirm": "إلغاء الدعوة",
             "keep": "إبقاء"
-        }
+        },
+        "resent": "أُرسلت الدعوة إلى {email}",
+        "linkCopied": "تم نسخ الرابط"
     },
     "invite": {
         "workspaceTitle": "دعوة إلى {name}",
-        "teamTitle": "دعوة إلى الفريق",
         "description": "سيتلقون دعوة بالبريد الإلكتروني.",
         "email": "البريد الإلكتروني",
         "emailPlaceholder": "you@company.com",
@@ -121,11 +127,10 @@
         "copyLink": "نسخ رابط الدعوة",
         "done": "تم",
         "roles": {
-            "owner": "كل شيء، بما في ذلك الفريق والعلامة التجارية والنطاقات",
-            "admin": "مساحات العمل والأعضاء والرصيد",
             "workspaceAdmin": "يدير مساحة العمل وأعضاءها",
             "workspaceMember": "يعمل مع الزملاء"
-        }
+        },
+        "teamPlaceholder": "colleague@company.com"
     },
     "usage": {
         "empty": "لم يُنفق شيء بعد"
@@ -138,11 +143,8 @@
             "archiving": "قيد الأرشفة",
             "archived": "مؤرشف",
             "restoring": "قيد الاستعادة",
-            "none": "لا جهاز"
+            "none": "لم يبدأ"
         },
-        "disk": "القرص",
-        "diskUsed": "{used} من {total}",
-        "diskUnknown": "لم يُقَس بعد",
         "notStarted": "يبدأ مع أول زميل",
         "restart": "إعادة التشغيل",
         "restartConfirm": {
@@ -150,20 +152,18 @@
             "description": "يتوقف الزملاء عما يفعلونه لمدة دقيقة تقريبًا.",
             "confirm": "إعادة التشغيل"
         },
-        "restarting": "الجهاز قيد إعادة التشغيل"
+        "restarting": "الجهاز قيد إعادة التشغيل",
+        "summary": "{state}، القرص {percent}%"
     },
     "danger": {
         "archive": "أرشفة",
-        "archiveHint": "يوقف زملاءها ويحتفظ ببياناتها. وتبقى محتسبة ضمن حدك.",
         "archiveConfirm": {
             "title": "أرشفة {name}؟",
             "description": "سيفقد أعضاؤها الوصول إليها ويتوقف زملاؤها إلى أن تستعيدها.",
             "confirm": "أرشفة"
         },
         "restore": "استعادة",
-        "restoreHint": "تعود كما كانت خلال بضع دقائق.",
         "delete": "حذف",
-        "deleteHint": "يمحو زملاءها وملفاتها ومحادثاتها نهائيًا.",
         "deleteConfirm": {
             "title": "حذف مساحة العمل هذه؟",
             "description": "يتم محو زملائها وملفاتها ومحادثاتها نهائيًا. ويعود الرصيد الذي منحته لها ولم تنفقه إلى احتياطيك.",
@@ -175,9 +175,7 @@
     },
     "credit": {
         "title": "الرصيد",
-        "reserve": "الاحتياطي",
-        "reserveHint": "لم يُمنح لمساحة عمل بعد",
-        "left": "المتبقي في مساحة العمل هذه",
+        "reserve": "في الاحتياطي",
         "add": "إضافة رصيد",
         "takeBack": "استرجاع",
         "reserveEmpty": "الاحتياطي فارغ",
@@ -215,15 +213,35 @@
             "allocate": "إضافة {count, plural, =0 {رصيدًا} zero {رصيدًا} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}}",
             "takeBack": "استرجاع {count, plural, =0 {رصيدًا} zero {رصيدًا} one {رصيدًا واحدًا} two {رصيدين} few {# أرصدة} many {# رصيدًا} other {# رصيد}}"
         },
-        "tookLess": "{count, plural, =0 {لم يتبقَّ أي رصيد للاسترجاع} zero {لم يتبقَّ أي رصيد للاسترجاع} one {لم يتبقَّ سوى رصيد واحد للاسترجاع} two {لم يتبقَّ سوى رصيدين للاسترجاع} few {لم يتبقَّ سوى # أرصدة للاسترجاع} many {لم يتبقَّ سوى # رصيدًا للاسترجاع} other {لم يتبقَّ سوى # رصيد للاسترجاع}}"
+        "tookLess": "{count, plural, =0 {لم يتبقَّ أي رصيد للاسترجاع} zero {لم يتبقَّ أي رصيد للاسترجاع} one {لم يتبقَّ سوى رصيد واحد للاسترجاع} two {لم يتبقَّ سوى رصيدين للاسترجاع} few {لم يتبقَّ سوى # أرصدة للاسترجاع} many {لم يتبقَّ سوى # رصيدًا للاسترجاع} other {لم يتبقَّ سوى # رصيد للاسترجاع}}",
+        "withClients": "لدى العملاء",
+        "inReserve": "{amount} في الاحتياطي",
+        "leftInReserve": "يتبقى {amount} في الاحتياطي",
+        "becomes": "← {amount}",
+        "amountLabel": "الرصيد المراد إضافته",
+        "more": "المزيد",
+        "columns": {
+            "workspace": "مساحة العمل",
+            "lasts": "المدة",
+            "has": "لديها",
+            "give": "منح",
+            "then": "بعد ذلك"
+        },
+        "hasAndLasts": "{amount}، {runway}",
+        "give": "رصيد لـ {name}",
+        "giveAll": "{count, plural, zero {منح رصيد} one {منح رصيد واحد} two {منح رصيدين} few {منح # أرصدة} many {منح # رصيدًا} other {منح # رصيد}}",
+        "clear": "مسح",
+        "tooMuch": "أكثر من الاحتياطي",
+        "notGiven": "{count, plural, zero {حصلت كل مساحات العمل على رصيدها} one {لم تحصل مساحة عمل واحدة على رصيدها} two {لم تحصل مساحتا عمل على رصيدهما} few {لم تحصل # مساحات عمل على رصيدها} many {لم تحصل # مساحة عمل على رصيدها} other {لم تحصل # مساحة عمل على رصيدها}}"
     },
     "team": {
         "title": "الفريق",
-        "description": "يفتحون أي مساحة عمل دون أن يراهم أعضاؤها."
+        "hint": "لا يراهم العملاء أبدًا",
+        "invited": "المدعوون",
+        "members": "الأعضاء"
     },
     "brand": {
         "title": "العلامة التجارية",
-        "description": "ما يراه عملاؤك.",
         "name": "الاسم",
         "nameInvalid": "من 1 إلى 40 حرفًا، دون {list}",
         "icon": "الأيقونة",
@@ -247,18 +265,10 @@
         "supportPlaceholder": "support@company.com",
         "supportHint": "حيث يكتب عملاؤك لطلب المساعدة.",
         "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
-        "docs": "التوثيق",
+        "docs": "مركز المساعدة",
         "terms": "الشروط",
         "privacy": "سياسة الخصوصية",
         "urlInvalid": "استخدم عنوانًا كاملًا يبدأ بـ https://",
-        "preview": {
-            "light": "فاتح",
-            "dark": "داكن",
-            "user": "حرّر التقرير الأسبوعي",
-            "assistant": "تم. <link>افتح التقرير</link>",
-            "unread": "غير مقروء",
-            "progress": "التقدم"
-        },
         "unsaved": "تغييرات غير محفوظة",
         "discard": "تجاهل",
         "leave": {
@@ -266,26 +276,19 @@
             "description": "ستضيع تغييراتك على العلامة التجارية.",
             "confirm": "مغادرة",
             "stay": "البقاء"
-        }
+        },
+        "identity": "الهوية",
+        "contact": "التواصل",
+        "legal": "المعلومات القانونية"
     },
     "domains": {
         "title": "النطاقات",
-        "description": "حيث يسجّل عملاؤك الدخول.",
-        "default": "العنوان الافتراضي",
-        "custom": "نطاقك",
         "copyAddress": "نسخ العنوان",
         "add": "إضافة نطاق",
-        "empty": {
-            "title": "لا نطاق بعد",
-            "description": "قدّم التطبيق من عنوانك الخاص."
-        },
         "status": {
-            "pending": "بانتظار DNS",
-            "active": "نشط",
-            "error": "خطأ"
+            "active": "نشط"
         },
         "record": {
-            "hint": "أضف هذه السجلات حيث تدير نطاقك. قد يستغرق ظهورها ساعة.",
             "type": "النوع",
             "name": "الاسم",
             "value": "القيمة",
@@ -293,7 +296,7 @@
             "copyValue": "نسخ القيمة"
         },
         "checkedAt": "آخر فحص: {time}",
-        "check": "فحص مجددًا",
+        "check": "فحص الآن",
         "remove": "إزالة",
         "removeConfirm": {
             "title": "إزالة {hostname}؟",
@@ -314,6 +317,17 @@
             "noToken": "سجل TXT مفقود.",
             "taken": "سبقك شخص آخر إلى إثبات ملكية هذا النطاق.",
             "lookupFailed": "لم يستجب DNS لهذا النطاق. سنحاول مرة أخرى."
+        },
+        "signInAt": "يسجّل عملاؤك الدخول عبر",
+        "moving": "جارٍ الانتقال إلى {hostname}",
+        "lost": "لم يعد {hostname} يشير إلى هنا",
+        "included": "مضمّن",
+        "alsoAnswers": "يستجيب أيضًا",
+        "more": "المزيد عن {hostname}",
+        "steps": {
+            "records": "أضف هذه السجلات حيث اشتريت النطاق",
+            "seen": "نرى أنه يشير إلى هنا",
+            "https": "يفتح عبر HTTPS"
         }
     },
     "failed": {
@@ -331,5 +345,82 @@
         "signIn": "سجّل الدخول أو أنشئ حسابك بالبريد {email} للانضمام إليه.",
         "expired": "انتهت صلاحية هذه الدعوة. اطلب من مالك الفريق إرسال دعوة جديدة.",
         "failed": "تعذّر الانضمام إلى الفريق"
+    },
+    "runway": {
+        "empty": "نفد",
+        "unused": "غير مستخدم",
+        "days": "{days, plural, zero {أقل من يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+        "long": "أكثر من 99 يومًا"
+    },
+    "alerts": {
+        "outOfCredit": "نفد الرصيد، الزملاء متوقفون مؤقتًا",
+        "machine": "الجهاز يحتاج إلى نظرة",
+        "disk": "القرص ممتلئ بنسبة {percent}%",
+        "invite": "بانتظار {email}",
+        "inviteExpired": "انتهت صلاحية دعوة {email}",
+        "lowCredit": "{days, plural, =0 {رصيد يكفي لأقل من يوم} zero {رصيد يكفي لأقل من يوم} one {رصيد يكفي ليوم واحد بعد} two {رصيد يكفي ليومين آخرين} few {رصيد يكفي لـ # أيام أخرى} many {رصيد يكفي لـ # يومًا آخر} other {رصيد يكفي لـ # يوم آخر}}",
+        "actions": {
+            "addCredit": "إضافة رصيد",
+            "seeMachine": "عرض الجهاز",
+            "resend": "إعادة إرسال الدعوة"
+        }
+    },
+    "firstVisit": {
+        "title": "{name} على وشك الافتتاح.",
+        "done": "تم",
+        "start": "ابدأ",
+        "steps": {
+            "brand": "إعداد علامتك التجارية",
+            "domain": "ربط نطاقك",
+            "workspace": "إنشاء أول مساحة عمل لك",
+            "team": "دعوة فريقك"
+        }
+    },
+    "setup": {
+        "title": "بدء التشغيل",
+        "progress": "{done} من {total}",
+        "done": "تم",
+        "created": "أُنشئت مساحة العمل",
+        "credit": "أُضيف {amount} رصيد",
+        "creditMissing": "إضافة الرصيد",
+        "adminJoins": "انضمام {email}",
+        "adminExpired": "انتهت صلاحية دعوة {email}",
+        "adminJoined": "انضم مشرفها",
+        "adminMissing": "انضمام مشرفها",
+        "coworker": "توظيف أول زميل",
+        "copyLink": "نسخ الرابط",
+        "resend": "إعادة الإرسال",
+        "invite": "دعوة"
+    },
+    "preview": {
+        "titles": {
+            "app": "معاينة التطبيق",
+            "auth": "معاينة صفحة تسجيل الدخول"
+        },
+        "admin": "مشرف",
+        "search": "بحث",
+        "inbox": "صندوق الوارد",
+        "chief": "Chief of Staff",
+        "credits": "الأرصدة",
+        "creditsLeft": "المتبقي {amount}",
+        "tier": "متوازن",
+        "composer": "أرسل رسالة...",
+        "attach": "إرفاق ملف",
+        "ask": "ابحث عن 100 وكالة ويب في ليون، وضعها في `leads` وأخبرني بما يلفت النظر. بنفس تنسيق https://example.com/report",
+        "tool": "يبحث في الويب",
+        "toolSummary": "تمت قراءة 40 صفحة",
+        "answer": "وجدت **100 وكالة ويب في ليون**، ولكل منها بريد إلكتروني عام للتواصل.\n\n- 38 منها تضم أقل من 10 أشخاص\n- 7 منها توظّف حاليًا",
+        "question": "إلى من أكتب أولًا؟",
+        "optionSmall": "الفرق الصغيرة الـ38",
+        "optionHiring": "الوكالات الـ7 التي توظّف",
+        "lines": {
+            "chief": "اكتملت المتابعة الصباحية.",
+            "nova": "المسودة جاهزة: 900 كلمة، ثلاثة أقسام.",
+            "ledger": "فواتير أكتوبر",
+            "pulse": "الموافقة على العملاء المحتملين في ليون",
+            "echo": "مزامنة CRM",
+            "vega": "أربعة عملاء محتملين جدد هذا الأسبوع."
+        },
+        "signIn": "تسجيل الدخول إلى {name}"
     }
 }

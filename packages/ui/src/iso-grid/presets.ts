@@ -2,6 +2,8 @@
 // dessiné en buddy ; les couleurs et les flags d'effets disent son état, et le buddy en tire son
 // humeur. Les apps l'importent dans leur adaptateur métier.
 
+import type { CoworkerLook } from "@rerun/contracts";
+
 import { brandIconToneFromUrl } from "../brand-icon";
 import { ISO_HALO_COLOR } from "./iso";
 import type { TileStyle } from "./types";
@@ -157,3 +159,15 @@ export function connectorTileStyle(icon: string | null | undefined): TileStyle {
 // Les spaces n'ont plus d'identité colorée : elles sont toutes rendues en blanc/neutre (rendu subtil
 // géré par ContainerBlock, qui reconnaît `#ffffff`). Une seule constante, pas de palette ni de cycle.
 export const SPACE_COLOR = "#ffffff";
+
+// The preset draws the buddy and its mood; the coworker's chosen look rides on top of it.
+export function wearLook(
+  style: TileStyle,
+  look: CoworkerLook | null | undefined,
+): TileStyle {
+  if (!look || !style.buddy) return style;
+  return {
+    ...style,
+    buddy: { ...(style.buddy === true ? {} : style.buddy), ...look },
+  };
+}

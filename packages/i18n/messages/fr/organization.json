@@ -6,7 +6,11 @@
         "team": "Équipe",
         "brand": "Marque",
         "domains": "Domaines",
-        "back": "Retour à l’app"
+        "back": "Retour à l’app",
+        "reserve": "{amount} <hint>en réserve</hint>",
+        "account": "Votre compte",
+        "switch": "{name}, changer de workspace",
+        "alerts": "{count, plural, one {# a besoin de vous} other {# ont besoin de vous}}"
     },
     "suspended": {
         "title": "Cette organisation est suspendue",
@@ -22,13 +26,14 @@
         "member": "Membre"
     },
     "status": {
-        "active": "Actif",
+        "active": "En ligne",
         "archived": "Archivé",
         "archiving": "Archivage",
         "restoring": "Restauration",
         "provisioning": "En création",
         "outOfCredit": "Sans crédit",
-        "suspended": "Suspendu"
+        "suspended": "Suspendu",
+        "waitingAdmin": "En attente de son admin"
     },
     "workspaces": {
         "title": "Workspaces",
@@ -37,55 +42,55 @@
         "limitReached": "{max, plural, one {Votre organisation est limitée à # workspace} other {Votre organisation est limitée à # workspaces}}",
         "search": "Rechercher un workspace",
         "noMatch": "Aucun workspace ne correspond à « {query} »",
-        "summary": "{members, plural, one {# membre} other {# membres}} · {coworkers, plural, one {# coworker} other {# coworkers}} · {credits, plural, one {# crédit} other {# crédits}}",
-        "columns": {
-            "name": "Nom",
-            "members": "Membres",
-            "coworkers": "Coworkers",
-            "credit": "Crédit restant",
-            "lastActivity": "Activité"
-        },
-        "noActivity": "Aucune",
-        "empty": {
-            "title": "Aucun workspace",
-            "description": "Créez-en un par client et invitez son premier admin."
-        },
+        "showMore": "Voir plus",
+        "board": "{count, plural, one {Board de {name}, # coworker} other {Board de {name}, # coworkers}}",
+        "credit": "{count, plural, one {{amount} crédit, {runway}} other {{amount} crédits, {runway}}}",
         "unnamed": "Workspace sans nom"
     },
     "create": {
         "title": "Nouveau workspace",
-        "description": "Son premier admin reçoit une invitation par email.",
+        "question": "Pour qui est-il ?",
+        "close": "Fermer",
         "logo": "Importer un logo",
-        "name": "Nom",
+        "name": "Client",
         "namePlaceholder": "Acme",
         "nameTooLong": "{max} caractères au plus",
-        "email": "Email du premier admin",
+        "email": "Son admin",
         "emailPlaceholder": "vous@entreprise.com",
         "emailInvalid": "Saisissez une adresse email valide",
         "logoTooLarge": "Cette image dépasse 8 Mo",
-        "submit": "Créer",
+        "credit": "Crédit de départ",
+        "noCredit": "Aucun",
+        "submit": "Créer et inviter",
+        "mailTo": "À {email}",
+        "mailTitle": "L’email d’invitation",
         "done": {
-            "title": "{name} est prêt",
-            "description": "Une invitation est partie à {email}.",
-            "linkHint": "Envoyez ce lien à {email}.",
+            "title": "{name} est prêt.",
+            "description": "{email} a reçu l’invitation. Ce lien fait la même chose :",
+            "sent": "{email} a reçu l’invitation.",
             "copyLink": "Copier le lien d’invitation",
-            "close": "Terminé",
+            "creditFailed": "Le crédit n’a pas pu être ajouté. Ajoutez-le depuis le workspace.",
             "open": "Voir le workspace"
         }
     },
     "detail": {
-        "back": "Workspaces",
-        "open": "Ouvrir le workspace",
+        "open": "Ouvrir",
+        "more": "Plus",
         "notReady": "Ce workspace n’est pas encore prêt",
         "archived": "Restaurez d’abord ce workspace",
-        "members": "Membres",
-        "credit": "Crédit",
+        "people": "Personnes",
         "usage": "Consommation",
+        "status": "Statut",
         "machine": "Machine",
-        "danger": "Gérer"
+        "admin": "Admin",
+        "noAdmin": "Pas encore",
+        "paused": "Les coworkers sont en pause",
+        "noCredit": "Pas encore de crédit",
+        "unspent": "Pas encore dépensé",
+        "daysLeft": "{days, plural, =0 {Moins d’un jour restant} one {Environ # jour restant} other {Environ # jours restants}}"
     },
     "people": {
-        "you": "(vous)",
+        "you": "Vous",
         "unknown": "Utilisateur inconnu",
         "invite": "Inviter",
         "role": "Rôle de {name}",
@@ -107,11 +112,12 @@
             "description": "Le lien envoyé à {email} ne fonctionne plus.",
             "confirm": "Annuler l’invitation",
             "keep": "Garder"
-        }
+        },
+        "resent": "Invitation envoyée à {email}",
+        "linkCopied": "Lien copié"
     },
     "invite": {
         "workspaceTitle": "Inviter dans {name}",
-        "teamTitle": "Inviter dans l’équipe",
         "description": "La personne reçoit une invitation par email.",
         "email": "Email",
         "emailPlaceholder": "vous@entreprise.com",
@@ -121,11 +127,10 @@
         "copyLink": "Copier le lien d’invitation",
         "done": "Terminé",
         "roles": {
-            "owner": "Tout, équipe, marque et domaines compris",
-            "admin": "Workspaces, membres et crédit",
             "workspaceAdmin": "Gère le workspace et ses membres",
             "workspaceMember": "Travaille avec les coworkers"
-        }
+        },
+        "teamPlaceholder": "collegue@entreprise.com"
     },
     "usage": {
         "empty": "Rien de consommé pour l’instant"
@@ -138,11 +143,8 @@
             "archiving": "Archivage",
             "archived": "Archivée",
             "restoring": "Restauration",
-            "none": "Aucune machine"
+            "none": "Pas démarrée"
         },
-        "disk": "Disque",
-        "diskUsed": "{used} sur {total}",
-        "diskUnknown": "Pas encore mesuré",
         "notStarted": "Démarre avec son premier coworker",
         "restart": "Redémarrer",
         "restartConfirm": {
@@ -150,20 +152,18 @@
             "description": "Les coworkers s’interrompent pendant environ une minute.",
             "confirm": "Redémarrer"
         },
-        "restarting": "La machine redémarre"
+        "restarting": "La machine redémarre",
+        "summary": "{state}, disque à {percent} %"
     },
     "danger": {
         "archive": "Archiver",
-        "archiveHint": "Arrête ses coworkers et garde ses données. Il compte toujours dans votre limite.",
         "archiveConfirm": {
             "title": "Archiver {name} ?",
             "description": "Ses membres perdent l’accès et ses coworkers s’arrêtent jusqu’à ce que vous le restauriez.",
             "confirm": "Archiver"
         },
         "restore": "Restaurer",
-        "restoreHint": "Comme avant, en quelques minutes.",
         "delete": "Supprimer",
-        "deleteHint": "Efface définitivement ses coworkers, fichiers et conversations.",
         "deleteConfirm": {
             "title": "Supprimer ce workspace ?",
             "description": "Ses coworkers, fichiers et conversations sont effacés définitivement. Le crédit que vous lui avez donné et qu’il n’a pas dépensé revient dans votre réserve.",
@@ -175,9 +175,7 @@
     },
     "credit": {
         "title": "Crédit",
-        "reserve": "Réserve",
-        "reserveHint": "Pas encore versé à un workspace",
-        "left": "Restant dans ce workspace",
+        "reserve": "En réserve",
         "add": "Ajouter du crédit",
         "takeBack": "Reprendre",
         "reserveEmpty": "La réserve est vide",
@@ -215,15 +213,35 @@
             "allocate": "Ajouter {count, plural, =0 {du crédit} one {# crédit} other {# crédits}}",
             "takeBack": "Reprendre {count, plural, =0 {du crédit} one {# crédit} other {# crédits}}"
         },
-        "tookLess": "{count, plural, =0 {Il ne restait aucun crédit à reprendre} one {Il ne restait que # crédit à reprendre} other {Il ne restait que # crédits à reprendre}}"
+        "tookLess": "{count, plural, =0 {Il ne restait aucun crédit à reprendre} one {Il ne restait que # crédit à reprendre} other {Il ne restait que # crédits à reprendre}}",
+        "withClients": "Chez les clients",
+        "inReserve": "{amount} en réserve",
+        "leftInReserve": "Reste {amount} en réserve",
+        "becomes": "→ {amount}",
+        "amountLabel": "Crédit à ajouter",
+        "more": "Plus",
+        "columns": {
+            "workspace": "Workspace",
+            "lasts": "Durée",
+            "has": "Solde",
+            "give": "Verser",
+            "then": "Ensuite"
+        },
+        "hasAndLasts": "{amount}, {runway}",
+        "give": "Crédit pour {name}",
+        "giveAll": "{count, plural, one {Verser # crédit} other {Verser # crédits}}",
+        "clear": "Effacer",
+        "tooMuch": "Plus que la réserve",
+        "notGiven": "{count, plural, one {# workspace n’a pas reçu son crédit} other {# workspaces n’ont pas reçu leur crédit}}"
     },
     "team": {
         "title": "Équipe",
-        "description": "Elle ouvre tous les workspaces sans que leurs membres la voient."
+        "hint": "Invisible pour vos clients",
+        "invited": "Invités",
+        "members": "Membres"
     },
     "brand": {
         "title": "Marque",
-        "description": "Ce que voient vos clients.",
         "name": "Nom",
         "nameInvalid": "De 1 à 40 caractères, sans {list}",
         "icon": "Icône",
@@ -247,18 +265,10 @@
         "supportPlaceholder": "support@entreprise.com",
         "supportHint": "Là où vos clients demandent de l’aide.",
         "emailInvalid": "Saisissez une adresse email valide",
-        "docs": "Documentation",
+        "docs": "Centre d’aide",
         "terms": "Conditions",
         "privacy": "Politique de confidentialité",
         "urlInvalid": "Utilisez une adresse complète, en https://",
-        "preview": {
-            "light": "Clair",
-            "dark": "Sombre",
-            "user": "Prépare le rapport hebdo",
-            "assistant": "C’est fait. <link>Ouvrir le rapport</link>",
-            "unread": "Non lu",
-            "progress": "Progression"
-        },
         "unsaved": "Modifications non enregistrées",
         "discard": "Annuler",
         "leave": {
@@ -266,26 +276,19 @@
             "description": "Vos modifications de la marque sont perdues.",
             "confirm": "Quitter",
             "stay": "Rester"
-        }
+        },
+        "identity": "Identité",
+        "contact": "Contact",
+        "legal": "Mentions légales"
     },
     "domains": {
         "title": "Domaines",
-        "description": "Là où vos clients se connectent.",
-        "default": "Adresse par défaut",
-        "custom": "Votre domaine",
         "copyAddress": "Copier l’adresse",
         "add": "Ajouter un domaine",
-        "empty": {
-            "title": "Aucun domaine",
-            "description": "Servez l’app depuis votre propre adresse."
-        },
         "status": {
-            "pending": "En attente du DNS",
-            "active": "Actif",
-            "error": "Erreur"
+            "active": "En ligne"
         },
         "record": {
-            "hint": "Ajoutez ces enregistrements là où votre domaine est géré. Ils peuvent mettre une heure à apparaître.",
             "type": "Type",
             "name": "Nom",
             "value": "Valeur",
@@ -293,7 +296,7 @@
             "copyValue": "Copier la valeur"
         },
         "checkedAt": "Dernière vérification : {time}",
-        "check": "Revérifier",
+        "check": "Vérifier",
         "remove": "Retirer",
         "removeConfirm": {
             "title": "Retirer {hostname} ?",
@@ -314,6 +317,17 @@
             "noToken": "L’enregistrement TXT est manquant.",
             "taken": "Quelqu’un d’autre a prouvé ce domaine avant vous.",
             "lookupFailed": "Le DNS de ce domaine n’a pas répondu. Nous réessaierons."
+        },
+        "signInAt": "Vos clients se connectent sur",
+        "moving": "Passage à {hostname}",
+        "lost": "{hostname} ne pointe plus ici",
+        "included": "Inclus",
+        "alsoAnswers": "Répond aussi",
+        "more": "Plus sur {hostname}",
+        "steps": {
+            "records": "Ajoutez ces enregistrements là où vous avez acheté le domaine",
+            "seen": "Nous le voyons pointer ici",
+            "https": "Il s’ouvre en HTTPS"
         }
     },
     "failed": {
@@ -331,5 +345,82 @@
         "signIn": "Connectez-vous ou créez votre compte avec {email} pour la rejoindre.",
         "expired": "Cette invitation a expiré. Demandez à un propriétaire de l’équipe de vous en envoyer une nouvelle.",
         "failed": "Impossible de rejoindre l’équipe"
+    },
+    "runway": {
+        "empty": "Épuisé",
+        "unused": "Inutilisé",
+        "days": "{days, plural, one {# jour} other {# jours}}",
+        "long": "99+ jours"
+    },
+    "alerts": {
+        "outOfCredit": "Plus de crédit, les coworkers sont en pause",
+        "machine": "La machine est à vérifier",
+        "disk": "Disque plein à {percent} %",
+        "invite": "En attente de {email}",
+        "inviteExpired": "L’invitation de {email} a expiré",
+        "lowCredit": "{days, plural, =0 {Du crédit pour moins d’un jour} one {Du crédit pour encore # jour} other {Du crédit pour encore # jours}}",
+        "actions": {
+            "addCredit": "Ajouter du crédit",
+            "seeMachine": "Voir la machine",
+            "resend": "Renvoyer l’invitation"
+        }
+    },
+    "firstVisit": {
+        "title": "{name} est presque ouvert.",
+        "done": "Terminé",
+        "start": "Commencer",
+        "steps": {
+            "brand": "Définir votre marque",
+            "domain": "Connecter votre domaine",
+            "workspace": "Créer votre premier workspace",
+            "team": "Inviter votre équipe"
+        }
+    },
+    "setup": {
+        "title": "Mise en ligne",
+        "progress": "{done} sur {total}",
+        "done": "Terminé",
+        "created": "Workspace créé",
+        "credit": "{amount} crédits ajoutés",
+        "creditMissing": "Crédit ajouté",
+        "adminJoins": "{email} rejoint",
+        "adminExpired": "L’invitation de {email} a expiré",
+        "adminJoined": "Son admin a rejoint",
+        "adminMissing": "Son admin rejoint",
+        "coworker": "Premier coworker recruté",
+        "copyLink": "Copier le lien",
+        "resend": "Renvoyer",
+        "invite": "Inviter"
+    },
+    "preview": {
+        "titles": {
+            "app": "Aperçu de l’app",
+            "auth": "Aperçu de la page de connexion"
+        },
+        "admin": "Admin",
+        "search": "Rechercher",
+        "inbox": "Boîte de réception",
+        "chief": "Chief of Staff",
+        "credits": "Crédits",
+        "creditsLeft": "{amount} restants",
+        "tier": "Équilibré",
+        "composer": "Envoyer un message...",
+        "attach": "Joindre un fichier",
+        "ask": "Trouve 100 agences web à Lyon, mets-les dans `leads` et dis-moi ce qui ressort. Même format que https://example.com/report",
+        "tool": "Recherche sur le web",
+        "toolSummary": "40 pages lues",
+        "answer": "J’ai trouvé **100 agences web à Lyon**, toutes avec un email de contact public.\n\n- 38 comptent moins de 10 personnes\n- 7 recrutent en ce moment",
+        "question": "À qui écrire en premier ?",
+        "optionSmall": "Les 38 petites équipes",
+        "optionHiring": "Les 7 qui recrutent",
+        "lines": {
+            "chief": "Check-in du matin terminé.",
+            "nova": "Le brouillon est prêt : 900 mots, trois sections.",
+            "ledger": "Factures d’octobre",
+            "pulse": "Valider les prospects de Lyon",
+            "echo": "Synchroniser le CRM",
+            "vega": "Quatre nouveaux leads cette semaine."
+        },
+        "signIn": "Se connecter à {name}"
     }
 }

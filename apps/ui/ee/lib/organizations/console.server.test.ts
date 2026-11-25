@@ -17,7 +17,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => mocks.
 vi.mock('@/supabase/session/getServerSession', () => ({ getSessionIdentity: mocks.getSessionIdentity, getAuthUser: vi.fn(), getServerSession: vi.fn(), getSessionWorkspace: vi.fn() }))
 vi.mock('@/lib/brand/server', () => ({ getBrand: async () => RERUN_BRAND }))
 vi.mock('@rerun/cloud/organizations', () => ({ get ORGANIZATIONS_ENABLED() { return mocks.enabled } }))
-vi.mock('@rerun/cloud/organizations.server', () => ({ organizationBrandOfWorkspace: async () => null, readOrganizationMachine: async () => null }))
+vi.mock('@rerun/cloud/organizations.server', () => ({ organizationBrandOfWorkspace: async () => null, readOrganizationMachine: async () => null, readOrganizationMachines: async () => new Map() }))
 vi.mock('@rerun/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 vi.mock('@rerun/cloud/email', () => ({ EMAIL_DELIVERY: false, sendWorkspaceInviteEmail: vi.fn() }))
 vi.mock('next/server', () => ({ after: () => {} }))

@@ -2,7 +2,7 @@
 // les types génériques de l'isogrid (Tile/Container/TileLink). Le package ne connaît que tiles &
 // containers ; toute la sémantique « agent » vit ici.
 
-import { SPACE_COLOR, agentTileStyle, disabledAgentTileStyle } from '@rerun/ui/iso-grid'
+import { SPACE_COLOR, agentTileStyle, disabledAgentTileStyle, wearLook } from '@rerun/ui/iso-grid'
 import { englishKitTranslator, type KitTranslator } from '@rerun/ui/locale'
 import type { Container, Tile, TileCountdown, TileLink, TileResults, TileStyle } from '@rerun/ui/iso-grid'
 import type { WorkspaceAccess } from '@/hooks/useWorkspaceAccess'
@@ -21,18 +21,12 @@ function pausedAgentTileStyle(name: string, access: Exclude<WorkspaceAccess, 'li
     return { ...locked, badge: null, opacity: 0.55, status: { label: 'Restoring', labelKey: 'restoring', tone: 'neutral', pinned: { label: 'Restoring', labelKey: 'restoring', spinner: true } } }
 }
 
-// The preset draws the buddy and its mood; the coworker's chosen look rides on top of it.
-function wearing(style: TileStyle, look: IsoAgent['look']): TileStyle {
-    if (!look || !style.buddy) return style
-    return { ...style, buddy: { ...(style.buddy === true ? {} : style.buddy), ...look } }
-}
-
 // `nextRun` is the agent's soonest scheduled run. One that is switched off or unreachable runs
 // nothing, so it announces nothing. `results` is what it finished that you have not opened, held
 // back while it works on the next thing. `t` writes what a screen reader says of the tile.
 export function tileFromAgent(a: IsoAgent, justPlaced = false, attentionCount = 0, access: WorkspaceAccess = 'live', nextRun: TileCountdown | null = null, results: TileResults | null = null, t: KitTranslator = englishKitTranslator): Tile {
     const disabled = !!a.disabledAt || access !== 'live'
-    const style = wearing(access !== 'live' ? pausedAgentTileStyle(a.name, access) : disabled ? disabledAgentTileStyle(a.name) : agentTileStyle(a.status, a.name, attentionCount), a.look)
+    const style = wearLook(access !== 'live' ? pausedAgentTileStyle(a.name, access) : disabled ? disabledAgentTileStyle(a.name) : agentTileStyle(a.status, a.name, attentionCount), a.look)
     const countdown = !disabled && a.status !== 'offline' ? nextRun : null
     const shownResults = !disabled && a.status !== 'working' && results && results.count > 0 ? results : null
     const state = t(`isoGrid.status.${access === 'paused' ? 'paused' : access === 'restoring' ? 'restoring' : disabled ? 'disabled' : a.status}`)

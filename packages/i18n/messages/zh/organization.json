@@ -6,7 +6,11 @@
         "team": "团队",
         "brand": "品牌",
         "domains": "域名",
-        "back": "返回应用"
+        "back": "返回应用",
+        "reserve": "{amount} <hint>储备积分</hint>",
+        "account": "您的账号",
+        "switch": "{name}，切换工作区",
+        "alerts": "{count, plural, other {# 项需要您处理}}"
     },
     "suspended": {
         "title": "此组织已被暂停",
@@ -22,13 +26,14 @@
         "member": "成员"
     },
     "status": {
-        "active": "活跃",
+        "active": "已上线",
         "archived": "已归档",
         "archiving": "归档中",
         "restoring": "恢复中",
         "provisioning": "设置中",
         "outOfCredit": "积分不足",
-        "suspended": "已暂停"
+        "suspended": "已暂停",
+        "waitingAdmin": "等待其管理员"
     },
     "workspaces": {
         "title": "工作区",
@@ -37,55 +42,55 @@
         "limitReached": "{max, plural, other {您的组织最多可有 # 个工作区}}",
         "search": "搜索工作区",
         "noMatch": "没有符合“{query}”的工作区",
-        "summary": "{members, plural, other {# 名成员}} · {coworkers, plural, other {# 位同事}} · {credits, plural, other {# 积分}}",
-        "columns": {
-            "name": "名称",
-            "members": "成员",
-            "coworkers": "同事",
-            "credit": "剩余积分",
-            "lastActivity": "最近活动"
-        },
-        "noActivity": "暂无",
-        "empty": {
-            "title": "还没有工作区",
-            "description": "为每位客户创建一个，并邀请其首位管理员。"
-        },
+        "showMore": "显示更多",
+        "board": "{count, plural, other {{name} 的看板，# 位同事}}",
+        "credit": "{count, plural, other {{amount} 积分，{runway}}}",
         "unnamed": "未命名工作区"
     },
     "create": {
         "title": "新建工作区",
-        "description": "其首位管理员将通过邮件收到邀请。",
+        "question": "为谁创建？",
+        "close": "关闭",
         "logo": "上传标志",
-        "name": "名称",
+        "name": "客户",
         "namePlaceholder": "Acme",
         "nameTooLong": "最多 {max} 个字符",
-        "email": "首位管理员的邮箱",
+        "email": "其管理员",
         "emailPlaceholder": "you@company.com",
         "emailInvalid": "请输入有效的邮箱地址",
         "logoTooLarge": "此图片超过 8 MB",
-        "submit": "创建",
+        "credit": "初始积分",
+        "noCredit": "无",
+        "submit": "创建并邀请",
+        "mailTo": "收件人：{email}",
+        "mailTitle": "邀请邮件",
         "done": {
-            "title": "{name} 已就绪",
-            "description": "我们已邀请 {email}。",
-            "linkHint": "请把此链接发给 {email}。",
+            "title": "{name} 已就绪。",
+            "description": "邀请已发送至 {email}。此链接同样有效：",
+            "sent": "邀请已发送至 {email}。",
             "copyLink": "复制邀请链接",
-            "close": "完成",
+            "creditFailed": "无法添加积分。请在工作区中添加。",
             "open": "查看工作区"
         }
     },
     "detail": {
-        "back": "工作区",
-        "open": "打开工作区",
+        "open": "打开",
+        "more": "更多",
         "notReady": "此工作区尚未就绪",
         "archived": "请先恢复此工作区",
-        "members": "成员",
-        "credit": "积分",
+        "people": "人员",
         "usage": "用量",
+        "status": "状态",
         "machine": "机器",
-        "danger": "管理"
+        "admin": "管理员",
+        "noAdmin": "暂无",
+        "paused": "同事已暂停",
+        "noCredit": "还没有积分",
+        "unspent": "尚未消费",
+        "daysLeft": "{days, plural, =0 {剩余不到一天} other {约剩 # 天}}"
     },
     "people": {
-        "you": "（您）",
+        "you": "您",
         "unknown": "未知用户",
         "invite": "邀请",
         "role": "{name} 的角色",
@@ -107,11 +112,12 @@
             "description": "发给 {email} 的链接将失效。",
             "confirm": "取消邀请",
             "keep": "保留"
-        }
+        },
+        "resent": "已向 {email} 发送邀请",
+        "linkCopied": "链接已复制"
     },
     "invite": {
         "workspaceTitle": "邀请加入 {name}",
-        "teamTitle": "邀请加入团队",
         "description": "对方将通过邮件收到邀请。",
         "email": "邮箱",
         "emailPlaceholder": "you@company.com",
@@ -121,11 +127,10 @@
         "copyLink": "复制邀请链接",
         "done": "完成",
         "roles": {
-            "owner": "全部权限，含团队、品牌和域名",
-            "admin": "工作区、成员和积分",
             "workspaceAdmin": "管理工作区及其成员",
             "workspaceMember": "与同事一起工作"
-        }
+        },
+        "teamPlaceholder": "colleague@company.com"
     },
     "usage": {
         "empty": "还没有消费"
@@ -138,11 +143,8 @@
             "archiving": "归档中",
             "archived": "已归档",
             "restoring": "恢复中",
-            "none": "无机器"
+            "none": "未启动"
         },
-        "disk": "磁盘",
-        "diskUsed": "{used} / {total}",
-        "diskUnknown": "尚未测量",
         "notStarted": "首位同事加入时启动",
         "restart": "重启",
         "restartConfirm": {
@@ -150,20 +152,18 @@
             "description": "同事将暂停当前工作约一分钟。",
             "confirm": "重启"
         },
-        "restarting": "机器正在重启"
+        "restarting": "机器正在重启",
+        "summary": "{state}，磁盘 {percent}%"
     },
     "danger": {
         "archive": "归档",
-        "archiveHint": "停止其同事并保留数据。仍计入您的上限。",
         "archiveConfirm": {
             "title": "归档 {name}？",
             "description": "其成员将失去访问权限，同事将停止，直到您恢复。",
             "confirm": "归档"
         },
         "restore": "恢复",
-        "restoreHint": "几分钟后恢复原状。",
         "delete": "删除",
-        "deleteHint": "永久清除其同事、文件和对话。",
         "deleteConfirm": {
             "title": "删除此工作区？",
             "description": "其同事、文件和对话将被永久清除。您给它且尚未用完的积分会回到您的储备。",
@@ -176,8 +176,6 @@
     "credit": {
         "title": "积分",
         "reserve": "储备",
-        "reserveHint": "尚未分配给工作区",
-        "left": "此工作区剩余",
         "add": "添加积分",
         "takeBack": "收回",
         "reserveEmpty": "储备为空",
@@ -215,15 +213,35 @@
             "allocate": "添加 {count, plural, =0 {积分} other {# 积分}}",
             "takeBack": "收回 {count, plural, =0 {积分} other {# 积分}}"
         },
-        "tookLess": "{count, plural, =0 {没有可收回的积分} other {仅有 # 积分可收回}}"
+        "tookLess": "{count, plural, =0 {没有可收回的积分} other {仅有 # 积分可收回}}",
+        "withClients": "客户持有",
+        "inReserve": "储备 {amount}",
+        "leftInReserve": "储备剩余 {amount}",
+        "becomes": "→ {amount}",
+        "amountLabel": "要添加的积分",
+        "more": "更多",
+        "columns": {
+            "workspace": "工作区",
+            "lasts": "可用时长",
+            "has": "现有",
+            "give": "分配",
+            "then": "之后"
+        },
+        "hasAndLasts": "{amount}，{runway}",
+        "give": "给 {name} 的积分",
+        "giveAll": "{count, plural, other {分配 # 积分}}",
+        "clear": "清除",
+        "tooMuch": "超出储备",
+        "notGiven": "{count, plural, other {# 个工作区未收到积分}}"
     },
     "team": {
         "title": "团队",
-        "description": "他们可以打开任何工作区，其成员看不到他们。"
+        "hint": "客户看不到他们",
+        "invited": "已邀请",
+        "members": "成员"
     },
     "brand": {
         "title": "品牌",
-        "description": "您的客户看到的内容。",
         "name": "名称",
         "nameInvalid": "1 到 40 个字符，不含 {list}",
         "icon": "图标",
@@ -247,18 +265,10 @@
         "supportPlaceholder": "support@company.com",
         "supportHint": "您的客户求助时联系的地址。",
         "emailInvalid": "请输入有效的邮箱地址",
-        "docs": "文档",
+        "docs": "帮助中心",
         "terms": "条款",
         "privacy": "隐私政策",
         "urlInvalid": "请使用完整地址，以 https:// 开头",
-        "preview": {
-            "light": "浅色",
-            "dark": "深色",
-            "user": "起草每周报告",
-            "assistant": "完成。<link>打开报告</link>",
-            "unread": "未读",
-            "progress": "进度"
-        },
         "unsaved": "有未保存的更改",
         "discard": "放弃",
         "leave": {
@@ -266,26 +276,19 @@
             "description": "您对品牌的更改将丢失。",
             "confirm": "离开",
             "stay": "留下"
-        }
+        },
+        "identity": "标识",
+        "contact": "联系方式",
+        "legal": "法律"
     },
     "domains": {
         "title": "域名",
-        "description": "您的客户登录的地址。",
-        "default": "默认地址",
-        "custom": "您的域名",
         "copyAddress": "复制地址",
         "add": "添加域名",
-        "empty": {
-            "title": "还没有域名",
-            "description": "用您自己的地址提供应用。"
-        },
         "status": {
-            "pending": "等待 DNS",
-            "active": "活跃",
-            "error": "错误"
+            "active": "已上线"
         },
         "record": {
-            "hint": "请在管理域名的地方添加这些记录。生效可能需要一小时。",
             "type": "类型",
             "name": "名称",
             "value": "值",
@@ -293,7 +296,7 @@
             "copyValue": "复制值"
         },
         "checkedAt": "上次检查：{time}",
-        "check": "重新检查",
+        "check": "立即检查",
         "remove": "移除",
         "removeConfirm": {
             "title": "移除 {hostname}？",
@@ -314,6 +317,17 @@
             "noToken": "缺少 TXT 记录。",
             "taken": "其他人已先验证了此域名。",
             "lookupFailed": "此域名的 DNS 没有响应。我们会再试一次。"
+        },
+        "signInAt": "您的客户登录地址",
+        "moving": "正在迁移到 {hostname}",
+        "lost": "{hostname} 已不再指向这里",
+        "included": "已包含",
+        "alsoAnswers": "其他可用地址",
+        "more": "{hostname} 的更多信息",
+        "steps": {
+            "records": "在您购买域名的地方添加这些记录",
+            "seen": "我们检测到它指向这里",
+            "https": "可通过 HTTPS 打开"
         }
     },
     "failed": {
@@ -331,5 +345,82 @@
         "signIn": "请使用 {email} 登录或创建账户以加入。",
         "expired": "此邀请已过期。请让团队所有者重新发送。",
         "failed": "无法加入团队"
+    },
+    "runway": {
+        "empty": "已用完",
+        "unused": "未使用",
+        "days": "{days, plural, other {# 天}}",
+        "long": "99+ 天"
+    },
+    "alerts": {
+        "outOfCredit": "积分不足，同事已暂停",
+        "machine": "机器需要检查",
+        "disk": "磁盘已用 {percent}%",
+        "invite": "等待 {email}",
+        "inviteExpired": "对 {email} 的邀请已过期",
+        "lowCredit": "{days, plural, =0 {积分不够用一天} other {积分还够用 # 天}}",
+        "actions": {
+            "addCredit": "添加积分",
+            "seeMachine": "查看机器",
+            "resend": "重发邀请"
+        }
+    },
+    "firstVisit": {
+        "title": "{name} 即将开放。",
+        "done": "已完成",
+        "start": "开始",
+        "steps": {
+            "brand": "设置您的品牌",
+            "domain": "连接您的域名",
+            "workspace": "创建您的首个工作区",
+            "team": "邀请您的团队"
+        }
+    },
+    "setup": {
+        "title": "上线",
+        "progress": "{done} / {total}",
+        "done": "已完成",
+        "created": "工作区已创建",
+        "credit": "已添加 {amount} 积分",
+        "creditMissing": "添加积分",
+        "adminJoins": "{email} 加入",
+        "adminExpired": "对 {email} 的邀请已过期",
+        "adminJoined": "其管理员已加入",
+        "adminMissing": "其管理员加入",
+        "coworker": "聘用首位同事",
+        "copyLink": "复制链接",
+        "resend": "重发",
+        "invite": "邀请"
+    },
+    "preview": {
+        "titles": {
+            "app": "应用预览",
+            "auth": "登录页面预览"
+        },
+        "admin": "管理员",
+        "search": "搜索",
+        "inbox": "收件箱",
+        "chief": "Chief of Staff",
+        "credits": "积分",
+        "creditsLeft": "剩余 {amount}",
+        "tier": "均衡",
+        "composer": "发送消息...",
+        "attach": "添加文件",
+        "ask": "找出里昂的 100 家网页设计公司，放入 `leads`，并告诉我有哪些突出之处。格式参照 https://example.com/report",
+        "tool": "正在搜索网页",
+        "toolSummary": "已读取 40 个网页",
+        "answer": "我找到了**里昂的 100 家网页设计公司**，全部都有公开的联系邮箱。\n\n- 38 家不足 10 人\n- 7 家目前正在招聘",
+        "question": "我应该先联系谁？",
+        "optionSmall": "38 个小团队",
+        "optionHiring": "7 家正在招聘的公司",
+        "lines": {
+            "chief": "早间例行查看已完成。",
+            "nova": "草稿已就绪：900 字，三个部分。",
+            "ledger": "十月发票",
+            "pulse": "批准里昂的潜在客户",
+            "echo": "同步 CRM",
+            "vega": "本周有四位新的潜在客户。"
+        },
+        "signIn": "登录 {name}"
     }
 }

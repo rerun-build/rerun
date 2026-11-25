@@ -4,7 +4,6 @@ import { getTranslations } from 'next-intl/server'
 import { WorkspaceDetailScreen } from '@/ee/components/organization/WorkspaceDetailScreen'
 import { openConsole, openConsoleWorkspace } from '@/ee/lib/organizations/console.server'
 import { getCreditUsage } from '@/ee/services/credit-usage.service'
-import { loadOrganizationCredit } from '@/ee/services/organization-credit.service'
 import { listOrganizationWorkspaceMembers } from '@/ee/services/organization-members.service'
 
 type WorkspacePageProps = { params: Promise<{ id: string }> }
@@ -23,6 +22,6 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
         console.error('[organizations] could not read the usage of a workspace', workspace.id, err)
         return null
     })
-    const [people, { balanceMicros }] = await Promise.all([listOrganizationWorkspaceMembers(ctx, workspace.id), loadOrganizationCredit(ctx)])
-    return <WorkspaceDetailScreen initial={{ workspace }} initialPeople={people} initialReserve={{ balanceMicros }} usage={usage} />
+    const people = await listOrganizationWorkspaceMembers(ctx, workspace.id)
+    return <WorkspaceDetailScreen key={workspace.id} initial={{ workspace }} initialPeople={people} usage={usage} />
 }

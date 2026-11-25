@@ -1,148 +1,232 @@
 'use client'
 
-import { Badge } from '@rerun/ui/primitives'
 import { creditsFromMicros, formatCredits } from '@rerun/contracts'
-import { formatNumber, shortRelativeTime } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
-import { Input } from '@/components/ui/input'
-import { PanelList } from '@/components/ui/panel-list'
-import { PANEL_CARD, PanelRow } from '@/components/ui/panel-row'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { ChevronRightIcon, LayersIcon, PlusIcon, SearchIcon } from '@/lib/icons'
+import { CONSOLE_NEW_WORKSPACE, consoleWorkspacePath } from '@/ee/lib/organizations/console-routes'
+import { LayersIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-import { ConsolePage } from './ConsolePage'
+import { alertOf, byAttention, isQuiet, runwayDays, type WorkspaceAlert } from './console-alerts'
+import { wholeCredits } from './input'
+import { ClientBoard, Dot, Heading, Page, Search } from './parts'
 import { SquareLogo } from './SquareLogo'
-import { WORKSPACE_STATUS_TONE, type ConsoleWorkspace, type ConsoleWorkspaceStatus, type WriteBlock } from './types'
+import type { ConsoleWorkspace, WriteBlock } from './types'
 import { useBlockReason } from './useBlockReason'
 
-// Past this many the list gets a search field: a handful is read at a glance.
-const SEARCH_FROM = 8
-
-const COLUMN = { count: 'w-20 text-end', credit: 'w-24 text-end', activity: 'w-24 text-end' }
+const PAGE_SIZE = 12
+const GRID = 'grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3'
 
 type WorkspacesViewProps = {
-    workspaces: ConsoleWorkspace[] | null
+    workspaces: ConsoleWorkspace[]
     maxWorkspaces: number
+    reserveMicros: number
     block: WriteBlock | null
-    onOpen: (workspace: ConsoleWorkspace) => void
-    onNew: () => void
+    resendingId: number | null
+    onAddCredit: (workspace: ConsoleWorkspace) => void
+    onResend: (workspace: ConsoleWorkspace) => void
 }
 
-export function WorkspacesView({ workspaces, maxWorkspaces, block, onOpen, onNew }: WorkspacesViewProps) {
+export function WorkspacesView({ workspaces, maxWorkspaces, reserveMicros, block, resendingId, onAddCredit, onResend }: WorkspacesViewProps) {
     const t = useTranslations('organization.workspaces')
+    const tCredit = useTranslations('organization.credit')
+    const tFirstVisit = useTranslations('organization.firstVisit')
     const blockReason = useBlockReason(block)
     const [query, setQuery] = useState('')
-    const count = workspaces?.length ?? 0
-    const full = !!workspaces && count >= maxWorkspaces
-    const newReason = blockReason ?? (full ? t('limitReached', { max: maxWorkspaces }) : undefined)
+    const [shown, setShown] = useState(PAGE_SIZE)
+    const needle = query.trim().toLowerCase()
+    const sorted = byAttention(needle ? workspaces.filter(workspace => workspace.name.toLowerCase().includes(needle)) : workspaces)
 
-    const newButton = (
-        <TooltipDisabledReason reason={newReason}>
-            <Button disabled={!workspaces || !!newReason} onClick={onNew}>
-                <PlusIcon />
-                {t('new')}
+    return (
+        <Page width="max-w-7xl">
+            <div className="space-y-8">
+                <Heading
+                    title={t('title')}
+                    meta={t('count', { count: workspaces.length, max: maxWorkspaces })}
+                    actions={
+                        <>
+                            <Search label={t('search')} value={query} onChange={setQuery} className="w-44 sm:w-56" />
+                            <NewWorkspaceButton reason={blockReason ?? (workspaces.length >= maxWorkspaces ? t('limitReached', { max: maxWorkspaces }) : undefined)} />
+                        </>
+                    }
+                />
+                {workspaces.length === 0 ? (
+                    <EmptyState icon={LayersIcon} title={tFirstVisit('steps.workspace')} className="py-16" />
+                ) : sorted.length === 0 ? (
+                    <p className="py-16 text-center text-sm break-words text-muted-foreground">{t('noMatch', { query: query.trim() })}</p>
+                ) : (
+                    <div className={GRID}>
+                        {sorted.slice(0, shown).map(workspace => (
+                            <BoardCard
+                                key={workspace.id}
+                                workspace={workspace}
+                                blockReason={blockReason}
+                                creditReason={wholeCredits(reserveMicros) < 1 ? tCredit('reserveEmpty') : undefined}
+                                resending={resendingId === workspace.id}
+                                onAddCredit={() => onAddCredit(workspace)}
+                                onResend={() => onResend(workspace)}
+                            />
+                        ))}
+                    </div>
+                )}
+                {sorted.length > shown && (
+                    <div className="flex justify-center">
+                        <Button variant="outline" onClick={() => setShown(current => current + PAGE_SIZE)}>
+                            {t('showMore')}
+                        </Button>
+                    </div>
+                )}
+            </div>
+        </Page>
+    )
+}
+
+function NewWorkspaceButton({ reason }: { reason?: string }) {
+    const t = useTranslations('organization.workspaces')
+    const label = (
+        <>
+            <PlusIcon />
+            {t('new')}
+        </>
+    )
+    if (!reason)
+        return (
+            <Link href={CONSOLE_NEW_WORKSPACE} className={buttonVariants()}>
+                {label}
+            </Link>
+        )
+    return (
+        <TooltipDisabledReason reason={reason}>
+            <Button disabled>{label}</Button>
+        </TooltipDisabledReason>
+    )
+}
+
+type BoardCardProps = { workspace: ConsoleWorkspace; blockReason?: string; creditReason?: string; resending: boolean; onAddCredit: () => void; onResend: () => void }
+
+function BoardCard({ workspace, blockReason, creditReason, resending, onAddCredit, onResend }: BoardCardProps) {
+    const { name, iconUrl, coworkers } = workspace
+    const alert = alertOf(workspace)
+    const href = consoleWorkspacePath(workspace.id)
+    return (
+        <article className="group relative min-w-0">
+            <div className="relative h-48 overflow-hidden rounded-xl ring-1 ring-border transition-shadow group-hover:ring-foreground/30">
+                {coworkers.length > 0 ? (
+                    <ClientBoard workspace={workspace} className={cn('size-full', isQuiet(workspace) && 'opacity-40 grayscale')} />
+                ) : (
+                    <div className="flex size-full items-center justify-center bg-background">
+                        <SquareLogo name={name} iconUrl={iconUrl} className={cn('size-16 rounded-2xl', isQuiet(workspace) && 'opacity-40 grayscale')} />
+                    </div>
+                )}
+            </div>
+            <div className="flex items-center gap-3 pt-3">
+                <SquareLogo name={name} iconUrl={iconUrl} className="size-8" />
+                <div className="min-w-0 flex-1">
+                    <h2 className="truncate text-sm font-medium">
+                        <Link href={href} className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-3 focus-visible:after:ring-ring/50">
+                            {name}
+                        </Link>
+                    </h2>
+                    {alert ? <AlertLine alert={alert} /> : <StatusText workspace={workspace} />}
+                </div>
+                {alert && <AlertAction alert={alert} href={href} reason={alert.kind === 'invite' ? blockReason : (blockReason ?? creditReason)} resending={resending} onAddCredit={onAddCredit} onResend={onResend} />}
+            </div>
+        </article>
+    )
+}
+
+function AlertLine({ alert }: { alert: WorkspaceAlert }) {
+    const text = useAlertText()(alert)
+    return (
+        <span className="flex min-w-0 items-center gap-2 text-xs">
+            <Dot tone={alert.severe ? 'red' : 'amber'} />
+            <span className="truncate" title={text}>
+                {text}
+            </span>
+        </span>
+    )
+}
+
+function useAlertText() {
+    const t = useTranslations('organization.alerts')
+    return (alert: WorkspaceAlert): string => {
+        if (alert.kind === 'disk') return t('disk', { percent: alert.percent })
+        if (alert.kind === 'invite') return t(alert.expired ? 'inviteExpired' : 'invite', { email: alert.email })
+        return alert.kind === 'lowCredit' ? t('lowCredit', { days: alert.days }) : t(alert.kind)
+    }
+}
+
+function AlertAction({ alert, href, reason, resending, onAddCredit, onResend }: { alert: WorkspaceAlert; href: string; reason?: string; resending: boolean; onAddCredit: () => void; onResend: () => void }) {
+    const t = useTranslations('organization.alerts.actions')
+    if (alert.kind === 'disk' || alert.kind === 'machine')
+        return (
+            <Link href={href} className={cn('relative', buttonVariants({ variant: 'outline', size: 'sm' }))}>
+                {t('seeMachine')}
+            </Link>
+        )
+    const inviting = alert.kind === 'invite'
+    return (
+        <TooltipDisabledReason reason={reason} className="relative">
+            <Button variant="outline" size="sm" className="relative" disabled={!!reason} loading={resending} onClick={inviting ? onResend : onAddCredit}>
+                {t(inviting ? 'resend' : 'addCredit')}
             </Button>
         </TooltipDisabledReason>
     )
-
-    return (
-        <ConsolePage title={t('title')} meta={workspaces && <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{t('count', { count, max: maxWorkspaces })}</span>} actions={newButton}>
-            {!workspaces ? <WorkspacesSkeleton /> : count === 0 ? <EmptyState icon={LayersIcon} title={t('empty.title')} description={t('empty.description')} className="py-16" /> : <WorkspaceList workspaces={workspaces} query={query} onQuery={setQuery} onOpen={onOpen} />}
-        </ConsolePage>
-    )
 }
 
-function WorkspaceList({ workspaces, query, onQuery, onOpen }: { workspaces: ConsoleWorkspace[]; query: string; onQuery: (query: string) => void; onOpen: (workspace: ConsoleWorkspace) => void }) {
-    const t = useTranslations('organization.workspaces')
-    const needle = query.trim().toLowerCase()
-    const shown = needle ? workspaces.filter(workspace => workspace.name.toLowerCase().includes(needle)) : workspaces
-    return (
-        <div className="space-y-3">
-            {workspaces.length > SEARCH_FROM && (
-                <div className="relative">
-                    <SearchIcon className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input type="search" aria-label={t('search')} placeholder={t('search')} value={query} onChange={event => onQuery(event.target.value)} className="ps-9 [&::-webkit-search-cancel-button]:hidden" />
-                </div>
-            )}
-            {shown.length === 0 ? (
-                <p className="py-10 text-center text-sm break-words text-muted-foreground">{t('noMatch', { query: query.trim() })}</p>
-            ) : (
-                <div>
-                    <div aria-hidden className="hidden items-center gap-4 px-3 pb-2 text-xs text-muted-foreground lg:flex">
-                        <span className="flex-1">{t('columns.name')}</span>
-                        <span className={COLUMN.count}>{t('columns.members')}</span>
-                        <span className={COLUMN.count}>{t('columns.coworkers')}</span>
-                        <span className={COLUMN.credit}>{t('columns.credit')}</span>
-                        <span className={COLUMN.activity}>{t('columns.lastActivity')}</span>
-                        <span className="w-4" />
-                    </div>
-                    <PanelList>
-                        {shown.map(workspace => (
-                            <WorkspaceRow key={workspace.id} workspace={workspace} onOpen={() => onOpen(workspace)} />
-                        ))}
-                    </PanelList>
-                </div>
-            )}
-        </div>
-    )
-}
-
-function WorkspaceRow({ workspace, onOpen }: { workspace: ConsoleWorkspace; onOpen: () => void }) {
-    const t = useTranslations('organization.workspaces')
+function StatusText({ workspace }: { workspace: ConsoleWorkspace }) {
+    const t = useTranslations('organization')
     const locale = useLocale()
-    const activity = workspace.lastActivityAt ? shortRelativeTime(workspace.lastActivityAt, locale) : t('noActivity')
-    return (
-        <PanelRow
-            onClick={onOpen}
-            leading={<SquareLogo name={workspace.name} iconUrl={workspace.iconUrl} />}
-            title={workspace.name}
-            meta={<WorkspaceStatusBadge status={workspace.status} />}
-            actions={
-                <span className="flex items-center gap-4 text-sm text-muted-foreground tabular-nums">
-                    <span className={cn('hidden lg:block', COLUMN.count)}>{formatNumber(workspace.memberCount, locale)}</span>
-                    <span className={cn('hidden lg:block', COLUMN.count)}>{formatNumber(workspace.coworkerCount, locale)}</span>
-                    <span className={cn('hidden lg:block', COLUMN.credit, workspace.creditMicros > 0 ? 'text-foreground' : 'text-destructive')}>{formatCredits(workspace.creditMicros, locale)}</span>
-                    <span className={cn('hidden lg:block', COLUMN.activity)}>{activity}</span>
-                    <ChevronRightIcon className="size-4" />
-                </span>
-            }
-        >
-            <span className="truncate text-xs text-muted-foreground lg:hidden">{t('summary', { members: workspace.memberCount, coworkers: workspace.coworkerCount, credits: creditsFromMicros(workspace.creditMicros) })}</span>
-        </PanelRow>
-    )
+    const runway = useRunwayText()(workspace)
+    return <p className="truncate text-xs text-muted-foreground tabular-nums">{isQuiet(workspace) ? t(`status.${workspace.status}`) : t('workspaces.credit', { count: creditsFromMicros(workspace.creditMicros), amount: formatCredits(workspace.creditMicros, locale), runway })}</p>
 }
 
-export function WorkspaceStatusBadge({ status }: { status: ConsoleWorkspaceStatus }) {
-    const t = useTranslations('organization.status')
-    return (
-        <Badge size="xs" tone={WORKSPACE_STATUS_TONE[status]} glow={false} className="shrink-0 font-medium">
-            {t(status)}
-        </Badge>
-    )
+export function useRunwayText() {
+    const t = useTranslations('organization.runway')
+    return (workspace: ConsoleWorkspace): string => {
+        if (workspace.creditMicros <= 0) return t('empty')
+        const days = runwayDays(workspace)
+        if (days === null) return t('unused')
+        return days > 99 ? t('long') : t('days', { days })
+    }
 }
 
-const NAME_WIDTHS = ['w-36', 'w-24', 'w-44', 'w-28', 'w-32']
-
-function WorkspacesSkeleton() {
+export function WorkspacesSkeleton() {
+    const t = useTranslations('organization.workspaces')
     return (
-        <PanelList>
-            {NAME_WIDTHS.map(width => (
-                <div key={width} className={cn('flex items-center gap-3 p-3', PANEL_CARD)}>
-                    <Skeleton className="size-9 shrink-0 rounded-lg" />
-                    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                        <Skeleton className={cn('h-3.5 max-w-full', width)} />
-                        <Skeleton className="h-3 w-4/5 lg:hidden" />
-                    </div>
-                    <Skeleton className="h-4 w-14 rounded-full" />
-                    <Skeleton className="hidden h-3.5 w-56 lg:block" />
+        <Page width="max-w-7xl">
+            <div className="space-y-8">
+                <Heading
+                    title={t('title')}
+                    meta={<Skeleton className="h-4 w-14" />}
+                    actions={
+                        <>
+                            <Skeleton className="h-8 w-44 rounded-lg sm:w-56" />
+                            <Skeleton className="h-9 w-36 rounded-lg" />
+                        </>
+                    }
+                />
+                <div className={GRID}>
+                    {['w-32', 'w-24', 'w-40', 'w-28', 'w-36', 'w-20'].map(width => (
+                        <div key={width} className="min-w-0">
+                            <Skeleton className="h-48 w-full rounded-xl" />
+                            <div className="flex items-center gap-3 pt-3">
+                                <Skeleton className="size-8 rounded-lg" />
+                                <div className="flex-1 space-y-1.5">
+                                    <Skeleton className={cn('h-3.5', width)} />
+                                    <Skeleton className="h-3 w-28" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            ))}
-        </PanelList>
+            </div>
+        </Page>
     )
 }

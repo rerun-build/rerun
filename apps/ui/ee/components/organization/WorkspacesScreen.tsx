@@ -1,50 +1,49 @@
 'use client'
 
-import { isStableLocale } from '@rerun/i18n'
-import { useLocale, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { createOrganizationWorkspaceAction, listOrganizationWorkspacesAction } from '@/ee/actions/organization.actions'
-import { consoleWorkspacePath } from '@/ee/lib/organizations/console-routes'
-import type { OrganizationWorkspaceSummary } from '@/ee/services/organization-workspaces.service'
+import { allocateOrganizationCreditAction, resendOrganizationWorkspaceInvitationAction } from '@/ee/actions/organization.actions'
+import type { ConsoleSetup } from '@/ee/lib/organizations/console.server'
 
-import { consoleWorkspaceOf } from './console-data'
-import { useWriteBlock } from './ConsoleProvider'
-import { CreateWorkspaceDialog, type NewWorkspace } from './CreateWorkspaceDialog'
-import { consoleStatusOf, isBusy } from './types'
+import { useConsole, useWriteBlock } from './ConsoleProvider'
+import { CreditTransferDialog } from './CreditTransferDialog'
+import { FirstVisit } from './FirstVisit'
+import type { ConsoleWorkspace } from './types'
 import { useConsoleChange } from './useConsoleChange'
-import { useConsoleData } from './useConsoleData'
 import { WorkspacesView } from './WorkspacesView'
 
-type WorkspaceList = { workspaces: OrganizationWorkspaceSummary[]; maxWorkspaces: number }
-
-const anyBusy = ({ workspaces }: WorkspaceList) => workspaces.some(workspace => isBusy(consoleStatusOf(workspace)))
-
-export function WorkspacesScreen({ initial }: { initial: WorkspaceList }) {
-    const t = useTranslations('organization.workspaces')
-    const locale = useLocale()
-    const router = useRouter()
+export function WorkspacesScreen({ setup }: { setup: ConsoleSetup | null }) {
+    const t = useTranslations('organization')
+    const { workspaces, maxWorkspaces, reserveMicros, brand, reload } = useConsole()
     const block = useWriteBlock()
-    const { data, reload } = useConsoleData(initial, listOrganizationWorkspacesAction, { waiting: anyBusy })
-    const { submit } = useConsoleChange(reload)
-    const [creating, setCreating] = useState(false)
+    const { pending, run, submit } = useConsoleChange<string>(reload)
+    const [giving, setGiving] = useState<ConsoleWorkspace | null>(null)
+    const [dialogOpen, setDialogOpen] = useState(false)
 
-    const open = (workspaceId: number) => router.push(consoleWorkspacePath(workspaceId))
+    if (workspaces.length === 0 && setup) return <FirstVisit brand={brand} setup={setup} />
 
-    const create = ({ name, adminEmail, logo }: NewWorkspace) => {
-        const form = new FormData()
-        form.append('name', name)
-        form.append('adminEmail', adminEmail)
-        if (isStableLocale(locale)) form.append('locale', locale)
-        if (logo) form.append('logoFile', logo)
-        return submit(() => createOrganizationWorkspaceAction(form))
+    const resend = ({ id, pendingAdmin }: ConsoleWorkspace) => {
+        if (!pendingAdmin) return
+        void run(String(id), () => resendOrganizationWorkspaceInvitationAction(id, pendingAdmin.invitationId), { done: () => toast.success(t('people.resent', { email: pendingAdmin.email })) })
     }
 
     return (
         <>
-            <WorkspacesView workspaces={data.workspaces.map(workspace => consoleWorkspaceOf(workspace, t('unnamed')))} maxWorkspaces={data.maxWorkspaces} block={block} onOpen={workspace => open(workspace.id)} onNew={() => setCreating(true)} />
-            <CreateWorkspaceDialog open={creating} onOpenChange={setCreating} onCreate={create} onView={open} />
+            <WorkspacesView
+                workspaces={workspaces}
+                maxWorkspaces={maxWorkspaces}
+                reserveMicros={reserveMicros}
+                block={block}
+                resendingId={pending ? Number(pending) : null}
+                onAddCredit={workspace => {
+                    setGiving(workspace)
+                    setDialogOpen(true)
+                }}
+                onResend={resend}
+            />
+            {giving && <CreditTransferDialog direction={dialogOpen ? 'allocate' : null} onOpenChange={setDialogOpen} reserveMicros={reserveMicros} workspaces={workspaces} fixedWorkspaceId={giving.id} onSubmit={transfer => submit(() => allocateOrganizationCreditAction(transfer))} />}
         </>
     )
 }

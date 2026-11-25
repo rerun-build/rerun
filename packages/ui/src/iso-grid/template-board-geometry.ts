@@ -1,8 +1,8 @@
-import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
+import type { CoworkerLook, TemplateAgent, TemplateConnector } from '@rerun/contracts'
 
 import { CABLE_DRAW_MS } from './components/TileLinks'
 import { BLOCK_HEIGHT, GRID_SIZE, TILE_H, TILE_W, hashUnit, isoPosition, tileTopLift } from './iso'
-import { type AgentStatus, agentTileStyle, connectorTileStyle } from './presets'
+import { type AgentStatus, agentTileStyle, connectorTileStyle, wearLook } from './presets'
 import type { Tile, TileLink } from './types'
 
 // The layout of a template's board, shared by the free-running preview (TemplateBoardPreview) and
@@ -114,7 +114,7 @@ function pickCell(ring: Cell[], anchor: Cell, keepOut: Set<string>, connectorCel
 // an agent. Stated as its own type rather than TemplateAgent so a caller that only holds this much
 // (an admin lab projecting rows down before sending them to the client) can render one too. A
 // template has no state to show, so `status` is only stated by a caller staging a scene of its own.
-export type BoardAgent = Pick<TemplateAgent, 'key' | 'name' | 'connectorSlugs'> & { status?: AgentStatus }
+export type BoardAgent = Pick<TemplateAgent, 'key' | 'name' | 'connectorSlugs'> & { status?: AgentStatus; look?: CoworkerLook | null }
 
 // L'identité d'un lien telle que TileLinks la reconstruit, pour qu'un appelant puisse en désigner un.
 export function templateLinkId(source: string, target: string) {
@@ -158,7 +158,7 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
             id: agent.key,
             position: anchors[index],
             span: 2,
-            style: agentTileStyle(agent.status ?? 'idle', agent.name),
+            style: wearLook(agentTileStyle(agent.status ?? 'idle', agent.name), agent.look),
             ariaLabel: agent.name,
         })
         dropDelays.set(agent.key, index * AGENT_STEP)

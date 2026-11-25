@@ -2,16 +2,39 @@
     "_context": {
         "nav.label": "Accessibility name of the navigation of the console an agency manages its clients' workspaces from.",
         "workspaces.count": "How many workspaces the agency has out of its limit, next to the page title.",
-        "workspaces.noActivity": "In the Last activity column, a workspace nobody has used yet.",
         "credit.reserve": "The credit the agency bought and has not given to a workspace yet.",
         "credit.takeBack": "Verb: move credit from a workspace back to the agency's reserve.",
         "credit.kinds.allocation": "A line of the credit history: credit was given to this workspace.",
         "credit.kinds.adjustment": "A line of the credit history: the balance was corrected by hand.",
-        "credit.change": "Before and after a transfer, as two figures.",
         "brand.guarded": "{status} is error, waiting or running: what this color already means in the app.",
-        "brand.preview.assistant": "Sample message of an AI coworker in a preview. The <link> part is a link.",
         "domains.record.name": "The Name column of a DNS record.",
-        "machine.states.none": "The workspace has no server at the moment."
+        "machine.states.none": "The workspace has no server yet.",
+        "nav.reserve": "The credit the agency can still give, at the top of its console. The <hint> part is dropped on a phone.",
+        "nav.switch": "Accessibility name of the menu that changes the workspace being looked at.",
+        "alerts.machine": "The server of a client's workspace is in error.",
+        "runway.empty": "How long the credit of a workspace lasts: there is none left.",
+        "runway.unused": "How long the credit of a workspace lasts: nothing was spent, so there is no estimate.",
+        "runway.days": "How long the credit of a workspace lasts.",
+        "create.question": "Title of the page that creates the workspace of a new client.",
+        "create.noCredit": "One of the amounts of credit to start with: none.",
+        "setup.title": "Title of the steps of a new workspace.",
+        "setup.coworker": "A step of a new workspace: its first AI coworker is there.",
+        "credit.columns.lasts": "Column: how long the credit of this workspace lasts.",
+        "credit.columns.has": "Column: the credit this workspace has.",
+        "credit.columns.give": "Column: the credit to give to this workspace, typed there.",
+        "credit.columns.then": "Column: the credit this workspace will have after that.",
+        "credit.becomes": "Follows the current balance: what it becomes once the credit is added.",
+        "credit.clear": "Button: empties the amounts typed.",
+        "credit.giveAll": "Button that gives the credit typed to every workspace at once.",
+        "domains.signInAt": "Introduces the address shown large under it.",
+        "domains.lost": "This domain was served and its DNS no longer points here.",
+        "team.hint": "Next to the title: the clients never see the people of the agency's team.",
+        "preview.ask": "Sample message a person writes to an AI coworker, in a preview. Keep the `leads` code span and the address.",
+        "preview.answer": "Sample answer of an AI coworker, in Markdown. Keep the bold and the list.",
+        "preview.tier": "Name of a level of AI model, under the chat input.",
+        "firstVisit.title": "First visit of an agency that has no client yet.",
+        "credit.dialog.change": "Before and after a transfer, as two figures.",
+        "preview.signIn": "Title of an agency's sign-in page, in a preview. {name} is the agency's brand."
     },
     "nav": {
         "label": "Organization",
@@ -20,7 +43,11 @@
         "team": "Team",
         "brand": "Brand",
         "domains": "Domains",
-        "back": "Back to the app"
+        "back": "Back to the app",
+        "reserve": "{amount} <hint>in reserve</hint>",
+        "account": "Your account",
+        "switch": "{name}, change workspace",
+        "alerts": "{count, plural, one {# needs you} other {# need you}}"
     },
     "suspended": {
         "title": "This organization is suspended",
@@ -36,70 +63,71 @@
         "member": "Member"
     },
     "status": {
-        "active": "Active",
+        "active": "Live",
         "archived": "Archived",
         "archiving": "Archiving",
         "restoring": "Restoring",
         "provisioning": "Setting up",
         "outOfCredit": "Out of credit",
-        "suspended": "Suspended"
+        "suspended": "Suspended",
+        "waitingAdmin": "Waiting for its admin"
     },
     "workspaces": {
         "title": "Workspaces",
         "count": "{count} of {max}",
         "new": "New workspace",
         "limitReached": "{max, plural, one {Your organization is limited to # workspace} other {Your organization is limited to # workspaces}}",
-        "search": "Search workspaces",
+        "search": "Find a workspace",
         "noMatch": "No workspace matches “{query}”",
-        "summary": "{members, plural, one {# member} other {# members}} · {coworkers, plural, one {# coworker} other {# coworkers}} · {credits, plural, one {# credit} other {# credits}}",
-        "columns": {
-            "name": "Name",
-            "members": "Members",
-            "coworkers": "Coworkers",
-            "credit": "Credit left",
-            "lastActivity": "Last activity"
-        },
-        "noActivity": "None yet",
-        "empty": {
-            "title": "No workspace yet",
-            "description": "Create one for each client and invite its first admin."
-        },
+        "showMore": "Show more",
+        "board": "{count, plural, one {Board of {name}, # coworker} other {Board of {name}, # coworkers}}",
+        "credit": "{count, plural, one {{amount} credit, {runway}} other {{amount} credits, {runway}}}",
         "unnamed": "Untitled workspace"
     },
     "create": {
         "title": "New workspace",
-        "description": "Its first admin gets an invitation by email.",
+        "question": "Who is it for?",
+        "close": "Close",
         "logo": "Upload a logo",
-        "name": "Name",
+        "name": "Client",
         "namePlaceholder": "Acme",
         "nameTooLong": "{max} characters at most",
-        "email": "First admin’s email",
+        "email": "Their admin",
         "emailPlaceholder": "you@company.com",
         "emailInvalid": "Enter a valid email address",
         "logoTooLarge": "This image is larger than 8 MB",
-        "submit": "Create",
+        "credit": "Credit to start with",
+        "noCredit": "None",
+        "submit": "Create and invite",
+        "mailTo": "To {email}",
+        "mailTitle": "The invitation email",
         "done": {
-            "title": "{name} is ready",
-            "description": "We invited {email}.",
-            "linkHint": "Send this link to {email}.",
+            "title": "{name} is ready.",
+            "description": "{email} has the invite. This link does the same:",
+            "sent": "{email} has the invite.",
             "copyLink": "Copy the invitation link",
-            "close": "Done",
-            "open": "View workspace"
+            "creditFailed": "The credit could not be added. Add it from the workspace.",
+            "open": "See workspace"
         }
     },
     "detail": {
-        "back": "Workspaces",
-        "open": "Open workspace",
+        "open": "Open",
+        "more": "More",
         "notReady": "This workspace is not ready yet",
         "archived": "Restore this workspace first",
-        "members": "Members",
-        "credit": "Credit",
+        "people": "People",
         "usage": "Usage",
+        "status": "Status",
         "machine": "Machine",
-        "danger": "Manage"
+        "admin": "Admin",
+        "noAdmin": "None yet",
+        "paused": "Coworkers are paused",
+        "noCredit": "No credit yet",
+        "unspent": "Not spent yet",
+        "daysLeft": "{days, plural, =0 {Less than a day left} one {About # day left} other {About # days left}}"
     },
     "people": {
-        "you": "(you)",
+        "you": "You",
         "unknown": "Unknown user",
         "invite": "Invite",
         "role": "Role of {name}",
@@ -121,11 +149,12 @@
             "description": "The link sent to {email} stops working.",
             "confirm": "Cancel invitation",
             "keep": "Keep"
-        }
+        },
+        "resent": "Invitation sent to {email}",
+        "linkCopied": "Link copied"
     },
     "invite": {
         "workspaceTitle": "Invite to {name}",
-        "teamTitle": "Invite to the team",
         "description": "They get an invitation by email.",
         "email": "Email",
         "emailPlaceholder": "you@company.com",
@@ -135,11 +164,10 @@
         "copyLink": "Copy the invitation link",
         "done": "Done",
         "roles": {
-            "owner": "Everything, team, brand and domains included",
-            "admin": "Workspaces, members and credit",
             "workspaceAdmin": "Manages the workspace and its members",
             "workspaceMember": "Works with the coworkers"
-        }
+        },
+        "teamPlaceholder": "colleague@company.com"
     },
     "usage": {
         "empty": "Nothing spent yet"
@@ -152,11 +180,8 @@
             "archiving": "Archiving",
             "archived": "Archived",
             "restoring": "Restoring",
-            "none": "No machine"
+            "none": "Not started"
         },
-        "disk": "Disk",
-        "diskUsed": "{used} of {total}",
-        "diskUnknown": "Not measured yet",
         "notStarted": "Starts with its first coworker",
         "restart": "Restart",
         "restartConfirm": {
@@ -164,20 +189,18 @@
             "description": "Coworkers stop what they are doing for about a minute.",
             "confirm": "Restart"
         },
-        "restarting": "The machine is restarting"
+        "restarting": "The machine is restarting",
+        "summary": "{state}, disk {percent}%"
     },
     "danger": {
         "archive": "Archive",
-        "archiveHint": "Stops its coworkers and keeps its data. It still counts in your limit.",
         "archiveConfirm": {
             "title": "Archive {name}?",
             "description": "Its members lose access and its coworkers stop until you restore it.",
             "confirm": "Archive"
         },
         "restore": "Restore",
-        "restoreHint": "Back as it was, in a few minutes.",
         "delete": "Delete",
-        "deleteHint": "Erases its coworkers, files and conversations for good.",
         "deleteConfirm": {
             "title": "Delete this workspace?",
             "description": "Its coworkers, files and conversations are erased for good. Credit you gave it and it has not spent goes back to your reserve.",
@@ -189,9 +212,7 @@
     },
     "credit": {
         "title": "Credit",
-        "reserve": "Reserve",
-        "reserveHint": "Not given to a workspace yet",
-        "left": "Left in this workspace",
+        "reserve": "In reserve",
         "add": "Add credit",
         "takeBack": "Take back",
         "reserveEmpty": "The reserve is empty",
@@ -229,15 +250,35 @@
             "allocate": "Add {count, plural, =0 {credit} one {# credit} other {# credits}}",
             "takeBack": "Take back {count, plural, =0 {credit} one {# credit} other {# credits}}"
         },
-        "tookLess": "{count, plural, =0 {No credit was left to take back} one {Only # credit was left to take back} other {Only # credits were left to take back}}"
+        "tookLess": "{count, plural, =0 {No credit was left to take back} one {Only # credit was left to take back} other {Only # credits were left to take back}}",
+        "withClients": "With clients",
+        "inReserve": "{amount} in reserve",
+        "leftInReserve": "{amount} left in reserve",
+        "becomes": "→ {amount}",
+        "amountLabel": "Credit to add",
+        "more": "More",
+        "columns": {
+            "workspace": "Workspace",
+            "lasts": "Lasts",
+            "has": "Has",
+            "give": "Give",
+            "then": "Then"
+        },
+        "hasAndLasts": "{amount}, {runway}",
+        "give": "Credit for {name}",
+        "giveAll": "{count, plural, one {Give # credit} other {Give # credits}}",
+        "clear": "Clear",
+        "tooMuch": "More than the reserve",
+        "notGiven": "{count, plural, one {# workspace did not get its credit} other {# workspaces did not get their credit}}"
     },
     "team": {
         "title": "Team",
-        "description": "They open any workspace without its members seeing them."
+        "hint": "Clients never see them",
+        "invited": "Invited",
+        "members": "Members"
     },
     "brand": {
         "title": "Brand",
-        "description": "What your clients see.",
         "name": "Name",
         "nameInvalid": "1 to 40 characters, without {list}",
         "icon": "Icon",
@@ -261,18 +302,10 @@
         "supportPlaceholder": "support@company.com",
         "supportHint": "Where your clients write for help.",
         "emailInvalid": "Enter a valid email address",
-        "docs": "Documentation",
+        "docs": "Help center",
         "terms": "Terms",
         "privacy": "Privacy policy",
         "urlInvalid": "Use a full address, starting with https://",
-        "preview": {
-            "light": "Light",
-            "dark": "Dark",
-            "user": "Draft the weekly report",
-            "assistant": "Done. <link>Open the report</link>",
-            "unread": "Unread",
-            "progress": "Progress"
-        },
         "unsaved": "Unsaved changes",
         "discard": "Discard",
         "leave": {
@@ -280,26 +313,19 @@
             "description": "Your changes to the brand are lost.",
             "confirm": "Leave",
             "stay": "Stay"
-        }
+        },
+        "identity": "Identity",
+        "contact": "Contact",
+        "legal": "Legal"
     },
     "domains": {
         "title": "Domains",
-        "description": "Where your clients sign in.",
-        "default": "Default address",
-        "custom": "Your domain",
         "copyAddress": "Copy the address",
-        "add": "Add domain",
-        "empty": {
-            "title": "No domain yet",
-            "description": "Serve the app from your own address."
-        },
+        "add": "Add a domain",
         "status": {
-            "pending": "Waiting for DNS",
-            "active": "Active",
-            "error": "Error"
+            "active": "Live"
         },
         "record": {
-            "hint": "Add these records where your domain is managed. They can take an hour to show.",
             "type": "Type",
             "name": "Name",
             "value": "Value",
@@ -307,7 +333,7 @@
             "copyValue": "Copy the value"
         },
         "checkedAt": "Last check: {time}",
-        "check": "Check again",
+        "check": "Check now",
         "remove": "Remove",
         "removeConfirm": {
             "title": "Remove {hostname}?",
@@ -328,6 +354,17 @@
             "noToken": "The TXT record is missing.",
             "taken": "Someone else proved this domain first.",
             "lookupFailed": "The DNS of this domain did not answer. We will try again."
+        },
+        "signInAt": "Your clients sign in at",
+        "moving": "Moving to {hostname}",
+        "lost": "{hostname} stopped pointing here",
+        "included": "Included",
+        "alsoAnswers": "Also answers",
+        "more": "More about {hostname}",
+        "steps": {
+            "records": "Add these records where you bought the domain",
+            "seen": "We see it point here",
+            "https": "It opens over HTTPS"
         }
     },
     "failed": {
@@ -345,5 +382,82 @@
         "signIn": "Sign in or create your account with {email} to join it.",
         "expired": "This invitation has expired. Ask an owner of the team to send a new one.",
         "failed": "Could not join the team"
+    },
+    "runway": {
+        "empty": "Empty",
+        "unused": "Unused",
+        "days": "{days, plural, one {# day} other {# days}}",
+        "long": "99+ days"
+    },
+    "alerts": {
+        "outOfCredit": "Out of credit, coworkers are paused",
+        "machine": "The machine needs a look",
+        "disk": "Disk {percent}% full",
+        "invite": "Waiting for {email}",
+        "inviteExpired": "The invitation of {email} expired",
+        "lowCredit": "{days, plural, =0 {Credit for less than a day} one {Credit for # more day} other {Credit for # more days}}",
+        "actions": {
+            "addCredit": "Add credit",
+            "seeMachine": "See machine",
+            "resend": "Resend invite"
+        }
+    },
+    "firstVisit": {
+        "title": "{name} is almost open.",
+        "done": "Done",
+        "start": "Start",
+        "steps": {
+            "brand": "Set your brand",
+            "domain": "Connect your domain",
+            "workspace": "Create your first workspace",
+            "team": "Invite your team"
+        }
+    },
+    "setup": {
+        "title": "Going live",
+        "progress": "{done} of {total}",
+        "done": "Done",
+        "created": "Workspace created",
+        "credit": "{amount} credits added",
+        "creditMissing": "Credit added",
+        "adminJoins": "{email} joins",
+        "adminExpired": "The invitation of {email} expired",
+        "adminJoined": "Its admin joined",
+        "adminMissing": "Its admin joins",
+        "coworker": "First coworker hired",
+        "copyLink": "Copy link",
+        "resend": "Resend",
+        "invite": "Invite"
+    },
+    "preview": {
+        "titles": {
+            "app": "Preview of the app",
+            "auth": "Preview of the sign-in page"
+        },
+        "admin": "Admin",
+        "search": "Search",
+        "inbox": "Inbox",
+        "chief": "Chief of Staff",
+        "credits": "Credits",
+        "creditsLeft": "{amount} left",
+        "tier": "Balanced",
+        "composer": "Send a message...",
+        "attach": "Attach a file",
+        "ask": "Find 100 web agencies in Lyon, put them in `leads` and tell me what stands out. Same format as https://example.com/report",
+        "tool": "Searching the web",
+        "toolSummary": "40 pages read",
+        "answer": "I found **100 web agencies in Lyon**, all with a public contact email.\n\n- 38 have fewer than 10 people\n- 7 are hiring right now",
+        "question": "Who should I write to first?",
+        "optionSmall": "The 38 small teams",
+        "optionHiring": "The 7 that are hiring",
+        "lines": {
+            "chief": "Morning check-in done.",
+            "nova": "The draft is ready: 900 words, three sections.",
+            "ledger": "October invoices",
+            "pulse": "Approve the Lyon prospects",
+            "echo": "Sync the CRM",
+            "vega": "Four new leads this week."
+        },
+        "signIn": "Sign in to {name}"
     }
 }
