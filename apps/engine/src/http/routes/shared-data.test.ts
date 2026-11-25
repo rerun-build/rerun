@@ -26,8 +26,10 @@ describe('shared database over HTTP', () => {
     it('never exposes its bookkeeping table', async () => {
         const tables = (await (await app.request('/shared/data/tables')).json()) as { tables: { name: string }[] }
         expect(tables.tables.map(t => t.name)).not.toContain('_rerun_shared_tables')
-        expect((await app.request('/shared/data/tables/_rerun_shared_tables/rows')).status).toBe(500)
+        expect((await app.request('/shared/data/tables/_rerun_shared_tables/rows')).status).toBe(400)
         expect((await app.request('/shared/data/tables/_rerun_shared_tables/purge', { method: 'POST' })).status).toBe(500)
+        const insert = await post('/shared/data/tables/_rerun_shared_tables/rows', { values: { name: 'x' } })
+        expect(insert.status).toBe(400)
     })
 
     it('reads back what was written and refuses a write on the query endpoint', async () => {

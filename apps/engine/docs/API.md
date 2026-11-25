@@ -1117,6 +1117,9 @@ the database's message.
 { "tables": [ { "name": "leads", "columns": [ { "name": "id", "type": "INTEGER", "pk": true, "notnull": false } ] } ] }
 ```
 
+`?counts=1` adds `"rows"`, the number of rows, to each table. It counts every table, so only ask
+for it when it is shown.
+
 ### `POST <base>/query`
 
 A read-only statement (anything that writes is refused). `limit` defaults to 100, max 1000.
@@ -1147,10 +1150,18 @@ A page of rows: `limit` (default 50, max 500), `offset`, `sort` + `dir`, `q` (te
 { "columns": ["id", "name"], "rows": [{ "id": 1, "name": "Ana" }], "total": 120 }
 ```
 
+An unknown table or column answers `400` with its name.
+
 ### `GET <base>/tables/:name/groups?groupBy=<column>`
 
 Row counts per value of a column (`groupBy` required), at most 50 groups, with an optional `sum`
 column, and the same `where` and `q`: `{ "groups": [{ "value": "Paris", "total": 12, "sum": 3400 }] }`.
+
+### `POST <base>/tables/:name/rows`
+
+Adds one row: `{ "values": { "name": "Tom", "email": "tom@globex.io" } }`. Answers `201` with
+`{ "row": { "__rowid": 2, ... } }`, the row as saved. An unknown column, an empty row or a broken
+constraint answers `400`. A table `WITHOUT ROWID` is refused.
 
 ### `PATCH <base>/tables/:name/rows/:rowid`
 

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const engineDbColumnSchema = z.object({ name: z.string(), type: z.string(), pk: z.boolean(), notnull: z.boolean() })
-export const engineDbTableSchema = z.object({ name: z.string(), columns: z.array(engineDbColumnSchema) })
+export const engineDbTableSchema = z.object({ name: z.string(), columns: z.array(engineDbColumnSchema), rows: z.number().optional() })
 export const engineDbTablesListSchema = z.object({ tables: z.array(engineDbTableSchema) })
 export const engineDbRowsSchema = z.object({ columns: z.array(z.string()), rows: z.array(z.record(z.string(), z.unknown())), total: z.number() })
 export const engineDeleteRowsResultSchema = z.object({ deleted: z.number() })

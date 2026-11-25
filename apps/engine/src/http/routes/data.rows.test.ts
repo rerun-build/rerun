@@ -84,9 +84,13 @@ describe('reading table rows', () => {
         expect(page.rows[0].name).toBe('item-599')
     })
 
-    // Looks wrong: an unknown table is the caller's mistake but answers as a server fault.
-    it('answers 500 on a table that does not exist', async () => {
-        expect((await app.request(`${base}/tables/nope/rows`)).status).toBe(500)
+    it('refuses an unknown table or column with the reason', async () => {
+        const missing = await app.request(`${base}/tables/nope/rows`)
+        expect(missing.status).toBe(400)
+        expect(await missing.json()).toEqual({ error: 'Table not found: nope' })
+        const column = await app.request(`${base}/tables/items/rows?where=${encodeURIComponent(JSON.stringify([{ column: 'ghost', equals: 1 }]))}`)
+        expect(column.status).toBe(400)
+        expect(await column.json()).toEqual({ error: 'Column not found: ghost' })
     })
 })
 
@@ -151,5 +155,45 @@ describe('exporting a table', () => {
         const text = await res.text()
         expect(JSON.parse(text)).toEqual([{ id: 2, name: 'Bob', note: 'line one\nline two' }])
         expect(text).toContain('\n  ')
+    })
+})
+
+describe('adding and editing a row', () => {
+    beforeAll(async () => {
+        await execute('CREATE TABLE clients (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT)')
+        await execute("INSERT INTO clients (name, email) VALUES ('Marie', 'marie@northwind.com')")
+    })
+
+    function send(method: 'POST' | 'PATCH', path: string, body: unknown) {
+        return app.request(`${base}/tables/${path}`, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+    }
+
+    it('adds a row and answers it with its rowid', async () => {
+        const res = await send('POST', 'clients/rows', { values: { name: 'Tom', email: 'tom@globex.io' } })
+        expect(res.status).toBe(201)
+        const { row } = (await res.json()) as { row: Record<string, unknown> }
+        expect(row).toEqual({ __rowid: 2, id: 2, name: 'Tom', email: 'tom@globex.io' })
+        expect(await count('clients')).toBe(2)
+    })
+
+    it('refuses an unknown column, an empty row and a broken constraint', async () => {
+        expect((await send('POST', 'clients/rows', { values: { name: 'Sara', phone: '1' } })).status).toBe(400)
+        expect((await send('POST', 'clients/rows', { values: {} })).status).toBe(400)
+        expect((await send('POST', 'clients/rows', { values: { email: 'nobody@x.io' } })).status).toBe(400)
+        expect((await send('POST', 'missing/rows', { values: { name: 'Sara' } })).status).toBe(400)
+        expect(await count('clients')).toBe(2)
+    })
+
+    it('edits a row in place', async () => {
+        const res = await send('PATCH', 'clients/rows/1', { values: { email: 'marie@initech.co' } })
+        expect(res.status).toBe(200)
+        expect(((await res.json()) as { row: Record<string, unknown> }).row).toEqual({ __rowid: 1, id: 1, name: 'Marie', email: 'marie@initech.co' })
+        expect((await send('PATCH', 'clients/rows/99', { values: { email: 'x' } })).status).toBe(400)
+    })
+
+    it('counts the rows of each table only when asked', async () => {
+        const listed = async (query: string) => ((await (await app.request(`${base}/tables${query}`)).json()) as { tables: { name: string; rows?: number }[] }).tables
+        expect((await listed('?counts=1')).find(table => table.name === 'clients')?.rows).toBe(2)
+        expect((await listed('')).find(table => table.name === 'clients')?.rows).toBeUndefined()
     })
 })

@@ -49,4 +49,5 @@ export type EngineDbGroup = z.infer<typeof engineDbGroupSchema>
 
 export const rowUpdateSchema = z.object({ values: z.record(z.string(), sqlValueSchema) })
 export type RowUpdate = z.infer<typeof rowUpdateSchema>
+export const rowInsertSchema = z.object({ values: z.record(z.string(), sqlValueSchema) })
 export const engineRowUpdateResultSchema = z.object({ row: z.record(z.string(), z.unknown()) })

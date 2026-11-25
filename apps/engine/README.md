@@ -175,7 +175,8 @@ GET|POST /agents/:id/triggers   GET|PATCH|DELETE /triggers/:slug   POST /trigger
 files   /agents/:id/files   /shared/files   /agents/:id/skills/:slug/files
         GET / /read /raw   PUT / /raw   POST /raw /move /dir   DELETE /
 data    /agents/:id/data   /shared/data
-        GET /tables   POST /query /execute /sources   GET|DELETE /tables/:name   ...
+        GET /tables[?counts=1]   POST /query /execute /sources   GET|DELETE /tables/:name
+        GET|POST /tables/:name/rows   PATCH /tables/:name/rows/:rowid   ...
 
 GET    /brain/pages   GET|PUT|DELETE /brain/pages/:slug   ...   GET /brain/proposals   POST /brain/seed
 GET|POST /brain/skills   GET|PATCH|DELETE /brain/skills/:slug   POST /brain/skills/share

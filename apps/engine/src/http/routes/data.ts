@@ -2,8 +2,8 @@ import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { Client } from '@libsql/client'
 import { z } from 'zod'
-import { dbExecuteSchema, dbQuerySchema, rowFilterSchema, rowUpdateSchema, tableSourcesRequestSchema, tableSourcesResultSchema, tableViewInputSchema } from '@rerun/contracts'
-import { deleteTableRows, dropTable, executeStore, exportTableRows, groupTableRows, listTables, purgeTable, queryStore, readTableRows, updateTableRow } from '../../db/sqlStore.js'
+import { dbExecuteSchema, dbQuerySchema, rowFilterSchema, rowInsertSchema, rowUpdateSchema, tableSourcesRequestSchema, tableSourcesResultSchema, tableViewInputSchema } from '@rerun/contracts'
+import { deleteTableRows, dropTable, executeStore, exportTableRows, groupTableRows, insertTableRow, listTables, listTablesWithRowCounts, purgeTable, queryStore, readTableRows, updateTableRow } from '../../db/sqlStore.js'
 import { deleteTableViews, deleteView, listViews, saveView } from '../../db/tableViews.js'
 import { lookupPaidSources } from '../../db/repos/paid-sources.js'
 
@@ -43,7 +43,8 @@ export function createDataRouter(getClient: (c: Context) => Promise<Client>, hid
     }
 
     routes.get('/tables', async c => {
-        return c.json({ tables: await listTables(await getClient(c), hidden) })
+        const client = await getClient(c)
+        return c.json({ tables: c.req.query('counts') === '1' ? await listTablesWithRowCounts(client, hidden) : await listTables(client, hidden) })
     })
 
     routes.post('/query', async c => {
@@ -75,8 +76,12 @@ export function createDataRouter(getClient: (c: Context) => Promise<Client>, hid
         const dir = c.req.query('dir') || undefined
         const q = c.req.query('q') || undefined
         const columns = parseColumns(c.req.query('columns'))
-        const where = parseWhere(c.req.query('where'))
-        return c.json(await readTableRows(client, name, { limit, offset, sort, dir, q, where, columns, hidden }))
+        try {
+            const where = parseWhere(c.req.query('where'))
+            return c.json(await readTableRows(client, name, { limit, offset, sort, dir, q, where, columns, hidden }))
+        } catch (err) {
+            return failure(c, err, 'Could not read the rows')
+        }
     })
 
     routes.get('/tables/:name/groups', async c => {
@@ -95,6 +100,16 @@ export function createDataRouter(getClient: (c: Context) => Promise<Client>, hid
             return c.json({ groups })
         } catch (err) {
             return failure(c, err, 'Could not group rows')
+        }
+    })
+
+    routes.post('/tables/:name/rows', async c => {
+        const client = await getClient(c)
+        const { values } = rowInsertSchema.parse(await c.req.json())
+        try {
+            return c.json({ row: await insertTableRow(client, c.req.param('name')!, values, hidden) }, 201)
+        } catch (err) {
+            return failure(c, err, 'Could not add the row')
         }
     })
 

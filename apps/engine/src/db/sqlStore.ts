@@ -81,7 +81,7 @@ export function serializeRow(columns: string[], row: Record<string, unknown>): R
 }
 
 export type DbColumn = { name: string; type: string; pk: boolean; notnull: boolean }
-export type DbTable = { name: string; columns: DbColumn[] }
+export type DbTable = { name: string; columns: DbColumn[]; rows?: number }
 
 async function tableNames(client: Client, hidden: string[] = []): Promise<string[]> {
     const rs = await client.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
@@ -109,6 +109,15 @@ export async function listTables(client: Client, hidden: string[] = []): Promise
     const names = await tableNames(client, hidden)
     const tables: DbTable[] = []
     for (const name of names) tables.push({ name, columns: await columnsOf(client, name) })
+    return tables
+}
+
+export async function listTablesWithRowCounts(client: Client, hidden: string[] = []): Promise<DbTable[]> {
+    const tables = await listTables(client, hidden)
+    for (const table of tables) {
+        const rs = await client.execute(`SELECT count(*) AS n FROM ${quoteIdent(table.name)}`)
+        table.rows = Number(rs.rows[0]?.n ?? 0)
+    }
     return tables
 }
 
@@ -260,6 +269,27 @@ export async function updateTableRow(
     const read = await client.execute({ sql: `SELECT rowid AS "__rowid", ${buildSelect(allColumns)} FROM ${quoted} WHERE rowid = ?`, args: [rowid] })
     const row = read.rows[0] as unknown as Record<string, unknown> | undefined
     if (!row) throw new Error('Row not found.')
+    return serializeRow(read.columns, row)
+}
+
+export async function insertTableRow(client: Client, table: string, values: Record<string, SqlParam>, hidden: string[] = []): Promise<Record<string, unknown>> {
+    await requireTable(client, table, hidden)
+    if (!(await tableHasRowid(client, table))) throw new Error(`Table has no rowid: ${table}`)
+    const allColumns = await columnsOf(client, table)
+    const entries = Object.entries(values)
+    if (entries.length === 0) throw new Error('Nothing to insert.')
+    for (const [column] of entries) {
+        if (!allColumns.some(c => c.name === column)) throw new Error(`Column not found: ${column}`)
+    }
+    const quoted = quoteIdent(table)
+    const columns = entries.map(([column]) => quoteIdent(column)).join(', ')
+    const placeholders = entries.map(() => '?').join(', ')
+    const rs = await withBusyRetry(() => client.execute({ sql: `INSERT INTO ${quoted} (${columns}) VALUES (${placeholders})`, args: entries.map(([, value]) => value) }))
+    const rowid = rs.lastInsertRowid
+    if (rowid === undefined) throw new Error('Row not inserted.')
+    const read = await client.execute({ sql: `SELECT rowid AS "__rowid", ${buildSelect(allColumns)} FROM ${quoted} WHERE rowid = ?`, args: [rowid] })
+    const row = read.rows[0] as unknown as Record<string, unknown> | undefined
+    if (!row) throw new Error('Row not inserted.')
     return serializeRow(read.columns, row)
 }
 
