@@ -123,7 +123,7 @@ export const FOREMAN_BOX_TOOL_DEFS = [
 ] as const
 
 // What the Chief of Staff does for the workspace itself, beyond its coworkers: its name, the one
-// every member reads, and the people it brings in. Only an admin's turn may use them.
+// every member reads, the people it brings in, and the company it works for. Only an admin's turn may use them.
 export const FOREMAN_SELF_TOOL_DEFS = [
     {
         name: 'invite_members',
@@ -136,6 +136,18 @@ export const FOREMAN_SELF_TOOL_DEFS = [
                 scope: { type: 'string', enum: ['all', 'assigned'], description: 'Which Boxes they reach once they join. Defaults to all.' },
             },
             required: ['emails'],
+        },
+    },
+    {
+        name: 'save_company_website',
+        description:
+            "Save the website of the user's company, once they gave it: it is read for what the company sells and to whom, it names the workspace, and the Brain of the workspace is filled from it within a few minutes. Their own site only, never a page on a platform such as LinkedIn or Instagram. When they have none, or would rather not say, pass none: true instead, so nobody asks again. Only an admin can.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                url: { type: 'string', description: 'The address as the user gave it. A bare domain works.' },
+                none: { type: 'boolean', description: 'True when they have no website, or would rather not give it.' },
+            },
         },
     },
     {

@@ -96,6 +96,7 @@ const NAMES_ALLOWED: Record<string, string> = {
     'app/api/_services/desktop-auth.service.ts': 'the account signing in',
     'lib/foreman/inbox-tools.ts': 'signed through messageAuthorOf',
     'lib/foreman/checkin-context.ts': 'the founder, staff left out',
+    'app/api/_services/naming.service.ts': 'the founder, staff left out, whose first name the workspace may carry',
     'lib/apps/analytics.ts': 'the first member for analytics, staff left out',
     'trigger/explore-company.ts': 'the first member, staff left out',
     'lib/email/recipient.ts': 'the address of a recipient, whom every caller took from the helper or from the team of an organization',

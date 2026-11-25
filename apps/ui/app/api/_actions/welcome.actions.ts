@@ -7,8 +7,7 @@ import { requireAdminContext, type WorkspaceContext } from '@/app/api/_auth/owne
 import { ensureWorkspaceNamed } from '@/app/api/_services/naming.service'
 import { requestCompanyExplore } from '@/lib/brain/request-seed'
 import { decideIndustry } from '@/lib/company/decide-industry'
-import { companySiteUrl } from '@/lib/company/firecrawl'
-import { analyzeCompanyProfile } from '@/lib/company/profile'
+import { readCompanySite, withCompanySite } from '@/lib/company/company-site'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
 import { readAnswers, saveFirstName, writeAnswers } from '@/lib/foreman/profile'
 import { failure, failureOf } from '@/lib/i18n/action-error'
@@ -23,10 +22,6 @@ import type { ActionResult } from './space.actions'
 // would put the workspace in the onboarding chat's funnel, whose phases the engine's Chief of Staff
 // waits behind.
 
-// The read started while the site was being typed is usually done by the time it is sent. One that
-// is not gets this long before the address is kept alone: the questions do not wait on a slow site.
-const SITE_READ_BUDGET_MS = 12_000
-
 async function welcomeContext(): Promise<WorkspaceContext> {
     const ctx = await requireAdminContext()
     if (ctx.authUser.is_anonymous) throw new Error('Create your account first.')
@@ -40,8 +35,6 @@ async function saveAnswers(ctx: WorkspaceContext, change: (answers: ForemanAnswe
 }
 
 const withProgress = (answers: ForemanAnswers, progress: WelcomeProgress): ForemanAnswers => ({ ...answers, onboarding: { ...answers.onboarding, ...progress } })
-
-const withinBudget = <T>(work: Promise<T>, fallback: T): Promise<T> => Promise.race([work, new Promise<T>(resolve => setTimeout(() => resolve(fallback), SITE_READ_BUDGET_MS))])
 
 /**
  * The company website, read for what it sells, or `null` for someone who has none. What comes back
@@ -60,31 +53,15 @@ export async function saveWelcomeSiteAction(site: string | null): Promise<Action
 
         const platform = platformHost(site)
         if (platform) return failure('notYourCompanySite', { domain: platform })
-        const url = companySiteUrl(site)
-        if (!url) return failure('notAWebsiteAddress')
+        const company = await readCompanySite(site)
+        if (!company) return failure('notAWebsiteAddress')
 
-        const analysis = await withinBudget(analyzeCompanyProfile(url), null)
-        const profile = analysis?.ok ? analysis.analysis.profile : null
-        const industry = profile?.industry && isTemplateCategory(profile.industry) ? profile.industry : null
-
-        await saveAnswers(ctx, answers =>
-            withProgress(
-                {
-                    ...answers,
-                    company_url: analysis?.ok ? analysis.analysis.url : url,
-                    company_name: profile?.name ?? undefined,
-                    company_description: profile?.description ?? undefined,
-                    company_offering: profile?.offering ?? undefined,
-                    company_audience: profile?.audience ?? undefined,
-                },
-                { siteSkipped: false, siteIndustry: industry ?? undefined }
-            )
-        )
+        await saveAnswers(ctx, answers => withCompanySite(answers, company))
 
         // The paid sources and the workspace name both read the address just written.
-        await requestCompanyExplore(ctx.supabase, ctx.workspace.id, url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
+        await requestCompanyExplore(ctx.supabase, ctx.workspace.id, company.url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
         await ensureWorkspaceNamed({ workspaceId: ctx.workspace.id, userId: ctx.userId })
-        return { ok: true, industry }
+        return { ok: true, industry: company.industry }
     } catch (err) {
         return failureOf(err, 'saveAnswerFailed')
     }
@@ -96,10 +73,9 @@ export async function saveWelcomeSiteAction(site: string | null): Promise<Action
  */
 export async function saveWelcomeIntakeAction(intake: ForemanIntake): Promise<{ industry: TemplateCategory }> {
     const ctx = await welcomeContext()
-    const url = intake.companyUrl && !platformHost(intake.companyUrl) ? companySiteUrl(intake.companyUrl) : null
-    const analysis = url ? await withinBudget(analyzeCompanyProfile(url), null) : null
-    const profile = analysis?.ok ? analysis.analysis.profile : null
-    const siteIndustry = profile?.industry && isTemplateCategory(profile.industry) ? profile.industry : null
+    const site = intake.companyUrl ? await readCompanySite(intake.companyUrl) : null
+    const profile = site?.profile ?? null
+    const siteIndustry = site?.industry ?? null
     // The one they picked is the only one that is not a guess; `other` when nothing could be told, so
     // the question is not asked again.
     const industry: TemplateCategory = intake.industry ?? siteIndustry ?? intake.decidedIndustry ?? 'other'
@@ -108,7 +84,7 @@ export async function saveWelcomeIntakeAction(intake: ForemanIntake): Promise<{ 
         withProgress(
             {
                 ...answers,
-                company_url: analysis?.ok ? analysis.analysis.url : (url ?? answers.company_url),
+                company_url: site?.url ?? answers.company_url,
                 company_name: profile?.name ?? answers.company_name,
                 company_description: profile?.description ?? answers.company_description,
                 company_offering: profile?.offering ?? intake.industryLabel ?? answers.company_offering,
@@ -116,13 +92,13 @@ export async function saveWelcomeIntakeAction(intake: ForemanIntake): Promise<{ 
                 industry,
                 position: intake.position ?? answers.position,
             },
-            { siteSkipped: !url, siteIndustry: siteIndustry ?? undefined, industryLabel: intake.industryLabel ?? undefined }
+            { siteSkipped: !site, siteIndustry: siteIndustry ?? undefined, industryLabel: intake.industryLabel ?? undefined }
         )
     )
 
     // Before the exploration, which looks for the person on LinkedIn by their first name.
     if (intake.firstName) await saveFirstName(ctx, intake.firstName)
-    if (url) await requestCompanyExplore(ctx.supabase, ctx.workspace.id, url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
+    if (site) await requestCompanyExplore(ctx.supabase, ctx.workspace.id, site.url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
     await ensureWorkspaceNamed({ workspaceId: ctx.workspace.id, userId: ctx.userId })
     return { industry }
 }

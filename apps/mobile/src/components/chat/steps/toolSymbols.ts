@@ -147,6 +147,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     search_docs: 'book',
     rerun_hub_search_docs: 'book',
     analyze_website: 'globe',
+    save_company_website: 'globe',
     save_profile: 'users',
     save_needs: 'users',
     list_templates: 'list',

@@ -180,16 +180,36 @@ export function foremanSystemPrompt(state: ForemanState): string {
 // onboarding ends, and the Chief of Staff speaks first, about them, with the starter pack of their
 // line of work to offer.
 function greetingBlock(state: ForemanState): string {
-    const pack = starterPack(state.answers.industry)
-        .map(card => `- ${card.promise} (template ${card.template})`)
-        .join('\n')
+    const asked = owesWebsite(state)
     return [
         `This turn was opened by the app, not by them: the message \`${KICKOFF_MARKER}\` means they have just finished signing up and see you for the first time. Speak first, in four short lines at most, no heading:`,
         `- greet them${state.firstName ? ` as ${state.firstName}` : ''};`,
-        '- say in one sentence what you understood of their company, from what you already know about them above. If you know nothing about it, leave this line out. Never invent a fact about their company;',
-        `- offer the first coworkers you would hire for them, out of the starter templates of their line of work:\n${pack}`,
-        'Then call ask_user with the first three of those coworkers as options, so they pick one in a tap. Install nothing before they answer.',
+        ...(asked
+            ? ['- say in one sentence that you would like to read the website of their company, to know what it does before you hire anyone;', ASK_FOR_THE_WEBSITE]
+            : ['- say in one sentence what you understood of their company, from what you already know about them above. If you know nothing about it, leave this line out. Never invent a fact about their company;', `- ${firstCoworkersOffer(state.answers.industry)}`]),
     ].join('\n')
+}
+
+export function firstCoworkersOffer(industry: ForemanState['answers']['industry']): string {
+    const pack = starterPack(industry)
+        .map(card => `- ${card.promise} (template ${card.template})`)
+        .join('\n')
+    return `Offer the first coworkers you would hire for them, out of the starter templates of their line of work:\n${pack}\nCall ask_user with the first three of those coworkers as options, so they pick one in a tap. Install nothing before they answer.`
+}
+
+// Nothing before this conversation asks for the website: the sign-up only asks what they do, and the
+// Brain, the name of the workspace and every coworker are the better for it. The app that asked, or
+// whoever said they have none, is not asked twice.
+function owesWebsite(state: ForemanState): boolean {
+    return !state.isMember && !state.answers.company_url && !state.answers.onboarding?.siteSkipped
+}
+
+const ASK_FOR_THE_WEBSITE = `Then call ask_user with one question, the address of their company website, and no options: they type it in the form, and skip the question when they have none. Only when the email they signed up with is on a domain of their company's own, give two options: that domain, and "I don't have one". Offer no coworker before they answer.`
+
+// The answer comes back on a turn of its own, which the greeting above is no part of.
+function websiteBlock(state: ForemanState): string | null {
+    if (state.agents.length > 0 || state.answers.onboarding?.greetPending !== false || !owesWebsite(state)) return null
+    return 'They have just arrived, and the first thing you asked them is the address of their company website. When they give it, call save_company_website with it. When they skip the question, have none or would rather not say, call save_company_website with none: true. Its answer says what comes next: do that in the same turn. If they ask for something else instead, do that and leave the website for later.'
 }
 
 // Only for a box that hands the Chief of Staff the Vault tools: on another one the same words would
@@ -210,7 +230,7 @@ const VAULT_ON_PHONE_NOTE = 'They are in the mobile app, which cannot show a for
 // the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
 export function foremanEngineInstructions(state: ForemanState, { greeting = false, vault = false }: { greeting?: boolean; vault?: boolean } = {}): string {
     const brand = brandOf(state)
-    const blocks = [brandText(engineCharter(state.foreman.name, brand), brand), `${workspaceLine(state)} You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : noPlanNote(brand), languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, vault ? VAULT_NOTE : null, vault && isMobileApp(state) ? brandText(VAULT_ON_PHONE_NOTE, brand) : null, checklistBlock(state.gettingStarted), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [brandText(engineCharter(state.foreman.name, brand), brand), `${workspaceLine(state)} You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : noPlanNote(brand), languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : websiteBlock(state), !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, vault ? VAULT_NOTE : null, vault && isMobileApp(state) ? brandText(VAULT_ON_PHONE_NOTE, brand) : null, checklistBlock(state.gettingStarted), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

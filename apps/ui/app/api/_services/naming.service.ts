@@ -2,6 +2,7 @@ import type { Database } from '@/app/api/database.types'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { isBlobUrl } from '@/lib/blobs/catalog'
 import { accountFirstName } from '@/lib/naming/account-first-name'
+import { readFirstName } from '@/lib/naming/first-name'
 import { DEFAULT_WORKSPACE_NAME, workspaceNameFrom } from '@/lib/naming/workspace-name'
 import { boxNameFrom, companyNameFromAnswers, industryFromAnswers } from '@/lib/onboarding/box-name'
 import { faviconUrl, siteDomain } from '@/lib/onboarding/site-favicon'
@@ -15,17 +16,19 @@ type Profile = { companyName: string | null; companyUrl: string | null; industry
 // from the client: a caller that acts in the same tick as the foreman's `save_profile` would still
 // hold the answers from before it, which is how a Box ended up unnamed for someone whose company we
 // had just read off their site. The first name is the caller's own.
-async function onboardingProfile(workspaceId: number): Promise<Profile> {
+// Without a session to read it from (a turn of the Chief of Staff), it is read off the account of
+// `userId`.
+async function onboardingProfile(workspaceId: number, userId?: string): Promise<Profile> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMaybeSingle(supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: workspaceId })
     const answers = data?.answers ?? null
-    const { session } = await getServerSession()
+    const firstName = userId ? readFirstName((await supabase.auth.admin.getUserById(userId)).data.user?.user_metadata) : await accountFirstName((await getServerSession()).session)
 
     return {
         companyName: companyNameFromAnswers(answers),
         companyUrl: (answers as { company_url?: string } | null)?.company_url ?? null,
         industry: industryFromAnswers(answers),
-        firstName: (await accountFirstName(session)) || null,
+        firstName: firstName || null,
     }
 }
 
@@ -57,22 +60,27 @@ async function faviconIfServed(domain: string): Promise<string | null> {
 // Names the workspace once, from whatever the onboarding learned. Silent on every failure: it is
 // called from the Box claim, which hands a pool engine back on any throw, and no name is worth an
 // engine.
-export async function ensureWorkspaceNamed(params: { workspaceId: number; userId: string }): Promise<void> {
+//
+// `overFirstName` also replaces the name built from their first name, which is only there because the
+// company was not known yet. The Chief of Staff asks for it, with no session behind its turn.
+export async function ensureWorkspaceNamed(params: { workspaceId: number; userId: string; overFirstName?: boolean }): Promise<void> {
     try {
         const supabase = createServiceRoleClient()
         const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'icon_url', 'is_sandbox'] as const, { id: params.workspaceId })
         if (!workspace || workspace.is_sandbox) return
         // A name already on the row was either chosen in the settings dialog or written by an earlier
         // pass. Either way it is someone's answer, and nothing here overwrites it.
-        if (workspace.name && workspace.name !== DEFAULT_WORKSPACE_NAME) return
+        const unnamed = !workspace.name || workspace.name === DEFAULT_WORKSPACE_NAME
+        if (!unnamed && !params.overFirstName) return
 
         // The name falls back on the caller's first name when the onboarding found no company: an
         // invited member claiming a Box must not get the team's workspace named after them.
         if ((await workspaceFounderUserId(params.workspaceId)) !== params.userId) return
 
-        const profile = await onboardingProfile(params.workspaceId)
+        const profile = await onboardingProfile(params.workspaceId, params.overFirstName ? params.userId : undefined)
+        if (!unnamed && workspace.name !== workspaceNameFrom({ firstName: profile.firstName })) return
         const name = workspaceNameFrom(profile)
-        if (name === DEFAULT_WORKSPACE_NAME) return
+        if (name === DEFAULT_WORKSPACE_NAME || name === workspace.name) return
 
         const domain = profile.companyName && profile.companyUrl ? siteDomain(profile.companyUrl) : null
         const icon = domain && (!workspace.icon_url || isBlobUrl(workspace.icon_url)) ? await faviconIfServed(domain) : null

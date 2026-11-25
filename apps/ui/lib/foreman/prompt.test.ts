@@ -82,6 +82,32 @@ describe('foremanEngineInstructions on the turn the welcome page leaves owed', (
         expect(instructions).toContain('ask_user')
     })
 
+    describe('and nobody asked for their website yet', () => {
+        const arrived = stateWith({ foreman: {}, answers: { industry: 'saas' } })
+        const asked = (answers: ForemanState['answers']) => stateWith({ foreman: {}, answers: { ...answers, onboarding: { ...answers.onboarding, greetPending: false } } })
+
+        it('asks for it first, and offers no coworker before the answer', () => {
+            const instructions = foremanEngineInstructions(arrived, { greeting: true })
+            expect(instructions).toContain('the address of their company website')
+            expect(instructions).not.toContain('template sales-development-rep')
+        })
+
+        it('keeps knowing what the answer is for on the turn it comes back on', () => {
+            expect(foremanEngineInstructions(asked({ industry: 'saas' }))).toContain('call save_company_website')
+        })
+
+        it('lets go of it once it has one, they have none, or a coworker is at work', () => {
+            expect(foremanEngineInstructions(asked({ company_url: 'https://acme.com' }))).not.toContain('save_company_website')
+            expect(foremanEngineInstructions(asked({ onboarding: { siteSkipped: true } }))).not.toContain('save_company_website')
+            expect(foremanEngineInstructions({ ...asked({}), agents: [{ id: 'a' }] as unknown as ForemanState['agents'] })).not.toContain('the first thing you asked them')
+        })
+
+        it('never asks whoever was asked by the app, nor a member', () => {
+            expect(foremanEngineInstructions(stateWith({ foreman: {}, answers: { industry: 'saas', onboarding: { siteSkipped: true } } }), { greeting: true })).toContain('template sales-development-rep')
+            expect(foremanEngineInstructions({ ...asked({}), isMember: true })).not.toContain('save_company_website')
+        })
+    })
+
     it('guesses their language from the browser for the words said before they wrote any', () => {
         expect(foremanEngineInstructions({ ...welcomed, foreman: {} }, { greeting: true })).toContain('Their browser is set to fr')
         expect(foremanEngineInstructions({ ...welcomed, foreman: {} })).not.toContain('Their browser is set to')

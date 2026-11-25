@@ -19,7 +19,7 @@ const LABELLED_TOOLS = [
     'get_skill', 'upsert_skill', 'delete_skill', 'list_schedules', 'upsert_schedule', 'run_schedule_now', 'delete_schedule', 'list_runs', 'get_run',
     'search_connectors', 'list_agent_connectors', 'attach_connector', 'detach_connector', 'list_vault', 'attach_vault_entry', 'detach_vault_entry', 'share_vault_entry', 'rename_vault_entry', 'delete_vault_entry', 'add_vault_entry', 'open_vault', 'send_message', 'list_pending_cards', 'answer_card', 'create_boxes', 'build_team', 'write_agent',
     'rename_box', 'delete_box', 'focus_agent', 'show_agents', 'open_connector_setup', 'open_settings', 'recenter_board', 'open_brain_page',
-    'read_attachment', 'search_docs', 'analyze_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
+    'read_attachment', 'search_docs', 'analyze_website', 'save_company_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
     'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',
     'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service',
     'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete', 'remote_computers', 'remote_exec',
@@ -34,7 +34,7 @@ const ACTIVE_TOOLS = [
     'leads_email_find', 'leads_email_verify', 'leads_phone_find', 'google_serp', 'google_maps_search', 'download', 'memory_write', 'memory_recall',
     'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'vision_analyze', 'image_generation', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_runs',
     'team_get_run', 'ai_status', 'skill_read', 'skill_read_file', 'skill_create', 'skill_edit', 'skill_update', 'mcp_search', 'rerun_hub_service_search',
-    'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'list_pending_cards', 'answer_card', 'build_team', 'search_docs', 'rerun_hub_search_docs', 'analyze_website',
+    'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'list_pending_cards', 'answer_card', 'build_team', 'search_docs', 'rerun_hub_search_docs', 'analyze_website', 'save_company_website',
     'list_templates', 'propose_plan', 'install_template', 'remote_computers', 'remote_exec',
 ] as const
 

@@ -12,6 +12,7 @@ import { dispatchInboxTool } from '@/lib/foreman/inbox-tools'
 import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, accountToolNameOf } from '@/lib/foreman/engine-brief'
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { FOREMAN_NAME_MAX, sanitizeForemanName } from '@/lib/foreman/name'
+import { firstCoworkersOffer } from '@/lib/foreman/prompt'
 import { saveForemanName } from '@/lib/foreman/profile'
 import { workspaceBrand } from '@/lib/brand/workspace'
 import { searchDocs } from '@/lib/foreman/search-docs'
@@ -19,8 +20,10 @@ import { FOREMAN_BOX_TOOL_DEFS, FOREMAN_INBOX_TOOL_DEFS } from '@/lib/foreman/to
 import { asString, asStringArray, requireString } from '@/lib/mcp/args'
 import { inviteMember, resolveWorkspaceIdentities } from '@/app/api/_services/members.service'
 import { failure } from '@/lib/i18n/action-error'
+import { readCompanySite, saveCompanySite, skipCompanySite } from '@/lib/company/company-site'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectSingle } from '@/supabase/supabase-helpers'
+import { platformHost } from '@rerun/contracts'
 
 const BOX_TOOL_NAMES = new Set<string>(FOREMAN_BOX_TOOL_DEFS.map(def => def.name))
 const INBOX_TOOL_NAMES = new Set<string>(FOREMAN_INBOX_TOOL_DEFS.map(def => def.name))
@@ -34,6 +37,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (tool === 'search_docs') return searchDocs(requireString(args.query, 'query'), await workspaceBrand(workspaceId))
     if (tool === 'set_name') return setName(actor, args)
     if (tool === 'invite_members') return inviteMembers(actor, args)
+    if (tool === 'save_company_website') return saveCompanyWebsite(actor, args)
     if (INBOX_TOOL_NAMES.has(tool)) return dispatchInboxTool(actor, tool, args)
     if (tool === 'add_vault_entry') return addVaultEntry(actor, args)
 
@@ -61,6 +65,24 @@ async function setName(actor: Actor, args: Record<string, unknown>): Promise<{ n
     if (!name) throw new Error(`That name cannot be used: 1 to ${FOREMAN_NAME_MAX} letters, digits, spaces, dots, apostrophes or hyphens.`)
     await saveForemanName({ supabase: createServiceRoleClient(), workspace: { id: actor.workspaceId } }, name)
     return { name }
+}
+
+async function saveCompanyWebsite(actor: Actor, args: Record<string, unknown>) {
+    if (!isAdminActor(actor)) throw new Error('Only an admin of the workspace can save its website. Tell the user to ask one.')
+    const supabase = createServiceRoleClient()
+    const { workspaceId } = actor
+    if (args.none === true) {
+        const answers = await skipCompanySite({ supabase, workspaceId })
+        return { saved: false, next: firstCoworkersOffer(answers.industry) }
+    }
+    const input = requireString(args.url, 'url')
+    const platform = platformHost(input)
+    if (platform) throw new Error(`${platform} is a platform, not the website of their company. Ask for their own address, or whether they have none.`)
+    const site = await readCompanySite(input)
+    if (!site) throw new Error('That does not look like a website address. Ask them for it again.')
+    const userId = actor.kind === 'user' ? actor.userId : await founderOf(workspaceId)
+    const answers = await saveCompanySite({ supabase, workspaceId, userId }, site)
+    return { saved: true, url: site.url, company: site.profile, next: `${site.profile ? 'Say in one sentence what you understood of their company.' : 'The site could not be read: say so in one short line, and never invent what they do.'} ${firstCoworkersOffer(answers.industry)}` }
 }
 
 // Added with the checks of the Vault's own Add page, then left for the user to sign in to: no value

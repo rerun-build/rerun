@@ -219,6 +219,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     search_docs: BookOpenIcon,
     rerun_hub_search_docs: BookOpenIcon,
     analyze_website: GlobeIcon,
+    save_company_website: GlobeIcon,
     save_profile: UsersIcon,
     save_needs: UsersIcon,
     list_templates: ListIcon,

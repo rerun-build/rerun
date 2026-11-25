@@ -37,6 +37,33 @@ beforeEach(() => {
     )
 })
 
+describe('ensureWorkspaceNamed once the company is known', () => {
+    const named = (name: string) => {
+        service = fakeSupabase(table => {
+            if (table === 'workspaces') return { data: { id: WORKSPACE_ID, name, icon_url: null, is_sandbox: false } }
+            if (table === 'workspace_onboarding') return { data: { answers: COMPANY } }
+            return undefined
+        })
+        Object.assign(service.client, { auth: { admin: { getUserById: async () => ({ data: { user: { user_metadata: { first_name: 'Ada' } } } }) } } })
+    }
+    const written = () => (service.writes('workspaces')[0]?.payload as { name?: string } | undefined)?.name
+
+    it('replaces the name built from their first name when asked to', async () => {
+        named("Ada's workspace")
+        await ensureWorkspaceNamed({ workspaceId: WORKSPACE_ID, userId: FOUNDER, overFirstName: true })
+        expect(written()).toBe('Acme')
+    })
+
+    it('never touches it otherwise, nor a name somebody chose', async () => {
+        named("Ada's workspace")
+        await ensureWorkspaceNamed({ workspaceId: WORKSPACE_ID, userId: FOUNDER })
+        expect(written()).toBeUndefined()
+        named('Night shift')
+        await ensureWorkspaceNamed({ workspaceId: WORKSPACE_ID, userId: FOUNDER, overFirstName: true })
+        expect(written()).toBeUndefined()
+    })
+})
+
 describe('ensureWorkspaceNamed and the company favicon', () => {
     it('gives the favicon to a workspace with no icon', async () => {
         workspaceWithIcon(null)
