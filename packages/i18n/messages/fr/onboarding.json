@@ -143,7 +143,58 @@
     },
     "view": {
         "title": "Comment voulez-vous voir votre équipe ?",
-        "hint": "Changez à tout moment depuis le menu de votre workspace"
+        "description": "Choisissez, vous pourrez changer à tout moment.",
+        "options": {
+            "simple": {
+                "line": "Vos coworkers dans une liste, le chat à côté."
+            },
+            "board": {
+                "line": "Votre équipe sur un board 3D, dans une Box par équipe ou client."
+            }
+        },
+        "perks": {
+            "messaging": "Comme une messagerie",
+            "smallScreen": "Idéal sur petit écran",
+            "glance": "Tout le monde d'un coup d'œil",
+            "live": "Les voir travailler en direct"
+        },
+        "continue": {
+            "simple": "Continuer avec Classique",
+            "board": "Continuer avec le Board"
+        },
+        "hint": "Changez à tout moment depuis le menu du workspace.",
+        "panel": {
+            "simple": {
+                "title": "Parlez à votre équipe.",
+                "line": "Vos coworkers dans une liste, le chat à côté, comme les messageries que vous utilisez déjà."
+            },
+            "board": {
+                "title": "Regardez-les travailler.",
+                "line": "Vos coworkers vivent dans des Boxes, une par équipe ou client, et vos collègues travaillent à leurs côtés. Ils s'illuminent quand ils travaillent et lèvent la main quand ils ont besoin de vous."
+            },
+            "app": {
+                "growth": "Growth",
+                "backOffice": "Back office",
+                "triage": "Tri de la boîte mail",
+                "report": "Rapport hebdo",
+                "now": "à l'instant",
+                "lines": {
+                    "nova": "Vous : Envoie les deux.",
+                    "atlas": "14 leads qualifiés ce matin",
+                    "iris": "Brouillon prêt pour jeudi",
+                    "pico": "Relance de la facture n° 2214"
+                },
+                "messages": {
+                    "first": "J'ai parcouru les 34 e-mails reçus cette nuit. Neuf sont des réponses au fil sur les tarifs : j'ai rédigé des réponses et je les ai laissées dans vos brouillons.",
+                    "second": "Envoie les deux d'Acme, garde le reste.",
+                    "third": "Envoyé. Les sept autres vous attendent dans Gmail, et je referai un passage à 9 h.",
+                    "fourth": "Peux-tu aussi relancer les deux devis de la semaine dernière ?",
+                    "fifth": "C'est fait, et une réponse est déjà arrivée. Je l'ai mise en haut de votre boîte, et je relancerai l'autre jeudi si elle reste silencieuse."
+                },
+                "foreman": "Gère votre workspace avec vous",
+                "workspace": "Acme"
+            }
+        }
     },
     "trial": {
         "title": "Démarrez votre essai gratuit",

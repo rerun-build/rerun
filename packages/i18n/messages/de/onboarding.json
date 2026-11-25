@@ -143,7 +143,58 @@
     },
     "view": {
         "title": "Wie möchtest du dein Team sehen?",
-        "hint": "Jederzeit im Menü deines Workspace umschalten"
+        "description": "Wähle eine Ansicht, du kannst jederzeit wechseln.",
+        "options": {
+            "simple": {
+                "line": "Deine Coworker in einer Liste, der Chat daneben."
+            },
+            "board": {
+                "line": "Dein Team auf einem 3D-Board, je Team oder Kunde eine Box."
+            }
+        },
+        "perks": {
+            "messaging": "Fühlt sich an wie eine Messaging-App",
+            "smallScreen": "Ideal für kleine Bildschirme",
+            "glance": "Alle auf einen Blick",
+            "live": "Sieh ihnen live bei der Arbeit zu"
+        },
+        "continue": {
+            "simple": "Weiter mit Klassisch",
+            "board": "Weiter mit dem Board"
+        },
+        "hint": "Wechsle jederzeit im Workspace-Menü.",
+        "panel": {
+            "simple": {
+                "title": "Sprich mit deinem Team.",
+                "line": "Deine Coworker in einer Liste, der Chat daneben, wie in den Messaging-Apps, die du schon kennst."
+            },
+            "board": {
+                "title": "Sieh ihnen bei der Arbeit zu.",
+                "line": "Deine Coworker leben in Boxes, eine pro Team oder Kunde, und deine Kollegen arbeiten neben ihnen. Sie leuchten bei der Arbeit und heben die Hand, wenn sie dich brauchen."
+            },
+            "app": {
+                "growth": "Wachstum",
+                "backOffice": "Back Office",
+                "triage": "Posteingang sortieren",
+                "report": "Wochenbericht",
+                "now": "jetzt",
+                "lines": {
+                    "nova": "Du: Schick die beiden.",
+                    "atlas": "14 Leads heute Morgen qualifiziert",
+                    "iris": "Entwurf für Donnerstag fertig",
+                    "pico": "Mahne Rechnung #2214 an"
+                },
+                "messages": {
+                    "first": "Ich habe die 34 E-Mails von heute Nacht durchgesehen. Neun davon sind Antworten auf den Preisthread, also habe ich Antworten entworfen und in deinen Entwürfen abgelegt.",
+                    "second": "Schick die beiden von Acme, den Rest halte zurück.",
+                    "third": "Gesendet. Die sieben anderen warten in Gmail auf dich, und den nächsten Durchlauf mache ich um 9 Uhr.",
+                    "fourth": "Kannst du auch die zwei Angebote von letzter Woche nachfassen?",
+                    "fifth": "Erledigt, und eine Antwort ist schon da. Ich habe sie ganz oben in deinen Posteingang gelegt und hake am Donnerstag bei der anderen nach, falls sie ausbleibt."
+                },
+                "foreman": "Führt deinen Workspace mit dir",
+                "workspace": "Acme"
+            }
+        }
     },
     "trial": {
         "title": "Starte deine kostenlose Testphase",

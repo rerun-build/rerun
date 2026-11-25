@@ -143,7 +143,58 @@
     },
     "view": {
         "title": "Ekibinizi nasıl görmek istersiniz?",
-        "hint": "Workspace menünüzden istediğiniz zaman değiştirin"
+        "description": "Birini seçin, istediğiniz zaman değiştirebilirsiniz.",
+        "options": {
+            "simple": {
+                "line": "Coworker'larınız bir listede, sohbet yanında."
+            },
+            "board": {
+                "line": "Ekibiniz 3D bir panoda, her ekip veya müşteri için bir Box."
+            }
+        },
+        "perks": {
+            "messaging": "Mesajlaşma uygulaması gibi",
+            "smallScreen": "Küçük ekranda harika",
+            "glance": "Herkesi tek bakışta görün",
+            "live": "Çalışmalarını canlı izleyin"
+        },
+        "continue": {
+            "simple": "Klasik ile devam et",
+            "board": "Pano ile devam et"
+        },
+        "hint": "Çalışma alanı menünüzden istediğiniz zaman değiştirin.",
+        "panel": {
+            "simple": {
+                "title": "Ekibinizle konuşun.",
+                "line": "Coworker'larınız bir listede, sohbet yanında; tıpkı zaten kullandığınız mesajlaşma uygulamaları gibi."
+            },
+            "board": {
+                "title": "Çalışmalarını izleyin.",
+                "line": "Coworker'larınız Boxes içinde yaşar, her ekip veya müşteri için bir tane, ekip arkadaşlarınız da yanlarında çalışır. Çalışırken parlarlar, size ihtiyaç duyunca el kaldırırlar."
+            },
+            "app": {
+                "growth": "Büyüme",
+                "backOffice": "Arka ofis",
+                "triage": "Gelen kutusu ayıklama",
+                "report": "Haftalık rapor",
+                "now": "şimdi",
+                "lines": {
+                    "nova": "Siz: İkisini gönder.",
+                    "atlas": "Bu sabah 14 potansiyel müşteri nitelendirildi",
+                    "iris": "Perşembe için taslak hazır",
+                    "pico": "2214 numaralı fatura takipte"
+                },
+                "messages": {
+                    "first": "Gece gelen 34 e-postayı inceledim. Dokuzu fiyatlandırma yazışmasına verilen yanıtlar, bu yüzden yanıtları hazırlayıp taslaklarınıza bıraktım.",
+                    "second": "Acme'den gelen ikisini gönder, kalanları beklet.",
+                    "third": "Gönderildi. Diğer yedisi Gmail'de sizi bekliyor, bir sonraki turu saat 9'da yapacağım.",
+                    "fourth": "Geçen haftaki iki teklifi de takip edebilir misin?",
+                    "fifth": "Tamam, bir yanıt şimdiden geldi. Onu gelen kutunuzun en üstüne koydum, diğeri sessiz kalırsa Perşembe günü tekrar yazacağım."
+                },
+                "foreman": "Çalışma alanınızı sizinle yönetir",
+                "workspace": "Acme"
+            }
+        }
     },
     "trial": {
         "title": "Ücretsiz denemenizi başlatın",

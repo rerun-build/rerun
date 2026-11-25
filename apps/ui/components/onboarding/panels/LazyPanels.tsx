@@ -6,4 +6,5 @@ import dynamic from 'next/dynamic'
 // narrow for the panel never loads them.
 export const LazyShowcase = dynamic(() => import('../showcase/Showcase').then(module => module.Showcase), { ssr: false })
 export const LazyMembersPanel = dynamic(() => import('./MembersPanel').then(module => module.MembersPanel), { ssr: false })
+export const LazyViewPanel = dynamic(() => import('./ViewPanel').then(module => module.ViewPanel), { ssr: false })
 export const LazyTeamPanel = dynamic(() => import('./TeamPanel').then(module => module.TeamPanel), { ssr: false })

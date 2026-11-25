@@ -3,7 +3,7 @@
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
 import { finishWelcomeTeamAction, saveWelcomeSectorAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
-import { LazyMembersPanel, LazyShowcase, LazyTeamPanel } from '@/components/onboarding/panels/LazyPanels'
+import { LazyMembersPanel, LazyShowcase, LazyTeamPanel, LazyViewPanel } from '@/components/onboarding/panels/LazyPanels'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
@@ -32,15 +32,13 @@ export type WelcomeAnswers = {
     sector: SectorId | null
     sectorLabel: string
     industry: TemplateCategory | null
+    view: WorkspaceView
     invites: SentInvite[]
 }
 
 type QuestionStep = 'industry' | 'team' | 'view'
 
 const QUESTIONS: QuestionStep[] = ['industry', 'team', 'view']
-
-// How long a picked tile shows its check before the next step takes its place.
-const PICKED_BEAT_MS = 250
 
 // How long the machine gets to answer before the page offers to try again or go in anyway.
 const ENGINE_PATIENCE_MS = 90_000
@@ -63,6 +61,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     const [direction, setDirection] = useState(1)
     const [sector, setSector] = useState<SectorAnswer>({ sector: initial.sector, label: initial.sectorLabel })
     const [industry, setIndustry] = useState<TemplateCategory | null>(initial.industry)
+    const [view, setView] = useState<WorkspaceView>(initial.view)
     const [invites, setInvites] = useState<SentInvite[]>(initial.invites)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -80,15 +79,14 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
         setStep(target)
     }
 
-    const saved = (result: { ok: true } | ActionFailure, completed: QuestionStep, target: OnboardingStep, skipped = false, view?: WorkspaceView) => {
+    const saved = (result: { ok: true } | ActionFailure, completed: QuestionStep, target: OnboardingStep, skipped = false, chosenView?: WorkspaceView) => {
         setSaving(false)
         if (!result.ok) {
             setError(errorText(result))
-            return false
+            return
         }
-        track('onboarding_step_completed', { step: completed, skipped, ...(view ? { view } : {}) })
+        track('onboarding_step_completed', { step: completed, skipped, ...(chosenView ? { view: chosenView } : {}) })
         go(target)
-        return true
     }
 
     const submitSector = async () => {
@@ -106,11 +104,11 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     }
 
     // Kept on this device as the view the app opens in once the onboarding is done.
-    const pickView = async (view: WorkspaceView) => {
+    const submitView = async () => {
+        setSaving(true)
         setError(null)
         rememberWorkspaceView(view)
-        const [result] = await Promise.all([saveWelcomeViewAction(view), new Promise(resolve => setTimeout(resolve, PICKED_BEAT_MS))])
-        return saved(result, 'view', afterQuestions, false, view)
+        saved(await saveWelcomeViewAction(view), 'view', afterQuestions, false, view)
     }
 
     const startTrial = useCallback(() => {
@@ -195,7 +193,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     ) : step === 'team' ? (
         <TeamStep invites={invites} onInvited={sent => setInvites(current => [...current, sent])} onDone={() => void finishTeam()} onBack={back} saving={saving} error={error} />
     ) : step === 'view' ? (
-        <ViewStep onPick={pickView} onBack={back} error={error} />
+        <ViewStep view={view} onView={setView} onSubmit={() => void submitView()} onBack={back} saving={saving} error={error} />
     ) : step === 'trial' ? (
         <TrialStep onBack={() => go('view')} onStart={startTrial} />
     ) : (
@@ -210,6 +208,8 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
             <LazyTeamPanel industry={picked?.category ?? (sector.label ? null : industry)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} />
         ) : !askPhone && step === 'team' ? (
             <LazyMembersPanel name={firstName ?? email ?? ''} email={email} invites={invites.map(invite => invite.email)} />
+        ) : !askPhone && step === 'view' ? (
+            <LazyViewPanel view={view} onView={setView} person={firstName ?? email ?? ''} />
         ) : (
             <LazyShowcase />
         )

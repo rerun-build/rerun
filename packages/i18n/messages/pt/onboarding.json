@@ -143,7 +143,58 @@
     },
     "view": {
         "title": "Como você quer ver sua equipe?",
-        "hint": "Mude quando quiser no menu do seu workspace"
+        "description": "Escolha uma, você pode trocar quando quiser.",
+        "options": {
+            "simple": {
+                "line": "Seus coworkers em uma lista, com o chat ao lado."
+            },
+            "board": {
+                "line": "Seu time em um quadro 3D, com uma Box por equipe ou cliente."
+            }
+        },
+        "perks": {
+            "messaging": "Parece um app de mensagens",
+            "smallScreen": "Ótima em telas pequenas",
+            "glance": "Veja todos de relance",
+            "live": "Acompanhe o trabalho ao vivo"
+        },
+        "continue": {
+            "simple": "Continuar com a Clássica",
+            "board": "Continuar com o Quadro"
+        },
+        "hint": "Troque quando quiser no menu do seu workspace.",
+        "panel": {
+            "simple": {
+                "title": "Converse com seu time.",
+                "line": "Seus coworkers em uma lista, com o chat ao lado, como os apps de mensagens que você já usa."
+            },
+            "board": {
+                "title": "Veja todos trabalhando.",
+                "line": "Seus coworkers vivem em Boxes, uma por equipe ou cliente, e seus colegas trabalham ao lado deles. Eles brilham enquanto trabalham e levantam a mão quando precisam de você."
+            },
+            "app": {
+                "growth": "Growth",
+                "backOffice": "Back office",
+                "triage": "Triagem da caixa de entrada",
+                "report": "Relatório semanal",
+                "now": "agora",
+                "lines": {
+                    "nova": "Você: Envie os dois.",
+                    "atlas": "14 leads qualificados esta manhã",
+                    "iris": "Rascunho pronto para quinta",
+                    "pico": "Cobrando a fatura #2214"
+                },
+                "messages": {
+                    "first": "Li os 34 e-mails que chegaram durante a noite. Nove deles são respostas à conversa sobre preços, então redigi as respostas e deixei nos seus rascunhos.",
+                    "second": "Envie os dois da Acme e segure o resto.",
+                    "third": "Enviado. Os outros sete estão esperando por você no Gmail, e farei a próxima rodada às 9h.",
+                    "fourth": "Você pode cobrar também os dois orçamentos da semana passada?",
+                    "fifth": "Pronto, e uma resposta já chegou. Coloquei no topo da sua caixa de entrada e, se a outra continuar sem resposta, volto a cobrar na quinta."
+                },
+                "foreman": "Toca seu workspace com você",
+                "workspace": "Acme"
+            }
+        }
     },
     "trial": {
         "title": "Comece seu teste grátis",

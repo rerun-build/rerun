@@ -76,6 +76,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                     sector: sectorById(answers.onboarding?.sector)?.id ?? null,
                     sectorLabel: answers.onboarding?.industryLabel ?? '',
                     industry,
+                    view: answers.onboarding?.view ?? 'simple',
                     invites: (pending ?? []).map(invite => ({ email: invite.email })),
                 }}
                 starterRoles={starterRoles}

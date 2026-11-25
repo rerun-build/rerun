@@ -4,7 +4,7 @@
         "engine.greetingNamed": "{name} is the first name of the person. Said by the Chief of Staff, the AI assistant of the workspace, when it wakes up at the end of the onboarding.",
         "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up.",
         "view.title": "Title of the onboarding step that asks how the person wants to see their workspace: as the isometric board (Boxes and coworkers drawn in 3D) or as the classic view (a list of coworkers beside the chat). 'Your team' means their AI coworkers.",
-        "view.hint": "Line under the two tiles of the step, followed by a picture of the small switch that changes the view later, found in the menu of the workspace.",
+        "view.hint": "Line under the two tiles of the step: where the view is changed later.",
         "showcase": "The panel beside the sign-in form: four chapters, each a short tab label, a headline, one line, and the text of an example drawn in the real interface (a job typed by a user, a coworker's answer, a small table).",
         "showcase.create.job": "Typed by a user in the box that creates a coworker. {when} is showcase.create.when and has to read naturally in the middle of the sentence.",
         "showcase.task.title": "'Them' are the AI coworkers.",
@@ -16,7 +16,9 @@
         "sector.panel.heading": "Title bar of a small window that lists the first AI coworkers offered for the line of work picked.",
         "sector.panel.anyone": "Shown in that title bar while no line of work is picked.",
         "team.panel.shared": "'Coworker' is an AI coworker. 'All of you' are the people of the workspace.",
-        "team.panel.more": "Counts the people invited that the small window has no room for."
+        "team.panel.more": "Counts the people invited that the small window has no room for.",
+        "view.panel": "The panel beside the step: the view picked, previewed full size.",
+        "view.panel.app": "A made-up workspace drawn in the classic view: names of two Boxes, of two conversations, the last line of each coworker's chat, and a short exchange between a person and an AI coworker about their emails. 'Acme' is the name of the company, 'Runs your workspace with you' is said of the Chief of Staff."
     },
     "metaTitle": "Welcome",
     "back": "Back",
@@ -162,7 +164,58 @@
     },
     "view": {
         "title": "How do you want to see your team?",
-        "hint": "Switch anytime from your workspace menu"
+        "description": "Pick one, you can switch anytime.",
+        "options": {
+            "simple": {
+                "line": "Your coworkers in a list, the chat beside them."
+            },
+            "board": {
+                "line": "Your team on a 3D board, in a Box per team or client."
+            }
+        },
+        "perks": {
+            "messaging": "Feels like a messaging app",
+            "smallScreen": "Great on a small screen",
+            "glance": "See everyone at a glance",
+            "live": "Watch them work live"
+        },
+        "continue": {
+            "simple": "Continue with Classic",
+            "board": "Continue with the Board"
+        },
+        "hint": "Switch anytime from your workspace menu.",
+        "panel": {
+            "simple": {
+                "title": "Talk to your team.",
+                "line": "Your coworkers in a list, the chat beside them, like the messaging apps you already use."
+            },
+            "board": {
+                "title": "Watch them work.",
+                "line": "Your coworkers live in Boxes, one per team or client, and your teammates work beside them. They glow while they work and raise a hand when they need you."
+            },
+            "app": {
+                "growth": "Growth",
+                "backOffice": "Back office",
+                "triage": "Inbox triage",
+                "report": "Weekly report",
+                "now": "now",
+                "lines": {
+                    "nova": "You: Send the two.",
+                    "atlas": "14 leads qualified this morning",
+                    "iris": "Draft ready for Thursday",
+                    "pico": "Chasing invoice #2214"
+                },
+                "messages": {
+                    "first": "I went through the 34 emails that came in overnight. Nine of them are answers to the pricing thread, so I drafted replies and left them in your drafts.",
+                    "second": "Send the two from Acme, hold the rest.",
+                    "third": "Sent. The seven others are waiting for you in Gmail, and I will run the next pass at 9am.",
+                    "fourth": "Can you also chase the two quotes from last week?",
+                    "fifth": "Done, and one reply already came back. I put it on top of your inbox and I will follow up on the other on Thursday if it stays quiet."
+                },
+                "foreman": "Runs your workspace with you",
+                "workspace": "Acme"
+            }
+        }
     },
     "trial": {
         "title": "Start your free trial",
