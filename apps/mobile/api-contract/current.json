@@ -6625,6 +6625,10 @@
                                                 "name": {
                                                     "nullable": true,
                                                     "type": "string"
+                                                },
+                                                "supportChatToken": {
+                                                    "nullable": true,
+                                                    "type": "string"
                                                 }
                                             },
                                             "required": [
@@ -8714,6 +8718,10 @@
                                                     "type": "string"
                                                 },
                                                 "name": {
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "supportChatToken": {
                                                     "nullable": true,
                                                     "type": "string"
                                                 }

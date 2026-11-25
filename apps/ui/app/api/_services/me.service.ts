@@ -4,6 +4,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { brandSignature, type Signer } from '@/app/api/_auth/signature'
 import { ORGANIZATION_AUTHOR_ID, type Me, type MessageAuthor } from '@rerun/contracts'
 import { getAuthUser } from '@/supabase/session/getServerSession'
+import { supportChatTokenOf } from '@/app/api/_services/support-token.service'
 import type { User } from '@supabase/supabase-js'
 
 export { displayNameOf, readProfile, type UserProfile } from '@/lib/auth/user-profile'
@@ -44,6 +45,7 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
 // A token issued before the account had a name does not carry it until its next refresh: the auth
 // server is asked for that account, and only for it.
 export async function loadMe(ctx: WorkspaceContext): Promise<Me> {
-    const authUser = readProfile(ctx.authUser).name ? ctx.authUser : ((await getAuthUser()) ?? ctx.authUser)
-    return readMe({ ...ctx, authUser }, ctx.userLocale)
+    const [authUser, supportChatToken] = await Promise.all([readProfile(ctx.authUser).name ? ctx.authUser : getAuthUser().then(user => user ?? ctx.authUser), supportChatTokenOf(ctx.supabase, ctx.userId)])
+    const me = readMe({ ...ctx, authUser }, ctx.userLocale)
+    return { ...me, user: { ...me.user, supportChatToken } }
 }

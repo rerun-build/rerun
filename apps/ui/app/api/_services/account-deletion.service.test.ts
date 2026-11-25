@@ -194,6 +194,7 @@ describe('anonymizeAccount', () => {
 
         expect(db.writes('user_phones')).toEqual([expect.objectContaining({ method: 'delete' })])
         expect(db.writes('sign_in_codes')).toEqual([expect.objectContaining({ method: 'delete' })])
+        expect(db.writes('user_support_tokens')).toEqual([expect.objectContaining({ method: 'delete' })])
         expect(db.writes('users')[0].payload).toMatchObject({ onboarding_answers: null, deleted_at: expect.any(String) })
         expect(mocks.removeAvatars).toHaveBeenCalledWith([`${USER}/a.webp`])
 

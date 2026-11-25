@@ -3677,6 +3677,32 @@ export type Database = {
           },
         ]
       }
+      user_support_tokens: {
+        Row: {
+          created_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_support_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           account_role: Database["public"]["Enums"]["account_role"]

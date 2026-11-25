@@ -12,6 +12,9 @@ export const meSchema = z.object({
         // The language the account picked in the app (a short BCP 47 tag), null to follow the device.
         // Absent from a hub older than the language packs.
         locale: z.string().nullable().optional(),
+        // The key that opens this account's support conversation on every device (Crisp's token_id).
+        // Null on a server without a support chat, absent from a hub older than it.
+        supportChatToken: z.string().nullable().optional(),
     }),
     workspace: workspaceSummarySchema,
 })

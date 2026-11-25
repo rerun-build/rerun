@@ -22,6 +22,7 @@ vi.mock('@/supabase/server', () => ({
     createClient: async () => ({ ...state.db?.client, auth: { getUser: async () => ({ data: { user: state.ctx?.authUser } }) } }),
     getRequestAccessToken: async () => 'token',
 }))
+vi.mock('@rerun/cloud/support', () => ({ SUPPORT_CHAT_ENABLED: true }))
 vi.mock('@/supabase/session/getServerSession', async importOriginal => ({ ...(await importOriginal<typeof import('@/supabase/session/getServerSession')>()), getAuthUser: async () => state.ctx?.authUser }))
 
 const agents: Rows<'agents'> = [
@@ -42,6 +43,7 @@ const tables = {
         { user_id: 'user-grace', workspace_id: 7, role: 'member', box_scope: 'assigned', organization_staff: false },
     ],
     workspaces: [{ id: 7, name: 'Atelier Nord', icon_url: null, plan: 'pro', is_sandbox: false, subscription_status: 'active' }],
+    user_support_tokens: [{ user_id: 'user-ada', token: '0b6c1f3e-5a2d-4c8e-9f17-3d2a6b8e4c51' }],
 }
 
 const users: Record<string, { id: string; email: string; user_metadata: Record<string, string> }> = {
@@ -81,8 +83,9 @@ describe('the Home of the mobile app', () => {
 
     it('reads the account and its workspace', async () => {
         const { GET } = await import('@/app/api/v1/me/route')
-        const me = (await expectContract(mobileApi.getMe, await callRoute(GET, mobileApi.getMe))) as { workspace: { subscribed: boolean } }
+        const me = (await expectContract(mobileApi.getMe, await callRoute(GET, mobileApi.getMe))) as { user: { supportChatToken?: string | null }; workspace: { subscribed: boolean } }
         expect(me.workspace.subscribed).toBe(true)
+        expect(me.user.supportChatToken).toBe('0b6c1f3e-5a2d-4c8e-9f17-3d2a6b8e4c51')
     })
 
     it('lists the workspaces the account can switch to', async () => {
