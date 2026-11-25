@@ -1,5 +1,6 @@
 import { tool, type ModelMessage, type ToolSet } from 'ai'
 import { z } from 'zod'
+import { productText } from '../../brand/brand.js'
 import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming, type TurnOrder } from '../../agents/turn-order.js'
 import type { AgentConfig } from '../../agents/types.js'
@@ -323,7 +324,7 @@ export function requestSecretTool(ctx: Pick<RunContext, 'turnOrder'> & { agent?:
     return {
         request_secret: hitlTool(
             ctx.turnOrder,
-            `Ask the user for one or more credentials (API key, token, password) through a secure masked form, then END YOUR TURN. NEVER ask anyone to paste a secret into the chat: the conversation is stored and sent to the model, this form is not. Each value the user enters is written straight into your coworker variables on the engine and is NEVER shown to you: you only get back the names of the variables that were filled. Reference a filled variable as \${KEY} in an MCP server config (headers, url, env, args) or in a shell command; that placeholder is resolved at run time. Use suggest_service instead when the service exists in the Rerun catalog; use this tool for anything else that needs a key. Group every credential you need for the same setup into a single call.${foreman ? ` ${FOREMAN_VAULT_SECRET_NOTE}` : ''}`,
+            productText(`Ask the user for one or more credentials (API key, token, password) through a secure masked form, then END YOUR TURN. NEVER ask anyone to paste a secret into the chat: the conversation is stored and sent to the model, this form is not. Each value the user enters is written straight into your coworker variables on the engine and is NEVER shown to you: you only get back the names of the variables that were filled. Reference a filled variable as \${KEY} in an MCP server config (headers, url, env, args) or in a shell command; that placeholder is resolved at run time. Use suggest_service instead when the service exists in the Rerun catalog; use this tool for anything else that needs a key. Group every credential you need for the same setup into a single call.${foreman ? ` ${FOREMAN_VAULT_SECRET_NOTE}` : ''}`),
             foreman ? secretInput.refine(headersMatchSecrets, 'vault.mcpServer.headers must name every key of secrets, each once, and nothing else.') : secretInput,
         ),
     }

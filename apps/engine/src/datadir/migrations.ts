@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections, switchOnModels } from '../connections/migrate.js'
-import { agentsDir, boxPlanPath, brainSkillsDir, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
+import { agentsDir, boxBrandPath, boxPlanPath, brainSkillsDir, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { adoptConnectors } from '../vault/adopt.js'
 
@@ -157,6 +157,19 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
         id: 'brain-skills',
         up: async () => {
             await mkdir(brainSkillsDir(), { recursive: true })
+        },
+    },
+    {
+        // The brand the machine runs under, Rerun until the hub says otherwise. An engine from before
+        // this step never reads it, and one after it keeps there what the hub answered last.
+        version: 10,
+        id: 'box-brand',
+        up: async () => {
+            const target = boxBrandPath()
+            if (existsSync(target)) return
+            const tmp = `${target}.tmp`
+            await writeFile(tmp, `${JSON.stringify({ name: 'Rerun', whiteLabel: false, supportEmail: null }, null, 4)}\n`, 'utf8')
+            await rename(tmp, target)
         },
     },
 ]

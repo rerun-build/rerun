@@ -12,6 +12,7 @@ import type { RunContext } from '../../runtime/context.js'
 import { hubCallerHeaders, type HubCaller } from '../../runtime/hub.js'
 import { pageFacts, stripHtml } from './page-facts.js'
 import { savePage, textExtension } from './page-file.js'
+import { productName, productText } from '../../brand/brand.js'
 
 export const FETCH_TIMEOUT_MS = 30_000
 const SEARCH_TIMEOUT_MS = 15_000
@@ -30,7 +31,7 @@ const refusal = (verb: string, e: NonPublicHostError, url: string): HostAttempt 
 // What a coworker auditing a site must not read as a fact about it: the status went to our reader,
 // from a datacenter with our user agent, and a URL it guessed proves nothing when it does not exist.
 function statusLine(status: number, url: string): string {
-    if (isFailureStatus(status)) return `[${status}] ${url} (sent to Rerun's reader: not proof that Google or visitors get the same)`
+    if (isFailureStatus(status)) return `[${status}] ${url} (sent to ${productName()}'s reader: not proof that Google or visitors get the same)`
     if (status === 404 || status === 410) return `[${status}] ${url} (no page here: if you guessed this URL instead of following a link, that is not proof of a broken page)`
     return `[${status}] ${url}`
 }
@@ -43,7 +44,7 @@ type SearchResult = { title: string; url: string; snippet: string }
 
 async function searchHub(caller: HubCaller, query: string, maxResults: number): Promise<SearchResult[]> {
     const { RERUN_HUB_BASE_URL: hub, RERUN_API_KEY: token } = env()
-    if (!hub || !token) throw new Error('web search is unavailable: the engine is not linked to a Rerun hub')
+    if (!hub || !token) throw new Error(productText('web search is unavailable: the engine is not linked to a Rerun hub'))
 
     const res = await fetch(`${hub.replace(/\/$/, '')}/api/search`, {
         method: 'POST',
@@ -53,7 +54,7 @@ async function searchHub(caller: HubCaller, query: string, maxResults: number): 
     })
     if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null
-        throw new Error(body?.error ?? `the Rerun hub answered ${res.status}`)
+        throw new Error(body?.error ?? `the ${productName()} hub answered ${res.status}`)
     }
     const data = (await res.json()) as { results?: SearchResult[] }
     return data.results ?? []
@@ -138,7 +139,7 @@ export function webTools(ctx: RunContext, fetchTimeoutMs = FETCH_TIMEOUT_MS): To
                     } catch (e) {
                         if (runSignal?.aborted) throw e
                         if (e instanceof NonPublicHostError) return refusal('Fetch', e, url)
-                        direct = { text: `Fetch failed: ${failureReason(e, signal, fetchTimeoutMs)} (${url}). This is Rerun's reader failing, not proof that the site is down.`, failed: true }
+                        direct = { text: `Fetch failed: ${failureReason(e, signal, fetchTimeoutMs)} (${url}). This is ${productName()}'s reader failing, not proof that the site is down.`, failed: true }
                     }
                     if (raw || !isRefusal(directStatus)) return direct
 
@@ -146,8 +147,8 @@ export function webTools(ctx: RunContext, fetchTimeoutMs = FETCH_TIMEOUT_MS): To
                     if (!page) return direct
                     const note =
                         directStatus === null
-                            ? "(read through Rerun: Rerun's reader could not reach the site directly, not proof that the site is down)"
-                            : `(read through Rerun: the site answered ${directStatus} to Rerun's reader, not proof that Google or visitors get the same)`
+                            ? productText("(read through Rerun: Rerun's reader could not reach the site directly, not proof that the site is down)")
+                            : productText(`(read through Rerun: the site answered ${directStatus} to Rerun's reader, not proof that Google or visitors get the same)`)
                     return { text: hubPageText(url, note, page, await saveHubPage(id, url, page)), failed: false }
                 }),
         }),

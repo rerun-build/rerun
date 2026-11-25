@@ -46,6 +46,7 @@ import { mcpWireMiddleware } from '../tools/mcp-wire.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
+import { refreshBrand } from '../brand/brand.js'
 import { offersTeamRequests, runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
 import { stoppedTurn } from './stopped-turn.js'
@@ -541,7 +542,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         ;({ connection, provider, model } = resolved)
         if (connection) tried.add(connection.id)
         const t0 = Date.now()
-        const order = turnOrder(provider, await answeringModel(provider, model))
+        const [order] = await Promise.all([answeringModel(provider, model).then(answering => turnOrder(provider, answering)), refreshBrand()])
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
         const effort = runEffort(baseAgent, runOverride, provider, model)
         const ctx: RunContext = { agent, sessionId, logger, provider, model, effort, turnOrder: order, author, writer, abortSignal: attemptSignal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals, unattended: runsUnattended(trigger), readOnly, called: trigger.source === 'chat' && trigger.calledBy !== undefined, teamRequests: offersTeamRequests(trigger), screenBudget: createScreenBudget(provider) }

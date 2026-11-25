@@ -28,6 +28,7 @@ import { BRIDGE_SERVER_NAME } from '../agents/types.js'
 import { findVaultConflicts, VaultConflictError } from './conflicts.js'
 import { clearVaultToken, copyVaultTokens, listVaultTokenServers } from './tokens.js'
 import type { LoadedVaultItem } from './types.js'
+import { productName } from '../brand/brand.js'
 
 // Every write that changes who holds what (an item, its servers, its variables, its attachments)
 // goes through this one lock: the conflict check reads every other item, and two attachments made
@@ -130,7 +131,7 @@ export async function vaultItemUsage(item: LoadedVaultItem): Promise<string[]> {
 function assertServers(config: Pick<VaultItemConfig, 'mcpServers' | 'skills'>): void {
     for (const server of config.mcpServers) {
         if ([...Object.values(server.headers), ...Object.values(server.env)].includes(VAULT_REDACTED)) throw badRequest('A server cannot be written back with a value the Vault redacted')
-        if (server.name === BRIDGE_SERVER_NAME) throw badRequest(`"${BRIDGE_SERVER_NAME}" is reserved for Rerun's own tools`)
+        if (server.name === BRIDGE_SERVER_NAME) throw badRequest(`"${BRIDGE_SERVER_NAME}" is reserved for ${productName()}'s own tools`)
         if (!MCP_SERVER_NAME_RE.test(server.name)) throw badRequest(`Invalid MCP server name: ${JSON.stringify(server.name)}`)
     }
     const slugs = config.skills.map(skill => skill.slug)

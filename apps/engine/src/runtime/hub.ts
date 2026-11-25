@@ -2,6 +2,7 @@ import { FOREMAN_HUB_TOKEN_HEADER } from '@rerun/contracts'
 import type { LoadedAgent } from '../agents/types.js'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
+import { productText } from '../brand/brand.js'
 
 const TIMEOUT_MS = 20_000
 
@@ -16,7 +17,7 @@ export function hubCallerHeaders(caller: HubCaller): Record<string, string> {
 
 export async function callHub(caller: HubCaller, tool: string, args: Record<string, unknown>, timeoutMs = TIMEOUT_MS): Promise<unknown> {
     const { RERUN_HUB_BASE_URL: hub, RERUN_API_KEY: token } = env()
-    if (!hub || !token) throw new Error('Service catalog is unavailable: the engine is not linked to a Rerun hub.')
+    if (!hub || !token) throw new Error(productText('Service catalog is unavailable: the engine is not linked to a Rerun hub.'))
     const url = `${hub.replace(/\/$/, '')}/api/hub`
 
     const controller = new AbortController()

@@ -11,6 +11,7 @@ import { liveConnection } from '../../remote/registry.js'
 import type { RemoteConnection } from '../../remote/connection.js'
 import type { RunContext } from '../../runtime/context.js'
 import { callFailure, findComputer, unavailable, unknownComputer } from './remote-common.js'
+import { productName } from '../../brand/brand.js'
 
 // The files of a linked computer. Heavy files stay there: the coworker lists, reads a little, writes
 // small text files, and copies to or from its own workspace only what fits in a chat attachment.
@@ -28,7 +29,7 @@ async function ready(handle: string): Promise<Ready | string> {
     if (busy) return busy
     const connection = liveConnection(view.id)
     if (!connection || !view.facts) return unavailable({ ...view, online: false }) as string
-    if (!connection.offers('files')) return `#${view.handle} does not offer its files: its owner switched them off in the Rerun app.`
+    if (!connection.offers('files')) return `#${view.handle} does not offer its files: its owner switched them off in the ${productName()} app.`
     return { view, connection }
 }
 

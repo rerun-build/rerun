@@ -13,6 +13,7 @@ import { findPendingHitl } from '../tools/builtin/hitl.js'
 import type { RemoteConnection } from './connection.js'
 import { liveConnection, onRemoteEvent } from './registry.js'
 import { getComputer } from './store.js'
+import { productText } from '../brand/brand.js'
 
 // The end of a job a coworker started on a computer wakes that coworker in the conversation it
 // started it from, once, with what came out of it. The wake waits for the conversation to be free:
@@ -69,7 +70,7 @@ const OUTCOME: Record<RemoteJob['state'], string> = {
 export function wakeMessage(handle: string, job: RemoteJob, tail: string): string {
     const exit = job.exitCode !== null ? ` (exit ${job.exitCode})` : ''
     const report = [
-        `The job ${job.id} you started on #${handle} has ended: it ${OUTCOME[job.state]}${exit}${duration(job)}.`,
+        `The job ${job.id} you started on #${handle} has ended: it ${productText(OUTCOME[job.state])}${exit}${duration(job)}.`,
         `Command: ${job.command}`,
         tail.trim() ? `Last lines of its output:\n${tail.trim()}` : 'It printed nothing.',
         'Carry on with the task it was for, and tell the user what came out of it.',

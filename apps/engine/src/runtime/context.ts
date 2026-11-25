@@ -1,6 +1,7 @@
 import type { CheckinReason, MessageAuthor, Provider, ReasoningEffort } from '@rerun/contracts'
 import type { UIMessageStreamWriter } from 'ai'
 import type { TurnOrder } from '../agents/turn-order.js'
+import { boxBrand } from '../brand/brand.js'
 import type { LoadedAgent } from '../agents/types.js'
 import type { AgentRow } from '../db/schema.js'
 import type { Logger } from '../lib/logger.js'
@@ -26,8 +27,9 @@ export type RunTrigger =
 export const runsUnattended = (trigger: RunTrigger): boolean => trigger.source === 'schedule' || trigger.source === 'trigger' || trigger.source === 'checkin' || trigger.source === 'job' || (trigger.source === 'chat' && trigger.calledBy !== undefined)
 
 // Someone is in the chat and the hub has a team at the other end (Rerun Cloud): the coworker may draft
-// a request for that team. A coworker another one called has nobody to send it.
-export const offersTeamRequests = (trigger: RunTrigger): boolean => trigger.source === 'chat' && trigger.teamRequests === true && trigger.calledBy === undefined
+// a request for that team. A coworker another one called has nobody to send it, and an organization's
+// clients write to the organization.
+export const offersTeamRequests = (trigger: RunTrigger): boolean => trigger.source === 'chat' && trigger.teamRequests === true && trigger.calledBy === undefined && !boxBrand().whiteLabel
 
 // A check-in only reads and suggests: its tools, its CLI sandbox and its end all follow from this.
 export const runsReadOnly = (trigger: RunTrigger): boolean => trigger.source === 'checkin'

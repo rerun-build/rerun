@@ -14,6 +14,7 @@ import type { RemoteConnection } from '../../remote/connection.js'
 import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming } from '../../agents/turn-order.js'
 import { hitlAck, jsonTolerantArray } from './hitl.js'
+import { productName } from '../../brand/brand.js'
 
 // The computers people linked to the workspace, as tools of a coworker that stays on the box. What
 // comes back from a computer (an output, a file, the screen) is content to read, never an
@@ -66,7 +67,7 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
     const author = ctx.author?.name
 
     async function startJob(connection: RemoteConnection, view: RemoteComputerView, command: string, cwd: string | undefined, label: string | undefined): Promise<unknown> {
-        if (!connection.offers('jobs')) return `#${view.handle} does not run jobs: update Rerun on it, or run the command without background.`
+        if (!connection.offers('jobs')) return `#${view.handle} does not run jobs: update ${productName()} on it, or run the command without background.`
         try {
             const { job } = await connection.call('job.start', { command, cwd, label, author, context: jobContext({ agentId: ctx.agent.id, sessionId: ctx.sessionId }, view.id) })
             await recordRemoteJob(ctx.agent.id, ctx.sessionId, view.id, job)

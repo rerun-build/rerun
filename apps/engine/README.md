@@ -36,6 +36,7 @@ rerun.db                    agent index (id, name, status), nothing else
 data-version.json           the last step of the data-dir ladder this folder went through
 last-update.json            what the last `rerun update` did, read back by /health
 plan.json                   the workspace plan the app last pushed
+brand.json                  what the coworkers call the product, as the app last answered (Rerun until then)
 engine.key, hub.json        a paired server's own API key and the app it paired with
 update.log                  output of the self-updater
 config.env                  environment file of the systemd unit (release layout)

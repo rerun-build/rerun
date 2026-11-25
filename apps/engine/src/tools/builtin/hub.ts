@@ -2,13 +2,14 @@ import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { RunContext } from '../../runtime/context.js'
 import { callHub } from '../../runtime/hub.js'
+import { boxBrand, productName, productText } from '../../brand/brand.js'
 
 export function hubTools(ctx: RunContext): ToolSet {
     const call = (name: string, args: Record<string, unknown>) => callHub(ctx.agent, name, args)
     return {
         rerun_hub_service_search: tool({
             description:
-                'Semantic search over the Rerun service library (Stripe, Gmail, Figma, Metricool, …) for capabilities you can install on yourself. ALWAYS call this FIRST, before building any new integration or app yourself — describe the capability you need in natural language (e.g. "schedule social media posts") and it returns the most relevant ready-made services, ranked, with whether each is already installed. If nothing relevant comes back, the library does not handle it — build the capability yourself. Finding a service is not a reason to ask the user to connect it yet.',
+                productText('Semantic search over the Rerun service library (Stripe, Gmail, Figma, Metricool, …) for capabilities you can install on yourself. ALWAYS call this FIRST, before building any new integration or app yourself — describe the capability you need in natural language (e.g. "schedule social media posts") and it returns the most relevant ready-made services, ranked, with whether each is already installed. If nothing relevant comes back, the library does not handle it — build the capability yourself. Finding a service is not a reason to ask the user to connect it yet.'),
             inputSchema: z.object({
                 query: z.string().describe('Natural-language description of the capability you need (matched semantically, not just by keyword).'),
                 category: z.string().optional().describe('Optional category filter.'),
@@ -41,7 +42,7 @@ export function hubTools(ctx: RunContext): ToolSet {
         }),
         rerun_hub_publish_file: tool({
             description:
-                'Publish a file or folder from your workspace to a URL the user can open. Use it whenever the user needs to see, open or share something you produced (a page, site, report, chart, PDF, export) instead of saying it is in your workspace. Returns the URL and who can open it. Served as-is, so make it final. A page or site gets its own address (https://<slug>.rerun.site) with a "Made with Rerun" badge. For several pages, publish the FOLDER with an index.html at its root; never inline images as base64. Re-publishing a path keeps its URL and access. The url of a single file opens a viewer page: give fileUrl, the file itself, to a service that downloads it (an image Instagram fetches). A public link may wait for a person to approve it: say so when the result does. A page that shows or collects data from your database names its tables in `tables`: the published page then gets window.rerun.data, which reads and writes them live, so never copy rows into the HTML. In the page script: await rerun.data.rows("clients", { limit, offset, sort, dir, q, where: { column: value } }) gives { columns, rows, total } (each row has its __rowid); await rerun.data.add("clients", { name }) adds a row; await rerun.data.update("clients", row.__rowid, { email }) edits one; rerun.data.watch("clients", options, ({ rows }) => render(rows)) reads now and again every few seconds, so rows added elsewhere show up without republishing. Row values may come from visitors: put them in the page with textContent, never innerHTML. These calls only work on the published page, not on a file opened from your folder.',
+                `Publish a file or folder from your workspace to a URL the user can open. Use it whenever the user needs to see, open or share something you produced (a page, site, report, chart, PDF, export) instead of saying it is in your workspace. Returns the URL and who can open it. Served as-is, so make it final. A page or site gets its own address${boxBrand().whiteLabel ? '' : ' (https://<slug>.rerun.site) with a "Made with Rerun" badge'}. For several pages, publish the FOLDER with an index.html at its root; never inline images as base64. Re-publishing a path keeps its URL and access. The url of a single file opens a viewer page: give fileUrl, the file itself, to a service that downloads it (an image Instagram fetches). A public link may wait for a person to approve it: say so when the result does. A page that shows or collects data from your database names its tables in \`tables\`: the published page then gets window.rerun.data, which reads and writes them live, so never copy rows into the HTML. In the page script: await rerun.data.rows("clients", { limit, offset, sort, dir, q, where: { column: value } }) gives { columns, rows, total } (each row has its __rowid); await rerun.data.add("clients", { name }) adds a row; await rerun.data.update("clients", row.__rowid, { email }) edits one; rerun.data.watch("clients", options, ({ rows }) => render(rows)) reads now and again every few seconds, so rows added elsewhere show up without republishing. Row values may come from visitors: put them in the page with textContent, never innerHTML. These calls only work on the published page, not on a file opened from your folder.`,
             inputSchema: z.object({
                 path: z.string().describe('Path to the file or folder in your workspace, e.g. "reports/q2.pdf" or "sites/launch" (a folder needs an index.html at its root).'),
                 slug: z.string().optional().describe('Optional readable name for the URL (lowercase letters, digits, hyphens). A random suffix is appended: "q2-report" gives "q2-report-k3m9xqw7pt". Share the URL returned, never guess it.'),
@@ -79,7 +80,9 @@ export function hubTools(ctx: RunContext): ToolSet {
         }),
         rerun_hub_search_docs: tool({
             description:
-                'Search the Rerun documentation (docs.rerun.build) for how Rerun works, its limits, pricing or API. Returns passages with their links: hand the user the one you used. Query in English keywords.',
+                boxBrand().whiteLabel
+                    ? `Search the documentation of ${productName()} for how it works, its limits or API. Returns passages: hand the user a link only when one comes with them. It holds no price. Query in English keywords.`
+                    : 'Search the Rerun documentation (docs.rerun.build) for how Rerun works, its limits, pricing or API. Returns passages with their links: hand the user the one you used. Query in English keywords.',
             inputSchema: z.object({ query: z.string().describe('e.g. "webhook trigger token"') }),
             execute: ({ query }) => call('search_docs', { query }),
         }),

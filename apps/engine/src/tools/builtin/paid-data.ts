@@ -35,6 +35,7 @@ import { cardCallTiming } from '../../agents/turn-order.js'
 import { hitlAck } from './hitl.js'
 import { checkSpendConsent, recordSpend } from './spend-consent.js'
 import { HOST_FAILURE_THRESHOLD, HostBreaker } from '../host-breaker.js'
+import { productName, productText } from '../../brand/brand.js'
 
 // The hub waits up to 90 seconds on Treg, which walks several providers before it gives up.
 const PAID_CALL_TIMEOUT_MS = 100_000
@@ -62,7 +63,7 @@ type HubAnswer = { status: number; body: Record<string, unknown> | null }
 
 async function postHub(agentId: string, path: string, payload: unknown, timeout: AbortSignal, headers: Record<string, string> = {}): Promise<HubAnswer> {
     const { RERUN_HUB_BASE_URL: hub, RERUN_API_KEY: token } = env()
-    if (!hub || !token) throw new Error('paid data is unavailable: the engine is not linked to a Rerun hub')
+    if (!hub || !token) throw new Error(productText('paid data is unavailable: the engine is not linked to a Rerun hub'))
 
     const res = await fetch(`${hub.replace(/\/$/, '')}${path}`, {
         method: 'POST',
@@ -79,8 +80,8 @@ async function requestSpend(ctx: RunContext, input: RequestSpendInput): Promise<
     const unknown = input.calls.map(call => call.capability).find(capability => !isPaidDataCapability(capability))
     if (unknown !== undefined) throw new Error(`Unknown capability "${unknown}", nothing was asked: pick ids from ${PAID_DATA_CATALOG_TOOL}.`)
     const { status, body } = await postHub(ctx.agent.id, '/api/paid-data/estimate', { calls: input.calls }, AbortSignal.timeout(ESTIMATE_TIMEOUT_MS))
-    if (status === 402 && body?.error === CREDIT_PAUSED_ERROR) throw new Error('Could not ask for this spend: the workspace Rerun credit is paused. Tell the user to resume it in Settings before asking again.')
-    if (status !== 200 || !body) throw new Error(`Could not price this spend, nothing was asked: ${String(body?.error ?? `the Rerun hub answered ${status}`)}`)
+    if (status === 402 && body?.error === CREDIT_PAUSED_ERROR) throw new Error(productText('Could not ask for this spend: the workspace Rerun credit is paused. Tell the user to resume it in Settings before asking again.'))
+    if (status !== 200 || !body) throw new Error(`Could not price this spend, nothing was asked: ${String(body?.error ?? `the ${productName()} hub answered ${status}`)}`)
     const estimate = body as unknown as PaidDataEstimate & { remainingMicros?: number }
     const creditLeftMicros = estimate.remainingMicros ?? 0
     return {
@@ -173,9 +174,9 @@ async function runPaid(ctx: RunContext, breaker: HostBreaker, capability: string
     recordSpend(consent.approvalId, billedMicros)
     const cost = billedMicros > 0 ? `Billed ${formatCreditsLabel(billedMicros)}.` : 'Nothing was billed.'
 
-    if (status === 402) return { ...notRun(OUT_OF_CREDIT_MESSAGE), reason: PAID_DATA_OUT_OF_CREDIT }
+    if (status === 402) return { ...notRun(productText(OUT_OF_CREDIT_MESSAGE)), reason: PAID_DATA_OUT_OF_CREDIT }
     if (sourceDown) return notRun(consecutiveDown >= HOST_FAILURE_THRESHOLD ? SOURCE_CLOSED_MESSAGE : SOURCE_DOWN_MESSAGE)
-    if (status !== 200 || !body) return { status: 'failed', billedMicros, message: `Failed: ${String(body?.error ?? `the Rerun hub answered ${status}`)}. ${cost}` }
+    if (status !== 200 || !body) return { status: 'failed', billedMicros, message: `Failed: ${String(body?.error ?? `the ${productName()} hub answered ${status}`)}. ${cost}` }
 
     if (body.outcome === 'pending') return { status: 'pending', billedMicros, message: `The provider is still working on this request. ${cost} Do not call it again with the same input: it would be billed twice.` }
     const servedBy = typeof body.servedBy === 'string' ? body.servedBy : undefined
@@ -213,13 +214,13 @@ export function paidDataTools(ctx: RunContext): ToolSet {
     const config = ctx.agent.config
     if (config.tools.requestApproval && !config.paidDataAlwaysAllow) {
         tools.request_spend = tool({
-            description: `Ask the user to approve spending Rerun credit on paid_data, and pause the run until they answer. Call it before the first paid call of a task, with every paid_data call the task needs, by capability: the Rerun hub prices them and the user sees one card with the cost per line and the total. Then end your turn. An approval covers about its estimate. One card per task is the normal way to use paid_data, not a last resort: call it as soon as you know the batch, including to offer the step that completes a result your free tools left partial. ${cardCallTiming(ctx.turnOrder)}`,
+            description: productText(`Ask the user to approve spending Rerun credit on paid_data, and pause the run until they answer. Call it before the first paid call of a task, with every paid_data call the task needs, by capability: the Rerun hub prices them and the user sees one card with the cost per line and the total. Then end your turn. An approval covers about its estimate. One card per task is the normal way to use paid_data, not a last resort: call it as soon as you know the batch, including to offer the step that completes a result your free tools left partial. ${cardCallTiming(ctx.turnOrder)}`),
             inputSchema: requestSpendSchema,
             execute: async input => requestSpend(ctx, input),
         })
     }
     tools[PAID_DATA_CATALOG_TOOL] = tool({ description: PAID_DATA_CATALOG_DESCRIPTION, inputSchema: paidDataCatalogLookupSchema, execute: async input => readCatalog(input) })
-    tools[PAID_DATA_TOOL] = tool({ description: PAID_DATA_DESCRIPTION, inputSchema: paidDataCallSchema, execute: async ({ capability, params }, { toolCallId }) => runPaid(ctx, breaker, capability, params, toolCallId) })
+    tools[PAID_DATA_TOOL] = tool({ description: productText(PAID_DATA_DESCRIPTION), inputSchema: paidDataCallSchema, execute: async ({ capability, params }, { toolCallId }) => runPaid(ctx, breaker, capability, params, toolCallId) })
     tools[PAID_DATA_READ_TOOL] = tool({
         description: PAID_DATA_READ_DESCRIPTION,
         inputSchema: paidDataReadSchema,

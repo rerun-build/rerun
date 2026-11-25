@@ -92,6 +92,9 @@ export const boxBackupsPath = () => resolve(connectionsDir(), 'backups.json')
 // What the hub last said about the workspace's plan, which decides whether premium models run.
 export const boxPlanPath = () => resolve(dataDir(), 'plan.json')
 
+// The brand the hub last said this machine runs under: what its coworkers call the product.
+export const boxBrandPath = () => resolve(dataDir(), 'brand.json')
+
 // The MCP servers an agent declares as `npx <package>`, installed once so a run does not fetch them again.
 export const mcpPackagesDir = () => resolve(dataDir(), 'mcp-packages')
 

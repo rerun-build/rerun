@@ -24,6 +24,7 @@ import { forgetClaudePlanLimitsAttempt } from './claude-plan-limits.js'
 import { forgetCustomCatalog } from './custom-catalog.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
+import { productText } from '../brand/brand.js'
 
 async function writeConfig(id: string, config: ConnectionConfig): Promise<void> {
     const target = connectionConfigPath(id)
@@ -59,10 +60,10 @@ export async function createConnection(input: CreateConnectionInput, id = newId(
 }
 
 export async function patchConnection(id: string, patch: UpdateConnectionInput): Promise<LoadedConnection> {
-    if (id === RERUN_CONNECTION_ID && patch.name !== undefined) throw badRequest('The Rerun connection cannot be renamed')
+    if (id === RERUN_CONNECTION_ID && patch.name !== undefined) throw badRequest(productText('The Rerun connection cannot be renamed'))
     // Rerun Balanced is the one model a box always has, so switching every model off can never
     // leave it with nothing to run on.
-    if (id === RERUN_CONNECTION_ID && patch.models && !patch.models.includes(RERUN_MODEL)) throw badRequest('Rerun Balanced cannot be switched off')
+    if (id === RERUN_CONNECTION_ID && patch.models && !patch.models.includes(RERUN_MODEL)) throw badRequest(productText('Rerun Balanced cannot be switched off'))
     return withConnectionLock(id, async () => {
         const current = await getConnection(id)
         const next = connectionConfigSchema.parse({ ...current.config, ...patch })
@@ -74,7 +75,7 @@ export async function patchConnection(id: string, patch: UpdateConnectionInput):
 }
 
 export async function updateConnectionKeys(id: string, { set, remove }: UpdateConnectionKeysInput): Promise<string[]> {
-    if (id === RERUN_CONNECTION_ID) throw badRequest('The Rerun connection is keyless')
+    if (id === RERUN_CONNECTION_ID) throw badRequest(productText('The Rerun connection is keyless'))
     return withConnectionLock(id, async () => {
         const path = connectionEnvPath(id)
         const next = await readEnvFile(path)
@@ -96,7 +97,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
 // Exported because a delete releases everything pointing at the connection before it removes it,
 // and detaching a fleet of agents only to refuse the delete afterwards would be worse than either.
 export function assertConnectionDeletable(id: string): void {
-    if (id === RERUN_CONNECTION_ID) throw badRequest('The Rerun connection cannot be deleted')
+    if (id === RERUN_CONNECTION_ID) throw badRequest(productText('The Rerun connection cannot be deleted'))
 }
 
 export async function deleteConnection(id: string): Promise<void> {

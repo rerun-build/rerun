@@ -1,6 +1,7 @@
 import { computerHandleOf, type RemoteComputerView } from '@rerun/contracts'
 import { RemoteCallError } from '../../remote/connection.js'
 import { listComputerViews } from '../../remote/registry.js'
+import { productName, productText } from '../../brand/brand.js'
 
 // What every tool of a linked computer says the same way: which computer, whether it can answer,
 // and what went wrong on its side.
@@ -13,10 +14,10 @@ export async function findComputer(handle: string): Promise<{ view: RemoteComput
 }
 
 export const unknownComputer = (handle: string, known: RemoteComputerView[]) =>
-    known.length === 0 ? 'No computer is linked to this workspace. A person links one from the Rerun desktop app (account, Desktop tab).' : `No computer is called ${handle}. The linked ones: ${known.map(computer => `#${computer.handle}`).join(', ')}.`
+    known.length === 0 ? productText('No computer is linked to this workspace. A person links one from the Rerun desktop app (account, Desktop tab).') : `No computer is called ${handle}. The linked ones: ${known.map(computer => `#${computer.handle}`).join(', ')}.`
 
 export function unavailable(view: RemoteComputerView): string | null {
-    if (!view.online) return `#${view.handle} is offline${view.lastSeenAt ? ` (last seen ${view.lastSeenAt})` : ''}: the Rerun app is not running on it, or it is asleep. Nothing was run. Tell the user; do not retry in a loop.`
+    if (!view.online) return `#${view.handle} is offline${view.lastSeenAt ? ` (last seen ${view.lastSeenAt})` : ''}: the ${productName()} app is not running on it, or it is asleep. Nothing was run. Tell the user; do not retry in a loop.`
     if (view.paused) return `#${view.handle} is paused by its owner. Nothing was run. Tell the user; it runs again once they resume it from the app.`
     return null
 }

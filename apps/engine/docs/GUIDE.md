@@ -58,6 +58,7 @@ Everything lives under `RERUN_DATA_DIR` (default `~/.rerun`, `/data` in the Dock
   data-version.json             data-dir migration ladder version
   last-update.json              what the last `rerun update` did
   plan.json                     the workspace plan the app last pushed
+  brand.json                    what the coworkers call the product, as the app last answered (Rerun until then)
   engine.key, hub.json          a paired server's key and the app it paired with
   connections/
     <id>/connection.json        provider, name, models, base URL
@@ -257,6 +258,13 @@ Every engine carries one built-in agent, the Chief of Staff (`kind: "foreman"`, 
 ### The system prompt
 
 On each run the system prompt is assembled (`src/agents/systemPrompt.ts`) from: the agent's `SOUL.md`, a compact **index of its skills**, the **most relevant memories** for the incoming message, and operating notes for the tools it has. Full skill bodies are loaded only when the agent calls `skill_read`, which keeps the context small. An agent whose guided setup is still pending also gets a `setup` section and the `install_complete` tool, both of which disappear the moment it closes its installation.
+
+The product is named in it by the brand of the workspace (`src/brand/brand.ts`). The engine asks the app
+for it with its key (`GET {RERUN_HUB_BASE_URL}/api/engines/brand`), at most once a minute and as a run
+starts, whatever started it, keeps the answer in `brand.json`, and goes on with the last one when the app
+does not answer or predates the route. A text of the engine a model or a person reads names the product
+through `productText` or `productName`, which leave it untouched for Rerun; tool names, environment
+variables and paths never change.
 
 ---
 

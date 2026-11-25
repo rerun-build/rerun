@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
+import { PROVIDER_LABELS, RERUN_CONNECTION_ID, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
 import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
@@ -14,6 +14,7 @@ import { listConnections } from '../../connections/registry.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import type { RunContext } from '../../runtime/context.js'
 import { callHub } from '../../runtime/hub.js'
+import { productName, productText } from '../../brand/brand.js'
 
 const SUBSCRIPTION_PROVIDERS: ReadonlySet<Provider> = new Set(['claude', 'codex', 'opencode'])
 
@@ -22,12 +23,17 @@ function billing(provider: Provider): 'rerun_credit' | 'subscription' | 'api_key
     return SUBSCRIPTION_PROVIDERS.has(provider) ? 'subscription' : 'api_key'
 }
 
+const providerLabel = (provider: Provider): string => (provider === 'rerun' ? productName() : PROVIDER_LABELS[provider])
+
+// The keyless connection is named by the product; every other one by the person who added it.
+const connectionName = (connection: LoadedConnection): string => (connection.id === RERUN_CONNECTION_ID ? productName() : connection.config.name)
+
 function describeConnection(connection: LoadedConnection) {
     const summary = toSummary(connection)
     return {
         id: connection.id,
-        name: connection.config.name,
-        provider: PROVIDER_LABELS[connection.config.provider],
+        name: connectionName(connection),
+        provider: providerLabel(connection.config.provider),
         billing: billing(connection.config.provider),
         connected: summary.connected,
         credentialRejected: summary.credentialRejected,
@@ -58,7 +64,7 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
     return {
         ai_status: tool({
             description:
-                'See which AI you run on right now (connection, provider, model), the default of the workspace, every AI provider connected to it, and what is left on each: the Rerun credit, and for a Claude, Codex or OpenCode subscription the percentage used of each limit window with when it resets. Call it when the user asks which AI or model you use, what they can switch to, how much credit or quota is left, or why you stopped on a limit. API keys carry no quota here, only whether they work. A subscription with no reading yet has planLimits null: say it is unknown, never guess a figure. State the credit in credits, never in dollars. Read-only: to switch model, the user picks it in your settings.',
+                productText('See which AI you run on right now (connection, provider, model), the default of the workspace, every AI provider connected to it, and what is left on each: the Rerun credit, and for a Claude, Codex or OpenCode subscription the percentage used of each limit window with when it resets. Call it when the user asks which AI or model you use, what they can switch to, how much credit or quota is left, or why you stopped on a limit. API keys carry no quota here, only whether they work. A subscription with no reading yet has planLimits null: say it is unknown, never guess a figure. State the credit in credits, never in dollars. Read-only: to switch model, the user picks it in your settings.'),
             inputSchema: z.object({}),
             execute: async () => {
                 const connections = await listConnections()
@@ -72,8 +78,8 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
                 return {
                     current: {
                         connectionId: current?.id ?? null,
-                        connectionName: current?.config.name ?? null,
-                        provider: PROVIDER_LABELS[ctx.provider],
+                        connectionName: current ? connectionName(current) : null,
+                        provider: providerLabel(ctx.provider),
                         model: ctx.model,
                         ...(answering !== ctx.model ? { answeringModel: answering } : {}),
                     },

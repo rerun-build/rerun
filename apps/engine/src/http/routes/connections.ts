@@ -17,6 +17,7 @@ import { probeCustomEndpoint, refreshCustomCatalog, refreshStaleCustomCatalogs }
 import type { LoadedConnection } from '../../connections/types.js'
 import { sendNotification } from '../../runtime/notify.js'
 import { logger } from '../../lib/logger.js'
+import { productText } from '../../brand/brand.js'
 
 export const connectionRoutes = new Hono()
 
@@ -67,7 +68,7 @@ connectionRoutes.put('/backups', async c => {
     const next = boxBackupsSchema.parse(await c.req.json())
     const seen = new Set<string>()
     for (const { connectionId, model } of next.backups) {
-        if (connectionId === RERUN_CONNECTION_ID) return c.json({ error: 'The Rerun credit is its own switch, not a backup' }, 400)
+        if (connectionId === RERUN_CONNECTION_ID) return c.json({ error: productText('The Rerun credit is its own switch, not a backup') }, 400)
         const key = `${connectionId}\n${model}`
         if (seen.has(key)) return c.json({ error: `${model} is already a backup` }, 400)
         seen.add(key)

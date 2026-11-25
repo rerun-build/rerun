@@ -23,6 +23,7 @@ import { attachedVaultItems } from '../vault/runtime.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
 import { SKILL_STYLE } from '../skills/style.js'
 import { offersTeamRequests, type RunTrigger } from '../runtime/context.js'
+import { boxBrand, brandNote, productText } from '../brand/brand.js'
 
 function environmentNote(agentId: string, sharedDb: boolean): string {
     const sharedDbSentence = sharedDb ? ` The shared database of this space is at ${sharedDbPath()}, reachable from a script through the RERUN_SHARED_DB environment variable.` : ''
@@ -73,7 +74,7 @@ const SHARED_DATABASE_NOTE =
 const SHARED_SCHEMA_BUDGET = { maxTables: 40, maxChars: 4000, more: (n: number) => `... and ${n} more tables, call shared_db_schema to see them.` }
 
 const vocabularyNote = (hub: boolean) =>
-    `Rerun calls the workers of a workspace coworkers, and you are one of them. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (call_agent, agentId): there an agent is a coworker. You cannot create, rename or delete a coworker. Every workspace comes with a Chief of Staff, the assistant that creates and configures coworkers, one or a whole team, from a description or a file. It is not a coworker: team_status never lists it, so its absence there proves nothing, and no coworker can become it. When the user wants a coworker created, send them to it with a brief they can paste. They can also add one by hand with New coworker, and rename one from its menu. It is called Chief of Staff unless the workspace gave it another name: a name the user takes for a coworker, or sees with an orb, that no coworker has is probably that one. Any other name you do not know may be a person or a Box: say you do not know it rather than guess. ${hub ? 'When they ask who or where it is, or where a button is, call rerun_hub_search_docs in that same turn and tell them where to find it: a place on the screen is never named from memory, nor left for them to guess.' : 'You cannot see their screen and have no documentation search: when they ask where it is, or where a button is, say so and give them https://docs.rerun.build/chief-of-staff for the Chief of Staff, https://docs.rerun.build for the rest. A place on the screen is never named from memory.'}`
+    `Rerun calls the workers of a workspace coworkers, and you are one of them. Say "coworker" when you talk to the user. Tool names, parameters and file paths still say "agent" (call_agent, agentId): there an agent is a coworker. You cannot create, rename or delete a coworker. Every workspace comes with a Chief of Staff, the assistant that creates and configures coworkers, one or a whole team, from a description or a file. It is not a coworker: team_status never lists it, so its absence there proves nothing, and no coworker can become it. When the user wants a coworker created, send them to it with a brief they can paste. They can also add one by hand with New coworker, and rename one from its menu. It is called Chief of Staff unless the workspace gave it another name: a name the user takes for a coworker, or sees with an orb, that no coworker has is probably that one. Any other name you do not know may be a person or a Box: say you do not know it rather than guess. ${hub ? 'When they ask who or where it is, or where a button is, call rerun_hub_search_docs in that same turn and tell them where to find it: a place on the screen is never named from memory, nor left for them to guess.' : `You cannot see their screen and have no documentation search: when they ask where it is, or where a button is, say so${boxBrand().whiteLabel ? '' : ' and give them https://docs.rerun.build/chief-of-staff for the Chief of Staff, https://docs.rerun.build for the rest'}. A place on the screen is never named from memory.`}`
 
 // The Chief of Staff creates, renames and deletes coworkers with its account tools: the note above
 // made it refuse to (RER-228).
@@ -95,7 +96,7 @@ const QUICK_REPLIES_NOTE =
     'When your message ends on a result you just delivered or on an open question, and the next step is obvious, end it with 1 to 3 replies the user can send in one click, never when your message waits for something only the user has (a URL, an ID, a name, an email, a file, an access): a click sends the reply word for word as their own message, so a reply can never hold that value, and the block is left out entirely, even for the other questions of that message. The replies go one per line, between a <quick_replies> line and a </quick_replies> line, as the very last lines of your message, after everything else and never inside a code fence. For example:\n<quick_replies>\nFind 100 more\nExport them as CSV\n</quick_replies>\nThe chat turns that block into buttons under your message and never shows it as text. It is the only block the chat reads from your text. Write each reply as the user would say it, short and specific to what you just produced, under 40 characters: after finding 100 leads, "Find 100 more", "Target SaaS founders instead" or "Export them as CSV", never "Thanks" or "Tell me more". Give a single reply when one next step is clearly the most likely. Skip the block after a plain acknowledgement, when nothing obvious follows, and in any turn that ends on a card asking the user something: that card already tells them how to answer. The replies never carry information of their own: your message must be complete without them, and a reply never stands in for telling the user that something failed. A click only sends text, so a reply never says the user did something outside the chat (approved, clicked a button, signed in).'
 
 const rerunDocsNote = (web: boolean) =>
-    `A question about Rerun itself (how something works, what it costs, what a plan or the API allows, where something is in the app) is answered out of the documentation: call rerun_hub_search_docs and give the user the link of the passage you used. Never answer one of those from memory, and never invent a feature, a limit or a price. When you are stuck on Rerun's side, a Rerun tool failing in a way you do not understand or a step in the app the user cannot find or cannot get through, look it up with rerun_hub_search_docs before answering or retrying blindly.${web ? ' When a passage is cut short, read the whole page with web_fetch on its docs.rerun.build link.' : ''}`
+    `A question about Rerun itself (how something works, what it costs, what a plan or the API allows, where something is in the app) is answered out of the documentation: call rerun_hub_search_docs${boxBrand().whiteLabel ? '' : ' and give the user the link of the passage you used'}. Never answer one of those from memory, and never invent a feature, a limit or a price. When you are stuck on Rerun's side, a Rerun tool failing in a way you do not understand or a step in the app the user cannot find or cannot get through, look it up with rerun_hub_search_docs before answering or retrying blindly.${web && !boxBrand().whiteLabel ? ' When a passage is cut short, read the whole page with web_fetch on its docs.rerun.build link.' : ''}`
 
 const TEAM_REQUESTS_NOTE =
     'When the user asks for something Rerun cannot do yet, or runs into a bug of Rerun itself, do not stop at "not possible". Check the Rerun documentation and the app catalog first. Once the gap stands (no built-in way, no app, no setting does it), call request_feature in that same turn, whatever else you still need from the user: your message says what is possible today and asks in plain words for what a workaround would need, and the request is the one card of that turn. When the user asked for Rerun to do it itself (built in, right in the chat) and only an app of the catalog gets close, that app is the workaround the card names, and the request still goes. A Rerun screen, button or tool that misbehaves and that the documentation does not explain is reported the same way, as a bug, in the turn the user tells you about it, even when you cannot reproduce it yourself: the quick checks worth trying go in your message beside the card, never instead of it. Never for a plain question, and never twice for the same request in a conversation.'
@@ -366,10 +367,11 @@ async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promi
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
     const stable = [
-        section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
-        section('vocabulary', FOREMAN_VOCABULARY_NOTE),
+        section('identity', agent.brief?.instructions.trim() || productText(agent.soul.trim())),
+        section('vocabulary', productText(FOREMAN_VOCABULARY_NOTE)),
+        section('product', brandNote()),
         section('environment', checkinEnvironmentNote(agent.id)),
-        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
+        CLI_PROVIDERS.has(provider) ? section('bridged_tools', productText(cliBridgeNote(provider, cfg.web))) : '',
         section('operating_notes', CHECKIN_OPERATING_NOTES),
         offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
         section('verbosity', verbosityNote(agent.config.verbosity, false)),
@@ -403,13 +405,14 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     const operating = [FOREMAN_OPERATING_NOTES, cfg.skills && learns ? SKILL_PROPOSAL_REMINDER : '', cfg.skills && cfg.memory ? WHERE_IT_BELONGS_NOTE : ''].filter(Boolean).join(' ')
     const foremanComputers = await remoteComputersNote(cfg.remoteComputers)
     const stable = [
-        section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
-        section('vocabulary', FOREMAN_VOCABULARY_NOTE),
+        section('identity', agent.brief?.instructions.trim() || productText(agent.soul.trim())),
+        section('vocabulary', productText(FOREMAN_VOCABULARY_NOTE)),
+        section('product', brandNote()),
         section('environment', foremanEnvironmentNote(agent.id, called)),
-        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
+        CLI_PROVIDERS.has(provider) ? section('bridged_tools', productText(cliBridgeNote(provider, cfg.web))) : '',
         section('operating_notes', operating),
         cfg.hub ? section('service_catalog', serviceCatalogNote(computer, takeover, cfg.paidData)) : '',
-        cfg.paidData ? section('paid_data', paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval)) : '',
+        cfg.paidData ? section('paid_data', productText(paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval))) : '',
         computer ? section('computer', computerNote(takeover, provider === 'codex', cfg.paidData, cfg.hub, cfg.requestSecret)) : '',
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
@@ -429,7 +432,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('company_brain', brain),
         foremanComputers ? section('linked_computers', foremanComputers) : '',
         own.memory,
-        cfg.db ? section('database', `${databaseNote(cfg.sharedDb)} ${FOREMAN_COWORKER_DATABASES_NOTE}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
+        cfg.db ? section('database', `${productText(databaseNote(cfg.sharedDb))} ${FOREMAN_COWORKER_DATABASES_NOTE}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
         section('variables', variablesNote(agent)),
@@ -464,14 +467,15 @@ export async function buildSystemPrompt(
     // Who it is, where it runs, how it works, how it talks to the user, then this session.
     const stable = [
         section('identity', agent.soul.trim() || defaultSoul(agent.config)),
-        section('vocabulary', vocabularyNote(cfg.hub)),
+        section('vocabulary', productText(vocabularyNote(cfg.hub))),
+        section('product', brandNote()),
         section('environment', environmentNote(agent.id, cfg.sharedDb)),
-        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
+        CLI_PROVIDERS.has(provider) ? section('bridged_tools', productText(cliBridgeNote(provider, cfg.web))) : '',
         section('operating_notes', operatingNotes(cfg.skills && agent.config.selfImprovement.enabled)),
         hasPendingSetup(agent) ? section('setup', setupNote(cfg.paidData)) : '',
         cfg.hub ? section('service_catalog', serviceCatalogNote(computer, takeover, cfg.paidData)) : '',
-        cfg.hub ? section('rerun_docs', rerunDocsNote(cfg.web)) : '',
-        cfg.paidData ? section('paid_data', paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval)) : '',
+        cfg.hub ? section('rerun_docs', productText(rerunDocsNote(cfg.web))) : '',
+        cfg.paidData ? section('paid_data', productText(paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval))) : '',
         computer ? section('computer', computerNote(takeover, provider === 'codex', cfg.paidData, cfg.hub, cfg.requestSecret)) : '',
         section('reporting_failures', FAILURE_NOTE),
         conversational ? section('what_the_user_sees', `${WHAT_THE_USER_SEES_NOTE} ${showBeforeAskingNote(cfg.cards)}`) : '',
@@ -493,7 +497,7 @@ export async function buildSystemPrompt(
         own.triggers,
         section('company_brain', brain),
         own.memory,
-        cfg.db ? section('database', `${databaseNote(cfg.sharedDb)}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
+        cfg.db ? section('database', `${productText(databaseNote(cfg.sharedDb))}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `${SHARED_DATABASE_NOTE}${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
         section('variables', variablesNote(agent)),

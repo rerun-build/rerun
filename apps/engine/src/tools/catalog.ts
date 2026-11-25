@@ -28,6 +28,7 @@ import { askUserTool, requestApprovalTool, requestSecretTool, requestTakeoverToo
 import { agentConfigSchema, type AgentConfig } from '../agents/types.js'
 import type { RunContext } from '../runtime/context.js'
 import { desktopEnabled, remoteComputersEnabled } from '../config/env.js'
+import { productText } from '../brand/brand.js'
 import { remoteComputerTools } from './builtin/remote.js'
 
 type CapabilityKey = keyof AgentConfig['tools'] | 'self'
@@ -86,9 +87,9 @@ function toolsOf(def: FamilyDef): ToolInfo[] {
 const shownFamilies = (): FamilyDef[] => FAMILIES.filter(def => !def.hidden?.())
 
 export function toolCatalog(): FamilyInfo[] {
-    return shownFamilies().map(def => ({ family: def.family, description: def.description, tools: toolsOf(def) }))
+    return shownFamilies().map(def => ({ family: def.family, description: productText(def.description), tools: toolsOf(def) }))
 }
 
 export function agentToolCatalog(config: AgentConfig): AgentFamilyInfo[] {
-    return shownFamilies().map(def => ({ family: def.family, description: def.description, enabled: def.enabled(config), tools: toolsOf(def) }))
+    return shownFamilies().map(def => ({ family: def.family, description: productText(def.description), enabled: def.enabled(config), tools: toolsOf(def) }))
 }

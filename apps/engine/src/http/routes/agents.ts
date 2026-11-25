@@ -26,6 +26,7 @@ import { stopDesktop } from '../../desktop/session.js'
 import { finishTakeover } from '../../desktop/takeover.js'
 import { agentDir, configPath, installPath, soulPath } from '../../config/paths.js'
 import { agentToolCatalog } from '../../tools/catalog.js'
+import { refreshBrand } from '../../brand/brand.js'
 import type { RunModel } from '../../agents/availability.js'
 import { copyVaultAttachments, forgetVaultAgent } from '../../vault/store.js'
 import { agentMcpServers } from '../../vault/runtime.js'
@@ -72,6 +73,7 @@ agentRoutes.get('/:id', async c => {
 agentRoutes.get('/:id/tools', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
+    await refreshBrand()
     return c.json({ families: agentToolCatalog(await readAgentConfig(id)) })
 })
 

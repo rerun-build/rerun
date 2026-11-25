@@ -1,3 +1,5 @@
+import { productText } from '../brand/brand.js'
+
 export class HttpError extends Error {
     status: number
     code?: string
@@ -27,7 +29,7 @@ export const coworkerBusy = () => new HttpError(409, 'Another run of this cowork
 
 export const subscriptionLimited = () => new HttpError(429, "This coworker's subscription has hit its usage limit; scheduled runs are paused until it resets.", 'subscription_limited')
 
-export const budgetExhausted = () => new HttpError(402, 'Rerun credits used up; automated runs on Rerun models are paused until they reset or you add credits.', 'budget_latched')
+export const budgetExhausted = () => new HttpError(402, productText('Rerun credits used up; automated runs on Rerun models are paused until they reset or you add credits.'), 'budget_latched')
 
 export const checkinsDisabled = () => new HttpError(403, 'The check-ins of the Chief of Staff are switched off on this box.', 'checkins_disabled')
 

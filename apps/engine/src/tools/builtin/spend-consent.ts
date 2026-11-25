@@ -2,6 +2,7 @@ import { formatCreditsLabel, parseHitlReply, parseSpendDecision, readSpendQuote 
 import { extractText, listMessages } from '../../db/repos/messages.js'
 import { canonicalHitlName } from './hitl.js'
 import type { RunContext } from '../../runtime/context.js'
+import { productText } from '../../brand/brand.js'
 
 // How far past its estimate an approval stretches before the user is asked again. Not a cap on the
 // credit: a real bill lands on either side of a rough estimate, and asking again over a few cents
@@ -106,7 +107,7 @@ export async function checkSpendConsent(ctx: RunContext): Promise<SpendConsent> 
     if (ctx.agent.config.paidDataAlwaysAllow) return { granted: true, approvalId: null }
 
     const approval = await loadApproval(ctx)
-    if (!approval) return { granted: false, reason: ctx.agent.config.tools.requestApproval ? NO_APPROVAL : NO_ONE_TO_APPROVE }
+    if (!approval) return { granted: false, reason: productText(ctx.agent.config.tools.requestApproval ? NO_APPROVAL : NO_ONE_TO_APPROVE) }
 
     const spent = spentAgainst(approval.approvalId)
     if (spent >= approval.estimateMicros * SPEND_OVERRUN_FACTOR) {

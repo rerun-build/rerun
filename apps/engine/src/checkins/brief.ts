@@ -1,6 +1,7 @@
 import { foremanBriefSchema, type CheckinReason, type ForemanBrief } from '@rerun/contracts'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
+import { productText } from '../brand/brand.js'
 
 const FETCH_TIMEOUT_MS = 10_000
 
@@ -14,7 +15,7 @@ Look at how the workspace is doing through what you can read: your memory, your 
 // on the hub and nothing else. Never throws: the check-in goes on with the text above.
 export async function fetchCheckinBrief(reason: CheckinReason): Promise<ForemanBrief> {
     const { RERUN_HUB_BASE_URL: hub, RERUN_API_KEY: token } = env()
-    const fallback: ForemanBrief = { instructions: CHECKIN_FALLBACK_INSTRUCTIONS, tools: [] }
+    const fallback: ForemanBrief = { instructions: productText(CHECKIN_FALLBACK_INSTRUCTIONS), tools: [] }
     if (!hub || !token) return fallback
     try {
         const res = await fetch(`${hub.replace(/\/$/, '')}/api/foreman/checkin-brief`, {
