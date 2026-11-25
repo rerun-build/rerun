@@ -12,7 +12,7 @@
 #
 # `@rerun/contracts` resolves to its gitignored `dist/`, so the UI and the engine fail on "Can't resolve
 # '@rerun/contracts'" until it is built.
-setup = "([ -e cloud/.git ] || git clone -q \"$(git remote get-url origin | sed -E 's#/rerun(\\.git)?$#/rerun-cloud.git#')\" cloud || echo 'WARNING: cloud/ was not cloned. Without access to rerun-cloud this is the open source build; with access, fix git auth and rerun the setup.' >&2) && ([ ! -f cloud/conductor/tailscale-up.sh ] || bash cloud/conductor/tailscale-up.sh setup) && pnpm install --force && pnpm build:contracts && (pnpm cloud db:link || true) && (pnpm cloud env:prod || true)"
+setup = "([ -e cloud/.git ] || git clone -q \"$(git remote get-url origin | sed -E 's#/rerun(\\.git)?$#/rerun-cloud.git#')\" cloud || echo 'WARNING: cloud/ was not cloned. Without access to rerun-cloud this is the open source build; with access, fix git auth and rerun the setup.' >&2) && ([ ! -f cloud/conductor/tailscale-up.sh ] || bash cloud/conductor/tailscale-up.sh setup) && pnpm install --prefer-offline && pnpm build:contracts && (pnpm cloud db:link || true) && (pnpm cloud env:prod || true)"
 run_mode = "concurrent"
 
 # Cloud workspaces only: on the Mac the actions live in `.conductor/settings.local.toml` of the main
