@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const getCustomMcpServer = vi.fn()
 const openPendingGrant = vi.fn()
 const purgeExpiredGrants = vi.fn()
+const resolveClient = vi.fn<typeof import('@/lib/mcp-oauth').resolveClient>()
 let afterTasks: Promise<unknown>[] = []
 vi.mock('next/server', async importOriginal => ({ ...(await importOriginal<typeof import('next/server')>()), after: (task: () => Promise<unknown>) => void afterTasks.push(task()) }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ openPendingGrant: (...args: unknown[]) => openPendingGrant(...args), purgeExpiredGrants: () => purgeExpiredGrants() }))
@@ -31,7 +32,7 @@ vi.mock('@/app/api/_services/workspace-engine.service', async importOriginal => 
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
     discoverAuthServer: async () => ({ authorizationEndpoint: 'https://linear.app/oauth/authorize', tokenEndpoint: 'https://linear.app/oauth/token', scopesSupported: ['read'] }),
-    resolveClient: async () => ({ clientId: 'client-1' }),
+    resolveClient: (...args: Parameters<typeof resolveClient>) => resolveClient(...args),
 }))
 
 const { GET } = await import('./route')
@@ -44,6 +45,7 @@ beforeEach(() => {
     afterTasks = []
     openPendingGrant.mockReset().mockResolvedValue(undefined)
     purgeExpiredGrants.mockReset().mockResolvedValue([])
+    resolveClient.mockReset().mockResolvedValue({ clientId: 'client-1' })
     getCustomMcpServer.mockReset().mockResolvedValue({ server: { name: 'linear', displayName: 'Linear', transport: 'http', host: 'mcp.linear.app', icon: null, signInUrl: 'https://mcp.linear.app/mcp' }, status: 'needs_auth' })
 })
 
@@ -120,6 +122,24 @@ describe('GET /api/oauth/mobile/start, for an entry of the Vault', () => {
         const ctx = decodeContext(cookie.value)
         expect(ctx).toMatchObject({ agentId: '', serverName: 'notion', mcpUrl: 'https://mcp.notion.com/mcp', vault: { itemId: 'item-1', workspaceId: 7 } })
         expect(callbackGrant(ctx)).toMatchObject({ vaultItem: 'item-1', workspaceId: 7, userId: 'user-1', desktop: 'stable' })
+    })
+
+    it("signs a WordPress.com entry in through Rerun's own app on the OAuth 2 endpoints, the secret kept on the hub", async () => {
+        const actual = await vi.importActual<typeof import('@/lib/mcp-oauth')>('@/lib/mcp-oauth')
+        resolveClient.mockImplementation(actual.resolveClient)
+        vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_ID', 'wpcom-app')
+        vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_SECRET', 'wpcom-secret')
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', oauth: { serverName: 'wordpress', url: 'https://public-api.wordpress.com/wpcom/v2/mcp/v1' } } as never)
+
+        const res = await open(vaultTicket())
+
+        const authorize = new URL(res.headers.get('location')!)
+        expect(authorize.origin + authorize.pathname).toBe('https://public-api.wordpress.com/oauth2/authorize')
+        expect(authorize.searchParams.get('client_id')).toBe('wpcom-app')
+        expect(authorize.searchParams.get('scope')).toBe('global')
+        const ctx = decodeContext(res.cookies.getAll()[0].value)
+        expect(ctx).toMatchObject({ clientId: 'wpcom-app', tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token', vault: { itemId: 'item-1', workspaceId: 7 } })
+        expect(ctx.clientSecret).toBeUndefined()
     })
 
     it("starts a Composio entry as the entry's own user, bound to the entry and to the app", async () => {
