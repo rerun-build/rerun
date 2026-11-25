@@ -5,7 +5,7 @@ import { refusalMessageOf, refusalResponse } from '../lib/refusal-body.js'
 // A local model on modest hardware reads a long prompt for minutes before its first token, and
 // sends no response header until then: past the five minutes Node allows, the request is dropped and
 // retried from scratch, three times over. Measured on a CPU box: a 20k-token prompt takes 25 minutes.
-const CUSTOM_ENDPOINT_PATIENCE_MS = 60 * 60_000
+export const CUSTOM_ENDPOINT_PATIENCE_MS = 60 * 60_000
 const customEndpointDispatcher = new UndiciAgent({ headersTimeout: CUSTOM_ENDPOINT_PATIENCE_MS, bodyTimeout: CUSTOM_ENDPOINT_PATIENCE_MS })
 
 // A proxy or a host in front of the endpoint can answer its 402 with a whole page: only a sentence is

@@ -20,7 +20,7 @@ function prunablePart(part: ToolResultPart): boolean {
 }
 
 // A paid answer, a page or a cut tool result saved whole stays reachable once its result is pruned: the pointer survives.
-function savedPointerOf(output: ToolResultOutput): string {
+export function savedPointerOf(output: ToolResultOutput): string {
     const value = output.value as { saved?: unknown } | string | undefined
     const page = typeof value === 'string' ? /Saved whole: (\.rerun\/pages\/\S+)/.exec(value)?.[1] : undefined
     if (page) return `; the whole page is saved at ${page}, read or grep it`

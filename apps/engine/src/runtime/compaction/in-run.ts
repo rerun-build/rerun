@@ -9,7 +9,6 @@ import { withoutReasoning } from '../replayed-reasoning.js'
 import { compactionThreshold, recordCompactionUsage, runContextWindow, summarizeMiddle, summaryMessageOf } from './compact.js'
 import { COMPACTION_TAIL_TOKEN_BUDGET } from './config.js'
 import { estimateTokens } from './estimate.js'
-import { pruneToolOutputs } from './prune.js'
 import { repairToolPairs } from './repair.js'
 import { tailStartIndex } from './split.js'
 
@@ -113,12 +112,9 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
         const checkpointId = newId()
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'running' } })
         try {
-            const middle = pruneToolOutputs(view, cut).messages.slice(0, cut)
-            const summary = await summarizeMiddle(ctx, override, middle)
+            const summary = await summarizeMiddle(ctx, override, view.slice(0, cut), threshold)
             await recordCompactionUsage(ctx, stepNumber, summary)
             compacted = { summary: summaryMessageOf(IN_RUN_SUMMARY_PREAMBLE, summary.text), coveredCount, keptUntil: messages.length }
-            // Weighed against what the steps carried before the summary, not against the pruned copy
-            // the summary was written from, where a large result is down to a line.
             const tokensRecovered = Math.max(0, estimateTokens(view.slice(0, cut)) - estimateTokens([compacted.summary, ...pinned]))
             ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'done', messagesCompacted, tokensRecovered } })
             ctx.logger.info({ agent: ctx.agent.id, session: ctx.sessionId, run: ctx.runId, stepNumber, tokens, messagesCompacted, tokensRecovered, usage: summary.usage }, 'context compacted mid-run')

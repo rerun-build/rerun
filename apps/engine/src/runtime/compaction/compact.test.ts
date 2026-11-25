@@ -127,6 +127,27 @@ describe('prepareRunHistory', () => {
         expect(writes).toHaveLength(0)
     })
 
+    // RER-314: an earlier summary has no copy to read again, a cut tool result does.
+    it('keeps the earlier summary whole and cuts the tool results to make room', async () => {
+        const prior = `## Historical Task Snapshot\nPRIOR ${'s'.repeat(100_000)} END OF PRIOR`
+        state.checkpoint = { summaryJson: JSON.stringify({ role: 'user', content: prior }), throughCreatedAt: 't' }
+        state.rows = [
+            row(0, 'user', 'go on'),
+            ...Array.from({ length: 8 }, (_, i) => [
+                row(1 + 2 * i, 'assistant', [{ type: 'tool-call', toolCallId: `c${i}`, toolName: 'shell_exec', input: { command: `step ${i}` } }]),
+                row(2 + 2 * i, 'tool', [{ type: 'tool-result', toolCallId: `c${i}`, toolName: 'shell_exec', output: { type: 'text', value: `${i}`.padEnd(CHUNK, '.') } }]),
+            ]).flat(),
+        ]
+        const { ctx } = context()
+
+        await prepareRunHistory(ctx, 'system')
+
+        expect(state.prompts).toHaveLength(1)
+        const prompt = JSON.stringify(state.prompts[0].prompt)
+        expect(prompt).toContain(JSON.stringify(prior).slice(1, -1))
+        expect(prompt).toContain('characters cut]')
+    })
+
     it('strips the reasoning of stored turns', async () => {
         state.rows = [row(0, 'assistant', [{ type: 'reasoning', text: 'hmm' }, { type: 'text', text: 'answer' }])]
         const { ctx } = context('no-such-model')
@@ -224,7 +245,14 @@ describe('prepareRunHistory', () => {
         expect(prompt).toContain('first question')
         expect(prompt).toContain('→ called shell_exec')
         expect(prompt).toContain('← shell_exec result:')
-        expect(prompt).toContain('[pruned] shell_exec output')
+        // Eight messages of 40,000 characters overflow the budget of gpt-4o's 96k threshold on their
+        // own: the result of `ls` gives way whole before they do, then each of them keeps its head.
+        expect(prompt).not.toContain('[pruned]')
+        expect(prompt).not.toContain('y'.repeat(100))
+        expect(prompt).toContain(`first question ${'x'.repeat(20_000)}`)
+        expect(prompt).toContain('characters cut]')
+        const [system, user] = call.prompt as [{ content: string }, { content: Array<{ text: string }> }]
+        expect(system.content.length + user.content.map(part => part.text).join('').length).toBeLessThanOrEqual((96_000 - 12_000) * 3)
         expect(prompt).not.toContain('SECRET THOUGHT')
         expect(prompt).not.toContain('RECALLED MEMORY')
         expect(prompt).not.toContain('10....')

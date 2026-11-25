@@ -6,6 +6,7 @@ import { COMPACTION_FINISH_REASON, isContextPart, modelContextWindow, type Provi
 import { modelFor, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
+import { CUSTOM_ENDPOINT_PATIENCE_MS } from '../../agents/custom-endpoint-fetch.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
 import { listMessagesAfter } from '../../db/repos/messages.js'
 import { getLatestCheckpoint, saveCheckpoint } from '../../db/repos/checkpoints.js'
@@ -16,9 +17,9 @@ import type { RunContext } from '../context.js'
 import { signHistoryMessage } from '../message-authors.js'
 import { withoutReasoning } from '../replayed-reasoning.js'
 import { costMicrosFrom } from '../step-cost.js'
-import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_SUMMARY_TOKENS_CEILING, COMPACTION_TAIL_TOKEN_BUDGET, COMPACTION_TRIGGER_RATIO } from './config.js'
+import { COMPACTION_MAX_TRIGGER_TOKENS, COMPACTION_SUMMARY_INPUT_CHARS_PER_TOKEN, COMPACTION_SUMMARY_TOKENS_CEILING, COMPACTION_TAIL_TOKEN_BUDGET, COMPACTION_TRIGGER_RATIO } from './config.js'
 import { estimateTokens } from './estimate.js'
-import { pruneToolOutputs } from './prune.js'
+import { savedPointerOf } from './prune.js'
 import { repairToolPairs } from './repair.js'
 import { tailStartIndex } from './split.js'
 
@@ -35,47 +36,105 @@ const SUMMARY_TITLE = 'Historical Task Snapshot'
 const SUMMARY_REQUEST = `The transcript above is over: do not continue it, call no tool and answer nobody in it. Write the handoff summary now, starting with the line "## ${SUMMARY_TITLE}". Keep the section titles in English whatever the language of the transcript.`
 
 // A summary of a long history on a slow model takes minutes, so the ceiling is generous: it only has
-// to keep a provider that never answers from holding the run, which then goes on uncompacted.
+// to keep a provider that never answers from holding the run, which then goes on uncompacted. A
+// custom endpoint (a local model) reads a long prompt for as long as one of its steps would.
 const COMPACTION_TIMEOUT_MS = 15 * 60 * 1000
 
-function partToText(part: unknown): string {
-    if (typeof part === 'string') return part
-    if (!part || typeof part !== 'object') return ''
-    const p = part as Record<string, unknown>
-    // The memories recalled for a turn and its timestamp were context, not conversation.
-    if (isContextPart(p)) return ''
-    if (p.type === 'text' && typeof p.text === 'string') return p.text
-    if (p.type === 'tool-call') return `→ called ${String(p.toolName)}(${JSON.stringify(p.input ?? {}).slice(0, 1000)})`
-    if (p.type === 'tool-result') {
-        const output = p.output as { value?: unknown } | undefined
-        return `← ${String(p.toolName)} result: ${JSON.stringify(output?.value ?? output ?? '').slice(0, 1000)}`
-    }
-    return ''
+function summaryTimeoutMs(provider: Provider): number {
+    return provider === 'custom' ? CUSTOM_ENDPOINT_PATIENCE_MS : COMPACTION_TIMEOUT_MS
 }
 
-function serializeForSummary(messages: ModelMessage[]): string {
-    return messages
-        .map(message => {
-            const content = message.content as unknown
-            const body = typeof content === 'string' ? content : Array.isArray(content) ? content.map(partToText).filter(Boolean).join('\n') : ''
-            return `[${message.role}]\n${body}`
-        })
-        .filter(Boolean)
-        .join('\n\n')
+// Only `body` gives way to the budget; `pointer` is where a cut result can be read again whole. The
+// tools give way first: a message or an earlier summary has no copy to read again once cut.
+type SummaryPiece = { before: string; body: string; after: string; pointer: string; yields: 'tool' | 'text' }
+
+function textPiece(body: string): SummaryPiece {
+    return { before: '', body, after: '', pointer: '', yields: 'text' }
+}
+
+function pieceOf(part: unknown): SummaryPiece | undefined {
+    if (typeof part === 'string') return textPiece(part)
+    if (!part || typeof part !== 'object') return undefined
+    const p = part as Record<string, unknown>
+    // The memories recalled for a turn and its timestamp were context, not conversation.
+    if (isContextPart(p)) return undefined
+    if (p.type === 'text' && typeof p.text === 'string') return textPiece(p.text)
+    if (p.type === 'tool-call') return { before: `→ called ${String(p.toolName)}(`, body: JSON.stringify(p.input ?? {}), after: ')', pointer: '', yields: 'tool' }
+    if (p.type === 'tool-result') {
+        const output = p.output as { type?: string; value?: unknown } | undefined
+        // A result read as text stays text: as JSON every line break of the code it holds turns into `\n`.
+        const body = typeof output?.value === 'string' ? output.value : JSON.stringify(output?.value ?? output ?? '')
+        return { before: `← ${String(p.toolName)} result: `, body, after: '', pointer: output ? savedPointerOf({ type: output.type ?? 'text', value: output.value }) : '', yields: 'tool' }
+    }
+    return undefined
+}
+
+// The largest length every body can keep so that all of them fit in `budget`: a body under it stays whole.
+function bodyCap(lengths: number[], budget: number): number {
+    const sorted = [...lengths].sort((a, b) => a - b)
+    let left = budget
+    for (let i = 0; i < sorted.length; i++) {
+        const share = Math.floor(left / (sorted.length - i))
+        if (sorted[i] > share) return Math.max(0, share)
+        left -= sorted[i]
+    }
+    return Infinity
+}
+
+function cutMarker({ pointer }: SummaryPiece, cutChars: number): string {
+    return `\n…[${cutChars} characters cut${pointer}]…\n`
+}
+
+// Cutting a body no longer than the note that replaces it would only lengthen it.
+function cuttable(piece: SummaryPiece): boolean {
+    return piece.body.length > cutMarker(piece, piece.body.length).length
+}
+
+function cutBody(piece: SummaryPiece, cap: number): string {
+    const { body } = piece
+    if (body.length <= cap) return body
+    const head = Math.ceil(cap * 0.75)
+    return `${body.slice(0, head)}${cutMarker(piece, body.length - cap)}${body.slice(body.length - (cap - head))}`
+}
+
+function serializeForSummary(messages: ModelMessage[], budgetChars: number): string {
+    const turns = messages.map(message => {
+        const content = message.content as unknown
+        const parts = typeof content === 'string' ? [content] : Array.isArray(content) ? content : []
+        return { role: message.role, pieces: parts.map(pieceOf).filter((piece): piece is SummaryPiece => !!piece && !!(piece.before || piece.body)) }
+    })
+    const pieces = turns.flatMap(turn => turn.pieces)
+    // The note of a cut body is held back in advance, at its longest.
+    const fixedChars = (piece: SummaryPiece) => piece.before.length + piece.after.length + 1 + (cuttable(piece) ? cutMarker(piece, piece.body.length).length : piece.body.length)
+    const frame = turns.reduce((sum, turn) => sum + turn.role.length + 5, 0) + pieces.reduce((sum, piece) => sum + fixedChars(piece), 0)
+    const cuttableLengths = (yields: SummaryPiece['yields']) => pieces.filter(piece => piece.yields === yields && cuttable(piece)).map(piece => piece.body.length)
+    const room = budgetChars - frame
+    const textCap = bodyCap(cuttableLengths('text'), room)
+    const textKept = cuttableLengths('text').reduce((sum, length) => sum + Math.min(length, textCap), 0)
+    const toolCap = bodyCap(cuttableLengths('tool'), room - textKept)
+    const capOf = (piece: SummaryPiece) => (!cuttable(piece) ? Infinity : piece.yields === 'text' ? textCap : toolCap)
+    return turns.map(turn => `[${turn.role}]\n${turn.pieces.map(piece => `${piece.before}${cutBody(piece, capOf(piece))}${piece.after}`).join('\n')}`).join('\n\n')
+}
+
+// The summary is asked of the run's own model, so what it reads stays under the threshold the run
+// is compacted at, with room left for the summary it writes.
+function summaryInputBudgetChars(threshold: number): number {
+    const tokens = Math.max(threshold / 2, threshold - COMPACTION_SUMMARY_TOKENS_CEILING)
+    return Math.floor(tokens * COMPACTION_SUMMARY_INPUT_CHARS_PER_TOKEN) - SUMMARY_SYSTEM.length - SUMMARY_REQUEST.length - '<transcript>\n\n</transcript>\n\n'.length
 }
 
 export type CompactionSummary = { text: string; usage: LanguageModelUsage; providerMetadata: unknown; durationMs: number }
 
-export async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefined, middle: ModelMessage[]): Promise<CompactionSummary> {
+export async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefined, middle: ModelMessage[], threshold: number): Promise<CompactionSummary> {
     const startedAt = Date.now()
     const release = await ensureCliAuth(ctx.agent.resolved.provider, ctx.agent.resolved.connection)
     try {
-        const signal = deadlineSignal(COMPACTION_TIMEOUT_MS, ctx.abortSignal)
+        const signal = deadlineSignal(summaryTimeoutMs(ctx.provider), ctx.abortSignal)
         const { text, usage, providerMetadata } = await raceAbort(
             generateText({
                 model: modelFor(ctx.agent, override, undefined, undefined, { sessionId: ctx.sessionId }),
                 system: SUMMARY_SYSTEM,
-                prompt: `<transcript>\n${serializeForSummary(middle)}\n</transcript>\n\n${SUMMARY_REQUEST}`,
+                prompt: `<transcript>\n${serializeForSummary(middle, summaryInputBudgetChars(threshold))}\n</transcript>\n\n${SUMMARY_REQUEST}`,
                 temperature: 0,
                 maxOutputTokens: COMPACTION_SUMMARY_TOKENS_CEILING,
                 abortSignal: signal,
@@ -152,7 +211,8 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
 
     const contextWindow = runContextWindow(ctx.model, ctx.provider, ctx.agent.resolved.connection)
     if (!contextWindow) return working
-    if (estimateTokens(working, system, toolChars) < compactionThreshold(contextWindow, ctx.provider)) return working
+    const threshold = compactionThreshold(contextWindow, ctx.provider)
+    if (estimateTokens(working, system, toolChars) < threshold) return working
 
     const offset = priorSummary ? 1 : 0
     const tailStart = tailStartIndex(working, COMPACTION_TAIL_TOKEN_BUDGET)
@@ -163,10 +223,9 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
     ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'running' } })
 
     try {
-        const pruned = pruneToolOutputs(working, tailStart)
-        const middle = pruned.messages.slice(0, tailStart)
-        const tail = pruned.messages.slice(tailStart)
-        const summary = await summarizeMiddle(ctx, override, middle)
+        const middle = working.slice(0, tailStart)
+        const tail = working.slice(tailStart)
+        const summary = await summarizeMiddle(ctx, override, middle, threshold)
         await recordCompactionUsage(ctx, 0, summary)
         const summaryMessage = summaryMessageOf(SUMMARY_PREAMBLE, summary.text)
         const throughRow = live[newThroughIndex].row

@@ -105,7 +105,7 @@ describe('createInRunCompactor', () => {
 
         expect(state.prompts).toHaveLength(1)
         expect(state.prompts[0]).toContain('THE REQUEST')
-        expect(state.prompts[0]).toContain('[pruned] shell_exec output')
+        expect(state.prompts[0]).not.toContain('[pruned]')
         expect(sent?.[0]).toEqual({ role: 'user', content: `${IN_RUN_SUMMARY_PREAMBLE}\n\n${summary('SUMMARY')}` })
         expect(sent?.[1]).toEqual(REQUEST)
         expect(sent?.slice(2)).toEqual(messages.slice(messages.length - (sent?.length ?? 0) + 2))
@@ -117,8 +117,62 @@ describe('createInRunCompactor', () => {
         expect(writes.map(w => w.data.status)).toEqual(['running', 'done'])
         expect(writes[1]).toEqual({ type: 'data-compaction', id: writes[0].id, data: { status: 'done', messagesCompacted: compacted, tokensRecovered: expect.any(Number) } })
         expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({ run: 'run-1', stepNumber: 12, messagesCompacted: compacted }), 'context compacted mid-run')
-        // Ten results of ~10k tokens left the context, even though the summary read them pruned.
+        // Ten results of ~10k tokens left the context.
         expect(writes[1].data.tokensRecovered).toBeGreaterThan(90_000)
+    })
+
+    // RER-314: a summary written from one line per result forgot the ticket the run was working on,
+    // and the run read it again after every compaction.
+    it('lets the summary read the ticket a tool returned and the code the run wrote, whole', async () => {
+        const ticket = `MINIAPP-7 ${'rotate the csrf_token on every render. '.repeat(800)}KEEP THE EXISTING ERROR MESSAGE`
+        const code = `cat > login.php <<'EOF'\n${'$token = bin2hex(random_bytes(32));\n'.repeat(200)}// END OF LOGIN.PHP\nEOF`
+        const messages: ModelMessage[] = [
+            ...OPENING,
+            { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 'ticket', toolName: 'tool_result_read', input: { path: '.rerun/tool-results/jira.txt' } }] },
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: 'ticket', toolName: 'tool_result_read', output: { type: 'text', value: ticket } }] },
+            { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 'write', toolName: 'shell_exec', input: { command: code } }] },
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: 'write', toolName: 'shell_exec', output: { type: 'text', value: 'ok' } }] },
+            ...Array.from({ length: 4 }, (_, i) => toolStep(i)).flat(),
+        ]
+
+        // The provider counted the last step past the threshold: what is left to summarise fits the budget.
+        await compactorFor(context().ctx)({ messages, steps: [{ usage: { inputTokens: 100_000, outputTokens: 0 } }], stepNumber: 6 })
+
+        expect(state.prompts).toHaveLength(1)
+        expect(state.prompts[0]).toContain(ticket)
+        expect(state.prompts[0]).toContain(JSON.stringify(JSON.stringify({ command: code })).slice(1, -1))
+        expect(state.prompts[0]).not.toContain('[pruned]')
+    })
+
+    it('keeps what the summary reads under the threshold, every result cut to its head and tail', async () => {
+        const saved = `${'z'.repeat(60_000)}\n[Cut at 40,000 characters: the whole result is saved at .rerun/tool-results/big.txt]`
+        const messages: ModelMessage[] = [
+            ...runOf(12),
+            { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 'big', toolName: 'shell_exec', input: { command: 'cat big' } }] },
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: 'big', toolName: 'shell_exec', output: { type: 'text', value: saved } }] },
+            ...Array.from({ length: 2 }, (_, i) => toolStep(20 + i)).flat(),
+        ]
+
+        await compactorFor(context().ctx)({ messages, steps: noSteps, stepNumber: 15 })
+
+        const [system, user] = JSON.parse(state.prompts[0]) as [{ content: string }, { content: Array<{ text: string }> }]
+        const read = system.content.length + user.content.map(part => part.text).join('').length
+        // gpt-4o is compacted at 96k tokens, and keeps 12k of them for the summary it writes.
+        expect(read).toBeLessThanOrEqual((96_000 - 12_000) * 3)
+        expect(read).toBeGreaterThan((96_000 - 12_000) * 3 - 2_000)
+        for (let i = 0; i < 12; i++) expect(user.content[0].text).toContain(`← shell_exec result: ${i}...`)
+        expect(user.content[0].text).toContain('characters cut; the whole result is saved at .rerun/tool-results/big.txt, read it with tool_result_read]')
+    })
+
+    it('keeps a message whole and cuts the tool results first when the budget is short', async () => {
+        const pasted = `MINIAPP-9 ${'a ticket pasted in the chat. '.repeat(5_000)}END OF TICKET`
+        const messages: ModelMessage[] = [{ role: 'user', content: pasted }, OPENING[1], REQUEST, ...Array.from({ length: 10 }, (_, i) => toolStep(i)).flat()]
+
+        await compactorFor(context().ctx)({ messages, steps: noSteps, stepNumber: 10 })
+
+        expect(state.prompts).toHaveLength(1)
+        expect(state.prompts[0]).toContain(pasted)
+        expect(state.prompts[0]).toContain('characters cut]')
     })
 
     it('does not count the request it sends again among what it recovered', async () => {

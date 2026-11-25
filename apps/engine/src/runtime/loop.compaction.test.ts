@@ -142,7 +142,8 @@ describe('compaction in the middle of a run', () => {
         expect(stream.calls).toHaveLength(4)
         expect(summaries).toHaveLength(1)
         expect(summaries[0]).toContain('dump everything')
-        expect(summaries[0]).toContain('[pruned] dump output')
+        expect(summaries[0]).toContain('← dump result: DUMP-1')
+        expect(summaries[0]).not.toContain('[pruned]')
 
         expect(JSON.stringify(stream.calls[2].prompt)).toContain('DUMP-1')
         const fourth = (stream.calls[3].prompt as PromptMessage[]).filter(message => message.role !== 'system')
