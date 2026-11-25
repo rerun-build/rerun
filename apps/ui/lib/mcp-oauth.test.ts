@@ -384,6 +384,20 @@ describe('exchangeCode', () => {
         vi.unstubAllEnvs()
     })
 
+    it('sends the pre-registered WordPress.com secret to the OAuth 2 token endpoint, the only one that knows its app', async () => {
+        vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_ID', 'wpcom-app')
+        vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_SECRET', 'wpcom-secret')
+        const fetchMock = vi.fn(async () => Response.json({ access_token: 'at', token_type: 'bearer', scope: 'global' }))
+        vi.stubGlobal('fetch', fetchMock)
+        const wordpress = { ...CTX, mcpUrl: 'https://public-api.wordpress.com/wpcom/v2/mcp/v1', tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token', clientId: 'wpcom-app' }
+        await expect(exchangeCode(wordpress, 'code')).resolves.toEqual({ accessToken: 'at', refreshToken: undefined, expiresAt: undefined, scope: 'global' })
+        const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
+        expect(url).toBe('https://public-api.wordpress.com/oauth2/token')
+        expect(new URLSearchParams(init.body as string).get('client_secret')).toBe('wpcom-secret')
+        expect(engineClientSecret(wordpress)).toBeUndefined()
+        vi.unstubAllEnvs()
+    })
+
     it('sends the pre-registered Asana secret at the exchange', async () => {
         vi.stubEnv('RERUN_ASANA_MCP_CLIENT_ID', 'asana-id')
         vi.stubEnv('RERUN_ASANA_MCP_CLIENT_SECRET', 'asana-secret')

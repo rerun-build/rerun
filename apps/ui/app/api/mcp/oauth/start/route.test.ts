@@ -37,6 +37,7 @@ let role: 'admin' | 'member' = 'admin'
 let documents: Record<string, unknown> = {}
 const fetchMock = vi.fn(async (input: string | URL) => {
     const doc = documents[String(input)]
+    if (doc instanceof Response) return doc.clone()
     return doc ? Response.json(doc) : new Response('not found', { status: 404 })
 })
 
@@ -214,5 +215,48 @@ describe('POST /api/mcp/oauth/start for a Vault entry', () => {
         expect(res.status).toBe(400)
         expect(res.cookies.getAll()).toEqual([])
         expect(getVaultItem).not.toHaveBeenCalled()
+    })
+
+    describe('for WordPress.com, which refuses to register a client from the address of the hub', () => {
+        const WPCOM_MCP = 'https://public-api.wordpress.com/wpcom/v2/mcp/v1'
+        const WPCOM_REGISTER = 'https://public-api.wordpress.com/oauth2-1/register'
+
+        beforeEach(() => {
+            vi.mocked(getVaultItem).mockResolvedValue({ ...entry, slug: 'wordpress', oauth: { serverName: 'wordpress', url: WPCOM_MCP } } as never)
+            documents = {
+                'https://public-api.wordpress.com/.well-known/oauth-protected-resource/wpcom/v2/mcp/v1': { resource: WPCOM_MCP, authorization_servers: ['https://public-api.wordpress.com'], scopes_supported: ['global', 'auth', 'openid', 'posts', 'media'] },
+                'https://public-api.wordpress.com/.well-known/oauth-authorization-server': {
+                    authorization_endpoint: 'https://public-api.wordpress.com/oauth2-1/authorize',
+                    token_endpoint: 'https://public-api.wordpress.com/oauth2-1/token',
+                    registration_endpoint: WPCOM_REGISTER,
+                    scopes_supported: ['global', 'auth', 'openid', 'posts', 'media'],
+                },
+                [WPCOM_REGISTER]: Response.json({ error: 'invalid_request', error_description: 'Registration failed. Please try again.' }, { status: 400 }),
+            }
+        })
+
+        it('fails at the registration without an app of its own', async () => {
+            const res = await start({ agentId: undefined, vaultItemId: 'item-1', serverName: 'wordpress' })
+
+            expect(res.status).toBe(400)
+            expect(((await res.json()) as { error: string }).error).toBe('client registration failed (400)')
+        })
+
+        it("signs in through Rerun's own app on the OAuth 2 endpoints, the secret kept on the hub", async () => {
+            vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_ID', 'wpcom-app')
+            vi.stubEnv('RERUN_WORDPRESS_MCP_CLIENT_SECRET', 'wpcom-secret')
+
+            const res = await start({ agentId: undefined, vaultItemId: 'item-1', serverName: 'wordpress' })
+
+            expect(res.status).toBe(200)
+            const authorize = new URL(((await res.json()) as { authorizationUrl: string }).authorizationUrl)
+            expect(authorize.origin + authorize.pathname).toBe('https://public-api.wordpress.com/oauth2/authorize')
+            expect(authorize.searchParams.get('client_id')).toBe('wpcom-app')
+            expect(authorize.searchParams.get('scope')).toBe('global')
+            const context = decodeContext(res.cookies.getAll()[0].value)
+            expect(context).toMatchObject({ clientId: 'wpcom-app', tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token', mcpUrl: WPCOM_MCP })
+            expect(context.clientSecret).toBeUndefined()
+            expect(fetchMock.mock.calls.map(([url]) => String(url))).not.toContain(WPCOM_REGISTER)
+        })
     })
 })

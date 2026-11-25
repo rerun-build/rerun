@@ -139,12 +139,13 @@ Each one switches a feature on. Empty means the feature is off, and the rest of 
 
 ## OAuth apps of your own
 
-A few services in the catalog sign in through an OAuth app registered by the install itself. Without its id and secret, that sign-in does not work: GitHub and Asana still connect with a personal access token, Facebook and Typeform do not connect. See [Services and apps](/self-host/services#oauth-apps-of-your-own).
+A few services in the catalog sign in through an OAuth app registered by the install itself. Without its id and secret, that sign-in does not work: GitHub and Asana still connect with a personal access token, Facebook and Typeform do not connect, and WordPress.com does not connect from an install on a rented server, whose address it refuses. See [Services and apps](/self-host/services#oauth-apps-of-your-own).
 
 | Variables | Service | Redirect URL to register |
 | --- | --- | --- |
 | `RERUN_GITHUB_MCP_CLIENT_ID`, `RERUN_GITHUB_MCP_CLIENT_SECRET` | GitHub, **Sign in with GitHub** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` |
 | `RERUN_ASANA_MCP_CLIENT_ID`, `RERUN_ASANA_MCP_CLIENT_SECRET` | Asana, **Sign in with Asana** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` |
+| `RERUN_WORDPRESS_MCP_CLIENT_ID`, `RERUN_WORDPRESS_MCP_CLIENT_SECRET` | WordPress.com, **Connect WordPress.com** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` |
 | `RERUN_FACEBOOK_CLIENT_ID`, `RERUN_FACEBOOK_CLIENT_SECRET` | Facebook, **Connect with Facebook** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/facebook/callback` |
 | `RERUN_TYPEFORM_CLIENT_ID`, `RERUN_TYPEFORM_CLIENT_SECRET` | Typeform, **Connect with Typeform** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/typeform/callback` |
 

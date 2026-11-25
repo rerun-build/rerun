@@ -35,9 +35,10 @@ async function dropUnclaimedSignIns(): Promise<void> {
 }
 
 async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverName: string; url: string; mobileGrant: string; vault?: OAuthContext['vault'] }): Promise<NextResponse> {
-    const metadata = await discoverAuthServer(target.url)
-    const clientInfo = await resolveClient(metadata, target.url, req)
+    const discovered = await discoverAuthServer(target.url)
+    const clientInfo = await resolveClient(discovered, target.url, req)
     if (!clientInfo?.clientId) throw new Error('No OAuth client available for this provider')
+    const metadata = { ...discovered, ...clientInfo.signIn }
 
     const { verifier, challenge, state } = createPkce()
     const ctx: OAuthContext = {

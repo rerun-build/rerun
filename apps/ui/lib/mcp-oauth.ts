@@ -55,7 +55,10 @@ export type DiscoveredMetadata = {
     clientIdMetadataDocumentSupported?: boolean
 }
 
-export type ClientInfo = { clientId: string; clientSecret?: string }
+export type SignInEndpoints = Pick<DiscoveredMetadata, 'authorizationEndpoint' | 'tokenEndpoint' | 'scopesSupported'>
+
+// `signIn` replaces the discovered endpoints for a client the authorization server does not serve.
+export type ClientInfo = { clientId: string; clientSecret?: string; signIn?: SignInEndpoints }
 
 const appOrigin = (req: Request): string => requestOrigin(req.headers)
 
@@ -238,7 +241,7 @@ export async function registerClient(registrationEndpoint: string, redirectUri: 
     return { clientId: data.client_id, clientSecret: data.client_secret }
 }
 
-type PreRegisteredClient = { mcpOrigin: string; clientIdEnv: string; clientSecretEnv: string; engineRefreshes?: boolean }
+type PreRegisteredClient = { mcpOrigin: string; clientIdEnv: string; clientSecretEnv: string; engineRefreshes?: boolean; signIn?: SignInEndpoints }
 
 // For authorization servers offering neither DCR nor Client ID Metadata Documents, an OAuth app
 // registered by Rerun itself. Keyed on the MCP origin rather than the authorization server, so
@@ -250,18 +253,31 @@ const PRE_REGISTERED_CLIENTS: PreRegisteredClient[] = [
     { mcpOrigin: 'https://api.githubcopilot.com', clientIdEnv: 'RERUN_GITHUB_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_GITHUB_MCP_CLIENT_SECRET' },
     // Asana access tokens last one hour and its token endpoint only takes authenticated clients.
     { mcpOrigin: 'https://mcp.asana.com', clientIdEnv: 'RERUN_ASANA_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_ASANA_MCP_CLIENT_SECRET', engineRefreshes: true },
+    // WordPress.com refuses to register a client from a datacenter address, the hub's included. Its OAuth 2.1
+    // server only serves registered clients, so its app signs in on the OAuth 2 endpoints, whose `global`
+    // token the MCP server accepts and which never expires.
+    {
+        mcpOrigin: 'https://public-api.wordpress.com',
+        clientIdEnv: 'RERUN_WORDPRESS_MCP_CLIENT_ID',
+        clientSecretEnv: 'RERUN_WORDPRESS_MCP_CLIENT_SECRET',
+        signIn: {
+            authorizationEndpoint: 'https://public-api.wordpress.com/oauth2/authorize',
+            tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token',
+            scopesSupported: ['global'],
+        },
+    },
 ]
 
 // Their registration endpoint answers every caller with one shared client and keeps its own
 // redirect URIs, echoing ours back without registering it: HeyGen hands out "HeyGen MCP Default".
 const CLIENT_METADATA_DOCUMENT_FIRST = ['https://mcp.heygen.com']
 
-function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: string; engineRefreshes: boolean } | null {
+function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: string; engineRefreshes: boolean; signIn?: SignInEndpoints } | null {
     const origin = new URL(mcpUrl).origin
     const entry = PRE_REGISTERED_CLIENTS.find(client => client.mcpOrigin === origin)
     const clientId = entry && process.env[entry.clientIdEnv]
     const clientSecret = entry && process.env[entry.clientSecretEnv]
-    return clientId && clientSecret ? { clientId, clientSecret, engineRefreshes: entry.engineRefreshes === true } : null
+    return clientId && clientSecret ? { clientId, clientSecret, engineRefreshes: entry.engineRefreshes === true, signIn: entry.signIn } : null
 }
 
 // A client registered by Rerun itself, whose only redirect URI is on Rerun's own address.
@@ -271,7 +287,7 @@ export function isPreRegistered(mcpUrl: string): boolean {
 
 export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string, req: Request, clientName?: string): Promise<ClientInfo | null> {
     const preRegistered = preRegisteredClient(mcpUrl)
-    if (preRegistered) return { clientId: preRegistered.clientId }
+    if (preRegistered) return { clientId: preRegistered.clientId, signIn: preRegistered.signIn }
 
     if (metadata.clientIdMetadataDocumentSupported && CLIENT_METADATA_DOCUMENT_FIRST.includes(new URL(mcpUrl).origin)) {
         return { clientId: clientMetadataDocumentUrl(req) }

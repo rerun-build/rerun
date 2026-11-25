@@ -38,10 +38,11 @@ export async function POST(req: Request) {
         const from = isPreRegistered(mcpUrl) ? await requestHostReturn(req) : null
         if (from) return startOnRerunHost(from, { agentId: vault ? '' : agentId, workspaceId: starter.workspaceId, userId: signedInUserId(starter) }, { flow: 'mcp', serverName, mcpUrl, ...(vault ? { vaultItem: vault.itemId } : {}) })
 
-        const metadata = await discoverAuthServer(mcpUrl)
-        const clientInfo = await resolveClient(metadata, mcpUrl, req, (await getBrand()).name)
+        const discovered = await discoverAuthServer(mcpUrl)
+        const clientInfo = await resolveClient(discovered, mcpUrl, req, (await getBrand()).name)
 
         if (!clientInfo?.clientId) return NextResponse.json(refusal('noOAuthClient'), { status: 400 })
+        const metadata = { ...discovered, ...clientInfo.signIn }
 
         const { verifier, challenge, state } = createPkce()
         const ctx: OAuthContext = {
