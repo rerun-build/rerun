@@ -2,7 +2,8 @@
 
 import { clearMessageFeedbackAction, fetchSessionFeedbackAction, rateMessageAction, updateMessageFeedbackAction, type FeedbackScope } from '@/app/api/_actions/message-feedback.actions'
 import type { MessageFeedbackDetails } from '@/components/chat/MessageFeedbackDialog'
-import type { MessageFeedbackRating } from '@rerun/contracts'
+import { useBrand } from '@/components/brand/BrandProvider'
+import { isWhiteLabel, type MessageFeedbackRating } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -20,6 +21,7 @@ const NO_VOTES: ReadonlyMap<string, Vote> = new Map()
 
 export function useMessageFeedback(sessionId: string | null | undefined, scope: FeedbackScope = 'agent') {
     const t = useTranslations('chat.feedback')
+    const offered = !isWhiteLabel(useBrand())
     const key = sessionId ?? null
     // Tagged with the session they belong to, so switching conversations shows none of the last one's.
     const [sessionVotes, setSessionVotes] = useState<SessionVotes>({ sessionId: null, votes: NO_VOTES })
@@ -114,5 +116,6 @@ export function useMessageFeedback(sessionId: string | null | undefined, scope: 
         if (!open) setDialog(current => (current ? { ...current, open: false } : current))
     }, [])
 
-    return { votes, rate, dialogOpen: dialog?.open ?? false, dialogRating: dialog?.rating ?? 'up', submitDetails, onDialogOpenChange }
+    // A vote sends the conversation to Rerun's team: under an organization's brand there is no thumb.
+    return { votes, rate: offered ? rate : undefined, dialogOpen: dialog?.open ?? false, dialogRating: dialog?.rating ?? 'up', submitDetails, onDialogOpenChange }
 }

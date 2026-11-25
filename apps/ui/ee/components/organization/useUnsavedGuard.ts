@@ -30,10 +30,15 @@ export function useUnsavedGuard(dirty: boolean) {
     return {
         asking: heldLink !== null,
         stay: () => setHeldLink(null),
+        // Let through for this one click: a link that leads nowhere else (the page's own tab) leaves
+        // the draft where it is, and the next one is held again.
         leave: () => {
             leaving.current = true
             setHeldLink(null)
             heldLink?.click()
+            setTimeout(() => {
+                leaving.current = false
+            })
         },
     }
 }

@@ -295,7 +295,6 @@
         },
         "status": {
             "pending": "Waiting for DNS",
-            "verifying": "Verifying",
             "active": "Active",
             "error": "Error"
         },

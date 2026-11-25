@@ -1,6 +1,5 @@
 'use client'
 
-import { creditsFromMicros, MICROS_PER_CREDIT } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef, useState, type FormEvent } from 'react'
@@ -18,9 +17,10 @@ import { CoinsIcon } from '@/lib/icons'
 import { randomUuid } from '@/lib/random-uuid'
 import { cn } from '@/lib/utils'
 
-import { readCredits } from './input'
+import { readCredits, wholeCredits } from './input'
 import { SquareLogo } from './SquareLogo'
 import { isOpenable, type ConsoleResult, type ConsoleWorkspace, type CreditTransfer } from './types'
+import { useHeldDialog, type Hold } from './useHeldDialog'
 
 export type TransferDirection = 'allocate' | 'takeBack'
 
@@ -34,16 +34,15 @@ type TransferFormProps = {
 }
 
 export function CreditTransferDialog({ direction, onOpenChange, ...form }: Omit<TransferFormProps, 'direction'> & { direction: TransferDirection | null; onOpenChange: (open: boolean) => void }) {
+    const dialog = useHeldDialog(onOpenChange)
     return (
-        <Dialog open={!!direction} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md sm:[@media(min-height:30rem)]:overflow-visible">{direction && <CreditTransferForm key={direction} direction={direction} {...form} onClose={() => onOpenChange(false)} />}</DialogContent>
+        <Dialog open={!!direction} onOpenChange={dialog.onOpenChange}>
+            <DialogContent className="sm:max-w-md sm:[@media(min-height:30rem)]:overflow-visible">{direction && <CreditTransferForm key={direction} direction={direction} {...form} hold={dialog.hold} onClose={dialog.close} />}</DialogContent>
         </Dialog>
     )
 }
 
-const wholeCredits = (micros: number) => Math.floor(micros / MICROS_PER_CREDIT)
-
-function CreditTransferForm({ direction, reserveMicros, workspaces, fixedWorkspaceId, onSubmit, onClose }: TransferFormProps & { onClose: () => void }) {
+function CreditTransferForm({ direction, reserveMicros, workspaces, fixedWorkspaceId, onSubmit, hold, onClose }: TransferFormProps & { hold: Hold; onClose: () => void }) {
     const t = useTranslations('organization.credit.dialog')
     const tStatus = useTranslations('organization.status')
     const tCommon = useTranslations('common')
@@ -77,7 +76,7 @@ function CreditTransferForm({ direction, reserveMicros, workspaces, fixedWorkspa
         sendingNow.current = true
         setSending(true)
         setError(null)
-        const result = await onSubmit({ workspaceId: workspace.id, credits, requestId })
+        const result = await hold(() => onSubmit({ workspaceId: workspace.id, credits, requestId }))
         sendingNow.current = false
         setSending(false)
         if (result.ok) onClose()
@@ -86,7 +85,7 @@ function CreditTransferForm({ direction, reserveMicros, workspaces, fixedWorkspa
 
     const moved = tooMuch ? 0 : (credits ?? 0)
     const change = (micros: number, sign: 1 | -1) => {
-        const before = creditsFromMicros(micros)
+        const before = wholeCredits(micros)
         return moved ? t('change', { before: formatNumber(before, locale), after: formatNumber(before + sign * moved, locale) }) : formatNumber(before, locale)
     }
 
@@ -115,7 +114,7 @@ function CreditTransferForm({ direction, reserveMicros, workspaces, fixedWorkspa
                 </dl>
             </div>
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" disabled={sending} onClick={onClose}>
                     {tCommon('cancel')}
                 </Button>
                 <TooltipDisabledReason reason={tooMuchReason} className="max-sm:w-full">

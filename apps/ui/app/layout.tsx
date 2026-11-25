@@ -49,7 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const [t, brand] = await Promise.all([getTranslations("layout.site"), getBrand()]);
   const titleTemplate = `%s | ${brand.name}`;
   const title = t("title");
-  const description = t("description", { trialDays: TRIAL_DAYS });
+  // The offer of Rerun: an organization's address says nothing of a trial it does not give.
+  const description = isWhiteLabel(brand) ? undefined : t("description", { trialDays: TRIAL_DAYS });
   const ogImages = isWhiteLabel(brand) ? [] : [{ url: site.ogImage, ...site.ogImageSize, alt: title }];
   return {
     title: {

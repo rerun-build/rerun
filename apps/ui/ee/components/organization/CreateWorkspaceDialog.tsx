@@ -17,6 +17,7 @@ import { LOGO_ACCEPT, LOGO_MAX_BYTES } from '@/lib/workspace/logo-input'
 
 import { isEmail } from './input'
 import type { ConsoleResult, InviteAnswer } from './types'
+import { useHeldDialog, type Hold } from './useHeldDialog'
 
 export type NewWorkspace = { name: string; adminEmail: string; logo: File | null }
 
@@ -28,14 +29,15 @@ type CreateWorkspaceDialogProps = {
 }
 
 export function CreateWorkspaceDialog({ open, onOpenChange, onCreate, onView }: CreateWorkspaceDialogProps) {
+    const dialog = useHeldDialog(onOpenChange)
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">{open && <CreateWorkspaceForm onCreate={onCreate} onClose={() => onOpenChange(false)} onView={onView} />}</DialogContent>
+        <Dialog open={open} onOpenChange={dialog.onOpenChange}>
+            <DialogContent className="sm:max-w-md">{open && <CreateWorkspaceForm onCreate={onCreate} hold={dialog.hold} onClose={dialog.close} onView={onView} />}</DialogContent>
         </Dialog>
     )
 }
 
-function CreateWorkspaceForm({ onCreate, onClose, onView }: Pick<CreateWorkspaceDialogProps, 'onCreate' | 'onView'> & { onClose: () => void }) {
+function CreateWorkspaceForm({ onCreate, hold, onClose, onView }: Pick<CreateWorkspaceDialogProps, 'onCreate' | 'onView'> & { hold: Hold; onClose: () => void }) {
     const t = useTranslations('organization.create')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()
@@ -66,7 +68,7 @@ function CreateWorkspaceForm({ onCreate, onClose, onView }: Pick<CreateWorkspace
         if (!ready || creating) return
         setCreating(true)
         setError(null)
-        const result = await onCreate({ name: name.trim(), adminEmail, logo: logo?.file ?? null })
+        const result = await hold(() => onCreate({ name: name.trim(), adminEmail, logo: logo?.file ?? null }))
         setCreating(false)
         if (result.ok) setCreated(result)
         else setError(errorText(result))
@@ -116,7 +118,7 @@ function CreateWorkspaceForm({ onCreate, onClose, onView }: Pick<CreateWorkspace
                 {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" disabled={creating} onClick={onClose}>
                     {tCommon('cancel')}
                 </Button>
                 <Button type="submit" loading={creating} disabled={!ready}>

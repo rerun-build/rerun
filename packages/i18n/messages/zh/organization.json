@@ -281,7 +281,6 @@
         },
         "status": {
             "pending": "等待 DNS",
-            "verifying": "验证中",
             "active": "活跃",
             "error": "错误"
         },

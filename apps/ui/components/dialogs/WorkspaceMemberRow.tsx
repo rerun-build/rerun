@@ -1,6 +1,7 @@
 'use client'
 
 import type { WorkspaceInviteRow, WorkspaceMember } from '@/app/api/_actions/members.actions'
+import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -32,11 +33,15 @@ type MemberRowProps = {
 
 export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isLastAdmin, busy, onRoleChange, onRemove, onOpen }: MemberRowProps) {
     const t = useTranslations('dialogs.members')
+    const tManaged = useTranslations('managed')
     const [confirmingRemoval, setConfirmingRemoval] = useState(false)
     const email = member.email ?? t('unknownUser')
     const name = profile?.name && profile.name !== UNNAMED ? profile.name : null
     const nextRole: WorkspaceRole = member.role === 'admin' ? 'member' : 'admin'
     const roleChangeBlocked = nextRole === 'member' && isLastAdmin ? t('lastAdmin') : undefined
+    // The organization that runs the workspace lets its people go, from its console.
+    const manager = useWorkspaceManager()
+    const removalBlocked = manager ? tManaged('removeAsk', { manager: manager.name }) : undefined
 
     return (
         <>
@@ -76,9 +81,11 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                                     {!isSelf && (
                                         <>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem variant="destructive" onSelect={() => setConfirmingRemoval(true)}>
-                                                {t('remove')}
-                                            </DropdownMenuItem>
+                                            <TooltipDisabledReason reason={removalBlocked} side="bottom" className="flex w-full">
+                                                <DropdownMenuItem variant="destructive" disabled={!!removalBlocked} onSelect={() => setConfirmingRemoval(true)} className="w-full">
+                                                    {t('remove')}
+                                                </DropdownMenuItem>
+                                            </TooltipDisabledReason>
                                         </>
                                     )}
                                 </DropdownMenuContent>

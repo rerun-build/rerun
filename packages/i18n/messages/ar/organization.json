@@ -281,7 +281,6 @@
         },
         "status": {
             "pending": "بانتظار DNS",
-            "verifying": "قيد التحقق",
             "active": "نشط",
             "error": "خطأ"
         },

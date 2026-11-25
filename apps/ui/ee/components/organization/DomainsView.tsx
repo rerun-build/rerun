@@ -24,6 +24,7 @@ import { ConsoleGroup, ConsolePage } from './ConsolePage'
 import { readHostname } from './input'
 import { DOMAIN_STATUS_TONE, type ConsoleDomain, type ConsoleResult, type DnsRecord, type DomainStatus, type WriteBlock } from './types'
 import { useBlockReason } from './useBlockReason'
+import { useHeldDialog, type Hold } from './useHeldDialog'
 
 type DomainsViewProps = {
     // Null while it is read.
@@ -91,18 +92,20 @@ function DomainCard({ domain, checking, blockReason, onCheck, onRemove }: { doma
     const locale = useLocale()
     const [confirming, setConfirming] = useState(false)
     const { hostname, status, error, records, lastCheckedAt } = domain
-    const live = status === 'active'
+    // Served and pointing here: nothing left to set up. One that is served and stopped pointing here
+    // shows what to publish again, and can be checked as soon as it is.
+    const settled = status === 'active' && !error
     return (
         <div className={cn('space-y-4 p-4', PANEL_CARD)}>
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-0.5">
                     <p className="text-sm font-medium break-all">{hostname}</p>
-                    {lastCheckedAt && !live && <p className="text-xs text-muted-foreground">{t('checkedAt', { time: fullDateTime(lastCheckedAt, locale) })}</p>}
+                    {lastCheckedAt && !settled && <p className="text-xs text-muted-foreground">{t('checkedAt', { time: fullDateTime(lastCheckedAt, locale) })}</p>}
                 </div>
                 <DomainStatusBadge status={status} />
             </div>
             {error && <p className="text-sm break-words text-destructive">{error}</p>}
-            {!live && records.length > 0 && (
+            {!settled && records.length > 0 && (
                 <div className="space-y-3">
                     <p className="text-xs text-muted-foreground">{t('record.hint')}</p>
                     {records.map(record => (
@@ -116,9 +119,9 @@ function DomainCard({ domain, checking, blockReason, onCheck, onRemove }: { doma
                         {t('remove')}
                     </Button>
                 </TooltipDisabledReason>
-                {!live && (
+                {!settled && (
                     <TooltipDisabledReason reason={blockReason}>
-                        <Button variant="outline" disabled={!!blockReason} loading={checking || status === 'verifying'} onClick={onCheck}>
+                        <Button variant="outline" disabled={!!blockReason} loading={checking} onClick={onCheck}>
                             <RotateCwIcon />
                             {t('check')}
                         </Button>
@@ -148,14 +151,15 @@ function DnsRecordFields({ record }: { record: DnsRecord }) {
 }
 
 function AddDomainDialog({ open, onOpenChange, onAdd }: { open: boolean; onOpenChange: (open: boolean) => void; onAdd: DomainsViewProps['onAdd'] }) {
+    const dialog = useHeldDialog(onOpenChange)
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">{open && <AddDomainForm onAdd={onAdd} onClose={() => onOpenChange(false)} />}</DialogContent>
+        <Dialog open={open} onOpenChange={dialog.onOpenChange}>
+            <DialogContent className="sm:max-w-md">{open && <AddDomainForm onAdd={onAdd} hold={dialog.hold} onClose={dialog.close} />}</DialogContent>
         </Dialog>
     )
 }
 
-function AddDomainForm({ onAdd, onClose }: { onAdd: DomainsViewProps['onAdd']; onClose: () => void }) {
+function AddDomainForm({ onAdd, hold, onClose }: { onAdd: DomainsViewProps['onAdd']; hold: Hold; onClose: () => void }) {
     const t = useTranslations('organization.domains.dialog')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()
@@ -172,7 +176,7 @@ function AddDomainForm({ onAdd, onClose }: { onAdd: DomainsViewProps['onAdd']; o
         if (problem || sending) return
         setSending(true)
         setError(null)
-        const result = await onAdd(hostname)
+        const result = await hold(() => onAdd(hostname))
         setSending(false)
         if (result.ok) onClose()
         else setError(errorText(result))
@@ -185,7 +189,7 @@ function AddDomainForm({ onAdd, onClose }: { onAdd: DomainsViewProps['onAdd']; o
                 <Input id="organization-hostname" autoFocus autoCapitalize="none" autoComplete="off" spellCheck={false} inputMode="url" placeholder="app.acme.com" value={typed} aria-invalid={!!problemText || undefined} onBlur={() => setLeft(true)} onChange={event => (setTyped(event.target.value), setError(null))} />
             </Field>
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" disabled={sending} onClick={onClose}>
                     {tCommon('cancel')}
                 </Button>
                 <Button type="submit" loading={sending} disabled={!typed.trim() || (left && !!problem)}>

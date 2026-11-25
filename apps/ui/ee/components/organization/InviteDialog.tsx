@@ -16,6 +16,7 @@ import { UsersIcon } from '@/lib/icons'
 
 import { isEmail } from './input'
 import type { ConsoleResult, InviteAnswer, PersonRole } from './types'
+import { useHeldDialog, type Hold } from './useHeldDialog'
 
 export type InviteRole<Role extends PersonRole> = { value: Role; description: string }
 
@@ -29,14 +30,15 @@ type InviteDialogProps<Role extends PersonRole> = {
 }
 
 export function InviteDialog<Role extends PersonRole>({ open, onOpenChange, ...form }: InviteDialogProps<Role>) {
+    const dialog = useHeldDialog(onOpenChange)
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">{open && <InviteForm {...form} onClose={() => onOpenChange(false)} />}</DialogContent>
+        <Dialog open={open} onOpenChange={dialog.onOpenChange}>
+            <DialogContent className="sm:max-w-md">{open && <InviteForm {...form} hold={dialog.hold} onClose={dialog.close} />}</DialogContent>
         </Dialog>
     )
 }
 
-function InviteForm<Role extends PersonRole>({ title, roles, onInvite, onClose }: Omit<InviteDialogProps<Role>, 'open' | 'onOpenChange'> & { onClose: () => void }) {
+function InviteForm<Role extends PersonRole>({ title, roles, onInvite, hold, onClose }: Omit<InviteDialogProps<Role>, 'open' | 'onOpenChange'> & { hold: Hold; onClose: () => void }) {
     const t = useTranslations('organization.invite')
     const tRoles = useTranslations('organization.roles')
     const tCommon = useTranslations('common')
@@ -53,7 +55,7 @@ function InviteForm<Role extends PersonRole>({ title, roles, onInvite, onClose }
         if (!isEmail(email) || sending) return
         setSending(true)
         setError(null)
-        const result = await onInvite(email, role)
+        const result = await hold(() => onInvite(email, role))
         setSending(false)
         if (!result.ok) return setError(errorText(result))
         if (result.inviteUrl) setInviteUrl(result.inviteUrl)
@@ -96,7 +98,7 @@ function InviteForm<Role extends PersonRole>({ title, roles, onInvite, onClose }
                 </Field>
             </div>
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" disabled={sending} onClick={onClose}>
                     {tCommon('cancel')}
                 </Button>
                 <Button type="submit" loading={sending} disabled={!isEmail(email)}>

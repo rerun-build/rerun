@@ -1,6 +1,6 @@
 'use client'
 
-import { creditsFromMicros, formatCredits } from '@rerun/contracts'
+import { formatCredits } from '@rerun/contracts'
 import { fullDateTime, shortDate } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -15,6 +15,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ArrowDownIcon, ArrowLeftIcon, ArrowRightIcon, CoinsIcon, PencilIcon, PlusIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
+import { wholeCredits } from './input'
 import { ConsoleGroup, ConsolePage } from './ConsolePage'
 import { CreditTransferDialog, type TransferDirection } from './CreditTransferDialog'
 import type { ConsoleResult, ConsoleWorkspace, CreditMovement, CreditTransfer, WriteBlock } from './types'
@@ -41,8 +42,8 @@ export function CreditView({ reserveMicros, workspaces, movements, hasMore, load
     const [direction, setDirection] = useState<TransferDirection | null>(null)
     const loading = reserveMicros === null
 
-    const allocateReason = blockReason ?? (loading ? undefined : creditsFromMicros(reserveMicros) < 1 ? t('reserveEmpty') : workspaces.length === 0 ? t('noWorkspace') : undefined)
-    const takeBackReason = blockReason ?? (loading || workspaces.some(workspace => creditsFromMicros(workspace.creditMicros) >= 1) ? undefined : t('nothingToTakeBack'))
+    const allocateReason = blockReason ?? (loading ? undefined : wholeCredits(reserveMicros) < 1 ? t('reserveEmpty') : workspaces.length === 0 ? t('noWorkspace') : undefined)
+    const takeBackReason = blockReason ?? (loading || workspaces.some(workspace => wholeCredits(workspace.creditMicros) >= 1) ? undefined : t('nothingToTakeBack'))
 
     return (
         <ConsolePage title={t('title')}>
@@ -107,7 +108,7 @@ function MovementRow({ movement }: { movement: CreditMovement }) {
             description={details || undefined}
             actions={
                 <span className="flex flex-col items-end gap-0.5">
-                    <span className={cn('text-sm font-medium tabular-nums', movement.reversed ? 'text-muted-foreground line-through' : gained && 'text-emerald-600 dark:text-emerald-400')}>
+                    <span dir="ltr" className={cn('text-sm font-medium tabular-nums', movement.reversed ? 'text-muted-foreground line-through' : gained && 'text-emerald-600 dark:text-emerald-400')}>
                         {gained ? '+' : '−'}
                         {formatCredits(Math.abs(movement.micros), locale)}
                     </span>

@@ -1,6 +1,6 @@
 'use client'
 
-import { HScrollFade } from '@rerun/ui/primitives'
+import { HScrollFade, ScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useEffect, useRef, type ReactNode } from 'react'
@@ -41,13 +41,17 @@ export function OrganizationShell({ organization, active, hrefs, backHref, suspe
         <div className="flex h-dvh flex-col bg-background text-foreground lg:flex-row">
             <aside className="hidden w-60 shrink-0 flex-col border-e bg-muted/20 lg:flex">
                 <Identity organization={organization} className="p-4" />
-                <nav aria-label={t('nav.label')} className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2">
+                <nav aria-label={t('nav.label')} className="flex min-h-0 flex-1 flex-col">
+                    <ScrollFade className="min-h-0 flex-1 px-2">
+                        <div className="space-y-0.5">
                     {sections.map(({ id, href, icon: Icon }) => (
                         <Link key={id} href={href} aria-current={id === active ? 'page' : undefined} className={cn('flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-colors', id === active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground')}>
                             <Icon className="size-4 shrink-0" />
                             <span className="truncate">{t(`nav.${id}`)}</span>
                         </Link>
                     ))}
+                        </div>
+                    </ScrollFade>
                 </nav>
                 <div className="border-t p-2">
                     <Link href={backHref} className="flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground">

@@ -1,6 +1,6 @@
 'use client'
 
-import { creditsFromMicros, formatCredits } from '@rerun/contracts'
+import { formatCredits } from '@rerun/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
@@ -11,6 +11,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ExternalLinkIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
+import { wholeCredits } from './input'
 import { ConsoleGroup, ConsolePage } from './ConsolePage'
 import { CreditTransferDialog, type TransferDirection } from './CreditTransferDialog'
 import { InviteDialog } from './InviteDialog'
@@ -129,8 +130,8 @@ function WorkspaceCredit({ workspace, reserveMicros, blockReason, unavailable, o
     const locale = useLocale()
     const [direction, setDirection] = useState<TransferDirection | null>(null)
     const { creditMicros } = workspace
-    const allocateReason = blockReason ?? unavailable ?? (creditsFromMicros(reserveMicros) < 1 ? t('reserveEmpty') : undefined)
-    const takeBackReason = blockReason ?? (creditsFromMicros(creditMicros) < 1 ? t('workspaceEmpty') : undefined)
+    const allocateReason = blockReason ?? unavailable ?? (wholeCredits(reserveMicros) < 1 ? t('reserveEmpty') : undefined)
+    const takeBackReason = blockReason ?? (wholeCredits(creditMicros) < 1 ? t('workspaceEmpty') : undefined)
     return (
         <div className={cn('flex flex-1 flex-col justify-between gap-4 p-4', PANEL_CARD)}>
             <div className="space-y-1">

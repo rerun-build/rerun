@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
@@ -19,6 +19,18 @@ export function useConsoleChange<Name extends string = never>(reload: () => Prom
     const errorText = useErrorText()
     const running = useRef(false)
     const [pending, setPending] = useState<Name | null>(null)
+
+    // A change that leaves the page stays pending for good. Back from where it led, the browser may
+    // give the page as it was left: nothing is under way any more.
+    useEffect(() => {
+        const comeBack = (event: PageTransitionEvent) => {
+            if (!event.persisted) return
+            running.current = false
+            setPending(null)
+        }
+        window.addEventListener('pageshow', comeBack)
+        return () => window.removeEventListener('pageshow', comeBack)
+    }, [])
 
     // For a dialog, which waits for the answer and shows the refusal itself.
     async function submit<Result extends ConsoleResult>(action: () => Promise<Result>, undo?: () => void): Promise<Result | Refused> {

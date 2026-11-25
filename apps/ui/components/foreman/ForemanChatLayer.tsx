@@ -88,7 +88,7 @@ type ForemanChatLayerProps = {
     /** Stops one delegated task of the run being streamed. Absent, the task shows no stop. */
     onStopTask?: (taskId: string) => void
     /** The row under an answer: copy, regenerate, thumbs. Only the foreman on the engine has it. */
-    actions?: { onRegenerate: (messageId: string) => void; onRate: (messageId: string, rating: MessageFeedbackRating, messageText: string) => void; ratingOf: (messageId: string) => MessageFeedbackRating | null } | null
+    actions?: { onRegenerate: (messageId: string) => void; onRate?: (messageId: string, rating: MessageFeedbackRating, messageText: string) => void; ratingOf: (messageId: string) => MessageFeedbackRating | null } | null
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess

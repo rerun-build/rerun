@@ -59,7 +59,10 @@ export function BrandView({ fields: saved, iconUrl, block, onSave }: BrandViewPr
     const pickedUrl = icon?.url
     useEffect(() => () => void (pickedUrl && URL.revokeObjectURL(pickedUrl)), [pickedUrl])
 
-    const dirty = !!icon || JSON.stringify(draft) !== savedKey
+    // What a save would write, to tell a real change from a space typed after the name or a color
+    // written another way.
+    const clean = { ...(Object.fromEntries(Object.entries(draft).map(([key, value]) => [key, value.trim()])) as BrandFields), color: normalizeHex(draft.color) ?? draft.color.trim() }
+    const dirty = !!icon || JSON.stringify(clean) !== JSON.stringify({ ...saved, color: normalizeHex(saved.color) ?? saved.color })
     const problems = brandProblems(draft)
     const blocked = !!blockReason
     const guard = useUnsavedGuard(dirty)
@@ -95,7 +98,6 @@ export function BrandView({ fields: saved, iconUrl, block, onSave }: BrandViewPr
         if (!dirty || blocked || saving || Object.keys(problems).length > 0) return
         setSaving(true)
         setError(null)
-        const clean = Object.fromEntries(Object.entries(draft).map(([key, value]) => [key, value.trim()])) as BrandFields
         const result = await onSave({ ...clean, color: color ?? '' }, icon?.file ?? null)
         setSaving(false)
         if (!result.ok) return setError(errorText(result))

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { brandProblems, iconProblem, isHttpsUrl, readCredits, readHostname } from './input'
+import { brandProblems, iconProblem, isHttpsUrl, readCredits, readHostname, wholeCredits } from './input'
 import type { BrandFields } from './types'
 
 const FIELDS: BrandFields = { name: 'Nordlys', color: '#1668e3', supportEmail: 'help@nordlys.agency', docsUrl: 'https://help.nordlys.agency', termsUrl: '', privacyUrl: '' }
@@ -17,6 +17,14 @@ describe('readCredits', () => {
         expect(readCredits('abc')).toBeNull()
         expect(readCredits('-')).toBeNull()
         expect(readCredits('12345678901')).toBe(123_456_789)
+    })
+})
+
+describe('wholeCredits', () => {
+    it('is what can be moved out of a balance: the fraction stays', () => {
+        expect(wholeCredits(96_000)).toBe(9)
+        expect(wholeCredits(6_000)).toBe(0)
+        expect(wholeCredits(100_000)).toBe(10)
     })
 })
 

@@ -16,6 +16,12 @@ describe('brand icons', () => {
         expect(urls.filter(url => !inPublic(url))).toEqual([])
     })
 
+    it('draws an organization that uploaded no image its initial, never the files of Rerun', () => {
+        const unnamed = { ...AGENCY, iconUrl: null }
+        expect(brandIcons(unnamed)).toEqual({ icon: '/icons/initial.png', apple: '/icons/initial.png' })
+        expect(brandManifestIcons(unnamed)).toEqual([{ src: '/icons/initial.png', sizes: '512x512', type: 'image/png', purpose: 'any' }])
+    })
+
     it('serves them from paths no redirect takes over', async () => {
         vi.stubEnv('NEXT_PUBLIC_ADMIN_URL', 'https://admin.example')
         vi.resetModules()

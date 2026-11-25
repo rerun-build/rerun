@@ -281,7 +281,6 @@
         },
         "status": {
             "pending": "DNS bekleniyor",
-            "verifying": "Doğrulanıyor",
             "active": "Etkin",
             "error": "Hata"
         },

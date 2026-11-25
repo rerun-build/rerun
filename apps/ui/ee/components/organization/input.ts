@@ -1,4 +1,4 @@
-import { normalizeHex } from '@rerun/contracts'
+import { MICROS_PER_CREDIT, normalizeHex } from '@rerun/contracts'
 import { z } from 'zod'
 
 import { normalizeHostname } from '@/ee/lib/organizations/hostname'
@@ -16,6 +16,10 @@ export function isEmail(value: string): boolean {
 export function isHttpsUrl(value: string): boolean {
     return value.startsWith('https://') && URL.canParse(value)
 }
+
+// What can be moved out of a balance: whole credits, so a fraction is never promised. A balance of
+// 9.6 moves 9, and the console says 9 wherever a move is offered.
+export const wholeCredits = (micros: number): number => Math.floor(micros / MICROS_PER_CREDIT)
 
 // Whole credits, whatever a person types between the digits. Null while nothing usable is there.
 export function readCredits(value: string): number | null {

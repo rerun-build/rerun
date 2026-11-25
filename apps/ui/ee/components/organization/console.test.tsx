@@ -376,6 +376,14 @@ describe('BrandView', () => {
         expect(bar()).toBe(false)
     })
 
+    it('takes a space after the name, or the same color written another way, for no change', async () => {
+        await render(view())
+        await type('#brand-name', 'Nordlys ')
+        expect(bar()).toBe(false)
+        await type('#brand-color', '#1668E3')
+        expect(bar()).toBe(false)
+    })
+
     it('discards back to what is saved', async () => {
         await render(view())
         await type('#brand-name', 'Other')
@@ -468,6 +476,32 @@ describe('DomainsView', () => {
         expect(container.textContent).toContain('It points elsewhere.')
         expect(container.textContent).toContain('edge.rerun.work')
         expect(buttons().filter(candidate => candidate.textContent === 'Check again')).toHaveLength(1)
+    })
+
+    it('shows what to publish again, and a check, for a domain still served whose DNS left', async () => {
+        const failing = { id: 'd3', hostname: 'gone.nordlys.agency', status: 'active' as const, error: 'This domain points somewhere else.', records: [{ type: 'CNAME' as const, name: 'gone', value: 'edge.rerun.work' }], lastCheckedAt: null }
+        const onCheck = vi.fn()
+        await render(<DomainsView defaultHostname="nordlys.rerun.work" domains={[failing]} checkingId={null} block={null} onAdd={vi.fn(ok)} onCheck={onCheck} onRemove={noop} />)
+        expect(container.textContent).toContain('Active')
+        expect(container.textContent).toContain('This domain points somewhere else.')
+        expect(container.textContent).toContain('edge.rerun.work')
+        await click(button('Check again'))
+        expect(onCheck).toHaveBeenCalledWith(failing)
+    })
+
+    it('stays open, Cancel off, until the domain it sent is answered', async () => {
+        let answer: (result: { ok: true }) => void = noop
+        const onAdd = vi.fn(() => new Promise<{ ok: true }>(resolve => (answer = resolve)))
+        await render(view(onAdd))
+        await click(button('Add domain'))
+        await type('#organization-hostname', 'app.acme.com')
+        await submit()
+        expect(lastButton('Cancel').disabled).toBe(true)
+        await act(async () => void document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
+        expect(document.querySelector('#organization-hostname')).not.toBeNull()
+
+        await act(async () => answer({ ok: true }))
+        expect(document.querySelector('#organization-hostname')).toBeNull()
     })
 
     it('adds the domain of a pasted address, and refuses a bare one', async () => {

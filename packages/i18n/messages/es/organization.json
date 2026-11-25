@@ -281,7 +281,6 @@
         },
         "status": {
             "pending": "Esperando al DNS",
-            "verifying": "Verificando",
             "active": "Activo",
             "error": "Error"
         },

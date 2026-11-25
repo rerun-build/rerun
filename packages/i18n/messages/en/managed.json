@@ -1,12 +1,14 @@
 {
     "_context": {
         "contact": "Button, opens an email to the organization (an agency) that runs the workspace for its people. {manager} is its name.",
+        "removeAsk": "Tooltip of a disabled \"Remove\" in the list of members. {manager} is the organization that runs the workspace.",
         "paused.reason": "Tooltip of a disabled button. {manager} is the organization that runs the workspace.",
         "paused.coworker": "{name} is a coworker (an AI agent), {manager} the organization that runs the workspace.",
         "credit.providedBy": "Under \"Credits\". {manager} is the organization that gives the workspace its AI credits.",
         "credit.outOwnPlan": "{plan} is \"Claude\" or \"ChatGPT\". {manager} is the organization that gives the workspace its AI credits."
     },
     "contact": "Contact {manager}",
+    "removeAsk": "Ask {manager} to remove someone",
     "templateUnavailable": "Not available in this workspace",
     "paused": {
         "title": "This workspace is paused.",

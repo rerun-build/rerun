@@ -50,7 +50,7 @@ export type BrandFields = { name: string; color: string; supportEmail: string; d
 
 export type DnsRecord = { type: 'CNAME' | 'TXT'; name: string; value: string }
 
-export type DomainStatus = 'pending' | 'verifying' | 'active' | 'error'
+export type DomainStatus = 'pending' | 'active' | 'error'
 
 export type ConsoleDomain = { id: string; hostname: string; status: DomainStatus; error: string | null; records: DnsRecord[]; lastCheckedAt: string | null }
 
@@ -66,7 +66,7 @@ export const WORKSPACE_STATUS_TONE: Record<ConsoleWorkspaceStatus, BadgeTone> = 
 
 export const MACHINE_STATE_TONE: Record<MachineState, BadgeTone> = { running: 'green', stopped: 'orange', error: 'red', archiving: 'cyan', restoring: 'cyan', archived: 'neutral', none: 'neutral' }
 
-export const DOMAIN_STATUS_TONE: Record<DomainStatus, BadgeTone> = { pending: 'orange', verifying: 'cyan', active: 'green', error: 'red' }
+export const DOMAIN_STATUS_TONE: Record<DomainStatus, BadgeTone> = { pending: 'orange', active: 'green', error: 'red' }
 
 // One word for where a workspace stands: what its organization did to it, then its machine, then its
 // credit. `provisioning` until someone uses it, which is what takes it a machine.
