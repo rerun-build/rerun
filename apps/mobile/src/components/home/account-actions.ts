@@ -19,7 +19,10 @@ export function initialsOf(user: Me['user'] | undefined): string | null {
 
 export function contactSupport(user: Me['user'] | undefined) {
     const email = user?.email && !user.email.endsWith('@phone.rerun.build') ? `&user_email=${encodeURIComponent(user.email)}` : ''
-    return WebBrowser.openBrowserAsync(`https://go.crisp.chat/chat/embed/?website_id=${CRISP_WEBSITE_ID}${email}`)
+    // The account's key opens the conversation it has on the web. No session_merge here: the in-app
+    // browser keeps its cookies past a sign-out, and the next account would inherit that conversation.
+    const token = user?.supportChatToken ? `&token_id=${encodeURIComponent(user.supportChatToken)}` : ''
+    return WebBrowser.openBrowserAsync(`https://go.crisp.chat/chat/embed/?website_id=${CRISP_WEBSITE_ID}${email}${token}`)
 }
 
 const confirm = (title: string, message: string, action: string, cancel: string) =>
