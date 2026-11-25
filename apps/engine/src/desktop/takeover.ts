@@ -51,7 +51,8 @@ async function openable(url: string): Promise<boolean> {
 // it rather than clearing the lock files of a Chromium that is still running.
 // A browser opened from the dock of the screen has nobody to say it is done, so it closes once the
 // screen has gone unwatched, unless the agent asks for a takeover on it in the meantime.
-// A run that drives the browser itself holds it open past both limits, until the run lets go.
+// A run that drives the browser itself holds it open past both limits, until the run lets go, then
+// fifteen minutes more for the turn that follows.
 export async function startTakeover(agentId: string, url?: string, { endWhenUnwatched = false }: TakeoverOptions = {}): Promise<void> {
     const open = () => joinActive(agentId, url, endWhenUnwatched)
     const already = open()
@@ -124,7 +125,11 @@ export async function startTakeover(agentId: string, url?: string, { endWhenUnwa
 function joinActive(agentId: string, url: string | undefined, endWhenUnwatched: boolean): Promise<void> | null {
     const takeover = active.get(agentId)
     if (!takeover || takeover.closing) return null
-    if (!endWhenUnwatched) takeover.endWhenUnwatched = false
+    // A person who takes over a window kept for the run's next turn gets their own fifteen minutes.
+    if (!endWhenUnwatched) {
+        takeover.endWhenUnwatched = false
+        takeover.rearmExpiry()
+    }
     const context = takeover.context
     if (!url || !context) return Promise.resolve()
     return openable(url)
@@ -156,8 +161,10 @@ export async function handBackTakeover(agentId: string): Promise<TakeoverResult>
     return { url, open: true }
 }
 
-// For a run that drives the browser with its own hands. Letting go closes a browser nobody is
-// looking at; one a person watches or asked for stays theirs to close.
+// For a run that drives the browser with its own hands. A run often ends on a question, a code or an
+// approval the user answers in the chat, not on the screen: its window waits fifteen minutes for the
+// next turn, with the tabs and the session a fresh one would have lost. One a person asked for stays
+// theirs to close.
 export async function holdBrowser(agentId: string, url?: string): Promise<() => void> {
     await startTakeover(agentId, url, { endWhenUnwatched: true })
     return holdOpenBrowser(agentId)
@@ -173,8 +180,13 @@ export function holdOpenBrowser(agentId: string): () => void {
         if (released) return
         released = true
         takeover.runHolds--
-        if (takeover.runHolds > 0) return
-        if (takeover.expired || (takeover.endWhenUnwatched && viewersOf(agentId) === 0)) takeover.finish()
+        if (takeover.runHolds > 0 || takeover.closing) return
+        if (takeover.endWhenUnwatched) {
+            takeover.keptUntil = Date.now() + MAX_TAKEOVER_MS
+            takeover.rearmExpiry()
+            return
+        }
+        if (takeover.expired) takeover.finish()
     }
 }
 
@@ -190,3 +202,7 @@ export function joinableBrowser(agentId: string): Promise<BrowserContext | null>
 }
 
 export const activeTakeovers = (): string[] => [...active.keys()]
+
+// The windows an engine restart would take from someone: a run working in it, or a person who asked
+// for it. One only kept for a run's next turn is not among them.
+export const takeoversInUse = (): string[] => [...active].filter(([, takeover]) => takeover.runHolds > 0 || !takeover.endWhenUnwatched).map(([agentId]) => agentId)

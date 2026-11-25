@@ -57,7 +57,7 @@ vi.mock('../virtual-display.js', () => ({
     },
 }))
 vi.mock('../../desktop/session.js', () => ({ desktopAvailable: () => pw.desktop }))
-vi.mock('../../desktop/takeover.js', () => ({ joinableBrowser: () => pw.joinable?.() ?? null }))
+vi.mock('../../desktop/takeover.js', () => ({ joinableBrowser: () => pw.joinable?.() ?? null, holdOpenBrowser: () => () => {} }))
 
 vi.mock('patchright', () => ({
     chromium: {

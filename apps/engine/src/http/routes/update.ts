@@ -5,7 +5,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { activeRunCount } from '../../runtime/run-control.js'
 import { desktopViewerCount } from '../../desktop/session.js'
-import { activeTakeovers } from '../../desktop/takeover.js'
+import { takeoversInUse } from '../../desktop/takeover.js'
 import { buildCommit } from '../../runtime/build-info.js'
 import { readLastUpdate } from '../../runtime/last-update.js'
 import { artifactArgs } from '../../cli/commands/release.js'
@@ -38,8 +38,9 @@ updateRoutes.post('/', async c => {
     const { force = false, artifact } = parsed.data
 
     const activeRuns = activeRunCount()
-    // A restart would cut the screen of whoever is signing in for an agent right now.
-    if (!force && (activeRuns > 0 || desktopViewerCount() > 0 || activeTakeovers().length > 0)) return c.json({ started: false, reason: 'busy', activeRuns })
+    // A restart would cut the screen of whoever is signing in for an agent right now. A browser only
+    // kept open for a run's next turn does not hold the update back.
+    if (!force && (activeRuns > 0 || desktopViewerCount() > 0 || takeoversInUse().length > 0)) return c.json({ started: false, reason: 'busy', activeRuns })
     if (updating) return c.json({ started: false, reason: 'already-updating' })
     updating = true
 

@@ -13,7 +13,7 @@ import { withKeyedLock } from '../../lib/lock.js'
 import { NonPublicHostError, assertPublicUrl, isHttpUrl, resolvesToPublicAddresses } from '../../lib/public-fetch.js'
 import { PUBLIC_HTTP_URL_MESSAGE, publicHttpUrl } from '../url.js'
 import type { RunContext } from '../../runtime/context.js'
-import { joinableBrowser } from '../../desktop/takeover.js'
+import { holdOpenBrowser, joinableBrowser } from '../../desktop/takeover.js'
 import { savePage } from './page-file.js'
 
 const TEXT_LIMIT = 50_000
@@ -231,7 +231,15 @@ export function browserTools(ctx: RunContext): ToolSet {
                     // taken before a session opening right now can take it and be missed.
                     const joining = joinableBrowser(id)
                     const open = joining && (await joining)
-                    if (open) return readInOpenBrowser(ctx, open, visit)
+                    if (open) {
+                        // Held for the read: a window kept for the next turn could otherwise close under it.
+                        const release = holdOpenBrowser(id)
+                        try {
+                            return await readInOpenBrowser(ctx, open, visit)
+                        } finally {
+                            release()
+                        }
+                    }
                     return withKeyedLock(`browser:${id}`, async (): Promise<HostAttempt> => {
                         let context: BrowserContext | undefined
                         let screen: DisplayHold | undefined

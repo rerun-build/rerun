@@ -66,7 +66,7 @@ vi.mock('../lib/logger.js', () => ({ logger: { info() {}, warn() {} } }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const { withKeyedLock } = await import('../lib/lock.js')
-const { activeTakeovers, finishTakeover, handBackTakeover, holdBrowser, holdOpenBrowser, joinableBrowser, startTakeover } = await import('./takeover.js')
+const { activeTakeovers, finishTakeover, handBackTakeover, holdBrowser, holdOpenBrowser, joinableBrowser, startTakeover, takeoversInUse } = await import('./takeover.js')
 
 const contexts = () => state.contexts as FakeContext[]
 
@@ -215,7 +215,7 @@ describe('takeover', () => {
 })
 
 describe('a browser held by a run', () => {
-    it('stays open past the fifteen minutes and the empty room, then closes when the run lets go', async () => {
+    it('stays open past the fifteen minutes and the empty room while the run works in it, then fifteen minutes more for its next turn', async () => {
         vi.useFakeTimers()
         const release = await holdBrowser('a1', 'https://app.example/')
         expect(state.url).toBe('https://app.example/')
@@ -223,32 +223,95 @@ describe('a browser held by a run', () => {
         expect(activeTakeovers()).toEqual(['a1'])
         release()
         release()
-        await vi.advanceTimersByTimeAsync(0)
+        await vi.advanceTimersByTimeAsync(14 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        expect(contexts()[0]!.closed).toBe(false)
+        await vi.advanceTimersByTimeAsync(60_000)
         expect(activeTakeovers()).toEqual([])
         expect(contexts()[0]!.closed).toBe(true)
     })
 
-    it('is one window for every run that holds it, open until the last lets go', async () => {
+    it('is still there for the next turn when the run ends on a question to a user who is not watching the screen', async () => {
+        vi.useFakeTimers()
+        const firstTurn = await holdBrowser('a1', 'https://signup.example/register')
+        firstTurn()
+        await vi.advanceTimersByTimeAsync(45_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        expect(await joinableBrowser('a1')).toBe(contexts()[0])
+        const nextTurn = await holdBrowser('a1')
+        expect(state.launches).toHaveLength(1)
+        expect(state.url).toBe('https://signup.example/register')
+        await vi.advanceTimersByTimeAsync(20 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        nextTurn()
+        await vi.advanceTimersByTimeAsync(15 * 60_000)
+        expect(activeTakeovers()).toEqual([])
+    })
+
+    it('is one window for every run that holds it, kept until fifteen minutes after the last lets go', async () => {
+        vi.useFakeTimers()
         const first = await holdBrowser('a1')
         const second = await holdBrowser('a1', 'https://other.example/')
         expect(state.launches).toHaveLength(1)
         first()
-        await new Promise(next => setTimeout(next, 10))
+        await vi.advanceTimersByTimeAsync(20 * 60_000)
         expect(activeTakeovers()).toEqual(['a1'])
         second()
-        await vi.waitFor(() => expect(activeTakeovers()).toEqual([]))
+        await vi.advanceTimersByTimeAsync(14 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        await vi.advanceTimersByTimeAsync(60_000)
+        expect(activeTakeovers()).toEqual([])
     })
 
-    it('is left to the person watching when the run lets go, and closes once they have gone', async () => {
+    it('waits for the next turn even once the person watching has gone, then closes after fifteen minutes', async () => {
         vi.useFakeTimers()
         state.viewers = 1
         const release = await holdBrowser('a1')
         release()
         await vi.advanceTimersByTimeAsync(60_000)
-        expect(activeTakeovers()).toEqual(['a1'])
         state.viewers = 0
+        await vi.advanceTimersByTimeAsync(2 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        await vi.advanceTimersByTimeAsync(12 * 60_000)
+        expect(activeTakeovers()).toEqual([])
+    })
+
+    it('gives a person who takes it over while it waits fifteen minutes of their own', async () => {
+        vi.useFakeTimers()
+        const release = await holdBrowser('a1', 'https://site.example/')
+        release()
+        await vi.advanceTimersByTimeAsync(13 * 60_000)
+        state.viewers = 1
+        await startTakeover('a1', 'https://site.example/login')
+        expect(state.launches).toHaveLength(1)
+        await vi.advanceTimersByTimeAsync(14 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
         await vi.advanceTimersByTimeAsync(60_000)
         expect(activeTakeovers()).toEqual([])
+    })
+
+    it('is not closed under a read that joins it as it is about to close', async () => {
+        vi.useFakeTimers()
+        const release = await holdBrowser('a1', 'https://site.example/')
+        release()
+        await vi.advanceTimersByTimeAsync(14 * 60_000 + 50_000)
+        const read = holdOpenBrowser('a1')
+        await vi.advanceTimersByTimeAsync(20_000)
+        expect(contexts()[0]!.closed).toBe(false)
+        read()
+        await vi.advanceTimersByTimeAsync(15 * 60_000)
+        expect(activeTakeovers()).toEqual([])
+    })
+
+    it('does not count as in use while it only waits for the next turn', async () => {
+        vi.useFakeTimers()
+        const release = await holdBrowser('a1')
+        expect(takeoversInUse()).toEqual(['a1'])
+        release()
+        expect(activeTakeovers()).toEqual(['a1'])
+        expect(takeoversInUse()).toEqual([])
+        await startTakeover('a1')
+        expect(takeoversInUse()).toEqual(['a1'])
     })
 
     it('stays with a person who was handed it, until they are done', async () => {
@@ -302,7 +365,7 @@ describe('a browser handed back', () => {
         expect(contexts()[0]!.closed).toBe(true)
     })
 
-    it('is kept by the run that works in it, past its fifteen minutes, and closes when that run lets go', async () => {
+    it('is kept by the run that works in it, past its fifteen minutes, then fifteen minutes more for its next turn', async () => {
         vi.useFakeTimers()
         await startTakeover('a1', 'https://site.example/login')
         await handBackTakeover('a1')
@@ -310,7 +373,9 @@ describe('a browser handed back', () => {
         await vi.advanceTimersByTimeAsync(20 * 60_000)
         expect(activeTakeovers()).toEqual(['a1'])
         release()
-        await vi.advanceTimersByTimeAsync(0)
+        await vi.advanceTimersByTimeAsync(14 * 60_000)
+        expect(activeTakeovers()).toEqual(['a1'])
+        await vi.advanceTimersByTimeAsync(60_000)
         expect(activeTakeovers()).toEqual([])
     })
 
