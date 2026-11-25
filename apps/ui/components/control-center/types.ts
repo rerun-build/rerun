@@ -1,3 +1,4 @@
+import type { SearchFilter, SearchSource } from '@/lib/control-center/global-search'
 import type { BadgeTone } from '@rerun/ui/primitives'
 import type { ComponentType } from 'react'
 
@@ -15,6 +16,9 @@ export type ControlRow = {
     onSelect: () => void
     // Present when the row opens a page of its own, on Tab or →.
     onDrill?: () => void
+    // A hit of the global search: the source it comes from, and the line around the word.
+    source?: SearchSource
+    snippet?: string
 }
 
 export type ControlSection = {
@@ -22,4 +26,10 @@ export type ControlSection = {
     heading: string
     rows: ControlRow[]
     loading?: boolean
+    // Said in place of the section when it found nothing.
+    emptyMessage?: string
+    // Said under the rows, or in place of `emptyMessage`, when some of what it covers was not searched.
+    notice?: string
 }
+
+export type SourceChip = { value: SearchFilter; label: string; count: number | 'pending' | 'unknown' }

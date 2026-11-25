@@ -162,7 +162,8 @@
             "recentConversations": "שיחות אחרונות",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "לפתוח",
-            "moveTo": "להעביר אל"
+            "moveTo": "להעביר אל",
+            "bestMatches": "התוצאות הטובות ביותר"
         },
         "agent": {
             "desktop": "שולחן עבודה",
@@ -173,7 +174,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {לחפש או לשאול את {name}…} other {לחפש או לשאול את ה-Chief of Staff שלך…}}",
-            "root": "לחפש סוכנים, הגדרות, שיחות…",
+            "root": "לחפש בכל סביבת העבודה…",
             "agent": "לחפש ב-{name}…",
             "agentUnknown": "לחפש בסוכן הזה…",
             "box": "לחפש סוכנים ב-Box הזה…",
@@ -181,12 +182,18 @@
         },
         "empty": {
             "box": "עדיין אין סוכנים ב-Box הזה.",
-            "noMatch": "אין תוצאות."
+            "noMatch": "אין תוצאות.",
+            "nothingMentions": "שום דבר בסביבת העבודה הזו לא מזכיר את „{query}”."
+        },
+        "notice": {
+            "unavailable": "לא ניתן היה לחפש בנשמות, במיומנויות, בקבצים, ב-Brain ובטבלאות.",
+            "partial": "החיפוש נעצר לפני הסוף, ייתכן שחסרות תוצאות."
         },
         "hints": {
             "open": "לפתוח",
             "more": "עוד",
-            "searchPage": "<keys></keys> שוב כדי לחפש בדף"
+            "searchPage": "<keys></keys> שוב כדי לחפש בדף",
+            "nextSource": "המקור הבא"
         },
         "commands": {
             "new_agent": "סוכן חדש",
@@ -208,6 +215,25 @@
             "notifications": "התראות",
             "shortcuts": "קיצורי מקלדת",
             "whats_new": "מה חדש"
+        },
+        "sources": {
+            "all": "הכול",
+            "coworker": "עמיתים",
+            "skill": "מיומנויות",
+            "file": "קבצים",
+            "brain": "Brain",
+            "table": "טבלאות",
+            "conversation": "שיחות"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "משותף",
+            "soul": "{box} · נשמה",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · שורה {line}} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · שורה {row}} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "או לבחור שם",

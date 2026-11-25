@@ -162,7 +162,8 @@
             "recentConversations": "المحادثات الأخيرة",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "فتح",
-            "moveTo": "نقل إلى"
+            "moveTo": "نقل إلى",
+            "bestMatches": "أفضل النتائج"
         },
         "agent": {
             "desktop": "سطح المكتب",
@@ -173,7 +174,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {ابحث أو اسأل {name}…} other {ابحث أو اسأل الـ Chief of Staff…}}",
-            "root": "ابحث في الوكلاء والإعدادات والمحادثات…",
+            "root": "ابحث في مساحة العمل كلها…",
             "agent": "ابحث في {name}…",
             "agentUnknown": "ابحث في هذا الوكيل…",
             "box": "ابحث عن وكلاء في هذا Box…",
@@ -181,12 +182,18 @@
         },
         "empty": {
             "box": "لا يوجد وكلاء في هذا Box بعد.",
-            "noMatch": "لا توجد نتائج مطابقة."
+            "noMatch": "لا توجد نتائج مطابقة.",
+            "nothingMentions": "لا شيء في مساحة العمل هذه يذكر “{query}”."
+        },
+        "notice": {
+            "unavailable": "تعذّر البحث في الأرواح والمهارات والملفات وBrain والجداول.",
+            "partial": "توقف البحث قبل نهايته، وقد تكون بعض النتائج ناقصة."
         },
         "hints": {
             "open": "فتح",
             "more": "المزيد",
-            "searchPage": "<keys></keys> مرة أخرى للبحث في الصفحة"
+            "searchPage": "<keys></keys> مرة أخرى للبحث في الصفحة",
+            "nextSource": "المصدر التالي"
         },
         "commands": {
             "new_agent": "وكيل جديد",
@@ -208,6 +215,25 @@
             "notifications": "الإشعارات",
             "shortcuts": "اختصارات لوحة المفاتيح",
             "whats_new": "ما الجديد"
+        },
+        "sources": {
+            "all": "الكل",
+            "coworker": "الزملاء",
+            "skill": "المهارات",
+            "file": "الملفات",
+            "brain": "Brain",
+            "table": "الجداول",
+            "conversation": "المحادثات"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "مشترك",
+            "soul": "{box} · الروح",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · السطر {line}} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · الصف {row}} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "أو اختر اسمًا",

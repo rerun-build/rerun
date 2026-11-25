@@ -70,6 +70,8 @@ import {
     type BrainRevision,
     type BrainSeedPage,
     type BrainSeedResult,
+    workspaceSearchResultSchema,
+    type WorkspaceSearchResult,
 } from '@rerun/contracts'
 import { isNetworkFailure } from '@/lib/net/network-error'
 import { forgetMachineAt } from '@/lib/engine/engine-memory'
@@ -407,6 +409,15 @@ export async function readDbTableRows(conn: EngineConnection, base: string, tabl
     if (params.columns && params.columns.length > 0) qs.set('columns', params.columns.join(','))
     if (params.where && params.where.length > 0) qs.set('where', JSON.stringify(params.where))
     return request(conn, `${base}/tables/${encodeURIComponent(table)}/rows?${qs.toString()}`, { method: 'GET' }, d => engineDbRowsSchema.parse(d))
+}
+
+// Past the fail-fast budget: the search reads every file of the machine, and the engine stops it at 1.5 s.
+const SEARCH_TIMEOUT_MS = 8_000
+
+export async function searchWorkspace(conn: EngineConnection, q: string, agentIds: string[], signal?: AbortSignal): Promise<WorkspaceSearchResult> {
+    const timeout = AbortSignal.timeout(SEARCH_TIMEOUT_MS)
+    const qs = new URLSearchParams({ q, agents: agentIds.join(',') })
+    return request(conn, `/search?${qs.toString()}`, { method: 'GET', signal: signal ? AbortSignal.any([signal, timeout]) : timeout }, d => workspaceSearchResultSchema.parse(d))
 }
 
 export type ReadDbTableGroupsParams = { groupBy: string; sum?: string; q?: string; where?: RowFilter[] }

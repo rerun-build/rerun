@@ -6,18 +6,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Kbd } from '@/components/ui/kbd'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
+import { highlightParts, stepFilter, type SearchFilter } from '@/lib/control-center/global-search'
 import { ArrowLeftIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useForemanName } from '@/hooks/useForemanName'
 import { Orb } from '@rerun/ui/foreman'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge, useScrollFade } from '@rerun/ui/primitives'
 import { StepTransition } from '@rerun/ui/steps'
 import { Command as CommandPrimitive } from 'cmdk'
 import { useTranslations } from 'next-intl'
-import { useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { Fragment, useEffect, useState, type CSSProperties, type KeyboardEvent } from 'react'
 
-import type { ControlRow, ControlSection } from './types'
+import type { ControlRow, ControlSection, SourceChip } from './types'
 
 type ControlCenterPanelProps = {
     query: string
@@ -32,6 +33,12 @@ type ControlCenterPanelProps = {
     sections: ControlSection[]
     emptyLabel: string
     mod: string
+    // The global search: one chip per source under the field, Tab walking them.
+    chips?: SourceChip[]
+    filter?: SearchFilter
+    onFilterChange?: (filter: SearchFilter) => void
+    // ⌘↵ asks the assistant even when its row is not in the list (a source chip is on).
+    onAsk?: () => void
 }
 
 export const HINT_KEY = 'min-w-5 px-1 py-0 text-[10px] shadow-none'
@@ -119,7 +126,7 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
     )
 }
 
-export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey, depth, crumbs, onBack, sections, emptyLabel, mod }: ControlCenterPanelProps) {
+export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey, depth, crumbs, onBack, sections, emptyLabel, mod, chips, filter = 'all', onFilterChange, onAsk }: ControlCenterPanelProps) {
     const t = useTranslations('layout.controlCenter')
     const foremanName = useForemanName()
     const rows = sections.flatMap(section => section.rows)
@@ -130,7 +137,7 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
 
     // A new page or a new query starts from its first row. Results that land later (conversations)
     // leave the selection where the user put it.
-    const selectionScope = `${pageKey}|${query}`
+    const selectionScope = `${pageKey}|${query}|${filter}`
     const [selectedScope, setSelectedScope] = useState(selectionScope)
     if (selectedScope !== selectionScope) {
         setSelectedScope(selectionScope)
@@ -138,18 +145,24 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
     }
 
     const selectedRow = rows.find(row => row.id === selectedId)
-    const askRow = rows.find(row => row.leading.kind === 'assistant')
+    const ask = onAsk ?? rows.find(row => row.leading.kind === 'assistant')?.onSelect
+    const [list, setList] = useState<HTMLDivElement | null>(null)
+    const listFade = useScrollFade(list)
 
     function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
         if (event.key === 'Tab') {
             // Focus stays in the field: the list is driven from it.
             event.preventDefault()
-            if (!event.shiftKey) selectedRow?.onDrill?.()
+            if (chips) {
+                // The dialog's focus trap would otherwise send Shift+Tab from the field to the last chip.
+                event.stopPropagation()
+                onFilterChange?.(stepFilter(filter, event.shiftKey ? -1 : 1))
+            } else if (!event.shiftKey) selectedRow?.onDrill?.()
             return
         }
         if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
             event.preventDefault()
-            askRow?.onSelect()
+            ask?.()
             return
         }
         if (event.key === 'ArrowRight' && caretAtEnd(event.target) && selectedRow?.onDrill) {
@@ -175,17 +188,25 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
             )}
             {/* No box around the field: the panel itself is the place to write. */}
             <CommandPrimitive.Input value={query} onValueChange={onQueryChange} placeholder={placeholder} className="w-full min-w-0 bg-transparent px-3 pt-2.5 pb-3.5 text-base text-foreground outline-hidden placeholder:text-muted-foreground/70" />
-            <CommandList className="-mx-1 max-h-[min(26rem,55dvh)] border-t border-border/50 px-1">
+            {chips && onFilterChange && <SourceChips chips={chips} filter={filter} onFilterChange={onFilterChange} />}
+            <CommandList ref={setList} className={cn('-mx-1 border-t border-border/50 px-1', chips ? 'max-h-[min(26rem,calc(66dvh-8.5rem))]' : 'max-h-[min(26rem,55dvh)]')} style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
                 <StepTransition stepKey={pageKey} direction={trail.direction}>
-                    {!sections.some(section => section.loading) && <CommandEmpty className="text-muted-foreground">{emptyLabel}</CommandEmpty>}
-                    {sections.map(section => (
-                        <CommandGroup key={section.id} heading={section.heading}>
-                            {section.rows.map(row => (
-                                <ControlRowItem key={row.id} row={row} />
-                            ))}
-                            {section.loading && <ControlRowsSkeleton />}
-                        </CommandGroup>
-                    ))}
+                    {!chips && !sections.some(section => section.loading) && <CommandEmpty className="text-muted-foreground">{emptyLabel}</CommandEmpty>}
+                    {sections.map(section =>
+                        section.rows.length === 0 && !section.loading && section.emptyMessage ? (
+                            <p key={section.id} className="px-3 pt-4 pb-2 text-center text-sm text-muted-foreground">
+                                {section.notice ?? section.emptyMessage}
+                            </p>
+                        ) : (
+                            <Fragment key={section.id}>
+                                <CommandGroup heading={section.heading}>
+                                    {section.rows.map(row => (row.source ? <HitRowItem key={row.id} row={row} query={query} /> : <ControlRowItem key={row.id} row={row} />))}
+                                    {section.loading && (chips ? <HitsSkeleton /> : <ControlRowsSkeleton />)}
+                                </CommandGroup>
+                                {section.notice && <p className="px-3 pt-1 pb-2 text-xs text-muted-foreground">{section.notice}</p>}
+                            </Fragment>
+                        )
+                    )}
                 </StepTransition>
             </CommandList>
             <div className="-mx-1 -mb-1 flex items-center gap-4 border-t border-border/50 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
@@ -193,7 +214,21 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
                     <Kbd className={HINT_KEY}>↵</Kbd>
                     {t('hints.open')}
                 </span>
-                {askRow ? (
+                {chips ? (
+                    <>
+                        <span className="flex items-center gap-1.5 max-sm:hidden">
+                            <Kbd className={HINT_KEY}>Tab</Kbd>
+                            {t('hints.nextSource')}
+                        </span>
+                        {ask && (
+                            <span className="ms-auto flex items-center gap-1.5 max-sm:hidden">
+                                <Kbd className={HINT_KEY}>{mod}</Kbd>
+                                <Kbd className={HINT_KEY}>↵</Kbd>
+                                {t('askRerun', foremanName)}
+                            </span>
+                        )}
+                    </>
+                ) : ask ? (
                     <span className="flex items-center gap-1.5 max-sm:hidden">
                         <Kbd className={HINT_KEY}>{mod}</Kbd>
                         <Kbd className={HINT_KEY}>↵</Kbd>
@@ -205,16 +240,18 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
                         {t('hints.more')}
                     </span>
                 )}
-                <span className="ms-auto flex items-center gap-1.5 max-sm:hidden">
-                    {t.rich('hints.searchPage', {
-                        keys: () => (
-                            <>
-                                <Kbd className={HINT_KEY}>{mod}</Kbd>
-                                <Kbd className={HINT_KEY}>F</Kbd>
-                            </>
-                        ),
-                    })}
-                </span>
+                {!chips && (
+                    <span className="ms-auto flex items-center gap-1.5 max-sm:hidden">
+                        {t.rich('hints.searchPage', {
+                            keys: () => (
+                                <>
+                                    <Kbd className={HINT_KEY}>{mod}</Kbd>
+                                    <Kbd className={HINT_KEY}>F</Kbd>
+                                </>
+                            ),
+                        })}
+                    </span>
+                )}
             </div>
         </Command>
     )
@@ -263,6 +300,98 @@ export function ControlRowItem({ row }: { row: ControlRow }) {
                 )}
             </span>
         </CommandItem>
+    )
+}
+
+function SourceChips({ chips, filter, onFilterChange }: { chips: SourceChip[]; filter: SearchFilter; onFilterChange: (filter: SearchFilter) => void }) {
+    const [row, setRow] = useState<HTMLDivElement | null>(null)
+    const fade = useScrollFade(row, { axis: 'x' })
+
+    // Centered, clear of the fade at the edges. The row scrolls alone: `scrollIntoView` would also move
+    // the dialog around it.
+    useEffect(() => {
+        const chip = row?.querySelector('[aria-pressed="true"]')
+        if (!row || !chip) return
+        const rowBox = row.getBoundingClientRect()
+        const chipBox = chip.getBoundingClientRect()
+        row.scrollBy({ left: chipBox.left + chipBox.width / 2 - (rowBox.left + rowBox.width / 2) })
+    }, [row, filter])
+
+    return (
+        <div ref={setRow} className="-mt-1.5 flex gap-1 overflow-x-auto px-2 pb-2 [scrollbar-width:none]" style={{ maskImage: fade, WebkitMaskImage: fade }}>
+            {chips.map(chip => {
+                const active = chip.value === filter
+                return (
+                    <button
+                        key={chip.value}
+                        type="button"
+                        // Tab from the field walks the chips, and a click leaves the caret in the field.
+                        tabIndex={-1}
+                        onMouseDown={event => event.preventDefault()}
+                        aria-pressed={active}
+                        onClick={() => onFilterChange(chip.value)}
+                        className={cn(
+                            'flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-transparent px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground',
+                            active && 'border-border bg-muted text-foreground',
+                            chip.count === 0 && !active && 'opacity-50'
+                        )}
+                    >
+                        {chip.label}
+                        {chip.count === 'pending' && <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-muted-foreground/50" />}
+                        {typeof chip.count === 'number' && <span className="text-muted-foreground tabular-nums">{chip.count}</span>}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
+
+function Highlight({ text, query, className }: { text: string; query: string; className?: string }) {
+    return (
+        <span className={className}>
+            {highlightParts(text, query).map((part, index) =>
+                part.match ? (
+                    <mark key={index} className="rounded-[3px] bg-brand/20 px-0.5 text-foreground">
+                        {part.text}
+                    </mark>
+                ) : (
+                    part.text
+                )
+            )}
+        </span>
+    )
+}
+
+function HitRowItem({ row, query }: { row: ControlRow; query: string }) {
+    return (
+        <CommandItem value={row.id} onSelect={row.onSelect} className="items-start gap-2.5 [&>svg:last-child]:hidden">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-muted-foreground">
+                <RowLeading leading={row.leading} />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="flex min-w-0 items-baseline gap-2">
+                    <Highlight text={row.label} query={query} className={cn('truncate', row.detail && 'max-w-[75%] shrink-0')} />
+                    {row.detail && <span className="min-w-0 truncate text-xs text-muted-foreground">{row.detail}</span>}
+                </span>
+                {row.snippet && <Highlight text={row.snippet} query={query} className="truncate text-xs text-muted-foreground" />}
+            </span>
+        </CommandItem>
+    )
+}
+
+function HitsSkeleton() {
+    return (
+        <div aria-hidden>
+            {[52, 38, 64].map(width => (
+                <div key={width} className="flex items-start gap-2.5 px-2 py-1.5">
+                    <Skeleton className="size-5 rounded-md" />
+                    <div className="flex flex-1 flex-col gap-1.5">
+                        <Skeleton className="h-3.5" style={{ width: `${width - 20}%` }} />
+                        <Skeleton className="h-3" style={{ width: `${width}%` }} />
+                    </div>
+                </div>
+            ))}
+        </div>
     )
 }
 

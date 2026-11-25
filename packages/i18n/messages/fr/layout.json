@@ -162,7 +162,8 @@
             "recentConversations": "Conversations récentes",
             "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Ouvrir",
-            "moveTo": "Déplacer vers"
+            "moveTo": "Déplacer vers",
+            "bestMatches": "Meilleurs résultats"
         },
         "agent": {
             "desktop": "Bureau",
@@ -173,7 +174,7 @@
         },
         "placeholder": {
             "rootAssistant": "{named, select, yes {Rechercher ou demander à {name}…} other {Rechercher ou demander à votre Chief of Staff…}}",
-            "root": "Rechercher agents, paramètres, conversations…",
+            "root": "Rechercher dans tout le workspace…",
             "agent": "Rechercher dans {name}…",
             "agentUnknown": "Rechercher dans cet agent…",
             "box": "Rechercher des agents dans cette Box…",
@@ -181,12 +182,18 @@
         },
         "empty": {
             "box": "Aucun agent dans cette Box pour l'instant.",
-            "noMatch": "Aucun résultat."
+            "noMatch": "Aucun résultat.",
+            "nothingMentions": "Rien dans ce workspace ne mentionne « {query} »."
+        },
+        "notice": {
+            "unavailable": "Les âmes, les skills, les fichiers, le Brain et les tables n'ont pas pu être consultés.",
+            "partial": "La recherche s'est arrêtée avant la fin, il peut manquer des résultats."
         },
         "hints": {
             "open": "Ouvrir",
             "more": "Plus",
-            "searchPage": "<keys></keys> à nouveau pour chercher dans la page"
+            "searchPage": "<keys></keys> à nouveau pour chercher dans la page",
+            "nextSource": "Source suivante"
         },
         "commands": {
             "new_agent": "Nouvel agent",
@@ -208,6 +215,25 @@
             "notifications": "Notifications",
             "shortcuts": "Raccourcis clavier",
             "whats_new": "Nouveautés"
+        },
+        "sources": {
+            "all": "Tout",
+            "coworker": "Coworkers",
+            "skill": "Skills",
+            "file": "Fichiers",
+            "brain": "Brain",
+            "table": "Tables",
+            "conversation": "Conversations"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "Partagé",
+            "soul": "{box} · Âme",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · ligne {line}} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · ligne {row}} other {}}",
+            "conversation": "{agent} · {when}"
         }
     },
     "boxNameSuggestions": "Ou choisissez un nom",
