@@ -2,6 +2,7 @@
     "_context": {
         "metaTitle": "Title of the page in search results and the browser tab.",
         "hero.lead": "First line of the H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep the line about as long as in English.",
+        "hero.productHuntAlt": "Alt text of the Product Hunt badge. \"Rerun for Agencies\" is the name of the launch and \"Product Hunt\" the site: keep both as they are.",
         "partner": "Button that writes an email to the founders.",
         "mailSubject": "Subject of the email the button opens.",
         "perks.title": "<fade> is greyed.",
@@ -19,7 +20,8 @@
         "lead": "Sell <keep>AI <chip>Coworkers</chip></keep>",
         "tail": "Under your own brand.",
         "first": "A plug-and-play AI app for your clients, with your URL, colors and logo.",
-        "second": "Manage every client from one place, on the web and on mobile."
+        "second": "Manage every client from one place, on the web and on mobile.",
+        "productHuntAlt": "Rerun for Agencies - Plug-and-play AI coworkers for your clients, on your brand. | Product Hunt"
     },
     "partner": "Become a partner",
     "mailSubject": "White label for my agency",
