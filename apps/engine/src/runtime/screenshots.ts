@@ -1,5 +1,5 @@
 import type { LoadedConnection } from '../connections/types.js'
-import { behaviourOf, modelSeesImages } from '../agents/opencode.js'
+import { behaviourOf, CHAT_FORMAT_PROVIDERS, modelSeesImages } from '../agents/opencode.js'
 import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
@@ -43,7 +43,6 @@ export function createScreenshotStore(): ScreenshotStore {
 // A chat-completions tool message is text only: a provider speaking that format gets the picture
 // in a user message right after it.
 export type ScreenshotDelivery = 'tool-result' | 'user-message'
-const CHAT_COMPLETIONS_PROVIDERS = new Set<Provider>(['rerun', 'openrouter', 'custom'])
 
 type ToolResultPart = Extract<Exclude<Extract<ModelMessage, { role: 'tool' }>['content'][number], { type: 'tool-approval-response' }>, { type: 'tool-result' }>
 
@@ -112,5 +111,5 @@ export function stepWithScreenshots(messages: ModelMessage[], store: ScreenshotS
     if (!store || !modelSeesImages(provider, model, connection)) return {}
     const behaviour = behaviourOf(provider, model)
     const replayed = behaviour === 'anthropic' ? withoutThoughtsBoundToDroppedPictures(messages, store) : messages
-    return { messages: withScreenshots(replayed, store, CHAT_COMPLETIONS_PROVIDERS.has(behaviour) ? 'user-message' : 'tool-result') }
+    return { messages: withScreenshots(replayed, store, CHAT_FORMAT_PROVIDERS.has(behaviour) ? 'user-message' : 'tool-result') }
 }

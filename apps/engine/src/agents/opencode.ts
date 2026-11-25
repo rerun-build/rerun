@@ -27,6 +27,10 @@ export function opencodeBehaviour(model: string): OpencodeBehaviour | undefined 
     return entry && BEHAVIOUR_OF_WIRE[entry.wire]
 }
 
+// The behaviours that speak the OpenAI chat format: a tool message is text only, and the model is
+// never sent its reasoning back.
+export const CHAT_FORMAT_PROVIDERS: ReadonlySet<Provider> = new Set(['rerun', 'openrouter', 'custom'])
+
 // The provider a model behaves like: itself, or for OpenCode the one its wire format belongs to.
 export function behaviourOf(provider: Provider, model: string): Provider {
     if (provider !== 'opencode') return provider

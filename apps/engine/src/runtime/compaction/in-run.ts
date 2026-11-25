@@ -1,6 +1,6 @@
 import type { ModelMessage } from 'ai'
 import { isContextPart } from '@rerun/contracts'
-import { behaviourOf } from '../../agents/opencode.js'
+import { behaviourOf, CHAT_FORMAT_PROVIDERS } from '../../agents/opencode.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import type { ModelOverride } from '../../agents/providers.js'
 import { newId } from '../../lib/ids.js'
@@ -66,7 +66,11 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
     if (!contextWindow) return undefined
     const threshold = compactionThreshold(contextWindow, ctx.provider)
     const turnIndex = turnIndexOf(initialMessages)
-    const bindsThinking = behaviourOf(ctx.provider, ctx.model) === 'anthropic'
+    const behaviour = behaviourOf(ctx.provider, ctx.model)
+    const bindsThinking = behaviour === 'anthropic'
+    // The OpenAI chat format has no field for a thought: the model is never sent its reasoning back,
+    // so counting it would compact a run long before it reaches the threshold (RER-314).
+    const asSent = (messages: ModelMessage[]): ModelMessage[] => (CHAT_FORMAT_PROVIDERS.has(behaviour) ? messages.map(withoutReasoning) : messages)
 
     let compacted: Compacted | undefined
     // After a summary, done or failed, the next waits for the context to grow by another tail's
@@ -97,10 +101,10 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
         const kept = compacted ? repairToolPairs(view) : undefined
         const last = steps.at(-1)?.usage
         const measured = (last?.inputTokens ?? 0) + (last?.outputTokens ?? 0)
-        const tokens = Math.max(measured, estimateTokens(view, system, toolChars))
+        const tokens = Math.max(measured, estimateTokens(asSent(view), system, toolChars))
         if (tokens < threshold || tokens < nextCompactionAt) return kept
 
-        const cut = cutIndex(view)
+        const cut = cutIndex(asSent(view))
         const coveredBefore = compacted?.coveredCount ?? 0
         const coveredCount = coveredBefore + cut - synthetic
         const pinned = pinnedOf(messages, coveredCount)
@@ -115,11 +119,11 @@ export function createInRunCompactor(ctx: RunContext, { system, toolChars, overr
             const summary = await summarizeMiddle(ctx, override, view.slice(0, cut), threshold)
             await recordCompactionUsage(ctx, stepNumber, summary)
             compacted = { summary: summaryMessageOf(IN_RUN_SUMMARY_PREAMBLE, summary.text), coveredCount, keptUntil: messages.length }
-            const tokensRecovered = Math.max(0, estimateTokens(view.slice(0, cut)) - estimateTokens([compacted.summary, ...pinned]))
+            const tokensRecovered = Math.max(0, estimateTokens(asSent(view.slice(0, cut))) - estimateTokens([compacted.summary, ...pinned]))
             ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'done', messagesCompacted, tokensRecovered } })
             ctx.logger.info({ agent: ctx.agent.id, session: ctx.sessionId, run: ctx.runId, stepNumber, tokens, messagesCompacted, tokensRecovered, usage: summary.usage }, 'context compacted mid-run')
             const sent = repairToolPairs(viewOf(messages).view)
-            nextCompactionAt = estimateTokens(sent, system, toolChars) + COMPACTION_TAIL_TOKEN_BUDGET
+            nextCompactionAt = estimateTokens(asSent(sent), system, toolChars) + COMPACTION_TAIL_TOKEN_BUDGET
             return sent
         } catch (error) {
             nextCompactionAt = tokens + COMPACTION_TAIL_TOKEN_BUDGET

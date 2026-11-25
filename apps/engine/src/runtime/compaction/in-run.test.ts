@@ -239,6 +239,35 @@ describe('createInRunCompactor', () => {
         expect(writes.filter(w => w.data.status === 'done')).toHaveLength(2)
     })
 
+    // RER-314: a custom endpoint was compacted at 86k real tokens out of a 150k threshold, its
+    // thoughts counted although the chat format never sends them back.
+    it('leaves out of the count the reasoning a chat model is never sent back', async () => {
+        const thinkingStep = (index: number): ModelMessage[] => [
+            { role: 'assistant', content: [{ type: 'reasoning', text: 'r'.repeat(100_000) }, { type: 'tool-call', toolCallId: `t${index}`, toolName: 'shell_exec', input: { command: `step ${index}` } }] },
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: `t${index}`, toolName: 'shell_exec', output: { type: 'text', value: 'ok' } }] },
+        ]
+        const messages = [...OPENING, ...Array.from({ length: 5 }, (_, i) => thinkingStep(i)).flat()]
+
+        expect(await compactorFor(context('custom', 'MiniMax-M3.1-Flash').ctx)({ messages, steps: noSteps, stepNumber: 5 })).toBeUndefined()
+        expect(state.prompts).toHaveLength(0)
+
+        // OpenAI's Responses API is sent its reasoning again: there it counts.
+        expect(await compactorFor(context().ctx)({ messages, steps: noSteps, stepNumber: 5 })).toBeDefined()
+        expect(state.prompts).toHaveLength(1)
+    })
+
+    it('keeps a tail of the tokens a chat model is sent, its reasoning left out', async () => {
+        const thinkingStep = (index: number): ModelMessage[] => [
+            { role: 'assistant', content: [{ type: 'reasoning', text: 'r'.repeat(100_000) }, { type: 'tool-call', toolCallId: `t${index}`, toolName: 'shell_exec', input: { command: `step ${index}` } }] },
+            { role: 'tool', content: [{ type: 'tool-result', toolCallId: `t${index}`, toolName: 'shell_exec', output: { type: 'text', value: `${index}`.padEnd(20_000, '.') } }] },
+        ]
+        const messages = [...OPENING, ...Array.from({ length: 20 }, (_, i) => thinkingStep(i)).flat()]
+
+        const sent = await compactorFor(context('custom', 'MiniMax-M3.1-Flash').ctx)({ messages, steps: noSteps, stepNumber: 20 })
+
+        expect(sent?.filter(message => message.role === 'tool').length).toBeGreaterThanOrEqual(3)
+    })
+
     // The estimate reads four characters to the token; the provider's count of the last step is
     // the truth when it says more.
     it('compacts on the tokens the last step really read', async () => {
