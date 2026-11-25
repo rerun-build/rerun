@@ -22,7 +22,7 @@ import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceList } from '@/components/services/ServiceList'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
-import { HScrollFade } from '@rerun/ui/primitives'
+import { Badge, HScrollFade } from '@rerun/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -463,9 +463,14 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 leading={<Icon {...serviceIconProps(s.icon, s.category)} size="sm" />}
                                                 description={s.label}
                                                 title={
-                                                    <span className="flex min-w-0 items-center gap-1.5">
+                                                    <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
                                                         <span className="truncate">{s.name}</span>
                                                         {s.vault && <VaultBadge />}
+                                                        {s.status === 'active' && (
+                                                            <Badge size="xs" tone="green" glow={false} className="shrink-0">
+                                                                {tServices('connect.connected')}
+                                                            </Badge>
+                                                        )}
                                                         {(s.status === 'needs_config' || s.status === 'needs_auth') && (
                                                             <TooltipLabeled label={s.status === 'needs_auth' ? t('needsAuthHint') : t('needsConfigHint')}>
                                                                 <AlertTriangleIcon className="size-3.5 shrink-0 text-amber-400" />
