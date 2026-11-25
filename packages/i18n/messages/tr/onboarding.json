@@ -133,7 +133,13 @@
         "link": "Davet bağlantısı",
         "copy": "Kopyala",
         "copied": "Kopyalandı",
-        "skip": "Atla"
+        "skip": "Şimdilik atla",
+        "panel": {
+            "title": "Hepiniz için tek ekip.",
+            "line": "Davet ettiğiniz herkes aynı coworker'larla çalışır, ne yaptıklarını görür ve onlara iş verebilir. Tüm ekibinizi ücretsiz davet edin.",
+            "shared": "Her coworker hepiniz için çalışır",
+            "more": "{count, plural, one {+# kişi daha} other {+# kişi daha}}"
+        }
     },
     "view": {
         "title": "Ekibinizi nasıl görmek istersiniz?",

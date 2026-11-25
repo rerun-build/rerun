@@ -133,7 +133,13 @@
         "link": "Link de convite",
         "copy": "Copiar",
         "copied": "Copiado",
-        "skip": "Pular"
+        "skip": "Pular por enquanto",
+        "panel": {
+            "title": "Um só time, para todos vocês.",
+            "line": "Todos que você convidar trabalham com os mesmos coworkers, veem o que eles fizeram e podem passar tarefas a eles. Convide seu time inteiro de graça.",
+            "shared": "Cada coworker trabalha para todos vocês",
+            "more": "{count, plural, one {+# a mais} many {+# a mais} other {+# a mais}}"
+        }
     },
     "view": {
         "title": "Como você quer ver sua equipe?",

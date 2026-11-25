@@ -133,7 +133,13 @@
         "link": "Enlace de invitación",
         "copy": "Copiar",
         "copied": "Copiado",
-        "skip": "Omitir"
+        "skip": "Omitir por ahora",
+        "panel": {
+            "title": "Un equipo, para todos.",
+            "line": "Todas las personas que invites trabajan con los mismos coworkers, ven lo que hicieron y pueden encargarles trabajo. Invita a todo tu equipo gratis.",
+            "shared": "Cada coworker trabaja para todos",
+            "more": "{count, plural, one {+# más} many {+# más} other {+# más}}"
+        }
     },
     "view": {
         "title": "¿Cómo quieres ver a tu equipo?",

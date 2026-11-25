@@ -14,7 +14,9 @@
         "promises": "What an AI coworker does for the person, in their voice ('my') or as a short imperative, on one line.",
         "sector.use": "Tile that keeps what the person typed as their answer. {words} is what they typed.",
         "sector.panel.heading": "Title bar of a small window that lists the first AI coworkers offered for the line of work picked.",
-        "sector.panel.anyone": "Shown in that title bar while no line of work is picked."
+        "sector.panel.anyone": "Shown in that title bar while no line of work is picked.",
+        "team.panel.shared": "'Coworker' is an AI coworker. 'All of you' are the people of the workspace.",
+        "team.panel.more": "Counts the people invited that the small window has no room for."
     },
     "metaTitle": "Welcome",
     "back": "Back",
@@ -150,7 +152,13 @@
         "link": "Invite link",
         "copy": "Copy",
         "copied": "Copied",
-        "skip": "Skip"
+        "skip": "Skip for now",
+        "panel": {
+            "title": "One team, for all of you.",
+            "line": "Everyone you invite works with the same coworkers, sees what they did and can hand them work. Invite your whole team for free.",
+            "shared": "Every coworker works for all of you",
+            "more": "{count, plural, one {+# more} other {+# more}}"
+        }
     },
     "view": {
         "title": "How do you want to see your team?",

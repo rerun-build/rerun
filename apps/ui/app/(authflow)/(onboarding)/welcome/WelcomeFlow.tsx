@@ -3,7 +3,7 @@
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
 import { finishWelcomeTeamAction, saveWelcomeSectorAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
-import { LazyShowcase, LazyTeamPanel } from '@/components/onboarding/panels/LazyPanels'
+import { LazyMembersPanel, LazyShowcase, LazyTeamPanel } from '@/components/onboarding/panels/LazyPanels'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
@@ -12,6 +12,7 @@ import { TeamStep, type SentInvite } from '@/components/onboarding/welcome/TeamS
 import { TrialStep } from '@/components/onboarding/welcome/TrialStep'
 import { ViewStep } from '@/components/onboarding/welcome/ViewStep'
 import { useErrorText } from '@/hooks/useErrorText'
+import { accountLabel } from '@/lib/auth/placeholder-email'
 import type { ActionFailure } from '@/lib/i18n/action-error'
 import { sectorById, type SectorId } from '@/lib/onboarding/sectors'
 import type { StarterRole } from '@/lib/onboarding/starter-roles.server'
@@ -55,7 +56,7 @@ const ENGINE_POLL_MS = 2_000
 export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; starterRoles: Record<string, StarterRole>; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
-    const { phoneStep, workspace } = useSession()
+    const { phoneStep, session, workspace } = useSession()
     const askPhone = phonePending && phoneStep !== 'clear'
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     const [step, setStep] = useState<OnboardingStep>(initialStep)
@@ -203,7 +204,15 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
 
     const t = useTranslations('onboarding.sectors')
     const picked = sectorById(sector.sector)
-    const panel = !askPhone && step === 'industry' ? <LazyTeamPanel industry={picked?.category ?? (sector.label ? null : industry)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} /> : <LazyShowcase />
+    const email = accountLabel(session?.user?.email)
+    const panel =
+        !askPhone && step === 'industry' ? (
+            <LazyTeamPanel industry={picked?.category ?? (sector.label ? null : industry)} sector={sector.sector} label={picked ? t(`${picked.id}.label`) : sector.label} roles={starterRoles} />
+        ) : !askPhone && step === 'team' ? (
+            <LazyMembersPanel name={firstName ?? email ?? ''} email={email} invites={invites.map(invite => invite.email)} />
+        ) : (
+            <LazyShowcase />
+        )
 
     const question = QUESTIONS.indexOf(step as QuestionStep)
     const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')

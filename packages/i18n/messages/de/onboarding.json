@@ -133,7 +133,13 @@
         "link": "Einladungslink",
         "copy": "Kopieren",
         "copied": "Kopiert",
-        "skip": "Überspringen"
+        "skip": "Vorerst überspringen",
+        "panel": {
+            "title": "Ein Team für euch alle.",
+            "line": "Alle, die du einlädst, arbeiten mit denselben Coworkern, sehen, was sie getan haben, und können ihnen Aufgaben geben. Lade dein ganzes Team kostenlos ein.",
+            "shared": "Jeder Coworker arbeitet für euch alle",
+            "more": "{count, plural, one {+# weitere Person} other {+# weitere}}"
+        }
     },
     "view": {
         "title": "Wie möchtest du dein Team sehen?",
