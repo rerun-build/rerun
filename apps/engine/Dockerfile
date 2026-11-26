@@ -20,7 +20,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --shell /bin/bash rerun && mkdir -p /data && chown rerun:rerun /data
 COPY --from=build --chown=rerun:rerun /out /app
-RUN npx --yes patchright@1.63.0 install-deps chromium && rm -rf /var/lib/apt/lists/*
+RUN npx --yes patchright@1.64.3 install-deps chromium && rm -rf /var/lib/apt/lists/*
 # Codex drives a ChatGPT plan, at CODEX_VERSION (src/runtime/codex-cli.ts). Claude Code ships inside
 # the Agent SDK, already in /app.
 RUN npm install -g "@openai/codex@0.170.0"
