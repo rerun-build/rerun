@@ -3691,6 +3691,7 @@ export type Database = {
           onboarding_completed_at: string | null
           signed_up_at: string | null
           support_token: string | null
+          two_step: Json | null
           verified: boolean
           workspace_id: number
         }
@@ -3707,6 +3708,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
           support_token?: string | null
+          two_step?: Json | null
           verified?: boolean
           workspace_id: number
         }
@@ -3723,6 +3725,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
           support_token?: string | null
+          two_step?: Json | null
           verified?: boolean
           workspace_id?: number
         }
@@ -4530,7 +4533,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      auth_sessions: {
+        Row: {
+          aal: "aal1" | "aal2" | "aal3" | null
+          created_at: string | null
+          id: string | null
+          not_after: string | null
+          refreshed_at: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aal?: "aal1" | "aal2" | "aal3" | null
+          created_at?: string | null
+          id?: string | null
+          not_after?: string | null
+          refreshed_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aal?: "aal1" | "aal2" | "aal3" | null
+          created_at?: string | null
+          id?: string | null
+          not_after?: string | null
+          refreshed_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       anonymize_auth_user: {

@@ -1,8 +1,16 @@
 import { Database } from './database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
 
-export type TableName = keyof Database['public']['Tables']
-export type TableRow<T extends TableName> = Database['public']['Tables'][T]['Row']
+// A view reads like a table.
+type Relations = Database['public']['Tables'] & Database['public']['Views']
+export type TableName = keyof Relations
+export type TableRow<T extends TableName> = Relations[T]['Row']
+
+// supabase-js types `from` with one overload for tables and one for views, which a name that may be
+// either cannot pick. The helpers type their own results, so the query is built on the table one.
+function from(supabase: SupabaseClient<Database>, table: TableName) {
+    return supabase.from(table as keyof Database['public']['Tables'])
+}
 
 // A bare null is not a valid filter: PostgREST needs `is.null`, so use `{ isNull: true }`.
 export type FilterValue<T> =
@@ -176,7 +184,7 @@ function applyJoinFilters<J extends Record<string, JoinConfig<any, any>>>(joinSe
 }
 
 export async function selectSingle<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }) {
-    let query = supabase.from(table).select(selection.join(','))
+    let query = from(supabase, table).select(selection.join(','))
     query = applyFilters(query, filters)
 
     if (orderBy) {
@@ -188,7 +196,7 @@ export async function selectSingle<T extends TableName, K extends keyof TableRow
 }
 
 export async function selectMaybeSingle<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }) {
-    let query = supabase.from(table).select(selection.join(','))
+    let query = from(supabase, table).select(selection.join(','))
     query = applyFilters(query, filters)
 
     if (orderBy) {
@@ -200,7 +208,7 @@ export async function selectMaybeSingle<T extends TableName, K extends keyof Tab
 }
 
 export async function selectMany<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[]>(supabase: SupabaseClient<Database>, table: T, selection: S, filters: Filters<T>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }, limit?: number, offset?: number) {
-    let query = supabase.from(table).select(selection.join(','))
+    let query = from(supabase, table).select(selection.join(','))
     query = applyFilters(query, filters)
 
     if (orderBy) {
@@ -243,7 +251,7 @@ export async function selectAll<T extends TableName, K extends keyof TableRow<T>
 // `*` by default: a head count selects nothing, and a table without an `id` column (workspace_members,
 // services, ...) answers an error on `id` that every caller would read as a count of zero.
 export async function selectCount<T extends TableName>(supabase: SupabaseClient<Database>, table: T, filters: Filters<T>, column: string = '*') {
-    let query = supabase.from(table).select(column, { count: 'exact', head: true })
+    let query = from(supabase, table).select(column, { count: 'exact', head: true })
     query = applyFilters(query, filters)
 
     const { error, count } = await query
@@ -261,7 +269,7 @@ export async function selectSingleWithJoins<T extends TableName, K extends keyof
 
     const fullSelection = [...selection, ...joinSelections].join(',')
 
-    let query = supabase.from(table).select(fullSelection)
+    let query = from(supabase, table).select(fullSelection)
     query = applyFilters(query, filters)
 
     if (orderBy) {
@@ -281,7 +289,7 @@ export async function selectMaybeSingleWithJoins<T extends TableName, K extends 
 
     const fullSelection = [...selection, ...joinSelections].join(',')
 
-    let query = supabase.from(table).select(fullSelection)
+    let query = from(supabase, table).select(fullSelection)
     query = applyFilters(query, filters)
 
     if (orderBy) {
@@ -301,7 +309,7 @@ export async function selectManyWithJoins<T extends TableName, K extends keyof T
 
     const fullSelection = [...selection, ...joinSelections].join(',')
 
-    let query = supabase.from(table).select(fullSelection)
+    let query = from(supabase, table).select(fullSelection)
     query = applyFilters(query, filters)
 
     // Appliquer les filtres de jointures directement sur la requête

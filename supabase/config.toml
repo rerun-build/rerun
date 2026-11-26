@@ -266,10 +266,19 @@ otp_length = 6
 template = "Your code is {{ .Code }}"
 max_frequency = "5s"
 
-# Configure MFA via WebAuthn
-# [auth.mfa.web_authn]
-# enroll_enabled = true
-# verify_enabled = true
+# Configure MFA via WebAuthn: the passkeys of the Security tab, a second step only, never a sign-in.
+[auth.mfa.web_authn]
+enroll_enabled = true
+verify_enabled = true
+
+# The relying party of those passkeys: the hub's own address. A passkey only works on the address its
+# rp_id names, so a hosted project sets the hub's domain here (app.rerun.build) and its origins.
+[auth.webauthn]
+rp_display_name = "Rerun"
+rp_id = "localhost"
+# The auth server checks the origin against this list alone. A hub served on another port (a Conductor
+# workspace, verify:ui) adds its own with SUPABASE_AUTH_WEBAUTHN_ORIGIN before `pnpm db:start`.
+rp_origins = ["http://localhost:3000", "env(SUPABASE_AUTH_WEBAUTHN_ORIGIN)"]
 
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
