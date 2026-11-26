@@ -1506,7 +1506,11 @@ To see the full transcript (tool calls included), use the run's `sessionId` with
 ### `GET /agents/:id/runs/:rid/stream`
 
 Joins the live stream of a run in flight, in the same format as `POST /chat`, with a keepalive
-comment line while it waits. `204` when the run is over or unknown.
+comment line while it waits. What the run already streamed comes first, its deltas merged: consecutive
+text, reasoning and tool input deltas of one part travel as one, and the input deltas of a tool call
+whose whole input is already there are left out, so the message they assemble is the same in far fewer
+events. What comes after is streamed as it comes. A run that ended can still be read this way for
+three minutes; `204` after that, or when the run is unknown.
 
 ### `GET /agents/:id/runs/:rid/steps`
 
