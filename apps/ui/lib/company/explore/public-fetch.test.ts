@@ -1,10 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import dns, { type LookupAddress } from 'node:dns'
+import { createServer, type Server } from 'node:http'
+import { isIP, type AddressInfo } from 'node:net'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fetchPublic } from './public-fetch'
+import { stackCollector } from './stack'
 
 const mocks = vi.hoisted(() => ({ lookup: vi.fn() }))
 vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
 
-const RESOLVED: Record<string, string> = { 'shop.test': '93.184.216.34', 'www.shop.test': '93.184.216.35' }
+const RESOLVED: Record<string, string> = { 'shop.test': '93.184.216.34', 'www.shop.test': '93.184.216.35', 'rebind.test': '93.184.216.36' }
 
 beforeEach(() => {
     mocks.lookup.mockImplementation(async (host: string) => {
@@ -60,5 +64,40 @@ describe('fetchPublic (company explore)', () => {
         const headers = new Headers(fetchMock.mock.calls[0][1]?.headers)
         expect(headers.get('accept')).toBe('text/html')
         expect(headers.get('user-agent')).toContain('Mozilla/5.0')
+    })
+})
+
+describe('stackCollector on a real connection', () => {
+    const internalHits: string[] = []
+    let internal: Server
+    let internalPort = 0
+
+    beforeAll(async () => {
+        // The check reads node:dns/promises (public above), the connection node:dns: a rebinding name
+        // answers 127.0.0.1 to the second.
+        type LookupCallback = (err: NodeJS.ErrnoException | null, address: string | LookupAddress[], family?: number) => void
+        vi.spyOn(dns, 'lookup').mockImplementation(((hostname: string, options: { all?: boolean }, callback: LookupCallback) => {
+            const address = isIP(hostname) ? hostname : '127.0.0.1'
+            return options.all ? callback(null, [{ address, family: 4 }]) : callback(null, address, 4)
+        }) as unknown as typeof dns.lookup)
+        internal = createServer((req, res) => {
+            internalHits.push(`${req.method} ${req.url}`)
+            res.writeHead(200, { 'content-type': 'text/html' })
+            res.end('<html><head><title>Internal admin</title><meta property="og:site_name" content="INTERNAL-SECRET"></head></html>')
+        })
+        await new Promise<void>(resolve => internal.listen(0, '127.0.0.1', resolve))
+        internalPort = (internal.address() as AddressInfo).port
+    })
+
+    afterAll(() => {
+        internal.close()
+        vi.restoreAllMocks()
+    })
+
+    it('brings nothing back from a name that resolves privately at connection time', async () => {
+        const input = { url: `http://rebind.test:${internalPort}/`, domain: 'rebind.test', personName: null, email: null, linkedinUrl: null }
+
+        await expect(stackCollector.run({ input, need: async () => null } as never)).rejects.toMatchObject({ cause: { code: 'ENOTPUBLIC' } })
+        expect(internalHits).toEqual([])
     })
 })

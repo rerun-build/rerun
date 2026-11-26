@@ -1,4 +1,4 @@
-import { resolvesToPublicAddresses } from '@/lib/net/public-fetch'
+import { fetchPublic } from '@/lib/net/public-fetch'
 
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
@@ -13,19 +13,11 @@ type FetchedLogo = { ok: true; bytes: Uint8Array } | ActionFailure
 
 // Downloads the image a logo link points at: public http(s) only, every redirect re-checked, an
 // image content type, and never more than LOGO_MAX_BYTES read off the wire.
-export async function fetchLogoBytes(url: string, redirectsLeft = MAX_REDIRECTS): Promise<FetchedLogo> {
+export async function fetchLogoBytes(url: string): Promise<FetchedLogo> {
     if (!URL.canParse(url)) return failure('noLogoFound')
-    const { protocol, hostname } = new URL(url)
-    if (!/^https?:$/.test(protocol) || !(await resolvesToPublicAddresses(hostname))) return failure('noLogoFound')
 
-    const res = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }).catch(() => null)
+    const res = await fetchPublic(url, {}, { timeoutMs: FETCH_TIMEOUT_MS, maxRedirects: MAX_REDIRECTS }).catch(() => null)
     if (!res) return failure('noLogoFound')
-
-    const location = res.headers.get('location')
-    if (res.status >= 300 && res.status < 400) {
-        if (!location || redirectsLeft === 0) return failure('noLogoFound')
-        return fetchLogoBytes(new URL(location, url).toString(), redirectsLeft - 1)
-    }
 
     if (!res.ok || !res.body || !(res.headers.get('content-type') ?? '').startsWith('image/')) return failure('noLogoFound')
     if (Number(res.headers.get('content-length') ?? 0) > LOGO_MAX_BYTES) return failure('imageTooLarge', { max: LOGO_MAX_BYTES / (1024 * 1024) })
