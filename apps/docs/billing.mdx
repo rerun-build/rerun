@@ -35,7 +35,7 @@ Two apps are sold by the account, on the same invoice as your plan. Each connect
 | **LinkedIn Pro** | One LinkedIn account they prospect from: messages, invitations, profile search. A reply or an accepted invitation wakes the coworker up | \$9/mo | \$108/yr |
 | **WhatsApp Pro** | One WhatsApp number they answer from, with text, files and voice notes. A new message wakes the coworker up | \$9/mo | \$108/yr |
 
-A slot follows the billing of your plan, and carries no yearly discount. Open the workspace pill, then the app under **Apps**, to connect an account, add a slot or see what each slot is used by. Only an admin can manage paid apps.
+A slot follows the billing of your plan, and carries no yearly discount. Open the workspace pill, then the app under **Apps**, to connect an account, add a slot or see what each slot is used by, or click **Manage slots** on the **Paid apps** tile of **Billing** to add or remove slots. Only an admin can manage paid apps.
 
 - **During your trial**, one slot per app costs \$0 and is billed with your plan once Pro starts. Adding a second slot of the same app ends the trial, like [any change during the trial](#managing-the-subscription).
 - **On Pro**, the first slot of an app is free for 5 days, then \$9 a month.
@@ -53,15 +53,15 @@ Pro includes 500 credits every month, yearly billing included. They reset each m
 
 ### Credit packs
 
-When you need more, click **Add credits** on the **Rerun credits** card of **Billing**. Each pack adds 1,000 credits for \$10, paid once, and up to 100 packs go in one purchase. Packs never expire: your coworkers draw on them once the credits of the month are spent.
+When you need more, click **Add credits** on the **Rerun credits** tile of **Billing**. Each pack adds 1,000 credits for \$10, paid once, and up to 100 packs go in one purchase. Packs never expire: your coworkers draw on them once the credits of the month are spent.
 
-During the trial the card offers **Start Pro now** instead.
+During the trial the tile shows the trial credits left, and its page offers **Start Pro now** instead: packs open once Pro starts.
 
 ### Credit usage
 
-**Billing** shows what is left on the **Rerun credits** card. Click **See usage**, or **Credit usage**, for the detail: credits used per day, the pace you spend them at, the split between **AI models** and **Paid data**, the spend by coworker, and the latest charges.
+**Billing** shows what is left on the **Rerun credits** tile: the credits of the month and those from packs. Click **See usage** for the detail: credits used each day of the current period, the split between **AI models** and **Paid data**, and the spend by coworker.
 
-The **Allow spending** switch on the same card stops all spending of credits. While it is off, your coworkers cannot use the Rerun models or paid data. Coworkers on your own AI keep working.
+The **Allow spending** switch on the **Rerun credits** page stops all spending of credits. While it is off, your coworkers cannot use the Rerun models or paid data. Coworkers on your own AI keep working.
 
 Every run also records what its model cost: see every coworker at once, with who started each run, in [Usage](/usage), or one coworker in the **Monitoring** tab of its **Activity** screen.
 
@@ -93,7 +93,18 @@ The same applies through the API: [`create_agent`](/api/tools/agents#create_agen
 
 ## Managing the subscription
 
-Open the workspace pill in the top left corner, then **Billing**. Only an admin can manage billing. From there you change your app slots, buy credits, switch between monthly and yearly, update your card, read your invoices, add your business details (VAT number or tax ID) for the invoices, and cancel.
+Open the workspace pill in the top left corner, then **Billing**. Only an admin can manage billing.
+
+**Billing** opens on your plan, with its price and its next renewal, and a banner when something needs you: a declined payment, credits running low, a plan that ends, or the date your trial turns into Pro. Under it, four tiles:
+
+- **Rerun credits**: what is left, **Add credits** and **See usage**.
+- **Machine**: bigger machines for busy workspaces are coming soon. Nothing to change there yet.
+- **Paid apps**: your LinkedIn Pro and WhatsApp Pro slots, and **Manage slots**.
+- **Payment**: the card you are charged on and the business name on your invoices, and **Update**.
+
+Then the last invoices (**All invoices** lists them all, ready to download), **Refer a friend** and **Cancel plan**. Each button opens its page in the same window, and the arrow in its header brings you back.
+
+From there you change your app slots, buy credits, switch between monthly and yearly (**Manage plan**), replace your card, add your business details (VAT number or tax ID) for the invoices, and cancel.
 
 - **Monthly to yearly** starts the year today, and the unused part of the month is credited.
 - **Yearly to monthly** waits for the end of the paid year.
@@ -117,9 +128,9 @@ Only a new account can use a referral link.
 
 ## Cancelling
 
-Click **Cancel plan** at the bottom of **Billing**. Your coworkers keep running until the end of the period you paid for. After that, schedules stop firing and the workspace pauses: its coworkers, their memories, their skills and their files are saved for 90 days.
+Click **Cancel plan** at the bottom of **Billing**. It shows what happens next, then asks why you leave before you confirm. Your coworkers keep running until the end of the period you paid for. After that, schedules stop firing and the workspace pauses: its coworkers, their memories, their skills and their files are saved for 90 days.
 
-- Before the end of the period, **Resume Pro** keeps the plan as if nothing happened.
+- Before the end of the period, **Resume Pro** on the banner of **Billing** keeps the plan as if nothing happened.
 - Once paused, **Restart Pro** in **Billing** brings the workspace back exactly as you left it. Your coworkers wake up in about a minute.
 - After 90 days, the saved workspace is deleted for good.
 

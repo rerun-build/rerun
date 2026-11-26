@@ -23,7 +23,7 @@ import { OptionRow } from '@rerun/ui/chat'
 import { TemplateBoardPreview, type BoardAgent } from '@rerun/ui/iso-grid'
 import { StepTransition, useStepper } from '@rerun/ui/steps'
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { CancelNote, DaysLeftCard, OfferCard, SunkCard, type IconType, type SunkStat } from './CancelFlowCards'
@@ -70,14 +70,21 @@ export type CancelFlowProps = {
     onResume: () => Promise<boolean>
     onClose: () => void
     onStepChange: (step: CancelStep) => void
+    // Inside another dialog: the flow starts at `firstStep`, hands its header to the host's own
+    // through `onHeader`, and keeps its buttons in the body.
+    embedded?: { firstStep: CancelStep; onHeader: (header: CancelFlowHeader) => void }
 }
 
 type Header = { icon: IconType; title: string; description: string }
 
-export function CancelFlow({ state, activity, activityLoading, agentCount, creditLeftLabel, onRemind, onClaim, onCancel, onCheckReason, onResume, onClose, onStepChange }: CancelFlowProps) {
+// `key` and `depth` say which step the header shows, `onBack` steps back like the footer's button.
+// The outcome has none: stepping back from it would reopen the farewell and cancel again.
+export type CancelFlowHeader = Header & { key: string; depth: number; onBack?: () => void }
+
+export function CancelFlow({ state, activity, activityLoading, agentCount, creditLeftLabel, onRemind, onClaim, onCancel, onCheckReason, onResume, onClose, onStepChange, embedded }: CancelFlowProps) {
     const locale = useLocale()
     const t = useTranslations('billing')
-    const firstStep: CancelStep = state.reminderAt ? 'goodbye' : 'sunk'
+    const firstStep: CancelStep = embedded?.firstStep ?? (state.reminderAt ? 'goodbye' : 'sunk')
     const stepper = useStepper(CANCEL_STEPS.length, CANCEL_STEPS.indexOf(firstStep))
     const step = CANCEL_STEPS[stepper.index]
     const [outcome, setOutcome] = useState<CancelOutcome>('cancelled')
@@ -207,10 +214,70 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
     const sunk = sunkFigures({ t, trial, state, activity, agentCount, creditLeftLabel, locale })
     const contentKey = `${step}-${outcome}`
 
+    const onHeader = embedded?.onHeader
+    const reportHeader = useEffectEvent(() => onHeader?.({ ...header, key: contentKey, depth: stepper.index - CANCEL_STEPS.indexOf(firstStep), onBack: step === 'done' ? undefined : goBack }))
+    useEffect(() => reportHeader(), [contentKey, header.title, header.description])
+
+    const footer = (
+        <>
+            {step === 'done' ? (
+                <>
+                    {outcome === 'cancelled' && (
+                        <Button variant="outline" disabled={busy} onClick={resume}>
+                            {trial ? t('cancel.buttons.resumeTrial') : t('cancel.buttons.resumeSubscription')}
+                        </Button>
+                    )}
+                    <Button onClick={onClose}>{t('cancel.buttons.done')}</Button>
+                </>
+            ) : (
+                <>
+                    <Button variant="ghost" disabled={busy} onClick={goBack}>
+                        {t('cancel.buttons.goBack')}
+                    </Button>
+                    {step === 'goodbye' && (
+                        <Button variant="outline" disabled={busy} onClick={stepper.goForward}>
+                            {t('cancel.buttons.continueToCancel')}
+                        </Button>
+                    )}
+                    {step === 'sunk' && (
+                        <Button variant="outline" onClick={stepper.goForward}>
+                            {t('cancel.buttons.continue')}
+                        </Button>
+                    )}
+                    {step === 'reason' && (
+                        <TooltipDisabledReason reason={reasonMissing}>
+                            <Button variant="outline" disabled={!!reasonMissing || busy} onClick={() => void continueFromReason()}>
+                                {t('cancel.buttons.continue')}
+                            </Button>
+                        </TooltipDisabledReason>
+                    )}
+                    {step === 'offer' && (
+                        <Button variant="outline" disabled={busy} onClick={declineOffer}>
+                            {t('cancel.buttons.noThanks')}
+                        </Button>
+                    )}
+                    {step === 'farewell' && (
+                        <Button
+                            variant="destructive"
+                            disabled={busy}
+                            onMouseEnter={() => setBoardQuiet(true)}
+                            onMouseLeave={() => setBoardQuiet(false)}
+                            onFocus={() => setBoardQuiet(true)}
+                            onBlur={() => setBoardQuiet(false)}
+                            onClick={() => void cancel()}
+                        >
+                            {trial ? t('cancel.buttons.cancelTrial') : t('cancel.buttons.cancelSubscription')}
+                        </Button>
+                    )}
+                </>
+            )}
+        </>
+    )
+
     return (
-        <div className="flex min-h-0 flex-col">
-            <DialogHeaderBar icon={header.icon} title={header.title} description={header.description} />
-            <div className="p-4">
+        <div className={cn('flex min-h-0 flex-col', embedded && 'flex-1')}>
+            {!embedded && <DialogHeaderBar icon={header.icon} title={header.title} description={header.description} />}
+            <div className={cn(!embedded && 'p-4')}>
                 <StepTransition stepKey={contentKey} direction={stepper.direction}>
                     {step === 'goodbye' && (
                         <div className="flex flex-col gap-5">
@@ -286,59 +353,11 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                 </StepTransition>
             </div>
 
-            <DialogFooter className={cn('m-0', step !== 'done' && 'sm:justify-between')}>
-                {step === 'done' ? (
-                    <>
-                        {outcome === 'cancelled' && (
-                            <Button variant="outline" disabled={busy} onClick={resume}>
-                                {trial ? t('cancel.buttons.resumeTrial') : t('cancel.buttons.resumeSubscription')}
-                            </Button>
-                        )}
-                        <Button onClick={onClose}>{t('cancel.buttons.done')}</Button>
-                    </>
-                ) : (
-                    <>
-                        <Button variant="ghost" disabled={busy} onClick={goBack}>
-                            {t('cancel.buttons.goBack')}
-                        </Button>
-                        {step === 'goodbye' && (
-                            <Button variant="outline" disabled={busy} onClick={stepper.goForward}>
-                                {t('cancel.buttons.continueToCancel')}
-                            </Button>
-                        )}
-                        {step === 'sunk' && (
-                            <Button variant="outline" onClick={stepper.goForward}>
-                                {t('cancel.buttons.continue')}
-                            </Button>
-                        )}
-                        {step === 'reason' && (
-                            <TooltipDisabledReason reason={reasonMissing}>
-                                <Button variant="outline" disabled={!!reasonMissing || busy} onClick={() => void continueFromReason()}>
-                                    {t('cancel.buttons.continue')}
-                                </Button>
-                            </TooltipDisabledReason>
-                        )}
-                        {step === 'offer' && (
-                            <Button variant="outline" disabled={busy} onClick={declineOffer}>
-                                {t('cancel.buttons.noThanks')}
-                            </Button>
-                        )}
-                        {step === 'farewell' && (
-                            <Button
-                                variant="destructive"
-                                disabled={busy}
-                                onMouseEnter={() => setBoardQuiet(true)}
-                                onMouseLeave={() => setBoardQuiet(false)}
-                                onFocus={() => setBoardQuiet(true)}
-                                onBlur={() => setBoardQuiet(false)}
-                                onClick={() => void cancel()}
-                            >
-                                {trial ? t('cancel.buttons.cancelTrial') : t('cancel.buttons.cancelSubscription')}
-                            </Button>
-                        )}
-                    </>
-                )}
-            </DialogFooter>
+            {embedded ? (
+                <div className={cn('mt-auto flex flex-col-reverse gap-2 pt-6 sm:flex-row sm:justify-end', step !== 'done' && 'sm:justify-between')}>{footer}</div>
+            ) : (
+                <DialogFooter className={cn('m-0', step !== 'done' && 'sm:justify-between')}>{footer}</DialogFooter>
+            )}
         </div>
     )
 }

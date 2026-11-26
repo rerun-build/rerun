@@ -23,7 +23,7 @@ vi.mock('@/app/api/_actions/workspace-restore.actions', () => ({ getSandboxArchi
 vi.mock('@/app/api/_actions/agent.actions', () => ({ activateAgentAction: vi.fn() }))
 vi.mock('@/ee/actions/billing.actions', () => ({ getSubscriptionStateAction: mocks.subscriptionState, getLifetimeBillingStateAction: mocks.subscriptionState, getCreditUsageAction: async () => ({ ok: true, usage: { bySource: [], byCoworker: [], latest: [], byDay: [], period: { start: '2026-11-01', end: '2026-12-01' } } }), setRerunCreditPausedAction: mocks.pause }))
 vi.mock('@/ee/components/dialogs/billing/CheckoutDialog', () => ({ CheckoutDialog: () => 'CHECKOUT' }))
-vi.mock('@/ee/components/dialogs/billing/PlanDialog', () => ({ PlanDialog: () => 'PLAN' }))
+vi.mock('@/ee/components/dialogs/billing/tiles/BillingTilesDialog', () => ({ BillingTilesDialog: () => 'PLAN', BillingTilesSkeleton: () => 'PLAN' }))
 vi.mock('@/ee/components/dialogs/billing/LifetimeDialog', () => ({ LifetimeDialog: () => 'LIFETIME' }))
 vi.mock('@/ee/components/dialogs/billing/CreditPane', () => ({ CreditPane: () => 'CREDIT_PANE' }))
 vi.mock('@/ee/components/dialogs/cancel-subscription/CancelSubscriptionDialog', () => ({ CancelSubscriptionDialog: () => null }))

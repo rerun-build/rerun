@@ -13,8 +13,9 @@ import { ExternalLinkIcon } from '@/lib/icons'
 import { longDate } from './checkout-copy'
 import { RightTitle, usd } from './parts'
 
-export function InvoicesPane({ onBack }: { onBack: () => void }) {
-    const locale = useLocale()
+// The workspace's invoices, newest first: null until they are in, empty when the read failed. A new
+// `reload` reads them again, after a payment.
+export function useInvoices(reload = 0): InvoiceSummary[] | null {
     const t = useTranslations('billing.plan.invoices')
     const errorText = useErrorText()
     const [invoices, setInvoices] = useState<InvoiceSummary[] | null>(null)
@@ -29,7 +30,15 @@ export function InvoicesPane({ onBack }: { onBack: () => void }) {
         return () => {
             cancelled = true
         }
-    }, [])
+    }, [reload])
+
+    return invoices
+}
+
+export function InvoicesPane({ onBack }: { onBack: () => void }) {
+    const locale = useLocale()
+    const t = useTranslations('billing.plan.invoices')
+    const invoices = useInvoices()
 
     return (
         <>
@@ -67,7 +76,7 @@ export function InvoicesPane({ onBack }: { onBack: () => void }) {
 
 const INVOICE_STATUSES = ['draft', 'open', 'uncollectible', 'void'] as const
 
-function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations<'billing.plan.invoices'>>): string {
+export function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations<'billing.plan.invoices'>>): string {
     const known = INVOICE_STATUSES.find(candidate => candidate === status)
     return known ? t(`status.${known}`) : status
 }

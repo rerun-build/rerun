@@ -7,101 +7,47 @@
         },
         "yourRenewal": "sua renovação",
         "status": {
-            "paymentFailed": "Pagamento falhou",
-            "ends": "Termina em {date}",
-            "ending": "Terminando",
-            "monthlyFrom": "Mensal a partir de {date}",
-            "active": "Ativo"
-        },
-        "summary": {
-            "monthlyRenews": "Coworkers ilimitados · cobrança mensal · renova em {renewal}",
-            "monthlyEnds": "Coworkers ilimitados · cobrança mensal · termina em {renewal}",
-            "yearlyRenews": "Coworkers ilimitados · cobrança anual · renova em {renewal}",
-            "yearlyEnds": "Coworkers ilimitados · cobrança anual · termina em {renewal}"
+            "ends": "Termina em {date}"
         },
         "success": {
             "done": "Concluído",
-            "paymentReceivedTitle": "Pagamento recebido",
-            "paymentReceivedBody": "Seu cartão foi atualizado e o Pro está ativo de novo.",
             "backOnTitle": "O Pro está de volta",
             "backOnBody": "Seu plano renova em {date}."
         },
-        "cardUpdated": "Cartão atualizado",
         "acceptTerms": "Aceite os termos primeiro",
         "pleaseWait": "Aguarde",
         "nextInvoice": "Próxima fatura",
         "overview": {
-            "keepYearlyFailed": "Não foi possível manter seu plano anual",
-            "billed": "Cobrança",
-            "billedYearly": "Anual, impostos inclusos",
-            "billedMonthly": "Mensal, impostos inclusos",
-            "from": "A partir de {date}",
-            "monthlyPrice": "Mensal · {price}",
             "title": "Faturamento",
-            "update": "Alterar",
             "invoices": "Faturas",
             "viewAll": "Ver todas",
             "creditUsage": "Uso de créditos",
-            "creditsLeft": "{credits} restantes",
-            "keepYearly": "Manter meu plano anual",
-            "switchHint": "Mude a cobrança para ver o novo preço.",
-            "cancelPlan": "Cancelar plano",
-            "referFriend": "Indique um amigo",
-            "freeMonths": "{count, plural, one {# mês grátis} other {# meses grátis}}",
-            "getFreeMonth": "Ganhe um mês grátis"
+            "creditsLeft": "{credits} restantes"
         },
         "change": {
-            "planLabel": "Coworkers ilimitados{slots}",
-            "switchScheduledTitle": "Mudança agendada",
-            "switchScheduledBody": "Seu plano anual vai até o fim. A cobrança mensal começa em {date}.",
             "changeScheduledTitle": "Alteração agendada",
-            "changeScheduledBody": "Você mantém {current} até {renewal}, depois {next} por {price}.",
-            "planUpdatedTitle": "Plano atualizado",
-            "planUpdatedBodyMonthly": "{plan}, cobrança mensal. Seu recibo está a caminho por e-mail.",
-            "planUpdatedBodyYearly": "{plan}, cobrança anual. Seu recibo está a caminho por e-mail.",
-            "switchToMonthly": "Mudar para mensal",
             "changeToSlots": "Mudar para {count, plural, one {<n></n> vaga de {provider}} other {<n></n> vagas de {provider}}}",
             "changeAppSlots": "Alterar suas vagas de apps",
-            "switchToYearly": "Mudar para anual",
-            "proLineMonthly": "Pro · {plan}, mensal",
-            "proLineYearly": "Pro · {plan}, anual",
-            "unusedTimeMonthly": "Tempo não usado do seu plano mensal",
-            "unusedTimeYearly": "Tempo não usado do seu plano anual",
             "dueTodayTaxIncluded": "A pagar hoje, impostos inclusos",
             "from": "A partir de {date}",
             "until": "Até {date}",
-            "monthlyFrom": "Mensal · <price></price>",
             "keepMyPlan": "Manter meu plano",
             "confirmAndPay": "Confirmar e pagar",
-            "switchOn": "Mudar em {date}",
             "scheduleFor": "Agendar para {date}",
-            "billedNowSlots": "As novas vagas são cobradas agora. A cobrança mensal começa em {date}.",
-            "slotsReady": "As novas vagas ficam prontas assim que o pagamento for aprovado.",
-            "yearlyStarts": "Seu plano anual começa assim que o pagamento for aprovado.",
             "nothingToday": "Nada é cobrado hoje."
         },
         "cancelPending": {
             "endOfPeriod": "o fim do seu período",
-            "resumeFailed": "Não foi possível retomar seu plano",
-            "title": "O Pro termina em {date}",
-            "body": "Seus coworkers continuam rodando até lá. Depois disso, o workspace é pausado e seus dados ficam guardados por 90 dias.",
-            "none": "Nenhum",
-            "resume": "Retomar o Pro",
-            "footnote": "Retomar mantém seu plano e cobra {price} em {date}."
+            "resumeFailed": "Não foi possível retomar seu plano"
         },
         "card": {
-            "notSaved": "Não foi possível salvar seu cartão",
-            "title": "Atualize seu cartão",
-            "save": "Salvar cartão",
-            "footnote": "Suas próximas faturas são cobradas neste cartão."
+            "notSaved": "Não foi possível salvar seu cartão"
         },
         "pastDue": {
             "declinedOn": "Seu pagamento de {amount} em {date} foi recusado.",
-            "declined": "Seu pagamento de {amount} foi recusado.",
             "lastDeclined": "Seu último pagamento foi recusado.",
             "paused": "Seu workspace está pausado e volta assim que o pagamento for aprovado.",
             "keepRunning": "Pague agora para manter seu workspace rodando.",
-            "ctaAmount": "Atualizar cartão e pagar {amount}",
             "cta": "Atualizar cartão e pagar"
         },
         "invoices": {
@@ -182,7 +128,6 @@
     "apps": {
         "title": "Apps",
         "description": "Superpoderes extras para seus coworkers, na mesma fatura do seu plano.",
-        "slotsSuffix": "{count, plural, one { + # vaga de {provider}} other { + # vagas de {provider}}}",
         "unit": {
             "monthly": "/mês",
             "yearly": "/ano"
@@ -954,5 +899,314 @@
     "startPlan": {
         "trialFailed": "Não foi possível começar seu teste",
         "trialStarted": "Teste iniciado"
+    },
+    "tiles": {
+        "pages": {
+            "billing": "Faturamento",
+            "home": {
+                "title": "Faturamento",
+                "renews": "{brand} Pro · renova em {date}",
+                "ends": "{brand} Pro · termina em {date}",
+                "declined": "{brand} Pro · pagamento recusado",
+                "trial": "Teste grátis · {count, plural, one {# dia restante} other {# dias restantes}}"
+            },
+            "plan": {
+                "title": "Gerenciar plano",
+                "description": "Como você é cobrado e o que o Pro inclui.",
+                "trialTitle": "Começar o {brand} Pro",
+                "trialDescription": "Encerre o teste hoje e mantenha tudo o que você configurou."
+            },
+            "credits": {
+                "title": "Créditos {brand}",
+                "description": "Eles pagam os modelos {brand} e os dados pagos.",
+                "trialDescription": "Os créditos de teste continuam quando o Pro começa."
+            },
+            "usage": {
+                "title": "Uso de créditos",
+                "description": "O que seus coworkers gastaram, e com o quê."
+            },
+            "apps": {
+                "title": "Apps pagos",
+                "description": "Uma vaga por conta que seus coworkers usam."
+            },
+            "payment": {
+                "title": "Pagamento",
+                "description": "O cartão que cobramos e o que aparece nas suas faturas."
+            },
+            "card": {
+                "replaceTitle": "Trocar cartão",
+                "addTitle": "Adicionar um cartão",
+                "payTitle": "Atualizar cartão e pagar",
+                "description": "Protegido pela Stripe. O {brand} nunca vê seu cartão."
+            },
+            "business": {
+                "title": "Dados da empresa",
+                "description": "Aparecem em todas as faturas a partir de agora."
+            },
+            "invoices": {
+                "title": "Faturas",
+                "description": "Todas as cobranças, prontas para baixar."
+            },
+            "referral": {
+                "title": "Indique um amigo",
+                "description": "Um amigo assina o Pro e vocês dois ganham um mês grátis."
+            },
+            "cancel": {
+                "title": "Cancelar o {brand} Pro",
+                "trialTitle": "Cancelar teste",
+                "description": "Veja o que acontece agora."
+            }
+        },
+        "card": {
+            "number": "{network} •••• {last4}",
+            "expires": "Expira em {date}",
+            "none": "Nenhum cartão salvo"
+        },
+        "home": {
+            "notice": {
+                "lowTitle": "{count, plural, one {Só resta # crédito} other {Só restam # créditos}}.",
+                "lowBody": "Os coworkers nos modelos {brand} param no zero.",
+                "addCredits": "Adicionar créditos",
+                "endsTitle": "Seu plano termina em {date}.",
+                "trialEndsTitle": "Seu teste termina em {date}.",
+                "endsBody": "Depois o workspace é pausado e fica salvo por {days} dias.",
+                "resumePro": "Retomar o Pro",
+                "resumeTrial": "Retomar o teste",
+                "trialResumedTitle": "Teste retomado",
+                "trialResumedBody": "O Pro começa sozinho em {date}.",
+                "trialTitle": "{amount} em {date}, nada antes.",
+                "trialBody": "Enviamos um e-mail na véspera."
+            },
+            "plan": {
+                "name": "{brand} Pro",
+                "manage": "Gerenciar plano",
+                "startPro": "Começar o Pro agora",
+                "badge": {
+                    "monthly": "Mensal",
+                    "yearly": "Anual",
+                    "trial": "Teste",
+                    "declined": "Pagamento recusado",
+                    "ends": "Termina em {date}",
+                    "monthlyFrom": "Mensal a partir de {date}"
+                },
+                "monthlyRenews": "{amount} por mês · renova em {date}",
+                "monthlyEnds": "{amount} por mês · termina em {date}",
+                "yearlyRenews": "{amount} por ano · renova em {date}",
+                "yearlyEnds": "{amount} por ano · termina em {date}",
+                "trialLine": "Grátis até {date}, depois {amount} por mês"
+            },
+            "credits": {
+                "title": "Créditos {brand}",
+                "add": "Adicionar créditos",
+                "seeUsage": "Ver uso",
+                "details": "Detalhes",
+                "leftLabel": "Créditos restantes",
+                "month": "{month} de {total} este mês",
+                "monthAndPacks": "{month} de {total} este mês · {packs} de pacotes",
+                "trialLine": "Créditos de teste, mantidos quando o Pro começa",
+                "locked": {
+                    "pastDue": "Pague a fatura recusada primeiro.",
+                    "canceling": "Retome o Pro para adicionar créditos."
+                }
+            },
+            "machine": {
+                "title": "Máquina",
+                "comingSoon": "Em breve",
+                "description": "Máquinas maiores para workspaces movimentados."
+            },
+            "apps": {
+                "title": "Apps pagos",
+                "manage": "Gerenciar vagas",
+                "off": "Desativado",
+                "slots": "{count} · {amount}"
+            },
+            "payment": {
+                "title": "Pagamento",
+                "update": "Atualizar"
+            },
+            "history": "Histórico",
+            "allInvoices": "Todas as faturas",
+            "noInvoice": "Nenhuma fatura ainda.",
+            "noInvoiceTrial": "Nenhuma fatura ainda. A primeira chega quando o Pro começar.",
+            "refer": "Indique um amigo",
+            "referEarned": "Indique um amigo · {count, plural, one {# mês ganho} other {# meses ganhos}}",
+            "cancelPlan": "Cancelar plano",
+            "cancelTrial": "Cancelar teste"
+        },
+        "plan": {
+            "name": "{brand} Pro",
+            "billedMonthly": "Cobrado todo mês",
+            "billedYearly": "Cobrado <amount></amount> por ano",
+            "perMonth": "<amount></amount><unit> / mês</unit>",
+            "included": {
+                "coworkers": "Coworkers e assentos ilimitados",
+                "machine": "Sua própria máquina privada",
+                "credits": "{credits} créditos {brand} todo mês",
+                "apps": "Todos os apps da biblioteca, com sua própria IA ou a nossa",
+                "api": "A API do {brand}, execuções ilimitadas"
+            },
+            "yearlySaves": "O faturamento anual economiza {amount} por ano no plano. As vagas de apps mantêm o preço.",
+            "proMonthly": "{brand} Pro, mensal",
+            "proYearly": "{brand} Pro, anual",
+            "appLine": "{app} × {count}",
+            "unusedMonth": "Parte não usada deste período",
+            "dueToday": "A pagar hoje, impostos incluídos",
+            "startPro": "Encerrar o teste e começar o Pro",
+            "switchYearly": "Mudar para anual",
+            "keepTrial": "Ou mantenha o teste: o Pro começa sozinho em {date}.",
+            "yearStartsToday": "Seu ano começa hoje. A parte não usada deste período é descontada.",
+            "acceptTerms": "Aceite os termos primeiro",
+            "until": "Até {date}",
+            "from": "A partir de {date}",
+            "yearlyAt": "Anual · {amount}",
+            "monthlyAt": "{amount} por mês",
+            "switchOn": "Mudar em {date}",
+            "nothingToday": "Nada a pagar hoje. Seu ano pago vai até o fim.",
+            "pendingSwitch": "Seu faturamento passa a ser mensal em {date}.",
+            "keepYearly": "Manter o faturamento anual",
+            "yourRenewal": "sua renovação",
+            "locked": {
+                "pastDue": "Pague a fatura recusada antes de mudar seu faturamento.",
+                "canceling": "Retome o Pro antes de mudar seu faturamento."
+            },
+            "success": {
+                "proTitle": "Boas-vindas ao Pro",
+                "proBody": "Seu teste terminou e o Pro começa hoje. Os coworkers desativados voltam a funcionar.",
+                "yearlyTitle": "Você está no faturamento anual",
+                "yearlyBody": "Seu ano começa hoje e renova em {date}.",
+                "monthlyTitle": "Mensal a partir de {date}",
+                "monthlyBody": "Seu plano anual vai até o fim, depois o faturamento passa a ser mensal.",
+                "keptYearlyTitle": "Você continua no faturamento anual",
+                "keptYearlyBody": "Seu plano renova em {date}, anualmente."
+            }
+        },
+        "credits": {
+            "leftLabel": "Créditos restantes",
+            "ownAi": "Coworkers na sua própria IA não gastam nenhum.",
+            "thisMonth": "Este mês",
+            "thisMonthResets": "Este mês, renova em {date}",
+            "monthOf": "{left} de {total}",
+            "fromPacks": "De pacotes, nunca expiram",
+            "packs": "Pacotes de créditos",
+            "packLine": "{count, plural, one {# crédito} other {# créditos}} por {price}, pago uma vez",
+            "lessAria": "Um pacote a menos",
+            "moreAria": "Um pacote a mais",
+            "addsCredits": "+<n></n> {count, plural, one {crédito} other {créditos}}",
+            "seeUsage": "Ver uso",
+            "pay": "Pagar <amount></amount>",
+            "payOnStripe": "Pagar na Stripe",
+            "chargedOnce": "Cobrado uma vez. Os créditos chegam na hora.",
+            "checkoutFootnote": "Você paga em uma página segura da Stripe e depois volta para cá.",
+            "acceptTerms": "Aceite os termos primeiro",
+            "trialLeft": "Créditos de teste restantes, de {trial}. O Pro adiciona mais {monthly} todo mês.",
+            "packsAfterTrial": "Os pacotes de créditos ficam disponíveis quando o Pro começar.",
+            "startPro": "Começar o Pro agora",
+            "locked": {
+                "pastDue": "Pague a fatura recusada primeiro.",
+                "canceling": "Retome o Pro para adicionar créditos."
+            },
+            "success": {
+                "title": "{count, plural, one {# crédito adicionado} other {# créditos adicionados}}",
+                "body": "Agora você tem {count, plural, one {# crédito} other {# créditos}}.",
+                "chargedTo": "Cobrado em {card}"
+            }
+        },
+        "usage": {
+            "lastDays": "{count, plural, one {Último dia} other {Últimos # dias}} · {credits} créditos",
+            "byCoworker": "Por coworker",
+            "empty": "Nada gasto ainda neste período."
+        },
+        "apps": {
+            "inUse": "{used} de {count, plural, one {# vaga em uso} other {# vagas em uso}}",
+            "noSlotMonthly": "Sem vaga · {price} por mês",
+            "noSlotYearly": "Sem vaga · {price} por ano",
+            "freeUntil": "Uma vaga grátis até {date}",
+            "lessAria": "Uma vaga de {app} a menos",
+            "moreAria": "Uma vaga de {app} a mais",
+            "loading": "Verificando as contas em uso…",
+            "disconnectFirst": "Desconecte uma conta de {app} primeiro.",
+            "trialOneSlot": "O teste inclui uma vaga. Comece o Pro para ter mais.",
+            "trialKeepsSlot": "A vaga do teste fica até o Pro começar.",
+            "connectHint": "Conecte as contas pelo próprio app: cada uma ocupa uma vaga.",
+            "cantRemoveUsed": "Não dá para remover uma vaga com uma conta: desconecte a conta primeiro.",
+            "addedLine": "{app}, +{count, plural, one {# vaga} other {# vagas}}",
+            "removedLine": "{app}, -{count, plural, one {# vaga} other {# vagas}}",
+            "newTotal": "Novo total",
+            "dueToday": "A pagar hoje, pelo restante do período",
+            "dueTodayTrial": "A pagar hoje, durante o teste",
+            "removedNote": "Uma vaga removida continua no seu plano até {date}.",
+            "addAndPay": "Adicionar {count, plural, one {# vaga} other {# vagas}} · pagar <amount></amount>",
+            "save": "Salvar",
+            "acceptTerms": "Aceite os termos primeiro",
+            "yourRenewal": "sua renovação",
+            "locked": {
+                "pastDue": "Pague a fatura recusada antes de mudar suas vagas.",
+                "canceling": "Retome o Pro antes de mudar suas vagas."
+            },
+            "success": {
+                "title": "Vagas atualizadas",
+                "addedBody": "Conecte a nova conta pelo app para começar a usar a vaga.",
+                "removedBody": "A vaga sai do seu plano em {date}."
+            }
+        },
+        "payment": {
+            "card": "Cartão",
+            "replace": "Trocar",
+            "add": "Adicionar",
+            "everyCharge": "Todas as cobranças vão para este cartão.",
+            "onInvoices": "Nas suas faturas",
+            "edit": "Editar",
+            "company": "Empresa",
+            "country": "País",
+            "taxId": "Número de IVA ou número fiscal",
+            "saveCard": "Salvar cartão",
+            "saveAndPay": "Salvar cartão e pagar {amount}",
+            "cardFootnote": "Suas próximas faturas são cobradas neste cartão.",
+            "invoiceOf": "Fatura de {date}",
+            "success": {
+                "cardTitle": "Cartão salvo",
+                "cardBody": "Suas próximas cobranças vão para este cartão.",
+                "paidTitle": "Pagamento recebido",
+                "paidBody": "Seu workspace voltou ao normal.",
+                "detailsTitle": "Dados salvos",
+                "numberRemovedTitle": "Número removido",
+                "detailsBody": "Suas próximas faturas vão mostrá-los."
+            }
+        },
+        "invoice": {
+            "plan": "{brand} Pro",
+            "appSlots": "{count, plural, one {{app}} other {{app} × #}}",
+            "creditPacks": "{count, plural, one {Pacote de créditos} other {Pacotes de créditos × #}}",
+            "prorated": "{items} (proporcional)",
+            "other": "Fatura",
+            "paid": "Paga",
+            "unpaid": "Não paga",
+            "download": "Baixar fatura"
+        },
+        "invoices": {
+            "empty": "Nenhuma fatura ainda.",
+            "emptyTrial": "Nenhuma fatura ainda. A primeira chega quando o Pro começar."
+        },
+        "referral": {
+            "monthsEarned": "Meses grátis ganhos",
+            "takenOff": "Descontados da sua próxima fatura do Pro."
+        },
+        "cancel": {
+            "periodEnd": "o fim do seu período",
+            "trial": {
+                "nothingCharged": "Nada é cobrado.",
+                "keepRunning": "Seus coworkers continuam rodando até o fim do teste, daqui a {count, plural, one {# dia} other {# dias}}.",
+                "saved": "Depois o workspace é pausado e fica salvo por {days} dias."
+            },
+            "paid": {
+                "keepRunning": "Seus coworkers continuam rodando até {date}.",
+                "pauses": "Depois os agendamentos param e o workspace é pausado.",
+                "saved": "Coworkers, memórias, skills e arquivos ficam salvos por {days} dias.",
+                "restart": "Retome o Pro quando quiser para continuar de onde parou."
+            },
+            "keep": "Manter meu plano",
+            "cancelPlan": "Cancelar plano",
+            "cancelTrial": "Cancelar teste"
+        }
     }
 }

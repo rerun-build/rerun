@@ -7,48 +7,22 @@
         },
         "yourRenewal": "موعد التجديد",
         "status": {
-            "paymentFailed": "فشل الدفع",
-            "ends": "ينتهي في {date}",
-            "ending": "قيد الانتهاء",
-            "monthlyFrom": "شهري بدءًا من {date}",
-            "active": "نشط"
-        },
-        "summary": {
-            "monthlyRenews": "زملاء بلا حدود · فوترة شهرية · يتجدد في {renewal}",
-            "monthlyEnds": "زملاء بلا حدود · فوترة شهرية · ينتهي في {renewal}",
-            "yearlyRenews": "زملاء بلا حدود · فوترة سنوية · يتجدد في {renewal}",
-            "yearlyEnds": "زملاء بلا حدود · فوترة سنوية · ينتهي في {renewal}"
+            "ends": "ينتهي في {date}"
         },
         "success": {
             "done": "تم",
-            "paymentReceivedTitle": "تم استلام الدفعة",
-            "paymentReceivedBody": "تم تحديث بطاقتك وعادت خطة Pro إلى العمل.",
             "backOnTitle": "عادت خطة Pro",
             "backOnBody": "تتجدد خطتك في {date}."
         },
-        "cardUpdated": "تم تحديث البطاقة",
         "acceptTerms": "وافق على الشروط أولًا",
         "pleaseWait": "يرجى الانتظار",
         "nextInvoice": "الفاتورة التالية",
         "overview": {
-            "keepYearlyFailed": "تعذّر الإبقاء على خطتك السنوية",
-            "billed": "الفوترة",
-            "billedYearly": "سنويًا، شاملة الضريبة",
-            "billedMonthly": "شهريًا، شاملة الضريبة",
-            "from": "بدءًا من {date}",
-            "monthlyPrice": "شهريًا · {price}",
             "title": "الفوترة",
-            "update": "تحديث",
             "invoices": "الفواتير",
             "viewAll": "عرض الكل",
             "creditUsage": "استخدام الرصيد",
-            "creditsLeft": "متبقٍ {credits}",
-            "keepYearly": "الإبقاء على خطتي السنوية",
-            "switchHint": "غيّر طريقة الفوترة لرؤية السعر الجديد.",
-            "cancelPlan": "إلغاء الخطة",
-            "referFriend": "ادعُ صديقًا",
-            "freeMonths": "{count, plural, zero {لا أشهر مجانية} one {شهر مجاني واحد} two {شهران مجانيان} few {# أشهر مجانية} many {# شهرًا مجانيًا} other {# شهر مجاني}}",
-            "getFreeMonth": "احصل على شهر مجاني"
+            "creditsLeft": "متبقٍ {credits}"
         },
         "referrals": {
             "title": "ادعُ صديقًا",
@@ -73,57 +47,29 @@
             }
         },
         "change": {
-            "planLabel": "زملاء بلا حدود{slots}",
-            "switchScheduledTitle": "تمت جدولة التحويل",
-            "switchScheduledBody": "تستمر خطتك السنوية حتى نهايتها. تبدأ الفوترة الشهرية في {date}.",
             "changeScheduledTitle": "تمت جدولة التغيير",
-            "changeScheduledBody": "تحتفظ بـ {current} حتى {renewal}، ثم {next} بسعر {price}.",
-            "planUpdatedTitle": "تم تحديث الخطة",
-            "planUpdatedBodyMonthly": "{plan}، بفوترة شهرية. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
-            "planUpdatedBodyYearly": "{plan}، بفوترة سنوية. إيصالك في طريقه إليك عبر البريد الإلكتروني.",
-            "switchToMonthly": "التحويل إلى الشهري",
             "changeToSlots": "التغيير إلى {count, plural, zero {<n></n> خانة {provider}} one {<n></n> خانة {provider}} two {<n></n> خانتين {provider}} few {<n></n> خانات {provider}} many {<n></n> خانة {provider}} other {<n></n> خانة {provider}}}",
             "changeAppSlots": "تغيير خانات تطبيقاتك",
-            "switchToYearly": "التحويل إلى السنوي",
-            "proLineMonthly": "Pro · {plan}، شهريًا",
-            "proLineYearly": "Pro · {plan}، سنويًا",
-            "unusedTimeMonthly": "الوقت غير المستخدم من خطتك الشهرية",
-            "unusedTimeYearly": "الوقت غير المستخدم من خطتك السنوية",
             "dueTodayTaxIncluded": "المستحق اليوم، شامل الضريبة",
             "from": "بدءًا من {date}",
             "until": "حتى {date}",
-            "monthlyFrom": "شهريًا · <price></price>",
             "keepMyPlan": "الإبقاء على خطتي",
             "confirmAndPay": "التأكيد والدفع",
-            "switchOn": "التحويل في {date}",
             "scheduleFor": "الجدولة في {date}",
-            "billedNowSlots": "تُفوتر الخانات الجديدة الآن. تبدأ الفوترة الشهرية في {date}.",
-            "slotsReady": "تصبح الخانات الجديدة جاهزة فور إتمام الدفع.",
-            "yearlyStarts": "تبدأ خطتك السنوية فور إتمام الدفع.",
             "nothingToday": "لن يُخصم أي مبلغ اليوم."
         },
         "cancelPending": {
             "endOfPeriod": "نهاية فترتك",
-            "resumeFailed": "تعذّر استئناف خطتك",
-            "title": "تنتهي خطة Pro في {date}",
-            "body": "يواصل زملاؤك العمل حتى ذلك الحين. بعدها تتوقف مساحة العمل مؤقتًا وتُحفظ بياناتها لمدة 90 يومًا.",
-            "none": "لا شيء",
-            "resume": "استئناف Pro",
-            "footnote": "الاستئناف يُبقي على خطتك ويُفوتر {price} في {date}."
+            "resumeFailed": "تعذّر استئناف خطتك"
         },
         "card": {
-            "notSaved": "تعذّر حفظ بطاقتك",
-            "title": "تحديث بطاقتك",
-            "save": "حفظ البطاقة",
-            "footnote": "تُخصم فواتيرك القادمة من هذه البطاقة."
+            "notSaved": "تعذّر حفظ بطاقتك"
         },
         "pastDue": {
             "declinedOn": "رُفضت دفعتك البالغة {amount} في {date}.",
-            "declined": "رُفضت دفعتك البالغة {amount}.",
             "lastDeclined": "رُفضت دفعتك الأخيرة.",
             "paused": "مساحة عملك متوقفة مؤقتًا وستعود فور إتمام الدفع.",
             "keepRunning": "ادفعها الآن لتستمر مساحة عملك في العمل.",
-            "ctaAmount": "تحديث البطاقة ودفع {amount}",
             "cta": "تحديث البطاقة والدفع"
         },
         "invoices": {
@@ -182,7 +128,6 @@
     "apps": {
         "title": "التطبيقات",
         "description": "قدرات إضافية لزملائك، على الفاتورة نفسها مع خطتك.",
-        "slotsSuffix": "{count, plural, zero { + لا خانات {provider}} one { + خانة {provider} واحدة} two { + خانتا {provider}} few { + # خانات {provider}} many { + # خانة {provider}} other { + # خانة {provider}}}",
         "unit": {
             "monthly": "/شهريًا",
             "yearly": "/سنويًا"
@@ -954,5 +899,314 @@
     "startPlan": {
         "trialFailed": "تعذّر بدء تجربتك",
         "trialStarted": "بدأت التجربة"
+    },
+    "tiles": {
+        "pages": {
+            "billing": "الفوترة",
+            "home": {
+                "title": "الفوترة",
+                "renews": "{brand} Pro · يتجدد في {date}",
+                "ends": "{brand} Pro · ينتهي في {date}",
+                "declined": "{brand} Pro · رُفضت الدفعة",
+                "trial": "تجربة مجانية · {count, plural, zero {لم يتبقَّ أي يوم} one {بقي يوم واحد} two {بقي يومان} few {بقيت # أيام} many {بقي # يومًا} other {بقي # يوم}}"
+            },
+            "plan": {
+                "title": "إدارة الخطة",
+                "description": "طريقة فوترتك، وما تتضمنه خطة Pro.",
+                "trialTitle": "ابدأ {brand} Pro",
+                "trialDescription": "أنهِ التجربة اليوم واحتفظ بكل ما أعددته."
+            },
+            "credits": {
+                "title": "أرصدة {brand}",
+                "description": "تُدفع بها نماذج {brand} والبيانات المدفوعة.",
+                "trialDescription": "تبقى أرصدة التجربة معك عند بدء Pro."
+            },
+            "usage": {
+                "title": "استخدام الرصيد",
+                "description": "ما أنفقه زملاؤك، وعلى ماذا."
+            },
+            "apps": {
+                "title": "التطبيقات المدفوعة",
+                "description": "خانة واحدة لكل حساب يستخدمه زملاؤك."
+            },
+            "payment": {
+                "title": "الدفع",
+                "description": "البطاقة التي نخصم منها، وما يظهر في فواتيرك."
+            },
+            "card": {
+                "replaceTitle": "استبدال البطاقة",
+                "addTitle": "إضافة بطاقة",
+                "payTitle": "تحديث البطاقة والدفع",
+                "description": "محمي بواسطة Stripe. لا يرى {brand} بطاقتك أبدًا."
+            },
+            "business": {
+                "title": "بيانات النشاط التجاري",
+                "description": "تُطبع على كل فاتورة من الآن فصاعدًا."
+            },
+            "invoices": {
+                "title": "الفواتير",
+                "description": "كل عملية خصم، جاهزة للتنزيل."
+            },
+            "referral": {
+                "title": "ادعُ صديقًا",
+                "description": "يدفع صديقك مقابل Pro، فتحصلان كلاكما على شهر مجاني."
+            },
+            "cancel": {
+                "title": "إلغاء {brand} Pro",
+                "trialTitle": "إلغاء التجربة",
+                "description": "إليك ما سيحدث بعد ذلك."
+            }
+        },
+        "card": {
+            "number": "{network} •••• {last4}",
+            "expires": "تنتهي في {date}",
+            "none": "لا توجد بطاقة محفوظة"
+        },
+        "home": {
+            "notice": {
+                "lowTitle": "{count, plural, zero {لم يتبقَّ أي رصيد.} one {بقي رصيد واحد فقط.} two {بقي رصيدان فقط.} few {بقيت # أرصدة فقط.} many {بقي # رصيدًا فقط.} other {بقي # رصيد فقط.}}",
+                "lowBody": "يتوقف الزملاء الذين يعملون على نماذج {brand} عند نفاد الرصيد.",
+                "addCredits": "إضافة أرصدة",
+                "endsTitle": "تنتهي خطتك في {date}.",
+                "trialEndsTitle": "تنتهي تجربتك في {date}.",
+                "endsBody": "بعدها تتوقف مساحة العمل مؤقتًا، وتُحفظ لمدة {days} يومًا.",
+                "resumePro": "استئناف Pro",
+                "resumeTrial": "استئناف التجربة",
+                "trialResumedTitle": "عادت التجربة",
+                "trialResumedBody": "تبدأ خطة Pro تلقائيًا في {date}.",
+                "trialTitle": "{amount} في {date}، ولا شيء قبل ذلك.",
+                "trialBody": "نراسلك في اليوم السابق."
+            },
+            "plan": {
+                "name": "{brand} Pro",
+                "manage": "إدارة الخطة",
+                "startPro": "ابدأ Pro الآن",
+                "badge": {
+                    "monthly": "شهري",
+                    "yearly": "سنوي",
+                    "trial": "تجربة",
+                    "declined": "رُفضت الدفعة",
+                    "ends": "ينتهي في {date}",
+                    "monthlyFrom": "شهري بدءًا من {date}"
+                },
+                "monthlyRenews": "{amount} شهريًا · يتجدد في {date}",
+                "monthlyEnds": "{amount} شهريًا · ينتهي في {date}",
+                "yearlyRenews": "{amount} سنويًا · يتجدد في {date}",
+                "yearlyEnds": "{amount} سنويًا · ينتهي في {date}",
+                "trialLine": "مجاني حتى {date}، ثم {amount} شهريًا"
+            },
+            "credits": {
+                "title": "أرصدة {brand}",
+                "add": "إضافة أرصدة",
+                "seeUsage": "عرض الاستخدام",
+                "details": "التفاصيل",
+                "leftLabel": "الأرصدة المتبقية",
+                "month": "{month} من {total} هذا الشهر",
+                "monthAndPacks": "{month} من {total} هذا الشهر · {packs} من الحزم",
+                "trialLine": "أرصدة التجربة، تبقى معك عند بدء Pro",
+                "locked": {
+                    "pastDue": "ادفع الفاتورة المرفوضة أولًا.",
+                    "canceling": "استأنف Pro لإضافة أرصدة."
+                }
+            },
+            "machine": {
+                "title": "الجهاز",
+                "comingSoon": "قريبًا",
+                "description": "أجهزة أكبر لمساحات العمل كثيرة النشاط."
+            },
+            "apps": {
+                "title": "التطبيقات المدفوعة",
+                "manage": "إدارة الخانات",
+                "off": "متوقف",
+                "slots": "{count} · {amount}"
+            },
+            "payment": {
+                "title": "الدفع",
+                "update": "تحديث"
+            },
+            "history": "السجل",
+            "allInvoices": "كل الفواتير",
+            "noInvoice": "لا توجد فواتير بعد.",
+            "noInvoiceTrial": "لا توجد فواتير بعد. تصدر الأولى عند بدء Pro.",
+            "refer": "ادعُ صديقًا",
+            "referEarned": "ادعُ صديقًا · {count, plural, zero {لم تحصل على أي شهر} one {حصلت على شهر واحد} two {حصلت على شهرين} few {حصلت على # أشهر} many {حصلت على # شهرًا} other {حصلت على # شهر}}",
+            "cancelPlan": "إلغاء الخطة",
+            "cancelTrial": "إلغاء التجربة"
+        },
+        "plan": {
+            "name": "{brand} Pro",
+            "billedMonthly": "يُفوتر كل شهر",
+            "billedYearly": "يُفوتر <amount></amount> سنويًا",
+            "perMonth": "<amount></amount><unit> / شهريًا</unit>",
+            "included": {
+                "coworkers": "زملاء ومقاعد بلا حدود",
+                "machine": "جهازك الخاص",
+                "credits": "{credits} من أرصدة {brand} كل شهر",
+                "apps": "كل تطبيقات المكتبة، بذكائك الاصطناعي الخاص أو بذكائنا",
+                "api": "واجهة {brand} API، وعمليات تشغيل بلا حدود"
+            },
+            "yearlySaves": "توفّر الفوترة السنوية {amount} سنويًا على الخطة. تحتفظ خانات التطبيقات بسعرها.",
+            "proMonthly": "{brand} Pro، شهريًا",
+            "proYearly": "{brand} Pro، سنويًا",
+            "appLine": "{app} × {count}",
+            "unusedMonth": "الجزء غير المستخدم من هذه الفترة",
+            "dueToday": "المستحق اليوم، شامل الضريبة",
+            "startPro": "أنهِ التجربة وابدأ Pro الآن",
+            "switchYearly": "التحويل إلى الفوترة السنوية",
+            "keepTrial": "أو أبقِ التجربة: تبدأ خطة Pro تلقائيًا في {date}.",
+            "yearStartsToday": "تبدأ سنتك اليوم. يُخصم الجزء غير المستخدم من هذه الفترة.",
+            "acceptTerms": "وافق على الشروط أولًا",
+            "until": "حتى {date}",
+            "from": "بدءًا من {date}",
+            "yearlyAt": "سنويًا · {amount}",
+            "monthlyAt": "{amount} شهريًا",
+            "switchOn": "التحويل في {date}",
+            "nothingToday": "لا شيء للدفع اليوم. تستمر سنتك المدفوعة حتى نهايتها.",
+            "pendingSwitch": "تصبح فوترتك شهرية في {date}.",
+            "keepYearly": "الإبقاء على الفوترة السنوية",
+            "yourRenewal": "موعد التجديد",
+            "locked": {
+                "pastDue": "ادفع الفاتورة المرفوضة قبل تغيير الفوترة.",
+                "canceling": "استأنف Pro قبل تغيير الفوترة."
+            },
+            "success": {
+                "proTitle": "مرحبًا بك في Pro",
+                "proBody": "انتهت تجربتك وتبدأ خطة Pro اليوم. يعود الزملاء الموقوفون إلى العمل.",
+                "yearlyTitle": "أنت الآن على الفوترة السنوية",
+                "yearlyBody": "تبدأ سنتك اليوم وتتجدد في {date}.",
+                "monthlyTitle": "شهريًا بدءًا من {date}",
+                "monthlyBody": "تستمر خطتك السنوية حتى نهايتها، ثم تصبح الفوترة شهرية.",
+                "keptYearlyTitle": "تبقى على الفوترة السنوية",
+                "keptYearlyBody": "تتجدد خطتك في {date}، سنويًا."
+            }
+        },
+        "credits": {
+            "leftLabel": "الأرصدة المتبقية",
+            "ownAi": "الزملاء الذين يعملون بذكائك الاصطناعي الخاص لا ينفقون شيئًا.",
+            "thisMonth": "هذا الشهر",
+            "thisMonthResets": "هذا الشهر، يُعاد الضبط في {date}",
+            "monthOf": "{left} من {total}",
+            "fromPacks": "من الحزم، لا تنتهي صلاحيتها أبدًا",
+            "packs": "حزم الأرصدة",
+            "packLine": "{count, plural, zero {لا أرصدة} one {رصيد واحد} two {رصيدان} few {# أرصدة} many {# رصيدًا} other {# رصيد}} مقابل {price}، تُدفع مرة واحدة",
+            "lessAria": "حزمة أقل",
+            "moreAria": "حزمة أخرى",
+            "addsCredits": "+<n></n> {count, plural, zero {رصيد} one {رصيد} two {رصيد} few {أرصدة} many {رصيدًا} other {رصيد}}",
+            "seeUsage": "عرض الاستخدام",
+            "pay": "ادفع <amount></amount>",
+            "payOnStripe": "الدفع عبر Stripe",
+            "chargedOnce": "يُخصم مرة واحدة. تصل الأرصدة فورًا.",
+            "checkoutFootnote": "تدفع على صفحة Stripe آمنة، ثم تعود إلى هنا.",
+            "acceptTerms": "وافق على الشروط أولًا",
+            "trialLeft": "أرصدة التجربة المتبقية من أصل {trial}. تضيف خطة Pro {monthly} أخرى كل شهر.",
+            "packsAfterTrial": "تُتاح حزم الأرصدة عند بدء Pro.",
+            "startPro": "ابدأ Pro الآن",
+            "locked": {
+                "pastDue": "ادفع الفاتورة المرفوضة أولًا.",
+                "canceling": "استأنف Pro لإضافة أرصدة."
+            },
+            "success": {
+                "title": "{count, plural, zero {لم تُضف أي أرصدة} one {أُضيف رصيد واحد} two {أُضيف رصيدان} few {أُضيفت # أرصدة} many {أُضيف # رصيدًا} other {أُضيف # رصيد}}",
+                "body": "{count, plural, zero {ليس لديك أي رصيد الآن.} one {لديك الآن رصيد واحد.} two {لديك الآن رصيدان.} few {لديك الآن # أرصدة.} many {لديك الآن # رصيدًا.} other {لديك الآن # رصيد.}}",
+                "chargedTo": "خُصم من {card}"
+            }
+        },
+        "usage": {
+            "lastDays": "{count, plural, zero {آخر 0 يوم} one {آخر يوم} two {آخر يومين} few {آخر # أيام} many {آخر # يومًا} other {آخر # يوم}} · {credits} رصيد",
+            "byCoworker": "حسب الزميل",
+            "empty": "لم يُنفق شيء بعد في هذه الفترة."
+        },
+        "apps": {
+            "inUse": "{used} من {count, plural, zero {0 خانة} one {خانة واحدة} two {خانتين} few {# خانات} many {# خانة} other {# خانة}} قيد الاستخدام",
+            "noSlotMonthly": "لا خانات · {price} شهريًا",
+            "noSlotYearly": "لا خانات · {price} سنويًا",
+            "freeUntil": "خانة واحدة مجانًا حتى {date}",
+            "lessAria": "خانة {app} أقل",
+            "moreAria": "خانة {app} أخرى",
+            "loading": "جارٍ التحقق من الحسابات المستخدمة…",
+            "disconnectFirst": "افصل حساب {app} أولًا.",
+            "trialOneSlot": "تتيح التجربة خانة واحدة. ابدأ Pro للمزيد.",
+            "trialKeepsSlot": "تبقى خانة التجربة حتى يبدأ Pro.",
+            "connectHint": "اربط الحسابات من التطبيق نفسه: كل حساب يشغل خانة.",
+            "cantRemoveUsed": "لا يمكن إزالة خانة فيها حساب: افصل الحساب أولًا.",
+            "addedLine": "{app}، +{count, plural, zero {0 خانة} one {خانة واحدة} two {خانتان} few {# خانات} many {# خانة} other {# خانة}}",
+            "removedLine": "{app}، -{count, plural, zero {0 خانة} one {خانة واحدة} two {خانتان} few {# خانات} many {# خانة} other {# خانة}}",
+            "newTotal": "الإجمالي الجديد",
+            "dueToday": "المستحق اليوم، لما تبقى من الفترة",
+            "dueTodayTrial": "المستحق اليوم، خلال التجربة",
+            "removedNote": "تبقى الخانة المُزالة في خطتك حتى {date}.",
+            "addAndPay": "{count, plural, zero {إضافة 0 خانة} one {إضافة خانة واحدة} two {إضافة خانتين} few {إضافة # خانات} many {إضافة # خانة} other {إضافة # خانة}} · ادفع <amount></amount>",
+            "save": "حفظ",
+            "acceptTerms": "وافق على الشروط أولًا",
+            "yourRenewal": "موعد التجديد",
+            "locked": {
+                "pastDue": "ادفع الفاتورة المرفوضة قبل تغيير خاناتك.",
+                "canceling": "استأنف Pro قبل تغيير خاناتك."
+            },
+            "success": {
+                "title": "تم تحديث الخانات",
+                "addedBody": "اربط الحساب الجديد من التطبيق لتشغيل الخانة.",
+                "removedBody": "تخرج الخانة من خطتك في {date}."
+            }
+        },
+        "payment": {
+            "card": "البطاقة",
+            "replace": "استبدال",
+            "add": "إضافة",
+            "everyCharge": "تُخصم كل المبالغ من هذه البطاقة.",
+            "onInvoices": "في فواتيرك",
+            "edit": "تعديل",
+            "company": "الشركة",
+            "country": "الدولة",
+            "taxId": "رقم ضريبة القيمة المضافة أو الرقم الضريبي",
+            "saveCard": "حفظ البطاقة",
+            "saveAndPay": "حفظ البطاقة ودفع {amount}",
+            "cardFootnote": "تُخصم فواتيرك القادمة من هذه البطاقة.",
+            "invoiceOf": "فاتورة {date}",
+            "success": {
+                "cardTitle": "تم حفظ البطاقة",
+                "cardBody": "تُخصم مبالغك القادمة من هذه البطاقة.",
+                "paidTitle": "تم استلام الدفعة",
+                "paidBody": "عادت مساحة عملك إلى وضعها الطبيعي.",
+                "detailsTitle": "تم حفظ البيانات",
+                "numberRemovedTitle": "تمت إزالة الرقم",
+                "detailsBody": "تظهر في فواتيرك القادمة."
+            }
+        },
+        "invoice": {
+            "plan": "{brand} Pro",
+            "appSlots": "{count, plural, zero {{app} × #} one {{app}} two {{app} × #} few {{app} × #} many {{app} × #} other {{app} × #}}",
+            "creditPacks": "{count, plural, zero {حزم أرصدة × #} one {حزمة أرصدة} two {حزم أرصدة × #} few {حزم أرصدة × #} many {حزم أرصدة × #} other {حزم أرصدة × #}}",
+            "prorated": "{items} (بالتناسب)",
+            "other": "فاتورة",
+            "paid": "مدفوعة",
+            "unpaid": "غير مدفوعة",
+            "download": "تنزيل الفاتورة"
+        },
+        "invoices": {
+            "empty": "لا توجد فواتير بعد.",
+            "emptyTrial": "لا توجد فواتير بعد. تصدر الأولى عند بدء Pro."
+        },
+        "referral": {
+            "monthsEarned": "الأشهر المجانية المكتسبة",
+            "takenOff": "تُخصم من فاتورة Pro التالية."
+        },
+        "cancel": {
+            "periodEnd": "نهاية فترتك",
+            "trial": {
+                "nothingCharged": "لن يُخصم أي مبلغ.",
+                "keepRunning": "يواصل زملاؤك العمل حتى نهاية التجربة، بعد {count, plural, zero {0 يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}.",
+                "saved": "بعدها تتوقف مساحة العمل مؤقتًا وتُحفظ لمدة {days} يومًا."
+            },
+            "paid": {
+                "keepRunning": "يواصل زملاؤك العمل حتى {date}.",
+                "pauses": "بعدها تتوقف الجداول وتتوقف مساحة العمل مؤقتًا.",
+                "saved": "يُحفظ الزملاء والذكريات والمهارات والملفات لمدة {days} يومًا.",
+                "restart": "أعد تشغيل Pro في أي وقت لتستأنف من حيث توقفت."
+            },
+            "keep": "الإبقاء على خطتي",
+            "cancelPlan": "إلغاء الخطة",
+            "cancelTrial": "إلغاء التجربة"
+        }
     }
 }

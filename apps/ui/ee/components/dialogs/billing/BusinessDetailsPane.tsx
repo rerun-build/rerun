@@ -18,11 +18,11 @@ import { Building2, ChevronRightIcon } from '@/lib/icons'
 
 import { PayFooter, RightTitle } from './parts'
 
-function countryName(country: string, locale: string): string {
+export function countryName(country: string, locale: string): string {
     return new Intl.DisplayNames([locale], { type: 'region' }).of(country) ?? country
 }
 
-function TaxIdStatusBadge({ status }: { status: TaxIdStatus | null }) {
+export function TaxIdStatusBadge({ status }: { status: TaxIdStatus | null }) {
     const t = useTranslations('billing.business.status')
     const badge = status ? TAX_ID_STATUS_BADGE[status] : null
     if (!status || !badge) return null
@@ -67,6 +67,27 @@ export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDet
 // Only reached with a billing country: the row stays disabled without one.
 export function BusinessDetailsPane({ business, onBack, onSaved }: { business: BusinessDetails; onBack: () => void; onSaved: () => Promise<void> }) {
     const t = useTranslations('billing.business')
+    return (
+        <>
+            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
+            <div className="mt-6 flex flex-1 flex-col">
+                <BusinessDetailsForm
+                    business={business}
+                    onSaved={onSaved}
+                    onDone={outcome => {
+                        toast.success(outcome === 'saved' ? t('saved') : t('removed'))
+                        onBack()
+                    }}
+                />
+            </div>
+        </>
+    )
+}
+
+// The name and the tax number the invoices carry. `onSaved` reloads what the dialog shows, `onDone`
+// says what changed once it has.
+export function BusinessDetailsForm({ business, onSaved, onDone }: { business: BusinessDetails; onSaved: () => Promise<void>; onDone: (outcome: 'saved' | 'removed') => void }) {
+    const t = useTranslations('billing.business')
     const errorText = useErrorText()
     const locale = useLocale()
     const country = business.country ?? ''
@@ -92,8 +113,7 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
         }
         await onSaved()
         setSaving(false)
-        toast.success(t('saved'))
-        onBack()
+        onDone('saved')
     }
 
     const remove = async () => {
@@ -105,73 +125,62 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
         }
         await onSaved()
         setRemoving(false)
-        toast.success(t('removed'))
-        onBack()
+        onDone('removed')
     }
 
-    if (types.length === 0) {
-        return (
-            <>
-                <RightTitle onBack={onBack}>{t('title')}</RightTitle>
-                <p className="mt-6 text-sm text-muted-foreground">{t('noTaxId', { country: countryName(country, locale) })}</p>
-            </>
-        )
-    }
+    if (types.length === 0) return <p className="text-sm text-muted-foreground">{t('noTaxId', { country: countryName(country, locale) })}</p>
 
     return (
-        <>
-            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
-            <form
-                className="mt-6 flex flex-1 flex-col"
-                onSubmit={event => {
-                    event.preventDefault()
-                    void save()
-                }}
-            >
-                <div className="flex flex-col gap-4">
-                    <Field label={t('nameLabel')} htmlFor="business-name">
-                        <Input id="business-name" autoComplete="organization" value={name} onChange={event => setName(event.target.value)} disabled={saving} />
+        <form
+            className="flex flex-1 flex-col"
+            onSubmit={event => {
+                event.preventDefault()
+                void save()
+            }}
+        >
+            <div className="flex flex-col gap-4">
+                <Field label={t('nameLabel')} htmlFor="business-name">
+                    <Input id="business-name" autoComplete="organization" value={name} onChange={event => setName(event.target.value)} disabled={saving} />
+                </Field>
+                {types.length > 1 && (
+                    <Field label={t('typeLabel')} htmlFor="tax-id-type">
+                        <Select value={type} onValueChange={next => setType(next as TaxIdType)} disabled={saving}>
+                            <SelectTrigger id="tax-id-type" className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent position="popper">
+                                {types.map(option => (
+                                    <SelectItem key={option} value={option}>
+                                        {option === 'eu_vat' ? t('euVat') : taxIdTypeLabel(option)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </Field>
-                    {types.length > 1 && (
-                        <Field label={t('typeLabel')} htmlFor="tax-id-type">
-                            <Select value={type} onValueChange={next => setType(next as TaxIdType)} disabled={saving}>
-                                <SelectTrigger id="tax-id-type" className="w-full">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent position="popper">
-                                    {types.map(option => (
-                                        <SelectItem key={option} value={option}>
-                                            {option === 'eu_vat' ? t('euVat') : taxIdTypeLabel(option)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </Field>
-                    )}
-                    <Field
-                        label={type?.endsWith('_vat') ? t('field.vat') : t('field.taxId')}
-                        htmlFor="tax-id-value"
-                        helperText={countryName(country, locale)}
-                        labelTrailing={savedNumberShown ? <TaxIdStatusBadge status={business.taxId!.status} /> : undefined}
+                )}
+                <Field
+                    label={type?.endsWith('_vat') ? t('field.vat') : t('field.taxId')}
+                    htmlFor="tax-id-value"
+                    helperText={countryName(country, locale)}
+                    labelTrailing={savedNumberShown ? <TaxIdStatusBadge status={business.taxId!.status} /> : undefined}
+                >
+                    <Input id="tax-id-value" autoComplete="off" spellCheck={false} placeholder={taxIdPlaceholder(type, country)} value={value} onChange={event => setValue(event.target.value)} disabled={saving} />
+                </Field>
+                {business.taxId && (
+                    <ConfirmDialog
+                        title={t('confirm.title')}
+                        description={t('confirm.description')}
+                        confirmLabel={t('confirm.confirm')}
+                        pending={removing}
+                        onConfirm={() => void remove()}
                     >
-                        <Input id="tax-id-value" autoComplete="off" spellCheck={false} placeholder={taxIdPlaceholder(type, country)} value={value} onChange={event => setValue(event.target.value)} disabled={saving} />
-                    </Field>
-                    {business.taxId && (
-                        <ConfirmDialog
-                            title={t('confirm.title')}
-                            description={t('confirm.description')}
-                            confirmLabel={t('confirm.confirm')}
-                            pending={removing}
-                            onConfirm={() => void remove()}
-                        >
-                            <button type="button" disabled={saving || removing} className="self-start text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-60">
-                                {t('removeNumber')}
-                            </button>
-                        </ConfirmDialog>
-                    )}
-                </div>
-                <PayFooter cta={t('save')} footnote={t('footnote')} loading={saving} disabled={unchanged || !name.trim() || !value.trim()} error={error} />
-            </form>
-        </>
+                        <button type="button" disabled={saving || removing} className="self-start text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-60">
+                            {t('removeNumber')}
+                        </button>
+                    </ConfirmDialog>
+                )}
+            </div>
+            <PayFooter cta={t('save')} footnote={t('footnote')} loading={saving} disabled={unchanged || !name.trim() || !value.trim()} error={error} />
+        </form>
     )
 }

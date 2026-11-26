@@ -20,7 +20,7 @@ const QUOTE_DEBOUNCE_MS = 250
 // number is in; `quote` keeps the last answer meanwhile, so the card on file does not blink at every
 // step. A failed quote reads as none: the pane falls back on the list price, and keeps the consent,
 // since the server may still charge the card on file.
-function useCreditQuote(packs: number): { quote: CreditQuote | null; loading: boolean; settled: boolean } {
+export function useCreditQuote(packs: number): { quote: CreditQuote | null; loading: boolean; settled: boolean } {
     const [answer, setAnswer] = useState<{ packs: number; quote: CreditQuote | null } | null>(null)
 
     useEffect(() => {

@@ -14,7 +14,7 @@ import { formatCredits } from '@rerun/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { CancelFlow, type CancelInput } from './CancelFlow'
+import { CancelFlow, type CancelFlowProps, type CancelInput } from './CancelFlow'
 import type { CancelStep } from './cancel-flow-copy'
 
 type CancelSubscriptionDialogProps = {
@@ -43,16 +43,19 @@ export function CancelSubscriptionDialog({ open, onOpenChange, onChanged }: Canc
 }
 
 // Mounted with the dialog's content, so every opening starts from a fresh read of the subscription.
-function CancelFlowLoader({
+// `embedded` runs it inside another dialog, see CancelFlow.
+export function CancelFlowLoader({
     onChanged,
     onClose,
     onFailed,
     onStepChange,
+    embedded,
 }: {
     onChanged: () => void
     onClose: () => void
     onFailed: () => void
     onStepChange: (step: { phase: CancelFlowState['phase']; step: CancelStep }) => void
+    embedded?: CancelFlowProps['embedded']
 }) {
     const locale = useLocale()
     const t = useTranslations('billing')
@@ -129,7 +132,7 @@ function CancelFlowLoader({
         return ok
     }
 
-    if (!state) return <CancelFlowSkeleton />
+    if (!state) return embedded ? <CancelFlowBodySkeleton /> : <CancelFlowSkeleton />
 
     return (
         <CancelFlow
@@ -145,7 +148,18 @@ function CancelFlowLoader({
             onResume={onResume}
             onClose={onClose}
             onStepChange={handleStepChange}
+            embedded={embedded}
         />
+    )
+}
+
+function CancelFlowBodySkeleton() {
+    return (
+        <div className="flex flex-col gap-5">
+            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+        </div>
     )
 }
 

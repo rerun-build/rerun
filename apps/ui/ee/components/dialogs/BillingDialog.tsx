@@ -18,7 +18,7 @@ import { CreditCardIcon, RefreshCwIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { useCreditCheckoutReturn } from '@/ee/lib/billing/useCreditCheckoutReturn'
 import { isLifetimePlan } from '@/ee/lib/billing/plans'
-import { useBillingStore } from '@/stores/billing.store'
+import { AGENT_LIMIT_TRIGGER, useBillingStore, type BillingHighlight } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -29,7 +29,8 @@ import { CreditPane, type CreditPurchased } from './billing/CreditPane'
 import { LifetimeDialog } from './billing/LifetimeDialog'
 import { ManagedCreditDialog } from './billing/ManagedCreditDialog'
 import { SuccessPanel } from './billing/parts'
-import { PlanDialog } from './billing/PlanDialog'
+import { BillingTilesDialog, BillingTilesSkeleton } from './billing/tiles/BillingTilesDialog'
+import type { View } from './billing/tiles/views'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
 
 // What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
@@ -37,9 +38,12 @@ import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscripti
 // dialog under the user's eyes.
 type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'credit' } | { kind: 'error' }
 
-// Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
-// and the plan dialog, which manages one that is paid. Rerun credit is sold to every workspace: one
-// with no paid plan to manage buys it from a dialog of its own.
+// Opened from a button about credit or referrals, the dialog starts on that page.
+const HIGHLIGHT_VIEW: Partial<Record<BillingHighlight, View>> = { credit_pack: 'credits', referrals: 'referral' }
+
+// Every openBilling() lands here. Two dialogs: the checkout, which sells a plan, and the billing
+// tiles, which manage one that is paid or on a card trial. Rerun credit is sold to every workspace:
+// one with no paid plan to manage buys it from a dialog of its own.
 export function BillingDialog() {
     const { workspace, role } = useSession()
     const manager = useWorkspaceManager()
@@ -54,6 +58,8 @@ export function BillingDialog() {
     useCreditCheckoutReturn()
 
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
+    // A trial waits for its card to know whether it lands on the tiles or on the checkout.
+    const tilesCertain = entitled && workspace?.subscription_status !== 'trialing' && !isLifetimePlan(workspace)
 
     // `offer` is forced once the server refused a trial the browser thought was still there.
     const resolve = useCallback(
@@ -136,7 +142,7 @@ export function BillingDialog() {
             ) : role === 'member' ? (
                 <AdminOnlyShell onClose={close} />
             ) : resolved.kind === 'loading' ? (
-                <LoadingShell />
+                tilesCertain ? <BillingTilesSkeleton /> : <LoadingShell />
             ) : resolved.kind === 'lifetime' && lifetimeState ? (
                 <LifetimeDialog
                     state={lifetimeState}
@@ -154,6 +160,8 @@ export function BillingDialog() {
                 <CreditPurchaseShell onClose={close} />
             ) : resolved.kind === 'error' ? (
                 <ErrorShell onRetry={() => void decide()} />
+            ) : resolved.kind === 'checkout' && resolved.route.variant === 'trial_card' && state ? (
+                <BillingTilesDialog state={state} initialView={trigger === AGENT_LIMIT_TRIGGER ? 'plan' : 'home'} onChanged={reload} />
             ) : resolved.kind === 'checkout' ? (
                 <CheckoutDialog
                     key={`${resolved.route.variant}:${resolved.route.payment}`}
@@ -165,9 +173,9 @@ export function BillingDialog() {
                     onTrialRefused={() => resolve(state, 'paid')}
                 />
             ) : state ? (
-                <PlanDialog state={state} highlightAddon={highlightAddon} onClose={close} onCancel={() => setCancelOpen(true)} onChanged={reload} />
+                <BillingTilesDialog state={state} initialView={(highlightAddon && HIGHLIGHT_VIEW[highlightAddon]) || 'home'} onChanged={reload} />
             ) : (
-                <LoadingShell />
+                <BillingTilesSkeleton />
             )}
             <CancelSubscriptionDialog open={cancelOpen} onOpenChange={setCancelOpen} onChanged={() => void reload()} />
         </Dialog>

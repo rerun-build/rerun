@@ -28,15 +28,6 @@ export function withAppSlots(quantities: AddonQuantities, slots: AppSlots): Addo
     return { ...quantities, ...Object.fromEntries(APP_SLUGS.map(slug => [APP_ADDON_KEYS[slug], slots[slug]])) }
 }
 
-type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
-
-// " + 2 LinkedIn slots + 1 WhatsApp slot", for the lines that name a whole plan.
-export function appSlotsLabel(slots: AppSlots, t: BillingTranslator): string {
-    return APP_SLUGS.filter(slug => slots[slug] > 0)
-        .map(slug => t('apps.slotsSuffix', { count: slots[slug], provider: appInfo(slug).providerLabel }))
-        .join('')
-}
-
 // The accounts behind each app's slots: a slot only goes back once nothing fills it.
 export function useAppSlots(slugs: AppSlug[], skip = false): Partial<Record<AppSlug, AppSlotsState>> {
     const enabled = useEnabledPaidApps()

@@ -7,48 +7,22 @@
         },
         "yourRenewal": "החידוש שלך",
         "status": {
-            "paymentFailed": "התשלום נכשל",
-            "ends": "מסתיים ב-{date}",
-            "ending": "מסתיים",
-            "monthlyFrom": "חודשי מ-{date}",
-            "active": "פעיל"
-        },
-        "summary": {
-            "monthlyRenews": "עמיתים ללא הגבלה · חיוב חודשי · מתחדש ב-{renewal}",
-            "monthlyEnds": "עמיתים ללא הגבלה · חיוב חודשי · מסתיים ב-{renewal}",
-            "yearlyRenews": "עמיתים ללא הגבלה · חיוב שנתי · מתחדש ב-{renewal}",
-            "yearlyEnds": "עמיתים ללא הגבלה · חיוב שנתי · מסתיים ב-{renewal}"
+            "ends": "מסתיים ב-{date}"
         },
         "success": {
             "done": "סיום",
-            "paymentReceivedTitle": "התשלום התקבל",
-            "paymentReceivedBody": "הכרטיס שלך עודכן ו-Pro פעיל שוב.",
             "backOnTitle": "Pro חזר לפעול",
             "backOnBody": "התוכנית שלך מתחדשת ב-{date}."
         },
-        "cardUpdated": "הכרטיס עודכן",
         "acceptTerms": "יש לאשר קודם את התנאים",
         "pleaseWait": "רק רגע",
         "nextInvoice": "החשבונית הבאה",
         "overview": {
-            "keepYearlyFailed": "לא ניתן לשמור את התוכנית השנתית שלך",
-            "billed": "חיוב",
-            "billedYearly": "שנתי, כולל מס",
-            "billedMonthly": "חודשי, כולל מס",
-            "from": "מ-{date}",
-            "monthlyPrice": "חודשי · {price}",
             "title": "חיוב",
-            "update": "לעדכן",
             "invoices": "חשבוניות",
             "viewAll": "להציג הכול",
             "creditUsage": "שימוש בקרדיטים",
-            "creditsLeft": "נותרו {credits}",
-            "keepYearly": "לשמור את התוכנית השנתית שלי",
-            "switchHint": "יש להחליף את מחזור החיוב כדי לראות את המחיר החדש.",
-            "cancelPlan": "לבטל את התוכנית",
-            "referFriend": "להמליץ לחבר",
-            "freeMonths": "{count, plural, one {חודש חינם אחד} two {# חודשים חינם} other {# חודשים חינם}}",
-            "getFreeMonth": "לקבל חודש חינם"
+            "creditsLeft": "נותרו {credits}"
         },
         "referrals": {
             "title": "להמליץ לחבר",
@@ -73,57 +47,29 @@
             }
         },
         "change": {
-            "planLabel": "עמיתים ללא הגבלה{slots}",
-            "switchScheduledTitle": "המעבר תוזמן",
-            "switchScheduledBody": "התוכנית השנתית שלך נמשכת עד סופה. החיוב החודשי מתחיל ב-{date}.",
             "changeScheduledTitle": "השינוי תוזמן",
-            "changeScheduledBody": "{current} נשאר אצלך עד {renewal}, ואז {next} ב-{price}.",
-            "planUpdatedTitle": "התוכנית עודכנה",
-            "planUpdatedBodyMonthly": "{plan}, בחיוב חודשי. הקבלה בדרך אליך באימייל.",
-            "planUpdatedBodyYearly": "{plan}, בחיוב שנתי. הקבלה בדרך אליך באימייל.",
-            "switchToMonthly": "לעבור לחיוב חודשי",
             "changeToSlots": "{count, plural, one {לשנות ל-<n></n> משבצת {provider}} two {לשנות ל-<n></n> משבצות {provider}} other {לשנות ל-<n></n> משבצות {provider}}}",
             "changeAppSlots": "לשנות את משבצות האפליקציות",
-            "switchToYearly": "לעבור לחיוב שנתי",
-            "proLineMonthly": "Pro · {plan}, חודשי",
-            "proLineYearly": "Pro · {plan}, שנתי",
-            "unusedTimeMonthly": "זמן שלא נוצל בתוכנית החודשית שלך",
-            "unusedTimeYearly": "זמן שלא נוצל בתוכנית השנתית שלך",
             "dueTodayTaxIncluded": "לתשלום היום, כולל מס",
             "from": "מ-{date}",
             "until": "עד {date}",
-            "monthlyFrom": "חודשי · <price></price>",
             "keepMyPlan": "לשמור את התוכנית שלי",
             "confirmAndPay": "לאשר ולשלם",
-            "switchOn": "לעבור ב-{date}",
             "scheduleFor": "לתזמן ל-{date}",
-            "billedNowSlots": "חיוב עכשיו על המשבצות החדשות. החיוב החודשי מתחיל ב-{date}.",
-            "slotsReady": "המשבצות החדשות מוכנות ברגע שהתשלום עובר.",
-            "yearlyStarts": "התוכנית השנתית שלך מתחילה ברגע שהתשלום עובר.",
             "nothingToday": "אין חיוב היום."
         },
         "cancelPending": {
             "endOfPeriod": "סוף התקופה שלך",
-            "resumeFailed": "לא ניתן לחדש את התוכנית שלך",
-            "title": "Pro מסתיים ב-{date}",
-            "body": "העמיתים שלך ממשיכים לפעול עד אז. אחרי זה סביבת העבודה מושהית והנתונים שלה נשמרים למשך 90 יום.",
-            "none": "אין",
-            "resume": "לחדש את Pro",
-            "footnote": "חידוש שומר על התוכנית שלך ומחייב {price} ב-{date}."
+            "resumeFailed": "לא ניתן לחדש את התוכנית שלך"
         },
         "card": {
-            "notSaved": "לא ניתן לשמור את הכרטיס שלך",
-            "title": "לעדכן את הכרטיס",
-            "save": "לשמור כרטיס",
-            "footnote": "החשבוניות הבאות שלך יחויבו בכרטיס הזה."
+            "notSaved": "לא ניתן לשמור את הכרטיס שלך"
         },
         "pastDue": {
             "declinedOn": "התשלום שלך על סך {amount} ב-{date} נדחה.",
-            "declined": "התשלום שלך על סך {amount} נדחה.",
             "lastDeclined": "התשלום האחרון שלך נדחה.",
             "paused": "סביבת העבודה שלך מושהית ותחזור ברגע שהתשלום יעבור.",
             "keepRunning": "יש לשלם עכשיו כדי שסביבת העבודה תמשיך לפעול.",
-            "ctaAmount": "לעדכן כרטיס ולשלם {amount}",
             "cta": "לעדכן כרטיס ולשלם"
         },
         "invoices": {
@@ -182,7 +128,6 @@
     "apps": {
         "title": "אפליקציות",
         "description": "כוחות־על נוספים לעמיתים שלך, באותה חשבונית של התוכנית.",
-        "slotsSuffix": "{count, plural, one { + משבצת {provider} אחת} two { + # משבצות {provider}} other { + # משבצות {provider}}}",
         "unit": {
             "monthly": "/חודש",
             "yearly": "/שנה"
@@ -954,5 +899,314 @@
     "startPlan": {
         "trialFailed": "לא ניתן להתחיל את תקופת הניסיון שלך",
         "trialStarted": "תקופת הניסיון התחילה"
+    },
+    "tiles": {
+        "pages": {
+            "billing": "חיוב",
+            "home": {
+                "title": "חיוב",
+                "renews": "{brand} Pro · מתחדש ב-{date}",
+                "ends": "{brand} Pro · מסתיים ב-{date}",
+                "declined": "{brand} Pro · התשלום נדחה",
+                "trial": "תקופת ניסיון חינם · {count, plural, one {נותר יום אחד} two {נותרו יומיים} other {נותרו # ימים}}"
+            },
+            "plan": {
+                "title": "ניהול התוכנית",
+                "description": "איך החיוב שלך עובד, ומה כלול ב-Pro.",
+                "trialTitle": "להתחיל את {brand} Pro",
+                "trialDescription": "לסיים את תקופת הניסיון היום ולשמור את כל מה שהגדרת."
+            },
+            "credits": {
+                "title": "קרדיטים של {brand}",
+                "description": "איתם משלמים על המודלים של {brand} ועל נתונים בתשלום.",
+                "trialDescription": "קרדיטי הניסיון עוברים הלאה כש-Pro מתחיל."
+            },
+            "usage": {
+                "title": "שימוש בקרדיטים",
+                "description": "כמה העמיתים שלך הוציאו, ועל מה."
+            },
+            "apps": {
+                "title": "אפליקציות בתשלום",
+                "description": "משבצת אחת לכל חשבון שהעמיתים שלך משתמשים בו."
+            },
+            "payment": {
+                "title": "תשלום",
+                "description": "הכרטיס שאנחנו מחייבים, ומה מופיע בחשבוניות שלך."
+            },
+            "card": {
+                "replaceTitle": "להחליף כרטיס",
+                "addTitle": "להוסיף כרטיס",
+                "payTitle": "לעדכן כרטיס ולשלם",
+                "description": "מאובטח על ידי Stripe. {brand} אף פעם לא רואה את הכרטיס שלך."
+            },
+            "business": {
+                "title": "פרטי העסק",
+                "description": "יופיעו בכל חשבונית מעכשיו."
+            },
+            "invoices": {
+                "title": "חשבוניות",
+                "description": "כל חיוב, מוכן להורדה."
+            },
+            "referral": {
+                "title": "להמליץ לחבר",
+                "description": "חבר משלם על Pro, ושניכם מקבלים חודש חינם."
+            },
+            "cancel": {
+                "title": "לבטל את {brand} Pro",
+                "trialTitle": "לבטל את תקופת הניסיון",
+                "description": "זה מה שקורה מכאן."
+            }
+        },
+        "card": {
+            "number": "{network} •••• {last4}",
+            "expires": "בתוקף עד {date}",
+            "none": "אין כרטיס שמור"
+        },
+        "home": {
+            "notice": {
+                "lowTitle": "{count, plural, one {נותר רק קרדיט אחד.} two {נותרו רק # קרדיטים.} other {נותרו רק # קרדיטים.}}",
+                "lowBody": "עמיתים שעובדים עם המודלים של {brand} נעצרים באפס.",
+                "addCredits": "להוסיף קרדיטים",
+                "endsTitle": "התוכנית שלך מסתיימת ב-{date}.",
+                "trialEndsTitle": "תקופת הניסיון שלך מסתיימת ב-{date}.",
+                "endsBody": "אחרי זה סביבת העבודה מושהית ונשמרת למשך {days} ימים.",
+                "resumePro": "לחדש את Pro",
+                "resumeTrial": "לחדש את תקופת הניסיון",
+                "trialResumedTitle": "תקופת הניסיון חודשה",
+                "trialResumedBody": "Pro יתחיל מעצמו ב-{date}.",
+                "trialTitle": "{amount} ב-{date}, ושום דבר לפני כן.",
+                "trialBody": "נשלח לך אימייל יום לפני."
+            },
+            "plan": {
+                "name": "{brand} Pro",
+                "manage": "לנהל את התוכנית",
+                "startPro": "להתחיל Pro עכשיו",
+                "badge": {
+                    "monthly": "חודשי",
+                    "yearly": "שנתי",
+                    "trial": "ניסיון",
+                    "declined": "התשלום נדחה",
+                    "ends": "מסתיים ב-{date}",
+                    "monthlyFrom": "חודשי מ-{date}"
+                },
+                "monthlyRenews": "{amount} לחודש · מתחדש ב-{date}",
+                "monthlyEnds": "{amount} לחודש · מסתיים ב-{date}",
+                "yearlyRenews": "{amount} לשנה · מתחדש ב-{date}",
+                "yearlyEnds": "{amount} לשנה · מסתיים ב-{date}",
+                "trialLine": "חינם עד {date}, ואז {amount} לחודש"
+            },
+            "credits": {
+                "title": "קרדיטים של {brand}",
+                "add": "להוסיף קרדיטים",
+                "seeUsage": "לראות שימוש",
+                "details": "פרטים",
+                "leftLabel": "קרדיטים שנותרו",
+                "month": "{month} מתוך {total} החודש",
+                "monthAndPacks": "{month} מתוך {total} החודש · {packs} מחבילות",
+                "trialLine": "קרדיטי ניסיון, עוברים הלאה כש-Pro מתחיל",
+                "locked": {
+                    "pastDue": "יש לשלם קודם את החשבונית שנדחתה.",
+                    "canceling": "יש לחדש את Pro כדי להוסיף קרדיטים."
+                }
+            },
+            "machine": {
+                "title": "מכונה",
+                "comingSoon": "בקרוב",
+                "description": "מכונות גדולות יותר לסביבות עבודה עמוסות."
+            },
+            "apps": {
+                "title": "אפליקציות בתשלום",
+                "manage": "לנהל משבצות",
+                "off": "כבוי",
+                "slots": "{count} · {amount}"
+            },
+            "payment": {
+                "title": "תשלום",
+                "update": "לעדכן"
+            },
+            "history": "היסטוריה",
+            "allInvoices": "כל החשבוניות",
+            "noInvoice": "אין עדיין חשבוניות.",
+            "noInvoiceTrial": "אין עדיין חשבוניות. הראשונה תגיע כש-Pro יתחיל.",
+            "refer": "להמליץ לחבר",
+            "referEarned": "להמליץ לחבר · {count, plural, one {נצבר חודש אחד} two {נצברו חודשיים} other {נצברו # חודשים}}",
+            "cancelPlan": "לבטל את התוכנית",
+            "cancelTrial": "לבטל את תקופת הניסיון"
+        },
+        "plan": {
+            "name": "{brand} Pro",
+            "billedMonthly": "חיוב כל חודש",
+            "billedYearly": "חיוב של <amount></amount> לשנה",
+            "perMonth": "<amount></amount><unit> / חודש</unit>",
+            "included": {
+                "coworkers": "עמיתים ומושבים ללא הגבלה",
+                "machine": "מכונה פרטית משלך",
+                "credits": "{credits} קרדיטים של {brand} כל חודש",
+                "apps": "כל אפליקציה בספרייה, עם ה-AI שלך או שלנו",
+                "api": "ה-API של {brand}, הרצות ללא הגבלה"
+            },
+            "yearlySaves": "חיוב שנתי חוסך {amount} לשנה על התוכנית. המחיר של משבצות האפליקציות לא משתנה.",
+            "proMonthly": "{brand} Pro, חודשי",
+            "proYearly": "{brand} Pro, שנתי",
+            "appLine": "{app} × {count}",
+            "unusedMonth": "החלק שלא נוצל מהתקופה הזו",
+            "dueToday": "לתשלום היום, כולל מס",
+            "startPro": "לסיים את הניסיון ולהתחיל Pro עכשיו",
+            "switchYearly": "לעבור לחיוב שנתי",
+            "keepTrial": "או להמשיך בתקופת הניסיון: Pro יתחיל מעצמו ב-{date}.",
+            "yearStartsToday": "השנה שלך מתחילה היום. החלק שלא נוצל מהתקופה הזו מקוזז.",
+            "acceptTerms": "יש לאשר קודם את התנאים",
+            "until": "עד {date}",
+            "from": "מ-{date}",
+            "yearlyAt": "שנתי · {amount}",
+            "monthlyAt": "{amount} לחודש",
+            "switchOn": "לעבור ב-{date}",
+            "nothingToday": "אין מה לשלם היום. השנה ששילמת עליה נמשכת עד סופה.",
+            "pendingSwitch": "החיוב שלך יהפוך לחודשי ב-{date}.",
+            "keepYearly": "להישאר בחיוב שנתי",
+            "yourRenewal": "החידוש שלך",
+            "locked": {
+                "pastDue": "יש לשלם את החשבונית שנדחתה לפני שמשנים את החיוב.",
+                "canceling": "יש לחדש את Pro לפני שמשנים את החיוב."
+            },
+            "success": {
+                "proTitle": "ברוך הבא ל-Pro",
+                "proBody": "תקופת הניסיון הסתיימה ו-Pro מתחיל היום. עמיתים שהושבתו חוזרים לפעול.",
+                "yearlyTitle": "עברת לחיוב שנתי",
+                "yearlyBody": "השנה שלך מתחילה היום ומתחדשת ב-{date}.",
+                "monthlyTitle": "חודשי מ-{date}",
+                "monthlyBody": "התוכנית השנתית שלך נמשכת עד סופה, ואז החיוב הופך לחודשי.",
+                "keptYearlyTitle": "נשארת בחיוב שנתי",
+                "keptYearlyBody": "התוכנית שלך מתחדשת ב-{date}, לשנה נוספת."
+            }
+        },
+        "credits": {
+            "leftLabel": "קרדיטים שנותרו",
+            "ownAi": "עמיתים שעובדים עם ה-AI שלך לא מוציאים כלום.",
+            "thisMonth": "החודש",
+            "thisMonthResets": "החודש, מתאפס ב-{date}",
+            "monthOf": "{left} מתוך {total}",
+            "fromPacks": "מחבילות, ללא תפוגה",
+            "packs": "חבילות קרדיטים",
+            "packLine": "{count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}} ב-{price}, תשלום חד־פעמי",
+            "lessAria": "חבילה אחת פחות",
+            "moreAria": "חבילה אחת יותר",
+            "addsCredits": "+<n></n> {count, plural, one {קרדיט} two {קרדיטים} other {קרדיטים}}",
+            "seeUsage": "לראות שימוש",
+            "pay": "לשלם <amount></amount>",
+            "payOnStripe": "לשלם ב-Stripe",
+            "chargedOnce": "חיוב חד־פעמי. הקרדיטים נכנסים מיד.",
+            "checkoutFootnote": "התשלום מתבצע בדף מאובטח של Stripe, ואז חוזרים לכאן.",
+            "acceptTerms": "יש לאשר קודם את התנאים",
+            "trialLeft": "קרדיטי ניסיון שנותרו, מתוך {trial}. Pro מוסיף עוד {monthly} כל חודש.",
+            "packsAfterTrial": "חבילות קרדיטים נפתחות כש-Pro מתחיל.",
+            "startPro": "להתחיל Pro עכשיו",
+            "locked": {
+                "pastDue": "יש לשלם קודם את החשבונית שנדחתה.",
+                "canceling": "יש לחדש את Pro כדי להוסיף קרדיטים."
+            },
+            "success": {
+                "title": "{count, plural, one {נוסף קרדיט אחד} two {נוספו # קרדיטים} other {נוספו # קרדיטים}}",
+                "body": "יש לך עכשיו {count, plural, one {קרדיט אחד} two {# קרדיטים} other {# קרדיטים}}.",
+                "chargedTo": "חויב בכרטיס {card}"
+            }
+        },
+        "usage": {
+            "lastDays": "{count, plural, one {היום האחרון} two {היומיים האחרונים} other {# הימים האחרונים}} · {credits} קרדיטים",
+            "byCoworker": "לפי עמית",
+            "empty": "עדיין לא הוצא כלום בתקופה הזו."
+        },
+        "apps": {
+            "inUse": "{used} מתוך {count, plural, one {משבצת אחת} two {# משבצות} other {# משבצות}} בשימוש",
+            "noSlotMonthly": "אין משבצת · {price} לחודש",
+            "noSlotYearly": "אין משבצת · {price} לשנה",
+            "freeUntil": "משבצת אחת חינם עד {date}",
+            "lessAria": "משבצת {app} אחת פחות",
+            "moreAria": "משבצת {app} אחת יותר",
+            "loading": "בודקים את החשבונות שבשימוש…",
+            "disconnectFirst": "יש לנתק קודם חשבון {app}.",
+            "trialOneSlot": "תקופת הניסיון כוללת משבצת אחת. כדי לקבל יותר, אפשר להתחיל Pro.",
+            "trialKeepsSlot": "משבצת הניסיון נשארת עד ש-Pro מתחיל.",
+            "connectHint": "מחברים חשבונות מתוך האפליקציה עצמה: כל אחד ממלא משבצת.",
+            "cantRemoveUsed": "אי אפשר להסיר משבצת שיש בה חשבון: יש לנתק קודם את החשבון.",
+            "addedLine": "{app}, +{count, plural, one {משבצת אחת} two {# משבצות} other {# משבצות}}",
+            "removedLine": "{app}, -{count, plural, one {משבצת אחת} two {# משבצות} other {# משבצות}}",
+            "newTotal": "סכום חדש",
+            "dueToday": "לתשלום היום, על יתרת התקופה",
+            "dueTodayTrial": "לתשלום היום, במהלך תקופת הניסיון",
+            "removedNote": "משבצת שהוסרה נשארת בתוכנית שלך עד {date}.",
+            "addAndPay": "{count, plural, one {להוסיף משבצת אחת} two {להוסיף # משבצות} other {להוסיף # משבצות}} · לשלם <amount></amount>",
+            "save": "לשמור",
+            "acceptTerms": "יש לאשר קודם את התנאים",
+            "yourRenewal": "החידוש שלך",
+            "locked": {
+                "pastDue": "יש לשלם את החשבונית שנדחתה לפני שמשנים את המשבצות.",
+                "canceling": "יש לחדש את Pro לפני שמשנים את המשבצות."
+            },
+            "success": {
+                "title": "המשבצות עודכנו",
+                "addedBody": "כדי להפעיל את המשבצת, יש לחבר את החשבון החדש מתוך האפליקציה.",
+                "removedBody": "המשבצת יוצאת מהתוכנית שלך ב-{date}."
+            }
+        },
+        "payment": {
+            "card": "כרטיס",
+            "replace": "להחליף",
+            "add": "להוסיף",
+            "everyCharge": "כל חיוב עובר לכרטיס הזה.",
+            "onInvoices": "בחשבוניות שלך",
+            "edit": "לערוך",
+            "company": "חברה",
+            "country": "מדינה",
+            "taxId": "מספר מע״מ או מספר מזהה לצורכי מס",
+            "saveCard": "לשמור כרטיס",
+            "saveAndPay": "לשמור כרטיס ולשלם {amount}",
+            "cardFootnote": "החשבוניות הבאות שלך יחויבו בכרטיס הזה.",
+            "invoiceOf": "חשבונית מ-{date}",
+            "success": {
+                "cardTitle": "הכרטיס נשמר",
+                "cardBody": "החיובים הבאים שלך יעברו לכרטיס הזה.",
+                "paidTitle": "התשלום התקבל",
+                "paidBody": "סביבת העבודה שלך חזרה לפעול כרגיל.",
+                "detailsTitle": "הפרטים נשמרו",
+                "numberRemovedTitle": "המספר הוסר",
+                "detailsBody": "הם יופיעו בחשבוניות הבאות שלך."
+            }
+        },
+        "invoice": {
+            "plan": "{brand} Pro",
+            "appSlots": "{count, plural, one {{app}} two {{app} × #} other {{app} × #}}",
+            "creditPacks": "{count, plural, one {חבילת קרדיטים} two {חבילות קרדיטים × #} other {חבילות קרדיטים × #}}",
+            "prorated": "{items} (יחסי)",
+            "other": "חשבונית",
+            "paid": "שולם",
+            "unpaid": "לא שולם",
+            "download": "להוריד חשבונית"
+        },
+        "invoices": {
+            "empty": "אין עדיין חשבוניות.",
+            "emptyTrial": "אין עדיין חשבוניות. הראשונה תגיע כש-Pro יתחיל."
+        },
+        "referral": {
+            "monthsEarned": "חודשים חינם שנצברו",
+            "takenOff": "יקוזז מחשבונית ה-Pro הבאה שלך."
+        },
+        "cancel": {
+            "periodEnd": "סוף התקופה שלך",
+            "trial": {
+                "nothingCharged": "אין שום חיוב.",
+                "keepRunning": "העמיתים שלך ממשיכים לפעול עד סוף תקופת הניסיון, {count, plural, one {בעוד יום אחד} two {בעוד יומיים} other {בעוד # ימים}}.",
+                "saved": "אחרי זה סביבת העבודה מושהית ונשמרת למשך {days} ימים."
+            },
+            "paid": {
+                "keepRunning": "העמיתים שלך ממשיכים לפעול עד {date}.",
+                "pauses": "אחרי זה התזמונים נעצרים וסביבת העבודה מושהית.",
+                "saved": "העמיתים, הזיכרונות, המיומנויות והקבצים נשמרים למשך {days} ימים.",
+                "restart": "אפשר להפעיל שוב את Pro בכל עת ולהמשיך מאיפה שהפסקת."
+            },
+            "keep": "לשמור את התוכנית שלי",
+            "cancelPlan": "לבטל את התוכנית",
+            "cancelTrial": "לבטל את תקופת הניסיון"
+        }
     }
 }

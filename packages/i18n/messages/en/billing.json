@@ -10,7 +10,6 @@
         "apps.lessReason.disconnectFirst": "Tooltip of a disabled minus button. {app} is the name of the app.",
         "apps.slots.lineMonthly": "The <slots> tag is replaced by the slot count sentence. {price} is a dollar amount.",
         "apps.slots.used": "The <used> tag is replaced by the number of slots in use, <n> by the number of slots bought ({total}).",
-        "apps.slotsSuffix": "Appended to \"Unlimited coworkers\" to name a whole plan, one per app. Keep the leading space and the plus sign. {provider} is a brand like LinkedIn.",
         "apps.trial.free": "{date} is a long date like \"November 12\". {price} is a price with its period, like \"$9/mo\".",
         "apps.trial.withPaid": "The <trial> tag is replaced by the free slot sentence, <n> by the number of paid slots.",
         "business.add": "Shown when no tax number is saved: opens the form to add one.",
@@ -68,17 +67,11 @@
         "plan.billed.monthly": "A price per month. {price} is a dollar amount like \"$29\".",
         "plan.billed.yearly": "A price per year. {price} is a dollar amount like \"$276\".",
         "plan.change.changeToSlots": "Title. The <n> tag is replaced by the animated number of slots ({count}). {provider} is a brand like LinkedIn.",
-        "plan.change.monthlyFrom": "Value of a summary row. The <price> tag is replaced by the animated price per month.",
-        "plan.change.planLabel": "Names a whole plan. {slots} is empty or a list of paid app slots, like \" + 2 LinkedIn slots\".",
-        "plan.change.switchOn": "Button. {date} is the renewal date, or \"your renewal\".",
         "plan.invoices.status.open": "Status of an invoice that is not paid yet.",
         "plan.invoices.status.uncollectible": "Status of an invoice Stripe gave up collecting.",
         "plan.invoices.status.void": "Status of an invoice that was cancelled.",
         "plan.overview.creditsLeft": "{credits} is an already formatted number of Rerun credits, like \"1,250\" or \"<1\".",
-        "plan.overview.update": "Button next to the saved card: replace it with another card.",
         "plan.status.ends": "Badge of a plan that was cancelled. {date} is a short date like \"Nov 12\".",
-        "plan.status.monthlyFrom": "Badge of a yearly plan that switches to monthly billing on {date}.",
-        "plan.summary.monthlyRenews": "Under the plan name. {renewal} is a short date or \"your renewal\".",
         "plan.yourRenewal": "Stands in for the renewal date when it is unknown, inside sentences like \"until {renewal}\".",
         "postPayment.button.placeOne": "Button. Place = put the coworker on the workspace board.",
         "stripe.percentOff": "Discount of a promo code.",
@@ -97,7 +90,19 @@
         "plan.credit.packCredits": "Under the number of packs: the credits they add, which never expire.",
         "plan.credit.dueBeforeTax": "Label of a summary row: the amount due today, tax added on the Stripe page.",
         "lifetime.slots.freeThen": "{price} is a monthly price like \"$9/mo\".",
-        "lifetime.slots.oneOnCheckout": "Tooltip of a disabled plus button: the first app slot is paid alone on a Stripe page."
+        "lifetime.slots.oneOnCheckout": "Tooltip of a disabled plus button: the first app slot is paid alone on a Stripe page.",
+        "tiles.home.machine.comingSoon": "Shown in large type on the Machine tile of the billing home, in place of a figure: bigger machines are not sold yet.",
+        "tiles.home.machine.title": "Tile title: the workspace's machine, the server its coworkers run on.",
+        "tiles.home.apps.slots": "{count} is the number of paid slots of an app, {amount} what they cost each billing period, like \"1 · $9\".",
+        "tiles.home.notice.trialTitle": "Banner during a free trial: {amount} is the first charge, {date} the day it is taken.",
+        "tiles.card.number": "A saved card: {network} is the card network, like Visa, {last4} its last four digits.",
+        "tiles.card.expires": "{date} is the card's expiry, like 04/30.",
+        "tiles.plan.perMonth": "The plan's price per month. <amount> is the animated price, <unit> the smaller text after it.",
+        "tiles.credits.addsCredits": "Under the credit packs stepper. <n> is the animated number of credits ({count}).",
+        "tiles.invoice.appSlots": "An app on an invoice: {app} is its name, like LinkedIn Pro, {count} its slots.",
+        "tiles.invoice.prorated": "{items} is the list of what the invoice charged for, like \"LinkedIn Pro\".",
+        "tiles.apps.addedLine": "A change of slots: {app} is the app's name, like LinkedIn Pro.",
+        "tiles.pages.card.description": "Under the title of the page where a card is added or replaced."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -107,48 +112,22 @@
         },
         "yourRenewal": "your renewal",
         "status": {
-            "paymentFailed": "Payment failed",
-            "ends": "Ends {date}",
-            "ending": "Ending",
-            "monthlyFrom": "Monthly from {date}",
-            "active": "Active"
-        },
-        "summary": {
-            "monthlyRenews": "Unlimited coworkers · billed monthly · renews {renewal}",
-            "monthlyEnds": "Unlimited coworkers · billed monthly · ends {renewal}",
-            "yearlyRenews": "Unlimited coworkers · billed yearly · renews {renewal}",
-            "yearlyEnds": "Unlimited coworkers · billed yearly · ends {renewal}"
+            "ends": "Ends {date}"
         },
         "success": {
             "done": "Done",
-            "paymentReceivedTitle": "Payment received",
-            "paymentReceivedBody": "Your card is updated and Pro is active again.",
             "backOnTitle": "Pro is back on",
             "backOnBody": "Your plan renews on {date}."
         },
-        "cardUpdated": "Card updated",
         "acceptTerms": "Accept the terms first",
         "pleaseWait": "Please wait",
         "nextInvoice": "Next invoice",
         "overview": {
-            "keepYearlyFailed": "Could not keep your yearly plan",
-            "billed": "Billed",
-            "billedYearly": "Yearly, tax included",
-            "billedMonthly": "Monthly, tax included",
-            "from": "From {date}",
-            "monthlyPrice": "Monthly · {price}",
             "title": "Billing",
-            "update": "Update",
             "invoices": "Invoices",
             "viewAll": "View all",
             "creditUsage": "Credit usage",
-            "creditsLeft": "{credits} left",
-            "keepYearly": "Keep my yearly plan",
-            "switchHint": "Switch the billing to see the new price.",
-            "cancelPlan": "Cancel plan",
-            "referFriend": "Refer a friend",
-            "freeMonths": "{count, plural, one {# free month} other {# free months}}",
-            "getFreeMonth": "Get a free month"
+            "creditsLeft": "{credits} left"
         },
         "referrals": {
             "title": "Refer a friend",
@@ -173,57 +152,29 @@
             }
         },
         "change": {
-            "planLabel": "Unlimited coworkers{slots}",
-            "switchScheduledTitle": "Switch scheduled",
-            "switchScheduledBody": "Your yearly plan runs to its end. Monthly billing starts on {date}.",
             "changeScheduledTitle": "Change scheduled",
-            "changeScheduledBody": "You keep {current} until {renewal}, then {next} at {price}.",
-            "planUpdatedTitle": "Plan updated",
-            "planUpdatedBodyMonthly": "{plan}, billed monthly. Your receipt is on its way by email.",
-            "planUpdatedBodyYearly": "{plan}, billed yearly. Your receipt is on its way by email.",
-            "switchToMonthly": "Switch to monthly",
             "changeToSlots": "Change to {count, plural, one {<n></n> {provider} slot} other {<n></n> {provider} slots}}",
             "changeAppSlots": "Change your app slots",
-            "switchToYearly": "Switch to yearly",
-            "proLineMonthly": "Pro · {plan}, monthly",
-            "proLineYearly": "Pro · {plan}, yearly",
-            "unusedTimeMonthly": "Unused time on your monthly plan",
-            "unusedTimeYearly": "Unused time on your yearly plan",
             "dueTodayTaxIncluded": "Due today, tax included",
             "from": "From {date}",
             "until": "Until {date}",
-            "monthlyFrom": "Monthly · <price></price>",
             "keepMyPlan": "Keep my plan",
             "confirmAndPay": "Confirm and pay",
-            "switchOn": "Switch on {date}",
             "scheduleFor": "Schedule for {date}",
-            "billedNowSlots": "Billed now for the new slots. Monthly billing starts on {date}.",
-            "slotsReady": "The new slots are ready as soon as the payment goes through.",
-            "yearlyStarts": "Your yearly plan starts as soon as the payment goes through.",
             "nothingToday": "Nothing is charged today."
         },
         "cancelPending": {
             "endOfPeriod": "the end of your period",
-            "resumeFailed": "Could not resume your plan",
-            "title": "Pro ends on {date}",
-            "body": "Your coworkers keep running until then. After that the workspace pauses and its data is saved for 90 days.",
-            "none": "None",
-            "resume": "Resume Pro",
-            "footnote": "Resuming keeps your plan and bills {price} on {date}."
+            "resumeFailed": "Could not resume your plan"
         },
         "card": {
-            "notSaved": "Your card could not be saved",
-            "title": "Update your card",
-            "save": "Save card",
-            "footnote": "Your next invoices are charged to this card."
+            "notSaved": "Your card could not be saved"
         },
         "pastDue": {
             "declinedOn": "Your {amount} payment on {date} was declined.",
-            "declined": "Your {amount} payment was declined.",
             "lastDeclined": "Your last payment was declined.",
             "paused": "Your workspace is paused and comes back as soon as it goes through.",
             "keepRunning": "Pay it now to keep your workspace running.",
-            "ctaAmount": "Update card and pay {amount}",
             "cta": "Update card and pay"
         },
         "invoices": {
@@ -282,7 +233,6 @@
     "apps": {
         "title": "Apps",
         "description": "Extra superpowers for your coworkers, on the same invoice as your plan.",
-        "slotsSuffix": "{count, plural, one { + # {provider} slot} other { + # {provider} slots}}",
         "unit": {
             "monthly": "/mo",
             "yearly": "/yr"
@@ -1054,5 +1004,314 @@
     "startPlan": {
         "trialFailed": "Could not start your trial",
         "trialStarted": "Trial started"
+    },
+    "tiles": {
+        "pages": {
+            "billing": "Billing",
+            "home": {
+                "title": "Billing",
+                "renews": "{brand} Pro · renews {date}",
+                "ends": "{brand} Pro · ends {date}",
+                "declined": "{brand} Pro · payment declined",
+                "trial": "Free trial · {count, plural, one {# day left} other {# days left}}"
+            },
+            "plan": {
+                "title": "Manage plan",
+                "description": "How you are billed, and what Pro includes.",
+                "trialTitle": "Start {brand} Pro",
+                "trialDescription": "End the trial today and keep everything you set up."
+            },
+            "credits": {
+                "title": "{brand} credits",
+                "description": "They pay for the {brand} models and paid data.",
+                "trialDescription": "Trial credits carry over once Pro starts."
+            },
+            "usage": {
+                "title": "Credit usage",
+                "description": "What your coworkers spent, and on what."
+            },
+            "apps": {
+                "title": "Paid apps",
+                "description": "One slot per account your coworkers use."
+            },
+            "payment": {
+                "title": "Payment",
+                "description": "The card we charge, and what goes on your invoices."
+            },
+            "card": {
+                "replaceTitle": "Replace card",
+                "addTitle": "Add a card",
+                "payTitle": "Update card and pay",
+                "description": "Secured by Stripe. {brand} never sees your card."
+            },
+            "business": {
+                "title": "Business details",
+                "description": "Printed on every invoice from now on."
+            },
+            "invoices": {
+                "title": "Invoices",
+                "description": "Every charge, ready to download."
+            },
+            "referral": {
+                "title": "Refer a friend",
+                "description": "A friend pays for Pro, you both get a month free."
+            },
+            "cancel": {
+                "title": "Cancel {brand} Pro",
+                "trialTitle": "Cancel trial",
+                "description": "Here is what happens next."
+            }
+        },
+        "card": {
+            "number": "{network} •••• {last4}",
+            "expires": "Expires {date}",
+            "none": "No card on file"
+        },
+        "home": {
+            "notice": {
+                "lowTitle": "Only {count, plural, one {# credit} other {# credits}} left.",
+                "lowBody": "Coworkers on the {brand} models stop at zero.",
+                "addCredits": "Add credits",
+                "endsTitle": "Your plan ends on {date}.",
+                "trialEndsTitle": "Your trial ends on {date}.",
+                "endsBody": "Then the workspace pauses, saved for {days} days.",
+                "resumePro": "Resume Pro",
+                "resumeTrial": "Resume trial",
+                "trialResumedTitle": "Trial resumed",
+                "trialResumedBody": "Pro starts on its own on {date}.",
+                "trialTitle": "{amount} on {date}, nothing before.",
+                "trialBody": "We email you the day before."
+            },
+            "plan": {
+                "name": "{brand} Pro",
+                "manage": "Manage plan",
+                "startPro": "Start Pro now",
+                "badge": {
+                    "monthly": "Monthly",
+                    "yearly": "Yearly",
+                    "trial": "Trial",
+                    "declined": "Payment declined",
+                    "ends": "Ends {date}",
+                    "monthlyFrom": "Monthly from {date}"
+                },
+                "monthlyRenews": "{amount} a month · renews {date}",
+                "monthlyEnds": "{amount} a month · ends {date}",
+                "yearlyRenews": "{amount} a year · renews {date}",
+                "yearlyEnds": "{amount} a year · ends {date}",
+                "trialLine": "Free until {date}, then {amount} a month"
+            },
+            "credits": {
+                "title": "{brand} credits",
+                "add": "Add credits",
+                "seeUsage": "See usage",
+                "details": "Details",
+                "leftLabel": "Credits left",
+                "month": "{month} of {total} this month",
+                "monthAndPacks": "{month} of {total} this month · {packs} from packs",
+                "trialLine": "Trial credits, carried over once Pro starts",
+                "locked": {
+                    "pastDue": "Pay the declined invoice first.",
+                    "canceling": "Resume Pro to add credits."
+                }
+            },
+            "machine": {
+                "title": "Machine",
+                "comingSoon": "Coming soon",
+                "description": "Bigger machines for busy workspaces."
+            },
+            "apps": {
+                "title": "Paid apps",
+                "manage": "Manage slots",
+                "off": "Off",
+                "slots": "{count} · {amount}"
+            },
+            "payment": {
+                "title": "Payment",
+                "update": "Update"
+            },
+            "history": "History",
+            "allInvoices": "All invoices",
+            "noInvoice": "No invoice yet.",
+            "noInvoiceTrial": "No invoice yet. The first one comes when Pro starts.",
+            "refer": "Refer a friend",
+            "referEarned": "Refer a friend · {count, plural, one {# month earned} other {# months earned}}",
+            "cancelPlan": "Cancel plan",
+            "cancelTrial": "Cancel trial"
+        },
+        "plan": {
+            "name": "{brand} Pro",
+            "billedMonthly": "Billed every month",
+            "billedYearly": "Billed <amount></amount> a year",
+            "perMonth": "<amount></amount><unit> / month</unit>",
+            "included": {
+                "coworkers": "Unlimited coworkers and seats",
+                "machine": "Your own private machine",
+                "credits": "{credits} {brand} credits every month",
+                "apps": "Every app of the library, your own AI or ours",
+                "api": "The {brand} API, unlimited runs"
+            },
+            "yearlySaves": "Yearly billing saves {amount} a year on the plan. App slots keep their price.",
+            "proMonthly": "{brand} Pro, monthly",
+            "proYearly": "{brand} Pro, yearly",
+            "appLine": "{app} × {count}",
+            "unusedMonth": "Unused part of this period",
+            "dueToday": "Due today, tax included",
+            "startPro": "End trial & start Pro now",
+            "switchYearly": "Switch to yearly",
+            "keepTrial": "Or keep the trial: Pro starts on its own on {date}.",
+            "yearStartsToday": "Your year starts today. The unused part of this period is taken off.",
+            "acceptTerms": "Accept the terms first",
+            "until": "Until {date}",
+            "from": "From {date}",
+            "yearlyAt": "Yearly · {amount}",
+            "monthlyAt": "{amount} a month",
+            "switchOn": "Switch on {date}",
+            "nothingToday": "Nothing to pay today. Your paid year runs to its end.",
+            "pendingSwitch": "Your billing turns monthly on {date}.",
+            "keepYearly": "Keep yearly billing",
+            "yourRenewal": "your renewal",
+            "locked": {
+                "pastDue": "Pay the declined invoice before you change your billing.",
+                "canceling": "Resume Pro before you change your billing."
+            },
+            "success": {
+                "proTitle": "Welcome to Pro",
+                "proBody": "Your trial ended and Pro starts today. Switched-off coworkers come back on.",
+                "yearlyTitle": "You are on yearly billing",
+                "yearlyBody": "Your year starts today and renews on {date}.",
+                "monthlyTitle": "Monthly from {date}",
+                "monthlyBody": "Your yearly plan runs to its end, then billing turns monthly.",
+                "keptYearlyTitle": "You stay on yearly billing",
+                "keptYearlyBody": "Your plan renews on {date}, yearly."
+            }
+        },
+        "credits": {
+            "leftLabel": "Credits left",
+            "ownAi": "Coworkers on your own AI spend none.",
+            "thisMonth": "This month",
+            "thisMonthResets": "This month, resets {date}",
+            "monthOf": "{left} of {total}",
+            "fromPacks": "From packs, never expire",
+            "packs": "Credit packs",
+            "packLine": "{count, plural, one {# credit} other {# credits}} for {price}, paid once",
+            "lessAria": "One pack less",
+            "moreAria": "One pack more",
+            "addsCredits": "+<n></n> {count, plural, one {credit} other {credits}}",
+            "seeUsage": "See usage",
+            "pay": "Pay <amount></amount>",
+            "payOnStripe": "Pay on Stripe",
+            "chargedOnce": "Charged once. The credits land right away.",
+            "checkoutFootnote": "You pay on a secure Stripe page, then come back here.",
+            "acceptTerms": "Accept the terms first",
+            "trialLeft": "Trial credits left, of {trial}. Pro adds {monthly} more every month.",
+            "packsAfterTrial": "Credit packs open once Pro starts.",
+            "startPro": "Start Pro now",
+            "locked": {
+                "pastDue": "Pay the declined invoice first.",
+                "canceling": "Resume Pro to add credits."
+            },
+            "success": {
+                "title": "{count, plural, one {# credit added} other {# credits added}}",
+                "body": "You now have {count, plural, one {# credit} other {# credits}}.",
+                "chargedTo": "Charged to {card}"
+            }
+        },
+        "usage": {
+            "lastDays": "Last {count, plural, one {day} other {# days}} · {credits} credits",
+            "byCoworker": "By coworker",
+            "empty": "Nothing spent yet this period."
+        },
+        "apps": {
+            "inUse": "{used} of {count, plural, one {# slot} other {# slots}} in use",
+            "noSlotMonthly": "No slot · {price} a month",
+            "noSlotYearly": "No slot · {price} a year",
+            "freeUntil": "One slot free until {date}",
+            "lessAria": "One {app} slot less",
+            "moreAria": "One {app} slot more",
+            "loading": "Checking the accounts in use…",
+            "disconnectFirst": "Disconnect a {app} account first.",
+            "trialOneSlot": "The trial runs one slot. Start Pro for more.",
+            "trialKeepsSlot": "Your trial slot stays until Pro starts.",
+            "connectHint": "Connect accounts from the app itself: each one fills a slot.",
+            "cantRemoveUsed": "A slot with an account in it can't be removed: disconnect the account first.",
+            "addedLine": "{app}, +{count, plural, one {# slot} other {# slots}}",
+            "removedLine": "{app}, -{count, plural, one {# slot} other {# slots}}",
+            "newTotal": "New total",
+            "dueToday": "Due today, for the rest of the period",
+            "dueTodayTrial": "Due today, during the trial",
+            "removedNote": "A removed slot stays on your plan until {date}.",
+            "addAndPay": "Add {count, plural, one {# slot} other {# slots}} · pay <amount></amount>",
+            "save": "Save",
+            "acceptTerms": "Accept the terms first",
+            "yourRenewal": "your renewal",
+            "locked": {
+                "pastDue": "Pay the declined invoice before you change your slots.",
+                "canceling": "Resume Pro before you change your slots."
+            },
+            "success": {
+                "title": "Slots updated",
+                "addedBody": "Connect the new account from the app to put the slot to work.",
+                "removedBody": "The slot leaves your plan on {date}."
+            }
+        },
+        "payment": {
+            "card": "Card",
+            "replace": "Replace",
+            "add": "Add",
+            "everyCharge": "Every charge goes to this card.",
+            "onInvoices": "On your invoices",
+            "edit": "Edit",
+            "company": "Company",
+            "country": "Country",
+            "taxId": "VAT number or tax ID",
+            "saveCard": "Save card",
+            "saveAndPay": "Save card and pay {amount}",
+            "cardFootnote": "Your next invoices are charged to this card.",
+            "invoiceOf": "{date} invoice",
+            "success": {
+                "cardTitle": "Card saved",
+                "cardBody": "Your next charges go to this card.",
+                "paidTitle": "Payment received",
+                "paidBody": "Your workspace is back to normal.",
+                "detailsTitle": "Details saved",
+                "numberRemovedTitle": "Number removed",
+                "detailsBody": "Your next invoices carry them."
+            }
+        },
+        "invoice": {
+            "plan": "{brand} Pro",
+            "appSlots": "{count, plural, one {{app}} other {{app} × #}}",
+            "creditPacks": "{count, plural, one {Credit pack} other {Credit packs × #}}",
+            "prorated": "{items} (prorated)",
+            "other": "Invoice",
+            "paid": "Paid",
+            "unpaid": "Unpaid",
+            "download": "Download invoice"
+        },
+        "invoices": {
+            "empty": "No invoice yet.",
+            "emptyTrial": "No invoice yet. The first one comes when Pro starts."
+        },
+        "referral": {
+            "monthsEarned": "Free months earned",
+            "takenOff": "Taken off your next Pro invoice."
+        },
+        "cancel": {
+            "periodEnd": "the end of your period",
+            "trial": {
+                "nothingCharged": "Nothing is charged.",
+                "keepRunning": "Your coworkers keep running until the trial ends, in {count, plural, one {# day} other {# days}}.",
+                "saved": "Then the workspace pauses and is saved for {days} days."
+            },
+            "paid": {
+                "keepRunning": "Your coworkers keep running until {date}.",
+                "pauses": "Then schedules stop and the workspace pauses.",
+                "saved": "Coworkers, memories, skills and files are saved for {days} days.",
+                "restart": "Restart Pro any time to pick up where you left."
+            },
+            "keep": "Keep my plan",
+            "cancelPlan": "Cancel plan",
+            "cancelTrial": "Cancel trial"
+        }
     }
 }

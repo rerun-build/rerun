@@ -18,7 +18,7 @@ const STATUS_TONE: Record<ReferralStatus, BadgeTone> = { subscribed: 'green', tr
 
 const EARNED_FILL = KIND_FILL.ai
 
-function ReferralLinkField({ link }: { link: string }) {
+export function ReferralLinkField({ link }: { link: string }) {
     const t = useTranslations('billing.plan.referrals')
     const { copied, copy } = useCopy()
     return (
@@ -72,7 +72,7 @@ function FriendRow({ friend }: { friend: ReferralFriend }) {
     )
 }
 
-function FriendList({ friends, more }: { friends: ReferralFriend[]; more: number }) {
+export function FriendList({ friends, more }: { friends: ReferralFriend[]; more: number }) {
     const t = useTranslations('billing.plan.referrals')
     return (
         <ul className="flex flex-col divide-y divide-border rounded-xl bg-background/60 ring-1 ring-border">
