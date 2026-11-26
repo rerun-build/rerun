@@ -21,7 +21,7 @@ import { failure } from '@/lib/i18n/action-error'
 import { readCompanySite, saveCompanySite, skipCompanySite } from '@/lib/company/company-site'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectSingle } from '@/supabase/supabase-helpers'
-import { platformHost } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, platformHost } from '@rerun/contracts'
 
 const BOX_TOOL_NAMES = new Set<string>(FOREMAN_BOX_TOOL_DEFS.map(def => def.name))
 const INBOX_TOOL_NAMES = new Set<string>(FOREMAN_INBOX_TOOL_DEFS.map(def => def.name))
@@ -38,6 +38,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (tool === 'save_company_website') return saveCompanyWebsite(actor, args)
     if (INBOX_TOOL_NAMES.has(tool)) return dispatchInboxTool(actor, tool, args)
     if (tool === 'add_vault_entry') return addVaultEntry(actor, args)
+    if (tool === 'send_message' && args.agentId === FOREMAN_AGENT_ID) throw new Error('You are the Chief of Staff: send_message reaches the coworkers of the workspace, not you.')
 
     // The turn speaks for the member who wrote it: a Box they create is theirs to manage, a coworker
     // lands only in a Box they manage, and only their Boxes are listed. A turn with nobody behind it

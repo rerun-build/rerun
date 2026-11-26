@@ -1,6 +1,6 @@
 import { FOREMAN_AGENT_ID, reasoningEffortSchema, type SessionKind } from '@rerun/contracts'
 
-import { actorFromContext, assertRunInReach, callableEngineAgentIds, runSessionsInReach } from '@/app/api/_auth/access'
+import { actorFromContext, assertRunInReach, runSessionsInReach } from '@/app/api/_auth/access'
 import { resolveAgentTarget, type AgentChatTarget } from '@/app/api/_services/chat.service'
 import { sendTurn } from '@/lib/chat/send-turn'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
@@ -9,12 +9,11 @@ import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { requestTimeZone } from '@/lib/i18n/request-locale'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { embedTextShared } from '@/lib/services/embed'
-import { cancelRun, getRun, supportsForemanVault } from '@/lib/engine/client'
+import { cancelRun, getRun } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, copyToShippedForemanRow, engineSessionOf, findForemanGeneral, loadForemanConversation, loadForemanConversationById, startEngineConversation } from '@/lib/foreman/conversation'
-import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
+import { foremanTurnParams } from '@/lib/foreman/engine-turn'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
-import { mintForemanHubToken } from '@/lib/foreman/hub-token'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
 import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
@@ -107,9 +106,7 @@ export async function POST(req: Request): Promise<Response> {
         sender: ctx,
         author: await messageAuthorOf(ctx, timezone),
         queued,
-        // Its brief is written by the hub on every turn: the instructions and the tools of where the
-        // workspace stands now, with a token that carries this member's rights.
-        engine: async () => ({ connectionId, model, effort, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting, vault: await supportsForemanVault(target.conn) }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }),
+        engine: () => foremanTurnParams(ctx, state, target, { connectionId, model, effort, source: 'dashboard', greeting }),
         conversationId: sessionId,
         engineSessionId: existing?.engineSessionId ?? undefined,
         log: 'agent=foreman',

@@ -75,6 +75,34 @@ const AGENT_TOOL_DEFS = [
         inputSchema: { type: 'object', properties: {} },
     },
     {
+        name: 'create_boxes',
+        description:
+            'Create one Box per name, in order: a Box is a rectangle on the board that groups the coworkers of a team, a client or a project. It is free and instant, and holds no machine nor data of its own: every coworker of the workspace keeps running on the same machine. The order draws the board: the first name lands at the centre and the ones after it against its faces. The first Box of a workspace also claims its machine, which takes a few seconds. You become a manager of the Boxes you create. The answer gives each Box its spaceId, to pass to create_agent or update_agent.',
+        inputSchema: {
+            type: 'object',
+            properties: { names: { type: 'array', items: { type: 'string' }, description: 'One name per Box, in the order they should read on the board.' } },
+            required: ['names'],
+        },
+    },
+    {
+        name: 'rename_box',
+        description: 'Rename a Box. The name is what people read on the board, nothing else depends on it. Needs Can manage on the Box.',
+        inputSchema: {
+            type: 'object',
+            properties: { spaceId: { type: 'string' }, name: { type: 'string' } },
+            required: ['spaceId', 'name'],
+        },
+    },
+    {
+        name: 'delete_box',
+        description: 'Delete a Box. It has to be empty first: move its coworkers to another Box with update_agent and spaceId, or delete them. Needs Can manage on the Box. Requires confirm: true.',
+        inputSchema: {
+            type: 'object',
+            properties: { spaceId: { type: 'string' }, confirm: { type: 'boolean' } },
+            required: ['spaceId', 'confirm'],
+        },
+    },
+    {
         name: 'list_agents',
         description: 'List the coworkers of the account: id, display name, handle (the mention/call key), description and Box. The id returned here is what every other tool takes as agentId.',
         inputSchema: {
@@ -433,11 +461,11 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'send_message',
         description:
-            'Talk to a coworker and get its answer. This is how you test an agent: no scheduled task needed. The call waits up to `waitSeconds` for the run to finish and returns the final text; if the coworker is still working when that runs out it returns status "running" with a runId, and the run carries on — poll get_run for the result. Pass `sessionId` to continue an earlier conversation instead of starting a fresh one. The answer names the conversation twice: `sessionId` is the engine id, the one to pass back here to continue it; `conversationId` is the conversation as the app knows it, null when the app could not record it.',
+            'Talk to a coworker and get its answer. This is how you test an agent: no scheduled task needed. The call waits up to `waitSeconds` for the run to finish and returns the final text; if the coworker is still working when that runs out it returns status "running" with a runId, and the run carries on — poll get_run for the result. Pass `sessionId` to continue an earlier conversation instead of starting a fresh one. The answer names the conversation twice: `sessionId` is the engine id, the one to pass back here to continue it; `conversationId` is the conversation as the app knows it, null when the app could not record it. With agentId "' + FOREMAN_AGENT_ID + '" the message goes to the Chief of Staff, in a conversation of the member who created this key that nobody else reads: there `sessionId` and `conversationId` are the same id, and the Chief of Staff acts with that member\'s rights.',
         inputSchema: {
             type: 'object',
             properties: {
-                agentId: { type: 'string' },
+                agentId: { type: 'string', description: `A coworker's id, or "${FOREMAN_AGENT_ID}" for the Chief of Staff.` },
                 message: { type: 'string' },
                 sessionId: { type: 'string', description: 'Continue this conversation. Omit to start a new one.' },
                 waitSeconds: { type: 'number', description: 'How long to wait for the answer. Default 120, max 600.' },

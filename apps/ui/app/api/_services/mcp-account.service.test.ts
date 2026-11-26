@@ -13,6 +13,10 @@ import { changeAgentHandle, createAgent, deleteAgent, renameAgent } from './agen
 import { declareService } from './agent-setup.service'
 import { ensureSessionRow, resolveAgentTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
+import { sendForemanTurnAsMember } from '@/lib/foreman/member-turn'
+import { dispatchBoxTool } from '@/lib/foreman/box-tools'
+import { deleteBox, renameBox } from './box.service'
+import { dispatchKnowledgeTool } from './mcp-knowledge.service'
 import { allocateServiceInstance, listInstalledServices, loadManifest, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -31,6 +35,9 @@ vi.mock('./services.service', () => ({
     uninstallService: vi.fn(),
 }))
 vi.mock('./mcp-knowledge.service', () => ({ dispatchKnowledgeTool: vi.fn() }))
+vi.mock('./box.service', () => ({ deleteBox: vi.fn(), renameBox: vi.fn() }))
+vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
+vi.mock('@/lib/foreman/member-turn', () => ({ sendForemanTurnAsMember: vi.fn() }))
 
 const WORKSPACE_ID = 7
 const FOREIGN_WORKSPACE_ID = 99
@@ -96,9 +103,20 @@ describe('dispatchAccountTool', () => {
             expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: ['foreman'] })
         })
 
-        it("never opens nor continues a conversation of the Chief of Staff, each member's own", async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'cos-row', message: 'hi', sessionId: 'someone-else' })).rejects.toThrow(/private/)
-            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'cos-row', message: 'hi' })).rejects.toThrow(/private/)
+        it("never opens a conversation of the Chief of Staff by its row, only through the door that keeps it the member's own", async () => {
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'cos-row', message: 'hi', sessionId: 'someone-else' })).rejects.toThrow(/agentId "foreman"/)
+            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'cos-row', message: 'hi' })).rejects.toThrow(/agentId "foreman"/)
+            expect(engineChat).not.toHaveBeenCalled()
+        })
+
+        it('sends to the Chief of Staff in a conversation of the member behind the key, and refuses a key with nobody behind it', async () => {
+            vi.mocked(sendForemanTurnAsMember).mockResolvedValue({ target: { conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'foreman' }, runId: 'run-cos', conversationId: 'conv-1' } as never)
+            vi.mocked(getRun).mockResolvedValue({ id: 'run-cos', status: 'success', sessionId: 'engine-session', output: 'Done.' } as never)
+
+            await expect(dispatchAccountTool(member, 'send_message', { agentId: 'foreman', message: 'hi', sessionId: 'conv-1' })).resolves.toMatchObject({ runId: 'run-cos', status: 'success', sessionId: 'conv-1', conversationId: 'conv-1', output: 'Done.' })
+            expect(sendForemanTurnAsMember).toHaveBeenCalledWith(member, 'hi', 'conv-1')
+
+            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'foreman', message: 'hi' })).rejects.toThrow(/acts for the workspace/)
             expect(engineChat).not.toHaveBeenCalled()
         })
 
@@ -418,5 +436,42 @@ describe('dispatchAccountTool', () => {
             expect(uploadFile).not.toHaveBeenCalled()
             expect(writeFileText).not.toHaveBeenCalled()
         })
+    })
+})
+
+describe('Boxes and the Chief of Staff on the account server', () => {
+    const member = { kind: 'user', userId: 'u-member', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'all' } as const
+
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(resolveRow).client)
+    })
+
+    it('creates Boxes as the member behind the key, naming each by the spaceId the other tools take', async () => {
+        vi.mocked(dispatchBoxTool).mockResolvedValue({ boxes: [{ boxId: 'box-new', name: 'Marketing', col: 0, row: 0, colEnd: 4, rowEnd: 4 }], failed: [{ name: 'Legal', error: 'taken' }] })
+        await expect(dispatchAccountTool(member, 'create_boxes', { names: ['Marketing', 'Legal'] })).resolves.toEqual({ boxes: [{ spaceId: 'box-new', name: 'Marketing' }], failed: [{ name: 'Legal', error: 'taken' }] })
+        expect(dispatchBoxTool).toHaveBeenCalledWith({ workspaceId: WORKSPACE_ID, userId: 'u-member', actor: member }, 'create_boxes', { names: ['Marketing', 'Legal'] })
+
+        await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'create_boxes', { names: ['Ops'] })).rejects.toThrow('acts for the workspace')
+    })
+
+    it('renames a Box, and deletes one only once confirmed', async () => {
+        await expect(dispatchAccountTool(member, 'rename_box', { spaceId: 'box-own', name: 'Revenue' })).resolves.toEqual({ spaceId: 'box-own', renamed: true })
+        expect(renameBox).toHaveBeenCalledWith(member, 'box-own', 'Revenue')
+
+        await expect(dispatchAccountTool(member, 'delete_box', { spaceId: 'box-own' })).rejects.toThrow('confirm: true')
+        expect(deleteBox).not.toHaveBeenCalled()
+        await expect(dispatchAccountTool(member, 'delete_box', { spaceId: 'box-own', confirm: true })).resolves.toEqual({ spaceId: 'box-own', deleted: true })
+        expect(deleteBox).toHaveBeenCalledWith(member, 'box-own')
+    })
+
+    it('lists the Chief of Staff beside the coworkers for a member, never for a key with nobody behind it', async () => {
+        await expect(dispatchAccountTool(member, 'list_agents', {})).resolves.toMatchObject({ chiefOfStaff: { agentId: 'foreman', name: 'Chief of Staff' } })
+        await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'list_agents', {})).resolves.not.toHaveProperty('chiefOfStaff')
+    })
+
+    it('hands a name it does not know to the next family', async () => {
+        await dispatchAccountTool(member, 'list_memories', { agentId: 'agent-open' })
+        expect(dispatchKnowledgeTool).toHaveBeenCalledWith(member, 'list_memories', { agentId: 'agent-open' })
     })
 })

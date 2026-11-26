@@ -44,6 +44,9 @@ import type { InstalledService } from '@/lib/services/types'
 import type { BoxConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineAgentSetup, EngineConnection, EngineRunDetail, EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
 import { MAX_MEMORIES_PER_CALL, MAX_MEMORY_CHARS, MAX_UPLOAD_MB } from '@/lib/mcp/account-tools'
 import { asBooleanRecord, asNumber, asString, asStringArray, clamp, requireConfirmation, requireString } from '@/lib/mcp/args'
+import { memberBehindKey } from '@/lib/mcp/member'
+import { dispatchBoxTool } from '@/lib/foreman/box-tools'
+import { sendForemanTurnAsMember } from '@/lib/foreman/member-turn'
 import { connectionModels, readModelPin, type ModelPin } from '@/lib/mcp/model-pin'
 import { projectRun } from '@/lib/mcp/run-projection'
 import { truncateField } from '@/lib/mcp/truncate'
@@ -54,6 +57,7 @@ import { MAX_TRIGGER_BODY_BYTES, triggerWebhookUrl } from '@/lib/triggers/webhoo
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { changeAgentHandle, createAgent, deleteAgent, moveAgentToBox, renameAgent, setAgentLook } from './agent.service'
+import { deleteBox, renameBox } from './box.service'
 import { declareService, installServiceSlugs } from './agent-setup.service'
 import { ensureSessionRow, resolveAgentTarget } from './chat.service'
 import { followCoworker, recordSessionParticipant } from './notification-audience.service'
@@ -258,6 +262,20 @@ async function waitForRun(conn: EngineConnection, engineAgentId: string, runId: 
     return run
 }
 
+// A conversation of the member who created the key, as their own chat would hold it: `sessionId` is
+// the conversation as the app knows it, the id that continues it.
+async function messageChiefOfStaff(actor: Actor, message: string, sessionId: string | undefined, waitSeconds: number) {
+    const turn = await sendForemanTurnAsMember(memberBehindKey(actor), message, sessionId)
+    const run = await waitForRun(turn.target.conn, turn.target.engineAgentId, turn.runId, waitSeconds)
+    return {
+        ...projectRun(run),
+        sessionId: turn.conversationId,
+        conversationId: turn.conversationId,
+        output: run.output ?? null,
+        ...(run.status === 'running' ? { note: `Still working after ${waitSeconds}s. The run continues: read it later with get_run and agentId "${FOREMAN_AGENT_ID}".` } : {}),
+    }
+}
+
 // Only the Boxes the caller manages are candidates: a coworker is created where it can be set up.
 async function resolveSpaceId(actor: Actor, requested?: string): Promise<string> {
     const supabase = createServiceRoleClient()
@@ -340,9 +358,30 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             }
         }
 
+        case 'create_boxes': {
+            const { userId } = memberBehindKey(actor)
+            const { boxes, failed } = (await dispatchBoxTool({ workspaceId, userId, actor }, 'create_boxes', args)) as { boxes: { boxId: string; name: string }[]; failed?: { name: string; error: string }[] }
+            return { boxes: boxes.map(box => ({ spaceId: box.boxId, name: box.name })), ...(failed ? { failed } : {}) }
+        }
+
+        case 'rename_box': {
+            const spaceId = requireString(args.spaceId, 'spaceId')
+            await renameBox(actor, spaceId, requireString(args.name, 'name'))
+            return { spaceId, renamed: true }
+        }
+
+        case 'delete_box': {
+            requireConfirmation(args, 'the Box')
+            const spaceId = requireString(args.spaceId, 'spaceId')
+            await deleteBox(actor, spaceId)
+            return { spaceId, deleted: true }
+        }
+
         case 'list_agents': {
             const [agents, visible] = await Promise.all([listWorkspaceAgents(workspaceId, asString(args.spaceId)), visibleSpaceIds(actor)])
-            return { agents: keepVisible(agents, visible, agent => agent.space_id) }
+            // Listed apart: it belongs to no Box, and its conversations are each member's own.
+            const chiefOfStaff = actor.kind === 'user' ? { chiefOfStaff: { agentId: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, note: `Talk to it with send_message and agentId "${FOREMAN_AGENT_ID}": the conversation is yours alone.` } } : {}
+            return { agents: keepVisible(agents, visible, agent => agent.space_id), ...chiefOfStaff }
         }
 
         case 'get_team_status': {
@@ -790,10 +829,12 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
         case 'send_message': {
             const agentId = requireString(args.agentId, 'agentId')
-            const [{ conn, engineAgentId }, callableAgentIds, recipient] = await Promise.all([resolveAgentTarget(agentId, 'use', actor), callableEngineAgentIds(actor), assertAgentInWorkspace(agentId, 'use', actor)])
-            // Its conversations are each member's own, held in the app: none is opened or continued from here.
-            if (agentKindPolicy(recipient.kind).conversations === 'per-member') throw new Error('This coworker keeps each member\'s conversations private: talk to it in the Rerun app.')
             const waitSeconds = clamp(asNumber(args.waitSeconds), DEFAULT_WAIT_SECONDS, MAX_WAIT_SECONDS)
+            if (agentId === FOREMAN_AGENT_ID) return await messageChiefOfStaff(actor, requireString(args.message, 'message'), asString(args.sessionId), waitSeconds)
+
+            const [{ conn, engineAgentId }, callableAgentIds, recipient] = await Promise.all([resolveAgentTarget(agentId, 'use', actor), callableEngineAgentIds(actor), assertAgentInWorkspace(agentId, 'use', actor)])
+            // Its conversations are each member's own: they go through the door that opens one of the member's.
+            if (agentKindPolicy(recipient.kind).conversations === 'per-member') throw new Error(`Talk to the ${FOREMAN_DISPLAY_NAME} with agentId "${FOREMAN_AGENT_ID}".`)
 
             const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, teamRequests: await offersTeamRequests(conn) })
             if (!res.ok) throw new Error(`The coworker could not be reached: ${res.status} ${await res.text().catch(() => '')}`.trim())
@@ -974,7 +1015,8 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         }
 
         default:
-            // The other families live next door, chained in that order: what the workspace knows, the conversations, the published pages, the template library, the Vault and sharing,
+            // The other families live next door, chained in that order: what the workspace knows,
+            // the conversations, the published pages, the template library, the Vault and sharing,
             // which any account can use, then template authoring, which resolves an expert sandbox
             // author before it runs anything. The ungated ones have to come first so an unknown name
             // does not pay a gate it was never aiming at. The last default is the one that answers

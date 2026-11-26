@@ -260,7 +260,7 @@ export async function findForemanGeneral(ctx: WorkspaceContext): Promise<General
 
 // Throws GeneralAlreadyOpenError when a General is inserted for a member who already has one: two
 // tabs raced to open it, and the one that lost is told which row won so the message can start over there.
-export async function startEngineConversation(ctx: WorkspaceContext, sessionId: string, engineSessionId: string, firstText: string, kind: SessionKind): Promise<void> {
+export async function startEngineConversation(ctx: WorkspaceContext, sessionId: string, engineSessionId: string, firstText: string, kind: SessionKind, source: SessionSource = 'dashboard'): Promise<void> {
     const supabase = createServiceRoleClient()
     const seed = stripVoiceMarker(stripAttachmentsRef(firstText)).trim()
     const { error } = await supabase.from('sessions').insert<SessionInsert>({
@@ -269,7 +269,7 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
         engine_session_id: engineSessionId,
         kind,
         status: 'working',
-        source: 'dashboard',
+        source,
         title: kind === 'general' ? GENERAL_SESSION_TITLE : seedSessionTitle(seed),
         first_message: kind === 'general' ? null : seed.slice(0, FIRST_MESSAGE_MAX_CHARS) || null,
     })

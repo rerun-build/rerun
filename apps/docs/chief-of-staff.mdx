@@ -47,6 +47,10 @@ Press <kbd>⌘</kbd> <kbd>F</kbd> (<kbd>Ctrl</kbd> <kbd>F</kbd> on Windows and L
 
 From two characters typed, it searches the whole workspace for the word: the coworkers (their name, description and soul), their skills and the Brain's, the shared files and each coworker's files, the Brain pages, the rows of every table and the titles of your conversations. A row of chips under the field gives the count for each source: **All** mixes them under **Best matches**, and <kbd>Tab</kbd> (<kbd>Shift</kbd> <kbd>Tab</kbd> back) moves to the next source. Each result shows the line where the word sits, highlighted; press <kbd>Enter</kbd> to open the file, skill, page, table or conversation it comes from. A coworker found by its name, handle or description opens its chat, one found by its soul alone opens its settings. You only find the coworkers of the Boxes you can open, and what the whole workspace shares. The search reads a file up to 1 MB, skips hidden files and folders, keeps the first matching line of each file and at most 20 results per source. When your machine does not answer, or the search takes too long, a line under the results says what could not be searched or that some results may be missing.
 
+### From your AI assistant
+
+An AI assistant connected to your workspace through the [Rerun API](/api/introduction), such as Claude Code, writes to the Chief of Staff with [`send_message`](/api/tools/runs#writing-to-the-chief-of-staff) and `agentId: "foreman"`. The conversation is yours alone, it shows up among your threads, and the Chief of Staff acts with your rights.
+
 ## Its name
 
 The Chief of Staff can carry a name of your choosing. Early in a conversation it offers to take one, once per conversation: say the name and it keeps it. A workspace admin can also click its name on its card and type another one, or empty the field to give it back the name **Chief of Staff**.

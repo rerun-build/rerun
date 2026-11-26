@@ -1,9 +1,9 @@
 ---
 title: "Coworkers"
-description: "List Boxes, see what every coworker is doing, read a coworker in full, create, update and delete coworkers."
+description: "Create and arrange Boxes, see what every coworker is doing, read a coworker in full, create, update and delete coworkers."
 ---
 
-A coworker lives inside a Box. Start from `list_spaces` when you need a `spaceId`, and from `list_agents` when you need an `agentId`: every other tool on this page takes one of those two.
+A coworker lives inside a Box. Start from `list_spaces` when you need a `spaceId`, and from `list_agents` when you need an `agentId`: every other tool on this page takes one of those two. Create, rename and delete the Boxes themselves with `create_boxes`, `rename_box` and `delete_box`.
 
 ## list_spaces
 
@@ -19,6 +19,38 @@ Takes no arguments.
 }
 ```
 
+## create_boxes
+
+Creates one Box per name, in order. A Box is a rectangle on the board that groups the coworkers of a team, a client or a project. It is free and instant, and it holds no machine and no data of its own: every coworker of the workspace keeps running on the same machine.
+
+<ParamField body="names" type="string[]" required>
+  One name per Box, in the order they should read on the board. The first one lands at the centre, the next ones against its sides.
+</ParamField>
+
+The first Box of a workspace also claims its machine, which takes a few seconds. You become a manager of the Boxes you create. A Box that could not be created is listed in `failed`, next to the ones that landed.
+
+```json Response
+{
+  "boxes": [{ "spaceId": "…", "name": "Marketing" }]
+}
+```
+
+Pass the `spaceId` to `create_agent`, or to `update_agent` to move a coworker into the new Box.
+
+## rename_box
+
+Renames a Box. Needs **Can manage** on it.
+
+<ParamField body="spaceId" type="string" required />
+<ParamField body="name" type="string" required />
+
+## delete_box
+
+Deletes a Box. It has to be empty first: move its coworkers to another Box with `update_agent` and `spaceId`, or delete them. Needs **Can manage** on it and `confirm: true`.
+
+<ParamField body="spaceId" type="string" required />
+<ParamField body="confirm" type="boolean" required />
+
 ## list_agents
 
 Lists the coworkers of the Boxes the key reaches, newest first.
@@ -28,6 +60,8 @@ Lists the coworkers of the Boxes the key reaches, newest first.
 </ParamField>
 
 Each coworker carries `id`, `name` (the display name), `handle` (the mention and call key), `description`, `status`, `space_id`, `created_at` and `look` (see [`update_agent`](#update_agent), `null` when nobody chose one). The `id` is what every other tool takes as `agentId`.
+
+The answer also carries `chiefOfStaff`, with `agentId: "foreman"`: the [Chief of Staff](/chief-of-staff) belongs to no Box, and you talk to it with [`send_message`](/api/tools/runs#send_message). A key from before keys recorded who created them acts for the workspace rather than for a member, and gets no `chiefOfStaff`.
 
 ## get_team_status
 

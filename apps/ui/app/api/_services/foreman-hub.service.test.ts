@@ -22,6 +22,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: async () => ({ dat
 const { dispatchForemanHubTool } = await import('./foreman-hub.service')
 const { workspaceFounderUserId } = await import('@/app/api/_auth/ownership')
 const { dispatchInboxTool } = await import('@/lib/foreman/inbox-tools')
+const { dispatchAccountTool } = await import('@/app/api/_services/mcp-account.service')
 
 const admin = { kind: 'user', userId: 'u-admin', workspaceId: 7, role: 'admin', boxScope: 'all' } as const
 const member = { kind: 'user', userId: 'u-member', workspaceId: 7, role: 'member', boxScope: 'all' } as const
@@ -138,5 +139,14 @@ describe('add_vault_entry', () => {
         mocks.addVaultEntry.mockResolvedValue({ id: 'item-notion', status: 'needs_auth' })
         await expect(dispatchForemanHubTool(member, 'add_vault_entry', { kind: 'app', slug: 'notion' })).resolves.toEqual({ id: 'item-notion', status: 'needs_auth' })
         expect(mocks.addVaultEntry).toHaveBeenCalledWith(member, { kind: 'app', slug: 'notion' })
+    })
+})
+
+describe('send_message', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    it('never sends the Chief of Staff a message to itself', async () => {
+        await expect(dispatchForemanHubTool(member, 'send_message', { agentId: 'foreman', message: 'hi' })).rejects.toThrow('You are the Chief of Staff')
+        expect(dispatchAccountTool).not.toHaveBeenCalled()
     })
 })

@@ -16,6 +16,8 @@ vi.mock('./agent.service', () => ({ changeAgentHandle: vi.fn(), createAgent: vi.
 vi.mock('./agent-setup.service', () => ({ installServiceSlugs: vi.fn() }))
 vi.mock('./services.service', () => ({ listCatalogServices: vi.fn(), listInstalledServices: vi.fn(), searchCatalogServices: vi.fn(), uninstallService: vi.fn() }))
 vi.mock('./mcp-knowledge.service', () => ({ dispatchKnowledgeTool: vi.fn() }))
+vi.mock('@/lib/foreman/member-turn', () => ({ sendForemanTurnAsMember: vi.fn() }))
+vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
 
 const ACTOR = workspaceActor(7)
 const LOOK = { eyes: 'googly', mouth: 'smile', color: '#7a2cf5' }

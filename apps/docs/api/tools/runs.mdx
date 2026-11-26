@@ -1,6 +1,6 @@
 ---
 title: "Messages and runs"
-description: "Talk to a coworker, read what it actually did, and stop a run."
+description: "Talk to a coworker or the Chief of Staff, read what it actually did, and stop a run."
 ---
 
 A run is one execution of a coworker. These tools are how you test a coworker without first inventing a routine for it, how you find out why the answer was not what you expected, and how you stop a run that went the wrong way. To read the whole conversation a run happened in, see [Conversations and cards](/api/tools/conversations).
@@ -9,7 +9,9 @@ A run is one execution of a coworker. These tools are how you test a coworker wi
 
 Talks to a coworker and waits for its answer.
 
-<ParamField body="agentId" type="string" required />
+<ParamField body="agentId" type="string" required>
+  A coworker's id, or `foreman` for the Chief of Staff.
+</ParamField>
 
 <ParamField body="message" type="string" required />
 
@@ -47,6 +49,12 @@ The answer names the conversation twice: `sessionId` is the engine's id, the one
   "output": "Done. I added 14 rows to the leads table and flagged 3 duplicates."
 }
 ```
+
+### Writing to the Chief of Staff
+
+With `agentId: "foreman"`, the message goes to the [Chief of Staff](/chief-of-staff) of the workspace, in a conversation of the member who created the key. Nobody else reads it, and the Chief of Staff acts with that member's rights. The conversation shows up among their threads with the Chief of Staff in the app.
+
+There, `sessionId` and `conversationId` are the same id: pass it back as `sessionId` to continue the conversation. `list_conversations` with `agentId: "foreman"` lists your conversations with it. A key that acts for the workspace rather than a member cannot write to the Chief of Staff: create a new key.
 
 <Note>
   A coworker can pause mid-run to ask you something or request an approval. When that happens the run finishes with the question waiting in the app, and `output` carries the coworker last message. See [Human in the loop](/agents/human-in-the-loop).

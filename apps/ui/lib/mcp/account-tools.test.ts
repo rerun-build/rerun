@@ -44,6 +44,7 @@ describe('account tool defs', () => {
             'create_agent_share',
             'revoke_agent_share',
             'delete_vault_entry',
+            'delete_box',
             'delete_memory',
             'delete_brain_page',
             'unpublish_page',
