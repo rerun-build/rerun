@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "请接受创作者计划条件以打开您的沙盒。",
     "invalidFeedback": "反馈无效",
     "messageNotFound": "未找到消息",
+    "messageEditEngineOutdated": "请更新此工作区的机器以编辑或删除消息。",
+    "messageEditRunInFlight": "请等待回复完成或将其停止，然后再更改消息。",
     "saveFeedbackFailed": "无法保存您的反馈",
     "feedbackNotFound": "未找到反馈",
     "feedbackUnavailable": "此处不提供反馈功能。",

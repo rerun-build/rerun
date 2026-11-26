@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "اقبل شروط برنامج صنّاع المحتوى لفتح بيئتك التجريبية.",
     "invalidFeedback": "ملاحظات غير صالحة",
     "messageNotFound": "الرسالة غير موجودة",
+    "messageEditEngineOutdated": "حدّث جهاز مساحة العمل هذه لتعديل الرسائل أو حذفها.",
+    "messageEditRunInFlight": "انتظر حتى ينتهي الرد، أو أوقفه، قبل تغيير رسالة.",
     "saveFeedbackFailed": "تعذّر حفظ ملاحظاتك",
     "feedbackNotFound": "الملاحظات غير موجودة",
     "feedbackUnavailable": "الملاحظات غير متاحة هنا.",

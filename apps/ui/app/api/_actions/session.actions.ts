@@ -3,9 +3,11 @@
 import { assertSessionInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findIdleSessions, findSessionActiveRun } from '@/app/api/_services/chat.service'
+import { ApiError } from '@/lib/api-error'
+import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { historyCursorSchema, sessionHistoryFilterSchema, type SessionHistoryFilter } from '@/lib/chat/history-filter'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
-import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentSessions, listAgentThreads, readPendingRequest, readSessionMessages, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryPage, type ThreadRow } from '@/app/api/_services/conversation.service'
+import { adoptEngineSession, cancelSessionRuns, conversationTakesMessageEdits, deleteConversationMessage, finalizeSession, listAgentSessions, listAgentThreads, readPendingRequest, readSessionMessages, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryPage, type ThreadRow } from '@/app/api/_services/conversation.service'
 
 export async function finalizeSessionAction(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
     await finalizeSession(sessionId, status, options).catch(() => {})
@@ -65,4 +67,18 @@ export async function cancelSessionRunsAction(sessionId: string): Promise<boolea
     return cancelSessionRuns(sessionId)
         .then(() => true)
         .catch(() => false)
+}
+
+export async function deleteConversationMessageAction(sessionId: string, messageId: string): Promise<{ ok: true; deletedIds: string[] } | ActionFailure> {
+    try {
+        return { ok: true, deletedIds: await deleteConversationMessage(sessionId, messageId) }
+    } catch (err) {
+        if (err instanceof ApiError && err.code) return failure(err.code)
+        return failureOf(err)
+    }
+}
+
+// Null when the machine could not be asked: the send then goes, and the hub refuses it if it must.
+export async function messageEditsAvailableAction(sessionId: string): Promise<boolean | null> {
+    return conversationTakesMessageEdits(sessionId).catch(() => null)
 }

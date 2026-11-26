@@ -1,6 +1,7 @@
-import { messagePreview } from '@rerun/contracts'
+import { messagePreview, messageText } from '@rerun/contracts'
 
 import type { Database } from '@/app/api/database.types'
+import type { HistoryMessage } from '@/lib/chat/engine-history'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
 type SessionUpdate = Database['public']['Tables']['sessions']['Update']
@@ -22,6 +23,17 @@ export async function recordSentMessage(sessionId: string, text: string, authorI
     } catch (err) {
         console.error('[session-preview] failed to record the sent message', err)
     }
+}
+
+// The line under the coworker once a message left its conversation: the last one still there, at the
+// time it was written, or nothing.
+export async function recordTranscriptEnd(sessionId: string, messages: readonly HistoryMessage[]): Promise<void> {
+    const last = messages.findLast(message => messagePreview(messageText(message)))
+    const update: SessionUpdate = last
+        ? { last_message: messagePreview(messageText(last)), last_message_from: last.role === 'user' ? 'user' : 'agent', last_message_author_id: last.role === 'user' ? (last.metadata?.authorId ?? null) : null, last_message_at: last.metadata?.createdAt ?? null }
+        : { last_message: null, last_message_from: null, last_message_author_id: null, last_message_at: null }
+    const { error } = await createServiceRoleClient().from('sessions').update<SessionUpdate>(update).eq('id', sessionId)
+    if (error) throw new Error(`Failed to record the end of session ${sessionId}: ${error.message}`)
 }
 
 // What the coworker answered, on the row of the conversation its run belongs to.

@@ -113,6 +113,7 @@ export const engineSessionSchema = sessionSchema
 export const engineSessionsListSchema = sessionsListSchema
 export const engineMessageSchema = messageSchema
 export const engineMessagesListSchema = messagesListSchema
+export const engineDeletedMessagesSchema = z.object({ deletedIds: z.array(z.string()) })
 export const engineMemorySchema = memorySchema
 export const engineMemoriesListSchema = memoriesListSchema
 export const engineFileEntrySchema = fileEntrySchema

@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "יש לאשר את תנאי תוכנית היוצרים כדי לפתוח את סביבת הניסוי שלך.",
     "invalidFeedback": "משוב לא תקין",
     "messageNotFound": "ההודעה לא נמצאה",
+    "messageEditEngineOutdated": "יש לעדכן את המכונה של סביבת העבודה הזו כדי לערוך או למחוק הודעות.",
+    "messageEditRunInFlight": "יש להמתין לסיום התשובה, או לעצור אותה, לפני שינוי הודעה.",
     "saveFeedbackFailed": "לא ניתן היה לשמור את המשוב שלך",
     "feedbackNotFound": "המשוב לא נמצא",
     "feedbackUnavailable": "משוב לא זמין כאן.",

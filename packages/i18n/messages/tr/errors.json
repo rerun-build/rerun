@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "Sandbox'ınızı açmak için içerik üreticisi programının koşullarını kabul edin.",
     "invalidFeedback": "Geçersiz geri bildirim",
     "messageNotFound": "Mesaj bulunamadı",
+    "messageEditEngineOutdated": "Mesajları düzenlemek veya silmek için bu çalışma alanının makinesini güncelleyin.",
+    "messageEditRunInFlight": "Bir mesajı değiştirmeden önce yanıtın bitmesini bekleyin veya yanıtı durdurun.",
     "saveFeedbackFailed": "Geri bildiriminiz kaydedilemedi",
     "feedbackNotFound": "Geri bildirim bulunamadı",
     "feedbackUnavailable": "Geri bildirim burada kullanılamıyor.",

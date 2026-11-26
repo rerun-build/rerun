@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "請接受創作者計畫條件，以開啟您的沙盒。",
     "invalidFeedback": "無效的意見回饋",
     "messageNotFound": "找不到訊息",
+    "messageEditEngineOutdated": "請更新這個工作區的機器，才能編輯或刪除訊息。",
+    "messageEditRunInFlight": "請等回覆完成或將其停止，再修改訊息。",
     "saveFeedbackFailed": "無法儲存您的意見回饋",
     "feedbackNotFound": "找不到意見回饋",
     "feedbackUnavailable": "此處無法提供意見回饋。",

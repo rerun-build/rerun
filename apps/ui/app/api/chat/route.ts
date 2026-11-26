@@ -8,6 +8,7 @@ import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { embedTextShared } from '@/lib/services/embed'
 import { sendTurn } from '@/lib/chat/send-turn'
+import { supportsMessageEdit } from '@/lib/engine/client'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { isConversationId } from '@/lib/chat/conversation-id'
 import { installSessionTitle, parseInstallMessage } from '@/lib/chat/install-marker'
@@ -15,7 +16,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { FOREMAN_AGENT_ID, SESSION_NOT_FOUND, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, MESSAGE_EDIT_ENGINE_OUTDATED, MESSAGE_NOT_FOUND, SESSION_NOT_FOUND, engineMessageIdOf, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -29,6 +30,9 @@ type ChatRequestBody = {
     // `general` opens the coworker's main conversation when no `sessionId` names it yet. Read only
     // on a new conversation; an install always runs in a thread of its own.
     kind?: SessionKind
+    // The message this one replaces, with everything after it: an edited message, a reply asked
+    // again. Its id as the chat holds it (`engine-<row id>`).
+    replaceFrom?: unknown
 }
 
 // A code rather than the engine's sentence: the chat turns it into a notice that opens a new
@@ -84,6 +88,11 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
 
+    const replaceFrom = typeof body.replaceFrom === 'string' ? engineMessageIdOf(body.replaceFrom) : null
+    if (body.replaceFrom != null && (!replaceFrom || !sessionId)) {
+        return Response.json({ error: MESSAGE_NOT_FOUND }, { status: 404 })
+    }
+
     // Not a conversation row's id (an engine session id carried into a chat link, typically): no
     // conversation can carry it. Refused before the embedding below, which a message that is never
     // sent would only waste.
@@ -106,6 +115,11 @@ export async function POST(request: Request) {
     const target = await resolveAgentTarget(agentId, 'use', actor).catch(() => null)
     if (!target || target.engineAgentId === FOREMAN_AGENT_ID) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
+    }
+    // An older engine drops `replaceFrom` and only appends: the edit would show, then the old
+    // messages would come back with the next reload.
+    if (replaceFrom && !(await supportsMessageEdit(target.conn))) {
+        return Response.json({ error: MESSAGE_EDIT_ENGINE_OUTDATED }, { status: 409 })
     }
 
     // A voice message carries its audio as a marker appended to the transcript; the session title
@@ -151,7 +165,7 @@ export async function POST(request: Request) {
         sender: actor,
         author,
         queued: queued === true,
-        engine: async () => ({ connectionId, model, effort, source, callableAgentIds: await callablePromise, install: !!install && isNew, userLanguage: install && isNew ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }),
+        engine: async () => ({ connectionId, model, effort, source, callableAgentIds: await callablePromise, ...(replaceFrom && { replaceFrom }), install: !!install && isNew, userLanguage: install && isNew ? (preferredLanguage(request.headers.get('accept-language')) ?? undefined) : undefined }),
         conversationId: sessionId,
         engineSessionId,
         log: `agent=${agentId}`,

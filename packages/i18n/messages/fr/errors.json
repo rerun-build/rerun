@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "Acceptez les conditions du programme créateur pour ouvrir votre sandbox.",
     "invalidFeedback": "Avis invalide",
     "messageNotFound": "Message introuvable",
+    "messageEditEngineOutdated": "Mettez à jour la machine de ce workspace pour modifier ou supprimer des messages.",
+    "messageEditRunInFlight": "Attendez la fin de la réponse, ou arrêtez-la, avant de modifier un message.",
     "saveFeedbackFailed": "Impossible d'enregistrer votre avis",
     "feedbackNotFound": "Avis introuvable",
     "feedbackUnavailable": "Les avis ne sont pas disponibles ici.",

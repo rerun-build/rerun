@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "Akzeptiere die Bedingungen des Creator-Programms, um deine Sandbox zu öffnen.",
     "invalidFeedback": "Ungültiges Feedback",
     "messageNotFound": "Nachricht nicht gefunden",
+    "messageEditEngineOutdated": "Aktualisiere die Maschine dieses Workspace, um Nachrichten zu bearbeiten oder zu löschen.",
+    "messageEditRunInFlight": "Warte, bis die Antwort fertig ist, oder stoppe sie, bevor du eine Nachricht änderst.",
     "saveFeedbackFailed": "Dein Feedback konnte nicht gespeichert werden",
     "feedbackNotFound": "Feedback nicht gefunden",
     "feedbackUnavailable": "Feedback ist hier nicht verfügbar.",

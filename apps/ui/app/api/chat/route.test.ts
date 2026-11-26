@@ -28,7 +28,7 @@ vi.mock('@/app/api/_services/chat.service', async importOriginal => ({
 vi.mock('@/app/api/_services/session-preview.service', () => ({ recordSentMessage: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('@/lib/ai/generate-title', () => ({ generateSessionTitle: vi.fn().mockResolvedValue('Title') }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ chat: vi.fn(), reconnectRun: vi.fn(), cancelRun: vi.fn().mockResolvedValue(undefined) }))
+vi.mock('@/lib/engine/client', () => ({ chat: vi.fn(), reconnectRun: vi.fn(), cancelRun: vi.fn().mockResolvedValue(undefined), supportsMessageEdit: vi.fn() }))
 
 const busy = () => Response.json({ runId: 'run-1', startedAt: null }, { status: 409 })
 const streaming = (runId: string, sessionId = 'engine-session') => new Response('data: {}\n\n', { headers: { 'Content-Type': 'text/event-stream', 'x-run-id': runId, 'x-session-id': sessionId } })
@@ -52,6 +52,7 @@ describe('POST /api/chat', () => {
         vi.mocked(resolveAgentTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } })
         vi.mocked(getExistingSession).mockResolvedValue({ sessionId: SESSION, agentId: 'agent', engineSessionId: 'engine-session' })
         vi.mocked(callableEngineAgentIds).mockResolvedValue(undefined)
+        vi.mocked(engine.supportsMessageEdit).mockResolvedValue(true)
     })
 
     afterEach(() => {
@@ -200,6 +201,42 @@ describe('POST /api/chat', () => {
 
         expect(response.status).toBe(404)
         expect(await response.json()).toEqual({ error: 'session_not_found' })
+    })
+
+    describe('replacing a message', () => {
+        it('hands the engine the row the message replaces, without the prefix of the transcript', async () => {
+            vi.mocked(engine.chat).mockImplementation(async () => streaming('run-edit'))
+
+            const response = await settle(POST(request({ text: 'ship it today', replaceFrom: 'engine-row-1' })))
+
+            expect(response.status).toBe(200)
+            expect(vi.mocked(engine.chat).mock.calls[0][2]).toMatchObject({ sessionId: 'engine-session', message: 'ship it today', replaceFrom: 'row-1' })
+        })
+
+        it('refuses an id the transcript never gave, or one with no conversation, without reaching the engine', async () => {
+            expect((await settle(POST(request({ replaceFrom: 'streamed-1' })))).status).toBe(404)
+            expect((await settle(POST(request({ sessionId: undefined, replaceFrom: 'engine-row-1' })))).status).toBe(404)
+            expect(engine.chat).not.toHaveBeenCalled()
+        })
+
+        it('answers engine_outdated on a machine that would only append', async () => {
+            vi.mocked(engine.supportsMessageEdit).mockResolvedValue(false)
+
+            const response = await settle(POST(request({ replaceFrom: 'engine-row-1' })))
+
+            expect(response.status).toBe(409)
+            expect(await response.json()).toEqual({ error: 'engine_outdated' })
+            expect(engine.chat).not.toHaveBeenCalled()
+        })
+
+        it('answers message_not_found when the engine no longer holds the message', async () => {
+            vi.mocked(engine.chat).mockResolvedValue(Response.json({ error: 'message not found', code: 'message_not_found' }, { status: 404 }))
+
+            const response = await settle(POST(request({ replaceFrom: 'engine-row-1' })))
+
+            expect(response.status).toBe(404)
+            expect(await response.json()).toEqual({ error: 'message_not_found' })
+        })
     })
 
     describe('General', () => {

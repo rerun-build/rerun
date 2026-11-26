@@ -15,6 +15,7 @@ import {
     ENGINE_CAPABILITY_FOREMAN_AGENT,
     ENGINE_CAPABILITY_FOREMAN_COWORKER,
     ENGINE_CAPABILITY_FOREMAN_FILES,
+    ENGINE_CAPABILITY_MESSAGE_EDIT,
     FOREMAN_AGENT_ID,
     checkinStartedSchema,
     foremanCheckinsSchema,
@@ -143,6 +144,7 @@ import {
     engineFileEntriesListSchema,
     engineMemoriesListSchema,
     engineMessagesListSchema,
+    engineDeletedMessagesSchema,
     engineRunDetailSchema,
     engineRunsListSchema,
     engineRunStepsListSchema,
@@ -557,13 +559,18 @@ export async function getSessionMessages(conn: EngineConnection, agentId: string
     return engineMessagesListSchema.parse(await res.json()).messages
 }
 
+// The ids of the rows that went: a reply takes its tool calls and their results with it.
+export async function deleteSessionMessage(conn: EngineConnection, agentId: string, sessionId: string, messageId: string): Promise<string[]> {
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/sessions/${encodeURIComponent(sessionId)}/messages/${encodeURIComponent(messageId)}`, { method: 'DELETE' }, d => engineDeletedMessagesSchema.parse(d).deletedIds)
+}
+
 // --- Chat (SSE, AI-SDK UI message stream protocol) ---
 
 // Returns the raw fetch Response so the caller can read the `x-session-id`
 // header and pipe the SSE body straight through to the browser.
 // `teamRequests` comes from `offersTeamRequests` on the server: this module also lands in the browser
 // bundle, so it cannot read a workspace's brand itself.
-export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; effort?: ReasoningEffort | null; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[]; teamRequests?: boolean }): Promise<Response> {
+export async function chat(conn: EngineConnection, agentId: string, params: { sessionId?: string; message: string; connectionId?: string; model?: string; effort?: ReasoningEffort | null; source?: SessionSource; foreman?: ForemanBrief; author?: MessageAuthor; install?: boolean; userLanguage?: string; callableAgentIds?: string[]; teamRequests?: boolean; replaceFrom?: string }): Promise<Response> {
     return fetchEngine(`${conn.baseUrl}/agents/${encodeURIComponent(agentId)}/chat`, {
         method: 'POST',
         headers: buildHeaders(conn),
@@ -725,6 +732,10 @@ async function engineCapabilities(conn: EngineConnection): Promise<Set<string>> 
 
 export async function supportsStreamedUploads(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FILES_STREAM)
+}
+
+export async function supportsMessageEdit(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_MESSAGE_EDIT)
 }
 
 export async function supportsForemanFiles(conn: EngineConnection): Promise<boolean> {

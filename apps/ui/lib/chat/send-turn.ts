@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { ENGINE_SESSION_NOT_FOUND, type MessageAuthor } from '@rerun/contracts'
+import { ENGINE_SESSION_NOT_FOUND, MESSAGE_NOT_FOUND, type MessageAuthor } from '@rerun/contracts'
 
 import type { UserActor } from '@/app/api/_auth/access'
 import { GeneralAlreadyOpenError, recordMessageSent, type AgentChatTarget } from '@/app/api/_services/chat.service'
@@ -103,6 +103,7 @@ export async function sendTurn(turn: Turn): Promise<Response> {
                 console.warn(`[CHAT SESSION GONE] ${turn.log} session=${conversationId ?? '(new)'} engineSession=${engineSessionId ?? '?'}`)
                 return turn.sessionGone()
             }
+            if (engineRes.status === 404 && errBody.includes(MESSAGE_NOT_FOUND)) return Response.json({ error: MESSAGE_NOT_FOUND }, { status: 404 })
             return Response.json({ error: `Engine error: ${engineRes.status} ${errBody}` }, { status: 502 })
         }
 

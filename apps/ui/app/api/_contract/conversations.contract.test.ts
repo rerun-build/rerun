@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
-import type { BrainPageDetail } from '@/lib/engine/client'
+import { EngineRequestError, type BrainPageDetail } from '@/lib/engine/client'
 import type { EngineMessage, EngineRun, EngineSkillProposal } from '@/lib/engine/types'
 import { callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
 import { fakeSupabase, tableResolver, writeMethodOf, type FakeSupabase, type SupabaseResolver } from '@/test/supabase-fake'
@@ -25,6 +25,8 @@ const engine = vi.hoisted(() => ({
     decideSkillProposal: vi.fn<typeof import('@/lib/engine/client').decideSkillProposal>(),
     revertBrainPage: vi.fn<typeof import('@/lib/engine/client').revertBrainPage>(),
     chat: vi.fn<typeof import('@/lib/engine/client').chat>(),
+    deleteSessionMessage: vi.fn<typeof import('@/lib/engine/client').deleteSessionMessage>(),
+    supportsMessageEdit: vi.fn<typeof import('@/lib/engine/client').supportsMessageEdit>(),
 }))
 
 vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), ...engine }))
@@ -252,6 +254,8 @@ describe('a conversation in the mobile app', () => {
         engine.listSkillProposals.mockResolvedValue([proposal])
         engine.decideSkillProposal.mockResolvedValue({ ...proposal, status: 'accepted' })
         engine.revertBrainPage.mockResolvedValue(revertedPage)
+        engine.supportsMessageEdit.mockResolvedValue(true)
+        engine.deleteSessionMessage.mockResolvedValue(['msg-u1'])
     })
 
     describe('the transcript', () => {
@@ -365,6 +369,69 @@ describe('a conversation in the mobile app', () => {
             expect(res.status).toBe(404)
             await expectContract(mobileApi.stopConversation, res, 404)
             expect(engine.cancelRun).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('deleting a message', () => {
+        const remove = async (id: string, messageId: string) => {
+            const { DELETE } = await import('@/app/api/v1/conversations/[id]/messages/[messageId]/route')
+            return callRoute(DELETE, mobileApi.deleteConversationMessage, { params: { id, messageId } })
+        }
+
+        it('deletes the engine row the transcript id names', async () => {
+            await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'engine-msg-u1'))
+            expect(engine.deleteSessionMessage).toHaveBeenCalledWith(expect.objectContaining({ apiKey: 'key' }), 'scout', 'eng-bakeries', 'msg-u1')
+        })
+
+        it('answers 404 for an id the transcript never gave, or a conversation of another workspace', async () => {
+            expect(await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'streamed-1'), 404)).toMatchObject({ code: 'messageNotFound' })
+            await expectContract(mobileApi.deleteConversationMessage, await remove(ELSEWHERE, 'engine-msg-u1'), 404)
+            expect(engine.deleteSessionMessage).not.toHaveBeenCalled()
+        })
+
+        it('puts the line under the coworker back on the last message left, at the time it was written', async () => {
+            engine.getSessionMessages.mockResolvedValue(transcript.slice(0, 1))
+            await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'engine-msg-a2'))
+            expect(state.db?.writes('sessions')).toEqual([
+                {
+                    method: 'update',
+                    payload: { last_message: 'Find bakeries in Lyon that are not in this list yet.', last_message_from: 'user', last_message_author_id: 'user-ada', last_message_at: '2026-11-19T08:38:00.000Z' },
+                    filters: [{ table: 'sessions', method: 'eq', args: ['id', BAKERIES] }],
+                },
+            ])
+        })
+
+        it('clears the line once nothing is left', async () => {
+            engine.getSessionMessages.mockResolvedValue([])
+            await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'engine-msg-u1'))
+            expect(state.db?.writes('sessions')[0]).toMatchObject({ payload: { last_message: null, last_message_from: null, last_message_author_id: null, last_message_at: null } })
+        })
+
+        it('lets go of a wait whose card went with the reply, and only that wait', async () => {
+            await expectContract(mobileApi.deleteConversationMessage, await remove(PRICING, 'engine-msg-a2'))
+            expect(state.db?.writes('sessions')[1]).toEqual({
+                method: 'update',
+                payload: { status: 'idle' },
+                filters: [
+                    { table: 'sessions', method: 'eq', args: ['id', PRICING] },
+                    { table: 'sessions', method: 'eq', args: ['status', 'awaiting_question'] },
+                ],
+            })
+        })
+
+        it('keeps the wait while its card is still in the conversation', async () => {
+            engine.getSessionMessages.mockResolvedValue([
+                { id: 'msg-q1', sessionId: 'eng-pricing', role: 'assistant', contentJson: JSON.stringify([{ type: 'text', text: 'Which price list?' }, { type: 'tool-call', toolCallId: 'call-ask', toolName: 'ask_user', input: { questions: [{ question: 'Which price list?', options: ['2026', 'Summer promo'] }] } }]), toolCallsJson: null, authorId: null, createdAt: '2026-11-19T08:30:00.000Z' },
+            ])
+            await expectContract(mobileApi.deleteConversationMessage, await remove(PRICING, 'engine-msg-u9'))
+            expect(state.db?.writes('sessions').filter(write => 'status' in (write.payload as object))).toEqual([])
+        })
+
+        it('answers 409 while a reply runs, and on a machine that predates message edits', async () => {
+            engine.deleteSessionMessage.mockRejectedValueOnce(new EngineRequestError('busy', 409))
+            expect(await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'engine-msg-u1'), 409)).toMatchObject({ code: 'messageEditRunInFlight' })
+            engine.supportsMessageEdit.mockResolvedValue(false)
+            expect(await expectContract(mobileApi.deleteConversationMessage, await remove(BAKERIES, 'engine-msg-u1'), 409)).toMatchObject({ code: 'messageEditEngineOutdated' })
         })
     })
 

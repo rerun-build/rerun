@@ -5,7 +5,7 @@ import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { encodePeaks } from '@/lib/voice/peaks'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { hitlKindOf } from '@/lib/chat-hitl'
-import { PROVIDER_SWITCH_PART, readProviderSwitchEntry, isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata, type ProviderSwitch } from '@rerun/contracts'
+import { ENGINE_MESSAGE_ID_PREFIX, PROVIDER_SWITCH_PART, readProviderSwitchEntry, isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata, type ProviderSwitch } from '@rerun/contracts'
 import { randomUuid } from '@/lib/random-uuid'
 
 type TextPart = { type: 'text'; text: string }
@@ -69,7 +69,7 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
         const content = safeParse(m.contentJson)
 
         if (m.role === 'user') {
-            result.push({ id: `engine-${m.id}`, role: 'user', parts: [{ type: 'text', text: extractText(content) }], metadata: { createdAt: m.createdAt, ...(m.authorId && { authorId: m.authorId }), ...(m.authorVia === 'foreman' && { relayedBy: 'foreman' as const }) } })
+            result.push({ id: `${ENGINE_MESSAGE_ID_PREFIX}${m.id}`, role: 'user', parts: [{ type: 'text', text: extractText(content) }], metadata: { createdAt: m.createdAt, ...(m.authorId && { authorId: m.authorId }), ...(m.authorVia === 'foreman' && { relayedBy: 'foreman' as const }) } })
             continue
         }
 
@@ -118,7 +118,7 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
             previous.parts.push(...parts)
             continue
         }
-        result.push({ id: `engine-${m.id}`, role: 'assistant', parts, metadata: { createdAt: m.createdAt } })
+        result.push({ id: `${ENGINE_MESSAGE_ID_PREFIX}${m.id}`, role: 'assistant', parts, metadata: { createdAt: m.createdAt } })
     }
 
     return result

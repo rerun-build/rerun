@@ -3,16 +3,19 @@ import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/owner
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, type SessionUsageSeed, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
 import { EMPTY_SESSION_SNAPSHOT, type SessionSnapshot } from '@/lib/chat/session-snapshot'
-import { openSkillProposal, pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { openSkillProposal, PEEK_STATUSES, pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { recordTranscriptEnd } from '@/app/api/_services/session-preview.service'
 import { getBrand } from '@/lib/brand/server'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
 import { sanitizeIlike } from '@/lib/search/ilike'
-import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
-import type { EngineSession, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
+import { cancelRun, deleteSessionMessage, EngineRequestError, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals, supportsMessageEdit } from '@/lib/engine/client'
+import { ApiError } from '@/lib/api-error'
+import { refusal } from '@/lib/i18n/action-error'
+import type { EngineConnection, EngineSession, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { sourcesOf, type SessionHistoryFilter } from '@/lib/chat/history-filter'
-import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
+import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, FOREMAN_AGENT_ID, agentKindPolicy, engineMessageIdOf, type AgentKind, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/supabase/server'
@@ -523,6 +526,46 @@ export async function readSessionSnapshot(sessionId: string): Promise<SessionSna
     const usage = runs?.lastDone ? await readUsageSeed(conn, engineAgentId, runs.lastDone).catch(() => null) : null
 
     return { messages, usage, lastError: lastRunError(runs?.latest), activeRunId: runs?.running?.id ?? null, proposals }
+}
+
+// Whether the machine running the conversation can edit and delete its messages: a box that has
+// not updated yet would only append.
+export async function conversationTakesMessageEdits(sessionId: string): Promise<boolean> {
+    const ctx = await getSessionEngineContext(sessionId)
+    return !!ctx?.engineSessionId && (await supportsMessageEdit(ctx.conn))
+}
+
+// One message taken out of a conversation, by its id as the chat holds it (`engine-<row id>`). A
+// reply goes whole, its tool calls with it. Answers the engine ids that went.
+export async function deleteConversationMessage(sessionId: string, messageId: string, actor?: Actor): Promise<string[]> {
+    const engineMessageId = engineMessageIdOf(messageId)
+    const ctx = await getSessionEngineContext(sessionId, actor)
+    if (!engineMessageId || !ctx || !ctx.engineSessionId) throw new ApiError(404, refusal('messageNotFound'))
+    if (!(await supportsMessageEdit(ctx.conn))) throw new ApiError(409, refusal('messageEditEngineOutdated'))
+    let deletedIds: string[]
+    try {
+        deletedIds = await deleteSessionMessage(ctx.conn, ctx.engineAgentId, ctx.engineSessionId, engineMessageId)
+    } catch (err) {
+        if (err instanceof EngineRequestError && err.status === 404) throw new ApiError(404, refusal('messageNotFound'))
+        if (err instanceof EngineRequestError && err.status === 409) throw new ApiError(409, refusal('messageEditRunInFlight'))
+        throw err
+    }
+    await settleAfterDelete(sessionId, ctx.conn, ctx.engineAgentId, ctx.engineSessionId).catch(err => console.error('[conversation] could not settle the row after a deleted message', err))
+    return deletedIds
+}
+
+// The row of the conversation follows what is left of it: the line under the coworker, and a wait on
+// a card that went with the deleted reply.
+async function settleAfterDelete(sessionId: string, conn: EngineConnection, engineAgentId: string, engineSessionId: string): Promise<void> {
+    const messages = transformEngineMessages(await getSessionMessages(conn, engineAgentId, engineSessionId))
+    await recordTranscriptEnd(sessionId, messages)
+    const supabase = createServiceRoleClient()
+    const { data: row } = await selectMaybeSingle(supabase, 'sessions', ['status'] as const, { id: sessionId })
+    if (!row || !PEEK_STATUSES.has(row.status)) return
+    const proposal = row.status === 'awaiting_approval' ? openSkillProposal(await listSkillProposals(conn, engineAgentId, engineSessionId)) : null
+    if (pendingRequestPeek(messages).pending || proposal) return
+    // Only the wait read above: a run started meanwhile owns the status now.
+    await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status: 'idle' }).eq('id', sessionId).eq('status', row.status)
 }
 
 // Stop covers the whole conversation, not just the run this client happens to be streaming. A run

@@ -121,6 +121,8 @@
     "acceptCreatorTermsFirst": "Acepta las condiciones del programa de creadores para abrir tu sandbox.",
     "invalidFeedback": "Opinión no válida",
     "messageNotFound": "Mensaje no encontrado",
+    "messageEditEngineOutdated": "Actualiza la máquina de este workspace para editar o eliminar mensajes.",
+    "messageEditRunInFlight": "Espera a que termine la respuesta, o detenla, antes de cambiar un mensaje.",
     "saveFeedbackFailed": "No se pudo guardar tu opinión",
     "feedbackNotFound": "Opinión no encontrada",
     "feedbackUnavailable": "Las opiniones no están disponibles aquí.",

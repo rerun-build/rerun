@@ -86,6 +86,9 @@ export const hubChatRequestSchema = z.object({
     connectionId: z.string().optional(),
     model: z.string().optional(),
     source: sessionSourceSchema.optional(),
+    // The message this one replaces with everything after it (an edited message, a reply asked
+    // again), by the id the transcript gives it. 409 `engine_outdated` on a machine that predates it.
+    replaceFrom: z.string().optional(),
 })
 
 export const chatResumeQuerySchema = z.object({ agentId: z.string(), runId: z.string() })
@@ -202,6 +205,9 @@ export const mobileApi = {
     // 304: the transcript the app holds, named by the ETag it sent back, has not changed.
     getConversationMessages: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/messages', response: z.array(conversationMessageSchema), emptyStatus: 304, headers: ['ETag'] }),
     getActiveRun: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/active-run', response: activeRunSchema }),
+    // A message of the conversation, by the id the transcript gives it: a reply goes whole. 409 while a
+    // reply is running, or when the machine of the workspace predates message edits.
+    deleteConversationMessage: hubEndpoint({ method: 'DELETE', path: '/api/v1/conversations/{id}/messages/{messageId}', response: 'none', errors: { 404: hubErrorSchema, 409: hubErrorSchema } }),
     stopConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/stop', response: 'none' }),
     acknowledgeConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/acknowledge', response: 'none' }),
     // A button under a push: 409 once the card it names is no longer the one waiting, or the coworker is still busy.

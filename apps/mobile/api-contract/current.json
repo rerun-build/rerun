@@ -49,6 +49,9 @@
                                     "queued": {
                                         "type": "boolean"
                                     },
+                                    "replaceFrom": {
+                                        "type": "string"
+                                    },
                                     "sessionId": {
                                         "type": "string"
                                     },
@@ -7559,6 +7562,82 @@
                     }
                 },
                 "x-mobile-api": "getConversationMessages"
+            }
+        },
+        "/api/v1/conversations/{id}/messages/{messageId}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "messageId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "deleteConversationMessage"
             }
         },
         "/api/v1/conversations/{id}/reply": {
