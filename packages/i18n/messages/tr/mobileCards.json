@@ -77,5 +77,26 @@
     },
     "table": {
         "partial": "{shown} / {total}"
+    },
+    "published": {
+        "asksPublic": "{coworker}, bağlantıya sahip herkesin açabilmesini istiyor",
+        "keepPrivate": "Gizli tut",
+        "makePublic": "Herkese aç",
+        "madePublicByYou": "Siz herkese açtınız",
+        "madePublic": "Herkese açıldı",
+        "keptFor": "{workspace} üyelerine özel tutuldu",
+        "unpublished": "Yayından kaldırıldı",
+        "copy": "Bağlantıyı kopyala",
+        "copied": "Kopyalandı",
+        "open": "Aç",
+        "updateFailed": "Bağlantı güncellenemedi",
+        "fallbackCoworker": "Coworker'ınız",
+        "fallbackWorkspace": "Çalışma alanı",
+        "access": {
+            "public": "Bağlantıya sahip herkes",
+            "workspace": "{workspace} üyeleri",
+            "password": "Parolaya sahip herkes",
+            "invited": "Yalnızca davet ettiğiniz kişiler"
+        }
     }
 }

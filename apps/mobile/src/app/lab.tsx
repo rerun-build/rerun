@@ -84,6 +84,8 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Steps, folded', href: '/lab-markdown?part=steps' },
     { label: 'Steps, running', href: '/lab-markdown?part=running' },
     { label: 'Tool steps', href: '/lab-steps' },
+    { label: 'Published link card', href: '/lab-published' },
+    { label: 'Published link card, dark', href: '/lab-published?scheme=dark' },
     { label: 'Tool steps, dark', href: '/lab-steps?scheme=dark' },
     { label: 'Paid data sources', href: '/lab-steps?scenario=paid' },
     { label: 'Cards: sub-runs, apps, compaction', href: '/lab-markdown?part=cards' },

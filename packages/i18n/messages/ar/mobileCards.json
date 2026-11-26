@@ -77,5 +77,26 @@
     },
     "table": {
         "partial": "{shown} من {total}"
+    },
+    "published": {
+        "asksPublic": "يريد {coworker} أن يتمكن أي شخص لديه الرابط من فتحه",
+        "keepPrivate": "إبقاؤه خاصًا",
+        "makePublic": "جعله عامًا",
+        "madePublicByYou": "جعلته عامًا",
+        "madePublic": "أصبح عامًا",
+        "keptFor": "متاح لأعضاء {workspace} فقط",
+        "unpublished": "أُلغي النشر",
+        "copy": "نسخ الرابط",
+        "copied": "تم النسخ",
+        "open": "فتح",
+        "updateFailed": "تعذّر تحديث الرابط",
+        "fallbackCoworker": "زميلك",
+        "fallbackWorkspace": "مساحة العمل",
+        "access": {
+            "public": "أي شخص لديه الرابط",
+            "workspace": "أعضاء {workspace}",
+            "password": "أي شخص لديه كلمة المرور",
+            "invited": "من تدعوهم فقط"
+        }
     }
 }

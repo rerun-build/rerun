@@ -77,5 +77,26 @@
     },
     "table": {
         "partial": "{shown} / {total}"
+    },
+    "published": {
+        "asksPublic": "{coworker} 希望任何拥有链接的人都能打开它",
+        "keepPrivate": "保持私密",
+        "makePublic": "设为公开",
+        "madePublicByYou": "已由您设为公开",
+        "madePublic": "已设为公开",
+        "keptFor": "仅限 {workspace} 的成员",
+        "unpublished": "已取消发布",
+        "copy": "复制链接",
+        "copied": "已复制",
+        "open": "打开",
+        "updateFailed": "无法更新链接",
+        "fallbackCoworker": "您的同事",
+        "fallbackWorkspace": "工作区",
+        "access": {
+            "public": "任何拥有链接的人",
+            "workspace": "{workspace} 的成员",
+            "password": "任何拥有密码的人",
+            "invited": "仅限您邀请的人"
+        }
     }
 }

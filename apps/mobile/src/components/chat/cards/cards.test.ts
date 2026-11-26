@@ -1,6 +1,6 @@
 import { fileHeadersFor, isHubFileUrl, mediaUrl, rawFileUrl } from '@/api/files'
 
-import { cardOf, connectCardOf, eventCardOf, sizeParts, toneOf } from './cards'
+import { cardOf, connectCardOf, eventCardOf, publishCardOf, publishCardsByMessage, sizeParts, toneOf } from './cards'
 
 jest.mock('expo-file-system', () => ({ Directory: class {}, File: class {}, Paths: {} }))
 jest.mock('expo-sharing', () => ({ shareAsync: jest.fn() }))
@@ -106,5 +106,70 @@ describe('connectCardOf', () => {
     it('leaves a search of the catalog and a call still running to the steps', () => {
         expect(connectCardOf({ type: 'tool-rerun_hub_service_search', state: 'output-available', output: [] })).toBeNull()
         expect(connectCardOf({ type: 'tool-rerun_hub_service_install', state: 'input-available' })).toBeNull()
+    })
+})
+
+describe('publishCardOf', () => {
+    const published = { status: 'published', url: 'https://pricing-launch.rerun.site/', fileUrl: null, slug: 'pricing-launch', path: 'pages/pricing.html', kind: 'file', contentType: 'text/html', size: 18420, title: 'Pricing page', access: 'workspace', requestedAccess: 'public', dataTables: [], message: 'Published.' }
+
+    it('reads the link and the public access the coworker asked for, live and reloaded', () => {
+        const card = { slug: 'pricing-launch', url: 'https://pricing-launch.rerun.site/', path: 'pages/pricing.html', title: 'Pricing page', access: 'workspace', requestedAccess: 'public' }
+        expect(publishCardOf({ type: 'tool-rerun_hub_publish_file', state: 'output-available', output: published })).toEqual(card)
+        expect(publishCardOf({ type: 'dynamic-tool', toolName: 'rerun__rerun_hub_publish_file', state: 'output-available', output: reloaded(published) })).toEqual(card)
+    })
+
+    it('reads a call made before links had an access as a public link titled by its path', () => {
+        const { title: _title, access: _access, requestedAccess: _asked, ...older } = published
+        expect(publishCardOf({ type: 'tool-rerun_hub_publish_file', state: 'output-available', output: older })).toMatchObject({ title: 'pages/pricing.html', access: 'public', requestedAccess: null })
+    })
+
+    it('leaves a call still running, a failure and any other tool to the steps', () => {
+        expect(publishCardOf({ type: 'tool-rerun_hub_publish_file', state: 'input-available' })).toBeNull()
+        expect(publishCardOf({ type: 'tool-rerun_hub_publish_file', state: 'output-available', output: { status: 'error', message: 'File not found' } })).toBeNull()
+        expect(publishCardOf({ type: 'tool-rerun_hub_unpublish_file', state: 'output-available', output: published })).toBeNull()
+    })
+})
+
+describe('publishCardsByMessage', () => {
+    const publish = (slug: string) => ({ type: 'tool-rerun_hub_publish_file', state: 'output-available', output: { status: 'published', slug, url: `https://${slug}.rerun.site/`, path: `${slug}.html`, title: slug, access: 'workspace', requestedAccess: 'public' } })
+    const text = (value: string) => ({ type: 'text', text: value })
+    const slugs = (placed: Map<string, { slug: string }[]>) => Object.fromEntries([...placed].map(([id, cards]) => [id, cards.map(card => card.slug)]))
+
+    it('draws the card under the text written after it, in the same message or a later one of the turn', () => {
+        const live = [{ id: 'a1', role: 'assistant', parts: [publish('pricing'), text('Tap Make public on the card below.')] }]
+        expect(slugs(publishCardsByMessage(live))).toEqual({ a1: ['pricing'] })
+        const reloaded = [
+            { id: 'u1', role: 'user', parts: [text('Publish it')] },
+            { id: 'a1', role: 'assistant', parts: [{ type: 'tool-fs_write', state: 'output-available', output: 'Wrote' }] },
+            { id: 'a2', role: 'assistant', parts: [publish('pricing')] },
+            { id: 'a3', role: 'assistant', parts: [text(''), text('Tap Make public on the card below.')] },
+        ]
+        expect(slugs(publishCardsByMessage(reloaded))).toEqual({ a3: ['pricing'] })
+    })
+
+    it('draws a link published again once, from its latest call', () => {
+        const again = { ...publish('pricing'), output: { ...publish('pricing').output, title: 'Pricing, fixed' } }
+        const live = [{ id: 'a1', role: 'assistant', parts: [publish('pricing'), text('Here it is.'), again, text('Fixed, tap Make public below.')] }]
+        const placed = publishCardsByMessage(live)
+        expect(slugs(placed)).toEqual({ a1: ['pricing'] })
+        expect(placed.get('a1')?.[0].title).toBe('Pricing, fixed')
+
+        const reloaded = [
+            { id: 'u1', role: 'user', parts: [text('Publish it')] },
+            { id: 'a1', role: 'assistant', parts: [publish('pricing')] },
+            { id: 'a2', role: 'assistant', parts: [text('Here it is.')] },
+            { id: 'a3', role: 'assistant', parts: [again] },
+            { id: 'a4', role: 'assistant', parts: [text('Fixed, tap Make public below.')] },
+        ]
+        expect(slugs(publishCardsByMessage(reloaded))).toEqual({ a4: ['pricing'] })
+    })
+
+    it('keeps the card in its turn when nothing is written after it', () => {
+        const messages = [
+            { id: 'a1', role: 'assistant', parts: [text('Publishing'), publish('pricing')] },
+            { id: 'u2', role: 'user', parts: [text('Thanks')] },
+            { id: 'a2', role: 'assistant', parts: [text('You are welcome.')] },
+        ]
+        expect(slugs(publishCardsByMessage(messages))).toEqual({ a1: ['pricing'] })
     })
 })

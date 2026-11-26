@@ -159,6 +159,7 @@ function App() {
                                             <Stack.Screen name="lab-screen" />
                                             <Stack.Screen name="lab-delegate" />
                                             <Stack.Screen name="lab-steps" />
+                                            <Stack.Screen name="lab-published" />
                                             <Stack.Screen name="lab-skill" />
                                             <Stack.Screen name="lab-composer" />
                                             <Stack.Screen name="lab-foreman" />

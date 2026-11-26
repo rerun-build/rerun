@@ -77,5 +77,26 @@
     },
     "table": {
         "partial": "{shown} מתוך {total}"
+    },
+    "published": {
+        "asksPublic": "{coworker} רוצה שכל מי שיש לו את הקישור יוכל לפתוח אותו",
+        "keepPrivate": "להשאיר פרטי",
+        "makePublic": "להפוך לציבורי",
+        "madePublicByYou": "הפכת אותו לציבורי",
+        "madePublic": "הפך לציבורי",
+        "keptFor": "נשאר לחברי {workspace}",
+        "unpublished": "הפרסום בוטל",
+        "copy": "להעתיק קישור",
+        "copied": "הועתק",
+        "open": "לפתוח",
+        "updateFailed": "לא ניתן לעדכן את הקישור",
+        "fallbackCoworker": "העמית שלך",
+        "fallbackWorkspace": "סביבת העבודה",
+        "access": {
+            "public": "כל מי שיש לו את הקישור",
+            "workspace": "חברי {workspace}",
+            "password": "כל מי שיש לו את הסיסמה",
+            "invited": "רק אנשים שהזמנת"
+        }
     }
 }

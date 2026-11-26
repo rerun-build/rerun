@@ -11,9 +11,10 @@ import { noteRender } from '@/perf/renders'
 import { spacing } from '@/theme/tokens'
 
 import { AgentPickerCard, readAgentPicks } from './cards/AgentPickerCard'
-import { cardOf, connectCardOf, eventCardOf } from './cards/cards'
+import { cardOf, connectCardOf, eventCardOf, type PublishCard } from './cards/cards'
 import { ConnectCardView } from './cards/ConnectCards'
 import { EventCardView } from './cards/EventCardView'
+import { PublishedCardView } from './cards/PublishedCardView'
 import { SkillProposalRow } from './cards/SkillProposalRow'
 import { Sources, type Source } from './cards/Sources'
 import { FileCardView } from './cards/FileCardView'
@@ -88,9 +89,13 @@ type MessageViewProps = {
     stamp?: MessageStamp
     // The data the turn bought, given only to the turn's last assistant message.
     paidSources?: PaidTurnSources
+    // The links published in this turn that are drawn under this message's text (publishCardsByMessage).
+    publishedCards?: PublishCard[]
 }
 
 type Block = { key: string; node: React.ReactNode }
+
+const slugsOf = (cards: PublishCard[] | undefined) => cards?.map(card => card.slug).join(' ') ?? ''
 
 // Drawn again only when what it shows changed: a stamp's `onToggle` only ever reaches its own message,
 // so a new one from the same time and the same state draws nothing new.
@@ -99,12 +104,14 @@ export const MessageView = memo(MessageViewBody, (previous, next) => {
     for (const key of keys) {
         if (key === 'stamp') {
             if (previous.stamp?.createdAt !== next.stamp?.createdAt || previous.stamp?.shown !== next.stamp?.shown) return false
+        } else if (key === 'publishedCards') {
+            if (slugsOf(previous.publishedCards) !== slugsOf(next.publishedCards)) return false
         } else if (previous[key] !== next[key]) return false
     }
     return true
 })
 
-function MessageViewBody({ message, isLastAssistant, running, settled = false, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources }: MessageViewProps) {
+function MessageViewBody({ message, isLastAssistant, running, settled = false, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources, publishedCards }: MessageViewProps) {
     noteRender('MessageView')
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
@@ -249,6 +256,7 @@ function MessageViewBody({ message, isLastAssistant, running, settled = false, a
     const actions = { onRegenerate, rating, onRate: onRate ? (vote: MessageFeedbackRating) => onRate(message.id, vote, answer) : undefined }
     if (closing.trim().length > 0) blocks.push({ key: 'closing', node: <AssistantMessage text={closing} showActions={isLastAssistant && !running} streaming={isLastAssistant && running} owner={fileOwner} actions={actions} /> })
     blocks.push(...held)
+    for (const card of publishedCards ?? []) blocks.push({ key: `u${card.slug}`, node: <PublishedCardView card={card} coworkerName={coworkerName} /> })
     if (sources.length > 0) blocks.push({ key: 'sources', node: <Sources sources={sources} /> })
     if (paidSources && !(isLastAssistant && running)) blocks.push({ key: 'paid-sources', node: <PaidSourcesPill turn={paidSources} /> })
     if (blocks.length === 0) return null

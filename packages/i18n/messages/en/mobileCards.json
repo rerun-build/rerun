@@ -78,10 +78,43 @@
     "table": {
         "partial": "{shown} of {total}"
     },
+    "published": {
+        "asksPublic": "{coworker} wants anyone with the link to open it",
+        "keepPrivate": "Keep private",
+        "makePublic": "Make public",
+        "madePublicByYou": "Made public by you",
+        "madePublic": "Made public",
+        "keptFor": "Kept for {workspace} members",
+        "unpublished": "Unpublished",
+        "copy": "Copy link",
+        "copied": "Copied",
+        "open": "Open",
+        "updateFailed": "Could not update the link",
+        "fallbackCoworker": "Your coworker",
+        "fallbackWorkspace": "Workspace",
+        "access": {
+            "public": "Anyone with the link",
+            "workspace": "{workspace} members",
+            "password": "Anyone with the password",
+            "invited": "Only people you invite"
+        }
+    },
     "_context": {
         "agentPicker.open": "A chip under a message of the Chief of Staff: opens one screen of a coworker. The words after Open are the names of the coworker's tabs.",
         "event.schedules": "A badge on the card that says a coworker finished its setup: how many schedules are turned on.",
         "event.triggers": "A badge on the card that says a coworker finished its setup: how many triggers are turned on.",
-        "table.partial": "How many rows of a table a card shows, out of the table's total."
+        "table.partial": "How many rows of a table a card shows, out of the table's total.",
+        "published.asksPublic": "Under a page a coworker published: the coworker asks that anyone with the link may open it, without signing in. {coworker} is the coworker's name.",
+        "published.keepPrivate": "Button: refuse to make the published link public; it stays for the workspace's members.",
+        "published.makePublic": "Button: make the published link public, so anyone with the link can open it.",
+        "published.madePublicByYou": "Status under a published link once the user agreed to make it public.",
+        "published.madePublic": "Status under a published link that someone made public.",
+        "published.keptFor": "Status under a published link once the user refused to make it public. {workspace} is the name of the workspace.",
+        "published.copy": "Screen reader label of the button that copies the address of a published page.",
+        "published.copied": "Screen reader label of the copy button right after the address was copied.",
+        "published.open": "Screen reader label of the button that opens a published page.",
+        "published.fallbackCoworker": "Stands in for the name of a coworker that no longer exists.",
+        "published.fallbackWorkspace": "Stands in for the name of a workspace that has none.",
+        "published.access.public": "Screen reader label of the small badge on a published page's thumbnail: who can open the link. {workspace} in the workspace label is the name of the workspace."
     }
 }

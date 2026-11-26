@@ -1,10 +1,11 @@
 import type { AuthorProfile, MessageFeedbackRating, PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
-import { Fragment, memo } from 'react'
+import { Fragment, memo, useMemo } from 'react'
 
 import type { FileOwner } from '@/api/files'
 import type { SkillProposals } from '@/chat/useSkillProposals'
 
+import { publishCardsByMessage } from './cards/cards'
 import { MessageView } from './MessageView'
 import { StartedByBanner, type StartedBy } from './origins/StartedByBanner'
 import type { ThreadItem } from './threads/general-threads'
@@ -42,6 +43,7 @@ export const Transcript = memo(function Transcript({ messages, from, to, busy, a
     const lastAssistant = messages.findLastIndex(message => message.role === 'assistant')
     // A run touches the turn it answers and the answer before it, whose buttons wait for it to end.
     const turnStart = messages.findLastIndex(message => message.role === 'user')
+    const publishedCards = useMemo(() => publishCardsByMessage(messages), [messages])
     const branches = (rows: ThreadItem[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread(thread.id)} />)
     return (
         <>
@@ -54,7 +56,7 @@ export const Transcript = memo(function Transcript({ messages, from, to, busy, a
                 authorOf={authorOf}
                 renderMessage={(message, index, stamp) => (
                     <Fragment key={message.id}>
-                        <MessageView message={message} isLastAssistant={index === lastAssistant} running={busy && (index >= turnStart || index === lastAssistant)} settled={!busy || index < turnStart} agentId={agentId} fileOwner={fileOwner} coworkerName={coworkerName} hiddenCallId={hiddenCallId} skillProposals={skillProposals} onStopTask={onStopTask} onRegenerate={index === lastAssistant ? onRegenerate : undefined} rating={ratingOf(message.id)} onRate={onRate} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
+                        <MessageView message={message} isLastAssistant={index === lastAssistant} running={busy && (index >= turnStart || index === lastAssistant)} settled={!busy || index < turnStart} agentId={agentId} fileOwner={fileOwner} coworkerName={coworkerName} hiddenCallId={hiddenCallId} skillProposals={skillProposals} onStopTask={onStopTask} onRegenerate={index === lastAssistant ? onRegenerate : undefined} rating={ratingOf(message.id)} onRate={onRate} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} publishedCards={publishedCards.get(message.id)} />
                         {branches(threadRows.after.get(index))}
                     </Fragment>
                 )}

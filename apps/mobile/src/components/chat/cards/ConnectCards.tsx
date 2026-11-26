@@ -5,7 +5,6 @@ import { useTranslations } from 'use-intl'
 
 import { readMcpServer } from '@/api/mcp'
 import { readService } from '@/api/services'
-import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -14,13 +13,9 @@ import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect, runMcpConnect } from '@/lib/oauth-connect'
 import { hostOf } from '@/lib/url'
 
+import { useCaller } from './CardParts'
 import type { ConnectCard } from './cards'
 import { EventRow } from './EventCardView'
-
-function useCaller() {
-    const { session, me } = useAuth()
-    return session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
-}
 
 // The app's logo in the card's tile, or nothing and the tile keeps its glyph.
 function logoOf(uri: string | null | undefined) {

@@ -9,6 +9,11 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
+export function useCaller() {
+    const { session, me } = useAuth()
+    return session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
+}
+
 export function CardFrame({ symbol, title, meta, children }: { symbol: IconName; title: string; meta?: string; children: ReactNode }) {
     const theme = useTheme()
     return (
@@ -33,9 +38,8 @@ export function CardFrame({ symbol, title, meta, children }: { symbol: IconName;
 // one falls back to a glyph rather than an empty box.
 export function AuthedImage({ url, fallback = 'image', style }: { url: string | null; fallback?: IconName; style: StyleProp<ViewStyle> }) {
     const theme = useTheme()
-    const { session, me } = useAuth()
+    const caller = useCaller()
     const [broken, setBroken] = useState<string | null>(null)
-    const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     return (
         <View style={[{ overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }, style]}>
             {url && broken !== url ? (

@@ -1,4 +1,4 @@
-import { brainChangeOf, fileCardSchema, mcpRegisterCardOf, parseHubOutput, stripBridgePrefix, tableCardSchema, type BrainChange, type FileCard, type McpRegisterCard, type TableCard } from '@rerun/contracts'
+import { brainChangeOf, fileCardSchema, mcpRegisterCardOf, parseHubOutput, publishedAccessModeSchema, stripBridgePrefix, tableCardSchema, type BrainChange, type FileCard, type McpRegisterCard, type PublishedAccessMode, type TableCard } from '@rerun/contracts'
 
 type ToolPart = { type: string; toolName?: string; state?: string; output?: unknown }
 
@@ -84,4 +84,62 @@ export function connectCardOf(part: EventPart): ConnectCard | null {
         return card ? { kind: 'mcp-server', card } : null
     }
     return null
+}
+
+export type PublishCard = { slug: string; url: string; path: string; title: string; access: PublishedAccessMode; requestedAccess: 'public' | null }
+
+// What a coworker published, as the tool output told it at the time. A call made before links had an
+// access carries neither its title nor its access: it was public.
+export function publishCardOf(part: ToolPart): PublishCard | null {
+    if (part.state !== 'output-available') return null
+    const name = stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
+    if (name !== 'rerun_hub_publish_file') return null
+    const out = parseHubOutput<{ status?: string; slug?: string; url?: string; path?: string; title?: string; access?: string; requestedAccess?: string | null }>(part.output)
+    if (out?.status !== 'published' || !out.slug || !out.url) return null
+    const access = publishedAccessModeSchema.safeParse(out.access ?? 'public')
+    const path = out.path ?? ''
+    return { slug: out.slug, url: out.url, path, title: out.title || path || out.slug, access: access.success ? access.data : 'public', requestedAccess: out.requestedAccess === 'public' ? 'public' : null }
+}
+
+type TranscriptMessage = { id: string; role: string; parts: ({ type: string; text?: string } & Partial<ToolPart>)[] }
+
+// Where each published link is drawn: under the first text the coworker writes after publishing it, as
+// the coworker says "the card below". A reloaded transcript splits a turn into one message per step,
+// so the text can be in a later message of the same turn; a turn that writes nothing after keeps the
+// card on its last message. A link published again keeps its slug: only its latest call is drawn.
+export function publishCardsByMessage(messages: TranscriptMessage[]): Map<string, PublishCard[]> {
+    const placed = new Map<string, PublishCard[]>()
+    let waiting: PublishCard[] = []
+    let lastAssistant: string | null = null
+    const place = (messageId: string) => {
+        if (waiting.length === 0) return
+        placed.set(messageId, [...(placed.get(messageId) ?? []), ...waiting])
+        waiting = []
+    }
+    const forget = (slug: string) => {
+        waiting = waiting.filter(card => card.slug !== slug)
+        for (const [messageId, cards] of placed) {
+            const kept = cards.filter(card => card.slug !== slug)
+            if (kept.length === cards.length) continue
+            if (kept.length > 0) placed.set(messageId, kept)
+            else placed.delete(messageId)
+        }
+    }
+    for (const message of messages) {
+        if (message.role !== 'assistant') {
+            if (lastAssistant) place(lastAssistant)
+            lastAssistant = null
+            continue
+        }
+        lastAssistant = message.id
+        for (const part of message.parts) {
+            if (part.type === 'text' && part.text?.trim()) place(message.id)
+            const card = part.type === 'text' ? null : publishCardOf(part as ToolPart)
+            if (!card) continue
+            forget(card.slug)
+            waiting.push(card)
+        }
+    }
+    if (lastAssistant) place(lastAssistant)
+    return placed
 }

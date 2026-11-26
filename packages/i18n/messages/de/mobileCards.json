@@ -77,5 +77,26 @@
     },
     "table": {
         "partial": "{shown} von {total}"
+    },
+    "published": {
+        "asksPublic": "{coworker} möchte, dass alle mit dem Link ihn öffnen können",
+        "keepPrivate": "Privat lassen",
+        "makePublic": "Öffentlich machen",
+        "madePublicByYou": "Von dir öffentlich gemacht",
+        "madePublic": "Öffentlich gemacht",
+        "keptFor": "Nur für Mitglieder von {workspace}",
+        "unpublished": "Nicht mehr veröffentlicht",
+        "copy": "Link kopieren",
+        "copied": "Kopiert",
+        "open": "Öffnen",
+        "updateFailed": "Link konnte nicht aktualisiert werden",
+        "fallbackCoworker": "Dein Coworker",
+        "fallbackWorkspace": "Workspace",
+        "access": {
+            "public": "Alle mit dem Link",
+            "workspace": "Mitglieder von {workspace}",
+            "password": "Alle mit dem Passwort",
+            "invited": "Nur Personen, die du einlädst"
+        }
     }
 }
