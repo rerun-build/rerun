@@ -241,6 +241,7 @@
     "createScheduleFailed": "Zamanlama oluşturulamadı",
     "updateScheduleFailed": "Zamanlama güncellenemedi",
     "renameRoutineNeedsUpdate": "Rutinlerini yeniden adlandırmak için bu coworker'ı güncelleyin",
+    "scriptRoutineNeedsUpdate": "Zamanlanmış komutları çalıştırmak için bu coworker'ı güncelleyin",
     "describeSchedule": "Görevin ne zaman çalışacağını açıklayın",
     "scheduleNotUnderstood": "Bu zamanlama anlaşılamadı. Farklı ifade etmeyi deneyin.",
     "runScheduleFailed": "Zamanlama çalıştırılamadı",

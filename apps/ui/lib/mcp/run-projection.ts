@@ -1,4 +1,4 @@
-export function projectRun(run: { id: string; status: string; sessionId: string; provider: string | null; model: string | null; triggerSource: string | null; triggerSlug: string | null; stepCount: number; inputTokens: number | null; outputTokens: number | null; totalTokens: number | null; costMicros: number | null; startedAt: string; finishedAt: string | null; error: string | null }) {
+export function projectRun(run: { id: string; status: string; sessionId: string; provider: string | null; model: string | null; triggerSource: string | null; triggerSlug: string | null; stepCount: number; inputTokens: number | null; outputTokens: number | null; totalTokens: number | null; costMicros: number | null; startedAt: string; finishedAt: string | null; error: string | null; exitCode?: number | null }) {
     return {
         runId: run.id,
         status: run.status,
@@ -14,5 +14,7 @@ export function projectRun(run: { id: string; status: string; sessionId: string;
         startedAt: run.startedAt,
         finishedAt: run.finishedAt,
         error: run.error,
+        // Set on the run of a script routine once it ended with a code.
+        exitCode: run.exitCode ?? null,
     }
 }

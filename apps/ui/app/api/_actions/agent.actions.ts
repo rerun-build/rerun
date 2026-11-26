@@ -47,6 +47,7 @@ import {
     getSessionMessages as engineGetSessionMessages,
     supportsForemanCoworker,
     supportsScheduleRename,
+    supportsScriptRoutines,
     getSkill as engineGetSkill,
     listAgentTools as engineListAgentTools,
     agentDataBase,
@@ -604,7 +605,9 @@ export async function clearMemoriesAction(agentId: string): Promise<SuccessResul
 // history is read via the /runs endpoints (see listRunsAction /
 // listScheduleRunsAction below).
 
-export type WorkspaceRoutine = Pick<EngineSchedule, 'slug' | 'name' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'lastRunAt'> & {
+export type WorkspaceRoutine = Pick<EngineSchedule, 'slug' | 'name' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'lastRunAt' | 'kind'> & {
+    // The linked computer a script routine runs on, null on the workspace machine or for an instruction.
+    runsOn: string | null
     agentId: string
     nextRunAt: string | null
     runningSince: string | null
@@ -672,6 +675,8 @@ async function routinesOf(conn: EngineConnection, agentId: string, engineAgentId
         timezone: schedule.timezone,
         enabled: schedule.enabled,
         lastRunAt: schedule.lastRunAt,
+        kind: schedule.kind,
+        runsOn: schedule.script?.runsOn ?? null,
         nextRunAt: nextRunAt(schedule, now),
         runningSince: scheduledRuns.find(run => run.triggerSlug === schedule.slug)?.startedAt ?? null,
         setupPending,
@@ -695,6 +700,16 @@ export async function getScheduleAction(agentId: string, slug: string): Promise<
     }
 }
 
+// An engine older than script routines would keep the command as an instruction for the model.
+export async function supportsScriptRoutinesAction(agentId: string): Promise<boolean> {
+    try {
+        const { conn } = await resolveAgentTarget(agentId)
+        return await supportsScriptRoutines(conn)
+    } catch {
+        return false
+    }
+}
+
 async function followAsCaller(agentId: string): Promise<void> {
     const { user, membership } = await getServerSession()
     if (user) await followCoworker(participantIdOf({ userId: user.id, organizationStaff: membership?.organization_staff }), agentId)
@@ -703,6 +718,7 @@ async function followAsCaller(agentId: string): Promise<void> {
 export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
+        if (params.kind === 'script' && !(await supportsScriptRoutines(conn))) return { success: false, ...refusal('scriptRoutineNeedsUpdate') }
         const schedule = await engineCreateSchedule(conn, engineAgentId, params)
         await followAsCaller(agentId)
         return { success: true, schedule }
@@ -714,6 +730,7 @@ export async function createScheduleAction(agentId: string, params: ScheduleCrea
 export async function updateScheduleAction(agentId: string, slug: string, patch: ScheduleUpdateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage')
+        if (patch.kind === 'script' && !(await supportsScriptRoutines(conn))) return { success: false, ...refusal('scriptRoutineNeedsUpdate') }
         const schedule = await engineUpdateSchedule(conn, engineAgentId, slug, patch)
         // A box that predates renaming drops the unknown field and still answers 200.
         if (patch.name !== undefined && schedule.name !== patch.name.trim()) return { success: false, ...refusal('renameRoutineNeedsUpdate') }
@@ -919,6 +936,31 @@ async function runsForSessionTitle(agentId: string, title: string): Promise<Engi
 
 export async function listScheduleRunsAction(agentId: string, slug: string): Promise<EngineRun[]> {
     return runsForSessionTitle(agentId, `schedule: ${slug}`)
+}
+
+// A script routine's runs have no conversation: they are read by their routine. An engine that does
+// not filter by routine answers every run, so the filter is applied here too.
+export async function listScriptRunsAction(agentId: string, slug: string): Promise<EngineRun[]> {
+    try {
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
+        const runs = await engineListRuns(conn, engineAgentId, { triggerSlug: slug, limit: SCRIPT_HISTORY_RUNS })
+        return runs.filter(run => run.triggerSource === 'schedule' && run.triggerSlug === slug && !run.sessionId)
+    } catch {
+        return []
+    }
+}
+
+const SCRIPT_HISTORY_RUNS = 50
+
+// What a script printed, read one run at a time: the list never carries it.
+export async function getScriptRunOutputAction(agentId: string, runId: string): Promise<string | null> {
+    try {
+        const { conn, engineAgentId } = await resolveAgentTarget(agentId)
+        const run = await engineGetRun(conn, engineAgentId, runId)
+        return run.sessionId ? null : (run.output ?? '')
+    } catch {
+        return null
+    }
 }
 
 export async function listTriggerRunsAction(agentId: string, slug: string): Promise<EngineRun[]> {

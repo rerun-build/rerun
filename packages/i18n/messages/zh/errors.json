@@ -241,6 +241,7 @@
     "createScheduleFailed": "无法创建计划",
     "updateScheduleFailed": "无法更新计划",
     "renameRoutineNeedsUpdate": "请更新这位同事以重命名其例行任务",
+    "scriptRoutineNeedsUpdate": "请更新这位同事以运行定时命令",
     "describeSchedule": "请描述任务应在何时运行",
     "scheduleNotUnderstood": "无法理解该计划，请换种说法。",
     "runScheduleFailed": "无法运行计划",

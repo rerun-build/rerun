@@ -2,7 +2,8 @@ import type { EngineRun } from '@/lib/engine/types'
 
 export type TaskSource = 'schedule' | 'trigger'
 
-export type TaskOutcome = { runId: string; sessionId: string; status: 'done' | 'error'; finishedAt: string }
+// `exitCode` is set on the run of a script routine, which has no conversation (`sessionId` is empty).
+export type TaskOutcome = { runId: string; sessionId: string; status: 'done' | 'error'; startedAt: string; finishedAt: string; exitCode: number | null }
 
 export const outcomeKey = (source: TaskSource, slug: string) => `${source}:${slug}`
 
@@ -19,7 +20,7 @@ export function latestOutcomes(runs: EngineRun[]): Record<string, TaskOutcome> {
         const key = outcomeKey(sourceOf(run)!, run.triggerSlug!)
         const finishedAt = run.finishedAt ?? run.startedAt
         if (outcomes[key] && outcomes[key].finishedAt >= finishedAt) continue
-        outcomes[key] = { runId: run.id, sessionId: run.sessionId, status: run.status as TaskOutcome['status'], finishedAt }
+        outcomes[key] = { runId: run.id, sessionId: run.sessionId, status: run.status as TaskOutcome['status'], startedAt: run.startedAt, finishedAt, exitCode: run.exitCode ?? null }
     }
     return outcomes
 }

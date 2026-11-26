@@ -1,7 +1,7 @@
 import { workspaceActor } from '@/app/api/_auth/access'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createSchedule, getAgent, listConnections, patchAgent, setBoxDefault, updateSchedule, updateTrigger } from '@/lib/engine/client'
+import { createSchedule, getAgent, getSchedule, listConnections, patchAgent, setBoxDefault, supportsScriptRoutines, updateSchedule, updateTrigger } from '@/lib/engine/client'
 import type { BoxConnection, EngineAgentDetail } from '@/lib/engine/types'
 
 import { resolveAgentTarget } from './chat.service'
@@ -122,5 +122,44 @@ describe('dispatchAccountTool, what a coworker runs on', () => {
         await dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_trigger', { agentId: 'agent-own', slug: 'hook', connectionId: 'codex-clem', model: 'gpt-6-sol' })
 
         expect(updateTrigger).toHaveBeenCalledWith(CONN, 'engine-agent', 'hook', expect.objectContaining({ connectionId: 'codex-clem', provider: 'codex', model: 'gpt-6-sol' }))
+    })
+})
+
+describe('dispatchAccountTool, a scheduled script', () => {
+    const actor = workspaceActor(WORKSPACE_ID)
+    const script = { runsOn: null, folder: 'shared/', timeoutSec: 300, notify: 'failures' as const }
+
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent' })
+        vi.mocked(supportsScriptRoutines).mockResolvedValue(true)
+    })
+
+    it('creates a script on the coworker, with no model', async () => {
+        await dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', name: 'Sync prices', body: 'python3 sync.py', cron: '0 */6 * * *', script: { timeoutMinutes: 15 } })
+        expect(createSchedule).toHaveBeenCalledWith(CONN, 'engine-agent', expect.objectContaining({ body: 'python3 sync.py', kind: 'script', script: { ...script, timeoutSec: 900 } }))
+        expect(listConnections).not.toHaveBeenCalled()
+    })
+
+    it('passes a computer named by its handle for the engine to resolve', async () => {
+        await dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', name: 'Nas backup', body: 'python3 backup.py', cron: '0 2 * * *', script: { runsOn: '#synology', notifyOnSuccess: true } })
+        expect(createSchedule).toHaveBeenCalledWith(CONN, 'engine-agent', expect.objectContaining({ script: { runsOn: '#synology', folder: '', timeoutSec: 300, notify: 'always' } }))
+    })
+
+    it('changes a script and keeps what the call leaves out', async () => {
+        vi.mocked(getSchedule).mockResolvedValue({ kind: 'script', script: { ...script, folder: 'shared/scripts', notify: 'always' } } as never)
+        await dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', slug: 'sync-prices', body: 'python3 sync.py --all', script: { timeoutMinutes: 60 } })
+        expect(updateSchedule).toHaveBeenCalledWith(CONN, 'engine-agent', 'sync-prices', expect.objectContaining({ body: 'python3 sync.py --all', script: { runsOn: null, folder: 'shared/scripts', timeoutSec: 3600, notify: 'always' } }))
+    })
+
+    it('refuses a model, a limit it does not offer, an instruction turned into a script and an engine too old', async () => {
+        await expect(dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', name: 'X', body: 'x', cron: '0 2 * * *', model: 'claude-opus-5-5', script: {} })).rejects.toThrow(/A script runs no model/)
+        await expect(dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', name: 'X', body: 'x', cron: '0 2 * * *', script: { timeoutMinutes: 7 } })).rejects.toThrow(/timeoutMinutes must be one of 1, 5, 15, 60/)
+        vi.mocked(getSchedule).mockResolvedValue({ kind: 'instruction', script: null } as never)
+        await expect(dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', slug: 'daily', script: {} })).rejects.toThrow(/daily is an instruction/)
+        vi.mocked(supportsScriptRoutines).mockResolvedValue(false)
+        await expect(dispatchAccountTool(actor, 'upsert_schedule', { agentId: 'agent-own', name: 'X', body: 'x', cron: '0 2 * * *', script: {} })).rejects.toThrow(/engine too old/)
+        expect(createSchedule).not.toHaveBeenCalled()
+        expect(updateSchedule).not.toHaveBeenCalled()
     })
 })

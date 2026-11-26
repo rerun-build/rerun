@@ -241,6 +241,7 @@
     "createScheduleFailed": "無法建立排程",
     "updateScheduleFailed": "無法更新排程",
     "renameRoutineNeedsUpdate": "請更新這位同事，才能重新命名它的例行工作",
+    "scriptRoutineNeedsUpdate": "請更新這位同事，才能執行排程指令",
     "describeSchedule": "請描述任務應在何時執行",
     "scheduleNotUnderstood": "無法理解該排程。請換個說法試試。",
     "runScheduleFailed": "無法執行排程",

@@ -297,6 +297,7 @@
     "createScheduleFailed": "Failed to create schedule",
     "updateScheduleFailed": "Failed to update schedule",
     "renameRoutineNeedsUpdate": "Update this coworker to rename its routines",
+    "scriptRoutineNeedsUpdate": "Update this coworker to run commands on a schedule",
     "describeSchedule": "Describe when the task should run",
     "scheduleNotUnderstood": "Couldn't understand that schedule. Try rephrasing.",
     "runScheduleFailed": "Failed to run schedule",

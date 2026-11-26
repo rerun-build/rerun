@@ -21,6 +21,7 @@ import {
     foremanCheckinsSchema,
     type ForemanCheckins,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
+    ENGINE_CAPABILITY_SCRIPT_ROUTINES,
     ENGINE_CAPABILITY_VAULT,
     ENGINE_CAPABILITY_VAULT_INSTANCE,
     ENGINE_CAPABILITY_VAULT_RENAME,
@@ -76,6 +77,8 @@ import {
     usageRunsResponseSchema,
     type UsageRunsQuery,
     type UsageRunsResponse,
+    type ScheduleKind,
+    type ScheduleScript,
 } from '@rerun/contracts'
 import { isNetworkFailure } from '@/lib/net/network-error'
 import { forgetMachineAt } from '@/lib/engine/engine-memory'
@@ -770,6 +773,10 @@ export async function supportsScheduleRename(conn: EngineConnection): Promise<bo
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_SCHEDULE_RENAME)
 }
 
+export async function supportsScriptRoutines(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_SCRIPT_ROUTINES)
+}
+
 // The box keeps the workspace's Vault. Without it, every connector stays in its coworker's folder.
 export async function supportsVault(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT)
@@ -907,8 +914,9 @@ export async function decideSkillProposal(conn: EngineConnection, agentId: strin
 
 // A null model means "whatever the agent runs", which is itself the Box default when the agent
 // picked nothing. A routine only freezes a pair when someone chose one.
-export type ScheduleCreateParams = { name: string; description?: string; body: string; cron?: string; runAt?: string; timezone?: string; enabled?: boolean; connectionId?: string | null; provider?: EngineProvider | null; model?: string | null }
-export type ScheduleUpdateParams = { name?: string; description?: string; body?: string; cron?: string; runAt?: string; timezone?: string; enabled?: boolean; connectionId?: string | null; provider?: EngineProvider | null; model?: string | null }
+// A script routine runs `body` as a shell command, with no model: `script` says where and how.
+export type ScheduleCreateParams = { name: string; description?: string; body: string; cron?: string; runAt?: string; timezone?: string; enabled?: boolean; connectionId?: string | null; provider?: EngineProvider | null; model?: string | null; kind?: ScheduleKind; script?: ScheduleScript | null }
+export type ScheduleUpdateParams = { name?: string; description?: string; body?: string; cron?: string; runAt?: string; timezone?: string; enabled?: boolean; connectionId?: string | null; provider?: EngineProvider | null; model?: string | null; kind?: ScheduleKind; script?: ScheduleScript | null }
 
 export async function listSchedules(conn: EngineConnection, agentId: string, init: RequestInit = {}): Promise<EngineSchedule[]> {
     return request(conn, `/agents/${encodeURIComponent(agentId)}/schedules`, { ...init, method: 'GET' }, d => engineSchedulesListSchema.parse(d).schedules)
@@ -1010,15 +1018,16 @@ export async function requestEngineUpdate(conn: EngineConnection, force = false,
 
 // --- Runs (execution history) ---
 
-export type RunFilter = { limit?: number; sessionId?: string; status?: EngineRun['status'] }
+export type RunFilter = { limit?: number; sessionId?: string; status?: EngineRun['status']; triggerSlug?: string }
 
 // An engine that predates `session` / `status` ignores them and returns its most recent runs, so
 // callers keep filtering what comes back.
-export async function listRuns(conn: EngineConnection, agentId: string, { limit, sessionId, status }: RunFilter = {}): Promise<EngineRun[]> {
+export async function listRuns(conn: EngineConnection, agentId: string, { limit, sessionId, status, triggerSlug }: RunFilter = {}): Promise<EngineRun[]> {
     const params = new URLSearchParams()
     if (limit) params.set('limit', String(limit))
     if (sessionId) params.set('session', sessionId)
     if (status) params.set('status', status)
+    if (triggerSlug) params.set('triggerSlug', triggerSlug)
     const qs = params.size > 0 ? `?${params}` : ''
     return request(conn, `/agents/${encodeURIComponent(agentId)}/runs${qs}`, { method: 'GET' }, d => engineRunsListSchema.parse(d).runs)
 }

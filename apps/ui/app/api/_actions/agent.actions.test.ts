@@ -56,11 +56,15 @@ vi.mock('@/lib/engine/client', () => ({
     getSessionMessages: vi.fn(),
     listSchedules: vi.fn(async () => [{ slug: 'daily', name: 'Daily', cron: '0 9 * * *', runAt: null, timezone: 'UTC', enabled: true, lastRunAt: null }]),
     listRuns: vi.fn(async () => []),
+    getRun: vi.fn(),
     getAgent: vi.fn(async () => null),
     getSkill: vi.fn(async () => ({ slug: 'outreach', name: 'Outreach', description: 'd', body: 'Real procedure', files: [] })),
     updateSkill: vi.fn(async () => ({ slug: 'outreach' })),
     fetchSkillArchive: vi.fn(async () => new Uint8Array([1, 2, 3]).buffer),
     supportsScheduleRename: vi.fn(async () => true),
+    supportsScriptRoutines: vi.fn(async () => true),
+    createSchedule: vi.fn(async () => ({ slug: 'sync', kind: 'script' })),
+    updateSchedule: vi.fn(async () => ({ slug: 'sync', name: 'Sync', kind: 'script' })),
 }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
@@ -299,5 +303,42 @@ describe('answerForemanSecretRequestAction', () => {
         await expect(actions.answerSecretRequestAction('session-1', { OPENAI_API_KEY: 'sk-test' })).resolves.toMatchObject({ success: false, code: 'secretNotRequested' })
         expect(mocks.saveSecretsToVault).not.toHaveBeenCalled()
         expect(engine.updateAgentKeys).not.toHaveBeenCalled()
+    })
+})
+
+describe('the runs of a script routine', () => {
+    it("keeps the routine's own runs, those without a conversation, from an engine that may not filter", async () => {
+        vi.mocked(engine.listRuns).mockResolvedValue([
+            { id: 'r1', sessionId: '', triggerSource: 'schedule', triggerSlug: 'sync' },
+            { id: 'r2', sessionId: 's2', triggerSource: 'schedule', triggerSlug: 'sync' },
+            { id: 'r3', sessionId: '', triggerSource: 'schedule', triggerSlug: 'other' },
+        ] as never)
+
+        await expect(actions.listScriptRunsAction(AGENT, 'sync')).resolves.toEqual([expect.objectContaining({ id: 'r1' })])
+        expect(engine.listRuns).toHaveBeenCalledWith(conn, 'engine-1', { triggerSlug: 'sync', limit: 50 })
+    })
+
+    it('reads what a script printed, and nothing of a run that has a conversation', async () => {
+        vi.mocked(engine.getRun).mockResolvedValueOnce({ id: 'r1', sessionId: '', output: 'Traceback' } as never)
+        await expect(actions.getScriptRunOutputAction(AGENT, 'r1')).resolves.toBe('Traceback')
+        vi.mocked(engine.getRun).mockResolvedValueOnce({ id: 'r2', sessionId: 's2', output: 'An answer' } as never)
+        await expect(actions.getScriptRunOutputAction(AGENT, 'r2')).resolves.toBeNull()
+    })
+})
+
+describe('a script routine on an engine that predates them', () => {
+    const script = { runsOn: null, folder: 'shared/', timeoutSec: 300, notify: 'failures' } as const
+
+    it('is refused before the engine is asked, so it never lands as an instruction for the model', async () => {
+        vi.mocked(engine.supportsScriptRoutines).mockResolvedValue(false)
+        await expect(actions.createScheduleAction(AGENT, { name: 'Sync', body: 'python3 sync.py', cron: '0 * * * *', kind: 'script', script })).resolves.toMatchObject({ success: false, code: 'scriptRoutineNeedsUpdate' })
+        await expect(actions.updateScheduleAction(AGENT, 'sync', { kind: 'script', script, body: 'python3 sync.py' })).resolves.toMatchObject({ success: false, code: 'scriptRoutineNeedsUpdate' })
+        expect(engine.createSchedule).not.toHaveBeenCalled()
+        expect(engine.updateSchedule).not.toHaveBeenCalled()
+    })
+
+    it('still lets an instruction through', async () => {
+        vi.mocked(engine.supportsScriptRoutines).mockResolvedValue(false)
+        await expect(actions.updateScheduleAction(AGENT, 'sync', { enabled: false })).resolves.toMatchObject({ success: true })
     })
 })

@@ -1,4 +1,5 @@
-import { COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, COWORKER_PALETTE, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { agentScriptInputSchema, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, COWORKER_PALETTE, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { z } from 'zod'
 import { CONVERSATION_TOOL_DEFS } from './conversation-tools'
 import { KNOWLEDGE_TOOL_DEFS } from './knowledge-tools'
 import { LIBRARY_TOOL_DEFS } from './library-tools'
@@ -61,6 +62,16 @@ const AUTOMATION_MODEL_PIN_PROPERTIES = {
     connectionId: { type: 'string', description: 'Run this one on a given AI connection, by its id from list_ai_connections, instead of the one its coworker runs on. Goes with `model`.' },
     model: { type: ['string', 'null'], description: 'Run this one on a model of its own. Omit it and it runs whatever its coworker runs, following it when that changes. Pass null to go back to that.' },
 } as const
+
+const { type: scriptType, properties: scriptProperties, additionalProperties: scriptAdditional } = z.toJSONSchema(agentScriptInputSchema, { io: 'input' })
+
+const SCRIPT_PROPERTY = {
+    type: scriptType,
+    properties: scriptProperties,
+    additionalProperties: scriptAdditional,
+    description:
+        'Run `body` as a shell command, as it is, with no model and no credit: for a fixed command that needs no judgement (a Python script, a backup, a sync). Never with `model` or `connectionId`. Each run keeps its exit code and its output, and the team hears of a failure. On the workspace machine it runs with the coworker\'s rights; on a linked computer, only what its owner lets through without anyone in a chat. On an update, it changes where and how a script runs: a task stays an instruction or a script, delete and recreate to change that.',
+}
 
 // The Chief of Staff holds apps too, under its fixed id.
 const CONNECTOR_HOLDER_ID = {
@@ -351,7 +362,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'upsert_schedule',
         description:
-            'Create a scheduled task, or update it when `slug` is given. `body` is the instruction the coworker receives when it fires, written as if you were talking to it. Pass `cron` for a recurring task (5-field cron) or `runAt` for a one-off ISO date: something to do once ("at 7pm") is always `runAt`, never a cron, and a one-off deletes itself once its run succeeds. It runs on whatever its coworker runs unless you pass `model` (and `connectionId`) to give it a model of its own. Three things to know: passing `body` on an update replaces the whole instruction, so read the current one with list_schedules and edit that text — never write a body from memory; the slug is derived from the name and is what run_schedule_now and delete_schedule address, so read it back from the response; and an update can change a cron but cannot clear it nor turn a recurring task into a one-off — delete and recreate for that.',
+            'Create a scheduled task, or update it when `slug` is given. `body` is the instruction the coworker receives when it fires, written as if you were talking to it; with `script`, it is a shell command run as it is, with no model, for a fixed job that needs no judgement. Pass `cron` for a recurring task (5-field cron) or `runAt` for a one-off ISO date: something to do once ("at 7pm") is always `runAt`, never a cron, and a one-off deletes itself once its run succeeds. It runs on whatever its coworker runs unless you pass `model` (and `connectionId`) to give it a model of its own. Three things to know: passing `body` on an update replaces the whole instruction, so read the current one with list_schedules and edit that text — never write a body from memory; the slug is derived from the name and is what run_schedule_now and delete_schedule address, so read it back from the response; and an update can change a cron but cannot clear it nor turn a recurring task into a one-off — delete and recreate for that.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -359,12 +370,13 @@ const AGENT_TOOL_DEFS = [
                 slug: { type: 'string', description: 'Omit to create, pass an existing slug to update.' },
                 name: { type: 'string' },
                 description: { type: 'string' },
-                body: { type: 'string', description: 'The instruction sent to the coworker when the task fires.' },
+                body: { type: 'string', description: 'The instruction sent to the coworker when the task fires, or the shell command a script runs.' },
                 cron: { type: 'string', description: 'e.g. "0 9 * * 1" for every Monday at 9.' },
                 runAt: { type: 'string', description: 'ISO date for a one-off run. Deleted once its run succeeds.' },
                 timezone: { type: 'string', description: 'IANA timezone, e.g. "Europe/Paris".' },
                 enabled: { type: 'boolean' },
                 ...AUTOMATION_MODEL_PIN_PROPERTIES,
+                script: SCRIPT_PROPERTY,
             },
             required: ['agentId'],
         },

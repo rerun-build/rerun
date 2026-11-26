@@ -28,6 +28,18 @@ export function isRunCompletion(event: NotificationPayload['event']): boolean {
     return event.endsWith('.completed')
 }
 
+// A script routine that worked, set to speak only when it fails: it closes what its last failure left
+// open, and tells nobody.
+export function isQuietCompletion(notification: Pick<StoredNotification, 'event' | 'kind' | 'metadata'>): boolean {
+    return notification.kind === 'done' && isRunCompletion(notification.event) && (notification.metadata as { quiet?: unknown } | null)?.quiet === true
+}
+
+// The routine a script's run belongs to, read from its notification: that run has no conversation.
+export function scriptRoutineSlugOf(metadata: unknown): string | null {
+    const { script, scheduleSlug } = (metadata ?? {}) as { script?: unknown; scheduleSlug?: unknown }
+    return script === true && typeof scheduleSlug === 'string' && scheduleSlug ? scheduleSlug : null
+}
+
 export function completionStatus(notification: StoredNotification): SessionStatus | null {
     if (notification.event === 'agent.notification') {
         if (notification.kind === 'question') return 'awaiting_question' as unknown as SessionStatus

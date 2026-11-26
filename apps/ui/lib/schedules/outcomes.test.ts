@@ -44,5 +44,9 @@ describe('latestOutcomes', () => {
         const outcomes = latestOutcomes([run({ id: 'c1', triggerSource: 'checkin', triggerSlug: 'back-on-invoices', status: 'done' })])
         expect(outcomes['schedule:back-on-invoices']).toMatchObject({ runId: 'c1', status: 'done' })
     })
-})
 
+    it('keeps the exit code and the start of a script run', () => {
+        const outcomes = latestOutcomes([run({ id: 's1', sessionId: '', status: 'error', exitCode: 1 })])
+        expect(outcomes['schedule:digest']).toEqual({ runId: 's1', sessionId: '', status: 'error', startedAt: '2026-10-20T08:00:00Z', finishedAt: '2026-10-20T08:01:00Z', exitCode: 1 })
+    })
+})

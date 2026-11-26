@@ -241,6 +241,7 @@
     "createScheduleFailed": "No se pudo crear la rutina",
     "updateScheduleFailed": "No se pudo actualizar la rutina",
     "renameRoutineNeedsUpdate": "Actualiza este coworker para renombrar sus rutinas",
+    "scriptRoutineNeedsUpdate": "Actualiza este coworker para ejecutar comandos programados",
     "describeSchedule": "Describe cuándo debe ejecutarse la tarea",
     "scheduleNotUnderstood": "No se entendió esa programación. Prueba a reformularla.",
     "runScheduleFailed": "No se pudo ejecutar la rutina",

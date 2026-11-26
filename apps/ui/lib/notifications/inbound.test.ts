@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, storedKind, type StoredNotification } from './inbound'
+import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, isQuietCompletion, scriptRoutineSlugOf, storedKind, type StoredNotification } from './inbound'
 import type { NotificationPayload } from '@/lib/engine/types'
 
 const BASE = {
@@ -107,5 +107,26 @@ describe('agentReplyOf', () => {
         expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'error', message: 'Message failed: boom' }))).toBeNull()
         expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'done', message: 'Message stopped', metadata: { status: 'cancelled' } }))).toBeNull()
         expect(agentReplyOf(stored({ event: 'agent.notification', kind: 'question' }))).toBeNull()
+    })
+})
+
+describe('isQuietCompletion', () => {
+    it('is a script routine that worked and only speaks when it fails', () => {
+        expect(isQuietCompletion(stored({ event: 'agent.schedule.completed', kind: 'done', metadata: { script: true, quiet: true } }))).toBe(true)
+    })
+
+    it('is never a failure, a routine that speaks on every run, nor an event that is not a run ending', () => {
+        expect(isQuietCompletion(stored({ event: 'agent.schedule.completed', kind: 'error', metadata: { script: true, quiet: true } }))).toBe(false)
+        expect(isQuietCompletion(stored({ event: 'agent.schedule.completed', kind: 'done', metadata: { script: true } }))).toBe(false)
+        expect(isQuietCompletion(stored({ event: 'agent.notification', kind: 'done', metadata: { quiet: true } }))).toBe(false)
+    })
+})
+
+describe('scriptRoutineSlugOf', () => {
+    it('names the routine of a script run, and nothing for any other notification', () => {
+        expect(scriptRoutineSlugOf({ script: true, scheduleSlug: 'sync-prices' })).toBe('sync-prices')
+        expect(scriptRoutineSlugOf({ scheduleSlug: 'daily-brief' })).toBeNull()
+        expect(scriptRoutineSlugOf({ script: true })).toBeNull()
+        expect(scriptRoutineSlugOf(null)).toBeNull()
     })
 })

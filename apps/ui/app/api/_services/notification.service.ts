@@ -15,7 +15,7 @@ import { ACCOUNT_REFUSED_ERROR_CODE, RERUN_BUDGET_ERROR_CODE, suppressesErrorEma
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { ALERT_STATE_OF_KIND, awaitedApp, DAILY_EMAIL_CAP, DAILY_EMAIL_WINDOW_MS, holdsARun, incidentMessage, opensConversation } from '@/lib/notifications/incident-email'
 import { incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
-import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
+import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, isQuietCompletion, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
 import { coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
@@ -77,6 +77,10 @@ export async function recordNotification(token: string, payload: NotificationPay
     // person who pressed Stop does not need "Run finished" in their inbox and in their mailbox.
     if (isCancelled(notification)) {
         await applySessionStatus(supabase, agent ?? null, notification)
+        return { ok: true }
+    }
+    if (isQuietCompletion(notification)) {
+        if (!engine.isSandbox) await resolveIncidents(supabase, resolvedIncidentKeysFor({ event: notification.event, kind: notification.kind, agentId: notification.agentId, source: notification.source, metadata: notification.metadata, sessionId: notification.sessionId }))
         return { ok: true }
     }
     // What the apps and the notification rules call this coworker.

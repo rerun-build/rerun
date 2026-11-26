@@ -241,6 +241,7 @@
     "createScheduleFailed": "تعذّر إنشاء الجدول",
     "updateScheduleFailed": "تعذّر تحديث الجدول",
     "renameRoutineNeedsUpdate": "حدّث هذا الزميل لإعادة تسمية مهامه الروتينية",
+    "scriptRoutineNeedsUpdate": "حدّث هذا الزميل لتشغيل أوامر مجدولة",
     "describeSchedule": "صف متى يجب أن تعمل المهمة",
     "scheduleNotUnderstood": "تعذّر فهم هذا الجدول. جرّب صياغة أخرى.",
     "runScheduleFailed": "تعذّر تشغيل الجدول",

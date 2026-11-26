@@ -241,6 +241,7 @@
     "createScheduleFailed": "Falha ao criar o agendamento",
     "updateScheduleFailed": "Falha ao atualizar o agendamento",
     "renameRoutineNeedsUpdate": "Atualize este coworker para renomear as rotinas dele",
+    "scriptRoutineNeedsUpdate": "Atualize este coworker para executar comandos agendados",
     "describeSchedule": "Descreva quando a tarefa deve rodar",
     "scheduleNotUnderstood": "Não entendemos esse agendamento. Tente reformular.",
     "runScheduleFailed": "Falha ao executar o agendamento",

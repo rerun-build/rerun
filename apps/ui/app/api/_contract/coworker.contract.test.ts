@@ -172,7 +172,7 @@ const registry: ServiceRegistry = {
 }
 
 const schedules: Awaited<ReturnType<Engine['listSchedules']>> = [
-    { slug: 'weekly-leads', name: 'Weekly leads', description: '', enabled: true, cron: '0 9 * * 1', runAt: null, timezone: 'Europe/Paris', lastRunAt: '2026-11-17T08:00:00.000Z', connectionId: null, provider: null, model: null, body: 'List 20 new bakeries in Lyon.', createdAt: '2026-11-06T11:00:00.000Z' },
+    { slug: 'weekly-leads', name: 'Weekly leads', description: '', enabled: true, cron: '0 9 * * 1', runAt: null, timezone: 'Europe/Paris', lastRunAt: '2026-11-17T08:00:00.000Z', connectionId: null, provider: null, model: null, kind: 'instruction', script: null, body: 'List 20 new bakeries in Lyon.', createdAt: '2026-11-06T11:00:00.000Z' },
 ]
 const triggers: Awaited<ReturnType<Engine['listTriggers']>> = [
     { slug: 'new-lead', name: 'New lead', description: '', enabled: false, token: 'tok_9f8e7d', methods: ['POST'], lastFiredAt: null, fireCount: 0, connectionId: null, provider: null, model: null, body: 'Qualify the lead in the payload.', createdAt: '2026-11-07T11:00:00.000Z' },

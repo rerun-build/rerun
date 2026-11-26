@@ -1,4 +1,4 @@
-import { agentKindPolicy, connectorSkillReadOnlyError, COWORKER_PALETTE, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { agentKindPolicy, agentScriptInputSchema, connectorSkillReadOnlyError, scriptOfInput, scriptRunsOnRef, type AgentScriptInput, type ScheduleScript, COWORKER_PALETTE, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, assertRunInReach, callableEngineAgentIds, runSessionsInReach, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
@@ -17,6 +17,7 @@ import {
     getAgent as engineGetAgent,
     getRun as engineGetRun,
     getRunTools as engineGetRunTools,
+    getSchedule as engineGetSchedule,
     getSkill as engineGetSkill,
     getTrigger as engineGetTrigger,
     importSkill as engineImportSkill,
@@ -31,6 +32,7 @@ import {
     rotateTriggerToken as engineRotateTriggerToken,
     runScheduleNow as engineRunScheduleNow,
     setBoxDefault as engineSetBoxDefault,
+    supportsScriptRoutines,
     updateSchedule as engineUpdateSchedule,
     updateTrigger as engineUpdateTrigger,
     uploadFile as engineUploadFile,
@@ -134,6 +136,19 @@ function readConfigPatch(args: Record<string, unknown>, pin: ModelPin | undefine
 
 function namesModelPin(args: Record<string, unknown>): boolean {
     return args.connectionId !== undefined || args.provider !== undefined || args.model !== undefined
+}
+
+function readScriptInput(value: unknown): AgentScriptInput | undefined {
+    if (value === undefined || value === null) return undefined
+    const parsed = agentScriptInputSchema.safeParse(value)
+    if (!parsed.success) throw new Error(`script: ${parsed.error.issues.map(issue => `${issue.path.join('.') || 'value'} ${issue.message}`).join('; ')}`)
+    return parsed.data
+}
+
+function scriptOf(input: AgentScriptInput, current: ScheduleScript | null): ScheduleScript {
+    const script = scriptOfInput(input, current, scriptRunsOnRef(input, current))
+    if ('error' in script) throw new Error(`script: ${script.error}`)
+    return script
 }
 
 // A workspace that has not claimed its machine yet has no connection to check a pin against, and
@@ -694,6 +709,10 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const agentId = requireString(args.agentId, 'agentId')
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
             const slug = asString(args.slug)
+            const scriptInput = readScriptInput(args.script)
+            if (scriptInput && namesModelPin(args)) throw new Error('A script runs no model: leave model and connectionId out.')
+            // An engine older than script routines would keep the command as an instruction for a model.
+            if (scriptInput && !(await supportsScriptRoutines(conn))) throw new Error('This workspace runs an engine too old to run a command without a model: update it first.')
             const checked = await checkedModelPin(conn, engineAgentId, args)
 
             const shared = {
@@ -707,7 +726,10 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             }
 
             if (slug) {
-                return await engineUpdateSchedule(conn, engineAgentId, slug, shared)
+                if (!scriptInput) return await engineUpdateSchedule(conn, engineAgentId, slug, shared)
+                const current = await engineGetSchedule(conn, engineAgentId, slug)
+                if (current.kind !== 'script') throw new Error(`${slug} is an instruction: to run a command instead, delete it and create it again with script.`)
+                return await engineUpdateSchedule(conn, engineAgentId, slug, { ...shared, script: scriptOf(scriptInput, current.script) })
             }
 
             const cron = shared.cron
@@ -723,6 +745,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 runAt,
                 timezone: shared.timezone,
                 enabled: shared.enabled,
+                ...(scriptInput ? { kind: 'script' as const, script: scriptOf(scriptInput, null) } : {}),
             })
             await followCoworker(followerId, agentId)
             return schedule

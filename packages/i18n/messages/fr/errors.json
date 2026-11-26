@@ -241,6 +241,7 @@
     "createScheduleFailed": "Impossible de créer la routine",
     "updateScheduleFailed": "Impossible de mettre à jour la routine",
     "renameRoutineNeedsUpdate": "Mettez à jour ce coworker pour renommer ses routines",
+    "scriptRoutineNeedsUpdate": "Mettez à jour ce coworker pour lancer des commandes planifiées",
     "describeSchedule": "Décrivez quand la tâche doit tourner",
     "scheduleNotUnderstood": "Impossible de comprendre ce planning. Essayez de reformuler.",
     "runScheduleFailed": "Impossible de lancer la routine",

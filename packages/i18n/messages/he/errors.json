@@ -241,6 +241,7 @@
     "createScheduleFailed": "יצירת התזמון נכשלה",
     "updateScheduleFailed": "עדכון התזמון נכשל",
     "renameRoutineNeedsUpdate": "יש לעדכן את העמית הזה כדי לשנות את שמות השגרות שלו",
+    "scriptRoutineNeedsUpdate": "יש לעדכן את העמית הזה כדי להריץ פקודות מתוזמנות",
     "describeSchedule": "יש לתאר מתי המשימה צריכה לרוץ",
     "scheduleNotUnderstood": "לא הצלחנו להבין את התזמון הזה. אפשר לנסח מחדש.",
     "runScheduleFailed": "הרצת התזמון נכשלה",

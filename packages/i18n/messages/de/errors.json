@@ -241,6 +241,7 @@
     "createScheduleFailed": "Zeitplan konnte nicht erstellt werden",
     "updateScheduleFailed": "Zeitplan konnte nicht aktualisiert werden",
     "renameRoutineNeedsUpdate": "Aktualisiere diesen Coworker, um seine Routinen umzubenennen",
+    "scriptRoutineNeedsUpdate": "Aktualisiere diesen Coworker, um geplante Befehle auszuführen",
     "describeSchedule": "Beschreibe, wann die Aufgabe laufen soll",
     "scheduleNotUnderstood": "Dieser Zeitplan wurde nicht verstanden. Versuch es anders zu formulieren.",
     "runScheduleFailed": "Zeitplan konnte nicht ausgeführt werden",
