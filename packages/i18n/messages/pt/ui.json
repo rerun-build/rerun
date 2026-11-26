@@ -53,5 +53,11 @@
         "live": "Forma de onda do áudio ao vivo",
         "processing": "Processando áudio",
         "idle": "Forma de onda do áudio inativa"
+    },
+    "colorPicker": {
+        "saturationBrightness": "Saturação e brilho",
+        "saturationBrightnessValue": "{saturation}% de saturação, {brightness}% de brilho",
+        "hue": "Matiz",
+        "hex": "Cor hexadecimal"
     }
 }

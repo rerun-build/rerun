@@ -66,5 +66,11 @@
         "live": "Live audio waveform",
         "processing": "Processing audio",
         "idle": "Audio waveform idle"
+    },
+    "colorPicker": {
+        "saturationBrightness": "Saturation and brightness",
+        "saturationBrightnessValue": "{saturation}% saturation, {brightness}% brightness",
+        "hue": "Hue",
+        "hex": "Hex color"
     }
 }

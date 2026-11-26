@@ -15,7 +15,12 @@
         "share": "分享",
         "close": "關閉卡片",
         "nameField": "同事名稱",
-        "rename": "重新命名 {name}"
+        "rename": "重新命名 {name}",
+        "customize": "自訂",
+        "customizeMe": "來幫我打扮吧！",
+        "customizeName": "自訂 {name}",
+        "lookTitle": "{name} 的外觀",
+        "lookDescription": "顏色、材質和臉部"
     },
     "agentChatsList": {
         "title": "討論串",
@@ -898,8 +903,10 @@
         "material": "材質",
         "eyes": "眼睛",
         "mouth": "嘴巴",
+        "face": "臉部",
         "shuffle": "隨機",
         "reset": "預設",
+        "customColor": "自訂顏色",
         "materialOptions": {
             "classic": "經典",
             "fluffy": "毛茸茸",
@@ -912,14 +919,19 @@
             "chrome": "鍍鉻"
         },
         "colors": {
+            "sky": "天藍",
             "blue": "藍色",
             "indigo": "靛藍",
             "violet": "紫羅蘭",
             "purple": "紫色",
             "pink": "粉紅",
             "rose": "玫瑰紅",
+            "orange": "橘色",
+            "brown": "棕色",
             "lime": "萊姆綠",
-            "green": "綠色"
+            "green": "綠色",
+            "teal": "藍綠色",
+            "graphite": "石墨灰"
         },
         "eyesOptions": {
             "pill": "膠囊眼",
@@ -946,6 +958,11 @@
             "open": "張嘴",
             "cat": "貓嘴",
             "flat": "一字嘴"
+        },
+        "tooClose": {
+            "working": "接近同事工作時的顏色。它工作時仍會彈跳並發光。",
+            "error": "接近同事故障時的顏色：它故障時會比較難察覺。",
+            "waiting": "接近同事等你回覆時的顏色：它在等待時會比較難察覺。"
         }
     },
     "agentPanelLogs": {

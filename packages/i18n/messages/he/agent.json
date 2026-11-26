@@ -15,7 +15,12 @@
         "share": "לשתף",
         "close": "לסגור את הכרטיס",
         "nameField": "שם העמית",
-        "rename": "לשנות את השם של {name}"
+        "rename": "לשנות את השם של {name}",
+        "customize": "להתאים אישית",
+        "customizeMe": "תעצב אותי!",
+        "customizeName": "להתאים אישית את {name}",
+        "lookTitle": "המראה של {name}",
+        "lookDescription": "הצבע, החומר והפנים"
     },
     "agentChatsList": {
         "title": "שרשורים",
@@ -898,8 +903,10 @@
         "material": "חומר",
         "eyes": "עיניים",
         "mouth": "פה",
+        "face": "פנים",
         "shuffle": "ערבוב",
         "reset": "ברירת מחדל",
+        "customColor": "צבע מותאם אישית",
         "materialOptions": {
             "classic": "קלאסי",
             "fluffy": "פרוותי",
@@ -912,14 +919,19 @@
             "chrome": "כרום"
         },
         "colors": {
+            "sky": "תכלת",
             "blue": "כחול",
             "indigo": "אינדיגו",
             "violet": "סגול-כחלחל",
             "purple": "סגול",
             "pink": "ורוד",
             "rose": "ורד",
+            "orange": "כתום",
+            "brown": "חום",
             "lime": "ליים",
-            "green": "ירוק"
+            "green": "ירוק",
+            "teal": "טורקיז",
+            "graphite": "גרפיט"
         },
         "eyesOptions": {
             "pill": "עיני גלולה",
@@ -946,6 +958,11 @@
             "open": "פה פתוח",
             "cat": "פה של חתול",
             "flat": "פה ישר"
+        },
+        "tooClose": {
+            "working": "קרוב לצבע של עמית בעבודה. הוא עדיין יקפוץ ויזהר בזמן שהוא עובד.",
+            "error": "קרוב לצבע של עמית שהתקלקל: יהיה קשה יותר לזהות מתי הוא מתקלקל.",
+            "waiting": "קרוב לצבע של עמית שמחכה לך: יהיה קשה יותר לזהות מתי הוא מחכה."
         }
     },
     "agentPanelLogs": {

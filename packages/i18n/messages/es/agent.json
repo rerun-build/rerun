@@ -15,7 +15,12 @@
         "share": "Compartir",
         "close": "Cerrar la tarjeta",
         "nameField": "Nombre del coworker",
-        "rename": "Renombrar a {name}"
+        "rename": "Renombrar a {name}",
+        "customize": "Personalizar",
+        "customizeMe": "¡Personalízame!",
+        "customizeName": "Personalizar a {name}",
+        "lookTitle": "Apariencia de {name}",
+        "lookDescription": "Su color, material y cara"
     },
     "agentChatsList": {
         "title": "Hilos",
@@ -898,8 +903,10 @@
         "material": "Material",
         "eyes": "Ojos",
         "mouth": "Boca",
+        "face": "Cara",
         "shuffle": "Al azar",
         "reset": "Por defecto",
+        "customColor": "Color personalizado",
         "materialOptions": {
             "classic": "Clásico",
             "fluffy": "Esponjoso",
@@ -912,14 +919,19 @@
             "chrome": "Cromo"
         },
         "colors": {
+            "sky": "Cielo",
             "blue": "Azul",
             "indigo": "Índigo",
             "violet": "Violeta",
             "purple": "Púrpura",
             "pink": "Rosa",
             "rose": "Frambuesa",
+            "orange": "Naranja",
+            "brown": "Marrón",
             "lime": "Lima",
-            "green": "Verde"
+            "green": "Verde",
+            "teal": "Verde azulado",
+            "graphite": "Grafito"
         },
         "eyesOptions": {
             "pill": "Ojos de píldora",
@@ -946,6 +958,11 @@
             "open": "Boca abierta",
             "cat": "Boca de gato",
             "flat": "Boca recta"
+        },
+        "tooClose": {
+            "working": "Parecido al color de un coworker trabajando. Igual rebotará y brillará mientras trabaja.",
+            "error": "Parecido al color de un coworker averiado: te costará más notar cuando falle.",
+            "waiting": "Parecido al color de un coworker que te espera: te costará más notar cuando espere."
         }
     },
     "agentPanelLogs": {

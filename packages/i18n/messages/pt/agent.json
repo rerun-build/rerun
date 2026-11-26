@@ -15,7 +15,12 @@
         "share": "Compartilhar",
         "close": "Fechar o cartão",
         "nameField": "Nome do coworker",
-        "rename": "Renomear {name}"
+        "rename": "Renomear {name}",
+        "customize": "Personalizar",
+        "customizeMe": "Me personalize!",
+        "customizeName": "Personalizar {name}",
+        "lookTitle": "Aparência de {name}",
+        "lookDescription": "A cor, o material e o rosto"
     },
     "agentChatsList": {
         "title": "Tópicos",
@@ -898,8 +903,10 @@
         "material": "Material",
         "eyes": "Olhos",
         "mouth": "Boca",
+        "face": "Rosto",
         "shuffle": "Aleatório",
         "reset": "Padrão",
+        "customColor": "Cor personalizada",
         "materialOptions": {
             "classic": "Clássico",
             "fluffy": "Fofinho",
@@ -912,14 +919,19 @@
             "chrome": "Cromado"
         },
         "colors": {
+            "sky": "Céu",
             "blue": "Azul",
             "indigo": "Índigo",
             "violet": "Violeta",
             "purple": "Roxo",
             "pink": "Rosa",
             "rose": "Framboesa",
+            "orange": "Laranja",
+            "brown": "Marrom",
             "lime": "Lima",
-            "green": "Verde"
+            "green": "Verde",
+            "teal": "Verde-azulado",
+            "graphite": "Grafite"
         },
         "eyesOptions": {
             "pill": "Olhos de pílula",
@@ -946,6 +958,11 @@
             "open": "Boca aberta",
             "cat": "Boca de gato",
             "flat": "Boca reta"
+        },
+        "tooClose": {
+            "working": "Parecida com a cor de um coworker trabalhando. Ele ainda vai pular e brilhar enquanto trabalha.",
+            "error": "Parecida com a cor de um coworker com falha: vai ser mais difícil perceber quando ele falhar.",
+            "waiting": "Parecida com a cor de um coworker esperando por você: vai ser mais difícil perceber quando ele estiver esperando."
         }
     },
     "agentPanelLogs": {

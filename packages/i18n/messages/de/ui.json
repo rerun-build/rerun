@@ -53,5 +53,11 @@
         "live": "Live-Audiowellenform",
         "processing": "Audio wird verarbeitet",
         "idle": "Audiowellenform inaktiv"
+    },
+    "colorPicker": {
+        "saturationBrightness": "Sättigung und Helligkeit",
+        "saturationBrightnessValue": "{saturation} % Sättigung, {brightness} % Helligkeit",
+        "hue": "Farbton",
+        "hex": "Hex-Farbe"
     }
 }

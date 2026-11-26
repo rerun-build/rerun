@@ -53,5 +53,11 @@
         "live": "实时音频波形",
         "processing": "正在处理音频",
         "idle": "音频波形空闲"
+    },
+    "colorPicker": {
+        "saturationBrightness": "饱和度和亮度",
+        "saturationBrightnessValue": "饱和度 {saturation}%，亮度 {brightness}%",
+        "hue": "色相",
+        "hex": "十六进制颜色"
     }
 }

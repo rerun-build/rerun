@@ -53,5 +53,11 @@
         "live": "גל קול חי",
         "processing": "מעבד את השמע",
         "idle": "גל קול במנוחה"
+    },
+    "colorPicker": {
+        "saturationBrightness": "רוויה ובהירות",
+        "saturationBrightnessValue": "רוויה {saturation}%, בהירות {brightness}%",
+        "hue": "גוון",
+        "hex": "צבע הקסדצימלי"
     }
 }

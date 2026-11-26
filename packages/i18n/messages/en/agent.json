@@ -111,7 +111,12 @@
         "share": "Share",
         "close": "Close the card",
         "nameField": "Coworker name",
-        "rename": "Rename {name}"
+        "rename": "Rename {name}",
+        "customize": "Customize",
+        "customizeMe": "Customize me!",
+        "customizeName": "Customize {name}",
+        "lookTitle": "{name}’s look",
+        "lookDescription": "Its color, material and face"
     },
     "agentChatsList": {
         "title": "Threads",
@@ -994,8 +999,10 @@
         "material": "Material",
         "eyes": "Eyes",
         "mouth": "Mouth",
+        "face": "Face",
         "shuffle": "Shuffle",
         "reset": "Default",
+        "customColor": "Custom color",
         "materialOptions": {
             "classic": "Classic",
             "fluffy": "Fluffy",
@@ -1008,14 +1015,19 @@
             "chrome": "Chrome"
         },
         "colors": {
+            "sky": "Sky",
             "blue": "Blue",
             "indigo": "Indigo",
             "violet": "Violet",
             "purple": "Purple",
             "pink": "Pink",
             "rose": "Rose",
+            "orange": "Orange",
+            "brown": "Brown",
             "lime": "Lime",
-            "green": "Green"
+            "green": "Green",
+            "teal": "Teal",
+            "graphite": "Graphite"
         },
         "eyesOptions": {
             "pill": "Pill eyes",
@@ -1042,6 +1054,11 @@
             "open": "Open mouth",
             "cat": "Cat mouth",
             "flat": "Flat mouth"
+        },
+        "tooClose": {
+            "working": "Close to the color of a coworker at work. It will still bounce and shine while it works.",
+            "error": "Close to the color of a coworker that broke down: it will be harder to tell when it does.",
+            "waiting": "Close to the color of a coworker waiting for you: it will be harder to tell when it waits."
         }
     },
     "agentPanelLogs": {

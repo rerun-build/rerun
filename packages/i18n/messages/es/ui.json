@@ -53,5 +53,11 @@
         "live": "Onda de audio en directo",
         "processing": "Procesando audio",
         "idle": "Onda de audio inactiva"
+    },
+    "colorPicker": {
+        "saturationBrightness": "Saturación y brillo",
+        "saturationBrightnessValue": "{saturation} % de saturación, {brightness} % de brillo",
+        "hue": "Tono",
+        "hex": "Color hexadecimal"
     }
 }

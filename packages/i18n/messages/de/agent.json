@@ -15,7 +15,12 @@
         "share": "Teilen",
         "close": "Karte schließen",
         "nameField": "Name des Coworkers",
-        "rename": "{name} umbenennen"
+        "rename": "{name} umbenennen",
+        "customize": "Anpassen",
+        "customizeMe": "Pass mich an!",
+        "customizeName": "{name} anpassen",
+        "lookTitle": "Aussehen von {name}",
+        "lookDescription": "Farbe, Material und Gesicht"
     },
     "agentChatsList": {
         "title": "Threads",
@@ -898,8 +903,10 @@
         "material": "Material",
         "eyes": "Augen",
         "mouth": "Mund",
+        "face": "Gesicht",
         "shuffle": "Zufällig",
         "reset": "Standard",
+        "customColor": "Eigene Farbe",
         "materialOptions": {
             "classic": "Klassisch",
             "fluffy": "Flauschig",
@@ -912,14 +919,19 @@
             "chrome": "Chrom"
         },
         "colors": {
+            "sky": "Himmelblau",
             "blue": "Blau",
             "indigo": "Indigo",
             "violet": "Violett",
             "purple": "Lila",
             "pink": "Pink",
             "rose": "Himbeere",
+            "orange": "Orange",
+            "brown": "Braun",
             "lime": "Limette",
-            "green": "Grün"
+            "green": "Grün",
+            "teal": "Petrol",
+            "graphite": "Graphit"
         },
         "eyesOptions": {
             "pill": "Pillenaugen",
@@ -946,6 +958,11 @@
             "open": "Offener Mund",
             "cat": "Katzenmund",
             "flat": "Gerader Mund"
+        },
+        "tooClose": {
+            "working": "Ähnlich der Farbe eines Coworkers bei der Arbeit. Er hüpft und leuchtet trotzdem, während er arbeitet.",
+            "error": "Ähnlich der Farbe eines ausgefallenen Coworkers: Du erkennst schwerer, wenn er ausfällt.",
+            "waiting": "Ähnlich der Farbe eines Coworkers, der auf dich wartet: Du erkennst schwerer, wenn er wartet."
         }
     },
     "agentPanelLogs": {

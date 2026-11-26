@@ -15,7 +15,12 @@
         "share": "Partager",
         "close": "Fermer la carte",
         "nameField": "Nom du coworker",
-        "rename": "Renommer {name}"
+        "rename": "Renommer {name}",
+        "customize": "Personnaliser",
+        "customizeMe": "Personnalisez-moi !",
+        "customizeName": "Personnaliser {name}",
+        "lookTitle": "L’apparence de {name}",
+        "lookDescription": "Sa couleur, sa matière et son visage"
     },
     "agentChatsList": {
         "title": "Fils",
@@ -898,8 +903,10 @@
         "material": "Matière",
         "eyes": "Yeux",
         "mouth": "Bouche",
+        "face": "Visage",
         "shuffle": "Au hasard",
         "reset": "Par défaut",
+        "customColor": "Couleur personnalisée",
         "materialOptions": {
             "classic": "Classique",
             "fluffy": "Duveteux",
@@ -912,14 +919,19 @@
             "chrome": "Chrome"
         },
         "colors": {
+            "sky": "Ciel",
             "blue": "Bleu",
             "indigo": "Indigo",
             "violet": "Violet",
             "purple": "Pourpre",
             "pink": "Rose",
             "rose": "Framboise",
+            "orange": "Orange",
+            "brown": "Marron",
             "lime": "Citron vert",
-            "green": "Vert"
+            "green": "Vert",
+            "teal": "Bleu canard",
+            "graphite": "Graphite"
         },
         "eyesOptions": {
             "pill": "Yeux en pilule",
@@ -946,6 +958,11 @@
             "open": "Bouche ouverte",
             "cat": "Bouche de chat",
             "flat": "Bouche droite"
+        },
+        "tooClose": {
+            "working": "Proche de la couleur d’un coworker au travail. Il rebondira et brillera quand même pendant qu’il travaille.",
+            "error": "Proche de la couleur d’un coworker en panne : vous verrez moins bien quand il tombe en panne.",
+            "waiting": "Proche de la couleur d’un coworker qui vous attend : vous verrez moins bien quand il attend."
         }
     },
     "agentPanelLogs": {

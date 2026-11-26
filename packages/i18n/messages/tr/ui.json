@@ -53,5 +53,11 @@
         "live": "Canlı ses dalga formu",
         "processing": "Ses işleniyor",
         "idle": "Ses dalga formu boşta"
+    },
+    "colorPicker": {
+        "saturationBrightness": "Doygunluk ve parlaklık",
+        "saturationBrightnessValue": "%{saturation} doygunluk, %{brightness} parlaklık",
+        "hue": "Ton",
+        "hex": "Hex renk kodu"
     }
 }

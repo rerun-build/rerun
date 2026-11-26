@@ -53,5 +53,11 @@
         "live": "موجة صوتية مباشرة",
         "processing": "جارٍ معالجة الصوت",
         "idle": "موجة صوتية خاملة"
+    },
+    "colorPicker": {
+        "saturationBrightness": "التشبع والسطوع",
+        "saturationBrightnessValue": "التشبع {saturation}%، السطوع {brightness}%",
+        "hue": "تدرج اللون",
+        "hex": "لون سداسي عشري"
     }
 }

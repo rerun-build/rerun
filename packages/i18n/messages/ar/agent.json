@@ -15,7 +15,12 @@
         "share": "مشاركة",
         "close": "إغلاق البطاقة",
         "nameField": "اسم الزميل",
-        "rename": "إعادة تسمية {name}"
+        "rename": "إعادة تسمية {name}",
+        "customize": "تخصيص",
+        "customizeMe": "خصّصني!",
+        "customizeName": "تخصيص {name}",
+        "lookTitle": "مظهر {name}",
+        "lookDescription": "لونه وخامته ووجهه"
     },
     "agentChatsList": {
         "title": "المحادثات",
@@ -898,8 +903,10 @@
         "material": "الخامة",
         "eyes": "العينان",
         "mouth": "الفم",
+        "face": "الوجه",
         "shuffle": "عشوائي",
         "reset": "افتراضي",
+        "customColor": "لون مخصص",
         "materialOptions": {
             "classic": "كلاسيكي",
             "fluffy": "زغبي",
@@ -912,14 +919,19 @@
             "chrome": "كروم"
         },
         "colors": {
+            "sky": "سماوي",
             "blue": "أزرق",
             "indigo": "نيلي",
             "violet": "بنفسجي",
             "purple": "أرجواني",
             "pink": "وردي",
             "rose": "زهري",
+            "orange": "برتقالي",
+            "brown": "بني",
             "lime": "ليموني",
-            "green": "أخضر"
+            "green": "أخضر",
+            "teal": "أزرق مخضر",
+            "graphite": "غرافيتي"
         },
         "eyesOptions": {
             "pill": "عيون بيضاوية",
@@ -946,6 +958,11 @@
             "open": "فم مفتوح",
             "cat": "فم قطة",
             "flat": "فم مستقيم"
+        },
+        "tooClose": {
+            "working": "قريب من لون زميل يعمل. سيظل يقفز ويلمع أثناء عمله.",
+            "error": "قريب من لون زميل متعطّل: سيصعب عليك ملاحظة تعطّله.",
+            "waiting": "قريب من لون زميل ينتظرك: سيصعب عليك ملاحظة انتظاره."
         }
     },
     "agentPanelLogs": {

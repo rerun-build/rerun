@@ -15,7 +15,12 @@
         "share": "Paylaş",
         "close": "Kartı kapat",
         "nameField": "Coworker adı",
-        "rename": "Yeniden adlandır: {name}"
+        "rename": "Yeniden adlandır: {name}",
+        "customize": "Özelleştir",
+        "customizeMe": "Beni özelleştirin!",
+        "customizeName": "Özelleştir: {name}",
+        "lookTitle": "Görünüm: {name}",
+        "lookDescription": "Rengi, malzemesi ve yüzü"
     },
     "agentChatsList": {
         "title": "Konular",
@@ -898,8 +903,10 @@
         "material": "Malzeme",
         "eyes": "Gözler",
         "mouth": "Ağız",
+        "face": "Yüz",
         "shuffle": "Rastgele",
         "reset": "Varsayılan",
+        "customColor": "Özel renk",
         "materialOptions": {
             "classic": "Klasik",
             "fluffy": "Tüylü",
@@ -912,14 +919,19 @@
             "chrome": "Krom"
         },
         "colors": {
+            "sky": "Gök mavisi",
             "blue": "Mavi",
             "indigo": "Çivit",
             "violet": "Menekşe",
             "purple": "Mor",
             "pink": "Pembe",
             "rose": "Ahududu",
+            "orange": "Turuncu",
+            "brown": "Kahverengi",
             "lime": "Misket limonu",
-            "green": "Yeşil"
+            "green": "Yeşil",
+            "teal": "Petrol mavisi",
+            "graphite": "Grafit"
         },
         "eyesOptions": {
             "pill": "Hap gözler",
@@ -946,6 +958,11 @@
             "open": "Açık ağız",
             "cat": "Kedi ağzı",
             "flat": "Düz ağız"
+        },
+        "tooClose": {
+            "working": "Çalışan bir coworker'ın rengine yakın. Çalışırken yine de zıplayıp parlayacak.",
+            "error": "Arızalanan bir coworker'ın rengine yakın: arızalandığında fark etmek daha zor olacak.",
+            "waiting": "Sizi bekleyen bir coworker'ın rengine yakın: beklediğinde fark etmek daha zor olacak."
         }
     },
     "agentPanelLogs": {
