@@ -35,7 +35,7 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
     const t = useTranslations('vault')
     const errorText = useErrorText()
     const [busy, setBusy] = useState(false)
-    const [signingIn, setSigningIn] = useState(false)
+    const [signIn, setSignIn] = useState<SignInAttempt | null>(null)
 
     const run = async (action: () => Promise<{ ok: true } | { ok: false; error: string; code?: string }>) => {
         setBusy(true)
@@ -45,6 +45,7 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
         setBusy(false)
     }
 
+    const signInKind = signInKindOf(entry)
     const everyoneReason = !listing.isAdmin ? t('reasons.adminOnly') : entry.app ? t('reasons.paidAppEveryone') : undefined
 
     return (
@@ -63,10 +64,11 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                     </div>
                 )}
                 <VaultStatusBadge entry={entry} />
+                {signInKind && entry.status !== 'needs_auth' && !signIn && <ReconnectButton entry={entry} kind={signInKind} canAdd={listing.canAdd} onSignIn={setSignIn} />}
             </div>
 
             <PanelScroller className="space-y-6 p-4">
-                <SignInSection entry={entry} canAdd={listing.canAdd} signingIn={signingIn} onSigningIn={setSigningIn} onChanged={onChanged} />
+                <SignInSection entry={entry} kind={signInKind} canAdd={listing.canAdd} signIn={signIn} onSignIn={setSignIn} onChanged={onChanged} />
 
                 <VaultCoworkersGroup
                     coworkers={listing.coworkers}
@@ -155,10 +157,44 @@ function AccountNameField({ name, placeholder, busy, onSubmit, onCancel }: { nam
     )
 }
 
-function SignInSection({ entry, canAdd, signingIn, onSigningIn, onChanged }: { entry: VaultEntryView; canAdd: boolean; signingIn: boolean; onSigningIn: (on: boolean) => void; onChanged: () => Promise<void> }) {
+type SignInKind = 'oauth' | 'brokered'
+// The sign-in under way, and the window its click opened when Rerun brokers it.
+type SignInAttempt = { popup: Window | null }
+
+const isNotSetUp = (entry: VaultEntryView) => entry.status === 'needs_config' && !!entry.slug
+
+function signInKindOf(entry: VaultEntryView): SignInKind | null {
+    if (isNotSetUp(entry)) return null
+    if (entry.oauth) return 'oauth'
+    return entry.managed || entry.composio ? 'brokered' : null
+}
+
+// A browser only lets the click itself open a window: a brokered sign-in opens its own here.
+function ReconnectButton({ entry, kind, canAdd, onSignIn }: { entry: VaultEntryView; kind: SignInKind; canAdd: boolean; onSignIn: (attempt: SignInAttempt) => void }) {
+    const t = useTranslations('vault')
+    const tServices = useTranslations('services')
+    const reason = kind === 'brokered' && !canAdd ? t('reasons.manageAny') : undefined
+    return (
+        <TooltipDisabledReason reason={reason} className="shrink-0">
+            <Button
+                size="xs"
+                variant="outline"
+                className="shrink-0"
+                disabled={!!reason}
+                onClick={() => onSignIn({ popup: kind === 'brokered' ? openPendingSignInPopup(entry.name, tServices('signInPopup.connecting', { name: entry.name })) : null })}
+            >
+                {t('detail.reconnect')}
+            </Button>
+        </TooltipDisabledReason>
+    )
+}
+
+type SignInSectionProps = { entry: VaultEntryView; kind: SignInKind | null; canAdd: boolean; signIn: SignInAttempt | null; onSignIn: (attempt: SignInAttempt | null) => void; onChanged: () => Promise<void> }
+
+function SignInSection({ entry, kind, canAdd, signIn, onSignIn, onChanged }: SignInSectionProps) {
     const t = useTranslations('vault')
 
-    if (entry.status === 'needs_config' && entry.slug) {
+    if (isNotSetUp(entry)) {
         return (
             <Alert>
                 <AlertDescription className="space-y-3">
@@ -170,74 +206,48 @@ function SignInSection({ entry, canAdd, signingIn, onSigningIn, onChanged }: { e
     }
 
     const signedOut = entry.status === 'needs_auth'
-    if (!entry.oauth && (entry.managed || entry.composio)) return <BrokeredSignIn entry={entry} canAdd={canAdd} signedOut={signedOut} onChanged={onChanged} />
-    if (!entry.oauth) return null
-    if (!signedOut && !signingIn) {
-        return (
-            <div className="flex justify-end">
-                <Button size="xs" variant="outline" onClick={() => onSigningIn(true)}>
-                    {t('detail.reconnect')}
-                </Button>
-            </div>
-        )
-    }
+    if (!kind || (!signedOut && !signIn)) return null
+    if (kind === 'brokered' && signIn) return <BrokeredSignIn entry={entry} popup={signIn.popup} onSignIn={onSignIn} onChanged={onChanged} />
     return (
         <Alert variant={signedOut ? 'warning' : 'default'}>
             <AlertDescription className="space-y-3">
                 {signedOut && <p>{t('detail.signedOut', { name: entry.name })}</p>}
-                <McpOAuthAuthorize
-                    url={entry.oauth.url}
-                    agentId=""
-                    vaultItemId={entry.id}
-                    serverName={entry.oauth.serverName}
-                    onAuthorized={async () => {
-                        await markVaultEntryAuthorizedAction(entry.id)
-                        onSigningIn(false)
-                        await onChanged()
-                    }}
-                />
+                {kind === 'oauth' && entry.oauth ? (
+                    <McpOAuthAuthorize
+                        url={entry.oauth.url}
+                        agentId=""
+                        vaultItemId={entry.id}
+                        serverName={entry.oauth.serverName}
+                        onAuthorized={async () => {
+                            await markVaultEntryAuthorizedAction(entry.id)
+                            onSignIn(null)
+                            await onChanged()
+                        }}
+                    />
+                ) : (
+                    <ReconnectButton entry={entry} kind={kind} canAdd={canAdd} onSignIn={onSignIn} />
+                )}
             </AlertDescription>
         </Alert>
     )
 }
 
-// A managed or Composio account signed in again, once for every coworker using it. The click opens the
-// window and starts the sign-in, whose callback turns the entry active.
-function BrokeredSignIn({ entry, canAdd, signedOut, onChanged }: { entry: VaultEntryView; canAdd: boolean; signedOut: boolean; onChanged: () => Promise<void> }) {
-    const t = useTranslations('vault')
-    const tServices = useTranslations('services')
-    const [attempt, setAttempt] = useState<{ popup: Window | null } | null>(null)
-
-    const reconnect = (
-        <TooltipDisabledReason reason={canAdd ? undefined : t('reasons.manageAny')}>
-            <Button size="xs" variant="outline" disabled={!canAdd} onClick={() => setAttempt({ popup: openPendingSignInPopup(entry.name, tServices('signInPopup.connecting', { name: entry.name })) })}>
-                {t('detail.reconnect')}
-            </Button>
-        </TooltipDisabledReason>
-    )
+// A managed or Composio account signed in again, once for every coworker using it. The click opened the
+// window and this starts the sign-in, whose callback turns the entry active.
+function BrokeredSignIn({ entry, popup, onSignIn, onChanged }: { entry: VaultEntryView; popup: Window | null; onSignIn: (attempt: SignInAttempt | null) => void; onChanged: () => Promise<void> }) {
     const connect = {
         agentId: '',
         vaultItemId: entry.id,
         instanceKey: entry.id,
         name: entry.name,
         autoStart: true,
-        pendingPopup: attempt?.popup,
+        pendingPopup: popup,
         onAuthorized: async () => {
             await onChanged()
-            setAttempt(null)
+            onSignIn(null)
         },
     }
-
-    if (attempt) return entry.managed ? <ManagedConnect {...connect} provider={entry.managed.provider} serverName={entry.managed.serverName} /> : <ComposioConnect {...connect} />
-    if (!signedOut) return <div className="flex justify-end">{reconnect}</div>
-    return (
-        <Alert variant="warning">
-            <AlertDescription className="space-y-3">
-                <p>{t('detail.signedOut', { name: entry.name })}</p>
-                {reconnect}
-            </AlertDescription>
-        </Alert>
-    )
+    return entry.managed ? <ManagedConnect {...connect} provider={entry.managed.provider} serverName={entry.managed.serverName} /> : <ComposioConnect {...connect} />
 }
 
 // The install form of the entry's app, filled in again: its sign-in methods come from the catalog.
