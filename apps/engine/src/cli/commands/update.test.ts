@@ -630,10 +630,18 @@ describe('installBrowser', () => {
     const INSTALL = 'pnpm --filter rerun-engine exec patchright install --no-shell chromium'
     const REPO: FakeLayout = { kind: 'monorepo', root: '/repo', packageDir: '/repo/apps/engine' }
 
-    it('does nothing when chromium is already on disk', async () => {
+    it('links chromium already on disk to this release, without the system deps (RER-344)', async () => {
         await installBrowser(REPO)
-        expect(state.calls).toEqual([])
-        expect(out).toBe('chromium already installed\n')
+        expect(state.calls).toEqual([INSTALL])
+        expect(state.cwds).toEqual(['/repo'])
+        expect(out).toContain('chromium already installed: linking it to this release\n')
+    })
+
+    it('links chromium already on disk from the new release folder, the one patchright names in its link', async () => {
+        const cli = `${process.execPath} /opt/rerun/releases/abc1234/node_modules/patchright/cli.js`
+        await installBrowser({ kind: 'release', root: '/opt/rerun', packageDir: '/opt/rerun/releases/abc1234' })
+        expect(state.calls).toEqual([`${cli} install --no-shell chromium`])
+        expect(state.cwds).toEqual(['/opt/rerun/releases/abc1234'])
     })
 
     it('installs the system deps directly as root, then the browser, through pnpm in a checkout', async () => {

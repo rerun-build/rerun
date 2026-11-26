@@ -53,18 +53,22 @@ function patchrightCommand(layout: Layout, args: string[]): { command: string; a
     return { command: process.execPath, args: [resolve(layout.packageDir, 'node_modules', 'patchright', 'cli.js'), ...args], cwd: layout.packageDir }
 }
 
+// Every Playwright on the box shares ~/.cache/ms-playwright, and each `playwright install` deletes the
+// browsers no live link of `.links/` names. The engine's link points into its release folder, which
+// pruning removes two updates later: a coworker's own install then deleted the engine's Chromium
+// (RER-344). `install` rewrites that link to this release first, and downloads nothing already there.
 export async function installBrowser(layout: Layout): Promise<void> {
     if (await browserInstalled()) {
-        process.stdout.write('chromium already installed\n')
-        return
-    }
-    const deps = patchrightCommand(layout, ['install-deps', 'chromium'])
-    if (isRoot()) {
-        run(deps.command, deps.args, { cwd: deps.cwd })
-    } else if (canSudo()) {
-        run('sudo', ['-n', deps.command, ...deps.args], { cwd: deps.cwd })
+        process.stdout.write('chromium already installed: linking it to this release\n')
     } else {
-        process.stdout.write('no passwordless sudo available: skipping chromium system dependencies (the browser may fail to launch)\n')
+        const deps = patchrightCommand(layout, ['install-deps', 'chromium'])
+        if (isRoot()) {
+            run(deps.command, deps.args, { cwd: deps.cwd })
+        } else if (canSudo()) {
+            run('sudo', ['-n', deps.command, ...deps.args], { cwd: deps.cwd })
+        } else {
+            process.stdout.write('no passwordless sudo available: skipping chromium system dependencies (the browser may fail to launch)\n')
+        }
     }
     const install = patchrightCommand(layout, ['install', '--no-shell', 'chromium'])
     run(install.command, install.args, { cwd: install.cwd })
