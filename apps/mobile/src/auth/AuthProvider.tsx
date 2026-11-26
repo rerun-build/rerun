@@ -7,6 +7,7 @@ import { fetchMe } from '@/api/account'
 import { isAdminRole } from '@/auth/access'
 import { ApiError } from '@/api/client'
 import { forgetGoogleAccount } from '@/auth/google'
+import { readOwesSecondStep } from '@/auth/second-step'
 import { bootstrap } from '@/auth/sign-in'
 import { supabase } from '@/auth/supabase'
 import { cachedMe, clearLocalCache } from '@/data/local-cache'
@@ -23,6 +24,9 @@ type AuthState = {
     // False until the stored session has been read: the app shows nothing rather than flash sign-in.
     ready: boolean
     session: Session | null
+    // Signed in with the first method of an account with two-step verification: the session waits
+    // here, out of the app, until one of the account's methods raises it.
+    secondStep: Session | null
     me: Me | null
     switchWorkspace: (workspaceId: number) => Promise<void>
     // Reads the account again, for what changes under it: a workspace that just started its plan.
@@ -53,8 +57,16 @@ async function loadMe(accessToken: string): Promise<Me> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [ready, setReady] = useState(false)
-    const [session, setSession] = useState<Session | null>(null)
+    const [sessionRead, setSessionRead] = useState(false)
+    const [rawSession, setRawSession] = useState<Session | null>(null)
+    // Whether the person last checked still owes their second step. Kept per person, not per token: a
+    // refreshed token is checked again behind the screen, which stays as it was meanwhile.
+    const [level, setLevel] = useState<{ userId: string; owes: boolean } | null>(null)
+    const levelKnown = !rawSession || level?.userId === rawSession.user.id
+    const owes = !!rawSession && levelKnown && !!level?.owes
+    const session = rawSession && levelKnown && !owes ? rawSession : null
+    const secondStep = owes ? rawSession : null
+    const ready = sessionRead && levelKnown
     const [me, setMe] = useState<Me | null>(null)
     // The workspace last picked in this session: a read of the account sent before the pick (a refresh
     // as the app comes back to the foreground on a tapped push) must not take the person back.
@@ -69,13 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data }) => {
-            setSession(data.session)
+            setRawSession(data.session)
             // The account as last read: the home opens on it while the hub is asked again.
             if (data.session) setMe(cachedMe(data.session.user.id).read())
-            setReady(true)
+            setSessionRead(true)
         })
         const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
-            setSession(next)
+            setRawSession(next)
             if (!next) {
                 setMe(null)
                 picked.current = null
@@ -84,6 +96,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         return () => listener.subscription.unsubscribe()
     }, [])
+
+    const rawToken = rawSession?.access_token
+    const rawUserId = rawSession?.user.id
+    useEffect(() => {
+        if (!rawToken || !rawUserId) return
+        let cancelled = false
+        readOwesSecondStep()
+            .catch(() => false)
+            .then(owesIt => {
+                if (!cancelled) setLevel({ userId: rawUserId, owes: owesIt })
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [rawToken, rawUserId])
 
     const email = session?.user.email
     useEffect(() => {
@@ -152,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // unregistered behind, while the access token is still good.
     const signOut = useCallback(async () => {
         const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
-        setSession(null)
+        setRawSession(null)
         setMe(null)
         picked.current = null
         clearLocalCache()
@@ -165,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forgetPerson().catch(() => {})
     }, [session, me])
 
-    return <AuthContext.Provider value={{ ready, session, me, switchWorkspace, refreshMe, signOut }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ ready, session, secondStep, me, switchWorkspace, refreshMe, signOut }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthState {

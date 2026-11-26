@@ -96,5 +96,32 @@
             "not-rerun": "Esta dirección no es un servidor Rerun.",
             "outdated": "Actualiza este servidor Rerun para usarlo desde la app."
         }
+    },
+    "secondStep": {
+        "code": {
+            "title": "Un paso más",
+            "subtitle": "Introduce el código de 6 dígitos de tu app de autenticación.",
+            "wrong": "Código incorrecto. Prueba el que muestra tu app ahora.",
+            "verify": "Verificar"
+        },
+        "passkey": {
+            "title": "Confirma que eres tú",
+            "subtitle": "Usa la llave de acceso de este dispositivo: Face ID, Touch ID o tu llave de seguridad.",
+            "use": "Usar mi llave de acceso",
+            "failed": "La llave de acceso no respondió. Inténtalo de nuevo o usa otro método."
+        },
+        "backup": {
+            "title": "Usar un código de respaldo",
+            "subtitle": "Cada código funciona una vez. Escribe uno de los códigos que guardaste.",
+            "placeholder": "XXXX-XXXX",
+            "verify": "Verificar",
+            "wrong": "Este código no funciona. Revísalo o prueba con otro.",
+            "tooMany": "Demasiados intentos. Espera unos minutos y vuelve a intentarlo.",
+            "back": "Volver a los otros métodos"
+        },
+        "useApp": "Usar mi app de autenticación",
+        "usePasskey": "Usar mi llave de acceso",
+        "useBackup": "Usar un código de respaldo",
+        "otherAccount": "Iniciar sesión con otra cuenta"
     }
 }

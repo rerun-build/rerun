@@ -96,5 +96,32 @@
             "not-rerun": "Diese Adresse ist kein Rerun-Server.",
             "outdated": "Aktualisiere diesen Rerun-Server, um ihn mit der App zu nutzen."
         }
+    },
+    "secondStep": {
+        "code": {
+            "title": "Noch ein Schritt",
+            "subtitle": "Gib den 6-stelligen Code aus deiner Authenticator-App ein.",
+            "wrong": "Falscher Code. Versuch den, den deine App gerade anzeigt.",
+            "verify": "Bestätigen"
+        },
+        "passkey": {
+            "title": "Bestätige, dass du es bist",
+            "subtitle": "Nutze den Passkey auf diesem Gerät: Face ID, Touch ID oder deinen Sicherheitsschlüssel.",
+            "use": "Meinen Passkey nutzen",
+            "failed": "Der Passkey hat nicht geantwortet. Versuch es erneut oder nutze eine andere Methode."
+        },
+        "backup": {
+            "title": "Backup-Code nutzen",
+            "subtitle": "Jeder Code funktioniert einmal. Gib einen der Codes ein, die du gespeichert hast.",
+            "placeholder": "XXXX-XXXX",
+            "verify": "Bestätigen",
+            "wrong": "Dieser Code funktioniert nicht. Prüfe ihn oder versuch einen anderen.",
+            "tooMany": "Zu viele Versuche. Warte ein paar Minuten und versuch es dann erneut.",
+            "back": "Zurück zu den anderen Methoden"
+        },
+        "useApp": "Meine Authenticator-App nutzen",
+        "usePasskey": "Meinen Passkey nutzen",
+        "useBackup": "Backup-Code nutzen",
+        "otherAccount": "Mit einem anderen Konto anmelden"
     }
 }

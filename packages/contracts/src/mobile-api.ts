@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { agentKeysListSchema, createCoworkerSchema, createdCoworkerSchema, updateAgentKeysSchema, updateCoworkerSchema } from './agent.js'
-import { accountDeletionStatusSchema, appSessionSchema, deleteAccountRequestSchema, emailCodePreparedSchema, emailCodeRequestSchema, phoneCodeRequestSchema, phoneCodeSentSchema, phoneSignInRequestSchema, signInRefusalSchema } from './app-auth.js'
+import { accountDeletionStatusSchema, appSessionSchema, backupCodeRequestSchema, deleteAccountRequestSchema, emailCodePreparedSchema, emailCodeRequestSchema, phoneCodeRequestSchema, phoneCodeSentSchema, phoneSignInRequestSchema, raisedSessionSchema, signInRefusalSchema } from './app-auth.js'
 import { agentViewSchema, boardAgentSchema, boxSchema, workspaceSummarySchema } from './board.js'
 import { brainRevertRequestSchema } from './brain.js'
 import { clientConfigSchema } from './client.js'
@@ -157,6 +157,7 @@ export const mobileApi = {
     signInWithPhone: hubEndpoint({ method: 'POST', path: '/api/v1/auth/phone/session', body: phoneSignInRequestSchema, response: appSessionSchema, errors: SIGN_IN_REFUSALS }),
     sendEmailCode: hubEndpoint({ method: 'POST', path: '/api/v1/auth/email/code', body: emailCodeRequestSchema, response: emailCodePreparedSchema, errors: SIGN_IN_REFUSALS }),
     bootstrap: hubEndpoint({ method: 'POST', path: '/api/v1/bootstrap', response: meSchema, errors: { 403: hubErrorSchema } }),
+    spendBackupCode: hubEndpoint({ method: 'POST', path: '/api/v1/auth/two-step/backup-code', body: backupCodeRequestSchema, response: raisedSessionSchema, errors: { 400: hubErrorSchema, 401: hubErrorSchema, 429: hubErrorSchema } }),
 
     getMe: hubEndpoint({ method: 'GET', path: '/api/v1/me', response: meSchema, errors: { 403: hubErrorSchema, 404: hubErrorSchema } }),
     listWorkspaces: hubEndpoint({ method: 'GET', path: '/api/v1/workspaces', response: z.array(workspaceSummarySchema) }),

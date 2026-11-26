@@ -96,5 +96,32 @@
             "not-rerun": "此地址不是 Rerun 服务器。",
             "outdated": "请更新此 Rerun 服务器后再从应用中使用。"
         }
+    },
+    "secondStep": {
+        "code": {
+            "title": "还差一步",
+            "subtitle": "输入身份验证器应用中的 6 位验证码。",
+            "wrong": "验证码错误。请输入应用当前显示的验证码。",
+            "verify": "验证"
+        },
+        "passkey": {
+            "title": "确认是您本人",
+            "subtitle": "使用此设备上的通行密钥：Face ID、Touch ID 或您的安全密钥。",
+            "use": "使用我的通行密钥",
+            "failed": "通行密钥没有响应。请重试，或使用其他方式。"
+        },
+        "backup": {
+            "title": "使用备用码",
+            "subtitle": "每个备用码只能使用一次。请输入您保存的其中一个备用码。",
+            "placeholder": "XXXX-XXXX",
+            "verify": "验证",
+            "wrong": "此备用码无效。请检查后重试，或换一个备用码。",
+            "tooMany": "尝试次数过多。请等待几分钟后再试。",
+            "back": "返回其他方式"
+        },
+        "useApp": "使用我的身份验证器应用",
+        "usePasskey": "使用我的通行密钥",
+        "useBackup": "使用备用码",
+        "otherAccount": "使用其他账号登录"
     }
 }

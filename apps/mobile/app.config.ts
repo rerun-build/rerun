@@ -85,11 +85,24 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
     }
 }
 
+// Passkeys work on a domain that names the app in its apple-app-site-association (iOS) and
+// assetlinks.json (Android), both served by the hub: Rerun Cloud's builds list its hubs in
+// EXPO_PUBLIC_PASSKEY_DOMAINS, read again at runtime by src/auth/second-step.ts.
+function withPasskeyDomains(config: ConfigContext['config']): ConfigContext['config'] {
+    const domains = (process.env.EXPO_PUBLIC_PASSKEY_DOMAINS ?? '')
+        .split(',')
+        .map((domain: string) => domain.trim())
+        .filter(Boolean)
+    if (domains.length === 0) return config
+    const associatedDomains = [...(config.ios?.associatedDomains ?? []), ...domains.map((domain: string) => `webcredentials:${domain}`)]
+    return { ...config, ios: { ...config.ios, associatedDomains } }
+}
+
 const PERSONAL_TEAM_DROPS: ReadonlySet<string | undefined> = new Set(['expo-notifications', 'expo-widgets', './plugins/with-notification-service'])
 
 export default ({ config: base }: ConfigContext): ExpoConfig => {
     assertStoreBuildHasHub()
-    const config = withGoogleServices(withAndroidDevClient(withLanguages(withEasProject(base))))
+    const config = withPasskeyDomains(withGoogleServices(withAndroidDevClient(withLanguages(withEasProject(base)))))
     if (!personalTeam) return config as ExpoConfig
 
     return {
@@ -102,6 +115,8 @@ export default ({ config: base }: ConfigContext): ExpoConfig => {
         plugins: paidTeam ? config.plugins : config.plugins?.filter(plugin => !PERSONAL_TEAM_DROPS.has(Array.isArray(plugin) ? plugin[0] : plugin)),
         ios: {
             ...config.ios,
+            // Associated domains need a paid team too: a free one signs no passkey either.
+            associatedDomains: paidTeam ? config.ios?.associatedDomains : undefined,
             bundleIdentifier: process.env.RERUN_IOS_BUNDLE_ID ?? `${config.ios?.bundleIdentifier}.dev`,
         },
     }

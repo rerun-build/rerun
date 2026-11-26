@@ -18,15 +18,21 @@ function deferred<T>(): Deferred<T> {
 const meOf = (workspaceId: number, role = 'admin') => ({ workspace: { id: workspaceId, role, subscribed: true } }) as unknown as Me
 
 const mockSession = { user: { id: 'user-1', email: 'person@example.com' }, access_token: 'jwt' }
+let mockAuthListener: (event: string, session: unknown) => void = () => {}
 jest.mock('@/auth/supabase', () => ({
     supabase: {
         auth: {
             getSession: async () => ({ data: { session: mockSession } }),
-            onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+            onAuthStateChange: (listener: (event: string, session: unknown) => void) => {
+                mockAuthListener = listener
+                return { data: { subscription: { unsubscribe: () => {} } } }
+            },
             signOut: async () => ({}),
         },
     },
 }))
+let mockOwesSecondStep = false
+jest.mock('@/auth/second-step', () => ({ readOwesSecondStep: async () => mockOwesSecondStep }))
 const mockBootstrap = jest.fn<Promise<Me>, [string]>()
 jest.mock('@/auth/sign-in', () => ({ bootstrap: (accessToken: string) => mockBootstrap(accessToken) }))
 const mockFetchMe = jest.fn<Promise<Me>, [{ accessToken: string; workspaceId: number }]>()
@@ -92,6 +98,62 @@ async function renderSignedIn() {
 
 const B = 18259
 const A = 1
+
+describe('the second step of a sign-in', () => {
+    beforeEach(() => {
+        mockStore.clear()
+        mockBootstrap.mockReset()
+        mockBootstrap.mockResolvedValue(meOf(B))
+    })
+    afterEach(() => {
+        mockOwesSecondStep = false
+    })
+
+    it('keeps a session that owes its second step out of the app, and the hub unasked', async () => {
+        mockOwesSecondStep = true
+        await renderSignedIn()
+        expect(auth.ready).toBe(true)
+        expect(auth.session).toBeNull()
+        expect(auth.secondStep).toBe(mockSession)
+        expect(mockBootstrap).not.toHaveBeenCalled()
+    })
+
+    it('lets a session that owes nothing in', async () => {
+        await renderSignedIn()
+        expect(auth.session).toBe(mockSession)
+        expect(auth.secondStep).toBeNull()
+        expect(mockBootstrap).toHaveBeenCalledWith('jwt')
+    })
+
+    it('keeps the app on screen while a refreshed token is checked again', async () => {
+        const seen: { ready: boolean; signedIn: boolean }[] = []
+        rendered = await render(
+            <AuthProvider>
+                <Probe onAuth={value => seen.push({ ready: value.ready, signedIn: Boolean(value.session) })} />
+            </AuthProvider>
+        )
+        await act(async () => {})
+        const before = seen.length
+        await act(async () => {
+            mockAuthListener('TOKEN_REFRESHED', { ...mockSession, access_token: 'jwt-refreshed' })
+        })
+        expect(seen.length).toBeGreaterThan(before)
+        expect(seen.slice(before)).toEqual(seen.slice(before).map(() => ({ ready: true, signedIn: true })))
+    })
+
+    it('holds a refreshed session that still owes its second step until it is raised', async () => {
+        mockOwesSecondStep = true
+        await renderSignedIn()
+        expect(auth.secondStep).toBe(mockSession)
+        mockOwesSecondStep = false
+        const raised = { ...mockSession, access_token: 'jwt-aal2' }
+        await act(async () => {
+            mockAuthListener('MFA_CHALLENGE_VERIFIED', raised)
+        })
+        expect(auth.secondStep).toBeNull()
+        expect(auth.session).toBe(raised)
+    })
+})
 
 describe('the active workspace', () => {
     beforeEach(() => {

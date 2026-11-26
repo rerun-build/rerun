@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { AuthProvider, useAuth } from '@/auth/AuthProvider'
 import { BuddyClock } from '@/components/buddy/motion'
 import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
+import { SecondFactor } from '@/components/auth/SecondFactor'
 import { AiConsent } from '@/components/consent/AiConsent'
 import { NoPlan } from '@/components/home/NoPlan'
 import { useIsSplit } from '@/components/layout/PaneSize'
@@ -51,7 +52,7 @@ function App() {
     const appearanceLoaded = useAppearanceLoaded()
     const scheme = useColorSchemeName()
     const updateRequired = useUpdateRequired()
-    const { ready, session, me, refreshMe, signOut } = useAuth()
+    const { ready, session, secondStep, me, refreshMe, signOut } = useAuth()
     const signedIn = Boolean(session)
     const inactiveWorkspace = signedIn && me !== null && !me.workspace.subscribed
     const { route, reload } = useOnboardingRoute()
@@ -101,6 +102,8 @@ function App() {
             <BuddyClock>
                 {updateRequired ? (
                     <UpdateRequired />
+                ) : secondStep ? (
+                    <SecondFactor onSignOut={() => void signOut()} />
                 ) : signedIn && aiConsent.state === 'needed' ? (
                     <OnboardingShell>
                         <AiConsent onAgree={aiConsent.grant} onDecline={() => void signOut()} />

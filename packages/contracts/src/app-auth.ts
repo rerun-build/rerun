@@ -27,6 +27,13 @@ export type AppSession = z.infer<typeof appSessionSchema>
 // the person's methods leaves it out by this name.
 export const TWO_STEP_RECOVERY_FACTOR_NAME = 'rerun-recovery'
 
+// The second step of a sign-in with two-step verification, by a backup code: the app hands its own
+// session over (the access token as its bearer, the refresh token here), the hub raises it to aal2
+// and gives it back.
+export const backupCodeRequestSchema = z.object({ code: z.string().trim().min(8).max(20), refreshToken: z.string().min(1) })
+export const raisedSessionSchema = z.object({ session: z.object({ accessToken: z.string(), refreshToken: z.string() }) })
+export type RaisedSession = z.infer<typeof raisedSessionSchema>
+
 export const emailCodeRequestSchema = z.object({ email: z.string().trim().email().max(320) })
 
 // `mailed` when the hub sent the code still good for this address again, or holds it back because it

@@ -96,5 +96,32 @@
             "not-rerun": "Bu adres bir Rerun sunucusu değil.",
             "outdated": "Uygulamadan kullanmak için bu Rerun sunucusunu güncelleyin."
         }
+    },
+    "secondStep": {
+        "code": {
+            "title": "Bir adım daha",
+            "subtitle": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.",
+            "wrong": "Yanlış kod. Uygulamanızın şu an gösterdiği kodu deneyin.",
+            "verify": "Doğrula"
+        },
+        "passkey": {
+            "title": "Siz olduğunuzu doğrulayın",
+            "subtitle": "Bu cihazdaki geçiş anahtarını kullanın: Face ID, Touch ID veya güvenlik anahtarınız.",
+            "use": "Geçiş anahtarımı kullan",
+            "failed": "Geçiş anahtarı yanıt vermedi. Tekrar deneyin ya da başka bir yöntem kullanın."
+        },
+        "backup": {
+            "title": "Yedek kod kullanın",
+            "subtitle": "Her kod bir kez çalışır. Kaydettiğiniz kodlardan birini yazın.",
+            "placeholder": "XXXX-XXXX",
+            "verify": "Doğrula",
+            "wrong": "Bu kod çalışmıyor. Kontrol edin ya da başka bir kod deneyin.",
+            "tooMany": "Çok fazla deneme. Birkaç dakika bekleyip tekrar deneyin.",
+            "back": "Diğer yöntemlere dön"
+        },
+        "useApp": "Kimlik doğrulama uygulamamı kullan",
+        "usePasskey": "Geçiş anahtarımı kullan",
+        "useBackup": "Yedek kod kullan",
+        "otherAccount": "Başka bir hesapla giriş yap"
     }
 }

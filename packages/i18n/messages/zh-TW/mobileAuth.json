@@ -96,5 +96,32 @@
             "not-rerun": "此位址不是 Rerun 伺服器。",
             "outdated": "請更新此 Rerun 伺服器，才能從 App 使用。"
         }
+    },
+    "secondStep": {
+        "code": {
+            "title": "還差一個步驟",
+            "subtitle": "請輸入驗證器應用程式中的 6 位數驗證碼。",
+            "wrong": "驗證碼錯誤。請輸入應用程式目前顯示的驗證碼。",
+            "verify": "驗證"
+        },
+        "passkey": {
+            "title": "確認是您本人",
+            "subtitle": "使用這台裝置上的密碼金鑰：Face ID、Touch ID 或您的安全金鑰。",
+            "use": "使用我的密碼金鑰",
+            "failed": "密碼金鑰沒有回應。請再試一次，或改用其他方式。"
+        },
+        "backup": {
+            "title": "使用備用碼",
+            "subtitle": "每組備用碼只能使用一次。請輸入您儲存的其中一組備用碼。",
+            "placeholder": "XXXX-XXXX",
+            "verify": "驗證",
+            "wrong": "這組備用碼無效。請檢查後再試，或改用另一組。",
+            "tooMany": "嘗試次數過多。請稍候幾分鐘再試。",
+            "back": "返回其他方式"
+        },
+        "useApp": "使用我的驗證器應用程式",
+        "usePasskey": "使用我的密碼金鑰",
+        "useBackup": "使用備用碼",
+        "otherAccount": "使用其他帳號登入"
     }
 }

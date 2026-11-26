@@ -118,6 +118,10 @@ Sign-in codes go out through Supabase unless you set up that hook. See [Set up S
 | `HCAPTCHA_SECRET_KEY` | Optional | empty | Its secret key. Set both or neither. Without any captcha secret, no captcha. |
 | `TELLA_AUTO_CAPTURE_SECRET` | Optional | empty | The "Capture identification" value of a Tella workspace. A request carrying it in the `x-tella-auto-capture` header signs in without the captcha. Empty: no exception. |
 | `STAGING_PASSWORD` | Optional | empty | Puts every page behind a browser password prompt (HTTP Basic Auth, any user name). `/api/*` stays open, so engines and webhooks keep working. |
+| `PASSKEY_IOS_APP_IDS` | Optional | empty | The iPhone apps allowed to use this install's passkeys for [two-step verification](/account-security), as `TEAMID.bundle.id`, comma separated. Served at `/.well-known/apple-app-site-association`. Empty: the file answers 404, and the app offers the authenticator code and backup codes only. |
+| `PASSKEY_ANDROID_APPS` | Optional | empty | The same for Android, as `package:SHA-256 fingerprint of the signing certificate`, comma separated. Served at `/.well-known/assetlinks.json`. |
+
+[Two-step verification](/account-security) needs multi-factor authentication on in your Supabase project: the authenticator app (TOTP) and WebAuthn, both enroll and verify. Passkeys also need its WebAuthn relying party: the domain of your install as RP ID, and its URL as origin (`[auth.webauthn]` of `supabase/config.toml`, which sets them for a local stack). A passkey then works on that address only.
 
 ## Optional services
 
