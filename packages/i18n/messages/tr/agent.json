@@ -450,7 +450,35 @@
             "saveChanges": "Değişiklikleri kaydet",
             "create": "Görev oluştur"
         },
-        "count": "{count, plural, one {# zamanlanmış görev} other {# zamanlanmış görev}}"
+        "count": "{count, plural, one {# zamanlanmış görev} other {# zamanlanmış görev}}",
+        "script": {
+            "runInstead": "Bunun yerine modelsiz bir komut çalıştır",
+            "instructionInstead": "Bunun yerine bir talimat yaz",
+            "runsOn": "Çalıştığı yer",
+            "workspaceMachine": "Çalışma alanı makinesi",
+            "linkedComputer": "{name} (bağlı bilgisayar)",
+            "unlinkedComputer": "Artık bağlı olmayan bir bilgisayar",
+            "onlineOnly": "Yalnızca bu bilgisayar çevrimiçiyken çalışır.",
+            "command": "Komut",
+            "folder": "Klasör",
+            "stopAfter": "Durdurma süresi",
+            "timeoutMinutes": "{minutes} dk",
+            "timeoutHours": "{hours, plural, one {# saat} other {# saat}}",
+            "notifyFailures": "Yalnızca başarısız olunca bildir",
+            "notifyHelper": "Her çalıştırma çıktısını ve çıkış kodunu saklar.",
+            "runNow": "Şimdi çalıştır",
+            "neverRan": "Hiç çalışmadı",
+            "rowSucceeded": "{duration} içinde çıkış 0 · {time}",
+            "rowFailed": "Başarısız, çıkış {code} · {time}",
+            "rowFailedNoCode": "Başarısız · {time}",
+            "cardSucceeded": "Başarılı",
+            "cardFailed": "Başarısız, çıkış kodu {code}",
+            "cardFailedNoCode": "Başarısız",
+            "running": "Çalışıyor",
+            "exitCode": "çıkış {code}",
+            "noExitCode": "çıkış kodu yok",
+            "noOutput": "Hiçbir şey yazdırmadı."
+        }
     },
     "taskNotifyField": {
         "label": "Bana bildir",

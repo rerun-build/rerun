@@ -450,7 +450,35 @@
             "saveChanges": "儲存變更",
             "create": "建立任務"
         },
-        "count": "{count, plural, other {# 個排程任務}}"
+        "count": "{count, plural, other {# 個排程任務}}",
+        "script": {
+            "runInstead": "改為執行指令，不使用模型",
+            "instructionInstead": "改為撰寫指示",
+            "runsOn": "執行位置",
+            "workspaceMachine": "工作區機器",
+            "linkedComputer": "{name}（已連結的電腦）",
+            "unlinkedComputer": "已不再連結的電腦",
+            "onlineOnly": "僅在這台電腦連線時執行。",
+            "command": "指令",
+            "folder": "資料夾",
+            "stopAfter": "逾時停止",
+            "timeoutMinutes": "{minutes} 分鐘",
+            "timeoutHours": "{hours, plural, other {# 小時}}",
+            "notifyFailures": "僅在失敗時通知",
+            "notifyHelper": "每次執行都會保留輸出與結束代碼。",
+            "runNow": "立即執行",
+            "neverRan": "從未執行",
+            "rowSucceeded": "結束代碼 0，耗時 {duration} · {time}",
+            "rowFailed": "失敗，結束代碼 {code} · {time}",
+            "rowFailedNoCode": "失敗 · {time}",
+            "cardSucceeded": "成功",
+            "cardFailed": "失敗，結束代碼 {code}",
+            "cardFailedNoCode": "失敗",
+            "running": "執行中",
+            "exitCode": "結束代碼 {code}",
+            "noExitCode": "無結束代碼",
+            "noOutput": "沒有任何輸出。"
+        }
     },
     "taskNotifyField": {
         "label": "通知我",

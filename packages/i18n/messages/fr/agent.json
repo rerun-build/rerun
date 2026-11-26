@@ -450,7 +450,35 @@
             "saveChanges": "Enregistrer",
             "create": "Créer la tâche"
         },
-        "count": "{count, plural, one {# tâche planifiée} other {# tâches planifiées}}"
+        "count": "{count, plural, one {# tâche planifiée} other {# tâches planifiées}}",
+        "script": {
+            "runInstead": "Lancer une commande à la place, sans modèle",
+            "instructionInstead": "Écrire une consigne à la place",
+            "runsOn": "S'exécute sur",
+            "workspaceMachine": "Machine du workspace",
+            "linkedComputer": "{name} (ordinateur lié)",
+            "unlinkedComputer": "Un ordinateur qui n'est plus lié",
+            "onlineOnly": "S'exécute seulement quand cet ordinateur est en ligne.",
+            "command": "Commande",
+            "folder": "Dossier",
+            "stopAfter": "Arrêter après",
+            "timeoutMinutes": "{minutes} min",
+            "timeoutHours": "{hours, plural, one {# heure} other {# heures}}",
+            "notifyFailures": "Me prévenir seulement en cas d'échec",
+            "notifyHelper": "Chaque exécution garde sa sortie et son code de retour.",
+            "runNow": "Lancer maintenant",
+            "neverRan": "Jamais lancée",
+            "rowSucceeded": "Code 0 en {duration} · {time}",
+            "rowFailed": "Échec, code {code} · {time}",
+            "rowFailedNoCode": "Échec · {time}",
+            "cardSucceeded": "Réussie",
+            "cardFailed": "Échec, code de retour {code}",
+            "cardFailedNoCode": "Échec",
+            "running": "En cours",
+            "exitCode": "code {code}",
+            "noExitCode": "sans code",
+            "noOutput": "Rien n'a été affiché."
+        }
     },
     "taskNotifyField": {
         "label": "Me prévenir",

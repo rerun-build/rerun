@@ -19,6 +19,8 @@ export type AnnouncedNotification = {
     message: string
     engineSessionId: string | null
     engineRunId: string | null
+    /** The routine a script's run belongs to: it has no conversation, so the notification opens it. */
+    scriptSlug?: string | null
     createdAt: string
 }
 

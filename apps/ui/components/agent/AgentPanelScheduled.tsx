@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { createScheduleAction, deleteScheduleAction, getScheduleAction, listAgentRoutinesAction, listScheduleRunsAction, listTaskOutcomesAction, parseScheduleAction, testScheduleAction, updateScheduleAction, type WorkspaceRoutine } from '@/app/api/_actions/agent.actions'
+import { createScheduleAction, deleteScheduleAction, getScheduleAction, listAgentRoutinesAction, listScheduleRunsAction, listTaskOutcomesAction, parseScheduleAction, supportsScriptRoutinesAction, testScheduleAction, updateScheduleAction, type WorkspaceRoutine } from '@/app/api/_actions/agent.actions'
 import { adoptRunSession, RunHistoryList } from '@/components/agent/AgentRunHistory'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { RunModelField, useRunModel } from '@/components/agent/RunModelField'
@@ -32,6 +32,10 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonRows } from '@/components/ui/skeleton'
 import { useBoardStore } from '@/stores/board.store'
 import { RoutineList } from '@rerun/ui/foreman'
+import { AgentBuddy } from '@rerun/ui/iso-grid'
+import type { ScheduleKind } from '@rerun/contracts'
+import { ModeLink, newScriptDraft, ScriptFields, ScriptGlyph, ScriptLastRunCard, ScriptOutcomeFooter, ScriptRunHistory, type ScriptDraft } from '@/components/agent/ScriptRoutine'
+import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { formatDate } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -44,7 +48,7 @@ type AgentPanelScheduledProps = {
     onFocusConsumed?: () => void
 }
 
-type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string }
+type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string; script: boolean }
 
 export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSlug, onFocusConsumed }: AgentPanelScheduledProps) {
     const boxManageReason = useBoxManageReason(agentId)
@@ -55,6 +59,8 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     const loadRoutines = useCallback(() => listAgentRoutinesAction(agentId), [agentId])
     const list = useRoutines({ load: loadRoutines, agentId, onRunStarted: (routine, sessionId, runId) => onOpenSession(sessionId, routine.name, runId) })
     const schedulesRefreshKey = useBoardStore(s => s.schedulesRefreshKey)
+    const { computers } = useMentionComputers()
+    const tScript = useTranslations('agent.agentPanelScheduled.script')
 
     // A routine opened from elsewhere lands on its editor, on the render that carries the request.
     const requestedFocus = focusSlug ?? null
@@ -99,12 +105,20 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     if (view.mode === 'edit') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={backToSavedList} onBack={backToList} onShowHistory={() => setView({ mode: 'runs', slug: view.slug })} onOpenSession={onOpenSession} />
+                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={backToSavedList} onBack={backToList} onShowHistory={script => setView({ mode: 'runs', slug: view.slug, script })} onOpenSession={onOpenSession} />
             </PanelSteps>
         )
     }
 
     if (view.mode === 'runs') {
+        const backToEditor = () => setView({ mode: 'edit', slug: view.slug })
+        if (view.script) {
+            return (
+                <PanelSteps stepKey={stepKey} depth={stepDepth}>
+                    <ScriptRunHistory agentId={agentId} slug={view.slug} title={list.routines?.find(s => s.slug === view.slug)?.name ?? view.slug} onBack={backToEditor} />
+                </PanelSteps>
+            )
+        }
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
                 <ScheduleRuns agentId={agentId} schedule={list.routines?.find(s => s.slug === view.slug)} slug={view.slug} onBack={() => setView({ mode: 'edit', slug: view.slug })} onOpenSession={onOpenSession} />
@@ -121,6 +135,14 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     }
 
     const openEditor = (routine: WorkspaceRoutine) => setView({ mode: 'edit', slug: routine.slug })
+    const placeOf = (routine: WorkspaceRoutine) => {
+        if (routine.kind !== 'script') return undefined
+        if (!routine.runsOn) return tScript('workspaceMachine')
+        // Unread, the list would call every computer unlinked.
+        if (!computers) return undefined
+        return computers.find(computer => computer.id === routine.runsOn)?.name ?? tScript('unlinkedComputer')
+    }
+    const routines = list.routines.map(routine => ({ ...routine, place: placeOf(routine) }))
     const newButton = (
         <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
@@ -145,7 +167,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                     />
                 ) : (
                     <RoutineList
-                        routines={list.routines}
+                        routines={routines}
                         now={list.now}
                         onOpen={openEditor}
                         onToggle={canManage ? list.toggle : undefined}
@@ -154,12 +176,23 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                         onRename={list.rename}
                         onCancelRename={list.cancelRename}
                         renderMenu={routine => <RoutineMenu routine={routine} canRename={list.canRename && canManage} onRename={() => list.startRename(routine)} onEdit={() => openEditor(routine)} onRunNow={() => list.runNow(routine)} />}
-                        renderFooter={routine => <TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', routine.slug)]} lastStartedAt={routine.lastRunAt} />}
+                        renderLeading={routine => (routine.kind === 'script' ? <ScriptGlyph /> : <CoworkerGlyph agentId={agentId} />)}
+                        renderFooter={routine =>
+                            routine.kind === 'script' ? <ScriptOutcomeFooter outcome={outcomes[outcomeKey('schedule', routine.slug)]} /> : <TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', routine.slug)]} lastStartedAt={routine.lastRunAt} />
+                        }
                         className="min-h-0 flex-1 pt-1"
                     />
                 )}
             </div>
         </PanelSteps>
+    )
+}
+
+function CoworkerGlyph({ agentId }: { agentId: string }) {
+    return (
+        <span className="flex size-7 items-center justify-center rounded-lg bg-muted">
+            <AgentBuddy agentId={agentId} size={18} animated={false} facing="right" />
+        </span>
     )
 }
 
@@ -247,9 +280,11 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
     )
 }
 
-function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistory, onOpenSession }: { agentId: string; agentName: string; slug?: string; onDone: () => void; onBack: () => void; onShowHistory?: () => void; onOpenSession?: (sessionId: string, title: string, runId: string | null) => void }) {
+function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistory, onOpenSession }: { agentId: string; agentName: string; slug?: string; onDone: () => void; onBack: () => void; onShowHistory?: (script: boolean) => void; onOpenSession?: (sessionId: string, title: string, runId: string | null) => void }) {
     const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelScheduled.editor')
+    const tScript = useTranslations('agent.agentPanelScheduled.script')
+    const tErrors = useTranslations('errors')
     const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
@@ -265,12 +300,27 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
     const [enabled, setEnabled] = useState(true)
     const [savedEnabled, setSavedEnabled] = useState(true)
     const [body, setBody] = useState('')
+    // The instruction and the command are kept apart, so switching back and forth loses neither.
+    const [command, setCommand] = useState('')
+    const [kind, setKind] = useState<ScheduleKind>('instruction')
+    const [script, setScript] = useState<ScriptDraft>(newScriptDraft)
     const [saving, setSaving] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [testing, setTesting] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [canRename, setCanRename] = useState(false)
     const setup = useAgentSetup(agentId)
+    // Null until the engine answers. An engine older than script routines would keep the command as an
+    // instruction for the model, so the link waits for it.
+    const [canScript, setCanScript] = useState<boolean | null>(null)
+
+    useEffect(() => {
+        let cancelled = false
+        void supportsScriptRoutinesAction(agentId).then(supported => !cancelled && setCanScript(supported))
+        return () => {
+            cancelled = true
+        }
+    }, [agentId])
 
     useEffect(() => {
         if (!slug) return
@@ -293,7 +343,11 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                     setEnabled(s.enabled ?? true)
                     setSavedEnabled(s.enabled ?? true)
                     setPick({ connectionId: s.connectionId ?? null, model: s.model })
-                    setBody(s.body ?? '')
+                    setKind(s.kind)
+                    if (s.kind === 'script') {
+                        setCommand(s.body ?? '')
+                        setScript(s.script ?? newScriptDraft())
+                    } else setBody(s.body ?? '')
                 }
             })
             .finally(() => setLoading(false))
@@ -303,15 +357,16 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         setSaving(true)
         setError(null)
         const scheduling = scheduleMode === 'cron' ? { cron: cron.trim(), runAt: undefined } : { runAt: runAtLocal ? localInputToIso(runAtLocal) : '', cron: undefined }
-        const provider = providerFor(pick)
+        // A script runs no model: it carries its command and its settings instead.
+        const run = kind === 'script' ? { kind, script, body: command, connectionId: null, provider: null, model: null } : { kind, script: null, body, connectionId: pick.connectionId, provider: providerFor(pick), model: pick.model }
         const result = isEdit
-            ? await updateScheduleAction(agentId, slug!, { name: canRename ? name.trim() : undefined, description, body, timezone: timezone.trim() || undefined, enabled, connectionId: pick.connectionId, provider, model: pick.model, ...scheduling })
-            : await createScheduleAction(agentId, { name, description, body, timezone: timezone.trim() || undefined, connectionId: pick.connectionId, provider, model: pick.model, ...scheduling })
+            ? await updateScheduleAction(agentId, slug!, { name: canRename ? name.trim() : undefined, description, timezone: timezone.trim() || undefined, enabled, ...run, ...scheduling })
+            : await createScheduleAction(agentId, { name, description, timezone: timezone.trim() || undefined, ...run, ...scheduling })
         setSaving(false)
         if (result.success) useBoardStore.getState().requestSchedulesRefresh()
         if (result.success) onDone()
         else setError(errorText(result, t('saveFailed')))
-    }, [agentId, slug, isEdit, canRename, name, description, scheduleMode, cron, runAtLocal, timezone, enabled, pick, body, onDone, providerFor, t, errorText])
+    }, [agentId, slug, isEdit, canRename, name, description, scheduleMode, cron, runAtLocal, timezone, enabled, pick, body, command, kind, script, onDone, providerFor, t, errorText])
 
     const handleTest = useCallback(async () => {
         if (!slug) return
@@ -324,7 +379,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                 return
             }
             if (!result.sessionId) {
-                onShowHistory?.()
+                onShowHistory?.(kind === 'script')
                 return
             }
             const title = name.trim() || slug
@@ -335,7 +390,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         } finally {
             setTesting(false)
         }
-    }, [agentId, slug, name, onOpenSession, onShowHistory, t, errorText])
+    }, [agentId, slug, name, kind, onOpenSession, onShowHistory, t, errorText])
 
     const handleDelete = useCallback(async () => {
         if (!slug) return
@@ -355,7 +410,8 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         )
     }
 
-    const canSave = name.trim() && body.trim() && (scheduleMode === 'cron' ? cron.trim() : runAtLocal)
+    const isScript = kind === 'script'
+    const canSave = name.trim() && (isScript ? command.trim() : body.trim()) && (scheduleMode === 'cron' ? cron.trim() : runAtLocal)
     // Mirrors the engine, which refuses a manual run of a task still paused for the install: that run
     // would get the install prompt and ask its questions a second time.
     const waitingForSetup = setup.pending && !savedEnabled
@@ -364,13 +420,14 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         <PanelEditorShell>
             <PanelEditorHeader title={isEdit ? (canManage ? t('titleEdit') : t('titleReadOnly')) : t('titleNew')} onBack={onBack}>
                 {isEdit && onShowHistory && (
-                    <Button size="sm" variant="ghost" onClick={onShowHistory}>
+                    <Button size="sm" variant="ghost" onClick={() => onShowHistory(isScript)}>
                         <HistoryIcon className="size-3.5 me-1" /> {t('history')}
                     </Button>
                 )}
             </PanelEditorHeader>
             <PanelEditorBody>
                 {error && <p className="text-xs text-destructive">{error}</p>}
+                {slug && isScript && onShowHistory && <ScriptLastRunCard agentId={agentId} slug={slug} onShowHistory={() => onShowHistory(true)} />}
                 <Input label={t('name')} helperText={isEdit && !canRename ? t('nameLockedHelper') : undefined} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={!canManage || (isEdit && !canRename)} maxLength={120} placeholder={t('namePlaceholder')} className="h-8 text-sm" />
                 <Input label={t('description')} hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={!canManage} placeholder={t('descriptionPlaceholder')} className="h-8 text-sm" />
 
@@ -392,17 +449,33 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                     <TimezoneCombobox value={timezone} onChange={setTimezone} placeholder="Europe/Paris" disabled={!canManage} />
                 </Field>
 
-                <RunModelField id="schedule-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText={t('modelHelper')} />
+                {isScript ? (
+                    <>
+                        <ScriptFields script={script} onScript={setScript} command={command} onCommand={setCommand} disabled={!canManage} onInstructionInstead={() => setKind('instruction')} />
+                        {isEdit && (
+                            <Field orientation="row" label={t('enabled')}>
+                                <Switch checked={enabled} disabled={!canManage} onCheckedChange={setEnabled} />
+                            </Field>
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <RunModelField id="schedule-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText={t('modelHelper')} />
 
-                {isEdit && (
-                    <Field orientation="row" label={t('enabled')}>
-                        <Switch checked={enabled} disabled={!canManage} onCheckedChange={setEnabled} />
-                    </Field>
+                        {isEdit && (
+                            <Field orientation="row" label={t('enabled')}>
+                                <Switch checked={enabled} disabled={!canManage} onCheckedChange={setEnabled} />
+                            </Field>
+                        )}
+
+                        {slug && <TaskNotifyField agentId={agentId} source="schedule" slug={slug} />}
+
+                        <MarkdownTextarea label={t('prompt')} dialogTitle={t('promptDialogTitle')} helperText={t('promptHelper')} value={body} onChange={setBody} disabled={!canManage} className="text-xs min-h-32 font-mono" placeholder={t('promptPlaceholder')} />
+                        <TooltipDisabledReason reason={canScript === false ? tErrors('scriptRoutineNeedsUpdate') : undefined} className="self-start">
+                            <ModeLink label={tScript('runInstead')} onClick={() => setKind('script')} disabled={!canManage || canScript !== true} />
+                        </TooltipDisabledReason>
+                    </>
                 )}
-
-                {slug && <TaskNotifyField agentId={agentId} source="schedule" slug={slug} />}
-
-                <MarkdownTextarea label={t('prompt')} dialogTitle={t('promptDialogTitle')} helperText={t('promptHelper')} value={body} onChange={setBody} disabled={!canManage} className="text-xs min-h-32 font-mono" placeholder={t('promptPlaceholder')} />
 
                 {isEdit && waitingForSetup && (
                     <p className="text-xs text-muted-foreground">
@@ -433,7 +506,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                 )}
                 {isEdit && (
                     <Button size="sm" variant="outline" className="flex-1" loading={testing} onClick={handleTest} disabled={saving || waitingForSetup}>
-                        {t('testRun')}
+                        {isScript ? tScript('runNow') : t('testRun')}
                     </Button>
                 )}
                 <TooltipDisabledReason reason={manageReason} className="flex-1">

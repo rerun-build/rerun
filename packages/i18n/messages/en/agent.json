@@ -546,7 +546,35 @@
             "saveChanges": "Save changes",
             "create": "Create task"
         },
-        "count": "{count, plural, one {# scheduled task} other {# scheduled tasks}}"
+        "count": "{count, plural, one {# scheduled task} other {# scheduled tasks}}",
+        "script": {
+            "runInstead": "Run a command instead, without a model",
+            "instructionInstead": "Write an instruction instead",
+            "runsOn": "Runs on",
+            "workspaceMachine": "Workspace machine",
+            "linkedComputer": "{name} (linked computer)",
+            "unlinkedComputer": "A computer no longer linked",
+            "onlineOnly": "Runs only while this computer is online.",
+            "command": "Command",
+            "folder": "Folder",
+            "stopAfter": "Stop after",
+            "timeoutMinutes": "{minutes} min",
+            "timeoutHours": "{hours, plural, one {# hour} other {# hours}}",
+            "notifyFailures": "Notify only when it fails",
+            "notifyHelper": "Each run keeps its output and exit code.",
+            "runNow": "Run now",
+            "neverRan": "Never ran",
+            "rowSucceeded": "Exit 0 in {duration} · {time}",
+            "rowFailed": "Failed, exit {code} · {time}",
+            "rowFailedNoCode": "Failed · {time}",
+            "cardSucceeded": "Succeeded",
+            "cardFailed": "Failed, exit code {code}",
+            "cardFailedNoCode": "Failed",
+            "running": "Running",
+            "exitCode": "exit {code}",
+            "noExitCode": "no exit code",
+            "noOutput": "It printed nothing."
+        }
     },
     "taskNotifyField": {
         "label": "Notify me",

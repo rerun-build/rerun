@@ -11,6 +11,7 @@ import { useBrand } from '@/components/brand/BrandProvider'
 import { appIconUrl } from '@/lib/brand/icons'
 import { playNotificationSoundOnce, showBrowserNotification } from '@/lib/notifications/browser'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
+import { scriptRoutineSlugOf } from '@/lib/notifications/inbound'
 import { isScheduledSource, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { deliveryFor, recipientReason } from '@/lib/notifications/routing'
 import { useBoardStore } from '@/stores/board.store'
@@ -79,8 +80,9 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
 
             const status = kind === 'done' ? FINISHED_STATUS : ANNOUNCED_STATUS[kind]
             const shown = normalizeNotificationPrefs(prefsRef.current).toast && !!status
+            const scriptSlug = scriptRoutineSlugOf(row.metadata)
             const openConversation =
-                row.agent_id || fromForeman ? () => openConversationFromNotification({ agentId: row.agent_id, engineAgentId: row.engine_agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id }) : undefined
+                row.agent_id || fromForeman ? () => openConversationFromNotification({ agentId: row.agent_id, engineAgentId: row.engine_agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id, scriptSlug }) : undefined
             if (shown && status) {
                 useNotificationsStore.getState().announce({
                     id: row.id,
@@ -90,6 +92,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
                     message,
                     engineSessionId: row.engine_session_id,
                     engineRunId: row.engine_run_id,
+                    scriptSlug,
                     createdAt: row.created_at,
                 })
             }

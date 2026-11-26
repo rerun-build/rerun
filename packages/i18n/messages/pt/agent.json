@@ -450,7 +450,35 @@
             "saveChanges": "Salvar alterações",
             "create": "Criar tarefa"
         },
-        "count": "{count, plural, one {# tarefa agendada} other {# tarefas agendadas}}"
+        "count": "{count, plural, one {# tarefa agendada} other {# tarefas agendadas}}",
+        "script": {
+            "runInstead": "Executar um comando em vez disso, sem modelo",
+            "instructionInstead": "Escrever uma instrução em vez disso",
+            "runsOn": "Executa em",
+            "workspaceMachine": "Máquina do workspace",
+            "linkedComputer": "{name} (computador vinculado)",
+            "unlinkedComputer": "Um computador que não está mais vinculado",
+            "onlineOnly": "Executa só enquanto este computador estiver online.",
+            "command": "Comando",
+            "folder": "Pasta",
+            "stopAfter": "Parar após",
+            "timeoutMinutes": "{minutes} min",
+            "timeoutHours": "{hours, plural, one {# hora} other {# horas}}",
+            "notifyFailures": "Avisar só quando falhar",
+            "notifyHelper": "Cada execução guarda a saída e o código de saída.",
+            "runNow": "Executar agora",
+            "neverRan": "Nunca executou",
+            "rowSucceeded": "Código 0 em {duration} · {time}",
+            "rowFailed": "Falhou, código {code} · {time}",
+            "rowFailedNoCode": "Falhou · {time}",
+            "cardSucceeded": "Concluída",
+            "cardFailed": "Falhou, código de saída {code}",
+            "cardFailedNoCode": "Falhou",
+            "running": "Em execução",
+            "exitCode": "código {code}",
+            "noExitCode": "sem código",
+            "noOutput": "Não exibiu nada."
+        }
     },
     "taskNotifyField": {
         "label": "Me avisar",

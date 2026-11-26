@@ -450,7 +450,35 @@
             "saveChanges": "לשמור שינויים",
             "create": "ליצור משימה"
         },
-        "count": "{count, plural, one {משימה מתוזמנת אחת} two {שתי משימות מתוזמנות} other {# משימות מתוזמנות}}"
+        "count": "{count, plural, one {משימה מתוזמנת אחת} two {שתי משימות מתוזמנות} other {# משימות מתוזמנות}}",
+        "script": {
+            "runInstead": "להריץ פקודה במקום, בלי מודל",
+            "instructionInstead": "לכתוב הנחיה במקום",
+            "runsOn": "רץ על",
+            "workspaceMachine": "מכונת סביבת העבודה",
+            "linkedComputer": "{name} (מחשב מקושר)",
+            "unlinkedComputer": "מחשב שכבר לא מקושר",
+            "onlineOnly": "רץ רק כשהמחשב הזה מחובר.",
+            "command": "פקודה",
+            "folder": "תיקייה",
+            "stopAfter": "לעצור אחרי",
+            "timeoutMinutes": "{minutes} דק׳",
+            "timeoutHours": "{hours, plural, one {שעה אחת} two {שעתיים} other {# שעות}}",
+            "notifyFailures": "להודיע רק כשזה נכשל",
+            "notifyHelper": "כל הרצה שומרת את הפלט ואת קוד היציאה שלה.",
+            "runNow": "להריץ עכשיו",
+            "neverRan": "עוד לא רץ",
+            "rowSucceeded": "יציאה 0 תוך {duration} · {time}",
+            "rowFailed": "נכשל, יציאה {code} · {time}",
+            "rowFailedNoCode": "נכשל · {time}",
+            "cardSucceeded": "הצליח",
+            "cardFailed": "נכשל, קוד יציאה {code}",
+            "cardFailedNoCode": "נכשל",
+            "running": "רץ",
+            "exitCode": "יציאה {code}",
+            "noExitCode": "ללא קוד יציאה",
+            "noOutput": "לא הודפס כלום."
+        }
     },
     "taskNotifyField": {
         "label": "להודיע לי",

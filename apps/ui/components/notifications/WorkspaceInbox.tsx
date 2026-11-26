@@ -157,7 +157,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     } else if (view !== null && view !== 'hub') {
         const { notification } = view
         const row = rowOf(notification)
-        const { agentId, engineSessionId, engineRunId } = notification
+        const { agentId, engineSessionId, engineRunId, scriptSlug } = notification
         detailKey = notification.id
         detail = (
             <InboxDetailCard
@@ -171,7 +171,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
                     agentId
                         ? () => {
                               setView(null)
-                              void openConversationFromNotification({ agentId, engineSessionId, engineRunId })
+                              void openConversationFromNotification({ agentId, engineSessionId, engineRunId, scriptSlug })
                           }
                         : undefined
                 }

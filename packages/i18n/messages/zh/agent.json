@@ -450,7 +450,35 @@
             "saveChanges": "保存更改",
             "create": "创建任务"
         },
-        "count": "{count, plural, other {# 个定时任务}}"
+        "count": "{count, plural, other {# 个定时任务}}",
+        "script": {
+            "runInstead": "改为运行命令，不使用模型",
+            "instructionInstead": "改为编写指令",
+            "runsOn": "运行位置",
+            "workspaceMachine": "工作区机器",
+            "linkedComputer": "{name}（已关联的电脑）",
+            "unlinkedComputer": "已不再关联的电脑",
+            "onlineOnly": "仅在这台电脑在线时运行。",
+            "command": "命令",
+            "folder": "文件夹",
+            "stopAfter": "超时停止",
+            "timeoutMinutes": "{minutes} 分钟",
+            "timeoutHours": "{hours, plural, other {# 小时}}",
+            "notifyFailures": "仅在失败时通知",
+            "notifyHelper": "每次运行都会保留输出和退出码。",
+            "runNow": "立即运行",
+            "neverRan": "从未运行",
+            "rowSucceeded": "退出码 0，用时 {duration} · {time}",
+            "rowFailed": "失败，退出码 {code} · {time}",
+            "rowFailedNoCode": "失败 · {time}",
+            "cardSucceeded": "成功",
+            "cardFailed": "失败，退出码 {code}",
+            "cardFailedNoCode": "失败",
+            "running": "运行中",
+            "exitCode": "退出码 {code}",
+            "noExitCode": "无退出码",
+            "noOutput": "没有任何输出。"
+        }
     },
     "taskNotifyField": {
         "label": "通知我",

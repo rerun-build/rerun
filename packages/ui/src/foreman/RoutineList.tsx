@@ -32,6 +32,8 @@ export type RoutineEntry = {
     runningSince: string | null
     /** The coworker's install is still running, so its routines cannot be switched on yet. */
     setupPending?: boolean
+    /** Where a routine that runs a command runs it, after the rule ("Workspace machine"). */
+    place?: string
 }
 
 export type RoutineListProps<T extends RoutineEntry> = {
@@ -44,6 +46,8 @@ export type RoutineListProps<T extends RoutineEntry> = {
     onToggle?: (routine: T, enabled: boolean) => void
     isSaving?: (routine: T) => boolean
     renderMenu?: (routine: T) => ReactNode
+    /** Before the name, in place of the coworker's face: what kind of routine it is. */
+    renderLeading?: (routine: T) => ReactNode
     /** Under the rule, the line about the last run. */
     renderFooter?: (routine: T) => ReactNode
     renamingKey?: string | null
@@ -138,13 +142,14 @@ export function RoutineList<T extends RoutineEntry>({ routines, now, docked = fa
 
 type RoutineRowProps<T extends RoutineEntry> = Omit<RoutineListProps<T>, 'routines' | 'docked' | 'className'> & { routine: T }
 
-function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen, onToggle, isSaving, renderMenu, renderFooter, renamingKey, onRename, onCancelRename }: RoutineRowProps<T>) {
+function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen, onToggle, isSaving, renderMenu, renderLeading, renderFooter, renamingKey, onRename, onCancelRename }: RoutineRowProps<T>) {
     const t = useKitTranslations()
     const renaming = renamingKey === routineKey(routine)
     const open = () => !renaming && onOpen(routine)
-    const rule = [routine.frequency, agentNameOf?.(routine.agentId)].filter(Boolean).join(' · ')
+    const rule = [routine.frequency, routine.place, agentNameOf?.(routine.agentId)].filter(Boolean).join(' · ')
     const blockedBySetup = Boolean(routine.setupPending) && !routine.enabled
     const footer = renderFooter?.(routine)
+    const leading = renderLeading?.(routine)
 
     return (
         <div
@@ -154,7 +159,9 @@ function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen,
             onKeyDown={event => event.target === event.currentTarget && event.key === 'Enter' && open()}
             className="group flex min-h-16 cursor-pointer items-center gap-3 px-4 py-3 outline-none transition-colors hover:bg-accent/30 focus-visible:bg-accent/30"
         >
-            {agentNameOf && (
+            {leading ? (
+                <span className="shrink-0">{leading}</span>
+            ) : agentNameOf && (
                 <span className="shrink-0">
                     {routine.agentId === FOREMAN_AGENT_ID ? <Orb size={28} paused facing="right" /> : <AgentBuddy agentId={routine.agentId} size={28} animated={false} facing="right" mood={routine.enabled ? 'idle' : 'asleep'} />}
                 </span>

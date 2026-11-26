@@ -51,6 +51,7 @@ import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, isAppSlug } from '@/lib/apps/type
 import { usePaidAppsStore } from '@rerun/cloud/apps.client'
 import { RECONNECT_PARAM } from '@/lib/engine/ai-sources'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
+import { scriptRoutineSlugOf } from '@/lib/notifications/inbound'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AGENT_FOCUS_TABS, type AgentFocusTab, type SpacePublic } from '@/lib/board/types'
@@ -325,9 +326,9 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         if (!notificationId || notificationLinkOpened.current || !hydrated) return
         notificationLinkOpened.current = true
         clearSearchParams('notification')
-        void selectMaybeSingle(createClient(), 'notifications', ['agent_id', 'engine_agent_id', 'engine_session_id', 'engine_run_id'] as const, { id: notificationId }).then(({ data }) => {
+        void selectMaybeSingle(createClient(), 'notifications', ['agent_id', 'engine_agent_id', 'engine_session_id', 'engine_run_id', 'metadata'] as const, { id: notificationId }).then(({ data }) => {
             if (!data) return
-            void openConversationFromNotification({ agentId: data.agent_id, engineAgentId: data.engine_agent_id, engineSessionId: data.engine_session_id, engineRunId: data.engine_run_id })
+            void openConversationFromNotification({ agentId: data.agent_id, engineAgentId: data.engine_agent_id, engineSessionId: data.engine_session_id, engineRunId: data.engine_run_id, scriptSlug: scriptRoutineSlugOf(data.metadata) })
         })
     }, [searchParams, hydrated])
 

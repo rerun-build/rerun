@@ -450,7 +450,35 @@
             "saveChanges": "Änderungen speichern",
             "create": "Aufgabe erstellen"
         },
-        "count": "{count, plural, one {# geplante Aufgabe} other {# geplante Aufgaben}}"
+        "count": "{count, plural, one {# geplante Aufgabe} other {# geplante Aufgaben}}",
+        "script": {
+            "runInstead": "Stattdessen einen Befehl ausführen, ohne Modell",
+            "instructionInstead": "Stattdessen eine Anweisung schreiben",
+            "runsOn": "Läuft auf",
+            "workspaceMachine": "Workspace-Maschine",
+            "linkedComputer": "{name} (verknüpfter Computer)",
+            "unlinkedComputer": "Ein nicht mehr verknüpfter Computer",
+            "onlineOnly": "Läuft nur, solange dieser Computer online ist.",
+            "command": "Befehl",
+            "folder": "Ordner",
+            "stopAfter": "Stoppen nach",
+            "timeoutMinutes": "{minutes} Min.",
+            "timeoutHours": "{hours, plural, one {# Stunde} other {# Stunden}}",
+            "notifyFailures": "Nur bei Fehlern benachrichtigen",
+            "notifyHelper": "Jeder Lauf behält seine Ausgabe und seinen Exit-Code.",
+            "runNow": "Jetzt ausführen",
+            "neverRan": "Nie gelaufen",
+            "rowSucceeded": "Exit 0 in {duration} · {time}",
+            "rowFailed": "Fehlgeschlagen, Exit {code} · {time}",
+            "rowFailedNoCode": "Fehlgeschlagen · {time}",
+            "cardSucceeded": "Erfolgreich",
+            "cardFailed": "Fehlgeschlagen, Exit-Code {code}",
+            "cardFailedNoCode": "Fehlgeschlagen",
+            "running": "Läuft",
+            "exitCode": "Exit {code}",
+            "noExitCode": "kein Exit-Code",
+            "noOutput": "Keine Ausgabe."
+        }
     },
     "taskNotifyField": {
         "label": "Benachrichtige mich",

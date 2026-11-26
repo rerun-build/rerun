@@ -13,6 +13,8 @@ type OpenConversationArgs = {
     engineAgentId?: string | null
     engineSessionId: string | null
     engineRunId: string | null
+    // A script routine's run has no conversation: its notification opens the routine instead.
+    scriptSlug?: string | null
 }
 
 // The Chief of Staff sits on no board: its notification names it by its engine id, and the
@@ -28,9 +30,10 @@ async function openForemanThread(engineSessionId: string | null): Promise<void> 
 // conversation tab, then, once the engine session id is resolved to the DB session id, drives the
 // chat to the exact conversation. The tab is forced before the lookup so a notification without a
 // resolvable session still lands on the chat rather than on whatever tab was left active.
-export async function openConversationFromNotification({ agentId, engineAgentId, engineSessionId, engineRunId }: OpenConversationArgs): Promise<void> {
+export async function openConversationFromNotification({ agentId, engineAgentId, engineSessionId, engineRunId, scriptSlug }: OpenConversationArgs): Promise<void> {
     if (engineAgentId === FOREMAN_AGENT_ID) return openForemanThread(engineSessionId)
     if (!agentId) return
+    if (!engineSessionId && scriptSlug) return useBoardStore.getState().openAgentSchedule(agentId, scriptSlug)
 
     useBoardStore.getState().openAgentChat(agentId)
 

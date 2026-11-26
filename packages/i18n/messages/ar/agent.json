@@ -450,7 +450,35 @@
             "saveChanges": "حفظ التغييرات",
             "create": "إنشاء المهمة"
         },
-        "count": "{count, plural, zero {# مهمة مجدولة} one {مهمة مجدولة واحدة} two {مهمتان مجدولتان} few {# مهام مجدولة} many {# مهمة مجدولة} other {# مهمة مجدولة}}"
+        "count": "{count, plural, zero {# مهمة مجدولة} one {مهمة مجدولة واحدة} two {مهمتان مجدولتان} few {# مهام مجدولة} many {# مهمة مجدولة} other {# مهمة مجدولة}}",
+        "script": {
+            "runInstead": "تشغيل أمر بدلًا من ذلك، دون نموذج",
+            "instructionInstead": "كتابة تعليمات بدلًا من ذلك",
+            "runsOn": "يعمل على",
+            "workspaceMachine": "جهاز مساحة العمل",
+            "linkedComputer": "{name} (حاسوب مرتبط)",
+            "unlinkedComputer": "حاسوب لم يعد مرتبطًا",
+            "onlineOnly": "يعمل فقط عندما يكون هذا الحاسوب متصلًا.",
+            "command": "الأمر",
+            "folder": "المجلد",
+            "stopAfter": "الإيقاف بعد",
+            "timeoutMinutes": "{minutes} د",
+            "timeoutHours": "{hours, plural, zero {# ساعة} one {ساعة واحدة} two {ساعتان} few {# ساعات} many {# ساعة} other {# ساعة}}",
+            "notifyFailures": "الإشعار عند الفشل فقط",
+            "notifyHelper": "يحتفظ كل تشغيل بمخرجاته ورمز الخروج.",
+            "runNow": "تشغيل الآن",
+            "neverRan": "لم يعمل قط",
+            "rowSucceeded": "الخروج 0 خلال {duration} · {time}",
+            "rowFailed": "فشل، رمز الخروج {code} · {time}",
+            "rowFailedNoCode": "فشل · {time}",
+            "cardSucceeded": "نجح",
+            "cardFailed": "فشل، رمز الخروج {code}",
+            "cardFailedNoCode": "فشل",
+            "running": "قيد التشغيل",
+            "exitCode": "الخروج {code}",
+            "noExitCode": "بلا رمز خروج",
+            "noOutput": "لم يطبع شيئًا."
+        }
     },
     "taskNotifyField": {
         "label": "أبلغني",
