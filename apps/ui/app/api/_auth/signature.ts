@@ -11,3 +11,9 @@ export type Signer = Pick<WorkspaceContext, 'organizationStaff'> & { workspace: 
 export async function brandSignature(signer: Signer): Promise<Brand | null> {
     return signer.organizationStaff ? workspaceBrand(signer.workspace.id) : null
 }
+
+// The engine has no users of its own: every write to the Brain names a person in the page history.
+export async function brainAuthorOf(signer: Signer & { userId: string; email: string | null }): Promise<string> {
+    const brand = await brandSignature(signer)
+    return `user:${brand?.name ?? signer.email ?? signer.userId}`
+}

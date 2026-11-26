@@ -1,11 +1,11 @@
 ---
 title: "Memory and files"
-description: "Give a coworker what it should know and the files it works from, before its first run."
+description: "Give a coworker what it should know and the files it works from, then read, recall and clean them up."
 ---
 
-A coworker keeps two things of its own besides its prompt and its skills: its **memory**, the facts it recalls when a task calls for them, and its **workspace folder**, the files it works from. These two tools write to them. They never read back: there is no tool that lists, reads or deletes a memory or a workspace file. The coworker reads them itself, and you read them in the app. See [Data and files](/agents/data).
+A coworker keeps two things of its own besides its prompt and its skills: its **memory**, the facts it recalls when a task calls for them, and its **workspace folder**, the files it works from. The workspace also has a **shared folder** every coworker reads and writes. See [Data and files](/agents/data).
 
-Both need **Can manage** on the coworker's Box. They are how you hand a coworker what it should know and the files it works from before its first run, instead of waiting for it to learn them.
+Writing needs **Can manage** on the coworker's Box: `write_memory`, `delete_memory` and `upload_workspace_file` are how you hand a coworker what it should know before its first run, and how you correct it later. Reading needs **Can use**: `list_memories`, `recall_memories`, `list_files` and `read_file`. The shared folder is open to every member of the workspace, as in the **Files** of the Brain.
 
 ## write_memory
 
@@ -49,6 +49,64 @@ The entries are written one after another. An entry that fails does not stop the
 
 `failed` is absent when every entry was written. A call over 100 entries, an empty list, an empty `content` or a `content` over 20,000 characters is refused as a whole, before anything is written.
 
+## list_memories
+
+Lists what a coworker remembers, newest first. The filters and the pages are applied on the whole memory of the coworker.
+
+<ParamField body="agentId" type="string" required />
+
+<ParamField body="kind" type="string">
+  `preference`, `fact`, `learned`, `note` or `task`.
+</ParamField>
+
+<ParamField body="tag" type="string" />
+
+<ParamField body="limit" type="number">
+  Default `50`, between `1` and `200`.
+</ParamField>
+
+<ParamField body="offset" type="number">
+  Default `0`. Pass `nextOffset` from the previous answer to read on.
+</ParamField>
+
+```json Response
+{
+  "memories": [
+    { "id": "…", "kind": "preference", "tags": [], "content": "Prefers the weekly report on Monday morning, in French.", "createdAt": "2026-11-20T09:12:00.000Z", "status": "active" }
+  ],
+  "total": 37,
+  "nextOffset": 50
+}
+```
+
+`total` counts the memories that match the filters. `nextOffset` is `null` on the last page.
+
+## recall_memories
+
+Finds the memories of a coworker about a subject, by meaning, best match first: the way the coworker recalls them itself during a run. Reading them here does not count as the coworker using them.
+
+<ParamField body="agentId" type="string" required />
+
+<ParamField body="query" type="string" required>
+  What to look for, in plain words.
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Default `5`, between `1` and `20`.
+</ParamField>
+
+## delete_memory
+
+Deletes one memory of a coworker. Needs `confirm: true`.
+
+<ParamField body="agentId" type="string" required />
+<ParamField body="memoryId" type="string" required>
+  From `list_memories` or `recall_memories`.
+</ParamField>
+<ParamField body="confirm" type="boolean" required />
+
+A memory cannot be edited in place. To correct one, delete it and write the right version with `write_memory`, which gives it a new id.
+
 ## upload_workspace_file
 
 Writes one file into the coworker's own workspace folder, creating the folders on the way and replacing a file already at that path.
@@ -74,3 +132,47 @@ Up to 5 MB, once decoded. One file per call.
 ```
 
 `bytes` is the size written, after decoding.
+
+## list_files
+
+Lists one folder: of a coworker workspace folder, or of the shared folder. Each entry gives its `name`, its `path`, its `type` (`file` or `dir`) and its size in `bytes`. One level at a time, folders first. Hidden files, whose name starts with a dot, are left out.
+
+<ParamField body="agentId" type="string">
+  The coworker whose folder to list.
+</ParamField>
+
+<ParamField body="shared" type="boolean">
+  `true` to list the shared folder instead. Pass `agentId` or `shared`, not both.
+</ParamField>
+
+<ParamField body="path" type="string">
+  The folder to list, relative to the root, for example `reports/2026`. Defaults to the root.
+</ParamField>
+
+```json Response
+{
+  "path": "reports",
+  "entries": [{ "name": "q1.md", "path": "reports/q1.md", "type": "file", "bytes": 1240 }]
+}
+```
+
+## read_file
+
+Reads one page of 100,000 characters of a text file, in a coworker folder or in the shared folder.
+
+<ParamField body="agentId" type="string" />
+<ParamField body="shared" type="boolean" />
+
+<ParamField body="path" type="string" required>
+  The file, as `list_files` gives it.
+</ParamField>
+
+<ParamField body="offset" type="integer">
+  The character to start at. Omit it for the first page, then pass `nextOffset`.
+</ParamField>
+
+```json Response
+{ "path": "reports/q1.md", "content": "# Q1\n…", "offset": 0, "nextOffset": null, "totalChars": 1240, "truncated": false }
+```
+
+Only text files are read: `md`, `markdown`, `txt`, `json`, `yaml`, `yml`, `csv`, `tsv`, `js`, `mjs`, `ts`, `py`, `rb`, `sh`, `sql`, `html`, `css`, `xml`, `toml`, `ini` and `env`. An image, a PDF or any other file is refused: open it in the app.

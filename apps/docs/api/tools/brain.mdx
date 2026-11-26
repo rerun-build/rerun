@@ -1,0 +1,83 @@
+---
+title: "Brain"
+description: "Read and write the pages every coworker of the workspace reads."
+---
+
+The [Brain](/brain) holds what the company is, sells and decides, written once and read by every coworker of the workspace from its next run. These tools read and write its pages. Writing needs a member behind the key: a write is signed in the page history with the name of the member who created it. A key that acts for the workspace still lists, reads and deletes pages.
+
+Like the app, they are open to every member of the workspace. A page filed under a Box the key cannot open reads as filed for everyone.
+
+## list_brain_pages
+
+Lists the pages of the Brain, without their content.
+
+<ParamField body="type" type="string">
+  Only the pages of this type.
+</ParamField>
+
+<ParamField body="spaceId" type="string">
+  Only the pages filed under this Box.
+</ParamField>
+
+```json Response
+{
+  "pages": [
+    { "slug": "pricing", "title": "Pricing", "type": "offering", "tags": [], "spaceId": null, "updatedAt": "2026-11-20T09:12:00.000Z", "updatedBy": "user:ada@acme.test", "hash": "…" }
+  ]
+}
+```
+
+The types are `company`, `offering`, `market`, `team`, `voice`, `stack` and `priorities` for the cards of the company, and `customer`, `competitor`, `person`, `product`, `decision` and `note` for pages about one thing.
+
+## get_brain_page
+
+Reads one page in full: its markdown `content`, its `sources`, the pages it links to and the ones linking to it (`backlinks`), its `hash` and its `revisions`, newest first.
+
+<ParamField body="slug" type="string" required />
+
+## write_brain_page
+
+Creates a page, or rewrites one. The write replaces the whole page.
+
+<ParamField body="slug" type="string" required>
+  Lowercase kebab-case, 64 characters at most, for example `pricing` or `acme-corp`.
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  120 characters at most.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  One of the types above.
+</ParamField>
+
+<ParamField body="content" type="string" required>
+  The whole page in markdown, 60,000 characters at most.
+</ParamField>
+
+<ParamField body="sources" type="string[]">
+  Where the facts come from: URLs or file paths, 50 at most.
+</ParamField>
+
+<ParamField body="baseHash" type="string | null" required>
+  `null` to create the page. To change one, the `hash` that `get_brain_page` gave.
+</ParamField>
+
+<ParamField body="spaceId" type="string">
+  File the page under this Box, the way the Brain files a page in the app. Leave it out to keep it for everyone.
+</ParamField>
+
+```json Response
+{ "slug": "pricing", "hash": "…", "title": "Pricing", "spaceId": null, "created": true }
+```
+
+A write made against an older `hash`, because someone changed the page since you read it, is refused. Read the page again with `get_brain_page` and redo your change on what it says now.
+
+Filing under a Box comes after the write. When it fails, the page stays written for everyone and the answer carries a `note`: call `write_brain_page` again with the new `hash` and `spaceId` to file it.
+
+## delete_brain_page
+
+Deletes a page. No coworker reads it any more, and the links to it from other pages break. Needs `confirm: true`.
+
+<ParamField body="slug" type="string" required />
+<ParamField body="confirm" type="boolean" required />

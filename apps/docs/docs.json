@@ -119,6 +119,7 @@
               "api/tools/agents",
               "api/tools/skills",
               "api/tools/memory-and-files",
+              "api/tools/brain",
               "api/tools/schedules",
               "api/tools/triggers",
               "api/tools/runs",

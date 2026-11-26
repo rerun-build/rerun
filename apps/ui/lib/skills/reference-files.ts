@@ -1,6 +1,7 @@
 import { posix } from 'node:path'
-import { deleteFile, listFiles, readFileText, skillFilesBase } from '@/lib/engine/client'
+import { deleteFile, listFiles, skillFilesBase } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
+import { readTextFilePage } from '@/lib/files/text-page'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
 import { SKILL_ENTRY, isTextSkillFile } from './folder-import'
 
@@ -65,16 +66,7 @@ export async function readSkillReferenceFile(conn: EngineConnection, agentId: st
     if (!Number.isInteger(offset) || offset < 0) throw new Error('offset must be a non-negative integer.')
 
     try {
-        const page = await readFileText(conn, skillFilesBase(agentId, slug), target, offset)
-        if (offset > 0 && page.offset === undefined) {
-            throw new Error('The machine of this workspace must be updated before it can read beyond the first 100 000 characters of a skill reference file.')
-        }
-        if (page.offset !== undefined && page.offset !== offset) throw new Error(`The Box returned offset ${page.offset} instead of ${offset}. Update the Box and try again.`)
-
-        const truncated = page.truncated ?? page.content.length >= MAX_SKILL_FILE_CHARS
-        const nextOffset = page.nextOffset !== undefined ? page.nextOffset : truncated ? offset + page.content.length : null
-        const totalChars = page.totalChars ?? (truncated ? null : offset + page.content.length)
-        return { path: target, content: page.content, offset: page.offset ?? 0, nextOffset, totalChars, truncated }
+        return { path: target, ...(await readTextFilePage(conn, skillFilesBase(agentId, slug), target, offset)) }
     } catch (err) {
         // The engine answers a missing file with a bare 500 from the filesystem, so the reason a
         // read failed is worth stating as the caller can act on it rather than as a stack.

@@ -29,6 +29,7 @@ vi.mock('@/lib/engine/client', () => ({
         }
     },
     SPACE_DATA_BASE: '/shared/db',
+    SHARED_FILES_BASE: '/shared/files',
     countBrainProposals: vi.fn(),
     listBrainPages: vi.fn(),
     listBrainFileMeta: vi.fn(),

@@ -1,5 +1,6 @@
 import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { CONVERSATION_TOOL_DEFS } from './conversation-tools'
+import { KNOWLEDGE_TOOL_DEFS } from './knowledge-tools'
 import { LIBRARY_TOOL_DEFS } from './library-tools'
 import { PUBLISH_TOOL_DEFS } from './publish-tools'
 import { SHARE_TOOL_DEFS } from './share-tools'
@@ -617,6 +618,6 @@ const AGENT_TOOL_DEFS = [
 
 // The other families are declared next door: same server, same key, and this file was already long
 // enough. The template authoring tools come last because they need an expert sandbox.
-export const ACCOUNT_TOOL_DEFS = [...AGENT_TOOL_DEFS, ...CONVERSATION_TOOL_DEFS, ...PUBLISH_TOOL_DEFS, ...LIBRARY_TOOL_DEFS, ...VAULT_TOOL_DEFS, ...SHARE_TOOL_DEFS, ...TEMPLATE_TOOL_DEFS]
+export const ACCOUNT_TOOL_DEFS = [...AGENT_TOOL_DEFS, ...KNOWLEDGE_TOOL_DEFS, ...CONVERSATION_TOOL_DEFS, ...PUBLISH_TOOL_DEFS, ...LIBRARY_TOOL_DEFS, ...VAULT_TOOL_DEFS, ...SHARE_TOOL_DEFS, ...TEMPLATE_TOOL_DEFS]
 
 export const ACCOUNT_TOOL_NAMES = ACCOUNT_TOOL_DEFS.map(t => t.name)

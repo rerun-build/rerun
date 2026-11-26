@@ -2,7 +2,7 @@
 
 import { actorFromContext, manageableSpaceIds, visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { brandSignature } from '@/app/api/_auth/signature'
+import { brainAuthorOf } from '@/app/api/_auth/signature'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
@@ -20,11 +20,10 @@ import { sitsInABox } from '@/lib/agents/in-box'
 // your box" state rather than an error.
 const isMissingRoute = (err: unknown) => err instanceof engine.EngineRequestError && err.status === 404
 
-// Every write names a person in the page history; the engine has no users of its own.
 async function authorContext() {
     const ctx = await requireWorkspaceContext()
-    const [conn, brand] = await Promise.all([getWorkspaceConnection(ctx.workspace.id), brandSignature(ctx)])
-    return { conn, author: `user:${brand?.name ?? ctx.userEmail ?? ctx.userId}` }
+    const [conn, author] = await Promise.all([getWorkspaceConnection(ctx.workspace.id), brainAuthorOf({ ...ctx, email: ctx.userEmail })])
+    return { conn, author }
 }
 
 // A workspace gets its machine when its first coworker is built: until then, an onboarding user who

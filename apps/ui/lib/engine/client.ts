@@ -384,6 +384,7 @@ export const agentDataBase = (agentId: string) => `/agents/${encodeURIComponent(
 
 export const agentFilesBase = (agentId: string) => `/agents/${encodeURIComponent(agentId)}/files`
 export const SPACE_DATA_BASE = '/shared/data'
+export const SHARED_FILES_BASE = '/shared/files'
 
 // `counts` asks for the rows of every table, which the engine counts one by one: only for a screen
 // that shows them. An engine that predates it answers without.
