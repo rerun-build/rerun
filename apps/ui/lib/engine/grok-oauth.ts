@@ -96,6 +96,22 @@ export async function pollGrokDeviceAuth(deviceCode: string): Promise<GrokOAuthT
     throw new AppError('deviceAuthFailed')
 }
 
+// A sign-in exchanged and then not stored would leave a live lineage nobody holds: it is handed back.
+// Best effort, as on the engine's delete.
+export async function revokeGrokKeys(keys: Record<string, string>): Promise<void> {
+    for (const [key, hint] of [['GROK_OAUTH_REFRESH_TOKEN', 'refresh_token'], ['GROK_OAUTH_TOKEN', 'access_token']] as const) {
+        const token = keys[key]
+        if (!token) continue
+        await fetch(`${GROK_AUTH_ORIGIN}/oauth2/revoke`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ token, token_type_hint: hint, client_id: GROK_OAUTH_CLIENT_ID }),
+            redirect: 'error',
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        }).catch(() => undefined)
+    }
+}
+
 // The engine reads these back from the connection's .env (apps/engine grok-token.ts).
 export function grokKeysFrom(tokens: GrokOAuthTokens): Record<string, string> {
     const keys: Record<string, string> = { GROK_OAUTH_TOKEN: tokens.accessToken, GROK_OAUTH_EXPIRES_AT: String(tokens.expiresAt) }

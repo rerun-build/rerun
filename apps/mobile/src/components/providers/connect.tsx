@@ -219,7 +219,7 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
 // The web's Grok sign-in: a code typed on xAI's page while the hub polls and stores the connection
 // itself. A refusal of the moment (a hub out of reach) is polled through, so an approval given
 // meanwhile still lands; xAI's own answers end the wait.
-const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokNeedsUpdate', 'signInOtherProvider'])
+const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'grokNeedsUpdate', 'signInOtherProvider'])
 
 export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
     const { view, caller } = useAiConnections()
@@ -257,7 +257,11 @@ export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
         if (!pending || !caller) return
         let cancelled = false
         let failed = 0
+        // A poll that stores the connection can outlast the interval: the next tick would play the
+        // spent code again and read the sign-in as expired.
+        let polling = false
         const timer = setInterval(async () => {
+            if (polling) return
             if (Date.now() > pending.expiresAt) {
                 clearInterval(timer)
                 if (cancelled) return
@@ -267,6 +271,7 @@ export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
                 return
             }
             let answer: Awaited<ReturnType<typeof pollGrokSignIn>>
+            polling = true
             try {
                 answer = await pollGrokSignIn(caller, { ticket: pending.ticket, connectionId: reconnectRef.current ?? undefined })
             } catch (err) {
@@ -278,6 +283,8 @@ export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
                 setError(messageOf(err, t('startFailed')))
                 track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'device_auth_failed', error: messageOf(err, '').slice(0, 200) })
                 return
+            } finally {
+                polling = false
             }
             if (cancelled || answer.status === 'pending') return
             clearInterval(timer)

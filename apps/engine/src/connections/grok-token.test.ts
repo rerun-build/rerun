@@ -256,9 +256,11 @@ async function settle<T>(promise: Promise<T>): Promise<T> {
         () => (done = true),
         () => (done = true),
     )
+    // Only as far as the next timer: however many turns the I/O takes, the clock moves by the retry
+    // delays alone, never past the life of the token in hand.
     while (!done) {
         await nextTurn()
-        await vi.advanceTimersByTimeAsync(1_000)
+        if (vi.getTimerCount() > 0) await vi.advanceTimersToNextTimerAsync()
     }
     return promise
 }
@@ -351,6 +353,25 @@ describe('deleting a connection', () => {
             ['refresh-start', 'refresh_token', 'b1a00492-073a-47ea-816f-4c329264a828'],
             ['access-old', 'access_token', 'b1a00492-073a-47ea-816f-4c329264a828'],
         ])
+        expect(existsSync(connectionDir('grokcnx'))).toBe(false)
+    })
+
+    it('waits for a refresh in flight and hands back the lineage it wrote, not the one it spent', async () => {
+        let answer!: () => void
+        auth.script.push(async () => {
+            await new Promise<void>(resolve => (answer = resolve))
+            auth.used.add('refresh-start')
+            return Response.json({ access_token: 'access-1', refresh_token: 'refresh-1', expires_in: 21600 })
+        })
+        const connection = await grokConnection(signedIn(0))
+        const refreshing = ensureGrokToken(connection)
+        await until(() => auth.calls.length === 1)
+        const deleting = deleteConnection('grokcnx')
+        answer()
+        await refreshing
+        await deleting
+        const revoked = auth.calls.filter(call => call.url.endsWith('/oauth2/revoke')).map(call => call.body.get('token'))
+        expect(revoked).toEqual(['refresh-1', 'access-1'])
         expect(existsSync(connectionDir('grokcnx'))).toBe(false)
     })
 

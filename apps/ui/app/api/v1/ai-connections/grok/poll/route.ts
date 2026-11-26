@@ -1,4 +1,4 @@
-import { grokKeysWhenApproved, storeSignInKeys } from '@/app/api/_services/ai-connection.service'
+import { grokKeysWhenApproved, storeGrokSignIn } from '@/app/api/_services/ai-connection.service'
 import { answeringConnectionErrors, signInStep } from '@/app/api/v1/_lib/ai-connection-errors'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
 import { openGrokSignIn } from '@/lib/engine/sign-in-ticket'
@@ -14,5 +14,5 @@ export const POST = apiRoute(mobileApi.pollGrokSignIn, { auth: 'admin' }, async 
         return grokKeysWhenApproved(deviceCode)
     })
     if (!keys) return { status: 'pending' as const }
-    return answeringConnectionErrors(async () => ({ status: 'connected' as const, connectionId: await storeSignInKeys(ctx.workspace.id, 'grok', keys, body) }))
+    return answeringConnectionErrors(async () => ({ status: 'connected' as const, connectionId: await storeGrokSignIn(ctx.workspace.id, keys, body) }))
 })

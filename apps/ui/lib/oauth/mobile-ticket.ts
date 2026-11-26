@@ -53,13 +53,17 @@ export function open<T extends { exp: number }>(raw: string | null | undefined, 
 // A ticket whose claims must not be read by whoever carries it: a device code is enough, before the
 // person approves, for anyone holding it to take the sign-in. Encrypted and authenticated with a key
 // of its own derived from the same secret, so it never opens as a signed ticket, nor one as it.
+const GCM_IV_BYTES = 12
+// Node takes a shorter tag than it writes unless told the length, and a 4-byte tag falls to guessing.
+const GCM_TAG_BYTES = 16
+
 function privateKey(): Buffer {
     return createHash('sha256').update(`private-ticket:${secret()}`).digest()
 }
 
 export function sealPrivate(claims: Record<string, unknown>, ttlMs: number): string {
-    const iv = randomBytes(12)
-    const cipher = createCipheriv('aes-256-gcm', privateKey(), iv)
+    const iv = randomBytes(GCM_IV_BYTES)
+    const cipher = createCipheriv('aes-256-gcm', privateKey(), iv, { authTagLength: GCM_TAG_BYTES })
     const body = Buffer.concat([cipher.update(JSON.stringify({ ...claims, exp: Date.now() + ttlMs }), 'utf8'), cipher.final()])
     return [iv, cipher.getAuthTag(), body].map(part => part.toString('base64url')).join('.')
 }
@@ -67,10 +71,10 @@ export function sealPrivate(claims: Record<string, unknown>, ttlMs: number): str
 export function openPrivate<T extends { exp: number }>(raw: string | null | undefined, label: string): T {
     if (!raw) throw new Error(`Missing ${label}`)
     const [iv, tag, body] = raw.split('.').map(part => Buffer.from(part, 'base64url'))
-    if (!iv?.length || !tag?.length || !body?.length) throw new Error(`Invalid ${label}`)
+    if (iv?.length !== GCM_IV_BYTES || tag?.length !== GCM_TAG_BYTES || !body?.length) throw new Error(`Invalid ${label}`)
     let claims: T
     try {
-        const decipher = createDecipheriv('aes-256-gcm', privateKey(), iv)
+        const decipher = createDecipheriv('aes-256-gcm', privateKey(), iv, { authTagLength: GCM_TAG_BYTES })
         decipher.setAuthTag(tag)
         claims = JSON.parse(Buffer.concat([decipher.update(body), decipher.final()]).toString('utf8')) as T
     } catch {

@@ -47,17 +47,18 @@ import {
     updateConnectionKeys as engineUpdateConnectionKeys,
 } from '@/lib/engine/client'
 import { type CodexDeviceAuthStart, codexKeysFrom, pollCodexDeviceAuth, startCodexDeviceAuth } from '@/lib/engine/codex-oauth'
-import { type GrokDeviceAuthStart, grokKeysFrom, pollGrokDeviceAuth, startGrokDeviceAuth } from '@/lib/engine/grok-oauth'
+import { type GrokDeviceAuthStart, grokKeysFrom, pollGrokDeviceAuth, revokeGrokKeys, startGrokDeviceAuth } from '@/lib/engine/grok-oauth'
 import { pinFirst } from '@/lib/engine/model-groups'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
-import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, NO_BOX_BACKUPS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, NO_BOX_BACKUPS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 
 // The AI providers of a workspace, for both the web dialog's server actions and the app's /api/v1
 // routes. They live at the root of the engine's data dir, never under a Box: the workspace is the
@@ -294,6 +295,19 @@ export async function grokKeysWhenApproved(deviceCode: string): Promise<Record<s
     return tokens ? grokKeysFrom(tokens) : null
 }
 
+// xAI has spent the device code by now: a store that fails cannot be polled again into a success. The
+// sign-in is handed back to xAI and the refusal says to start again, unless it already says why (no
+// plan, another provider), which the caller answers as it does everywhere else.
+export async function storeGrokSignIn(workspaceId: number, keys: Record<string, string>, target: { connectionId?: string; name?: string }): Promise<string> {
+    try {
+        return await storeSignInKeys(workspaceId, 'grok', keys, target)
+    } catch (err) {
+        await revokeGrokKeys(keys)
+        if (err instanceof NoPlanError || err instanceof ConnectionInputError) throw err
+        throw new ConnectionInputError('grokSignInNotStored')
+    }
+}
+
 // --- The app's view ---
 
 // What the app adds: the connection takes the name the web would suggest and the provider's
@@ -310,7 +324,10 @@ export async function storeSignInKeys(workspaceId: number, provider: AddableProv
     if (!target.connectionId) return addAiConnection(workspaceId, provider, keys, { name: target.name, signedIn: true })
     const existing = (await listAiConnections(workspaceId)).connections.find(connection => connection.id === target.connectionId)
     if (existing?.provider !== provider) throw new ConnectionInputError('signInOtherProvider')
-    await updateAiConnectionKeys(workspaceId, existing.id, { set: keys }, { signedIn: true })
+    // A new Grok sign-in may be another account: what the old one left and the new one does not carry
+    // goes, so the engine never refreshes against the previous lineage.
+    const remove = provider === 'grok' ? CONNECTION_SATELLITE_KEYS.grok.filter(key => !(key in keys)) : undefined
+    await updateAiConnectionKeys(workspaceId, existing.id, { set: keys, ...(remove ? { remove } : {}) }, { signedIn: true })
     return existing.id
 }
 

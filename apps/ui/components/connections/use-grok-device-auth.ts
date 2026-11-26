@@ -32,7 +32,7 @@ const OPEN_LOCK_MS = 5000
 // What ends the wait for good: xAI's answer, or a refusal of the hub no retry changes. Anything else
 // (the hub or its database out of reach for a moment) is polled through, so an approval given on
 // xAI's page meanwhile is still picked up, up to a run of failures this long.
-const FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokNeedsUpdate', 'signInOtherProvider', 'adminOnlyAiProviders', 'trialToConnectModel', 'managedWorkspacePaused'])
+const FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'grokNeedsUpdate', 'signInOtherProvider', 'adminOnlyAiProviders', 'trialToConnectModel', 'managedWorkspacePaused'])
 const MAX_FAILED_POLLS = 6
 
 // The person types a short code on xAI's own page while the hub polls. Unlike Codex's flow, the hub

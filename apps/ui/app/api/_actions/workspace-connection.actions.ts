@@ -15,7 +15,7 @@ import {
     startClaudeSignIn,
     startCodexSignIn,
     startGrokSignIn,
-    storeSignInKeys,
+    storeGrokSignIn,
     updateAiConnection,
     updateAiConnectionKeys,
     type AiConnectionsList,
@@ -195,7 +195,7 @@ export async function pollGrokSignInAction(input: GrokSignInPollInput): Promise<
         const { ticket, connectionId, name } = grokSignInPollInputSchema.parse(input)
         const keys = await grokKeysWhenApproved(openGrokSignIn(ticket, userId, workspace.id).deviceCode)
         if (!keys) return { status: 'pending' }
-        return { status: 'connected', connectionId: await storeSignInKeys(workspace.id, 'grok', keys, { connectionId, name }) }
+        return { status: 'connected', connectionId: await storeGrokSignIn(workspace.id, keys, { connectionId, name }) }
     } catch (err) {
         if (err instanceof NoPlanError) return { status: 'error', ...refusal(err.code === 'managedWorkspacePaused' ? err.code : 'trialToConnectModel'), reason: 'no_plan' }
         return { status: 'error', ...refusalOf(err, 'deviceAuthFailed') }

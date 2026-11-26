@@ -112,9 +112,14 @@ async function revokeSignIn(id: string): Promise<void> {
     if (connection?.config.provider === 'grok') await revokeGrokTokens(connection.env)
 }
 
+// Under the connection's lock: a refresh in flight writes its new lineage first, and that lineage is
+// the one handed back, never one already spent.
 export async function deleteConnection(id: string): Promise<void> {
     assertConnectionDeletable(id)
-    await revokeSignIn(id)
+    await withConnectionLock(id, async () => {
+        await revokeSignIn(id)
+        await rm(connectionDir(id), { recursive: true, force: true })
+    })
     unloadConnection(id)
     forgetPlanLimits(id)
     forgetCliModels(id)
@@ -125,7 +130,6 @@ export async function deleteConnection(id: string): Promise<void> {
     forgetGrokTokenState(id)
     forgetGrokPlanLimitsAttempt(id)
     forgetGrokModelsAttempt(id)
-    await rm(connectionDir(id), { recursive: true, force: true })
 }
 
 // The keyless connection every box carries. Provisioned on boot rather than special-cased at read

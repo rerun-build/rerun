@@ -603,5 +603,6 @@
     "grokSignInOnly": "Ein Grok-Abo wird über die Anmeldung bei xAI verbunden, nicht mit einem eingefügten Schlüssel.",
     "grokDeviceLoginRefused": "xAI hat keinen Code zum Verbinden dieses Grok-Kontos ausgegeben.",
     "grokSignInDenied": "Die Anmeldung wurde bei xAI abgelehnt. Starte sie erneut, um Grok zu verbinden.",
-    "grokSignInExpired": "Der Code ist abgelaufen, bevor er bestätigt wurde. Starte die Anmeldung erneut."
+    "grokSignInExpired": "Der Code ist abgelaufen, bevor er bestätigt wurde. Starte die Anmeldung erneut.",
+    "grokSignInNotStored": "xAI hat die Anmeldung bestätigt, aber sie konnte nicht auf der Maschine dieses Workspace gespeichert werden. Starte sie erneut."
 }

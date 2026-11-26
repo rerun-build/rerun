@@ -65,12 +65,26 @@ describe('a Grok refusal', () => {
         expect(readPlanLimits('grokcnx')?.windows[0]?.usedPercent).toBe(100)
     })
 
-    it('reads the same sentence with the week far from spent as an account without the plan', async () => {
+    it('reads the same sentence with the week far from spent as an account without the plan, which locks no model', async () => {
         billing = { config: { currentPeriod: period, creditUsagePercent: 12 } }
         refusal = () => Response.json({ error: 'You have run out of credits or need a Grok subscription.' }, { status: 403 })
         const error = await runRefused()
         expect(messageOf(error)).toBe('No Grok subscription on this xAI account')
-        expect(classifyProviderError('grok', error)).toBe(RUN_ERROR_CODES.modelNotInPlan)
+        expect(classifyProviderError('grok', error)).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    it('names no window it cannot vouch for: a spending cap with the week not spent, or no reading at all', async () => {
+        billing = { config: { currentPeriod: period, creditUsagePercent: 30 } }
+        refusal = () => Response.json({ error: 'You have reached your monthly spending limit. Raise your spending limit to continue.' }, { status: 402 })
+        const capped = await runRefused()
+        expect(messageOf(capped)).toBe('Grok usage limit reached')
+        expect(classifyProviderError('grok', capped)).toBe(RUN_ERROR_CODES.usageLimit)
+        expect(describeSubscriptionLimit(messageOf(capped)).scope).not.toBe('weekly')
+
+        forgetPlanLimits('grokcnx')
+        billing = { unexpected: true }
+        refusal = () => Response.json({ error: 'You have run out of credits or need a Grok subscription.' }, { status: 403 })
+        expect(messageOf(await runRefused())).toBe('Grok usage limit reached')
     })
 
     it('reads a quota 429 as the week spent, and leaves a plain rate limit to the retries', async () => {

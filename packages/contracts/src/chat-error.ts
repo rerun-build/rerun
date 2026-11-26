@@ -95,7 +95,7 @@ export const CHATGPT_SPEND_CAP = /hit your spend cap set (?:in|by)/i
 // window that ran out. The chat words both the same way, but the engine reports it under its own
 // code: waiting for a reset does not bring the model back, and the funnel must not read it as a
 // spent quota.
-export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found|active opencode go subscription is required|no grok subscription on this xai account|grok plan does not include/i
+export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found|active opencode go subscription is required|grok plan does not include/i
 
 // OpenCode turns a Go model away when the account's privacy settings exclude it: served outside
 // Europe and the United States, or by an endpoint that trains on what it is sent. Only the account

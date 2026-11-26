@@ -603,5 +603,6 @@
     "grokSignInOnly": "Un plan de Grok se conecta iniciando sesión en xAI, no pegando una clave.",
     "grokDeviceLoginRefused": "xAI se negó a dar un código para conectar esta cuenta de Grok.",
     "grokSignInDenied": "El inicio de sesión se rechazó en xAI. Vuelve a empezar para conectar Grok.",
-    "grokSignInExpired": "El código caducó antes de ser aprobado. Vuelve a iniciar sesión."
+    "grokSignInExpired": "El código caducó antes de ser aprobado. Vuelve a iniciar sesión.",
+    "grokSignInNotStored": "xAI aprobó el inicio de sesión, pero no se pudo guardar en la máquina de este workspace. Vuelve a empezar."
 }

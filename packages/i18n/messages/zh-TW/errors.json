@@ -603,5 +603,6 @@
     "grokSignInOnly": "Grok 方案需透過登入 xAI 連結，而不是貼上金鑰。",
     "grokDeviceLoginRefused": "xAI 拒絕提供連結此 Grok 帳號的代碼。",
     "grokSignInDenied": "登入在 xAI 上遭到拒絕。請重新開始以連結 Grok。",
-    "grokSignInExpired": "代碼在核准前已過期。請重新開始登入。"
+    "grokSignInExpired": "代碼在核准前已過期。請重新開始登入。",
+    "grokSignInNotStored": "xAI 已核准登入，但無法儲存到此工作區的機器上。請重新開始。"
 }

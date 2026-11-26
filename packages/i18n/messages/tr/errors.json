@@ -603,5 +603,6 @@
     "grokSignInOnly": "Bir Grok planı, yapıştırılan bir anahtarla değil, xAI'de oturum açılarak bağlanır.",
     "grokDeviceLoginRefused": "xAI bu Grok hesabını bağlamak için bir kod vermeyi reddetti.",
     "grokSignInDenied": "Oturum açma xAI'de reddedildi. Grok'u bağlamak için yeniden başlatın.",
-    "grokSignInExpired": "Kod onaylanmadan önce süresi doldu. Oturum açmayı yeniden başlatın."
+    "grokSignInExpired": "Kod onaylanmadan önce süresi doldu. Oturum açmayı yeniden başlatın.",
+    "grokSignInNotStored": "xAI oturum açmayı onayladı, ancak bu çalışma alanının makinesine kaydedilemedi. Yeniden başlatın."
 }

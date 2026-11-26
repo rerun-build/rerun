@@ -1,6 +1,10 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelMiddleware, wrapLanguageModel } from 'ai'
 import { GROK_MODEL_NOT_IN_PLAN, GROK_NO_SUBSCRIPTION, GROK_PROXY_BASE_URL, GROK_WEEKLY_LIMIT, grokSeesImages, type PlanLimitWindow } from '@rerun/contracts'
+
+// What a refusal of the allowance reads when the week's reading cannot tell which one it is: still a
+// spent subscription to the chat, which then names no window it cannot vouch for.
+const GROK_ALLOWANCE_REFUSED = 'Grok usage limit reached'
 import { recordCredentialRejected } from '../connections/credential-rejections.js'
 import { refreshGrokPlanLimits } from '../connections/grok-plan-limits.js'
 import { grokFetch, type GrokRequestContext } from '../connections/grok-proxy.js'
@@ -20,8 +24,8 @@ const MODEL_REFUSAL = /does not exist or your team|does not have access to (?:it
 
 const RESET_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' })
 
-function weeklyLimit(window: PlanLimitWindow | null): string {
-    return window?.resetsAt ? `${GROK_WEEKLY_LIMIT} · resets ${RESET_FORMAT.format(new Date(window.resetsAt))}` : GROK_WEEKLY_LIMIT
+function weeklyLimit(window: PlanLimitWindow): string {
+    return window.resetsAt ? `${GROK_WEEKLY_LIMIT} · resets ${RESET_FORMAT.format(new Date(window.resetsAt))}` : GROK_WEEKLY_LIMIT
 }
 
 type RefusalContext = { connection: LoadedConnection; model: string }
@@ -42,7 +46,7 @@ async function rewrittenRefusal(status: number, original: string, { connection, 
         const spent = spentPlanWindow(connection.id)
         if (spent) return weeklyLimit(spent)
         if (NO_SUBSCRIPTION.test(original) && readPlanLimits(connection.id)) return GROK_NO_SUBSCRIPTION
-        return weeklyLimit(readPlanLimits(connection.id)?.windows[0] ?? null)
+        return GROK_ALLOWANCE_REFUSED
     }
     if ((status === 400 || status === 403 || status === 404) && MODEL_REFUSAL.test(original)) return `${GROK_MODEL_NOT_IN_PLAN} \`${model}\``
     if (status === 426) return 'Provider returned error: Grok turned away the client version this engine sends. Update the engine.'
