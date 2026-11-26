@@ -1,4 +1,5 @@
 import { notFound } from '../lib/errors.js'
+import { logger } from '../lib/logger.js'
 import { clearAgentCache } from '../agents/registry.js'
 import { isPathSegment } from '../config/paths.js'
 import { connectionExists, listConnectionIds, loadConnectionFromDisk } from './loader.js'
@@ -18,14 +19,30 @@ export async function getConnection(id: string): Promise<LoadedConnection> {
     return connection
 }
 
+const unreadable = new Set<string>()
+
+// A connection this engine cannot read, such as one a newer engine wrote for a provider this one
+// does not know, is left out rather than failing every list, run and fallback with it: an engine
+// rolled back under a box keeps running on the connections it does know. Said once per connection.
+async function readableConnection(id: string): Promise<LoadedConnection | null> {
+    try {
+        return await getConnection(id)
+    } catch (error) {
+        if (!unreadable.has(id)) logger.warn({ connection: id, err: error instanceof Error ? error.message : String(error) }, 'connection left out: this engine cannot read it')
+        unreadable.add(id)
+        return null
+    }
+}
+
 export async function findConnection(id: string | null | undefined): Promise<LoadedConnection | null> {
     if (!id || !isPathSegment(id) || !connectionExists(id)) return null
-    return getConnection(id)
+    return readableConnection(id)
 }
 
 export async function listConnections(): Promise<LoadedConnection[]> {
     const ids = await listConnectionIds()
-    return Promise.all(ids.map(id => getConnection(id)))
+    const connections = await Promise.all(ids.map(readableConnection))
+    return connections.filter((connection): connection is LoadedConnection => connection !== null)
 }
 
 // Agents hold a reference to the shared instance, so dropping a connection from the cache has to

@@ -37,6 +37,10 @@
             "custom": {
                 "title": "Point d’accès personnalisé",
                 "hint": "Ollama, LM Studio, vLLM ou tout serveur compatible OpenAI"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "Connectez-vous avec votre compte xAI"
             }
         },
         "summary": "{kind} · {count, plural, one {# modèle} other {# modèles}}",

@@ -37,6 +37,10 @@
             "custom": {
                 "title": "自定义端点",
                 "hint": "Ollama、LM Studio、vLLM 或任何兼容 OpenAI 的服务器"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "使用你的 xAI 账户登录"
             }
         },
         "summary": "{kind} · {count, plural, other {# 个模型}}",

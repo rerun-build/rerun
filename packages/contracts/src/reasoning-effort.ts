@@ -19,6 +19,7 @@ export function acceptsReasoningEffort(provider: Provider | null | undefined, mo
         case 'anthropic':
             return claudeTakesEffort(model)
         case 'codex':
+        case 'grok':
             return true
         case 'openai':
             return /^gpt-[56]/.test(model)

@@ -37,6 +37,10 @@
             "custom": {
                 "title": "Endpoint personalizado",
                 "hint": "Ollama, LM Studio, vLLM ou qualquer servidor compatível com OpenAI"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "Entre com sua conta xAI"
             }
         },
         "summary": "{kind} · {count, plural, one {# modelo} other {# modelos}}",

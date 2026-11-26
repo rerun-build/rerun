@@ -52,7 +52,8 @@
             "opencodeWindow": "OpenCode Go: {window, select, weekly {Wochenlimit} other {Monatslimit}} erreicht",
             "opencode": "OpenCode-Go-Limit erreicht",
             "openaiCredits": "OpenAI-API-Guthaben aufgebraucht",
-            "anthropicCredits": "Anthropic-API-Guthaben aufgebraucht"
+            "anthropicCredits": "Anthropic-API-Guthaben aufgebraucht",
+            "grokNoSubscription": "Kein Grok-Abo"
         },
         "messages": {
             "openaiCredits": "Dein OpenAI-API-Konto hat kein Guthaben mehr. Lade Guthaben auf platform.openai.com auf oder stell diesen Coworker auf ein anderes Modell um.",
@@ -74,7 +75,8 @@
             "weekly": "Dein {plan}-Tarif hat sein Wochenlimit erreicht. Stell diesen Coworker auf ein anderes Modell um, bis die neue Woche beginnt.",
             "model": "Dein {plan}-Tarif hat sein Limit für {model} erreicht. Die anderen {plan}-Modelle laufen weiter: Wechsle zu einem davon.",
             "sessionResets": "Dein {plan}-Tarif hat sein aktuelles Nutzungsfenster aufgebraucht. Es füllt sich um {resetsAt} wieder auf; stell diesen Coworker solange auf ein anderes Modell um.",
-            "session": "Dein {plan}-Tarif hat sein aktuelles Nutzungsfenster aufgebraucht. Es füllt sich von selbst wieder auf; stell diesen Coworker solange auf ein anderes Modell um."
+            "session": "Dein {plan}-Tarif hat sein aktuelles Nutzungsfenster aufgebraucht. Es füllt sich von selbst wieder auf; stell diesen Coworker solange auf ein anderes Modell um.",
+            "grokNoSubscription": "Dieses xAI-Konto hat kein Grok-Abo, das Grok Build enthält. Schließe ein Abo auf grok.com ab oder stelle diesen Coworker auf einen anderen Anbieter um."
         }
     }
 }

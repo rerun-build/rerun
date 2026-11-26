@@ -74,6 +74,10 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'google/gemini-3-flash-preview': 1_000_000,
     'x-ai/grok-4.7': 500_000,
     'x-ai/grok-4.6': 500_000,
+    'grok-4.7': 500_000,
+    'grok-4.7-build-fast': 500_000,
+    'grok-4.6': 500_000,
+    'grok-4.5': 500_000,
     'xiaomi/mimo-v2.6-pro': 1_000_000,
     'xiaomi/mimo-v2.5-pro': 1_000_000,
     'xiaomi/mimo-v2.5': 1_000_000,
@@ -109,9 +113,13 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
 // Claude serves 200k on a subscription whatever the model's API window, and 1M only on the ids
 // that ask for it. The engine switches the CLI's own compaction off (one compaction, Rerun's), so
 // this budget is the only thing that keeps a session inside the window.
+//
+// The Grok subscription serves 256k of the 500k its models take (`context_window` of its
+// `/v1/models`, read 2026-11-26), the larger one only to a client that asks for it.
 const CLI_CONTEXT_WINDOW: Partial<Record<Provider, (id: string) => number>> = {
     codex: () => 272_000,
     claude: id => (id.endsWith('[1m]') ? 1_000_000 : 200_000),
+    grok: () => 256_000,
 }
 
 // `provider` is widened to string because the chat gauge reads it back off message metadata,
@@ -191,6 +199,10 @@ export const MODEL_LABEL: Record<string, string> = {
     'google/gemini-3.1-pro-preview': 'Gemini 3.1 Pro',
     'x-ai/grok-4.7': 'Grok 4.7',
     'x-ai/grok-4.6': 'Grok 4.6',
+    'grok-4.7': 'Grok 4.7',
+    'grok-4.7-build-fast': 'Grok 4.7 Fast',
+    'grok-4.6': 'Grok 4.6',
+    'grok-4.5': 'Grok 4.5',
     'moonshotai/kimi-k3.1-pro': 'Kimi K3.1 Pro',
     'moonshotai/kimi-k3': 'Kimi K3',
     'deepseek/deepseek-v4-pro': 'DeepSeek V4 Pro',

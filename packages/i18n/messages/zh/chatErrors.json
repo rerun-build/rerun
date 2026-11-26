@@ -52,7 +52,8 @@
             "opencodeWindow": "已达到 OpenCode Go {window, select, weekly {每周} other {每月}}上限",
             "opencode": "已达到 OpenCode Go 上限",
             "openaiCredits": "OpenAI API 积分已用完",
-            "anthropicCredits": "Anthropic API 积分已用完"
+            "anthropicCredits": "Anthropic API 积分已用完",
+            "grokNoSubscription": "没有 Grok 订阅"
         },
         "messages": {
             "openaiCredits": "您的 OpenAI API 账号已没有积分。请在 platform.openai.com 上添加积分，或将此同事切换到其他模型。",
@@ -74,7 +75,8 @@
             "weekly": "您的 {plan} 套餐已达到每周上限。在新的一周开始之前，请将此同事切换到其他模型。",
             "model": "您的 {plan} 套餐已达到 {model} 上限。其他 {plan} 模型仍可运行：请切换到其中之一。",
             "sessionResets": "您的 {plan} 套餐已用完当前用量窗口。它将于 {resetsAt} 恢复；在此期间，请将此同事切换到其他模型。",
-            "session": "您的 {plan} 套餐已用完当前用量窗口。它会自动恢复；在此期间，请将此同事切换到其他模型。"
+            "session": "您的 {plan} 套餐已用完当前用量窗口。它会自动恢复；在此期间，请将此同事切换到其他模型。",
+            "grokNoSubscription": "此 xAI 账户没有包含 Grok Build 的 Grok 订阅。请在 grok.com 订阅，或将此同事切换到其他提供商。"
         }
     }
 }

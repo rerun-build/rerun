@@ -6,3 +6,12 @@ GET /api/v1/agents/{id} removed the enum constraint from the `agent/look/color` 
 # This build never sends a look: it has no picker (apps/mobile/src of its commit). Every colour it knows matches the pattern.
 POST /api/v1/agents added the pattern `^#[0-9a-fA-F]{6}$` to the request property `look/color`
 PATCH /api/v1/agents/{id} added the pattern `^#[0-9a-fA-F]{6}$` to the request property `look/color`
+# This build parses the provider of a connection strictly and does not know grok. The hub leaves it out
+# of what it answers a build below MOBILE_IOS_GROK_BUILD / MOBILE_ANDROID_GROK_BUILD:
+# apps/ui/app/api/v1/_lib/legacy-client.ts (aiConnectionsForClient, agentViewForClient,
+# agentModelsForClient), tested in legacy-client.test.ts.
+GET /api/v1/agents/{id} added the new `grok` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `grok` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `grok` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `grok` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `grok` enum value to the `connections/items/provider` response property for the response status `200`

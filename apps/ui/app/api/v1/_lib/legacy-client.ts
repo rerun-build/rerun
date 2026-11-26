@@ -1,32 +1,35 @@
 import { type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ClientPlatform, COWORKER_COLORS, type EmailCodePrepared, nearestHashedCoworkerColor, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
-// The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
-// know anywhere in a response fails the whole parse, and with it as the machine's default that is
-// every coworker's sheet. Until the build that knows a provider is the minimum, the routes those
-// builds read leave it out. Each provider names the env var holding its first build; unset, every
-// build is treated as one that does not know it. The Android app was born after every one of them.
-const FIRST_IOS_BUILD_ENV: Partial<Record<Provider, string>> = {
-    opencode: 'MOBILE_IOS_OPENCODE_BUILD',
-    custom: 'MOBILE_IOS_CUSTOM_BUILD',
+// The builds already in people's hands parse `providerSchema` strictly: one provider they do not know
+// anywhere in a response fails the whole parse, and with it as the machine's default that is every
+// coworker's sheet. Until the build that knows a provider is the minimum, the routes those builds read
+// leave it out. Each provider names, per platform, the env var holding its first build; unset, every
+// build of that platform is treated as one that does not know it. A platform it does not name was
+// born knowing it: the Android app came after OpenCode and custom endpoints, not after Grok.
+const FIRST_BUILD_ENV: Partial<Record<Provider, Partial<Record<ClientPlatform, string>>>> = {
+    opencode: { ios: 'MOBILE_IOS_OPENCODE_BUILD' },
+    custom: { ios: 'MOBILE_IOS_CUSTOM_BUILD' },
+    grok: { ios: 'MOBILE_IOS_GROK_BUILD', android: 'MOBILE_ANDROID_GROK_BUILD' },
 }
 
-const PROVIDERS_UNKNOWN_TO_LEGACY = Object.keys(FIRST_IOS_BUILD_ENV) as Provider[]
+const PROVIDERS_UNKNOWN_TO_LEGACY = Object.keys(FIRST_BUILD_ENV) as Provider[]
 
-function firstIosBuild(provider: Provider): number | null {
-    const name = FIRST_IOS_BUILD_ENV[provider]
-    const build = Number.parseInt((name && process.env[name]) ?? '', 10)
+function firstBuild(name: string): number | null {
+    const build = Number.parseInt(process.env[name] ?? '', 10)
     return Number.isInteger(build) && build > 0 ? build : null
 }
 
 // A request without the header is an old iOS build: only the app sends it, and only recent ones do.
 export function clientKnowsProvider(req: Request, provider: Provider): boolean {
-    if (!FIRST_IOS_BUILD_ENV[provider]) return true
+    const builds = FIRST_BUILD_ENV[provider]
+    if (!builds) return true
     const client = clientOf(req)
-    if (client?.platform === 'android') return true
-    const firstBuild = firstIosBuild(provider)
-    if (!client || firstBuild === null) return false
-    return client.build >= firstBuild
+    if (!client) return false
+    const name = builds[client.platform]
+    if (!name) return true
+    const first = firstBuild(name)
+    return first !== null && client.build >= first
 }
 
 function unknownTo(req: Request): ((provider: Provider | null | undefined) => boolean) | null {

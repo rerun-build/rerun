@@ -37,6 +37,10 @@
             "custom": {
                 "title": "Özel uç nokta",
                 "hint": "Ollama, LM Studio, vLLM veya OpenAI uyumlu herhangi bir sunucu"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "xAI hesabınızla giriş yapın"
             }
         },
         "summary": "{kind} · {count, plural, one {# model} other {# model}}",

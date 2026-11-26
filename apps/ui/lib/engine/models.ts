@@ -117,6 +117,16 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         ],
     },
     {
+        provider: 'grok',
+        label: 'Grok (Subscription)',
+        keyName: 'GROK_OAUTH_TOKEN',
+        section: 'subscription',
+        apiKeyUrl: 'https://grok.com/plans',
+        // Grok Build's own list for the account: a model it leaves out is locked (`cliModels`). The
+        // fast variant spends the week's allowance twice as fast as the model it speeds up.
+        models: [model('grok-4.6', 4), model('grok-4.7', 5), model('grok-4.7-build-fast', 5), model('grok-4.5', 3)],
+    },
+    {
         provider: 'openai',
         label: 'OpenAI',
         keyName: 'OPENAI_API_KEY',

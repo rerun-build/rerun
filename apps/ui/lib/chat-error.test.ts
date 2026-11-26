@@ -340,6 +340,37 @@ describe('OpenCode limits', () => {
     })
 })
 
+// What the engine writes in place of xAI's refusals, whose body names the account's team.
+describe('Grok limits', () => {
+    const weekly = 'AI_APICallError: Grok weekly limit reached · resets Nov 30, 2:53 PM UTC'
+    const noSubscription = 'AI_APICallError: No Grok subscription on this xAI account'
+    const notInPlan = 'AI_APICallError: Grok plan does not include `grok-4.7`'
+
+    it('reads the week spent as a usage limit of the Grok plan, with its reset', () => {
+        expect(classifyChatError(weekly)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(weekly)).toEqual({ plan: 'grok', scope: 'weekly', resetsAt: 'Nov 30, 2:53 PM UTC' })
+        expect(chatErrorTitle('usage_limit', weekly)).toBe('Grok weekly limit reached')
+        expect(friendlyError(weekly)).toBe('Your Grok plan has reached its weekly limit. It resets Nov 30, 2:53 PM UTC; switch this coworker to another model until then.')
+    })
+
+    it('reads an account with no Grok plan as one to subscribe, never as a wait', () => {
+        expect(classifyChatError(noSubscription)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(noSubscription)).toEqual({ plan: 'grok', scope: 'no_subscription' })
+        expect(chatErrorTitle('usage_limit', noSubscription)).toBe('No Grok subscription')
+        expect(friendlyError(noSubscription)).toBe('This xAI account has no Grok subscription that includes Grok Build. Subscribe on grok.com, or switch this coworker to another provider.')
+    })
+
+    it('names the model the Grok plan does not serve', () => {
+        expect(classifyChatError(notInPlan)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(notInPlan)).toEqual({ plan: 'grok', scope: 'not_in_plan', modelName: 'Grok 4.7' })
+        expect(chatErrorTitle('usage_limit', notInPlan)).toBe("Grok 4.7 isn't in your Grok plan")
+    })
+
+    it('leaves a Grok model on OpenRouter to the generic rules', () => {
+        expect(describeSubscriptionLimit('Provider returned error: x-ai/grok-4.7 is overloaded').plan).not.toBe('grok')
+    })
+})
+
 // What OpenCode answers an account whose settings or plan turn a Go model away, as the engine stores it
 // (RER-139). The generic "switch to another model" sent people round every model of the catalog.
 describe('OpenCode account refusals', () => {

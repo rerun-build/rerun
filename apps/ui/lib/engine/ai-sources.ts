@@ -14,7 +14,7 @@ export type AddableProvider = Exclude<Provider, 'rerun'>
 
 // The API key providers with a key to fetch from a console. A custom endpoint is listed beside them
 // but asks for its address first, and its key is optional.
-export type KeyProvider = Exclude<AddableProvider, 'claude' | 'codex' | 'opencode' | 'custom'>
+export type KeyProvider = Exclude<AddableProvider, 'claude' | 'codex' | 'grok' | 'opencode' | 'custom'>
 
 // The providers connected by pasting a key, whose page walks the user through getting one. OpenCode
 // is one of them while it sells a plan: it sits with the subscriptions, not with the API keys.

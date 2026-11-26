@@ -37,6 +37,10 @@
             "custom": {
                 "title": "Custom endpoint",
                 "hint": "Ollama, LM Studio, vLLM or any OpenAI-compatible server"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "Sign in with your xAI account"
             }
         },
         "summary": "{kind} · {count, plural, one {# model} other {# models}}",
@@ -180,7 +184,8 @@
         "sources.guide.opencode.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.guide.opencode.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
-        "sources.creditBackManaged": "Completes the sentence \"Credits used up, back ...\" of the mobile app."
+        "sources.creditBackManaged": "Completes the sentence \"Credits used up, back ...\" of the mobile app.",
+        "sources.pitch.grok.title": "SuperGrok is the name of xAI's paid Grok plan: keep it as it is."
     },
     "noPlan": {
         "trialText": "Start your free trial to connect your own Claude plan, ChatGPT plan or API key.",

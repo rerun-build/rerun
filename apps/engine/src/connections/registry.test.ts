@@ -76,6 +76,17 @@ describe('connection registry', () => {
         expect(all.find(c => c.id === 'a')).toBe(a)
     })
 
+    it('leaves out a connection it cannot read, for a provider a newer engine knows, instead of failing the list', async () => {
+        await connection('a')
+        await mkdir(connectionDir('b'), { recursive: true })
+        await writeFile(connectionConfigPath('b'), JSON.stringify({ name: 'b', provider: 'from-the-future', models: [], createdAt: '2026-01-01' }))
+        await writeFile(connectionEnvPath('b'), '')
+
+        expect((await listConnections()).map(c => c.id)).toEqual(['a'])
+        expect(await findConnection('b')).toBeNull()
+        await expect(getConnection('b')).rejects.toThrow()
+    })
+
     it('drops every cached agent when a connection is unloaded', async () => {
         await mkdir(agentDir('holder'), { recursive: true })
         await writeAgentConfig('holder', agentConfigSchema.parse({ name: 'holder' }))

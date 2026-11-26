@@ -52,7 +52,8 @@
             "opencodeWindow": "تم بلوغ الحد {window, select, weekly {الأسبوعي} other {الشهري}} في OpenCode Go",
             "opencode": "تم بلوغ حد OpenCode Go",
             "openaiCredits": "نفد رصيد OpenAI API",
-            "anthropicCredits": "نفد رصيد Anthropic API"
+            "anthropicCredits": "نفد رصيد Anthropic API",
+            "grokNoSubscription": "لا يوجد اشتراك Grok"
         },
         "messages": {
             "openaiCredits": "لم يتبقَّ أي رصيد في حسابك على OpenAI API. أضف رصيدًا على platform.openai.com، أو انقل هذا الزميل إلى نموذج آخر.",
@@ -74,7 +75,8 @@
             "weekly": "بلغت خطة {plan} حدها الأسبوعي. انقل هذا الزميل إلى نموذج آخر حتى يبدأ أسبوع جديد.",
             "model": "بلغت خطة {plan} حد {model}. لا تزال نماذج {plan} الأخرى تعمل: انتقل إلى أحدها.",
             "sessionResets": "استنفدت خطة {plan} نافذة الاستخدام الحالية. تتجدد في {resetsAt}؛ انقل هذا الزميل إلى نموذج آخر في الأثناء.",
-            "session": "استنفدت خطة {plan} نافذة الاستخدام الحالية. تتجدد تلقائيًا؛ انقل هذا الزميل إلى نموذج آخر في الأثناء."
+            "session": "استنفدت خطة {plan} نافذة الاستخدام الحالية. تتجدد تلقائيًا؛ انقل هذا الزميل إلى نموذج آخر في الأثناء.",
+            "grokNoSubscription": "لا يملك حساب xAI هذا اشتراك Grok يشمل Grok Build. اشترك عبر grok.com، أو انقل هذا الزميل إلى مزوّد آخر."
         }
     }
 }

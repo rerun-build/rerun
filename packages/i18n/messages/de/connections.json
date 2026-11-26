@@ -37,6 +37,10 @@
             "custom": {
                 "title": "Eigener Endpunkt",
                 "hint": "Ollama, LM Studio, vLLM oder ein OpenAI-kompatibler Server"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "Mit deinem xAI-Konto anmelden"
             }
         },
         "summary": "{kind} · {count, plural, one {# Modell} other {# Modelle}}",

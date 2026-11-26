@@ -1,4 +1,20 @@
-import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, CHATGPT_SPEND_CAP, CHATGPT_WORKSPACE_CREDITS, CHATGPT_WORKSPACE_LIMIT, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_PRIVACY_REFUSAL, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
+import {
+    ANTHROPIC_API_CREDITS,
+    ANTHROPIC_KEY_NOT_SCOPED,
+    CHATGPT_SPEND_CAP,
+    CHATGPT_WORKSPACE_CREDITS,
+    CHATGPT_WORKSPACE_LIMIT,
+    GROK_MODEL_NOT_IN_PLAN,
+    GROK_NO_SUBSCRIPTION,
+    GROK_WEEKLY_LIMIT,
+    OPENAI_API_CREDITS,
+    OPENCODE_CREDITS_USED_UP,
+    OPENCODE_GO_LIMIT,
+    OPENCODE_PRIVACY_REFUSAL,
+    classifyChatError,
+    stripErrorPrefix,
+    type ChatErrorKind,
+} from './chat-error.js'
 import { modelLabel } from './models.js'
 
 // The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
@@ -15,10 +31,10 @@ export function isBudgetExhausted(message: string): boolean {
 //
 // `not_in_plan` is a model the plan does not include at all ("Fable 5.1 requires usage credits"),
 // `credits` the paid overage spent (or, on `openai` and `anthropic`, the API account's prepaid
-// credits), `spend` an organization's monthly cap.
+// credits), `spend` an organization's monthly cap, `no_subscription` an account with no plan at all.
 export type SubscriptionLimit = {
-    plan: 'claude' | 'chatgpt' | 'opencode' | 'openai' | 'anthropic' | null
-    scope: 'session' | 'weekly' | 'monthly' | 'model' | 'not_in_plan' | 'credits' | 'spend'
+    plan: 'claude' | 'chatgpt' | 'opencode' | 'openai' | 'anthropic' | 'grok' | null
+    scope: 'session' | 'weekly' | 'monthly' | 'model' | 'not_in_plan' | 'credits' | 'spend' | 'no_subscription'
     modelName?: string
     resetsAt?: string
 }
@@ -54,12 +70,23 @@ function opencodeLimit(message: string, m: string): SubscriptionLimit | null {
     return withReset({ plan: 'opencode', scope }, message)
 }
 
+// The engine writes these in place of what xAI answers (see `grokFetch`): xAI's body names the team.
+function grokLimit(message: string, m: string): SubscriptionLimit | null {
+    if (m.includes(GROK_NO_SUBSCRIPTION.toLowerCase())) return { plan: 'grok', scope: 'no_subscription' }
+    if (m.includes(GROK_WEEKLY_LIMIT.toLowerCase())) return withReset({ plan: 'grok', scope: 'weekly' }, message)
+    if (!m.includes(GROK_MODEL_NOT_IN_PLAN.toLowerCase())) return null
+    const id = /grok plan does not include `([^`]+)`/i.exec(message)?.[1]
+    return { plan: 'grok', scope: 'not_in_plan', ...(id ? { modelName: modelLabel(id) } : {}) }
+}
+
 export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     const message = stripErrorPrefix(raw)
     const m = message.toLowerCase()
     // Before the Claude rules: a Console model is often a Claude, and its 402 names it.
     const opencode = opencodeLimit(message, m)
     if (opencode) return opencode
+    const grok = grokLimit(message, m)
+    if (grok) return grok
     if (OPENAI_API_CREDITS.test(message)) return { plan: 'openai', scope: 'credits' }
     if (ANTHROPIC_API_CREDITS.test(message)) return { plan: 'anthropic', scope: 'credits' }
     if (m.includes(CHATGPT_WORKSPACE_LIMIT.toLowerCase())) {
@@ -81,15 +108,15 @@ export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     return { plan: null, scope: 'session' }
 }
 
-const PLAN_LABELS: Record<'claude' | 'chatgpt' | 'opencode', string> = { claude: 'Claude', chatgpt: 'ChatGPT', opencode: 'OpenCode Go' }
+const PLAN_LABELS: Record<'claude' | 'chatgpt' | 'opencode' | 'grok', string> = { claude: 'Claude', chatgpt: 'ChatGPT', opencode: 'OpenCode Go', grok: 'Grok' }
 
 type TitledKind = Exclude<ChatErrorKind, 'generic' | 'usage_limit'>
 type ExplainedKind = Exclude<TitledKind, 'run_in_flight'>
 
 const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'overloaded', 'context_window', 'provider_error', 'thinking_replay', 'interrupted', 'session_gone']
 
-type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits'
-type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'chatgptCredits' | 'chatgptSpend' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
+type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits' | 'grokNoSubscription'
+type LimitMessageKey = 'grokNoSubscription' | 'openaiCredits' | 'anthropicCredits' | 'chatgptCredits' | 'chatgptSpend' | 'opencodeCredits' | 'opencodeNoGo' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
 
 // The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
 export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | 'anthropicKeyNotScoped.title' | 'anthropicKeyNotScoped.message' | 'opencodePrivacy.title' | 'opencodePrivacy.region' | 'opencodePrivacy.training' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
@@ -111,6 +138,7 @@ function opencodeLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string 
 // "the provider", because a Box can hold both and only one of them is out.
 export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.plan === 'opencode') return opencodeLimitMessage(limit, t)
+    if (limit.scope === 'no_subscription') return t('limits.messages.grokNoSubscription')
     if (limit.plan === 'openai') return t('limits.messages.openaiCredits')
     if (limit.plan === 'anthropic') return t('limits.messages.anthropicCredits')
     if (limit.scope === 'not_in_plan') {
@@ -132,6 +160,7 @@ export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorC
 
 export function subscriptionLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.plan === 'opencode') return opencodeLimitTitle(limit, t)
+    if (limit.scope === 'no_subscription') return t('limits.titles.grokNoSubscription')
     if (limit.plan === 'openai') return t('limits.titles.openaiCredits')
     if (limit.plan === 'anthropic') return t('limits.titles.anthropicCredits')
     if (limit.scope === 'not_in_plan') {

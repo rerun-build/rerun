@@ -1889,7 +1889,8 @@
                                                                 "google",
                                                                 "openrouter",
                                                                 "opencode",
-                                                                "custom"
+                                                                "custom",
+                                                                "grok"
                                                             ],
                                                             "nullable": true,
                                                             "type": "string"
@@ -2099,7 +2100,8 @@
                                                         "google",
                                                         "openrouter",
                                                         "opencode",
-                                                        "custom"
+                                                        "custom",
+                                                        "grok"
                                                     ],
                                                     "nullable": true,
                                                     "type": "string"
@@ -3171,7 +3173,8 @@
                                                             "google",
                                                             "openrouter",
                                                             "opencode",
-                                                            "custom"
+                                                            "custom",
+                                                            "grok"
                                                         ],
                                                         "type": "string"
                                                     }
@@ -4976,7 +4979,8 @@
                                                             "google",
                                                             "openrouter",
                                                             "opencode",
-                                                            "custom"
+                                                            "custom",
+                                                            "grok"
                                                         ],
                                                         "type": "string"
                                                     },
@@ -5093,7 +5097,8 @@
                                                             "google",
                                                             "openrouter",
                                                             "opencode",
-                                                            "custom"
+                                                            "custom",
+                                                            "grok"
                                                         ],
                                                         "type": "string"
                                                     },
@@ -5235,7 +5240,8 @@
                                             "google",
                                             "openrouter",
                                             "opencode",
-                                            "custom"
+                                            "custom",
+                                            "grok"
                                         ],
                                         "type": "string"
                                     }

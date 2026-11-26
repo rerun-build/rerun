@@ -52,7 +52,8 @@
             "opencodeWindow": "הגעת למגבלה ה{window, select, weekly {שבועית} other {חודשית}} של OpenCode Go",
             "opencode": "הגעת למגבלת OpenCode Go",
             "openaiCredits": "קרדיטי OpenAI API נגמרו",
-            "anthropicCredits": "קרדיטי Anthropic API נגמרו"
+            "anthropicCredits": "קרדיטי Anthropic API נגמרו",
+            "grokNoSubscription": "אין מינוי ל-Grok"
         },
         "messages": {
             "openaiCredits": "לא נשארו קרדיטים בחשבון OpenAI API שלך. אפשר להוסיף קרדיטים ב-platform.openai.com, או להעביר את העמית הזה למודל אחר.",
@@ -74,7 +75,8 @@
             "weekly": "תוכנית {plan} שלך הגיעה למגבלה השבועית. עד תחילת השבוע הבא אפשר להעביר את העמית הזה למודל אחר.",
             "model": "תוכנית {plan} שלך הגיעה למגבלת {model}. שאר המודלים של {plan} עדיין פועלים: אפשר לעבור לאחד מהם.",
             "sessionResets": "תוכנית {plan} שלך ניצלה את חלון השימוש הנוכחי. הוא מתמלא שוב ב-{resetsAt}; בינתיים אפשר להעביר את העמית הזה למודל אחר.",
-            "session": "תוכנית {plan} שלך ניצלה את חלון השימוש הנוכחי. הוא מתמלא שוב מעצמו; בינתיים אפשר להעביר את העמית הזה למודל אחר."
+            "session": "תוכנית {plan} שלך ניצלה את חלון השימוש הנוכחי. הוא מתמלא שוב מעצמו; בינתיים אפשר להעביר את העמית הזה למודל אחר.",
+            "grokNoSubscription": "לחשבון xAI הזה אין מינוי ל-Grok שכולל את Grok Build. הירשמו למינוי ב-grok.com, או העבירו את העמית הזה לספק אחר."
         }
     }
 }

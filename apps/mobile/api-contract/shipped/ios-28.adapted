@@ -11,3 +11,12 @@ GET /api/v1/ai-connections added the new `custom` enum value to the `addable/ite
 GET /api/v1/ai-connections added the new `custom` enum value to the `connections/items/provider` response property for the response status `200`
 GET /api/v1/ai-connections added the new `opencode` enum value to the `addable/items/provider` response property for the response status `200`
 GET /api/v1/ai-connections added the new `opencode` enum value to the `connections/items/provider` response property for the response status `200`
+# This build parses the provider of a connection strictly and does not know grok. The hub leaves it out
+# of what it answers a build below MOBILE_IOS_GROK_BUILD / MOBILE_ANDROID_GROK_BUILD:
+# apps/ui/app/api/v1/_lib/legacy-client.ts (aiConnectionsForClient, agentViewForClient,
+# agentModelsForClient), tested in legacy-client.test.ts.
+GET /api/v1/agents/{id} added the new `grok` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `grok` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `grok` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `grok` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `grok` enum value to the `connections/items/provider` response property for the response status `200`

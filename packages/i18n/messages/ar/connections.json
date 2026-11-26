@@ -37,6 +37,10 @@
             "custom": {
                 "title": "نقطة نهاية مخصصة",
                 "hint": "Ollama أو LM Studio أو vLLM أو أي خادم متوافق مع OpenAI"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "سجّل الدخول بحساب xAI الخاص بك"
             }
         },
         "summary": "{kind} · {count, plural, zero {لا نماذج} one {نموذج واحد} two {نموذجان} few {# نماذج} many {# نموذجًا} other {# نموذج}}",

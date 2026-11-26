@@ -37,6 +37,10 @@
             "custom": {
                 "title": "נקודת קצה מותאמת",
                 "hint": "Ollama, LM Studio, vLLM או כל שרת תואם OpenAI"
+            },
+            "grok": {
+                "title": "SuperGrok",
+                "hint": "התחברו עם חשבון ה-xAI שלכם"
             }
         },
         "summary": "{kind} · {count, plural, one {# מודל} two {# מודלים} other {# מודלים}}",

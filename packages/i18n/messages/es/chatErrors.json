@@ -52,7 +52,8 @@
             "opencodeWindow": "Límite {window, select, weekly {semanal} other {mensual}} de OpenCode Go alcanzado",
             "opencode": "Límite de OpenCode Go alcanzado",
             "openaiCredits": "Créditos de la API de OpenAI agotados",
-            "anthropicCredits": "Créditos de la API de Anthropic agotados"
+            "anthropicCredits": "Créditos de la API de Anthropic agotados",
+            "grokNoSubscription": "Sin suscripción a Grok"
         },
         "messages": {
             "openaiCredits": "Tu cuenta de la API de OpenAI no tiene créditos. Añade créditos en platform.openai.com, o cambia este coworker a otro modelo.",
@@ -74,7 +75,8 @@
             "weekly": "Tu plan de {plan} alcanzó su límite semanal. Cambia este coworker a otro modelo hasta que empiece la semana siguiente.",
             "model": "Tu plan de {plan} alcanzó su límite de {model}. Los demás modelos de {plan} siguen funcionando: cambia a uno de ellos.",
             "sessionResets": "Tu plan de {plan} agotó su ventana de uso actual. Se recarga a las {resetsAt}; mientras tanto, cambia este coworker a otro modelo.",
-            "session": "Tu plan de {plan} agotó su ventana de uso actual. Se recarga sola; mientras tanto, cambia este coworker a otro modelo."
+            "session": "Tu plan de {plan} agotó su ventana de uso actual. Se recarga sola; mientras tanto, cambia este coworker a otro modelo.",
+            "grokNoSubscription": "Esta cuenta de xAI no tiene una suscripción a Grok que incluya Grok Build. Suscríbete en grok.com o cambia este coworker a otro proveedor."
         }
     }
 }

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { agentViewSchema, boardAgentSchema, COWORKER_COLORS, coworkerLookSchema, type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent } from '@rerun/contracts'
 import { z } from 'zod'
 
-import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
+import { shippedBeforeGrok, shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
 import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, boardAgentsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
@@ -68,13 +68,26 @@ describe('clientKnowsProvider', () => {
         expect(clientKnowsProvider(request('ios/9.9.9 (999)'), 'opencode')).toBe(false)
     })
 
-    it('trusts every Android build: the Android app was born knowing every provider', () => {
+    it('trusts every Android build with OpenCode and custom endpoints: the Android app was born knowing them', () => {
         expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'opencode')).toBe(true)
         expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'custom')).toBe(true)
         vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
         vi.stubEnv('MOBILE_IOS_CUSTOM_BUILD', '52')
         expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'opencode')).toBe(true)
         expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'custom')).toBe(true)
+    })
+
+    it('holds each platform to its own first build of Grok, and none while it is not set', () => {
+        expect(clientKnowsProvider(request('ios/9.9.9 (999)'), 'grok')).toBe(false)
+        expect(clientKnowsProvider(request('android/9.9.9 (999)'), 'grok')).toBe(false)
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '60')
+        vi.stubEnv('MOBILE_ANDROID_GROK_BUILD', '25')
+        expect(clientKnowsProvider(request('ios/1.6.0 (60)'), 'grok')).toBe(true)
+        expect(clientKnowsProvider(request('ios/1.5.9 (59)'), 'grok')).toBe(false)
+        expect(clientKnowsProvider(request('android/1.6.0 (25)'), 'grok')).toBe(true)
+        expect(clientKnowsProvider(request('android/1.5.9 (24)'), 'grok')).toBe(false)
+        expect(clientKnowsProvider(request('android/1.6.0 (60)'), 'opencode')).toBe(true)
+        expect(clientKnowsProvider(request(), 'grok')).toBe(false)
     })
 
     it('reads a header it cannot parse as an old build, whatever platform it names', () => {
@@ -109,20 +122,53 @@ describe('responses for an older build', () => {
         expect(agentModelsForClient(old, models).groups.map(g => g.connectionId)).toEqual(['rerun'])
     })
 
-    it('hands an Android build the response untouched, with no first build set', () => {
+    it('keeps OpenCode for an Android build, with no first build set', () => {
         const android = request('android/1.0.0 (1)')
-        expect(aiConnectionsForClient(android, view)).toBe(view)
-        expect(agentModelsForClient(android, models)).toBe(models)
-        expect(agentViewForClient(android, agentView)).toBe(agentView)
+        expect(aiConnectionsForClient(android, view)).toEqual(view)
+        expect(agentModelsForClient(android, models)).toEqual(models)
+        expect(agentViewForClient(android, agentView)).toEqual(agentView)
     })
 
     it('hands a build that knows every provider the response untouched', () => {
         vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
         vi.stubEnv('MOBILE_IOS_CUSTOM_BUILD', '40')
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '40')
         const current = request('ios/1.4.0 (40)')
         expect(aiConnectionsForClient(current, view)).toBe(view)
         expect(agentModelsForClient(current, models)).toBe(models)
         expect(agentViewForClient(current, agentView)).toBe(agentView)
+    })
+})
+
+// Grok came after every build in people's hands, Android ones included.
+describe('responses for a build from before Grok', () => {
+    const grokView: AiConnectionsView = {
+        ...view,
+        connections: [...view.connections, { id: 'cnx-grok', name: 'Grok', provider: 'grok', kind: 'plan', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: '', extraModels: [], planWindows: [] }],
+        addable: [...view.addable, { provider: 'grok', kind: 'plan', title: 'Grok', hint: '', suggestedName: 'Grok', guide: null }],
+    }
+    const grokModels: AgentModels = { ...models, groups: [...models.groups, { connectionId: 'cnx-grok', label: 'Grok', provider: 'grok', models: [{ id: 'grok-4.6', label: 'Grok 4.6' }], defaultModel: 'grok-4.6' }] }
+    const onGrok: AgentView = agentViewSchema.parse({ ...agentView, detail: { ...agentView.detail, config: { name: 'Scout', provider: 'grok', connectionId: 'cnx-grok', model: 'grok-4.6' }, resolvedConnectionId: 'cnx-grok', resolvedProvider: 'grok', resolvedModel: 'grok-4.6' } })
+
+    it.each(['android/1.0.4 (18)', 'ios/1.0.6 (51)', 'ios/1.0.6'])('leaves Grok out for %s, which then parses the answer', client => {
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '60')
+        vi.stubEnv('MOBILE_ANDROID_GROK_BUILD', '25')
+        const req = request(client)
+        expect(shippedBeforeGrok.connectionsView.safeParse(grokView).success).toBe(false)
+        expect(shippedBeforeGrok.connectionsView.safeParse(aiConnectionsForClient(req, grokView)).success).toBe(true)
+        expect(shippedBeforeGrok.agentModels.safeParse(agentModelsForClient(req, grokModels)).success).toBe(true)
+        expect(shippedBeforeGrok.agentView.safeParse(onGrok).success).toBe(false)
+        expect(shippedBeforeGrok.agentView.safeParse(agentViewForClient(req, onGrok)).success).toBe(true)
+        expect(agentViewForClient(req, onGrok).detail).toMatchObject({ resolvedProvider: null, config: { provider: null, model: null } })
+    })
+
+    it('hands Grok to the builds that know it, on either platform', () => {
+        vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
+        vi.stubEnv('MOBILE_IOS_CUSTOM_BUILD', '40')
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '60')
+        vi.stubEnv('MOBILE_ANDROID_GROK_BUILD', '25')
+        expect(aiConnectionsForClient(request('ios/1.6.0 (60)'), grokView)).toBe(grokView)
+        expect(aiConnectionsForClient(request('android/1.6.0 (25)'), grokView)).toBe(grokView)
     })
 })
 

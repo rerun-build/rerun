@@ -7,7 +7,7 @@
 // `currentColor` so their near-black marks stay visible in both light and dark themes.
 
 import type { JSX } from 'react'
-import { OpenCodeMark } from '@rerun/ui/beams'
+import { MODEL_LOGOS, OpenCodeMark } from '@rerun/ui/beams'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { ServerIcon } from '@/lib/icons'
 
@@ -82,6 +82,17 @@ function CursorIcon({ className = 'size-3.5' }: IconProps) {
     )
 }
 
+// xAI's mark, drawn in `currentColor` like OpenAI's so it stays visible in both themes.
+function GrokIcon({ className = 'size-3.5' }: IconProps) {
+    return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            {MODEL_LOGOS.grok.paths.map(d => (
+                <path key={d} d={d} />
+            ))}
+        </svg>
+    )
+}
+
 const PROVIDER_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     rerun: RerunIcon,
     anthropic: AnthropicIcon,
@@ -93,6 +104,7 @@ const PROVIDER_ICONS: Record<string, (p: IconProps) => JSX.Element> = {
     apple: AppleIcon,
     openrouter: OpenRouterIcon,
     opencode: OpenCodeMark,
+    grok: GrokIcon,
 }
 
 // Brand logo for a catalog provider id. A provider with no logo of its own — a user's own

@@ -48,6 +48,14 @@ export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
 // quoting them is not ChatGPT: only the engine knows the run went through Codex.
 export const CHATGPT_WORKSPACE_LIMIT = 'ChatGPT workspace limit reached'
 
+// What the engine stores when the Grok subscription refuses a run, in place of xAI's own body, which
+// names the account's team: the week's allowance spent ("Grok weekly limit reached · resets Nov 30,
+// 2:53 PM UTC"), an xAI account whose plan does not include Grok Build, or a model the plan does not
+// serve ("Grok plan does not include `grok-4.7`").
+export const GROK_WEEKLY_LIMIT = 'Grok weekly limit reached'
+export const GROK_NO_SUBSCRIPTION = 'No Grok subscription on this xAI account'
+export const GROK_MODEL_NOT_IN_PLAN = 'Grok plan does not include'
+
 // What the engine stores when a custom endpoint answers 402, ahead of the server's own sentence. What
 // a 402 means is up to each server, so the chat shows that sentence as it is.
 export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
@@ -62,7 +70,7 @@ export const CUSTOM_ENDPOINT_REFUSED = 'Custom endpoint refused the request'
 // once they are spent), Codex "The 'gpt-6-astra' model is not supported when using Codex with a
 // ChatGPT account". Shared with the engine's `classifyProviderError`, so both ends agree.
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|active opencode go subscription is required|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low|workspace is out of credits\. (?:add credits to continue|ask your workspace owner)|hit your spend cap set (?:in|by)/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|active opencode go subscription is required|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low|workspace is out of credits\. (?:add credits to continue|ask your workspace owner)|hit your spend cap set (?:in|by)|grok weekly limit reached|no grok subscription on this xai account|grok plan does not include/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names OpenAI: the engine's sentence, or OpenAI's own one,
 // which points at platform.openai.com. An OpenAI-compatible gateway answering `insufficient_quota`
@@ -87,7 +95,7 @@ export const CHATGPT_SPEND_CAP = /hit your spend cap set (?:in|by)/i
 // window that ran out. The chat words both the same way, but the engine reports it under its own
 // code: waiting for a reset does not bring the model back, and the funnel must not read it as a
 // spent quota.
-export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found|active opencode go subscription is required/i
+export const MODEL_NOT_IN_PLAN = /not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found|active opencode go subscription is required|no grok subscription on this xai account|grok plan does not include/i
 
 // OpenCode turns a Go model away when the account's privacy settings exclude it: served outside
 // Europe and the United States, or by an endpoint that trains on what it is sent. Only the account

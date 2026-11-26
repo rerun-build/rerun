@@ -53,7 +53,8 @@ export type PlanLimits = z.infer<typeof planLimitsSchema>
 // `model/list`, Claude Code's `supportedModels`). Codex answers for the account: an old binary has
 // never heard of a new model, a free plan is not offered a paid one, and `outdated` tells the two
 // apart (the binary is not the one this engine release pins). Claude Code only names its own picker,
-// a model it leaves out still runs, so its reading is kept for diagnosis and refuses nothing.
+// a model it leaves out still runs, so its reading is kept for diagnosis and refuses nothing. Grok
+// has no binary: its list is the account's, read off the subscription's own endpoint.
 export const cliModelsSchema = z.object({
     models: z.array(z.string()),
     version: z.string().nullable(),
@@ -65,9 +66,11 @@ export type CliModels = z.infer<typeof cliModelsSchema>
 // The 1M-context variants of a Claude model run on the same binary entry as the model itself.
 const cliModelKey = (id: string): string => id.replace(/\[1m\]$/, '')
 
+const ACCOUNT_LISTED_PROVIDERS: ReadonlySet<Provider> = new Set(['codex', 'grok'])
+
 // Without a reading nothing is refused: a probe that failed must never lock models that work.
 export function cliServesModel(provider: Provider, cliModels: CliModels | null | undefined, id: string): boolean {
-    if (provider !== 'codex' || !cliModels) return true
+    if (!ACCOUNT_LISTED_PROVIDERS.has(provider) || !cliModels) return true
     const key = cliModelKey(id)
     return cliModels.models.some(model => cliModelKey(model) === key)
 }
@@ -186,6 +189,7 @@ export const CONNECTION_TOKEN_KEY: Record<z.infer<typeof providerSchema>, string
     opencode: 'OPENCODE_API_KEY',
     // Optional: a local server (Ollama, LM Studio) takes requests without one.
     custom: 'CUSTOM_API_KEY',
+    grok: 'GROK_OAUTH_TOKEN',
 }
 
 // What is wrong with a value about to be stored as a Claude subscription token, or null when it
@@ -213,6 +217,8 @@ export const CONNECTION_SATELLITE_KEYS: Record<z.infer<typeof providerSchema>, s
     openrouter: [],
     opencode: [],
     custom: [],
+    // `ACCOUNT_ID` is the `sub` of the xAI sign-in, `EXPIRES_AT` the access token's end in ms.
+    grok: ['GROK_OAUTH_REFRESH_TOKEN', 'GROK_OAUTH_ID_TOKEN', 'GROK_OAUTH_ACCOUNT_ID', 'GROK_OAUTH_EXPIRES_AT'],
 }
 
 // Every env var name that used to live on an agent and now belongs to a connection. What the boot
@@ -292,6 +298,9 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
     ],
     // Only the endpoint knows what it serves: the models arrive with the connection, read off it.
     custom: [],
+    // Grok Build's own list for the account (`GET /v1/models`), the fast variant after the model it
+    // speeds up: it spends the week's allowance twice as fast.
+    grok: ['grok-4.6', 'grok-4.7', 'grok-4.7-build-fast', 'grok-4.5'],
 }
 
 // How a connection names itself when nobody has yet: the boot migration builds "Claude (Theo)"
@@ -306,6 +315,7 @@ export const PROVIDER_LABELS: Record<z.infer<typeof providerSchema>, string> = {
     openrouter: 'OpenRouter',
     opencode: 'OpenCode',
     custom: 'Custom',
+    grok: 'Grok',
 }
 
 // The model the app's picker offers for one coworker, grouped and labelled by the hub with the web

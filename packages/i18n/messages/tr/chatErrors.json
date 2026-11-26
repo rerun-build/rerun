@@ -52,7 +52,8 @@
             "opencodeWindow": "OpenCode Go {window, select, weekly {haftalık} other {aylık}} sınırına ulaşıldı",
             "opencode": "OpenCode Go sınırına ulaşıldı",
             "openaiCredits": "OpenAI API kredileri tükendi",
-            "anthropicCredits": "Anthropic API kredileri tükendi"
+            "anthropicCredits": "Anthropic API kredileri tükendi",
+            "grokNoSubscription": "Grok aboneliği yok"
         },
         "messages": {
             "openaiCredits": "OpenAI API hesabınızda kredi kalmadı. platform.openai.com üzerinden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
@@ -74,7 +75,8 @@
             "weekly": "{plan} planınız haftalık sınırına ulaştı. Yeni hafta başlayana kadar bu coworker'ı başka bir modele geçirin.",
             "model": "{plan} planınız {model} sınırına ulaştı. Diğer {plan} modelleri hâlâ çalışıyor: bunlardan birine geçin.",
             "sessionResets": "{plan} planınız mevcut kullanım penceresini tüketti. Yenilenme zamanı: {resetsAt}. Bu arada bu coworker'ı başka bir modele geçirin.",
-            "session": "{plan} planınız mevcut kullanım penceresini tüketti. Kendiliğinden yenilenecek; bu arada bu coworker'ı başka bir modele geçirin."
+            "session": "{plan} planınız mevcut kullanım penceresini tüketti. Kendiliğinden yenilenecek; bu arada bu coworker'ı başka bir modele geçirin.",
+            "grokNoSubscription": "Bu xAI hesabının Grok Build'i içeren bir Grok aboneliği yok. grok.com üzerinden abone olun veya bu coworker'ı başka bir sağlayıcıya geçirin."
         }
     }
 }
