@@ -77,6 +77,10 @@ export const ENGINE_CAPABILITY_FOREMAN_AGENT = 'foreman.agent'
 // The engine accepts linked computers on `/remote/ws` and answers `/remote/computers`.
 export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 
+// A chat message may carry `replaceFrom`, and `DELETE /agents/:id/sessions/:sid/messages/:mid`
+// answers: a message of a conversation can be edited, a reply asked again, a message deleted.
+export const ENGINE_CAPABILITY_MESSAGE_EDIT = 'messages.edit'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),

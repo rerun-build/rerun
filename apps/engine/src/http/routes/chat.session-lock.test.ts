@@ -59,4 +59,19 @@ describe('one live run per session', () => {
 
         releaseSession('run-in-flight')
     })
+
+    it('answers 404 on a message to replace that is not in the conversation, and frees the session', async () => {
+        const session = await createSession(id, 'replace')
+        const app = createServer()
+        const send = () =>
+            app.request(`/agents/${id}/chat`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ sessionId: session.id, message: 'edited', replaceFrom: 'not-a-message' }),
+            })
+        const res = await send()
+        expect(res.status).toBe(404)
+        expect(await res.json()).toMatchObject({ code: 'message_not_found' })
+        expect((await send()).status).toBe(404)
+    })
 })

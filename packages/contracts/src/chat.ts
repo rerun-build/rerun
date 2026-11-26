@@ -58,6 +58,10 @@ export const chatRequestSchema = z.object({
     // feature request or a bug report for it. An engine that predates it drops it; a hub that predates
     // it never offers the card.
     teamRequests: z.boolean().optional(),
+    // The id of a message of this conversation: it and everything after it are removed before the
+    // run, so `message` takes its place (an edited message, a reply asked again). An engine without
+    // ENGINE_CAPABILITY_MESSAGE_EDIT drops it and only appends.
+    replaceFrom: z.string().min(1).max(64).optional(),
 })
 
 export const contextOccupancySchema = z.object({

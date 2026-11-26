@@ -62,7 +62,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -79,7 +79,8 @@ version the folder is at against the one this build takes it to.
   routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
-  Staff answers every coworker route but what its kind does not do, see above), and `desktop`
+  Staff answers every coworker route but what its kind does not do, see above), `messages.edit`
+  (`replaceFrom` on a chat message and `DELETE .../sessions/:sid/messages/:mid`), and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,
@@ -788,7 +789,8 @@ the assistant and tool messages, and runs the curator when `selfImprovement.enab
   "callableAgentIds": ["abc...", "def..."],
   "install": false,
   "userLanguage": "fr",
-  "teamRequests": true
+  "teamRequests": true,
+  "replaceFrom": "message-id"
 }
 ```
 
@@ -818,6 +820,11 @@ Only `message` is required.
   prompt section are not there, nor for a coworker another one called.
 - `foreman` is read only on `/agents/foreman/chat`: the instructions and the tools the app hands the
   Chief of Staff for this turn.
+- `replaceFrom` names a message of the conversation (`sessionId` required): that message and every
+  message after it are removed, with their search index rows and the compaction summaries that
+  covered them, before `message` is appended and the run starts. It edits a message of the user, or
+  asks a reply again from the message before it. `404 { "code": "message_not_found" }` when the
+  message is not in the conversation.
 
 Returns an **SSE stream** (AI SDK UI message stream protocol). The session id is in the
 `x-session-id` response header and the run id in `x-run-id`. Event lines look like:
@@ -867,6 +874,19 @@ Full transcript of a session (ordered). `404` if the session does not belong to 
 ```
 
 `role` is `user` | `assistant` | `tool`. `authorVia` is `foreman` on a message the Chief of Staff sent for its author, null otherwise. `contentJson` is the JSON-encoded AI SDK message content (string for user text; arrays of parts for assistant/tool).
+
+### `DELETE /agents/:id/sessions/:sid/messages/:mid`
+
+Deletes a message. A `user` message goes alone. An `assistant` or `tool` message takes its whole reply
+with it: every row between the user message before it and the next one, so a tool call never outlives
+its result. The search index rows and the compaction summaries that covered them go too.
+
+```json
+{ "deletedIds": ["...", "..."] }
+```
+
+`404` when the session or the message is not there, `409 { "code": "run_in_flight" }` while a run
+holds the conversation.
 
 ---
 

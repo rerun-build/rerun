@@ -1,9 +1,11 @@
-import { chatRequestSchema, ENGINE_SESSION_NOT_FOUND, type SessionSource } from '@rerun/contracts'
+import { chatRequestSchema, ENGINE_SESSION_NOT_FOUND, MESSAGE_NOT_FOUND, type SessionSource } from '@rerun/contracts'
 import { Hono } from 'hono'
 import { getAgent } from '../../agents/registry.js'
 import { claimInstallSession } from '../../agents/setup.js'
 import { touchMember } from '../../db/repos/members.js'
 import { createSession, getSession } from '../../db/repos/sessions.js'
+import { truncateSessionFrom } from '../../db/repos/messages.js'
+import { forgetCodexThread } from '../../agents/codex-threads.js'
 import { startRun } from '../../db/repos/runs.js'
 import { agentDisabled } from '../../lib/errors.js'
 import { logger } from '../../lib/logger.js'
@@ -43,6 +45,17 @@ chatRoutes.post('/chat', async c => {
         // stop it, instead of showing a dead end the user cannot act on.
         const claim = sessionClaim(session.id)
         return c.json({ error: 'a run is already in flight on this session', code: 'run_in_flight', runId: holder, sessionId: session.id, startedAt: claim ? new Date(claim.claimedAt).toISOString() : null, authorId: claim?.authorId ?? null }, 409)
+    }
+    if (body.replaceFrom) {
+        const removed = await truncateSessionFrom(agentId, session.id, body.replaceFrom).catch(err => {
+            releaseSession(runId)
+            throw err
+        })
+        if (!removed) {
+            releaseSession(runId)
+            return c.json({ error: 'message not found', code: MESSAGE_NOT_FOUND }, 404)
+        }
+        forgetCodexThread(agentId, session.id)
     }
     const run = await startRun(agent.id, session.id, runId).catch(err => {
         releaseSession(runId)

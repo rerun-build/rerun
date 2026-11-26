@@ -163,6 +163,7 @@ GET /agents/:id/archive   GET /agents/:id/archive/plan
 
 POST   /agents/:id/chat                      stream a run (AI SDK UI message stream)
 GET    /agents/:id/sessions   /sessions/:sid   /sessions/:sid/messages
+DELETE /agents/:id/sessions/:sid/messages/:mid
 GET    /agents/:id/runs   /runs/:rid   /runs/:rid/stream   /runs/:rid/steps   /runs/:rid/tools
 POST   /agents/:id/runs/:rid/cancel   /runs/:rid/tasks/:taskId/cancel
 GET    /agents/:id/usage   /agents/:id/stats

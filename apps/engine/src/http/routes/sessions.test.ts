@@ -13,6 +13,7 @@ const { writeAgentConfig } = await import('../../agents/config-write.js')
 const { agentDir } = await import('../../config/paths.js')
 const { createSession, touchSession } = await import('../../db/repos/sessions.js')
 const { appendMessage } = await import('../../db/repos/messages.js')
+const { claimSession, releaseSession } = await import('../../runtime/run-control.js')
 
 const id = 'sessionagent'
 const app = createServer()
@@ -104,5 +105,43 @@ describe('GET /agents/:id/sessions/:sid/messages', () => {
 
     it('404s on a session that does not exist', async () => {
         expect((await app.request(`/agents/${id}/sessions/nope/messages`)).status).toBe(404)
+    })
+})
+
+describe('DELETE /agents/:id/sessions/:sid/messages/:mid', () => {
+    async function remove(sid: string, mid: string) {
+        return app.request(`/agents/${id}/sessions/${sid}/messages/${mid}`, { method: 'DELETE' })
+    }
+
+    it('deletes the message and names what went', async () => {
+        const session = await createSession(id, 'delete')
+        const ask = await appendMessage(id, session.id, { role: 'user', content: 'typo' })
+        const reply = await appendMessage(id, session.id, { role: 'assistant', content: 'answer' })
+        const res = await remove(session.id, ask.id)
+        expect(res.status).toBe(200)
+        expect(await res.json()).toEqual({ deletedIds: [ask.id] })
+        const { messages } = (await (await app.request(`/agents/${id}/sessions/${session.id}/messages`)).json()) as { messages: { id: string }[] }
+        expect(messages.map(m => m.id)).toEqual([reply.id])
+    })
+
+    it('refuses while a run holds the conversation, and leaves the session free after', async () => {
+        const session = await createSession(id, 'busy')
+        const ask = await appendMessage(id, session.id, { role: 'user', content: 'hello' })
+        expect(claimSession(session.id, 'run-busy')).toBeNull()
+        const busy = await remove(session.id, ask.id)
+        expect(busy.status).toBe(409)
+        expect(await busy.json()).toMatchObject({ code: 'run_in_flight' })
+        releaseSession('run-busy')
+        expect((await remove(session.id, ask.id)).status).toBe(200)
+        expect(claimSession(session.id, 'run-after')).toBeNull()
+        releaseSession('run-after')
+    })
+
+    it('404s on an unknown message or a session of another agent', async () => {
+        const session = await createSession(id, 'missing')
+        expect((await remove(session.id, 'nope')).status).toBe(404)
+        const foreign = await createSession('otheragent', 'not yours')
+        const theirs = await appendMessage('otheragent', foreign.id, { role: 'user', content: 'mine' })
+        expect((await remove(foreign.id, theirs.id)).status).toBe(404)
     })
 })
