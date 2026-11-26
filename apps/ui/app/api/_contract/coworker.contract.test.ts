@@ -5,7 +5,7 @@ import { z } from 'zod'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { ServiceRegistry } from '@/lib/services/registry'
-import { callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
+import { CONTRACT_WORKSPACE, callRoute, contractContext, contractSessionUser, expectContract } from '@/test/mobile-contract'
 import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema } from '@/test/shipped-ios'
 import { fakeSupabase, tableResolver, type FakeSupabase, type SupabaseResolver } from '@/test/supabase-fake'
 
@@ -69,6 +69,7 @@ vi.mock('@/supabase/session/getServerSession', async importOriginal => ({
 vi.mock('@rerun/cloud/billing', async importOriginal => ({
     ...(await importOriginal<typeof import('@rerun/cloud/billing')>()),
     activeAgentLimitFor: ((maxAgents: number | null) => maxAgents) satisfies typeof import('@rerun/cloud/billing').activeAgentLimitFor,
+    rerunCreditTotalMicros: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).rerunCreditTotalMicros,
 }))
 vi.mock('@rerun/cloud/engines', async importOriginal => ({
     ...(await importOriginal<typeof import('@rerun/cloud/engines')>()),
@@ -342,6 +343,45 @@ describe('a coworker in the mobile app', () => {
                 ['cnx-oc', 'opencode'],
             ])
             expect(models).toMatchObject({ pinned: { connectionId: 'cnx-oc', model: 'go/glm-5.3' }, resolved: { connectionId: 'cnx-oc', model: 'go/glm-5.3' }, boxDefault: { connectionId: 'cnx-oc', model: 'go/deepseek-v4-pro' } })
+        })
+
+        it('shows how much of each subscription and of the Rerun credit of the month is used, and when it resets', async () => {
+            const inTwoHours = new Date(Date.now() + 2 * 3_600_000).toISOString()
+            const withUsage = connectionsListSchema.parse({
+                ...connections,
+                connections: connections.connections.map(connection =>
+                    connection.id === 'cnx-oc'
+                        ? {
+                              ...connection,
+                              planLimits: {
+                                  windows: [
+                                      { kind: 'session', label: null, usedPercent: 42, resetsAt: inTwoHours },
+                                      { kind: 'weekly', label: null, usedPercent: 68, resetsAt: null },
+                                  ],
+                                  capturedAt: new Date().toISOString(),
+                              },
+                          }
+                        : connection
+                ),
+            })
+            engine.listConnections.mockResolvedValue(withUsage)
+            state.ctx = contractContext(state.db as FakeSupabase, { workspace: { ...CONTRACT_WORKSPACE, rerun_budget_micros: 10_000_000, rerun_used_micros: 2_300_000 } })
+            const { GET } = await import('@/app/api/v1/agents/[id]/models/route')
+            const models = (await expectContract(mobileApi.getAgentModels, await callRoute(GET, mobileApi.getAgentModels, { params: { id: SCOUT }, client: CURRENT_IOS }))) as z.infer<typeof agentModelsSchema>
+            expect(models.groups.map(group => group.planWindows)).toEqual([
+                [{ name: 'Monthly credit', usedPercent: 23, reset: 'resets Dec 19' }],
+                [
+                    { name: '5-hour', usedPercent: 42, reset: expect.stringMatching(/^resets in /) },
+                    { name: 'Weekly', usedPercent: 68, reset: null },
+                ],
+            ])
+        })
+
+        it('shows no gauge for a paused credit nor for a plan not read yet', async () => {
+            state.ctx = contractContext(state.db as FakeSupabase, { workspace: { ...CONTRACT_WORKSPACE, rerun_budget_micros: 10_000_000, rerun_credit_paused_at: '2026-11-20T09:00:00.000Z' } })
+            const { GET } = await import('@/app/api/v1/agents/[id]/models/route')
+            const models = (await expectContract(mobileApi.getAgentModels, await callRoute(GET, mobileApi.getAgentModels, { params: { id: SCOUT }, client: CURRENT_IOS }))) as z.infer<typeof agentModelsSchema>
+            expect(models.groups.map(group => group.planWindows)).toEqual([[], []])
         })
 
         it('leaves out a provider an older iOS build does not know, so that build still reads the picker', async () => {

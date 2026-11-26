@@ -3171,6 +3171,29 @@
                                                         },
                                                         "type": "array"
                                                     },
+                                                    "planWindows": {
+                                                        "items": {
+                                                            "properties": {
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reset": {
+                                                                    "nullable": true,
+                                                                    "type": "string"
+                                                                },
+                                                                "usedPercent": {
+                                                                    "type": "number"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "name",
+                                                                "usedPercent",
+                                                                "reset"
+                                                            ],
+                                                            "type": "object"
+                                                        },
+                                                        "type": "array"
+                                                    },
                                                     "provider": {
                                                         "enum": [
                                                             "rerun",

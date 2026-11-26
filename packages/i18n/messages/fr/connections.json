@@ -53,7 +53,9 @@
             "weekly": "Hebdomadaire",
             "monthly": "Mensuel",
             "modelWeekly": "{label} hebdomadaire",
-            "modelWeeklyUnnamed": "Modèle hebdomadaire"
+            "modelWeeklyUnnamed": "Modèle hebdomadaire",
+            "monthlyCredit": "Crédit du mois",
+            "credit": "Crédits"
         },
         "windowResets": "réinitialisation {when}",
         "tiers": {

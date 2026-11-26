@@ -53,7 +53,9 @@
             "weekly": "Haftalık",
             "monthly": "Aylık",
             "modelWeekly": "{label} haftalık",
-            "modelWeeklyUnnamed": "Model haftalık"
+            "modelWeeklyUnnamed": "Model haftalık",
+            "monthlyCredit": "Aylık kredi",
+            "credit": "Krediler"
         },
         "windowResets": "{when} sıfırlanır",
         "tiers": {

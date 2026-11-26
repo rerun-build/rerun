@@ -53,7 +53,9 @@
             "weekly": "Weekly",
             "monthly": "Monthly",
             "modelWeekly": "{label} weekly",
-            "modelWeeklyUnnamed": "Model weekly"
+            "modelWeeklyUnnamed": "Model weekly",
+            "monthlyCredit": "Monthly credit",
+            "credit": "Credits"
         },
         "windowResets": "resets {when}",
         "tiers": {

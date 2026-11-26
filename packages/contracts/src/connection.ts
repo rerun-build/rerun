@@ -313,6 +313,10 @@ export const PROVIDER_LABELS: Record<z.infer<typeof providerSchema>, string> = {
 export const modelChoiceSchema = z.object({ connectionId: z.string(), model: z.string() })
 export type ModelChoice = z.infer<typeof modelChoiceSchema>
 
+// One window of a subscription's usage (or the Rerun credit), named and dated in words by the hub.
+export const planWindowViewSchema = z.object({ name: z.string(), usedPercent: z.number(), reset: z.string().nullable() })
+export type PlanWindowView = z.infer<typeof planWindowViewSchema>
+
 export const agentModelsSchema = z.object({
     groups: z.array(
         z.object({
@@ -321,6 +325,8 @@ export const agentModelsSchema = z.object({
             provider: providerSchema,
             models: z.array(z.object({ id: z.string(), label: z.string(), description: z.string().optional(), locked: z.boolean().optional() })),
             defaultModel: z.string(),
+            // Empty until the plan's usage has been read once.
+            planWindows: z.array(planWindowViewSchema).optional(),
         })
     ),
     // What the coworker pinned; null when it follows the box.
@@ -359,7 +365,7 @@ export const aiConnectionViewSchema = z.object({
     models: z.array(z.object({ id: z.string(), label: z.string(), description: z.string().optional(), enabled: z.boolean(), locked: z.boolean() })),
     baseUrl: z.string(),
     extraModels: z.array(z.string()),
-    planWindows: z.array(z.object({ name: z.string(), usedPercent: z.number(), reset: z.string().nullable() })),
+    planWindows: z.array(planWindowViewSchema),
 })
 export type AiConnectionView = z.infer<typeof aiConnectionViewSchema>
 

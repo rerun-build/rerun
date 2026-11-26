@@ -53,7 +53,9 @@
             "weekly": "每周",
             "monthly": "每月",
             "modelWeekly": "{label} 每周",
-            "modelWeeklyUnnamed": "模型每周"
+            "modelWeeklyUnnamed": "模型每周",
+            "monthlyCredit": "本月积分",
+            "credit": "积分"
         },
         "windowResets": "{when}重置",
         "tiers": {

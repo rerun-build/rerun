@@ -20,8 +20,7 @@ import {
     livePlanWindows,
     modelName,
     offeredModels,
-    planWindowName,
-    planWindowReset,
+    planWindowView,
     rerunCreditOf,
     modelDescription,
     sourceKind,
@@ -305,7 +304,7 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
         })),
         baseUrl: source.baseUrl ?? '',
         extraModels: source.extraModels,
-        planWindows: livePlanWindows(source).map(window => ({ name: planWindowName(window, t, source.provider), usedPercent: window.usedPercent, reset: planWindowReset(window, t, locale) })),
+        planWindows: livePlanWindows(source).map(window => planWindowView(window, t, source.provider, locale)),
     }
 }
 

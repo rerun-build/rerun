@@ -53,7 +53,9 @@
             "weekly": "שבועי",
             "monthly": "חודשי",
             "modelWeekly": "{label} שבועי",
-            "modelWeeklyUnnamed": "מודל שבועי"
+            "modelWeeklyUnnamed": "מודל שבועי",
+            "monthlyCredit": "קרדיט חודשי",
+            "credit": "קרדיטים"
         },
         "windowResets": "מתאפס {when}",
         "tiers": {

@@ -53,7 +53,9 @@
             "weekly": "أسبوعي",
             "monthly": "شهري",
             "modelWeekly": "{label} أسبوعي",
-            "modelWeeklyUnnamed": "النموذج أسبوعيًا"
+            "modelWeeklyUnnamed": "النموذج أسبوعيًا",
+            "monthlyCredit": "الرصيد الشهري",
+            "credit": "الرصيد"
         },
         "windowResets": "يُعاد الضبط {when}",
         "tiers": {

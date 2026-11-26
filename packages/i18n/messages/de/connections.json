@@ -53,7 +53,9 @@
             "weekly": "Wöchentlich",
             "monthly": "Monatlich",
             "modelWeekly": "{label} wöchentlich",
-            "modelWeeklyUnnamed": "Modell wöchentlich"
+            "modelWeeklyUnnamed": "Modell wöchentlich",
+            "monthlyCredit": "Monatsguthaben",
+            "credit": "Guthaben"
         },
         "windowResets": "wird {when} zurückgesetzt",
         "tiers": {

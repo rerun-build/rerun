@@ -4,7 +4,7 @@ import type { BoxConnection, BoxConnectionsList, BoxDefault } from '@/lib/engine
 import { shortUntil } from '@/lib/time'
 import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { formatNumber, shortDate } from '@rerun/i18n/format'
-import { PROVIDER_LABELS, RERUN_BRAND, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isWhiteLabel, opencodePlanOf, opencodeServesModel, toProviderModel, type Brand, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
+import { PROVIDER_LABELS, RERUN_BRAND, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isWhiteLabel, opencodePlanOf, opencodeServesModel, toProviderModel, type Brand, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type PlanWindowView, type Provider, type RerunTier } from '@rerun/contracts'
 
 // The AI providers dialog sorts every connection by who pays for it: the credit included with
 // Rerun, the user's own subscription, or the user's own API key.
@@ -35,7 +35,7 @@ export function connectMethod(provider: string): ConnectMethod {
     return 'key'
 }
 
-type PlanWindowCopy = 'session' | 'fiveHour' | 'weekly' | 'monthly' | 'modelWeekly' | 'modelWeeklyUnnamed'
+type PlanWindowCopy = 'session' | 'fiveHour' | 'weekly' | 'monthly' | 'modelWeekly' | 'modelWeeklyUnnamed' | 'monthlyCredit' | 'credit'
 type CliUnavailableCopy = 'opencodeRetired' | 'codexOutdated' | 'notInChatgptPlan'
 
 export type SourceCopy = (
@@ -331,6 +331,18 @@ export function planWindowPercent(window: PlanLimitWindow): string {
 
 export function planWindowReset(window: PlanLimitWindow, t: SourceCopy, locale: string): string | null {
     return window.resetsAt ? t('sources.windowResets', { when: shortUntil(window.resetsAt, locale) }) : null
+}
+
+export function planWindowView(window: PlanLimitWindow, t: SourceCopy, provider: string, locale: string): PlanWindowView {
+    return { name: planWindowName(window, t, provider), usedPercent: window.usedPercent, reset: planWindowReset(window, t, locale) }
+}
+
+// The Rerun credit as one more gauge, shown where the web picker's RerunCreditHint shows it. The credit an
+// organization hands out comes back with no month, so its gauge is not named after one.
+export function creditWindowView(credit: RerunCredit, t: SourceCopy, locale: string): PlanWindowView | null {
+    if (credit.paused || (credit.budgetMicros <= 0 && !credit.managed)) return null
+    const name = credit.managed ? t('sources.windows.credit') : t('sources.windows.monthlyCredit')
+    return { name, usedPercent: credit.percent, reset: credit.resetAt ? t('sources.windowResets', { when: shortDate(credit.resetAt, locale) }) : null }
 }
 
 function creditSummary(credit: RerunCredit, t: SourceCopy, locale: string): string {

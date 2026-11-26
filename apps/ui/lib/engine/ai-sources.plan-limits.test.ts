@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
-import { creditResetPhrase, isCreditUsedUp, isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, rerunCreditOf, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
+import { creditResetPhrase, creditWindowView, isCreditUsedUp, isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, rerunCreditOf, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import type { BoxConnection } from './types'
 
@@ -160,5 +160,26 @@ describe('pillUsage', () => {
         expect(pillUsage(rerun, spending)).toEqual({ inner: 42, outer: null, windows: [] })
         expect(pillUsage(rerun, credit)).toBeNull()
         expect(pillUsage(rerun, { ...spending, paused: true })).toBeNull()
+    })
+})
+
+describe('creditWindowView', () => {
+    const t = englishTranslator('connections')
+    const spending: RerunCredit = { usedMicros: 2_300_000, budgetMicros: 10_000_000, resetAt: '2026-12-01T12:00:00.000Z', percent: 23 }
+
+    it('gauges the Rerun credit of the month with the day it comes back', () => {
+        expect(creditWindowView(spending, t, 'en')).toEqual({ name: 'Monthly credit', usedPercent: 23, reset: 'resets Dec 1' })
+        expect(creditWindowView({ ...spending, resetAt: null }, t, 'en')).toEqual({ name: 'Monthly credit', usedPercent: 23, reset: null })
+    })
+
+    it('shows nothing when there is no credit or it is paused, as the model pill does', () => {
+        expect(creditWindowView(credit, t, 'en')).toBeNull()
+        expect(creditWindowView({ ...spending, paused: true }, t, 'en')).toBeNull()
+    })
+
+    it('names the credit an organization hands out without a month, and gauges it even when none is left', () => {
+        const managed = (columns: object) => rerunCreditOf({ organization_id: 'org-nordlys', current_period_end: '2026-12-01T12:00:00.000Z', ...columns })
+        expect(creditWindowView(managed({ rerun_budget_micros: 10_000_000, rerun_used_micros: 2_300_000 }), t, 'en')).toEqual({ name: 'Credits', usedPercent: 23, reset: null })
+        expect(creditWindowView(managed({}), t, 'en')).toEqual({ name: 'Credits', usedPercent: 100, reset: null })
     })
 })
