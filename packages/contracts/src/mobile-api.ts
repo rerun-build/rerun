@@ -14,6 +14,9 @@ import {
     codexSignInPollInputSchema,
     codexSignInPollSchema,
     codexSignInStartSchema,
+    grokSignInPollInputSchema,
+    grokSignInPollSchema,
+    grokSignInStartSchema,
     connectionUsageSchema,
     createAiConnectionInputSchema,
     replaceAiConnectionKeyInputSchema,
@@ -241,6 +244,8 @@ export const mobileApi = {
     finishClaudeSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/ai-connections/claude/finish', body: claudeSignInFinishInputSchema, response: aiConnectionCreatedSchema, errors: NO_PLAN }),
     startCodexSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/ai-connections/codex/start', response: codexSignInStartSchema }),
     pollCodexSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/ai-connections/codex/poll', body: codexSignInPollInputSchema, response: codexSignInPollSchema, errors: { 400: hubErrorSchema, ...NO_PLAN } }),
+    startGrokSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/ai-connections/grok/start', response: grokSignInStartSchema, errors: { 400: hubErrorSchema, ...NO_PLAN } }),
+    pollGrokSignIn: hubEndpoint({ method: 'POST', path: '/api/v1/ai-connections/grok/poll', body: grokSignInPollInputSchema, response: grokSignInPollSchema, errors: { 400: hubErrorSchema, ...NO_PLAN } }),
 
     getOnboarding: hubEndpoint({ method: 'GET', path: '/api/v1/onboarding', response: onboardingStateSchema }),
     saveOnboardingIntake: hubEndpoint({ method: 'POST', path: '/api/v1/onboarding/intake', body: foremanIntakeSchema, response: 'none', status: 200 }),

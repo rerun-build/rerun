@@ -56,6 +56,7 @@ vi.mock('@rerun/cloud/edition', () => ({
 const engine = {
     supportsOpencode: vi.fn(),
     supportsCustomProvider: vi.fn(),
+    supportsGrok: vi.fn(),
     probeCustomEndpoint: vi.fn(),
     listConnections: vi.fn(),
     createConnection: vi.fn(),
@@ -70,6 +71,7 @@ vi.mock('@/lib/engine/client', async importOriginal => ({
     listConnections: (...args: unknown[]) => engine.listConnections(...args),
     supportsOpencode: (...args: unknown[]) => engine.supportsOpencode(...args),
     supportsCustomProvider: (...args: unknown[]) => engine.supportsCustomProvider(...args),
+    supportsGrok: (...args: unknown[]) => engine.supportsGrok(...args),
     probeCustomEndpoint: (...args: unknown[]) => engine.probeCustomEndpoint(...args),
     createConnection: (...args: unknown[]) => engine.createConnection(...args),
     patchConnection: (...args: unknown[]) => engine.patchConnection(...args),
@@ -120,6 +122,7 @@ beforeEach(() => {
     providerKeyProblem.mockResolvedValue(null)
     engine.supportsOpencode.mockResolvedValue(true)
     engine.supportsCustomProvider.mockResolvedValue(false)
+    engine.supportsGrok.mockResolvedValue(false)
     cloud = true
     vi.unstubAllEnvs()
     vi.stubEnv('MOBILE_OAUTH_TICKET_SECRET', 'test-secret')

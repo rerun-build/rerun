@@ -38,6 +38,7 @@ import {
     getConnectionUsage as engineGetConnectionUsage,
     probeCustomEndpoint as engineProbeCustomEndpoint,
     supportsCustomProvider,
+    supportsGrok,
     supportsOpencode,
     listConnections as engineListConnections,
     patchConnection as enginePatchConnection,
@@ -46,6 +47,7 @@ import {
     updateConnectionKeys as engineUpdateConnectionKeys,
 } from '@/lib/engine/client'
 import { type CodexDeviceAuthStart, codexKeysFrom, pollCodexDeviceAuth, startCodexDeviceAuth } from '@/lib/engine/codex-oauth'
+import { type GrokDeviceAuthStart, grokKeysFrom, pollGrokDeviceAuth, startGrokDeviceAuth } from '@/lib/engine/grok-oauth'
 import { pinFirst } from '@/lib/engine/model-groups'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -148,19 +150,26 @@ export async function isCustomOffered(conn: EngineConnection | null | undefined)
     return !conn || (await supportsCustomProvider(conn))
 }
 
+// Grok runs in the engine's own loop too, and only an engine that announces it keeps its tokens fresh.
+// Offered without a machine yet, for the same reason as OpenCode.
+export async function isGrokOffered(conn: EngineConnection | null | undefined): Promise<boolean> {
+    return !conn || (await supportsGrok(conn))
+}
+
 // `opencodeOffered`: whether this workspace's engine runs OpenCode. `customOffered`: whether it runs
-// custom endpoints.
-export type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
+// custom endpoints. `grokOffered`: whether it runs a Grok plan.
+export type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean; grokOffered: boolean }
 
 // A workspace whose machine is not claimed yet has nothing plugged in, and is offered every provider.
 export async function listAiConnectionsWithOffers(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
     const engine = await findWorkspaceEngine(workspaceId)
-    const [list, opencodeOffered, customOffered] = await Promise.all([
+    const [list, opencodeOffered, customOffered, grokOffered] = await Promise.all([
         engine ? listAiConnections(workspaceId, { fresh }) : { connections: [], default: null, backups: NO_BOX_BACKUPS },
         isOpencodeOffered(engine?.conn).catch(() => false),
         isCustomOffered(engine?.conn).catch(() => false),
+        isGrokOffered(engine?.conn).catch(() => false),
     ])
-    return { ...list, opencodeOffered, customOffered }
+    return { ...list, opencodeOffered, customOffered, grokOffered }
 }
 
 
@@ -173,13 +182,23 @@ async function assertClaudePlanOffered(workspaceId: number, provider: CreateBoxC
 
 async function assertProviderOffered(provider: CreateBoxConnectionInput['provider'], conn: EngineConnection): Promise<void> {
     if (provider === 'custom' && !(await supportsCustomProvider(conn))) throw new ConnectionInputError('customNeedsUpdate')
+    if (provider === 'grok' && !(await supportsGrok(conn))) throw new ConnectionInputError('grokNeedsUpdate')
     if (provider !== 'opencode') return
     if (!(await supportsOpencode(conn))) throw new ConnectionInputError('opencodeNeedsUpdate')
 }
 
+// A Grok plan only arrives through its sign-in, which the hub finishes itself: a value pasted by hand
+// would be a token the engine cannot refresh, or one taken from someone else's machine.
+function assertNotPastedGrok(provider: CreateBoxConnectionInput['provider'], { signedIn }: SignInOrigin): void {
+    if (provider === 'grok' && !signedIn) throw new ConnectionInputError('grokSignInOnly')
+}
+
+type SignInOrigin = { signedIn?: boolean }
+
 // Throws NoPlanError (capacity.service) when the workspace has no plan: without one there is no machine to hold a
 // credential, whatever the user pastes.
-export async function createAiConnection(workspaceId: number, params: CreateBoxConnectionInput): Promise<BoxConnection> {
+export async function createAiConnection(workspaceId: number, params: CreateBoxConnectionInput, origin: SignInOrigin = {}): Promise<BoxConnection> {
+    assertNotPastedGrok(params.provider, origin)
     assertValidClaudeToken(params.keys)
     await assertPublicBaseUrl(params.baseUrl)
     await assertClaudePlanOffered(workspaceId, params.provider)
@@ -204,11 +223,12 @@ export async function updateAiConnection(workspaceId: number, id: string, patch:
     return brandConnection(await enginePatchConnection(await getWorkspaceConnection(workspaceId), id, patch), await getBrand())
 }
 
-export async function updateAiConnectionKeys(workspaceId: number, id: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<void> {
+export async function updateAiConnectionKeys(workspaceId: number, id: string, body: { set?: Record<string, string>; remove?: string[] }, origin: SignInOrigin = {}): Promise<void> {
     assertValidClaudeToken(body.set)
     const conn = await getWorkspaceConnection(workspaceId)
     if (body.set && Object.keys(body.set).length > 0) {
         const target = (await engineListConnections(conn)).connections.find(c => c.id === id)
+        if (target) assertNotPastedGrok(target.provider, origin)
         const keyProblem = target ? await providerKeyProblem(target.provider, body.set, target.baseUrl) : null
         if (keyProblem) throw new ConnectionInputError(keyProblem.code, keyProblem.params)
     }
@@ -257,23 +277,40 @@ export async function codexKeysWhenApproved(deviceAuthId: string, userCode: stri
     return tokens ? codexKeysFrom(tokens) : null
 }
 
+// --- Grok (Subscription) device auth ---
+// The person types a code on xAI's page; the hub polls and, once approved, stores the connection
+// itself: neither the device code nor a token ever reaches the browser or the phone.
+
+export async function startGrokSignIn(workspaceId: number): Promise<GrokDeviceAuthStart> {
+    const engine = await findWorkspaceEngine(workspaceId)
+    if (!(await isGrokOffered(engine?.conn))) throw new ConnectionInputError('grokNeedsUpdate')
+    return startGrokDeviceAuth()
+}
+
+// Null while the person has not approved yet. The caller stores the keys at once (`storeSignInKeys`):
+// they are never handed further.
+export async function grokKeysWhenApproved(deviceCode: string): Promise<Record<string, string> | null> {
+    const tokens = await pollGrokDeviceAuth(deviceCode)
+    return tokens ? grokKeysFrom(tokens) : null
+}
+
 // --- The app's view ---
 
 // What the app adds: the connection takes the name the web would suggest and the provider's
 // default models, the way the web dialog creates one.
-export async function addAiConnection(workspaceId: number, provider: AddableProvider, keys: Record<string, string>, options: { name?: string; baseUrl?: string; models?: string[] } = {}): Promise<string> {
+export async function addAiConnection(workspaceId: number, provider: AddableProvider, keys: Record<string, string>, options: { name?: string; baseUrl?: string; models?: string[] } & SignInOrigin = {}): Promise<string> {
     const name = options.name ?? suggestName(provider, await takenNames(workspaceId))
-    const created = await createAiConnection(workspaceId, { name, provider, models: options.models ?? DEFAULT_CONNECTION_MODELS[provider], extraModels: [], baseUrl: options.baseUrl, keys })
+    const created = await createAiConnection(workspaceId, { name, provider, models: options.models ?? DEFAULT_CONNECTION_MODELS[provider], extraModels: [], baseUrl: options.baseUrl, keys }, { signedIn: options.signedIn })
     return created.id
 }
 
 // A sign-in that lands either adds a connection or puts an existing one back on its feet: the keys
 // go straight to the machine, the caller only learns which connection holds them.
 export async function storeSignInKeys(workspaceId: number, provider: AddableProvider, keys: Record<string, string>, target: { connectionId?: string; name?: string }): Promise<string> {
-    if (!target.connectionId) return addAiConnection(workspaceId, provider, keys, { name: target.name })
+    if (!target.connectionId) return addAiConnection(workspaceId, provider, keys, { name: target.name, signedIn: true })
     const existing = (await listAiConnections(workspaceId)).connections.find(connection => connection.id === target.connectionId)
     if (existing?.provider !== provider) throw new ConnectionInputError('signInOtherProvider')
-    await updateAiConnectionKeys(workspaceId, existing.id, { set: keys })
+    await updateAiConnectionKeys(workspaceId, existing.id, { set: keys }, { signedIn: true })
     return existing.id
 }
 
@@ -323,7 +360,7 @@ export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiCo
         connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, t, locale, brand.name)),
         default: { ...pick, label: modelName(pick.connectionId, pick.model, brand.name) },
         credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit, t, locale) },
-        addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: isClaudePlanOffered(ctx.workspace) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
+        addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: isClaudePlanOffered(ctx.workspace), grok: await isGrokOffered(engine?.conn) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
             provider,
             kind: sourceKind(provider),
             ...providerPitch(provider, t),

@@ -5,6 +5,7 @@ import {
     claudeKeysFromCode,
     codexKeysWhenApproved,
     createAiConnection,
+    grokKeysWhenApproved,
     deleteAiConnection,
     getAiConnectionUsage,
     listAiConnectionsWithOffers,
@@ -13,6 +14,8 @@ import {
     setWorkspaceDefaultModel,
     startClaudeSignIn,
     startCodexSignIn,
+    startGrokSignIn,
+    storeSignInKeys,
     updateAiConnection,
     updateAiConnectionKeys,
     type AiConnectionsList,
@@ -20,8 +23,9 @@ import {
 import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
+import { mintGrokSignIn, openGrokSignIn } from '@/lib/engine/sign-in-ticket'
 import type { BoxBackupModels, BoxConnection, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import { NO_BOX_BACKUPS, customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { NO_BOX_BACKUPS, customProbeInputSchema, grokSignInPollInputSchema, type CustomProbeInput, type CustomProbeResult, type GrokSignInPollInput, type GrokSignInStart } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 // The AI providers of the workspace, for the web dialog. The workspace of the session is the whole
@@ -57,7 +61,7 @@ export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
     try {
         return await listAiConnectionsWithOffers(await requireWorkspaceId())
     } catch {
-        return { connections: [], default: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false }
+        return { connections: [], default: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false, grokOffered: false }
     }
 }
 
@@ -168,6 +172,32 @@ export async function pollCodexDeviceAuthAction(deviceAuthId: string, userCode: 
         const keys = await codexKeysWhenApproved(deviceAuthId, userCode)
         return keys ? { status: 'ok', keys } : { status: 'pending' }
     } catch (err) {
+        return { status: 'error', ...refusalOf(err, 'deviceAuthFailed') }
+    }
+}
+
+// The Grok sign-in runs on the same sealed ticket as the app's, and the hub stores the connection the
+// moment it is approved: unlike the two above, no key ever comes back to the browser. Admins only, as
+// every other change to the workspace's AI providers.
+export async function startGrokSignInAction(): Promise<({ ok: true } & GrokSignInStart) | ({ ok: false } & ActionRefusal & { reason?: 'no_plan' })> {
+    try {
+        const { workspace, userId } = await requireAdminContext('adminOnlyAiProviders')
+        const start = await startGrokSignIn(workspace.id)
+        return { ok: true, ticket: mintGrokSignIn(userId, workspace.id, start), userCode: start.userCode, verificationUrl: start.verificationUrl, pollIntervalMs: start.pollIntervalMs, expiresAt: start.expiresAt }
+    } catch (err) {
+        return { ok: false, ...refusalOf(err, 'couldNotStartConnection') }
+    }
+}
+
+export async function pollGrokSignInAction(input: GrokSignInPollInput): Promise<{ status: 'pending' } | { status: 'connected'; connectionId: string } | ({ status: 'error' } & ActionRefusal & { reason?: 'no_plan' })> {
+    try {
+        const { workspace, userId } = await requireAdminContext('adminOnlyAiProviders')
+        const { ticket, connectionId, name } = grokSignInPollInputSchema.parse(input)
+        const keys = await grokKeysWhenApproved(openGrokSignIn(ticket, userId, workspace.id).deviceCode)
+        if (!keys) return { status: 'pending' }
+        return { status: 'connected', connectionId: await storeSignInKeys(workspace.id, 'grok', keys, { connectionId, name }) }
+    } catch (err) {
+        if (err instanceof NoPlanError) return { status: 'error', ...refusal(err.code === 'managedWorkspacePaused' ? err.code : 'trialToConnectModel'), reason: 'no_plan' }
         return { status: 'error', ...refusalOf(err, 'deviceAuthFailed') }
     }
 }

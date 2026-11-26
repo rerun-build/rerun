@@ -598,5 +598,10 @@
     "domainsUnavailable": "Alan adları burada kullanılamıyor.",
     "brandInvalid": "Markanızın alanlarını kontrol edin.",
     "brandIconNotSquare": "Simge kare olmalıdır.",
-    "brandIconTooSmall": "Simge en az {min} px genişliğinde olmalıdır."
+    "brandIconTooSmall": "Simge en az {min} px genişliğinde olmalıdır.",
+    "grokNeedsUpdate": "Grok bu makinenin bir sonraki güncellemesiyle geliyor. Biraz sonra tekrar deneyin.",
+    "grokSignInOnly": "Bir Grok planı, yapıştırılan bir anahtarla değil, xAI'de oturum açılarak bağlanır.",
+    "grokDeviceLoginRefused": "xAI bu Grok hesabını bağlamak için bir kod vermeyi reddetti.",
+    "grokSignInDenied": "Oturum açma xAI'de reddedildi. Grok'u bağlamak için yeniden başlatın.",
+    "grokSignInExpired": "Kod onaylanmadan önce süresi doldu. Oturum açmayı yeniden başlatın."
 }

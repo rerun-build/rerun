@@ -598,5 +598,10 @@
     "domainsUnavailable": "النطاقات غير متاحة هنا.",
     "brandInvalid": "تحقق من حقول علامتك التجارية.",
     "brandIconNotSquare": "يجب أن تكون الأيقونة مربعة.",
-    "brandIconTooSmall": "يجب ألا يقل عرض الأيقونة عن {min} بكسل."
+    "brandIconTooSmall": "يجب ألا يقل عرض الأيقونة عن {min} بكسل.",
+    "grokNeedsUpdate": "يصل Grok مع التحديث القادم لهذا الجهاز. حاول مرة أخرى بعد قليل.",
+    "grokSignInOnly": "يتصل اشتراك Grok بتسجيل الدخول إلى xAI، وليس بمفتاح ملصق.",
+    "grokDeviceLoginRefused": "رفضت xAI إعطاء رمز لربط حساب Grok هذا.",
+    "grokSignInDenied": "رُفض تسجيل الدخول على xAI. ابدأ من جديد لربط Grok.",
+    "grokSignInExpired": "انتهت صلاحية الرمز قبل الموافقة عليه. ابدأ تسجيل الدخول من جديد."
 }

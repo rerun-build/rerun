@@ -1,6 +1,7 @@
 import {
     ENGINE_CAPABILITY_DESKTOP,
     ENGINE_CAPABILITY_OPENCODE,
+    ENGINE_CAPABILITY_GROK,
     ENGINE_CAPABILITY_CUSTOM,
     customProbeResultSchema,
     desktopStatusSchema,
@@ -763,6 +764,10 @@ export async function supportsDesktop(conn: EngineConnection): Promise<boolean> 
 
 export async function supportsOpencode(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_OPENCODE)
+}
+
+export async function supportsGrok(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_GROK)
 }
 
 export async function supportsCustomProvider(conn: EngineConnection): Promise<boolean> {

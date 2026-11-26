@@ -4,6 +4,9 @@
 // discovery document or a response: no address that came back from a server is ever followed.
 export const GROK_AUTH_ORIGIN = 'https://auth.x.ai'
 export const GROK_OAUTH_CLIENT_ID = 'b1a00492-073a-47ea-816f-4c329264a828'
+// Grok Build's own scopes: `grok-cli:access` opens the subscription's proxy, `offline_access` the
+// refresh token the engine keeps the sign-in alive with.
+export const GROK_OAUTH_SCOPES = 'openid profile email offline_access grok-cli:access api:access'
 
 // Where the subscription is billed: Grok Build's own proxy, which speaks the Responses API. The
 // same token on api.x.ai lands on a small free allowance instead.

@@ -598,5 +598,10 @@
     "domainsUnavailable": "此處無法使用網域。",
     "brandInvalid": "請檢查您品牌的欄位。",
     "brandIconNotSquare": "圖示必須是正方形。",
-    "brandIconTooSmall": "圖示寬度必須至少 {min} px。"
+    "brandIconTooSmall": "圖示寬度必須至少 {min} px。",
+    "grokNeedsUpdate": "Grok 將隨這台機器的下一次更新推出。請稍後再試。",
+    "grokSignInOnly": "Grok 方案需透過登入 xAI 連結，而不是貼上金鑰。",
+    "grokDeviceLoginRefused": "xAI 拒絕提供連結此 Grok 帳號的代碼。",
+    "grokSignInDenied": "登入在 xAI 上遭到拒絕。請重新開始以連結 Grok。",
+    "grokSignInExpired": "代碼在核准前已過期。請重新開始登入。"
 }

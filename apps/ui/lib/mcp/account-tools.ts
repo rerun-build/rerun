@@ -48,7 +48,7 @@ const MODEL_PIN_PROPERTIES = {
     provider: {
         type: 'string',
         description:
-            'rerun | anthropic | claude | codex | openai | google | openrouter | opencode | custom. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider; with several, the call is refused and lists them. It replaces whatever connection the coworker was pinned to.',
+            'rerun | anthropic | claude | codex | grok | openai | google | openrouter | opencode | custom. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider; with several, the call is refused and lists them. It replaces whatever connection the coworker was pinned to.',
     },
     model: {
         type: ['string', 'null'],
@@ -215,7 +215,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'list_ai_connections',
         description:
-            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
+            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, Grok, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
         inputSchema: { type: 'object', properties: {} },
     },
     {

@@ -7,7 +7,7 @@ import type { Database } from '@/app/api/database.types'
 import { CLAUDE_OAUTH } from '@/lib/engine/claude-oauth'
 import { CODEX_OAUTH } from '@/lib/engine/codex-oauth'
 import { forgetMachine } from '@/lib/engine/engine-memory'
-import { mintClaudeSignIn, mintCodexSignIn } from '@/lib/engine/sign-in-ticket'
+import { mintClaudeSignIn, mintCodexSignIn, mintGrokSignIn } from '@/lib/engine/sign-in-ticket'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { callRoute, contractContext, expectContract } from '@/test/mobile-contract'
 import { shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
@@ -23,6 +23,7 @@ const engine = vi.hoisted(() => ({
     listConnections: vi.fn<EngineClient['listConnections']>(),
     supportsOpencode: vi.fn<EngineClient['supportsOpencode']>(),
     supportsCustomProvider: vi.fn<EngineClient['supportsCustomProvider']>(),
+    supportsGrok: vi.fn<EngineClient['supportsGrok']>(),
     createConnection: vi.fn<EngineClient['createConnection']>(),
     patchConnection: vi.fn<EngineClient['patchConnection']>(),
     updateConnectionKeys: vi.fn<EngineClient['updateConnectionKeys']>(),
@@ -112,6 +113,7 @@ beforeEach(() => {
     engine.listConnections.mockResolvedValue({ connections: [claude, opencode, custom, rerun], default: { connectionId: 'cnx-claude', model: 'claude-sonnet-4-6' }, backups: { backups: [], rerunCreditLastResort: false } })
     engine.supportsOpencode.mockResolvedValue(true)
     engine.supportsCustomProvider.mockResolvedValue(true)
+    engine.supportsGrok.mockResolvedValue(true)
     engine.createConnection.mockImplementation(async (_conn, params: CreateBoxConnectionInput) => boxConnection({ id: `cnx-${params.provider}-2`, name: params.name, provider: params.provider, models: params.models }))
     engine.patchConnection.mockImplementation(async (_conn, id, patch) => ({ ...claude, id, ...patch }))
     engine.updateConnectionKeys.mockResolvedValue(['CLAUDE_CODE_OAUTH_TOKEN'])
@@ -134,6 +136,18 @@ describe('the AI providers of the mobile app', () => {
         expect(view.connections.find(connection => connection.id === 'cnx-claude')).toMatchObject({ kind: 'plan', status: 'connected', isDefault: true })
         expect(view.default).toMatchObject({ connectionId: 'cnx-claude', model: 'claude-sonnet-4-6' })
         expect(view.addable.map(entry => entry.provider)).toEqual(['claude', 'codex', 'opencode', 'anthropic', 'openai', 'google', 'openrouter', 'custom'])
+    })
+
+    it('offers Grok to a build that knows it, on a machine that runs it', async () => {
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '60')
+        const { GET } = await import('@/app/api/v1/ai-connections/route')
+        const view = (await expectContract(mobileApi.listAiConnections, await callRoute(GET, mobileApi.listAiConnections, { client: 'ios/1.6.0 (60)' }))) as z.infer<typeof aiConnectionsViewSchema>
+        expect(view.addable.map(entry => entry.provider)).toEqual(['claude', 'codex', 'grok', 'opencode', 'anthropic', 'openai', 'google', 'openrouter', 'custom'])
+        expect(view.addable.find(entry => entry.provider === 'grok')).toMatchObject({ kind: 'plan', title: 'SuperGrok', suggestedName: 'Grok', guide: null })
+
+        engine.supportsGrok.mockResolvedValue(false)
+        const older = (await expectContract(mobileApi.listAiConnections, await callRoute(GET, mobileApi.listAiConnections, { client: 'ios/1.6.0 (60)' }))) as z.infer<typeof aiConnectionsViewSchema>
+        expect(older.addable.map(entry => entry.provider)).not.toContain('grok')
     })
 
     // An iOS build from before OpenCode and custom endpoints parses the provider strictly: one it does
@@ -272,6 +286,120 @@ describe('the subscription sign-ins of the mobile app', () => {
     })
 })
 
+const grokDeviceCode = 'xai-device-code-01'
+const grokStarted = () => Response.json({ device_code: grokDeviceCode, user_code: 'N4FS-5STQ', verification_uri: 'https://accounts.x.ai/oauth2/device', verification_uri_complete: 'https://accounts.x.ai/oauth2/device?user_code=N4FS-5STQ', expires_in: 1800, interval: 5 })
+const grokIdToken = `x.${Buffer.from(JSON.stringify({ sub: 'xai-user-1' })).toString('base64url')}.y`
+const grokApproved = () => Response.json({ access_token: 'grok-access', refresh_token: 'grok-refresh', id_token: grokIdToken, expires_in: 21600, token_type: 'Bearer' })
+const grokPoll = (answer: () => Response) => ({ 'https://auth.x.ai/oauth2/token': answer })
+
+describe('the Grok sign-in of the mobile app', () => {
+    it('starts with the device code encrypted in the ticket, on a machine that runs Grok', async () => {
+        providerEndpoints({ 'https://auth.x.ai/oauth2/device/code': grokStarted })
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/start/route')
+        const start = await expectContract(mobileApi.startGrokSignIn, await callRoute(POST, mobileApi.startGrokSignIn))
+        expect(start).toMatchObject({ ticket: expect.any(String), userCode: 'N4FS-5STQ', verificationUrl: 'https://accounts.x.ai/oauth2/device?user_code=N4FS-5STQ', pollIntervalMs: 5000 })
+        expect(JSON.stringify(start)).not.toContain(grokDeviceCode)
+        const sent = new URLSearchParams(String(vi.mocked(fetch).mock.calls[0]![1]!.body))
+        expect(Object.fromEntries(sent)).toEqual({ client_id: 'b1a00492-073a-47ea-816f-4c329264a828', scope: 'openid profile email offline_access grok-cli:access api:access' })
+    })
+
+    it('shows no address xAI answers with off its own sign-in page', async () => {
+        providerEndpoints({ 'https://auth.x.ai/oauth2/device/code': () => Response.json({ device_code: grokDeviceCode, user_code: 'N4FS-5STQ', verification_uri_complete: 'https://evil.example/approve', expires_in: 1800, interval: 1 }) })
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/start/route')
+        expect(await expectContract(mobileApi.startGrokSignIn, await callRoute(POST, mobileApi.startGrokSignIn))).toMatchObject({ verificationUrl: 'https://accounts.x.ai/oauth2/device', pollIntervalMs: 5000 })
+    })
+
+    it('says the machine has to update first when its engine does not run Grok', async () => {
+        engine.supportsGrok.mockResolvedValue(false)
+        providerEndpoints({})
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/start/route')
+        const res = await callRoute(POST, mobileApi.startGrokSignIn)
+        expect(await expectContract(mobileApi.startGrokSignIn, res, 400)).toMatchObject({ code: 'grokNeedsUpdate' })
+        expect(fetch).not.toHaveBeenCalled()
+    })
+
+    it('answers pending until xAI approves, then stores the Grok tokens and hands none of them back', async () => {
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        const ticket = mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 })
+        for (const error of ['authorization_pending', 'slow_down']) {
+            providerEndpoints(grokPoll(() => Response.json({ error }, { status: 400 })))
+            expect(await expectContract(mobileApi.pollGrokSignIn, await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket } }))).toEqual({ status: 'pending' })
+        }
+
+        providerEndpoints(grokPoll(grokApproved))
+        const done = await expectContract(mobileApi.pollGrokSignIn, await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket } }))
+        expect(done).toEqual({ status: 'connected', connectionId: 'cnx-grok-2' })
+        expect(JSON.stringify(done)).not.toContain('grok-access')
+        expect(engine.createConnection).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ name: 'Grok', provider: 'grok', models: ['grok-4.6', 'grok-4.7', 'grok-4.7-build-fast', 'grok-4.5'], keys: expect.objectContaining({ GROK_OAUTH_TOKEN: 'grok-access', GROK_OAUTH_REFRESH_TOKEN: 'grok-refresh', GROK_OAUTH_ID_TOKEN: grokIdToken, GROK_OAUTH_ACCOUNT_ID: 'xai-user-1', GROK_OAUTH_EXPIRES_AT: expect.any(String) }) })
+        )
+        const sent = new URLSearchParams(String(vi.mocked(fetch).mock.calls[0]![1]!.body))
+        expect(Object.fromEntries(sent)).toEqual({ grant_type: 'urn:ietf:params:oauth:grant-type:device_code', device_code: grokDeviceCode, client_id: 'b1a00492-073a-47ea-816f-4c329264a828' })
+    })
+
+    it('signs an existing Grok connection in again, and refuses to land on another provider', async () => {
+        engine.listConnections.mockResolvedValue({ connections: [claude, rerun, boxConnection({ id: 'cnx-grok', name: 'Grok', provider: 'grok', models: ['grok-4.6'], credentialRejected: true })], default: null, backups: { backups: [], rerunCreditLastResort: false } })
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        const ticket = mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 })
+        providerEndpoints(grokPoll(grokApproved))
+        expect(await expectContract(mobileApi.pollGrokSignIn, await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket, connectionId: 'cnx-grok' } }))).toEqual({ status: 'connected', connectionId: 'cnx-grok' })
+        expect(engine.updateConnectionKeys).toHaveBeenCalledWith(expect.anything(), 'cnx-grok', { set: expect.objectContaining({ GROK_OAUTH_TOKEN: 'grok-access' }) })
+
+        const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket, connectionId: 'cnx-claude' } })
+        expect(await expectContract(mobileApi.pollGrokSignIn, res, 400)).toMatchObject({ code: 'signInOtherProvider' })
+    })
+
+    it.each([
+        ['access_denied', 'grokSignInDenied'],
+        ['expired_token', 'grokSignInExpired'],
+        ['invalid_grant', 'grokSignInExpired'],
+    ])('reads %s as %s, without xAI\'s words', async (error, code) => {
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        providerEndpoints(grokPoll(() => Response.json({ error, error_description: 'team 00000000-1111-4222' }, { status: 400 })))
+        const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket: mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }) } })
+        const body = await expectContract(mobileApi.pollGrokSignIn, res, 400)
+        expect(body).toMatchObject({ code })
+        expect(JSON.stringify(body)).not.toContain('00000000-1111')
+        expect(engine.createConnection).not.toHaveBeenCalled()
+    })
+
+    it.each([
+        ['another person', () => mintGrokSignIn('user-grace', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }), 'This sign-in was started from another account. Start it again.'],
+        ['another workspace', () => mintGrokSignIn('user-ada', 8, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }), 'This sign-in was started from another workspace. Start it again.'],
+        ['the time it had', () => mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() - 3 * 60_000 }), 'Sign-in expired, please retry'],
+        ['a Codex ticket', () => mintCodexSignIn('user-ada', { deviceAuthId: 'deviceauth_01', userCode: 'K7QX-M2PL' }), 'Invalid sign-in'],
+        ['a forged one', () => `${mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }).slice(0, -4)}AAAA`, 'Invalid sign-in'],
+    ])('polls nothing for a ticket from %s', async (_name, ticket, error) => {
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        providerEndpoints(grokPoll(grokApproved))
+        const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket: ticket() } })
+        expect(await expectContract(mobileApi.pollGrokSignIn, res, 400)).toMatchObject({ error })
+        expect(fetch).not.toHaveBeenCalled()
+    })
+
+    it('refuses to store a Grok sign-in on a workspace without a plan, with its reason', async () => {
+        withoutPlan()
+        providerEndpoints(grokPoll(grokApproved))
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket: mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }) } })
+        expect(await expectContract(mobileApi.pollGrokSignIn, res, 403)).toMatchObject({ reason: 'no_plan' })
+    })
+
+    it('never takes a Grok token pasted by hand, to add a connection or to replace its key', async () => {
+        const list = await import('@/app/api/v1/ai-connections/route')
+        const added = await callRoute(list.POST, mobileApi.createAiConnection, { body: { provider: 'grok', apiKey: 'xai-token-from-elsewhere' } })
+        expect(await expectContract(mobileApi.createAiConnection, added, 400)).toMatchObject({ code: 'grokSignInOnly' })
+
+        engine.listConnections.mockResolvedValue({ connections: [rerun, boxConnection({ id: 'cnx-grok', name: 'Grok', provider: 'grok', models: ['grok-4.6'] })], default: null, backups: { backups: [], rerunCreditLastResort: false } })
+        const keys = await import('@/app/api/v1/ai-connections/[id]/keys/route')
+        const replaced = await callRoute(keys.PUT, mobileApi.replaceAiConnectionKey, { params: { id: 'cnx-grok' }, body: { apiKey: 'xai-token-from-elsewhere' } })
+        expect(await expectContract(mobileApi.replaceAiConnectionKey, replaced, 400)).toMatchObject({ code: 'grokSignInOnly' })
+        expect(engine.createConnection).not.toHaveBeenCalled()
+        expect(engine.updateConnectionKeys).not.toHaveBeenCalled()
+    })
+})
+
 // Every write on the providers is the admin's: a member reads the list and the usage, and gets the
 // 403 the app reads with the same schema as a missing plan.
 describe('a member who does not run the workspace', () => {
@@ -285,6 +413,8 @@ describe('a member who does not run the workspace', () => {
         ['startClaudeSignIn', mobileApi.startClaudeSignIn, async () => callRoute((await import('@/app/api/v1/ai-connections/claude/start/route')).POST, mobileApi.startClaudeSignIn)],
         ['finishClaudeSignIn', mobileApi.finishClaudeSignIn, async () => callRoute((await import('@/app/api/v1/ai-connections/claude/finish/route')).POST, mobileApi.finishClaudeSignIn, { body: { code: 'auth-code#s', ticket: mintClaudeSignIn('user-ada', { verifier: 'v', state: 's' }) } })],
         ['pollCodexSignIn', mobileApi.pollCodexSignIn, async () => callRoute((await import('@/app/api/v1/ai-connections/codex/poll/route')).POST, mobileApi.pollCodexSignIn, { body: { ticket: mintCodexSignIn('user-ada', { deviceAuthId: 'deviceauth_01', userCode: 'K7QX-M2PL' }) } })],
+        ['startGrokSignIn', mobileApi.startGrokSignIn, async () => callRoute((await import('@/app/api/v1/ai-connections/grok/start/route')).POST, mobileApi.startGrokSignIn)],
+        ['pollGrokSignIn', mobileApi.pollGrokSignIn, async () => callRoute((await import('@/app/api/v1/ai-connections/grok/poll/route')).POST, mobileApi.pollGrokSignIn, { body: { ticket: mintGrokSignIn('user-ada', 7, { deviceCode: 'xai-device-code-01', expiresAt: Date.now() + 1_800_000 }) } })],
     ]
 
     it.each(calls)('gets a 403 the app reads from %s', async (_name, endpoint, call) => {

@@ -4,9 +4,9 @@ import { track } from '@rerun/analytics/client'
 const ERROR_MAX_LENGTH = 200
 
 // A Claude token only carries refresh material when the app ran the sign-in itself: a setup-token
-// pasted by hand has none.
+// pasted by hand has none. Codex and Grok only connect through their sign-in.
 export function connectionMethod(provider: string, keys: Record<string, string>): AiConnectionMethod {
-    if (provider === 'codex') return 'oauth'
+    if (provider === 'codex' || provider === 'grok') return 'oauth'
     if (provider === 'claude') return keys.CLAUDE_CODE_OAUTH_REFRESH_TOKEN ? 'oauth' : 'token'
     return 'api_key'
 }

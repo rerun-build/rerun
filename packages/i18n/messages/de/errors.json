@@ -598,5 +598,10 @@
     "domainsUnavailable": "Domains sind hier nicht verfügbar.",
     "brandInvalid": "Prüfe die Felder deiner Marke.",
     "brandIconNotSquare": "Das Symbol muss quadratisch sein.",
-    "brandIconTooSmall": "Das Symbol muss mindestens {min} px breit sein."
+    "brandIconTooSmall": "Das Symbol muss mindestens {min} px breit sein.",
+    "grokNeedsUpdate": "Grok kommt mit dem nächsten Update dieser Maschine. Versuche es gleich noch einmal.",
+    "grokSignInOnly": "Ein Grok-Abo wird über die Anmeldung bei xAI verbunden, nicht mit einem eingefügten Schlüssel.",
+    "grokDeviceLoginRefused": "xAI hat keinen Code zum Verbinden dieses Grok-Kontos ausgegeben.",
+    "grokSignInDenied": "Die Anmeldung wurde bei xAI abgelehnt. Starte sie erneut, um Grok zu verbinden.",
+    "grokSignInExpired": "Der Code ist abgelaufen, bevor er bestätigt wurde. Starte die Anmeldung erneut."
 }

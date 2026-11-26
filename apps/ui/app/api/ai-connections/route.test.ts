@@ -6,7 +6,7 @@ import { GET } from './route'
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: vi.fn() }))
 vi.mock('@/app/api/_services/ai-connection.service', () => ({ listAiConnectionsWithOffers: vi.fn() }))
 
-const LIST = { connections: [], default: null, backups: { backups: [], rerunCreditLastResort: false }, opencodeOffered: false, customOffered: false }
+const LIST = { connections: [], default: null, backups: { backups: [], rerunCreditLastResort: false }, opencodeOffered: false, customOffered: false, grokOffered: false }
 
 beforeEach(() => {
     vi.mocked(requireWorkspaceId).mockReset()

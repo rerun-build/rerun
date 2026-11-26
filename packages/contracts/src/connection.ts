@@ -447,3 +447,12 @@ export type CodexSignInPollInput = z.infer<typeof codexSignInPollInputSchema>
 
 export const codexSignInPollSchema = z.discriminatedUnion('status', [z.object({ status: z.literal('pending') }), z.object({ status: z.literal('connected'), connectionId: z.string() })])
 export type CodexSignInPoll = z.infer<typeof codexSignInPollSchema>
+
+// Grok signs in with a device code as well, and the hub answers in the same shapes: the code to type
+// with a sealed ticket, then pending until the connection is stored. The tokens never leave the hub.
+export const grokSignInStartSchema = codexSignInStartSchema
+export type GrokSignInStart = CodexSignInStart
+export const grokSignInPollInputSchema = codexSignInPollInputSchema
+export type GrokSignInPollInput = CodexSignInPollInput
+export const grokSignInPollSchema = codexSignInPollSchema
+export type GrokSignInPoll = CodexSignInPoll

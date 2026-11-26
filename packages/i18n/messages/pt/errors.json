@@ -598,5 +598,10 @@
     "domainsUnavailable": "Os domínios não estão disponíveis aqui.",
     "brandInvalid": "Verifique os campos da sua marca.",
     "brandIconNotSquare": "O ícone precisa ser quadrado.",
-    "brandIconTooSmall": "O ícone precisa ter pelo menos {min} px de largura."
+    "brandIconTooSmall": "O ícone precisa ter pelo menos {min} px de largura.",
+    "grokNeedsUpdate": "O Grok chega com a próxima atualização desta máquina. Tente de novo daqui a pouco.",
+    "grokSignInOnly": "Um plano do Grok se conecta entrando na xAI, não colando uma chave.",
+    "grokDeviceLoginRefused": "A xAI se recusou a fornecer um código para conectar esta conta do Grok.",
+    "grokSignInDenied": "O login foi recusado na xAI. Comece de novo para conectar o Grok.",
+    "grokSignInExpired": "O código expirou antes de ser aprovado. Comece o login de novo."
 }

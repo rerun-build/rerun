@@ -53,7 +53,8 @@
         "organizationNeedsOwner": "The team is the staff of an organization; owner is a role above admin.",
         "organizationOwnerOnly": "Owner is the highest role in the team of an organization.",
         "managedWorkspace": "Refusal of anything to buy, in a workspace run by an organization (an agency) for its people.",
-        "managedWorkspacePaused": "Same workspace, put away by its organization."
+        "managedWorkspacePaused": "Same workspace, put away by its organization.",
+        "grokSignInOnly": "Grok is xAI's assistant; xAI is the company. A plan is a paid subscription."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -654,5 +655,10 @@
     "domainsUnavailable": "Domains are not available here.",
     "brandInvalid": "Check the fields of your brand.",
     "brandIconNotSquare": "The icon has to be square.",
-    "brandIconTooSmall": "The icon has to be {min} px wide or more."
+    "brandIconTooSmall": "The icon has to be {min} px wide or more.",
+    "grokNeedsUpdate": "Grok arrives with the next update of this machine. Try again in a little while.",
+    "grokSignInOnly": "A Grok plan connects by signing in to xAI, not with a pasted key.",
+    "grokDeviceLoginRefused": "xAI refused to hand out a code to connect this Grok account.",
+    "grokSignInDenied": "The sign-in was declined on xAI. Start it again to connect Grok.",
+    "grokSignInExpired": "The code expired before it was approved. Start the sign-in again."
 }

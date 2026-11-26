@@ -5733,6 +5733,227 @@
                 "x-mobile-api": "setWorkspaceDefaultModel"
             }
         },
+        "/api/v1/ai-connections/grok/poll": {
+            "post": {
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "connectionId": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "ticket": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "ticket"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "status": {
+                                                    "enum": [
+                                                        "pending"
+                                                    ],
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "status"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        {
+                                            "properties": {
+                                                "connectionId": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "enum": [
+                                                        "connected"
+                                                    ],
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "status",
+                                                "connectionId"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "pollGrokSignIn"
+            }
+        },
+        "/api/v1/ai-connections/grok/start": {
+            "post": {
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "expiresAt": {
+                                            "type": "number"
+                                        },
+                                        "pollIntervalMs": {
+                                            "type": "number"
+                                        },
+                                        "ticket": {
+                                            "type": "string"
+                                        },
+                                        "userCode": {
+                                            "type": "string"
+                                        },
+                                        "verificationUrl": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "ticket",
+                                        "userCode",
+                                        "verificationUrl",
+                                        "pollIntervalMs",
+                                        "expiresAt"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "startGrokSignIn"
+            }
+        },
         "/api/v1/ai-connections/{id}": {
             "delete": {
                 "parameters": [

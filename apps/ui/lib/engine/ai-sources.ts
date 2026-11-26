@@ -73,14 +73,14 @@ export function providerGuide(provider: GuidedProvider, t: SourceCopy): { title:
     return { title: t(`sources.guide.${provider}.title`), steps: steps.join('\n') }
 }
 
-export const PLAN_PROVIDERS: AddableProvider[] = ['claude', 'codex']
+export const PLAN_PROVIDERS: AddableProvider[] = ['claude', 'codex', 'grok']
 
-// OpenCode joins the subscriptions only where it can run: behind its release flag, on a machine
-// whose engine says it knows the provider. A workspace on the restricted lifetime plan is not offered
-// the Claude plan: AppSumo will not list a deal that signs buyers in with their Claude subscription.
-export function planProviders(opencodeOffered: boolean, { claude = true }: { claude?: boolean } = {}): AddableProvider[] {
+// OpenCode and Grok join the subscriptions only where they can run: on a machine whose engine says it
+// knows the provider. A workspace on the restricted lifetime plan is not offered the Claude plan:
+// AppSumo will not list a deal that signs buyers in with their Claude subscription.
+export function planProviders(opencodeOffered: boolean, { claude = true, grok = false }: { claude?: boolean; grok?: boolean } = {}): AddableProvider[] {
     const providers = opencodeOffered ? [...PLAN_PROVIDERS, 'opencode' as const] : PLAN_PROVIDERS
-    return claude ? providers : providers.filter(provider => provider !== 'claude')
+    return providers.filter(provider => (claude || provider !== 'claude') && (grok || provider !== 'grok'))
 }
 export const KEY_PROVIDERS: KeyProvider[] = ['anthropic', 'openai', 'google', 'openrouter']
 
@@ -89,9 +89,9 @@ export function keyProviders(customOffered: boolean): AddableProvider[] {
     return customOffered ? [...KEY_PROVIDERS, 'custom'] : KEY_PROVIDERS
 }
 
-export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: 'Claude Code', codex: 'Codex', opencode: 'OpenCode' }
+export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: 'Claude Code', codex: 'Codex', grok: 'Grok Build', opencode: 'OpenCode' }
 
-const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT', opencode: 'OpenCode' }
+const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT', grok: 'Grok', opencode: 'OpenCode' }
 
 // What a person calls the plan behind a connection: "Claude", "ChatGPT", or the connection's own name.
 // Rerun's own connection is named by the machine, which knows no other brand.

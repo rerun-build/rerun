@@ -598,5 +598,10 @@
     "domainsUnavailable": "דומיינים אינם זמינים כאן.",
     "brandInvalid": "יש לבדוק את שדות המותג שלך.",
     "brandIconNotSquare": "האייקון חייב להיות ריבועי.",
-    "brandIconTooSmall": "רוחב האייקון חייב להיות לפחות {min} פיקסלים."
+    "brandIconTooSmall": "רוחב האייקון חייב להיות לפחות {min} פיקסלים.",
+    "grokNeedsUpdate": "Grok יגיע עם העדכון הבא של המכונה הזו. נסו שוב בעוד רגע.",
+    "grokSignInOnly": "מינוי Grok מתחבר דרך התחברות ל-xAI, לא עם מפתח מודבק.",
+    "grokDeviceLoginRefused": "xAI סירבה לתת קוד לחיבור חשבון ה-Grok הזה.",
+    "grokSignInDenied": "ההתחברות נדחתה ב-xAI. התחילו מחדש כדי לחבר את Grok.",
+    "grokSignInExpired": "תוקף הקוד פג לפני שאושר. התחילו את ההתחברות מחדש."
 }

@@ -7,7 +7,8 @@ import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createAiConnectionAction, setBackupModelsAction, updateAiConnectionKeysAction } from './workspace-connection.actions'
+import { createAiConnectionAction, pollGrokSignInAction, setBackupModelsAction, startGrokSignInAction, updateAiConnectionKeysAction } from './workspace-connection.actions'
+import { mintGrokSignIn } from '@/lib/engine/sign-in-ticket'
 
 // The lifetime plans only exist on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
 vi.mock('@rerun/cloud/billing', async importOriginal => ({
@@ -31,12 +32,14 @@ vi.mock('@/lib/engine/client', () => ({
     patchConnection: vi.fn(),
     setBoxBackups: vi.fn(),
     setBoxDefault: vi.fn(),
+    supportsGrok: vi.fn(),
     updateConnectionKeys: vi.fn(),
 }))
 vi.mock('@/lib/engine/verify-provider-key', () => ({ providerKeyProblem: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/engine/claude-oauth', () => ({ buildClaudeAuthorize: vi.fn(), exchangeClaudeCode: vi.fn() }))
 vi.mock('@/lib/engine/codex-oauth', () => ({ codexKeysFrom: vi.fn(), pollCodexDeviceAuth: vi.fn(), startCodexDeviceAuth: vi.fn() }))
+vi.mock('@/lib/engine/grok-oauth', async importOriginal => ({ ...(await importOriginal<object>()), pollGrokDeviceAuth: vi.fn(), startGrokDeviceAuth: vi.fn() }))
 
 const conn = { baseUrl: 'https://engine.test', apiKey: 'box-key' }
 const params = { name: 'Anthropic', provider: 'anthropic' as const, models: [], extraModels: [], keys: { ANTHROPIC_API_KEY: 'sk-ant-api03-key' } }
@@ -160,5 +163,48 @@ describe('setBackupModelsAction', () => {
 
         expect(await setBackupModelsAction(next)).toMatchObject({ success: false })
         expect(engine.setBoxBackups).not.toHaveBeenCalled()
+    })
+})
+
+// The browser starts and polls the Grok sign-in like the app does: it holds a sealed ticket, and the
+// hub stores the connection itself. No device code and no token ever come back to it.
+describe('the Grok sign-in of the web dialog', () => {
+    beforeEach(async () => {
+        vi.stubEnv('MOBILE_OAUTH_TICKET_SECRET', 'actions-secret')
+        vi.mocked(requireAdminContext).mockResolvedValue({ workspace: { id: 7 }, userId: 'user-ada', role: 'admin' } as never)
+        vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn, managed: true })
+        vi.mocked(engine.supportsGrok).mockResolvedValue(true)
+        vi.mocked(engine.listConnections).mockResolvedValue({ connections: [], default: null, backups: { backups: [], rerunCreditLastResort: false } } as never)
+        vi.mocked(engine.createConnection).mockResolvedValue({ ...created, id: 'cnx-grok', provider: 'grok' } as never)
+        const oauth = await import('@/lib/engine/grok-oauth')
+        vi.mocked(oauth.startGrokDeviceAuth).mockResolvedValue({ deviceCode: 'xai-device-code', userCode: 'N4FS-5STQ', verificationUrl: 'https://accounts.x.ai/oauth2/device', pollIntervalMs: 5000, expiresAt: Date.now() + 1_800_000 })
+        vi.mocked(oauth.pollGrokDeviceAuth).mockResolvedValue({ accessToken: 'grok-access', refreshToken: 'grok-refresh', idToken: '', accountId: 'xai-user', expiresAt: Date.now() + 21_600_000 })
+    })
+
+    it('starts with a ticket that does not show the device code', async () => {
+        const start = await startGrokSignInAction()
+        expect(start).toMatchObject({ ok: true, userCode: 'N4FS-5STQ', ticket: expect.any(String) })
+        expect(JSON.stringify(start)).not.toContain('xai-device-code')
+    })
+
+    it('stores the approved sign-in on the machine and answers with the connection alone', async () => {
+        const answer = await pollGrokSignInAction({ ticket: mintGrokSignIn('user-ada', 7, { deviceCode: 'xai-device-code', expiresAt: Date.now() + 1_800_000 }) })
+        expect(answer).toEqual({ status: 'connected', connectionId: 'cnx-grok' })
+        expect(engine.createConnection).toHaveBeenCalledWith(conn, expect.objectContaining({ provider: 'grok', keys: expect.objectContaining({ GROK_OAUTH_TOKEN: 'grok-access', GROK_OAUTH_REFRESH_TOKEN: 'grok-refresh' }) }))
+    })
+
+    it('refuses a member who is not an admin, and a ticket from another workspace', async () => {
+        vi.mocked(requireAdminContext).mockRejectedValue(new AuthorizationError('adminOnlyAiProviders'))
+        await expect(startGrokSignInAction()).resolves.toMatchObject({ ok: false, code: 'adminOnlyAiProviders' })
+        await expect(pollGrokSignInAction({ ticket: 'x' })).resolves.toMatchObject({ status: 'error', code: 'adminOnlyAiProviders' })
+
+        vi.mocked(requireAdminContext).mockResolvedValue({ workspace: { id: 8 }, userId: 'user-ada', role: 'admin' } as never)
+        await expect(pollGrokSignInAction({ ticket: mintGrokSignIn('user-ada', 7, { deviceCode: 'xai-device-code', expiresAt: Date.now() + 1_800_000 }) })).resolves.toMatchObject({ status: 'error' })
+        expect(engine.createConnection).not.toHaveBeenCalled()
+    })
+
+    it('never takes a Grok token pasted by hand', async () => {
+        await expect(createAiConnectionAction({ name: 'Grok', provider: 'grok', models: [], extraModels: [], keys: { GROK_OAUTH_TOKEN: 'pasted' } })).resolves.toMatchObject({ success: false, code: 'grokSignInOnly' })
+        expect(engine.createConnection).not.toHaveBeenCalled()
     })
 })

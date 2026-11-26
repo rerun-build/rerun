@@ -598,5 +598,10 @@
     "domainsUnavailable": "此处不支持域名。",
     "brandInvalid": "请检查品牌的各个字段。",
     "brandIconNotSquare": "图标必须是正方形。",
-    "brandIconTooSmall": "图标宽度至少为 {min} px。"
+    "brandIconTooSmall": "图标宽度至少为 {min} px。",
+    "grokNeedsUpdate": "Grok 将随此机器的下一次更新到来。请稍后再试。",
+    "grokSignInOnly": "Grok 套餐需要登录 xAI 来连接，而不是粘贴密钥。",
+    "grokDeviceLoginRefused": "xAI 拒绝提供用于连接此 Grok 账户的代码。",
+    "grokSignInDenied": "登录在 xAI 上被拒绝。请重新开始以连接 Grok。",
+    "grokSignInExpired": "代码在获批之前已过期。请重新开始登录。"
 }
