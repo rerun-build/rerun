@@ -298,6 +298,48 @@ describe('browser_navigate', () => {
         })
     })
 
+    // A pinch on a phone during a takeover left a site at 250% in the coworker's profile, and its
+    // sign-in button two screens down on every visit after (RER-324).
+    describe('page zoom', () => {
+        const profileWith = (preferences: string) => {
+            const dir = mkdtempSync(resolve(tmpdir(), 'rerun-zoom-'))
+            mkdirSync(resolve(dir, 'Default'))
+            writeFileSync(resolve(dir, 'Default/Preferences'), preferences)
+            return dir
+        }
+        const preferencesOf = (dir: string) => readFileSync(resolve(dir, 'Default/Preferences'), 'utf8')
+
+        it('opens every site at 100% and keeps the rest of the profile', async () => {
+            const dir = profileWith(JSON.stringify({ partition: { per_host_zoom_levels: { x: { 'shop.example.com': { zoom_level: 5.02 } } }, other: 1 }, profile: { name: 'Coworker' } }))
+
+            await launchContext(dir, ':9', { viewport: null })
+
+            expect(JSON.parse(preferencesOf(dir))).toEqual({ partition: { other: 1 }, profile: { name: 'Coworker' } })
+            expect(pw.launches.at(-1)?.dir).toBe(dir)
+        })
+
+        it('leaves a profile without a zoom untouched', async () => {
+            const preferences = '{"partition": {"other": 1}}'
+            const dir = profileWith(preferences)
+
+            await launchContext(dir, ':9', { viewport: null })
+
+            expect(preferencesOf(dir)).toBe(preferences)
+        })
+
+        it('still launches on a new profile or an unreadable one', async () => {
+            const fresh = mkdtempSync(resolve(tmpdir(), 'rerun-zoom-'))
+            const broken = profileWith('{not json')
+
+            await launchContext(fresh, ':9', { viewport: null })
+            await launchContext(broken, ':9', { viewport: null })
+
+            expect(existsSync(resolve(fresh, 'Default/Preferences'))).toBe(false)
+            expect(preferencesOf(broken)).toBe('{not json')
+            expect(pw.launches.map(launch => launch.dir)).toEqual(expect.arrayContaining([fresh, broken]))
+        })
+    })
+
     it('caps the text at 50k characters', async () => {
         pw.page.views = showing('z'.repeat(80_000))
         const out = await navigate(ctxWith(), { url: 'https://example.com/' })

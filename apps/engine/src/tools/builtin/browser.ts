@@ -1,4 +1,4 @@
-import { mkdir, rm } from 'node:fs/promises'
+import { mkdir, readFile, rm } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { chromium, type BrowserContext, type Page, type Response as PageResponse } from 'patchright'
 import { tool, type ToolSet } from 'ai'
@@ -9,6 +9,7 @@ import { detectBotWall, type BotWall } from '../bot-wall.js'
 import { holdDisplay, type DisplayHold } from '../virtual-display.js'
 import { offersTakeover } from './hitl.js'
 import { browserProfileDir } from '../../config/paths.js'
+import { writeFileAtomic } from '../../lib/atomic-write.js'
 import { withKeyedLock } from '../../lib/lock.js'
 import { NonPublicHostError, assertPublicUrl, isHttpUrl, resolvesToPublicAddresses } from '../../lib/public-fetch.js'
 import { PUBLIC_HTTP_URL_MESSAGE, publicHttpUrl } from '../url.js'
@@ -77,6 +78,23 @@ async function launchPersistentContext(profileDir: string, options: LaunchOption
     }
 }
 
+// Chromium keeps a page zoom per site in the profile. A coworker never zooms a page on purpose: a zoom
+// comes from a person who pinched or Ctrl+scrolled during a takeover, and it pushed a site's sign-in
+// button off the screen for every visit that followed (RER-324). Each launch starts at 100%.
+async function clearPageZoom(profileDir: string): Promise<void> {
+    const file = resolve(profileDir, 'Default/Preferences')
+    let preferences: { partition?: unknown } | null
+    try {
+        preferences = JSON.parse(await readFile(file, 'utf8'))
+    } catch {
+        return
+    }
+    const partition = preferences?.partition
+    if (typeof partition !== 'object' || partition === null || !('per_host_zoom_levels' in partition)) return
+    delete partition.per_host_zoom_levels
+    await writeFileAtomic(file, JSON.stringify(preferences))
+}
+
 export async function launchContext(profileDir: string, display: string | null, extra: LaunchOptions = {}, guards: ContextGuards = {}): Promise<BrowserContext> {
     const options: LaunchOptions = {
         channel: 'chromium',
@@ -85,6 +103,7 @@ export async function launchContext(profileDir: string, display: string | null, 
         ...extra,
     }
     await mkdir(profileDir, { recursive: true })
+    await clearPageZoom(profileDir)
     const context = await launchPersistentContext(profileDir, options)
     await context.route('**/*', publicRequestsOnly(guards))
     return context
