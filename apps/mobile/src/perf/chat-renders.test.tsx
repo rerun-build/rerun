@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import type { UIMessage } from 'ai'
 import { Platform } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { ConversationPane } from '@/components/chat/ConversationPane'
 
@@ -57,7 +58,10 @@ jest.mock('@/data/useMentionComputers', () => {
     return { useMentionComputers: () => computers }
 })
 jest.mock('@/data/useWorkspaceAgents', () => ({ useWorkspaceAgents: () => null }))
-jest.mock('@/data/local-cache', () => ({ cachedBoard: () => ({ read: () => null }) }))
+jest.mock('@/data/local-cache', () => ({
+    cachedBoard: () => ({ read: () => null }),
+    cachedForeman: () => ({ read: () => null }),
+}))
 jest.mock('@/components/chat/screen/useAgentScreen', () => {
     const screen = { status: 'idle', uri: null, attachWebView: () => {}, onMessage: () => {}, frames: null, mirror: () => {} }
     return { useAgentScreen: () => screen }
@@ -85,7 +89,11 @@ const noop = () => {}
 
 async function openLongConversation(messages = longTranscript()) {
     mockChat.state = { messages, busy: false, status: 'ready' }
-    await render(<ConversationPane coworker={coworker} makeEndpoints={makeEndpoints} initialSessionId="perf-session" onSessionCreated={noop} models={null} status="idle" onStatusChange={noop} webUrl="https://app.rerun.build" />)
+    await render(
+        <GestureHandlerRootView>
+            <ConversationPane coworker={coworker} makeEndpoints={makeEndpoints} initialSessionId="perf-session" onSessionCreated={noop} models={null} status="idle" onStatusChange={noop} webUrl="https://app.rerun.build" />
+        </GestureHandlerRootView>,
+    )
     await act(async () => {})
 }
 
