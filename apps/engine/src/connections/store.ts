@@ -15,13 +15,14 @@ import { readEnvFile, serializeEnv, writeEnvFile } from '../lib/env-file.js'
 import { badRequest } from '../lib/errors.js'
 import { newId, nowIso } from '../lib/ids.js'
 import { forgetCredentialRejected } from './credential-rejections.js'
-import { connectionExists } from './loader.js'
+import { connectionExists, loadConnectionFromDisk } from './loader.js'
 import { withConnectionLock } from './lock.js'
 import { forgetCliModels } from './cli-models.js'
 import { forgetPlanLimits } from './plan-limits.js'
 import { forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'
 import { forgetClaudePlanLimitsAttempt } from './claude-plan-limits.js'
 import { forgetCustomCatalog } from './custom-catalog.js'
+import { forgetGrokTokenState, revokeGrokTokens } from './grok-token.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
 import { productText } from '../brand/brand.js'
@@ -89,6 +90,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         forgetClaudePlanLimitsAttempt(id)
         forgetCustomCatalog(id)
         forgetCredentialRejected(id)
+        forgetGrokTokenState(id)
         await reloadConnection(id)
         return Object.keys(next).sort()
     })
@@ -100,8 +102,15 @@ export function assertConnectionDeletable(id: string): void {
     if (id === RERUN_CONNECTION_ID) throw badRequest(productText('The Rerun connection cannot be deleted'))
 }
 
+// A connection that cannot be read any more has nothing left to hand back.
+async function revokeSignIn(id: string): Promise<void> {
+    const connection = await loadConnectionFromDisk(id).catch(() => null)
+    if (connection?.config.provider === 'grok') await revokeGrokTokens(connection.env)
+}
+
 export async function deleteConnection(id: string): Promise<void> {
     assertConnectionDeletable(id)
+    await revokeSignIn(id)
     unloadConnection(id)
     forgetPlanLimits(id)
     forgetCliModels(id)
@@ -109,6 +118,7 @@ export async function deleteConnection(id: string): Promise<void> {
     forgetClaudePlanLimitsAttempt(id)
     forgetCustomCatalog(id)
     forgetCredentialRejected(id)
+    forgetGrokTokenState(id)
     await rm(connectionDir(id), { recursive: true, force: true })
 }
 
