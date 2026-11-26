@@ -348,6 +348,14 @@
         "remove": "Remover",
         "removeLabel": "Remover a mensagem da fila"
     },
+    "quote": {
+        "reply": "Responder",
+        "replyToBubble": "Responder a este balão",
+        "placeholder": "Responda a este trecho…",
+        "remove": "Remover a citação",
+        "you": "Você",
+        "showSource": "Ir para a mensagem citada"
+    },
     "context": {
         "usedLabel": "Contexto usado: {percent}%",
         "title": "Contexto",

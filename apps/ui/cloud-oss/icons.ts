@@ -260,6 +260,7 @@ import {
     RefreshCwIcon as LucideRefreshCwIcon,
     Repeat as LucideRepeat,
     Repeat2 as LucideRepeat2,
+    Reply as LucideReply,
     RocketIcon as LucideRocketIcon,
     RotateCwIcon as LucideRotateCwIcon,
     Satellite as LucideSatellite,
@@ -509,6 +510,7 @@ export const LayersIcon: LucideIcon = LucideLayersIcon
 export const CardsIcon: LucideIcon = LucideGalleryVerticalEnd
 export const ListOrdered: LucideIcon = LucideListOrdered
 export const QuickReplyIcon: LucideIcon = mirroredInRtl(LucideMessageSquareReply)
+export const ReplyIcon: LucideIcon = mirroredInRtl(LucideReply)
 export const MessageAuthorIcon: LucideIcon = LucideMessageSquareText
 export const LayoutDashboard: LucideIcon = LucideLayoutDashboard
 export const LayoutDashboardIcon: LucideIcon = LucideLayoutDashboardIcon

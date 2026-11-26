@@ -484,6 +484,7 @@
             "selectMessage": "選取訊息",
             "editMessage": "編輯選取的訊息",
             "regenerateReply": "重新產生選取的回覆",
+            "quoteSelection": "回覆選取的文字",
             "copyMessage": "複製選取的訊息",
             "copyMessageLink": "複製選取訊息的連結",
             "deleteMessage": "刪除選取的訊息",

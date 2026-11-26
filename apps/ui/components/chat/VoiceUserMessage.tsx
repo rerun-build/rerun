@@ -1,5 +1,6 @@
 'use client'
 
+import type { MessageQuote } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
@@ -9,6 +10,7 @@ import { USER_BUBBLE_INK, USER_BUBBLE_SHAPE } from '@/components/chat/bubble-sty
 import { CopyAction } from '@/components/chat/CopyAction'
 import { MessageAttachments } from '@/components/chat/MessageAttachments'
 import { MessageTimeTooltip } from '@/components/chat/MessageTimeTooltip'
+import { QuoteInBubble } from '@/components/chat/quote/QuoteCards'
 import { useVoicePlayback } from '@/components/chat/useVoicePlayback'
 import { VoiceMessageBubble } from '@/components/chat/VoiceMessageBubble'
 import { VoiceTranscript } from '@/components/chat/VoiceTranscript'
@@ -19,6 +21,8 @@ import type { VoiceMessage } from '@/lib/voice/marker'
 
 type VoiceUserMessageProps = {
     voice: VoiceMessage
+    /** The passage the recording replies to, drawn at the top of the bubble. */
+    quote?: MessageQuote
     agentId?: string
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
@@ -33,7 +37,7 @@ type VoiceUserMessageProps = {
  * what the agent read from it. The actions come up on hover like the agent's, and stay on a touch
  * screen.
  */
-export function VoiceUserMessage({ voice, agentId, rawUrlFor, readFile, attachmentPaths, createdAt, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
+export function VoiceUserMessage({ voice, quote, agentId, rawUrlFor, readFile, attachmentPaths, createdAt, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
     const t = useTranslations('chat.voice')
     const playback = useVoicePlayback({ agentId, rawUrlFor, src: voice.src, durationMs: voice.durationMs })
     const [open, setOpen] = useState(defaultTranscriptOpen)
@@ -45,6 +49,7 @@ export function VoiceUserMessage({ voice, agentId, rawUrlFor, readFile, attachme
             {attachmentPaths && attachmentPaths.length > 0 && <MessageAttachments agentId={agentId} paths={attachmentPaths} rawUrlFor={rawUrlFor} readFile={readFile} />}
             <MessageTimeTooltip createdAt={createdAt} side="left">
                 <MessageContent className={cn(USER_BUBBLE_SHAPE, USER_BUBBLE_INK)} data-ink>
+                    {quote && <QuoteInBubble quote={quote} />}
                     <VoiceMessageBubble playback={playback} durationMs={voice.durationMs} peaks={voice.peaks} />
                 </MessageContent>
             </MessageTimeTooltip>

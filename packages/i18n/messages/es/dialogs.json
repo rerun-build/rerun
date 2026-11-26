@@ -484,6 +484,7 @@
             "selectMessage": "Seleccionar un mensaje",
             "editMessage": "Editar el mensaje seleccionado",
             "regenerateReply": "Regenerar la respuesta seleccionada",
+            "quoteSelection": "Responder al texto seleccionado",
             "copyMessage": "Copiar el mensaje seleccionado",
             "copyMessageLink": "Copiar un enlace al mensaje seleccionado",
             "deleteMessage": "Eliminar el mensaje seleccionado",

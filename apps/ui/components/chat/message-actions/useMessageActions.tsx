@@ -16,6 +16,7 @@ import { isTypingTarget } from '@/lib/typing-target'
 import { InlineMessageEditor } from './InlineMessageEditor'
 import { messageActionItems } from './message-action-items'
 import { SelectableMessage } from './SelectableMessage'
+import { hasQuotableSelection } from '@/components/chat/quote/QuoteSelectionPill'
 
 type ReplayOptions = { body: { replaceFrom: string } }
 
@@ -285,6 +286,8 @@ export function useMessageActions({ active, agentId, agentName, sessionId, messa
                 return release()
             }
             const action = actionForKey(event.key)
+            // Text selected in the thread takes R to quote it (QuoteSelectionPill), not to regenerate.
+            if (action === 'regenerate' && hasQuotableSelection(rootRef.current)) return
             const message = messagesRef.current.find(item => item.id === selectedId)
             if (!action || !message) return
             if (action === 'edit' && message.role !== 'user') return

@@ -348,6 +348,14 @@
         "remove": "إزالة",
         "removeLabel": "إزالة الرسالة المنتظرة"
     },
+    "quote": {
+        "reply": "رد",
+        "replyToBubble": "الرد على هذه الفقاعة",
+        "placeholder": "رد على هذا المقطع…",
+        "remove": "إزالة الاقتباس",
+        "you": "أنت",
+        "showSource": "الانتقال إلى الرسالة المقتبسة"
+    },
     "context": {
         "usedLabel": "السياق المستخدم: {percent}%",
         "title": "السياق",

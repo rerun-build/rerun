@@ -318,6 +318,12 @@
         "backToChat": "Volver a la conversación",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "Responde a este fragmento…",
+        "remove": "Quitar la cita",
+        "you": "Tú",
+        "showSource": "Ir al mensaje citado"
+    },
     "messageActions": {
         "edit": "Editar",
         "regenerate": "Regenerar",

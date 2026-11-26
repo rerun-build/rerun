@@ -318,6 +318,12 @@
         "backToChat": "Back to the conversation",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "Reply to this passage…",
+        "remove": "Remove the quote",
+        "you": "You",
+        "showSource": "Go to the quoted message"
+    },
     "messageActions": {
         "edit": "Edit",
         "regenerate": "Regenerate",

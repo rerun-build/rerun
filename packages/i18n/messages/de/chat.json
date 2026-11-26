@@ -348,6 +348,14 @@
         "remove": "Entfernen",
         "removeLabel": "Wartende Nachricht entfernen"
     },
+    "quote": {
+        "reply": "Antworten",
+        "replyToBubble": "Auf diese Blase antworten",
+        "placeholder": "Auf diese Stelle antworten…",
+        "remove": "Zitat entfernen",
+        "you": "Du",
+        "showSource": "Zur zitierten Nachricht"
+    },
     "context": {
         "usedLabel": "Kontext genutzt: {percent} %",
         "title": "Kontext",

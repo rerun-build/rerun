@@ -1,6 +1,6 @@
 'use client'
 
-import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { MAX_UPLOAD_FILE_BYTES, prependQuote, type MessageQuote } from '@rerun/contracts'
 import type { ChatStatus, FileUIPart } from 'ai'
 import { AnimatePresence, motion } from 'motion/react'
 import { type ReactNode, type Ref, type RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
@@ -14,6 +14,7 @@ import { AttachButton, ChatAttachments } from '@/components/chat/ChatAttachments
 import { ComposerLinkMirror } from '@/components/chat/ComposerLinkMirror'
 import { MentionCommandsButton, type MentionCommands } from '@/components/chat/MentionAutocomplete'
 import { QueuedMessagePill } from '@/components/chat/QueuedMessagePill'
+import { QuoteStrip } from '@/components/chat/quote/QuoteCards'
 import { VoiceComposerControls } from '@/components/chat/VoiceComposerControls'
 import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
 import { MarkdownEditorDialog } from '@/components/ui/markdown-editor-dialog'
@@ -102,6 +103,11 @@ export type ChatComposerProps = {
     /** Told whenever an attachment is in flight: a queued message must wait for the last byte. */
     onUploadingChange?: (uploading: boolean) => void
     placeholder?: string
+    /** The passage the next message replies to: drawn over the field, sent at the head of the message. */
+    quote?: MessageQuote | null
+    /** Drops the quote: its ✕, Escape, or the message that carried it leaving. */
+    onClearQuote?: () => void
+    onShowQuoteSource?: (quote: MessageQuote) => void
     ref?: Ref<ChatComposerHandle>
 }
 
@@ -133,9 +139,13 @@ export function ChatComposer({
     commands,
     onUploadingChange,
     placeholder,
+    quote = null,
+    onClearQuote,
+    onShowQuoteSource,
     ref,
 }: ChatComposerProps) {
     const t = useTranslations('chat.composer')
+    const tQuote = useTranslations('chat.quote')
     const { load: loadDraft, save: saveDraft, clear: clearDraft } = useComposerDraft(uid)
 
     const ownRef = useRef<HTMLTextAreaElement | null>(null)
@@ -286,7 +296,9 @@ export function ChatComposer({
     )
 
     const deliver = useCallback(
-        (text: string) => {
+        (written: string) => {
+            const text = prependQuote(written, quote)
+            if (quote) onClearQuote?.()
             // A run still holds the conversation: the message waits rather than being dropped, and
             // leaves on its own once the run ends.
             if (busy && queue) {
@@ -296,7 +308,7 @@ export function ChatComposer({
             onSend(text)
             onSent?.()
         },
-        [busy, queue, onSend, onSent]
+        [busy, queue, onSend, onSent, quote, onClearQuote]
     )
 
     // Pressing enter mid-upload is a request to send, not an error: the message waits for the last
@@ -336,14 +348,14 @@ export function ChatComposer({
             // PromptInput has already emptied the textarea, and with it every label.
             const trimmed = expandLinks(text).trim()
             clearLinks()
-            if (!trimmed && files.length === 0) return
+            if (!trimmed && files.length === 0 && !quote) return
             if (gate && !gate.ready) {
                 gate.onBlocked()
                 throw new SubmitBlocked('Select a model to start', true)
             }
 
             const messageText = await appendUploadedAttachments(trimmed, files.length)
-            if (!messageText) return
+            if (!messageText && !quote) return
             deliver(messageText)
             setAttachmentUploads({})
             uploads.clearFinished()
@@ -351,7 +363,7 @@ export function ChatComposer({
             setExpandable(false)
             setComposerEmpty(true)
         },
-        [gate, uploads, clearDraft, deliver, expandLinks, clearLinks, appendUploadedAttachments]
+        [gate, uploads, clearDraft, deliver, expandLinks, clearLinks, appendUploadedAttachments, quote]
     )
 
     // The chips live inside PromptInput, which only empties them on its own submit. A voice message
@@ -385,7 +397,7 @@ export function ChatComposer({
     // The microphone shows whenever nothing is typed, and a run in flight keeps its Stop button. It
     // takes the send button's place only when there is genuinely nothing to send: attachments alone
     // are a valid message, so with them it sits next to Send and the recording carries them along.
-    const composerHasContent = !composerEmpty || Object.keys(attachmentUploads).length > 0
+    const composerHasContent = !composerEmpty || Object.keys(attachmentUploads).length > 0 || !!quote
     const recording = voice.status !== 'idle'
     const voiceControlsVisible = voiceEnabled && (recording || (composerEmpty && status === 'ready' && !uploading && !busy))
     const submitVisible = !recording && !(voiceControlsVisible && !composerHasContent)
@@ -405,6 +417,7 @@ export function ChatComposer({
         <>
             {gate?.hint && <div className="mb-2">{gate.hint}</div>}
             <QueuedMessagePill text={queue?.text ?? null} busy={busy} pending={queue?.pending ?? false} onSendNow={() => queue?.onSendNow()} onDiscard={() => queue?.onDiscard()} />
+            {onClearQuote && <QuoteStrip quote={quote} onRemove={onClearQuote} onShowSource={source => onShowQuoteSource?.(source)} />}
             <PromptInput
                 multiple
                 maxFiles={attachmentsEnabled ? 10 : 0}
@@ -426,7 +439,7 @@ export function ChatComposer({
                         <div className="relative w-full">
                             <PromptInputTextarea
                                 ref={inputRef}
-                                placeholder={placeholder ?? (commands && !commands.triggers.includes('/') ? t('placeholderNoSkill') : t('placeholder'))}
+                                placeholder={quote ? tQuote('placeholder') : (placeholder ?? (commands && !commands.triggers.includes('/') ? t('placeholderNoSkill') : t('placeholder')))}
                                 className={cn(expandable && 'pe-9', links.hasTokens && 'text-transparent caret-foreground [scrollbar-gutter:stable]')}
                                 {...textareaProps}
                                 onChange={e => {
@@ -435,6 +448,10 @@ export function ChatComposer({
                                 }}
                                 onKeyDown={e => {
                                     textareaProps?.onKeyDown?.(e)
+                                    if (!e.defaultPrevented && e.key === 'Escape' && quote) {
+                                        e.preventDefault()
+                                        onClearQuote?.()
+                                    }
                                     if (!e.defaultPrevented) links.handlers.onKeyDown(e)
                                 }}
                                 onSelect={e => {

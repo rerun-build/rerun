@@ -484,6 +484,7 @@
             "selectMessage": "Bir mesaj seç",
             "editMessage": "Seçili mesajı düzenle",
             "regenerateReply": "Seçili yanıtı yeniden oluştur",
+            "quoteSelection": "Seçili metni yanıtla",
             "copyMessage": "Seçili mesajı kopyala",
             "copyMessageLink": "Seçili mesajın bağlantısını kopyala",
             "deleteMessage": "Seçili mesajı sil",

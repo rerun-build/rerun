@@ -348,6 +348,14 @@
         "remove": "Retirer",
         "removeLabel": "Retirer le message en attente"
     },
+    "quote": {
+        "reply": "Répondre",
+        "replyToBubble": "Répondre à cette bulle",
+        "placeholder": "Répondre à ce passage…",
+        "remove": "Retirer la citation",
+        "you": "Vous",
+        "showSource": "Aller au message cité"
+    },
     "context": {
         "usedLabel": "Contexte utilisé : {percent} %",
         "title": "Contexte",

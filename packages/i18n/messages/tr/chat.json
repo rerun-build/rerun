@@ -348,6 +348,14 @@
         "remove": "Kaldır",
         "removeLabel": "Sıradaki mesajı kaldır"
     },
+    "quote": {
+        "reply": "Yanıtla",
+        "replyToBubble": "Bu balonu yanıtla",
+        "placeholder": "Bu bölümü yanıtlayın…",
+        "remove": "Alıntıyı kaldır",
+        "you": "Siz",
+        "showSource": "Alıntılanan mesaja git"
+    },
     "context": {
         "usedLabel": "Kullanılan bağlam: %{percent}",
         "title": "Bağlam",

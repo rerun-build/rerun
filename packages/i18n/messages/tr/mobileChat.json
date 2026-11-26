@@ -318,6 +318,12 @@
         "backToChat": "Sohbete dön",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "Bu bölümü yanıtlayın…",
+        "remove": "Alıntıyı kaldır",
+        "you": "Siz",
+        "showSource": "Alıntılanan mesaja git"
+    },
     "messageActions": {
         "edit": "Düzenle",
         "regenerate": "Yeniden oluştur",

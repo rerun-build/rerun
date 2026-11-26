@@ -318,6 +318,12 @@
         "backToChat": "返回对话",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "回复这段内容…",
+        "remove": "移除引用",
+        "you": "您",
+        "showSource": "跳转到被引用的消息"
+    },
     "messageActions": {
         "edit": "编辑",
         "regenerate": "重新生成",

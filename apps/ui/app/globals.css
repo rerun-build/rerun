@@ -438,6 +438,27 @@ pre {
   margin-bottom: 0;
 }
 
+/* The passage a reply quotes, marked in its source without touching the message's DOM (CSS Custom
+   Highlight API, see components/chat/quote): in the brand's ink while it waits in the composer, with
+   a light brand wash for a moment when a sent quote leads back to it. On the person's bubble, drawn
+   in the brand, the passage keeps the bubble's ink and takes a wash of it instead. */
+::highlight(quote-draft) {
+  color: var(--color-brand-text);
+}
+
+::highlight(quote-flash) {
+  color: var(--color-brand-text);
+  background-color: color-mix(in oklab, var(--color-brand) 12%, transparent);
+}
+
+::highlight(quote-draft-ink) {
+  background-color: color-mix(in oklab, var(--color-bubble-ink) 28%, transparent);
+}
+
+::highlight(quote-flash-ink) {
+  background-color: color-mix(in oklab, var(--color-bubble-ink) 35%, transparent);
+}
+
 /* Streamdown wraps every streamed word in a span it blurs in. It ships no reduced-motion
    rule of its own, so the words land instantly here instead. */
 @media (prefers-reduced-motion: reduce) {

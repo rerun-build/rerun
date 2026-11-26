@@ -348,6 +348,14 @@
         "remove": "移除",
         "removeLabel": "移除排队的消息"
     },
+    "quote": {
+        "reply": "回复",
+        "replyToBubble": "回复这条气泡",
+        "placeholder": "回复这段内容…",
+        "remove": "移除引用",
+        "you": "您",
+        "showSource": "跳转到被引用的消息"
+    },
     "context": {
         "usedLabel": "已用上下文：{percent}%",
         "title": "上下文",

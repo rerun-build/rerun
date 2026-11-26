@@ -574,6 +574,7 @@
             "selectMessage": "Select a message",
             "editMessage": "Edit the selected message",
             "regenerateReply": "Regenerate the selected reply",
+            "quoteSelection": "Reply to the selected text",
             "copyMessage": "Copy the selected message",
             "copyMessageLink": "Copy a link to the selected message",
             "deleteMessage": "Delete the selected message",

@@ -470,6 +470,14 @@
         "remove": "Remove",
         "removeLabel": "Remove queued message"
     },
+    "quote": {
+        "reply": "Reply",
+        "replyToBubble": "Reply to this bubble",
+        "placeholder": "Reply to this passage…",
+        "remove": "Remove the quote",
+        "you": "You",
+        "showSource": "Go to the quoted message"
+    },
     "context": {
         "usedLabel": "Context used: {percent}%",
         "title": "Context",

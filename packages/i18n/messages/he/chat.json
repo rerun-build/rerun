@@ -348,6 +348,14 @@
         "remove": "להסיר",
         "removeLabel": "להסיר את ההודעה שבתור"
     },
+    "quote": {
+        "reply": "להשיב",
+        "replyToBubble": "להשיב לבועה הזו",
+        "placeholder": "להשיב לקטע הזה…",
+        "remove": "להסיר את הציטוט",
+        "you": "אתה",
+        "showSource": "למעבר להודעה המצוטטת"
+    },
     "context": {
         "usedLabel": "הקשר בשימוש: {percent}%",
         "title": "הקשר",

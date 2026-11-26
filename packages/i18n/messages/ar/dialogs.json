@@ -484,6 +484,7 @@
             "selectMessage": "تحديد رسالة",
             "editMessage": "تعديل الرسالة المحددة",
             "regenerateReply": "إعادة إنشاء الرد المحدد",
+            "quoteSelection": "الرد على النص المحدد",
             "copyMessage": "نسخ الرسالة المحددة",
             "copyMessageLink": "نسخ رابط الرسالة المحددة",
             "deleteMessage": "حذف الرسالة المحددة",

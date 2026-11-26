@@ -484,6 +484,7 @@
             "selectMessage": "לבחור הודעה",
             "editMessage": "לערוך את ההודעה שנבחרה",
             "regenerateReply": "ליצור מחדש את התשובה שנבחרה",
+            "quoteSelection": "להשיב לטקסט שנבחר",
             "copyMessage": "להעתיק את ההודעה שנבחרה",
             "copyMessageLink": "להעתיק קישור להודעה שנבחרה",
             "deleteMessage": "למחוק את ההודעה שנבחרה",

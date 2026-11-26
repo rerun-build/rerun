@@ -35,6 +35,8 @@ import { VoiceUserMessage } from '@/components/chat/VoiceUserMessage'
 import { WebhookRunBlock } from '@/components/chat/WebhookRunBlock'
 import { ServiceInstalledBlock } from '@/components/services/ServiceInstalledBlock'
 import { PublishedChatCard } from '@/components/published/PublishedChatCard'
+import { QuoteInBubble } from '@/components/chat/quote/QuoteCards'
+import { QuotableBubble } from '@/components/chat/quote/QuotableBubble'
 import { parseAttachments } from '@/lib/chat/attachments-marker'
 import { hitlKindOf, parseHitlReply } from '@/lib/chat-hitl'
 import type { HitlCallPart } from '@/lib/chat/hitl-receipts'
@@ -53,7 +55,7 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, parseJobEnd, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources, type TableCard as TableCardData } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, parseJobEnd, providerSwitchSchema, parseQuote, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources, type TableCard as TableCardData } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -176,15 +178,19 @@ function MessageViewInner({ message, isActive = false, settled = false, isLastAs
     const triggerPayload = message.role === 'user' && !install && !hitlReply && !scheduledRun ? parseTriggerPayload(messageText(message)) : null
     const jobEnd = message.role === 'user' && !install && !hitlReply && !scheduledRun && !triggerPayload ? parseJobEnd(messageText(message)) : null
     const automated = !!scheduledRun || !!triggerPayload || !!jobEnd
-    // A voice message sent with files carries the attachments marker after its voice marker.
-    const attachments = message.role === 'user' && !install && !hitlReply && !automated ? parseAttachments(messageText(message)) : null
-    const voice = message.role === 'user' && !install && !hitlReply && !automated ? parseVoiceMessage(attachments?.text ?? messageText(message)) : null
+    // A reply opens on the passage it quotes; a voice message sent with files carries the attachments
+    // marker after its voice marker.
+    const spoken = message.role === 'user' && !install && !hitlReply && !automated
+    const quoted = spoken ? parseQuote(messageText(message)) : null
+    const body = quoted?.text ?? messageText(message)
+    const attachments = spoken ? parseAttachments(body) : null
+    const voice = spoken ? parseVoiceMessage(attachments?.text ?? body) : null
     const subRuns = pairSubRuns(message.parts, { settled })
     const quickReplies = showQuickReplies && onSendMessage ? quickRepliesOf(message).filter(reply => onDraftReply || quickReplyDraft(reply) === null) : []
     const onStopTask = stopTaskOverride ?? (activeRunId && agentId ? (taskId: string) => void cancelSubRunAction(agentId, activeRunId, taskId) : undefined)
 
     // Files sent without a word: the thumbnails are the whole message, an empty bubble under them would be noise.
-    if (attachments && !attachments.text) {
+    if (attachments && !attachments.text && !quoted) {
         return (
             <Message from={message.role}>
                 <MessageAttachments agentId={agentId} paths={attachments.paths} rawUrlFor={rawUrlFor} readFile={readFile} />
@@ -192,7 +198,7 @@ function MessageViewInner({ message, isActive = false, settled = false, isLastAs
         )
     }
 
-    if (voice) return <VoiceUserMessage voice={voice} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} attachmentPaths={attachments?.paths} createdAt={createdAt} />
+    if (voice) return <VoiceUserMessage voice={voice} quote={quoted?.quote} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} attachmentPaths={attachments?.paths} createdAt={createdAt} />
 
     const renderAssistantSteps = (): AssistantStep[] => {
         const lastPart = message.parts.length - 1
@@ -400,20 +406,32 @@ function MessageViewInner({ message, isActive = false, settled = false, isLastAs
     // A setup block answered: what the user decided, not the reply written for the agent.
     if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} spentMicros={spentMicros} spendRunning={spendRunning} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} onSendMessage={onSendMessage} />
 
+    const userText = attachments ? attachments.text : body
+    const content = (
+        <MessageTimeTooltip createdAt={inkBubble ? createdAt : undefined} side="left">
+            <MessageContent className={cn(USER_BUBBLE_SHAPE, inkBubble && USER_BUBBLE_INK, assistantSteps && assistantLayout && 'overflow-visible')} data-ink={inkBubble || undefined}>
+                {assistantSteps ? (
+                    assistantLayout ? assistantLayout(assistantSteps) : assistantSteps.map(step => <Fragment key={step.key}>{step.node}</Fragment>)
+                ) : message.role === 'user' ? (
+                    <>
+                        {quoted && <QuoteInBubble quote={quoted.quote} />}
+                        {userText && (
+                            <div data-quote-text="user" className="min-w-0">
+                                <ExpandableMessage agentId={agentId} mentions={mentions}>{userText}</ExpandableMessage>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <AgentWorkspaceMessage agentId={agentId}>{messageText(message)}</AgentWorkspaceMessage>
+                )}
+            </MessageContent>
+        </MessageTimeTooltip>
+    )
+
     return (
         <Message from={message.role}>
             {attachments && <MessageAttachments agentId={agentId} paths={attachments.paths} rawUrlFor={rawUrlFor} readFile={readFile} />}
-            <MessageTimeTooltip createdAt={inkBubble ? createdAt : undefined} side="left">
-                <MessageContent className={cn(USER_BUBBLE_SHAPE, inkBubble && USER_BUBBLE_INK, assistantSteps && assistantLayout && 'overflow-visible')} data-ink={inkBubble || undefined}>
-                    {assistantSteps ? (
-                        assistantLayout ? assistantLayout(assistantSteps) : assistantSteps.map(step => <Fragment key={step.key}>{step.node}</Fragment>)
-                    ) : message.role === 'user' ? (
-                        <ExpandableMessage agentId={agentId} mentions={mentions}>{attachments ? attachments.text : messageText(message)}</ExpandableMessage>
-                    ) : (
-                        <AgentWorkspaceMessage agentId={agentId}>{messageText(message)}</AgentWorkspaceMessage>
-                    )}
-                </MessageContent>
-            </MessageTimeTooltip>
+            {inkBubble ? <QuotableBubble side="user">{content}</QuotableBubble> : content}
             {sources.length > 0 && (
                 <Sources>
                     <SourcesTrigger count={sources.length} />

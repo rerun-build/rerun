@@ -318,6 +318,12 @@
         "backToChat": "חזרה לשיחה",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "להשיב לקטע הזה…",
+        "remove": "להסיר את הציטוט",
+        "you": "אתה",
+        "showSource": "למעבר להודעה המצוטטת"
+    },
     "messageActions": {
         "edit": "לערוך",
         "regenerate": "ליצור מחדש",

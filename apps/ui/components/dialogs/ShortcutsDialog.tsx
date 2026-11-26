@@ -9,7 +9,7 @@ import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
-type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'selectMessage' | 'editMessage' | 'regenerateReply' | 'copyMessage' | 'copyMessageLink' | 'deleteMessage' | 'deselectMessage' | 'previousFile' | 'nextFile' | 'zoomIn' | 'zoomOut' | 'fitBoard' | 'fitBox'
+type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'selectMessage' | 'editMessage' | 'regenerateReply' | 'quoteSelection' | 'copyMessage' | 'copyMessageLink' | 'deleteMessage' | 'deselectMessage' | 'previousFile' | 'nextFile' | 'zoomIn' | 'zoomOut' | 'fitBoard' | 'fitBox'
 type Shortcut = { keys: string[]; action: ShortcutAction }
 type ShortcutGroup = { title: 'general' | 'chat' | 'files' | 'board'; shortcuts: Shortcut[] }
 
@@ -34,6 +34,7 @@ function buildGroups(mod: string): ShortcutGroup[] {
                 { keys: ['↑', '↓'], action: 'selectMessage' },
                 { keys: ['E'], action: 'editMessage' },
                 { keys: ['R'], action: 'regenerateReply' },
+                { keys: ['R'], action: 'quoteSelection' },
                 { keys: ['C'], action: 'copyMessage' },
                 { keys: ['L'], action: 'copyMessageLink' },
                 { keys: ['⌫'], action: 'deleteMessage' },

@@ -348,6 +348,14 @@
         "remove": "移除",
         "removeLabel": "移除佇列中的訊息"
     },
+    "quote": {
+        "reply": "回覆",
+        "replyToBubble": "回覆這個泡泡",
+        "placeholder": "回覆這段內容…",
+        "remove": "移除引用",
+        "you": "您",
+        "showSource": "前往被引用的訊息"
+    },
     "context": {
         "usedLabel": "已使用的上下文：{percent}%",
         "title": "上下文",

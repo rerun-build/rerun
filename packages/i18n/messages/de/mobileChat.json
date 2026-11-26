@@ -318,6 +318,12 @@
         "backToChat": "Zurück zur Unterhaltung",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "Auf diese Stelle antworten…",
+        "remove": "Zitat entfernen",
+        "you": "Du",
+        "showSource": "Zur zitierten Nachricht"
+    },
     "messageActions": {
         "edit": "Bearbeiten",
         "regenerate": "Neu generieren",

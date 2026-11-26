@@ -318,6 +318,12 @@
         "backToChat": "العودة إلى المحادثة",
         "brand": "Rerun"
     },
+    "quote": {
+        "placeholder": "رد على هذا المقطع…",
+        "remove": "إزالة الاقتباس",
+        "you": "أنت",
+        "showSource": "الانتقال إلى الرسالة المقتبسة"
+    },
     "messageActions": {
         "edit": "تعديل",
         "regenerate": "إعادة الإنشاء",

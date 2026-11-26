@@ -30,6 +30,8 @@ import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
 import { MessageView } from '@/components/chat/MessageView'
+import { QuoteSelectionPill, useQuoteSelection } from '@/components/chat/quote/QuoteSelectionPill'
+import { QuoteReplyContext, useQuoteReply, type QuoteSide } from '@/components/chat/quote/useQuoteReply'
 import { useMessageActions } from '@/components/chat/message-actions/useMessageActions'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
@@ -66,7 +68,7 @@ import { contextStatsOf } from '@/lib/chat/context-stats'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore, hitlCallKind, isLatestUserMessage, spentAfter } from '@/lib/chat/hitl-receipts'
 import { turnRanOutOfPaidCredit } from '@/lib/chat/paid-data-credit'
-import { authorTurnsOf } from '@/lib/chat/message-author'
+import { authorIdOf, authorShortName, authorTurnsOf, FORMER_MEMBER } from '@/lib/chat/message-author'
 import { splitTurnsAtBreaks, timeBreaksOf } from '@/lib/chat/message-times'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
 import { shouldFlush, shouldKeepQueued } from '@/lib/chat/queued-message'
@@ -82,7 +84,7 @@ import { isClaudePlanOffered, isLifetimePlan } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
-import { COWORKER_STARTER_SUGGESTIONS, ORGANIZATION_AUTHOR_ID, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite, turnOpenerId } from '@rerun/contracts'
+import { COWORKER_STARTER_SUGGESTIONS, ORGANIZATION_AUTHOR_ID, QUOTE_FROM_USER, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite, turnOpenerId } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
@@ -907,6 +909,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         [regenerate, status]
     )
     const stopFollowing = useCallback(() => conversationRef.current?.stopScroll(), [])
+    const focusComposer = useCallback(() => composerRef.current?.focus(), [])
     const messageActions = useMessageActions({ active, agentId, agentName, sessionId, messages, setMessages, replay: replayTurn, busy: status === 'submitted' || status === 'streaming', rootRef: chatRootRef, stopFollowing, inputRef, focusMessageId, arrival, error, clearError })
     // Inline, this arrow would be a new prop on every render and would defeat MessageView's memo
     // for every message of the conversation.
@@ -996,6 +999,18 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     const authorTurns = useMemo(() => splitTurnsAtBreaks(authorTurnsOf(messages), timeBreaks), [messages, timeBreaks])
     const authorIds = useMemo(() => [...new Set(authorTurns.flatMap(turn => (turn.authorId ? [turn.authorId] : [])))], [authorTurns])
     const profileOf = useMemberProfiles(workspace?.id, authorIds)
+    // A passage of the person is theirs; one of another member of a shared conversation is named.
+    const quotedAuthorOf = useCallback(
+        (side: QuoteSide, messageId: string) => {
+            if (side === 'assistant') return agentName
+            const message = messagesRef.current.find(item => item.id === messageId)
+            const messageAuthor = message ? authorIdOf(message) : undefined
+            if (!messageAuthor || messageAuthor === authorId) return QUOTE_FROM_USER
+            return authorShortName(profileOf(messageAuthor) ?? FORMER_MEMBER)
+        },
+        [agentName, authorId, profileOf]
+    )
+    const quoteReply = useQuoteReply({ rootRef: chatRootRef, authorOf: quotedAuthorOf, focusComposer, stopFollowing, conversationKey: sessionId })
 
     const displayedError = runError || (error && !reconnecting) ? unwrapChatError(runError ?? error?.message) : null
     const errorKind = displayedError === null ? null : classifyChatError(displayedError)
@@ -1039,6 +1054,9 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     // going on with the conversation.
     const composerKept = !pendingHitl || pendingHitl.kind === 'feature'
     const footerVisible = composerKept || !!pendingAlert || skillProposals.pinned.length > 0
+    // A quote goes to the composer: none while it is away (a question, the install's gate).
+    const canQuote = active && composerKept && !showInstallGate
+    const quoteSelection = useQuoteSelection({ rootRef: chatRootRef, scroller, enabled: canQuote, onQuote: quoteReply.quoteFrom })
 
     const takeoverAsk = pendingHitl?.kind === 'takeover' ? { callId: pendingHitl.toolCallId, request: pendingTakeover(pendingHitl.input) } : null
     const runOnScreen = useMemo(() => runUsesScreen(messages), [messages])
@@ -1049,128 +1067,131 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
 
     return (
         <FeatureRequestConversationProvider value={featureRequestConversation}>
-            <div ref={chatRootRef} data-chat-scrolled={active && scrollEdges.top > 0 ? '' : undefined} className="relative flex flex-1 flex-col overflow-hidden">
+            <div ref={chatRootRef} data-chat-scrolled={active && scrollEdges.top > 0 ? '' : undefined} data-quote-enabled={canQuote || undefined} className="relative flex flex-1 flex-col overflow-hidden">
                 {header}
                 {/* History lands after mount, as a resize: animating it would scroll the whole
                     conversation in front of the user. Only a reply being written is followed smoothly. */}
-                <Conversation className="flex-1" contextRef={conversationRef} initial="instant" resize={status === 'streaming' || status === 'submitted' ? 'smooth' : 'instant'}>
-                    <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
-                        <ConversationContent className="mx-auto w-full max-w-[var(--chat-column,none)]">
-                            {historyAwaited && <SkeletonChat className="py-2" />}
-                            {threadRows.leading.length > 0 && !historyAwaited && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
-                            {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && (
-                                <ConversationEmptyState>
-                                    <AgentBuddy agentId={agentId} mood={buddyMood} size={96} closesEyesAtRest />
-                                    <div className="space-y-1">
-                                        <h3 className="font-medium text-sm">{t('emptyTitle')}</h3>
-                                        <p className="text-muted-foreground text-sm">{t('emptyDescription')}</p>
-                                    </div>
-                                    <Suggestions className="mt-2 justify-center">
-                                        {COWORKER_STARTER_SUGGESTIONS.map(s => (
-                                            <Suggestion key={s} suggestion={s} onClick={text => sendMessage({ text })} />
-                                        ))}
-                                    </Suggestions>
-                                </ConversationEmptyState>
-                            )}
-                            {authorTurns.map(turn => {
-                                const views = turn.items.map(({ message, index: mi }) => {
-                                    const isLast = mi === messages.length - 1
-                                    const isActive = isLast && (status === 'streaming' || status === 'submitted')
-                                    const hitlCall = hitlCallBefore(messages, mi)
-                                    const spendReply = hitlCallKind(hitlCall) === 'spend'
-                                    const branches = threadBranches(threadRows.after.get(mi))
-                                    const view = messageActions.wrap(
-                                        message,
-                                        <MessageView
-                                            key={message.id}
-                                            message={message}
-                                            isActive={isActive}
-                                            settled={!isLast || !showLoader}
-                                            isLastAssistant={mi === lastAssistant}
-                                            agentId={agentId}
-                                            pendingHitlToolCallId={pendingHitl?.toolCallId}
-                                            pendingMcpSignIn={pendingHitl?.kind === 'mcp' ? pendingMcpSignIn(pendingHitl.input).name : undefined}
-                                            hitlCall={hitlCall}
-                                            spentMicros={spendReply ? spentAfter(messages, mi) : undefined}
-                                            spendRunning={spendReply && (status === 'streaming' || status === 'submitted') && isLatestUserMessage(messages, mi)}
-                                            pendingAlertToolCallId={pendingAlert?.toolCallId ?? undefined}
-                                            activeRunId={activeRunIdRef.current}
-                                            onSendMessage={sendMessage}
-                                            onDraftReply={draftReply}
-                                            showQuickReplies={isLast && !showLoader && !pendingHitl && !pendingAlert && displayedError === null}
-                                            onRegenerate={(isLast && pendingHitl) || messageActions.selectedId === message.id ? undefined : handleRegenerate}
-                                            onRateMessage={sessionId ? messageFeedback.rate : undefined}
-                                            feedbackRating={messageFeedback.votes.get(message.id)?.rating ?? null}
-                                            skillProposals={skillProposals.proposals}
-                                            decidingProposalId={skillProposals.pendingId}
-                                            onDecideProposal={skillProposals.decide}
-                                            pinnedProposalIds={skillProposals.pinnedIds}
-                                            installing={setup?.pending === true}
-                                            mentions={mentionTokens}
-                                            createdAt={messageTimes[mi]}
-                                            paidSources={paidSourcesByTurn.get(message.id)}
-                                        />
-                                    )
-                                    if (!branches?.length) return view
+                <QuoteReplyContext value={canQuote ? quoteReply.context : null}>
+                    <Conversation className="flex-1" contextRef={conversationRef} initial="instant" resize={status === 'streaming' || status === 'submitted' ? 'smooth' : 'instant'}>
+                        <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
+                            <ConversationContent className="mx-auto w-full max-w-[var(--chat-column,none)]">
+                                {historyAwaited && <SkeletonChat className="py-2" />}
+                                {threadRows.leading.length > 0 && !historyAwaited && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
+                                {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && (
+                                    <ConversationEmptyState>
+                                        <AgentBuddy agentId={agentId} mood={buddyMood} size={96} closesEyesAtRest />
+                                        <div className="space-y-1">
+                                            <h3 className="font-medium text-sm">{t('emptyTitle')}</h3>
+                                            <p className="text-muted-foreground text-sm">{t('emptyDescription')}</p>
+                                        </div>
+                                        <Suggestions className="mt-2 justify-center">
+                                            {COWORKER_STARTER_SUGGESTIONS.map(s => (
+                                                <Suggestion key={s} suggestion={s} onClick={text => sendMessage({ text })} />
+                                            ))}
+                                        </Suggestions>
+                                    </ConversationEmptyState>
+                                )}
+                                {authorTurns.map(turn => {
+                                    const views = turn.items.map(({ message, index: mi }) => {
+                                        const isLast = mi === messages.length - 1
+                                        const isActive = isLast && (status === 'streaming' || status === 'submitted')
+                                        const hitlCall = hitlCallBefore(messages, mi)
+                                        const spendReply = hitlCallKind(hitlCall) === 'spend'
+                                        const branches = threadBranches(threadRows.after.get(mi))
+                                        const view = messageActions.wrap(
+                                            message,
+                                            <MessageView
+                                                key={message.id}
+                                                message={message}
+                                                isActive={isActive}
+                                                settled={!isLast || !showLoader}
+                                                isLastAssistant={mi === lastAssistant}
+                                                agentId={agentId}
+                                                pendingHitlToolCallId={pendingHitl?.toolCallId}
+                                                pendingMcpSignIn={pendingHitl?.kind === 'mcp' ? pendingMcpSignIn(pendingHitl.input).name : undefined}
+                                                hitlCall={hitlCall}
+                                                spentMicros={spendReply ? spentAfter(messages, mi) : undefined}
+                                                spendRunning={spendReply && (status === 'streaming' || status === 'submitted') && isLatestUserMessage(messages, mi)}
+                                                pendingAlertToolCallId={pendingAlert?.toolCallId ?? undefined}
+                                                activeRunId={activeRunIdRef.current}
+                                                onSendMessage={sendMessage}
+                                                onDraftReply={draftReply}
+                                                showQuickReplies={isLast && !showLoader && !pendingHitl && !pendingAlert && displayedError === null}
+                                                onRegenerate={(isLast && pendingHitl) || messageActions.selectedId === message.id ? undefined : handleRegenerate}
+                                                onRateMessage={sessionId ? messageFeedback.rate : undefined}
+                                                feedbackRating={messageFeedback.votes.get(message.id)?.rating ?? null}
+                                                skillProposals={skillProposals.proposals}
+                                                decidingProposalId={skillProposals.pendingId}
+                                                onDecideProposal={skillProposals.decide}
+                                                pinnedProposalIds={skillProposals.pinnedIds}
+                                                installing={setup?.pending === true}
+                                                mentions={mentionTokens}
+                                                createdAt={messageTimes[mi]}
+                                                paidSources={paidSourcesByTurn.get(message.id)}
+                                            />
+                                        )
+                                        if (!branches?.length) return view
+                                        return (
+                                            <Fragment key={message.id}>
+                                                {view}
+                                                {branches}
+                                            </Fragment>
+                                        )
+                                    })
+                                    const opening = turn.items[0].index
                                     return (
-                                        <Fragment key={message.id}>
-                                            {view}
-                                            {branches}
+                                        <Fragment key={turn.key}>
+                                            {timeBreaks.has(opening) && <ChatTimeSeparator createdAt={messageTimes[opening]} />}
+                                            {turn.authorId ? <AuthoredGroup author={profileOf(turn.authorId)} relayed={turn.relayed}>{views}</AuthoredGroup> : views}
                                         </Fragment>
                                     )
-                                })
-                                const opening = turn.items[0].index
-                                return (
-                                    <Fragment key={turn.key}>
-                                        {timeBreaks.has(opening) && <ChatTimeSeparator createdAt={messageTimes[opening]} />}
-                                        {turn.authorId ? <AuthoredGroup author={profileOf(turn.authorId)} relayed={turn.relayed}>{views}</AuthoredGroup> : views}
-                                    </Fragment>
-                                )
-                            })}
-                            {pendingHitl && pendingHitl.kind !== 'takeover' && (
-                                <motion.div key={pendingHitl.toolCallId} ref={pendingHitlRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
-                                    {pendingHitl.kind === 'question' && <QuestionForm inline ref={questionFormRef} target={{ kind: 'agent', agentId }} questions={pendingQuestions(pendingHitl.input)} onSend={text => sendMessage({ text })} onCancel={() => dismissHitl(pendingHitl.toolCallId)} textareaRef={inputRef} textareaProps={mentionTextareaProps} />}
-                                    {pendingHitl.kind === 'approval' && <ActionApprovalBlock inline approvals={pendingApprovals(pendingHitl.input)} onSubmit={decisions => sendMessage({ text: serializeApprovalDecisions(decisions) })} />}
-                                    {pendingHitl.kind === 'secret' && agentId && <SecretRequestBlock inline agentId={agentId} sessionId={sessionId ?? null} secrets={pendingSecrets(pendingHitl.input)} reason={typeof pendingHitl.input.reason === 'string' ? pendingHitl.input.reason : undefined} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.secret })} onDismiss={() => dismissHitl(pendingHitl.toolCallId)} />}
-                                    {pendingHitl.kind === 'computer' && <ComputerAccessBlock input={pendingHitl.input} output={pendingHitl.output} onReply={text => sendMessage({ text })} />}
-                                    {pendingHitl.kind === 'feature' && <FeatureRequestBlock request={pendingFeatureRequest(pendingHitl.input)} toolCallId={pendingHitl.toolCallId} onSent={text => sendMessage({ text })} onSkip={() => sendMessage({ text: HITL_CANCELLED.feature })} />}
-                                    {pendingHitl.kind === 'spend' && <SpendRequestBlock input={pendingHitl.input} output={pendingHitl.output} onSubmit={decision => void submitSpend(decision)} />}
-                                    {pendingHitl.kind === 'mcp' && agentId && <McpSignInBlock inline agentId={agentId} {...pendingMcpSignIn(pendingHitl.input)} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.mcp })} />}
-                                    {pendingHitl.kind === 'service' && agentId && <ServiceSuggestionBlock inline agentId={agentId} services={(Array.isArray(pendingHitl.input.services) ? pendingHitl.input.services : []) as { slug: string; reason?: string }[]} onDone={summary => sendMessage({ text: summary })} />}
-                                </motion.div>
-                            )}
-                            {screenShown && (
-                                <ChatScreen
-                                    agentId={agentId}
-                                    active={active}
-                                    site={screenSite(messages, takeoverAsk?.request.url ?? null)}
-                                    takeoverAsk={takeoverAsk}
-                                    onTakeoverDone={summary => sendMessage({ text: summary })}
-                                    onTakeoverSkip={() => sendMessage({ text: HITL_CANCELLED.takeover })}
-                                    scroller={scroller}
-                                    floatingHost={chatRoot}
-                                    arriveRef={takeoverAsk ? pendingHitlRef : undefined}
-                                    fallback={activityLoader}
-                                />
-                            )}
-                            {!screenShown && activityLoader}
-                            {outOfPaidCredit && !showLoader && displayedError === null && (
-                                <Message from="assistant">
-                                    {/* Paid data only runs on Rerun credit: connecting a Claude or ChatGPT plan would not buy it. */}
-                                    <MessageContent>
-                                        <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} />
-                                    </MessageContent>
-                                </Message>
-                            )}
-                            {displayedError !== null && errorKind !== null && (
-                                <Message from="assistant">
-                                    <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={errorKind === 'usage_limit' ? switchModelAndContinue : switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
-                                </Message>
-                            )}
-                        </ConversationContent>
-                    </div>
-                    <ConversationScrollButton pending={pendingCue} />
-                </Conversation>
+                                })}
+                                {pendingHitl && pendingHitl.kind !== 'takeover' && (
+                                    <motion.div key={pendingHitl.toolCallId} ref={pendingHitlRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
+                                        {pendingHitl.kind === 'question' && <QuestionForm inline ref={questionFormRef} target={{ kind: 'agent', agentId }} questions={pendingQuestions(pendingHitl.input)} onSend={text => sendMessage({ text })} onCancel={() => dismissHitl(pendingHitl.toolCallId)} textareaRef={inputRef} textareaProps={mentionTextareaProps} />}
+                                        {pendingHitl.kind === 'approval' && <ActionApprovalBlock inline approvals={pendingApprovals(pendingHitl.input)} onSubmit={decisions => sendMessage({ text: serializeApprovalDecisions(decisions) })} />}
+                                        {pendingHitl.kind === 'secret' && agentId && <SecretRequestBlock inline agentId={agentId} sessionId={sessionId ?? null} secrets={pendingSecrets(pendingHitl.input)} reason={typeof pendingHitl.input.reason === 'string' ? pendingHitl.input.reason : undefined} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.secret })} onDismiss={() => dismissHitl(pendingHitl.toolCallId)} />}
+                                        {pendingHitl.kind === 'computer' && <ComputerAccessBlock input={pendingHitl.input} output={pendingHitl.output} onReply={text => sendMessage({ text })} />}
+                                        {pendingHitl.kind === 'feature' && <FeatureRequestBlock request={pendingFeatureRequest(pendingHitl.input)} toolCallId={pendingHitl.toolCallId} onSent={text => sendMessage({ text })} onSkip={() => sendMessage({ text: HITL_CANCELLED.feature })} />}
+                                        {pendingHitl.kind === 'spend' && <SpendRequestBlock input={pendingHitl.input} output={pendingHitl.output} onSubmit={decision => void submitSpend(decision)} />}
+                                        {pendingHitl.kind === 'mcp' && agentId && <McpSignInBlock inline agentId={agentId} {...pendingMcpSignIn(pendingHitl.input)} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.mcp })} />}
+                                        {pendingHitl.kind === 'service' && agentId && <ServiceSuggestionBlock inline agentId={agentId} services={(Array.isArray(pendingHitl.input.services) ? pendingHitl.input.services : []) as { slug: string; reason?: string }[]} onDone={summary => sendMessage({ text: summary })} />}
+                                    </motion.div>
+                                )}
+                                {screenShown && (
+                                    <ChatScreen
+                                        agentId={agentId}
+                                        active={active}
+                                        site={screenSite(messages, takeoverAsk?.request.url ?? null)}
+                                        takeoverAsk={takeoverAsk}
+                                        onTakeoverDone={summary => sendMessage({ text: summary })}
+                                        onTakeoverSkip={() => sendMessage({ text: HITL_CANCELLED.takeover })}
+                                        scroller={scroller}
+                                        floatingHost={chatRoot}
+                                        arriveRef={takeoverAsk ? pendingHitlRef : undefined}
+                                        fallback={activityLoader}
+                                    />
+                                )}
+                                {!screenShown && activityLoader}
+                                {outOfPaidCredit && !showLoader && displayedError === null && (
+                                    <Message from="assistant">
+                                        {/* Paid data only runs on Rerun credit: connecting a Claude or ChatGPT plan would not buy it. */}
+                                        <MessageContent>
+                                            <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} />
+                                        </MessageContent>
+                                    </Message>
+                                )}
+                                {displayedError !== null && errorKind !== null && (
+                                    <Message from="assistant">
+                                        <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={errorKind === 'usage_limit' ? switchModelAndContinue : switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
+                                    </Message>
+                                )}
+                            </ConversationContent>
+                        </div>
+                        <ConversationScrollButton pending={pendingCue} />
+                    </Conversation>
+                </QuoteReplyContext>
+                {quoteSelection.pending && <QuoteSelectionPill pending={quoteSelection.pending} onReply={quoteSelection.take} />}
                 {messageActions.dialog}
                 <MessageFeedbackDialog open={messageFeedback.dialogOpen} rating={messageFeedback.dialogRating} onOpenChange={messageFeedback.onDialogOpenChange} onSubmit={messageFeedback.submitDetails} />
 
@@ -1214,7 +1235,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                 </motion.div>
                             ) : (
                                 <motion.div key="composer" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden pb-px">
-                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={composerTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
+                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={composerTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} quote={quoteReply.quote} onClearQuote={quoteReply.clear} onShowQuoteSource={quoteReply.showSource} />
                                     <ComposerSubscriptionCta open={!hasOwnConnection} claudePlanOffered={isClaudePlanOffered(workspace)} onClick={connectSubscription} />
                                 </motion.div>
                             )}
