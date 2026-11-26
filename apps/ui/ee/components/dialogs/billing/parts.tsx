@@ -449,7 +449,7 @@ export function PayFooter({
     error,
     children,
 }: {
-    cta: string
+    cta: ReactNode
     footnote?: ReactNode
     onClick?: () => void
     loading?: boolean
