@@ -1,4 +1,4 @@
-type RunHandle = { controller: AbortController; agentId: string; cancel?: () => Promise<void> }
+type RunHandle = { controller: AbortController; agentId: string; script: boolean; cancel?: () => Promise<void> }
 
 const controllers = new Map<string, RunHandle>()
 
@@ -11,9 +11,11 @@ type SessionClaim = { runId: string; claimedAt: number; authorId?: string }
 const sessionClaims = new Map<string, SessionClaim>()
 const claimedSessions = new Map<string, string>()
 
-export function registerRunAbort(runId: string, agentId: string): AbortController {
+// `script`: the run of a script routine. It is live like any other, so an update of the engine waits
+// for it and a cancel finds it, but it runs no model and drives no screen: its coworker stays free.
+export function registerRunAbort(runId: string, agentId: string, { script = false }: { script?: boolean } = {}): AbortController {
     const controller = new AbortController()
-    controllers.set(runId, { controller, agentId })
+    controllers.set(runId, { controller, agentId, script })
     return controller
 }
 
@@ -50,7 +52,7 @@ export function releaseSession(runId: string): void {
 }
 
 export function agentHasLiveRun(agentId: string): boolean {
-    for (const handle of controllers.values()) if (handle.agentId === agentId) return true
+    for (const handle of controllers.values()) if (handle.agentId === agentId && !handle.script) return true
     return false
 }
 

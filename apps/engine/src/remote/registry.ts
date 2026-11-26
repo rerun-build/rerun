@@ -16,6 +16,15 @@ export function onRemoteEvent(listener: EventListener): () => void {
     return () => eventListeners.delete(listener)
 }
 
+type ConnectListener = (computerId: string, connection: RemoteConnection) => void
+const connectListeners = new Set<ConnectListener>()
+
+// A computer that just connected, for whoever left it something to do while it was away.
+export function onRemoteConnect(listener: ConnectListener): () => void {
+    connectListeners.add(listener)
+    return () => connectListeners.delete(listener)
+}
+
 export function liveConnection(computerId: string): RemoteConnection | null {
     const connection = live.get(computerId)
     return connection?.open ? connection : null
@@ -38,6 +47,7 @@ export async function registerConnection(identity: RemoteComputerIdentity, conne
     })
     await recordConnection(identity, { appVersion: connection.appVersion, protocol: connection.protocol, capabilities: [...connection.capabilities], facts: connection.facts, at: connection.connectedAt.toISOString() })
     logger.info({ computerId: identity.id, protocol: connection.protocol, app: connection.appVersion, os: connection.facts.os }, 'remote computer connected')
+    for (const listener of connectListeners) listener(identity.id, connection)
 }
 
 export function viewOf(computer: StoredComputer): RemoteComputerView {

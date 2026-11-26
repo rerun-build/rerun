@@ -157,3 +157,20 @@ describe('session claims', () => {
         releaseSession('run-unsigned')
     })
 })
+
+describe('the run of a script routine', () => {
+    it('counts as a live run and can be aborted, but leaves its coworker free for a run of its own', () => {
+        const before = activeRunCount()
+        const controller = registerRunAbort('script-run', 'agent-script', { script: true })
+        expect(activeRunCount()).toBe(before + 1)
+        expect(agentHasLiveRun('agent-script')).toBe(false)
+
+        registerRunAbort('model-run', 'agent-script')
+        expect(agentHasLiveRun('agent-script')).toBe(true)
+        unregisterRunAbort('model-run')
+
+        expect(abortRun('script-run')).not.toBeNull()
+        expect(controller.signal.aborted).toBe(true)
+        expect(activeRunCount()).toBe(before)
+    })
+})

@@ -6,6 +6,8 @@ import { getAgent } from '../agents/registry.js'
 import { createSession } from '../db/repos/sessions.js'
 import { deleteFiredOneOff, listSchedules, markFired, type Schedule } from '../schedules/loader.js'
 import { buildScheduledRunMessage } from '../schedules/message.js'
+import { fireScript } from '../schedules/script-run.js'
+import { SCRIPT_RUN_SESSION_ID } from '../db/repos/runs.js'
 import { isDue } from '../schedules/cron.js'
 import { sweepMemoriesIfDue } from '../memory/maintenance.js'
 import { maintainBrainIfDue } from '../brain/maintenance.js'
@@ -35,6 +37,14 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
     const agent = await getAgent(agentId)
     if (!agent.config.enabled) throw agentDisabled()
     if (agent.config.kind === 'foreman' && schedule.checkIn) return firePromise(schedule, opts)
+    // A script runs no model and drives no screen: no budget, subscription or busy coworker holds it.
+    if (schedule.kind === 'script') {
+        const { runId, settled } = await fireScript(agent, schedule, opts)
+        const started = { runId, sessionId: SCRIPT_RUN_SESSION_ID }
+        inFlight.set(key, started)
+        void settled.finally(() => inFlight.delete(key))
+        return started
+    }
     // A coworker has one screen, taken by the first of its runs to act on it, which may come well
     // after that run started. A schedule firing beside a live run (a chat, a call from another
     // coworker) would race it for the screen, so it stays due and fires on the tick after that run.

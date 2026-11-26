@@ -1,7 +1,7 @@
 import type { RemoteJob } from '@rerun/contracts'
 import { getSystemDb } from '../systemDb.js'
 
-export type RemoteJobRow = { id: string; computerId: string; sessionId: string; command: string; label: string | null; author: string | null; state: string; exitCode: number | null; startedAt: string; endedAt: string | null; wokeAt: string | null }
+export type RemoteJobRow = { id: string; computerId: string; sessionId: string; command: string; label: string | null; author: string | null; state: string; exitCode: number | null; startedAt: string; endedAt: string | null; wokeAt: string | null; runId: string | null }
 
 const rowOf = (row: Record<string, unknown>): RemoteJobRow => ({
     id: String(row.id),
@@ -15,14 +15,23 @@ const rowOf = (row: Record<string, unknown>): RemoteJobRow => ({
     startedAt: String(row.started_at),
     endedAt: (row.ended_at as string | null) ?? null,
     wokeAt: (row.woke_at as string | null) ?? null,
+    runId: (row.run_id as string | null) ?? null,
 })
 
-export async function recordRemoteJob(agentId: string, sessionId: string, computerId: string, job: RemoteJob): Promise<void> {
+// `runId`: the run of a script routine the job is, which has no conversation to be found by.
+export async function recordRemoteJob(agentId: string, sessionId: string, computerId: string, job: RemoteJob, runId: string | null = null): Promise<void> {
     const { client } = await getSystemDb(agentId)
     await client.execute({
-        sql: 'INSERT OR IGNORE INTO remote_jobs (id, computer_id, session_id, command, label, author, state, exit_code, started_at, ended_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        args: [job.id, computerId, sessionId, job.command, job.label ?? null, job.author ?? null, job.state, job.exitCode, job.startedAt, job.endedAt],
+        sql: 'INSERT OR IGNORE INTO remote_jobs (id, computer_id, session_id, command, label, author, state, exit_code, started_at, ended_at, run_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        args: [job.id, computerId, sessionId, job.command, job.label ?? null, job.author ?? null, job.state, job.exitCode, job.startedAt, job.endedAt, runId],
     })
+}
+
+// The jobs of script routines whose end was never told: still out on their computer.
+export async function listOpenScriptJobs(agentId: string): Promise<Array<RemoteJobRow & { runId: string }>> {
+    const { client } = await getSystemDb(agentId)
+    const result = await client.execute('SELECT * FROM remote_jobs WHERE run_id IS NOT NULL AND ended_at IS NULL')
+    return result.rows.map(row => rowOf(row as unknown as Record<string, unknown>)).flatMap(job => (job.runId ? [{ ...job, runId: job.runId }] : []))
 }
 
 export async function getRemoteJob(agentId: string, jobId: string): Promise<RemoteJobRow | null> {

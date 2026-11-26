@@ -26,7 +26,8 @@ const { writeAgentConfig } = await import('../agents/config-write.js')
 const { agentDir } = await import('../config/paths.js')
 const { insertAgentIndex } = await import('../db/repos/agents.js')
 const { createSession } = await import('../db/repos/sessions.js')
-const { getRun, startRun } = await import('../db/repos/runs.js')
+const { getRun, settleScriptRun, startRun, startScriptRun } = await import('../db/repos/runs.js')
+const { recordRemoteJob, settleRemoteJob } = await import('../db/repos/remote-jobs.js')
 const { reconcileInterruptedRuns } = await import('./reconcile.js')
 const { ensureForeman } = await import('../agents/foreman.js')
 const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')
@@ -97,6 +98,31 @@ describe('reconcileInterruptedRuns', () => {
 
         expect(result.runs).toBe(1)
         expect((await getRun(FOREMAN_AGENT_ID, run.id))?.status).toBe('error')
+    })
+
+    // A script has no conversation: its notification opens its routine, which the hub reads from `script`.
+    it('fails the script a restart cut on the workspace machine, as the run of a script', async () => {
+        const run = await startScriptRun(id, 'sync-prices')
+
+        expect(await reconcileInterruptedRuns()).toMatchObject({ runs: 1, notified: 1 })
+
+        expect((await getRun(id, run.id))?.status).toBe('error')
+        expect(sent.find(n => n.runId === run.id)).toMatchObject({ kind: 'error', sessionId: null, metadata: { script: true, scheduleSlug: 'sync-prices', errorCode: 'engine_restarted' } })
+    })
+
+    // Its job runs on, on a linked computer: the restart interrupted nothing, and its end settles the run.
+    it('leaves alone, and announces nothing of, a script whose job is still out on a linked computer', async () => {
+        const run = await startScriptRun(id, 'nas-backup')
+        await recordRemoteJob(id, '', 'c1', { id: 'job-out', command: 'python3 backup.py', cwd: '/volume1', state: 'running', exitCode: null, startedAt: run.startedAt, endedAt: null }, run.id)
+
+        expect(await reconcileInterruptedRuns()).toMatchObject({ runs: 0, notified: 0 })
+
+        expect((await getRun(id, run.id))?.status).toBe('running')
+        expect(sent).toHaveLength(0)
+
+        // Its end, so the next case starts with no run in flight.
+        await settleRemoteJob(id, { id: 'job-out', command: 'python3 backup.py', cwd: '/volume1', state: 'succeeded', exitCode: 0, startedAt: run.startedAt, endedAt: new Date().toISOString() })
+        await settleScriptRun(id, run.id, { status: 'done', exitCode: 0, output: '', error: null })
     })
 
     it('does nothing when no run was in flight', async () => {

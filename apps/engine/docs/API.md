@@ -62,7 +62,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "schedules.script", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -73,10 +73,10 @@ version the folder is at against the one this build takes it to.
 ```
 
 - `activeAgents` are the agents loaded in memory, `activeRuns` the runs in flight, `claimedSessions`
-  the conversations holding a run (the two should move together), `desktopViewers` the open screen
-  connections.
+  the conversations holding a run (the two should move together, apart from the script of a routine,
+  which is a run in flight with no conversation), `desktopViewers` the open screen connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
-  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
+  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `schedules.script` (a schedule can be a script, `kind: "script"`, see [Script tasks](#script-tasks)), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
   Staff answers every coworker route but what its kind does not do, see above), `messages.edit`
@@ -126,8 +126,8 @@ Both fields are optional. `artifact.url` must be `https`, `sha256` 64 hex charac
 hash; otherwise `400`. Answers:
 
 - `202 { "started": true, "commit": "<current>", "lastUpdate": { ... } }`
-- `200 { "started": false, "reason": "busy", "activeRuns": 1 }` while a run, a screen viewer or a
-  browser takeover is live, unless `force` is true
+- `200 { "started": false, "reason": "busy", "activeRuns": 1 }` while a run (the script of a routine
+  included), a screen viewer or a browser takeover is live, unless `force` is true
 - `200 { "started": false, "reason": "already-updating" }`
 
 ---
@@ -285,7 +285,9 @@ does not check out is acknowledged and wakes no one.
 The computer tells the end (`job.finished`) until it is acknowledged; the engine records it, wakes
 the conversation once (`woke_at`) with a headless run whose trigger is `{ source: 'job' }`, after any
 run in flight and any card waiting for the person, and only then acknowledges it: an engine that
-restarts while it waits hears the end again at the computer's next connection. `GET /remote/computers/:id/jobs`,
+restarts while it waits hears the end again at the computer's next connection. The job of a script
+routine names its run as well (`remote_jobs.run_id`, step 9): its end settles that run and wakes no
+one (see [Script tasks](#script-tasks)). `GET /remote/computers/:id/jobs`,
 `GET /remote/computers/:id/jobs/:jobId` (the last 4 KB of output) and `POST …/:jobId/stop` read and
 stop them from the hub; they answer `409` while the computer is offline. File tools: `remote_file_list`, `remote_file_read` (text up to 100 KB, a binary
 file is described), `remote_file_write` (text), and `remote_transfer` (one file of up to 100 MB between the
@@ -1389,7 +1391,7 @@ table. Each source stops at 20 hits, and the whole search at about 1.5 s, with `
 
 ## Schedules
 
-Scheduled tasks are markdown files (`agents/<id>/schedules/<slug>.md`) scanned from disk by the in-process scheduler every 30 seconds. A task is either **recurring** (`cron`) or **one-shot** (`runAt`). When due, the engine starts a fresh session and runs the task `body` as the agent's instruction, no user message needed. Each fire is recorded in the `runs` table like any other run, and its completion is pushed to the app (see [Notifications](#notifications)).
+Scheduled tasks are markdown files (`agents/<id>/schedules/<slug>.md`) scanned from disk by the in-process scheduler every 30 seconds. A task is either **recurring** (`cron`) or **one-shot** (`runAt`). When due, the engine starts a fresh session and runs the task `body` as the agent's instruction, no user message needed. A **script** (`kind: "script"`) runs its `body` as a shell command instead, with no model and no session (see [Script tasks](#script-tasks)). Each fire is recorded in the `runs` table like any other run, and its completion is pushed to the app (see [Notifications](#notifications)).
 
 ### `GET /agents/:id/schedules`
 
@@ -1415,13 +1417,34 @@ Returns the created schedule `201`. `400` for an invalid cron, `runAt` or time z
 
 A one-shot is disabled when it fires and deleted once its run ends `done`; after a failed or cancelled run, or one that ended on a human-in-the-loop card, it stays, disabled. Its runs stay in the `runs` table either way.
 
+### Script tasks
+
+A schedule with `"kind": "script"` runs its `body` as a shell command, as it is: no model, no session, no credit. `connectionId`, `provider` and `model` are refused on create (`400 A script runs no model`) and dropped on read. Its settings are in `script`:
+
+```json
+{ "name": "Sync prices", "kind": "script", "body": "python3 scripts/sync_prices.py", "cron": "0 */6 * * *", "script": { "runsOn": null, "folder": "shared/scripts", "timeoutSec": 900, "notify": "failures" } }
+```
+
+- `runsOn`: `null` for the workspace machine (default), or a linked computer by its id, its `#handle` or its name; the routine keeps the id, and an unknown computer answers `400`. There it runs as a job, only when the computer is online, takes work without anyone in the chat, and its approval mode lets the program through; otherwise the run fails with the reason.
+- `folder`: where the command starts. On the workspace machine `shared/` (default) or a folder under it, or `workspace/` and a folder under it for the coworker's own files; anything else is `400`. On a computer, a folder of that computer, its working folder when empty.
+- `timeoutSec`: `60`, `300` (default), `900` or `3600`. Past it, the command is stopped with what it started (`SIGTERM`, then `SIGKILL` for whatever is left) and the run fails with exit code `124`. A computer that does not tell the end of its job 60 s after that fails the run too, and its job is stopped again when it reconnects.
+- `notify`: `failures` (default) tells nobody of a run that exits `0`; `always` tells every run.
+
+A script's run is in `runs` with an empty `sessionId`, `triggerSource: "schedule"`, its `exitCode`, and the last 64,000 characters it printed as the `output` of `GET /agents/:id/runs/:rid`. A coworker's `schedule_*` tools set up and change a script too (`schedule_create` with `script`): on the workspace machine only with its `shell` tool on, on a linked computer only with its `remoteComputers` tools on, a command the policy blocks refused, and a computer that will not take it without anyone in the chat named in the answer.
+
+While it runs, a script is a run in flight: `GET /health` counts it in `activeRuns`, `POST /update` answers `busy`, and `POST /agents/:id/runs/:rid/cancel` stops it, the command and everything it started on the workspace machine, the job on a linked computer. Its run ends `cancelled`, with the code and the output it had, and nobody is told of a failure. A computer that is offline when its job is cancelled has it stopped when it reconnects.
+
+A restart of the engine cuts a script on the workspace machine, whose run is closed `error` like any other. A job on a linked computer runs on: its run stays `running`, the engine takes it up again at boot with what is left of its limit, counted from when the run started, and its end settles the run.
+
+A schedule without `kind` is an instruction (`"kind": "instruction"`, `"script": null`).
+
 ### `GET /agents/:id/schedules/:slug`
 
 Return one schedule. `404` if unknown.
 
 ### `PATCH /agents/:id/schedules/:slug`
 
-Update a schedule. Body: any subset of `{ "name"?, "description"?, "body"?, "cron"?, "runAt"?, "timezone"?, "enabled"?, "connectionId"?, "provider"?, "model"? }`. Set `"enabled": false` to pause it without deleting. A new `name` (max 120 characters) is written into the file; the slug does not change.
+Update a schedule. Body: any subset of `{ "name"?, "description"?, "body"?, "cron"?, "runAt"?, "timezone"?, "enabled"?, "connectionId"?, "provider"?, "model"?, "kind"?, "script"? }`. Set `"enabled": false` to pause it without deleting. A new `name` (max 120 characters) is written into the file; the slug does not change.
 
 `model: null` means "whatever the agent runs", which is itself the engine default when the agent picked nothing: the routine follows instead of freezing today's pair. It is what a schedule created without a model gets.
 
@@ -1429,7 +1452,7 @@ An automation that does pin a pair keeps it. When that pair stops being runnable
 
 ### `POST /agents/:id/schedules/:slug/run`
 
-Fires the schedule now, in a fresh session, without touching `lastRunAt`: `202 { "runId", "sessionId" }`.
+Fires the schedule now, in a fresh session, without touching `lastRunAt`: `202 { "runId", "sessionId" }`. A script opens no session: its `sessionId` is `""`.
 A manual run is a deliberate probe: it may clear a paused credit or subscription limit, or show
 the failure again. `409` while the agent's guided setup is pending and the schedule is still off.
 
@@ -1504,12 +1527,14 @@ Every execution (chat, scheduled fire, trigger, a call from another coworker) is
 agent's `runs` table, with each model step in `run_steps` and each tool call in `tool_calls`.
 
 `status` is `running`, `done`, `error` or `cancelled`. A run cut by a restart is closed `error`
-(`interrupted: engine restarted`) at the next boot.
+(`interrupted: engine restarted`) at the next boot, except the script of a routine whose job still runs
+on a linked computer (see [Script tasks](#script-tasks)).
 
 ### `GET /agents/:id/runs`
 
 List runs for an agent, newest first. `?limit=` (default `50`, max `200`), `?session=<sid>`,
-`?status=<status>`.
+`?status=<status>`, `?triggerSlug=<slug>` (the runs of one schedule or trigger). A script's run also
+carries its `exitCode`; the list never carries what it printed.
 
 ```json
 { "runs": [ { "id": "...", "agentId": "abc...", "sessionId": "...", "status": "done", "stepCount": 4, "usageJson": "{\"inputTokens\":1200,\"outputTokens\":340}", "provider": "anthropic", "model": "claude-sonnet-4-6", "triggerSource": "schedule", "triggerSlug": "daily-digest", "costMicros": 1830, "inputTokens": 1200, "outputTokens": 340, "cachedInputTokens": 0, "reasoningTokens": 0, "totalTokens": 1540, "startedAt": "...", "finishedAt": "...", "error": null } ] }
@@ -1518,7 +1543,7 @@ List runs for an agent, newest first. `?limit=` (default `50`, max `200`), `?ses
 ### `GET /agents/:id/runs/:rid`
 
 One run plus its final assistant `output` (the text produced during the run, from the session
-transcript). `404` if the run is unknown or belongs to another agent.
+transcript). For a script's run, `output` is the end of what the command printed. `404` if the run is unknown or belongs to another agent.
 
 To see the full transcript (tool calls included), use the run's `sessionId` with
 `GET /agents/:id/sessions/:sid/messages`.
@@ -1551,7 +1576,8 @@ it shares that number with a model step.
 Stops the run. `{ "ok": true, "aborted": true }`, answered once the stopped turn is stored: the
 conversation keeps what the run had said and done, without the card it had put up. `aborted` is false
 when no live loop held it (a row left over from a restart): the row is closed `cancelled` anyway and
-the app is told, so the conversation does not stay "working".
+the app is told, so the conversation does not stay "working". The run of a script routine is stopped
+the same way: answered once its command, or its job on a linked computer, has ended.
 
 ### `POST /agents/:id/runs/:rid/tasks/:taskId/cancel`
 

@@ -1,8 +1,9 @@
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
-import { failInterruptedRuns, type InterruptedRun } from '../db/repos/runs.js'
+import { failInterruptedRuns, SCRIPT_RUN_SESSION_ID, type InterruptedRun } from '../db/repos/runs.js'
 import { listAgentIndex, resetBusyAgents } from '../db/repos/agents.js'
 import { failInterruptedSkillProposals } from '../db/repos/skill-proposals.js'
 import { systemDbExists } from '../db/systemDb.js'
+import { remoteComputersEnabled } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 import { emitRunTerminal, triggerFromRun } from './run-events.js'
 import { RUN_ERROR_CODES } from './provider-errors.js'
@@ -22,7 +23,7 @@ export async function reconcileInterruptedRuns(now = Date.now()): Promise<Reconc
     const agentIds = [...(await listAgentIndex()).map(agent => agent.id), FOREMAN_AGENT_ID]
     for (const agentId of agentIds) {
         if (!systemDbExists(agentId)) continue
-        for (const run of await failInterruptedRuns(agentId)) interrupted.push({ ...run, agentId })
+        for (const run of await failInterruptedRuns(agentId, { keepOpenScriptJobs: remoteComputersEnabled() })) interrupted.push({ ...run, agentId })
         proposals += await failInterruptedSkillProposals(agentId)
     }
     const agents = await resetBusyAgents()
@@ -42,6 +43,8 @@ export async function reconcileInterruptedRuns(now = Date.now()): Promise<Reconc
             kind: 'error',
             error: 'interrupted: engine restarted',
             errorCode: RUN_ERROR_CODES.engineRestarted,
+            // So its notification opens the routine: a script's run has no conversation.
+            script: run.sessionId === SCRIPT_RUN_SESSION_ID ? { exitCode: null, timedOut: false, notify: 'always' } : undefined,
         })
     }
 

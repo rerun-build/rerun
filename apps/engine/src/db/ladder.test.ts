@@ -124,6 +124,10 @@ describe('sqlite ladders', () => {
               9,
               "run-starter",
             ],
+            [
+              10,
+              "script-run-result",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -337,6 +341,21 @@ describe('system.db v8 to v9', () => {
         expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
         await SYSTEM_DB_MIGRATIONS[8].up(client)
         expect((await client.execute('SELECT id, starter_kind, starter_id FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', starter_kind: null, starter_id: null }])
+    })
+})
+
+describe('system.db v9 to v10', () => {
+    it('adds the exit code and the output of a script run and the run of a job, leaves the runs already there without them, and replays without harm', async () => {
+        const client = freshFile('v9-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 9), 'v9-system.db')
+        expect(await columns(client, 'runs')).not.toContain('exit_code')
+        expect(await columns(client, 'remote_jobs')).not.toContain('run_id')
+        await client.execute("INSERT INTO runs (id, agent_id, session_id, status, started_at) VALUES ('r1', 'a1', 's1', 'done', '2026-11-26T00:00:00.000Z')")
+        await migrateSystemDb(client, 'v9-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[9].up(client)
+        expect((await client.execute('SELECT id, exit_code, script_output FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', exit_code: null, script_output: null }])
+        expect(await columns(client, 'remote_jobs')).toContain('run_id')
     })
 })
 

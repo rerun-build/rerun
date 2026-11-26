@@ -49,6 +49,8 @@ describe('reading a schedule file', () => {
             provider: null,
             model: null,
             checkIn: false,
+            kind: 'instruction',
+            script: null,
             body: 'Do the thing.',
             createdAt: '',
         })
@@ -272,5 +274,45 @@ describe('concurrent writes', () => {
         await writeFile(scheduleFile(id, 'daily'), '')
         await expect(markFired(id, 'daily', '2026-10-16T09:00:00.000Z')).rejects.toThrow(/front matter/)
         expect(await readFile(scheduleFile(id, 'daily'), 'utf8')).toBe('')
+    })
+})
+
+describe('a script routine', () => {
+    it('keeps its command and settings across a write and a read, and runs no model', async () => {
+        await writeSchedule(id, { name: 'Sync prices', body: 'python3 scripts/sync_prices.py', cron: '0 */6 * * *', kind: 'script', script: { runsOn: null, folder: 'shared/scripts', timeoutSec: 900, notify: 'always' }, provider: 'anthropic', model: 'claude-opus-4-8' })
+        const raw = await readFile(scheduleFile(id, 'sync-prices'), 'utf8')
+        expect(raw).toContain('kind: script')
+        expect(raw).toContain('timeoutSec: 900')
+        expect(await readSchedule(id, 'sync-prices')).toMatchObject({
+            kind: 'script',
+            script: { runsOn: null, folder: 'shared/scripts', timeoutSec: 900, notify: 'always' },
+            body: 'python3 scripts/sync_prices.py',
+            provider: null,
+            model: null,
+            connectionId: null,
+        })
+    })
+
+    it('fills the defaults a sparse script file leaves out, and drops a timeout it does not offer', async () => {
+        await rawSchedule('bare-script', 'kind: script\ncron: 0 9 * * *\ntimeoutSec: 7', 'ls')
+        expect((await readSchedule(id, 'bare-script')).script).toEqual({ runsOn: null, folder: 'shared/', timeoutSec: 300, notify: 'failures' })
+    })
+
+    it('keeps the computer a script runs on when another of its settings is not offered any more', async () => {
+        await rawSchedule('nas-backup', 'kind: script\ncron: 0 2 * * *\nrunsOn: pc-1\nfolder: /volume1\ntimeoutSec: 7\nnotify: always', 'rsync -a a b')
+        expect((await readSchedule(id, 'nas-backup')).script).toEqual({ runsOn: 'pc-1', folder: '/volume1', timeoutSec: 300, notify: 'always' })
+    })
+
+    it('leaves the file of an instruction as it was, without any script key', async () => {
+        await writeSchedule(id, { name: 'Brief', body: 'Write the brief.', cron: '0 8 * * *' })
+        const raw = await readFile(scheduleFile(id, 'brief'), 'utf8')
+        expect(raw).not.toMatch(/kind|runsOn|timeoutSec|notify/)
+    })
+
+    it('turns back into an instruction without its script settings', async () => {
+        await writeSchedule(id, { name: 'Sync', body: 'ls', cron: '0 9 * * *', kind: 'script' })
+        const next = await updateScheduleAt(id, 'sync', { kind: 'instruction', body: 'List the files.' })
+        expect(next).toMatchObject({ kind: 'instruction', script: null, body: 'List the files.' })
+        expect(await readFile(scheduleFile(id, 'sync'), 'utf8')).not.toContain('kind:')
     })
 })

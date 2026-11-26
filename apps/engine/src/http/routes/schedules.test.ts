@@ -7,6 +7,12 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-schedules-'))
 process.env.RERUN_API_KEY = ''
 process.env.RERUN_HUB_BASE_URL = ''
 
+const computers = vi.hoisted(() => ({ views: [{ id: 'c1', handle: 'synology', name: 'Synology' }] as unknown[] }))
+vi.mock('../../remote/registry.js', async importOriginal => ({
+    ...(await importOriginal<typeof import('../../remote/registry.js')>()),
+    listComputerViews: async () => computers.views,
+}))
+
 const fired = vi.hoisted(() => [] as { agentId: string; slug: string; opts: unknown }[])
 
 vi.mock('../../runtime/scheduler.js', async importOriginal => ({
@@ -157,6 +163,28 @@ describe('PATCH a schedule', () => {
     it('keeps the cron when a runAt is added', async () => {
         await create({ name: 'Both timings', body: 'x', cron: '0 9 * * *' })
         expect(await patch('both-timings', { runAt: '2030-01-01T09:00:00.000Z' })).toMatchObject({ cron: '0 9 * * *', runAt: '2030-01-01T09:00:00.000Z' })
+    })
+})
+
+describe('a script on a linked computer', () => {
+    const script = (runsOn: string) => ({ runsOn, folder: '', timeoutSec: 300, notify: 'failures' })
+
+    it('names its computer by #handle, name or id, and keeps the id', async () => {
+        const created = (await create({ name: 'Nas backup', body: 'python3 backup.py', cron: '0 2 * * *', kind: 'script', script: script('#synology') })) as Schedule & { script: { runsOn: string } }
+        expect(created.script.runsOn).toBe('c1')
+        expect(((await patch('nas-backup', { script: script('Synology') })) as Schedule & { script: { runsOn: string } }).script.runsOn).toBe('c1')
+    })
+
+    it('refuses a computer nobody linked', async () => {
+        expect((await send('POST', '', { name: 'Studio', body: 'python3 x.py', cron: '0 2 * * *', kind: 'script', script: script('#studio') })).status).toBe(400)
+    })
+
+    it('keeps a computer unlinked since, when the routine already ran there', async () => {
+        await create({ name: 'Old nas', body: 'python3 x.py', cron: '0 2 * * *', kind: 'script', script: script('c1') })
+        computers.views = []
+        expect((await send('PATCH', '/old-nas', { name: 'Old NAS', script: script('c1') })).status).toBe(200)
+        expect((await send('PATCH', '/old-nas', { script: script('#studio') })).status).toBe(400)
+        computers.views = [{ id: 'c1', handle: 'synology', name: 'Synology' }]
     })
 })
 

@@ -264,6 +264,12 @@ const RUN_CHECKIN_COLUMNS = ['checkin_json TEXT']
 // from before this step, which the usage dashboard shows as not recorded.
 const RUN_STARTER_COLUMNS = ['starter_kind TEXT', 'starter_id TEXT']
 
+// What a script routine's run ended with: its exit code and the end of what it printed.
+const RUN_SCRIPT_COLUMNS = ['exit_code INTEGER', 'script_output TEXT']
+
+// The run of a script routine a job on a linked computer is: that run has no conversation to find it by.
+const REMOTE_JOB_RUN_COLUMNS = ['run_id TEXT']
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -331,6 +337,14 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'run-starter',
         up: async client => {
             await ensureColumns(client, 'runs', RUN_STARTER_COLUMNS)
+        },
+    },
+    {
+        version: 10,
+        id: 'script-run-result',
+        up: async client => {
+            await ensureColumns(client, 'runs', RUN_SCRIPT_COLUMNS)
+            await ensureColumns(client, 'remote_jobs', REMOTE_JOB_RUN_COLUMNS)
         },
     },
 ]

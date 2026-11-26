@@ -57,6 +57,9 @@ export const runs = sqliteTable('runs', {
     startedAt: text('started_at').notNull(),
     finishedAt: text('finished_at'),
     error: text('error'),
+    // A run of a script routine: see `schedules/script-run.ts`.
+    exitCode: integer('exit_code'),
+    scriptOutput: text('script_output'),
 })
 
 export const runSteps = sqliteTable('run_steps', {

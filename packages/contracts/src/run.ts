@@ -22,6 +22,8 @@ export const runSchema = z.object({
     startedAt: z.string(),
     finishedAt: z.string().nullable(),
     error: z.string().nullable(),
+    // Set on a run of a script routine once it ended with a code; absent on an engine without them.
+    exitCode: z.number().int().nullable().optional(),
 })
 export type Run = z.infer<typeof runSchema>
 

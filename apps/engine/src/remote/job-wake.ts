@@ -22,22 +22,24 @@ import { productText } from '../brand/brand.js'
 // once the wake is delivered: until then it tells it again, at each connection too, so an engine
 // that restarts while it waits picks the end up where it left it.
 
-export type JobContext = { agentId: string; sessionId: string }
+// `runId` names the run of a script routine the job is: its end settles that run, and wakes nobody.
+export type JobContext = { agentId: string; sessionId: string; runId?: string }
 
-const signedPart = (computerId: string, context: JobContext) => `${computerId}\n${context.agentId}\n${context.sessionId}`
+// The run is signed only when there is one, so a job started before script routines still reads.
+const signedPart = (computerId: string, context: JobContext) => `${computerId}\n${context.agentId}\n${context.sessionId}${context.runId ? `\n${context.runId}` : ''}`
 
 // Signed with the box key for the one computer it is handed to: a computer cannot name a
 // conversation the engine never started a job from on it. A box without a key signs nothing, like
 // its tickets (`lib/signed-ticket.ts`).
 export function jobContext(context: JobContext, computerId: string, key: string | undefined = env().RERUN_API_KEY): string {
-    return JSON.stringify({ a: context.agentId, s: context.sessionId, ...(key ? { m: signatureOf(key, signedPart(computerId, context)) } : {}) })
+    return JSON.stringify({ a: context.agentId, s: context.sessionId, ...(context.runId ? { r: context.runId } : {}), ...(key ? { m: signatureOf(key, signedPart(computerId, context)) } : {}) })
 }
 
 export function readJobContext(raw: string | undefined, computerId: string, key: string | undefined = env().RERUN_API_KEY): JobContext | null {
     try {
-        const parsed = JSON.parse(raw ?? '') as { a?: unknown; s?: unknown; m?: unknown }
+        const parsed = JSON.parse(raw ?? '') as { a?: unknown; s?: unknown; r?: unknown; m?: unknown }
         if (typeof parsed.a !== 'string' || typeof parsed.s !== 'string') return null
-        const context = { agentId: parsed.a, sessionId: parsed.s }
+        const context: JobContext = { agentId: parsed.a, sessionId: parsed.s, ...(typeof parsed.r === 'string' ? { runId: parsed.r } : {}) }
         if (key && !signedWith(key, signedPart(computerId, context), typeof parsed.m === 'string' ? parsed.m : undefined)) return null
         return context
     } catch {
@@ -85,7 +87,9 @@ async function conversationBusy(agentId: string, sessionId: string): Promise<boo
     return findPendingHitl(messages) !== null
 }
 
-export type WakeDeps = { pollMs?: number; giveUpMs?: number; start?: typeof startHeadlessRun }
+export type ScriptJobSettler = (context: JobContext & { runId: string }, job: RemoteJob, connection: RemoteConnection) => Promise<void>
+
+export type WakeDeps = { pollMs?: number; giveUpMs?: number; start?: typeof startHeadlessRun; settleScript?: ScriptJobSettler }
 
 async function wakeWhenFree(context: JobContext, message: string, trigger: { computer: string; jobId: string }, deps: WakeDeps): Promise<void> {
     const deadline = Date.now() + (deps.giveUpMs ?? GIVE_UP_MS)
@@ -114,9 +118,10 @@ export async function handleJobFinished(computerId: string, job: RemoteJob, conn
     delivering.add(key)
     try {
         const known = await getRemoteJob(context.agentId, job.id)
-        if (!known) await recordRemoteJob(context.agentId, context.sessionId, computerId, job)
+        if (!known) await recordRemoteJob(context.agentId, context.sessionId, computerId, job, context.runId ?? null)
         await settleRemoteJob(context.agentId, job)
-        if (!known?.wokeAt) {
+        if (context.runId) await deps.settleScript?.({ ...context, runId: context.runId }, job, connection)
+        else if (!known?.wokeAt) {
             const tail = await connection
                 .call('job.logs', { jobId: job.id, tailBytes: TAIL_BYTES }, { timeoutMs: 10_000 })
                 .then(logs => logs.output)

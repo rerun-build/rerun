@@ -45,6 +45,10 @@ export const ENGINE_CAPABILITY_DESKTOP = 'desktop'
 // A schedule's PATCH takes a new `name` and writes it into the schedule's own file, its slug unchanged.
 export const ENGINE_CAPABILITY_SCHEDULE_RENAME = 'schedules.rename'
 
+// A schedule can be a script (`kind: 'script'`): it runs its body as a shell command, with no model.
+// An engine without it drops `kind` and would keep the command as an instruction for the model.
+export const ENGINE_CAPABILITY_SCRIPT_ROUTINES = 'schedules.script'
+
 // `POST /update` takes a prebuilt artifact (`{ artifact: { url, sha256, commit } }`) instead of pulling and building.
 export const ENGINE_CAPABILITY_ARTIFACT_UPDATE = 'update.artifact'
 

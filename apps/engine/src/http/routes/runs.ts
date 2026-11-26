@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { aggregateUsageByDay, cancelRun, getRun, listRunsByAgent } from '../../db/repos/runs.js'
+import { aggregateUsageByDay, cancelRun, getRun, listRunsByAgent, SCRIPT_RUN_SESSION_ID } from '../../db/repos/runs.js'
 import { listRunSteps, listToolCalls } from '../../db/repos/telemetry.js'
 import { collectAssistantText } from '../../db/repos/messages.js'
 import { resumeStreamResponse } from '../../runtime/stream.js'
@@ -76,7 +76,8 @@ runRoutes.get('/', async c => {
     const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 200) : 50
     const sessionId = c.req.query('session') || undefined
     const status = c.req.query('status') || undefined
-    return c.json({ runs: await listRunsByAgent(agentId, { limit, sessionId, status }) })
+    const triggerSlug = c.req.query('triggerSlug') || undefined
+    return c.json({ runs: await listRunsByAgent(agentId, { limit, sessionId, status, triggerSlug }) })
 })
 
 runRoutes.get('/:rid/steps', async c => {
@@ -100,6 +101,8 @@ runRoutes.get('/:rid', async c => {
     const rid = c.req.param('rid')
     const run = await getRun(agentId, rid)
     if (!run || run.agentId !== agentId) return c.json({ error: 'run not found' }, 404)
-    const output = await collectAssistantText(agentId, run.sessionId, run.startedAt, run.finishedAt)
-    return c.json({ ...run, output })
+    const { scriptOutput, ...row } = run
+    // A script run has no conversation: what it printed is its output.
+    const output = run.sessionId === SCRIPT_RUN_SESSION_ID ? scriptOutput : await collectAssistantText(agentId, run.sessionId, run.startedAt, run.finishedAt)
+    return c.json({ ...row, output })
 })

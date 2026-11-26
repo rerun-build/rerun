@@ -3,6 +3,7 @@ import type { RunErrorCode } from './provider-errors.js'
 import type { RunTrigger } from './context.js'
 import { settleCheckin } from '../checkins/settle.js'
 import { parseCheckinLog } from '../checkins/log.js'
+import type { ScriptNotify } from '@rerun/contracts'
 
 const FINAL_TEXT_MAX = 2000
 
@@ -25,6 +26,8 @@ export type RunTerminal = {
     provider?: string
     model?: string
     costMicros?: number | null
+    // The run of a script routine, which has no session and no model.
+    script?: { exitCode: number | null; timedOut: boolean; notify: ScriptNotify }
 }
 
 // A stored run only keeps the trigger's slug, not its display name; the slug is the best label
@@ -87,6 +90,13 @@ export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     if (trigger.source === 'chat' && trigger.author) metadata.authorId = trigger.author.id
     if (terminal.error) metadata.error = terminal.error
     if (terminal.errorCode) metadata.errorCode = terminal.errorCode
+    if (terminal.script) {
+        metadata.script = true
+        metadata.exitCode = terminal.script.exitCode
+        metadata.timedOut = terminal.script.timedOut
+        // Still sent, so the hub closes the failure it may have open on this routine, but nobody is told.
+        if (terminal.kind === 'done' && terminal.script.notify === 'failures') metadata.quiet = true
+    }
     // The hub classifies a notification as interactive or scheduled from the top-level `source`,
     // and without it every failing cron was read as an interactive run: the "Scheduled tasks"
     // preference silenced nothing and the errors arrived under the wrong switch. `chat` is not a
@@ -94,5 +104,5 @@ export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     // so an interactive run stays null.
     // A run woken by the end of a job on a computer goes on a conversation someone had: it reads as one.
     const source = routine ? trigger.source : null
-    await sendNotification({ event, kind: terminal.kind, agentId: terminal.agentId, sessionId: terminal.sessionId, runId: terminal.runId, message, source, metadata }).catch(() => {})
+    await sendNotification({ event, kind: terminal.kind, agentId: terminal.agentId, sessionId: terminal.sessionId || null, runId: terminal.runId, message, source, metadata }).catch(() => {})
 }

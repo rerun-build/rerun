@@ -1,7 +1,7 @@
 import { readFile, readdir, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import matter from 'gray-matter'
-import { providerSchema, type MessageAuthor, type Provider } from '@rerun/contracts'
+import { providerSchema, scheduleScriptSchema, type MessageAuthor, type Provider, type ScheduleKind, type ScheduleScript } from '@rerun/contracts'
 import { scheduleFile, schedulesDir } from '../config/paths.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import { nowIso, slugify } from '../lib/ids.js'
@@ -23,6 +23,9 @@ export type Schedule = {
     // A routine the Chief of Staff set itself to come back to something: it fires as a check-in,
     // which reads and speaks only when there is something to say.
     checkIn: boolean
+    // A script runs `body` as a shell command, with no model: see `script-run.ts`.
+    kind: ScheduleKind
+    script: ScheduleScript | null
     body: string
     createdAt: string
 }
@@ -39,6 +42,8 @@ export type ScheduleInput = {
     provider?: Provider | null
     model?: string | null
     checkIn?: boolean
+    kind?: ScheduleKind
+    script?: ScheduleScript | null
 }
 
 const PROVIDERS: Provider[] = providerSchema.options
@@ -51,10 +56,29 @@ function toProvider(value: unknown): Provider | null {
     return typeof value === 'string' && (PROVIDERS as string[]).includes(value) ? (value as Provider) : null
 }
 
+// Field by field: one value the engine no longer offers falls back on its own, and never sends a
+// script meant for a linked computer to the workspace machine.
+function toScript(data: Record<string, unknown>): ScheduleScript {
+    const { shape } = scheduleScriptSchema
+    const field = <K extends keyof typeof shape>(key: K, value: unknown) => {
+        const parsed = shape[key].safeParse(value ?? undefined)
+        return (parsed.success ? parsed.data : shape[key].parse(undefined)) as ScheduleScript[K]
+    }
+    return { runsOn: field('runsOn', str(data.runsOn)), folder: field('folder', data.folder), timeoutSec: field('timeoutSec', data.timeoutSec), notify: field('notify', data.notify) }
+}
+
+// A script runs no model and is never a check-in: whatever an older file or a caller says about those
+// is dropped, and an instruction keeps no script settings.
+function normalized(schedule: Schedule): Schedule {
+    if (schedule.kind !== 'script') return { ...schedule, script: null }
+    return { ...schedule, script: schedule.script ?? scheduleScriptSchema.parse({}), connectionId: null, provider: null, model: null, checkIn: false }
+}
+
 function toSchedule(slug: string, raw: string): Schedule {
     const parsed = matter(raw)
     const data = parsed.data as Record<string, unknown>
-    return {
+    const kind: ScheduleKind = data.kind === 'script' ? 'script' : 'instruction'
+    return normalized({
         slug,
         name: typeof data.name === 'string' ? data.name : slug,
         description: typeof data.description === 'string' ? data.description : '',
@@ -67,9 +91,11 @@ function toSchedule(slug: string, raw: string): Schedule {
         provider: toProvider(data.provider),
         model: str(data.model),
         checkIn: data.checkIn === true,
+        kind,
+        script: kind === 'script' ? toScript(data) : null,
         body: parsed.content.trim(),
         createdAt: typeof data.createdAt === 'string' ? data.createdAt : '',
-    }
+    })
 }
 
 function serialize(schedule: Schedule): string {
@@ -86,6 +112,9 @@ function serialize(schedule: Schedule): string {
         model: schedule.model,
         // Written only when set, so every other routine keeps the file it had.
         ...(schedule.checkIn ? { checkIn: true } : {}),
+        ...(schedule.kind === 'script' && schedule.script
+            ? { kind: 'script', runsOn: schedule.script.runsOn, folder: schedule.script.folder, timeoutSec: schedule.script.timeoutSec, notify: schedule.script.notify }
+            : {}),
         createdAt: schedule.createdAt,
     })
 }
@@ -134,7 +163,7 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
     const slug = slugify(input.name)
     const { schedule, created } = await withScheduleLock(agentId, slug, async () => {
         const existing = scheduleExists(agentId, slug) ? await readScheduleForUpdate(agentId, slug) : null
-        const next: Schedule = {
+        const next: Schedule = normalized({
             slug,
             name: input.name,
             description: input.description ?? existing?.description ?? '',
@@ -149,9 +178,11 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
             provider: input.provider !== undefined ? input.provider : (existing?.provider ?? null),
             model: input.model !== undefined ? input.model : (existing?.model ?? null),
             checkIn: input.checkIn ?? existing?.checkIn ?? false,
+            kind: input.kind ?? existing?.kind ?? 'instruction',
+            script: input.script !== undefined ? input.script : (existing?.script ?? null),
             body: input.body,
             createdAt: existing?.createdAt || nowIso(),
-        }
+        })
         await mkdir(schedulesDir(agentId), { recursive: true })
         await writeFileAtomic(scheduleFile(agentId, slug), serialize(next))
         return { schedule: next, created: !existing }
@@ -163,7 +194,7 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
     return schedule
 }
 
-export type SchedulePatch = Partial<Pick<Schedule, 'name' | 'description' | 'body' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'connectionId' | 'provider' | 'model'>>
+export type SchedulePatch = Partial<Pick<Schedule, 'name' | 'description' | 'body' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'connectionId' | 'provider' | 'model' | 'kind' | 'script'>>
 
 // Edits the file at its own slug. `name` is only the label: the slug, and with it the file, the run
 // history and the hub's references, stay what they were when the schedule was created.
@@ -171,7 +202,7 @@ export async function updateScheduleAt(agentId: string, slug: string, patch: Sch
     return withScheduleLock(agentId, slug, async () => {
         const current = await readScheduleForUpdate(agentId, slug)
         const defined = Object.fromEntries(Object.entries(patch).filter(([, value]) => value !== undefined)) as SchedulePatch
-        const next: Schedule = { ...current, ...defined }
+        const next = normalized({ ...current, ...defined })
         await writeFileAtomic(scheduleFile(agentId, slug), serialize(next))
         return next
     })
