@@ -9,15 +9,12 @@ import { attachVaultPaidAccountAction, detachVaultPaidAccountAction } from '@/ap
 import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
 import type { VaultListing } from '@/app/api/_services/vault.service'
 import { AppIcon } from '@/components/apps/PaidAppViews'
-import { Group } from '@/components/connections/AiProvidersPanel'
 import { Button } from '@/components/ui/button'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { PanelRow } from '@/components/ui/panel-row'
-import { Switch } from '@/components/ui/switch'
-import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useErrorText } from '@/hooks/useErrorText'
 import { appInfo } from '@/lib/apps/catalog'
 import { ChevronLeftIcon } from '@/lib/icons'
+import { VaultCoworkersGroup } from './VaultCoworkersGroup'
 
 type Props = { account: VaultPaidAccount; listing: VaultListing; onBack: () => void; onChanged: () => Promise<void> }
 
@@ -26,15 +23,14 @@ type Props = { account: VaultPaidAccount; listing: VaultListing; onBack: () => v
 export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: Props) {
     const t = useTranslations('vault')
     const errorText = useErrorText()
-    const [busy, setBusy] = useState<string | null>(null)
-    const coworkers = listing.coworkers
+    const [busy, setBusy] = useState(false)
 
     const toggle = async (agentId: string, on: boolean) => {
-        setBusy(agentId)
+        setBusy(true)
         const res = on ? await attachVaultPaidAccountAction(account.slug, account.connectionId, agentId) : await detachVaultPaidAccountAction(account.slug, account.connectionId, agentId)
         if (!res.ok) toast.error(errorText(res, t('errors.changeFailed')))
         await onChanged()
-        setBusy(null)
+        setBusy(false)
     }
 
     return (
@@ -54,31 +50,15 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
             <PanelScroller className="space-y-6 p-4">
                 <p className="text-xs text-muted-foreground">{t('paid.managedInApp', { provider: appInfo(account.slug).providerLabel })}</p>
 
-                <Group title={t('detail.coworkers')}>
-                    <TooltipDisabledReason reason={t('reasons.paidAppEveryone')} className="flex w-full">
-                        <PanelRow title={t('detail.everyone')} description={t('detail.everyoneHint')} actions={<Switch checked={false} disabled aria-label={t('detail.everyone')} />} />
-                    </TooltipDisabledReason>
-                    {coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
-                    {coworkers.map(coworker => {
-                        const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
-                        return (
-                            <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">
-                                <PanelRow
-                                    title={coworker.name}
-                                    actions={
-                                        <Switch
-                                            checked={account.agentIds.includes(coworker.id)}
-                                            disabled={!!reason || busy !== null}
-                                            aria-label={coworker.name}
-                                            onCheckedChange={checked => void toggle(coworker.id, checked)}
-                                        />
-                                    }
-                                />
-                            </TooltipDisabledReason>
-                        )
-                    })}
-                    {account.hiddenAgents > 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.hiddenCoworkers', { count: account.hiddenAgents })}</p>}
-                </Group>
+                <VaultCoworkersGroup
+                    coworkers={listing.coworkers}
+                    isOn={coworker => account.agentIds.includes(coworker.id)}
+                    onToggle={(coworker, on) => void toggle(coworker.id, on)}
+                    everyone={false}
+                    everyoneReason={t('reasons.paidAppEveryone')}
+                    hiddenCoworkers={account.hiddenAgents}
+                    busy={busy}
+                />
             </PanelScroller>
         </div>
     )

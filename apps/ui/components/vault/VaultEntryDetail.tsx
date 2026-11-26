@@ -19,13 +19,12 @@ import { openPendingSignInPopup } from '@/components/services/sign-in-popup'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { PanelRow } from '@/components/ui/panel-row'
 import { Spinner } from '@/components/ui/spinner'
-import { Switch } from '@/components/ui/switch'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useErrorText } from '@/hooks/useErrorText'
 import { ChevronLeftIcon, PencilIcon, Trash2Icon } from '@/lib/icons'
 import type { AuthMethodSummary } from '@/lib/services/types'
+import { VaultCoworkersGroup } from './VaultCoworkersGroup'
 import { VaultStatusBadge } from './VaultPanel'
 import { vaultSetupDriver } from './vault-setup-driver'
 
@@ -35,18 +34,17 @@ type Props = { entry: VaultEntryView; listing: VaultListing; icon: ReactNode; on
 export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Props) {
     const t = useTranslations('vault')
     const errorText = useErrorText()
-    const [busy, setBusy] = useState<string | null>(null)
+    const [busy, setBusy] = useState(false)
     const [signingIn, setSigningIn] = useState(false)
 
-    const run = async (key: string, action: () => Promise<{ ok: true } | { ok: false; error: string; code?: string }>) => {
-        setBusy(key)
+    const run = async (action: () => Promise<{ ok: true } | { ok: false; error: string; code?: string }>) => {
+        setBusy(true)
         const res = await action()
         if (!res.ok) toast.error(errorText(res as never, t('errors.changeFailed')))
         await onChanged()
-        setBusy(null)
+        setBusy(false)
     }
 
-    const attached = (engineAgentId: string) => entry.sharedWithAll || entry.agentIds.includes(engineAgentId)
     const everyoneReason = !listing.isAdmin ? t('reasons.adminOnly') : entry.app ? t('reasons.paidAppEveryone') : undefined
 
     return (
@@ -70,43 +68,16 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
             <PanelScroller className="space-y-6 p-4">
                 <SignInSection entry={entry} canAdd={listing.canAdd} signingIn={signingIn} onSigningIn={setSigningIn} onChanged={onChanged} />
 
-                <Group title={t('detail.coworkers')}>
-                    <TooltipDisabledReason reason={everyoneReason} className="flex w-full">
-                        <PanelRow
-                            title={t('detail.everyone')}
-                            description={t('detail.everyoneHint')}
-                            actions={
-                                <Switch
-                                    checked={entry.sharedWithAll}
-                                    disabled={!!everyoneReason || busy !== null}
-                                    aria-label={t('detail.everyone')}
-                                    onCheckedChange={checked => void run('everyone', () => shareVaultEntryAction(entry.id, checked))}
-                                />
-                            }
-                        />
-                    </TooltipDisabledReason>
-                    {listing.coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
-                    {listing.coworkers.map(coworker => {
-                        const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
-                        const on = attached(coworker.engineAgentId)
-                        return (
-                            <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">
-                                <PanelRow
-                                    title={coworker.name}
-                                    actions={
-                                        <Switch
-                                            checked={on}
-                                            disabled={!!reason || entry.sharedWithAll || busy !== null}
-                                            aria-label={coworker.name}
-                                            onCheckedChange={checked => void run(coworker.id, () => (checked ? attachVaultEntryAction(entry.id, coworker.id) : detachVaultEntryAction(entry.id, coworker.id)))}
-                                        />
-                                    }
-                                />
-                            </TooltipDisabledReason>
-                        )
-                    })}
-                    {entry.hiddenCoworkers > 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.hiddenCoworkers', { count: entry.hiddenCoworkers })}</p>}
-                </Group>
+                <VaultCoworkersGroup
+                    coworkers={listing.coworkers}
+                    isOn={coworker => entry.sharedWithAll || entry.agentIds.includes(coworker.engineAgentId)}
+                    onToggle={(coworker, on) => void run(() => (on ? attachVaultEntryAction(entry.id, coworker.id) : detachVaultEntryAction(entry.id, coworker.id)))}
+                    everyone={entry.sharedWithAll}
+                    everyoneReason={everyoneReason}
+                    onEveryone={on => void run(() => shareVaultEntryAction(entry.id, on))}
+                    hiddenCoworkers={entry.hiddenCoworkers}
+                    busy={busy}
+                />
 
                 {entry.envKeys.length > 0 && (
                     <Group title={t('detail.variables')}>

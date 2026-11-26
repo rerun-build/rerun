@@ -28,6 +28,8 @@ export default {
             open: async (ctx) => {
                 await openVault(ctx)
                 await dialog(ctx).getByText('Gmail', { exact: true }).click()
+                const finance = dialog(ctx).getByRole('button', { name: /^Finance/ })
+                if ((await finance.getAttribute('aria-expanded')) === 'false') await finance.click()
                 const toggle = invoiceChaserSwitch(ctx)
                 await toggle.waitFor()
                 if ((await toggle.getAttribute('aria-checked')) === 'true') {
