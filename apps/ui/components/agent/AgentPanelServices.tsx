@@ -462,6 +462,11 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 key={s.key}
                                                 leading={<Icon {...serviceIconProps(s.icon, s.category)} size="sm" />}
                                                 description={s.label}
+                                                footer={s.status === 'active' ? (
+                                                    <Badge size="xs" tone="green" glow={false}>
+                                                        {tServices('connect.connected')}
+                                                    </Badge>
+                                                ) : undefined}
                                                 title={
                                                     <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
                                                         <span className="truncate">{s.name}</span>
