@@ -344,12 +344,14 @@ describe('a reconnect during a refresh', () => {
     })
 })
 
+const revocations = () => auth.calls.filter(call => call.url === 'https://auth.x.ai/oauth2/revoke')
+
 describe('deleting a connection', () => {
     it('hands the sign-in back to xAI, refresh token first, then removes it', async () => {
         await grokConnection(signedIn(60))
         await deleteConnection('grokcnx')
-        const revocations = auth.calls.filter(call => call.url === 'https://auth.x.ai/oauth2/revoke')
-        expect(revocations.map(call => [call.body.get('token'), call.body.get('token_type_hint'), call.body.get('client_id')])).toEqual([
+        await until(() => revocations().length === 2)
+        expect(revocations().map(call => [call.body.get('token'), call.body.get('token_type_hint'), call.body.get('client_id')])).toEqual([
             ['refresh-start', 'refresh_token', 'b1a00492-073a-47ea-816f-4c329264a828'],
             ['access-old', 'access_token', 'b1a00492-073a-47ea-816f-4c329264a828'],
         ])
@@ -370,9 +372,23 @@ describe('deleting a connection', () => {
         answer()
         await refreshing
         await deleting
-        const revoked = auth.calls.filter(call => call.url.endsWith('/oauth2/revoke')).map(call => call.body.get('token'))
-        expect(revoked).toEqual(['refresh-1', 'access-1'])
+        await until(() => revocations().length === 2)
+        expect(revocations().map(call => call.body.get('token'))).toEqual(['refresh-1', 'access-1'])
         expect(existsSync(connectionDir('grokcnx'))).toBe(false)
+    })
+
+    it('does not wait for xAI: the connection is gone while the revocation is still out', async () => {
+        let answer!: () => void
+        auth.script.push(async () => {
+            await new Promise<void>(resolve => (answer = resolve))
+            return new Response(null, { status: 200 })
+        })
+        await grokConnection(signedIn(60))
+        await deleteConnection('grokcnx')
+        expect(existsSync(connectionDir('grokcnx'))).toBe(false)
+        expect(revocations()).toHaveLength(1)
+        answer()
+        await until(() => revocations().length === 2)
     })
 
     it('goes through when xAI cannot be reached', async () => {
@@ -380,6 +396,7 @@ describe('deleting a connection', () => {
         await grokConnection(signedIn(60))
         await deleteConnection('grokcnx')
         expect(existsSync(connectionDir('grokcnx'))).toBe(false)
+        await until(() => revocations().length === 2)
     })
 
     it('hands back nothing for another provider', async () => {

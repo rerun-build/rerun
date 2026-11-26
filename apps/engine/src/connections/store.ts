@@ -107,19 +107,22 @@ export function assertConnectionDeletable(id: string): void {
 }
 
 // A connection that cannot be read any more has nothing left to hand back.
-async function revokeSignIn(id: string): Promise<void> {
+async function grokSignInOf(id: string): Promise<Record<string, string> | null> {
     const connection = await loadConnectionFromDisk(id).catch(() => null)
-    if (connection?.config.provider === 'grok') await revokeGrokTokens(connection.env)
+    return connection?.config.provider === 'grok' ? connection.env : null
 }
 
-// Under the connection's lock: a refresh in flight writes its new lineage first, and that lineage is
-// the one handed back, never one already spent.
+// Read under the connection's lock: a refresh in flight writes its new lineage first, and that
+// lineage is the one handed back, never one already spent. The revocation itself is not waited for:
+// xAI out of reach must not hold the delete, nor the answer to whoever asked for it.
 export async function deleteConnection(id: string): Promise<void> {
     assertConnectionDeletable(id)
-    await withConnectionLock(id, async () => {
-        await revokeSignIn(id)
+    const grokSignIn = await withConnectionLock(id, async () => {
+        const signIn = await grokSignInOf(id)
         await rm(connectionDir(id), { recursive: true, force: true })
+        return signIn
     })
+    if (grokSignIn) void revokeGrokTokens(grokSignIn)
     unloadConnection(id)
     forgetPlanLimits(id)
     forgetCliModels(id)

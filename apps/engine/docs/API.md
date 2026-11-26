@@ -465,9 +465,9 @@ hands the tokens over once (`GROK_OAUTH_TOKEN`, `GROK_OAUTH_REFRESH_TOKEN`, `GRO
 them against `https://auth.x.ai/oauth2/token`: two minutes before the access token lapses, under the
 connection's lock, from the lineage on disk, one refresh at a time per connection (xAI rotates the
 refresh token on every use). A refused grant marks the connection `credentialRejected`; a network
-failure, a 429 or a 5xx keeps the token in hand while it lasts. `DELETE /connections/:id` revokes
-both tokens at `https://auth.x.ai/oauth2/revoke` first, under the same lock as a refresh, best
-effort.
+failure, a 429 or a 5xx keeps the token in hand while it lasts. `DELETE /connections/:id` reads the
+tokens under the same lock as a refresh, removes the connection, then revokes both at
+`https://auth.x.ai/oauth2/revoke`, best effort and without holding its answer for it.
 
 There is no CLI: the engine runs Grok in its own loop, on the OpenAI SDK's Responses model, against
 Grok Build's proxy `https://cli-chat-proxy.grok.com/v1`, with `store: false` and the encrypted
