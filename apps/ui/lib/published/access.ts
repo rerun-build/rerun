@@ -1,4 +1,6 @@
-export const PUBLISHED_ACCESS_MODES = ['public', 'workspace', 'password', 'invited'] as const
+import { publishedAccessModeSchema } from '@rerun/contracts'
+
+export const PUBLISHED_ACCESS_MODES = publishedAccessModeSchema.options
 export type PublishedAccess = (typeof PUBLISHED_ACCESS_MODES)[number]
 
 export const PUBLISH_POLICIES = ['people', 'anyone', 'never'] as const

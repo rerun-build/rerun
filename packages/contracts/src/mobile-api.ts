@@ -43,6 +43,7 @@ import { notificationPrefsPatchSchema, notificationPrefsSchema } from './notific
 import { onboardingEngineSchema, onboardingStateSchema } from './onboarding.js'
 import { changeOpenChatsSchema, openChatsSchema } from './open-chats.js'
 import { paidDataAlwaysAllowSchema } from './paid-data.js'
+import { makePublishedPublicSchema, publishedLinkChangedSchema, publishedLinkReadSchema } from './published.js'
 import { remoteComputerRuleSchema } from './remote-computer.js'
 import { routinesViewSchema, updateRoutineSchema } from './routine.js'
 import { connectTargetSchema, installedServiceSchema, installResultSchema, installServiceInputSchema, mcpServerViewSchema, resolvedServiceSchema, resolveServicesInputSchema, signInClaimSchema } from './service.js'
@@ -207,6 +208,9 @@ export const mobileApi = {
     replyToConversation: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/reply', body: conversationReplySchema, response: conversationReplyResultSchema, errors: { 409: hubErrorSchema } }),
     listSkillProposals: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/skill-proposals', response: skillProposalsListSchema }),
     decideSkillProposal: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/skill-proposals', body: skillProposalDecideRequestSchema, response: skillProposalDecidedSchema }),
+    getPublishedLink: hubEndpoint({ method: 'GET', path: '/api/v1/published/{slug}', response: publishedLinkReadSchema }),
+    makePublishedLinkPublic: hubEndpoint({ method: 'PATCH', path: '/api/v1/published/{slug}', body: makePublishedPublicSchema, response: publishedLinkChangedSchema }),
+    dismissPublishedAccessRequest: hubEndpoint({ method: 'DELETE', path: '/api/v1/published/{slug}/access-request', response: 'none' }),
     listMessageFeedback: hubEndpoint({ method: 'GET', path: '/api/v1/conversations/{id}/feedback', query: messageFeedbackQuerySchema, response: messageFeedbackListSchema }),
     rateMessage: hubEndpoint({ method: 'POST', path: '/api/v1/conversations/{id}/feedback', body: messageFeedbackRateRequestSchema, response: messageFeedbackRatedSchema }),
     updateMessageFeedback: hubEndpoint({ method: 'PATCH', path: '/api/v1/feedback/{id}', body: messageFeedbackDetailsRequestSchema, response: 'none' }),

@@ -1,3 +1,5 @@
+import type { PublishedAccessMode } from '@rerun/contracts'
+
 import type { InputDef, InstallOutcome } from './manifest'
 
 // Result shapes shared between the server service layer and the client renderers.
@@ -123,7 +125,7 @@ export type InstallResult =
 
 // --- Published files (publishing via the Hub) ---
 
-export type PublishedAccessMode = 'public' | 'workspace' | 'password' | 'invited'
+export type { PublishedAccessMode }
 
 export type PublishResult = {
     status: 'published'

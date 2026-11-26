@@ -18,7 +18,7 @@ import { useAwaitedThumbnail } from '@/hooks/useAwaitedThumbnail'
 import type { AccessChange } from '@/lib/services/publish'
 import type { PublishedAccess } from '@/lib/published/access'
 import { rendersAsPage } from '@/lib/published/host'
-import { publishedHostOf } from '@/lib/published/links'
+import { publishedHostOf } from '@rerun/contracts'
 import type { PublishedFile } from '@/lib/services/types'
 import { CheckIcon, ChevronDownIcon, LinkIcon, Share2Icon, Trash2Icon, XIcon } from '@/lib/icons'
 

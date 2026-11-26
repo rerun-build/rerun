@@ -9798,6 +9798,264 @@
                 "x-mobile-api": "startOnboardingTrial"
             }
         },
+        "/api/v1/published/{slug}": {
+            "get": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "file": {
+                                            "nullable": true,
+                                            "properties": {
+                                                "access": {
+                                                    "enum": [
+                                                        "public",
+                                                        "workspace",
+                                                        "password",
+                                                        "invited"
+                                                    ],
+                                                    "type": "string"
+                                                },
+                                                "contentType": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "enum": [
+                                                        "file",
+                                                        "site"
+                                                    ],
+                                                    "type": "string"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "requestedAccess": {
+                                                    "enum": [
+                                                        "public"
+                                                    ],
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "thumbnailUrl": {
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "string"
+                                                },
+                                                "url": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "slug",
+                                                "url",
+                                                "path",
+                                                "kind",
+                                                "contentType",
+                                                "title",
+                                                "access",
+                                                "requestedAccess",
+                                                "thumbnailUrl",
+                                                "updatedAt"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "file"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "getPublishedLink"
+            },
+            "patch": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "access": {
+                                        "enum": [
+                                            "public"
+                                        ],
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "access"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "file": {
+                                            "properties": {
+                                                "access": {
+                                                    "enum": [
+                                                        "public",
+                                                        "workspace",
+                                                        "password",
+                                                        "invited"
+                                                    ],
+                                                    "type": "string"
+                                                },
+                                                "contentType": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "enum": [
+                                                        "file",
+                                                        "site"
+                                                    ],
+                                                    "type": "string"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "requestedAccess": {
+                                                    "enum": [
+                                                        "public"
+                                                    ],
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "thumbnailUrl": {
+                                                    "nullable": true,
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "string"
+                                                },
+                                                "url": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "slug",
+                                                "url",
+                                                "path",
+                                                "kind",
+                                                "contentType",
+                                                "title",
+                                                "access",
+                                                "requestedAccess",
+                                                "thumbnailUrl",
+                                                "updatedAt"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "file"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "makePublishedLinkPublic"
+            }
+        },
+        "/api/v1/published/{slug}/access-request": {
+            "delete": {
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "dismissPublishedAccessRequest"
+            }
+        },
         "/api/v1/workspaces": {
             "get": {
                 "parameters": [],
