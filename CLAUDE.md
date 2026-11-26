@@ -157,6 +157,15 @@ A spread payload (`.insert({ ...row })`) escapes excess-property checking, so pi
 
 Before finishing any feature touching Supabase, grep your own diff for `.from('` and check nothing reads raw and every write carries its generic.
 
+## A table with row level security holds two-step sessions back
+
+Every `public` table that enables row level security also gets the restrictive `two_step_required`
+policy of `supabase/migrations/20261126120100_two_step_required_policies.sql`, copied as it is: an
+account with two-step verification reads nothing until its session has been through its second step.
+A `security definer` function that `authenticated` may call reads past every policy, so it carries the
+same condition (`20261126120200_two_step_required_functions.sql`), or reads through a function that does.
+`apps/ui/lib/auth/two-step/rls.test.ts` fails on a table or a function that lacks it.
+
 # The mobile API never breaks a shipped build
 
 A build of the app keeps the schemas it was compiled with for as long as it stays installed, while the hub
