@@ -14,7 +14,7 @@ import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
-import { ConnectionBadge, ErrorLine, LogoTile, ReadOnlyNote, SheetFrame, UsageBar } from './bits'
+import { ConnectionBadge, ErrorLine, LogoTile, PlanWindowRow, ReadOnlyNote, SheetFrame, UsageBar } from './bits'
 import { signsIn } from './routes'
 
 type ConnectionDetailProps = {
@@ -146,16 +146,8 @@ function PlanUsage({ connection }: { connection: AiConnectionView }) {
                     connection.planWindows.map((window, index) => (
                         <Fragment key={window.name}>
                             {index > 0 && <Separator />}
-                            <View style={{ gap: spacing.sm, padding: spacing.lg }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
-                                    <AppText variant="callout" numberOfLines={1} style={{ flex: 1 }}>
-                                        {window.name}
-                                    </AppText>
-                                    <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                                        {[t('percent', { percent: Math.round(window.usedPercent) }), window.reset].filter(Boolean).join(' · ')}
-                                    </AppText>
-                                </View>
-                                <UsageBar percent={window.usedPercent} />
+                            <View style={{ padding: spacing.lg }}>
+                                <PlanWindowRow window={window} />
                             </View>
                         </Fragment>
                     ))

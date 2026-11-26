@@ -8,7 +8,7 @@ import { useTranslations } from 'use-intl'
 import { fetchAgentModels, setAgentModel } from '@/api/models'
 import { AI_PROVIDERS_ADMIN_ONLY, manageLock } from '@/auth/access'
 import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
-import { ReadOnlyNote } from '@/components/providers/bits'
+import { PlanWindowRow, ReadOnlyNote } from '@/components/providers/bits'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Card, SectionTitle, Separator } from '@/components/ui/GroupedList'
@@ -93,6 +93,16 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
                     <View key={group.connectionId} style={{ gap: spacing.sm }}>
                         <SectionTitle>{group.label}</SectionTitle>
                         <Card>
+                            {group.planWindows?.length ? (
+                                <>
+                                    <View style={{ gap: 10, paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: 14 }}>
+                                        {group.planWindows.map(window => (
+                                            <PlanWindowRow key={window.name} window={window} compact />
+                                        ))}
+                                    </View>
+                                    <Separator inset={0} />
+                                </>
+                            ) : null}
                             {group.models.map((model, index) => (
                                 <Fragment key={model.id}>
                                     {index > 0 && <Separator inset={spacing.lg + 20 + spacing.md} />}

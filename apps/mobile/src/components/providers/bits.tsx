@@ -1,4 +1,4 @@
-import type { AiConnectionView, ConnectionUsage, Provider } from '@rerun/contracts'
+import type { AiConnectionView, ConnectionUsage, PlanWindowView, Provider } from '@rerun/contracts'
 import * as WebBrowser from 'expo-web-browser'
 import type { ReactNode } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
@@ -117,6 +117,25 @@ export function UsageBar({ percent }: { percent: number }) {
     return (
         <View style={{ height: 4, borderRadius: radius.pill, backgroundColor: theme.muted, overflow: 'hidden' }}>
             <View style={{ width: `${Math.max(2, Math.min(100, percent))}%`, height: '100%', borderRadius: radius.pill, backgroundColor: tone }} />
+        </View>
+    )
+}
+
+// One window of a plan: its name, how much of it is used and when it resets, the bar under them.
+// Compact in the model picker, where the gauges sit above the models of their subscription.
+export function PlanWindowRow({ window, compact }: { window: PlanWindowView; compact?: boolean }) {
+    const t = useTranslations('mobileProviders.planUsage')
+    return (
+        <View style={{ gap: compact ? 6 : spacing.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
+                <AppText variant={compact ? 'footnote' : 'callout'} numberOfLines={1} style={{ flex: 1 }}>
+                    {window.name}
+                </AppText>
+                <AppText variant="footnote" tone="muted" numberOfLines={1} style={compact ? { fontVariant: ['tabular-nums'] } : undefined}>
+                    {[t('percent', { percent: Math.round(window.usedPercent) }), window.reset].filter(Boolean).join(' · ')}
+                </AppText>
+            </View>
+            <UsageBar percent={window.usedPercent} />
         </View>
     )
 }
