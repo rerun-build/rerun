@@ -17,6 +17,8 @@ const VERIFICATION_ORIGIN = 'https://accounts.x.ai'
 const VERIFICATION_URL = `${VERIFICATION_ORIGIN}/oauth2/device`
 
 const MIN_POLL_INTERVAL_S = 5
+// A poll that lands a moment early is answered `slow_down`: the interval xAI asks for is kept clear of.
+const POLL_INTERVAL_MARGIN_MS = 1000
 const DEFAULT_TTL_S = 15 * 60
 const REQUEST_TIMEOUT_MS = 10_000
 const FALLBACK_LIFETIME_MS = 3_600_000
@@ -62,13 +64,17 @@ export async function startGrokDeviceAuth(): Promise<GrokDeviceAuthStart> {
         deviceCode: answer.device_code,
         userCode: answer.user_code,
         verificationUrl: verificationUrlOf(answer),
-        pollIntervalMs: Math.max(MIN_POLL_INTERVAL_S, Number.isFinite(interval) ? interval : 0) * 1000,
+        pollIntervalMs: Math.max(MIN_POLL_INTERVAL_S, Number.isFinite(interval) ? interval : 0) * 1000 + POLL_INTERVAL_MARGIN_MS,
         expiresAt: Date.now() + (Number.isFinite(ttl) && ttl > 0 ? ttl : DEFAULT_TTL_S) * 1000,
     }
 }
 
-// One poll: null while the person has not approved yet. A refusal never carries xAI's body.
-export async function pollGrokDeviceAuth(deviceCode: string): Promise<GrokOAuthTokens | null> {
+// What xAI answers while the person has not approved yet: `slow_down` asks the next polls to come
+// further apart.
+type GrokDeviceAuthWait = 'pending' | 'slow_down'
+
+// One poll. A refusal never carries xAI's body.
+export async function pollGrokDeviceAuth(deviceCode: string): Promise<GrokOAuthTokens | GrokDeviceAuthWait> {
     const res = await fetch(TOKEN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
@@ -88,8 +94,8 @@ export async function pollGrokDeviceAuth(deviceCode: string): Promise<GrokOAuthT
             expiresAt: typeof answer.expires_in === 'number' && answer.expires_in > 0 ? Date.now() + answer.expires_in * 1000 : Date.now() + FALLBACK_LIFETIME_MS,
         }
     }
-    // RFC 8628: still waiting, or polled a little fast. The next poll comes at the interval anyway.
-    if (answer.error === 'authorization_pending' || answer.error === 'slow_down') return null
+    if (answer.error === 'authorization_pending') return 'pending'
+    if (answer.error === 'slow_down') return 'slow_down'
     if (answer.error === 'access_denied') throw new AppError('grokSignInDenied')
     // An expired code, or one that was already exchanged (a ticket played twice).
     if (answer.error === 'expired_token' || answer.error === 'invalid_grant') throw new AppError('grokSignInExpired')

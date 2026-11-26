@@ -4,7 +4,7 @@ import { pollGrokSignInAction, startGrokSignInAction } from '@/app/api/_actions/
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { AiConnectionSurface } from '@rerun/analytics'
-import type { GrokSignInStart } from '@rerun/contracts'
+import { GROK_SLOW_DOWN_STEP_MS, type GrokSignInStart } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -31,7 +31,7 @@ const OPEN_LOCK_MS = 5000
 
 // What ends the wait for good: xAI's answer, or a refusal of the hub no retry changes. Anything else
 // (the hub or its database out of reach for a moment) is polled through, so an approval given on
-// xAI's page meanwhile is still picked up, up to a run of failures this long.
+// xAI's page meanwhile is still picked up, up to this many failures in a row.
 const FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'grokNeedsUpdate', 'signInOtherProvider', 'adminOnlyAiProviders', 'trialToConnectModel', 'managedWorkspacePaused'])
 const MAX_FAILED_POLLS = 6
 
@@ -94,33 +94,36 @@ export function useGrokDeviceAuth(onConnected: ConnectedHandler, surface: AiConn
         setTimeout(() => setCopied(false), 2000)
     }, [pending])
 
-    // Poll until the person approves, the code expires, or the row unmounts. `cancelled` guards the
-    // in-flight action so a late answer cannot revive a torn-down flow.
+    // Poll until the person approves, the code expires, or the row unmounts. Each poll is armed once
+    // the one before has answered, so two never cross, and `cancelled` guards the in-flight action so
+    // a late answer cannot revive a torn-down flow.
     useEffect(() => {
         if (!pending) return
         let cancelled = false
-        let polling = false
         let failedPolls = 0
+        let interval = pending.pollIntervalMs
+        let timer: ReturnType<typeof setTimeout>
 
-        const timer = setInterval(async () => {
-            if (polling) return
+        const poll = async () => {
             if (Date.now() > pending.expiresAt) {
-                clearInterval(timer)
-                if (!cancelled) {
-                    setPending(null)
-                    setExpired(true)
-                    setError(t('codeExpired'))
-                    trackAiConnectionFailed('grok', 'oauth', surface, 'code_expired')
-                }
+                setPending(null)
+                setExpired(true)
+                setError(t('codeExpired'))
+                trackAiConnectionFailed('grok', 'oauth', surface, 'code_expired')
                 return
             }
-            polling = true
-            // A poll that failed to reach the server is retried on the next tick, like a pending one.
-            const res = await pollGrokSignInAction({ ticket: pending.ticket, ...targetRef.current }).catch(() => ({ status: 'pending' as const }))
-            polling = false
-            if (cancelled || res.status === 'pending') return
-            if (res.status === 'error' && !FINAL_REFUSALS.has(res.code ?? '') && res.reason !== 'no_plan' && ++failedPolls < MAX_FAILED_POLLS) return
-            clearInterval(timer)
+            // A poll that failed to reach the server is tried again at the next one, and counts for nothing.
+            const res = await pollGrokSignInAction({ ticket: pending.ticket, ...targetRef.current }).catch(() => null)
+            if (cancelled) return
+            if (res?.status === 'pending') {
+                failedPolls = 0
+                if (res.slowDown) interval += GROK_SLOW_DOWN_STEP_MS
+            }
+            const passing = res?.status === 'error' && !FINAL_REFUSALS.has(res.code ?? '') && res.reason !== 'no_plan' && ++failedPolls < MAX_FAILED_POLLS
+            if (!res || res.status === 'pending' || passing) {
+                timer = setTimeout(poll, interval)
+                return
+            }
             setPending(null)
             if (res.status === 'error') {
                 setError(errorText(res))
@@ -131,11 +134,12 @@ export function useGrokDeviceAuth(onConnected: ConnectedHandler, surface: AiConn
             if (cancelled) return
             if (applied.success) setConnected(true)
             else setError(errorText(applied, t('saveConnectionFailed')))
-        }, pending.pollIntervalMs)
+        }
 
+        timer = setTimeout(poll, interval)
         return () => {
             cancelled = true
-            clearInterval(timer)
+            clearTimeout(timer)
         }
     }, [pending, surface, t, tCommon, errorText])
 

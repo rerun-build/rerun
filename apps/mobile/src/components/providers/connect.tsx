@@ -1,5 +1,5 @@
 import type { AiConnectionMethod } from '@rerun/analytics'
-import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart, type GrokSignInStart } from '@rerun/contracts'
+import { claudeTokenIssue, GROK_SLOW_DOWN_STEP_MS, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart, type GrokSignInStart } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'
@@ -218,8 +218,9 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
 // `reconnectId` replaces the key of a connection its provider turned away rather than adding one.
 // The web's Grok sign-in: a code typed on xAI's page while the hub polls and stores the connection
 // itself. A refusal of the moment (a hub out of reach) is polled through, so an approval given
-// meanwhile still lands; xAI's own answers end the wait.
+// meanwhile still lands, up to this many in a row; xAI's own answers end the wait.
 const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'grokNeedsUpdate', 'signInOtherProvider'])
+const GROK_MAX_FAILED_POLLS = 6
 
 export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
     const { view, caller } = useAiConnections()
@@ -253,49 +254,54 @@ export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
         }
     }
 
+    // Each poll is armed once the one before has answered: one that stores the connection can outlast
+    // the interval, and a second one would play the spent code again and read the sign-in as expired.
     useEffect(() => {
         if (!pending || !caller) return
         let cancelled = false
-        let failed = 0
-        // A poll that stores the connection can outlast the interval: the next tick would play the
-        // spent code again and read the sign-in as expired.
-        let polling = false
-        const timer = setInterval(async () => {
-            if (polling) return
+        let failedInARow = 0
+        let interval = pending.pollIntervalMs
+        let timer: ReturnType<typeof setTimeout>
+
+        const poll = async () => {
             if (Date.now() > pending.expiresAt) {
-                clearInterval(timer)
-                if (cancelled) return
                 setPending(null)
                 setExpired(true)
                 track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'code_expired' })
                 return
             }
             let answer: Awaited<ReturnType<typeof pollGrokSignIn>>
-            polling = true
             try {
                 answer = await pollGrokSignIn(caller, { ticket: pending.ticket, connectionId: reconnectRef.current ?? undefined })
             } catch (err) {
                 if (cancelled) return
                 const final = err instanceof ApiError && err.status < 500 && (err.status === 403 || GROK_FINAL_REFUSALS.has(err.code ?? ''))
-                if (!final && ++failed < 6) return
-                clearInterval(timer)
+                if (!final && ++failedInARow < GROK_MAX_FAILED_POLLS) {
+                    timer = setTimeout(poll, interval)
+                    return
+                }
                 setPending(null)
                 setError(messageOf(err, t('startFailed')))
                 track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'device_auth_failed', error: messageOf(err, '').slice(0, 200) })
                 return
-            } finally {
-                polling = false
             }
-            if (cancelled || answer.status === 'pending') return
-            clearInterval(timer)
+            if (cancelled) return
+            if (answer.status === 'pending') {
+                failedInARow = 0
+                if (answer.slowDown) interval += GROK_SLOW_DOWN_STEP_MS
+                timer = setTimeout(poll, interval)
+                return
+            }
             setPending(null)
             setConnectionId(answer.connectionId)
             connected('grok', 'oauth', surface)
             if (reconnectRef.current) leave()
-        }, pending.pollIntervalMs)
+        }
+
+        timer = setTimeout(poll, interval)
         return () => {
             cancelled = true
-            clearInterval(timer)
+            clearTimeout(timer)
         }
     }, [pending, caller, surface, t])
 

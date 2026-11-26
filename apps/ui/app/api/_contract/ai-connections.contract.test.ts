@@ -297,7 +297,7 @@ describe('the Grok sign-in of the mobile app', () => {
         providerEndpoints({ 'https://auth.x.ai/oauth2/device/code': grokStarted })
         const { POST } = await import('@/app/api/v1/ai-connections/grok/start/route')
         const start = await expectContract(mobileApi.startGrokSignIn, await callRoute(POST, mobileApi.startGrokSignIn))
-        expect(start).toMatchObject({ ticket: expect.any(String), userCode: 'N4FS-5STQ', verificationUrl: 'https://accounts.x.ai/oauth2/device?user_code=N4FS-5STQ', pollIntervalMs: 5000 })
+        expect(start).toMatchObject({ ticket: expect.any(String), userCode: 'N4FS-5STQ', verificationUrl: 'https://accounts.x.ai/oauth2/device?user_code=N4FS-5STQ', pollIntervalMs: 6000 })
         expect(JSON.stringify(start)).not.toContain(grokDeviceCode)
         const sent = new URLSearchParams(String(vi.mocked(fetch).mock.calls[0]![1]!.body))
         expect(Object.fromEntries(sent)).toEqual({ client_id: 'b1a00492-073a-47ea-816f-4c329264a828', scope: 'openid profile email offline_access grok-cli:access api:access' })
@@ -306,7 +306,7 @@ describe('the Grok sign-in of the mobile app', () => {
     it('shows no address xAI answers with off its own sign-in page', async () => {
         providerEndpoints({ 'https://auth.x.ai/oauth2/device/code': () => Response.json({ device_code: grokDeviceCode, user_code: 'N4FS-5STQ', verification_uri_complete: 'https://evil.example/approve', expires_in: 1800, interval: 1 }) })
         const { POST } = await import('@/app/api/v1/ai-connections/grok/start/route')
-        expect(await expectContract(mobileApi.startGrokSignIn, await callRoute(POST, mobileApi.startGrokSignIn))).toMatchObject({ verificationUrl: 'https://accounts.x.ai/oauth2/device', pollIntervalMs: 5000 })
+        expect(await expectContract(mobileApi.startGrokSignIn, await callRoute(POST, mobileApi.startGrokSignIn))).toMatchObject({ verificationUrl: 'https://accounts.x.ai/oauth2/device', pollIntervalMs: 6000 })
     })
 
     it('says the machine has to update first when its engine does not run Grok', async () => {
@@ -321,9 +321,9 @@ describe('the Grok sign-in of the mobile app', () => {
     it('answers pending until xAI approves, then stores the Grok tokens and hands none of them back', async () => {
         const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
         const ticket = mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 })
-        for (const error of ['authorization_pending', 'slow_down']) {
+        for (const [error, answer] of [['authorization_pending', { status: 'pending' }], ['slow_down', { status: 'pending', slowDown: true }]] as const) {
             providerEndpoints(grokPoll(() => Response.json({ error }, { status: 400 })))
-            expect(await expectContract(mobileApi.pollGrokSignIn, await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket } }))).toEqual({ status: 'pending' })
+            expect(await expectContract(mobileApi.pollGrokSignIn, await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket } }))).toEqual(answer)
         }
 
         providerEndpoints(grokPoll(grokApproved))

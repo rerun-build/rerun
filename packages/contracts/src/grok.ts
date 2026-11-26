@@ -8,6 +8,9 @@ export const GROK_OAUTH_CLIENT_ID = 'b1a00492-073a-47ea-816f-4c329264a828'
 // refresh token the engine keeps the sign-in alive with.
 export const GROK_OAUTH_SCOPES = 'openid profile email offline_access grok-cli:access api:access'
 
+// What a device-code poll answered `slow_down` adds to its interval, for good (RFC 8628, section 3.5).
+export const GROK_SLOW_DOWN_STEP_MS = 5000
+
 // Where the subscription is billed: Grok Build's own proxy, which speaks the Responses API. The
 // same token on api.x.ai lands on a small free allowance instead.
 export const GROK_PROXY_BASE_URL = 'https://cli-chat-proxy.grok.com/v1'

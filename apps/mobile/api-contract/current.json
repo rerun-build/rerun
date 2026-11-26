@@ -5770,6 +5770,9 @@
                                     "oneOf": [
                                         {
                                             "properties": {
+                                                "slowDown": {
+                                                    "type": "boolean"
+                                                },
                                                 "status": {
                                                     "enum": [
                                                         "pending"

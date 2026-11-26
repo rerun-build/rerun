@@ -112,6 +112,32 @@ describe('the Grok sign-in of the AI providers panel', () => {
         expect(button('Get a new code')).toBeDefined()
     })
 
+    it('counts failures in a row only: a poll that goes through starts the count again', async () => {
+        await getCode()
+        for (let round = 0; round < 2; round++) {
+            for (let i = 0; i < 5; i++) actions.pollGrokSignInAction.mockResolvedValueOnce({ status: 'error', error: 'Not authenticated' })
+            actions.pollGrokSignInAction.mockResolvedValueOnce({ status: 'pending' })
+        }
+        for (let i = 0; i < 12; i++) await tick()
+        expect(container.textContent).not.toContain('Not authenticated')
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(12)
+    })
+
+    it('polls further apart, for good, once xAI asks it to slow down', async () => {
+        await getCode()
+        actions.pollGrokSignInAction.mockResolvedValueOnce({ status: 'pending', slowDown: true })
+        await tick()
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(1)
+        await tick()
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(1)
+        await tick()
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(2)
+        await tick()
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(2)
+        await tick()
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(3)
+    })
+
     it('says the machine has to update when its engine does not run Grok', async () => {
         actions.startGrokSignInAction.mockResolvedValue({ ok: false, error: 'Grok arrives with the next update of this machine. Try again in a little while.', code: 'grokNeedsUpdate' })
         await getCode()

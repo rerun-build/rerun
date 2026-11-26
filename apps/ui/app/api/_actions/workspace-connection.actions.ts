@@ -25,7 +25,7 @@ import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
 import { mintGrokSignIn, openGrokSignIn } from '@/lib/engine/sign-in-ticket'
 import type { BoxBackupModels, BoxConnection, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import { NO_BOX_BACKUPS, customProbeInputSchema, grokSignInPollInputSchema, type CustomProbeInput, type CustomProbeResult, type GrokSignInPollInput, type GrokSignInStart } from '@rerun/contracts'
+import { NO_BOX_BACKUPS, customProbeInputSchema, grokSignInPollInputSchema, type CustomProbeInput, type CustomProbeResult, type GrokSignInPoll, type GrokSignInPollInput, type GrokSignInStart } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 // The AI providers of the workspace, for the web dialog. The workspace of the session is the whole
@@ -189,13 +189,13 @@ export async function startGrokSignInAction(): Promise<({ ok: true } & GrokSignI
     }
 }
 
-export async function pollGrokSignInAction(input: GrokSignInPollInput): Promise<{ status: 'pending' } | { status: 'connected'; connectionId: string } | ({ status: 'error' } & ActionRefusal & { reason?: 'no_plan' })> {
+export async function pollGrokSignInAction(input: GrokSignInPollInput): Promise<GrokSignInPoll | ({ status: 'error' } & ActionRefusal & { reason?: 'no_plan' })> {
     try {
         const { workspace, userId } = await requireAdminContext('adminOnlyAiProviders')
         const { ticket, connectionId, name } = grokSignInPollInputSchema.parse(input)
-        const keys = await grokKeysWhenApproved(openGrokSignIn(ticket, userId, workspace.id).deviceCode)
-        if (!keys) return { status: 'pending' }
-        return { status: 'connected', connectionId: await storeGrokSignIn(workspace.id, keys, { connectionId, name }) }
+        const answer = await grokKeysWhenApproved(openGrokSignIn(ticket, userId, workspace.id).deviceCode)
+        if (!('keys' in answer)) return answer
+        return { status: 'connected', connectionId: await storeGrokSignIn(workspace.id, answer.keys, { connectionId, name }) }
     } catch (err) {
         if (err instanceof NoPlanError) return { status: 'error', ...refusal(err.code === 'managedWorkspacePaused' ? err.code : 'trialToConnectModel'), reason: 'no_plan' }
         return { status: 'error', ...refusalOf(err, 'deviceAuthFailed') }

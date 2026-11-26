@@ -193,6 +193,16 @@ describe('the Grok sign-in of the web dialog', () => {
         expect(engine.createConnection).toHaveBeenCalledWith(conn, expect.objectContaining({ provider: 'grok', keys: expect.objectContaining({ GROK_OAUTH_TOKEN: 'grok-access', GROK_OAUTH_REFRESH_TOKEN: 'grok-refresh' }) }))
     })
 
+    it('tells the browser when xAI asks for more room between polls', async () => {
+        const oauth = await import('@/lib/engine/grok-oauth')
+        const ticket = mintGrokSignIn('user-ada', 7, { deviceCode: 'xai-device-code', expiresAt: Date.now() + 1_800_000 })
+        vi.mocked(oauth.pollGrokDeviceAuth).mockResolvedValue('pending')
+        await expect(pollGrokSignInAction({ ticket })).resolves.toEqual({ status: 'pending' })
+        vi.mocked(oauth.pollGrokDeviceAuth).mockResolvedValue('slow_down')
+        await expect(pollGrokSignInAction({ ticket })).resolves.toEqual({ status: 'pending', slowDown: true })
+        expect(engine.createConnection).not.toHaveBeenCalled()
+    })
+
     it('refuses a member who is not an admin, and a ticket from another workspace', async () => {
         vi.mocked(requireAdminContext).mockRejectedValue(new AuthorizationError('adminOnlyAiProviders'))
         await expect(startGrokSignInAction()).resolves.toMatchObject({ ok: false, code: 'adminOnlyAiProviders' })

@@ -450,9 +450,11 @@ export type CodexSignInPoll = z.infer<typeof codexSignInPollSchema>
 
 // Grok signs in with a device code as well, and the hub answers in the same shapes: the code to type
 // with a sealed ticket, then pending until the connection is stored. The tokens never leave the hub.
+// `slowDown` is xAI asking for more room between polls (RFC 8628): whoever polls adds
+// `GROK_SLOW_DOWN_STEP_MS` to its interval, for this poll and every one after it.
 export const grokSignInStartSchema = codexSignInStartSchema
 export type GrokSignInStart = CodexSignInStart
 export const grokSignInPollInputSchema = codexSignInPollInputSchema
 export type GrokSignInPollInput = CodexSignInPollInput
-export const grokSignInPollSchema = codexSignInPollSchema
-export type GrokSignInPoll = CodexSignInPoll
+export const grokSignInPollSchema = z.discriminatedUnion('status', [z.object({ status: z.literal('pending'), slowDown: z.boolean().optional() }), z.object({ status: z.literal('connected'), connectionId: z.string() })])
+export type GrokSignInPoll = z.infer<typeof grokSignInPollSchema>

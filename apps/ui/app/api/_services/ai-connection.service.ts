@@ -289,11 +289,15 @@ export async function startGrokSignIn(workspaceId: number): Promise<GrokDeviceAu
     return startGrokDeviceAuth()
 }
 
-// Null while the person has not approved yet. The caller stores the keys at once (`storeSignInKeys`):
-// they are never handed further.
-export async function grokKeysWhenApproved(deviceCode: string): Promise<Record<string, string> | null> {
-    const tokens = await pollGrokDeviceAuth(deviceCode)
-    return tokens ? grokKeysFrom(tokens) : null
+type GrokSignInWait = { status: 'pending'; slowDown?: true }
+
+// The keys once the person has approved, which the caller stores at once (`storeGrokSignIn`) and never
+// hands further. Until then, the answer its poll gets.
+export async function grokKeysWhenApproved(deviceCode: string): Promise<{ keys: Record<string, string> } | GrokSignInWait> {
+    const answer = await pollGrokDeviceAuth(deviceCode)
+    if (answer === 'pending') return { status: 'pending' }
+    if (answer === 'slow_down') return { status: 'pending', slowDown: true }
+    return { keys: grokKeysFrom(answer) }
 }
 
 type GrokSignInTarget = { connectionId?: string; name?: string }
