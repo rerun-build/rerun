@@ -1,0 +1,50 @@
+---
+title: "Usage"
+description: "Tokens, models and spend of every coworker of the workspace, run by run, with who started each run."
+---
+
+**Usage** shows what every coworker of the workspace used, as it runs: for each run, its coworker, who started it, its model, its input and output tokens and its cost. Open it from the workspace menu, under **Usage**.
+
+Every member opens it. A member sees the runs of the coworkers of the Boxes they reach, and of the Chief of Staff.
+
+## Filters
+
+The bar at the top picks what the numbers count:
+
+- **The period**: Today, Last 7 days, Last 30 days, Last 90 days, Month to date, or a range picked on the calendar.
+- **Coworkers**, **Started by**, **Models** and **Cost** (**Priced** or **Not priced**), several values at once.
+
+The filters in effect show as chips under the bar, each with its own way out, and **Clear all** removes them. A click on a row of a ranking adds it as a filter.
+
+**Export CSV** downloads the runs the filters keep, one line each: when it started, its status, coworker, who started it, model, provider, input and output tokens, and cost in dollars.
+
+## What it shows
+
+- **Runs**, compared with the period of the same length just before, then the **input** and **output** tokens, and the runs **Not priced** and **Not recorded** (see below).
+- **The chart**, in **Spend** or **Tokens**, by hour, day or week (picked from the length of the period, or by hand). Its headers give the total and its change against the previous period, the average, and the busiest bar. Hover a bar to read it, with the same slot of the previous period and the coworker, person or model that weighs most in it.
+- **Three rankings**: by coworker, by who started the run, and by model.
+- **Every run**, newest first, searchable, sorted by when, input, output or cost. A run still going shows **Running**.
+
+The dialog refreshes every 15 seconds while it is open.
+
+## Who started a run
+
+- **A person**: the member who wrote to the coworker.
+- **Other coworkers**: another coworker called it.
+- **Schedules**, **Webhooks**: a routine or a webhook of the coworker.
+- **Check-ins**: the Chief of Staff woke on its own.
+- **Computer jobs**: a job ended on a [linked computer](/computers).
+- **API**: a call through the [API or an MCP client](/api/introduction).
+- **Not recorded**: a conversation from before the workspace's machine recorded who started each run. Its cost is counted in the totals, never charged to a person.
+
+## No price
+
+A run on a model Rerun does not price shows **No price** instead of a cost: a Claude or ChatGPT subscription, your own API key, or a custom endpoint. Its provider bills it. Its tokens are counted, its cost is left out of every total, and it is never shown as \$0.
+
+The cost of a run is the cost of its model. The [paid apps](/billing#paid-apps) are a monthly slot, not a cost per run: they are not in Usage.
+
+<Note>
+  Usage reads at most the 20,000 most recent runs of a period. Past that, it says so: pick a shorter period to see them all.
+</Note>
+
+The detail of one coworker (its steps, tool calls and errors) stays in the **Monitoring** and **Logs** tabs of its **Activity** screen. The Rerun credits left and their pace are in [Billing](/billing#credit-usage).
